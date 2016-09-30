@@ -15,16 +15,24 @@ namespace Symfony\Component\DependencyInjection;
  * A simple implementation of ContainerAwareInterface.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @api
  */
 abstract class ContainerAware implements ContainerAwareInterface
 {
     /**
      * @var ContainerInterface
+     *
+     * @api
      */
     protected $container;
 
     /**
-     * {@inheritdoc}
+     * Sets the Container associated with this Controller.
+     *
+     * @param ContainerInterface $container A ContainerInterface instance
+     *
+     * @api
      */
     public function setContainer(ContainerInterface $container = null)
     {

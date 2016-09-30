@@ -47,7 +47,7 @@ class ResolveInvalidReferencesPass implements CompilerPassInterface
             foreach ($definition->getMethodCalls() as $call) {
                 try {
                     $calls[] = array($call[0], $this->processArguments($call[1], true));
-                } catch (RuntimeException $e) {
+                } catch (RuntimeException $ignore) {
                     // this call is simply removed
                 }
             }
@@ -58,7 +58,7 @@ class ResolveInvalidReferencesPass implements CompilerPassInterface
                 try {
                     $value = $this->processArguments(array($value), true);
                     $properties[$name] = reset($value);
-                } catch (RuntimeException $e) {
+                } catch (RuntimeException $ignore) {
                     // ignore property
                 }
             }

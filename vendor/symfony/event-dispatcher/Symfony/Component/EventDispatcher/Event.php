@@ -51,7 +51,7 @@ class Event
      *
      * @return bool Whether propagation was already stopped for this event.
      *
-     * @return bool Whether propagation was already stopped for this event.
+     * @api
      */
     public function isPropagationStopped()
     {
@@ -64,6 +64,8 @@ class Event
      * If multiple event listeners are connected to the same event, no
      * further event listener will be triggered once any trigger calls
      * stopPropagation().
+     *
+     * @api
      */
     public function stopPropagation()
     {
@@ -101,6 +103,7 @@ class Event
     /**
      * Gets the event's name.
      *
+     * @return string
      *
      * @deprecated Deprecated in 2.4, to be removed in 3.0. The event name is passed to the listener call.
      *

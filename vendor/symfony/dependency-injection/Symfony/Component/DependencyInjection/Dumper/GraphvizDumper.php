@@ -180,7 +180,7 @@ class GraphvizDumper extends Dumper
         foreach ($container->getServiceIds() as $id) {
             $service = $container->get($id);
 
-            if (array_key_exists($id, $container->getAliases())) {
+            if (in_array($id, array_keys($container->getAliases()))) {
                 continue;
             }
 
@@ -278,7 +278,7 @@ class GraphvizDumper extends Dumper
      */
     private function dotize($id)
     {
-        return strtolower(preg_replace('/\W/i', '_', $id));
+        return strtolower(preg_replace('/[^\w]/i', '_', $id));
     }
 
     /**

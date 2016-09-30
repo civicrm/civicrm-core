@@ -31,11 +31,6 @@ class RecursiveDirectoryIterator extends \RecursiveDirectoryIterator
      */
     private $rewindable;
 
-    // these 3 properties take part of the performance optimization to avoid redoing the same work in all iterations
-    private $rootPath;
-    private $subPath;
-    private $directorySeparator = '/';
-
     /**
      * Constructor.
      *
@@ -53,10 +48,6 @@ class RecursiveDirectoryIterator extends \RecursiveDirectoryIterator
 
         parent::__construct($path, $flags);
         $this->ignoreUnreadableDirs = $ignoreUnreadableDirs;
-        $this->rootPath = (string) $path;
-        if ('/' !== DIRECTORY_SEPARATOR && !($flags & self::UNIX_PATHS)) {
-            $this->directorySeparator = DIRECTORY_SEPARATOR;
-        }
     }
 
     /**
@@ -66,17 +57,7 @@ class RecursiveDirectoryIterator extends \RecursiveDirectoryIterator
      */
     public function current()
     {
-        // the logic here avoids redoing the same work in all iterations
-
-        if (null === $subPathname = $this->subPath) {
-            $subPathname = $this->subPath = (string) $this->getSubPath();
-        }
-        if ('' !== $subPathname) {
-            $subPathname .= $this->directorySeparator;
-        }
-        $subPathname .= $this->getFilename();
-
-        return new SplFileInfo($this->rootPath.$this->directorySeparator.$subPathname, $this->subPath, $subPathname);
+        return new SplFileInfo(parent::current()->getPathname(), $this->getSubPath(), $this->getSubPathname());
     }
 
     /**
@@ -92,10 +73,6 @@ class RecursiveDirectoryIterator extends \RecursiveDirectoryIterator
             if ($children instanceof self) {
                 // parent method will call the constructor with default arguments, so unreadable dirs won't be ignored anymore
                 $children->ignoreUnreadableDirs = $this->ignoreUnreadableDirs;
-
-                // performance optimization to avoid redoing the same work in all children
-                $children->rewindable = &$this->rewindable;
-                $children->rootPath = $this->rootPath;
             }
 
             return $children;
@@ -118,10 +95,8 @@ class RecursiveDirectoryIterator extends \RecursiveDirectoryIterator
             return;
         }
 
-        // @see https://bugs.php.net/68557
-        if (PHP_VERSION_ID < 50523 || PHP_VERSION_ID >= 50600 && PHP_VERSION_ID < 50607) {
-            parent::next();
-        }
+        // @see https://bugs.php.net/bug.php?id=49104
+        parent::next();
 
         parent::rewind();
     }

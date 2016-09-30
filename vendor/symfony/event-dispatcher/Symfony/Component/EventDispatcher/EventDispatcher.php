@@ -46,9 +46,11 @@ class EventDispatcher implements EventDispatcherInterface
         $event->setDispatcher($this);
         $event->setName($eventName);
 
-        if ($listeners = $this->getListeners($eventName)) {
-            $this->doDispatch($listeners, $eventName, $event);
+        if (!isset($this->listeners[$eventName])) {
+            return $event;
         }
+
+        $this->doDispatch($this->getListeners($eventName), $eventName, $event);
 
         return $event;
     }
@@ -59,10 +61,6 @@ class EventDispatcher implements EventDispatcherInterface
     public function getListeners($eventName = null)
     {
         if (null !== $eventName) {
-            if (!isset($this->listeners[$eventName])) {
-                return array();
-            }
-
             if (!isset($this->sorted[$eventName])) {
                 $this->sortListeners($eventName);
             }
@@ -70,7 +68,7 @@ class EventDispatcher implements EventDispatcherInterface
             return $this->sorted[$eventName];
         }
 
-        foreach ($this->listeners as $eventName => $eventListeners) {
+        foreach (array_keys($this->listeners) as $eventName) {
             if (!isset($this->sorted[$eventName])) {
                 $this->sortListeners($eventName);
             }
@@ -167,7 +165,6 @@ class EventDispatcher implements EventDispatcherInterface
             if ($event->isPropagationStopped()) {
                 break;
             }
-            call_user_func($listener, $event);
         }
     }
 
@@ -180,7 +177,9 @@ class EventDispatcher implements EventDispatcherInterface
     {
         $this->sorted[$eventName] = array();
 
-        krsort($this->listeners[$eventName]);
-        $this->sorted[$eventName] = call_user_func_array('array_merge', $this->listeners[$eventName]);
+        if (isset($this->listeners[$eventName])) {
+            krsort($this->listeners[$eventName]);
+            $this->sorted[$eventName] = call_user_func_array('array_merge', $this->listeners[$eventName]);
+        }
     }
 }

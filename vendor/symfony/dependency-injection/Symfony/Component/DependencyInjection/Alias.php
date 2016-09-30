@@ -11,14 +11,21 @@
 
 namespace Symfony\Component\DependencyInjection;
 
+/**
+ * @api
+ */
 class Alias
 {
     private $id;
     private $public;
 
     /**
+     * Constructor.
+     *
      * @param string $id     Alias identifier
      * @param bool   $public If this alias is public
+     *
+     * @api
      */
     public function __construct($id, $public = true)
     {
@@ -30,6 +37,8 @@ class Alias
      * Checks if this DI Alias should be public or not.
      *
      * @return bool
+     *
+     * @api
      */
     public function isPublic()
     {
@@ -40,6 +49,8 @@ class Alias
      * Sets if this Alias is public.
      *
      * @param bool $boolean If this Alias should be public
+     *
+     * @api
      */
     public function setPublic($boolean)
     {
@@ -50,6 +61,8 @@ class Alias
      * Returns the Id of this alias.
      *
      * @return string The alias id
+     *
+     * @api
      */
     public function __toString()
     {

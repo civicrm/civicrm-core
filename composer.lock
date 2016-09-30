@@ -653,30 +653,17 @@
         },
         {
             "name": "symfony/dependency-injection",
-<<<<<<< HEAD
-            "version": "v2.3.42",
-=======
             "version": "v2.5.12",
->>>>>>> d59aa28... New files for 4.7
             "target-dir": "Symfony/Component/DependencyInjection",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/dependency-injection.git",
-<<<<<<< HEAD
-                "reference": "06265ee128644eb70356bd72ab28c9ded6618d19"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/symfony/dependency-injection/zipball/06265ee128644eb70356bd72ab28c9ded6618d19",
-                "reference": "06265ee128644eb70356bd72ab28c9ded6618d19",
-=======
                 "reference": "c42aee05b466cc9c66b87ddf7d263402befb6962"
             },
             "dist": {
                 "type": "zip",
                 "url": "https://api.github.com/repos/symfony/dependency-injection/zipball/c42aee05b466cc9c66b87ddf7d263402befb6962",
                 "reference": "c42aee05b466cc9c66b87ddf7d263402befb6962",
->>>>>>> d59aa28... New files for 4.7
                 "shasum": ""
             },
             "require": {
@@ -684,10 +671,7 @@
             },
             "require-dev": {
                 "symfony/config": "~2.2",
-<<<<<<< HEAD
-=======
                 "symfony/expression-language": "~2.4,>=2.4.10",
->>>>>>> d59aa28... New files for 4.7
                 "symfony/yaml": "~2.1"
             },
             "suggest": {
@@ -704,10 +688,7 @@
             "autoload": {
                 "psr-0": {
                     "Symfony\\Component\\DependencyInjection\\": ""
-                },
-                "exclude-from-classmap": [
-                    "/Tests/"
-                ]
+                }
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -715,63 +696,41 @@
             ],
             "authors": [
                 {
-                    "name": "Fabien Potencier",
-                    "email": "fabien@symfony.com"
+                    "name": "Symfony Community",
+                    "homepage": "http://symfony.com/contributors"
                 },
                 {
-                    "name": "Symfony Community",
-                    "homepage": "https://symfony.com/contributors"
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
                 }
             ],
             "description": "Symfony DependencyInjection Component",
-<<<<<<< HEAD
-            "homepage": "https://symfony.com",
-            "time": "2016-05-30 08:31:06"
-        },
-        {
-            "name": "symfony/event-dispatcher",
-            "version": "v2.3.42",
-=======
             "homepage": "http://symfony.com",
             "time": "2015-01-25 04:37:39"
         },
         {
             "name": "symfony/event-dispatcher",
             "version": "v2.5.12",
->>>>>>> d59aa28... New files for 4.7
             "target-dir": "Symfony/Component/EventDispatcher",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/event-dispatcher.git",
-<<<<<<< HEAD
-                "reference": "fd6d162d97bf3e6060622e5c015af39ca72e33bc"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/symfony/event-dispatcher/zipball/fd6d162d97bf3e6060622e5c015af39ca72e33bc",
-                "reference": "fd6d162d97bf3e6060622e5c015af39ca72e33bc",
-=======
                 "reference": "af6eb6a9a1a3b411facfd8e7e3f82a6be7919c04"
             },
             "dist": {
                 "type": "zip",
                 "url": "https://api.github.com/repos/symfony/event-dispatcher/zipball/af6eb6a9a1a3b411facfd8e7e3f82a6be7919c04",
                 "reference": "af6eb6a9a1a3b411facfd8e7e3f82a6be7919c04",
->>>>>>> d59aa28... New files for 4.7
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.3"
             },
             "require-dev": {
-<<<<<<< HEAD
-                "symfony/dependency-injection": "~2.0,>=2.0.5"
-=======
                 "psr/log": "~1.0",
                 "symfony/config": "~2.0,>=2.0.5",
                 "symfony/dependency-injection": "~2.0,>=2.0.5,<2.6.0",
                 "symfony/stopwatch": "~2.3"
->>>>>>> d59aa28... New files for 4.7
             },
             "suggest": {
                 "symfony/dependency-injection": "",
@@ -786,10 +745,7 @@
             "autoload": {
                 "psr-0": {
                     "Symfony\\Component\\EventDispatcher\\": ""
-                },
-                "exclude-from-classmap": [
-                    "/Tests/"
-                ]
+                }
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -797,33 +753,15 @@
             ],
             "authors": [
                 {
-                    "name": "Fabien Potencier",
-                    "email": "fabien@symfony.com"
+                    "name": "Symfony Community",
+                    "homepage": "http://symfony.com/contributors"
                 },
                 {
-                    "name": "Symfony Community",
-                    "homepage": "https://symfony.com/contributors"
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
                 }
             ],
             "description": "Symfony EventDispatcher Component",
-<<<<<<< HEAD
-            "homepage": "https://symfony.com",
-            "time": "2016-04-04 09:22:54"
-        },
-        {
-            "name": "symfony/finder",
-            "version": "v2.3.42",
-            "target-dir": "Symfony/Component/Finder",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/symfony/finder.git",
-                "reference": "dce4b58434fc1cbd66e3006e539bb53074dfea82"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/symfony/finder/zipball/dce4b58434fc1cbd66e3006e539bb53074dfea82",
-                "reference": "dce4b58434fc1cbd66e3006e539bb53074dfea82",
-=======
             "homepage": "http://symfony.com",
             "time": "2015-01-29 18:20:43"
         },
@@ -887,7 +825,6 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/symfony/Finder/zipball/e527ebf47ff912a45e148b7d0b107b80ec0b3cc2",
                 "reference": "e527ebf47ff912a45e148b7d0b107b80ec0b3cc2",
->>>>>>> d59aa28... New files for 4.7
                 "shasum": ""
             },
             "require": {
@@ -902,10 +839,7 @@
             "autoload": {
                 "psr-0": {
                     "Symfony\\Component\\Finder\\": ""
-                },
-                "exclude-from-classmap": [
-                    "/Tests/"
-                ]
+                }
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -913,33 +847,15 @@
             ],
             "authors": [
                 {
-                    "name": "Fabien Potencier",
-                    "email": "fabien@symfony.com"
+                    "name": "Symfony Community",
+                    "homepage": "http://symfony.com/contributors"
                 },
                 {
-                    "name": "Symfony Community",
-                    "homepage": "https://symfony.com/contributors"
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
                 }
             ],
             "description": "Symfony Finder Component",
-<<<<<<< HEAD
-            "homepage": "https://symfony.com",
-            "time": "2016-05-13 14:58:35"
-        },
-        {
-            "name": "symfony/process",
-            "version": "v2.3.42",
-            "target-dir": "Symfony/Component/Process",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/symfony/process.git",
-                "reference": "89aced1438655ad81fc828c2e2e555e9b88fef3b"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/symfony/process/zipball/89aced1438655ad81fc828c2e2e555e9b88fef3b",
-                "reference": "89aced1438655ad81fc828c2e2e555e9b88fef3b",
-=======
             "homepage": "http://symfony.com",
             "time": "2015-01-03 08:01:13"
         },
@@ -956,7 +872,6 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/symfony/Process/zipball/00a1308e8b5aec5eba7c8f1708426a78f929be8c",
                 "reference": "00a1308e8b5aec5eba7c8f1708426a78f929be8c",
->>>>>>> d59aa28... New files for 4.7
                 "shasum": ""
             },
             "require": {
@@ -971,10 +886,7 @@
             "autoload": {
                 "psr-0": {
                     "Symfony\\Component\\Process\\": ""
-                },
-                "exclude-from-classmap": [
-                    "/Tests/"
-                ]
+                }
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -991,10 +903,6 @@
                 }
             ],
             "description": "Symfony Process Component",
-<<<<<<< HEAD
-            "homepage": "https://symfony.com",
-            "time": "2016-03-31 08:39:43"
-=======
             "homepage": "http://symfony.com",
             "time": "2015-02-08 07:07:45"
         },
@@ -1060,7 +968,6 @@
                 "qrcode"
             ],
             "time": "2015-09-12 10:08:34"
->>>>>>> d59aa28... New files for 4.7
         },
         {
             "name": "totten/ca-config",

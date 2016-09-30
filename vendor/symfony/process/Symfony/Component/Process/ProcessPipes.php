@@ -50,11 +50,12 @@ class ProcessPipes
         // @see https://bugs.php.net/bug.php?id=51800
         if ($this->useFiles && !$this->disableOutput) {
             $this->files = array(
-                Process::STDOUT => tempnam(sys_get_temp_dir(), 'out_sf_proc'),
-                Process::STDERR => tempnam(sys_get_temp_dir(), 'err_sf_proc'),
+                Process::STDOUT => tempnam(sys_get_temp_dir(), 'sf_proc_stdout'),
+                Process::STDERR => tempnam(sys_get_temp_dir(), 'sf_proc_stderr'),
             );
             foreach ($this->files as $offset => $file) {
-                if (false === $file || false === $this->fileHandles[$offset] = fopen($file, 'rb')) {
+                $this->fileHandles[$offset] = fopen($this->files[$offset], 'rb');
+                if (false === $this->fileHandles[$offset]) {
                     throw new RuntimeException('A temporary file could not be opened to write the process output to, verify that your TEMP environment variable is writable');
                 }
             }

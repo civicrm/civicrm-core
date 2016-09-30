@@ -49,7 +49,7 @@ class XmlFileLoader extends FileLoader
         $this->parseImports($xml, $path);
 
         // parameters
-        $this->parseParameters($xml);
+        $this->parseParameters($xml, $path);
 
         // extensions
         $this->loadFromExtensions($xml);
@@ -94,7 +94,6 @@ class XmlFileLoader extends FileLoader
             return;
         }
 
-        $defaultDirectory = dirname($file);
         foreach ($imports as $import) {
             $this->setCurrentDir(dirname($file));
             $this->import($import->getAttribute('resource'), null, (bool) XmlUtils::phpize($import->getAttribute('ignore-errors')), $file);
