@@ -142,16 +142,13 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       return $params['non_deductible_amount'];
     }
     $priceSetId = CRM_Utils_Array::value('priceSetId', $params);
-
     // return non-deductible amount if it is set at the price field option level
-    if (!empty($priceSetId) && !empty($form->_lineItem) && !empty($form->_lineItem[$priceSetId])) {
-      $nonDeductibleAmount = 0;
-      foreach ($form->_lineItem[$priceSetId] as $fieldId => $options) {
-        $nonDeductibleAmount += $options['non_deductible_amount'] * $options['qty'];
-      }
-      if ($nonDeductibleAmount) {
-        return $nonDeductibleAmount;
-      }
+    if ($priceSetId && !empty($form->_lineItem)) {
+      $nonDeductibleAmount = CRM_Price_BAO_PriceSet::getNonDeductibleAmountFromPriceSet($priceSetId, $form->_lineItem);
+    }
+
+    if (!empty($nonDeductibleAmount)) {
+      return $nonDeductibleAmount;
     }
     else {
       if ($financialType->is_deductible) {
