@@ -11,7 +11,7 @@
  * contributors, visit https://github.com/PHPOffice/PHPWord/contributors.
  *
  * @link        https://github.com/PHPOffice/PHPWord
- * @copyright   2010-2014 PHPWord contributors
+ * @copyright   2010-2016 PHPWord contributors
  * @license     http://www.gnu.org/licenses/lgpl.txt LGPL version 3
  */
 
@@ -151,7 +151,9 @@ class ZipArchive
      * Close the active archive
      *
      * @return bool
+     *
      * @throws \PhpOffice\PhpWord\Exception\Exception
+     *
      * @codeCoverageIgnore Can't find any test case. Uncomment when found.
      */
     public function close()

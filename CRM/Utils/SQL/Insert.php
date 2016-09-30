@@ -88,7 +88,7 @@ class CRM_Utils_SQL_Insert {
    *
    * @param array $columns
    *
-   * @return $this
+   * @return CRM_Utils_SQL_Insert
    * @throws \CRM_Core_Exception
    */
   public function columns($columns) {

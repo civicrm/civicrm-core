@@ -11,11 +11,13 @@
  * contributors, visit https://github.com/PHPOffice/PHPWord/contributors.
  *
  * @link        https://github.com/PHPOffice/PHPWord
- * @copyright   2010-2014 PHPWord contributors
+ * @copyright   2010-2016 PHPWord contributors
  * @license     http://www.gnu.org/licenses/lgpl.txt LGPL version 3
  */
 
 namespace PhpOffice\PhpWord\Style;
+
+use PhpOffice\PhpWord\SimpleType\Jc;
 
 /**
  * Frame defines the size and position of an object
@@ -88,11 +90,9 @@ class Frame extends AbstractStyle
     const WRAP_INFRONT = 'infront';
 
     /**
-     * Alignment
-     *
-     * @var \PhpOffice\PhpWord\Style\Alignment
+     * @var string
      */
-    private $alignment;
+    private $alignment = '';
 
     /**
      * Unit
@@ -178,31 +178,59 @@ class Frame extends AbstractStyle
      */
     public function __construct($style = array())
     {
-        $this->alignment = new Alignment();
         $this->setStyleByArray($style);
     }
 
     /**
-     * Get alignment
+     * @since 0.13.0
      *
      * @return string
      */
-    public function getAlign()
+    public function getAlignment()
     {
-        return $this->alignment->getValue();
+        return $this->alignment;
     }
 
     /**
-     * Set alignment
+     * @since 0.13.0
      *
      * @param string $value
+     *
      * @return self
+     */
+    public function setAlignment($value)
+    {
+        if (Jc::getValidator()->isValid($value)) {
+            $this->alignment = $value;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @deprecated 0.13.0 Use the `getAlignment` method instead.
+     *
+     * @return string
+     *
+     * @codeCoverageIgnore
+     */
+    public function getAlign()
+    {
+        return $this->getAlignment();
+    }
+
+    /**
+     * @deprecated 0.13.0 Use the `setAlignment` method instead.
+     *
+     * @param string $value
+     *
+     * @return self
+     *
+     * @codeCoverageIgnore
      */
     public function setAlign($value = null)
     {
-        $this->alignment->setValue($value);
-
-        return $this;
+        return $this->setAlignment($value);
     }
 
     /**

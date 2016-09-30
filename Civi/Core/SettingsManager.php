@@ -99,7 +99,7 @@ class SettingsManager {
    * Ensure that all defaults values are included with
    * all current and future bags.
    *
-   * @return $this
+   * @return SettingsManager
    */
   public function useDefaults() {
     if (!$this->useDefaults) {
@@ -130,7 +130,7 @@ class SettingsManager {
    * If you call useMandatory multiple times, it will
    * re-scan the global $civicrm_setting.
    *
-   * @return $this
+   * @return SettingsManager
    */
   public function useMandatory() {
     $this->mandatory = NULL;
@@ -293,7 +293,7 @@ class SettingsManager {
   /**
    * Flush all in-memory and persistent caches related to settings.
    *
-   * @return $this
+   * @return SettingsManager
    */
   public function flush() {
     $this->mandatory = NULL;

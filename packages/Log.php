@@ -101,6 +101,10 @@ class Log
                             '%{class}'      => '%8$s',
                             '%\{'           => '%%{');
 
+    public function __construct()
+    {
+    }
+
     /**
      * Utility function which wraps PHP's class_exists() function to ensure
      * consistent behavior between PHP versions 4 and 5.  Autoloading behavior

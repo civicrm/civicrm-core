@@ -11,13 +11,13 @@
  * contributors, visit https://github.com/PHPOffice/PHPWord/contributors.
  *
  * @link        https://github.com/PHPOffice/PHPWord
- * @copyright   2010-2014 PHPWord contributors
+ * @copyright   2010-2016 PHPWord contributors
  * @license     http://www.gnu.org/licenses/lgpl.txt LGPL version 3
  */
 
 namespace PhpOffice\PhpWord\Style;
 
-use PhpOffice\PhpWord\Shared\String;
+use PhpOffice\Common\Text;
 
 /**
  * Abstract style class
@@ -161,7 +161,7 @@ abstract class AbstractStyle
         if (isset($this->aliases[$key])) {
             $key = $this->aliases[$key];
         }
-        $method = 'set' . String::removeUnderscorePrefix($key);
+        $method = 'set' . Text::removeUnderscorePrefix($key);
         if (method_exists($this, $method)) {
             $this->$method($value);
         }
@@ -278,7 +278,9 @@ abstract class AbstractStyle
      * @param mixed $value
      * @param array $enum
      * @param mixed $default
+     *
      * @return mixed
+     *
      * @throws \InvalidArgumentException
      */
     protected function setEnumVal($value = null, $enum = array(), $default = null)
@@ -337,9 +339,12 @@ abstract class AbstractStyle
     /**
      * Set style using associative array
      *
-     * @param array $style
-     * @return self
      * @deprecated 0.11.0
+     *
+     * @param array $style
+     *
+     * @return self
+     *
      * @codeCoverageIgnore
      */
     public function setArrayStyle(array $style = array())

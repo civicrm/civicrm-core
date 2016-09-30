@@ -71,7 +71,6 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
         'entity_table' => "civicrm_contribution",
         'financial_trxn_id' => $trxn->id,
         'amount' => $params['total_amount'],
-        'currency' => $trxn->currency,
       );
 
     if (!empty($trxnEntityTable)) {

@@ -11,17 +11,19 @@
  * contributors, visit https://github.com/PHPOffice/PHPWord/contributors.
  *
  * @link        https://github.com/PHPOffice/PHPWord
- * @copyright   2010-2014 PHPWord contributors
+ * @copyright   2010-2016 PHPWord contributors
  * @license     http://www.gnu.org/licenses/lgpl.txt LGPL version 3
  */
 
 namespace PhpOffice\PhpWord;
 
+use PhpOffice\PhpWord\Escaper\RegExp;
+use PhpOffice\PhpWord\Escaper\Xml;
 use PhpOffice\PhpWord\Exception\CopyFileException;
 use PhpOffice\PhpWord\Exception\CreateTemporaryFileException;
 use PhpOffice\PhpWord\Exception\Exception;
-use PhpOffice\PhpWord\Shared\String;
 use PhpOffice\PhpWord\Shared\ZipArchive;
+use Zend\Stdlib\StringUtils;
 
 class TemplateProcessor
 {
@@ -98,61 +100,140 @@ class TemplateProcessor
             );
             $index++;
         }
-        $this->tempDocumentMainPart = $this->fixBrokenMacros($this->zipClass->getFromName('word/document.xml'));
+        $this->tempDocumentMainPart = $this->fixBrokenMacros($this->zipClass->getFromName($this->getMainPartName()));
+    }
+
+    /**
+     * @param string $xml
+     * @param \XSLTProcessor $xsltProcessor
+     *
+     * @return string
+     *
+     * @throws \PhpOffice\PhpWord\Exception\Exception
+     */
+    protected function transformSingleXml($xml, $xsltProcessor)
+    {
+        $domDocument = new \DOMDocument();
+        if (false === $domDocument->loadXML($xml)) {
+            throw new Exception('Could not load the given XML document.');
+        }
+
+        $transformedXml = $xsltProcessor->transformToXml($domDocument);
+        if (false === $transformedXml) {
+            throw new Exception('Could not transform the given XML document.');
+        }
+
+        return $transformedXml;
+    }
+
+    /**
+     * @param mixed $xml
+     * @param \XSLTProcessor $xsltProcessor
+     *
+     * @return mixed
+     */
+    protected function transformXml($xml, $xsltProcessor)
+    {
+        if (is_array($xml)) {
+            foreach ($xml as &$item) {
+                $item = $this->transformSingleXml($item, $xsltProcessor);
+            }
+        } else {
+            $xml = $this->transformSingleXml($xml, $xsltProcessor);
+        }
+
+        return $xml;
     }
 
     /**
      * Applies XSL style sheet to template's parts.
+     * 
+     * Note: since the method doesn't make any guess on logic of the provided XSL style sheet,
+     * make sure that output is correctly escaped. Otherwise you may get broken document.
      *
-     * @param \DOMDocument $xslDOMDocument
+     * @param \DOMDocument $xslDomDocument
      * @param array $xslOptions
-     * @param string $xslOptionsURI
+     * @param string $xslOptionsUri
      *
      * @return void
      *
      * @throws \PhpOffice\PhpWord\Exception\Exception
      */
-    public function applyXslStyleSheet($xslDOMDocument, $xslOptions = array(), $xslOptionsURI = '')
+    public function applyXslStyleSheet($xslDomDocument, $xslOptions = array(), $xslOptionsUri = '')
     {
         $xsltProcessor = new \XSLTProcessor();
 
-        $xsltProcessor->importStylesheet($xslDOMDocument);
-
-        if (false === $xsltProcessor->setParameter($xslOptionsURI, $xslOptions)) {
+        $xsltProcessor->importStylesheet($xslDomDocument);
+        if (false === $xsltProcessor->setParameter($xslOptionsUri, $xslOptions)) {
             throw new Exception('Could not set values for the given XSL style sheet parameters.');
         }
 
-        $xmlDOMDocument = new \DOMDocument();
-        if (false === $xmlDOMDocument->loadXML($this->tempDocumentMainPart)) {
-            throw new Exception('Could not load XML from the given template.');
-        }
-
-        $xmlTransformed = $xsltProcessor->transformToXml($xmlDOMDocument);
-        if (false === $xmlTransformed) {
-            throw new Exception('Could not transform the given XML document.');
-        }
-
-        $this->tempDocumentMainPart = $xmlTransformed;
+        $this->tempDocumentHeaders = $this->transformXml($this->tempDocumentHeaders, $xsltProcessor);
+        $this->tempDocumentMainPart = $this->transformXml($this->tempDocumentMainPart, $xsltProcessor);
+        $this->tempDocumentFooters = $this->transformXml($this->tempDocumentFooters, $xsltProcessor);
     }
 
     /**
-     * @param mixed $macro
+     * @param string $macro
+     *
+     * @return string
+     */
+    protected static function ensureMacroCompleted($macro)
+    {
+        if (substr($macro, 0, 2) !== '${' && substr($macro, -1) !== '}') {
+            $macro = '${' . $macro . '}';
+        }
+
+        return $macro;
+    }
+
+    /**
+     * @param string $subject
+     *
+     * @return string
+     */
+    protected static function ensureUtf8Encoded($subject)
+    {
+        if (!StringUtils::isValidUtf8($subject)) {
+            $subject = utf8_encode($subject);
+        }
+
+        return $subject;
+    }
+
+    /**
+     * @param mixed $search
      * @param mixed $replace
      * @param integer $limit
      *
      * @return void
      */
-    public function setValue($macro, $replace, $limit = self::MAXIMUM_REPLACEMENTS_DEFAULT)
+    public function setValue($search, $replace, $limit = self::MAXIMUM_REPLACEMENTS_DEFAULT)
     {
-        foreach ($this->tempDocumentHeaders as $index => $headerXML) {
-            $this->tempDocumentHeaders[$index] = $this->setValueForPart($this->tempDocumentHeaders[$index], $macro, $replace, $limit);
+        if (is_array($search)) {
+            foreach ($search as &$item) {
+                $item = self::ensureMacroCompleted($item);
+            }
+        } else {
+            $search = self::ensureMacroCompleted($search);
         }
 
-        $this->tempDocumentMainPart = $this->setValueForPart($this->tempDocumentMainPart, $macro, $replace, $limit);
-
-        foreach ($this->tempDocumentFooters as $index => $headerXML) {
-            $this->tempDocumentFooters[$index] = $this->setValueForPart($this->tempDocumentFooters[$index], $macro, $replace, $limit);
+        if (is_array($replace)) {
+            foreach ($replace as &$item) {
+                $item = self::ensureUtf8Encoded($item);
+            }
+        } else {
+            $replace = self::ensureUtf8Encoded($replace);
         }
+
+        if (Settings::isOutputEscapingEnabled()) {
+            $xmlEscaper = new Xml();
+            $replace = $xmlEscaper->escape($replace);
+        }
+
+        $this->tempDocumentHeaders = $this->setValueForPart($search, $replace, $this->tempDocumentHeaders, $limit);
+        $this->tempDocumentMainPart = $this->setValueForPart($search, $replace, $this->tempDocumentMainPart, $limit);
+        $this->tempDocumentFooters = $this->setValueForPart($search, $replace, $this->tempDocumentFooters, $limit);
     }
 
     /**
@@ -317,14 +398,14 @@ class TemplateProcessor
      */
     public function save()
     {
-        foreach ($this->tempDocumentHeaders as $index => $headerXML) {
-            $this->zipClass->addFromString($this->getHeaderName($index), $this->tempDocumentHeaders[$index]);
+        foreach ($this->tempDocumentHeaders as $index => $xml) {
+            $this->zipClass->addFromString($this->getHeaderName($index), $xml);
         }
 
-        $this->zipClass->addFromString('word/document.xml', $this->tempDocumentMainPart);
+        $this->zipClass->addFromString($this->getMainPartName(), $this->tempDocumentMainPart);
 
-        foreach ($this->tempDocumentFooters as $index => $headerXML) {
-            $this->zipClass->addFromString($this->getFooterName($index), $this->tempDocumentFooters[$index]);
+        foreach ($this->tempDocumentFooters as $index => $xml) {
+            $this->zipClass->addFromString($this->getFooterName($index), $xml);
         }
 
         // Close zip file
@@ -353,7 +434,7 @@ class TemplateProcessor
         }
 
         /*
-         * Note: we do not use ``rename`` function here, because it looses file ownership data on Windows platform.
+         * Note: we do not use `rename` function here, because it looses file ownership data on Windows platform.
          * As a result, user cannot open the file directly getting "Access denied" message.
          *
          * @see https://github.com/PHPOffice/PHPWord/issues/532
@@ -366,8 +447,6 @@ class TemplateProcessor
      * Finds parts of broken macros and sticks them together.
      * Macros, while being edited, could be implicitly broken by some of the word processors.
      *
-     * @since 0.13.0
-     *
      * @param string $documentPart The document part in XML representation.
      *
      * @return string
@@ -377,7 +456,7 @@ class TemplateProcessor
         $fixedDocumentPart = $documentPart;
 
         $fixedDocumentPart = preg_replace_callback(
-            '|\$\{([^\}]+)\}|U',
+            '|\$[^{]*\{[^}]*\}|U',
             function ($match) {
                 return strip_tags($match[0]);
             },
@@ -390,30 +469,21 @@ class TemplateProcessor
     /**
      * Find and replace macros in the given XML section.
      *
+     * @param mixed $search
+     * @param mixed $replace
      * @param string $documentPartXML
-     * @param string $search
-     * @param string $replace
      * @param integer $limit
      *
      * @return string
      */
-    protected function setValueForPart($documentPartXML, $search, $replace, $limit)
+    protected function setValueForPart($search, $replace, $documentPartXML, $limit)
     {
-        if (substr($search, 0, 2) !== '${' && substr($search, -1) !== '}') {
-            $search = '${' . $search . '}';
-        }
-
-        if (!String::isUTF8($replace)) {
-            $replace = utf8_encode($replace);
-        }
-
         // Note: we can't use the same function for both cases here, because of performance considerations.
         if (self::MAXIMUM_REPLACEMENTS_DEFAULT === $limit) {
             return str_replace($search, $replace, $documentPartXML);
         } else {
-            $regExpDelim = '/';
-            $escapedSearch = preg_quote($search, $regExpDelim);
-            return preg_replace("{$regExpDelim}{$escapedSearch}{$regExpDelim}u", $replace, $documentPartXML, $limit);
+            $regExpEscaper = new RegExp();
+            return preg_replace($regExpEscaper->escape($search), $replace, $documentPartXML, $limit);
         }
     }
 
@@ -432,18 +502,6 @@ class TemplateProcessor
     }
 
     /**
-     * Get the name of the footer file for $index.
-     *
-     * @param integer $index
-     *
-     * @return string
-     */
-    protected function getFooterName($index)
-    {
-        return sprintf('word/footer%d.xml', $index);
-    }
-
-    /**
      * Get the name of the header file for $index.
      *
      * @param integer $index
@@ -453,6 +511,26 @@ class TemplateProcessor
     protected function getHeaderName($index)
     {
         return sprintf('word/header%d.xml', $index);
+    }
+
+    /**
+     * @return string
+     */
+    protected function getMainPartName()
+    {
+        return 'word/document.xml';
+    }
+
+    /**
+     * Get the name of the footer file for $index.
+     *
+     * @param integer $index
+     *
+     * @return string
+     */
+    protected function getFooterName($index)
+    {
+        return sprintf('word/footer%d.xml', $index);
     }
 
     /**

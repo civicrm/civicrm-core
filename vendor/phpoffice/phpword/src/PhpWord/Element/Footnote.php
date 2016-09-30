@@ -11,7 +11,7 @@
  * contributors, visit https://github.com/PHPOffice/PHPWord/contributors.
  *
  * @link        https://github.com/PHPOffice/PHPWord
- * @copyright   2010-2014 PHPWord contributors
+ * @copyright   2010-2016 PHPWord contributors
  * @license     http://www.gnu.org/licenses/lgpl.txt LGPL version 3
  */
 
@@ -20,7 +20,7 @@ namespace PhpOffice\PhpWord\Element;
 use PhpOffice\PhpWord\Style\Paragraph;
 
 /**
- * Footnote element
+ * @codeCoverageIgnore
  */
 class Footnote extends AbstractContainer
 {
@@ -67,9 +67,9 @@ class Footnote extends AbstractContainer
     /**
      * Get Footnote Reference ID
      *
-     * @return int
      * @deprecated 0.10.0
-     * @codeCoverageIgnore
+     *
+     * @return int
      */
     public function getReferenceId()
     {
@@ -79,9 +79,9 @@ class Footnote extends AbstractContainer
     /**
      * Set Footnote Reference ID
      *
-     * @param int $rId
      * @deprecated 0.10.0
-     * @codeCoverageIgnore
+     *
+     * @param int $rId
      */
     public function setReferenceId($rId)
     {

@@ -11,7 +11,7 @@
  * contributors, visit https://github.com/PHPOffice/PHPWord/contributors.
  *
  * @link        https://github.com/PHPOffice/PHPWord
- * @copyright   2010-2014 PHPWord contributors
+ * @copyright   2010-2016 PHPWord contributors
  * @license     http://www.gnu.org/licenses/lgpl.txt LGPL version 3
  */
 
@@ -158,6 +158,8 @@ abstract class AbstractContainer extends AbstractElement
      * Get all elements
      *
      * @return array
+     *
+     * @codeCoverageIgnore
      */
     public function getElements()
     {
@@ -178,7 +180,9 @@ abstract class AbstractContainer extends AbstractElement
      * Check if a method is allowed for the current container
      *
      * @param string $method
+     *
      * @return bool
+     *
      * @throws \BadMethodCallException
      */
     private function checkValidity($method)
@@ -245,25 +249,14 @@ abstract class AbstractContainer extends AbstractElement
     }
 
     /**
-     * Add memory image element
-     *
-     * @param string $src
-     * @param mixed $style
-     * @return \PhpOffice\PhpWord\Element\Image
-     * @deprecated 0.9.0
-     * @codeCoverageIgnore
-     */
-    public function addMemoryImage($src, $style = null)
-    {
-        return $this->addImage($src, $style);
-    }
-
-    /**
      * Create textrun element
      *
-     * @param mixed $paragraphStyle
-     * @return \PhpOffice\PhpWord\Element\TextRun
      * @deprecated 0.10.0
+     *
+     * @param mixed $paragraphStyle
+     *
+     * @return \PhpOffice\PhpWord\Element\TextRun
+     *
      * @codeCoverageIgnore
      */
     public function createTextRun($paragraphStyle = null)
@@ -274,9 +267,12 @@ abstract class AbstractContainer extends AbstractElement
     /**
      * Create footnote element
      *
-     * @param mixed $paragraphStyle
-     * @return \PhpOffice\PhpWord\Element\Footnote
      * @deprecated 0.10.0
+     *
+     * @param mixed $paragraphStyle
+     *
+     * @return \PhpOffice\PhpWord\Element\Footnote
+     *
      * @codeCoverageIgnore
      */
     public function createFootnote($paragraphStyle = null)

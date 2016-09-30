@@ -11,7 +11,7 @@ $filler = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. '
 
 // Normal
 $section = $phpWord->addSection();
-$section->addText(htmlspecialchars("Normal paragraph. {$filler}"));
+$section->addText("Normal paragraph. {$filler}");
 
 // Two columns
 $section = $phpWord->addSection(
@@ -21,11 +21,11 @@ $section = $phpWord->addSection(
         'breakType' => 'continuous',
     )
 );
-$section->addText(htmlspecialchars("Two columns, one inch (1440 twips) spacing. {$filler}"));
+$section->addText("Two columns, one inch (1440 twips) spacing. {$filler}");
 
 // Normal
 $section = $phpWord->addSection(array('breakType' => 'continuous'));
-$section->addText(htmlspecialchars("Normal paragraph again. {$filler}"));
+$section->addText("Normal paragraph again. {$filler}");
 
 // Three columns
 $section = $phpWord->addSection(
@@ -35,11 +35,11 @@ $section = $phpWord->addSection(
         'breakType' => 'continuous',
     )
 );
-$section->addText(htmlspecialchars("Three columns, half inch (720 twips) spacing. {$filler}"));
+$section->addText("Three columns, half inch (720 twips) spacing. {$filler}");
 
 // Normal
 $section = $phpWord->addSection(array('breakType' => 'continuous'));
-$section->addText(htmlspecialchars('Normal paragraph again.'));
+$section->addText("Normal paragraph again. {$filler}");
 
 // Save file
 echo write($phpWord, basename(__FILE__, '.php'), $writers);

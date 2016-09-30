@@ -11,7 +11,7 @@
  * contributors, visit https://github.com/PHPOffice/PHPWord/contributors.
  *
  * @link        https://github.com/PHPOffice/PHPWord
- * @copyright   2010-2014 PHPWord contributors
+ * @copyright   2010-2016 PHPWord contributors
  * @license     http://www.gnu.org/licenses/lgpl.txt LGPL version 3
  */
 
@@ -94,7 +94,9 @@ class Field extends AbstractElement
      * Set Field type
      *
      * @param string $type
+     *
      * @return string
+     *
      * @throws \InvalidArgumentException
      */
     public function setType($type = null)
@@ -123,7 +125,9 @@ class Field extends AbstractElement
      * Set Field properties
      *
      * @param array $properties
+     *
      * @return self
+     *
      * @throws \InvalidArgumentException
      */
     public function setProperties($properties = array())
@@ -153,7 +157,9 @@ class Field extends AbstractElement
      * Set Field options
      *
      * @param array $options
+     *
      * @return self
+     *
      * @throws \InvalidArgumentException
      */
     public function setOptions($options = array())

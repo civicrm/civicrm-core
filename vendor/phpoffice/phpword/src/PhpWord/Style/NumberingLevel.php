@@ -11,11 +11,13 @@
  * contributors, visit https://github.com/PHPOffice/PHPWord/contributors.
  *
  * @link        https://github.com/PHPOffice/PHPWord
- * @copyright   2010-2014 PHPWord contributors
+ * @copyright   2010-2016 PHPWord contributors
  * @license     http://www.gnu.org/licenses/lgpl.txt LGPL version 3
  */
 
 namespace PhpOffice\PhpWord\Style;
+
+use PhpOffice\PhpWord\SimpleType\Jc;
 
 /**
  * Numbering level definition
@@ -81,12 +83,9 @@ class NumberingLevel extends AbstractStyle
     private $text;
 
     /**
-     * Align left|center|right|both
-     *
      * @var string
-     * @link http://www.schemacentral.com/sc/ooxml/e-w_lvlJc-1.html
      */
-    private $align;
+    private $alignment = '';
 
     /**
      * Left
@@ -281,26 +280,55 @@ class NumberingLevel extends AbstractStyle
     }
 
     /**
-     * Get align
+     * @since 0.13.0
      *
      * @return string
      */
-    public function getAlign()
+    public function getAlignment()
     {
-        return $this->align;
+        return $this->alignment;
     }
 
     /**
-     * Set align
+     * @since 0.13.0
      *
      * @param string $value
+     *
      * @return self
+     */
+    public function setAlignment($value)
+    {
+        if (Jc::getValidator()->isValid($value)) {
+            $this->alignment = $value;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @deprecated 0.13.0 Use the `getAlignment` method instead.
+     *
+     * @return string
+     *
+     * @codeCoverageIgnore
+     */
+    public function getAlign()
+    {
+        return $this->getAlignment();
+    }
+
+    /**
+     * @deprecated 0.13.0 Use the `setAlignment` method instead.
+     *
+     * @param string $value
+     *
+     * @return self
+     *
+     * @codeCoverageIgnore
      */
     public function setAlign($value)
     {
-        $enum = array('left', 'center', 'right', 'both');
-        $this->align = $this->setEnumVal($value, $enum, $this->align);
-        return $this;
+        return $this->setAlignment($value);
     }
 
     /**

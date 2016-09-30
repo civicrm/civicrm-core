@@ -11,14 +11,16 @@
  * contributors, visit https://github.com/PHPOffice/PHPWord/contributors.
  *
  * @link        https://github.com/PHPOffice/PHPWord
- * @copyright   2010-2014 PHPWord contributors
+ * @copyright   2010-2016 PHPWord contributors
  * @license     http://www.gnu.org/licenses/lgpl.txt LGPL version 3
  */
 
 namespace PhpOffice\PhpWord;
 
 /**
- * @deprecated 0.12.0 Use \PhpOffice\PhpWord\TemplateProcessor instead.
+ * @deprecated 0.12.0 Use `\PhpOffice\PhpWord\TemplateProcessor` instead.
+ *
+ * @codeCoverageIgnore
  */
 class Template extends TemplateProcessor
 {

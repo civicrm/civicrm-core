@@ -41,7 +41,7 @@ class civicrm_handler_filter_relationship_type extends views_handler_filter_in_o
         return;
       }
       require_once 'CRM/Core/PseudoConstant.php';
-      $relationshipType_array = CRM_Core_PseudoConstant::relationshipType($columnName = 'name');
+      $relationshipType_array = CRM_Core_PseudoConstant::relationshipType($columnName = 'label');
 
       // relationshipType() returns information about relations as array with fields
       // 'label_a_b', 'label_b_a', 'contact_type_a' and 'contact_type_b'.
@@ -49,7 +49,7 @@ class civicrm_handler_filter_relationship_type extends views_handler_filter_in_o
 
       $options = array();
       foreach ($relationshipType_array as $id => $value_array) {
-        $options[$id] = $value_array['name_a_b'];
+        $options[$id] = $value_array['label_a_b'];
       }
 
       self::$_relationshipType = $options;

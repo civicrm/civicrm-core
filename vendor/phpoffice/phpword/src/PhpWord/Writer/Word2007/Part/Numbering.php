@@ -11,16 +11,16 @@
  * contributors, visit https://github.com/PHPOffice/PHPWord/contributors.
  *
  * @link        https://github.com/PHPOffice/PHPWord
- * @copyright   2010-2014 PHPWord contributors
+ * @copyright   2010-2016 PHPWord contributors
  * @license     http://www.gnu.org/licenses/lgpl.txt LGPL version 3
  */
 
 namespace PhpOffice\PhpWord\Writer\Word2007\Part;
 
-use PhpOffice\PhpWord\Shared\XMLWriter;
+use PhpOffice\Common\XMLWriter;
+use PhpOffice\PhpWord\Style;
 use PhpOffice\PhpWord\Style\Numbering as NumberingStyle;
 use PhpOffice\PhpWord\Style\NumberingLevel;
-use PhpOffice\PhpWord\Style;
 
 /**
  * Word2007 numbering part writer: word/numbering.xml
@@ -97,7 +97,7 @@ class Numbering extends AbstractPart
     /**
      * Write level.
      *
-     * @param \PhpOffice\PhpWord\Shared\XMLWriter $xmlWriter
+     * @param \PhpOffice\Common\XMLWriter $xmlWriter
      * @param \PhpOffice\PhpWord\Style\NumberingLevel $level
      * @return void
      */
@@ -108,17 +108,18 @@ class Numbering extends AbstractPart
 
         // Numbering level properties
         $properties = array(
-            'start'   => 'start',
-            'format'  => 'numFmt',
-            'restart' => 'lvlRestart',
-            'pStyle'  => 'pStyle',
-            'suffix'  => 'suff',
-            'text'    => 'lvlText',
-            'align'   => 'lvlJc'
+            'start'     => 'start',
+            'format'    => 'numFmt',
+            'restart'   => 'lvlRestart',
+            'pStyle'    => 'pStyle',
+            'suffix'    => 'suff',
+            'text'      => 'lvlText',
+            'alignment' => 'lvlJc',
         );
         foreach ($properties as $property => $nodeName) {
             $getMethod = "get{$property}";
-            if (!is_null($level->$getMethod())) {
+            if ('' !== $level->$getMethod()         // this condition is now supported by `alignment` only
+                && !is_null($level->$getMethod())) {
                 $xmlWriter->startElement("w:{$nodeName}");
                 $xmlWriter->writeAttribute('w:val', $level->$getMethod());
                 $xmlWriter->endElement(); // w:start
@@ -137,7 +138,7 @@ class Numbering extends AbstractPart
      *
      * @since 0.11.0
      *
-     * @param \PhpOffice\PhpWord\Shared\XMLWriter $xmlWriter
+     * @param \PhpOffice\Common\XMLWriter $xmlWriter
      * @param \PhpOffice\PhpWord\Style\NumberingLevel $level
      * @return void
      * @todo Use paragraph style writer
@@ -170,7 +171,7 @@ class Numbering extends AbstractPart
      *
      * @since 0.11.0
      *
-     * @param \PhpOffice\PhpWord\Shared\XMLWriter $xmlWriter
+     * @param \PhpOffice\Common\XMLWriter $xmlWriter
      * @param \PhpOffice\PhpWord\Style\NumberingLevel $level
      * @return void
      * @todo Use font style writer

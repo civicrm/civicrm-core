@@ -11,18 +11,14 @@
  * contributors, visit https://github.com/PHPOffice/PHPWord/contributors.
  *
  * @link        https://github.com/PHPOffice/PHPWord
- * @copyright   2010-2014 PHPWord contributors
+ * @copyright   2010-2016 PHPWord contributors
  * @license     http://www.gnu.org/licenses/lgpl.txt LGPL version 3
  */
 
 namespace PhpOffice\PhpWord\Element;
 
-use PhpOffice\PhpWord\Exception\Exception;
 use PhpOffice\PhpWord\Style\Section as SectionStyle;
 
-/**
- * Section
- */
 class Section extends AbstractContainer
 {
     /**
@@ -82,6 +78,8 @@ class Section extends AbstractContainer
      * Get section style
      *
      * @return \PhpOffice\PhpWord\Style\Section
+     *
+     * @codeCoverageIgnore
      */
     public function getStyle()
     {
@@ -91,9 +89,11 @@ class Section extends AbstractContainer
     /**
      * Add header
      *
-     * @param string $type
-     * @return Header
      * @since 0.10.0
+     *
+     * @param string $type
+     *
+     * @return Header
      */
     public function addHeader($type = Header::AUTO)
     {
@@ -103,9 +103,11 @@ class Section extends AbstractContainer
     /**
      * Add footer
      *
-     * @param string $type
-     * @return Footer
      * @since 0.10.0
+     *
+     * @param string $type
+     *
+     * @return Footer
      */
     public function addFooter($type = Header::AUTO)
     {
@@ -116,6 +118,8 @@ class Section extends AbstractContainer
      * Get header elements
      *
      * @return Header[]
+     *
+     * @codeCoverageIgnore
      */
     public function getHeaders()
     {
@@ -126,6 +130,8 @@ class Section extends AbstractContainer
      * Get footer elements
      *
      * @return Footer[]
+     *
+     * @codeCoverageIgnore
      */
     public function getFooters()
     {
@@ -153,11 +159,14 @@ class Section extends AbstractContainer
     /**
      * Add header/footer
      *
+     * @since 0.10.0
+     *
      * @param string $type
      * @param boolean $header
+     *
      * @return Header|Footer
-     * @throws \PhpOffice\PhpWord\Exception\Exception
-     * @since 0.10.0
+     *
+     * @throws \Exception
      */
     private function addHeaderFooter($type = Header::AUTO, $header = true)
     {
@@ -175,7 +184,7 @@ class Section extends AbstractContainer
             $collection[$index] = $container;
             return $container;
         } else {
-            throw new Exception('Invalid header/footer type.');
+            throw new \Exception('Invalid header/footer type.');
         }
 
     }
@@ -183,8 +192,10 @@ class Section extends AbstractContainer
     /**
      * Set section style
      *
-     * @param array $settings
      * @deprecated 0.12.0
+     *
+     * @param array $settings
+     *
      * @codeCoverageIgnore
      */
     public function setSettings($settings = null)
@@ -195,8 +206,10 @@ class Section extends AbstractContainer
     /**
      * Get section style
      *
-     * @return \PhpOffice\PhpWord\Style\Section
      * @deprecated 0.12.0
+     *
+     * @return \PhpOffice\PhpWord\Style\Section
+     *
      * @codeCoverageIgnore
      */
     public function getSettings()
@@ -207,8 +220,10 @@ class Section extends AbstractContainer
     /**
      * Create header
      *
-     * @return Header
      * @deprecated 0.10.0
+     *
+     * @return Header
+     *
      * @codeCoverageIgnore
      */
     public function createHeader()
@@ -219,8 +234,10 @@ class Section extends AbstractContainer
     /**
      * Create footer
      *
-     * @return Footer
      * @deprecated 0.10.0
+     *
+     * @return Footer
+     *
      * @codeCoverageIgnore
      */
     public function createFooter()
@@ -231,8 +248,10 @@ class Section extends AbstractContainer
     /**
      * Get footer
      *
-     * @return Footer
      * @deprecated 0.10.0
+     *
+     * @return Footer
+     *
      * @codeCoverageIgnore
      */
     public function getFooter()

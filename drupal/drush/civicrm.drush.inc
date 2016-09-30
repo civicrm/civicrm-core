@@ -386,7 +386,7 @@ function _civicrm_install_db($dbuser, $dbpass, $dbhost, $dbname,
 
   if (function_exists('mysqli_connect')) {
     $dbhostParts = explode(':', $dbhost);
-    $conn = @mysqli_connect($dbhostParts[0], $dbuser, $dbpass, '', isset($dbhostParts[1]) ? $dbhostParts[1] : '');
+    $conn = @mysqli_connect($dbhostParts[0], $dbuser, $dbpass, '', isset($dbhostParts[1]) ? $dbhostParts[1] : NULL);
     $dbOK = ($a = @mysqli_select_db($conn, $dbname)) || ($b = @mysqli_query($conn, "CREATE DATABASE $dbname"));
   }
   elseif (function_exists('mysql_connect')) {

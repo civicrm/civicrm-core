@@ -11,7 +11,7 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
   /**
    * @param array $params
    *
-   * @return $this
+   * @return CRM_Event_Cart_BAO_Cart
    */
   public static function add(&$params) {
     $cart = new CRM_Event_Cart_BAO_Cart();
@@ -57,7 +57,7 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
   /**
    * @param array $params
    *
-   * @return $this
+   * @return CRM_Event_Cart_BAO_Cart
    * @throws Exception
    */
   public static function create($params) {

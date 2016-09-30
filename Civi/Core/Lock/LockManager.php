@@ -107,7 +107,7 @@ class LockManager {
    * @param string|array $factory
    *   A callback. The callback should accept a $name parameter.
    *   Callbacks will be located using the resolver.
-   * @return $this
+   * @return LockManager
    * @see Resolver
    */
   public function register($pattern, $factory) {

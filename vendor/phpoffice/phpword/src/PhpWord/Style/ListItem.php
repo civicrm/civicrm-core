@@ -11,7 +11,7 @@
  * contributors, visit https://github.com/PHPOffice/PHPWord/contributors.
  *
  * @link        https://github.com/PHPOffice/PHPWord
- * @copyright   2010-2014 PHPWord contributors
+ * @copyright   2010-2016 PHPWord contributors
  * @license     http://www.gnu.org/licenses/lgpl.txt LGPL version 3
  */
 
@@ -155,7 +155,7 @@ class ListItem extends AbstractStyle
         }
 
         // Property mapping for numbering level information
-        $properties = array('start', 'format', 'text', 'align', 'tabPos', 'left', 'hanging', 'font', 'hint');
+        $properties = array('start', 'format', 'text', 'alignment', 'tabPos', 'left', 'hanging', 'font', 'hint');
 
         // Legacy level information
         $listTypeStyles = array(

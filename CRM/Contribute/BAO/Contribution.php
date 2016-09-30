@@ -188,6 +188,12 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
 
     // CRM-16189
     CRM_Financial_BAO_FinancialAccount::checkFinancialTypeHasDeferred($params, $contributionID);
+    if ($contributionID && !empty($params['revenue_recognition_date']) && !empty($params['prevContribution'])
+      && !($contributionStatus[$params['prevContribution']->contribution_status_id] == 'Pending')
+      && !self::allowUpdateRevenueRecognitionDate($contributionID)
+    ) {
+      unset($params['revenue_recognition_date']);
+    }
 
     if (!isset($params['tax_amount']) && $setPrevContribution && (isset($params['total_amount']) ||
      isset($params['financial_type_id']))) {
@@ -3469,22 +3475,10 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         $deferredFinancialAccount = CRM_Contribute_PseudoConstant::financialAccountType($params['prevContribution']->financial_type_id, $relationTypeId);
       }
       $lastFinancialTrxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($params['prevContribution']->id, 'DESC', FALSE, NULL, $deferredFinancialAccount);
-      if ($params['trxnParams']['total_amount'] < 0) {
-        if (!empty($lastFinancialTrxnId['financialTrxnId'])) {
-          if ($params['total_amount'] > 0) {
-            $params['trxnParams']['to_financial_account_id'] = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialTrxn', $lastFinancialTrxnId['financialTrxnId'], 'to_financial_account_id');
-            $params['trxnParams']['payment_instrument_id'] = $params['prevContribution']->payment_instrument_id;
-          }
-          else {
-            $params['trxnParams']['to_financial_account_id'] = $params['to_financial_account_id'];
-            $params['trxnParams']['payment_instrument_id'] = $params['contribution']->payment_instrument_id;
-          }
-        }
-      }
-      else {
-        if ($params['total_amount'] < 0) {
-          $params['trxnParams']['payment_instrument_id'] = $params['prevContribution']->payment_instrument_id;
+      if (!empty($lastFinancialTrxnId['financialTrxnId'])) {
+        if ($params['total_amount'] != $params['trxnParams']['total_amount']) {
           $params['trxnParams']['to_financial_account_id'] = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialTrxn', $lastFinancialTrxnId['financialTrxnId'], 'to_financial_account_id');
+          $params['trxnParams']['payment_instrument_id'] = $params['prevContribution']->payment_instrument_id;
         }
         else {
           $params['trxnParams']['to_financial_account_id'] = $params['to_financial_account_id'];
@@ -3608,21 +3602,14 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       foreach ($params['line_item'] as $lineitems) {
         foreach ($lineitems as $fieldValueId => $fieldValues) {
           $prevFinancialItem = CRM_Financial_BAO_FinancialItem::getPreviousFinancialItem($fieldValues['id']);
-          if (!CRM_Utils_Rule::currencyCode($trxn->currency)) {
-            $trxn->currency = CRM_Core_Config::singleton()->defaultCurrency;
-          }
-
           // save to entity_financial_trxn table
           $entityFinancialTrxnParams = array(
             'entity_table' => "civicrm_financial_item",
             'entity_id' => $prevFinancialItem->id,
             'financial_trxn_id' => $trxn->id,
             'amount' => $trxn->total_amount,
-            'currency' => $trxn->currency,
           );
-          $entityTrxn = new CRM_Financial_DAO_EntityFinancialTrxn();
-          $entityTrxn->copyValues($entityFinancialTrxnParams);
-          $entityTrxn->save();
+          civicrm_api3('entityFinancialTrxn', 'create', $entityFinancialTrxnParams);
         }
       }
     }
@@ -5294,6 +5281,34 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
     else {
       parent::assignTestValues($fieldName, $fieldDef, $counter);
     }
+  }
+
+  /**
+   * Check if contribution has participant/membership payment.
+   *
+   * @param int $contributionId
+   *   Contribution ID
+   *
+   * @return bool
+   */
+  public static function allowUpdateRevenueRecognitionDate($contributionId) {
+    // get line item for contribution
+    $lineItems = CRM_Price_BAO_LineItem::getLineItems($contributionId, 'contribution', NULL, TRUE, TRUE);
+    // check if line item is for membership or participant
+    foreach ($lineItems as $items) {
+      if ($items['entity_table'] == 'civicrm_participant') {
+        $flag = FALSE;
+        break;
+      }
+      elseif ($items['entity_table'] == 'civicrm_membership') {
+        $flag = FALSE;
+      }
+      else {
+        $flag = TRUE;
+        break;
+      }
+    }
+    return $flag;
   }
 
 }

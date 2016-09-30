@@ -11,7 +11,7 @@
  * contributors, visit https://github.com/PHPOffice/PHPWord/contributors.
  *
  * @link        https://github.com/PHPOffice/PHPWord
- * @copyright   2010-2014 PHPWord contributors
+ * @copyright   2010-2016 PHPWord contributors
  * @license     http://www.gnu.org/licenses/lgpl.txt LGPL version 3
  */
 namespace PhpOffice\PhpWord\Style;
@@ -133,7 +133,9 @@ class Image extends Frame
      * Set wrapping style
      *
      * @param string $wrappingStyle
+     *
      * @throws \InvalidArgumentException
+     *
      * @return self
      */
     public function setWrappingStyle($wrappingStyle)
@@ -157,7 +159,9 @@ class Image extends Frame
      * Set positioning type
      *
      * @param string $positioning
+     *
      * @throws \InvalidArgumentException
+     *
      * @return self
      */
     public function setPositioning($positioning)
@@ -181,7 +185,9 @@ class Image extends Frame
      * Set horizontal alignment
      *
      * @param string $alignment
+     *
      * @throws \InvalidArgumentException
+     *
      * @return self
      */
     public function setPosHorizontal($alignment)
@@ -205,7 +211,9 @@ class Image extends Frame
      * Set vertical alignment
      *
      * @param string $alignment
+     *
      * @throws \InvalidArgumentException
+     *
      * @return self
      */
     public function setPosVertical($alignment)
@@ -229,7 +237,9 @@ class Image extends Frame
      * Set horizontal relation
      *
      * @param string $relto
+     *
      * @throws \InvalidArgumentException
+     *
      * @return self
      */
     public function setPosHorizontalRel($relto)
@@ -253,7 +263,9 @@ class Image extends Frame
      * Set vertical relation
      *
      * @param string $relto
+     *
      * @throws \InvalidArgumentException
+     *
      * @return self
      */
     public function setPosVerticalRel($relto)

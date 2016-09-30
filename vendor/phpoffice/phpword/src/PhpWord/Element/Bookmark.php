@@ -11,14 +11,13 @@
  * contributors, visit https://github.com/PHPOffice/PHPWord/contributors.
  *
  * @link        https://github.com/PHPOffice/PHPWord
- * @copyright   2010-2014 PHPWord contributors
+ * @copyright   2010-2016 PHPWord contributors
  * @license     http://www.gnu.org/licenses/lgpl.txt LGPL version 3
  */
 
 namespace PhpOffice\PhpWord\Element;
 
-use PhpOffice\PhpWord\Shared\String;
-use PhpOffice\PhpWord\Style;
+use PhpOffice\Common\Text as CommonText;
 
 /**
  * Bookmark element
@@ -47,7 +46,7 @@ class Bookmark extends AbstractElement
     public function __construct($name)
     {
 
-        $this->name = String::toUTF8($name);
+        $this->name = CommonText::toUTF8($name);
         return $this;
     }
 

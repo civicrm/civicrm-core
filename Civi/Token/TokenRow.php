@@ -71,7 +71,7 @@ class TokenRow {
 
   /**
    * @param string $format
-   * @return $this
+   * @return TokenRow
    */
   public function format($format) {
     $this->format = $format;
@@ -84,7 +84,7 @@ class TokenRow {
    *
    * @param string|array $a
    * @param mixed $b
-   * @return $this
+   * @return TokenRow
    */
   public function context($a = NULL, $b = NULL) {
     if (is_array($a)) {
@@ -105,7 +105,7 @@ class TokenRow {
    * @param string|array $a
    * @param string|array $b
    * @param mixed $c
-   * @return $this
+   * @return TokenRow
    */
   public function tokens($a = NULL, $b = NULL, $c = NULL) {
     if (is_array($a)) {
@@ -171,7 +171,7 @@ class TokenRow {
    *
    * @param string $format
    *
-   * @return $this
+   * @return TokenRow
    */
   public function fill($format = NULL) {
     if ($format === NULL) {

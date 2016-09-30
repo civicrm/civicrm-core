@@ -11,14 +11,15 @@
  * contributors, visit https://github.com/PHPOffice/PHPWord/contributors.
  *
  * @link        https://github.com/PHPOffice/PHPWord
- * @copyright   2010-2014 PHPWord contributors
+ * @copyright   2010-2016 PHPWord contributors
  * @license     http://www.gnu.org/licenses/lgpl.txt LGPL version 3
  */
 
 namespace PhpOffice\PhpWord\Style;
 
+use PhpOffice\Common\Text;
 use PhpOffice\PhpWord\Exception\InvalidStyleException;
-use PhpOffice\PhpWord\Shared\String;
+use PhpOffice\PhpWord\SimpleType\Jc;
 
 /**
  * Paragraph style
@@ -76,11 +77,9 @@ class Paragraph extends Border
     private $next;
 
     /**
-     * Alignment
-     *
-     * @var \PhpOffice\PhpWord\Style\Alignment
+     * @var string
      */
-    private $alignment;
+    private $alignment = '';
 
     /**
      * Indentation
@@ -160,14 +159,6 @@ class Paragraph extends Border
     private $shading;
 
     /**
-     * Create new instance
-     */
-    public function __construct()
-    {
-        $this->alignment = new Alignment();
-    }
-
-    /**
      * Set Style value
      *
      * @param string $key
@@ -176,10 +167,10 @@ class Paragraph extends Border
      */
     public function setStyleValue($key, $value)
     {
-        $key = String::removeUnderscorePrefix($key);
-        if ($key == 'indent' || $key == 'hanging') {
+        $key = Text::removeUnderscorePrefix($key);
+        if ('indent' == $key || 'hanging' == $key) {
             $value = $value * 720;
-        } elseif ($key == 'spacing') {
+        } elseif ('spacing' == $key) {
             $value += 240; // because line height of 1 matches 240 twips
         }
 
@@ -202,7 +193,7 @@ class Paragraph extends Border
             'name'              => $this->getStyleName(),
             'basedOn'           => $this->getBasedOn(),
             'next'              => $this->getNext(),
-            'alignment'         => $this->getAlign(),
+            'alignment'         => $this->getAlignment(),
             'indentation'       => $this->getIndentation(),
             'spacing'           => $this->getSpace(),
             'pagination'        => array(
@@ -223,26 +214,55 @@ class Paragraph extends Border
     }
 
     /**
-     * Get alignment
+     * @since 0.13.0
      *
      * @return string
      */
-    public function getAlign()
+    public function getAlignment()
     {
-        return $this->alignment->getValue();
+        return $this->alignment;
     }
 
     /**
-     * Set alignment
+     * @since 0.13.0
      *
      * @param string $value
+     *
      * @return self
+     */
+    public function setAlignment($value)
+    {
+        if (Jc::getValidator()->isValid($value)) {
+            $this->alignment = $value;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @deprecated 0.13.0 Use the `getAlignment` method instead.
+     *
+     * @return string
+     *
+     * @codeCoverageIgnore
+     */
+    public function getAlign()
+    {
+        return $this->getAlignment();
+    }
+
+    /**
+     * @deprecated 0.13.0 Use the `setAlignment` method instead.
+     *
+     * @param string $value
+     *
+     * @return self
+     *
+     * @codeCoverageIgnore
      */
     public function setAlign($value = null)
     {
-        $this->alignment->setValue($value);
-
-        return $this;
+        return $this->setAlignment($value);
     }
 
     /**
@@ -458,7 +478,9 @@ class Paragraph extends Border
      * Set the line height
      *
      * @param int|float|string $lineHeight
+     *
      * @return self
+     *
      * @throws \PhpOffice\PhpWord\Exception\InvalidStyleException
      */
     public function setLineHeight($lineHeight)
@@ -643,6 +665,7 @@ class Paragraph extends Border
      * Get allow first/last line to display on a separate page setting
      *
      * @deprecated 0.10.0
+     *
      * @codeCoverageIgnore
      */
     public function getWidowControl()
@@ -654,6 +677,7 @@ class Paragraph extends Border
      * Get keep paragraph with next paragraph setting
      *
      * @deprecated 0.10.0
+     *
      * @codeCoverageIgnore
      */
     public function getKeepNext()
@@ -665,6 +689,7 @@ class Paragraph extends Border
      * Get keep all lines on one page setting
      *
      * @deprecated 0.10.0
+     *
      * @codeCoverageIgnore
      */
     public function getKeepLines()
@@ -676,6 +701,7 @@ class Paragraph extends Border
      * Get start paragraph on next page setting
      *
      * @deprecated 0.10.0
+     *
      * @codeCoverageIgnore
      */
     public function getPageBreakBefore()

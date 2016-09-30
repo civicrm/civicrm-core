@@ -11,7 +11,7 @@
  * contributors, visit https://github.com/PHPOffice/PHPWord/contributors.
  *
  * @link        https://github.com/PHPOffice/PHPWord
- * @copyright   2010-2014 PHPWord contributors
+ * @copyright   2010-2016 PHPWord contributors
  * @license     http://www.gnu.org/licenses/lgpl.txt LGPL version 3
  */
 
@@ -25,8 +25,9 @@ class TOC extends Tab
     /**
      * Tab leader types for backward compatibility
      *
-     * @const string
      * @deprecated 0.11.0
+     *
+     * @const string
      */
     const TABLEADER_DOT = self::TAB_LEADER_DOT;
     const TABLEADER_UNDERSCORE = self::TAB_LEADER_UNDERSCORE;
