@@ -226,9 +226,9 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
   }
 
   /**
-   * requireValidDBName() method (to check valid database name)
+   * requireSafeDBName() method (to check valid database name)
    */
-  public function testRequireValidDBName() {
+  public function testRequireSafeDBName() {
     $databases = array(
       'testdb' => TRUE,
       'test_db' => TRUE,
@@ -236,7 +236,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
       '123testdb' => TRUE,
       'test12db34' => TRUE,
       'test_12_db34' => TRUE,
-      'test-db' => FALSE,
+      'test-db' => TRUE,
       'test;db' => FALSE,
       'test*&db' => FALSE,
       'testdb;Delete test' => FALSE,
@@ -245,7 +245,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     );
     $testDetails = array();
     foreach ($databases as $database => $val) {
-      $this->assertEquals(CRM_Core_DAO::requireValidDBName($database), $val);
+      $this->assertEquals(CRM_Core_DAO::requireSafeDBName($database), $val);
     }
   }
 
