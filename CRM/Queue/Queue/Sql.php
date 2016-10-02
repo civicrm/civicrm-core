@@ -156,14 +156,6 @@ class CRM_Queue_Queue_Sql extends CRM_Queue_Queue {
         $dao->data = unserialize($dao->data);
         return $dao;
       }
-      else {
-        CRM_Core_Error::debug_var('not ready for release', $dao);
-        return FALSE;
-      }
-    }
-    else {
-      CRM_Core_Error::debug_var('no items found');
-      return FALSE;
     }
   }
 
@@ -196,10 +188,6 @@ class CRM_Queue_Queue_Sql extends CRM_Queue_Queue {
       ));
       $dao->data = unserialize($dao->data);
       return $dao;
-    }
-    else {
-      CRM_Core_Error::debug_var('no items found');
-      return FALSE;
     }
   }
 
