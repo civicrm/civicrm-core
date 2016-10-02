@@ -2463,16 +2463,17 @@ SELECT contact_id
   }
 
   /**
-   * function to check valid db name containing only characters in [0-9,a-z,A-Z_]
+   * ensure database name is 'safe', i.e. only contains word characters (includes underscores)
+   * and dashes, and contains at least one [a-z] case insenstive.
    *
    * @param $database
    *
    * @return bool
    */
-  public static function requireValidDBName($database) {
+  public static function requireSafeDBName($database) {
     $matches = array();
     preg_match(
-      "/^[0-9]*[a-zA-Z_]+[a-zA-Z0-9_]*$/",
+      "/^[\w\-]*[a-z]+[\w\-]*$/i",
       $database,
       $matches
     );
