@@ -1,27 +1,28 @@
 <?php
+
 /*
- +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
- |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007.                                       |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License along with this program; if not, contact CiviCRM LLC       |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
- +--------------------------------------------------------------------+
+  +--------------------------------------------------------------------+
+  | CiviCRM version 4.7                                                |
+  +--------------------------------------------------------------------+
+  | Copyright CiviCRM LLC (c) 2004-2016                                |
+  +--------------------------------------------------------------------+
+  | This file is a part of CiviCRM.                                    |
+  |                                                                    |
+  | CiviCRM is free software; you can copy, modify, and distribute it  |
+  | under the terms of the GNU Affero General Public License           |
+  | Version 3, 19 November 2007.                                       |
+  |                                                                    |
+  | CiviCRM is distributed in the hope that it will be useful, but     |
+  | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+  | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+  | See the GNU Affero General Public License for more details.        |
+  |                                                                    |
+  | You should have received a copy of the GNU Affero General Public   |
+  | License along with this program; if not, contact CiviCRM LLC       |
+  | at info[AT]civicrm[DOT]org. If you have questions about the        |
+  | GNU Affero General Public License or the licensing of CiviCRM,     |
+  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+  +--------------------------------------------------------------------+
  */
 
 /**
@@ -247,6 +248,7 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
     $this->addTask(ts('Add Data Type column to civicrm_option_group'), 'addDataTypeColumnToOptionGroupTable');
   }
+
   /**
    * Upgrade function.
    *
@@ -255,8 +257,8 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
   public function upgrade_4_7_13($rev) {
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
     $this->addTask(ts('Add colum to allow for payment processors to set what card types are accepted'), 'addAcceptedCardTypesField');
+    $this->addTask(ts('Update FK_civicrm_entity_financial_trxn_financial_trxn_id to CASCADE ON DELETE'), 'upgradeFinancialTrxnFK');
   }
-
 
   /*
    * Important! All upgrade functions MUST call the 'runSql' task.
@@ -299,7 +301,6 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
   public static function migrateSettings(CRM_Queue_TaskContext $ctx) {
     // Tip: If there are problems with adding the new uniqueness index, try inspecting:
     // SELECT name, domain_id, contact_id, count(*) AS dupes FROM civicrm_setting cs GROUP BY name, domain_id, contact_id HAVING dupes > 1;
-
     // Nav records are expendable. https://forum.civicrm.org/index.php?topic=36933.0
     CRM_Core_DAO::executeQuery('DELETE FROM civicrm_setting WHERE contact_id IS NOT NULL AND name = "navigation"');
 
@@ -342,12 +343,10 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
           3 => array(serialize($value), 'String'),
         );
         $settingId = CRM_Core_DAO::singleValueQuery(
-          'SELECT id FROM civicrm_setting WHERE domain_id = %1 AND name = %2',
-          $rowParams);
+                'SELECT id FROM civicrm_setting WHERE domain_id = %1 AND name = %2', $rowParams);
         if (!$settingId) {
           CRM_Core_DAO::executeQuery(
-            'INSERT INTO civicrm_setting (domain_id, name, value, is_domain) VALUES (%1,%2,%3,1)',
-            $rowParams);
+              'INSERT INTO civicrm_setting (domain_id, name, value, is_domain) VALUES (%1,%2,%3,1)', $rowParams);
         }
       }
     }
@@ -496,15 +495,14 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
     $domains = CRM_Core_DAO::executeQuery("SELECT DISTINCT d.id FROM civicrm_domain d LEFT JOIN civicrm_setting s ON d.id=s.domain_id AND s.name = 'remote_profile_submissions' WHERE s.id IS NULL");
     while ($domains->fetch()) {
       CRM_Core_DAO::executeQuery(
-        "INSERT INTO civicrm_setting (`name`, `value`, `domain_id`, `is_domain`, `contact_id`, `component_id`, `created_date`, `created_id`)
-          VALUES (%2, %3, %4, %5, NULL, NULL, %6, NULL)",
-        array(
-          2 => array('remote_profile_submissions', 'String'),
-          3 => array('s:1:"1";', 'String'),
-          4 => array($domains->id, 'Integer'),
-          5 => array(1, 'Integer'),
-          6 => array(date('Y-m-d H:i:s'), 'String'),
-        )
+          "INSERT INTO civicrm_setting (`name`, `value`, `domain_id`, `is_domain`, `contact_id`, `component_id`, `created_date`, `created_id`)
+          VALUES (%2, %3, %4, %5, NULL, NULL, %6, NULL)", array(
+        2 => array('remote_profile_submissions', 'String'),
+        3 => array('s:1:"1";', 'String'),
+        4 => array($domains->id, 'Integer'),
+        5 => array(1, 'Integer'),
+        6 => array(date('Y-m-d H:i:s'), 'String'),
+          )
       );
     }
     return TRUE;
@@ -820,8 +818,7 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
     CRM_Core_DAO::executeQuery('UPDATE civicrm_dashboard SET url = REPLACE(url, "&snippet=5", ""), fullscreen_url = REPLACE(fullscreen_url, "&snippet=5", "")');
 
     if (!CRM_Core_BAO_SchemaHandler::checkIfFieldExists('civicrm_dashboard', 'cache_minutes')) {
-      CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_dashboard ADD COLUMN cache_minutes int unsigned NOT NULL DEFAULT 60 COMMENT "Number of minutes to cache dashlet content in browser localStorage."',
-         array(), TRUE, NULL, FALSE, FALSE);
+      CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_dashboard ADD COLUMN cache_minutes int unsigned NOT NULL DEFAULT 60 COMMENT "Number of minutes to cache dashlet content in browser localStorage."', array(), TRUE, NULL, FALSE, FALSE);
     }
     if ($domain->locales) {
       $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
@@ -854,8 +851,7 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
    */
   public static function addDataTypeColumnToOptionGroupTable() {
     if (!CRM_Core_BAO_SchemaHandler::checkIfFieldExists('civicrm_option_group', 'data_type')) {
-      CRM_Core_DAO::executeQuery("ALTER TABLE `civicrm_option_group` ADD COLUMN `data_type` varchar(128) COLLATE utf8_unicode_ci DEFAULT NULL comment 'Data Type of Option Group.'",
-         array(), TRUE, NULL, FALSE, FALSE);
+      CRM_Core_DAO::executeQuery("ALTER TABLE `civicrm_option_group` ADD COLUMN `data_type` varchar(128) COLLATE utf8_unicode_ci DEFAULT NULL comment 'Data Type of Option Group.'", array(), TRUE, NULL, FALSE, FALSE);
     }
     $domain = new CRM_Core_DAO_Domain();
     $domain->find(TRUE);
@@ -877,6 +873,31 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
     if (!CRM_Core_BAO_SchemaHandler::checkIfFieldExists('civicrm_payment_processor', 'accepted_credit_cards')) {
       CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_payment_processor ADD COLUMN `accepted_credit_cards` text   DEFAULT NULL COMMENT 'array of accepted credit card types'");
     }
+    return TRUE;
+  }
+
+  /**
+   * CRM-19366 When deleting contributions, some records are left behind. Changing
+   * FK_civicrm_entity_financial_trxn_financial_trxn_id to cascade on delete
+   * @return bool
+   */
+  public static function upgradeFinancialTrxnFK(CRM_Queue_TaskContext $ctx) {
+
+    CRM_Core_BAO_SchemaHandler::safeRemoveFK('civicrm_entity_financial_trxn', 'FK_civicrm_entity_financial_trxn_financial_trxn_id');
+
+    CRM_Core_DAO::executeQuery("SET FOREIGN_KEY_CHECKS = 0;");
+
+    CRM_Core_DAO::executeQuery("
+      ALTER TABLE `civicrm_entity_financial_trxn`
+        ADD CONSTRAINT `FK_civicrm_entity_financial_trxn_financial_trxn_id`
+        FOREIGN KEY (`financial_trxn_id`)
+        REFERENCES `civicrm_financial_trxn`(`id`)
+        ON DELETE CASCADE
+        ON UPDATE RESTRICT;
+    ");
+
+    CRM_Core_DAO::executeQuery("SET FOREIGN_KEY_CHECKS = 1;");
+
     return TRUE;
   }
 
