@@ -1013,6 +1013,17 @@ class CRM_Core_SelectValues {
   }
 
   /**
+   * @return array
+   */
+  public static function contributeMode() {
+    return array(
+      CRM_Core_Payment::BILLING_MODE_FORM => 'direct',
+      CRM_Core_Payment::BILLING_MODE_BUTTON => 'directIPN',
+      CRM_Core_Payment::BILLING_MODE_NOTIFY => 'notify',
+    );
+  }
+
+  /**
    * Frequency unit for schedule reminders.
    *
    * @param int $count
