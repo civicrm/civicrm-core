@@ -65,7 +65,7 @@
   </td>
 </tr>
 
-<tr><td>{$form.membership_id.label} {$form.membership_id.html}</td>
+<tr><td><label>{$form.membership_id.label}</label> {$form.membership_id.html}</td>
 </tr>
 
 <tr><td><label>{ts}Member Since{/ts}</label></td></tr>
