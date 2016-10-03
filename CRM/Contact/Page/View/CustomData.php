@@ -134,6 +134,7 @@ class CRM_Contact_Page_View_CustomData extends CRM_Core_Page {
         $page->set('multiRecordFieldListing', $multiRecordFieldListing);
         $page->set('pageViewType', 'customDataView');
         $page->set('contactType', $ctype);
+        $page->_headersOnly = TRUE;
         $page->assign('viewCustomData', array(
           $this->_groupId => array(
             $this->_groupId => $groupTree[$this->_groupId],

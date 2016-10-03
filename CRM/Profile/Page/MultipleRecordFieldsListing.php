@@ -171,7 +171,7 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
   public function browse() {
     $dateFields = NULL;
     $cgcount = 0;
-    $attributes = $headerAttr = array();
+    $attributes = $result = $headerAttr = array();
     $dateFieldsVals = NULL;
     if ($this->_pageViewType == 'profileDataView' && $this->_profileId) {
       $fields = CRM_Core_BAO_UFGroup::getFields($this->_profileId, FALSE, NULL,
@@ -219,7 +219,7 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
       // from the above customGroupInfo we can get $this->_customGroupTitle
       $this->_customGroupTitle = $groupDetail[$customGroupId]['title'];
     }
-    if ($fieldIDs && !empty($fieldIDs) && $this->_contactId) {
+    if ($fieldIDs && !empty($fieldIDs) && $this->_contactId && empty($this->_headersOnly)) {
       $options = array();
       $returnProperities = array(
         'html_type',
@@ -429,8 +429,13 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
     $headers = array();
     if (!empty($fieldIDs)) {
       foreach ($fieldIDs as $fieldID) {
-        $headers[$fieldID] = ($this->_pageViewType == 'profileDataView') ? $customGroupInfo[$fieldID]['fieldLabel'] : $fieldLabels[$fieldID]['label'];
-        $headerAttr[$fieldID]['columnName'] = $fieldLabels[$fieldID]['column_name'];
+        if ($this->_pageViewType == 'profileDataView') {
+          $headers[$fieldID] = $customGroupInfo[$fieldID]['fieldLabel'];
+        }
+        else {
+          $headers[$fieldID] = $fieldLabels[$fieldID]['label'];
+          $headerAttr[$fieldID]['columnName'] = $fieldLabels[$fieldID]['column_name'];
+        }
       }
     }
     $this->assign('dateFields', $dateFields);
