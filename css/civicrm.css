@@ -3274,6 +3274,12 @@ div.m ul#civicrm-menu,
   padding-left: 2px;
   border: 2px dashed transparent;
 }
+
+.crm-container .crmf-title .crm-editable-enabled,
+.crm-container .crmf-description .crm-editable-enabled {
+  white-space: normal;
+}
+
 .crm-container .crm-editable-textarea-enabled {
   white-space: normal;
 }
