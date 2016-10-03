@@ -630,20 +630,29 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
         CRM_Core_BAO_Address::checkContactSharedAddressFields($fields, $contactID);
         $addCaptcha = FALSE;
         // fetch file preview when not submitted yet, like in online contribution Confirm and ThankYou page
-        $viewOnlyFileValues = array();
+        $viewOnlyFileValues = empty($profileContactType) ? array() : array($profileContactType => array());
         foreach ($fields as $key => $field) {
           if ($viewOnly &&
             isset($field['data_type']) &&
             $field['data_type'] == 'File' || ($viewOnly && $field['name'] == 'image_URL')
           ) {
-            $viewOnlyFileValues[$key] = '';
-            if (!empty($this->_params[$key])) {
-              $path = CRM_Utils_Array::value('name', $this->_params[$key]);
-              $fileType = CRM_Utils_Array::value('type', $this->_params[$key]);
-              $viewOnlyFileValues[$key] = CRM_Utils_File::getFileURL($path, $fileType);
+            //retrieve file value from submitted values on basis of $profileContactType
+            $fileValue = empty($profileContactType) ? CRM_Utils_Array::value($key, $this->_params) : CRM_Utils_Array::value(sprintf('%s[%s]', $profileContactType, $key), $this->_params);
+
+            if ($fileValue) {
+              $path = CRM_Utils_Array::value('name', $fileValue);
+              $fileType = CRM_Utils_Array::value('type', $fileValue);
+              $fileValue = CRM_Utils_File::getFileURL($path, $fileType);
+            }
+
+            // format custom file value fetched from submitted value
+            if ($profileContactType) {
+              $viewOnlyFileValues[$profileContactType][$key] = $fileValue;
+            }
+            else {
+              $viewOnlyFileValues[$key] = $fileValue;
             }
           }
-
           if ($profileContactType) {
             //Since we are showing honoree name separately so we are removing it from honoree profile just for display
             if ($profileContactType == 'honor') {
