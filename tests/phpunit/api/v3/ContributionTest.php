@@ -2593,7 +2593,34 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
         'Event',
       )
     );
+
+    $this->checkCreditCardDetails($mut, $contribution['id']);
     $mut->stop();
+  }
+
+  /**
+   * Check credit card details in sent mail via API
+   *
+   * @param $mut obj CiviMailUtils instance
+   * @param int $contributionID Contribution ID
+   *
+   */
+  public function checkCreditCardDetails($mut, $contributionID) {
+    $contribution = $this->callAPISuccess('contribution', 'create', $this->_params);
+    $this->callAPISuccess('contribution', 'sendconfirmation', array(
+        'id' => $contributionID,
+        'receipt_from_email' => 'api@civicrm.org',
+        'payment_processor_id' => $this->paymentProcessorID,
+      )
+    );
+    $mut->checkMailLog(array(
+        'Credit Card Information', // credit card header
+        'Billing Name and Address', // billing header
+        'anthony_anderson@civicrm.org', // billing name
+      ), array(
+        'Event',
+      )
+    );
   }
 
   /**
