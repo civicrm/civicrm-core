@@ -269,39 +269,33 @@
 {include file="CRM/Case/Form/ActivityToCase.tpl"}
 
 {* pane to display / edit regular tags or tagsets for cases *}
-{if $showTags OR $showTagsets}
-
+{if $showTags}
 <div id="casetags" class="crm-accordion-wrapper  crm-case-tags-block">
  <div class="crm-accordion-header">
   {ts}Case Tags{/ts}
  </div><!-- /.crm-accordion-header -->
  <div class="crm-accordion-body">
-  {assign var="tagExits" value=0}
   {if $tags}
-    <div class="crm-block crm-content-block crm-case-caseview-display-tags">&nbsp;&nbsp;{$tags}</div>
-    {assign var="tagExits" value=1}
+    <p class="crm-block crm-content-block crm-case-caseview-display-tags">&nbsp;&nbsp;{$tags}</p>
   {/if}
 
-   {foreach from=$tagsetInfo.case item=displayTagset}
-     {if $displayTagset.entityTagsArray}
-       <div class="crm-block crm-content-block crm-case-caseview-display-tagset">
-         &nbsp;&nbsp;{$displayTagset.parentName}:
-         {foreach from=$displayTagset.entityTagsArray item=val name="tagsetList"}
-           &nbsp;{$val.name}{if !$smarty.foreach.tagsetList.last},{/if}
-         {/foreach}
-       </div>
-       {assign var="tagExits" value=1}
-     {/if}
+   {foreach from=$tagSetTags item=displayTagset}
+     <p class="crm-block crm-content-block crm-case-caseview-display-tagset">
+       &nbsp;&nbsp;<strong>{$displayTagset.name}:</strong>
+       {', '|implode:$displayTagset.items}
+     </p>
    {/foreach}
 
-   {if !$tagExits }
+   {if !$tags && !$tagSetTags }
      <div class="status">
        {ts}There are no tags currently assigned to this case.{/ts}
      </div>
    {/if}
 
   <div class="crm-submit-buttons">
-    <a class="button case-miniform" href="#manageTagsDialog" data-key="{crmKey name='civicrm/case/ajax/processtags'}">{if $tagExits}{ts}Edit Tags{/ts}{else}{ts}Add Tags{/ts}{/if}</a>
+    <a class="button case-miniform" href="#manageTagsDialog" data-key="{crmKey name='civicrm/case/ajax/processtags'}">
+      {if $tags || $tagSetTags}{ts}Edit Tags{/ts}{else}{ts}Add Tags{/ts}{/if}
+    </a>
   </div>
 
  </div><!-- /.crm-accordion-body -->
