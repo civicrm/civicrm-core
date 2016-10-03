@@ -135,8 +135,8 @@
                   {if $n eq 'organization_name' && !empty($form.onbehalfof_id)}
                     {$form.onbehalfof_id.html}
                   {/if}
-                  {if $field.html_type eq 'File' && $viewOnlyFileValues.$prefix}
-                    {$viewOnlyFileValues.$prefix.$n}
+                  {if $field.html_type eq 'File' && $viewOnlyPrefixFileValues}
+                    {$viewOnlyPrefixFileValues.$prefix.$n}
                   {else}
                     {$form.$prefix.$n.html}
                   {/if}
