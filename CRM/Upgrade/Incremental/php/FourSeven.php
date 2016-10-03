@@ -247,6 +247,7 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
   public function upgrade_4_7_12($rev) {
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
     $this->addTask(ts('Add Data Type column to civicrm_option_group'), 'addDataTypeColumnToOptionGroupTable');
+    $this->addTask(ts('Update FK_civicrm_entity_financial_trxn_financial_trxn_id to CASCADE ON DELETE'), 'upgradeFinancialTrxnFK');    
   }
 
   /**
