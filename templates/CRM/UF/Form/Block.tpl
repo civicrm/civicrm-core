@@ -135,9 +135,9 @@
                 {if $form.$phone_ext_field.html}
                   &nbsp;{$form.$phone_ext_field.html}
                 {/if}
-              {elseif $field.html_type eq 'File' && ($viewOnlyFileValues.$n OR $viewOnlyFileValues.$prefix)}
+              {elseif $field.html_type eq 'File' && ($viewOnlyFileValues OR $viewOnlyPrefixFileValues)}
                 {if $prefix}
-                  {$viewOnlyFileValues.$prefix.$n}
+                  {$viewOnlyPrefixFileValues.$prefix.$n}
                 {else}
                   {$viewOnlyFileValues.$n}
                 {/if}

@@ -787,7 +787,10 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
         $this->assign($name, $fields);
 
-        if (count($viewOnlyFileValues)) {
+        if ($profileContactType && count($viewOnlyFileValues[$profileContactType])) {
+          $this->assign('viewOnlyPrefixFileValues', $viewOnlyFileValues);
+        }
+        elseif (count($viewOnlyFileValues)) {
           $this->assign('viewOnlyFileValues', $viewOnlyFileValues);
         }
 
