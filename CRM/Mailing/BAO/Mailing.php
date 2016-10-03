@@ -921,8 +921,7 @@ ORDER BY   i.contact_id, i.{$tempColumn}
    * @return void
    */
   public function getTestRecipients($testParams) {
-    $session = CRM_Core_Session::singleton();
-    $senderId = $session->get('userID');
+    $senderId = CRM_Core_Session::singleton()->getLoggedInContactID();
     list($aclJoin, $aclWhere) = CRM_ACL_BAO_ACL::buildAcl($senderId);
 
     if (!empty($testParams['test_group']) && array_key_exists($testParams['test_group'], CRM_Core_PseudoConstant::group())) {

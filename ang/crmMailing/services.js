@@ -314,7 +314,8 @@
           options: {force_rollback: 1},
           'api.mailing_job.create': 1, // note: exact match to API default
           'api.MailingRecipients.getcount': {
-            mailing_id: '$value.id'
+            mailing_id: '$value.id',
+            check_permissions: 1
           }
         });
         delete params.recipients; // the content was merged in
@@ -442,7 +443,7 @@
             .then(function (deliveryInfos) {
               var count = Object.keys(deliveryInfos).length;
               if (count === 0) {
-                CRM.alert(ts('Could not identify any recipients. Perhaps the group is empty?'));
+                CRM.alert(ts('Could not identify any recipients. Perhaps the group is empty or due to insufficient permission?'));
               }
             })
           ;
@@ -509,7 +510,7 @@
             return crmLegacy.url('civicrm/contact/search/advanced',
               'force=1&mailing_id=' + mailing.id + statType.searchFilter);
           case 'report':
-            var reportIds = CRM.crmMailing.reportIds; 
+            var reportIds = CRM.crmMailing.reportIds;
             return crmLegacy.url('civicrm/report/instance/' + reportIds[statType.reportType],
                 'reset=1&mailing_id_value=' + mailing.id + statType.reportFilter);
           default:
