@@ -50,7 +50,7 @@
     <table>civicrm_financial_trxn</table>
     <key>id</key>
     <add>3.2</add>
-    <onDelete>SET NULL</onDelete>
+    <onDelete>CASCADE</onDelete>
   </foreignKey>
   <field>
     <name>amount</name>
