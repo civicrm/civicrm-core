@@ -143,6 +143,12 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
       return CRM_Core_DAO::$_nullObject;
     }
 
+    if ($params['entity_table'] == 'civicrm_contact' && !empty($params['check_permissions'])) {
+      if (!CRM_Contact_BAO_Contact_Permission::allow($params['entity_id'], CRM_Core_Permission::EDIT)) {
+        throw new CRM_Exception('Permission denied to modify contact record');
+      }
+    }
+
     $note = new CRM_Core_BAO_Note();
 
     if (!isset($params['modified_date'])) {
