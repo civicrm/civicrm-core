@@ -805,13 +805,13 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
       'membershipID' => 'membershipID',
       'related_contact' => 'relatedContactID',
       'onbehalf_dupe_alert' => 'onBehalfDupeAlert',
+      'accountingCode' => 'accountingCode',
     );
     foreach ($notifyParameterMap as $paramsName => $notifyName) {
       if (!empty($params[$paramsName])) {
         $notifyParameters[$notifyName] = $params[$paramsName];
       }
     }
-    $this->setNotifyUrlParameters($notifyParameters);
     $notifyURL = $this->getNotifyUrl();
 
     $config = CRM_Core_Config::singleton();
@@ -829,9 +829,6 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
       TRUE, NULL, FALSE
     );
 
-    $customParams = array_merge($notifyParameters, array(
-      'accountingCode' => CRM_Utils_Array::value('accountingCode', $params),
-    ));
     $paypalParams = array(
       'business' => $this->_paymentProcessor['user_name'],
       'notify_url' => $notifyURL,
@@ -847,7 +844,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
       'invoice' => $params['invoiceID'],
       'lc' => substr($config->lcMessages, -2),
       'charset' => function_exists('mb_internal_encoding') ? mb_internal_encoding() : 'UTF-8',
-      'custom' => json_encode($customParams),
+      'custom' => json_encode($notifyParameters),
       'bn' => 'CiviCRM_SP',
     );
 
