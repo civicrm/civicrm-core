@@ -24,6 +24,7 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
+{crmRegion name="contribute-form-contributionpage-settings-main"}
 <div class="crm-block crm-form-block crm-contribution-contributionpage-settings-form-block">
 <div class="help">
     {if $action eq 0}
@@ -202,3 +203,6 @@
      }
  {/literal}
 </script>
+{/crmRegion}
+{crmRegion name="contribute-form-contributionpage-settings-post"}
+{/crmRegion}
