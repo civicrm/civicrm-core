@@ -3270,7 +3270,6 @@ div.m ul#civicrm-menu,
 
 /* in place edit  */
 .crm-container .crm-editable-enabled {
-  white-space: nowrap;
   padding-left: 2px;
   border: 2px dashed transparent;
 }
