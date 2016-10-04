@@ -174,19 +174,19 @@ class CRM_Contact_Form_Search_Custom_Group extends CRM_Contact_Form_Search_Custo
 
       //distinguish column according to user selection
       if (($this->_includeGroups && !$this->_includeTags)) {
-        unset($this->_columns['Tag Name']);
+        unset($this->_columns[ts('Tag Name')]);
         $selectClause .= ", GROUP_CONCAT(DISTINCT group_names ORDER BY group_names ASC ) as gname";
       }
       elseif ($this->_includeTags && (!$this->_includeGroups)) {
-        unset($this->_columns['Group Name']);
+        unset($this->_columns[ts('Group Name')]);
         $selectClause .= ", GROUP_CONCAT(DISTINCT tag_names  ORDER BY tag_names ASC ) as tname";
       }
       elseif (!empty($this->_includeTags) && !empty($this->_includeGroups)) {
         $selectClause .= ", GROUP_CONCAT(DISTINCT group_names ORDER BY group_names ASC ) as gname , GROUP_CONCAT(DISTINCT tag_names ORDER BY tag_names ASC ) as tname";
       }
       else {
-        unset($this->_columns['Tag Name']);
-        unset($this->_columns['Group Name']);
+        unset($this->_columns[ts('Tag Name')]);
+        unset($this->_columns[ts('Group Name')]);
       }
     }
 
