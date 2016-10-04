@@ -42,20 +42,7 @@
  * @return array
  */
 function civicrm_api3_entity_tag_get($params) {
-
-  if (empty($params['entity_id'])) {
-    return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
-  }
-  else {
-    //do legacy non-standard behaviour
-    $values = CRM_Core_BAO_EntityTag::getTag($params['entity_id'], $params['entity_table']);
-
-    $result = array();
-    foreach ($values as $v) {
-      $result[$v] = array('tag_id' => $v);
-    }
-    return civicrm_api3_create_success($result, $params, 'EntityTag');
-  }
+  return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
@@ -162,6 +149,10 @@ function _civicrm_api3_entity_tag_common($params, $op = 'add') {
       $values['removed'] += $r;
       $values['not_removed'] += $nr;
     }
+  }
+  if (empty($values['added']) && empty($values['removed'])) {
+    $values['is_error'] = 1;
+    $values['error_message'] = "Unable to $op tags";
   }
   return $values;
 }
