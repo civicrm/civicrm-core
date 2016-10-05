@@ -117,7 +117,11 @@ class CRM_Utils_Geocode_Google {
       $add .= '+' . urlencode(str_replace('', '+', $values['country']));
     }
 
-    $query = 'http://' . self::$_server . self::$_uri . $add;
+    if (!empty($config->geoAPIKey)) {
+      $add .= '&key=' . urlencode($config->geoAPIKey);
+    }
+
+    $query = 'https://' . self::$_server . self::$_uri . $add;
 
     require_once 'HTTP/Request.php';
     $request = new HTTP_Request($query);
