@@ -96,6 +96,10 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
     }
 
     // CRM-16189
+    if (!empty($params['financial_type_id'])) {
+      CRM_Financial_BAO_FinancialAccount::validateFinancialType($params['financial_type_id']);
+    }
+   
     $isError = CRM_Financial_BAO_FinancialAccount::validateFinancialType(
       CRM_Utils_Array::value('financial_type_id', $params)
     );
