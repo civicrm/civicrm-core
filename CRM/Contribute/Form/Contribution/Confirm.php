@@ -133,12 +133,22 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @param array $params
    * @param CRM_Financial_BAO_FinancialType $financialType
    * @param bool $online
+   * @param CRM_Contribute_Form_Contribution_Confirm $form
    *
    * @return array
    */
-  protected static function getNonDeductibleAmount($params, $financialType, $online) {
+  protected static function getNonDeductibleAmount($params, $financialType, $online, $form) {
     if (isset($params['non_deductible_amount']) && (!empty($params['non_deductible_amount']))) {
       return $params['non_deductible_amount'];
+    }
+    $priceSetId = CRM_Utils_Array::value('priceSetId', $params);
+    // return non-deductible amount if it is set at the price field option level
+    if ($priceSetId && !empty($form->_lineItem)) {
+      $nonDeductibleAmount = CRM_Price_BAO_PriceSet::getNonDeductibleAmountFromPriceSet($priceSetId, $form->_lineItem);
+    }
+
+    if (!empty($nonDeductibleAmount)) {
+      return $nonDeductibleAmount;
     }
     else {
       if ($financialType->is_deductible) {
@@ -832,7 +842,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     }
     $params['is_recur'] = $isRecur;
     $recurringContributionID = self::processRecurringContribution($form, $params, $contactID, $financialType);
-    $nonDeductibleAmount = self::getNonDeductibleAmount($params, $financialType, $online);
+    $nonDeductibleAmount = self::getNonDeductibleAmount($params, $financialType, $online, $form);
 
     $now = date('YmdHis');
     $receiptDate = CRM_Utils_Array::value('receipt_date', $params);
