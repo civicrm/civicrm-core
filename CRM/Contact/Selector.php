@@ -927,8 +927,26 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
     $mapMask = $mask & 4095;
 
     $links = self::links($this->_context, $this->_contextMenu, $this->_key);
+    // CRM-12645- suppress the Edit link if user does not have permission.
+    $editlink = $links[CRM_Core_Action::UPDATE];  // Remember the Edit link
 
     foreach ($rows as $id => & $row) {
+         //
+        // Check if we have permission to edit the record.  If we have, we enable the link, otherwise
+        // we don't.
+        if (CRM_Contact_BAO_Contact_Permission::allow($row['contact_id'], CRM_Core_Permission::EDIT)) {
+           // Enable the edit function
+           $links[CRM_Core_Action::UPDATE] = $editlink;
+        }
+        else
+        {
+            // Suppress the edit function
+            $links[CRM_Core_Action::UPDATE] = array(
+           'name' => '----',
+         );
+        }
+
+  
       if (!empty($this->_formValues['deleted_contacts']) && CRM_Core_Permission::check('access deleted contacts')
       ) {
         $links = array(
