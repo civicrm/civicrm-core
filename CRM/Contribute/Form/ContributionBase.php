@@ -625,7 +625,10 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
           CRM_Core_Session::setStatus(ts('Some of the profile fields cannot be configured for this page.'), ts('Warning'), 'alert');
         }
 
-        $fields = array_diff_assoc($fields, $this->_fields);
+        //remove common fields only if profile is not configured for onbehalf/honor
+        if (!in_array($profileContactType, array('honor', 'onbehalf'))) {
+          $fields = array_diff_assoc($fields, $this->_fields);
+        }
 
         CRM_Core_BAO_Address::checkContactSharedAddressFields($fields, $contactID);
         $addCaptcha = FALSE;
