@@ -219,7 +219,7 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
       // from the above customGroupInfo we can get $this->_customGroupTitle
       $this->_customGroupTitle = $groupDetail[$customGroupId]['title'];
     }
-    if ($fieldIDs && !empty($fieldIDs) && $this->_contactId && empty($this->_headersOnly)) {
+    if (!empty($fieldIDs) && $this->_contactId) {
       $options = array();
       $returnProperities = array(
         'html_type',
@@ -259,7 +259,10 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
           = $options[$fieldIDs[$key]]['attributes']['date_format'] = CRM_Utils_Array::value('date_format', $returnValues);
         $options[$fieldIDs[$key]]['attributes']['time_format'] = CRM_Utils_Array::value('time_format', $returnValues);
       }
+      $linkAction = array_sum(array_keys($this->links()));
+    }
 
+    if (!empty($fieldIDs) && $this->_contactId && empty($this->_headersOnly)) {
       $DTparams = !empty($this->_DTparams) ? $this->_DTparams : NULL;
       // commonly used for both views i.e profile listing view (profileDataView) and custom data listing view (customDataView)
       $result = CRM_Core_BAO_CustomValueTable::getEntityValues($this->_contactId, NULL, $fieldIDs, TRUE, $DTparams);
@@ -298,7 +301,6 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
             }
           }
         }
-        $linkAction = array_sum(array_keys($this->links()));
 
         if ($reached) {
           unset($links[CRM_Core_Action::COPY]);
@@ -384,8 +386,6 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
                 $op = 'profile.multiValue.row';
               }
               else {
-                $headerAttr[$fieldId]['dataType'] = CRM_Utils_Array::value('data-type', $fieldAttributes);
-                $headerAttr[$fieldId]['dataEmptyOption'] = CRM_Utils_Array::value('data-empty-option', $fieldAttributes);
                 // different set of url params
                 $actionParams['gid'] = $actionParams['groupID'] = $this->_customGroupId;
                 $actionParams['cid'] = $actionParams['entityID'] = $this->_contactId;
@@ -428,11 +428,25 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
 
     $headers = array();
     if (!empty($fieldIDs)) {
+      $fields = array('Radio', 'Select', 'Select Country', 'Select State/Province');
       foreach ($fieldIDs as $fieldID) {
         if ($this->_pageViewType == 'profileDataView') {
           $headers[$fieldID] = $customGroupInfo[$fieldID]['fieldLabel'];
         }
-        else {
+        elseif (!empty($this->_headersOnly)) {
+          if (!$options[$fieldID]['attributes']['is_view'] && $linkAction & CRM_Core_Action::UPDATE) {
+            $spec = $options[$fieldID]['attributes'];
+
+            if (in_array($spec['html_type'], $fields)) {
+              $headerAttr[$fieldID]['dataType'] = $spec['data_type'] == 'Boolean' ? 'boolean' : 'select';
+              if (!$spec['is_required']) {
+                $headerAttr[$fieldID]['dataEmptyOption'] = ts('- none -');
+              }
+            }
+            elseif ($spec['html_type'] == 'TextArea') {
+              $headerAttr[$fieldID]['dataType'] = 'textarea';
+            }
+          }
           $headers[$fieldID] = $fieldLabels[$fieldID]['label'];
           $headerAttr[$fieldID]['columnName'] = $fieldLabels[$fieldID]['column_name'];
         }
