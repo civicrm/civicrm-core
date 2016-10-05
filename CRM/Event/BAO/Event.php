@@ -99,13 +99,6 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
     if (!empty($params['financial_type_id'])) {
       CRM_Financial_BAO_FinancialAccount::validateFinancialType($params['financial_type_id']);
     }
-   
-    $isError = CRM_Financial_BAO_FinancialAccount::validateFinancialType(
-      CRM_Utils_Array::value('financial_type_id', $params)
-    );
-    if ($isError) {
-      throw new CRM_Core_Exception(ts('Deferred revenue account is not configured for selected financial type. Please have an administrator set up the deferred revenue account at Administer > CiviContribute > Financial Accounts, then configure it for financial types at Administer > CiviContribution > Financial Types, Accounts'));
-    }
 
     $event = new CRM_Event_DAO_Event();
 
