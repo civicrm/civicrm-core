@@ -501,7 +501,7 @@
        );
 
       function showHideCancelInfo(obj) {
-        if (obj.find(":selected").text() == 'Refunded' || obj.find(":selected").text() == 'Cancelled') {
+        if (obj.find(":selected").val() == '3' || obj.find(":selected").val() == '7') {
           $('#cancelInfo').show( );
           $('#total_amount').attr('readonly', true);
         }
