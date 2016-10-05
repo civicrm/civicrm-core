@@ -473,6 +473,7 @@ class CRM_Member_BAO_Query {
     ));
 
     $form->addElement('text', 'member_source', ts('Source'));
+    $form->add('number', 'membership_id', ts('Membership ID'), array('class' => 'four', 'min' => 1));
 
     CRM_Core_Form_Date::buildDateRange($form, 'member_join_date', 1, '_low', '_high', ts('From'), FALSE);
     $form->addElement('hidden', 'member_join_date_range_error');
