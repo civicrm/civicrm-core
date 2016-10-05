@@ -357,7 +357,7 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
                     civicrm_subscription_history.method as method';
     }
 
-    $where = " WHERE contact_a.id = %1 AND civicrm_group.is_active = 1 AND saved_search_id IS NULL";
+    $where = " WHERE contact_a.id = %1 AND civicrm_group.is_active = 1";
 
     if ($excludeHidden) {
       $where .= " AND civicrm_group.is_hidden = 0 ";
