@@ -182,7 +182,7 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
       if (!empty($financialTypes)) {
         $addWhere = "financial_type_id IN (" . implode(',', array_keys($financialTypes)) . ")";
       }
-      $fieldValueDAO->whereAdd($addWhere);
+      $fieldValueDAO->addWhere($addWhere);
     }
     $fieldValueDAO->orderBy($orderBy, 'label');
     if ($isActive) {
