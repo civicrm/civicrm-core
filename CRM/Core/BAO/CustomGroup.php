@@ -330,6 +330,8 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
    *   api - through which it is properly tested - so can be refactored with some comfort.)
    *
    * @param bool $checkPermission
+   * @param varchar $singleRecord
+   *   holds 'new' or id if view/edit/copy form for a single record is being loaded.
    *
    * @return array
    *   Custom field 'tree'.
@@ -353,7 +355,8 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
     $fromCache = TRUE,
     $onlySubType = NULL,
     $returnAll = FALSE,
-    $checkPermission = TRUE
+    $checkPermission = TRUE,
+    $singleRecord = NULL
   ) {
     if ($entityID) {
       $entityID = CRM_Utils_Type::escape($entityID, 'Integer');
@@ -596,7 +599,7 @@ ORDER BY civicrm_custom_group.weight,
     // add info to groupTree
 
     if (isset($groupTree['info']) && !empty($groupTree['info']) &&
-      !empty($groupTree['info']['tables'])
+      !empty($groupTree['info']['tables']) && $singleRecord != 'new'
     ) {
       $select = $from = $where = array();
       $groupTree['info']['where'] = NULL;
@@ -630,7 +633,7 @@ ORDER BY civicrm_custom_group.weight,
       }
       $multipleFieldTablesWithEntityData = array_keys($entityMultipleSelectClauses);
       if (!empty($multipleFieldTablesWithEntityData)) {
-        self::buildEntityTreeMultipleFields($groupTree, $entityID, $entityMultipleSelectClauses, $multipleFieldTablesWithEntityData);
+        self::buildEntityTreeMultipleFields($groupTree, $entityID, $entityMultipleSelectClauses, $multipleFieldTablesWithEntityData, $singleRecord);
       }
 
     }
@@ -751,8 +754,10 @@ ORDER BY civicrm_custom_group.weight,
    *   Array of select clauses relevant to the entity.
    * @param array $multipleFieldTablesWithEntityData
    *   Array of tables in which this entity has data.
+   * @param varchar $singleRecord
+   *   holds 'new' or id if view/edit/copy form for a single record is being loaded.
    */
-  static public function buildEntityTreeMultipleFields(&$groupTree, $entityID, $entityMultipleSelectClauses, $multipleFieldTablesWithEntityData) {
+  static public function buildEntityTreeMultipleFields(&$groupTree, $entityID, $entityMultipleSelectClauses, $multipleFieldTablesWithEntityData, $singleRecord = NULL) {
     foreach ($entityMultipleSelectClauses as $table => $selectClauses) {
       $select = implode(',', $selectClauses);
       $query = "
@@ -760,7 +765,11 @@ ORDER BY civicrm_custom_group.weight,
         FROM $table
         WHERE entity_id = $entityID
       ";
-      self::buildTreeEntityDataFromQuery($groupTree, $query, array($table));
+      if ($singleRecord) {
+        $offset = $singleRecord - 1;
+        $query .= " LIMIT {$offset}, 1";
+      }
+      self::buildTreeEntityDataFromQuery($groupTree, $query, array($table), $singleRecord);
     }
   }
 
@@ -776,8 +785,10 @@ ORDER BY civicrm_custom_group.weight,
    * @param array $includedTables
    *   Tables to include - required because the function (for historical reasons).
    *   iterates through the group tree
+   * @param varchar $singleRecord
+   *   holds 'new' OR id if view/edit/copy form for a single record is being loaded.
    */
-  static public function buildTreeEntityDataFromQuery(&$groupTree, $query, $includedTables) {
+  static public function buildTreeEntityDataFromQuery(&$groupTree, $query, $includedTables, $singleRecord = NULL) {
     $dao = CRM_Core_DAO::executeQuery($query);
     while ($dao->fetch()) {
       foreach ($groupTree as $groupID => $group) {
@@ -792,7 +803,7 @@ ORDER BY civicrm_custom_group.weight,
           continue;
         }
         foreach ($group['fields'] as $fieldID => $dontCare) {
-          self::buildCustomFieldData($dao, $groupTree, $table, $groupID, $fieldID);
+          self::buildCustomFieldData($dao, $groupTree, $table, $groupID, $fieldID, $singleRecord);
         }
       }
     }
@@ -811,8 +822,10 @@ ORDER BY civicrm_custom_group.weight,
    *   Custom group ID.
    * @param int $fieldID
    *   Custom field ID.
+   * @param varchar $singleRecord
+   *   holds 'new' or id if loading view/edit/copy for a single record.
    */
-  static public function buildCustomFieldData($dao, &$groupTree, $table, $groupID, $fieldID) {
+  static public function buildCustomFieldData($dao, &$groupTree, $table, $groupID, $fieldID, $singleRecord = NULL) {
     $column = $groupTree[$groupID]['fields'][$fieldID]['column_name'];
     $idName = "{$table}_id";
     $fieldName = "{$table}_{$column}";
@@ -896,7 +909,10 @@ ORDER BY civicrm_custom_group.weight,
     if (!array_key_exists('customValue', $groupTree[$groupID]['fields'][$fieldID])) {
       $groupTree[$groupID]['fields'][$fieldID]['customValue'] = array();
     }
-    if (empty($groupTree[$groupID]['fields'][$fieldID]['customValue'])) {
+    if (empty($groupTree[$groupID]['fields'][$fieldID]['customValue']) && !empty($singleRecord)) {
+      $groupTree[$groupID]['fields'][$fieldID]['customValue'] = array($singleRecord => $customValue);
+    }
+    elseif (empty($groupTree[$groupID]['fields'][$fieldID]['customValue'])) {
       $groupTree[$groupID]['fields'][$fieldID]['customValue'] = array(1 => $customValue);
     }
     else {
