@@ -4780,7 +4780,8 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
       CRM_Utils_Array::value('task', $this->_params)
     ));
     if ($this->_outputMode !==NULL) {
-      // We didn't get it using output, so we now try with task.
+      // We didn't get it using output, so we now try with task.  This seems to
+      // happen when the user isn't privileged.
         $this->_outputMode = str_replace('report_instance.', '', CRM_Utils_Request::retrieve(
           'task',
           'String',
