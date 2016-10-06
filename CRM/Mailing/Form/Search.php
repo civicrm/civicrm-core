@@ -64,7 +64,7 @@ class CRM_Mailing_Form_Search extends CRM_Core_Form {
     $enabledLanguages = CRM_Core_I18n::languages(TRUE);
 
     if (count($enabledLanguages) > 1) {
-      $this->addElement('select', 'language', ts('Language'), array('' => ' - all languages - ') + $enabledLanguages, array('class' => 'crm-select2'));
+      $this->addElement('select', 'language', ts('Language'), array('' => ts('- all languages -')) + $enabledLanguages, array('class' => 'crm-select2'));
     }
 
     if ($parent->_sms) {
