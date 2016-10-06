@@ -60,6 +60,7 @@ class CRM_Mailing_Selector_Search extends CRM_Core_Selector_Base implements CRM_
     'contact_id',
     'mailing_id',
     'mailing_name',
+    'language',
     'sort_name',
     'email',
     'mailing_subject',
@@ -356,6 +357,11 @@ class CRM_Mailing_Selector_Search extends CRM_Core_Selector_Base implements CRM_
         array(
           'name' => ts('Mailing Name'),
           'sort' => 'mailing_name',
+          'direction' => CRM_Utils_Sort::DONTCARE,
+        ),
+        array(
+          'name' => ts('Language'),
+          'sort' => 'language',
           'direction' => CRM_Utils_Sort::DONTCARE,
         ),
         array(
