@@ -6,7 +6,6 @@
 class CRM_Custom_Import_Form_MapField extends CRM_Contact_Import_Form_MapField {
   protected $_parser = 'CRM_Custom_Import_Parser_Api';
   protected $_mappingType = 'Import Multi value custom data';
-  protected $_highlightedFields = array();
   /**
    * Entity being imported to.
    * @var string
@@ -24,6 +23,7 @@ class CRM_Custom_Import_Form_MapField extends CRM_Contact_Import_Form_MapField {
     $this->_columnCount = $this->get('columnCount');
     $this->assign('columnCount', $this->_columnCount);
     $this->_dataValues = $this->get('dataValues');
+    $highlightedFields = array('contact_id', 'external_identifier');
 
     //Separate column names from actual values.
     $columnNames = $this->_dataValues[0];
@@ -42,7 +42,7 @@ class CRM_Custom_Import_Form_MapField extends CRM_Contact_Import_Form_MapField {
       $this->_columnHeaders = $this->_dataValues[0];
     }
     $this->assign('rowDisplayCount', 2);
-    $this->assign('highlightedFields', $this->_highlightedFields);
+    $this->assign('highlightedFields', $highlightedFields);
   }
 
   /**
@@ -72,16 +72,13 @@ class CRM_Custom_Import_Form_MapField extends CRM_Contact_Import_Form_MapField {
       foreach ($fields['mapper'] as $mapperPart) {
         $importKeys[] = $mapperPart[0];
       }
-      $requiredFields = array(
-        'contact_id' => ts('Contact ID'),
-      );
-      foreach ($requiredFields as $field => $title) {
-        if (!in_array($field, $importKeys)) {
-          if (!isset($errors['_qf_default'])) {
-            $errors['_qf_default'] = '';
-          }
-          $errors['_qf_default'] .= ts('Missing required field: %1', array(1 => $title));
+
+      // check either contact id or external identifier
+      if (!in_array('contact_id', $importKeys) && !in_array('external_identifier', $importKeys)) {
+        if (!isset($errors['_qf_default'])) {
+          $errors['_qf_default'] = '';
         }
+        $errors['_qf_default'] .= ts('Missing required field: %1', array(1 => ts('Contact ID or External Identifier')));
       }
     }
 
