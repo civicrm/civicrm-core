@@ -106,11 +106,11 @@ class CRM_Utils_Address {
         }
         else {
           //Capitalization display on uppercase to contries with special characters
-          $fields['country'] = mb_convert_case($fields['country'], MB_CASE_UPPER,"UTF-8");
+          $fields['country'] = mb_convert_case($fields['country'], MB_CASE_UPPER, "UTF-8");
         }
       }
       else {
-        $fields['country'] = strtoupper($fields['country']);
+          $fields['country'] = mb_convert_case($fields['country'], MB_CASE_UPPER, "UTF-8");
       }
     }
 
