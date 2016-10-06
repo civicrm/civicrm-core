@@ -23,9 +23,7 @@ class CRM_Custom_Import_Form_MapField extends CRM_Contact_Import_Form_MapField {
     $this->_columnCount = $this->get('columnCount');
     $this->assign('columnCount', $this->_columnCount);
     $this->_dataValues = $this->get('dataValues');
-    $highlightedFields = array();
-    $highlightedFields[] = 'contact_id';
-    $highlightedFields[] = 'external_identifier';
+    $highlightedFields = array('contact_id', 'external_identifier');
 
     //Separate column names from actual values.
     $columnNames = $this->_dataValues[0];
@@ -80,7 +78,7 @@ class CRM_Custom_Import_Form_MapField extends CRM_Contact_Import_Form_MapField {
         if (!isset($errors['_qf_default'])) {
           $errors['_qf_default'] = '';
         }
-        $errors['_qf_default'] .= ts('Missing required field: %1', array(1 => ts('Contact ID')));
+        $errors['_qf_default'] .= ts('Missing required field: %1', array(1 => ts('Contact ID or External Identifier')));
       }
     }
 
