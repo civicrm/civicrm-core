@@ -110,7 +110,7 @@ class CRM_Utils_Address {
         }
       }
       else {
-          $fields['country'] = mb_convert_case($fields['country'], MB_CASE_UPPER, "UTF-8");
+        $fields['country'] = mb_convert_case($fields['country'], MB_CASE_UPPER, "UTF-8");
       }
     }
 
