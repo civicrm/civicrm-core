@@ -2052,7 +2052,6 @@ WHERE  {$whereClause}";
       }
     }
     elseif (array_key_exists($field, $contactRelationshipTypes)) {
-      self::manipulateHeaderRows($headerRows, $contactRelationshipTypes);
       foreach ($value as $relationField => $relationValue) {
         // below block is same as primary block (duplicate)
         if (isset($relationQuery[$field]->_fields[$relationField]['title'])) {
@@ -2117,6 +2116,8 @@ WHERE  {$whereClause}";
     else {
       $headerRows[] = $field;
     }
+
+    self::manipulateHeaderRows($headerRows, $contactRelationshipTypes);
 
     self::sqlColumnDefn($query, $sqlColumns, $field);
 
