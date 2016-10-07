@@ -152,11 +152,13 @@ class CRM_Custom_Form_CustomData {
    */
   public static function setGroupTree(&$form, $subType, $gid, $onlySubType = NULL, $getCachedTree = FALSE) {
     $singleRecord = NULL;
-    if (!empty($form->_groupCount) && $form->_multiRecordDisplay == 'single') {
+    if (!empty($form->_groupCount) && !empty($form->_multiRecordDisplay) && $form->_multiRecordDisplay == 'single') {
       $singleRecord = $form->_groupCount;
     }
     $mode = CRM_Utils_Request::retrieve('mode', 'String', $form);
-    if ($form->_groupCount == 0 && $mode == 'add' && $form->_multiRecordDisplay == 'single') {
+    // when a new record is being added for multivalued custom fields.
+    if (isset($form->_groupCount) && $form->_groupCount == 0 && $mode == 'add' &&
+      !empty($form->_multiRecordDisplay) && $form->_multiRecordDisplay == 'single') {
       $singleRecord = 'new';
     }
 
