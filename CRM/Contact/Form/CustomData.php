@@ -233,7 +233,14 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
         $groupTree = CRM_Core_BAO_CustomGroup::getTree($this->_type,
           $this,
           $this->_entityId,
-          $this->_groupID
+          $this->_groupID,
+          array(),
+          NULL,
+          TRUE,
+          NULL,
+          FALSE,
+          TRUE,
+          $this->_copyValueId
         );
         $valueIdDefaults = array();
         $groupTreeValueId = CRM_Core_BAO_CustomGroup::formatGroupTree($groupTree, $this->_copyValueId, $this);
