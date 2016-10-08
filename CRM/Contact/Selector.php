@@ -942,7 +942,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
         $links[CRM_Core_Action::UPDATE] = array(
           'name' => '----',
         );
-    }
+      }
       if (!empty($this->_formValues['deleted_contacts']) && CRM_Core_Permission::check('access deleted contacts')
       ) {
         $links = array(
