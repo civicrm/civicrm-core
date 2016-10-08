@@ -227,7 +227,8 @@ class Requirements {
       'details' => "Connected",
     );
 
-    $conn = @mysqli_connect($db_config['host'], $db_config['username'], $db_config['password']);
+    $host = isset($db_config['server']) ? $db_config['server'] : $db_config['host'];
+    $conn = @mysqli_connect($host, $db_config['username'], $db_config['password']);
 
     if (!$conn) {
       $results['details'] = mysqli_connect_error();
@@ -256,7 +257,8 @@ class Requirements {
       'severity' => $this::REQUIREMENT_OK,
     );
 
-    $conn = @mysqli_connect($db_config['host'], $db_config['username'], $db_config['password']);
+    $host = isset($db_config['server']) ? $db_config['server'] : $db_config['host'];
+    $conn = @mysqli_connect($host, $db_config['username'], $db_config['password']);
     if (!$conn || !($info = mysqli_get_server_info($conn))) {
       $results['severity'] = $this::REQUIREMENT_WARNING;
       $results['details'] = "Cannot determine the version of MySQL installed. Please ensure at least version {$min} is installed.";
