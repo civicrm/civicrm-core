@@ -66,6 +66,9 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
       'civicrm_uf_match',
       'civicrm_activity',
       'civicrm_activity_contact',
+      'civicrm_note',
+      'civicrm_entity_tag',
+      'civicrm_tag',
     );
     $this->quickCleanup($tablesToTruncate);
     $config = CRM_Core_Config::singleton();
@@ -136,6 +139,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
       );
       // We should be prevented from getting or creating entities for a contact we don't have permission for
       $this->callAPIFailure($entity, 'create', $params);
+      $this->callAPISuccess($entity, 'create', array('check_permissions' => 0) + $params);
       $results = $this->callAPISuccess($entity, 'get', array('contact_id' => $disallowedContact, 'check_permissions' => 1));
       $this->assertEquals(0, $results['count']);
 
@@ -143,6 +147,31 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
       $params['contact_id'] = $this->allowedContactId;
       $this->callAPISuccess($entity, 'create', $params);
       $results = $this->callAPISuccess($entity, 'get', array('contact_id' => $this->allowedContactId, 'check_permissions' => 1));
+      $this->assertGreaterThan(0, $results['count']);
+    }
+    $newTag = civicrm_api3('Tag', 'create', array(
+      'name' => 'Foo123',
+    ));
+    $relatedEntities = array(
+      'Note' => array('note' => 'abc'),
+      'EntityTag' => array('tag_id' => $newTag['id']),
+    );
+    foreach ($relatedEntities as $entity => $params) {
+      $params += array(
+        'entity_id' => $disallowedContact,
+        'entity_table' => 'civicrm_contact',
+        'check_permissions' => 1,
+      );
+      // We should be prevented from getting or creating entities for a contact we don't have permission for
+      $this->callAPIFailure($entity, 'create', $params);
+      $this->callAPISuccess($entity, 'create', array('check_permissions' => 0) + $params);
+      $results = $this->callAPISuccess($entity, 'get', array('entity_id' => $disallowedContact, 'entity_table' => 'civicrm_contact', 'check_permissions' => 1));
+      $this->assertEquals(0, $results['count']);
+
+      // We should be allowed to create and get for entities we do have permission on
+      $params['entity_id'] = $this->allowedContactId;
+      $this->callAPISuccess($entity, 'create', $params);
+      $results = $this->callAPISuccess($entity, 'get', array('entity_id' => $this->allowedContactId, 'entity_table' => 'civicrm_contact', 'check_permissions' => 1));
       $this->assertGreaterThan(0, $results['count']);
     }
   }
