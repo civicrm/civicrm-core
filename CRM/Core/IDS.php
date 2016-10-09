@@ -160,6 +160,7 @@ class CRM_Core_IDS {
     exceptions[]        = instructions
     exceptions[]        = suggested_message
     exceptions[]        = page_text
+    exceptions[]        = details
 ";
     if (file_put_contents($configFile, $contents) === FALSE) {
       CRM_Core_Error::movedSiteError($configFile);
