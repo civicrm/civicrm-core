@@ -2440,13 +2440,15 @@ SELECT contact_id
         $relatedClauses = array();
         $relatedEntities = $this->buildOptions('entity_table', 'get');
         foreach ((array) $relatedEntities as $table => $ent) {
-          $ent = CRM_Core_DAO_AllCoreTables::getBriefName(CRM_Core_DAO_AllCoreTables::getClassForTable($table));
-          $subquery = CRM_Utils_SQL::mergeSubquery($ent);
-          if ($subquery) {
-            $relatedClauses[] = "(entity_table = '$table' AND entity_id " . implode(' AND entity_id ', $subquery) . ")";
-          }
-          else {
-            $relatedClauses[] = "(entity_table = '$table')";
+          if (!empty($ent)) {
+            $ent = CRM_Core_DAO_AllCoreTables::getBriefName(CRM_Core_DAO_AllCoreTables::getClassForTable($table));
+            $subquery = CRM_Utils_SQL::mergeSubquery($ent);
+            if ($subquery) {
+              $relatedClauses[] = "(entity_table = '$table' AND entity_id " . implode(' AND entity_id ', $subquery) . ")";
+            }
+            else {
+              $relatedClauses[] = "(entity_table = '$table')";
+            }
           }
         }
         if ($relatedClauses) {
