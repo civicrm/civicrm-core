@@ -806,6 +806,8 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
       'related_contact' => 'relatedContactID',
       'onbehalf_dupe_alert' => 'onBehalfDupeAlert',
       'accountingCode' => 'accountingCode',
+      'contributionRecurID' => 'contributionRecurID',
+      'contributionPageID' => 'contributionPageID',
     );
     foreach ($notifyParameterMap as $paramsName => $notifyName) {
       if (!empty($params[$paramsName])) {
@@ -887,11 +889,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
 
     // if recurring donations, add a few more items
     if (!empty($params['is_recur'])) {
-      if ($params['contributionRecurID']) {
-        $notifyURL .= "&contributionRecurID={$params['contributionRecurID']}&contributionPageID={$params['contributionPageID']}";
-        $paypalParams['notify_url'] = $notifyURL;
-      }
-      else {
+      if (!$params['contributionRecurID']) {
         CRM_Core_Error::fatal(ts('Recurring contribution, but no database id'));
       }
 
