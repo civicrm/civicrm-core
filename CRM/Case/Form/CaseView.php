@@ -375,33 +375,27 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
 
     // see if we have any tagsets which can be assigned to cases
     $parentNames = CRM_Core_BAO_Tag::getTagSet('civicrm_case');
-    $tagSetTagNames = array();
+    $tagSetTags = array();
     if ($parentNames) {
       $this->assign('showTags', TRUE);
       $tagSetItems = civicrm_api3('entityTag', 'get', array(
         'entity_id' => $this->_caseID,
         'entity_table' => 'civicrm_case',
+        'tag_id.parent_id.is_tagset' => 1,
         'options' => array('limit' => 0),
+        'return' => array("tag_id.parent_id", "tag_id.parent_id.name", "tag_id.name"),
       ));
-      if ($tagSetItems['count']) {
-        $tagSetTags = civicrm_api3('tag', 'get', array(
-          'id' => array('IN' => array_keys($tagSetItems['values'])),
-          'parent_id.is_tagset' => 1,
-          'return' => array("parent_id", "parent_id.name", "name"),
-          'options' => array('limit' => 0),
-        ));
-        foreach ($tagSetTags['values'] as $id => $tag) {
-          $tagSetTagNames += array(
-            $tag['parent_id'] => array(
-              'name' => $tag['parent_id.name'],
-              'items' => array(),
-            ),
-          );
-          $tagSetTagNames[$tag['parent_id']]['items'][$id] = $tag['name'];
-        }
+      foreach ($tagSetItems['values'] as $tag) {
+        $tagSetTags += array(
+          $tag['tag_id.parent_id'] => array(
+            'name' => $tag['tag_id.parent_id.name'],
+            'items' => array(),
+          ),
+        );
+        $tagSetTags[$tag['tag_id.parent_id']]['items'][] = $tag['tag_id.name'];
       }
     }
-    $this->assign('tagSetTags', $tagSetTagNames);
+    $this->assign('tagSetTags', $tagSetTags);
     CRM_Core_Form_Tag::buildQuickForm($this, $parentNames, 'civicrm_case', $this->_caseID, FALSE, TRUE);
 
     $this->addButtons(array(
