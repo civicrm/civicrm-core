@@ -290,6 +290,16 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
   // Loc block is only used for events
   $permissions['loc_block'] = $permissions['event'];
 
+  // Price sets are shared by several components, user needs access to at least one of them
+  $permissions['price_set'] = array(
+    'default' => array(
+      array('access CiviEvent', 'access CiviContribute', 'access CiviMember'),
+    ),
+    'get' => array(
+      array('access CiviCRM', 'view event info', 'make online contributions'),
+    ),
+  );
+
   // File permissions
   $permissions['file'] = array(
     'default' => array(
