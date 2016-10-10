@@ -585,14 +585,12 @@ WHERE participant.contact_id = %1 AND  note.entity_table = 'civicrm_participant'
    * @return array
    */
   public static function entityTables() {
-    $tables = array(
-      'civicrm_relationship',
-      'civicrm_contact',
-      'civicrm_participant',
-      'civicrm_contribution',
+    return array(
+      'civicrm_relationship' => 'Relationship',
+      'civicrm_contact' => 'Contact',
+      'civicrm_participant' => 'Participant',
+      'civicrm_contribution' => 'Contribution',
     );
-    // Identical keys & values
-    return array_combine($tables, $tables);
   }
 
 }

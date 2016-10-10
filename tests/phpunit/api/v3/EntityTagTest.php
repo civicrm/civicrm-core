@@ -64,7 +64,7 @@ class api_v3_EntityTagTest extends CiviUnitTestCase {
     $this->useTransaction(TRUE);
 
     $this->_individualID = $this->individualCreate();
-    $this->_tag = $this->tagCreate();
+    $this->_tag = $this->tagCreate(array('name' => 'EntityTagTest'));
     $this->_tagID = $this->_tag['id'];
     $this->_householdID = $this->houseHoldCreate();
     $this->_organizationID = $this->organizationCreate();
@@ -298,6 +298,32 @@ class api_v3_EntityTagTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('entity_tag', 'delete', $params);
     $this->assertEquals($result['removed'], 1);
     $this->assertEquals($result['not_removed'], 1);
+  }
+
+  public function testEntityTagJoin() {
+    $org = $this->callAPISuccess('Contact', 'create', array(
+      'contact_type' => 'Organization',
+      'organization_name' => 'Org123',
+      'api.EntityTag.create' => array(
+        'tag_id' => $this->_tagID,
+      ),
+    ));
+    // Fetch contact info via join
+    $result = $this->callAPISuccessGetSingle('EntityTag', array(
+      'return' => array("entity_id.organization_name", "tag_id.name"),
+      'entity_id' => $org['id'],
+      'entity_table' => "civicrm_contact",
+    ));
+    $this->assertEquals('Org123', $result['entity_id.organization_name']);
+    $this->assertEquals('EntityTagTest', $result['tag_id.name']);
+    // This should return no results by restricting contact_type
+    $result = $this->callAPISuccess('EntityTag', 'get', array(
+      'return' => array("entity_id.organization_name"),
+      'entity_id' => $org['id'],
+      'entity_table' => "civicrm_contact",
+      'entity_id.contact_type' => "Individual",
+    ));
+    $this->assertEquals(0, $result['count']);
   }
 
 }
