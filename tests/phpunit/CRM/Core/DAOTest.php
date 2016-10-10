@@ -51,7 +51,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
       'location_type_id' => 1,
     );
 
-    $email = CRM_Core_BAO_Email::add($params);
+    CRM_Core_BAO_Email::add($params);
 
     $refs = $contact->findReferences();
     $refsByTable = array();
@@ -217,7 +217,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     CRM_Contact_BAO_Contact::deleteContact($contact->id, FALSE, TRUE);
     $exception_thrown = FALSE;
     try {
-      $deleted_contact = CRM_Contact_BAO_Contact::findById($deleted_contact_id);
+      CRM_Contact_BAO_Contact::findById($deleted_contact_id);
     }
     catch (Exception $e) {
       $exception_thrown = TRUE;
@@ -243,7 +243,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
       '123456' => FALSE,
       'test#$%^&*' => FALSE,
     );
-    $testDetails = array();
+
     foreach ($databases as $database => $val) {
       $this->assertEquals(CRM_Core_DAO::requireSafeDBName($database), $val);
     }

@@ -379,8 +379,7 @@ civicrm_activity_assignment.record_type_id = $assigneeID ) ";
         $userId = $form->_interviewerId;
       }
       if (!$userId) {
-        $session = CRM_Core_Session::singleton();
-        $userId = $session->get('userID');
+        $userId = CRM_Core_Session::singleton()->getLoggedInContactID();
       }
       if ($userId) {
         $defaults = array();

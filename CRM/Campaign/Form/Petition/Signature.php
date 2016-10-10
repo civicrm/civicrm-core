@@ -163,8 +163,7 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
     }
 
     // check if the user is registered and we have a contact ID
-    $session = CRM_Core_Session::singleton();
-    return $session->get('userID');
+    return CRM_Core_Session::singleton()->getLoggedInContactID();
   }
 
   public function preProcess() {

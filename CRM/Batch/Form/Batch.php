@@ -98,8 +98,7 @@ class CRM_Batch_Form_Batch extends CRM_Admin_Form {
       $params['id'] = $this->_id;
     }
     else {
-      $session = CRM_Core_Session::singleton();
-      $params['created_id'] = $session->get('userID');
+      $params['created_id'] = CRM_Core_Session::singleton()->getLoggedInContactID();
       $params['created_date'] = CRM_Utils_Date::processDate(date("Y-m-d"), date("H:i:s"));
     }
 

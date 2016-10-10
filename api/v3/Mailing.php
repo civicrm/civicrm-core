@@ -525,7 +525,6 @@ function civicrm_api3_mailing_preview($params) {
     $fromEmail = $params['from_email'];
   }
 
-  $session = CRM_Core_Session::singleton();
   $mailing = new CRM_Mailing_BAO_Mailing();
   $mailing->id = $params['id'];
   $mailing->find(TRUE);
@@ -538,13 +537,13 @@ function civicrm_api3_mailing_preview($params) {
   $returnProperties = $mailing->getReturnProperties();
   $contactID = CRM_Utils_Array::value('contact_id', $params);
   if (!$contactID) {
-    $contactID = $session->get('userID');
+    $contactID = CRM_Core_Session::singleton()->getLoggedInContactID();
   }
   $mailingParams = array('contact_id' => $contactID);
 
   $details = CRM_Utils_Token::getTokenDetails($mailingParams, $returnProperties, TRUE, TRUE, NULL, $mailing->getFlattenedTokens());
 
-  $mime = $mailing->compose(NULL, NULL, NULL, $session->get('userID'), $fromEmail, $fromEmail,
+  $mime = $mailing->compose(NULL, NULL, NULL, CRM_Core_Session::singleton()->getLoggedInContactID(), $fromEmail, $fromEmail,
     TRUE, $details[0][$contactID], $attachments
   );
 

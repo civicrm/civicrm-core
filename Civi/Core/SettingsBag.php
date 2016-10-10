@@ -380,9 +380,8 @@ class SettingsBag {
 
     $dao->created_date = \CRM_Utils_Time::getTime('YmdHis');
 
-    $session = \CRM_Core_Session::singleton();
-    if (\CRM_Contact_BAO_Contact_Utils::isContactId($session->get('userID'))) {
-      $dao->created_id = $session->get('userID');
+    if (\CRM_Contact_BAO_Contact_Utils::isContactId(\CRM_Core_Session::singleton()->getLoggedInContactID())) {
+      $dao->created_id = \CRM_Core_Session::singleton()->getLoggedInContactID();
     }
 
     if ($dao->id) {

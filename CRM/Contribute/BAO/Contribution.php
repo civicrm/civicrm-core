@@ -521,14 +521,12 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_contribution', $contribution->id);
     }
 
-    $session = CRM_Core_Session::singleton();
-
     if (!empty($params['note'])) {
       $noteParams = array(
         'entity_table' => 'civicrm_contribution',
         'note' => $params['note'],
         'entity_id' => $contribution->id,
-        'contact_id' => $session->get('userID'),
+        'contact_id' => CRM_Core_Session::singleton()->getLoggedInContactID(),
         'modified_date' => date('Ymd'),
       );
       if (!$noteParams['contact_id']) {
@@ -3984,9 +3982,8 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
       'skipRecentView' => TRUE,
     );
 
-    // create activity with target contacts
-    $session = CRM_Core_Session::singleton();
-    $id = $session->get('userID');
+    // Create activity with target contacts.
+    $id = CRM_Core_Session::singleton()->getLoggedInContactID();
     if ($id) {
       $activityParams['source_contact_id'] = $id;
       $activityParams['target_contact_id'][] = $targetCid;

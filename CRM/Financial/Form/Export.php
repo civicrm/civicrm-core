@@ -162,9 +162,8 @@ class CRM_Financial_Form_Export extends CRM_Core_Form {
     $totals = CRM_Batch_BAO_Batch::batchTotals($batchIds);
 
     // build batch params
-    $session = CRM_Core_Session::singleton();
     $batchParams['modified_date'] = date('YmdHis');
-    $batchParams['modified_id'] = $session->get('userID');
+    $batchParams['modified_id'] = CRM_Core_Session::singleton()->getLoggedInContactID();
     $batchParams['status_id'] = $this->_exportStatusId;
 
     $ids = array();

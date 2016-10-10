@@ -142,12 +142,14 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
     $event = self::add($params);
     CRM_Price_BAO_PriceSet::setPriceSets($params, $event, 'event');
     if (is_a($event, 'CRM_Core_Error')) {
+      // @todo - this should not be called - deprecated function.
+      // throw exception here instead? (or right after add). Without the
+      // commit it may be irrelevant anyway.
       CRM_Core_DAO::transaction('ROLLBACK');
       return $event;
     }
 
-    $session = CRM_Core_Session::singleton();
-    $contactId = $session->get('userID');
+    $contactId = CRM_Core_Session::singleton()->getLoggedInContactID();
     if (!$contactId) {
       $contactId = CRM_Utils_Array::value('contact_id', $params);
     }
@@ -192,11 +194,6 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
     $groupTree = CRM_Core_BAO_CustomGroup::getGroupDetail(NULL, NULL, $extends);
     foreach ($groupTree as $values) {
       $query = "DELETE FROM " . $values['table_name'] . " WHERE entity_id = " . $id;
-
-      $params = array(
-        1 => array($values['table_name'], 'string'),
-        2 => array($id, 'integer'),
-      );
 
       CRM_Core_DAO::executeQuery($query);
     }
@@ -1376,7 +1373,6 @@ WHERE civicrm_event.is_active = 1
           isset($values[$fields['participant_status_id']['title']]) &&
           is_numeric($values[$fields['participant_status_id']['title']])
         ) {
-          $status = array();
           $status = CRM_Event_PseudoConstant::participantStatus();
           $values[$fields['participant_status_id']['title']] = $status[$values[$fields['participant_status_id']['title']]];
         }
@@ -1385,7 +1381,6 @@ WHERE civicrm_event.is_active = 1
           isset($values[$fields['participant_role_id']['title']]) &&
           is_numeric($values[$fields['participant_role_id']['title']])
         ) {
-          $roles = array();
           $roles = CRM_Event_PseudoConstant::participantRole();
           $values[$fields['participant_role_id']['title']] = $roles[$values[$fields['participant_role_id']['title']]];
         }
@@ -1750,7 +1745,6 @@ WHERE  id = $cfID
     //hack to skip cancelled participants, CRM-4320
     $where = "participant.registered_by_id={$participantId}";
     if ($skipCancel) {
-      $cancelStatusId = 0;
       $negativeStatuses = CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Negative'");
       $cancelStatusId = array_search('Cancelled', $negativeStatuses);
       $where .= " AND participant.status_id != {$cancelStatusId}";

@@ -423,9 +423,8 @@ class CRM_Activity_Page_AJAX {
       }
     }
 
-    // store the activity filter preference CRM-11761
-    $session = CRM_Core_Session::singleton();
-    $userID = $session->get('userID');
+    // Store the activity filter preference CRM-11761.
+    $userID = CRM_Core_Session::singleton()->getLoggedInContactID();
     if ($userID) {
       $activityFilter = array(
         'activity_type_filter_id' => empty($params['activity_type_id']) ? '' : CRM_Utils_Type::escape($params['activity_type_id'], 'Integer'),

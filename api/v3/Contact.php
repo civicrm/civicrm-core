@@ -395,8 +395,7 @@ function civicrm_api3_contact_delete($params) {
     throw new \Civi\API\Exception\UnauthorizedException('Permission denied to modify contact record');
   }
 
-  $session = CRM_Core_Session::singleton();
-  if ($contactID == $session->get('userID')) {
+  if ($contactID == CRM_Core_Session::singleton()->getLoggedInContactID()) {
     return civicrm_api3_create_error('This contact record is linked to the currently logged in user account - and cannot be deleted.');
   }
   $restore = !empty($params['restore']) ? $params['restore'] : FALSE;

@@ -438,8 +438,7 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
     }
 
     if (isset($this->_params['options']['my_cases'])) {
-      $session = CRM_Core_Session::singleton();
-      $userID = $session->get('userID');
+      $userID = CRM_Core_Session::singleton()->getLoggedInContactID();
       $clauses[] = "{$this->_aliases['civicrm_contact']}.id = {$userID}";
     }
 

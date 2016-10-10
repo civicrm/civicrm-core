@@ -97,8 +97,7 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
     // check if new layout is create, if so set the created_id (if not set)
     if (empty($params['id'])) {
       if (empty($params['created_id'])) {
-        $session = CRM_Core_Session::singleton();
-        $params['created_id'] = $session->get('userID');
+        $params['created_id'] = CRM_Core_Session::singleton()->getLoggedInContactID();
       }
     }
 

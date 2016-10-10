@@ -76,7 +76,7 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
     }
     else {
       if (!$this->_contactID) {
-        $this->_contactID = $session->get('userID');
+        $this->_contactID = CRM_Core_Session::singleton()->getLoggedInContactID();
         if (!$this->_contactID) {
           CRM_Utils_System::fatal('Could not retrieve contact id');
         }

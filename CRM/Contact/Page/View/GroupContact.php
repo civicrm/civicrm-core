@@ -179,8 +179,7 @@ class CRM_Contact_Page_View_GroupContact extends CRM_Core_Page {
     $ids = array($contactID);
     $method = 'Admin';
 
-    $session = CRM_Core_Session::singleton();
-    $userID = $session->get('userID');
+    $userID = CRM_Core_Session::singleton()->getLoggedInContactID();
 
     if ($userID == $contactID) {
       $method = 'Web';

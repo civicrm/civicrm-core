@@ -606,9 +606,8 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   public static function closeReOpen($batchIds = array(), $status) {
     $batchStatus = CRM_Core_PseudoConstant::get('CRM_Batch_DAO_Batch', 'status_id');
     $params['status_id'] = CRM_Utils_Array::key($status, $batchStatus);
-    $session = CRM_Core_Session::singleton();
     $params['modified_date'] = date('YmdHis');
-    $params['modified_id'] = $session->get('userID');
+    $params['modified_id'] = CRM_Core_Session::singleton()->getLoggedInContactID();
     foreach ($batchIds as $key => $value) {
       $params['id'] = $ids['batchID'] = $value;
       self::create($params, $ids);

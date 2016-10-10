@@ -89,8 +89,7 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
         CRM_Core_Session::setStatus(ts('You have selected "Redirect to Database". A test email can not be sent.'), ts("Email Disabled"), "error");
       }
       else {
-        $session = CRM_Core_Session::singleton();
-        $userID = $session->get('userID');
+        $userID = CRM_Core_Session::singleton()->getLoggedInContactID();
         list($toDisplayName, $toEmail, $toDoNotEmail) = CRM_Contact_BAO_Contact::getContactDetails($userID);
 
         //get the default domain email address.CRM-4250
