@@ -4779,15 +4779,15 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
       FALSE,
       CRM_Utils_Array::value('task', $this->_params)
     ));
-    if ($this->_outputMode !==NULL) {
+    if ($this->_outputMode !== NULL) {
       // We didn't get it using output, so we now try with task.
-        $this->_outputMode = str_replace('report_instance.', '', CRM_Utils_Request::retrieve(
+      $this->_outputMode = str_replace('report_instance.', '', CRM_Utils_Request::retrieve(
           'task',
           'String',
           CRM_Core_DAO::$_nullObject,
           FALSE,
           CRM_Utils_Array::value('task', $this->_params)
-      ));
+        ));
     }
     // if contacts are added to group
     if (!empty($this->_params['groups']) && empty($this->_outputMode)) {
