@@ -1493,9 +1493,9 @@ class CRM_Report_Form extends CRM_Core_Form {
 
     $this->assign('instanceForm', $this->_instanceForm);
 
-    // CRM-16274 Determine if user has 'edit all contacts' or equivalent
-    $permission = CRM_Core_Permission::getPermission();
-    if ($permission == CRM_Core_Permission::EDIT &&
+    // CRM-19330 - check that the user has Edit All Groups permissions.
+    $permission = CRM_Core_Permission::check(CRM_Core_Permission::EDIT_GROUPS);
+    if ($permission  &&
       $this->_add2groupSupported
     ) {
       $this->addElement('select', 'groups', ts('Group'),
@@ -3879,13 +3879,13 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
     if (!empty($prop['filters']) && $this->_customGroupFilters) {
       foreach ($prop['filters'] as $fieldAlias => $val) {
         foreach (array(
-                   'value',
-                   'min',
-                   'max',
-                   'relative',
-                   'from',
-                   'to',
-                 ) as $attach) {
+          'value',
+          'min',
+          'max',
+          'relative',
+          'from',
+          'to',
+        ) as $attach) {
           if (isset($this->_params[$fieldAlias . '_' . $attach]) &&
             (!empty($this->_params[$fieldAlias . '_' . $attach])
               || ($attach != 'relative' &&
@@ -4752,6 +4752,16 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
       FALSE,
       CRM_Utils_Array::value('task', $this->_params)
     ));
+    if ($this->_outputMode !==NULL) {
+      // We didn't get it using output, so we now try with task.
+        $this->_outputMode = str_replace('report_instance.', '', CRM_Utils_Request::retrieve(
+          'task',
+          'String',
+          CRM_Core_DAO::$_nullObject,
+          FALSE,
+          CRM_Utils_Array::value('task', $this->_params)
+      ));
+    }
     // if contacts are added to group
     if (!empty($this->_params['groups']) && empty($this->_outputMode)) {
       $this->_outputMode = 'group';
