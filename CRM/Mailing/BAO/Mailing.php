@@ -3171,13 +3171,11 @@ AND        m.id = %1
    * Whitelist of possible values for the entity_table field
    * @return array
    */
-  public static function mailingGroupEntityTables() {
-    $tables = array(
-      CRM_Contact_BAO_Group::getTableName(),
-      CRM_Mailing_BAO_Mailing::getTableName(),
+  public static function mailingGroupEntityTables($context = NULL) {
+    return array(
+      CRM_Contact_BAO_Group::getTableName() => 'Group',
+      CRM_Mailing_BAO_Mailing::getTableName() => 'Mailing',
     );
-    // Identical keys & values
-    return array_combine($tables, $tables);
   }
 
   /**

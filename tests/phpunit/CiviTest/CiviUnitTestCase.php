@@ -2389,17 +2389,6 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Delete note.
-   *
-   * @param array $params
-   *
-   * @return array|int
-   */
-  public function noteDelete($params) {
-    return $this->callAPISuccess('Note', 'delete', $params);
-  }
-
-  /**
    * Create custom field with Option Values.
    *
    * @param array $customGroup
