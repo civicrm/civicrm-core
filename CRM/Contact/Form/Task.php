@@ -443,6 +443,21 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
       }
       $householdsDAO->free();
     }
+
+    // If contact list has changed, households will probably be at the end of
+    // the list. Sort it again by sort_name.
+    if (implode(',', $this->_contactIds) != $relID) {
+      $contact_sort = array();
+      $result = civicrm_api3('Contact', 'get', array(
+        'return' => array('id'),
+        'id' => array('IN' => $this->_contactIds),
+        'options' => array(
+          'limit' => 0,
+          'sort' => "sort_name"
+        ),
+      ));
+      $this->_contactIds = array_keys($result['values']);
+    }
   }
 
   /**
