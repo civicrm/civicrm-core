@@ -151,16 +151,12 @@ class api_v3_EntityTagACLTest extends CiviUnitTestCase {
   public function testThatForEntityWithoutACLOrEditAllThereIsNoAccess($entity) {
 
     CRM_Core_Config::singleton()->userPermissionClass->permissions = array('access CiviCRM', 'view all contacts');
-    $this->callAPISuccess('EntityTag', 'create', array(
+    $this->callAPIFailure('EntityTag', 'create', array(
       'entity_id' => 1,
       'tag_id' => $entity,
       'check_permissions' => TRUE,
       'entity_table' => $this->getTableForTag($entity),
     ));
-    $this->callAPISuccessGetCount('EntityTag', array(
-      'entity_id' => 1,
-      'entity_table' => $this->getTableForTag($entity),
-    ), 0);
   }
 
   /**
@@ -203,7 +199,8 @@ class api_v3_EntityTagACLTest extends CiviUnitTestCase {
 
     CRM_Core_Config::singleton()->userPermissionClass->permissions = array('access CiviCRM', 'view all contacts');
     $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereHookAllResults'));
-    $this->callAPISuccess('EntityTag', 'create', array(
+    civicrm_api('EntityTag', 'create', array(
+      'version' => 3,
       'entity_id' => 1,
       'tag_id' => $entity,
       'entity_table' => $this->getTableForTag($entity),
