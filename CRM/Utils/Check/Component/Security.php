@@ -397,10 +397,10 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
     $heuristicBaseUrl = $res_arr[0];
     $res_arr = explode($filePathMarker, str_replace('\\', '/', $targetDir));
     if (count($res_arr)) == 2) {
-       $heuristicSuffix = $res_arr[1];
+      $heuristicSuffix = $res_arr[1];
     }
     else {
-       $heuristicSuffix = "";
+      $heuristicSuffix = "";
     }
 
     return $heuristicBaseUrl . $filePathMarker . $heuristicSuffix;
