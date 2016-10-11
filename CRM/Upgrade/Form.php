@@ -491,7 +491,7 @@ SET    version = '$version'
     }
 
     // check for mysql trigger privileges
-    if (!CRM_Core_DAO::checkTriggerViewPermission(FALSE, TRUE)) {
+    if (!\Civi::settings()->get('logging_no_trigger_permission') && !CRM_Core_DAO::checkTriggerViewPermission(FALSE, TRUE)) {
       $error = ts('CiviCRM %1 requires MySQL trigger privileges.',
         array(1 => $latestVer));
     }
