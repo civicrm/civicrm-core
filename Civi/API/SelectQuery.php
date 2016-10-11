@@ -123,8 +123,7 @@ abstract class SelectQuery {
     $this->buildSelectFields();
 
     $this->buildWhereClause();
-
-    if (in_array('count', $this->select)) {
+    if (in_array('count_rows', $this->select)) {
       $this->query->select("count(*) as c");
     }
     else {
@@ -144,7 +143,7 @@ abstract class SelectQuery {
     $result_dao = \CRM_Core_DAO::executeQuery($this->query->toSQL());
 
     while ($result_dao->fetch()) {
-      if (in_array('count', $this->select)) {
+      if (in_array('count_rows', $this->select)) {
         $result_dao->free();
         return (int) $result_dao->c;
       }
