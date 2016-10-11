@@ -121,6 +121,12 @@ WHERE contact_id IN ({$contact_id_list})
   public static function allow($id, $type = CRM_Core_Permission::VIEW) {
     $tables = array();
     $whereTables = array();
+    // first: check if contact is trying to view own contact
+    if (   $type == CRM_Core_Permission::VIEW && CRM_Core_Permission::check('view my contact')
+        || $type == CRM_Core_Permission::EDIT && CRM_Core_Permission::check('edit my contact')
+      ) {
+      return TRUE;
+    }
 
     # FIXME: push this somewhere below, to not give this permission so many rights
     $isDeleted = (bool) CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $id, 'is_deleted');
