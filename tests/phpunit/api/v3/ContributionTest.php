@@ -2091,6 +2091,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     )));
     unset($expectedLineItem['id'], $expectedLineItem['entity_id']);
     unset($lineItem2['values'][0]['id'], $lineItem2['values'][0]['entity_id']);
+    $expectedLineItem['contribution_type_id'] = $lineItem2['values'][0]['contribution_type_id'];
     $this->assertEquals($expectedLineItem, $lineItem2['values'][0]);
   }
 
@@ -2141,6 +2142,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     )));
     unset($expectedLineItem['id'], $expectedLineItem['entity_id']);
     unset($lineItem2['values'][0]['id'], $lineItem2['values'][0]['entity_id']);
+    $expectedLineItem['contribution_type_id'] = $lineItem2['values'][0]['contribution_type_id'];
     $this->assertEquals($expectedLineItem, $lineItem2['values'][0]);
   }
 
