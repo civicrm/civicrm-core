@@ -250,6 +250,53 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     $this->assertTrue((bool) preg_match('/Includer Person/', $previewNames[0]), "Name 'Includer Person' should appear in '" . $previewNames[0] . '"');
   }
 
+  public function testMailerPreviewRecipientsDeduplicate() {
+    // BEGIN SAMPLE DATA
+    $groupIDs['grp'] = $this->groupCreate(array('name' => 'Example group', 'title' => 'Example group'));
+    $contactIDs['include_me'] = $this->individualCreate(array(
+        'email' => 'include.me@example.org',
+        'first_name' => 'Includer',
+        'last_name' => 'Person',
+      ));
+    $contactIDs['include_me_duplicate'] = $this->individualCreate(array(
+        'email' => 'include.me@example.org',
+        'first_name' => 'IncluderDuplicate',
+        'last_name' => 'Person',
+      ));
+    $this->callAPISuccess('GroupContact', 'create', array(
+        'group_id' => $groupIDs['grp'],
+        'contact_id' => $contactIDs['include_me'],
+      ));
+    $this->callAPISuccess('GroupContact', 'create', array(
+        'group_id' => $groupIDs['grp'],
+        'contact_id' => $contactIDs['include_me_duplicate'],
+      ));
+
+    $params = $this->_params;
+    $params['groups']['include'] = array($groupIDs['grp']);
+    $params['mailings']['include'] = array();
+    $params['options']['force_rollback'] = 1;
+    $params['dedupe_email'] = 1;
+    $params['api.mailing_job.create'] = 1;
+    $params['api.MailingRecipients.get'] = array(
+      'mailing_id' => '$value.id',
+      'api.contact.getvalue' => array(
+        'return' => 'display_name',
+      ),
+      'api.email.getvalue' => array(
+        'return' => 'email',
+      ),
+    );
+    // END SAMPLE DATA
+
+    $create = $this->callAPIAndDocument('Mailing', 'create', $params, __FUNCTION__, __FILE__);
+
+    $preview = $create['values'][$create['id']]['api.MailingRecipients.get'];
+    $this->assertEquals(1, $preview['count']);
+    $previewEmails = array_values(CRM_Utils_Array::collect('api.email.getvalue', $preview['values']));
+    $this->assertEquals(array('include.me@example.org'), $previewEmails);
+  }
+
   /**
    *
    */
