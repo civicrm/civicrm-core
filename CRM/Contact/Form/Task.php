@@ -453,7 +453,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
         'id' => array('IN' => $this->_contactIds),
         'options' => array(
           'limit' => 0,
-          'sort' => "sort_name"
+          'sort' => "sort_name",
         ),
       ));
       $this->_contactIds = array_keys($result['values']);
