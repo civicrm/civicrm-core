@@ -54,3 +54,6 @@ civicrm.settings.php
 sql/dummy_processor.mysql
 distmaker/distmaker.conf
 distmaker/out
+/nbproject/project.xml
+/nbproject/project.properties
+/templates/CRM/Member/Form/
