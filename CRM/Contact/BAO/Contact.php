@@ -789,7 +789,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
    * @return bool
    *   Was contact deleted?
    */
-  public static function deleteContact($id, $restore = FALSE, $skipUndelete = FALSE) {
+  public static function deleteContact($id, $restore = FALSE, $skipUndelete = FALSE, $checkPermissions = TRUE) {
 
     if (!$id) {
       return FALSE;
@@ -801,8 +801,8 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
 
     // make sure we have edit permission for this contact
     // before we delete
-    if (($skipUndelete && !CRM_Core_Permission::check('delete contacts')) ||
-      ($restore && !CRM_Core_Permission::check('access deleted contacts'))
+    if ($checkPermissions && (($skipUndelete && !CRM_Core_Permission::check('delete contacts')) ||
+      ($restore && !CRM_Core_Permission::check('access deleted contacts')))
     ) {
       return FALSE;
     }
