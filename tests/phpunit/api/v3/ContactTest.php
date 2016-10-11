@@ -2250,6 +2250,24 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that delete with skip undelete respects permissions.
+   */
+  public function testContactDeletePermissions() {
+    $contactID = $this->individualCreate();
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('access CiviCRM');
+    $this->callAPIFailure('Contact', 'delete', array(
+      'id' => $contactID,
+      'check_permissions' => 1,
+      'skip_undelete' => 1,
+    ));
+    $this->callAPISuccess('Contact', 'delete', array(
+      'id' => $contactID,
+      'check_permissions' => 0,
+      'skip_undelete' => 1,
+    ));
+  }
+
+  /**
    * Test update with check permissions set.
    */
   public function testContactUpdatePermissions() {
