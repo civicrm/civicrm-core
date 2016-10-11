@@ -58,133 +58,61 @@ class Request {
    *   - data: \CRM_Utils_OptionBag derived from params [v4-only]
    *   - chains: unspecified derived from params [v4-only]
    */
-  public static function create($entity, $action, $params, $extra) {
-    $apiRequest = array(); // new \Civi\API\Request();
-    $apiRequest['id'] = self::$nextId++;
-    $apiRequest['version'] = self::parseVersion($params);
-    $apiRequest['params'] = $params;
-    $apiRequest['extra'] = $extra;
-    $apiRequest['fields'] = NULL;
+  public static function create($entity, $action, $params, $extra = NULL) {
+    $version = \CRM_Utils_Array::value('version', $params);
+    switch ($version) {
+      default:
+        $apiRequest = array();
+        $apiRequest['id'] = self::$nextId++;
+        $apiRequest['version'] = (int) $version;
+        $apiRequest['params'] = $params;
+        $apiRequest['extra'] = $extra;
+        $apiRequest['fields'] = NULL;
+        $apiRequest['entity'] = self::normalizeEntityName($entity, $apiRequest['version']);
+        $apiRequest['action'] = self::normalizeActionName($action, $apiRequest['version']);
+        return $apiRequest;
 
-    $apiRequest['entity'] = $entity = self::normalizeEntityName($entity, $apiRequest['version']);
-    $apiRequest['action'] = $action = self::normalizeActionName($action, $apiRequest['version']);
-
-    // APIv1-v3 mix data+options in $params which means that each API callback is responsible
-    // for splitting the two. In APIv4, the split is done systematically so that we don't
-    // so much parsing logic spread around.
-    if ($apiRequest['version'] >= 4) {
-      $options = array();
-      $data = array();
-      $chains = array();
-      foreach ($params as $key => $value) {
-        if ($key == 'options') {
-          $options = array_merge($options, $value);
+      case 4:
+        $callable = array("Civi\\Api4\\$entity", $action);
+        if (!is_callable($callable)) {
+          throw new Exception\NotImplementedException("API ($entity, $action) does not exist (join the API team and implement it!)");
         }
-        elseif ($key == 'return') {
-          if (!isset($options['return'])) {
-            $options['return'] = array();
-          }
-          $options['return'] = array_merge($options['return'], $value);
+        $apiCall = call_user_func($callable);
+        $apiRequest['id'] = self::$nextId++;
+        unset($params['version']);
+        foreach ($params as $name => $param) {
+          $setter = 'set' . ucfirst($name);
+          $apiCall->$setter($param);
         }
-        elseif (preg_match('/^option\.(.*)$/', $key, $matches)) {
-          $options[$matches[1]] = $value;
-        }
-        elseif (preg_match('/^return\.(.*)$/', $key, $matches)) {
-          if ($value) {
-            if (!isset($options['return'])) {
-              $options['return'] = array();
-            }
-            $options['return'][] = $matches[1];
-          }
-        }
-        elseif (preg_match('/^format\.(.*)$/', $key, $matches)) {
-          if ($value) {
-            if (!isset($options['format'])) {
-              $options['format'] = $matches[1];
-            }
-            else {
-              throw new \API_Exception("Too many API formats specified");
-            }
-          }
-        }
-        elseif (preg_match('/^api\./', $key)) {
-          // FIXME: represent subrequests as instances of "Request"
-          $chains[$key] = $value;
-        }
-        elseif ($key == 'debug') {
-          $options['debug'] = $value;
-        }
-        elseif ($key == 'version') {
-          // ignore
-        }
-        else {
-          $data[$key] = $value;
-
-        }
-      }
-      $apiRequest['options'] = new \CRM_Utils_OptionBag($options);
-      $apiRequest['data'] = new \CRM_Utils_OptionBag($data);
-      $apiRequest['chains'] = $chains;
+        return $apiCall;
     }
 
-    return $apiRequest;
   }
 
   /**
-   * Normalize/validate entity and action names
+   * Normalize entity to be CamelCase.
+   *
+   * APIv1-v3 munges entity/action names, and accepts any mixture of case and underscores.
    *
    * @param string $entity
    * @param int $version
    * @return string
-   * @throws \API_Exception
    */
   public static function normalizeEntityName($entity, $version) {
-    if ($version <= 3) {
-      // APIv1-v3 munges entity/action names, and accepts any mixture of case and underscores.
-      // We normalize entity to be CamelCase.
-      return \CRM_Utils_String::convertStringToCamel(\CRM_Utils_String::munge($entity));
-    }
-    else {
-      // APIv4 requires exact spelling & capitalization of entity/action name; deviations should cause errors
-      if (!preg_match('/^[a-zA-Z][a-zA-Z0-9]*$/', $entity)) {
-        throw new \API_Exception("Malformed entity");
-      }
-      return $entity;
-    }
-  }
-
-  public static function normalizeActionName($action, $version) {
-    if ($version <= 3) {
-      // APIv1-v3 munges entity/action names, and accepts any mixture of case and underscores.
-      // We normalize action to be lowercase.
-      return strtolower(\CRM_Utils_String::munge($action));
-    }
-    else {
-      // APIv4 requires exact spelling & capitalization of entity/action name; deviations should cause errors
-      if (!preg_match('/^[a-zA-Z][a-zA-Z0-9]*$/', $action)) {
-        throw new \API_Exception("Malformed action");
-      }
-      // TODO: Not sure about camelCase actions - in v3 they are all lowercase.
-      return strtolower($action{0}) . substr($action, 1);
-    }
+    return \CRM_Utils_String::convertStringToCamel(\CRM_Utils_String::munge($entity));
   }
 
   /**
-   * We must be sure that every request uses only one version of the API.
+   * Normalize api action name to be lowercase.
    *
-   * @param array $params
-   *   API parameters.
-   * @return int
+   * APIv1-v3 munges entity/action names, and accepts any mixture of case and underscores.
+   *
+   * @param $action
+   * @param $version
+   * @return string
    */
-  protected static function parseVersion($params) {
-    $desired_version = empty($params['version']) ? NULL : (int) $params['version'];
-    if (isset($desired_version) && is_int($desired_version)) {
-      return $desired_version;
-    }
-    else {
-      // we will set the default to version 3 as soon as we find that it works.
-      return 3;
-    }
+  public static function normalizeActionName($action, $version) {
+    return strtolower(\CRM_Utils_String::munge($action));
   }
 
 }

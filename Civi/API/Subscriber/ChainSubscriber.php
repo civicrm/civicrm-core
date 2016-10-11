@@ -67,10 +67,12 @@ class ChainSubscriber implements EventSubscriberInterface {
    */
   public function onApiRespond(\Civi\API\Event\RespondEvent $event) {
     $apiRequest = $event->getApiRequest();
-    $result = $event->getResponse();
-    if (\CRM_Utils_Array::value('is_error', $result, 0) == 0) {
-      $this->callNestedApi($event->getApiKernel(), $apiRequest['params'], $result, $apiRequest['action'], $apiRequest['entity'], $apiRequest['version']);
-      $event->setResponse($result);
+    if ($apiRequest['version'] < 4) {
+      $result = $event->getResponse();
+      if (\CRM_Utils_Array::value('is_error', $result, 0) == 0) {
+        $this->callNestedApi($event->getApiKernel(), $apiRequest['params'], $result, $apiRequest['action'], $apiRequest['entity'], $apiRequest['version']);
+        $event->setResponse($result);
+      }
     }
   }
 

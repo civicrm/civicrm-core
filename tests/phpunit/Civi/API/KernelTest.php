@@ -6,7 +6,7 @@ use \Symfony\Component\EventDispatcher\EventDispatcher;
 /**
  */
 class KernelTest extends \CiviUnitTestCase {
-  const MOCK_VERSION = 99;
+  const MOCK_VERSION = 3;
 
   /**
    * @var array(int => array('name' => string $eventName, 'type' => string $className))
