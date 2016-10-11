@@ -233,31 +233,6 @@ class CRM_Report_Form_Contact_Summary extends CRM_Report_Form {
   }
 
   /**
-   * Initialise basic row.
-   *
-   * @param array $rows
-   *
-   * @param bool $entryFound
-   * @param array $row
-   * @param int $rowId
-   * @param int $rowNum
-   * @param array $types
-   *
-   * @return bool
-   */
-  private function _initBasicRow(&$rows, &$entryFound, $row, $rowId, $rowNum, $types) {
-    if (!array_key_exists($rowId, $row)) {
-      return FALSE;
-    }
-
-    $value = $row[$rowId];
-    if ($value) {
-      $rows[$rowNum][$rowId] = $types[$value];
-    }
-    $entryFound = TRUE;
-  }
-
-  /**
    * Alter display of rows.
    *
    * Iterate through the rows retrieved via SQL and make changes for display purposes,
