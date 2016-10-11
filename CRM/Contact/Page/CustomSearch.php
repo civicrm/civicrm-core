@@ -63,10 +63,10 @@ ORDER By  v.weight
     $rows = array();
     while ($dao->fetch()) {
       if (trim($dao->description)) {
-        $rows[$dao->value] = $dao->description;
+        $rows[$dao->value] = ts($dao->description);
       }
       else {
-        $rows[$dao->value] = $dao->label;
+        $rows[$dao->value] = ts($dao->label);
       }
     }
     return $rows;
