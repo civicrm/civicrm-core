@@ -200,6 +200,39 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Verify that we can retreive contacts of different sub types
+   */
+
+  public function testGetMultipleContactSubTypes() {
+
+    // This test presumes that there are no parents or students in the dataset
+
+    // create a student
+    $student = $this->callAPISuccess('contact', 'create', array(
+      'email' => 'student@example.com',
+      'contact_type' => 'Individual',
+      'contact_sub_type' => 'Student',
+    ));
+
+    // create a parent
+    $parent = $this->callAPISuccess('contact', 'create', array(
+      'email' => 'student@example.com',
+      'contact_type' => 'Individual',
+      'contact_sub_type' => 'Parent',
+    ));
+
+    // get all students and parents
+    $getParams = array('contact_sub_type' => array('IN' => array('Parent', 'Student')));
+    $result = civicrm_api3('contact', 'get', $getParams);
+
+    // check that we retrieved the student and the parent
+    $this->assertArrayHasKey($student['id'], $result['values']);
+    $this->assertArrayHasKey($parent['id'], $result['values']);
+
+  }
+
+
+  /**
    * Verify that attempt to create contact with empty params fails.
    */
   public function testCreateEmptyContact() {
