@@ -65,6 +65,9 @@
       {foreach from=$rows item=row}
       <tr id="crm-mailing_{$row.id}" class="{cycle values="odd-row,even-row"} crm-mailing crm-mailing_status-{$row.status}">
         <td class="crm-mailing-name">{$row.name}</td>
+        {if $multilingual}
+          <td class="crm-mailing-language">{$row.language}</td>
+        {/if}
         <td class="crm-mailing-status crm-mailing_status-{$row.status}">{$row.status}</td>
         <td class="crm-mailing-created_by"><a href ={crmURL p='civicrm/contact/view' q="reset=1&cid="}{$row.created_id}>{$row.created_by}</a></td>
         <td class="crm-mailing-created_date">{$row.created_date}</td>

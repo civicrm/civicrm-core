@@ -334,14 +334,17 @@ class CRM_Core_ManagedEntities {
         'version' => 3,
         'id' => $dao->entity_id,
       );
-      $result = civicrm_api($dao->entity_type, 'delete', $params);
-      if ($result['is_error']) {
-        $this->onApiError($dao->entity_type, 'delete', $params, $result);
-      }
+      $check = civicrm_api3($dao->entity_type, 'get', $params);
+      if ((bool) $check['count']) {
+        $result = civicrm_api($dao->entity_type, 'delete', $params);
+        if ($result['is_error']) {
+          $this->onApiError($dao->entity_type, 'delete', $params, $result);
+        }
 
-      CRM_Core_DAO::executeQuery('DELETE FROM civicrm_managed WHERE id = %1', array(
-        1 => array($dao->id, 'Integer'),
-      ));
+        CRM_Core_DAO::executeQuery('DELETE FROM civicrm_managed WHERE id = %1', array(
+          1 => array($dao->id, 'Integer'),
+        ));
+      }
     }
   }
 

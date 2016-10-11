@@ -43,6 +43,23 @@ class api_v3_NavigationTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test get specifying parent
+   */
+  public function testGetByParent() {
+    // get by name
+    $this->callAPISuccess($this->_entity, 'get', array('parentID' => 'Administer', 'domain_id' => 1));
+
+    $params = array(
+      'name' => 'Administer',
+      'domain_id' => 1,
+      'return' => 'id',
+    );
+    $adminId = $this->callAPISuccess($this->_entity, 'getvalue', $params);
+
+    $this->callAPISuccess($this->_entity, 'get', array('parentID' => $adminId, 'domain_id' => 1));
+  }
+
+  /**
    * Test create function.
    */
   public function testCreate() {

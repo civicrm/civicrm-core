@@ -38,20 +38,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
   public function checkPhpVersion() {
     $messages = array();
 
-    if (version_compare(phpversion(), CRM_Upgrade_Incremental_General::MIN_RECOMMENDED_PHP_VER) < 0) {
-      $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        ts('This system uses PHP version %1. While this meets the minimum requirements for CiviCRM to function, upgrading to PHP version %2 or newer is recommended for maximum compatibility.',
-          array(
-            1 => phpversion(),
-            2 => CRM_Upgrade_Incremental_General::MIN_RECOMMENDED_PHP_VER,
-          )),
-        ts('PHP Out-of-Date'),
-        \Psr\Log\LogLevel::NOTICE,
-        'fa-server'
-      );
-    }
-    else {
+    if (version_compare(phpversion(), CRM_Upgrade_Incremental_General::MIN_RECOMMENDED_PHP_VER) >= 0) {
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__,
         ts('This system uses PHP version %1 which meets or exceeds the minimum recommendation of %2.',
@@ -61,6 +48,34 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
           )),
         ts('PHP Up-to-Date'),
         \Psr\Log\LogLevel::INFO,
+        'fa-server'
+      );
+    }
+    elseif (version_compare(phpversion(), CRM_Upgrade_Incremental_General::MIN_DEFECT_PHP_VER) >= 0) {
+      $messages[] = new CRM_Utils_Check_Message(
+        __FUNCTION__,
+        ts('This system uses PHP version %1. While this meets the minimum requirements for CiviCRM to function, upgrading to PHP version %2 or newer is recommended for maximum compatibility.',
+          array(
+            1 => phpversion(),
+            2 => CRM_Upgrade_Incremental_General::MIN_RECOMMENDED_PHP_VER,
+            3 => CRM_Upgrade_Incremental_General::MIN_DEFECT_PHP_VER,
+          )),
+        ts('PHP Out-of-Date'),
+        \Psr\Log\LogLevel::NOTICE,
+        'fa-server'
+      );
+    }
+    else {
+      $messages[] = new CRM_Utils_Check_Message(
+        __FUNCTION__,
+        ts('This system uses PHP version %1. CiviCRM can be installed on this version, but some specific features are known to fail or degrade. Version %3 is the bare minimum to avoid known issues, and version %2 is recommended.',
+          array(
+            1 => phpversion(),
+            2 => CRM_Upgrade_Incremental_General::MIN_RECOMMENDED_PHP_VER,
+            3 => CRM_Upgrade_Incremental_General::MIN_DEFECT_PHP_VER,
+          )),
+        ts('PHP Out-of-Date'),
+        \Psr\Log\LogLevel::WARNING,
         'fa-server'
       );
     }

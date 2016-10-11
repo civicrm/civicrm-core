@@ -1266,7 +1266,10 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    */
   public function relationshipTypeDelete($relationshipTypeID) {
     $params['id'] = $relationshipTypeID;
-    $this->callAPISuccess('relationship_type', 'delete', $params);
+    $check = $this->callAPISuccess('relationship_type', 'get', $params);
+    if (!empty($check['count'])) {
+      $this->callAPISuccess('relationship_type', 'delete', $params);
+    }
   }
 
   /**
@@ -1621,7 +1624,10 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     $params = array(
       'id' => $participantID,
     );
-    return $this->callAPISuccess('Participant', 'delete', $params);
+    $check = $this->callAPISuccess('Participant', 'get', $params);
+    if ($check['count'] > 0) {
+      return $this->callAPISuccess('Participant', 'delete', $params);
+    }
   }
 
   /**
@@ -2541,7 +2547,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
   public function restoreDefaultPriceSetConfig() {
     CRM_Core_DAO::executeQuery('DELETE FROM civicrm_price_set WHERE id > 2');
     CRM_Core_DAO::executeQuery("INSERT INTO `civicrm_price_field` (`id`, `price_set_id`, `name`, `label`, `html_type`, `is_enter_qty`, `help_pre`, `help_post`, `weight`, `is_display_amounts`, `options_per_line`, `is_active`, `is_required`, `active_on`, `expire_on`, `javascript`, `visibility_id`) VALUES (1, 1, 'contribution_amount', 'Contribution Amount', 'Text', 0, NULL, NULL, 1, 1, 1, 1, 1, NULL, NULL, NULL, 1)");
-    CRM_Core_DAO::executeQuery("INSERT INTO `civicrm_price_field_value` (`id`, `price_field_id`, `name`, `label`, `description`, `amount`, `count`, `max_value`, `weight`, `membership_type_id`, `membership_num_terms`, `is_default`, `is_active`, `financial_type_id`, `deductible_amount`) VALUES (1, 1, 'contribution_amount', 'Contribution Amount', NULL, '1', NULL, NULL, 1, NULL, NULL, 0, 1, 1, 0.00)");
+    CRM_Core_DAO::executeQuery("INSERT INTO `civicrm_price_field_value` (`id`, `price_field_id`, `name`, `label`, `description`, `amount`, `count`, `max_value`, `weight`, `membership_type_id`, `membership_num_terms`, `is_default`, `is_active`, `financial_type_id`, `non_deductible_amount`) VALUES (1, 1, 'contribution_amount', 'Contribution Amount', NULL, '1', NULL, NULL, 1, NULL, NULL, 0, 1, 1, 0.00)");
   }
   /*
    * Function does a 'Get' on the entity & compares the fields in the Params with those returned

@@ -1007,7 +1007,7 @@ WHERE  id = %1";
   public static function getCachedPriceSetDetail($priceSetID) {
     $cacheKey = __CLASS__ . __FUNCTION__ . '_' . $priceSetID;
     $cache = CRM_Utils_Cache::singleton();
-    $values = (array) $cache->get($cacheKey);
+    $values = $cache->get($cacheKey);
     if (empty($values)) {
       $data = self::getSetDetail($priceSetID);
       $values = $data[$priceSetID];
@@ -1917,6 +1917,26 @@ select ps.id, group_concat(distinct member_of_contact_id) as member_of_contact_i
     }
 
     return $defaults;
+  }
+
+  /**
+   * Get non-deductible amount from price options
+   *
+   * @param int $priceSetId
+   * @param array $lineItem
+   *
+   * @return int
+   *   calculated non-deductible amount.
+   */
+  public static function getNonDeductibleAmountFromPriceSet($priceSetId, $lineItem) {
+    $nonDeductibleAmount = 0;
+    if (!empty($lineItem[$priceSetId])) {
+      foreach ($lineItem[$priceSetId] as $fieldId => $options) {
+        $nonDeductibleAmount += $options['non_deductible_amount'] * $options['qty'];
+      }
+    }
+
+    return $nonDeductibleAmount;
   }
 
 }

@@ -40,9 +40,12 @@
   {/if}
   {if $contributionMode}
   <div class="help">
-    {if $contactId}
-      {ts 1=$displayName 2=$contributionMode|upper}Use this form to {if $payNow} edit {else} submit a new {/if} contribution on behalf of %1. <strong>A
-        %2 transaction will be submitted</strong> using the selected payment processor.{/ts}
+    {if $contactId && $payNow}
+      {ts 1=$displayName 2=$contributionMode|upper}Use this form to edit a contribution on behalf of %1. <strong>A
+      %2 transaction will be submitted</strong> using the selected payment processor.{/ts}
+    {elseif $contactId}
+      {ts 1=$displayName 2=$contributionMode|upper}Use this form to submit a new contribution on behalf of %1. <strong>A
+      %2 transaction will be submitted</strong> using the selected payment processor.{/ts}
     {else}
       {ts 1=$displayName 2=$contributionMode|upper}Use this form to submit a new contribution. <strong>A %2 transaction will be submitted</strong> using the selected payment processor.{/ts}
     {/if}
@@ -470,12 +473,6 @@
       }
     }
   }
-
-  function status() {
-    cj("#cancel_date").val('');
-    cj("#cancel_reason").val('');
-  }
-
   </script>
   {/literal}
 
@@ -502,26 +499,26 @@
 
     {/literal}{if !$contributionMode}{literal}
      CRM.$(function($) {
-      showHideCancelInfo(cj('#contribution_status_id'));
+      showHideCancelInfo($('#contribution_status_id'));
 
-      cj('#contribution_status_id').change(function() {
-       showHideCancelInfo(cj('#contribution_status_id'));
+      $('#contribution_status_id').change(function() {
+       showHideCancelInfo($('#contribution_status_id'));
+      });
+
+      function showHideCancelInfo(obj) {
+        var cancelInfo_show_ids = [{/literal}{$cancelInfo_show_ids}{literal}];
+        if (cancelInfo_show_ids.indexOf(obj.val()) > -1) {
+          $('#cancelInfo').show( );
+          $('#total_amount').attr('readonly', true);
+        }
+        else {
+          $("#cancel_date").val('');
+          $("#cancel_reason").val('');
+          $('#cancelInfo').hide( );
+          $("#total_amount").removeAttr('readonly');
+        }
       }
-       );
-     });
-
-     function showHideCancelInfo(obj) {
-       var cancelInfo_show_ids = [{/literal}{$cancelInfo_show_ids}{literal}];
-       if (cancelInfo_show_ids.indexOf(obj.val()) > -1) {
-         cj('#cancelInfo').show( );
-         cj('#total_amount').attr('readonly', true);
-       }
-       else {
-         status();
-         cj('#cancelInfo').hide( );
-         cj("#total_amount").removeAttr('readonly');
-       }
-     }
+    });
 
     {/literal}{/if}{literal}
     </script>
