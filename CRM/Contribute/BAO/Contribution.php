@@ -3072,7 +3072,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     }
     elseif (!empty($params['membership_id'])) {
       //so far $params['membership_id'] should only be set coming in from membershipBAO::create so the situation where multiple memberships
-      //are created off one contribution should be handled elsewhere
+      // are created off one contribution should be handled elsewhere
       $entityId = $params['membership_id'];
       $entityTable = 'civicrm_membership';
     }
