@@ -467,6 +467,11 @@
     }
   }
 
+  function status() {
+    cj("#cancel_date").val('');
+    cj("#cancel_reason").val('');
+  }
+  
   </script>
   {/literal}
 
@@ -500,16 +505,16 @@
       }
        );
 
-      function showHideCancelInfo(obj) {
-        if (obj.find(":selected").text() == 'Refunded' || obj.find(":selected").text() == 'Cancelled') {
-          $('#cancelInfo').show( );
-          $('#total_amount').attr('readonly', true);
-        }
-        else {
-          $("#cancel_date").val('');
-          $("#cancel_reason").val('');
-          $('#cancelInfo').hide( );
-          $("#total_amount").removeAttr('readonly');
+     function showHideCancelInfo(obj) {
+       var cancelInfo_show_ids = [{/literal}{$cancelInfo_show_ids}{literal}];
+       if (cancelInfo_show_ids.indexOf(obj.val()) > -1) {
+         $('#cancelInfo').show( );
+         $('#total_amount').attr('readonly', true);
+       }
+       else {
+         status();
+         $('#cancelInfo').hide( );
+         $("#total_amount").removeAttr('readonly');
         }
       }
      });
