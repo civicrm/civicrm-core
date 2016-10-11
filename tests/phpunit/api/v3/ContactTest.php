@@ -215,9 +215,15 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
     // create a parent
     $parent = $this->callAPISuccess('contact', 'create', array(
-      'email' => 'student@example.com',
+      'email' => 'parent@example.com',
       'contact_type' => 'Individual',
       'contact_sub_type' => 'Parent',
+    ));
+
+    // create a parent
+    $contact = $this->callAPISuccess('contact', 'create', array(
+      'email' => 'parent@example.com',
+      'contact_type' => 'Individual',
     ));
 
     // get all students and parents
@@ -227,6 +233,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     // check that we retrieved the student and the parent
     $this->assertArrayHasKey($student['id'], $result['values']);
     $this->assertArrayHasKey($parent['id'], $result['values']);
+    $this->assertEquals(2, $result['count']);
 
   }
 
