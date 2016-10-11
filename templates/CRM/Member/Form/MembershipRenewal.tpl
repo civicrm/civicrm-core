@@ -23,6 +23,19 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
+{if $priceSetOnly == 1}
+  {assign var=financial_type_id value=$form['financial_type_id']['value'][0]}
+  {include file="CRM/Price/Form/PriceSet.tpl" context="standalone" extends="Membership"}
+  <script>
+    cj('#financial_type_id').val({$form.financial_type_id.value[0]});
+    {if $price_set_has_new_orgs}
+      cj('#join_date_desc').show();
+    {else}
+      cj('#join_date_desc').hide();
+    {/if}
+  </script>
+{else}
+
 {* this template is used for renewing memberships for a contact  *}
   {if $membershipMode == 'test' }
     {assign var=registerMode value="TEST"}
@@ -64,19 +77,48 @@
       </tr>
       <tr class="crm-member-membershiprenew-form-block-org_name">
         <td class="label">{ts}Membership Organization and Type{/ts}</td>
-        <td class="html-adjust">{$orgName}&nbsp;&nbsp;-&nbsp;&nbsp;{$memType}
-          {if $member_is_test} {ts}(test){/ts}{/if}
-          &nbsp; <a id="changeMembershipOrgType" href='#'
-                    onclick='adjustMembershipOrgType(); return false;'>{ts}change membership type{/ts}</a>
+        <td class="html-adjust">
+          <table>
+            <tr>
+            <td>
+                {$orgName}&nbsp;&nbsp;-&nbsp;&nbsp;{$memType}
+                      {if $member_is_test} {ts}(test){/ts}{/if}
+            </td>
+            <td>
+                  <a id="changeMembershipOrgType" href='#' onclick='adjustMembershipOrgType(); return false;'>{ts}change membership type{/ts}</a>
+            </td>
+            </tr>
+          </table>
         </td>
       </tr>
       <tr id="membershipOrgType" class="crm-member-membershiprenew-form-block-renew_org_name hiddenElement">
         <td class="label">{$form.membership_type_id.label}</td>
         <td>{$form.membership_type_id.html}
-          {if $member_is_test} {ts}(test){/ts}{/if}<br/>
+          {if $member_is_test} {ts}(test){/ts}{/if}
+          <br/>
           <span class="description">{ts}Select Membership Organization and then Membership Type.{/ts}</span>
         </td>
       </tr>
+      {if $priceSetId}
+        {** the price set drop-down and section **}
+        <tr id="membershipPriceSet" class="crm-member-membershiprenew-form-block-renew_priceset">
+          <td class="label">{$form.price_set_id.label}</td>
+          <td>
+            <span id='membershipPriceSetBlockPriceSet' class='hiddenElement'>
+              <span id='selectPriceSet'>{$form.price_set_id.html}</span>
+                &nbsp;<a id="hidePriceSet" href='#' onclick='hidePriceSet(); return false;'>{ts}switch to single membership view{/ts}</a>
+                {* if there is a price set, then we will have one to start, so no need to show a hidden block *}
+                <div id="priceset"><br/>{include file="CRM/Price/Form/PriceSet.tpl" extends="Membership"}</div>
+              </span>
+            </span>
+            <span id='membershipPriceSetBlockSingleMembership'>
+              {ts}This membership does not appear to have been created using a price set.{/ts}<br/>
+              {ts}You may still renew it using a price set by{/ts}
+                <a id="showPriceSet" href='#' onclick='showPriceSet(); return false;'>{ts}clicking here{/ts}</a>.
+            </span>
+          </td>
+        <tr/>
+      {/if}
       <tr class="crm-member-membershiprenew-form-block-membership_status">
         <td class="label">{ts}Membership Status{/ts}</td>
         <td class="html-adjust">&nbsp;{$membershipStatus}<br/>
@@ -88,7 +130,12 @@
       </tr>
       <tr class="crm-member-membershiprenew-form-block-renewal_date">
         <td class="label">{$form.renewal_date.label}</td>
-        <td>{include file="CRM/common/jcalendar.tpl" elementName=renewal_date}</td>
+        <td>{include file="CRM/common/jcalendar.tpl" elementName=renewal_date}
+        {if $priceSetId}
+        <br />
+        <span class="description hiddenElement" id="join_date_desc">{ts}If you choose a membership type for an organization for which this contact is not member of, then this date will also be used as the 'Member Since' date{/ts}</span>
+        {/if}
+        </td>
       </tr>
       <tr id="defaultNumTerms" class="crm-member-membershiprenew-form-block-default-num_terms">
         <td colspan="2" class="description">
@@ -226,7 +273,59 @@
     function adjustMembershipOrgType() {
       cj('#membershipOrgType').show();
       cj('#changeMembershipOrgType').hide();
+      cj('#showPriceSet').hide();
     }
+
+    {/literal}
+    {if $priceSet}
+      var priceSet = {$priceSet};
+      {literal}
+      var membershipTypeOrg = cj('#membership_type_id_0').val();
+      var membershipTypeId = cj('#membership_type_id_1').val();
+
+      function showPriceSet() {
+      {/literal}
+        {if $price_set_has_new_orgs}{literal}
+          cj('#join_date_desc').show();
+        {/literal}{/if}
+        {literal}
+        cj('#price_set_id').val(priceSet);
+        // unset membershiptype and org, so to avoid triggering processing on those, since we're using a price set
+        membershipTypeOrg = cj('#membership_type_id_0').val();
+        membershipTypeId = cj('#membership_type_id_1').val();
+        cj('#membership_type_id_0').val(null);
+        cj('#membership_type_id_1').val(null);
+
+        // We're using a price set.  total_amount is read only *}
+        cj('#total_amount').prop('readonly', 'true');
+        // join date, which is pretty well synonyous to renewal_date, but allowed separately for more flexibility
+        cj('#membershipJoinDate').show();
+
+        cj('#changeMembershipOrgType').hide();
+        cj('#membershipPriceSetBlockSingleMembership').hide();
+        cj('#membershipPriceSetBlockPriceSet').show();
+      }
+
+      function hidePriceSet() {
+        // unset price set so that we don't submit it
+        priceSet = cj('#price_set_id').val();
+        cj('#price_set_id').val(null);
+
+        //set back membership org & type
+        cj('#membership_type_id_0').val(membershipTypeOrg);
+        cj('#membership_type_id_1').val(membershipTypeId);
+
+        // make total_amount editable again
+        cj('#total_amount').removeProp('readonly');
+
+        cj('#changeMembershipOrgType').show();
+        cj('#membershipPriceSetBlockSingleMembership').show();
+        cj('#membershipPriceSetBlockPriceSet').hide();
+      }
+      {/literal}
+    {/if}
+
+  {literal}
 
     function changeNumTerms() {
       cj('#changeNumTerms').show();
@@ -303,5 +402,37 @@
         cj('#record-different-contact').hide();
       }
     }
+
+    function buildAmount( ) {
+        priceSetId = cj("#price_set_id").val( );
+        var fname = '#priceset';
+
+        cj('#total_amount').val( '' );
+        cj('#total_amount').attr("readonly", true);
+
+        var dataUrl = {/literal}"{crmURL h=0 q='snippet=4'}"{literal} + '&priceSetOnly=1&priceSetId=' + priceSetId;
+
+        var response = cj.ajax({
+          url: dataUrl,
+          async: false
+        }).responseText;
+
+        cj( fname ).show().html( response );
+        // freeze total amount text field.
+
+        cj( "#totalAmountORPriceSet" ).hide( );
+        cj( "#mem_type_id" ).hide( );
+        var manual = "{/literal}{ts}Manual membership and price{/ts}{literal}";
+        cj("#price_set_id option[value='']").html( manual );
+        cj( "#num_terms_row" ).hide( );
+        cj(".crm-membership-form-block-financial_type_id-mode").hide();
+    }
+
+  {/literal}
+  {if $show_price_set}
+      showPriceSet();
+  {/if}
+
   </script>
-{/literal}
+
+{/if}
