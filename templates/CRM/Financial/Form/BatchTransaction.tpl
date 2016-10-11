@@ -90,7 +90,7 @@
 {literal}
 <script type="text/javascript">
 CRM.$(function($) {
-  CRM.$('#_qf_BatchTransaction_submit-top, #_qf_BatchTransaction_submit-botttom').click(function() {
+  CRM.$('#_qf_BatchTransaction_submit-top, #_qf_BatchTransaction_submit-bottom').click(function() {
     CRM.$('.crm-batch_transaction_search-accordion:not(.collapsed)').crmAccordionToggle();
   });
   var batchStatus = {/literal}{$statusID}{literal};
@@ -104,7 +104,7 @@ CRM.$(function($) {
       buildTransactionSelectorAssign( false );
     }
     buildTransactionSelectorRemove();
-    CRM.$('#_qf_BatchTransaction_submit-botttom, #_qf_BatchTransaction_submit-top').click( function() {
+    CRM.$('#_qf_BatchTransaction_submit-bottom, #_qf_BatchTransaction_submit-top').click( function() {
       buildTransactionSelectorAssign( true );
       return false;
     });
