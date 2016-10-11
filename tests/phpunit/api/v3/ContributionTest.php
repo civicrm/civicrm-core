@@ -2083,15 +2083,14 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
         'line_total' => '100.00',
         'unit_price' => '100.00',
         'financial_type_id' => 2,
+        'contribution_type_id' => 2,
       )
     );
-
     $lineItem2 = $this->callAPISuccess('line_item', 'get', array_merge($lineItemParams, array(
       'entity_id' => $originalContribution['id'] + 1,
     )));
     unset($expectedLineItem['id'], $expectedLineItem['entity_id']);
     unset($lineItem2['values'][0]['id'], $lineItem2['values'][0]['entity_id']);
-    $expectedLineItem['contribution_type_id'] = $lineItem2['values'][0]['contribution_type_id'];
     $this->assertEquals($expectedLineItem, $lineItem2['values'][0]);
   }
 
@@ -2134,6 +2133,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
         'line_total' => '100.00',
         'unit_price' => '100.00',
         'financial_type_id' => 2,
+        'contribution_type_id' => 2,
       )
     );
 
@@ -2142,7 +2142,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     )));
     unset($expectedLineItem['id'], $expectedLineItem['entity_id']);
     unset($lineItem2['values'][0]['id'], $lineItem2['values'][0]['entity_id']);
-    $expectedLineItem['contribution_type_id'] = $lineItem2['values'][0]['contribution_type_id'];
     $this->assertEquals($expectedLineItem, $lineItem2['values'][0]);
   }
 
