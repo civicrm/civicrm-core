@@ -2083,9 +2083,9 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
         'line_total' => '100.00',
         'unit_price' => '100.00',
         'financial_type_id' => 2,
+        'contribution_type_id' => 2,
       )
     );
-
     $lineItem2 = $this->callAPISuccess('line_item', 'get', array_merge($lineItemParams, array(
       'entity_id' => $originalContribution['id'] + 1,
     )));
@@ -2133,6 +2133,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
         'line_total' => '100.00',
         'unit_price' => '100.00',
         'financial_type_id' => 2,
+        'contribution_type_id' => 2,
       )
     );
 
