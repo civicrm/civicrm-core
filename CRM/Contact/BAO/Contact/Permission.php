@@ -119,8 +119,10 @@ WHERE contact_id IN ({$contact_id_list})
    *   true if the user has permission, false otherwise
    */
   public static function allow($id, $type = CRM_Core_Permission::VIEW) {
-    $tables = array();
-    $whereTables = array();
+    // get logged in user
+    $session   = CRM_Core_Session::singleton();
+    $contactID = (int) $session->get('userID');
+
     // first: check if contact is trying to view own contact
     if (   $type == CRM_Core_Permission::VIEW && CRM_Core_Permission::check('view my contact')
         || $type == CRM_Core_Permission::EDIT && CRM_Core_Permission::check('edit my contact')
@@ -142,13 +144,16 @@ WHERE contact_id IN ({$contact_id_list})
       return TRUE;
     }
 
-    //check permission based on relationship, CRM-2963
+    // check permission based on relationship, CRM-2963
     if (self::relationship($id)) {
       return TRUE;
     }
 
-    $permission = CRM_ACL_API::whereClause($type, $tables, $whereTables);
+    // check permission based on ACL
+    $tables = array();
+    $whereTables = array();
 
+    $permission = CRM_ACL_API::whereClause($type, $tables, $whereTables);
     $from = CRM_Contact_BAO_Query::fromClause($whereTables);
 
     $query = "
@@ -207,6 +212,7 @@ AND    $operationClause
 
     $from = CRM_Contact_BAO_Query::fromClause($whereTables);
 
+    // FIXME: don't use 'ON DUPLICATE KEY UPDATE'
     CRM_Core_DAO::executeQuery("
 INSERT INTO civicrm_acl_contact_cache ( user_id, contact_id, operation )
 SELECT      $userID as user_id, contact_a.id as contact_id, '$operation' as operation
