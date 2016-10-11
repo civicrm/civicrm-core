@@ -52,7 +52,7 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
    * @throws CRM_Core_Exception
    */
   public function __construct($inputData) {
-    $this->setInputParameters($inputData);
+    $this->setInputParameters(array_merge($inputData, json_decode($inputData['custom'], TRUE)));
     parent::__construct();
   }
 
