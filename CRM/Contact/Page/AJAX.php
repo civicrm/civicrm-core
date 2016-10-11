@@ -680,7 +680,9 @@ LIMIT {$offset}, {$rowCount}
 
     foreach ($mappings as $key => $dbName) {
       if (!empty($searchParams[$key])) {
-        $queryParams[$nextParamKey] = array('%' . $searchParams[$key] . '%', 'String');
+        // CRM-18694.
+        $wildcard = strstr($key, 'postcode') ? '' : '%';
+        $queryParams[$nextParamKey] = array($wildcard . $searchParams[$key] . '%', 'String');
         $where[] = $dbName . " LIKE %{$nextParamKey} ";
         $nextParamKey++;
       }
