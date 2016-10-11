@@ -202,7 +202,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   /**
    * Verify that we can retreive contacts of different sub types
    */
-
   public function testGetMultipleContactSubTypes() {
 
     // This test presumes that there are no parents or students in the dataset
