@@ -2,18 +2,20 @@
 
 <menu>
   <item>
-     <path>civicrm/tag</path>
-     <title>Tags (Categories)</title>
-     <desc>Tags are useful for segmenting the contacts in your database into categories (e.g. Staff Member, Donor, Volunteer, etc.). Create and edit available tags here.</desc>
-     <page_callback>CRM_Tag_Page_Tag</page_callback>
-     <adminGroup>Customize Data and Screens</adminGroup>
-     <icon>admin/small/11.png</icon>
-     <weight>25</weight>
+    <path>civicrm/tag</path>
+    <title>Tags (Categories)</title>
+    <desc>Tags are useful for segmenting the contacts in your database into categories (e.g. Staff Member, Donor, Volunteer, etc.). Create and edit available tags here.</desc>
+    <page_callback>CRM_Tag_Page_Tag</page_callback>
+    <adminGroup>Customize Data and Screens</adminGroup>
+    <access_arguments>administer CiviCRM;manage tags</access_arguments>
+    <icon>admin/small/11.png</icon>
+    <weight>25</weight>
   </item>
   <item>
-     <path>civicrm/tag/add</path>
-     <title>New Tag</title>
-     <page_callback>CRM_Tag_Page_Tag</page_callback>
-     <path_arguments>action=add</path_arguments>
+    <path>civicrm/tag/add</path>
+    <title>New Tag</title>
+    <page_callback>CRM_Tag_Page_Tag</page_callback>
+    <path_arguments>action=add</path_arguments>
+    <access_arguments>administer CiviCRM;manage tags</access_arguments>
   </item>
 </menu>
