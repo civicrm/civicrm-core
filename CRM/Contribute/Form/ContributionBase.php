@@ -640,7 +640,10 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
             $field['data_type'] == 'File' || ($viewOnly && $field['name'] == 'image_URL')
           ) {
             //retrieve file value from submitted values on basis of $profileContactType
-            $fileValue = empty($profileContactType) ? CRM_Utils_Array::value($key, $this->_params) : CRM_Utils_Array::value(sprintf('%s[%s]', $profileContactType, $key), $this->_params);
+            $fileValue = CRM_Utils_Array::value($key, $this->_params);
+            if (!empty($profileContactType) && !empty($this->_params[$profileContactType])) {
+              $fileValue = CRM_Utils_Array::value($key, $this->_params[$profileContactType]);
+            }
 
             if ($fileValue) {
               $path = CRM_Utils_Array::value('name', $fileValue);
