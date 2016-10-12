@@ -24,7 +24,7 @@ class CRM_ACL_ListTest extends CiviUnitTestCase {
    * general test for the 'view all contacts' permission
    */
   public function testViewAllPermission() {
-    // create test contacts    
+    // create test contacts
     $contacts = $this->createScenarioPlain();
 
     // test WITH all permissions
@@ -113,7 +113,7 @@ class CRM_ACL_ListTest extends CiviUnitTestCase {
       sort($result);
 
       $this->assertNotContains($contacts[0], $result, "User[0] should NOT have $permission_label permission on contact[0].");
-      $this->assertContains($contacts[1],    $result, "User[0] should have $permission_label permission on contact[1].");
+      $this->assertContains($contacts[1], $result, "User[0] should have $permission_label permission on contact[1].");
       $this->assertNotContains($contacts[2], $result, "User[0] should NOT have $permission_label permission on contact[2].");
       $this->assertNotContains($contacts[3], $result, "User[0] should NOT have $permission_label permission on contact[3].");
       $this->assertNotContains($contacts[4], $result, "User[0] should NOT have $permission_label permission on contact[4].");
@@ -127,8 +127,8 @@ class CRM_ACL_ListTest extends CiviUnitTestCase {
       sort($result);
 
       $this->assertNotContains($contacts[0], $result, "User[0] should NOT have $permission_label permission on contact[0].");
-      $this->assertContains($contacts[1],    $result, "User[0] should have $permission_label permission on contact[1].");
-      $this->assertContains($contacts[2],    $result, "User[0] should have second degree $permission_label permission on contact[2].");
+      $this->assertContains($contacts[1], $result, "User[0] should have $permission_label permission on contact[1].");
+      $this->assertContains($contacts[2], $result, "User[0] should have second degree $permission_label permission on contact[2].");
       $this->assertNotContains($contacts[3], $result, "User[0] should NOT have $permission_label permission on contact[3].");
       $this->assertNotContains($contacts[4], $result, "User[0] should NOT have $permission_label permission on contact[4].");
     }
@@ -152,11 +152,11 @@ class CRM_ACL_ListTest extends CiviUnitTestCase {
     $result = CRM_Contact_BAO_Contact_Permission::allowList($contacts);
     sort($result);
 
-    $this->assertContains($contacts[0],    $result, "User[0] should NOT have an ACL permission on contact[0].");
-    $this->assertContains($contacts[1],    $result, "User[0] should have an ACL permission on contact[1].");
+    $this->assertContains($contacts[0], $result, "User[0] should NOT have an ACL permission on contact[0].");
+    $this->assertContains($contacts[1], $result, "User[0] should have an ACL permission on contact[1].");
     $this->assertNotContains($contacts[2], $result, "User[0] should NOT have an ACL permission on contact[2].");
     $this->assertNotContains($contacts[3], $result, "User[0] should NOT have an RELATION permission on contact[3].");
-    $this->assertContains($contacts[4],    $result, "User[0] should NOT have an ACL permission on contact[4].");
+    $this->assertContains($contacts[4], $result, "User[0] should NOT have an ACL permission on contact[4].");
   }
 
 
@@ -178,11 +178,11 @@ class CRM_ACL_ListTest extends CiviUnitTestCase {
     $result = CRM_Contact_BAO_Contact_Permission::allowList($contacts);
     sort($result);
 
-    $this->assertContains($contacts[0],    $result, "User[0] should have an ACL permission on contact[0].");
-    $this->assertContains($contacts[1],    $result, "User[0] should have an ACL permission on contact[1].");
-    $this->assertContains($contacts[2],    $result, "User[0] should have second degree an relation permission on contact[2].");
+    $this->assertContains($contacts[0], $result, "User[0] should have an ACL permission on contact[0].");
+    $this->assertContains($contacts[1], $result, "User[0] should have an ACL permission on contact[1].");
+    $this->assertContains($contacts[2], $result, "User[0] should have second degree an relation permission on contact[2].");
     $this->assertNotContains($contacts[3], $result, "User[0] should NOT have an ACL permission on contact[3].");
-    $this->assertContains($contacts[4],    $result, "User[0] should have an ACL permission on contact[4].");
+    $this->assertContains($contacts[4], $result, "User[0] should have an ACL permission on contact[4].");
   }
 
   /**
@@ -231,7 +231,7 @@ class CRM_ACL_ListTest extends CiviUnitTestCase {
             // listPermission reports PERMISSION GRANTED
             $this->assertTrue($individual_result, "Permission::allow denies {$permission_label} access for contact[{$contact_index[$contact_id]}], while Permission::allowList grants it. User permission: '{$user_permissions_label}'");
 
-          } 
+          }
           else {
             // listPermission reports PERMISSION DENIED
             $this->assertFalse($individual_result, "Permission::allow grantes {$permission_label} access for contact[{$contact_index[$contact_id]}], while Permission::allowList denies it. User permission: '{$user_permissions_label}'");
