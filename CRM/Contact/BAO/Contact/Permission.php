@@ -190,7 +190,7 @@ WHERE contact_a.id = %1 AND $permission";
   public static function cache($userID, $type = CRM_Core_Permission::VIEW, $force = FALSE) {
     static $_processed = array();
 
-    if ($type = CRM_Core_Permission::VIEW) {
+    if ($type == CRM_Core_Permission::VIEW) {
       $operationClause = " operation IN ( 'Edit', 'View' ) ";
       $operation = 'View';
     }
