@@ -1257,7 +1257,7 @@ class CRM_Utils_System {
    */
   public static function getDocBaseURL() {
     // FIXME: move this to configuration at some stage
-    return 'http://book.civicrm.org/';
+    return 'https://docs.civicrm.org/';
   }
 
   /**

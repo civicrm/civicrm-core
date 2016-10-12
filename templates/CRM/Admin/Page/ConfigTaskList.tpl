@@ -155,35 +155,35 @@
         <td colspan="2">{ts}Components{/ts}</td>
     </tr>
     <tr class="even">
-        <td class="tasklist nowrap" style="width: 10%;">{docURL page="user/contributions/what-is-civicontribute" text="CiviContribute"}</td>
+        <td class="tasklist nowrap" style="width: 10%;">{docURL page="user/en/stable/contributions/what-is-civicontribute" text="CiviContribute"}</td>
         <td>{ts}Online fundraising and donor management, as well as offline contribution processing and tracking.{/ts}</td>
     </tr>
     <tr class="even">
-        <td class="tasklist nowrap" style="width: 10%;">{docURL page="user/pledges/what-is-civipledge" text="CiviPledge"}</td>
+        <td class="tasklist nowrap" style="width: 10%;">{docURL page="user/en/stable/pledges/what-is-civipledge" text="CiviPledge"}</td>
         <td>{ts}Accept and track pledges (for recurring gifts).{/ts}</td>
     </tr>
     <tr class="even">
-        <td class="tasklist nowrap">{docURL page="user/events/what-is-civievent" text="CiviEvent"}</td>
+        <td class="tasklist nowrap">{docURL page="user/en/stable/events/what-is-civievent" text="CiviEvent"}</td>
         <td>{ts}Online event registration and participant tracking.{/ts}</td>
     </tr>
     <tr class="even">
-        <td class="tasklist nowrap">{docURL page="user/membership/introduction-to-memberships" text="CiviMember"}</td>
+        <td class="tasklist nowrap">{docURL page="user/en/stable/membership/what-is-civimember" text="CiviMember"}</td>
         <td>{ts}Online signup and membership management.{/ts}</td>
     </tr>
     <tr class="even">
-        <td class="tasklist nowrap">{docURL page="user/email/what-is-civimail" text="CiviMail"}</td>
+        <td class="tasklist nowrap">{docURL page="user/en/stable/email/what-is-civimail" text="CiviMail"}</td>
         <td>{ts}Personalized email blasts and newsletters.{/ts}</td>
     </tr>
     <tr class="even">
-        <td class="tasklist nowrap">{docURL page="user/campaign/what-is-civicampaign" text="CiviCampaign"}</td>
+        <td class="tasklist nowrap">{docURL page="user/en/stable/campaign/what-is-civicampaign" text="CiviCampaign"}</td>
         <td>{ts}Link together events, mailings, activities, and contributions. Create surveys and online petitions.{/ts}</td>
     </tr>
     <tr class="even">
-        <td class="tasklist nowrap">{docURL page="user/case-management/what-is-civicase" text="CiviCase"}</td>
+        <td class="tasklist nowrap">{docURL page="user/en/stable/case-management/what-is-civicase" text="CiviCase"}</td>
         <td>{ts}Integrated case management for human service providers{/ts}</td>
     </tr>
     <tr class="even">
-        <td class="tasklist nowrap">{docURL page="user/grants/what-is-civigrant" text="CiviGrant"}</td>
+        <td class="tasklist nowrap">{docURL page="user/en/stable/grants/what-is-civigrant" text="CiviGrant"}</td>
         <td>{ts}Distribute funds to others, for example foundations, grant givers, etc.{/ts}</td>
     </tr>
 </table>
