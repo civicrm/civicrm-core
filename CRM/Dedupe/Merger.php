@@ -1225,6 +1225,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
               ) {
                 // Set this value as the default against the 'other' contact value
                 $rows["move_location_{$blockName}_{$count}"]['main'] = $mainValueCheck[$blockInfo['displayField']];
+                $rows["move_location_{$blockName}_{$count}"]['main_is_primary'] = $mainValueCheck['is_primary'];
                 $mainContactBlockId = $mainValueCheck['id'];
                 break;
               }
@@ -1233,6 +1234,9 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
           // Add checkbox to migrate data from 'other' to 'main'
           $elements[] = array('advcheckbox', "move_location_{$blockName}_{$count}");
+
+          // Add checkbox to set the 'other' location as primary
+          $elements[] = array('advcheckbox', "location_blocks[$blockName][$count][set_other_primary]", NULL, ts('Set as primary'));
 
           // Flag up this field to skipMerge function (@todo: do we need to?)
           $migrationInfo["move_location_{$blockName}_{$count}"] = 1;
@@ -1247,17 +1251,10 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           // Provide a select drop-down for the location's location type
           // eg: Home, Work...
 
-          $js = NULL;
-
           if ($blockInfo['hasLocation']) {
 
             // Load the location options for this entity
             $locationOptions = civicrm_api3($blockName, 'getoptions', array('field' => 'location_type_id'));
-
-            // JS lookup 'main' contact's location (if there are any)
-            if (!empty($locations['main'][$blockName])) {
-              $js = array('onChange' => "mergeBlock('$blockName', this, $count, 'locTypeId' );");
-            }
 
             $thisLocId = $value['location_type_id'];
 
@@ -1272,7 +1269,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
               "location_blocks[$blockName][$count][locTypeId]",
               NULL,
               $defaultLocId + $tmpIdList,
-              $js,
             );
 
             // Add the relevant information to the $migrationInfo
@@ -1280,7 +1276,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
             // @todo Check this logic out
             $migrationInfo['location_blocks'][$blockName][$count]['locTypeId'] = $thisLocId;
             if ($blockName != 'address') {
-              $elements[] = array('advcheckbox', "location_blocks[{$blockName}][$count][operation]", NULL, ts('add new'));
+              $elements[] = array('advcheckbox', "location_blocks[{$blockName}][$count][operation]", NULL, ts('Add new'));
               // always use add operation
               $migrationInfo['location_blocks'][$blockName][$count]['operation'] = 1;
             }
@@ -1290,17 +1286,10 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           // Provide a select drop-down for the location's type/provider
           // eg websites: Google+, Facebook...
 
-          $js = NULL;
-
           if ($blockInfo['hasType']) {
 
             // Load the type options for this entity
             $typeOptions = civicrm_api3($blockName, 'getoptions', array('field' => $blockInfo['hasType']));
-
-            // CRM-17556 Set up JS lookup of 'main' contact's value by type
-            if (!empty($locations['main'][$blockName])) {
-              $js = array('onChange' => "mergeBlock('$blockName', this, $count, 'typeTypeId' );");
-            }
 
             $thisTypeId = CRM_Utils_Array::value($blockInfo['hasType'], $value);
 
@@ -1315,7 +1304,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
               "location_blocks[$blockName][$count][typeTypeId]",
               NULL,
               $defaultTypeId + $tmpIdList,
-              $js,
             );
 
             // Add the information to the migrationInfo
@@ -2058,7 +2046,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *  ugly.
    *
    * The use of the new hook is tested, including the fact it is called before contributions are merged, as this
-   * is likely to be siginificant data in merge hooks.
+   * is likely to be significant data in merge hooks.
    *
    * @param int $mainId
    * @param int $otherId
@@ -2102,6 +2090,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           continue;
         }
         $daoName = 'CRM_Core_DAO_' . $locationBlocks[$name]['label'];
+        $changePrimary = FALSE;
         $primaryDAOId = (array_key_exists($name, $primaryBlockIds)) ? array_pop($primaryBlockIds[$name]) : NULL;
         $billingDAOId = (array_key_exists($name, $billingBlockIds)) ? array_pop($billingBlockIds[$name]) : NULL;
 
@@ -2129,10 +2118,26 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
             $otherBlockDAO->{$locationBlocks[$name]['hasType']} = $typeTypeId;
           }
 
-          // if main contact already has primary & billing, set the flags to 0.
-          if ($primaryDAOId) {
+          // If we're deliberately setting this as primary then add the flag
+          // and remove it from the current primary location (if there is one).
+          // But only once for each entity.
+          $set_primary = CRM_Utils_Array::value('set_other_primary', $migrationInfo['location_blocks'][$name][$blkCount]);
+          if (!$changePrimary && $set_primary == "1") {
+            $otherBlockDAO->is_primary = 1;
+            if ($primaryDAOId) {
+              $removePrimaryDAO = new $daoName();
+              $removePrimaryDAO->id = $primaryDAOId;
+              $removePrimaryDAO->is_primary = 0;
+              $blocksDAO[$name]['update'][$primaryDAOId] = $removePrimaryDAO;
+            }
+            $changePrimary = TRUE;
+          }
+          // Otherwise, if main contact already has primary, set it to 0.
+          elseif ($primaryDAOId) {
             $otherBlockDAO->is_primary = 0;
           }
+
+          // If the main contact already has a billing location, set this to 0.
           if ($billingDAOId) {
             $otherBlockDAO->is_billing = 0;
           }
