@@ -126,8 +126,7 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
       'GroupContact' => CRM_Contact_DAO_GroupContact::getTableName(),
     );
 
-    $session = CRM_Core_Session::singleton();
-    $contact_id = $session->get('userID');
+    $contact_id = CRM_Core_Session::getLoggedInContactID();
 
     $where = " {$t['ACL']}.operation = '" . CRM_Utils_Type::escape($operation, 'String') . "'";
 

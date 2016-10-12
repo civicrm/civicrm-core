@@ -97,7 +97,7 @@ class CRM_Mailing_Page_View extends CRM_Core_Page {
       $this->_contactID = $contactID;
     }
     else {
-      $this->_contactID = CRM_Core_Session::singleton()->getLoggedInContactID();
+      $this->_contactID = CRM_Core_Session::getLoggedInContactID();
     }
 
     // mailing key check
