@@ -933,7 +933,6 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
 
     $links_template = self::links($this->_context, $this->_contextMenu, $this->_key);
 
-
     foreach ($rows as $id => & $row) {
       $links = $links_template;
 
