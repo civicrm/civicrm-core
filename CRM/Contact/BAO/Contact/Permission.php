@@ -188,7 +188,8 @@ WHERE contact_a.id = %1 AND $permission";
    *   Should we force a recompute.
    */
   public static function cache($userID, $type = CRM_Core_Permission::VIEW, $force = FALSE) {
-    static $_processed = array();
+    static $_processed = array( CRM_Core_Permission::VIEW => array(),
+                                CRM_Core_Permission::EDIT => array());
 
     if ($type == CRM_Core_Permission::VIEW) {
       $operationClause = " operation IN ( 'Edit', 'View' ) ";
@@ -200,7 +201,8 @@ WHERE contact_a.id = %1 AND $permission";
     }
 
     if (!$force) {
-      if (!empty($_processed[$userID])) {
+      // skip if already calculated
+      if (!empty($_processed[$type][$userID])) {
         return;
       }
 
@@ -214,7 +216,7 @@ AND    $operationClause
       $params = array(1 => array($userID, 'Integer'));
       $count = CRM_Core_DAO::singleValueQuery($sql, $params);
       if ($count > 0) {
-        $_processed[$userID] = 1;
+        $_processed[$type][$userID] = 1;
         return;
       }
     }
@@ -238,8 +240,7 @@ ON DUPLICATE KEY UPDATE
          contact_id=VALUES(contact_id),
          operation=VALUES(operation)"
     );
-
-    $_processed[$userID] = 1;
+    $_processed[$type][$userID] = 1;
   }
 
   /**
