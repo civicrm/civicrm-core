@@ -99,11 +99,6 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
       $result = unserialize($fv);
     }
 
-    //CRM-19250: fetch the default date format to format mysql value as per CRM_Core_Error::addDate()
-    $dateFormat = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_PreferencesDate', 'searchDate', 'date_format', 'name');
-    $dateFormat = empty($dateFormat) ? CRM_Core_Config::singleton()->dateInputFormat : $dateFormat;
-    $dateFormat = CRM_Utils_Array::value($dateFormat, CRM_Core_SelectValues::datePluginToPHPFormats());
-
     $specialFields = array('contact_type', 'group', 'contact_tags', 'member_membership_type_id', 'member_status_id');
     foreach ($result as $element => $value) {
       if (CRM_Contact_BAO_Query::isAlreadyProcessedForQueryFormat($value)) {
@@ -118,7 +113,7 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
             $result["{$entityName}_date_relative"] = $result['relative_dates'][$entityName];
           }
           else {
-            $result[$id] = date($dateFormat, strtotime($value));
+            $result[$id] = $value;
             $result["{$entityName}_date_relative"] = 0;
           }
         }
