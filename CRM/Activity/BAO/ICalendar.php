@@ -115,8 +115,7 @@ class CRM_Activity_BAO_ICalendar {
    * @return string
    */
   private function getPrimaryEmail() {
-    $session = &CRM_Core_Session::singleton();
-    $uid = $session->get('userID');
+    $uid = CRM_Core_Session::getLoggedInContactID();
     $primary = '';
     $emails = CRM_Core_BAO_Email::allEmails($uid);
     foreach ($emails as $eid => $e) {
