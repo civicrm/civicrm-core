@@ -31,7 +31,7 @@
   </div>
 {/if}
 <div class="spacer"></div>
-{if $priceSetId}
+{if $priceSetOnly}
   {include file="CRM/Price/Form/PriceSet.tpl" context="standalone" extends="Membership"}
   {literal}
   <script type="text/javascript">
@@ -606,7 +606,7 @@
       cj( "#total_amount" ).val( '' );
       cj('#total_amount').attr("readonly", true);
 
-      var dataUrl = {/literal}"{crmURL h=0 q='snippet=4'}"{literal} + '&priceSetId=' + priceSetId;
+      var dataUrl = {/literal}"{crmURL h=0 q='snippet=4'}"{literal} + '&priceSetOnly=TRUE&priceSetId=' + priceSetId;
 
       var response = cj.ajax({
         url: dataUrl,

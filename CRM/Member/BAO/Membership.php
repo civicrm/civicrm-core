@@ -364,6 +364,8 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
       $params['line_item'] = $params['lineItems'];
     }
 
+    //we failed to retrieve an existing membership payment contribution_id, just above.
+    //This means we're dealing with a first contribution.
     //do cleanup line  items if membership edit the Membership type.
     if (empty($ids['contribution']) && !empty($ids['membership'])) {
       CRM_Price_BAO_LineItem::deleteLineItems($ids['membership'], 'civicrm_membership');
@@ -2142,7 +2144,9 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
 
   /**
    * Retrieve the contribution id for the associated Membership id.
-   * @todo we should get this off the line item
+   * @todo we should get this off the line item, which may not be easily doable
+   *       since adding memberships using priceSets calls this first to properly
+   *       update line-items that are in fluxing state.
    *
    * @param int $membershipId
    *   Membership id.
@@ -2164,10 +2168,14 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
       return $contributionIds;
     }
 
-    if ($membershipPayment->find(TRUE)) {
-      return $membershipPayment->contribution_id;
+    // Pre CRM-15861, only returning first was fine, since when this was called
+    // we only ever had one item.  Post CRM-15861, need to get last.
+    $last = NULL;
+    $membershipPayment->find();
+    while ($membershipPayment->fetch()) {
+      $last = $membershipPayment->contribution_id;
     }
-    return NULL;
+    return $last;
   }
 
   /**
@@ -2526,6 +2534,99 @@ WHERE      civicrm_membership.is_test = 0";
       $cancelledMembershipIds[] = $dao->membership_type_id;
     }
     return $cancelledMembershipIds;
+  }
+
+  /**
+   *
+   * Given specified contact, return a map of membership orgs (that contact
+   * has ever been member of), and info on the last membership that contact
+   * has signed up for this org.
+
+   * Initial use case for this method was to return a list of membership
+   * type that a contact should be renewed on when renewing using *any*
+   * priceset, unlike online renewals which only renew for a specific price set
+   *
+   * @param int $contactId, The contact who's memberships we want breakdown for
+   *        int $mostImportMembershipId.  It is possible that a contact may have
+   *          multiple memberships for the same org (not usually, but some orgs
+   *          do this). Any membership that matches this Id will be given
+   *          preference and returned (over all other ones for the same org)
+   * @return array
+   *   Array (int $member_of_contact_id =>
+   *      Array (of the fields returned by the results set (see below)
+   *   )
+   *
+   */
+  public static function getContactMembershipsByMembershipOrg($contactId, $mostImportMembershipId) {
+    $query = "
+          SELECT org.member_of_contact_id,
+            org.display_name,
+            mem.id AS membership_id,
+            mem.membership_type_id,
+            mem.status_id,
+            st.is_current_member,
+            li.contribution_id,
+            li.price_field_id,
+            li.price_field_value_id,
+            co.receive_date
+          FROM (SELECT DISTINCT member_of_contact_id, con.display_name FROM civicrm_membership_type LEFT JOIN civicrm_contact con ON con.id = member_of_contact_id) org
+              INNER JOIN civicrm_membership mem
+                     ON mem.membership_type_id IN (SELECT id FROM civicrm_membership_type mt2 WHERE mt2.member_of_contact_id = org.member_of_contact_id)
+                     AND mem.contact_id = %1
+            LEFT JOIN civicrm_line_item li
+                   ON li.entity_table = 'civicrm_membership'
+                  AND li.entity_id = mem.id
+                  AND li.price_field_value_id IN (SELECT id FROM civicrm_price_field_value pfv WHERE membership_type_id IN (SELECT id FROM civicrm_membership_type mt2 WHERE mt2.member_of_contact_id  = org.member_of_contact_id))
+            LEFT JOIN civicrm_contribution co
+                ON co.id = li.contribution_id
+            LEFT JOIN civicrm_membership_status st
+                ON st.id = mem.status_id
+          ORDER BY  member_of_contact_id, is_current_member DESC, receive_date DESC, li.contribution_id DESC";
+
+    $dao = CRM_CORE_DAO::executeQuery($query, array(1 => array($contactId, 'Int')));
+    $last = 0;
+    $toReturn = array();
+    while ($dao->fetch()) {
+      // only return one row per member org.  This is easier than creating the crazy
+      // subquery that would be required to get the same result.
+      if ($dao->member_of_contact_id === $last && $mostImportMembershipId != $dao->membership_id) {
+        continue;
+      }
+      $last = $dao->member_of_contact_id;
+      $toReturn[$last] = (array) $dao;
+      $last = $dao->member_of_contact_id;
+    }
+
+    return $toReturn;
+  }
+
+  /**
+   *
+   * @param int $contact_id
+   * @return array
+   *   Array (int, int, int): The membership orgs that contact is part of.
+   */
+  public static function getActiveContactMemberships($contact_id) {
+    $sql = "SELECT DISTINCT member_of_contact_id
+  FROM civicrm_membership
+  	INNER JOIN civicrm_membership_type t ON t.id = civicrm_membership.membership_type_id
+ WHERE status_id IN (SELECT id FROM civicrm_membership_status WHERE is_current_member = 1)
+   AND contact_id = %1
+   ";
+    $params = array(1 => array($contact_id, 'Integer'));
+    $dao = self::executeQuery($sql, $params);
+    $contact_membership_orgs = array();
+    $cnt = 0;
+    while ($dao->fetch()) {
+      array_push($contact_membership_orgs, $dao->member_of_contact_id);
+      $cnt++;
+    }
+    if (empty($contact_membership_orgs) || $cnt < 1) {
+      return NULL;
+    }
+    else {
+      return $contact_membership_orgs;
+    }
   }
 
 }
