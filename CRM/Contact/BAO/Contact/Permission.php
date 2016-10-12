@@ -56,8 +56,8 @@ class CRM_Contact_BAO_Contact_Permission {
     $contact_id_list = implode(',', $contact_ids);
 
     // make sure the the general permissions are given
-    if (   $type == CRM_Core_Permission::VIEW && CRM_Core_Permission::check('view all contacts')
-        || $type == CRM_Core_Permission::EDIT && CRM_Core_Permission::check('edit all contacts')
+    if (   CRM_Core_Permission::check('edit all contacts')
+        || $type == CRM_Core_Permission::VIEW && CRM_Core_Permission::check('view all contacts')
       ) {
 
       // if the general permission is there, all good
