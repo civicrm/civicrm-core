@@ -3273,7 +3273,6 @@ div.m ul#civicrm-menu,
   padding-left: 2px;
   border: 2px dashed transparent;
 }
-
 .crm-container .crm-editable-textarea-enabled {
   white-space: normal;
 }
@@ -3373,11 +3372,6 @@ div.m ul#civicrm-menu,
 }
 #crm-container .crm-group-name span.crm-editable-enabled {
   text-indent: 0;
-}
-
-#crm-container .crm-group-name .crm-editable-enabled,
-#crm-container .crm-group-description .crm-editable-enabled{
-  white-space: normal;
 }
 
 #crm-container div.crm-row-parent-name {
