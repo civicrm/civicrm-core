@@ -480,49 +480,46 @@
     {literal}
     <script type="text/javascript">
       CRM.$(function($) {
-        checkEmailDependancies( );
-        cj('#is_email_receipt').click( function( ) {
-          checkEmailDependancies( );
+        var $form = $('form.{/literal}{$form.formClass}{literal}');
+        checkEmailDependancies();
+        $('#is_email_receipt', $form).click(function() {
+          checkEmailDependancies();
         });
+  
+        function checkEmailDependancies( ) {
+          if ($('#is_email_receipt', $form).prop('checked')) {
+            $('#fromEmail', $form).show();
+            $('#receiptDate', $form).hide();
+          }
+          else {
+            $('#fromEmail', $form).hide();
+            $('#receiptDate', $form).show();
+          }
+        }
+      {/literal}{if !$contributionMode}{literal}
+        showHideCancelInfo($('#contribution_status_id', $form));
+  
+        $('#contribution_status_id', $form).change(function() {
+         showHideCancelInfo($('#contribution_status_id', $form));
+        });
+  
+        function showHideCancelInfo(obj) {
+          var cancelInfo_show_ids = [{/literal}{$cancelInfo_show_ids}{literal}];
+          if (cancelInfo_show_ids.indexOf(obj.val()) > -1) {
+            $('#cancelInfo', $form).show();
+            $('#total_amount', $form).attr('readonly', true);
+          }
+          else {
+            $("#cancel_date", $form).val('');
+            $("#cancel_reason", $form).val('');
+            $('#cancelInfo', $form).hide();
+            $("#total_amount", $form).removeAttr('readonly');
+          }
+        }
       });
 
-      function checkEmailDependancies( ) {
-        if (cj('#is_email_receipt').prop('checked' )) {
-          cj('#fromEmail').show( );
-          cj('#receiptDate').hide( );
-        }
-        else {
-          cj('#fromEmail').hide( );
-          cj('#receiptDate').show( );
-        }
-      }
-
-    {/literal}{if !$contributionMode}{literal}
-     CRM.$(function($) {
-      showHideCancelInfo($('#contribution_status_id'));
-
-      $('#contribution_status_id').change(function() {
-       showHideCancelInfo($('#contribution_status_id'));
-      });
-
-      function showHideCancelInfo(obj) {
-        var cancelInfo_show_ids = [{/literal}{$cancelInfo_show_ids}{literal}];
-        if (cancelInfo_show_ids.indexOf(obj.val()) > -1) {
-          $('#cancelInfo').show( );
-          $('#total_amount').attr('readonly', true);
-        }
-        else {
-          $("#cancel_date").val('');
-          $("#cancel_reason").val('');
-          $('#cancelInfo').hide( );
-          $("#total_amount").removeAttr('readonly');
-        }
-      }
-    });
-
-    {/literal}{/if}{literal}
+      {/literal}{/if}
     </script>
-    {/literal}
       {if !$contributionMode}
         {include file="CRM/common/showHideByFieldValue.tpl"
         trigger_field_id    ="payment_instrument_id"
