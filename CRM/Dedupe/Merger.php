@@ -764,44 +764,15 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           // return error
           return FALSE;
         }
-
         // Generate var $migrationInfo. The variable structure is exactly same as
         // $formValues submitted during a UI merge for a pair of contacts.
         $rowsElementsAndInfo = CRM_Dedupe_Merger::getRowsElementsAndInfo($mainId, $otherId, $checkPermissions);
-
-        $migrationInfo = &$rowsElementsAndInfo['migration_info'];
-
         // add additional details that we might need to resolve conflicts
-        $migrationInfo['main_details'] = &$rowsElementsAndInfo['main_details'];
-        $migrationInfo['other_details'] = &$rowsElementsAndInfo['other_details'];
-        $migrationInfo['rows'] = &$rowsElementsAndInfo['rows'];
+        $rowsElementsAndInfo['migration_info']['main_details'] = &$rowsElementsAndInfo['main_details'];
+        $rowsElementsAndInfo['migration_info']['other_details'] = &$rowsElementsAndInfo['other_details'];
+        $rowsElementsAndInfo['migration_info']['rows'] = &$rowsElementsAndInfo['rows'];
 
-        // go ahead with merge if there is no conflict
-        $conflicts = array();
-        if (!CRM_Dedupe_Merger::skipMerge($mainId, $otherId, $migrationInfo, $mode, $conflicts)) {
-          CRM_Dedupe_Merger::moveAllBelongings($mainId, $otherId, $migrationInfo, $checkPermissions);
-          $resultStats['merged'][] = array('main_id' => $mainId, 'other_id' => $otherId);
-          $deletedContacts[] = $otherId;
-        }
-        else {
-          $resultStats['skipped'][] = array('main_id' => $mainId, 'other_id' => $otherId);
-        }
-
-        // store any conflicts
-        if (!empty($conflicts)) {
-          foreach ($conflicts as $key => $dnc) {
-            $conflicts[$key] = "{$migrationInfo['rows'][$key]['title']}: '{$migrationInfo['rows'][$key]['main']}' vs. '{$migrationInfo['rows'][$key]['other']}'";
-          }
-          CRM_Core_BAO_PrevNextCache::markConflict($mainId, $otherId, $cacheKeyString, $conflicts);
-        }
-        else {
-          // delete entry from PrevNextCache table so we don't consider the pair next time
-          // pair may have been flipped, so make sure we delete using both orders
-          CRM_Core_BAO_PrevNextCache::deletePair($mainId, $otherId, $cacheKeyString, TRUE);
-        }
-
-        CRM_Core_DAO::freeResult();
-        unset($rowsElementsAndInfo, $migrationInfo);
+        self::dedupePair($rowsElementsAndInfo['migration_info'], $resultStats, $deletedContacts, $mode, $checkPermissions, $mainId, $otherId, $cacheKeyString);
       }
 
       if ($cacheKeyString && !$redirectForPerformance) {
@@ -2177,6 +2148,53 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         }
       }
     }
+  }
+
+  /**
+   * Dedupe a pair of contacts.
+   *
+   * @param array $migrationInfo
+   * @param array $resultStats
+   * @param array $deletedContacts
+   * @param string $mode
+   * @param bool $checkPermissions
+   * @param int $mainId
+   * @param int $otherId
+   * @param string $cacheKeyString
+   */
+  protected static function dedupePair(&$migrationInfo, &$resultStats, &$deletedContacts, $mode, $checkPermissions, $mainId, $otherId, $cacheKeyString) {
+
+    // go ahead with merge if there is no conflict
+    $conflicts = array();
+    if (!CRM_Dedupe_Merger::skipMerge($mainId, $otherId, $migrationInfo, $mode, $conflicts)) {
+      CRM_Dedupe_Merger::moveAllBelongings($mainId, $otherId, $migrationInfo, $checkPermissions);
+      $resultStats['merged'][] = array(
+        'main_id' => $mainId,
+        'other_id' => $otherId,
+      );
+      $deletedContacts[] = $otherId;
+    }
+    else {
+      $resultStats['skipped'][] = array(
+        'main_id' => $mainId,
+        'other_id' => $otherId,
+      );
+    }
+
+    // store any conflicts
+    if (!empty($conflicts)) {
+      foreach ($conflicts as $key => $dnc) {
+        $conflicts[$key] = "{$migrationInfo['rows'][$key]['title']}: '{$migrationInfo['rows'][$key]['main']}' vs. '{$migrationInfo['rows'][$key]['other']}'";
+      }
+      CRM_Core_BAO_PrevNextCache::markConflict($mainId, $otherId, $cacheKeyString, $conflicts);
+    }
+    else {
+      // delete entry from PrevNextCache table so we don't consider the pair next time
+      // pair may have been flipped, so make sure we delete using both orders
+      CRM_Core_BAO_PrevNextCache::deletePair($mainId, $otherId, $cacheKeyString, TRUE);
+    }
+
+    CRM_Core_DAO::freeResult();
   }
 
 }
