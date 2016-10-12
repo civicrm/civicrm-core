@@ -1342,6 +1342,9 @@ class CRM_Utils_System {
     else {
       $docBaseURL = self::getDocBaseURL();
     }
+    array(
+
+     );
 
     if (!isset($params['title']) or $params['title'] === NULL) {
       $params['title'] = ts('Opens documentation in a new window.');
