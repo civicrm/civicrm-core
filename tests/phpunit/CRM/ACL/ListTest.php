@@ -16,6 +16,7 @@ class CRM_ACL_ListTest extends CiviUnitTestCase {
   public function setUp() {
     parent::setUp();
     $this->useTransaction(TRUE);
+    $this->allowedContactsACL = array();
   }
 
   /**
@@ -93,14 +94,14 @@ class CRM_ACL_ListTest extends CiviUnitTestCase {
 
 
   /**
-   * Test access related to the 'access deleted contact' permission
+   * Test access based on relations
    * 
    * There should be the following permission-relationship
    * contact[0] -> contact[1] -> contact[2]
    */
   public function testPermissionByRelation() {
     // create test scenario
-    $contacts = $this->createScenarioRelation();
+    $contacts = $this->createScenarioRelations();
 
     // remove all permissions
     $config = CRM_Core_Config::singleton();
@@ -115,11 +116,11 @@ class CRM_ACL_ListTest extends CiviUnitTestCase {
       sort($result);
 
 
-      $this->assertNotContains($contacts[0], $result, "Contact[0] should NOT have $permission_label permission on contact[0].");
-      $this->assertContains(   $contacts[1], $result, "Contact[0] should have $permission_label permission on contact[1].");
-      $this->assertNotContains($contacts[2], $result, "Contact[0] should NOT have $permission_label permission on contact[2].");
-      $this->assertNotContains($contacts[3], $result, "Contact[0] should NOT have $permission_label permission on contact[3].");
-      $this->assertNotContains($contacts[4], $result, "Contact[0] should NOT have $permission_label permission on contact[4].");
+      $this->assertNotContains($contacts[0], $result, "User[0] should NOT have $permission_label permission on contact[0].");
+      $this->assertContains(   $contacts[1], $result, "User[0] should have $permission_label permission on contact[1].");
+      $this->assertNotContains($contacts[2], $result, "User[0] should NOT have $permission_label permission on contact[2].");
+      $this->assertNotContains($contacts[3], $result, "User[0] should NOT have $permission_label permission on contact[3].");
+      $this->assertNotContains($contacts[4], $result, "User[0] should NOT have $permission_label permission on contact[4].");
     }
     
     // run this for SECOND DEGREE relations
@@ -129,29 +130,63 @@ class CRM_ACL_ListTest extends CiviUnitTestCase {
       $result = CRM_Contact_BAO_Contact_Permission::allowList($contacts, $permission);
       sort($result);
 
-      $this->assertNotContains($contacts[0], $result, "Contact[0] should NOT have $permission_label permission on contact[0].");
-      $this->assertContains(   $contacts[1], $result, "Contact[0] should have $permission_label permission on contact[1].");
-      $this->assertContains(   $contacts[2], $result, "Contact[0] should have second degree $permission_label permission on contact[2].");
-      $this->assertNotContains($contacts[3], $result, "Contact[0] should NOT have $permission_label permission on contact[3].");
-      $this->assertNotContains($contacts[4], $result, "Contact[0] should NOT have $permission_label permission on contact[4].");
+      $this->assertNotContains($contacts[0], $result, "User[0] should NOT have $permission_label permission on contact[0].");
+      $this->assertContains(   $contacts[1], $result, "User[0] should have $permission_label permission on contact[1].");
+      $this->assertContains(   $contacts[2], $result, "User[0] should have second degree $permission_label permission on contact[2].");
+      $this->assertNotContains($contacts[3], $result, "User[0] should NOT have $permission_label permission on contact[3].");
+      $this->assertNotContains($contacts[4], $result, "User[0] should NOT have $permission_label permission on contact[4].");
     }
   }
 
 
   /**
-   * Test access related to the 'access deleted contact' permission
+   * Test access based on ACL
    */
-  public function _testPermissionByACL() {
-    // CRM_Core_Config::singleton()->userPermissionClass->permissions = array('edit all contacts', 'view all contacts');
-    // $contacts = $this->createScenarioPlain();
+  public function testPermissionByACL() {
+    $contacts = $this->createScenarioPlain();
+
+    // set custom hook
+    $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'hook_civicrm_aclWhereClause'));
+
+    // run simple test
+    $permissions_to_check = array(CRM_Core_Permission::VIEW => 'View', CRM_Core_Permission::EDIT => 'Edit');
+
+    $this->allowedContactsACL = array($contacts[0], $contacts[1], $contacts[4]);
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = array();
+    $result = CRM_Contact_BAO_Contact_Permission::allowList($contacts);
+    sort($result);
+
+    $this->assertContains(   $contacts[0], $result, "User[0] should NOT have an ACL permission on contact[0].");
+    $this->assertContains(   $contacts[1], $result, "User[0] should have an ACL permission on contact[1].");
+    $this->assertNotContains($contacts[2], $result, "User[0] should NOT have an ACL permission on contact[2].");
+    $this->assertNotContains($contacts[3], $result, "User[0] should NOT have an RELATION permission on contact[3].");
+    $this->assertContains(   $contacts[4], $result, "User[0] should NOT have an ACL permission on contact[4].");
   }
 
+
   /**
-   * Test access related to the 'access deleted contact' permission
+   * Test access with a mix of ACL and relationship
    */
-  public function _testPermissionACLvsRelationship() {
-    // CRM_Core_Config::singleton()->userPermissionClass->permissions = array('edit all contacts', 'view all contacts');
-    // $contacts = $this->createScenarioPlain();
+  public function testPermissionACLvsRelationship() {
+    $contacts = $this->createScenarioRelations();
+
+    // set custom hook
+    $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'hook_civicrm_aclWhereClause'));
+
+    $config = CRM_Core_Config::singleton();
+    $config->userPermissionClass->permissions = array();
+    $config->secondDegRelPermissions = TRUE;
+
+    $this->allowedContactsACL = array($contacts[0], $contacts[1], $contacts[4]);
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = array();
+    $result = CRM_Contact_BAO_Contact_Permission::allowList($contacts);
+    sort($result);
+
+    $this->assertContains(   $contacts[0], $result, "User[0] should have an ACL permission on contact[0].");
+    $this->assertContains(   $contacts[1], $result, "User[0] should have an ACL permission on contact[1].");
+    $this->assertContains(   $contacts[2], $result, "User[0] should have second degree an relation permission on contact[2].");
+    $this->assertNotContains($contacts[3], $result, "User[0] should NOT have an ACL permission on contact[3].");
+    $this->assertContains(   $contacts[4], $result, "User[0] should have an ACL permission on contact[4].");
   }
 
   /**
@@ -189,7 +224,7 @@ class CRM_ACL_ListTest extends CiviUnitTestCase {
   /**
    * create plain test scenario, no relationships/ACLs
    */
-  protected function createScenarioRelation() {
+  protected function createScenarioRelations() {
     $contacts = $this->createScenarioPlain();
 
     // create some relationships
@@ -219,5 +254,15 @@ class CRM_ACL_ListTest extends CiviUnitTestCase {
       ));
 
     return $contacts;
+  }
+
+  /** 
+   * ACL HOOK implementation for various tests 
+   */
+  public function hook_civicrm_aclWhereClause($type, &$tables, &$whereTables, &$contactID, &$where ) {
+    if (!empty($this->allowedContactsACL)) {
+      $contact_id_list = implode(',', $this->allowedContactsACL);
+      $where = " contact_a.id IN ($contact_id_list)";
+    }
   }
 }
