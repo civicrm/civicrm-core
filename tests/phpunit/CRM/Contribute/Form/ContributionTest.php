@@ -185,9 +185,6 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
    * Test the submit function on the contribution page.
    */
   public function testSubmitCreditCardPayPal() {
-    $this->markTestIncomplete('Paypal is creating a complete contribution but we are testing pending
-      we are unsure at this point if this is correct behaviour or not');
-    return;
     $form = new CRM_Contribute_Form_Contribution();
     $paymentProcessorID = $this->paymentProcessorCreate(array('is_test' => 0));
     $form->_mode = 'Live';
@@ -234,7 +231,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     }
     $this->callAPISuccessGetCount('Contribution', array(
       'contact_id' => $this->_individualId,
-      'contribution_status_id' => 'Pending',
+      'contribution_status_id' => 'Completed',
     ), 1);
     $contact = $this->callAPISuccessGetSingle('Contact', array('id' => $this->_individualId));
     $this->assertTrue(empty($contact['source']));
