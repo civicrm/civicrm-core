@@ -629,6 +629,39 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
 
     foreach ($rows as $rowNum => $row) {
 
+      // Handle ID to label conversion for contact fields
+      $entryFound = $this->alterDisplayContactFields($row, $rows, $rowNum, 'contact/relationship', 'View Relationships') ? TRUE : $entryFound;
+
+      // Handle contact subtype A
+      if (array_key_exists('civicrm_contact_contact_sub_type_a', $row)) {
+        if ($value = $row['civicrm_contact_contact_sub_type_a']) {
+          $rowValues = explode(CRM_Core_DAO::VALUE_SEPARATOR, $value);
+          $rowLabels = array();
+          foreach ($rowValues as $rowValue) {
+            if ($rowValue) {
+              $rowLabels[] = CRM_Core_Pseudoconstant::getLabel('CRM_Contact_BAO_Contact', 'contact_sub_type', $rowValue);
+            }
+          }
+          $rows[$rowNum]['civicrm_contact_contact_sub_type_a'] = implode(', ', $rowLabels);
+        }
+        $entryFound = TRUE;
+      }
+
+      // Handle contact subtype B
+      if (array_key_exists('civicrm_contact_b_contact_sub_type_b', $row)) {
+        if ($value = $row['civicrm_contact_b_contact_sub_type_b']) {
+          $rowValues = explode(CRM_Core_DAO::VALUE_SEPARATOR, $value);
+          $rowLabels = array();
+          foreach ($rowValues as $rowValue) {
+            if ($rowValue) {
+              $rowLabels[] = CRM_Core_Pseudoconstant::getLabel('CRM_Contact_BAO_Contact', 'contact_sub_type', $rowValue);
+            }
+          }
+          $rows[$rowNum]['civicrm_contact_b_contact_sub_type_b'] = implode(', ', $rowLabels);
+        }
+        $entryFound = TRUE;
+      }
+
       // Handle country.
       if (array_key_exists('civicrm_address_country_id', $row)) {
         if ($value = $row['civicrm_address_country_id']) {
@@ -655,7 +688,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
           = $rows[$rowNum]['civicrm_contact_sort_name_a'] . ' (' .
           $rows[$rowNum]['civicrm_contact_id'] . ')';
         $rows[$rowNum]['civicrm_contact_sort_name_a_link'] = $url;
-        $rows[$rowNum]['civicrm_contact_sort_name_a_hover'] = ts("View Contact details for this contact.");
+        $rows[$rowNum]['civicrm_contact_sort_name_a_hover'] = ts('View Contact Detail Report for this contact');
         $entryFound = TRUE;
       }
 
@@ -670,18 +703,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
           = $rows[$rowNum]['civicrm_contact_b_sort_name_b'] . ' (' .
           $rows[$rowNum]['civicrm_contact_b_id'] . ')';
         $rows[$rowNum]['civicrm_contact_b_sort_name_b_link'] = $url;
-        $rows[$rowNum]['civicrm_contact_b_sort_name_b_hover'] = ts("View Contact details for this contact.");
-        $entryFound = TRUE;
-      }
-
-      if (array_key_exists('civicrm_relationship_relationship_id', $row) &&
-        array_key_exists('civicrm_contact_id', $row)
-      ) {
-        $url = "/civicrm/contact/view/rel?reset=1&action=update&rtype=a_b&cid=" .
-          $row['civicrm_contact_id'] . "&id=" .
-          $row['civicrm_relationship_relationship_id'];
-        $rows[$rowNum]['civicrm_relationship_relationship_id_link'] = $url;
-        $rows[$rowNum]['civicrm_relationship_relationship_id_hover'] = ts("Edit this relationship.");
+        $rows[$rowNum]['civicrm_contact_b_sort_name_b_hover'] = ts('View Contact Detail Report for this contact');
         $entryFound = TRUE;
       }
 
