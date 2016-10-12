@@ -469,9 +469,9 @@ class InstallRequirements {
         $testDetails = array(
           ts("MySQL %1 Configuration", array(1 => $dbName)),
           ts("Is the provided database name valid?"),
-          ts("The database name provided is not valid. Please use only 0-9, a-z, A-Z and _ as characters in the name."),
+          ts("The database name provided is not valid. Please use only 0-9, a-z, A-Z, _ and - as characters in the name."),
         );
-        if (!CRM_Core_DAO::requireValidDBName($databaseConfig['database'])) {
+        if (!CRM_Core_DAO::requireSafeDBName($databaseConfig['database'])) {
           $this->error($testDetails);
           return FALSE;
         }

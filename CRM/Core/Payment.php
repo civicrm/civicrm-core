@@ -48,33 +48,6 @@ abstract class CRM_Core_Payment {
   protected $_component;
 
   /**
-   * Parameters to append to the notify url.
-   *
-   * The notify url is passed to the payment processor and the processor uses it for return ping backs or redirection.
-   *
-   * @var array
-   */
-  protected $notifyUrlParameters = array();
-
-  /**
-   * Get notify url parameters.
-   *
-   * @return array
-   */
-  public function getNotifyUrlParameters() {
-    return $this->notifyUrlParameters;
-  }
-
-  /**
-   * Set notify url parameters.
-   *
-   * @param array $notifyUrlParameters
-   */
-  public function setNotifyUrlParameters($notifyUrlParameters) {
-    $this->notifyUrlParameters = $notifyUrlParameters;
-  }
-
-  /**
    * How are we getting billing information.
    *
    * We are trying to completely deprecate these parameters.
@@ -993,7 +966,7 @@ abstract class CRM_Core_Payment {
   protected function getNotifyUrl() {
     $url = CRM_Utils_System::url(
       'civicrm/payment/ipn/' . $this->_paymentProcessor['id'],
-      $this->getNotifyUrlParameters(),
+      array(),
       TRUE,
       NULL,
       FALSE
@@ -1143,7 +1116,6 @@ abstract class CRM_Core_Payment {
         'processor_name' => @$_GET['processor_name'],
         'processor_id' => @$_GET['processor_id'],
         'mode' => @$_GET['mode'],
-        'q' => @$_GET['q'],
       )
     );
     CRM_Utils_System::civiExit();
@@ -1168,12 +1140,13 @@ abstract class CRM_Core_Payment {
    */
   public static function handlePaymentMethod($method, $params = array()) {
     if (!isset($params['processor_id']) && !isset($params['processor_name'])) {
-      $q = explode('/', CRM_Utils_Array::value('q', $params, ''));
+      $q = explode('/', CRM_Utils_Array::value(CRM_Core_Config::singleton()->userFrameworkURLVar, $_GET, ''));
       $lastParam = array_pop($q);
       if (is_numeric($lastParam)) {
         $params['processor_id'] = $_GET['processor_id'] = $lastParam;
       }
       else {
+        self::logPaymentNotification($params);
         throw new CRM_Core_Exception("Either 'processor_id' (recommended) or 'processor_name' (deprecated) is required for payment callback.");
       }
     }

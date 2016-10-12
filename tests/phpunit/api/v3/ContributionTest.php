@@ -634,7 +634,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'contribution_status_id' => 1,
     );
 
-    $this->callAPIFailure('contribution', 'create', $params, 'contact_id is not valid : 999');
+    $this->callAPIFailure('contribution', 'create', $params);
   }
 
   /**
@@ -2083,9 +2083,9 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
         'line_total' => '100.00',
         'unit_price' => '100.00',
         'financial_type_id' => 2,
+        'contribution_type_id' => 2,
       )
     );
-
     $lineItem2 = $this->callAPISuccess('line_item', 'get', array_merge($lineItemParams, array(
       'entity_id' => $originalContribution['id'] + 1,
     )));
@@ -2133,6 +2133,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
         'line_total' => '100.00',
         'unit_price' => '100.00',
         'financial_type_id' => 2,
+        'contribution_type_id' => 2,
       )
     );
 
@@ -2593,7 +2594,34 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
         'Event',
       )
     );
+
+    $this->checkCreditCardDetails($mut, $contribution['id']);
     $mut->stop();
+  }
+
+  /**
+   * Check credit card details in sent mail via API
+   *
+   * @param $mut obj CiviMailUtils instance
+   * @param int $contributionID Contribution ID
+   *
+   */
+  public function checkCreditCardDetails($mut, $contributionID) {
+    $contribution = $this->callAPISuccess('contribution', 'create', $this->_params);
+    $this->callAPISuccess('contribution', 'sendconfirmation', array(
+        'id' => $contributionID,
+        'receipt_from_email' => 'api@civicrm.org',
+        'payment_processor_id' => $this->paymentProcessorID,
+      )
+    );
+    $mut->checkMailLog(array(
+        'Credit Card Information', // credit card header
+        'Billing Name and Address', // billing header
+        'anthony_anderson@civicrm.org', // billing name
+      ), array(
+        'Event',
+      )
+    );
   }
 
   /**

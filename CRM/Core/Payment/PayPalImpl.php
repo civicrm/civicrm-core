@@ -805,13 +805,15 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
       'membershipID' => 'membershipID',
       'related_contact' => 'relatedContactID',
       'onbehalf_dupe_alert' => 'onBehalfDupeAlert',
+      'accountingCode' => 'accountingCode',
+      'contributionRecurID' => 'contributionRecurID',
+      'contributionPageID' => 'contributionPageID',
     );
     foreach ($notifyParameterMap as $paramsName => $notifyName) {
       if (!empty($params[$paramsName])) {
         $notifyParameters[$notifyName] = $params[$paramsName];
       }
     }
-    $this->setNotifyUrlParameters($notifyParameters);
     $notifyURL = $this->getNotifyUrl();
 
     $config = CRM_Core_Config::singleton();
@@ -844,7 +846,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
       'invoice' => $params['invoiceID'],
       'lc' => substr($config->lcMessages, -2),
       'charset' => function_exists('mb_internal_encoding') ? mb_internal_encoding() : 'UTF-8',
-      'custom' => CRM_Utils_Array::value('accountingCode', $params),
+      'custom' => json_encode($notifyParameters),
       'bn' => 'CiviCRM_SP',
     );
 
@@ -887,11 +889,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
 
     // if recurring donations, add a few more items
     if (!empty($params['is_recur'])) {
-      if ($params['contributionRecurID']) {
-        $notifyURL .= "&contributionRecurID={$params['contributionRecurID']}&contributionPageID={$params['contributionPageID']}";
-        $paypalParams['notify_url'] = $notifyURL;
-      }
-      else {
+      if (!$params['contributionRecurID']) {
         CRM_Core_Error::fatal(ts('Recurring contribution, but no database id'));
       }
 

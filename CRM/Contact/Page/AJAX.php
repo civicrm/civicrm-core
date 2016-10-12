@@ -223,9 +223,6 @@ class CRM_Contact_Page_AJAX {
     CRM_Utils_JSON::output($output);
   }
 
-  /**
-   * @throws \CiviCRM_API3_Exception
-   */
   public static function relationship() {
     $relType = CRM_Utils_Request::retrieve('rel_type', 'String', CRM_Core_DAO::$_nullObject, TRUE);
     $relContactID = CRM_Utils_Request::retrieve('rel_contact', 'Positive', CRM_Core_DAO::$_nullObject, TRUE);
@@ -249,13 +246,19 @@ class CRM_Contact_Page_AJAX {
 
     // Loop through multiple case clients
     foreach ($clientList as $i => $sourceContactID) {
-      $result = civicrm_api3('relationship', 'create', array(
-        'case_id' => $caseID,
-        'relationship_type_id' => $relTypeId,
-        "contact_id_$a" => $relContactID,
-        "contact_id_$b" => $sourceContactID,
-        'start_date' => 'now',
-      ));
+      try {
+        $result = civicrm_api3('relationship', 'create', array(
+          'case_id' => $caseID,
+          'relationship_type_id' => $relTypeId,
+          "contact_id_$a" => $relContactID,
+          "contact_id_$b" => $sourceContactID,
+          'start_date' => 'now',
+        ));
+      }
+      catch (CiviCRM_API3_Exception $e) {
+        $ret['is_error'] = 1;
+        $ret['error_message'] = $e->getMessage();
+      }
       // Save activity only for the primary (first) client
       if ($i == 0 && empty($result['is_error'])) {
         CRM_Case_BAO_Case::createCaseRoleActivity($caseID, $result['id'], $relContactID);
@@ -677,7 +680,9 @@ LIMIT {$offset}, {$rowCount}
 
     foreach ($mappings as $key => $dbName) {
       if (!empty($searchParams[$key])) {
-        $queryParams[$nextParamKey] = array('%' . $searchParams[$key] . '%', 'String');
+        // CRM-18694.
+        $wildcard = strstr($key, 'postcode') ? '' : '%';
+        $queryParams[$nextParamKey] = array($wildcard . $searchParams[$key] . '%', 'String');
         $where[] = $dbName . " LIKE %{$nextParamKey} ";
         $nextParamKey++;
       }

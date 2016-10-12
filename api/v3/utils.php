@@ -176,7 +176,7 @@ function civicrm_api3_create_success($values = 1, $params = array(), $entity = N
         $values[$key]['id'] = $item[$lowercase_entity . "_id"];
       }
       if (!empty($item['financial_type_id'])) {
-        //4.3 legacy handling
+        // 4.3 legacy handling.
         $values[$key]['contribution_type_id'] = $item['financial_type_id'];
       }
       if (!empty($item['next_sched_contribution_date'])) {
@@ -382,7 +382,7 @@ function _civicrm_api3_get_DAO($name) {
  *   return the DAO name to manipulate this function
  *   eg. "civicrm_contact_create" or "Contact" will return "CRM_Contact_BAO_Contact"
  *
- * @return mixed
+ * @return string|null
  */
 function _civicrm_api3_get_BAO($name) {
   // FIXME: DAO should be renamed CRM_Badge_DAO_BadgeLayout
@@ -1336,9 +1336,24 @@ function _civicrm_api3_check_required_fields($params, $daoName, $return = FALSE)
  * @return array
  */
 function _civicrm_api3_basic_get($bao_name, $params, $returnAsSuccess = TRUE, $entity = "", $sql = NULL, $uniqueFields = FALSE) {
-  $query = new \Civi\API\SelectQuery($bao_name, $params, $uniqueFields);
+  $entity = CRM_Core_DAO_AllCoreTables::getBriefName(str_replace('_BAO_', '_DAO_', $bao_name));
+  $options = _civicrm_api3_get_options_from_params($params);
+
+  $query = new \Civi\API\Api3SelectQuery($entity, CRM_Utils_Array::value('check_permissions', $params, FALSE));
+  $query->where = $params;
+  if ($options['is_count']) {
+    $query->select = array('count_rows');
+  }
+  else {
+    $query->select = array_keys(array_filter($options['return']));
+    $query->orderBy = $options['sort'];
+    $query->isFillUniqueFields = $uniqueFields;
+  }
+  $query->limit = $options['limit'];
+  $query->offset = $options['offset'];
   $query->merge($sql);
   $result = $query->run();
+
   if ($returnAsSuccess) {
     return civicrm_api3_create_success($result, $params, $entity, 'get');
   }
@@ -1457,9 +1472,14 @@ function _civicrm_api3_basic_delete($bao_name, &$params) {
   _civicrm_api3_check_edit_permissions($bao_name, array('id' => $params['id']));
   $args = array(&$params['id']);
   if (method_exists($bao_name, 'del')) {
-    $bao = call_user_func_array(array($bao_name, 'del'), $args);
-    if ($bao !== FALSE) {
-      return civicrm_api3_create_success(TRUE);
+    $dao = new $bao_name();
+    $dao->id = $params['id'];
+    if ($dao->find()) {
+      $bao = call_user_func_array(array($bao_name, 'del'), $args);
+      if ($bao !== FALSE) {
+        return civicrm_api3_create_success();
+      }
+      throw new API_Exception('Could not delete entity id ' . $params['id']);
     }
     throw new API_Exception('Could not delete entity id ' . $params['id']);
   }

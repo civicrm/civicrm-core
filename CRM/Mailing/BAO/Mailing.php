@@ -542,7 +542,7 @@ WHERE  mailing_id = %1
       $groupBy = $groupJoin = '';
       if ($dedupeEmail) {
         $groupJoin = " INNER JOIN civicrm_email e ON e.id = i.email_id";
-        $groupBy = " GROUP BY e.email, i.contact_id ";
+        $groupBy = " GROUP BY e.email ";
       }
 
       $sql = "
@@ -921,11 +921,7 @@ ORDER BY   i.contact_id, i.{$tempColumn}
    * @return void
    */
   public function getTestRecipients($testParams) {
-    $session = CRM_Core_Session::singleton();
-    $senderId = $session->get('userID');
-    list($aclJoin, $aclWhere) = CRM_ACL_BAO_ACL::buildAcl($senderId);
-
-    if (!empty($testParams['test_group']) && array_key_exists($testParams['test_group'], CRM_Core_PseudoConstant::group())) {
+    if (array_key_exists($testParams['test_group'], CRM_Core_PseudoConstant::group())) {
       $contacts = civicrm_api('contact', 'get', array(
           'version' => 3,
           'group' => $testParams['test_group'],
@@ -942,15 +938,13 @@ SELECT     civicrm_email.id AS email_id,
            civicrm_email.is_primary as is_primary,
            civicrm_email.is_bulkmail as is_bulkmail
 FROM       civicrm_email
-INNER JOIN civicrm_contact contact_a ON civicrm_email.contact_id = contact_a.id
-{$aclJoin}
+INNER JOIN civicrm_contact ON civicrm_email.contact_id = civicrm_contact.id
 WHERE      (civicrm_email.is_bulkmail = 1 OR civicrm_email.is_primary = 1)
-AND        contact_a.id = {$groupContact}
-AND        contact_a.do_not_email = 0
-AND        contact_a.is_deceased <> 1
+AND        civicrm_contact.id = {$groupContact}
+AND        civicrm_contact.do_not_email = 0
+AND        civicrm_contact.is_deceased <> 1
 AND        civicrm_email.on_hold = 0
-AND        contact_a.is_opt_out = 0
-{$aclWhere}
+AND        civicrm_contact.is_opt_out = 0
 GROUP BY   civicrm_email.id
 ORDER BY   civicrm_email.is_bulkmail DESC
 ";
@@ -2518,6 +2512,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
       "$mailing.approval_status_id", "createdContact.sort_name as created_by", "scheduledContact.sort_name as scheduled_by",
       "$mailing.created_id as created_id", "$mailing.scheduled_id as scheduled_id", "$mailing.is_archived as archived",
       "$mailing.created_date as created_date", "campaign_id", "$mailing.sms_provider_id as sms_provider_id",
+      "$mailing.language",
     );
 
     // we only care about parent jobs, since that holds all the info on
@@ -2579,6 +2574,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
         'campaign_id' => $dao->campaign_id,
         'campaign' => empty($dao->campaign_id) ? NULL : $allCampaigns[$dao->campaign_id],
         'sms_provider_id' => $dao->sms_provider_id,
+        'language' => $dao->language,
       );
     }
     return $rows;

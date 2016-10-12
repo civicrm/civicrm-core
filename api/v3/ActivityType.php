@@ -117,5 +117,9 @@ function _civicrm_api3_activity_type_create_spec(&$params) {
  * @deprecated use OptionValue api
  */
 function civicrm_api3_activity_type_delete($params) {
-  return civicrm_api3_create_success(CRM_Core_BAO_OptionValue::del($params['id']), $params);
+  $result = CRM_Core_BAO_OptionValue::del($params['id']);
+  if ($result) {
+    return civicrm_api3_create_success(TRUE, $params);
+  }
+  throw new API_Exception("Failure to delete activity type id {$params['id']}");
 }

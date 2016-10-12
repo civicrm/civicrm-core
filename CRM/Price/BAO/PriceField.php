@@ -138,6 +138,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
           'is_active' => 1,
           'is_default' => CRM_Utils_Array::value($params['option_weight'][$index], $defaultArray) ? $defaultArray[$params['option_weight'][$index]] : 0,
           'membership_num_terms' => NULL,
+          'non_deductible_amount' => CRM_Utils_Array::value('non_deductible_amount', $params),
         );
 
         if ($options['membership_type_id']) {

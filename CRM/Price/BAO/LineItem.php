@@ -375,6 +375,7 @@ AND li.entity_id = {$entityId}
         'html_type' => $fields['html_type'],
         'financial_type_id' => CRM_Utils_Array::value('financial_type_id', $options[$oid]),
         'tax_amount' => CRM_Utils_Array::value('tax_amount', $options[$oid]),
+        'non_deductible_amount' => CRM_Utils_Array::value('non_deductible_amount', $options[$oid]),
       );
 
       if ($values[$oid]['membership_type_id'] && empty($values[$oid]['auto_renew'])) {
@@ -432,7 +433,9 @@ AND li.entity_id = {$entityId}
       }
 
       foreach ($values as &$line) {
-        $line['entity_table'] = $entityTable;
+        if (empty($line['entity_table'])) {
+          $line['entity_table'] = $entityTable;
+        }
         if (empty($line['entity_id'])) {
           $line['entity_id'] = $entityId;
         }

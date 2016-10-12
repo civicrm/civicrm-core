@@ -554,7 +554,7 @@ class CRM_Core_Session {
    * @throws CiviCRM_API3_Exception
    */
   public function getLoggedInContactDisplayName() {
-    $userContactID = CRM_Core_Session::singleton()->getLoggedInContactID();
+    $userContactID = CRM_Core_Session::getLoggedInContactID();
     if (!$userContactID) {
       return '';
     }

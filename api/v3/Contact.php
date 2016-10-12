@@ -408,7 +408,8 @@ function civicrm_api3_contact_delete($params) {
   if ($skipUndelete && CRM_Financial_BAO_FinancialItem::checkContactPresent(array($contactID), $error)) {
     return civicrm_api3_create_error($error['_qf_default']);
   }
-  if (CRM_Contact_BAO_Contact::deleteContact($contactID, $restore, $skipUndelete)) {
+  if (CRM_Contact_BAO_Contact::deleteContact($contactID, $restore, $skipUndelete,
+    CRM_Utils_Array::value('check_permissions', $params))) {
     return civicrm_api3_create_success();
   }
   else {

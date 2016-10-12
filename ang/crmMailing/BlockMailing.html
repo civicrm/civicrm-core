@@ -61,7 +61,7 @@ It could perhaps be thinned by 30-60% by making more directives.
           ng-model="mailing.recipients.groups.base[0]"
           ng-required="true"
           >
-          <option ng-repeat="grp in crmMailingConst.groupNames | orderBy:'title'" value="{{grp.id}}">{{grp.title}}</option>
+          <option ng-repeat="grp in crmMailingConst.groupNames | filter:{is_hidden:0} | orderBy:'title'" value="{{grp.id}}">{{grp.title}}</option>
         </select>
       </div>
     </span>
@@ -78,6 +78,20 @@ It could perhaps be thinned by 30-60% by making more directives.
         required
         placeholder="Subject"
         name="subject" />
+    </div>
+    <div ng-if="crmMailingConst.isMultiLingual">
+      <div crm-ui-field="{name: 'subform.language', title: ts('Language')}">
+        <select
+          crm-ui-id="subform.language"
+          crm-ui-select="{dropdownAutoWidth : true, allowClear: false, placeholder: ts('- choose language -')}"
+          name="language"
+          ng-model="mailing.language"
+          required
+          >
+          <option value=""></option>
+          <option ng-repeat="(key,val) in crmMailingConst.enabledLanguages" value="{{key}}">{{val}}</option>
+        </select>
+      </div>
     </div>
   </div>
 </div>

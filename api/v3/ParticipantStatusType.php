@@ -77,5 +77,5 @@ function civicrm_api3_participant_status_type_delete($params) {
     return civicrm_api3_create_success(TRUE);
   }
 
-  return civicrm_api3_create_error(TRUE);
+  throw new API_Exception('Could not delete participant status type id ' . $params['id']);
 }
