@@ -411,6 +411,43 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
         'canMerge' => TRUE,
       ),
     ), $pairs);
+
+    $this->callAPISuccess('GroupContact', 'create', array('group_id' => $groupID, 'contact_id' => $this->contacts[5]['id']));
+    CRM_Core_DAO::executeQuery("DELETE FROM civicrm_prevnext_cache");
+    $pairs = CRM_Dedupe_Merger::getDuplicatePairs(
+      $ruleGroups['id'],
+      $groupID,
+      TRUE,
+      25,
+      FALSE
+    );
+
+    $this->assertEquals(array(
+      0 => array(
+        'srcID' => $this->contacts[5]['id'],
+        'srcName' => 'Walt Disney Ltd',
+        'dstID' => $this->contacts[4]['id'],
+        'dstName' => 'Walt Disney Ltd',
+        'weight' => 20,
+        'canMerge' => TRUE,
+      ),
+      1 => array(
+        'srcID' => $this->contacts[6]['id'],
+        'srcName' => 'Walt Disney',
+        'dstID' => $this->contacts[4]['id'],
+        'dstName' => 'Walt Disney Ltd',
+        'weight' => 10,
+        'canMerge' => TRUE,
+      ),
+      2 => array(
+        'srcID' => $this->contacts[6]['id'],
+        'srcName' => 'Walt Disney',
+        'dstID' => $this->contacts[5]['id'],
+        'dstName' => 'Walt Disney Ltd',
+        'weight' => 10,
+        'canMerge' => TRUE,
+      ),
+    ), $pairs);
   }
 
   /**
