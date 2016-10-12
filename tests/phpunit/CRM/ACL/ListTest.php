@@ -15,6 +15,7 @@ class CRM_ACL_ListTest extends CiviUnitTestCase {
    */
   public function setUp() {
     parent::setUp();
+    // $this->quickCleanup(array('civicrm_acl_contact_cache'), TRUE);
     $this->useTransaction(TRUE);
     $this->allowedContactsACL = array();
   }
@@ -192,9 +193,57 @@ class CRM_ACL_ListTest extends CiviUnitTestCase {
   /**
    * Test access related to the 'access deleted contact' permission
    */
-  public function _testPermissionCompare() {
-    // CRM_Core_Config::singleton()->userPermissionClass->permissions = array('edit all contacts', 'view all contacts');
-    // $contacts = $this->createScenarioPlain();
+  public function testPermissionCompare() {
+    $contacts = $this->createScenarioRelations();
+    $contact_index = array_flip($contacts);
+
+    // set custom hook
+    $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'hook_civicrm_aclWhereClause'));
+
+    $config = CRM_Core_Config::singleton();
+    $this->allowedContactsACL = array($contacts[0], $contacts[1], $contacts[4]);
+    $config->secondDegRelPermissions = TRUE;
+
+    // test configurations
+    $permissions_to_check    = array(CRM_Core_Permission::VIEW => 'View', CRM_Core_Permission::EDIT => 'Edit');
+    $user_permission_options = array(/*ALL*/ NULL, /*NONE*/ array(), array('view all contacts'), array('edit all contacts'), array('view all contacts', 'edit all contacts'));
+
+    // run all combinations of those
+    foreach ($permissions_to_check as $permission_to_check => $permission_label) {
+      foreach ($user_permission_options as $user_permissions) {
+        // select the contact range
+        $contact_range = $contacts;
+        if (is_array($user_permissions) && count($user_permissions)==0) {
+          // slight (explainable) deviation on the own contact
+          unset($contact_range[0]);
+        }
+
+        $config->userPermissionClass->permissions = $user_permissions;
+        $user_permissions_label = json_encode($user_permissions);
+
+        // get the list result
+        $list_result = CRM_Contact_BAO_Contact_Permission::allowList($contact_range, $permission_to_check);
+        $this->assertTrue(count($list_result) <= count($contact_range), "Permission::allowList should return a subset of the contats.");
+        foreach ($list_result as $contact_id) {
+          $this->assertContains($contact_id, $contact_range, "Permission::allowList should return a subset of the contats.");
+        }
+
+        // now compare the results
+        foreach ($contact_range as $contact_id) {
+          $individual_result = CRM_Contact_BAO_Contact_Permission::allow($contact_id, $permission_to_check);
+
+          if (in_array($contact_id, $list_result)) {
+            // listPermission reports PERMISSION GRANTED
+            $this->assertTrue($individual_result, "Permission::allow denies {$permission_label} access for contact[{$contact_index[$contact_id]}], while Permission::allowList grants it. User permission: '{$user_permissions_label}'");
+
+          } else {
+            // listPermission reports PERMISSION DENIED
+            $this->assertFalse($individual_result, "Permission::allow grantes {$permission_label} access for contact[{$contact_index[$contact_id]}], while Permission::allowList denies it. User permission: '{$user_permissions_label}'");
+
+          }
+        }
+      }
+    }
   }
 
 
