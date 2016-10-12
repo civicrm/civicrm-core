@@ -57,8 +57,7 @@ class CRM_ACL_API {
    */
   public static function check($str, $contactID = NULL) {
     if ($contactID == NULL) {
-      $session = CRM_Core_Session::singleton();
-      $contactID = $session->get('userID');
+      $contactID = CRM_Core_Session::getLoggedInContactID();
     }
 
     if (!$contactID) {
@@ -164,8 +163,7 @@ class CRM_ACL_API {
     $includedGroups = NULL
   ) {
     if ($contactID == NULL) {
-      $session = CRM_Core_Session::singleton();
-      $contactID = $session->get('userID');
+      $contactID = CRM_Core_Session::getLoggedInContactID();
     }
 
     if (!$contactID) {
