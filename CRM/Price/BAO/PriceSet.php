@@ -1722,7 +1722,7 @@ WHERE       ps.id = %1
     $priceSetParams = array();
     foreach ($params as $field => $value) {
       $parts = explode('_', $field);
-      if (count($parts) == 2 && $parts[0] == 'price' && is_numeric($parts[1])) {
+      if (count($parts) == 2 && $parts[0] == 'price' && is_numeric($parts[1]) && is_array($value)) {
         $priceSetParams[$field] = $value;
       }
     }
