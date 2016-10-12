@@ -926,9 +926,20 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
     // mask value to hide map link if there are not lat/long
     $mapMask = $mask & 4095;
 
-    $links = self::links($this->_context, $this->_contextMenu, $this->_key);
+    // get permissions on an individual level (CRM-12645)
+    $can_edit_list = CRM_Contact_BAO_Contact_Permission::allowList(array_keys($rows), CRM_Core_Permission::EDIT);
+
+    $links_template = self::links($this->_context, $this->_contextMenu, $this->_key);
+
 
     foreach ($rows as $id => & $row) {
+      $links = $links_template;
+
+      // remove edit/view links (CRM-12645)
+      if (isset($links[CRM_Core_Action::UPDATE]) && !in_array($id, $can_edit_list)) {
+        unset($links[CRM_Core_Action::UPDATE]);
+      }
+
       if (!empty($this->_formValues['deleted_contacts']) && CRM_Core_Permission::check('access deleted contacts')
       ) {
         $links = array(
