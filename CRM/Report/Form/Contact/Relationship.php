@@ -707,6 +707,17 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
         $entryFound = TRUE;
       }
 
+      if (array_key_exists('civicrm_relationship_relationship_id', $row) &&
+        array_key_exists('civicrm_contact_id', $row)
+      ) {
+        $url = "/civicrm/contact/view/rel?reset=1&action=update&rtype=a_b&cid=" .
+          $row['civicrm_contact_id'] . "&id=" .
+          $row['civicrm_relationship_relationship_id'];
+        $rows[$rowNum]['civicrm_relationship_relationship_id_link'] = $url;
+        $rows[$rowNum]['civicrm_relationship_relationship_id_hover'] = ts("Edit this relationship.");
+        $entryFound = TRUE;
+      }
+
       // skip looking further in rows, if first row itself doesn't
       // have the column we need
       if (!$entryFound) {
