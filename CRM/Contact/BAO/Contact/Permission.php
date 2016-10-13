@@ -63,7 +63,7 @@ class CRM_Contact_BAO_Contact_Permission {
 
       // if the general permission is there, all good
       if (CRM_Core_Permission::check('access deleted contacts')) {
-        // if user can access delted contacts -> fine
+        // if user can access deleted contacts -> fine
         return $contact_ids;
       }
       else {
@@ -534,7 +534,6 @@ SELECT second_degree_relationship.contact_id_{$second_direction['to']} AS contac
     while ($result->fetch()) {
       $result_set[(int) $result->contact_id] = TRUE;
     }
-    $keys = array_keys($result_set);
     return array_keys($result_set);
   }
 
