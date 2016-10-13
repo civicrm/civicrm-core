@@ -148,7 +148,6 @@ class CRM_Core_I18n {
    * @return array
    *   Array of code/language name mappings
    */
-
   public static function languages($justEnabled = FALSE) {
     static $all = NULL;
     static $enabled = NULL;
