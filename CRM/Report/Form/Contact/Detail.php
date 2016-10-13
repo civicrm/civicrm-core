@@ -641,7 +641,7 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
 
     if (!empty($this->_selectComponent['relationship_civireport'])) {
 
-      $relTypes = CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, 'null', NULL, NULL, TRUE);
+      $relTypes = CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, NULL, NULL, NULL, TRUE);
 
       $val = 'relationship_civireport';
       $eligibleResult[$val] = $val;
