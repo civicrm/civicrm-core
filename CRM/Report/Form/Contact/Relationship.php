@@ -633,6 +633,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
       $entryFound = $this->alterDisplayContactFields($row, $rows, $rowNum, 'contact/relationship', 'View Relationships') ? TRUE : $entryFound;
 
       // Handle contact subtype A
+      // @todo refactor into separate function
       if (array_key_exists('civicrm_contact_contact_sub_type_a', $row)) {
         if ($value = $row['civicrm_contact_contact_sub_type_a']) {
           $rowValues = explode(CRM_Core_DAO::VALUE_SEPARATOR, $value);
@@ -648,6 +649,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
       }
 
       // Handle contact subtype B
+      // @todo refactor into separate function
       if (array_key_exists('civicrm_contact_b_contact_sub_type_b', $row)) {
         if ($value = $row['civicrm_contact_b_contact_sub_type_b']) {
           $rowValues = explode(CRM_Core_DAO::VALUE_SEPARATOR, $value);
@@ -662,7 +664,8 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
         $entryFound = TRUE;
       }
 
-      // Handle country.
+      // Handle country
+      // @todo use alterDisplayAddressFields function
       if (array_key_exists('civicrm_address_country_id', $row)) {
         if ($value = $row['civicrm_address_country_id']) {
           $rows[$rowNum]['civicrm_address_country_id'] = CRM_Core_PseudoConstant::country($value, FALSE);
@@ -670,6 +673,8 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
         $entryFound = TRUE;
       }
 
+      // Handle state/province
+      // @todo use alterDisplayAddressFields function
       if (array_key_exists('civicrm_address_state_province_id', $row)) {
         if ($value = $row['civicrm_address_state_province_id']) {
           $rows[$rowNum]['civicrm_address_state_province_id'] = CRM_Core_PseudoConstant::stateProvince($value, FALSE);
@@ -677,6 +682,8 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
         $entryFound = TRUE;
       }
 
+      // Handle contact name A
+      // @todo refactor into separate function
       if (array_key_exists('civicrm_contact_sort_name_a', $row) &&
         array_key_exists('civicrm_contact_id', $row)
       ) {
@@ -692,6 +699,8 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
         $entryFound = TRUE;
       }
 
+      // Handle contact name B
+      // @todo refactor into separate function
       if (array_key_exists('civicrm_contact_b_sort_name_b', $row) &&
         array_key_exists('civicrm_contact_b_id', $row)
       ) {
@@ -707,6 +716,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
         $entryFound = TRUE;
       }
 
+      // Handle relationship
       if (array_key_exists('civicrm_relationship_relationship_id', $row) &&
         array_key_exists('civicrm_contact_id', $row)
       ) {
