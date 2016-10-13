@@ -811,6 +811,7 @@ HTACCESS;
       case 'image/gif':
       case 'image/x-png':
       case 'image/png':
+      case 'image/jpg':
         list($imageWidth, $imageHeight) = getimagesize($path);
         list($imageThumbWidth, $imageThumbHeight) = CRM_Contact_BAO_Contact::getThumbSize($imageWidth, $imageHeight);
         $url = "<a href=\"$url\" class='crm-image-popup'>
@@ -824,6 +825,25 @@ HTACCESS;
     }
 
     return $url;
+  }
+
+  /**
+   * Return formatted image icon
+   *
+   * @param string $imageURL
+   *   Contact's image url
+   *
+   * @return string $url
+   */
+  public static function getImageURL($imageURL) {
+    // retrieve image name from $imageURL
+    $imageURL = CRM_Utils_String::unstupifyUrl($imageURL);
+    parse_str(parse_url($imageURL, PHP_URL_QUERY), $query);
+
+    $path = CRM_Core_Config::singleton()->customFileUploadDir . $query['photo'];
+    $mimeType = 'image/' . strtolower(pathinfo($path, PATHINFO_EXTENSION));
+
+    return self::getFileURL($path, $mimeType);
   }
 
 }
