@@ -86,7 +86,7 @@ class LocalizationInitializer {
 
         // set default currency in currencies_enabled (option group)
         if (isset($settings['defaultCurrency'])) {
-          self::updateCurrencies(array($settings['defaultCurrency']), $settings['defaultCurrency']);
+          \CRM_Admin_Form_Setting_Localization::updateEnabledCurrencies(array($settings['defaultCurrency']), $settings['defaultCurrency']);
         }
 
       }
@@ -124,36 +124,6 @@ class LocalizationInitializer {
       }
       civicrm_api3('OptionValue', 'create', $params);
     }
-
-  }
-
-  /**
-   * Replace available currencies by the ones provided
-   *
-   * @param $currencies array of currencies ['USD', 'CAD']
-   * @param $default default currency
-   */
-  protected static function updateCurrencies($currencies, $default) {
-
-    // sort so that when we display drop down, weights have right value
-    sort($currencies);
-
-    // get labels for all the currencies
-    $options = array();
-
-    $currencySymbols = \CRM_Admin_Form_Setting_Localization::getCurrencySymbols();
-    for ($i = 0; $i < count($currencies); $i++) {
-      $options[] = array(
-        'label' => $currencySymbols[$currencies[$i]],
-        'value' => $currencies[$i],
-        'weight' => $i + 1,
-        'is_active' => 1,
-        'is_default' => $currencies[$i] == $default,
-      );
-    }
-
-    $dontCare = NULL;
-    \CRM_Core_OptionGroup::createAssoc('currencies_enabled', $options, $dontCare);
 
   }
 
