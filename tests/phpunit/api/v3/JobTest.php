@@ -354,38 +354,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test the batch merge function actually works!
-   *
-   * @dataProvider getMergeSets
-   *
-   * @param $dataSet
-   */
-  public function testBatchMergeConflictOnDeceased($dataSet) {
-    foreach ($dataSet['contacts'] as $params) {
-      $this->callAPISuccess('Contact', 'create', $params);
-    }
-
-    $result = $this->callAPISuccess('Job', 'process_batch_merge', array('mode' => $dataSet['mode']));
-    $this->assertEquals($dataSet['skipped'], count($result['values']['skipped']), 'Failed to skip the right number:' . $dataSet['skipped']);
-    $this->assertEquals($dataSet['merged'], count($result['values']['merged']));
-    $result = $this->callAPISuccess('Contact', 'get', array(
-      'contact_sub_type' => 'Student',
-      'sequential' => 1,
-      'options' => array('sort' => 'id ASC'),
-    ));
-    $this->assertEquals(count($dataSet['expected']), $result['count']);
-    foreach ($dataSet['expected'] as $index => $contact) {
-      foreach ($contact as $key => $value) {
-        // Handle the fact it's in a different field in the return value.
-        if ($key == 'gender_id') {
-          $key = 'gender';
-        }
-        $this->assertEquals($value, $result['values'][$index][$key]);
-      }
-    }
-  }
-
-  /**
    * Check that the merge carries across various related entities.
    *
    * Note the group combinations & expected results:
