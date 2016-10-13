@@ -28,7 +28,7 @@ class CRM_ACL_ListTest extends CiviUnitTestCase {
     $contacts = $this->createScenarioPlain();
 
     // test WITH all permissions
-    CRM_Core_Config::singleton()->userPermissionClass->permissions = NULL;
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = NULL; // NULL means 'all permissions' in UnitTests environment
     $result = CRM_Contact_BAO_Contact_Permission::allowList($contacts);
     sort($result);
     $this->assertEquals($result, $contacts, "Contacts should be viewable when 'view all contacts'");
@@ -38,6 +38,12 @@ class CRM_ACL_ListTest extends CiviUnitTestCase {
     $result = CRM_Contact_BAO_Contact_Permission::allowList($contacts, CRM_Core_Permission::VIEW);
     sort($result);
     $this->assertEquals($result, $contacts, "Contacts should be viewable when 'view all contacts'");
+
+    // test WITH EDIT permissions (should imply VIEW)
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('edit all contacts');
+    $result = CRM_Contact_BAO_Contact_Permission::allowList($contacts, CRM_Core_Permission::VIEW);
+    sort($result);
+    $this->assertEquals($result, $contacts, "Contacts should be viewable when 'edit all contacts'");
 
     // test WITHOUT permission
     CRM_Core_Config::singleton()->userPermissionClass->permissions = array();
