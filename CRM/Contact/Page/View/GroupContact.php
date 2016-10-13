@@ -37,11 +37,11 @@ class CRM_Contact_Page_View_GroupContact extends CRM_Core_Page {
    */
   public function browse() {
 
-    $count = CRM_Contact_BAO_GroupContact::getContactGroup($this->_contactId, NULL, NULL, TRUE);
+    $count = CRM_Contact_BAO_GroupContact::getContactGroup($this->_contactId, NULL, NULL, TRUE, FALSE, FALSE, TRUE, NULL, TRUE);
 
-    $in = CRM_Contact_BAO_GroupContact::getContactGroup($this->_contactId, 'Added');
-    $pending = CRM_Contact_BAO_GroupContact::getContactGroup($this->_contactId, 'Pending');
-    $out = CRM_Contact_BAO_GroupContact::getContactGroup($this->_contactId, 'Removed');
+    $in = CRM_Contact_BAO_GroupContact::getContactGroup($this->_contactId, 'Added', NULL, FALSE, FALSE, FALSE, TRUE, NULL, TRUE);
+    $pending = CRM_Contact_BAO_GroupContact::getContactGroup($this->_contactId, 'Pending', NULL, FALSE, FALSE, FALSE, TRUE, NULL, TRUE);
+    $out = CRM_Contact_BAO_GroupContact::getContactGroup($this->_contactId, 'Removed', NULL, FALSE, FALSE, FALSE, TRUE, NULL, TRUE);
 
     // keep track of all 'added' contact groups so we can remove them from the smart group
     // section
