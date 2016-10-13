@@ -653,7 +653,6 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
       );
     }
 
-    $seenIDs = array();
     while ($result->fetch()) {
       $row = array();
       $this->_query->convertToPseudoNames($result);
@@ -838,16 +837,13 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
         $row['contact_sub_type'] = $result->contact_sub_type ? CRM_Contact_BAO_ContactType::contactTypePairs(FALSE, $result->contact_sub_type, ', ') : $result->contact_sub_type;
         $row['contact_id'] = $result->contact_id;
         $row['sort_name'] = $result->sort_name;
+        // Surely this if should be if NOT - otherwise it's just wierd.
         if (array_key_exists('id', $row)) {
           $row['id'] = $result->contact_id;
         }
       }
 
-      // Dedupe contacts
-      if (in_array($row['contact_id'], $seenIDs) === FALSE) {
-        $seenIDs[] = $row['contact_id'];
-        $rows[] = $row;
-      }
+      $rows[$row['contact_id']] = $row;
     }
 
     return $rows;
@@ -915,25 +911,29 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
    */
   public function addActions(&$rows) {
 
-    $permissions = array(CRM_Core_Permission::getPermission());
-    if (CRM_Core_Permission::check('delete contacts')) {
-      $permissions[] = CRM_Core_Permission::DELETE;
-    }
-    $mask = CRM_Core_Action::mask($permissions);
-    // mask value to hide map link if there are not lat/long
-    $mapMask = $mask & 4095;
+    $basicPermissions = CRM_Core_Permission::check('delete contacts') ? array(CRM_Core_Permission::DELETE) : array();
 
     // get permissions on an individual level (CRM-12645)
+    // @todo look at storing this to the session as this is called twice during search results render.
     $can_edit_list = CRM_Contact_BAO_Contact_Permission::allowList(array_keys($rows), CRM_Core_Permission::EDIT);
 
     $links_template = self::links($this->_context, $this->_contextMenu, $this->_key);
 
     foreach ($rows as $id => & $row) {
       $links = $links_template;
+      if (in_array($id, $can_edit_list)) {
+        $mask = CRM_Core_Action::mask(array_merge(array(CRM_Core_Permission::EDIT), $basicPermissions));
+      }
+      else {
+        $mask = CRM_Core_Action::mask(array_merge(array(CRM_Core_Permission::VIEW), $basicPermissions));
+      }
 
-      // remove edit/view links (CRM-12645)
-      if (isset($links[CRM_Core_Action::UPDATE]) && !in_array($id, $can_edit_list)) {
-        unset($links[CRM_Core_Action::UPDATE]);
+      if ((!is_numeric(CRM_Utils_Array::value('geo_code_1', $row))) &&
+        (empty($row['city']) ||
+          !CRM_Utils_Array::value('state_province', $row)
+        )
+      ) {
+        $mask = $mask & 4095;
       }
 
       if (!empty($this->_formValues['deleted_contacts']) && CRM_Core_Permission::check('access deleted contacts')
@@ -972,26 +972,10 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
           $row['contact_id']
         );
       }
-      elseif ((is_numeric(CRM_Utils_Array::value('geo_code_1', $row))) ||
-        (!empty($row['city']) &&
-          CRM_Utils_Array::value('state_province', $row)
-        )
-      ) {
-        $row['action'] = CRM_Core_Action::formLink(
-          $links,
-          $mask,
-          array('id' => $row['contact_id']),
-          ts('more'),
-          FALSE,
-          'contact.selector.actions',
-          'Contact',
-          $row['contact_id']
-        );
-      }
       else {
         $row['action'] = CRM_Core_Action::formLink(
           $links,
-          $mapMask,
+          $mask,
           array('id' => $row['contact_id']),
           ts('more'),
           FALSE,
