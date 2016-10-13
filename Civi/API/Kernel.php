@@ -130,7 +130,7 @@ class Kernel {
     $apiRequest = Request::create($entity, $action, $params, $extra);
 
     try {
-      $this->boot();
+      $this->boot($apiRequest);
       list($apiProvider, $apiRequest) = $this->resolve($apiRequest);
       $this->authorize($apiProvider, $apiRequest);
       return TRUE;
