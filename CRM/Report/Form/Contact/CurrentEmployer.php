@@ -352,6 +352,7 @@ FROM civicrm_contact {$this->_aliases['civicrm_contact']}
           $this->_absoluteUrl, $this->_id, $this->_drilldownReport
         );
         $rows[$rowNum]['civicrm_employer_organization_name_link'] = $url;
+        $rows[$rowNum]['civicrm_employer_organization_name_hover'] = ts('View Contact Detail Report for this contact');
         $entryFound = TRUE;
       }
 
@@ -371,14 +372,8 @@ FROM civicrm_contact {$this->_aliases['civicrm_contact']}
         }
       }
 
-      //handle gender
-      if (array_key_exists('civicrm_contact_gender_id', $row)) {
-        if ($value = $row['civicrm_contact_gender_id']) {
-          $gender = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id');
-          $rows[$rowNum]['civicrm_contact_gender_id'] = $gender[$value];
-        }
-        $entryFound = TRUE;
-      }
+      // Handle ID to label conversion for contact fields
+      $entryFound = $this->alterDisplayContactFields($row, $rows, $rowNum, 'contact/currentEmployer', 'View Contact Detail') ? TRUE : $entryFound;
 
       // display birthday in the configured custom format
       if (array_key_exists('civicrm_contact_birth_date', $row)) {
@@ -390,14 +385,15 @@ FROM civicrm_contact {$this->_aliases['civicrm_contact']}
       }
 
       // convert employee name to links
-      if (array_key_exists('civicrm_contact_display_name', $row) &&
+      if (array_key_exists('civicrm_contact_sort_name', $row) &&
         array_key_exists('civicrm_contact_id', $row)
       ) {
         $url = CRM_Report_Utils_Report::getNextUrl('contact/detail',
           'reset=1&force=1&id_op=eq&id_value=' . $row['civicrm_contact_id'],
           $this->_absoluteUrl, $this->_id, $this->_drilldownReport
         );
-        $rows[$rowNum]['civicrm_contact_display_name_link'] = $url;
+        $rows[$rowNum]['civicrm_contact_sort_name_link'] = $url;
+        $rows[$rowNum]['civicrm_contact_sort_name_hover'] = ts('View Contact Detail Report for this contact');
         $entryFound = TRUE;
       }
 

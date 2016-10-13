@@ -629,7 +629,43 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
 
     foreach ($rows as $rowNum => $row) {
 
-      // Handle country.
+      // Handle ID to label conversion for contact fields
+      $entryFound = $this->alterDisplayContactFields($row, $rows, $rowNum, 'contact/relationship', 'View Relationships') ? TRUE : $entryFound;
+
+      // Handle contact subtype A
+      // @todo refactor into separate function
+      if (array_key_exists('civicrm_contact_contact_sub_type_a', $row)) {
+        if ($value = $row['civicrm_contact_contact_sub_type_a']) {
+          $rowValues = explode(CRM_Core_DAO::VALUE_SEPARATOR, $value);
+          $rowLabels = array();
+          foreach ($rowValues as $rowValue) {
+            if ($rowValue) {
+              $rowLabels[] = CRM_Core_Pseudoconstant::getLabel('CRM_Contact_BAO_Contact', 'contact_sub_type', $rowValue);
+            }
+          }
+          $rows[$rowNum]['civicrm_contact_contact_sub_type_a'] = implode(', ', $rowLabels);
+        }
+        $entryFound = TRUE;
+      }
+
+      // Handle contact subtype B
+      // @todo refactor into separate function
+      if (array_key_exists('civicrm_contact_b_contact_sub_type_b', $row)) {
+        if ($value = $row['civicrm_contact_b_contact_sub_type_b']) {
+          $rowValues = explode(CRM_Core_DAO::VALUE_SEPARATOR, $value);
+          $rowLabels = array();
+          foreach ($rowValues as $rowValue) {
+            if ($rowValue) {
+              $rowLabels[] = CRM_Core_Pseudoconstant::getLabel('CRM_Contact_BAO_Contact', 'contact_sub_type', $rowValue);
+            }
+          }
+          $rows[$rowNum]['civicrm_contact_b_contact_sub_type_b'] = implode(', ', $rowLabels);
+        }
+        $entryFound = TRUE;
+      }
+
+      // Handle country
+      // @todo use alterDisplayAddressFields function
       if (array_key_exists('civicrm_address_country_id', $row)) {
         if ($value = $row['civicrm_address_country_id']) {
           $rows[$rowNum]['civicrm_address_country_id'] = CRM_Core_PseudoConstant::country($value, FALSE);
@@ -637,6 +673,8 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
         $entryFound = TRUE;
       }
 
+      // Handle state/province
+      // @todo use alterDisplayAddressFields function
       if (array_key_exists('civicrm_address_state_province_id', $row)) {
         if ($value = $row['civicrm_address_state_province_id']) {
           $rows[$rowNum]['civicrm_address_state_province_id'] = CRM_Core_PseudoConstant::stateProvince($value, FALSE);
@@ -644,6 +682,8 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
         $entryFound = TRUE;
       }
 
+      // Handle contact name A
+      // @todo refactor into separate function
       if (array_key_exists('civicrm_contact_sort_name_a', $row) &&
         array_key_exists('civicrm_contact_id', $row)
       ) {
@@ -655,10 +695,12 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
           = $rows[$rowNum]['civicrm_contact_sort_name_a'] . ' (' .
           $rows[$rowNum]['civicrm_contact_id'] . ')';
         $rows[$rowNum]['civicrm_contact_sort_name_a_link'] = $url;
-        $rows[$rowNum]['civicrm_contact_sort_name_a_hover'] = ts("View Contact details for this contact.");
+        $rows[$rowNum]['civicrm_contact_sort_name_a_hover'] = ts('View Contact Detail Report for this contact');
         $entryFound = TRUE;
       }
 
+      // Handle contact name B
+      // @todo refactor into separate function
       if (array_key_exists('civicrm_contact_b_sort_name_b', $row) &&
         array_key_exists('civicrm_contact_b_id', $row)
       ) {
@@ -670,10 +712,11 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
           = $rows[$rowNum]['civicrm_contact_b_sort_name_b'] . ' (' .
           $rows[$rowNum]['civicrm_contact_b_id'] . ')';
         $rows[$rowNum]['civicrm_contact_b_sort_name_b_link'] = $url;
-        $rows[$rowNum]['civicrm_contact_b_sort_name_b_hover'] = ts("View Contact details for this contact.");
+        $rows[$rowNum]['civicrm_contact_b_sort_name_b_hover'] = ts('View Contact Detail Report for this contact');
         $entryFound = TRUE;
       }
 
+      // Handle relationship
       if (array_key_exists('civicrm_relationship_relationship_id', $row) &&
         array_key_exists('civicrm_contact_id', $row)
       ) {
