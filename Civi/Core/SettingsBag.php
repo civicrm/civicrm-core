@@ -364,7 +364,7 @@ class SettingsBag {
       }
     }
 
-    if (\CRM_Utils_System::isNull($value)) {
+    if (!is_array($value) && \CRM_Utils_System::isNull($value)) {
       $dao->value = 'null';
     }
     else {
