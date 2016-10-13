@@ -854,7 +854,7 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
       }
 
       // Handle ID to label conversion for contact fields
-      $entryFound = $this->alterDisplayContactFields($row, $rows, $rowNum, 'contact/detail', 'View Contact Detail') ? TRUE : $entryFound;
+      $entryFound = $this->alterDisplayContactFields($row, $rows, $rowNum, NULL, NULL) ? TRUE : $entryFound;
 
       // display birthday in the configured custom format
       if (array_key_exists('civicrm_contact_birth_date', $row)) {
