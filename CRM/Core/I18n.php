@@ -148,12 +148,21 @@ class CRM_Core_I18n {
    * @return array
    *   Array of code/language name mappings
    */
+
   public static function languages($justEnabled = FALSE) {
     static $all = NULL;
     static $enabled = NULL;
 
     if (!$all) {
       $all = CRM_Contact_BAO_Contact::buildOptions('preferred_language');
+
+      // get labels
+      $rows = array();
+      $labels = array();
+      CRM_Core_OptionValue::getValues(array('name' => 'languages'), $rows);
+      foreach ($rows as $id => $row) {
+        $labels[$row['name']] = $row['label'];
+      }
 
       // check which ones are available; add them to $all if not there already
       $codes = array();
@@ -162,7 +171,7 @@ class CRM_Core_I18n {
           if (preg_match('/^[a-z][a-z]_[A-Z][A-Z]$/', $filename)) {
             $codes[] = $filename;
             if (!isset($all[$filename])) {
-              $all[$filename] = $filename;
+              $all[$filename] = $labels[$filename];
             }
           }
         }
@@ -178,6 +187,8 @@ class CRM_Core_I18n {
           unset($all[$code]);
         }
       }
+
+      ksort($all);
     }
 
     if ($enabled === NULL) {
