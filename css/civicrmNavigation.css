@@ -91,6 +91,7 @@ li.menu-separator.active{
   display:block;
   font-weight:normal;
   text-decoration:none;
+  border-bottom-style:none;
 }
 
 * html div.menu-item {
