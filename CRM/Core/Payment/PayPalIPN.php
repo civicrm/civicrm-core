@@ -334,7 +334,7 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
     }
 
     $paymentProcessorID = $this->retrieve('processor_id', 'Integer', FALSE);
-    if (!empty($paymentProcessorID)) {
+    if (empty($paymentProcessorID)) {
       $processorParams = array(
         'user_name' => $this->retrieve('receiver_email', 'String', FALSE),
         'payment_processor_type_id' => CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_PaymentProcessorType', 'PayPal_Standard', 'id', 'name'),
