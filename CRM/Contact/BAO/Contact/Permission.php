@@ -91,7 +91,7 @@ class CRM_Contact_BAO_Contact_Permission {
     $operation = ($type == CRM_Core_Permission::VIEW) ? 'View' : 'Edit';
 
     // add clause for deleted contacts, if the user doesn't have the permission to access them
-    $LEFT_JOIN_DELETED = $CAN_ACCESS_DELETED = '';
+    $LEFT_JOIN_DELETED = $AND_CAN_ACCESS_DELETED = '';
     if (!CRM_Core_Permission::check('access deleted contacts')) {
       $LEFT_JOIN_DELETED      = "LEFT JOIN civicrm_contact ON civicrm_contact.id = contact_id";
       $AND_CAN_ACCESS_DELETED = "AND civicrm_contact.is_deleted = 0";
