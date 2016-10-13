@@ -25,9 +25,7 @@
 *}
 {* This form is for displaying contact Image *}
 <div class="crm-contact_image crm-contact_image-block">
-  <a href="{$imageURL}" class='crm-image-popup'>
-    <img src="{$imageURL}" height={$imageThumbHeight} width={$imageThumbWidth}>
-  </a>
+  {$imageURL}
 </div>
 {if $action eq 0 or $action eq 2}
   <div class='crm-contact_image-block crm-contact_image crm-contact_image-delete'>{$deleteURL}</div>
