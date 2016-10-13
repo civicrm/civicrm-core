@@ -115,6 +115,7 @@ WHERE contact_id IN ({$contact_id_list})
     // if some have been rejected, double check for permissions inherited by relationship
     if (count($result_set) < count($contact_ids)) {
       $rejected_contacts       = array_diff_key($contact_ids, $result_set);
+      // @todo consider storing these to the acl cache for next time, since we have fetched.
       $allowed_by_relationship = self::relationshipList($rejected_contacts);
       foreach ($allowed_by_relationship as $contact_id) {
         $result_set[(int) $contact_id] = TRUE;
