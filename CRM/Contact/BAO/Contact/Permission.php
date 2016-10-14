@@ -33,6 +33,98 @@
 class CRM_Contact_BAO_Contact_Permission {
 
   /**
+   * Check which of the given contact IDs the logged in user
+   *   has permissions for the operation type according to:
+   *    - general permissions (e.g. 'edit all contacts')
+   *    - deletion status (unless you have 'access deleted contacts')
+   *    - ACL
+   *    - permissions inherited through relationships (also second degree if enabled)
+   *
+   * @param array $contact_ids
+   *   Contact IDs.
+   * @param int $type the type of operation (view|edit)
+   *
+   * @see CRM_Contact_BAO_Contact_Permission::allow
+   *
+   * @return array
+   *    list of contact IDs the logged in user has the given permission for
+   */
+  public static function allowList($contact_ids, $type = CRM_Core_Permission::VIEW) {
+    $result_set = array();
+    if (empty($contact_ids)) {
+      // empty contact lists would cause trouble in the SQL. And be pointless.
+      return $result_set;
+    }
+
+    // make sure the the general permissions are given
+    if (CRM_Core_Permission::check('edit all contacts')
+        || $type == CRM_Core_Permission::VIEW && CRM_Core_Permission::check('view all contacts')
+      ) {
+
+      // if the general permission is there, all good
+      if (CRM_Core_Permission::check('access deleted contacts')) {
+        // if user can access delted contacts -> fine
+        return $contact_ids;
+      }
+      else {
+        // if the user CANNOT access deleted contacts, these need to be filtered
+        $contact_id_list = implode(',', $contact_ids);
+        $filter_query = "SELECT DISTINCT(id) FROM civicrm_contact WHERE id IN ($contact_id_list) AND is_deleted = 0";
+        $query = CRM_Core_DAO::executeQuery($filter_query);
+        while ($query->fetch()) {
+          $result_set[(int) $query->id] = TRUE;
+        }
+        return array_keys($result_set);
+      }
+    }
+
+    // get logged in user
+    $contactID = CRM_Core_Session::getLoggedInContactID();
+    if (empty($contactID)) {
+      return array();
+    }
+
+    // make sure the cache is filled
+    self::cache($contactID, $type);
+
+    // compile query
+    $operation = ($type == CRM_Core_Permission::VIEW) ? 'View' : 'Edit';
+
+    // add clause for deleted contacts, if the user doesn't have the permission to access them
+    $LEFT_JOIN_DELETED = $CAN_ACCESS_DELETED = '';
+    if (!CRM_Core_Permission::check('access deleted contacts')) {
+      $LEFT_JOIN_DELETED      = "LEFT JOIN civicrm_contact ON civicrm_contact.id = contact_id";
+      $AND_CAN_ACCESS_DELETED = "AND civicrm_contact.is_deleted = 0";
+    }
+
+    // RUN the query
+    $contact_id_list = implode(',', $contact_ids);
+    $query = "
+SELECT contact_id
+ FROM civicrm_acl_contact_cache
+ {$LEFT_JOIN_DELETED}
+WHERE contact_id IN ({$contact_id_list}) 
+  AND user_id = {$contactID}
+  AND operation = '{$operation}'
+  {$AND_CAN_ACCESS_DELETED}";
+    $result = CRM_Core_DAO::executeQuery($query);
+    while ($result->fetch()) {
+      $result_set[(int) $result->contact_id] = TRUE;
+    }
+
+    // if some have been rejected, double check for permissions inherited by relationship
+    if (count($result_set) < count($contact_ids)) {
+      $rejected_contacts       = array_diff_key($contact_ids, $result_set);
+      $allowed_by_relationship = self::relationshipList($rejected_contacts);
+      foreach ($allowed_by_relationship as $contact_id) {
+        $result_set[(int) $contact_id] = TRUE;
+      }
+    }
+
+    return array_keys($result_set);
+  }
+
+  /**
    * Check if the logged in user has permissions for the operation type.
    *
    * @param int $id
@@ -43,8 +135,15 @@ class CRM_Contact_BAO_Contact_Permission {
    *   true if the user has permission, false otherwise
    */
   public static function allow($id, $type = CRM_Core_Permission::VIEW) {
-    $tables = array();
-    $whereTables = array();
+    // get logged in user
+    $contactID = CRM_Core_Session::getLoggedInContactID();
+
+    // first: check if contact is trying to view own contact
+    if ($type == CRM_Core_Permission::VIEW && CRM_Core_Permission::check('view my contact')
+     || $type == CRM_Core_Permission::EDIT && CRM_Core_Permission::check('edit my contact')
+      ) {
+      return TRUE;
+    }
 
     # FIXME: push this somewhere below, to not give this permission so many rights
     $isDeleted = (bool) CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $id, 'is_deleted');
@@ -60,13 +159,16 @@ class CRM_Contact_BAO_Contact_Permission {
       return TRUE;
     }
 
-    //check permission based on relationship, CRM-2963
+    // check permission based on relationship, CRM-2963
     if (self::relationship($id)) {
       return TRUE;
     }
 
-    $permission = CRM_ACL_API::whereClause($type, $tables, $whereTables);
+    // check permission based on ACL
+    $tables = array();
+    $whereTables = array();
 
+    $permission = CRM_ACL_API::whereClause($type, $tables, $whereTables);
     $from = CRM_Contact_BAO_Query::fromClause($whereTables);
 
     $query = "
@@ -87,9 +189,15 @@ WHERE contact_a.id = %1 AND $permission";
    *   Should we force a recompute.
    */
   public static function cache($userID, $type = CRM_Core_Permission::VIEW, $force = FALSE) {
-    static $_processed = array();
+    // FIXME: maybe find a better way of keeping track of this. @eileen pointed out
+    //   that somebody might flush the cache away from under our feet,
+    //   but the altenative would be a SQL call every time this is called,
+    //   and a complete rebuild if the result was an empty set...
+    static $_processed = array(
+      CRM_Core_Permission::VIEW => array(),
+      CRM_Core_Permission::EDIT => array());
 
-    if ($type = CRM_Core_Permission::VIEW) {
+    if ($type == CRM_Core_Permission::VIEW) {
       $operationClause = " operation IN ( 'Edit', 'View' ) ";
       $operation = 'View';
     }
@@ -99,7 +207,8 @@ WHERE contact_a.id = %1 AND $permission";
     }
 
     if (!$force) {
-      if (!empty($_processed[$userID])) {
+      // skip if already calculated
+      if (!empty($_processed[$type][$userID])) {
         return;
       }
 
@@ -113,7 +222,7 @@ AND    $operationClause
       $params = array(1 => array($userID, 'Integer'));
       $count = CRM_Core_DAO::singleValueQuery($sql, $params);
       if ($count > 0) {
-        $_processed[$userID] = 1;
+        $_processed[$type][$userID] = 1;
         return;
       }
     }
@@ -125,6 +234,7 @@ AND    $operationClause
 
     $from = CRM_Contact_BAO_Query::fromClause($whereTables);
 
+    // FIXME: don't use 'ON DUPLICATE KEY UPDATE'
     CRM_Core_DAO::executeQuery("
 INSERT INTO civicrm_acl_contact_cache ( user_id, contact_id, operation )
 SELECT      $userID as user_id, contact_a.id as contact_id, '$operation' as operation
@@ -136,8 +246,7 @@ ON DUPLICATE KEY UPDATE
          contact_id=VALUES(contact_id),
          operation=VALUES(operation)"
     );
-
-    $_processed[$userID] = 1;
+    $_processed[$type][$userID] = 1;
   }
 
   /**
@@ -154,8 +263,7 @@ ON DUPLICATE KEY UPDATE
     $contactID = NULL
   ) {
     if (!$contactID) {
-      $session = CRM_Core_Session::singleton();
-      $contactID = $session->get('userID');
+      $contactID = CRM_Core_Session::getLoggedInContactID();
     }
 
     if ($type = CRM_Core_Permission::VIEW) {
@@ -249,12 +357,12 @@ AND    $operationClause LIMIT 1";
    * @return bool
    *   true if logged in user has permission to view
    *   selected contact record else false
+   *
+   * @deprecated should be replaced by a ::relationshipList(array($selectedContactID)) call
    */
   public static function relationship($selectedContactID, $contactID = NULL) {
-    $session = CRM_Core_Session::singleton();
-    $config = CRM_Core_Config::singleton();
     if (!$contactID) {
-      $contactID = $session->get('userID');
+      $contactID = CRM_Core_Session::getLoggedInContactID();
       if (!$contactID) {
         return FALSE;
       }
@@ -265,6 +373,8 @@ AND    $operationClause LIMIT 1";
       return TRUE;
     }
     else {
+      // FIXME: secondDegRelPermissions should be a setting
+      $config  = CRM_Core_Config::singleton();
       if ($config->secondDegRelPermissions) {
         $query = "
 SELECT firstdeg.id
@@ -331,6 +441,101 @@ WHERE  (( contact_id_a = %1 AND contact_id_b = %2 AND is_permission_a_b = 1 ) OR
       );
       return CRM_Core_DAO::singleValueQuery($query, $params);
     }
+  }
+
+
+  /**
+   * Filter a list of contact_ids by the ones that the
+   *  currently active user as a permissioned relationship with
+   *
+   * @param array $contact_ids
+   *   List of contact IDs to be filtered
+   *
+   * @return array
+   *   List of contact IDs that the user has permissions for
+   */
+  public static function relationshipList($contact_ids) {
+    $result_set = array();
+
+    // no processing empty lists (avoid SQL errors as well)
+    if (empty($contact_ids)) {
+      return array();
+    }
+
+    // get the currently logged in user
+    $contactID = CRM_Core_Session::getLoggedInContactID();
+    if (empty($contactID)) {
+      return array();
+    }
+
+    // compile a list of queries (later to UNION)
+    $queries = array();
+    $contact_id_list = implode(',', $contact_ids);
+
+    // add a select statement for each direection
+    $directions = array(array('from' => 'a', 'to' => 'b'), array('from' => 'b', 'to' => 'a'));
+
+    // NORMAL/SINGLE DEGREE RELATIONSHIPS
+    foreach ($directions as $direction) {
+      $user_id_column    = "contact_id_{$direction['from']}";
+      $contact_id_column = "contact_id_{$direction['to']}";
+
+      // add clause for deleted contacts, if the user doesn't have the permission to access them
+      $LEFT_JOIN_DELETED = $AND_CAN_ACCESS_DELETED = '';
+      if (!CRM_Core_Permission::check('access deleted contacts')) {
+        $LEFT_JOIN_DELETED       = "LEFT JOIN civicrm_contact ON civicrm_contact.id = {$contact_id_column} ";
+        $AND_CAN_ACCESS_DELETED  = "AND civicrm_contact.is_deleted = 0";
+      }
+
+      $queries[] = "
+SELECT civicrm_relationship.{$contact_id_column} AS contact_id
+  FROM civicrm_relationship 
+  {$LEFT_JOIN_DELETED}
+ WHERE civicrm_relationship.{$user_id_column} = {$contactID}
+   AND civicrm_relationship.{$contact_id_column} IN ({$contact_id_list})
+   AND civicrm_relationship.is_active = 1
+   AND civicrm_relationship.is_permission_{$direction['from']}_{$direction['to']} = 1
+   $AND_CAN_ACCESS_DELETED";
+    }
+
+    // FIXME: secondDegRelPermissions should be a setting
+    $config = CRM_Core_Config::singleton();
+    if ($config->secondDegRelPermissions) {
+      foreach ($directions as $first_direction) {
+        foreach ($directions as $second_direction) {
+          // add clause for deleted contacts, if the user doesn't have the permission to access them
+          $LEFT_JOIN_DELETED = $AND_CAN_ACCESS_DELETED = '';
+          if (!CRM_Core_Permission::check('access deleted contacts')) {
+            $LEFT_JOIN_DELETED       = "LEFT JOIN civicrm_contact first_degree_contact  ON first_degree_contact.id  = second_degree_relationship.contact_id_{$second_direction['from']}\n";
+            $LEFT_JOIN_DELETED      .= "LEFT JOIN civicrm_contact second_degree_contact ON second_degree_contact.id = second_degree_relationship.contact_id_{$second_direction['to']} ";
+            $AND_CAN_ACCESS_DELETED  = "AND first_degree_contact.is_deleted = 0\n";
+            $AND_CAN_ACCESS_DELETED .= "AND second_degree_contact.is_deleted = 0 ";
+          }
+
+          $queries[] = "
+SELECT second_degree_relationship.contact_id_{$second_direction['to']} AS contact_id
+  FROM civicrm_relationship first_degree_relationship
+  LEFT JOIN civicrm_relationship second_degree_relationship ON first_degree_relationship.contact_id_{$first_direction['to']} = second_degree_relationship.contact_id_{$first_direction['from']}
+  {$LEFT_JOIN_DELETED}
+ WHERE first_degree_relationship.contact_id_{$first_direction['from']} = {$contactID}
+   AND second_degree_relationship.contact_id_{$second_direction['to']} IN ({$contact_id_list})
+   AND first_degree_relationship.is_active = 1
+   AND first_degree_relationship.is_permission_{$first_direction['from']}_{$first_direction['to']} = 1
+   AND second_degree_relationship.is_active = 1
+   AND second_degree_relationship.is_permission_{$second_direction['from']}_{$second_direction['to']} = 1
+   $AND_CAN_ACCESS_DELETED";
+        }
+      }
+    }
+
+    // finally UNION the queries and call
+    $query = "(" . implode(")\nUNION DISTINCT (", $queries) . ")";
+    $result = CRM_Core_DAO::executeQuery($query);
+    while ($result->fetch()) {
+      $result_set[(int) $result->contact_id] = TRUE;
+    }
+    $keys = array_keys($result_set);
+    return array_keys($result_set);
   }
 
 
