@@ -57,6 +57,14 @@ class CRM_Core_BAO_SchemaHandlerTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test CRM_Core_BAO_SchemaHandler::getIndexes() function
+   */
+  public function testGetIndexes() {
+    $indexes = CRM_Core_BAO_SchemaHandler::getIndexes(array('civicrm_contact'));
+    $this->assertTrue(in_array('index_contact_type', $indexes['civicrm_contact']));
+  }
+
+  /**
    * Test creating an index.
    *
    * We want to be sure it creates an index and exits gracefully if the index
