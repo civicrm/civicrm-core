@@ -121,7 +121,7 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
    */
   public function testGetTreeEventSubTypeAlphabetical() {
     $eventType = $this->callAPISuccess('OptionValue', 'Create', array('option_group_id' => 'event_type', 'value' => 'meeting', 'label' => 'Meeting'));
-    $customGroup = $this->CustomGroupCreate(array('extends' => 'Event', 'extends_entity_column_value' => array('meeting')));
+    $customGroup = $this->CustomGroupCreate(array('extends' => 'Event', 'extends_entity_column_value' => array('Meeting')));
     $customField = $this->customFieldCreate(array('custom_group_id' => $customGroup['id']));
     $result1 = CRM_Core_BAO_CustomGroup::getTree('Event', NULL, NULL, NULL, CRM_Core_DAO::VALUE_SEPARATOR . 'meeting' . CRM_Core_DAO::VALUE_SEPARATOR);
     $this->assertEquals('Custom Field', $result1[$customGroup['id']]['fields'][$customField['id']]['label']);
