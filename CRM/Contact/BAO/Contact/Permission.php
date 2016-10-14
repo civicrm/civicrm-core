@@ -161,7 +161,7 @@ WHERE contact_id IN ({$contact_id_list})
     }
 
     // check permission based on relationship, CRM-2963
-    if (self::relationship($id)) {
+    if (self::relationshipList(array($id))) {
       return TRUE;
     }
 
@@ -173,12 +173,15 @@ WHERE contact_id IN ({$contact_id_list})
     $from = CRM_Contact_BAO_Query::fromClause($whereTables);
 
     $query = "
-SELECT count(DISTINCT contact_a.id)
+SELECT contact_a.id
        $from
-WHERE contact_a.id = %1 AND $permission";
-    $params = array(1 => array($id, 'Integer'));
+WHERE contact_a.id = %1 AND $permission
+  LIMIT 1
+";
 
-    return (CRM_Core_DAO::singleValueQuery($query, $params) > 0) ? TRUE : FALSE;
+    if (CRM_Core_DAO::singleValueQuery($query, array(1 => array($id, 'Integer')))) {
+      return TRUE;
+    }
   }
 
   /**
@@ -341,104 +344,6 @@ AND    $operationClause LIMIT 1";
     }
     return NULL;
   }
-
-  /**
-   * Get the permission base on its relationship.
-   *
-   * @param int $selectedContactID
-   *   Contact id of selected contact.
-   * @param int $contactID
-   *   Contact id of the current contact.
-   *
-   * @return bool
-   *   true if logged in user has permission to view
-   *   selected contact record else false
-   *
-   * @deprecated should be replaced by a ::relationshipList(array($selectedContactID)) call
-   */
-  public static function relationship($selectedContactID, $contactID = NULL) {
-    if (!$contactID) {
-      $contactID = CRM_Core_Session::getLoggedInContactID();
-      if (!$contactID) {
-        return FALSE;
-      }
-    }
-    if ($contactID == $selectedContactID &&
-      (CRM_Core_Permission::check('edit my contact'))
-    ) {
-      return TRUE;
-    }
-    else {
-      // FIXME: secondDegRelPermissions should be a setting
-      $config  = CRM_Core_Config::singleton();
-      if ($config->secondDegRelPermissions) {
-        $query = "
-SELECT firstdeg.id
-FROM   civicrm_relationship firstdeg
-LEFT JOIN civicrm_relationship seconddegaa
-  on firstdeg.contact_id_a = seconddegaa.contact_id_b
-  and seconddegaa.is_permission_b_a = 1
-  and firstdeg.is_permission_b_a = 1
-  and seconddegaa.is_active = 1
-LEFT JOIN civicrm_relationship seconddegab
-  on firstdeg.contact_id_a = seconddegab.contact_id_a
-  and seconddegab.is_permission_a_b = 1
-  and firstdeg.is_permission_b_a = 1
-  and seconddegab.is_active = 1
-LEFT JOIN civicrm_relationship seconddegba
-  on firstdeg.contact_id_b = seconddegba.contact_id_b
-  and seconddegba.is_permission_b_a = 1
-  and firstdeg.is_permission_a_b = 1
-  and seconddegba.is_active = 1
-LEFT JOIN civicrm_relationship seconddegbb
-  on firstdeg.contact_id_b = seconddegbb.contact_id_a
-  and seconddegbb.is_permission_a_b = 1
-  and firstdeg.is_permission_a_b = 1
-  and seconddegbb.is_active = 1
-WHERE
-  (
-    ( firstdeg.contact_id_a = %1 AND firstdeg.contact_id_b = %2 AND firstdeg.is_permission_a_b = 1 )
-    OR ( firstdeg.contact_id_a = %2 AND firstdeg.contact_id_b = %1 AND firstdeg.is_permission_b_a = 1 )
-    OR (
-      firstdeg.contact_id_a = %1 AND seconddegba.contact_id_a = %2
-      AND (seconddegba.contact_id_a NOT IN (SELECT id FROM civicrm_contact WHERE is_deleted = 1))
-    )
-    OR (
-      firstdeg.contact_id_a = %1 AND seconddegbb.contact_id_b = %2
-      AND (seconddegbb.contact_id_b NOT IN (SELECT id FROM civicrm_contact WHERE is_deleted = 1))
-    )
-    OR (
-      firstdeg.contact_id_b = %1 AND seconddegab.contact_id_b = %2
-      AND (seconddegab.contact_id_b NOT IN (SELECT id FROM civicrm_contact WHERE is_deleted = 1))
-    )
-    OR (
-      firstdeg.contact_id_b = %1 AND seconddegaa.contact_id_a = %2      AND (seconddegaa.contact_id_a NOT IN (SELECT id FROM civicrm_contact WHERE is_deleted = 1))
-    )
-  )
-  AND (firstdeg.contact_id_a NOT IN (SELECT id FROM civicrm_contact WHERE is_deleted = 1))
-  AND (firstdeg.contact_id_b NOT IN (SELECT id FROM civicrm_contact WHERE is_deleted = 1))
-  AND ( firstdeg.is_active = 1)
-      ";
-      }
-      else {
-        $query = "
-SELECT id
-FROM   civicrm_relationship
-WHERE  (( contact_id_a = %1 AND contact_id_b = %2 AND is_permission_a_b = 1 ) OR
-        ( contact_id_a = %2 AND contact_id_b = %1 AND is_permission_b_a = 1 )) AND
-       (contact_id_a NOT IN (SELECT id FROM civicrm_contact WHERE is_deleted = 1)) AND
-       (contact_id_b NOT IN (SELECT id FROM civicrm_contact WHERE is_deleted = 1))
-  AND  ( civicrm_relationship.is_active = 1 )
-";
-      }
-      $params = array(
-        1 => array($contactID, 'Integer'),
-        2 => array($selectedContactID, 'Integer'),
-      );
-      return CRM_Core_DAO::singleValueQuery($query, $params);
-    }
-  }
-
 
   /**
    * Filter a list of contact_ids by the ones that the
