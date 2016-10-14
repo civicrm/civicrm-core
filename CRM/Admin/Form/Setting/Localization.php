@@ -247,7 +247,7 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
    * @param $currencies array of currencies ['USD', 'CAD']
    * @param $default default currency
    */
-  protected static function updateEnabledCurrencies($currencies, $default) {
+  public static function updateEnabledCurrencies($currencies, $default) {
 
     // sort so that when we display drop down, weights have right value
     sort($currencies);

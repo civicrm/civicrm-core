@@ -81,7 +81,7 @@ class LocalizationInitializer {
 
         // support for enabled languages (option group)
         if (isset($settings['languagesOption']) && count($settings['languagesOption']) > 0) {
-          self::updateLanguages($settings['languagesOption']);
+          \CRM_Core_BAO_OptionGroup::setActiveValues('languages', $settings['languagesOption']);
         }
 
         // set default currency in currencies_enabled (option group)
@@ -98,32 +98,6 @@ class LocalizationInitializer {
 
     // apply the config
     civicrm_api3('Setting', 'create', $settingsParams);
-
-  }
-
-  /**
-   * Enable provided languages and disable all others
-   *
-   * @param $languages array of languages (locale code) ['fr_CA', 'en_CA']
-   * @throws \CiviCRM_API3_Exception
-   */
-  protected static function updateLanguages($languages) {
-    $result = civicrm_api3('OptionValue', 'get', array(
-      'option_group_id' => "languages",
-      'options' => array('limit' => 0),
-    ));
-
-    foreach ($result['values'] as $id => $language) {
-      $params = $language;
-      if (in_array($language['name'], $languages)) {
-        $params['is_active'] = 1;
-      }
-      else {
-        // disable every language that is not in the given list
-        $params['is_active'] = 0;
-      }
-      civicrm_api3('OptionValue', 'create', $params);
-    }
 
   }
 
