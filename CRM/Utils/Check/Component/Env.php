@@ -300,6 +300,83 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
   }
 
   /**
+   * Recommend that sites use path-variables for their directories and URLs.
+   * @return array
+   */
+  public function checkUrlVariables() {
+    $messages = array();
+    $hasOldStyle = FALSE;
+    $settingNames = array(
+      'userFrameworkResourceURL',
+      'imageUploadURL',
+      'customCSSURL',
+      'extensionsURL',
+    );
+
+    foreach ($settingNames as $settingName) {
+      $settingValue = Civi::settings()->get($settingName);
+      if (!empty($settingValue) && $settingValue{0} != '[') {
+        $hasOldStyle = TRUE;
+        break;
+      }
+    }
+
+    if ($hasOldStyle) {
+      $message = new CRM_Utils_Check_Message(
+        __FUNCTION__,
+        ts('<a href="%1">Resource URLs</a> may use absolute paths, relative paths, or variables. Absolute paths are more difficult to maintain. To maximize portability, consider using a variable in each URL (eg "<tt>[cms.root]</tt>" or "<tt>[civicrm.files]</tt>").',
+          array(1 => CRM_Utils_System::url('civicrm/admin/setting/url', "reset=1"))),
+        ts('Resource URLs: Make them portable'),
+        \Psr\Log\LogLevel::NOTICE,
+        'fa-server'
+      );
+      $messages[] = $message;
+    }
+
+    return $messages;
+  }
+
+  /**
+   * Recommend that sites use path-variables for their directories and URLs.
+   * @return array
+   */
+  public function checkDirVariables() {
+    $messages = array();
+    $hasOldStyle = FALSE;
+    $settingNames = array(
+      'uploadDir',
+      'imageUploadDir',
+      'customFileUploadDir',
+      'customTemplateDir',
+      'customPHPPathDir',
+      'extensionsDir',
+    );
+
+    foreach ($settingNames as $settingName) {
+      $settingValue = Civi::settings()->get($settingName);
+      if (!empty($settingValue) && $settingValue{0} != '[') {
+        $hasOldStyle = TRUE;
+        break;
+      }
+    }
+
+    if ($hasOldStyle) {
+      $message = new CRM_Utils_Check_Message(
+        __FUNCTION__,
+        ts('<a href="%1">Directories</a> may use absolute paths, relative paths, or variables. Absolute paths are more difficult to maintain. To maximize portability, consider using a variable in each directory (eg "<tt>[cms.root]</tt>" or "<tt>[civicrm.files]</tt>").',
+          array(1 => CRM_Utils_System::url('civicrm/admin/setting/path', "reset=1"))),
+        ts('Directory Paths: Make them portable'),
+        \Psr\Log\LogLevel::NOTICE,
+        'fa-server'
+      );
+      $messages[] = $message;
+    }
+
+    return $messages;
+  }
+
+
+  /**
    * Checks if new versions are available
    * @return array
    */
