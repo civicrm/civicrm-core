@@ -215,11 +215,12 @@ abstract class SelectQuery {
       if ($depth > self::MAX_JOINS) {
         throw new UnauthorizedException("Maximum number of joins exceeded in parameter $fkFieldName");
       }
+      $subStack = array_slice($stack, 0, $depth);
+      $this->getJoinInfo($fkField, $subStack);
       if (!isset($fkField['FKApiName']) || !isset($fkField['FKClassName'])) {
         // Join doesn't exist - might be another param with a dot in it for some reason, we'll just ignore it.
         return NULL;
       }
-      $subStack = array_slice($stack, 0, $depth);
       // Ensure we have permission to access the other api
       if (!$this->checkPermissionToJoin($fkField['FKApiName'], $subStack)) {
         throw new UnauthorizedException("Authorization failed to join onto {$fkField['FKApiName']} api in parameter $fkFieldName");
@@ -255,6 +256,23 @@ abstract class SelectQuery {
       $prev = $tableAlias;
     }
     return array($tableAlias, $fieldName);
+  }
+
+  /**
+   * Get join info for dynamically-joined fields (e.g. "entity_id")
+   *
+   * @param $fkField
+   * @param $stack
+   */
+  protected function getJoinInfo(&$fkField, $stack) {
+    if ($fkField['name'] == 'entity_id') {
+      $entityTableParam = substr(implode('.', $stack), 0, -2) . 'table';
+      $entityTable = \CRM_Utils_Array::value($entityTableParam, $this->where);
+      if ($entityTable && is_string($entityTable) && \CRM_Core_DAO_AllCoreTables::getClassForTable($entityTable)) {
+        $fkField['FKClassName'] = \CRM_Core_DAO_AllCoreTables::getClassForTable($entityTable);
+        $fkField['FKApiName'] = \CRM_Core_DAO_AllCoreTables::getBriefName($fkField['FKClassName']);
+      }
+    }
   }
 
   /**

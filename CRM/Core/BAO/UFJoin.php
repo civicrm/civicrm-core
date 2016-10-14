@@ -186,13 +186,11 @@ class CRM_Core_BAO_UFJoin extends CRM_Core_DAO_UFJoin {
    * @return array
    */
   public static function entityTables() {
-    $tables = array(
-      'civicrm_event',
-      'civicrm_contribution_page',
-      'civicrm_survey',
+    return array(
+      'civicrm_event' => 'Event',
+      'civicrm_contribution_page' => 'ContributionPage',
+      'civicrm_survey' => 'Survey',
     );
-    // Identical keys & values
-    return array_combine($tables, $tables);
   }
 
 }
