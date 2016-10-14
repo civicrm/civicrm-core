@@ -140,8 +140,8 @@ WHERE contact_id IN ({$contact_id_list})
     $contactID = CRM_Core_Session::getLoggedInContactID();
 
     // first: check if contact is trying to view own contact
-    if ($type == CRM_Core_Permission::VIEW && CRM_Core_Permission::check('view my contact')
-     || $type == CRM_Core_Permission::EDIT && CRM_Core_Permission::check('edit my contact')
+    if ($contactID == $id && ($type == CRM_Core_Permission::VIEW && CRM_Core_Permission::check('view my contact')
+     || $type == CRM_Core_Permission::EDIT && CRM_Core_Permission::check('edit my contact'))
       ) {
       return TRUE;
     }
