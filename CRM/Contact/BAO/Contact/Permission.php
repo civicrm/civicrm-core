@@ -165,6 +165,7 @@ WHERE contact_id IN ({$contact_id_list})
       return TRUE;
     }
 
+    // We should probably do a cheap check whether it's in the cache first.
     // check permission based on ACL
     $tables = array();
     $whereTables = array();
@@ -246,45 +247,6 @@ WHERE    $permission
 AND ac.user_id IS NULL
 ");
     $_processed[$type][$userID] = 1;
-  }
-
-  /**
-   * Check if there are any contacts in cache table.
-   *
-   * @param int|string $type the type of operation (view|edit)
-   * @param int $contactID
-   *   Contact id.
-   *
-   * @return bool
-   */
-  public static function hasContactsInCache(
-    $type = CRM_Core_Permission::VIEW,
-    $contactID = NULL
-  ) {
-    if (!$contactID) {
-      $contactID = CRM_Core_Session::getLoggedInContactID();
-    }
-
-    if ($type = CRM_Core_Permission::VIEW) {
-      $operationClause = " operation IN ( 'Edit', 'View' ) ";
-      $operation = 'View';
-    }
-    else {
-      $operationClause = " operation = 'Edit' ";
-      $operation = 'Edit';
-    }
-
-    // fill cache
-    self::cache($contactID);
-
-    $sql = "
-SELECT id
-FROM   civicrm_acl_contact_cache
-WHERE  user_id = %1
-AND    $operationClause LIMIT 1";
-
-    $params = array(1 => array($contactID, 'Integer'));
-    return (bool) CRM_Core_DAO::singleValueQuery($sql, $params);
   }
 
   /**
