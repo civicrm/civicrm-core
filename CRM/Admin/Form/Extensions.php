@@ -178,12 +178,12 @@ class CRM_Admin_Form_Extensions extends CRM_Admin_Form {
     }
 
     if ($this->_action & CRM_Core_Action::ADD) {
-      CRM_Extension_System::singleton()->getManager()->install(array($this->_key));
+      civicrm_api3('Extension', 'install', array('keys' => $this->_key));
       CRM_Core_Session::setStatus("", ts('Extension Installed'), "success");
     }
 
     if ($this->_action & CRM_Core_Action::ENABLE) {
-      CRM_Extension_System::singleton()->getManager()->enable(array($this->_key));
+      civicrm_api3('Extension', 'enable', array('keys' => $this->_key));
       CRM_Core_Session::setStatus("", ts('Extension Enabled'), "success");
     }
 
