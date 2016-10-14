@@ -399,4 +399,15 @@ function _civicrm_api3_system_get_whitelist($whitelistFile) {
 function civicrm_api3_system_updatelogtables() {
   $schema = new CRM_Logging_Schema();
   $schema->updateLogTableSchema();
+  return civicrm_api3_create_success(1);
+}
+
+/**
+ * Update indexes.
+ *
+ * This adds any indexes that exist in the schema but not the database.
+ */
+function civicrm_api3_system_updateindexes() {
+  CRM_Core_BAO_SchemaHandler::createMissingIndices(CRM_Core_BAO_SchemaHandler::getMissingIndices());
+  return civicrm_api3_create_success(1);
 }
