@@ -610,7 +610,7 @@ class CRM_Extension_Manager {
       $info = @$infos[$key];
 
       if ($this->getStatus($key) === self::STATUS_INSTALLED) {
-        // skip
+        $sorter->add($key, $info->requires);
       }
       elseif ($info && $info->requires) {
         $sorter->add($key, $info->requires);
