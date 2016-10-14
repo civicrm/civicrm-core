@@ -32,6 +32,20 @@
         <td class="label">{ts}Development stage{/ts}</td><td>{$extension.develStage}</td>
     </tr>
     <tr>
+        <td class="label">{ts}Requires{/ts}</td>
+        <td>
+            {foreach from=$extension.requires item=ext}
+                {if array_key_exists($ext, $localExtensionRows)}
+                    {$localExtensionRows.$ext.name}
+                {elseif array_key_exists($ext, $remoteExtensionRows)}
+                    {$remoteExtensionRows.$ext.name} (not downloaded)
+                {else}
+                    {$ext} (not installed locally or available remotely)
+                {/if}
+            {/foreach}
+        </td>
+    </tr>
+    <tr>
         <td class="label">{ts}Compatible with{/ts}</td>
         <td>
             {foreach from=$extension.compatibility.ver item=ver}
