@@ -920,13 +920,18 @@ ORDER BY a.object_id
       $ids = $includedGroups;
     }
     if ($contactID) {
+      $groupWhere = '';
+      if (!empty($allGroups)) {
+        $groupWhere = " AND id IN (" . implode(',', array_keys($allGroups)) . ")";
+      }
       // Contacts create hidden groups from search results. They should be able to retrieve their own.
       $ownHiddenGroupsList = CRM_Core_DAO::singleValueQuery("
         SELECT GROUP_CONCAT(id) FROM civicrm_group WHERE is_hidden =1 AND created_id = $contactID
+        $groupWhere
       ");
       if ($ownHiddenGroupsList) {
         $ownHiddenGroups = explode(',', $ownHiddenGroupsList);
-        $ids = array_merge($ids, $ownHiddenGroups);
+        $ids = array_merge((array) $ids, $ownHiddenGroups);
       }
 
     }
