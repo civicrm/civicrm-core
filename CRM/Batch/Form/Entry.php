@@ -239,6 +239,15 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
       }
     }
 
+    // CRM-19477: Display Error for Batch Sizes Exceeding php.ini max_input_vars
+    // Notes: $this->_elementIndex gives an approximate count of the variables being sent
+    // An offset value is set to deal with additional vars that are likely passed.
+    // There may be a more accurate way to do this...
+    $offset = 50; // set an offset to account for other vars we are not counting
+    if ((count($this->_elementIndex) + $offset) > ini_get("max_input_vars")) {
+      CRM_Core_Error::fatal(ts('Batch size is too large. Increase value of php.ini setting "max_input_vars" (current val = ' . ini_get("max_input_vars") . ')'));
+    }
+
     $this->assign('fields', $this->_fields);
     CRM_Core_Resources::singleton()
       ->addSetting(array(
