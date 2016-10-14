@@ -219,4 +219,36 @@ class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup {
     return \Civi::$statics[__CLASS__]['titles_by_name'];
   }
 
+  /**
+   * Set the given values to active, and set all other values to inactive.
+   *
+   * @param string $optionGroupName
+   *   e.g "languages"
+   * @param array<string> $activeValues
+   *   e.g. array("en_CA","fr_CA")
+   */
+  public static function setActiveValues($optionGroupName, $activeValues) {
+    $params = array(
+      1 => array($optionGroupName, 'String'),
+    );
+
+    // convert activeValues into placeholders / params in the query
+    $placeholders = array();
+    $i = count($params) + 1;
+    foreach ($activeValues as $value) {
+      $placeholders[] = "%{$i}";
+      $params[$i] = array($value, 'String');
+      $i++;
+    }
+    $placeholders = implode(', ', $placeholders);
+
+    CRM_Core_DAO::executeQuery("
+UPDATE civicrm_option_value cov
+       LEFT JOIN civicrm_option_group cog ON cov.option_group_id = cog.id
+SET cov.is_active = CASE WHEN cov.name IN ({$placeholders}) THEN 1 ELSE 0 END
+WHERE cog.name = %1",
+      $params
+    );
+  }
+
 }
