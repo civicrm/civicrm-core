@@ -590,6 +590,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
               //$relationshipCustomFields    = self::getRelationTypeCustomGroupData( $id );
               //asort($relationshipCustomFields);
 
+              $relatedFields = array();
               $relationshipType = new CRM_Contact_BAO_RelationshipType();
               $relationshipType->id = $id;
               if ($relationshipType->find(TRUE)) {
