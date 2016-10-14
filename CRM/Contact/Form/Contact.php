@@ -440,13 +440,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     CRM_Contact_Form_Edit_Address::setDefaultValues($defaults, $this);
 
     if (!empty($defaults['image_URL'])) {
-      list($imageWidth, $imageHeight) = getimagesize(CRM_Utils_String::unstupifyUrl($defaults['image_URL']));
-      list($imageThumbWidth, $imageThumbHeight) = CRM_Contact_BAO_Contact::getThumbSize($imageWidth, $imageHeight);
-      $this->assign('imageWidth', $imageWidth);
-      $this->assign('imageHeight', $imageHeight);
-      $this->assign('imageThumbWidth', $imageThumbWidth);
-      $this->assign('imageThumbHeight', $imageThumbHeight);
-      $this->assign('imageURL', $defaults['image_URL']);
+      $this->assign("imageURL", CRM_Utils_File::getImageURL($defaults['image_URL']));
     }
 
     //set location type and country to default for each block
