@@ -657,10 +657,13 @@ ORDER BY civicrm_custom_group.weight,
     }
 
     $contactTypes = CRM_Contact_BAO_ContactType::basicTypeInfo(TRUE);
+    $contactTypes = array_merge($contactTypes, array('Event' => 1));
+
     if ($entityType != 'Contact' && !array_key_exists($entityType, $contactTypes)) {
       throw new CRM_Core_Exception('Invalid Entity Filter');
     }
     $subTypes = CRM_Contact_BAO_ContactType::subTypeInfo($entityType, TRUE);
+    $subTypes = array_merge($subTypes, CRM_Event_PseudoConstant::eventType());
     if (!array_key_exists($subType, $subTypes)) {
       throw new CRM_Core_Exception('Invalid Filter');
     }
