@@ -260,7 +260,7 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
     // get labels for all the currencies
     $options = array();
 
-    $currencySymbols = \CRM_Admin_Form_Setting_Localization::getCurrencySymbols();
+    $currencySymbols = CRM_Admin_Form_Setting_Localization::getCurrencySymbols();
     for ($i = 0; $i < count($currencies); $i++) {
       $options[] = array(
         'label' => $currencySymbols[$currencies[$i]],
@@ -272,7 +272,7 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
     }
 
     $dontCare = NULL;
-    \CRM_Core_OptionGroup::createAssoc('currencies_enabled', $options, $dontCare);
+    CRM_Core_OptionGroup::createAssoc('currencies_enabled', $options, $dontCare);
 
   }
 
