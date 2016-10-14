@@ -43,6 +43,7 @@ class CRM_Admin_Form_Setting_Date extends CRM_Admin_Form_Setting {
     'dateformatYear' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
     'dateformatTime' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
     'dateformatFinancialBatch' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
+    'dateformatshortdate' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
     'weekBegins' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
     'dateInputFormat' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
     'timeInputFormat' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
