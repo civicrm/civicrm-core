@@ -929,12 +929,12 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * @return bool
    */
   static public function locationIsSame($mainAddress, $comparisonAddress) {
-    $keysToIgnore = array('id', 'is_primary', 'is_billing', 'manual_geo_code', 'contact_id');
+    $keysToIgnore = array('id', 'is_primary', 'is_billing', 'manual_geo_code', 'contact_id', 'reset_date', 'hold_date');
     foreach ($comparisonAddress as $field => $value) {
       if (in_array($field, $keysToIgnore)) {
         continue;
       }
-      if (!empty($value) && isset($mainAddress[$field]) && $mainAddress[$field] != $value) {
+      if ((!empty($value) || $value === '0') && isset($mainAddress[$field]) && $mainAddress[$field] != $value) {
         return FALSE;
       }
     }
