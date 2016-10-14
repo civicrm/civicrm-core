@@ -63,13 +63,13 @@
         params.name = $('input.select-row').map(function() {return $(this).attr('id');}).get().join('-');
       }
     }
-    $.getJSON(url, params, function(data) {
+    $.post(url, params, function(data) {
       if (data && data.getCount !== undefined) {
         selected = data.getCount;
         displayCount();
         enableTaskMenu();
       }
-    });
+    }, 'json');
   }
 
   /**
