@@ -464,6 +464,16 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
 
     $options = CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
 
+    // Special formatting for validate/match context
+    if ($fieldName == 'entity_table' && in_array($context, array('validate', 'match'))) {
+      $options = array();
+      foreach (self::buildOptions($fieldName) as $tableName => $label) {
+        $bao = CRM_Core_DAO_AllCoreTables::getClassForTable($tableName);
+        $apiName = CRM_Core_DAO_AllCoreTables::getBriefName($bao);
+        $options[$tableName] = $apiName;
+      }
+    }
+
     return $options;
   }
 
