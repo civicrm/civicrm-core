@@ -442,6 +442,11 @@ class CRM_Report_Form extends CRM_Core_Form {
   protected $rollupRow = array();
 
   /**
+   * @var string Database attributes - character set and collation
+   */
+  protected $_databaseAttributes = 'DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci';
+
+  /**
    * SQL being run in this report.
    *
    * The sql in the report is stored in this variable in order to be displayed on the developer tab.
