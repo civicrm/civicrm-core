@@ -36,13 +36,12 @@
         <td>
             {foreach from=$extension.requires item=ext}
                 {if array_key_exists($ext, $localExtensionRows)}
-                    {$localExtensionRows.$ext.name} (already downloaded - {$ext})
+                    {$localExtensionRows.$ext.name}
                 {elseif array_key_exists($ext, $remoteExtensionRows)}
-                    {$remoteExtensionRows.$ext.name} (not downloaded - {$ext})
+                    {$remoteExtensionRows.$ext.name} (not downloaded)
                 {else}
-                    {$ext} {ts}(not available){/ts}
+                    {$ext} (not installed locally or available remotely)
                 {/if}
-                <br/>
             {/foreach}
         </td>
     </tr>
