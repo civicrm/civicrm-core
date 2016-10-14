@@ -2109,6 +2109,7 @@ WHERE  {$whereClause}";
           }
         }
       }
+      self::manipulateHeaderRows($headerRows, $contactRelationshipTypes);
     }
     elseif ($selectedPaymentFields && array_key_exists($field, self::componentPaymentFields())) {
       $headerRows[] = CRM_Utils_Array::value($field, self::componentPaymentFields());
@@ -2116,8 +2117,6 @@ WHERE  {$whereClause}";
     else {
       $headerRows[] = $field;
     }
-
-    self::manipulateHeaderRows($headerRows, $contactRelationshipTypes);
 
     self::sqlColumnDefn($query, $sqlColumns, $field);
 
