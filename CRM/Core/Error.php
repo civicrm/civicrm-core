@@ -195,32 +195,29 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     // can avoid infinite loops.
     global $_DB_DATAOBJECT;
 
-    if (!isset($_DB_DATAOBJECT['CONFIG']['database'])) {
-      // we haven't setup sql, so it's not our sql error...
-    }
-    elseif (preg_match('/^mysql:/', $_DB_DATAOBJECT['CONFIG']['database']) &&
-      mysql_error()
-    ) {
-      $mysql_error = mysql_error() . ', ' . mysql_errno();
-      $template->assign_by_ref('mysql_code', $mysql_error);
-
-      // execute a dummy query to clear error stack
-      mysql_query('select 1');
-    }
-    elseif (preg_match('/^mysqli:/', $_DB_DATAOBJECT['CONFIG']['database'])) {
+    if (isset($_DB_DATAOBJECT['CONFIG']['database'])) {
       $dao = new CRM_Core_DAO();
-
       if (isset($_DB_DATAOBJECT['CONNECTIONS'][$dao->_database_dsn_md5])) {
         $conn = $_DB_DATAOBJECT['CONNECTIONS'][$dao->_database_dsn_md5];
-        $link = $conn->connection;
 
-        if (mysqli_error($link)) {
-          $mysql_error = mysqli_error($link) . ', ' . mysqli_errno($link);
-          $template->assign_by_ref('mysql_code', $mysql_error);
-
-          // execute a dummy query to clear error stack
-          mysqli_query($link, 'select 1');
+        // FIXME: Polymorphism for the win.
+        if ($conn instanceof DB_mysqli) {
+          $link = $conn->connection;
+          if (mysqli_error($link)) {
+            $mysql_error = mysqli_error($link) . ', ' . mysqli_errno($link);
+            mysqli_query($link, 'select 1'); // execute a dummy query to clear error stack
+          }
         }
+        elseif ($conn instanceof DB_mysql) {
+          if (mysql_error()) {
+            $mysql_error = mysql_error() . ', ' . mysql_errno();
+            mysql_query('select 1'); // execute a dummy query to clear error stack
+          }
+        }
+        else {
+          $mysql_error = 'fixme-unknown-db-cxn';
+        }
+        $template->assign_by_ref('mysql_code', $mysql_error);
       }
     }
 
