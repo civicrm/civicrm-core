@@ -359,25 +359,7 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
         $currencies[] = $newCurrency;
       }
 
-      // sort so that when we display drop down, weights have right value
-      sort($currencies);
-
-      // get labels for all the currencies
-      $options = array();
-
-      $currencySymbols = CRM_Admin_Form_Setting_Localization::getCurrencySymbols();
-      for ($i = 0; $i < count($currencies); $i++) {
-        $options[] = array(
-          'label' => $currencySymbols[$currencies[$i]],
-          'value' => $currencies[$i],
-          'weight' => $i + 1,
-          'is_active' => 1,
-          'is_default' => $currencies[$i] == $newCurrency,
-        );
-      }
-
-      $dontCare = NULL;
-      CRM_Core_OptionGroup::createAssoc('currencies_enabled', $options, $dontCare);
+      CRM_Admin_Form_Setting_Localization::updateEnabledCurrencies($currencies, $newCurrency);
     }
 
   }
