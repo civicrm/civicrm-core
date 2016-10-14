@@ -4880,7 +4880,7 @@ LIMIT 1;";
     if (!empty($contribution->source)) {
       return $contribution->source;
     }
-    elseif (!empty($contribution->contribution_page_id)) {
+    elseif (!empty($contribution->contribution_page_id) && is_numeric($contribution->contribution_page_id)) {
       $contributionPageTitle = civicrm_api3('ContributionPage', 'getvalue', array(
         'id' => $contribution->contribution_page_id,
         'return' => 'title',
