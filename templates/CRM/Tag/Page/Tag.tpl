@@ -27,7 +27,7 @@
 {capture assign=docLink}{docURL page="user/organising-your-data/groups-and-tags"}{/capture}
 
 {if $action eq 1 or $action eq 2 or $action eq 8}
-    {include file="CRM/Admin/Form/Tag.tpl"}
+    {include file="CRM/Tag/Form/Edit.tpl"}
 {else}
 <div class="crm-content-block">
     <div class="help">
@@ -91,7 +91,7 @@
     {else}
         <div class="messages status no-popup">
         <div class="icon inform-icon"></div>&nbsp;
-            {capture assign=crmURL}{crmURL p='civicrm/admin/tag' q="action=add&reset=1"}{/capture}
+            {capture assign=crmURL}{crmURL p='civicrm/tag' q="action=add&reset=1"}{/capture}
             {ts 1=$crmURL}There are no Tags present. You can <a href='%1'>add one</a>.{/ts}
         </div>
     {/if}
