@@ -183,6 +183,7 @@ WHERE contact_a.id = %1 AND $permission
     if (CRM_Core_DAO::singleValueQuery($query, array(1 => array($id, 'Integer')))) {
       return TRUE;
     }
+    return FALSE;
   }
 
   /**
