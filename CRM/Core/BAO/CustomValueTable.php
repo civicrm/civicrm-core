@@ -241,7 +241,7 @@ class CRM_Core_BAO_CustomValueTable {
             $params[$count] = array($entityID, 'Integer');
             $count++;
 
-            $fieldNames = implode(',', array_keys($set));
+            $fieldNames = implode(',', CRM_Utils_Type::escapeAll(array_keys($set), 'MysqlColumnNameOrAlias'));
             $fieldValues = implode(',', array_values($set));
             $query = "$sqlOP ( $fieldNames ) VALUES ( $fieldValues )";
             // for multiple values we dont do on duplicate key update
