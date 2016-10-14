@@ -34,7 +34,7 @@ Depends: CRM/common/enableDisableApi.tpl and CRM/common/jsortable.tpl
         </tr>
         <tr class="hiddenElement" id="crm-extensions-details-{$row.id}">
             <td>
-                {include file="CRM/Admin/Page/ExtensionDetails.tpl" extension=$row}
+                {include file="CRM/Admin/Page/ExtensionDetails.tpl" extension=$row localExtensionRows=$localExtensionRows remoteExtensionRows=$remoteExtensionRows}
             </td>
             <td></td><td></td><td></td><td></td>
         </tr>
