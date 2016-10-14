@@ -727,6 +727,50 @@ class api_v3_JobTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test the batch merge respects email "on hold".
+   *
+   * Test CRM-19148, Batch merge - Email on hold data lost when there is a conflict.
+   *
+   * @dataProvider getOnHoldSets
+   *
+   * @param
+   */
+  public function testBatchMergeEmailOnHold($onHold1, $onHold2, $merge) {
+    $contactID1 = $this->individualCreate(array(
+      'api.email.create' => array(
+        'email' => 'batman@gotham.met',
+        'location_type_id' => 'Work',
+        'is_primary' => 1,
+        'on_hold' => $onHold1,
+      ),
+    ));
+    $contactID2 = $this->individualCreate(array(
+      'api.email.create' => array(
+        'email' => 'batman@gotham.met',
+        'location_type_id' => 'Work',
+        'is_primary' => 1,
+        'on_hold' => $onHold2,
+      ),
+    ));
+    $result = $this->callAPISuccess('Job', 'process_batch_merge', array());
+    $this->assertEquals($merge, count($result['values']['merged']));
+  }
+
+  /**
+   * Data provider for testBatchMergeEmailOnHold: combinations of on_hold & expected outcomes.
+   */
+  public function getOnHoldSets() {
+    // Each row specifies: contact 1 on_hold, contact 2 on_hold, merge? (0 or 1),
+    $sets = array(
+      array(0, 0, 1),
+      array(0, 1, 0),
+      array(1, 0, 0),
+      array(1, 1, 1),
+    );
+    return $sets;
+  }
+
+  /**
    * Test the batch merge does not fatal on an empty rule.
    *
    * @dataProvider getRuleSets
