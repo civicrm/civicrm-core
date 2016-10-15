@@ -42,6 +42,13 @@ class CRM_Admin_Form_Extensions extends CRM_Admin_Form {
   public function preProcess() {
     parent::preProcess();
 
+    $mainPage = new CRM_Admin_Page_Extensions();
+    $localExtensionRows = $mainPage->formatLocalExtensionRows();
+    $this->assign('localExtensionRows', $localExtensionRows);
+
+    $remoteExtensionRows = $mainPage->formatRemoteExtensionRows($localExtensionRows);
+    $this->assign('remoteExtensionRows', $remoteExtensionRows);
+
     $this->_key = CRM_Utils_Request::retrieve('key', 'String',
       $this, FALSE, 0
     );
