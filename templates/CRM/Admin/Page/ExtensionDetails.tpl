@@ -40,8 +40,9 @@
                 {elseif array_key_exists($ext, $remoteExtensionRows)}
                     {$remoteExtensionRows.$ext.name} (not downloaded)
                 {else}
-                    {$ext} (not installed locally or available remotely)
+                    {ts}Untitled{/ts}
                 {/if}
+                (<tt>{$ext}</tt>)<br/>
             {/foreach}
         </td>
     </tr>
