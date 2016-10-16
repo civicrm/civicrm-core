@@ -77,10 +77,10 @@ class E2E_Extern_SoapTest extends CiviEndToEndTestCase {
   public function testGetContact() {
     $client = $this->createClient();
     $key = $client->authenticate($this->adminUser, $this->adminPass);
-    $contacts = json_decode($client->get_contact($key, array(
+    $contacts = $client->get_contact($key, array(
       'contact_id' => 101,
       'return.display_name' => 1,
-    )), TRUE);
+    ));
     $this->assertEquals($contacts['is_error'], 0);
     $this->assertEquals($contacts['count'], 1);
     $this->assertEquals($contacts['values'][101]['contact_id'], 101);

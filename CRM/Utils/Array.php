@@ -1076,4 +1076,16 @@ class CRM_Utils_Array {
     return $input;
   }
 
+  public static function encode_items($array) {
+    foreach ($array as $key => $value) {
+      if (is_array($value)) {
+        $array[$key] = self::encode_items($value);
+      }
+      else {
+        $array[$key] = mb_convert_encoding($value, 'Windows-1252', 'UTF-8');
+      }
+    }
+    return $array;
+  }
+
 }
