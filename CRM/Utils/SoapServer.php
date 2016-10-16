@@ -330,7 +330,7 @@ class CRM_Utils_SoapServer {
   public function get_contact($key, $params) {
     $this->verify($key);
     $params['version'] = 3;
-    return civicrm_api('contact', 'get', $params);
+    return json_encode(civicrm_api('contact', 'get', $params));
   }
 
 }
