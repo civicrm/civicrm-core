@@ -23145,8 +23145,8 @@ VALUES
     ( @domainID, 'civicrm/import/activity?reset=1',                         'Import Activities',      'Import Activities',    'import contacts',  '',             @contactlastID, '1', '1',   8 ),
     ( @domainID, 'civicrm/group/add?reset=1',                               'New Group',              'New Group',            'edit groups',      '',             @contactlastID, '1', NULL,  9 ),
     ( @domainID, 'civicrm/group?reset=1',                                   'Manage Groups',          'Manage Groups',        'access CiviCRM',   '',             @contactlastID, '1', '1',   10 ),
-    ( @domainID, 'civicrm/admin/tag?reset=1&action=add',                    'New Tag',                'New Tag',              'administer CiviCRM', '',           @contactlastID, '1', NULL, 11 ),
-    ( @domainID, 'civicrm/admin/tag?reset=1',                               'Manage Tags (Categories)', 'Manage Tags (Categories)', 'administer CiviCRM', '',     @contactlastID, '1','1', 12 ),
+    ( @domainID, 'civicrm/tag?reset=1&action=add',                    'New Tag',                'New Tag',              'manage tags', '',           @contactlastID, '1', NULL, 11 ),
+    ( @domainID, 'civicrm/tag?reset=1',                               'Manage Tags (Categories)', 'Manage Tags (Categories)', 'manage tags', '',     @contactlastID, '1','1', 12 ),
     ( @domainID, 'civicrm/contact/deduperules?reset=1',  'Find and Merge Duplicate Contacts', 'Find and Merge Duplicate Contacts', 'administer dedupe rules,merge duplicate contacts', 'OR', @contactlastID, '1', NULL, 13 );
 
 INSERT INTO civicrm_navigation
@@ -23344,7 +23344,7 @@ INSERT INTO civicrm_navigation
 VALUES
     ( @domainID, 'civicrm/admin/custom/group?reset=1',      'Custom Fields', 'Custom Fields',                             'administer CiviCRM', '',   @CustomizelastID, '1', NULL, 1 ),
     ( @domainID, 'civicrm/admin/uf/group?reset=1',          'Profiles', 'Profiles',                                       'administer CiviCRM', '',   @CustomizelastID, '1', NULL, 2 ),
-    ( @domainID, 'civicrm/admin/tag?reset=1',               'Tags (Categories)', 'Tags (Categories)',                     'administer CiviCRM', '',   @CustomizelastID, '1', NULL, 3 ),
+    ( @domainID, 'civicrm/tag?reset=1',               'Tags (Categories)', 'Tags (Categories)',                     'administer CiviCRM', '',   @CustomizelastID, '1', NULL, 3 ),
     ( @domainID, 'civicrm/admin/options/activity_type?reset=1', 'Activity Types', 'Activity Types',   'administer CiviCRM', '',   @CustomizelastID, '1', NULL, 4 ),
     ( @domainID, 'civicrm/admin/reltype?reset=1',           'Relationship Types', 'Relationship Types',                   'administer CiviCRM', '',   @CustomizelastID, '1', NULL, 5 ),
     ( @domainID, 'civicrm/admin/options/subtype?reset=1',   'Contact Types','Contact Types',                              'administer CiviCRM', '',   @CustomizelastID, '1', NULL, 6 ),
@@ -23853,4 +23853,4 @@ INSERT INTO `civicrm_report_instance`
 VALUES
     (  @domainID, 'Survey Details', 'survey/detail', 'Detailed report for canvassing, phone-banking, walk lists or other surveys.', 'access CiviReport', 'a:39:{s:6:"fields";a:2:{s:9:"sort_name";s:1:"1";s:6:"result";s:1:"1";}s:22:"assignee_contact_id_op";s:2:"eq";s:25:"assignee_contact_id_value";s:0:"";s:12:"sort_name_op";s:3:"has";s:15:"sort_name_value";s:0:"";s:17:"street_number_min";s:0:"";s:17:"street_number_max";s:0:"";s:16:"street_number_op";s:3:"lte";s:19:"street_number_value";s:0:"";s:14:"street_name_op";s:3:"has";s:17:"street_name_value";s:0:"";s:15:"postal_code_min";s:0:"";s:15:"postal_code_max";s:0:"";s:14:"postal_code_op";s:3:"lte";s:17:"postal_code_value";s:0:"";s:7:"city_op";s:3:"has";s:10:"city_value";s:0:"";s:20:"state_province_id_op";s:2:"in";s:23:"state_province_id_value";a:0:{}s:13:"country_id_op";s:2:"in";s:16:"country_id_value";a:0:{}s:12:"survey_id_op";s:2:"in";s:15:"survey_id_value";a:0:{}s:12:"status_id_op";s:2:"eq";s:15:"status_id_value";s:1:"1";s:11:"custom_1_op";s:2:"in";s:14:"custom_1_value";a:0:{}s:11:"custom_2_op";s:2:"in";s:14:"custom_2_value";a:0:{}s:17:"custom_3_relative";s:1:"0";s:13:"custom_3_from";s:0:"";s:11:"custom_3_to";s:0:"";s:11:"description";s:75:"Detailed report for canvassing, phone-banking, walk lists or other surveys.";s:13:"email_subject";s:0:"";s:8:"email_to";s:0:"";s:8:"email_cc";s:0:"";s:10:"permission";s:17:"access CiviReport";s:6:"groups";s:0:"";s:9:"domain_id";i:1;}');
 
-UPDATE civicrm_domain SET version = '4.7.12';
+UPDATE civicrm_domain SET version = '4.7.13';

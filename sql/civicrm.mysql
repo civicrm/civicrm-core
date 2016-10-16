@@ -2866,7 +2866,8 @@ CREATE TABLE `civicrm_mailing` (
      `sms_provider_id` int unsigned    ,
      `hash` varchar(16)    COMMENT 'Key for validating requests related to this mailing.',
      `location_type_id` int unsigned    COMMENT 'With email_selection_method, determines which email address to use',
-     `email_selection_method` varchar(20)   DEFAULT 'automatic' COMMENT 'With location_type_id, determine how to choose the email address to use.' 
+     `email_selection_method` varchar(20)   DEFAULT 'automatic' COMMENT 'With location_type_id, determine how to choose the email address to use.',
+     `language` varchar(5)    COMMENT 'Language of the content of the mailing. Useful for tokens.' 
 ,
     PRIMARY KEY ( `id` )
  
@@ -3387,7 +3388,8 @@ CREATE TABLE `civicrm_payment_processor` (
      `billing_mode` int unsigned NOT NULL   COMMENT 'Billing Mode (deprecated)',
      `is_recur` tinyint    COMMENT 'Can process recurring contributions',
      `payment_type` int unsigned   DEFAULT 1 COMMENT 'Payment Type: Credit or Debit (deprecated)',
-     `payment_instrument_id` int unsigned   DEFAULT 1 COMMENT 'Payment Instrument ID' 
+     `payment_instrument_id` int unsigned   DEFAULT 1 COMMENT 'Payment Instrument ID',
+     `accepted_credit_cards` text   DEFAULT NULL COMMENT 'array of accepted credit card types' 
 ,
     PRIMARY KEY ( `id` )
  
@@ -4369,7 +4371,7 @@ CREATE TABLE `civicrm_price_field_value` (
      `is_default` tinyint   DEFAULT 0 COMMENT 'Is this default price field option',
      `is_active` tinyint   DEFAULT 1 COMMENT 'Is this price field value active',
      `financial_type_id` int unsigned   DEFAULT NULL COMMENT 'FK to Financial Type.',
-     `deductible_amount` decimal(20,2) NOT NULL  DEFAULT 0.0 COMMENT 'Tax-deductible portion of the amount' 
+     `non_deductible_amount` decimal(20,2) NOT NULL  DEFAULT 0.0 COMMENT 'Portion of total amount which is NOT tax deductible.' 
 ,
     PRIMARY KEY ( `id` )
  
@@ -4923,7 +4925,7 @@ CREATE TABLE `civicrm_line_item` (
      `participant_count` int unsigned   DEFAULT NULL COMMENT 'Participant count for field',
      `price_field_value_id` int unsigned   DEFAULT NULL COMMENT 'FK to civicrm_price_field_value',
      `financial_type_id` int unsigned   DEFAULT NULL COMMENT 'FK to Financial Type.',
-     `deductible_amount` decimal(20,2) NOT NULL  DEFAULT 0.0 COMMENT 'Tax-deductible portion of the amount',
+     `non_deductible_amount` decimal(20,2) NOT NULL  DEFAULT 0.0 COMMENT 'Portion of total amount which is NOT tax deductible.',
      `tax_amount` decimal(20,2)    COMMENT 'tax of each item' 
 ,
     PRIMARY KEY ( `id` )

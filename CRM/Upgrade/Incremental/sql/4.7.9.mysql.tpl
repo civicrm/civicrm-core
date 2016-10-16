@@ -42,18 +42,6 @@ VALUES
   ('Deferred Revenue - Event Fee', @domainContactId, @opLiability, 'Event revenue to be recognized in future months when the events occur', '2730', 'OCLIAB', 0, 1, 0, 0),
   ('Deferred Revenue - Member Dues', @domainContactId, @opLiability, 'Membership revenue to be recognized in future months', '2740', 'OCLIAB', 0, 1, 0, 0);
 
-SELECT @financial_account_id_dref := max(id) FROM civicrm_financial_account WHERE name = 'Deferred Revenue - Event Fee';
-SELECT @financial_account_id_drmd := max(id) FROM civicrm_financial_account WHERE name = 'Deferred Revenue - Member Dues';
-SELECT @option_value_rel_id_dr := value FROM civicrm_option_value WHERE option_group_id = @option_group_id_arel AND name = 'Deferred Revenue Account is';
-SELECT @financial_type_id_md := max(id) FROM civicrm_financial_type WHERE name = 'Member Dues';
-SELECT @financial_type_id_ef := max(id) FROM civicrm_financial_type WHERE name = 'Event Fee';
-
-INSERT INTO `civicrm_entity_financial_account`
-  (entity_table, entity_id, account_relationship, financial_account_id)
-VALUES
-  ('civicrm_financial_type', @financial_type_id_ef, @option_value_rel_id_dr, @financial_account_id_dref),
-  ('civicrm_financial_type', @financial_type_id_md, @option_value_rel_id_dr, @financial_account_id_drmd);
-
 -- CRM-16189 Financial account relationship
 SELECT @option_group_id_act           := max(id) from civicrm_option_group where name = 'activity_type';
 SELECT @option_group_id_act_wt  := MAX(weight) FROM civicrm_option_value WHERE option_group_id = @option_group_id_act;

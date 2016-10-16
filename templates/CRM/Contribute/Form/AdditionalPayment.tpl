@@ -190,80 +190,64 @@
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>
   {literal}
-  <script type="text/javascript">
-  function verify( ) {
-    if (cj('#is_email_receipt').prop('checked')) {
-      var ok = confirm( '{/literal}{ts escape='js'}Click OK to save this payment record AND send a receipt to the contributor now{/ts}{literal}.' );
-      if (!ok) {
-        return false;
-      }
-    }
-  }
-  </script>
-  {/literal}
-
-    {literal}
     <script type="text/javascript">
+      function verify() {
+        if (cj('#is_email_receipt').prop('checked')) {
+          return confirm( '{/literal}{ts escape='js'}Click OK to save this payment record AND send a receipt to the contributor now{/ts}{literal}.' );
+        }
+      }
       CRM.$(function($) {
-        checkEmailDependancies( );
-        cj('#is_email_receipt').click( function( ) {
-          checkEmailDependancies( );
+        var $form = $('form.{/literal}{$form.formClass}{literal}');
+        checkEmailDependancies();
+        $('#is_email_receipt', $form).click(function() {
+          checkEmailDependancies();
+        });
+
+        function checkEmailDependancies() {
+          if ($('#is_email_receipt', $form).attr('checked')) {
+            $('#fromEmail, #notice', $form).show();
+            $('#receiptDate', $form).hide();
+          }
+          else {
+            $('#fromEmail, #notice', $form).hide( );
+            $('#receiptDate', $form).show();
+          }
+        }
+  
+        // bind first click of accordion header to load crm-accordion-body with snippet
+        $('#adjust-option-type', $form).hide();
+        $('.crm-ajax-accordion .crm-accordion-header', $form).one('click', function() {
+          loadPanes($(this).attr('id'));
+        });
+        $('.crm-ajax-accordion:not(.collapsed) .crm-accordion-header', $form).each(function(index) {
+          loadPanes($(this).attr('id'));
+        });
+        // load panes function call for snippet based on id of crm-accordion-header
+        function loadPanes(id) {
+          var url = "{/literal}{crmURL p='civicrm/payment/add' q='formType=' h=0}{literal}" + id;
+          {/literal}
+          {if $contributionMode}
+            url += "&mode={$contributionMode}";
+          {/if}
+          {if $qfKey}
+            url += "&qfKey={$qfKey}";
+          {/if}
+          {literal}
+          if (!$('div.'+ id, $form).html()) {
+            CRM.loadPage(url, {target: $('div.' + id, $form)});
+          }
+        }
+        
+        $('#fee_amount', $form).change( function() {
+          var totalAmount = $('#total_amount', $form).val();
+          var feeAmount = $('#fee_amount', $form).val();
+          var netAmount = totalAmount.replace(/,/g, '') - feeAmount.replace(/,/g, '');
+          if (!$('#net_amount', $form).val() && totalAmount) {
+            $('#net_amount', $form).val(CRM.formatMoney(netAmount, true));
+          }
         });
       });
 
-      function checkEmailDependancies( ) {
-        if (cj('#is_email_receipt').attr( 'checked' )) {
-          cj('#fromEmail').show( );
-          cj('#receiptDate').hide( );
-          cj('#notice').show( );
-        }
-        else {
-          cj('#fromEmail').hide( );
-          cj('#notice').hide( );
-          cj('#receiptDate').show( );
-        }
-      }
-
-    // bind first click of accordion header to load crm-accordion-body with snippet
-    // everything else taken care of by cj().crm-accordions()
-    CRM.$(function($) {
-      cj('#adjust-option-type').hide();
-      cj('.crm-ajax-accordion .crm-accordion-header').one('click', function() {
-        loadPanes(cj(this).attr('id'));
-      });
-      cj('.crm-ajax-accordion:not(.collapsed) .crm-accordion-header').each(function(index) {
-        loadPanes(cj(this).attr('id'));
-      });
-    });
-    // load panes function call for snippet based on id of crm-accordion-header
-    function loadPanes( id ) {
-      var url = "{/literal}{crmURL p='civicrm/payment/add' q='snippet=4&formType=' h=0}{literal}" + id;
-      {/literal}
-      {if $contributionMode}
-        url = url + "&mode={$contributionMode}";
-      {/if}
-      {if $qfKey}
-        url = url + "&qfKey={$qfKey}";
-      {/if}
-      {literal}
-      if (! cj('div.'+id).html()) {
-        var loading = '<img src="{/literal}{$config->resourceBase}i/loading.gif{literal}" alt="{/literal}{ts escape='js'}loading{/ts}{literal}" />&nbsp;{/literal}{ts escape='js'}Loading{/ts}{literal}...';
-        cj('div.'+id).html(loading);
-        cj.ajax({
-          url    : url,
-          success: function(data) { cj('div.'+id).html(data).trigger('crmLoad'); }
-        });
-      }
-    }
-
-cj('#fee_amount').change( function() {
-  var totalAmount = cj('#total_amount').val();
-  var feeAmount = cj('#fee_amount').val();
-  var netAmount = totalAmount.replace(/,/g, '') - feeAmount.replace(/,/g, '');
-  if (!cj('#net_amount').val() && totalAmount) {
-    cj('#net_amount').val(CRM.formatMoney(netAmount, true));
-  }
-});
     </script>
     {/literal}
       {if !$contributionMode}

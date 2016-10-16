@@ -146,8 +146,7 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
       return $event;
     }
 
-    $session = CRM_Core_Session::singleton();
-    $contactId = $session->get('userID');
+    $contactId = CRM_Core_Session::getLoggedInContactID();
     if (!$contactId) {
       $contactId = CRM_Utils_Array::value('contact_id', $params);
     }

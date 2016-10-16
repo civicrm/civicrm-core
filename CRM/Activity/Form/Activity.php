@@ -228,7 +228,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     }
 
     $session = CRM_Core_Session::singleton();
-    $this->_currentUserId = $session->get('userID');
+    $this->_currentUserId = CRM_Core_Session::getLoggedInContactID();
 
     $this->_currentlyViewedContactId = $this->get('contactId');
     if (!$this->_currentlyViewedContactId) {

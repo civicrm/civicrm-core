@@ -35,6 +35,7 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
     $this->_fields = array_merge(array(
         'do_not_import' => array('title' => ts('- do not import -')),
         'contact_id' => array('title' => ts('Contact ID')),
+        'external_identifier' => array('title' => ts('External Identifier')),
       ), $importableFields);
   }
 
@@ -120,7 +121,7 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
     $errorMessage = NULL;
 
     $contactType = $this->_contactType ? $this->_contactType : 'Organization';
-    CRM_Contact_Import_Parser_Contact::isErrorInCustomData($this->_params, $errorMessage, $contactType, NULL);
+    CRM_Contact_Import_Parser_Contact::isErrorInCustomData($this->_params + array('contact_type' => $contactType), $errorMessage, $this->_contactSubType, NULL);
 
     // pseudoconstants
     if ($errorMessage) {
@@ -164,7 +165,15 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
     $session = CRM_Core_Session::singleton();
     $dateType = $session->get('dateTypes');
 
-    $formatted['id'] = $this->_params['contact_id'];
+    if (isset($this->_params['external_identifier']) && !isset($this->_params['contact_id'])) {
+      $checkCid = new CRM_Contact_DAO_Contact();
+      $checkCid->external_identifier = $this->_params['external_identifier'];
+      $checkCid->find(TRUE);
+      $formatted['id'] = $checkCid->id;
+    }
+    else {
+      $formatted['id'] = $this->_params['contact_id'];
+    }
     $setDateFields = array_intersect_key($this->_params, array_flip($this->_dateFields));
 
     CRM_Contact_Import_Parser_Contact::formatCommonData($this->_params, $formatted, $formatted);

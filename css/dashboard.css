@@ -9,10 +9,8 @@
   float: left;
   margin: 0;
   /* padding-bottom and min-height make sure that there is always a sizable drop zone. */
-  min-height: 400px;
-  height: 400px;
-  height: auto !important;
-  padding: 0 0 250px;
+  min-height: 200px;
+  padding: 0 0 40px;
   list-style-type: none;
 }
 
@@ -218,4 +216,14 @@
 
 #crm-container .ui-sortable-placeholder * {
   visibility: hidden;
+}
+
+@media screen and (max-device-width: 50em), screen and (max-width: 50em) {
+  #crm-container .column {
+    width: 100%;
+    min-height: 0;
+  }
+  #crm-container .column-0 {
+    padding: 0;
+  }
 }

@@ -20,7 +20,7 @@
  * @return array|int
  */
 function civicrm_api($entity, $action, $params, $extra = NULL) {
-  return \Civi::service('civi_api_kernel')->run($entity, $action, $params, $extra);
+  return \Civi::service('civi_api_kernel')->runSafe($entity, $action, $params, $extra);
 }
 
 /**
@@ -40,7 +40,7 @@ function civicrm_api($entity, $action, $params, $extra = NULL) {
  */
 function civicrm_api3($entity, $action, $params = array()) {
   $params['version'] = 3;
-  $result = civicrm_api($entity, $action, $params);
+  $result = \Civi::service('civi_api_kernel')->runSafe($entity, $action, $params);
   if (is_array($result) && !empty($result['is_error'])) {
     throw new CiviCRM_API3_Exception($result['error_message'], CRM_Utils_Array::value('error_code', $result, 'undefined'), $result);
   }

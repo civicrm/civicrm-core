@@ -78,14 +78,18 @@ class CRM_Core_I18n_Schema {
       // drop old indices
       if (isset($indices[$table])) {
         foreach ($indices[$table] as $index) {
-          $queries[] = "DROP INDEX {$index['name']} ON {$table}";
+          if (CRM_Core_BAO_SchemaHandler::checkIfIndexExists($table, $index['name'])) {
+            $queries[] = "DROP INDEX {$index['name']} ON {$table}";
+          }
         }
       }
       // deal with columns
       foreach ($hash as $column => $type) {
         $queries[] = "ALTER TABLE {$table} ADD {$column}_{$locale} {$type}";
-        $queries[] = "UPDATE {$table} SET {$column}_{$locale} = {$column}";
-        $queries[] = "ALTER TABLE {$table} DROP {$column}";
+        if (CRM_Core_BAO_SchemaHandler::checkIfFieldExists($table, $column)) {
+          $queries[] = "UPDATE {$table} SET {$column}_{$locale} = {$column}";
+          $queries[] = "ALTER TABLE {$table} DROP {$column}";
+        }
       }
 
       // add view
@@ -361,7 +365,10 @@ class CRM_Core_I18n_Schema {
     global $dbLocale;
     $tables = self::schemaStructureTables();
     foreach ($tables as $table) {
-      $query = preg_replace("/([^'\"])({$table})([^_'\"])/", "\\1\\2{$dbLocale}\\3", $query);
+      // CRM-19093
+      // should match the civicrm table name such as: civicrm_event
+      // but must not match the table name if it's a substring of another table: civicrm_events_in_cart
+      $query = preg_replace("/([^'\"])({$table})([^a-z_'\"])/", "\\1\\2{$dbLocale}\\3", $query);
     }
     // uncomment the below to rewrite the civicrm_value_* queries
     // $query = preg_replace("/(civicrm_value_[a-z0-9_]+_\d+)([^_])/", "\\1{$dbLocale}\\2", $query);

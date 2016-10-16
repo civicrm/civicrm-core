@@ -138,6 +138,10 @@ class CRM_Contact_Form_Edit_CommunicationPreferences {
         );
       }
     }
+
+    if (array_key_exists('preferred_mail_format', $fields) && empty($fields['preferred_mail_format'])) {
+      $errors['preferred_mail_format'] = ts('Please select an email format preferred by this contact.');
+    }
     return empty($errors) ? TRUE : $errors;
   }
 

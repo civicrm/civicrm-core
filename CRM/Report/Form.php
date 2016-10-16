@@ -3746,6 +3746,15 @@ ORDER BY cg.weight, cf.weight";
           $curFilters[$fieldName]['type'] = CRM_Utils_Type::T_STRING;
       }
 
+      // CRM-19401 fix
+      if ($customDAO->html_type == 'Select' && !array_key_exists('options', $curFilters[$fieldName])) {
+        $options = CRM_Core_PseudoConstant::get('CRM_Core_BAO_CustomField', 'custom_' . $customDAO->cf_id, array(), 'search');
+        if ($options !== FALSE) {
+          $curFilters[$fieldName]['operatorType'] = CRM_Core_BAO_CustomField::isSerialized($customDAO) ? CRM_Report_Form::OP_MULTISELECT_SEPARATOR : CRM_Report_Form::OP_MULTISELECT;
+          $curFilters[$fieldName]['options'] = $options;
+        }
+      }
+
       if (!array_key_exists('type', $curFields[$fieldName])) {
         $curFields[$fieldName]['type'] = CRM_Utils_Array::value('type', $curFilters[$fieldName], array());
       }
@@ -4300,10 +4309,17 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
     // There is no reason not to add links for all fields but it seems a bit odd to be able to click on
     // 'Mrs'. Also, we don't have metadata about the title. So, add selectively to addLinks.
     $addLinks = array('gender_id' => 'Gender');
-    foreach (array('prefix_id', 'suffix_id', 'gender_id') as $fieldName) {
+    foreach (array('prefix_id', 'suffix_id', 'gender_id', 'contact_sub_type', 'preferred_language') as $fieldName) {
       if (array_key_exists('civicrm_contact_' . $fieldName, $row)) {
         if (($value = $row['civicrm_contact_' . $fieldName]) != FALSE) {
-          $rows[$rowNum]['civicrm_contact_' . $fieldName] = CRM_Core_Pseudoconstant::getLabel('CRM_Contact_BAO_Contact', $fieldName, $value);
+          $rowValues = explode(CRM_Core_DAO::VALUE_SEPARATOR, $value);
+          $rowLabels = array();
+          foreach ($rowValues as $rowValue) {
+            if ($rowValue) {
+              $rowLabels[] = CRM_Core_Pseudoconstant::getLabel('CRM_Contact_BAO_Contact', $fieldName, $rowValue);
+            }
+          }
+          $rows[$rowNum]['civicrm_contact_' . $fieldName] = implode(', ', $rowLabels);
           if ($baseUrl && ($title = CRM_Utils_Array::value($fieldName, $addLinks)) != FALSE) {
             $this->addLinkToRow($rows[$rowNum], $baseUrl, $linkText, $value, $fieldName, 'civicrm_contact', $title);
           }
@@ -4504,6 +4520,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
       'do_not_sms' => array(),
       'is_opt_out' => array(),
       'is_deceased' => array(),
+      'preferred_language' => array(),
     );
   }
 
@@ -4569,6 +4586,9 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
       'is_opt_out' => array(
         'title' => ts('Do not bulk email'),
         'type' => CRM_Utils_Type::T_BOOLEAN,
+      ),
+      'preferred_language' => array(
+        'title' => ts('Preferred Language'),
       ),
     );
   }

@@ -91,6 +91,7 @@ li.menu-separator.active{
   display:block;
   font-weight:normal;
   text-decoration:none;
+  border:0;
 }
 
 * html div.menu-item {
@@ -142,8 +143,9 @@ li.menu-separator{
 }
 
 #civicrm-menu #crm-qsearch {
-  padding: 1px 3px 1px 2px;
-  background-color: #000 !important;
+  padding: 1px 0 1px 2px;
+  background-color: transparent !important;
+  border-right: none;
 }
 
 #civicrm-menu #crm-qsearch input {
@@ -151,7 +153,7 @@ li.menu-separator{
   border: 1px solid black;
   margin: 0;
   padding: 2px 16px 3px 2px;
-  height: 16px;
+  height: 17px;
 }
 #civicrm-menu #crm-qsearch input:hover,
 #civicrm-menu #crm-qsearch input:focus,

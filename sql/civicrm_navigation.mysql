@@ -110,8 +110,8 @@ VALUES
     ( @domainID, 'civicrm/import/activity?reset=1',                         'Import Activities',      'Import Activities',    'import contacts',  '',             @contactlastID, '1', '1',   8 ),
     ( @domainID, 'civicrm/group/add?reset=1',                               'New Group',              'New Group',            'edit groups',      '',             @contactlastID, '1', NULL,  9 ),
     ( @domainID, 'civicrm/group?reset=1',                                   'Manage Groups',          'Manage Groups',        'access CiviCRM',   '',             @contactlastID, '1', '1',   10 ),
-    ( @domainID, 'civicrm/admin/tag?reset=1&action=add',                    'New Tag',                'New Tag',              'administer CiviCRM', '',           @contactlastID, '1', NULL, 11 ),
-    ( @domainID, 'civicrm/admin/tag?reset=1',                               'Manage Tags (Categories)', 'Manage Tags (Categories)', 'administer CiviCRM', '',     @contactlastID, '1','1', 12 ),
+    ( @domainID, 'civicrm/tag?reset=1&action=add',                    'New Tag',                'New Tag',              'manage tags', '',           @contactlastID, '1', NULL, 11 ),
+    ( @domainID, 'civicrm/tag?reset=1',                               'Manage Tags (Categories)', 'Manage Tags (Categories)', 'manage tags', '',     @contactlastID, '1','1', 12 ),
     ( @domainID, 'civicrm/contact/deduperules?reset=1',  'Find and Merge Duplicate Contacts', 'Find and Merge Duplicate Contacts', 'administer dedupe rules,merge duplicate contacts', 'OR', @contactlastID, '1', NULL, 13 );
 
 INSERT INTO civicrm_navigation
@@ -309,7 +309,7 @@ INSERT INTO civicrm_navigation
 VALUES
     ( @domainID, 'civicrm/admin/custom/group?reset=1',      'Custom Fields', 'Custom Fields',                             'administer CiviCRM', '',   @CustomizelastID, '1', NULL, 1 ),
     ( @domainID, 'civicrm/admin/uf/group?reset=1',          'Profiles', 'Profiles',                                       'administer CiviCRM', '',   @CustomizelastID, '1', NULL, 2 ),
-    ( @domainID, 'civicrm/admin/tag?reset=1',               'Tags (Categories)', 'Tags (Categories)',                     'administer CiviCRM', '',   @CustomizelastID, '1', NULL, 3 ),
+    ( @domainID, 'civicrm/tag?reset=1',               'Tags (Categories)', 'Tags (Categories)',                     'administer CiviCRM', '',   @CustomizelastID, '1', NULL, 3 ),
     ( @domainID, 'civicrm/admin/options/activity_type?reset=1', 'Activity Types', 'Activity Types',   'administer CiviCRM', '',   @CustomizelastID, '1', NULL, 4 ),
     ( @domainID, 'civicrm/admin/reltype?reset=1',           'Relationship Types', 'Relationship Types',                   'administer CiviCRM', '',   @CustomizelastID, '1', NULL, 5 ),
     ( @domainID, 'civicrm/admin/options/subtype?reset=1',   'Contact Types','Contact Types',                              'administer CiviCRM', '',   @CustomizelastID, '1', NULL, 6 ),

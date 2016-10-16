@@ -65,6 +65,9 @@
   </td>
 </tr>
 
+<tr><td><label>{$form.membership_id.label}</label> {$form.membership_id.html}</td>
+</tr>
+
 <tr><td><label>{ts}Member Since{/ts}</label></td></tr>
 <tr>
 {include file="CRM/Core/DateRange.tpl" fieldName="member_join_date" from='_low' to='_high'}

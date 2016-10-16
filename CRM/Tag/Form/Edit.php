@@ -34,7 +34,7 @@
 /**
  * This class generates form components for Tag.
  */
-class CRM_Admin_Form_Tag extends CRM_Admin_Form {
+class CRM_Tag_Form_Edit extends CRM_Admin_Form {
   protected $_isTagSet;
 
   /**
@@ -52,7 +52,7 @@ class CRM_Admin_Form_Tag extends CRM_Admin_Form {
 
     if ($this->_action == CRM_Core_Action::DELETE) {
       if ($this->_id && $tag = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Tag', $this->_id, 'name', 'parent_id')) {
-        $url = CRM_Utils_System::url('civicrm/admin/tag', "reset=1");
+        $url = CRM_Utils_System::url('civicrm/tag', "reset=1");
         CRM_Core_Error::statusBounce(ts("This tag cannot be deleted. You must delete all its child tags ('%1', etc) prior to deleting this tag.", array(1 => $tag)), $url);
       }
       if ($this->_values['is_reserved'] == 1 && !CRM_Core_Permission::check('administer reserved tags')) {

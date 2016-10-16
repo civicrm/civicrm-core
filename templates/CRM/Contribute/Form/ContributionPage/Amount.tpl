@@ -24,6 +24,7 @@
  +--------------------------------------------------------------------+
 *}
 {capture assign="adminPriceSets"}{crmURL p='civicrm/admin/price' q="reset=1"}{/capture}
+{crmRegion name="contribute-form-contributionpage-amount-main"}
 <div class="crm-block crm-form-block crm-contribution-contributionpage-amount-form-block">
 <div class="help">
     {ts}Use this form to configure Contribution Amount options. You can give contributors the ability to enter their own contribution amounts - and/or provide a fixed list of amounts. For fixed amounts, you can enter a label for each 'level' of contribution (e.g. Friend, Sustainer, etc.). If you allow people to enter their own dollar amounts, you can also set minimum and maximum values. Depending on your choice of Payment Processor, you may be able to offer a recurring contribution option.{/ts} {docURL page="user/contributions/payment-processors"}
@@ -482,3 +483,6 @@
 </script>
 {/literal}
 {/if}
+{/crmRegion}
+{crmRegion name="contribute-form-contributionpage-amount-post"}
+{/crmRegion}

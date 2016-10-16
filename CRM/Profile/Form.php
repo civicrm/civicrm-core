@@ -577,13 +577,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
     }
 
     if (!empty($this->_defaults['image_URL'])) {
-      list($imageWidth, $imageHeight) = getimagesize(CRM_Utils_String::unstupifyUrl($this->_defaults['image_URL']));
-      list($imageThumbWidth, $imageThumbHeight) = CRM_Contact_BAO_Contact::getThumbSize($imageWidth, $imageHeight);
-      $this->assign("imageWidth", $imageWidth);
-      $this->assign("imageHeight", $imageHeight);
-      $this->assign("imageThumbWidth", $imageThumbWidth);
-      $this->assign("imageThumbHeight", $imageThumbHeight);
-      $this->assign("imageURL", $this->_defaults['image_URL']);
+      $this->assign("imageURL", CRM_Utils_File::getImageURL($this->_defaults['image_URL']));
       $this->removeFileRequiredRules('image_URL');
     }
 
