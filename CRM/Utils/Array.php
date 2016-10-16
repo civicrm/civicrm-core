@@ -1076,6 +1076,13 @@ class CRM_Utils_Array {
     return $input;
   }
 
+  /**
+   * Ensure that array is encoded in utf8 format.
+   *
+   * @param array $array
+   *
+   * @return array $array utf8-encoded.
+   */
   public static function encode_items($array) {
     foreach ($array as $key => $value) {
       if (is_array($value)) {
