@@ -105,13 +105,14 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
         $id = CRM_Utils_Array::value(0, $value);
         $value = CRM_Utils_Array::value(2, $value);
         if (is_array($value) && in_array(key($value), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
-          //Needs to set the from and to value for BETWEEN or else it uses IN
-          if (key($value) == 'BETWEEN' && substr($id, 0, 7) == 'custom_' ){
+            //Needs to set the from and to value for BETWEEN or else it uses IN
+            if (key($value) == 'BETWEEN' && substr($id, 0, 7) == 'custom_') {
                 $result[$id . '_from'] = $value['BETWEEN'][0];
                 $result[$id . '_to'] = $value['BETWEEN'][1];
                 unset($result[$element]);
                 continue;
-            } else {
+            }
+            else {
                 $value = CRM_Utils_Array::value(key($value), $value);
             }
         }
