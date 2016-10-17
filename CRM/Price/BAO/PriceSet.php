@@ -1054,14 +1054,16 @@ WHERE  id = %1";
         if (!is_array($options) || !in_array($id, $validPriceFieldIds)) {
           continue;
         }
-        CRM_Price_BAO_PriceField::addQuickFormElement($form,
-          'price_' . $field['id'],
-          $field['id'],
-          FALSE,
-          CRM_Utils_Array::value('is_required', $field, FALSE),
-          NULL,
-          $options
-        );
+        if (!empty($options)) {
+          CRM_Price_BAO_PriceField::addQuickFormElement($form,
+            'price_' . $field['id'],
+            $field['id'],
+            FALSE,
+            CRM_Utils_Array::value('is_required', $field, FALSE),
+            NULL,
+            $options
+          );
+        }
       }
     }
   }
