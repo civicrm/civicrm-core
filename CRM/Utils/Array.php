@@ -1089,7 +1089,7 @@ class CRM_Utils_Array {
         $array[$key] = self::encode_items($value);
       }
       else {
-        $array[$key] = mb_convert_encoding($value, 'Windows-1252', 'UTF-8');
+        $array[$key] = mb_convert_encoding($value, mb_detect_encoding($value, mb_detect_order(), TRUE), 'UTF-8');
       }
     }
     return $array;
