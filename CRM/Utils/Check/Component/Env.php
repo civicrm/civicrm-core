@@ -708,9 +708,9 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     if (!function_exists('mb_substr')) {
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__,
-        ts('The required PHP Multibyte String extension is not enabled on your server. Ask your system administrator to install it.'),
+        ts('The PHP Multibyte String extension is needed for CiviCRM to correctly handle user input among other functionality. Ask your system administrator to install it.'),
         ts('Missing mbstring Extension'),
-        \Psr\Log\LogLevel::ERROR,
+        \Psr\Log\LogLevel::WARNING,
         'fa-server'
       );
     }
