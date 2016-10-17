@@ -62,6 +62,7 @@ function smarty_function_crmNavigationMenu($params, &$smarty) {
       // We don't put them as a query string because some browsers will refuse to cache a page with a ? in the url
       // @see CRM_Admin_Page_AJAX::getNavigationMenu
       $lang = CRM_Core_I18n::getLocale();
+      $lang = empty($lang) ? 'en_US' : $lang;
       $domain = CRM_Core_Config::domainID();
       $key = CRM_Core_BAO_Navigation::getCacheKey($contactID);
       $src = CRM_Utils_System::url("civicrm/ajax/menujs/$contactID/$lang/$domain/$key");
