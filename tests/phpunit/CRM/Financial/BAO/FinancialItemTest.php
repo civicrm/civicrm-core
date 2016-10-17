@@ -266,4 +266,39 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
     $this->assertEquals($entityResult, $entityTrxn->amount, 'Verify Amount for Financial Item');
   }
 
+  /**
+   * Check method getPreviousFinancialItem().
+   */
+  public function testGetPreviousFinancialItem() {
+    $contactId = $this->individualCreate();
+
+    $params = array(
+      'contact_id' => $contactId,
+      'currency' => 'USD',
+      'financial_type_id' => 1,
+      'contribution_status_id' => 1,
+      'payment_instrument_id' => 1,
+      'source' => 'STUDENT',
+      'receive_date' => '20160522000000',
+      'receipt_date' => '20160522000000',
+      'non_deductible_amount' => 0.00,
+      'total_amount' => 100.00,
+      'trxn_id' => '22ereerwww444444',
+      'invoice_id' => '86ed39c9e9ee6ef6031621ce0eafe7eb81',
+    );
+
+    $contribution = CRM_Contribute_BAO_Contribution::create($params);
+
+    $params = array(
+      'id' => $contribution->id,
+      'total_amount' => 300.00,
+    );
+
+    $contribution = CRM_Contribute_BAO_Contribution::create($params);
+    $financialItem = CRM_Financial_BAO_FinancialItem::getPreviousFinancialItem($contribution->id);
+    $params = array('id' => $financialItem->id);
+    $financialItem = $this->callAPISuccess('FinancialItem', 'get', $params);
+    $this->assertEquals($financialItem['values'][$financialItem['id']]['amount'], 200.00, "The amounts do not match.");
+  }
+
 }

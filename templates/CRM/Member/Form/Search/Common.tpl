@@ -50,7 +50,12 @@
     {$form.member_pay_later.label}&nbsp;{$form.member_pay_later.html}
     </p>
     <p>
-    {$form.member_auto_renew.label}&nbsp;{$form.member_auto_renew.html}
+      {if $form.member_auto_renew}
+          <label>{$form.member_auto_renew.label}</label>
+          {help id="id-member_auto_renew" file="CRM/Member/Form/Search.hlp"}
+          <br/>
+          {$form.member_auto_renew.html}
+        {/if}
     </p>
     <p>
     {$form.member_is_override.label}
@@ -58,6 +63,9 @@
     {$form.member_is_override.html}
     </p>
   </td>
+</tr>
+
+<tr><td><label>{$form.membership_id.label}</label> {$form.membership_id.html}</td>
 </tr>
 
 <tr><td><label>{ts}Member Since{/ts}</label></td></tr>

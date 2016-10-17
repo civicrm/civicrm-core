@@ -29,10 +29,21 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2016
- * $Id$
- *
  */
 class CRM_Report_Form_Contact_CurrentEmployer extends CRM_Report_Form {
+
+  /**
+   * This report has not been optimised for group filtering.
+   *
+   * The functionality for group filtering has been improved but not
+   * all reports have been adjusted to take care of it. This report has not
+   * and will run an inefficient query until fixed.
+   *
+   * CRM-19170
+   *
+   * @var bool
+   */
+  protected $groupFilterNotOptimised = TRUE;
 
   protected $_summary = NULL;
 
@@ -44,8 +55,7 @@ class CRM_Report_Form_Contact_CurrentEmployer extends CRM_Report_Form {
   public $_drilldownReport = array('contact/detail' => 'Link to Detail Report');
 
   /**
-   */
-  /**
+   * Class constructor.
    */
   public function __construct() {
 
@@ -111,32 +121,7 @@ class CRM_Report_Form_Contact_CurrentEmployer extends CRM_Report_Form {
             'title' => ts('Contact Subtype'),
           ),
         ),
-        'filters' => array(
-          'sort_name' => array('title' => ts('Employee Name')),
-          'source' => array(
-            'title' => ts('Contact Source'),
-            'type' => CRM_Utils_Type::T_STRING,
-          ),
-          'id' => array(
-            'title' => ts('Contact ID'),
-            'no_display' => TRUE,
-          ),
-          'gender_id' => array(
-            'title' => ts('Gender'),
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id'),
-          ),
-          'birth_date' => array(
-            'title' => ts('Birth Date'),
-            'operatorType' => CRM_Report_Form::OP_DATE,
-          ),
-          'contact_type' => array(
-            'title' => ts('Contact Type'),
-          ),
-          'contact_sub_type' => array(
-            'title' => ts('Contact Subtype'),
-          ),
-        ),
+        'filters' => array_merge($this->getBasicContactFilters(), array('sort_name' => array('title' => ts('Employee Name')))),
         'grouping' => 'contact-fields',
       ),
       'civicrm_relationship' => array(
@@ -246,6 +231,7 @@ class CRM_Report_Form_Contact_CurrentEmployer extends CRM_Report_Form {
         }
       }
     }
+    $this->_selectClauses = $select;
 
     $this->_select = "SELECT " . implode(', ', $select) . " ";
   }
@@ -321,7 +307,12 @@ FROM civicrm_contact {$this->_aliases['civicrm_contact']}
   }
 
   public function groupBy() {
-    $this->_groupBy = "GROUP BY {$this->_aliases['civicrm_employer']}.id,{$this->_aliases['civicrm_contact']}.id";
+    $groupBy = array(
+      "{$this->_aliases['civicrm_employer']}.id",
+      "{$this->_aliases['civicrm_contact']}.id",
+    );
+
+    $this->_groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, $groupBy);
   }
 
   public function orderBy() {
@@ -361,6 +352,7 @@ FROM civicrm_contact {$this->_aliases['civicrm_contact']}
           $this->_absoluteUrl, $this->_id, $this->_drilldownReport
         );
         $rows[$rowNum]['civicrm_employer_organization_name_link'] = $url;
+        $rows[$rowNum]['civicrm_employer_organization_name_hover'] = ts('View Contact Detail Report for this contact');
         $entryFound = TRUE;
       }
 
@@ -380,14 +372,8 @@ FROM civicrm_contact {$this->_aliases['civicrm_contact']}
         }
       }
 
-      //handle gender
-      if (array_key_exists('civicrm_contact_gender_id', $row)) {
-        if ($value = $row['civicrm_contact_gender_id']) {
-          $gender = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id');
-          $rows[$rowNum]['civicrm_contact_gender_id'] = $gender[$value];
-        }
-        $entryFound = TRUE;
-      }
+      // Handle ID to label conversion for contact fields
+      $entryFound = $this->alterDisplayContactFields($row, $rows, $rowNum, 'contact/currentEmployer', 'View Contact Detail') ? TRUE : $entryFound;
 
       // display birthday in the configured custom format
       if (array_key_exists('civicrm_contact_birth_date', $row)) {
@@ -399,14 +385,15 @@ FROM civicrm_contact {$this->_aliases['civicrm_contact']}
       }
 
       // convert employee name to links
-      if (array_key_exists('civicrm_contact_display_name', $row) &&
+      if (array_key_exists('civicrm_contact_sort_name', $row) &&
         array_key_exists('civicrm_contact_id', $row)
       ) {
         $url = CRM_Report_Utils_Report::getNextUrl('contact/detail',
           'reset=1&force=1&id_op=eq&id_value=' . $row['civicrm_contact_id'],
           $this->_absoluteUrl, $this->_id, $this->_drilldownReport
         );
-        $rows[$rowNum]['civicrm_contact_display_name_link'] = $url;
+        $rows[$rowNum]['civicrm_contact_sort_name_link'] = $url;
+        $rows[$rowNum]['civicrm_contact_sort_name_hover'] = ts('View Contact Detail Report for this contact');
         $entryFound = TRUE;
       }
 

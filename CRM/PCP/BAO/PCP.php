@@ -50,20 +50,11 @@ class CRM_PCP_BAO_PCP extends CRM_PCP_DAO_PCP {
    * Add or update either a Personal Campaign Page OR a PCP Block.
    *
    * @param array $params
-   *   Reference array contains the values submitted by the form.
-   * @param bool $pcpBlock
-   *   If true, create or update PCPBlock, else PCP.
+   *   Values to create the pcp.
    *
    * @return object
    */
-  public static function add(&$params, $pcpBlock = TRUE) {
-    if ($pcpBlock) {
-      // action is taken depending upon the mode
-      $dao = new CRM_PCP_DAO_PCPBlock();
-      $dao->copyValues($params);
-      $dao->save();
-      return $dao;
-    }
+  public static function create($params) {
 
     $dao = new CRM_PCP_DAO_PCP();
     $dao->copyValues($params);
@@ -76,8 +67,7 @@ class CRM_PCP_BAO_PCP extends CRM_PCP_DAO_PCP {
 
     // set currency for CRM-1496
     if (!isset($dao->currency)) {
-      $config = &CRM_Core_Config::singleton();
-      $dao->currency = $config->defaultCurrency;
+      $dao->currency = CRM_Core_Config::singleton()->defaultCurrency;
     }
 
     $dao->save();
@@ -117,7 +107,7 @@ WHERE  civicrm_pcp.contact_id = civicrm_contact.id
     $links = self::pcpLinks();
 
     $query = "
-SELECT * FROM civicrm_pcp pcp
+SELECT pcp.*, block.is_tellfriend_enabled FROM civicrm_pcp pcp
 LEFT JOIN civicrm_pcp_block block ON block.id = pcp.pcp_block_id
 WHERE pcp.is_active = 1
   AND pcp.contact_id = %1
@@ -194,7 +184,7 @@ FROM civicrm_pcp_block block
 LEFT JOIN civicrm_pcp pcp ON pcp.pcp_block_id = block.id
 WHERE block.is_active = 1
 {$clause}
-GROUP BY block.id
+GROUP BY block.id, pcp.id
 ORDER BY target_entity_type, target_entity_id
 ";
     $pcpBlockDao = CRM_Core_DAO::executeQuery($query);

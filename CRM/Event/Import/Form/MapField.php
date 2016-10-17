@@ -295,6 +295,8 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
    */
   public static function formRule($fields, $files, $self) {
     $errors = array();
+    // define so we avoid notices below
+    $errors['_qf_default'] = '';
     $fieldMessage = NULL;
     if (!array_key_exists('savedMapping', $fields)) {
       $importKeys = array();
@@ -375,6 +377,9 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
       }
     }
 
+    if (empty($errors['_qf_default'])) {
+      unset($errors['_qf_default']);
+    }
     if (!empty($errors)) {
       if (!empty($errors['saveMappingName'])) {
         $_flag = 1;
@@ -403,10 +408,8 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
     }
 
     $fileName = $this->controller->exportValue('DataSource', 'uploadFile');
+    $seperator = $this->controller->exportValue('DataSource', 'fieldSeparator');
     $skipColumnHeader = $this->controller->exportValue('DataSource', 'skipColumnHeader');
-
-    $config = CRM_Core_Config::singleton();
-    $seperator = $config->fieldSeparator;
 
     $mapperKeys = array();
     $mapper = array();

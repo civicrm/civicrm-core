@@ -164,7 +164,7 @@ class CRM_Utils_Mail {
     }
 
     // first call the mail alter hook
-    CRM_Utils_Hook::alterMailParams($params);
+    CRM_Utils_Hook::alterMailParams($params, 'singleEmail');
 
     // check if any module has aborted mail sending
     if (!empty($params['abortMailSend']) || empty($params['toEmail'])) {
@@ -267,6 +267,7 @@ class CRM_Utils_Mail {
       }
       if (!empty($headers['Bcc'])) {
         $to[] = CRM_Utils_Array::value('Bcc', $headers);
+        unset($headers['Bcc']);
       }
     }
     if (is_object($mailer)) {

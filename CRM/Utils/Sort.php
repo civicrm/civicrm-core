@@ -121,7 +121,7 @@ class CRM_Utils_Sort {
 
     foreach ($vars as $weight => $value) {
       $this->_vars[$weight] = array(
-        'name' => $value['sort'],
+        'name' => CRM_Utils_Type::validate($value['sort'], 'MysqlColumnNameOrAlias'),
         'direction' => CRM_Utils_Array::value('direction', $value),
         'title' => $value['name'],
       );
@@ -152,11 +152,11 @@ class CRM_Utils_Sort {
       $this->_vars[$this->_currentSortID]['direction'] == self::DONTCARE
     ) {
       $this->_vars[$this->_currentSortID]['name'] = str_replace(' ', '_', $this->_vars[$this->_currentSortID]['name']);
-      return $this->_vars[$this->_currentSortID]['name'] . ' asc';
+      return CRM_Utils_Type::escape($this->_vars[$this->_currentSortID]['name'], 'MysqlColumnNameOrAlias') . ' asc';
     }
     else {
       $this->_vars[$this->_currentSortID]['name'] = str_replace(' ', '_', $this->_vars[$this->_currentSortID]['name']);
-      return $this->_vars[$this->_currentSortID]['name'] . ' desc';
+      return CRM_Utils_Type::escape($this->_vars[$this->_currentSortID]['name'], 'MysqlColumnNameOrAlias') . ' desc';
     }
   }
 

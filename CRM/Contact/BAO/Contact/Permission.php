@@ -260,7 +260,7 @@ AND    $operationClause LIMIT 1";
       }
     }
     if ($contactID == $selectedContactID &&
-      (CRM_Core_Permission::check('edit my contact') || CRM_Core_Permission::check('view my contact'))
+      (CRM_Core_Permission::check('edit my contact'))
     ) {
       return TRUE;
     }

@@ -194,9 +194,9 @@ class WebTest_Profile_ProfileAddTest extends CiviSeleniumTestCase {
     //check the existence of the two contacts in the group
     $this->openCiviPage('group', 'reset=1');
     $this->type('title', $groupName);
-    $this->click('_qf_Search_refresh');
-    $this->waitForElementPresent("xpath=//table[@class='crm-group-selector no-footer dataTable']/tbody/tr/td/span[text() = '$groupName']/parent::td/following-sibling::td[@class=' crm-group-group_links']/span/a");
-    $this->clickLink("xpath=//table[@class='crm-group-selector no-footer dataTable']/tbody/tr/td[1]/span[text() = '$groupName']/parent::td/following-sibling::td[@class=' crm-group-group_links']/span/a");
+    $this->click('title');
+    $this->waitForElementPresent("xpath=//div[text() = '$groupName']/parent::td/following-sibling::td[@class='crm-group-group_links']/span/a");
+    $this->clickLink("xpath=//div[text() = '$groupName']/parent::td/following-sibling::td[@class='crm-group-group_links']/span/a");
     $contactEmails = array(
       1 => "$lastName1, $firstName1",
       2 => "$lastName2, $firstName2",

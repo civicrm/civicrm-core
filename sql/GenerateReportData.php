@@ -352,7 +352,7 @@ class CRM_GCD {
     // number of seconds for 2 year
     $numSecond = 63072000;
 
-    $dateFormat = "Ymdhis";
+    $dateFormat = "YmdHis";
     $today = time();
 
     // both are defined
@@ -383,7 +383,7 @@ class CRM_GCD {
   private function _insert(&$dao) {
     if (self::ADD_TO_DB) {
       if (!$dao->insert()) {
-        echo "ERROR INSERT: " . mysql_error() . "\n";
+        echo "ERROR INSERT: " . mysqli_error($dao->getConnection()->connection) . "\n";
         print_r($dao);
         exit(1);
       }
@@ -397,7 +397,7 @@ class CRM_GCD {
   private function _update($dao) {
     if (self::ADD_TO_DB) {
       if (!$dao->update()) {
-        echo "ERROR UPDATE: " . mysql_error() . "\n";
+        echo "ERROR UPDATE: " . mysqli_error($dao->getConnection()->connection) . "\n";
         print_r($dao);
         exit(1);
       }
@@ -1563,7 +1563,7 @@ INSERT INTO `civicrm_pcp`
 VALUES
     ({$this->individual[3]}, 2, 'My Personal Civi Fundraiser', 'I''m on a mission to get all my friends and family to help support my favorite open-source civic sector CRM.', '<p>Friends and family - please help build much needed infrastructure for the civic sector by supporting my personal campaign!</p>\r\n<p><a href=\"https://civicrm.org\">You can learn more about CiviCRM here</a>.</p>\r\n<p>Then click the <strong>Contribute Now</strong> button to go to our easy-to-use online contribution form.</p>', 'Contribute Now', 1, 1, 1, 5000.00, NULL, 1);
 ";
-    CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
+    CRM_Core_DAO::executeQuery($query);
   }
 
   public function addContribution() {

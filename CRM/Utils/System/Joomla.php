@@ -603,6 +603,14 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   }
 
   /**
+   * @inheritDoc
+   */
+  public function getTimeZoneString() {
+    $timezone = JFactory::getConfig()->get('offset');
+    return !$timezone ? date_default_timezone_get() : $timezone;
+  }
+
+  /**
    * Get a list of all installed modules, including enabled and disabled ones
    *
    * @return array
@@ -695,7 +703,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   /**
    * @inheritDoc
    */
-  public function getDefaultSiteSettings($dir) {
+  public function getDefaultSiteSettings($dir = NULL) {
     $config = CRM_Core_Config::singleton();
     $url = preg_replace(
       '|/administrator|',

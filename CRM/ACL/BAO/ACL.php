@@ -126,8 +126,7 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
       'GroupContact' => CRM_Contact_DAO_GroupContact::getTableName(),
     );
 
-    $session = CRM_Core_Session::singleton();
-    $contact_id = $session->get('userID');
+    $contact_id = CRM_Core_Session::getLoggedInContactID();
 
     $where = " {$t['ACL']}.operation = '" . CRM_Utils_Type::escape($operation, 'String') . "'";
 
@@ -863,6 +862,13 @@ SELECT g.*
     $allGroups = NULL,
     $includedGroups = NULL
   ) {
+    $userCacheKey = "{$contactID}_{$type}_{$tableName}_" . CRM_Core_Config::domainID() . '_' . md5(implode(',', array_merge((array) $allGroups, (array) $includedGroups)));
+    if (empty(Civi::$statics[__CLASS__]['permissioned_groups'])) {
+      Civi::$statics[__CLASS__]['permissioned_groups'] = array();
+    }
+    if (!empty(Civi::$statics[__CLASS__]['permissioned_groups'][$userCacheKey])) {
+      return Civi::$statics[__CLASS__]['permissioned_groups'][$userCacheKey];
+    }
 
     $acls = CRM_ACL_BAO_Cache::build($contactID);
 
@@ -913,9 +919,25 @@ ORDER BY a.object_id
     ) {
       $ids = $includedGroups;
     }
+    if ($contactID) {
+      $groupWhere = '';
+      if (!empty($allGroups)) {
+        $groupWhere = " AND id IN (" . implode(',', array_keys($allGroups)) . ")";
+      }
+      // Contacts create hidden groups from search results. They should be able to retrieve their own.
+      $ownHiddenGroupsList = CRM_Core_DAO::singleValueQuery("
+        SELECT GROUP_CONCAT(id) FROM civicrm_group WHERE is_hidden =1 AND created_id = $contactID
+        $groupWhere
+      ");
+      if ($ownHiddenGroupsList) {
+        $ownHiddenGroups = explode(',', $ownHiddenGroupsList);
+        $ids = array_merge((array) $ids, $ownHiddenGroups);
+      }
+
+    }
 
     CRM_Utils_Hook::aclGroup($type, $contactID, $tableName, $allGroups, $ids);
-
+    Civi::$statics[__CLASS__]['permissioned_groups'][$userCacheKey] = $ids;
     return $ids;
   }
 

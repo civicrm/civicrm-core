@@ -32,10 +32,6 @@
  */
 
 /**
- * Files required
- */
-
-/**
  * Membership search.
  *
  * Class is a pane in advanced search and the membership search page.
@@ -52,14 +48,14 @@ class CRM_Member_Form_Search extends CRM_Core_Form_Search {
   /**
    * Are we restricting ourselves to a single contact.
    *
-   * @var boolean
+   * @var bool
    */
   protected $_single = FALSE;
 
   /**
    * Are we restricting ourselves to a single contact.
    *
-   * @var boolean
+   * @var bool
    */
   protected $_limit = NULL;
 
@@ -93,7 +89,7 @@ class CRM_Member_Form_Search extends CRM_Core_Form_Search {
      * driven by the wizard framework
      */
 
-    $this->_reset = CRM_Utils_Request::retrieve('reset', 'Boolean', CRM_Core_DAO::$_nullObject);
+    $this->_reset = CRM_Utils_Request::retrieve('reset', 'Boolean');
     $this->_force = CRM_Utils_Request::retrieve('force', 'Boolean', $this, FALSE);
     $this->_limit = CRM_Utils_Request::retrieve('limit', 'Positive', $this);
     $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this, FALSE, 'search');

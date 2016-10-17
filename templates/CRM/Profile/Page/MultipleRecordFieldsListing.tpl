@@ -37,16 +37,14 @@
         {strip}
           <table id="records-{$customGroupId}" class={if $pageViewType eq 'customDataView'}"crm-multifield-selector crm-ajax-table"{else}'display'{/if}>
             <thead>
-            <tr>
             {if $pageViewType eq 'customDataView'}
               {foreach from=$headers key=recId item=head}
-                <th data-data={ts}'{$head}'{/ts}
+                <th data-data={ts}'{$headerAttr.$recId.columnName}'{/ts}
                 {if !empty($headerAttr.$recId.dataType)}cell-data-type="{$headerAttr.$recId.dataType}"{/if}
                 {if !empty($headerAttr.$recId.dataEmptyOption)}cell-data-empty-option="{$headerAttr.$recId.dataEmptyOption}"{/if}>{ts}{$head}{/ts}
                 </th>
               {/foreach}
               <th data-data="action" data-orderable="false">&nbsp;</th>
-            </tr>
             </thead>
               {literal}
               <script type="text/javascript">
@@ -84,12 +82,11 @@
               {foreach from=$headers key=recId item=head}
                 <th>{ts}{$head}{/ts}</th>
               {/foreach}
-              <th></th>
+
               {foreach from=$dateFields key=fieldId item=v}
                 <th class='hiddenElement'></th>
               {/foreach}
               <th>&nbsp;</th>
-              </tr>
               </thead>
               {foreach from=$records key=recId item=rows}
                 <tr class="{cycle values="odd-row,even-row"}">

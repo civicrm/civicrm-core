@@ -124,7 +124,7 @@
         }
       },
       "language": {
-        "zeroRecords": ZeroRecordText 
+        "zeroRecords": ZeroRecordText
       },
       "drawCallback": function(settings) {
         //Add data attributes to cells
@@ -143,7 +143,9 @@
         $(settings.nTable).trigger('crmLoad');
         if (parentsOnly) {
           $('tbody tr.crm-group-parent', settings.nTable).each( function() {
-            $(this).find('td:first').prepend('{/literal}<span class="collapsed show-children" title="{ts}show child groups{/ts}"/></span>{literal}');
+            $(this).find('td:first')
+              .prepend('{/literal}<span class="collapsed show-children" title="{ts}show child groups{/ts}"/></span>{literal}')
+              .find('div').css({'display': 'inline'});
           });
         }
       }
@@ -187,7 +189,7 @@
         $('.parent_is_' + parent_id).hide();
         $('.parent_is_' + parent_id).each(function(i, obj) {
           // also hide children of children
-          var gID = $(this).find('td:nth-child(2)').text();
+          var gID = $(this).data('id');
           $('.parent_is_' + gID).hide();
         });
       }
@@ -201,7 +203,7 @@
         // child rows for this parent have already been retrieved so just show them
         $('.parent_is_' + parent_id ).show();
       } else {
-        //FIXME Is it possible to replace all this with a datatables call? 
+        //FIXME Is it possible to replace all this with a datatables call?
         $.ajax( {
             "dataType": 'json',
             "url": {/literal}'{crmURL p="civicrm/ajax/grouplist" h=0 q="snippet=4"}'{literal},
@@ -211,10 +213,10 @@
               $.each( response.data, function( i, val ) {
                 appendHTML += '<tr id="row_'+val.group_id+'_'+parent_id+'" data-entity="group" data-id="'+val.group_id+'" class="crm-entity parent_is_'+parent_id+' crm-row-child">';
                 if ( val.is_parent ) {
-                  appendHTML += '<td class="crm-group-name crmf-title ' + levelClass + '">' + '{/literal}<span class="collapsed show-children" title="{ts}show child groups{/ts}"/></span><div class="crm-editable">{literal}' + val.title + '</div></td>';
+                  appendHTML += '<td class="crm-group-name crmf-title ' + levelClass + '">' + '{/literal}<span class="collapsed show-children" title="{ts}show child groups{/ts}"/></span><div class="crmf-title crm-editable" style="display:inline">{literal}' + val.title + '</div></td>';
                 }
                 else {
-                  appendHTML += '<td class="' + levelClass + '">' + '{/literal}<span class="collapsed show-children" title="{ts}show child groups{/ts}"/></span><span class="crm-group-name crmf-title crm-editable">{literal}' + val.title + '</span></td>';
+                  appendHTML += '<td class="crm-group-name  crmf-title crm-editable ' + levelClass + '"><span class="crm-no-children"></span>' + val.title + '</td>';
                 }
                 appendHTML += '<td class="right">' + val.count + "</td>";
                 appendHTML += "<td>" + val.created_by + "</td>";

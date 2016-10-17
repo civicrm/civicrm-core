@@ -42,20 +42,36 @@ class CRM_Utils_ICalendar {
   /**
    * Escape text elements for safe ICalendar use.
    *
-   * @param $text
+   * @param string $text
    *   Text to escape.
    *
    * @return string
-   *   Escaped text
    */
   public static function formatText($text) {
     $text = strip_tags($text);
     $text = str_replace("\"", "DQUOTE", $text);
     $text = str_replace("\\", "\\\\", $text);
-    $text = str_replace(",", "\,", $text);
-    $text = str_replace(";", "\;", $text);
+    $text = str_replace(',', '\,', $text);
+    $text = str_replace(';', '\;', $text);
     $text = str_replace(array("\r\n", "\n", "\r"), "\\n ", $text);
     $text = implode("\n ", str_split($text, 50));
+    return $text;
+  }
+
+  /**
+   * Restore iCal formatted text to normal.
+   *
+   * @param string $text
+   *   Text to unescape.
+   *
+   * @return string
+   */
+  public static function unformatText($text) {
+    $text = str_replace('\n ', "\n", $text);
+    $text = str_replace('\;', ';', $text);
+    $text = str_replace('\,', ',', $text);
+    $text = str_replace("\\\\", "\\", $text);
+    $text = str_replace("DQUOTE", "\"", $text);
     return $text;
   }
 

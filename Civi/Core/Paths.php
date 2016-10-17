@@ -61,7 +61,7 @@ class Paths {
    *   Function which returns an array with keys:
    *    - path: string.
    *    - url: string.
-   * @return $this
+   * @return Paths
    */
   public function register($name, $factory) {
     $this->variableFactory[$name] = $factory;

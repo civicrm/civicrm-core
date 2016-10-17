@@ -46,6 +46,17 @@
     <add>1.5</add>
   </field>
   <field>
+    <name>data_type</name>
+    <title>Data Type for this option group</title>
+    <type>varchar</type>
+    <length>128</length>
+    <comment>Option group description.</comment>
+    <pseudoconstant>
+      <callback>CRM_Utils_Type::dataTypes</callback>
+    </pseudoconstant>
+    <add>4.7</add>
+  </field>
+  <field>
     <name>is_reserved</name>
     <title>Option Group Is Reserved?</title>
     <type>boolean</type>

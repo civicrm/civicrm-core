@@ -25,23 +25,31 @@
 *}
 <div class="batch-update crm-block crm-form-block crm-event-batch-form-block">
 <fieldset>
-<div class="help">
+  <div class="help">
     {if $context EQ 'statusChange'} {* Update Participant Status task *}
-        {ts}Update the status for each participant individually, OR change all statuses to:{/ts}
-        {$form.status_change.html}  {help id="id-status_change"}
+      {ts}Update the status for each participant individually below, or change all statuses to:{/ts}
+      {$form.status_change.html}  {help id="id-status_change"}
+      {if $status}
         <div class="status">
-          {ts}Participants whose status is changed FROM Pending Pay Later TO Registered or Attended will receive a confirmation email and their payment status will be set to completed. If this is not what you want to do, you can change their participant status by editing their event registration record directly.{/ts}
+          <p>{ts}This form <strong>will send email</strong> to contacts only in certain circumstances:{/ts}</p>
+          <ul>
+            <li>{ts}<strong>Resolving "Pay Later" registrations:</strong> Participants whose status is changed from <em>Pending Pay Later</em> to <em>Registered</em> or <em>Attended</em> will receive a confirmation email and their payment status will be set to completed. If this is not you want to do, you can change their participant status by editing their event registration record directly.{/ts}</li>
+          {if $notifyingStatuses}
+            <li>{ts 1=$notifyingStatuses}<strong>Special statuses:</strong> Participants whose status is changed to any of the following will be automatically notified via email: %1{/ts}</li>
+          {/if}
+          </ul>
         </div>
-        {if $notifyingStatuses}
-          <div class="status">
-            {ts 1=$notifyingStatuses}Participants whose status is changed TO any of the following will be automatically notified via email: %1.{/ts}
-          </div>
-        {/if}
+      {/if}
     {else}
-        {ts}Update field values for each participant as needed. To set a field to the same value for ALL rows, enter that value for the first participation and then click the <strong>Copy icon</strong> (next to the column title).{/ts}
+      {if $statusProfile EQ 1} {* Update Participant Status in batch task *}
+        <div class="status">{$status}</div>
+      {/if}
+      {ts}Update field values for each participant as needed. To set a field to the same value for ALL rows, enter that value for the first participation and then click the
+        <strong>Copy icon</strong>
+        (next to the column title).{/ts}
     {/if}
     <p>{ts}Click <strong>Update Participant(s)</strong> below to save all your changes.{/ts}</p>
-</div>
+  </div>
         <table class="crm-copy-fields">
        <thead class="sticky">
             <tr class="columnheader">
@@ -65,7 +73,7 @@
               <td class="crm-event-title">{$details.$pid.title}</td>
               {foreach from=$fields item=field key=fieldName}
                 {assign var=n value=$field.name}
-                {if ( $fields.$n.data_type eq 'Date') or ( $n eq 'participant_register_date' ) }
+                {if ( $n eq 'participant_register_date' ) }
                    <td class="compressed">{include file="CRM/common/jcalendar.tpl" elementName=$n elementIndex=$pid batchUpdate=1}</td>
                 {else}
                   <td class="compressed">{$form.field.$pid.$n.html}</td>

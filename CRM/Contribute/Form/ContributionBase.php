@@ -197,6 +197,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
     // current contribution page id
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
+    $this->_ccid = CRM_Utils_Request::retrieve('ccid', 'Positive', $this);
     if (!$this->_id) {
       // seems like the session is corrupted and/or we lost the id trail
       // lets just bump this to a regular session error and redirect user to main page
@@ -291,6 +292,10 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       // check for is_monetary status
       $isMonetary = CRM_Utils_Array::value('is_monetary', $this->_values);
       $isPayLater = CRM_Utils_Array::value('is_pay_later', $this->_values);
+      if (!empty($this->_ccid) && $isPayLater) {
+        $isPayLater = FALSE;
+        $this->_values['is_pay_later'] = FALSE;
+      }
 
       if ($isMonetary &&
         (!$isPayLater || !empty($this->_values['payment_processor']))
@@ -467,14 +472,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * Assign the minimal set of variables to the template.
    */
   public function assignToTemplate() {
-    $name = CRM_Utils_Array::value('billing_first_name', $this->_params);
-    if (!empty($this->_params['billing_middle_name'])) {
-      $name .= " {$this->_params['billing_middle_name']}";
-    }
-    $name .= ' ' . CRM_Utils_Array::value('billing_last_name', $this->_params);
-    $name = trim($name);
-    $this->assign('billingName', $name);
-    $this->set('name', $name);
+    $this->set('name', $this->assignBillingName($this->_params));
 
     $this->assign('paymentProcessor', $this->_paymentProcessor);
     $vars = array(
@@ -526,22 +524,10 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       }
     }
 
-    // assign the address formatted up for display
-    $addressParts = array(
-      "street_address-{$this->_bltID}",
-      "city-{$this->_bltID}",
-      "postal_code-{$this->_bltID}",
-      "state_province-{$this->_bltID}",
-      "country-{$this->_bltID}",
-    );
-
-    $addressFields = array();
-    foreach ($addressParts as $part) {
-      list($n, $id) = explode('-', $part);
-      $addressFields[$n] = CRM_Utils_Array::value('billing_' . $part, $this->_params);
-    }
-
-    $this->assign('address', CRM_Utils_Address::format($addressFields));
+    $this->assign('address', CRM_Utils_Address::getFormattedBillingAddressFieldsFromParameters(
+      $this->_params,
+      $this->_bltID
+    ));
 
     if (!empty($this->_params['onbehalf_profile_id']) && !empty($this->_params['onbehalf'])) {
       $this->assign('onBehalfName', $this->_params['organization_name']);
@@ -573,11 +559,11 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
         $this->assign('bank_account_number', $this->_params['bank_account_number']);
       }
       else {
-        $date = CRM_Utils_Date::format(CRM_Utils_array::value('credit_card_exp_date', $this->_params));
+        $date = CRM_Utils_Date::format(CRM_Utils_Array::value('credit_card_exp_date', $this->_params));
         $date = CRM_Utils_Date::mysqlToIso($date);
         $this->assign('credit_card_exp_date', $date);
         $this->assign('credit_card_number',
-          CRM_Utils_System::mungeCreditCard(CRM_Utils_array::value('credit_card_number', $this->_params))
+          CRM_Utils_System::mungeCreditCard(CRM_Utils_Array::value('credit_card_number', $this->_params))
         );
       }
     }
@@ -622,17 +608,9 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
         'financial_type' => 1,
       );
 
-      $fields = NULL;
-      if ($contactID && CRM_Core_BAO_UFGroup::filterUFGroups($id, $contactID)) {
-        $fields = CRM_Core_BAO_UFGroup::getFields($id, FALSE, CRM_Core_Action::ADD, NULL, NULL, FALSE,
-          NULL, FALSE, NULL, CRM_Core_Permission::CREATE, NULL
-        );
-      }
-      else {
-        $fields = CRM_Core_BAO_UFGroup::getFields($id, FALSE, CRM_Core_Action::ADD, NULL, NULL, FALSE,
-          NULL, FALSE, NULL, CRM_Core_Permission::CREATE, NULL
-        );
-      }
+      $fields = CRM_Core_BAO_UFGroup::getFields($id, FALSE, CRM_Core_Action::ADD, NULL, NULL, FALSE,
+        NULL, FALSE, NULL, CRM_Core_Permission::CREATE, NULL
+      );
 
       if ($fields) {
         // unset any email-* fields since we already collect it, CRM-2888
@@ -647,19 +625,40 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
           CRM_Core_Session::setStatus(ts('Some of the profile fields cannot be configured for this page.'), ts('Warning'), 'alert');
         }
 
-        $fields = array_diff_assoc($fields, $this->_fields);
+        //remove common fields only if profile is not configured for onbehalf/honor
+        if (!in_array($profileContactType, array('honor', 'onbehalf'))) {
+          $fields = array_diff_assoc($fields, $this->_fields);
+        }
 
         CRM_Core_BAO_Address::checkContactSharedAddressFields($fields, $contactID);
         $addCaptcha = FALSE;
+        // fetch file preview when not submitted yet, like in online contribution Confirm and ThankYou page
+        $viewOnlyFileValues = empty($profileContactType) ? array() : array($profileContactType => array());
         foreach ($fields as $key => $field) {
           if ($viewOnly &&
             isset($field['data_type']) &&
             $field['data_type'] == 'File' || ($viewOnly && $field['name'] == 'image_URL')
           ) {
-            // ignore file upload fields
-            continue;
-          }
+            //retrieve file value from submitted values on basis of $profileContactType
+            $fileValue = CRM_Utils_Array::value($key, $this->_params);
+            if (!empty($profileContactType) && !empty($this->_params[$profileContactType])) {
+              $fileValue = CRM_Utils_Array::value($key, $this->_params[$profileContactType]);
+            }
 
+            if ($fileValue) {
+              $path = CRM_Utils_Array::value('name', $fileValue);
+              $fileType = CRM_Utils_Array::value('type', $fileValue);
+              $fileValue = CRM_Utils_File::getFileURL($path, $fileType);
+            }
+
+            // format custom file value fetched from submitted value
+            if ($profileContactType) {
+              $viewOnlyFileValues[$profileContactType][$key] = $fileValue;
+            }
+            else {
+              $viewOnlyFileValues[$key] = $fileValue;
+            }
+          }
           if ($profileContactType) {
             //Since we are showing honoree name separately so we are removing it from honoree profile just for display
             if ($profileContactType == 'honor') {
@@ -708,6 +707,13 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
         }
 
         $this->assign($name, $fields);
+
+        if ($profileContactType && count($viewOnlyFileValues[$profileContactType])) {
+          $this->assign('viewOnlyPrefixFileValues', $viewOnlyFileValues);
+        }
+        elseif (count($viewOnlyFileValues)) {
+          $this->assign('viewOnlyFileValues', $viewOnlyFileValues);
+        }
 
         if ($addCaptcha && !$viewOnly) {
           $captcha = CRM_Utils_ReCAPTCHA::singleton();

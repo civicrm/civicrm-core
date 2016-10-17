@@ -39,7 +39,7 @@ class CRM_Pledge_BAO_PledgeTest extends CiviUnitTestCase {
    */
   protected function setUp() {
     parent::setUp();
-    $this->_contactId = Contact::createIndividual();
+    $this->_contactId = $this->individualCreate();
   }
 
   /**
@@ -127,6 +127,34 @@ class CRM_Pledge_BAO_PledgeTest extends CiviUnitTestCase {
     $pledgeId = CRM_Pledge_BAO_Pledge::retrieve($pledgeParams, $defaults);
 
     $this->assertEquals(count($pledgeId), 1, "Pledge was retrieved");
+  }
+
+  /**
+   *  Test build recur params.
+   */
+  public function testGetPledgeStartDate() {
+    $startDate = json_encode(array('calendar_month' => 6));
+
+    $params = array(
+      'pledge_start_date' => $startDate,
+      'is_pledge_start_date_editable' => TRUE,
+      'is_pledge_start_date_visible' => TRUE,
+    );
+
+    // Try with relative date
+    $date = CRM_Pledge_BAO_Pledge::getPledgeStartDate(6, $params);
+    $paymentDate = CRM_Pledge_BAO_Pledge::getPaymentDate(6);
+
+    $this->assertEquals(date('m/d/Y', strtotime($date)), $paymentDate, "The two dates do not match");
+
+    // Try with fixed date
+    $params = array(
+      'pledge_start_date' => json_encode(array('contribution_date' => '2016-06-10')),
+      'is_pledge_start_date_visible' => FALSE,
+    );
+
+    $date = CRM_Pledge_BAO_Pledge::getPledgeStartDate($date, $params);
+    $this->assertEquals($date, '20160610', "The two dates do not match");
   }
 
 }

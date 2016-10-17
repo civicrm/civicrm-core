@@ -518,26 +518,29 @@ if (!CRM.vars) CRM.vars = {};
       else {
         selectParams.formatInputTooShort = function() {
           var txt = $el.data('select-params').formatInputTooShort || $.fn.select2.defaults.formatInputTooShort.call(this);
-          txt += renderEntityRefFilters($el) + renderEntityRefCreateLinks($el);
+          txt += entityRefFiltersMarkup($el) + renderEntityRefCreateLinks($el);
           return txt;
         };
         selectParams.formatNoMatches = function() {
           var txt = $el.data('select-params').formatNoMatches || $.fn.select2.defaults.formatNoMatches;
-          txt += renderEntityRefFilters($el) + renderEntityRefCreateLinks($el);
+          txt += entityRefFiltersMarkup($el) + renderEntityRefCreateLinks($el);
           return txt;
         };
         $el.on('select2-open.crmEntity', function() {
           var $el = $(this);
-          loadEntityRefFilterOptions($el);
+          renderEntityRefFilterValue($el);
           $('#select2-drop')
             .off('.crmEntity')
             .on('click.crmEntity', 'a.crm-add-entity', function(e) {
+              var extra = $el.data('api-params').extra,
+                formUrl = $(this).attr('href') + '&returnExtra=display_name,sort_name' + (extra ? (',' + extra) : '');
               $el.select2('close');
-              CRM.loadForm($(this).attr('href'), {
+              CRM.loadForm(formUrl, {
                 dialog: {width: 500, height: 220}
               }).on('crmFormSuccess', function(e, data) {
                 if (data.status === 'success' && data.id) {
-                  CRM.status(ts('%1 Created', {1: data.label}));
+                  data.label = data.extra.sort_name;
+                  CRM.status(ts('%1 Created', {1: data.extra.display_name}));
                   if ($el.select2('container').hasClass('select2-container-multi')) {
                     var selection = $el.select2('data');
                     selection.push(data);
@@ -549,7 +552,7 @@ if (!CRM.vars) CRM.vars = {};
               });
               return false;
             })
-            .on('change.crmEntity', 'select.crm-entityref-filter-value', function() {
+            .on('change.crmEntity', '.crm-entityref-filter-value', function() {
               var filter = $el.data('user-filter') || {};
               filter.value = $(this).val();
               $(this).toggleClass('active', !!filter.value);
@@ -566,7 +569,8 @@ if (!CRM.vars) CRM.vars = {};
               var filter = {key: $(this).val()};
               $(this).toggleClass('active', !!filter.key);
               $el.data('user-filter', filter);
-              loadEntityRefFilterOptions($el);
+              renderEntityRefFilterValue($el);
+              $('.crm-entityref-filter-key', '#select2-drop').focus();
             });
         });
       }
@@ -655,12 +659,15 @@ if (!CRM.vars) CRM.vars = {};
         $dateField = $('<input type="' + type + '">').insertAfter($dataField);
         copyAttributes($dataField, $dateField, ['placeholder', 'style', 'class', 'disabled']);
         $dateField.addClass('crm-form-' + type);
-        settings.minDate = settings.minDate ? CRM.utils.makeDate(settings.minDate) : null;
-        settings.maxDate = settings.maxDate ? CRM.utils.makeDate(settings.maxDate) : null;
         if (hasDatepicker) {
+          settings.minDate = settings.minDate ? CRM.utils.makeDate(settings.minDate) : null;
+          settings.maxDate = settings.maxDate ? CRM.utils.makeDate(settings.maxDate) : null;
           settings.dateFormat = typeof settings.date === 'string' ? settings.date : CRM.config.dateInputFormat;
           settings.changeMonth = _.includes(settings.dateFormat, 'm');
           settings.changeYear = _.includes(settings.dateFormat, 'y');
+          if (!settings.yearRange && settings.minDate !== null && settings.maxDate !== null) {
+            settings.yearRange = '' + CRM.utils.formatDate(settings.minDate, 'yy') + ':' + CRM.utils.formatDate(settings.maxDate, 'yy');
+          }
           $dateField.addClass('crm-form-date').datepicker(settings);
         } else {
           $dateField.attr('min', settings.minDate ? CRM.utils.formatDate(settings.minDate, 'yy') : '1000');
@@ -728,14 +735,27 @@ if (!CRM.vars) CRM.vars = {};
   };
 
   $.fn.crmAjaxTable = function() {
+    // Strip the ids from ajax urls to make pageLength storage more generic
+    function simplifyUrl(ajax) {
+      // Datatables ajax prop could be a url string or an object containing the url
+      var url = typeof ajax === 'object' ? ajax.url : ajax;
+      return typeof url === 'string' ? url.replace(/[&?]\w*id=\d+/g, '') : null;
+    }
+
     return $(this).each(function() {
-      //Declare the defaults for DataTables
+      // Recall pageLength for this table
+      var url = simplifyUrl($(this).data('ajax'));
+      if (url && window.localStorage && localStorage['dataTablePageLength:' + url]) {
+        $(this).data('pageLength', localStorage['dataTablePageLength:' + url]);
+      }
+      // Declare the defaults for DataTables
       var defaults = {
         "processing": true,
         "serverSide": true,
         "aaSorting": [],
         "dom": '<"crm-datatable-pager-top"lfp>rt<"crm-datatable-pager-bottom"ip>',
         "pageLength": 25,
+        "pagingType": "full_numbers",
         "drawCallback": function(settings) {
           //Add data attributes to cells
           $('thead th', settings.nTable).each( function( index ) {
@@ -755,6 +775,12 @@ if (!CRM.vars) CRM.vars = {};
       };
       //Include any table specific data
       var settings = $.extend(true, defaults, $(this).data('table'));
+      // Remember pageLength
+      $(this).on('length.dt', function(e, settings, len) {
+        if (settings.ajax && window.localStorage) {
+          localStorage['dataTablePageLength:' + simplifyUrl(settings.ajax)] = len;
+        }
+      });
       //Make the DataTables call
       $(this).DataTable(settings);
     });
@@ -819,24 +845,27 @@ if (!CRM.vars) CRM.vars = {};
     var
       entity = $el.data('api-entity').toLowerCase(),
       filters = $.extend([], CRM.config.entityRef.filters[entity] || []),
-      filter = $el.data('user-filter') || {},
       params = $.extend({params: {}}, $el.data('api-params') || {}).params,
       result = [];
     $.each(filters, function() {
-      if (typeof params[this.key] === 'undefined') {
-        result.push(this);
+      var filter = $.extend({type: 'select', 'attributes': {}, entity: entity}, this);
+      if (typeof params[filter.key] === 'undefined') {
+        result.push(filter);
       }
-      else if (this.key == 'contact_type' && typeof params.contact_sub_type === 'undefined') {
-        this.options = _.remove(this.options, function(option) {
+      else if (filter.key == 'contact_type' && typeof params.contact_sub_type === 'undefined') {
+        filter.options = _.remove(filter.options, function(option) {
           return option.key.indexOf(params.contact_type + '__') === 0;
         });
-        result.push(this);
+        result.push(filter);
       }
     });
     return result;
   }
 
-  function renderEntityRefFilters($el) {
+  /**
+   * Provide markup for entity ref filters
+   */
+  function entityRefFiltersMarkup($el) {
     var
       filters = getEntityRefFilters($el),
       filter = $el.data('user-filter') || {},
@@ -848,48 +877,77 @@ if (!CRM.vars) CRM.vars = {};
       '<select class="crm-entityref-filter-key' + (filter.key ? ' active' : '') + '">' +
       '<option value="">' + ts('Refine search...') + '</option>' +
       CRM.utils.renderOptions(filters, filter.key) +
-      '</select> &nbsp; ' +
-      '<select class="crm-entityref-filter-value' + (filter.key ? ' active"' : '"') + (filter.key ? '' : ' style="display:none;"') + '>' +
-      '<option value="">' + ts('- select -') + '</option>';
-    if (filterSpec && filterSpec.options) {
-      markup += CRM.utils.renderOptions(filterSpec.options, filter.value);
-    }
-    markup += '</select></div>';
+      '</select>' + entityRefFilterValueMarkup(filter, filterSpec) + '</div>';
     return markup;
   }
 
   /**
-   * Fetch options for a filter (via ajax if necessary) and populate the appropriate select list
-   * @param $el
+   * Provide markup for entity ref filter value field
    */
-  function loadEntityRefFilterOptions($el) {
-    var
-      filters = getEntityRefFilters($el),
-      filter = $el.data('user-filter') || {},
-      filterSpec = filter.key ? _.find(filters, {key: filter.key}) : null,
-      $valField = $('.crm-entityref-filter-value', '#select2-drop');
+  function entityRefFilterValueMarkup(filter, filterSpec) {
+    var markup = '';
     if (filterSpec) {
-      $valField.show().val('');
-      if (filterSpec.options) {
-        CRM.utils.setOptions($valField, filterSpec.options, false, filter.value);
+      var attrs = '',
+        attributes = _.cloneDeep(filterSpec.attributes);
+      if (filterSpec.type !== 'select') {
+        attributes.type = filterSpec.type;
+        attributes.value = typeof filter.value !== 'undefined' ? filter.value : '';
+      }
+      attributes.class = 'crm-entityref-filter-value' + (filter.value ? ' active' : '');
+      $.each(attributes, function (attr, val) {
+        attrs += ' ' + attr + '="' + val + '"';
+      });
+      if (filterSpec.type === 'select') {
+        markup = '<select' + attrs + '><option value="">' + ts('- select -') + '</option>';
+        if (filterSpec.options) {
+          markup += CRM.utils.renderOptions(filterSpec.options, filter.value);
+        }
+        markup += '</select>';
       } else {
-        $valField.prop('disabled', true);
-        // Fieldname may be prefixed with joins - strip those out
-        var fieldName = _.last(filter.key.split('.'));
-        CRM.api3(filterSpec.entity || $el.data('api-entity'), 'getoptions', {field: fieldName, context: 'search', sequential: 1})
-          .done(function(result) {
-            var entity = $el.data('api-entity').toLowerCase(),
-              globalFilterSpec = _.find(CRM.config.entityRef.filters[entity], {key: filter.key}) || {};
-            // Store options globally so we don't have to look them up again
-            globalFilterSpec.options = result.values;
-            $valField.prop('disabled', false);
-            CRM.utils.setOptions($valField, result.values);
-            $valField.val(filter.value || '');
-          });
+        markup = '<input' + attrs + '/>';
+      }
+    }
+    return markup;
+  }
+
+  /**
+   * Render the entity ref filter value field
+   */
+  function renderEntityRefFilterValue($el) {
+    var
+      filter = $el.data('user-filter') || {},
+      filterSpec = filter.key ? _.find(getEntityRefFilters($el), {key: filter.key}) : null,
+      $keyField = $('.crm-entityref-filter-key', '#select2-drop'),
+      $valField = null;
+    if (filterSpec) {
+      $('.crm-entityref-filter-value', '#select2-drop').remove();
+      $valField = $(entityRefFilterValueMarkup(filter, filterSpec));
+      $keyField.after($valField);
+      if (filterSpec.type === 'select' && !filterSpec.options) {
+        loadEntityRefFilterOptions(filter, filterSpec, $valField, $el);
       }
     } else {
-      $valField.hide().val('').change();
+      $('.crm-entityref-filter-value', '#select2-drop').hide().val('').change();
     }
+  }
+
+  /**
+   * Fetch options for a filter via ajax api
+   */
+  function loadEntityRefFilterOptions(filter, filterSpec, $valField, $el) {
+    $valField.prop('disabled', true);
+    // Fieldname may be prefixed with joins - strip those out
+    var fieldName = _.last(filter.key.split('.'));
+    CRM.api3(filterSpec.entity, 'getoptions', {field: fieldName, context: 'search', sequential: 1})
+      .done(function(result) {
+        var entity = $el.data('api-entity').toLowerCase(),
+          globalFilterSpec = _.find(CRM.config.entityRef.filters[entity], {key: filter.key}) || {};
+        // Store options globally so we don't have to look them up again
+        globalFilterSpec.options = result.values;
+        $valField.prop('disabled', false);
+        CRM.utils.setOptions($valField, result.values);
+        $valField.val(filter.value || '');
+      });
   }
 
   //CRM-15598 - Override url validator method to allow relative url's (e.g. /index.htm)

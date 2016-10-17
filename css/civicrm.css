@@ -838,7 +838,7 @@ input.crm-form-entityref {
 }
 
 #crm-container .crm-flashchart {
-  overflow: scroll;
+  overflow: auto;
 }
 
 #crm-container td.enclosingNested {
@@ -3024,18 +3024,27 @@ div.m ul#civicrm-menu,
 .select2-drop .crm-entityref-filters {
   margin-top: 4px;
 }
-.select2-drop .crm-entityref-filters select {
+.select2-drop .crm-entityref-filters select,
+.select2-drop .crm-entityref-filters input {
   border-radius: 3px;
   border: 1px solid #f2f2f2;
   background-color: #f6f6f6;
   color: #494949;
   font-size: 11px;
-  max-width: 70%;
+  max-width: 60%;
 }
 .select2-drop .crm-entityref-filters select:hover,
 .select2-drop .crm-entityref-filters select:focus,
-.select2-drop .crm-entityref-filters select.active {
+.select2-drop .crm-entityref-filters select.active,
+.select2-drop .crm-entityref-filters input {
   border: 1px solid #808080;
+}
+.select2-drop .crm-entityref-filter-value {
+  margin-left: 1em;
+}
+.select2-drop .crm-entityref-filters input {
+  padding-left: .5em;
+  background-color: #fefefe;
 }
 /* Style autocomplete results */
 .crm-container .select2-results {
@@ -3261,7 +3270,6 @@ div.m ul#civicrm-menu,
 
 /* in place edit  */
 .crm-container .crm-editable-enabled {
-  white-space: nowrap;
   padding-left: 2px;
   border: 2px dashed transparent;
 }
@@ -3330,6 +3338,7 @@ div.m ul#civicrm-menu,
   text-align: center;
   height: 23px;
   width: 32px;
+  z-index: 1;
 }
 
 .crm-editable-form button[type=cancel] {
@@ -3536,7 +3545,6 @@ span.crm-status-icon {
 }
 .crm-container.crm-public .select2-container .select2-choice {
   padding: 5px 5px 5px 8px;
-  height: auto;
 }
 .crm-container.crm-public .select2-container-multi .select2-choices {
   padding: 4px;

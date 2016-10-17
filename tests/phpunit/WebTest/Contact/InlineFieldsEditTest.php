@@ -67,15 +67,12 @@ class WebTest_Contact_InlineFieldsEditTest extends CiviSeleniumTestCase {
 
     // Custom data
     $this->click('css=div.crm-custom-set-block-1 .collapsible-title');
-    // Because it tends to cause problems, all uses of sleep() must be justified in comments
-    // NOTE: Sleep should never be used for wait for anything to load from the server
-    // Justification for this instance: opening an accordion is predictable
-    sleep(1);
+    $this->waitForAjaxContent();
     $this->openInlineForm('custom-set-content-1');
-    $dateFieldId = $this->getAttribute("xpath=//div[@class='crm-accordion-body']/table/tbody/tr[3]/td[@class='html-adjust']/input@id");
+    $dateFieldId = $this->getAttribute("xpath=//table[@class='form-layout-compressed']/tbody/tr[3]/td[@class='html-adjust']/span/input@id");
     $this->inlineEdit('custom-set-content-1', array(
       'CIVICRM_QFID_Edu_2' => 1,
-      "//div[@class='crm-accordion-body']/table/tbody/tr[2]/td[@class='html-adjust']/select" => array('Single'),
+      "//table[@class='form-layout-compressed']/tbody/tr[2]/td[@class='html-adjust']/select" => array('Single'),
       $dateFieldId => 'date: now - 10 years',
     ));
 
@@ -312,7 +309,7 @@ class WebTest_Contact_InlineFieldsEditTest extends CiviSeleniumTestCase {
             case 'string':
               if ($val && substr($val, 0, 5) == 'date:') {
                 $val = date('m/d/Y', strtotime(trim(substr($val, 5))));
-                $item = "xpath=//input[starts-with(@id, '{$item}_display_')]";
+                $item = "xpath=//input[@id='{$item}']/following-sibling::input";
               }
               if ($val) {
                 $this->assertElementValueEquals($item, $val);

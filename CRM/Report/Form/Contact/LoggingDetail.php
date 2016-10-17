@@ -36,23 +36,10 @@ class CRM_Report_Form_Contact_LoggingDetail extends CRM_Logging_ReportDetail {
   /**
    */
   public function __construct() {
-    $logging = new CRM_Logging_Schema();
-    $this->tables[] = 'civicrm_contact';
-    $this->tables = array_merge($this->tables, array_keys($logging->customDataLogTables()));
-    $this->tables[] = 'civicrm_email';
-    $this->tables[] = 'civicrm_phone';
-    $this->tables[] = 'civicrm_im';
-    $this->tables[] = 'civicrm_openid';
-    $this->tables[] = 'civicrm_website';
-    $this->tables[] = 'civicrm_address';
-    $this->tables[] = 'civicrm_note';
-    $this->tables[] = 'civicrm_relationship';
-    $this->tables[] = 'civicrm_activity';
-    $this->tables[] = 'civicrm_case';
-
-    // allow tables to be extended by report hook query objects
-    CRM_Report_BAO_Hook::singleton()->alterLogTables($this, $this->tables);
-
+    $this->log_conn_id = CRM_Utils_Request::retrieve('log_conn_id', 'String');
+    $this->log_date = CRM_Utils_Request::retrieve('log_date', 'String');
+    $this->setTablesToContactRelatedTables();
+    $this->calculateContactDiffs();
     $this->detail = 'logging/contact/detail';
     $this->summary = 'logging/contact/summary';
 

@@ -98,16 +98,16 @@
     <thead>
       <tr class="columnheader">
         <th data-data="is_selected_input" class="crm-dedupe-selection"><input type="checkbox" value="0" name="pnid_all" class="crm-dedupe-select-all"></th>
-        <th data-data="src_image"    class="crm-empty">&nbsp;</th>
-        <th data-data="src"          class="crm-contact">{ts}Contact{/ts} 1</th>
         <th data-data="dst_image"    class="crm-empty">&nbsp;</th>
-        <th data-data="dst"          class="crm-contact-duplicate">{ts}Contact{/ts} 2 ({ts}Duplicate{/ts})</th>
-        <th data-data="src_email"    class="crm-contact">{ts}Email{/ts} 1</th>
-        <th data-data="dst_email"    class="crm-contact-duplicate">{ts}Email{/ts} 2 ({ts}Duplicate{/ts})</th>
-        <th data-data="src_street"   class="crm-contact">{ts}Street Address{/ts} 1</th>
-        <th data-data="dst_street"   class="crm-contact-duplicate">{ts}Street Address{/ts} 2 ({ts}Duplicate{/ts})</th>
-        <th data-data="src_postcode" class="crm-contact">{ts}Postcode{/ts} 1</th>
-        <th data-data="dst_postcode" class="crm-contact-duplicate">{ts}Postcode{/ts} 2 ({ts}Duplicate{/ts})</th>
+        <th data-data="dst"          class="crm-contact">{ts}Contact{/ts} 1</th>
+        <th data-data="src_image"    class="crm-empty">&nbsp;</th>
+        <th data-data="src"          class="crm-contact-duplicate">{ts}Contact{/ts} 2 ({ts}Duplicate{/ts})</th>
+        <th data-data="dst_email"    class="crm-contact">{ts}Email{/ts} 1</th>
+        <th data-data="src_email"    class="crm-contact-duplicate">{ts}Email{/ts} 2 ({ts}Duplicate{/ts})</th>
+        <th data-data="dst_street"   class="crm-contact">{ts}Street Address{/ts} 1</th>
+        <th data-data="src_street"   class="crm-contact-duplicate">{ts}Street Address{/ts} 2 ({ts}Duplicate{/ts})</th>
+        <th data-data="dst_postcode" class="crm-contact">{ts}Postcode{/ts} 1</th>
+        <th data-data="src_postcode" class="crm-contact-duplicate">{ts}Postcode{/ts} 2 ({ts}Duplicate{/ts})</th>
         <th data-data="conflicts"    class="crm-contact-conflicts">{ts}Conflicts{/ts}</th>
         <th data-data="weight"       class="crm-threshold">{ts}Threshold{/ts}</th>
         <th data-data="actions"      class="crm-empty">&nbsp;</th>
@@ -137,50 +137,26 @@
 {if $context eq 'search'}
    {crmButton href=$backURL icon="times"}{ts}Done{/ts}{/crmButton}
 {elseif $context eq 'conflicts'}
-   {if call_user_func(array('CRM_Core_Permission','check'), 'force merge duplicate contacts')}
-     {if $gid}
-       {capture assign=backURL}{crmURL p="civicrm/contact/dedupemerge" q="reset=1&rgid=`$rgid`&gid=`$gid`&action=map&mode=aggressive" a=1}{/capture}
-     {else}
-       {capture assign=backURL}{crmURL p="civicrm/contact/dedupemerge" q="reset=1&rgid=`$rgid`&action=map&mode=aggressive" a=1}{/capture}
-     {/if}
+  {if call_user_func(array('CRM_Core_Permission','check'), 'force merge duplicate contacts')}
+     {capture assign=backURL}{crmURL p="civicrm/contact/dedupemerge" q="`$urlQuery`&action=map&mode=aggressive" a=1}{/capture}
      <a href="{$backURL}" title="{ts}Force Merge Selected Duplicates{/ts}" onclick="return confirm('{ts escape="js"}This will run the batch merge process on the selected duplicates. The operation will run in force merge mode - all selected duplicates will be merged into main contacts even in case of any conflicts. Click OK to proceed if you are sure you wish to run this operation.{/ts}');" class="button"><span><i class="crm-i fa-bolt"></i> {ts}Force Merge Selected Duplicates{/ts}</span></a>
 
-     {if $gid}
-       {capture assign=backURL}{crmURL p="civicrm/contact/dedupemerge" q="reset=1&rgid=`$rgid`&gid=`$gid`&action=map" a=1}{/capture}
-     {else}
-       {capture assign=backURL}{crmURL p="civicrm/contact/dedupemerge" q="reset=1&rgid=`$rgid`&action=map" a=1}{/capture}
-     {/if}
+     {capture assign=backURL}{crmURL p="civicrm/contact/dedupemerge" q="`$urlQuery`&action=map" a=1}{/capture}
      <a href="{$backURL}" title="{ts}Safe Merge Selected Duplicates{/ts}" onclick="return confirm('{ts escape="js"}This will run the batch merge process on the selected duplicates. The operation will run in safe mode - only records with no direct data conflicts will be merged. Click OK to proceed if you are sure you wish to run this operation.{/ts}');" class="button"><span><i class="crm-i fa-compress"></i> {ts}Safe Merge Selected Duplicates{/ts}</span></a>
-   {/if}
+  {/if}
 
-   {if $gid}
-      {capture assign=backURL}{crmURL p="civicrm/contact/dedupefind" q="reset=1&action=update&rgid=`$rgid`&gid=`$gid`" a=1}{/capture}
-   {else}
-      {capture assign=backURL}{crmURL p="civicrm/contact/dedupefind" q="reset=1&action=update&rgid=`$rgid`" a=1}{/capture}
-   {/if}
+  {capture assign=backURL}{crmURL p="civicrm/contact/dedupefind" q="`$urlQuery`&action=update" a=1}{/capture}
    <a href="{$backURL}" title="{ts}List All Duplicates{/ts}" class="button"><span><i class="crm-i fa-refresh"></i> {ts}List All Duplicates{/ts}</span></a>
 {else}
-   {if $gid}
-      {capture assign=backURL}{crmURL p="civicrm/contact/dedupefind" q="reset=1&rgid=`$rgid`&gid=`$gid`&action=renew" a=1}{/capture}
-   {else}
-      {capture assign=backURL}{crmURL p="civicrm/contact/dedupefind" q="reset=1&rgid=`$rgid`&action=renew" a=1}{/capture}
-   {/if}
+   {capture assign=backURL}{crmURL p="civicrm/contact/dedupefind" q="`$urlQuery`&action=renew" a=1}{/capture}
    <a href="{$backURL}" title="{ts}Refresh List of Duplicates{/ts}" onclick="return confirm('{ts escape="js"}This will refresh the duplicates list. Click OK to proceed.{/ts}');" class="button">
      <span><i class="crm-i fa-refresh"></i> {ts}Refresh Duplicates{/ts}</span>
    </a>
 
-   {if $gid}
-      {capture assign=backURL}{crmURL p="civicrm/contact/dedupemerge" q="reset=1&rgid=`$rgid`&gid=`$gid`&action=map" a=1}{/capture}
-   {else}
-      {capture assign=backURL}{crmURL p="civicrm/contact/dedupemerge" q="reset=1&rgid=`$rgid`&action=map" a=1}{/capture}
-   {/if}
+  {capture assign=backURL}{crmURL p="civicrm/contact/dedupemerge" q="`$urlQuery`&action=map" a=1}{/capture}
    <a href="{$backURL}" title="{ts}Batch Merge Duplicate Contacts{/ts}" onclick="return confirm('{ts escape="js"}This will run the batch merge process on the selected duplicates. The operation will run in safe mode - only records with no direct data conflicts will be merged. Click OK to proceed if you are sure you wish to run this operation.{/ts}');" class="button"><span><i class="crm-i fa-compress"></i> {ts}Batch Merge Selected Duplicates{/ts}</span></a>
 
-   {if $gid}
-      {capture assign=backURL}{crmURL p="civicrm/contact/dedupemerge" q="reset=1&rgid=`$rgid`&gid=`$gid`" a=1}{/capture}
-   {else}
-      {capture assign=backURL}{crmURL p="civicrm/contact/dedupemerge" q="reset=1&rgid=`$rgid`" a=1}{/capture}
-   {/if}
+   {capture assign=backURL}{crmURL p="civicrm/contact/dedupemerge" q=$urlQuery a=1}{/capture}
    <a href="{$backURL}" title="{ts}Batch Merge Duplicate Contacts{/ts}" onclick="return confirm('{ts escape="js"}This will run the batch merge process on the listed duplicates. The operation will run in safe mode - only records with no direct data conflicts will be merged. Click OK to proceed if you are sure you wish to run this operation.{/ts}');" class="button"><span><i class="crm-i fa-compress"></i> {ts}Batch Merge All Duplicates{/ts}</span></a>
 
    <a href='#' title="{ts}Flip Selected Duplicates{/ts}" class="crm-dedupe-flip-selections button"><span><i class="crm-i fa-exchange"></i> {ts}Flip Selected Duplicates{/ts}</span></a>

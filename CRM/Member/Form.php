@@ -431,25 +431,6 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
   }
 
   /**
-   * Assign billing name to the template.
-   */
-  protected function assignBillingName() {
-    $name = '';
-    if (!empty($this->_params['billing_first_name'])) {
-      $name = $this->_params['billing_first_name'];
-    }
-
-    if (!empty($this->_params['billing_middle_name'])) {
-      $name .= " {$this->_params['billing_middle_name']}";
-    }
-
-    if (!empty($this->_params['billing_last_name'])) {
-      $name .= " {$this->_params['billing_last_name']}";
-    }
-    $this->assign('billingName', $name);
-  }
-
-  /**
    * Wrapper function for unit tests.
    *
    * @param array $formValues

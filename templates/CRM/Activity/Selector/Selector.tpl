@@ -39,7 +39,7 @@
       </div>
     </div><!-- /.crm-accordion-body -->
   </div><!-- /.crm-accordion-wrapper -->
-  <table class="contact-activity-selector-{$context} crm-ajax-table" data-order='[[5,"asc"]]'>
+  <table class="contact-activity-selector-{$context} crm-ajax-table">
     <thead>
     <tr>
       <th data-data="activity_type" class="crm-contact-activity-activity_type">{ts}Type{/ts}</th>
@@ -62,14 +62,14 @@
           "ajax": {
             "url": {/literal}'{crmURL p="civicrm/ajax/contactactivity" h=0 q="snippet=4&context=$context&cid=$contactId"}'{literal},
             "data": function (d) {
-              d.activity_type_id = $('.crm-activity-selector-activity select#activity_type_filter_id').val(),
-              d.activity_type_exclude_id = $('.crm-activity-selector-activity select#activity_type_exclude_filter_id').val()
+              d.activity_type_id = $('.crm-activity-selector-' + context + ' select#activity_type_filter_id').val(),
+              d.activity_type_exclude_id = $('.crm-activity-selector-' + context + ' select#activity_type_exclude_filter_id').val()
             }
           }
         });
         $(function($) {
           $('.activity-search-options :input').change(function(){
-            CRM.$('.contact-activity-selector-activity').DataTable().draw();
+            CRM.$('table.contact-activity-selector-' + context).DataTable().draw();
           });
         });
       })(CRM.$);

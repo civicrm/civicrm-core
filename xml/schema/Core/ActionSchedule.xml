@@ -82,7 +82,7 @@
   <field>
     <name>start_action_condition</name>
     <type>varchar</type>
-    <length>32</length>
+    <length>64</length>
     <comment>Reminder Action</comment>
     <add>3.4</add>
   </field>

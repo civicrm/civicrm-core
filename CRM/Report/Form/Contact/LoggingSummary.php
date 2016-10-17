@@ -53,6 +53,11 @@ class CRM_Report_Form_Contact_LoggingSummary extends CRM_Logging_ReportSummary {
             'no_display' => TRUE,
             'required' => TRUE,
           ),
+          'log_grouping' => array(
+            'required' => TRUE,
+            'title' => ts('Extra information to control grouping'),
+            'no_display' => TRUE,
+          ),
           'log_action' => array(
             'default' => TRUE,
             'title' => ts('Action'),
@@ -174,6 +179,14 @@ class CRM_Report_Form_Contact_LoggingSummary extends CRM_Logging_ReportSummary {
     $newRows = array();
 
     foreach ($rows as $key => &$row) {
+      $isMerge = 0;
+      $baseQueryCriteria = "reset=1&log_conn_id={$row['log_civicrm_entity_log_conn_id']}";
+      if (!CRM_Logging_Differ::checkLogCanBeUsedWithNoLogDate($row['log_civicrm_entity_log_date'])) {
+        $baseQueryCriteria .= '&log_date=' . CRM_Utils_Date::isoToMysql($row['log_civicrm_entity_log_date']);
+      }
+      if ($this->cid) {
+        $baseQueryCriteria .= '&cid=' . $this->cid;
+      }
       if (!isset($isDeleted[$row['log_civicrm_entity_altered_contact_id']])) {
         $isDeleted[$row['log_civicrm_entity_altered_contact_id']] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
           $row['log_civicrm_entity_altered_contact_id'], 'is_deleted') !== '0';
@@ -189,6 +202,24 @@ class CRM_Report_Form_Contact_LoggingSummary extends CRM_Logging_ReportSummary {
         if ($entity) {
           $row['log_civicrm_entity_altered_contact'] = $row['log_civicrm_entity_altered_contact'] . " [{$entity}]";
         }
+        if ($entity == 'Contact Merged') {
+          // We're looking at a merge activity created against the surviving
+          // contact record. There should be a single activity created against
+          // the deleted contact record, with this activity as parent.
+          $deletedID = CRM_Core_DAO::singleValueQuery('
+            SELECT GROUP_CONCAT(contact_id) FROM civicrm_activity_contact ac
+            INNER JOIN civicrm_activity a
+            ON a.id = ac.activity_id AND a.parent_id = ' . $row['log_civicrm_entity_id'] . ' AND ac.record_type_id =
+            ' . CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_ActivityContact', 'record_type_id', 'Activity Targets')
+          );
+          if ($deletedID && !stristr($deletedID, ',')) {
+            $baseQueryCriteria .= '&oid=' . $deletedID;
+          }
+          $row['log_civicrm_entity_log_action'] = ts('Contact Merge');
+          $row = $this->addDetailReportLinksToRow($baseQueryCriteria, $row);
+          $isMerge = 1;
+        }
+
       }
       $row['altered_by_contact_display_name_link'] = CRM_Utils_System::url('civicrm/contact/view', 'reset=1&cid=' . $row['log_civicrm_entity_log_user_id']);
       $row['altered_by_contact_display_name_hover'] = ts("Go to contact summary");
@@ -198,11 +229,14 @@ class CRM_Report_Form_Contact_LoggingSummary extends CRM_Logging_ReportSummary {
       }
 
       if ('Contact' == CRM_Utils_Array::value('log_type', $this->_logTables[$row['log_civicrm_entity_log_type']]) &&
-        CRM_Utils_Array::value('log_civicrm_entity_log_action', $row) == 'Insert'
+        CRM_Utils_Array::value('log_civicrm_entity_log_action', $row) == ts('Insert')
       ) {
         $row['log_civicrm_entity_log_action'] = ts('Update');
       }
 
+      // For certain tables, we may want to look at an alternate column to
+      // determine which action to display, determined by the 'action_column'
+      // key of the entry in $this->_logTables.
       if ($newAction = $this->getEntityAction($row['log_civicrm_entity_id'],
         $row['log_civicrm_entity_log_conn_id'],
         $row['log_civicrm_entity_log_type'],
@@ -216,22 +250,19 @@ class CRM_Report_Form_Contact_LoggingSummary extends CRM_Logging_ReportSummary {
       $date = CRM_Utils_Date::isoToMysql($row['log_civicrm_entity_log_date']);
 
       if ('Update' == CRM_Utils_Array::value('log_civicrm_entity_log_action', $row)) {
-        $q = "reset=1&log_conn_id={$row['log_civicrm_entity_log_conn_id']}&log_date=" . $date;
-        if ($this->cid) {
-          $q .= '&cid=' . $this->cid;
-        }
-        $q .= (!empty($row['log_civicrm_entity_altered_contact'])) ? '&alteredName=' . $row['log_civicrm_entity_altered_contact'] : '';
-        $q .= (!empty($row['altered_by_contact_display_name'])) ? '&alteredBy=' . $row['altered_by_contact_display_name'] : '';
-        $q .= (!empty($row['log_civicrm_entity_log_user_id'])) ? '&alteredById=' . $row['log_civicrm_entity_log_user_id'] : '';
-
-        $url1 = CRM_Report_Utils_Report::getNextUrl('logging/contact/detail', "{$q}&snippet=4&section=2&layout=overlay", FALSE, TRUE);
-        $url2 = CRM_Report_Utils_Report::getNextUrl('logging/contact/detail', "{$q}&section=2", FALSE, TRUE);
-        $hoverTitle = ts('View details for this update');
-        $row['log_civicrm_entity_log_action'] = "<a href='{$url1}' class='crm-summary-link'><i class=\"crm-i fa-list-alt\"></i></a>&nbsp;<a title='{$hoverTitle}' href='{$url2}'>" . ts('Update') . '</a>';
+        $row = $this->addDetailReportLinksToRow($baseQueryCriteria, $row);
       }
 
+      // In the summary, we only want to show one row per entity type,
+      // connection ID, contact ID, and user ID, rolling up multiple
+      // related actions against the same entity.
       $key = $date . '_' .
         $row['log_civicrm_entity_log_type'] . '_' .
+        // This ensures merge activities are not 'lost' by aggregation.
+        // I would prefer not to lose other entities either but it's a balancing act as
+        // described in https://issues.civicrm.org/jira/browse/CRM-12867 so adding this criteria
+        // while hackish saves us from figuring out if the original decision is still good.
+        $isMerge . '_' .
         $row['log_civicrm_entity_log_conn_id'] . '_' .
         $row['log_civicrm_entity_log_user_id'] . '_' .
         $row['log_civicrm_entity_altered_contact_id'];
@@ -269,11 +300,37 @@ INNER JOIN civicrm_contact modified_contact_civireport
         ON (fk_table.{$detail['fk']} = modified_contact_civireport.id {$clause})";
     }
 
+    if (!empty($detail['extra_joins'])) {
+      $joinClause .= "
+INNER JOIN `{$this->loggingDB}`.{$detail['extra_joins']['table']} extra_table ON {$detail['extra_joins']['join']}";
+    }
+
     $this->_from = "
 FROM `{$this->loggingDB}`.$tableName entity_log_civireport
 {$joinClause}
 LEFT  JOIN civicrm_contact altered_by_contact_civireport
         ON (entity_log_civireport.log_user_id = altered_by_contact_civireport.id)";
+  }
+
+  /**
+   * Add links & hovers to the detailed report.
+   *
+   * @param $baseQueryCriteria
+   * @param $row
+   *
+   * @return mixed
+   */
+  protected function addDetailReportLinksToRow($baseQueryCriteria, $row) {
+    $q = $baseQueryCriteria;
+    $q .= (!empty($row['log_civicrm_entity_altered_contact'])) ? '&alteredName=' . $row['log_civicrm_entity_altered_contact'] : '';
+    $q .= (!empty($row['altered_by_contact_display_name'])) ? '&alteredBy=' . $row['altered_by_contact_display_name'] : '';
+    $q .= (!empty($row['log_civicrm_entity_log_user_id'])) ? '&alteredById=' . $row['log_civicrm_entity_log_user_id'] : '';
+
+    $url1 = CRM_Report_Utils_Report::getNextUrl('logging/contact/detail', "{$q}&snippet=4&section=2&layout=overlay", FALSE, TRUE);
+    $url2 = CRM_Report_Utils_Report::getNextUrl('logging/contact/detail', "{$q}&section=2", FALSE, TRUE);
+    $hoverTitle = ts('View details for this update');
+    $row['log_civicrm_entity_log_action'] = "<a href='{$url1}' class='crm-summary-link'><i class=\"crm-i fa-list-alt\"></i></a>&nbsp;<a title='{$hoverTitle}' href='{$url2}'>" . $row['log_civicrm_entity_log_action'] . '</a>';
+    return $row;
   }
 
 }

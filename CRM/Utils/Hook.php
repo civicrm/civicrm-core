@@ -519,6 +519,21 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
+   * (Experimental) This hook is called when build the menu table.
+   *
+   * @param array $items
+   *   List of records to include in menu table.
+   * @return null
+   *   the return value is ignored
+   */
+  public static function alterMenu(&$items) {
+    return self::singleton()->invoke(1, $items,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
+      'civicrm_alterMenu'
+    );
+  }
+
+  /**
    * This hook is called for declaring managed entities via API.
    *
    * @param array $entities
@@ -1144,6 +1159,24 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
+   * This hook allows modification of the data calculated for merging locations.
+   *
+   * @param array $blocksDAO
+   *   Array of location DAO to be saved. These are arrays in 2 keys 'update' & 'delete'.
+   * @param int $mainId
+   *   Contact_id of the contact that survives the merge.
+   * @param int $otherId
+   *   Contact_id of the contact that will be absorbed and deleted.
+   * @param array $migrationInfo
+   *   Calculated migration info, informational only.
+   *
+   * @return mixed
+   */
+  public static function alterLocationMergeData(&$blocksDAO, $mainId, $otherId, $migrationInfo) {
+    return self::singleton()->invoke(4, $blocksDAO, $mainId, $otherId, $migrationInfo, self::$_nullObject, self::$_nullObject, 'civicrm_alterLocationMergeData');
+  }
+
+  /**
    * This hook provides a way to override the default privacy behavior for notes.
    *
    * @param array &$noteValues
@@ -1474,6 +1507,20 @@ abstract class CRM_Utils_Hook {
       'civicrm_triggerInfo'
     );
   }
+  /**
+   * This hook allows changes to the spec of which tables to log.
+   *
+   * @param array $logTableSpec
+   *
+   * @return mixed
+   */
+  public static function alterLogTables(&$logTableSpec) {
+    return self::singleton()->invoke(1, $logTableSpec, $_nullObject,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject,
+      self::$_nullObject,
+      'civicrm_alterLogTables'
+    );
+  }
 
   /**
    * This hook is called when a module-extension is installed.
@@ -1708,6 +1755,8 @@ abstract class CRM_Utils_Hook {
    *   - name: string, a unique short name (e.g. "ReportInstance")
    *   - class: string, a PHP DAO class (e.g. "CRM_Report_DAO_Instance")
    *   - table: string, a SQL table name (e.g. "civicrm_report_instance")
+   *   - fields_callback: array, list of callables which manipulates field list
+   *   - links_callback: array, list of callables which manipulates fk list
    *
    * @return null
    *   The return value is ignored
@@ -2063,6 +2112,26 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
+   * This hook is called to alter Deferred revenue item values just before they are
+   * inserted in civicrm_financial_trxn table
+   *
+   * @param array $deferredRevenues
+   *
+   * @param array $contributionDetails
+   *
+   * @param bool $update
+   *
+   * @param string $context
+   *
+   * @return mixed
+   */
+  public static function alterDeferredRevenueItems(&$deferredRevenues, $contributionDetails, $update, $context) {
+    return self::singleton()->invoke(4, $deferredRevenues, $contributionDetails, $update, $context,
+      self::$_nullObject, self::$_nullObject, 'civicrm_alterDeferredRevenueItems'
+    );
+  }
+
+  /**
    * This hook is called when the entries of the CSV Batch export are mapped.
    *
    * @param array $results
@@ -2096,6 +2165,20 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
+   * Allows the list of filters on the EntityRef widget to be altered.
+   *
+   * @see CRM_Core_Resources::entityRefFilters
+   *
+   * @param array $filters
+   */
+  public static function entityRefFilters(&$filters) {
+    self::singleton()->invoke(1, $filters, self::$_nullObject, self::$_nullObject,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject,
+      'civicrm_entityRefFilters'
+    );
+  }
+
+  /**
    * This hook is called for bypass a few civicrm urls from IDS check
    * @param array $skip list of civicrm url;
    */
@@ -2103,6 +2186,20 @@ abstract class CRM_Utils_Hook {
     return self::singleton()->invoke(1, $skip, self::$_nullObject,
       self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
       'civicrm_idsException'
+    );
+  }
+
+  /**
+   * This hook is called when a geocoder's format method is called.
+   *
+   * @param string $geoProvider
+   * @param array $values
+   * @param SimpleXMLElement $xml
+   */
+  public static function geocoderFormat($geoProvider, &$values, $xml) {
+    return self::singleton()->invoke(3, $geoProvider, $values, $xml,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject,
+      'civicrm_geocoderFormat'
     );
   }
 

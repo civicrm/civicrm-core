@@ -1013,6 +1013,17 @@ class CRM_Core_SelectValues {
   }
 
   /**
+   * @return array
+   */
+  public static function contributeMode() {
+    return array(
+      CRM_Core_Payment::BILLING_MODE_FORM => 'direct',
+      CRM_Core_Payment::BILLING_MODE_BUTTON => 'directIPN',
+      CRM_Core_Payment::BILLING_MODE_NOTIFY => 'notify',
+    );
+  }
+
+  /**
    * Frequency unit for schedule reminders.
    *
    * @param int $count
@@ -1070,6 +1081,32 @@ class CRM_Core_SelectValues {
       'month' => ts('Months'),
       'week' => ts('Weeks'),
       'day' => ts('Days'),
+    );
+  }
+
+  /**
+   * Exportable document formats.
+   *
+   * @return array
+   */
+  public static function documentFormat() {
+    return array(
+      'pdf' => ts('Portable Document Format (.pdf)'),
+      'docx' => ts('MS Word (.docx)'),
+      'odt' => ts('Open Office (.odt)'),
+      'html' => ts('Webpage (.html)'),
+    );
+  }
+
+  /**
+   * Application type of document.
+   *
+   * @return array
+   */
+  public static function documentApplicationType() {
+    return array(
+      'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'odt' => 'application/vnd.oasis.opendocument.text',
     );
   }
 

@@ -177,7 +177,7 @@
         {if $emailExists and $isEmailEnabledForSite}
           <tr id="send-receipt" class="crm-membership-form-block-send_receipt">
             <td class="label">{$form.send_receipt.label}</td><td>{$form.send_receipt.html}<br />
-            <span class="description">{ts 1=$emailExists}Automatically email a membership confirmation and receipt to %1 ?{/ts} {ts}OR if the payment is from a different contact, this email will only go to them.{/ts}</span></td>
+            <span class="description">{ts 1=$emailExists}Automatically email a membership confirmation and receipt to %1? OR if the payment is from a different contact, this email will only go to them.{/ts}</span></td>
             <span class="auto-renew-text">{ts}For auto-renewing memberships the emails are sent when each payment is received{/ts}</span>
           </tr>
           {elseif $context eq 'standalone' and $isEmailEnabledForSite}
@@ -387,7 +387,7 @@
       // and that merged into that code as currently behaviour is inconsistent.
       var emailExists = '{$emailExists}';
       var isStandalone = ('{$context}' == 'standalone');
-      var isEmailEnabledForSite = {$isEmailEnabledForSite};
+      var isEmailEnabledForSite = {if $isEmailEnabledForSite}true{else}false{/if};
 
       {literal}
       var isEmailable = (isEmailEnabledForSite && (emailExists || isStandalone));

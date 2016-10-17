@@ -68,7 +68,8 @@ New York City Council
 New York State Senate - Ken Zalewski
 Northbridge Digital - Oliver Gibson
 Olaf Buddenhagen
-Palante Technology Cooperative - Jon Goldberg, Joseph Lacey, Paul Campbell
+Palante Technology Cooperative - Jon Goldberg, Joseph Lacey
+Paul Campbell
 Progressive Tech Project - Alice Aguilar, Jamie McClelland
 Richard Van Oosterhout
 RocXa

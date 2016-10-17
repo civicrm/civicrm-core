@@ -155,14 +155,15 @@ class CRM_Contact_Form_Search_Custom_EventAggregate extends CRM_Contact_Form_Sea
                          on civicrm_contact.id = civicrm_participant.contact_id";
     }
     else {
-      unset($this->_columns['Participant']);
+      unset($this->_columns[ts('Participant')]);
     }
 
     $where = $this->where();
+    $groupFromSelect = "civicrm_option_value.label, civicrm_contribution.payment_instrument_id";
 
-    $groupBy = "event_id";
+    $groupBy = "event_id, event_type_id, {$groupFromSelect}";
     if (!empty($this->_formValues['event_type_id'])) {
-      $groupBy = "event_type_id";
+      $groupBy = "event_type_id, event_id, {$groupFromSelect}";
     }
 
     $sql = "

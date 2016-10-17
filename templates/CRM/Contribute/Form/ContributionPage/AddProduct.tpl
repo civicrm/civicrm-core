@@ -23,6 +23,7 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
+{crmRegion name="contribute-form-contributionpage-addproduct-main"}
 {capture assign=managePremiumsURL}{crmURL p='civicrm/admin/contribute/managePremiums' q="reset=1"}{/capture}
 <h3>{if $action eq 2 }{ts}Add Products to This Page{/ts} {elseif $action eq 1024}{ts}Preview{/ts}{else} {ts}Remove Products from this Page{/ts}{/if}</h3>
 <div class="crm-block crm-form-block crm-contribution-add_product-form-block">
@@ -101,3 +102,6 @@
 });
 {/literal}
 </script>
+{/crmRegion}
+{crmRegion name="contribute-form-contributionpage-addproduct-post"}
+{/crmRegion}

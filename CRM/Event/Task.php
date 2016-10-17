@@ -116,7 +116,7 @@ class CRM_Event_Task {
           'result' => TRUE,
         ),
         15 => array(
-          'title' => ts('Participant status - change (emails sent)'),
+          'title' => ts('Participant status - change'),
           'class' => 'CRM_Event_Form_Task_ParticipantStatus',
           'result' => TRUE,
         ),

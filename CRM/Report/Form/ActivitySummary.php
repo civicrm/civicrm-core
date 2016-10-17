@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2016
- * $Id$
- *
  */
 class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
 
@@ -40,8 +38,20 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
   protected $_tempDurationSumTableName;
 
   /**
+   * This report has not been optimised for group filtering.
+   *
+   * The functionality for group filtering has been improved but not
+   * all reports have been adjusted to take care of it. This report has not
+   * and will run an inefficient query until fixed.
+   *
+   * CRM-19170
+   *
+   * @var bool
    */
+  protected $groupFilterNotOptimised = TRUE;
+
   /**
+   * Class constructor.
    */
   public function __construct() {
     $this->_columns = array(
@@ -79,7 +89,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
         'dao' => 'CRM_Core_DAO_Email',
         'fields' => array(
           'email' => array(
-            'title' => 'Email',
+            'title' => ts('Email'),
           ),
         ),
         'order_bys' => array(
@@ -93,7 +103,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
         'dao' => 'CRM_Core_DAO_Email',
         'fields' => array(
           'phone' => array(
-            'title' => 'Phone',
+            'title' => ts('Phone'),
           ),
         ),
         'grouping' => 'contact-fields',
@@ -275,6 +285,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
         }
       }
     }
+    $this->_selectClauses = $select;
 
     $this->_select = "SELECT " . implode(', ', $select) . " ";
   }
@@ -400,7 +411,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
     }
   }
 
-  public function groupBy() {
+  public function groupBy($includeSelectCol = TRUE) {
     $this->_groupBy = array();
     if (!empty($this->_params['group_bys']) &&
       is_array($this->_params['group_bys'])) {
@@ -431,11 +442,15 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
           }
         }
       }
-
+      $groupBy = $this->_groupBy;
       $this->_groupBy = "GROUP BY " . implode(', ', $this->_groupBy);
     }
     else {
+      $groupBy = "{$this->_aliases['civicrm_activity']}.id";
       $this->_groupBy = "GROUP BY {$this->_aliases['civicrm_activity']}.id ";
+    }
+    if ($includeSelectCol) {
+      $this->_groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, $groupBy);
     }
   }
 
@@ -537,6 +552,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
     // now build the query for duration sum
     $this->from(TRUE);
     $this->where(TRUE);
+    $this->groupBy(FALSE);
 
     // build the query to calulate duration sum
     $sql = "SELECT SUM(activity_civireport.duration) as civicrm_activity_duration_total {$this->_from} {$this->_where} {$this->_groupBy} {$this->_having} {$this->_orderBy} {$this->_limit}";
@@ -626,7 +642,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
   public function modifyColumnHeaders() {
     //CRM-16719 modify name of column
     if (!empty($this->_columnHeaders['civicrm_activity_status_id'])) {
-      $this->_columnHeaders['civicrm_activity_status_id']['title'] = "Status";
+      $this->_columnHeaders['civicrm_activity_status_id']['title'] = ts('Status');
     }
   }
 
@@ -643,7 +659,6 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
     $entryFound = FALSE;
     $activityType = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE);
     $activityStatus = CRM_Core_PseudoConstant::activityStatus();
-    $flagContact = 0;
     $onHover = ts('View Contact Summary for this Contact');
     foreach ($rows as $rowNum => $row) {
       // make count columns point to activity detail report
@@ -672,6 +687,8 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
             break;
           }
         }
+        // reset date filter on activity reports.
+        $url[] = "resetDateFilter=1";
         $url = implode('&', $url);
         $url = CRM_Report_Utils_Report::getNextUrl('activity', "reset=1&force=1&{$url}",
                  $this->_absoluteUrl,
@@ -685,21 +702,8 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
       if (array_key_exists('civicrm_contact_sort_name', $row) && $this->_outputMode != 'csv') {
         if ($value = $row['civicrm_contact_id']) {
 
-          if ($rowNum == 0) {
-            $priviousContact = $value;
-          }
-          else {
-            if ($priviousContact == $value) {
-              $flagContact = 1;
-              $priviousContact = $value;
-            }
-            else {
-              $flagContact = 0;
-              $priviousContact = $value;
-            }
-          }
-
-          if ($flagContact == 1) {
+          // unset the name, email and phone fields if the contact is the same as the previous contact
+          if (isset($previousContact) && $previousContact == $value) {
             $rows[$rowNum]['civicrm_contact_sort_name'] = "";
 
             if (array_key_exists('civicrm_email_email', $row)) {
@@ -718,6 +722,9 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
             $rows[$rowNum]['civicrm_contact_sort_name'] = "<a href='$url'>" . $row['civicrm_contact_sort_name'] .
               '</a>';
           }
+
+          // store the contact ID of this contact
+          $previousContact = $value;
           $entryFound = TRUE;
         }
       }

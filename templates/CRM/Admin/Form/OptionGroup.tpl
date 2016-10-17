@@ -44,6 +44,10 @@
           </tr>
         <td class="label">{$form.name.label}</td>
               <td>{$form.name.html}</td></tr>
+          <tr class="crm-admin-optiongroup-form-block-data-type">
+            <td class="label">{$form.data_type.label}</td>
+            <td>{$form.data_type.html}</td>
+          </tr>
           <tr class="crm-admin-optiongroup-form-block-is_active">
               <td class="label">{$form.is_active.label}</td>
               <td>{$form.is_active.html}</td>

@@ -94,7 +94,7 @@ class CRM_Utils_ReCAPTCHA {
     if ($form->isSubmitted() && empty($form->_submitValues['g-recaptcha-response'])) {
       $form->setElementError(
         'g-recaptcha-response',
-        ts('Input text must match the phrase in the image. Please review the image and re-enter matching text.')
+        ts('Please go back and complete the CAPTCHA at the bottom of this form.')
       );
     }
   }

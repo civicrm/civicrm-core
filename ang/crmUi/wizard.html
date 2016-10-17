@@ -1,6 +1,6 @@
 <div class="crm-wizard">
   <ul class="crm-wizard-nav wizard-bar">
-    <li ng-repeat="step in steps" ng-class="{'current-step':step.selected}">
+    <li ng-repeat="step in steps" ng-class="{'current-step':step.selected}" class="{{crmUiWizardNavClass}}">
       <span>{{crmUiWizardCtrl.iconFor($index)}}</span>
       <a href="" ng-click="crmUiWizardCtrl.select(step)" ng-show="crmUiWizardCtrl.isSelectable(step)">{{1 + $index}}. {{step.$parent.$eval(step.crmTitle)}}</a>
       <span ng-show="!crmUiWizardCtrl.isSelectable(step)">{{1 + $index}}. {{step.$parent.$eval(step.crmTitle)}}</span>

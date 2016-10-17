@@ -112,6 +112,9 @@ function selectValue( val, prefix) {
     if (document.getElementById("subject").length) {
       document.getElementById("subject").value ="";
     }
+    if (document.getElementById("subject").length) {
+      document.getElementById("subject").value ="";
+    }
     if ( !isPDF ) {
       if (prefix == 'SMS') {
         document.getElementById("sms_text_message").value ="";
@@ -121,6 +124,12 @@ function selectValue( val, prefix) {
         document.getElementById("text_message").value ="";
       }
     }
+    else {
+      cj('.crm-html_email-accordion').show();
+      cj('.crm-document-accordion').hide();
+      cj('#document_type').closest('tr').show();
+    }
+
     CRM.wysiwyg.setVal('#' + html_message, '');
     if ( isPDF ) {
       showBindFormatChkBox();
@@ -131,6 +140,23 @@ function selectValue( val, prefix) {
   var dataUrl = {/literal}"{crmURL p='civicrm/ajax/template' h=0 }"{literal};
 
   cj.post( dataUrl, {tid: val}, function( data ) {
+    var hide = (data.document_body && isPDF) ? false : true;
+    cj('.crm-html_email-accordion, .crm-pdf-format-accordion').toggle(hide);
+    cj('.crm-document-accordion').toggle(!hide);
+
+    cj('#document_type').closest('tr').toggle(hide);
+
+    // Unset any uploaded document when any template is chosen
+    if (cj('#document.file').length) {
+      cj('#document_file').val('');
+    }
+
+    if (!hide) {
+      cj("#subject").val( data.subject );
+      cj("#document-preview").html(data.document_body).parent().css({'background': 'white'});
+      return;
+    }
+
     if ( !isPDF ) {
       if (prefix == "SMS") {
           text_message = "sms_text_message";

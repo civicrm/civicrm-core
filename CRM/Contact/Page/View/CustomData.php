@@ -101,12 +101,6 @@ class CRM_Contact_Page_View_CustomData extends CRM_Core_Page {
     $this->assign('editOwnCustomData', $editOwnCustomData);
 
     if ($this->_action == CRM_Core_Action::BROWSE) {
-      //Custom Groups Inline
-      $entityType = CRM_Contact_BAO_Contact::getContactType($this->_contactId);
-      $entitySubType = CRM_Contact_BAO_Contact::getContactSubType($this->_contactId);
-      $groupTree = CRM_Core_BAO_CustomGroup::getTree($entityType, $this, $this->_contactId,
-        $this->_groupId, $entitySubType
-      );
 
       $displayStyle = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup',
         $this->_groupId,
@@ -115,7 +109,8 @@ class CRM_Contact_Page_View_CustomData extends CRM_Core_Page {
 
       if ($this->_multiRecordDisplay != 'single') {
         $id = "custom_{$this->_groupId}";
-        $this->ajaxResponse['tabCount'] = CRM_Contact_BAO_Contact::getCountComponent($id, $this->_contactId, $groupTree[$this->_groupId]['table_name']);
+        $tableName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->_groupId, 'table_name');
+        $this->ajaxResponse['tabCount'] = CRM_Contact_BAO_Contact::getCountComponent($id, $this->_contactId, $tableName);
       }
 
       if ($displayStyle === 'Tab with table' && $this->_multiRecordDisplay != 'single') {
@@ -134,22 +129,29 @@ class CRM_Contact_Page_View_CustomData extends CRM_Core_Page {
         $page->set('multiRecordFieldListing', $multiRecordFieldListing);
         $page->set('pageViewType', 'customDataView');
         $page->set('contactType', $ctype);
-        $page->assign('viewCustomData', array(
-          $this->_groupId => array(
-            $this->_groupId => $groupTree[$this->_groupId],
-          ),
-        ));
+        $page->_headersOnly = TRUE;
         $page->run();
       }
       else {
+        //Custom Groups Inline
+        $entityType = CRM_Contact_BAO_Contact::getContactType($this->_contactId);
+        $entitySubType = CRM_Contact_BAO_Contact::getContactSubType($this->_contactId);
         $recId = NULL;
         if ($this->_multiRecordDisplay == 'single') {
           $groupTitle = CRM_Core_BAO_CustomGroup::getTitle($this->_groupId);
           CRM_Utils_System::setTitle(ts('View %1 Record', array(1 => $groupTitle)));
+          $groupTree = CRM_Core_BAO_CustomGroup::getTree($entityType, $this, $this->_contactId,
+            $this->_groupId, $entitySubType, NULL, TRUE, NULL, FALSE, TRUE, $this->_cgcount
+          );
 
           $recId = $this->_recId;
           $this->assign('multiRecordDisplay', $this->_multiRecordDisplay);
           $this->assign('skipTitle', 1);
+        }
+        else {
+          $groupTree = CRM_Core_BAO_CustomGroup::getTree($entityType, $this, $this->_contactId,
+            $this->_groupId, $entitySubType
+          );
         }
         CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree, FALSE, NULL, NULL, $recId, $this->_contactId);
       }

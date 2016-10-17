@@ -43,7 +43,7 @@
     {/if}
   {else}
     <div class='messages status'>
-        <div class='icon inform-icon'></div>&nbsp; {ts}This report can not be displayed because there are no entries in the logging tables yet.{/ts}
+        <div class='icon inform-icon'></div>&nbsp; {ts}This report can not be displayed because there are no relevant entries in the logging tables.{/ts}
     </div>
   {/if}
   {if $layout neq 'overlay'}

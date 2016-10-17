@@ -38,6 +38,8 @@
  */
 class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Selector_API {
 
+  const CACHE_SIZE = 500;
+
   /**
    * This defines two actions- View and Edit.
    *
@@ -901,10 +903,10 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
     // $sortByCharacter triggers a refresh in the prevNext cache
     if ($sortByCharacter && $sortByCharacter != 'all') {
       $cacheKey .= "_alphabet";
-      $this->fillupPrevNextCache($sort, $cacheKey);
+      $this->fillupPrevNextCache($sort, $cacheKey, 0, max(self::CACHE_SIZE, $pageSize));
     }
-    elseif ($firstRecord >= $countRow) {
-      $this->fillupPrevNextCache($sort, $cacheKey, $countRow, 500 + $firstRecord - $countRow);
+    elseif (($firstRecord + $pageSize) >= $countRow) {
+      $this->fillupPrevNextCache($sort, $cacheKey, $countRow, max(self::CACHE_SIZE, $pageSize) + $firstRecord - $countRow);
     }
     return $cacheKey;
   }
@@ -1020,7 +1022,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
    * @param int $start
    * @param int $end
    */
-  public function fillupPrevNextCache($sort, $cacheKey, $start = 0, $end = 500) {
+  public function fillupPrevNextCache($sort, $cacheKey, $start = 0, $end = self::CACHE_SIZE) {
     $coreSearch = TRUE;
     // For custom searches, use the contactIDs method
     if (is_a($this, 'CRM_Contact_Selector_Custom')) {
@@ -1090,7 +1092,7 @@ SELECT DISTINCT 'civicrm_contact', contact_a.id, contact_a.id, '$cacheKey', cont
 
     $dao = CRM_Core_DAO::executeQuery($sql);
 
-    // build insert query, note that currently we build cache for 500 contact records at a time, hence below approach
+    // build insert query, note that currently we build cache for 500 (self::CACHE_SIZE) contact records at a time, hence below approach
     $insertValues = array();
     while ($dao->fetch()) {
       $insertValues[] = "('civicrm_contact', {$dao->contact_id}, {$dao->contact_id}, '{$cacheKey}', '" . CRM_Core_DAO::escapeString($dao->sort_name) . "')";
@@ -1189,7 +1191,7 @@ SELECT DISTINCT 'civicrm_contact', contact_a.id, contact_a.id, '$cacheKey', cont
   /**
    * @return CRM_Contact_BAO_Query
    */
-  public function &getQuery() {
+  public function getQuery() {
     return $this->_query;
   }
 

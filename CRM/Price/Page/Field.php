@@ -110,8 +110,6 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
 
   /**
    * Browse all price set fields.
-   *
-   * @return void
    */
   public function browse() {
     $resourceManager = CRM_Core_Resources::singleton();
@@ -218,8 +216,6 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
    *
    * @param string $action
    *   The action to be invoked.
-   *
-   * @return void
    */
   public function edit($action) {
     // create a simple controller for editing price data

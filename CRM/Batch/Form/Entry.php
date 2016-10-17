@@ -239,6 +239,15 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
       }
     }
 
+    // CRM-19477: Display Error for Batch Sizes Exceeding php.ini max_input_vars
+    // Notes: $this->_elementIndex gives an approximate count of the variables being sent
+    // An offset value is set to deal with additional vars that are likely passed.
+    // There may be a more accurate way to do this...
+    $offset = 50; // set an offset to account for other vars we are not counting
+    if ((count($this->_elementIndex) + $offset) > ini_get("max_input_vars")) {
+      CRM_Core_Error::fatal(ts('Batch size is too large. Increase value of php.ini setting "max_input_vars" (current val = ' . ini_get("max_input_vars") . ')'));
+    }
+
     $this->assign('fields', $this->_fields);
     CRM_Core_Resources::singleton()
       ->addSetting(array(
@@ -263,7 +272,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    *   Posted values of the form.
    * @param array $files
    *   List of errors to be posted back to the form.
-   * @param array $self
+   * @param \CRM_Batch_Form_Entry $self
    *   Form object.
    *
    * @return array
@@ -280,6 +289,11 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
     //CRM-16480 if contact is selected, validate financial type and amount field.
     foreach ($params['field'] as $key => $value) {
+      if (isset($value['trxn_id'])) {
+        if (0 < CRM_Core_DAO::singleValueQuery('SELECT id FROM civicrm_contribution WHERE trxn_id = %1', array(1 => array($value['trxn_id'], 'String')))) {
+          $errors["field[$key][trxn_id]"] = ts('Transaction ID must be unique within the database');
+        }
+      }
       foreach ($fields as $field => $label) {
         if (!empty($params['primary_contact_id'][$key]) && empty($value[$field])) {
           $errors["field[$key][$field]"] = ts('%1 is a required field.', array(1 => $label));
@@ -650,6 +664,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
         foreach ($dateTypes as $dateField => $dateVariable) {
           $$dateVariable = CRM_Utils_Date::processDate($value[$dateField]);
+          $fDate[$dateField] = CRM_Utils_Array::value($dateField, $value);
         }
 
         $calcDates = array();
@@ -806,12 +821,16 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
             }
           }
           foreach (array('join_date', 'start_date', 'end_date') as $dateType) {
-            $formDates[$dateType] = CRM_Utils_Array::value($dateType, $value);
+            //CRM-18000 - ignore $dateType if its not explicitly passed
+            if (!empty($fDate[$dateType]) || !empty($fDate['membership_' . $dateType])) {
+              $formDates[$dateType] = CRM_Utils_Array::value($dateType, $value);
+            }
           }
           $membershipSource = CRM_Utils_Array::value('source', $value);
           list($membership) = CRM_Member_BAO_Membership::renewMembership(
             $value['contact_id'], $value['membership_type_id'], FALSE,
-            NULL, NULL, $value['custom'], NULL, NULL, FALSE,
+            //$numTerms should be default to 1.
+            NULL, NULL, $value['custom'], 1, NULL, FALSE,
             NULL, $membershipSource, $isPayLater, $campaignId, $formDates
           );
 

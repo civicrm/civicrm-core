@@ -259,6 +259,9 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
     $this->addEntityRef('payment_processor', ts('Payment Processor'), array(
       'entity' => 'PaymentProcessor',
       'multiple' => TRUE,
+      'api' => array(
+        'params' => array('domain_id' => CRM_Core_Config::domainID()),
+      ),
       'select' => array('minimumInputLength' => 0),
     ));
 
@@ -520,6 +523,13 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
           $errors['pay_later_receipt'] = ts('Please enter the Pay Later instructions to be displayed to your users.');
         }
       }
+    }
+    // CRM-16189
+    try {
+      CRM_Financial_BAO_FinancialAccount::validateFinancialType($values['financial_type_id']);
+    }
+    catch (CRM_Core_Exception $e) {
+      $errors['financial_type_id'] = $e->getMessage();
     }
     return empty($errors) ? TRUE : $errors;
   }

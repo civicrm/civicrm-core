@@ -75,6 +75,11 @@ class PermissionCheck implements EventSubscriberInterface {
 
       if (!\CRM_Core_Permission::check($permissions) and !self::checkACLPermission($apiRequest)) {
         if (is_array($permissions)) {
+          foreach ($permissions as &$permission) {
+            if (is_array($permission)) {
+              $permission = '( ' . implode(' or ', $permission) . ' )';
+            }
+          }
           $permissions = implode(' and ', $permissions);
         }
         // FIXME: Generating the exception ourselves allows for detailed error
@@ -84,6 +89,12 @@ class PermissionCheck implements EventSubscriberInterface {
 
       $event->authorize();
       $event->stopPropagation();
+    }
+    elseif ($apiRequest['version'] == 4) {
+      if (!$apiRequest->getCheckPermissions()) {
+        $event->authorize();
+        $event->stopPropagation();
+      }
     }
   }
 

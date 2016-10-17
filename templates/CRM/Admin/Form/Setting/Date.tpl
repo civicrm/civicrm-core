@@ -51,6 +51,14 @@
           <td class="label">{$form.dateformatTime.label}</td>
           <td>{$form.dateformatTime.html}</td>
        </tr>
+       <tr class="crm-date-form-block-dateformatTime">
+          <td class="label">{$form.dateformatFinancialBatch.label}</td>
+          <td>{$form.dateformatFinancialBatch.html}</td>
+       </tr>
+       <tr class="crm-date-form-block-dateformatTime">
+          <td class="label">{$form.dateformatshortdate.label}</td>
+          <td>{$form.dateformatshortdate.html}</td>
+       </tr>
      </table>
 </fieldset>
 <fieldset><legend>{ts}Date Input Fields{/ts}</legend>

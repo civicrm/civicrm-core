@@ -37,6 +37,13 @@
 class CRM_Admin_Form_OptionGroup extends CRM_Admin_Form {
 
   /**
+   * Explicitly declare the entity api name.
+   */
+  public function getDefaultEntity() {
+    return 'OptionGroup';
+  }
+
+  /**
    * Build the form object.
    */
   public function buildQuickForm() {
@@ -70,6 +77,8 @@ class CRM_Admin_Form_OptionGroup extends CRM_Admin_Form {
       ts('Description'),
       CRM_Core_DAO::getAttribute('CRM_Core_DAO_OptionGroup', 'description')
     );
+
+    $this->addSelect('data_type', array('options' => CRM_Utils_Type::dataTypes()), TRUE);
 
     $element = $this->add('checkbox', 'is_active', ts('Enabled?'));
     if ($this->_action & CRM_Core_Action::UPDATE) {

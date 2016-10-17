@@ -576,7 +576,6 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (1922, 1029, "CE", "Ceara"),
 (1923, 1029, "DF", "Distrito Federal"),
 (1924, 1029, "ES", "Espirito Santo"),
-(1925, 1029, "FN", "Fernando de Noronha"),
 (1926, 1029, "GO", "Goias"),
 (1927, 1029, "MA", "Maranhao"),
 (1928, 1029, "MG", "Minas Gerais"),
@@ -3431,7 +3430,7 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (4978, 1227, "71", "Midway Islands"),
 (4979, 1227, "76", "Navassa Island"),
 (4980, 1227, "95", "Palmyra Atoll"),
-(4981, 1227, "79", "Wake Ialand"),
+(4981, 1227, "79", "Wake Island"),
 (4982, 1229, "AR", "Artigsa"),
 (4983, 1229, "CA", "Canelones"),
 (4984, 1229, "CL", "Cerro Largo"),
@@ -4011,4 +4010,11 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (NULL, 1101, "TG", "Telangana"),
 
 -- CRM-17800
-(NULL, 1187, "04", "Ash Sharqiyah");
+(NULL, 1187, "04", "Ash Sharqiyah"),
+
+-- CRM-19134 Missing French overseas departments.
+(NULL, 1076, "GP", "Guadeloupe"),
+(NULL, 1076, "MQ", "Martinique"),
+(NULL, 1076, "GF", "Guyane"),
+(NULL, 1076, "RE", "La Réunion"),
+(NULL, 1076, "YT", "Mayotte");

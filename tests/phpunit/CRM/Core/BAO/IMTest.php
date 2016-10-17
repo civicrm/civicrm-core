@@ -13,7 +13,7 @@ class CRM_Core_BAO_IMTest extends CiviUnitTestCase {
    * Add() method (create and update modes)
    */
   public function testAdd() {
-    $contactId = Contact::createIndividual();
+    $contactId = $this->individualCreate();
 
     $params = array();
     $params = array(
@@ -47,7 +47,7 @@ class CRM_Core_BAO_IMTest extends CiviUnitTestCase {
     $isEditIM = $this->assertDBNotNull('CRM_Core_DAO_IM', $imId, 'name', 'id', 'Database check on updated IM name record.');
     $this->assertEquals($isEditIM, 'doe.jane', 'Verify IM provider_id value is doe.jane.');
 
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
   }
 
   /**
@@ -70,7 +70,7 @@ class CRM_Core_BAO_IMTest extends CiviUnitTestCase {
     $this->assertEquals('alan1.smith1', $firstIMValue[0]['name'], 'Confirm primary IM value.');
     $this->assertEquals(1, $firstIMValue[0]['is_primary'], 'Confirm first IM is primary.');
 
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
   }
 
 }

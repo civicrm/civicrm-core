@@ -61,6 +61,7 @@ function civicrm_api3_dashboard_create($params) {
  *   array of parameters determined by getfields.
  */
 function _civicrm_api3_dashboard_create_spec(&$params) {
+  $params['is_active']['api.default'] = 1;
   unset($params['version']);
 }
 
@@ -92,6 +93,6 @@ function civicrm_api3_dashboard_delete($params) {
     return civicrm_api3_create_success(1, $params, 'Dashboard', 'delete');
   }
   else {
-    return civicrm_api3_create_error('Could not delete dashlet');
+    throw new API_Exception('Could not delete dashlet');
   }
 }

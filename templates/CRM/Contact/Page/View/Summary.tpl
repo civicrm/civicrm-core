@@ -123,12 +123,6 @@
   <div class="crm-block crm-content-block crm-contact-page crm-inline-edit-container">
     <div id="mainTabContainer">
       <ul class="crm-contact-tabs-list">
-        <li id="tab_summary" class="crm-tab-button ui-corner-all">
-          <a href="#contact-summary" title="{ts}Summary{/ts}">
-            <span> </span> {ts}Summary{/ts}
-            <em></em>
-          </a>
-        </li>
         {foreach from=$allTabs key=tabName item=tabValue}
           <li id="tab_{$tabValue.id}" class="crm-tab-button ui-corner-all crm-count-{$tabValue.count}{if isset($tabValue.class)} {$tabValue.class}{/if}">
             <a href="{$tabValue.url}" title="{$tabValue.title}">
@@ -249,6 +243,7 @@
           </div><!-- #contact_panel -->
           {if $showAddress}
             <div class="contact_panel">
+              {crmRegion name="contact-addresses"}
               {assign var='locationIndex' value=1}
               {if $address}
                 {foreach from=$address item=add key=locationIndex}
@@ -265,26 +260,30 @@
                   {include file="CRM/Contact/Page/Inline/Address.tpl"}
                 </div>
               {/if}
-
+              {/crmRegion}
               </div> <!-- end of contact panel -->
             {/if}
             <div class="contact_panel">
               {if $showCommunicationPreferences}
                 <div class="contactCardLeft">
+                  {crmRegion name="contact-comm-pref"}
                   <div class="crm-summary-comm-pref-block">
                     <div class="crm-summary-block" id="communication-pref-block" >
                       {include file="CRM/Contact/Page/Inline/CommunicationPreferences.tpl"}
                     </div>
                   </div>
+                  {/crmRegion}
                 </div> <!-- contactCardLeft -->
               {/if}
               {if $contact_type eq 'Individual' AND $showDemographics}
                 <div class="contactCardRight">
+                  {crmRegion name="contact-demographic"}
                   <div class="crm-summary-demographic-block">
                     <div class="crm-summary-block" id="demographic-block">
                       {include file="CRM/Contact/Page/Inline/Demographics.tpl"}
                     </div>
                   </div>
+                  {/crmRegion}
                 </div> <!-- contactCardRight -->
               {/if}
               <div class="clear"></div>

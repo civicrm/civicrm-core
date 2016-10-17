@@ -93,4 +93,22 @@ class CRM_Core_ErrorTest extends CiviUnitTestCase {
     }
   }
 
+  /**
+   * Check that a debugger is created and there is no error when passing in a prefix.
+   *
+   * Do some basic content checks.
+   */
+  public function testDebugLoggerFormat() {
+    $log = CRM_Core_Error::createDebugLogger('my-test');
+    $log->log('Mary had a little lamb');
+    $log->log('Little lamb');
+    $config = CRM_Core_Config::singleton();
+    $fileContents = file_get_contents($log->_filename);
+    $this->assertEquals($config->configAndLogDir . 'CiviCRM.' . 'my-test.' . CRM_Core_Error::generateLogFileHash($config) . '.log', $log->_filename);
+    // The 5 here is a bit arbitrary - on my local the date part is 15 chars (Mar 29 05:29:16) - but we are just checking that
+    // there are chars for the date at the start.
+    $this->assertTrue(strpos($fileContents, '[info] Mary had a little lamb') > 10);
+    $this->assertContains('[info] Little lamb', $fileContents);
+  }
+
 }

@@ -45,7 +45,7 @@ $config = CRM_Core_Config::singleton();
 
 $prefix = 'Automated Generated Group: ';
 $query = "DELETE FROM civicrm_group where name like '%{$prefix}%'";
-CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
+CRM_Core_DAO::executeQuery($query);
 
 $numGroups = 100;
 

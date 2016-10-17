@@ -95,7 +95,6 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
    */
   public function buildQuickForm() {
     $ufGroupId = $this->get('ufGroupId');
-
     if (!$ufGroupId) {
       CRM_Core_Error::fatal('ufGroupId is missing');
     }
@@ -105,6 +104,10 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
     $this->addDefaultButtons(ts('Save'));
     $this->_fields = array();
     $this->_fields = CRM_Core_BAO_UFGroup::getFields($ufGroupId, FALSE, CRM_Core_Action::VIEW);
+    if (array_key_exists('participant_status', $this->_fields)) {
+      $this->assign('statusProfile', 1);
+      $this->assignToTemplate();
+    }
 
     // remove file type field and then limit fields
     $suppressFields = FALSE;
@@ -510,6 +513,19 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
     $template->clearTemplateVars();
 
     return $statusId;
+  }
+
+  /**
+   * Assign the minimal set of variables to the template.
+   */
+  public function assignToTemplate() {
+    $notifyingStatuses = array('Pending from waitlist', 'Pending from approval', 'Expired', 'Cancelled');
+    $notifyingStatuses = array_intersect($notifyingStatuses, CRM_Event_PseudoConstant::participantStatus());
+    $this->assign('status', TRUE);
+    if (!empty($notifyingStatuses)) {
+      $s = '<em>' . implode('</em>, <em>', $notifyingStatuses) . '</em>';
+      $this->assign('notifyingStatuses', $s);
+    }
   }
 
 }

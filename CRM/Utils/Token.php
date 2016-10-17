@@ -753,6 +753,9 @@ class CRM_Utils_Token {
           $value = CRM_Core_PseudoConstant::getLabel('CRM_Contact_BAO_Contact', $token, $value);
         }
       }
+      elseif ($value && CRM_Utils_String::endsWith($token, '_date')) {
+        $value = CRM_Utils_Date::customFormat($value);
+      }
     }
 
     if (!$html) {
@@ -1406,9 +1409,9 @@ class CRM_Utils_Token {
    */
   public static function getMembershipTokenDetails($membershipIDs) {
     $memberships = civicrm_api3('membership', 'get', array(
-        'options' => array('limit' => 200000),
-        'membership_id' => array('IN' => (array) $membershipIDs),
-      ));
+      'options' => array('limit' => 0),
+      'membership_id' => array('IN' => (array) $membershipIDs),
+    ));
     return $memberships['values'];
   }
 
@@ -1798,6 +1801,9 @@ class CRM_Utils_Token {
       default:
         if (in_array($token, self::$_tokens[$entity])) {
           $value = $membership[$token];
+          if (CRM_Utils_String::endsWith($token, '_date')) {
+            $value = CRM_Utils_Date::customFormat($value);
+          }
         }
         else {
           // ie unchanged

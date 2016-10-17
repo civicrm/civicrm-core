@@ -54,7 +54,7 @@ class CiviEnvBuilder {
    *
    * @param string|array $names
    *   One or more extension names. You may use a wildcard '*'.
-   * @return $this
+   * @return CiviEnvBuilder
    */
   public function install($names) {
     return $this->addStep(new ExtensionsStep('install', $names));
@@ -66,7 +66,7 @@ class CiviEnvBuilder {
    * @param string $dir
    *   The current test directory. We'll search for info.xml to
    *   see what this extension is.
-   * @return $this
+   * @return CiviEnvBuilder
    * @throws \CRM_Extension_Exception_ParseException
    */
   public function installMe($dir) {
@@ -78,7 +78,7 @@ class CiviEnvBuilder {
    *
    * @param string|array $names
    *   One or more extension names. You may use a wildcard '*'.
-   * @return $this
+   * @return CiviEnvBuilder
    */
   public function uninstall($names) {
     return $this->addStep(new ExtensionsStep('uninstall', $names));
@@ -90,7 +90,7 @@ class CiviEnvBuilder {
    * @param string $dir
    *   The current test directory. We'll search for info.xml to
    *   see what this extension is.
-   * @return $this
+   * @return CiviEnvBuilder
    * @throws \CRM_Extension_Exception_ParseException
    */
   public function uninstallMe($dir) {
@@ -165,7 +165,7 @@ class CiviEnvBuilder {
    *   Forcibly execute the build, even if the configuration hasn't changed.
    *   This will slow-down the tests, but it may be appropriate for some very sloppy
    *   tests.
-   * @return $this
+   * @return CiviEnvBuilder
    */
   public function apply($force = FALSE) {
     $dbName = \Civi\Test::dsn('database');

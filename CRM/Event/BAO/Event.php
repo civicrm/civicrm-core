@@ -95,6 +95,10 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
       CRM_Utils_Hook::pre('create', 'Event', NULL, $params);
     }
 
+    // CRM-16189
+    if (!empty($params['financial_type_id'])) {
+      CRM_Financial_BAO_FinancialAccount::validateFinancialType($params['financial_type_id']);
+    }
     $event = new CRM_Event_DAO_Event();
 
     $event->copyValues($params);
@@ -142,8 +146,7 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
       return $event;
     }
 
-    $session = CRM_Core_Session::singleton();
-    $contactId = $session->get('userID');
+    $contactId = CRM_Core_Session::getLoggedInContactID();
     if (!$contactId) {
       $contactId = CRM_Utils_Array::value('contact_id', $params);
     }
@@ -194,7 +197,7 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
         2 => array($id, 'integer'),
       );
 
-      CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
+      CRM_Core_DAO::executeQuery($query);
     }
 
     // price set cleanup, CRM-5527
@@ -408,7 +411,6 @@ WHERE      civicrm_event.is_active = 1 AND
            ( civicrm_event.is_template IS NULL OR civicrm_event.is_template = 0) AND
            civicrm_event.start_date >= DATE_SUB( NOW(), INTERVAL 7 day )
            $validEventIDs
-GROUP BY   civicrm_event.id
 ORDER BY   civicrm_event.start_date ASC
 $event_summary_limit
 ";
@@ -1008,7 +1010,7 @@ WHERE civicrm_event.is_active = 1
           $from = ' FROM ' . $tableName;
           $where = " WHERE {$tableName}.entity_id = {$id}";
           $query = $insert . $select . $from . $where;
-          $dao = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
+          $dao = CRM_Core_DAO::executeQuery($query);
         }
       }
     }

@@ -425,8 +425,8 @@ FROM civicrm_action_schedule cas
    * @param $preferred_language
    */
   public static function setCommunicationLanguage($communication_language, $preferred_language) {
-    $config = CRM_Core_Config::singleton();
-    $language = $config->lcMessages;
+    $currentLocale = CRM_Core_I18n::getLocale();
+    $language = $currentLocale;
 
     // prepare the language for the email
     if ($communication_language == CRM_Core_I18n::AUTO) {
@@ -440,13 +440,13 @@ FROM civicrm_action_schedule cas
 
     // language not in the existing language, use default
     $languages = CRM_Core_I18n::languages(TRUE);
-    if (!in_array($language, $languages)) {
-      $language = $config->lcMessages;
+    if (!array_key_exists($language, $languages)) {
+      $language = $currentLocale;
     }
 
     // change the language
     $i18n = CRM_Core_I18n::singleton();
-    $i18n->setLanguage($language);
+    $i18n->setLocale($language);
   }
 
   /**

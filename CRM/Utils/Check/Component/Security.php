@@ -257,6 +257,28 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
   }
 
   /**
+   * Discourage use of remote profile forms.
+   */
+  public function checkRemoteProfile() {
+    $messages = array();
+
+    if (Civi::settings()->get('remote_profile_submissions')) {
+      $messages[] = new CRM_Utils_Check_Message(
+        __FUNCTION__,
+        ts('Warning: External profile support (aka "HTML Snippet" support) is enabled in <a href="%1">system settings</a>. This setting may be prone to abuse. If you must retain it, consider HTTP throttling or other protections.',
+          array(1 => CRM_Utils_System::url('civicrm/admin/setting/misc', 'reset=1'))
+        ),
+        ts('Remote Profiles Enabled'),
+        \Psr\Log\LogLevel::WARNING,
+        'fa-lock'
+      );
+    }
+
+    return $messages;
+  }
+
+
+  /**
    * Check that the sysadmin has not modified the Cxn
    * security setup.
    */
@@ -371,8 +393,8 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
     $filePathMarker = $this->getFilePathMarker();
     $config = CRM_Core_Config::singleton();
 
-    list ($heuristicBaseUrl, $ignore) = explode($filePathMarker, $config->imageUploadURL);
-    list ($ignore, $heuristicSuffix) = explode($filePathMarker, str_replace('\\', '/', $targetDir));
+    list($heuristicBaseUrl) = explode($filePathMarker, $config->imageUploadURL);
+    list(, $heuristicSuffix) = array_pad(explode($filePathMarker, str_replace('\\', '/', $targetDir)), 2, '');
     return $heuristicBaseUrl . $filePathMarker . $heuristicSuffix;
   }
 

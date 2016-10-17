@@ -215,7 +215,13 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
       $this->registerRule('amount', 'callback', 'money', 'CRM_Utils_Rule');
       $this->addRule('amount', ts('Please enter a monetary value for this field.'), 'money');
 
+      $this->add('text', 'non_deductible_amount', ts('Non-deductible Amount'), NULL);
+      $this->registerRule('non_deductible_amount', 'callback', 'money', 'CRM_Utils_Rule');
+      $this->addRule('non_deductible_amount', ts('Please enter a monetary value for this field.'), 'money');
+
       $this->add('textarea', 'description', ts('Description'));
+      $this->add('textarea', 'help_pre', ts('Pre Option Help'));
+      $this->add('textarea', 'help_post', ts('Post Option Help'));
 
       // weight
       $this->add('text', 'weight', ts('Order'), NULL, TRUE);
@@ -283,7 +289,13 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
     ) {
       $errors['count'] = ts('Participant count can not be greater than max participants.');
     }
-
+    // CRM-16189
+    try {
+      CRM_Financial_BAO_FinancialAccount::validateFinancialType($fields['financial_type_id'], $form->_fid, 'PriceField');
+    }
+    catch (CRM_Core_Exception $e) {
+      $errors['financial_type_id'] = $e->getMessage();
+    }
     return empty($errors) ? TRUE : $errors;
   }
 

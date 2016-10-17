@@ -122,41 +122,60 @@ class CRM_Mailing_Selector_Browse extends CRM_Core_Selector_Base implements CRM_
           'sort' => 'name',
           'direction' => CRM_Utils_Sort::DONTCARE,
         ),
+      );
+
+      if (CRM_Core_I18n::isMultilingual()) {
+        self::$_columnHeaders = array_merge(
+          self::$_columnHeaders,
+          array(
+            array(
+              'name' => ts('Language'),
+              'sort' => 'language',
+              'direction' => CRM_Utils_Sort::DONTCARE,
+            ),
+          )
+        );
+      }
+
+      self::$_columnHeaders = array_merge(
+        self::$_columnHeaders,
         array(
-          'name' => ts('Status'),
-          'sort' => 'status',
-          'direction' => CRM_Utils_Sort::DONTCARE,
-        ),
-        array(
-          'name' => ts('Created By'),
-          'sort' => 'created_by',
-          'direction' => CRM_Utils_Sort::DONTCARE,
-        ),
-        array(
-          'name' => ts('Created Date'),
-          'sort' => 'created_date',
-          'direction' => $unscheduledOrder,
-        ),
-        array(
-          'name' => ts('Sent By'),
-          'sort' => 'scheduled_by',
-          'direction' => CRM_Utils_Sort::DONTCARE,
-        ),
-        array(
-          'name' => ts('Scheduled'),
-          'sort' => 'scheduled_date',
-          'direction' => $scheduledOrder,
-        ),
-        array(
-          'name' => ts('Started'),
-          'sort' => 'start_date',
-          'direction' => CRM_Utils_Sort::DONTCARE,
-        ),
-        array(
-          'name' => ts('Completed'),
-          'sort' => 'end_date',
-          'direction' => $completedOrder,
-        ),
+          array(
+            'name' => ts('Status'),
+            'sort' => 'status',
+            'direction' => CRM_Utils_Sort::DONTCARE,
+          ),
+          array(
+            'name' => ts('Created By'),
+            'sort' => 'created_by',
+            'direction' => CRM_Utils_Sort::DONTCARE,
+          ),
+          array(
+            'name' => ts('Created Date'),
+            'sort' => 'created_date',
+            'direction' => $unscheduledOrder,
+          ),
+          array(
+            'name' => ts('Sent By'),
+            'sort' => 'scheduled_by',
+            'direction' => CRM_Utils_Sort::DONTCARE,
+          ),
+          array(
+            'name' => ts('Scheduled'),
+            'sort' => 'scheduled_date',
+            'direction' => $scheduledOrder,
+          ),
+          array(
+            'name' => ts('Started'),
+            'sort' => 'start_date',
+            'direction' => CRM_Utils_Sort::DONTCARE,
+          ),
+          array(
+            'name' => ts('Completed'),
+            'sort' => 'end_date',
+            'direction' => $completedOrder,
+          ),
+        )
       );
 
       if (CRM_Campaign_BAO_Campaign::isCampaignEnable()) {
@@ -171,6 +190,8 @@ class CRM_Mailing_Selector_Browse extends CRM_Core_Selector_Base implements CRM_
         self::$_columnHeaders[] = array('name' => ts('Action'));
       }
     }
+
+    CRM_Core_Smarty::singleton()->assign('multilingual', CRM_Core_I18n::isMultilingual());
     return self::$_columnHeaders;
   }
 
@@ -333,6 +354,9 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
       }
       $opString = implode('.', $pageTypes);
 
+      // get languages for later conversion
+      $languages = CRM_Core_I18n::languages();
+
       foreach ($rows as $key => $row) {
         $actionMask = NULL;
         if ($row['sms_provider_id']) {
@@ -394,7 +418,22 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
         // get status strings as per locale settings CRM-4411.
         $rows[$key]['status'] = CRM_Mailing_BAO_MailingJob::status($row['status']);
 
-        $rows[$key]['action'] = CRM_Core_Action::formLink($actionLinks,
+        // get language string
+        $rows[$key]['language'] = $languages[$row['language']];
+
+        $validLinks = $actionLinks;
+        if (($mailingUrl = CRM_Mailing_BAO_Mailing::getPublicViewUrl($row['id'])) != FALSE) {
+          $validLinks[] = array(
+            'name' => ts('Public View'),
+            'url' => 'civicrm/mailing/view',
+            'qs' => 'id=%%mid%%&reset=1',
+            'title' => ts('Public View'),
+            'fe' => TRUE,
+          );
+        }
+
+        $rows[$key]['action'] = CRM_Core_Action::formLink(
+          $validLinks,
           $actionMask,
           array('mid' => $row['id']),
           "more",
@@ -579,6 +618,11 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
       $clauses[] = '( campaign_id IN ( ' . implode(' , ', array_values($campainIds)) . ' ) )';
     }
 
+    if ($language = $this->_parent->get('language')) {
+      $clauses[] = "civicrm_mailing.language = %6";
+      $params[6] = array($language, 'String');
+    }
+
     if (empty($clauses)) {
       return 1;
     }
@@ -598,7 +642,7 @@ LEFT JOIN civicrm_mailing_job ON (civicrm_mailing_job.mailing_id = civicrm_maili
 LEFT JOIN civicrm_contact createdContact ON ( civicrm_mailing.created_id = createdContact.id )
 LEFT JOIN civicrm_contact scheduledContact ON ( civicrm_mailing.scheduled_id = scheduledContact.id )
 WHERE $whereClause
-ORDER BY LEFT(name, 1)
+ORDER BY UPPER(LEFT(name, 1))
 ";
 
     $dao = CRM_Core_DAO::executeQuery($query, $params);

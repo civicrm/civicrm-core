@@ -95,7 +95,13 @@
      $('.crm-chain-select-control', "#select_org div").select2('val', '');
      $('input[type=text], select, textarea', "#select_org div").not('.crm-chain-select-control, #onbehalfof_id').val('').change();
      $('input[type=radio], input[type=checkbox]', "#select_org div").prop('checked', false).change();
-     $('#on-behalf-block input').val('');
+
+     $('#on-behalf-block input').not('input[type=checkbox], input[type=radio], #onbehalfof_id').val('');
+     // clear checkboxes and radio
+     $('#on-behalf-block')
+      .find('input[type=checkbox], input[type=radio]')
+      .not('input[name=org_option]')
+      .attr('checked', false);
     }
 
    function selectCreateOrg( orgOption, reset ) {
@@ -125,7 +131,19 @@
 
      if (submittedCID == contactID) {
        $.each(submittedOnBehalfInfo, function(key, value) {
-         $('#onbehalf_' + key ).val(value);
+         //handle checkboxes
+         if (typeof value === 'object') {
+           $.each(value, function(k, v) {
+             $('#onbehalf_' + key + '_' + k).prop('checked', v);
+           });
+         }
+         else if ($('#onbehalf_' + key).length) {
+           $('#onbehalf_' + key ).val(value);
+         }
+         //radio buttons
+         else if ($("input[name='onbehalf[" + key + "]']").length) {
+           $("input[name='onbehalf[" + key + "]']").val([value]);
+         }
        });
        return;
      }

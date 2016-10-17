@@ -18,7 +18,10 @@
           var addr = crmFromAddresses.getByLabel(newValue);
           mailing.from_name = addr.author;
           mailing.from_email = addr.email;
-          mailing.replyto_email = addr.email;
+          // CRM-18364: set replyTo as from_email only if custom replyTo is disabled in mail settings.
+          if (!CRM.crmMailing.enableReplyTo) {
+            mailing.replyto_email = crmFromAddresses.getByAuthorEmail(mailing.from_name, mailing.from_email, true).label;
+          }
         });
         // FIXME: Shouldn't we also be watching mailing.from_name and mailing.from_email?
       }

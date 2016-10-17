@@ -51,113 +51,111 @@
 
 <script language="JavaScript" type="text/javascript">
 {literal}
-cj("#financial_account_id").change(function() {
-{/literal}
-  relationID = "#account_relationship"
-  financialAccountID = "#financial_account_id"
-  callbackURL = "{crmURL p='civicrm/ajax/rest' h=0 q='className=CRM_Financial_Page_AJAX&fnName=jqFinancialRelation'}"
-{literal}
-  var financialId = cj("#financial_account_id").val();
-  var check = cj(relationID).val();
-  if (check == 'select' || financialId == 'select') {
-    callbackURL = callbackURL+"&_value=" + financialId;
-    cj.ajax({
-      url: callbackURL,
-      context: document.body,
-      success: function(data, textStatus) {
-  cj(relationID).html("");//clear old options
-  data = eval(data);//get json array
-        if (data != null) {
-    for (i = 0; i < data.length; i++) {
-      if (data[i].selected == 'Selected') {
-        var idf = data[i].value;
-            }
-      cj(relationID).get(0).add(new Option(data[i].name, data[i].value), document.all ? i : null);
-    }
-        }
-  if (idf != null) {
-    cj(relationID).val(idf);
-        }
-      }
-    });
-    if (financialId == 'select') {
-{/literal}
-      callbackURLs = "{crmURL p='civicrm/ajax/rest' h=0 q='className=CRM_Financial_Page_AJAX&fnName=jqFinancial'}"
-{literal}
-      callbackURLs = callbackURLs + "&_value=select";
-      cj.ajax({
-        url: callbackURLs,
-        context: document.body,
-        success: function(data, textStatus) {
-    cj(financialAccountID).html("");//clear old options
-    data = eval(data);//get json array
-          if (data != null) {
-      for (i = 0; i < data.length; i++) {
-        cj(financialAccountID).get(0).add(new Option(data[i].name, data[i].value), document.all ? i : null);
-      }
-    }
-    }
-      });
-    }
-  }
-});
-{/literal}
-{literal}
-cj("#account_relationship").change(function() {
-{/literal}
-  relationID = "#account_relationship"
-  financialAccountID = "#financial_account_id"
-  callbackURLs = "{crmURL p='civicrm/ajax/rest' h=0 q='className=CRM_Financial_Page_AJAX&fnName=jqFinancial'}"
-{literal}
-  var financialId = cj("#account_relationship").val();
-  var check = cj(financialAccountID).val();
-  if (check == 'select' || financialId == 'select') {
-    callbackURLs = callbackURLs+"&_value="+financialId;
-    cj.ajax({
-      url: callbackURLs,
-      context: document.body,
-      success: function(data, textStatus) {
-  cj(financialAccountID).html("");//clear old options
-  data = eval(data);//get json array
-        if (data != null) {
-    for (i = 0; i < data.length; i++) {
-       if (data[i].selected == 'Selected') {
-         var idf = data[i].value;
-             }
-       cj(financialAccountID).get(0).add(new Option(data[i].name, data[i].value), document.all ? i : null);
-    }
-  }
-  if (idf != null) {
-    cj(financialAccountID).val(idf);
-        }
-      }
-    });
-    if (financialId == 'select') {
-{/literal}
+CRM.$(function($) {
+  $("#financial_account_id").change(function() {
+    {/literal}
+      relationID = "#account_relationship"
+      financialAccountID = "#financial_account_id"
       callbackURL = "{crmURL p='civicrm/ajax/rest' h=0 q='className=CRM_Financial_Page_AJAX&fnName=jqFinancialRelation'}"
-{literal}
-      callbackURL = callbackURL+"&_value=select";
-      cj.ajax({
+    {literal}
+    var financialId = $("#financial_account_id").val();
+    var check = $(relationID).val();
+    if (check == 'select' || financialId == 'select') {
+      callbackURL = callbackURL+"&_value=" + financialId;
+      $.ajax({
         url: callbackURL,
-        context: document.body,
-        success: function(data, textStatus) {
-    cj(relationID).html("");//clear old options
-    data = eval(data);//get json array
+      	context: document.body,
+      	success: function(data, textStatus) {
+          $(relationID).html("");//clear old options
+  	  data = eval(data);//get json array
           if (data != null) {
-      for (i = 0; i < data.length; i++) {
-        if (data[i].selected == 'Selected') {
-    var idf = data[i].value;
+    	    for (i = 0; i < data.length; i++) {
+      	      if (data[i].selected == 'Selected') {
+                var idf = data[i].value;
               }
-        cj(relationID).get(0).add(new Option(data[i].name, data[i].value), document.all ? i : null);
-      }
-    }
-    if (idf != null) {
-      cj(relationID).val(idf);
+              $(relationID).get(0).add(new Option(data[i].name, data[i].value), document.all ? i : null);
+    	    }
+          }
+  	  if (idf != null) {
+      	    $(relationID).val(idf);
           }
         }
       });
     }
-  }
+    if (financialId == 'select') {
+      {/literal}
+        callbackURLs = "{crmURL p='civicrm/ajax/rest' h=0 q='className=CRM_Financial_Page_AJAX&fnName=jqFinancial'}"
+      {literal}
+      callbackURLs = callbackURLs + "&_value=select";
+      $.ajax({
+        url: callbackURLs,
+        context: document.body,
+        success: function(data, textStatus) {
+          $(financialAccountID).html("");//clear old options
+    	  data = eval(data);//get json array
+          if (data != null) {
+      	    for (i = 0; i < data.length; i++) {
+              $(financialAccountID).get(0).add(new Option(data[i].name, data[i].value), document.all ? i : null);
+            }
+          }
+        }
+      });
+    }
+  });
+  $("#account_relationship").change(function() {
+    {/literal}
+      relationID = "#account_relationship"
+      financialAccountID = "#financial_account_id"
+      callbackURLs = "{crmURL p='civicrm/ajax/rest' h=0 q='className=CRM_Financial_Page_AJAX&fnName=jqFinancial'}"
+    {literal}
+    var financialId = $("#account_relationship").val();
+    var check = $(financialAccountID).val();
+    callbackURLs = callbackURLs+"&_value="+financialId;
+    $.ajax({
+      url: callbackURLs,
+      context: document.body,
+      success: function(data, textStatus) {
+        $(financialAccountID).html("");//clear old options
+        data = eval(data);//get json array
+        if (data != null) {
+          for (i = 0; i < data.length; i++) {
+       	    if (data[i].selected == 'Selected') {
+              var idf = data[i].value;
+            }
+	    $(financialAccountID).get(0).add(new Option(data[i].name, data[i].value), document.all ? i : null);
+          }
+        }
+  	if (idf != null) {
+    	  $(financialAccountID).val(idf);
+        }
+      }
+    });
+    if (financialId == 'select') {
+      {/literal}
+        callbackURL = "{crmURL p='civicrm/ajax/rest' h=0 q='className=CRM_Financial_Page_AJAX&fnName=jqFinancialRelation'}"
+      {literal}
+      callbackURL = callbackURL+"&_value=select";
+      $.ajax({
+        url: callbackURL,
+        context: document.body,
+        success: function(data, textStatus) {
+          $(relationID).html("");//clear old options
+          data = eval(data);//get json array
+          if (data != null) {
+            for (i = 0; i < data.length; i++) {
+              if (data[i].selected == 'Selected') {
+                var idf = data[i].value;
+              }
+              $(relationID).get(0).add(new Option(data[i].name, data[i].value), document.all ? i : null);
+            }
+          }
+          if (idf != null) {
+            $(relationID).val(idf);
+          }
+        }
+      });
+    }
+  });
 });
 {/literal}
 </script>

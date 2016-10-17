@@ -301,105 +301,6 @@ WHERE  contribution_id = {$id}
   }
 
   /**
-   * This function process contribution related objects.
-   *
-   * @param int $contributionId
-   * @param int $statusId
-   * @param int|null $previousStatusId
-   *
-   * @param string $receiveDate
-   *
-   * @return null|string
-   */
-  protected function updateRelatedComponent($contributionId, $statusId, $previousStatusId = NULL, $receiveDate = NULL) {
-    $statusMsg = NULL;
-    if (!$contributionId || !$statusId) {
-      return $statusMsg;
-    }
-
-    $params = array(
-      'contribution_id' => $contributionId,
-      'contribution_status_id' => $statusId,
-      'previous_contribution_status_id' => $previousStatusId,
-      'receive_date' => $receiveDate,
-    );
-
-    $updateResult = CRM_Contribute_BAO_Contribution::transitionComponents($params);
-
-    if (!is_array($updateResult) ||
-      !($updatedComponents = CRM_Utils_Array::value('updatedComponents', $updateResult)) ||
-      !is_array($updatedComponents) ||
-      empty($updatedComponents)
-    ) {
-      return $statusMsg;
-    }
-
-    // get the user display name.
-    $sql = "
-   SELECT  display_name as displayName
-     FROM  civicrm_contact
-LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_contact.id )
-    WHERE  civicrm_contribution.id = {$contributionId}";
-    $userDisplayName = CRM_Core_DAO::singleValueQuery($sql);
-
-    // get the status message for user.
-    foreach ($updatedComponents as $componentName => $updatedStatusId) {
-
-      if ($componentName == 'CiviMember') {
-        $updatedStatusName = CRM_Utils_Array::value($updatedStatusId,
-          CRM_Member_PseudoConstant::membershipStatus()
-        );
-        if ($updatedStatusName == 'Cancelled') {
-          $statusMsg .= "<br />" . ts("Membership for %1 has been Cancelled.", array(1 => $userDisplayName));
-        }
-        elseif ($updatedStatusName == 'Expired') {
-          $statusMsg .= "<br />" . ts("Membership for %1 has been Expired.", array(1 => $userDisplayName));
-        }
-        else {
-          $endDate = CRM_Utils_Array::value('membership_end_date', $updateResult);
-          if ($endDate) {
-            $statusMsg .= "<br />" . ts("Membership for %1 has been updated. The membership End Date is %2.",
-                array(
-                  1 => $userDisplayName,
-                  2 => $endDate,
-                )
-              );
-          }
-        }
-      }
-
-      if ($componentName == 'CiviEvent') {
-        $updatedStatusName = CRM_Utils_Array::value($updatedStatusId,
-          CRM_Event_PseudoConstant::participantStatus()
-        );
-        if ($updatedStatusName == 'Cancelled') {
-          $statusMsg .= "<br />" . ts("Event Registration for %1 has been Cancelled.", array(1 => $userDisplayName));
-        }
-        elseif ($updatedStatusName == 'Registered') {
-          $statusMsg .= "<br />" . ts("Event Registration for %1 has been updated.", array(1 => $userDisplayName));
-        }
-      }
-
-      if ($componentName == 'CiviPledge') {
-        $updatedStatusName = CRM_Utils_Array::value($updatedStatusId,
-          CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name')
-        );
-        if ($updatedStatusName == 'Cancelled') {
-          $statusMsg .= "<br />" . ts("Pledge Payment for %1 has been Cancelled.", array(1 => $userDisplayName));
-        }
-        elseif ($updatedStatusName == 'Failed') {
-          $statusMsg .= "<br />" . ts("Pledge Payment for %1 has been Failed.", array(1 => $userDisplayName));
-        }
-        elseif ($updatedStatusName == 'Completed') {
-          $statusMsg .= "<br />" . ts("Pledge Payment for %1 has been updated.", array(1 => $userDisplayName));
-        }
-      }
-    }
-
-    return $statusMsg;
-  }
-
-  /**
    * @return array
    *   Array of valid processors. The array resembles the DB table but also has 'object' as a key
    * @throws Exception
@@ -449,7 +350,7 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
           }
         }
       }
-      CRM_Financial_Form_Payment::addCreditCardJs();
+      CRM_Financial_Form_Payment::addCreditCardJs($id);
     }
     $this->assign('recurringPaymentProcessorIds',
       empty($this->_recurPaymentProcessors) ? '' : implode(',', array_keys($this->_recurPaymentProcessors))
@@ -699,6 +600,12 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
 
     if ($hasBillingField) {
       $addressParams = array_merge($this->_params, $addressParams);
+      // CRM-18277 don't let this get passed in because we don't want contribution source to override contact source.
+      // Ideally we wouldn't just randomly merge everything into addressParams but just pass in a relevant array.
+      // Note this source field is covered by a unit test.
+      if (isset($addressParams['source'])) {
+        unset($addressParams['source']);
+      }
       //here we are setting up the billing contact - if different from the member they are already created
       // but they will get billing details assigned
       CRM_Contact_BAO_Contact::createProfileContact($addressParams, $fields,

@@ -165,7 +165,7 @@ class api_v3_RelationshipTypeTest extends CiviUnitTestCase {
       'is_active' => 0,
     );
     $result = $this->callAPIFailure('relationship_type', 'delete', $params,
-      'Invalid value for relationship type ID'
+      'id is not a valid integer'
     );
   }
 

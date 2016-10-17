@@ -732,6 +732,7 @@
     })
 
     // example: <div crm-ui-wizard="myWizardCtrl"><div crm-ui-wizard-step crm-title="ts('Step 1')">...</div><div crm-ui-wizard-step crm-title="ts('Step 2')">...</div></div>
+    // example with custom nav classes: <div crm-ui-wizard crm-ui-wizard-nav-class="ng-animate-out ...">...</div>
     // Note: "myWizardCtrl" has various actions/properties like next() and $first().
     // WISHLIST: Allow each step to determine if it is "complete" / "valid" / "selectable"
     // WISHLIST: Allow each step to enable/disable (show/hide) itself
@@ -739,7 +740,8 @@
       return {
         restrict: 'EA',
         scope: {
-          crmUiWizard: '@'
+          crmUiWizard: '@',
+          crmUiWizardNavClass: '@' // string, A list of classes that will be added to the nav items
         },
         templateUrl: '~/crmUi/wizard.html',
         transclude: true,
@@ -869,6 +871,7 @@
     // example: <div crm-ui-wizard-step crm-title="ts('My Title')" ng-form="mySubForm">...content...</div>
     // If there are any conditional steps, then be sure to set a weight explicitly on *all* steps to maintain ordering.
     // example: <div crm-ui-wizard-step="100" crm-title="..." ng-if="...">...content...</div>
+    // example with custom classes: <div crm-ui-wizard-step="100" crm-ui-wizard-step-class="ng-animate-out ...">...content...</div>
     .directive('crmUiWizardStep', function() {
       var nextWeight = 1;
       return {
@@ -876,9 +879,10 @@
         restrict: 'EA',
         scope: {
           crmTitle: '@', // expression, evaluates to a printable string
-          crmUiWizardStep: '@' // int, a weight which determines the ordering of the steps
+          crmUiWizardStep: '@', // int, a weight which determines the ordering of the steps
+          crmUiWizardStepClass: '@' // string, A list of classes that will be added to the template
         },
-        template: '<div class="crm-wizard-step" ng-show="selected" ng-transclude/></div>',
+        template: '<div class="crm-wizard-step {{crmUiWizardStepClass}}" ng-show="selected" ng-transclude/></div>',
         transclude: true,
         link: function (scope, element, attrs, ctrls) {
           var crmUiWizardCtrl = ctrls[0], form = ctrls[1];
@@ -891,7 +895,7 @@
             return form.$valid;
           };
           crmUiWizardCtrl.add(scope);
-          element.on('$destroy', function(){
+          scope.$on('$destroy', function(){
             crmUiWizardCtrl.remove(scope);
           });
         }

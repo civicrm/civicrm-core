@@ -156,7 +156,6 @@ function _civicrm_api3_constant_get_spec(&$params) {
     'fromEmailAddress',
     'gender',
     'group',
-    'groupIterator',
     'honor',
     'IMProvider',
     'individualPrefix',

@@ -142,7 +142,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
       $sql = " DROP TABLE IF EXISTS {$form->_componentTable}";
       CRM_Core_DAO::executeQuery($sql);
 
-      $sql = "CREATE TABLE {$form->_componentTable} ( contact_id int primary key) ENGINE=MyISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci";
+      $sql = "CREATE TABLE {$form->_componentTable} ( contact_id int primary key) ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci";
       CRM_Core_DAO::executeQuery($sql);
     }
 
@@ -442,6 +442,21 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
         }
       }
       $householdsDAO->free();
+    }
+
+    // If contact list has changed, households will probably be at the end of
+    // the list. Sort it again by sort_name.
+    if (implode(',', $this->_contactIds) != $relID) {
+      $contact_sort = array();
+      $result = civicrm_api3('Contact', 'get', array(
+        'return' => array('id'),
+        'id' => array('IN' => $this->_contactIds),
+        'options' => array(
+          'limit' => 0,
+          'sort' => "sort_name",
+        ),
+      ));
+      $this->_contactIds = array_keys($result['values']);
     }
   }
 

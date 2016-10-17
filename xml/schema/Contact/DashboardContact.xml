@@ -47,6 +47,13 @@
     <onDelete>CASCADE</onDelete>
     <add>3.1</add>
   </foreignKey>
+  <index>
+    <name>index_dashboard_id_contact_id</name>
+    <fieldName>dashboard_id</fieldName>
+    <fieldName>contact_id</fieldName>
+    <unique>true</unique>
+    <add>4.7</add>
+  </index>
   <field>
     <name>column_no</name>
     <type>boolean</type>
@@ -61,6 +68,7 @@
     <comment>Is Minimized?</comment>
     <default>0</default>
     <add>3.1</add>
+    <drop>4.7</drop>
   </field>
   <field>
     <name>is_fullscreen</name>
@@ -69,6 +77,7 @@
     <comment>Is Fullscreen?</comment>
     <default>1</default>
     <add>3.1</add>
+    <drop>4.7</drop>
   </field>
   <field>
     <name>is_active</name>
@@ -91,6 +100,7 @@
     <type>longtext</type>
     <comment>dashlet content</comment>
     <add>3.3</add>
+    <drop>4.7</drop>
   </field>
   <field>
     <name>created_date</name>
@@ -98,5 +108,6 @@
     <title>Dashlet Created On</title>
     <comment>When was content populated</comment>
     <add>3.3</add>
+    <drop>4.7</drop>
   </field>
 </table>

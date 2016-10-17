@@ -239,7 +239,7 @@ class CRM_Contribute_BAO_Query {
     // Adding address_id in a way that is more easily extendable since the above is a bit ... wordy.
     $supportedBasicReturnValues = array('address_id');
     foreach ($supportedBasicReturnValues as $fieldName) {
-      if (!empty($query->_returnProperties[$fieldName])) {
+      if (!empty($query->_returnProperties[$fieldName]) && empty($query->_select[$fieldName])) {
         $query->_select[$fieldName] = "civicrm_contribution.{$fieldName} as $fieldName";
         $query->_element[$fieldName] = $query->_tables['civicrm_contribution'] = 1;
       }
@@ -825,7 +825,7 @@ class CRM_Contribute_BAO_Query {
                SELECT con.id as id, con.contact_id, cso.id as filter_id, NULL as scredit_id
                  FROM civicrm_contribution con
             LEFT JOIN civicrm_contribution_soft cso ON con.id = cso.contribution_id
-             GROUP BY id, contact_id, scredit_id
+             GROUP BY id, contact_id, scredit_id, cso.id
             UNION ALL
                SELECT scredit.contribution_id as id, scredit.contact_id, scredit.id as filter_id, scredit.id as scredit_id
                  FROM civicrm_contribution_soft as scredit";
@@ -886,6 +886,7 @@ class CRM_Contribute_BAO_Query {
       // on what field to show instead.
       'contribution_product_id' => 1,
       'product_name' => 1,
+      'currency' => 1,
     );
     if (self::isSoftCreditOptionEnabled()) {
       $properties = array_merge($properties, self::softCreditReturnProperties());

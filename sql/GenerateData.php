@@ -374,7 +374,7 @@ class CRM_GCD {
 
     // number of seconds per year
     $numSecond = 31536000;
-    $dateFormat = "Ymdhis";
+    $dateFormat = "YmdHis";
     $today = time();
 
     // both are defined
@@ -430,7 +430,7 @@ class CRM_GCD {
   private function _insert(&$dao) {
     if (self::ADD_TO_DB) {
       if (!$dao->insert()) {
-        echo "ERROR INSERT: " . mysql_error() . "\n";
+        echo "ERROR INSERT: " . mysqli_error($dao->getConnection()->connection) . "\n";
         print_r($dao);
         exit(1);
       }
@@ -444,7 +444,7 @@ class CRM_GCD {
   private function _update(&$dao) {
     if (self::ADD_TO_DB) {
       if (!$dao->update()) {
-        echo "ERROR UPDATE: " . mysql_error() . "\n";
+        echo "ERROR UPDATE: " . mysqli_error($dao->getConnection()->connection) . "\n";
         print_r($dao);
         exit(1);
       }
@@ -1976,22 +1976,6 @@ AND    a.details = 'Participant Payment'
     $this->_query($sql);
   }
 
-}
-
-/**
- * @param null $str
- *
- * @return bool
- */
-function user_access($str = NULL) {
-  return TRUE;
-}
-
-/**
- * @return array
- */
-function module_list() {
-  return array();
 }
 
 echo ("Starting data generation on " . date("F dS h:i:s A") . "\n");

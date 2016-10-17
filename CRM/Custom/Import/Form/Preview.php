@@ -82,14 +82,12 @@ class CRM_Custom_Import_Form_Preview extends CRM_Import_Form_Preview {
    */
   public function postProcess() {
     $fileName = $this->controller->exportValue('DataSource', 'uploadFile');
+    $separator = $this->controller->exportValue('DataSource', 'fieldSeparator');
     $skipColumnHeader = $this->controller->exportValue('DataSource', 'skipColumnHeader');
     $invalidRowCount = $this->get('invalidRowCount');
     $conflictRowCount = $this->get('conflictRowCount');
     $onDuplicate = $this->get('onDuplicate');
     $entity = $this->get('_entity');
-
-    $config = CRM_Core_Config::singleton();
-    $separator = $config->fieldSeparator;
 
     $mapper = $this->controller->exportValue('MapField', 'mapper');
     $mapperKeys = array();

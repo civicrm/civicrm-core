@@ -9,6 +9,11 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
   protected $_groupId;
   protected $_contactIds = array();
 
+  public function tearDown() {
+    $this->quickCleanup(array('civicrm_contact', 'civicrm_group_contact', 'civicrm_group'));
+    parent::tearDown();
+  }
+
   public function createDupeContacts() {
     // create a group to hold contacts, so that dupe checks don't consider any other contacts in the DB
     $params = array(
@@ -17,10 +22,9 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
       'domain_id'  => 1,
       'is_active'  => 1,
       'visibility' => 'Public Pages',
-      'version'    => 3,
     );
-    // TODO: This is not an API test!!
-    $result = civicrm_api('group', 'create', $params);
+
+    $result = $this->callAPISuccess('group', 'create', $params);
     $this->_groupId = $result['id'];
 
     // contact data set
@@ -105,21 +109,23 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
         'group_id'   => $this->_groupId,
         'version'    => 3,
       );
-      $res = civicrm_api('group_contact', 'create', $grpParams);
+      $this->callAPISuccess('group_contact', 'create', $grpParams);
     }
   }
 
+  /**
+   * Delete all created contacts.
+   */
   public function deleteDupeContacts() {
-    // delete all created contacts
     foreach ($this->_contactIds as $contactId) {
-      Contact::delete($contactId);
+      $this->contactDelete($contactId);
     }
-
-    // delete dupe group
-    $params = array('id' => $this->_groupId, 'version' => 3);
-    civicrm_api('group', 'delete', $params);
+    $this->groupDelete($this->_groupId);
   }
 
+  /**
+   * Test the batch merge.
+   */
   public function testBatchMergeSelectedDuplicates() {
     $this->createDupeContacts();
 
@@ -152,11 +158,12 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
     $object->set('gid', $this->_groupId);
     $object->set('rgid', $dao->id);
     $object->set('action', CRM_Core_Action::UPDATE);
+    $object->setEmbedded(TRUE);
     @$object->run();
 
     // Retrieve pairs from prev next cache table
     $select = array('pn.is_selected' => 'is_selected');
-    $cacheKeyString = "merge Individual_{$dao->id}_{$this->_groupId}";
+    $cacheKeyString = CRM_Dedupe_Merger::getMergeCacheKeyString($dao->id, $this->_groupId);
     $pnDupePairs = CRM_Core_BAO_PrevNextCache::retrieve($cacheKeyString, NULL, NULL, 0, 0, $select);
 
     $this->assertEquals(count($foundDupes), count($pnDupePairs), 'Check number of dupe pairs in prev next cache.');
@@ -179,6 +186,9 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
     $this->deleteDupeContacts();
   }
 
+  /**
+   * Test the batch merge.
+   */
   public function testBatchMergeAllDuplicates() {
     $this->createDupeContacts();
 
@@ -211,11 +221,12 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
     $object->set('gid', $this->_groupId);
     $object->set('rgid', $dao->id);
     $object->set('action', CRM_Core_Action::UPDATE);
+    $object->setEmbedded(TRUE);
     @$object->run();
 
     // Retrieve pairs from prev next cache table
     $select = array('pn.is_selected' => 'is_selected');
-    $cacheKeyString = "merge Individual_{$dao->id}_{$this->_groupId}";
+    $cacheKeyString = CRM_Dedupe_Merger::getMergeCacheKeyString($dao->id, $this->_groupId);
     $pnDupePairs = CRM_Core_BAO_PrevNextCache::retrieve($cacheKeyString, NULL, NULL, 0, 0, $select);
 
     $this->assertEquals(count($foundDupes), count($pnDupePairs), 'Check number of dupe pairs in prev next cache.');
@@ -254,6 +265,278 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
       ),
     );
   }
+
+  /**
+   * Test function that gets duplicate pairs.
+   *
+   * It turns out there are 2 code paths retrieving this data so my initial focus is on ensuring
+   * they match.
+   */
+  public function testGetMatches() {
+    $this->setupMatchData();
+    $pairs = CRM_Dedupe_Merger::getDuplicatePairs(
+      1,
+      NULL,
+      TRUE,
+      25,
+      FALSE
+    );
+
+    $this->assertEquals(array(
+      0 => array(
+        'srcID' => $this->contacts[1]['id'],
+        'srcName' => 'Mr. Mickey Mouse II',
+        'dstID' => $this->contacts[0]['id'],
+        'dstName' => 'Mr. Mickey Mouse II',
+        'weight' => 20,
+        'canMerge' => TRUE,
+      ),
+      1 => array(
+        'srcID' => $this->contacts[3]['id'],
+        'srcName' => 'Mr. Minnie Mouse II',
+        'dstID' => $this->contacts[2]['id'],
+        'dstName' => 'Mr. Minnie Mouse II',
+        'weight' => 20,
+        'canMerge' => TRUE,
+      ),
+    ), $pairs);
+  }
+
+  /**
+   * Test function that gets organization pairs.
+   *
+   * Note the rule will match on organization_name OR email - hence lots of matches.
+   */
+  public function testGetOrganizationMatches() {
+    $this->setupMatchData();
+    $ruleGroups = $this->callAPISuccessGetSingle('RuleGroup', array('contact_type' => 'Organization', 'used' => 'Supervised'));
+
+    $pairs = CRM_Dedupe_Merger::getDuplicatePairs(
+      $ruleGroups['id'],
+      NULL,
+      TRUE,
+      25,
+      FALSE
+    );
+
+    $expectedPairs = array(
+      0 => array(
+        'srcID' => $this->contacts[5]['id'],
+        'srcName' => 'Walt Disney Ltd',
+        'dstID' => $this->contacts[4]['id'],
+        'dstName' => 'Walt Disney Ltd',
+        'weight' => 20,
+        'canMerge' => TRUE,
+      ),
+      1 => array(
+        'srcID' => $this->contacts[7]['id'],
+        'srcName' => 'Walt Disney',
+        'dstID' => $this->contacts[6]['id'],
+        'dstName' => 'Walt Disney',
+        'weight' => 10,
+        'canMerge' => TRUE,
+      ),
+      2 => array(
+        'srcID' => $this->contacts[6]['id'],
+        'srcName' => 'Walt Disney',
+        'dstID' => $this->contacts[4]['id'],
+        'dstName' => 'Walt Disney Ltd',
+        'weight' => 10,
+        'canMerge' => TRUE,
+      ),
+      3 => array(
+        'srcID' => $this->contacts[6]['id'],
+        'srcName' => 'Walt Disney',
+        'dstID' => $this->contacts[5]['id'],
+        'dstName' => 'Walt Disney Ltd',
+        'weight' => 10,
+        'canMerge' => TRUE,
+      ),
+    );
+    usort($pairs, array(__CLASS__, 'compareDupes'));
+    usort($expectedPairs, array(__CLASS__, 'compareDupes'));
+    $this->assertEquals($expectedPairs, $pairs);
+  }
+
+  /**
+   * Function to sort $duplicate records in a stable way.
+   *
+   * @param array $a
+   * @param array $b
+   * @return int
+   */
+  public static function compareDupes($a, $b) {
+    foreach (array('srcName', 'dstName', 'srcID', 'dstID') as $field) {
+      if ($a[$field] != $b[$field]) {
+        return ($a[$field] < $b[$field]) ? 1 : -1;
+      }
+    }
+    return 0;
+  }
+
+  /**
+   *  Test function that gets organization duplicate pairs.
+   */
+  public function testGetOrganizationMatchesInGroup() {
+    $this->setupMatchData();
+    $ruleGroups = $this->callAPISuccessGetSingle('RuleGroup', array('contact_type' => 'Organization', 'used' => 'Supervised'));
+
+    $groupID = $this->groupCreate(array('title' => 'she-mice'));
+
+    $this->callAPISuccess('GroupContact', 'create', array('group_id' => $groupID, 'contact_id' => $this->contacts[4]['id']));
+
+    $pairs = CRM_Dedupe_Merger::getDuplicatePairs(
+      $ruleGroups['id'],
+      $groupID,
+      TRUE,
+      25,
+      FALSE
+    );
+
+    $this->assertEquals(array(
+      0 => array(
+        'srcID' => $this->contacts[5]['id'],
+        'srcName' => 'Walt Disney Ltd',
+        'dstID' => $this->contacts[4]['id'],
+        'dstName' => 'Walt Disney Ltd',
+        'weight' => 20,
+        'canMerge' => TRUE,
+      ),
+      1 => array(
+        'srcID' => $this->contacts[6]['id'],
+        'srcName' => 'Walt Disney',
+        'dstID' => $this->contacts[4]['id'],
+        'dstName' => 'Walt Disney Ltd',
+        'weight' => 10,
+        'canMerge' => TRUE,
+      ),
+    ), $pairs);
+
+    $this->callAPISuccess('GroupContact', 'create', array('group_id' => $groupID, 'contact_id' => $this->contacts[5]['id']));
+    CRM_Core_DAO::executeQuery("DELETE FROM civicrm_prevnext_cache");
+    $pairs = CRM_Dedupe_Merger::getDuplicatePairs(
+      $ruleGroups['id'],
+      $groupID,
+      TRUE,
+      25,
+      FALSE
+    );
+
+    $this->assertEquals(array(
+      0 => array(
+        'srcID' => $this->contacts[5]['id'],
+        'srcName' => 'Walt Disney Ltd',
+        'dstID' => $this->contacts[4]['id'],
+        'dstName' => 'Walt Disney Ltd',
+        'weight' => 20,
+        'canMerge' => TRUE,
+      ),
+      1 => array(
+        'srcID' => $this->contacts[6]['id'],
+        'srcName' => 'Walt Disney',
+        'dstID' => $this->contacts[4]['id'],
+        'dstName' => 'Walt Disney Ltd',
+        'weight' => 10,
+        'canMerge' => TRUE,
+      ),
+      2 => array(
+        'srcID' => $this->contacts[6]['id'],
+        'srcName' => 'Walt Disney',
+        'dstID' => $this->contacts[5]['id'],
+        'dstName' => 'Walt Disney Ltd',
+        'weight' => 10,
+        'canMerge' => TRUE,
+      ),
+    ), $pairs);
+  }
+
+  /**
+   * Test function that gets duplicate pairs.
+   *
+   * It turns out there are 2 code paths retrieving this data so my initial focus is on ensuring
+   * they match.
+   */
+  public function testGetMatchesInGroup() {
+    $this->setupMatchData();
+
+    $groupID = $this->groupCreate(array('title' => 'she-mice'));
+
+    $this->callAPISuccess('GroupContact', 'create', array('group_id' => $groupID, 'contact_id' => $this->contacts[3]['id']));
+
+    $pairs = CRM_Dedupe_Merger::getDuplicatePairs(
+      1,
+      $groupID,
+      TRUE,
+      25,
+      FALSE
+    );
+
+    $this->assertEquals(array(
+      0 => array(
+        'srcID' => $this->contacts[3]['id'],
+        'srcName' => 'Mr. Minnie Mouse II',
+        'dstID' => $this->contacts[2]['id'],
+        'dstName' => 'Mr. Minnie Mouse II',
+        'weight' => 20,
+        'canMerge' => TRUE,
+      ),
+    ), $pairs);
+  }
+
+  /**
+   * Set up some contacts for our matching.
+   */
+  public function setupMatchData() {
+    $fixtures = array(
+      array(
+        'first_name' => 'Mickey',
+        'last_name' => 'Mouse',
+        'email' => 'mickey@mouse.com',
+      ),
+      array(
+        'first_name' => 'Mickey',
+        'last_name' => 'Mouse',
+        'email' => 'mickey@mouse.com',
+      ),
+      array(
+        'first_name' => 'Minnie',
+        'last_name' => 'Mouse',
+        'email' => 'mickey@mouse.com',
+      ),
+      array(
+        'first_name' => 'Minnie',
+        'last_name' => 'Mouse',
+        'email' => 'mickey@mouse.com',
+      ),
+    );
+    foreach ($fixtures as $fixture) {
+      $contactID = $this->individualCreate($fixture);
+      $this->contacts[] = array_merge($fixture, array('id' => $contactID));
+    }
+    $organizationFixtures = array(
+      array(
+        'organization_name' => 'Walt Disney Ltd',
+        'email' => 'walt@disney.com',
+      ),
+      array(
+        'organization_name' => 'Walt Disney Ltd',
+        'email' => 'walt@disney.com',
+      ),
+      array(
+        'organization_name' => 'Walt Disney',
+        'email' => 'walt@disney.com',
+      ),
+      array(
+        'organization_name' => 'Walt Disney',
+        'email' => 'walter@disney.com',
+      ),
+    );
+    foreach ($organizationFixtures as $fixture) {
+      $contactID = $this->organizationCreate($fixture);
+      $this->contacts[] = array_merge($fixture, array('id' => $contactID));
+    }
+  }
+
 
   /**
    * Get the list of tables that refer to the CID.

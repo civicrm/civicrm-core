@@ -171,7 +171,44 @@ class api_v3_DomainTest extends CiviUnitTestCase {
     $this->assertEquals($result['count'], 1);
     $this->assertNotNull($result['id']);
     $this->assertEquals($result['values'][$result['id']]['name'], $this->params['name']);
-    $this->assertEquals($result['values'][$result['id']]['version'], $this->params['domain_version']);
+    $this->assertEquals($result['values'][$result['id']]['domain_version'], $this->params['domain_version']);
+  }
+
+  /**
+   * Test if Domain.create does not touch the version of the domain.
+   *
+   * See CRM-17430.
+   */
+  public function testUpdateDomainName() {
+    // First create a domain.
+    $domain_result = $this->callAPISuccess('domain', 'create', $this->params);
+    $domain_before = $this->callAPISuccess('Domain', 'getsingle', array('id' => $domain_result['id']));
+
+    // Change domain name.
+    $this->callAPISuccess('Domain', 'create', array(
+      'id' => $domain_result['id'],
+      'name' => 'B-Team domain',
+    ));
+
+    // Get domain again.
+    $domain_after = $this->callAPISuccess('Domain', 'getsingle', array('id' => $domain_result['id']));
+
+    // Version should still be the same.
+    $this->assertEquals($domain_before['version'], $domain_after['version']);
+  }
+
+  /**
+   * Test whether Domain.create returns a correct value for domain_version.
+   *
+   * See CRM-17430.
+   */
+  public function testCreateDomainResult() {
+    // First create a domain.
+    $domain_result = $this->callAPISuccess('Domain', 'create', $this->params);
+    $result_value = CRM_Utils_Array::first($domain_result['values']);
+
+    // Check for domain_version in create result.
+    $this->assertEquals($this->params['domain_version'], $result_value['domain_version']);
   }
 
   /**
