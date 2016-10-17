@@ -581,9 +581,18 @@ function _civicrm_api3_get_using_query_object($entity, $params, $additional_opti
   if (empty($returnProperties)) {
     $returnProperties = $defaultReturnProperties;
   }
+
+  $fields = civicrm_api($entity, 'getfields', array('version' => 3, 'action' => 'get'));
+
+  // Translate field names to unique names for the query builder
+  foreach ($fields['values'] as $uniqueName => $field) {
+    if (isset($field['name']) && isset($inputParams[$field['name']]) && $field['name'] != $uniqueName) {
+      $inputParams[$uniqueName] = $params[$field['name']];
+      unset($inputParams[$field['name']]);
+    }
+  }
+
   if (!empty($params['check_permissions'])) {
-    // we will filter query object against getfields
-    $fields = civicrm_api($entity, 'getfields', array('version' => 3, 'action' => 'get'));
     // we need to add this in as earlier in this function 'id' was unset in favour of $entity_id
     $fields['values'][$lowercase_entity . '_id'] = array();
     $varsToFilter = array('returnProperties', 'inputParams');
