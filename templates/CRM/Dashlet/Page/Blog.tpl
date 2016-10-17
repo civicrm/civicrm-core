@@ -61,7 +61,7 @@
       <div class="crm-accordion-wrapper collapsed">
         <div class="crm-accordion-header">
           <span class="crm-news-feed-item-title">{$article.title}</span>
-          <span class="crm-news-feed-item-preview"> - {$article.description|strip_tags|substr:0:100}…</span>
+          <span class="crm-news-feed-item-preview"> - {$article.description|strip_tags|ltrim|mb_substr:0:100}…</span>
         </div>
         <div class="crm-accordion-body">
           <div>{$article.description}</div>
