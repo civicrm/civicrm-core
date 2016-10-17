@@ -942,6 +942,23 @@ class CRM_Utils_Array {
   }
 
   /**
+   * Index an array of arrays by an item in each array
+   *
+   * @param string|int $indexKey
+   * @param array $array
+   *
+   * @return array
+   */
+  public static function indexBy($indexKey, $array) {
+    $result = array();
+    foreach ($array as $key => $value) {
+      $newKey = CRM_Utils_Array::value($indexKey, $value, $key);
+      $result[$newKey] = $value;
+    }
+    return $result;
+  }
+
+  /**
    * Copy all properties of $other into $array (recursively).
    *
    * @param array|ArrayAccess $array

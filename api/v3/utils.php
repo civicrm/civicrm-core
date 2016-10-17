@@ -1674,6 +1674,7 @@ function _civicrm_api3_validate_fields($entity, $action, &$params, $fields) {
       }
     }
   }
+  $fields = CRM_Utils_Array::indexBy('name', $fields);
   $fields = array_intersect_key($fields, $params);
   if (!empty($chainApiParams)) {
     $fields = array_merge($fields, $chainApiParams);
