@@ -51,8 +51,14 @@ function civicrm_api3_option_value_get($params) {
     }
     $params['option_group_id'] = $optionGroup['id'];
   }
+  $options = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 
-  return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+  if (!empty($params['autocomplete_cfid'])) {
+    $hookOptions = CRM_Core_BAO_CustomField::fieldOptionsForAutoCompleteSelect($params);
+    $options['values'] = array_merge($options['values'], $hookOptions);
+  }
+
+  return $options;
 }
 
 /**

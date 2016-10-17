@@ -186,6 +186,20 @@ class CRM_Core_FieldOptionsTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('custom_field', 'create', $api_params);
     $customField3 = $result['id'];
 
+    // Add a custom Autocomplete-select field.
+    $api_params = array(
+      'custom_group_id' => $customGroup['id'],
+      'label' => $custom_group_name . 4,
+      'html_type' => 'Autocomplete-Select',
+      'data_type' => 'String',
+      'option_values' => array(
+        'test_1' => 'Test One',
+        'test_2' => 'Test Two',
+      ),
+    );
+    $result = $this->callAPISuccess('custom_field', 'create', $api_params);
+    $customField4 = $result['id'];
+
     $this->targetField = 'custom_' . $customField1;
     $this->replaceOptions = NULL;
     $this->appendOptions = array('baz' => 'Baz');
@@ -204,6 +218,34 @@ class CRM_Core_FieldOptionsTest extends CiviUnitTestCase {
     $this->appendOptions = array(2 => 'Maybe');
     $options = CRM_Core_PseudoConstant::get('CRM_Core_BAO_CustomField', $this->targetField);
     $this->assertEquals(array(1 => 'Yes', 0 => 'No', 2 => 'Maybe'), $options);
+
+    $this->targetField = 'custom_' . $customField4;
+    $this->replaceOptions = NULL;
+    $this->appendOptions = array('test_3' => 'Test Three');
+    $params = array(
+      'option_group_id' => CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $customField4, 'option_group_id'),
+      'autocomplete_cfid' => $customField4,
+      'label' => array('LIKE' => '%test%'),
+      'return' => array('value', 'label'),
+    );
+
+    // Assert if hook options are fetched.
+    $optionValues = $this->callAPISuccess('option_value', 'get', $params);
+    $labels = CRM_Utils_Array::collect('label', $optionValues['values']);
+    $values = CRM_Utils_Array::collect('value', $optionValues['values']);
+    $this->assertEquals(array('test_1', 'test_2', 'test_3'), array_values($values));
+    $this->assertEquals(array('Test One', 'Test Two', 'Test Three'), array_values($labels));
+
+    // Assert if default value is set.
+    unset($params['label']);
+    $defaultValue = array(
+      'value' => 'test_3',
+      'label' => 'Test Three',
+    );
+    $params['value'] = array('IN' => array('test_3'));
+    $optionValues = $this->callAPISuccess('option_value', 'get', $params);
+    $this->assertEquals(1, count($optionValues['values']));
+    $this->assertEquals($defaultValue, array_pop($optionValues['values']));
 
     $field->free();
   }
