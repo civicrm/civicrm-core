@@ -259,7 +259,7 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
 
 
   /*
-   * Important! All upgrade functions MUST call the 'runSql' task.
+   * Important! All upgrade functions MUST add a 'runSql' task.
    * Uncomment and use the following template for a new upgrade version
    * (change the x in the function name):
    */
