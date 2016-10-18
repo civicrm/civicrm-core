@@ -669,7 +669,7 @@ class CRM_Core_I18n {
    */
   public static function getLocale() {
     global $tsLocale;
-    return $tsLocale;
+    return $tsLocale ? $tsLocale : 'en_US';
   }
 
 }
