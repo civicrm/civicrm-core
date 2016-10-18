@@ -3001,8 +3001,12 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
  AS SELECT ca.case_id, a.id, a.activity_date_time, a.status_id, a.activity_type_id
  FROM civicrm_case_activity ca
  INNER JOIN civicrm_activity a ON ca.activity_id=a.id
- WHERE a.activity_date_time <= DATE_ADD( NOW(), INTERVAL 14 DAY )
- AND a.is_current_revision = 1 AND a.is_deleted=0 AND a.status_id = $scheduled_id";
+ WHERE a.activity_date_time = 
+(SELECT b.activity_date_time FROM civicrm_case_activity bca
+ INNER JOIN civicrm_activity b ON bca.activity_id=b.id
+ WHERE b.activity_date_time <= DATE_ADD( NOW(), INTERVAL 14 DAY )
+ AND b.is_current_revision = 1 AND b.is_deleted=0 AND b.status_id = $scheduled_id
+ AND bca.case_id = ca.case_id ORDER BY b.activity_date_time ASC LIMIT 1)";
         break;
 
       case 'recent':
@@ -3010,9 +3014,12 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
  AS SELECT ca.case_id, a.id, a.activity_date_time, a.status_id, a.activity_type_id
  FROM civicrm_case_activity ca
  INNER JOIN civicrm_activity a ON ca.activity_id=a.id
- WHERE a.activity_date_time <= NOW()
- AND a.activity_date_time >= DATE_SUB( NOW(), INTERVAL 14 DAY )
- AND a.is_current_revision = 1 AND a.is_deleted=0 AND a.status_id <> $scheduled_id";
+ WHERE a.activity_date_time = 
+(SELECT b.activity_date_time FROM civicrm_case_activity bca
+ INNER JOIN civicrm_activity b ON bca.activity_id=b.id
+ WHERE b.activity_date_time >= DATE_SUB( NOW(), INTERVAL 14 DAY )
+ AND b.is_current_revision = 1 AND b.is_deleted=0 AND b.status_id <> $scheduled_id
+ AND bca.case_id = ca.case_id ORDER BY b.activity_date_time DESC LIMIT 1)";
         break;
     }
     return $sql;
