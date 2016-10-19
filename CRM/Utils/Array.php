@@ -1088,8 +1088,11 @@ class CRM_Utils_Array {
       if (is_array($value)) {
         $array[$key] = self::encode_items($value);
       }
-      else {
+      elseif (is_string($value)) {
         $array[$key] = mb_convert_encoding($value, mb_detect_encoding($value, mb_detect_order(), TRUE), 'UTF-8');
+      }
+      else {
+        $array[$key] = $value;
       }
     }
     return $array;
