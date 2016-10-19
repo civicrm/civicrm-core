@@ -287,6 +287,25 @@ class CRM_Utils_File {
   }
 
   /**
+   * Save a fake file somewhere
+   *
+   * @param string $dir
+   *   The directory where the file should be saved.
+   * @param string $contents
+   *   Optional: the contents of the file.
+   *
+   * @return string
+   *   The filename saved, or FALSE on failure.
+   */
+  public static function createFakeFile($dir, $contents = 'delete me') {
+    $dir = self::addTrailingSlash($dir);
+    $file = 'delete-this-' . CRM_Utils_String::createRandom(10, CRM_Utils_String::ALPHANUMERIC);
+    $success = file_put_contents($dir . $file, $contents);
+
+    return ($success === FALSE) ? FALSE : $file;
+  }
+
+  /**
    * @param string|NULL $dsn
    *   Use NULL to load the default/active connection from CRM_Core_DAO.
    *   Otherwise, give a full DSN string.
