@@ -258,14 +258,23 @@ class CRM_Core_OptionValue {
    * @param int $optionGroupID
    * @param string $fieldName
    *   The name of the field in the DAO.
+   * @param bool $domainSpecific
+   *   Filter this check to the current domain.
+   *   Some optionGroups allow for same labels or same names but
+   *   they must be in different domains, so filter the check to
+   *   the current domain.
    *
    * @return bool
    *   true if object exists
    */
-  public static function optionExists($value, $daoName, $daoID, $optionGroupID, $fieldName = 'name') {
+  public static function optionExists($value, $daoName, $daoID, $optionGroupID, $fieldName = 'name', $domainSpecific) {
     $object = new $daoName();
     $object->$fieldName = $value;
     $object->option_group_id = $optionGroupID;
+
+    if ($domainSpecific) {
+      $object->domain_id = CRM_Core_Config::domainID();
+    }
 
     if ($object->find(TRUE)) {
       return ($daoID && $object->id == $daoID) ? TRUE : FALSE;

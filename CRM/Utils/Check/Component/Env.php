@@ -38,20 +38,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
   public function checkPhpVersion() {
     $messages = array();
 
-    if (version_compare(phpversion(), CRM_Upgrade_Incremental_General::MIN_RECOMMENDED_PHP_VER) < 0) {
-      $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        ts('This system uses PHP version %1. While this meets the minimum requirements for CiviCRM to function, upgrading to PHP version %2 or newer is recommended for maximum compatibility.',
-          array(
-            1 => phpversion(),
-            2 => CRM_Upgrade_Incremental_General::MIN_RECOMMENDED_PHP_VER,
-          )),
-        ts('PHP Out-of-Date'),
-        \Psr\Log\LogLevel::NOTICE,
-        'fa-server'
-      );
-    }
-    else {
+    if (version_compare(phpversion(), CRM_Upgrade_Incremental_General::MIN_RECOMMENDED_PHP_VER) >= 0) {
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__,
         ts('This system uses PHP version %1 which meets or exceeds the minimum recommendation of %2.',
@@ -61,6 +48,57 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
           )),
         ts('PHP Up-to-Date'),
         \Psr\Log\LogLevel::INFO,
+        'fa-server'
+      );
+    }
+    elseif (version_compare(phpversion(), CRM_Upgrade_Incremental_General::MIN_DEFECT_PHP_VER) >= 0) {
+      $messages[] = new CRM_Utils_Check_Message(
+        __FUNCTION__,
+        ts('This system uses PHP version %1. While this meets the minimum requirements for CiviCRM to function, upgrading to PHP version %2 or newer is recommended for maximum compatibility.',
+          array(
+            1 => phpversion(),
+            2 => CRM_Upgrade_Incremental_General::MIN_RECOMMENDED_PHP_VER,
+            3 => CRM_Upgrade_Incremental_General::MIN_DEFECT_PHP_VER,
+          )),
+        ts('PHP Out-of-Date'),
+        \Psr\Log\LogLevel::NOTICE,
+        'fa-server'
+      );
+    }
+    else {
+      $messages[] = new CRM_Utils_Check_Message(
+        __FUNCTION__,
+        ts('This system uses PHP version %1. CiviCRM can be installed on this version, but some specific features are known to fail or degrade. Version %3 is the bare minimum to avoid known issues, and version %2 is recommended.',
+          array(
+            1 => phpversion(),
+            2 => CRM_Upgrade_Incremental_General::MIN_RECOMMENDED_PHP_VER,
+            3 => CRM_Upgrade_Incremental_General::MIN_DEFECT_PHP_VER,
+          )),
+        ts('PHP Out-of-Date'),
+        \Psr\Log\LogLevel::WARNING,
+        'fa-server'
+      );
+    }
+
+    return $messages;
+  }
+
+  /**
+   * @return array
+   */
+  public function checkPhpMysqli() {
+    $messages = array();
+
+    if (!extension_loaded('mysqli')) {
+      $messages[] = new CRM_Utils_Check_Message(
+        __FUNCTION__,
+        ts('Future versions of CiviCRM may require the PHP extension "%2". To ensure that your system will be compatible, please install it in advance. For more explanation, see <a href="%1">the announcement</a>.',
+          array(
+            1 => 'https://civicrm.org/blog/totten/psa-please-verify-php-extension-mysqli',
+            2 => 'mysqli',
+          )),
+        ts('Forward Compatibility: Enable "mysqli"'),
+        \Psr\Log\LogLevel::WARNING,
         'fa-server'
       );
     }
@@ -74,6 +112,8 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
    * @return array<CRM_Utils_Check_Message> an empty array, or a list of warnings
    */
   public function checkMysqlTime() {
+    //CRM-19115 - Always set MySQL time before checking it.
+    CRM_Core_Config::singleton()->userSystem->setMySQLTimeZone();
     $messages = array();
 
     $phpNow = date('Y-m-d H:i');
@@ -254,6 +294,133 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
         ts("Learn more in the <a %1>online documentation</a>.", array(1 => $docUrl))
       );
       $messages[] = $message;
+    }
+
+    return $messages;
+  }
+
+  /**
+   * Recommend that sites use path-variables for their directories and URLs.
+   * @return array
+   */
+  public function checkUrlVariables() {
+    $messages = array();
+    $hasOldStyle = FALSE;
+    $settingNames = array(
+      'userFrameworkResourceURL',
+      'imageUploadURL',
+      'customCSSURL',
+      'extensionsURL',
+    );
+
+    foreach ($settingNames as $settingName) {
+      $settingValue = Civi::settings()->get($settingName);
+      if (!empty($settingValue) && $settingValue{0} != '[') {
+        $hasOldStyle = TRUE;
+        break;
+      }
+    }
+
+    if ($hasOldStyle) {
+      $message = new CRM_Utils_Check_Message(
+        __FUNCTION__,
+        ts('<a href="%1">Resource URLs</a> may use absolute paths, relative paths, or variables. Absolute paths are more difficult to maintain. To maximize portability, consider using a variable in each URL (eg "<tt>[cms.root]</tt>" or "<tt>[civicrm.files]</tt>").',
+          array(1 => CRM_Utils_System::url('civicrm/admin/setting/url', "reset=1"))),
+        ts('Resource URLs: Make them portable'),
+        \Psr\Log\LogLevel::NOTICE,
+        'fa-server'
+      );
+      $messages[] = $message;
+    }
+
+    return $messages;
+  }
+
+  /**
+   * Recommend that sites use path-variables for their directories and URLs.
+   * @return array
+   */
+  public function checkDirVariables() {
+    $messages = array();
+    $hasOldStyle = FALSE;
+    $settingNames = array(
+      'uploadDir',
+      'imageUploadDir',
+      'customFileUploadDir',
+      'customTemplateDir',
+      'customPHPPathDir',
+      'extensionsDir',
+    );
+
+    foreach ($settingNames as $settingName) {
+      $settingValue = Civi::settings()->get($settingName);
+      if (!empty($settingValue) && $settingValue{0} != '[') {
+        $hasOldStyle = TRUE;
+        break;
+      }
+    }
+
+    if ($hasOldStyle) {
+      $message = new CRM_Utils_Check_Message(
+        __FUNCTION__,
+        ts('<a href="%1">Directories</a> may use absolute paths, relative paths, or variables. Absolute paths are more difficult to maintain. To maximize portability, consider using a variable in each directory (eg "<tt>[cms.root]</tt>" or "<tt>[civicrm.files]</tt>").',
+          array(1 => CRM_Utils_System::url('civicrm/admin/setting/path', "reset=1"))),
+        ts('Directory Paths: Make them portable'),
+        \Psr\Log\LogLevel::NOTICE,
+        'fa-server'
+      );
+      $messages[] = $message;
+    }
+
+    return $messages;
+  }
+
+  /**
+   * Check that important directories are writable.
+   *
+   * @return array
+   *   Any CRM_Utils_Check_Message instances that need to be generated.
+   */
+  public function checkDirsWritable() {
+    $notWritable = array();
+
+    $config = CRM_Core_Config::singleton();
+    $directories = array(
+      'uploadDir' => ts('Temporary Files Directory'),
+      'imageUploadDir' => ts('Images Directory'),
+      'customFileUploadDir' => ts('Custom Files Directory'),
+      'extensionsDir' => ts('CiviCRM Extensions Directory'),
+    );
+
+    foreach ($directories as $directory => $label) {
+      $file = CRM_Utils_File::createFakeFile($config->$directory);
+
+      if ($file === FALSE) {
+        $notWritable[] = "$label ({$config->$directory})";
+      }
+      else {
+        $dirWithSlash = CRM_Utils_File::addTrailingSlash($config->$directory);
+        unlink($dirWithSlash . $file);
+      }
+    }
+
+    $messages = array();
+
+    if (!empty($notWritable)) {
+      $messages[] = new CRM_Utils_Check_Message(
+        __FUNCTION__,
+        ts('The %1 is not writable.  Please check your file permissions.', array(
+          1 => implode(', ', $notWritable),
+          'count' => count($notWritable),
+          'plural' => 'The following directories are not writable: %1.  Please check your file permissions.',
+        )),
+        ts('Directory not writable', array(
+          'count' => count($notWritable),
+          'plural' => 'Directories not writable',
+        )),
+        \Psr\Log\LogLevel::ERROR,
+        'fa-ban'
+      );
     }
 
     return $messages;

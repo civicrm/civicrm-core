@@ -178,7 +178,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
       $defaults['financial_type_id'] = array_search('Donation', CRM_Contribute_PseudoConstant::financialType());
     }
 
-    $pledgeStatus = CRM_Contribute_PseudoConstant::contributionStatus();
+    $pledgeStatus = CRM_Pledge_BAO_Pledge::buildOptions('status_id');
     $pledgeStatusNames = CRM_Core_OptionGroup::values('contribution_status',
       FALSE, FALSE, FALSE, NULL, 'name', TRUE
     );
@@ -362,7 +362,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
     }
 
     if (CRM_Utils_Array::value('status_id', $this->_values) !=
-      array_search('Cancelled', CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name'))
+      CRM_Core_PseudoConstant::getKey('CRM_Pledge_BAO_Pledge', 'status_id', 'Cancelled')
     ) {
 
       $this->addElement('checkbox', 'is_acknowledge', ts('Send Acknowledgment?'), NULL,
@@ -486,9 +486,6 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
 
     $session = CRM_Core_Session::singleton();
 
-    // get All Payments status types.
-    $paymentStatusTypes = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
-
     $fields = array(
       'frequency_unit',
       'frequency_interval',
@@ -505,14 +502,6 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
       $params[$f] = CRM_Utils_Array::value($f, $formValues);
     }
 
-    // defaults status is "Pending".
-    // if update get status.
-    if ($this->_id) {
-      $params['pledge_status_id'] = $params['status_id'] = $this->_values['status_id'];
-    }
-    else {
-      $params['pledge_status_id'] = $params['status_id'] = array_search('Pending', $paymentStatusTypes);
-    }
     // format amount
     $params['amount'] = CRM_Utils_Rule::cleanMoney(CRM_Utils_Array::value('amount', $formValues));
     $params['currency'] = CRM_Utils_Array::value('currency', $formValues);

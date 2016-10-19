@@ -71,7 +71,6 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
         'entity_table' => "civicrm_contribution",
         'financial_trxn_id' => $trxn->id,
         'amount' => $params['total_amount'],
-        'currency' => $trxn->currency,
       );
 
     if (!empty($trxnEntityTable)) {
@@ -669,7 +668,9 @@ WHERE pp.participant_id = {$entityId} AND ft.to_financial_account_id != {$toFina
         }
       }
       $accountRel = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Income Account is' "));
-      // TODO: Call hook to alter $deferredRevenues
+
+      CRM_Utils_Hook::alterDeferredRevenueItems($deferredRevenues, $contributionDetails, $update, $context);
+
       foreach ($deferredRevenues as $key => $deferredRevenue) {
         $results = civicrm_api3('EntityFinancialAccount', 'get', array(
           'entity_table' => 'civicrm_financial_type',

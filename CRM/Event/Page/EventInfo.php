@@ -242,9 +242,7 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
       $this->assign('mapURL', $mapURL);
     }
 
-    if (CRM_Core_Permission::check('view event participants') &&
-      CRM_Core_Permission::check('view all contacts')
-    ) {
+    if (CRM_Core_Permission::check('view event participants')) {
       $statusTypes = CRM_Event_PseudoConstant::participantStatus(NULL, 'is_counted = 1', 'label');
       $statusTypesPending = CRM_Event_PseudoConstant::participantStatus(NULL, 'is_counted = 0', 'label');
       $findParticipants['statusCounted'] = implode(', ', array_values($statusTypes));

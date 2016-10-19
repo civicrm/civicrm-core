@@ -379,7 +379,7 @@ class CRM_Dedupe_Finder {
       $displayNames[$dao->id] = $dao->display_name;
     }
 
-    $userId = CRM_Core_Session::singleton()->getLoggedInContactID();
+    $userId = CRM_Core_Session::getLoggedInContactID();
     foreach ($foundDupes as $dupes) {
       $srcID = $dupes[1];
       $dstID = $dupes[0];

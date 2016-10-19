@@ -38,6 +38,7 @@ class CRM_Admin_Form_Preferences_Contribute extends CRM_Admin_Form_Preferences {
   protected $_settings = array(
     'cvv_backoffice_required' => CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,
     'acl_financial_type' => CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,
+    'always_post_to_accounts_receivable' => CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,
     'deferred_revenue_enabled' => CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,
     'default_invoice_page' => CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,
     'financial_account_bal_enable' => CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,
@@ -248,7 +249,9 @@ class CRM_Admin_Form_Preferences_Contribute extends CRM_Admin_Form_Preferences {
     else {
       $setting = explode(CRM_Core_DAO::VALUE_SEPARATOR, substr($values['user_dashboard_options'], 1, -1));
       $invoiceKey = array_search($setKey, $setting);
-      unset($setting[$invoiceKey]);
+      if ($invoiceKey !== FALSE) {
+        unset($setting[$invoiceKey]);
+      }
       $settingName = CRM_Core_DAO::VALUE_SEPARATOR .
         implode(CRM_Core_DAO::VALUE_SEPARATOR, array_values($setting)) .
         CRM_Core_DAO::VALUE_SEPARATOR;

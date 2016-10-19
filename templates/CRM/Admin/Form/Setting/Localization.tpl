@@ -134,7 +134,7 @@
         {else}
           <tr class="crm-localization-form-block-description">
               <td>
-              <span class="description">{ts}In order to use this functionality, the installation's database user must have privileges to create triggers (in MySQL 5.0 – and in MySQL 5.1 if binary logging is enabled – this means the SUPER privilege). This install either does not seem to have the required privilege enabled.{/ts} {ts}(Multilingual support currently cannot be enabled on installations with enabled logging.){/ts}</span><br /><br />
+              <span class="description">{ts}In order to use this functionality, the installation's database user must have privileges to create triggers and views (in MySQL 5.0 – and in MySQL 5.1 if binary logging is enabled – this means the SUPER privilege). This install either does not seem to have the required privilege enabled.{/ts} {ts}(Multilingual support currently cannot be enabled on installations with enabled logging.){/ts}</span><br /><br />
               <span class="description" style="color:red">{$warning}</span></td>
           </tr>
         {/if}

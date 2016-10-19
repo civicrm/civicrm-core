@@ -144,7 +144,7 @@ class CRM_Core_BAO_CustomOption {
         $action -= CRM_Core_Action::DISABLE;
       }
       if (in_array($field->html_type, array('CheckBox', 'AdvMulti-Select', 'Multi-Select'))) {
-        if (in_array($dao->value, $defVal)) {
+        if (isset($defVal) && in_array($dao->value, $defVal)) {
           $options[$dao->id]['is_default'] = '<img src="' . $config->resourceBase . 'i/check.gif" />';
         }
         else {

@@ -201,9 +201,6 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
     $campaignTypes = CRM_Campaign_PseudoConstant::campaignType();
     $membershipType = CRM_Member_BAO_MembershipType::getMembershipTypes(FALSE);
     $participantRole = CRM_Core_OptionGroup::values('participant_role');
-    $relTypeInd = CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, 'null', NULL, 'Individual');
-    $relTypeOrg = CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, 'null', NULL, 'Organization');
-    $relTypeHou = CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, 'null', NULL, 'Household');
 
     ksort($sel1);
     asort($activityType);
@@ -211,19 +208,6 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
     asort($grantType);
     asort($membershipType);
     asort($participantRole);
-    $allRelationshipType = array();
-    $allRelationshipType = array_merge($relTypeInd, $relTypeOrg);
-    $allRelationshipType = array_merge($allRelationshipType, $relTypeHou);
-
-    //adding subtype specific relationships CRM-5256
-    $subTypes = CRM_Contact_BAO_ContactType::subTypeInfo();
-
-    foreach ($subTypes as $subType => $val) {
-      $subTypeRelationshipTypes = CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, NULL, NULL, $val['parent'],
-        FALSE, 'label', TRUE, $subType
-      );
-      $allRelationshipType = array_merge($allRelationshipType, $subTypeRelationshipTypes);
-    }
 
     $sel2['Event'] = $eventType;
     $sel2['Grant'] = $grantType;
@@ -234,7 +218,7 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
     $sel2['ParticipantEventName'] = CRM_Event_PseudoConstant::event(NULL, FALSE, "( is_template IS NULL OR is_template != 1 )");
     $sel2['ParticipantEventType'] = $eventType;
     $sel2['Contribution'] = CRM_Contribute_PseudoConstant::financialType();
-    $sel2['Relationship'] = $allRelationshipType;
+    $sel2['Relationship'] = self::getRelationshipTypes();
 
     $sel2['Individual'] = CRM_Contact_BAO_ContactType::subTypePairs('Individual', FALSE, NULL);
     $sel2['Household'] = CRM_Contact_BAO_ContactType::subTypePairs('Household', FALSE, NULL);
@@ -244,17 +228,9 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
 
     foreach ($sel2 as $main => $sub) {
       if (!empty($sel2[$main])) {
-        if ($main == 'Relationship') {
-          $relName = self::getFormattedList($sel2[$main]);
-          $sel2[$main] = array(
-            '' => ts("- Any -"),
-          ) + $relName;
-        }
-        else {
-          $sel2[$main] = array(
-            '' => ts("- Any -"),
-          ) + $sel2[$main];
-        }
+        $sel2[$main] = array(
+          '' => ts("- Any -"),
+        ) + $sel2[$main];
       }
     }
 
@@ -460,8 +436,13 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
       }
 
       if (!empty($this->_subtypes)) {
-        $subtypesToBeRemoved = array_diff($this->_subtypes, array_intersect($this->_subtypes, $params['extends'][1]));
-        CRM_Contact_BAO_ContactType::deleteCustomRowsOfSubtype($this->_id, $subtypesToBeRemoved);
+        $subtypesToBeRemoved = array();
+        $subtypesToPreserve = $params['extends'][1];
+        // Don't remove any value if group is extended to -any- subtype
+        if (!empty($subtypesToPreserve[0])) {
+          $subtypesToBeRemoved = array_diff($this->_subtypes, array_intersect($this->_subtypes, $subtypesToPreserve));
+        }
+        CRM_Contact_BAO_ContactType::deleteCustomRowsOfSubtype($this->_id, $subtypesToBeRemoved, $subtypesToPreserve);
       }
     }
     elseif ($this->_action & CRM_Core_Action::ADD) {
@@ -514,36 +495,29 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
   }
 
   /**
-   * Return a formatted list of relationship name.
-   *
-   * @param array $list
-   *   Array of relationship name.
+   * Return a formatted list of relationship labels.
    *
    * @return array
-   *   Array of relationship name.
+   *   Array (int $id => string $label).
    */
-  public static function getFormattedList(&$list) {
-    $relName = array();
-
-    foreach ($list as $listItemKey => $itemValue) {
-      // Extract the relationship ID.
-      $key = substr($listItemKey, 0, strpos($listItemKey, '_'));
-      if (isset($list["{$key}_b_a"])) {
-        $relName["$key"] = $list["{$key}_a_b"];
-        // Are the two labels different?
-        if ($list["{$key}_a_b"] != $list["{$key}_b_a"]) {
-          $relName["$key"] = $list["{$key}_a_b"] . ' / ' . $list["{$key}_b_a"];
-        }
-        unset($list["{$key}_b_a"]);
-        unset($list["{$key}_a_b"]);
-      }
-      else {
-        // If no '_b_a' label exists save the '_a_b' one and unset it from the list
-        $relName["{$key}"] = $list["{$key}_a_b"];
-        unset($list["{$key}_a_b"]);
-      }
-    }
-    return $relName;
+  public static function getRelationshipTypes() {
+    // Note: We include inactive reltypes because we don't want to break custom-data
+    // UI when a reltype is disabled.
+    return CRM_Core_DAO::executeQuery('
+      SELECT
+        id,
+        (CASE 1
+           WHEN label_a_b is not null AND label_b_a is not null AND label_a_b != label_b_a
+            THEN concat(label_a_b, \' / \', label_b_a)
+           WHEN label_a_b is not null
+            THEN label_a_b
+           WHEN label_b_a is not null
+            THEN label_b_a
+           ELSE concat("RelType #", id)
+        END) as label
+      FROM civicrm_relationship_type
+      '
+    )->fetchMap('id', 'label');
   }
 
 }

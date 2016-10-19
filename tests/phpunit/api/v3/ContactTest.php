@@ -200,6 +200,45 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Verify that we can retreive contacts of different sub types
+   */
+  public function testGetMultipleContactSubTypes() {
+
+    // This test presumes that there are no parents or students in the dataset
+
+    // create a student
+    $student = $this->callAPISuccess('contact', 'create', array(
+      'email' => 'student@example.com',
+      'contact_type' => 'Individual',
+      'contact_sub_type' => 'Student',
+    ));
+
+    // create a parent
+    $parent = $this->callAPISuccess('contact', 'create', array(
+      'email' => 'parent@example.com',
+      'contact_type' => 'Individual',
+      'contact_sub_type' => 'Parent',
+    ));
+
+    // create a parent
+    $contact = $this->callAPISuccess('contact', 'create', array(
+      'email' => 'parent@example.com',
+      'contact_type' => 'Individual',
+    ));
+
+    // get all students and parents
+    $getParams = array('contact_sub_type' => array('IN' => array('Parent', 'Student')));
+    $result = civicrm_api3('contact', 'get', $getParams);
+
+    // check that we retrieved the student and the parent
+    $this->assertArrayHasKey($student['id'], $result['values']);
+    $this->assertArrayHasKey($parent['id'], $result['values']);
+    $this->assertEquals(2, $result['count']);
+
+  }
+
+
+  /**
    * Verify that attempt to create contact with empty params fails.
    */
   public function testCreateEmptyContact() {
@@ -2250,6 +2289,24 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that delete with skip undelete respects permissions.
+   */
+  public function testContactDeletePermissions() {
+    $contactID = $this->individualCreate();
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('access CiviCRM');
+    $this->callAPIFailure('Contact', 'delete', array(
+      'id' => $contactID,
+      'check_permissions' => 1,
+      'skip_undelete' => 1,
+    ));
+    $this->callAPISuccess('Contact', 'delete', array(
+      'id' => $contactID,
+      'check_permissions' => 0,
+      'skip_undelete' => 1,
+    ));
+  }
+
+  /**
    * Test update with check permissions set.
    */
   public function testContactUpdatePermissions() {
@@ -2965,6 +3022,65 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'auto_flip' => FALSE,
     ));
     $this->callAPISuccess('Setting', 'create', array('contact_undelete' => TRUE));
+  }
+
+  /**
+   * Ensure format with return=group shows comma-separated group IDs.
+   *
+   * CRM-19426
+   */
+  public function testContactGetReturnGroup() {
+    // Set up a contact, asser that they were created.
+    $contact_params = array(
+      'contact_type' => 'Individual',
+      'first_name' => 'Test',
+      'last_name' => 'Groupmember',
+      'email' => 'test@example.org',
+    );
+    $create_contact = $this->callApiSuccess('Contact', 'create', $contact_params);
+    $this->assertEquals(0, $create_contact['is_error']);
+    $this->assertInternalType('int', $create_contact['id']);
+
+    $created_contact_id = $create_contact['id'];
+
+    // Set up multiple groups, add the contact to the groups.
+    $test_groups = array('Test group A', 'Test group B');
+    foreach ($test_groups as $title) {
+      // Use this contact as group owner, since we know they exist.
+      $group_params = array(
+        'title' => $title,
+        'created_id' => $created_contact_id,
+      );
+      $create_group = $this->callApiSuccess('Group', 'create', $group_params);
+      $this->assertEquals(0, $create_group['is_error']);
+      $this->assertInternalType('int', $create_group['id']);
+
+      $created_group_ids[] = $create_group['id'];
+
+      // Add contact to the new group.
+      $group_contact_params = array(
+        'contact_id' => $created_contact_id,
+        'group_id' => $create_group['id'],
+      );
+      $create_group_contact = $this->callApiSuccess('GroupContact', 'create', $group_contact_params);
+      $this->assertEquals(0, $create_group_contact['is_error']);
+      $this->assertInternalType('int', $create_group_contact['added']);
+    }
+
+    // Use the Contact,get API to retrieve the contact
+    $contact_get_params = array(
+      'id' => $created_contact_id,
+      'return' => 'group',
+    );
+    $contact_get = $this->callApiSuccess('Contact', 'get', $contact_get_params);
+    $this->assertInternalType('array', $contact_get['values'][$created_contact_id]);
+    $this->assertInternalType('string', $contact_get['values'][$created_contact_id]['groups']);
+
+    // Ensure they are shown as being in each created group.
+    $contact_group_ids = explode(',', $contact_get['values'][$created_contact_id]['groups']);
+    foreach ($created_group_ids as $created_group_id) {
+      $this->assertContains($created_group_id, $contact_group_ids);
+    }
   }
 
 }

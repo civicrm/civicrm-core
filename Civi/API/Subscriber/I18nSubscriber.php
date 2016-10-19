@@ -73,38 +73,35 @@ class I18nSubscriber implements EventSubscriberInterface {
     $domain->id = \CRM_Core_Config::domainID();
     $domain->find(TRUE);
 
-    if ($domain->config_backend) {
-      $defaults = unserialize($domain->config_backend);
+    // are we in a multi-language setup?
+    $multiLang = $domain->locales ? TRUE : FALSE;
+    $lcMessages = NULL;
 
-      // are we in a multi-language setup?
-      $multiLang = $domain->locales ? TRUE : FALSE;
-      $lcMessages = NULL;
-
-      // on multi-lang sites based on request and civicrm_uf_match
-      if ($multiLang) {
-        $languageLimit = array();
-        if (array_key_exists('languageLimit', $defaults) && is_array($defaults['languageLimit'])) {
-          $languageLimit = $defaults['languageLimit'];
-        }
-
-        if (in_array($lcMessagesRequest, array_keys($languageLimit))) {
-          $lcMessages = $lcMessagesRequest;
-        }
-        else {
-          throw new \API_Exception(ts('Language not enabled: %1', array(1 => $lcMessagesRequest)));
-        }
+    // on multi-lang sites based on request and civicrm_uf_match
+    if ($multiLang) {
+      $config = \CRM_Core_Config::singleton();
+      $languageLimit = array();
+      if (isset($config->languageLimit) and $config->languageLimit) {
+        $languageLimit = $config->languageLimit;
       }
 
-      global $dbLocale;
-
-      // set suffix for table names - use views if more than one language
-      if ($lcMessages) {
-        $dbLocale = $multiLang && $lcMessages ? "_{$lcMessages}" : '';
-
-        // FIXME: an ugly hack to fix CRM-4041
-        global $tsLocale;
-        $tsLocale = $lcMessages;
+      if (in_array($lcMessagesRequest, array_keys($languageLimit))) {
+        $lcMessages = $lcMessagesRequest;
       }
+      else {
+        throw new \API_Exception(ts('Language not enabled: %1', array(1 => $lcMessagesRequest)));
+      }
+    }
+
+    global $dbLocale;
+
+    // set suffix for table names - use views if more than one language
+    if ($lcMessages) {
+      $dbLocale = $multiLang && $lcMessages ? "_{$lcMessages}" : '';
+
+      // FIXME: an ugly hack to fix CRM-4041
+      global $tsLocale;
+      $tsLocale = $lcMessages;
     }
   }
 

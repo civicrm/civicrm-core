@@ -32,6 +32,10 @@
  * @copyright CiviCRM LLC (c) 2004-2016
  */
 
+if (!defined('DB_DSN_MODE')) {
+  define('DB_DSN_MODE', 'auto');
+}
+
 require_once 'PEAR.php';
 require_once 'DB/DataObject.php';
 
@@ -107,7 +111,8 @@ class CRM_Core_DAO extends DB_DataObject {
     if (defined('CIVICRM_DAO_DEBUG')) {
       self::DebugLevel(CIVICRM_DAO_DEBUG);
     }
-    CRM_Core_DAO::setFactory(new CRM_Contact_DAO_Factory());
+    $factory = new CRM_Contact_DAO_Factory();
+    CRM_Core_DAO::setFactory($factory);
     if (CRM_Utils_Constant::value('CIVICRM_MYSQL_STRICT', CRM_Utils_System::isDevelopment())) {
       CRM_Core_DAO::executeQuery('SET SESSION sql_mode = STRICT_TRANS_TABLES');
     }
@@ -462,7 +467,7 @@ class CRM_Core_DAO extends DB_DataObject {
    *
    * @param bool $hook
    *
-   * @return $this
+   * @return CRM_Core_DAO
    */
   public function save($hook = TRUE) {
     if (!empty($this->id)) {
@@ -724,14 +729,18 @@ class CRM_Core_DAO extends DB_DataObject {
    * @param string $fieldName
    *   The name of the field in the DAO.
    *
+   * @param string $domainID
+   *   The id of the domain.  Object exists only for the given domain.
+   *
    * @return bool
    *   true if object exists
    */
-  public static function objectExists($value, $daoName, $daoID, $fieldName = 'name') {
+  public static function objectExists($value, $daoName, $daoID, $fieldName = 'name', $domainID = NULL) {
     $object = new $daoName();
     $object->$fieldName = $value;
-
-    $config = CRM_Core_Config::singleton();
+    if ($domainID) {
+      $object->domain_id = $domainID;
+    }
 
     if ($object->find(TRUE)) {
       return ($daoID && $object->id == $daoID) ? TRUE : FALSE;
@@ -777,7 +786,7 @@ LIKE %1
        WHERE TABLE_SCHEMA = '" . CRM_Core_DAO::getDatabaseName() . "'
          AND TABLE_NAME LIKE 'civicrm_%'
          AND TABLE_NAME NOT LIKE 'civicrm_import_job_%'
-         AND TABLE_NAME NOT LIKE '%temp'
+         AND TABLE_NAME NOT LIKE '%_temp%'
       ");
 
     while ($dao->fetch()) {
@@ -800,7 +809,7 @@ LIKE %1
          AND TABLE_SCHEMA = '" . CRM_Core_DAO::getDatabaseName() . "'
          AND TABLE_NAME LIKE 'civicrm_%'
          AND TABLE_NAME NOT LIKE 'civicrm_import_job_%'
-         AND TABLE_NAME NOT LIKE '%temp'
+         AND TABLE_NAME NOT LIKE '%_temp%'
       ");
   }
 
@@ -1003,6 +1012,24 @@ FROM   civicrm_domain
     $result = array();
     while ($this->fetch()) {
       $result[] = $this->toArray();
+    }
+    return $result;
+  }
+
+  /**
+   * Get all the result records as mapping between columns.
+   *
+   * @param string $keyColumn
+   *   Ex: "name"
+   * @param string $valueColumn
+   *   Ex: "label"
+   * @return array
+   *   Ex: ["foo" => "The Foo Bar", "baz" => "The Baz Qux"]
+   */
+  public function fetchMap($keyColumn, $valueColumn) {
+    $result = array();
+    while ($this->fetch()) {
+      $result[$this->{$keyColumn}] = $this->{$valueColumn};
     }
     return $result;
   }
@@ -1389,9 +1416,7 @@ FROM   civicrm_domain
 
     foreach ($ids as $id) {
       if (isset($_DB_DATAOBJECT['RESULTS'][$id])) {
-        if (is_resource($_DB_DATAOBJECT['RESULTS'][$id]->result)) {
-          mysql_free_result($_DB_DATAOBJECT['RESULTS'][$id]->result);
-        }
+        $_DB_DATAOBJECT['RESULTS'][$id]->free();
         unset($_DB_DATAOBJECT['RESULTS'][$id]);
       }
 
@@ -1631,26 +1656,21 @@ SELECT contact_id
    */
   public static function escapeString($string) {
     static $_dao = NULL;
-
     if (!$_dao) {
-      // If this is an atypical case (e.g. preparing .sql files
-      // before Civi has been installed), then we fallback to
-      // DB-less escaping helper (mysql_real_escape_string).
-      // Note: In typical usage, escapeString() will only
-      // check one conditional ("if !$_dao") rather than
-      // two conditionals ("if !defined(DSN)")
+      // If this is an atypical case (e.g. preparing .sql file before CiviCRM
+      // has been installed), then we fallback DB-less str_replace escaping, as
+      // we can't use mysqli_real_escape_string, as there is no DB connection.
+      // Note: In typical usage, escapeString() will only check one conditional
+      // ("if !$_dao") rather than two conditionals ("if !defined(DSN)")
       if (!defined('CIVICRM_DSN')) {
-        if (function_exists('mysql_real_escape_string')) {
-          return mysql_real_escape_string($string);
-        }
-        else {
-          throw new CRM_Core_Exception("Cannot generate SQL. \"mysql_real_escape_string\" is missing. Have you installed PHP \"mysql\" extension?");
-        }
+        // See http://php.net/manual/en/mysqli.real-escape-string.php for the
+        // list of characters mysqli_real_escape_string escapes.
+        $search = array("\\", "\x00", "\n", "\r", "'", '"', "\x1a");
+        $replace = array("\\\\", "\\0", "\\n", "\\r", "\'", '\"', "\\Z");
+        return str_replace($search, $replace, $string);
       }
-
       $_dao = new CRM_Core_DAO();
     }
-
     return $_dao->escape($string);
   }
 
@@ -1884,8 +1904,8 @@ SELECT contact_id
     $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
     $dao = new CRM_Core_DAO();
     if ($view) {
-      $dao->query('CREATE OR REPLACE VIEW civicrm_domain_view AS SELECT * FROM civicrm_domain');
-      if (PEAR::getStaticProperty('DB_DataObject', 'lastError')) {
+      $result = $dao->query('CREATE OR REPLACE VIEW civicrm_domain_view AS SELECT * FROM civicrm_domain');
+      if (PEAR::getStaticProperty('DB_DataObject', 'lastError') || is_a($result, 'DB_Error')) {
         return FALSE;
       }
     }
@@ -2124,6 +2144,7 @@ SELECT contact_id
 
   /**
    * Get options for the called BAO object's field.
+   *
    * This function can be overridden by each BAO to add more logic related to context.
    * The overriding function will generally call the lower-level CRM_Core_PseudoConstant::get
    *
@@ -2407,11 +2428,32 @@ SELECT contact_id
    * @return array
    */
   public function addSelectWhereClause() {
-    // This is the default fallback, and works for contact-related entities like Email, Relationship, etc.
     $clauses = array();
-    foreach ($this->fields() as $fieldName => $field) {
+    $fields = $this->fields();
+    foreach ($fields as $fieldName => $field) {
+      // Clause for contact-related entities like Email, Relationship, etc.
       if (strpos($fieldName, 'contact_id') === 0 && CRM_Utils_Array::value('FKClassName', $field) == 'CRM_Contact_DAO_Contact') {
         $clauses[$fieldName] = CRM_Utils_SQL::mergeSubquery('Contact');
+      }
+      // Clause for an entity_table/entity_id combo
+      if ($fieldName == 'entity_id' && isset($fields['entity_table'])) {
+        $relatedClauses = array();
+        $relatedEntities = $this->buildOptions('entity_table', 'get');
+        foreach ((array) $relatedEntities as $table => $ent) {
+          if (!empty($ent)) {
+            $ent = CRM_Core_DAO_AllCoreTables::getBriefName(CRM_Core_DAO_AllCoreTables::getClassForTable($table));
+            $subquery = CRM_Utils_SQL::mergeSubquery($ent);
+            if ($subquery) {
+              $relatedClauses[] = "(entity_table = '$table' AND entity_id " . implode(' AND entity_id ', $subquery) . ")";
+            }
+            else {
+              $relatedClauses[] = "(entity_table = '$table')";
+            }
+          }
+        }
+        if ($relatedClauses) {
+          $clauses['id'] = 'IN (SELECT id FROM `' . $this->tableName() . '` WHERE (' . implode(') OR (', $relatedClauses) . '))';
+        }
       }
     }
     CRM_Utils_Hook::selectWhereClause($this, $clauses);
@@ -2442,16 +2484,17 @@ SELECT contact_id
   }
 
   /**
-   * function to check valid db name containing only characters in [0-9,a-z,A-Z_]
+   * ensure database name is 'safe', i.e. only contains word characters (includes underscores)
+   * and dashes, and contains at least one [a-z] case insenstive.
    *
    * @param $database
    *
    * @return bool
    */
-  public static function requireValidDBName($database) {
+  public static function requireSafeDBName($database) {
     $matches = array();
     preg_match(
-      "/^[0-9]*[a-zA-Z_]+[a-zA-Z0-9_]*$/",
+      "/^[\w\-]*[a-z]+[\w\-]*$/i",
       $database,
       $matches
     );

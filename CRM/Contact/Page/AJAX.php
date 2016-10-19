@@ -69,11 +69,12 @@ class CRM_Contact_Page_AJAX {
       parse_str($cf['filter'], $filterParams);
 
       $action = CRM_Utils_Array::value('action', $filterParams);
-
-      if (!empty($action) &&
-        !in_array($action, array('get', 'lookup'))
-      ) {
+      if (!empty($action) && !in_array($action, array('get', 'lookup'))) {
         CRM_Utils_System::civiExit('error');
+      }
+
+      if (!empty($filterParams['group'])) {
+        $filterParams['group'] = explode(',', $filterParams['group']);
       }
     }
 
@@ -149,6 +150,9 @@ class CRM_Contact_Page_AJAX {
       $contactList[] = array('id' => $value['id'], 'text' => implode(' :: ', $view));
     }
 
+    if (!empty($_GET['is_unit_test'])) {
+      return $contactList;
+    }
     CRM_Utils_JSON::output($contactList);
   }
 
@@ -219,9 +223,6 @@ class CRM_Contact_Page_AJAX {
     CRM_Utils_JSON::output($output);
   }
 
-  /**
-   * @throws \CiviCRM_API3_Exception
-   */
   public static function relationship() {
     $relType = CRM_Utils_Request::retrieve('rel_type', 'String', CRM_Core_DAO::$_nullObject, TRUE);
     $relContactID = CRM_Utils_Request::retrieve('rel_contact', 'Positive', CRM_Core_DAO::$_nullObject, TRUE);
@@ -245,13 +246,19 @@ class CRM_Contact_Page_AJAX {
 
     // Loop through multiple case clients
     foreach ($clientList as $i => $sourceContactID) {
-      $result = civicrm_api3('relationship', 'create', array(
-        'case_id' => $caseID,
-        'relationship_type_id' => $relTypeId,
-        "contact_id_$a" => $relContactID,
-        "contact_id_$b" => $sourceContactID,
-        'start_date' => 'now',
-      ));
+      try {
+        $result = civicrm_api3('relationship', 'create', array(
+          'case_id' => $caseID,
+          'relationship_type_id' => $relTypeId,
+          "contact_id_$a" => $relContactID,
+          "contact_id_$b" => $sourceContactID,
+          'start_date' => 'now',
+        ));
+      }
+      catch (CiviCRM_API3_Exception $e) {
+        $ret['is_error'] = 1;
+        $ret['error_message'] = $e->getMessage();
+      }
       // Save activity only for the primary (first) client
       if ($i == 0 && empty($result['is_error'])) {
         CRM_Case_BAO_Case::createCaseRoleActivity($caseID, $result['id'], $relContactID);
@@ -569,32 +576,17 @@ LIMIT {$offset}, {$rowCount}
    * Function used for CiviCRM dashboard operations.
    */
   public static function dashboard() {
-    $operation = CRM_Utils_Type::escape($_REQUEST['op'], 'String');
-
-    switch ($operation) {
-      case 'get_widgets_by_column':
-        // This would normally be coming from either the database (this user's settings) or a default/initial dashboard configuration.
-        // get contact id of logged in user
-
-        $dashlets = CRM_Core_BAO_Dashboard::getContactDashlets();
-        break;
-
-      case 'get_widget':
-        $dashletID = CRM_Utils_Type::escape($_GET['id'], 'Positive');
-
-        $dashlets = CRM_Core_BAO_Dashboard::getDashletInfo($dashletID);
-        break;
-
+    switch ($_REQUEST['op']) {
       case 'save_columns':
         CRM_Core_BAO_Dashboard::saveDashletChanges($_REQUEST['columns']);
-        CRM_Utils_System::civiExit();
+        break;
+
       case 'delete_dashlet':
         $dashletID = CRM_Utils_Type::escape($_REQUEST['dashlet_id'], 'Positive');
         CRM_Core_BAO_Dashboard::deleteDashlet($dashletID);
-        CRM_Utils_System::civiExit();
     }
 
-    CRM_Utils_JSON::output($dashlets);
+    CRM_Utils_System::civiExit();
   }
 
   /**
@@ -655,8 +647,8 @@ LIMIT {$offset}, {$rowCount}
     $offset    = isset($_REQUEST['start']) ? CRM_Utils_Type::escape($_REQUEST['start'], 'Integer') : 0;
     $rowCount  = isset($_REQUEST['length']) ? CRM_Utils_Type::escape($_REQUEST['length'], 'Integer') : 25;
 
-    $gid         = isset($_REQUEST['gid']) ? CRM_Utils_Type::escape($_REQUEST['gid'], 'Integer') : 0;
-    $rgid        = isset($_REQUEST['rgid']) ? CRM_Utils_Type::escape($_REQUEST['rgid'], 'Integer') : 0;
+    $gid = CRM_Utils_Request::retrieve('gid', 'Positive');
+    $rgid = CRM_Utils_Request::retrieve('rgid', 'Positive');
     $selected    = isset($_REQUEST['selected']) ? CRM_Utils_Type::escape($_REQUEST['selected'], 'Integer') : 0;
     if ($rowCount < 0) {
       $rowCount = 0;
@@ -688,7 +680,9 @@ LIMIT {$offset}, {$rowCount}
 
     foreach ($mappings as $key => $dbName) {
       if (!empty($searchParams[$key])) {
-        $queryParams[$nextParamKey] = array('%' . $searchParams[$key] . '%', 'String');
+        // CRM-18694.
+        $wildcard = strstr($key, 'postcode') ? '' : '%';
+        $queryParams[$nextParamKey] = array($wildcard . $searchParams[$key] . '%', 'String');
         $where[] = $dbName . " LIKE %{$nextParamKey} ";
         $nextParamKey++;
       }
@@ -817,7 +811,7 @@ LIMIT {$offset}, {$rowCount}
       $searchRows[$count]['weight'] = CRM_Utils_Array::value('weight', $pair);
 
       if (!empty($pairInfo['data']['canMerge'])) {
-        $mergeParams = "reset=1&cid={$pairInfo['entity_id1']}&oid={$pairInfo['entity_id2']}&action=update&rgid={$rgid}";
+        $mergeParams = "reset=1&cid={$pairInfo['entity_id1']}&oid={$pairInfo['entity_id2']}&action=update&rgid={$rgid}&limit=" . CRM_Utils_Request::retrieve('limit', 'Integer');
         if ($gid) {
           $mergeParams .= "&gid={$gid}";
         }
@@ -938,7 +932,7 @@ LIMIT {$offset}, {$rowCount}
     }
     $prevNextId = CRM_Utils_Type::escapeAll((array) $prevNextId, 'Positive');
     CRM_Core_BAO_PrevNextCache::flipPair($prevNextId, $onlySelected);
-    CRM_Utils_JSON::output();
+    CRM_Utils_System::civiExit();
   }
 
   /**

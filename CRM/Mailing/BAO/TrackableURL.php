@@ -83,9 +83,7 @@ class CRM_Mailing_BAO_TrackableURL extends CRM_Mailing_DAO_TrackableURL {
 
       $tracker->url = $url;
       $tracker->mailing_id = $mailing_id;
-      if (strlen($tracker->url) > 254) {
-        return $url;
-      }
+
       if (!$tracker->find(TRUE)) {
         $tracker->save();
       }

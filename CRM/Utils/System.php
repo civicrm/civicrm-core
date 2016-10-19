@@ -1257,7 +1257,7 @@ class CRM_Utils_System {
    */
   public static function getDocBaseURL() {
     // FIXME: move this to configuration at some stage
-    return 'http://book.civicrm.org/';
+    return 'https://docs.civicrm.org/';
   }
 
   /**
@@ -1303,6 +1303,7 @@ class CRM_Utils_System {
       }
       else {
         $docBaseURL = self::getDocBaseURL();
+        $page = self::formatDocUrl($page);
       }
       return $docBaseURL . str_replace(' ', '+', $page);
     }
@@ -1341,6 +1342,7 @@ class CRM_Utils_System {
     }
     else {
       $docBaseURL = self::getDocBaseURL();
+      $params['page'] = self::formatDocUrl($params['page']);
     }
 
     if (!isset($params['title']) or $params['title'] === NULL) {
@@ -1369,40 +1371,15 @@ class CRM_Utils_System {
   }
 
   /**
-   * Execute external or internal URLs and return server response.
+   * Add language and version parameters to the doc url.
    *
-   * @param string $url
-   *   Request URL.
-   * @param bool $addCookie
-   *   Whether to provide a cookie. Should be true to access internal URLs.
+   * Note that this function may run before CiviCRM is initialized and so should not call ts() or perform any db lookups.
    *
-   * @return string
-   *   Response from URL.
+   * @param $url
+   * @return mixed
    */
-  public static function getServerResponse($url, $addCookie = TRUE) {
-    CRM_Core_TemporaryErrorScope::ignoreException();
-    require_once 'HTTP/Request.php';
-    $request = new HTTP_Request($url);
-
-    if ($addCookie) {
-      foreach ($_COOKIE as $name => $value) {
-        $request->addCookie($name, $value);
-      }
-    }
-
-    if (isset($_SERVER['AUTH_TYPE'])) {
-      $request->setBasicAuth($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW']);
-    }
-
-    $config = CRM_Core_Config::singleton();
-    if ($config->userFramework == 'WordPress') {
-      session_write_close();
-    }
-
-    $request->sendRequest();
-    $response = $request->getResponseBody();
-
-    return $response;
+  public static function formatDocUrl($url) {
+    return preg_replace('#^user/((\w\w/)?stable/)?#', 'user/en/stable/', $url);
   }
 
   /**

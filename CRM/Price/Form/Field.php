@@ -235,6 +235,10 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
     $this->registerRule('price', 'callback', 'money', 'CRM_Utils_Rule');
     $this->addRule('price', ts('must be a monetary value'), 'money');
 
+    $this->add('text', 'non_deductible_amount', ts('Non-deductible Amount'), NULL);
+    $this->registerRule('non_deductible_amount', 'callback', 'money', 'CRM_Utils_Rule');
+    $this->addRule('non_deductible_amount', ts('Please enter a monetary value for this field.'), 'money');
+
     if ($this->_action == CRM_Core_Action::UPDATE) {
       $this->freeze('html_type');
     }
@@ -409,9 +413,11 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
       }
       else {
         // CRM-16189
-        $isError = CRM_Financial_BAO_FinancialAccount::validateFinancialType($fields['financial_type_id'], $form->_sid);
-        if ($isError) {
-          $errors['financial_type_id'] = ts('Deferred revenue account is not configured for selected financial type. Please have an administrator set up the deferred revenue account at Administer > CiviContribute > Financial Accounts, then configure it for financial types at Administer > CiviContribution > Financial Types, Accounts');
+        try {
+          CRM_Financial_BAO_FinancialAccount::validateFinancialType($fields['financial_type_id'], $form->_sid);
+        }
+        catch (CRM_Core_Exception $e) {
+          $errors['financial_type_id'] = $e->getMessage();
         }
       }
     }
@@ -531,9 +537,11 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
 
           $_flagOption = $_emptyRow = 0;
           // CRM-16189
-          $isError = CRM_Financial_BAO_FinancialAccount::validateFinancialType($fields['option_financial_type_id'][$index], $form->_fid, 'PriceField');
-          if ($isError) {
-            $errors["option_financial_type_id[{$index}]"] = ts('Deferred revenue account is not configured for selected financial type. Please have an administrator set up the deferred revenue account at Administer > CiviContribute > Financial Accounts, then configure it for financial types at Administer > CiviContribution > Financial Types, Accounts');
+          try {
+            CRM_Financial_BAO_FinancialAccount::validateFinancialType($fields['option_financial_type_id'][$index], $form->_fid, 'PriceField');
+          }
+          catch(CRM_Core_Exception $e) {
+            $errors["option_financial_type_id[{$index}]"] = $e->getMessage();
           }
         }
 

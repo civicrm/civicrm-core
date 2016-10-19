@@ -91,6 +91,22 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
   }
 
   /**
+   * Retrieve array of allowed credit cards for this payment processor.
+   * @param interger|null $paymentProcessorID id of processor.
+   * @return array
+   */
+  public static function getCreditCards($paymentProcessorID = NULL) {
+    if (!empty($paymentProcessorID)) {
+      $processor = new CRM_Financial_DAO_PaymentProcessor();
+      $processor->id = $paymentProcessorID;
+      $processor->find(TRUE);
+      $cards = json_decode($processor->accepted_credit_cards, TRUE);
+      return $cards;
+    }
+    return array();
+  }
+
+  /**
    * Retrieve DB object based on input parameters.
    *
    * It also stores all the retrieved values in the default array.

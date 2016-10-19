@@ -105,10 +105,13 @@ class CRM_Core_QuickForm_Action_Upload extends CRM_Core_QuickForm_Action {
           @unlink($this->_uploadDir . $data['values'][$pageName][$uploadName]);
         }
 
-        $data['values'][$pageName][$uploadName] = array(
+        $value = array(
           'name' => $this->_uploadDir . $newName,
           'type' => $value['type'],
         );
+        //CRM-19460 handle brackets if present in $uploadName, similar things we do it for all other inputs.
+        $value = $element->_prepareValue($value, TRUE);
+        $data['values'][$pageName] = HTML_QuickForm::arrayMerge($data['values'][$pageName], $value);
       }
     }
   }

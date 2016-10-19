@@ -124,8 +124,13 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     $log = CRM_Core_Config::getLog();
     $this->setLogger($log);
 
-    // set up error handling for Pear Error Stack
-    $this->setDefaultCallback(array($this, 'handlePES'));
+    // PEAR<=1.9.0 does not declare "static" properly.
+    if (!is_callable(array('PEAR', '__callStatic'))) {
+      $this->setDefaultCallback(array($this, 'handlePES'));
+    }
+    else {
+      PEAR_ErrorStack::setDefaultCallback(array($this, 'handlePES'));
+    }
   }
 
   /**
@@ -190,32 +195,29 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     // can avoid infinite loops.
     global $_DB_DATAOBJECT;
 
-    if (!isset($_DB_DATAOBJECT['CONFIG']['database'])) {
-      // we haven't setup sql, so it's not our sql error...
-    }
-    elseif (preg_match('/^mysql:/', $_DB_DATAOBJECT['CONFIG']['database']) &&
-      mysql_error()
-    ) {
-      $mysql_error = mysql_error() . ', ' . mysql_errno();
-      $template->assign_by_ref('mysql_code', $mysql_error);
-
-      // execute a dummy query to clear error stack
-      mysql_query('select 1');
-    }
-    elseif (preg_match('/^mysqli:/', $_DB_DATAOBJECT['CONFIG']['database'])) {
+    if (isset($_DB_DATAOBJECT['CONFIG']['database'])) {
       $dao = new CRM_Core_DAO();
-
       if (isset($_DB_DATAOBJECT['CONNECTIONS'][$dao->_database_dsn_md5])) {
         $conn = $_DB_DATAOBJECT['CONNECTIONS'][$dao->_database_dsn_md5];
-        $link = $conn->connection;
 
-        if (mysqli_error($link)) {
-          $mysql_error = mysqli_error($link) . ', ' . mysqli_errno($link);
-          $template->assign_by_ref('mysql_code', $mysql_error);
-
-          // execute a dummy query to clear error stack
-          mysqli_query($link, 'select 1');
+        // FIXME: Polymorphism for the win.
+        if ($conn instanceof DB_mysqli) {
+          $link = $conn->connection;
+          if (mysqli_error($link)) {
+            $mysql_error = mysqli_error($link) . ', ' . mysqli_errno($link);
+            mysqli_query($link, 'select 1'); // execute a dummy query to clear error stack
+          }
         }
+        elseif ($conn instanceof DB_mysql) {
+          if (mysql_error()) {
+            $mysql_error = mysql_error() . ', ' . mysql_errno();
+            mysql_query('select 1'); // execute a dummy query to clear error stack
+          }
+        }
+        else {
+          $mysql_error = 'fixme-unknown-db-cxn';
+        }
+        $template->assign_by_ref('mysql_code', $mysql_error);
       }
     }
 
@@ -647,6 +649,23 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   }
 
   /**
+   * Generate a hash for the logfile.
+   * CRM-13640.
+   */
+  public static function generateLogFileHash($config) {
+    // Use multiple (but stable) inputs for hash information.
+    $md5inputs = array(
+      defined('CIVICRM_SITE_KEY') ? CIVICRM_SITE_KEY : 'NO_SITE_KEY',
+      $config->userFrameworkBaseURL,
+      md5($config->dsn),
+      $config->dsn,
+    );
+    // Trim 8 chars off the string, make it slightly easier to find
+    // but reveals less information from the hash.
+    return substr(md5(var_export($md5inputs, 1)), 8);
+  }
+
+  /**
    * Generate the name of the logfile to use and store it as a static.
    *
    * This function includes poor man's log file management and a check as to whether the file exists.
@@ -659,7 +678,8 @@ class CRM_Core_Error extends PEAR_ErrorStack {
 
       $prefixString = $prefix ? ($prefix . '.') : '';
 
-      $fileName = $config->configAndLogDir . 'CiviCRM.' . $prefixString . md5($config->dsn) . '.log';
+      $hash = self::generateLogFileHash($config);
+      $fileName = $config->configAndLogDir . 'CiviCRM.' . $prefixString . $hash . '.log';
 
       // Roll log file monthly or if greater than 256M
       // note that PHP file functions have a limit of 2G and hence

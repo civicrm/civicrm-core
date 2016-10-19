@@ -133,6 +133,15 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   protected $origExtensionSystem;
 
   /**
+   * Array of IDs created during test setup routine.
+   *
+   * The cleanUpSetUpIds method can be used to clear these at the end of the test.
+   *
+   * @var array
+   */
+  public $setupIDs = array();
+
+  /**
    *  Constructor.
    *
    *  Because we are overriding the parent class constructor, we
@@ -1137,7 +1146,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   public function membershipTypeCreate($params = array()) {
     CRM_Member_PseudoConstant::flush('membershipType');
     CRM_Core_Config::clearDBCache();
-    $memberOfOrganization = $this->organizationCreate();
+    $this->setupIDs['contact'] = $memberOfOrganization = $this->organizationCreate();
     $params = array_merge(array(
       'name' => 'General',
       'duration_unit' => 'year',
@@ -1145,7 +1154,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       'period_type' => 'rolling',
       'member_of_contact_id' => $memberOfOrganization,
       'domain_id' => 1,
-      'financial_type_id' => 1,
+      'financial_type_id' => 2,
       'is_active' => 1,
       'sequential' => 1,
       'visibility' => 'Public',
@@ -1165,16 +1174,17 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @return mixed
    */
   public function contactMembershipCreate($params) {
-    $pre = array(
+    $params = array_merge(array(
       'join_date' => '2007-01-21',
       'start_date' => '2007-01-21',
       'end_date' => '2007-12-21',
       'source' => 'Payment',
-    );
-
-    foreach ($pre as $key => $val) {
-      if (!isset($params[$key])) {
-        $params[$key] = $val;
+      'membership_type_id' => 'General',
+    ), $params);
+    if (!is_numeric($params['membership_type_id'])) {
+      $membershipTypes = $this->callAPISuccess('Membership', 'getoptions', array('action' => 'create', 'field' => 'membership_type_id'));
+      if (!in_array($params['membership_type_id'], $membershipTypes['values'])) {
+        $this->membershipTypeCreate(array('name' => $params['membership_type_id']));
       }
     }
 
@@ -1256,7 +1266,10 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    */
   public function relationshipTypeDelete($relationshipTypeID) {
     $params['id'] = $relationshipTypeID;
-    $this->callAPISuccess('relationship_type', 'delete', $params);
+    $check = $this->callAPISuccess('relationship_type', 'get', $params);
+    if (!empty($check['count'])) {
+      $this->callAPISuccess('relationship_type', 'delete', $params);
+    }
   }
 
   /**
@@ -1611,7 +1624,10 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     $params = array(
       'id' => $participantID,
     );
-    return $this->callAPISuccess('Participant', 'delete', $params);
+    $check = $this->callAPISuccess('Participant', 'get', $params);
+    if ($check['count'] > 0) {
+      return $this->callAPISuccess('Participant', 'delete', $params);
+    }
   }
 
   /**
@@ -1957,40 +1973,37 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @param array $params
    * @return array|int
    */
-  public function activityCreate($params = NULL) {
-
-    if ($params === NULL) {
-      $individualSourceID = $this->individualCreate();
-
-      $contactParams = array(
+  public function activityCreate($params = array()) {
+    $params = array_merge(array(
+      'subject' => 'Discussion on warm beer',
+      'activity_date_time' => date('Ymd'),
+      'duration_hours' => 30,
+      'duration_minutes' => 20,
+      'location' => 'Baker Street',
+      'details' => 'Lets schedule a meeting',
+      'status_id' => 1,
+      'activity_name' => 'Meeting',
+    ), $params);
+    if (!isset($params['source_contact_id'])) {
+      $params['source_contact_id'] = $this->individualCreate();
+    }
+    if (!isset($params['target_contact_id'])) {
+      $params['target_contact_id'] = $this->individualCreate(array(
         'first_name' => 'Julia',
         'Last_name' => 'Anderson',
         'prefix' => 'Ms.',
         'email' => 'julia_anderson@civicrm.org',
         'contact_type' => 'Individual',
-      );
-
-      $individualTargetID = $this->individualCreate($contactParams);
-
-      $params = array(
-        'source_contact_id' => $individualSourceID,
-        'target_contact_id' => array($individualTargetID),
-        'assignee_contact_id' => array($individualTargetID),
-        'subject' => 'Discussion on warm beer',
-        'activity_date_time' => date('Ymd'),
-        'duration_hours' => 30,
-        'duration_minutes' => 20,
-        'location' => 'Baker Street',
-        'details' => 'Lets schedule a meeting',
-        'status_id' => 1,
-        'activity_name' => 'Meeting',
-      );
+      ));
+    }
+    if (!isset($params['assignee_contact_id'])) {
+      $params['assignee_contact_id'] = $params['target_contact_id'];
     }
 
     $result = $this->callAPISuccess('Activity', 'create', $params);
 
-    $result['target_contact_id'] = $individualTargetID;
-    $result['assignee_contact_id'] = $individualTargetID;
+    $result['target_contact_id'] = $params['target_contact_id'];
+    $result['assignee_contact_id'] = $params['assignee_contact_id'];
     return $result;
   }
 
@@ -2376,17 +2389,6 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Delete note.
-   *
-   * @param array $params
-   *
-   * @return array|int
-   */
-  public function noteDelete($params) {
-    return $this->callAPISuccess('Note', 'delete', $params);
-  }
-
-  /**
    * Create custom field with Option Values.
    *
    * @param array $customGroup
@@ -2534,7 +2536,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
   public function restoreDefaultPriceSetConfig() {
     CRM_Core_DAO::executeQuery('DELETE FROM civicrm_price_set WHERE id > 2');
     CRM_Core_DAO::executeQuery("INSERT INTO `civicrm_price_field` (`id`, `price_set_id`, `name`, `label`, `html_type`, `is_enter_qty`, `help_pre`, `help_post`, `weight`, `is_display_amounts`, `options_per_line`, `is_active`, `is_required`, `active_on`, `expire_on`, `javascript`, `visibility_id`) VALUES (1, 1, 'contribution_amount', 'Contribution Amount', 'Text', 0, NULL, NULL, 1, 1, 1, 1, 1, NULL, NULL, NULL, 1)");
-    CRM_Core_DAO::executeQuery("INSERT INTO `civicrm_price_field_value` (`id`, `price_field_id`, `name`, `label`, `description`, `amount`, `count`, `max_value`, `weight`, `membership_type_id`, `membership_num_terms`, `is_default`, `is_active`, `financial_type_id`, `deductible_amount`) VALUES (1, 1, 'contribution_amount', 'Contribution Amount', NULL, '1', NULL, NULL, 1, NULL, NULL, 0, 1, 1, 0.00)");
+    CRM_Core_DAO::executeQuery("INSERT INTO `civicrm_price_field_value` (`id`, `price_field_id`, `name`, `label`, `description`, `amount`, `count`, `max_value`, `weight`, `membership_type_id`, `membership_num_terms`, `is_default`, `is_active`, `financial_type_id`, `non_deductible_amount`) VALUES (1, 1, 'contribution_amount', 'Contribution Amount', NULL, '1', NULL, NULL, 1, NULL, NULL, 0, 1, 1, 0.00)");
   }
   /*
    * Function does a 'Get' on the entity & compares the fields in the Params with those returned
@@ -3298,7 +3300,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
       'is_active' => array('1' => 1),
       'price_set_id' => $priceset->id,
       'is_enter_qty' => 1,
-      'financial_type_id' => CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType', 'Event Fee', 'id', 'name'),
+      'financial_type_id' => $this->getFinancialTypeId('Event Fee'),
     );
     CRM_Price_BAO_PriceField::create($paramsField);
 
@@ -3390,8 +3392,8 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
    * @return array
    */
   protected function createPriceSet($component = 'contribution_page', $componentId = NULL) {
-    $paramsSet['title'] = 'Price Set';
-    $paramsSet['name'] = CRM_Utils_String::titleToVar('Price Set');
+    $paramsSet['title'] = 'Price Set' . substr(sha1(rand()), 0, 7);
+    $paramsSet['name'] = CRM_Utils_String::titleToVar($paramsSet['title']);
     $paramsSet['is_active'] = TRUE;
     $paramsSet['financial_type_id'] = 4;
     $paramsSet['extends'] = 1;
@@ -3416,7 +3418,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
       'is_active' => array('1' => 1, '2' => 1),
       'price_set_id' => $priceSet['id'],
       'is_enter_qty' => 1,
-      'financial_type_id' => CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType', 'Event Fee', 'id', 'name'),
+      'financial_type_id' => $this->getFinancialTypeId('Event Fee'),
     );
     $priceField = CRM_Price_BAO_PriceField::create($paramsField);
     if ($componentId) {
@@ -3590,6 +3592,36 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     // Be really careful not to remove or bypass this without ensuring stray rows do not re-appear
     // when calling completeTransaction or repeatTransaction.
     $this->callAPISuccessGetCount('FinancialItem', array('description' => 'Sales Tax', 'amount' => 0), 0);
+  }
+
+  /**
+   * Return financial type id on basis of name
+   *
+   * @param string $name Financial type m/c name
+   *
+   * @return int
+   */
+  public function getFinancialTypeId($name) {
+    return CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType', $name, 'id', 'name');
+  }
+
+  /**
+   * Cleanup function for contents of $this->ids.
+   *
+   * This is a best effort cleanup to use in tear downs etc.
+   *
+   * It will not fail if the data has already been removed (some tests may do
+   * their own cleanup).
+   */
+  protected function cleanUpSetUpIDs() {
+    foreach ($this->setupIDs as $entity => $id) {
+      try {
+        civicrm_api3($entity, 'delete', array('id' => $id, 'skip_undelete' => 1));
+      }
+      catch (CiviCRM_API3_Exception $e) {
+        // This is a best-effort cleanup function, ignore.
+      }
+    }
   }
 
 }

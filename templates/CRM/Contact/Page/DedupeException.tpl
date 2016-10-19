@@ -23,8 +23,24 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-
-<table id="dedupeExceptions" class="display crm-sortable">
+<div class="crm-accordion-header">
+  {ts}Filter Contacts{/ts}
+</div>
+<div class="crm-accordion-body">
+  <table class="no-border form-layout-compressed" id="searchOptions" style="width:100%;">
+    <tr>
+      <td class="crm-contact-form-block-contact1">
+        <label for="contact1">{ts}Contact 1{/ts}</label><br />
+        <input type="text" placeholder="Search Contact1" search-column="0" />
+      </td>
+      <td class="crm-contact-form-block-contact2">
+        <label for="contact2">{ts}Contact 2{/ts}</label><br />
+        <input type="text" placeholder="Search Contact2" search-column="1" />
+      </td>
+    </tr>
+  </table>
+</div>
+<table id="dedupeExceptions" class="display crm-sortable" data-searching='true' data=filter='false'>
   <thead>
     <tr class="columnheader">
       <th>{ts}Contact 1{/ts}</th>
@@ -49,3 +65,17 @@
 
 {* process the dupe contacts *}
 {include file="CRM/common/dedupe.tpl"}
+{literal}
+  <script type="text/javascript">
+    (function($) {
+      var table = CRM.$('table#dedupeExceptions').DataTable();
+      // apply the search
+      $('#searchOptions input').on( 'keyup change', function () {
+        table
+          .column($(this).attr('search-column'))
+          .search(this.value)
+          .draw();
+      });
+    })(CRM.$);
+  </script>
+{/literal}

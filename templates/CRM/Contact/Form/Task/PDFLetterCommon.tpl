@@ -27,26 +27,33 @@
 {if $form.template.html}
 <table class="form-layout-compressed">
     <tr>
-      <td class="label-left">{$form.template.label}</td>
-      <td>{$form.template.html}</td>
+      <td class="label-left">
+        {$form.template.label}
+        {help id="template" title=$form.template.label file="CRM/Contact/Form/Task/PDFLetterCommon.hlp"}
+      </td>
+      <td>
+        {$form.template.html} {ts}OR{/ts} {$form.document_file.html}
+      </td>
     </tr>
     <tr>
       <td class="label-left">{$form.subject.label}</td>
       <td>{$form.subject.html}</td>
     </tr>
+    {if $form.campaign_id}
     <tr>
       <td class="label-left">{$form.campaign_id.label}</td>
       <td>{$form.campaign_id.html}</td>
     </tr>
+    {/if}
 </table>
 {/if}
 
-<div class="crm-accordion-wrapper collapsed">
+<div class="crm-accordion-wrapper collapsed crm-pdf-format-accordion">
     <div class="crm-accordion-header">
         {$form.pdf_format_header.html}
     </div>
     <div class="crm-accordion-body">
-      <div class="crm-block crm-form-block crm-pdf-format-form-block">
+      <div class="crm-block crm-form-block">
     <table class="form-layout-compressed">
       <tr>
         <td class="label-left">{$form.format_id.label} {help id="id-pdf-format" file="CRM/Contact/Form/Task/PDFLetterCommon.hlp"}</td>
@@ -84,6 +91,15 @@
       </div>
   </div>
 </div>
+
+<div class="crm-accordion-wrapper crm-document-accordion ">
+  <div class="crm-accordion-header">
+    {ts}Preview Document{/ts}
+  </div><!-- /.crm-accordion-header -->
+  <div class="crm-accordion-body">
+    <div id='document-preview'></div>
+  </div><!-- /.crm-accordion-body -->
+</div><!-- /.crm-accordion-wrapper -->
 
 <div class="crm-accordion-wrapper crm-html_email-accordion ">
 <div class="crm-accordion-header">
@@ -129,6 +145,19 @@
 <script type="text/javascript">
 CRM.$(function($) {
   var $form = $('form.{/literal}{$form.formClass}{literal}');
+
+  {/literal}{if $form.formName eq 'PDF'}{literal}
+    $('.crm-document-accordion').hide();
+    $('#document_file').on('change', function() {
+      if (this.value) {
+        $('.crm-html_email-accordion, .crm-document-accordion, .crm-pdf-format-accordion').hide();
+        cj('#document_type').closest('tr').hide();
+        $('#template').val('');
+      }
+    });
+  {/literal}{/if}{literal}
+
+
   $('#format_id', $form).on('change', function() {
     selectFormat($(this).val());
   });

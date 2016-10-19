@@ -366,7 +366,7 @@ abstract class CRM_Core_Payment {
   public function validatePaymentInstrument($values, &$errors) {
     CRM_Core_Form::validateMandatoryFields($this->getMandatoryFields(), $values, $errors);
     if ($this->_paymentProcessor['payment_type'] == 1) {
-      CRM_Core_Payment_Form::validateCreditCard($values, $errors);
+      CRM_Core_Payment_Form::validateCreditCard($this->_paymentProcessor['id'], $values, $errors);
     }
   }
 
@@ -857,10 +857,10 @@ abstract class CRM_Core_Payment {
   }
 
   /**
-   * Get url to return to after cancelled or failed transaction
+   * Get url to return to after cancelled or failed transaction.
    *
-   * @param $qfKey
-   * @param $participantID
+   * @param string $qfKey
+   * @param int $participantID
    *
    * @return string cancel url
    */
@@ -967,7 +967,9 @@ abstract class CRM_Core_Payment {
     $url = CRM_Utils_System::url(
       'civicrm/payment/ipn/' . $this->_paymentProcessor['id'],
       array(),
-      TRUE
+      TRUE,
+      NULL,
+      FALSE
     );
     return (stristr($url, '.')) ? $url : '';
   }
@@ -1114,7 +1116,6 @@ abstract class CRM_Core_Payment {
         'processor_name' => @$_GET['processor_name'],
         'processor_id' => @$_GET['processor_id'],
         'mode' => @$_GET['mode'],
-        'q' => @$_GET['q'],
       )
     );
     CRM_Utils_System::civiExit();
@@ -1139,12 +1140,13 @@ abstract class CRM_Core_Payment {
    */
   public static function handlePaymentMethod($method, $params = array()) {
     if (!isset($params['processor_id']) && !isset($params['processor_name'])) {
-      $q = explode('/', CRM_Utils_Array::value('q', $params, ''));
+      $q = explode('/', CRM_Utils_Array::value(CRM_Core_Config::singleton()->userFrameworkURLVar, $_GET, ''));
       $lastParam = array_pop($q);
       if (is_numeric($lastParam)) {
         $params['processor_id'] = $_GET['processor_id'] = $lastParam;
       }
       else {
+        self::logPaymentNotification($params);
         throw new CRM_Core_Exception("Either 'processor_id' (recommended) or 'processor_name' (deprecated) is required for payment callback.");
       }
     }

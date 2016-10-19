@@ -48,6 +48,8 @@ class CRM_Mailing_Page_Report extends CRM_Core_Page_Basic {
   }
 
   /**
+   * An array of action links.
+   *
    * @return null
    */
   public function &links() {
@@ -139,6 +141,7 @@ class CRM_Mailing_Page_Report extends CRM_Core_Page_Basic {
     CRM_Utils_System::setTitle(ts('CiviMail Report: %1',
       array(1 => $report['mailing']['name'])
     ));
+    $this->assign('public_url', CRM_Mailing_BAO_Mailing::getPublicViewUrl($this->_mailing_id));
 
     return CRM_Core_Page::run();
   }

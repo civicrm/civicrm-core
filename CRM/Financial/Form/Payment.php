@@ -62,7 +62,7 @@ class CRM_Financial_Form_Payment extends CRM_Core_Form {
 
     CRM_Core_Payment_ProcessorForm::preProcess($this);
 
-    self::addCreditCardJs();
+    self::addCreditCardJs($this->_paymentProcessorID);
 
     $this->assign('paymentProcessorID', $this->_paymentProcessorID);
     $this->assign('currency', $this->currency);
@@ -97,8 +97,10 @@ class CRM_Financial_Form_Payment extends CRM_Core_Form {
   /**
    * Add JS to show icons for the accepted credit cards.
    */
-  public static function addCreditCardJs() {
-    $creditCardTypes = CRM_Core_Payment_Form::getCreditCardCSSNames();
+  public static function addCreditCardJs($paymentProcessorID = NULL) {
+    $creditCards = array();
+    $creditCards = CRM_Financial_BAO_PaymentProcessor::getCreditCards($paymentProcessorID);
+    $creditCardTypes = CRM_Core_Payment_Form::getCreditCardCSSNames($creditCards);
     CRM_Core_Resources::singleton()
       ->addScriptFile('civicrm', 'templates/CRM/Core/BillingBlock.js', 10)
       // workaround for CRM-13634

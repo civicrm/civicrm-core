@@ -23,6 +23,7 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
+<!-- .tpl file invoked: {$tplFile}. Call via form.tpl if we have a form in the page. -->
 {if $smarty.get.smartyDebug}
 {debug}
 {/if}

@@ -37,15 +37,15 @@ INSERT INTO civicrm_mail_settings (domain_id, name, is_default, domain) VALUES (
 -- activity and case dashlets
 
 INSERT INTO `civicrm_dashboard`
-    ( `domain_id`, `name`, `label`, `url`, `permission`, `permission_operator`, `column_no`, `is_minimized`, `is_active`, `weight`, `fullscreen_url`, `is_fullscreen`, `is_reserved`)
+    ( `domain_id`, `name`, `label`, `url`, `permission`, `permission_operator`, `is_active`, `fullscreen_url`, `is_reserved`, `cache_minutes`)
     VALUES
-    ( @domainID, 'blog', '{ts escape="sql"}CiviCRM News{/ts}', 'civicrm/dashlet/blog?reset=1&snippet=5', 'access CiviCRM', NULL, 0, 0, 1, 0, 'civicrm/dashlet/blog?reset=1&snippet=5&context=dashletFullscreen', 1, 1),
-    ( @domainID, 'getting-started', '{ts escape="sql"}CiviCRM Resources{/ts}', 'civicrm/dashlet/getting-started?reset=1&snippet=5', 'access CiviCRM', NULL, 0, 0, 1, 0, 'civicrm/dashlet/getting-started?reset=1&snippet=5&context=dashletFullscreen', 1, 1),
+    ( @domainID, 'blog', '{ts escape="sql"}CiviCRM News{/ts}', 'civicrm/dashlet/blog?reset=1', 'access CiviCRM', NULL, 1, 'civicrm/dashlet/blog?reset=1&context=dashletFullscreen', 1, 1440),
+    ( @domainID, 'getting-started', '{ts escape="sql"}CiviCRM Resources{/ts}', 'civicrm/dashlet/getting-started?reset=1', 'access CiviCRM', NULL, 1, 'civicrm/dashlet/getting-started?reset=1&context=dashletFullscreen', 1, 7200),
 
-    ( @domainID, 'activity', '{ts escape="sql"}Activities{/ts}', 'civicrm/dashlet/activity?reset=1&snippet=5', 'access CiviCRM', NULL, 0, 0, 1, 1, 'civicrm/dashlet/activity?reset=1&snippet=5&context=dashletFullscreen', 1, 1),
-    ( @domainID, 'myCases', '{ts escape="sql"}My Cases{/ts}', 'civicrm/dashlet/myCases?reset=1&snippet=5', 'access my cases and activities', NULL , 0, 0, 1, 2, 'civicrm/dashlet/myCases?reset=1&snippet=5&context=dashletFullscreen', 1, 1),
-    ( @domainID, 'allCases', '{ts escape="sql"}All Cases{/ts}', 'civicrm/dashlet/allCases?reset=1&snippet=5', 'access all cases and activities', NULL , 0, 0, 1, 3, 'civicrm/dashlet/allCases?reset=1&snippet=5&context=dashletFullscreen', 1, 1),
-    ( @domainID, 'casedashboard', '{ts escape="sql"}Case Dashboard Dashlet{/ts}', 'civicrm/dashlet/casedashboard?reset=1&snippet=5', 'access my cases and activities,access all cases and activities', 'OR' , 0, 0, 1, 4, 'civicrm/dashlet/casedashboard?reset=1&snippet=5&context=dashletFullscreen', 1, 1);
+    ( @domainID, 'activity', '{ts escape="sql"}Activities{/ts}', 'civicrm/dashlet/activity?reset=1', 'access CiviCRM', NULL, 1, 'civicrm/dashlet/activity?reset=1&context=dashletFullscreen', 1, 7200),
+    ( @domainID, 'myCases', '{ts escape="sql"}My Cases{/ts}', 'civicrm/dashlet/myCases?reset=1', 'access my cases and activities', NULL, 1, 'civicrm/dashlet/myCases?reset=1&context=dashletFullscreen', 1, 60),
+    ( @domainID, 'allCases', '{ts escape="sql"}All Cases{/ts}', 'civicrm/dashlet/allCases?reset=1', 'access all cases and activities', NULL, 1, 'civicrm/dashlet/allCases?reset=1&context=dashletFullscreen', 1, 60),
+    ( @domainID, 'casedashboard', '{ts escape="sql"}Case Dashboard Dashlet{/ts}', 'civicrm/dashlet/casedashboard?reset=1', 'access my cases and activities,access all cases and activities', 'OR', 1, 'civicrm/dashlet/casedashboard?reset=1&context=dashletFullscreen', 1, 60);
 
 -- event badge
 INSERT INTO civicrm_print_label (title, name, description, label_format_name, label_type_id, is_default, is_reserved, is_active, data)
@@ -110,8 +110,8 @@ VALUES
     ( @domainID, 'civicrm/import/activity?reset=1',                         '{ts escape="sql" skip="true"}Import Activities{/ts}',      'Import Activities',    'import contacts',  '',             @contactlastID, '1', '1',   8 ),
     ( @domainID, 'civicrm/group/add?reset=1',                               '{ts escape="sql" skip="true"}New Group{/ts}',              'New Group',            'edit groups',      '',             @contactlastID, '1', NULL,  9 ),
     ( @domainID, 'civicrm/group?reset=1',                                   '{ts escape="sql" skip="true"}Manage Groups{/ts}',          'Manage Groups',        'access CiviCRM',   '',             @contactlastID, '1', '1',   10 ),
-    ( @domainID, 'civicrm/admin/tag?reset=1&action=add',                    '{ts escape="sql" skip="true"}New Tag{/ts}',                'New Tag',              'administer CiviCRM', '',           @contactlastID, '1', NULL, 11 ),
-    ( @domainID, 'civicrm/admin/tag?reset=1',                               '{ts escape="sql" skip="true"}Manage Tags (Categories){/ts}', 'Manage Tags (Categories)', 'administer CiviCRM', '',     @contactlastID, '1','1', 12 ),
+    ( @domainID, 'civicrm/tag?reset=1&action=add',                    '{ts escape="sql" skip="true"}New Tag{/ts}',                'New Tag',              'manage tags', '',           @contactlastID, '1', NULL, 11 ),
+    ( @domainID, 'civicrm/tag?reset=1',                               '{ts escape="sql" skip="true"}Manage Tags (Categories){/ts}', 'Manage Tags (Categories)', 'manage tags', '',     @contactlastID, '1','1', 12 ),
     ( @domainID, 'civicrm/contact/deduperules?reset=1',  '{ts escape="sql" skip="true"}Find and Merge Duplicate Contacts{/ts}', 'Find and Merge Duplicate Contacts', 'administer dedupe rules,merge duplicate contacts', 'OR', @contactlastID, '1', NULL, 13 );
 
 INSERT INTO civicrm_navigation
@@ -309,7 +309,7 @@ INSERT INTO civicrm_navigation
 VALUES
     ( @domainID, 'civicrm/admin/custom/group?reset=1',      '{ts escape="sql" skip="true"}Custom Fields{/ts}', 'Custom Fields',                             'administer CiviCRM', '',   @CustomizelastID, '1', NULL, 1 ),
     ( @domainID, 'civicrm/admin/uf/group?reset=1',          '{ts escape="sql" skip="true"}Profiles{/ts}', 'Profiles',                                       'administer CiviCRM', '',   @CustomizelastID, '1', NULL, 2 ),
-    ( @domainID, 'civicrm/admin/tag?reset=1',               '{ts escape="sql" skip="true"}Tags (Categories){/ts}', 'Tags (Categories)',                     'administer CiviCRM', '',   @CustomizelastID, '1', NULL, 3 ),
+    ( @domainID, 'civicrm/tag?reset=1',               '{ts escape="sql" skip="true"}Tags (Categories){/ts}', 'Tags (Categories)',                     'administer CiviCRM', '',   @CustomizelastID, '1', NULL, 3 ),
     ( @domainID, 'civicrm/admin/options/activity_type?reset=1', '{ts escape="sql" skip="true"}Activity Types{/ts}', 'Activity Types',   'administer CiviCRM', '',   @CustomizelastID, '1', NULL, 4 ),
     ( @domainID, 'civicrm/admin/reltype?reset=1',           '{ts escape="sql" skip="true"}Relationship Types{/ts}', 'Relationship Types',                   'administer CiviCRM', '',   @CustomizelastID, '1', NULL, 5 ),
     ( @domainID, 'civicrm/admin/options/subtype?reset=1',   '{ts escape="sql" skip="true"}Contact Types{/ts}','Contact Types',                              'administer CiviCRM', '',   @CustomizelastID, '1', NULL, 6 ),

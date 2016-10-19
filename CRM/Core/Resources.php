@@ -788,8 +788,8 @@ class CRM_Core_Resources {
 
   /**
    * Provide a list of available entityRef filters.
-   * FIXME: This function doesn't really belong in this class
-   * @TODO: Provide a sane way to extend this list for other entities - a hook or??
+   * @todo: move component filters into their respective components (e.g. CiviEvent)
+   *
    * @return array
    */
   public static function getEntityRefFilters() {
@@ -834,6 +834,7 @@ class CRM_Core_Resources {
       array('key' => 'country', 'value' => ts('Country'), 'entity' => 'address'),
       array('key' => 'gender_id', 'value' => ts('Gender')),
       array('key' => 'is_deceased', 'value' => ts('Deceased')),
+      array('key' => 'source', 'value' => ts('Contact Source'), 'type' => 'text'),
     );
 
     if (in_array('CiviCase', $config->enableComponents)) {
@@ -855,6 +856,8 @@ class CRM_Core_Resources {
         $filters['case'][] = $filter;
       }
     }
+
+    CRM_Utils_Hook::entityRefFilters($filters);
 
     return $filters;
   }

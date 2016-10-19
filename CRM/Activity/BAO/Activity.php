@@ -479,7 +479,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
     }
 
     if (!empty($params['target_contact_id'])) {
-      if (is_array($params['target_contact_id']) && !CRM_Utils_array::crmIsEmptyArray($params['target_contact_id'])) {
+      if (is_array($params['target_contact_id']) && !CRM_Utils_Array::crmIsEmptyArray($params['target_contact_id'])) {
         $msgs[] = "target=" . implode(',', $params['target_contact_id']);
         // take only first target
         // will be used for recently viewed display
@@ -625,8 +625,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
    * @return bool
    */
   public static function logActivityAction($activity, $logMessage = NULL) {
-    $session = CRM_Core_Session::singleton();
-    $id = $session->get('userID');
+    $id = CRM_Core_Session::getLoggedInContactID();
     if (!$id) {
       $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
       $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
@@ -768,7 +767,7 @@ LEFT JOIN  civicrm_case_activity ON ( civicrm_case_activity.activity_id = tbl.ac
     $query = "CREATE TEMPORARY TABLE {$activityContactTempTable} (
                 activity_id int unsigned, contact_id int unsigned, record_type_id varchar(16),
                  contact_name varchar(255), is_deleted int unsigned, counter int unsigned, INDEX index_activity_id( activity_id ) )
-                ENGINE=MYISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci";
+                ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci";
 
     CRM_Core_DAO::executeQuery($query);
 
@@ -789,22 +788,20 @@ WHERE ac.record_type_id != %1
     $params = array(1 => array($targetID, 'Integer'));
     CRM_Core_DAO::executeQuery($query, $params);
 
+    $activityFields = array("ac.activity_id", "ac.contact_id", "ac.record_type_id", "c.sort_name", "c.is_deleted");
+    $select = CRM_Contact_BAO_Query::appendAnyValueToSelect($activityFields, "ac.activity_id");
+
     // for each activity insert one target contact
     // if we load all target contacts the performance will suffer a lot for mass-activities.
     $query = "
 INSERT INTO {$activityContactTempTable} ( activity_id, contact_id, record_type_id, contact_name, is_deleted, counter )
-SELECT     ac.activity_id,
-           ac.contact_id,
-           ac.record_type_id,
-           c.sort_name,
-           c.is_deleted,
-           count(ac.contact_id)
+{$select}, count(ac.contact_id)
 FROM       {$activityTempTable}
 INNER JOIN civicrm_activity a ON ( a.id = {$activityTempTable}.activity_id )
 INNER JOIN civicrm_activity_contact ac ON ( ac.activity_id = {$activityTempTable}.activity_id )
 INNER JOIN civicrm_contact c ON c.id = ac.contact_id
 WHERE ac.record_type_id = %1
-GROUP BY ac.activity_id, ac.contact_id
+GROUP BY ac.activity_id
 ";
 
     CRM_Core_DAO::executeQuery($query, $params);
@@ -1196,8 +1193,7 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
   ) {
     // get the contact details of logged in contact, which we set as from email
     if ($userID == NULL) {
-      $session = CRM_Core_Session::singleton();
-      $userID = $session->get('userID');
+      $userID = CRM_Core_Session::getLoggedInContactID();
     }
 
     list($fromDisplayName, $fromEmail, $fromDoNotEmail) = CRM_Contact_BAO_Contact::getContactDetails($userID);
@@ -1383,8 +1379,7 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
     $userID = NULL
   ) {
     if ($userID == NULL) {
-      $session = CRM_Core_Session::singleton();
-      $userID = $session->get('userID');
+      $userID = CRM_Core_Session::getLoggedInContactID();
     }
 
     $text = &$activityParams['sms_text_message'];
@@ -1883,8 +1878,7 @@ SELECT  display_name
       $activityParams['id'] = $activity->activity_id;
     }
     // create activity with target contacts
-    $session = CRM_Core_Session::singleton();
-    $id = $session->get('userID');
+    $id = CRM_Core_Session::getLoggedInContactID();
     if ($id) {
       $activityParams['source_contact_id'] = $id;
       $activityParams['target_contact_id'][] = $activity->contact_id;
@@ -2071,11 +2065,9 @@ AND cl.modified_id  = c.id
       return NULL;
     }
 
-    $session = CRM_Core_Session::singleton();
-
     $followupParams = array();
     $followupParams['parent_id'] = $activityId;
-    $followupParams['source_contact_id'] = $session->get('userID');
+    $followupParams['source_contact_id'] = CRM_Core_Session::getLoggedInContactID();
     $followupParams['status_id'] = CRM_Core_OptionGroup::getValue('activity_status', 'Scheduled', 'name');
 
     $followupParams['activity_type_id'] = $params['followup_activity_type_id'];

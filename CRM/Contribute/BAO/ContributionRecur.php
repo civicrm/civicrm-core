@@ -85,7 +85,7 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
     $recurring->id = CRM_Utils_Array::value('id', $params);
 
     // set currency for CRM-1496
-    if (!isset($recurring->currency)) {
+    if (empty($params['id']) && !isset($recurring->currency)) {
       $config = CRM_Core_Config::singleton();
       $recurring->currency = $config->defaultCurrency;
     }
@@ -861,7 +861,7 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
     else {
       // Only update next sched date if it's empty or 'just now' because payment processors may be managing
       // the scheduled date themselves as core did not previously provide any help.
-      if (empty($params['next_sched_contribution_date']) || strtotime($params['next_sched_contribution_date']) ==
+      if (empty($existing['next_sched_contribution_date']) || strtotime($existing['next_sched_contribution_date']) ==
         strtotime(date('Y-m-d'))) {
         $params['next_sched_contribution_date'] = date('Y-m-d', strtotime('+' . $existing['frequency_interval'] . ' ' . $existing['frequency_unit']));
       }
@@ -902,6 +902,7 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
   public static function calculateRecurLineItems($recurId, $total_amount, $financial_type_id) {
     $originalContributionID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $recurId, 'id', 'contribution_recur_id');
     $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($originalContributionID);
+    $lineSets = array();
     if (count($lineItems) == 1) {
       foreach ($lineItems as $index => $lineItem) {
         if ($financial_type_id) {
@@ -920,6 +921,13 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
         $lineSets[$priceField->price_set_id][] = $lineItem;
       }
     }
+    // CRM-19309 if more than one then just pass them through:
+    elseif (count($lineItems) > 1) {
+      foreach ($lineItems as $index => $lineItem) {
+        $lineSets[$index][] = $lineItem;
+      }
+    }
+
     return $lineSets;
   }
 

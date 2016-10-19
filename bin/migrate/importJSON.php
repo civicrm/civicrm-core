@@ -38,7 +38,10 @@ function run() {
   $config = CRM_Core_Config::singleton();
 
   // this does not return on failure
-  // CRM_Utils_System::authenticateScript( true );
+  CRM_Utils_System::authenticateScript(TRUE);
+  if (!CRM_Core_Permission::check('administer CiviCRM')) {
+    CRM_Utils_System::authenticateAbort("User does not have required permission (administer CiviCRM).\n", TRUE);
+  }
 
   require_once 'CRM/Utils/Migrate/ImportJSON.php';
   $import = new CRM_Utils_Migrate_ImportJSON();

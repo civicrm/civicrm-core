@@ -369,6 +369,7 @@ class CRM_Contact_BAO_Query {
     'email',
     'im',
     'address_name',
+    'master_id',
   );
 
   /**
@@ -1537,7 +1538,10 @@ class CRM_Contact_BAO_Query {
 
     self::filterCountryFromValuesIfStateExists($formValues);
 
-    foreach ($formValues as $id => $values) {
+    foreach ($formValues as $id => &$val) {
+      // CRM-19374 - we don't want to change $val in $formValues.
+      // Assign it to a temp variable which operates while iteration.
+      $values = $val;
 
       if (self::isAlreadyProcessedForQueryFormat($values)) {
         $params[] = $values;
@@ -2159,8 +2163,7 @@ class CRM_Contact_BAO_Query {
       );
     }
     elseif ($name === 'is_deceased') {
-      $this->_where[$grouping][] = self::buildClause("contact_a.{$name}", $op, $value);
-      $this->_qill[$grouping][] = "$field[title] $op \"$value\"";
+      $this->setQillAndWhere($name, $op, $value, $grouping, $field);
       self::$_openedPanes[ts('Demographics')] = TRUE;
     }
     elseif ($name === 'created_date' || $name === 'modified_date' || $name === 'deceased_date' || $name === 'birth_date') {
@@ -2237,14 +2240,11 @@ class CRM_Contact_BAO_Query {
         $value = self::getWildCardedValue($wildcard, $op, $value);
       }
 
-      $wc = 'civicrm_website.url';
-      $this->_where[$grouping][] = $d = self::buildClause($wc, $op, $value);
+      $this->_where[$grouping][] = $d = self::buildClause('civicrm_website.url', $op, $value);
       $this->_qill[$grouping][] = "$field[title] $op \"$value\"";
     }
     elseif ($name === 'contact_is_deleted') {
-      $this->_where[$grouping][] = self::buildClause("contact_a.is_deleted", $op, $value);
-      list($qillop, $qillVal) = CRM_Contact_BAO_Query::buildQillForFieldValue(NULL, $name, $value, $op);
-      $this->_qill[$grouping][] = ts("%1 %2 %3", array(1 => $field['title'], 2 => $qillop, 3 => $qillVal));
+      $this->setQillAndWhere('is_deleted', $op, $value, $grouping, $field);
     }
     elseif (!empty($field['where'])) {
       $type = NULL;
@@ -2867,9 +2867,7 @@ class CRM_Contact_BAO_Query {
     }
     elseif (is_array($value)) {
       foreach ($value as $k => $v) {
-        if (!empty($k)) {
-          $clause[$k] = "($alias $op '%" . CRM_Core_DAO::VALUE_SEPARATOR . CRM_Utils_Type::escape($v, 'String') . CRM_Core_DAO::VALUE_SEPARATOR . "%')";
-        }
+        $clause[$k] = "($alias $op '%" . CRM_Core_DAO::VALUE_SEPARATOR . CRM_Utils_Type::escape($v, 'String') . CRM_Core_DAO::VALUE_SEPARATOR . "%')";
       }
     }
     else {
@@ -4142,12 +4140,12 @@ civicrm_relationship.is_permission_a_b = 0
       if (!empty($dateValueLow)) {
         $date = date('Ymd', strtotime($dateValueLow[2]));
         $where[$grouping][] = "civicrm_relationship.$dateField >= $date";
-        $this->_qill[$grouping][] = ($dateField == 'end_date' ? ts('Relationship Ended on or After') : ts('Relationship Recorded Start Date On or Before')) . " " . CRM_Utils_Date::customFormat($date);
+        $this->_qill[$grouping][] = ($dateField == 'end_date' ? ts('Relationship Ended on or After') : ts('Relationship Recorded Start Date On or After')) . " " . CRM_Utils_Date::customFormat($date);
       }
       if (!empty($dateValueHigh)) {
         $date = date('Ymd', strtotime($dateValueHigh[2]));
         $where[$grouping][] = "civicrm_relationship.$dateField <= $date";
-        $this->_qill[$grouping][] = ($dateField == 'end_date' ? ts('Relationship Ended on or Before') : ts('Relationship Recorded Start Date On or After')) . " " . CRM_Utils_Date::customFormat($date);
+        $this->_qill[$grouping][] = ($dateField == 'end_date' ? ts('Relationship Ended on or Before') : ts('Relationship Recorded Start Date On or Before')) . " " . CRM_Utils_Date::customFormat($date);
       }
     }
   }
@@ -4524,6 +4522,41 @@ civicrm_relationship.is_permission_a_b = 0
         unset($formValues['country']);
       }
     }
+  }
+
+  /**
+   * For some special cases, grouping by subset of select fields becomes mandatory.
+   * Hence, full_group_by mode is handled by appending any_value
+   * keyword to select fields not present in groupBy
+   *
+   * @param array $selectClauses
+   * @param array $groupBy - Columns already included in GROUP By clause.
+   *
+   * @return string
+   */
+  public static function appendAnyValueToSelect($selectClauses, $groupBy) {
+    $mysqlVersion = CRM_Core_DAO::singleValueQuery('SELECT VERSION()');
+    $sqlMode = explode(',', CRM_Core_DAO::singleValueQuery('SELECT @@sql_mode'));
+
+    // Disable only_full_group_by mode for lower sql versions.
+    if (version_compare($mysqlVersion, '5.7', '<') || (!empty($sqlMode) && !in_array('ONLY_FULL_GROUP_BY', $sqlMode))) {
+      $key = array_search('ONLY_FULL_GROUP_BY', $sqlMode);
+      unset($sqlMode[$key]);
+      CRM_Core_DAO::executeQuery("SET SESSION sql_mode = '" . implode(',', $sqlMode) . "'");
+    }
+    else {
+      $groupBy = array_map('trim', (array) $groupBy);
+      $aggregateFunctions = '/(ROUND|AVG|COUNT|GROUP_CONCAT|SUM|MAX|MIN)\(/i';
+      foreach ($selectClauses as $key => &$val) {
+        list($selectColumn, $alias) = array_pad(preg_split('/ as /i', $val), 2, NULL);
+        // append ANY_VALUE() keyword
+        if (!in_array($selectColumn, $groupBy) && preg_match($aggregateFunctions, trim($selectColumn)) !== 1) {
+          $val = str_replace($selectColumn, "ANY_VALUE({$selectColumn})", $val);
+        }
+      }
+    }
+
+    return "SELECT " . implode(', ', $selectClauses) . " ";
   }
 
   /**
@@ -5753,7 +5786,7 @@ AND   displayRelType.is_active = 1
       }
 
       if (is_object($dao) && property_exists($dao, $value['idCol'])) {
-        $val = $dao->$value['idCol'];
+        $val = $dao->{$value['idCol']};
         if ($key == 'groups') {
           $dao->groups = $this->convertGroupIDStringToLabelString($dao, $val);
           return;
@@ -5768,10 +5801,10 @@ AND   displayRelType.is_active = 1
           $dao->$idColumn = $val;
 
           if ($key == 'state_province_name') {
-            $dao->$value['pseudoField'] = $dao->$key = CRM_Core_PseudoConstant::stateProvinceAbbreviation($val);
+            $dao->{$value['pseudoField']} = $dao->$key = CRM_Core_PseudoConstant::stateProvinceAbbreviation($val);
           }
           else {
-            $dao->$value['pseudoField'] = $dao->$key = CRM_Core_PseudoConstant::getLabel($baoName, $value['pseudoField'], $val);
+            $dao->{$value['pseudoField']} = $dao->$key = CRM_Core_PseudoConstant::getLabel($baoName, $value['pseudoField'], $val);
           }
         }
         elseif ($value['pseudoField'] == 'state_province_abbreviation') {
@@ -6162,6 +6195,29 @@ AND   displayRelType.is_active = 1
     // Note that groups that the user does not have permission to will be excluded (good).
     $groups = array_intersect_key($allGroups, array_flip($groupIDs));
     return implode(', ', $groups);
+
+  }
+
+  /**
+   * Set the qill and where properties for a field.
+   *
+   * This function is intended as a short-term function to encourage refactoring
+   * & re-use - but really we should just have less special-casing.
+   *
+   * @param string $name
+   * @param string $op
+   * @param string|array $value
+   * @param string $grouping
+   * @param string $field
+   */
+  public function setQillAndWhere($name, $op, $value, $grouping, $field) {
+    $this->_where[$grouping][] = self::buildClause("contact_a.{$name}", $op, $value);
+    list($qillop, $qillVal) = CRM_Contact_BAO_Query::buildQillForFieldValue(NULL, $name, $value, $op);
+    $this->_qill[$grouping][] = ts("%1 %2 %3", array(
+      1 => $field['title'],
+      2 => $qillop,
+      3 => $qillVal,
+    ));
   }
 
 }

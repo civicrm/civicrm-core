@@ -1203,7 +1203,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
               $registerUrl .= '&pcpId=' . $self->_pcpId;
             }
 
-            $status = ts("It looks like you are already registered for this event. If you want to change your registration, or you feel that you've gotten this message in error, please contact the site administrator.") . ' ' . ts('You can also <a href="%1">register another participant</a>.', array(1 => $registerUrl));
+            $status = ts("It looks like you are already registered for this event. If you want to change your registration, or you feel that you've received this message in error, please contact the site administrator.") . ' ' . ts('You can also <a href="%1">register another participant</a>.', array(1 => $registerUrl));
             $session->setStatus($status, ts('Oops.'), 'alert');
             $url = CRM_Utils_System::url('civicrm/event/info',
               "reset=1&id={$self->_values['event']['id']}&noFullMsg=true"
@@ -1220,7 +1220,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
           }
 
           if ($isAdditional) {
-            $status = ts("It looks like this participant is already registered for this event. If you want to change your registration, or you feel that you've gotten this message in error, please contact the site administrator.");
+            $status = ts("It looks like this participant is already registered for this event. If you want to change your registration, or you feel that you've received this message in error, please contact the site administrator.");
             $session->setStatus($status, ts('Oops.'), 'alert');
             return $participant->id;
           }

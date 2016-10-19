@@ -203,4 +203,12 @@
     </pseudoconstant>
     <add>4.7</add>
   </field>
+<field>
+    <name>accepted_credit_cards</name>
+    <title>Accepted Credit Cards</title>
+    <type>text</type>
+    <default>NULL</default>
+    <comment>array of accepted credit card types</comment>
+    <add>4.7</add>
+  </field>
 </table>

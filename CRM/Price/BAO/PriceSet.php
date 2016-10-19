@@ -79,14 +79,11 @@ class CRM_Price_BAO_PriceSet extends CRM_Price_DAO_PriceSet {
       $priceSetID = CRM_Utils_Array::value('id', $params);
     }
     // CRM-16189
-    if ($validatePriceSet) {
-      $isError = CRM_Financial_BAO_FinancialAccount::validateFinancialType(
-        CRM_Utils_Array::value('financial_type_id', $params),
+    if ($validatePriceSet && !empty($params['financial_type_id'])) {
+      CRM_Financial_BAO_FinancialAccount::validateFinancialType(
+        $params['financial_type_id'],
         $priceSetID
       );
-      if ($isError) {
-        throw new CRM_Core_Exception(ts('Deferred revenue account is not configured for selected financial type. Please have an administrator set up the deferred revenue account at Administer > CiviContribute > Financial Accounts, then configure it for financial types at Administer > CiviContribution > Financial Types, Accounts'));
-      }
     }
     $priceSetBAO = new CRM_Price_BAO_PriceSet();
     $priceSetBAO->copyValues($params);
@@ -1012,7 +1009,7 @@ WHERE  id = %1";
   public static function getCachedPriceSetDetail($priceSetID) {
     $cacheKey = __CLASS__ . __FUNCTION__ . '_' . $priceSetID;
     $cache = CRM_Utils_Cache::singleton();
-    $values = (array) $cache->get($cacheKey);
+    $values = $cache->get($cacheKey);
     if (empty($values)) {
       $data = self::getSetDetail($priceSetID);
       $values = $data[$priceSetID];
@@ -1725,11 +1722,31 @@ WHERE       ps.id = %1
     $priceSetParams = array();
     foreach ($params as $field => $value) {
       $parts = explode('_', $field);
-      if (count($parts) == 2 && $parts[0] == 'price' && is_numeric($parts[1])) {
+      if (count($parts) == 2 && $parts[0] == 'price' && is_numeric($parts[1]) && is_array($value)) {
         $priceSetParams[$field] = $value;
       }
     }
     return $priceSetParams;
+  }
+
+  /**
+   * Get non-deductible amount from price options
+   *
+   * @param int $priceSetId
+   * @param array $lineItem
+   *
+   * @return int
+   *   calculated non-deductible amount.
+   */
+  public static function getNonDeductibleAmountFromPriceSet($priceSetId, $lineItem) {
+    $nonDeductibleAmount = 0;
+    if (!empty($lineItem[$priceSetId])) {
+      foreach ($lineItem[$priceSetId] as $fieldId => $options) {
+        $nonDeductibleAmount += $options['non_deductible_amount'] * $options['qty'];
+      }
+    }
+
+    return $nonDeductibleAmount;
   }
 
 }

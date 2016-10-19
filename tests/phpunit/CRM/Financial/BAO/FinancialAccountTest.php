@@ -249,9 +249,9 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
     $cid = $this->individualCreate();
     $params = array(
       'contact_id' => $cid,
-      'receive_date' => '2010-01-20',
+      'receive_date' => '2016-01-20',
       'total_amount' => 100,
-      'financial_type_id' => 3,
+      'financial_type_id' => 4,
       'revenue_recognition_date' => date('Ymd', strtotime("+1 month")),
       'line_items' => array(
         array(
@@ -264,6 +264,7 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
               'qty' => 1,
               'unit_price' => 100,
               'line_total' => 100,
+              'financial_type_id' => 4,
             ),
             array(
               'entity_table' => 'civicrm_contribution',
@@ -273,17 +274,32 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
               'qty' => 1,
               'unit_price' => 200,
               'line_total' => 200,
-              'financial_type_id' => 1,
+              'financial_type_id' => 4,
             ),
           ),
-          'params' => array(),
         ),
       ),
     );
-    $contribution = CRM_Contribute_BAO_Contribution::create($params);
-    $valid = CRM_Financial_BAO_FinancialAccount::checkFinancialTypeHasDeferred($params, $contribution->id);
-    $message = "Revenue recognition date can only be specified if the financial type selected has a deferred revenue account configured. Please have an administrator set up the deferred revenue account at Administer > CiviContribute > Financial Accounts, then configure it for financial types at Administer > CiviContribution > Financial Types, Accounts";
-    $this->assertEquals($valid, $message, "The messages do not match");
+    try {
+      CRM_Financial_BAO_FinancialAccount::checkFinancialTypeHasDeferred($params);
+    }
+    catch (CRM_Core_Exception $e) {
+      $this->fail("Missed expected exception");
+    }
+    $params = array(
+      'contact_id' => $cid,
+      'receive_date' => '2016-01-20',
+      'total_amount' => 100,
+      'financial_type_id' => 1,
+      'revenue_recognition_date' => date('Ymd', strtotime("+1 month")),
+    );
+    try {
+      CRM_Financial_BAO_FinancialAccount::checkFinancialTypeHasDeferred($params);
+      $this->fail("Missed expected exception");
+    }
+    catch (CRM_Core_Exception $e) {
+      $this->assertEquals('Revenue recognition date can only be specified if the financial type selected has a deferred revenue account configured. Please have an administrator set up the deferred revenue account at Administer > CiviContribute > Financial Accounts, then configure it for financial types at Administer > CiviContribution > Financial Types, Accounts', $e->getMessage());
+    }
   }
 
   /**
@@ -292,15 +308,21 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
    */
   public function testValidateFinancialType() {
     Civi::settings()->set('contribution_invoice_settings', array('deferred_revenue_enabled' => '1'));
-    $deferred = CRM_Financial_BAO_FinancialAccount::getDeferredFinancialType();
     $financialTypes = CRM_Contribute_PseudoConstant::financialType();
     foreach ($financialTypes as $key => $value) {
-      $validate = CRM_Financial_BAO_FinancialAccount::validateFinancialType($key);
-      if (array_key_exists($key, $deferred)) {
-        $this->assertFalse($validate, "This should not have thrown an error.");
+      try {
+        CRM_Financial_BAO_FinancialAccount::validateFinancialType($key);
+        if (!in_array($value, array('Member Dues', 'Event Fee'))) {
+          $this->fail("Missed expected exception");
+        }
       }
-      else {
-        $this->assertEquals($validate, TRUE);
+      catch (CRM_Core_Exception $e) {
+        if (in_array($value, array('Member Dues', 'Event Fees'))) {
+          $this->fail("Should not call exception");
+        }
+        else {
+          $this->assertEquals('Deferred revenue account is not configured for selected financial type. Please have an administrator set up the deferred revenue account at Administer > CiviContribute > Financial Accounts, then configure it for financial types at Administer > CiviContribution > Financial Types, Accounts', $e->getMessage());
+        }
       }
     }
   }

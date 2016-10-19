@@ -8,7 +8,7 @@
   },
   "include-path": ["vendor/tecnickcom"],
   "require": {
-    "dompdf/dompdf" : "0.6.*",
+    "dompdf/dompdf" : "0.7.*",
     "symfony/config": "~2.5.0",
     "symfony/dependency-injection": "~2.5.0",
     "symfony/event-dispatcher": "~2.5.0",
@@ -21,7 +21,8 @@
     "civicrm/civicrm-cxn-rpc": "~0.15.12.04",
     "zetacomponents/base": "1.7.*",
     "zetacomponents/mail": "dev-1.7-civi",
-    "phpoffice/phpword": "^0.12.1"
+    "phpoffice/phpword": "^0.13.0",
+    "pear/Validate_Finance_CreditCard": "dev-master"
   },
   "repositories": [
     {
@@ -32,11 +33,13 @@
   "scripts": {
     "post-install-cmd": [
       "bash tools/scripts/composer/dompdf-cleanup.sh",
-      "bash tools/scripts/composer/tcpdf-cleanup.sh"
+      "bash tools/scripts/composer/tcpdf-cleanup.sh",
+      "bash tools/scripts/composer/pear-execption-fix.sh"
     ],
     "post-update-cmd": [
       "bash tools/scripts/composer/dompdf-cleanup.sh",
-      "bash tools/scripts/composer/tcpdf-cleanup.sh"
+      "bash tools/scripts/composer/tcpdf-cleanup.sh",
+      "bash tools/scripts/composer/pear-execption-fix.sh"
     ]
   }
 }

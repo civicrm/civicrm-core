@@ -177,10 +177,12 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
         'addressee',
       )) && !$isReserved
     ) {
+      $domainSpecificOptionGroups = array('from_email_address');
+      $domainSpecific = in_array($this->_gName, $domainSpecificOptionGroups) ? TRUE : FALSE;
       $this->addRule('label',
         ts('This Label already exists in the database for this option group. Please select a different Value.'),
         'optionExists',
-        array('CRM_Core_DAO_OptionValue', $this->_id, $this->_gid, 'label')
+        array('CRM_Core_DAO_OptionValue', $this->_id, $this->_gid, 'label', $domainSpecific)
       );
     }
 
@@ -376,7 +378,30 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       }
     }
 
+    $dataType = self::getOptionGroupDataType($self->_gName);
+    if ($dataType && $self->_gName !== 'activity_type') {
+      $validate = CRM_Utils_Type::validate($fields['value'], $dataType, FALSE);
+      if (!$validate) {
+        CRM_Core_Session::setStatus(
+          ts('Data Type of the value field for this option value does not match ' . $dataType),
+          ts('Value field Data Type mismatch'));
+      }
+    }
     return $errors;
+  }
+
+  /**
+   * Get the DataType for a specified Option Group.
+   *
+   * @param string $optionGroupName name of the option group
+   *
+   * @return string|null
+   */
+  public static function getOptionGroupDataType($optionGroupName) {
+    $optionGroupId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', $optionGroupName, 'id', 'name');
+
+    $dataType = CRM_Core_BAO_OptionGroup::getDataType($optionGroupId);
+    return $dataType;
   }
 
   /**

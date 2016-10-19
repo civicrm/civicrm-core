@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2016
- * $Id$
- *
  */
 class CRM_Report_Form_Mailing_Detail extends CRM_Report_Form {
 
@@ -44,6 +42,20 @@ class CRM_Report_Form_Mailing_Detail extends CRM_Report_Form {
   protected $_exposeContactID = FALSE;
 
   /**
+   * This report has not been optimised for group filtering.
+   *
+   * The functionality for group filtering has been improved but not
+   * all reports have been adjusted to take care of it. This report has not
+   * and will run an inefficient query until fixed.
+   *
+   * CRM-19170
+   *
+   * @var bool
+   */
+  protected $groupFilterNotOptimised = TRUE;
+
+  /**
+   * Class constructor.
    */
   public function __construct() {
     $this->_columns = array();
@@ -440,7 +452,7 @@ class CRM_Report_Form_Mailing_Detail extends CRM_Report_Form {
     $mailing->query($query);
 
     while ($mailing->fetch()) {
-      $data[mysql_real_escape_string($mailing->name)] = $mailing->name;
+      $data[CRM_Core_DAO::escapeString($mailing->name)] = $mailing->name;
     }
 
     return $data;

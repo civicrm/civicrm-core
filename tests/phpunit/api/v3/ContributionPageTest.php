@@ -147,7 +147,9 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     );
 
     $this->callAPISuccess('contribution_page', 'submit', $submitParams);
-    $this->callAPISuccess('contribution', 'getsingle', array('contribution_page_id' => $this->_ids['contribution_page']));
+    $contribution = $this->callAPISuccess('contribution', 'getsingle', array('contribution_page_id' => $this->_ids['contribution_page']));
+    //assert non-deductible amount
+    $this->assertEquals(5.00, $contribution['non_deductible_amount']);
   }
 
   /**
@@ -305,7 +307,8 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
 
     $this->callAPIAndDocument('contribution_page', 'submit', $submitParams, __FUNCTION__, __FILE__, 'submit contribution page', NULL);
     $contribution = $this->callAPISuccess('contribution', 'getsingle', array('contribution_page_id' => $this->_ids['contribution_page']));
-    $this->callAPISuccess('membership_payment', 'getsingle', array('contribution_id' => $contribution['id']));
+    $membershipPayment = $this->callAPISuccess('membership_payment', 'getsingle', array('contribution_id' => $contribution['id']));
+    $this->callAPISuccessGetSingle('LineItem', array('contribution_id' => $contribution['id'], 'entity_id' => $membershipPayment['id']));
   }
 
   /**
@@ -837,7 +840,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
         'membership_type_id' => $membershipTypeID,
         'price_field_id' => $priceField['id'],
       ));
-      $this->_ids['price_field_value'][] = $priceFieldValue['id'];
+      $this->_ids['price_field_value'][] = $priceFieldValue;
     }
   }
 
@@ -890,6 +893,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
           'financial_type_id' => 'Donation',
           'amount' => 20,
           'financial_type_id' => 'Donation',
+          'non_deductible_amount' => 15,
         )
       );
       $priceFieldValue = $this->callAPISuccess('price_field_value', 'create', array(
@@ -899,6 +903,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
           'financial_type_id' => 'Donation',
           'amount' => 10,
           'financial_type_id' => 'Donation',
+          'non_deductible_amount' => 5,
         )
       );
       $this->_ids['price_field_value'] = array($priceFieldValue['id']);

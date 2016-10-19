@@ -118,7 +118,6 @@ class CRM_Core_Config_MagicMerge {
       'backtrace' => array('setting'),
       'contact_default_language' => array('setting'),
       'countryLimit' => array('setting'),
-      'dashboardCacheTimeout' => array('setting'),
       'dateInputFormat' => array('setting'),
       'dateformatDatetime' => array('setting'),
       'dateformatFull' => array('setting'),
@@ -126,6 +125,7 @@ class CRM_Core_Config_MagicMerge {
       'dateformatTime' => array('setting'),
       'dateformatYear' => array('setting'),
       'dateformatFinancialBatch' => array('setting'),
+      'dateformatshortdate' => array('setting'),
       'debug' => array('setting', 'debug_enabled'), // renamed.
       'defaultContactCountry' => array('setting'),
       'defaultContactStateProvince' => array('setting'),

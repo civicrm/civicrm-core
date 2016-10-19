@@ -185,7 +185,7 @@ ORDER BY entity_id
       $acl[$dao->id]['is_active'] = $dao->is_active;
 
       if ($acl[$dao->id]['entity_id']) {
-        $acl[$dao->id]['entity'] = $roles[$acl[$dao->id]['entity_id']];
+        $acl[$dao->id]['entity'] = CRM_Utils_Array::value($acl[$dao->id]['entity_id'], $roles);
       }
       else {
         $acl[$dao->id]['entity'] = ts('Everyone');

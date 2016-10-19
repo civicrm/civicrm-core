@@ -223,7 +223,7 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
             'name' => 'street_number',
             'dbAlias' => 'address_civireport.street_number%2',
           ),
-          'street_number' => array('title' => 'Street Number'),
+          'street_number' => array('title' => ts('Street Number')),
         ),
         'grouping' => 'location-fields',
       ),

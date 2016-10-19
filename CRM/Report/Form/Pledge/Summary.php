@@ -42,8 +42,20 @@ class CRM_Report_Form_Pledge_Summary extends CRM_Report_Form {
   protected $_emailField = FALSE;
 
   /**
+   * This report has not been optimised for group filtering.
+   *
+   * The functionality for group filtering has been improved but not
+   * all reports have been adjusted to take care of it. This report has not
+   * and will run an inefficient query until fixed.
+   *
+   * CRM-19170
+   *
+   * @var bool
    */
+  protected $groupFilterNotOptimised = TRUE;
+
   /**
+   * Class constructor.
    */
   public function __construct() {
     $this->_columns = array(
@@ -125,7 +137,7 @@ class CRM_Report_Form_Pledge_Summary extends CRM_Report_Form {
         ),
         'filters' => array(
           'pledge_create_date' => array(
-            'title' => 'Pledge Made Date',
+            'title' => ts('Pledge Made Date'),
             'operatorType' => CRM_Report_Form::OP_DATE,
           ),
           'pledge_amount' => array(
@@ -133,7 +145,7 @@ class CRM_Report_Form_Pledge_Summary extends CRM_Report_Form {
             'operatorType' => CRM_Report_Form::OP_INT,
           ),
           'currency' => array(
-            'title' => 'Currency',
+            'title' => ts('Currency'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_OptionGroup::values('currencies_enabled'),
             'default' => NULL,
@@ -280,7 +292,7 @@ class CRM_Report_Form_Pledge_Summary extends CRM_Report_Form {
       $groupBy = "{$this->_aliases['civicrm_contact']}.id";
       $this->_groupBy = "GROUP BY {$groupBy}";
     }
-    $this->appendSelect($this->_selectClauses, $groupBy);
+    $this->_select = CRM_Contact_BAO_Query::appendAnyValueToSelect($this->_selectClauses, $groupBy);
     $this->_groupBy .= " {$this->_rollup}";
   }
 
@@ -306,16 +318,16 @@ class CRM_Report_Form_Pledge_Summary extends CRM_Report_Form {
       if ($dao->fetch()) {
         $statistics['count']['amount'] = array(
           'value' => $dao->amount,
-          'title' => 'Total Pledged',
+          'title' => ts('Total Pledged'),
           'type' => CRM_Utils_Type::T_MONEY,
         );
         $statistics['count']['count '] = array(
           'value' => $dao->count,
-          'title' => 'Total No Pledges',
+          'title' => ts('Total No Pledges'),
         );
         $statistics['count']['avg   '] = array(
           'value' => $dao->avg,
-          'title' => 'Average',
+          'title' => ts('Average'),
           'type' => CRM_Utils_Type::T_MONEY,
         );
       }

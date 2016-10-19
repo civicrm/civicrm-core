@@ -319,7 +319,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
       FALSE
     );
 
-    $this->assertEquals(array(
+    $expectedPairs = array(
       0 => array(
         'srcID' => $this->contacts[5]['id'],
         'srcName' => 'Walt Disney Ltd',
@@ -352,7 +352,26 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
         'weight' => 10,
         'canMerge' => TRUE,
       ),
-    ), $pairs);
+    );
+    usort($pairs, array(__CLASS__, 'compareDupes'));
+    usort($expectedPairs, array(__CLASS__, 'compareDupes'));
+    $this->assertEquals($expectedPairs, $pairs);
+  }
+
+  /**
+   * Function to sort $duplicate records in a stable way.
+   *
+   * @param array $a
+   * @param array $b
+   * @return int
+   */
+  public static function compareDupes($a, $b) {
+    foreach (array('srcName', 'dstName', 'srcID', 'dstID') as $field) {
+      if ($a[$field] != $b[$field]) {
+        return ($a[$field] < $b[$field]) ? 1 : -1;
+      }
+    }
+    return 0;
   }
 
   /**
@@ -387,6 +406,43 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
         'srcID' => $this->contacts[6]['id'],
         'srcName' => 'Walt Disney',
         'dstID' => $this->contacts[4]['id'],
+        'dstName' => 'Walt Disney Ltd',
+        'weight' => 10,
+        'canMerge' => TRUE,
+      ),
+    ), $pairs);
+
+    $this->callAPISuccess('GroupContact', 'create', array('group_id' => $groupID, 'contact_id' => $this->contacts[5]['id']));
+    CRM_Core_DAO::executeQuery("DELETE FROM civicrm_prevnext_cache");
+    $pairs = CRM_Dedupe_Merger::getDuplicatePairs(
+      $ruleGroups['id'],
+      $groupID,
+      TRUE,
+      25,
+      FALSE
+    );
+
+    $this->assertEquals(array(
+      0 => array(
+        'srcID' => $this->contacts[5]['id'],
+        'srcName' => 'Walt Disney Ltd',
+        'dstID' => $this->contacts[4]['id'],
+        'dstName' => 'Walt Disney Ltd',
+        'weight' => 20,
+        'canMerge' => TRUE,
+      ),
+      1 => array(
+        'srcID' => $this->contacts[6]['id'],
+        'srcName' => 'Walt Disney',
+        'dstID' => $this->contacts[4]['id'],
+        'dstName' => 'Walt Disney Ltd',
+        'weight' => 10,
+        'canMerge' => TRUE,
+      ),
+      2 => array(
+        'srcID' => $this->contacts[6]['id'],
+        'srcName' => 'Walt Disney',
+        'dstID' => $this->contacts[5]['id'],
         'dstName' => 'Walt Disney Ltd',
         'weight' => 10,
         'canMerge' => TRUE,

@@ -99,6 +99,12 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
 
       $postUpgradeMessage .= '<p>' . ts('The custom fatal error template setting has been removed.') . '</p>';
     }
+    //if ($rev == '4.7.11') {
+    //  $postUpgradeMessage .= '<br /><br />' . ts("WARNING: For increased security, profile submissions embedded in remote sites are no longer allowed to create or edit data by default. If you need to allow users to submit profiles from external sites, you can restore this at Administer > System Settings > Misc (Undelete, PDFs, Limits, Logging, Captcha, etc.) > 'Accept profile submissions from external sites'");
+    //}
+    if ($rev == '4.7.11') {
+      $postUpgradeMessage .= '<br /><br />' . ts("By default, CiviCRM now disables the ability to import directly from SQL. To use this feature, you must explicitly grant permission 'import SQL datasource'.");
+    }
   }
 
   /**
@@ -218,10 +224,42 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
   public function upgrade_4_7_10($rev) {
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
     $this->addTask(ts('Upgrade Add Help Pre and Post Fields to price value table'), 'addHelpPreAndHelpPostFieldsPriceFieldValue');
+    $this->addTask(ts('Alter index and type for image URL'), 'alterIndexAndTypeForImageURL');
   }
 
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_4_7_11($rev) {
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
+    $this->addTask('Dashboard schema updates', 'dashboardSchemaUpdate');
+    $this->addTask(ts('Fill in setting "remote_profile_submissions"'), 'migrateRemoteSubmissionsSetting');
+  }
+
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_4_7_12($rev) {
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
+    $this->addTask(ts('Add Data Type column to civicrm_option_group'), 'addDataTypeColumnToOptionGroupTable');
+  }
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_4_7_13($rev) {
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
+    $this->addTask(ts('Add column to allow for payment processors to set what card types are accepted'), 'addAcceptedCardTypesField');
+  }
+
+
   /*
-   * Important! All upgrade functions MUST call the 'runSql' task.
+   * Important! All upgrade functions MUST add a 'runSql' task.
    * Uncomment and use the following template for a new upgrade version
    * (change the x in the function name):
    */
@@ -258,7 +296,7 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
    * @param CRM_Queue_TaskContext $ctx
    * @return bool
    */
-  public function migrateSettings(CRM_Queue_TaskContext $ctx) {
+  public static function migrateSettings(CRM_Queue_TaskContext $ctx) {
     // Tip: If there are problems with adding the new uniqueness index, try inspecting:
     // SELECT name, domain_id, contact_id, count(*) AS dupes FROM civicrm_setting cs GROUP BY name, domain_id, contact_id HAVING dupes > 1;
 
@@ -358,7 +396,7 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
    *
    * @return bool
    */
-  public function addGettingStartedDashlet(CRM_Queue_TaskContext $ctx) {
+  public static function addGettingStartedDashlet(CRM_Queue_TaskContext $ctx) {
     $sql = "SELECT count(*) FROM civicrm_dashboard WHERE name='getting-started'";
     $res = CRM_Core_DAO::singleValueQuery($sql);
     $domainId = CRM_Core_Config::domainID();
@@ -393,7 +431,7 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
     $ufGroupDAO->module = 'OnBehalf';
     $ufGroupDAO->find(TRUE);
 
-    $forOrgColums = array();
+    $forOrgColums = array('is_for_organization');
     if ($domain->locales) {
       $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
       foreach ($locales as $locale) {
@@ -444,13 +482,42 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
   }
 
   /**
+   * v4.7.11 adds a new setting "remote_profile_submissions". This is
+   * long-standing feature that existing sites may be using; however, it's
+   * a bit prone to abuse. For new sites, the default is to disable it
+   * (since that is more secure). For existing sites, the default is to
+   * enable it (since that is more compatible).
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   *
+   * @return bool
+   */
+  public static function migrateRemoteSubmissionsSetting(CRM_Queue_TaskContext $ctx) {
+    $domains = CRM_Core_DAO::executeQuery("SELECT DISTINCT d.id FROM civicrm_domain d LEFT JOIN civicrm_setting s ON d.id=s.domain_id AND s.name = 'remote_profile_submissions' WHERE s.id IS NULL");
+    while ($domains->fetch()) {
+      CRM_Core_DAO::executeQuery(
+        "INSERT INTO civicrm_setting (`name`, `value`, `domain_id`, `is_domain`, `contact_id`, `component_id`, `created_date`, `created_id`)
+          VALUES (%2, %3, %4, %5, NULL, NULL, %6, NULL)",
+        array(
+          2 => array('remote_profile_submissions', 'String'),
+          3 => array('s:1:"1";', 'String'),
+          4 => array($domains->id, 'Integer'),
+          5 => array(1, 'Integer'),
+          6 => array(date('Y-m-d H:i:s'), 'String'),
+        )
+      );
+    }
+    return TRUE;
+  }
+
+  /**
    * CRM-11782 - Get rid of VALUE_SEPARATOR character in saved search form values
    *
    * @param \CRM_Queue_TaskContext $ctx
    *
    * @return bool
    */
-  public function fixContactTypeInSmartGroups(CRM_Queue_TaskContext $ctx) {
+  public static function fixContactTypeInSmartGroups(CRM_Queue_TaskContext $ctx) {
     $sep = CRM_Core_DAO::VALUE_SEPARATOR;
     $dao = CRM_Core_DAO::executeQuery("SELECT id, form_values FROM civicrm_saved_search WHERE form_values LIKE '%$sep%'");
     while ($dao->fetch()) {
@@ -475,7 +542,7 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
    *
    * @return bool
    */
-  public function deleteVersionCheckCacheFile(CRM_Queue_TaskContext $ctx) {
+  public static function deleteVersionCheckCacheFile(CRM_Queue_TaskContext $ctx) {
     $config = CRM_Core_Config::singleton();
     $cacheFile = $config->uploadDir . 'version-info-cache.json';
     if (file_exists($cacheFile)) {
@@ -491,7 +558,7 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
    *
    * @return bool
    */
-  public function disableFlexibleJobsExtension(CRM_Queue_TaskContext $ctx) {
+  public static function disableFlexibleJobsExtension(CRM_Queue_TaskContext $ctx) {
     try {
       civicrm_api3('Extension', 'disable', array('key' => 'com.klangsoft.flexiblejobs'));
     }
@@ -509,7 +576,7 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
    *
    * @return bool
    */
-  public function addIndexFinancialTrxnTrxnID(CRM_Queue_TaskContext $ctx) {
+  public static function addIndexFinancialTrxnTrxnID(CRM_Queue_TaskContext $ctx) {
     $tables = array('civicrm_financial_trxn' => array('trxn_id'));
     CRM_Core_BAO_SchemaHandler::createIndexes($tables);
     return TRUE;
@@ -522,7 +589,7 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
    *
    * @return bool
    */
-  public function addIndexContributionCreditNoteID(CRM_Queue_TaskContext $ctx) {
+  public static function addIndexContributionCreditNoteID(CRM_Queue_TaskContext $ctx) {
     $tables = array('civicrm_contribution' => array('creditnote_id'));
     CRM_Core_BAO_SchemaHandler::createIndexes($tables);
     return TRUE;
@@ -537,7 +604,7 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
    *
    * @return bool
    */
-  public function addCombinedIndexFinancialItemEntityIDEntityType() {
+  public static function addCombinedIndexFinancialItemEntityIDEntityType() {
     CRM_Core_BAO_SchemaHandler::dropIndexIfExists('civicrm_financial_item', 'UI_id');
     CRM_Core_BAO_SchemaHandler::dropIndexIfExists('civicrm_financial_item', 'IX_Entity');
     CRM_Core_BAO_SchemaHandler::createIndexes(array(
@@ -552,7 +619,7 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
    * Add Chargeback contribution status and Chargeback and Contra account relationships,
    * checking first if one exists.
    */
-  public function addRefundAndChargeBackAccountsIfNotExist() {
+  public static function addRefundAndChargeBackAccountsIfNotExist() {
     // First we enable and edit the record for Credit contra - this exists but is disabled for most sites.
     // Using the ensure function (below) will not enabled a disabled option (by design).
     CRM_Core_DAO::executeQuery("UPDATE civicrm_option_value v
@@ -585,7 +652,7 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
    *
    * @return bool
    */
-  public function addIndexContributionSource(CRM_Queue_TaskContext $ctx) {
+  public static function addIndexContributionSource(CRM_Queue_TaskContext $ctx) {
     CRM_Core_BAO_SchemaHandler::createIndexes(array('civicrm_contribution' => array('source')));
     return TRUE;
   }
@@ -600,7 +667,7 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
    *
    * @return bool
    */
-  public function addIndexContributionAmount(CRM_Queue_TaskContext $ctx) {
+  public static function addIndexContributionAmount(CRM_Queue_TaskContext $ctx) {
     CRM_Core_BAO_SchemaHandler::createIndexes(array(
       'civicrm_contribution' => array(array('total_amount', 'receive_date')),
     ));
@@ -617,7 +684,7 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
    *
    * @return bool
    */
-  public function addDeletedByMergeActivityType(CRM_Queue_TaskContext $ctx) {
+  public static function addDeletedByMergeActivityType(CRM_Queue_TaskContext $ctx) {
     CRM_Core_BAO_OptionValue::ensureOptionValueExists(array(
       'option_group_id' => 'activity_type',
       'name' => 'Contact Deleted by Merge',
@@ -636,7 +703,7 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
    *
    * @return bool
    */
-  public function addHelpPreAndHelpPostFieldsPriceFieldValue(CRM_Queue_TaskContext $ctx) {
+  public static function addHelpPreAndHelpPostFieldsPriceFieldValue(CRM_Queue_TaskContext $ctx) {
     $domain = new CRM_Core_DAO_Domain();
     $domain->find(TRUE);
     if ($domain->locales) {
@@ -674,7 +741,7 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
    *
    * @return bool
    */
-  public function upgradeMailingFKs(CRM_Queue_TaskContext $ctx) {
+  public static function upgradeMailingFKs(CRM_Queue_TaskContext $ctx) {
 
     // Safely drop the foreign keys
     CRM_Core_BAO_SchemaHandler::safeRemoveFK('civicrm_mailing_event_queue', 'FK_civicrm_mailing_event_queue_email_id');
@@ -723,6 +790,93 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
 
     CRM_Core_DAO::executeQuery("SET FOREIGN_KEY_CHECKS = 1;");
 
+    return TRUE;
+  }
+
+  /**
+   * CRM-17663 - Dashboard schema changes
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   *
+   * @return bool
+   */
+  public static function dashboardSchemaUpdate(CRM_Queue_TaskContext $ctx) {
+    if (!CRM_Core_BAO_SchemaHandler::checkIfIndexExists('civicrm_dashboard_contact', 'index_dashboard_id_contact_id')) {
+      // Delete any stray duplicate rows and add unique index to prevent new dupes and enable INSERT/UPDATE combo query
+      CRM_Core_DAO::executeQuery('DELETE c1 FROM civicrm_dashboard_contact c1, civicrm_dashboard_contact c2 WHERE c1.contact_id = c2.contact_id AND c1.dashboard_id = c2.dashboard_id AND c1.id > c2.id');
+      CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_dashboard_contact ADD UNIQUE INDEX index_dashboard_id_contact_id (dashboard_id, contact_id);');
+    }
+    $domain = new CRM_Core_DAO_Domain();
+    $domain->find(TRUE);
+    CRM_Core_BAO_SchemaHandler::dropColumn('civicrm_dashboard_contact', 'content');
+    CRM_Core_BAO_SchemaHandler::dropColumn('civicrm_dashboard_contact', 'is_minimized');
+    CRM_Core_BAO_SchemaHandler::dropColumn('civicrm_dashboard_contact', 'is_fullscreen');
+    CRM_Core_BAO_SchemaHandler::dropColumn('civicrm_dashboard_contact', 'created_date');
+    CRM_Core_BAO_SchemaHandler::dropColumn('civicrm_dashboard', 'is_fullscreen');
+    CRM_Core_BAO_SchemaHandler::dropColumn('civicrm_dashboard', 'is_minimized');
+    CRM_Core_BAO_SchemaHandler::dropColumn('civicrm_dashboard', 'column_no');
+    CRM_Core_BAO_SchemaHandler::dropColumn('civicrm_dashboard', 'weight');
+
+    CRM_Core_DAO::executeQuery('UPDATE civicrm_dashboard SET url = REPLACE(url, "&snippet=5", ""), fullscreen_url = REPLACE(fullscreen_url, "&snippet=5", "")');
+
+    if (!CRM_Core_BAO_SchemaHandler::checkIfFieldExists('civicrm_dashboard', 'cache_minutes')) {
+      CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_dashboard ADD COLUMN cache_minutes int unsigned NOT NULL DEFAULT 60 COMMENT "Number of minutes to cache dashlet content in browser localStorage."',
+         array(), TRUE, NULL, FALSE, FALSE);
+    }
+    if ($domain->locales) {
+      $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
+      CRM_Core_I18n_Schema::rebuildMultilingualSchema($locales, NULL);
+    }
+
+    CRM_Core_DAO::executeQuery('UPDATE civicrm_dashboard SET cache_minutes = 1440 WHERE name = "blog"');
+    CRM_Core_DAO::executeQuery('UPDATE civicrm_dashboard SET cache_minutes = 7200 WHERE name IN ("activity","getting-started")');
+    return TRUE;
+  }
+
+  /**
+   * CRM-19100 - Alter Index and Type for Image URL
+   * @return bool
+   */
+  public static function alterIndexAndTypeForImageURL() {
+    $length = array();
+    CRM_Core_BAO_SchemaHandler::dropIndexIfExists('civicrm_contact', 'index_image_url');
+    CRM_Core_DAO::executeQuery("ALTER TABLE `civicrm_contact` CHANGE `image_URL` `image_URL` TEXT CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT 'optional URL for preferred image (photo, logo, etc.) to display for this contact.'");
+
+    $length['civicrm_contact']['image_URL'] = 128;
+    CRM_Core_BAO_SchemaHandler::createIndexes(array('civicrm_contact' => array('image_URL')), 'index', $length);
+
+    return TRUE;
+  }
+
+  /**
+   * CRM-18651 Add DataType column to Option Group Table
+   * @return bool
+   */
+  public static function addDataTypeColumnToOptionGroupTable() {
+    if (!CRM_Core_BAO_SchemaHandler::checkIfFieldExists('civicrm_option_group', 'data_type')) {
+      CRM_Core_DAO::executeQuery("ALTER TABLE `civicrm_option_group` ADD COLUMN `data_type` varchar(128) COLLATE utf8_unicode_ci DEFAULT NULL comment 'Data Type of Option Group.'",
+         array(), TRUE, NULL, FALSE, FALSE);
+    }
+    $domain = new CRM_Core_DAO_Domain();
+    $domain->find(TRUE);
+    if ($domain->locales) {
+      $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
+      CRM_Core_I18n_Schema::rebuildMultilingualSchema($locales, NULL);
+    }
+
+    CRM_Core_DAO::executeQuery("UPDATE `civicrm_option_group` SET `data_type` = 'Integer'
+      WHERE name IN ('activity_type', 'gender', 'payment_instrument', 'participant_role', 'event_type')");
+    return TRUE;
+  }
+
+  /**
+   * CRM-19372 Add field to store accepted credit credit cards for a payment processor.
+   * @return bool
+   */
+  public static function addAcceptedCardTypesField() {
+    if (!CRM_Core_BAO_SchemaHandler::checkIfFieldExists('civicrm_payment_processor', 'accepted_credit_cards')) {
+      CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_payment_processor ADD COLUMN `accepted_credit_cards` text   DEFAULT NULL COMMENT 'array of accepted credit card types'");
+    }
     return TRUE;
   }
 

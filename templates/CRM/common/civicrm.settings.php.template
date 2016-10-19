@@ -103,6 +103,14 @@ if (!defined('CIVICRM_DSN')) {
 }
 
 /**
+ * CiviCRM DSN Mode
+ * Used to determine if you want CiviCRM to automatically change the dsn to mysqli if its avaliable.
+ * Uncomment and edit below as necessary
+ */
+// define ('DB_DSN_MODE', 'auto');
+
+
+/**
  * CiviCRM Logging Database
  *
  * Used to point to a different database to use for logging (if desired). If unset defaults to equal CIVICRM_DSN.
@@ -212,10 +220,10 @@ if (!defined('CIVICRM_UF_BASEURL')) {
  //  global $civicrm_setting;
 
  // Override the Temporary Files directory.
- // $civicrm_setting['Directory Preferences']['customFileUploadDir'] = '/path/to/upload';
+ // $civicrm_setting['Directory Preferences']['uploadDir'] = '/path/to/upload-dir' ;
 
  // Override the custom files upload directory.
- // $civicrm_setting['Directory Preferences']['uploadDir'] = '/path/to/upload-dir' ;
+ // $civicrm_setting['Directory Preferences']['customFileUploadDir'] = '/path/to/custom-dir';
 
  // Override the images directory.
  // $civicrm_setting['Directory Preferences']['imageUploadDir'] = '/path/to/image-upload-dir' ;
@@ -252,6 +260,13 @@ if (!defined('CIVICRM_UF_BASEURL')) {
 
  // Override the CMS root path defined by cmsRootPath.
  // define('CIVICRM_CMSDIR', '/path/to/install/root/');
+
+ // Opt-out of announcements by the CiviCRM core team for releases, paid services, events, etc. Separate each preferred optout category with a comma:
+ //   "offers": paid service offers
+ //   "asks": requests for donations or membership signup/renewal to CiviCRM
+ //   "releases": major release announcements
+ //   "events": announcements of local/national upcoming events
+ // $civicrm_setting['CiviCRM Preferences']['communityMessagesUrl'] = 'https://alert.civicrm.org/alert?prot=1&ver={ver}&uf={uf}&sid={sid}&lang={lang}&co={co}&optout=offers,asks';
 
 
 /**

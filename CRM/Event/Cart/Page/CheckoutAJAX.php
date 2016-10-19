@@ -35,9 +35,8 @@ class CRM_Event_Cart_Page_CheckoutAJAX {
     $requiredTemplate = file_get_contents($templateDir . '/CRM/Form/label.tpl');
     $renderer->setRequiredTemplate($requiredTemplate);
 
-    $form->accept($renderer);
     $template = CRM_Core_Smarty::singleton();
-    $template->assign('form', $renderer->toArray());
+    $template->assign('form', $form->toSmarty());
     $template->assign('participant', $participant);
     $output = $template->fetch("CRM/Event/Cart/Form/Checkout/Participant.tpl");
     $transaction->commit();

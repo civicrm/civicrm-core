@@ -98,24 +98,36 @@
    * @returns {*}
    */
   function getField(name) {
-    if (!name) {
-      return {};
-    }
-    if (getFieldData[name]) {
-      return getFieldData[name];
-    }
-    var ent = entity,
-      act = action,
-      prefix = '';
-    _.each(name.split('.'), function(piece) {
-      if (joins[prefix]) {
-        ent = joins[prefix];
-        act = 'get';
+    var field = {};
+    if (name && getFieldData[name]) {
+      field = _.cloneDeep(getFieldData[name]);
+    } else if (name) {
+      var ent = entity,
+        act = action,
+        prefix = '';
+      _.each(name.split('.'), function(piece) {
+        if (joins[prefix]) {
+          ent = joins[prefix];
+          act = 'get';
+        }
+        name = piece;
+        prefix += (prefix.length ? '.' : '') + piece;
+      });
+      if (getFieldsCache[ent+act].values[name]) {
+        field = _.cloneDeep(getFieldsCache[ent+act].values[name]);
       }
-      name = piece;
-      prefix += (prefix.length ? '.' : '') + piece;
-    });
-    return getFieldsCache[ent+act].values[name] || {};
+    }
+    addJoinInfo(field, name);
+    return field;
+  }
+
+  function addJoinInfo(field, name) {
+    if (field.name === 'entity_id') {
+      var entityTableParam = name.slice(0, -2) + 'table';
+      if (params[entityTableParam]) {
+        field.FKApiName = getField(entityTableParam).options[params[entityTableParam]];
+      }
+    }
   }
 
   /**
@@ -276,6 +288,15 @@
     });
   }
 
+  function changeFKEntity() {
+    var $row = $(this).closest('tr'),
+      name = $('input.api-param-name', $row).val(),
+      operator = $('.api-param-op', $row).val();
+    if (name && name.slice(-12) === 'entity_table') {
+      $('input[value=' + name.slice(0, -5) + 'id]', '#api-join').prop('checked', false).change();
+    }
+  }
+
   /**
    * For "get" actions show the "return" options
    *
@@ -395,7 +416,7 @@
     if (operator !== '=') {
       return false;
     }
-    return true;
+    return fieldName !== 'entity_table';
     /*
      * Attempt to resolve the ambiguity of the = operator using metadata
      * commented out because there is not enough metadata in the api at this time
@@ -658,8 +679,8 @@
     $.each(params, function(key, value) {
       var json = JSON.stringify(value),
         // Encourage 'return' to be an array - at least in php & js
-        js = key === 'return' ? JSON.stringify(evaluate(value, true)) : json,
-        php = key === 'return' ? phpFormat(evaluate(value, true)) : phpFormat(value);
+        js = key === 'return' && action !== 'getvalue' ? JSON.stringify(evaluate(value, true)) : json,
+        php = key === 'return' && action !== 'getvalue' ? phpFormat(evaluate(value, true)) : phpFormat(value);
       if (!(i++)) {
         q.php += ", array(\n";
         q.json += ", {\n";
@@ -832,11 +853,12 @@
       var joinable = {};
       (function recurse(fields, joinable, prefix, depth, entities) {
         _.each(fields, function(field) {
+          var name = prefix + field.name;
+          addJoinInfo(field, name);
           var entity = field.FKApiName;
-          if (entity && field.FKClassName) {
-            var name = prefix + field.name;
+          if (entity) {
             joinable[name] = {
-              title: field.title,
+              title: field.title + ' (' + field.FKApiName + ')',
               entity: entity,
               checked: !!joins[name]
             };
@@ -845,9 +867,15 @@
               joinable[name].children = {};
               recurse(getFieldsCache[entity+'get'].values, joinable[name].children, name + '.', depth+1, entities.concat(entity));
             }
+          } else if (field.name == 'entity_id' && fields.entity_table && fields.entity_table.options) {
+            joinable[name] = {
+              title: field.title + ' (' + ts('First select %1', {1: fields.entity_table.title}) + ')',
+              entity: '',
+              disabled: true
+            };
           }
         });
-      })(getFieldData, joinable, '', 1, [entity]);
+      })(_.cloneDeep(getFieldData), joinable, '', 1, [entity]);
       if (!_.isEmpty(joinable)) {
         // Send joinTpl as a param so it can recursively call itself to render children
         $('#api-join').show().children('div').html(joinTpl({joins: joinable, tpl: joinTpl}));
@@ -918,6 +946,7 @@
         checkBookKeepingEntity(entity, action);
       })
       .on('change keyup', 'input.api-input, #api-params select', buildParams)
+      .on('change', '.api-param-name, .api-param-value, .api-param-op', changeFKEntity)
       .on('submit', submit);
 
     $('#api-params')

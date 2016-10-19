@@ -716,7 +716,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     }
     $result = civicrm_api($Entity, 'Get', array());
     $this->assertEquals(1, $result['is_error']);
-    $this->assertContains("Mandatory key(s) missing from params array", $result['error_message']);
+    $this->assertContains("Unknown api version", $result['error_message']);
   }
 
   /**
@@ -1074,30 +1074,15 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
 
   /**
    * @dataProvider entities
-   * @expectedException PHPUnit_Framework_Error
+   * @expectedException CiviCRM_API3_Exception
    * @param $Entity
    */
   public function testWithoutParam_create($Entity) {
-    // should create php complaining that a param is missing
-    $result = civicrm_api($Entity, 'Create');
-  }
-
-  /**
-   * @dataProvider entities_create
-   * @param $Entity
-   * @throws \PHPUnit_Framework_IncompleteTestError
-   */
-  public function testEmptyParam_create($Entity) {
-    $this->markTestIncomplete("fixing this test to test the api functions fails on numerous tests
-      which will either create a completely blank entity (batch, participant status) or
-      have a damn good crack at it (e.g mailing job). Marking this as incomplete beats false success");
-    return;
-    if (in_array($Entity, $this->toBeImplemented['create'])) {
-      // $this->markTestIncomplete("civicrm_api3_{$Entity}_create to be implemented");
-      return;
+    if ($Entity === 'Setting') {
+      $this->markTestSkipped('It seems OK for setting to skip here as it silently sips invalid params');
     }
-    $result = $this->callAPIFailure($Entity, 'Create', array());
-    $this->assertContains("Mandatory key(s) missing from params array", $result['error_message']);
+    // should create php complaining that a param is missing
+    civicrm_api3($Entity, 'Create');
   }
 
   /**
@@ -1297,6 +1282,10 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
         //api has special handling on these 2 fields for backward compatibility reasons
         $entity['contribution_type_id'] = $updateParams['financial_type_id'];
       }
+      if (isset($updateParams['next_sched_contribution_date']) && in_array($entityName, array('ContributionRecur'))) {
+        //api has special handling on these 2 fields for backward compatibility reasons
+        $entity['next_sched_contribution'] = $updateParams['next_sched_contribution_date'];
+      }
 
       $update = $this->callAPISuccess($entityName, 'create', $updateParams);
       $checkParams = array(
@@ -1326,6 +1315,10 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
         if (isset($updateParams['financial_type_id']) && in_array($entityName, array('Grant'))) {
           //api has special handling on these 2 fields for backward compatibility reasons
           $entity['contribution_type_id'] = $updateParams['financial_type_id'];
+        }
+        if (isset($updateParams['next_sched_contribution_date']) && in_array($entityName, array('ContributionRecur'))) {
+          //api has special handling on these 2 fields for backward compatibility reasons
+          $entity['next_sched_contribution'] = $updateParams['next_sched_contribution_date'];
         }
       }
     }
@@ -1369,7 +1362,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     }
     $result = civicrm_api($Entity, 'Delete', array());
     $this->assertEquals(1, $result['is_error']);
-    $this->assertContains("Mandatory key(s) missing from params array", $result['error_message']);
+    $this->assertContains("Unknown api version", $result['error_message']);
   }
 
   /**
@@ -1378,13 +1371,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    * @throws \PHPUnit_Framework_IncompleteTestError
    */
   public function testInvalidID_delete($Entity) {
-    // turn test off for now
-    $this->markTestIncomplete("Entity [ $Entity ] cannot be mocked - no known DAO");
-    return;
-    if (in_array($Entity, $this->toBeImplemented['delete'])) {
-      // $this->markTestIncomplete("civicrm_api3_{$Entity}_delete to be implemented");
-      return;
-    }
     $result = $this->callAPIFailure($Entity, 'Delete', array('id' => 999));
   }
 

@@ -80,10 +80,6 @@ function civicrm_api3_contribution_create(&$params) {
   }
   _civicrm_api3_contribution_create_legacy_support_45($params);
 
-  // Make sure tax calculation is handled via api.
-  // @todo this belongs in the BAO NOT the api.
-  $params = CRM_Contribute_BAO_Contribution::checkTaxAmount($params);
-
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'Contribution');
 }
 
@@ -572,6 +568,10 @@ function civicrm_api3_contribution_repeattransaction(&$params) {
       'A valid original contribution ID is required', 'invalid_data');
   }
   $original_contribution = clone $contribution;
+  $input['payment_processor_id'] = civicrm_api3('contributionRecur', 'getvalue', array(
+    'return' => 'payment_processor_id',
+    'id' => $contribution->contribution_recur_id,
+  ));
   try {
     if (!$contribution->loadRelatedObjects($input, $ids, TRUE)) {
       throw new API_Exception('failed to load related objects');

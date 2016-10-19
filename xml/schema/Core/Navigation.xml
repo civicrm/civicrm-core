@@ -83,7 +83,8 @@
     <comment>Parent navigation item, used for grouping</comment>
     <pseudoconstant>
       <table>civicrm_navigation</table>
-      <keyColumn>name</keyColumn>
+      <keyColumn>id</keyColumn>
+      <nameColumn>name</nameColumn>
       <labelColumn>label</labelColumn>
     </pseudoconstant>
     <add>3.0</add>
