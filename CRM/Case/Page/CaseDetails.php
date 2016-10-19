@@ -50,7 +50,7 @@ class CRM_Case_Page_CaseDetails extends CRM_Core_Page {
 
     $caseId = CRM_Utils_Request::retrieve('caseId', 'Positive', $this);
 
-    CRM_Case_Page_Tab::setContext();
+    CRM_Case_Page_Tab::setContext($this);
 
     $this->assign('caseID', $caseId);
     $this->assign('contactID', $this->_contactId);
