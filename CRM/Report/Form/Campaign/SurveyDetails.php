@@ -151,6 +151,11 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
             'title' => ts('Street Number'),
             'type' => 1,
           ),
+          'street_address' => array(
+            'name' => 'street_address',
+            'title' => ts('Street Address'),
+            'type' => 1,
+          ),
           'street_name' => array(
             'name' => 'street_name',
             'title' => ts('Street Name'),
@@ -181,6 +186,11 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
           ),
         ),
         'filters' => array(
+          'street_address' => array(
+            'title' => ts('Street Address'),
+            'operator' => 'like',
+            'name' => 'street_address',
+          ),
           'street_number' => array(
             'title' => ts('Street Number'),
             'type' => 1,
