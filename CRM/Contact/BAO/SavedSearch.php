@@ -105,7 +105,13 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
         $id = CRM_Utils_Array::value(0, $value);
         $value = CRM_Utils_Array::value(2, $value);
         if (is_array($value) && in_array(key($value), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
-          $value = CRM_Utils_Array::value(key($value), $value);
+          $op = key($value);
+          $value = CRM_Utils_Array::value($op, $value);
+          if (in_array($op, array('BETWEEN', '>=', '<='))) {
+            self::decodeRelativeFields($result, $id, $op, $value);
+            unset($result[$element]);
+            continue;
+          }
         }
         if (strpos($id, '_date_low') !== FALSE || strpos($id, '_date_high') !== FALSE) {
           $entityName = strstr($id, '_date', TRUE);
@@ -406,6 +412,31 @@ LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_
     // merge with original queryParams if relative date value(s) found
     if (count($relativeDates['relative_dates'])) {
       $queryParams = array_merge($queryParams, $relativeDates);
+    }
+  }
+
+  /**
+   * Decode relative custom fields (converted by CRM_Contact_BAO_Query->convertCustomRelativeFields(...))
+   *  into desired formValues
+   *
+   * @param array $formValues
+   * @param string $fieldName
+   * @param string $op
+   * @param array|string|int $value
+   */
+  public static function decodeRelativeFields(&$formValues, $fieldName, $op, $value) {
+    switch ($op) {
+      case 'BETWEEN':
+        list($formValues[$fieldName . '_from'], $formValues[$fieldName . '_to']) = $value;
+        break;
+
+      case '>=':
+        $formValues[$fieldName . '_from'] = $value;
+        break;
+
+      case '<=':
+        $formValues[$fieldName . '_to'] = $value;
+        break;
     }
   }
 
