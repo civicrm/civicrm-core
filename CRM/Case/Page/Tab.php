@@ -246,7 +246,6 @@ class CRM_Case_Page_Tab extends CRM_Core_Page {
    */
   public static function setContext(&$form) {
     $context = $form->get('context');
-    CRM_Core_Error::Debug("context", $context);
     $url = NULL;
 
     $qfKey = CRM_Utils_Request::retrieve('key', 'String', $form);
