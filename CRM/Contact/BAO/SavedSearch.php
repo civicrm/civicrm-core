@@ -425,6 +425,21 @@ LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_
    * @param array|string|int $value
    */
   public static function decodeRelativeFields(&$formValues, $fieldName, $op, $value) {
+    // check if its a custom date field, if yes then ISO format the value
+    if (CRM_Contact_BAO_Query::isCustomDateField($fieldName)) {
+      $field = (array) CRM_Core_BAO_CustomField::getFieldObject(CRM_Core_BAO_CustomField::getKeyID($fieldName));
+      //CRM-18349, date value must be ISO formatted before being set as a default value for crmDatepicker custom field
+      $ISODateFormat = CRM_Utils_Array::value('time_format', $field) ? 'Y-m-d G:i:s' : 'Y-m-d';
+
+      if (is_array($value)) {
+        foreach ($value as $key => $v) {
+          $value[$key] = CRM_Utils_Date::processDate($v, NULL, FALSE, $ISODateFormat);
+        }
+      }
+      else {
+        $value = CRM_Utils_Date::processDate($value, NULL, FALSE, $ISODateFormat);
+      }
+    }
     switch ($op) {
       case 'BETWEEN':
         list($formValues[$fieldName . '_from'], $formValues[$fieldName . '_to']) = $value;
