@@ -2407,19 +2407,100 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    *
    * The search string 'b' & 'bob' both return ordered by sort_name if includeOrderByClause
    * is true (default) but if it is false then matches are returned in ID order.
+   *
+   * @dataProvider getSearchSortOptions
    */
-  public function testGetQuickExactFirst() {
+  public function testGetQuickExactFirst($searchParameters, $settings, $firstContact, $secondContact = NULL) {
     $this->getQuickSearchSampleData();
-    $result = $this->callAPISuccess('contact', 'getquick', array('name' => 'b'));
-    $this->assertEquals('A Bobby, Bobby', $result['values'][0]['sort_name']);
-    $this->assertEquals('B Bobby, Bobby', $result['values'][1]['sort_name']);
-    $result = $this->callAPISuccess('contact', 'getquick', array('name' => 'bob'));
-    $this->assertEquals('A Bobby, Bobby', $result['values'][0]['sort_name']);
-    $this->assertEquals('B Bobby, Bobby', $result['values'][1]['sort_name']);
-    $this->callAPISuccess('Setting', 'create', array('includeOrderByClause' => FALSE));
-    $result = $this->callAPISuccess('contact', 'getquick', array('name' => 'bob'));
-    $this->assertEquals('Bob, Bob', $result['values'][0]['sort_name']);
-    $this->assertEquals('A Bobby, Bobby', $result['values'][1]['sort_name']);
+    $this->callAPISuccess('Setting', 'create', $settings);
+    $result = $this->callAPISuccess('contact', 'getquick', $searchParameters);
+    $this->assertEquals($firstContact, $result['values'][0]['sort_name']);
+    $this->assertEquals($secondContact, $result['values'][1]['sort_name']);
+    $this->callAPISuccess('Setting', 'create', array('includeWildCardInName' => TRUE, 'includeOrderByClause' => TRUE));
+  }
+
+  public function getSearchSortOptions() {
+    $firstAlphabeticalContactBySortName = 'A Bobby, Bobby';
+    $secondAlphabeticalContactBySortName = 'Aadvark, Bob';
+    $secondAlphabeticalContactWithEmailBySortName = 'Bob, Bob';
+    $firstAlphabeticalContactFirstNameBob = 'Aadvark, Bob';
+    $secondAlphabeticalContactFirstNameBob  = 'Bob, Bob';
+    $firstByIDContactFirstNameBob = 'Bob, Bob';
+    $secondByIDContactFirstNameBob  = 'K Bobby, Bob';
+    $firstContactByID = 'Bob, Bob';
+    $secondContactByID = 'E Bobby, Bobby';
+    $bobLikeEmail = 'A Bobby, Bobby';
+
+    return array(
+      'empty_search_basic' => array(
+        'search_parameters' => array('name' => '%'),
+        'settings' => array('includeWildCardInName' => TRUE, 'includeOrderByClause' => TRUE),
+        'first_contact' => $firstAlphabeticalContactBySortName,
+        'second_contact' => $secondAlphabeticalContactBySortName,
+      ),
+      'empty_search_basic_no_wildcard' => array(
+        'search_parameters' => array('name' => '%'),
+        'settings' => array('includeWildCardInName' => FALSE, 'includeOrderByClause' => TRUE),
+        'first_contact' => $firstAlphabeticalContactBySortName,
+        'second_contact' => $secondAlphabeticalContactBySortName,
+      ),
+      'single_letter_search_basic' => array(
+        'search_parameters' => array('name' => 'b'),
+        'settings' => array('includeWildCardInName' => TRUE, 'includeOrderByClause' => TRUE),
+        'first_contact' => $firstAlphabeticalContactBySortName,
+        'second_contact' => $secondAlphabeticalContactBySortName,
+      ),
+      'bob_search_basic' => array(
+        'search_parameters' => array('name' => 'bob'),
+        'settings' => array('includeWildCardInName' => TRUE, 'includeOrderByClause' => TRUE),
+        'first_contact' => $firstAlphabeticalContactBySortName,
+        'second_contact' => $secondAlphabeticalContactBySortName,
+      ),
+      'bob_search_no_orderby' => array(
+        'search_parameters' => array('name' => 'bob'),
+        'settings' => array('includeWildCardInName' => TRUE, 'includeOrderByClause' => FALSE),
+        'first_contact' => $firstContactByID,
+        'second_contact' => $secondContactByID,
+      ),
+      'bob_search_no_wildcard' => array(
+        'search_parameters' => array('name' => 'bob'),
+        'settings' => array('includeWildCardInName' => FALSE, 'includeOrderByClause' => TRUE),
+        'second_contact' => $bobLikeEmail,
+        'first_contact' => $secondAlphabeticalContactFirstNameBob,
+      ),
+      // This should be the same as just no wildcard as if we had an exactMatch while searching by
+      // sort name it would rise to the top CRM-19547
+      'bob_search_no_wildcard_no_orderby' => array(
+        'search_parameters' => array('name' => 'bob'),
+        'settings' => array('includeWildCardInName' => FALSE, 'includeOrderByClause' => TRUE),
+        'second_contact' => $bobLikeEmail,
+        'first_contact' => $secondAlphabeticalContactFirstNameBob,
+      ),
+      'first_name_search_basic' => array(
+        'search_parameters' => array('name' => 'bob', 'field_name' => 'first_name'),
+        'settings' => array('includeWildCardInName' => TRUE, 'includeOrderByClause' => TRUE),
+        'first_contact' => $firstAlphabeticalContactFirstNameBob,
+        'second_contact' => $secondAlphabeticalContactFirstNameBob,
+      ),
+      'first_name_search_no_wildcard' => array(
+        'search_parameters' => array('name' => 'bob', 'field_name' => 'first_name'),
+        'settings' => array('includeWildCardInName' => FALSE, 'includeOrderByClause' => TRUE),
+        'first_contact' => $firstAlphabeticalContactFirstNameBob,
+        'second_contact' => $secondAlphabeticalContactFirstNameBob,
+      ),
+      'first_name_search_no_orderby' => array(
+        'search_parameters' => array('name' => 'bob', 'field_name' => 'first_name'),
+        'settings' => array('includeWildCardInName' => TRUE, 'includeOrderByClause' => FALSE),
+        'first_contact' => $firstByIDContactFirstNameBob,
+        'second_contact' => $secondByIDContactFirstNameBob,
+      ),
+      'email_search_basic' => array(
+        'search_parameters' => array('name' => 'bob', 'field_name' => 'email', 'table_name' => 'eml'),
+        'settings' => array('includeWildCardInName' => FALSE, 'includeOrderByClause' => TRUE),
+        'first_contact' => $firstAlphabeticalContactBySortName,
+        'second_contact' => $secondAlphabeticalContactWithEmailBySortName,
+      ),
+    );
   }
 
   /**
@@ -2432,9 +2513,9 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'name' => 'c',
     ));
     $expectedData = array(
+      'A Bobby, Bobby :: bob@bobby.com',
       'Bob, Bob :: bob@bob.com',
       'C Bobby, Bobby',
-      'E Bobby, Bobby :: bob@bobby.com',
       'H Bobby, Bobby :: bob@h.com',
       'Second Domain',
       $this->callAPISuccessGetValue('Contact', array('id' => $loggedInContactID, 'return' => 'last_name')) . ', Logged In :: anthony_anderson@civicrm.org',
@@ -2481,9 +2562,9 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     // Without the acl it would be 6 like the previous email getquick test.
     $this->assertEquals(5, $result['count']);
     $expectedData = array(
+      'A Bobby, Bobby :: bob@bobby.com',
       'Bob, Bob :: bob@bob.com',
       'C Bobby, Bobby',
-      'E Bobby, Bobby :: bob@bobby.com',
       'Second Domain',
       $this->callAPISuccessGetValue('Contact', array('id' => $loggedInContactID, 'return' => 'last_name')) . ', Logged In :: anthony_anderson@civicrm.org',
     );
@@ -2524,14 +2605,14 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'table_name' => 'cc',
     ));
     $this->assertEquals(1, $result['count']);
-    $this->assertEquals('A Bobby, Bobby', $result['values'][0]['sort_name']);
+    $this->assertEquals('E Bobby, Bobby', $result['values'][0]['sort_name']);
     $result = $this->callAPISuccess('contact', 'getquick', array(
       'name' => $max + 2,
       'field_name' => 'contact_id',
       'table_name' => 'cc',
     ));
     $this->assertEquals(1, $result['count']);
-    $this->assertEquals('A Bobby, Bobby', $result['values'][0]['sort_name']);
+    $this->assertEquals('E Bobby, Bobby', $result['values'][0]['sort_name']);
   }
 
   /**
@@ -2548,6 +2629,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'table_name' => 'cc',
     ));
     $expected = array(
+      'Aadvark, Bob',
       'Bob, Bob',
       'K Bobby, Bob',
       'A Bobby, Bobby',
@@ -2559,7 +2641,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->callAPISuccess('Setting', 'create', array('includeOrderByClause' => FALSE));
     $result = $this->callAPISuccess('contact', 'getquick', array('name' => 'bob'));
     $this->assertEquals('Bob, Bob', $result['values'][0]['sort_name']);
-    $this->assertEquals('A Bobby, Bobby', $result['values'][1]['sort_name']);
+    $this->assertEquals('E Bobby, Bobby', $result['values'][1]['sort_name']);
   }
 
   /**
@@ -2568,7 +2650,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   public function testGetQuickFirstNameACLs() {
     $this->getQuickSearchSampleData();
     $userID = $this->createLoggedInUser();
-    $this->callAPISuccess('Setting', 'create', array('includeOrderByClause' => TRUE));
+    $this->callAPISuccess('Setting', 'create', array('includeOrderByClause' => TRUE, 'search_autocomplete_count' => 15));
     CRM_Core_Config::singleton()->userPermissionClass->permissions = array();
     $result = $this->callAPISuccess('contact', 'getquick', array(
       'name' => 'Bob',
@@ -2584,9 +2666,9 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'field_name' => 'first_name',
       'table_name' => 'cc',
     ));
-    $this->assertEquals('K Bobby, Bob', $result['values'][1]['sort_name']);
+    $this->assertEquals('K Bobby, Bob', $result['values'][2]['sort_name']);
     // Without the ACL 9 would be bob@h.com.
-    $this->assertEquals('I Bobby, Bobby', $result['values'][9]['sort_name']);
+    $this->assertEquals('I Bobby, Bobby', $result['values'][10]['sort_name']);
   }
 
   /**
@@ -2655,7 +2737,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   public function getQuickSearchSampleData() {
     $contacts = array(
       array('first_name' => 'Bob', 'last_name' => 'Bob', 'external_identifier' => 'abc', 'email' => 'bob@bob.com'),
-      array('first_name' => 'Bobby', 'last_name' => 'A Bobby', 'external_identifier' => 'abcd'),
+      array('first_name' => 'Bobby', 'last_name' => 'E Bobby', 'external_identifier' => 'abcd'),
       array(
         'first_name' => 'Bobby',
         'last_name' => 'B Bobby',
@@ -2677,13 +2759,14 @@ class api_v3_ContactTest extends CiviUnitTestCase {
         ),
       ),
       array('first_name' => 'Bobby', 'last_name' => 'D Bobby', 'external_identifier' => 'efg'),
-      array('first_name' => 'Bobby', 'last_name' => 'E Bobby', 'external_identifier' => 'hij', 'email' => 'bob@bobby.com'),
+      array('first_name' => 'Bobby', 'last_name' => 'A Bobby', 'external_identifier' => 'hij', 'email' => 'bob@bobby.com'),
       array('first_name' => 'Bobby', 'last_name' => 'F Bobby', 'external_identifier' => 'klm'),
       array('first_name' => 'Bobby', 'last_name' => 'G Bobby', 'external_identifier' => 'nop'),
       array('first_name' => 'Bobby', 'last_name' => 'H Bobby', 'external_identifier' => 'qrs', 'email' => 'bob@h.com'),
       array('first_name' => 'Bobby', 'last_name' => 'I Bobby'),
       array('first_name' => 'Bobby', 'last_name' => 'J Bobby'),
       array('first_name' => 'Bob', 'last_name' => 'K Bobby', 'external_identifier' => 'bcdef'),
+      array('first_name' => 'Bob', 'last_name' => 'Aadvark'),
     );
     foreach ($contacts as $type => $contact) {
       $contact['contact_type'] = 'Individual';
