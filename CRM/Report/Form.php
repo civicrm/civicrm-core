@@ -4713,7 +4713,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
     if (isset($temp)) {
       $query->_aliases['civicrm_line_item'] = $temp;
     }
-    $from = " INNER JOIN civicrm_contribution_temp temp ON {$query->_aliases['civicrm_contribution']}.id = temp.id ";
+    $from = " INNER JOIN civicrm_contribution_temp temp ON IF({$query->_aliases['civicrm_contribution']}.id IS NULL, 1, IF({$query->_aliases['civicrm_contribution']}.id = temp.id, 1, 0))  ";
     if ($return) {
       return $from;
     }
