@@ -2172,7 +2172,7 @@ function _civicrm_api3_validate_integer(&$params, &$fieldName, &$fieldInfo, $ent
     return;
   }
 
-  if (isset($fieldValue)) {
+  if (!empty($fieldValue)) {
     // if value = 'user_contact_id' (or similar), replace value with contact id
     if (!is_numeric($fieldValue) && is_scalar($fieldValue)) {
       $realContactId = _civicrm_api3_resolve_contactID($fieldValue);
@@ -2201,6 +2201,9 @@ function _civicrm_api3_validate_integer(&$params, &$fieldName, &$fieldInfo, $ent
         2100, array('field' => $fieldName, "max_length" => $fieldInfo['maxlength'])
       );
     }
+  }
+  elseif ($fieldValue === 0 && (!empty($fieldInfo['pseudoconstant']) || !empty($fieldInfo['options']))) {
+    throw new API_Exception("'0' is not a valid option for field $fieldName", 2001, array('error_field' => $fieldName));
   }
 
   if (!empty($op)) {
@@ -2389,9 +2392,8 @@ function _civicrm_api3_api_match_pseudoconstant_value(&$value, $options, $fieldN
     return;
   }
 
-  // Translate value into key. Use strict param to avoid
-  // incorrect return of first key when $value is 0.
-  $newValue = array_search($value, $options, TRUE);
+  // Translate value into key.
+  $newValue = array_search($value, $options);
   if ($newValue !== FALSE) {
     $value = $newValue;
     return;
