@@ -1314,6 +1314,7 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
       // if there are file attachments we will return how many and, if only one, add a link to it
       if (!empty($dao->attachment_ids)) {
         $attachmentIDs = explode(',', $dao->attachment_ids);
+        $attachmentIDs = array_unique($attachmentIDs);
         $values[$dao->id]['no_attachments'] = count($attachmentIDs);
         if ($values[$dao->id]['no_attachments'] == 1) {
           // if there is only one it's easy to do a link - otherwise just flag it
@@ -1325,6 +1326,10 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
             FALSE
           );
           $url .= " <a href='$attachmentViewUrl' ><span class='icon paper-icon'></span></a>";
+        }
+        elseif ($values[$dao->id]['no_attachments'] > 1) {
+          // if there are multiple attachments, display an icon with a count only - no link
+          $url .= " <span class='icon paper-icon'></span><span>x" . $values[$dao->id]['no_attachments'] . "</span>";
         }
       }
 
