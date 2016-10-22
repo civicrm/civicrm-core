@@ -105,7 +105,13 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
         $id = CRM_Utils_Array::value(0, $value);
         $value = CRM_Utils_Array::value(2, $value);
         if (is_array($value) && in_array(key($value), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
-          $value = CRM_Utils_Array::value(key($value), $value);
+          $op = key($value);
+          $value = CRM_Utils_Array::value($op, $value);
+          if (in_array($op, array('BETWEEN', '>=', '<='))) {
+            self::decodeRelativeFields($result, $id, $op, $value);
+            unset($result[$element]);
+            continue;
+          }
         }
         if (strpos($id, '_date_low') !== FALSE || strpos($id, '_date_high') !== FALSE) {
           $entityName = strstr($id, '_date', TRUE);
@@ -406,6 +412,46 @@ LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_
     // merge with original queryParams if relative date value(s) found
     if (count($relativeDates['relative_dates'])) {
       $queryParams = array_merge($queryParams, $relativeDates);
+    }
+  }
+
+  /**
+   * Decode relative custom fields (converted by CRM_Contact_BAO_Query->convertCustomRelativeFields(...))
+   *  into desired formValues
+   *
+   * @param array $formValues
+   * @param string $fieldName
+   * @param string $op
+   * @param array|string|int $value
+   */
+  public static function decodeRelativeFields(&$formValues, $fieldName, $op, $value) {
+    // check if its a custom date field, if yes then ISO format the value
+    if (CRM_Contact_BAO_Query::isCustomDateField($fieldName)) {
+      $field = (array) CRM_Core_BAO_CustomField::getFieldObject(CRM_Core_BAO_CustomField::getKeyID($fieldName));
+      //CRM-18349, date value must be ISO formatted before being set as a default value for crmDatepicker custom field
+      $ISODateFormat = CRM_Utils_Array::value('time_format', $field) ? 'Y-m-d G:i:s' : 'Y-m-d';
+
+      if (is_array($value)) {
+        foreach ($value as $key => $v) {
+          $value[$key] = CRM_Utils_Date::processDate($v, NULL, FALSE, $ISODateFormat);
+        }
+      }
+      else {
+        $value = CRM_Utils_Date::processDate($value, NULL, FALSE, $ISODateFormat);
+      }
+    }
+    switch ($op) {
+      case 'BETWEEN':
+        list($formValues[$fieldName . '_from'], $formValues[$fieldName . '_to']) = $value;
+        break;
+
+      case '>=':
+        $formValues[$fieldName . '_from'] = $value;
+        break;
+
+      case '<=':
+        $formValues[$fieldName . '_to'] = $value;
+        break;
     }
   }
 

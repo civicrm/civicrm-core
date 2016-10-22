@@ -300,6 +300,133 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
   }
 
   /**
+   * Recommend that sites use path-variables for their directories and URLs.
+   * @return array
+   */
+  public function checkUrlVariables() {
+    $messages = array();
+    $hasOldStyle = FALSE;
+    $settingNames = array(
+      'userFrameworkResourceURL',
+      'imageUploadURL',
+      'customCSSURL',
+      'extensionsURL',
+    );
+
+    foreach ($settingNames as $settingName) {
+      $settingValue = Civi::settings()->get($settingName);
+      if (!empty($settingValue) && $settingValue{0} != '[') {
+        $hasOldStyle = TRUE;
+        break;
+      }
+    }
+
+    if ($hasOldStyle) {
+      $message = new CRM_Utils_Check_Message(
+        __FUNCTION__,
+        ts('<a href="%1">Resource URLs</a> may use absolute paths, relative paths, or variables. Absolute paths are more difficult to maintain. To maximize portability, consider using a variable in each URL (eg "<tt>[cms.root]</tt>" or "<tt>[civicrm.files]</tt>").',
+          array(1 => CRM_Utils_System::url('civicrm/admin/setting/url', "reset=1"))),
+        ts('Resource URLs: Make them portable'),
+        \Psr\Log\LogLevel::NOTICE,
+        'fa-server'
+      );
+      $messages[] = $message;
+    }
+
+    return $messages;
+  }
+
+  /**
+   * Recommend that sites use path-variables for their directories and URLs.
+   * @return array
+   */
+  public function checkDirVariables() {
+    $messages = array();
+    $hasOldStyle = FALSE;
+    $settingNames = array(
+      'uploadDir',
+      'imageUploadDir',
+      'customFileUploadDir',
+      'customTemplateDir',
+      'customPHPPathDir',
+      'extensionsDir',
+    );
+
+    foreach ($settingNames as $settingName) {
+      $settingValue = Civi::settings()->get($settingName);
+      if (!empty($settingValue) && $settingValue{0} != '[') {
+        $hasOldStyle = TRUE;
+        break;
+      }
+    }
+
+    if ($hasOldStyle) {
+      $message = new CRM_Utils_Check_Message(
+        __FUNCTION__,
+        ts('<a href="%1">Directories</a> may use absolute paths, relative paths, or variables. Absolute paths are more difficult to maintain. To maximize portability, consider using a variable in each directory (eg "<tt>[cms.root]</tt>" or "<tt>[civicrm.files]</tt>").',
+          array(1 => CRM_Utils_System::url('civicrm/admin/setting/path', "reset=1"))),
+        ts('Directory Paths: Make them portable'),
+        \Psr\Log\LogLevel::NOTICE,
+        'fa-server'
+      );
+      $messages[] = $message;
+    }
+
+    return $messages;
+  }
+
+  /**
+   * Check that important directories are writable.
+   *
+   * @return array
+   *   Any CRM_Utils_Check_Message instances that need to be generated.
+   */
+  public function checkDirsWritable() {
+    $notWritable = array();
+
+    $config = CRM_Core_Config::singleton();
+    $directories = array(
+      'uploadDir' => ts('Temporary Files Directory'),
+      'imageUploadDir' => ts('Images Directory'),
+      'customFileUploadDir' => ts('Custom Files Directory'),
+      'extensionsDir' => ts('CiviCRM Extensions Directory'),
+    );
+
+    foreach ($directories as $directory => $label) {
+      $file = CRM_Utils_File::createFakeFile($config->$directory);
+
+      if ($file === FALSE) {
+        $notWritable[] = "$label ({$config->$directory})";
+      }
+      else {
+        $dirWithSlash = CRM_Utils_File::addTrailingSlash($config->$directory);
+        unlink($dirWithSlash . $file);
+      }
+    }
+
+    $messages = array();
+
+    if (!empty($notWritable)) {
+      $messages[] = new CRM_Utils_Check_Message(
+        __FUNCTION__,
+        ts('The %1 is not writable.  Please check your file permissions.', array(
+          1 => implode(', ', $notWritable),
+          'count' => count($notWritable),
+          'plural' => 'The following directories are not writable: %1.  Please check your file permissions.',
+        )),
+        ts('Directory not writable', array(
+          'count' => count($notWritable),
+          'plural' => 'Directories not writable',
+        )),
+        \Psr\Log\LogLevel::ERROR,
+        'fa-ban'
+      );
+    }
+
+    return $messages;
+  }
+
+  /**
    * Checks if new versions are available
    * @return array
    */

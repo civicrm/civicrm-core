@@ -226,10 +226,12 @@ function _civicrm_api3_event_getlist_params(&$request) {
   $fieldsToReturn = array('start_date', 'event_type_id', 'title', 'summary');
   $request['params']['return'] = array_unique(array_merge($fieldsToReturn, $request['extra']));
   $request['params']['options']['sort'] = 'start_date DESC';
-  $request['params'] += array(
-    'is_template' => 0,
-    'is_active' => 1,
-  );
+  if (empty($request['params']['id'])) {
+    $request['params'] += array(
+      'is_template' => 0,
+      'is_active' => 1,
+    );
+  }
 }
 
 /**
