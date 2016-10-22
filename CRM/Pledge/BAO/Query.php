@@ -30,7 +30,7 @@
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2016
  */
-class CRM_Pledge_BAO_Query {
+class CRM_Pledge_BAO_Query extends CRM_Core_BAO_Query {
   /**
    * Get pledge fields.
    *
@@ -431,15 +431,6 @@ class CRM_Pledge_BAO_Query {
   }
 
   /**
-   * Getter for the qill object.
-   *
-   * @return string
-   */
-  public function qill() {
-    return (isset($this->_qill)) ? $this->_qill : "";
-  }
-
-  /**
    * Ideally this function should include fields that are displayed in the selector.
    *
    * @param int $mode
@@ -577,36 +568,12 @@ class CRM_Pledge_BAO_Query {
       array('' => ts('- any -')) + $freqUnitsDisplay
     );
 
-    // add all the custom  searchable fields
-    $pledge = array('Pledge');
-    $groupDetails = CRM_Core_BAO_CustomGroup::getGroupDetail(NULL, TRUE, $pledge);
-    if ($groupDetails) {
-      $form->assign('pledgeGroupTree', $groupDetails);
-      foreach ($groupDetails as $group) {
-        foreach ($group['fields'] as $field) {
-          $fieldId = $field['id'];
-          $elementName = 'custom_' . $fieldId;
-          if ($field['data_type'] == 'Date' && $field['is_search_range']) {
-            CRM_Core_Form_Date::buildDateRange($form, $elementName, 1, '_from', '_to', ts('From:'), FALSE);
-          }
-          else {
-            CRM_Core_BAO_CustomField::addQuickFormElement($form, $elementName, $fieldId, FALSE, TRUE);
-          }
-        }
-      }
-    }
+    self::addCustomFormFields($form, array('Pledge'));
 
     CRM_Campaign_BAO_Campaign::addCampaignInComponentSearch($form, 'pledge_campaign_id');
 
     $form->assign('validCiviPledge', TRUE);
     $form->setDefaults(array('pledge_test' => 0));
-  }
-
-  /**
-   * @param $row
-   * @param int $id
-   */
-  public static function searchAction(&$row, $id) {
   }
 
   /**
