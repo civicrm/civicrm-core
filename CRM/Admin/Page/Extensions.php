@@ -255,8 +255,10 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
         $row['id']
       );
       if (isset($localExtensionRows[$info->key])) {
-        if (version_compare($localExtensionRows[$info->key]['version'], $info->version, '<')) {
-          $row['is_upgradeable'] = TRUE;
+        if (array_key_exists('version', $localExtensionRows[$info->key])) {
+          if (version_compare($localExtensionRows[$info->key]['version'], $info->version, '<')) {
+            $row['is_upgradeable'] = TRUE;
+          }
         }
       }
       $remoteExtensionRows[$row['id']] = $row;
