@@ -70,10 +70,10 @@
           {include file="CRM/Core/DateRange.tpl" fieldName="contribution_recur_cancel_date" from='_low' to='_high'}
         </td>
       </tr>
-      {if $contributeRecurGroupTree}
+      {if $contributionRecurGroupTree}
         <tr>
           <td colspan="4">
-            {include file="CRM/Custom/Form/Search.tpl" groupTree=$contributeRecurGroupTree showHideLinks=false}
+            {include file="CRM/Custom/Form/Search.tpl" groupTree=$contributionRecurGroupTree showHideLinks=false}
           </td>
         </tr>
       {/if}
