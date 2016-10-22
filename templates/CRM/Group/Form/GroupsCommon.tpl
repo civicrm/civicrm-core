@@ -47,3 +47,13 @@
     </tr>
   </table>
 {/if}
+{if $form.organization_id}
+  <h3>{ts}Associated Organization{/ts} {help id="id-group-organization" file="CRM/Group/Page/Group.hlp"}</h3>
+  <table class="form-layout-compressed">
+    <tr class="crm-group-form-block-organization">
+      <td class="label">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{$form.organization_id.label}</td>
+      <td>{$form.organization_id.html|crmAddClass:huge}
+      </td>
+    </tr>
+  </table>
+{/if}
