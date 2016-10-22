@@ -677,8 +677,6 @@ case_relation_type.id = case_relationship.relationship_type_id )";
    * @param CRM_Core_Form $form
    */
   public static function buildSearchForm(&$form) {
-    $config = CRM_Core_Config::singleton();
-
     //validate case configuration.
     $configured = CRM_Case_BAO_Case::isCaseConfigured();
     $form->assign('notConfigured', !$configured['configured']);
@@ -727,7 +725,12 @@ case_relation_type.id = case_relationship.relationship_type_id )";
         foreach ($group['fields'] as $field) {
           $fieldId = $field['id'];
           $elementName = 'custom_' . $fieldId;
-          CRM_Core_BAO_CustomField::addQuickFormElement($form, $elementName, $fieldId, FALSE, TRUE);
+          if ($field['data_type'] == 'Date' && $field['is_search_range']) {
+            CRM_Core_Form_Date::buildDateRange($form, $elementName, 1, '_from', '_to', ts('From:'), FALSE);
+          }
+          else {
+            CRM_Core_BAO_CustomField::addQuickFormElement($form, $elementName, $fieldId, FALSE, TRUE);
+          }
         }
       }
     }
