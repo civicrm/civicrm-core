@@ -191,7 +191,7 @@ class CRM_Case_Page_Tab extends CRM_Core_Page {
 
     $this->assign('action', $this->_action);
 
-    self::setContext($this);
+    $this->setContext();
 
     if ($this->_action & CRM_Core_Action::VIEW) {
       $this->view();
@@ -241,14 +241,11 @@ class CRM_Case_Page_Tab extends CRM_Core_Page {
     return self::$_links;
   }
 
-  /**
-   * @param CRM_Core_Form $form
-   */
-  public static function setContext(&$form) {
-    $context = $form->get('context');
+  public function setContext() {
+    $context = $this->get('context');
     $url = NULL;
 
-    $qfKey = CRM_Utils_Request::retrieve('key', 'String', $form);
+    $qfKey = CRM_Utils_Request::retrieve('key', 'String', $this);
     //validate the qfKey
     if (!CRM_Utils_Rule::qfKey($qfKey)) {
       $qfKey = NULL;
@@ -256,9 +253,9 @@ class CRM_Case_Page_Tab extends CRM_Core_Page {
 
     switch ($context) {
       case 'activity':
-        if ($form->_contactId) {
+        if ($this->_contactId) {
           $url = CRM_Utils_System::url('civicrm/contact/view',
-            "reset=1&force=1&cid={$form->_contactId}&selectedChild=activity"
+            "reset=1&force=1&cid={$this->_contactId}&selectedChild=activity"
           );
         }
         break;
@@ -284,12 +281,12 @@ class CRM_Case_Page_Tab extends CRM_Core_Page {
         break;
 
       case 'fulltext':
-        $action = CRM_Utils_Request::retrieve('action', 'String', $form);
+        $action = CRM_Utils_Request::retrieve('action', 'String', $this);
         $urlParams = 'force=1';
         $urlString = 'civicrm/contact/search/custom';
         if ($action == CRM_Core_Action::RENEW) {
-          if ($form->_contactId) {
-            $urlParams .= '&cid=' . $form->_contactId;
+          if ($this->_contactId) {
+            $urlParams .= '&cid=' . $this->_contactId;
           }
           $urlParams .= '&context=fulltext&action=view';
           $urlString = 'civicrm/contact/view/case';
@@ -301,9 +298,9 @@ class CRM_Case_Page_Tab extends CRM_Core_Page {
         break;
 
       default:
-        if ($form->_contactId) {
+        if ($this->_contactId) {
           $url = CRM_Utils_System::url('civicrm/contact/view',
-            "reset=1&force=1&cid={$form->_contactId}&selectedChild=case"
+            "reset=1&force=1&cid={$this->_contactId}&selectedChild=case"
           );
         }
         break;

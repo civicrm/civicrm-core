@@ -841,15 +841,9 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       }
     }
     // For single additions - show validation error if the contact has already been registered
-    // for this event.
+    // for this event with the same role.
     if ($self->_single && ($self->_action & CRM_Core_Action::ADD)) {
-      if ($self->_context == 'standalone') {
-        $contactId = CRM_Utils_Array::value('contact_id', $values);
-      }
-      else {
-        $contactId = $self->_contactId;
-      }
-
+      $contactId = $self->_contactId;
       $eventId = CRM_Utils_Array::value('event_id', $values);
       if (!empty($contactId) && !empty($eventId)) {
         $dupeCheck = new CRM_Event_BAO_Participant();

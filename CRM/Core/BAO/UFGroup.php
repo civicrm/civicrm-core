@@ -1467,14 +1467,14 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
     $ufGroup->copyValues($params);
 
     $ufGroupID = CRM_Utils_Array::value('ufgroup', $ids, CRM_Utils_Array::value('id', $params));
-    if (!$ufGroupID && empty($params['name'])) {
+    if (!$ufGroupID) {
       $ufGroup->name = CRM_Utils_String::munge($ufGroup->title, '_', 56);
     }
     $ufGroup->id = $ufGroupID;
 
     $ufGroup->save();
 
-    if (!$ufGroupID && empty($params['name'])) {
+    if (!$ufGroupID) {
       $ufGroup->name = $ufGroup->name . "_{$ufGroup->id}";
       $ufGroup->save();
     }
