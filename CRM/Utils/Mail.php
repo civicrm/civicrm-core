@@ -264,8 +264,8 @@ class CRM_Utils_Mail {
     //   the Bcc must not be present in $header as otherwise it will be shown to all recipients
     // ref: https://pear.php.net/bugs/bug.php?id=8047, full thread and answer [2011-04-19 20:48 UTC]
     if (get_class($mailer) != "Mail_mail") {
-      //get emails from headers, since these are
-      //combination of name and email addresses.
+      // get emails from headers, since these are
+      // combination of name and email addresses.
       if (!empty($headers['Cc'])) {
         $to[] = CRM_Utils_Array::value('Cc', $headers);
       }
@@ -275,7 +275,7 @@ class CRM_Utils_Mail {
       }
     }
 
-   if (is_object($mailer)) {
+    if (is_object($mailer)) {
       $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
       $result = $mailer->send($to, $headers, $message);
       if (is_a($result, 'PEAR_Error')) {
