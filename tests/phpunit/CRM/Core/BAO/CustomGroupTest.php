@@ -101,8 +101,11 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
     $this->callAPISuccess('ContactType', 'delete', array('id' => $contactType['id']));
   }
 
+  /**
+   * Test calling GetTree for a custom field extending multiple subTypes.
+   */
   public function testGetTreetContactSubTypeForMultipleSubTypes() {
-    $contactType1 = $this->callApiSuccess('ContactType', 'create', array('name' => 'Big Bank', 'label' => 'biggee', 'parent_id' => 'Organization'));
+    $contactType1 = $this->callAPISuccess('ContactType', 'create', array('name' => 'Big Bank', 'label' => 'biggee', 'parent_id' => 'Organization'));
     $contactType2 = $this->callAPISuccess('ContactType', 'create', array('name' => 'Small Bank', 'label' => 'smallee', 'parent_id' => 'Organization'));
     $customGroup = $this->CustomGroupCreate(array('extends' => 'Organization', 'extends_entity_column_value' => array('Big_Bank', 'Small_Bank')));
     $customField = $this->customFieldCreate(array('custom_group_id' => $customGroup['id']));
@@ -111,6 +114,19 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
     $this->customGroupDelete($customGroup['id']);
     $this->callAPISuccess('ContactType', 'delete', array('id' => $contactType1['id']));
     $this->callAPISuccess('ContactType', 'delete', array('id' => $contactType2['id']));
+  }
+
+  /**
+   * Test calling GetTree for a custom field that extends a non numerical Event Type.
+   */
+  public function testGetTreeEventSubTypeAlphabetical() {
+    $eventType = $this->callAPISuccess('OptionValue', 'Create', array('option_group_id' => 'event_type', 'value' => 'meeting', 'label' => 'Meeting'));
+    $customGroup = $this->CustomGroupCreate(array('extends' => 'Event', 'extends_entity_column_value' => array('Meeting')));
+    $customField = $this->customFieldCreate(array('custom_group_id' => $customGroup['id']));
+    $result1 = CRM_Core_BAO_CustomGroup::getTree('Event', NULL, NULL, NULL, CRM_Core_DAO::VALUE_SEPARATOR . 'meeting' . CRM_Core_DAO::VALUE_SEPARATOR);
+    $this->assertEquals('Custom Field', $result1[$customGroup['id']]['fields'][$customField['id']]['label']);
+    $this->customGroupDelete($customGroup['id']);
+    $this->callAPISuccess('OptionValue', 'delete', array('id' => $eventType['id']));
   }
 
   /**
