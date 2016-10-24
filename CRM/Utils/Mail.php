@@ -257,8 +257,12 @@ class CRM_Utils_Mail {
     $result = NULL;
     $mailer = \Civi::service('pear_mail');
 
-    // Mail_smtp and Mail_sendmail mailers require Bcc anc Cc emails
-    // be included in both $to and $headers['Cc', 'Bcc']
+    // CRM-3795, CRM-7355, CRM-7557, CRM-9058, CRM-9887, CRM-12883, CRM-19173 and others ...
+    // The PEAR library requires different parameters based on the mailer used:
+    // * Mail_mail requires the Cc/Bcc recipients listed ONLY in the $headers variable
+    // * All other mailers require that all be recipients be listed in the $to array AND that
+    //   the Bcc must not be present in $header as otherwise it will be shown to all recipients
+    // ref: https://pear.php.net/bugs/bug.php?id=8047, full thread and answer [2011-04-19 20:48 UTC]
     if (get_class($mailer) != "Mail_mail") {
       // get emails from headers, since these are
       // combination of name and email addresses.
@@ -270,6 +274,7 @@ class CRM_Utils_Mail {
         unset($headers['Bcc']);
       }
     }
+
     if (is_object($mailer)) {
       $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
       $result = $mailer->send($to, $headers, $message);
