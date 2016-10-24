@@ -310,6 +310,10 @@ function _civicrm_api3_case_deprecation() {
  *   api result array
  */
 function civicrm_api3_case_update($params) {
+  if (!isset($params['case_id']) && isset($params['id'])) {
+    $params['case_id'] = $params['id'];
+  }
+
   //check parameters
   civicrm_api3_verify_mandatory($params, NULL, array('id'));
 
