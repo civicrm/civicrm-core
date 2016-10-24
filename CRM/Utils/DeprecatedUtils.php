@@ -450,7 +450,7 @@ function _civicrm_api3_deprecated_formatted_param($params, &$values, $create = F
               }
 
               if ($errorMsg) {
-                return civicrm_api3_create_error($errorMsg, $value[$key]);
+                return civicrm_api3_create_error($errorMsg);
               }
 
               // finally get soft credit contact id.
@@ -523,7 +523,7 @@ function _civicrm_api3_deprecated_formatted_param($params, &$values, $create = F
             }
           }
           else {
-            return civicrm_api3_create_error('No match found for specified contact in contribution data. Row was skipped.', 'pledge_payment');
+            return civicrm_api3_create_error('No match found for specified contact in pledge payment data. Row was skipped.');
           }
         }
         else {
@@ -539,7 +539,7 @@ function _civicrm_api3_deprecated_formatted_param($params, &$values, $create = F
               $contributionContactID = $params['contribution_contact_id'] = $values['contribution_contact_id'] = $contact->id;
             }
             else {
-              return civicrm_api3_create_error('No match found for specified contact in contribution data. Row was skipped.', 'pledge_payment');
+              return civicrm_api3_create_error('No match found for specified contact in pledge payment data. Row was skipped.');
             }
           }
           else {
@@ -551,21 +551,21 @@ function _civicrm_api3_deprecated_formatted_param($params, &$values, $create = F
 
               // check if only one contact is found
               if (count($matchedIDs) > 1) {
-                return civicrm_api3_create_error($error['error_message']['message'], 'pledge_payment');
+                return civicrm_api3_create_error($error['error_message']['message']);
               }
               else {
                 $contributionContactID = $params['contribution_contact_id'] = $values['contribution_contact_id'] = $matchedIDs[0];
               }
             }
             else {
-              return civicrm_api3_create_error('No match found for specified contact in contribution data. Row was skipped.', 'pledge_payment');
+              return civicrm_api3_create_error('No match found for specified contact in contribution data. Row was skipped.');
             }
           }
         }
 
         if (!empty($params['pledge_id'])) {
           if (CRM_Core_DAO::getFieldValue('CRM_Pledge_DAO_Pledge', $params['pledge_id'], 'contact_id') != $contributionContactID) {
-            return civicrm_api3_create_error('Invalid Pledge ID provided. Contribution row was skipped.', 'pledge_payment');
+            return civicrm_api3_create_error('Invalid Pledge ID provided. Contribution row was skipped.');
           }
           $values['pledge_id'] = $params['pledge_id'];
         }
@@ -575,10 +575,10 @@ function _civicrm_api3_deprecated_formatted_param($params, &$values, $create = F
           $pledgeDetails = CRM_Pledge_BAO_Pledge::getContactPledges($contributionContactID);
 
           if (empty($pledgeDetails)) {
-            return civicrm_api3_create_error('No open pledges found for this contact. Contribution row was skipped.', 'pledge_payment');
+            return civicrm_api3_create_error('No open pledges found for this contact. Contribution row was skipped.');
           }
           elseif (count($pledgeDetails) > 1) {
-            return civicrm_api3_create_error('This contact has more than one open pledge. Unable to determine which pledge to apply the contribution to. Contribution row was skipped.', 'pledge_payment');
+            return civicrm_api3_create_error('This contact has more than one open pledge. Unable to determine which pledge to apply the contribution to. Contribution row was skipped.');
           }
 
           // this mean we have only one pending / in progress pledge
@@ -593,7 +593,7 @@ function _civicrm_api3_deprecated_formatted_param($params, &$values, $create = F
           $values['pledge_payment_id'] = $pledgePaymentDetails['id'];
         }
         else {
-          return civicrm_api3_create_error('Contribution and Pledge Payment amount mismatch for this record. Contribution row was skipped.', 'pledge_payment');
+          return civicrm_api3_create_error('Contribution and Pledge Payment amount mismatch for this record. Contribution row was skipped.');
         }
         break;
 
