@@ -103,7 +103,7 @@ class CRM_Contact_BAO_Contact_Permission {
 SELECT contact_id
  FROM civicrm_acl_contact_cache
  {$LEFT_JOIN_DELETED}
-WHERE contact_id IN ({$contact_id_list}) 
+WHERE contact_id IN ({$contact_id_list})
   AND user_id = {$contactID}
   AND operation = '{$operation}'
   {$AND_CAN_ACCESS_DELETED}";
@@ -211,6 +211,7 @@ WHERE contact_a.id = %1 AND $permission
       $operationClause = " operation = 'Edit' ";
       $operation = 'Edit';
     }
+    $queryParams = array(1 => array($userID, 'Integer'));
 
     if (!$force) {
       // skip if already calculated
@@ -225,8 +226,7 @@ FROM   civicrm_acl_contact_cache
 WHERE  user_id = %1
 AND    $operationClause
 ";
-      $params = array(1 => array($userID, 'Integer'));
-      $count = CRM_Core_DAO::singleValueQuery($sql, $params);
+      $count = CRM_Core_DAO::singleValueQuery($sql, $queryParams);
       if ($count > 0) {
         $_processed[$type][$userID] = 1;
         return;
@@ -236,7 +236,7 @@ AND    $operationClause
     $tables = array();
     $whereTables = array();
 
-    $permission = CRM_ACL_API::whereClause($type, $tables, $whereTables, $userID);
+    $permission = CRM_ACL_API::whereClause($type, $tables, $whereTables, $userID, FALSE, FALSE, TRUE);
 
     $from = CRM_Contact_BAO_Query::fromClause($whereTables);
     CRM_Core_DAO::executeQuery("
@@ -247,6 +247,16 @@ SELECT DISTINCT $userID as user_id, contact_a.id as contact_id, '{$operation}' a
 WHERE    $permission
 AND ac.user_id IS NULL
 ");
+
+    // Add in a row for the logged in contact. Do not try to combine with the above query or an ugly OR will appear in
+    // the permission clause.
+    if (CRM_Core_Permission::check('edit my contact') ||
+      ($type == CRM_Core_Permission::VIEW && CRM_Core_Permission::check('view my contact'))) {
+      if (!CRM_Core_DAO::executeQuery("
+        SELECT count(*) FROM civicrm_acl_contact_cache WHERE user_id = %1 AND contact_id = %1 AND operation = '{$operation}'", $queryParams)) {
+        CRM_Core_DAO::executeQuery("INSERT INTO civicrm_acl_contact_cache ( user_id, contact_id, operation ) VALUES(%1, %1, '{$operation}')");
+      }
+    }
     $_processed[$type][$userID] = 1;
   }
 
@@ -353,7 +363,7 @@ AND ac.user_id IS NULL
 
       $queries[] = "
 SELECT civicrm_relationship.{$contact_id_column} AS contact_id
-  FROM civicrm_relationship 
+  FROM civicrm_relationship
   {$LEFT_JOIN_DELETED}
  WHERE civicrm_relationship.{$user_id_column} = {$contactID}
    AND civicrm_relationship.{$contact_id_column} IN ({$contact_id_list})
