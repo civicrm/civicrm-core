@@ -86,6 +86,13 @@ class CRM_Member_BAO_Query {
         $query->_whereTables['civicrm_membership_status'] = 1;
       }
 
+      if (!empty($query->_returnProperties['membership_is_current_member'])) {
+        $query->_select['is_current_member'] = "civicrm_membership_status.is_current_member as is_current_member";
+        $query->_element['is_current_member'] = 1;
+        $query->_tables['civicrm_membership_status'] = 1;
+        $query->_whereTables['civicrm_membership_status'] = 1;
+      }
+
       if (!empty($query->_returnProperties['membership_status_id'])) {
         $query->_select['status_id'] = "civicrm_membership_status.id as status_id";
         $query->_element['status_id'] = 1;
@@ -249,6 +256,13 @@ class CRM_Member_BAO_Query {
         list($op, $value) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Member_DAO_Membership', $name, $value, $op);
         $query->_qill[$grouping][] = $qillName . ' ' . $op . ' ' . $value;
         $query->_tables['civicrm_membership'] = $query->_whereTables['civicrm_membership'] = 1;
+        return;
+
+      case 'membership_is_current_member':
+        // We don't want to include all tests for sql OR CRM-7827
+        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_membership_status.is_current_member", $op, $value, "Boolean");
+        $query->_qill[$grouping][] = ts('Active Member');
+        $query->_tables['civicrm_membership_status'] = $query->_whereTables['civicrm_membership_status'] = 1;
         return;
 
       case 'member_test':
@@ -486,6 +500,7 @@ class CRM_Member_BAO_Query {
 
     $form->addFormRule(array('CRM_Member_BAO_Query', 'formRule'), $form);
 
+    $form->addYesNo('membership_is_current_member', ts('Active Member?'), TRUE);
     $form->addYesNo('member_is_primary', ts('Primary Member?'), TRUE);
     $form->addYesNo('member_pay_later', ts('Pay Later?'), TRUE);
 
