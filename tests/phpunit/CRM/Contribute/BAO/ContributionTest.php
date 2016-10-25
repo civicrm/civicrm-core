@@ -585,9 +585,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
    */
   public function testAddPayments() {
     list($lineItems, $contribution) = $this->addParticipantWithContribution();
-    foreach ($lineItems as $value) {
-      CRM_Contribute_BAO_Contribution::addPayments($value, array($contribution));
-    }
+    CRM_Contribute_BAO_Contribution::addPayments(array($contribution));
     $this->checkItemValues($contribution);
   }
 
