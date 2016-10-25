@@ -2172,7 +2172,7 @@ function _civicrm_api3_validate_integer(&$params, &$fieldName, &$fieldInfo, $ent
     return;
   }
 
-  if (!empty($fieldValue)) {
+  if (!empty($fieldValue) || $fieldValue === '0' || $fieldValue === 0) {
     // if value = 'user_contact_id' (or similar), replace value with contact id
     if (!is_numeric($fieldValue) && is_scalar($fieldValue)) {
       $realContactId = _civicrm_api3_resolve_contactID($fieldValue);
@@ -2390,7 +2390,8 @@ function _civicrm_api3_api_match_pseudoconstant_value(&$value, $options, $fieldN
   }
 
   // Translate value into key
-  $newValue = array_search($value, $options);
+  // Cast $value to string to avoid a bug in array_search
+  $newValue = array_search((string) $value, $options);
   if ($newValue !== FALSE) {
     $value = $newValue;
     return;
