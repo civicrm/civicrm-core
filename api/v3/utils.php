@@ -581,9 +581,18 @@ function _civicrm_api3_get_using_query_object($entity, $params, $additional_opti
   if (empty($returnProperties)) {
     $returnProperties = $defaultReturnProperties;
   }
+
+  $fields = civicrm_api($entity, 'getfields', array('version' => 3, 'action' => 'get'));
+
+  // Translate field names to unique names for the query builder
+  foreach ($fields['values'] as $uniqueName => $field) {
+    if (isset($field['name']) && isset($inputParams[$field['name']]) && $field['name'] != $uniqueName) {
+      $inputParams[$uniqueName] = $params[$field['name']];
+      unset($inputParams[$field['name']]);
+    }
+  }
+
   if (!empty($params['check_permissions'])) {
-    // we will filter query object against getfields
-    $fields = civicrm_api($entity, 'getfields', array('version' => 3, 'action' => 'get'));
     // we need to add this in as earlier in this function 'id' was unset in favour of $entity_id
     $fields['values'][$lowercase_entity . '_id'] = array();
     $varsToFilter = array('returnProperties', 'inputParams');
@@ -1674,6 +1683,7 @@ function _civicrm_api3_validate_fields($entity, $action, &$params, $fields) {
       }
     }
   }
+  $fields = CRM_Utils_Array::indexBy('name', $fields);
   $fields = array_intersect_key($fields, $params);
   if (!empty($chainApiParams)) {
     $fields = array_merge($fields, $chainApiParams);
@@ -2116,6 +2126,7 @@ function _getStandardTypeFromCustomDataType($value) {
  */
 function _civicrm_api3_swap_out_aliases(&$apiRequest, $fields) {
   foreach ($fields as $field => $values) {
+    $field = CRM_Utils_Array::value('name', $values, $field);
     $uniqueName = CRM_Utils_Array::value('uniqueName', $values);
     if (!empty($values['api.aliases'])) {
       // if aliased field is not set we try to use field alias
@@ -2128,15 +2139,6 @@ function _civicrm_api3_swap_out_aliases(&$apiRequest, $fields) {
           // out of the woodwork but will be implementing only as _spec function extended
           unset($apiRequest['params'][$alias]);
         }
-      }
-    }
-    if (!isset($apiRequest['params'][$field]) && !empty($values['name']) && $field != $values['name']
-      && isset($apiRequest['params'][$values['name']])
-    ) {
-      $apiRequest['params'][$field] = $apiRequest['params'][$values['name']];
-      // note that it would make sense to unset the original field here but tests need to be in place first
-      if ($field != 'domain_version') {
-        unset($apiRequest['params'][$values['name']]);
       }
     }
     if (!isset($apiRequest['params'][$field])
