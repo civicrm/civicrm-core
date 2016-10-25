@@ -1119,6 +1119,50 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
   }
 
   /**
+   * CRM-18503 - Test membership join date is correctly set for fixed memberships.
+   */
+  public function testMembershipJoinDateFixed() {
+    $memStatus = CRM_Member_PseudoConstant::membershipStatus();
+    // Update the fixed membership type to 1 year duration.
+    $this->callAPISuccess('membership_type', 'create', array('id' => $this->_membershipTypeID2, 'duration_interval' => 1));
+    $contactId = $this->createLoggedInUser();
+    // Create membership with 'Pending' status.
+    $params = array(
+      'contact_id' => $contactId,
+      'membership_type_id' => $this->_membershipTypeID2,
+      'source' => 'test membership',
+      'is_pay_later' => 0,
+      'status_id' => array_search('Pending', $memStatus),
+      'skipStatusCal' => 1,
+      'is_for_organization' => 1,
+    );
+    $ids = array();
+    $membership = CRM_Member_BAO_Membership::create($params, $ids);
+
+    // Update membership to 'Completed' and check the dates.
+    $memParams = array(
+      'id' => $membership->id,
+      'contact_id' => $contactId,
+      'is_test' => 0,
+      'membership_type_id' => $this->_membershipTypeID2,
+      'num_terms' => 1,
+      'status_id' => array_search('New', $memStatus),
+    );
+    $result = $this->callAPISuccess('Membership', 'create', $memParams);
+
+    $expectedDates = array(
+      'join_date' => date('Ymd'),
+      'start_date' => date('Ymd',strtotime(date('Y-03-01'))),
+      'end_date' => date('Ymd',strtotime(date('Y-03-01') . '+ 1 year - 1 day')),
+    );
+    foreach ($result['values'] as $values) {
+      foreach ($expectedDates as $date => $val) {
+        $this->assertEquals($val, $values[$date]);
+      }
+    }
+  }
+
+  /**
    * Test correct end and start dates are calculated for fixed multi year memberships.
    *
    * The empty start date is calculated to be the start_date (1 Jan prior to the join_date - so 1 Jan 15)
