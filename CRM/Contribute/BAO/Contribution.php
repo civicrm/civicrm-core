@@ -4960,13 +4960,13 @@ LIMIT 1;";
    * in entity financial trxn table
    *
    * @param array $params
-   *  array of contribution params.
-   * @param object $trxn
-   *  CRM_Financial_DAO_FinancialTrxn object
-   * @param array $contribution
+   *
+   * @param Integer $trxnId
+   *
+   * @param float $contributionTotalAmount
    *
    */
-  public static function assignProportionalLineItems($params, $trxn, $contribution) {
+  public static function assignProportionalLineItems($params, $trxnId, $contributionTotalAmount) {
     $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($params['contribution_id']);
     if (!empty($lineItems)) {
       // get financial item
@@ -4980,10 +4980,10 @@ LIMIT 1;";
       }
       $eftParams = array(
         'entity_table' => 'civicrm_financial_item',
-        'financial_trxn_id' => $trxn->id,
+        'financial_trxn_id' => $trxnId,
       );
       foreach ($lineItems as $key => $value) {
-        $paid = $value['line_total'] * ($params['total_amount'] / $contribution['total_amount']);
+        $paid = $value['line_total'] * ($params['total_amount'] / $contributionTotalAmount);
         // Record Entity Financial Trxn
         $eftParams['amount'] = round($paid, 2);
         $eftParams['entity_id'] = $ftIds[$value['price_field_value_id']];
