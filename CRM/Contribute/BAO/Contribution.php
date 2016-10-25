@@ -1839,7 +1839,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
 
             // Figure out number of terms
             $numterms = 1;
-            $lineitems = CRM_Price_BAO_LineItem::getLineItems($contributionId, 'contribution');
+            $lineitems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($contributionId);
             foreach ($lineitems as $lineitem) {
               if ($membership->membership_type_id == CRM_Utils_Array::value('membership_type_id', $lineitem)) {
                 $numterms = CRM_Utils_Array::value('membership_num_terms', $lineitem);
@@ -2639,7 +2639,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       }
       // set lineItem for contribution
       if ($this->id) {
-        $lineItem = CRM_Price_BAO_LineItem::getLineItems($this->id, 'contribution', 1);
+        $lineItem = CRM_Price_BAO_LineItem::getLineItemsByContributionID($this->id, TRUE);
         if (!empty($lineItem)) {
           $itemId = key($lineItem);
           foreach ($lineItem as &$eachItem) {
@@ -5276,7 +5276,7 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
    */
   public static function allowUpdateRevenueRecognitionDate($contributionId) {
     // get line item for contribution
-    $lineItems = CRM_Price_BAO_LineItem::getLineItems($contributionId, 'contribution', NULL, TRUE, TRUE);
+    $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($contributionId);
     // check if line item is for membership or participant
     foreach ($lineItems as $items) {
       if ($items['entity_table'] == 'civicrm_participant') {

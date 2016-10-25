@@ -395,7 +395,7 @@ LIMIT 1";
         $params, $items);
       }
       else {
-        $items = CRM_Price_BAO_LineItem::getLineItems($contributionID, 'contribution', TRUE, TRUE, TRUE);
+        $items = CRM_Price_BAO_LineItem::getLineItemsByContributionID($contributionID, TRUE);
       }
       if (!empty($items)) {
         $lineItems[] = $items;

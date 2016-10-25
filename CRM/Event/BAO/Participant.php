@@ -1882,7 +1882,7 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
     $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
     $partiallyPaidStatusId = array_search('Partially paid', $contributionStatuses);
     $pendingRefundStatusId = array_search('Pending refund', $contributionStatuses);
-    $previousLineItems = CRM_Price_BAO_LineItem::getLineItems($participantId, 'participant');
+    $previousLineItems = CRM_Price_BAO_LineItem::getLineItems($participantId);
     CRM_Price_BAO_PriceSet::processAmount($feeBlock,
       $params, $lineItems
     );
