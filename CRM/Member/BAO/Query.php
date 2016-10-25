@@ -261,7 +261,7 @@ class CRM_Member_BAO_Query {
       case 'membership_is_current_member':
         // We don't want to include all tests for sql OR CRM-7827
         $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_membership_status.is_current_member", $op, $value, "Boolean");
-        $query->_qill[$grouping][] = ts('Active Member');
+        $query->_qill[$grouping][] = ts('Is an %1 Member', array(1  => $value ? 'Active' : 'Inactive'));
         $query->_tables['civicrm_membership_status'] = $query->_whereTables['civicrm_membership_status'] = 1;
         return;
 
