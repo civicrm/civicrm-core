@@ -2202,6 +2202,9 @@ function _civicrm_api3_validate_integer(&$params, &$fieldName, &$fieldInfo, $ent
       );
     }
   }
+  elseif ($fieldValue === 0 && (!empty($fieldInfo['pseudoconstant']) || !empty($fieldInfo['options']))) {
+    throw new API_Exception("'0' is not a valid option for field $fieldName", 2001, array('error_field' => $fieldName));
+  }
 
   if (!empty($op)) {
     $params[$fieldName][$op] = $fieldValue;
@@ -2389,7 +2392,7 @@ function _civicrm_api3_api_match_pseudoconstant_value(&$value, $options, $fieldN
     return;
   }
 
-  // Translate value into key
+  // Translate value into key.
   $newValue = array_search($value, $options);
   if ($newValue !== FALSE) {
     $value = $newValue;
