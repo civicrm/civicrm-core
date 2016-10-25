@@ -2184,7 +2184,7 @@ function _civicrm_api3_validate_integer(&$params, &$fieldName, &$fieldInfo, $ent
       }
     }
     if (!empty($fieldInfo['pseudoconstant']) || !empty($fieldInfo['options'])) {
-      _civicrm_api3_api_match_pseudoconstant($fieldValue, $entity, $fieldName, $fieldInfo);
+      _civicrm_api3_api_match_pseudoconstant($fieldValue, $entity, $fieldName, $fieldInfo, $op);
     }
 
     // After swapping options, ensure we have an integer(s)
@@ -2305,7 +2305,7 @@ function _civicrm_api3_validate_string(&$params, &$fieldName, &$fieldInfo, $enti
     }
   }
   if (!empty($fieldInfo['pseudoconstant']) || !empty($fieldInfo['options'])) {
-    _civicrm_api3_api_match_pseudoconstant($fieldValue, $entity, $fieldName, $fieldInfo);
+    _civicrm_api3_api_match_pseudoconstant($fieldValue, $entity, $fieldName, $fieldInfo, $op);
   }
   // Check our field length
   elseif (is_string($fieldValue) && !empty($fieldInfo['maxlength']) && strlen(utf8_decode($fieldValue)) > $fieldInfo['maxlength']) {
@@ -2329,10 +2329,15 @@ function _civicrm_api3_validate_string(&$params, &$fieldName, &$fieldInfo, $enti
  * @param string $entity : api entity name
  * @param string $fieldName : field name used in api call (not necessarily the canonical name)
  * @param array $fieldInfo : getfields meta-data
+ * @param string $op
  *
  * @throws \API_Exception
  */
-function _civicrm_api3_api_match_pseudoconstant(&$fieldValue, $entity, $fieldName, $fieldInfo) {
+function _civicrm_api3_api_match_pseudoconstant(&$fieldValue, $entity, $fieldName, $fieldInfo, $op = '=') {
+  if (in_array($op, array('>', '<', '>=', '<=', 'LIKE', 'NOT LIKE'))) {
+    return;
+  }
+
   $options = CRM_Utils_Array::value('options', $fieldInfo);
 
   if (!$options) {
