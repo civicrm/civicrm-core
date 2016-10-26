@@ -157,9 +157,13 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
 
       if (!$this->_id) {
         //save record in mapping table
-        $mappingParams = array('mapping_type' => 'Search Builder');
-        $temp = array();
-        $mapping = CRM_Core_BAO_Mapping::add($mappingParams, $temp);
+        $mappingParams = array(
+          'mapping_type_id' => CRM_Core_OptionGroup::getValue('mapping_type',
+            'Search Builder',
+            'name'
+          ),
+        );
+        $mapping = CRM_Core_BAO_Mapping::add($mappingParams);
         $mappingId = $mapping->id;
       }
       else {
@@ -230,7 +234,21 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
       $params['id'] = CRM_Contact_BAO_SavedSearch::getName($this->_id, 'id');
     }
 
-    CRM_Contact_BAO_Group::create($params);
+    $group = CRM_Contact_BAO_Group::create($params);
+
+    // Update mapping with the name and description of the group.
+    if ($mappingId && $group) {
+      $mappingParams = array(
+        'id' => $mappingId,
+        'name' => CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $group->id, 'name', 'id'),
+        'description' => CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $group->id, 'description', 'id'),
+        'mapping_type_id' => CRM_Core_OptionGroup::getValue('mapping_type',
+          'Search Builder',
+          'name'
+        ),
+      );
+      CRM_Core_BAO_Mapping::add($mappingParams);
+    }
 
     // CRM-9464
     $this->_id = $savedSearch->id;
