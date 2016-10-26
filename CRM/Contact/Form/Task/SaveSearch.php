@@ -234,10 +234,10 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
       $params['id'] = CRM_Contact_BAO_SavedSearch::getName($this->_id, 'id');
     }
 
-    CRM_Contact_BAO_Group::create($params);
+    $group = CRM_Contact_BAO_Group::create($params);
 
     // Update mapping with the name and description of the group.
-    if ($mappingId) {
+    if ($mappingId && $group) {
       $mappingParams = array(
         'id' => $mappingId,
         'name' => CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $group->id, 'name', 'id'),
