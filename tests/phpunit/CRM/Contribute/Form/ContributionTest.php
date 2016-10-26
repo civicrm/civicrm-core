@@ -476,6 +476,80 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * Ensure that price field are shown during pay later/pending Contribution
+   */
+  public function testEmailReceiptOnPayLater() {
+    $donationFT = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType', 'Donation', 'id', 'name');
+    $paramsSet = array(
+      'title' => 'Price Set' . substr(sha1(rand()), 0, 4),
+      'is_active' => TRUE,
+      'financial_type_id' => $donationFT,
+      'extends' => 2,
+    );
+    $paramsSet['name'] = CRM_Utils_String::titleToVar($paramsSet['title']);
+
+    $priceset = CRM_Price_BAO_PriceSet::create($paramsSet);
+    $priceSetId = $priceset->id;
+
+    //Checking for priceset added in the table.
+    $this->assertDBCompareValue('CRM_Price_BAO_PriceSet', $priceSetId, 'title',
+      'id', $paramsSet['title'], 'Check DB for created priceset'
+    );
+    $paramsField = array(
+      'label' => 'Price Field',
+      'name' => CRM_Utils_String::titleToVar('Price Field'),
+      'html_type' => 'CheckBox',
+      'option_label' => array('1' => 'Price Field 1', '2' => 'Price Field 2'),
+      'option_value' => array('1' => 100, '2' => 200),
+      'option_name' => array('1' => 'Price Field 1', '2' => 'Price Field 2'),
+      'option_weight' => array('1' => 1, '2' => 2),
+      'option_amount' => array('1' => 100, '2' => 200),
+      'is_display_amounts' => 1,
+      'weight' => 1,
+      'options_per_line' => 1,
+      'is_active' => array('1' => 1, '2' => 1),
+      'price_set_id' => $priceset->id,
+      'is_enter_qty' => 1,
+      'financial_type_id' => $donationFT,
+    );
+    $priceField = CRM_Price_BAO_PriceField::create($paramsField);
+    $priceFieldValue = $this->callAPISuccess('PriceFieldValue', 'get', array('price_field_id' => $priceField->id));
+
+    $params = array(
+      'total_amount' => 100,
+      'financial_type_id' => $donationFT,
+      'receive_date' => '04/21/2015',
+      'receive_date_time' => '11:27PM',
+      'contact_id' => $this->_individualId,
+      'is_email_receipt' => TRUE,
+      'from_email_address' => 'test@test.com',
+      'price_set_id' => $priceSetId,
+      'contribution_status_id' => CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name'),
+    );
+
+    foreach ($priceFieldValue['values'] as $id => $price) {
+      if ($price['amount'] == 100) {
+        $params['price_' . $priceField->id] = array($id => 1);
+      }
+    }
+    $form = new CRM_Contribute_Form_Contribution();
+    $mut = new CiviMailUtils($this, TRUE);
+    $form->_priceSet = current(CRM_Price_BAO_PriceSet::getSetDetail($priceSetId));
+    $form->testSubmit($params, CRM_Core_Action::ADD);
+
+    $mut->checkMailLog(array(
+        'Financial Type: Donation
+---------------------------------------------------------
+Item                             Qty       Each       Total
+----------------------------------------------------------
+Price Field - Price Field 1        1   $ 100.00      $ 100.00
+',
+      )
+    );
+    $mut->stop();
+  }
+
+  /**
    * Test that a contribution is assigned against a pledge.
    */
   public function testUpdatePledge() {

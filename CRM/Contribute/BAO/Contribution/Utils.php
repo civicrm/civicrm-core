@@ -90,6 +90,11 @@ class CRM_Contribute_BAO_Contribution_Utils {
       CRM_Utils_Date::mysqlToIso($form->_params['receive_date'])
     );
 
+    if (empty($form->_values['amount'])) {
+      // If the amount is not in _values[], set it
+      $form->_values['amount'] = $form->_params['amount'];
+    }
+
     if ($isPaymentTransaction) {
       $contributionParams = array(
         'id' => CRM_Utils_Array::value('contribution_id', $paymentParams),
@@ -208,10 +213,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
         'payment_processor_id' => 0,
       );
     }
-    elseif (empty($form->_values['amount'])) {
-      // If the amount is not in _values[], set it
-      $form->_values['amount'] = $form->_params['amount'];
-    }
+
     CRM_Contribute_BAO_ContributionPage::sendMail($contactID,
       $form->_values,
       $contribution->is_test
