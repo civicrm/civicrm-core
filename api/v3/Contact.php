@@ -758,7 +758,7 @@ function civicrm_api3_contact_getquick($params) {
         if ($value == 'phone') {
           $actualSelectElements[] = $select[] = 'phone_ext';
         }
-        $from[$value] = "LEFT JOIN civicrm_{$value} {$suffix} ON ( cc.id = {$suffix}.contact_id AND {$suffix}.is_primary = 1 ) ";
+        $from[$value] = "LEFT JOIN civicrm_{$value} {$suffix} ON cc.id = {$suffix}.contact_id ";
         break;
 
       case 'country':
