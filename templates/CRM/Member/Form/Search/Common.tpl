@@ -42,6 +42,10 @@
   </td>
   <td>
     <p>
+    {$form.membership_is_current_member.label}
+    {$form.membership_is_current_member.html}
+    </p>
+    <p>
     {$form.member_is_primary.label}
     {help id="id-member_is_primary" file="CRM/Member/Form/Search.hlp"}
     {$form.member_is_primary.html}
