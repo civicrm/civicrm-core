@@ -2639,10 +2639,12 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       }
       // set lineItem for contribution
       if ($this->id) {
-        $lineItem = CRM_Price_BAO_LineItem::getLineItems($this->id, 'contribution', 1);
-        if (!empty($lineItem)) {
-          $itemId = key($lineItem);
-          foreach ($lineItem as &$eachItem) {
+        $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($this->id);
+        if (!empty($lineItems)) {
+          $firstLineItem = reset($lineItems);
+          $priceSet = civicrm_api3('PriceSet', 'getsingle', array('id' => $firstLineItem['price_set_id'], 'return' => 'is_quick_config, id'));
+          $values['priceSetID'] = $priceSet['id'];
+          foreach ($lineItems as &$eachItem) {
             if (isset($this->_relatedObjects['membership'])
              && is_array($this->_relatedObjects['membership'])
              && array_key_exists($eachItem['membership_type_id'], $this->_relatedObjects['membership'])) {
@@ -2650,9 +2652,11 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
               $eachItem['start_date'] = CRM_Utils_Date::customFormat($this->_relatedObjects['membership'][$eachItem['membership_type_id']]->start_date);
               $eachItem['end_date'] = CRM_Utils_Date::customFormat($this->_relatedObjects['membership'][$eachItem['membership_type_id']]->end_date);
             }
+            // This is actually used in conjunction with is_quick_config in the template & we should deprecate it.
+            // However, that does create upgrade pain so would be better to be phased in.
+            $values['useForMember'] = !$priceSet['is_quick_config'];
           }
-          $values['lineItem'][0] = $lineItem;
-          $values['priceSetID'] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', $lineItem[$itemId]['price_field_id'], 'price_set_id');
+          $values['lineItem'][0] = $lineItems;
         }
       }
 
@@ -2806,9 +2810,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     $billingMode = empty($this->_relatedObjects['paymentProcessor']) ? CRM_Core_Payment::BILLING_MODE_NOTIFY : $this->_relatedObjects['paymentProcessor']['billing_mode'];
     $template->assign('contributeMode', CRM_Utils_Array::value($billingMode, CRM_Core_SelectValues::contributeMode()));
 
-    if (!empty($values['lineItem']) && !empty($this->_relatedObjects['membership'])) {
-      $values['useForMember'] = TRUE;
-    }
     //assign honor information to receipt message
     $softRecord = CRM_Contribute_BAO_ContributionSoft::getSoftContribution($this->id);
 
