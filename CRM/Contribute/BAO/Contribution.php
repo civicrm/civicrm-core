@@ -2148,7 +2148,8 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
       //CRM-18805 -- Contribution page not recorded on recurring transactions, Recurring contribution payments
       //do not create CC or BCC emails or profile notifications.
       //The if is just to be safe. Not sure if we can ever arrive with this unset
-      if (isset($contribution->contribution_page_id)) {
+      // but per CRM-19478 it seems it can be 'null'
+      if (isset($contribution->contribution_page_id) && is_numeric($contribution->contribution_page_id)) {
         $contributionParams['contribution_page_id'] = $contribution->contribution_page_id;
       }
 
