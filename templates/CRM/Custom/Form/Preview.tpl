@@ -49,35 +49,6 @@
         {if $element.help_pre}
             <tr><td class="label"></td><td class="description">{$element.help_pre}</td></tr>
         {/if}
-  {if $element.options_per_line }
-        {*assign var="element_name" value=$element.custom_group_id|cat:_|cat:$field_id|cat:_|cat:$element.name*}
-        {assign var="element_name" value=$element.element_name}
-        <tr>
-         <td class="label">{$form.$element_name.label}{if $element.help_post}{help id=$element.id file="CRM/Custom/Form/CustomField.hlp" title=$form.$element_name.label}{/if}</td>
-         <td>
-            {assign var="count" value="1"}
-                <table class="form-layout-compressed">
-                 <tr>
-                   {* sort by fails for option per line. Added a variable to iterate through the element array*}
-                   {assign var="index" value="1"}
-                   {foreach name=outer key=key item=item from=$form.$element_name}
-                        {if $index < 10}
-                            {assign var="index" value=`$index+1`}
-                        {else}
-                          <td class="labels font-light">{$form.$element_name.$key.html}</td>
-                              {if $count == $element.options_per_line}
-                                {assign var="count" value="1"}
-                           </tr>
-                            {else}
-                                {assign var="count" value=`$count+1`}
-                            {/if}
-                         {/if}
-                    {/foreach}
-                 </tr>
-                </table>
-         </td>
-        </tr>
-  {else}
         {assign var="name" value=`$element.name`}
         {*assign var="element_name" value=$group_id|cat:_|cat:$field_id|cat:_|cat:$element.name*}
         {assign var="element_name" value=$element.element_name}
@@ -91,7 +62,6 @@
                 {/if}
         {/if}
           </td>
-  {/if}
      {/if}
     {/foreach}
     </table>

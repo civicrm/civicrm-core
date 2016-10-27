@@ -33,15 +33,6 @@
 
     {foreach from=$cd_edit.fields item=element key=field_id}
       <div class="crm-summary-row">
-        {if $element.options_per_line != 0}
-          <div class="crm-label">{$element.field_title}</div>
-          <div class="crm-content crm-custom_data">
-              {* sort by fails for option per line. Added a variable to iterate through the element array*}
-              {foreach from=$element.field_value item=val}
-                {$val}
-              {/foreach}
-          </div>
-        {else}
           <div class="crm-label">{$element.field_title}</div>
           {if $element.field_data_type EQ 'ContactReference' && $element.contact_ref_id}
             {*Contact ref id passed if user has sufficient permissions - so make a link.*}
@@ -55,7 +46,6 @@
           {else}
             <div class="crm-content crm-custom-data">{$element.field_value}</div>
           {/if}
-        {/if}
       </div>
     {/foreach}
   </div>

@@ -35,18 +35,8 @@
       {foreach from=$cd_edit.fields item=element key=field_id}
         <table class="crm-info-panel">
           <tr>
-            {if $element.options_per_line != 0}
-              <td class="label">{$element.field_title}</td>
-              <td class="html-adjust">
-              {* sort by fails for option per line. Added a variable to iterate through the element array*}
-                {foreach from=$element.field_value item=val}
-                  {$val}<br/>
-                {/foreach}
-              </td>
-              {else}
-                <td class="label">{$element.field_title}</td>
-                <td class="html-adjust">{$element.field_value}</td>
-            {/if}
+            <td class="label">{$element.field_title}</td>
+            <td class="html-adjust">{$element.field_value}</td>
           </tr>
         </table>
       {/foreach}

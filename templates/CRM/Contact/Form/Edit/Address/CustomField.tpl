@@ -31,41 +31,6 @@
             <td class="html-adjust description">{$element.help_pre}</td>
         </tr>
     {/if}
-     {if $element.options_per_line != 0 }
-        <tr>
-            <td class="label">{$form.address.$blockId.$element_name.label}</td>
-            <td class="html-adjust">
-                {assign var="count" value="1"}
-                <table class="form-layout-compressed" style="margin-top: -0.5em;">
-                    <tr>
-                        {* sort by fails for option per line. Added a variable to iterate through the element array*}
-                        {assign var="index" value="1"}
-                        {foreach name=outer key=key item=item from=$form.address.$blockId.$element_name}
-                            {if $index < 10}
-                                {assign var="index" value=`$index+1`}
-                            {else}
-                                <td class="labels font-light">{$form.address.$blockId.$element_name.$key.html}</td>
-                                {if $count == $element.options_per_line}
-                                    </tr>
-                                    <tr>
-                                    {assign var="count" value="1"}
-                                {else}
-                                    {assign var="count" value=`$count+1`}
-                                {/if}
-                            {/if}
-                        {/foreach}
-                    </tr>
-                </table>
-            </td>
-        </tr>
-
-        {if $element.help_post}
-            <tr>
-                <td>&nbsp;</td>
-                <td class="description">{$element.help_post}<br />&nbsp;</td>
-            </tr>
-             {/if}
-    {else}
         <tr>
             <td class="label">{$form.address.$blockId.$element_name.label}</td>
             <td class="html-adjust">
@@ -102,6 +67,5 @@
 <td>&nbsp;</td>
 <td class="description">{$element.help_post}<br />&nbsp;</td>
 </tr>
-        {/if}
     {/if}
 {/if}
