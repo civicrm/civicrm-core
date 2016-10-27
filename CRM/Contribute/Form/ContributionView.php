@@ -151,14 +151,15 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
     }
 
     $lineItems = array();
+    $displayLineItems = FALSE;
     if ($id) {
-      $lineItem = CRM_Price_BAO_LineItem::getLineItems($id, 'contribution', 1, TRUE, TRUE);
-      if (!empty($lineItem)) {
-        $lineItems[] = $lineItem;
-      }
-
+      $lineItems = array(CRM_Price_BAO_LineItem::getLineItemsByContributionID(($id)));
+      $firstLineItem = reset($lineItems[0]);
+      $priceSet = civicrm_api3('PriceSet', 'getsingle', array('id' => $firstLineItem['price_set_id'], 'return' => 'is_quick_config, id'));
+      $displayLineItems = !$priceSet['is_quick_config'];
     }
-    $this->assign('lineItem', empty($lineItems) ? FALSE : $lineItems);
+    $this->assign('lineItem', $lineItems);
+    $this->assign('displayLineItems', $displayLineItems);
     $values['totalAmount'] = $values['total_amount'];
 
     //do check for campaigns

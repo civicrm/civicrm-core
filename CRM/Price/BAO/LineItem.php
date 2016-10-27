@@ -214,6 +214,7 @@ AND li.entity_id = {$entityId}
       li.entity_id,
       pf.label as field_title,
       pf.html_type,
+      pf.price_set_id,
       pfv.membership_type_id,
       pfv.membership_num_terms,
       li.price_field_id,
@@ -298,6 +299,7 @@ AND li.entity_id = {$entityId}
         'membership_type_id' => $dao->membership_type_id,
         'membership_num_terms' => $dao->membership_num_terms,
         'tax_amount' => $dao->tax_amount,
+        'price_set_id' => $dao->price_set_id,
       );
       $lineItems[$dao->id]['tax_rate'] = CRM_Price_BAO_LineItem::calculateTaxRate($lineItems[$dao->id]);
       $lineItems[$dao->id]['subTotal'] = $lineItems[$dao->id]['qty'] * $lineItems[$dao->id]['unit_price'];
