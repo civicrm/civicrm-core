@@ -3624,4 +3624,25 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     }
   }
 
+  /**
+   * Enable Tax and Invoicing
+   */
+  protected function enableTaxAndInvoicing($params = array()) {
+    // Enable component contribute setting
+    $contributeSetting = array_merge($params,
+      array(
+        'invoicing' => 1,
+        'invoice_prefix' => 'INV_',
+        'credit_notes_prefix' => 'CN_',
+        'due_date' => 10,
+        'due_date_period' => 'days',
+        'notes' => '',
+        'is_email_pdf' => 1,
+        'tax_term' => 'Sales Tax',
+        'tax_display_settings' => 'Inclusive',
+      )
+    );
+    return Civi::settings()->set('contribution_invoice_settings', $contributeSetting);
+  }
+
 }

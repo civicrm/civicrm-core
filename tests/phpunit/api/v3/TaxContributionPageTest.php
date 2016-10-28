@@ -142,18 +142,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
     $halfFinancialRelation = CRM_Financial_BAO_FinancialTypeAccount::add($financialRelationHalftax);
 
     // Enable component contribute setting
-    $contributeSetting = array(
-      'invoicing' => 1,
-      'invoice_prefix' => 'INV_',
-      'credit_notes_prefix' => 'CN_',
-      'due_date' => 10,
-      'due_date_period' => 'days',
-      'notes' => '',
-      'is_email_pdf' => 1,
-      'tax_term' => 'Sales Tax',
-      'tax_display_settings' => 'Inclusive',
-    );
-    $setInvoiceSettings = Civi::settings()->set('contribution_invoice_settings', $contributeSetting);
+    $setInvoiceSettings = $this->enableTaxAndInvoicing();
 
     // Payment Processor
     $paymentProceParams = array(

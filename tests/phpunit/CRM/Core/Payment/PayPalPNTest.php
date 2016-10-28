@@ -67,7 +67,15 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
     $this->quickCleanUpFinancialEntities();
   }
 
-  public function testIPNPaymentSuccess() {
+  /**
+   * Test IPN response updates contribution and invoice is attached in mail reciept
+   *
+   * The scenario is that a pending contribution exists and the IPN call will update it to completed.
+   * And also if Tax and Invoicing is enabled, this unit test ensure that invoice pdf is attached with email recipet
+   */
+  public function testInvoiceSentOnIPNPaymentSuccess() {
+    $this->enableTaxAndInvoicing();
+
     $pendingStatusID = CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name');
     $completedStatusID = CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name');
     $params = array(
@@ -76,6 +84,7 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
       'trxn_id' => NULL,
       'invoice_id' => $this->_invoiceID,
       'contribution_status_id' => $pendingStatusID,
+      'is_email_receipt' => TRUE,
     );
     $this->_contributionID = $this->contributionCreate($params);
     $contribution = $this->callAPISuccess('contribution', 'get', array('id' => $this->_contributionID, 'sequential' => 1));
@@ -86,9 +95,18 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
     global $_REQUEST;
     $_REQUEST = array('q' => CRM_Utils_System::url('civicrm/payment/ipn/' . $this->_paymentProcessorID)) + $this->getPaypalTransaction();
 
+    $mut = new CiviMailUtils($this, TRUE);
     $paymentProcesors = civicrm_api3('PaymentProcessor', 'getsingle', array('id' => $this->_paymentProcessorID));
     $payment = Civi\Payment\System::singleton()->getByProcessor($paymentProcesors);
     $payment->handlePaymentNotification();
+
+    // Check if invoice pdf is attached with contribution mail reciept
+    $mut->checkMailLog(array(
+      'Content-Transfer-Encoding: base64',
+      'Content-Type: application/pdf',
+      'filename=Invoice.pdf',
+    ));
+    $mut->stop();
 
     $contribution = $this->callAPISuccess('contribution', 'get', array('id' => $this->_contributionID, 'sequential' => 1));
     // assert that contribution is completed after getting response from paypal standard which has transaction id set and completed status
@@ -204,6 +222,7 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
       'first_name' => 'Robert',
       'txn_id' => '8XA571746W2698126',
       'residence_country' => 'US',
+      'custom' => '[]',
     );
   }
 
