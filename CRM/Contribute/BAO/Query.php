@@ -30,7 +30,7 @@
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2016
  */
-class CRM_Contribute_BAO_Query {
+class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
 
   /**
    * Static field for all the export/import contribution fields.
@@ -1112,19 +1112,7 @@ class CRM_Contribute_BAO_Query {
       FALSE, array('class' => 'crm-select2', 'multiple' => 'multiple', 'placeholder' => ts('- any -'))
     );
 
-    // Add all the custom searchable fields
-    $contribution = array('Contribution');
-    $groupDetails = CRM_Core_BAO_CustomGroup::getGroupDetail(NULL, TRUE, $contribution);
-    if ($groupDetails) {
-      $form->assign('contributeGroupTree', $groupDetails);
-      foreach ($groupDetails as $group) {
-        foreach ($group['fields'] as $field) {
-          $fieldId = $field['id'];
-          $elementName = 'custom_' . $fieldId;
-          CRM_Core_BAO_CustomField::addQuickFormElement($form, $elementName, $fieldId, FALSE, TRUE);
-        }
-      }
-    }
+    self::addCustomFormFields($form, array('Contribution'));
 
     CRM_Campaign_BAO_Campaign::addCampaignInComponentSearch($form, 'contribution_campaign_id');
 
@@ -1143,15 +1131,6 @@ class CRM_Contribute_BAO_Query {
     $form->setDefaults(array('contribution_test' => 0));
 
     CRM_Contribute_BAO_ContributionRecur::recurringContribution($form);
-  }
-
-  /**
-   * Function that may not be needed.
-   *
-   * @param array $row
-   * @param int $id
-   */
-  public static function searchAction(&$row, $id) {
   }
 
   /**

@@ -30,7 +30,7 @@
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2016
  */
-class CRM_Member_BAO_Query {
+class CRM_Member_BAO_Query extends CRM_Core_BAO_Query {
 
   /**
    * Get available fields.
@@ -520,33 +520,12 @@ class CRM_Member_BAO_Query {
     $form->addYesNo('member_test', ts('Membership is a Test?'), TRUE);
     $form->addYesNo('member_is_override', ts('Membership Status Is Overriden?'), TRUE);
 
-    // add all the custom  searchable fields
-    $extends = array('Membership');
-    $groupDetails = CRM_Core_BAO_CustomGroup::getGroupDetail(NULL, TRUE, $extends);
-    if ($groupDetails) {
-      $form->assign('membershipGroupTree', $groupDetails);
-      foreach ($groupDetails as $group) {
-        foreach ($group['fields'] as $field) {
-          $fieldId = $field['id'];
-          $elementName = 'custom_' . $fieldId;
-          CRM_Core_BAO_CustomField::addQuickFormElement($form, $elementName, $fieldId, FALSE, TRUE);
-        }
-      }
-    }
+    self::addCustomFormFields($form, array('Membership'));
 
     CRM_Campaign_BAO_Campaign::addCampaignInComponentSearch($form, 'member_campaign_id');
 
     $form->assign('validCiviMember', TRUE);
     $form->setDefaults(array('member_test' => 0));
-  }
-
-  /**
-   * Possibly un-required function.
-   *
-   * @param array $row
-   * @param int $id
-   */
-  public static function searchAction(&$row, $id) {
   }
 
   /**
