@@ -395,21 +395,11 @@ class CRM_Activity_BAO_Query {
   }
 
   /**
-   * Getter for the qill object.
-   *
-   * @return string
-   */
-  public function qill() {
-    return (isset($this->_qill)) ? $this->_qill : "";
-  }
-
-  /**
    * Add all the elements shared between case activity search and advanced search.
    *
    * @param CRM_Core_Form $form
    */
   public static function buildSearchForm(&$form) {
-    $activityOptions = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE);
     $form->addSelect('activity_type_id',
       array('entity' => 'activity', 'label' => ts('Activity Type(s)'), 'multiple' => 'multiple', 'option_url' => NULL, 'placeholder' => ts('- any -'))
     );
@@ -457,18 +447,8 @@ class CRM_Activity_BAO_Query {
                  array('class' => 'crm-select2')
                  );
     }
-    $extends = array('Activity');
-    $groupDetails = CRM_Core_BAO_CustomGroup::getGroupDetail(NULL, TRUE, $extends);
-    if ($groupDetails) {
-      $form->assign('activityGroupTree', $groupDetails);
-      foreach ($groupDetails as $group) {
-        foreach ($group['fields'] as $field) {
-          $fieldId = $field['id'];
-          $elementName = 'custom_' . $fieldId;
-          CRM_Core_BAO_CustomField::addQuickFormElement($form, $elementName, $fieldId, FALSE, TRUE);
-        }
-      }
-    }
+
+    CRM_Core_BAO_Query::addCustomFormFields($form, array('Activity'));
 
     CRM_Campaign_BAO_Campaign::addCampaignInComponentSearch($form, 'activity_campaign_id');
 
@@ -486,7 +466,6 @@ class CRM_Activity_BAO_Query {
       $resultOptions = array();
       foreach ($optionGroups as $gid => $name) {
         if ($name) {
-          $value = array();
           $value = CRM_Core_OptionGroup::values($name);
           if (!empty($value)) {
             while (list($k, $v) = each($value)) {

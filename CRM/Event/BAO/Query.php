@@ -32,7 +32,7 @@
  * $Id$
  *
  */
-class CRM_Event_BAO_Query {
+class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
 
   /**
    * Function get the import/export fields for contribution.
@@ -513,15 +513,6 @@ class CRM_Event_BAO_Query {
   }
 
   /**
-   * Getter for the qill object.
-   *
-   * @return string
-   */
-  public function qill() {
-    return (isset($this->_qill)) ? $this->_qill : "";
-  }
-
-  /**
    * @param $mode
    * @param bool $includeCustomFields
    *
@@ -646,31 +637,13 @@ class CRM_Event_BAO_Query {
 
     $form->addRule('participant_fee_amount_low', ts('Please enter a valid money value.'), 'money');
     $form->addRule('participant_fee_amount_high', ts('Please enter a valid money value.'), 'money');
-    // add all the custom  searchable fields
-    $extends = array('Participant', 'Event');
-    $groupDetails = CRM_Core_BAO_CustomGroup::getGroupDetail(NULL, TRUE, $extends);
-    if ($groupDetails) {
-      $form->assign('participantGroupTree', $groupDetails);
-      foreach ($groupDetails as $group) {
-        foreach ($group['fields'] as $field) {
-          $fieldId = $field['id'];
-          $elementName = 'custom_' . $fieldId;
-          CRM_Core_BAO_CustomField::addQuickFormElement($form, $elementName, $fieldId, FALSE, TRUE);
-        }
-      }
-    }
+
+    self::addCustomFormFields($form, array('Participant', 'Event'));
 
     CRM_Campaign_BAO_Campaign::addCampaignInComponentSearch($form, 'participant_campaign_id');
 
     $form->assign('validCiviEvent', TRUE);
     $form->setDefaults(array('participant_test' => 0));
-  }
-
-  /**
-   * @param $row
-   * @param int $id
-   */
-  public static function searchAction(&$row, $id) {
   }
 
   /**
