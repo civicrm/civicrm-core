@@ -267,6 +267,7 @@
           return ret;
         }, {})
       };
+      getFieldsCache[entity+action] = {values: _.cloneDeep(getFieldData)};
       showFields(['api_action']);
       renderJoinSelector();
       return;

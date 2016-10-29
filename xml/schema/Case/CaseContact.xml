@@ -37,7 +37,6 @@
     <name>contact_id</name>
     <title>Contact ID</title>
     <type>int unsigned</type>
-    <uniqueName>case_contact_id</uniqueName>
     <required>true</required>
     <comment>Contact ID of contact record given case belongs to.</comment>
     <html>

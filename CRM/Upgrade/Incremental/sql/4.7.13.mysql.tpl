@@ -19,3 +19,6 @@ WHERE `name` = 'New Tag';
 UPDATE civicrm_navigation SET
   `url` = 'civicrm/admin/tag?reset=1'
 WHERE `name` = 'Tags (Categories)';
+
+-- CRM-16352: Add language filter support for mass mailing
+ALTER TABLE civicrm_mailing ADD COLUMN `language` varchar(5) DEFAULT NULL COMMENT 'Language of the content of the mailing. Useful for tokens.';
