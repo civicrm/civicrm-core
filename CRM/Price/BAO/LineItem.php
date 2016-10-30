@@ -225,7 +225,8 @@ AND li.entity_id = {$entityId}
 
     if ($relatedEntity) {
       $condition = "li.contribution_id = %2.id ";
-    } else {
+    }
+    else {
       $condition = "li.entity_id = %2.id AND li.entity_table = 'civicrm_%2'";
     }
 
