@@ -172,11 +172,12 @@ AND li.entity_id = {$entityId}
   /**
    * Wrapper for line item retrieval when contribution ID is known.
    * @param int $contributionID
+   * @param bool $isQuick
    *
    * @return array
    */
-  public static function getLineItemsByContributionID($contributionID) {
-    return self::getLineItems($contributionID, 'contribution', NULL, TRUE, TRUE, " WHERE contribution_id = " . (int) $contributionID);
+  public static function getLineItemsByContributionID($contributionID, $isQuick = FALSE) {
+    return self::getLineItems($contributionID, 'contribution', $isQuick, TRUE, TRUE);
   }
 
   /**
@@ -188,20 +189,15 @@ AND li.entity_id = {$entityId}
    * @param string $entity
    *   participant/contribution.
    *
-   * @param null $isQuick
+   * @param bool $isQuick
    * @param bool $isQtyZero
    * @param bool $relatedEntity
-   *
-   * @param string $overrideWhereClause
-   *   E.g "WHERE contribution id = 7 " per the getLineItemsByContributionID wrapper.
-   *   this function precedes the convenience of the contribution id but since it does quite a bit more than just a db retrieval we need to be able to use it even
-   *   when we don't want it's entity-id magix
    *
    * @param bool $invoice
    * @return array
    *   Array of line items
    */
-  public static function getLineItems($entityId, $entity = 'participant', $isQuick = NULL, $isQtyZero = TRUE, $relatedEntity = FALSE, $overrideWhereClause = '', $invoice = FALSE) {
+  public static function getLineItems($entityId, $entity = 'participant', $isQuick = FALSE, $isQtyZero = TRUE, $relatedEntity = FALSE, $invoice = FALSE) {
     $whereClause = $fromClause = NULL;
     $selectClause = "
       SELECT    li.id,
@@ -269,9 +265,6 @@ AND li.entity_id = {$entityId}
     $getTaxDetails = FALSE;
     $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
     $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
-    if ($overrideWhereClause) {
-      $whereClause = $overrideWhereClause;
-    }
 
     $dao = CRM_Core_DAO::executeQuery("$selectClause $fromClause $whereClause $orderByClause", $params);
     while ($dao->fetch()) {
@@ -289,9 +282,7 @@ AND li.entity_id = {$entityId}
         'field_title' => $dao->field_title,
         'html_type' => $dao->html_type,
         'description' => $dao->description,
-        // the entity id seems prone to randomness but not sure if it has a reason - so if we are overriding the Where clause we assume
-        // we also JUST WANT TO KNOW the the entity_id in the DB
-        'entity_id' => empty($overrideWhereClause) ? $entityId : $dao->entity_id,
+        'entity_id' => $dao->entity_id,
         'entity_table' => $dao->entity_table,
         'contribution_id' => $dao->contribution_id,
         'financial_type_id' => $dao->financial_type_id,
@@ -580,7 +571,7 @@ AND li.entity_id = {$entityId}
         $isRelatedID = TRUE;
       }
       foreach ($entityId as $id) {
-        $lineItems = CRM_Price_BAO_LineItem::getLineItems($id, $entityTable, NULL, TRUE, $isRelatedID);
+        $lineItems = CRM_Price_BAO_LineItem::getLineItems($id, $entityTable, FALSE, TRUE, $isRelatedID);
         foreach ($lineItems as $key => $values) {
           if (!$setID && $values['price_field_id']) {
             $setID = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', $values['price_field_id'], 'price_set_id');

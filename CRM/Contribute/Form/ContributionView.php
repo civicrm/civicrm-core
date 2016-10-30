@@ -152,7 +152,7 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
 
     $lineItems = array();
     if ($id) {
-      $lineItem = CRM_Price_BAO_LineItem::getLineItems($id, 'contribution', 1, TRUE, TRUE);
+      $lineItem = CRM_Price_BAO_LineItem::getLineItemsByContributionID($id, TRUE);
       if (!empty($lineItem)) {
         $lineItems[] = $lineItem;
       }
