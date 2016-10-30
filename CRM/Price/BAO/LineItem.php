@@ -188,8 +188,8 @@ AND li.entity_id = {$entityId}
    * @param string $entity
    *   participant/contribution.
    *
-   * @param null $isQuick
-   * @param bool $isQtyZero
+   * @param null $ignoreQuickConfig
+   * @param bool $allowZeroDollarAmounts
    * @param bool $relatedEntity
    *
    * @param string $overrideWhereClause
@@ -201,7 +201,7 @@ AND li.entity_id = {$entityId}
    * @return array
    *   Array of line items
    */
-  public static function getLineItems($entityId, $entity = 'participant', $isQuick = NULL, $isQtyZero = TRUE, $relatedEntity = FALSE, $overrideWhereClause = '', $invoice = FALSE) {
+  public static function getLineItems($entityId, $entity = 'participant', $ignoreQuickConfig = NULL, $allowZeroDollarAmounts = TRUE, $relatedEntity = FALSE, $overrideWhereClause = '', $invoice = FALSE) {
     $whereClause = $fromClause = NULL;
     $selectClause = "
       SELECT    li.id,
@@ -223,9 +223,10 @@ AND li.entity_id = {$entityId}
       li.tax_amount,
       pfv.description";
 
-    $condition = "li.entity_id = %2.id AND li.entity_table = 'civicrm_%2'";
     if ($relatedEntity) {
       $condition = "li.contribution_id = %2.id ";
+    } else {
+      $condition = "li.entity_id = %2.id AND li.entity_table = 'civicrm_%2'";
     }
 
     $fromClause = "
@@ -246,12 +247,12 @@ AND li.entity_id = {$entityId}
 
     $orderByClause = " ORDER BY pf.weight, pfv.weight";
 
-    if ($isQuick) {
+    if ($ignoreQuickConfig) {
       $fromClause .= " LEFT JOIN civicrm_price_set cps on cps.id = pf.price_set_id ";
       $whereClause .= " and cps.is_quick_config = 0";
     }
 
-    if (!$isQtyZero) {
+    if (!$allowZeroDollarAmounts) {
       $whereClause .= " and li.qty != 0";
     }
 
