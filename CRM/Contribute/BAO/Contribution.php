@@ -2640,7 +2640,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       }
       // set lineItem for contribution
       if ($this->id) {
-        $lineItem = CRM_Price_BAO_LineItem::getLineItems($this->id, 'contribution', 1);
+        $lineItem = CRM_Price_BAO_LineItem::getLineItemsByContributionID($this->id);
         if (!empty($lineItem)) {
           $itemId = key($lineItem);
           foreach ($lineItem as &$eachItem) {
