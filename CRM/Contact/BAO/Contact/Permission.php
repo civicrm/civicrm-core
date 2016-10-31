@@ -252,8 +252,8 @@ AND ac.user_id IS NULL
     // the permission clause.
     if (CRM_Core_Permission::check('edit my contact') ||
       ($type == CRM_Core_Permission::VIEW && CRM_Core_Permission::check('view my contact'))) {
-      if (!CRM_Core_DAO::executeQuery("
-        SELECT count(*) FROM civicrm_acl_contact_cache WHERE user_id = %1 AND contact_id = %1 AND operation = '{$operation}'", $queryParams)) {
+      if (!CRM_Core_DAO::singleValueQuery("
+        SELECT count(*) FROM civicrm_acl_contact_cache WHERE user_id = %1 AND contact_id = %1 AND operation = '{$operation}' LIMIT 1", $queryParams)) {
         CRM_Core_DAO::executeQuery("INSERT INTO civicrm_acl_contact_cache ( user_id, contact_id, operation ) VALUES(%1, %1, '{$operation}')");
       }
     }
