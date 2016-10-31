@@ -3444,7 +3444,8 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       return;
     }
     if ($context == 'changedAmount' || $context == 'changeFinancialType') {
-      $itemAmount = $params['trxnParams']['total_amount'] = $params['trxnParams']['net_amount'] = $params['total_amount'] - $params['prevContribution']->total_amount;
+      $params['trxnParams']['total_amount'] = $params['trxnParams']['net_amount'] = $params['total_amount'] - $params['prevContribution']->total_amount;
+      $itemAmount = $params['total_amount'] - $params['prevContribution']->total_amount - $params['tax_amount'] + $params['prevContribution']->tax_amount;
     }
     if ($context == 'changedStatus') {
       //get all the statuses
@@ -3547,6 +3548,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       }
     }
     $trxn = CRM_Core_BAO_FinancialTrxn::create($params['trxnParams']);
+    $previousLineItem = CRM_Price_BAO_LineItem::getLineItemsByContributionID($params['id']);
     $params['entity_id'] = $trxn->id;
     if ($context != 'changePaymentInstrument') {
       $itemParams['entity_table'] = 'civicrm_line_item';
@@ -3576,7 +3578,12 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
             }
           }
           else {
-            $amount = $diff * $fieldValues['line_total'];
+            if ($context == 'changedAmount') {
+              $itemParams['amount'] = $diff * ($fieldValues['line_total'] - $previousLineItem[$fieldValues['id']]['line_total']);
+            }
+            else {
+              $amount = $diff * $fieldValues['line_total'];
+            }
           }
 
           $itemParams = array(
@@ -3597,7 +3604,12 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
           if ($fieldValues['tax_amount']) {
             $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
             $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
-            $itemParams['amount'] = $diff * $fieldValues['tax_amount'];
+            if ($context == 'changedAmount') {
+              $itemParams['amount'] = $diff * ($fieldValues['tax_amount'] - $previousLineItem[$fieldValues['id']]['tax_amount']);
+            }
+            else {
+              $itemParams['amount'] = $diff * $fieldValues['tax_amount'];
+            }
             $itemParams['description'] = $taxTerm;
             if ($fieldValues['financial_type_id']) {
               $itemParams['financial_account_id'] = self::getFinancialAccountId($fieldValues['financial_type_id']);
