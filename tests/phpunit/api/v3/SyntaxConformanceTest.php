@@ -1047,7 +1047,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   public function testInvalidSort_get($Entity) {
     $invalidEntitys = array('ActivityType', 'Setting', 'System');
     if (in_array($Entity, $invalidEntitys)) {
-      $this->markTestSkipped('It seems OK for ' . $entity . ' to skip here as it silently sips invalid params');
+      $this->markTestSkipped('It seems OK for ' . $Entity . ' to skip here as it silently sips invalid params');
     }
     $result = $this->callAPIFailure($Entity, 'get', array('options' => array('sort' => 'sleep(1)')));
   }
