@@ -348,7 +348,13 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
     }
     else {
       $this->_from = "
-      FROM civicrm_activity {$this->_aliases['civicrm_activity']} {$this->_aclFrom} ";
+      FROM civicrm_activity {$this->_aliases['civicrm_activity']}
+              LEFT JOIN civicrm_activity_contact target_activity
+                     ON {$this->_aliases['civicrm_activity']}.id = target_activity.activity_id AND
+                        target_activity.record_type_id = {$targetID}
+              LEFT JOIN civicrm_contact contact_civireport
+                     ON target_activity.contact_id = contact_civireport.id
+              {$this->_aclFrom}";
     }
   }
 
@@ -537,7 +543,8 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
 
     // create temp table to store main result
     $tempQuery = "CREATE TEMPORARY TABLE {$this->_tempTableName} (
-      id int unsigned NOT NULL AUTO_INCREMENT, " . implode(', ', $dbColumns) . ' , PRIMARY KEY (id))';
+      id int unsigned NOT NULL AUTO_INCREMENT, " . implode(', ', $dbColumns) . ' , PRIMARY KEY (id))'
+      . $this->_databaseAttributes;
     CRM_Core_DAO::executeQuery($tempQuery);
 
     // build main report query
@@ -560,7 +567,8 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
     // create temp table to store duration
     $this->_tempDurationSumTableName = CRM_Core_DAO::createTempTableName('civicrm_activity');
     $tempQuery = "CREATE TEMPORARY TABLE {$this->_tempDurationSumTableName} (
-      id int unsigned NOT NULL AUTO_INCREMENT, civicrm_activity_duration_total VARCHAR(128), PRIMARY KEY (id))";
+      id int unsigned NOT NULL AUTO_INCREMENT, civicrm_activity_duration_total VARCHAR(128), PRIMARY KEY (id))"
+      . $this->_databaseAttributes;
     CRM_Core_DAO::executeQuery($tempQuery);
 
     // store the result in temporary table
