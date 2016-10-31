@@ -374,7 +374,8 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
         $params['fee_amount'] = 0;
       }
     }
-    if (!isset($params['net_amount'])) {
+    // recalculate net amount if tax amount is set
+    if (!isset($params['net_amount']) || isset($params['tax_amount'])) {
       if (!$contributionID) {
         $params['net_amount'] = $params['total_amount'] - $params['fee_amount'];
       }
