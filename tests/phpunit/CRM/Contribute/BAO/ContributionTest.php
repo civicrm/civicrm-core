@@ -585,9 +585,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
    */
   public function testAddPayments() {
     list($lineItems, $contribution) = $this->addParticipantWithContribution();
-    foreach ($lineItems as $value) {
-      CRM_Contribute_BAO_Contribution::addPayments($value, array($contribution));
-    }
+    CRM_Contribute_BAO_Contribution::addPayments(array($contribution));
     $this->checkItemValues($contribution);
   }
 
@@ -617,7 +615,6 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
    */
   public function testAssignProportionalLineItems() {
     list($lineItems, $contribution) = $this->addParticipantWithContribution();
-    $contributions['total_amount'] = $contribution->total_amount;
     $params = array(
       'contribution_id' => $contribution->id,
       'total_amount' => 150.00,
@@ -625,7 +622,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $trxn = new CRM_Financial_DAO_FinancialTrxn();
     $trxn->orderBy('id DESC');
     $trxn->find(TRUE);
-    CRM_Contribute_BAO_Contribution::assignProportionalLineItems($params, $trxn, $contributions);
+    CRM_Contribute_BAO_Contribution::assignProportionalLineItems($params, $trxn->id, $contribution->total_amount);
     $this->checkItemValues($contribution);
   }
 
