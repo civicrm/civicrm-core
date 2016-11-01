@@ -570,6 +570,11 @@ AND ( expire_on IS NULL OR expire_on >= {$currentTime} )
 
     $dao = CRM_Core_DAO::executeQuery($sql, $params);
 
+    $isDefaultContributionPriceSet = FALSE;
+    if ('default_contribution_amount' == CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $setID)) {
+      $isDefaultContributionPriceSet = TRUE;
+    }
+
     $visibility = CRM_Core_PseudoConstant::visibility('name');
     while ($dao->fetch()) {
       $fieldID = $dao->id;
@@ -587,7 +592,7 @@ AND ( expire_on IS NULL OR expire_on >= {$currentTime} )
         }
         $setTree[$setID]['fields'][$fieldID][$field] = $dao->$field;
       }
-      $setTree[$setID]['fields'][$fieldID]['options'] = CRM_Price_BAO_PriceField::getOptions($fieldID, FALSE);
+      $setTree[$setID]['fields'][$fieldID]['options'] = CRM_Price_BAO_PriceField::getOptions($fieldID, FALSE, FALSE, $isDefaultContributionPriceSet);
     }
 
     // also get the pre and post help from this price set
