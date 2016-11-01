@@ -326,11 +326,11 @@ class CRM_Core_Payment_Form {
    * Make sure that credit card number and cvv are valid.
    * Called within the scope of a QF formRule function
    *
-   * @param int $processorID
    * @param array $values
    * @param array $errors
+   * @param int $processorID
    */
-  public static function validateCreditCard($processorID = NULL, $values, &$errors) {
+  public static function validateCreditCard($values, &$errors, $processorID = NULL) {
     if (!empty($values['credit_card_type']) || !empty($values['credit_card_number'])) {
       if (!empty($values['credit_card_type'])) {
         $processorCards = CRM_Financial_BAO_PaymentProcessor::getCreditCards($processorID);
