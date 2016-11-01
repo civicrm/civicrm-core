@@ -47,11 +47,11 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
       'is_active' => 1,
     );
     $ids = array();
-    $contributionType = CRM_Financial_BAO_FinancialAccount::add($params, $ids);
+    $financialAccount = CRM_Financial_BAO_FinancialAccount::add($params, $ids);
 
     $result = $this->assertDBNotNull(
       'CRM_Financial_BAO_FinancialAccount',
-      $contributionType->id,
+      $financialAccount->id,
       'name',
       'id',
       'Database check on updated financial type record.'
@@ -74,7 +74,7 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
 
     $result = CRM_Financial_BAO_FinancialAccount::retrieve($params, $defaults);
 
-    $this->assertEquals($result->name, 'Donations', 'Verify financial type name.');
+    $this->assertEquals($result->name, 'Donations', 'Verify financial account name.');
   }
 
   /**
@@ -87,18 +87,18 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
       'is_active' => 1,
     );
     $ids = array();
-    $contributionType = CRM_Financial_BAO_FinancialAccount::add($params, $ids);
-    $result = CRM_Financial_BAO_FinancialAccount::setIsActive($contributionType->id, 0);
-    $this->assertEquals($result, TRUE, 'Verify financial type record updation for is_active.');
+    $financialAccount = CRM_Financial_BAO_FinancialAccount::add($params, $ids);
+    $result = CRM_Financial_BAO_FinancialAccount::setIsActive($financialAccount->id, 0);
+    $this->assertEquals($result, TRUE, 'Verify financial account record updation for is_active.');
 
     $isActive = $this->assertDBNotNull(
       'CRM_Financial_BAO_FinancialAccount',
-      $contributionType->id,
+      $financialAccount->id,
       'is_active',
       'id',
-      'Database check on updated for financial type is_active.'
+      'Database check on updated for financial account is_active.'
     );
-    $this->assertEquals($isActive, 0, 'Verify financial types is_active.');
+    $this->assertEquals($isActive, 0, 'Verify financial account is_active.');
   }
 
   /**
@@ -111,12 +111,12 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
       'is_active' => 1,
     );
     $ids = array();
-    $contributionType = CRM_Financial_BAO_FinancialAccount::add($params, $ids);
+    $financialAccount = CRM_Financial_BAO_FinancialAccount::add($params, $ids);
 
-    CRM_Financial_BAO_FinancialAccount::del($contributionType->id);
-    $params = array('id' => $contributionType->id);
+    CRM_Financial_BAO_FinancialAccount::del($financialAccount->id);
+    $params = array('id' => $financialAccount->id);
     $result = CRM_Financial_BAO_FinancialAccount::retrieve($params, $defaults);
-    $this->assertEquals(empty($result), TRUE, 'Verify financial types record deletion.');
+    $this->assertEquals(empty($result), TRUE, 'Verify financial account record deletion.');
   }
 
   /**
