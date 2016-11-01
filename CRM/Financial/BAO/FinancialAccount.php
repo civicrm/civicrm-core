@@ -158,13 +158,14 @@ class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAcco
 
     if ($check) {
       CRM_Core_Session::setStatus(ts('This financial account cannot be deleted since it is being used as a header account. Please remove it from being a header account before trying to delete it again.'));
-      return CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/admin/financial/financialAccount', "reset=1&action=browse"));
+      return FALSE;
     }
 
     // delete from financial Type table
     $financialAccount = new CRM_Financial_DAO_FinancialAccount();
     $financialAccount->id = $financialAccountId;
     $financialAccount->delete();
+    return TRUE;
   }
 
   /**
