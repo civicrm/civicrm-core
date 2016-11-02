@@ -28,15 +28,14 @@
 {assign var="rowCount" value=1}
 {foreach from=$viewCustomData item=customValues key=customGroupId}
   {foreach from=$customValues item=cd_edit key=cvID}
-  {assign var="customRegion" value='contact-custom-data-'|cat:$cd_edit.name}
-  {crmRegion name=$customRegion}
+    {crmRegion name="custom-data-view-`$cd_edit.name`"}
     {if $cd_edit.help_pre}
       <div class="messages help">{$cd_edit.help_pre}</div>
     {/if}
     {if $multiRecordDisplay neq 'single'}
     <table class="no-border">
       {assign var='index' value=$groupId|cat:"_$cvID"}
-      {if ($editOwnCustomData and $showEdit) or ($showEdit and $editCustomData and $groupId)}
+      {if ($showEdit && $cd_edit.editable && $groupId) && ($editOwnCustomData or $editCustomData)}
         <tr>
           <td>
             <a
@@ -55,7 +54,7 @@
               </div>
             {/if}
             <div class="crm-accordion-body">
-              {if $groupId and $cvID and $editCustomData}
+              {if $groupId and $cvID and $editCustomData and $cd_edit.editable}
                 <div class="crm-submit-buttons">
                   <a href="#" class="crm-hover-button crm-custom-value-del"
                      data-post='{ldelim}"valueID": "{$cvID}", "groupID": "{$customGroupId}", "contactId": "{$contactId}", "key": "{crmKey name='civicrm/ajax/customvalue'}"{rdelim}'
