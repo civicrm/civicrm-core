@@ -161,6 +161,7 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
     $this->assign('lineItem', $lineItems);
     $this->assign('displayLineItems', $displayLineItems);
     $values['totalAmount'] = $values['total_amount'];
+    $this->assign('displayLineItemFinancialType', TRUE);
 
     //do check for campaigns
     if ($campaignId = CRM_Utils_Array::value('campaign_id', $values)) {
