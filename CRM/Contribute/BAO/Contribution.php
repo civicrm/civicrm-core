@@ -3219,7 +3219,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       $params['trxnParams'] = $trxnParams;
 
       if (!empty($params['prevContribution'])) {
-        $updated = FALSE;
+        $updated = $ignoreChangeAmount = FALSE;
         $params['trxnParams']['total_amount'] = $trxnParams['total_amount'] = $params['total_amount'] = $params['prevContribution']->total_amount;
         $params['trxnParams']['fee_amount'] = $params['prevContribution']->fee_amount;
         $params['trxnParams']['net_amount'] = $params['prevContribution']->net_amount;
@@ -3266,7 +3266,15 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
             self::updateFinancialAccounts($params, 'changeFinancialType');
             /* $params['trxnParams']['to_financial_account_id'] = $trxnParams['to_financial_account_id']; */
             $params['financial_account_id'] = $newFinancialAccount;
-            $params['total_amount'] = $params['trxnParams']['total_amount'] = $params['trxnParams']['net_amount'] = $trxnParams['total_amount'];
+            $changeFTAmount = $trxnParams['total_amount'];
+            if (isset($params['prevContribution']->total_amount) || isset($params['tax_amount'])) {
+              $changesinTaxAmount = $totalAmount - $params['prevContribution']->total_amount + $params['prevContribution']->tax_amount - CRM_Utils_Array::value('tax_amount', $params, 0);
+              if ($changesinTaxAmount == 0) {
+                $ignoreChangeAmount = TRUE;
+                $changeFTAmount = $totalAmount;
+              }
+            }
+            $params['total_amount'] = $params['trxnParams']['total_amount'] = $params['trxnParams']['net_amount'] = $changeFTAmount;
             self::updateFinancialAccounts($params);
             $params['trxnParams']['to_financial_account_id'] = $trxnParams['to_financial_account_id'];
             $updated = TRUE;
@@ -3342,7 +3350,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         $params['trxnParams']['net_amount'] = CRM_Utils_Array::value('net_amount', $params);
         $params['trxnParams']['total_amount'] = $trxnParams['total_amount'] = $params['total_amount'] = $totalAmount;
         $params['trxnParams']['trxn_id'] = $params['contribution']->trxn_id;
-        if (isset($totalAmount) &&
+        if (!$ignoreChangeAmount && isset($totalAmount) &&
           $totalAmount != $params['prevContribution']->total_amount
         ) {
           //Update Financial Records
@@ -3444,8 +3452,13 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       return;
     }
     if ($context == 'changedAmount' || $context == 'changeFinancialType') {
-      $params['trxnParams']['total_amount'] = $params['trxnParams']['net_amount'] = $params['total_amount'] - $params['prevContribution']->total_amount;
-      $itemAmount = $params['total_amount'] - $params['prevContribution']->total_amount - CRM_Utils_Array::value('tax_amount', $params, 0) + $params['prevContribution']->tax_amount;
+      $itemAmount = $params['trxnParams']['total_amount'] = $params['trxnParams']['net_amount'] = $params['total_amount'] - $params['prevContribution']->total_amount;
+      if (isset($params['prevContribution']->tax_amount)) {
+        $itemAmount -= CRM_Utils_Array::value('tax_amount', $params, 0);
+      }
+      if (isset($params['tax_amount'])) {
+        $itemAmount += $params['prevContribution']->tax_amount;
+      }
     }
     if ($context == 'changedStatus') {
       //get all the statuses
@@ -3575,6 +3588,9 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
             $amount = $itemAmount;
             if (!$amount) {
               $amount = $params['total_amount'];
+              if ($context === NULL) {
+                $amount -= CRM_Utils_Array::value('tax_amount', $params, 0);
+              }
             }
           }
           else {
@@ -3601,18 +3617,25 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
           $params['line_item'][$fieldId][$fieldValueId]['deferred_line_total'] = $amount;
           $params['line_item'][$fieldId][$fieldValueId]['financial_item_id'] = $financialItem->id;
 
-          if ($fieldValues['tax_amount']) {
+          $taxAmount = $fieldValues['tax_amount'];
+          $taxFinancialType = $fieldValues['financial_type_id'];
+          if ($context == 'changeFinancialType') {
+            $taxAmount = $previousLineItem[$fieldValues['id']]['tax_amount'];
+            $taxFinancialType = $previousLineItem[$fieldValues['id']]['financial_type_id'];
+          }
+
+          if ($taxAmount) {
             $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
             $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
             if ($context == 'changedAmount') {
               $itemParams['amount'] = $diff * ($fieldValues['tax_amount'] - $previousLineItem[$fieldValues['id']]['tax_amount']);
             }
             else {
-              $itemParams['amount'] = $diff * $fieldValues['tax_amount'];
+              $itemParams['amount'] = $diff * $taxAmount;
             }
             $itemParams['description'] = $taxTerm;
-            if ($fieldValues['financial_type_id']) {
-              $itemParams['financial_account_id'] = self::getFinancialAccountId($fieldValues['financial_type_id']);
+            if ($taxFinancialType) {
+              $itemParams['financial_account_id'] = self::getFinancialAccountId($taxFinancialType);
             }
             CRM_Financial_BAO_FinancialItem::create($itemParams, NULL, $trxnIds);
           }
