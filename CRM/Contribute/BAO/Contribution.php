@@ -3445,7 +3445,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     }
     if ($context == 'changedAmount' || $context == 'changeFinancialType') {
       $params['trxnParams']['total_amount'] = $params['trxnParams']['net_amount'] = $params['total_amount'] - $params['prevContribution']->total_amount;
-      $itemAmount = $params['total_amount'] - $params['prevContribution']->total_amount - $params['tax_amount'] + $params['prevContribution']->tax_amount;
+      $itemAmount = $params['total_amount'] - $params['prevContribution']->total_amount - CRM_Utils_Array::value('tax_amount', $params, 0) + $params['prevContribution']->tax_amount;
     }
     if ($context == 'changedStatus') {
       //get all the statuses
@@ -3548,7 +3548,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       }
     }
     $trxn = CRM_Core_BAO_FinancialTrxn::create($params['trxnParams']);
-    $previousLineItem = CRM_Price_BAO_LineItem::getLineItemsByContributionID($params['id']);
+    $previousLineItem = CRM_Price_BAO_LineItem::getLineItemsByContributionID($params['contribution']->id);
     $params['entity_id'] = $trxn->id;
     if ($context != 'changePaymentInstrument') {
       $itemParams['entity_table'] = 'civicrm_line_item';
