@@ -2933,7 +2933,8 @@ class CRM_Contact_BAO_Query {
 
     //CRM-19589: contact(s) removed from a Smart Group, resides in civicrm_group_contact table
     $ssClause = NULL;
-    if (in_array("'Added'", $statii) ||  // if both Added and Removed statuses are selected
+    if (empty($gcsValues) || // if no status selected
+      in_array("'Added'", $statii) ||  // if both Added and Removed statuses are selected
       (count($statii) == 1 && $statii[0] == 'Removed') // if only Removed status is selected
     ) {
       $ssClause = $this->addGroupContactCache($value, NULL, "contact_a", $op);
