@@ -167,15 +167,19 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
     curl_close($submit);
 
     $response_fields = $this->explode_csv($response);
+
+    // fetch available contribution statuses
+    $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+
     // check gateway MD5 response
     if (!$this->checkMD5($response_fields[37], $response_fields[6], $response_fields[9])) {
+      $params['payment_status_id'] = array_search('Failed', $contributionStatus);
       return self::error(9003, 'MD5 Verification failed');
     }
 
     // check for application errors
     // TODO:
     // AVS, CVV2, CAVV, and other verification results
-    $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
     switch ($response_fields[0]) {
       case self::AUTH_REVIEW :
         $params['payment_status_id'] = array_search('Pending', $contributionStatus);
