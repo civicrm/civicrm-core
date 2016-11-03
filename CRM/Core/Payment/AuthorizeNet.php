@@ -181,15 +181,15 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
     // TODO:
     // AVS, CVV2, CAVV, and other verification results
     switch ($response_fields[0]) {
-      case self::AUTH_REVIEW :
+      case self::AUTH_REVIEW:
         $params['payment_status_id'] = array_search('Pending', $contributionStatus);
         break;
 
-      case self::AUTH_ERROR :
+      case self::AUTH_ERROR:
         $params['payment_status_id'] = array_search('Failed', $contributionStatus);
         break;
 
-      case self::AUTH_DECLINED :
+      case self::AUTH_DECLINED:
         $errormsg = $response_fields[2] . ' ' . $response_fields[3];
         return self::error($response_fields[1], $errormsg);
 
