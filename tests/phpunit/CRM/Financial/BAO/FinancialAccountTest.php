@@ -120,6 +120,39 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
   }
 
   /**
+   * Check method del()
+   */
+  public function testdelIfHasContribution() {
+    $params = array(
+      'name' => 'Donation Test',
+      'is_active' => 1,
+      'is_deductible' => 1,
+      'is_reserved' => 1,
+    );
+    $financialType = CRM_Financial_BAO_FinancialType::add($params);
+    $defaults = array();
+    $params = array(
+      'name' => 'Donation Test',
+      'is_active' => 1,
+    );
+    $result = CRM_Financial_BAO_FinancialAccount::retrieve($params, $defaults);
+
+    $contactId = $this->individualCreate();
+    $contributionParams = array(
+      'total_amount' => 300,
+      'currency' => 'USD',
+      'contact_id' => $contactId,
+      'financial_type_id' => $financialType->id,
+      'contribution_status_id' => 1,
+    );
+    $contributions = CRM_Contribute_BAO_Contribution::create($contributionParams);
+    CRM_Financial_BAO_FinancialAccount::del($result->id);
+    $params = array('id' => $result->id);
+    $result = CRM_Financial_BAO_FinancialAccount::retrieve($params, $defaults);
+    $this->assertEquals(empty($result), FALSE, 'Verify financial account record deletion.');
+  }
+
+  /**
    * Check method getAccountingCode()
    */
   public function testGetAccountingCode() {
