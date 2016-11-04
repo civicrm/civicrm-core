@@ -29,54 +29,53 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2016
- * $Id$
  *
  */
 
 /**
  * This implements the profile page for all contacts. It uses a selector
  * object to do the actual dispay. The fields displayd are controlled by
- * the admin
+ * the admin.
  */
 class CRM_Profile_Page_Listings extends CRM_Core_Page {
 
   /**
-   * All the fields that are listings related
+   * All the fields that are listings related.
    *
    * @var array
    */
   protected $_fields;
 
   /**
-   * The custom fields for this domain
+   * The custom fields for this domain.
    *
    * @var array
    */
   protected $_customFields;
 
   /**
-   * The input params from the request
+   * The input params from the request.
    *
    * @var array
    */
   protected $_params;
 
   /**
-   * The group id that we are editing
+   * The group id that we are editing.
    *
    * @var int
    */
   protected $_gid;
 
   /**
-   * State whether to display search form or not
+   * State whether to display search form or not.
    *
    * @var int
    */
   protected $_search;
 
   /**
-   * Should we display a map
+   * Should we display a map.
    *
    * @var int
    */
@@ -92,7 +91,6 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
    * Extracts the parameters from the request and constructs information for
    * the selector object to do a query
    *
-   * @return void
    */
   public function preProcess() {
 
@@ -230,7 +228,7 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
           if (in_array($customField['html_type'],
             array('Multi-Select', 'CheckBox', 'Multi-Select State/Province', 'Multi-Select Country', 'Radio', 'Select')
           )) {
-            // only reset on a POST submission if we dont see any value
+            // only reset on a POST submission if we don't see any value
             $value = NULL;
             $this->set($name, $value);
           }
@@ -282,7 +280,6 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
   /**
    * Run this page (figure out the action needed and perform it).
    *
-   * @return void
    */
   public function run() {
     $this->preProcess();
@@ -396,7 +393,7 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
       $controller->run();
     }
 
-    //CRM-6862 -run form cotroller after
+    //CRM-6862 -run form controller after
     //selector, since it erase $_POST
     $formController->run();
 
@@ -492,9 +489,6 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
    *
    * @return string
    */
-  /**
-   * @return string
-   */
   public function getTemplateFileName() {
     $fileName = $this->checkTemplateFileExists();
     return $fileName ? $fileName : parent::getTemplateFileName();
@@ -504,9 +498,6 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
    * Default extra tpl file basically just replaces .tpl with .extra.tpl
    * i.e. we dont override
    *
-   * @return string
-   */
-  /**
    * @return string
    */
   public function overrideExtraTemplateFileName() {
