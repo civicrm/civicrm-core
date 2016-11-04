@@ -4512,6 +4512,7 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
     if ($input['component'] == 'contribute') {
       if ($contribution->contribution_page_id) {
         // Figure out what we gain from this.
+        // Note that we may have overwritten the is_email_receipt input, fix that below.
         CRM_Contribute_BAO_ContributionPage::setValues($contribution->contribution_page_id, $values);
       }
       elseif ($recurContrib && $recurringContributionID) {
@@ -4520,7 +4521,11 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
         $values['title'] = $source = ts('Offline Recurring Contribution');
       }
 
-      if ($recurContrib && $recurringContributionID && !isset($input['is_email_receipt'])) {
+      if (isset($input['is_email_receipt'])) {
+        // CRM-19601 - we may have overwritten this above.
+        $values['is_email_receipt'] = $input['is_email_receipt'];
+      }
+      elseif ($recurContrib && $recurringContributionID) {
         //CRM-13273 - is_email_receipt setting on recurring contribution should take precedence over contribution page setting
         // but CRM-16124 if $input['is_email_receipt'] is set then that should not be overridden.
         $values['is_email_receipt'] = $recurContrib->is_email_receipt;
