@@ -29,7 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2016
- * $Id$
  *
  */
 
@@ -57,7 +56,6 @@ class CRM_Profile_Page_View extends CRM_Core_Page {
    * Heart of the viewing process. The runner gets all the meta data for
    * the contact and calls the appropriate type of page to view.
    *
-   * @return void
    */
   public function preProcess() {
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive',
@@ -163,9 +161,8 @@ class CRM_Profile_Page_View extends CRM_Core_Page {
   }
 
   /**
-   * Build the outcome basing on the CRM_Profile_Page_Dynamic's HTML
+   * Build the outcome basing on the CRM_Profile_Page_Dynamic's HTML.
    *
-   * @return void
    */
   public function run() {
     $this->preProcess();
@@ -202,9 +199,6 @@ class CRM_Profile_Page_View extends CRM_Core_Page {
    *
    * @return string
    */
-  /**
-   * @return string
-   */
   public function getTemplateFileName() {
     $fileName = $this->checkTemplateFileExists();
     return $fileName ? $fileName : parent::getTemplateFileName();
@@ -214,9 +208,6 @@ class CRM_Profile_Page_View extends CRM_Core_Page {
    * Default extra tpl file basically just replaces .tpl with .extra.tpl
    * i.e. we dont override
    *
-   * @return string
-   */
-  /**
    * @return string
    */
   public function overrideExtraTemplateFileName() {
