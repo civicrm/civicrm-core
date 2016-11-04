@@ -29,7 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2016
- * $Id$
  *
  */
 
@@ -48,7 +47,6 @@ class CRM_Profile_Form_Dynamic extends CRM_Profile_Form {
    *
    * @param
    *
-   * @return void
    */
   public function preProcess() {
     if ($this->get('register')) {
@@ -71,7 +69,6 @@ class CRM_Profile_Form_Dynamic extends CRM_Profile_Form {
   /**
    * Build the form object.
    *
-   * @return void
    */
   public function buildQuickForm() {
     $this->addButtons(array(
@@ -115,9 +112,6 @@ class CRM_Profile_Form_Dynamic extends CRM_Profile_Form {
 
   /**
    * Process the user submitted custom data values.
-   *
-   *
-   * @return void
    */
   public function postProcess() {
     parent::postProcess();

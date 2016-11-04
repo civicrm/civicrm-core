@@ -29,7 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2016
- * $Id$
  *
  */
 
@@ -55,7 +54,6 @@ class CRM_Profile_Form_Edit extends CRM_Profile_Form {
    *
    * @param
    *
-   * @return void
    */
   public function preProcess() {
     $this->_mode = CRM_Profile_Form::MODE_CREATE;
@@ -153,7 +151,6 @@ SELECT module,is_reserved
   /**
    * Build the form object.
    *
-   * @return void
    */
   public function buildQuickForm() {
     if (empty($this->_ufGroup['id'])) {
@@ -257,8 +254,6 @@ SELECT module,is_reserved
   /**
    * Process the user submitted custom data values.
    *
-   *
-   * @return void
    */
   public function postProcess() {
     parent::postProcess();
