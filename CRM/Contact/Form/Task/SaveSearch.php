@@ -183,10 +183,7 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
     $savedSearch = new CRM_Contact_BAO_SavedSearch();
     $savedSearch->id = $this->_id;
     $queryParams = $this->get('queryParams');
-    // CRM-18585 include selected operator in $savedSearch->form_values
-    if (!empty($formValues['operator'])) {
-      $queryParams[] = array('operator', '=', $formValues['operator'], 0, 0);
-    }
+
     // Use the query parameters rather than the form values - these have already been assessed / converted
     // with the extra knowledge that the form has.
     // Note that we want to move towards a standardised way of saving the query that is not
@@ -195,6 +192,7 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
     // sql operator syntax at the query layer.
     if (!$isSearchBuilder) {
       CRM_Contact_BAO_SavedSearch::saveRelativeDates($queryParams, $formValues);
+      CRM_Contact_BAO_SavedSearch::saveSkippedElement($queryParams, $formValues);
       $savedSearch->form_values = serialize($queryParams);
     }
     else {
