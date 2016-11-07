@@ -417,6 +417,28 @@ LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_
   }
 
   /**
+   * Store search variables in $queryParams which were skipped while processing query params,
+   * precisely at CRM_Contact_BAO_Query::fixWhereValues(...). But these variable are required in
+   * building smart group criteria otherwise it will cause issues like CRM-18585,CRM-19571
+   *
+   * @param array $queryParams
+   * @param array $formValues
+   */
+  public static function saveSkippedElement(&$queryParams, $formValues) {
+    // these are elements which are skipped in a smart group criteria
+    $specialElements = array(
+      'operator',
+      'component_mode',
+      'display_relationship_type',
+    );
+    foreach ($specialElements as $element) {
+      if (!empty($formValues[$element])) {
+        $queryParams[] = array($element, '=', $formValues[$element], 0, 0);
+      }
+    }
+  }
+
+  /**
    * Decode relative custom fields (converted by CRM_Contact_BAO_Query->convertCustomRelativeFields(...))
    *  into desired formValues
    *
