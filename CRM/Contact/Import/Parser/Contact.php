@@ -506,16 +506,36 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
         )))
     ) {
 
-      if ($internalCid = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $params['external_identifier'], 'id', 'external_identifier')) {
+      $extIDResult = civicrm_api3('Contact', 'get', array(
+        'external_identifier' => $params['external_identifier'],
+        'showAll' => 'all',
+        'return' => array('id', 'contact_is_deleted'),
+      ));
+      if (isset($extIDResult['id'])) {
+        // record with matching external identifier does exist.
+        $internalCid = $extIDResult['id'];
         if ($internalCid != CRM_Utils_Array::value('id', $params)) {
-          $errorMessage = ts('External ID already exists in Database.');
-          array_unshift($values, $errorMessage);
-          $importRecordParams = array(
-            $statusFieldName => 'ERROR',
-            "${statusFieldName}Msg" => $errorMessage,
-          );
-          $this->updateImportRecord($values[count($values) - 1], $importRecordParams);
-          return CRM_Import_Parser::DUPLICATE;
+          if ($extIDResult['values'][$internalCid]['contact_is_deleted'] == 1) {
+            // And it is deleted. What to do? If we skip it, they user
+            // will be under the impression that the record exists in
+            // the database, yet they won't be able to find it. If we
+            // don't skip it, the database will try to insert a new record
+            // with an external_identifier that is non-unique. So...
+            // we will update this contact to remove the external_identifier
+            // and let a new record be created.
+            $params = array('id' => $internalCid, 'external_identifier' => '');
+            civicrm_api3('Contact', 'update', $params);
+          }
+          else {
+            $errorMessage = ts('External ID already exists in Database.');
+            array_unshift($values, $errorMessage);
+            $importRecordParams = array(
+              $statusFieldName => 'ERROR',
+              "${statusFieldName}Msg" => $errorMessage,
+            );
+            $this->updateImportRecord($values[count($values) - 1], $importRecordParams);
+            return CRM_Import_Parser::DUPLICATE;
+          }
         }
       }
     }
@@ -2197,14 +2217,15 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
       $extIDContact = civicrm_api3('Contact', 'get', array(
         'external_identifier' => $params['external_identifier'],
         'showAll' => 'all',
-        'return' => array('id','is_deleted'),
+        'return' => array('id','contact_is_deleted'),
       ));
       if (isset($extIDContact['id'])) {
         $extIDMatch = $extIDContact['id'];
-        if($extIDContact['is_deleted'] == 1) {
+
+        if ($extIDResult['values'][$extIDMatch]['contact_is_deleted'] == 1) {
           // If the contact is deleted, restore it so it can be properly
           // updated.
-          $params = array('id' => $extIDMatch, 'is_deleted' => 0);
+          $params = array('id' => $extIDMatch, 'contact_is_deleted' => 0);
           civicrm_api3('Contact','Update', $params);
         }
       }
