@@ -2193,12 +2193,20 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
     $extIDMatch = NULL;
 
     if (!empty($params['external_identifier'])) {
+      // Check for any match on external id, deleted or otherwise.
       $extIDContact = civicrm_api3('Contact', 'get', array(
         'external_identifier' => $params['external_identifier'],
-        'return' => 'id',
+        'showAll' => 'all',
+        'return' => array('id','is_deleted'),
       ));
       if (isset($extIDContact['id'])) {
         $extIDMatch = $extIDContact['id'];
+        if($extIDContact['is_deleted'] == 1) {
+          // If the contact is deleted, restore it so it can be properly
+          // updated.
+          $params = array('id' => $extIDMatch, 'is_deleted' => 0);
+          civicrm_api3('Contact','Update', $params);
+        }
       }
     }
     $checkParams = array('check_permissions' => FALSE, 'match' => $params);
