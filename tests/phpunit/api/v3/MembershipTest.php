@@ -1152,8 +1152,8 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
 
     $expectedDates = array(
       'join_date' => date('Ymd'),
-      'start_date' => date('Ymd',strtotime(date('Y-03-01'))),
-      'end_date' => date('Ymd',strtotime(date('Y-03-01') . '+ 1 year - 1 day')),
+      'start_date' => date('Ymd', strtotime(date('Y-03-01'))),
+      'end_date' => date('Ymd', strtotime(date('Y-03-01') . '+ 1 year - 1 day')),
     );
     foreach ($result['values'] as $values) {
       foreach ($expectedDates as $date => $val) {
