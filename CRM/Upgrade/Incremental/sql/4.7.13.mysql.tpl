@@ -7,17 +7,17 @@ ALTER TABLE  `civicrm_line_item` CHANGE  `deductible_amount`  `non_deductible_am
 
 -- CRM-15371 Manage tags with new *manage tags* permission (used to need *administer CiviCRM* permission)
 UPDATE civicrm_navigation SET
-  `url` = 'civicrm/tag?reset=1&action=add',
+  `url` = 'civicrm/tag?reset=1',
   `permission` = 'manage tags'
 WHERE `name` = 'Manage Tags (Categories)';
 
 UPDATE civicrm_navigation SET
-  `url` = 'civicrm/admin/tag?reset=1',
+  `url` = 'civicrm/tag?reset=1&action=add',
   `permission` = 'manage tags'
 WHERE `name` = 'New Tag';
 
 UPDATE civicrm_navigation SET
-  `url` = 'civicrm/admin/tag?reset=1'
+  `url` = 'civicrm/tag?reset=1'
 WHERE `name` = 'Tags (Categories)';
 
 -- CRM-16352: Add language filter support for mass mailing
