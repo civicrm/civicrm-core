@@ -2931,7 +2931,15 @@ class CRM_Contact_BAO_Query {
       $statii[] = '"Added"';
     }
 
-    $ssClause = $this->addGroupContactCache($value, NULL, "contact_a", $op);
+    //CRM-19589: contact(s) removed from a Smart Group, resides in civicrm_group_contact table
+    $ssClause = NULL;
+    if (empty($gcsValues) || // if no status selected
+      in_array("'Added'", $statii) ||  // if both Added and Removed statuses are selected
+      (count($statii) == 1 && $statii[0] == 'Removed') // if only Removed status is selected
+    ) {
+      $ssClause = $this->addGroupContactCache($value, NULL, "contact_a", $op);
+    }
+
     $isSmart = (!$ssClause) ? FALSE : TRUE;
     if (!is_array($value) &&
       count($statii) == 1 &&
@@ -2944,7 +2952,7 @@ class CRM_Contact_BAO_Query {
     }
     $groupClause = NULL;
 
-    if (!$isSmart) {
+    if (!$isSmart || in_array("'Added'", $statii)) {
       $groupIds = implode(',', (array) $value);
       $gcTable = "`civicrm_group_contact-{$groupIds}`";
       $joinClause = array("contact_a.id = {$gcTable}.contact_id");
@@ -2978,6 +2986,7 @@ class CRM_Contact_BAO_Query {
     if (strpos($op, 'NULL') === FALSE) {
       $this->_qill[$grouping][] = ts("Group Status %1", array(1 => implode(' ' . ts('or') . ' ', $statii)));
     }
+
     if ($groupClause) {
       $this->_where[$grouping][] = $groupClause;
     }
