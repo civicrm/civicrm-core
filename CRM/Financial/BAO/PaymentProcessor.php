@@ -291,7 +291,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    * @param string|NULL $mode
    * only return this mode - test|live or NULL for all
    * @param bool $reset
-   * @param boo $domain
+   * @param bool $domain
    *   Dp we want to limit this to jusst the current domain.
    *
    * @throws CiviCRM_API3_Exception
@@ -382,7 +382,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
       $processors = self::getAllPaymentProcessors('all', TRUE, FALSE);
     }
     else {
-      $processors = self::getAllPaymentProcessors('all');
+      $processors = self::getAllPaymentProcessors('all', TRUE);
     }
 
     if (in_array('TestMode', $capabilities) && is_array($ids)) {
