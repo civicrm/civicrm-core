@@ -235,10 +235,6 @@
       {/if}
     {/foreach}
   </table>
-  <div class='form-item'>
-    <!--<p>{$form.moveBelongings.html} {$form.moveBelongings.label}</p>-->
-    <!--<p>{$form.deleteOther.html} {$form.deleteOther.label}</p>-->
-  </div>
 
   <div class="crm-submit-buttons">
     {include file="CRM/common/formButtons.tpl" location="bottom"}
