@@ -87,14 +87,21 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
       CRM_Core_Error::statusBounce(ts('The selected pair of contacts are marked as non duplicates. If these records should be merged, you can remove this exception on the <a href="%1">Dedupe Exceptions</a> page.', array(1 => CRM_Utils_System::url('civicrm/dedupe/exception', 'reset=1'))));
     }
     $this->_contactType = civicrm_api3('Contact', 'getvalue', array('id' => $cid, 'return' => 'contact_type'));
-    $isFromDedupeScreen = TRUE;
+
+    $browseUrl = CRM_Utils_System::url('civicrm/contact/dedupefind', $urlParams . '&action=browse');
+
     if (!$this->_rgid) {
-      $isFromDedupeScreen = FALSE;
+      // Unset browse URL as we have come from the search screen.
+      $browseUrl = '';
       $this->_rgid = civicrm_api3('RuleGroup', 'getvalue', array(
         'contact_type' => $this->_contactType,
         'used' => 'Supervised',
         'return' => 'id',
       ));
+    }
+    $this->assign('browseUrl', $browseUrl);
+    if ($browseUrl) {
+      $session->pushUserContext($browseUrl);
     }
 
     $cacheKey = CRM_Dedupe_Merger::getMergeCacheKeyString($this->_rgid, $gid);
@@ -175,13 +182,6 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
     $this->assign('user', $cmsUser);
 
     $session = CRM_Core_Session::singleton();
-
-    // context fixed.
-    if ($isFromDedupeScreen) {
-      $browseUrl = CRM_Utils_System::url('civicrm/contact/dedupefind', $urlParams . '&action=browse');
-      $session->pushUserContext($browseUrl);
-    }
-    $this->assign('browseUrl', empty($browseUrl) ? '' : $browseUrl);
 
     // ensure that oid is not the current user, if so refuse to do the merge
     if ($session->get('userID') == $oid) {
