@@ -193,6 +193,19 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
 
     // add elements
     foreach ($rowsElementsAndInfo['elements'] as $element) {
+      // We could push this down to the getRowsElementsAndInfo function but it's
+      // already so overloaded - let's start moving towards doing form-things
+      // on the form.
+      if (substr($element[1], 0, 13) === 'move_location') {
+        $element[4] = array_merge(
+          (array) CRM_Utils_Array::value(4, $element, array()),
+          array('data-location' => substr($element[1], 14), 'data-is_location' => TRUE));
+      }
+      if (substr($element[1], 0, 15) === 'location_blocks') {
+        // @todo We could add some data elements here to make jquery manipulation more straight-forward
+        // @todo consider enabling if it is an add & defaulting to true.
+        $element[4] = array_merge((array) CRM_Utils_Array::value(4, $element, array()), array('disabled' => TRUE));
+      }
       $this->addElement($element[0],
         $element[1],
         array_key_exists('2', $element) ? $element[2] : NULL,

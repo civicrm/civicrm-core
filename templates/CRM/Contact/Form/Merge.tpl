@@ -399,29 +399,26 @@
     }
   }
 
+  /**
+   * Toggle the location type and the is_primary on & off depending on whether the merge box is ticked.
+   *
+   * @param element
+   */
+  function toggleRelatedLocationFields(element) {
+    relatedElements = CRM.$(element).parent().siblings('td').find('input,select,label,hidden');
+    if (CRM.$(element).is(':checked')) {
+      relatedElements.removeClass('disabled').attr('disabled', false);
+
+    }
+    else {
+      relatedElements.addClass('disabled').attr('disabled', true);
+    }
+
+  }
+
   CRM.$(function($) {
-
-    $('table td input.form-checkbox').each(function() {
-      var ele = null;
-      var element = $(this).attr('id').split('_',3);
-
-      switch ( element['1'] ) {
-        case 'addressee':
-          ele = '#' + element['0'] + '_' + element['1'];
-          break;
-
-         case 'email':
-         case 'postal':
-           ele = '#' + element['0'] + '_' + element['1'] + '_' + element['2'];
-           break;
-      }
-
-      if( ele ) {
-        $(this).on('click', function() {
-          var val = $(this).prop('checked');
-          $('input' + ele + ', input' + ele + '_custom').prop('checked', val);
-        });
-      }
+    $('input.crm-form-checkbox[data-is_location]').on('click', function(){
+      toggleRelatedLocationFields(this)
     });
 
     // Show/hide matching data rows
@@ -430,7 +427,8 @@
     });
 
     // Call mergeBlock whenever a location type is changed
-    $('body').on('change', 'select[id$="locTypeId"],select[id$="typeTypeId"],input[id$="[operation]"],input[id$="[set_other_primary]"]', function(event){
+    $('select[id$="locTypeId"],select[id$="typeTypeId"],input[id$="[operation]"],input[id$="[set_other_primary]"]').on('change',
+      function(event){
 
       // All the information we need is held in the id, separated by underscores
       var nameSplit = this.name.split('[');
