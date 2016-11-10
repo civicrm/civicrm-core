@@ -286,6 +286,16 @@ class CRM_Upgrade_Incremental_php_FourSix {
   }
 
   /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_4_6_24($rev) {
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'task_4_6_x_runSql', $rev);
+    $this->addTask(ts('Add column to support bi-directional relationship types'), 'addBidirectionRelationshipTypeField', $rev);
+  }
+
+  /**
    * Add Getting Started dashlet to dashboard
    *
    * @param \CRM_Queue_TaskContext $ctx
@@ -329,6 +339,17 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
             6 => array(date('Y-m-d H:i:s'), 'String'),
           )
       );
+    }
+    return TRUE;
+  }
+
+  /**
+   * CRM-19630 Add field to support bi-directonal relationships.
+   * @return bool
+   */
+  public function addBidirectionRelationshipTypeField() {
+    if (!CRM_Core_BAO_SchemaHandler::checkIfFieldExists('civicrm_relationship_type', 'is_bidirectional')) {
+      CRM_Core_DAO::executeQuery("ALTER TABLE `civicrm_relationship_type` ADD COLUMN `is_bidirectional` tinyint(4) DEFAULT '0' COMMENT 'Can this relationship type be used bi-directionaly?'");
     }
     return TRUE;
   }

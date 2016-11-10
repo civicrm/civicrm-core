@@ -61,6 +61,12 @@
                 <td class="label">{$form.is_active.label}</td>
                 <td>{$form.is_active.html}</td>
             </tr>
+            <tr class="crm-relationship-type-form-block-is_bidirectional">
+                <td class="label">{$form.is_bidirectional.label}</td>
+                <td>{$form.is_bidirectional.html}<br />
+                  <span class="description">{ts}Can a 'B to A' relationship be created when their is's an existing 'A to B' relationship?{/ts}</span>
+                </td>
+            </tr>
         </table>
     {/if}
     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
