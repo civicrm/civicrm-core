@@ -130,9 +130,24 @@
               $row.title|substr:0:5 == "Phone"}
 
             <td>
-              {* @TODO check if this is ever an array or a fileName? *}
+
               {* This is on one long line for address formatting *}
-              {if $row.title|substr:0:7 == "Address"}<span style="white-space: pre" id="main_{$blockName}_{$blockId}">{else}<span id="main_{$blockName}_{$blockId}">{/if}{if !is_array($row.main)}{$row.main}{elseif $row.main.fileName}{$row.main.fileName}{else}{', '|implode:$row.main}{/if}</span>
+              {if $row.title|substr:0:7 == "Address"}
+                <span style="white-space: pre" id="main_{$blockName}_{$blockId}">
+              {else}
+                <span id="main_{$blockName}_{$blockId}">
+              {/if}
+
+              {* @TODO check if this is ever an array or a fileName? *}
+              {if !is_array($row.main)}
+                {$row.main}
+              {elseif $row.main.fileName}
+                {$row.main.fileName}
+              {else}
+                {', '|implode:$row.main}
+              {/if}
+
+              </span>
             </td>
 
             <td>
@@ -239,7 +254,7 @@
   /**
    * Triggered when a 'location' or 'type' destination is changed, and when
    * the operation or 'set primary' checkboxes are changed.
-   * 
+   *
    * Check to see if the 'main' contact record has a corresponding location
    * block when the destination of a field is changed. Allow existing location
    * fields to be overwritten with data from the 'other' contact.
