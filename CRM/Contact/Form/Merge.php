@@ -89,7 +89,7 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
     }
     $this->assign('browseUrl', $browseUrl);
     if ($browseUrl) {
-      $session->pushUserContext($browseUrl);
+      CRM_Core_Session::singleton()->pushUserContext($browseUrl);
     }
 
     $cacheKey = CRM_Dedupe_Merger::getMergeCacheKeyString($this->_rgid, $gid);
@@ -164,8 +164,8 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
     $session = CRM_Core_Session::singleton();
 
     $rowsElementsAndInfo = CRM_Dedupe_Merger::getRowsElementsAndInfo($cid, $oid);
-    $main = $this->_mainDetails = &$rowsElementsAndInfo['main_details'];
-    $other = $this->_otherDetails = &$rowsElementsAndInfo['other_details'];
+    $main = $this->_mainDetails = $rowsElementsAndInfo['main_details'];
+    $other = $this->_otherDetails = $rowsElementsAndInfo['other_details'];
 
     if ($main['contact_id'] != $cid) {
       CRM_Core_Error::fatal(ts('The main contact record does not exist'));
