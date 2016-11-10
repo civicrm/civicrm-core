@@ -96,4 +96,49 @@ class CRM_Report_Form_Contribute_DetailTest extends CiviReportTestCase {
     $this->assertCsvArraysEqual($expectedOutputCsvArray, $reportCsvArray);
   }
 
+  /**
+   * @return array
+   */
+  public function postalCodeDataProvider() {
+    return array(
+      array(
+        'CRM_Report_Form_Contribute_Detail',
+        array(
+          'fields' => array(
+            'sort_name',
+            'first_name',
+            'email',
+            'total_amount',
+            'postal_code',
+          ),
+          'filters' => array(
+            'postal_code_value' => 'B10 G56',
+            'postal_code_op' => 'has',
+          ),
+        ),
+        'fixtures/dataset-ascii.sql',
+        'fixtures/DetailPostalCodeTest-ascii.csv',
+      ),
+    );
+  }
+
+  /**
+   * @dataProvider postalCodeDataProvider
+   * @param $reportClass
+   * @param $inputParams
+   * @param $dataSet
+   * @param $expectedOutputCsvFile
+   * @throws \Exception
+   */
+  public function testPostalCodeSearchReportOutput($reportClass, $inputParams, $dataSet, $expectedOutputCsvFile) {
+    $config = CRM_Core_Config::singleton();
+    CRM_Utils_File::sourceSQLFile($config->dsn, dirname(__FILE__) . "/{$dataSet}");
+
+    $reportCsvFile = $this->getReportOutputAsCsv($reportClass, $inputParams);
+    $reportCsvArray = $this->getArrayFromCsv($reportCsvFile);
+
+    $expectedOutputCsvArray = $this->getArrayFromCsv(dirname(__FILE__) . "/{$expectedOutputCsvFile}");
+    $this->assertCsvArraysEqual($expectedOutputCsvArray, $reportCsvArray);
+  }
+
 }
