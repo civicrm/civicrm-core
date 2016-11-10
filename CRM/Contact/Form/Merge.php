@@ -212,22 +212,6 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
     $this->assign('userContextURL', $session->readUserContext());
   }
 
-  /**
-   * This virtual function is used to set the default values of
-   * various form elements
-   *
-   * access        public
-   *
-   * @return array
-   *   reference to the array of default values
-   */
-  /**
-   * @return array
-   */
-  public function setDefaultValues() {
-    return array('deleteOther' => 1);
-  }
-
   public function addRules() {
   }
 
