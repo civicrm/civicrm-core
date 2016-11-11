@@ -106,6 +106,20 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
           ),
         ),
         'filters' => array(
+          'sort_name' => array(
+            'title' => ts('Contact Name'),
+            'type' => CRM_Utils_Type::T_STRING,
+            'operator' => 'like',
+          ),
+          'id' => array(
+            'title' => ts('Contact ID'),
+            'type' => CRM_Utils_Type::T_INT,
+            'no_display' => TRUE,
+          ),
+          'birth_date' => array(
+            'title' => ts('Birth Date'),
+            'operatorType' => CRM_Report_Form::OP_DATE,
+          ),
           'gender_id' => array(
             'title' => ts('Gender'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
@@ -116,13 +130,6 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
           ),
           'contact_sub_type' => array(
             'title' => ts('Contact Subtype'),
-          ),
-        ),
-        'filters' => array(
-          'gender_id' => array(
-            'title' => ts('Gender'),
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id'),
           ),
         ),
       ),
@@ -150,28 +157,6 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
           ),
         ),
         'filters' => array(
-          'sort_name' => array(
-            'title' => ts('Participant Name'),
-            'type' => CRM_Utils_Type::T_STRING,
-            'operator' => 'like',
-          ),
-          'id' => array(
-            'title' => ts('Contact ID'),
-            'type' => CRM_Utils_Type::T_INT,
-            'no_display' => TRUE,
-          ),
-          'birth_date' => array(
-            'title' => ts('Birth Date'),
-            'operatorType' => CRM_Report_Form::OP_DATE,
-          ),
-          'contact_type' => array(
-            'title' => ts('Contact Type'),
-            'type' => CRM_Utils_Type::T_STRING,
-          ),
-          'contact_sub_type' => array(
-            'title' => ts('Contact Subtype'),
-            'type' => CRM_Utils_Type::T_STRING,
-          ),
           'receive_date' => array(
             'default' => 'this.year',
             'operatorType' => CRM_Report_Form::OP_DATE,
