@@ -4685,9 +4685,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
     if (!CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
       return FALSE;
     }
-    $financialTypes = NULL;
     CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($this->financialTypes);
-    $this->financialTypes = $financialTypes;
     if (strpos($query->_from, 'civicrm_contribution') === FALSE) {
       return FALSE;
     }
@@ -4696,7 +4694,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
       $liFTs = implode(',', array_keys(CRM_Contribute_Pseudoconstant::financialType()));
     }
     else {
-      $contFTs = $liFTs = implode(',', array_keys($financialTypes));
+      $contFTs = $liFTs = implode(',', array_keys($this->financialTypes));
     }
     $temp = CRM_Utils_Array::value('civicrm_line_item', $query->_aliases);
     if ($alias) {
