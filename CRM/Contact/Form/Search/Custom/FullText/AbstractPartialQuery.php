@@ -260,47 +260,7 @@ GROUP BY {$tableValues['id']}
    *   SQL, eg "MATCH (col1) AGAINST (queryText)" or "col1 LIKE '%queryText%'"
    */
   public function matchText($table, $fullTextFields, $queryText) {
-    $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
-
-    if (strpos($table, ' ') === FALSE) {
-      $tableName = $tableAlias = $table;
-    }
-    else {
-      list ($tableName, $tableAlias) = explode(' ', $table);
-    }
-    if (is_scalar($fullTextFields)) {
-      $fullTextFields = array($fullTextFields);
-    }
-
-    $clauses = array();
-    if (CRM_Core_InnoDBIndexer::singleton()->hasDeclaredIndex($tableName, $fullTextFields)) {
-      $formattedQuery = CRM_Utils_QueryFormatter::singleton()
-        ->format($queryText, CRM_Utils_QueryFormatter::LANG_SQL_FTSBOOL);
-
-      $prefixedFieldNames = array();
-      foreach ($fullTextFields as $fieldName) {
-        $prefixedFieldNames[] = "$tableAlias.$fieldName";
-      }
-
-      $clauses[] = sprintf("MATCH (%s) AGAINST ('%s' IN BOOLEAN MODE)",
-        implode(',', $prefixedFieldNames),
-        $strtolower(CRM_Core_DAO::escapeString($formattedQuery))
-      );
-    }
-    else {
-      //CRM_Core_Session::setStatus(ts('Cannot use FTS for %1 (%2)', array(
-      //  1 => $table,
-      //  2 => implode(', ', $fullTextFields),
-      //)));
-
-      $formattedQuery = CRM_Utils_QueryFormatter::singleton()
-        ->format($queryText, CRM_Utils_QueryFormatter::LANG_SQL_LIKE);
-      $escapedText = $strtolower(CRM_Core_DAO::escapeString($formattedQuery));
-      foreach ($fullTextFields as $fieldName) {
-        $clauses[] = "$tableAlias.$fieldName LIKE '{$escapedText}'";
-      }
-    }
-    return implode(' OR ', $clauses);
+    return CRM_Utils_QueryFormatter::singleton()->formatSql($table, $fullTextFields, $queryText);
   }
 
   /**
