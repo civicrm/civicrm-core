@@ -42,9 +42,7 @@ class CRM_Contact_Form_Search_Custom_Sample extends CRM_Contact_Form_Search_Cust
     parent::__construct($formValues);
 
     if (!isset($formValues['state_province_id'])) {
-      $this->_stateID = CRM_Utils_Request::retrieve('stateID', 'Integer',
-        CRM_Core_DAO::$_nullObject
-      );
+      $this->_stateID = CRM_Utils_Request::retrieve('stateID', 'Integer');
       if ($this->_stateID) {
         $formValues['state_province_id'] = $this->_stateID;
       }

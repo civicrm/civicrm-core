@@ -3301,7 +3301,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
             );
             $groupTree = CRM_Utils_Array::crmArrayMerge($groupTree, $subTree);
           }
-          $formattedGroupTree = CRM_Core_BAO_CustomGroup::formatGroupTree($groupTree, 1, CRM_Core_DAO::$_nullObject);
+          $formattedGroupTree = CRM_Core_BAO_CustomGroup::formatGroupTree($groupTree, 1);
           CRM_Core_BAO_CustomGroup::setDefaults($formattedGroupTree, $defaults);
         }
 

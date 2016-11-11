@@ -524,19 +524,9 @@ class CRM_Report_Form extends CRM_Core_Form {
    * @throws \Exception
    */
   public function preProcessCommon() {
-    $this->_force
-      = CRM_Utils_Request::retrieve(
-      'force',
-      'Boolean',
-      CRM_Core_DAO::$_nullObject
-      );
+    $this->_force = CRM_Utils_Request::retrieve('force', 'Boolean');
 
-    $this->_dashBoardRowCount
-      = CRM_Utils_Request::retrieve(
-      'rowCount',
-      'Integer',
-      CRM_Core_DAO::$_nullObject
-      );
+    $this->_dashBoardRowCount = CRM_Utils_Request::retrieve('rowCount', 'Integer');
 
     $this->_section = CRM_Utils_Request::retrieve('section', 'Integer');
 

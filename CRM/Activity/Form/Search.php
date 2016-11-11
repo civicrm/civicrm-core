@@ -314,9 +314,7 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
 
     // Added for membership search
 
-    $signupType = CRM_Utils_Request::retrieve('signupType', 'Positive',
-      CRM_Core_DAO::$_nullObject
-    );
+    $signupType = CRM_Utils_Request::retrieve('signupType', 'Positive');
 
     if ($signupType) {
       $this->_formValues['activity_role'] = 1;
@@ -342,9 +340,7 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
       }
     }
 
-    $dateLow = CRM_Utils_Request::retrieve('dateLow', 'String',
-      CRM_Core_DAO::$_nullObject
-    );
+    $dateLow = CRM_Utils_Request::retrieve('dateLow', 'String');
 
     if ($dateLow) {
       $dateLow = date('m/d/Y', strtotime($dateLow));
@@ -354,9 +350,7 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
       $this->_defaults['activity_date_low'] = $dateLow;
     }
 
-    $dateHigh = CRM_Utils_Request::retrieve('dateHigh', 'String',
-      CRM_Core_DAO::$_nullObject
-    );
+    $dateHigh = CRM_Utils_Request::retrieve('dateHigh', 'String');
 
     if ($dateHigh) {
       // Activity date time assumes midnight at the beginning of the date
