@@ -131,7 +131,11 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
   public static function create(&$params) {
     $origParams = array_merge(array(), $params);
 
-    if (!isset($params['id'])) {
+    $op = empty($params['id']) ? 'create' : 'edit';
+
+    CRM_Utils_Hook::pre($op, 'CustomField', CRM_Utils_Array::value('id', $params), $params);
+
+    if ($op == 'create') {
       if (!isset($params['column_name'])) {
         // if add mode & column_name not present, calculate it.
         $params['column_name'] = strtolower(CRM_Utils_String::munge($params['label'], '_', 32));
@@ -291,7 +295,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
 
     $triggerRebuild = CRM_Utils_Array::value('triggerRebuild', $params, TRUE);
     //create/drop the index when we toggle the is_searchable flag
-    if (!empty($params['id'])) {
+    if ($op == 'edit') {
       self::createField($customField, 'modify', $indexExist, $triggerRebuild);
     }
     else {
@@ -310,6 +314,8 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
 
     // complete transaction
     $transaction->commit();
+
+    CRM_Utils_Hook::post($op, 'CustomField', $customField->id, $customField);
 
     CRM_Utils_System::flushCache();
 
@@ -1128,6 +1134,8 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     $field->delete();
     CRM_Core_BAO_UFField::delUFField($field->id);
     CRM_Utils_Weight::correctDuplicateWeights('CRM_Core_DAO_CustomField');
+
+    CRM_Utils_Hook::post('delete', 'CustomField', $field->id, $field);
   }
 
   /**
