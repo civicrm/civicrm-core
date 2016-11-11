@@ -458,7 +458,8 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
       // Output tag list as nested hierarchy
       // TODO: This will only work when api.entity is "entity_tag". What about others?
       if ($context == 'search' || $context == 'create') {
-        return CRM_Core_BAO_Tag::getTags(CRM_Utils_Array::value('entity_table', $props, 'civicrm_contact'), CRM_Core_DAO::$_nullArray, CRM_Utils_Array::value('parent_id', $params), '- ');
+        $dummyArray = array();
+        return CRM_Core_BAO_Tag::getTags(CRM_Utils_Array::value('entity_table', $props, 'civicrm_contact'), $dummyArray, CRM_Utils_Array::value('parent_id', $params), '- ');
       }
     }
 
