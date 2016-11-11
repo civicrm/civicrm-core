@@ -538,7 +538,7 @@ class CRM_Report_Form extends CRM_Core_Form {
       CRM_Core_DAO::$_nullObject
       );
 
-    $this->_section = CRM_Utils_Request::retrieve('section', 'Integer', CRM_Core_DAO::$_nullObject);
+    $this->_section = CRM_Utils_Request::retrieve('section', 'Integer');
 
     $this->assign('section', $this->_section);
     CRM_Core_Region::instance('page-header')->add(array(
@@ -3329,7 +3329,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     if ($this->addPaging) {
       $this->_select = str_ireplace('SELECT ', 'SELECT SQL_CALC_FOUND_ROWS ', $this->_select);
 
-      $pageId = CRM_Utils_Request::retrieve('crmPID', 'Integer', CRM_Core_DAO::$_nullObject);
+      $pageId = CRM_Utils_Request::retrieve('crmPID', 'Integer');
 
       // @todo all http vars should be extracted in the preProcess
       // - not randomly in the class

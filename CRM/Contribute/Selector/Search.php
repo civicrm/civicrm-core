@@ -336,10 +336,10 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
     $componentId = $componentContext = NULL;
     if ($this->_context != 'contribute') {
       // @todo explain the significance of context & why we do not get these i that context.
-      $qfKey = CRM_Utils_Request::retrieve('key', 'String', CRM_Core_DAO::$_nullObject);
-      $componentId = CRM_Utils_Request::retrieve('id', 'Positive', CRM_Core_DAO::$_nullObject);
-      $componentAction = CRM_Utils_Request::retrieve('action', 'String', CRM_Core_DAO::$_nullObject);
-      $componentContext = CRM_Utils_Request::retrieve('compContext', 'String', CRM_Core_DAO::$_nullObject);
+      $qfKey = CRM_Utils_Request::retrieve('key', 'String');
+      $componentId = CRM_Utils_Request::retrieve('id', 'Positive');
+      $componentAction = CRM_Utils_Request::retrieve('action', 'String');
+      $componentContext = CRM_Utils_Request::retrieve('compContext', 'String');
 
       if (!$componentContext &&
         $this->_compContext

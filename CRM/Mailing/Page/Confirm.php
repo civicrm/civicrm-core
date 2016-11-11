@@ -38,9 +38,9 @@ class CRM_Mailing_Page_Confirm extends CRM_Core_Page {
   public function run() {
     CRM_Utils_System::addHTMLHead('<META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">');
 
-    $contact_id = CRM_Utils_Request::retrieve('cid', 'Integer', CRM_Core_DAO::$_nullObject);
-    $subscribe_id = CRM_Utils_Request::retrieve('sid', 'Integer', CRM_Core_DAO::$_nullObject);
-    $hash = CRM_Utils_Request::retrieve('h', 'String', CRM_Core_DAO::$_nullObject);
+    $contact_id = CRM_Utils_Request::retrieve('cid', 'Integer');
+    $subscribe_id = CRM_Utils_Request::retrieve('sid', 'Integer');
+    $hash = CRM_Utils_Request::retrieve('h', 'String');
 
     if (!$contact_id ||
       !$subscribe_id ||

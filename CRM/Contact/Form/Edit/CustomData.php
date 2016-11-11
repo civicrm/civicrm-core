@@ -42,8 +42,8 @@ class CRM_Contact_Form_Edit_CustomData {
    * @param CRM_Core_Form $form
    */
   public static function preProcess(&$form) {
-    $form->_type = CRM_Utils_Request::retrieve('type', 'String', CRM_Core_DAO::$_nullObject);
-    $form->_subType = CRM_Utils_Request::retrieve('subType', 'String', CRM_Core_DAO::$_nullObject);
+    $form->_type = CRM_Utils_Request::retrieve('type', 'String');
+    $form->_subType = CRM_Utils_Request::retrieve('subType', 'String');
 
     //build the custom data as other blocks.
     //$form->assign( "addBlock", false );
