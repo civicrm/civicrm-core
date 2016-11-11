@@ -450,7 +450,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     }
 
     //do check for cancel recurring and clean db, CRM-7696
-    if (CRM_Utils_Request::retrieve('cancel', 'Boolean', CRM_Core_DAO::$_nullObject)) {
+    if (CRM_Utils_Request::retrieve('cancel', 'Boolean')) {
       self::cancelRecurring();
     }
 
@@ -1004,15 +1004,15 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * lets delete the recurring and related contribution.
    */
   public function cancelRecurring() {
-    $isCancel = CRM_Utils_Request::retrieve('cancel', 'Boolean', CRM_Core_DAO::$_nullObject);
+    $isCancel = CRM_Utils_Request::retrieve('cancel', 'Boolean');
     if ($isCancel) {
-      $isRecur = CRM_Utils_Request::retrieve('isRecur', 'Boolean', CRM_Core_DAO::$_nullObject);
-      $recurId = CRM_Utils_Request::retrieve('recurId', 'Positive', CRM_Core_DAO::$_nullObject);
+      $isRecur = CRM_Utils_Request::retrieve('isRecur', 'Boolean');
+      $recurId = CRM_Utils_Request::retrieve('recurId', 'Positive');
       //clean db for recurring contribution.
       if ($isRecur && $recurId) {
         CRM_Contribute_BAO_ContributionRecur::deleteRecurContribution($recurId);
       }
-      $contribId = CRM_Utils_Request::retrieve('contribId', 'Positive', CRM_Core_DAO::$_nullObject);
+      $contribId = CRM_Utils_Request::retrieve('contribId', 'Positive');
       if ($contribId) {
         CRM_Contribute_BAO_Contribution::deleteContribution($contribId);
       }

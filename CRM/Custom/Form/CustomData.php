@@ -90,7 +90,7 @@ class CRM_Custom_Form_CustomData {
     $form->assign('cgCount', $form->_groupCount);
 
     //carry qf key, since this form is not inhereting core form.
-    if ($qfKey = CRM_Utils_Request::retrieve('qfKey', 'String', CRM_Core_DAO::$_nullObject)) {
+    if ($qfKey = CRM_Utils_Request::retrieve('qfKey', 'String')) {
       $form->assign('qfKey', $qfKey);
     }
 
@@ -101,8 +101,8 @@ class CRM_Custom_Form_CustomData {
       $form->_entityId = CRM_Utils_Request::retrieve('entityID', 'Positive', $form);
     }
 
-    $typeCheck = CRM_Utils_Request::retrieve('type', 'String', CRM_Core_DAO::$_nullObject);
-    $urlGroupId = CRM_Utils_Request::retrieve('groupID', 'Positive', CRM_Core_DAO::$_nullObject);
+    $typeCheck = CRM_Utils_Request::retrieve('type', 'String');
+    $urlGroupId = CRM_Utils_Request::retrieve('groupID', 'Positive');
     if (isset($typeCheck) && $urlGroupId) {
       $form->_groupID = $urlGroupId;
     }

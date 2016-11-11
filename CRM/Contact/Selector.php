@@ -178,7 +178,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
     $contextMenu = NULL
   ) {
     //don't build query constructor, if form is not submitted
-    $force = CRM_Utils_Request::retrieve('force', 'Boolean', CRM_Core_DAO::$_nullObject);
+    $force = CRM_Utils_Request::retrieve('force', 'Boolean');
     if (empty($formValues) && !$force) {
       return;
     }
@@ -862,10 +862,10 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
     // 2. if records are sorted
 
     // get current page requested
-    $pageNum = CRM_Utils_Request::retrieve('crmPID', 'Integer', CRM_Core_DAO::$_nullObject);
+    $pageNum = CRM_Utils_Request::retrieve('crmPID', 'Integer');
 
     // get the current sort order
-    $currentSortID = CRM_Utils_Request::retrieve('crmSID', 'String', CRM_Core_DAO::$_nullObject);
+    $currentSortID = CRM_Utils_Request::retrieve('crmSID', 'String');
 
     $session = CRM_Core_Session::singleton();
 
@@ -891,7 +891,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
     $firstRecord = ($pageNum - 1) * $pageSize;
 
     //for alphabetic pagination selection save
-    $sortByCharacter = CRM_Utils_Request::retrieve('sortByCharacter', 'String', CRM_Core_DAO::$_nullObject);
+    $sortByCharacter = CRM_Utils_Request::retrieve('sortByCharacter', 'String');
 
     //for text field pagination selection save
     $countRow = CRM_Core_BAO_PrevNextCache::getCount($cacheKey, NULL, "entity_table = 'civicrm_contact'");
