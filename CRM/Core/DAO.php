@@ -47,9 +47,14 @@ require_once 'CRM/Core/I18n.php';
 class CRM_Core_DAO extends DB_DataObject {
 
   /**
-   * A null object so we can pass it as reference if / when needed
+   * @var null
+   * @deprecated
    */
   static $_nullObject = NULL;
+  /**
+   * @var array
+   * @deprecated
+   */
   static $_nullArray = array();
 
   static $_dbColumnValueCache = NULL;
@@ -1529,7 +1534,7 @@ FROM   civicrm_domain
    * @param $toId
    * @param array $newData
    *
-   * @return null
+   * @return CRM_Core_DAO|null
    */
   public static function cascadeUpdate($daoName, $fromId, $toId, $newData = array()) {
     $object = new $daoName();
@@ -1563,7 +1568,7 @@ FROM   civicrm_domain
         return $newObject;
       }
     }
-    return CRM_Core_DAO::$_nullObject;
+    return NULL;
   }
 
   /**

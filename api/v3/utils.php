@@ -1531,7 +1531,7 @@ function _civicrm_api3_custom_data_get(&$returnArray, $checkPermission, $entity,
     TRUE,
     $checkPermission
   );
-  $groupTree = CRM_Core_BAO_CustomGroup::formatGroupTree($groupTree, 1, CRM_Core_DAO::$_nullObject);
+  $groupTree = CRM_Core_BAO_CustomGroup::formatGroupTree($groupTree, 1);
   $customValues = array();
   CRM_Core_BAO_CustomGroup::setDefaults($groupTree, $customValues);
   $fieldInfo = array();
