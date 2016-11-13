@@ -4097,6 +4097,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
       );
     }
 
+    $street_address_filters = $general_address_filters = array();
     if ($filters) {
       // Address filter depends on whether street address parsing is enabled.
       // (CRM-18696)
