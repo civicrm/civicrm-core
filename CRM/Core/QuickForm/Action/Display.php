@@ -111,7 +111,7 @@ class CRM_Core_QuickForm_Action_Display extends CRM_Core_QuickForm_Action {
     $form = $page->toSmarty();
 
     // Deprecated - use snippet=6 instead of json=1
-    $json = CRM_Utils_Request::retrieve('json', 'Boolean', CRM_Core_DAO::$_nullObject);
+    $json = CRM_Utils_Request::retrieve('json', 'Boolean');
     if ($json) {
       CRM_Utils_JSON::output($form);
     }

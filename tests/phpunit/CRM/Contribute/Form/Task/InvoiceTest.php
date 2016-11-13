@@ -57,8 +57,6 @@ class CRM_Contribute_Form_Task_InvoiceTest extends CiviUnitTestCase {
       'forPage' => 1,
     );
 
-    $form = new CRM_Contribute_Form_Task_Invoice();
-
     $this->_individualId = $this->individualCreate();
     $contributionParams = array(
       'contact_id' => $this->_individualId,
@@ -78,7 +76,7 @@ class CRM_Contribute_Form_Task_InvoiceTest extends CiviUnitTestCase {
 
     $contactIds[] = $this->_individualId;
     foreach ($contributionIDs as $contributionID) {
-      $invoiceHTML[current($contributionID)] = CRM_Contribute_Form_Task_Invoice::printPDF($contributionID, $params, $contactIds, $form);
+      $invoiceHTML[current($contributionID)] = CRM_Contribute_Form_Task_Invoice::printPDF($contributionID, $params, $contactIds);
     }
 
     $this->assertNotContains('Due Date', $invoiceHTML[$result['id']]);

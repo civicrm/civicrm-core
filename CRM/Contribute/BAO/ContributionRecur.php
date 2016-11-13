@@ -305,7 +305,7 @@ SELECT r.payment_processor_id
       }
 
       // if there are associated objects, cancel them as well
-      if ($objects == CRM_Core_DAO::$_nullObject) {
+      if (!$objects) {
         $transaction->commit();
         return TRUE;
       }

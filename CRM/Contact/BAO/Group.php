@@ -861,7 +861,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
                                ON contact.id = gOrg.organization_id ";
 
       //get the Organization ID
-      $orgID = CRM_Utils_Request::retrieve('oid', 'Positive', CRM_Core_DAO::$_nullObject);
+      $orgID = CRM_Utils_Request::retrieve('oid', 'Positive');
       if ($orgID) {
         $where = " AND gOrg.organization_id = {$orgID}";
       }

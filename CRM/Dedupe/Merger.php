@@ -1727,7 +1727,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       CRM_Contact_BAO_Contact::createProfileContact($submitted, CRM_Core_DAO::$_nullArray, $mainId);
     }
 
-    CRM_Utils_Hook::post('merge', 'Contact', $mainId, CRM_Core_DAO::$_nullObject);
+    CRM_Utils_Hook::post('merge', 'Contact', $mainId);
     self::createMergeActivities($mainId, $otherId);
 
     return TRUE;

@@ -434,7 +434,7 @@ class CRM_Utils_Weight {
   }
 
   public static function fixOrder() {
-    $signature = CRM_Utils_Request::retrieve('_sgn', 'String', CRM_Core_DAO::$_nullObject);
+    $signature = CRM_Utils_Request::retrieve('_sgn', 'String');
     $signer = new CRM_Utils_Signer(CRM_Core_Key::privateKey(), self::$SIGNABLE_FIELDS);
 
     // Validate $_GET values b/c subsequent code reads $_GET (via CRM_Utils_Request::retrieve)
@@ -443,14 +443,14 @@ class CRM_Utils_Weight {
     }
 
     // Note: Ensure this list matches self::$SIGNABLE_FIELDS
-    $daoName = CRM_Utils_Request::retrieve('dao', 'String', CRM_Core_DAO::$_nullObject);
-    $id = CRM_Utils_Request::retrieve('id', 'Integer', CRM_Core_DAO::$_nullObject);
-    $idName = CRM_Utils_Request::retrieve('idName', 'String', CRM_Core_DAO::$_nullObject);
-    $url = CRM_Utils_Request::retrieve('url', 'String', CRM_Core_DAO::$_nullObject);
-    $filter = CRM_Utils_Request::retrieve('filter', 'String', CRM_Core_DAO::$_nullObject);
-    $src = CRM_Utils_Request::retrieve('src', 'Integer', CRM_Core_DAO::$_nullObject);
-    $dst = CRM_Utils_Request::retrieve('dst', 'Integer', CRM_Core_DAO::$_nullObject);
-    $dir = CRM_Utils_Request::retrieve('dir', 'String', CRM_Core_DAO::$_nullObject);
+    $daoName = CRM_Utils_Request::retrieve('dao', 'String');
+    $id = CRM_Utils_Request::retrieve('id', 'Integer');
+    $idName = CRM_Utils_Request::retrieve('idName', 'String');
+    $url = CRM_Utils_Request::retrieve('url', 'String');
+    $filter = CRM_Utils_Request::retrieve('filter', 'String');
+    $src = CRM_Utils_Request::retrieve('src', 'Integer');
+    $dst = CRM_Utils_Request::retrieve('dst', 'Integer');
+    $dir = CRM_Utils_Request::retrieve('dir', 'String');
     $object = new $daoName();
     $srcWeight = CRM_Core_DAO::getFieldValue($daoName, $src, 'weight', $idName);
     $dstWeight = CRM_Core_DAO::getFieldValue($daoName, $dst, 'weight', $idName);

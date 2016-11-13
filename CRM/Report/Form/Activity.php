@@ -60,7 +60,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
     // Lets hide it for now.
     $this->_exposeContactID = FALSE;
     // if navigated from count link of activity summary reports.
-    $this->_resetDateFilter = CRM_Utils_Request::retrieve('resetDateFilter', 'Boolean', CRM_Core_DAO::$_nullObject);
+    $this->_resetDateFilter = CRM_Utils_Request::retrieve('resetDateFilter', 'Boolean');
 
     $config = CRM_Core_Config::singleton();
     $campaignEnabled = in_array("CiviCampaign", $config->enableComponents);
