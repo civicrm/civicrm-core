@@ -94,7 +94,7 @@ class CRM_Financial_Page_AJAX {
 
     if ($_GET['_value'] != 'select') {
       $financialAccountType = CRM_Financial_BAO_FinancialAccount::getfinancialAccountRelations(TRUE);
-      $financialAccountId = CRM_Utils_Request::retrieve('_value', 'Positive', CRM_Core_DAO::$_nullObject);
+      $financialAccountId = CRM_Utils_Request::retrieve('_value', 'Positive');
       $financialAccountTypeId = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialAccount', $financialAccountId, 'financial_account_type_id');
     }
     $params['orderColumn'] = 'label';
@@ -145,7 +145,7 @@ class CRM_Financial_Page_AJAX {
     ) {
       CRM_Utils_System::civiExit();
     }
-    $productId = CRM_Utils_Request::retrieve('_value', 'Positive', CRM_Core_DAO::$_nullObject);
+    $productId = CRM_Utils_Request::retrieve('_value', 'Positive');
     $elements = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Product', $productId, 'financial_type_id');
     CRM_Utils_JSON::output($elements);
   }

@@ -789,7 +789,7 @@ WHERE  id = %1";
    *
    * @param bool $applyLimit
    *
-   * @return array
+   * @return array|null
    *   array reference of all countries.
    */
   public static function country($id = FALSE, $applyLimit = TRUE) {
@@ -846,7 +846,7 @@ WHERE  id = %1";
         return self::$country[$id];
       }
       else {
-        return CRM_Core_DAO::$_nullObject;
+        return NULL;
       }
     }
     return self::$country;
@@ -1618,12 +1618,12 @@ ORDER BY name";
    *
    * @param int $stateID
    *
-   * @return int
+   * @return int|null
    *   the country id that the state belongs to
    */
   public static function countryIDForStateID($stateID) {
     if (empty($stateID)) {
-      return CRM_Core_DAO::$_nullObject;
+      return NULL;
     }
 
     $query = "

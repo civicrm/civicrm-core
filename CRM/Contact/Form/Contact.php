@@ -374,7 +374,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
         $this->assign('paramSubType', $paramSubType);
       }
 
-      if (CRM_Utils_Request::retrieve('type', 'String', CRM_Core_DAO::$_nullObject)) {
+      if (CRM_Utils_Request::retrieve('type', 'String')) {
         CRM_Contact_Form_Edit_CustomData::preProcess($this);
       }
       else {

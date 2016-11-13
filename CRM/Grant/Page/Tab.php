@@ -198,10 +198,7 @@ class CRM_Grant_Page_Tab extends CRM_Contact_Page_View {
     }
     $session->pushUserContext($url);
 
-    if (CRM_Utils_Request::retrieve('confirmed', 'Boolean',
-      CRM_Core_DAO::$_nullObject
-    )
-    ) {
+    if (CRM_Utils_Request::retrieve('confirmed', 'Boolean')) {
       CRM_Grant_BAO_Grant::del($this->_id);
       CRM_Utils_System::redirect($url);
     }

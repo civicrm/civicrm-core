@@ -762,7 +762,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
     $this->_done = TRUE;
 
     //for prev/next pagination
-    $crmPID = CRM_Utils_Request::retrieve('crmPID', 'Integer', CRM_Core_DAO::$_nullObject);
+    $crmPID = CRM_Utils_Request::retrieve('crmPID', 'Integer');
 
     if (array_key_exists($this->_searchButtonName, $_POST) ||
       ($this->_force && !$crmPID)

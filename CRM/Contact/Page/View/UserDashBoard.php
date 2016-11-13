@@ -243,9 +243,7 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
     CRM_Utils_Hook::links('view.contact.userDashBoard',
       'Contact',
       CRM_Core_DAO::$_nullObject,
-      self::$_links,
-      CRM_Core_DAO::$_nullObject,
-      CRM_Core_DAO::$_nullObject
+      self::$_links
     );
     return self::$_links;
   }

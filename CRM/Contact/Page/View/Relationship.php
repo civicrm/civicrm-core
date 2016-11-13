@@ -157,10 +157,7 @@ class CRM_Contact_Page_View_Relationship extends CRM_Core_Page {
 
     $session->pushUserContext($url);
 
-    if (CRM_Utils_Request::retrieve('confirmed', 'Boolean',
-      CRM_Core_DAO::$_nullObject
-    )
-    ) {
+    if (CRM_Utils_Request::retrieve('confirmed', 'Boolean')) {
       if ($this->_caseId) {
         //create an activity for case role removal.CRM-4480
         CRM_Case_BAO_Case::createCaseRoleActivity($this->_caseId, $this->_id);
