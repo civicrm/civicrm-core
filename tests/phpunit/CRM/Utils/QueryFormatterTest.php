@@ -74,7 +74,7 @@ class CRM_Utils_QueryFormatterTest extends CiviUnitTestCase {
     $cases[] = array('someone@example.com', 'fts', 'wildwords', '*someone* *example*', $allEmailRows);
     $cases[] = array('someone@example.com', 'fts', 'wildwords-suffix', 'someone* example*', $allEmailRows);
 
-    $cases[] = array('someone@example.com', 'ftsbool', 'simple', '+someone +example', $allEmailRows);
+    $cases[] = array('someone@example.com', 'ftsbool', 'simple', '+"someone" +"example"', $allEmailRows);
     $cases[] = array('someone@example.com', 'ftsbool', 'phrase', '+"someone@example.com"', $allEmailRows);
     $cases[] = array('someone@example.com', 'ftsbool', 'wildphrase', '+"*someone@example.com*"', $allEmailRows);
     $cases[] = array('someone@example.com', 'ftsbool', 'wildwords', '+*someone* +*example*', $allEmailRows);
@@ -92,7 +92,7 @@ class CRM_Utils_QueryFormatterTest extends CiviUnitTestCase {
     $cases[] = array('first second', 'fts', 'wildwords', '*first* *second*', array(3, 4, 5, 7));
     $cases[] = array('first second', 'fts', 'wildwords-suffix', 'first* second*', array(3, 4, 5, 7));
 
-    $cases[] = array('first second', 'ftsbool', 'simple', '+first +second', array(3, 4, 5));
+    $cases[] = array('first second', 'ftsbool', 'simple', '+"first" +"second"', array(3, 4, 5));
     $cases[] = array('first second', 'ftsbool', 'phrase', '+"first second"', array(3, 4, 5));
     $cases[] = array('first second', 'ftsbool', 'wildphrase', '+"*first second*"', array(3, 4, 5));
     $cases[] = array('first second', 'ftsbool', 'wildwords', '+*first* +*second*', array(3, 4, 5, 7));
@@ -103,6 +103,9 @@ class CRM_Utils_QueryFormatterTest extends CiviUnitTestCase {
     $cases[] = array('first second', 'solr', 'wildphrase', '"*first second*"', NULL);
     $cases[] = array('first second', 'solr', 'wildwords', '*first* *second*', NULL);
     $cases[] = array('first second', 'solr', 'wildwords-suffix', 'first* second*', NULL);
+
+    $cases[] = array('someone@', 'ftsbool', 'simple', '+"someone"', $allEmailRows);
+    $cases[] = array('@example.com', 'ftsbool', 'simple', '+"example.com"', $allEmailRows);
 
     // If user supplies wildcards, then ignore mode.
     foreach (array(
