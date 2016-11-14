@@ -85,7 +85,12 @@ class CRM_Contribute_BAO_Contribution_Utils {
     $paymentParams['contactID'] = $form->_params['contactID'] = $contactID;
 
     //fix for CRM-16317
-    $form->_params['receive_date'] = date('YmdHis');
+    if (empty($form->_params['receive_date'])) {
+      $form->_params['receive_date'] = date('YmdHis');
+    }
+    if (!empty($form->_params['start_date'])) {
+      $form->_params['start_date'] = date('YmdHis');
+    }
     $form->assign('receive_date',
       CRM_Utils_Date::mysqlToIso($form->_params['receive_date'])
     );
@@ -139,7 +144,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
         $paymentParams['source'] = $paymentParams['contribution_source'];
       }
 
-      if ($form->_values['is_recur'] && $contribution->contribution_recur_id) {
+      if (CRM_Utils_Array::value('is_recur', $form->_params) && $contribution->contribution_recur_id) {
         $paymentParams['contributionRecurID'] = $contribution->contribution_recur_id;
       }
       if (isset($paymentParams['contribution_source'])) {

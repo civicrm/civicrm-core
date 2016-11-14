@@ -148,13 +148,14 @@ class CRM_Pledge_BAO_PledgeTest extends CiviUnitTestCase {
     $this->assertEquals(date('m/d/Y', strtotime($date)), $paymentDate, "The two dates do not match");
 
     // Try with fixed date
+    $date = NULL;
     $params = array(
-      'pledge_start_date' => json_encode(array('contribution_date' => '2016-06-10')),
+      'pledge_start_date' => json_encode(array('calendar_date' => '06/10/2016')),
       'is_pledge_start_date_visible' => FALSE,
     );
 
     $date = CRM_Pledge_BAO_Pledge::getPledgeStartDate($date, $params);
-    $this->assertEquals($date, '20160610', "The two dates do not match");
+    $this->assertEquals(date('m/d/Y', strtotime($date)), '06/10/2016', "The two dates do not match");
   }
 
 }
