@@ -1150,14 +1150,25 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     );
     $result = $this->callAPISuccess('Membership', 'create', $memParams);
 
+    // Extend duration interval if join_date exceeds the rollover period.
+    $joinDate = date('Y-m-d');
+    $year = date('Y');
+    $startDate = date('Y-m-d', strtotime(date('Y-03-01')));
+    $membershipTypeDetails = CRM_Member_BAO_MembershipType::getMembershipTypeDetails($this->_membershipTypeID2);
+    $fixedPeriodRollover = CRM_Member_BAO_MembershipType::isDuringFixedAnnualRolloverPeriod($joinDate, $membershipTypeDetails, $year, $startDate);
+    $y = 1;
+    if ($fixedPeriodRollover) {
+      $y += 1;
+    }
+
     $expectedDates = array(
       'join_date' => date('Ymd'),
-      'start_date' => date('Ymd', strtotime(date('Y-03-01'))),
-      'end_date' => date('Ymd', strtotime(date('Y-03-01') . '+ 1 year - 1 day')),
+      'start_date' => str_replace('-', '', $startDate),
+      'end_date' => date('Ymd', strtotime(date('Y-03-01') . "+ {$y} year - 1 day")),
     );
     foreach ($result['values'] as $values) {
       foreach ($expectedDates as $date => $val) {
-        $this->assertEquals($val, $values[$date]);
+        $this->assertEquals($val, $values[$date], "Failed asserting {$date} values");
       }
     }
   }
