@@ -197,7 +197,7 @@ WHERE contact_a.id = %1 AND $permission
   public static function cache($userID, $type = CRM_Core_Permission::VIEW, $force = FALSE) {
     // FIXME: maybe find a better way of keeping track of this. @eileen pointed out
     //   that somebody might flush the cache away from under our feet,
-    //   but the altenative would be a SQL call every time this is called,
+    //   but the alternative would be a SQL call every time this is called,
     //   and a complete rebuild if the result was an empty set...
     static $_processed = array(
       CRM_Core_Permission::VIEW => array(),
@@ -305,7 +305,9 @@ AND ac.user_id IS NULL
   }
 
   /**
-   * Generate acl subquery that can be placed in the WHERE clause of a query or the ON clause of a JOIN
+   * Generate acl subquery that can be placed in the WHERE clause of a query or the ON clause of a JOIN.
+   *
+   * This is specifically for VIEW operations.
    *
    * @return string|null
    */
