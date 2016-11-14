@@ -35,11 +35,11 @@
  * Class CRM_Contact_Form_Merge.
  */
 class CRM_Contact_Form_Merge extends CRM_Core_Form {
-  // the id of the contact that tere's a duplicate for; this one will
-  // possibly inherit some of $_oid's properties and remain in the system
+  // The id of the contact that there's a duplicate for; this one will
+  // possibly inherit some of $_oid's properties and remain in the system.
   var $_cid = NULL;
 
-  // the id of the other contact - the duplicate one that will get deleted
+  // The id of the other contact - the duplicate one that will get deleted.
   var $_oid = NULL;
 
   var $_contactType = NULL;
@@ -51,10 +51,16 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
    */
   var $limit;
 
-  // FIXME: QuickForm can't create advcheckboxes with value set to 0 or '0' :(
-  // see HTML_QuickForm_advcheckbox::setValues() - but patching that doesn't
-  // help, as QF doesn't put the 0-value elements in exportValues() anyway...
-  // to side-step this, we use the below UUID as a (re)placeholder
+  /**
+   * String for quickform bug handling.
+   *
+   * FIXME: QuickForm can't create advcheckboxes with value set to 0 or '0' :(
+   * see HTML_QuickForm_advcheckbox::setValues() - but patching that doesn't
+   * help, as QF doesn't put the 0-value elements in exportValues() anyway...
+   * to side-step this, we use the below UUID as a (re)placeholder
+   *
+   * @var string
+   */
   var $_qfZeroBug = 'e8cddb72-a257-11dc-b9cc-0016d3330ee9';
 
   public function preProcess() {
