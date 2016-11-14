@@ -454,7 +454,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    * @param string $actualStartDate
    * @return bool is this in the window where the membership gets an extra part-period added
    */
-  protected static function isDuringFixedAnnualRolloverPeriod($startDate, $membershipTypeDetails, $year, $actualStartDate) {
+  public static function isDuringFixedAnnualRolloverPeriod($startDate, $membershipTypeDetails, $year, $actualStartDate) {
 
     $rolloverMonth = substr($membershipTypeDetails['fixed_period_rollover_day'], 0,
       strlen($membershipTypeDetails['fixed_period_rollover_day']) - 2
