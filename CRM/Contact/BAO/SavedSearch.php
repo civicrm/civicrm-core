@@ -117,7 +117,17 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
           $entityName = strstr($id, '_date', TRUE);
           if (!empty($result['relative_dates']) && array_key_exists($entityName, $result['relative_dates'])) {
             $result[$id] = NULL;
-            $result["{$entityName}_date_relative"] = $result['relative_dates'][$entityName];
+
+            /*
+             * CRM-19625: we need to “push” the `_date_relative` entry
+             * before the `_date_low` and `_date_high` so the
+             * `CRM_Contact_BAO_Query::fixDateValues()` could fill
+             * them correctly.
+             *
+             * Here the `_date_relative` is push at the very top of
+             * the `$result` array.
+             */
+            $result = array("{$entityName}_date_relative" => $result['relative_dates'][$entityName]) + $result;
           }
           else {
             $result[$id] = $value;
