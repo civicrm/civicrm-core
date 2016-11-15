@@ -376,7 +376,8 @@ ul#civicrm-menu li#crm-qsearch {
   font-weight: normal;
 }
 
-#crm-container .crm-container .form-layout td.label {
+#crm-container .form-layout td.label,
+.crm-container .form-layout td.label {
   width: inherit;
 }
 
