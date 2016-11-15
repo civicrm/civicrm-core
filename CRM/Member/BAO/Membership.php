@@ -1094,12 +1094,9 @@ AND civicrm_membership.is_test = %2";
   /**
    * Function check the status of the membership before adding membership for a contact.
    *
-   * @param int $contactId
-   *   Contact id.
-   *
    * @return int
    */
-  public static function statusAvailabilty($contactId) {
+  public static function statusAvailabilty() {
     $membership = new CRM_Member_DAO_MembershipStatus();
     $membership->whereAdd('is_active=1');
     return $membership->count();
