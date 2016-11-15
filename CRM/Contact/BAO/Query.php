@@ -1620,6 +1620,13 @@ class CRM_Contact_BAO_Query {
         }
 
         if (array_key_exists($fromRange, $formValues) && array_key_exists($toRange, $formValues)) {
+          // relative dates are not processed correctly as lower date value were ignored,
+          // to ensure both high and low date value got added IF there is relative date,
+          // we need to reset $formValues by unset and then adding again via CRM_Contact_BAO_Query::fixDateValues(...)
+          if (!empty($formValues[$id])) {
+            unset($formValues[$fromRange]);
+            unset($formValues[$toRange]);
+          }
           CRM_Contact_BAO_Query::fixDateValues($formValues[$id], $formValues[$fromRange], $formValues[$toRange]);
           continue;
         }
