@@ -96,6 +96,11 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
     if (!CRM_Core_Permission::checkActionPermission('CiviMember', $this->_action)) {
       CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
     }
+    if (!CRM_Member_BAO_Membership::statusAvailabilty()) {
+      // all possible statuses are disabled - redirect back to contact form
+      CRM_Core_Error::statusBounce(ts('There are no configured membership statuses. You cannot add this membership until your membership statuses are correctly configured'));
+    }
+
     parent::preProcess();
     $params = array();
     $params['context'] = CRM_Utils_Request::retrieve('context', 'String', $this, FALSE, 'membership');
