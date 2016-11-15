@@ -257,6 +257,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'trxn_id' => 'create_first_success',
       'fee_amount' => .85,
     ));
+    $processor = $dummyPP->getPaymentProcessor();
     $this->callAPISuccess('ContributionPage', 'create', array(
       'id' => $this->_ids['contribution_page'],
       'payment_processor' => array($paymentProcessor2ID, $this->_ids['payment_processor']),
@@ -286,6 +287,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->_checkFinancialRecords(array(
       'id' => $contribution['id'],
       'total_amount' => $contribution['total_amount'],
+      'payment_instrument_id' => $processor['payment_instrument_id'],
     ), 'online');
   }
 
@@ -599,6 +601,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->setUpMembershipContributionPage();
     $dummyPP = Civi\Payment\System::singleton()->getByProcessor($this->_paymentProcessor);
     $dummyPP->setDoDirectPaymentResult(array('payment_status_id' => 1, 'trxn_id' => 'create_first_success'));
+    $processor = $dummyPP->getPaymentProcessor();
 
     $submitParams = array(
       'price_' . $this->_ids['price_field'][0] => reset($this->_ids['price_field_value']),
@@ -624,6 +627,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'contribution_page_id' => $this->_ids['contribution_page'],
       'contribution_status_id' => 1,
     ));
+    $this->assertEquals($processor['payment_instrument_id'], $contribution['payment_instrument_id']);
 
     $this->assertEquals('create_first_success', $contribution['trxn_id']);
     $membershipPayment = $this->callAPISuccess('membership_payment', 'getsingle', array());
@@ -646,6 +650,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $renewedMembership = $this->callAPISuccessGetSingle('membership', array('id' => $membershipPayment['membership_id']));
     $this->assertEquals(date('Y-m-d', strtotime('+ 1 year', strtotime($membership['end_date']))), $renewedMembership['end_date']);
     $recurringContribution = $this->callAPISuccess('contribution_recur', 'getsingle', array('id' => $contribution['contribution_recur_id']));
+    $this->assertEquals($processor['payment_instrument_id'], $recurringContribution['payment_instrument_id']);
     $this->assertEquals(5, $recurringContribution['contribution_status_id']);
   }
 
