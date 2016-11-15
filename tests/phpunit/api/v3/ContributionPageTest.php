@@ -632,8 +632,8 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->assertEquals($membership['contact_id'], $contribution['contact_id']);
     $this->assertEquals(1, $membership['status_id']);
     $this->callAPISuccess('contribution_recur', 'getsingle', array('id' => $contribution['contribution_recur_id']));
-    //@todo - check with Joe about these not existing
-    //$this->callAPISuccess('line_item', 'getsingle', array('contribution_id' => $contribution['id'], 'entity_id' => $membership['id']));
+
+    $this->callAPISuccess('line_item', 'getsingle', array('contribution_id' => $contribution['id'], 'entity_id' => $membership['id']));
     //renew it with processor setting completed - should extend membership
     $submitParams['contact_id'] = $contribution['contact_id'];
     $dummyPP->setDoDirectPaymentResult(array('payment_status_id' => 1, 'trxn_id' => 'create_second_success'));
@@ -710,8 +710,13 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->setUpMembershipContributionPage();
     $dummyPP = Civi\Payment\System::singleton()->getByProcessor($this->_paymentProcessor);
     $dummyPP->setDoDirectPaymentResult(array('payment_status_id' => 2));
-    // Add a contribution so the id will not be 1 & will differ from membership id.
+    $this->membershipTypeCreate(array('name' => 'Student'));
+
+    // Add a contribution & a couple of memberships so the id will not be 1 & will differ from membership id.
+    // This saves us from 'accidental success'.
     $this->contributionCreate(array('contact_id' => $this->contactIds[0]));
+    $this->contactMembershipCreate(array('contact_id' => $this->contactIds[0]));
+    $this->contactMembershipCreate(array('contact_id' => $this->contactIds[0], 'membership_type_id' => 'Student'));
 
     $submitParams = array(
       'price_' . $this->_ids['price_field'][0] => reset($this->_ids['price_field_value']),
@@ -737,6 +742,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'contribution_page_id' => $this->_ids['contribution_page'],
       'contribution_status_id' => 2,
     ));
+
     $membershipPayment = $this->callAPISuccess('membership_payment', 'getsingle', array());
     $this->assertEquals($membershipPayment['contribution_id'], $contribution['id']);
     $membership = $this->callAPISuccessGetSingle('membership', array('id' => $membershipPayment['membership_id']));
