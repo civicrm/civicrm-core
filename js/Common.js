@@ -752,7 +752,7 @@ if (!CRM.vars) CRM.vars = {};
       var defaults = {
         "processing": true,
         "serverSide": true,
-        "aaSorting": [],
+        "order": [],
         "dom": '<"crm-datatable-pager-top"lfp>rt<"crm-datatable-pager-bottom"ip>',
         "pageLength": 25,
         "pagingType": "full_numbers",
