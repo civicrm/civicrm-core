@@ -1044,6 +1044,21 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    * @param $Entity
    * @throws \PHPUnit_Framework_IncompleteTestError
    */
+  public function testInvalidSort_get($Entity) {
+    $invalidEntitys = array('ActivityType', 'Setting', 'System');
+    if (in_array($Entity, $invalidEntitys)) {
+      $this->markTestSkipped('It seems OK for ' . $Entity . ' to skip here as it silently sips invalid params');
+    }
+    $result = $this->callAPIFailure($Entity, 'get', array('options' => array('sort' => 'sleep(1)')));
+  }
+
+  /**
+   * @dataProvider entities_create
+   *
+   * Check that create doesn't work with an invalid
+   * @param $Entity
+   * @throws \PHPUnit_Framework_IncompleteTestError
+   */
   public function testInvalidID_create($Entity) {
     // turn test off for noew
     $this->markTestIncomplete("Entity [ $Entity ] cannot be mocked - no known DAO");
