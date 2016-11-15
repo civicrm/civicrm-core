@@ -1861,7 +1861,13 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     unset($lineItem1['values'][0]['id'], $lineItem1['values'][0]['entity_id']);
     unset($lineItem2['values'][0]['id'], $lineItem2['values'][0]['entity_id']);
     $this->assertEquals($lineItem1['values'][0], $lineItem2['values'][0]);
-    $this->_checkFinancialRecords(array('id' => $originalContribution['id'] + 1), 'online');
+    $this->_checkFinancialRecords(array(
+      'id' => $originalContribution['id'] + 1,
+      'payment_instrument_id' => $this->callAPISuccessGetValue('PaymentProcessor', array(
+        'id' => $originalContribution['payment_processor_id'],
+        'return' => 'payment_instrument_id',
+      )),
+    ), 'online');
     $this->quickCleanUpFinancialEntities();
   }
 
@@ -3050,7 +3056,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
           array('contribution_recur_id' => $contributionRecur['id']))
       );
     }
-
+    $originalContribution['payment_processor_id'] = $paymentProcessorID;
     return $originalContribution;
   }
 
