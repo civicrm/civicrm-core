@@ -668,6 +668,7 @@ function _civicrm_api3_get_query_object($params, $mode, $entity) {
   $sql = "$select $from $where $having";
 
   if (!empty($sort)) {
+    $sort = CRM_Utils_Type::escape($sort, 'MysqlOrderBy');
     $sql .= " ORDER BY $sort ";
   }
   if (!empty($rowCount)) {
@@ -880,11 +881,24 @@ function _civicrm_api3_get_options_from_params(&$params, $queryObject = FALSE, $
 
   $options = array(
     'offset' => CRM_Utils_Rule::integer($offset) ? $offset : NULL,
-    'sort' => CRM_Utils_Rule::string($sort) ? $sort : NULL,
     'limit' => CRM_Utils_Rule::integer($limit) ? $limit : NULL,
     'is_count' => $is_count,
     'return' => !empty($returnProperties) ? $returnProperties : array(),
   );
+
+  $finalSort = array();
+  $options['sort'] = NULL;
+  if (!empty($sort)) {
+    foreach ((array) $sort as $s) {
+      if (CRM_Utils_Rule::mysqlOrderBy($s)) {
+        $finalSort[] = $s;
+      }
+      else {
+        throw new API_Exception("Unknown field specified for sort. Cannot order by '$s'");
+      }
+    }
+    $options['sort'] = implode(', ', $finalSort);
+  }
 
   if ($options['sort'] && stristr($options['sort'], 'SELECT')) {
     throw new API_Exception('invalid string in sort options');
@@ -939,6 +953,7 @@ function _civicrm_api3_apply_options_to_dao(&$params, &$dao, $entity) {
       $dao->limit((int) $options['offset'], (int) $options['limit']);
     }
     if (!empty($options['sort'])) {
+      $options['sort'] = CRM_Utils_Type::escape($options['sort'], 'MysqlOrderBy');
       $dao->orderBy($options['sort']);
     }
   }
