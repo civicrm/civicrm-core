@@ -375,3 +375,14 @@ ul#civicrm-menu li#crm-qsearch {
 .crm-container .disabled {
   font-weight: normal;
 }
+
+#crm-container .form-layout td.label,
+.crm-container .form-layout td.label {
+  width: inherit;
+}
+
+#crm-container .label {
+  background-color: inherit;
+  width: inherit;
+  display: block;
+}
