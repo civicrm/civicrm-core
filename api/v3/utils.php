@@ -886,9 +886,11 @@ function _civicrm_api3_get_options_from_params(&$params, $queryObject = FALSE, $
     'is_count' => $is_count,
     'return' => !empty($returnProperties) ? $returnProperties : array(),
   );
+
   $finalSort = array();
-  if (is_array($sort)) {
-    foreach ($sort as $s) {
+  $options['sort'] = NULL;
+  if (!empty($sort)) {
+    foreach ((array) $sort as $s) {
       if (CRM_Utils_Rule::mysqlOrderBy($s)) {
         $finalSort[] = $s;
       }
@@ -896,17 +898,8 @@ function _civicrm_api3_get_options_from_params(&$params, $queryObject = FALSE, $
         throw new API_Exception("Unknown field specified for sort. Cannot order by '$s'");
       }
     }
+    $options['sort'] = implode(', ', $finalSort);
   }
-  elseif ($sort) {
-    if (CRM_Utils_Rule::mysqlOrderBy($sort)) {
-      $finalSort[] = $sort;
-    }
-    else {
-      throw new API_Exception("Unknown field specified for sort. Cannot order by '$sort'");
-    }
-  }
-
-  $options['sort'] = !empty($finalSort) ? implode(', ', $finalSort) : NULL;
 
   if ($options['sort'] && stristr($options['sort'], 'SELECT')) {
     throw new API_Exception('invalid string in sort options');
