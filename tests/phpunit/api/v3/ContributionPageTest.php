@@ -710,6 +710,8 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->setUpMembershipContributionPage();
     $dummyPP = Civi\Payment\System::singleton()->getByProcessor($this->_paymentProcessor);
     $dummyPP->setDoDirectPaymentResult(array('payment_status_id' => 2));
+    // Add a contribution so the id will not be 1 & will differ from membership id.
+    $this->contributionCreate(array('contact_id' => $this->contactIds[0]));
 
     $submitParams = array(
       'price_' . $this->_ids['price_field'][0] => reset($this->_ids['price_field_value']),
@@ -740,13 +742,20 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $membership = $this->callAPISuccessGetSingle('membership', array('id' => $membershipPayment['membership_id']));
     $this->assertEquals($membership['contact_id'], $contribution['contact_id']);
     $this->assertEquals(5, $membership['status_id']);
-    //@todo - check with Joe about these not existing
-    //$this->callAPISuccess('line_item', 'getsingle', array('contribution_id' => $contribution['id'], 'entity_id' => $membership['id']));
+
+    $line = $this->callAPISuccess('line_item', 'getsingle', array('contribution_id' => $contribution['id']));
+    $this->assertEquals('civicrm_membership', $line['entity_table']);
+    $this->assertEquals($membership['id'], $line['entity_id']);
+
     $this->callAPISuccess('contribution', 'completetransaction', array(
       'id' => $contribution['id'],
       'trxn_id' => 'ipn_called',
       'payment_processor_id' => $this->_paymentProcessor['id'],
     ));
+    $line = $this->callAPISuccess('line_item', 'getsingle', array('contribution_id' => $contribution['id']));
+    $this->assertEquals('civicrm_membership', $line['entity_table']);
+    $this->assertEquals($membership['id'], $line['entity_id']);
+
     $membership = $this->callAPISuccessGetSingle('membership', array('id' => $membershipPayment['membership_id']));
     //renew it with processor setting completed - should extend membership
     $submitParams = array_merge($submitParams, array(
@@ -756,6 +765,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
         'frequency_unit' => 'month',
       )
     );
+
     $dummyPP->setDoDirectPaymentResult(array('payment_status_id' => 2));
     $this->callAPISuccess('contribution_page', 'submit', $submitParams);
     $newContribution = $this->callAPISuccess('contribution', 'getsingle', array(
@@ -766,6 +776,9 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
         'contribution_status_id' => 2,
       )
     );
+    $line = $this->callAPISuccess('line_item', 'getsingle', array('contribution_id' => $newContribution['id']));
+    $this->assertEquals('civicrm_membership', $line['entity_table']);
+    $this->assertEquals($membership['id'], $line['entity_id']);
 
     $renewedMembership = $this->callAPISuccessGetSingle('membership', array('id' => $membershipPayment['membership_id']));
     //no renewal as the date hasn't changed
