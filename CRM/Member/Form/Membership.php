@@ -404,7 +404,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
   public function buildQuickForm() {
 
     $this->assign('taxRates', json_encode(CRM_Core_PseudoConstant::getTaxRates()));
-
     $this->assign('currency', CRM_Core_Config::singleton()->defaultCurrencySymbol);
     $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
     $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);

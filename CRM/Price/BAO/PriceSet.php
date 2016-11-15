@@ -124,6 +124,18 @@ class CRM_Price_BAO_PriceSet extends CRM_Price_DAO_PriceSet {
   }
 
   /**
+   * Get the default price set id for an entity.
+   *
+   * @param string $entity
+   * @return mixed
+   */
+  public static function getDefaultPriceSetID($entity = 'contribution') {
+    $priceSet = self::getDefaultPriceSet($entity);
+    $priceSet = reset($priceSet);
+    return $priceSet['setID'];
+  }
+
+  /**
    * Calculate the default price set id
    * assigned to the contribution/membership etc
    *

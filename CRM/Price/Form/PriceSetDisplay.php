@@ -40,6 +40,16 @@ class CRM_Price_Form_PriceSetDisplay extends CRM_Core_Form {
    * PreProcess function.
    */
   public function preProcess() {
+    $this->context = CRM_Utils_Request::retrieve('context', 'String', $this, FALSE, 'Standalone');
+    $this->extends = CRM_Utils_Request::retrieve('extends', 'String', $this);
+    $this->priceSetId = CRM_Utils_Request::retrieve('price_set_id', 'String', $this);
+    $defaultPriceSetID = CRM_Price_BAO_PriceSet::getDefaultPriceSetID(strtolower($this->extends));
+    if (empty($this->priceSetId)) {
+      $this->priceSetId = $defaultPriceSetID;
+    }
+    $this->assign('defaultPriceSetID', $defaultPriceSetID);
+    $this->assign('context', $this->context);
+    $this->assign('extends', $this->extends);
     $this->assign('suppressForm', TRUE);
     $this->controller->_generateQFKey = FALSE;
   }
@@ -58,6 +68,8 @@ class CRM_Price_Form_PriceSetDisplay extends CRM_Core_Form {
    * Build quick form.
    */
   public function buildQuickForm() {
+    $this->set('priceSetId', $this->priceSetId);
+    CRM_Price_BAO_PriceSet::buildPriceSet($this);
   }
 
 }
