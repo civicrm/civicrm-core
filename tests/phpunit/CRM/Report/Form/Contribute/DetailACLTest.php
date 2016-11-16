@@ -82,15 +82,6 @@ class CRM_Report_Form_Contribute_DetailACLTest extends CiviReportTestCase {
    * @throws \Exception
    */
   public function testContributionReportOutput($reportClass, $inputParams, $dataSet, $expectedOutputCsvFile) {
-    /* $this->setACL(); */
-    /* $this->setPermissions(array( */
-    /*   'view contributions of type Donation', */
-    /*   'access CiviReport', */
-    /*   'access Report Criteria', */
-    /*   'administer Reports', */
-    /*   'view all contacts', */
-    /*   'view debug output' */
-    /* )); */
     $config = CRM_Core_Config::singleton();
     CRM_Utils_File::sourceSQLFile($config->dsn, dirname(__FILE__) . "/{$dataSet}");
 
