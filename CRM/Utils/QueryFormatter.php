@@ -295,7 +295,7 @@ class CRM_Utils_QueryFormatter {
         $csid = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionValue', 'CRM_Contact_Form_Search_Custom_FullText', 'value', 'name');
         $url = CRM_Utils_System::url("civicrm/contact/search/custom", "csid={$csid}&reset=1");
         $operators = implode("', '", $operators);
-        CRM_Core_Error::statusBounce("InnoDB Full-Text Search does not support the use of a string ending with any of these operators ('{$operators}' or a single '@') in boolean mode. These invalid queries return a syntax error.", $url);
+        CRM_Core_Error::statusBounce("Full-Text Search does not support the use of a search string ending with any of these operators ('{$operators}' or a single '@'). Please adjust your search term and try again.", $url);
       }
     }
 
