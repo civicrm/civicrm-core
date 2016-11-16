@@ -197,7 +197,15 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       'entity_table' => 'civicrm_membership',
       'contribution_id' => $contribution['id'],
     ), 1);
-    $this->_checkFinancialRecords(array('id' => $contribution['id'], 'total_amount' => 50, 'financial_account_id' => 2), 'online');
+    $this->_checkFinancialRecords(array(
+      'id' => $contribution['id'],
+      'total_amount' => 50,
+      'financial_account_id' => 2,
+      'payment_instrument_id' => $this->callAPISuccessGetValue('PaymentProcessor', array(
+        'id' => $this->_paymentProcessorID,
+        'return' => 'payment_instrument_id',
+      )),
+      ), 'online');
   }
 
   /**
@@ -264,16 +272,20 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
     $this->assertNotEmpty($contributionRecur['invoice_id']);
     $this->assertEquals(CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id',
       'Pending'), $contributionRecur['contribution_status_id']);
-    $this->assertEquals(CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id',
-      'Credit Card'), $contributionRecur['payment_instrument_id']);
+    $this->assertEquals($this->callAPISuccessGetValue('PaymentProcessor', array(
+      'id' => $this->_paymentProcessorID,
+      'return' => 'payment_instrument_id',
+    )), $contributionRecur['payment_instrument_id']);
 
     $contribution = $this->callAPISuccess('Contribution', 'getsingle', array(
       'contact_id' => $this->_individualId,
       'is_test' => TRUE,
     ));
 
-    $this->assertEquals(CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id',
-      'Credit Card'), $contribution['payment_instrument_id']);
+    $this->assertEquals($this->callAPISuccessGetValue('PaymentProcessor', array(
+      'id' => $this->_paymentProcessorID,
+      'return' => 'payment_instrument_id',
+    )), $contribution['payment_instrument_id']);
     $this->assertEquals($contributionRecur['id'], $contribution['contribution_recur_id']);
 
     $this->callAPISuccessGetCount('LineItem', array(
@@ -328,15 +340,17 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
     'In Progress'), $contributionRecur['contribution_status_id']);
     $this->assertNotEmpty($contributionRecur['next_sched_contribution_date']);
      */
-    $this->assertEquals(CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id',
-      'Credit Card'), $contributionRecur['payment_instrument_id']);
+    $paymentInstrumentID = $this->callAPISuccessGetValue('PaymentProcessor', array(
+      'id' => $this->_paymentProcessorID,
+      'return' => 'payment_instrument_id',
+    ));
+    $this->assertEquals($paymentInstrumentID, $contributionRecur['payment_instrument_id']);
 
     $contribution = $this->callAPISuccess('Contribution', 'getsingle', array(
       'contact_id' => $this->_individualId,
       'is_test' => TRUE,
     ));
-    $this->assertEquals(CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id',
-      'Credit Card'), $contribution['payment_instrument_id']);
+    $this->assertEquals($paymentInstrumentID, $contribution['payment_instrument_id']);
 
     $this->assertEquals('kettles boil water', $contribution['trxn_id']);
     $this->assertEquals(.29, $contribution['fee_amount']);

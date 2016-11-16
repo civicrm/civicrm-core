@@ -164,8 +164,11 @@ function civicrm_api3_generic_getfields($apiRequest, $unique = TRUE) {
       $metadata = array();
   }
 
-  // Normalize this for the sake of spec funcions
-  $apiRequest['params']['options']['get_options'] = $optionsToResolve;
+  // Hack for product api to pass tests.
+  if (!is_string($apiRequest['params']['options'])) {
+    // Normalize this for the sake of spec funcions
+    $apiRequest['params']['options']['get_options'] = $optionsToResolve;
+  }
 
   // find any supplemental information
   $hypApiRequest = array('entity' => $apiRequest['entity'], 'action' => $action, 'version' => $apiRequest['version']);

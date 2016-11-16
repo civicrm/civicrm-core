@@ -844,7 +844,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'total_amount' => 100.00,
       'financial_type_id' => 1,
       'contribution_page_id' => $contributionPage['id'],
-      'payment_processor' => 1,
+      'payment_processor' => $this->paymentProcessorID,
       'trxn_id' => 12345,
       'invoice_id' => 67890,
       'source' => 'SSF',
@@ -860,6 +860,10 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals($contribution['values'][$contribution['id']]['invoice_id'], 67890);
     $this->assertEquals($contribution['values'][$contribution['id']]['source'], 'SSF');
     $this->assertEquals($contribution['values'][$contribution['id']]['contribution_status_id'], 1);
+    $contribution['payment_instrument_id'] = $this->callAPISuccessGetValue('PaymentProcessor', array(
+      'id' => $this->paymentProcessorID,
+      'return' => 'payment_instrument_id',
+    ));
     $this->_checkFinancialRecords($contribution, 'online');
   }
 
