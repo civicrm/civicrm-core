@@ -64,8 +64,7 @@ class CRM_Report_Form_Contribute_DetailACLTest extends CiviReportTestCase {
             'total_amount',
             'financial_type_id',
           ),
-          'filters' => array(
-          ),
+          'filters' => array(),
         ),
         'fixtures/dataset-acl-ascii.sql',
         'fixtures/DetailContributionNoACLTest-ascii.csv',
@@ -107,8 +106,7 @@ class CRM_Report_Form_Contribute_DetailACLTest extends CiviReportTestCase {
             'total_amount',
             'financial_type_id',
           ),
-          'filters' => array(
-          ),
+          'filters' => array(),
         ),
         'fixtures/dataset-acl-ascii.sql',
         'fixtures/DetailContributionACLTest-ascii.csv',
@@ -132,7 +130,6 @@ class CRM_Report_Form_Contribute_DetailACLTest extends CiviReportTestCase {
       'access Report Criteria',
       'administer Reports',
       'view all contacts',
-      'view debug output'
     ));
     $config = CRM_Core_Config::singleton();
     CRM_Utils_File::sourceSQLFile($config->dsn, dirname(__FILE__) . "/{$dataSet}");
