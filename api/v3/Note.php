@@ -112,7 +112,7 @@ function _civicrm_api3_note_get_spec(&$params) {
  * @return array
  *   Nested associative array beginning with direct children of given note.
  */
-function &civicrm_api3_note_tree_get($params) {
+function civicrm_api3_note_tree_get($params) {
   civicrm_api3_verify_mandatory($params, NULL, array('id'));
 
   if (!is_numeric($params['id'])) {
