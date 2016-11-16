@@ -1488,7 +1488,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       );
       $params['source'] = $formValues['source'] ? $formValues['source'] : $params['contribution_source'];
       $params['trxn_id'] = CRM_Utils_Array::value('trxn_id', $result);
-      $params['payment_instrument_id'] = 1;
       $params['is_test'] = ($this->_mode == 'live') ? 0 : 1;
       if (!empty($formValues['send_receipt'])) {
         $params['receipt_date'] = $now;
