@@ -228,10 +228,11 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     catch (Civi\Payment\Exception\PaymentProcessorException $e) {
       $error = TRUE;
     }
+
     $this->assertTrue($error);
     $this->callAPISuccessGetCount('Contribution', array(
       'contact_id' => $this->_individualId,
-      'contribution_status_id' => 'Pending',
+      'contribution_status_id' => $error ? 'Pending' : 'Completed',
       'payment_instrument_id' => $this->callAPISuccessGetValue('PaymentProcessor', array(
         'return' => 'payment_instrument_id',
         'id' => $paymentProcessorID,
