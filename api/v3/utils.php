@@ -73,12 +73,6 @@ function civicrm_api3_verify_one_mandatory($params, $daoName = NULL, $keyoptions
  */
 function civicrm_api3_verify_mandatory($params, $daoName = NULL, $keys = array(), $verifyDAO = TRUE) {
   $unmatched = array();
-  if ($daoName != NULL && $verifyDAO && empty($params['id'])) {
-    $unmatched = _civicrm_api3_check_required_fields($params, $daoName, TRUE);
-    if (!is_array($unmatched)) {
-      $unmatched = array();
-    }
-  }
 
   if (!empty($params['id'])) {
     $keys = array('version');
@@ -476,58 +470,6 @@ function _civicrm_api3_field_names($fields) {
       $result[] = $value['name'];
     }
   }
-  return $result;
-}
-
-/**
- * Returns an array with database information for the custom fields of an
- * entity.
- *
- * Something similar might already exist in CiviCRM. But I was not
- * able to find it.
- *
- * @param string $entity
- *
- * @return array
- *   an array that maps the custom field ID's to table name and
- *   column name. E.g.:
- *   {
- *     '1' => array {
- *       'table_name' => 'table_name_1',
- *       'column_name' => 'column_name_1',
- *       'data_type' => 'data_type_1',
- *     },
- *   }
- */
-function _civicrm_api3_custom_fields_for_entity($entity) {
-  $result = array();
-
-  $query = "
-SELECT f.id, f.label, f.data_type,
-       f.html_type, f.is_search_range,
-       f.option_group_id, f.custom_group_id,
-       f.column_name, g.table_name,
-       f.date_format,f.time_format
-  FROM civicrm_custom_field f
-  JOIN civicrm_custom_group g ON f.custom_group_id = g.id
- WHERE g.is_active = 1
-   AND f.is_active = 1
-   AND g.extends = %1";
-
-  $params = array(
-    '1' => array($entity, 'String'),
-  );
-
-  $dao = CRM_Core_DAO::executeQuery($query, $params);
-  while ($dao->fetch()) {
-    $result[$dao->id] = array(
-      'table_name' => $dao->table_name,
-      'column_name' => $dao->column_name,
-      'data_type' => $dao->data_type,
-    );
-  }
-  $dao->free();
-
   return $result;
 }
 
@@ -1248,73 +1190,6 @@ function formatCheckBoxField(&$checkboxFieldValue, $customFieldLabel, $entity) {
   if ($formatValue) {
     $checkboxFieldValue = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, $possibleValues) . CRM_Core_DAO::VALUE_SEPARATOR;
   }
-}
-
-/**
- * This function ensures that we have the right input parameters.
- *
- * @deprecated
- *
- * This function is only called when $dao is passed into verify_mandatory.
- * The practice of passing $dao into verify_mandatory turned out to be
- * unsatisfactory as the required fields @ the dao level is so different to the abstract
- * api level. Hence the intention is to remove this function
- * & the associated param from verify_mandatory
- *
- * @param array $params
- *   Associative array of property name/value.
- *   pairs to insert in new history.
- * @param string $daoName
- * @param bool $return
- *
- * @daoName string DAO to check params against
- *
- * @return bool
- *   Should the missing fields be returned as an array (core error created as default)
- *   true if all fields present, depending on $result a core error is created of an array of missing fields is returned
- */
-function _civicrm_api3_check_required_fields($params, $daoName, $return = FALSE) {
-  //@deprecated - see notes
-  if (isset($params['extends'])) {
-    if (($params['extends'] == 'Activity' ||
-        $params['extends'] == 'Phonecall' ||
-        $params['extends'] == 'Meeting' ||
-        $params['extends'] == 'Group' ||
-        $params['extends'] == 'Contribution'
-      ) &&
-      ($params['style'] == 'Tab')
-    ) {
-      return civicrm_api3_create_error(ts("Can not create Custom Group in Tab for " . $params['extends']));
-    }
-  }
-
-  $dao = new $daoName();
-  $fields = $dao->fields();
-
-  $missing = array();
-  foreach ($fields as $k => $v) {
-    if ($v['name'] == 'id') {
-      continue;
-    }
-
-    if (!empty($v['required'])) {
-      // 0 is a valid input for numbers, CRM-8122
-      if (!isset($params[$k]) || (empty($params[$k]) && !($params[$k] === 0))) {
-        $missing[] = $k;
-      }
-    }
-  }
-
-  if (!empty($missing)) {
-    if (!empty($return)) {
-      return $missing;
-    }
-    else {
-      return civicrm_api3_create_error(ts("Required fields " . implode(',', $missing) . " for $daoName are not present"));
-    }
-  }
-
-  return TRUE;
 }
 
 /**
