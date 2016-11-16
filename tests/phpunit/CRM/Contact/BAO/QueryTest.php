@@ -320,7 +320,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
    */
   public function testContactIDClause() {
     $params = array(
-      array("mark_x_93980", "=", 1, 0, 0),
+      array("mark_x_2", "=", 1, 0, 0),
       array("mark_x_foo@example.com", "=", 1, 0, 0),
     );
     $returnProperties = array(
@@ -340,7 +340,9 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
     catch (Exception $e) {
       $this->assertEquals("A fatal error was triggered: One of parameters  (value: foo@example.com) is not of the type Positive",
         $e->getMessage());
+      return $this->assertTrue(TRUE);
     }
+    return $this->fail('Test failed for some reason which is not good');
   }
 
 }
