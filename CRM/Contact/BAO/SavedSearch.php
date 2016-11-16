@@ -113,14 +113,9 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
           $value = CRM_Utils_Array::value(key($value), $value);
         }
         if (strpos($id, '_date_low') !== FALSE || strpos($id, '_date_high') !== FALSE) {
+          $result[$id] = date($dateFormat, strtotime($value));
           $entityName = strstr($id, '_date', TRUE);
-          if (!empty($result['relative_dates']) && array_key_exists($entityName, $result['relative_dates'])) {
-            $result["{$entityName}_date_relative"] = $result['relative_dates'][$entityName];
-          }
-          else {
-            $result[$id] = date($dateFormat, strtotime($value));
-            $result["{$entityName}_date_relative"] = 0;
-          }
+          $result["{$entityName}_date_relative"] = 0;
         }
         else {
           $result[$id] = $value;
@@ -391,26 +386,6 @@ LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_
     }
     else {
       parent::assignTestValues($fieldName, $fieldDef, $counter);
-    }
-  }
-
-  /**
-   * Store relative dates in separate array format
-   *
-   * @param array $queryParams
-   * @param array $formValues
-   */
-  public static function saveRelativeDates(&$queryParams, $formValues) {
-    $relativeDates = array('relative_dates' => array());
-    foreach ($formValues as $id => $value) {
-      if (preg_match('/_date_relative$/', $id) && !empty($value)) {
-        $entityName = strstr($id, '_date', TRUE);
-        $relativeDates['relative_dates'][$entityName] = $value;
-      }
-    }
-    // merge with original queryParams if relative date value(s) found
-    if (count($relativeDates['relative_dates'])) {
-      $queryParams = array_merge($queryParams, $relativeDates);
     }
   }
 

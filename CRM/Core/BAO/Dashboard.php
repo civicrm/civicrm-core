@@ -493,9 +493,6 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
   public static function deleteDashlet($dashletID) {
     $dashlet = new CRM_Core_DAO_Dashboard();
     $dashlet->id = $dashletID;
-    if (!$dashlet->find(TRUE)) {
-      return FALSE;
-    }
     $dashlet->delete();
     return TRUE;
   }

@@ -350,7 +350,7 @@ WHERE  contribution_id = {$id}
           }
         }
       }
-      CRM_Financial_Form_Payment::addCreditCardJs($id);
+      CRM_Financial_Form_Payment::addCreditCardJs();
     }
     $this->assign('recurringPaymentProcessorIds',
       empty($this->_recurPaymentProcessors) ? '' : implode(',', array_keys($this->_recurPaymentProcessors))

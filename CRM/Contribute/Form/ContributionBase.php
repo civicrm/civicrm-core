@@ -472,7 +472,14 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * Assign the minimal set of variables to the template.
    */
   public function assignToTemplate() {
-    $this->set('name', $this->assignBillingName($this->_params));
+    $name = CRM_Utils_Array::value('billing_first_name', $this->_params);
+    if (!empty($this->_params['billing_middle_name'])) {
+      $name .= " {$this->_params['billing_middle_name']}";
+    }
+    $name .= ' ' . CRM_Utils_Array::value('billing_last_name', $this->_params);
+    $name = trim($name);
+    $this->assign('billingName', $name);
+    $this->set('name', $name);
 
     $this->assign('paymentProcessor', $this->_paymentProcessor);
     $vars = array(
@@ -524,10 +531,22 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       }
     }
 
-    $this->assign('address', CRM_Utils_Address::getFormattedBillingAddressFieldsFromParameters(
-      $this->_params,
-      $this->_bltID
-    ));
+    // assign the address formatted up for display
+    $addressParts = array(
+      "street_address-{$this->_bltID}",
+      "city-{$this->_bltID}",
+      "postal_code-{$this->_bltID}",
+      "state_province-{$this->_bltID}",
+      "country-{$this->_bltID}",
+    );
+
+    $addressFields = array();
+    foreach ($addressParts as $part) {
+      list($n, $id) = explode('-', $part);
+      $addressFields[$n] = CRM_Utils_Array::value('billing_' . $part, $this->_params);
+    }
+
+    $this->assign('address', CRM_Utils_Address::format($addressFields));
 
     if (!empty($this->_params['onbehalf_profile_id']) && !empty($this->_params['onbehalf'])) {
       $this->assign('onBehalfName', $this->_params['organization_name']);
@@ -625,37 +644,19 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
           CRM_Core_Session::setStatus(ts('Some of the profile fields cannot be configured for this page.'), ts('Warning'), 'alert');
         }
 
-        //remove common fields only if profile is not configured for onbehalf/honor
-        if (!in_array($profileContactType, array('honor', 'onbehalf'))) {
-          $fields = array_diff_assoc($fields, $this->_fields);
-        }
+        $fields = array_diff_assoc($fields, $this->_fields);
 
         CRM_Core_BAO_Address::checkContactSharedAddressFields($fields, $contactID);
         $addCaptcha = FALSE;
-        // fetch file preview when not submitted yet, like in online contribution Confirm and ThankYou page
-        $viewOnlyFileValues = empty($profileContactType) ? array() : array($profileContactType => array());
         foreach ($fields as $key => $field) {
           if ($viewOnly &&
             isset($field['data_type']) &&
             $field['data_type'] == 'File' || ($viewOnly && $field['name'] == 'image_URL')
           ) {
-            //retrieve file value from submitted values on basis of $profileContactType
-            $fileValue = empty($profileContactType) ? CRM_Utils_Array::value($key, $this->_params) : CRM_Utils_Array::value(sprintf('%s[%s]', $profileContactType, $key), $this->_params);
-
-            if ($fileValue) {
-              $path = CRM_Utils_Array::value('name', $fileValue);
-              $fileType = CRM_Utils_Array::value('type', $fileValue);
-              $fileValue = CRM_Utils_File::getFileURL($path, $fileType);
-            }
-
-            // format custom file value fetched from submitted value
-            if ($profileContactType) {
-              $viewOnlyFileValues[$profileContactType][$key] = $fileValue;
-            }
-            else {
-              $viewOnlyFileValues[$key] = $fileValue;
-            }
+            // ignore file upload fields
+            continue;
           }
+
           if ($profileContactType) {
             //Since we are showing honoree name separately so we are removing it from honoree profile just for display
             if ($profileContactType == 'honor') {
@@ -704,13 +705,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
         }
 
         $this->assign($name, $fields);
-
-        if ($profileContactType && count($viewOnlyFileValues[$profileContactType])) {
-          $this->assign('viewOnlyPrefixFileValues', $viewOnlyFileValues);
-        }
-        elseif (count($viewOnlyFileValues)) {
-          $this->assign('viewOnlyFileValues', $viewOnlyFileValues);
-        }
 
         if ($addCaptcha && !$viewOnly) {
           $captcha = CRM_Utils_ReCAPTCHA::singleton();

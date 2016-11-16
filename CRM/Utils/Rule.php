@@ -725,6 +725,7 @@ class CRM_Utils_Rule {
    * @return bool
    */
   public static function creditCardNumber($value, $type) {
+    require_once 'Validate/Finance/CreditCard.php';
     return Validate_Finance_CreditCard::number($value, $type);
   }
 
@@ -735,6 +736,8 @@ class CRM_Utils_Rule {
    * @return bool
    */
   public static function cvv($value, $type) {
+    require_once 'Validate/Finance/CreditCard.php';
+
     return Validate_Finance_CreditCard::cvv($value, $type);
   }
 

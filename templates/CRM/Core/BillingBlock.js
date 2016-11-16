@@ -67,15 +67,9 @@
     $.each(card_types, function(key, pattern) {
       if (ccnumber.match('^' + pattern + '$')) {
         var value = card_values[key];
-        //$.each(CRM.config.creditCardTypes, function(key2, val) {
-        //  if (value == val) { 
-            $('.crm-container .credit_card_type-section .crm-credit_card_type-icon-' + key).css('opacity', 1);
-            $('select#credit_card_type').val(value);
-            return false;
-        //  }
-        //  else {
-        //    $
-       // });
+        $('.crm-container .credit_card_type-section .crm-credit_card_type-icon-' + key).css('opacity', 1);
+        $('select#credit_card_type').val(value);
+        return false;
       }
     });
   }

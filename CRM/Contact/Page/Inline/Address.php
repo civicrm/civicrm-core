@@ -77,14 +77,10 @@ class CRM_Contact_Page_Inline_Address extends CRM_Core_Page {
           );
         }
       }
-      $idValue = $currentAddressBlock['address'][$locBlockNo]['id'];
-      if (!empty($currentAddressBlock['address'][$locBlockNo]['master_id'])) {
-        $idValue = $currentAddressBlock['address'][$locBlockNo]['master_id'];
-      }
 
       // add custom data of type address
       $groupTree = CRM_Core_BAO_CustomGroup::getTree('Address',
-        $this, $idValue
+        $this, $currentAddressBlock['address'][$locBlockNo]['id']
       );
 
       // we setting the prefix to dnc_ below so that we don't overwrite smarty's grouptree var.

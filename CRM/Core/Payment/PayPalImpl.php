@@ -176,7 +176,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    */
   public function validatePaymentInstrument($values, &$errors) {
     if ($this->_paymentProcessor['payment_processor_type'] == 'PayPal' && !$this->isPaypalExpress($values)) {
-      CRM_Core_Payment_Form::validateCreditCard($this->_paymentProcessor['id'], $values, $errors);
+      CRM_Core_Payment_Form::validateCreditCard($values, $errors);
       CRM_Core_Form::validateMandatoryFields($this->getMandatoryFields(), $values, $errors);
     }
   }

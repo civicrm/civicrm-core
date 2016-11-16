@@ -793,8 +793,8 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
 
     $groupsDT = array();
     $groupsDT['data'] = $groupList;
-    $groupsDT['recordsTotal'] = !empty($params['total']) ? $params['total'] : NULL;
-    $groupsDT['recordsFiltered'] = !empty($params['total']) ? $params['total'] : NULL;
+    $groupsDT['recordsTotal'] = $params['total'];
+    $groupsDT['recordsFiltered'] = $params['total'];
 
     return $groupsDT;
   }
@@ -814,7 +814,6 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
 
     //$this->pagerAToZ( $whereClause, $params );
 
-    $limit = "";
     if (!empty($params['rowCount']) &&
       $params['rowCount'] > 0
     ) {

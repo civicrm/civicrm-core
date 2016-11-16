@@ -93,6 +93,6 @@ function civicrm_api3_dashboard_delete($params) {
     return civicrm_api3_create_success(1, $params, 'Dashboard', 'delete');
   }
   else {
-    throw new API_Exception('Could not delete dashlet');
+    return civicrm_api3_create_error('Could not delete dashlet');
   }
 }

@@ -870,11 +870,6 @@ WHERE  civicrm_participant.id = {$participantId}
    * @return \CRM_Event_DAO_Participant
    */
   public static function deleteParticipant($id) {
-    $participant = new CRM_Event_DAO_Participant();
-    $participant->id = $id;
-    if (!$participant->find()) {
-      return FALSE;
-    }
     CRM_Utils_Hook::pre('delete', 'Participant', $id, CRM_Core_DAO::$_nullArray);
 
     $transaction = new CRM_Core_Transaction();
@@ -907,6 +902,8 @@ WHERE  civicrm_participant.id = {$participantId}
       CRM_Core_BAO_Note::del($noteId, FALSE);
     }
 
+    $participant = new CRM_Event_DAO_Participant();
+    $participant->id = $id;
     $participant->delete();
 
     $transaction->commit();

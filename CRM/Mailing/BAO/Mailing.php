@@ -2512,7 +2512,6 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
       "$mailing.approval_status_id", "createdContact.sort_name as created_by", "scheduledContact.sort_name as scheduled_by",
       "$mailing.created_id as created_id", "$mailing.scheduled_id as scheduled_id", "$mailing.is_archived as archived",
       "$mailing.created_date as created_date", "campaign_id", "$mailing.sms_provider_id as sms_provider_id",
-      "$mailing.language",
     );
 
     // we only care about parent jobs, since that holds all the info on
@@ -2574,7 +2573,6 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
         'campaign_id' => $dao->campaign_id,
         'campaign' => empty($dao->campaign_id) ? NULL : $allCampaigns[$dao->campaign_id],
         'sms_provider_id' => $dao->sms_provider_id,
-        'language' => $dao->language,
       );
     }
     return $rows;

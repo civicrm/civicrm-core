@@ -23,7 +23,6 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-{crmRegion name="contribute-form-contributionpage-thankyou-main"}
 <div class="crm-block crm-form-block crm-contribution-contributionpage-thankyou-form-block">
 <div class="help">
     <p>{ts}Use this form to configure the thank-you message and receipting options.{/ts} {help id="id_thank"}</p>
@@ -89,6 +88,3 @@
      }
  {/literal}
 </script>
-{/crmRegion}
-{crmRegion name="contribute-form-contributionpage-thankyou-post}
-{/crmRegion}

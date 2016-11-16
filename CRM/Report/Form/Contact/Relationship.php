@@ -370,7 +370,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
                         ON ( {$this->_aliases['civicrm_relationship']}.relationship_type_id  =
                              {$this->_aliases['civicrm_relationship_type']}.id  ) ";
 
-    // Include Email Field.
+    // include Email Field
     if ($this->_emailField_a) {
       $this->_from .= "
              LEFT JOIN civicrm_email {$this->_aliases['civicrm_email']}
@@ -385,7 +385,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
                             {$this->_aliases['civicrm_email_b']}.contact_id AND
                             {$this->_aliases['civicrm_email_b']}.is_primary = 1 )";
     }
-    // Include Phone Field.
+    // include Phone Field
     if ($this->_phoneField_a) {
       $this->_from .= "
              LEFT JOIN civicrm_phone {$this->_aliases['civicrm_phone']}
@@ -532,7 +532,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
     }
     if (!empty($statistics['filters'])) {
       foreach ($statistics['filters'] as $id => $value) {
-        // For displaying relationship type filter.
+        //for displaying relationship type filter
         if ($value['title'] == 'Relationship') {
           $relTypes = CRM_Core_PseudoConstant::relationshipType();
           $op = CRM_Utils_Array::value('relationship_type_id_op', $this->_params) == 'in' ? ts('Is one of') . ' ' : ts('Is not one of') . ' ';
@@ -544,14 +544,14 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
             implode(', ', $relationshipTypes);
         }
 
-        // For displaying relationship status.
+        //for displaying relationship status
         if ($value['title'] == 'Relationship Status') {
           $isStatusFilter = TRUE;
           $statistics['filters'][$id]['value'] = $relStatus;
         }
       }
     }
-    // For displaying relationship status.
+    //for displaying relationship status
     if (!$isStatusFilter && $relStatus) {
       $statistics['filters'][] = array(
         'title' => 'Relationship Status',
@@ -588,17 +588,18 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
   public function postProcess() {
     $this->beginPostProcess();
 
-    $originalRelationshipTypeIdValue = CRM_Utils_Array::value('relationship_type_id_value', $this->_params);
-    if ($originalRelationshipTypeIdValue) {
+    $originalRelationshipTypeIdValue = $this->_params['relationship_type_id_value'];
+    if (!empty($this->_params['relationship_type_id_value'])) {
       $relationshipTypes = array();
       $direction = array();
-      foreach ((array) $originalRelationshipTypeIdValue as $relationship_type) {
+      $relType = array();
+      foreach ($this->_params['relationship_type_id_value'] as $relationship_type) {
         $relType = explode('_', $relationship_type);
         $direction[] = $relType[1] . '_' . $relType[2];
         $relationshipTypes[] = intval($relType[0]);
       }
-      // Lets take the first relationship type to guide us in the relationship
-      // direction we should use.
+      // Lets take the first relationship type to guide us in the relationship direction
+      // we should use.
       $this->relationType = $direction[0];
       $this->_params['relationship_type_id_value'] = $relationshipTypes;
     }
@@ -614,7 +615,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
     $this->doTemplateAssignment($rows);
 
     if (!empty($originalRelationshipTypeIdValue)) {
-      // Store its old value, CRM-5837.
+      // store its old value, CRM-5837
       $this->_params['relationship_type_id_value'] = $originalRelationshipTypeIdValue;
     }
     $this->endPostProcess($rows);
@@ -624,12 +625,12 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
    * @param $rows
    */
   public function alterDisplay(&$rows) {
-    // Custom code to alter rows.
+    // custom code to alter rows
     $entryFound = FALSE;
 
     foreach ($rows as $rowNum => $row) {
 
-      // Handle country.
+      // handle country
       if (array_key_exists('civicrm_address_country_id', $row)) {
         if ($value = $row['civicrm_address_country_id']) {
           $rows[$rowNum]['civicrm_address_country_id'] = CRM_Core_PseudoConstant::country($value, FALSE);
@@ -701,11 +702,11 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
   public function buildValidityQuery($valid) {
     $clause = NULL;
     if ($valid == '1') {
-      // Relationships dates are not expired.
+      // relationships dates are not expired
       $clause = "((start_date <= CURDATE() OR start_date is null) AND (end_date >= CURDATE() OR end_date is null))";
     }
     elseif ($valid == '0') {
-      // Relationships dates are expired or has not started yet.
+      // relationships dates are expired or has not started yet
       $clause = "(start_date >= CURDATE() OR end_date < CURDATE())";
     }
     return $clause;

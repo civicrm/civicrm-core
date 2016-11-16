@@ -151,16 +151,6 @@ class CRM_Custom_Form_CustomData {
    * @return array
    */
   public static function setGroupTree(&$form, $subType, $gid, $onlySubType = NULL, $getCachedTree = FALSE) {
-    $singleRecord = NULL;
-    if (!empty($form->_groupCount) && !empty($form->_multiRecordDisplay) && $form->_multiRecordDisplay == 'single') {
-      $singleRecord = $form->_groupCount;
-    }
-    $mode = CRM_Utils_Request::retrieve('mode', 'String', $form);
-    // when a new record is being added for multivalued custom fields.
-    if (isset($form->_groupCount) && $form->_groupCount == 0 && $mode == 'add' &&
-      !empty($form->_multiRecordDisplay) && $form->_multiRecordDisplay == 'single') {
-      $singleRecord = 'new';
-    }
 
     $groupTree = CRM_Core_BAO_CustomGroup::getTree($form->_type,
       $form,
@@ -169,10 +159,7 @@ class CRM_Custom_Form_CustomData {
       $subType,
       $form->_subName,
       $getCachedTree,
-      $onlySubType,
-      FALSE,
-      TRUE,
-      $singleRecord
+      $onlySubType
     );
 
     if (property_exists($form, '_customValueCount') && !empty($groupTree)) {
