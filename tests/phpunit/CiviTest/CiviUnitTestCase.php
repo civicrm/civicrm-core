@@ -1375,6 +1375,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       'url_recur' => 'http://dummy.com',
       'billing_mode' => 1,
       'sequential' => 1,
+      'payment_instrument_id' => 'Debit Card',
     );
     $processor = $this->callAPISuccess('PaymentProcessor', 'create', $processorParams);
     return $processor['id'];

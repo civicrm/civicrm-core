@@ -596,6 +596,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'trxn_id' => 'kettles boil water',
       'fee_amount' => .14,
     ));
+    $processorDetail = $processor->getPaymentProcessor();
     $this->callAPISuccess('MembershipType', 'create', array(
       'id' => $this->membershipTypeAnnualFixedID,
       'duration_unit' => 'month',
@@ -618,6 +619,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
 
     $this->assertEquals(.14, $contribution['fee_amount']);
     $this->assertEquals('kettles boil water', $contribution['trxn_id']);
+    $this->assertEquals($processorDetail['payment_instrument_id'], $contribution['payment_instrument_id']);
 
     $this->callAPISuccessGetCount('LineItem', array(
       'entity_id' => $membership['id'],
