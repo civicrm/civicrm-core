@@ -2290,7 +2290,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $receipt_date = $this->callAPISuccess('Contribution', 'getvalue', array('id' => $contribution['id'], 'return' => 'receipt_date'));
     $this->assertEquals('', $receipt_date);
   }
- 
+
   /**
    * Complete the transaction using the template with all the possible.
    */
