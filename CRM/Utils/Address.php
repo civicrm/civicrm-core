@@ -348,6 +348,10 @@ class CRM_Utils_Address {
     $addressFields = array();
     foreach ($addressParts as $name => $field) {
       $addressFields[$name] = CRM_Utils_Array::value($field, $params);
+      //Include values which prepend 'billing_' to country and state_province.
+      if (empty($params[$field])) {
+        $addressFields[$name] = CRM_Utils_Array::value('billing_' . $field, $params);
+      }
     }
     return CRM_Utils_Address::format($addressFields);
   }
