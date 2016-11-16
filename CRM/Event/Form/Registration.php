@@ -1322,7 +1322,7 @@ WHERE  v.option_group_id = g.id
       $feeBlock = $priceSetDetails['fields'];
     }
 
-    $optionMaxValues = $fieldSelected = array();
+    $optionMaxValues = $fieldSelected = $priceFieldCheck = array();
     foreach ($params as $pNum => $values) {
       if (!is_array($values) || $values == 'skip') {
         continue;
@@ -1343,6 +1343,11 @@ WHERE  v.option_group_id = g.id
           (!$noneOptionValueSelected && !is_array($value))
         ) {
           continue;
+        }
+
+        // Make an array for selected price fields.
+        if (!empty($priceFieldId) && !empty($value)) {
+          $priceFieldCheck[] = $priceFieldId;
         }
 
         $fieldSelected[$pNum] = TRUE;
@@ -1374,7 +1379,7 @@ WHERE  v.option_group_id = g.id
       }
 
       //validate for price field selection.
-      if (empty($fieldSelected[$pNum])) {
+      if (empty($fieldSelected[$pNum]) || empty($priceFieldCheck)) {
         $errors[$pNum]['_qf_default'] = ts('Select at least one option from Event Fee(s).');
       }
     }
