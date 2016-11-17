@@ -607,17 +607,27 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
   public function clauseComponent() {
     $selectedContacts = implode(',', $this->_contactSelected);
     $eligibleResult = $rows = $tempArray = array();
+    $whereClause = NULL;
     foreach ($this->_component as $val) {
       if (!empty($this->_selectComponent[$val]) &&
         ($val != 'activity_civireport' && $val != 'relationship_civireport')
       ) {
-        $tableName = str_replace('_civireport', '', $val);
-        $alias = $this->_aliases["civicrm_{$tableName}"];
-        $whereClause = $this->addPermissionedFromClause($val);
+        if ($val == "contribution_civireport") {
+          list($whereClause, $join) = 
+          $this->_formComponent[$val] .= $this->getPermissionedFromWhereClauseForContribution();
+        }
+        if ($val == "membership_civireport") {
+          list($whereClause, $join) = $this->getPermissionedFromWhereClauseForMembership();
+          $this->_formComponent[$val] .= $join;
+        }
+        if ($val == "participant_civireport") {
+          list($whereClause, $join) = $this->getPermissionedFromWhereClauseForParticipant();
+          $this->_formComponent[$val] .= $join;
+        }
         $sql = "{$this->_selectComponent[$val]} {$this->_formComponent[$val]}
           WHERE {$this->_aliases['civicrm_contact']}.id IN ( $selectedContacts )
           {$whereClause}
-          GROUP BY {$alias}.id";
+          GROUP BY {$val}.id";
 
         $dao = CRM_Core_DAO::executeQuery($sql);
         while ($dao->fetch()) {
@@ -968,46 +978,6 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
         }
       }
     }
-  }
-
-  /**
-   * Function to alter from clause by adding checks for permissoned financial type.
-   *
-   * @param string $component
-   *
-   * @return string
-   */
-  public function addPermissionedFromClause($component) {
-    if (is_null($this->financialTypes)) {
-      return NULL;
-    }
-    $financialTypes = 0;
-    if (!empty($this->financialTypes)) {
-      $financialTypes = implode(',', array_keys($this->financialTypes));
-    }
-    $clause = "financial_type_id IN ({$financialTypes})";
-    $whereClause = NULL;
-
-    switch ($component) {
-      case 'participant_civireport':
-      case 'membership_civireport':
-        $tableName = str_replace('_civireport', '', $component);
-        $alias = $this->_aliases["civicrm_{$tableName}"];
-        if ($component == 'membership_civireport') {
-          $this->_formComponent[$component] .= " INNER JOIN civicrm_membership_type ON civicrm_membership_type.id = {$alias}.membership_type_id AND civicrm_membership_type.$clause";
-        }
-        $this->_formComponent[$component] .= " LEFT JOIN civicrm_line_item ON civicrm_line_item.entity_id = {$alias}.id AND 'civicrm_{$tableName}' = civicrm_line_item.entity_table";
-        $whereClause = " AND (civicrm_line_item.{$clause} OR civicrm_line_item.id IS NULL)";
-        break;
-
-      case 'contribution_civireport':
-        $this->_formComponent[$component] .= " AND {$this->_aliases['civicrm_contribution']}.$clause
-        INNER JOIN civicrm_line_item ON civicrm_line_item.contribution_id = {$this->_aliases['civicrm_contribution']}.id
-        AND civicrm_line_item.$clause";
-        break;
-    }
-
-    return $whereClause;
   }
 
 }

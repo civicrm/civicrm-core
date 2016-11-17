@@ -4877,4 +4877,76 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
     }
   }
 
+  /**
+   * Function to alter from/where clause for contribution by adding checks for permissoned financial type.
+   *
+   * @return array
+   */
+  public function getPermissionedFromWhereClauseForContribution() {
+    $clause = $this->getPermissionedFTClause();
+    if (is_null($clause)) {
+      return array();
+    }
+
+    $join = " AND {$this->_aliases['civicrm_contribution']}.$clause
+      INNER JOIN civicrm_line_item ON civicrm_line_item.contribution_id = {$this->_aliases['civicrm_contribution']}.id
+      AND civicrm_line_item.$clause";
+
+    return $join;
+  }
+
+  /**
+   * Function to alter from/where clause for membership by adding checks for permissoned financial type.
+   *
+   *
+   * @return array
+   */
+  public function getPermissionedFromWhereClauseForMembership() {
+    $clause = $this->getPermissionedFTClause();
+    if (is_null($clause)) {
+      return array();
+    }
+
+    $join = " INNER JOIN civicrm_membership_type ON civicrm_membership_type.id = {$this->_aliases['civicrm_membership']}.membership_type_id AND civicrm_membership_type.$clause
+      LEFT JOIN civicrm_line_item ON civicrm_line_item.entity_id = {$this->_aliases['civicrm_membership']}.id AND 'civicrm_membership' = civicrm_line_item.entity_table";
+    $whereClause = " AND (civicrm_line_item.{$clause} OR civicrm_line_item.id IS NULL)";
+
+    return array($whereClause, $join);
+  }
+
+  /**
+   * Function to alter from/where clause for participant by adding checks for permissoned financial type.
+   *
+   *
+   * @return array
+   */
+  public function getPermissionedFromWhereClauseForParticipant() {
+    $clause = $this->getPermissionedFTClause();
+    if (is_null($clause)) {
+      return array();
+    }
+
+    $join = " LEFT JOIN civicrm_line_item ON civicrm_line_item.entity_id = {$this->_aliases['civicrm_participant']}.id AND 'civicrm_{participant}' = civicrm_line_item.entity_table";
+    $whereClause = " AND (civicrm_line_item.{$clause} OR civicrm_line_item.id IS NULL)";
+
+    return array($whereClause, $join);
+  }
+
+  /**
+   * Function to build clause for financial type.
+   *
+   *
+   * @return string
+   */
+  public function getPermissionedFTClause() {
+    if (empty($this->financialTypes)) {
+      return NULL;
+    }
+
+    $fTypes = implode(',', array_keys($this->financialTypes));
+    $clause = "financial_type_id IN ({$fTypes})";
+
+    return $clause;
+  }
+
 }
