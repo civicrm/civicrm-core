@@ -4708,12 +4708,14 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
               {$query->_where}
                       AND {$query->_aliases['civicrm_contribution']}.financial_type_id IN (" . $contFTs . ")
                       AND {$query->_aliases['civicrm_line_item']}.id IS NULL
-              GROUP BY {$query->_aliases['civicrm_contribution']}.id";
+              GROUP BY {$query->_aliases['civicrm_contribution']}.id
+              UNION SELECT 0 as contribution_dummy_id
+    ";
     CRM_Core_DAO::executeQuery($sql);
     if (isset($temp)) {
       $query->_aliases['civicrm_line_item'] = $temp;
     }
-    $from = " INNER JOIN civicrm_contribution_temp temp ON IF({$query->_aliases['civicrm_contribution']}.id IS NULL, 1, IF({$query->_aliases['civicrm_contribution']}.id = temp.id, 1, 0))  ";
+    $from = " INNER JOIN civicrm_contribution_temp temp ON IF({$query->_aliases['civicrm_contribution']}.id IS NULL, 1, {$query->_aliases['civicrm_contribution']}.id = temp.id)  ";
     if ($return) {
       return $from;
     }
