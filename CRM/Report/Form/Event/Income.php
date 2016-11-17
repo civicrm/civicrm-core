@@ -225,7 +225,13 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
     $rows['Status'] = $statusRows;
 
     //Count the Participant by payment instrument ID for Event
-    //e.g. Credit Card, Check,Cash etc
+    //e.g. Credit Card, Check,Cash etc$whereclause = array();
+    // Add FT ACL
+    $this->getPermissionedFTClauseForLineItem($whereclause, 'c');
+    $where = '';
+    if (!empty($whereclause)) {
+      $where = 'AND ' . $whereclause[0];
+    }
     $paymentInstrument = "
             SELECT c.payment_instrument_id               as INSTRUMENT,
                    COUNT( civicrm_participant.id )       as participant,
@@ -237,7 +243,7 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
             LEFT JOIN civicrm_contribution c ON ( pp.contribution_id = c.id)
 
             WHERE     civicrm_participant.event_id IN ( {$eventID} )
-                      AND civicrm_participant.is_test  = 0
+                      AND civicrm_participant.is_test  = 0 {$where}
                       {$activeParticipantClause}
                       AND ((pp.participant_id = civicrm_participant.id )
                            OR (pp.participant_id = civicrm_participant.registered_by_id ))
