@@ -4942,15 +4942,19 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
    * Function to build where clause for financial type ACL.
    *
    * @param array $clauses
+   * @param string $alias
    *
    */
-  public function getPermissionedFTClauseForLineItem(&$clauses) {
+  public function getPermissionedFTClauseForLineItem(&$clauses, $alias = NULL) {
     if (!CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
       return FALSE;
     }
     CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($this->financialTypes);
     $clause = $this->getPermissionedFTClause();
-    $clauses[] = $this->_aliases['civicrm_line_item'] . '.' . $clause;
+    if (empty($alias)) {
+      $alias = $this->_aliases['civicrm_line_item'];
+    }
+    $clauses[] = $alias . '.' . $clause;
   }
 
 }
