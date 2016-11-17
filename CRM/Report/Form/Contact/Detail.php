@@ -613,7 +613,6 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
         ($val != 'activity_civireport' && $val != 'relationship_civireport')
       ) {
         if ($val == "contribution_civireport") {
-          list($whereClause, $join) = 
           $this->_formComponent[$val] .= $this->getPermissionedFromWhereClauseForContribution();
         }
         if ($val == "membership_civireport") {
