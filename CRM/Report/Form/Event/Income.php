@@ -108,7 +108,6 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
       "civicrm_option_value.label as event_type",
       "civicrm_participant.fee_currency as currency",
     );
-    $groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($select);
 
     $sql = "
             SELECT  " . implode(', ', $select) . ",
@@ -122,7 +121,7 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
             LEFT JOIN  civicrm_participant ON ( civicrm_event.id = civicrm_participant.event_id
                        {$activeParticipantClause} AND civicrm_participant.is_test  = 0 )
 
-            WHERE      civicrm_event.id IN( {$eventID}) {$groupBy}";
+            WHERE      civicrm_event.id IN( {$eventID}) GROUP BY civicrm_event.id";
 
     $eventDAO = CRM_Core_DAO::executeQuery($sql);
     $currency = array();
