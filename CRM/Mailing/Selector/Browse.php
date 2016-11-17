@@ -419,7 +419,7 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
         $rows[$key]['status'] = CRM_Mailing_BAO_MailingJob::status($row['status']);
 
         // get language string
-        $rows[$key]['language'] = $languages[$row['language']];
+        $rows[$key]['language'] = (isset($row['language']) ? $languages[$row['language']] : NULL);
 
         $validLinks = $actionLinks;
         if (($mailingUrl = CRM_Mailing_BAO_Mailing::getPublicViewUrl($row['id'])) != FALSE) {
