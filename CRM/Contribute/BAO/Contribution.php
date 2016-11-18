@@ -4727,13 +4727,10 @@ LIMIT 1;";
       $userName = NULL;
 
       // First, try to retrieve default name and email address.
-      $sitewide_default_from = array_pop(CRM_Core_OptionGroup::values('from_email_address', NULL, NULL, NULL, ' AND is_default = 1'));
-      // Parse the results (which is in "Name" <email> format) into a name and an email.
-      if (!empty($sitewide_default_from)) {
-        if (preg_match('/"([^"]*)"\s*<([^>]*)>/', $sitewide_default_from, $matches)) {
-          $userName = $matches[1];
-          $userEmail = $matches[2];
-        }
+      $domainEmailValues = CRM_Core_BAO_Domain::getNameAndEmail();
+      if (!empty($domainEmailValues)) {
+        $userName = $domainEmailValues[0];
+        $userEmail = $domainEmailValues[1];
       }
 
       if (empty($userEmail)) {
