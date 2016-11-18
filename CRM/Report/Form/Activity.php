@@ -791,7 +791,7 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
     $this->customDataFrom();
     $this->where('target');
     $insertCols = implode(',', $this->_selectAliases);
-    $tempQuery = "CREATE TEMPORARY TABLE civireport_activity_temp_target CHARACTER SET utf8 COLLATE utf8_unicode_ci AS
+    $tempQuery = "CREATE TEMPORARY TABLE civireport_activity_temp_target" . $this->_databaseAttributes  . " AS
 {$this->_select} {$this->_from} {$this->_where} ";
     CRM_Core_DAO::executeQuery($tempQuery);
 

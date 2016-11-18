@@ -555,7 +555,7 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
 
     $this->groupBy();
 
-    $tempQuery = "CREATE TEMPORARY TABLE {$tempTableName} CHARACTER SET utf8 COLLATE utf8_unicode_ci AS
+    $tempQuery = "CREATE TEMPORARY TABLE {$tempTableName} {$this->_databaseAttributes} AS
                   {$select} {$this->_from} {$this->_where} {$this->_groupBy} ";
     CRM_Core_DAO::executeQuery($tempQuery);
 
