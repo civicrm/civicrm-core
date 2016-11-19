@@ -2262,6 +2262,34 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->revertTemplateToReservedTemplate();
   }
 
+  /**
+   * CRM-1960 - Test to ensure that completetransaction respects the is_email_receipt setting
+   */
+  public function testCompleteTransactionWithEmailReceiptInput() {
+    // Create a Contribution Page with is_email_receipt = TRUE
+    $contributionPage = $this->callAPISuccess('ContributionPage', 'create', array(
+      'receipt_from_name' => 'Mickey Mouse',
+      'receipt_from_email' => 'mickey@mouse.com',
+      'title' => "Test Contribution Page",
+      'financial_type_id' => 1,
+      'currency' => 'CAD',
+      'is_monetary' => TRUE,
+      'is_email_receipt' => TRUE,
+    ));
+    $this->_params['contribution_page_id'] = $contributionPage['id'];
+    $params = array_merge($this->_params, array('contribution_status_id' => 2));
+    $contribution = $this->callAPISuccess('contribution', 'create', $params);
+    // Complete the transaction overriding is_email_receipt to = FALSE
+    $this->callAPISuccess('contribution', 'completetransaction', array(
+      'id' => $contribution['id'],
+      'trxn_date' => date('2011-04-09'),
+      'trxn_id' => 'kazam',
+      'is_email_receipt' => 0,
+    ));
+    // Check if a receipt was issued
+    $receipt_date = $this->callAPISuccess('Contribution', 'getvalue', array('id' => $contribution['id'], 'return' => 'receipt_date'));
+    $this->assertEquals('', $receipt_date);
+  }
 
   /**
    * Complete the transaction using the template with all the possible.
