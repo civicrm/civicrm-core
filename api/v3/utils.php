@@ -2474,6 +2474,7 @@ function _civicrm_api3_check_edit_permissions($bao_name, $params) {
     'CRM_Core_BAO_Address',
     'CRM_Core_BAO_IM',
     'CRM_Core_BAO_Website',
+    'CRM_Core_BAO_OpenID',
   );
   if (!empty($params['check_permissions']) && in_array($bao_name, $contactEntities)) {
     $cid = !empty($params['contact_id']) ? $params['contact_id'] : CRM_Core_DAO::getFieldValue($bao_name, $params['id'], 'contact_id');
