@@ -1457,7 +1457,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         }
       }
 
-      $membershipParams['skipLineItem'] = 1;
+      if (!$isProcessSeparateMembershipTransaction) {
+        $membershipParams['skipLineItem'] = 1;
+      }
       $paymentResult = CRM_Contribute_BAO_Contribution_Utils::processConfirm($form, $membershipParams,
         $contactID,
         $financialTypeID,
