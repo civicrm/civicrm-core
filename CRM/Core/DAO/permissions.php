@@ -115,6 +115,7 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
   $permissions['phone'] = $permissions['address'];
   $permissions['website'] = $permissions['address'];
   $permissions['im'] = $permissions['address'];
+  $permissions['open_i_d'] = $permissions['address'];
 
   // Also managed by ACLs - CRM-19448
   $permissions['entity_tag'] = array('default' => array());
