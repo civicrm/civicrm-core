@@ -315,4 +315,34 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
     }
   }
 
+  /**
+   * CRM-19562 ensure that only ids are used for contactid searching.
+   */
+  public function testContactIDClause() {
+    $params = array(
+      array("mark_x_2", "=", 1, 0, 0),
+      array("mark_x_foo@example.com", "=", 1, 0, 0),
+    );
+    $returnProperties = array(
+      "sort_name" => 1,
+      "email" => 1,
+      "do_not_email" => 1,
+      "is_deceased" => 1,
+      "on_hold" => 1,
+      "display_name" => 1,
+      "preferred_mail_format" => 1,
+    );
+    $numberofContacts = 2;
+    $query = new CRM_Contact_BAO_Query($params, $returnProperties);
+    try {
+      $query->apiQuery($params, $returnProperties, NULL, NULL, 0, $numberofContacts);
+    }
+    catch (Exception $e) {
+      $this->assertEquals("A fatal error was triggered: One of parameters  (value: foo@example.com) is not of the type Positive",
+        $e->getMessage());
+      return $this->assertTrue(TRUE);
+    }
+    return $this->fail('Test failed for some reason which is not good');
+  }
+
 }
