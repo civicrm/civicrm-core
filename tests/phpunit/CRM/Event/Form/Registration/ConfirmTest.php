@@ -50,10 +50,9 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
           'scriptFee' => '',
           'scriptArray' => '',
           'priceSetId' => '6',
-          'price_7' =>
-            array (
-              13 => 1,
-            ),
+          'price_7' => array(
+            13 => 1,
+          ),
           'payment_processor_id' => '1',
           'bypass_payment' => '',
           'MAX_FILE_SIZE' => '33554432',
@@ -73,7 +72,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
           'button' => '_qf_Register_upload',
           'billing_state_province-5' => 'AP',
           'billing_country-5' => 'US',
-        )
+        ),
       ),
     ));
     $this->callAPISuccessGetSingle('Participant', array());
