@@ -223,8 +223,8 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
    */
   public function upgrade_4_7_10($rev) {
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
-    $this->addTask(ts('Upgrade Add Help Pre and Post Fields to price value table'), 'addHelpPreAndHelpPostFieldsPriceFieldValue');
-    $this->addTask(ts('Alter index and type for image URL'), 'alterIndexAndTypeForImageURL');
+    $this->addTask('Upgrade Add Help Pre and Post Fields to price value table', 'addHelpPreAndHelpPostFieldsPriceFieldValue');
+    $this->addTask('Alter index and type for image URL', 'alterIndexAndTypeForImageURL');
   }
 
   /**
@@ -235,7 +235,7 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
   public function upgrade_4_7_11($rev) {
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
     $this->addTask('Dashboard schema updates', 'dashboardSchemaUpdate');
-    $this->addTask(ts('Fill in setting "remote_profile_submissions"'), 'migrateRemoteSubmissionsSetting');
+    $this->addTask('Fill in setting "remote_profile_submissions"', 'migrateRemoteSubmissionsSetting');
   }
 
   /**
@@ -245,7 +245,7 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
    */
   public function upgrade_4_7_12($rev) {
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
-    $this->addTask(ts('Add Data Type column to civicrm_option_group'), 'addDataTypeColumnToOptionGroupTable');
+    $this->addTask('Add Data Type column to civicrm_option_group', 'addDataTypeColumnToOptionGroupTable');
   }
   /**
    * Upgrade function.
@@ -254,7 +254,7 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
    */
   public function upgrade_4_7_13($rev) {
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
-    $this->addTask(ts('Add column to allow for payment processors to set what card types are accepted'), 'addAcceptedCardTypesField');
+    $this->addTask('Add column to allow for payment processors to set what card types are accepted', 'addAcceptedCardTypesField');
   }
 
 
@@ -272,6 +272,8 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
   //  public function upgrade_4_7_x($rev) {
   //    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
   //    // Additional tasks here...
+  //    // Note: do not use ts() in the addTask description because it adds unnecessary strings to transifex.
+  //    // The above is an exception because 'Upgrade DB to %1: SQL' is generic & reusable.
   //  }
 
   /**
