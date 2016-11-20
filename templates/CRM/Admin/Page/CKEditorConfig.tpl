@@ -38,6 +38,17 @@
   #toolbarModifierWrapper .toolbar button[data-group=config] {
     display: none;
   }
+  .api-field-desc {
+    font-size: .8em;
+    color: #828282;
+    line-height: 1.3em;
+  }
+  .select2-highlighted .api-field-desc {
+    color: #fcfcfc;
+  }
+  #crm-custom-config-options > div {
+    margin: .5em .2em;
+  }
 {/literal}</style>
 {* Force the custom config file to reload by appending a new query string *}
 <script type="text/javascript">
@@ -47,14 +58,14 @@
 <form method="post" action="{crmURL}" id="toolbarModifierForm">
   <div class="crm-block crm-form-block">
     <label for="skin">{ts}Skin{/ts}</label>
-    <select id="skin" name="skin" class="crm-select2 eight config-param">
+    <select id="skin" name="config_skin" class="crm-select2 eight config-param">
       {foreach from=$skins item='s'}
         <option value="{$s}" {if $s == $skin}selected{/if}>{$s|ucfirst}</option>
       {/foreach}
     </select>
     &nbsp;&nbsp;
     <label for="extraPlugins">{ts}Plugins{/ts}</label>
-    <input id="extraPlugins" name="extraPlugins" class="huge config-param" value="{$extraPlugins}" placeholder="{ts}Select optional extra features{/ts}">
+    <input id="extraPlugins" name="config_extraPlugins" class="huge config-param" value="{$extraPlugins}" placeholder="{ts}Select optional extra features{/ts}">
   </div>
 
   <div class="editors-container">
@@ -68,6 +79,15 @@
     </div>
   </div>
 
+
+  <div class="crm-block crm-form-block">
+    <fieldset>
+      <legend>{ts}Advanced Options{/ts}</legend>
+      <div class="description">{ts 1='href="http://docs.ckeditor.com/#!/api/CKEDITOR.config" target="_blank"'}Refer to the <a %1>CKEditor Api Documentation</a> for details.{/ts}</div>
+      <div id="crm-custom-config-options"></div>
+    </fieldset>
+  </div>
+
   <div class="crm-submit-buttons">
     <span class="crm-button crm-i-button">
       <i class="crm-i fa-wrench"></i> <input type="submit" value="{ts}Save{/ts}" name="save" class="crm-form-submit" accesskey="S"/>
@@ -77,3 +97,8 @@
     </span>
   </div>
 </form>
+<script type="text/template" id="config-row-tpl">
+  <div class="crm-config-option-row">
+    <input class="huge crm-config-option-name" placeholder="{ts}Option{/ts}"/>
+  </div>
+</script>
