@@ -125,7 +125,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     $searchBlockValues = array(
       'basic' => array('', 'addBasicSearchDetail'),
       'location' => array('state_province', 'addAddressSearchDetail'),
-      'demographics' => array('civicrm_gender_Transgender_3', 'addDemographicSearchDetail'),
+      'demographics' => array('civicrm_gender_Other_3', 'addDemographicSearchDetail'),
       'notes' => array('note', ''),
       'activity' => array('activity_type_id', 'addActivitySearchDetail'),
       'CiviContribute' => array('contribution_currency_type', 'addContributionSearchDetail'),
