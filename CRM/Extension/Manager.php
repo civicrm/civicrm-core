@@ -614,7 +614,7 @@ class CRM_Extension_Manager {
       }
       elseif ($info && $info->requires) {
         $sorter->add($key, $info->requires);
-        $todoKeys = array_merge($todoKeys, $info->requires);
+        $todoKeys = array_merge($todoKeys, array($info->requires));
       }
       else {
         $sorter->add($key, array());
