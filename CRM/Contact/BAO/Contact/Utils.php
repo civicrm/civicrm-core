@@ -49,7 +49,7 @@ class CRM_Contact_BAO_Contact_Utils {
   public static function getImage($contactType, $urlOnly = FALSE, $contactId = NULL, $addProfileOverlay = TRUE) {
     static $imageInfo = array();
 
-    $contactType = explode(CRM_Core_DAO::VALUE_SEPARATOR, trim($contactType, CRM_Core_DAO::VALUE_SEPARATOR));
+    $contactType = CRM_Utils_Array::explodePadded($contactType);
     $contactType = $contactType[0];
 
     if (!array_key_exists($contactType, $imageInfo)) {
