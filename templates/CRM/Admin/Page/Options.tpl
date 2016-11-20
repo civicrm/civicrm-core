@@ -36,7 +36,7 @@
 {else}
 <div class="help">
   {if $gName eq "gender"}
-    {ts}CiviCRM is pre-configured with standard options for individual gender (Male, Female, Transgender). Modify these options as needed for your installation.{/ts}
+    {ts}CiviCRM is pre-configured with standard options for individual gender (Male, Female, Other). Modify these options as needed for your installation.{/ts}
   {elseif $gName eq "individual_prefix"}
       {ts}CiviCRM is pre-configured with standard options for individual contact prefixes (Ms., Mr., Dr. etc.). Customize these options and add new ones as needed for your installation.{/ts}
   {elseif $gName eq "mobile_provider"}
