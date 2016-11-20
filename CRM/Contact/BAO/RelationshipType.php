@@ -123,6 +123,10 @@ class CRM_Contact_BAO_RelationshipType extends CRM_Contact_DAO_RelationshipType 
 
     $result = $relationshipType->save();
 
+    // CRM-19630
+    CRM_Contact_DAO_RelationshipType::executeQuery("UPDATE civicrm_relationship_type SET is_bidirectional=%1 WHERE id=%2",
+      array(1 => array($params['is_bidirectional'], 'Int'), 2 => array($relationshipType->id, 'Int')));
+
     CRM_Core_PseudoConstant::relationshipType('label', TRUE);
     CRM_Core_PseudoConstant::relationshipType('name', TRUE);
     CRM_Case_XMLProcessor::flushStaticCaches();

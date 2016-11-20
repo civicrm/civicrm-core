@@ -148,6 +148,14 @@
     </comment>
     <add>1.1</add>
   </field>
+  <field>
+    <name>is_bidirectional</name>
+    <title>Relationship Type is Bi-Direcitonal</title>
+    <type>boolean</type>
+    <default>0</default>
+    <comment>Can this relationship type be used bi-directionally?</comment>
+    <add>4.7</add>
+  </field>
   <index>
     <name>UI_name_a_b</name>
     <fieldName>name_a_b</fieldName>

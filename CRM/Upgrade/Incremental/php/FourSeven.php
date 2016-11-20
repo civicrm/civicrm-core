@@ -257,6 +257,15 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
     $this->addTask(ts('Add column to allow for payment processors to set what card types are accepted'), 'addAcceptedCardTypesField');
   }
 
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_4_7_14($rev) {
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
+    $this->addTask(ts('Add column to support bi-directional relationship types'), 'addBidirectionRelationshipTypeField');
+  }
 
   /*
    * Important! All upgrade functions MUST add a 'runSql' task.
@@ -876,6 +885,17 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
   public static function addAcceptedCardTypesField() {
     if (!CRM_Core_BAO_SchemaHandler::checkIfFieldExists('civicrm_payment_processor', 'accepted_credit_cards')) {
       CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_payment_processor ADD COLUMN `accepted_credit_cards` text   DEFAULT NULL COMMENT 'array of accepted credit card types'");
+    }
+    return TRUE;
+  }
+
+  /**
+   * CRM-19630 Add field to support bi-directonal relationships.
+   * @return bool
+   */
+  public static function addBidirectionRelationshipTypeField() {
+    if (!CRM_Core_BAO_SchemaHandler::checkIfFieldExists('civicrm_relationship_type', 'is_bidirectional')) {
+      CRM_Core_DAO::executeQuery("ALTER TABLE `civicrm_relationship_type` ADD COLUMN `is_bidirectional` tinyint(4) DEFAULT '0' COMMENT 'Can this relationship type be used bi-directionaly?'");
     }
     return TRUE;
   }
