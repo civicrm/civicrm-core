@@ -117,10 +117,16 @@ class CRM_Event_Form_Task_SaveSearch extends CRM_Event_Form_Task {
 
     $session = CRM_Core_Session::singleton();
 
+    // add support for Relative Date Range searches
+    $fv = array_merge(
+      $this->get('formValues'),
+      CRM_Contact_BAO_SavedSearch::findRelativeToNow($formValues)
+    );
+
     //save the search
     $savedSearch = new CRM_Contact_BAO_SavedSearch();
     $savedSearch->id = $this->_id;
-    $savedSearch->form_values = serialize($this->get('formValues'));
+    $savedSearch->form_values = serialize($fv);
     $savedSearch->save();
     $this->set('ssID', $savedSearch->id);
     CRM_Core_Session::setStatus(ts("Your smart group has been saved as '%1'.", array(1 => $formValues['title'])), ts('Saved'), 'success');

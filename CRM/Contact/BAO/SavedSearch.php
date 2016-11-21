@@ -360,4 +360,42 @@ LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_
     return $savedSearch;
   }
 
+  // add support for Relative Date Range searches
+  public static function findRelativeToNow($fv) {
+    $relativeToNow = array();
+    foreach ($fv as $id => $value) {
+      // this bit copied from CRM_Contact_BAO_Query::convertFormValues
+      if (preg_match('/_date_relative$/', $id) ||
+        $id == 'event_relative' ||
+        $id == 'case_from_relative' ||
+        $id == 'case_to_relative'
+      ) {
+        // if it's not a relative date range, move on
+        if ($value != 1) {
+          continue;
+        }
+        if ($id == 'event_relative') {
+          $fromRange = 'event_start_date_low';
+          $toRange = 'event_end_date_high';
+        }
+        elseif ($id == 'case_from_relative') {
+          $fromRange = 'case_from_start_date_low';
+          $toRange = 'case_from_start_date_high';
+        }
+        elseif ($id == 'case_to_relative') {
+          $fromRange = 'case_to_end_date_low';
+          $toRange = 'case_to_end_date_high';
+        }
+        else {
+          $dateComponent = explode('_date_relative', $id);
+          $fromRange = "{$dateComponent[0]}_date_low";
+          $toRange = "{$dateComponent[0]}_date_high";
+        }
+        $relativeToNow[$fromRange] = $fv[$fromRange];
+        $relativeToNow[$toRange] = $fv[$toRange];
+      }
+    }
+    return $relativeToNow;
+  }
+
 }

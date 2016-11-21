@@ -184,10 +184,16 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
       CRM_Core_BAO_Mapping::saveMappingFields($formValues, $mappingId);
     }
 
+    // add support for Relative Date Range searches
+    $fv = array_merge(
+      $this->get('formValues'),
+      CRM_Contact_BAO_SavedSearch::findRelativeToNow($formValues)
+    );
+
     //save the search
     $savedSearch = new CRM_Contact_BAO_SavedSearch();
     $savedSearch->id = $this->_id;
-    $savedSearch->form_values = serialize($this->get('formValues'));
+    $savedSearch->form_values = serialize($fv);
     $savedSearch->mapping_id = $mappingId;
     $savedSearch->search_custom_id = $this->get('customSearchID');
     $savedSearch->save();

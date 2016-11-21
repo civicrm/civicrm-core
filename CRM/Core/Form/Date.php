@@ -135,6 +135,7 @@ class CRM_Core_Form_Date {
     $selector = array(
       '' => ts('- any -'),
       0 => ts('Choose Date Range'),
+      1 => ts('Relative Date Range'),
       'previous_2.year' => ts('Previous 2 Years'),
       'previous_2.quarter' => ts('Previous 2 Quarters'),
       'previous_2.month' => ts('Previous 2 Months'),
