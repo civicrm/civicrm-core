@@ -4734,7 +4734,7 @@ LIMIT 1;";
 
       if (empty($userEmail)) {
         // If that didn't work, try to use the logged in user.
-        $userID = CRM_Core_Session::singleton()->getLoggedInContactID();
+        $userID = CRM_Core_Session::getLoggedInContactID();
         if (!empty($userID)) {
           list($userName, $userEmail) = CRM_Contact_BAO_Contact_Location::getEmailDetails($userID);
         }
