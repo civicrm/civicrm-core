@@ -1375,6 +1375,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       'url_recur' => 'http://dummy.com',
       'billing_mode' => 1,
       'sequential' => 1,
+      'payment_instrument_id' => 'Debit Card',
     );
     $processor = $this->callAPISuccess('PaymentProcessor', 'create', $processorParams);
     return $processor['id'];
@@ -3087,6 +3088,8 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
         'billing_mode' => 3,
         'financial_type_id' => 1,
         'financial_account_id' => 12,
+         // Credit card = 1 so can pass 'by accident'.
+        'payment_instrument_id' => 'Debit Card',
       ),
       $params);
     if (!is_numeric($params['payment_processor_type_id'])) {
@@ -3378,7 +3381,6 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
       'participant_id' => $participant['id'],
       'contribution_id' => $contribution['id'],
     );
-    $ids = array();
     $this->callAPISuccess('ParticipantPayment', 'create', $paymentParticipant);
     return array($lineItems, $contribution);
   }
@@ -3527,7 +3529,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
         'to_financial_account_id' => 12,
         'total_amount' => CRM_Utils_Array::value('total_amount', $params, 100),
         'status_id' => 1,
-        'payment_instrument_id' => 1,
+        'payment_instrument_id' => CRM_Utils_Array::value('payment_instrument_id', $params, 1),
       );
     }
     elseif ($context == 'payLater') {

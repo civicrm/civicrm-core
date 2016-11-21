@@ -483,7 +483,15 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'contribution_id' => $contribution['id'],
     ), 1);
 
-    $this->_checkFinancialRecords(array('id' => $contribution['id'], 'total_amount' => 50, 'financial_account_id' => 2), 'online');
+    $this->_checkFinancialRecords(array(
+      'id' => $contribution['id'],
+      'total_amount' => 50,
+      'financial_account_id' => 2,
+      'payment_instrument_id' => $this->callAPISuccessGetValue('PaymentProcessor', array(
+        'id' => $this->_paymentProcessorID,
+        'return' => 'payment_instrument_id',
+      )),
+    ), 'online');
     $this->mut->checkMailLog(array(
       '50',
       'Receipt text',
@@ -596,6 +604,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'trxn_id' => 'kettles boil water',
       'fee_amount' => .14,
     ));
+    $processorDetail = $processor->getPaymentProcessor();
     $this->callAPISuccess('MembershipType', 'create', array(
       'id' => $this->membershipTypeAnnualFixedID,
       'duration_unit' => 'month',
@@ -618,6 +627,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
 
     $this->assertEquals(.14, $contribution['fee_amount']);
     $this->assertEquals('kettles boil water', $contribution['trxn_id']);
+    $this->assertEquals($processorDetail['payment_instrument_id'], $contribution['payment_instrument_id']);
 
     $this->callAPISuccessGetCount('LineItem', array(
       'entity_id' => $membership['id'],

@@ -844,7 +844,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'total_amount' => 100.00,
       'financial_type_id' => 1,
       'contribution_page_id' => $contributionPage['id'],
-      'payment_processor' => 1,
+      'payment_processor' => $this->paymentProcessorID,
       'trxn_id' => 12345,
       'invoice_id' => 67890,
       'source' => 'SSF',
@@ -860,6 +860,10 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals($contribution['values'][$contribution['id']]['invoice_id'], 67890);
     $this->assertEquals($contribution['values'][$contribution['id']]['source'], 'SSF');
     $this->assertEquals($contribution['values'][$contribution['id']]['contribution_status_id'], 1);
+    $contribution['payment_instrument_id'] = $this->callAPISuccessGetValue('PaymentProcessor', array(
+      'id' => $this->paymentProcessorID,
+      'return' => 'payment_instrument_id',
+    ));
     $this->_checkFinancialRecords($contribution, 'online');
   }
 
@@ -1861,7 +1865,13 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     unset($lineItem1['values'][0]['id'], $lineItem1['values'][0]['entity_id']);
     unset($lineItem2['values'][0]['id'], $lineItem2['values'][0]['entity_id']);
     $this->assertEquals($lineItem1['values'][0], $lineItem2['values'][0]);
-    $this->_checkFinancialRecords(array('id' => $originalContribution['id'] + 1), 'online');
+    $this->_checkFinancialRecords(array(
+      'id' => $originalContribution['id'] + 1,
+      'payment_instrument_id' => $this->callAPISuccessGetValue('PaymentProcessor', array(
+        'id' => $originalContribution['payment_processor_id'],
+        'return' => 'payment_instrument_id',
+      )),
+    ), 'online');
     $this->quickCleanUpFinancialEntities();
   }
 
@@ -3078,7 +3088,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
           array('contribution_recur_id' => $contributionRecur['id']))
       );
     }
-
+    $originalContribution['payment_processor_id'] = $paymentProcessorID;
     return $originalContribution;
   }
 

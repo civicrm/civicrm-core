@@ -143,10 +143,6 @@ function civicrm_api3_membership_create($params) {
   //need to pass action to handle related memberships.
   $params['action'] = $action;
 
-  if (empty($params['line_item']) && !empty($params['membership_type_id']) && empty($params['skipLineItem'])) {
-    CRM_Price_BAO_LineItem::getLineItemArray($params, NULL, 'membership', $params['membership_type_id']);
-  }
-
   $membershipBAO = CRM_Member_BAO_Membership::create($params, $ids, TRUE);
 
   if (array_key_exists('is_error', $membershipBAO)) {

@@ -552,7 +552,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
 
       $this->_params['contribution_status_id'] = $result['payment_status_id'];
       $this->_params['trxn_id'] = $result['trxn_id'];
-      $this->_params['payment_instrument_id'] = 1;
       $this->_params['is_test'] = ($this->_mode == 'live') ? 0 : 1;
       $this->set('params', $this->_params);
       $this->assign('trxn_id', $result['trxn_id']);
@@ -584,7 +583,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
 
     $isPending = ($this->_params['contribution_status_id'] == 2) ? TRUE : FALSE;
 
-    list($renewMembership) = CRM_Member_BAO_Membership::renewMembership(
+    list($renewMembership) = CRM_Member_BAO_Membership::processMembership(
       $this->_contactID, $this->_params['membership_type_id'][1], $isTestMembership,
       $renewalDate, NULL, $customFieldsFormatted, $numRenewTerms, $this->_membershipId,
       $isPending,

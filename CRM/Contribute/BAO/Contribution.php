@@ -4790,14 +4790,12 @@ LIMIT 1;";
       FROM   civicrm_membership_payment
       WHERE  contribution_id = %1 ";
     $params = array(1 => array($this->id, 'Integer'));
+    $ids['membership'] = (array) CRM_Utils_Array::value('membership', $ids, array());
 
     $dao = CRM_Core_DAO::executeQuery($query, $params);
     while ($dao->fetch()) {
-      if ($dao->membership_id) {
-        if (!is_array($ids['membership'])) {
-          $ids['membership'] = array();
-        }
-        $ids['membership'][] = $dao->membership_id;
+      if ($dao->membership_id && !in_array($dao->membership_id, $ids['membership'])) {
+        $ids['membership'][$dao->membership_id] = $dao->membership_id;
       }
     }
 
