@@ -267,7 +267,7 @@ class CRM_Mailing_Event_BAO_Opened extends CRM_Mailing_Event_DAO_Opened {
     }
 
     if ($is_distinct) {
-      $query .= " GROUP BY $queue.id ";
+      $query .= " GROUP BY $queue.id, $open.time_stamp ";
     }
 
     $orderBy = "sort_name ASC, {$open}.time_stamp DESC";

@@ -339,10 +339,10 @@ class CRM_Mailing_Event_BAO_Forward extends CRM_Mailing_Event_DAO_Forward {
     }
 
     if ($is_distinct) {
-      $query .= " GROUP BY $queue.id ";
+      $query .= " GROUP BY $queue.id, dest_contact.id, dest_email.email, $forward.time_stamp ";
     }
 
-    $orderBy = "sort_name ASC, {$forward}.time_stamp DESC";
+    $orderBy = "$contact.sort_name ASC, {$forward}.time_stamp DESC";
     if ($sort) {
       if (is_string($sort)) {
         $sort = CRM_Utils_Type::escape($sort, 'String');
