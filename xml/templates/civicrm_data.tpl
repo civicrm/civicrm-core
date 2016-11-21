@@ -209,6 +209,7 @@ VALUES
    ('communication_style'           , '{ts escape="sql"}Communication Style{/ts}'                , NULL, 1, 1, 0),
    ('msg_mode'                      , '{ts escape="sql"}Message Mode{/ts}'                       , NULL, 1, 1, 0),
    ('contact_date_reminder_options' , '{ts escape="sql"}Contact Date Reminder Options{/ts}'      , NULL, 1, 1, 1),
+   ('wysiwyg_presets'               , '{ts escape="sql"}WYSIWYG Editor Presets{/ts}'             , NULL, 1, 1, 0),
    ('relative_date_filters'         , '{ts escape="sql"}Relative Date Filters{/ts}'              , NULL, 1, 1, 0);
 
 SELECT @option_group_id_pcm            := max(id) from civicrm_option_group where name = 'preferred_communication_method';
@@ -288,6 +289,7 @@ SELECT @option_group_id_communication_style := max(id) from civicrm_option_group
 SELECT @option_group_id_msg_mode := max(id) from civicrm_option_group where name = 'msg_mode';
 SELECT @option_group_id_contactDateMode := max(id) from civicrm_option_group where name = 'contact_date_reminder_options';
 SELECT @option_group_id_date_filter    := max(id) from civicrm_option_group where name = 'relative_date_filters';
+SELECT @option_group_id_wysiwyg_presets    := max(id) from civicrm_option_group where name = 'wysiwyg_presets';
 
 SELECT @contributeCompId := max(id) FROM civicrm_component where name = 'CiviContribute';
 SELECT @eventCompId      := max(id) FROM civicrm_component where name = 'CiviEvent';
@@ -961,6 +963,11 @@ VALUES
 -- Reminder Options for Contact Date Fields
 (@option_group_id_contactDateMode, '{ts escape="sql"}Actual date only{/ts}', '1', 'Actual date only', NULL, NULL, 0, 1, NULL, 0, 1, 1, NULL, NULL),
 (@option_group_id_contactDateMode, '{ts escape="sql"}Each anniversary{/ts}', '2', 'Each anniversary', NULL, NULL, 0, 2, NULL, 0, 1, 1, NULL, NULL),
+
+-- WYSIWYG Editor Presets
+(@option_group_id_wysiwyg_presets, '{ts escape="sql"}Default{/ts}',   '1', 'default',   NULL, NULL, 1, 1, NULL, 0, 1, 1, NULL, NULL),
+(@option_group_id_wysiwyg_presets, '{ts escape="sql"}CiviMail{/ts}',  '2', 'civimail',  NULL, NULL, 0, 2, NULL, 0, 1, 1, @contributeCompId, NULL),
+(@option_group_id_wysiwyg_presets, '{ts escape="sql"}CiviEvent{/ts}', '3', 'civievent', NULL, NULL, 0, 3, NULL, 0, 1, 1, @eventCompId, NULL),
 
 -- Relative Date Filters
    (@option_group_id_date_filter, '{ts escape="sql"}Today{/ts}', 'this.day', 'this.day', NULL, NULL, NULL,1, NULL, 0, 0, 1, NULL, NULL),

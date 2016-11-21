@@ -40,7 +40,7 @@
  */
 class CRM_Admin_Page_CKEditorConfig extends CRM_Core_Page {
 
-  const CONFIG_FILENAME = '[civicrm.files]/persist/crm-ckeditor-config.js';
+  const CONFIG_FILEPATH = '[civicrm.files]/persist/crm-ckeditor-';
 
   /**
    * Settings that cannot be configured in "advanced options"
@@ -61,15 +61,19 @@ class CRM_Admin_Page_CKEditorConfig extends CRM_Core_Page {
     'filebrowserFlashUploadUrl',
   );
 
+  public $preset;
+
   /**
    * Run page.
    *
    * @return string
    */
   public function run() {
+    $this->preset = CRM_Utils_Array::value('preset', $_REQUEST, 'default');
+
     // If the form was submitted, take appropriate action.
     if (!empty($_POST['revert'])) {
-      self::deleteConfigFile();
+      self::deleteConfigFile($this->preset);
     }
     elseif (!empty($_POST['config'])) {
       $this->save($_POST);
@@ -91,10 +95,17 @@ class CRM_Admin_Page_CKEditorConfig extends CRM_Core_Page {
         'settings' => $settings,
       ));
 
+    $configUrl = self::getConfigUrl($this->preset);
+    if (!$configUrl) {
+      $configUrl = self::getConfigUrl('default');
+    }
+
+    $this->assign('preset', $this->preset);
+    $this->assign('presets', CRM_Core_OptionGroup::values('wysiwyg_presets', FALSE, FALSE, FALSE, NULL, 'label', TRUE, FALSE, 'name'));
     $this->assign('skins', $this->getCKSkins());
     $this->assign('skin', CRM_Utils_Array::value('skin', $settings));
     $this->assign('extraPlugins', CRM_Utils_Array::value('extraPlugins', $settings));
-    $this->assign('configUrl', self::getConfigUrl());
+    $this->assign('configUrl', $configUrl);
     $this->assign('revertConfirm', htmlspecialchars(ts('Are you sure you want to revert all changes?', array('escape' => 'js'))));
 
     CRM_Utils_System::appendBreadCrumb(array(array(
@@ -133,7 +144,7 @@ class CRM_Admin_Page_CKEditorConfig extends CRM_Core_Page {
         $config = substr_replace($config, $setting, $pos, 0);
       }
     }
-    self::saveConfigFile($config);
+    self::saveConfigFile($this->preset, $config);
     if (!empty($params['save'])) {
       CRM_Core_Session::setStatus(ts("You may need to clear your browser's cache to see the changes in CiviCRM."), ts('CKEditor Saved'), 'success');
     }
@@ -194,7 +205,7 @@ class CRM_Admin_Page_CKEditorConfig extends CRM_Core_Page {
    */
   private function getConfigSettings() {
     $matches = $result = array();
-    $file = self::getConfigFile();
+    $file = self::getConfigFile($this->preset);
     $result['skin'] = 'moono';
     if ($file) {
       $contents = file_get_contents($file);
@@ -207,39 +218,44 @@ class CRM_Admin_Page_CKEditorConfig extends CRM_Core_Page {
   }
 
   /**
-   * @return null|string
+   * @param string $preset
+   *   Omit to get an array of all presets
+   * @return array|null|string
    */
-  public static function getConfigUrl() {
-    if (self::getConfigFile()) {
-      return Civi::paths()->getUrl(self::CONFIG_FILENAME, 'absolute');
+  public static function getConfigUrl($preset = NULL) {
+    $items = array();
+    $presets = CRM_Core_OptionGroup::values('wysiwyg_presets', FALSE, FALSE, FALSE, NULL, 'name');
+    foreach ($presets as $key => $name) {
+      if (self::getConfigFile($name)) {
+        $items[$name] = Civi::paths()->getUrl(self::CONFIG_FILEPATH . $name . '.js', 'absolute');
+      }
     }
-    return NULL;
+    return $preset ? CRM_Utils_Array::value($preset, $items) : $items;
   }
 
   /**
-   * @param bool $checkIfFileExists
-   *   If false, this fn will return fileName even if it doesn't exist
+   * @param string $preset
    *
    * @return null|string
    */
-  public static function getConfigFile($checkIfFileExists = TRUE) {
-    $fileName = Civi::paths()->getPath(self::CONFIG_FILENAME);
-    return !$checkIfFileExists || is_file($fileName) ? $fileName : NULL;
+  public static function getConfigFile($preset = 'default') {
+    $fileName = Civi::paths()->getPath(self::CONFIG_FILEPATH . $preset . '.js');
+    return is_file($fileName) ? $fileName : NULL;
   }
 
   /**
    * @param string $contents
    */
-  public static function saveConfigFile($contents) {
-    $file = self::getConfigFile(FALSE);
+  public static function saveConfigFile($preset, $contents) {
+    $file = Civi::paths()->getPath(self::CONFIG_FILEPATH . $preset . '.js');
     file_put_contents($file, $contents);
   }
 
   /**
    * Delete config file.
    */
-  public static function deleteConfigFile() {
-    $file = self::getConfigFile();
+  public static function deleteConfigFile($preset) {
+    $file = self::getConfigFile($preset);
     if ($file) {
       unlink($file);
     }
