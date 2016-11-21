@@ -413,9 +413,9 @@ LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_
     // merge with original queryParams if relative date value(s) found
     if (count($relativeDates['relative_dates'])) {
       // fix up relative date range
-      foreach($relativeDates['relative_dates'] as $entityName => $value) {
+      foreach ($relativeDates['relative_dates'] as $entityName => $value) {
         if ($value == 1) {
-          foreach($queryParams as &$param) {
+          foreach ($queryParams as &$param) {
             if (strpos($param[0], $entityName) === 0) {
               $param[2] = $formValues[$param[0]];
             }
