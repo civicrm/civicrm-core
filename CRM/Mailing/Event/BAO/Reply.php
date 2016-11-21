@@ -403,7 +403,7 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
     }
 
     if ($is_distinct) {
-      $query .= " GROUP BY $queue.id ";
+      $query .= " GROUP BY $queue.id, $contact.id, $reply.time_stamp ";
     }
 
     $orderBy = "sort_name ASC, {$reply}.time_stamp DESC";
