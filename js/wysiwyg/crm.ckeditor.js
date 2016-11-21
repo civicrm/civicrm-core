@@ -64,11 +64,13 @@
     function initialize() {
       var
         browseUrl = CRM.config.resourceBase + "packages/kcfinder/browse.php?cms=civicrm",
-        uploadUrl = CRM.config.resourceBase + "packages/kcfinder/upload.php?cms=civicrm";
+        uploadUrl = CRM.config.resourceBase + "packages/kcfinder/upload.php?cms=civicrm",
+        preset = $(item).data('preset') || 'default',
+        // This variable is always an array but a legacy extension could be setting it as a string.
+        customConfig = (typeof CRM.config.CKEditorCustomConfig === 'string') ? CRM.config.CKEditorCustomConfig :
+          (CRM.config.CKEditorCustomConfig[preset] || CRM.config.CKEditorCustomConfig.default);
 
       $(item).addClass('crm-wysiwyg-enabled');
-
-      var isFullPage = $(item).hasClass('crm-wysiwyg-fullpage');
 
       CKEDITOR.replace($(item)[0], {
         filebrowserBrowseUrl: browseUrl + '&type=files',
@@ -77,9 +79,7 @@
         filebrowserUploadUrl: uploadUrl + '&type=files',
         filebrowserImageUploadUrl: uploadUrl + '&type=images',
         filebrowserFlashUploadUrl: uploadUrl + '&type=flash',
-        allowedContent: true, // For CiviMail!
-        fullPage: isFullPage,
-        customConfig: CRM.config.CKEditorCustomConfig,
+        customConfig: customConfig,
         on: {
           instanceReady: onReady
         }
