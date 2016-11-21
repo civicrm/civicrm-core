@@ -728,6 +728,7 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
       'product_name' => 1,
       'currency' => 1,
       'cancel_date' => 1,
+      'contribution_recur_id' => 1,
     );
     if (self::isSoftCreditOptionEnabled()) {
       $properties = array_merge($properties, self::softCreditReturnProperties());
