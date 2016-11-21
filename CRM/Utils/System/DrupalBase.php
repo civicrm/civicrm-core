@@ -646,7 +646,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
         }
 
         //Check if files path exists...
-        if ($this->checkFilesExists($basepath, $folder)) {
+        if ($this->checkFilesExists($basepath, $folder) && $folder == $_SERVER['HTTP_HOST']) {
           $correct = $folder;
           break;
         }
