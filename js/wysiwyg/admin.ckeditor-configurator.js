@@ -44,7 +44,7 @@
         $el.after('<span>&nbsp; = &nbsp;<select class="crm-form-select" name="config_' + name + '"><option value="false">false</option><option value="true">true</option></select></span>');
       }
       else {
-        $el.after('<span>&nbsp; = &nbsp;<input class="crm-form-text huge" type="' + (type==='Number' ? 'number' : 'text') + '" name="config_' + name + '" /></span>');
+        $el.after('<span>&nbsp; = &nbsp;<input class="crm-form-text ' + (type==='Number' ? 'eight" type="number"' : 'huge" type="text"') + ' name="config_' + name + '"/></span>');
       }
     } else {
       $el.closest('div').remove();
