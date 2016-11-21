@@ -801,7 +801,7 @@ class CRM_Utils_Date {
    *   start date, end date
    */
   public static function getFromTo($relative, $from, $to) {
-    if ($relative) {
+    if (strpos($relative, '.') !== FALSE) {
       list($term, $unit) = explode('.', $relative);
       $dateRange = self::relativeToAbsolute($term, $unit);
       $from = $dateRange['from'];
@@ -810,7 +810,7 @@ class CRM_Utils_Date {
     }
 
     $from = self::processDate($from);
-    $to = self::processDate($to, '235959');
+    $to = self::processDate($to, $relative != 1 ? '235959' : NULL);
 
     return array($from, $to);
   }

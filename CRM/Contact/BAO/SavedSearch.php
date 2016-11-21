@@ -116,7 +116,7 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
         if (strpos($id, '_date_low') !== FALSE || strpos($id, '_date_high') !== FALSE) {
           $entityName = strstr($id, '_date', TRUE);
           if (!empty($result['relative_dates']) && array_key_exists($entityName, $result['relative_dates'])) {
-            $result[$id] = NULL;
+            $result[$id] = $result['relative_dates'][$entityName] == 1 ? $value : NULL;
             $result["{$entityName}_date_relative"] = $result['relative_dates'][$entityName];
           }
           else {
@@ -412,6 +412,16 @@ LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_
     }
     // merge with original queryParams if relative date value(s) found
     if (count($relativeDates['relative_dates'])) {
+      // fix up relative date range
+      foreach($relativeDates['relative_dates'] as $entityName => $value) {
+        if ($value == 1) {
+          foreach($queryParams as &$param) {
+            if (strpos($param[0], $entityName) === 0) {
+              $param[2] = $formValues[$param[0]];
+            }
+          }
+        }
+      }
       $queryParams = array_merge($queryParams, $relativeDates);
     }
   }

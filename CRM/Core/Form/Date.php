@@ -132,6 +132,7 @@ class CRM_Core_Form_Date {
     $selector = array(
       '' => ts('- any -'),
       0 => ts('Choose Date Range'),
+      1 => ts('Relative Date Range'),
     );
     // CRM-16195 Pull relative date filters from an option group
     $selector = $selector + CRM_Core_OptionGroup::values('relative_date_filters');
