@@ -185,12 +185,10 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
    * Test the submit function on the contribution page.
    */
   public function testSubmitCreditCardPayPal() {
-    $this->markTestIncomplete('Paypal is creating a complete contribution but we are testing pending
-      we are unsure at this point if this is correct behaviour or not');
-    return;
     $form = new CRM_Contribute_Form_Contribution();
     $paymentProcessorID = $this->paymentProcessorCreate(array('is_test' => 0));
     $form->_mode = 'Live';
+    $error = FALSE;
     try {
       $form->testSubmit(array(
         'total_amount' => 50,
@@ -198,7 +196,6 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
         'receive_date' => '04/21/2015',
         'receive_date_time' => '11:27PM',
         'contact_id' => $this->_individualId,
-        'payment_instrument_id' => array_search('Credit Card', $this->paymentInstruments),
         'contribution_status_id' => 1,
         'credit_card_number' => 4444333322221111,
         'cvv2' => 123,
@@ -229,12 +226,16 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       ), CRM_Core_Action::ADD);
     }
     catch (Civi\Payment\Exception\PaymentProcessorException $e) {
-      $this->assertEquals('Transaction cannot be processed. Please use a different payment card.',
-        $e->getMessage());
+      $error = TRUE;
     }
+
     $this->callAPISuccessGetCount('Contribution', array(
       'contact_id' => $this->_individualId,
-      'contribution_status_id' => 'Pending',
+      'contribution_status_id' => $error ? 'Pending' : 'Completed',
+      'payment_instrument_id' => $this->callAPISuccessGetValue('PaymentProcessor', array(
+        'return' => 'payment_instrument_id',
+        'id' => $paymentProcessorID,
+       )),
     ), 1);
     $contact = $this->callAPISuccessGetSingle('Contact', array('id' => $this->_individualId));
     $this->assertTrue(empty($contact['source']));

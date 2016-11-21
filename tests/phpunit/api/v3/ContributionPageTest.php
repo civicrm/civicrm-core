@@ -257,6 +257,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'trxn_id' => 'create_first_success',
       'fee_amount' => .85,
     ));
+    $processor = $dummyPP->getPaymentProcessor();
     $this->callAPISuccess('ContributionPage', 'create', array(
       'id' => $this->_ids['contribution_page'],
       'payment_processor' => array($paymentProcessor2ID, $this->_ids['payment_processor']),
@@ -286,6 +287,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->_checkFinancialRecords(array(
       'id' => $contribution['id'],
       'total_amount' => $contribution['total_amount'],
+      'payment_instrument_id' => $processor['payment_instrument_id'],
     ), 'online');
   }
 
@@ -399,6 +401,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->callAPIAndDocument('contribution_page', 'submit', $submitParams, __FUNCTION__, __FILE__, 'submit contribution page', NULL);
     $contributions = $this->callAPISuccess('contribution', 'get', array('contribution_page_id' => $this->_ids['contribution_page']));
     $this->assertCount(2, $contributions['values']);
+    $this->callAPISuccessGetCount('LineItem', array(), 2);
     $membershipPayment = $this->callAPISuccess('membership_payment', 'getsingle', array());
     $this->assertTrue(in_array($membershipPayment['contribution_id'], array_keys($contributions['values'])));
     $membership = $this->callAPISuccessGetSingle('membership', array('id' => $membershipPayment['membership_id']));
@@ -599,6 +602,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->setUpMembershipContributionPage();
     $dummyPP = Civi\Payment\System::singleton()->getByProcessor($this->_paymentProcessor);
     $dummyPP->setDoDirectPaymentResult(array('payment_status_id' => 1, 'trxn_id' => 'create_first_success'));
+    $processor = $dummyPP->getPaymentProcessor();
 
     $submitParams = array(
       'price_' . $this->_ids['price_field'][0] => reset($this->_ids['price_field_value']),
@@ -624,6 +628,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'contribution_page_id' => $this->_ids['contribution_page'],
       'contribution_status_id' => 1,
     ));
+    $this->assertEquals($processor['payment_instrument_id'], $contribution['payment_instrument_id']);
 
     $this->assertEquals('create_first_success', $contribution['trxn_id']);
     $membershipPayment = $this->callAPISuccess('membership_payment', 'getsingle', array());
@@ -632,8 +637,8 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->assertEquals($membership['contact_id'], $contribution['contact_id']);
     $this->assertEquals(1, $membership['status_id']);
     $this->callAPISuccess('contribution_recur', 'getsingle', array('id' => $contribution['contribution_recur_id']));
-    //@todo - check with Joe about these not existing
-    //$this->callAPISuccess('line_item', 'getsingle', array('contribution_id' => $contribution['id'], 'entity_id' => $membership['id']));
+
+    $this->callAPISuccess('line_item', 'getsingle', array('contribution_id' => $contribution['id'], 'entity_id' => $membership['id']));
     //renew it with processor setting completed - should extend membership
     $submitParams['contact_id'] = $contribution['contact_id'];
     $dummyPP->setDoDirectPaymentResult(array('payment_status_id' => 1, 'trxn_id' => 'create_second_success'));
@@ -646,6 +651,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $renewedMembership = $this->callAPISuccessGetSingle('membership', array('id' => $membershipPayment['membership_id']));
     $this->assertEquals(date('Y-m-d', strtotime('+ 1 year', strtotime($membership['end_date']))), $renewedMembership['end_date']);
     $recurringContribution = $this->callAPISuccess('contribution_recur', 'getsingle', array('id' => $contribution['contribution_recur_id']));
+    $this->assertEquals($processor['payment_instrument_id'], $recurringContribution['payment_instrument_id']);
     $this->assertEquals(5, $recurringContribution['contribution_status_id']);
   }
 
@@ -710,6 +716,13 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->setUpMembershipContributionPage();
     $dummyPP = Civi\Payment\System::singleton()->getByProcessor($this->_paymentProcessor);
     $dummyPP->setDoDirectPaymentResult(array('payment_status_id' => 2));
+    $this->membershipTypeCreate(array('name' => 'Student'));
+
+    // Add a contribution & a couple of memberships so the id will not be 1 & will differ from membership id.
+    // This saves us from 'accidental success'.
+    $this->contributionCreate(array('contact_id' => $this->contactIds[0]));
+    $this->contactMembershipCreate(array('contact_id' => $this->contactIds[0]));
+    $this->contactMembershipCreate(array('contact_id' => $this->contactIds[0], 'membership_type_id' => 'Student'));
 
     $submitParams = array(
       'price_' . $this->_ids['price_field'][0] => reset($this->_ids['price_field_value']),
@@ -735,18 +748,26 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'contribution_page_id' => $this->_ids['contribution_page'],
       'contribution_status_id' => 2,
     ));
+
     $membershipPayment = $this->callAPISuccess('membership_payment', 'getsingle', array());
     $this->assertEquals($membershipPayment['contribution_id'], $contribution['id']);
     $membership = $this->callAPISuccessGetSingle('membership', array('id' => $membershipPayment['membership_id']));
     $this->assertEquals($membership['contact_id'], $contribution['contact_id']);
     $this->assertEquals(5, $membership['status_id']);
-    //@todo - check with Joe about these not existing
-    //$this->callAPISuccess('line_item', 'getsingle', array('contribution_id' => $contribution['id'], 'entity_id' => $membership['id']));
+
+    $line = $this->callAPISuccess('line_item', 'getsingle', array('contribution_id' => $contribution['id']));
+    $this->assertEquals('civicrm_membership', $line['entity_table']);
+    $this->assertEquals($membership['id'], $line['entity_id']);
+
     $this->callAPISuccess('contribution', 'completetransaction', array(
       'id' => $contribution['id'],
       'trxn_id' => 'ipn_called',
       'payment_processor_id' => $this->_paymentProcessor['id'],
     ));
+    $line = $this->callAPISuccess('line_item', 'getsingle', array('contribution_id' => $contribution['id']));
+    $this->assertEquals('civicrm_membership', $line['entity_table']);
+    $this->assertEquals($membership['id'], $line['entity_id']);
+
     $membership = $this->callAPISuccessGetSingle('membership', array('id' => $membershipPayment['membership_id']));
     //renew it with processor setting completed - should extend membership
     $submitParams = array_merge($submitParams, array(
@@ -756,6 +777,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
         'frequency_unit' => 'month',
       )
     );
+
     $dummyPP->setDoDirectPaymentResult(array('payment_status_id' => 2));
     $this->callAPISuccess('contribution_page', 'submit', $submitParams);
     $newContribution = $this->callAPISuccess('contribution', 'getsingle', array(
@@ -766,6 +788,9 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
         'contribution_status_id' => 2,
       )
     );
+    $line = $this->callAPISuccess('line_item', 'getsingle', array('contribution_id' => $newContribution['id']));
+    $this->assertEquals('civicrm_membership', $line['entity_table']);
+    $this->assertEquals($membership['id'], $line['entity_id']);
 
     $renewedMembership = $this->callAPISuccessGetSingle('membership', array('id' => $membershipPayment['membership_id']));
     //no renewal as the date hasn't changed

@@ -827,7 +827,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
             }
           }
           $membershipSource = CRM_Utils_Array::value('source', $value);
-          list($membership) = CRM_Member_BAO_Membership::renewMembership(
+          list($membership) = CRM_Member_BAO_Membership::processMembership(
             $value['contact_id'], $value['membership_type_id'], FALSE,
             //$numTerms should be default to 1.
             NULL, NULL, $value['custom'], 1, NULL, FALSE,
