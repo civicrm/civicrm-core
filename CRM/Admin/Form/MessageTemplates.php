@@ -205,7 +205,7 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
           'cols' => '80',
           'rows' => '8',
           'onkeyup' => "return verify(this)",
-          'class' => 'crm-wysiwyg-fullpage',
+          'preset' => 'civimail',
         )
       );
     }

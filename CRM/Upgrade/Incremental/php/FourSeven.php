@@ -257,6 +257,15 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
     $this->addTask('Add column to allow for payment processors to set what card types are accepted', 'addAcceptedCardTypesField');
   }
 
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_4_7_14($rev) {
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
+    $this->addTask('Add WYSIWYG Editor Presets', 'addWysiwygPresets');
+  }
 
   /*
    * Important! All upgrade functions MUST add a 'runSql' task.
@@ -879,6 +888,44 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
     if (!CRM_Core_BAO_SchemaHandler::checkIfFieldExists('civicrm_payment_processor', 'accepted_credit_cards')) {
       CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_payment_processor ADD COLUMN `accepted_credit_cards` text   DEFAULT NULL COMMENT 'array of accepted credit card types'");
     }
+    return TRUE;
+  }
+
+  /**
+   * CRM-19372 Add field to store accepted credit credit cards for a payment processor.
+   * @return bool
+   */
+  public static function addWysiwygPresets() {
+    CRM_Core_BAO_OptionGroup::ensureOptionGroupExists(array(
+      'name' => 'wysiwyg_presets',
+      'title' => ts('WYSIWYG Editor Presets'),
+      'is_reserved' => 1,
+    ));
+    $values = array(
+      'default' => array('label' => ts('Default'), 'is_default' => 1),
+      'civimail' => array('label' => ts('CiviMail'), 'component_id' => 'CiviMail'),
+      'civievent' => array('label' => ts('CiviEvent'), 'component_id' => 'CiviEvent'),
+    );
+    foreach ($values as $name => $value) {
+      civicrm_api3('OptionValue', 'create', $value + array(
+        'options' => array('match' => array('name', 'option_group_id')),
+        'name' => $name,
+        'option_group_id' => 'wysiwyg_presets',
+      ));
+    }
+    $fileName = Civi::paths()->getPath('[civicrm.files]/persist/crm-ckeditor-config.js');
+    if (file_exists($fileName)) {
+      $config = file_get_contents($fileName);
+      $pos = strrpos($config, '};');
+      $setting = "\n\tconfig.allowedContent = true;\n";
+      $config = substr_replace($config, $setting, $pos, 0);
+      unlink($fileName);
+    }
+    else {
+      $config = "CKEDITOR.editorConfig = function( config ) {\n\tconfig.allowedContent = true;\n};\n";
+    }
+    $newFileName = Civi::paths()->getPath('[civicrm.files]/persist/crm-ckeditor-default.js');
+    file_put_contents($newFileName, $config);
     return TRUE;
   }
 
