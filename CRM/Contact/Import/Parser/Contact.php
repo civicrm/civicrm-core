@@ -2222,7 +2222,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
       if (isset($extIDContact['id'])) {
         $extIDMatch = $extIDContact['id'];
 
-        if ($extIDResult['values'][$extIDMatch]['contact_is_deleted'] == 1) {
+        if ($extIDContact['values'][$extIDMatch]['contact_is_deleted'] == 1) {
           // If the contact is deleted, restore it so it can be properly
           // updated.
           $params = array('id' => $extIDMatch, 'contact_is_deleted' => 0);
