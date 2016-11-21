@@ -1,0 +1,1177 @@
+[
+    {
+        "id": "allowedContent",
+        "type": "CKEDITOR.filter.allowedContentRules\/Boolean",
+        "description": "Allowed content rules."
+    },
+    {
+        "id": "autoEmbed_widget",
+        "type": "String\/Function",
+        "description": "Specifies the widget to use to automatically embed a link."
+    },
+    {
+        "id": "autoGrow_bottomSpace",
+        "type": "Number",
+        "description": "Extra vertical space to be added between the content and the editor bottom bar when adjusting editor height to conten..."
+    },
+    {
+        "id": "autoGrow_maxHeight",
+        "type": "Number",
+        "description": "The maximum height that the editor can assume when adjusting to content by using the Auto Grow feature."
+    },
+    {
+        "id": "autoGrow_minHeight",
+        "type": "Number",
+        "description": "The minimum height that the editor can assume when adjusting to content by using the Auto Grow feature."
+    },
+    {
+        "id": "autoGrow_onStartup",
+        "type": "Boolean",
+        "description": "Whether automatic editor height adjustment brought by the Auto Grow feature should happen on editor creation."
+    },
+    {
+        "id": "autoParagraph",
+        "type": "Boolean",
+        "description": "Whether to automatically create wrapping blocks around inline content inside the document body."
+    },
+    {
+        "id": "autoUpdateElement",
+        "type": "Boolean",
+        "description": "Whether the element replaced by the editor (usually a &lt;textarea&gt;) is to be updated automatically when posting t..."
+    },
+    {
+        "id": "baseFloatZIndex",
+        "type": "Number",
+        "description": "The base Z-index for floating dialog windows and popups."
+    },
+    {
+        "id": "baseHref",
+        "type": "String",
+        "description": "The base href URL used to resolve relative and absolute URLs in the editor content."
+    },
+    {
+        "id": "basicEntities",
+        "type": "Boolean",
+        "description": "Whether to escape basic HTML entities in the document, including:   &amp;nbsp; &amp;gt; &amp;lt; &amp;amp;    Note: T..."
+    },
+    {
+        "id": "blockedKeystrokes",
+        "type": "Array",
+        "description": "The keystrokes that are blocked by default as the browser implementation is buggy."
+    },
+    {
+        "id": "bodyClass",
+        "type": "String",
+        "description": "Sets the class attribute to be used on the body element of the editing area."
+    },
+    {
+        "id": "bodyId",
+        "type": "String",
+        "description": "Sets the id attribute to be used on the body element of the editing area."
+    },
+    {
+        "id": "browserContextMenuOnCtrl",
+        "type": "Boolean",
+        "description": "Whether to show the browser native context menu when the Ctrl or Meta (Mac) key is pressed on opening the context men..."
+    },
+    {
+        "id": "clipboard_defaultContentType",
+        "type": "'html'\/'text'",
+        "description": "The default content type that is used when pasted data cannot be clearly recognized as HTML or text."
+    },
+    {
+        "id": "codeSnippetGeshi_url",
+        "type": "String",
+        "description": "Sets GeSHi URL which, once queried with Ajax, will return highlighted code."
+    },
+    {
+        "id": "codeSnippet_codeClass",
+        "type": "String",
+        "description": "A CSS class of the &lt;code&gt; element used internally for styling (by default highlight.js themes, see config.codeS..."
+    },
+    {
+        "id": "codeSnippet_languages",
+        "type": "Object",
+        "description": "Restricts languages available in the \"Code Snippet\" dialog window."
+    },
+    {
+        "id": "codeSnippet_theme",
+        "type": "String",
+        "description": "A theme used to render code snippets."
+    },
+    {
+        "id": "colorButton_backStyle",
+        "type": "Object",
+        "description": "Stores the style definition that applies the text background color."
+    },
+    {
+        "id": "colorButton_colors",
+        "type": "String",
+        "description": "Defines the colors to be displayed in the color selectors."
+    },
+    {
+        "id": "colorButton_enableAutomatic",
+        "type": "Boolean",
+        "description": "Whether to enable the Automatic button in the color selectors."
+    },
+    {
+        "id": "colorButton_enableMore",
+        "type": "Boolean",
+        "description": "Whether to enable the More Colors button in the color selectors."
+    },
+    {
+        "id": "colorButton_foreStyle",
+        "type": "Object",
+        "description": "Stores the style definition that applies the text foreground color."
+    },
+    {
+        "id": "contentsCss",
+        "type": "String\/Array",
+        "description": "The CSS file(s) to be used to apply style to editor content."
+    },
+    {
+        "id": "contentsLangDirection",
+        "type": "String",
+        "description": "The writing direction of the language which is used to create editor content."
+    },
+    {
+        "id": "contentsLanguage",
+        "type": "String",
+        "description": "Language code of  the writing language which is used to author the editor content."
+    },
+    {
+        "id": "copyFormatting_allowRules",
+        "type": "String",
+        "description": "Defines rules for the elements from which the styles should be fetched."
+    },
+    {
+        "id": "copyFormatting_allowedContexts",
+        "type": "Boolean\/String[]",
+        "description": "Defines which contexts should be enabled in the Copy Formatting plugin."
+    },
+    {
+        "id": "copyFormatting_disallowRules",
+        "type": "String",
+        "description": "Defines rules for the elements from which fetching styles is explicitly forbidden (eg."
+    },
+    {
+        "id": "copyFormatting_keystrokeCopy",
+        "type": "Number",
+        "description": "Defines the keyboard shortcut for copying styles."
+    },
+    {
+        "id": "copyFormatting_keystrokePaste",
+        "type": "Number",
+        "description": "Defines the keyboard shortcut for applying styles."
+    },
+    {
+        "id": "copyFormatting_outerCursor",
+        "type": "Boolean",
+        "description": "Defines if the \"disabled\" cursor should be attached to the whole page when the Copy Formatting plugin is active."
+    },
+    {
+        "id": "coreStyles_bold",
+        "type": "Object",
+        "description": "The style definition that applies the bold style to the text."
+    },
+    {
+        "id": "coreStyles_italic",
+        "type": "Object",
+        "description": "The style definition that applies the italics style to the text."
+    },
+    {
+        "id": "coreStyles_strike",
+        "type": "Object",
+        "description": "The style definition that applies the strikethrough style to the text."
+    },
+    {
+        "id": "coreStyles_subscript",
+        "type": "Object",
+        "description": "The style definition that applies the subscript style to the text."
+    },
+    {
+        "id": "coreStyles_superscript",
+        "type": "Object",
+        "description": "The style definition that applies the superscript style to the text."
+    },
+    {
+        "id": "coreStyles_underline",
+        "type": "Object",
+        "description": "The style definition that applies the underline style to the text."
+    },
+    {
+        "id": "customConfig",
+        "type": "String",
+        "description": "The URL path to the custom configuration file to be loaded."
+    },
+    {
+        "id": "dataIndentationChars",
+        "type": "String",
+        "description": "The characters to be used for indenting HTML output produced by the editor."
+    },
+    {
+        "id": "defaultLanguage",
+        "type": "String",
+        "description": "The language to be used if the language setting is left empty and it is not possible to localize the editor to the us..."
+    },
+    {
+        "id": "devtools_styles",
+        "type": "String",
+        "description": "A setting that stores CSS rules to be injected into the page with styles to be applied to the tooltip element."
+    },
+    {
+        "id": "devtools_textCallback",
+        "type": "Function",
+        "description": "A function that returns the text to be displayed inside the Developer Tools tooltip when hovering over a dialog UI el..."
+    },
+    {
+        "id": "dialog_backgroundCoverColor",
+        "type": "String",
+        "description": "The color of the dialog background cover."
+    },
+    {
+        "id": "dialog_backgroundCoverOpacity",
+        "type": "Number",
+        "description": "The opacity of the dialog background cover."
+    },
+    {
+        "id": "dialog_buttonsOrder",
+        "type": "String",
+        "description": "The guideline to follow when generating the dialog buttons."
+    },
+    {
+        "id": "dialog_magnetDistance",
+        "type": "Number",
+        "description": "The distance of magnetic borders used in moving and resizing dialogs, measured in pixels."
+    },
+    {
+        "id": "dialog_noConfirmCancel",
+        "type": "Boolean",
+        "description": "Tells if user should not be asked to confirm close, if any dialog field was modified."
+    },
+    {
+        "id": "dialog_startupFocusTab",
+        "type": "Boolean",
+        "description": "If the dialog has more than one tab, put focus into the first tab as soon as dialog is opened."
+    },
+    {
+        "id": "disableNativeSpellChecker",
+        "type": "Boolean",
+        "description": "Disables the built-in spell checker if the browser provides one."
+    },
+    {
+        "id": "disableNativeTableHandles",
+        "type": "Boolean",
+        "description": "Disables the \"table tools\" offered natively by the browser (currently Firefox only) to perform quick table editing op..."
+    },
+    {
+        "id": "disableObjectResizing",
+        "type": "Boolean",
+        "description": "Disables the ability to resize objects (images and tables) in the editing area."
+    },
+    {
+        "id": "disableReadonlyStyling",
+        "type": "Boolean",
+        "description": "Disables inline styling on read-only elements."
+    },
+    {
+        "id": "disallowedContent",
+        "type": "CKEDITOR.filter.disallowedContentRules",
+        "description": "Disallowed content rules."
+    },
+    {
+        "id": "div_wrapTable",
+        "type": "Boolean",
+        "description": "Whether to wrap the entire table instead of individual cells when creating a &lt;div&gt; in a table cell."
+    },
+    {
+        "id": "docType",
+        "type": "String",
+        "description": "Sets the DOCTYPE to be used when loading the editor content as HTML."
+    },
+    {
+        "id": "emailProtection",
+        "type": "String",
+        "description": "The e-mail address anti-spam protection option."
+    },
+    {
+        "id": "embed_provider",
+        "type": "String",
+        "description": "A template for the URL of the provider endpoint."
+    },
+    {
+        "id": "enableTabKeyTools",
+        "type": "Boolean",
+        "description": "Allow context-sensitive Tab key behaviors, including the following scenarios:  When selection is anchored inside tabl..."
+    },
+    {
+        "id": "enterMode",
+        "type": "Number",
+        "description": "Sets the behavior of the Enter key."
+    },
+    {
+        "id": "entities",
+        "type": "Boolean",
+        "description": "Whether to use HTML entities in the editor output."
+    },
+    {
+        "id": "entities_additional",
+        "type": "String",
+        "description": "A comma-separated list of  additional entities to be used."
+    },
+    {
+        "id": "entities_greek",
+        "type": "Boolean",
+        "description": "Whether to convert some symbols, mathematical symbols, and Greek letters to HTML entities."
+    },
+    {
+        "id": "entities_latin",
+        "type": "Boolean",
+        "description": "Whether to convert some Latin characters (Latin alphabet No."
+    },
+    {
+        "id": "entities_processNumerical",
+        "type": "Boolean\/String",
+        "description": "Whether to convert all remaining characters not included in the ASCII character table to their relative decimal numer..."
+    },
+    {
+        "id": "extraAllowedContent",
+        "type": "Object\/String",
+        "description": "This option makes it possible to set additional allowed content rules for CKEDITOR.editor.filter."
+    },
+    {
+        "id": "extraPlugins",
+        "type": "String",
+        "description": "A list of additional plugins to be loaded."
+    },
+    {
+        "id": "fileTools_defaultFileName",
+        "type": "String",
+        "description": "Default file name (without extension) that will be used for files created from a Base64 data string (for example for ..."
+    },
+    {
+        "id": "filebrowserBrowseUrl",
+        "type": "String",
+        "description": "The location of an external file manager that should be launched when the Browse Server button is pressed."
+    },
+    {
+        "id": "filebrowserFlashBrowseUrl",
+        "type": "String",
+        "description": "The location of an external file browser that should be launched when the Browse Server button is pressed in the Flas..."
+    },
+    {
+        "id": "filebrowserFlashUploadUrl",
+        "type": "String",
+        "description": "The location of the script that handles file uploads in the Flash dialog window."
+    },
+    {
+        "id": "filebrowserImageBrowseLinkUrl",
+        "type": "String",
+        "description": "The location of an external file manager that should be launched when the Browse Server button is pressed in the Link..."
+    },
+    {
+        "id": "filebrowserImageBrowseUrl",
+        "type": "String",
+        "description": "The location of an external file manager that should be launched when the Browse Server button is pressed in the Imag..."
+    },
+    {
+        "id": "filebrowserImageUploadUrl",
+        "type": "String",
+        "description": "The location of the script that handles file uploads in the Image dialog window."
+    },
+    {
+        "id": "filebrowserUploadUrl",
+        "type": "String",
+        "description": "The location of the script that handles file uploads."
+    },
+    {
+        "id": "filebrowserWindowFeatures",
+        "type": "String",
+        "description": "The features to use in the file manager popup window."
+    },
+    {
+        "id": "filebrowserWindowHeight",
+        "type": "Number\/String",
+        "description": "The height of the file manager popup window."
+    },
+    {
+        "id": "filebrowserWindowWidth",
+        "type": "Number\/String",
+        "description": "The width of the file manager popup window."
+    },
+    {
+        "id": "fillEmptyBlocks",
+        "type": "Boolean\/Function",
+        "description": "Whether a filler text (non-breaking space entity &mdash; &amp;nbsp;) will be inserted into empty block elements in HT..."
+    },
+    {
+        "id": "find_highlight",
+        "type": "Object",
+        "description": "Defines the style to be used to highlight results with the find dialog."
+    },
+    {
+        "id": "flashAddEmbedTag",
+        "type": "Boolean",
+        "description": "Add &lt;embed&gt; tag as alternative: &lt;object&gt;&lt;embed&gt;&lt;\/embed&gt;&lt;\/object&gt;."
+    },
+    {
+        "id": "flashConvertOnEdit",
+        "type": "Boolean",
+        "description": "Use flashEmbedTagOnly and flashAddEmbedTag values on edit."
+    },
+    {
+        "id": "flashEmbedTagOnly",
+        "type": "Boolean",
+        "description": "Save as &lt;embed&gt; tag only."
+    },
+    {
+        "id": "floatSpaceDockedOffsetX",
+        "type": "Number",
+        "description": "Along with floatSpaceDockedOffsetY it defines the amount of offset (in pixels) between the float space and the editab..."
+    },
+    {
+        "id": "floatSpaceDockedOffsetY",
+        "type": "Number",
+        "description": "Along with floatSpaceDockedOffsetX it defines the amount of offset (in pixels) between the float space and the editab..."
+    },
+    {
+        "id": "floatSpacePinnedOffsetX",
+        "type": "Number",
+        "description": "Along with floatSpacePinnedOffsetY it defines the amount of offset (in pixels) between the float space and the viewpo..."
+    },
+    {
+        "id": "floatSpacePinnedOffsetY",
+        "type": "Number",
+        "description": "Along with floatSpacePinnedOffsetX it defines the amount of offset (in pixels) between the float space and the viewpo..."
+    },
+    {
+        "id": "floatSpacePreferRight",
+        "type": "Boolean",
+        "description": "Indicates that the float space should be aligned to the right side of the editable area rather than to the left (if p..."
+    },
+    {
+        "id": "fontSize_defaultLabel",
+        "type": "String",
+        "description": "The text to be displayed in the Font Size combo is none of the available values matches the current cursor position o..."
+    },
+    {
+        "id": "fontSize_sizes",
+        "type": "String",
+        "description": "The list of fonts size to be displayed in the Font Size combo in the toolbar."
+    },
+    {
+        "id": "fontSize_style",
+        "type": "Object",
+        "description": "The style definition to be used to apply the font size in the text."
+    },
+    {
+        "id": "font_defaultLabel",
+        "type": "String",
+        "description": "The text to be displayed in the Font combo is none of the available values matches the current cursor position or tex..."
+    },
+    {
+        "id": "font_names",
+        "type": "String",
+        "description": "The list of fonts names to be displayed in the Font combo in the toolbar."
+    },
+    {
+        "id": "font_style",
+        "type": "Object",
+        "description": "The style definition to be used to apply the font in the text."
+    },
+    {
+        "id": "forceEnterMode",
+        "type": "Boolean",
+        "description": "Forces the use of enterMode as line break regardless of the context."
+    },
+    {
+        "id": "forcePasteAsPlainText",
+        "type": "Boolean",
+        "description": "Whether to force all pasting operations to insert on plain text into the editor, loosing any formatting information p..."
+    },
+    {
+        "id": "forceSimpleAmpersand",
+        "type": "Boolean",
+        "description": "Whether to force using '&amp;' instead of '&amp;amp;' in element attributes values."
+    },
+    {
+        "id": "format_address",
+        "type": "Object",
+        "description": "The style definition to be used to apply the Address format."
+    },
+    {
+        "id": "format_div",
+        "type": "Object",
+        "description": "The style definition to be used to apply the Normal (DIV) format."
+    },
+    {
+        "id": "format_h1",
+        "type": "Object",
+        "description": "The style definition to be used to apply the Heading 1 format."
+    },
+    {
+        "id": "format_h2",
+        "type": "Object",
+        "description": "The style definition to be used to apply the Heading 2 format."
+    },
+    {
+        "id": "format_h3",
+        "type": "Object",
+        "description": "The style definition to be used to apply the Heading 3 format."
+    },
+    {
+        "id": "format_h4",
+        "type": "Object",
+        "description": "The style definition to be used to apply the Heading 4 format."
+    },
+    {
+        "id": "format_h5",
+        "type": "Object",
+        "description": "The style definition to be used to apply the Heading 5 format."
+    },
+    {
+        "id": "format_h6",
+        "type": "Object",
+        "description": "The style definition to be used to apply the Heading 6 format."
+    },
+    {
+        "id": "format_p",
+        "type": "Object",
+        "description": "The style definition to be used to apply the Normal format."
+    },
+    {
+        "id": "format_pre",
+        "type": "Object",
+        "description": "The style definition to be used to apply the Formatted format."
+    },
+    {
+        "id": "format_tags",
+        "type": "String",
+        "description": "A list of semicolon-separated style names (by default: tags) representing the style definition for each entry to be d..."
+    },
+    {
+        "id": "fullPage",
+        "type": "Boolean",
+        "description": "Indicates whether the content to be edited is being input as a full HTML page."
+    },
+    {
+        "id": "grayt_autoStartup",
+        "type": "Boolean",
+        "description": "Enables Grammar As You Type (GRAYT) on SCAYT startup."
+    },
+    {
+        "id": "height",
+        "type": "Number\/String",
+        "description": "The height of the editing area that includes the editor content."
+    },
+    {
+        "id": "htmlEncodeOutput",
+        "type": "Boolean",
+        "description": "Whether to escape HTML when the editor updates the original input element."
+    },
+    {
+        "id": "ignoreEmptyParagraph",
+        "type": "Boolean",
+        "description": "Whether the editor must output an empty value ('') if its content only consists of an empty paragraph."
+    },
+    {
+        "id": "image2_alignClasses",
+        "type": "String[]",
+        "description": "CSS classes applied to aligned images."
+    },
+    {
+        "id": "image2_altRequired",
+        "type": "Boolean",
+        "description": "Determines whether alternative text is required for the captioned image."
+    },
+    {
+        "id": "image2_captionedClass",
+        "type": "String",
+        "description": "A CSS class applied to the &lt;figure&gt; element of a captioned image."
+    },
+    {
+        "id": "image2_disableResizer",
+        "type": "Boolean",
+        "description": "Disables the image resizer."
+    },
+    {
+        "id": "image2_prefillDimensions",
+        "type": "Boolean",
+        "description": "Determines whether dimension inputs should be automatically filled when the image URL changes in the Enhanced Image p..."
+    },
+    {
+        "id": "imageUploadUrl",
+        "type": "String",
+        "description": "The URL where images should be uploaded."
+    },
+    {
+        "id": "image_prefillDimensions",
+        "type": "Boolean",
+        "description": "Determines whether dimension inputs should be automatically filled when the image URL changes in the Image plugin dia..."
+    },
+    {
+        "id": "image_previewText",
+        "type": "String",
+        "description": "Padding text to set off the image in the preview area."
+    },
+    {
+        "id": "image_removeLinkByEmptyURL",
+        "type": "Boolean",
+        "description": "Whether to remove links when emptying the link URL field in the Image dialog window."
+    },
+    {
+        "id": "indentClasses",
+        "type": "Array",
+        "description": "A list of classes to use for indenting the contents."
+    },
+    {
+        "id": "indentOffset",
+        "type": "Number",
+        "description": "The size in indentation units of each indentation step."
+    },
+    {
+        "id": "indentUnit",
+        "type": "String",
+        "description": "The unit used for indentation offset."
+    },
+    {
+        "id": "jqueryOverrideVal",
+        "type": "Boolean",
+        "description": "Allows CKEditor to override jQuery.fn.val()."
+    },
+    {
+        "id": "justifyClasses",
+        "type": "Array",
+        "description": "List of classes to use for aligning the contents."
+    },
+    {
+        "id": "keystrokes",
+        "type": "Array",
+        "description": "A list associating keystrokes with editor commands."
+    },
+    {
+        "id": "language",
+        "type": "String",
+        "description": "The user interface language localization to use."
+    },
+    {
+        "id": "language_list",
+        "type": "Array",
+        "description": "Specifies the list of languages available in the Language plugin."
+    },
+    {
+        "id": "linkJavaScriptLinksAllowed",
+        "type": "Boolean",
+        "description": "Whether JavaScript code is allowed as a href attribute in an anchor tag."
+    },
+    {
+        "id": "linkShowAdvancedTab",
+        "type": "Boolean",
+        "description": "Whether to show the Advanced tab in the Link dialog window."
+    },
+    {
+        "id": "linkShowTargetTab",
+        "type": "Boolean",
+        "description": "Whether to show the Target tab in the Link dialog window."
+    },
+    {
+        "id": "magicline_color",
+        "type": "String",
+        "description": "Defines the color of the magic line."
+    },
+    {
+        "id": "magicline_everywhere",
+        "type": "Boolean",
+        "description": "Activates the special all-encompassing mode that considers all focus spaces between CKEDITOR.dtd.$block elements as a..."
+    },
+    {
+        "id": "magicline_holdDistance",
+        "type": "Number",
+        "description": "Defines the distance between the mouse pointer and the box within which the magic line stays revealed and no other fo..."
+    },
+    {
+        "id": "magicline_keystrokeNext",
+        "type": "Number",
+        "description": "Defines the default keystroke that accesses the closest unreachable focus space after the caret (start of the selecti..."
+    },
+    {
+        "id": "magicline_keystrokePrevious",
+        "type": "Number",
+        "description": "Defines the default keystroke that accesses the closest unreachable focus space before the caret (start of the select..."
+    },
+    {
+        "id": "magicline_tabuList",
+        "type": "Number",
+        "description": "Defines a list of attributes that, if assigned to some elements, prevent the magic line from being used within these ..."
+    },
+    {
+        "id": "magicline_triggerOffset",
+        "type": "Number",
+        "description": "Sets the default vertical distance between the edge of the element and the mouse pointer that causes the magic line t..."
+    },
+    {
+        "id": "mathJaxClass",
+        "type": "String",
+        "description": "Sets the default class for span elements that will be converted into Mathematical Formulas widgets."
+    },
+    {
+        "id": "mathJaxLib",
+        "type": "String",
+        "description": "Sets the path to the MathJax library."
+    },
+    {
+        "id": "menu_groups",
+        "type": "String",
+        "description": "A comma separated list of items group names to be displayed in the context menu."
+    },
+    {
+        "id": "menu_subMenuDelay",
+        "type": "Number",
+        "description": "The amount of time, in milliseconds, the editor waits before displaying submenu options when moving the mouse over op..."
+    },
+    {
+        "id": "newpage_html",
+        "type": "String",
+        "description": "The HTML to load in the editor when the \"new page\" command is executed."
+    },
+    {
+        "id": "notification_duration",
+        "type": "Number",
+        "description": "After how many milliseconds the notification of the info and success type should close automatically."
+    },
+    {
+        "id": "on",
+        "type": "Object",
+        "description": "Sets listeners on editor events."
+    },
+    {
+        "id": "pasteFilter",
+        "type": "String",
+        "description": "Defines a filter which is applied to external data pasted or dropped into the editor."
+    },
+    {
+        "id": "pasteFromWordCleanupFile",
+        "type": "String",
+        "description": "The file that provides the Microsoft Word cleanup function for pasting operations."
+    },
+    {
+        "id": "pasteFromWordNumberedHeadingToList",
+        "type": "Boolean",
+        "description": "Whether to transform Microsoft Word outline numbered headings into lists."
+    },
+    {
+        "id": "pasteFromWordPromptCleanup",
+        "type": "Boolean",
+        "description": "Whether to prompt the user about the clean up of content being pasted from Microsoft Word."
+    },
+    {
+        "id": "pasteFromWordRemoveFontStyles",
+        "type": "Boolean",
+        "description": "Whether to ignore all font-related formatting styles, including:   font size; font family; font foreground and backgr..."
+    },
+    {
+        "id": "pasteFromWordRemoveStyles",
+        "type": "Boolean",
+        "description": "Whether to remove element styles that cannot be managed with the editor."
+    },
+    {
+        "id": "plugins",
+        "type": "String",
+        "description": "Comma-separated list of plugins to be used in an editor instance."
+    },
+    {
+        "id": "protectedSource",
+        "type": "Array",
+        "description": "A list of regular expressions to be executed on input HTML, indicating HTML source code that when matched, must not b..."
+    },
+    {
+        "id": "readOnly",
+        "type": "Boolean",
+        "description": "If true, makes the editor start in read-only state."
+    },
+    {
+        "id": "removeButtons",
+        "type": "String",
+        "description": "List of toolbar button names that must not be rendered."
+    },
+    {
+        "id": "removeDialogTabs",
+        "type": "String",
+        "description": "The dialog contents to removed."
+    },
+    {
+        "id": "removeFormatAttributes",
+        "type": "String",
+        "description": "A comma separated list of elements attributes to be removed when executing the remove format command."
+    },
+    {
+        "id": "removeFormatTags",
+        "type": "String",
+        "description": "A comma separated list of elements to be removed when executing the remove format command."
+    },
+    {
+        "id": "removePlugins",
+        "type": "String",
+        "description": "A list of plugins that must not be loaded."
+    },
+    {
+        "id": "resize_dir",
+        "type": "String",
+        "description": "The dimensions for which the editor resizing is enabled."
+    },
+    {
+        "id": "resize_enabled",
+        "type": "Boolean",
+        "description": "Whether to enable the resizing feature."
+    },
+    {
+        "id": "resize_maxHeight",
+        "type": "Number",
+        "description": "The maximum editor height, in pixels, when resizing the editor interface by using the resize handle."
+    },
+    {
+        "id": "resize_maxWidth",
+        "type": "Number",
+        "description": "The maximum editor width, in pixels, when resizing the editor interface by using the resize handle."
+    },
+    {
+        "id": "resize_minHeight",
+        "type": "Number",
+        "description": "The minimum editor height, in pixels, when resizing the editor interface by using the resize handle."
+    },
+    {
+        "id": "resize_minWidth",
+        "type": "Number",
+        "description": "The minimum editor width, in pixels, when resizing the editor interface by using the resize handle."
+    },
+    {
+        "id": "scayt_autoStartup",
+        "type": "Boolean",
+        "description": "Automatically enables SCAYT on editor startup."
+    },
+    {
+        "id": "scayt_contextCommands",
+        "type": "String",
+        "description": "Customizes the display of SCAYT context menu commands (\"Add Word\", \"Ignore\", \"Ignore All\", \"Options\", \"Languages\", \"D..."
+    },
+    {
+        "id": "scayt_contextMenuItemsOrder",
+        "type": "String",
+        "description": "Defines the order of SCAYT context menu items by groups."
+    },
+    {
+        "id": "scayt_customDictionaryIds",
+        "type": "String",
+        "description": "Links SCAYT to custom dictionaries."
+    },
+    {
+        "id": "scayt_customerId",
+        "type": "String",
+        "description": "Sets the customer ID for SCAYT."
+    },
+    {
+        "id": "scayt_disableOptionsStorage",
+        "type": "String|Array",
+        "description": "Disables storing of SCAYT options between sessions."
+    },
+    {
+        "id": "scayt_elementsToIgnore",
+        "type": "String",
+        "description": "Specifies the names of tags that will be skipped while spell checking."
+    },
+    {
+        "id": "scayt_handleCheckDirty",
+        "type": "String",
+        "description": "If set to true, it overrides the checkDirty functionality of CKEditor to fix SCAYT issues with incorrect checkDirty b..."
+    },
+    {
+        "id": "scayt_handleUndoRedo",
+        "type": "String",
+        "description": "Configures undo\/redo behavior of SCAYT in CKEditor."
+    },
+    {
+        "id": "scayt_ignoreAllCapsWords",
+        "type": "Boolean",
+        "description": "Enables the \"Ignore All-Caps Words\" option by default."
+    },
+    {
+        "id": "scayt_ignoreDomainNames",
+        "type": "Boolean",
+        "description": "Enables the \"Ignore Domain Names\" option by default."
+    },
+    {
+        "id": "scayt_ignoreWordsWithMixedCases",
+        "type": "Boolean",
+        "description": "Enables the \"Ignore Words with Mixed Case\" option by default."
+    },
+    {
+        "id": "scayt_ignoreWordsWithNumbers",
+        "type": "Boolean",
+        "description": "Enables the \"Ignore Words with Numbers\" option by default."
+    },
+    {
+        "id": "scayt_inlineModeImmediateMarkup",
+        "type": "Boolean",
+        "description": "Enables SCAYT initialization when inline CKEditor is not focused."
+    },
+    {
+        "id": "scayt_maxSuggestions",
+        "type": "Number",
+        "description": "Defines the number of SCAYT suggestions to show in the main context menu."
+    },
+    {
+        "id": "scayt_minWordLength",
+        "type": "Number",
+        "description": "Defines the minimum length of words that will be collected from the editor content for spell checking."
+    },
+    {
+        "id": "scayt_moreSuggestions",
+        "type": "String",
+        "description": "Enables and disables the \"More Suggestions\" sub-menu in the context menu."
+    },
+    {
+        "id": "scayt_multiLanguageMode",
+        "type": "Boolean",
+        "description": "Enables multi-language support in SCAYT."
+    },
+    {
+        "id": "scayt_multiLanguageStyles",
+        "type": "Object",
+        "description": "Defines additional styles for misspellings for specified languages."
+    },
+    {
+        "id": "scayt_sLang",
+        "type": "String",
+        "description": "Sets the default spell checking language for SCAYT."
+    },
+    {
+        "id": "scayt_serviceHost",
+        "type": "String",
+        "description": "Sets the host for the WebSpellChecker service (ssrv.cgi) full path."
+    },
+    {
+        "id": "scayt_servicePath",
+        "type": "String",
+        "description": "Sets the path to the WebSpellChecker service (ssrv.cgi)."
+    },
+    {
+        "id": "scayt_servicePort",
+        "type": "String",
+        "description": "Sets the port for the WebSpellChecker service (ssrv.cgi) full path."
+    },
+    {
+        "id": "scayt_serviceProtocol",
+        "type": "String",
+        "description": "Sets the protocol for the WebSpellChecker service (ssrv.cgi) full path."
+    },
+    {
+        "id": "scayt_srcUrl",
+        "type": "String",
+        "description": "Sets the URL to SCAYT core."
+    },
+    {
+        "id": "scayt_uiTabs",
+        "type": "String",
+        "description": "Customizes the SCAYT dialog and SCAYT toolbar menu to show particular tabs and items."
+    },
+    {
+        "id": "scayt_userDictionaryName",
+        "type": "String",
+        "description": "Activates a User Dictionary in SCAYT."
+    },
+    {
+        "id": "sharedSpaces",
+        "type": "Object",
+        "description": "Makes it possible to place some of the editor UI blocks, like the toolbar and the elements path, in any element on th..."
+    },
+    {
+        "id": "shiftEnterMode",
+        "type": "Number",
+        "description": "Similarly to the enterMode setting, it defines the behavior of the Shift+Enter key combination."
+    },
+    {
+        "id": "skin",
+        "type": "String",
+        "description": "The editor skin name."
+    },
+    {
+        "id": "smiley_columns",
+        "type": "Number",
+        "description": "The number of columns to be generated by the smilies matrix."
+    },
+    {
+        "id": "smiley_descriptions",
+        "type": "Array",
+        "description": "The description to be used for each of the smileys defined in the smiley_images setting."
+    },
+    {
+        "id": "smiley_images",
+        "type": "Array",
+        "description": "The file names for the smileys to be displayed."
+    },
+    {
+        "id": "smiley_path",
+        "type": "String",
+        "description": "The base path used to build the URL for the smiley images."
+    },
+    {
+        "id": "sourceAreaTabSize",
+        "type": "Number",
+        "description": "Controls the tab-size CSS property of the source editing area."
+    },
+    {
+        "id": "specialChars",
+        "type": "Array",
+        "description": "The list of special characters visible in the \"Special Character\" dialog window."
+    },
+    {
+        "id": "startupFocus",
+        "type": "Boolean",
+        "description": "Whether an editable element should have focus when the editor is loading for the first time."
+    },
+    {
+        "id": "startupMode",
+        "type": "String",
+        "description": "The mode to load at the editor startup."
+    },
+    {
+        "id": "startupOutlineBlocks",
+        "type": "Boolean",
+        "description": "Whether to automaticaly enable the show block\" command when the editor loads."
+    },
+    {
+        "id": "startupShowBorders",
+        "type": "Boolean",
+        "description": "Whether to automatically enable the \"show borders\" command when the editor loads."
+    },
+    {
+        "id": "stylesSet",
+        "type": "String\/Array\/Boolean",
+        "description": "The \"styles definition set\" to use in the editor."
+    },
+    {
+        "id": "stylesheetParser_skipSelectors",
+        "type": "RegExp",
+        "description": "A regular expression that defines whether a CSS rule will be skipped by the Stylesheet Parser plugin."
+    },
+    {
+        "id": "stylesheetParser_validSelectors",
+        "type": "RegExp",
+        "description": "A regular expression that defines which CSS rules will be used by the Stylesheet Parser plugin."
+    },
+    {
+        "id": "tabIndex",
+        "type": "Number",
+        "description": "The editor tabindex value."
+    },
+    {
+        "id": "tabSpaces",
+        "type": "Number",
+        "description": "Intructs the editor to add a number of spaces (&amp;nbsp;) to the text when hitting the Tab key."
+    },
+    {
+        "id": "templates",
+        "type": "String",
+        "description": "The templates definition set to use."
+    },
+    {
+        "id": "templates_files",
+        "type": "Object",
+        "description": "The list of templates definition files to load."
+    },
+    {
+        "id": "templates_replaceContent",
+        "type": "Boolean",
+        "description": "Whether the \"Replace actual contents\" checkbox is checked by default in the Templates dialog."
+    },
+    {
+        "id": "title",
+        "type": "String\/Boolean",
+        "description": "Customizes the human-readable title of this editor."
+    },
+    {
+        "id": "toolbar",
+        "type": "Array\/String",
+        "description": "The toolbox (alias toolbar) definition."
+    },
+    {
+        "id": "toolbarCanCollapse",
+        "type": "Boolean",
+        "description": "Whether the toolbar can be collapsed by the user."
+    },
+    {
+        "id": "toolbarGroupCycling",
+        "type": "Boolean",
+        "description": "When enabled, causes the Arrow keys navigation to cycle within the current toolbar group."
+    },
+    {
+        "id": "toolbarGroups",
+        "type": "Array",
+        "description": "The toolbar groups definition."
+    },
+    {
+        "id": "toolbarLocation",
+        "type": "String",
+        "description": "The part of the user interface where the toolbar will be rendered."
+    },
+    {
+        "id": "toolbarStartupExpanded",
+        "type": "Boolean",
+        "description": "Whether the toolbar must start expanded when the editor is loaded."
+    },
+    {
+        "id": "uiColor",
+        "type": "String",
+        "description": "The base user interface color to be used by the editor."
+    },
+    {
+        "id": "undoStackSize",
+        "type": "Number",
+        "description": "The number of undo steps to be saved."
+    },
+    {
+        "id": "uploadUrl",
+        "type": "String",
+        "description": "The URL where files should be uploaded."
+    },
+    {
+        "id": "useComputedState",
+        "type": "Boolean",
+        "description": "Indicates that some of the editor features, like alignment and text direction, should use the \"computed value\" of the..."
+    },
+    {
+        "id": "width",
+        "type": "String\/Number",
+        "description": "The editor UI outer width."
+    },
+    {
+        "id": "wsc_cmd",
+        "type": "String",
+        "description": "The parameter sets the active tab, when the WSC dialog is opened."
+    },
+    {
+        "id": "wsc_customDictionaryIds",
+        "type": "String",
+        "description": "It links WSC to custom dictionaries."
+    },
+    {
+        "id": "wsc_customLoaderScript",
+        "type": "String",
+        "description": "The parameter sets the URL to WSC file."
+    },
+    {
+        "id": "wsc_customerId",
+        "type": "String",
+        "description": "The parameter sets the customer ID for WSC."
+    },
+    {
+        "id": "wsc_lang",
+        "type": "String",
+        "description": "The parameter sets the default spellchecking language for WSC."
+    },
+    {
+        "id": "wsc_userDictionaryName",
+        "type": "String",
+        "description": "It activates a user dictionary for WSC."
+    }
+]
