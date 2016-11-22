@@ -374,7 +374,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
         $params['fee_amount'] = 0;
       }
     }
-    // recalculate net amount if tax amount is set
+    // recalculate net amount if it is not set or if tax amount is set
     if (!isset($params['net_amount']) || isset($params['tax_amount'])) {
       if (!$contributionID) {
         $params['net_amount'] = $params['total_amount'] - $params['fee_amount'];
@@ -3264,16 +3264,8 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
               }
             }
             self::updateFinancialAccounts($params, 'changeFinancialType');
-            /* $params['trxnParams']['to_financial_account_id'] = $trxnParams['to_financial_account_id']; */
             $params['financial_account_id'] = $newFinancialAccount;
-            $changeFTAmount = $trxnParams['total_amount'];
-            if (isset($params['prevContribution']->total_amount) || isset($params['tax_amount'])) {
-              $changesinTaxAmount = $totalAmount - $params['prevContribution']->total_amount + $params['prevContribution']->tax_amount - CRM_Utils_Array::value('tax_amount', $params, 0);
-              if ($changesinTaxAmount == 0) {
-                $ignoreChangeAmount = TRUE;
-                $changeFTAmount = $totalAmount;
-              }
-            }
+            list($changeFTAmount, $ignoreChangeAmount) = self::calcluateFTChangeAmount($params, $trxnParams['total_amount']);
             $params['total_amount'] = $params['trxnParams']['total_amount'] = $params['trxnParams']['net_amount'] = $changeFTAmount;
             self::updateFinancialAccounts($params);
             $params['trxnParams']['to_financial_account_id'] = $trxnParams['to_financial_account_id'];
@@ -3584,23 +3576,15 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
           if ($context == 'changeFinancialType' || self::isContributionStatusNegative($params['contribution']->contribution_status_id)) {
             $diff = -1;
           }
-          if (!empty($params['is_quick_config'])) {
-            $amount = $itemAmount;
-            if (!$amount) {
-              $amount = $params['total_amount'];
-              if ($context === NULL) {
-                $amount -= CRM_Utils_Array::value('tax_amount', $params, 0);
-              }
-            }
-          }
-          else {
-            if ($context == 'changedAmount') {
-              $itemParams['amount'] = $diff * ($fieldValues['line_total'] - $previousLineItem[$fieldValues['id']]['line_total']);
-            }
-            else {
-              $amount = $diff * $fieldValues['line_total'];
-            }
-          }
+          
+          // calculate financial item amount
+          $amountParams = array(
+            'diff' => $diff,
+            'line_total' => $fieldValues['line_total'],
+            'previous_line_total' => CRM_Utils_Array::value('line_total', CRM_Utils_Array::value($fieldValues['id'], $previousLineItem)),
+            'item_amount' => $itemAmount,
+          );
+          $amount = self::calcluateFinancialItemAmount($params, $amountParams, $context);
 
           $itemParams = array(
             'transaction_date' => $receiveDate,
@@ -5370,6 +5354,63 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
     $trxn = CRM_Core_BAO_FinancialTrxn::create($params);
     self::$_trxnIDs[] = $trxn->id;
     $trxnParams['from_financial_account_id'] = $params['to_financial_account_id'];
+  }
+
+  /**
+   * Calculate amount when Financial type for contribution is changed.
+   *
+   * @param array $params
+   *   contribution params
+   * @param float $totalAmount
+   *   financial trxn total amount
+   *
+   * @return array
+   */
+  public static function calcluateFTChangeAmount($params, $totalAmount) {
+    $changeFTAmount = $totalAmount;
+    $ignoreChangeAmount = FALSE;
+    if (isset($params['prevContribution']->total_amount) || isset($params['tax_amount'])) {
+      $taxAmount = CRM_Utils_Array::value('tax_amount', $params, 0);
+      $changesinTaxAmount = $totalAmount - $params['prevContribution']->total_amount + $params['prevContribution']->tax_amount - $taxAmount;
+
+      if ($changesinTaxAmount == 0) {
+        $ignoreChangeAmount = TRUE;
+        $changeFTAmount = $totalAmount;
+      }
+    }
+
+    return array($changeFTAmount, $ignoreChangeAmount);
+  }
+
+  /**
+   * Calculate financial item amount when contribution is updated.
+   *
+   * @param array $params
+   *   contribution params
+   * @param array $totalAmount
+   *
+   * @param string $context
+   *
+   * @return float
+   */
+  public static function calcluateFinancialItemAmount($params, $amountParams, $context) {
+    if (!empty($params['is_quick_config'])) {
+      $amount = $amountParams['item_amount'];
+      if (!$amount) {
+        $amount = $params['total_amount'];
+        if ($context === NULL) {
+          $amount -= CRM_Utils_Array::value('tax_amount', $params, 0);
+        }
+      }
+    }
+    else {
+      $amount = $amountParams['line_total'];
+      if ($context == 'changedAmount') {
+        $amount -= $amountParams['previous_line_total'];
+      }
+      $amount *= $amountParams['diff'];
+    }
+    return $amount;
   }
 
 }
