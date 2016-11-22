@@ -728,6 +728,7 @@ class CRM_Core_Resources {
     $editor = Civi::settings()->get('editor_id');
     if ($editor == "CKEditor") {
       $items[] = "js/wysiwyg/crm.ckeditor.js";
+      CRM_Admin_Page_CKEditorConfig::setConfigDefault();
       $items[] = array('config' => array('CKEditorCustomConfig' => CRM_Admin_Page_CKEditorConfig::getConfigUrl()));
     }
 
