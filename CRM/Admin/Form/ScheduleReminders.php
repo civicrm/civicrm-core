@@ -492,7 +492,6 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
 
     if ($absoluteDate = CRM_Utils_Array::value('absolute_date', $params)) {
       $params['absolute_date'] = CRM_Utils_Date::processDate($absoluteDate);
-      $params['is_repeat'] = 0;
       foreach ($moreKeys as $mkey) {
         $params[$mkey] = 'null';
       }
