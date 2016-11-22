@@ -4722,10 +4722,6 @@ LIMIT 1;";
     }
     $contribution->loadRelatedObjects($input, $ids, TRUE);
     if (!$returnMessageText) {
-      // Set receipt from e-mail and name in value if we are sending the message.
-      $userEmail = NULL;
-      $userName = NULL;
-
       // First, try to retrieve default name and email address.
       $domainEmailValues = CRM_Core_BAO_Domain::getNameAndEmail();
       if (!empty($domainEmailValues)) {
