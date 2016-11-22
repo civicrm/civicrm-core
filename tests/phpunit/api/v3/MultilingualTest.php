@@ -51,17 +51,7 @@ class api_v3_MultilingualTest extends CiviUnitTestCase {
   }
 
   public function testOptionLanguage() {
-    $this->callAPISuccess('Setting', 'create', array(
-      'lcMessages' => 'en_US',
-      'languageLimit' => array(
-        'en_US' => 1,
-      ),
-    ));
-
-    CRM_Core_I18n_Schema::makeMultilingual('en_US');
-
-    global $dbLocale;
-    $dbLocale = '_en_US';
+    $this->enableMultilingual();
 
     CRM_Core_I18n_Schema::addLocale('fr_CA', 'en_US');
 
@@ -104,6 +94,65 @@ class api_v3_MultilingualTest extends CiviUnitTestCase {
 
     $this->assertEquals($french['label'], 'Messagerie instantanée');
     $this->assertEquals($default['label'], $english_original['label']);
+  }
+
+  /**
+   * CRM-19677: Ensure that entity apis are not affected on Multilingual setup
+   *  with check_permissions = TRUE
+   */
+  public function testAllEntities() {
+    $this->enableMultilingual();
+
+    // list of entities which has mandatory attributes
+    $specialEntities = array(
+      'Attachment' => array('id' => 13),
+      'CustomValue' => array('entity_id' => 13),
+      'MailingContact' => array('contact_id' => 13),
+      'Profile' => array('profile_id' => 13),
+      'MailingGroup' => array('mailing_id' => 13),
+    );
+    // deprecated or API.Get is not supported/implemented
+    $skippableEntities = array(
+      'Logging',
+      'MailingEventConfirm',
+      'MailingEventResubscribe',
+      'MailingEventSubscribe',
+      'MailingEventUnsubscribe',
+      'Location',
+      'Pcp',
+      'Survey',
+      'UFField', // throw error for help_post column
+      'UFGroup', //throw error for title
+      'User', // need loggedIn user id
+    );
+    // fetch all entities
+    $entities = $this->callAPISuccess('Entity', 'get', array());
+    $skippableEntities = array_merge($skippableEntities, $entities['deprecated']);
+
+    foreach ($entities['values'] as $entity) {
+      $params = array('check_permissions' => 1);
+      if (in_array($entity, $skippableEntities) && $entity != 'MailingGroup') {
+        continue;
+      }
+      if (array_key_exists($entity, $specialEntities)) {
+        $params = array_merge($params, $specialEntities[$entity]);
+      }
+      $this->callAPISuccess($entity, 'get', $params);
+    }
+  }
+
+  public function enableMultilingual() {
+    $this->callAPISuccess('Setting', 'create', array(
+      'lcMessages' => 'en_US',
+      'languageLimit' => array(
+        'en_US' => 1,
+      ),
+    ));
+
+    CRM_Core_I18n_Schema::makeMultilingual('en_US');
+
+    global $dbLocale;
+    $dbLocale = '_en_US';
   }
 
 }
