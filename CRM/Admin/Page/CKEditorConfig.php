@@ -135,7 +135,7 @@ class CRM_Admin_Page_CKEditorConfig extends CRM_Core_Page {
     foreach ($params as $key => $val) {
       $val = trim($val);
       if (strpos($key, 'config_') === 0 && strlen($val)) {
-        if ($val != 'true' && $val != 'false' && $val[0] != '{' && $val[0] != '[' && !is_numeric($val)) {
+        if ($val != 'true' && $val != 'false' && $val != 'null' && $val[0] != '{' && $val[0] != '[' && !is_numeric($val)) {
           $val = json_encode($val);
         }
         $pos = strrpos($config, '};');
@@ -206,6 +206,9 @@ class CRM_Admin_Page_CKEditorConfig extends CRM_Core_Page {
   private function getConfigSettings() {
     $matches = $result = array();
     $file = self::getConfigFile($this->preset);
+    if (!$file) {
+      $file = self::getConfigFile('default');
+    }
     $result['skin'] = 'moono';
     if ($file) {
       $contents = file_get_contents($file);
