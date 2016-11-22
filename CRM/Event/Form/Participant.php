@@ -473,8 +473,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
 
     //setting default register date
     if ($this->_action == CRM_Core_Action::ADD) {
-      $statuses = array_flip($this->_participantStatuses);
-      $defaults[$this->_id]['status_id'] = CRM_Utils_Array::value(ts('Registered'), $statuses);
+      $defaults[$this->_id]['status_id'] = key($this->_participantStatuses);
       if (!empty($defaults[$this->_id]['event_id'])) {
         $contributionTypeId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event',
           $defaults[$this->_id]['event_id'],
