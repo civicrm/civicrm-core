@@ -1362,10 +1362,15 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $newParams = array_merge($contribParams, array(
         'id' => $contribution['id'],
         'contribution_status_id' => 3,
+        'cancel_date' => '2012-02-02 09:00',
       )
     );
+    //Check if trxn_date is same as cancel_date.
+    $checkTrxnDate = array(
+      'trxn_date' => '2012-02-02 09:00:00',
+    );
     $contribution = $this->callAPISuccess('contribution', 'create', $newParams);
-    $this->_checkFinancialTrxn($contribution, 'cancelPending');
+    $this->_checkFinancialTrxn($contribution, 'cancelPending', NULL, $checkTrxnDate);
     $this->_checkFinancialItem($contribution['id'], 'cancelPending');
   }
 
