@@ -36,6 +36,9 @@
     <table>
       <tr class="columnheader">
         <th>{ts}Item{/ts}</th>
+        {if $displayLineItemFinancialType}
+          <th>{ts}Financial Type{/ts}</th>
+        {/if}
         {if $context EQ "Membership"}
           <th class="right">{ts}Fee{/ts}</th>
         {else}
@@ -60,6 +63,9 @@
       {foreach from=$value item=line}
         <tr{if $line.qty EQ 0} class="cancelled"{/if}>
           <td>{if $line.html_type eq 'Text'}{$line.label}{else}{$line.field_title} - {$line.label}{/if} {if $line.description}<div class="description">{$line.description}</div>{/if}</td>
+          {if $displayLineItemFinancialType}
+            <td>{$line.financial_type}</td>
+          {/if}
           {if $context NEQ "Membership"}
             <td class="right">{$line.qty}</td>
             <td class="right">{$line.unit_price|crmMoney}</td>

@@ -1420,7 +1420,8 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
 
             switch ($query->_fields[$field]['data_type']) {
               case 'String':
-                $length = empty($query->_fields[$field]['text_length']) ? 255 : $query->_fields[$field]['text_length'];
+                // May be option labels, which could be up to 512 characters
+                $length = max(512, CRM_Utils_Array::value('text_length', $query->_fields[$field]));
                 $sqlColumns[$fieldName] = "$fieldName varchar($length)";
                 break;
 

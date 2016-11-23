@@ -1583,6 +1583,8 @@ class CRM_Contact_BAO_Query {
    */
   public static function legacyConvertFormValues($id, &$values) {
     $legacyElements = array(
+      'membership_type_id',
+      'membership_status_id',
       'activity_type_id',
       'location_type',
       'membership_type_id',
@@ -3554,6 +3556,7 @@ WHERE  id IN ( $groupIDs )
         $contactIds[] = substr($values[0], CRM_Core_Form::CB_PREFIX_LEN);
       }
     }
+    CRM_Utils_Type::validateAll($contactIds, 'Positive');
     if (!empty($contactIds)) {
       $this->_where[0][] = " ( contact_a.id IN (" . implode(',', $contactIds) . " ) ) ";
     }
@@ -5638,7 +5641,7 @@ AND   displayRelType.is_active = 1
       }
 
       if (is_object($dao) && property_exists($dao, $value['idCol'])) {
-        $val = $dao->$value['idCol'];
+        $val = $dao->{$value['idCol']};
 
         if (CRM_Utils_System::isNull($val)) {
           $dao->$key = NULL;
@@ -5649,10 +5652,10 @@ AND   displayRelType.is_active = 1
           $dao->$idColumn = $val;
 
           if ($key == 'state_province_name') {
-            $dao->$value['pseudoField'] = $dao->$key = CRM_Core_PseudoConstant::stateProvinceAbbreviation($val);
+            $dao->{$value['pseudoField']} = $dao->$key = CRM_Core_PseudoConstant::stateProvinceAbbreviation($val);
           }
           else {
-            $dao->$value['pseudoField'] = $dao->$key = CRM_Core_PseudoConstant::getLabel($baoName, $value['pseudoField'], $val);
+            $dao->{$value['pseudoField']} = $dao->$key = CRM_Core_PseudoConstant::getLabel($baoName, $value['pseudoField'], $val);
           }
         }
         elseif ($value['pseudoField'] == 'state_province_abbreviation') {

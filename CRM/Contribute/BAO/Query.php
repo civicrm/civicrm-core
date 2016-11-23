@@ -811,6 +811,8 @@ class CRM_Contribute_BAO_Query {
       'contribution_product_id' => 1,
       'product_name' => 1,
       'currency' => 1,
+      'cancel_date' => 1,
+      'contribution_recur_id' => 1,
     );
   }
 

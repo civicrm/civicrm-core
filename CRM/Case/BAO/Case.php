@@ -1313,19 +1313,9 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
       }
       // if there are file attachments we will return how many and, if only one, add a link to it
       if (!empty($dao->attachment_ids)) {
-        $attachmentIDs = explode(',', $dao->attachment_ids);
+        $attachmentIDs = array_unique(explode(',', $dao->attachment_ids));
         $values[$dao->id]['no_attachments'] = count($attachmentIDs);
-        if ($values[$dao->id]['no_attachments'] == 1) {
-          // if there is only one it's easy to do a link - otherwise just flag it
-          $attachmentViewUrl = CRM_Utils_System::url(
-            "civicrm/file",
-            "reset=1&eid=" . $dao->id . "&id=" . $dao->attachment_ids,
-            FALSE,
-            NULL,
-            FALSE
-          );
-          $url .= " <a href='$attachmentViewUrl' ><span class='icon paper-icon'></span></a>";
-        }
+        $url .= implode(' ', CRM_Core_BAO_File::paperIconAttachment('civicrm_activity', $dao->id));
       }
 
       $values[$dao->id]['links'] = $url;

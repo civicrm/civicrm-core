@@ -17,7 +17,7 @@
     "branch": "stable/3.5",
     "commit": "8bcec8afd14a35807ae8582a1d9c45280370376a"
   },
-  "_source": "git://github.com/colemanw/select2.git",
+  "_source": "https://github.com/colemanw/select2.git",
   "_target": "stable/3.5",
   "_originalSource": "colemanw/select2"
 }

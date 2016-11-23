@@ -211,7 +211,7 @@ class CRM_Utils_PDF_Utils {
       return $dompdf->output();
     }
     else {
-      // CRM-19183 remove .pdf extension from filename.
+      // CRM-19183 remove .pdf extension from filename
       $fileName = basename($fileName, ".pdf");
       $dompdf->stream($fileName);
     }
