@@ -691,10 +691,11 @@ SELECT label, value
 
       foreach ($sql as $tableName => $values) {
         $columnNames = implode(',', $values);
-        $tableName = CRM_Utils_Type::escape($tableName, 'MysqlColumnNameOrAlias');
+        $title = CRM_Core_DAO::escapeString($groupTitle[$tableName]);
+        $mysqlTableName = CRM_Utils_Type::escape($tableName, 'MysqlColumnNameOrAlias');
         $sql[$tableName] = "
-SELECT '" . CRM_Core_DAO::escapeString($groupTitle[$tableName]) . "' as groupTitle, $columnNames
-FROM   $tableName
+SELECT '" . $title . "' as groupTitle, $columnNames
+FROM   $mysqlTableName
 WHERE  entity_id = %1
 ";
       }
