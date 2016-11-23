@@ -921,20 +921,9 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
       $setting = "\n\tconfig.allowedContent = true;\n";
       $config = substr_replace($config, $setting, $pos, 0);
       unlink($fileName);
+      $newFileName = Civi::paths()->getPath('[civicrm.files]/persist/crm-ckeditor-default.js');
+      file_put_contents($newFileName, $config);
     }
-    // Create config file if it doesn't exist
-    else {
-      $config = "CKEDITOR.editorConfig = function( config ) {\n\tconfig.allowedContent = true;\n};\n";
-      // Make sure directories exist
-      if (!is_dir(Civi::paths()->getPath('[civicrm.files]'))) {
-        mkdir(Civi::paths()->getPath('[civicrm.files]'));
-      }
-      if (!is_dir(Civi::paths()->getPath('[civicrm.files]/persist'))) {
-        mkdir(Civi::paths()->getPath('[civicrm.files]/persist'));
-      }
-    }
-    $newFileName = Civi::paths()->getPath('[civicrm.files]/persist/crm-ckeditor-default.js');
-    file_put_contents($newFileName, $config);
     return TRUE;
   }
 
