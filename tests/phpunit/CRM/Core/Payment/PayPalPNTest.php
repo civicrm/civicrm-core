@@ -222,7 +222,6 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
       'first_name' => 'Robert',
       'txn_id' => '8XA571746W2698126',
       'residence_country' => 'US',
-      'custom' => '[]',
     );
   }
 
