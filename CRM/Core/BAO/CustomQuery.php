@@ -371,32 +371,46 @@ SELECT label, value
                 else {
                   $value = CRM_Utils_Type::escape($value, 'Integer');
                 }
+                $value = str_replace(array('[', ']', ','), array('\[', '\]', '[:comma:]'), $value);
+                $value = str_replace('|', '[:separator:]', $value);
               }
               elseif ($isSerialized) {
                 if (in_array(key($value), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
                   $op = key($value);
                   $value = $value[$op];
                 }
-                $value = implode(',', (array) $value);
+                // CRM-19006: escape characters like comma, | before building regex pattern
+                $value = (array) $value;
+                foreach ($value as $key => $val) {
+                  $value[$key] = str_replace(array('[', ']', ','), array('\[', '\]', '[:comma:]'), $val);
+                  $value[$key] = str_replace('|', '[:separator:]', $value[$key]);
+                }
+                $value = implode(',', $value);
               }
 
               // CRM-14563,CRM-16575 : Special handling of multi-select custom fields
-              if ($isSerialized && !empty($value) && !strstr($op, 'NULL') && !strstr($op, 'LIKE')) {
-                if (strstr($op, 'IN')) {
-                  $value = str_replace(",", "[[:cntrl:]]*|[[:cntrl:]]*", $value);
-                  $value = str_replace('(', '[[.left-parenthesis.]]', $value);
-                  $value = str_replace(')', '[[.right-parenthesis.]]', $value);
-                }
+              if ($isSerialized && !CRM_Utils_System::isNull($value) && !strstr($op, 'NULL') && !strstr($op, 'LIKE')) {
+                $sp = CRM_Core_DAO::VALUE_SEPARATOR;
+                $value = str_replace(",", "$sp|$sp", $value);
+                $value = str_replace(array('[:comma:]', '(', ')'), array(',', '[[.left-parenthesis.]]', '[[.right-parenthesis.]]'), $value);
                 $op = (strstr($op, '!') || strstr($op, 'NOT')) ? 'NOT RLIKE' : 'RLIKE';
-                $value = "[[:cntrl:]]*" . $value . "[[:cntrl:]]*";
+                $value = $sp . $value . $sp;
                 if (!$wildcard) {
-                  $value = str_replace("[[:cntrl:]]*|", '', $value);
+                  foreach (explode("|", $value) as $val) {
+                    $val = str_replace('[:separator:]', '\|', $val);
+                    $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $val, 'String');
+                  }
+                }
+                else {
+                  $value = str_replace('[:separator:]', '\|', $value);
+                  $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $value, 'String');
                 }
               }
-
-              //FIX for custom data query fired against no value(NULL/NOT NULL)
-              $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $value, 'String');
-              $this->_qill[$grouping][] = "$field[label] $qillOp $qillValue";
+              else {
+                //FIX for custom data query fired against no value(NULL/NOT NULL)
+                $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $value, 'String');
+              }
+              $this->_qill[$grouping][] = $field['label'] . " $qillOp $qillValue";
             }
             break;
 
@@ -408,7 +422,7 @@ SELECT label, value
 
           case 'Int':
             $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $value, 'Integer');
-            $this->_qill[$grouping][] = ts("%1 %2 %3", array(1 => $field['label'], 2 => $qillOp, 3 => $qillValue));;
+            $this->_qill[$grouping][] = ts("%1 %2 %3", array(1 => $field['label'], 2 => $qillOp, 3 => $qillValue));
             break;
 
           case 'Boolean':
