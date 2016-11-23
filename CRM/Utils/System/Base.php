@@ -582,7 +582,7 @@ abstract class CRM_Utils_System_Base {
         $filesURL = $baseURL . "sites/$siteName/files/civicrm/";
       }
       else {
-        $filesURL = $config->userSystem->checkMultisite($civicrm_root, $baseURL);
+        $filesURL = $baseURL . "sites/default/files/civicrm/";
       }
     }
     elseif ($config->userFramework == 'UnitTests') {
