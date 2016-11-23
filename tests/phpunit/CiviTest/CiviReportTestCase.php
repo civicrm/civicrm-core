@@ -165,9 +165,12 @@ class CiviReportTestCase extends CiviUnitTestCase {
 
   /**
    * Set ACLs for Financial Types()
+   *
+   * @param bool $flag
    */
-  protected function setACL() {
-    CRM_Core_BAO_Setting::setItem(array('acl_financial_type' => 1), NULL, 'contribution_invoice_settings');
+  protected function setACL($flag = TRUE) {
+    CRM_Core_BAO_Setting::setItem(array('acl_financial_type' => $flag), NULL, 'contribution_invoice_settings');
+    CRM_Financial_BAO_FinancialType::$_statusACLFt = array();
   }
 
   /**

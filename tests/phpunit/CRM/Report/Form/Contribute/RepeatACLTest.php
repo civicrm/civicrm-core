@@ -60,10 +60,10 @@ class CRM_Report_Form_Contribute_RepeatACLTest extends CiviReportTestCase {
           'filters' => array(
             'receive_date1_relative' => '0',
             'receive_date2_relative' => '0',
-            'receive_date1_from' => '01/01/2010',
-            'receive_date1_to' => '12/31/2010',
-            'receive_date2_from' => '01/01/2011',
-            'receive_date2_to' => '12/31/2011',
+            'receive_date1_from' => '20100101',
+            'receive_date1_to' => '20101231',
+            'receive_date2_from' => '20110101',
+            'receive_date2_to' => '20111231',
           ),
         ),
         'fixtures/dataset-acl-ascii.sql',
@@ -105,10 +105,10 @@ class CRM_Report_Form_Contribute_RepeatACLTest extends CiviReportTestCase {
           'filters' => array(
             'receive_date1_relative' => '0',
             'receive_date2_relative' => '0',
-            'receive_date1_from' => '01/01/2010',
-            'receive_date1_to' => '12/31/2010',
-            'receive_date2_from' => '01/01/2011',
-            'receive_date2_to' => '12/31/2011',
+            'receive_date1_from' => '20100101',
+            'receive_date1_to' => '20101231',
+            'receive_date2_from' => '20110101',
+            'receive_date2_to' => '20111231',
           ),
         ),
         'fixtures/dataset-acl-ascii.sql',
@@ -142,6 +142,7 @@ class CRM_Report_Form_Contribute_RepeatACLTest extends CiviReportTestCase {
 
     $expectedOutputCsvArray = $this->getArrayFromCsv(dirname(__FILE__) . "/{$expectedOutputCsvFile}");
     $this->assertCsvArraysEqual($expectedOutputCsvArray, $reportCsvArray);
+    $this->setACL(FALSE);
   }
 
 }
