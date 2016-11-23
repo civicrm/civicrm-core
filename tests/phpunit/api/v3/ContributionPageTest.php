@@ -449,7 +449,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       ),
       array(
         'Total: $'
-      )
+      ),
     );
     $mut->stop();
     $mut->clearMessages(999);
