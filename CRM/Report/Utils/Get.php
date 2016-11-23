@@ -66,7 +66,10 @@ class CRM_Report_Utils_Get {
     $from = self::getTypedValue("{$fieldName}_from", $type);
     $to = self::getTypedValue("{$fieldName}_to", $type);
 
-    $relative = CRM_Utils_Array::value("{$fieldName}_relative", $_GET);
+    $relative = self::getTypedValue("{$fieldName}_relative", CRM_Utils_Type::T_STRING);
+    if ($relative !== NULL) {
+      $defaults["{$fieldName}_relative"] = $relative;
+    }
     if ($relative) {
       list($from, $to) = CRM_Report_Form::getFromTo($relative, NULL, NULL);
       $from = substr($from, 0, 8);
