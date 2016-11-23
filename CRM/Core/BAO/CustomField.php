@@ -737,9 +737,11 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         return $match[1];
       }
       else {
+        //CRM-19679
+        $id = CRM_Utils_Array::value(2, $match);
         return array(
           $match[1],
-          CRM_Utils_Array::value(2, $match),
+          ($id != '-0') ? $id : null,
         );
       }
     }
