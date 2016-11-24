@@ -1,0 +1,91 @@
+# This is a key of GitHub handles to real contributors' names and organizations,
+# to be used for preparing credits for release notes.
+---
+- github      : agh1
+  name        : Andrew Hunt
+  organization: AGH Strategies
+- github      : artem3
+  name        : Artem Goncharenko
+- github      : colemanw
+  name        : Coleman Watts
+  organization: CiviCRM
+- github      : davecivicrm
+  name        : Dave Greenberg
+  organization: CiviCRM
+- github      : edzelopez
+  name        : Edzel Lopez
+  organization: JMA Consulting
+- github      : eileenmcnaughton
+  name        : Eileen McNaughton
+  organization: Fuzion NZ
+- github      : francescbassas
+  name        : Francesc Bassas i Bullich
+- github      : ginkgofjg
+  name        : Frank Gómez
+  organization: Ginkgo Street Labs
+- github      : jernic
+  name        : jernic
+- github      : jitendrapurohit
+  name        : Jitendra Purohit
+  organization: CiviCRM
+- github      : jmcclelland
+  name        : Jamie McClelland
+  organization: Progressive Technology Project
+- github      : joemurray
+  name        : Joe Murray
+  organization: JMA Consulting
+- github      : JohnFF
+  name        : John Kirk
+  organization: CiviFirst
+- github      : KarinG
+  name        : Karin Gerritsen
+  organization: Semper IT
+- github      : lcdservices
+  name        : Brian Shaughnessy
+  organization: Lighthouse Design and Consulting
+- github      : michaelmcandrew
+  name        : Michael McAndrew
+  organization: Third Sector Design
+- github      : mlutfy
+  name        : Mathieu Lutfy
+  organization: Coop SymbioTIC
+- github      : mollux
+  name        : Mattias Michaux
+- github      : monishdeb
+  name        : Monish Deb
+  organization: CiviCRM
+- github      : nganivet
+  name        : Nicolas Ganivet
+  organization: CiviDesk
+- github      : pradpnayak
+  name        : Pradeep Nayak
+  organization: JMA Consulting
+- github      : samuelsov
+  name        : Samuel Vanhove
+  organization: Coop SymbioTIC
+- github      : seamuslee001
+  name        : Seamus Lee
+  organization: Australian Greens
+- github      : sqweets
+  name        : Ellen Hendricks
+  organization: Spry Digital
+- github      : stoob
+  name        : Stuart Gaston
+  organization: Korlon
+- github      : systopia
+  name        : Björn Endres
+  organization: Systopia
+- github      : tobiaslounsbury
+  name        : Tobias Lounsbury
+  organization: Ginkgo Street Labs
+- github      : totten
+  name        : Tim Otten
+  organization: CiviCRM
+- github      : tschuettler
+  name        : Thomas Schüttler
+- github      : xurizaemon
+  name        : Chris Burgess
+  organization: Fuzion
+- github      : yashodha
+  name        : Yashodha Chaku
+  organization: CiviCRM
