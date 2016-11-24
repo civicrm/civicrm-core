@@ -1835,6 +1835,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
    * @param int $campaignId
    * @param array $formDates
    * @param null|CRM_Contribute_BAO_Contribution $contribution
+   * @param array $lineItems
    *
    * @return array
    * @throws \CRM_Core_Exception
