@@ -1916,6 +1916,9 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
             //update related Memberships.
             CRM_Member_BAO_Membership::updateRelatedMemberships($membership->id, $formattedParams);
 
+            //CRM-19678: No Membership Renewal Activity is created when a Pay Later is set to Completed
+            CRM_Activity_BAO_Activity::addActivity($membership, 'Membership Renewal', $membership->contact_id);
+
             $updateResult['membership_end_date'] = CRM_Utils_Date::customFormat($dates['end_date'],
               '%B %E%f, %Y'
             );
