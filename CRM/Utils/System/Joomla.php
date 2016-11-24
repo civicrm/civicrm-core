@@ -827,4 +827,22 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     );
   }
 
+  /**
+   * @inheritDoc
+   */
+  public function getDefaultFileStorage() {
+    $config = CRM_Core_Config::singleton();
+    $baseURL = CRM_Utils_System::languageNegotiationURL($config->userFrameworkBaseURL, FALSE, TRUE);
+
+    // gross hack
+    // we need to remove the administrator/ from the end
+    $tempURL = str_replace("/administrator/", "/", $baseURL);
+    $filesURL = $tempURL . "media/civicrm/";
+
+    return array(
+      'url' => $filesURL,
+      'path' => CRM_Utils_File::baseFilePath(),
+    );
+  }
+
 }

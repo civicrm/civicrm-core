@@ -73,7 +73,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
-   * Moved from CRM_Utils_System_Base
+   * @inheritDoc
    */
   public function getDefaultFileStorage() {
     $config = CRM_Core_Config::singleton();

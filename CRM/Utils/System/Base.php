@@ -552,50 +552,15 @@ abstract class CRM_Utils_System_Base {
   /**
    * Determine the default location for file storage.
    *
-   * FIXME:
-   *  1. This was pulled out from a bigger function. It should be split
-   *     into even smaller pieces and marked abstract.
-   *  2. This would be easier to compute by a calling a CMS API, but
-   *     for whatever reason Civi gets it from config data.
-   *
    * @return array
    *   - url: string. ex: "http://example.com/sites/foo.com/files/civicrm"
    *   - path: string. ex: "/var/www/sites/foo.com/files/civicrm"
+   * @throws \CRM_Core_Exception
    */
   public function getDefaultFileStorage() {
-    global $civicrm_root;
     $config = CRM_Core_Config::singleton();
-    $baseURL = CRM_Utils_System::languageNegotiationURL($config->userFrameworkBaseURL, FALSE, TRUE);
-
-    $filesURL = NULL;
-    $filesPath = NULL;
-
-    if ($config->userFramework == 'Joomla') {
-      // gross hack
-      // we need to remove the administrator/ from the end
-      $tempURL = str_replace("/administrator/", "/", $baseURL);
-      $filesURL = $tempURL . "media/civicrm/";
-    }
-    elseif ($this->is_drupal) {
-      $siteName = $config->userSystem->parseDrupalSiteName($civicrm_root);
-      if ($siteName) {
-        $filesURL = $baseURL . "sites/$siteName/files/civicrm/";
-      }
-      else {
-        $filesURL = $baseURL . "sites/default/files/civicrm/";
-      }
-    }
-    elseif ($config->userFramework == 'UnitTests') {
-      $filesURL = $baseURL . "sites/default/files/civicrm/";
-    }
-    else {
-      throw new CRM_Core_Exception("Failed to locate default file storage ($config->userFramework)");
-    }
-
-    return array(
-      'url' => $filesURL,
-      'path' => CRM_Utils_File::baseFilePath(),
-    );
+    throw new CRM_Core_Exception("Failed to locate default file storage ($config->userFramework)");
+    return array();
   }
 
   /**
