@@ -51,7 +51,10 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
    * @param array $params
    *   (reference) an assoc array of name/value pairs.
    *
-   * @return CRM_Price_DAO_LineItem
+   * @return \CRM_Price_DAO_LineItem
+   *
+   * @throws \CiviCRM_API3_Exception
+   * @throws \Exception
    */
   public static function create(&$params) {
     $id = CRM_Utils_Array::value('id', $params);
