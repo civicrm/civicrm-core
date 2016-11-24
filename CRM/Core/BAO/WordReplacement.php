@@ -226,7 +226,8 @@ WHERE  domain_id = %1
     $settingsResult = civicrm_api3('Setting', 'get', array(
       'return' => 'lcMessages',
     ));
-    $lang = CRM_Utils_Array::first($settingsResult['values'])['lcMessages'];
+    $returnValues = CRM_Utils_Array::first($settingsResult['values']);
+    $lang = $returnValues['lcMessages'];
 
     $wordReplacementCreateParams = array();
     // get all domains
