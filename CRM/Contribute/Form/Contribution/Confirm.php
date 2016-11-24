@@ -1470,6 +1470,11 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       if (!$isProcessSeparateMembershipTransaction) {
         $membershipParams['skipLineItem'] = 1;
       }
+      else {
+        $membershipParams['total_amount'] = $totalAmount;
+        CRM_Price_BAO_LineItem::getLineItemArray($membershipParams);
+
+      }
       $paymentResult = CRM_Contribute_BAO_Contribution_Utils::processConfirm($form, $membershipParams,
         $contactID,
         $financialTypeID,
@@ -1494,7 +1499,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         if (empty($form->_params['auto_renew']) && !empty($membershipParams['is_recur'])) {
           unset($membershipParams['is_recur']);
         }
-        list($membershipContribution, $secondPaymentResult) = $this->processSecondaryFinancialTransaction($contactID, $form, $membershipParams,
+        list($membershipContribution, $secondPaymentResult) = $this->processSecondaryFinancialTransaction($contactID, $form, array_merge($membershipParams, array('skipLineItem' => 1)),
           $isTest, $membershipLineItems, CRM_Utils_Array::value('minimum_fee', $membershipDetails, 0), CRM_Utils_Array::value('financial_type_id', $membershipDetails));
         $paymentResults[] = array('contribution_id' => $membershipContribution->id, 'result' => $secondPaymentResult);
       }
@@ -1551,7 +1556,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
           date('YmdHis'), CRM_Utils_Array::value('cms_contactID', $membershipParams),
           $customFieldsFormatted,
           $numTerms, $membershipID, $pending,
-          $contributionRecurID, $membershipSource, $isPayLater, $campaignId, array(), $membershipContribution
+          $contributionRecurID, $membershipSource, $isPayLater, $campaignId, array(), $membershipContribution,
+          $form->_lineItem
         );
 
         $form->set('renewal_mode', $renewalMode);
@@ -1563,6 +1569,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         if (!empty($membershipContribution)) {
           // update recurring id for membership record
           CRM_Member_BAO_Membership::updateRecurMembership($membership, $membershipContribution);
+          // Next line is probably redundant. Checksprevent it happening twice.
           CRM_Member_BAO_Membership::linkMembershipPayment($membership, $membershipContribution);
         }
       }
