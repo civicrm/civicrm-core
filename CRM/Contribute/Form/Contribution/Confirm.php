@@ -1551,7 +1551,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
           date('YmdHis'), CRM_Utils_Array::value('cms_contactID', $membershipParams),
           $customFieldsFormatted,
           $numTerms, $membershipID, $pending,
-          $contributionRecurID, $membershipSource, $isPayLater, $campaignId, array(), $membershipContribution
+          $contributionRecurID, $membershipSource, $isPayLater, $campaignId, array(), $membershipContribution,
+          $form->_lineItem
         );
 
         $form->set('renewal_mode', $renewalMode);
