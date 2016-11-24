@@ -7,6 +7,16 @@ starting with CiviCRM 4.7.14.
 
 Released December 2016
 
+### Credits
+
+This release was developed by the following code authors:
+
+AGH Strategies - Andrew Hunt; Australian Greens - Seamus Lee; CiviCRM - Coleman Watts, Jitendra Purohit, Monish Deb, Tim Otten, and Yashodha Chaku; CiviDesk - Nicolas Ganivet; CiviFirst - John Kirk; Coop SymbioTIC - Samuel Vanhove; Francesc Bassas i Bullich; Fuzion - Chris Burgess and Eileen McNaughton; Ginkgo Street Labs - Tobias Lounsbury; JMA Consulting - Edzel Lopez and Pradeep Nayak; Lighthouse Consulting and Design - Brian Shaughnessy; Progressive Technology Project - Jamie McClelland; Spry Digital - Ellen Hendricks; Systopia - Björn Endres; Third Sector Design - Michael McAndrew; Thomas Schüttler
+
+Most authors also reviewed code for this release; in addition, the following reviewers contributed their comments:
+
+Artem Goncharenko; Coop SymbioTIC - Mathieu Lutfy; Dave Greenberg; Ginkgo Street Labs - Frank Gómez; JMA Consulting - Joe Murray; Korlon - Stuart Gaston; Mattias Michaux; Semper IT - Karin Gerritsen
+
 ### Features
 
 #### Core CiviCRM
