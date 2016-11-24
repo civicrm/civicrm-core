@@ -1054,7 +1054,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
     $params['currencyID'] = CRM_Core_Config::singleton()->defaultCurrency;
 
-    $is_quick_config = 0;
+    // @todo refactor this & leverage it from the unit tests.
     if (!empty($params['priceSetId'])) {
       $is_quick_config = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_priceSetId, 'is_quick_config');
       if ($is_quick_config) {
@@ -1118,7 +1118,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       }
     }
     //If the membership & contribution is used in contribution page & not separate payment
-    $fieldId = $memPresent = $membershipLabel = $fieldOption = $is_quick_config = NULL;
+    $memPresent = $membershipLabel = $fieldOption = $is_quick_config = NULL;
     $proceFieldAmount = 0;
     if (property_exists($this, '_separateMembershipPayment') && $this->_separateMembershipPayment == 0) {
       $is_quick_config = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_priceSetId, 'is_quick_config');
