@@ -64,7 +64,6 @@ class CRM_Contribute_BAO_Contribution_Utils {
     $isRecur
   ) {
     CRM_Core_Payment_Form::mapParams($form->_bltID, $form->_params, $paymentParams, TRUE);
-    $lineItems = $form->_lineItem;
     $isPaymentTransaction = self::isPaymentTransaction($form);
 
     $financialType = new CRM_Financial_DAO_FinancialType();
@@ -104,12 +103,15 @@ class CRM_Contribute_BAO_Contribution_Utils {
       $contributionParams = array(
         'id' => CRM_Utils_Array::value('contribution_id', $paymentParams),
         'contact_id' => $contactID,
-        'line_item' => $lineItems,
         'is_test' => $isTest,
         'campaign_id' => CRM_Utils_Array::value('campaign_id', $paymentParams, CRM_Utils_Array::value('campaign_id', $form->_values)),
         'contribution_page_id' => $form->_id,
         'source' => CRM_Utils_Array::value('source', $paymentParams, CRM_Utils_Array::value('description', $paymentParams)),
       );
+      if (isset($paymentParams['line_item'])) {
+        // @todo make sure this is consisently set at this point.
+        $contributionParams['line_item'] = $paymentParams['line_item'];
+      }
       if (!empty($form->_paymentProcessor)) {
         $contributionParams['payment_instrument_id'] = $paymentParams['payment_instrument_id'] = $form->_paymentProcessor['payment_instrument_id'];
       }

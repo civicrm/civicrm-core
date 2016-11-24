@@ -227,7 +227,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
    * @param array $ids
-   *   The array that holds all the db ids.
+   *   Deprecated parameter The array that holds all the db ids.
    * @param bool $skipRedirect
    * @param string $activityType
    *
@@ -321,6 +321,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
       );
     }
 
+    // This code ensures a line item is created but it is recomended you pass in 'skipLineItem' or 'line_item'
     if (empty($params['line_item']) && !empty($params['membership_type_id']) && empty($params['skipLineItem'])) {
       CRM_Price_BAO_LineItem::getLineItemArray($params, NULL, 'membership', $params['membership_type_id']);
     }
@@ -341,7 +342,26 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
       CRM_Price_BAO_LineItem::deleteLineItems($ids['membership'], 'civicrm_membership');
     }
 
+    // This could happen if there is no contribution or we are in one of many
+    // weird and wonderful flows. This is scary code. Keep adding tests.
     if (!empty($params['line_item']) && empty($ids['contribution'])) {
+
+      foreach ($params['line_item'] as $priceSetId => $lineItems) {
+        foreach ($lineItems as $lineIndex => $lineItem) {
+          $lineMembershipType = CRM_Utils_Array::value('membership_type_id', $lineItem);
+          if (CRM_Utils_Array::value('contribution', $params)) {
+            $params['line_item'][$priceSetId][$lineIndex]['contribution_id'] = $params['contribution']->id;
+          }
+          if ($lineMembershipType && $lineMembershipType == CRM_Utils_Array::value('membership_type_id', $params)) {
+            $params['line_item'][$priceSetId][$lineIndex]['entity_id'] = $membership->id;
+            $params['line_item'][$priceSetId][$lineIndex]['entity_table'] = 'civicrm_membership';
+          }
+          elseif (!$lineMembershipType && CRM_Utils_Array::value('contribution', $params)) {
+            $params['line_item'][$priceSetId][$lineIndex]['entity_id'] = $params['contribution']->id;
+            $params['line_item'][$priceSetId][$lineIndex]['entity_table'] = 'civicrm_contribution';
+          }
+        }
+      }
       CRM_Price_BAO_LineItem::processPriceSet(
         $membership->id,
         $params['line_item'],
@@ -1814,11 +1834,13 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
    * @param $isPayLater
    * @param int $campaignId
    * @param array $formDates
+   * @param null|CRM_Contribute_BAO_Contribution $contribution
+   * @param array $lineItems
    *
-   * @throws CRM_Core_Exception
    * @return array
+   * @throws \CRM_Core_Exception
    */
-  public static function processMembership($contactID, $membershipTypeID, $is_test, $changeToday, $modifiedID, $customFieldsFormatted, $numRenewTerms, $membershipID, $pending, $contributionRecurID, $membershipSource, $isPayLater, $campaignId, $formDates = array(), $contribution = NULL) {
+  public static function processMembership($contactID, $membershipTypeID, $is_test, $changeToday, $modifiedID, $customFieldsFormatted, $numRenewTerms, $membershipID, $pending, $contributionRecurID, $membershipSource, $isPayLater, $campaignId, $formDates = array(), $contribution = NULL, $lineItems = array()) {
     $renewalMode = $updateStatusId = FALSE;
     $allStatus = CRM_Member_PseudoConstant::membershipStatus();
     $format = '%Y%m%d';
@@ -1850,6 +1872,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
           'status_id' => $currentMembership['status_id'],
           'start_date' => $currentMembership['start_date'],
           'end_date' => $currentMembership['end_date'],
+          'line_item' => $lineItems,
           'join_date' => $currentMembership['join_date'],
           'membership_type_id' => $membershipTypeID,
           'max_related' => !empty($membershipTypeDetails['max_related']) ? $membershipTypeDetails['max_related'] : NULL,
@@ -2028,6 +2051,9 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
 
     $memParams['contribution'] = $contribution;
     $memParams['custom'] = $customFieldsFormatted;
+    // Load all line items & process all in membership. Don't do in contribution.
+    // Relevant tests in api_v3_ContributionPageTest.
+    $memParams['line_item'] = $lineItems;
     $membership = self::create($memParams, $ids, FALSE, $activityType);
 
     // not sure why this statement is here, seems quite odd :( - Lobo: 12/26/2010
