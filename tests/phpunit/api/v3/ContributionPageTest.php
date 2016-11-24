@@ -664,7 +664,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    * - the first creates a new membership, completed contribution, in progress recurring. Check these
    * - create another - end date should be extended
    */
-  public function testSubmitMembershipComplexPriceSetPaymentPaymentProcessorRecurInstantPayment() {
+  public function testSubmitMembershipComplexNonPriceSetPaymentPaymentProcessorRecurInstantPayment() {
     $this->params['is_recur'] = 1;
     $this->params['recur_frequency_unit'] = 'month';
     // Add a membership so membership & contribution are not both 1.
@@ -738,6 +738,140 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $recurringContribution = $this->callAPISuccess('contribution_recur', 'getsingle', array('id' => $contribution['contribution_recur_id']));
     $this->assertEquals($processor['payment_instrument_id'], $recurringContribution['payment_instrument_id']);
     $this->assertEquals(5, $recurringContribution['contribution_status_id']);
+  }
+
+  /**
+   * Test submit recurring membership with immediate confirmation (IATS style).
+   *
+   * - we process 2 membership transactions against with a recurring contribution against a contribution page with an immediate
+   * processor (IATS style - denoted by returning trxn_id)
+   * - the first creates a new membership, completed contribution, in progress recurring. Check these
+   * - create another - end date should be extended
+   */
+  public function testSubmitMembershipComplexPriceSetPaymentPaymentProcessorRecurInstantPayment() {
+    $this->params['is_recur'] = 1;
+    $this->params['recur_frequency_unit'] = 'month';
+    // Add a membership so membership & contribution are not both 1.
+    $preExistingMembershipID = $this->contactMembershipCreate(array('contact_id' => $this->contactIds[0]));
+    $this->createPriceSetWithPage();
+    $this->addSecondOrganizationMembershipToPriceSet();
+    $this->setupPaymentProcessor();
+
+    $dummyPP = Civi\Payment\System::singleton()->getByProcessor($this->_paymentProcessor);
+    $dummyPP->setDoDirectPaymentResult(array('payment_status_id' => 1, 'trxn_id' => 'create_first_success'));
+    $processor = $dummyPP->getPaymentProcessor();
+
+    $submitParams = array(
+      'price_' . $this->_ids['price_field'][0] => $this->_ids['price_field_value']['cont'],
+      'price_' . $this->_ids['price_field']['org1'] => $this->_ids['price_field_value']['org1'],
+      'price_' . $this->_ids['price_field']['org2'] => $this->_ids['price_field_value']['org2'],
+      'id' => (int) $this->_ids['contribution_page'],
+      'amount' => 10,
+      'billing_first_name' => 'Billy',
+      'billing_middle_name' => 'Goat',
+      'billing_last_name' => 'Gruff',
+      'email' => 'billy@goat.gruff',
+      'selectMembership' => NULL,
+      'payment_processor_id' => 1,
+      'credit_card_number' => '4111111111111111',
+      'credit_card_type' => 'Visa',
+      'credit_card_exp_date' => array('M' => 9, 'Y' => 2040),
+      'cvv2' => 123,
+      'frequency_interval' => 1,
+      'frequency_unit' => 'month',
+    );
+
+    $this->callAPIAndDocument('contribution_page', 'submit', $submitParams, __FUNCTION__, __FILE__, 'submit contribution page', NULL);
+    $contribution = $this->callAPISuccess('contribution', 'getsingle', array(
+      'contribution_page_id' => $this->_ids['contribution_page'],
+      'contribution_status_id' => 1,
+    ));
+    $this->assertEquals($processor['payment_instrument_id'], $contribution['payment_instrument_id']);
+
+    $this->assertEquals('create_first_success', $contribution['trxn_id']);
+    $membershipPayments = $this->callAPISuccess('membership_payment', 'get', array(
+      'sequential' => 1,
+      'contribution_id' => $contribution['id'],
+    ));
+    $this->assertEquals(2, $membershipPayments['count']);
+    $lines = $this->callAPISuccess('line_item', 'get', array('sequential' => 1, 'contribution_id' => $contribution['id']));
+    $this->assertEquals(3, $lines['count']);
+    $this->assertEquals('civicrm_membership', $lines['values'][0]['entity_table']);
+    $this->assertEquals($preExistingMembershipID + 1, $lines['values'][0]['entity_id']);
+    $this->assertEquals('civicrm_contribution', $lines['values'][1]['entity_table']);
+    $this->assertEquals($contribution['id'], $lines['values'][1]['entity_id']);
+    $this->assertEquals('civicrm_membership', $lines['values'][2]['entity_table']);
+    $this->assertEquals($preExistingMembershipID + 2, $lines['values'][2]['entity_id']);
+
+    $this->callAPISuccessGetSingle('MembershipPayment', array('contribution_id' => $contribution['id'], 'membership_id' => $preExistingMembershipID + 1));
+    $membership = $this->callAPISuccessGetSingle('membership', array('id' => $preExistingMembershipID + 1));
+
+    //renew it with processor setting completed - should extend membership
+    $submitParams['contact_id'] = $contribution['contact_id'];
+    $dummyPP->setDoDirectPaymentResult(array('payment_status_id' => 1, 'trxn_id' => 'create_second_success'));
+    $this->callAPISuccess('contribution_page', 'submit', $submitParams);
+    $renewContribution = $this->callAPISuccess('contribution', 'getsingle', array(
+      'id' => array('NOT IN' => array($contribution['id'])),
+      'contribution_page_id' => $this->_ids['contribution_page'],
+      'contribution_status_id' => 1,
+    ));
+    $lines = $this->callAPISuccess('line_item', 'get', array('sequential' => 1, 'contribution_id' => $renewContribution['id']));
+    $this->assertEquals(3, $lines['count']);
+    $this->assertEquals('civicrm_membership', $lines['values'][0]['entity_table']);
+    $this->assertEquals($preExistingMembershipID + 1, $lines['values'][0]['entity_id']);
+    $this->assertEquals('civicrm_contribution', $lines['values'][1]['entity_table']);
+    $this->assertEquals($renewContribution['id'], $lines['values'][1]['entity_id']);
+
+    $renewedMembership = $this->callAPISuccessGetSingle('membership', array('id' => $preExistingMembershipID + 1));
+    $this->assertEquals(date('Y-m-d', strtotime('+ 1 year', strtotime($membership['end_date']))), $renewedMembership['end_date']);
+  }
+
+  /**
+   * Extend the price set with a second organisation's membership.
+   */
+  public function addSecondOrganizationMembershipToPriceSet() {
+    $organization2ID = $this->organizationCreate();
+    $membershipTypes = $this->callAPISuccess('MembershipType', 'get', array());
+    $this->_ids['membership_type'] = array_keys($membershipTypes['values']);
+    $this->_ids['membership_type']['org2'] = $this->membershipTypeCreate(array('contact_id' => $organization2ID, 'name' => 'Org 2'));
+    $priceField = $this->callAPISuccess('PriceField', 'create', array(
+      'price_set_id' => $this->_ids['price_set'],
+      'html_type' => 'Radio',
+      'name' => 'Org1 Price',
+      'label' => 'Org1Price',
+    ));
+    $this->_ids['price_field']['org1'] = $priceField['id'];
+
+    $priceFieldValue = $this->callAPISuccess('price_field_value', 'create', array(
+      'name' => 'org1 amount',
+      'label' => 'org 1 Amount',
+      'amount' => 2,
+      'financial_type_id' => 'Member Dues',
+      'format.only_id' => TRUE,
+      'membership_type_id' => reset($this->_ids['membership_type']),
+      'price_field_id' => $priceField['id'],
+    ));
+    $this->_ids['price_field_value']['org1'] = $priceFieldValue;
+
+    $priceField = $this->callAPISuccess('PriceField', 'create', array(
+      'price_set_id' => $this->_ids['price_set'],
+      'html_type' => 'Radio',
+      'name' => 'Org2 Price',
+      'label' => 'Org2Price',
+    ));
+    $this->_ids['price_field']['org2'] = $priceField['id'];
+
+    $priceFieldValue = $this->callAPISuccess('price_field_value', 'create', array(
+      'name' => 'org2 amount',
+      'label' => 'org 2 Amount',
+      'amount' => 200,
+      'financial_type_id' => 'Member Dues',
+      'format.only_id' => TRUE,
+      'membership_type_id' => $this->_ids['membership_type']['org2'],
+      'price_field_id' => $priceField['id'],
+    ));
+    $this->_ids['price_field_value']['org2'] = $priceFieldValue;
+
   }
 
   /**
@@ -944,13 +1078,34 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       $priceFieldValue = $this->callAPISuccess('price_field_value', 'create', array(
         'name' => 'membership_amount',
         'label' => 'Membership Amount',
-        'amount' => 1,
+        'amount' => 2,
         'financial_type_id' => 'Donation',
         'format.only_id' => TRUE,
         'membership_type_id' => $membershipTypeID,
         'price_field_id' => $priceField['id'],
       ));
       $this->_ids['price_field_value'][] = $priceFieldValue;
+    }
+    if (!empty($this->_ids['membership_type']['org2'])) {
+      $priceField = $this->callAPISuccess('price_field', 'create', array(
+        'price_set_id' => reset($this->_ids['price_set']),
+        'name' => 'membership_org2',
+        'label' => 'Membership Org2',
+        'html_type' => 'Checkbox',
+        'sequential' => 1,
+      ));
+      $this->_ids['price_field']['org2'] = $priceField['id'];
+
+      $priceFieldValue = $this->callAPISuccess('price_field_value', 'create', array(
+        'name' => 'membership_org2',
+        'label' => 'Membership org 2',
+        'amount' => 55,
+        'financial_type_id' => 'Member Dues',
+        'format.only_id' => TRUE,
+        'membership_type_id' => $this->_ids['membership_type']['org2'],
+        'price_field_id' => $priceField['id'],
+      ));
+      $this->_ids['price_field_value']['org2'] = $priceFieldValue;
     }
     $priceField = $this->callAPISuccess('price_field', 'create', array(
       'price_set_id' => reset($this->_ids['price_set']),

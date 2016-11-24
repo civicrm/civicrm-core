@@ -1456,6 +1456,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $errors = $paymentResults = array();
     $form->_values['isMembership'] = TRUE;
     $isRecurForFirstTransaction = CRM_Utils_Array::value('is_recur', $form->_values, CRM_Utils_Array::value('is_recur', $membershipParams));
+    $unprocessedLineItems = $form->_lineItem;
     $totalAmount = $membershipParams['amount'];
 
     if ($isPaidMembership) {
@@ -1521,7 +1522,26 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     //@todo it should no longer be possible for it to get to this point & membership to not be an array
     if (is_array($membershipTypeIDs) && !empty($membershipContributionID)) {
       $typesTerms = CRM_Utils_Array::value('types_terms', $membershipParams, array());
+
+      $membershipLines = $nonMembershipLines = array();
+      foreach ($unprocessedLineItems as $priceSetID => $lines) {
+        foreach ($lines as $line) {
+          if (!empty($line['membership_type_id'])) {
+            $membershipLines[$line['membership_type_id']] = $line['price_field_value_id'];
+          }
+        }
+      }
+
+      $i = 1;
       foreach ($membershipTypeIDs as $memType) {
+        if ($i < count($membershipTypeIDs)) {
+          $membershipLineItems[$priceSetID][$membershipLines[$memType]] = $unprocessedLineItems[$priceSetID][$membershipLines[$memType]];
+          unset($unprocessedLineItems[$priceSetID][$membershipLines[$memType]]);
+        }
+        else {
+          $membershipLineItems = $unprocessedLineItems;
+        }
+        $i++;
         $numTerms = CRM_Utils_Array::value($memType, $typesTerms, 1);
         if (!empty($membershipContribution)) {
           $pendingStatus = CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name');
@@ -1557,7 +1577,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
           $customFieldsFormatted,
           $numTerms, $membershipID, $pending,
           $contributionRecurID, $membershipSource, $isPayLater, $campaignId, array(), $membershipContribution,
-          $form->_lineItem
+          $membershipLineItems
         );
 
         $form->set('renewal_mode', $renewalMode);
@@ -1936,9 +1956,20 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     else {
       $form->_params['payment_processor_id'] = 0;
     }
+
     $priceFields = $priceFields[$priceSetID]['fields'];
     CRM_Price_BAO_PriceSet::processAmount($priceFields, $paramsProcessedForForm, $lineItems, 'civicrm_contribution');
     $form->_lineItem = array($priceSetID => $lineItems);
+    $membershipPriceFieldIDs = array();
+    foreach ((array) $lineItems as $lineItem) {
+      if (!empty($lineItem['membership_type_id'])) {
+        $form->set('useForMember', 1);
+        $form->_useForMember = 1;
+        $membershipPriceFieldIDs['id'] = $priceSetID;
+        $membershipPriceFieldIDs[] = $lineItem['price_field_value_id'];
+      }
+    }
+    $form->set('memberPriceFieldIDS', $membershipPriceFieldIDs);
     $form->processFormSubmission(CRM_Utils_Array::value('contact_id', $params));
   }
 
@@ -2325,7 +2356,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $priceFieldIds = $this->get('memberPriceFieldIDS');
 
     if (!empty($priceFieldIds)) {
-      $contributionTypeID = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $priceFieldIds['id'], 'financial_type_id');
+      $financialTypeID = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $priceFieldIds['id'], 'financial_type_id');
       unset($priceFieldIds['id']);
       $membershipTypeIds = array();
       $membershipTypeTerms = array();
@@ -2344,7 +2375,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         }
       }
       $membershipParams['selectMembership'] = $membershipTypeIds;
-      $membershipParams['financial_type_id'] = $contributionTypeID;
+      $membershipParams['financial_type_id'] = $financialTypeID;
       $membershipParams['types_terms'] = $membershipTypeTerms;
     }
     if (!empty($membershipParams['selectMembership'])) {
