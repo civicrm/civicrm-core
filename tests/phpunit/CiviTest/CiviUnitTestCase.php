@@ -3647,4 +3647,78 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     return Civi::settings()->set('contribution_invoice_settings', $contributeSetting);
   }
 
+  /**
+   * Create price set with contribution test for test setup.
+   *
+   * This could be merged with 4.5 function setup in api_v3_ContributionPageTest::setUpContributionPage
+   * on parent class at some point (fn is not in 4.4).
+   *
+   * @param $entity
+   * @param array $params
+   */
+  public function createPriceSetWithPage($entity = NULL, $params = array()) {
+    $membershipTypeID = $this->membershipTypeCreate(array('name' => 'Special'));
+    $contributionPageResult = $this->callAPISuccess('contribution_page', 'create', array(
+      'title' => "Test Contribution Page",
+      'financial_type_id' => 1,
+      'currency' => 'NZD',
+      'goal_amount' => 50,
+      'is_pay_later' => 1,
+      'is_monetary' => TRUE,
+      'is_email_receipt' => FALSE,
+    ));
+    $priceSet = $this->callAPISuccess('price_set', 'create', array(
+      'is_quick_config' => 0,
+      'extends' => 'CiviMember',
+      'financial_type_id' => 1,
+      'title' => 'my Page',
+    ));
+    $priceSetID = $priceSet['id'];
+
+    CRM_Price_BAO_PriceSet::addTo('civicrm_contribution_page', $contributionPageResult['id'], $priceSetID);
+    $priceField = $this->callAPISuccess('price_field', 'create', array(
+      'price_set_id' => $priceSetID,
+      'label' => 'Goat Breed',
+      'html_type' => 'Radio',
+    ));
+    $priceFieldValue = $this->callAPISuccess('price_field_value', 'create', array(
+        'price_set_id' => $priceSetID,
+        'price_field_id' => $priceField['id'],
+        'label' => 'Long Haired Goat',
+        'amount' => 20,
+        'financial_type_id' => 'Donation',
+        'membership_type_id' => $membershipTypeID,
+        'membership_num_terms' => 1,
+      )
+    );
+    $this->_ids['price_field_value'] = array($priceFieldValue['id']);
+    $priceFieldValue = $this->callAPISuccess('price_field_value', 'create', array(
+        'price_set_id' => $priceSetID,
+        'price_field_id' => $priceField['id'],
+        'label' => 'Shoe-eating Goat',
+        'amount' => 10,
+        'financial_type_id' => 'Donation',
+        'membership_type_id' => $membershipTypeID,
+        'membership_num_terms' => 2,
+      )
+    );
+    $this->_ids['price_field_value'][] = $priceFieldValue['id'];
+
+    $priceFieldValue = $this->callAPISuccess('price_field_value', 'create', array(
+        'price_set_id' => $priceSetID,
+        'price_field_id' => $priceField['id'],
+        'label' => 'Shoe-eating Goat',
+        'amount' => 10,
+        'financial_type_id' => 'Donation',
+      )
+    );
+    $this->_ids['price_field_value']['cont'] = $priceFieldValue['id'];
+
+    $this->_ids['price_set'] = $priceSetID;
+    $this->_ids['contribution_page'] = $contributionPageResult['id'];
+    $this->_ids['price_field'] = array($priceField['id']);
+
+    $this->_ids['membership_type'] = $membershipTypeID;
+  }
+
 }
