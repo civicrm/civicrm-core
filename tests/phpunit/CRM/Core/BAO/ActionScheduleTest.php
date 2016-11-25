@@ -162,6 +162,36 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'start_action_unit' => 'day',
       'subject' => '1-Day (repeating) (about {activity.activity_type})',
     );
+    $this->fixtures['sched_activity_1day_r_on_abs_date'] = array(
+      'name' => 'One_Day_Phone_Call_Notice_R',
+      'title' => 'One Day Phone Call Notice R',
+      'limit_to' => 1,
+      'absolute_date' => CRM_Utils_Date::processDate('20120614100000'),
+      'body_html' => '<p>1-Day (repeating)</p>',
+      'body_text' => '1-Day (repeating)',
+      'entity_status' => '1',
+      'entity_value' => '2',
+      'group_id' => NULL,
+      'is_active' => '1',
+      'is_repeat' => '1',
+      'mapping_id' => '1',
+      'msg_template_id' => NULL,
+      'recipient' => '2',
+      'recipient_listing' => NULL,
+      'recipient_manual' => NULL,
+      'record_activity' => NULL,
+      'repetition_frequency_interval' => '6',
+      'repetition_frequency_unit' => 'hour',
+      'end_action' => 'after',
+      'end_date' => 'activity_date_time',
+      'end_frequency_interval' => '2',
+      'end_frequency_unit' => 'day',
+      'start_action_condition' => '',
+      'start_action_date' => '',
+      'start_action_offset' => '',
+      'start_action_unit' => '',
+      'subject' => '1-Day (repeating) (about {activity.activity_type})',
+    );
     $this->fixtures['sched_membership_join_2week'] = array(
       'name' => 'sched_membership_join_2week',
       'title' => 'sched_membership_join_2week',
@@ -831,6 +861,49 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       array(
         // Run cron 6 hours later; send second message.
         'time' => '2012-06-14 21:00:01',
+        'recipients' => array(array('test-member@example.com')),
+        'subjects' => array('1-Day (repeating) (about Phone Call)'),
+      ),
+    ));
+  }
+
+  public function testActivityDateTimeMatchRepeatableScheduleOnAbsDate() {
+    $actionScheduleDao = CRM_Core_BAO_ActionSchedule::add($this->fixtures['sched_activity_1day_r_on_abs_date']);
+    $this->assertTrue(is_numeric($actionScheduleDao->id));
+
+    $activity = $this->createTestObject('CRM_Activity_DAO_Activity', $this->fixtures['phonecall']);
+    $this->assertTrue(is_numeric($activity->id));
+    $contact = $this->callAPISuccess('contact', 'create', $this->fixtures['contact']);
+    $activity->save();
+
+    $source['contact_id'] = $contact['id'];
+    $source['activity_id'] = $activity->id;
+    $source['record_type_id'] = 2;
+    $activityContact = $this->createTestObject('CRM_Activity_DAO_ActivityContact', $source);
+    $activityContact->save();
+
+    $this->assertCronRuns(array(
+      array(
+        // Before the 24-hour mark, no email
+        'time' => '2012-06-13 04:00:00',
+        'recipients' => array(),
+        'subjects' => array(),
+      ),
+      array(
+        // On absolute date set on 2012-06-14
+        'time' => '2012-06-14 00:00:00',
+        'recipients' => array(array('test-member@example.com')),
+        'subjects' => array('1-Day (repeating) (about Phone Call)'),
+      ),
+      array(
+        // Run cron 4 hours later; first message already sent
+        'time' => '2012-06-14 04:00:00',
+        'recipients' => array(),
+        'subjects' => array(),
+      ),
+      array(
+        // Run cron 6 hours later; send second message.
+        'time' => '2012-06-14 06:00:01',
         'recipients' => array(array('test-member@example.com')),
         'subjects' => array('1-Day (repeating) (about Phone Call)'),
       ),
