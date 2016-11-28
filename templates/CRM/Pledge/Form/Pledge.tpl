@@ -149,23 +149,21 @@
 // bind first click of accordion header to load crm-accordion-body with snippet
 // everything else taken care of by cj().crm-accordions()
 cj(document).ready( function() {
-
- var eachPaymentAmout = cj('#eachPaymentAmount');
- var symbol = cj('#currency option:selected').text();
- if( symbol.indexOf('(') > 0){
-   symbol = symbol.substring(symbol.lastIndexOf("(")+1,symbol.lastIndexOf(")"));
- }
+  var eachPaymentAmout = cj('#eachPaymentAmount');
+  var symbol = cj('#currency option:selected').text();
+  if( symbol.indexOf('(') > 0) {
+    symbol = symbol.substring(symbol.lastIndexOf("(")+1,symbol.lastIndexOf(")"));
+  }
   cj('.currency-symbol').text(symbol).append("&nbsp;").append(eachPaymentAmout);
   // if there are more than one currency enabled.
-   cj('#currency').change(function(){
-     symbol = cj(this).find(':selected').text();
-     if( symbol.indexOf('(') > 0){
-       symbol = symbol.substring(symbol.lastIndexOf("(")+1,symbol.lastIndexOf(")"));
-     }
-     cj('.currency-symbol').text(symbol).append("&nbsp;");
-     cj('.currency-symbol').append(eachPaymentAmout);
+  cj('#currency').change(function() {
+    symbol = cj(this).find(':selected').text();
+    if( symbol.indexOf('(') > 0) {
+      symbol = symbol.substring(symbol.lastIndexOf("(")+1,symbol.lastIndexOf(")"));
     }
-   );
+    cj('.currency-symbol').text(symbol).append("&nbsp;").append(eachPaymentAmout);
+  });
+
     cj('.crm-ajax-accordion .crm-accordion-header').one('click', function() {
       loadPanes(cj(this).attr('id'));
     });
