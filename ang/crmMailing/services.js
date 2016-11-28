@@ -155,6 +155,9 @@
             groups: {include: [], exclude: [], base: []},
             mailings: {include: [], exclude: []}
           },
+          template_type: "traditional",
+          // Workaround CRM-19756 w/template_options.nonce
+          template_options: {nonce: 1},
           name: "",
           campaign_id: null,
           replyto_email: "",
