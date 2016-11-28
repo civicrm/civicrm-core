@@ -450,9 +450,8 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
     $query = "SELECT distinct( contact_id )
               FROM civicrm_dashboard_contact WHERE dashboard_id = {$dashlet->id}";
     $dao = CRM_Core_DAO::executeQuery($query);
-    $skipContactIDs = array();
     while ($dao->fetch()) {
-      if(array_key_exists($dao->contact_id, $contactIDs)) {
+      if (array_key_exists($dao->contact_id, $contactIDs)) {
         unset($contactIDs[$dao->contact_id]);
       }
     }
