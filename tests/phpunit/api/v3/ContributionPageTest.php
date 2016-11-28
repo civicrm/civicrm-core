@@ -440,10 +440,18 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->assertTrue(in_array($membershipPayment['contribution_id'], array_keys($contributions['values'])));
     $membership = $this->callAPISuccessGetSingle('membership', array('id' => $membershipPayment['membership_id']));
     $this->assertEquals($membership['contact_id'], $contributions['values'][$membershipPayment['contribution_id']]['contact_id']);
-    $mut->checkAllMailLog(array(
-      '$ 2.00',
-      'Membership Fee',
-    ));
+    // We should have two separate email messages, each with their own amount
+    // line and no total line.
+    $mut->checkAllMailLog(
+      array(
+        'Amount: $ 2.00',
+        'Amount: $ 10.00',
+        'Membership Fee',
+      ),
+      array(
+        'Total: $',
+      )
+    );
     $mut->stop();
     $mut->clearMessages(999);
   }
