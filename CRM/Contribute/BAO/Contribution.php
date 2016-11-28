@@ -4723,7 +4723,8 @@ LIMIT 1;";
     $contribution->loadRelatedObjects($input, $ids, TRUE);
     if (!$returnMessageText) {
       // First, try to retrieve default name and email address.
-      $domainEmailValues = CRM_Core_BAO_Domain::getNameAndEmail();
+      $skipFatal = TRUE;
+      $domainEmailValues = CRM_Core_BAO_Domain::getNameAndEmail($skipFatal);
       if (!empty($domainEmailValues)) {
         $userName = $domainEmailValues[0];
         $userEmail = $domainEmailValues[1];
