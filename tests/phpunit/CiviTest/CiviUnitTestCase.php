@@ -1362,7 +1362,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @return int
    *   Id Payment Processor
    */
-  public function processorCreate() {
+  public function processorCreate($params = array()) {
     $processorParams = array(
       'domain_id' => 1,
       'name' => 'Dummy',
@@ -1377,6 +1377,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       'sequential' => 1,
       'payment_instrument_id' => 'Debit Card',
     );
+    $processorParams = array_merge($processorParams, $params);
     $processor = $this->callAPISuccess('PaymentProcessor', 'create', $processorParams);
     return $processor['id'];
   }

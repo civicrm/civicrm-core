@@ -1404,6 +1404,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         'id' => $params['id'],
       ));
       $this->_id = $params['id'];
+      $this->_values = $existingContribution;
     }
     else {
       $existingContribution = array();

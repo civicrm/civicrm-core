@@ -2497,6 +2497,65 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test if renewal activity is create after changing Pending contribution to Completed via offline
+   */
+  public function testPendingToCompleteContribution() {
+    $contributionPage = $this->createPriceSetWithPage('membership');
+    $stateOfGrace = $this->callAPISuccess('MembershipStatus', 'getvalue', array(
+      'name' => 'Grace',
+      'return' => 'id')
+    );
+    $this->setUpPendingContribution($this->_ids['price_field_value'][0]);
+    $this->callAPISuccess('membership', 'getsingle', array('id' => $this->_ids['membership']));
+
+    // change pending contribution to completed
+    $form = new CRM_Contribute_Form_Contribution();
+    $error = FALSE;
+    $form->_params = array(
+      'id' => $this->_ids['contribution'],
+      'total_amount' => 20,
+      'net_amount' => 20,
+      'fee_amount' => 0,
+      'financial_type_id' => 1,
+      'receive_date' => '04/21/2015',
+      'receive_date_time' => '11:27PM',
+      'contact_id' => $this->_individualId,
+      'contribution_status_id' => 1,
+      'billing_middle_name' => '',
+      'billing_last_name' => 'Adams',
+      'billing_street_address-5' => '790L Lincoln St S',
+      'billing_city-5' => 'Maryknoll',
+      'billing_state_province_id-5' => 1031,
+      'billing_postal_code-5' => 10545,
+      'billing_country_id-5' => 1228,
+      'frequency_interval' => 1,
+      'frequency_unit' => 'month',
+      'installments' => '',
+      'hidden_AdditionalDetail' => 1,
+      'hidden_Premium' => 1,
+      'from_email_address' => '"civi45" <civi45@civicrm.com>',
+      'receipt_date' => '',
+      'receipt_date_time' => '',
+      'payment_processor_id' => $this->paymentProcessorID,
+      'currency' => 'USD',
+      'contribution_page_id' => $this->_ids['contribution_page'],
+      'contribution_mode' => 'membership',
+      'source' => 'Membership Signup and Renewal',
+    );
+    try {
+      $form->testSubmit($form->_params, CRM_Core_Action::UPDATE);
+    }
+    catch (Civi\Payment\Exception\PaymentProcessorException $e) {
+      $error = TRUE;
+    }
+    $activity = $this->callAPISuccess('Activity', 'get', array(
+      'activity_type_id' => 'Membership Renewal',
+      'source_record_id' => $this->_ids['contribution'],
+    ));
+    $this->assertEquals(1, $activity['count']);
+  }
+
+  /**
    * Test membership is renewed when transaction completed.
    */
   public function testCompleteTransactionMembershipPriceSetTwoTerms() {
@@ -2531,7 +2590,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'domain_id' => 1,
       'contact_id' => $contactID,
       'receive_date' => date('Ymd'),
-      'total_amount' => 100.00,
+      'total_amount' => 20.00,
       'financial_type_id' => 1,
       'payment_instrument_id' => 'Credit Card',
       'non_deductible_amount' => 10.00,
