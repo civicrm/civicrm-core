@@ -448,7 +448,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
         'Membership Fee',
       ),
       array(
-        'Total: $'
+        'Total: $',
       ),
     );
     $mut->stop();
