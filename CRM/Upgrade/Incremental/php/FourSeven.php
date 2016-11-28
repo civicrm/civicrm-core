@@ -287,6 +287,16 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
   }
 
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_4_7_16($rev) {
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
+    $this->addTask('Add new CiviMail fields', 'addMailingTemplateType');
+  }
+
   /*
    * Important! All upgrade functions MUST add a 'runSql' task.
    * Uncomment and use the following template for a new upgrade version
@@ -876,6 +886,17 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
     $length['civicrm_contact']['image_URL'] = 128;
     CRM_Core_BAO_SchemaHandler::createIndexes(array('civicrm_contact' => array('image_URL')), 'index', $length);
 
+    return TRUE;
+  }
+
+  public static function addMailingTemplateType() {
+    if (!CRM_Core_DAO::checkFieldExists('civicrm_mailing', 'template_type', FALSE)) {
+      CRM_Core_DAO::executeQuery('
+        ALTER TABLE civicrm_mailing
+        ADD COLUMN `template_type` varchar(64)  NOT NULL DEFAULT \'traditional\' COMMENT \'The language/processing system used for email templates.\',
+        ADD COLUMN `template_options` longtext  COMMENT \'Advanced options used by the email templating system. (JSON encoded)\'
+      ');
+    }
     return TRUE;
   }
 

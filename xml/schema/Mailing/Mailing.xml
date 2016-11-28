@@ -160,6 +160,24 @@
     </html>
   </field>
   <field>
+    <name>template_type</name>
+    <title>Template Type</title>
+    <type>varchar</type>
+    <length>64</length>
+    <default>'traditional'</default>
+    <required>true</required>
+    <comment>The language/processing system used for email templates.</comment>
+    <pseudoconstant>
+      <callback>CRM_Mailing_BAO_Mailing::getTemplateTypeNames</callback>
+    </pseudoconstant>
+  </field>
+  <field>
+    <name>template_options</name>
+    <title>Template Options (JSON)</title>
+    <type>longtext</type>
+    <comment>Advanced options used by the email templating system. (JSON encoded)</comment>
+  </field>
+  <field>
     <name>subject</name>
     <type>varchar</type>
     <length>128</length>

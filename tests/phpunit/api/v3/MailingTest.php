@@ -86,6 +86,14 @@ class api_v3_MailingTest extends CiviUnitTestCase {
   }
 
   /**
+   *
+   */
+  public function testTemplateTypeOptions() {
+    $types = $this->callAPISuccess('Mailing', 'getoptions', array('field' => 'template_type'));
+    $this->assertTrue(isset($types['values']['traditional']));
+  }
+
+  /**
    * The Mailing.create API supports magic properties "groups[include,enclude]" and "mailings[include,exclude]".
    * Make sure these work
    */
