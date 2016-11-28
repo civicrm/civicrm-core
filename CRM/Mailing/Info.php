@@ -165,6 +165,7 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
     CRM_Core_Resources::singleton()
       ->addSetting(array(
         'crmMailing' => array(
+          'templateTypes' => CRM_Mailing_BAO_Mailing::getTemplateTypes(),
           'civiMails' => $civiMails['values'],
           'campaignEnabled' => in_array('CiviCampaign', $config->enableComponents),
           'groupNames' => $groupNames['values'],
