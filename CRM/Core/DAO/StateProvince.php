@@ -134,7 +134,7 @@ class CRM_Core_DAO_StateProvince extends CRM_Core_DAO {
         'country_id' => array(
           'name' => 'country_id',
           'type' => CRM_Utils_Type::T_INT,
-          'title' => ts('County') ,
+          'title' => ts('Country') ,
           'description' => 'ID of Country that State/Province belong',
           'required' => true,
           'FKClassName' => 'CRM_Core_DAO_Country',
