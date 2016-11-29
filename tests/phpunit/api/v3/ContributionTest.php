@@ -2656,11 +2656,26 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     catch (Civi\Payment\Exception\PaymentProcessorException $e) {
       $error = TRUE;
     }
+    // Case 1: Assert that Membership Renewal Activity is created on Pending (Pay later) to Completed Contribution via backoffice
     $activity = $this->callAPISuccess('Activity', 'get', array(
       'activity_type_id' => 'Membership Renewal',
       'source_record_id' => $this->_ids['contribution'],
     ));
     $this->assertEquals(1, $activity['count']);
+
+    // Case 2: Assert that Membership Signup Activity is created on Pending (Pay later) Contribution on current membership
+    $this->setUpPendingContribution($this->_ids['price_field_value'][0], array('trxn_id' => 'xoa12', 'invoice_id' => '12mv'));
+    $activity = $this->callAPISuccess('Activity', 'get', array(
+      'activity_type_id' => 'Membership Signup',
+      'source_record_id' => $this->_ids['contribution'],
+    ));
+    $this->assertEquals(1, $activity['count']);
+    // Case 3: Assert that no Membership Renewal Activity is created on Pending (Pay later) Contribution on current membership
+    $activity = $this->callAPISuccess('Activity', 'get', array(
+      'activity_type_id' => 'Membership Renewal',
+      'source_record_id' => $this->_ids['contribution'],
+    ));
+    $this->assertEquals(0, $activity['count']);
   }
 
   /**
@@ -2685,7 +2700,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    *
    * @param int $priceFieldValueID
    */
-  public function setUpPendingContribution($priceFieldValueID) {
+  public function setUpPendingContribution($priceFieldValueID, $contriParams = array()) {
     $contactID = $this->individualCreate();
     $membership = $this->callAPISuccess('membership', 'create', array(
       'contact_id' => $contactID,
@@ -2694,7 +2709,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'end_date' => 'yesterday',
       'join_date' => 'yesterday - 1 year',
     ));
-    $contribution = $this->callAPISuccess('contribution', 'create', array(
+    $contribution = $this->callAPISuccess('contribution', 'create', array_merge(array(
       'domain_id' => 1,
       'contact_id' => $contactID,
       'receive_date' => date('Ymd'),
@@ -2708,7 +2723,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'contribution_status_id' => 2,
       'contribution_page_id' => $this->_ids['contribution_page'],
       'api.membership_payment.create' => array('membership_id' => $membership['id']),
-    ));
+    ), $contriParams));
 
     $this->callAPISuccess('line_item', 'create', array(
       'entity_id' => $contribution['id'],
