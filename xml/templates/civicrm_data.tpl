@@ -966,7 +966,7 @@ VALUES
 
 -- WYSIWYG Editor Presets
 (@option_group_id_wysiwyg_presets, '{ts escape="sql"}Default{/ts}',   '1', 'default',   NULL, NULL, 1, 1, NULL, 0, 1, 1, NULL, NULL),
-(@option_group_id_wysiwyg_presets, '{ts escape="sql"}CiviMail{/ts}',  '2', 'civimail',  NULL, NULL, 0, 2, NULL, 0, 1, 1, @contributeCompId, NULL),
+(@option_group_id_wysiwyg_presets, '{ts escape="sql"}CiviMail{/ts}',  '2', 'civimail',  NULL, NULL, 0, 2, NULL, 0, 1, 1, @mailCompId, NULL),
 (@option_group_id_wysiwyg_presets, '{ts escape="sql"}CiviEvent{/ts}', '3', 'civievent', NULL, NULL, 0, 3, NULL, 0, 1, 1, @eventCompId, NULL),
 
 -- Relative Date Filters
