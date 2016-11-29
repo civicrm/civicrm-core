@@ -42,9 +42,8 @@ class CRM_Contribute_BAO_Contribution_Utils {
    *   value pairs
    * @param int $contactID
    *   Contact id.
-   * @param int $contributionTypeId
+   * @param int $financialTypeID
    *   Financial type id.
-   * @param int|string $component component id
    * @param bool $isTest
    * @param bool $isRecur
    *
@@ -58,8 +57,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
     &$form,
     &$paymentParams,
     $contactID,
-    $contributionTypeId,
-    $component = 'contribution',
+    $financialTypeID,
     $isTest,
     $isRecur
   ) {
@@ -67,7 +65,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
     $isPaymentTransaction = self::isPaymentTransaction($form);
 
     $financialType = new CRM_Financial_DAO_FinancialType();
-    $financialType->id = $contributionTypeId;
+    $financialType->id = $financialTypeID;
     $financialType->find(TRUE);
     if ($financialType->is_deductible) {
       $form->assign('is_deductible', TRUE);
@@ -79,7 +77,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
     //CRM-15297 - contributionType is obsolete - pass financial type as well so people can deprecate it
     $paymentParams['financialType_name'] = $paymentParams['contributionType_name'] = $form->_params['contributionType_name'] = $financialType->name;
     //CRM-11456
-    $paymentParams['financialType_accounting_code'] = $paymentParams['contributionType_accounting_code'] = $form->_params['contributionType_accounting_code'] = CRM_Financial_BAO_FinancialAccount::getAccountingCode($contributionTypeId);
+    $paymentParams['financialType_accounting_code'] = $paymentParams['contributionType_accounting_code'] = $form->_params['contributionType_accounting_code'] = CRM_Financial_BAO_FinancialAccount::getAccountingCode($financialTypeID);
     $paymentParams['contributionPageID'] = $form->_params['contributionPageID'] = $form->_values['id'];
     $paymentParams['contactID'] = $form->_params['contactID'] = $contactID;
 
@@ -127,11 +125,12 @@ class CRM_Contribute_BAO_Contribution_Utils {
         $isRecur
       );
 
-      $paymentParams['contributionTypeID'] = $contributionTypeId;
       $paymentParams['item_name'] = $form->_params['description'];
 
       $paymentParams['qfKey'] = $form->controller->_key;
-      if ($component == 'membership') {
+      if ($paymentParams['skipLineItem']) {
+        // We are not processing the line item here because we are processing a membership.
+        // Do not continue with contribution processing in this function.
         return array('contribution' => $contribution);
       }
 
