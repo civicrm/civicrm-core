@@ -320,23 +320,13 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     if (!empty($this->_membershipBlock)) {
       $this->_params['selectMembership'] = $this->get('selectMembership');
     }
-    if (!empty($this->_paymentProcessor)) {
-      if ($this->_paymentProcessor['object']->supports('preApproval')) {
-        $preApprovalParams = $this->_paymentProcessor['object']->getPreApprovalDetails($this->get('pre_approval_parameters'));
-        $this->_params = array_merge($this->_params, $preApprovalParams);
+    if (!empty($this->_paymentProcessor) &&  $this->_paymentProcessor['object']->supports('preApproval')) {
+      $preApprovalParams = $this->_paymentProcessor['object']->getPreApprovalDetails($this->get('pre_approval_parameters'));
+      $this->_params = array_merge($this->_params, $preApprovalParams);
 
-        // We may have fetched some billing details from the getPreApprovalDetails function so we
-        // want to ensure we set this after that function has been called.
-        CRM_Core_Payment_Form::mapParams($this->_bltID, $preApprovalParams, $this->_params, FALSE);
-      }
-
-      // Set text version of state & country if present.
-      if (!empty($this->_params["billing_state_province_id-{$this->_bltID}"])) {
-        $this->_params["state_province-{$this->_bltID}"] = CRM_Core_PseudoConstant::stateProvinceAbbreviation($this->_params["billing_state_province_id-{$this->_bltID}"]);
-      }
-      if (!empty($this->_params["billing_country_id-{$this->_bltID}"])) {
-        $this->_params["country-{$this->_bltID}"] = CRM_Core_PseudoConstant::countryIsoCode($this->_params["billing_country_id-{$this->_bltID}"]);
-      }
+      // We may have fetched some billing details from the getPreApprovalDetails function so we
+      // want to ensure we set this after that function has been called.
+      CRM_Core_Payment_Form::mapParams($this->_bltID, $preApprovalParams, $this->_params, FALSE);
     }
 
     $this->_params['is_pay_later'] = $this->get('is_pay_later');
