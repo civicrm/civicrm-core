@@ -1,12 +1,20 @@
 # This is a key of GitHub handles to real contributors' names and organizations,
 # to be used for preparing credits for release notes.
 ---
+- github      : adixon
+  name        : Alan Dixon
+  organization: Blackfly Solutions
 - github      : agh1
   name        : Andrew Hunt
   organization: AGH Strategies
 - github      : agileware
-  name        : Agileware
+  name        : Agileware Team
   organization: Agileware
+- github      : alifrumin
+  name        : Alice Frumin
+  organization: AGH Strategies
+- github      : andrew-cormick-dockery
+  name        : Andrew Cormick-Dockery
 - github      : artem3
   name        : Artem Goncharenko
 - github      : colemanw
@@ -15,6 +23,9 @@
 - github      : davecivicrm
   name        : Dave Greenberg
   organization: CiviCRM
+- github      : davejenx
+  name        : Dave Jenkins
+  organization: Circle Interactive
 - github      : edzelopez
   name        : Edzel Lopez
   organization: JMA Consulting
@@ -26,6 +37,11 @@
 - github      : ginkgofjg
   name        : Frank Gómez
   organization: Ginkgo Street Labs
+- github      : ginkgomzd
+  name        : Michael Z Daryabeygi
+  organization: Ginkgo Street Labs
+- github      : ineffyble
+  name        : Effy Elden
 - github      : jernic
   name        : jernic
 - github      : jitendrapurohit
@@ -34,6 +50,8 @@
 - github      : jmcclelland
   name        : Jamie McClelland
   organization: Progressive Technology Project
+- github      : JKingsnorth
+  name        : John Kingsnorth
 - github      : joemurray
   name        : Joe Murray
   organization: JMA Consulting
@@ -43,12 +61,26 @@
 - github      : KarinG
   name        : Karin Gerritsen
   organization: Semper IT
+- github      : konadave
+  name        : David Reedy Jr
+  organization: Klangsoft
 - github      : lcdservices
   name        : Brian Shaughnessy
   organization: Lighthouse Design and Consulting
+- github      : liedekef
+  name        : Franky Van Liedekerke
+  organization: E-Dynamics
+- github      : litespeedmarc
+  name        : Marc Brazeau
+- github      : magnolia61
+  name        : Richard van Oosterhout
 - github      : michaelmcandrew
   name        : Michael McAndrew
   organization: Third Sector Design
+- github      : MiltoxBeyond
+  name        : Milton Zurita
+- github      : MiyaNoctem
+  name        : Camilo Rodriguez
 - github      : mlutfy
   name        : Mathieu Lutfy
   organization: Coop SymbioTIC
@@ -60,15 +92,26 @@
 - github      : nganivet
   name        : Nicolas Ganivet
   organization: CiviDesk
+- github      : PalanteJon
+  name        : Jon Goldberg
 - github      : pradpnayak
   name        : Pradeep Nayak
   organization: JMA Consulting
+- github      : rubofvil
+  name        : Rubén Pineda
+  organization: iXiam
 - github      : samuelsov
   name        : Samuel Vanhove
   organization: Coop SymbioTIC
+- github      : saurabhbatra96
+  name        : Saurabh Batra
+- github      : scardinius
+  name        : Tomasz Pietrzkowski
 - github      : seamuslee001
   name        : Seamus Lee
   organization: Australian Greens
+- github      : sharique
+  name        : Sharique Ahmed Farooqui
 - github      : sqweets
   name        : Ellen Hendricks
   organization: Spry Digital
@@ -86,6 +129,13 @@
   organization: CiviCRM
 - github      : tschuettler
   name        : Thomas Schüttler
+- github      : vedantrathore
+  name        : Vedant Rathore
+- github      : Vgratioulet
+  name        : Véronique Gratioulet
+- github      : wmortada
+  name        : William Mortada
+  organization: Community IT Academy
 - github      : xurizaemon
   name        : Chris Burgess
   organization: Fuzion
