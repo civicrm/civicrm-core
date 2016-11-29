@@ -1880,6 +1880,10 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
         if ($contributionRecurID) {
           $memParams['contribution_recur_id'] = $contributionRecurID;
         }
+        //CRM-19678 : Pay later chosen on current membership then create 'Membership Signup' Activity to track
+        if ($isPayLater) {
+          $activityType = 'Membership Signup';
+        }
         $membership = self::create($memParams, $ids, FALSE, $activityType);
         return array($membership, $renewalMode, $dates);
       }
