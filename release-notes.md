@@ -11,15 +11,40 @@ Released December 2016
 
 This release was developed by the following code authors:
 
-AGH Strategies - Andrew Hunt; Australian Greens - Seamus Lee; CiviCRM - Coleman Watts, Jitendra Purohit, Monish Deb, Tim Otten, and Yashodha Chaku; CiviDesk - Nicolas Ganivet; CiviFirst - John Kirk; Coop SymbioTIC - Samuel Vanhove; Francesc Bassas i Bullich; Fuzion - Chris Burgess and Eileen McNaughton; Ginkgo Street Labs - Tobias Lounsbury; JMA Consulting - Edzel Lopez and Pradeep Nayak; Lighthouse Consulting and Design - Brian Shaughnessy; Progressive Technology Project - Jamie McClelland; Spry Digital - Ellen Hendricks; Systopia - Björn Endres; Third Sector Design - Michael McAndrew; Thomas Schüttler
+AGH Strategies - Alice Frumin and Andrew Hunt; Agileware - Agileware Team;
+Australian Greens - Seamus Lee; Blackfly Solutions - Alan Dixon; Camilo
+Rodriguez; Circle Interactive - Dave Jenkins; CiviCRM - Coleman Watts, Jitendra
+Purohit, Monish Deb, Tim Otten, and Yashodha Chaku; CiviDesk - Nicolas Ganivet;
+CiviFirst - John Kirk; Community IT Academy - William Mortada; Coop SymbioTIC -
+Mathieu Lutfy and Samuel Vanhove; E-Dynamics - Franky Van Liedekerke; Effy
+Elden; Francesc Bassas i Bullich; Fuzion NZ - Chris Burgess and Eileen
+McNaughton; Ginkgo Street Labs - Frank Gómez and Tobias Lounsbury; jernic; JMA
+Consulting - Edzel Lopez and Pradeep Nayak; John Kingsnorth; Klangsoft - David
+Reedy Jr; Lighthouse Design and Consulting - Brian Shaughnessy; Marc Brazeau;
+Milton Zurita; Progressive Technology Project - Jamie McClelland; Semper IT -
+Karin Gerritsen; Sharique Ahmed Farooqui; Spry Digital - Ellen Hendricks;
+Systopia - Björn Endres; Third Sector Design - Michael McAndrew; Thomas
+Schüttler; Tomasz Pietrzkowski; Vedant Rathore; Véronique Gratioulet
 
-Most authors also reviewed code for this release; in addition, the following reviewers contributed their comments:
+Most authors also reviewed code for this release; in addition, the following
+reviewers contributed their comments:
 
-Artem Goncharenko; Coop SymbioTIC - Mathieu Lutfy; Dave Greenberg; Ginkgo Street Labs - Frank Gómez; JMA Consulting - Joe Murray; Korlon - Stuart Gaston; Mattias Michaux; Semper IT - Karin Gerritsen
+Andrew Cormick-Dockery; Artem Goncharenko; British Humanist Association -
+William Gordon; CiviCRM - Dave Greenberg; CompuCorp - Jamie Novick; Ginkgo
+Street Labs - Michael Z Daryabeygi; IXiam - Rubén Pineda; JMA Consulting - Joe
+Murray; Jon Goldberg; Korlon - Stuart Gaston; Mattias Michaux; Northbridge
+Digital - Oliver Gibson; Phil Morice Brubaker; Richard Seabrook; Richard van
+Oosterhout; Rob Brandt; Saurabh Batra
 
 ### Features
 
 #### Core CiviCRM
+
+- **[CRM-19494](https://issues.civicrm.org/jira/browse/CRM-19494) Refactoring of
+  permission code ([9246](https://github.com/civicrm/civicrm-core/pull/9246) and
+  [9339](https://github.com/civicrm/civicrm-core/pull/9339))**
+
+  Improve performance of contact view/edit permissions
 
 - **CRM_Utils_Check - Suggest using `[cms.root]`, etal
   ([8466](https://github.com/civicrm/civicrm-core/pull/8466))**
@@ -41,10 +66,45 @@ Artem Goncharenko; Coop SymbioTIC - Mathieu Lutfy; Dave Greenberg; Ginkgo Street
   Responses from SOAP requests to the API should be encoded properly to be
   compatible with PHP 7
 
-- **[CRM-19494](https://issues.civicrm.org/jira/browse/CRM-19494) Refactoring of
-  permission code ([9246](https://github.com/civicrm/civicrm-core/pull/9246))**
+- **[CRM-19606](https://issues.civicrm.org/jira/browse/CRM-19606) Provide help
+  text in installer to provide mysql port, if mysql is running on different port
+  ([9354](https://github.com/civicrm/civicrm-core/pull/9354))**
 
-  Improve performance of contact view/edit permissions
+  Explain how an alternate MySQL port can be specified on install
+
+- **[CRM-19644](https://issues.civicrm.org/jira/browse/CRM-19644) Set a value
+  for iDisplayLength in jsortable.tpl
+  ([9380](https://github.com/civicrm/civicrm-core/pull/9380))**
+
+  Listings that use DataTables should display 25 items at a time by default
+
+- **[CRM-17795](https://issues.civicrm.org/jira/browse/CRM-17795) Api - add
+  support for joins and ACLs
+  ([9413](https://github.com/civicrm/civicrm-core/pull/9413))**
+
+  Add support for joins to OpenID in API Get operations
+
+- **[CRM-19581](https://issues.civicrm.org/jira/browse/CRM-19581) Default third
+  gender should not be 'Transgender'
+  ([9417](https://github.com/civicrm/civicrm-core/pull/9417))**
+
+  The default set of genders should be "Female", "Male", and "Other"
+
+#### Accounting
+
+- **[CRM-16189](https://issues.civicrm.org/jira/browse/CRM-16189) Improve
+  support for Accrual Method bookkeeping
+  ([9338](https://github.com/civicrm/civicrm-core/pull/9338))**
+
+  Cleanup of code from earlier improvements.
+
+#### CiviCampaign
+
+- **[CRM-19595](https://issues.civicrm.org/jira/browse/CRM-19595) Adding street
+  address to the survey details report
+  ([9299](https://github.com/civicrm/civicrm-core/pull/9299))**
+
+  Includes all address fields in the survey details report
 
 #### CiviCase
 
@@ -55,12 +115,71 @@ Artem Goncharenko; Coop SymbioTIC - Mathieu Lutfy; Dave Greenberg; Ginkgo Street
   The Case.update API will accept the `id` parameter as case ID if `case_id` is
   missing.
 
-#### Helper Scripts
+#### CiviContribute
+
+- **[CRM-19583](https://issues.civicrm.org/jira/browse/CRM-19583) Show financial
+  type for line items when viewing them back-office
+  ([9337](https://github.com/civicrm/civicrm-core/pull/9337))**
+
+- **[CRM-19601](https://issues.civicrm.org/jira/browse/CRM-19601) Add support
+  for `is_email_receipt` to api calls to completetransaction and
+  repeattransaction
+  ([9353](https://github.com/civicrm/civicrm-core/pull/9353) and
+  [9403](https://github.com/civicrm/civicrm-core/pull/9403))**
+
+  Allow the Contribute.completetransaction API to override the contribution form
+  settings for emailing a receipt.
+
+#### CiviEvent
+
+- **[CRM-18139](https://issues.civicrm.org/jira/browse/CRM-18139) Notification
+  needed when using Batch Update of Participants via Profile (currently only
+  when using Change Participant Status function)
+  ([9372](https://github.com/civicrm/civicrm-core/pull/9372))**
+
+  Clarifies help text notification emails go out upon bulk participant status
+  change only if the participant registered online.
+
+#### CiviMember
+
+- **[CRM-19556](https://issues.civicrm.org/jira/browse/CRM-19556) Allow to
+  search on active membership
+  ([9314](https://github.com/civicrm/civicrm-core/pull/9314) and
+  [9457](https://github.com/civicrm/civicrm-core/pull/9457))**
+
+  Membership search includes a single option to search for memberships whose
+  statuses are considered "current".
+
+#### Backdrop integration
 
 - **bin/givi - Add backdrop support
   ([8944](https://github.com/civicrm/civicrm-core/pull/8944))**
 
   Support Backdrop in the givi script.
+
+#### Drupal integration
+
+- **[CRM-19640](https://issues.civicrm.org/jira/browse/CRM-19640) Dynamic custom
+  fieldsets for Webform Integration
+  ([9377](https://github.com/civicrm/civicrm-core/pull/9377))**
+
+  Add pre and post hooks for custom field operations
+
+- **[CRM-19274]( ) Access Instant Messaging in Drupal Views ([civicrm-drupal
+  395](https://github.com/civicrm/civicrm-drupal/pull/395))**
+
+  Expose instant messenger values in Views
+
+- **[CRM-16479](https://issues.civicrm.org/jira/browse/CRM-16479) Support image
+  styles for contact image in Drupal Views ([civicrm-drupal
+  364](https://github.com/civicrm/civicrm-drupal/pull/364))**
+
+  Let the Image module display contact images in site-specific styles within
+  Views
+
+- **[CRM-19568](https://issues.civicrm.org/jira/browse/CRM-19568) Expose
+  recurring contribution processor ID to views ([civicrm-drupal
+  406](https://github.com/civicrm/civicrm-drupal/pull/406))**
 
 ### Bugs
 
@@ -98,8 +217,8 @@ Artem Goncharenko; Coop SymbioTIC - Mathieu Lutfy; Dave Greenberg; Ginkgo Street
   Fixed problem in WordPress where the normal permission checks and hooks were
   bypassed on profiles in edit mode.
 
-- **[CRM-19490](https://issues.civicrm.org/jira/browse/CRM-19490) Add a “short
-  date” format setting to allow for localized display of dates in profile fields
+- **[CRM-19490](https://issues.civicrm.org/jira/browse/CRM-19490) Add a "short
+  date" format setting to allow for localized display of dates in profile fields
   ([9253](https://github.com/civicrm/civicrm-core/pull/9253))**
 
   When date fields appear in profiles on the confirmation page of contribution
@@ -134,7 +253,7 @@ Artem Goncharenko; Coop SymbioTIC - Mathieu Lutfy; Dave Greenberg; Ginkgo Street
   Internationalise "Select Code" on contributions page widget tab
   ([9282](https://github.com/civicrm/civicrm-core/pull/9282))**
 
-  The US English words “select code” on the contribution page widget should be
+  The US English words "select code" on the contribution page widget should be
   translated.
 
 - **[CRM-19313](https://issues.civicrm.org/jira/browse/CRM-19313) Can't assign
@@ -187,14 +306,14 @@ Artem Goncharenko; Coop SymbioTIC - Mathieu Lutfy; Dave Greenberg; Ginkgo Street
   to '0' are not passed to _civicrm_api3_api_match_pseudoconstant for validation
   ([9320](https://github.com/civicrm/civicrm-core/pull/9320))**
 
-  An integer field with the value “0” should not bypass validation
+  An integer field with the value "0" should not bypass validation
 
 - **[CRM-19563](https://issues.civicrm.org/jira/browse/CRM-19563) Mappings from
   search builder saved with mapping_type_id = NULL
   ([9316](https://github.com/civicrm/civicrm-core/pull/9316))**
 
   When creating a smart group from search builder, the mapping type should be
-  set as “Search Builder”, and the mapping should not appear in the
+  set as "Search Builder", and the mapping should not appear in the
   import/export mappings list.
 
 - **[CRM-19278](https://issues.civicrm.org/jira/browse/CRM-19278) Google
@@ -203,6 +322,152 @@ Artem Goncharenko; Coop SymbioTIC - Mathieu Lutfy; Dave Greenberg; Ginkgo Street
 
   If Google returns an error while geocoding (other than not finding any results
   for the address), the error message should be logged.
+
+- **[CRM-19394](https://issues.civicrm.org/jira/browse/CRM-19394) Relative date
+  ranges no longer working in Smart Group criteria
+  ([9332](https://github.com/civicrm/civicrm-core/pull/9332),
+  [9334](https://github.com/civicrm/civicrm-core/pull/9334), and
+  [9392](https://github.com/civicrm/civicrm-core/pull/9392))**
+
+  Store the relative date criteria (e.g. "this calendar year") rather than
+  today’s computed values for relative dates when saving searches
+
+- **Comment Fixes for CRM/Profile directory
+  ([9351](https://github.com/civicrm/civicrm-core/pull/9351))**
+
+- **[CRM-19607](https://issues.civicrm.org/jira/browse/CRM-19607) Usability
+  issue - mapping vs mapping
+  ([9355](https://github.com/civicrm/civicrm-core/pull/9355))**
+
+  Reword the geocode option during import to say "geocode" instead of "mapping",
+  since an unrelated "saved field mapping" option is also on the form.
+
+- **[CRM-19571](https://issues.civicrm.org/jira/browse/CRM-19571) Smart Groups
+  don't save Relation Contact settings
+  ([9352](https://github.com/civicrm/civicrm-core/pull/9352))**
+
+  If search results are based upon related contacts, a smart group based upon
+  that search should be made up of the related contacts
+
+- **[CRM-19616](https://issues.civicrm.org/jira/browse/CRM-19616) Incorrect URL
+  for manage tags ([9359](https://github.com/civicrm/civicrm-core/pull/9359))**
+
+  Fixed problem where menu contained incorrect links to add and manage tags
+
+- **[CRM-19352](https://issues.civicrm.org/jira/browse/CRM-19352) Fix pre-post
+  help text on custom data
+  ([9360](https://github.com/civicrm/civicrm-core/pull/9360))**
+
+  Fixed regression where "pre-form" help for multi-record custom fields
+  displayed after the fields.
+
+- **[CRM-19593](https://issues.civicrm.org/jira/browse/CRM-19593) Non-editable
+  custom fields show edit button
+  ([9348](https://github.com/civicrm/civicrm-core/pull/9348))**
+
+  If all fields in a custom set are "view only" there shouldn't be an edit or
+  delete button visible
+
+- **[CRM-19589](https://issues.civicrm.org/jira/browse/CRM-19589) Search for
+  contacts in Smart Groups based on group status shows incorrect results
+  ([9347](https://github.com/civicrm/civicrm-core/pull/9347))**
+
+  Fixed problem where search for "removed" contacts in a smart group returns all
+  "added" contacts.
+
+- **[CRM-19623](https://issues.civicrm.org/jira/browse/CRM-19623) is not of the
+  type Int when report is filtered with postal code
+  ([9366](https://github.com/civicrm/civicrm-core/pull/9366))**
+
+  Fixed address field metadata in reports.
+
+- **[CRM-19617](https://issues.civicrm.org/jira/browse/CRM-19617) Undefined
+  index notice in CRM_Contact_Form_Contact::checkDuplicateContacts()
+  ([9361](https://github.com/civicrm/civicrm-core/pull/9361))**
+
+  Avoids PHP notices on duplicate check when the user lacks edit permission on
+  one of the contacts
+
+- **[CRM-19048](https://issues.civicrm.org/jira/browse/CRM-19048) FullText -
+  Search by email, blank
+  ([8633](https://github.com/civicrm/civicrm-core/pull/8633))**
+
+  Fixes an error when using the CiviCRM full text search with an email address
+  or blank value
+
+- **[CRM-19431](https://issues.civicrm.org/jira/browse/CRM-19431) The empty
+  array that it's not really empty
+  ([9376](https://github.com/civicrm/civicrm-core/pull/9376))**
+
+  Removes use of `CRM_Core_DAO::$_nullArray` in certain places as it might not
+  be empty
+
+- **[CRM-17335](https://issues.civicrm.org/jira/browse/CRM-17335) Stop passing
+  CRM_Core_DAO::$_nullArray pointlessly
+  ([9379](https://github.com/civicrm/civicrm-core/pull/9379))**
+
+  Removes use of `CRM_Core_DAO::$_nullArray` and `CRM_Core_DAO::$_nullObject` in
+  certain places as they might not be empty
+
+- **[CRM-19646](https://issues.civicrm.org/jira/browse/CRM-19646) Fatal error on
+  generating ACLs from refactoring
+  ([9385](https://github.com/civicrm/civicrm-core/pull/9385))**
+
+  Fixed a regression in how the ACL cache is populated
+
+- **[CRM-17879](https://issues.civicrm.org/jira/browse/CRM-17879) PDF formats in
+  Message Templates not loading
+  ([9367](https://github.com/civicrm/civicrm-core/pull/9367))**
+
+  Carry PDF page formatting with message templates where it is specified
+
+- **[CRM-19650](https://issues.civicrm.org/jira/browse/CRM-19650) API functions
+  no longer used ([9397](https://github.com/civicrm/civicrm-core/pull/9397))**
+
+  Removes deprecated utility code in the API
+
+- **[CRM-17869](https://issues.civicrm.org/jira/browse/CRM-17869) Custom field
+  relative date filter searching removed in date picker tidy up
+  ([9304](https://github.com/civicrm/civicrm-core/pull/9304))**
+
+  Reverts a refactoring of date filter code that removed the relative date
+  filter dropdown
+
+- **[CRM-19503](https://issues.civicrm.org/jira/browse/CRM-19503) MySQL error on
+  Activity Summary Report if you sort or group by contact
+  ([9264](https://github.com/civicrm/civicrm-core/pull/9264))**
+
+  Fixes character set and collation problems on the temporary table that is
+  created in preparing the report.
+
+- **[CRM-19397](https://issues.civicrm.org/jira/browse/CRM-19397) Notice error:
+  unserialize(): Error at offset when searching on contacts
+  ([9310](https://github.com/civicrm/civicrm-core/pull/9310))**
+
+  No longer perform an i18n re-write when saving data to cache
+
+- **[CRM-19547](https://issues.civicrm.org/jira/browse/CRM-19547) Quickform
+  search speed issue when few characters
+  ([9301](https://github.com/civicrm/civicrm-core/pull/9301))**
+
+  Optimize the quick search process to not prioritize exact matches in cases
+  when an exact match is unlikely or unhelpful
+
+- **[CRM-19668](https://issues.civicrm.org/jira/browse/CRM-19668) Contact
+  relationship list doesn't display correct icon for subtypes
+  ([9415](https://github.com/civicrm/civicrm-core/pull/9415))**
+
+  Contacts in the relationship tab should show the correct icon if they are a
+  contact subtype
+
+- **Remove unnecessary ts() from upgrade tasks
+  ([9418](https://github.com/civicrm/civicrm-core/pull/9418))**
+
+- **[CRM-19303](https://issues.civicrm.org/jira/browse/CRM-19303) CKEditor
+  configuration can't be edited on a Drupal multisite installation
+  ([9409](https://github.com/civicrm/civicrm-core/pull/9409))**
+
+  Use the appropriate file URL for storing ckEditor configuration
 
 #### Accounting
 
@@ -213,6 +478,14 @@ Artem Goncharenko; Coop SymbioTIC - Mathieu Lutfy; Dave Greenberg; Ginkgo Street
   When the financial batch assignment list refreshes, if the select-all checkbox
   is checked, all transactions should be checked.
 
+- **[CRM-19587](https://issues.civicrm.org/jira/browse/CRM-19587) DB Error when
+  trying to delete Financial Account
+  ([9342](https://github.com/civicrm/civicrm-core/pull/9342) and
+  [9346](https://github.com/civicrm/civicrm-core/pull/9346))**
+
+  Refuse to delete a financial account if it is present in the
+  `civicrm_financial_item` table
+
 #### CiviCampaign
 
 - **[CRM-19536](https://issues.civicrm.org/jira/browse/CRM-19536) Type is not
@@ -222,13 +495,6 @@ Artem Goncharenko; Coop SymbioTIC - Mathieu Lutfy; Dave Greenberg; Ginkgo Street
   Reports should treat `campaign_id` as an integer.
 
 #### CiviCase
-
-- **Select correct activity if more than one in upcoming or recent period
-  ([9011](https://github.com/civicrm/civicrm-core/pull/9011))**
-
-  The upcoming case activity displayed with a case should be the one coming up
-  soonest within the next 14 days.  Similarly, the recent case activity should
-  be the most recent one within the past 14 days.
 
 - **Remove phony fk info from case api
   ([9262](https://github.com/civicrm/civicrm-core/pull/9262))**
@@ -243,10 +509,26 @@ Artem Goncharenko; Coop SymbioTIC - Mathieu Lutfy; Dave Greenberg; Ginkgo Street
   Record the contact ID in `civicrm_case` table as `contact_id` rather than
   `case_contact_id`
 
+- **Select correct activity if more than one in upcoming or recent period
+  ([9011](https://github.com/civicrm/civicrm-core/pull/9011))**
+
+  The upcoming case activity displayed with a case should be the one coming up
+  soonest within the next 14 days.  Similarly, the recent case activity should
+  be the most recent one within the past 14 days.
+
+- **[CRM-19551](https://issues.civicrm.org/jira/browse/CRM-19551) Display
+  multiple case activity attachments
+  ([9330](https://github.com/civicrm/civicrm-core/pull/9330))**
+
+  Display links to each attached file on a case listing
+
 - **Remove accidental debug statement
   ([9292](https://github.com/civicrm/civicrm-core/pull/9292))**
 
 #### CiviContribute
+
+- ** Pass-thru empty values from api contribution_sendconfirmation
+  ([9344](https://github.com/civicrm/civicrm-core/pull/9344))**
 
 - **[CRM-19539](https://issues.civicrm.org/jira/browse/CRM-19539) Bug prevents
   error message to be shown on pledge contribution import
@@ -266,6 +548,77 @@ Artem Goncharenko; Coop SymbioTIC - Mathieu Lutfy; Dave Greenberg; Ginkgo Street
 
   Fixed problem on online contributions where pay-later contributions with price
   sets had no contribution details.
+
+- **[CRM-19478](https://issues.civicrm.org/jira/browse/CRM-19478) API not
+  handling Paypal recurring IPN where p=null for Contribution Page
+  ([9326](https://github.com/civicrm/civicrm-core/pull/9326))**
+
+  Fixed problem where CiviCRM would fail on certain IPN notifications.
+
+- **[CRM-19590](https://issues.civicrm.org/jira/browse/CRM-19590) Failed CC
+  Contributions Listed with Status of Pending (Incomplete Transaction) Instead
+  of Failed ([9350](https://github.com/civicrm/civicrm-core/pull/9350))**
+
+  If an online contribution fails the MD5 check on Authorize.net, the
+  contribution status should be "Failed", not "Pending – Incomplete Transaction"
+
+- **[CRM-19635](https://issues.civicrm.org/jira/browse/CRM-19635) Notice errors
+  on Contribution Aggregate by Relationship report
+  ([9373](https://github.com/civicrm/civicrm-core/pull/9373))**
+
+  Fixes PHP notices in certain reports using address filters
+
+- **[CRM-16558](https://issues.civicrm.org/jira/browse/CRM-16558) Broken link
+  for updateSubscriptionUrl
+  ([9382](https://github.com/civicrm/civicrm-core/pull/9382))**
+
+  Only display the URL for updating a recurring contribution if the payment
+  processor supports it
+
+- **[CRM-19153](https://issues.civicrm.org/jira/browse/CRM-19153) Future pledge
+  start date causes improper future pledge payment dates
+  ([8785](https://github.com/civicrm/civicrm-core/pull/8785))**
+
+  Fixes a problem where pledge dates set for a day of the month were set to
+  start at the Linux epoch rather than the next instance of that day of the
+  month
+
+- **[CRM-19621](https://issues.civicrm.org/jira/browse/CRM-19621) Contribution
+  "confirm" page does not display state/country
+  ([9399](https://github.com/civicrm/civicrm-core/pull/9399))**
+
+  Fixed a regression preventing state/province and country from displaying on a
+  contribution page’s confirmation page.
+
+- **[CRM-17807](https://issues.civicrm.org/jira/browse/CRM-17807) Unit test to
+  check if invoice is created for paypal
+  ([9333](https://github.com/civicrm/civicrm-core/pull/9333))**
+
+  Added test coverage for an past issue with PayPal Standard
+
+- **Whitespace changes
+  ([9336](https://github.com/civicrm/civicrm-core/pull/9336))**
+
+- **see above ([9345](https://github.com/civicrm/civicrm-core/pull/9345))**
+
+- **[CRM-19654](https://issues.civicrm.org/jira/browse/CRM-19654) Missing cancel
+  date and row style for canceled contributions
+  ([9400](https://github.com/civicrm/civicrm-core/pull/9400))**
+
+  Provides `cancel_date` to contribution listings allowing them to be styled as
+  canceled
+
+- **[CRM-19636](https://issues.civicrm.org/jira/browse/CRM-19636) DB error on
+  Top Donor Report ([9375](https://github.com/civicrm/civicrm-core/pull/9375))**
+
+  Uses standard contact fields rather than specifying them in the Top Donors
+  report
+
+- **[CRM-19676](https://issues.civicrm.org/jira/browse/CRM-19676) PayPal
+  Standard IPN fails with "Invalid input parameters"
+  ([9431](https://github.com/civicrm/civicrm-core/pull/9431))**
+
+  Fix a regression that ignores PayPal IPN parameters in some cases
 
 #### CiviEvent
 
@@ -289,6 +642,48 @@ Artem Goncharenko; Coop SymbioTIC - Mathieu Lutfy; Dave Greenberg; Ginkgo Street
 
   Test that events can have text as the event type.
 
+- **[CRM-19569](https://issues.civicrm.org/jira/browse/CRM-19569) Event Info
+  page should provide relative link to event registration page
+  ([9324](https://github.com/civicrm/civicrm-core/pull/9324))**
+
+  Links from an event info page to the registration form should be relative
+  rather than absolute.
+
+- **[CRM-19560](https://issues.civicrm.org/jira/browse/CRM-19560) When Exporting
+  Participant fields, the list is not specific
+  ([9363](https://github.com/civicrm/civicrm-core/pull/9363))**
+
+  Exporting participant status and role should yield separately labeled columns
+  for id and label.
+
+- **[CRM-19567](https://issues.civicrm.org/jira/browse/CRM-19567) FALSE "Payment
+  amount is less than the amount owed" warning
+  ([9322](https://github.com/civicrm/civicrm-core/pull/9322))**
+
+  Fixed problem where fulfilling a partially-paid event registration warned
+  users that the payment was short
+
+- **[CRM-19626](https://issues.civicrm.org/jira/browse/CRM-19626) Event
+  Registration page allows registration even if no number (or the number 0) has
+  been entered in any ticket quantity boxes
+  ([9388](https://github.com/civicrm/civicrm-core/pull/9388))**
+
+  Make sure that an event registration requires at least one price field to be
+  filled even though none are required
+
+- **[CRM-19302](https://issues.civicrm.org/jira/browse/CRM-19302) Event copy -
+  file type custom data not being copied properly
+  ([9407](https://github.com/civicrm/civicrm-core/pull/9407))**
+
+  When copying an event, file custom fields should be copied rather than having
+  both events refer to the same file.
+
+- **[CRM-19661](https://issues.civicrm.org/jira/browse/CRM-19661) Notice error
+  on Event Income Report (Detail)
+  ([9406](https://github.com/civicrm/civicrm-core/pull/9406))**
+
+  Default group by event ID on event income report to prevent a PHP notice
+
 #### CiviGrant
 
 - **[CRM-19543](https://issues.civicrm.org/jira/browse/CRM-19543) contact_id
@@ -297,3 +692,123 @@ Artem Goncharenko; Coop SymbioTIC - Mathieu Lutfy; Dave Greenberg; Ginkgo Street
 
   The Grant API spec should indicate that `contact_id`, `status_id`, and
   `amount_total` are required.
+
+#### CiviMail
+
+- **[CRM-9484](https://issues.civicrm.org/jira/browse/CRM-9484) Running
+  EmailProcessor.php causes Fatal Error and creates and empty contact record
+  ([8889](https://github.com/civicrm/civicrm-core/pull/8889))**
+
+  When processing inbound emails, CiviCRM should log unrecognized message parts
+  rather than letting the process fail.
+
+- **[CRM-19645](https://issues.civicrm.org/jira/browse/CRM-19645) Missing
+  translation of label on Opt Out button
+  ([9384](https://github.com/civicrm/civicrm-core/pull/9384))**
+
+  Adds `ts()` wrapper to make the "opt out" button translatable on the CiviMail
+  opt out confirmation form
+
+- **[CRM-19659](https://issues.civicrm.org/jira/browse/CRM-19659) Undefined
+  index notice for NULL language index when browsing mailings
+  ([9404](https://github.com/civicrm/civicrm-core/pull/9404))**
+
+- **[CRM-19649](https://issues.civicrm.org/jira/browse/CRM-19649) ckeditor
+  includes html/head/body tags
+  ([9419](https://github.com/civicrm/civicrm-core/pull/9419) and
+  [9427](https://github.com/civicrm/civicrm-core/pull/9427)])**
+
+  Allow for multiple presets for WYSIWYG editor settings and improve ckEditor
+  defaults
+
+- **[CRM-19677](https://issues.civicrm.org/jira/browse/CRM-19677) Mailings fail
+  in Multilingual post 4.7.13
+  ([9430](https://github.com/civicrm/civicrm-core/pull/9430))**
+
+  Fix a regression by getting the correct table name for mailings in
+  multilingual sites
+
+#### CiviMember
+
+- **[CRM-18503](https://issues.civicrm.org/jira/browse/CRM-18503) Membership
+  join_date is incorrectly set by CiviContribute sign-up page
+  ([9358](https://github.com/civicrm/civicrm-core/pull/9358))**
+
+  The join date for new online memberships should be the current date even when
+  the start date is set to match a fixed membership term
+
+- **[CRM-19462](https://issues.civicrm.org/jira/browse/CRM-19462) Membership
+  autorenew error when included via price set
+  ([9315](https://github.com/civicrm/civicrm-core/pull/9315))**
+
+  Fixes problem where autorenew is neither available nor set if a price set
+  includes a membership type that allows autorenew
+
+- **Fix membership join_date test
+  ([9383](https://github.com/civicrm/civicrm-core/pull/9383))**
+
+- **[CRM-15861](https://issues.civicrm.org/jira/browse/CRM-15861) Offline
+  membership renewal doesn't display priceset choices
+  ([9386](https://github.com/civicrm/civicrm-core/pull/9386))**
+
+  Cleanup of backend membership form code
+
+- **[CRM-19580](https://issues.civicrm.org/jira/browse/CRM-19580) Line items are
+  missing from manual receipts when using a price set with multiple membership
+  organization price fields
+  ([9327](https://github.com/civicrm/civicrm-core/pull/9327))**
+
+  Displays all line items on a contribution receipt, even when it includes
+  memberships from multiple membership organizations
+
+- **[CRM-19594](https://issues.civicrm.org/jira/browse/CRM-19594) Wrong
+  Membership Updated
+  ([9390](https://github.com/civicrm/civicrm-core/pull/9390),
+  [9444](https://github.com/civicrm/civicrm-core/pull/9444), and
+  [9449](https://github.com/civicrm/civicrm-core/pull/9449))**
+
+  Prevent membership renewals from applying to memberships that have the same ID
+  number as the renewal contribution
+
+#### Drupal integration
+
+- **[CRM-19430](https://issues.civicrm.org/jira/browse/CRM-19430) Relationship
+  type field in view doesn't update on label change ([civicrm-drupal
+  403](https://github.com/civicrm/civicrm-drupal/pull/403))**
+
+  In Views, display the current relationship type label
+
+- **[CRM-14280](https://issues.civicrm.org/jira/browse/CRM-14280) Missing
+  permission "edit relationships" in Drupal ([civicrm-drupal
+  404](https://github.com/civicrm/civicrm-drupal/pull/404))**
+
+  Allow users with `edit all contacts` the ability to see relationship edit
+  links
+
+- **Remove error-suppression arroba ([civicrm-drupal
+  396](https://github.com/civicrm/civicrm-drupal/pull/396))**
+
+  Fix a problem preventing notice of a failure to load the settings file
+
+- **[CRM-19611](https://issues.civicrm.org/jira/browse/CRM-19611) Remove Event
+  Details custom group  ([civicrm-drupal
+  410](https://github.com/civicrm/civicrm-drupal/pull/410))**
+
+  No longer have CiviEngage create a custom field for Event Organizer
+
+- **[CRM-19604](https://issues.civicrm.org/jira/browse/CRM-19604) Drush:
+  `civicrm-ext-list` only shows up to 25 extensions ([civicrm-drupal
+    411](https://github.com/civicrm/civicrm-drupal/pull/411))**
+
+  Bypass the default API limit of 25 when listing CiviCRM extension using Drush
+
+- **Remove Drupal 6 multicurrency module code
+  ([9325](https://github.com/civicrm/civicrm-core/pull/9325))**
+
+#### Joomla integration
+
+- **[CRM-19629](https://issues.civicrm.org/jira/browse/CRM-19629) Labels display
+  as pills on Joomla backend CiviCRM pages
+  ([9365](https://github.com/civicrm/civicrm-core/pull/9365))**
+
+  Overrides Bootstrap styling of elements with the class `label`
