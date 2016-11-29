@@ -330,13 +330,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         CRM_Core_Payment_Form::mapParams($this->_bltID, $preApprovalParams, $this->_params, FALSE);
       }
 
-      // Set text version of state & country if present.
-      if (!empty($this->_params["billing_state_province_id-{$this->_bltID}"])) {
-        $this->_params["state_province-{$this->_bltID}"] = CRM_Core_PseudoConstant::stateProvinceAbbreviation($this->_params["billing_state_province_id-{$this->_bltID}"]);
-      }
-      if (!empty($this->_params["billing_country_id-{$this->_bltID}"])) {
-        $this->_params["country-{$this->_bltID}"] = CRM_Core_PseudoConstant::countryIsoCode($this->_params["billing_country_id-{$this->_bltID}"]);
-      }
     }
 
     $this->_params['is_pay_later'] = $this->get('is_pay_later');
