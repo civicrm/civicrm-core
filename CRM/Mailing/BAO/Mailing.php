@@ -768,7 +768,7 @@ ORDER BY   i.contact_id, i.{$tempColumn}
    * @return array
    *   reference to an assoc array
    */
-  private function &getTemplates() {
+  public function getTemplates() {
     if (!$this->templates) {
       $this->getHeaderFooter();
       $this->templates = array();
@@ -1063,7 +1063,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    * @return array
    *   array ref that hold array refs to the verp info, urls, and headers
    */
-  private function getVerpAndUrlsAndHeaders($job_id, $event_queue_id, $hash, $email, $isForward = FALSE) {
+  public function getVerpAndUrlsAndHeaders($job_id, $event_queue_id, $hash, $email, $isForward = FALSE) {
     $config = CRM_Core_Config::singleton();
 
     /**
