@@ -1374,10 +1374,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @param array $premiumParams
    * @param array $membershipLineItems
    *   Line items specifically relating to memberships.
-   * @param bool $isPayLater
    */
   protected function processMembership($membershipParams, $contactID, $customFieldsFormatted, $fieldTypes, $premiumParams,
-                                $membershipLineItems, $isPayLater) {
+                                $membershipLineItems) {
 
     $membershipTypeIDs = (array) $membershipParams['selectMembership'];
     $membershipTypes = CRM_Member_BAO_Membership::buildMembershipTypeValues($this, $membershipTypeIDs);
@@ -1410,7 +1409,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     $this->postProcessMembership($membershipParams, $contactID,
       $this, $premiumParams, $customFieldsFormatted, $fieldTypes, $membershipType, $membershipTypeIDs, $isPaidMembership, $this->_membershipId, $isProcessSeparateMembershipTransaction, $financialTypeID,
-      $membershipLineItems, $isPayLater, $isPending);
+      $membershipLineItems, $isPending);
 
     $this->assign('membership_assign', TRUE);
     $this->set('membershipTypeID', $membershipParams['selectMembership']);
@@ -1440,9 +1439,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @param bool $isProcessSeparateMembershipTransaction
    *
    * @param int $financialTypeID
-   * @param array $membershipLineItems
-   *   Line items specific to membership payment that is separate to contribution.
-   * @param bool $isPayLater
+   * @param array $unprocessedLineItems
+   *   Line items for payment options chosen on the form.
    * @param bool $isPending
    *
    * @throws \CRM_Core_Exception
@@ -1450,13 +1448,14 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   protected function postProcessMembership(
     $membershipParams, $contactID, &$form, $premiumParams,
     $customFieldsFormatted = NULL, $includeFieldTypes = NULL, $membershipDetails, $membershipTypeIDs, $isPaidMembership, $membershipID,
-    $isProcessSeparateMembershipTransaction, $financialTypeID, $membershipLineItems, $isPayLater, $isPending) {
+    $isProcessSeparateMembershipTransaction, $financialTypeID, $unprocessedLineItems, $isPending) {
+
     $membershipContribution = NULL;
     $isTest = CRM_Utils_Array::value('is_test', $membershipParams, FALSE);
     $errors = $paymentResults = array();
     $form->_values['isMembership'] = TRUE;
     $isRecurForFirstTransaction = CRM_Utils_Array::value('is_recur', $form->_values, CRM_Utils_Array::value('is_recur', $membershipParams));
-    $unprocessedLineItems = $form->_lineItem;
+
     $totalAmount = $membershipParams['amount'];
 
     if ($isPaidMembership) {
@@ -1469,17 +1468,21 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       }
 
       if (!$isProcessSeparateMembershipTransaction) {
+        // Skip line items in the contribution processing transaction.
+        // We will create them with the membership for proper linking.
         $membershipParams['skipLineItem'] = 1;
       }
       else {
         $membershipParams['total_amount'] = $totalAmount;
+        $membershipParams['skipLineItem'] = 0;
         CRM_Price_BAO_LineItem::getLineItemArray($membershipParams);
 
       }
-      $paymentResult = CRM_Contribute_BAO_Contribution_Utils::processConfirm($form, $membershipParams,
+      $paymentResult = CRM_Contribute_BAO_Contribution_Utils::processConfirm(
+        $form,
+        $membershipParams,
         $contactID,
         $financialTypeID,
-        'membership',
         $isTest,
         $isRecurForFirstTransaction
       );
@@ -1496,12 +1499,12 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     if ($isProcessSeparateMembershipTransaction) {
       try {
-        $form->_lineItem = $membershipLineItems;
+        $form->_lineItem = $unprocessedLineItems;
         if (empty($form->_params['auto_renew']) && !empty($membershipParams['is_recur'])) {
           unset($membershipParams['is_recur']);
         }
         list($membershipContribution, $secondPaymentResult) = $this->processSecondaryFinancialTransaction($contactID, $form, array_merge($membershipParams, array('skipLineItem' => 1)),
-          $isTest, $membershipLineItems, CRM_Utils_Array::value('minimum_fee', $membershipDetails, 0), CRM_Utils_Array::value('financial_type_id', $membershipDetails));
+          $isTest, $unprocessedLineItems, CRM_Utils_Array::value('minimum_fee', $membershipDetails, 0), CRM_Utils_Array::value('financial_type_id', $membershipDetails));
         $paymentResults[] = array('contribution_id' => $membershipContribution->id, 'result' => $secondPaymentResult);
       }
       catch (CRM_Core_Exception $e) {
@@ -2012,7 +2015,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @return array
    */
   protected function processFormSubmission($contactID) {
-    $isPayLater = $this->_params['is_pay_later'];
     if (!isset($this->_params['payment_processor_id'])) {
       // If there is no processor we are using the pay-later manual pseudo-processor.
       // (note it might make sense to make this a row in the processor table in the db).
@@ -2266,13 +2268,15 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       }
 
       CRM_Core_Payment_Form::mapParams($this->_bltID, $this->_params, $membershipParams, TRUE);
-      $this->doMembershipProcessing($contactID, $membershipParams, $premiumParams, $isPayLater);
+      $this->doMembershipProcessing($contactID, $membershipParams, $premiumParams, $this->_lineItem);
     }
     else {
       // at this point we've created a contact and stored its address etc
       // all the payment processors expect the name and address to be in the
       // so we copy stuff over to first_name etc.
       $paymentParams = $this->_params;
+      // Make it explict that we are letting the processConfirm function figure out the line items.
+      $paymentParams['skipLineItem'] = 0;
 
       if (!empty($paymentParams['onbehalf']) &&
         is_array($paymentParams['onbehalf'])
@@ -2287,7 +2291,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $result = CRM_Contribute_BAO_Contribution_Utils::processConfirm($this, $paymentParams,
         $contactID,
         $this->wrangleFinancialTypeID($this->_values['financial_type_id']),
-        'contribution',
         ($this->_mode == 'test') ? 1 : 0,
         CRM_Utils_Array::value('is_recur', $paymentParams)
       );
@@ -2312,9 +2315,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @param int $contactID
    * @param array $membershipParams
    * @param array $premiumParams
-   * @param bool $isPayLater
+   * @param array $formLineItems
    */
-  protected function doMembershipProcessing($contactID, $membershipParams, $premiumParams, $isPayLater) {
+  protected function doMembershipProcessing($contactID, $membershipParams, $premiumParams, $formLineItems) {
     // This could be set by a hook.
     if (!empty($this->_params['installments'])) {
       $membershipParams['installments'] = $this->_params['installments'];
@@ -2380,8 +2383,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     }
     if (!empty($membershipParams['selectMembership'])) {
       // CRM-12233
-      $membershipLineItems = array();
+      $membershipLineItems = $formLineItems;
       if ($this->_separateMembershipPayment && $this->_values['amount_block_is_active']) {
+        $membershipLineItems = array();
         foreach ($this->_values['fee'] as $key => $feeValues) {
           if ($feeValues['name'] == 'membership_amount') {
             $fieldId = $this->_params['price_' . $key];
@@ -2392,7 +2396,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         }
       }
       try {
-        $this->processMembership($membershipParams, $contactID, $customFieldsFormatted, $fieldTypes, $premiumParams, $membershipLineItems, $isPayLater);
+        $this->processMembership($membershipParams, $contactID, $customFieldsFormatted, $fieldTypes, $premiumParams, $membershipLineItems);
       }
       catch (CRM_Core_Exception $e) {
         CRM_Core_Session::singleton()->setStatus($e->getMessage());

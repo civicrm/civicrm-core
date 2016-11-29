@@ -548,6 +548,12 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->assertTrue(in_array($membershipPayment['contribution_id'], array_keys($contributions['values'])));
     $membership = $this->callAPISuccessGetSingle('membership', array('id' => $membershipPayment['membership_id']));
     $this->assertEquals($membership['contact_id'], $contributions['values'][$membershipPayment['contribution_id']]['contact_id']);
+    $lineItem = $this->callAPISuccessGetSingle('LineItem', array('entity_table' => 'civicrm_membership'));
+    $this->assertEquals($lineItem['entity_id'], $membership['id']);
+    $this->assertEquals($lineItem['contribution_id'], $membershipPayment['contribution_id']);
+    $this->assertEquals($lineItem['qty'], 1);
+    $this->assertEquals($lineItem['unit_price'], 2);
+    $this->assertEquals($lineItem['line_total'], 2);
     foreach ($contributions['values'] as $contribution) {
       $this->assertEquals(.72, $contribution['fee_amount']);
       $this->assertEquals($contribution['total_amount'] - .72, $contribution['net_amount']);
