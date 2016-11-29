@@ -1310,7 +1310,7 @@ class CRM_Utils_Token {
    * @return array
    *   contactDetails with hooks swapped out
    */
-  public function getAnonymousTokenDetails($contactIDs = array(
+  public static function getAnonymousTokenDetails($contactIDs = array(
       0,
     ),
                                            $returnProperties = NULL,
