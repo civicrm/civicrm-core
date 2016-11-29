@@ -344,13 +344,19 @@ class CRM_Utils_Address {
       "state_province" => "state_province-{$billingLocationTypeID}",
       "country" => "country-{$billingLocationTypeID}",
     );
-
+    $specialAddressParts = array("country", "state_province");
     $addressFields = array();
     foreach ($addressParts as $name => $field) {
       $addressFields[$name] = CRM_Utils_Array::value($field, $params);
       //Include values which prepend 'billing_' to country and state_province.
       if (empty($params[$field])) {
         $addressFields[$name] = CRM_Utils_Array::value('billing_' . $field, $params);
+      }
+      foreach ($specialAddressParts as $addressPart) {
+        if ($name == $addressPart) {
+          $function = $addressPart == 'country' ? 'countryIsoCode' : 'stateProvinceAbbreviation';
+          $addressFields[$name] = CRM_Core_PseudoConstant::$function($addressFields[$name]);
+        }
       }
     }
     return CRM_Utils_Address::format($addressFields);
