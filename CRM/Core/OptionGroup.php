@@ -109,6 +109,7 @@ class CRM_Core_OptionGroup {
    * @param string $keyColumnName
    *   the column to use for 'key'.
    * @param string $orderBy
+   *   the column to use for ordering.
    *
    * @return array
    *   The values as specified by the params
