@@ -359,7 +359,7 @@ class CRM_Utils_Address {
           $value = $params[$alternateName];
         }
       }
-      if (is_numeric($value) && $name == 'state_province' || $name == 'country') {
+      if (is_numeric($value) && ($name == 'state_province' || $name == 'country')) {
         if ($name == 'state_province') {
           $addressFields[$name] = CRM_Core_PseudoConstant::stateProvinceAbbreviation($value);
         }
