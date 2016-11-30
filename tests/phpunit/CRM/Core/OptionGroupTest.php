@@ -43,8 +43,8 @@ class CRM_Core_OptionGroupTest extends CiviUnitTestCase {
    */
   public function testWeightOptionGroup() {
     $values = array();
-    $options1 = CRM_Core_OptionGroup::values('activity_type', FALSE, FALSE, FALSE, NULL, 'label', FALSE, TRUE);
-    $options2 = CRM_Core_OptionGroup::values('activity_type', FALSE, FALSE, FALSE, NULL, 'label', FALSE, TRUE, 'value', 'name');
+    $options1 = CRM_Core_OptionGroup::values('activity_type', FALSE, FALSE, FALSE, NULL, 'label', FALSE);
+    $options2 = CRM_Core_OptionGroup::values('activity_type', FALSE, FALSE, FALSE, NULL, 'label', FALSE, FALSE, 'value', 'name');
     // Verify that arrays are equal.
     $this->assertTrue(($options1 == $options2), "The arrays retrieved should be the same");
     // Verify sequence is different.

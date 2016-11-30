@@ -121,7 +121,7 @@ class CRM_Core_OptionGroup {
     $orderBy = 'weight'
   ) {
     $cache = CRM_Utils_Cache::singleton();
-    $cacheKey = self::createCacheKey($name, $flip, $grouping, $localize, $condition, $labelColumnName, $onlyActive, $keyColumnName);
+    $cacheKey = self::createCacheKey($name, $flip, $grouping, $localize, $condition, $labelColumnName, $onlyActive, $keyColumnName, $orderBy);
 
     if (!$fresh) {
       // Fetch from static var
