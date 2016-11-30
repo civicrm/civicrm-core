@@ -111,6 +111,15 @@ class CRM_Core_DAO extends DB_DataObject {
   }
 
   /**
+   * @return DB_common
+   */
+  public static function getConnection() {
+    global $_DB_DATAOBJECT;
+    $dao = new CRM_Core_DAO();
+    return $_DB_DATAOBJECT['CONNECTIONS'][$dao->_database_dsn_md5];
+  }
+
+  /**
    * @param string $fieldName
    * @param $fieldDef
    * @param array $params
@@ -279,9 +288,7 @@ class CRM_Core_DAO extends DB_DataObject {
       unset($this->$field);
     }
 
-    /**
-     * reset the various DB_DAO structures manually
-     */
+    /* reset the various DB_DAO structures manually */
     $this->_query = array();
     $this->whereAdd();
     $this->selectAdd();
@@ -2055,7 +2062,7 @@ SELECT contact_id
 
     $occurrences = array();
     foreach ($links as $refSpec) {
-      /** @var $refSpec CRM_Core_Reference_Interface */
+      /* @var $refSpec CRM_Core_Reference_Interface */
       $daoName = CRM_Core_DAO_AllCoreTables::getClassForTable($refSpec->getReferenceTable());
       $result = $refSpec->findReferences($this);
       if ($result) {
@@ -2084,7 +2091,7 @@ SELECT contact_id
 
     $counts = array();
     foreach ($links as $refSpec) {
-      /** @var $refSpec CRM_Core_Reference_Interface */
+      /* @var $refSpec CRM_Core_Reference_Interface */
       $count = $refSpec->getReferenceCount($this);
       if ($count['count'] != 0) {
         $counts[] = $count;
@@ -2092,7 +2099,7 @@ SELECT contact_id
     }
 
     foreach (CRM_Core_Component::getEnabledComponents() as $component) {
-      /** @var $component CRM_Core_Component_Info */
+      /* @var $component CRM_Core_Component_Info */
       $counts = array_merge($counts, $component->getReferenceCounts($this));
     }
     CRM_Utils_Hook::referenceCounts($this, $counts);
@@ -2123,7 +2130,7 @@ SELECT contact_id
       $daoTableName = $daoClassName::getTableName();
 
       foreach ($links as $refSpec) {
-        /** @var $refSpec CRM_Core_Reference_Interface */
+        /* @var $refSpec CRM_Core_Reference_Interface */
         if ($refSpec->matchesTargetTable($tableName)) {
           $refsFound[] = $refSpec;
         }

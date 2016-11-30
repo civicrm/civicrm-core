@@ -320,7 +320,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
     $this->userFrameworkVersion = $this->userSystem->getVersion();
 
     if ($userFramework == 'Joomla') {
-      /** @var object|null $mainframe */
+      // var object|null $mainframe.
       global $mainframe;
       $dbprefix = $mainframe ? $mainframe->getCfg('dbprefix') : 'jos_';
       $this->userFrameworkUsersTableName = $dbprefix . 'users';
@@ -411,7 +411,8 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
 
     $factoryClass = $this->DAOFactoryClass;
     require_once str_replace('_', DIRECTORY_SEPARATOR, $factoryClass) . '.php';
-    CRM_Core_DAO::setFactory(new $factoryClass());
+    $factory = new $factoryClass();
+    CRM_Core_DAO::setFactory($factory);
     if (CRM_Utils_Constant::value('CIVICRM_MYSQL_STRICT', CRM_Utils_System::isDevelopment())) {
       CRM_Core_DAO::executeQuery('SET SESSION sql_mode = STRICT_TRANS_TABLES');
     }
