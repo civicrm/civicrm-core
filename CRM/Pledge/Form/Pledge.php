@@ -352,11 +352,14 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
       $this->addDate('start_date', ts('Payments Start'), TRUE);
     }
 
+    if (!empty($this->_values['currency'])) {
+      $this->assign('currency', $this->_values['currency']);
+    }
+
     if ($this->_id &&
       !$this->_isPending
     ) {
       $eachPaymentAmount = $this->_values['original_installment_amount'];
-      $this->assign('currency', $this->_values['currency']);
       $this->assign('eachPaymentAmount', $eachPaymentAmount);
       $this->assign('hideCalender', TRUE);
     }
