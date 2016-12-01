@@ -33,12 +33,10 @@
 {if $amount}
 {if ! $is_separate_payment }
 {ts}Contribution Amount{/ts}: {$amount|crmMoney}
-{else}
-{ts}Additional Contribution{/ts}: {$amount|crmMoney}
-{/if}
-{/if}
 -------------------------------------------
 {ts}Total{/ts}: {$amount+$membership_amount|crmMoney}
+{/if}
+{/if}
 {elseif !$useForMember && $lineItem and $priceSetID & !$is_quick_config}
 {foreach from=$lineItem item=value key=priceset}
 ---------------------------------------------------------

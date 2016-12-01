@@ -101,25 +101,16 @@
            {$amount|crmMoney}
           </td>
          </tr>
-        {else}
+       {/if}
          <tr>
           <td {$labelStyle}>
-           {ts}Additional Contribution{/ts}
-          </td>
-          <td {$valueStyle}>
-           {$amount|crmMoney}
-          </td>
+             {ts}Total{/ts}
+           </td>
+           <td {$valueStyle}>
+             {$amount+$membership_amount|crmMoney}
+           </td>
          </tr>
-        {/if}
        {/if}
-       <tr>
-        <td {$labelStyle}>
-         {ts}Total{/ts}
-        </td>
-        <td {$valueStyle}>
-         {$amount+$membership_amount|crmMoney}
-        </td>
-       </tr>
 
       {elseif !$useForMember && $lineItem and $priceSetID and !$is_quick_config}
 
