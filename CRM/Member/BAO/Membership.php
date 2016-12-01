@@ -139,38 +139,45 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
     // reset the group contact cache since smart groups might be affected due to this
     CRM_Contact_BAO_GroupContactCache::opportunisticCacheFlush();
 
+    $targetContactID = $membership->contact_id;
+    if (!empty($params['is_for_organization'])) {
+      $targetContactID = CRM_Utils_Array::value('userId', $ids);
+    }
     if ($id) {
       if ($membership->status_id != $oldStatus) {
         $allStatus = CRM_Member_BAO_Membership::buildOptions('status_id', 'get');
-        $activityParam = array(
-          'subject' => "Status changed from {$allStatus[$oldStatus]} to {$allStatus[$membership->status_id]}",
-          'source_contact_id' => $membershipLog['modified_id'],
-          'target_contact_id' => $membership->contact_id,
-          'source_record_id' => $membership->id,
-          'activity_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Change Membership Status'),
-          'status_id' => 2,
-          'priority_id' => 2,
-          'activity_date_time' => date('Y-m-d H:i:s'),
+        CRM_Activity_BAO_Activity::addActivity($membership,
+          'Change Membership Status',
+          NULL,
+          array(
+            'subject' => "Status changed from {$allStatus[$oldStatus]} to {$allStatus[$membership->status_id]}",
+            'source_contact_id' => $membershipLog['modified_id'],
+            'priority_id' => 2,
+          )
         );
-        civicrm_api3('activity', 'create', $activityParam);
       }
       if (isset($membership->membership_type_id) && $membership->membership_type_id != $oldType) {
         $membershipTypes = CRM_Member_BAO_Membership::buildOptions('membership_type_id', 'get');
-        $activityParam = array(
-          'subject' => "Type changed from {$membershipTypes[$oldType]} to {$membershipTypes[$membership->membership_type_id]}",
-          'source_contact_id' => $membershipLog['modified_id'],
-          'target_contact_id' => $membership->contact_id,
-          'source_record_id' => $membership->id,
-          'activity_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Change Membership Type'),
-          'status_id' => 2,
-          'priority_id' => 2,
-          'activity_date_time' => date('Y-m-d H:i:s'),
+        CRM_Activity_BAO_Activity::addActivity($membership,
+          'Change Membership Type',
+          NULL,
+          array(
+            'subject' => "Type changed from {$membershipTypes[$oldType]} to {$membershipTypes[$membership->membership_type_id]}",
+            'source_contact_id' => $membershipLog['modified_id'],
+            'priority_id' => 2,
+          )
         );
-        civicrm_api3('activity', 'create', $activityParam);
+      }
+      // via Contribution.completeOrder membership.create is called again to ensure correct data has been
+      // copied to the related membership. but there is a sideffect of this new membership workflow as a
+      // 'Membership Renewal' Activity is created. We can avoid this on basis of is_override=FALSE condition
+      if (CRM_Utils_Array::value('is_override', $params) != 'null') {
+        CRM_Activity_BAO_Activity::addActivity($membership, 'Membership Renewal', $targetContactID);
       }
       CRM_Utils_Hook::post('edit', 'Membership', $membership->id, $membership);
     }
     else {
+      CRM_Activity_BAO_Activity::addActivity($membership, 'Membership Signup', $targetContactID);
       CRM_Utils_Hook::post('create', 'Membership', $membership->id, $membership);
     }
 
@@ -229,13 +236,12 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
    * @param array $ids
    *   Deprecated parameter The array that holds all the db ids.
    * @param bool $skipRedirect
-   * @param string $activityType
    *
    * @throws CRM_Core_Exception
    *
    * @return CRM_Member_BAO_Membership|CRM_Core_Error
    */
-  public static function create(&$params, &$ids, $skipRedirect = FALSE, $activityType = 'Membership Signup') {
+  public static function create(&$params, &$ids, $skipRedirect = FALSE) {
     // always calculate status if is_override/skipStatusCal is not true.
     // giving respect to is_override during import.  CRM-4012
 
@@ -376,54 +382,6 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
         'membership_type_id' => $membership->membership_type_id,
         'contribution_id' => $params['relate_contribution_id'],
       ));
-    }
-
-    // add activity record only during create mode and renew mode
-    // also add activity if status changed CRM-3984 and CRM-2521
-    if (empty($ids['membership']) ||
-      $activityType == 'Membership Renewal' || !empty($params['createActivity'])
-    ) {
-      if (!empty($ids['membership'])) {
-        $data = array();
-        CRM_Core_DAO::commonRetrieveAll('CRM_Member_DAO_Membership',
-          'id',
-          $membership->id,
-          $data,
-          array('contact_id', 'membership_type_id', 'source')
-        );
-
-        $membership->contact_id = $data[$membership->id]['contact_id'];
-        $membership->membership_type_id = $data[$membership->id]['membership_type_id'];
-        $membership->source = CRM_Utils_Array::value('source', $data[$membership->id]);
-      }
-
-      // since we are going to create activity record w/
-      // individual contact as a target in case of on behalf signup,
-      // so get the copy of organization id, CRM-5551
-      $realMembershipContactId = $membership->contact_id;
-
-      // create activity source = individual, target = org CRM-4027
-      $targetContactID = NULL;
-      if (!empty($params['is_for_organization'])) {
-        $targetContactID = $membership->contact_id;
-        $membership->contact_id = CRM_Utils_Array::value('userId', $ids);
-      }
-
-      if (empty($membership->contact_id) && (!empty($membership->owner_membership_id))) {
-        $membership->contact_id = $realMembershipContactId;
-      }
-
-      if (!empty($ids['membership']) && $activityType != 'Membership Signup') {
-        CRM_Activity_BAO_Activity::addActivity($membership, $activityType, $targetContactID);
-      }
-      elseif (empty($ids['membership'])) {
-        CRM_Activity_BAO_Activity::addActivity($membership, $activityType, $targetContactID);
-      }
-
-      // we might created activity record w/ individual
-      // contact as target so update membership object w/
-      // original organization id, CRM-5551
-      $membership->contact_id = $realMembershipContactId;
     }
 
     $transaction->commit();
@@ -1854,7 +1812,6 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
       $is_test, $membershipID, TRUE
     );
     if ($currentMembership) {
-      $activityType = 'Membership Renewal';
       $renewalMode = TRUE;
 
       // Do NOT do anything.
@@ -1880,11 +1837,8 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
         if ($contributionRecurID) {
           $memParams['contribution_recur_id'] = $contributionRecurID;
         }
-        //CRM-19678 : Pay later chosen on current membership then create 'Membership Signup' Activity to track
-        if ($isPayLater) {
-          $activityType = 'Membership Signup';
-        }
-        $membership = self::create($memParams, $ids, FALSE, $activityType);
+
+        $membership = self::create($memParams, $ids, FALSE);
         return array($membership, $renewalMode, $dates);
       }
 
@@ -1978,8 +1932,6 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
     }
     else {
       // NEW Membership
-
-      $activityType = 'Membership Signup';
       $memParams = array(
         'contact_id' => $contactID,
         'membership_type_id' => $membershipTypeID,
@@ -2058,7 +2010,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
     // Load all line items & process all in membership. Don't do in contribution.
     // Relevant tests in api_v3_ContributionPageTest.
     $memParams['line_item'] = $lineItems;
-    $membership = self::create($memParams, $ids, FALSE, $activityType);
+    $membership = self::create($memParams, $ids, FALSE);
 
     // not sure why this statement is here, seems quite odd :( - Lobo: 12/26/2010
     // related to: http://forum.civicrm.org/index.php/topic,11416.msg49072.html#msg49072

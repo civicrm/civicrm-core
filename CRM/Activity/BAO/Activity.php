@@ -2041,57 +2041,22 @@ WHERE      activity.id IN ($activityIds)";
    * @param string $activityType
    *   For Membership Signup or Renewal.
    * @param int $targetContactID
+   * @param array $params
+   *   Activity params to override
    *
    * @return bool|NULL
    */
   public static function addActivity(
     &$activity,
     $activityType = 'Membership Signup',
-    $targetContactID = NULL
+    $targetContactID = NULL,
+    $params = array()
   ) {
+    $date = date('YmdHis');
     if ($activity->__table == 'civicrm_membership') {
-      $membershipType = CRM_Member_PseudoConstant::membershipType($activity->membership_type_id);
-
-      if (!$membershipType) {
-        $membershipType = ts('Membership');
-      }
-
-      $subject = "{$membershipType}";
-
-      if (!empty($activity->source) && $activity->source != 'null') {
-        $subject .= " - {$activity->source}";
-      }
-
-      if ($activity->owner_membership_id) {
-        $query = "
-SELECT  display_name
-  FROM  civicrm_contact, civicrm_membership
- WHERE  civicrm_contact.id    = civicrm_membership.contact_id
-   AND  civicrm_membership.id = $activity->owner_membership_id
-";
-        $displayName = CRM_Core_DAO::singleValueQuery($query);
-        $subject .= " (by {$displayName})";
-      }
-
-      $subject .= " - Status: " . CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipStatus', $activity->status_id, 'label');
-      // CRM-72097 changed from start date to today
-      $date = date('YmdHis');
       $component = 'Membership';
     }
     elseif ($activity->__table == 'civicrm_participant') {
-      $event = CRM_Event_BAO_Event::getEvents(1, $activity->event_id, TRUE, FALSE);
-
-      $roles = CRM_Event_PseudoConstant::participantRole();
-      $status = CRM_Event_PseudoConstant::participantStatus();
-
-      $subject = $event[$activity->event_id];
-      if (!empty($roles[$activity->role_id])) {
-        $subject .= ' - ' . $roles[$activity->role_id];
-      }
-      if (!empty($status[$activity->status_id])) {
-        $subject .= ' - ' . $status[$activity->status_id];
-      }
-      $date = date('YmdHis');
       if ($activityType != 'Email') {
         $activityType = 'Event Registration';
       }
@@ -2103,35 +2068,36 @@ SELECT  display_name
         return NULL;
       }
 
-      $subject = NULL;
-
-      $subject .= CRM_Utils_Money::format($activity->total_amount, $activity->currency);
-      if (!empty($activity->source) && $activity->source != 'null') {
-        $subject .= " - {$activity->source}";
-      }
       $date = CRM_Utils_Date::isoToMysql($activity->receive_date);
       $activityType = $component = 'Contribution';
     }
+
     $activityParams = array(
       'source_contact_id' => $activity->contact_id,
       'source_record_id' => $activity->id,
+      'target_contact_id' => $activity->contact_id,
       'activity_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', $activityType),
-      'subject' => $subject,
       'activity_date_time' => $date,
       'is_test' => $activity->is_test,
       'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_status_id', 'Completed'),
       'skipRecentView' => TRUE,
       'campaign_id' => $activity->campaign_id,
     );
+    $activityParams = array_merge($activityParams, $params);
+
+    if (empty($activityParams['subject'])) {
+      $activityParams['subject'] = self::getActivitySubject($activity);
+    }
 
     if (!empty($activity->activity_id)) {
       $activityParams['id'] = $activity->activity_id;
     }
     // create activity with target contacts
-    $id = CRM_Core_Session::getLoggedInContactID();
-    if ($id) {
-      $activityParams['source_contact_id'] = $id;
-      $activityParams['target_contact_id'][] = $activity->contact_id;
+    if (!empty($activityParams['source_contact_id'])) {
+      $id = CRM_Core_Session::getLoggedInContactID();
+      if ($id) {
+        $activityParams['source_contact_id'] = $id;
+      }
     }
 
     // CRM-14945
@@ -2140,13 +2106,64 @@ SELECT  display_name
     }
     //CRM-4027
     if ($targetContactID) {
-      $activityParams['target_contact_id'][] = $targetContactID;
+      $activityParams['target_contact_id'] = $targetContactID;
     }
     // @todo - use api - remove lots of wrangling above. Remove deprecated fatal & let form layer
     // deal with any exceptions.
     if (is_a(self::create($activityParams), 'CRM_Core_Error')) {
       CRM_Core_Error::fatal("Failed creating Activity for $component of id {$activity->id}");
       return FALSE;
+    }
+  }
+
+  /**
+   * Get activity subject on basis of component object
+   *
+   * @param object $entityObj
+   *   (reference) particular component object.
+   *
+   * @return string
+   */
+  public static function getActivitySubject($entityObj) {
+    switch ($entityObj->__table) {
+      case 'civicrm_membership':
+        $membershipType = CRM_Member_PseudoConstant::membershipType($entityObj->membership_type_id);
+        $subject = $membershipType ? $membershipType : ts('Membership');
+
+        if (!CRM_Utils_System::isNull($entityObj->source)) {
+          $subject .= " - {$entityObj->source}";
+        }
+
+        if ($entityObj->owner_membership_id) {
+          list($displayName) = CRM_Contact_BAO_Contact::getDisplayAndImage(CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $entityObj->owner_membership_id, 'contact_id'));
+          $subject .= sprintf(' (by %s)', $displayName);
+        }
+
+        $subject .= " - Status: " . CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipStatus', $entityObj->status_id, 'label');
+        return $subject;
+
+      case 'civicrm_participant':
+        $event = CRM_Event_BAO_Event::getEvents(1, $entityObj->event_id, TRUE, FALSE);
+        $roles = CRM_Event_PseudoConstant::participantRole();
+        $status = CRM_Event_PseudoConstant::participantStatus();
+        $subject = $event[$entityObj->event_id];
+
+        if (!empty($roles[$entityObj->role_id])) {
+          $subject .= ' - ' . $roles[$entityObj->role_id];
+        }
+        if (!empty($status[$entityObj->status_id])) {
+          $subject .= ' - ' . $status[$entityObj->status_id];
+        }
+
+        return $subject;
+
+      case 'civicrm_contribution':
+        $subject = CRM_Utils_Money::format($entityObj->total_amount, $entityObj->currency);
+        if (!CRM_Utils_System::isNull($entityObj->source)) {
+          $subject .= " - {$entityObj->source}";
+        }
+
+        return $subject;
     }
   }
 

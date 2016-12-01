@@ -2739,7 +2739,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     ));
     $this->assertEquals(1, $logs['count']);
     $this->assertEquals($stateOfGrace, $membership['status_id']);
-    $contribution = $this->callAPISuccess('contribution', 'completetransaction', array('id' => $this->_ids['contribution']));
+    $this->callAPISuccess('contribution', 'completetransaction', array('id' => $this->_ids['contribution']));
     $membership = $this->callAPISuccess('membership', 'getsingle', array('id' => $this->_ids['membership']));
     $this->assertEquals(date('Y-m-d', strtotime('yesterday + 1 year')), $membership['end_date']);
     $this->callAPISuccessGetSingle('LineItem', array(
@@ -2749,12 +2749,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $logs = $this->callAPISuccess('MembershipLog', 'get', array(
       'membership_id' => $this->_ids['membership'],
     ));
-    //CRM-19600: Ensure that 'Membership Renewal' activity is created after successful membership regsitration
-    $activity = $this->callAPISuccess('Activity', 'get', array(
-      'activity_type_id' => 'Membership Renewal',
-      'source_record_id' => $contribution['id'],
-    ));
-    $this->assertEquals(1, $activity['count']);
     $this->assertEquals(2, $logs['count']);
     $this->assertNotEquals($stateOfGrace, $logs['values'][2]['status_id']);
     $this->cleanUpAfterPriceSets();
@@ -2832,6 +2826,14 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'source_record_id' => $this->_ids['contribution'],
     ));
     $this->assertEquals(0, $activity['count']);
+
+    //Case 4 (CRM-19600): Assert that Membership Renewal Activity is created via online contribution
+    $this->callAPISuccess('contribution', 'completetransaction', array('id' => $this->_ids['contribution']));
+    $activity = $this->callAPISuccess('Activity', 'get', array(
+      'activity_type_id' => 'Membership Renewal',
+      'source_record_id' => $this->_ids['contribution'],
+    ));
+    $this->assertEquals(1, $activity['count']);
   }
 
   /**
