@@ -14,3 +14,6 @@ UPDATE civicrm_navigation SET
   `url` = 'civicrm/tag?reset=1'
 WHERE `name` = 'Tags (Categories)'
 AND `url` = 'civicrm/admin/tag?reset=1';
+
+-- Handle message template changes
+{include file='../CRM/Upgrade/4.7.14.msg_template/civicrm_msg_template.tpl'}
