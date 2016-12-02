@@ -616,6 +616,10 @@ LIMIT 1;";
       $values['totalAmount'] = $input['amount'];
 
       $contribution->source = ts('Online Event Registration') . ': ' . $values['event']['title'];
+      // Set the value of is_email_confirm to the argument supplied in is_email_receipt, if available.
+      if (isset($input['is_email_receipt'])) {
+        $values['event']['is_email_confirm'] = $input['is_email_receipt'];
+      }
 
       if ($values['event']['is_email_confirm']) {
         $contribution->receipt_date = self::$_now;
