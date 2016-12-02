@@ -2438,9 +2438,14 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     if (empty($this->_component)) {
       $this->_component = CRM_Utils_Array::value('component', $input);
     }
+    if (isset($input['is_email_receipt'])) {
+      $values['is_email_receipt'] = $input['is_email_receipt'];
+    }
 
+    // Store values in a temp variable, so they don't get lost after _gatherMessageValues
+    $tmp_values = $values;
     //not really sure what params might be passed in but lets merge em into values
-    $values = array_merge($this->_gatherMessageValues($input, $values, $ids), $values);
+    $values = array_merge($this->_gatherMessageValues($input, $values, $ids), $tmp_values);
     if (!empty($input['receipt_date'])) {
       $values['receipt_date'] = $input['receipt_date'];
     }
