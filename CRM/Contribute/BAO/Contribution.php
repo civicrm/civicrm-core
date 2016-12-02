@@ -2205,8 +2205,10 @@ WHERE  contribution_id = %1 ";
       $this->_component = CRM_Utils_Array::value('component', $input);
     }
 
+    // Store values in a temp variable, so they don't get lost after _gatherMessageValues
+    $tmp_values = $values;
     //not really sure what params might be passed in but lets merge em into values
-    $values = array_merge($this->_gatherMessageValues($input, $values, $ids), $values);
+    $values = array_merge($this->_gatherMessageValues($input, $values, $ids), $tmp_values);
     $template = CRM_Core_Smarty::singleton();
     $this->_assignMessageVariablesToTemplate($values, $input, $template, $recur, $returnMessageText);
     //what does recur 'mean here - to do with payment processor return functionality but
