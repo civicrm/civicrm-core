@@ -280,6 +280,7 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
         'contribution_product_id',
         'invoice_id',
         'payment_instrument_id',
+        'contribution_batch_id',
       );
       CRM_Contact_BAO_Query::processSpecialFormValue($this->_formValues, $specialParams);
 
@@ -337,7 +338,6 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
       );
     }
 
-    // Why is this called twice? (see line 317)
     $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues);
     $selector = new CRM_Contribute_Selector_Search($this->_queryParams,
       $this->_action,
