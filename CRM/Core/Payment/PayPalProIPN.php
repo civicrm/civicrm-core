@@ -383,13 +383,13 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
 
     $this->completeTransaction($input, $ids, $objects, $transaction, $recur);
   }
-  
+
   /**
    * Gets PaymentProcessorID for PayPal
    *
    * @return int
    */
-  public function getPayPalPaymentProcessorID () {
+  public function getPayPalPaymentProcessorID() {
     // This is an unreliable method as there could be more than one instance.
     // Recommended approach is to use the civicrm/payment/ipn/xx url where xx is the payment
     // processor id & the handleNotification function (which should call the completetransaction api & by-pass this
@@ -404,7 +404,7 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
       'payment_processor_type_id' => $paymentProcessorTypeID,
       'return' => 'id',
     ));
-    
+
   }
 
   /**
