@@ -528,6 +528,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    * We are expecting a separate payment for the membership vs the contribution.
    */
   public function testSubmitMembershipBlockIsSeparatePaymentPaymentProcessorNow() {
+    $mut = new CiviMailUtils($this, TRUE);
     $this->setUpMembershipContributionPage(TRUE);
     $processor = Civi\Payment\System::singleton()->getById($this->_paymentProcessor['id']);
     $processor->setDoDirectPaymentResult(array('fee_amount' => .72));
@@ -538,6 +539,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'billing_first_name' => 'Billy',
       'billing_middle_name' => 'Goat',
       'billing_last_name' => 'Gruff',
+      'email-Primary' => 'henry@8th.king',
       'selectMembership' => $this->_ids['membership_type'],
       'payment_processor_id' => $this->_paymentProcessor['id'],
       'credit_card_number' => '4111111111111111',
@@ -566,6 +568,11 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       $this->assertEquals(.72, $contribution['fee_amount']);
       $this->assertEquals($contribution['total_amount'] - .72, $contribution['net_amount']);
     }
+    // The total string is currently absent & it seems worse with - although at some point
+    // it may have been intended
+    $mut->checkAllMailLog(array('$ 2.00', 'Contribution Amount', '$ 10.00'), array('Total:'));
+    $mut->stop();
+    $mut->clearMessages();
   }
 
   /**
@@ -1189,7 +1196,6 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
           'label' => 'Long Haired Goat',
           'financial_type_id' => 'Donation',
           'amount' => 20,
-          'financial_type_id' => 'Donation',
           'non_deductible_amount' => 15,
         )
       );
@@ -1199,7 +1205,6 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
           'label' => 'Shoe-eating Goat',
           'financial_type_id' => 'Donation',
           'amount' => 10,
-          'financial_type_id' => 'Donation',
           'non_deductible_amount' => 5,
         )
       );

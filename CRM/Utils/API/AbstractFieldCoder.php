@@ -128,7 +128,7 @@ abstract class CRM_Utils_API_AbstractFieldCoder implements API_Wrapper {
    */
   public function toApiOutput($apiRequest, $result) {
     $lowerAction = strtolower($apiRequest['action']);
-    if ($apiRequest['version'] == 3 && in_array($lowerAction, array('get', 'create', 'setvalue'))) {
+    if ($apiRequest['version'] == 3 && in_array($lowerAction, array('get', 'create', 'setvalue', 'getquick'))) {
       foreach ($result as $key => $value) {
         // Don't apply escaping to API control parameters (e.g. 'api.foo' or 'options.foo')
         // and don't apply to other skippable fields
