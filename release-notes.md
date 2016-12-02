@@ -7,36 +7,11 @@ starting with CiviCRM 4.7.14.
 
 Released December 2016
 
-### Credits
+- **[Features](#4.7.14-features)**
+- **[Bugs resolved](#4.7.14-bugs)**
+- **[Credits](#4.7.14-credits)**
 
-This release was developed by the following code authors:
-
-AGH Strategies - Alice Frumin and Andrew Hunt; Agileware - Agileware Team;
-Australian Greens - Seamus Lee; Blackfly Solutions - Alan Dixon; Camilo
-Rodriguez; Circle Interactive - Dave Jenkins; CiviCRM - Coleman Watts, Jitendra
-Purohit, Monish Deb, Tim Otten, and Yashodha Chaku; CiviDesk - Nicolas Ganivet;
-CiviFirst - John Kirk; Community IT Academy - William Mortada; Coop SymbioTIC -
-Mathieu Lutfy and Samuel Vanhove; E-Dynamics - Franky Van Liedekerke; Effy
-Elden; Francesc Bassas i Bullich; Fuzion NZ - Chris Burgess and Eileen
-McNaughton; Ginkgo Street Labs - Frank Gómez and Tobias Lounsbury; jernic; JMA
-Consulting - Edzel Lopez and Pradeep Nayak; John Kingsnorth; Klangsoft - David
-Reedy Jr; Lighthouse Design and Consulting - Brian Shaughnessy; Marc Brazeau;
-Milton Zurita; Progressive Technology Project - Jamie McClelland; Semper IT -
-Karin Gerritsen; Sharique Ahmed Farooqui; Spry Digital - Ellen Hendricks;
-Systopia - Björn Endres; Third Sector Design - Michael McAndrew; Thomas
-Schüttler; Tomasz Pietrzkowski; Vedant Rathore; Véronique Gratioulet
-
-Most authors also reviewed code for this release; in addition, the following
-reviewers contributed their comments:
-
-Andrew Cormick-Dockery; Artem Goncharenko; British Humanist Association -
-William Gordon; CiviCRM - Dave Greenberg; CompuCorp - Jamie Novick; Ginkgo
-Street Labs - Michael Z Daryabeygi; IXiam - Rubén Pineda; JMA Consulting - Joe
-Murray; Jon Goldberg; Korlon - Stuart Gaston; Mattias Michaux; Northbridge
-Digital - Oliver Gibson; Phil Morice Brubaker; Richard Seabrook; Richard van
-Oosterhout; Rob Brandt; Saurabh Batra
-
-### Features
+### <a name="4.7.14-features"></a>Features
 
 #### Core CiviCRM
 
@@ -80,7 +55,8 @@ Oosterhout; Rob Brandt; Saurabh Batra
 
 - **[CRM-17795](https://issues.civicrm.org/jira/browse/CRM-17795) Api - add
   support for joins and ACLs
-  ([9413](https://github.com/civicrm/civicrm-core/pull/9413))**
+  ([9413](https://github.com/civicrm/civicrm-core/pull/9413)) [completes
+  previous work]**
 
   Add support for joins to OpenID in API Get operations
 
@@ -181,7 +157,7 @@ Oosterhout; Rob Brandt; Saurabh Batra
   recurring contribution processor ID to views ([civicrm-drupal
   406](https://github.com/civicrm/civicrm-drupal/pull/406))**
 
-### Bugs
+### <a name="4.7.14-bugs"></a>Bugs resolved
 
 #### Core CiviCRM
 
@@ -465,7 +441,7 @@ Oosterhout; Rob Brandt; Saurabh Batra
 
 - **[CRM-19303](https://issues.civicrm.org/jira/browse/CRM-19303) CKEditor
   configuration can't be edited on a Drupal multisite installation
-  ([9409](https://github.com/civicrm/civicrm-core/pull/9409))**
+  ([9409](https://github.com/civicrm/civicrm-core/pull/9409)) [WIP]**
 
   Use the appropriate file URL for storing ckEditor configuration
 
@@ -812,3 +788,33 @@ Oosterhout; Rob Brandt; Saurabh Batra
   ([9365](https://github.com/civicrm/civicrm-core/pull/9365))**
 
   Overrides Bootstrap styling of elements with the class `label`
+
+### <a name="4.7.14-credits"></a>Credits
+
+This release was developed by the following code authors:
+
+AGH Strategies - Alice Frumin and Andrew Hunt; Agileware - Agileware Team;
+Australian Greens - Seamus Lee; Blackfly Solutions - Alan Dixon; Circle
+Interactive - Dave Jenkins; CiviCRM - Coleman Watts, Jitendra Purohit, Monish
+Deb, Tim Otten, and Yashodha Chaku; CiviDesk - Nicolas Ganivet; CiviFirst - John
+Kirk; Community IT Academy - William Mortada; CompuCorp - Camilo Rodriguez; Coop
+SymbioTIC - Mathieu Lutfy and Samuel Vanhove; E-Dynamics - Franky Van
+Liedekerke; Effy Elden; Francesc Bassas i Bullich; Fuzion NZ - Chris Burgess and
+Eileen McNaughton; Ginkgo Street Labs - Frank Gómez and Tobias Lounsbury;
+jernic; JMA Consulting - Edzel Lopez and Pradeep Nayak; John Kingsnorth;
+Klangsoft - David Reedy Jr; Lighthouse Design and Consulting - Brian
+Shaughnessy; Marc Brazeau; Milton Zurita; Progressive Technology Project - Jamie
+McClelland; Semper IT - Karin Gerritsen; Sharique Ahmed Farooqui; Spry Digital -
+Ellen Hendricks; Systopia - Björn Endres; Third Sector Design - Michael
+McAndrew; Thomas Schüttler; Vedant Rathore; Véronique Gratioulet; We Move
+Europe/Caltha - Tomasz Pietrzkowski
+
+Most authors also reviewed code for this release; in addition, the following
+reviewers contributed their comments:
+
+Andrew Cormick-Dockery; Artem Goncharenko; British Humanist Association -
+William Gordon; CiviCRM - Dave Greenberg; CompuCorp - Jamie Novick; Ginkgo
+Street Labs - Michael Z Daryabeygi; IXiam - Rubén Pineda; JMA Consulting - Joe
+Murray; Jon Goldberg; Korlon - Stuart Gaston; Mattias Michaux; Northbridge
+Digital - Oliver Gibson; Phil Morice Brubaker; Richard Seabrook; Richard van
+Oosterhout; Rob Brandt; Saurabh Batra
