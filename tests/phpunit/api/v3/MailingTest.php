@@ -95,6 +95,44 @@ class api_v3_MailingTest extends CiviUnitTestCase {
   }
 
   /**
+   * The `template_options` field should be treated a JSON object.
+   *
+   * This test will create, read, and update the field.
+   */
+  public function testMailerCreateTemplateOptions() {
+    // 1. Create mailing with template_options.
+    $params = $this->_params;
+    $params['template_options'] = json_encode(array('foo' => 'bar_1'));
+    $createResult = $this->callAPISuccess('mailing', 'create', $params);
+    $id = $createResult['id'];
+    $this->assertDBQuery('{"foo":"bar_1"}', 'SELECT template_options FROM civicrm_mailing WHERE id = %1', array(
+      1 => array($id, 'Int'),
+    ));
+    $this->assertEquals('bar_1', $createResult['values'][$id]['template_options']['foo']);
+
+    // 2. Get mailing with template_options.
+    $getResult = $this->callAPISuccess('mailing', 'get', array(
+      'id' => $id,
+    ));
+    $this->assertEquals('bar_1', $getResult['values'][$id]['template_options']['foo']);
+    $getValueResult = $this->callAPISuccess('mailing', 'getvalue', array(
+      'id' => $id,
+      'return' => 'template_options',
+    ));
+    $this->assertEquals('bar_1', $getValueResult['foo']);
+
+    // 3. Update mailing with template_options.
+    $updateResult = $this->callAPISuccess('mailing', 'create', array(
+      'id' => $id,
+      'template_options' => array('foo' => 'bar_2'),
+    ));
+    $this->assertDBQuery('{"foo":"bar_2"}', 'SELECT template_options FROM civicrm_mailing WHERE id = %1', array(
+      1 => array($id, 'Int'),
+    ));
+    $this->assertEquals('bar_2', $updateResult['values'][$id]['template_options']['foo']);
+  }
+
+  /**
    * The Mailing.create API supports magic properties "groups[include,enclude]" and "mailings[include,exclude]".
    * Make sure these work
    */
