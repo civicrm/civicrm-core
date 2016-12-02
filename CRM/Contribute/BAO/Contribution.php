@@ -2558,11 +2558,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
               $values['is_pay_later'] = 1;
             }
 
-            // if separate payment there are two contributions recorded and the
-            // admin will need to send a receipt for each of them separately.
-            // we dont link the two in the db (but can potentially infer it if needed)
-            $template->assign('is_separate_payment', 0);
-
             if ($recur && $paymentObject) {
               $url = $paymentObject->subscriptionURL($membership->id, 'membership', 'cancel');
               $template->assign('cancelSubscriptionUrl', $url);
@@ -2825,7 +2820,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
           'honor_profile_id' => CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFJoin', $values['id'], 'uf_group_id', 'entity_id'),
           'honor_id' => $softRecord['soft_credit'][1]['contact_id'],
         );
-        $softCreditTypes = CRM_Core_OptionGroup::values('soft_credit_type');
 
         $template->assign('soft_credit_type', $softRecord['soft_credit'][1]['soft_credit_type_label']);
         $template->assign('honor_block_is_active', CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFJoin', $values['id'], 'is_active', 'entity_id'));
@@ -4733,8 +4727,7 @@ LIMIT 1;";
     $contribution->loadRelatedObjects($input, $ids, TRUE);
     // set receipt from e-mail and name in value
     if (!$returnMessageText) {
-      $session = CRM_Core_Session::singleton();
-      $userID = $session->get('userID');
+      $userID = CRM_Core_Session::singleton()->getLoggedInContactID();
       if (!empty($userID)) {
         list($userName, $userEmail) = CRM_Contact_BAO_Contact_Location::getEmailDetails($userID);
         $values['receipt_from_email'] = CRM_Utils_Array::value('receipt_from_email', $input, $userEmail);
