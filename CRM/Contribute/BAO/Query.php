@@ -567,12 +567,9 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
         return;
 
       case 'contribution_batch_id':
-        $batches = CRM_Contribute_PseudoConstant::batch();
-        // The key 'NULL' indicates that the user is looking for contributions
-        // that are not contained in a batch, see CRM-19325.
-        $batches['NULL'] = ts('(none)');
-        $query->_where[$grouping][] = " civicrm_entity_batch.batch_id $op $value";
-        $query->_qill[$grouping][] = ts('Batch Name %1 %2', array(1 => $op, 2 => $batches[$value]));
+        list($qillOp, $qillValue) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Batch_BAO_EntityBatch', 'batch_id', $value, $op);
+        $query->_qill[$grouping][] = ts('Batch Name %1 %2', array(1 => $qillOp, 2 => $qillValue));
+        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause('civicrm_entity_batch.batch_id', $op, $value);
         $query->_tables['civicrm_contribution'] = $query->_whereTables['civicrm_contribution'] = 1;
         $query->_tables['contribution_batch'] = $query->_whereTables['contribution_batch'] = 1;
         return;
@@ -1129,7 +1126,7 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
         array(
           '' => ts('- any -'),
           // CRM-19325
-          'NULL' => ts('None'),
+          'IS NULL' => ts('None'),
         ) + $batches,
         FALSE, array('class' => 'crm-select2')
       );
