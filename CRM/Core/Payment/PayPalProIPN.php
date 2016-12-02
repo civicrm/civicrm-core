@@ -576,16 +576,10 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
     // membership would be an easy add - but not relevant to my customer...
     $this->_component = $input['component'] = 'contribute';
     $input['trxn_date'] = date('Y-m-d-H-i-s', strtotime(self::retrieve('time_created', 'String')));
-    $paymentProcessorTypeID = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_PaymentProcessorType',
+    $paymentProcessorID = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_PaymentProcessorType',
       'PayPal', 'id', 'name'
     );
-    $paymentProcessorID = (int) civicrm_api3('PaymentProcessor', 'getvalue', array(
-      'is_test' => 0,
-      'options' => array('limit' => 1),
-      'payment_processor_type_id' => $paymentProcessorTypeID,
-      'return' => 'id',
-    ));
-    
+
     if (!$this->validateData($input, $ids, $objects, TRUE, $paymentProcessorID)) {
       throw new CRM_Core_Exception('Data did not validate');
     }
