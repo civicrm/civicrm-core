@@ -195,22 +195,24 @@ civicrm_contact AS contact_a {$this->_aclFrom}
    * @return string
    */
   public function where($includeContactIDs = FALSE) {
-    $clauses = array();
+    $clauses = array(
+      "contrib.contact_id = contact_a.id",
+      "contrib.is_test = 0",
+    );
 
-    $clauses[] = "contrib.contact_id = contact_a.id";
-    $clauses[] = "contrib.is_test = 0";
-
-    $relative = $this->_formValues['contribution_date_relative'];
-    $startDate = $this->_formValues['contribution_date_low'];
-    $endDate = $this->_formValues['contribution_date_high'];
-    list($startDate, $endDate) = CRM_Utils_Date::getFromTo($relative, $startDate, $endDate);
-
-    if ($startDate) {
-      $clauses[] = "contrib.receive_date >= $startDate";
-    }
-
-    if ($endDate) {
-      $clauses[] = "contrib.receive_date <= $endDate";
+    $dateParams = array(
+      'contribution_date_relative' => $this->_formValues['contribution_date_relative'],
+      'contribution_date_low' => $this->_formValues['contribution_date_low'],
+      'contribution_date_high' => $this->_formValues['contribution_date_high'],
+    );
+    foreach (CRM_Contact_BAO_Query::convertFormValues($dateParams) as $values) {
+      list($name, $op, $value) = $values;
+      if (strstr($name, '_low')) {
+        $clauses[] = "contrib.receive_date >= " . CRM_Utils_Date::processDate($value);
+      }
+      else {
+        $clauses[] = "contrib.receive_date <= " . CRM_Utils_Date::processDate($value);
+      }
     }
 
     if ($includeContactIDs) {

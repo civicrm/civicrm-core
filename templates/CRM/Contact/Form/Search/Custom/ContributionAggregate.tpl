@@ -39,7 +39,7 @@
                 </tr>
             {/foreach}
             <tr class="crm-contact-custom-search-contributionDetails-form-block-receive_date">
-              <td><label>{ts}Contribution Dates{/ts}</label></td>
+              <td class="label">{ts}Contribution Dates{/ts}</td>
               {include file="CRM/Core/DateRange.tpl" fieldName="contribution_date" from='_low' to='_high'}
             </tr>
             <tr class="crm-contact-custom-search-contributionDetails-form-block-financial_type">
