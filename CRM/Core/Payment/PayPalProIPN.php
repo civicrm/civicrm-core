@@ -585,7 +585,7 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
       'payment_processor_type_id' => $paymentProcessorTypeID,
       'return' => 'id',
     ));
-    
+
     if (!$this->validateData($input, $ids, $objects, TRUE, $paymentProcessorID)) {
       throw new CRM_Core_Exception('Data did not validate');
     }
