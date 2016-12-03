@@ -215,6 +215,10 @@ class Container {
       ))->addTag('kernel.event_subscriber');
     }
 
+    if (file_exists($GLOBALS['civicrm_root'] . '/Civi/FlexMailer/Services.php')) {
+      \Civi\FlexMailer\Services::registerServices($container);
+    }
+
     \CRM_Utils_Hook::container($container);
 
     return $container;
@@ -252,6 +256,10 @@ class Container {
     $dispatcher->addListener(\Civi\ActionSchedule\Events::MAPPINGS, array('CRM_Contribute_ActionMapping_ByType', 'onRegisterActionMappings'));
     $dispatcher->addListener(\Civi\ActionSchedule\Events::MAPPINGS, array('CRM_Event_ActionMapping', 'onRegisterActionMappings'));
     $dispatcher->addListener(\Civi\ActionSchedule\Events::MAPPINGS, array('CRM_Member_ActionMapping', 'onRegisterActionMappings'));
+
+    if (file_exists($GLOBALS['civicrm_root'] . '/Civi/FlexMailer/Services.php')) {
+      \Civi\FlexMailer\Services::registerListeners($dispatcher);
+    }
 
     return $dispatcher;
   }
