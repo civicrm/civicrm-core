@@ -193,7 +193,12 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
       }
 
       // Compose and deliver each child job
-      $isComplete = $job->deliver($mailer, $testParams);
+      if (\CRM_Utils_Constant::value('CIVICRM_FLEXMAILER_HACK_DELIVER')) {
+        $isComplete = Civi\Core\Resolver::singleton()->call(CIVICRM_FLEXMAILER_HACK_DELIVER, array($job, $mailer, $testParams));
+      }
+      else {
+        $isComplete = $job->deliver($mailer, $testParams);
+      }
 
       CRM_Utils_Hook::post('create', 'CRM_Mailing_DAO_Spool', $job->id, $isComplete);
 
@@ -483,6 +488,10 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
    * @return void
    */
   public function deliver(&$mailer, $testParams = NULL) {
+    if (\Civi::settings()->get('experimentalFlexMailerEngine')) {
+      throw new \RuntimeException("Cannot use legacy deliver() when experimentalFlexMailerEngine is enabled");
+    }
+
     $mailing = new CRM_Mailing_BAO_Mailing();
     $mailing->id = $this->mailing_id;
     $mailing->find(TRUE);

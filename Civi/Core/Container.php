@@ -128,6 +128,10 @@ class Container {
       "CRM_Mailing_Tokens"
     ));//->addTag('kernel.event_subscriber');
 
+    if (\CRM_Utils_Constant::value('CIVICRM_FLEXMAILER_HACK_SERVICES')) {
+      \Civi\Core\Resolver::singleton()->call(CIVICRM_FLEXMAILER_HACK_SERVICES, array($container));
+    }
+
     return $container;
   }
 
@@ -161,6 +165,10 @@ class Container {
     $dispatcher->addSubscriberService('civi_token_compat', 'Civi\Token\TokenCompatSubscriber');
     $dispatcher->addSubscriberService('crm_mailing_tokens', 'CRM_Mailing_Tokens');
     $dispatcher->addSubscriberService('crm_mailing_action_tokens', 'CRM_Mailing_ActionTokens');
+
+    if (\CRM_Utils_Constant::value('CIVICRM_FLEXMAILER_HACK_LISTENERS')) {
+      \Civi\Core\Resolver::singleton()->call(CIVICRM_FLEXMAILER_HACK_LISTENERS, array($dispatcher));
+    }
 
     return $dispatcher;
   }
