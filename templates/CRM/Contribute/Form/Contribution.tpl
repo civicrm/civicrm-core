@@ -496,29 +496,28 @@
             $('#receiptDate', $form).show();
           }
         }
-      {/literal}{if !$contributionMode}{literal}
-        showHideCancelInfo($('#contribution_status_id', $form));
+        {/literal}{if !$contributionMode}{literal}
+          showHideCancelInfo($('#contribution_status_id', $form));
   
-        $('#contribution_status_id', $form).change(function() {
-         showHideCancelInfo($('#contribution_status_id', $form));
-        });
+          $('#contribution_status_id', $form).change(function() {
+            showHideCancelInfo($('#contribution_status_id', $form));
+          });
   
-        function showHideCancelInfo(obj) {
-          var cancelInfo_show_ids = [{/literal}{$cancelInfo_show_ids}{literal}];
-          if (cancelInfo_show_ids.indexOf(obj.val()) > -1) {
-            $('#cancelInfo', $form).show();
-            $('#total_amount', $form).attr('readonly', true);
+          function showHideCancelInfo(obj) {
+            var cancelInfo_show_ids = [{/literal}{$cancelInfo_show_ids}{literal}];
+            if (cancelInfo_show_ids.indexOf(obj.val()) > -1) {
+              $('#cancelInfo', $form).show();
+              $('#total_amount', $form).attr('readonly', true);
+            }
+            else {
+              $("#cancel_date", $form).val('');
+              $("#cancel_reason", $form).val('');
+              $('#cancelInfo', $form).hide();
+              $("#total_amount", $form).removeAttr('readonly');
+            }
           }
-          else {
-            $("#cancel_date", $form).val('');
-            $("#cancel_reason", $form).val('');
-            $('#cancelInfo', $form).hide();
-            $("#total_amount", $form).removeAttr('readonly');
-          }
-        }
+        {/literal}{/if}
       });
-
-      {/literal}{/if}
     </script>
       {if !$contributionMode}
         {include file="CRM/common/showHideByFieldValue.tpl"
