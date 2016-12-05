@@ -22,3 +22,8 @@ SELECT @contributionNavId := id, @domainID := domain_id FROM civicrm_navigation 
 UPDATE civicrm_navigation SET has_separator = 0 WHERE name = 'Manage Price Sets' AND parent_id = @contributionNavId;
 
 DELETE FROM civicrm_navigation WHERE name = 'Close Accounting Period' AND parent_id = @contributionNavId;
+
+-- Drop field opening_balance and current_period_opening_balance
+ALTER TABLE `civicrm_financial_account`
+  DROP `opening_balance`,
+  DROP `current_period_opening_balance`;

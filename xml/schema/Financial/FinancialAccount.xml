@@ -162,22 +162,4 @@
     <unique>true</unique>
     <add>4.3</add>
   </index>
-  <field>
-    <name>opening_balance</name>
-    <type>decimal</type>
-    <title>Opening Balance</title>
-    <comment>Contains the opening balance for this financial account</comment>
-    <default>0</default>
-    <length>20,2</length>
-    <add>4.7</add>
-  </field>
-  <field>
-    <name>current_period_opening_balance</name>
-    <type>decimal</type>
-    <length>20,2</length>
-    <title>Current period opening Balance</title>
-    <comment>Contains the opening balance for the current period for this financial account</comment>
-    <default>0</default>
-    <add>4.7</add>
-  </field>
 </table>
