@@ -335,6 +335,12 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
             'operatorType' => CRM_Report_Form::OP_DATE,
             'type' => CRM_Utils_Type::T_DATE,
           ),
+          'status_id' => array(
+            'title' => ts('Financial Transaction Status'),
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => CRM_Contribute_PseudoConstant::contributionStatus(),
+            'default' => array(1),
+          ),
         ),
         'order_bys' => array(
           'payment_instrument_id' => array('title' => ts('Payment Method')),
