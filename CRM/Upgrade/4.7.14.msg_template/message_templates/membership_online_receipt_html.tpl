@@ -91,8 +91,7 @@
          {$membership_amount|crmMoney}
         </td>
        </tr>
-       {if $amount}
-        {if ! $is_separate_payment }
+       {if $amount && !$is_separate_payment}
          <tr>
           <td {$labelStyle}>
            {ts}Contribution Amount{/ts}
@@ -101,13 +100,12 @@
            {$amount|crmMoney}
           </td>
          </tr>
-       {/if}
          <tr>
-          <td {$labelStyle}>
-             {ts}Total{/ts}
+           <td {$labelStyle}>
+            {ts}Total{/ts}
            </td>
            <td {$valueStyle}>
-             {$amount+$membership_amount|crmMoney}
+            {$amount+$membership_amount|crmMoney}
            </td>
          </tr>
        {/if}
