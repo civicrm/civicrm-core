@@ -3,9 +3,20 @@
   // This defines an interface which by default only handles plain textareas
   // A wysiwyg implementation can extend this by overriding as many of these functions as needed
   CRM.wysiwyg = {
-    supportsFileUploads: false,
-    create: function() {
-      return $.Deferred().resolve();
+    supportsFileUploads: !!CRM.config.wysisygScriptLocation,
+    create: function(item) {
+      var ret = $.Deferred();
+      // Lazy-load the wysiwyg js
+      if (CRM.config.wysisygScriptLocation) {
+        CRM.loadScript(CRM.config.wysisygScriptLocation).done(function() {
+          CRM.wysiwyg._create(item).done(function() {
+            ret.resolve();
+          });
+        });
+      } else {
+        ret.resolve();
+      }
+      return ret;
     },
     destroy: _.noop,
     updateElement: _.noop,
