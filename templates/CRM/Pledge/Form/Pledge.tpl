@@ -148,46 +148,46 @@
        </table>
 {literal}
 <script type="text/javascript">
-// bind first click of accordion header to load crm-accordion-body with snippet
-// everything else taken care of by cj().crm-accordions()
-cj(document).ready( function() {
-    cj('.crm-ajax-accordion .crm-accordion-header').one('click', function() {
-      loadPanes(cj(this).attr('id'));
+  // bind first click of accordion header to load crm-accordion-body with snippet
+  // everything else taken care of by $().crm-accordions()
+  CRM.$(function($) {
+    $('.crm-ajax-accordion .crm-accordion-header').one('click', function() {
+      loadPanes($(this).attr('id'));
     });
-    cj('#currency').on('change', function() {
-      replaceCurrency(cj(this).children(':selected').text());
+    $('#currency').on('change', function() {
+      replaceCurrency($('#currency option:selected').text());
     });
-    cj('.crm-ajax-accordion:not(.collapsed) .crm-accordion-header').each(function(index) {
-      loadPanes(cj(this).attr('id'));
+    $('.crm-ajax-accordion:not(.collapsed) .crm-accordion-header').each(function(index) {
+      loadPanes($(this).attr('id'));
     });
-});
 
-function replaceCurrency(val) {
-  var eachPaymentAmout = cj('#eachPaymentAmount');
-  var pos = val.indexOf("(") + 1;
-  if (pos) {
-    val = val.slice(pos, val.lastIndexOf(")"));
-  }
-  cj('.currency-symbol').text(val).append("&nbsp;").append(eachPaymentAmout);
-}
-
-// load panes function calls for snippet based on id of crm-accordion-header
-function loadPanes( id ) {
-    var url = "{/literal}{crmURL p='civicrm/contact/view/pledge' q='snippet=4&formType=' h=0}{literal}" + id;
-    {/literal}
-        {if $contributionMode}
-            url = url + "&mode={$contributionMode}";
-        {/if}
-    {literal}
-   if ( ! cj('div.'+id).html() ) {
-      var loading = '<img src="{/literal}{$config->resourceBase}i/loading.gif{literal}" alt="{/literal}{ts escape='js'}loading{/ts}{literal}" />&nbsp;{/literal}{ts escape='js'}Loading{/ts}{literal}...';
-      cj('div.'+id).html(loading);
-      cj.ajax({
-          url    : url,
-          success: function(data) { cj('div.'+id).html(data).trigger('crmLoad'); }
-          });
+    function replaceCurrency(val) {
+      var eachPaymentAmout = $('#eachPaymentAmount');
+      var pos = val.indexOf("(") + 1;
+      if (pos) {
+        val = val.slice(pos, val.lastIndexOf(")"));
       }
-  }
+      $('.currency-symbol').text(val).append("&nbsp;").append(eachPaymentAmout);
+    }
+
+    // load panes function calls for snippet based on id of crm-accordion-header
+    function loadPanes( id ) {
+      var url = "{/literal}{crmURL p='civicrm/contact/view/pledge' q='snippet=4&formType=' h=0}{literal}" + id;
+      {/literal}
+        {if $contributionMode}
+          url = url + "&mode={$contributionMode}";
+        {/if}
+      {literal}
+      if ( ! $('div.'+id).html() ) {
+        var loading = '<img src="{/literal}{$config->resourceBase}i/loading.gif{literal}" alt="{/literal}{ts escape='js'}loading{/ts}{literal}" />&nbsp;{/literal}{ts escape='js'}Loading{/ts}{literal}...';
+        $('div.'+id).html(loading);
+        $.ajax({
+          url    : url,
+            success: function(data) { $('div.'+id).html(data).trigger('crmLoad'); }
+        });
+      }
+    }
+  });
 </script>
 {/literal}
 
