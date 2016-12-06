@@ -70,7 +70,12 @@
   </tr>
         <tr class="crm-pledge-form-block-installments">
       <td class="label">{$form.installments.label}</td>
-      <td>{$form.installments.html} {ts}installments of{/ts} {if $action eq 1 or $isPending}{$form.eachPaymentAmount.html|crmMoney:$currency}{elseif $action eq 2 and !$isPending}{$eachPaymentAmount|crmMoney:$currency}{/if}&nbsp;{ts}every{/ts}&nbsp;{$form.frequency_interval.html}&nbsp;{$form.frequency_unit.html}</td></tr>
+      <td>{$form.installments.html} {ts}installments of{/ts}
+        {if $action eq 1 or $isPending}
+         <span class="currency-symbol">{$form.eachPaymentAmount.html|crmMoney:$currency}</span>
+        {elseif $action eq 2 and !$isPending}
+          <span class="currency-symbol">{$eachPaymentAmount|crmMoney:$currency} </span>
+        {/if}&nbsp;{ts}every{/ts}&nbsp;{$form.frequency_interval.html}&nbsp;{$form.frequency_unit.html}</td></tr>
         <tr class="crm-pledge-form-block-frequency_day">
       <td class="label nowrap">{$form.frequency_day.label}</td>
       <td>{$form.frequency_day.html} {ts}day of the period{/ts}<br />
@@ -144,6 +149,21 @@
 // bind first click of accordion header to load crm-accordion-body with snippet
 // everything else taken care of by cj().crm-accordions()
 cj(document).ready( function() {
+  var eachPaymentAmout = cj('#eachPaymentAmount');
+  var symbol = cj('#currency option:selected').text();
+  if( symbol.indexOf('(') > 0) {
+    symbol = symbol.substring(symbol.lastIndexOf("(")+1,symbol.lastIndexOf(")"));
+  }
+  cj('.currency-symbol').text(symbol).append("&nbsp;").append(eachPaymentAmout);
+  // if there are more than one currency enabled.
+  cj('#currency').change(function() {
+    symbol = cj(this).find(':selected').text();
+    if( symbol.indexOf('(') > 0) {
+      symbol = symbol.substring(symbol.lastIndexOf("(")+1,symbol.lastIndexOf(")"));
+    }
+    cj('.currency-symbol').text(symbol).append("&nbsp;").append(eachPaymentAmout);
+  });
+
     cj('.crm-ajax-accordion .crm-accordion-header').one('click', function() {
       loadPanes(cj(this).attr('id'));
     });
