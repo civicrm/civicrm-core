@@ -443,6 +443,7 @@ if (!CRM.vars) CRM.vars = {};
         // Use select2 ajax helper instead of CRM.api3 because it provides more value
         ajax: {
           url: CRM.url('civicrm/ajax/rest'),
+          quietMillis: 300,
           data: function (input, page_num) {
             var params = getEntityRefApiParams($el);
             params.input = input;
