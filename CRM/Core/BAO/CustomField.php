@@ -1053,13 +1053,12 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
 
         }
         else {
-          // FIXME: This won't work with customFieldOptions hook
           $attributes += array(
             'entity' => 'option_value',
             'placeholder' => $placeholder,
             'multiple' => $search,
             'api' => array(
-              'params' => array('option_group_id' => $field->option_group_id),
+              'params' => array('option_group_id' => $field->option_group_id, 'autocomplete_cfid' => $field->id),
             ),
           );
           $element = $qf->addEntityRef($elementName, $label, $attributes, $useRequired && !$search);
@@ -2460,6 +2459,49 @@ WHERE cf.id = %1 AND cg.is_multiple = 1";
         'labelColumn' => 'name',
       );
     }
+  }
+
+  /**
+   * Build hook options for Autocomplete-select widget.
+   *
+   * @param array $params
+   * @return array
+   */
+  public static function fieldOptionsForAutoCompleteSelect($params) {
+    $options = array();
+    $field = self::getFieldObject($params['autocomplete_cfid']);
+    $entity = $field->getEntity();
+
+    CRM_Utils_Hook::fieldOptions($entity, "custom_{$params['autocomplete_cfid']}", $options, array('context' => NULL));
+
+    $defaultValue = $filter = '';
+    if (!empty($params['label'])) {
+      $filter = trim($params['label']['LIKE'], '%');
+    }
+    if (!empty($params['value'])) {
+      $defaultValue = current($params['value']['IN']);
+    }
+
+    // Filter based on text search.
+    foreach ($options as $key => $val) {
+      if ($filter && stripos($val, $filter) === FALSE) {
+        unset($options[$key]);
+      }
+      else {
+        $options[$key] = array(
+          'value' => $key,
+          'label' => $val,
+        );
+      }
+    }
+    // Set default value if present.
+    if ($defaultValue && !empty($options)) {
+      $options = array_filter($options, function ($option) use ($defaultValue) {
+        return ($option['value'] == $defaultValue);
+      });
+    }
+
+    return $options;
   }
 
 }
