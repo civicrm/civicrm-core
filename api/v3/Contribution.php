@@ -391,6 +391,7 @@ function civicrm_api3_contribution_sendconfirmation($params) {
     'bcc_receipt',
     'receipt_text',
     'payment_processor_id',
+    'is_email_receipt',
   );
   $input = array_intersect_key($params, array_flip($allowedParams));
   CRM_Contribute_BAO_Contribution::sendMail($input, $ids, $params['id'], $values);
