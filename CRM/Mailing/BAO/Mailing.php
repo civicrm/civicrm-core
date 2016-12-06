@@ -1388,6 +1388,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     }
     elseif ($type == 'url') {
       if ($this->url_tracking && !empty($this->id)) {
+        CRM_Utils_Hook::alterUrl($token, ['id' => $this->id, 'campaign_id' => $this->campaign_id, 'event_queue_id' => $event_queue_id]);
         // ensure that Google CSS and any .css files are not tracked.
         if (!(strpos($token, 'css?family') || strpos($token, '.css'))) {
           $data = CRM_Mailing_BAO_TrackableURL::getTrackerURL($token, $this->id, $event_queue_id);
