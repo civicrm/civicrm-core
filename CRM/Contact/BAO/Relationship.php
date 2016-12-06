@@ -1118,6 +1118,19 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
         $where .= ' AND relationship_type_id = ' . CRM_Utils_Type::escape($params['relationship_type_id'], 'Positive');
       }
     }
+
+    // CRM-9335, CRM-16711: restrict to contacts that the user is permitted to view.
+    $aclTables      = array();
+    $aclWhereTables = array();
+    $permission = CRM_ACL_API::whereClause(CRM_Core_Permission::VIEW, $aclTables, $aclWhereTables);
+    $aclFrom = CRM_Contact_BAO_Query::fromClause($aclWhereTables);
+    $aclQuery = "
+SELECT contact_a.id
+   $aclFrom
+WHERE $permission
+";
+    $where .= " AND civicrm_contact.id IN ($aclQuery)";
+
     if ($direction == 'a_b') {
       $where .= ' ) UNION ';
     }
