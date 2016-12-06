@@ -4,25 +4,25 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "189ae04cf5b1ca1ee00d56a629a273c3",
-    "content-hash": "c2aba74bbb5b474831736b3e3bcbcb20",
+    "hash": "94c7ae299e411a3b9013da64e1232669",
+    "content-hash": "36ffd76fc5e7344ac6e587d11779ceeb",
     "packages": [
         {
             "name": "civicrm/civicrm-cxn-rpc",
-            "version": "v0.15.12.04",
+            "version": "v0.16.12.05",
             "source": {
                 "type": "git",
                 "url": "https://github.com/civicrm/civicrm-cxn-rpc.git",
-                "reference": "6e3a0f956860908a240758ab8c80a020549a6f03"
+                "reference": "e88e78dc491b7e8739a40231f46c2d4459347b12"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/civicrm/civicrm-cxn-rpc/zipball/6e3a0f956860908a240758ab8c80a020549a6f03",
-                "reference": "6e3a0f956860908a240758ab8c80a020549a6f03",
+                "url": "https://api.github.com/repos/civicrm/civicrm-cxn-rpc/zipball/e88e78dc491b7e8739a40231f46c2d4459347b12",
+                "reference": "e88e78dc491b7e8739a40231f46c2d4459347b12",
                 "shasum": ""
             },
             "require": {
-                "phpseclib/phpseclib": "0.3.*",
+                "phpseclib/phpseclib": "1.0.*",
                 "psr/log": "1.0.0"
             },
             "require-dev": {
@@ -45,7 +45,7 @@
                 }
             ],
             "description": "RPC library for CiviConnect",
-            "time": "2015-12-05 04:41:02"
+            "time": "2016-12-06 04:32:51"
         },
         {
             "name": "dompdf/dompdf",
@@ -469,16 +469,16 @@
         },
         {
             "name": "phpseclib/phpseclib",
-            "version": "0.3.10",
+            "version": "1.0.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpseclib/phpseclib.git",
-                "reference": "d15bba1edcc7c89e09cc74c5d961317a8b947bf4"
+                "reference": "38fa7332e96bcc546ce6eb5cbaa1168c96839393"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/d15bba1edcc7c89e09cc74c5d961317a8b947bf4",
-                "reference": "d15bba1edcc7c89e09cc74c5d961317a8b947bf4",
+                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/38fa7332e96bcc546ce6eb5cbaa1168c96839393",
+                "reference": "38fa7332e96bcc546ce6eb5cbaa1168c96839393",
                 "shasum": ""
             },
             "require": {
@@ -488,19 +488,14 @@
                 "phing/phing": "~2.7",
                 "phpunit/phpunit": "~4.0",
                 "sami/sami": "~2.0",
-                "squizlabs/php_codesniffer": "~1.5"
+                "squizlabs/php_codesniffer": "~2.0"
             },
             "suggest": {
                 "ext-gmp": "Install the GMP (GNU Multiple Precision) extension in order to speed up arbitrary precision integer arithmetic operations.",
                 "ext-mcrypt": "Install the Mcrypt extension in order to speed up a wide variety of cryptographic operations.",
-                "pear-pear/PHP_Compat": "Install PHP_Compat to get phpseclib working on PHP < 4.3.3."
+                "pear-pear/PHP_Compat": "Install PHP_Compat to get phpseclib working on PHP < 5.0.0."
             },
             "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "0.3-dev"
-                }
-            },
             "autoload": {
                 "psr-0": {
                     "Crypt": "phpseclib/",
@@ -510,6 +505,7 @@
                     "System": "phpseclib/"
                 },
                 "files": [
+                    "phpseclib/bootstrap.php",
                     "phpseclib/Crypt/Random.php"
                 ]
             },
@@ -540,6 +536,11 @@
                     "name": "Hans-Jürgen Petrich",
                     "email": "petrich@tronic-media.com",
                     "role": "Developer"
+                },
+                {
+                    "name": "Graham Campbell",
+                    "email": "graham@alt-three.com",
+                    "role": "Developer"
                 }
             ],
             "description": "PHP Secure Communications Library - Pure-PHP implementations of RSA, AES, SSH2, SFTP, X.509 etc.",
@@ -563,7 +564,7 @@
                 "x.509",
                 "x509"
             ],
-            "time": "2015-01-28 21:50:33"
+            "time": "2016-10-22 17:53:16"
         },
         {
             "name": "psr/log",
@@ -610,12 +611,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/config.git",
-                "reference": "d93bb29acfa5cff771cb4aa0fb4a97454ddb41e4"
+                "reference": "c7309e33b719433d5cf3845d0b5b9608609d8c8e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/config/zipball/d93bb29acfa5cff771cb4aa0fb4a97454ddb41e4",
-                "reference": "d93bb29acfa5cff771cb4aa0fb4a97454ddb41e4",
+                "url": "https://api.github.com/repos/symfony/config/zipball/c7309e33b719433d5cf3845d0b5b9608609d8c8e",
+                "reference": "c7309e33b719433d5cf3845d0b5b9608609d8c8e",
                 "shasum": ""
             },
             "require": {
