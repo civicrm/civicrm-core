@@ -738,8 +738,7 @@ AND  civicrm_group_contact.group_id = $groupID ";
 
     if (
       isset($config->smartGroupCacheTimeout) &&
-      is_numeric($config->smartGroupCacheTimeout) &&
-      $config->smartGroupCacheTimeout > 0
+      is_numeric($config->smartGroupCacheTimeout)
     ) {
       return $config->smartGroupCacheTimeout;
     }

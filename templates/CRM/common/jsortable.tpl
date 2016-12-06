@@ -118,6 +118,7 @@
       var oTable;
       if ( useAjax ) {
         oTable = $(tabId).dataTable({
+          "iDisplayLength": 25,
           "bFilter": false,
           "bAutoWidth": false,
           "aaSorting": sortColumn,

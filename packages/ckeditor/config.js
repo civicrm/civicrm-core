@@ -39,4 +39,5 @@ CKEDITOR.editorConfig = function( config ) {
 	config.removeDialogTabs = 'image:advanced;link:advanced';
 	config.basicEntities = false;
 	config.allowedContent = true;
+	config.forceSimpleAmpersand = true;
 };

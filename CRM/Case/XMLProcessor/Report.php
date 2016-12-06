@@ -669,10 +669,10 @@ AND " . CRM_Core_Permission::customGroupClause(CRM_Core_Permission::VIEW, 'cg.')
           $query = "
 SELECT label, value
   FROM civicrm_option_value
- WHERE option_group_id = {$dao->optionGroupID}
+ WHERE option_group_id = %1
 ";
 
-          $option = CRM_Core_DAO::executeQuery($query);
+          $option = CRM_Core_DAO::executeQuery($query, array(1 => array($dao->optionGroupID, 'Positive')));
           while ($option->fetch()) {
             $dataType = $dao->dataType;
             if ($dataType == 'Int' || $dataType == 'Float') {
@@ -691,9 +691,11 @@ SELECT label, value
 
       foreach ($sql as $tableName => $values) {
         $columnNames = implode(',', $values);
+        $title = CRM_Core_DAO::escapeString($groupTitle[$tableName]);
+        $mysqlTableName = CRM_Utils_Type::escape($tableName, 'MysqlColumnNameOrAlias');
         $sql[$tableName] = "
-SELECT '{$groupTitle[$tableName]}' as groupTitle, $columnNames
-FROM   $tableName
+SELECT '" . $title . "' as groupTitle, $columnNames
+FROM   $mysqlTableName
 WHERE  entity_id = %1
 ";
       }

@@ -430,8 +430,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
         );
       }
     }
-
-    if (CRM_Utils_System::isNull($value)) {
+    if (!is_array($value) && CRM_Utils_System::isNull($value)) {
       $dao->value = 'null';
     }
     else {

@@ -76,6 +76,16 @@
       <td class="right bold crm-contribution-soft_credit_amount"><span class="nowrap">{$row.contribution_soft_credit_amount|crmMoney:$row.currency}</span></td>
     {/if}
     <td class="crm-contribution-type crm-contribution-type_{$row.financial_type_id} crm-financial-type crm-financial-type_{$row.financial_type_id}">{$row.financial_type}</td>
+    <td class="crm-contribution-recur-id">
+      {if $row.contribution_recur_id}
+        <a href="{crmURL p='civicrm/contact/view/contributionrecur' q="reset=1&id=`$row.contribution_recur_id`&cid=`$row.contact_id`"}"
+           class ="action-item crm-hover-button"
+           title={ts}"Recurring payment"{/ts}
+        >
+          <div class="ui-icon ui-icon-refresh"></div>
+        </a>
+      {/if}
+    </td>
     <td class="crm-contribution-source">{$row.contribution_source}</td>
     <td class="crm-contribution-receive_date">{$row.receive_date|crmDate}</td>
     <td class="crm-contribution-thankyou_date">{$row.thankyou_date|crmDate}</td>

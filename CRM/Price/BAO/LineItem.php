@@ -247,6 +247,7 @@ AND li.entity_id = {$entityId}
         'entity_table' => $dao->entity_table,
         'contribution_id' => $dao->contribution_id,
         'financial_type_id' => $dao->financial_type_id,
+        'financial_type' => CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_Contribution', 'financial_type_id', $dao->financial_type_id),
         'membership_type_id' => $dao->membership_type_id,
         'membership_num_terms' => $dao->membership_num_terms,
         'tax_amount' => $dao->tax_amount,
