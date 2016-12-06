@@ -155,7 +155,13 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
       $profileContactType = CRM_Core_BAO_UFGroup::getContactType($form->_values['honoree_profile_id']);
       $dedupeParams = CRM_Dedupe_Finder::formatParams($params['honor'], $profileContactType);
       $dedupeParams['check_permission'] = FALSE;
-      $ids = CRM_Dedupe_Finder::dupesByParams($dedupeParams, $profileContactType);
+      // honoree should never be the donor
+      $exceptKeys = array(
+        'contactID' => 0,
+        'onbehalf_contact_id' => 0,
+      );
+      $except = array_values(array_intersect_key($params, $exceptKeys));
+      $ids = CRM_Dedupe_Finder::dupesByParams($dedupeParams, $profileContactType, 'Unsupervised', $except);
       if (count($ids)) {
         $honorId = CRM_Utils_Array::value(0, $ids);
       }
