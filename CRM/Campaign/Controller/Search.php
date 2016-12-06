@@ -39,7 +39,7 @@
  *
  * Typically the first form will display the search criteria and it's results
  *
- * The second form is used to process search results with the asscociated actions
+ * The second form is used to process search results with the associated actions
  *
  */
 class CRM_Campaign_Controller_Search extends CRM_Core_Controller {
