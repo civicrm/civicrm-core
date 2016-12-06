@@ -355,6 +355,9 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
     if (!empty($this->_values['currency'])) {
       $this->assign('currency', $this->_values['currency']);
     }
+    elseif (!empty($this->_submitValues['currency'])) {
+      $this->assign('currency', $this->_submitValues['currency']);
+    }
 
     if ($this->_id &&
       !$this->_isPending
