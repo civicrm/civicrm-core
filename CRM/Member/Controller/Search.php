@@ -39,7 +39,7 @@
  *  - the search controller is used for building/processing multiform
  *    searches.
  *
- * Typically the first form will display the search criteria and it's results
+ * Typically the first form will display the search criteria and its results
  *
  * The second form is used to process search results with the associated actions
  *
