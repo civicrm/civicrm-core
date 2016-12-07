@@ -151,8 +151,10 @@
       var tag;
       $('#mainTabContainer').tabs();
       $('.merge_tag').click(function(e) {
-        tag = $(this).crmEditableEntity();
-        mergeTagDialog();
+        CRM.loadScript(CRM.config.resourceBase + 'js/jquery/jquery.crmEditable.js').done(function() {
+          tag = $(this).crmEditableEntity();
+          mergeTagDialog();
+        });
         e.preventDefault();
       });
 

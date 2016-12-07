@@ -243,8 +243,16 @@ if (!CRM.vars) CRM.vars = {};
       var script = document.createElement('script');
       scriptsLoaded[url] = $.Deferred();
       script.onload = function () {
+        if (window.jQuery === CRM.$ && CRM.CMSjQuery) {
+          window.jQuery = CRM.CMSjQuery;
+        }
         scriptsLoaded[url].resolve();
       };
+      // Make jQuery global available while script is loading
+      if (window.jQuery !== CRM.$) {
+        CRM.CMSjQuery = window.jQuery;
+        window.jQuery = CRM.$;
+      }
       script.src = url;
       document.getElementsByTagName("head")[0].appendChild(script);
     }
@@ -883,6 +891,12 @@ if (!CRM.vars) CRM.vars = {};
         });
         // Hack to get translations for crmDatepicker.js since lazy-loaded js doesn't get preprocessed by php
         ts('Clear');ts('Time');
+      });
+      $('.crm-editable', e.target).not('thead *').each(function() {
+        var $el = $(this);
+        CRM.loadScript(CRM.config.resourceBase + 'js/jquery/jquery.crmEditable.js').done(function() {
+          $el.crmEditable();
+        });
       });
       // Cache Form Input initial values
       $('form[data-warn-changes] :input', e.target).each(function() {
