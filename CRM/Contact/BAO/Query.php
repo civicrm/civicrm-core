@@ -2956,14 +2956,23 @@ class CRM_Contact_BAO_Query {
       }
       $this->_tables[$gcTable] = $this->_whereTables[$gcTable] = " LEFT JOIN civicrm_group_contact {$gcTable} ON (" . implode(' AND ', $joinClause) . ")";
       if (strpos($op, 'IN') !== FALSE) {
-        $groupClause[] = "{$gcTable}.group_id $op ( $groupIds )";
+        $clause = "{$gcTable}.group_id $op ( $groupIds ) %s ";
       }
       elseif ($op == '!=') {
-        $groupClause[] = "{$gcTable}.contact_id NOT IN (SELECT contact_id FROM civicrm_group_contact cgc WHERE cgc.group_id = $groupIds)";
+        $clause = "{$gcTable}.contact_id NOT IN (SELECT contact_id FROM civicrm_group_contact cgc WHERE cgc.group_id = $groupIds %s)";
       }
       else {
-        $groupClause[] = "{$gcTable}.group_id $op $groupIds";
+        $clause = "{$gcTable}.group_id $op $groupIds %s ";
       }
+
+      // include child groups IDs if any
+      $childGroupIds = self::getChildGroupIds($regularGroupIDs);
+      $childClause = '';
+      if (count($childGroupIds)) {
+        $gcTable = ($op == '!=') ? 'cgc' : $gcTable;
+        $childClause = " OR {$gcTable}.group_id IN (" . implode(',', $childGroupIds) . ") ";
+      }
+      $groupClause[] = sprintf($clause, $childClause);
     }
 
     //CRM-19589: contact(s) removed from a Smart Group, resides in civicrm_group_contact table
@@ -2979,6 +2988,28 @@ class CRM_Contact_BAO_Query {
     if (strpos($op, 'NULL') === FALSE) {
       $this->_qill[$grouping][] = ts("Group Status %1", array(1 => implode(' ' . ts('or') . ' ', $statii)));
     }
+  }
+
+  /**
+   * Get child group ids
+   *
+   * @param array $ids
+   *    Parent Group IDs
+   *
+   * @return array
+   */
+  public static function getChildGroupIds($ids) {
+    $notFound = FALSE;
+    $childGroupIds = array();
+    foreach ($ids as $id) {
+      $childId = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $id, 'children');
+      while (!empty($childId)) {
+        $childGroupIds[] = $childId;
+        $childId = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $childId, 'children');
+      }
+    }
+
+    return $childGroupIds;
   }
 
   /**
