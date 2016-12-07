@@ -1,6 +1,5 @@
 // https://civicrm.org/licensing
 (function($, _) {
-  var scriptLoaded = false;
 
   function getInstance(item) {
     var name = $(item).attr("name"),
@@ -13,18 +12,9 @@
     }
   }
 
-  function loadScript(url) {
-    var deferred = $.Deferred(),
-      script = document.createElement('script');
-    script.onload = function() {deferred.resolve();};
-    script.src = url;
-    document.getElementsByTagName("head")[0].appendChild(script);
-    return deferred;
-  }
-
   CRM.wysiwyg.supportsFileUploads =  true;
 
-  CRM.wysiwyg.create = function(item) {
+  CRM.wysiwyg._create = function(item) {
     var deferred = $.Deferred();
 
     function onReady() {
@@ -94,10 +84,7 @@
       if (window.CKEDITOR) {
         initialize();
       } else {
-        if (scriptLoaded === false) {
-          scriptLoaded = loadScript(CRM.config.resourceBase + 'bower_components/ckeditor/ckeditor.js');
-        }
-        scriptLoaded.done(initialize);
+        CRM.loadScript(CRM.config.resourceBase + 'bower_components/ckeditor/ckeditor.js').done(initialize);
       }
     } else {
       deferred.reject();

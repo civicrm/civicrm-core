@@ -237,6 +237,20 @@ if (!CRM.vars) CRM.vars = {};
     }
   };
 
+  var scriptsLoaded = {};
+  CRM.loadScript = function(url) {
+    if (!scriptsLoaded[url]) {
+      var script = document.createElement('script');
+      scriptsLoaded[url] = $.Deferred();
+      script.onload = function () {
+        scriptsLoaded[url].resolve();
+      };
+      script.src = url;
+      document.getElementsByTagName("head")[0].appendChild(script);
+    }
+    return scriptsLoaded[url];
+  };
+
   /**
    * Populate a select list, overwriting the existing options except for the placeholder.
    * @param select jquery selector - 1 or more select elements
