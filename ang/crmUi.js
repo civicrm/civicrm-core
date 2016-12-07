@@ -79,18 +79,20 @@
             element.val(ngModel.$viewValue).change();
           };
 
-          element
-            .crmDatepicker(scope.crmUiDatepicker)
-            .on('change', function() {
-              var requiredLength = 19;
-              if (scope.crmUiDatepicker && scope.crmUiDatepicker.time === false) {
-                requiredLength = 10;
-              }
-              if (scope.crmUiDatepicker && scope.crmUiDatepicker.date === false) {
-                requiredLength = 8;
-              }
-              ngModel.$setValidity('incompleteDateTime', !($(this).val().length && $(this).val().length !== requiredLength));
-            });
+          CRM.loadScript(CRM.config.resourceBase + 'js/jquery/jquery.crmDatepicker.js').done(function() {
+            element
+              .crmDatepicker(scope.crmUiDatepicker)
+              .on('change', function () {
+                var requiredLength = 19;
+                if (scope.crmUiDatepicker && scope.crmUiDatepicker.time === false) {
+                  requiredLength = 10;
+                }
+                if (scope.crmUiDatepicker && scope.crmUiDatepicker.date === false) {
+                  requiredLength = 8;
+                }
+                ngModel.$setValidity('incompleteDateTime', !($(this).val().length && $(this).val().length !== requiredLength));
+              });
+          });
         }
       };
     })
