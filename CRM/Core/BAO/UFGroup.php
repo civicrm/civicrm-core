@@ -336,7 +336,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
       $query .= " AND $permissionClause ";
     }
 
-    if ($orderProfiles AND count($profileIds) > 1) {
+    if ($orderProfiles && count($profileIds) > 1) {
       $query .= " ORDER BY FIELD(  g.id, {$gids} )";
     }
     $group = CRM_Core_DAO::executeQuery($query, $params);
@@ -454,9 +454,9 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
 
     $addressCustom = FALSE;
     if (in_array($permissionType, array(
-        CRM_Core_Permission::CREATE,
-        CRM_Core_Permission::EDIT,
-      )) &&
+      CRM_Core_Permission::CREATE,
+      CRM_Core_Permission::EDIT,
+    )) &&
       in_array($field->field_name, array_keys($addressCustomFields))
     ) {
       $addressCustom = TRUE;
@@ -1868,9 +1868,9 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       $form->addChainSelect($name, array('label' => $title, 'required' => $required));
       $config = CRM_Core_Config::singleton();
       if (!in_array($mode, array(
-          CRM_Profile_Form::MODE_EDIT,
-          CRM_Profile_Form::MODE_SEARCH,
-        )) &&
+        CRM_Profile_Form::MODE_EDIT,
+        CRM_Profile_Form::MODE_SEARCH,
+      )) &&
         $config->defaultContactStateProvince
       ) {
         $defaultValues[$name] = $config->defaultContactStateProvince;
@@ -1881,9 +1881,9 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       $form->add('select', $name, $title, array('' => ts('- select -')) + CRM_Core_PseudoConstant::country(), $required, $selectAttributes);
       $config = CRM_Core_Config::singleton();
       if (!in_array($mode, array(
-          CRM_Profile_Form::MODE_EDIT,
-          CRM_Profile_Form::MODE_SEARCH,
-        )) &&
+        CRM_Profile_Form::MODE_EDIT,
+        CRM_Profile_Form::MODE_SEARCH,
+      )) &&
         $config->defaultContactCountry
       ) {
         $defaultValues[$name] = $config->defaultContactCountry;
@@ -2021,11 +2021,11 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       $profileType = CRM_Core_BAO_UFField::getProfileType($gId, TRUE, FALSE, TRUE);
 
       if (empty($profileType) || in_array($profileType, array(
-          'Contact',
-          'Contribution',
-          'Participant',
-          'Membership',
-        ))
+        'Contact',
+        'Contribution',
+        'Participant',
+        'Membership',
+      ))
       ) {
         $profileType = 'Individual';
       }
@@ -2147,10 +2147,10 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus();
       $statusName = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
       foreach (array(
-                 'In Progress',
-                 'Overdue',
-                 'Refunded',
-               ) as $suppress) {
+        'In Progress',
+        'Overdue',
+        'Refunded',
+      ) as $suppress) {
         unset($contributionStatuses[CRM_Utils_Array::key($suppress, $statusName)]);
       }
 
