@@ -1,0 +1,146 @@
+# This is a key of GitHub handles to real contributors' names and organizations,
+# to be used for preparing credits for release notes.
+---
+- github      : adixon
+  name        : Alan Dixon
+  organization: Blackfly Solutions
+- github      : agh1
+  name        : Andrew Hunt
+  organization: AGH Strategies
+- github      : agileware
+  name        : Agileware Team
+  organization: Agileware
+- github      : alifrumin
+  name        : Alice Frumin
+  organization: AGH Strategies
+- github      : andrew-cormick-dockery
+  name        : Andrew Cormick-Dockery
+- github      : artem3
+  name        : Artem Goncharenko
+- github      : colemanw
+  name        : Coleman Watts
+  organization: CiviCRM
+- github      : davecivicrm
+  name        : Dave Greenberg
+  organization: CiviCRM
+- github      : davejenx
+  name        : Dave Jenkins
+  organization: Circle Interactive
+- github      : edzelopez
+  name        : Edzel Lopez
+  organization: JMA Consulting
+- github      : eileenmcnaughton
+  name        : Eileen McNaughton
+  organization: Fuzion NZ
+- github      : francescbassas
+  name        : Francesc Bassas i Bullich
+- github      : ginkgofjg
+  name        : Frank Gómez
+  organization: Ginkgo Street Labs
+- github      : ginkgomzd
+  name        : Michael Z Daryabeygi
+  organization: Ginkgo Street Labs
+- github      : ineffyble
+  name        : Effy Elden
+- github      : jernic
+  name        : jernic
+- github      : jitendrapurohit
+  name        : Jitendra Purohit
+  organization: CiviCRM
+- github      : jmcclelland
+  name        : Jamie McClelland
+  organization: Progressive Technology Project
+- github      : JKingsnorth
+  name        : John Kingsnorth
+- github      : joemurray
+  name        : Joe Murray
+  organization: JMA Consulting
+- github      : JohnFF
+  name        : John Kirk
+  organization: CiviFirst
+- github      : KarinG
+  name        : Karin Gerritsen
+  organization: Semper IT
+- github      : konadave
+  name        : David Reedy Jr
+  organization: Klangsoft
+- github      : lcdservices
+  name        : Brian Shaughnessy
+  organization: Lighthouse Design and Consulting
+- github      : liedekef
+  name        : Franky Van Liedekerke
+  organization: E-Dynamics
+- github      : litespeedmarc
+  name        : Marc Brazeau
+- github      : magnolia61
+  name        : Richard van Oosterhout
+- github      : michaelmcandrew
+  name        : Michael McAndrew
+  organization: Third Sector Design
+- github      : MiltoxBeyond
+  name        : Milton Zurita
+- github      : MiyaNoctem
+  name        : Camilo Rodriguez
+  organization: CompuCorp
+- github      : mlutfy
+  name        : Mathieu Lutfy
+  organization: Coop SymbioTIC
+- github      : mollux
+  name        : Mattias Michaux
+- github      : monishdeb
+  name        : Monish Deb
+  organization: CiviCRM
+- github      : nganivet
+  name        : Nicolas Ganivet
+  organization: CiviDesk
+- github      : PalanteJon
+  name        : Jon Goldberg
+- github      : pradpnayak
+  name        : Pradeep Nayak
+  organization: JMA Consulting
+- github      : rubofvil
+  name        : Rubén Pineda
+  organization: iXiam
+- github      : samuelsov
+  name        : Samuel Vanhove
+  organization: Coop SymbioTIC
+- github      : saurabhbatra96
+  name        : Saurabh Batra
+- github      : scardinius
+  name        : Tomasz Pietrzkowski
+  organization: We Move Europe/Caltha
+- github      : seamuslee001
+  name        : Seamus Lee
+  organization: Australian Greens
+- github      : sharique
+  name        : Sharique Ahmed Farooqui
+- github      : sqweets
+  name        : Ellen Hendricks
+  organization: Spry Digital
+- github      : stoob
+  name        : Stuart Gaston
+  organization: Korlon
+- github      : systopia
+  name        : Björn Endres
+  organization: Systopia
+- github      : tobiaslounsbury
+  name        : Tobias Lounsbury
+  organization: Ginkgo Street Labs
+- github      : totten
+  name        : Tim Otten
+  organization: CiviCRM
+- github      : tschuettler
+  name        : Thomas Schüttler
+- github      : vedantrathore
+  name        : Vedant Rathore
+- github      : Vgratioulet
+  name        : Véronique Gratioulet
+- github      : wmortada
+  name        : William Mortada
+  organization: Community IT Academy
+- github      : xurizaemon
+  name        : Chris Burgess
+  organization: Fuzion
+- github      : yashodha
+  name        : Yashodha Chaku
+  organization: CiviCRM
