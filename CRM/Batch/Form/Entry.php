@@ -108,6 +108,10 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
   }
 
+  public function setBatchID($id) {
+    $this->_batchId = $id;
+  }
+
   /**
    * Build the form object.
    */
