@@ -442,6 +442,11 @@ class CRM_Report_Form extends CRM_Core_Form {
   protected $rollupRow = array();
 
   /**
+   * @var string Database attributes - character set and collation
+   */
+  protected $_databaseAttributes = 'DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci';
+
+  /**
    * SQL being run in this report.
    *
    * The sql in the report is stored in this variable in order to be displayed on the developer tab.
@@ -519,21 +524,11 @@ class CRM_Report_Form extends CRM_Core_Form {
    * @throws \Exception
    */
   public function preProcessCommon() {
-    $this->_force
-      = CRM_Utils_Request::retrieve(
-      'force',
-      'Boolean',
-      CRM_Core_DAO::$_nullObject
-      );
+    $this->_force = CRM_Utils_Request::retrieve('force', 'Boolean');
 
-    $this->_dashBoardRowCount
-      = CRM_Utils_Request::retrieve(
-      'rowCount',
-      'Integer',
-      CRM_Core_DAO::$_nullObject
-      );
+    $this->_dashBoardRowCount = CRM_Utils_Request::retrieve('rowCount', 'Integer');
 
-    $this->_section = CRM_Utils_Request::retrieve('section', 'Integer', CRM_Core_DAO::$_nullObject);
+    $this->_section = CRM_Utils_Request::retrieve('section', 'Integer');
 
     $this->assign('section', $this->_section);
     CRM_Core_Region::instance('page-header')->add(array(
@@ -3324,7 +3319,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     if ($this->addPaging) {
       $this->_select = str_ireplace('SELECT ', 'SELECT SQL_CALC_FOUND_ROWS ', $this->_select);
 
-      $pageId = CRM_Utils_Request::retrieve('crmPID', 'Integer', CRM_Core_DAO::$_nullObject);
+      $pageId = CRM_Utils_Request::retrieve('crmPID', 'Integer');
 
       // @todo all http vars should be extracted in the preProcess
       // - not randomly in the class
@@ -4058,6 +4053,20 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
    *   address fields for construct clause
    */
   public function addAddressFields($groupBy = TRUE, $orderBy = FALSE, $filters = TRUE, $defaults = array('country_id' => TRUE)) {
+    $defaultAddressFields = array(
+      'street_address' => ts('Street Address'),
+      'supplemental_address_1' => ts('Supplementary Address Field 1'),
+      'supplemental_address_2' => ts('Supplementary Address Field 2'),
+      'street_number' => ts('Street Number'),
+      'street_name' => ts('Street Name'),
+      'street_unit' => ts('Street Unit'),
+      'city' => ts('City'),
+      'postal_code' => ts('Postal Code'),
+      'postal_code_suffix' => ts('Postal Code Suffix'),
+      'country_id' => ts('Country'),
+      'state_province_id' => ts('State/Province'),
+      'county_id' => ts('County'),
+    );
     $addressFields = array(
       'civicrm_address' => array(
         'dao' => 'CRM_Core_DAO_Address',
@@ -4067,65 +4076,18 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
             'default' => CRM_Utils_Array::value('name', $defaults, FALSE),
             'name' => 'name',
           ),
-          'street_address' => array(
-            'title' => ts('Street Address'),
-            'default' => CRM_Utils_Array::value('street_address', $defaults, FALSE),
-          ),
-          'supplemental_address_1' => array(
-            'title' => ts('Supplementary Address Field 1'),
-            'default' => CRM_Utils_Array::value('supplemental_address_1', $defaults, FALSE),
-          ),
-          'supplemental_address_2' => array(
-            'title' => ts('Supplementary Address Field 2'),
-            'default' => CRM_Utils_Array::value('supplemental_address_2', $defaults, FALSE),
-          ),
-          'street_number' => array(
-            'name' => 'street_number',
-            'title' => ts('Street Number'),
-            'type' => 1,
-            'default' => CRM_Utils_Array::value('street_number', $defaults, FALSE),
-          ),
-          'street_name' => array(
-            'name' => 'street_name',
-            'title' => ts('Street Name'),
-            'type' => 1,
-            'default' => CRM_Utils_Array::value('street_name', $defaults, FALSE),
-          ),
-          'street_unit' => array(
-            'name' => 'street_unit',
-            'title' => ts('Street Unit'),
-            'type' => 1,
-            'default' => CRM_Utils_Array::value('street_unit', $defaults, FALSE),
-          ),
-          'city' => array(
-            'title' => ts('City'),
-            'default' => CRM_Utils_Array::value('city', $defaults, FALSE),
-          ),
-          'postal_code' => array(
-            'title' => ts('Postal Code'),
-            'default' => CRM_Utils_Array::value('postal_code', $defaults, FALSE),
-          ),
-          'postal_code_suffix' => array(
-            'title' => ts('Postal Code Suffix'),
-            'default' => CRM_Utils_Array::value('postal_code_suffix', $defaults, FALSE),
-          ),
-          'country_id' => array(
-            'title' => ts('Country'),
-            'default' => CRM_Utils_Array::value('country_id', $defaults, FALSE),
-          ),
-          'state_province_id' => array(
-            'title' => ts('State/Province'),
-            'default' => CRM_Utils_Array::value('state_province_id', $defaults, FALSE),
-          ),
-          'county_id' => array(
-            'title' => ts('County'),
-            'default' => CRM_Utils_Array::value('county_id', $defaults, FALSE),
-          ),
         ),
         'grouping' => 'location-fields',
       ),
     );
+    foreach ($defaultAddressFields as $fieldName => $fieldLabel) {
+      $addressFields['civicrm_address']['fields'][$fieldName] = array(
+        'title' => $fieldLabel,
+        'default' => CRM_Utils_Array::value($fieldName, $defaults, FALSE),
+      );
+    }
 
+    $street_address_filters = $general_address_filters = array();
     if ($filters) {
       // Address filter depends on whether street address parsing is enabled.
       // (CRM-18696)
@@ -4136,13 +4098,13 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
         $street_address_filters = array(
           'street_number' => array(
             'title' => ts('Street Number'),
-            'type' => 1,
+            'type' => CRM_Utils_Type::T_INT,
             'name' => 'street_number',
           ),
           'street_name' => array(
             'title' => ts('Street Name'),
             'name' => 'street_name',
-            'operator' => 'like',
+            'type' => CRM_Utils_Type::T_STRING,
           ),
         );
       }
@@ -4150,7 +4112,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
         $street_address_filters = array(
           'street_address' => array(
             'title' => ts('Street Address'),
-            'operator' => 'like',
+            'type' => CRM_Utils_Type::T_STRING,
             'name' => 'street_address',
           ),
         );
@@ -4158,12 +4120,12 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
       $general_address_filters = array(
         'postal_code' => array(
           'title' => ts('Postal Code'),
-          'type' => 1,
+          'type' => CRM_Utils_Type::T_STRING,
           'name' => 'postal_code',
         ),
         'city' => array(
           'title' => ts('City'),
-          'operator' => 'like',
+          'type' => CRM_Utils_Type::T_STRING,
           'name' => 'city',
         ),
         'country_id' => array(

@@ -392,10 +392,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       // Fetch the contribution & do proportional line item assignment
       $params = array('id' => $this->_contributionId);
       $contribution = CRM_Contribute_BAO_Contribution::retrieve($params, $defaults, $params);
-      $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($this->_contributionId);
-      if (!empty($lineItems)) {
-        CRM_Contribute_BAO_Contribution::addPayments($lineItems, array($contribution), $contributionStatusId);
-      }
+      CRM_Contribute_BAO_Contribution::addPayments(array($contribution), $contributionStatusId);
 
       // email sending
       if (!empty($result) && !empty($submittedValues['is_email_receipt'])) {

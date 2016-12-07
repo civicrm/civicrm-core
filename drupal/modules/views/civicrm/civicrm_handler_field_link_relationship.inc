@@ -117,7 +117,7 @@ class civicrm_handler_field_link_relationship extends views_handler_field {
 
         // LINKING TO RELATIONSHIP EDIT PAGE
       case 'edit_A_B':
-        if (user_access('edit relationships') && $link_text !== NULL && $link_text !== '') {
+        if (user_access('edit all contacts') && $link_text !== NULL && $link_text !== '') {
           return civicrm_views_href($link_text,
             'civicrm/contact/view/rel',
             "reset=1&action=update&id={$values->id}&cid={$values->civicrm_relationship_contact_id_a}&rtype=a_b"
@@ -134,7 +134,7 @@ class civicrm_handler_field_link_relationship extends views_handler_field {
 
         // LINKING TO RELATIONSHIP EDIT PAGE
       case 'edit_B_A':
-        if (user_access('edit relationships') && $link_text !== NULL && $link_text !== '') {
+        if (user_access('edit all contacts') && $link_text !== NULL && $link_text !== '') {
           return civicrm_views_href($link_text,
             'civicrm/contact/view/rel',
             "reset=1&action=update&id={$values->id}&cid={$values->civicrm_relationship_contact_id_b}&rtype=b_a"
@@ -143,7 +143,7 @@ class civicrm_handler_field_link_relationship extends views_handler_field {
 
         // LINKING TO RELATIONSHIP DELETE PAGE
       case 'delete':
-        if (user_access('edit relationships') && $link_text !== NULL && $link_text !== '') {
+        if (user_access('edit all contacts') && $link_text !== NULL && $link_text !== '') {
           return civicrm_views_href($link_text,
             'civicrm/contact/view/rel',
             "reset=1&action=delete&id={$values->id}&cid={$values->civicrm_relationship_contact_id_a}&rtype=a_b"

@@ -118,6 +118,7 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
 
     //CRM-14190
     CRM_Group_Form_Edit::buildParentGroups($this);
+    CRM_Group_Form_Edit::buildGroupOrganizations($this);
 
     // get the group id for the saved search
     $groupID = NULL;
@@ -156,9 +157,13 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
 
       if (!$this->_id) {
         //save record in mapping table
-        $mappingParams = array('mapping_type' => 'Search Builder');
-        $temp = array();
-        $mapping = CRM_Core_BAO_Mapping::add($mappingParams, $temp);
+        $mappingParams = array(
+          'mapping_type_id' => CRM_Core_OptionGroup::getValue('mapping_type',
+            'Search Builder',
+            'name'
+          ),
+        );
+        $mapping = CRM_Core_BAO_Mapping::add($mappingParams);
         $mappingId = $mapping->id;
       }
       else {
@@ -178,10 +183,7 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
     $savedSearch = new CRM_Contact_BAO_SavedSearch();
     $savedSearch->id = $this->_id;
     $queryParams = $this->get('queryParams');
-    // CRM-18585 include selected operator in $savedSearch->form_values
-    if (!empty($formValues['operator'])) {
-      $queryParams[] = array('operator', '=', $formValues['operator'], 0, 0);
-    }
+
     // Use the query parameters rather than the form values - these have already been assessed / converted
     // with the extra knowledge that the form has.
     // Note that we want to move towards a standardised way of saving the query that is not
@@ -190,6 +192,7 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
     // sql operator syntax at the query layer.
     if (!$isSearchBuilder) {
       CRM_Contact_BAO_SavedSearch::saveRelativeDates($queryParams, $formValues);
+      CRM_Contact_BAO_SavedSearch::saveSkippedElement($queryParams, $formValues);
       $savedSearch->form_values = serialize($queryParams);
     }
     else {
@@ -229,7 +232,21 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
       $params['id'] = CRM_Contact_BAO_SavedSearch::getName($this->_id, 'id');
     }
 
-    CRM_Contact_BAO_Group::create($params);
+    $group = CRM_Contact_BAO_Group::create($params);
+
+    // Update mapping with the name and description of the group.
+    if ($mappingId && $group) {
+      $mappingParams = array(
+        'id' => $mappingId,
+        'name' => CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $group->id, 'name', 'id'),
+        'description' => CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $group->id, 'description', 'id'),
+        'mapping_type_id' => CRM_Core_OptionGroup::getValue('mapping_type',
+          'Search Builder',
+          'name'
+        ),
+      );
+      CRM_Core_BAO_Mapping::add($mappingParams);
+    }
 
     // CRM-9464
     $this->_id = $savedSearch->id;
@@ -238,6 +255,19 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
     if (!empty($formValues['parents'])) {
       CRM_Contact_BAO_GroupNestingCache::update();
     }
+  }
+
+  /**
+   * Set form defaults.
+   *
+   * return array
+   */
+  public function setDefaultValues() {
+    $defaults = array();
+    if (empty($defaults['parents'])) {
+      $defaults['parents'] = CRM_Core_BAO_Domain::getGroupId();
+    }
+    return $defaults;
   }
 
 }

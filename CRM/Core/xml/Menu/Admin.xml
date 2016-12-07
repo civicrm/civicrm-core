@@ -117,7 +117,7 @@
   <item>
      <path>civicrm/admin/options/gender</path>
      <title>Gender Options</title>
-     <desc>Options for assigning gender to individual contacts (e.g. Male, Female, Transgender).</desc>
+     <desc>Options for assigning gender to individual contacts (e.g. Male, Female, Other).</desc>
      <page_callback>CRM_Admin_Page_Options</page_callback>
      <adminGroup>Customize Data and Screens</adminGroup>
      <icon>admin/small/01.png</icon>

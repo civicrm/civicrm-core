@@ -365,9 +365,7 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
     CRM_Utils_Hook::links('view.contact.activity',
       'Contact',
       $cid,
-      $hookLinks,
-      CRM_Core_DAO::$_nullObject,
-      CRM_Core_DAO::$_nullObject
+      $hookLinks
     );
     if (is_array($hookLinks)) {
       $obj->assign('hookLinks', $hookLinks);

@@ -196,7 +196,7 @@ function civicrm_api3_payment_create(&$params) {
       }
       elseif (!empty($trxn)) {
         // Assign the lineitems proportionally
-        CRM_Contribute_BAO_Contribution::assignProportionalLineItems($params, $trxn, $contribution);
+        CRM_Contribute_BAO_Contribution::assignProportionalLineItems($params, $trxn->id, $contribution['total_amount']);
       }
     }
   }

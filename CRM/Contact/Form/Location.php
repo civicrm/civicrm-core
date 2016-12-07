@@ -38,8 +38,8 @@ class CRM_Contact_Form_Location {
    * @param CRM_Core_Form $form
    */
   public static function preProcess(&$form) {
-    $form->_addBlockName = CRM_Utils_Request::retrieve('block', 'String', CRM_Core_DAO::$_nullObject);
-    $additionalblockCount = CRM_Utils_Request::retrieve('count', 'Positive', CRM_Core_DAO::$_nullObject);
+    $form->_addBlockName = CRM_Utils_Request::retrieve('block', 'String');
+    $additionalblockCount = CRM_Utils_Request::retrieve('count', 'Positive');
 
     $form->assign('addBlock', FALSE);
     if ($form->_addBlockName && $additionalblockCount) {

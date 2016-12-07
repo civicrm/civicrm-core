@@ -317,7 +317,7 @@ abstract class CRM_Utils_Hook {
    *   based on op. pre-hooks return a boolean or
    *                           an error message which aborts the operation
    */
-  public static function post($op, $objectName, $objectId, &$objectRef) {
+  public static function post($op, $objectName, $objectId, &$objectRef = NULL) {
     $event = new \Civi\Core\Event\PostEvent($op, $objectName, $objectId, $objectRef);
     \Civi::service('dispatcher')->dispatch("hook_civicrm_post", $event);
     \Civi::service('dispatcher')->dispatch("hook_civicrm_post::$objectName", $event);

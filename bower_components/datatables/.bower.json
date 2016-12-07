@@ -29,12 +29,12 @@
     "package.json"
   ],
   "homepage": "https://github.com/DataTables/DataTables",
-  "version": "1.10.12",
-  "_release": "1.10.12",
+  "version": "1.10.13",
+  "_release": "1.10.13",
   "_resolution": {
     "type": "version",
-    "tag": "1.10.12",
-    "commit": "b31abf704462a45f6ba7db439862d23c8cedc1f4"
+    "tag": "1.10.13",
+    "commit": "63f8617834c63628bd8639699976abc34b1d7190"
   },
   "_source": "https://github.com/DataTables/DataTables.git",
   "_target": "~1.10",

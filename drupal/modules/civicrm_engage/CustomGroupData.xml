@@ -92,20 +92,6 @@
       <collapse_adv_display>0</collapse_adv_display>
     </CustomGroup>
     <CustomGroup>
-      <name>Event_Details</name>
-      <title>Event Details</title>
-      <extends>Event</extends>
-      <style>Inline</style>
-      <collapse_display>1</collapse_display>
-      <help_pre></help_pre>
-      <help_post></help_post>
-      <weight>14</weight>
-      <is_active>1</is_active>
-      <table_name>civicrm_value_event_details</table_name>
-      <is_multiple>0</is_multiple>
-      <collapse_adv_display>0</collapse_adv_display>
-    </CustomGroup>
-    <CustomGroup>
       <name>Communication_Details</name>
       <title>Communication Details</title>
       <extends>Contact</extends>
@@ -728,25 +714,6 @@
       <column_name>reminder_response</column_name>
       <option_group_name>invitation_response_options</option_group_name>
       <custom_group_name>Participant_Info</custom_group_name>
-    </CustomField>
-    <CustomField>
-      <label>Event Contact Person</label>
-      <name>event_contact_person</name>
-      <data_type>ContactReference</data_type>
-      <html_type>Autocomplete-Select</html_type>
-      <filter>action=lookup&amp;group=2</filter>
-      <is_required>0</is_required>
-      <is_searchable>1</is_searchable>
-      <is_search_range>0</is_search_range>
-      <weight>8</weight>
-      <is_active>1</is_active>
-      <is_view>0</is_view>
-      <text_length>255</text_length>
-      <date_format>M:;:;:;d:;:;:;Y</date_format>
-      <note_columns>60</note_columns>
-      <note_rows>4</note_rows>
-      <column_name>event_contact_person</column_name>
-      <custom_group_name>Event_Details</custom_group_name>
     </CustomField>
     <CustomField>
       <label>Best time to Contact</label>

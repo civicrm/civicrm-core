@@ -374,7 +374,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
         $this->assign('paramSubType', $paramSubType);
       }
 
-      if (CRM_Utils_Request::retrieve('type', 'String', CRM_Core_DAO::$_nullObject)) {
+      if (CRM_Utils_Request::retrieve('type', 'String')) {
         CRM_Contact_Form_Edit_CustomData::preProcess($this);
       }
       else {
@@ -1164,14 +1164,14 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
         for ($i = 0; $i < count($contactLinks['rows']); $i++) {
           $row .= '  <tr>   ';
           $row .= '    <td class="matching-contacts-name"> ';
-          $row .= $contactLinks['rows'][$i]['display_name'];
+          $row .= CRM_Utils_Array::value('display_name', $contactLinks['rows'][$i]);
           $row .= '    </td>';
           $row .= '    <td class="matching-contacts-email"> ';
-          $row .= $contactLinks['rows'][$i]['primary_email'];
+          $row .= CRM_Utils_Array::value('primary_email', $contactLinks['rows'][$i]);
           $row .= '    </td>';
           $row .= '    <td class="action-items"> ';
-          $row .= $contactLinks['rows'][$i]['view'];
-          $row .= $contactLinks['rows'][$i]['edit'];
+          $row .= CRM_Utils_Array::value('view', $contactLinks['rows'][$i]);
+          $row .= CRM_Utils_Array::value('edit', $contactLinks['rows'][$i]);
           $row .= CRM_Utils_Array::value('merge', $contactLinks['rows'][$i]);
           $row .= '    </td>';
           $row .= '  </tr>   ';

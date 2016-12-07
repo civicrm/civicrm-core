@@ -112,7 +112,7 @@ function civicrm_conf_init() {
 
 $settingsFile = civicrm_conf_init( ) . '/civicrm.settings.php';
 define('CIVICRM_SETTINGS_PATH', $settingsFile);
-$error = @include_once( $settingsFile );
+$error = include_once( $settingsFile );
 if ( $error == false ) {
     echo "Could not load the settings file at: {$settingsFile}\n";
     exit( );

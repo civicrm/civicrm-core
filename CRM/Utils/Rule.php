@@ -715,7 +715,7 @@ class CRM_Utils_Rule {
    * @return bool
    */
   public static function optionExists($value, $options) {
-    return CRM_Core_OptionValue::optionExists($value, $options[0], $options[1], $options[2], CRM_Utils_Array::value(3, $options, 'name'));
+    return CRM_Core_OptionValue::optionExists($value, $options[0], $options[1], $options[2], CRM_Utils_Array::value(3, $options, 'name'), CRM_Utils_Array::value(4, $options, FALSE));
   }
 
   /**

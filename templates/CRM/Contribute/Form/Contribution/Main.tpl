@@ -349,7 +349,8 @@
   function toggleRecur( ) {
     var isRecur = cj('input[id="is_recur"]:checked');
     var allowAutoRenew = {/literal}'{$allowAutoRenewMembership}'{literal};
-    if ( allowAutoRenew && cj("#auto_renew") ) {
+    var quickConfig = {/literal}{$quickConfig}{literal};
+    if ( allowAutoRenew && cj("#auto_renew") && quickConfig) {
       showHideAutoRenew( null );
     }
     if (isRecur.val() > 0) {

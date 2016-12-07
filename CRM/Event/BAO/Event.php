@@ -99,6 +99,7 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
     if (!empty($params['financial_type_id'])) {
       CRM_Financial_BAO_FinancialAccount::validateFinancialType($params['financial_type_id']);
     }
+
     $event = new CRM_Event_DAO_Event();
 
     $event->copyValues($params);
@@ -992,28 +993,10 @@ WHERE civicrm_event.is_active = 1
     );
 
     if (!$afterCreate) {
-      //copy custom data
-      $extends = array('event');
-      $groupTree = CRM_Core_BAO_CustomGroup::getGroupDetail(NULL, NULL, $extends);
-      if ($groupTree) {
-        foreach ($groupTree as $groupID => $group) {
-          $table[$groupTree[$groupID]['table_name']] = array('entity_id');
-          foreach ($group['fields'] as $fieldID => $field) {
-            $table[$groupTree[$groupID]['table_name']][] = $groupTree[$groupID]['fields'][$fieldID]['column_name'];
-          }
-        }
-
-        foreach ($table as $tableName => $tableColumns) {
-          $insert = 'INSERT INTO ' . $tableName . ' (' . implode(', ', $tableColumns) . ') ';
-          $tableColumns[0] = $copyEvent->id;
-          $select = 'SELECT ' . implode(', ', $tableColumns);
-          $from = ' FROM ' . $tableName;
-          $where = " WHERE {$tableName}.entity_id = {$id}";
-          $query = $insert . $select . $from . $where;
-          $dao = CRM_Core_DAO::executeQuery($query);
-        }
-      }
+      // CRM-19302
+      self::copyCustomFields($id, $copyEvent->id);
     }
+
     $copyEvent->save();
 
     CRM_Utils_System::flushCache();
@@ -1021,6 +1004,57 @@ WHERE civicrm_event.is_active = 1
       CRM_Utils_Hook::copy('Event', $copyEvent);
     }
     return $copyEvent;
+  }
+
+  /**
+   * Method that copies custom fields values from an old event to a new one. Fixes bug CRM-19302,
+   * where if a custom field of File type was present, left both events using the same file,
+   * breaking download URL's for the old event.
+   *
+   * @param int $oldEventID
+   * @param int $newCopyID
+   */
+  public static function copyCustomFields($oldEventID, $newCopyID) {
+    // Obtain custom values for old event
+    $customParams = $htmlType = array();
+    $customValues = CRM_Core_BAO_CustomValueTable::getEntityValues($oldEventID, 'Event');
+
+    // If custom values present, we copy them
+    if (!empty($customValues)) {
+      // Get Field ID's and identify File type attributes, to handle file copying.
+      $fieldIds = implode(', ', array_keys($customValues));
+      $sql = "SELECT id FROM civicrm_custom_field WHERE html_type = 'File' AND id IN ( {$fieldIds} )";
+      $result = CRM_Core_DAO::executeQuery($sql);
+
+      // Build array of File type fields
+      while ($result->fetch()) {
+        $htmlType[] = $result->id;
+      }
+
+      // Build params array of custom values
+      foreach ($customValues as $field => $value) {
+        if ($value !== NULL) {
+          // Handle File type attributes
+          if (in_array($field, $htmlType)) {
+            $fileValues = CRM_Core_BAO_File::path($value, $oldEventID);
+            $customParams["custom_{$field}_-1"] = array(
+              'name' => $fileValues[0],
+              'type' => $fileValues[1],
+            );
+          }
+          // Handle other types
+          else {
+            $customParams["custom_{$field}_-1"] = $value;
+          }
+        }
+      }
+
+      // Save Custom Fields for new Event
+      CRM_Core_BAO_CustomValueTable::postProcess($customParams, 'civicrm_event', $newCopyID, 'Event');
+    }
+
+    // copy activity attachments ( if any )
+    CRM_Core_BAO_File::copyEntityFile('civicrm_event', $oldEventID, 'civicrm_event', $newCopyID);
   }
 
   /**

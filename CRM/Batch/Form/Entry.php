@@ -551,7 +551,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         }
         $value['line_item'] = $lineItem;
         //finally call contribution create for all the magic
-        $contribution = CRM_Contribute_BAO_Contribution::create($value, CRM_Core_DAO::$_nullArray);
+        $contribution = CRM_Contribute_BAO_Contribution::create($value);
         $batchTypes = CRM_Core_Pseudoconstant::get('CRM_Batch_DAO_Batch', 'type_id', array('flip' => 1), 'validate');
         if (!empty($this->_batchInfo['type_id']) && ($this->_batchInfo['type_id'] == $batchTypes['Pledge Payment'])) {
           $adjustTotalAmount = FALSE;
@@ -827,7 +827,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
             }
           }
           $membershipSource = CRM_Utils_Array::value('source', $value);
-          list($membership) = CRM_Member_BAO_Membership::renewMembership(
+          list($membership) = CRM_Member_BAO_Membership::processMembership(
             $value['contact_id'], $value['membership_type_id'], FALSE,
             //$numTerms should be default to 1.
             NULL, NULL, $value['custom'], 1, NULL, FALSE,

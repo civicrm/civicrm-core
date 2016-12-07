@@ -86,9 +86,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
       $this->_mode = 'auto_renew';
     }
 
-    if ((!$this->_crid && !$this->_coid && !$this->_mid) ||
-      ($this->_subscriptionDetails == CRM_Core_DAO::$_nullObject)
-    ) {
+    if ((!$this->_crid && !$this->_coid && !$this->_mid) || (!$this->_subscriptionDetails)) {
       CRM_Core_Error::fatal('Required information missing.');
     }
     if (!CRM_Core_Permission::check('edit contributions')) {

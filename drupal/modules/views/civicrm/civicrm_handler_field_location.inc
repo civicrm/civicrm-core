@@ -32,6 +32,7 @@ class civicrm_handler_field_location extends civicrm_handler_field {
   static $_locationTypes;
   static $_locationOps;
   static $location_op;
+
   function construct() {
     parent::construct();
     if (!self::$_locationTypes) {
@@ -109,19 +110,8 @@ class civicrm_handler_field_location extends civicrm_handler_field {
         vpr_trace();
         exit;
       }
-      if ($this->options['location_type'] > 0 ||
-        (isset($this->options['is_primary']) && $this->options['is_primary'])
-      ) {
-        $join        = $this->get_join();
-        $extra       = $this->location_extras();
-        $join->extra = $extra;
-        // Decide between And/Or
-        $join->extra_type = self::$_locationOps[$this->options['location_op']];
-        $this->table_alias = $this->query->add_table($this->table, $this->relationship, $join);
-      }
-      else {
-        $this->table_alias = $this->query->ensure_table($this->table, $this->relationship);
-      }
+      $join = $this->get_join();
+      $this->table_alias = $this->query->ensure_table($this->table, $this->relationship, $join);
     }
     return $this->table_alias;
   }
@@ -146,8 +136,23 @@ class civicrm_handler_field_location extends civicrm_handler_field {
     }
     return $extra;
   }
+
+  function join_location($join = array()) {
+    $extra = array();
+    if (isset($join->extra)) {
+      $extra = $join->extra;
+    }
+    $extra = array_merge($extra, $this->location_extras());
+    if (!empty($extra)) {
+      $join->extra = $extra;
+      $join->extra_type = self::$_locationOps[$this->options['location_op']];
+    }
+    return $join;
+  }
+
+  function get_join() {
+    $join = parent::get_join();
+    $join = $this->join_location($join);
+    return $join;
+  }
 }
-
-
-
-

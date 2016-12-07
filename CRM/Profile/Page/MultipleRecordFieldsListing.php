@@ -29,7 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2016
- * $Id$
  *
  */
 class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
@@ -137,7 +136,6 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
    * of action and executes that action. Finally it calls the parent's run
    * method.
    *
-   * @return void
    */
   public function run() {
     // get the requested action, default to 'browse'
@@ -166,7 +164,6 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
   /**
    * Browse the listing.
    *
-   * @return void
    */
   public function browse() {
     $dateFields = NULL;
@@ -288,7 +285,7 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
         $customGroupInfo = CRM_Core_BAO_CustomGroup::getGroupTitles($fieldInput);
         $this->_customGroupTitle = $customGroupInfo[$fieldIdInput]['groupTitle'];
       }
-      // $cgcount is defined before 'if' condition as enitiy may have no record
+      // $cgcount is defined before 'if' condition as entity may have no record
       // and $cgcount is used to build new record url
       $cgcount = 1;
       if ($result && !empty($result)) {

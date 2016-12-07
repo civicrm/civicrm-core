@@ -39,15 +39,15 @@ class civicrm_handler_field_relationship_type extends views_handler_field {
         return;
       }
       require_once 'CRM/Core/PseudoConstant.php';
-      $relationshipType_array = CRM_Core_PseudoConstant::relationshipType('name');
+      $relationshipType_array = CRM_Core_PseudoConstant::relationshipType('label');
 
       // relationshipType() returns information about relations as array with fields
       // 'name_a_b', 'name_b_a', 'contact_type_a' and 'contact_type_b'.
-      // We keep just 'name_a_b' for simplicity.
+      // We keep just 'label_a_b' for simplicity.
 
       $options = array();
       foreach ($relationshipType_array as $id => $value_array) {
-        $options[$id] = $value_array['name_a_b'];
+        $options[$id] = $value_array['label_a_b'];
       }
 
       self::$_relationshipType = $options;

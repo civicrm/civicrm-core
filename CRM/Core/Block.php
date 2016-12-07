@@ -421,9 +421,7 @@ class CRM_Core_Block {
     CRM_Utils_Hook::links('create.new.shorcuts',
       NULL,
       CRM_Core_DAO::$_nullObject,
-      $values,
-      CRM_Core_DAO::$_nullObject,
-      CRM_Core_DAO::$_nullObject
+      $values
     );
 
     foreach ($values as $key => $val) {

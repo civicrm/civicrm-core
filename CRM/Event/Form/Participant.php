@@ -841,9 +841,15 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       }
     }
     // For single additions - show validation error if the contact has already been registered
-    // for this event with the same role.
+    // for this event.
     if ($self->_single && ($self->_action & CRM_Core_Action::ADD)) {
-      $contactId = $self->_contactId;
+      if ($self->_context == 'standalone') {
+        $contactId = CRM_Utils_Array::value('contact_id', $values);
+      }
+      else {
+        $contactId = $self->_contactId;
+      }
+
       $eventId = CRM_Utils_Array::value('event_id', $values);
       if (!empty($contactId) && !empty($eventId)) {
         $dupeCheck = new CRM_Event_BAO_Participant();
@@ -1451,7 +1457,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
               $lineItem[$this->_priceSetId][$lineKey] = $line;
             }
             CRM_Price_BAO_LineItem::processPriceSet($participants[$num]->id, $lineItem, CRM_Utils_Array::value($num, $contributions, NULL), 'civicrm_participant');
-            CRM_Contribute_BAO_Contribution::addPayments($value, $contributions);
+            CRM_Contribute_BAO_Contribution::addPayments($contributions);
           }
         }
       }

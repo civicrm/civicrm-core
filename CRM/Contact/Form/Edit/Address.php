@@ -240,7 +240,7 @@ class CRM_Contact_Form_Edit_Address {
    * @return array|bool
    *   if no errors
    */
-  public static function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files = array(), $self = NULL) {
     $errors = array();
 
     $customDataRequiredFields = array();

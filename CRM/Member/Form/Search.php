@@ -296,26 +296,20 @@ class CRM_Member_Form_Search extends CRM_Core_Form_Search {
       return;
     }
 
-    $status = CRM_Utils_Request::retrieve('status', 'String',
-      CRM_Core_DAO::$_nullObject
-    );
+    $status = CRM_Utils_Request::retrieve('status', 'String');
     if ($status) {
       $status = explode(',', $status);
       $this->_formValues['membership_status_id'] = $this->_defaults['membership_status_id'] = (array) $status;
     }
 
-    $membershipType = CRM_Utils_Request::retrieve('type', 'String',
-      CRM_Core_DAO::$_nullObject
-    );
+    $membershipType = CRM_Utils_Request::retrieve('type', 'String');
 
     if ($membershipType) {
       $this->_formValues['membership_type_id'] = array($membershipType);
       $this->_defaults['membership_type_id'] = array($membershipType);
     }
 
-    $cid = CRM_Utils_Request::retrieve('cid', 'Positive',
-      CRM_Core_DAO::$_nullObject
-    );
+    $cid = CRM_Utils_Request::retrieve('cid', 'Positive');
 
     if ($cid) {
       $cid = CRM_Utils_Type::escape($cid, 'Integer');
@@ -330,32 +324,24 @@ class CRM_Member_Form_Search extends CRM_Core_Form_Search {
       }
     }
 
-    $fromDate = CRM_Utils_Request::retrieve('start', 'Date',
-      CRM_Core_DAO::$_nullObject
-    );
+    $fromDate = CRM_Utils_Request::retrieve('start', 'Date');
     if ($fromDate) {
       list($date) = CRM_Utils_Date::setDateDefaults($fromDate);
       $this->_formValues['member_start_date_low'] = $this->_defaults['member_start_date_low'] = $date;
     }
 
-    $toDate = CRM_Utils_Request::retrieve('end', 'Date',
-      CRM_Core_DAO::$_nullObject
-    );
+    $toDate = CRM_Utils_Request::retrieve('end', 'Date');
     if ($toDate) {
       list($date) = CRM_Utils_Date::setDateDefaults($toDate);
       $this->_formValues['member_start_date_high'] = $this->_defaults['member_start_date_high'] = $date;
     }
-    $joinDate = CRM_Utils_Request::retrieve('join', 'Date',
-      CRM_Core_DAO::$_nullObject
-    );
+    $joinDate = CRM_Utils_Request::retrieve('join', 'Date');
     if ($joinDate) {
       list($date) = CRM_Utils_Date::setDateDefaults($joinDate);
       $this->_formValues['member_join_date_low'] = $this->_defaults['member_join_date_low'] = $date;
     }
 
-    $joinEndDate = CRM_Utils_Request::retrieve('joinEnd', 'Date',
-      CRM_Core_DAO::$_nullObject
-    );
+    $joinEndDate = CRM_Utils_Request::retrieve('joinEnd', 'Date');
     if ($joinEndDate) {
       list($date) = CRM_Utils_Date::setDateDefaults($joinEndDate);
       $this->_formValues['member_join_date_high'] = $this->_defaults['member_join_date_high'] = $date;
@@ -366,7 +352,7 @@ class CRM_Member_Form_Search extends CRM_Core_Form_Search {
     );
 
     //LCD also allow restrictions to membership owner via GET
-    $owner = CRM_Utils_Request::retrieve('owner', 'String', CRM_Core_DAO::$_nullObject);
+    $owner = CRM_Utils_Request::retrieve('owner', 'String');
     if ($owner) {
       $this->_formValues['member_is_primary'] = $this->_defaults['member_is_primary'] = 2;
     }

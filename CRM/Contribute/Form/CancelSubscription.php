@@ -100,7 +100,7 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Core_Form {
 
     if (
       (!$this->_crid && !$this->_coid && !$this->_mid) ||
-      ($this->_subscriptionDetails == CRM_Core_DAO::$_nullObject)
+      (!$this->_subscriptionDetails)
     ) {
       CRM_Core_Error::fatal('Required information missing.');
     }
@@ -224,7 +224,7 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Core_Form {
         );
       $cancelStatus = CRM_Contribute_BAO_ContributionRecur::cancelRecurContribution(
         $this->_subscriptionDetails->recur_id,
-        CRM_Core_DAO::$_nullObject,
+        NULL,
         $activityParams
       );
 

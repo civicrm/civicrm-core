@@ -136,16 +136,13 @@ function civicrm_api3_membership_create($params) {
     $ids['userId'] = $params['contact_id'];
   }
   //for edit membership id should be present
+  // probably not required now.
   if (!empty($params['id'])) {
     $ids['membership'] = $params['id'];
     $action = CRM_Core_Action::UPDATE;
   }
   //need to pass action to handle related memberships.
   $params['action'] = $action;
-
-  if (empty($params['line_item']) && !empty($params['membership_type_id']) && empty($params['skipLineItem'])) {
-    CRM_Price_BAO_LineItem::getLineItemArray($params, NULL, 'membership', $params['membership_type_id']);
-  }
 
   $membershipBAO = CRM_Member_BAO_Membership::create($params, $ids, TRUE);
 

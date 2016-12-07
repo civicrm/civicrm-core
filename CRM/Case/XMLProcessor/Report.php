@@ -813,11 +813,11 @@ LIMIT  1
   }
 
   public static function printCaseReport() {
-    $caseID = CRM_Utils_Request::retrieve('caseID', 'Positive', CRM_Core_DAO::$_nullObject);
-    $clientID = CRM_Utils_Request::retrieve('cid', 'Positive', CRM_Core_DAO::$_nullObject);
-    $activitySetName = CRM_Utils_Request::retrieve('asn', 'String', CRM_Core_DAO::$_nullObject);
-    $isRedact = CRM_Utils_Request::retrieve('redact', 'Boolean', CRM_Core_DAO::$_nullObject);
-    $includeActivities = CRM_Utils_Request::retrieve('all', 'Positive', CRM_Core_DAO::$_nullObject);
+    $caseID = CRM_Utils_Request::retrieve('caseID', 'Positive');
+    $clientID = CRM_Utils_Request::retrieve('cid', 'Positive');
+    $activitySetName = CRM_Utils_Request::retrieve('asn', 'String');
+    $isRedact = CRM_Utils_Request::retrieve('redact', 'Boolean');
+    $includeActivities = CRM_Utils_Request::retrieve('all', 'Positive');
     $params = $otherRelationships = $globalGroupInfo = array();
     $report = new CRM_Case_XMLProcessor_Report($isRedact);
     if ($includeActivities) {

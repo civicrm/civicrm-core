@@ -382,8 +382,8 @@ function civicrm_api3_contribution_transact($params) {
  * @throws Exception
  */
 function civicrm_api3_contribution_sendconfirmation($params) {
-  $input = $ids = $values = array();
-  $passThroughParams = array(
+  $ids = $values = array();
+  $allowedParams = array(
     'receipt_from_email',
     'receipt_from_name',
     'receipt_update',
@@ -392,11 +392,7 @@ function civicrm_api3_contribution_sendconfirmation($params) {
     'receipt_text',
     'payment_processor_id',
   );
-  foreach ($passThroughParams as $key) {
-    if (isset($params[$key])) {
-      $input[$key] = $params[$key];
-    }
-  }
+  $input = array_intersect_key($params, array_flip($allowedParams));
   CRM_Contribute_BAO_Contribution::sendMail($input, $ids, $params['id'], $values);
 }
 

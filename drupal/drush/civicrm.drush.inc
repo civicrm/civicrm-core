@@ -576,7 +576,11 @@ function civicrm_drush_help($section) {
 function drush_civicrm_ext_list() {
   civicrm_initialize();
   try{
-    $result = civicrm_api('extension', 'get', array('version' => 3));
+    $result = civicrm_api3('extension', 'get', array(
+      'options' => array(
+        'limit' => 0,
+      ),
+    ));
     $rows = array(array(dt('App name'), dt('Status')));
     foreach ($result['values'] as $k => $extension_data) {
       $rows[] = array(
