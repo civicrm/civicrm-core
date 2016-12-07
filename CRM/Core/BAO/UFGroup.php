@@ -2208,6 +2208,9 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     elseif ($fieldName == 'activity_date_time') {
       $form->addDateTime($name, $title, $required, array('formatType' => 'activityDateTime'));
     }
+    elseif ($fieldName == 'priority_id') {
+      $form->add('select', $name, $title, CRM_Activity_BAO_Activity::buildOptions('priority_id'), $required, $selectAttributes);
+    }
     elseif ($fieldName == 'participant_status') {
       $cond = NULL;
       if ($online == TRUE) {
