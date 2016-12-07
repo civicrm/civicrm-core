@@ -5,7 +5,7 @@ starting with CiviCRM 4.7.14.
 
 ## CiviCRM 4.7.14
 
-Released December 2016
+Released December 7, 2016
 
 - **[Features](#4.7.14-features)**
 - **[Bugs resolved](#4.7.14-bugs)**
@@ -561,10 +561,20 @@ Released December 2016
 
 - **[CRM-19621](https://issues.civicrm.org/jira/browse/CRM-19621) Contribution
   "confirm" page does not display state/country
-  ([9399](https://github.com/civicrm/civicrm-core/pull/9399))**
+  ([9399](https://github.com/civicrm/civicrm-core/pull/9399) and
+  [9466](https://github.com/civicrm/civicrm-core/pull/9466))**
 
   Fixed a regression preventing state/province and country from displaying on a
   contribution page’s confirmation page.
+
+- **[CRM-19298](https://issues.civicrm.org/jira/browse/CRM-19298) Membership fee
+  amount doubled in receipt when 'separate membership payment' is configured
+  ([9474](https://github.com/civicrm/civicrm-core/pull/9474),
+  [9491](https://github.com/civicrm/civicrm-core/pull/9491), and
+  [9499](https://github.com/civicrm/civicrm-core/pull/9499)) [completes previous
+  work]**
+
+  Improvements to the membership receipts showing separate payments.
 
 - **[CRM-17807](https://issues.civicrm.org/jira/browse/CRM-17807) Unit test to
   check if invoice is created for paypal
@@ -595,6 +605,13 @@ Released December 2016
   ([9431](https://github.com/civicrm/civicrm-core/pull/9431))**
 
   Fix a regression that ignores PayPal IPN parameters in some cases
+
+- **[CRM-19692](https://issues.civicrm.org/jira/browse/CRM-19692) Cannot select
+  Priceset in Backend: Contributions: Submit Credit Card Contribution
+  ([9469](https://github.com/civicrm/civicrm-core/pull/9469))**
+
+  Fix a regression that prevents a price set from appearing when you select it
+  on the backend credit card contribution form.
 
 #### CiviEvent
 
@@ -638,14 +655,6 @@ Released December 2016
 
   Fixed problem where fulfilling a partially-paid event registration warned
   users that the payment was short
-
-- **[CRM-19626](https://issues.civicrm.org/jira/browse/CRM-19626) Event
-  Registration page allows registration even if no number (or the number 0) has
-  been entered in any ticket quantity boxes
-  ([9388](https://github.com/civicrm/civicrm-core/pull/9388))**
-
-  Make sure that an event registration requires at least one price field to be
-  filled even though none are required
 
 - **[CRM-19302](https://issues.civicrm.org/jira/browse/CRM-19302) Event copy -
   file type custom data not being copied properly
@@ -691,8 +700,9 @@ Released December 2016
 
 - **[CRM-19649](https://issues.civicrm.org/jira/browse/CRM-19649) ckeditor
   includes html/head/body tags
-  ([9419](https://github.com/civicrm/civicrm-core/pull/9419) and
-  [9427](https://github.com/civicrm/civicrm-core/pull/9427)])**
+  ([9419](https://github.com/civicrm/civicrm-core/pull/9419),
+  [9427](https://github.com/civicrm/civicrm-core/pull/9427)], and
+  [9496](https://github.com/civicrm/civicrm-core/pull/9496))**
 
   Allow for multiple presets for WYSIWYG editor settings and improve ckEditor
   defaults
@@ -740,8 +750,9 @@ Released December 2016
 - **[CRM-19594](https://issues.civicrm.org/jira/browse/CRM-19594) Wrong
   Membership Updated
   ([9390](https://github.com/civicrm/civicrm-core/pull/9390),
-  [9444](https://github.com/civicrm/civicrm-core/pull/9444), and
-  [9449](https://github.com/civicrm/civicrm-core/pull/9449))**
+  [9444](https://github.com/civicrm/civicrm-core/pull/9444),
+  [9449](https://github.com/civicrm/civicrm-core/pull/9449), and
+  [9464](https://github.com/civicrm/civicrm-core/pull/9464))**
 
   Prevent membership renewals from applying to memberships that have the same ID
   number as the renewal contribution
