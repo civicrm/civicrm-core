@@ -488,57 +488,6 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
     $mailing->find(TRUE);
     $mailing->free();
 
-    $eq = new CRM_Mailing_Event_BAO_Queue();
-    $eqTable = CRM_Mailing_Event_BAO_Queue::getTableName();
-    $emailTable = CRM_Core_BAO_Email::getTableName();
-    $phoneTable = CRM_Core_DAO_Phone::getTableName();
-    $contactTable = CRM_Contact_BAO_Contact::getTableName();
-    $edTable = CRM_Mailing_Event_BAO_Delivered::getTableName();
-    $ebTable = CRM_Mailing_Event_BAO_Bounce::getTableName();
-
-    $query = "  SELECT      $eqTable.id,
-                                $emailTable.email as email,
-                                $eqTable.contact_id,
-                                $eqTable.hash,
-                                NULL as phone
-                    FROM        $eqTable
-                    INNER JOIN  $emailTable
-                            ON  $eqTable.email_id = $emailTable.id
-                    INNER JOIN  $contactTable
-                            ON  $contactTable.id = $emailTable.contact_id
-                    LEFT JOIN   $edTable
-                            ON  $eqTable.id = $edTable.event_queue_id
-                    LEFT JOIN   $ebTable
-                            ON  $eqTable.id = $ebTable.event_queue_id
-                    WHERE       $eqTable.job_id = " . $this->id . "
-                        AND     $edTable.id IS null
-                        AND     $ebTable.id IS null
-                        AND    $contactTable.is_opt_out = 0";
-
-    if ($mailing->sms_provider_id) {
-      $query = "
-                    SELECT      $eqTable.id,
-                                $phoneTable.phone as phone,
-                                $eqTable.contact_id,
-                                $eqTable.hash,
-                                NULL as email
-                    FROM        $eqTable
-                    INNER JOIN  $phoneTable
-                            ON  $eqTable.phone_id = $phoneTable.id
-                    INNER JOIN  $contactTable
-                            ON  $contactTable.id = $phoneTable.contact_id
-                    LEFT JOIN   $edTable
-                            ON  $eqTable.id = $edTable.event_queue_id
-                    LEFT JOIN   $ebTable
-                            ON  $eqTable.id = $ebTable.event_queue_id
-                    WHERE       $eqTable.job_id = " . $this->id . "
-                        AND     $edTable.id IS null
-                        AND     $ebTable.id IS null
-                        AND    ( $contactTable.is_opt_out = 0
-                        OR       $contactTable.do_not_sms = 0 )";
-    }
-    $eq->query($query);
-
     $config = NULL;
 
     if ($config == NULL) {
@@ -567,6 +516,7 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
     $isDelivered = TRUE;
 
     // make sure that there's no more than $config->mailerBatchLimit mails processed in a run
+    $eq = self::findPendingTasks($this->id, $mailing->sms_provider_id ? 'sms' : 'email');
     while ($eq->fetch()) {
       // if ( ( $mailsProcessed % 100 ) == 0 ) {
       // CRM_Utils_System::xMemory( "$mailsProcessed: " );
@@ -1030,6 +980,67 @@ AND    record_type_id = $targetRecordID
     }
 
     return $result;
+  }
+
+  /**
+   * @param int $jobId
+   * @param string $medium
+   *   Ex: 'email' or 'sms'.
+   * @return \CRM_Mailing_Event_BAO_Queue
+   *   A query object whose rows provide ('id', 'contact_id', 'hash') and ('email' or 'phone').
+   */
+  public static function findPendingTasks($jobId, $medium) {
+    $eq = new CRM_Mailing_Event_BAO_Queue();
+    $queueTable = CRM_Mailing_Event_BAO_Queue::getTableName();
+    $emailTable = CRM_Core_BAO_Email::getTableName();
+    $phoneTable = CRM_Core_DAO_Phone::getTableName();
+    $contactTable = CRM_Contact_BAO_Contact::getTableName();
+    $deliveredTable = CRM_Mailing_Event_BAO_Delivered::getTableName();
+    $bounceTable = CRM_Mailing_Event_BAO_Bounce::getTableName();
+
+    $query = "  SELECT      $queueTable.id,
+                                $emailTable.email as email,
+                                $queueTable.contact_id,
+                                $queueTable.hash,
+                                NULL as phone
+                    FROM        $queueTable
+                    INNER JOIN  $emailTable
+                            ON  $queueTable.email_id = $emailTable.id
+                    INNER JOIN  $contactTable
+                            ON  $contactTable.id = $emailTable.contact_id
+                    LEFT JOIN   $deliveredTable
+                            ON  $queueTable.id = $deliveredTable.event_queue_id
+                    LEFT JOIN   $bounceTable
+                            ON  $queueTable.id = $bounceTable.event_queue_id
+                    WHERE       $queueTable.job_id = " . $jobId . "
+                        AND     $deliveredTable.id IS null
+                        AND     $bounceTable.id IS null
+                        AND    $contactTable.is_opt_out = 0";
+
+    if ($medium === 'sms') {
+      $query = "
+                    SELECT      $queueTable.id,
+                                $phoneTable.phone as phone,
+                                $queueTable.contact_id,
+                                $queueTable.hash,
+                                NULL as email
+                    FROM        $queueTable
+                    INNER JOIN  $phoneTable
+                            ON  $queueTable.phone_id = $phoneTable.id
+                    INNER JOIN  $contactTable
+                            ON  $contactTable.id = $phoneTable.contact_id
+                    LEFT JOIN   $deliveredTable
+                            ON  $queueTable.id = $deliveredTable.event_queue_id
+                    LEFT JOIN   $bounceTable
+                            ON  $queueTable.id = $bounceTable.event_queue_id
+                    WHERE       $queueTable.job_id = " . $jobId . "
+                        AND     $deliveredTable.id IS null
+                        AND     $bounceTable.id IS null
+                        AND    ( $contactTable.is_opt_out = 0
+                        OR       $contactTable.do_not_sms = 0 )";
+    }
+    $eq->query($query);
+    return $eq;
   }
 
 }
