@@ -170,6 +170,9 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
         TRUE
       );
     }
+    else {
+      $this->add('text', 'icon', ts('Icon'), array('class' => 'crm-icon-picker', 'title' => ts('Choose Icon'), 'allowClear' => TRUE));
+    }
 
     if (!in_array($this->_gName, array(
         'email_greeting',

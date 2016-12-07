@@ -139,7 +139,7 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
         $this->addOptionsEditLink($el, $element);
       }
 
-      if ($element->getType() == 'group' && $element->getAttribute('allowClear')) {
+      if ($element->getAttribute('allowClear')) {
         $this->appendUnselectButton($el, $element);
       }
     }
