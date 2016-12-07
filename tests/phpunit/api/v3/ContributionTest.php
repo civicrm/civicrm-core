@@ -2330,7 +2330,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'is_email_receipt' => 1,
     ));
     $mut->checkMailLog(array(
-      '<p>Please print this receipt for your records.</p>',
+      'Please print this receipt for your records.',
     ));
     $mut->stop();
   }
