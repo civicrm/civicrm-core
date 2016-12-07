@@ -4695,7 +4695,7 @@ LIMIT 1;";
       civicrm_api3('Contribution', 'sendconfirmation', array(
         'id' => $contribution->id,
         'payment_processor_id' => $paymentProcessorId,
-        'is_email_receipt' => (array_key_exists('is_email_receipt', $values) ? $values['is_email_receipt'] : 0),
+        'is_email_receipt' => CRM_Utils_Array::value('is_email_receipt', $values),
       ));
       CRM_Core_Error::debug_log_message("Receipt sent");
     }
