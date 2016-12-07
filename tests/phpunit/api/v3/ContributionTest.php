@@ -2306,6 +2306,36 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * CRM-19710 - Test to ensure that completetransaction respects the is_email_receipt setting, overriding default from contrib page
+   */
+  public function testCompleteTransactionWithEmailReceiptInputTrue() {
+    $mut = new CiviMailUtils($this, TRUE);
+    $this->createLoggedInUser();
+    // Create a Contribution Page with is_email_receipt = FALSE
+    $contributionPage = $this->callAPISuccess('ContributionPage', 'create', array(
+      'receipt_from_name' => 'Mickey Mouse',
+      'receipt_from_email' => 'mickey@mouse.com',
+      'title' => "Test Contribution Page",
+      'financial_type_id' => 1,
+      'currency' => 'CAD',
+      'is_monetary' => TRUE,
+      'is_email_receipt' => 0,
+    ));
+    $this->_params['contribution_page_id'] = $contributionPage['id'];
+    $params = array_merge($this->_params, array('contribution_status_id' => 2, 'receipt_date' => 'now'));
+    $contribution = $this->callAPISuccess('contribution', 'create', $params);
+    // Complete the transaction overriding is_email_receipt to = TRUE
+    $this->callAPISuccess('contribution', 'completetransaction', array(
+      'id' => $contribution['id'],
+      'is_email_receipt' => 1,
+    ));
+    $mut->checkMailLog(array(
+      '<p>Please print this receipt for your records.</p>',
+    ));
+    $mut->stop();
+  }
+
+  /**
    * Complete the transaction using the template with all the possible.
    */
   public function testCompleteTransactionWithTestTemplate() {
