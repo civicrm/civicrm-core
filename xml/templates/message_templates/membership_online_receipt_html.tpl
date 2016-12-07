@@ -91,8 +91,7 @@
          {$membership_amount|crmMoney}
         </td>
        </tr>
-       {if $amount}
-        {if ! $is_separate_payment }
+       {if $amount && !$is_separate_payment }
          <tr>
           <td {$labelStyle}>
            {ts}Contribution Amount{/ts}
@@ -109,8 +108,7 @@
             {$amount+$membership_amount|crmMoney}
            </td>
          </tr>
-        {/if}
-      {/if}
+       {/if}
 
       {elseif !$useForMember && $lineItem and $priceSetID and !$is_quick_config}
 
