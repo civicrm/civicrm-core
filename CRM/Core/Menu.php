@@ -625,10 +625,10 @@ class CRM_Core_Menu {
 
   /**
    * @param $path string
-   *  Path of menu item to retrieve.
+   *   Path of menu item to retrieve.
    *
    * @return array
-   *  Menu entry array.
+   *   Menu entry array.
    */
   public static function get($path) {
     // return null if menu rebuild
