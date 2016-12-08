@@ -1780,9 +1780,11 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
    *   array of memberships if created
    */
   public static function createRelatedMemberships(&$params, &$dao, $reset = FALSE) {
+    // CRM-4213 check for loops, using static variable to record contacts already processed.
     static $relatedContactIds = array();
     if ($reset) {
-      // not sure why a static var is in use here - we need a way to reset it from the test suite
+      // We need a way to reset this static variable from the test suite.
+      // @todo consider replacing with Civi::$statics but note reset now used elsewhere: CRM-17723.
       $relatedContactIds = array();
       return FALSE;
     }
@@ -1824,12 +1826,12 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
       );
     }
 
-    // check for loops. CRM-4213
-    // remove repeated related contacts, which already inherited membership.
-    $relatedContactIds[$membership->contact_id] = TRUE;
+    // CRM-4213, CRM-19735 check for loops, using static variable to record contacts already processed.
+    // Remove repeated related contacts, which already inherited membership of this type.
+    $relatedContactIds[$membership->contact_id][$membership->membership_type_id] = TRUE;
     foreach ($allRelatedContacts as $cid => $status) {
-      if (empty($relatedContactIds[$cid])) {
-        $relatedContactIds[$cid] = TRUE;
+      if (empty($relatedContactIds[$cid]) || empty($relatedContactIds[$cid][$membership->membership_type_id])) {
+        $relatedContactIds[$cid][$membership->membership_type_id] = TRUE;
 
         //don't create membership again for owner contact.
         $nestedRelationship = FALSE;
