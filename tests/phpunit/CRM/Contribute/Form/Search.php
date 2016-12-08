@@ -48,7 +48,7 @@ class CRM_Contribute_Form_Search extends CiviUnitTestCase {
   }
 
   /**
-   *  Test CRM_Contribute_Form_Search batch filters
+   *  CRM-19325: Test CRM_Contribute_Form_Search batch filters
    */
   public function testBatchFilter() {
     $this->quickCleanup($this->_tablesToTruncate);
@@ -98,7 +98,7 @@ class CRM_Contribute_Form_Search extends CiviUnitTestCase {
     );
 
     // create random contribution to check IS NULL filter more precisely
-    $randomContribution = civicrm_api3('Contribution', 'create', array(
+    $nonBatchContri = civicrm_api3('Contribution', 'create', array(
       'financial_type_id' => 1,
       'total_amount' => 123,
       'receive_date' => '07/24/2014',
@@ -108,29 +108,41 @@ class CRM_Contribute_Form_Search extends CiviUnitTestCase {
       'contribution_status_id' => 1,
       'contact_id' => $this->_individual,
     ));
+    $nonBatchContriID = $nonBatchContri['id'];
 
     // process batch entries
     $form = new CRM_Batch_Form_Entry();
     $form->setBatchID($batchID);
     $form->testProcessContribution($batchEntry);
 
+    // fetch created contributions
+    $entities = civicrm_api3('EntityBatch', 'get', array('batch_id' => $batchID));
+    $ids = array();
+    foreach ($entities['values'] as $value) {
+      $ids[] = $value['entity_id'];
+    }
+    list($batchContriID1, $batchContriID2) = $ids;
+
     $useCases = array(
       // Case 1: Search for ONLY those contributions which are created from batch
       array(
         'form_value' => array('contribution_batch_id' => 'IS NOT NULL'),
         'expected_count' => 2,
+        'expected_contribution' => array($batchContriID1, $batchContriID2),
         'expected_qill' => 'Batch Name Not Null',
       ),
       // Case 2: Search for ONLY those contributions which are NOT created from batch
       array(
         'form_value' => array('contribution_batch_id' => 'IS NULL'),
         'expected_count' => 1,
+        'expected_contribution' => array($nonBatchContriID),
         'expected_qill' => 'Batch Name Is Null',
       ),
       // Case 3: Search for ONLY those contributions which are created from batch ID - $batchID
       array(
         'form_value' => array('contribution_batch_id' => $batchID),
         'expected_count' => 2,
+        'expected_contribution' => array($batchContriID1, $batchContriID2),
         'expected_qill' => 'Batch Name = ' . $batchTitle,
       ),
     );
@@ -141,9 +153,14 @@ class CRM_Contribute_Form_Search extends CiviUnitTestCase {
       list($select, $from, $where, $having) = $query->query();
 
       // get and assert contribution count
-      $count = CRM_Core_DAO::singleValueQuery(sprintf('SELECT count(*) %s %s AND civicrm_contribution.id IS NOT NULL', $from, $where));
-      $this->assertEquals($case['expected_count'], $count);
-
+      $contributions = CRM_Core_DAO::executeQuery(sprintf('SELECT DISTINCT civicrm_contribution.id %s %s AND civicrm_contribution.id IS NOT NULL', $from, $where))->fetchAll();
+      foreach ($contributions as $key => $value) {
+        $contributions[$key] = $value['id'];
+      }
+      // assert the contribution count
+      $this->assertEquals($case['expected_count'], count($contributions));
+      // assert the contribution IDs
+      $this->checkArrayEquals($case['expected_contribution'], $contributions);
       // get and assert qill string
       $qill = trim(implode($query->getOperator(), CRM_Utils_Array::value(0, $query->qill())));
       $this->assertEquals($case['expected_qill'], $qill);
