@@ -551,6 +551,7 @@ class CRM_Core_SelectValues {
     return array(
       '{contribution.contribution_id}' => ts('Contribution ID'),
       '{contribution.total_amount}' => ts('Total Amount'),
+      '{contribution.financial_type}' => ts('Financial Type'),
       '{contribution.fee_amount}' => ts('Fee Amount'),
       '{contribution.net_amount}' => ts('Net Amount'),
       '{contribution.non_deductible_amount}' => ts('Non-deductible Amount'),
