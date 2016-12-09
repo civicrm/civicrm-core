@@ -372,6 +372,11 @@ if (!CRM.vars) CRM.vars = {};
     return settings;
   };
 
+  function formatCrmSelect2(row) {
+    var icon = $(row.element).data('icon');
+    return (icon ? '<i class="crm-i ' + icon + '"></i> ' : '') + _.escape(row.text);
+  }
+
   /**
    * Wrapper for select2 initialization function; supplies defaults
    * @param options object
@@ -388,7 +393,11 @@ if (!CRM.vars) CRM.vars = {};
       var
         $el = $(this),
         iconClass,
-        settings = {allowClear: !$el.hasClass('required')};
+        settings = {
+          allowClear: !$el.hasClass('required'),
+          formatResult: formatCrmSelect2,
+          formatSelection: formatCrmSelect2
+        };
       // quickform doesn't support optgroups so here's a hack :(
       $('option[value^=crm_optgroup]', this).each(function () {
         $(this).nextUntil('option[value^=crm_optgroup]').wrapAll('<optgroup label="' + $(this).text() + '" />');
