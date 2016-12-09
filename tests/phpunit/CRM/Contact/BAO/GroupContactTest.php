@@ -202,40 +202,23 @@ class CRM_Contact_BAO_GroupContactTest extends CiviUnitTestCase {
       array(
         'form_value' => array('group' => $regularGroup['id']),
         'expected_count' => 2,
-        'operator' => 'AND',
         'expected_contact' => array($contact2, $contact3),
       ),
       //Case 2: Find all contacts in smart group
       array(
         'form_value' => array('group' => $smartGroup['id']),
         'expected_count' => 2,
-        'operator' => 'AND',
         'expected_contact' => array($contact1, $contact2),
       ),
-      //Case 3: Find all contacts in regular group AND smart group
-      array(
-        'form_value' => array('group' => array('IN' => array($regularGroup['id'], $smartGroup['id']))),
-        'expected_count' => 1,
-        'operator' => 'AND',
-        'expected_contact' => array($contact2),
-      ),
-      //Case 4: Find all contacts in regular group OR smart group
+      //Case 3: Find all contacts in regular group and smart group
       array(
         'form_value' => array('group' => array('IN' => array($regularGroup['id'], $smartGroup['id']))),
         'expected_count' => 3,
-        'operator' => 'OR',
         'expected_contact' => array($contact1, $contact2, $contact3),
       ),
     );
     foreach ($useCases as $case) {
-      $query = new CRM_Contact_BAO_Query(
-        CRM_Contact_BAO_Query::convertFormValues($case['form_value']),
-        NULL, NULL,
-        FALSE, FALSE, 1,
-        FALSE, TRUE,
-        TRUE, NULL,
-        $case['operator']
-      );
+      $query = new CRM_Contact_BAO_Query(CRM_Contact_BAO_Query::convertFormValues($case['form_value']));
       list($select, $from, $where, $having) = $query->query();
       $groupContacts = CRM_Core_DAO::executeQuery("SELECT DISTINCT contact_a.id $from $where")->fetchAll();
       foreach ($groupContacts as $key => $value) {
