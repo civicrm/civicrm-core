@@ -5944,6 +5944,13 @@ AND   displayRelType.is_active = 1
   ) {
     $qillOperators = CRM_Core_SelectValues::getSearchBuilderOperators();
 
+    //API usually have fieldValue format as array(operator => array(values)),
+    //so we need to separate operator out of fieldValue param
+    if (is_array($fieldValue) && in_array(key($fieldValue), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
+      $op = key($fieldValue);
+      $fieldValue = $fieldValue[$op];
+    }
+
     // if Operator chosen is NULL/EMPTY then
     if (strpos($op, 'NULL') !== FALSE || strpos($op, 'EMPTY') !== FALSE) {
       return array(CRM_Utils_Array::value($op, $qillOperators, $op), '');
@@ -5970,15 +5977,11 @@ AND   displayRelType.is_active = 1
     elseif ($daoName == 'CRM_Contact_DAO_Group' && $fieldName == 'id') {
       $pseudoOptions = CRM_Core_PseudoConstant::group();
     }
+    elseif ($daoName == 'CRM_Batch_BAO_EntityBatch' && $fieldName == 'batch_id') {
+      $pseudoOptions = CRM_Contribute_PseudoConstant::batch();
+    }
     elseif ($daoName) {
       $pseudoOptions = CRM_Core_PseudoConstant::get($daoName, $fieldName, $pseudoExtraParam);
-    }
-
-    //API usually have fieldValue format as array(operator => array(values)),
-    //so we need to separate operator out of fieldValue param
-    if (is_array($fieldValue) && in_array(key($fieldValue), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
-      $op = key($fieldValue);
-      $fieldValue = $fieldValue[$op];
     }
 
     if (is_array($fieldValue)) {
@@ -6055,6 +6058,9 @@ AND   displayRelType.is_active = 1
    *   Array of fields whose name should be changed
    */
   public static function processSpecialFormValue(&$formValues, $specialFields, $changeNames = array()) {
+    // Array of special fields whose value are considered only for NULL or EMPTY operators
+    $nullableFields = array('contribution_batch_id');
+
     foreach ($specialFields as $element) {
       $value = CRM_Utils_Array::value($element, $formValues);
       if ($value) {
@@ -6065,7 +6071,10 @@ AND   displayRelType.is_active = 1
           }
           $formValues[$element] = array('IN' => $value);
         }
-        else {
+        elseif (in_array($value, array('IS NULL', 'IS NOT NULL', 'IS EMPTY', 'IS NOT EMPTY'))) {
+          $formValues[$element] = array($value => 1);
+        }
+        elseif (!in_array($element, $nullableFields)) {
           // if wildcard is already present return searchString as it is OR append and/or prepend with wildcard
           $isWilcard = strstr($value, '%') ? FALSE : CRM_Core_Config::singleton()->includeWildCardInName;
           $formValues[$element] = array('LIKE' => self::getWildCardedValue($isWilcard, 'LIKE', $value));
