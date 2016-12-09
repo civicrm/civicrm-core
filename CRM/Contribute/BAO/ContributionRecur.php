@@ -443,7 +443,7 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
   public static function getTemplateContribution($id) {
     $templateContribution = civicrm_api3('Contribution', 'get', array(
       'contribution_recur_id' => $id,
-      'options' => array('limit' => 1, 'sort' => array('id DESC')),
+      'options' => array('limit' => 1, 'sort' => 'id DESC'),
       'sequential' => 1,
       'contribution_test' => '',
     ));
