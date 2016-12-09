@@ -1359,4 +1359,26 @@ WHERE {$whereClause}";
     }
   }
 
+  /**
+   * Get child group ids
+   *
+   * @param array $ids
+   *    Parent Group IDs
+   *
+   * @return array
+   */
+  public static function getChildGroupIds($ids) {
+    $notFound = FALSE;
+    $childGroupIds = array();
+    foreach ($ids as $id) {
+      $childId = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $id, 'children');
+      while (!empty($childId)) {
+        $childGroupIds[] = $childId;
+        $childId = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $childId, 'children');
+      }
+    }
+
+    return $childGroupIds;
+  }
+
 }

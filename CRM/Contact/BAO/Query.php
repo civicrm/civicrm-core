@@ -2966,7 +2966,7 @@ class CRM_Contact_BAO_Query {
       }
 
       // include child groups IDs if any
-      $childGroupIds = self::getChildGroupIds($regularGroupIDs);
+      $childGroupIds = CRM_Contact_BAO_Group::getChildGroupIds($regularGroupIDs);
       $childClause = '';
       if (count($childGroupIds)) {
         $gcTable = ($op == '!=') ? 'cgc' : $gcTable;
@@ -2980,7 +2980,7 @@ class CRM_Contact_BAO_Query {
       $groupClause[] = " ( " . $this->addGroupContactCache($smartGroupIDs, NULL, "contact_a", $op) . " ) ";
     }
 
-    $and = ($op == 'IS NULL') ? 'AND' : $this->_operator;
+    $and = ($op == 'IS NULL') ? ' AND ' : ' OR ';
     $this->_where[$grouping][] = implode($and, $groupClause);
 
     list($qillop, $qillVal) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Contact_DAO_Group', 'id', $value, $op);
@@ -2988,28 +2988,6 @@ class CRM_Contact_BAO_Query {
     if (strpos($op, 'NULL') === FALSE) {
       $this->_qill[$grouping][] = ts("Group Status %1", array(1 => implode(' ' . ts('or') . ' ', $statii)));
     }
-  }
-
-  /**
-   * Get child group ids
-   *
-   * @param array $ids
-   *    Parent Group IDs
-   *
-   * @return array
-   */
-  public static function getChildGroupIds($ids) {
-    $notFound = FALSE;
-    $childGroupIds = array();
-    foreach ($ids as $id) {
-      $childId = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $id, 'children');
-      while (!empty($childId)) {
-        $childGroupIds[] = $childId;
-        $childId = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $childId, 'children');
-      }
-    }
-
-    return $childGroupIds;
   }
 
   /**
