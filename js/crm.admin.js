@@ -10,6 +10,12 @@
         });
         // Hack to get the strings in this lazy-loaded file translated
         ts('None');
+        ts('Normal');
+        ts('Rotate right');
+        ts('Rotate left');
+        ts('Rotate 180');
+        ts('Flip horizontal');
+        ts('Flip vertical');
       });
-    })
+    });
 })(CRM.$);
