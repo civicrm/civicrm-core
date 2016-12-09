@@ -25,25 +25,47 @@
       if ($(this).hasClass('iconpicker-widget')) {
         return;
       }
+
       var $input = $(this),
-        button = $('<a href="#" />').button({
-          label: $(this).val() || ts('None'),
-          icons: {primary: $(this).val()}
-        }).attr('title', $input.attr('title'));
-      $input.hide().addClass('iconpicker-widget').after(button).change(function() {
-        button.button('option', {
-          label: $(this).val() || ts('None'),
-          icons: {primary: $(this).val()}
+        $button = $('<a href="#" />').button().attr('title', $input.attr('title')),
+        $style = $('<select class="crm-form-select"></select>'),
+        options = [
+          {key: 'fa-rotate-90', value: ts('Rotate right')},
+          {key: 'fa-rotate-270', value: ts('Rotate left')},
+          {key: 'fa-rotate-180', value: ts('Rotate 180')},
+          {key: 'fa-flip-horizontal', value: ts('Flip horizontal')},
+          {key: 'fa-flip-vertical', value: ts('Flip vertical')}
+        ];
+
+      function formatButton() {
+        var split = $input.val().split(' ');
+        $button.button('option', {
+          label: split[0] || ts('None'),
+          icons: {primary: $input.val()}
         });
+        $style.toggle(!!split[0]).val(split[1] || '');
+      }
+
+      $input.hide().addClass('iconpicker-widget').after($style).after($button).change(formatButton);
+
+      CRM.utils.setOptions($style, options, ts('Normal'));
+
+      formatButton();
+
+      $style.change(function() {
+        if ($input.val()) {
+          var split = $input.val().split(' '),
+            style = $style.val();
+          $input.val(split[0] + (style ? ' ' + style : '')).change();
+        }
       });
 
-      button.click(function(e) {
+      $button.click(function(e) {
         var dialog;
 
         function displayIcons() {
           var term = $('input[name=search]', dialog).val().replace(/-/g, '').toLowerCase(),
-            $place = $('div.icons', dialog);
-          $place.html('');
+            $place = $('div.icons', dialog).html('');
           $.each(icons, function(i, icon) {
             if (!term.length || icon.replace(/-/g, '').indexOf(term) > -1) {
               var item = $('<a href="#" title="' + icon + '"/>').button({
@@ -69,8 +91,9 @@
         }
 
         function pickIcon(e) {
-          var newIcon = $(this).attr('title');
-          $input.val(newIcon).change();
+          var newIcon = $(this).attr('title'),
+            style = $style.val();
+          $input.val(newIcon + (style ? ' ' + style : '')).change();
           dialog.dialog('close');
           e.preventDefault();
         }
@@ -89,6 +112,7 @@
         loadIcons().done(displayDialog);
         e.preventDefault();
       });
+
     });
   };
 }(CRM.$, CRM._));
