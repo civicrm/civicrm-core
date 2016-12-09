@@ -273,6 +273,17 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
     $this->addTask('Add WYSIWYG Editor Presets', 'addWysiwygPresets');
   }
 
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_4_7_15($rev) {
+    $this->addTask('Add icon column to civicrm_option_value', 'addColumn',
+      'civicrm_option_value', 'icon', "varchar(255) COMMENT 'crm-i icon class' DEFAULT NULL");
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
+  }
+
   /*
    * Important! All upgrade functions MUST add a 'runSql' task.
    * Uncomment and use the following template for a new upgrade version
