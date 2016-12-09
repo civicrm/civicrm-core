@@ -881,7 +881,7 @@
           crmTitle: '@', // expression, evaluates to a printable string
           crmUiWizardStep: '@', // int, a weight which determines the ordering of the steps
           crmUiWizardStepClass: '@', // string, A list of classes that will be added to the template
-          crmUiWizardStepValid: '@', // bool, Is the wizard step valid or not?
+          crmUiWizardStepValid: '&' // bool, Is the wizard step valid or not?
         },
         template: '<div class="crm-wizard-step {{crmUiWizardStepClass}}" ng-show="selected" ng-transclude/></div>',
         transclude: true,
@@ -893,8 +893,10 @@
             scope.crmUiWizardStep = nextWeight++;
           }
           scope.isStepValid = function() {
-            if (typeof scope.crmUiWizardStepValid != 'undefined') {
-              return (scope.crmUiWizardStepValid === "true");
+            if (typeof scope.crmUiWizardStepValid() !== 'undefined') {
+              // Just because we have a custom check on the wizard step does
+              // not mean we can forgo form validity!
+              return scope.crmUiWizardStepValid() && form.$valid;
             } else {
               return form.$valid;
             }
