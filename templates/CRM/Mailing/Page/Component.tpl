@@ -38,8 +38,8 @@
         <th>{ts}Name{/ts}</th>
         <th>{ts}Type{/ts}</th>
         <th>{ts}Subject{/ts}</th>
-        <th>{ts}Body Text{/ts}</th>
         <th>{ts}Body HTML{/ts}</th>
+        <th>{ts}Body Text{/ts}</th>
         <th>{ts}Default?{/ts}</th>
         <th>{ts}Enabled?{/ts}</th>
         <th></th>
