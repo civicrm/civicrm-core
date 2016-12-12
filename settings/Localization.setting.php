@@ -361,7 +361,7 @@ return array(
       'maxlength' => '60',
     ),
     'default' => '%m/%d/%Y',
-    'title' => 'Date Format: Short date Day Month Year',
+    'title' => 'Date Format: Short date Month Day Year',
     'description' => '',
   ),
   'dateInputFormat' => array(
