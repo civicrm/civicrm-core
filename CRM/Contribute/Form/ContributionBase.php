@@ -738,6 +738,10 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
             else {
               $viewOnlyFileValues[$key] = $fileValue;
             }
+
+            // On viewOnly use-case (as in online contribution Confirm page) we no longer need to set
+            // required property because being required file is already uploaded while registration
+            $field['is_required'] = FALSE;
           }
 
           if ($profileContactType) {
