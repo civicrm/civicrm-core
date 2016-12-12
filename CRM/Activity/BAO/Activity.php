@@ -1812,6 +1812,14 @@ WHERE      activity.id IN ($activityIds)";
         return NULL;
       }
 
+      // retrieve existing activity based on source_record_id and activity_type
+      if (empty($params['id'])) {
+        $params['id'] = CRM_Utils_Array::value('id', civicrm_api3('Activity', 'Get', array(
+          'source_record_id' => $activity->id,
+          'activity_type_id' => $activityType,
+        )));
+      }
+
       $date = CRM_Utils_Date::isoToMysql($activity->receive_date);
       $activityType = $component = 'Contribution';
     }

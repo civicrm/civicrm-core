@@ -2609,6 +2609,13 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     );
     $this->setUpPendingContribution($this->_ids['price_field_value'][0]);
     $this->callAPISuccess('membership', 'getsingle', array('id' => $this->_ids['membership']));
+    // Case 1: Assert that Membership Signup Activity is created on Pending (Pay later) to Completed Contribution via backoffice
+    $activity = $this->callAPISuccess('Activity', 'get', array(
+      'activity_type_id' => 'Membership Signup',
+      'source_record_id' => $this->_ids['membership'],
+      'status_id' => 'Scheduled',
+    ));
+    $this->assertEquals(1, $activity['count']);
 
     // change pending contribution to completed
     $form = new CRM_Contribute_Form_Contribution();
@@ -2650,34 +2657,29 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     catch (Civi\Payment\Exception\PaymentProcessorException $e) {
       $error = TRUE;
     }
-    // Case 1: Assert that Membership Renewal Activity is created on Pending (Pay later) to Completed Contribution via backoffice
-    $activity = $this->callAPISuccess('Activity', 'get', array(
-      'activity_type_id' => 'Membership Renewal',
-      'source_record_id' => $this->_ids['contribution'],
-    ));
-    $this->assertEquals(1, $activity['count']);
-
-    // Case 2: Assert that Membership Signup Activity is created on Pending (Pay later) Contribution on current membership
-    $this->setUpPendingContribution($this->_ids['price_field_value'][0], array('trxn_id' => 'xoa12', 'invoice_id' => '12mv'));
+    // Case 2: After successful payment for Pending (Pay later) backoffice there are three activities created
+    //  2.a Update status of existing Scheduled Membership Signup (created in step 1) to Completed
     $activity = $this->callAPISuccess('Activity', 'get', array(
       'activity_type_id' => 'Membership Signup',
-      'source_record_id' => $this->_ids['contribution'],
+      'source_record_id' => $this->_ids['membership'],
+      'status_id' => 'Completed',
     ));
     $this->assertEquals(1, $activity['count']);
-    // Case 3: Assert that no Membership Renewal Activity is created on Pending (Pay later) Contribution on current membership
+    // 2.b Contribution activity created to record successful payment
     $activity = $this->callAPISuccess('Activity', 'get', array(
-      'activity_type_id' => 'Membership Renewal',
+      'activity_type_id' => 'Contribution',
       'source_record_id' => $this->_ids['contribution'],
-    ));
-    $this->assertEquals(0, $activity['count']);
-
-    //Case 4 (CRM-19600): Assert that Membership Renewal Activity is created via online contribution
-    $this->callAPISuccess('contribution', 'completetransaction', array('id' => $this->_ids['contribution']));
-    $activity = $this->callAPISuccess('Activity', 'get', array(
-      'activity_type_id' => 'Membership Renewal',
-      'source_record_id' => $this->_ids['contribution'],
+      'status_id' => 'Completed',
     ));
     $this->assertEquals(1, $activity['count']);
+    // 2.c 'Change membership type' activity created to record Membership status change from Grace to Current
+    $activity = $this->callAPISuccess('Activity', 'get', array(
+      'activity_type_id' => 'Change Membership Status',
+      'source_record_id' => $this->_ids['membership'],
+      'status_id' => 'Completed',
+    ));
+    $this->assertEquals(1, $activity['count']);
+    $this->assertEquals('Status changed from Grace to Current', $activity['values'][$activity['id']]['subject']);
   }
 
   /**
