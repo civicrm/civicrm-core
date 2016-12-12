@@ -56,11 +56,22 @@
   }
 
   /**
-   * Data provider for select2 "field" selectors
+   * Data provider for select2 "fields to return" selector
    * @returns {{results: Array.<T>}}
    */
   function returnFields() {
     return {results: fields.concat({id: '-', text: ts('Other') + '...', description: ts('Choose a field not in this list')})};
+  }
+
+  /**
+   * Data provider for select2 "field" selectors
+   * @returns {{results: Array.<T>}}
+   */
+  function selectFields() {
+    var items = _.filter(fields, function(field) {
+      return params[field.id] === undefined;
+    });
+    return {results: items.concat({id: '-', text: ts('Other') + '...', description: ts('Choose a field not in this list')})};
   }
 
   /**
@@ -138,7 +149,7 @@
     $('#api-params').append($(fieldTpl({name: name || '', noOps: _.includes(NO_OPERATORS, action)})));
     var $row = $('tr:last-child', '#api-params');
     $('input.api-param-name', $row).crmSelect2({
-      data: returnFields,
+      data: selectFields,
       formatSelection: function(field) {
         return field.text +
           (field.required ? ' <span class="crm-marker">*</span>' : '');
@@ -167,7 +178,8 @@
       {id: 'sort', text: 'sort'},
       {id: 'metadata', text: 'metadata'},
       {id: '-', text: ts('Other') + '...'}
-    ]});
+    ]})
+      .select2('open');
   }
 
   /**
@@ -183,7 +195,8 @@
       },
       placeholder: '<i class="crm-i fa-link"></i> ' + ts('Entity'),
       escapeMarkup: function(m) {return m;}
-    });
+    })
+      .select2('open');
   }
 
   /**
@@ -976,6 +989,7 @@
     $('#api-params-add').on('click', function(e) {
       e.preventDefault();
       addField();
+      $('tr:last-child input.api-param-name', '#api-params').select2('open');
     });
     $('#api-option-add').on('click', function(e) {
       e.preventDefault();
