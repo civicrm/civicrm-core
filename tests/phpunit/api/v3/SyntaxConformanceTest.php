@@ -1061,13 +1061,21 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    */
   public function testValidSortSingleArrayById_get($Entity) {
     $invalidEntitys = array('ActivityType', 'Setting', 'System');
-    if (in_array($Entity, $invalidEntitys)) {
-      $this->markTestSkipped('It seems OK for ' . $Entity . ' to skip here as it silently sips invalid params');
+    $tests = array(
+      'id' => '_id',
+      'id desc' => '_id desc',
+      'id DESC' => '_id DESC',
+      'id ASC' => '_id ASC',
+      'id asc' => '_id asc');
+    foreach ($tests as $test => $expected) {
+      if (in_array($Entity, $invalidEntitys)) {
+        $this->markTestSkipped('It seems OK for ' . $Entity . ' to skip here as it silently ignores passed in params');
+      }
+      $params = array('sort' => array($test));
+      $result = _civicrm_api3_get_options_from_params($params, FALSE, $Entity, 'get');
+      $lowercase_entity = _civicrm_api_get_entity_name_from_camel($Entity);
+      $this->assertEquals($lowercase_entity . $expected, $result['sort']);
     }
-    $params = array('sort' => array('id'));
-    $result = _civicrm_api3_get_options_from_params($params, FALSE, $Entity, 'get');
-    $lowercase_entity = _civicrm_api_get_entity_name_from_camel($Entity);
-    $this->assertEquals($result['sort'], $lowercase_entity . '_id');
   }
 
   /**
