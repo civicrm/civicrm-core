@@ -162,12 +162,13 @@
     });
 
     function replaceCurrency(val) {
+      var symbol = '';
       var eachPaymentAmout = $('#eachPaymentAmount');
       var pos = val.indexOf("(") + 1;
       if (pos) {
-        val = val.slice(pos, val.lastIndexOf(")"));
+        symbol = val.slice(pos, val.lastIndexOf(")"));
       }
-      $('.currency-symbol').text(val).append("&nbsp;").append(eachPaymentAmout);
+      $('.currency-symbol').text(symbol).append("&nbsp;").append(eachPaymentAmout);
     }
 
     // load panes function calls for snippet based on id of crm-accordion-header
