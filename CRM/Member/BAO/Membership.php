@@ -139,13 +139,20 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
     // reset the group contact cache since smart groups might be affected due to this
     CRM_Contact_BAO_GroupContactCache::opportunisticCacheFlush();
 
+    $activityParams = array();
+    $allStatus = CRM_Member_BAO_Membership::buildOptions('status_id', 'get');
+    if (!empty($params['is_pay_later']) ||
+      in_array($allStatus[$membership->status_id], array('Pending', 'Grace'))
+    ) {
+      $activityParams['status_id'] = CRM_Core_OptionGroup::getValue('activity_status', 'Scheduled', 'name');
+    }
+
     $targetContactID = $membership->contact_id;
     if (!empty($params['is_for_organization'])) {
       $targetContactID = CRM_Utils_Array::value('userId', $ids);
     }
     if ($id) {
       if ($membership->status_id != $oldStatus) {
-        $allStatus = CRM_Member_BAO_Membership::buildOptions('status_id', 'get');
         CRM_Activity_BAO_Activity::addActivity($membership,
           'Change Membership Status',
           NULL,
@@ -168,16 +175,29 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
           )
         );
       }
-      // via Contribution.completeOrder membership.create is called again to ensure correct data has been
-      // copied to the related membership. but there is a sideffect of this new membership workflow as a
-      // 'Membership Renewal' Activity is created. We can avoid this on basis of is_override=FALSE condition
-      if (CRM_Utils_Array::value('is_override', $params) != 'null') {
-        CRM_Activity_BAO_Activity::addActivity($membership, 'Membership Renewal', $targetContactID);
+
+      foreach (array('Membership Signup', 'Membership Renewal') as $activityType) {
+        $activityParams['id'] = CRM_Utils_Array::value('id',
+          civicrm_api3('Activity', 'Get',
+            array(
+              'source_record_id' => $membership->id,
+              'activity_type_id' => $activityType,
+              'status_id' => 'Scheduled',
+            )
+          )
+        );
+        // 1. Update Schedule Membership Signup/Renwal activity to completed on successful payment of pending membership
+        // 2. OR Create renewal activity scheduled if its membership renewal will be paid later
+        if (!empty($activityParams['id']) || $activityType == 'Membership Renewal') {
+          CRM_Activity_BAO_Activity::addActivity($membership, $activityType, $targetContactID, $activityParams);
+          break;
+        }
       }
+
       CRM_Utils_Hook::post('edit', 'Membership', $membership->id, $membership);
     }
     else {
-      CRM_Activity_BAO_Activity::addActivity($membership, 'Membership Signup', $targetContactID);
+      CRM_Activity_BAO_Activity::addActivity($membership, 'Membership Signup', $targetContactID, $activityParams);
       CRM_Utils_Hook::post('create', 'Membership', $membership->id, $membership);
     }
 
@@ -803,7 +823,7 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
     }
 
     //avoid pending membership as current membership: CRM-3027
-    $statusIds[] = array_search('Pending', CRM_Member_PseudoConstant::membershipStatus());
+    $statusIds = array(array_search('Pending', CRM_Member_PseudoConstant::membershipStatus()));
     if (!$membershipId) {
       // CRM-15475
       $statusIds[] = array_search(
@@ -1833,6 +1853,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
           'join_date' => $currentMembership['join_date'],
           'membership_type_id' => $membershipTypeID,
           'max_related' => !empty($membershipTypeDetails['max_related']) ? $membershipTypeDetails['max_related'] : NULL,
+          'is_pay_later' => $isPayLater,
         );
         if ($contributionRecurID) {
           $memParams['contribution_recur_id'] = $contributionRecurID;
