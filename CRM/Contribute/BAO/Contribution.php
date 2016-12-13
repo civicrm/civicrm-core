@@ -929,13 +929,18 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     if ($endDate) {
       $where[] = "receive_date <= '" . CRM_Utils_Type::escape($endDate, 'Timestamp') . "'";
     }
-    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes);
-    if ($financialTypes) {
-      $where[] = "c.financial_type_id IN (" . implode(',', array_keys($financialTypes)) . ")";
-      $where[] = "i.financial_type_id IN (" . implode(',', array_keys($financialTypes)) . ")";
-    }
-    else {
-      $where[] = "c.financial_type_id IN (0)";
+    $financialTypeACLJoin = '';
+    if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
+      $financialTypeACLJoin = " LEFT JOIN civicrm_line_item i ON (i.contribution_id = c.id AND i.entity_table = 'civicrm_contribution') ";
+      $financialTypes = CRM_Contribute_PseudoConstant::financialType();
+      CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes);
+      if ($financialTypes) {
+        $where[] = "c.financial_type_id IN (" . implode(',', array_keys($financialTypes)) . ")";
+        $where[] = "i.financial_type_id IN (" . implode(',', array_keys($financialTypes)) . ")";
+      }
+      else {
+        $where[] = "c.financial_type_id IN (0)";
+      }
     }
 
     $whereCond = implode(' AND ', $where);
@@ -946,7 +951,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
             currency
       FROM  civicrm_contribution c
 INNER JOIN  civicrm_contact contact ON ( contact.id = c.contact_id )
-LEFT JOIN  civicrm_line_item i ON ( i.contribution_id = c.id AND i.entity_table = 'civicrm_contribution' )
+     $financialTypeACLJoin
      WHERE  $whereCond
        AND  ( is_test = 0 OR is_test IS NULL )
        AND  contact.is_deleted = 0
