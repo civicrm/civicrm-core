@@ -381,10 +381,10 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $this->callAPISuccessGetCount('Membership', array('contact_id' => $contact2ID), 0);
     $this->callAPISuccessGetCount('EntityTag', array('contact_id' => $contactID), 2);
     $this->callAPISuccessGetCount('EntityTag', array('contact_id' => $contact2ID), 0);
-    // 12 activities is one for each contribution (2), one for each membership (+2 = 4)
-    // 3 for each of the added activities as there are 3 roles (+6 = 10
-    // 2 for the (source & target) contact merged activity (+2 = 12)
-    $this->callAPISuccessGetCount('ActivityContact', array('contact_id' => $contactID), 12);
+    // 14 activities is one for each contribution (2), two (source + target) for each membership (+(2x2) = 6)
+    // 3 for each of the added activities as there are 3 roles (+6 = 12
+    // 2 for the (source & target) contact merged activity (+2 = 14)
+    $this->callAPISuccessGetCount('ActivityContact', array('contact_id' => $contactID), 14);
     // 2 for the connection to the deleted by merge activity (source & target)
     $this->callAPISuccessGetCount('ActivityContact', array('contact_id' => $contact2ID), 2);
   }
