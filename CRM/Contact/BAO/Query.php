@@ -1791,18 +1791,7 @@ class CRM_Contact_BAO_Query {
         return;
 
       case 'group':
-        $this->group($values);
-        return;
-
       case 'group_type':
-        // so we resolve this into a list of groups & proceed as if they had been
-        // handed in
-        list($name, $op, $value, $grouping, $wildcard) = $values;
-        $values[0] = 'group';
-        $values[1] = 'IN';
-        $this->_paramLookup['group'][0][0] = 'group';
-        $this->_paramLookup['group'][0][1] = 'IN';
-        $this->_paramLookup['group'][0][2] = $values[2] = $this->getGroupsFromTypeCriteria($value);
         $this->group($values);
         return;
 
@@ -2917,6 +2906,10 @@ class CRM_Contact_BAO_Query {
 
     if (isset($value)) {
       $value = CRM_Utils_Array::value($op, $value, $value);
+    }
+
+    if ($name == 'group_type') {
+      $value = array_keys($this->getGroupsFromTypeCriteria($value));
     }
 
     $regularGroupIDs = $smartGroupIDs = array();
