@@ -2075,6 +2075,10 @@ WHERE      activity.id IN ($activityIds)";
           'activity_type_id' => $activityType,
         )));
       }
+      if (!empty($params['id'])) {
+        // CRM-13237 : if activity record found, update it with campaign id of contribution
+        $params['campaign_id'] = $activity->campaign_id;
+      }
 
       $date = CRM_Utils_Date::isoToMysql($activity->receive_date);
       $activityType = $component = 'Contribution';
@@ -2101,11 +2105,9 @@ WHERE      activity.id IN ($activityIds)";
       $activityParams['id'] = $activity->activity_id;
     }
     // create activity with target contacts
-    if (!empty($activityParams['source_contact_id'])) {
-      $id = CRM_Core_Session::getLoggedInContactID();
-      if ($id) {
-        $activityParams['source_contact_id'] = $id;
-      }
+    $id = CRM_Core_Session::getLoggedInContactID();
+    if ($id) {
+      $activityParams['source_contact_id'] = $id;
     }
 
     // CRM-14945
