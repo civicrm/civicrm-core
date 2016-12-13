@@ -576,6 +576,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       CRM_Core_DAO::setFieldValue('CRM_Activity_BAO_Activity', $activity['id'], 'campaign_id', $contribution->campaign_id);
       $contribution->activity_id = $activity['id'];
     }
+
     if (empty($contribution->contact_id)) {
       $contribution->find(TRUE);
     }
