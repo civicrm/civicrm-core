@@ -2919,7 +2919,15 @@ class CRM_Contact_BAO_Query {
       $value = CRM_Utils_Array::value($op, $value, $value);
     }
 
-    $groupIds = NULL;
+    $regularGroupIDs = $smartGroupIDs = array();
+    foreach ((array) $value as $id) {
+      if (CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $id, 'saved_search_id')) {
+        $smartGroupIDs[] = $id;
+      }
+      else {
+        $regularGroupIDs[] = $id;
+      }
+    }
 
     $isNotOp = ($op == 'NOT IN' || $op == '!=');
 
@@ -2935,32 +2943,12 @@ class CRM_Contact_BAO_Query {
       }
     }
     else {
-      $statii[] = '"Added"';
+      $statii[] = "'Added'";
     }
 
-    //CRM-19589: contact(s) removed from a Smart Group, resides in civicrm_group_contact table
-    $ssClause = NULL;
-    if (empty($gcsValues) || // if no status selected
-      in_array("'Added'", $statii) ||  // if both Added and Removed statuses are selected
-      (count($statii) == 1 && $statii[0] == 'Removed') // if only Removed status is selected
-    ) {
-      $ssClause = $this->addGroupContactCache($value, NULL, "contact_a", $op);
-    }
-
-    $isSmart = (!$ssClause) ? FALSE : TRUE;
-    if (!is_array($value) &&
-      count($statii) == 1 &&
-      $statii[0] == '"Added"' &&
-      !$isNotOp
-    ) {
-      if (!empty($value) && CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $value, 'saved_search_id')) {
-        $isSmart = TRUE;
-      }
-    }
-    $groupClause = NULL;
-
-    if (!$isSmart || in_array("'Added'", $statii)) {
-      $groupIds = implode(',', (array) $value);
+    $groupClause = array();
+    if (count($regularGroupIDs) || empty($value)) {
+      $groupIds = implode(',', (array) $regularGroupIDs);
       $gcTable = "`civicrm_group_contact-{$groupIds}`";
       $joinClause = array("contact_a.id = {$gcTable}.contact_id");
       if ($statii) {
@@ -2968,34 +2956,37 @@ class CRM_Contact_BAO_Query {
       }
       $this->_tables[$gcTable] = $this->_whereTables[$gcTable] = " LEFT JOIN civicrm_group_contact {$gcTable} ON (" . implode(' AND ', $joinClause) . ")";
       if (strpos($op, 'IN') !== FALSE) {
-        $groupClause = "{$gcTable}.group_id $op ( $groupIds )";
+        $clause = "{$gcTable}.group_id $op ( $groupIds ) %s ";
       }
       elseif ($op == '!=') {
-        $groupClause = "{$gcTable}.contact_id NOT IN (SELECT contact_id FROM civicrm_group_contact cgc WHERE cgc.group_id = $groupIds)";
+        $clause = "{$gcTable}.contact_id NOT IN (SELECT contact_id FROM civicrm_group_contact cgc WHERE cgc.group_id = $groupIds %s)";
       }
       else {
-        $groupClause = "{$gcTable}.group_id $op $groupIds";
+        $clause = "{$gcTable}.group_id $op $groupIds %s ";
       }
+
+      // include child groups IDs if any
+      $childGroupIds = CRM_Contact_BAO_Group::getChildGroupIds($regularGroupIDs);
+      $childClause = '';
+      if (count($childGroupIds)) {
+        $gcTable = ($op == '!=') ? 'cgc' : $gcTable;
+        $childClause = " OR {$gcTable}.group_id IN (" . implode(',', $childGroupIds) . ") ";
+      }
+      $groupClause[] = sprintf($clause, $childClause);
     }
 
-    if ($ssClause) {
-      $and = ($op == 'IS NULL') ? 'AND' : 'OR';
-      if ($groupClause) {
-        $groupClause = "( ( $groupClause ) $and ( $ssClause ) )";
-      }
-      else {
-        $groupClause = $ssClause;
-      }
+    //CRM-19589: contact(s) removed from a Smart Group, resides in civicrm_group_contact table
+    if (count($smartGroupIDs)) {
+      $groupClause[] = " ( " . $this->addGroupContactCache($smartGroupIDs, NULL, "contact_a", $op) . " ) ";
     }
+
+    $and = ($op == 'IS NULL') ? ' AND ' : ' OR ';
+    $this->_where[$grouping][] = implode($and, $groupClause);
 
     list($qillop, $qillVal) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Contact_DAO_Group', 'id', $value, $op);
     $this->_qill[$grouping][] = ts("Group(s) %1 %2", array(1 => $qillop, 2 => $qillVal));
     if (strpos($op, 'NULL') === FALSE) {
       $this->_qill[$grouping][] = ts("Group Status %1", array(1 => implode(' ' . ts('or') . ' ', $statii)));
-    }
-
-    if ($groupClause) {
-      $this->_where[$grouping][] = $groupClause;
     }
   }
 
