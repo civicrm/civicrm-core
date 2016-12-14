@@ -1059,6 +1059,32 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    * @param $Entity
    * @throws \PHPUnit_Framework_IncompleteTestError
    */
+  public function testValidSortSingleArrayById_get($Entity) {
+    $invalidEntitys = array('ActivityType', 'Setting', 'System');
+    $tests = array(
+      'id' => '_id',
+      'id desc' => '_id desc',
+      'id DESC' => '_id DESC',
+      'id ASC' => '_id ASC',
+      'id asc' => '_id asc');
+    foreach ($tests as $test => $expected) {
+      if (in_array($Entity, $invalidEntitys)) {
+        $this->markTestSkipped('It seems OK for ' . $Entity . ' to skip here as it silently ignores passed in params');
+      }
+      $params = array('sort' => array($test));
+      $result = _civicrm_api3_get_options_from_params($params, FALSE, $Entity, 'get');
+      $lowercase_entity = _civicrm_api_get_entity_name_from_camel($Entity);
+      $this->assertEquals($lowercase_entity . $expected, $result['sort']);
+    }
+  }
+
+  /**
+   * @dataProvider entities_create
+   *
+   * Check that create doesn't work with an invalid
+   * @param $Entity
+   * @throws \PHPUnit_Framework_IncompleteTestError
+   */
   public function testInvalidID_create($Entity) {
     // turn test off for noew
     $this->markTestIncomplete("Entity [ $Entity ] cannot be mocked - no known DAO");
