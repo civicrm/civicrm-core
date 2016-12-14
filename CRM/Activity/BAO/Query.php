@@ -190,7 +190,6 @@ class CRM_Activity_BAO_Query {
       case 'activity_type_id':
       case 'activity_status_id':
       case 'activity_engagement_level':
-      case 'activity_subject':
       case 'activity_id':
       case 'activity_campaign_id':
 
@@ -198,7 +197,7 @@ class CRM_Activity_BAO_Query {
         if (in_array($name, array('activity_engagement_level', 'activity_id'))) {
           $name = $qillName = str_replace('activity_', '', $name);
         }
-        if (in_array($name, array('activity_status_id', 'activity_subject'))) {
+        if (in_array($name, array('activity_status_id'))) {
           $name = str_replace('activity_', '', $name);
           $qillName = str_replace('_id', '', $qillName);
         }
@@ -211,6 +210,12 @@ class CRM_Activity_BAO_Query {
         $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_activity.$name", $op, $value, $dataType);
         list($op, $value) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Activity_DAO_Activity', $name, $value, $op);
         $query->_qill[$grouping][] = ts('%1 %2 %3', array(1 => $fields[$qillName]['title'], 2 => $op, 3 => $value));
+        break;
+
+      case 'activity':
+      case 'activity_details':
+      case 'activity_subject':
+        self::activity($values, $query);
         break;
 
       case 'activity_type':
@@ -426,7 +431,15 @@ class CRM_Activity_BAO_Query {
       array('entity' => 'activity', 'multiple' => 'multiple', 'option_url' => NULL, 'placeholder' => ts('- any -'))
     );
     $form->setDefaults(array('status_id' => array($activityStatus['Completed'], $activityStatus['Scheduled'])));
-    $form->addElement('text', 'activity_subject', ts('Subject'), CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'sort_name'));
+    $form->addElement('text', 'activity', ts('Activity Text'), CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'sort_name'));
+    $activity_options = array(
+      2 => ts('Details Only'),
+      3 => ts('Subject Only'),
+      6 => ts('Both'),
+    );
+    $form->addRadio('activity_option', '', $activity_options);
+    $form->setDefaults(array('activity_option' => 6));
+
     $form->addYesNo('activity_test', ts('Activity is a Test?'));
     $activity_tags = CRM_Core_BAO_Tag::getTags('civicrm_activity');
     if ($activity_tags) {
@@ -556,6 +569,48 @@ class CRM_Activity_BAO_Query {
     CRM_Utils_Rule::validDateRange($fields, 'activity_date', $errors, ts('Activity Date'));
 
     return empty($errors) ? TRUE : $errors;
+  }
+
+  /**
+   * Where/qill clause for notes
+   *
+   * @param array $values
+   */
+  public static function activity(&$values, &$query) {
+    list($name, $op, $value, $grouping, $wildcard) = $values;
+
+    $activityOptionValues = $query->getWhereValues('activity_option', $grouping);
+    $activityOption = CRM_Utils_Array::value('2', $activityOptionValues, '6');
+    $activityOption = ($name == 'activity_details') ? 2 : (($name == 'activity_subject') ? 3 : $activityOption);
+
+    $query->_useDistinct = TRUE;
+
+    $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
+    $n = trim($value);
+    $value = $strtolower(CRM_Core_DAO::escapeString($n));
+    if ($wildcard) {
+      if (strpos($value, '%') === FALSE) {
+        $value = "%$value%";
+      }
+      $op = 'LIKE';
+    }
+    elseif ($op == 'IS NULL' || $op == 'IS NOT NULL') {
+      $value = NULL;
+    }
+
+    $label = NULL;
+    $clauses = array();
+    if ($activityOption % 2 == 0) {
+      $clauses[] = $query->buildClause('civicrm_activity.details', $op, $value, 'String');
+      $label = ts('Activity: Details Only');
+    }
+    if ($activityOption % 3 == 0) {
+      $clauses[] = $query->buildClause('civicrm_activity.subject', $op, $value, 'String');
+      $label = $label ? ts('Activity: Details or Subject') : ts('Activity: Subject Only');
+    }
+    $query->_where[$grouping][] = "( " . implode(' OR ', $clauses) . " )";
+    list($qillOp, $qillVal) = $query->buildQillForFieldValue(NULL, $name, $n, $op);
+    $query->_qill[$grouping][] = ts("%1 %2 %3", array(1 => $label, 2 => $qillOp, 3 => $qillVal));
   }
 
 }
