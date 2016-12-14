@@ -76,14 +76,34 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
       $paymentProcessorTypeID = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_PaymentProcessorType',
         'AuthNet', 'id', 'name'
       );
-      $paymentProcessorID = (int) civicrm_api3('PaymentProcessor', 'getvalue', array(
+
+      $paymentProcessors = civicrm_api3('PaymentProcessor', 'get', array(
         'is_test' => 0,
-        'options' => array('limit' => 1),
         'payment_processor_type_id' => $paymentProcessorTypeID,
-         'return' => 'id',
+        'domain_id' => CIVICRM_DOMAIN_ID,
+        'return' => 'id',
       ));
 
-      if (!$this->validateData($input, $ids, $objects, TRUE, $paymentProcessorID)) {
+      // Keep these handy as the variables may be modified during validateData
+      $stash = array(
+        $input,
+        $ids,
+      );
+      foreach ($objects as $key => $obj) {
+        $stash[2][$key] = is_object($obj) ? clone $obj : $obj;
+      }
+
+      foreach ($paymentProcessors['values'] as $paymentProcessorID => $dontcare) {
+        if (!$this->validateData($input, $ids, $objects, TRUE, $paymentProcessorID)) {
+          // Reset the variables from our stash: any mods are probably wrong
+          list($input, $ids, $objects) = $stash;
+          continue;
+        }
+        $validated = TRUE;
+        break;
+      }
+
+      if (!$validated) {
         return FALSE;
       }
 
