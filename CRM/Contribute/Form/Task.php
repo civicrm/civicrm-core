@@ -101,12 +101,12 @@ class CRM_Contribute_Form_Task extends CRM_Core_Form {
 
     $values = $form->controller->exportValues($form->get('searchFormName'));
 
-    $form->_task = $values['task'];
+    $form->_task = CRM_Utils_Array::value('task', $values);
     $contributeTasks = CRM_Contribute_Task::tasks();
-    $form->assign('taskName', $contributeTasks[$form->_task]);
+    $form->assign('taskName', CRM_Utils_Array::value($form->_task, $contributeTasks));
 
     $ids = array();
-    if ($values['radio_ts'] == 'ts_sel') {
+    if (isset($values['radio_ts']) && $values['radio_ts'] == 'ts_sel') {
       foreach ($values as $name => $value) {
         if (substr($name, 0, CRM_Core_Form::CB_PREFIX_LEN) == CRM_Core_Form::CB_PREFIX) {
           $ids[] = substr($name, CRM_Core_Form::CB_PREFIX_LEN);
@@ -115,13 +115,17 @@ class CRM_Contribute_Form_Task extends CRM_Core_Form {
     }
     else {
       $queryParams = $form->get('queryParams');
-      $sortOrder = NULL;
+      $returnProperties = array('contribution_id' => 1);
+      $sortOrder = $sortCol = NULL;
       if ($form->get(CRM_Utils_Sort::SORT_ORDER)) {
         $sortOrder = $form->get(CRM_Utils_Sort::SORT_ORDER);
+        //Include sort column in select clause.
+        $sortCol = trim(str_replace(array('`', 'asc', 'desc'), '', $sortOrder));
+        $returnProperties[$sortCol] = 1;
       }
 
       $form->_includesSoftCredits = CRM_Contribute_BAO_Query::isSoftCreditOptionEnabled($queryParams);
-      $query = new CRM_Contact_BAO_Query($queryParams, array('contribution_id'), NULL, FALSE, FALSE,
+      $query = new CRM_Contact_BAO_Query($queryParams, $returnProperties, NULL, FALSE, FALSE,
         CRM_Contact_BAO_Query::MODE_CONTRIBUTE
       );
       // @todo the function CRM_Contribute_BAO_Query::isSoftCreditOptionEnabled should handle this
@@ -158,6 +162,7 @@ class CRM_Contribute_Form_Task extends CRM_Core_Form {
     }
 
     $form->_contributionIds = $form->_componentIds = $ids;
+    $form->set('contributionIds', $form->_contributionIds);
 
     //set the context for redirection for any task actions
     $session = CRM_Core_Session::singleton();
