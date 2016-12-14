@@ -3270,16 +3270,18 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
    * Create a price set for an event.
    *
    * @param int $feeTotal
+   * @param int $minAmt
    *
    * @return int
    *   Price Set ID.
    */
-  protected function eventPriceSetCreate($feeTotal) {
+  protected function eventPriceSetCreate($feeTotal, $minAmt = 0) {
     // creating price set, price field
     $paramsSet['title'] = 'Price Set';
     $paramsSet['name'] = CRM_Utils_String::titleToVar('Price Set');
     $paramsSet['is_active'] = FALSE;
     $paramsSet['extends'] = 1;
+    $paramsSet['min_amount'] = $minAmt;
 
     $priceset = CRM_Price_BAO_PriceSet::create($paramsSet);
     $priceSetId = $priceset->id;
