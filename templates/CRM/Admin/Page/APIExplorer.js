@@ -175,8 +175,11 @@
     $('.api-option-name', $row).crmSelect2({data: [
       {id: 'limit', text: 'limit'},
       {id: 'offset', text: 'offset'},
-      {id: 'sort', text: 'sort'},
+      {id: 'match', text: 'match'},
+      {id: 'match-mandatory', text: 'match-mandatory'},
       {id: 'metadata', text: 'metadata'},
+      {id: 'reload', text: 'reload'},
+      {id: 'sort', text: 'sort'},
       {id: '-', text: ts('Other') + '...'}
     ]})
       .select2('open');
