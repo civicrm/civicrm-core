@@ -171,18 +171,21 @@ class CRM_Contact_BAO_GroupContactTest extends CiviUnitTestCase {
     // Create contact with Gender - Male
     $contact1 = $this->individualCreate(array(
       'gender_id' => "Male",
+      'first_name' => 'A',
     ));
 
     // Create contact with Gender - Male and in regular group
     $contact2 = $this->individualCreate(array(
       'group' => array($regularGroup['id'] => 1),
       'gender_id' => "Male",
+      'first_name' => 'B',
     ), 1);
 
     // Create contact with Gender - Female and in regular group
     $contact3 = $this->individualCreate(array(
       'group' => array($regularGroup['id'] => 1),
       'gender_id' => "Female",
+      'first_name' => 'C',
     ), 1);
 
     // create smart group based on saved criteria Gender = Male
@@ -220,7 +223,7 @@ class CRM_Contact_BAO_GroupContactTest extends CiviUnitTestCase {
     foreach ($useCases as $case) {
       $query = new CRM_Contact_BAO_Query(CRM_Contact_BAO_Query::convertFormValues($case['form_value']));
       list($select, $from, $where, $having) = $query->query();
-      $groupContacts = CRM_Core_DAO::executeQuery("SELECT DISTINCT contact_a.id $from $where")->fetchAll();
+      $groupContacts = CRM_Core_DAO::executeQuery("SELECT DISTINCT contact_a.* $from $where ORDER BY contact_a.first_name")->fetchAll();
       foreach ($groupContacts as $key => $value) {
         $groupContacts[$key] = $value['id'];
       }
@@ -256,11 +259,13 @@ class CRM_Contact_BAO_GroupContactTest extends CiviUnitTestCase {
     // create contact in 'Group 1'
     $contact1 = $this->individualCreate(array(
       'group' => array($group1['id'] => 1),
+      'first_name' => 'A',
     ));
 
     // create contact in 'Group 2'
     $contact2 = $this->individualCreate(array(
       'group' => array($group2['id'] => 1),
+      'first_name' => 'B',
     ), 1);
 
     $useCases = array(
@@ -287,7 +292,7 @@ class CRM_Contact_BAO_GroupContactTest extends CiviUnitTestCase {
     foreach ($useCases as $case) {
       $query = new CRM_Contact_BAO_Query(CRM_Contact_BAO_Query::convertFormValues($case['form_value']));
       list($select, $from, $where, $having) = $query->query();
-      $groupContacts = CRM_Core_DAO::executeQuery("SELECT DISTINCT contact_a.id $from $where")->fetchAll();
+      $groupContacts = CRM_Core_DAO::executeQuery("SELECT DISTINCT contact_a.id $from $where ORDER BY contact_a.first_name")->fetchAll();
       foreach ($groupContacts as $key => $value) {
         $groupContacts[$key] = $value['id'];
       }
