@@ -3576,7 +3576,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
           if ($context == 'changeFinancialType' || self::isContributionStatusNegative($params['contribution']->contribution_status_id)) {
             $diff = -1;
           }
-          
+
           // calculate financial item amount
           $amountParams = array(
             'diff' => $diff,
@@ -5387,7 +5387,7 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
    *
    * @param array $params
    *   contribution params
-   * @param array $totalAmount
+   * @param array $amountParams
    *
    * @param string $context
    *
