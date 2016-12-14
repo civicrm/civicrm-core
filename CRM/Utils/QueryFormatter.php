@@ -288,14 +288,17 @@ class CRM_Utils_QueryFormatter {
   protected function _formatFtsBool($text, $mode) {
     $result = NULL;
     $operators = array('+', '-', '~', '(', ')');
+    $wildCards = array('@', '%', '*');
+    $expression = preg_quote(implode('', array_merge($operators, $wildCards)), '/');
 
     //Return if searched string ends with an unsupported operator.
+    //Or if the string contains an invalid joint occurrence of operators.
     foreach ($operators as $val) {
-      if ($text == '@' || CRM_Utils_String::endsWith($text, $val)) {
+      if ($text == '@' || CRM_Utils_String::endsWith($text, $val) || preg_match("/[{$expression}]{2,}/", $text)) {
         $csid = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionValue', 'CRM_Contact_Form_Search_Custom_FullText', 'value', 'name');
         $url = CRM_Utils_System::url("civicrm/contact/search/custom", "csid={$csid}&reset=1");
         $operators = implode("', '", $operators);
-        CRM_Core_Error::statusBounce("Full-Text Search does not support the use of a search string ending with any of these operators ('{$operators}' or a single '@'). Please adjust your search term and try again.", $url);
+        CRM_Core_Error::statusBounce("Full-Text Search does not support the use of a search with two attached operators or string ending with any of these operators ('{$operators}' or a single '@'). Please adjust your search term and try again.", $url, 'Invalid Search String');
       }
     }
 
