@@ -96,8 +96,8 @@
 </tr>
 <tr>
   <td>
-    {$form.activity.label}<br/>
-    {$form.activity.html|crmAddClass:big}<br/>
+    {$form.activity_text.label}<br/>
+    {$form.activity_text.html|crmAddClass:big}<br/>
     {$form.activity_option.html}<br/>
   </td>
   <td colspan="2">

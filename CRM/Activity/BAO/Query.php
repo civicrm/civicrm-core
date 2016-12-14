@@ -212,10 +212,8 @@ class CRM_Activity_BAO_Query {
         $query->_qill[$grouping][] = ts('%1 %2 %3', array(1 => $fields[$qillName]['title'], 2 => $op, 3 => $value));
         break;
 
-      case 'activity':
-      case 'activity_details':
-      case 'activity_subject':
-        self::activity($values, $query);
+      case 'activity_text':
+        self::whereClauseSingleActivityText($values, $query);
         break;
 
       case 'activity_type':
@@ -431,7 +429,7 @@ class CRM_Activity_BAO_Query {
       array('entity' => 'activity', 'multiple' => 'multiple', 'option_url' => NULL, 'placeholder' => ts('- any -'))
     );
     $form->setDefaults(array('status_id' => array($activityStatus['Completed'], $activityStatus['Scheduled'])));
-    $form->addElement('text', 'activity', ts('Activity Text'), CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'sort_name'));
+    $form->addElement('text', 'activity_text', ts('Activity Text'), CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'sort_name'));
     $activity_options = array(
       2 => ts('Details Only'),
       3 => ts('Subject Only'),
@@ -576,27 +574,20 @@ class CRM_Activity_BAO_Query {
    *
    * @param array $values
    */
-  public static function activity(&$values, &$query) {
+  public static function whereClauseSingleActivityText(&$values, &$query) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
-
     $activityOptionValues = $query->getWhereValues('activity_option', $grouping);
     $activityOption = CRM_Utils_Array::value('2', $activityOptionValues, '6');
-    $activityOption = ($name == 'activity_details') ? 2 : (($name == 'activity_subject') ? 3 : $activityOption);
 
     $query->_useDistinct = TRUE;
 
     $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
     $n = trim($value);
     $value = $strtolower(CRM_Core_DAO::escapeString($n));
-    if ($wildcard) {
-      if (strpos($value, '%') === FALSE) {
-        $value = "%$value%";
-      }
-      $op = 'LIKE';
+    if (strpos($value, '%') === FALSE) {
+      $value = "%$value%";
     }
-    elseif ($op == 'IS NULL' || $op == 'IS NOT NULL') {
-      $value = NULL;
-    }
+    $op = 'LIKE';
 
     $label = NULL;
     $clauses = array();

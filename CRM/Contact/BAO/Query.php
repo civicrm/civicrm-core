@@ -1886,10 +1886,8 @@ class CRM_Contact_BAO_Query {
       case 'followup_parent_id':
       case 'parent_id':
       case 'source_contact_id':
-      case 'activity':
+      case 'activity_text':
       case 'activity_option':
-      case 'activity_details':
-      case 'activity_subject':
       case 'test_activities':
       case 'activity_type_id':
       case 'activity_type':
