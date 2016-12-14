@@ -639,6 +639,9 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
     }
   }
 
+  /**
+   * Test that activity.get api works when filtering on subject.
+   */
   public function testActivityGetSubjectFilter() {
     $subject = 'test activity ' . __FUNCTION__;
     $params = $this->_params;
@@ -651,6 +654,9 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
     $this->assertEquals($activityget['subject'], $subject);
   }
 
+  /**
+   * Test that activity.get api works when filtering on details.
+   */
   public function testActivityGetDetailsFilter() {
     $details = 'test activity ' . __FUNCTION__;
     $params = $this->_params;
