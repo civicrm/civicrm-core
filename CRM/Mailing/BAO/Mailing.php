@@ -917,9 +917,11 @@ ORDER BY   i.contact_id, i.{$tempColumn}
    * @return void
    */
   public function getTestRecipients($testParams) {
-    $session = CRM_Core_Session::singleton();
-    $senderId = $session->get('userID');
-    list($aclJoin, $aclWhere) = CRM_ACL_BAO_ACL::buildAcl($senderId);
+    $creatorID = NULL;
+    if (!empty($this->id)) {
+      $creatorID = CRM_Core_DAO::getFieldValue('CRM_Mailing_DAO_Mailing', $this->id, 'created_id');
+    }
+    list($aclJoin, $aclWhere) = CRM_ACL_BAO_ACL::buildAcl($creatorID);
 
     if (array_key_exists($testParams['test_group'], CRM_Core_PseudoConstant::group())) {
       $contacts = civicrm_api('contact', 'get', array(
@@ -2466,7 +2468,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
         $mailings = implode(',', $mailingIDs);
         $mailingQuery = "
            SELECT DISTINCT ( m.id ) as id
-           FROM civicrm_mailing m 
+           FROM civicrm_mailing m
            LEFT JOIN civicrm_mailing_group g ON g.mailing_id = m.id
            WHERE g.entity_table like 'civicrm_mailing%' AND g.entity_id IN ($mailings)";
         $mailingDao = CRM_Core_DAO::executeQuery($mailingQuery);
