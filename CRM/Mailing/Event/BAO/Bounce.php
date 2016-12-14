@@ -238,7 +238,7 @@ class CRM_Mailing_Event_BAO_Bounce extends CRM_Mailing_Event_DAO_Bounce {
     }
 
     if ($is_distinct) {
-      $query .= " GROUP BY $queue.id ";
+      $query .= " GROUP BY $queue.id, $bounce.time_stamp, $bounce.bounce_reason, $bounceType.name ";
     }
 
     $orderBy = "sort_name ASC, {$bounce}.time_stamp DESC";

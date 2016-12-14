@@ -549,7 +549,7 @@ WHERE  email = %2
     }
 
     if ($is_distinct) {
-      $query .= " GROUP BY $queue.id ";
+      $query .= " GROUP BY $queue.id, $unsub.time_stamp, $unsub.org_unsubscribe";
     }
 
     $orderBy = "sort_name ASC, {$unsub}.time_stamp DESC";
