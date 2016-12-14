@@ -150,6 +150,7 @@
     var $row = $('tr:last-child', '#api-params');
     $('input.api-param-name', $row).crmSelect2({
       data: selectFields,
+      allowClear: false,
       formatSelection: function(field) {
         return field.text +
           (field.required ? ' <span class="crm-marker">*</span>' : '');
@@ -172,16 +173,19 @@
       $('#api-params').append($(optionsTpl({})));
     }
     var $row = $('.api-options-row:last', '#api-params');
-    $('.api-option-name', $row).crmSelect2({data: [
-      {id: 'limit', text: 'limit'},
-      {id: 'offset', text: 'offset'},
-      {id: 'match', text: 'match'},
-      {id: 'match-mandatory', text: 'match-mandatory'},
-      {id: 'metadata', text: 'metadata'},
-      {id: 'reload', text: 'reload'},
-      {id: 'sort', text: 'sort'},
-      {id: '-', text: ts('Other') + '...'}
-    ]})
+    $('.api-option-name', $row).crmSelect2({
+      data: [
+        {id: 'limit', text: 'limit'},
+        {id: 'offset', text: 'offset'},
+        {id: 'match', text: 'match'},
+        {id: 'match-mandatory', text: 'match-mandatory'},
+        {id: 'metadata', text: 'metadata'},
+        {id: 'reload', text: 'reload'},
+        {id: 'sort', text: 'sort'},
+        {id: '-', text: ts('Other') + '...'}
+      ],
+      allowClear: false
+    })
       .select2('open');
   }
 
@@ -197,6 +201,7 @@
           ($(item.element).hasClass('strikethrough') ? '<span class="strikethrough">' + item.text + '</span>' : item.text);
       },
       placeholder: '<i class="crm-i fa-link"></i> ' + ts('Entity'),
+      allowClear: false,
       escapeMarkup: function(m) {return m;}
     })
       .select2('open');
