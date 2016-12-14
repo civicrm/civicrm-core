@@ -803,8 +803,15 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
 
       $lineItem = array();
       CRM_Price_BAO_PriceSet::processAmount($self->_values['fee'], $fields, $lineItem);
+
+      $minAmt = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $fields['priceSetId'], 'min_amount');
       if ($fields['amount'] < 0) {
         $errors['_qf_default'] = ts('Event Fee(s) can not be less than zero. Please select the options accordingly');
+      }
+      elseif (!empty($minAmt) && $fields['amount'] < $minAmt) {
+        $errors['_qf_default'] = ts('A minimum amount of %1 should be selected from Event Fee(s).', array(
+          1 => CRM_Utils_Money::format($minAmt),
+        ));
       }
     }
 
