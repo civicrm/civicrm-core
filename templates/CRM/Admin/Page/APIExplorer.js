@@ -344,6 +344,11 @@
     }
     $('#api-params').prepend($(returnTpl({title: title, required: action == 'getvalue'})));
     $('#api-return-value').crmSelect2(params);
+    $("#api-return-value").select2("container").find("ul.select2-choices").sortable({
+      containment: 'parent',
+      start: function() { $("#api-return-value").select2("onSortStart"); },
+      update: function() { $("#api-return-value").select2("onSortEnd"); }
+    });
   }
 
   /**
