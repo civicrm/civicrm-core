@@ -1802,7 +1802,9 @@ class CRM_Contact_BAO_Query {
         $values[1] = 'IN';
         $this->_paramLookup['group'][0][0] = 'group';
         $this->_paramLookup['group'][0][1] = 'IN';
-        $this->_paramLookup['group'][0][2] = $values[2] = $this->getGroupsFromTypeCriteria($value);
+        $this->_paramLookup['group'][0][2] = $this->getGroupsFromTypeCriteria($value);
+        $this->_paramLookup['group'][0][3] = $grouping;
+        $this->_paramLookup['group'][0][4] = $wildcard;
         $this->group($values);
         return;
 
