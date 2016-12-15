@@ -65,7 +65,9 @@
                 </thead>
                 {foreach from=$rows item=row key=id }
                 <tr class="{cycle values="odd-row,even-row"} {$row.class} crm-tag crm-entity" id="tag-{$row.id}">
-                    <td class="crm-tag-name crm-editable crmf-name">{$row.name}</td>
+                    <td class="crm-tag-name crm-editable crmf-name" {if $row.color}style="background-color: {$row.color}; color: {$row.color|colorContrast};"{/if}>
+                      {$row.name}
+                    </td>
                     <td class="crm-tag-id">{$row.id}</td>
                     <td class="crm-tag-description crm-editable crmf-description">{$row.description} </td>
                     <td class="crm-tag-parent">{$row.parent}{if $row.parent_id} ({$row.parent_id}){/if}</td>

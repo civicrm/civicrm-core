@@ -165,7 +165,7 @@ WHERE t2.id IS NULL {$reservedClause}";
     $usedFor = CRM_Core_OptionGroup::values('tag_used_for');
 
     $query = "SELECT t1.name, t1.id, t2.name as parent, t1.description, t1.used_for, t1.is_tagset,
-                        t1.is_reserved, t1.parent_id, t1.used_for
+                        t1.is_reserved, t1.parent_id, t1.used_for, t1.color
                  FROM civicrm_tag t1 LEFT JOIN civicrm_tag t2 ON t1.parent_id = t2.id
                  GROUP BY t1.parent_id, t1.id";
 
