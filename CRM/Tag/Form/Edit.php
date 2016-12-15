@@ -85,6 +85,7 @@ class CRM_Tag_Form_Edit extends CRM_Admin_Form {
           $selectable->setValue(1);
         }
 
+        $this->add('color', 'color', ts('Color'));
       }
 
       $this->assign('isTagSet', $this->_isTagSet);
@@ -128,6 +129,12 @@ class CRM_Tag_Form_Edit extends CRM_Admin_Form {
 
     }
     parent::buildQuickForm();
+  }
+
+  public function setDefaultValues() {
+    $defaults = parent::setDefaultValues();
+    $defaults['color'] = '#ffffff';
+    return $defaults;
   }
 
   /**

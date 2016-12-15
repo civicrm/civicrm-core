@@ -52,6 +52,12 @@
             </span>
           </td>
         </tr>
+      {if $form.color.html}
+        <tr class="crm-tag-form-block-color">
+          <td class="label">{$form.color.label}</td>
+          <td>{$form.color.html}</td>
+        </tr>
+      {/if}
         <tr class="crm-tag-form-block-is_reserved">
            <td class="label">{$form.is_reserved.label}</td>
            <td>{$form.is_reserved.html} <br /><span class="description">{ts}Reserved tags can not be deleted. Users with 'administer reserved tags' permission can set or unset the reserved flag. You must uncheck 'Reserved' (and delete any child tags) before you can delete a tag.{/ts}
