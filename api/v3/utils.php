@@ -1637,7 +1637,7 @@ function _civicrm_api3_validate_foreign_keys($entity, $action, &$params, $fields
         _civicrm_api3_validate_constraint($params[$fieldName], $fieldName, $fieldInfo);
       }
       elseif (!empty($fieldInfo['required'])) {
-        throw new Exception("DB Constraint Violation - possibly $fieldName should possibly be marked as mandatory for this API. If so, please raise a bug report.");
+        throw new Exception("DB Constraint Violation - $fieldName should possibly be marked as mandatory for $entity,$action API. If so, please raise a bug report.");
       }
     }
     if (!empty($fieldInfo['api.unique'])) {
