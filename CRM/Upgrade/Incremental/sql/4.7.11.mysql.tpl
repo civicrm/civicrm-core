@@ -277,3 +277,11 @@ UPDATE civicrm_country SET name = "Saint Martin (French part)" WHERE lower(name)
 UPDATE civicrm_country SET name = "Afghanistan" WHERE lower(name) = lower("Afghanistan");
 UPDATE civicrm_country SET name = "Albania" WHERE lower(name) = lower("Albania");
 UPDATE civicrm_country SET name = "Algeria" WHERE lower(name) = lower("Algeria");
+
+SELECT @option_group_id_report := max(id) from civicrm_option_group where name = 'report_template';
+SELECT @contributeCompId := max(id) FROM civicrm_component where name = 'CiviContribute';
+SELECT @option_group_id_report_wt  := MAX(weight) FROM civicrm_option_value WHERE option_group_id = @option_group_id_report;
+INSERT INTO
+   civicrm_option_value (option_group_id, {localize field='label'}label{/localize}, value, name, grouping, filter, is_default, weight, {localize field='description'}description{/localize}, is_optgroup, is_reserved, is_active, component_id, visibility_id)
+VALUES
+(@option_group_id_report, {localize}'{ts escape="sql"}Trial Balance Report{/ts}'{/localize}, 'contribute/trialBalance', 'CRM_Report_Form_Contribute_TrialBalance', NULL, 0, NULL, @option_group_id_report_wt+1, {localize}'{ts escape="sql"}Balance for each account is calculated by summing entries since Prior Period Close Date, and adding to Current Period Opening Balance for Financial Account{/ts}'{/localize}, 0, 0, 1, @contributeCompId, NULL);

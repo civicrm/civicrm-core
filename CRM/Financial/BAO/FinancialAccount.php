@@ -552,4 +552,22 @@ WHERE `entity_table` = 'civicrm_financial_type' AND cfa.is_active = 1 AND ce.acc
     return $financialAccount;
   }
 
+  /**
+   * Get Organization Name associated with Financial Account.
+   *
+   * @return array
+   *
+   */
+  public static function getOrganizationNames() {
+    $sql = 'SELECT cc.id, cc.organization_name FROM civicrm_contact cc 
+      INNER JOIN civicrm_financial_account cfa ON cfa.contact_id = cc.id AND cc.is_deleted = 0
+      GROUP BY cc.id';
+    $result = CRM_Core_DAO::executeQuery($sql);
+    $organizationNames = array();
+    while ($result->fetch()) {
+      $organizationNames[$result->id] = $result->organization_name;
+    }
+    return $organizationNames;
+  }
+
 }
