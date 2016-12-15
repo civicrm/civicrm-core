@@ -148,6 +148,7 @@ class CRM_Core_OptionValue {
 
       $optionValue[$dao->id]['label'] = htmlspecialchars($optionValue[$dao->id]['label']);
       $optionValue[$dao->id]['order'] = $optionValue[$dao->id]['weight'];
+      $optionValue[$dao->id]['icon'] = CRM_Utils_Array::value('icon', $optionValue[$dao->id], '');
       $optionValue[$dao->id]['action'] = CRM_Core_Action::formLink($links, $action,
         array(
           'id' => $dao->id,
