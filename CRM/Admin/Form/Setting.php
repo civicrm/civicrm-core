@@ -134,7 +134,12 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
           $this->add('date', $setting, ts($props['title']), CRM_Core_SelectValues::date(NULL, 'M d'));
         }
         else {
-          $this->$add($setting, ts($props['title']));
+          if (CRM_Core_BAO_Setting::isEnvironmentSet($setting, NULL, TRUE)) {
+            $this->$add($setting, ts($props['title']), FALSE, NULL, array('disabled' => TRUE));
+          }
+          else {
+            $this->$add($setting, ts($props['title']));
+          }
         }
         // Migrate to using an array as easier in smart...
         $descriptions[$setting] = ts($props['description']);

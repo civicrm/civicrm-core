@@ -548,4 +548,40 @@ class api_v3_SettingTest extends CiviUnitTestCase {
     $this->assertEquals('Unconfirmed', $result['values'][$dom['id']]['tag_unconfirmed']);
   }
 
+  /**
+   * Test to set isProductionEnvironment
+   *
+   */
+  public function testSetCivicrmEnvironment() {
+    $params = array(
+      'isProductionEnvironment' => TRUE,
+    );
+    $result = $this->callAPISuccess('Setting', 'create', $params);
+    $params = array(
+      'name' => 'isProductionEnvironment',
+      'group' => 'Developer Preferences',
+    );
+    $result = $this->callAPISuccess('Setting', 'getvalue', $params);
+    $this->assertEquals(TRUE, $result);
+
+    global $civicrm_setting;
+    $civicrm_setting[CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME]['isProductionEnvironment'] = FALSE;
+    Civi::service('settings_manager')->useMandatory();
+    $result = $this->callAPISuccess('Setting', 'getvalue', $params);
+    $this->assertEquals(FALSE, $result);
+
+    // check that attempt to override value set in civicrm.settings.php raises error
+    $params = array(
+      'isProductionEnvironment' => TRUE,
+    );
+    $result = $this->callAPIFailure('Setting', 'create', $params);
+    $params = array(
+      'name' => 'isProductionEnvironment',
+      'group' => 'Developer Preferences',
+    );
+    $result = $this->callAPISuccess('Setting', 'getvalue', $params);
+    $this->assertEquals(FALSE, $result);
+    unset($civicrm_setting[CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME]['isProductionEnvironment']);
+  }
+
 }

@@ -107,6 +107,37 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
     $this->_mut->assertRecipients($this->getRecipients(1, 2));
   }
 
+  /**
+   * Test mail when in non-production environment.
+   *
+   */
+  public function testMailNonProductionRun() {
+    // Test in non-production mode.
+    $params = array(
+      'isProductionEnvironment' => FALSE,
+    );
+    $this->callAPISuccess('Setting', 'create', $params);
+    $this->createContactsInGroup(10, $this->_groupID);
+    Civi::settings()->add(array(
+      'mailerBatchLimit' => 2,
+    ));
+    $this->callAPISuccess('mailing', 'create', $this->_params);
+    $this->_mut->assertRecipients(array());
+    $this->callAPIFailure('job', 'process_mailing', "Failure in api call for job process_mailing:  Job has not been executed as it is a non-production environment.");
+
+    // Test with runInNonProductionEnvironment param.
+    $this->callAPISuccess('job', 'process_mailing', array('runInNonProductionEnvironment' => TRUE));
+    $this->_mut->assertRecipients($this->getRecipients(1, 2));
+
+    // Test in production mode.
+    $params = array(
+      'isProductionEnvironment' => TRUE,
+    );
+    $this->callAPISuccess('Setting', 'create', $params);
+    $this->callAPISuccess('job', 'process_mailing', array());
+    $this->_mut->assertRecipients($this->getRecipients(1, 2));
+  }
+
   public function concurrencyExamples() {
     $es = array();
 

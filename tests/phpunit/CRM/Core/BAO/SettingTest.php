@@ -180,4 +180,30 @@ class CRM_Core_BAO_SettingTest extends CiviUnitTestCase {
     $_testOnChange_hookCalls['metadata'] = $metadata;
   }
 
+  /**
+   * Test to set isProductionEnvironment
+   *
+   */
+  public function testSetCivicrmEnvironment() {
+    CRM_Core_BAO_Setting::setItem(TRUE, CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME, 'isProductionEnvironment');
+    $values = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME, 'isProductionEnvironment');
+    $this->assertEquals(TRUE, $values);
+
+    global $civicrm_setting;
+    $civicrm_setting[CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME]['isProductionEnvironment'] = FALSE;
+    Civi::service('settings_manager')->useMandatory();
+    $values = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME, 'isProductionEnvironment');
+    $this->assertEquals(FALSE, $values);
+
+    // check that attempt to override value set in civicrm.settings.php raises error
+    try {
+      CRM_Core_BAO_Setting::setItem(TRUE, CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME, 'isProductionEnvironment');
+      $this->fail("Missed expected exception");
+    }
+    catch (Exception $e) {
+      $this->assertEquals(ts('CiviCRM Environment already set in civicrm.settings.php!'), $e->getMessage());
+    }
+    unset($civicrm_setting[CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME]['isProductionEnvironment']);
+  }
+
 }
