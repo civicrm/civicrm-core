@@ -69,6 +69,7 @@ class CRM_Admin_Form extends CRM_Core_Form {
    */
   public function preProcess() {
     Civi::resources()->addStyleFile('civicrm', 'css/admin.css');
+    Civi::resources()->addScriptFile('civicrm', 'js/crm.admin.js');
 
     $this->_id = $this->get('id');
     $this->_BAOName = $this->get('BAOName');

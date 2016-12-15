@@ -183,6 +183,15 @@
     <default>NULL</default>
     <add>2.2</add>
   </field>
+  <field>
+    <name>icon</name>
+    <title>Icon</title>
+    <type>varchar</type>
+    <length>255</length>
+    <default>NULL</default>
+    <comment>crm-i icon class</comment>
+    <add>4.7</add>
+  </field>
   <index>
     <name>index_option_group_id_value</name>
     <fieldName length="128">value</fieldName>
