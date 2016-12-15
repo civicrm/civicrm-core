@@ -26,7 +26,7 @@
 {* this template is used for adding/editing tags  *}
 {literal}
 <style>
-  #tagtree .highlighted > span {
+  #tagtree .highlighted {
     background-color: #fefca6;
   }
   #tagtree .helpicon ins {
@@ -45,16 +45,18 @@
     CRM.updateContactSummaryTags = function() {
       var tags = [];
       $('#tagtree input:checkbox:checked+span label').each(function() {
-        tags.push($(this).text());
+        tags.push('<span class="crm-tag-item" style="' + $(this).attr('style') + '">' + $(this).text() + '</span>');
       });
       $('input.crm-contact-tagset').each(function() {
         var setTags = _.pluck($(this).select2('data'), 'label');
-        tags = tags.concat(setTags);
+        $.each(setTags, function (i, item) {
+          tags.push('<span class="crm-tag-item">' + item + '</span>');
+        });
       });
       // contact summary tabs and search forms both listen for this event
       $($form).closest('.crm-ajax-container').trigger('crmFormSuccess', {tabCount: tags.length});
       // update summary tab
-      $("#contact-summary #tags").html(tags.join(', '));
+      $("#contact-summary #tags").html(tags.join(' '));
     };
 
     $(function() {

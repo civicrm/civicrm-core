@@ -133,7 +133,9 @@ class CRM_Tag_Form_Edit extends CRM_Admin_Form {
 
   public function setDefaultValues() {
     $defaults = parent::setDefaultValues();
-    $defaults['color'] = '#ffffff';
+    if (empty($this->_id) || !CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Tag', $this->_id, 'color')) {
+      $defaults['color'] = '#ffffff';
+    }
     return $defaults;
   }
 
@@ -164,6 +166,10 @@ class CRM_Tag_Form_Edit extends CRM_Admin_Form {
 
     if (!isset($params['is_selectable'])) {
       $params['is_selectable'] = 0;
+    }
+
+    if (strtolower($params['color']) == '#ffffff') {
+      $params['color'] = 'null';
     }
 
     if ($this->_action == CRM_Core_Action::DELETE) {

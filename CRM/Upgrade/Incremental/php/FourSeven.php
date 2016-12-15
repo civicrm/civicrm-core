@@ -284,6 +284,10 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
       'civicrm_option_value', 'icon', "varchar(255) COMMENT 'crm-i icon class' DEFAULT NULL");
     $this->addTask('CRM-19626 - Add min_amount column to civicrm_price_set', 'addColumn',
       'civicrm_price_set', 'min_amount', "INT(10) UNSIGNED DEFAULT '0' COMMENT 'Minimum Amount required for this set.'");
+    $this->addTask('CRM-19769 - Add color column to civicrm_tag', 'addColumn',
+      'civicrm_tag', 'color', "varchar(255) COMMENT 'Hex color value e.g. #ffffff' DEFAULT NULL");
+    $this->addTask('CRM-19779 - Add color column to civicrm_option_value', 'addColumn',
+      'civicrm_option_value', 'color', "varchar(255) COMMENT 'Hex color value e.g. #ffffff' DEFAULT NULL");
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
   }
 

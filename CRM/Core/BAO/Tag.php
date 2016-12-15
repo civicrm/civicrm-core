@@ -172,6 +172,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
           $tags[$tag->id]['parent_id'] = $tag->parent_id;
           $tags[$tag->id]['is_tagset'] = $tag->is_tagset;
           $tags[$tag->id]['used_for'] = $tag->used_for;
+          $tags[$tag->id]['color'] = !empty($tag->color) ? $tag->color : NULL;
         }
       }
       $tag->free();
