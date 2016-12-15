@@ -482,7 +482,7 @@ ORDER BY start_date desc
       }
       else {
         $curDate = date('YmdHis');
-        $clauses[5] = "(end_date >= {$curDate} OR end_date IS NULL)";
+        $clauses[] = "(end_date >= {$curDate} OR end_date IS NULL)";
       }
     }
     else {

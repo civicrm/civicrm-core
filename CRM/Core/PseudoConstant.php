@@ -548,6 +548,7 @@ class CRM_Core_PseudoConstant {
       return $var;
     }
 
+    /* @var CRM_Core_DAO $object */
     $object = new $name();
 
     $object->selectAdd();
@@ -565,6 +566,10 @@ class CRM_Core_PseudoConstant {
 
     if (!$all) {
       $object->$filter = 1;
+      $aclClauses = array_filter($name::getSelectWhereClause());
+      foreach ($aclClauses as $clause) {
+        $object->whereAdd($clause);
+      }
     }
 
     $object->find();

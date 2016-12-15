@@ -622,7 +622,7 @@ class CRM_Utils_Array {
           $result[$key] = $record->{$prop};
         }
         else {
-          $result[$key] = $record[$prop];
+          $result[$key] = self::value($prop, $record);
         }
       }
     }
