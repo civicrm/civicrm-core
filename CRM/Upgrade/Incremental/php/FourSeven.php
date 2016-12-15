@@ -924,8 +924,7 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
       'civievent' => array('label' => ts('CiviEvent'), 'component_id' => 'CiviEvent'),
     );
     foreach ($values as $name => $value) {
-      civicrm_api3('OptionValue', 'create', $value + array(
-        'options' => array('match' => array('name', 'option_group_id')),
+      CRM_Core_BAO_OptionValue::ensureOptionValueExists($value + array(
         'name' => $name,
         'option_group_id' => 'wysiwyg_presets',
       ));
