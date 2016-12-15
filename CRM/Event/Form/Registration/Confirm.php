@@ -430,6 +430,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       $this->set('finalAmount', $this->_amount);
     }
     $participantCount = array();
+    $taxAmount = $totalTaxAmount = 0;
 
     //unset the skip participant from params.
     //build the $participantCount array.
@@ -442,7 +443,10 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       elseif ($participantNum) {
         $participantCount[$participantNum] = 'participant';
       }
-
+      $totalTaxAmount += CRM_Utils_Array::value('tax_amount', $record, 0);
+      if (CRM_Utils_Array::value('is_primary', $record)) {
+        $taxAmount = &$params[$participantNum]['tax_amount'];
+      }
       //lets get additional participant id to cancel.
       if ($this->_allowConfirmation && is_array($cancelledIds)) {
         $additonalId = CRM_Utils_Array::value('participant_id', $record);
@@ -451,7 +455,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         }
       }
     }
-
+    $taxAmount = $totalTaxAmount;
     $payment = $registerByID = $primaryCurrencyID = $contribution = NULL;
     $paymentObjError = ts('The system did not record payment details for this payment and so could not process the transaction. Please report this error to the site administrator.');
 
