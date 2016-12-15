@@ -171,18 +171,21 @@ class CRM_Contact_BAO_GroupContactTest extends CiviUnitTestCase {
     // Create contact with Gender - Male
     $contact1 = $this->individualCreate(array(
       'gender_id' => "Male",
+      'first_name' => 'A',
     ));
 
     // Create contact with Gender - Male and in regular group
     $contact2 = $this->individualCreate(array(
       'group' => array($regularGroup['id'] => 1),
       'gender_id' => "Male",
+      'first_name' => 'B',
     ), 1);
 
     // Create contact with Gender - Female and in regular group
     $contact3 = $this->individualCreate(array(
       'group' => array($regularGroup['id'] => 1),
       'gender_id' => "Female",
+      'first_name' => 'C',
     ), 1);
 
     // create smart group based on saved criteria Gender = Male
@@ -220,7 +223,76 @@ class CRM_Contact_BAO_GroupContactTest extends CiviUnitTestCase {
     foreach ($useCases as $case) {
       $query = new CRM_Contact_BAO_Query(CRM_Contact_BAO_Query::convertFormValues($case['form_value']));
       list($select, $from, $where, $having) = $query->query();
-      $groupContacts = CRM_Core_DAO::executeQuery("SELECT DISTINCT contact_a.id $from $where")->fetchAll();
+      $groupContacts = CRM_Core_DAO::executeQuery("SELECT DISTINCT contact_a.* $from $where ORDER BY contact_a.first_name")->fetchAll();
+      foreach ($groupContacts as $key => $value) {
+        $groupContacts[$key] = $value['id'];
+      }
+      $this->assertEquals($case['expected_count'], count($groupContacts));
+      $this->checkArrayEquals($case['expected_contact'], $groupContacts);
+    }
+  }
+
+  /**
+   *  CRM-19333: Test case for contact search on basis of group type
+   */
+  public function testbyGroupType() {
+    $groupTypes = CRM_Core_BAO_OptionValue::getOptionValuesAssocArrayFromName('group_type');
+    $mailingListGT = array_search('Mailing List', $groupTypes);
+    $accessControlGT = array_search('Access Control', $groupTypes);
+
+    // create group with group type - Mailing list
+    $group1 = $this->callAPISuccess('Group', 'create', array(
+      'title' => 'Group 1',
+      'visibility' => 'User and User Admin Only',
+      'is_active' => 1,
+      'group_type' => $mailingListGT,
+    ));
+
+    // create group with group type - Access Control
+    $group2 = $this->callAPISuccess('Group', 'create', array(
+      'title' => 'Group 2',
+      'visibility' => 'User and User Admin Only',
+      'is_active' => 1,
+      'group_type' => $accessControlGT,
+    ));
+
+    // create contact in 'Group 1'
+    $contact1 = $this->individualCreate(array(
+      'group' => array($group1['id'] => 1),
+      'first_name' => 'A',
+    ));
+
+    // create contact in 'Group 2'
+    $contact2 = $this->individualCreate(array(
+      'group' => array($group2['id'] => 1),
+      'first_name' => 'B',
+    ), 1);
+
+    $useCases = array(
+      //Case 1: Find contacts in group type - Mailing List
+      array(
+        'form_value' => array('group_type' => array($mailingListGT)),
+        'expected_count' => 1,
+        'expected_contact' => array($contact1),
+      ),
+      //Case 2: Find contacts in group type - Access Control
+      array(
+        'form_value' => array('group_type' => array($accessControlGT)),
+        'expected_count' => 1,
+        'expected_contact' => array($contact2),
+      ),
+      //Case 3: Find contacts in group type - Mailing List or Access List
+      array(
+        'form_value' => array('group_type' => array($mailingListGT, $accessControlGT)),
+        'expected_count' => 2,
+        'expected_contact' => array($contact1, $contact2),
+      ),
+    );
+
+    foreach ($useCases as $case) {
+      $query = new CRM_Contact_BAO_Query(CRM_Contact_BAO_Query::convertFormValues($case['form_value']));
+      list($select, $from, $where, $having) = $query->query();
+      $groupContacts = CRM_Core_DAO::executeQuery("SELECT DISTINCT contact_a.id $from $where ORDER BY contact_a.first_name")->fetchAll();
       foreach ($groupContacts as $key => $value) {
         $groupContacts[$key] = $value['id'];
       }
