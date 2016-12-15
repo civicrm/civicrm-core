@@ -220,7 +220,7 @@ class CRM_Core_PseudoConstant {
     if (strpos($fieldName, 'custom_') === 0 && is_numeric($fieldName[7])) {
       $customField = new CRM_Core_BAO_CustomField();
       $customField->id = (int) substr($fieldName, 7);
-      $options = $customField->getOptions();
+      $options = $customField->getOptions($context);
       if ($options && $flip) {
         $options = array_flip($options);
       }
