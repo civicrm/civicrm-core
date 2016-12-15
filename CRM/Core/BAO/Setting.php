@@ -176,6 +176,9 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     /** @var \Civi\Core\SettingsManager $manager */
     $manager = \Civi::service('settings_manager');
     $settings = ($contactID === NULL) ? $manager->getBagByDomain($domainID) : $manager->getBagByContact($domainID, $contactID);
+    if (self::isEnvironmentSet($name, $value)) {
+      throw new api_Exception('CiviCRM Environment already set in civicrm.settings.php!');
+    }
     $settings->set($name, $value);
   }
 
@@ -206,6 +209,9 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     $fieldsToSet = self::validateSettingsInput($params, $fields);
 
     foreach ($fieldsToSet as $settingField => &$settingValue) {
+      if (self::isEnvironmentSet($settingField, $settingValue)) {
+        throw new api_Exception('CiviCRM Environment already set in civicrm.settings.php!');
+      }
       self::validateSetting($settingValue, $fields['values'][$settingField]);
     }
 
@@ -488,6 +494,33 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
       }
     }
     return FALSE;
+  }
+
+  /**
+   * Check if isProductionEnvironment is explicitly set.
+   *
+   * @return bool
+   */
+  public static function isEnvironmentSet($setting, $value = NULL, $checkValue = FALSE) {
+    global $civicrm_setting;
+    if ($setting == 'isProductionEnvironment' && (isset($civicrm_setting[self::DEVELOPER_PREFERENCES_NAME][$setting])
+      && array_key_exists($setting, $civicrm_setting[self::DEVELOPER_PREFERENCES_NAME])) &&
+      ($checkValue || (isset($value) && $value != $civicrm_setting[self::DEVELOPER_PREFERENCES_NAME][$setting]))
+    ) {
+      return TRUE;
+    }
+    return FALSE;
+  }
+
+  /**
+   * Check if job is able to be executed by API.
+   *
+   * @throws API_Exception
+   */
+  public static function isAPIJobAllowedToRun($params) {
+    if (Civi::settings()->get('isProductionEnvironment') === FALSE && !CRM_Utils_Array::value('runInNonProductionEnvironment', $params)) {
+      throw new Exception("Job has not been executed as it is a non-production environment.");
+    }
   }
 
 }
