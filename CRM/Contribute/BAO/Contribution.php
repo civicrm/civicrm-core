@@ -3601,7 +3601,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
           $params['line_item'][$fieldId][$fieldValueId]['deferred_line_total'] = $amount;
           $params['line_item'][$fieldId][$fieldValueId]['financial_item_id'] = $financialItem->id;
 
-          $taxAmount = $fieldValues['tax_amount'];
+          $taxAmount = CRM_Utils_Array::value('tax_amount', $fieldValues);
           $taxFinancialType = $fieldValues['financial_type_id'];
           if ($context == 'changeFinancialType') {
             $taxAmount = $previousLineItem[$fieldValues['id']]['tax_amount'];

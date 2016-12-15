@@ -316,7 +316,7 @@ WHERE cc.id IN (' . implode(',', $contactIds) . ') AND con.is_test = 0';
           THEN 0
           ELSE 1
         END
-      GROUP BY cfi.id ORDER BY cfi.id DESC LIMIT 1';
+      ORDER BY cfi.id DESC LIMIT 1';
     $prevFinancialItem = CRM_Core_DAO::executeQuery($query, $queryParams);
     $prevFinancialItem->fetch();
     return $prevFinancialItem;
