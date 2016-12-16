@@ -622,6 +622,13 @@ FROM civicrm_action_schedule cas
       'entity_id' => $schedule->id,
     );
 
+    if (isset($tokenRow->context['contact'])) {
+      if (!isset($tokenRow->context['contact']['preferred_mail_format']) ||
+        $tokenRow->context['contact']['preferred_mail_format'] === NULL) {
+        $tokenRow->context['contact']['preferred_mail_format'] = 'Both';
+      }
+    }
+
     if (!$body_html || $tokenRow->context['contact']['preferred_mail_format'] == 'Text' ||
       $tokenRow->context['contact']['preferred_mail_format'] == 'Both'
     ) {

@@ -1443,6 +1443,10 @@ class CRM_Utils_Token {
     $greetingTokens = self::getTokens($tokenString);
 
     if (!empty($greetingTokens)) {
+      // Some greetings are required.
+      $greetingTokens[] = 'email_greeting';
+      $greetingTokens[] = 'postal_greeting';
+
       // first use the existing contact object for token replacement
       if (!empty($contactDetails)) {
         $tokenString = CRM_Utils_Token::replaceContactTokens($tokenString, $contactDetails, TRUE, $greetingTokens, TRUE, $escapeSmarty);
