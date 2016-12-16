@@ -639,6 +639,10 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
         'membership_id' => $renewMembership->id,
         'contribution_recur_id' => $contributionRecurID,
       ));
+      //Remove `tax_amount` if it is not calculated.
+      if (CRM_Utils_Array::value('tax_amount', $temporaryParams) === 0) {
+        unset($temporaryParams['tax_amount']);
+      }
       CRM_Member_BAO_Membership::recordMembershipContribution($temporaryParams);
     }
 
