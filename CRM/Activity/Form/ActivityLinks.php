@@ -57,7 +57,7 @@ class CRM_Activity_Form_ActivityLinks extends CRM_Core_Form {
 
     $activityTypes = array();
 
-    foreach ($allTypes as $id => $act) {
+    foreach ($allTypes as $act) {
       $url = 'civicrm/activity/add';
       if ($act['name'] == 'Email') {
         if (!CRM_Utils_Mail::validOutBoundMail() || !$contactId) {
@@ -93,7 +93,7 @@ class CRM_Activity_Form_ActivityLinks extends CRM_Core_Form {
         continue;
       }
       $act['url'] = CRM_Utils_System::url($url,
-        "{$urlParams}{$id}", FALSE, NULL, FALSE
+        "{$urlParams}{$act['value']}", FALSE, NULL, FALSE
       );
       $act += array('icon' => 'fa-plus-square-o');
       $activityTypes[$act['value']] = $act;
