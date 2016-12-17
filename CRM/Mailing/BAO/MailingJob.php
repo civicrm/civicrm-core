@@ -488,7 +488,7 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
    * @return void
    */
   public function deliver(&$mailer, $testParams = NULL) {
-    if (\Civi::settings()->get('experimentalFlexMailerEngine')) {
+    if (CRM_Core_BAO_Setting::getItem('Mailing Preferences', 'experimentalFlexMailerEngine')) {
       throw new \RuntimeException("Cannot use legacy deliver() when experimentalFlexMailerEngine is enabled");
     }
 
