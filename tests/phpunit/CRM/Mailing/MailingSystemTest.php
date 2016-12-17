@@ -36,6 +36,8 @@
  *
  */
 
+require_once 'tests/phpunit/CRM/Mailing/BaseMailingSystemTest.php';
+
 /**
  * Class CRM_Mailing_MailingSystemTest
  *
@@ -56,7 +58,7 @@ class CRM_Mailing_MailingSystemTest extends CRM_Mailing_BaseMailingSystemTest {
 
   public function setUp() {
     parent::setUp();
-    Civi::settings()->add(array('experimentalFlexMailerEngine' => FALSE));
+    CRM_Core_BAO_Setting::setItem(FALSE, 'Mailing Preferences', 'experimentalFlexMailerEngine');
 
     $hooks = \CRM_Utils_Hook::singleton();
     $hooks->setHook('civicrm_alterMailParams',
@@ -104,10 +106,12 @@ class CRM_Mailing_MailingSystemTest extends CRM_Mailing_BaseMailingSystemTest {
   }
 
   public function testHtmlWithOpenTracking() {
+    // $this->markTestSkipped('BaseMailingSystemTest::testHtmlWithOpenTracking does not apply to v4.6. CiviMail in v4.6 has old behavior.');
     parent::testHtmlWithOpenTracking();
   }
 
   public function testHtmlWithOpenAndUrlTracking() {
+    // $this->markTestSkipped('BaseMailingSystemTest::testHtmlWithOpenAndUrlTracking does not apply. CiviMail in v4.6 has old behavior.');
     parent::testHtmlWithOpenAndUrlTracking();
   }
 

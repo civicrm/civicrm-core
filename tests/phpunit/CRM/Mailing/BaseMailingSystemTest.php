@@ -36,6 +36,9 @@
  *
  */
 
+require_once 'CiviTest/CiviUnitTestCase.php';
+require_once 'CiviTest/CiviMailUtils.php';
+
 /**
  * Class CRM_Mailing_MailingSystemTest
  * @group headless
@@ -130,7 +133,7 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
         "Sample Header for TEXT formatted content.\n" . // Default header
         "BEWARE children need regular infusions of toys. Santa knows your .*\\. There is no http.*civicrm/mailing/optout.*\\.\n" .
         "to unsubscribe: http.*civicrm/mailing/optout" . // Default footer
-        ";",
+        ";s",
         $message->body->text
       );
     }
@@ -171,16 +174,14 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
       $this->assertEquals('plain', $textPart->subType);
       $this->assertRegExp(
         ";" .
-        "Sample Header for TEXT formatted content.\n" . // Default header
-        "You can go to Google \\[1\\] or opt out \\[2\\]\\.\n" . //  body_html, filtered
+        "Sample Header for (HTML|TEXT) formatted content..*" . // Default header; note 4.6+4.7 differ
+        "You can go to Google \\[1\\] or opt out \\[2\\]\\..*" . //  body_html, filtered
         "\n" .
         "Links:\n" .
         "------\n" .
         "\\[1\\] http://example.net/first\\?cs=[0-9a-f_]+\n" .
         "\\[2\\] http.*civicrm/mailing/optout.*\n" .
-        "\n" .
-        "to unsubscribe: http.*civicrm/mailing/optout" . // Default footer
-        ";",
+        ";s",
         $textPart->text
       );
     }
@@ -224,16 +225,13 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
       $this->assertRegExp(
         ";" .
         //  body_html, filtered
-        "You can go to Google \\[1\\] or opt out \\[2\\]\\.\n" .
-        "\n" .
+        "You can go to Google \\[1\\] or opt out \\[2\\]\\." .
+        ".*" .
         "Links:\n" .
         "------\n" .
         "\\[1\\] .*extern/url\.php\?u=\d+&qid=\d+\n" .
         "\\[2\\] http.*civicrm/mailing/optout.*\n" .
-        "\n" .
-        // Default footer
-        "to unsubscribe: http.*civicrm/mailing/optout" .
-        ";",
+        ";s",
         $textPart->text
       );
     }
