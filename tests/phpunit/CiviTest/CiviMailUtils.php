@@ -191,7 +191,7 @@ class CiviMailUtils extends PHPUnit_Framework_TestCase {
     $msgs = array();
 
     if ($this->_webtest) {
-      throw new Exception("Not implementated: getAllMessages for WebTest");
+      throw new Exception("Not implemented: getAllMessages for WebTest");
     }
     else {
       $dao = CRM_Core_DAO::executeQuery('SELECT headers, body FROM civicrm_mailing_spool ORDER BY id');
@@ -336,7 +336,7 @@ class CiviMailUtils extends PHPUnit_Framework_TestCase {
    */
   public function clearMessages($limit = 1) {
     if ($this->_webtest) {
-      throw new Exception("Not implementated: clearMessages for WebTest");
+      throw new Exception("Not implemented: clearMessages for WebTest");
     }
     else {
       CRM_Core_DAO::executeQuery('DELETE FROM civicrm_mailing_spool ORDER BY id DESC LIMIT ' . $limit);
