@@ -2227,6 +2227,9 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
           // to avoid key error from MySQL. 
           $params = array('id' => $extIDMatch, 'external_identifier' => '');
           civicrm_api3('Contact','Update', $params);
+
+          // And now it is no longer a match.
+          $extIDMatch = NULL;
         }
       }
     }
