@@ -199,7 +199,7 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
       self::$activityTypeList[$cache] = array();
 
       $query = "
-              SELECT  v.label as label ,v.value as value, v.name as name, v.description as description
+              SELECT  v.label as label ,v.value as value, v.name as name, v.description as description, v.icon
               FROM   civicrm_option_value v,
                      civicrm_option_group g
               WHERE  v.option_group_id = g.id
@@ -231,6 +231,7 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
         $activityTypes[$index]['id'] = $dao->value;
         $activityTypes[$index]['label'] = $dao->label;
         $activityTypes[$index]['name'] = $dao->name;
+        $activityTypes[$index]['icon'] = $dao->icon;
         $activityTypes[$index]['description'] = $dao->description;
       }
       self::$activityTypeList[$cache] = $activityTypes;
