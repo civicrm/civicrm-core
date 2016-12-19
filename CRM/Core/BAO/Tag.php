@@ -346,7 +346,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
   }
 
   /**
-   * Takes an associative array and creates a contact object.
+   * Takes an associative array and creates a tag object.
    *
    * The function extract all the params it needs to initialize the create a
    * contact object. the params array could contain additional unused name/value
