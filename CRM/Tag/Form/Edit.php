@@ -48,8 +48,6 @@ class CRM_Tag_Form_Edit extends CRM_Admin_Form {
    * Build the form object.
    */
   public function buildQuickForm() {
-    $this->setPageTitle($this->_isTagSet ? ts('Tag Set') : ts('Tag'));
-
     if ($this->_action == CRM_Core_Action::DELETE) {
       if ($this->_id && $tag = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Tag', $this->_id, 'name', 'parent_id')) {
         $url = CRM_Utils_System::url('civicrm/tag', "reset=1");
@@ -126,8 +124,8 @@ class CRM_Tag_Form_Edit extends CRM_Admin_Form {
         $adminReservedTags = FALSE;
       }
       $this->assign('adminReservedTags', $adminReservedTags);
-
     }
+    $this->setPageTitle($this->_isTagSet ? ts('Tag Set') : ts('Tag'));
     parent::buildQuickForm();
   }
 
@@ -136,6 +134,9 @@ class CRM_Tag_Form_Edit extends CRM_Admin_Form {
     if (empty($this->_id) || !CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Tag', $this->_id, 'color')) {
       $defaults['color'] = '#ffffff';
     }
+    if (empty($this->_id) && $this->_isTagSet) {
+      $defaults['used_for'] = 'civicrm_contact';
+    }
     return $defaults;
   }
 
@@ -143,12 +144,12 @@ class CRM_Tag_Form_Edit extends CRM_Admin_Form {
    * Process the form submission.
    */
   public function postProcess() {
-    $params = $ids = array();
-
     // store the submitted values in an array
     $params = $this->exportValues();
+    if ($this->_id) {
+      $params['id'] = $this->_id;
+    }
 
-    $ids['tag'] = $this->_id;
     if ($this->_action == CRM_Core_Action::ADD ||
       $this->_action == CRM_Core_Action::UPDATE
     ) {
@@ -176,12 +177,12 @@ class CRM_Tag_Form_Edit extends CRM_Admin_Form {
       if ($this->_id > 0) {
         $tag = civicrm_api3('tag', 'getsingle', array('id' => $this->_id));
         CRM_Core_BAO_Tag::del($this->_id);
-        CRM_Core_Session::setStatus(ts('The tag \'%1\' has been deleted.', array(1 => $tag['name'])), ts('Deleted'), 'success');
+        CRM_Core_Session::setStatus(ts("The tag '%1' has been deleted.", array(1 => $tag['name'])), ts('Deleted'), 'success');
       }
     }
     else {
-      $tag = CRM_Core_BAO_Tag::add($params, $ids);
-      CRM_Core_Session::setStatus(ts('The tag \'%1\' has been saved.', array(1 => $tag->name)), ts('Saved'), 'success');
+      $tag = CRM_Core_BAO_Tag::add($params);
+      CRM_Core_Session::setStatus(ts("The tag '%1' has been saved.", array(1 => $tag->name)), ts('Saved'), 'success');
     }
   }
 
