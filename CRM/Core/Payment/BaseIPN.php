@@ -698,7 +698,12 @@ LIMIT 1;";
       $contributionId['id'] = $contribution->id;
       $input['prevContribution'] = CRM_Contribute_BAO_Contribution::getValues($contributionId, CRM_Core_DAO::$_nullArray, CRM_Core_DAO::$_nullArray);
     }
-
+    if ($isNewContribution) {
+      CRM_Utils_Hook::pre('create', 'Contribution', NULL, $contribution);
+    }
+    else {
+      CRM_Utils_Hook::pre('edit', 'Contribution', $contribution->id, $contribution);
+    }
     $contribution->save();
 
     // Add new soft credit against current $contribution.
@@ -803,6 +808,12 @@ LIMIT 1;";
     }
 
     CRM_Core_Error::debug_log_message("Success: Database updated");
+    if ($isNewContribution) {
+      CRM_Utils_Hook::post('create', 'Contribution', NULL, $contribution);
+    }
+    else {
+      CRM_Utils_Hook::post('edit', 'Contribution', $contribution->id, $contribution);
+    }
     if ($this->_isRecurring) {
       $this->sendRecurringStartOrEndNotification($ids, $recur);
     }
