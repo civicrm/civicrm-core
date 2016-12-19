@@ -384,5 +384,9 @@ ul#civicrm-menu li#crm-qsearch {
 #crm-container .label {
   background-color: inherit;
   width: inherit;
+}
+
+#crm-container .form-layout .label {
   display: block;
 }
+
