@@ -67,14 +67,9 @@ class CRM_Tag_Form_Edit extends CRM_Admin_Form {
         $this->_isTagSet = TRUE;
       }
 
-      $allTag = array('' => ts('- select -')) + CRM_Core_BAO_Tag::getTagsNotInTagset();
-
-      if ($this->_id) {
-        unset($allTag[$this->_id]);
-      }
-
       if (!$this->_isTagSet) {
-        $this->add('select', 'parent_id', ts('Parent Tag'), $allTag, FALSE, array('class' => 'crm-select2'));
+        $colorTags = CRM_Core_BAO_Tag::getColorTags(NULL, TRUE, $this->_id);
+        $this->add('select2', 'parent_id', ts('Parent Tag'), $colorTags, FALSE, array('placeholder' => ts('- select -')));
 
         // Tagsets are not selectable by definition so only include the selectable field if NOT a tagset.
         $selectable = $this->add('checkbox', 'is_selectable', ts('Selectable?'));
