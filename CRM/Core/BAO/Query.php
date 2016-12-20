@@ -59,6 +59,15 @@ class CRM_Core_BAO_Query {
   }
 
   /**
+   * Getter for the qill object.
+   *
+   * @return string
+   */
+  public function qill() {
+    return (isset($this->_qill)) ? $this->_qill : "";
+  }
+
+  /**
    * Possibly unnecessary function.
    *
    * @param $row
