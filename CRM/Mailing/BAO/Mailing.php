@@ -3197,4 +3197,56 @@ AND        m.id = %1
     }
   }
 
+  /**
+   * Get a list of template types which can be used as `civicrm_mailing.template_type`.
+   *
+   * @return array
+   *   A list of template-types, keyed numerically. Each defines:
+   *     - name: string, a short symbolic name
+   *     - editorUrl: string, Angular template name
+   *
+   *   Ex: $templateTypes[0] === array('name' => 'mosaico', 'editorUrl' => '~/crmMosaico/editor.html').
+   */
+  public static function getTemplateTypes() {
+    if (!isset(Civi::$statics[__CLASS__]['templateTypes'])) {
+      $types = array();
+      $types[] = array(
+        'name' => 'traditional',
+        'editorUrl' => CRM_Mailing_Info::workflowEnabled() ? '~/crmMailing/EditMailingCtrl/workflow.html' : '~/crmMailing/EditMailingCtrl/2step.html',
+        'weight' => 0,
+      );
+
+      CRM_Utils_Hook::mailingTemplateTypes($types);
+
+      $defaults = array('weight' => 0);
+      foreach (array_keys($types) as $typeName) {
+        $types[$typeName] = array_merge($defaults, $types[$typeName]);
+      }
+      usort($types, function ($a, $b) {
+        if ($a['weight'] === $b['weight']) {
+          return 0;
+        }
+        return $a['weight'] < $b['weight'] ? -1 : 1;
+      });
+
+      Civi::$statics[__CLASS__]['templateTypes'] = $types;
+    }
+
+    return Civi::$statics[__CLASS__]['templateTypes'];
+  }
+
+  /**
+   * Get a list of template types.
+   *
+   * @return array
+   *   Array(string $name => string $label).
+   */
+  public static function getTemplateTypeNames() {
+    $r = array();
+    foreach (self::getTemplateTypes() as $type) {
+      $r[$type['name']] = $type['name'];
+    }
+    return $r;
+  }
+
 }

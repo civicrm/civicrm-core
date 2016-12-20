@@ -897,6 +897,23 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
+   * (Experimental) Modify the list of template-types used for CiviMail composition.
+   *
+   * @param array $types
+   *   Sequentially indexed list of template types. Each type specifies:
+   *     - name: string
+   *     - editorUrl: string, Angular template URL
+   *     - weight: int, priority when picking a default value for new mailings
+   * @return mixed
+   */
+  public static function mailingTemplateTypes(&$types) {
+    return self::singleton()->invoke(1, $types, self::$_nullObject, self::$_nullObject,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject,
+      'civicrm_mailingTemplateTypes'
+    );
+  }
+
+  /**
    * This hook is called when composing the array of membershipTypes and their cost during a membership registration
    * (new or renewal).
    * Note the hook is called on initial page load and also reloaded after submit (PRG pattern).
