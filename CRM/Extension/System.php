@@ -138,7 +138,7 @@ class CRM_Extension_System {
         if (is_dir($vendorPath)) {
           $containers['cmsvendor'] = new CRM_Extension_Container_Basic(
             $vendorPath,
-            $this->parameters['userFrameworkBaseURL'] . DIRECTORY_SEPARATOR . 'vendor',
+            CRM_Utils_File::addTrailingSlash($this->parameters['userFrameworkBaseURL'], '/') . 'vendor',
             $this->getCache(),
             'cmsvendor'
           );
