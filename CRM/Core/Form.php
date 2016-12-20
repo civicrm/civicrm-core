@@ -356,6 +356,16 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       }
       $type = $type == 'wysiwyg' ? 'textarea' : 'text';
     }
+    // Like select but accepts rich array data (with nesting, colors, icons, etc) as option list.
+    if ($inputType == 'select2') {
+      $type = 'text';
+      $options = $attributes;
+      $attributes = $attributes = ($extra ? $extra : array()) + array('class' => '');
+      $attributes['class'] = ltrim($attributes['class'] . " crm-select2 crm-form-select2");
+      $attributes['data-select-params'] = json_encode(array('data' => $options, 'multiple' => !empty($attributes['multiple'])));
+      unset($attributes['multiple']);
+      $extra = NULL;
+    }
     // @see http://wiki.civicrm.org/confluence/display/CRMDOC/crmDatepicker
     if ($type == 'datepicker') {
       $attributes = ($attributes ? $attributes : array());

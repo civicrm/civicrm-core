@@ -315,6 +315,42 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
   }
 
   /**
+   * @param string $usedFor
+   * @param bool $allowSelectingNonSelectable
+   * @param null $exclude
+   * @return array
+   * @throws \CiviCRM_API3_Exception
+   */
+  public static function getColorTags($usedFor = NULL, $allowSelectingNonSelectable = FALSE, $exclude = NULL) {
+    $params = array(
+      'options' => array('limit' => 0),
+      'is_tagset' => 0,
+      'return' => array('name', 'description', 'parent_id', 'color', 'is_selectable', 'used_for'),
+    );
+    if ($usedFor) {
+      $params['used_for'] = array('LIKE' => "%$usedFor%");
+    }
+    if ($exclude) {
+      $params['id'] = array('!=' => $exclude);
+    }
+    $allTags = array();
+    foreach (CRM_Utils_Array::value('values', civicrm_api3('Tag', 'get', $params)) as $id => $tag) {
+      $allTags[$id] = array(
+        'text' => $tag['name'],
+        'id' => $id,
+        'description' => CRM_Utils_Array::value('description', $tag),
+        'parent_id' => CRM_Utils_Array::value('parent_id', $tag),
+        'used_for' => CRM_Utils_Array::value('used_for', $tag),
+        'color' => CRM_Utils_Array::value('color', $tag),
+      );
+      if (!$allowSelectingNonSelectable && empty($tag['is_selectable'])) {
+        $allTags[$id]['disabled'] = TRUE;
+      }
+    }
+    return CRM_Utils_Array::buildTree($allTags);
+  }
+
+  /**
    * Delete the tag.
    *
    * @param int $id

@@ -373,8 +373,17 @@ if (!CRM.vars) CRM.vars = {};
   };
 
   function formatCrmSelect2(row) {
-    var icon = $(row.element).data('icon');
-    return (icon ? '<i class="crm-i ' + icon + '"></i> ' : '') + _.escape(row.text);
+    var icon = row.icon || $(row.element).data('icon'),
+      color = row.color || $(row.element).data('color'),
+      description = row.description || $(row.element).data('description'),
+      ret = '';
+    if (icon) {
+      ret += '<i class="crm-i ' + icon + '"></i> ';
+    }
+    if (color) {
+      ret += '<span class="crm-select-item-color" style="background-color: ' + color + '"></span> ';
+    }
+    return ret + _.escape(row.text) + (description ? '<div class="crm-select2-row-description"><p>' + _.escape(description) + '</p></div>' : '');
   }
 
   /**

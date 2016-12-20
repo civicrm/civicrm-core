@@ -352,9 +352,3 @@ div#crm-contact-thumbnail {
   color: #000;
 }
 
-.crm-tag-item {
-  display: inline-block;
-  padding: 1px 5px;
-  border-radius: 3px;
-  border: 1px solid grey;
-}
