@@ -3214,11 +3214,14 @@ AND        m.id = %1
   }
 
   /**
+   * Get a list of template types which can be used as `civicrm_mailing.template_type`.
+   *
    * @return array
-   *   A list of template-types, keyed by name. Each defines:
+   *   A list of template-types, keyed numerically. Each defines:
+   *     - name: string, a short symbolic name
    *     - editorUrl: string, Angular template name
    *
-   *   Ex: $templateTypes['mosaico']['editorUrl'] = '~/crmMosaico/editor.html'.
+   *   Ex: $templateTypes[0] === array('name' => 'mosaico', 'editorUrl' => '~/crmMosaico/editor.html').
    */
   public static function getTemplateTypes() {
     if (!isset(Civi::$statics[__CLASS__]['templateTypes'])) {
@@ -3249,6 +3252,8 @@ AND        m.id = %1
   }
 
   /**
+   * Get a list of template types.
+   *
    * @return array
    *   Array(string $name => string $label).
    */
