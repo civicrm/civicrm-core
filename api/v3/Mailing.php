@@ -44,7 +44,7 @@
  */
 function civicrm_api3_mailing_create($params) {
   if (isset($params['template_options']) && is_array($params['template_options'])) {
-    $params['template_options'] = $params['template_options'] === array() ? '{}' : json_encode($params['template_options']);
+    $params['template_options'] = ($params['template_options'] === array()) ? '{}' : json_encode($params['template_options']);
   }
   if (CRM_Mailing_Info::workflowEnabled()) {
     // Note: 'schedule mailings' and 'approve mailings' can update certain fields, but can't create.
