@@ -523,8 +523,8 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
             // with an external_identifier that is non-unique. So...
             // we will update this contact to remove the external_identifier
             // and let a new record be created.
-            $params = array('id' => $internalCid, 'external_identifier' => '');
-            civicrm_api3('Contact', 'update', $params);
+            $update_params = array('id' => $internalCid, 'external_identifier' => '');
+            civicrm_api3('Contact', 'update', $update_params);
           }
           else {
             $errorMessage = ts('External ID already exists in Database.');
