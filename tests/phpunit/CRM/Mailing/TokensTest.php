@@ -101,4 +101,35 @@ class CRM_Mailing_TokensTest extends \CiviUnitTestCase {
     $this->assertEquals(1, $count);
   }
 
+  /**
+   * Check the behavior in the erroneous situation where someone uses
+   * a mailing-related token without providing a mailing ID.
+   */
+  public function testTokensWithoutMailing() {
+    // We only need one case to see that the mailing-object works as
+    // an alternative to the mailing-id.
+    $inputTemplateFormat = 'text/plain';
+    $inputTemplate = 'To optout: {action.optOutUrl}!';
+
+    $mailing = CRM_Core_DAO::createTestObject('CRM_Mailing_DAO_Mailing', array(
+      'name' => 'Example Name',
+    ));
+    $contact = CRM_Core_DAO::createTestObject('CRM_Contact_DAO_Contact');
+
+    $p = new \Civi\Token\TokenProcessor(Civi::service('dispatcher'), array(
+      'mailing' => $mailing,
+    ));
+    $p->addMessage('example', $inputTemplate, $inputTemplateFormat);
+    $p->addRow()->context(array(
+      'contactId' => $contact->id,
+    ));
+    try {
+      $p->evaluate();
+      $this->fail('TokenProcessor::evaluate() should have thrown an exception');
+    }
+    catch (CRM_Core_Exception $e) {
+      $this->assertRegExp(';Cannot use action tokens unless context defines mailingJobId and mailingActionTarget;', $e->getMessage());
+    }
+  }
+
 }
