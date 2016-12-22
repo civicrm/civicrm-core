@@ -56,11 +56,7 @@ class CRM_Member_Tokens extends \Civi\Token\AbstractTokenSubscriber {
   }
 
   /**
-   * Is token active.
-   *
-   * @param \Civi\Token\TokenProcessor $processor
-   *
-   * @return bool
+   * @inheritDoc
    */
   public function checkActive(\Civi\Token\TokenProcessor $processor) {
     // Extracted from scheduled-reminders code. See the class description.
@@ -83,17 +79,7 @@ class CRM_Member_Tokens extends \Civi\Token\AbstractTokenSubscriber {
   }
 
   /**
-   * Evaluate the content of a single token.
-   *
-   * @param \Civi\Token\TokenRow $row
-   *   The record for which we want token values.
-   * @param string $entity
-   * @param string $field
-   *   The name of the token field.
-   * @param mixed $prefetch
-   *   Any data that was returned by the prefetch().
-   *
-   * @return mixed
+   * @inheritDoc
    */
   public function evaluateToken(\Civi\Token\TokenRow $row, $entity, $field, $prefetch = NULL) {
     $actionSearchResult = $row->context['actionSearchResult'];
