@@ -3553,7 +3553,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       }
     }
     $trxn = CRM_Core_BAO_FinancialTrxn::create($params['trxnParams']);
-    $previousLineItem = CRM_Price_BAO_LineItem::getLineItemsByContributionID($params['contribution']->id);
+    $previousLineItem = CRM_Price_BAO_LineItem::getLineItemsByContributionID($params['prevContribution']->id);
     $params['entity_id'] = $trxn->id;
     if ($context != 'changePaymentInstrument') {
       $itemParams['entity_table'] = 'civicrm_line_item';
