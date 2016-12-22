@@ -573,14 +573,10 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           }
 
           if (is_object($payment)) {
-            try {
-              $result = $payment->doPayment($value);
-              $value = array_merge($value, $result);
-            }
-            catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
-              CRM_Core_Session::singleton()->setStatus($e->getMessage());
-              CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/event/register', "id={$this->_eventId}"));
-            }
+            // Not quite sure why we don't just user $value since it contains the data
+            // from result
+            // @todo ditch $result & retest.
+            list($result, $value) = $this->processPayment($payment, $value);
           }
           else {
             CRM_Core_Error::fatal($paymentObjError);
@@ -824,7 +820,8 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           // call postprocess hook before leaving
           $this->postProcessHook();
           // this does not return
-          $payment->doPayment($primaryParticipant, 'event');
+
+          $this->processPayment($payment, $primaryParticipant);
         }
         else {
           CRM_Core_Error::fatal($paymentObjError);
@@ -1304,6 +1301,26 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     CRM_Event_BAO_Event::retrieve($eventParams, $form->_values['event']);
     $form->set('registerByID', $params['registerByID']);
     $form->postProcess();
+  }
+
+  /**
+   * Process the payment, redirecting back to the page on error.
+   *
+   * @param $payment
+   * @param $value
+   *
+   * @return array
+   */
+  private function processPayment($payment, $value) {
+    try {
+      $result = $payment->doPayment($value, 'event');
+      return array($result, $value);
+    }
+    catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
+      CRM_Core_Session::singleton()->setStatus($e->getMessage());
+      CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/event/register', "id={$this->_eventId}"));
+    }
+    return array();
   }
 
 }
