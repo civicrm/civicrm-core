@@ -532,10 +532,6 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
     $mailerBatchLimit = Civi::settings()->get('mailerBatchLimit');
     $eq = self::findPendingTasks($this->id, $mailing->sms_provider_id ? 'sms' : 'email');
     while ($eq->fetch()) {
-      // if ( ( $mailsProcessed % 100 ) == 0 ) {
-      // CRM_Utils_System::xMemory( "$mailsProcessed: " );
-      // }
-
       if ($mailerBatchLimit > 0 && self::$mailsProcessed >= $mailerBatchLimit) {
         if (!empty($fields)) {
           $this->deliverGroup($fields, $mailing, $mailer, $job_date, $attachments);
