@@ -113,9 +113,4 @@ class CRM_Mailing_ActionTokens extends \Civi\Token\AbstractTokenSubscriber {
         $field, $verp, $urls, TRUE));
   }
 
-  protected function getTrackOpenUrl(\Civi\Token\TokenRow $row) {
-    $config = CRM_Core_Config::singleton();
-    return $config->userFrameworkResourceURL . "extern/open.php?q=" . $row->context['mailingActionTarget']['id'];
-  }
-
 }
