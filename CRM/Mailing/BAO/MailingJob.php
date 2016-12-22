@@ -984,9 +984,12 @@ AND    record_type_id = $targetRecordID
   }
 
   /**
+   * Search the mailing-event queue for a list of pending delivery tasks.
+   *
    * @param int $jobId
    * @param string $medium
    *   Ex: 'email' or 'sms'.
+   *
    * @return \CRM_Mailing_Event_BAO_Queue
    *   A query object whose rows provide ('id', 'contact_id', 'hash') and ('email' or 'phone').
    */
@@ -994,7 +997,7 @@ AND    record_type_id = $targetRecordID
     $eq = new CRM_Mailing_Event_BAO_Queue();
     $queueTable = CRM_Mailing_Event_BAO_Queue::getTableName();
     $emailTable = CRM_Core_BAO_Email::getTableName();
-    $phoneTable = CRM_Core_DAO_Phone::getTableName();
+    $phoneTable = CRM_Core_BAO_Phone::getTableName();
     $contactTable = CRM_Contact_BAO_Contact::getTableName();
     $deliveredTable = CRM_Mailing_Event_BAO_Delivered::getTableName();
     $bounceTable = CRM_Mailing_Event_BAO_Bounce::getTableName();
