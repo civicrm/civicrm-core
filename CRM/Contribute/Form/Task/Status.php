@@ -83,13 +83,6 @@ AND    {$this->_componentClause}";
   }
 
   /**
-   * Sets contribution Ids for unit test.
-   */
-  public function setContributionIds($contributionIds) {
-    $this->_contributionIds = $contributionIds;
-  }
-
-  /**
    * Build the form object.
    */
   public function buildQuickForm() {
