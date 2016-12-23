@@ -140,7 +140,7 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
 
     $this->addButtons(array(
         array(
-          'type' => 'submit',
+          'type' => 'upload',
           'name' => ts('Make Thank-you Letters'),
           'isDefault' => TRUE,
         ),
