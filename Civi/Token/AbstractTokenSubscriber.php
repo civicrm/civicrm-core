@@ -141,10 +141,21 @@ abstract class AbstractTokenSubscriber implements EventSubscriberInterface {
     if (!$this->checkActive($e->getTokenProcessor())) {
       return;
     }
-    // TODO: check if any tokens for $entity are actually used; short-circuit.
+
+    $messageTokens = $e->getTokenProcessor()->getMessageTokens();
+    if (!isset($messageTokens[$this->entity])) {
+      return;
+    }
+
+    $activeTokens = array_intersect($messageTokens[$this->entity], array_keys($this->tokenNames));
+    if (empty($activeTokens)) {
+      return;
+    }
+
     $prefetch = $this->prefetch($e);
+
     foreach ($e->getRows() as $row) {
-      foreach ($this->tokenNames as $field => $label) {
+      foreach ($activeTokens as $field) {
         $this->evaluateToken($row, $this->entity, $field, $prefetch);
       }
     }

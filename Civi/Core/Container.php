@@ -203,8 +203,12 @@ class Container {
       'Civi\Token\TokenCompatSubscriber',
       array()
     ))->addTag('kernel.event_subscriber');
+    $container->setDefinition("crm_mailing_action_tokens", new Definition(
+      "CRM_Mailing_ActionTokens",
+      array()
+    ))->addTag('kernel.event_subscriber');
 
-    foreach (array('Activity', 'Contribute', 'Event', 'Member') as $comp) {
+    foreach (array('Activity', 'Contribute', 'Event', 'Mailing', 'Member') as $comp) {
       $container->setDefinition("crm_" . strtolower($comp) . "_tokens", new Definition(
         "CRM_{$comp}_Tokens",
         array()
