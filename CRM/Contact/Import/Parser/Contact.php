@@ -2217,16 +2217,16 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
       $extIDContact = civicrm_api3('Contact', 'get', array(
         'external_identifier' => $params['external_identifier'],
         'showAll' => 'all',
-        'return' => array('id','contact_is_deleted'),
+        'return' => array('id', 'contact_is_deleted'),
       ));
       if (isset($extIDContact['id'])) {
         $extIDMatch = $extIDContact['id'];
 
         if ($extIDContact['values'][$extIDMatch]['contact_is_deleted'] == 1) {
           // If the contact is deleted, update external identifier to be blank
-          // to avoid key error from MySQL. 
+          // to avoid key error from MySQL.
           $params = array('id' => $extIDMatch, 'external_identifier' => '');
-          civicrm_api3('Contact','Update', $params);
+          civicrm_api3('Contact', 'create', $params);
 
           // And now it is no longer a match.
           $extIDMatch = NULL;
