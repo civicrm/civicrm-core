@@ -58,6 +58,9 @@ class CRM_Tag_Form_Edit extends CRM_Admin_Form {
       }
     }
     else {
+      $parentId = NULL;
+      $isTagsetChild = FALSE;
+
       $this->_isTagSet = CRM_Utils_Request::retrieve('tagset', 'Positive', $this);
 
       if (!$this->_isTagSet &&
@@ -67,9 +70,16 @@ class CRM_Tag_Form_Edit extends CRM_Admin_Form {
         $this->_isTagSet = TRUE;
       }
 
+      if ($this->_id) {
+        $parentId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Tag', $this->_id, 'parent_id');
+        $isTagSetChild = $parentId ? CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Tag', $parentId, 'is_tagset') : FALSE;
+      }
+
       if (!$this->_isTagSet) {
-        $colorTags = CRM_Core_BAO_Tag::getColorTags(NULL, TRUE, $this->_id);
-        $this->add('select2', 'parent_id', ts('Parent Tag'), $colorTags, FALSE, array('placeholder' => ts('- select -')));
+        if (!$isTagSetChild) {
+          $colorTags = CRM_Core_BAO_Tag::getColorTags(NULL, TRUE, $this->_id);
+          $this->add('select2', 'parent_id', ts('Parent Tag'), $colorTags, FALSE, array('placeholder' => ts('- select -')));
+        }
 
         // Tagsets are not selectable by definition so only include the selectable field if NOT a tagset.
         $selectable = $this->add('checkbox', 'is_selectable', ts('Selectable?'));
@@ -99,13 +109,7 @@ class CRM_Tag_Form_Edit extends CRM_Admin_Form {
 
       $isReserved = $this->add('checkbox', 'is_reserved', ts('Reserved?'));
 
-      $usedFor = $this->addSelect('used_for', array('multiple' => TRUE, 'option_url' => NULL));
-
-      if ($this->_id &&
-        CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Tag', $this->_id, 'parent_id')
-      ) {
-        $usedFor->freeze();
-      }
+      $this->addSelect('used_for', array('multiple' => TRUE, 'option_url' => NULL));
 
       $adminTagset = TRUE;
       if (!CRM_Core_Permission::check('administer Tagsets')) {
@@ -129,7 +133,7 @@ class CRM_Tag_Form_Edit extends CRM_Admin_Form {
     if (empty($this->_id) || !CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Tag', $this->_id, 'color')) {
       $defaults['color'] = '#ffffff';
     }
-    if (empty($this->_id) && $this->_isTagSet) {
+    if (empty($this->_id)) {
       $defaults['used_for'] = 'civicrm_contact';
     }
     return $defaults;

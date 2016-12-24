@@ -85,3 +85,17 @@
     {/if}
     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>
+{literal}
+<script type="text/javascript">
+  CRM.$(function($) {
+    var $form = $('form.{/literal}{$form.formClass}{literal}');
+    function toggleUsedFor() {
+      $('.crm-tag-form-block-used_for', $form).toggle(!$(this).val());
+      if ($(this).val()) {
+        $('select#used_for', $form).val('').change();
+      }
+    }
+    $('input[name=parent_id]', $form).change(toggleUsedFor).each(toggleUsedFor);
+  });
+</script>
+{/literal}
