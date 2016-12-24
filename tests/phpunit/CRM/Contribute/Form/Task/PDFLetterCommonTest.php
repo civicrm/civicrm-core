@@ -126,7 +126,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
         'Hello Anthony Collins',
         '$ 100.00',
         $displayDate,
-        'Donation'
+        'Donation',
       );
 
       foreach ($expectedValues as $val) {
