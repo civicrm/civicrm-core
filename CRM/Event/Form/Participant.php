@@ -945,6 +945,9 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     }
 
     $config = CRM_Core_Config::singleton();
+    if (isset($params['total_amount'])) {
+      $params['total_amount'] = CRM_Utils_Rule::cleanMoney($params['total_amount']);
+    }
     if ($this->_isPaidEvent) {
 
       $contributionParams = array();
