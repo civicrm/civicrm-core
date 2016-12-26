@@ -1354,4 +1354,66 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->assertEquals($pledgePayment['values'][2]['contribution_id'], $contribution['id']);
   }
 
+  /**
+   * Test form submission with multiple option price set.
+   */
+  public function testSubmitContributionPageWithPriceSet() {
+    $this->_priceSetParams['is_quick_config'] = 0;
+    $this->setUpContributionPage();
+    $submitParams = array(
+      'price_' . $this->_ids['price_field'][0] => reset($this->_ids['price_field_value']),
+      'id' => (int) $this->_ids['contribution_page'],
+      'amount' => 80,
+      'first_name' => 'Billy',
+      'last_name' => 'Gruff',
+      'email' => 'billy@goat.gruff',
+      'is_pay_later' => TRUE,
+    );
+    $this->addPriceFields($submitParams);
+
+    $this->callAPISuccess('contribution_page', 'submit', $submitParams);
+    $contribution = $this->callAPISuccessGetSingle('contribution', array(
+      'contribution_page_id' => $this->_ids['contribution_page'],
+      'contribution_status_id' => 2,
+    ));
+    $this->callAPISuccessGetCount(
+      'LineItem',
+      array(
+        'contribution_id' => $contribution['id'],
+      ),
+      3
+    );
+  }
+
+  /**
+   * Function to add additional price fields to priceset.
+   * @param array $params
+   */
+  public function addPriceFields(&$params) {
+    $priceSetID = reset($this->_ids['price_set']);
+    $priceField = $this->callAPISuccess('price_field', 'create', array(
+      'price_set_id' => $priceSetID,
+      'label' => 'Chicken Breed',
+      'html_type' => 'CheckBox',
+    ));
+    $priceFieldValue1 = $this->callAPISuccess('price_field_value', 'create', array(
+      'price_set_id' => $priceSetID,
+      'price_field_id' => $priceField['id'],
+      'label' => 'Shoe-eating chicken -1',
+      'financial_type_id' => 'Donation',
+      'amount' => 30,
+    ));
+    $priceFieldValue2 = $this->callAPISuccess('price_field_value', 'create', array(
+      'price_set_id' => $priceSetID,
+      'price_field_id' => $priceField['id'],
+      'label' => 'Shoe-eating chicken -2',
+      'financial_type_id' => 'Donation',
+      'amount' => 40,
+    ));
+    $params['price_' . $priceField['id']] = array(
+      $priceFieldValue1['id'] => 1,
+      $priceFieldValue2['id'] => 1,
+    );
+  }
+
 }
