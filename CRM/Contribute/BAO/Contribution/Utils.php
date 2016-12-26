@@ -110,6 +110,9 @@ class CRM_Contribute_BAO_Contribution_Utils {
         // @todo make sure this is consisently set at this point.
         $contributionParams['line_item'] = $paymentParams['line_item'];
       }
+      elseif (isset($form->_lineItem)) {
+        $contributionParams['line_item'] = $form->_lineItem;
+      }
       if (!empty($form->_paymentProcessor)) {
         $contributionParams['payment_instrument_id'] = $paymentParams['payment_instrument_id'] = $form->_paymentProcessor['payment_instrument_id'];
       }
