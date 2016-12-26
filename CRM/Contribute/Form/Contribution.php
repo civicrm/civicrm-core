@@ -378,7 +378,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
 
     if (isset($defaults['net_amount'])) {
-      $defaults['net_amount'] = CRM_Contribute_BAO_Contribution::calculateNetAmount($defaults['net_amount'], $defaults['tax_amount']);
+      $defaults['net_amount'] = CRM_Contribute_BAO_Contribution::calculateNetAmount($defaults['net_amount'], CRM_Utils_Array::value('tax_amount', $defaults));
     }
 
     if ($this->_contributionType) {
