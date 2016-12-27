@@ -106,14 +106,9 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
 
     $ids = CRM_Event_BAO_Participant::getParticipantIds($this->_contributionId);
     if (count($ids) > 1) {
-      $total = 0;
-      foreach ($ids as $val) {
-        $total += CRM_Price_BAO_LineItem::getLineTotal($val, 'civicrm_participant');
-      }
+      $total = CRM_Price_BAO_LineItem::getLineTotal($this->_contributionId);
       $this->assign('totalLineTotal', $total);
-
-      $lineItemTotal = CRM_Price_BAO_LineItem::getLineTotal($this->_participantId, 'civicrm_participant');
-      $this->assign('lineItemTotal', $lineItemTotal);
+      $this->assign('lineItemTotal', $total);
     }
 
     $title = ts("Change selections for %1", array(1 => $this->_contributorDisplayName));

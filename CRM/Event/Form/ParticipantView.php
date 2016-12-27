@@ -74,6 +74,8 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
       $participantID, 'id', 'participant_id'
     );
     $this->assign('hasPayment', $paymentId);
+    $this->assign('componentId', $participantID);
+    $this->assign('component', 'event');
 
     if ($parentParticipantId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant',
       $participantID, 'registered_by_id'
