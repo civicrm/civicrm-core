@@ -2765,6 +2765,15 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
   /**
    * @param string $name
    */
+  public function financialAccountCreate($params, $entityParams) {
+    $account = CRM_Financial_BAO_FinancialAccount::add($params);
+    $entityParams['financial_account_id'] = $account->id;
+    return CRM_Financial_BAO_FinancialTypeAccount::add($entityParams);
+  }
+
+  /**
+   * @param string $name
+   */
   public function financialAccountDelete($name) {
     $financialAccount = new CRM_Financial_DAO_FinancialAccount();
     $financialAccount->name = $name;

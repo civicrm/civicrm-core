@@ -937,4 +937,76 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $this->assertFalse($allowUpdate);
   }
 
+  public function testChangePaymentInstrumentTax() {
+    $contactId = $this->individualCreate();
+    $this->enableTaxAndInvoicing();
+    $params = array(
+      'name' => "Sales tax account",
+      'financial_account_type_id' => key(CRM_Core_PseudoConstant::accountOptionValues('financial_account_type', NULL, " AND v.name LIKE 'Liability' ")),
+      'is_deductible' => 1,
+      'is_tax' => 1,
+      'tax_rate' => 10,
+      'is_active' => 1,
+    );
+    $entityParams = array(
+      'entity_table' => "civicrm_financial_type",
+      'account_relationship' => key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Sales Tax Account is' ")),
+      'entity_id' => 1,
+    );
+    $financialAccount = $this->financialAccountCreate($params, $entityParams);
+
+    $params = array(
+      'contact_id' => $contactId,
+      'currency' => 'USD',
+      'financial_type_id' => 1,
+      'contribution_status_id' => 1,
+      'payment_instrument_id' => 1,
+      'total_amount' => 200.00,
+      'fee_amount' => 0,
+      'non_deductible_amount' => 0,
+    );
+    $id = $this->contributionCreate($params);
+    $financialTrxn = $this->callAPISuccess('financial_trxn', 'get', array(
+      'trxn_id' => 12345,
+    ));
+
+    $this->assertEquals($financialTrxn['count'], 1, 'Counts do not match.');
+    $this->assertEquals($financialTrxn['values'][1]['payment_instrument_id'], 1, 'Payment Instrument is not the same.');
+    $this->assertEquals($financialTrxn['values'][1]['total_amount'], 220.00, 'Amount does not match.');
+
+    $financialItem = $this->callAPISuccess('financial_item', 'get', array(
+      'contact_id' => $contactId,
+    ));
+    $this->assertEquals($financialItem['count'], 2, 'Counts do not match.');
+    $this->assertEquals($financialItem['values'][1]['amount'], 200.00, 'Amount does not match.');
+    $this->assertEquals($financialItem['values'][2]['amount'], 20.00, 'Amount does not match.');
+    $this->assertEquals($financialItem['values'][2]['financial_account_id'], $financialAccount->financial_account_id, 'Account is not sales tax related.');
+    $this->assertEquals($financialItem['values'][2]['description'], 'Sales Tax', 'Account is not sales tax.');
+
+    // Change payment instrument.
+    $params['id'] = $id;
+    $params['payment_instrument_id'] = 2;
+    $this->contributionCreate($params);
+
+    $financialTrxn = $this->callAPISuccess('financial_trxn', 'get', array(
+      'trxn_id' => 12345,
+    ));
+
+    $this->assertEquals($financialTrxn['count'], 3, 'Counts do not match.');
+    $this->assertEquals($financialTrxn['values'][2]['payment_instrument_id'], 1, 'Payment Instrument is not the same.');
+    $this->assertEquals($financialTrxn['values'][2]['total_amount'], -220.00, 'Amount does not match.');
+    $this->assertEquals($financialTrxn['values'][3]['total_amount'], 220.00, 'Amount does not match.');
+    $this->assertEquals($financialTrxn['values'][3]['payment_instrument_id'], 2, 'Payment Instrument is not the same.');
+
+    // Asserting no changes in financial item.
+    $financialItem = $this->callAPISuccess('financial_item', 'get', array(
+      'contact_id' => $contactId,
+    ));
+    $this->assertEquals($financialItem['count'], 2, 'Counts do not match.');
+    $this->assertEquals($financialItem['values'][1]['amount'], 200.00, 'Amount does not match.');
+    $this->assertEquals($financialItem['values'][2]['amount'], 20.00, 'Amount does not match.');
+    $this->assertEquals($financialItem['values'][2]['financial_account_id'], $financialAccount->financial_account_id, 'Account is not sales tax related.');
+    $this->assertEquals($financialItem['values'][2]['description'], 'Sales Tax', 'Account is not sales tax.');
+  }
+
 }
