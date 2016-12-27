@@ -100,7 +100,7 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
     }
 
     $specialFields = array('contact_type', 'group', 'contact_tags', 'member_membership_type_id', 'member_status_id');
-    foreach ($result as $element => $value) {
+    foreach ($result as $element => &$value) {
       if (CRM_Contact_BAO_Query::isAlreadyProcessedForQueryFormat($value)) {
         $id = CRM_Utils_Array::value(0, $value);
         $value = CRM_Utils_Array::value(2, $value);
