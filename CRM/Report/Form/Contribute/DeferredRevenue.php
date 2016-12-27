@@ -102,7 +102,7 @@ class CRM_Report_Form_Contribute_DeferredRevenue extends CRM_Report_Form {
             'no_display' => TRUE,
           ),
           'id' => array(
-            'title' => ts('Financial_item_id'),
+            'title' => ts('Financial Item ID'),
             'required' => TRUE,
             'no_display' => TRUE,
           ),
