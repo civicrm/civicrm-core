@@ -385,9 +385,8 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
     }
 
     // @todo this belongs in the BAO.
-    if (isset($params['note'])) {
-      $this->saveRelationshipNotes($relationshipIds, $params['note']);
-    }
+    $note = !empty($params['note']) ? $params['note'] : '';
+    $this->saveRelationshipNotes($relationshipIds, $note);
 
     $this->setEmploymentRelationship($params, $relationshipIds);
 
@@ -511,7 +510,8 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
    * @return array
    */
   private function updateAction($params) {
-    $params = array_shift($this->preparePostProcessParameters($params));
+    $params = $this->preparePostProcessParameters($params);
+    $params = $params[0];
 
     CRM_Contact_BAO_Relationship::create($params);
 
@@ -561,6 +561,12 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
     else {
       $params['id'] = $this->_relationshipId;
       $params['contact_id_' . $relationshipTypeParts[2]] = $params['related_contact_id'];
+
+      foreach (array('start_date', 'end_date') as $dateParam) {
+        if (!empty($params[$dateParam])) {
+          $params[$dateParam] = CRM_Utils_Date::processDate($params[$dateParam]);
+        }
+      }
     }
 
     // CRM-14612 - Don't use adv-checkbox as it interferes with the form js
@@ -582,14 +588,23 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
         'entity_id' => $id,
         'entity_table' => 'civicrm_relationship',
       );
+
       $existing = civicrm_api3('note', 'get', $noteParams);
       if (!empty($existing['id'])) {
         $noteParams['id'] = $existing['id'];
       }
-      $noteParams['note'] = $note;
-      $noteParams['contact_id'] = $this->_contactId;
-      if (!empty($existing['id']) || $note) {
-        $action = $note ? 'create' : 'delete';
+
+      $action = NULL;
+      if (!empty($note)) {
+        $action = 'create';
+        $noteParams['note'] = $note;
+        $noteParams['contact_id'] = $this->_contactId;
+      }
+      elseif (!empty($noteParams['id'])) {
+        $action = 'delete';
+      }
+
+      if (!empty($action)) {
         civicrm_api3('note', $action, $noteParams);
       }
     }
