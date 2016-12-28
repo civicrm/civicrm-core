@@ -315,15 +315,15 @@ FROM civicrm_action_schedule cas
         catch (\Civi\Token\TokenException $e) {
           $errors['token_exception'] = $e->getMessage();
         }
-        
-          // update action log record
-          $logParams = array(
-            'id' => $dao->reminderID,
-            'is_error' => !empty($errors),
-            'message' => empty($errors) ? "null" : implode(' ', $errors),
-            'action_date_time' => $now,
-          );
-          CRM_Core_BAO_ActionLog::create($logParams);
+
+        // update action log record
+        $logParams = array(
+          'id' => $dao->reminderID,
+          'is_error' => !empty($errors),
+          'message' => empty($errors) ? "null" : implode(' ', $errors),
+          'action_date_time' => $now,
+        );
+        CRM_Core_BAO_ActionLog::create($logParams);
       }
       $dao->free();
     }
@@ -695,5 +695,5 @@ FROM civicrm_action_schedule cas
       'group' => ts('Select Group'),
     );
   }
-  
+
 }
