@@ -224,12 +224,7 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
 
     $actionLinks = array();
     foreach (self::$_links as $key => $value) {
-      if ($value['ref'] == 'reassign') {
-        $actionLinks['moreActions'][$key] = $value;
-      }
-      else {
-        $actionLinks['primaryActions'][$key] = $value;
-      }
+      $actionLinks['primaryActions'][$key] = $value;
     }
 
     return $actionLinks;
@@ -345,18 +340,6 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
         ts('more'),
         FALSE,
         'case.selector.actions',
-        'Case',
-        $result->case_id
-      );
-      $row['moreActions'] = CRM_Core_Action::formLink(CRM_Utils_Array::value('moreActions', $links),
-        $mask, array(
-          'id' => $result->case_id,
-          'cid' => $result->contact_id,
-          'cxt' => $this->_context,
-        ),
-        ts('more'),
-        TRUE,
-        'case.selector.moreActions',
         'Case',
         $result->case_id
       );
