@@ -4076,9 +4076,9 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
           LEFT JOIN civicrm_entity_financial_trxn eft ON (eft.entity_id = con.id AND eft.entity_table = 'civicrm_contribution')
           INNER JOIN civicrm_financial_trxn ft ON ft.id = eft.financial_trxn_id
             AND ft.to_financial_account_id != %2
-          INNER JOIN civicrm_entity_financial_trxn ef ON (ef.financial_trxn_id = ft.id AND ef.entity_table = 'civicrm_financial_item')
+          LEFT JOIN civicrm_entity_financial_trxn ef ON (ef.financial_trxn_id = ft.id AND ef.entity_table = 'civicrm_financial_item')
           LEFT JOIN civicrm_financial_item fi ON fi.id = ef.entity_id
-          INNER JOIN civicrm_financial_account fa ON fa.id = fi.financial_account_id
+          LEFT JOIN civicrm_financial_account fa ON fa.id = fi.financial_account_id
 
         WHERE con.id = %1 AND ft.is_payment = 1
         GROUP BY ft.id";
