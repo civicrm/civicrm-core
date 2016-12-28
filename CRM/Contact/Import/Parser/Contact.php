@@ -1990,7 +1990,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
           case 'Select':
           case 'Radio':
           case 'Autocomplete-Select':
-            if ($customFields[$customFieldID]['data_type'] == 'String') {
+            if ($customFields[$customFieldID]['data_type'] == 'String' || $customFields[$customFieldID]['data_type'] == 'Int') {
               $customOption = CRM_Core_BAO_CustomOption::getCustomOption($customFieldID, TRUE);
               foreach ($customOption as $customValue) {
                 $val = CRM_Utils_Array::value('value', $customValue);
