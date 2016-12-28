@@ -393,7 +393,7 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
     // and this is what we really want to test in this function.
     CRM_Contribute_BAO_Contribution::updateRelatedPledge(
       CRM_Core_Action::ADD,
-      $pledge['id'],
+      $pledgePayments['values'][0]['id'],
       $contributionID,
       NULL, // adjustTotalAmount
       404.70,
