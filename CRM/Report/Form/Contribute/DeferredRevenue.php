@@ -319,8 +319,6 @@ LEFT JOIN civicrm_event {$this->_aliases['civicrm_event']} ON {$this->_aliases['
    * Set limit.
    *
    * @param int $rowCount
-   *
-   * @return array
    */
   public function limit($rowCount = self::ROW_COUNT_LIMIT) {
     $this->_limit = NULL;
