@@ -937,4 +937,72 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $this->assertFalse($allowUpdate);
   }
 
+  /**
+   * Test calculateFinancialItemAmount().
+   */
+  public function testcalculateFinancialItemAmount() {
+    $testParams = array(
+      array(
+        'params' => array(),
+        'amountParams' => array(
+          'line_total' => 100,
+          'previous_line_total' => 300,
+          'diff' => 1,
+        ),
+        'context' => 'changedAmount',
+        'expectedItemAmount' => -200,
+      ),
+      array(
+        'params' => array(),
+        'amountParams' => array(
+          'line_total' => 100,
+          'previous_line_total' => 100,
+          'diff' => -1,
+        ),
+        'context' => 'changePaymentInstrument',
+        'expectedItemAmount' => -100,
+      ),
+      array(
+        'params' => array(
+          'is_quick_config' => TRUE,
+          'total_amount' => 110,
+          'tax_amount' => 10,
+        ),
+        'amountParams' => array(
+          'item_amount' => 100,
+        ),
+        'context' => 'changedAmount',
+        'expectedItemAmount' => 100,
+      ),
+      array(
+        'params' => array(
+          'is_quick_config' => TRUE,
+          'total_amount' => 110,
+          'tax_amount' => 10,
+        ),
+        'amountParams' => array(
+          'item_amount' => NULL,
+        ),
+        'context' => 'changedAmount',
+        'expectedItemAmount' => 110,
+      ),
+      array(
+        'params' => array(
+          'is_quick_config' => TRUE,
+          'total_amount' => 110,
+          'tax_amount' => 10,
+        ),
+        'amountParams' => array(
+          'item_amount' => NULL,
+        ),
+        'context' => NULL,
+        'expectedItemAmount' => 100,
+      ),
+    );
+    foreach ($testParams as $params) {
+      $itemAmount = CRM_Contribute_BAO_Contribution::calculateFinancialItemAmount($params['params'], $params['amountParams'], $params['context']);
+      $this->assertEquals($itemAmount, $params['expectedItemAmount'], 'Invalid Financial Item amount.');
+    }
+  }
+
 }
