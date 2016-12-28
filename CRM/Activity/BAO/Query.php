@@ -192,6 +192,10 @@ class CRM_Activity_BAO_Query {
       case 'activity_engagement_level':
       case 'activity_id':
       case 'activity_campaign_id':
+        // We no longer expect "subject" as a specific criteria (as of CRM-19447),
+        // but I'm leaving this case just to reduce the chance of introducing a
+        // regression.
+      case 'activity_subject':
 
         $qillName = $name;
         if (in_array($name, array('activity_engagement_level', 'activity_id'))) {
