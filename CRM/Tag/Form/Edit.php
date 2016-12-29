@@ -48,8 +48,6 @@ class CRM_Tag_Form_Edit extends CRM_Admin_Form {
    * Build the form object.
    */
   public function buildQuickForm() {
-    $this->setPageTitle($this->_isTagSet ? ts('Tag Set') : ts('Tag'));
-
     if ($this->_action == CRM_Core_Action::DELETE) {
       if ($this->_id && $tag = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Tag', $this->_id, 'name', 'parent_id')) {
         $url = CRM_Utils_System::url('civicrm/tag', "reset=1");
@@ -60,6 +58,9 @@ class CRM_Tag_Form_Edit extends CRM_Admin_Form {
       }
     }
     else {
+      $parentId = NULL;
+      $isTagsetChild = FALSE;
+
       $this->_isTagSet = CRM_Utils_Request::retrieve('tagset', 'Positive', $this);
 
       if (!$this->_isTagSet &&
@@ -69,14 +70,16 @@ class CRM_Tag_Form_Edit extends CRM_Admin_Form {
         $this->_isTagSet = TRUE;
       }
 
-      $allTag = array('' => ts('- select -')) + CRM_Core_BAO_Tag::getTagsNotInTagset();
-
       if ($this->_id) {
-        unset($allTag[$this->_id]);
+        $parentId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Tag', $this->_id, 'parent_id');
+        $isTagSetChild = $parentId ? CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Tag', $parentId, 'is_tagset') : FALSE;
       }
 
       if (!$this->_isTagSet) {
-        $this->add('select', 'parent_id', ts('Parent Tag'), $allTag, FALSE, array('class' => 'crm-select2'));
+        if (!$isTagSetChild) {
+          $colorTags = CRM_Core_BAO_Tag::getColorTags(NULL, TRUE, $this->_id);
+          $this->add('select2', 'parent_id', ts('Parent Tag'), $colorTags, FALSE, array('placeholder' => ts('- select -')));
+        }
 
         // Tagsets are not selectable by definition so only include the selectable field if NOT a tagset.
         $selectable = $this->add('checkbox', 'is_selectable', ts('Selectable?'));
@@ -85,6 +88,7 @@ class CRM_Tag_Form_Edit extends CRM_Admin_Form {
           $selectable->setValue(1);
         }
 
+        $this->add('color', 'color', ts('Color'));
       }
 
       $this->assign('isTagSet', $this->_isTagSet);
@@ -105,13 +109,7 @@ class CRM_Tag_Form_Edit extends CRM_Admin_Form {
 
       $isReserved = $this->add('checkbox', 'is_reserved', ts('Reserved?'));
 
-      $usedFor = $this->addSelect('used_for', array('multiple' => TRUE, 'option_url' => NULL));
-
-      if ($this->_id &&
-        CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Tag', $this->_id, 'parent_id')
-      ) {
-        $usedFor->freeze();
-      }
+      $this->addSelect('used_for', array('multiple' => TRUE, 'option_url' => NULL));
 
       $adminTagset = TRUE;
       if (!CRM_Core_Permission::check('administer Tagsets')) {
@@ -125,21 +123,32 @@ class CRM_Tag_Form_Edit extends CRM_Admin_Form {
         $adminReservedTags = FALSE;
       }
       $this->assign('adminReservedTags', $adminReservedTags);
-
     }
+    $this->setPageTitle($this->_isTagSet ? ts('Tag Set') : ts('Tag'));
     parent::buildQuickForm();
+  }
+
+  public function setDefaultValues() {
+    $defaults = parent::setDefaultValues();
+    if (empty($this->_id) || !CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Tag', $this->_id, 'color')) {
+      $defaults['color'] = '#ffffff';
+    }
+    if (empty($this->_id)) {
+      $defaults['used_for'] = 'civicrm_contact';
+    }
+    return $defaults;
   }
 
   /**
    * Process the form submission.
    */
   public function postProcess() {
-    $params = $ids = array();
-
     // store the submitted values in an array
     $params = $this->exportValues();
+    if ($this->_id) {
+      $params['id'] = $this->_id;
+    }
 
-    $ids['tag'] = $this->_id;
     if ($this->_action == CRM_Core_Action::ADD ||
       $this->_action == CRM_Core_Action::UPDATE
     ) {
@@ -159,16 +168,20 @@ class CRM_Tag_Form_Edit extends CRM_Admin_Form {
       $params['is_selectable'] = 0;
     }
 
+    if (strtolower($params['color']) == '#ffffff') {
+      $params['color'] = 'null';
+    }
+
     if ($this->_action == CRM_Core_Action::DELETE) {
       if ($this->_id > 0) {
         $tag = civicrm_api3('tag', 'getsingle', array('id' => $this->_id));
         CRM_Core_BAO_Tag::del($this->_id);
-        CRM_Core_Session::setStatus(ts('The tag \'%1\' has been deleted.', array(1 => $tag['name'])), ts('Deleted'), 'success');
+        CRM_Core_Session::setStatus(ts("The tag '%1' has been deleted.", array(1 => $tag['name'])), ts('Deleted'), 'success');
       }
     }
     else {
-      $tag = CRM_Core_BAO_Tag::add($params, $ids);
-      CRM_Core_Session::setStatus(ts('The tag \'%1\' has been saved.', array(1 => $tag->name)), ts('Saved'), 'success');
+      $tag = CRM_Core_BAO_Tag::add($params);
+      CRM_Core_Session::setStatus(ts("The tag '%1' has been saved.", array(1 => $tag->name)), ts('Saved'), 'success');
     }
   }
 

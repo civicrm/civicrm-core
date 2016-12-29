@@ -244,12 +244,11 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
       )), TRUE
     );
 
-    CRM_Core_BAO_Tag::getTags('civicrm_case', $tags, NULL,
-      '&nbsp;&nbsp;', TRUE);
+    $tags = CRM_Core_BAO_Tag::getColorTags('civicrm_case');
 
     if (!empty($tags)) {
-      $this->add('select', 'tag', ts('Select Tags'), $tags, FALSE,
-        array('id' => 'tags', 'multiple' => 'multiple', 'class' => 'crm-select2')
+      $this->add('select2', 'tag', ts('Tags'), $tags, FALSE,
+        array('class' => 'huge', 'multiple' => 'multiple')
       );
     }
 
@@ -371,6 +370,9 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
     $tagParams = array();
     if (!empty($params['tag'])) {
       $tagParams = array();
+      if (!is_array($params['tag'])) {
+        $params['tag'] = explode(',', $params['tag']);
+      }
       foreach ($params['tag'] as $tag) {
         $tagParams[$tag] = 1;
       }

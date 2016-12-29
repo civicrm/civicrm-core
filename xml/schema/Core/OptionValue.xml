@@ -192,6 +192,15 @@
     <comment>crm-i icon class</comment>
     <add>4.7</add>
   </field>
+  <field>
+    <name>color</name>
+    <title>Color</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>Hex color value e.g. #ffffff</comment>
+    <default>NULL</default>
+    <add>4.7</add>
+  </field>
   <index>
     <name>index_option_group_id_value</name>
     <fieldName length="128">value</fieldName>
