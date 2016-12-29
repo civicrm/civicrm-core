@@ -325,20 +325,43 @@ function _civicrm_api3_extension_refresh_spec(&$fields) {
  */
 function civicrm_api3_extension_get($params) {
   $statuses = CRM_Extension_System::singleton()->getManager()->getStatuses();
+  $mapper = CRM_Extension_System::singleton()->getMapper();
   $result = array();
   $id = 0;
   foreach ($statuses as $key => $status) {
-    //try {
-    //  $info = (array) $mapper->keyToInfo($key);
-    //} catch (CRM_Extension_Exception $e) {
-    $info = array();
+    try {
+      $obj = $mapper->keyToInfo($key);
+    }
+    catch (CRM_Extension_Exception $ex) {
+      CRM_Core_Session::setStatus(ts('Failed to read extension (%1). Please refresh the extension list.', array(1 => $key)));
+      continue;
+    }
+    $info = CRM_Extension_System::createExtendedInfo($obj);
     $info['id'] = $id++; // backward compatibility with indexing scheme
-    $info['key'] = $key;
-    //}
-    $info['status'] = $status;
     $result[] = $info;
   }
-  return _civicrm_api3_basic_array_get('Extension', $params, $result, 'id', array('id', 'key', 'status'));
+  return _civicrm_api3_basic_array_get('Extension', $params, $result, 'id', array());
+}
+
+/**
+ * Get a list of remotely available extensions.
+ *
+ * @param array $params
+ *
+ * @return array
+ *   API result
+ */
+function civicrm_api3_extension_getremote($params) {
+  $extensions = CRM_Extension_System::singleton()->getBrowser()->getExtensions();
+  $result = array();
+  $id = 0;
+  foreach ($extensions as $key => $obj) {
+    $info = array();
+    $info['id'] = $id++; // backward compatibility with indexing scheme
+    $info = array_merge($info, (array) $obj);
+    $result[] = $info;
+  }
+  return _civicrm_api3_basic_array_get('Extension', $params, $result, 'id', CRM_Utils_Array::value('return', $params, array()));
 }
 
 /**

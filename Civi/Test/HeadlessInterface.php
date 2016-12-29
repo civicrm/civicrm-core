@@ -7,7 +7,7 @@ namespace Civi\Test;
  * @package Civi\Test
  *
  * To run your test against a fake, headless database, flag it with the
- * HeadlessInterface. CiviTestListener will automatically boot
+ * HeadlessInterface. CiviTestListener will automatically boot Civi.
  *
  * Alternatively, if you wish to run a test in a live (CMS-enabled) environment,
  * flag it with EndToEndInterface.
@@ -23,7 +23,7 @@ namespace Civi\Test;
 interface HeadlessInterface {
 
   /**
-   * The setupHeadless functions runs at the start of each test case, right before
+   * The setupHeadless function runs at the start of each test case, right before
    * the headless environment reboots.
    *
    * It should perform any necessary steps required for putting the database

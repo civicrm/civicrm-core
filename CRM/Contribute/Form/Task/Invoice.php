@@ -223,7 +223,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
    */
   public function postProcess() {
     $params = $this->controller->exportValues($this->_name);
-    $this->printPDF($this->_contributionIds, $params, $this->_contactIds, $this);
+    self::printPDF($this->_contributionIds, $params, $this->_contactIds);
   }
 
   /**
@@ -235,10 +235,8 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
    *   Associated array of submitted values.
    * @param array $contactIds
    *   Contact Id.
-   * @param CRM_Core_Form $form
-   *   Form object.
    */
-  public static function printPDF($contribIDs, &$params, $contactIds, &$form) {
+  public static function printPDF($contribIDs, &$params, $contactIds) {
     // get all the details needed to generate a invoice
     $messageInvoice = array();
     $invoiceTemplate = CRM_Core_Smarty::singleton();
@@ -322,14 +320,11 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       $dueDate = date('F j ,Y', strtotime($contributionReceiveDate . "+" . $prefixValue['due_date'] . "" . $prefixValue['due_date_period']));
 
       if ($input['component'] == 'contribute') {
-        $eid = $contribID;
-        $etable = 'contribution';
-        $lineItem = CRM_Price_BAO_LineItem::getLineItems($eid, $etable, NULL, TRUE, TRUE);
+        $lineItem = CRM_Price_BAO_LineItem::getLineItemsByContributionID($contribID);
       }
       else {
         $eid = $contribution->_relatedObjects['participant']->id;
-        $etable = 'participant';
-        $lineItem = CRM_Price_BAO_LineItem::getLineItems($eid, $etable, NULL, TRUE, FALSE, '', TRUE);
+        $lineItem = CRM_Price_BAO_LineItem::getLineItems($eid, 'participant', NULL, TRUE, FALSE, TRUE);
       }
 
       //TO DO: Need to do changes for partially paid to display amount due on PDF invoice
@@ -666,7 +661,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
     $contributionIDs = array($contributionId);
     $contactId = CRM_Utils_Request::retrieve('cid', 'Positive', CRM_Core_DAO::$_nullObject, FALSE);
     $params = array('output' => 'pdf_invoice');
-    CRM_Contribute_Form_Task_Invoice::printPDF($contributionIDs, $params, $contactId, CRM_Core_DAO::$_nullObject);
+    CRM_Contribute_Form_Task_Invoice::printPDF($contributionIDs, $params, $contactId);
   }
 
 }

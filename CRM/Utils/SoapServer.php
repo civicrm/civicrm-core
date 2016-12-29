@@ -157,7 +157,8 @@ class CRM_Utils_SoapServer {
       'body' => $body,
       'version' => 3,
     );
-    return civicrm_api('Mailing', 'event_bounce', $params);
+    $result = civicrm_api('Mailing', 'event_bounce', $params);
+    return CRM_Utils_Array::encode_items($result);
   }
 
   /**
@@ -181,7 +182,8 @@ class CRM_Utils_SoapServer {
       'hash' => $hash,
       'version' => 3,
     );
-    return civicrm_api('MailingGroup', 'event_unsubscribe', $params);
+    $result = civicrm_api('MailingGroup', 'event_unsubscribe', $params);
+    return CRM_Utils_Array::encode_items($result);
   }
 
   /**
@@ -203,7 +205,8 @@ class CRM_Utils_SoapServer {
       'hash' => $hash,
       'version' => 3,
     );
-    return civicrm_api('MailingGroup', 'event_domain_unsubscribe', $params);
+    $result = civicrm_api('MailingGroup', 'event_domain_unsubscribe', $params);
+    return CRM_Utils_Array::encode_items($result);
   }
 
   /**
@@ -225,7 +228,8 @@ class CRM_Utils_SoapServer {
       'hash' => $hash,
       'version' => 3,
     );
-    return civicrm_api('MailingGroup', 'event_resubscribe', $params);
+    $result = civicrm_api('MailingGroup', 'event_resubscribe', $params);
+    return CRM_Utils_Array::encode_items($result);
   }
 
   /**
@@ -244,7 +248,8 @@ class CRM_Utils_SoapServer {
       'group_id' => $group,
       'version' => 3,
     );
-    return civicrm_api('MailingGroup', 'event_subscribe', $params);
+    $result = civicrm_api('MailingGroup', 'event_subscribe', $params);
+    return CRM_Utils_Array::encode_items($result);
   }
 
   /**
@@ -266,7 +271,8 @@ class CRM_Utils_SoapServer {
       'hash' => $hash,
       'version' => 3,
     );
-    return civicrm_api('Mailing', 'event_confirm', $params);
+    $result = civicrm_api('Mailing', 'event_confirm', $params);
+    return CRM_Utils_Array::encode_items($result);
   }
 
   /**
@@ -295,7 +301,8 @@ class CRM_Utils_SoapServer {
       'time_stamp' => date('YmdHis'),
       'version' => 3,
     );
-    return civicrm_api('Mailing', 'event_reply', $params);
+    $result = civicrm_api('Mailing', 'event_reply', $params);
+    return CRM_Utils_Array::encode_items($result);
   }
 
   /**
@@ -317,7 +324,8 @@ class CRM_Utils_SoapServer {
       'email' => $email,
       'version' => 3,
     );
-    return civicrm_api('Mailing', 'event_forward', $params);
+    $result = civicrm_api('Mailing', 'event_forward', $params);
+    return CRM_Utils_Array::encode_items($result);
   }
 
   /**
@@ -330,7 +338,8 @@ class CRM_Utils_SoapServer {
   public function get_contact($key, $params) {
     $this->verify($key);
     $params['version'] = 3;
-    return civicrm_api('contact', 'get', $params);
+    $result = civicrm_api('contact', 'get', $params);
+    return CRM_Utils_Array::encode_items($result);
   }
 
 }

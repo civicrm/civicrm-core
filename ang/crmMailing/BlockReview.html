@@ -34,6 +34,9 @@ Required vars: mailing, attachments
         </div>
         <div ng-show="!attachments.files.length && !attachments.uploader.queue.length"><em>{{ts('None')}}</em></div>
       </div>
+      <div ng-if="crmMailingConst.isMultiLingual" crm-ui-field="{title: ts('Language')}">
+        {{crmMailingConst.enabledLanguages[mailing.language]}}
+      </div>
       <div crm-ui-field="{title: ts('Tracking')}">
         <span crm-mailing-review-bool crm-on="mailing.url_tracking=='1'" crm-title="ts('Click-Throughs')"></span>
         <span crm-mailing-review-bool crm-on="mailing.open_tracking=='1'" crm-title="ts('Opens')"></span>

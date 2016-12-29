@@ -267,7 +267,7 @@ class CRM_Campaign_Selector_Search extends CRM_Core_Selector_Base implements CRM
    */
   public function buildPrevNextCache($sort) {
     //for prev/next pagination
-    $crmPID = CRM_Utils_Request::retrieve('crmPID', 'Integer', CRM_Core_DAO::$_nullObject);
+    $crmPID = CRM_Utils_Request::retrieve('crmPID', 'Integer');
 
     if (!$crmPID) {
       $cacheKey = "civicrm search {$this->_key}";

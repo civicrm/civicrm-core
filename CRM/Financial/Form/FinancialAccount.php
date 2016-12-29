@@ -202,8 +202,12 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
    */
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {
-      CRM_Financial_BAO_FinancialAccount::del($this->_id);
-      CRM_Core_Session::setStatus(ts('Selected Financial Account has been deleted.'));
+      if (CRM_Financial_BAO_FinancialAccount::del($this->_id)) {
+        CRM_Core_Session::setStatus(ts('Selected Financial Account has been deleted.'));
+      }
+      else {
+        CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/admin/financial/financialAccount', "reset=1&action=browse"));
+      }
     }
     else {
       // store the submitted values in an array

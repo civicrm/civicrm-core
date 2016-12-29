@@ -140,13 +140,11 @@ function _civicrm_api3_case_get_spec(&$params) {
     'title' => 'Case Client',
     'description' => 'Contact id of one or more clients to retrieve cases for',
     'type' => CRM_Utils_Type::T_INT,
-    'FKApiName' => 'Contact',
   );
   $params['activity_id'] = array(
     'title' => 'Case Activity',
     'description' => 'Id of an activity in the case',
     'type' => CRM_Utils_Type::T_INT,
-    'FKApiName' => 'Activity',
   );
 }
 
@@ -163,7 +161,6 @@ function _civicrm_api3_case_create_spec(&$params) {
     'description' => 'Contact id of case client(s)',
     'api.required' => 1,
     'type' => CRM_Utils_Type::T_INT,
-    'FKApiName' => 'Contact',
   );
   $params['status_id']['api.default'] = 1;
   $params['status_id']['api.aliases'] = array('case_status');
@@ -313,6 +310,10 @@ function _civicrm_api3_case_deprecation() {
  *   api result array
  */
 function civicrm_api3_case_update($params) {
+  if (!isset($params['case_id']) && isset($params['id'])) {
+    $params['case_id'] = $params['id'];
+  }
+
   //check parameters
   civicrm_api3_verify_mandatory($params, NULL, array('id'));
 

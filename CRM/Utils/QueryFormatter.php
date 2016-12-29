@@ -40,9 +40,24 @@
  * or in vain.
  */
 class CRM_Utils_QueryFormatter {
+  /**
+   * Generate queries using SQL LIKE expressions.
+   */
   const LANG_SQL_LIKE = 'like';
+
+  /**
+   * Generate queries using MySQL FTS expressions.
+   */
   const LANG_SQL_FTS = 'fts';
+
+  /**
+   * Generate queries using MySQL's boolean FTS expressions.
+   */
   const LANG_SQL_FTSBOOL = 'ftsbool';
+
+  /**
+   * Generate queries using Solr expressions.
+   */
   const LANG_SOLR = 'solr';
 
   /**
@@ -148,6 +163,67 @@ class CRM_Utils_QueryFormatter {
     }
 
     return $text;
+  }
+
+  /**
+   * Create a SQL WHERE expression for matching against a list of
+   * text columns.
+   *
+   * @param string $table
+   *   Eg "civicrm_note" or "civicrm_note mynote".
+   * @param array|string $columns
+   *   List of columns to search against.
+   *   Eg "first_name" or "activity_details".
+   * @param string $queryText
+   * @return string
+   *   SQL, eg "MATCH (col1) AGAINST (queryText)" or "col1 LIKE '%queryText%'"
+   */
+  public function formatSql($table, $columns, $queryText) {
+    if ($queryText === '*' || $queryText === '%' || empty($queryText)) {
+      return '(1)';
+    }
+
+    $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
+
+    if (strpos($table, ' ') === FALSE) {
+      $tableName = $tableAlias = $table;
+    }
+    else {
+      list ($tableName, $tableAlias) = explode(' ', $table);
+    }
+    if (is_scalar($columns)) {
+      $columns = array($columns);
+    }
+
+    $clauses = array();
+    if (CRM_Core_InnoDBIndexer::singleton()
+      ->hasDeclaredIndex($tableName, $columns)
+    ) {
+      $formattedQuery = $this->format($queryText, CRM_Utils_QueryFormatter::LANG_SQL_FTSBOOL);
+
+      $prefixedFieldNames = array();
+      foreach ($columns as $fieldName) {
+        $prefixedFieldNames[] = "$tableAlias.$fieldName";
+      }
+
+      $clauses[] = sprintf("MATCH (%s) AGAINST ('%s' IN BOOLEAN MODE)",
+        implode(',', $prefixedFieldNames),
+        $strtolower(CRM_Core_DAO::escapeString($formattedQuery))
+      );
+    }
+    else {
+      //CRM_Core_Session::setStatus(ts('Cannot use FTS for %1 (%2)', array(
+      //  1 => $table,
+      //  2 => implode(', ', $fullTextFields),
+      //)));
+
+      $formattedQuery = $this->format($queryText, CRM_Utils_QueryFormatter::LANG_SQL_LIKE);
+      $escapedText = $strtolower(CRM_Core_DAO::escapeString($formattedQuery));
+      foreach ($columns as $fieldName) {
+        $clauses[] = "$tableAlias.$fieldName LIKE '{$escapedText}'";
+      }
+    }
+    return implode(' OR ', $clauses);
   }
 
   /**
@@ -319,7 +395,15 @@ class CRM_Utils_QueryFormatter {
    * @return array
    */
   protected function parseWords($text) {
-    return explode(' ', preg_replace('/[ \r\n\t]+/', ' ', trim($text)));
+    //NYSS 9692 special handling for emails
+    if (preg_match('/^([a-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})$/', $text)) {
+      $parts = explode('@', $text);
+      $parts[1] = stristr($parts[1], '.', TRUE);
+      $text = implode(' ', $parts);
+    }
+
+    //NYSS also replace other occurrences of @
+    return explode(' ', preg_replace('/[ \r\n\t\@]+/', ' ', trim($text)));
   }
 
   /**

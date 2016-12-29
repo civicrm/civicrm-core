@@ -204,9 +204,7 @@ class CRM_Contact_Form_Edit_Address {
       // during contact editing : if no address is filled
       // required custom data must not produce 'required' form rule error
       // more handling done in formRule func
-      if (!$inlineEdit) {
-        CRM_Contact_Form_Edit_Address::storeRequiredCustomDataInfo($form, $groupTree);
-      }
+      CRM_Contact_Form_Edit_Address::storeRequiredCustomDataInfo($form, $groupTree);
 
       $template = CRM_Core_Smarty::singleton();
       $tplGroupTree = $template->get_template_vars('address_groupTree');
@@ -242,7 +240,7 @@ class CRM_Contact_Form_Edit_Address {
    * @return array|bool
    *   if no errors
    */
-  public static function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files = array(), $self = NULL) {
     $errors = array();
 
     $customDataRequiredFields = array();
@@ -269,8 +267,9 @@ class CRM_Contact_Form_Edit_Address {
         }
 
         // DETACH 'required' form rule error to
-        // custom data only if address data not exists upon submission
-        if (!empty($customDataRequiredFields) && !CRM_Core_BAO_Address::dataExists($addressValues)) {
+        // custom data if address data not exists upon submission
+        // or if master address is selected
+        if (!empty($customDataRequiredFields) && (!CRM_Core_BAO_Address::dataExists($addressValues) || !empty($addressValues['master_id']))) {
           foreach ($customDataRequiredFields as $customElementName) {
             $elementName = "address[$instance][$customElementName]";
             if ($self->getElementError($elementName)) {
@@ -419,7 +418,7 @@ class CRM_Contact_Form_Edit_Address {
    * @param array $groupTree
    */
   public static function storeRequiredCustomDataInfo(&$form, $groupTree) {
-    if (CRM_Utils_System::getClassName($form) == 'CRM_Contact_Form_Contact') {
+    if (in_array(CRM_Utils_System::getClassName($form), array('CRM_Contact_Form_Contact', 'CRM_Contact_Form_Inline_Address'))) {
       $requireOmission = NULL;
       foreach ($groupTree as $csId => $csVal) {
         // only process Address entity fields

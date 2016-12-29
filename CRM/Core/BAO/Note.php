@@ -134,13 +134,19 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
    * @param array $ids
    *   (deprecated) associated array with note id - preferably set $params['id'].
    *
-   * @return object
+   * @return object|null
    *   $note CRM_Core_BAO_Note object
    */
   public static function add(&$params, $ids = array()) {
     $dataExists = self::dataExists($params);
     if (!$dataExists) {
-      return CRM_Core_DAO::$_nullObject;
+      return NULL;
+    }
+
+    if (!empty($params['entity_table']) && $params['entity_table'] == 'civicrm_contact' && !empty($params['check_permissions'])) {
+      if (!CRM_Contact_BAO_Contact_Permission::allow($params['entity_id'], CRM_Core_Permission::EDIT)) {
+        throw new CRM_Exception('Permission denied to modify contact record');
+      }
     }
 
     $note = new CRM_Core_BAO_Note();
@@ -579,14 +585,12 @@ WHERE participant.contact_id = %1 AND  note.entity_table = 'civicrm_participant'
    * @return array
    */
   public static function entityTables() {
-    $tables = array(
-      'civicrm_relationship',
-      'civicrm_contact',
-      'civicrm_participant',
-      'civicrm_contribution',
+    return array(
+      'civicrm_relationship' => 'Relationship',
+      'civicrm_contact' => 'Contact',
+      'civicrm_participant' => 'Participant',
+      'civicrm_contribution' => 'Contribution',
     );
-    // Identical keys & values
-    return array_combine($tables, $tables);
   }
 
 }

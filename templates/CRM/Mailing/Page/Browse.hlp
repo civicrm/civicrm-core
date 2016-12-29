@@ -43,3 +43,12 @@
 {htxt id="is_archived"}
   {ts}This field is disabled when searching for Draft/Unscheduled mailings.{/ts}
 {/htxt}
+
+{htxt id="id-language-title"}
+  {ts}Language{/ts}
+{/htxt}
+{htxt id="id-language"}
+  {ts}Find mailing by language.{/ts}
+{/htxt}
+
+

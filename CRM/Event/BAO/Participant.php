@@ -757,7 +757,7 @@ GROUP BY  participant.event_id
 
       $participantStatus = array(
         'participant_status' => array(
-          'title' => 'Participant Status',
+          'title' => 'Participant Status (label)',
           'name' => 'participant_status',
           'type' => CRM_Utils_Type::T_STRING,
         ),
@@ -765,11 +765,14 @@ GROUP BY  participant.event_id
 
       $participantRole = array(
         'participant_role' => array(
-          'title' => 'Participant Role',
+          'title' => 'Participant Role (label)',
           'name' => 'participant_role',
           'type' => CRM_Utils_Type::T_STRING,
         ),
       );
+
+      $participantFields['participant_status_id']['title'] .= ' (ID)';
+      $participantFields['participant_role_id']['title'] .= ' (ID)';
 
       $discountFields = CRM_Core_DAO_Discount::export();
 
@@ -870,6 +873,11 @@ WHERE  civicrm_participant.id = {$participantId}
    * @return \CRM_Event_DAO_Participant
    */
   public static function deleteParticipant($id) {
+    $participant = new CRM_Event_DAO_Participant();
+    $participant->id = $id;
+    if (!$participant->find()) {
+      return FALSE;
+    }
     CRM_Utils_Hook::pre('delete', 'Participant', $id, CRM_Core_DAO::$_nullArray);
 
     $transaction = new CRM_Core_Transaction();
@@ -902,8 +910,6 @@ WHERE  civicrm_participant.id = {$participantId}
       CRM_Core_BAO_Note::del($noteId, FALSE);
     }
 
-    $participant = new CRM_Event_DAO_Participant();
-    $participant->id = $id;
     $participant->delete();
 
     $transaction->commit();

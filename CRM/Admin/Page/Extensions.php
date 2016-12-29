@@ -296,43 +296,7 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
    * @return array
    */
   public static function createExtendedInfo(CRM_Extension_Info $obj) {
-    $mapper = CRM_Extension_System::singleton()->getMapper();
-    $manager = CRM_Extension_System::singleton()->getManager();
-
-    $extensionRow = (array) $obj;
-    try {
-      $extensionRow['path'] = $mapper->keyToBasePath($obj->key);
-    }
-    catch (CRM_Extension_Exception $e) {
-      $extensionRow['path'] = '';
-    }
-    $extensionRow['status'] = $manager->getStatus($obj->key);
-
-    switch ($extensionRow['status']) {
-      case CRM_Extension_Manager::STATUS_UNINSTALLED:
-        $extensionRow['statusLabel'] = ''; // ts('Uninstalled');
-        break;
-
-      case CRM_Extension_Manager::STATUS_DISABLED:
-        $extensionRow['statusLabel'] = ts('Disabled');
-        break;
-
-      case CRM_Extension_Manager::STATUS_INSTALLED:
-        $extensionRow['statusLabel'] = ts('Enabled'); // ts('Installed');
-        break;
-
-      case CRM_Extension_Manager::STATUS_DISABLED_MISSING:
-        $extensionRow['statusLabel'] = ts('Disabled (Missing)');
-        break;
-
-      case CRM_Extension_Manager::STATUS_INSTALLED_MISSING:
-        $extensionRow['statusLabel'] = ts('Enabled (Missing)'); // ts('Installed');
-        break;
-
-      default:
-        $extensionRow['statusLabel'] = '(' . $extensionRow['status'] . ')';
-    }
-    return $extensionRow;
+    return CRM_Extension_System::createExtendedInfo($obj);
   }
 
 }

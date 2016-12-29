@@ -126,8 +126,11 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
       $params['financial_account_id'] = CRM_Utils_Array::value('financial_account_id', $result);
     }
     if (empty($trxnId)) {
-      $trxn = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contribution->id, 'ASC', TRUE);
-      $trxnId['id'] = $trxn['financialTrxnId'];
+      $trxnId['id'] = CRM_Contribute_BAO_Contribution::$_trxnIDs;
+      if (empty($trxnId['id'])) {
+        $trxn = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contribution->id, 'ASC', TRUE);
+        $trxnId['id'] = $trxn['financialTrxnId'];
+      }
     }
     $financialItem = self::create($params, NULL, $trxnId);
     return $financialItem;
@@ -161,20 +164,23 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
     }
 
     $financialItem->save();
-    if (!empty($trxnIds['id'])) {
-      $entity_financial_trxn_params = array(
-        'entity_table' => "civicrm_financial_item",
-        'entity_id' => $financialItem->id,
-        'financial_trxn_id' => $trxnIds['id'],
-        'amount' => $params['amount'],
-      );
-
-      $entity_trxn = new CRM_Financial_DAO_EntityFinancialTrxn();
-      $entity_trxn->copyValues($entity_financial_trxn_params);
-      if (!empty($ids['entityFinancialTrxnId'])) {
-        $entity_trxn->id = $ids['entityFinancialTrxnId'];
+    $financialtrxnIDS = CRM_Utils_Array::value('id', $trxnIds);
+    if (!empty($financialtrxnIDS)) {
+      if (!is_array($financialtrxnIDS)) {
+        $financialtrxnIDS = array($financialtrxnIDS);
       }
-      $entity_trxn->save();
+      foreach ($financialtrxnIDS as $tID) {
+        $entity_financial_trxn_params = array(
+          'entity_table' => "civicrm_financial_item",
+          'entity_id' => $financialItem->id,
+          'financial_trxn_id' => $tID,
+          'amount' => $params['amount'],
+        );
+        if (!empty($ids['entityFinancialTrxnId'])) {
+          $entity_financial_trxn_params['id'] = $ids['entityFinancialTrxnId'];
+        }
+        self::createEntityTrxn($entity_financial_trxn_params);
+      }
     }
     if (!empty($ids['id'])) {
       CRM_Utils_Hook::post('edit', 'FinancialItem', $financialItem->id, $financialItem);

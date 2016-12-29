@@ -382,8 +382,8 @@ function civicrm_api3_contribution_transact($params) {
  * @throws Exception
  */
 function civicrm_api3_contribution_sendconfirmation($params) {
-  $input = $ids = $values = array();
-  $passThroughParams = array(
+  $ids = $values = array();
+  $allowedParams = array(
     'receipt_from_email',
     'receipt_from_name',
     'receipt_update',
@@ -392,11 +392,7 @@ function civicrm_api3_contribution_sendconfirmation($params) {
     'receipt_text',
     'payment_processor_id',
   );
-  foreach ($passThroughParams as $key) {
-    if (isset($params[$key])) {
-      $input[$key] = $params[$key];
-    }
-  }
+  $input = array_intersect_key($params, array_flip($allowedParams));
   CRM_Contribute_BAO_Contribution::sendMail($input, $ids, $params['id'], $values);
 }
 
@@ -568,6 +564,10 @@ function civicrm_api3_contribution_repeattransaction(&$params) {
       'A valid original contribution ID is required', 'invalid_data');
   }
   $original_contribution = clone $contribution;
+  $input['payment_processor_id'] = civicrm_api3('contributionRecur', 'getvalue', array(
+    'return' => 'payment_processor_id',
+    'id' => $contribution->contribution_recur_id,
+  ));
   try {
     if (!$contribution->loadRelatedObjects($input, $ids, TRUE)) {
       throw new API_Exception('failed to load related objects');

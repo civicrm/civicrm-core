@@ -509,7 +509,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    * @param string $column
    *   Name/label that going to retrieve from db.
    * @param bool $biDirectional
-   * @param string $contactSubType
+   * @param array $contactSubType
    *   Includes relationship types between this subtype.
    * @param bool $onlySubTypeRelationTypes
    *   If set only subtype which is passed by $contactSubType
@@ -551,7 +551,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
       }
     }
 
-    $contactSubType = array();
+    $contactSubType = (array) $contactSubType;
     if ($contactId) {
       $contactType = CRM_Contact_BAO_Contact::getContactType($contactId);
       $contactSubType = CRM_Contact_BAO_Contact::getContactSubType($contactId);
@@ -1111,6 +1111,7 @@ WHERE  relationship_type_id = " . CRM_Utils_Type::escape($type, 'Integer');
                               civicrm_country.name as country,
                               civicrm_email.email as email,
                               civicrm_contact.contact_type as contact_type,
+                              civicrm_contact.contact_sub_type as contact_sub_type,
                               civicrm_phone.phone as phone,
                               civicrm_contact.id as civicrm_contact_id,
                               civicrm_relationship.contact_id_b as contact_id_b,
@@ -1334,6 +1335,7 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
         $values[$rid]['contact_id_a'] = $relationship->contact_id_a;
         $values[$rid]['contact_id_b'] = $relationship->contact_id_b;
         $values[$rid]['contact_type'] = $relationship->contact_type;
+        $values[$rid]['contact_sub_type'] = $relationship->contact_sub_type;
         $values[$rid]['relationship_type_id'] = $relationship->civicrm_relationship_type_id;
         $values[$rid]['relation'] = $relationship->relation;
         $values[$rid]['name'] = $relationship->sort_name;
@@ -2090,8 +2092,9 @@ AND cc.sort_name LIKE '%$name%'";
         $relationship['DT_RowAttr']['data-entity'] = 'relationship';
         $relationship['DT_RowAttr']['data-id'] = $values['id'];
 
-        //Add image icon for related contacts: CRM-14919
-        $icon = CRM_Contact_BAO_Contact_Utils::getImage($values['contact_type'],
+        //Add image icon for related contacts: CRM-14919; CRM-19668
+        $contactType = (!empty($values['contact_sub_type'])) ? $values['contact_sub_type'] : $values['contact_type'];
+        $icon = CRM_Contact_BAO_Contact_Utils::getImage($contactType,
           FALSE,
           $values['cid']
         );

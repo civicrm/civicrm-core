@@ -108,8 +108,8 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
       "civicrm_option_value.label as event_type",
       "civicrm_participant.fee_currency as currency",
     );
-    $groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($select);
 
+    $groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($select, 'civicrm_event.id');
     $sql = "
             SELECT  " . implode(', ', $select) . ",
                     SUM(civicrm_participant.fee_amount) as total,

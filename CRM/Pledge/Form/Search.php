@@ -76,7 +76,7 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
     // we allow the controller to set force/reset externally, useful when we are being
     // driven by the wizard framework
 
-    $this->_reset = CRM_Utils_Request::retrieve('reset', 'Boolean', CRM_Core_DAO::$_nullObject);
+    $this->_reset = CRM_Utils_Request::retrieve('reset', 'Boolean');
     $this->_force = CRM_Utils_Request::retrieve('force', 'Boolean', $this, FALSE);
     $this->_limit = CRM_Utils_Request::retrieve('limit', 'Positive', $this);
     $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this, FALSE, 'search');
@@ -369,17 +369,13 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
       $this->_defaults['pledge_status_id'] = $statuses;
     }
 
-    $pledgeFromDate = CRM_Utils_Request::retrieve('pstart', 'Date',
-      CRM_Core_DAO::$_nullObject
-    );
+    $pledgeFromDate = CRM_Utils_Request::retrieve('pstart', 'Date');
     if ($pledgeFromDate) {
       list($date) = CRM_Utils_Date::setDateDefaults($pledgeFromDate);
       $this->_formValues['pledge_create_date_low'] = $this->_defaults['pledge_create_date_low'] = $date;
     }
 
-    $pledgeToDate = CRM_Utils_Request::retrieve('pend', 'Date',
-      CRM_Core_DAO::$_nullObject
-    );
+    $pledgeToDate = CRM_Utils_Request::retrieve('pend', 'Date');
     if ($pledgeToDate) {
       list($date) = CRM_Utils_Date::setDateDefaults($pledgeToDate);
       $this->_formValues['pledge_create_date_high'] = $this->_defaults['pledge_create_date_high'] = $date;

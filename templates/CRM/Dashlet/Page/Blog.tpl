@@ -48,20 +48,20 @@
 {/literal}
 <div id="civicrm-news-feed">
   <ul>
-    {foreach from=$tabs key="key" item="title"}
-      <li class="ui-corner-all crm-tab-button">
-        <a href="#civicrm-news-feed-{$key}">{$title}</a>
+    {foreach from=$feeds item="channel"}
+      <li class="ui-corner-all crm-tab-button" title="{$channel.description}">
+        <a href="#civicrm-news-feed-{$channel.name}">{$channel.title}</a>
       </li>
     {/foreach}
   </ul>
 
-  {foreach from=$feeds key="key" item="feed"}
-    <div id="civicrm-news-feed-{$key}">
-    {foreach from=$feed item=article}
+  {foreach from=$feeds item="channel"}
+    <div id="civicrm-news-feed-{$channel.name}">
+    {foreach from=$channel.items item=article}
       <div class="crm-accordion-wrapper collapsed">
         <div class="crm-accordion-header">
           <span class="crm-news-feed-item-title">{$article.title}</span>
-          <span class="crm-news-feed-item-preview"> - {$article.description|strip_tags|substr:0:100}…</span>
+          <span class="crm-news-feed-item-preview"> - {if function_exists('mb_substr')}{$article.description|strip_tags|mb_substr:0:100}{else}{$article.description|strip_tags}{/if}</span>
         </div>
         <div class="crm-accordion-body">
           <div>{$article.description}</div>
@@ -69,14 +69,15 @@
         </div>
       </div>
     {/foreach}
-    {if !$feed}
-      <div class="messages status no-popup">
-        <div class="icon inform-icon"></div>
-        {ts}Sorry but we are not able to provide this at the moment.{/ts}
-      </div>
-    {/if}
     </div>
   {/foreach}
+  {if !$feeds}
+    <div class="messages status no-popup">
+      <div class="icon inform-icon"></div>
+      {ts}Sorry but we are not able to provide this at the moment.{/ts}
+    </div>
+  {/if}
+</div>
   
 </div>
 {literal}<script type="text/javascript">

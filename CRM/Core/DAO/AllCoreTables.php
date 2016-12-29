@@ -141,6 +141,11 @@ class CRM_Core_DAO_AllCoreTables {
   }
 
   public static function getClassForTable($tableName) {
+    //CRM-19677: on multilingual setup, trim locale from $tableName to fetch class name
+    if (CRM_Core_I18n::isMultilingual()) {
+      global $dbLocale;
+      $tableName = str_replace($dbLocale, '', $tableName);
+    }
     return CRM_Utils_Array::value($tableName, self::tables());
   }
 

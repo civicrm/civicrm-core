@@ -40,46 +40,28 @@ class CRM_Dashlet_Page_Blog extends CRM_Core_Page {
 
   const CHECK_TIMEOUT = 5;
   const CACHE_DAYS = 1;
-  const BLOG_URL = 'https://civicrm.org/blog/feed';
-  const EVENT_URL = 'https://civicrm.org/civicrm/event/ical?reset=1&list=1&rss=1';
+  const NEWS_URL = 'https://civicrm.org/news-feed.rss';
 
   /**
    * Gets url for blog feed.
    *
    * @return string
    */
-  public function getBlogUrl() {
-    // Note: We use "*default*" as the default (rather than self::BLOG_URL) so that future
-    // developers can change BLOG_URL without needing to update {civicrm_setting}.
+  public function getNewsUrl() {
+    // Note: We use "*default*" as the default (rather than self::NEWS_URL) so that future
+    // developers can change NEWS_URL without needing to update {civicrm_setting}.
     $url = Civi::settings()->get('blogUrl');
     if ($url === '*default*') {
-      $url = self::BLOG_URL;
+      $url = self::NEWS_URL;
     }
     return CRM_Utils_System::evalUrl($url);
-  }
-
-  /**
-   * Gets url for the events feed.
-   *
-   * @return string
-   */
-  public function getEventUrl() {
-    $url = self::EVENT_URL
-      . '&start=' . date("Ymd")
-      . '&end=' . date("Ymd", strtotime('now +6 month'));
-    return $url;
   }
 
   /**
    * Output data to template.
    */
   public function run() {
-    $this->assign('tabs', array(
-      'blog' => ts('Blog'),
-      'events' => ts('Events'),
-    ));
     $this->assign('feeds', $this->getData());
-
     return parent::run();
   }
 
@@ -93,7 +75,7 @@ class CRM_Dashlet_Page_Blog extends CRM_Core_Page {
   protected function getData() {
     // Fetch data from cache
     $cache = CRM_Core_DAO::executeQuery("SELECT data, created_date FROM civicrm_cache
-      WHERE group_name = 'dashboard' AND path = 'blog'");
+      WHERE group_name = 'dashboard' AND path = 'newsfeed'");
     if ($cache->fetch()) {
       $expire = time() - (60 * 60 * 24 * self::CACHE_DAYS);
       // Refresh data after CACHE_DAYS
@@ -101,7 +83,7 @@ class CRM_Dashlet_Page_Blog extends CRM_Core_Page {
         $new_data = $this->getFeeds();
         // If fetching the new rss feed was successful, return it
         // Otherwise use the old cached data - it's better than nothing
-        if ($new_data['blog']) {
+        if ($new_data) {
           return $new_data;
         }
       }
@@ -116,17 +98,13 @@ class CRM_Dashlet_Page_Blog extends CRM_Core_Page {
    * @return array
    */
   protected function getFeeds() {
-    $blogFeed = $this->getFeed($this->getBlogUrl());
-    // If unable to fetch the first feed, give up and return empty results.
-    if (!$blogFeed) {
-      return array_fill_keys(array_keys($this->get_template_vars('tabs')), array());
+    $newsFeed = $this->getFeed($this->getNewsUrl());
+    // If unable to fetch the feed, return empty results.
+    if (!$newsFeed) {
+      return array();
     }
-    $eventFeed = $this->getFeed($this->getEventUrl());
-    $feeds = array(
-      'blog' => $this->formatItems($blogFeed),
-      'events' => $this->formatItems($eventFeed),
-    );
-    CRM_Core_BAO_Cache::setItem($feeds, 'dashboard', 'blog');
+    $feeds = $this->formatItems($newsFeed);
+    CRM_Core_BAO_Cache::setItem($feeds, 'dashboard', 'newsfeed');
     return $feeds;
   }
 
@@ -152,23 +130,35 @@ class CRM_Dashlet_Page_Blog extends CRM_Core_Page {
    * @return array
    */
   protected function formatItems($feed) {
-    $items = array();
-    if ($feed && !empty($feed->channel->item)) {
-      foreach ($feed->channel->item as $item) {
-        $item = (array) $item;
-        $item['title'] = strip_tags($item['title']);
-        // Clean up description - remove tags that would break dashboard layout
-        $description = preg_replace('#<h[1-3][^>]*>(.+?)</h[1-3][^>]*>#s', '<h4>$1</h4>', $item['description']);
-        $description = strip_tags($description, "<a><p><h4><h5><h6><b><i><em><strong><ol><ul><li><dd><dt><code><pre><br/>");
-        // Add paragraph markup if it's missing.
-        if (strpos($description, '<p') === FALSE) {
-          $description = '<p>' . $description . '</p>';
+    $result = array();
+    if ($feed && !empty($feed->channel)) {
+      foreach ($feed->channel as $channel) {
+        $content = array(
+          'title' => (string) $channel->title,
+          'description' => (string) $channel->description,
+          'name' => strtolower(CRM_Utils_String::munge($channel->title, '-')),
+          'items' => array(),
+        );
+        foreach ($channel->item as $item) {
+          $item = (array) $item;
+          $item['title'] = strip_tags($item['title']);
+          // Clean up description - remove tags & styles that would break dashboard layout
+          $description = preg_replace('#<h[1-3][^>]*>(.+?)</h[1-3][^>]*>#s', '<h4>$1</h4>', $item['description']);
+          $description = strip_tags($description, "<a><p><h4><h5><h6><b><i><em><strong><ol><ul><li><dd><dt><code><pre><br><hr>");
+          $description = preg_replace('/(<[^>]+) style=["\'].*?["\']/i', '$1', $description);
+          // Add paragraph markup if it's missing.
+          if (strpos($description, '<p') === FALSE) {
+            $description = '<p>' . $description . '</p>';
+          }
+          $item['description'] = $description;
+          $content['items'][] = $item;
         }
-        $item['description'] = $description;
-        $items[] = $item;
+        if ($content['items']) {
+          $result[] = $content;
+        }
       }
     }
-    return $items;
+    return $result;
   }
 
 }

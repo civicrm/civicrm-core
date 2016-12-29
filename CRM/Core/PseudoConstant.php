@@ -246,7 +246,7 @@ class CRM_Core_PseudoConstant {
 
       // if callback is specified..
       if (!empty($pseudoconstant['callback'])) {
-        $fieldOptions = call_user_func(Civi\Core\Resolver::singleton()->get($pseudoconstant['callback']));
+        $fieldOptions = call_user_func(Civi\Core\Resolver::singleton()->get($pseudoconstant['callback']), $context);
         //CRM-18223: Allow additions to field options via hook.
         CRM_Utils_Hook::fieldOptions($entity, $fieldName, $fieldOptions, $params);
         return $fieldOptions;
@@ -789,7 +789,7 @@ WHERE  id = %1";
    *
    * @param bool $applyLimit
    *
-   * @return array
+   * @return array|null
    *   array reference of all countries.
    */
   public static function country($id = FALSE, $applyLimit = TRUE) {
@@ -846,7 +846,7 @@ WHERE  id = %1";
         return self::$country[$id];
       }
       else {
-        return CRM_Core_DAO::$_nullObject;
+        return NULL;
       }
     }
     return self::$country;
@@ -1618,12 +1618,12 @@ ORDER BY name";
    *
    * @param int $stateID
    *
-   * @return int
+   * @return int|null
    *   the country id that the state belongs to
    */
   public static function countryIDForStateID($stateID) {
     if (empty($stateID)) {
-      return CRM_Core_DAO::$_nullObject;
+      return NULL;
     }
 
     $query = "

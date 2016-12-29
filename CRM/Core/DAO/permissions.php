@@ -115,25 +115,11 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
   $permissions['phone'] = $permissions['address'];
   $permissions['website'] = $permissions['address'];
   $permissions['im'] = $permissions['address'];
+  $permissions['open_i_d'] = $permissions['address'];
 
-  // @todo - implement CRM_Core_BAO_EntityTag::addSelectWhereClause and remove this heavy-handed restriction
-  $permissions['entity_tag'] = array(
-    'get' => array('access CiviCRM', 'view all contacts'),
-    'default' => array('access CiviCRM', 'edit all contacts'),
-  );
-  // @todo - ditto
+  // Also managed by ACLs - CRM-19448
+  $permissions['entity_tag'] = array('default' => array());
   $permissions['note'] = $permissions['entity_tag'];
-
-  // CRM-17350 - entity_tag ACL permissions are checked at the BAO level
-  $permissions['entity_tag'] = array(
-    'get' => array(
-      'access CiviCRM',
-      'view all contacts',
-    ),
-    'default' => array(
-      'access CiviCRM',
-    ),
-  );
 
   // Allow non-admins to get and create tags to support tagset widget
   // Delete is still reserved for admins
@@ -304,6 +290,16 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
   );
   // Loc block is only used for events
   $permissions['loc_block'] = $permissions['event'];
+
+  // Price sets are shared by several components, user needs access to at least one of them
+  $permissions['price_set'] = array(
+    'default' => array(
+      array('access CiviEvent', 'access CiviContribute', 'access CiviMember'),
+    ),
+    'get' => array(
+      array('access CiviCRM', 'view event info', 'make online contributions'),
+    ),
+  );
 
   // File permissions
   $permissions['file'] = array(

@@ -254,12 +254,7 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
 
     //CRM-14190
     $parentGroups = self::buildParentGroups($this);
-
-    if (CRM_Core_Permission::check('administer Multiple Organizations') && CRM_Core_Permission::isMultisiteEnabled()) {
-      //group organization Element
-      $props = array('api' => array('params' => array('contact_type' => 'Organization')));
-      $this->addEntityRef('organization_id', ts('Organization'), $props);
-    }
+    self::buildGroupOrganizations($this);
 
     // is_reserved property CRM-9936
     $this->addElement('checkbox', 'is_reserved', ts('Reserved Group?'));
@@ -482,6 +477,22 @@ WHERE  title = %1
     }
 
     return $parentGroups;
+  }
+
+  /**
+   * Add the group organization checkbox to the form.
+   *
+   * Note this was traditionally a multisite thing - there is no particular reason why it is not available
+   * as a general field - it's historical use-case driven.
+   *
+   * @param CRM_Core_Form $form
+   */
+  public static function buildGroupOrganizations(&$form) {
+    if (CRM_Core_Permission::check('administer Multiple Organizations') && CRM_Core_Permission::isMultisiteEnabled()) {
+      //group organization Element
+      $props = array('api' => array('params' => array('contact_type' => 'Organization')));
+      $form->addEntityRef('organization_id', ts('Organization'), $props);
+    }
   }
 
 }

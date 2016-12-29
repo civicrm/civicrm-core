@@ -95,8 +95,9 @@ WHERE  parent_id IS NULL
           $sql .= " AND is_active = 1";
         }
 
+        $params = array();
         $dao = CRM_Core_DAO::executeQuery($sql,
-          CRM_Core_DAO::$_nullArray,
+          $params,
           FALSE,
           'CRM_Contact_DAO_ContactType'
         );

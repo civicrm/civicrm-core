@@ -48,7 +48,7 @@
         {/foreach}
                 {foreach from=$fields item=field key=fieldName}
                 {assign var=n value=$field.name}
-                {if ( $fields.$n.data_type eq 'Date') or (  $fields.$n.name eq 'activity_date_time' ) }
+                {if $fields.$n.name eq 'activity_date_time' }
                 <td class="compressed">{include file="CRM/common/jcalendar.tpl" elementName=$fieldName elementIndex=$activityId batchUpdate=1}</td>
                 {else}
                    <td class="compressed">{$form.field.$activityId.$n.html}</td>

@@ -29,7 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2016
- * $Id$
  *
  */
 
@@ -48,13 +47,13 @@ class CRM_Profile_Form_Edit extends CRM_Profile_Form {
   protected $_context;
   protected $_blockNo;
   protected $_prefix;
+  protected $returnExtra;
 
   /**
    * Pre processing work done here.
    *
    * @param
    *
-   * @return void
    */
   public function preProcess() {
     $this->_mode = CRM_Profile_Form::MODE_CREATE;
@@ -70,6 +69,9 @@ class CRM_Profile_Form_Edit extends CRM_Profile_Form {
 
     //set the prefix
     $this->_prefix = CRM_Utils_Request::retrieve('prefix', 'String', $this);
+
+    // Fields for the EntityRef widget
+    $this->returnExtra = CRM_Utils_Request::retrieve('returnExtra', 'String', $this);
 
     $this->assign('context', $this->_context);
 
@@ -98,8 +100,9 @@ class CRM_Profile_Form_Edit extends CRM_Profile_Form {
 
         if ($id != $userID) {
           // do not allow edit for anon users in joomla frontend, CRM-4668, unless u have checksum CRM-5228
+          // see also CRM-19079 for modifications to the condition
           $config = CRM_Core_Config::singleton();
-          if ($config->userFrameworkFrontend) {
+          if ($config->userFrameworkFrontend && $config->userSystem->is_joomla) {
             CRM_Contact_BAO_Contact_Permission::validateOnlyChecksum($id, $this);
           }
           else {
@@ -148,7 +151,6 @@ SELECT module,is_reserved
   /**
    * Build the form object.
    *
-   * @return void
    */
   public function buildQuickForm() {
     if (empty($this->_ufGroup['id'])) {
@@ -252,15 +254,21 @@ SELECT module,is_reserved
   /**
    * Process the user submitted custom data values.
    *
-   *
-   * @return void
    */
   public function postProcess() {
     parent::postProcess();
 
-    $displayName = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_id, 'display_name');
-    $sortName = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_id, 'sort_name');
-    $this->ajaxResponse['label'] = $sortName;
+    // Send back data for the EntityRef widget
+    if ($this->returnExtra) {
+      $contact = civicrm_api3('Contact', 'getsingle', array(
+        'id' => $this->_id,
+        'return' => $this->returnExtra,
+      ));
+      foreach (explode(',', $this->returnExtra) as $field) {
+        $field = trim($field);
+        $this->ajaxResponse['extra'][$field] = CRM_Utils_Array::value($field, $contact);
+      }
+    }
 
     // When saving (not deleting) and not in an ajax popup
     if (empty($_POST[$this->_deleteButtonName]) && $this->_context != 'dialog') {

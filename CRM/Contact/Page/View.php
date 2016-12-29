@@ -160,20 +160,7 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
     CRM_Utils_System::appendBreadCrumb(array(array('title' => ts('View Contact'), 'url' => $path)));
 
     if ($image_URL = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_contactId, 'image_URL')) {
-      //CRM-7265 --time being fix.
-      $config = CRM_Core_Config::singleton();
-      $image_URL = str_replace('https://', 'http://', $image_URL);
-      if (Civi::settings()->get('enableSSL')) {
-        $image_URL = str_replace('http://', 'https://', $image_URL);
-      }
-
-      list($imageWidth, $imageHeight) = getimagesize(CRM_Utils_String::unstupifyUrl($image_URL));
-      list($imageThumbWidth, $imageThumbHeight) = CRM_Contact_BAO_Contact::getThumbSize($imageWidth, $imageHeight);
-      $this->assign("imageWidth", $imageWidth);
-      $this->assign("imageHeight", $imageHeight);
-      $this->assign("imageThumbWidth", $imageThumbWidth);
-      $this->assign("imageThumbHeight", $imageThumbHeight);
-      $this->assign("imageURL", $image_URL);
+      $this->assign("imageURL", CRM_Utils_File::getImageURL($image_URL));
     }
 
     // also store in session for future use
@@ -378,9 +365,7 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
     CRM_Utils_Hook::links('view.contact.activity',
       'Contact',
       $cid,
-      $hookLinks,
-      CRM_Core_DAO::$_nullObject,
-      CRM_Core_DAO::$_nullObject
+      $hookLinks
     );
     if (is_array($hookLinks)) {
       $obj->assign('hookLinks', $hookLinks);
