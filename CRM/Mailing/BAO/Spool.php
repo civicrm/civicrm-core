@@ -56,8 +56,7 @@ class CRM_Mailing_BAO_Spool extends CRM_Mailing_DAO_Spool {
    *
    * @param int $job_id
    *
-   * @return bool|CRM_Core_Error
-   *   true if successful
+   * @return object
    */
   public function send($recipient, $headers, $body, $job_id = NULL) {
     $headerStr = array();
