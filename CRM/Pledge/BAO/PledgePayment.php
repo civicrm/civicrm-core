@@ -891,8 +891,6 @@ WHERE civicrm_pledge_payment.contribution_id = {$paymentContributionId}
           $newPledgeScheduledAmount = $oldestPayment['amount'];
 
           if (!$paymentContributionId) {
-            $newActualAmount = round($actualAmount - $pledgeScheduledAmount, 2);
-            $newPledgeScheduledAmount = $oldestPaymentAmount['amount'];
             // means we are editing payment scheduled payment, so update scheduled amount.
             CRM_Core_DAO::setFieldValue('CRM_Pledge_DAO_PledgePayment',
               $oldestPaymentAmount['id'],
