@@ -139,6 +139,9 @@
         field.FKApiName = getField(entityTableParam).options[params[entityTableParam]];
       }
     }
+    if (field.pseudoconstant && field.pseudoconstant.optionGroupName) {
+      field.FKApiName = 'OptionValue';
+    }
   }
 
   /**
