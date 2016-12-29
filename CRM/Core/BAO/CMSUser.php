@@ -196,7 +196,7 @@ class CRM_Core_BAO_CMSUser {
       }
 
       if ($emailName == NULL) {
-        $errors['_qf_default'] == ts('Could not find an email address.');
+        $errors['_qf_default'] = ts('Could not find an email address.');
         return $errors;
       }
 
