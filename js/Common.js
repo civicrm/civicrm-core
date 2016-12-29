@@ -373,8 +373,17 @@ if (!CRM.vars) CRM.vars = {};
   };
 
   function formatCrmSelect2(row) {
-    var icon = $(row.element).data('icon');
-    return (icon ? '<i class="crm-i ' + icon + '"></i> ' : '') + _.escape(row.text);
+    var icon = row.icon || $(row.element).data('icon'),
+      color = row.color || $(row.element).data('color'),
+      description = row.description || $(row.element).data('description'),
+      ret = '';
+    if (icon) {
+      ret += '<i class="crm-i ' + icon + '"></i> ';
+    }
+    if (color) {
+      ret += '<span class="crm-select-item-color" style="background-color: ' + color + '"></span> ';
+    }
+    return ret + _.escape(row.text) + (description ? '<div class="crm-select2-row-description"><p>' + _.escape(description) + '</p></div>' : '');
   }
 
   /**
@@ -483,9 +492,7 @@ if (!CRM.vars) CRM.vars = {};
         },
         minimumInputLength: 1,
         formatResult: CRM.utils.formatSelect2Result,
-        formatSelection: function(row) {
-          return _.escape((row.prefix !== undefined ? row.prefix + ' ' : '') + row.label + (row.suffix !== undefined ? ' ' + row.suffix : ''));
-        },
+        formatSelection: formatEntityRefSelection,
         escapeMarkup: _.identity,
         initSelection: function($el, callback) {
           var
@@ -819,6 +826,7 @@ if (!CRM.vars) CRM.vars = {};
       markup += '<div class="crm-select2-icon"><div class="crm-icon ' + row.icon_class + '-icon"></div></div>';
     }
     markup += '<div><div class="crm-select2-row-label '+(row.label_class || '')+'">' +
+      (row.color ? '<span class="crm-select-item-color" style="background-color: ' + row.color + '"></span> ' : '') +
       _.escape((row.prefix !== undefined ? row.prefix + ' ' : '') + row.label + (row.suffix !== undefined ? ' ' + row.suffix : '')) +
       '</div>' +
       '<div class="crm-select2-row-description">';
@@ -828,6 +836,11 @@ if (!CRM.vars) CRM.vars = {};
     markup += '</div></div></div>';
     return markup;
   };
+
+  function formatEntityRefSelection(row) {
+    return (row.color ? '<span class="crm-select-item-color" style="background-color: ' + row.color + '"></span> ' : '') +
+      _.escape((row.prefix !== undefined ? row.prefix + ' ' : '') + row.label + (row.suffix !== undefined ? ' ' + row.suffix : ''));
+  }
 
   function renderEntityRefCreateLinks($el) {
     var

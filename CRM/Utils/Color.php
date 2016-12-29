@@ -1,4 +1,5 @@
-{*
+<?php
+/*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
@@ -22,22 +23,34 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*}
-{* This tpl runs recursively to build each level of the tag tree *}
-<ul class="tree-level-{$level}">
-  {foreach from=$tree item="node" key="id"}
-    <li id="tag_{$id}">
-      <input name="tagList[{$id}]" id="check_{$id}" type="checkbox" {if $node.is_selectable EQ 0}disabled=""{/if} {if $tagged[$id]}checked="checked"{/if}/>
-      <span>
-        <label for="check_{$id}" id="tagLabel_{$id}" {if !empty($allTags.$id.color)}style="background-color: {$allTags.$id.color}; color: {$allTags.$id.color|colorContrast};"{/if}>
-          {$node.name}
-        </label>
-        {if $node.description}{help id=$id title=$node.name file="CRM/Tag/Form/Tagtree"}{/if}
-      </span>
-      {if $node.children}
-        {* Recurse... *}
-        {include file="CRM/Tag/Form/Tagtree.tpl" tree=$node.children level=$level+1}
-      {/if}
-    </li>
-  {/foreach}
-</ul>
+ */
+
+/**
+ *
+ * @package CRM
+ * @copyright CiviCRM LLC (c) 2004-2016
+ */
+
+/**
+ * Static utility functions for working with colors
+ */
+class CRM_Utils_Color {
+
+  /**
+   * Determine the appropriate text color for a given background.
+   *
+   * Based on YIQ value.
+   *
+   * @param string $hexcolor
+   * @return string
+   */
+  public static function getContrast($hexcolor) {
+    $hexcolor = trim($hexcolor, ' #');
+    $r = hexdec(substr($hexcolor, 0, 2));
+    $g = hexdec(substr($hexcolor, 2, 2));
+    $b = hexdec(substr($hexcolor, 4, 2));
+    $yiq = (($r * 299) + ($g * 587) + ($b * 114)) / 1000;
+    return ($yiq >= 128) ? 'black' : 'white';
+  }
+
+}

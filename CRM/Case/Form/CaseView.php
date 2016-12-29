@@ -343,28 +343,28 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
       $this->assign('hookCaseSummary', $hookCaseSummary);
     }
 
-    CRM_Core_BAO_Tag::getTags('civicrm_case', $allTags, NULL,
-      '&nbsp;&nbsp;', TRUE);
+    $allTags = CRM_Core_BAO_Tag::getColorTags('civicrm_case');
 
     if (!empty($allTags)) {
-      $this->add('select', 'case_tag', ts('Tags'), $allTags, FALSE,
-        array('id' => 'tags', 'multiple' => 'multiple', 'class' => 'crm-select2')
+      $this->add('select2', 'case_tag', ts('Tags'), $allTags, FALSE,
+        array('id' => 'tags', 'multiple' => 'multiple')
       );
 
       $tags = CRM_Core_BAO_EntityTag::getTag($this->_caseID, 'civicrm_case');
 
-      $this->setDefaults(array('case_tag' => $tags));
-
       foreach ($tags as $tid) {
-        if (isset($allTags[$tid])) {
-          $tags[$tid] = $allTags[$tid];
+        $tagInfo = CRM_Utils_Array::findInTree($tid, $allTags);
+        if ($tagInfo) {
+          $tags[$tid] = $tagInfo;
         }
         else {
           unset($tags[$tid]);
         }
       }
 
-      $this->assign('tags', implode(', ', array_filter($tags)));
+      $this->setDefaults(array('case_tag' => implode(',', array_keys($tags))));
+
+      $this->assign('tags', $tags);
       $this->assign('showTags', TRUE);
     }
     else {
