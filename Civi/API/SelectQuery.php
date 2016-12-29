@@ -230,8 +230,8 @@ abstract class SelectQuery {
       }
       $fieldInfo = \CRM_Utils_Array::value($fieldName, $fkField['FKApiSpec']);
 
-      // FIXME: What if the foreign key is not the "id" column?
-      if (!$fieldInfo || !isset($fkField['FKApiSpec']['id'])) {
+      $keyColumn = \CRM_Utils_Array::value('FKKeyColumn', $fkField, 'id');
+      if (!$fieldInfo || !isset($fkField['FKApiSpec'][$keyColumn])) {
         // Join doesn't exist - might be another param with a dot in it for some reason, we'll just ignore it.
         return NULL;
       }
@@ -240,9 +240,13 @@ abstract class SelectQuery {
 
       // Add acl condition
       $joinCondition = array_merge(
-        array("$prev.$fk = $tableAlias.id"),
+        array("$prev.$fk = $tableAlias.$keyColumn"),
         $this->getAclClause($tableAlias, \_civicrm_api3_get_BAO($fkField['FKApiName']), $subStack)
       );
+
+      if (!empty($fkField['FKCondition'])) {
+        $joinCondition[] = str_replace($fkTable, $tableAlias, $fkField['FKCondition']);
+      }
 
       $this->join($side, $fkTable, $tableAlias, $joinCondition);
 
@@ -259,7 +263,7 @@ abstract class SelectQuery {
   }
 
   /**
-   * Get join info for dynamically-joined fields (e.g. "entity_id")
+   * Get join info for dynamically-joined fields (e.g. "entity_id", "option_group")
    *
    * @param $fkField
    * @param $stack
@@ -272,6 +276,12 @@ abstract class SelectQuery {
         $fkField['FKClassName'] = \CRM_Core_DAO_AllCoreTables::getClassForTable($entityTable);
         $fkField['FKApiName'] = \CRM_Core_DAO_AllCoreTables::getBriefName($fkField['FKClassName']);
       }
+    }
+    if (!empty($fkField['pseudoconstant']['optionGroupName'])) {
+      $fkField['FKClassName'] = 'CRM_Core_DAO_OptionValue';
+      $fkField['FKApiName'] = 'OptionValue';
+      $fkField['FKKeyColumn'] = 'value';
+      $fkField['FKCondition'] = "civicrm_option_value.option_group_id = (SELECT id FROM civicrm_option_group WHERE name = '{$fkField['pseudoconstant']['optionGroupName']}')";
     }
   }
 
