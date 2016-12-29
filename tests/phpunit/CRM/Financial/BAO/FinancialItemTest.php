@@ -301,4 +301,49 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
     $this->assertEquals($financialItem['values'][$financialItem['id']]['amount'], 200.00, "The amounts do not match.");
   }
 
+  /**
+   * Check method getPreviousFinancialItem() with tax entry.
+   */
+  public function testGetPreviousFinancialItemHavingTax() {
+    $contactId = $this->individualCreate();
+    $this->enableTaxAndInvoicing();
+    $this->relationForFinancialTypeWithFinancialAccount(1);
+    $form = new CRM_Contribute_Form_Contribution();
+    $form->testSubmit(array(
+       'total_amount' => 100,
+        'financial_type_id' => 1,
+        'receive_date' => '04/21/2015',
+        'receive_date_time' => '11:27PM',
+        'contact_id' => $contactId,
+        'contribution_status_id' => 1,
+        'price_set_id' => 0,
+      ),
+      CRM_Core_Action::ADD
+    );
+    $contribution = $this->callAPISuccessGetSingle('Contribution',
+      array(
+        'contact_id' => $contactId,
+        'return' => array('id'),
+      )
+    );
+    $financialItem = CRM_Financial_BAO_FinancialItem::getPreviousFinancialItem($contribution['id']);
+    $params = array(
+      'id' => $financialItem->id,
+      'return' => array(
+        'description',
+        'status_id',
+        'amount',
+        'financial_account_id',
+      ),
+    );
+    $checkAgainst = array(
+      'id' => $financialItem->id,
+      'description' => ' Contribution Amount',
+      'status_id' => 1,
+      'amount' => '100.00',
+      'financial_account_id' => 1,
+    );
+    $financialItem = $this->callAPISuccessGetSingle('FinancialItem', $params, $checkAgainst);
+  }
+
 }
