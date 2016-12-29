@@ -938,7 +938,6 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
   }
 
   /**
-<<<<<<< HEAD
    * Test calculateFinancialItemAmount().
    */
   public function testcalculateFinancialItemAmount() {
