@@ -538,6 +538,7 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
           $value = "%$value%";
           $op = 'LIKE';
         }
+        // LOWER roughly translates to 'hurt my database without deriving any benefit' See CRM-19811.
         $wc = ($op != 'LIKE') ? "LOWER(civicrm_note.note)" : "civicrm_note.note";
         $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($wc, $op, $value, "String");
         $query->_qill[$grouping][] = ts('Contribution Note %1 %2', array(1 => $op, 2 => $quoteValue));

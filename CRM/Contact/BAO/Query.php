@@ -2182,6 +2182,7 @@ class CRM_Contact_BAO_Query {
         $op = 'LIKE';
         $value = self::getWildCardedValue($wildcard, $op, $value);
       }
+      // LOWER roughly translates to 'hurt my database without deriving any benefit' See CRM-19811.
       $wc = self::caseImportant($op) ? "LOWER({$field['where']})" : "{$field['where']}";
       $this->_where[$grouping][] = self::buildClause($wc, $op, "'$value'");
       $this->_qill[$grouping][] = "$field[title] $op \"$value\"";
@@ -2255,7 +2256,7 @@ class CRM_Contact_BAO_Query {
 
         //get the location name
         list($tName, $fldName) = self::getLocationTableName($field['where'], $locType);
-
+        // LOWER roughly translates to 'hurt my database without deriving any benefit' See CRM-19811.
         $fieldName = "LOWER(`$tName`.$fldName)";
 
         // we set both _tables & whereTables because whereTables doesn't seem to do what the name implies it should

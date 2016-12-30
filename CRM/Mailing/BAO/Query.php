@@ -260,6 +260,8 @@ class CRM_Mailing_BAO_Query {
           $value = "%$value%";
           $op = 'LIKE';
         }
+
+        // LOWER in query below roughly translates to 'hurt my database without deriving any benefit' See CRM-19811.
         $query->_where[$grouping][] = "LOWER(civicrm_mailing.name) $op '$value'";
         $query->_qill[$grouping][] = "Mailing Namename $op \"$value\"";
         $query->_tables['civicrm_mailing'] = $query->_whereTables['civicrm_mailing'] = 1;
