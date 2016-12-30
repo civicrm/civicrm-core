@@ -541,6 +541,16 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * Check the credit note retrieval is case insensitive.
+   */
+  public function testGetCreditNoteCaseInsensitive() {
+    $this->contributionCreate(array('contact_id' => $this->_individualId));
+    $this->contributionCreate(array('creditnote_id' => 'cN1234', 'contact_id' => $this->_individualId, 'invoice_id' => rand(), 'trxn_id' => rand()));
+    $contribution = $this->callAPISuccess('Contribution', 'getsingle', array('creditnote_id' => 'CN1234'));
+    $this->assertEquals($contribution['creditnote_id'], 'cN1234');
+  }
+
+  /**
    * Test retrieval by total_amount works.
    *
    * @throws Exception
