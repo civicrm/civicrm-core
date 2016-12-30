@@ -3620,7 +3620,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         'total_amount' => $trxn->total_amount,
         'contribution_id' => $params['contribution']->id,
       );
-      self::assignProportionalLineItems($trxnParams, $trxn->id, $params['contribution']->total_amount);
+      self::assignProportionalLineItems($trxnParams, $trxn->id, $params['prevContribution']->total_amount);
     }
     CRM_Core_BAO_FinancialTrxn::createDeferredTrxn(CRM_Utils_Array::value('line_item', $params), $params['contribution'], TRUE, $context);
   }
