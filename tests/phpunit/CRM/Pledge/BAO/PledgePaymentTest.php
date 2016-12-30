@@ -450,7 +450,7 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
       'amount' => 100.00,
       'pledge_status_id' => 2,
       'pledge_financial_type_id' => 1,
-      'original_installment_amount' => (100/12), // the API does not allow this
+      'original_installment_amount' => (100 / 12), // the API does not allow this
       'frequency_interval' => 1,
       'frequency_unit' => 'month',
       'frequency_day' => 1,
