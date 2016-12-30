@@ -336,6 +336,8 @@ class CRM_Utils_System_Backdrop extends CRM_Utils_System_DrupalBase {
       $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
       $name = $dbBackdrop->escapeSimple($strtolower($name));
       $userFrameworkUsersTableName = $this->getUsersTableName();
+
+      // LOWER in query below roughly translates to 'hurt my database without deriving any benefit' See CRM-19811.
       $sql = "
 SELECT u.*
 FROM   {$userFrameworkUsersTableName} u
