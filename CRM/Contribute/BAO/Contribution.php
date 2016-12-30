@@ -3615,19 +3615,12 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       }
     }
     if ($context == 'changePaymentInstrument') {
-      foreach ($params['line_item'] as $lineitems) {
-        foreach ($lineitems as $fieldValueId => $fieldValues) {
-          $prevFinancialItem = CRM_Financial_BAO_FinancialItem::getPreviousFinancialItem($fieldValues['id']);
-          // save to entity_financial_trxn table
-          $entityFinancialTrxnParams = array(
-            'entity_table' => "civicrm_financial_item",
-            'entity_id' => $prevFinancialItem->id,
-            'financial_trxn_id' => $trxn->id,
-            'amount' => $trxn->total_amount,
-          );
-          civicrm_api3('entityFinancialTrxn', 'create', $entityFinancialTrxnParams);
-        }
-      }
+      // store financial item Proportionaly.
+      $trxnParams = array(
+        'total_amount' => $trxn->total_amount,
+        'contribution_id' => $params['contribution']->id,
+      );
+      self::assignProportionalLineItems($trxnParams, $trxn->id, $params['contribution']->total_amount);
     }
     CRM_Core_BAO_FinancialTrxn::createDeferredTrxn(CRM_Utils_Array::value('line_item', $params), $params['contribution'], TRUE, $context);
   }
@@ -4942,29 +4935,13 @@ LIMIT 1;";
     $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($trxnParams['contribution_id']);
     if (!empty($lineItems)) {
       // get financial item
-      $sql = "SELECT fi.id, li.price_field_value_id
-      FROM civicrm_financial_item fi
-      INNER JOIN civicrm_line_item li ON li.id = fi.entity_id and fi.entity_table = 'civicrm_line_item'
-      WHERE li.contribution_id = %1";
-      $dao = CRM_Core_DAO::executeQuery($sql, array(1 => array($trxnParams['contribution_id'], 'Integer')));
-      while ($dao->fetch()) {
-        $ftIds[$dao->price_field_value_id] = $dao->id;
-      }
-      $eftParams = array(
-        'entity_table' => 'civicrm_financial_item',
-        'financial_trxn_id' => $trxnId,
+      list($ftIds, $taxItems) = self::getLastFinancialItemIds($trxnParams['contribution_id']);
+      $entityParams = array(
+        'contribution_total_amount' => $contributionTotalAmount,
+        'trxn_total_amount' => $trxnParams['total_amount'],
+        'trxn_id' => $trxnId,
       );
-      foreach ($lineItems as $key => $value) {
-        if ($value['qty'] == 0) {
-          continue;
-        }
-        $paid = $value['line_total'] * ($trxnParams['total_amount'] / $contributionTotalAmount);
-        // Record Entity Financial Trxn
-        $eftParams['amount'] = round($paid, 2);
-        $eftParams['entity_id'] = $ftIds[$value['price_field_value_id']];
-
-        civicrm_api3('EntityFinancialTrxn', 'create', $eftParams);
-      }
+      self::createProportionalFinancialEntries($entityParams, $lineItems, $ftIds, $taxItems);
     }
   }
 
