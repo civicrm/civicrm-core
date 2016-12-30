@@ -193,15 +193,14 @@ class CRM_Activity_BAO_Query {
       case 'activity_id':
       case 'activity_campaign_id':
         // We no longer expect "subject" as a specific criteria (as of CRM-19447),
-        // but I'm leaving this case just to reduce the chance of introducing a
-        // regression.
+        // but we still use activity_subject in Activity.Get API
       case 'activity_subject':
 
         $qillName = $name;
         if (in_array($name, array('activity_engagement_level', 'activity_id'))) {
           $name = $qillName = str_replace('activity_', '', $name);
         }
-        if (in_array($name, array('activity_status_id'))) {
+        if (in_array($name, array('activity_status_id', 'activity_subject'))) {
           $name = str_replace('activity_', '', $name);
           $qillName = str_replace('_id', '', $qillName);
         }
@@ -434,13 +433,9 @@ class CRM_Activity_BAO_Query {
     );
     $form->setDefaults(array('status_id' => array($activityStatus['Completed'], $activityStatus['Scheduled'])));
     $form->addElement('text', 'activity_text', ts('Activity Text'), CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'sort_name'));
-    $activity_options = array(
-      2 => ts('Details Only'),
-      3 => ts('Subject Only'),
-      6 => ts('Both'),
-    );
-    $form->addRadio('activity_option', '', $activity_options);
-    $form->setDefaults(array('activity_option' => 6));
+
+    $form->addRadio('activity_option', '', CRM_Core_SelectValues::activityTextOptions());
+    $form->setDefaults(array('activity_option' => 'both'));
 
     $form->addYesNo('activity_test', ts('Activity is a Test?'));
     $activity_tags = CRM_Core_BAO_Tag::getTags('civicrm_activity');
@@ -581,31 +576,22 @@ class CRM_Activity_BAO_Query {
   public static function whereClauseSingleActivityText(&$values, &$query) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
     $activityOptionValues = $query->getWhereValues('activity_option', $grouping);
-    $activityOption = CRM_Utils_Array::value('2', $activityOptionValues, '6');
+    $activityOption = CRM_Utils_Array::value(2, $activityOptionValues, 6);
 
     $query->_useDistinct = TRUE;
 
-    $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
-    $n = trim($value);
-    $value = $strtolower(CRM_Core_DAO::escapeString($n));
-    if (strpos($value, '%') === FALSE) {
-      $value = "%$value%";
-    }
-    $op = 'LIKE';
-
-    $label = NULL;
+    $label = ts('Activity Text (%1)', array(1 => CRM_Utils_Array::value($activityOption, CRM_Core_SelectValues::activityTextOptions())));
     $clauses = array();
     if ($activityOption % 2 == 0) {
       $clauses[] = $query->buildClause('civicrm_activity.details', $op, $value, 'String');
-      $label = ts('Activity: Details Only');
     }
     if ($activityOption % 3 == 0) {
       $clauses[] = $query->buildClause('civicrm_activity.subject', $op, $value, 'String');
-      $label = $label ? ts('Activity: Details or Subject') : ts('Activity: Subject Only');
     }
+
     $query->_where[$grouping][] = "( " . implode(' OR ', $clauses) . " )";
-    list($qillOp, $qillVal) = $query->buildQillForFieldValue(NULL, $name, $n, $op);
-    $query->_qill[$grouping][] = ts("%1 %2 %3", array(1 => $label, 2 => $qillOp, 3 => $qillVal));
+    list($qillOp, $qillVal) = $query->buildQillForFieldValue(NULL, $name, $value, $op);
+    $query->_qill[$grouping][] = ts("%1 %2 '%3'", array(1 => $label, 2 => $qillOp, 3 => $qillVal));
   }
 
 }

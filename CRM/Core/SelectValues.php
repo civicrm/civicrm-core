@@ -1110,4 +1110,17 @@ class CRM_Core_SelectValues {
     );
   }
 
+  /**
+   * Activity Text options.
+   *
+   * @return array
+   */
+  public static function activityTextOptions() {
+    return array(
+      2 => ts('Details Only'),
+      3 => ts('Subject Only'),
+      6 => ts('Both'),
+    );
+  }
+
 }
