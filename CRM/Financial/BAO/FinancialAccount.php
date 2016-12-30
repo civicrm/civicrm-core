@@ -112,6 +112,14 @@ class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAcco
 
     // action is taken depending upon the mode
     $financialAccount = new CRM_Financial_DAO_FinancialAccount();
+
+    // invoke pre hook
+    $op = 'create';
+    if (!empty($params['id'])) {
+      $op = 'edit';
+    }
+    CRM_Utils_Hook::pre($op, 'FinancialAccount', CRM_Utils_Array::value('id', $params), $params);
+
     if (!empty($params['id'])) {
       $financialAccount->id = $params['id'];
       $financialAccount->find(TRUE);
@@ -128,6 +136,14 @@ class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAcco
       $financialAccount->opening_balance = $financialAccount->current_period_opening_balance = '0.00';
     }
     $financialAccount->save();
+
+    // invoke post hook
+    $op = 'create';
+    if (!empty($params['id'])) {
+      $op = 'edit';
+    }
+    CRM_Utils_Hook::post($op, 'FinancialAccount', $financialAccount->id, $financialAccount);
+
     return $financialAccount;
   }
 
