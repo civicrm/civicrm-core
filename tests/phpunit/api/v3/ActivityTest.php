@@ -365,6 +365,43 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test get returns target and assignee contact names.
+   */
+  public function testActivityReturnTargetAssigneeName() {
+
+    $description = "Demonstrates retrieving activity target & source contact names.";
+    $subfile = "GetTargetandAssigneeName";
+    $target1 = $this->callAPISuccess('Contact', 'create', array('contact_type' => 'Individual', 'first_name' => 'A', 'last_name' => 'Cat'));
+    $target2 = $this->callAPISuccess('Contact', 'create', array('contact_type' => 'Individual', 'first_name' => 'B', 'last_name' => 'Good'));
+    $assignee = $this->callAPISuccess('Contact', 'create', array('contact_type' => 'Individual', 'first_name' => 'C', 'last_name' => 'Shore'));
+    $source = $this->callAPISuccess('Contact', 'create', array('contact_type' => 'Individual', 'first_name' => 'D', 'last_name' => 'Bug'));
+
+    $params = array(
+      'source_contact_id' => $source['id'],
+      'subject' => 'Make-it-Happen Meeting',
+      'activity_date_time' => '20170316',
+      'status_id' => 1,
+      'activity_type_id' => 1,
+      'target_contact_id' => array($target1['id'], $target2['id']),
+      'assignee_contact_id' => $assignee['id'],
+    );
+
+    $result = $this->callAPISuccess('activity', 'create', $params);
+    $result = $this->callAPIAndDocument('activity', 'getsingle', array(
+      'id' => $result['id'],
+      'return' => array('source_contact_name', 'target_contact_name', 'assignee_contact_name', 'subject'),
+    ), __FUNCTION__, __FILE__, $description, $subfile);
+
+    $this->assertEquals($params['subject'], $result['subject']);
+    $this->assertEquals($source['id'], $result['source_contact_id']);
+    $this->assertEquals('D Bug', $result['source_contact_name']);
+    $this->assertEquals('A Cat', $result['target_contact_name'][$target1['id']]);
+    $this->assertEquals('B Good', $result['target_contact_name'][$target2['id']]);
+    $this->assertEquals('C Shore', $result['assignee_contact_name'][$assignee['id']]);
+    $this->assertEquals($assignee['id'], $result['assignee_contact_id'][0]);
+  }
+
+  /**
    * Test civicrm_activity_create() using example code.
    */
   public function testActivityCreateExample() {
