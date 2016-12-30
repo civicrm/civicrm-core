@@ -175,6 +175,7 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
       $form->assign('tag', $tree);
       $form->assign('entityID', $contactId);
       $form->assign('entityTable', 'civicrm_contact');
+      $form->assign('allTags', CRM_Core_BAO_Tag::getTagsUsedFor('civicrm_contact', FALSE));
 
       if ($isRequired) {
         $form->addRule($fName, ts('%1 is a required field.', array(1 => $tagName)), 'required');
