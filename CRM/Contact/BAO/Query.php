@@ -1886,7 +1886,8 @@ class CRM_Contact_BAO_Query {
       case 'followup_parent_id':
       case 'parent_id':
       case 'source_contact_id':
-      case 'activity_subject':
+      case 'activity_text':
+      case 'activity_option':
       case 'test_activities':
       case 'activity_type_id':
       case 'activity_type':
@@ -4262,7 +4263,8 @@ civicrm_relationship.is_permission_a_b = 0
     list($select, $from, $where, $having) = $query->query();
     $groupBy = ($query->_useGroupBy) ? 'GROUP BY contact_a.id' : '';
 
-    return "$select $from $where $groupBy $having";
+    $query = "$select $from $where $groupBy $having";
+    return $query;
   }
 
   /**
