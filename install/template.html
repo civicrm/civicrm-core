@@ -97,7 +97,8 @@ if ($text_direction == 'rtl') {
 
 <h4><?php echo ts('CiviCRM Database Settings'); ?></h4>
 <p style="margin-left: 2em" id="mysql_credentials">
-  <label for="mysql_server"> <span><?php echo ts('MySQL server:'); ?></span> <input id="mysql_server" type="text" name="mysql[server]" value="<?php echo $databaseConfig['server']; ?>" /></label> <br />
+  <label for="mysql_server"> <span><?php echo ts('MySQL server:'); ?></span> <input id="mysql_server" type="text" name="mysql[server]" value="<?php echo $databaseConfig['server']; ?>" /></label>
+  <span class="testResults"> <?php echo ts('If your mysql server is running on other port than default 3306, provide server info as server:port (i.e. localhost:1234) ') ?> </span> </br>
   <label for="mysql_username"> <span><?php echo ts('MySQL username:'); ?></span> <input id="mysql_username" type="text" name="mysql[username]" value="<?php echo $databaseConfig['username']; ?>"  /></label> <br />
   <label for="mysql_password"> <span><?php echo ts('MySQL password:'); ?></span> <input id="mysql_password" type="password" name="mysql[password]" value="<?php echo $databaseConfig['password']; ?>" /></label> <br />
   <label for="mysql_database"><span><?php echo ts('MySQL database:'); ?></span> <input id="mysql_database" type="text" name="mysql[database]" value="<?php echo $databaseConfig['database']; ?>" /></label> <br />
@@ -106,7 +107,8 @@ if ($text_direction == 'rtl') {
 <?php if ($installType == 'drupal') { ?>
 <h4><?php echo ts('Drupal Database Settings'); ?></h4>
 <p style="margin-left: 2em" id="drupal_credentials" > <!--style="display: none"-->
-  <label for="drupal_server"> <span><?php echo ts('MySQL server:'); ?></span> <input id="drupal_server" type="text" name="drupal[server]" value="<?php echo $drupalConfig['server']; ?>" /></label> <br />
+  <label for="drupal_server"> <span><?php echo ts('MySQL server:'); ?></span> <input id="drupal_server" type="text" name="drupal[server]" value="<?php echo $drupalConfig['server']; ?>" /></label>
+  <span class="testResults"> <?php echo ts('If your mysql server is running on other port than default 3306, provide server info as server:port (i.e. localhost:1234) ') ?> </span> </br>
   <label for="drupal_username"> <span><?php echo ts('MySQL username:'); ?></span> <input id="drupal_username" type="text" name="drupal[username]" value="<?php echo $drupalConfig['username']; ?>"  /></label> <br />
   <label for="drupal_password"> <span><?php echo ts('MySQL password:'); ?></span> <input id="drupal_password" type="password" name="drupal[password]" value="<?php echo $drupalConfig['password']; ?>" /></label> <br />
   <label for="drupal_database"><span><?php echo ts('MySQL database:'); ?></span> <input id="drupal_database" type="text" name="drupal[database]" value="<?php echo $drupalConfig['database']; ?>" /></label> <br />
@@ -116,7 +118,8 @@ if ($text_direction == 'rtl') {
 <?php if ($installType == 'backdrop') { ?>
 <h4><?php echo ts('Backdrop Database Settings'); ?></h4>
 <p style="margin-left: 2em" id="backdrop_credentials" > <!--style="display: none"-->
-  <label for="backdrop_server"> <span><?php echo ts('MySQL server:'); ?></span> <input id="backdrop_server" type="text" name="backdrop[server]" value="<?php echo $backdropConfig['server'] ?>" /></label> <br />
+  <label for="backdrop_server"> <span><?php echo ts('MySQL server:'); ?></span> <input id="backdrop_server" type="text" name="backdrop[server]" value="<?php echo $backdropConfig['server'] ?>" /></label>
+  <span class="testResults"> <?php echo ts('If your mysql server is running on other port than default 3306, provide server info as server:port (i.e. localhost:1234) ') ?> </span> </br>
   <label for="backdrop_username"> <span><?php echo ts('MySQL username:'); ?></span> <input id="backdrop_username" type="text" name="backdrop[username]" value="<?php echo $backdropConfig['username'] ?>"  /></label> <br />
   <label for="backdrop_password"> <span><?php echo ts('MySQL password:'); ?></span> <input id="backdrop_password" type="password" name="backdrop[password]" value="<?php echo $backdropConfig['password'] ?>" /></label> <br />
   <label for="backdrop_database"><span><?php echo ts('MySQL database:'); ?></span> <input id="backdrop_database" type="text" name="backdrop[database]" value="<?php echo $backdropConfig['database'] ?>" /></label> <br />

@@ -337,7 +337,7 @@ class CRM_Mailing_Event_BAO_TrackableURLOpen extends CRM_Mailing_Event_DAO_Track
     }
 
     if ($is_distinct) {
-      $query .= " GROUP BY $queue.id ";
+      $query .= " GROUP BY $queue.id, $click.time_stamp, $url.url ";
     }
 
     $orderBy = "sort_name ASC, {$click}.time_stamp DESC";

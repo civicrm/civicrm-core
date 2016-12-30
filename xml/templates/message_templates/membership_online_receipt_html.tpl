@@ -91,8 +91,7 @@
          {$membership_amount|crmMoney}
         </td>
        </tr>
-       {if $amount}
-        {if ! $is_separate_payment }
+       {if $amount && !$is_separate_payment }
          <tr>
           <td {$labelStyle}>
            {ts}Contribution Amount{/ts}
@@ -101,25 +100,15 @@
            {$amount|crmMoney}
           </td>
          </tr>
-        {else}
          <tr>
-          <td {$labelStyle}>
-           {ts}Additional Contribution{/ts}
-          </td>
-          <td {$valueStyle}>
-           {$amount|crmMoney}
-          </td>
+           <td {$labelStyle}>
+           {ts}Total{/ts}
+            </td>
+            <td {$valueStyle}>
+            {$amount+$membership_amount|crmMoney}
+           </td>
          </tr>
-        {/if}
        {/if}
-       <tr>
-        <td {$labelStyle}>
-         {ts}Total{/ts}
-        </td>
-        <td {$valueStyle}>
-         {$amount+$membership_amount|crmMoney}
-        </td>
-       </tr>
 
       {elseif !$useForMember && $lineItem and $priceSetID and !$is_quick_config}
 
@@ -322,11 +311,13 @@
          {ts 1=$cancelSubscriptionUrl}This membership will be renewed automatically. You can cancel the auto-renewal option by <a href="%1">visiting this web page</a>.{/ts}
         </td>
        </tr>
-       <tr>
-        <td colspan="2" {$labelStyle}>
-         {ts 1=$updateSubscriptionBillingUrl}You can update billing details for this automatically renewed membership by <a href="%1">visiting this web page</a>.{/ts}
-        </td>
-       </tr>
+       {if $updateSubscriptionBillingUrl}
+         <tr>
+          <td colspan="2" {$labelStyle}>
+           {ts 1=$updateSubscriptionBillingUrl}You can update billing details for this automatically renewed membership by <a href="%1">visiting this web page</a>.{/ts}
+          </td>
+         </tr>
+       {/if}
       {/if}
      {/if}
 

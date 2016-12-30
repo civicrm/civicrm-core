@@ -132,7 +132,7 @@
     {/foreach}
     </table>
     {if $participantId and $hasPayment}
-      {include file="CRM/Contribute/Page/PaymentInfo.tpl" show='event-payment'}
+      {include file="CRM/Contribute/Page/PaymentInfo.tpl" show='payments'}
     {/if}
     {include file="CRM/Custom/Page/CustomDataView.tpl"}
     {if $accessContribution and $rows.0.contribution_id}

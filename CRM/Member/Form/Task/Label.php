@@ -57,7 +57,7 @@ class CRM_Member_Form_Task_Label extends CRM_Member_Form_Task {
    * @return void
    */
   public function buildQuickForm() {
-    CRM_Contact_Form_Task_Label::buildQuickForm($this);
+    CRM_Contact_Form_Task_Label::buildLabelForm($this);
     $this->addElement('checkbox', 'per_membership', ts('Print one label per Membership (rather than per contact)'));
   }
 

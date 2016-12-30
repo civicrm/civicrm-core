@@ -134,6 +134,9 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
     if ($this->_gName == 'payment_instrument' && $this->_id) {
       $defaults['financial_account_id'] = CRM_Financial_BAO_FinancialTypeAccount::getFinancialAccount($this->_id, 'civicrm_option_value', 'financial_account_id');
     }
+    if (empty($this->_id) || !CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionValue', $this->_id, 'color')) {
+      $defaults['color'] = '#ffffff';
+    }
     return $defaults;
   }
 
@@ -170,6 +173,13 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
         TRUE
       );
     }
+    else {
+      $this->add('text', 'icon', ts('Icon'), array('class' => 'crm-icon-picker', 'title' => ts('Choose Icon'), 'allowClear' => TRUE));
+    }
+
+    if ($this->_gName == 'activity_status') {
+      $this->add('color', 'color', ts('Color'));
+    }
 
     if (!in_array($this->_gName, array(
         'email_greeting',
@@ -177,10 +187,12 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
         'addressee',
       )) && !$isReserved
     ) {
+      $domainSpecificOptionGroups = array('from_email_address');
+      $domainSpecific = in_array($this->_gName, $domainSpecificOptionGroups) ? TRUE : FALSE;
       $this->addRule('label',
         ts('This Label already exists in the database for this option group. Please select a different Value.'),
         'optionExists',
-        array('CRM_Core_DAO_OptionValue', $this->_id, $this->_gid, 'label')
+        array('CRM_Core_DAO_OptionValue', $this->_id, $this->_gid, 'label', $domainSpecific)
       );
     }
 
@@ -423,7 +435,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       }
     }
     else {
-      $params = $ids = array();
+      $ids = array();
       $params = $this->exportValues();
 
       // allow multiple defaults within group.
@@ -451,6 +463,10 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
         else {
           $params['filter'] = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionValue', $this->_id, 'filter', 'id');
         }
+      }
+
+      if (isset($params['color']) && strtolower($params['color']) == '#ffffff') {
+        $params['color'] = 'null';
       }
 
       $groupParams = array('name' => ($this->_gName));

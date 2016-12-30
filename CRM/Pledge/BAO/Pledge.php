@@ -1204,15 +1204,17 @@ SELECT  pledge.contact_id              as contact_id,
   public static function getPledgeStartDate($date, $pledgeBlock) {
     $startDate = (array) json_decode($pledgeBlock['pledge_start_date']);
     list($field, $value) = each($startDate);
-    if (!CRM_Utils_Array::value('is_pledge_start_date_visible', $pledgeBlock)) {
-      return date('Ymd', strtotime($value));
-    }
-    if (!CRM_Utils_Array::value('is_pledge_start_date_editable', $pledgeBlock)) {
+    if (!empty($date) && !CRM_Utils_Array::value('is_pledge_start_date_editable', $pledgeBlock)) {
       return $date;
+    }
+    if (empty($date)) {
+      $date = $value;
     }
     switch ($field) {
       case 'contribution_date':
-        $date = date('Ymd');
+        if (empty($date)) {
+          $date = date('Ymd');
+        }
         break;
 
       case 'calendar_date':

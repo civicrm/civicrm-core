@@ -428,7 +428,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
       $today = date('Ymd');
       $relationActive = " AND (crel.is_active = 1 AND ( crel.end_date is NULL OR crel.end_date >= {$today} ) )";
       $relationWhere = " WHERE contact_household.is_deleted = 0  AND crel.{$contactA} IN ( {$relID} ) {$relationActive}";
-      $relationGroupBy = " GROUP BY crel.{$contactA}";
+      $relationGroupBy = " GROUP BY crel.{$contactA}, contact_household.id";
       $relationQueryString = "$relationSelect $relationFrom $relationWhere $relationGroupBy";
 
       $householdsDAO = CRM_Core_DAO::executeQuery($relationQueryString);
@@ -442,6 +442,21 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
         }
       }
       $householdsDAO->free();
+    }
+
+    // If contact list has changed, households will probably be at the end of
+    // the list. Sort it again by sort_name.
+    if (implode(',', $this->_contactIds) != $relID) {
+      $contact_sort = array();
+      $result = civicrm_api3('Contact', 'get', array(
+        'return' => array('id'),
+        'id' => array('IN' => $this->_contactIds),
+        'options' => array(
+          'limit' => 0,
+          'sort' => "sort_name",
+        ),
+      ));
+      $this->_contactIds = array_keys($result['values']);
     }
   }
 

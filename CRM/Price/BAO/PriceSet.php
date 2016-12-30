@@ -570,6 +570,11 @@ AND ( expire_on IS NULL OR expire_on >= {$currentTime} )
 
     $dao = CRM_Core_DAO::executeQuery($sql, $params);
 
+    $isDefaultContributionPriceSet = FALSE;
+    if ('default_contribution_amount' == CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $setID)) {
+      $isDefaultContributionPriceSet = TRUE;
+    }
+
     $visibility = CRM_Core_PseudoConstant::visibility('name');
     while ($dao->fetch()) {
       $fieldID = $dao->id;
@@ -587,12 +592,12 @@ AND ( expire_on IS NULL OR expire_on >= {$currentTime} )
         }
         $setTree[$setID]['fields'][$fieldID][$field] = $dao->$field;
       }
-      $setTree[$setID]['fields'][$fieldID]['options'] = CRM_Price_BAO_PriceField::getOptions($fieldID, FALSE);
+      $setTree[$setID]['fields'][$fieldID]['options'] = CRM_Price_BAO_PriceField::getOptions($fieldID, FALSE, FALSE, $isDefaultContributionPriceSet);
     }
 
     // also get the pre and post help from this price set
     $sql = "
-SELECT extends, financial_type_id, help_pre, help_post, is_quick_config
+SELECT extends, financial_type_id, help_pre, help_post, is_quick_config, min_amount
 FROM   civicrm_price_set
 WHERE  id = %1";
     $dao = CRM_Core_DAO::executeQuery($sql, $params);
@@ -602,6 +607,7 @@ WHERE  id = %1";
       $setTree[$setID]['help_pre'] = $dao->help_pre;
       $setTree[$setID]['help_post'] = $dao->help_post;
       $setTree[$setID]['is_quick_config'] = $dao->is_quick_config;
+      $setTree[$setID]['min_amount'] = $dao->min_amount;
     }
     return $setTree;
   }
@@ -797,19 +803,18 @@ WHERE  id = %1";
           $firstOption = reset($field['options']);
           $params["price_{$id}"] = array($firstOption['id'] => $params["price_{$id}"]);
           CRM_Price_BAO_LineItem::format($id, $params, $field, $lineItem);
-          if (CRM_Utils_Array::value('tax_rate', $field['options'][key($field['options'])])) {
-            $lineItem = self::setLineItem($field, $lineItem, key($field['options']));
-            $totalTax += $field['options'][key($field['options'])]['tax_amount'] * $lineItem[key($field['options'])]['qty'];
-          }
-          if (CRM_Utils_Array::value('name', $field['options'][key($field['options'])]) == 'contribution_amount') {
+          $optionValueId = key($field['options']);
+
+          if (CRM_Utils_Array::value('name', $field['options'][$optionValueId]) == 'contribution_amount') {
             $taxRates = CRM_Core_PseudoConstant::getTaxRates();
             if (array_key_exists($params['financial_type_id'], $taxRates)) {
               $field['options'][key($field['options'])]['tax_rate'] = $taxRates[$params['financial_type_id']];
-              $taxAmount = CRM_Contribute_BAO_Contribution_Utils::calculateTaxAmount($field['options'][key($field['options'])]['amount'], $field['options'][key($field['options'])]['tax_rate']);
-              $field['options'][key($field['options'])]['tax_amount'] = round($taxAmount['tax_amount'], 2);
-              $lineItem = self::setLineItem($field, $lineItem, key($field['options']));
-              $totalTax += $field['options'][key($field['options'])]['tax_amount'] * $lineItem[key($field['options'])]['qty'];
+              $taxAmount = CRM_Contribute_BAO_Contribution_Utils::calculateTaxAmount($field['options'][$optionValueId]['amount'], $field['options'][$optionValueId]['tax_rate']);
+              $field['options'][$optionValueId]['tax_amount'] = round($taxAmount['tax_amount'], 2);
             }
+          }
+          if (CRM_Utils_Array::value('tax_rate', $field['options'][$optionValueId])) {
+            $lineItem = self::setLineItem($field, $lineItem, $optionValueId, $totalTax);
           }
           $totalPrice += $lineItem[$firstOption['id']]['line_total'] + CRM_Utils_Array::value('tax_amount', $lineItem[key($field['options'])]);
           break;
@@ -824,8 +829,7 @@ WHERE  id = %1";
 
           CRM_Price_BAO_LineItem::format($id, $params, $field, $lineItem, $amount_override);
           if (CRM_Utils_Array::value('tax_rate', $field['options'][$optionValueId])) {
-            $lineItem = self::setLineItem($field, $lineItem, $optionValueId);
-            $totalTax += $field['options'][$optionValueId]['tax_amount'];
+            $lineItem = self::setLineItem($field, $lineItem, $optionValueId, $totalTax);
             if (CRM_Utils_Array::value('field_title', $lineItem[$optionValueId]) == 'Membership Amount') {
               $lineItem[$optionValueId]['line_total'] = $lineItem[$optionValueId]['unit_price'] = CRM_Utils_Rule::cleanMoney($lineItem[$optionValueId]['line_total'] - $lineItem[$optionValueId]['tax_amount']);
             }
@@ -848,8 +852,7 @@ WHERE  id = %1";
 
           CRM_Price_BAO_LineItem::format($id, $params, $field, $lineItem);
           if (CRM_Utils_Array::value('tax_rate', $field['options'][$optionValueId])) {
-            $lineItem = self::setLineItem($field, $lineItem, $optionValueId);
-            $totalTax += $field['options'][$optionValueId]['tax_amount'];
+            $lineItem = self::setLineItem($field, $lineItem, $optionValueId, $totalTax);
           }
           $totalPrice += $lineItem[$optionValueId]['line_total'] + CRM_Utils_Array::value('tax_amount', $lineItem[$optionValueId]);
           if (
@@ -866,8 +869,7 @@ WHERE  id = %1";
           CRM_Price_BAO_LineItem::format($id, $params, $field, $lineItem);
           foreach ($params["price_{$id}"] as $optionId => $option) {
             if (CRM_Utils_Array::value('tax_rate', $field['options'][$optionId])) {
-              $lineItem = self::setLineItem($field, $lineItem, $optionId);
-              $totalTax += $field['options'][$optionId]['tax_amount'];
+              $lineItem = self::setLineItem($field, $lineItem, $optionId, $totalTax);
             }
             $totalPrice += $lineItem[$optionId]['line_total'] + CRM_Utils_Array::value('tax_amount', $lineItem[$optionId]);
             if (
@@ -1659,10 +1661,11 @@ WHERE       ps.id = %1
    * @param array $field
    * @param array $lineItem
    * @param int $optionValueId
+   * @param float $totalTax
    *
    * @return array
    */
-  public static function setLineItem($field, $lineItem, $optionValueId) {
+  public static function setLineItem($field, $lineItem, $optionValueId, &$totalTax) {
     if ($field['html_type'] == 'Text') {
       $taxAmount = $field['options'][$optionValueId]['tax_amount'] * $lineItem[$optionValueId]['qty'];
     }
@@ -1672,7 +1675,7 @@ WHERE       ps.id = %1
     $taxRate = $field['options'][$optionValueId]['tax_rate'];
     $lineItem[$optionValueId]['tax_amount'] = $taxAmount;
     $lineItem[$optionValueId]['tax_rate'] = $taxRate;
-
+    $totalTax += $taxAmount;
     return $lineItem;
   }
 
@@ -1722,7 +1725,7 @@ WHERE       ps.id = %1
     $priceSetParams = array();
     foreach ($params as $field => $value) {
       $parts = explode('_', $field);
-      if (count($parts) == 2 && $parts[0] == 'price' && is_numeric($parts[1])) {
+      if (count($parts) == 2 && $parts[0] == 'price' && is_numeric($parts[1]) && is_array($value)) {
         $priceSetParams[$field] = $value;
       }
     }

@@ -499,7 +499,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     );
     $defaults = array();
     $financialTrxn = CRM_Core_BAO_FinancialTrxn::retrieve($trxnArray, $defaults);
-    $this->assertEquals(2, $financialTrxn->N, 'Mismatch count for is payment flag.');
+    $this->assertEquals(1, $financialTrxn->N, 'Mismatch count for is payment flag.');
     //update contribution amount
     $ids = array('contribution' => $contribution->id);
     $params['total_amount'] = 150;
@@ -514,10 +514,10 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     );
     $defaults = array();
     $financialTrxn = CRM_Core_BAO_FinancialTrxn::retrieve($trxnArray, $defaults);
-    $this->assertEquals(3, $financialTrxn->N, 'Mismatch count for is payment flag.');
+    $this->assertEquals(2, $financialTrxn->N, 'Mismatch count for is payment flag.');
     $trxnArray['is_payment'] = 0;
     $financialTrxn = CRM_Core_BAO_FinancialTrxn::retrieve($trxnArray, $defaults);
-    $this->assertEquals(NULL, $financialTrxn, 'Mismatch count for is payment flag.');
+    $this->assertEquals(1, $financialTrxn->N, 'Mismatch count for is payment flag.');
   }
 
   /**
@@ -585,9 +585,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
    */
   public function testAddPayments() {
     list($lineItems, $contribution) = $this->addParticipantWithContribution();
-    foreach ($lineItems as $value) {
-      CRM_Contribute_BAO_Contribution::addPayments($value, array($contribution));
-    }
+    CRM_Contribute_BAO_Contribution::addPayments(array($contribution));
     $this->checkItemValues($contribution);
   }
 
@@ -617,7 +615,6 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
    */
   public function testAssignProportionalLineItems() {
     list($lineItems, $contribution) = $this->addParticipantWithContribution();
-    $contributions['total_amount'] = $contribution->total_amount;
     $params = array(
       'contribution_id' => $contribution->id,
       'total_amount' => 150.00,
@@ -625,7 +622,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $trxn = new CRM_Financial_DAO_FinancialTrxn();
     $trxn->orderBy('id DESC');
     $trxn->find(TRUE);
-    CRM_Contribute_BAO_Contribution::assignProportionalLineItems($params, $trxn, $contributions);
+    CRM_Contribute_BAO_Contribution::assignProportionalLineItems($params, $trxn->id, $contribution->total_amount);
     $this->checkItemValues($contribution);
   }
 
@@ -938,6 +935,74 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $order = $this->callAPISuccess('order', 'create', $params);
     $allowUpdate = CRM_Contribute_BAO_Contribution::allowUpdateRevenueRecognitionDate($order['id']);
     $this->assertFalse($allowUpdate);
+  }
+
+  /**
+   * Test calculateFinancialItemAmount().
+   */
+  public function testcalculateFinancialItemAmount() {
+    $testParams = array(
+      array(
+        'params' => array(),
+        'amountParams' => array(
+          'line_total' => 100,
+          'previous_line_total' => 300,
+          'diff' => 1,
+        ),
+        'context' => 'changedAmount',
+        'expectedItemAmount' => -200,
+      ),
+      array(
+        'params' => array(),
+        'amountParams' => array(
+          'line_total' => 100,
+          'previous_line_total' => 100,
+          'diff' => -1,
+        ),
+        'context' => 'changePaymentInstrument',
+        'expectedItemAmount' => -100,
+      ),
+      array(
+        'params' => array(
+          'is_quick_config' => TRUE,
+          'total_amount' => 110,
+          'tax_amount' => 10,
+        ),
+        'amountParams' => array(
+          'item_amount' => 100,
+        ),
+        'context' => 'changedAmount',
+        'expectedItemAmount' => 100,
+      ),
+      array(
+        'params' => array(
+          'is_quick_config' => TRUE,
+          'total_amount' => 110,
+          'tax_amount' => 10,
+        ),
+        'amountParams' => array(
+          'item_amount' => NULL,
+        ),
+        'context' => 'changedAmount',
+        'expectedItemAmount' => 110,
+      ),
+      array(
+        'params' => array(
+          'is_quick_config' => TRUE,
+          'total_amount' => 110,
+          'tax_amount' => 10,
+        ),
+        'amountParams' => array(
+          'item_amount' => NULL,
+        ),
+        'context' => NULL,
+        'expectedItemAmount' => 100,
+      ),
+    );
+    foreach ($testParams as $params) {
+      $itemAmount = CRM_Contribute_BAO_Contribution::calculateFinancialItemAmount($params['params'], $params['amountParams'], $params['context']);
+      $this->assertEquals($itemAmount, $params['expectedItemAmount'], 'Invalid Financial Item amount.');
+    }
   }
 
 }

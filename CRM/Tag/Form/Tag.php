@@ -76,10 +76,10 @@ class CRM_Tag_Form_Tag extends CRM_Core_Form {
     $this->assign('tagged', $entityTag);
 
     // get the list of all the categories
-    $allTag = CRM_Core_BAO_Tag::getTagsUsedFor($this->_entityTable);
+    $allTags = CRM_Core_BAO_Tag::getTagsUsedFor($this->_entityTable, FALSE);
 
     // need to append the array with the " checked " if contact is tagged with the tag
-    foreach ($allTag as $tagID => $varValue) {
+    foreach ($allTags as $tagID => $varValue) {
       if (in_array($tagID, $entityTag)) {
         $tagAttribute = array(
           'checked' => 'checked',
@@ -112,7 +112,7 @@ class CRM_Tag_Form_Tag extends CRM_Core_Form {
     }
     $this->assign('tree', $tree);
 
-    $this->assign('tag', $allTag);
+    $this->assign('allTags', $allTags);
 
     //build tag widget
     $parentNames = CRM_Core_BAO_Tag::getTagSet('civicrm_contact');

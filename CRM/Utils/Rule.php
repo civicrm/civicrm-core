@@ -694,7 +694,7 @@ class CRM_Utils_Rule {
    * @param string $value
    *   The value of the field we are checking.
    * @param array $options
-   *   The daoName and fieldName (optional ).
+   *   The daoName, fieldName (optional) and DomainID (optional).
    *
    * @return bool
    *   true if object exists
@@ -705,7 +705,7 @@ class CRM_Utils_Rule {
       $name = $options[2];
     }
 
-    return CRM_Core_DAO::objectExists($value, CRM_Utils_Array::value(0, $options), CRM_Utils_Array::value(1, $options), CRM_Utils_Array::value(2, $options, $name));
+    return CRM_Core_DAO::objectExists($value, CRM_Utils_Array::value(0, $options), CRM_Utils_Array::value(1, $options), CRM_Utils_Array::value(2, $options, $name), CRM_Utils_Array::value(3, $options));
   }
 
   /**
@@ -715,7 +715,7 @@ class CRM_Utils_Rule {
    * @return bool
    */
   public static function optionExists($value, $options) {
-    return CRM_Core_OptionValue::optionExists($value, $options[0], $options[1], $options[2], CRM_Utils_Array::value(3, $options, 'name'));
+    return CRM_Core_OptionValue::optionExists($value, $options[0], $options[1], $options[2], CRM_Utils_Array::value(3, $options, 'name'), CRM_Utils_Array::value(4, $options, FALSE));
   }
 
   /**

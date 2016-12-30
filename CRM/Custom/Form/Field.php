@@ -422,10 +422,10 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
     $_showHide->addToTemplate();
 
     // text length for alpha numeric data types
-    $this->add('text',
+    $this->add('number',
       'text_length',
       ts('Database field length'),
-      $attributes['text_length'],
+      $attributes['text_length'] + array('min' => 1),
       FALSE
     );
     $this->addRule('text_length', ts('Value should be a positive number'), 'integer');
@@ -455,19 +455,19 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
     );
 
     // for Note field
-    $this->add('text',
+    $this->add('number',
       'note_columns',
       ts('Width (columns)') . ' ',
       $attributes['note_columns'],
       FALSE
     );
-    $this->add('text',
+    $this->add('number',
       'note_rows',
       ts('Height (rows)') . ' ',
       $attributes['note_rows'],
       FALSE
     );
-    $this->add('text',
+    $this->add('number',
       'note_length',
       ts('Maximum length') . ' ',
       $attributes['text_length'], // note_length is an alias for the text-length field
@@ -479,7 +479,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
     $this->addRule('note_length', ts('Value should be a positive number'), 'positiveInteger');
 
     // weight
-    $this->add('text', 'weight', ts('Order'),
+    $this->add('number', 'weight', ts('Order'),
       $attributes['weight'],
       TRUE
     );
@@ -489,7 +489,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
     $this->add('advcheckbox', 'is_required', ts('Required?'));
 
     // checkbox / radio options per line
-    $this->add('text', 'options_per_line', ts('Options Per Line'));
+    $this->add('number', 'options_per_line', ts('Options Per Line'), array('min' => 0));
     $this->addRule('options_per_line', ts('must be a numeric value'), 'numeric');
 
     // default value, help pre, help post, mask, attributes, javascript ?

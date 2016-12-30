@@ -287,6 +287,25 @@ class CRM_Utils_File {
   }
 
   /**
+   * Save a fake file somewhere
+   *
+   * @param string $dir
+   *   The directory where the file should be saved.
+   * @param string $contents
+   *   Optional: the contents of the file.
+   *
+   * @return string
+   *   The filename saved, or FALSE on failure.
+   */
+  public static function createFakeFile($dir, $contents = 'delete me') {
+    $dir = self::addTrailingSlash($dir);
+    $file = 'delete-this-' . CRM_Utils_String::createRandom(10, CRM_Utils_String::ALPHANUMERIC);
+    $success = file_put_contents($dir . $file, $contents);
+
+    return ($success === FALSE) ? FALSE : $file;
+  }
+
+  /**
    * @param string|NULL $dsn
    *   Use NULL to load the default/active connection from CRM_Core_DAO.
    *   Otherwise, give a full DSN string.
@@ -324,8 +343,7 @@ class CRM_Utils_File {
 
     // get rid of comments starting with # and --
 
-    $string = preg_replace("/^#[^\n]*$/m", "\n", $string);
-    $string = preg_replace("/^(--[^-]).*/m", "\n", $string);
+    $string = self::stripComments($string);
 
     $queries = preg_split('/;\s*$/m', $string);
     foreach ($queries as $query) {
@@ -343,6 +361,18 @@ class CRM_Utils_File {
         }
       }
     }
+  }
+  /**
+   *
+   * Strips comment from a possibly multiline SQL string
+   *
+   * @param string $string
+   *
+   * @return string
+   *   stripped string
+   */
+  public static function stripComments($string) {
+    return preg_replace("/^(#|--).*\R*/m", "", $string);
   }
 
   /**
@@ -811,6 +841,7 @@ HTACCESS;
       case 'image/gif':
       case 'image/x-png':
       case 'image/png':
+      case 'image/jpg':
         list($imageWidth, $imageHeight) = getimagesize($path);
         list($imageThumbWidth, $imageThumbHeight) = CRM_Contact_BAO_Contact::getThumbSize($imageWidth, $imageHeight);
         $url = "<a href=\"$url\" class='crm-image-popup'>
@@ -824,6 +855,25 @@ HTACCESS;
     }
 
     return $url;
+  }
+
+  /**
+   * Return formatted image icon
+   *
+   * @param string $imageURL
+   *   Contact's image url
+   *
+   * @return string $url
+   */
+  public static function getImageURL($imageURL) {
+    // retrieve image name from $imageURL
+    $imageURL = CRM_Utils_String::unstupifyUrl($imageURL);
+    parse_str(parse_url($imageURL, PHP_URL_QUERY), $query);
+
+    $path = CRM_Core_Config::singleton()->customFileUploadDir . $query['photo'];
+    $mimeType = 'image/' . strtolower(pathinfo($path, PATHINFO_EXTENSION));
+
+    return self::getFileURL($path, $mimeType);
   }
 
 }

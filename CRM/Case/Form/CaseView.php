@@ -56,8 +56,8 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
     if ($this->_showRelatedCases) {
       $relatedCases = $this->get('relatedCases');
       if (!isset($relatedCases)) {
-        $cId = CRM_Utils_Request::retrieve('cid', 'Integer', CRM_Core_DAO::$_nullObject);
-        $caseId = CRM_Utils_Request::retrieve('id', 'Integer', CRM_Core_DAO::$_nullObject);
+        $cId = CRM_Utils_Request::retrieve('cid', 'Integer');
+        $caseId = CRM_Utils_Request::retrieve('id', 'Integer');
         $relatedCases = CRM_Case_BAO_Case::getRelatedCases($caseId, $cId);
       }
       $this->assign('relatedCases', $relatedCases);
@@ -77,7 +77,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
       CRM_Core_Error::fatal(ts('You are not authorized to access this page.'));
     }
 
-    $fulltext = CRM_Utils_Request::retrieve('context', 'String', CRM_Core_DAO::$_nullObject);
+    $fulltext = CRM_Utils_Request::retrieve('context', 'String');
     if ($fulltext == 'fulltext') {
       $this->assign('fulltext', $fulltext);
     }
@@ -343,28 +343,28 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
       $this->assign('hookCaseSummary', $hookCaseSummary);
     }
 
-    CRM_Core_BAO_Tag::getTags('civicrm_case', $allTags, NULL,
-      '&nbsp;&nbsp;', TRUE);
+    $allTags = CRM_Core_BAO_Tag::getColorTags('civicrm_case');
 
     if (!empty($allTags)) {
-      $this->add('select', 'case_tag', ts('Tags'), $allTags, FALSE,
-        array('id' => 'tags', 'multiple' => 'multiple', 'class' => 'crm-select2')
+      $this->add('select2', 'case_tag', ts('Tags'), $allTags, FALSE,
+        array('id' => 'tags', 'multiple' => 'multiple')
       );
 
       $tags = CRM_Core_BAO_EntityTag::getTag($this->_caseID, 'civicrm_case');
 
-      $this->setDefaults(array('case_tag' => $tags));
-
       foreach ($tags as $tid) {
-        if (isset($allTags[$tid])) {
-          $tags[$tid] = $allTags[$tid];
+        $tagInfo = CRM_Utils_Array::findInTree($tid, $allTags);
+        if ($tagInfo) {
+          $tags[$tid] = $tagInfo;
         }
         else {
           unset($tags[$tid]);
         }
       }
 
-      $this->assign('tags', implode(', ', array_filter($tags)));
+      $this->setDefaults(array('case_tag' => implode(',', array_keys($tags))));
+
+      $this->assign('tags', $tags);
       $this->assign('showTags', TRUE);
     }
     else {
@@ -375,12 +375,27 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
 
     // see if we have any tagsets which can be assigned to cases
     $parentNames = CRM_Core_BAO_Tag::getTagSet('civicrm_case');
+    $tagSetTags = array();
     if ($parentNames) {
-      $this->assign('showTagsets', TRUE);
+      $this->assign('showTags', TRUE);
+      $tagSetItems = civicrm_api3('entityTag', 'get', array(
+        'entity_id' => $this->_caseID,
+        'entity_table' => 'civicrm_case',
+        'tag_id.parent_id.is_tagset' => 1,
+        'options' => array('limit' => 0),
+        'return' => array("tag_id.parent_id", "tag_id.parent_id.name", "tag_id.name"),
+      ));
+      foreach ($tagSetItems['values'] as $tag) {
+        $tagSetTags += array(
+          $tag['tag_id.parent_id'] => array(
+            'name' => $tag['tag_id.parent_id.name'],
+            'items' => array(),
+          ),
+        );
+        $tagSetTags[$tag['tag_id.parent_id']]['items'][] = $tag['tag_id.name'];
+      }
     }
-    else {
-      $this->assign('showTagsets', FALSE);
-    }
+    $this->assign('tagSetTags', $tagSetTags);
     CRM_Core_Form_Tag::buildQuickForm($this, $parentNames, 'civicrm_case', $this->_caseID, FALSE, TRUE);
 
     $this->addButtons(array(

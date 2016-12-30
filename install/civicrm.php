@@ -147,6 +147,13 @@ function civicrm_source($dsn, $fileName, $lineMode = FALSE) {
 
   require_once "$crmPath/packages/DB.php";
 
+  // CRM-19699 See also CRM_Core_DAO for PHP7 mysqli compatiblity.
+  // Duplicated here because this is not using CRM_Core_DAO directly
+  // and this function may be called directly from Drush.
+  if (!defined('DB_DSN_MODE')) {
+    define('DB_DSN_MODE', 'auto');
+  }
+
   $db = DB::connect($dsn);
   if (PEAR::isError($db)) {
     die("Cannot open $dsn: " . $db->getMessage());

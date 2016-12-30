@@ -80,7 +80,7 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
      * driven by the wizard framework
      */
 
-    $this->_reset = CRM_Utils_Request::retrieve('reset', 'Boolean', CRM_Core_DAO::$_nullObject);
+    $this->_reset = CRM_Utils_Request::retrieve('reset', 'Boolean');
     $this->_force = CRM_Utils_Request::retrieve('force', 'Boolean', $this, FALSE);
     $this->_limit = CRM_Utils_Request::retrieve('limit', 'Positive', $this);
     $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this, FALSE, 'search');
@@ -280,6 +280,7 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
         'contribution_product_id',
         'invoice_id',
         'payment_instrument_id',
+        'contribution_batch_id',
       );
       CRM_Contact_BAO_Query::processSpecialFormValue($this->_formValues, $specialParams);
 
@@ -382,9 +383,7 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
       return;
     }
 
-    $status = CRM_Utils_Request::retrieve('status', 'String',
-      CRM_Core_DAO::$_nullObject
-    );
+    $status = CRM_Utils_Request::retrieve('status', 'String');
     if ($status) {
       $this->_formValues['contribution_status_id'] = array($status => 1);
       $this->_defaults['contribution_status_id'] = array($status => 1);
@@ -406,18 +405,14 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
       }
     }
 
-    $lowDate = CRM_Utils_Request::retrieve('start', 'Timestamp',
-      CRM_Core_DAO::$_nullObject
-    );
+    $lowDate = CRM_Utils_Request::retrieve('start', 'Timestamp');
     if ($lowDate) {
       $lowDate = CRM_Utils_Type::escape($lowDate, 'Timestamp');
       $date = CRM_Utils_Date::setDateDefaults($lowDate);
       $this->_formValues['contribution_date_low'] = $this->_defaults['contribution_date_low'] = $date[0];
     }
 
-    $highDate = CRM_Utils_Request::retrieve('end', 'Timestamp',
-      CRM_Core_DAO::$_nullObject
-    );
+    $highDate = CRM_Utils_Request::retrieve('end', 'Timestamp');
     if ($highDate) {
       $highDate = CRM_Utils_Type::escape($highDate, 'Timestamp');
       $date = CRM_Utils_Date::setDateDefaults($highDate);
@@ -433,9 +428,7 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
       $this
     );
 
-    $test = CRM_Utils_Request::retrieve('test', 'Boolean',
-      CRM_Core_DAO::$_nullObject
-    );
+    $test = CRM_Utils_Request::retrieve('test', 'Boolean');
     if (isset($test)) {
       $test = CRM_Utils_Type::escape($test, 'Boolean');
       $this->_formValues['contribution_test'] = $test;

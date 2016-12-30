@@ -313,7 +313,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
       ksort($fields[$value]);
       if ($mappingType == 'Export') {
         $relationships = array();
-        $relationshipTypes = CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, NULL, NULL, $value);
+        $relationshipTypes = CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, NULL, NULL, $value, TRUE);
         asort($relationshipTypes);
 
         foreach ($relationshipTypes as $key => $var) {
@@ -590,6 +590,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
               //$relationshipCustomFields    = self::getRelationTypeCustomGroupData( $id );
               //asort($relationshipCustomFields);
 
+              $relatedFields = array();
               $relationshipType = new CRM_Contact_BAO_RelationshipType();
               $relationshipType->id = $id;
               if ($relationshipType->find(TRUE)) {

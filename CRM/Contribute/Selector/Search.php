@@ -183,11 +183,11 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
 
     // type of selector
     $this->_action = $action;
-
+    $returnProperties = CRM_Contribute_BAO_Query::selectorReturnProperties();
     $this->_includeSoftCredits = CRM_Contribute_BAO_Query::isSoftCreditOptionEnabled($this->_queryParams);
     $this->_query = new CRM_Contact_BAO_Query(
       $this->_queryParams,
-      CRM_Contribute_BAO_Query::selectorReturnProperties(),
+      $returnProperties,
       NULL, FALSE, FALSE,
       CRM_Contact_BAO_Query::MODE_CONTRIBUTE
     );
@@ -336,10 +336,10 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
     $componentId = $componentContext = NULL;
     if ($this->_context != 'contribute') {
       // @todo explain the significance of context & why we do not get these i that context.
-      $qfKey = CRM_Utils_Request::retrieve('key', 'String', CRM_Core_DAO::$_nullObject);
-      $componentId = CRM_Utils_Request::retrieve('id', 'Positive', CRM_Core_DAO::$_nullObject);
-      $componentAction = CRM_Utils_Request::retrieve('action', 'String', CRM_Core_DAO::$_nullObject);
-      $componentContext = CRM_Utils_Request::retrieve('compContext', 'String', CRM_Core_DAO::$_nullObject);
+      $qfKey = CRM_Utils_Request::retrieve('key', 'String');
+      $componentId = CRM_Utils_Request::retrieve('id', 'Positive');
+      $componentAction = CRM_Utils_Request::retrieve('action', 'String');
+      $componentContext = CRM_Utils_Request::retrieve('compContext', 'String');
 
       if (!$componentContext &&
         $this->_compContext
@@ -416,7 +416,9 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
         $contributionStatuses
       );
 
+      $isPayLater = FALSE;
       if ($result->is_pay_later && CRM_Utils_Array::value('contribution_status_name', $row) == 'Pending') {
+        $isPayLater = TRUE;
         $row['contribution_status'] .= ' (' . ts('Pay Later') . ')';
         $links[CRM_Core_Action::ADD] = array(
           'name' => ts('Pay with Credit Card'),
@@ -440,6 +442,19 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
         'cid' => $result->contact_id,
         'cxt' => $this->_context,
       );
+
+      if (in_array($row['contribution_status_name'], array('Partially paid', 'Pending refund')) || $isPayLater) {
+        $buttonName = ts('Record Payment');
+        if ($row['contribution_status_name'] == 'Pending refund') {
+          $buttonName = ts('Record Refund');
+        }
+        $links[CRM_Core_Action::ADD] = array(
+          'name' => $buttonName,
+          'url' => 'civicrm/payment',
+          'qs' => 'reset=1&id=%%id%%&cid=%%cid%%&action=add&component=contribution',
+          'title' => $buttonName,
+        );
+      }
 
       $row['action'] = CRM_Core_Action::formLink(
         $links,

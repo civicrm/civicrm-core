@@ -112,6 +112,14 @@ class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAcco
 
     // action is taken depending upon the mode
     $financialAccount = new CRM_Financial_DAO_FinancialAccount();
+
+    // invoke pre hook
+    $op = 'create';
+    if (!empty($params['id'])) {
+      $op = 'edit';
+    }
+    CRM_Utils_Hook::pre($op, 'FinancialAccount', CRM_Utils_Array::value('id', $params), $params);
+
     if (!empty($params['id'])) {
       $financialAccount->id = $params['id'];
       $financialAccount->find(TRUE);
@@ -128,6 +136,14 @@ class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAcco
       $financialAccount->opening_balance = $financialAccount->current_period_opening_balance = '0.00';
     }
     $financialAccount->save();
+
+    // invoke post hook
+    $op = 'create';
+    if (!empty($params['id'])) {
+      $op = 'edit';
+    }
+    CRM_Utils_Hook::post($op, 'FinancialAccount', $financialAccount->id, $financialAccount);
+
     return $financialAccount;
   }
 
@@ -144,6 +160,7 @@ class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAcco
     $dependency = array(
       array('Core', 'FinancialTrxn', 'to_financial_account_id'),
       array('Financial', 'FinancialTypeAccount', 'financial_account_id'),
+      array('Financial', 'FinancialItem', 'financial_account_id'),
     );
     foreach ($dependency as $name) {
       require_once str_replace('_', DIRECTORY_SEPARATOR, "CRM_" . $name[0] . "_BAO_" . $name[1]) . ".php";
@@ -157,13 +174,14 @@ class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAcco
 
     if ($check) {
       CRM_Core_Session::setStatus(ts('This financial account cannot be deleted since it is being used as a header account. Please remove it from being a header account before trying to delete it again.'));
-      return CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/admin/financial/financialAccount', "reset=1&action=browse"));
+      return FALSE;
     }
 
     // delete from financial Type table
     $financialAccount = new CRM_Financial_DAO_FinancialAccount();
     $financialAccount->id = $financialAccountId;
     $financialAccount->delete();
+    return TRUE;
   }
 
   /**

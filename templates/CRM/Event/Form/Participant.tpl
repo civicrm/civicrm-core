@@ -153,6 +153,12 @@
 
   cj('form[name=Participant]').on("click", '.validate',
     function(e) {
+      if (CRM.$('#total_amount').length == 0) {
+        var $balance = CRM.$('#payment-info-balance');
+        if ($balance.length > 0 && parseFloat($balance.attr('data-balance')) == 0) {
+          return true;
+        }
+      }
       var userSubmittedStatus = cj('#status_id').val();
       var statusLabel = cj('#status_id option:selected').text();
       if (userModifiedAmount < feeAmount && userSubmittedStatus != partiallyPaidStatusId) {
@@ -324,7 +330,7 @@
   {* JS block for ADD or UPDATE actions only *}
   {if $action eq 1 or $action eq 2}
     {if $participantId and $hasPayment}
-      {include file="CRM/Contribute/Page/PaymentInfo.tpl" show='event-payment'}
+      {include file="CRM/Contribute/Page/PaymentInfo.tpl" show='payments'}
     {/if}
 
     {*include custom data js file*}

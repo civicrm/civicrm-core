@@ -27,6 +27,7 @@
 {assign var="customDataGroupName" value=$customDataGroup.name}
 {strip}
   {if $displayStyle neq 'tableOriented' and ($action eq 16 or $action eq 4)} {* Browse or View actions *}
+    {assign var="customGroupDisplayDone" value=1}
     <div class="form-item">
       {include file="CRM/Custom/Page/CustomDataView.tpl"}
     </div>
@@ -63,11 +64,13 @@
     </script>
   {/literal}
 {/if}
+
+{* Todo: Comment on which part custom data gets displayed from the below code. *}
 {foreach from=$viewCustomData item=customGroupWrapper}
   {foreach from=$customGroupWrapper item=customGroup key=customGroupId}
     {assign var="customRegion" value='contact-custom-data-'|cat:$customGroup.name}
     {crmRegion name=$customRegion}
-      {if $customGroup.help_pre}
+      {if $customGroup.help_pre and !$customGroupDisplayDone}
         <div class="messages help">{$customGroup.help_pre}</div>
       {/if}
       {if $action eq 0 or $action eq 1 or $action eq 2 or $recordActivity}
@@ -89,7 +92,7 @@
           on_load_init_blocks(showBlocks, hideBlocks);
         </script>
       {/if}
-      {if $customGroup.help_post}
+      {if $customGroup.help_post and !$customGroupDisplayDone}
         <div class="messages help">{$customGroup.help_post}</div>
       {/if}
     {/crmRegion}

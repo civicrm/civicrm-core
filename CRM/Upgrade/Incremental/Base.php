@@ -132,4 +132,21 @@ class CRM_Upgrade_Incremental_Base {
     return TRUE;
   }
 
+  /**
+   * Add a column to a table if it doesn't already exist
+   *
+   * @param CRM_Queue_TaskContext $ctx
+   * @param string $table
+   * @param string $column
+   * @param string $properties
+   * @return bool
+   */
+  public static function addColumn($ctx, $table, $column, $properties) {
+    if (!CRM_Core_BAO_SchemaHandler::checkIfFieldExists($table, $column)) {
+      CRM_Core_DAO::executeQuery("ALTER TABLE `$table` ADD COLUMN `$column` $properties",
+        array(), TRUE, NULL, FALSE, FALSE);
+    }
+    return TRUE;
+  }
+
 }

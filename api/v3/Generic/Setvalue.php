@@ -143,7 +143,7 @@ function civicrm_api3_generic_setValue($apiRequest) {
       $params[$field] = '';
     }
     CRM_Core_BAO_CustomValueTable::setValues($params);
-    CRM_Utils_Hook::post('edit', $entity, $id, CRM_Core_DAO::$_nullObject);
+    CRM_Utils_Hook::post('edit', $entity, $id);
   }
   // Core fields
   elseif (CRM_Core_DAO::setFieldValue($dao_name, $id, $field, $params[$field])) {

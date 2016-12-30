@@ -94,7 +94,7 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
      * driven by the wizard framework
      */
 
-    $this->_reset = CRM_Utils_Request::retrieve('reset', 'Boolean', CRM_Core_DAO::$_nullObject);
+    $this->_reset = CRM_Utils_Request::retrieve('reset', 'Boolean');
     $this->_force = CRM_Utils_Request::retrieve('force', 'Boolean', $this, FALSE);
     $this->_limit = CRM_Utils_Request::retrieve('limit', 'Positive', $this);
     $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this, FALSE, 'search');
@@ -356,33 +356,25 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
       return;
     }
 
-    $caseStatus = CRM_Utils_Request::retrieve('status', 'Positive',
-      CRM_Core_DAO::$_nullObject
-    );
+    $caseStatus = CRM_Utils_Request::retrieve('status', 'Positive');
     if ($caseStatus) {
       $this->_formValues['case_status_id'] = $caseStatus;
       $this->_defaults['case_status_id'] = $caseStatus;
     }
-    $caseType = CRM_Utils_Request::retrieve('type', 'Positive',
-      CRM_Core_DAO::$_nullObject
-    );
+    $caseType = CRM_Utils_Request::retrieve('type', 'Positive');
     if ($caseType) {
       $this->_formValues['case_type_id'] = (array) $caseType;
       $this->_defaults['case_type_id'] = (array) $caseType;
     }
 
-    $caseFromDate = CRM_Utils_Request::retrieve('pstart', 'Date',
-      CRM_Core_DAO::$_nullObject
-    );
+    $caseFromDate = CRM_Utils_Request::retrieve('pstart', 'Date');
     if ($caseFromDate) {
       list($date) = CRM_Utils_Date::setDateDefaults($caseFromDate);
       $this->_formValues['case_start_date_low'] = $date;
       $this->_defaults['case_start_date_low'] = $date;
     }
 
-    $caseToDate = CRM_Utils_Request::retrieve('pend', 'Date',
-      CRM_Core_DAO::$_nullObject
-    );
+    $caseToDate = CRM_Utils_Request::retrieve('pend', 'Date');
     if ($caseToDate) {
       list($date) = CRM_Utils_Date::setDateDefaults($caseToDate);
       $this->_formValues['case_start_date_high'] = $date;
@@ -415,9 +407,7 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
       }
 
       // Now if case_owner is set in the url/post, use that instead.
-      $caseOwner = CRM_Utils_Request::retrieve('case_owner', 'Positive',
-        CRM_Core_DAO::$_nullObject
-      );
+      $caseOwner = CRM_Utils_Request::retrieve('case_owner', 'Positive');
       if ($caseOwner) {
         $this->_formValues['case_owner'] = $caseOwner;
         $this->_defaults['case_owner'] = $caseOwner;

@@ -187,10 +187,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     }
 
     if ($this->_action & CRM_Core_Action::ADD) {
-      if (!CRM_Member_BAO_Membership::statusAvailabilty($this->_contactID)) {
-        // all possible statuses are disabled - redirect back to contact form
-        CRM_Core_Error::statusBounce(ts('There are no configured membership statuses. You cannot add this membership until your membership statuses are correctly configured'));
-      }
       if ($this->_contactID) {
         //check whether contact has a current membership so we can alert user that they may want to do a renewal instead
         $contactMemberships = array();
@@ -1404,6 +1400,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         $financialType->id = $params['financial_type_id'];
         $financialType->find(TRUE);
         $this->_params = $formValues;
+        $paymentParams['payment_instrument_id'] = $this->_paymentProcessor['payment_instrument_id'];
         $contribution = CRM_Contribute_Form_Contribution_Confirm::processFormContribution($this,
           $paymentParams,
           NULL,
@@ -1491,7 +1488,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       );
       $params['source'] = $formValues['source'] ? $formValues['source'] : $params['contribution_source'];
       $params['trxn_id'] = CRM_Utils_Array::value('trxn_id', $result);
-      $params['payment_instrument_id'] = 1;
       $params['is_test'] = ($this->_mode == 'live') ? 0 : 1;
       if (!empty($formValues['send_receipt'])) {
         $params['receipt_date'] = $now;
@@ -1559,7 +1555,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         $result = CRM_Contribute_BAO_Contribution::transitionComponents($params, TRUE);
         if (!empty($result) && !empty($params['contribution_id'])) {
           $lineItem = array();
-          $lineItems = CRM_Price_BAO_LineItem::getLineItems($params['contribution_id'], 'contribution', NULL, TRUE, TRUE);
+          $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($params['contribution_id']);
           $itemId = key($lineItems);
           $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', $lineItems[$itemId]['price_field_id'], 'price_set_id');
 

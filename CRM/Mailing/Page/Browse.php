@@ -255,15 +255,15 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
       CRM_Utils_System::setTitle(ts('Find Mass SMS'));
     }
 
-    $crmRowCount = CRM_Utils_Request::retrieve('crmRowCount', 'Integer', CRM_Core_DAO::$_nullObject);
-    $crmPID = CRM_Utils_Request::retrieve('crmPID', 'Integer', CRM_Core_DAO::$_nullObject);
+    $crmRowCount = CRM_Utils_Request::retrieve('crmRowCount', 'Integer');
+    $crmPID = CRM_Utils_Request::retrieve('crmPID', 'Integer');
     if ($crmRowCount || $crmPID) {
       $urlParams .= '&force=1';
       $urlParams .= $crmRowCount ? '&crmRowCount=' . $crmRowCount : '';
       $urlParams .= $crmPID ? '&crmPID=' . $crmPID : '';
     }
 
-    $crmSID = CRM_Utils_Request::retrieve('crmSID', 'Integer', CRM_Core_DAO::$_nullObject);
+    $crmSID = CRM_Utils_Request::retrieve('crmSID', 'Integer');
     if ($crmSID) {
       $urlParams .= '&crmSID=' . $crmSID;
     }

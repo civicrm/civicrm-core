@@ -30,7 +30,7 @@
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2016
  */
-class CRM_Case_BAO_Query {
+class CRM_Case_BAO_Query extends CRM_Core_BAO_Query {
 
   /**
    * Get fields.
@@ -677,8 +677,6 @@ case_relation_type.id = case_relationship.relationship_type_id )";
    * @param CRM_Core_Form $form
    */
   public static function buildSearchForm(&$form) {
-    $config = CRM_Core_Config::singleton();
-
     //validate case configuration.
     $configured = CRM_Case_BAO_Case::isCaseConfigured();
     $form->assign('notConfigured', !$configured['configured']);
@@ -718,27 +716,9 @@ case_relation_type.id = case_relationship.relationship_type_id )";
       $form->addElement('checkbox', 'case_deleted', ts('Deleted Cases'));
     }
 
-    // add all the custom  searchable fields
-    $extends = array('Case');
-    $groupDetails = CRM_Core_BAO_CustomGroup::getGroupDetail(NULL, TRUE, $extends);
-    if ($groupDetails) {
-      $form->assign('caseGroupTree', $groupDetails);
-      foreach ($groupDetails as $group) {
-        foreach ($group['fields'] as $field) {
-          $fieldId = $field['id'];
-          $elementName = 'custom_' . $fieldId;
-          CRM_Core_BAO_CustomField::addQuickFormElement($form, $elementName, $fieldId, FALSE, TRUE);
-        }
-      }
-    }
-    $form->setDefaults(array('case_owner' => 1));
-  }
+    self::addCustomFormFields($form, array('Case'));
 
-  /**
-   * @param $row
-   * @param int $id
-   */
-  public static function searchAction(&$row, $id) {
+    $form->setDefaults(array('case_owner' => 1));
   }
 
   /**

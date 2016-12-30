@@ -507,11 +507,9 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
      * driven by the wizard framework
      */
 
-    $this->_reset = CRM_Utils_Request::retrieve('reset', 'Boolean',
-      CRM_Core_DAO::$_nullObject
-    );
+    $this->_reset = CRM_Utils_Request::retrieve('reset', 'Boolean');
 
-    $this->_force = CRM_Utils_Request::retrieve('force', 'Boolean', CRM_Core_DAO::$_nullObject);
+    $this->_force = CRM_Utils_Request::retrieve('force', 'Boolean');
     $this->_groupID = CRM_Utils_Request::retrieve('gid', 'Positive', $this);
     $this->_amtgID = CRM_Utils_Request::retrieve('amtgID', 'Positive', $this);
     $this->_ssID = CRM_Utils_Request::retrieve('ssID', 'Positive', $this);
@@ -764,7 +762,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
     $this->_done = TRUE;
 
     //for prev/next pagination
-    $crmPID = CRM_Utils_Request::retrieve('crmPID', 'Integer', CRM_Core_DAO::$_nullObject);
+    $crmPID = CRM_Utils_Request::retrieve('crmPID', 'Integer');
 
     if (array_key_exists($this->_searchButtonName, $_POST) ||
       ($this->_force && !$crmPID)

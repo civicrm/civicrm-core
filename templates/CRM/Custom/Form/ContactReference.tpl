@@ -35,6 +35,7 @@
       minimumInputLength: 1,
       ajax: {
         url: {/literal}"{$customUrls.$element_name}"{literal},
+        quietMillis: 300,
         data: function(term) {
           return {term: term};
         },

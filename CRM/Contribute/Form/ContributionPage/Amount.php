@@ -518,7 +518,7 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
         'calendar_month' => 'pledge_calendar_month',
       );
       if ($params['pledge_default_toggle'] == 'contribution_date') {
-        $fieldValue = json_encode(array('contribution_date' => date('Ymd')));
+        $fieldValue = json_encode(array('contribution_date' => date('m/d/Y')));
       }
       else {
         foreach ($pledgeDateFields as $key => $pledgeDateField) {

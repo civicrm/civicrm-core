@@ -226,14 +226,14 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
       if ($action == CRM_Core_Action::PREVIEW) {
         $mapURL = CRM_Utils_System::url('civicrm/contact/map/event',
           "eid={$this->_id}&reset=1&action=preview",
-          TRUE, NULL, TRUE,
+          FALSE, NULL, TRUE,
           TRUE
         );
       }
       else {
         $mapURL = CRM_Utils_System::url('civicrm/contact/map/event',
           "eid={$this->_id}&reset=1",
-          TRUE, NULL, TRUE,
+          FALSE, NULL, TRUE,
           TRUE
         );
       }
@@ -254,7 +254,7 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
     if ($participantListingID) {
       $participantListingURL = CRM_Utils_System::url('civicrm/event/participant',
         "reset=1&id={$this->_id}",
-        TRUE, NULL, TRUE, TRUE
+        FALSE, NULL, TRUE, TRUE
       );
       $this->assign('participantListingURL', $participantListingURL);
     }
@@ -272,7 +272,7 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
         $action_query = $action === CRM_Core_Action::PREVIEW ? "&action=$action" : '';
         $url = CRM_Utils_System::url('civicrm/event/register',
           "id={$this->_id}&reset=1{$action_query}",
-          TRUE, NULL, TRUE,
+          FALSE, NULL, TRUE,
           TRUE
         );
         if (!$eventFullMessage || $hasWaitingList) {
@@ -287,7 +287,7 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
             $link = CRM_Event_Cart_BAO_EventInCart::get_registration_link($this->_id);
             $registerText = $link['label'];
 
-            $url = CRM_Utils_System::url($link['path'], $link['query'] . $action_query, TRUE, NULL, TRUE, TRUE);
+            $url = CRM_Utils_System::url($link['path'], $link['query'] . $action_query, FALSE, NULL, TRUE, TRUE);
           }
 
           //Fixed for CRM-4855

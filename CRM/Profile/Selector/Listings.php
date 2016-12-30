@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2016
- * $Id$
- *
  */
 
 /**
@@ -369,7 +367,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
         }
       }
 
-      // if we dont have any valid columns, dont add the implicit ones
+      // if we don't have any valid columns, don't add the implicit ones
       // this allows the template to check on emptiness of column headers
       if ($empty) {
         self::$_columnHeaders = array();
@@ -792,7 +790,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
     }
 
     //if the field is in selector and not a searchable field
-    //get the proper customvalue table name
+    //get the proper custom value table name
     if ($selectorSet) {
       $this->_multiRecordTableName
         = $multiRecordTableName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $customGroupId, 'table_name');

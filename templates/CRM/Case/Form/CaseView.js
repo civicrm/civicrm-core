@@ -33,7 +33,7 @@
   var miniForms = {
     '#manageTagsDialog': {
       post: function(data) {
-        var tagsChecked = $("#tags", this) ? $("#tags", this).select2('val').join(',') : '',
+        var tagsChecked = $("#tags", this) ? $("#tags", this).val() : '',
           tagList = {},
           url = CRM.url('civicrm/case/ajax/processtags');
         $("input[name^=case_taglist]", this).each(function() {

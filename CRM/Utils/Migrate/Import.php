@@ -155,6 +155,10 @@ class CRM_Utils_Migrate_Import {
       foreach ($optionValuesXML->OptionValue as $optionValueXML) {
         $optionValue = new CRM_Core_DAO_OptionValue();
         $optionValue->option_group_id = $idMap['option_group'][(string ) $optionValueXML->option_group_name];
+        if (empty($optionValue->option_group_id)) {
+          //CRM-17410 check if option group already exist.
+          $optionValue->option_group_id = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', $optionValueXML->option_group_name, 'id', 'name');
+        }
         $this->copyData($optionValue, $optionValueXML, FALSE, 'label');
         if (!isset($optionValue->value)) {
           $sql = "

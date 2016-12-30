@@ -1076,4 +1076,57 @@ class CRM_Utils_Array {
     return $input;
   }
 
+  /**
+   * Ensure that array is encoded in utf8 format.
+   *
+   * @param array $array
+   *
+   * @return array $array utf8-encoded.
+   */
+  public static function encode_items($array) {
+    foreach ($array as $key => $value) {
+      if (is_array($value)) {
+        $array[$key] = self::encode_items($value);
+      }
+      elseif (is_string($value)) {
+        $array[$key] = mb_convert_encoding($value, mb_detect_encoding($value, mb_detect_order(), TRUE), 'UTF-8');
+      }
+      else {
+        $array[$key] = $value;
+      }
+    }
+    return $array;
+  }
+
+  public static function buildTree($elements, $parentId = NULL) {
+    $branch = array();
+
+    foreach ($elements as $element) {
+      if ($element['parent_id'] == $parentId) {
+        $children = self::buildTree($elements, $element['id']);
+        if ($children) {
+          $element['children'] = $children;
+        }
+        $branch[] = $element;
+      }
+    }
+
+    return $branch;
+  }
+
+  public static function findInTree($search, $tree, $field = 'id') {
+    foreach ($tree as $item) {
+      if ($item[$field] == $search) {
+        return $item;
+      }
+      if (!empty($item['children'])) {
+        $found = self::findInTree($search, $item['children']);
+        if ($found) {
+          return $found;
+        }
+      }
+    }
+    return NULL;
+  }
+
 }

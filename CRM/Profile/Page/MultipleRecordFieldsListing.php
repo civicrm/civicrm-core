@@ -29,7 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2016
- * $Id$
  *
  */
 class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
@@ -137,7 +136,6 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
    * of action and executes that action. Finally it calls the parent's run
    * method.
    *
-   * @return void
    */
   public function run() {
     // get the requested action, default to 'browse'
@@ -166,11 +164,10 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
   /**
    * Browse the listing.
    *
-   * @return void
    */
   public function browse() {
     $dateFields = NULL;
-    $cgcount = 0;
+    $newCgCount = $cgcount = 0;
     $attributes = $result = $headerAttr = array();
     $dateFieldsVals = NULL;
     if ($this->_pageViewType == 'profileDataView' && $this->_profileId) {
@@ -262,7 +259,7 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
       $linkAction = array_sum(array_keys($this->links()));
     }
 
-    if (!empty($fieldIDs) && $this->_contactId && empty($this->_headersOnly)) {
+    if (!empty($fieldIDs) && $this->_contactId) {
       $DTparams = !empty($this->_DTparams) ? $this->_DTparams : NULL;
       // commonly used for both views i.e profile listing view (profileDataView) and custom data listing view (customDataView)
       $result = CRM_Core_BAO_CustomValueTable::getEntityValues($this->_contactId, NULL, $fieldIDs, TRUE, $DTparams);
@@ -288,10 +285,11 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
         $customGroupInfo = CRM_Core_BAO_CustomGroup::getGroupTitles($fieldInput);
         $this->_customGroupTitle = $customGroupInfo[$fieldIdInput]['groupTitle'];
       }
-      // $cgcount is defined before 'if' condition as enitiy may have no record
+      // $cgcount is defined before 'if' condition as entity may have no record
       // and $cgcount is used to build new record url
       $cgcount = 1;
-      if ($result && !empty($result)) {
+      $newCgCount = (!$reached) ? $resultCount + 1 : NULL;
+      if (!empty($result) && empty($this->_headersOnly)) {
         $links = self::links();
         if ($this->_pageViewType == 'profileDataView') {
           $pageCheckSum = $this->get('pageCheckSum');
@@ -305,7 +303,6 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
         if ($reached) {
           unset($links[CRM_Core_Action::COPY]);
         }
-        $newCgCount = (!$reached) ? $resultCount + 1 : NULL;
         if (!empty($DTparams)) {
           $this->_total = $resultCount;
           $cgcount = $DTparams['offset'] + 1;
@@ -455,6 +452,7 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
     $this->assign('dateFields', $dateFields);
     $this->assign('dateFieldsVals', $dateFieldsVals);
     $this->assign('cgcount', $cgcount);
+    $this->assign('newCgCount', $newCgCount);
     $this->assign('contactId', $this->_contactId);
     $this->assign('contactType', $this->_contactType);
     $this->assign('customGroupTitle', $this->_customGroupTitle);

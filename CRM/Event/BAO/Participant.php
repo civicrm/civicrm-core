@@ -757,7 +757,7 @@ GROUP BY  participant.event_id
 
       $participantStatus = array(
         'participant_status' => array(
-          'title' => 'Participant Status',
+          'title' => 'Participant Status (label)',
           'name' => 'participant_status',
           'type' => CRM_Utils_Type::T_STRING,
         ),
@@ -765,11 +765,14 @@ GROUP BY  participant.event_id
 
       $participantRole = array(
         'participant_role' => array(
-          'title' => 'Participant Role',
+          'title' => 'Participant Role (label)',
           'name' => 'participant_role',
           'type' => CRM_Utils_Type::T_STRING,
         ),
       );
+
+      $participantFields['participant_status_id']['title'] .= ' (ID)';
+      $participantFields['participant_role_id']['title'] .= ' (ID)';
 
       $discountFields = CRM_Core_DAO_Discount::export();
 
@@ -2032,11 +2035,7 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
     // the recordAdjustedAmt code would execute over here
     $ids = CRM_Event_BAO_Participant::getParticipantIds($contributionId);
     if (count($ids) > 1) {
-      $total = 0;
-      foreach ($ids as $val) {
-        $total += CRM_Price_BAO_LineItem::getLineTotal($val, 'civicrm_participant');
-      }
-      $updatedAmount = $total;
+      $updatedAmount = CRM_Price_BAO_LineItem::getLineTotal($contributionId);
     }
     else {
       $updatedAmount = $params['amount'];

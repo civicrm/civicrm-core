@@ -29,7 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2016
- * $Id$
  *
  */
 
@@ -55,7 +54,6 @@ class CRM_Profile_Form_Edit extends CRM_Profile_Form {
    *
    * @param
    *
-   * @return void
    */
   public function preProcess() {
     $this->_mode = CRM_Profile_Form::MODE_CREATE;
@@ -102,8 +100,9 @@ class CRM_Profile_Form_Edit extends CRM_Profile_Form {
 
         if ($id != $userID) {
           // do not allow edit for anon users in joomla frontend, CRM-4668, unless u have checksum CRM-5228
+          // see also CRM-19079 for modifications to the condition
           $config = CRM_Core_Config::singleton();
-          if ($config->userFrameworkFrontend) {
+          if ($config->userFrameworkFrontend && $config->userSystem->is_joomla) {
             CRM_Contact_BAO_Contact_Permission::validateOnlyChecksum($id, $this);
           }
           else {
@@ -152,7 +151,6 @@ SELECT module,is_reserved
   /**
    * Build the form object.
    *
-   * @return void
    */
   public function buildQuickForm() {
     if (empty($this->_ufGroup['id'])) {
@@ -256,8 +254,6 @@ SELECT module,is_reserved
   /**
    * Process the user submitted custom data values.
    *
-   *
-   * @return void
    */
   public function postProcess() {
     parent::postProcess();

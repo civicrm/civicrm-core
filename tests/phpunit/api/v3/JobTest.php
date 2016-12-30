@@ -354,38 +354,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test the batch merge function actually works!
-   *
-   * @dataProvider getMergeSets
-   *
-   * @param $dataSet
-   */
-  public function testBatchMergeConflictOnDeceased($dataSet) {
-    foreach ($dataSet['contacts'] as $params) {
-      $this->callAPISuccess('Contact', 'create', $params);
-    }
-
-    $result = $this->callAPISuccess('Job', 'process_batch_merge', array('mode' => $dataSet['mode']));
-    $this->assertEquals($dataSet['skipped'], count($result['values']['skipped']), 'Failed to skip the right number:' . $dataSet['skipped']);
-    $this->assertEquals($dataSet['merged'], count($result['values']['merged']));
-    $result = $this->callAPISuccess('Contact', 'get', array(
-      'contact_sub_type' => 'Student',
-      'sequential' => 1,
-      'options' => array('sort' => 'id ASC'),
-    ));
-    $this->assertEquals(count($dataSet['expected']), $result['count']);
-    foreach ($dataSet['expected'] as $index => $contact) {
-      foreach ($contact as $key => $value) {
-        // Handle the fact it's in a different field in the return value.
-        if ($key == 'gender_id') {
-          $key = 'gender';
-        }
-        $this->assertEquals($value, $result['values'][$index][$key]);
-      }
-    }
-  }
-
-  /**
    * Check that the merge carries across various related entities.
    *
    * Note the group combinations & expected results:
@@ -756,6 +724,50 @@ class api_v3_JobTest extends CiviUnitTestCase {
       'email' => 'batman@gotham.met',
       'contact_id' => array('IN' => array_keys($deletedContacts['values'])),
     ), 4);
+  }
+
+  /**
+   * Test the batch merge respects email "on hold".
+   *
+   * Test CRM-19148, Batch merge - Email on hold data lost when there is a conflict.
+   *
+   * @dataProvider getOnHoldSets
+   *
+   * @param
+   */
+  public function testBatchMergeEmailOnHold($onHold1, $onHold2, $merge) {
+    $contactID1 = $this->individualCreate(array(
+      'api.email.create' => array(
+        'email' => 'batman@gotham.met',
+        'location_type_id' => 'Work',
+        'is_primary' => 1,
+        'on_hold' => $onHold1,
+      ),
+    ));
+    $contactID2 = $this->individualCreate(array(
+      'api.email.create' => array(
+        'email' => 'batman@gotham.met',
+        'location_type_id' => 'Work',
+        'is_primary' => 1,
+        'on_hold' => $onHold2,
+      ),
+    ));
+    $result = $this->callAPISuccess('Job', 'process_batch_merge', array());
+    $this->assertEquals($merge, count($result['values']['merged']));
+  }
+
+  /**
+   * Data provider for testBatchMergeEmailOnHold: combinations of on_hold & expected outcomes.
+   */
+  public function getOnHoldSets() {
+    // Each row specifies: contact 1 on_hold, contact 2 on_hold, merge? (0 or 1),
+    $sets = array(
+      array(0, 0, 1),
+      array(0, 1, 0),
+      array(1, 0, 0),
+      array(1, 1, 1),
+    );
+    return $sets;
   }
 
   /**

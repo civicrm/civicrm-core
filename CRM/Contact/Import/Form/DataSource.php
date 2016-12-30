@@ -208,7 +208,7 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
     $geoCode = FALSE;
     if (!empty($config->geocodeMethod)) {
       $geoCode = TRUE;
-      $this->addElement('checkbox', 'doGeocodeAddress', ts('Lookup mapping info during import?'));
+      $this->addElement('checkbox', 'doGeocodeAddress', ts('Geocode addresses during import?'));
     }
     $this->assign('geoCode', $geoCode);
 

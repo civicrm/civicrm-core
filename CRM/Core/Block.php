@@ -396,10 +396,10 @@ class CRM_Core_Block {
         ));
       }
 
-      if (CRM_Core_Permission::check('administer CiviCRM')) {
+      if (CRM_Core_Permission::check('manage tags')) {
         $shortCuts = array_merge($shortCuts, array(
           array(
-            'path' => 'civicrm/admin/tag',
+            'path' => 'civicrm/tag',
             'query' => 'reset=1&action=add',
             'ref' => 'new-tag',
             'title' => ts('Tag'),
@@ -421,9 +421,7 @@ class CRM_Core_Block {
     CRM_Utils_Hook::links('create.new.shorcuts',
       NULL,
       CRM_Core_DAO::$_nullObject,
-      $values,
-      CRM_Core_DAO::$_nullObject,
-      CRM_Core_DAO::$_nullObject
+      $values
     );
 
     foreach ($values as $key => $val) {

@@ -316,7 +316,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
    *
    */
   public function buildRegistrationBlock(&$form) {
-    $attributes = CRM_Core_DAO::getAttribute('CRM_Event_DAO_Event', 'intro_text') + array('class' => 'collapsed');
+    $attributes = CRM_Core_DAO::getAttribute('CRM_Event_DAO_Event', 'intro_text') + array('class' => 'collapsed', 'preset' => 'civievent');
     $form->add('wysiwyg', 'intro_text', ts('Introductory Text'), $attributes);
     $form->add('wysiwyg', 'footer_text', ts('Footer Text'), $attributes);
 
@@ -406,8 +406,8 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
       $form->addYesNo('is_confirm_enabled', ts('Use a confirmation screen?'), NULL, NULL, array('onclick' => "return showHideByValue('is_confirm_enabled','','confirm_screen_settings','block','radio',false);"));
     }
     $form->add('text', 'confirm_title', ts('Title'), $attributes['confirm_title']);
-    $form->add('wysiwyg', 'confirm_text', ts('Introductory Text'), $attributes['confirm_text'] + array('class' => 'collapsed'));
-    $form->add('wysiwyg', 'confirm_footer_text', ts('Footer Text'), $attributes['confirm_text'] + array('class' => 'collapsed'));
+    $form->add('wysiwyg', 'confirm_text', ts('Introductory Text'), $attributes['confirm_text'] + array('class' => 'collapsed', 'preset' => 'civievent'));
+    $form->add('wysiwyg', 'confirm_footer_text', ts('Footer Text'), $attributes['confirm_text'] + array('class' => 'collapsed', 'preset' => 'civievent'));
   }
 
   /**
@@ -436,8 +436,8 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
   public function buildThankYouBlock(&$form) {
     $attributes = CRM_Core_DAO::getAttribute('CRM_Event_DAO_Event');
     $form->add('text', 'thankyou_title', ts('Title'), $attributes['thankyou_title']);
-    $form->add('wysiwyg', 'thankyou_text', ts('Introductory Text'), $attributes['thankyou_text'] + array('class' => 'collapsed'));
-    $form->add('wysiwyg', 'thankyou_footer_text', ts('Footer Text'), $attributes['thankyou_text'] + array('class' => 'collapsed'));
+    $form->add('wysiwyg', 'thankyou_text', ts('Introductory Text'), $attributes['thankyou_text'] + array('class' => 'collapsed', 'preset' => 'civievent'));
+    $form->add('wysiwyg', 'thankyou_footer_text', ts('Footer Text'), $attributes['thankyou_text'] + array('class' => 'collapsed', 'preset' => 'civievent'));
   }
 
   /**

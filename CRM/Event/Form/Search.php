@@ -96,7 +96,7 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
      * we allow the controller to set force/reset externally, useful when we are being
      * driven by the wizard framework
      */
-    $this->_reset = CRM_Utils_Request::retrieve('reset', 'Boolean', CRM_Core_DAO::$_nullObject);
+    $this->_reset = CRM_Utils_Request::retrieve('reset', 'Boolean');
     $this->_force = CRM_Utils_Request::retrieve('force', 'Boolean', $this, FALSE);
     $this->_limit = CRM_Utils_Request::retrieve('limit', 'Positive', $this);
     $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this, FALSE, 'search');
@@ -405,17 +405,13 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
     // if this search has been forced
     // then see if there are any get values, and if so over-ride the post values
     // note that this means that GET over-rides POST :)
-    $event = CRM_Utils_Request::retrieve('event', 'Positive',
-      CRM_Core_DAO::$_nullObject
-    );
+    $event = CRM_Utils_Request::retrieve('event', 'Positive');
     if ($event) {
       $this->_formValues['event_id'] = $event;
       $this->_formValues['event_name'] = CRM_Event_PseudoConstant::event($event, TRUE);
     }
 
-    $status = CRM_Utils_Request::retrieve('status', 'String',
-      CRM_Core_DAO::$_nullObject
-    );
+    $status = CRM_Utils_Request::retrieve('status', 'String');
 
     if (isset($status)) {
       if ($status === 'true') {
@@ -433,9 +429,7 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
       $this->_formValues['participant_status_id'] = is_array($statusTypes) ? array('IN' => array_keys($statusTypes)) : $statusTypes;
     }
 
-    $role = CRM_Utils_Request::retrieve('role', 'String',
-      CRM_Core_DAO::$_nullObject
-    );
+    $role = CRM_Utils_Request::retrieve('role', 'String');
 
     if (isset($role)) {
       if ($role === 'true') {
@@ -450,9 +444,7 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
       $this->_formValues['participant_role_id'] = is_array($roleTypes) ? array_keys($roleTypes) : $roleTypes;
     }
 
-    $type = CRM_Utils_Request::retrieve('type', 'Positive',
-      CRM_Core_DAO::$_nullObject
-    );
+    $type = CRM_Utils_Request::retrieve('type', 'Positive');
     if ($type) {
       $this->_formValues['event_type'] = $type;
     }

@@ -33,7 +33,7 @@
         <div class="status">
           <p>{ts}This form <strong>will send email</strong> to contacts only in certain circumstances:{/ts}</p>
           <ul>
-            <li>{ts}<strong>Resolving "Pay Later" registrations:</strong> Participants whose status is changed from <em>Pending Pay Later</em> to <em>Registered</em> or <em>Attended</em> will receive a confirmation email and their payment status will be set to completed. If this is not you want to do, you can change their participant status by editing their event registration record directly.{/ts}</li>
+            <li>{ts}<strong>Resolving "Pay Later" registrations for online registrations:</strong> Participants who registered online whose status is changed from <em>Pending Pay Later</em> to <em>Registered</em> or <em>Attended</em> will receive a confirmation email and their payment status will be set to completed. If this is not you want to do, you can change their participant status by editing their event registration record directly.{/ts}</li>
           {if $notifyingStatuses}
             <li>{ts 1=$notifyingStatuses}<strong>Special statuses:</strong> Participants whose status is changed to any of the following will be automatically notified via email: %1{/ts}</li>
           {/if}
