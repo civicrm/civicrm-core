@@ -36,6 +36,14 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
   }
 
   /**
+   * Clean up after each test.
+   */
+  public function tearDown() {
+    $this->quickCleanUpFinancialEntities();
+    parent::tearDown();
+  }
+
+  /**
    * Check method add()
    */
   public function testAdd() {
