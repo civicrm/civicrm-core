@@ -328,23 +328,43 @@ function _civicrm_api3_activity_get_formatResult($params, $activities) {
   }
 
   $returns['source_contact_id'] = 1;
+  if (!empty($returns['target_contact_name'])) {
+    $returns['target_contact_id'] = 1;
+  }
+  if (!empty($returns['assignee_contact_name'])) {
+    $returns['assignee_contact_id'] = 1;
+  }
+
   foreach ($returns as $n => $v) {
     switch ($n) {
       case 'assignee_contact_id':
         foreach ($activities as $key => $activityArray) {
-          $activities[$key]['assignee_contact_id'] = CRM_Activity_BAO_ActivityAssignment::retrieveAssigneeIdsByActivityId($activityArray['id']);
+          $cids = $activities[$key]['assignee_contact_id'] = CRM_Activity_BAO_ActivityAssignment::retrieveAssigneeIdsByActivityId($activityArray['id']);
+          if ($cids && !empty($returns['assignee_contact_name'])) {
+            foreach ($cids as $cid) {
+              $activities[$key]['assignee_contact_name'][$cid] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $cid, 'display_name');
+            }
+          }
         }
         break;
 
       case 'target_contact_id':
         foreach ($activities as $key => $activityArray) {
-          $activities[$key]['target_contact_id'] = CRM_Activity_BAO_ActivityTarget::retrieveTargetIdsByActivityId($activityArray['id']);
+          $cids = $activities[$key]['target_contact_id'] = CRM_Activity_BAO_ActivityTarget::retrieveTargetIdsByActivityId($activityArray['id']);
+          if ($cids && !empty($returns['target_contact_name'])) {
+            foreach ($cids as $cid) {
+              $activities[$key]['target_contact_name'][$cid] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $cid, 'display_name');
+            }
+          }
         }
         break;
 
       case 'source_contact_id':
         foreach ($activities as $key => $activityArray) {
-          $activities[$key]['source_contact_id'] = CRM_Activity_BAO_Activity::getSourceContactID($activityArray['id']);
+          $cid = $activities[$key]['source_contact_id'] = CRM_Activity_BAO_Activity::getSourceContactID($activityArray['id']);
+          if ($cid && !empty($returns['source_contact_name'])) {
+            $activities[$key]['source_contact_name'] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $cid, 'display_name');
+          }
         }
         break;
 
