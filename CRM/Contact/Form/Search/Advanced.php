@@ -194,15 +194,15 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
    *   the default array reference
    */
   public function setDefaultValues() {
-    $defaults = $this->_formValues;
+    $defaults = array_merge($this->_formValues, array(
+      'privacy_toggle' => 1,
+      'operator' => TRUE,
+    ));
     $this->normalizeDefaultValues($defaults);
 
     if ($this->_context === 'amtg') {
       $defaults['task'] = CRM_Contact_Task::GROUP_CONTACTS;
     }
-
-    $defaults['privacy_toggle'] = 1;
-    $defaults['operator'] = 'AND';
 
     return $defaults;
   }
