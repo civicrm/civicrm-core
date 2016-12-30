@@ -112,8 +112,17 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
     //@todo - figure out why
     $form->_contactIds = array_keys($contacts);
     self::createActivities($form, $html_message, $form->_contactIds);
+
+    //CRM-19761
     if (!empty($html)) {
-      CRM_Utils_PDF_Utils::html2pdf($html, "CiviLetter.pdf", FALSE, $formValues);
+      $type = $formValues['document_type'];
+
+      if ($type == 'pdf') {
+        CRM_Utils_PDF_Utils::html2pdf($html, "CiviLetter.pdf", FALSE, $formValues);
+      }
+      else {
+        CRM_Utils_PDF_Document::html2doc($html, "CiviLetter.$type", $formValues);
+      }
     }
 
     $form->postProcessHook();

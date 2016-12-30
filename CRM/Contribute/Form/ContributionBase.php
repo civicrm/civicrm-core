@@ -292,9 +292,15 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       // check for is_monetary status
       $isMonetary = CRM_Utils_Array::value('is_monetary', $this->_values);
       $isPayLater = CRM_Utils_Array::value('is_pay_later', $this->_values);
-      if (!empty($this->_ccid) && $isPayLater) {
-        $isPayLater = FALSE;
-        $this->_values['is_pay_later'] = FALSE;
+      if (!empty($this->_ccid)) {
+        $this->_values['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution',
+          $this->_ccid,
+          'financial_type_id'
+        );
+        if ($isPayLater) {
+          $isPayLater = FALSE;
+          $this->_values['is_pay_later'] = FALSE;
+        }
       }
 
       if ($isMonetary &&
@@ -658,6 +664,10 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
             else {
               $viewOnlyFileValues[$key] = $fileValue;
             }
+
+            // On viewOnly use-case (as in online contribution Confirm page) we no longer need to set
+            // required property because being required file is already uploaded while registration
+            $field['is_required'] = FALSE;
           }
           if ($profileContactType) {
             //Since we are showing honoree name separately so we are removing it from honoree profile just for display

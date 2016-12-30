@@ -538,23 +538,28 @@ WHERE  mailing_id = %1
       $params = array(1 => array($mailing_id, 'Integer'));
       CRM_Core_DAO::executeQuery($sql, $params);
 
+      $selectClause = array('%1', 'i.contact_id', "i.{$tempColumn}");
+      $select = "SELECT " . implode(', ', $selectClause);
       // CRM-3975
       $groupBy = $groupJoin = '';
+      $orderBy = "i.contact_id, i.{$tempColumn}";
       if ($dedupeEmail) {
+        $orderBy = "MIN(i.contact_id), MIN(i.{$tempColumn})";
         $groupJoin = " INNER JOIN civicrm_email e ON e.id = i.email_id";
         $groupBy = " GROUP BY e.email ";
+        $select = CRM_Contact_BAO_Query::appendAnyValueToSelect($selectClause, 'e.email');
       }
 
       $sql = "
 INSERT INTO civicrm_mailing_recipients ( mailing_id, contact_id, {$tempColumn} )
-SELECT %1, i.contact_id, i.{$tempColumn}
+{$select}
 FROM       civicrm_contact contact_a
 INNER JOIN I_$job_id i ON contact_a.id = i.contact_id
            $groupJoin
            {$aclFrom}
            {$aclWhere}
            $groupBy
-ORDER BY   i.contact_id, i.{$tempColumn}
+ORDER BY   {$orderBy}
 ";
 
       CRM_Core_DAO::executeQuery($sql, $params);
@@ -758,7 +763,7 @@ ORDER BY   i.contact_id, i.{$tempColumn}
    * @return array
    *   reference to an assoc array
    */
-  private function &getTemplates() {
+  public function getTemplates() {
     if (!$this->templates) {
       $this->getHeaderFooter();
       $this->templates = array();
@@ -921,7 +926,7 @@ ORDER BY   i.contact_id, i.{$tempColumn}
    * @return void
    */
   public function getTestRecipients($testParams) {
-    if (array_key_exists($testParams['test_group'], CRM_Core_PseudoConstant::group())) {
+    if (!empty($testParams['test_group']) && array_key_exists($testParams['test_group'], CRM_Core_PseudoConstant::group())) {
       $contacts = civicrm_api('contact', 'get', array(
           'version' => 3,
           'group' => $testParams['test_group'],
@@ -1066,7 +1071,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    * @return array
    *   array ref that hold array refs to the verp info, urls, and headers
    */
-  private function getVerpAndUrlsAndHeaders($job_id, $event_queue_id, $hash, $email, $isForward = FALSE) {
+  public function getVerpAndUrlsAndHeaders($job_id, $event_queue_id, $hash, $email, $isForward = FALSE) {
     $config = CRM_Core_Config::singleton();
 
     /**
@@ -3190,6 +3195,58 @@ AND        m.id = %1
     if ((civicrm_api3('Mailing', 'getvalue', array('id' => $id, 'return' => 'visibility'))) === 'Public Pages') {
       return CRM_Utils_System::url('civicrm/mailing/view', array('id' => $id), $absolute, NULL, TRUE, TRUE);
     }
+  }
+
+  /**
+   * Get a list of template types which can be used as `civicrm_mailing.template_type`.
+   *
+   * @return array
+   *   A list of template-types, keyed numerically. Each defines:
+   *     - name: string, a short symbolic name
+   *     - editorUrl: string, Angular template name
+   *
+   *   Ex: $templateTypes[0] === array('name' => 'mosaico', 'editorUrl' => '~/crmMosaico/editor.html').
+   */
+  public static function getTemplateTypes() {
+    if (!isset(Civi::$statics[__CLASS__]['templateTypes'])) {
+      $types = array();
+      $types[] = array(
+        'name' => 'traditional',
+        'editorUrl' => CRM_Mailing_Info::workflowEnabled() ? '~/crmMailing/EditMailingCtrl/workflow.html' : '~/crmMailing/EditMailingCtrl/2step.html',
+        'weight' => 0,
+      );
+
+      CRM_Utils_Hook::mailingTemplateTypes($types);
+
+      $defaults = array('weight' => 0);
+      foreach (array_keys($types) as $typeName) {
+        $types[$typeName] = array_merge($defaults, $types[$typeName]);
+      }
+      usort($types, function ($a, $b) {
+        if ($a['weight'] === $b['weight']) {
+          return 0;
+        }
+        return $a['weight'] < $b['weight'] ? -1 : 1;
+      });
+
+      Civi::$statics[__CLASS__]['templateTypes'] = $types;
+    }
+
+    return Civi::$statics[__CLASS__]['templateTypes'];
+  }
+
+  /**
+   * Get a list of template types.
+   *
+   * @return array
+   *   Array(string $name => string $label).
+   */
+  public static function getTemplateTypeNames() {
+    $r = array();
+    foreach (self::getTemplateTypes() as $type) {
+      $r[$type['name']] = $type['name'];
+    }
+    return $r;
   }
 
 }

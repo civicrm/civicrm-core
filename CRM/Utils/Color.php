@@ -1,4 +1,5 @@
-{*
+<?php
+/*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
@@ -22,28 +23,34 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*}
-{*CRM-14190*}
-{if $parent_groups|@count > 0 or $form.parents.html}
-  <h3>{ts}Parent Groups{/ts} {help id="id-group-parent" file="CRM/Group/Page/Group.hlp"}</h3>
-  {if $parent_groups|@count > 0}
-    <table class="form-layout-compressed">
-      <tr>
-        <td><label>{ts}Remove Parent?{/ts}</label></td>
-      </tr>
-      {foreach from=$parent_groups item=cgroup key=group_id}
-        {assign var="element_name" value="remove_parent_group_"|cat:$group_id}
-        <tr>
-          <td>&nbsp;&nbsp;{$form.$element_name.html}&nbsp;{$form.$element_name.label}</td>
-        </tr>
-      {/foreach}
-    </table>
-    <br />
-  {/if}
-  <table class="form-layout-compressed">
-    <tr class="crm-group-form-block-parents">
-      <td class="label">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{$form.parents.label}</td>
-      <td>{$form.parents.html|crmAddClass:huge}</td>
-    </tr>
-  </table>
-{/if}
+ */
+
+/**
+ *
+ * @package CRM
+ * @copyright CiviCRM LLC (c) 2004-2016
+ */
+
+/**
+ * Static utility functions for working with colors
+ */
+class CRM_Utils_Color {
+
+  /**
+   * Determine the appropriate text color for a given background.
+   *
+   * Based on YIQ value.
+   *
+   * @param string $hexcolor
+   * @return string
+   */
+  public static function getContrast($hexcolor) {
+    $hexcolor = trim($hexcolor, ' #');
+    $r = hexdec(substr($hexcolor, 0, 2));
+    $g = hexdec(substr($hexcolor, 2, 2));
+    $b = hexdec(substr($hexcolor, 4, 2));
+    $yiq = (($r * 299) + ($g * 587) + ($b * 114)) / 1000;
+    return ($yiq >= 128) ? 'black' : 'white';
+  }
+
+}

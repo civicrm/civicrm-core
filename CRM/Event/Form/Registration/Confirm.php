@@ -430,6 +430,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       $this->set('finalAmount', $this->_amount);
     }
     $participantCount = array();
+    $taxAmount = $totalTaxAmount = 0;
 
     //unset the skip participant from params.
     //build the $participantCount array.
@@ -442,7 +443,10 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       elseif ($participantNum) {
         $participantCount[$participantNum] = 'participant';
       }
-
+      $totalTaxAmount += CRM_Utils_Array::value('tax_amount', $record, 0);
+      if (CRM_Utils_Array::value('is_primary', $record)) {
+        $taxAmount = &$params[$participantNum]['tax_amount'];
+      }
       //lets get additional participant id to cancel.
       if ($this->_allowConfirmation && is_array($cancelledIds)) {
         $additonalId = CRM_Utils_Array::value('participant_id', $record);
@@ -451,7 +455,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         }
       }
     }
-
+    $taxAmount = $totalTaxAmount;
     $payment = $registerByID = $primaryCurrencyID = $contribution = NULL;
     $paymentObjError = ts('The system did not record payment details for this payment and so could not process the transaction. Please report this error to the site administrator.');
 
@@ -1290,9 +1294,11 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     $_REQUEST['id'] = $form->_eventId = $params['id'];
     $form->controller = new CRM_Event_Controller_Registration();
     $form->_params = $params['params'];
+    $form->_amount = $form->_totalAmount = CRM_Utils_Array::value('totalAmount', $params);
     $form->set('params', $params['params']);
     $form->_values['custom_pre_id'] = array();
     $form->_values['custom_post_id'] = array();
+    $form->_values['event'] = CRM_Utils_Array::value('event', $params);
     $form->_contributeMode = $params['contributeMode'];
     $eventParams = array('id' => $params['id']);
     CRM_Event_BAO_Event::retrieve($eventParams, $form->_values['event']);

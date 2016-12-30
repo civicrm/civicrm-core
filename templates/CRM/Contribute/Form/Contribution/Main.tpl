@@ -355,11 +355,11 @@
     }
     if (isRecur.val() > 0) {
       cj('#recurHelp').show();
-      cj('#amount_sum_label').text(ts('Regular amount'));
+      cj('#amount_sum_label').text('{/literal}{ts escape='js'}Regular amount{/ts}{literal}');
     }
     else {
       cj('#recurHelp').hide();
-      cj('#amount_sum_label').text(ts('Total amount'));
+      cj('#amount_sum_label').text('{/literal}{ts escape='js'}Total amount{/ts}{literal}');
     }
   }
 

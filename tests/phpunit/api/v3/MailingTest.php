@@ -86,6 +86,52 @@ class api_v3_MailingTest extends CiviUnitTestCase {
   }
 
   /**
+   *
+   */
+  public function testTemplateTypeOptions() {
+    $types = $this->callAPISuccess('Mailing', 'getoptions', array('field' => 'template_type'));
+    $this->assertTrue(isset($types['values']['traditional']));
+  }
+
+  /**
+   * The `template_options` field should be treated a JSON object.
+   *
+   * This test will create, read, and update the field.
+   */
+  public function testMailerCreateTemplateOptions() {
+    // 1. Create mailing with template_options.
+    $params = $this->_params;
+    $params['template_options'] = json_encode(array('foo' => 'bar_1'));
+    $createResult = $this->callAPISuccess('mailing', 'create', $params);
+    $id = $createResult['id'];
+    $this->assertDBQuery('{"foo":"bar_1"}', 'SELECT template_options FROM civicrm_mailing WHERE id = %1', array(
+      1 => array($id, 'Int'),
+    ));
+    $this->assertEquals('bar_1', $createResult['values'][$id]['template_options']['foo']);
+
+    // 2. Get mailing with template_options.
+    $getResult = $this->callAPISuccess('mailing', 'get', array(
+      'id' => $id,
+    ));
+    $this->assertEquals('bar_1', $getResult['values'][$id]['template_options']['foo']);
+    $getValueResult = $this->callAPISuccess('mailing', 'getvalue', array(
+      'id' => $id,
+      'return' => 'template_options',
+    ));
+    $this->assertEquals('bar_1', $getValueResult['foo']);
+
+    // 3. Update mailing with template_options.
+    $updateResult = $this->callAPISuccess('mailing', 'create', array(
+      'id' => $id,
+      'template_options' => array('foo' => 'bar_2'),
+    ));
+    $this->assertDBQuery('{"foo":"bar_2"}', 'SELECT template_options FROM civicrm_mailing WHERE id = %1', array(
+      1 => array($id, 'Int'),
+    ));
+    $this->assertEquals('bar_2', $updateResult['values'][$id]['template_options']['foo']);
+  }
+
+  /**
    * The Mailing.create API supports magic properties "groups[include,enclude]" and "mailings[include,exclude]".
    * Make sure these work
    */
@@ -248,6 +294,53 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     $this->assertEquals(array('include.me@example.org'), $previewEmails);
     $previewNames = array_values(CRM_Utils_Array::collect('api.contact.getvalue', $preview['values']));
     $this->assertTrue((bool) preg_match('/Includer Person/', $previewNames[0]), "Name 'Includer Person' should appear in '" . $previewNames[0] . '"');
+  }
+
+  public function testMailerPreviewRecipientsDeduplicate() {
+    // BEGIN SAMPLE DATA
+    $groupIDs['grp'] = $this->groupCreate(array('name' => 'Example group', 'title' => 'Example group'));
+    $contactIDs['include_me'] = $this->individualCreate(array(
+        'email' => 'include.me@example.org',
+        'first_name' => 'Includer',
+        'last_name' => 'Person',
+      ));
+    $contactIDs['include_me_duplicate'] = $this->individualCreate(array(
+        'email' => 'include.me@example.org',
+        'first_name' => 'IncluderDuplicate',
+        'last_name' => 'Person',
+      ));
+    $this->callAPISuccess('GroupContact', 'create', array(
+        'group_id' => $groupIDs['grp'],
+        'contact_id' => $contactIDs['include_me'],
+      ));
+    $this->callAPISuccess('GroupContact', 'create', array(
+        'group_id' => $groupIDs['grp'],
+        'contact_id' => $contactIDs['include_me_duplicate'],
+      ));
+
+    $params = $this->_params;
+    $params['groups']['include'] = array($groupIDs['grp']);
+    $params['mailings']['include'] = array();
+    $params['options']['force_rollback'] = 1;
+    $params['dedupe_email'] = 1;
+    $params['api.mailing_job.create'] = 1;
+    $params['api.MailingRecipients.get'] = array(
+      'mailing_id' => '$value.id',
+      'api.contact.getvalue' => array(
+        'return' => 'display_name',
+      ),
+      'api.email.getvalue' => array(
+        'return' => 'email',
+      ),
+    );
+    // END SAMPLE DATA
+
+    $create = $this->callAPIAndDocument('Mailing', 'create', $params, __FUNCTION__, __FILE__);
+
+    $preview = $create['values'][$create['id']]['api.MailingRecipients.get'];
+    $this->assertEquals(1, $preview['count']);
+    $previewEmails = array_values(CRM_Utils_Array::collect('api.email.getvalue', $preview['values']));
+    $this->assertEquals(array('include.me@example.org'), $previewEmails);
   }
 
   /**

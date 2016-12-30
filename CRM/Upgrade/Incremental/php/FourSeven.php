@@ -260,7 +260,8 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
    */
   public function upgrade_4_7_13($rev) {
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
-    $this->addTask('Add column to allow for payment processors to set what card types are accepted', 'addAcceptedCardTypesField');
+    $this->addTask('CRM-19372 - Add column to allow for payment processors to set what card types are accepted', 'addColumn',
+      'civicrm_payment_processor', 'accepted_credit_cards', "text DEFAULT NULL COMMENT 'array of accepted credit card types'");
   }
 
   /**
@@ -271,6 +272,33 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
   public function upgrade_4_7_14($rev) {
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
     $this->addTask('Add WYSIWYG Editor Presets', 'addWysiwygPresets');
+  }
+
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_4_7_15($rev) {
+    $this->addTask('CRM-19723 - Add icon column to civicrm_option_value', 'addColumn',
+      'civicrm_option_value', 'icon', "varchar(255) COMMENT 'crm-i icon class' DEFAULT NULL");
+    $this->addTask('CRM-19626 - Add min_amount column to civicrm_price_set', 'addColumn',
+      'civicrm_price_set', 'min_amount', "INT(10) UNSIGNED DEFAULT '0' COMMENT 'Minimum Amount required for this set.'");
+    $this->addTask('CRM-19769 - Add color column to civicrm_tag', 'addColumn',
+      'civicrm_tag', 'color', "varchar(255) COMMENT 'Hex color value e.g. #ffffff' DEFAULT NULL");
+    $this->addTask('CRM-19779 - Add color column to civicrm_option_value', 'addColumn',
+      'civicrm_option_value', 'color', "varchar(255) COMMENT 'Hex color value e.g. #ffffff' DEFAULT NULL");
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
+  }
+
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_4_7_16($rev) {
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
+    $this->addTask('Add new CiviMail fields', 'addMailingTemplateType');
   }
 
   /*
@@ -865,6 +893,17 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
     return TRUE;
   }
 
+  public static function addMailingTemplateType() {
+    if (!CRM_Core_DAO::checkFieldExists('civicrm_mailing', 'template_type', FALSE)) {
+      CRM_Core_DAO::executeQuery('
+        ALTER TABLE civicrm_mailing
+        ADD COLUMN `template_type` varchar(64)  NOT NULL DEFAULT \'traditional\' COMMENT \'The language/processing system used for email templates.\',
+        ADD COLUMN `template_options` longtext  COMMENT \'Advanced options used by the email templating system. (JSON encoded)\'
+      ');
+    }
+    return TRUE;
+  }
+
   /**
    * CRM-18651 Add DataType column to Option Group Table
    * @return bool
@@ -890,17 +929,6 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
    * CRM-19372 Add field to store accepted credit credit cards for a payment processor.
    * @return bool
    */
-  public static function addAcceptedCardTypesField() {
-    if (!CRM_Core_BAO_SchemaHandler::checkIfFieldExists('civicrm_payment_processor', 'accepted_credit_cards')) {
-      CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_payment_processor ADD COLUMN `accepted_credit_cards` text   DEFAULT NULL COMMENT 'array of accepted credit card types'");
-    }
-    return TRUE;
-  }
-
-  /**
-   * CRM-19372 Add field to store accepted credit credit cards for a payment processor.
-   * @return bool
-   */
   public static function addWysiwygPresets() {
     CRM_Core_BAO_OptionGroup::ensureOptionGroupExists(array(
       'name' => 'wysiwyg_presets',
@@ -913,8 +941,7 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
       'civievent' => array('label' => ts('CiviEvent'), 'component_id' => 'CiviEvent'),
     );
     foreach ($values as $name => $value) {
-      civicrm_api3('OptionValue', 'create', $value + array(
-        'options' => array('match' => array('name', 'option_group_id')),
+      CRM_Core_BAO_OptionValue::ensureOptionValueExists($value + array(
         'name' => $name,
         'option_group_id' => 'wysiwyg_presets',
       ));

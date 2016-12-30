@@ -2461,6 +2461,16 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
     $params['caseId'] = NULL;
     $context = CRM_Utils_Array::value('context', $params);
     $showContactOverlay = !CRM_Utils_String::startsWith($context, "dashlet");
+    $activityTypeInfo = civicrm_api3('OptionValue', 'get', array(
+      'option_group_id' => "activity_type",
+      'options' => array('limit' => 0),
+    ));
+    $activityIcons = array();
+    foreach ($activityTypeInfo['values'] as $type) {
+      if (!empty($type['icon'])) {
+        $activityIcons[$type['value']] = $type['icon'];
+      }
+    }
 
     // Get contact activities.
     $activities = CRM_Activity_BAO_Activity::getActivities($params);
@@ -2488,7 +2498,7 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
         $activity = array();
         $activity['DT_RowId'] = $activityId;
         // Add class to this row if overdue.
-        $activity['DT_RowClass'] = 'crm-entity';
+        $activity['DT_RowClass'] = "crm-entity status-id-{$values['status_id']}";
         if (CRM_Utils_Date::overdue(CRM_Utils_Array::value('activity_date_time', $values))
           && CRM_Utils_Array::value('status_id', $values) == 1
         ) {
@@ -2502,7 +2512,7 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
         $activity['DT_RowAttr']['data-entity'] = 'activity';
         $activity['DT_RowAttr']['data-id'] = $activityId;
 
-        $activity['activity_type'] = $values['activity_type'];
+        $activity['activity_type'] = (!empty($activityIcons[$values['activity_type_id']]) ? '<span class="crm-i ' . $activityIcons[$values['activity_type_id']] . '"></span> ' : '') . $values['activity_type'];
         $activity['subject'] = $values['subject'];
 
         $activity['source_contact_name'] = '';

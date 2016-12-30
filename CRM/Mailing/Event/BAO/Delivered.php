@@ -200,7 +200,7 @@ class CRM_Mailing_Event_BAO_Delivered extends CRM_Mailing_Event_DAO_Delivered {
     }
 
     if ($is_distinct) {
-      $query .= " GROUP BY $queue.id ";
+      $query .= " GROUP BY $queue.id, $delivered.id";
     }
 
     $orderBy = "sort_name ASC, {$delivered}.time_stamp DESC";

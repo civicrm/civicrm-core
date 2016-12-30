@@ -217,6 +217,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     'number',
     'url',
     'email',
+    'color',
   );
 
   /**
@@ -345,6 +346,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     $attributes = '', $required = FALSE, $extra = NULL
   ) {
     // Fudge some extra types that quickform doesn't support
+    $inputType = $type;
     if ($type == 'wysiwyg' || in_array($type, self::$html5Types)) {
       $attributes = ($attributes ? $attributes : array()) + array('class' => '');
       $attributes['class'] = ltrim($attributes['class'] . " crm-form-$type");
@@ -353,6 +355,16 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         unset($attributes['preset']);
       }
       $type = $type == 'wysiwyg' ? 'textarea' : 'text';
+    }
+    // Like select but accepts rich array data (with nesting, colors, icons, etc) as option list.
+    if ($inputType == 'select2') {
+      $type = 'text';
+      $options = $attributes;
+      $attributes = $attributes = ($extra ? $extra : array()) + array('class' => '');
+      $attributes['class'] = ltrim($attributes['class'] . " crm-select2 crm-form-select2");
+      $attributes['data-select-params'] = json_encode(array('data' => $options, 'multiple' => !empty($attributes['multiple'])));
+      unset($attributes['multiple']);
+      $extra = NULL;
     }
     // @see http://wiki.civicrm.org/confluence/display/CRMDOC/crmDatepicker
     if ($type == 'datepicker') {
@@ -382,6 +394,10 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     $element = $this->addElement($type, $name, $label, $attributes, $extra);
     if (HTML_QuickForm::isError($element)) {
       CRM_Core_Error::fatal(HTML_QuickForm::errorMessage($element));
+    }
+
+    if ($inputType == 'color') {
+      $this->addRule($name, ts('%1 must contain a color value e.g. #ffffff.', array(1 => $label)), 'regex', '/#[0-9a-fA-F]{6}/');
     }
 
     if ($required) {

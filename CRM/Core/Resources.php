@@ -712,7 +712,6 @@ class CRM_Core_Resources {
       "bower_components/select2/select2.min.js",
       "bower_components/select2/select2.min.css",
       "bower_components/font-awesome/css/font-awesome.min.css",
-      "packages/jquery/plugins/jquery.tableHeader.js",
       "packages/jquery/plugins/jquery.form.min.js",
       "packages/jquery/plugins/jquery.timeentry.min.js",
       "packages/jquery/plugins/jquery.blockUI.min.js",
@@ -727,13 +726,18 @@ class CRM_Core_Resources {
     // add wysiwyg editor
     $editor = Civi::settings()->get('editor_id');
     if ($editor == "CKEditor") {
-      $items[] = "js/wysiwyg/crm.ckeditor.js";
       CRM_Admin_Page_CKEditorConfig::setConfigDefault();
-      $items[] = array('config' => array('CKEditorCustomConfig' => CRM_Admin_Page_CKEditorConfig::getConfigUrl()));
+      $items[] = array(
+        'config' => array(
+          'wysisygScriptLocation' => Civi::paths()->getUrl("[civicrm.root]/js/wysiwyg/crm.ckeditor.js"),
+          'CKEditorCustomConfig' => CRM_Admin_Page_CKEditorConfig::getConfigUrl(),
+        ),
+      );
     }
 
     // These scripts are only needed by back-office users
     if (CRM_Core_Permission::check('access CiviCRM')) {
+      $items[] = "packages/jquery/plugins/jquery.tableHeader.js";
       $items[] = "packages/jquery/plugins/jquery.menu.min.js";
       $items[] = "css/civicrmNavigation.css";
       $items[] = "packages/jquery/plugins/jquery.jeditable.min.js";

@@ -173,6 +173,7 @@ class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup {
   public static function ensureOptionGroupExists($params) {
     $existingValues = civicrm_api3('OptionGroup', 'get', array(
       'name' => $params['name'],
+      'return' => 'id',
     ));
     if (!$existingValues['count']) {
       $result = civicrm_api3('OptionGroup', 'create', $params);

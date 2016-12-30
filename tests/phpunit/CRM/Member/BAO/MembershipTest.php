@@ -503,7 +503,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     $config->keyDisable = TRUE;
 
     $isTestMembership = 0;
-    list($MembershipRenew) = CRM_Member_BAO_Membership::renewMembership(
+    list($MembershipRenew) = CRM_Member_BAO_Membership::processMembership(
       $contactId,
       $this->_membershipTypeID,
       $isTestMembership,
@@ -590,7 +590,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
 
     $membershipRenewal = new CRM_Core_Form();
     $membershipRenewal->controller = new CRM_Core_Controller();
-    list($MembershipRenew) = CRM_Member_BAO_Membership::renewMembership(
+    list($MembershipRenew) = CRM_Member_BAO_Membership::processMembership(
       $contactId,
       $this->_membershipTypeID,
       FALSE,

@@ -287,6 +287,20 @@ class CRM_Utils_QueryFormatter {
    */
   protected function _formatFtsBool($text, $mode) {
     $result = NULL;
+    $operators = array('+', '-', '~', '(', ')');
+    $wildCards = array('@', '%', '*');
+    $expression = preg_quote(implode('', array_merge($operators, $wildCards)), '/');
+
+    //Return if searched string ends with an unsupported operator.
+    //Or if the string contains an invalid joint occurrence of operators.
+    foreach ($operators as $val) {
+      if ($text == '@' || CRM_Utils_String::endsWith($text, $val) || preg_match("/[{$expression}]{2,}/", $text)) {
+        $csid = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionValue', 'CRM_Contact_Form_Search_Custom_FullText', 'value', 'name');
+        $url = CRM_Utils_System::url("civicrm/contact/search/custom", "csid={$csid}&reset=1");
+        $operators = implode("', '", $operators);
+        CRM_Core_Error::statusBounce("Full-Text Search does not support the use of a search with two attached operators or string ending with any of these operators ('{$operators}' or a single '@'). Please adjust your search term and try again.", $url, 'Invalid Search String');
+      }
+    }
 
     // normalize user-inputted wildcards
     $text = str_replace('%', '*', $text);
@@ -309,7 +323,7 @@ class CRM_Utils_QueryFormatter {
     else {
       switch ($mode) {
         case self::MODE_NONE:
-          $result = $this->mapWords($text, '+word');
+          $result = $this->mapWords($text, '+word', TRUE);
           break;
 
         case self::MODE_PHRASE:
@@ -380,11 +394,13 @@ class CRM_Utils_QueryFormatter {
    *   User-supplied query string.
    * @param string $template
    *   A prototypical description of each word, eg "word%" or "word*" or "*word*".
+   * @param bool $quotes
+   *   True if each searched keyword need to be surrounded with quotes.
    * @return string
    */
-  protected function mapWords($text, $template) {
+  protected function mapWords($text, $template, $quotes = FALSE) {
     $result = array();
-    foreach ($this->parseWords($text) as $word) {
+    foreach ($this->parseWords($text, $quotes) as $word) {
       $result[] = str_replace('word', $word, $template);
     }
     return implode(' ', $result);
@@ -392,9 +408,10 @@ class CRM_Utils_QueryFormatter {
 
   /**
    * @param $text
+   * @bool $quotes
    * @return array
    */
-  protected function parseWords($text) {
+  protected function parseWords($text, $quotes) {
     //NYSS 9692 special handling for emails
     if (preg_match('/^([a-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})$/', $text)) {
       $parts = explode('@', $text);
@@ -403,7 +420,19 @@ class CRM_Utils_QueryFormatter {
     }
 
     //NYSS also replace other occurrences of @
-    return explode(' ', preg_replace('/[ \r\n\t\@]+/', ' ', trim($text)));
+    $replacedText = preg_replace('/[ \r\n\t\@]+/', ' ', trim($text));
+    //filter empty values if any
+    $keywords = array_filter(explode(' ', $replacedText));
+
+    //Ensure each searched keywords are wrapped in double quotes.
+    if ($quotes) {
+      foreach ($keywords as &$val) {
+        if (!is_numeric($val)) {
+          $val = "\"{$val}\"";
+        }
+      }
+    }
+    return $keywords;
   }
 
   /**

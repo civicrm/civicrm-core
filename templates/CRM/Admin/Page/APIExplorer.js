@@ -56,11 +56,22 @@
   }
 
   /**
-   * Data provider for select2 "field" selectors
+   * Data provider for select2 "fields to return" selector
    * @returns {{results: Array.<T>}}
    */
   function returnFields() {
     return {results: fields.concat({id: '-', text: ts('Other') + '...', description: ts('Choose a field not in this list')})};
+  }
+
+  /**
+   * Data provider for select2 "field" selectors
+   * @returns {{results: Array.<T>}}
+   */
+  function selectFields() {
+    var items = _.filter(fields, function(field) {
+      return params[field.id] === undefined;
+    });
+    return {results: items.concat({id: '-', text: ts('Other') + '...', description: ts('Choose a field not in this list')})};
   }
 
   /**
@@ -128,6 +139,9 @@
         field.FKApiName = getField(entityTableParam).options[params[entityTableParam]];
       }
     }
+    if (field.pseudoconstant && field.pseudoconstant.optionGroupName) {
+      field.FKApiName = 'OptionValue';
+    }
   }
 
   /**
@@ -138,7 +152,8 @@
     $('#api-params').append($(fieldTpl({name: name || '', noOps: _.includes(NO_OPERATORS, action)})));
     var $row = $('tr:last-child', '#api-params');
     $('input.api-param-name', $row).crmSelect2({
-      data: returnFields,
+      data: selectFields,
+      allowClear: false,
       formatSelection: function(field) {
         return field.text +
           (field.required ? ' <span class="crm-marker">*</span>' : '');
@@ -161,13 +176,20 @@
       $('#api-params').append($(optionsTpl({})));
     }
     var $row = $('.api-options-row:last', '#api-params');
-    $('.api-option-name', $row).crmSelect2({data: [
-      {id: 'limit', text: 'limit'},
-      {id: 'offset', text: 'offset'},
-      {id: 'sort', text: 'sort'},
-      {id: 'metadata', text: 'metadata'},
-      {id: '-', text: ts('Other') + '...'}
-    ]});
+    $('.api-option-name', $row).crmSelect2({
+      data: [
+        {id: 'limit', text: 'limit'},
+        {id: 'offset', text: 'offset'},
+        {id: 'match', text: 'match'},
+        {id: 'match-mandatory', text: 'match-mandatory'},
+        {id: 'metadata', text: 'metadata'},
+        {id: 'reload', text: 'reload'},
+        {id: 'sort', text: 'sort'},
+        {id: '-', text: ts('Other') + '...'}
+      ],
+      allowClear: false
+    })
+      .select2('open');
   }
 
   /**
@@ -182,8 +204,10 @@
           ($(item.element).hasClass('strikethrough') ? '<span class="strikethrough">' + item.text + '</span>' : item.text);
       },
       placeholder: '<i class="crm-i fa-link"></i> ' + ts('Entity'),
+      allowClear: false,
       escapeMarkup: function(m) {return m;}
-    });
+    })
+      .select2('open');
   }
 
   /**
@@ -323,6 +347,11 @@
     }
     $('#api-params').prepend($(returnTpl({title: title, required: action == 'getvalue'})));
     $('#api-return-value').crmSelect2(params);
+    $("#api-return-value").select2("container").find("ul.select2-choices").sortable({
+      containment: 'parent',
+      start: function() { $("#api-return-value").select2("onSortStart"); },
+      update: function() { $("#api-return-value").select2("onSortEnd"); }
+    });
   }
 
   /**
@@ -976,6 +1005,7 @@
     $('#api-params-add').on('click', function(e) {
       e.preventDefault();
       addField();
+      $('tr:last-child input.api-param-name', '#api-params').select2('open');
     });
     $('#api-option-add').on('click', function(e) {
       e.preventDefault();

@@ -640,6 +640,36 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that activity.get api works when filtering on subject.
+   */
+  public function testActivityGetSubjectFilter() {
+    $subject = 'test activity ' . __FUNCTION__;
+    $params = $this->_params;
+    $params['subject'] = $subject;
+    $activity = $this->callAPISuccess('Activity', 'Create', $params);
+    $activityget = $this->callAPISuccess('activity', 'getsingle', array(
+      'subject' => $subject,
+      'id' => $activity['id'],
+    ));
+    $this->assertEquals($activityget['subject'], $subject);
+  }
+
+  /**
+   * Test that activity.get api works when filtering on details.
+   */
+  public function testActivityGetDetailsFilter() {
+    $details = 'test activity ' . __FUNCTION__;
+    $params = $this->_params;
+    $params['details'] = $details;
+    $activity = $this->callAPISuccess('Activity', 'Create', $params);
+    $activityget = $this->callAPISuccess('activity', 'getsingle', array(
+      'details' => $details,
+      'id' => $activity['id'],
+    ));
+    $this->assertEquals($activityget['details'], $details);
+  }
+
+  /**
    * test that get functioning does filtering.
    */
   public function testGetStatusID() {

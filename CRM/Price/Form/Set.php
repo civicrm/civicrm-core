@@ -183,6 +183,8 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
       }
     }
 
+    $this->addElement('text', 'min_amount', ts('Minimum Amount'));
+
     if (CRM_Utils_System::isNull($extends)) {
       $this->assign('extends', FALSE);
     }

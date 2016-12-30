@@ -1091,7 +1091,7 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
 
       $caseActivity['DT_RowId'] = $caseActivityId;
       //Add classes to the row, via DataTables syntax
-      $caseActivity['DT_RowClass'] = "crm-entity";
+      $caseActivity['DT_RowClass'] = "crm-entity status-id-$dao->status";
 
       if (CRM_Utils_Array::crmInArray($dao->status, $compStatusValues)) {
         $caseActivity['DT_RowClass'] .= " status-completed";
@@ -1126,7 +1126,8 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
       $caseActivity['subject'] = $dao->subject;
 
       //Activity Type
-      $caseActivity['type'] = $activityTypes[$dao->type]['label'];
+      $caseActivity['type'] = (!empty($activityTypes[$dao->type]['icon']) ? '<span class="crm-i ' . $activityTypes[$dao->type]['icon'] . '"></span> ' : '')
+        . $activityTypes[$dao->type]['label'];
 
       //Activity Target (With)
       $targetContact = '';

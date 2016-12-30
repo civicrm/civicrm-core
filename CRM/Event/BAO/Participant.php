@@ -2035,11 +2035,7 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
     // the recordAdjustedAmt code would execute over here
     $ids = CRM_Event_BAO_Participant::getParticipantIds($contributionId);
     if (count($ids) > 1) {
-      $total = 0;
-      foreach ($ids as $val) {
-        $total += CRM_Price_BAO_LineItem::getLineTotal($val, 'civicrm_participant');
-      }
-      $updatedAmount = $total;
+      $updatedAmount = CRM_Price_BAO_LineItem::getLineTotal($contributionId);
     }
     else {
       $updatedAmount = $params['amount'];

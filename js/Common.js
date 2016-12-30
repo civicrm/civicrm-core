@@ -237,6 +237,20 @@ if (!CRM.vars) CRM.vars = {};
     }
   };
 
+  var scriptsLoaded = {};
+  CRM.loadScript = function(url) {
+    if (!scriptsLoaded[url]) {
+      var script = document.createElement('script');
+      scriptsLoaded[url] = $.Deferred();
+      script.onload = function () {
+        scriptsLoaded[url].resolve();
+      };
+      script.src = url;
+      document.getElementsByTagName("head")[0].appendChild(script);
+    }
+    return scriptsLoaded[url];
+  };
+
   /**
    * Populate a select list, overwriting the existing options except for the placeholder.
    * @param select jquery selector - 1 or more select elements
@@ -358,6 +372,20 @@ if (!CRM.vars) CRM.vars = {};
     return settings;
   };
 
+  function formatCrmSelect2(row) {
+    var icon = row.icon || $(row.element).data('icon'),
+      color = row.color || $(row.element).data('color'),
+      description = row.description || $(row.element).data('description'),
+      ret = '';
+    if (icon) {
+      ret += '<i class="crm-i ' + icon + '"></i> ';
+    }
+    if (color) {
+      ret += '<span class="crm-select-item-color" style="background-color: ' + color + '"></span> ';
+    }
+    return ret + _.escape(row.text) + (description ? '<div class="crm-select2-row-description"><p>' + _.escape(description) + '</p></div>' : '');
+  }
+
   /**
    * Wrapper for select2 initialization function; supplies defaults
    * @param options object
@@ -374,7 +402,11 @@ if (!CRM.vars) CRM.vars = {};
       var
         $el = $(this),
         iconClass,
-        settings = {allowClear: !$el.hasClass('required')};
+        settings = {
+          allowClear: !$el.hasClass('required'),
+          formatResult: formatCrmSelect2,
+          formatSelection: formatCrmSelect2
+        };
       // quickform doesn't support optgroups so here's a hack :(
       $('option[value^=crm_optgroup]', this).each(function () {
         $(this).nextUntil('option[value^=crm_optgroup]').wrapAll('<optgroup label="' + $(this).text() + '" />');
@@ -443,6 +475,7 @@ if (!CRM.vars) CRM.vars = {};
         // Use select2 ajax helper instead of CRM.api3 because it provides more value
         ajax: {
           url: CRM.url('civicrm/ajax/rest'),
+          quietMillis: 300,
           data: function (input, page_num) {
             var params = getEntityRefApiParams($el);
             params.input = input;
@@ -459,9 +492,7 @@ if (!CRM.vars) CRM.vars = {};
         },
         minimumInputLength: 1,
         formatResult: CRM.utils.formatSelect2Result,
-        formatSelection: function(row) {
-          return _.escape((row.prefix !== undefined ? row.prefix + ' ' : '') + row.label + (row.suffix !== undefined ? ' ' + row.suffix : ''));
-        },
+        formatSelection: formatEntityRefSelection,
         escapeMarkup: _.identity,
         initSelection: function($el, callback) {
           var
@@ -795,6 +826,7 @@ if (!CRM.vars) CRM.vars = {};
       markup += '<div class="crm-select2-icon"><div class="crm-icon ' + row.icon_class + '-icon"></div></div>';
     }
     markup += '<div><div class="crm-select2-row-label '+(row.label_class || '')+'">' +
+      (row.color ? '<span class="crm-select-item-color" style="background-color: ' + row.color + '"></span> ' : '') +
       _.escape((row.prefix !== undefined ? row.prefix + ' ' : '') + row.label + (row.suffix !== undefined ? ' ' + row.suffix : '')) +
       '</div>' +
       '<div class="crm-select2-row-description">';
@@ -804,6 +836,11 @@ if (!CRM.vars) CRM.vars = {};
     markup += '</div></div></div>';
     return markup;
   };
+
+  function formatEntityRefSelection(row) {
+    return (row.color ? '<span class="crm-select-item-color" style="background-color: ' + row.color + '"></span> ' : '') +
+      _.escape((row.prefix !== undefined ? row.prefix + ' ' : '') + row.label + (row.suffix !== undefined ? ' ' + row.suffix : ''));
+  }
 
   function renderEntityRefCreateLinks($el) {
     var
@@ -1485,8 +1522,10 @@ if (!CRM.vars) CRM.vars = {};
         $(this).siblings('input:text').val('').trigger('change', ['crmClear']);
         return false;
       })
-      .on('change', 'input.crm-form-radio:checked', function() {
-        $(this).siblings('.crm-clear-link').css({visibility: ''});
+      .on('change', 'input.crm-form-radio:checked, input[allowclear=1]', function(e, context) {
+        if (context !== 'crmClear' && ($(this).is(':checked') || ($(this).is('[allowclear=1]') && $(this).val()))) {
+          $(this).siblings('.crm-clear-link').css({visibility: ''});
+        }
       })
 
       // Allow normal clicking of links within accordions

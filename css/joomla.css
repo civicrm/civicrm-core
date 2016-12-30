@@ -381,7 +381,7 @@ ul#civicrm-menu li#crm-qsearch {
   width: inherit;
 }
 
-#crm-container .label {
+#crm-container .crm-event-form-fee-block .label {
   background-color: inherit;
   width: inherit;
   display: block;

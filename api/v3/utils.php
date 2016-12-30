@@ -813,12 +813,6 @@ function _civicrm_api3_get_options_from_params(&$params, $queryObject = FALSE, $
       $returnProperties[$lowercase_entity . '_id'] = 1;
       unset($returnProperties['id']);
     }
-    switch (trim(strtolower($sort))) {
-      case 'id':
-      case 'id desc':
-      case 'id asc':
-        $sort = str_replace('id', $lowercase_entity . '_id', $sort);
-    }
   }
 
   $options = array(
@@ -833,6 +827,14 @@ function _civicrm_api3_get_options_from_params(&$params, $queryObject = FALSE, $
   if (!empty($sort)) {
     foreach ((array) $sort as $s) {
       if (CRM_Utils_Rule::mysqlOrderBy($s)) {
+        if ($entity && $action == 'get') {
+          switch (trim(strtolower($s))) {
+            case 'id':
+            case 'id desc':
+            case 'id asc':
+              $s = str_replace('id', $lowercase_entity . '_id', $s);
+          }
+        }
         $finalSort[] = $s;
       }
       else {
@@ -1635,7 +1637,7 @@ function _civicrm_api3_validate_foreign_keys($entity, $action, &$params, $fields
         _civicrm_api3_validate_constraint($params[$fieldName], $fieldName, $fieldInfo);
       }
       elseif (!empty($fieldInfo['required'])) {
-        throw new Exception("DB Constraint Violation - possibly $fieldName should possibly be marked as mandatory for this API. If so, please raise a bug report.");
+        throw new Exception("DB Constraint Violation - $fieldName should possibly be marked as mandatory for $entity,$action API. If so, please raise a bug report.");
       }
     }
     if (!empty($fieldInfo['api.unique'])) {

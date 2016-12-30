@@ -38,8 +38,8 @@
         <th>{ts}Name{/ts}</th>
         <th>{ts}Type{/ts}</th>
         <th>{ts}Subject{/ts}</th>
-        <th>{ts}Body Text{/ts}</th>
         <th>{ts}Body HTML{/ts}</th>
+        <th>{ts}Body Text{/ts}</th>
         <th>{ts}Default?{/ts}</th>
         <th>{ts}Enabled?{/ts}</th>
         <th></th>
@@ -49,8 +49,8 @@
            <td class="crm-editable" data-field="name">{$row.name}</td>
            <td>{$row.component_type}</td>
            <td>{$row.subject}</td>
-           <td>{$row.body_text|escape}</td>
            <td>{$row.body_html|escape}</td>
+           <td>{$row.body_text|escape}</td>
            <td>{if $row.is_default eq 1}<img src="{$config->resourceBase}i/check.gif" alt="{ts}Default{/ts}" />{/if}&nbsp;</td>
      <td id="row_{$row.id}_status">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
            <td>{$row.action|replace:'xx':$row.id}</td>

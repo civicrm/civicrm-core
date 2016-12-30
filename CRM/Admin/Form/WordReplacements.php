@@ -226,7 +226,8 @@ class CRM_Admin_Form_WordReplacements extends CRM_Core_Form {
     CRM_Core_BAO_WordReplacement::setLocaleCustomStrings($config->lcMessages, $overrides);
 
     // This controller was originally written to CRUD $config->locale_custom_strings,
-    // but that's no longer the canonical store. Sync changes to canonical store.
+    // but that's no longer the canonical store. Sync changes to canonical store
+    // (civicrm_word_replacement table in the database).
     // This is inefficient - at some point, we should rewrite this UI.
     CRM_Core_BAO_WordReplacement::rebuildWordReplacementTable();
 

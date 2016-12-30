@@ -135,6 +135,13 @@ class WebTest_Contribute_OnlineContributionTest extends CiviSeleniumTestCase {
     $this->assertElementContainsText("xpath=//div[@class='crm-group billing_name_address-group']//div[@class='crm-section no-label billing_name-section']", $firstName . "billing");
     $this->assertElementContainsText("xpath=//div[@class='crm-group billing_name_address-group']//div[@class='crm-section no-label billing_name-section']", $lastName . "billing");
 
+    $stateText = CRM_Core_PseudoConstant::stateProvinceAbbreviation(1004);
+    $countryText = CRM_Core_PseudoConstant::countryIsoCode(1228);
+    $billingDetails = array('15 Main St.', 'San Jose', '94129', $stateText, $countryText);
+    foreach ($billingDetails as $field) {
+      $this->assertElementContainsText("xpath=//div[@class='crm-group billing_name_address-group']//div[@class='crm-section no-label billing_address-section']", $field);
+    }
+
     $this->click("_qf_Confirm_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
