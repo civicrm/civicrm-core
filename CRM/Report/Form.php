@@ -1493,12 +1493,10 @@ class CRM_Report_Form extends CRM_Core_Form {
 
     $this->assign('instanceForm', $this->_instanceForm);
 
-    // CRM-16274 Determine if user has 'edit all contacts' or equivalent
-    // CRM-19330 Remove Add Contact to Group if the user does not have edit permissions
-    // Calling CRM_Core_Permission::getPermission() always returns CRM_Core_Permission::EDIT
-    // and is therefore useless for our purpose.
+    // CRM-19330 - check that the user has Edit permissions
+    // getPermission() simply returns CRM_Core_Permission::EDIT.
     $permission = CRM_Core_Permission::check(CRM_Core_Permission::EDIT);
-    if ($permission &&
+    if ($permission  &&
       $this->_add2groupSupported
     ) {
       $this->addElement('select', 'groups', ts('Group'),
@@ -1519,7 +1517,7 @@ class CRM_Report_Form extends CRM_Core_Form {
           'name' => $showResultsLabel,
           'isDefault' => TRUE,
         ),
-      )
+    )
     );
   }
 
@@ -3882,13 +3880,13 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
     if (!empty($prop['filters']) && $this->_customGroupFilters) {
       foreach ($prop['filters'] as $fieldAlias => $val) {
         foreach (array(
-                   'value',
-                   'min',
-                   'max',
-                   'relative',
-                   'from',
-                   'to',
-                 ) as $attach) {
+          'value',
+          'min',
+          'max',
+          'relative',
+          'from',
+          'to',
+        ) as $attach) {
           if (isset($this->_params[$fieldAlias . '_' . $attach]) &&
             (!empty($this->_params[$fieldAlias . '_' . $attach])
               || ($attach != 'relative' &&
@@ -4079,7 +4077,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
             'default' => CRM_Utils_Array::value('name', $defaults, FALSE),
             'name' => 'name',
           ),
-        ),
+          ),
         'grouping' => 'location-fields',
       ),
     );
