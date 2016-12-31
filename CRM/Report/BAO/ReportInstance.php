@@ -392,7 +392,7 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
       );
     }
     else {
-      // Remove the options to save or save a copy.
+      // CRM-19330 Remove the options to save or save a copy.
       unset($actions['report_instance.save']);
       unset($actions['report_instance.copy']);
     }
