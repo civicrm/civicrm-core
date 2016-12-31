@@ -88,7 +88,7 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
       $validTriggerPermission = CRM_Core_DAO::checkTriggerViewPermission(TRUE);
 
       if ($validTriggerPermission &&
-        !$config->logging
+        !\Civi::settings()->get('logging')
       ) {
         $this->addElement('checkbox', 'makeMultilingual', ts('Enable Multiple Languages'),
           NULL, array('onChange' => "if (this.checked) CRM.alert($warning, $warningTitle)")
