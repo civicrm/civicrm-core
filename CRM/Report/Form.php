@@ -4077,7 +4077,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
             'default' => CRM_Utils_Array::value('name', $defaults, FALSE),
             'name' => 'name',
           ),
-        ),
+          ),
         'grouping' => 'location-fields',
       ),
     );
