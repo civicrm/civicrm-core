@@ -284,6 +284,8 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
         return;
       }
     }
+    $qillName = $name;
+    $pseudoExtraParam = array();
     switch ($name) {
       case 'contribution_date':
       case 'contribution_date_low':
@@ -357,21 +359,14 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
       case (strpos($name, '_amount') !== FALSE):
       case (strpos($name, '_date') !== FALSE && $name != 'contribution_fulfilled_date'):
       case 'contribution_campaign_id':
-        $qillName = $name;
-        $pseudoExtraParam = array();
-        // @todo including names using a switch statement & then using an 'if' to filter them out is ... odd!
-        if ((strpos($name, '_amount') !== FALSE) || (strpos($name, '_date') !== FALSE) || in_array($name,
-            array(
-              'contribution_id',
-              'contribution_currency',
-              'contribution_source',
-              'contribution_trxn_id',
-              'contribution_check_number',
-              'contribution_payment_instrument_id',
-              'contribution_contact_id',
-              'contribution_campaign_id',
-            )
-          )
+
+        $fieldNamesNotToStripContributionFrom = array(
+          'contribution_currency_type',
+          'contribution_status_id',
+          'contribution_page_id',
+        );
+        // @todo these are mostly legacy params. Find a better way to deal with them.
+        if (!in_array($name, $fieldNamesNotToStripContributionFrom)
         ) {
           $name = str_replace('contribution_', '', $name);
           if (!in_array($name, array('source', 'id', 'contact_id', 'campaign_id'))) {
