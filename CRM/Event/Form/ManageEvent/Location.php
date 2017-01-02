@@ -197,7 +197,7 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
       if (!isset($locationEvents[$this->_oldLocBlockId]) || (!$this->_oldLocBlockId)) {
         $locationEvents = array('' => ts('- select -')) + $locationEvents;
       }
-      $this->add('select', 'loc_event_id', ts('Use Location'), $locationEvents);
+      $this->add('select', 'loc_event_id', ts('Use Location'), $locationEvents, FALSE, array('class' => 'crm-select2'));
     }
     $this->addElement('advcheckbox', 'is_show_location', ts('Show Location?'));
     parent::buildQuickForm();
