@@ -889,7 +889,7 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
         //this
         'display_name' => 1,
         // array
-        'financial_type' => 1,
+        'financial_type_id' => 1,
         // to
         'contribution_source' => 1,
         // strangle
@@ -903,7 +903,7 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
         // torture
         'accounting_code' => 1,
         // small
-        'payment_instrument' => 1,
+        // 'payment_instrument' => 1,
         // kittens
         'payment_instrument_id' => 1,
         // argh
@@ -941,7 +941,7 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
         // actually
         'is_pay_later' => 1,
         // required
-        'contribution_status' => 1,
+        // 'contribution_status' => 1,
         // instead
         'contribution_status_id' => 1,
         // of
