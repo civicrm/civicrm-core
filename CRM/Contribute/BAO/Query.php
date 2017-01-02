@@ -284,8 +284,20 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
         return;
       }
     }
+
+    // These are legacy names.
+    // @todo enotices when these are hit so we can start to elimnate them.
+    $fieldAliases = array(
+      'financial_type' => 'financial_type_id',
+      'contribution_page' => 'contribution_page_id',
+      'payment_instrument' => 'payment_instrument_id',
+      'contribution_payment_instrument' => 'contribution_payment_instrument_id',
+      'contribution_status' => 'contribution_status_id',
+    );
+    $name = isset($fieldAliases[$name]) ? $fieldAliases[$name] : $name;
     $qillName = $name;
     $pseudoExtraParam = array();
+
     switch ($name) {
       case 'contribution_date':
       case 'contribution_date_low':
@@ -335,12 +347,6 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
         $query->_tables['civicrm_contribution'] = $query->_whereTables['civicrm_contribution'] = 1;
         return;
 
-      case 'financial_type':
-      case 'contribution_page':
-      case 'payment_instrument':
-      case 'contribution_payment_instrument':
-      case 'contribution_status':
-        $name .= '_id';
       case 'financial_type_id':
         CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes);
         $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_contribution.$name", 'IN', array_keys($financialTypes), 'String');
