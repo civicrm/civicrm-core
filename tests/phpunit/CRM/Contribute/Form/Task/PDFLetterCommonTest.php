@@ -39,6 +39,16 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
    */
   protected $_individualId;
 
+  protected $_docTypes = NULL;
+
+  protected $_contactIds = NULL;
+
+  protected function setUp() {
+    parent::setUp();
+    $this->_individualId = $this->individualCreate(array('first_name' => 'Anthony', 'last_name' => 'Collins'));
+    $this->_docTypes = CRM_Core_SelectValues::documentApplicationType();
+  }
+
   /**
    * Clean up after each test.
    */
@@ -79,6 +89,49 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
   public function hookTokenValues(&$details, $contactIDs, $jobID, $tokens, $className) {
     foreach ($details as $index => $detail) {
       $details[$index]['favourite_emoticon'] = 'emo';
+    }
+  }
+
+  /**
+   * Test contribution token replacement in
+   * html returned by postProcess function.
+   */
+  public function testPostProcess() {
+    $this->_individualId = $this->individualCreate();
+    foreach (array('docx', 'odt') as $docType) {
+      $formValues = array(
+        'is_unit_test' => TRUE,
+        'group_by' => NULL,
+        'document_file' => array(
+          'name' => __DIR__ . "/sample_documents/Template.$docType",
+          'type' => $this->_docTypes[$docType],
+        ),
+      );
+
+      $contributionParams = array(
+        'contact_id' => $this->_individualId,
+        'total_amount' => 100,
+        'financial_type_id' => 'Donation',
+      );
+      $contribution = $this->callAPISuccess('Contribution', 'create', $contributionParams);
+      $contributionId = $contribution['id'];
+      $form = new CRM_Contribute_Form_Task_PDFLetter();
+      $form->setContributionIds(array($contributionId));
+      $format = Civi::settings()->get('dateformatFull');
+      $date = CRM_Utils_Date::getToday();
+      $displayDate = CRM_Utils_Date::customFormat($date, $format);
+
+      $html = CRM_Contribute_Form_Task_PDFLetterCommon::postProcess($form, $formValues);
+      $expectedValues = array(
+        'Hello Anthony Collins',
+        '$ 100.00',
+        $displayDate,
+        'Donation',
+      );
+
+      foreach ($expectedValues as $val) {
+        $this->assertTrue(strpos($html[$contributionId], $val) !== 0);
+      }
     }
   }
 
