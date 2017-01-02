@@ -1154,10 +1154,15 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $joinDate = date('Y-m-d');
     $year = date('Y');
     $startDate = date('Y-m-d', strtotime(date('Y-03-01')));
+    $rollOver = TRUE;
+    if (strtotime($startDate) > time()) {
+      $rollOver = FALSE;
+      $startDate = date('Y-m-d', strtotime(date('Y-03-01') . '- 1 year'));
+    }
     $membershipTypeDetails = CRM_Member_BAO_MembershipType::getMembershipTypeDetails($this->_membershipTypeID2);
     $fixedPeriodRollover = CRM_Member_BAO_MembershipType::isDuringFixedAnnualRolloverPeriod($joinDate, $membershipTypeDetails, $year, $startDate);
     $y = 1;
-    if ($fixedPeriodRollover) {
+    if ($fixedPeriodRollover && $rollOver) {
       $y += 1;
     }
 
