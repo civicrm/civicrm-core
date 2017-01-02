@@ -91,7 +91,6 @@ class CRM_Export_BAO_Export {
     $headerRows = $returnProperties = array();
     $primary = $paymentFields = $selectedPaymentFields = FALSE;
     $origFields = $fields;
-    $relationField = NULL;
 
     $phoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
     $imProviders = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
@@ -155,7 +154,7 @@ class CRM_Export_BAO_Export {
       );
 
       foreach ($fields as $key => $value) {
-        $phoneTypeId = $imProviderId = NULL;
+        $phoneTypeId = $imProviderId = $relationField = NULL;
         $relationshipTypes = $fieldName = CRM_Utils_Array::value(1, $value);
         if (!$fieldName) {
           continue;
