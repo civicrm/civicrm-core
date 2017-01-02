@@ -39,7 +39,7 @@ class CRM_Utils_Cache_Arraycache implements CRM_Utils_Cache_Interface {
   /**
    * The cache storage container, an in memory array by default
    */
-  private $_cache;
+  protected $_cache;
 
   /**
    * Constructor.
