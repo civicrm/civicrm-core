@@ -77,13 +77,20 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
       $query->_tables['civicrm_contribution'] = $query->_whereTables['civicrm_contribution'] = 1;
     }
 
-    $pseudoConstantFields = array('financial_type_id', 'payment_instrument_id', 'contribution_status_id');
-    foreach ($pseudoConstantFields as $pseudoConstantField) {
-      if (!empty($query->_returnProperties[$pseudoConstantField])) {
-        $query->_select['financial_type_id'] = "civicrm_contribution.{$pseudoConstantField} as $pseudoConstantField";
+    $pseudoConstantFields = array(
+      'financial_type_id' => 'financial_type_id',
+      'financial_type' => 'financial_type_id',
+      'payment_instrument_id' => 'payment_instrument_id',
+      'payment_instrument' => 'payment_instrument_id',
+      'contribution_status_id' => 'contribution_status_id',
+      'contribution_status' => 'contribution_status_id',
+    );
+    foreach ($pseudoConstantFields as $pseudoConstantFieldAlias => $pseudoConstantField) {
+      if (!empty($query->_returnProperties[$pseudoConstantFieldAlias])) {
+        $query->_select[$pseudoConstantField] = "civicrm_contribution.{$pseudoConstantField} as $pseudoConstantField";
         $query->_element[$pseudoConstantField] = $query->_tables['civicrm_contribution'] = 1;
         $query->_tables['civicrm_contribution'] = 1;
-        $query->_pseudoConstantsSelect[str_replace($pseudoConstantField, '_id', '')] = array(
+        $query->_pseudoConstantsSelect[str_replace('_id', '', $pseudoConstantField)] = array(
           'pseudoField' => $pseudoConstantField,
           'idCol' => $pseudoConstantField,
           'bao' => 'CRM_Contribute_BAO_Contribution',
@@ -648,6 +655,7 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
         break;
 
       case 'civicrm_accounting_code':
+        // @todo joining on option value in this way in not indexed. Use a pseudoconstant method to render instead.
         if ($mode & CRM_Contact_BAO_Query::MODE_CONTRIBUTE) {
           $from = " $side JOIN civicrm_entity_financial_account ON civicrm_entity_financial_account.entity_id = civicrm_contribution.financial_type_id AND civicrm_entity_financial_account.entity_table = 'civicrm_financial_type' ";
           $from .= " INNER JOIN civicrm_financial_account ON civicrm_financial_account.id = civicrm_entity_financial_account.financial_account_id ";
@@ -663,12 +671,6 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
       case 'civicrm_product':
         $from = " $side  JOIN civicrm_contribution_product ON civicrm_contribution_product.contribution_id = civicrm_contribution.id";
         $from .= " $side  JOIN civicrm_product ON civicrm_contribution_product.product_id =civicrm_product.id ";
-        break;
-
-      case 'contribution_payment_instrument':
-        $from = " $side JOIN civicrm_option_group option_group_payment_instrument ON ( option_group_payment_instrument.name = 'payment_instrument')";
-        $from .= " $side JOIN civicrm_option_value contribution_payment_instrument ON (civicrm_contribution.payment_instrument_id = contribution_payment_instrument.value
-                               AND option_group_payment_instrument.id = contribution_payment_instrument.option_group_id ) ";
         break;
 
       case 'contribution_softcredit_type':
