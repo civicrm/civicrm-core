@@ -77,15 +77,21 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
       $query->_tables['civicrm_contribution'] = $query->_whereTables['civicrm_contribution'] = 1;
     }
 
-    // get financial_type
-    if (!empty($query->_returnProperties['financial_type'])) {
-      $query->_select['financial_type'] = "civicrm_financial_type.name as financial_type";
-      $query->_element['financial_type'] = 1;
-      $query->_tables['civicrm_contribution'] = 1;
-      $query->_tables['civicrm_financial_type'] = 1;
+    $pseudoConstantFields = array('financial_type_id', 'payment_instrument_id', 'contribution_status_id');
+    foreach ($pseudoConstantFields as $pseudoConstantField) {
+      if (!empty($query->_returnProperties[$pseudoConstantField])) {
+        $query->_select['financial_type_id'] = "civicrm_contribution.{$pseudoConstantField} as $pseudoConstantField";
+        $query->_element[$pseudoConstantField] = $query->_tables['civicrm_contribution'] = 1;
+        $query->_tables['civicrm_contribution'] = 1;
+        $query->_pseudoConstantsSelect[str_replace($pseudoConstantField, '_id', '')] = array(
+          'pseudoField' => $pseudoConstantField,
+          'idCol' => $pseudoConstantField,
+          'bao' => 'CRM_Contribute_BAO_Contribution',
+        );
+      }
     }
 
-    // get accounting code
+    // @todo see if accounting code can leverage pseudoconstants, current join is unindexed.
     if (!empty($query->_returnProperties['accounting_code'])) {
       $query->_select['accounting_code'] = "civicrm_financial_account.accounting_code as accounting_code";
       $query->_element['accounting_code'] = 1;
@@ -106,51 +112,21 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
       $query->_tables['contribution_batch'] = 1;
     }
 
+    // @todo add these simple fiels in a less repetitive way.
     if (!empty($query->_returnProperties['contribution_source'])) {
       $query->_select['contribution_source'] = "civicrm_contribution.source as contribution_source";
       $query->_element['contribution_source'] = 1;
       $query->_tables['civicrm_contribution'] = 1;
     }
 
-    // get contribution_status
-    if (!empty($query->_returnProperties['contribution_status_id'])) {
-      $query->_select['contribution_status_id'] = "contribution_status.value as contribution_status_id";
-      $query->_element['contribution_status_id'] = 1;
-      $query->_tables['civicrm_contribution'] = 1;
-      $query->_tables['contribution_status'] = 1;
-    }
-
-    // get contribution_status label
-    if (!empty($query->_returnProperties['contribution_status'])) {
-      $query->_select['contribution_status'] = "contribution_status.label as contribution_status";
-      $query->_element['contribution_status'] = 1;
-      $query->_tables['civicrm_contribution'] = 1;
-      $query->_tables['contribution_status'] = 1;
-    }
-
-    // get payment instrument
-    if (!empty($query->_returnProperties['payment_instrument'])) {
-      $query->_select['payment_instrument'] = "contribution_payment_instrument.label as payment_instrument";
-      $query->_element['payment_instrument'] = 1;
-      $query->_tables['civicrm_contribution'] = 1;
-      $query->_tables['contribution_payment_instrument'] = 1;
-    }
-
-    // get payment instrument id
-    if (!empty($query->_returnProperties['payment_instrument_id'])) {
-      $query->_select['instrument_id'] = "contribution_payment_instrument.value as instrument_id";
-      $query->_select['payment_instrument_id'] = "contribution_payment_instrument.value as payment_instrument_id";
-      $query->_element['instrument_id'] = $query->_element['payment_instrument_id'] = 1;
-      $query->_tables['civicrm_contribution'] = 1;
-      $query->_tables['contribution_payment_instrument'] = 1;
-    }
-
+    //@todo add these simple fiels in a less repetitive way.
     if (!empty($query->_returnProperties['check_number'])) {
       $query->_select['contribution_check_number'] = "civicrm_contribution.check_number as contribution_check_number";
       $query->_element['contribution_check_number'] = 1;
       $query->_tables['civicrm_contribution'] = 1;
     }
 
+    //@todo this could be rendered via pseudoconstant and avoid a join, speeding up the query.
     if (!empty($query->_returnProperties['contribution_campaign_id'])) {
       $query->_select['contribution_campaign_id'] = 'civicrm_contribution.campaign_id as contribution_campaign_id';
       $query->_element['contribution_campaign_id'] = 1;
@@ -231,6 +207,7 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
       $query->_tables['civicrm_contribution_soft'] = 1;
     }
 
+    //@todo this could be rendered via pseudoconstant and avoid a join, speeding up the query.
     if (!empty($query->_returnProperties['contribution_campaign_title'])) {
       $query->_select['contribution_campaign_title'] = "civicrm_campaign.title as contribution_campaign_title";
       $query->_element['contribution_campaign_title'] = $query->_tables['civicrm_campaign'] = 1;
@@ -245,12 +222,6 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
       }
     }
 
-    //CRM-16116: get financial_type_id
-    if (!empty($query->_returnProperties['financial_type_id'])) {
-      $query->_select['financial_type_id'] = "civicrm_contribution.financial_type_id as financial_type_id";
-      $query->_element['financial_type_id'] = $query->_tables['civicrm_contribution'] = 1;
-    }
-    // LCD 716 END
   }
 
   /**
@@ -699,12 +670,6 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
                                AND option_group_payment_instrument.id = contribution_payment_instrument.option_group_id ) ";
         break;
 
-      case 'contribution_status':
-        $from = " $side JOIN civicrm_option_group option_group_contribution_status ON (option_group_contribution_status.name = 'contribution_status')";
-        $from .= " $side JOIN civicrm_option_value contribution_status ON (civicrm_contribution.contribution_status_id = contribution_status.value
-                               AND option_group_contribution_status.id = contribution_status.option_group_id ) ";
-        break;
-
       case 'contribution_softcredit_type':
         $from = " $side JOIN civicrm_option_group option_group_contribution_softcredit_type ON
           (option_group_contribution_softcredit_type.name = 'soft_credit_type')";
@@ -878,8 +843,6 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
       // Without this value here we get an e-notice BUT the value does not appear to be rendered anywhere.
       'contribution_campaign_id' => 1,
       'contribution_status_id' => 1,
-      // @todo return this & fix query to do pseudoconstant thing.
-      'contribution_status' => 1,
       // @todo the product field got added because it suited someone's use case.
       // ideally we would have some configurability here because I think 90% of sites would
       // disagree this is the right field to show - but they wouldn't agree with each other
