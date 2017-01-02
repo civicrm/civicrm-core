@@ -124,7 +124,7 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
     );
 
     if ($params['installments'] == 1) {
-      $params['is_recur'] == FALSE;
+      $params['is_recur'] = FALSE;
     }
 
     if ($params['is_recur'] == TRUE) {
