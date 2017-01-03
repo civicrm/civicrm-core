@@ -196,7 +196,7 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
   public function setDefaultValues() {
     $defaults = array_merge($this->_formValues, array(
       'privacy_toggle' => 1,
-      'operator' => TRUE,
+      'operator' => 'AND',
     ));
     $this->normalizeDefaultValues($defaults);
 
