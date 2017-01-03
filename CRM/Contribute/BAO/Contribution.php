@@ -3101,8 +3101,8 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     if ($contributionStatus == 'Partially paid'
       && !empty($params['partial_payment_total']) && !empty($params['partial_amount_pay'])
     ) {
-      $partialAmtPay = $params['partial_amount_pay'];
-      $partialAmtTotal = $params['partial_payment_total'];
+      $partialAmtPay = CRM_Utils_Rule::cleanMoney($params['partial_amount_pay']);
+      $partialAmtTotal = CRM_Utils_Rule::cleanMoney($params['partial_payment_total']);
 
       $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Accounts Receivable Account is' "));
       $fromFinancialAccountId = CRM_Contribute_PseudoConstant::financialAccountType($params['financial_type_id'], $relationTypeId);
