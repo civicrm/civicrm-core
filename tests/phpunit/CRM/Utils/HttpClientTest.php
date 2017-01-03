@@ -6,12 +6,12 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  */
 class CRM_Utils_HttpClientTest extends CiviUnitTestCase {
 
-  const VALID_HTTP_URL = 'http://sandbox.civicrm.org/';
-  const VALID_HTTP_REGEX = '/<html/';
-  const VALID_HTTPS_URL = 'https://civicrm.org/INSTALL.mysql.txt';
-  const VALID_HTTPS_REGEX = '/MySQL/';
-  const SELF_SIGNED_HTTPS_URL = 'https://www-test.civicrm.org:4433/index.html';
-  const SELF_SIGNED_HTTPS_REGEX = '/self-signed/';
+  const VALID_HTTP_URL = 'http://httpclienttest-http.civicrm.org/index.html';
+  const VALID_HTTP_REGEX = '/This is httpclienttest-http\./';
+  const VALID_HTTPS_URL = 'https://httpclienttest-https.civicrm.org/index.html';
+  const VALID_HTTPS_REGEX = '/This is httpclienttest-https\./';
+  const SELF_SIGNED_HTTPS_URL = 'https://httpclienttest-selfsign.civicrm.org:4433/index.html';
+  const SELF_SIGNED_HTTPS_REGEX = '/This is httpclienttest-selfsign\./';
 
   /**
    * @var string path to which we can store temp file
