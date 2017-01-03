@@ -149,6 +149,18 @@ class api_v3_GroupTest extends CiviUnitTestCase {
     $this->assertEquals($group['parents'], "");
     $this->assertEquals($group['group_type'], $params['group_type']);
 
+    //Pass group_type param in checkbox format.
+    $params = array_merge($params, array(
+        'name' => 'Test Checkbox Format',
+        'title' => 'Test Checkbox Format',
+        'group_type' => array(2 => 1),
+      )
+    );
+    $result = $this->callAPISuccess('Group', 'create', $params);
+    $group = $result['values'][$result['id']];
+    $this->assertEquals($group['name'], "Test Checkbox Format");
+    $this->assertEquals($group['group_type'], array_keys($params['group_type']));
+
     //assert single value for group_type and parent
     $params = array_merge($params, array(
         'name' => 'Test Group 2',
