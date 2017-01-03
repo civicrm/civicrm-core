@@ -661,19 +661,6 @@ AND civicrm_case.status_id != $closedId";
             'Case',
             $result->case_id
           );
-          $casesList[$result->case_id]['moreActions'] = CRM_Core_Action::formLink($actions['moreActions'],
-            $mask,
-            array(
-              'id' => $result->case_id,
-              'cid' => $result->contact_id,
-              'cxt' => $context,
-            ),
-            ts('more'),
-            TRUE,
-            'case.actions.more',
-            'Case',
-            $result->case_id
-          );
         }
         elseif ($field == 'case_status') {
           if (in_array($result->$field, $caseStatus)) {
