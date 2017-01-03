@@ -1176,6 +1176,29 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
   }
 
   /**
+   * Test to check if amount is proportionally asigned for PI change.
+   */
+  public function testProportionallyAssignedForPIChange() {
+    list($contribution, $financialAccount) = $this->createContributionWithTax();
+    $params = array(
+      'id' => $contribution['id'],
+      'payment_instrument_id' => 3,
+    );
+    $this->callAPISuccess('Contribution', 'create', $params);
+    $lastFinancialTrxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contribution['id'], 'DESC');
+    $eftParams = array(
+      'entity_table' => 'civicrm_financial_item',
+      'financial_trxn_id' => $lastFinancialTrxnId['financialTrxnId'],
+    );
+    $entityFinancialTrxn = $this->callAPISuccess('EntityFinancialTrxn', 'Get', $eftParams);
+    $this->assertEquals($entityFinancialTrxn['count'], 2, 'Invalid count.');
+    $testAmount = array(10, 100);
+    foreach ($entityFinancialTrxn['values'] as $value) {
+      $this->assertEquals($value['amount'], array_pop($testAmount), 'Invalid amount stored in civicrm_entity_financial_trxn.');
+    }
+  }
+
+  /**
    * Function to create contribution with tax.
    */
   public function createContributionWithTax() {
