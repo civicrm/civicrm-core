@@ -1084,4 +1084,64 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $this->assertTrue(($salesTaxFinancialAccount == $expectedResult), 'Function returned wrong values.');
   }
 
+  /**
+   * Test for function createProportionalEntry().
+   */
+  public function testcreateProportionalEntry() {
+    $contactId = $this->individualCreate();
+    $this->enableTaxAndInvoicing();
+    $financialType = $this->createFinancialType();
+    $financialAccount = $this->relationForFinancialTypeWithFinancialAccount($financialType['id']);
+    $form = new CRM_Contribute_Form_Contribution();
+
+    $form->testSubmit(array(
+       'total_amount' => 100,
+        'financial_type_id' => $financialType['id'],
+        'receive_date' => '04/21/2015',
+        'receive_date_time' => '11:27PM',
+        'contact_id' => $contactId,
+        'contribution_status_id' => 1,
+        'price_set_id' => 0,
+      ),
+      CRM_Core_Action::ADD
+    );
+    $contribution = $this->callAPISuccessGetSingle('Contribution',
+      array(
+        'contact_id' => $contactId,
+        'return' => array('tax_amount', 'total_amount'),
+      )
+    );
+    $params = array(
+      'total_amount' => 55,
+      'to_financial_account_id' => $financialAccount->financial_account_id,
+      'payment_instrument_id' => 1,
+      'trxn_date' => date('Ymd'),
+      'status_id' => 1,
+    );
+    $financialTrxn = $this->callAPISuccess('FinancialTrxn', 'create', $params);
+    $params = array(
+      'amount' => 50,
+      'entity_table' => 'civicrm_contribution',
+      'entity_id' => $contribution['id'],
+      'financial_trxn_id' => $financialTrxn['id'],
+    );
+    $this->callAPISuccess('EntityFinancialTrxn', 'create', $params);
+    $entityParams = array(
+      'contribution_total_amount' => $contribution['total_amount'],
+      'trxn_total_amount' => 55,
+      'line_item_amount' => 100,
+    );
+    $previousLineItem = CRM_Financial_BAO_FinancialItem::getPreviousFinancialItem($contribution['id']);
+    $eftParams = array(
+      'entity_table' => 'civicrm_financial_item',
+      'entity_id' => $previousLineItem->id,
+      'financial_trxn_id' => $financialTrxn['id'],
+    );
+    CRM_Contribute_BAO_Contribution::createProportionalEntry($entityParams, $eftParams);
+    $trxnTestArray = array_merge($eftParams, array(
+      'amount' => 50,
+    ));
+    $entityFinancialTrxn = $this->callAPISuccessGetSingle('EntityFinancialTrxn', $eftParams, $trxnTestArray);
+  }
+
 }
