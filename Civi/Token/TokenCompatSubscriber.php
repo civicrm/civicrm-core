@@ -61,6 +61,20 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
           // FIXME: Need to differentiate errors which kill the batch vs the individual row.
           throw new TokenException("Failed to generate token data. Invalid contact ID: " . $row->context['contactId']);
         }
+
+        $contactTokens = \CRM_Utils_Array::value('contact', $messageTokens);
+        if (!empty($contactTokens)) {
+          try {
+             $result = civicrm_api3('Contact', 'getsingle', array(
+              'id' => $contactId,
+              'return' => $contactTokens,
+             ));
+             $contact = array_merge($contact, $result);
+           }
+           catch (CiviCRM_API3_Exception $e) {
+             //do nothing
+           }
+        }
       }
       else {
         $contact = $row->context['contact'];
@@ -76,7 +90,6 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
 
       // Note: This is a small contract change from the past; data should be missing
       // less randomly.
-      //\CRM_Utils_Hook::tokenValues($contact, $row->context['contactId']);
       \CRM_Utils_Hook::tokenValues($contactArray,
         (array) $contactId,
         empty($row->context['mailingJob']) ? NULL : $row->context['mailingJob']->id,

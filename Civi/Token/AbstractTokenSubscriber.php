@@ -148,16 +148,47 @@ abstract class AbstractTokenSubscriber implements EventSubscriberInterface {
     }
 
     $activeTokens = array_intersect($messageTokens[$this->entity], array_keys($this->tokenNames));
-    if (empty($activeTokens)) {
-      return;
-    }
+    $extraTokens = array_diff($messageTokens[$this->entity], array_keys($this->tokenNames));
 
     $prefetch = $this->prefetch($e);
 
     foreach ($e->getRows() as $row) {
-      foreach ($activeTokens as $field) {
+      $this->evaluateExtraToken($row, $this->entity, $extraTokens);
+      foreach ((array) $activeTokens as $field) {
         $this->evaluateToken($row, $this->entity, $field, $prefetch);
       }
+    }
+  }
+
+  /**
+   * Populate the custom field and other remaining entity token data.
+   *
+   * @param TokenRow $e
+   *   The record for which we want token values.
+   * @param string $entity
+   *   The entity for which we want the token values
+   * @param array $tokens
+   *   The array of tokens whose data need to be fetched 
+   */
+  public function evaluateExtraToken(TokenRow $row, $entity, $tokens) {
+    if (empty($tokens)) {
+      return;
+    }
+
+    $actionSearchResult = $row->context['actionSearchResult'];
+
+    try {
+      $result = civicrm_api3($entity, 'getsingle', array(
+        'id' => $actionSearchResult->entity_id,
+        'return' => $tokens,
+      ));
+    }
+    catch (CiviCRM_API3_Exception $e) {
+      return;
+    }
+
+    foreach ($tokens as $token) {
+      $row->tokens($entity, $token, \CRM_Utils_Array::value($token, $result, ''));
     }
   }
 
