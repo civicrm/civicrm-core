@@ -57,6 +57,31 @@ class CRM_Contact_BAO_SavedSearchTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test setDefaults for privacy radio buttons.
+   */
+  public function testDefaultValues() {
+    $sg = new CRM_Contact_Form_Search_Advanced();
+    $sg->controller = new CRM_Core_Controller();
+    $sg->_formValues = array(
+      'group_search_selected' => 'group',
+      'privacy_options' => array('do_not_email'),
+      'privacy_operator' => 'OR',
+      'privacy_toggle' => 2,
+      'operator' => 'AND',
+      'component_mode' => 1,
+    );
+    CRM_Core_DAO::executeQuery(
+      "INSERT INTO civicrm_saved_search (form_values) VALUES('" . serialize($sg->_formValues) . "')"
+    );
+    $ssID = CRM_Core_DAO::singleValueQuery('SELECT LAST_INSERT_ID()');
+    $sg->set('ssID', $ssID);
+
+    $defaults = $sg->setDefaultValues();
+
+    $this->checkArrayEquals($defaults, $sg->_formValues);
+  }
+
+  /**
    * Test fixValues function.
    *
    * @dataProvider getSavedSearches
