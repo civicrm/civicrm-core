@@ -136,6 +136,14 @@
                 {if $form.$phone_ext_field.html}
                   &nbsp;{$form.$phone_ext_field.html}
                 {/if}
+			  {elseif ( $field.data_type eq 'Date' ) AND
+              (( $form.formName eq 'Confirm' )  or
+              ( $form.formName eq 'ThankYou' )) }
+                <span class="crm-frozen-field">
+                    {assign var="date_value" value=$form.$n.value}
+                    {$date_value|crmDate}
+                    <input type="hidden" name="{$form.$n.name}" value="{$form.$n.value}" id="{$form.$n.name}">
+                </span>
               {else}
                 {if $prefix}
                   {if $n eq 'organization_name' && !empty($form.onbehalfof_id)}
