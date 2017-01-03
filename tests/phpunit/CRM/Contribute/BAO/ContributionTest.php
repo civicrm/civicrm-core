@@ -1069,4 +1069,19 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $this->assertEquals($financialTrxn['total_amount'], 8000, 'Invalid Tax amount.');
   }
 
+  /**
+   * Test for function getSalesTaxFinancialAccounts().
+   */
+  public function testgetSalesTaxFinancialAccounts() {
+    $this->enableTaxAndInvoicing();
+    $financialType = $this->createFinancialType();
+    $financialAccount = $this->relationForFinancialTypeWithFinancialAccount($financialType['id']);
+    $expectedResult = array($financialAccount->financial_account_id => $financialAccount->financial_account_id);
+    $financialType = $this->createFinancialType();
+    $financialAccount = $this->relationForFinancialTypeWithFinancialAccount($financialType['id']);
+    $expectedResult[$financialAccount->financial_account_id] = $financialAccount->financial_account_id;
+    $salesTaxFinancialAccount = CRM_Contribute_BAO_Contribution::getSalesTaxFinancialAccounts();
+    $this->assertTrue(($salesTaxFinancialAccount == $expectedResult), 'Function returned wrong values.');
+  }
+
 }
