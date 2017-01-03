@@ -194,6 +194,11 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
    *   the default array reference
    */
   public function setDefaultValues() {
+    // Set ssID for unit tests.
+    if (empty($this->_ssID)) {
+      $this->_ssID = $this->get('ssID');
+    }
+
     $defaults = array_merge($this->_formValues, array(
       'privacy_toggle' => 1,
       'operator' => 'AND',
