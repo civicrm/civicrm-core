@@ -1088,29 +1088,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
    * Test for function createProportionalEntry().
    */
   public function testcreateProportionalEntry() {
-    $contactId = $this->individualCreate();
-    $this->enableTaxAndInvoicing();
-    $financialType = $this->createFinancialType();
-    $financialAccount = $this->relationForFinancialTypeWithFinancialAccount($financialType['id']);
-    $form = new CRM_Contribute_Form_Contribution();
-
-    $form->testSubmit(array(
-       'total_amount' => 100,
-        'financial_type_id' => $financialType['id'],
-        'receive_date' => '04/21/2015',
-        'receive_date_time' => '11:27PM',
-        'contact_id' => $contactId,
-        'contribution_status_id' => 1,
-        'price_set_id' => 0,
-      ),
-      CRM_Core_Action::ADD
-    );
-    $contribution = $this->callAPISuccessGetSingle('Contribution',
-      array(
-        'contact_id' => $contactId,
-        'return' => array('tax_amount', 'total_amount'),
-      )
-    );
+    $contribution = $this->createContributionWithTax();
     $params = array(
       'total_amount' => 55,
       'to_financial_account_id' => $financialAccount->financial_account_id,
@@ -1142,6 +1120,49 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       'amount' => 50,
     ));
     $entityFinancialTrxn = $this->callAPISuccessGetSingle('EntityFinancialTrxn', $eftParams, $trxnTestArray);
+  }
+
+  /**
+   * Test for function getLastFinancialItemIds().
+   */
+  public function testgetLastFinancialItemIds() {
+    $contribution = $this->createContributionWithTax();
+    list($ftIds, $taxItems) = CRM_Contribute_BAO_Contribution::getLastFinancialItemIds($contribution['id']);
+    $this->assertEquals(count($ftIds), 1, 'Invalid count.');
+    $this->assertEquals(count($taxItems), 1, 'Invalid count.');
+    foreach ($taxItems as $value) {
+      $this->assertEquals($value['amount'], 10, 'Invalid tax amount.');
+    }
+  }
+
+  /**
+   * Function to create contribution with tax.
+   */
+  public function createContributionWithTax() {
+    $contactId = $this->individualCreate();
+    $this->enableTaxAndInvoicing();
+    $financialType = $this->createFinancialType();
+    $financialAccount = $this->relationForFinancialTypeWithFinancialAccount($financialType['id']);
+    $form = new CRM_Contribute_Form_Contribution();
+
+    $form->testSubmit(array(
+       'total_amount' => 100,
+        'financial_type_id' => $financialType['id'],
+        'receive_date' => '04/21/2015',
+        'receive_date_time' => '11:27PM',
+        'contact_id' => $contactId,
+        'contribution_status_id' => 1,
+        'price_set_id' => 0,
+      ),
+      CRM_Core_Action::ADD
+    );
+    $contribution = $this->callAPISuccessGetSingle('Contribution',
+      array(
+        'contact_id' => $contactId,
+        'return' => array('tax_amount', 'total_amount'),
+      )
+    );
+    return $contribution;
   }
 
 }
