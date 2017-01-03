@@ -138,13 +138,13 @@
    .focus(
      function() {
        feeAmount = cj(this).val();
-       feeAmount = parseInt(feeAmount);
+       feeAmount = Number(feeAmount.replace(/[^0-9\.]+/g,""));
      }
    )
    .change(
     function() {
       userModifiedAmount = cj(this).val();
-      userModifiedAmount = parseInt(userModifiedAmount);
+      userModifiedAmount = Number(userModifiedAmount.replace(/[^0-9\.]+/g,""));
       if (userModifiedAmount < feeAmount) {
         cj('#status_id').val(partiallyPaidStatusId).change();
       }
