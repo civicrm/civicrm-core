@@ -76,6 +76,7 @@ function activity_create_expectedresult() {
         'campaign_id' => '',
         'engagement_level' => '',
         'weight' => '',
+        'is_star' => '',
       ),
     ),
   );
