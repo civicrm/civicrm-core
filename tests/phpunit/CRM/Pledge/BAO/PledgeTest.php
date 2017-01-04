@@ -40,20 +40,7 @@ class CRM_Pledge_BAO_PledgeTest extends CiviUnitTestCase {
   protected function setUp() {
     parent::setUp();
     $this->_contactId = $this->individualCreate();
-  }
-
-  /**
-   * Tears down the fixture, for example, closes a network connection.
-   * This method is called after a test is executed.
-   */
-  protected function tearDown() {
-  }
-
-  /**
-   *  Test for Add/Update Pledge.
-   */
-  public function testAdd() {
-    $params = array(
+    $this->_params = array(
       'contact_id' => $this->_contactId,
       'frequency_unit' => 'month',
       'original_installment_amount' => 25.00,
@@ -68,13 +55,44 @@ class CRM_Pledge_BAO_PledgeTest extends CiviUnitTestCase {
       'currency' => 'USD',
       'amount' => 300,
     );
+  }
 
+  /**
+   * Tears down the fixture, for example, closes a network connection.
+   * This method is called after a test is executed.
+   */
+  protected function tearDown() {
+  }
+
+  /**
+   *  Test for Add/Update Pledge.
+   */
+  public function testAdd() {
     //do test for normal add.
-    $pledge = CRM_Pledge_BAO_Pledge::add($params);
+    $pledge = CRM_Pledge_BAO_Pledge::add($this->_params);
 
-    foreach ($params as $param => $value) {
+    foreach ($this->_params as $param => $value) {
       $this->assertEquals($value, $pledge->$param);
     }
+  }
+
+  /**
+   * Test Pledge Payment Status with 1 installment
+   * and not passing status id.
+   */
+  public function testPledgePaymentStatus() {
+    $scheduledDate = date('Ymd', mktime(0, 0, 0, date("m"), date("d") + 2, date("y")));
+    $this->_params['installments'] = 1;
+    $this->_params['scheduled_date'] = $scheduledDate;
+
+    unset($this->_params['status_id']);
+    $pledge = CRM_Pledge_BAO_Pledge::create($this->_params);
+    $pledgePayment = CRM_Pledge_BAO_PledgePayment::getPledgePayments($pledge->id);
+
+    $this->assertEquals(count($pledgePayment), 1);
+    $payment = array_pop($pledgePayment);
+    $this->assertEquals($payment['status'], 'Pending');
+    $this->assertEquals($payment['scheduled_date'], date('Y-m-d 00:00:00', strtotime($scheduledDate)));
   }
 
   /**
