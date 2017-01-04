@@ -24,6 +24,7 @@ class CRM_Core_RegionTest extends CiviUnitTestCase {
     $actual = $smarty->fetch('string:{crmRegion name=testBlank}{/crmRegion}');
     $expected = '';
     $this->assertEquals($expected, $actual);
+    $this->fail("Totally bogus failure");
   }
 
   /**
