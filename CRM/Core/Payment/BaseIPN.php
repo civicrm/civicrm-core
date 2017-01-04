@@ -520,7 +520,20 @@ LIMIT 1;";
               $dates['join_date'] = CRM_Utils_Date::customFormat($currentMembership['join_date'], $format);
             }
             else {
-              $dates = CRM_Member_BAO_MembershipType::getDatesForMembershipType($membership->membership_type_id, NULL, NULL, NULL, $num_terms);
+              $receiveDate = CRM_Utils_Date::processDate($changeToday, NULL, FALSE, 'Y-m-d');
+              $startDate = CRM_Utils_Date::processDate($membership->start_date, NULL, FALSE, 'Y-m-d');
+              $endDate = CRM_Utils_Date::processDate($membership->end_date, NULL, FALSE, 'Y-m-d');
+              if ($receiveDate > $startDate) {
+                $startDate = NULL;
+                $endDate = NULL;
+              }
+              else {
+                $startDate = $membership->start_date;
+                $endDate = $membership->end_date;
+              }
+              $dates = CRM_Member_BAO_MembershipType::getDatesForMembershipType($membership->membership_type_id,
+                $changeToday, $startDate, $endDate, $numterms
+              );
             }
 
             //get the status for membership.
