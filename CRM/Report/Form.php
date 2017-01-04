@@ -1522,7 +1522,7 @@ class CRM_Report_Form extends CRM_Core_Form {
           'name' => $showResultsLabel,
           'isDefault' => TRUE,
         ),
-      )
+    )
     );
   }
 
