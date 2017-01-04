@@ -92,14 +92,16 @@ class CRM_Case_Task {
           'result' => FALSE,
         ),
       );
+
       //CRM-4418, check for delete
       if (!CRM_Core_Permission::check('delete in CiviCase')) {
         unset(self::$_tasks[1]);
       }
+
+      CRM_Utils_Hook::searchTasks('case', self::$_tasks);
+      asort(self::$_tasks);
     }
 
-    CRM_Utils_Hook::searchTasks('case', self::$_tasks);
-    asort(self::$_tasks);
     return self::$_tasks;
   }
 

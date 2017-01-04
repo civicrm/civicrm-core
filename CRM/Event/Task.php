@@ -145,9 +145,9 @@ class CRM_Event_Task {
       if (!CRM_Core_Permission::check('edit event participants')) {
         unset(self::$_tasks[4], self::$_tasks[5], self::$_tasks[15]);
       }
-    }
 
-    CRM_Utils_Hook::searchTasks('event', self::$_tasks);
+      CRM_Utils_Hook::searchTasks('event', self::$_tasks);
+    }
 
     return self::$_tasks;
   }

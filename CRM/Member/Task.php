@@ -119,9 +119,11 @@ class CRM_Member_Task {
       if (!CRM_Core_Permission::check('edit memberships')) {
         unset(self::$_tasks[5]);
       }
+
+      CRM_Utils_Hook::searchTasks('membership', self::$_tasks);
+      asort(self::$_tasks);
     }
-    CRM_Utils_Hook::searchTasks('membership', self::$_tasks);
-    asort(self::$_tasks);
+
     return self::$_tasks;
   }
 
