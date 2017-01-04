@@ -71,6 +71,8 @@ class CRM_Core_ClassLoader {
       return;
     }
 
+    require_once dirname(dirname(__DIR__)) . '/packages/vendor/autoload.php';
+
     // we do this to prevent a autoloader errors with joomla / 3rd party packages
     // use absolute path since we dont know the content of include_path as yet
     // CRM-11304

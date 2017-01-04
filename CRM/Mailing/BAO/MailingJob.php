@@ -38,13 +38,22 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
   CONST MAX_CONTACTS_TO_PROCESS = 1000;
 
   /**
+   *(Dear God Why) Keep a global count of mails processed within the current
+   * request.
+   *
+   * @static
+   * @var int
+   */
+  static $mailsProcessed = 0;
+
+  /**
    * class constructor
    */
   function __construct() {
     parent::__construct();
   }
 
-  function create ($params){
+  public static function create($params) {
     $job = new CRM_Mailing_BAO_MailingJob();
     $job->mailing_id = $params['mailing_id'];
     $job->status = $params['status'];
@@ -112,9 +121,7 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
 
     while ($job->fetch()) {
       // still use job level lock for each child job
-      $lockName = "civimail.job.{$job->id}";
-
-      $lock = new CRM_Core_Lock($lockName);
+      $lock = Civi\Core\Container::singleton()->get('lockManager')->acquire("data.mailing.job.{$job->id}");
       if (!$lock->isAcquired()) {
         continue;
       }
@@ -317,9 +324,7 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
     // X Number of child jobs
     while ($job->fetch()) {
       // still use job level lock for each child job
-      $lockName = "civimail.job.{$job->id}";
-
-      $lock = new CRM_Core_Lock($lockName);
+      $lock = Civi\Core\Container::singleton()->get('lockManager')->acquire("data.mailing.job.{$job->id}");
       if (!$lock->isAcquired()) {
         continue;
       }
@@ -507,8 +512,7 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
     }
     $eq->query($query);
 
-    static $config = NULL;
-    static $mailsProcessed = 0;
+    $config = NULL;
 
     if ($config == NULL) {
       $config = CRM_Core_Config::singleton();
@@ -543,7 +547,7 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
 
       if (
         $config->mailerBatchLimit > 0 &&
-        $mailsProcessed >= $config->mailerBatchLimit
+        self::$mailsProcessed >= $config->mailerBatchLimit
       ) {
         if (!empty($fields)) {
           $this->deliverGroup($fields, $mailing, $mailer, $job_date, $attachments);
@@ -551,7 +555,7 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
         $eq->free();
         return FALSE;
       }
-      $mailsProcessed++;
+      self::$mailsProcessed++;
 
       $fields[] = array(
         'id' => $eq->id,
@@ -578,6 +582,18 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
     return $isDelivered;
   }
 
+  /**
+   * @param array $fields
+   *   List of intended recipients.
+   *   Each recipient is an array with keys 'hash', 'contact_id', 'email', etc.
+   * @param $mailing
+   * @param $mailer
+   * @param $job_date
+   * @param $attachments
+   *
+   * @return bool|null
+   * @throws Exception
+   */
   public function deliverGroup(&$fields, &$mailing, &$mailer, &$job_date, &$attachments) {
     static $smtpConnectionErrors = 0;
 

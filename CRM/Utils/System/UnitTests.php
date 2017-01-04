@@ -63,7 +63,24 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Drupal {
     return;
   }
 
-  function mapConfigToSSL() {
+  /**
+   * Bootstrap the phony CMS.
+   *
+   * @param string $name
+   *   Optional username for login.
+   * @param string $pass
+   *   Optional password for login.
+   *
+   * @return bool
+   */
+  function loadBootStrap($params = array(), $loadUser = TRUE, $throwError = TRUE, $realPath = NULL) {
+    return TRUE;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function mapConfigToSSL() {
     global $base_url;
     $base_url = str_replace('http://', 'https://', $base_url);
   }
@@ -172,6 +189,18 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Drupal {
    */
   public function getLoginURL($destination = '') {
     throw new Exception("Method not implemented: getLoginURL");
+  }
+
+
+  /**
+   * Load user into session.
+   *
+   * @param $user
+   *
+   * @return bool
+   */
+  public function loadUser($user) {
+    return TRUE;
   }
 
 }

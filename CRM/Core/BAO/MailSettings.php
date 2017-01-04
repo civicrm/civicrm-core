@@ -47,15 +47,17 @@ class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
    *
    * @return object  DAO with the default mail settings set
    */
-  static function &defaultDAO() {
-    static $dao = NULL;
-    if (!$dao) {
-      $dao             = new self;
+  public static function defaultDAO($reset = FALSE) {
+    static $mailSettings = array();
+    $domainID = CRM_Core_Config::domainID();
+    if (empty($mailSettings[$domainID]) || $reset) {
+      $dao = new self();
       $dao->is_default = 1;
-      $dao->domain_id  = CRM_Core_Config::domainID();
+      $dao->domain_id = $domainID;
       $dao->find(TRUE);
+      $mailSettings[$domainID] = $dao;
     }
-    return $dao;
+    return $mailSettings[$domainID];
   }
 
   /**
@@ -176,6 +178,7 @@ class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
     }
 
     $transaction->commit();
+    CRM_Core_BAO_MailSettings::defaultDAO(TRUE);
 
     return $mailSettings;
   }
