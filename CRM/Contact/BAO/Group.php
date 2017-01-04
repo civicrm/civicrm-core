@@ -1103,7 +1103,8 @@ WHERE  id IN $groupIdString
           'visibility' => $dao->visibility,
           'description' => $dao->description,
         );
-      } else {
+      }
+      else {
         $roots[$dao->id] = array(
           'id' => $dao->id,
           'title' => $dao->title,
@@ -1115,7 +1116,7 @@ WHERE  id IN $groupIdString
     $dao->free();
 
     $hierarchy = array();
-    for($i=0; $i < count($roots); $i++) {
+    for ($i = 0; $i < count($roots); $i++) {
       self::buildGroupHierarchy($hierarchy, $roots[$i], $tree, $titleOnly, $spacer, 0);
     }
     return $hierarchy;
@@ -1141,7 +1142,7 @@ WHERE  id IN $groupIdString
     }
     else {
       $hierarchy[$group['id']] = array(
-        'title' => $spaces .$group['title'],
+        'title' => $spaces . $group['title'],
         'description' => $group['description'],
         'visibility' => $group['visibility'],
       );
@@ -1152,7 +1153,7 @@ WHERE  id IN $groupIdString
     // caused the function getGroupsHierarchy with a foreach execution takes
     // around 2.2 seoonds (2,200 ms).
     // Changing to a for loop execustion takes around 0.02 seconds (20 ms).
-    for($i=0; $i < count($tree[$group['id']]); $i++) {
+    for ($i = 0; $i < count($tree[$group['id']]); $i++) {
       self::buildGroupHierarchy($hierarchy, $tree[$group['id'][$i]], $tree, $titleOnly, $spacer, $level + 1);
     }
   }
