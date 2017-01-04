@@ -1153,8 +1153,10 @@ WHERE  id IN $groupIdString
     // caused the function getGroupsHierarchy with a foreach execution takes
     // around 2.2 seoonds (2,200 ms).
     // Changing to a for loop execustion takes around 0.02 seconds (20 ms).
-    for ($i = 0; $i < count($tree[$group['id']]); $i++) {
-      self::buildGroupHierarchy($hierarchy, $tree[$group['id'][$i]], $tree, $titleOnly, $spacer, $level + 1);
+    if (isset($tree[$group['id']]) && is_array($tree[$group['id']])) {
+      for ($i = 0; $i < count($tree[$group['id']]); $i++) {
+        self::buildGroupHierarchy($hierarchy, $tree[$group['id'][$i]], $tree, $titleOnly, $spacer, $level + 1);
+      }
     }
   }
 
