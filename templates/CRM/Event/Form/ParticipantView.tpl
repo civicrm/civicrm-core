@@ -110,7 +110,9 @@
                 <td class="label">{ts}Selections{/ts}</td>
                 <td>{include file="CRM/Price/Page/LineItem.tpl" context="Event"}
                 {if $hasPayment or $parentHasPayment}
+                  {if !$invoicing}
                    <a class="action-item crm-hover-button" href='{crmURL p="civicrm/event/participant/feeselection" q="reset=1&id=`$participantId`&cid=`$contactId`&action=update"}'><span class="icon ui-icon-pencil"></span> {ts}Change Selections{/ts}</a>
+                  {/if}
                 {/if}
                 </td>
             {else}

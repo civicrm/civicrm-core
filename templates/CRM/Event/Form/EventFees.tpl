@@ -40,9 +40,11 @@
                 </tr>
                 <tr>
                   <td></td>
+                  {if !$invoicing}
                   <td>
                     <a class="action-item crm-hover-button" href='{crmURL p="civicrm/event/participant/feeselection" q="reset=1&id=`$participantId`&cid=`$contactId`&action=update"}'><span class="icon ui-icon-pencil"></span> {ts}Change Selections{/ts}</a>
                   </td>
+                  {/if}
                 </tr>
             {else}
                 <tr class="crm-event-eventfees-form-block-event_level">

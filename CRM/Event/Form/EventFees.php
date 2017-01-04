@@ -389,6 +389,7 @@ SELECT  id, html_type
       }
       if ($invoicing) {
         $form->assign('totalTaxAmount', $totalTaxAmount);
+        $form->assign('invoicing', 1);
       }
       $form->assign('lineItem', empty($lineItem) ? FALSE : $lineItem);
       $discounts = array();
