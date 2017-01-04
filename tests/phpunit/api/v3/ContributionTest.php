@@ -214,6 +214,66 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test the 'return' param works for all fields.
+   */
+  public function testGetContributionReturnFunctionality() {
+    $params = $this->_params;
+    $params['check_number'] = 'bouncer';
+    $params['payment_instrument_id'] = 'Check';
+    $params['cancel_date'] = 'yesterday';
+    $params['receipt_date'] = 'yesterday';
+    $params['thankyou_date'] = 'yesterday';
+    $params['revenue_recognition_date'] = 'yesterday';
+    $params['amount_level'] = 'Unreasonable';
+    $params['cancel_reason'] = 'You lose sucker';
+    $params['creditnote_id'] = 'sudo rm -rf';
+    $params['tax_amount'] = '1';
+    $address = $this->callAPISuccess('Address', 'create', array(
+      'street_address' => 'Knockturn Alley',
+      'contact_id' => $this->_individualId,
+      'location_type_id' => 'Home',
+    ));
+    $params['address_id'] = $address['id'];
+    $contributionPage = $this->contributionPageCreate();
+    $params['contribution_page_id'] = $contributionPage['id'];
+    $contributionRecur = $this->callAPISuccess('ContributionRecur', 'create', array(
+      'contact_id' => $this->_individualId,
+      'frequency_interval' => 1,
+      'amount' => 5,
+    ));
+    $params['contribution_recur_id'] = $contributionRecur['id'];
+
+    $params['campaign_id'] = $this->campaignCreate();
+
+    $contributionID = $this->contributionCreate($params);
+    $contribution = $this->callAPISuccessGetSingle('Contribution', array('id' => $contributionID));
+    $this->assertEquals('bouncer', $contribution['check_number']);
+    $this->assertEquals('bouncer', $contribution['contribution_check_number']);
+
+    $fields = CRM_Contribute_BAO_Contribution::fields();
+    $fieldsLockedIn = array(
+      'contribution_id', 'contribution_contact_id', 'financial_type_id', 'contribution_page_id',
+      'payment_instrument_id', 'receive_date', 'non_deductible_amount', 'total_amount',
+      'fee_amount', 'net_amount', 'trxn_id', 'invoice_id', 'currency', 'cancel_date', 'cancel_reason',
+      'receipt_date', 'thankyou_date', 'contribution_source', 'amount_level', 'contribution_recur_id',
+      'is_test', 'is_pay_later', 'contribution_status_id', 'address_id', 'check_number', 'contribution_campaign_id',
+      'creditnote_id', 'tax_amount', 'revenue_recognition_date', 'decoy',
+    );
+    $missingFields = array_diff($fieldsLockedIn, array_keys($fields));
+    // If any of the locked in fields disappear from the $fields array we need to make sure it is still
+    // covered as the test contract now guarantees them in the return array.
+    $this->assertEquals($missingFields, array(29 => 'decoy'), 'A field which was covered by the test contract has changed.');
+    foreach ($fields as $fieldName => $fieldSpec) {
+      $contribution = $this->callAPISuccessGetSingle('Contribution', array('id' => $contributionID, 'return' => $fieldName));
+      $returnField = $fieldName;
+      if ($returnField == 'contribution_contact_id') {
+        $returnField = 'contact_id';
+      }
+      $this->assertTrue((!empty($contribution[$returnField]) || $contribution[$returnField] === "0"), $returnField);
+    }
+  }
+
+  /**
    * We need to ensure previous tested behaviour still works as part of the api contract.
    */
   public function testGetContributionLegacyBehaviour() {
