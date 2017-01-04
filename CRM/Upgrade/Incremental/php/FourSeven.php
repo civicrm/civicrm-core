@@ -299,6 +299,8 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
   public function upgrade_4_7_16($rev) {
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
     $this->addTask('Add new CiviMail fields', 'addMailingTemplateType');
+    $this->addTask('CRM-19770 - Add is_star column to civicrm_activity', 'addColumn',
+      'civicrm_activity', 'is_star', "tinyint DEFAULT '0' COMMENT 'Activity marked as favorite.'");
   }
 
   /*
