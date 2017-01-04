@@ -390,15 +390,6 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
           'confirm_message' => ts('Are you sure you want delete this report? This action cannot be undone.'),
         ),
       );
-    } else  {
-      // CRM-19330 Remove the options to save or save a copy
-      unset($actions['report_instance.save']);
-      unset($actions['report_instance.copy']);
-    }
-    else {
-      // CRM-19330 Remove the options to save or save a copy.
-      unset($actions['report_instance.save']);
-      unset($actions['report_instance.copy']);
     }
     else {
       // CRM-19330 Remove the options to save or save a copy.
