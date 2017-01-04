@@ -340,6 +340,8 @@ SET    version = '$version'
    */
   public function getRevisionSequence() {
     $revList = array();
+
+    // Old style: Detect versions from CRM/Upgrade/Incremental/sql/{{VERSION}}.mysql.tpl
     $sqlDir = implode(DIRECTORY_SEPARATOR,
       array(dirname(__FILE__), 'Incremental', 'sql')
     );
@@ -354,6 +356,26 @@ SET    version = '$version'
         if (!in_array($matches[1], $revList)) {
           $revList[] = $matches[1];
         }
+      }
+    }
+
+    // New style: Detect versions from CRM/Upgrade/Incremental/any/{{VERSION}/}
+    $incDir = implode(DIRECTORY_SEPARATOR,
+      array(dirname(__FILE__), 'Incremental', 'any')
+    );
+    $incDirItems = scandir($incDir);
+    $incDirPattern = '/^((\d{1,2}\.\d{1,2})\.(\d{1,2}\.)?(\d{1,2}|\w{4,7}))$/i';
+    foreach ($incDirItems as $incDirItem) {
+      if (!is_dir($incDir . DIRECTORY_SEPARATOR . $incDirItem) || $incDirItem{0} === '.') {
+        continue;
+      }
+      if (preg_match($incDirPattern, $incDirItem, $matches)) {
+        if (!in_array($matches[1], $revList)) {
+          $revList[] = $matches[1];
+        }
+      }
+      else {
+        CRM_Core_Error::fatal("Found subdirectory with malformed version name ($incDirItem).");
       }
     }
 
@@ -420,12 +442,10 @@ SET    version = '$version'
     if (file_exists($tplFile)) {
       $this->processLocales($tplFile, $rev);
     }
-    else {
-      if (!file_exists($sqlFile)) {
-        CRM_Core_Error::fatal("sqlfile - $rev.mysql not found.");
-      }
+    elseif (file_exists($sqlFile)) {
       $this->source($sqlFile);
     }
+    // else: Version probably uses newer file structure.
   }
 
   /**
@@ -574,6 +594,8 @@ SET    version = '$version'
         );
         $queue->createItem($beginTask);
 
+        // Traditional handler for files like CRM/Upgrade/Incremental/php/FourFour.php
+        // and CRM/Upgrade/Incremental/sql/*.mysql.tpl.
         $task = new CRM_Queue_Task(
         // callback
           array('CRM_Upgrade_Form', 'doIncrementalUpgradeStep'),
@@ -582,6 +604,25 @@ SET    version = '$version'
           "Upgrade DB to $rev"
         );
         $queue->createItem($task);
+
+        // Newer handler for files like CRM/Upgrade/Incremental/any/{VERSION}/{*.php,*.mysql.tpl}
+        $incDir = implode(DIRECTORY_SEPARATOR,
+          array(dirname(__FILE__), 'Incremental', 'any', $rev)
+        );
+        if (is_dir($incDir)) {
+          $taskDir = new CRM_Queue_TaskDir($incDir);
+          $taskDir
+            ->addCallback('/\.task\.php$/', array('CRM_Upgrade_Form', 'doPhpFileStep'))
+            ->addCallback('/\.mysql\.tpl$/', array('CRM_Upgrade_Form', 'doSqlTplFileStep'))
+            ->setTitle("Upgrade DB to $rev: {file.name}")
+            ->setData(array(
+              'rev' => $rev,
+              'currentVer' => $currentVer,
+              'latestVer' => $latestVer,
+              'postUpgradeMessageFile' => $postUpgradeMessageFile,
+            ))
+            ->fill($queue);
+        }
 
         $task = new CRM_Queue_Task(
         // callback
@@ -672,6 +713,51 @@ SET    version = '$version'
 
     return TRUE;
   }
+
+  /**
+   * Handle any file matching "CRM/Upgrade/Incremental/any/*.task.php".
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   * @param string $file
+   * @param array $data
+   *   Array('rev'=>, 'latestVer'=>, ...).
+   * @return bool
+   * @throws \Exception
+   */
+  public static function doPhpFileStep(CRM_Queue_TaskContext $ctx, $file, $data) {
+    $stack = CRM_Utils_GlobalStack::singleton();
+    $stack->push(array(
+      '_TASK' => array('ctx' => $ctx, 'file' => $file) + $data,
+    ));
+
+    try {
+      include $file;
+    }
+    catch (Exception $e) {
+      $stack->pop();
+      throw $e;
+    }
+
+    $stack->pop();
+    return TRUE;
+  }
+
+  /**
+   * Handle any file matching "CRM/Upgrade/Incremental/any/*.mysql.tpl".
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   * @param string $file
+   * @param array $data
+   *   Array('rev'=>, 'latestVer'=>, ...).
+   * @return bool
+   * @throws \Exception
+   */
+  public static function doSqlTplFileStep(CRM_Queue_TaskContext $ctx, $file, $data) {
+    $upgrade = new CRM_Upgrade_Form();
+    $upgrade->processLocales($file, $data['rev']);
+    return TRUE;
+  }
+
 
   /**
    * Perform an incremental version update.
