@@ -1920,6 +1920,7 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
       $submittedFields = implode(', ', $submittedFieldId);
       $submittedFieldValues = implode(', ', $submittedFieldValueIds);
     }
+    $financialItemsArray = array();
     if (!empty($submittedFields) && !empty($submittedFieldValues)) {
       $updateLineItem = "UPDATE civicrm_line_item li
 INNER JOIN civicrm_financial_item fi
@@ -1945,7 +1946,6 @@ GROUP BY li.entity_table, li.entity_id, price_field_value_id, fi.id
       $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
       $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
       $updateFinancialItemInfoValues = array();
-      $financialItemsArray = array();
       while ($updateFinancialItemInfoDAO->fetch()) {
         $updateFinancialItemInfoValues = (array) $updateFinancialItemInfoDAO;
         $updateFinancialItemInfoValues['transaction_date'] = date('YmdHis');
@@ -2093,6 +2093,7 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
 FROM civicrm_line_item
 WHERE (entity_table = 'civicrm_participant' AND entity_id = {$participantId} AND qty > 0)";
     $getUpdatedLineItemsDAO = CRM_Core_DAO::executeQuery($getUpdatedLineItems);
+    $line = array();
     while ($getUpdatedLineItemsDAO->fetch()) {
       $line[$getUpdatedLineItemsDAO->price_field_value_id] = $getUpdatedLineItemsDAO->label . ' - ' . (float) $getUpdatedLineItemsDAO->qty;
     }

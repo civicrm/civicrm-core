@@ -49,6 +49,7 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
         'civicrm_line_item',
         'civicrm_financial_item',
         'civicrm_financial_trxn',
+        'civicrm_price_set',
         'civicrm_entity_financial_trxn',
       ),
       TRUE
@@ -118,12 +119,22 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
     $priceSet = CRM_Utils_Array::value($priceSetId, $priceSet);
     $feeBlock = CRM_Utils_Array::value('fields', $priceSet);
     $params['price_2'] = $feeTotal;
+    $tempParams = $params;
+    $templineItems = $lineItem;
     CRM_Price_BAO_PriceSet::processAmount($feeBlock,
       $params, $lineItem
     );
     $lineItemVal[$priceSetId] = $lineItem;
     CRM_Price_BAO_LineItem::processPriceSet($participant['id'], $lineItemVal, $contribution, 'civicrm_participant');
-    return array($participant, $contribution);
+
+    return array(
+      'participant' => $participant,
+      'contribution' => $contribution,
+      'lineItem' => $templineItems,
+      'params' => $tempParams,
+      'feeBlock' => $feeBlock,
+      'priceSetId' => $priceSetId,
+    );
   }
 
   /**
@@ -133,7 +144,8 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
     $feeAmt = 100;
     $amtPaid = 60;
     $balance = $feeAmt - $amtPaid;
-    list($participant, $contribution) = $this->addParticipantWithPayment($feeAmt, $amtPaid);
+    $result = $this->addParticipantWithPayment($feeAmt, $amtPaid);
+    extract($result);
     $paymentInfo = CRM_Contribute_BAO_Contribution::getPaymentInfo($participant['id'], 'event');
 
     // amount checking
@@ -144,6 +156,44 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
     // status checking
     $this->assertEquals($participant['participant_status_id'], 14, 'Status record is not proper for participant');
     $this->assertEquals($contribution->contribution_status_id, 8, 'Status record is not proper for contribution');
+  }
+
+  /**
+   * Test owed/refund info is listed on view payments.
+   */
+  public function testTransactionInfo() {
+    $feeAmt = 100;
+    $amtPaid = 80;
+    $result = $this->addParticipantWithPayment($feeAmt, $amtPaid);
+    extract($result);
+
+    //Complete the partial payment.
+    $submittedValues = array(
+      'total_amount' => 20,
+      'payment_instrument_id' => 3,
+    );
+    CRM_Contribute_BAO_Contribution::recordAdditionalPayment($contribution->id, $submittedValues, 'owed', $participant['id']);
+
+    //Change selection to a lower amount.
+    $params['price_2'] = 50;
+    CRM_Event_BAO_Participant::changeFeeSelections($params, $participant['id'], $contribution->id, $feeBlock, $lineItem, $feeAmt, $priceSetId);
+
+    //Record a refund of the remaining amount.
+    $submittedValues['total_amount'] = 50;
+    CRM_Contribute_BAO_Contribution::recordAdditionalPayment($contribution->id, $submittedValues, 'refund', $participant['id']);
+    $paymentInfo = CRM_Contribute_BAO_Contribution::getPaymentInfo($participant['id'], 'event', TRUE);
+    $transaction = $paymentInfo['transaction'];
+
+    //Assert all transaction(owed and refund) are listed on view payments.
+    $this->assertEquals(count($transaction), 3, 'Transaction Details is not proper');
+    $this->assertEquals($transaction[0]['total_amount'], 80.00);
+    $this->assertEquals($transaction[0]['status'], 'Completed');
+
+    $this->assertEquals($transaction[1]['total_amount'], 20.00);
+    $this->assertEquals($transaction[1]['status'], 'Completed');
+
+    $this->assertEquals($transaction[2]['total_amount'], -50.00);
+    $this->assertEquals($transaction[2]['status'], 'Refunded');
   }
 
 }
