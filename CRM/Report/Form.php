@@ -577,6 +577,11 @@ class CRM_Report_Form extends CRM_Core_Form {
       else {
         $this->_formValues = NULL;
       }
+      // CRM-19330 Unprivileged users don't get the task in the form values,
+      // but they appear in the post
+      if (!$this->_formValues['task']) {
+        $this->_formValues['task'] = filter_input(INPUT_POST, 'task');
+      }
 
       $this->setOutputMode();
 
