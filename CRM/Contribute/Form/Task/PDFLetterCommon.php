@@ -10,9 +10,12 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
    * Process the form after the input has been submitted and validated.
    *
    * @param CRM_Contribute_Form_Task $form
+   * @param array $formValues
    */
-  public static function postProcess(&$form) {
-    $formValues = $form->controller->exportValues($form->getName());
+  public static function postProcess(&$form, $formValues = NULL) {
+    if (empty($formValues)) {
+      $formValues = $form->controller->exportValues($form->getName());
+    }
     list($formValues, $categories, $html_message, $messageToken, $returnProperties) = self::processMessageTemplate($formValues);
     $isPDF = FALSE;
     $emailParams = array();
@@ -107,6 +110,10 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
           $thanks++;
         }
       }
+    }
+
+    if (!empty($formValues['is_unit_test'])) {
+      return $html;
     }
     //createActivities requires both $form->_contactIds and $contacts -
     //@todo - figure out why

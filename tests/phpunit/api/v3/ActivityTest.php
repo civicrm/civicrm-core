@@ -680,13 +680,12 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
    * Test that activity.get api works when filtering on subject.
    */
   public function testActivityGetSubjectFilter() {
-    $subject = 'test activity ' . __FUNCTION__;
+    $subject = 'test activity ' . __FUNCTION__ . mt_rand();
     $params = $this->_params;
     $params['subject'] = $subject;
     $activity = $this->callAPISuccess('Activity', 'Create', $params);
     $activityget = $this->callAPISuccess('activity', 'getsingle', array(
       'subject' => $subject,
-      'id' => $activity['id'],
     ));
     $this->assertEquals($activityget['subject'], $subject);
   }
@@ -695,15 +694,27 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
    * Test that activity.get api works when filtering on details.
    */
   public function testActivityGetDetailsFilter() {
-    $details = 'test activity ' . __FUNCTION__;
+    $details = 'test activity ' . __FUNCTION__ . mt_rand();
     $params = $this->_params;
     $params['details'] = $details;
     $activity = $this->callAPISuccess('Activity', 'Create', $params);
     $activityget = $this->callAPISuccess('activity', 'getsingle', array(
       'details' => $details,
-      'id' => $activity['id'],
     ));
     $this->assertEquals($activityget['details'], $details);
+  }
+
+  /**
+   * Test that activity.get api works when filtering on tag.
+   */
+  public function testActivityGetTagFilter() {
+    $tag = $this->callAPISuccess('Tag', 'create', array('name' => mt_rand(), 'used_for' => 'Activities'));
+    $activity = $this->callAPISuccess('Activity', 'Create', $this->_params);
+    $this->callAPISuccess('EntityTag', 'create', array('entity_table' => 'civicrm_activity', 'tag_id' => $tag['id'], 'entity_id' => $activity['id']));
+    $activityget = $this->callAPISuccess('activity', 'getsingle', array(
+      'tag_id' => $tag['id'],
+    ));
+    $this->assertEquals($activityget['id'], $activity['id']);
   }
 
   /**

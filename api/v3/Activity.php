@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -224,6 +224,54 @@ function _civicrm_api3_activity_create_spec(&$params) {
 }
 
 /**
+ * Specify Metadata for get.
+ *
+ * @param array $params
+ */
+function _civicrm_api3_activity_get_spec(&$params) {
+  $params['tag_id'] = array(
+    'name' => 'tag_id',
+    'title' => 'Tags',
+    'description' => 'Find activities with specified tags.',
+    'type' => 1,
+    'FKClassName' => 'CRM_Core_DAO_Tag',
+    'FKApiName' => 'Tag',
+  );
+  $params['case_id'] = array(
+    'name' => 'case_id',
+    'title' => 'Cases',
+    'description' => 'Find activities within specified cases.',
+    'type' => 1,
+    'FKClassName' => 'CRM_Case_DAO_Case',
+    'FKApiName' => 'Case',
+  );
+  $params['target_contact_id'] = array(
+    'name' => 'target_contact_id',
+    'title' => 'Target Contact ID',
+    'description' => 'Find activities with specified target contact.',
+    'type' => 1,
+    'FKClassName' => 'CRM_Contact_DAO_Contact',
+    'FKApiName' => 'Contact',
+  );
+  $params['source_contact_id'] = array(
+    'name' => 'source_contact_id',
+    'title' => 'Source Contact ID',
+    'description' => 'Find activities with specified source contact.',
+    'type' => 1,
+    'FKClassName' => 'CRM_Contact_DAO_Contact',
+    'FKApiName' => 'Contact',
+  );
+  $params['assignee_contact_id'] = array(
+    'name' => 'assignee_contact_id',
+    'title' => 'Assignee Contact ID',
+    'description' => 'Find activities with specified assignee contact.',
+    'type' => 1,
+    'FKClassName' => 'CRM_Contact_DAO_Contact',
+    'FKApiName' => 'Contact',
+  );
+}
+
+/**
  * Gets a CiviCRM activity according to parameters.
  *
  * @param array $params
@@ -266,6 +314,7 @@ function civicrm_api3_activity_get($params) {
   }
   else {
     $sql = CRM_Utils_SQL_Select::fragment();
+    // Support search by activity_contact
     $options = civicrm_api3('ActivityContact', 'getoptions', array('field' => 'record_type_id'));
     $options = $options['values'];
     $activityContactOptions = array(
@@ -275,17 +324,31 @@ function civicrm_api3_activity_get($params) {
     );
     foreach ($activityContactOptions as $activityContactName => $activityContactValue) {
       if (!empty($params[$activityContactName])) {
-        // If the intent is to have multiple joins -- one for each relation -- then you would
-        // need different table aliases. Consider replacing 'ac' and passing in a '!alias' param,
-        // with a different value for each relation.
-        $sql->join(
-          'activity_' . $activityContactName,
-          'LEFT JOIN civicrm_activity_contact ac ON a.id = ac.activity_id AND ac.record_type_id = #typeId',
-          array('typeId' => $activityContactValue)
+        if (!is_array($params[$activityContactName])) {
+          $params[$activityContactName] = array('=' => $params[$activityContactName]);
+        }
+        $clause = \CRM_Core_DAO::createSQLFilter('contact_id', $params[$activityContactName]);
+        $sql->where('a.id IN (SELECT activity_id FROM civicrm_activity_contact WHERE record_type_id = #typeId AND !clause)',
+          array('#typeId' => $activityContactValue, '!clause' => $clause)
         );
-        $sql->where('ac.contact_id IN (#cid)', array(
-          'cid' => $params[$activityContactName],
-        ));
+      }
+    }
+    if (!empty($params['tag_id'])) {
+      if (!is_array($params['tag_id'])) {
+        $params['tag_id'] = array('=' => $params['tag_id']);
+      }
+      $clause = \CRM_Core_DAO::createSQLFilter('tag_id', $params['tag_id']);
+      if ($clause) {
+        $sql->where('a.id IN (SELECT entity_id FROM civicrm_entity_tag WHERE entity_table = "civicrm_activity" AND !clause)', array('!clause' => $clause));
+      }
+    }
+    if (!empty($params['case_id'])) {
+      if (!is_array($params['case_id'])) {
+        $params['case_id'] = array('=' => $params['case_id']);
+      }
+      $clause = \CRM_Core_DAO::createSQLFilter('case_id', $params['case_id']);
+      if ($clause) {
+        $sql->where('a.id IN (SELECT activity_id FROM civicrm_case_activity WHERE !clause)', array('!clause' => $clause));
       }
     }
     $activities = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, FALSE, 'Activity', $sql);

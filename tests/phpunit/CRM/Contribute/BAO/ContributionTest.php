@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -1003,6 +1003,70 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       $itemAmount = CRM_Contribute_BAO_Contribution::calculateFinancialItemAmount($params['params'], $params['amountParams'], $params['context']);
       $this->assertEquals($itemAmount, $params['expectedItemAmount'], 'Invalid Financial Item amount.');
     }
+  }
+
+  /**
+   * Test calculateNetAmount.
+   */
+  public function testcalculateNetAmount() {
+    $testParams = array(
+      array(
+        'net_amount' => 100,
+        'tax_amount' => 10,
+        'expectedNetAmount' => 90,
+      ),
+      array(
+        'net_amount' => 200,
+        'tax_amount' => 0,
+        'expectedNetAmount' => 200,
+      ),
+      array(
+        'net_amount' => 300,
+        'tax_amount' => NULL,
+        'expectedNetAmount' => 300,
+      ),
+      array(
+        'net_amount' => -100,
+        'tax_amount' => 20,
+        'expectedNetAmount' => -120,
+      ),
+    );
+
+    foreach ($testParams as $params) {
+      $netAmount = CRM_Contribute_BAO_Contribution::calculateNetAmount($params['net_amount'], $params['tax_amount']);
+      $this->assertEquals($netAmount, $params['expectedNetAmount'], 'Invalid Net amount.');
+    }
+  }
+
+  /**
+   * Test recording of amount with comma separator.
+   */
+  public function testCommaSeparatorAmount() {
+    $contactId = $this->individualCreate();
+
+    $params = array(
+      'contact_id' => $contactId,
+      'currency' => 'USD',
+      'financial_type_id' => 1,
+      'contribution_status_id' => 8,
+      'payment_instrument_id' => 1,
+      'receive_date' => '20080522000000',
+      'receipt_date' => '20080522000000',
+      'total_amount' => '20000.00',
+      'partial_payment_total' => '20,000.00',
+      'partial_amount_pay' => '8,000.00',
+    );
+
+    $contribution = CRM_Contribute_BAO_Contribution::create($params);
+    $lastFinancialTrxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contribution->id, 'DESC');
+    $financialTrxn = $this->callAPISuccessGetSingle(
+      'FinancialTrxn',
+      array(
+        'id' => $lastFinancialTrxnId['financialTrxnId'],
+        'return' => array('total_amount'),
+      )
+    );
+    $this->assertEquals($financialTrxn['total_amount'], 8000, 'Invalid Tax amount.');
   }
 
 }

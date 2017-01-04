@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -378,7 +378,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
 
     if (isset($defaults['net_amount'])) {
-      $defaults['net_amount'] = CRM_Utils_Money::format($defaults['net_amount'], NULL, '%a');
+      $defaults['net_amount'] = CRM_Contribute_BAO_Contribution::calculateNetAmount($defaults['net_amount'], CRM_Utils_Array::value('tax_amount', $defaults));
     }
 
     if ($this->_contributionType) {
@@ -970,16 +970,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     if (!empty($fields['total_amount']) && (!empty($fields['net_amount']) || !empty($fields['fee_amount']))) {
       $sum = CRM_Utils_Rule::cleanMoney($fields['net_amount']) + CRM_Utils_Rule::cleanMoney($fields['fee_amount']);
-      // For taxable contribution we need to deduct taxable amount from
-      // (net amount + fee amount) before comparing it with total amount
-      if (!empty($self->_values['tax_amount'])) {
-        $componentDetails = CRM_Contribute_BAO_Contribution::getComponentDetails($self->_id);
-        if (!(CRM_Utils_Array::value('membership', $componentDetails) ||
-            CRM_Utils_Array::value('participant', $componentDetails))
-        ) {
-          $sum = CRM_Utils_Money::format($sum - $self->_values['tax_amount'], NULL, '%a');
-        }
-      }
       if (CRM_Utils_Rule::cleanMoney($fields['total_amount']) != $sum) {
         $errors['total_amount'] = ts('The sum of fee amount and net amount must be equal to total amount');
       }

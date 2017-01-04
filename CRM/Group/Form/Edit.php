@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -379,17 +379,6 @@ WHERE  title = %1
       }
 
       $params['is_reserved'] = CRM_Utils_Array::value('is_reserved', $params, FALSE);
-
-      $groupTypeIds = array();
-      $groupType = CRM_Utils_Array::value('group_type', $params);
-      if (is_array($groupType)) {
-        foreach ($groupType as $type => $selected) {
-          if ($selected) {
-            $groupTypeIds[] = $type;
-          }
-        }
-      }
-      $params['group_type'] = $groupTypeIds;
 
       $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
         $this->_id,

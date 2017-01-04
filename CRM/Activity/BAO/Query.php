@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Activity_BAO_Query {
 
@@ -431,7 +431,14 @@ class CRM_Activity_BAO_Query {
     $form->addSelect('status_id',
       array('entity' => 'activity', 'multiple' => 'multiple', 'option_url' => NULL, 'placeholder' => ts('- any -'))
     );
-    $form->setDefaults(array('status_id' => array($activityStatus['Completed'], $activityStatus['Scheduled'])));
+    $ssID = $form->get('ssID');
+    $status = array($activityStatus['Completed'], $activityStatus['Scheduled']);
+    //If status is saved in smart group.
+    if (!empty($ssID) && !empty($form->_formValues['activity_status_id'])) {
+      $status = $form->_formValues['activity_status_id'];
+    }
+    $form->setDefaults(array('status_id' => $status));
+
     $form->addElement('text', 'activity_text', ts('Activity Text'), CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'sort_name'));
 
     $form->addRadio('activity_option', '', CRM_Core_SelectValues::activityTextOptions());
