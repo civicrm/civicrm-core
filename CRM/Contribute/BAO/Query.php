@@ -130,12 +130,6 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
       $query->_tables['contribution_payment_instrument'] = 1;
     }
 
-    if (!empty($query->_returnProperties['contribution_campaign_id'])) {
-      $query->_select['contribution_campaign_id'] = 'civicrm_contribution.campaign_id as contribution_campaign_id';
-      $query->_element['contribution_campaign_id'] = 1;
-      $query->_tables['civicrm_contribution'] = 1;
-    }
-
     if (!empty($query->_returnProperties['contribution_campaign_title'])) {
       $query->_select['contribution_campaign_title'] = "civicrm_campaign.title as contribution_campaign_title";
       $query->_element['contribution_campaign_title'] = $query->_tables['civicrm_campaign'] = 1;
