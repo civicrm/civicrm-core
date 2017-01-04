@@ -1105,7 +1105,7 @@ WHERE  id IN $groupIdString
         );
       }
       else {
-        $roots[$dao->id] = array(
+        $roots[] = array(
           'id' => $dao->id,
           'title' => $dao->title,
           'visibility' => $dao->visibility,
