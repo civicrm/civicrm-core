@@ -592,7 +592,7 @@ AND ( expire_on IS NULL OR expire_on >= {$currentTime} )
         }
         $setTree[$setID]['fields'][$fieldID][$field] = $dao->$field;
       }
-      $setTree[$setID]['fields'][$fieldID]['options'] = CRM_Price_BAO_PriceField::getOptions($fieldID, FALSE, FALSE, $isDefaultContributionPriceSet);
+      $setTree[$setID]['fields'][$fieldID]['options'] = CRM_Price_BAO_PriceField::getOptions($fieldID, FALSE, FALSE, $isDefaultContributionPriceSet, $dao->html_type);
     }
 
     // also get the pre and post help from this price set
@@ -1673,7 +1673,7 @@ WHERE       ps.id = %1
       $taxAmount = $field['options'][$optionValueId]['tax_amount'];
     }
     $taxRate = $field['options'][$optionValueId]['tax_rate'];
-    $lineItem[$optionValueId]['tax_amount'] = $taxAmount;
+    $lineItem[$optionValueId]['tax_amount'] = round($taxAmount, 2);
     $lineItem[$optionValueId]['tax_rate'] = $taxRate;
     $totalTax += $taxAmount;
     return $lineItem;
