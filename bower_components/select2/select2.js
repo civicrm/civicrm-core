@@ -2441,9 +2441,16 @@ the specific language governing permissions and limitations under the Apache Lic
             // hide the search box if this is the first we got the results and there are enough of them for search
 
             if (initial === true) {
-                var min = this.opts.minimumResultsForSearch;
+                var resultCount = 0, min = this.opts.minimumResultsForSearch;
+                if ($(this.opts.element).is('select')) {
+                    resultCount = $('option', this.opts.element).length;
+                }
+		else {
+                    resultCount = countResults(data.results);
+                }
+
                 if (min >= 0) {
-                    this.showSearch(countResults(data.results) >= min);
+                    this.showSearch(resultCount >= min);
                 }
             }
         },

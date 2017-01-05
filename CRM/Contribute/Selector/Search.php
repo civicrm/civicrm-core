@@ -26,17 +26,21 @@
  */
 
 /**
+ *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2016
  */
 
 /**
- * Class to render contribution search results.
+ * This class is used to retrieve and display a range of
+ * contacts that match the given criteria (specifically for
+ * results of advanced search options.
+ *
  */
 class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements CRM_Core_Selector_API {
 
   /**
-   * Array of action links.
+   * This defines two actions- View and Edit.
    *
    * @var array
    */
@@ -508,11 +512,6 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
           array(
             'name' => ts('Type'),
             'sort' => 'financial_type',
-            'direction' => CRM_Utils_Sort::DONTCARE,
-          ),
-          array(
-            'name' =>'',
-            'sort' => 'contribution_recur_id',
             'direction' => CRM_Utils_Sort::DONTCARE,
           ),
           array(

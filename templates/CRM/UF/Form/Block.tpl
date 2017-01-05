@@ -108,11 +108,7 @@
         {else}
           <div class="crm-section editrow_{$n}-section form-item" id="editrow-{$n}">
             <div class="label">
-              {if $prefix}
-                {$form.$prefix.$n.label}
-              {else}
-                {$form.$n.label}
-              {/if}
+              {if $prefix}{$form.$prefix.$n.label}{else}{$form.$n.label}{/if}
             </div>
             <div class="content">
               {if $n|substr:0:3 eq 'im-'}
@@ -139,12 +135,6 @@
                 {if $prefix}{$form.$prefix.$n.html}{else}{$form.$n.html}{/if}
                 {if $form.$phone_ext_field.html}
                   &nbsp;{$form.$phone_ext_field.html}
-                {/if}
-              {elseif $field.html_type eq 'File' && ($viewOnlyFileValues OR $viewOnlyPrefixFileValues)}
-                {if $prefix}
-                  {$viewOnlyPrefixFileValues.$prefix.$n}
-                {else}
-                  {$viewOnlyFileValues.$n}
                 {/if}
               {else}
                 {if $prefix}

@@ -26,45 +26,59 @@
  */
 
 /**
+ * This api exposes CiviCRM states/provinces
  *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
- * $Id$
- *
+ * @package CiviCRM_APIv3
  */
 
 /**
- * This class is used by the Search functionality.
+ * Add a state/province.
  *
- *  - the search controller is used for building/processing multiform
- *    searches.
+ * @param array $params
+ *   Array per getfields metadata.
  *
- * Typically the first form will display the search criteria and its results
- *
- * The second form is used to process search results with the associated actions
- *
+ * @return array
+ *   API result array
+ * @throws \API_Exception
  */
-class CRM_Member_Controller_Search extends CRM_Core_Controller {
+function civicrm_api3_state_province_create($params) {
+  return _civicrm_api3_basic_create(_civicrm_api3_get_DAO(__FUNCTION__), $params);
+}
 
-  /**
-   * Class constructor.
-   *
-   * @param string $title
-   * @param bool|int $action
-   * @param bool $modal
-   */
-  public function __construct($title = NULL, $action = CRM_Core_Action::NONE, $modal = TRUE) {
+/**
+ * Adjust Metadata for Create action.
+ *
+ * The metadata is used for setting defaults, documentation & validation.
+ *
+ * @param array $params
+ *   Array of parameters determined by getfields.
+ */
+function _civicrm_api3_state_province_create_spec(&$params) {
+  $params['name']['api.required'] = 1;
+  $params['country_id']['api.required'] = 1;
+  $params['abbreviation']['api.required'] = 1;
+}
 
-    parent::__construct($title, $modal);
+/**
+ * Deletes an existing state/province.
+ *
+ * @param array $params
+ *
+ * @return array
+ */
+function civicrm_api3_state_province_delete($params) {
+  return _civicrm_api3_basic_delete(_civicrm_api3_get_DAO(__FUNCTION__), $params);
+}
 
-    $this->_stateMachine = new CRM_Member_StateMachine_Search($this, $action);
-
-    // create and instantiate the pages
-    $this->addPages($this->_stateMachine, $action);
-
-    // add all the actions
-    $config = CRM_Core_Config::singleton();
-    $this->addActions();
-  }
-
+/**
+ * Retrieve one or more states/provinces.
+ *
+ * @param array $params
+ *   Array per getfields metadata.
+ *
+ * @return array
+ *   api result array
+ */
+function civicrm_api3_state_province_get($params) {
+  return _civicrm_api3_basic_get(_civicrm_api3_get_DAO(__FUNCTION__), $params);
 }

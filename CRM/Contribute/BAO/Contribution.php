@@ -1916,6 +1916,9 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
             //update related Memberships.
             CRM_Member_BAO_Membership::updateRelatedMemberships($membership->id, $formattedParams);
 
+            //CRM-19678: No Membership Renewal Activity is created when a Pay Later is set to Completed
+            CRM_Activity_BAO_Activity::addActivity($membership, 'Membership Renewal', $membership->contact_id);
+
             $updateResult['membership_end_date'] = CRM_Utils_Date::customFormat($dates['end_date'],
               '%B %E%f, %Y'
             );
@@ -3188,7 +3191,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         'payment_instrument_id' => CRM_Utils_Array::value('payment_instrument_id', $params, $params['contribution']->payment_instrument_id),
         'check_number' => CRM_Utils_Array::value('check_number', $params),
       );
-      if ($contributionStatus == 'Refunded' || $contributionStatus == 'Chargeback') {
+      if ($contributionStatus == 'Refunded' || $contributionStatus == 'Chargeback' || $contributionStatus == 'Cancelled') {
         $trxnParams['trxn_date'] = !empty($params['contribution']->cancel_date) ? $params['contribution']->cancel_date : date('YmdHis');
         if (isset($params['refund_trxn_id'])) {
           // CRM-17751 allow a separate trxn_id for the refund to be passed in via api & form.
@@ -3627,21 +3630,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       }
     }
     CRM_Core_BAO_FinancialTrxn::createDeferredTrxn(CRM_Utils_Array::value('line_item', $params), $params['contribution'], TRUE, $context);
-  }
-
-
-  /**
-   * Is this contribution status a reversal.
-   *
-   * If so we would expect to record a negative value in the financial_trxn table.
-   *
-   * @param int $status_id
-   *
-   * @return bool
-   */
-  public static function isContributionStatusNegative($status_id) {
-    $reversalStatuses = array('Cancelled', 'Chargeback', 'Refunded');
-    return in_array(CRM_Contribute_PseudoConstant::contributionStatus($status_id, 'name'), $reversalStatuses);
   }
 
   /**
@@ -4612,6 +4600,8 @@ LIMIT 1;";
             $var = TRUE;
             CRM_Member_BAO_Membership::createRelatedMemberships($var, $var, TRUE);
             civicrm_api3('Membership', 'create', $membershipParams);
+            //CRM-19600: Add Membership Renewal activity
+            CRM_Activity_BAO_Activity::addActivity($membership, 'Membership Renewal', $membership->contact_id);
           }
         }
       }

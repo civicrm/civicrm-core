@@ -11,11 +11,11 @@
     "jquery": ">= 1.7.1"
   },
   "homepage": "https://github.com/colemanw/select2",
-  "_release": "8bcec8afd1",
+  "_release": "90d4b9ee38",
   "_resolution": {
     "type": "branch",
     "branch": "stable/3.5",
-    "commit": "8bcec8afd14a35807ae8582a1d9c45280370376a"
+    "commit": "90d4b9ee388b33e17c9f58a2866a4765f00b9a55"
   },
   "_source": "https://github.com/colemanw/select2.git",
   "_target": "stable/3.5",

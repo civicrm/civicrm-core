@@ -395,8 +395,7 @@ SELECT rec.id                   as recur_id,
       FROM civicrm_contribution_recur rec
 LEFT JOIN civicrm_contribution       con ON ( con.contribution_recur_id = rec.id )
 LEFT  JOIN civicrm_membership_payment mp  ON ( mp.contribution_id = con.id )
-     WHERE rec.id = %1
-  GROUP BY rec.id";
+     WHERE rec.id = %1";
     }
     elseif ($entity == 'contribution') {
       $sql .= "

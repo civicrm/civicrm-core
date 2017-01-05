@@ -3656,7 +3656,8 @@ CREATE TABLE `civicrm_price_set` (
      `extends` varchar(255) NOT NULL   COMMENT 'What components are using this price set?',
      `financial_type_id` int unsigned   DEFAULT NULL COMMENT 'FK to Financial Type(for membership price sets only).',
      `is_quick_config` tinyint   DEFAULT 0 COMMENT 'Is set if edited on Contribution or Event Page rather than through Manage Price Sets',
-     `is_reserved` tinyint   DEFAULT 0 COMMENT 'Is this a predefined system price set  (i.e. it can not be deleted, edited)?' 
+     `is_reserved` tinyint   DEFAULT 0 COMMENT 'Is this a predefined system price set  (i.e. it can not be deleted, edited)?',
+     `min_amount` int unsigned   DEFAULT 0 COMMENT 'Minimum Amount required for this set.' 
 ,
     PRIMARY KEY ( `id` )
  

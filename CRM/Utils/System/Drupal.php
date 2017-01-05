@@ -162,8 +162,8 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
    * @inheritDoc
    */
   public function getLoginURL($destination = '') {
-    $query = $destination ? array('destination' => $destination) : array();
-    return url('user', array('query' => $query), TRUE);
+    $query = $destination ? array('destination' => $destination) : NULL;
+    return CRM_Utils_System::url('user', $query, TRUE);
   }
 
   /**

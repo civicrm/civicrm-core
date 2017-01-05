@@ -237,6 +237,20 @@ if (!CRM.vars) CRM.vars = {};
     }
   };
 
+  var scriptsLoaded = {};
+  CRM.loadScript = function(url) {
+    if (!scriptsLoaded[url]) {
+      var script = document.createElement('script');
+      scriptsLoaded[url] = $.Deferred();
+      script.onload = function () {
+        scriptsLoaded[url].resolve();
+      };
+      script.src = url;
+      document.getElementsByTagName("head")[0].appendChild(script);
+    }
+    return scriptsLoaded[url];
+  };
+
   /**
    * Populate a select list, overwriting the existing options except for the placeholder.
    * @param select jquery selector - 1 or more select elements
@@ -443,6 +457,7 @@ if (!CRM.vars) CRM.vars = {};
         // Use select2 ajax helper instead of CRM.api3 because it provides more value
         ajax: {
           url: CRM.url('civicrm/ajax/rest'),
+          quietMillis: 300,
           data: function (input, page_num) {
             var params = getEntityRefApiParams($el);
             params.input = input;
