@@ -1914,7 +1914,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $form->controller = new CRM_Contribute_Controller_Contribution();
     $params['invoiceID'] = md5(uniqid(rand(), TRUE));
     $paramsProcessedForForm = $form->_params = self::getFormParams($params['id'], $params);
-    $form->_amount = $params['amount'];
+    $form->_amount = CRM_Utils_Array::value('amount', $params, 0);
     // hack these in for test support.
     $form->_fields['billing_first_name'] = 1;
     $form->_fields['billing_last_name'] = 1;
@@ -1951,7 +1951,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     }
 
     $priceFields = $priceFields[$priceSetID]['fields'];
-    CRM_Price_BAO_PriceSet::processAmount($priceFields, $paramsProcessedForForm, $lineItems, 'civicrm_contribution');
+    CRM_Price_BAO_PriceSet::processAmount($priceFields, $form->_params, $lineItems, 'civicrm_contribution');
     $form->_lineItem = array($priceSetID => $lineItems);
     $membershipPriceFieldIDs = array();
     foreach ((array) $lineItems as $lineItem) {
