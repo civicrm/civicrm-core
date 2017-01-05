@@ -1947,6 +1947,31 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
+   * Modify the CiviCRM container - add new services, parameters, extensions, etc.
+   *
+   * @code
+   * use Symfony\Component\Config\Resource\FileResource;
+   * use Symfony\Component\DependencyInjection\Definition;
+   *
+   * function mymodule_civicrm_container($container) {
+   *   $container->addResource(new FileResource(__FILE__));
+   *   $container->setDefinition('mysvc', new Definition('My\Class', array()));
+   * }
+   * @endcode
+   *
+   * Tip: The container configuration will be compiled/cached. The default cache
+   * behavior is aggressive. When you first implement the hook, be sure to
+   * flush the cache. Additionally, you should relax caching during development.
+   * In `civicrm.settings.php`, set define('CIVICRM_CONTAINER_CACHE', 'auto').
+   *
+   * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
+   * @see http://symfony.com/doc/current/components/dependency_injection/index.html
+   */
+  public static function container(\Symfony\Component\DependencyInjection\ContainerBuilder $container) {
+    self::singleton()->invoke(1, $container, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_container');
+  }
+
+  /**
    * @param array <CRM_Core_FileSearchInterface> $fileSearches
    * @return mixed
    */
