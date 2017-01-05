@@ -1672,8 +1672,9 @@ WHERE       ps.id = %1
     else {
       $taxAmount = $field['options'][$optionValueId]['tax_amount'];
     }
+    $taxAmount = round($taxAmount, 2);
     $taxRate = $field['options'][$optionValueId]['tax_rate'];
-    $lineItem[$optionValueId]['tax_amount'] = round($taxAmount, 2);
+    $lineItem[$optionValueId]['tax_amount'] = $taxAmount;
     $lineItem[$optionValueId]['tax_rate'] = $taxRate;
     $totalTax += $taxAmount;
     return $lineItem;
