@@ -137,9 +137,11 @@ class CRM_Activity_Task {
       if (!CRM_Core_Permission::check('delete activities')) {
         unset(self::$_tasks[1]);
       }
+
+      CRM_Utils_Hook::searchTasks('activity', self::$_tasks);
+      asort(self::$_tasks);
     }
-    CRM_Utils_Hook::searchTasks('activity', self::$_tasks);
-    asort(self::$_tasks);
+
     return self::$_tasks;
   }
 

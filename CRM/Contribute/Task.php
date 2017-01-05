@@ -133,6 +133,7 @@ class CRM_Contribute_Task {
       if (!$invoicing) {
         unset(self::$_tasks[9]);
       }
+
       CRM_Utils_Hook::searchTasks('contribution', self::$_tasks);
       asort(self::$_tasks);
     }

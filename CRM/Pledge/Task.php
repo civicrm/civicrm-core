@@ -89,9 +89,11 @@ class CRM_Pledge_Task {
       if (!CRM_Core_Permission::check('delete in CiviPledge')) {
         unset(self::$_tasks[1]);
       }
+
+      CRM_Utils_Hook::searchTasks('pledge', self::$_tasks);
+      asort(self::$_tasks);
     }
-    CRM_Utils_Hook::searchTasks('pledge', self::$_tasks);
-    asort(self::$_tasks);
+
     return self::$_tasks;
   }
 
