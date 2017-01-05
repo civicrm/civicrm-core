@@ -30,6 +30,25 @@
  */
 
 /**
+ * If ENV[CIVICRM_UF]==UnitTests, switch to alternate config.
+ */
+if (getenv('CIVICRM_UF') === 'UnitTests') {
+  define('CIVICRM_UF', 'UnitTests');
+  $_CIVI_TEST_DIR = rtrim('%%crmRoot%%', '/') . '/tests/phpunit/CiviTest';
+  if (!defined('CIVICRM_SETTINGS_LOCAL_PATH')) {
+    define('CIVICRM_SETTINGS_LOCAL_PATH', $_CIVI_TEST_DIR . '/civicrm.settings.local.php');
+    if (file_exists(CIVICRM_SETTINGS_LOCAL_PATH)) {
+      require_once CIVICRM_SETTINGS_LOCAL_PATH;
+    }
+  }
+
+  if (!defined('CIVICRM_SETTINGS_PATH')) {
+    define('CIVICRM_SETTINGS_PATH', $_CIVI_TEST_DIR . '/civicrm.settings.dist.php');
+  }
+  require_once $_CIVI_TEST_DIR . '/civicrm.settings.dist.php';
+}
+
+/**
  * Content Management System (CMS) Host:
  *
  * CiviCRM can be hosted in either Drupal 6 or 7, Joomla or WordPress.
