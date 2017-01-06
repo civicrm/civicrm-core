@@ -414,7 +414,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
           if (!empty($qf->_quickConfig) && $field->name == 'contribution_amount') {
             $extra += array('onclick' => 'clearAmountOther();');
           }
-          elseif (!empty($qf->_quickConfig) && $field->name == 'membership_amount') {
+          if ($field->name == 'membership_amount') {
             $extra += array(
               'onclick' => "return showHideAutoRenew({$opt['membership_type_id']});",
               'membership-type' => $opt['membership_type_id'],
