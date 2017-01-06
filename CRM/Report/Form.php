@@ -577,6 +577,11 @@ class CRM_Report_Form extends CRM_Core_Form {
       else {
         $this->_formValues = NULL;
       }
+      // CRM-19330 Unprivileged users don't get the task in the form values,
+      // but they appear in the post
+      if (!$this->_formValues['task']) {
+        $this->_formValues['task'] = filter_input(INPUT_POST, 'task');
+      }
 
       $this->setOutputMode();
 
@@ -1493,9 +1498,10 @@ class CRM_Report_Form extends CRM_Core_Form {
 
     $this->assign('instanceForm', $this->_instanceForm);
 
-    // CRM-16274 Determine if user has 'edit all contacts' or equivalent
-    $permission = CRM_Core_Permission::getPermission();
-    if ($permission == CRM_Core_Permission::EDIT &&
+    // CRM-19330 - check that the user has Edit permissions
+    // getPermission() simply returns CRM_Core_Permission::EDIT.
+    $permission = CRM_Core_Permission::check(CRM_Core_Permission::EDIT);
+    if ($permission  &&
       $this->_add2groupSupported
     ) {
       $this->addElement('select', 'groups', ts('Group'),
