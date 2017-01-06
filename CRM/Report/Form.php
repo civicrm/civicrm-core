@@ -3112,6 +3112,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
    * @param array|null $rows
    */
   public function endPostProcess(&$rows = NULL) {
+    $this->assign('report_class', get_class($this));
     if ($this->_storeResultSet) {
       $this->_resultSet = $rows;
     }
