@@ -1528,7 +1528,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'non_deductible_amount' => 10.00,
       'net_amount' => 100.00,
       'contribution_status_id' => 1,
-      'note' => 'Donating for Nobel Cause',
+      'note' => 'Donating for Noble Cause',
 
     );
 
@@ -1538,19 +1538,20 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'contribution_id' => $contribution['id'],
 
     );
-    $contribution = $this->callAPISuccess('contribution', 'get', $new_params);
+    $contribution = $this->callAPISuccessGetSingle('contribution', $new_params);
 
-    $this->assertEquals($contribution['values'][$contributionID]['contact_id'], $this->_individualId);
-    $this->assertEquals($contribution['values'][$contributionID]['total_amount'], 110.00);
-    $this->assertEquals($contribution['values'][$contributionID]['financial_type_id'], $this->_financialTypeId);
-    $this->assertEquals($contribution['values'][$contributionID]['instrument_id'], $old_payment_instrument);
-    $this->assertEquals($contribution['values'][$contributionID]['non_deductible_amount'], 10.00);
-    $this->assertEquals($contribution['values'][$contributionID]['fee_amount'], $old_fee_amount);
-    $this->assertEquals($contribution['values'][$contributionID]['net_amount'], 100.00);
-    $this->assertEquals($contribution['values'][$contributionID]['trxn_id'], $old_trxn_id);
-    $this->assertEquals($contribution['values'][$contributionID]['invoice_id'], $old_invoice_id);
-    $this->assertEquals($contribution['values'][$contributionID]['contribution_source'], $old_source);
-    $this->assertEquals($contribution['values'][$contributionID]['contribution_status'], 'Completed');
+    $this->assertEquals($contribution['contact_id'], $this->_individualId);
+    $this->assertEquals($contribution['total_amount'], 110.00);
+    $this->assertEquals($contribution['financial_type_id'], $this->_financialTypeId);
+    $this->assertEquals($contribution['financial_type'], 'Donation');
+    $this->assertEquals($contribution['instrument_id'], $old_payment_instrument);
+    $this->assertEquals($contribution['non_deductible_amount'], 10.00);
+    $this->assertEquals($contribution['fee_amount'], $old_fee_amount);
+    $this->assertEquals($contribution['net_amount'], 100.00);
+    $this->assertEquals($contribution['trxn_id'], $old_trxn_id);
+    $this->assertEquals($contribution['invoice_id'], $old_invoice_id);
+    $this->assertEquals($contribution['contribution_source'], $old_source);
+    $this->assertEquals($contribution['contribution_status'], 'Completed');
     $params = array(
       'contribution_id' => $contributionID,
 
@@ -1558,8 +1559,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('contribution', 'delete', $params);
     $this->assertAPISuccess($result);
   }
-
-  ///////////////// civicrm_contribution_delete methods
 
   /**
    * Attempt (but fail) to delete a contribution without parameters.
