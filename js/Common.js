@@ -1610,6 +1610,33 @@ if (!CRM.vars) CRM.vars = {};
     }
   };
 
+  // Sugar methods for window.localStorage, with a fallback for older browsers
+  var cacheItems = {};
+  CRM.cache = {
+    get: function (name, defaultValue) {
+      try {
+        if (localStorage.getItem('CRM' + name) !== null) {
+          return JSON.parse(localStorage.getItem('CRM' + name));
+        }
+      } catch(e) {}
+      return cacheItems[name] === undefined ? defaultValue : cacheItems[name];
+    },
+    set: function (name, value) {
+      try {
+        localStorage.setItem('CRM' + name, JSON.stringify(value));
+      } catch(e) {}
+      cacheItems[name] = value;
+    },
+    clear: function(name) {
+      try {
+        localStorage.removeItem('CRM' + name);
+      } catch(e) {}
+      delete cacheItems[name];
+    }
+  };
+
+
+
   // Determine if a user has a given permission.
   // @see CRM_Core_Resources::addPermissions
   CRM.checkPerm = function(perm) {
