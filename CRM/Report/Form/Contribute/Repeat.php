@@ -1032,7 +1032,7 @@ CREATE TEMPORARY TABLE $this->tempTableRepeat1 (
 {$this->contributionJoinTableColumn} int unsigned,
 total_amount_sum int,
 total_amount_count int
-) ENGINE=HEAP DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci";
+) ENGINE=HEAP {$this->_databaseAttributes}";
     CRM_Core_DAO::executeQuery($sql);
     CRM_Core_DAO::executeQuery("INSERT INTO $this->tempTableRepeat1 {$subContributionQuery1}");
 
@@ -1048,7 +1048,7 @@ CREATE TEMPORARY TABLE  $this->tempTableRepeat2 (
 total_amount_sum int,
 total_amount_count int,
 currency varchar(3)
-) ENGINE=HEAP DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci";
+) ENGINE=HEAP {$this->_databaseAttributes}";
     CRM_Core_DAO::executeQuery($sql);
     $sql = "INSERT INTO $this->tempTableRepeat2 {$subContributionQuery2}";
     CRM_Core_DAO::executeQuery($sql);

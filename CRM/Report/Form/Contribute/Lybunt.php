@@ -556,7 +556,7 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
     $this->contactTempTable = 'civicrm_report_temp_lybunt_c_' . date('Ymd_') . uniqid();
     $this->limit();
     $getContacts = "
-      CREATE TEMPORARY TABLE $this->contactTempTable
+      CREATE TEMPORARY TABLE $this->contactTempTable {$this->_databaseAttributes}
       SELECT SQL_CALC_FOUND_ROWS {$this->_aliases['civicrm_contact']}.id as cid {$this->_from} {$this->_where}
       GROUP BY {$this->_aliases['civicrm_contact']}.id";
     $this->executeReportQuery($getContacts);
