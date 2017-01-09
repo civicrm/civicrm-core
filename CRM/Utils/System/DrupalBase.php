@@ -545,6 +545,13 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
     return user_load($userID);
   }
 
+  /**
+   * Parse the name of the drupal site.
+   *
+   * @param string $civicrm_root
+   *
+   * @return null|string
+   */
   public function parseDrupalSiteName($civicrm_root) {
     $siteName = NULL;
     if (strpos($civicrm_root,

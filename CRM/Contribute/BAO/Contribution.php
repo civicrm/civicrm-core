@@ -3769,6 +3769,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    * @param string $paymentType
    *   'owed' for purpose of recording partial payments, 'refund' for purpose of recording refund payments.
    * @param int $participantId
+   * @param bool $updateStatus
    *
    * @return null|object
    */
@@ -4330,9 +4331,11 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
   /**
    * Compute the stats values
    *
-   * @param $stat either 'mode' or 'median'
-   * @param $sql
-   * @param $alias of civicrm_contribution
+   * @param string $stat either 'mode' or 'median'
+   * @param string $sql
+   * @param string $alias of civicrm_contribution
+   *
+   * @return array|null
    */
   public static function computeStats($stat, $sql, $alias = NULL) {
     $mode = $median = array();
@@ -4385,7 +4388,7 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
         return $median;
 
       default:
-        return;
+        return NULL;
     }
   }
 
@@ -4422,6 +4425,8 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
    *   Duplication of param needs review. Only used by AuthorizeNetIPN
    * @param int $isFirstOrLastRecurringPayment
    *   Deprecated param only used by AuthorizeNetIPN.
+   *
+   * @return array
    */
   public static function completeOrder(&$input, &$ids, $objects, $transaction, $recur, $contribution, $isRecurring, $isFirstOrLastRecurringPayment) {
     $primaryContributionID = isset($contribution->id) ? $contribution->id : $objects['first_contribution']->id;
@@ -4946,11 +4951,12 @@ LIMIT 1;";
   }
 
   /**
-   * Function to check line items
+   * Function to check line items.
    *
    * @param array $params
    *  array of order params.
    *
+   * @throws \API_Exception
    */
   public static function checkLineItems(&$params) {
     $totalAmount = CRM_Utils_Array::value('total_amount', $params);
@@ -5392,8 +5398,9 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
   /**
    * Create array of last financial item id's.
    *
-   * @param array $contributionId
+   * @param int $contributionId
    *
+   * @return array
    */
   public static function getLastFinancialItemIds($contributionId) {
     $sql = "SELECT fi.id, li.price_field_value_id, li.tax_amount, fi.financial_account_id
