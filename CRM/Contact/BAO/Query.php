@@ -2183,18 +2183,17 @@ class CRM_Contact_BAO_Query {
         $op = 'LIKE';
         $value = self::getWildCardedValue($wildcard, $op, $value);
       }
+      // LOWER roughly translates to 'hurt my database without deriving any benefit' See CRM-19811.
       $wc = self::caseImportant($op) ? "LOWER({$field['where']})" : "{$field['where']}";
       $this->_where[$grouping][] = self::buildClause($wc, $op, "'$value'");
       $this->_qill[$grouping][] = "$field[title] $op \"$value\"";
     }
     elseif ($name === 'current_employer') {
-      $value = $strtolower(CRM_Core_DAO::escapeString($value));
       if ($wildcard) {
         $op = 'LIKE';
         $value = self::getWildCardedValue($wildcard, $op, $value);
       }
-      $wc = self::caseImportant($op) ? "LOWER(contact_a.organization_name)" : "contact_a.organization_name";
-      $ceWhereClause = self::buildClause($wc, $op,
+      $ceWhereClause = self::buildClause("contact_a.organization_name", $op,
         $value
       );
       $ceWhereClause .= " AND contact_a.contact_type = 'Individual'";
@@ -2258,7 +2257,7 @@ class CRM_Contact_BAO_Query {
 
         //get the location name
         list($tName, $fldName) = self::getLocationTableName($field['where'], $locType);
-
+        // LOWER roughly translates to 'hurt my database without deriving any benefit' See CRM-19811.
         $fieldName = "LOWER(`$tName`.$fldName)";
 
         // we set both _tables & whereTables because whereTables doesn't seem to do what the name implies it should
@@ -2267,10 +2266,12 @@ class CRM_Contact_BAO_Query {
       }
       else {
         if ($tableName == 'civicrm_contact') {
+          // LOWER roughly translates to 'hurt my database without deriving any benefit' See CRM-19811.
           $fieldName = "LOWER(contact_a.{$fieldName})";
         }
         else {
           if ($op != 'IN' && !is_numeric($value) && !is_array($value)) {
+            // LOWER roughly translates to 'hurt my database without deriving any benefit' See CRM-19811.
             $fieldName = "LOWER({$field['where']})";
           }
           else {
@@ -3336,13 +3337,16 @@ WHERE  $smartGroupClause
       $fieldsub = array();
       $value = "'" . self::getWildCardedValue($wildcard, $op, $value) . "'";
       if ($fieldName == 'sort_name') {
+        // LOWER roughly translates to 'hurt my database without deriving any benefit' See CRM-19811.
         $wc = self::caseImportant($op) ? "LOWER(contact_a.sort_name)" : "contact_a.sort_name";
       }
       else {
+        // LOWER roughly translates to 'hurt my database without deriving any benefit' See CRM-19811.
         $wc = self::caseImportant($op) ? "LOWER(contact_a.display_name)" : "contact_a.display_name";
       }
       $fieldsub[] = " ( $wc $op $value )";
       if ($config->includeNickNameInName) {
+        // LOWER roughly translates to 'hurt my database without deriving any benefit' See CRM-19811.
         $wc = self::caseImportant($op) ? "LOWER(contact_a.nick_name)" : "contact_a.nick_name";
         $fieldsub[] = " ( $wc $op $value )";
       }
@@ -3479,6 +3483,7 @@ WHERE  $smartGroupClause
         $value = "%{$value}%";
       }
       $op = 'LIKE';
+      // LOWER roughly translates to 'hurt my database without deriving any benefit' See CRM-19811.
       $this->_where[$grouping][] = self::buildClause('LOWER(civicrm_address.street_address)', $op, $value, 'String');
       $this->_qill[$grouping][] = ts('Street') . " $op '$n'";
     }
@@ -3515,6 +3520,7 @@ WHERE  $smartGroupClause
     else {
       $value = strtolower($n);
 
+      // LOWER roughly translates to 'hurt my database without deriving any benefit' See CRM-19811.
       $this->_where[$grouping][] = self::buildClause('LOWER(civicrm_address.street_number)', $op, $value, 'String');
       $this->_qill[$grouping][] = ts('Street Number') . " $op '$n'";
     }
@@ -5631,6 +5637,8 @@ AND   displayRelType.is_active = 1
   }
 
   /**
+   * See CRM-19811 for why this is database hurty without apparent benefit.
+   *
    * @param $op
    *
    * @return bool
@@ -5708,6 +5716,7 @@ AND   displayRelType.is_active = 1
       }
     }
     else {
+      // LOWER roughly translates to 'hurt my database without deriving any benefit' See CRM-19811.
       $wc = self::caseImportant($op) ? "LOWER({$field['where']})" : "{$field['where']}";
     }
     if (in_array($name, $pseudoFields)) {
