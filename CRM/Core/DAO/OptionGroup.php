@@ -34,16 +34,18 @@
  */
 require_once 'CRM/Core/DAO.php';
 require_once 'CRM/Utils/Type.php';
+/**
+ * CRM_Core_DAO_OptionGroup constructor.
+ */
 class CRM_Core_DAO_OptionGroup extends CRM_Core_DAO {
   /**
-   * static instance to hold the table name
+   * Static instance to hold the table name.
    *
    * @var string
    */
   static $_tableName = 'civicrm_option_group';
   /**
-   * static value to see if we should log any modifications to
-   * this table in the civicrm_log table
+   * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var boolean
    */
@@ -97,9 +99,7 @@ class CRM_Core_DAO_OptionGroup extends CRM_Core_DAO {
    */
   public $is_locked;
   /**
-   * class constructor
-   *
-   * @return civicrm_option_group
+   * Class constructor.
    */
   function __construct() {
     $this->__table = 'civicrm_option_group';

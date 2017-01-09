@@ -37,18 +37,20 @@
 require_once 'CRM/Core/DAO.php';
 require_once 'CRM/Utils/Type.php';
 
+/**
+ * {$table.className} constructor.
+ */
 class {$table.className} extends CRM_Core_DAO {ldelim}
 
      /**
-      * static instance to hold the table name
+      * Static instance to hold the table name.
       *
       * @var string
       */
       static $_tableName = '{$table.name}';
 
       /**
-       * static value to see if we should log any modifications to
-       * this table in the civicrm_log table
+       * Should CiviCRM log any modifications to this table in the civicrm_log table.
        *
        * @var boolean
        */
@@ -67,9 +69,7 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
 {/foreach} {* table.fields *}
 
     /**
-     * class constructor
-     *
-     * @return {$table.name}
+     * Class constructor.
      */
     function __construct( ) {ldelim}
         $this->__table = '{$table.name}';
@@ -79,7 +79,7 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
 
 {if $table.foreignKey || $table.dynamicForeignKey}
     /**
-     * Returns foreign keys and entity references
+     * Returns foreign keys and entity references.
      *
      * @return array
      *   [CRM_Core_Reference_Interface]

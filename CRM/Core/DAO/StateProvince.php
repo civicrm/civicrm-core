@@ -34,16 +34,18 @@
  */
 require_once 'CRM/Core/DAO.php';
 require_once 'CRM/Utils/Type.php';
+/**
+ * CRM_Core_DAO_StateProvince constructor.
+ */
 class CRM_Core_DAO_StateProvince extends CRM_Core_DAO {
   /**
-   * static instance to hold the table name
+   * Static instance to hold the table name.
    *
    * @var string
    */
   static $_tableName = 'civicrm_state_province';
   /**
-   * static value to see if we should log any modifications to
-   * this table in the civicrm_log table
+   * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var boolean
    */
@@ -73,16 +75,14 @@ class CRM_Core_DAO_StateProvince extends CRM_Core_DAO {
    */
   public $country_id;
   /**
-   * class constructor
-   *
-   * @return civicrm_state_province
+   * Class constructor.
    */
   function __construct() {
     $this->__table = 'civicrm_state_province';
     parent::__construct();
   }
   /**
-   * Returns foreign keys and entity references
+   * Returns foreign keys and entity references.
    *
    * @return array
    *   [CRM_Core_Reference_Interface]
