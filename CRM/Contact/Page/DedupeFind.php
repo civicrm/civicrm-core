@@ -155,6 +155,7 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
         if ($context == 'conflicts') {
           // if the current screen was intended to list only selected contacts, move back to full dupe list
           $urlQry['action'] = 'update';
+          unset($urlQry['snippet']);
           CRM_Utils_System::redirect(CRM_Utils_System::url(CRM_Utils_System::currentPath(), $urlQry));
         }
         if ($gid) {
