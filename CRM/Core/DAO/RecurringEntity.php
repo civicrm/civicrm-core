@@ -34,16 +34,18 @@
  */
 require_once 'CRM/Core/DAO.php';
 require_once 'CRM/Utils/Type.php';
+/**
+ * CRM_Core_DAO_RecurringEntity constructor.
+ */
 class CRM_Core_DAO_RecurringEntity extends CRM_Core_DAO {
   /**
-   * static instance to hold the table name
+   * Static instance to hold the table name.
    *
    * @var string
    */
   static $_tableName = 'civicrm_recurring_entity';
   /**
-   * static value to see if we should log any modifications to
-   * this table in the civicrm_log table
+   * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var boolean
    */
@@ -78,9 +80,7 @@ class CRM_Core_DAO_RecurringEntity extends CRM_Core_DAO {
    */
   public $mode;
   /**
-   * class constructor
-   *
-   * @return civicrm_recurring_entity
+   * Class constructor.
    */
   function __construct() {
     $this->__table = 'civicrm_recurring_entity';

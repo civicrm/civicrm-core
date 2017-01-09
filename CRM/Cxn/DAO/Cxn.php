@@ -34,16 +34,18 @@
  */
 require_once 'CRM/Core/DAO.php';
 require_once 'CRM/Utils/Type.php';
+/**
+ * CRM_Cxn_DAO_Cxn constructor.
+ */
 class CRM_Cxn_DAO_Cxn extends CRM_Core_DAO {
   /**
-   * static instance to hold the table name
+   * Static instance to hold the table name.
    *
    * @var string
    */
   static $_tableName = 'civicrm_cxn';
   /**
-   * static value to see if we should log any modifications to
-   * this table in the civicrm_log table
+   * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var boolean
    */
@@ -115,9 +117,7 @@ class CRM_Cxn_DAO_Cxn extends CRM_Core_DAO {
    */
   public $fetched_date;
   /**
-   * class constructor
-   *
-   * @return civicrm_cxn
+   * Class constructor.
    */
   function __construct() {
     $this->__table = 'civicrm_cxn';

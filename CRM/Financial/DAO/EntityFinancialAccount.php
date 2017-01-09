@@ -34,16 +34,18 @@
  */
 require_once 'CRM/Core/DAO.php';
 require_once 'CRM/Utils/Type.php';
+/**
+ * CRM_Financial_DAO_EntityFinancialAccount constructor.
+ */
 class CRM_Financial_DAO_EntityFinancialAccount extends CRM_Core_DAO {
   /**
-   * static instance to hold the table name
+   * Static instance to hold the table name.
    *
    * @var string
    */
   static $_tableName = 'civicrm_entity_financial_account';
   /**
-   * static value to see if we should log any modifications to
-   * this table in the civicrm_log table
+   * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var boolean
    */
@@ -79,16 +81,14 @@ class CRM_Financial_DAO_EntityFinancialAccount extends CRM_Core_DAO {
    */
   public $financial_account_id;
   /**
-   * class constructor
-   *
-   * @return civicrm_entity_financial_account
+   * Class constructor.
    */
   function __construct() {
     $this->__table = 'civicrm_entity_financial_account';
     parent::__construct();
   }
   /**
-   * Returns foreign keys and entity references
+   * Returns foreign keys and entity references.
    *
    * @return array
    *   [CRM_Core_Reference_Interface]
