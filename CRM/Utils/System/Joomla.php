@@ -712,8 +712,20 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
       '',
       $config->userFrameworkBaseURL
     );
-    // CRM-19453 - This makes it OS independent.
-    $siteRoot = JPATH_SITE;
+    // CRM-19453 - Enable this to work in Windows, to by recognising
+    // the directory separator.
+    if (DIRECTORY_SEPARATOR === "\\") {
+      $pattern = '|\\\\media\\\\civicrm\\\\.*$|';
+    }
+    else {
+      $pattern = '|/media/civicrm/.*$|';
+    }
+
+    $siteRoot = preg_replace(
+      $pattern,
+      '',
+      $config->imageUploadDir
+    );
     return array($url, NULL, $siteRoot);
   }
 
