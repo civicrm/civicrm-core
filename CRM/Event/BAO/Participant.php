@@ -1905,11 +1905,12 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
         // if found in submitted items, do not use it for new item creations
         if (in_array($previousLineItem['price_field_value_id'], $submittedFieldValueIds)) {
           // if submitted line items are existing don't fire INSERT query
-          if($previousLineItem['line_total']!=0){
-             unset($insertLines[$previousLineItem['price_field_value_id']]);
-          } else {
-             $insertLines[$previousLineItem['price_field_value_id']]['skip'] = true;
-          }   
+          if ($previousLineItem['line_total'] != 0) {
+            unset($insertLines[$previousLineItem['price_field_value_id']]);
+          }
+          else {
+            $insertLines[$previousLineItem['price_field_value_id']]['skip'] = TRUE;
+          }
           // for updating the line items i.e. use-case - once deselect-option selecting again
           if (($previousLineItem['line_total'] != $submittedLineItems[$previousLineItem['price_field_value_id']]['line_total']) ||
             ($submittedLineItems[$previousLineItem['price_field_value_id']]['line_total'] == 0 && $submittedLineItems[$previousLineItem['price_field_value_id']]['qty'] == 1) ||
@@ -2029,7 +2030,7 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
     // insert new line items
     if (!empty($insertLines)) {
       foreach ($insertLines as $valueId => $lineParams) {
-        if (!array_key_exists('skip',$lineParams)) {
+        if (!array_key_exists('skip', $lineParams)) {
           $lineParams['entity_table'] = 'civicrm_participant';
           $lineParams['entity_id'] = $participantId;
           $lineParams['contribution_id'] = $contributionId;
