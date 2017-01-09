@@ -3615,19 +3615,12 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       }
     }
     if ($context == 'changePaymentInstrument') {
-      foreach ($params['line_item'] as $lineitems) {
-        foreach ($lineitems as $fieldValueId => $fieldValues) {
-          $prevFinancialItem = CRM_Financial_BAO_FinancialItem::getPreviousFinancialItem($fieldValues['id']);
-          // save to entity_financial_trxn table
-          $entityFinancialTrxnParams = array(
-            'entity_table' => "civicrm_financial_item",
-            'entity_id' => $prevFinancialItem->id,
-            'financial_trxn_id' => $trxn->id,
-            'amount' => $trxn->total_amount,
-          );
-          civicrm_api3('entityFinancialTrxn', 'create', $entityFinancialTrxnParams);
-        }
-      }
+      // store financial item Proportionaly.
+      $trxnParams = array(
+        'total_amount' => $trxn->total_amount,
+        'contribution_id' => $params['contribution']->id,
+      );
+      self::assignProportionalLineItems($trxnParams, $trxn->id, $params['prevContribution']->total_amount);
     }
     CRM_Core_BAO_FinancialTrxn::createDeferredTrxn(CRM_Utils_Array::value('line_item', $params), $params['contribution'], TRUE, $context);
   }
@@ -4942,29 +4935,13 @@ LIMIT 1;";
     $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($trxnParams['contribution_id']);
     if (!empty($lineItems)) {
       // get financial item
-      $sql = "SELECT fi.id, li.price_field_value_id
-      FROM civicrm_financial_item fi
-      INNER JOIN civicrm_line_item li ON li.id = fi.entity_id and fi.entity_table = 'civicrm_line_item'
-      WHERE li.contribution_id = %1";
-      $dao = CRM_Core_DAO::executeQuery($sql, array(1 => array($trxnParams['contribution_id'], 'Integer')));
-      while ($dao->fetch()) {
-        $ftIds[$dao->price_field_value_id] = $dao->id;
-      }
-      $eftParams = array(
-        'entity_table' => 'civicrm_financial_item',
-        'financial_trxn_id' => $trxnId,
+      list($ftIds, $taxItems) = self::getLastFinancialItemIds($trxnParams['contribution_id']);
+      $entityParams = array(
+        'contribution_total_amount' => $contributionTotalAmount,
+        'trxn_total_amount' => $trxnParams['total_amount'],
+        'trxn_id' => $trxnId,
       );
-      foreach ($lineItems as $key => $value) {
-        if ($value['qty'] == 0) {
-          continue;
-        }
-        $paid = $value['line_total'] * ($trxnParams['total_amount'] / $contributionTotalAmount);
-        // Record Entity Financial Trxn
-        $eftParams['amount'] = round($paid, 2);
-        $eftParams['entity_id'] = $ftIds[$value['price_field_value_id']];
-
-        civicrm_api3('EntityFinancialTrxn', 'create', $eftParams);
-      }
+      self::createProportionalFinancialEntries($entityParams, $lineItems, $ftIds, $taxItems);
     }
   }
 
@@ -5374,6 +5351,103 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
       $netAmount -= $taxAmount;
     }
     return CRM_Utils_Money::format($netAmount, NULL, '%a');
+  }
+
+  /**
+   * Retrieve Sales Tax Financial Accounts.
+   *
+   *
+   * @return array
+   *
+   */
+  public static function getSalesTaxFinancialAccounts() {
+    $query = "SELECT cfa.id FROM civicrm_entity_financial_account ce
+ INNER JOIN civicrm_financial_account cfa ON ce.financial_account_id = cfa.id
+ WHERE `entity_table` = 'civicrm_financial_type' AND cfa.is_tax = 1 AND ce.account_relationship = %1 GROUP BY cfa.id";
+    $accountRel = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Sales Tax Account is' "));
+    $queryParams = array(1 => array($accountRel, 'Integer'));
+    $dao = CRM_Core_DAO::executeQuery($query, $queryParams);
+    $financialAccount = array();
+    while ($dao->fetch()) {
+      $financialAccount[$dao->id] = $dao->id;
+    }
+    return $financialAccount;
+  }
+
+  /**
+   * Create tax entry in civicrm_entity_financial_trxn table.
+   *
+   * @param array $entityParams
+   *
+   * @param array $eftParams
+   *
+   */
+  public static function createProportionalEntry($entityParams, $eftParams) {
+    $paid = $entityParams['line_item_amount'] * ($entityParams['trxn_total_amount'] / $entityParams['contribution_total_amount']);
+    // Record Entity Financial Trxn
+    $eftParams['amount'] = round($paid, 2);
+    civicrm_api3('EntityFinancialTrxn', 'create', $eftParams);
+  }
+
+  /**
+   * Create array of last financial item id's.
+   *
+   * @param array $contributionId
+   *
+   */
+  public static function getLastFinancialItemIds($contributionId) {
+    $sql = "SELECT fi.id, li.price_field_value_id, li.tax_amount, fi.financial_account_id
+      FROM civicrm_financial_item fi
+      INNER JOIN civicrm_line_item li ON li.id = fi.entity_id and fi.entity_table = 'civicrm_line_item'
+      WHERE li.contribution_id = %1";
+    $dao = CRM_Core_DAO::executeQuery($sql, array(1 => array($contributionId, 'Integer')));
+    $ftIds = $taxItems = array();
+    $salesTaxFinancialAccount = self::getSalesTaxFinancialAccounts();
+    while ($dao->fetch()) {
+      /* if sales tax item*/
+      if (in_array($dao->financial_account_id, $salesTaxFinancialAccount)) {
+        $taxItems[$dao->price_field_value_id] = array(
+          'financial_item_id' => $dao->id,
+          'amount' => $dao->tax_amount,
+        );
+      }
+      else {
+        $ftIds[$dao->price_field_value_id] = $dao->id;
+      }
+    }
+    return array($ftIds, $taxItems);
+  }
+
+  /**
+   * Create proportional entries in civicrm_entity_financial_trxn.
+   *
+   * @param array $entityParams
+   *
+   * @param array $lineItems
+   *
+   * @param array $ftIds
+   *
+   * @param array $taxItems
+   *
+   */
+  public static function createProportionalFinancialEntries($entityParams, $lineItems, $ftIds, $taxItems) {
+    $eftParams = array(
+      'entity_table' => 'civicrm_financial_item',
+      'financial_trxn_id' => $entityParams['trxn_id'],
+    );
+    foreach ($lineItems as $key => $value) {
+      if ($value['qty'] == 0) {
+        continue;
+      }
+      $eftParams['entity_id'] = $ftIds[$value['price_field_value_id']];
+      $entityParams['line_item_amount'] = $value['line_total'];
+      self::createProportionalEntry($entityParams, $eftParams);
+      if (array_key_exists($value['price_field_value_id'], $taxItems)) {
+        $entityParams['line_item_amount'] = $taxItems[$value['price_field_value_id']]['amount'];
+        $eftParams['entity_id'] = $taxItems[$value['price_field_value_id']]['financial_item_id'];
+        self::createProportionalEntry($entityParams, $eftParams);
+      }
+    }
   }
 
 }

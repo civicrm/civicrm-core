@@ -248,6 +248,21 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test searches are case insensitive.
+   */
+  public function testCaseInsensitive() {
+    $orgID = $this->organizationCreate(array('organization_name' => 'BOb'));
+    $this->callAPISuccess('Contact', 'create', array('display_name' => 'Minnie Mouse', 'employer_id' => $orgID, 'contact_type' => 'Individual'));
+    $searchParams = array(array('current_employer', '=', 'bob', 0, 1));
+    $query = new CRM_Contact_BAO_Query($searchParams);
+    $result = $query->apiQuery($searchParams);
+    $this->assertEquals(1, count($result[0]));
+    $contact = reset($result[0]);
+    $this->assertEquals('Minnie Mouse', $contact['display_name']);
+    $this->assertEquals('BOb', $contact['current_employer']);
+  }
+
+  /**
    * Test smart groups with non-numeric don't fail on equal queries.
    *
    * CRM-14720

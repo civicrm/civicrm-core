@@ -69,7 +69,9 @@ class Container {
 
     // In pre-installation environments, don't bother with caching.
     if (!defined('CIVICRM_TEMPLATE_COMPILEDIR') || !defined('CIVICRM_DSN') || $cacheMode === 'never' || \CRM_Utils_System::isInUpgradeMode()) {
-      return $this->createContainer();
+      $containerBuilder = $this->createContainer();
+      $containerBuilder->compile();
+      return $containerBuilder;
     }
 
     $envId = \CRM_Core_Config_Runtime::getId();
@@ -215,6 +217,10 @@ class Container {
       ))->addTag('kernel.event_subscriber');
     }
 
+    if (\CRM_Utils_Constant::value('CIVICRM_FLEXMAILER_HACK_SERVICES')) {
+      \Civi\Core\Resolver::singleton()->call(CIVICRM_FLEXMAILER_HACK_SERVICES, array($container));
+    }
+
     \CRM_Utils_Hook::container($container);
 
     return $container;
@@ -252,6 +258,10 @@ class Container {
     $dispatcher->addListener(\Civi\ActionSchedule\Events::MAPPINGS, array('CRM_Contribute_ActionMapping_ByType', 'onRegisterActionMappings'));
     $dispatcher->addListener(\Civi\ActionSchedule\Events::MAPPINGS, array('CRM_Event_ActionMapping', 'onRegisterActionMappings'));
     $dispatcher->addListener(\Civi\ActionSchedule\Events::MAPPINGS, array('CRM_Member_ActionMapping', 'onRegisterActionMappings'));
+
+    if (\CRM_Utils_Constant::value('CIVICRM_FLEXMAILER_HACK_LISTENERS')) {
+      \Civi\Core\Resolver::singleton()->call(CIVICRM_FLEXMAILER_HACK_LISTENERS, array($dispatcher));
+    }
 
     return $dispatcher;
   }

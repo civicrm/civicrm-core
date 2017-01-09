@@ -3630,6 +3630,23 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
   }
 
   /**
+   * Create Financial Type.
+   *
+   * @param array $params
+   *
+   * @return array
+   */
+  protected function createFinancialType($params = array()) {
+    $params = array_merge($params,
+      array(
+        'name' => 'Financial-Type -' . substr(sha1(rand()), 0, 7),
+        'is_active' => 1,
+      )
+    );
+    return $this->callAPISuccess('FinancialType', 'create', $params);
+  }
+
+  /**
    * Enable Tax and Invoicing
    */
   protected function enableTaxAndInvoicing($params = array()) {

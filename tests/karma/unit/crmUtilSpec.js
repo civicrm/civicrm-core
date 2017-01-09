@@ -145,4 +145,64 @@ describe('crmUtil', function() {
     });
   });
 
+  describe('crmThrottle', function() {
+    var crmThrottle, $q, $timeout, i;
+
+    beforeEach(inject(function(_crmThrottle_, _$q_, _$timeout_) {
+      crmThrottle = _crmThrottle_;
+      $q = _$q_;
+      $timeout = _$timeout_;
+    }));
+
+    function resolveAfterTimeout() {
+      var dfr = $q.defer();
+      $timeout(function(){
+        dfr.resolve(i++);
+      }, 80);
+      return dfr.promise;
+    }
+
+    it('executes the function once', function() {
+      i = 0;
+      crmThrottle(resolveAfterTimeout);
+      expect(i).toBe(0);
+      $timeout.flush(100);
+      expect(i).toBe(1);
+      $timeout.verifyNoPendingTasks();
+    });
+
+    it('executes the function again', function() {
+      i = 0;
+      crmThrottle(resolveAfterTimeout);
+      $timeout.flush(100);
+      expect(i).toBe(1);
+      crmThrottle(resolveAfterTimeout);
+      $timeout.flush(20);
+      expect(i).toBe(1);
+      $timeout.flush(100);
+      expect(i).toBe(2);
+      $timeout.verifyNoPendingTasks();
+    });
+
+    it('executes the first and last function', function() {
+      i = 0;
+      crmThrottle(resolveAfterTimeout);
+      $timeout.flush(10);
+      crmThrottle(resolveAfterTimeout);
+      crmThrottle(resolveAfterTimeout);
+      crmThrottle(resolveAfterTimeout);
+      crmThrottle(resolveAfterTimeout);
+      expect(i).toBe(0);
+      $timeout.flush(100);
+      expect(i).toBe(1);
+      $timeout.flush(100);
+      $timeout.flush(100);
+      $timeout.flush(100);
+      $timeout.flush(100);
+      expect(i).toBe(2);
+      $timeout.verifyNoPendingTasks();
+    });
+
+  });
+
 });
