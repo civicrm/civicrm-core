@@ -236,7 +236,7 @@ class CRM_Activity_Page_AJAX {
             break;
 
           case 'caseRoles':
-            $row['actions'] = '<a href="#editCaseRoleDialog" title="' . ts('Assign %1', array(1 => $typeLabel)) . '" class="crm-hover-button case-miniform" data-contact_type="' . $contactType . '" data-rel_type="' . $row['relation_type'] . '_b_a" data-key="' . CRM_Core_Key::get('civicrm/ajax/relation') . '">' .
+            $row['actions'] = '<a href="#editCaseRoleDialog" title="' . ts('Assign %1', array(1 => $typeLabel)) . '" class="crm-hover-button case-miniform" data-contact_type="' . $contactType . '" data-rel_type="' . $row['relation_type'] . '_a_b" data-key="' . CRM_Core_Key::get('civicrm/ajax/relation') . '">' .
               '<i class="crm-i fa-pencil"></i>' .
               '</a>';
             break;
