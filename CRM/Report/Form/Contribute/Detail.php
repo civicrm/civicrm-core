@@ -557,7 +557,7 @@ GROUP BY {$this->_aliases['civicrm_contribution']}.currency";
 
     // 1. use main contribution query to build temp table 1
     $sql = $this->buildQuery();
-    $tempQuery = 'CREATE TEMPORARY TABLE civireport_contribution_detail_temp1 AS ' . $sql;
+    $tempQuery = "CREATE TEMPORARY TABLE civireport_contribution_detail_temp1 {$this->_databaseAttributes} AS {$sql}";
     CRM_Core_DAO::executeQuery($tempQuery);
     $this->setPager();
 
@@ -575,7 +575,7 @@ GROUP BY {$this->_aliases['civicrm_contribution']}.currency";
     }
     // we inner join with temp1 to restrict soft contributions to those in temp1 table
     $sql = "{$select} {$this->_from} {$this->_where} {$this->_groupBy}";
-    $tempQuery = 'CREATE TEMPORARY TABLE civireport_contribution_detail_temp2 AS ' . $sql;
+    $tempQuery = "CREATE TEMPORARY TABLE civireport_contribution_detail_temp2 {$this->_databaseAttributes} AS {$sql}";
     CRM_Core_DAO::executeQuery($tempQuery);
     if (CRM_Utils_Array::value('contribution_or_soft_value', $this->_params) ==
       'soft_credits_only'
@@ -613,7 +613,7 @@ UNION ALL
     }
 
     // 4. build temp table 3
-    $sql = "CREATE TEMPORARY TABLE civireport_contribution_detail_temp3 AS {$tempQuery}";
+    $sql = "CREATE TEMPORARY TABLE civireport_contribution_detail_temp3 {$this->_databaseAttributes} AS {$tempQuery}";
     CRM_Core_DAO::executeQuery($sql);
 
     // 5. Re-construct order-by to make sense for final query on temp3 table
