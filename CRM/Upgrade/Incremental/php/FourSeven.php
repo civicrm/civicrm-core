@@ -895,6 +895,11 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
     return TRUE;
   }
 
+  /**
+   * Add mailing template type.
+   *
+   * @return bool
+   */
   public static function addMailingTemplateType() {
     if (!CRM_Core_DAO::checkFieldExists('civicrm_mailing', 'template_type', FALSE)) {
       CRM_Core_DAO::executeQuery('

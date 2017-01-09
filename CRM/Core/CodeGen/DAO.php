@@ -20,6 +20,12 @@ class CRM_Core_CodeGen_DAO extends CRM_Core_CodeGen_BaseTask {
    */
   private $raw;
 
+  /**
+   * CRM_Core_CodeGen_DAO constructor.
+   *
+   * @param \CRM_Core_CodeGen_Main $config
+   * @param string $name
+   */
   public function __construct($config, $name) {
     parent::__construct($config);
     $this->name = $name;
