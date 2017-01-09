@@ -165,6 +165,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
       $errors['cms_name'] = $nameError;
     }
 
+    // LOWER in query below roughly translates to 'hurt my database without deriving any benefit' See CRM-19811.
     $sql = "
       SELECT name, mail
       FROM {users}
