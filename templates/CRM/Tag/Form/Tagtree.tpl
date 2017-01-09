@@ -29,10 +29,9 @@
     <li id="tag_{$id}">
       <input name="tagList[{$id}]" id="check_{$id}" type="checkbox" {if $node.is_selectable EQ 0}disabled=""{/if} {if $tagged[$id]}checked="checked"{/if}/>
       <span>
-        <label for="check_{$id}" id="tagLabel_{$id}" {if !empty($allTags.$id.color)}style="background-color: {$allTags.$id.color}; color: {$allTags.$id.color|colorContrast};"{/if}>
+        <label for="check_{$id}" id="tagLabel_{$id}" class="crm-tag-item" {if !empty($allTags.$id.color)}style="background-color: {$allTags.$id.color}; color: {$allTags.$id.color|colorContrast};"{/if} title="{$node.description}">
           {$node.name}
         </label>
-        {if $node.description}{help id=$id title=$node.name file="CRM/Tag/Form/Tagtree"}{/if}
       </span>
       {if $node.children}
         {* Recurse... *}
