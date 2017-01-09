@@ -4,7 +4,7 @@
       {{ts('A/B testing allows you to send two test mailings to a random subset of your recipients. After collecting and comparing metrics, the more successful mailing will be sent to the remaining recipients.')}}
     </div>
     <div crm-ui-field="{name: 'setupForm.abName', title: ts('Name'), help: hs('name')}" ng-if="fields.abName">
-      <input
+      <input type="text"
         crm-ui-id="setupForm.abName"
         name="abName"
         ng-model="abtest.ab.name"
