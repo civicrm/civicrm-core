@@ -299,6 +299,23 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
   }
 
   /**
+   * @dataProvider ajaxModeData
+   */
+  public function testIsAjaxMode($query, $result) {
+    $_REQUEST = $_GET = $query;
+    $this->assertEquals($result, CRM_Core_Resources::isAjaxMode());
+  }
+
+  public function ajaxModeData() {
+    return array(
+      array(array('q' => 'civicrm/ajax/foo'), TRUE),
+      array(array('q' => 'civicrm/test/page'), FALSE),
+      array(array('q' => 'civicrm/test/page', 'snippet' => 'json'), TRUE),
+      array(array('q' => 'civicrm/test/page', 'snippet' => 'foo'), FALSE),
+    );
+  }
+
+  /**
    * @param CRM_Utils_Cache_Interface $cache
    * @param string $cacheKey
    *
