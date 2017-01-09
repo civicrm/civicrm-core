@@ -2122,63 +2122,60 @@ WHERE (entity_table = 'civicrm_participant' AND entity_id = {$participantId} AND
     $pendingAmount = CRM_Core_BAO_FinancialTrxn::getBalanceTrxnAmt($contributionId);
     $pendingAmount = CRM_Utils_Array::value('total_amount', $pendingAmount, 0);
     $balanceAmt = $updatedAmount - $paidAmount;
-    if ($paidAmount != $pendingAmount) {
-      $balanceAmt -= $pendingAmount;
-    }
 
     $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
     $partiallyPaidStatusId = array_search('Partially paid', $contributionStatuses);
     $pendingRefundStatusId = array_search('Pending refund', $contributionStatuses);
-    $completedStatusId = array_search('Completed', $contributionStatuses);
+    $contributionStatusVal = $completedStatusId = array_search('Completed', $contributionStatuses);
 
     $updatedContributionDAO = new CRM_Contribute_BAO_Contribution();
     $adjustedTrxn = $skip = FALSE;
-    if ($balanceAmt) {
-      if ($balanceAmt > 0 && $paidAmount != 0) {
-        $contributionStatusVal = $partiallyPaidStatusId;
-      }
-      elseif ($balanceAmt < 0 && $paidAmount != 0) {
-        $contributionStatusVal = $pendingRefundStatusId;
-      }
-      elseif ($paidAmount == 0) {
-        //skip updating the contribution status if no payment is made
-        $skip = TRUE;
-        $updatedContributionDAO->cancel_date = 'null';
-        $updatedContributionDAO->cancel_reason = NULL;
-      }
-      // update contribution status and total amount without trigger financial code
-      // as this is handled in current BAO function used for change selection
-      $updatedContributionDAO->id = $contributionId;
-      if (!$skip) {
-        $updatedContributionDAO->contribution_status_id = $contributionStatusVal;
-      }
-      $updatedContributionDAO->total_amount = $updatedContributionDAO->net_amount = $updatedAmount;
-      $updatedContributionDAO->fee_amount = 0;
-      $updatedContributionDAO->tax_amount = $taxAmount;
-      if (!empty($updateAmountLevel)) {
-        $updatedContributionDAO->amount_level = $updateAmountLevel;
-      }
-      $updatedContributionDAO->save();
-      // adjusted amount financial_trxn creation
-      $updatedContribution = CRM_Contribute_BAO_Contribution::getValues(
-        array('id' => $contributionId),
-        CRM_Core_DAO::$_nullArray,
-        CRM_Core_DAO::$_nullArray
-      );
-      $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Accounts Receivable Account is' "));
-      $toFinancialAccount = CRM_Contribute_PseudoConstant::financialAccountType($updatedContribution->financial_type_id, $relationTypeId);
-      $adjustedTrxnValues = array(
-        'from_financial_account_id' => NULL,
-        'to_financial_account_id' => $toFinancialAccount,
-        'total_amount' => $balanceAmt,
-        'status_id' => $completedStatusId,
-        'payment_instrument_id' => $updatedContribution->payment_instrument_id,
-        'contribution_id' => $updatedContribution->id,
-        'trxn_date' => date('YmdHis'),
-        'currency' => $updatedContribution->currency,
-      );
-      $adjustedTrxn = CRM_Core_BAO_FinancialTrxn::create($adjustedTrxnValues);
+    if ($balanceAmt > 0 && $paidAmount != 0) {
+      $contributionStatusVal = $partiallyPaidStatusId;
     }
+    elseif ($balanceAmt < 0 && $paidAmount != 0) {
+      $contributionStatusVal = $pendingRefundStatusId;
+    }
+    elseif ($paidAmount == 0) {
+      //skip updating the contribution status if no payment is made
+      $skip = TRUE;
+      $updatedContributionDAO->cancel_date = 'null';
+      $updatedContributionDAO->cancel_reason = NULL;
+    }
+    // update contribution status and total amount without trigger financial code
+    // as this is handled in current BAO function used for change selection
+    $updatedContributionDAO->id = $contributionId;
+    if (!$skip) {
+      $updatedContributionDAO->contribution_status_id = $contributionStatusVal;
+    }
+    $updatedContributionDAO->total_amount = $updatedContributionDAO->net_amount = $updatedAmount;
+    $updatedContributionDAO->fee_amount = 0;
+    $updatedContributionDAO->tax_amount = $taxAmount;
+    if (!empty($updateAmountLevel)) {
+      $updatedContributionDAO->amount_level = $updateAmountLevel;
+    }
+    $updatedContributionDAO->save();
+    // adjusted amount financial_trxn creation
+    $updatedContribution = CRM_Contribute_BAO_Contribution::getValues(
+      array('id' => $contributionId),
+      CRM_Core_DAO::$_nullArray,
+      CRM_Core_DAO::$_nullArray
+    );
+    $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Accounts Receivable Account is' "));
+    $toFinancialAccount = CRM_Contribute_PseudoConstant::financialAccountType($updatedContribution->financial_type_id, $relationTypeId);
+    $adjustedTrxnValues = array(
+      'from_financial_account_id' => NULL,
+      'to_financial_account_id' => $toFinancialAccount,
+      'total_amount' => $balanceAmt,
+      'status_id' => $completedStatusId,
+      'payment_instrument_id' => $updatedContribution->payment_instrument_id,
+      'contribution_id' => $updatedContribution->id,
+      'trxn_date' => date('YmdHis'),
+      'currency' => $updatedContribution->currency,
+    );
+
+    $adjustedTrxn = CRM_Core_BAO_FinancialTrxn::create($adjustedTrxnValues);
+
     return $adjustedTrxn;
   }
 
