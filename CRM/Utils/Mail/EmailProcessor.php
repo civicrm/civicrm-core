@@ -259,10 +259,9 @@ class CRM_Utils_Mail_EmailProcessor {
           }
           else {
             $matches = TRUE;
+            CRM_Utils_Hook::emailProcessor('activity', $params, $mail, $result);
             echo "Processed as Activity: {$mail->subject}\n";
           }
-
-          CRM_Utils_Hook::emailProcessor('activity', $params, $mail, $result);
         }
 
         // if $matches is empty, this email is not CiviMail-bound
