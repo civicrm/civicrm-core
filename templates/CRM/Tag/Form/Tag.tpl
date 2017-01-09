@@ -26,11 +26,13 @@
 {* this template is used for adding/editing tags  *}
 {literal}
 <style>
-  #tagtree .highlighted {
-    background-color: #fefca6;
+  #tagtree,
+  #tagtree li.highlighted ul {
+    background-color: white;
   }
-  #tagtree .helpicon ins {
-    display: none;
+  #tagtree li.highlighted,
+  #tagtree li.highlighted-child.jstree-closed {
+    background-color: #fefcb0;
   }
   #tagtree ins.jstree-icon {
     cursor: pointer;
@@ -45,12 +47,11 @@
     CRM.updateContactSummaryTags = function() {
       var tags = [];
       $('#tagtree input:checkbox:checked+span label').each(function() {
-        tags.push('<span class="crm-tag-item" style="' + $(this).attr('style') + '">' + $(this).text() + '</span>');
+        tags.push('<span class="crm-tag-item" style="' + $(this).attr('style') + '" title="' + ($(this).attr('title') || '') + '">' + $(this).text() + '</span>');
       });
       $('input.crm-contact-tagset').each(function() {
-        var setTags = _.pluck($(this).select2('data'), 'label');
-        $.each(setTags, function (i, item) {
-          tags.push('<span class="crm-tag-item">' + item + '</span>');
+        $.each($(this).select2('data'), function (i, tag) {
+          tags.push('<span class="crm-tag-item" title="' + (tag.description || '') + '"' + (tag.color ? 'style="color: #fff; background-color: ' + tag.color + ';"' : '') + '>' + tag.label + '</span>');
         });
       });
       // contact summary tabs and search forms both listen for this event
@@ -62,10 +63,11 @@
     $(function() {
       function highlightSelected() {
         $("ul input:not(:checked)", '#tagtree').each(function () {
-          $(this).closest("li").removeClass('highlighted');
+          $(this).closest("li").removeClass('highlighted highlighted-child');
         });
         $("ul input:checked", '#tagtree').each(function () {
-          $(this).parents("li[id^=tag]").addClass('highlighted');
+          $(this).closest("li").addClass('highlighted');
+          $(this).parents("li[id^=tag]").addClass('highlighted-child');
         });
       }
       highlightSelected();
@@ -82,6 +84,7 @@
         //load js tree.
         $("#tagtree").jstree({
           plugins : ["themes", "html_data"],
+          core: {animation: 100},
           themes: {
             "theme": 'classic',
             "dots": false,
