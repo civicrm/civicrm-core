@@ -16,7 +16,7 @@ class SequenceListener implements CaseChangeListener {
   /**
    * @param bool $reset
    *   Whether to forcibly rebuild the entire container.
-   * @return \Symfony\Component\DependencyInjection\TaggedContainerInterface
+   * @return SequenceListener
    */
   public static function singleton($reset = FALSE) {
     if ($reset || self::$singleton === NULL) {
@@ -36,6 +36,7 @@ class SequenceListener implements CaseChangeListener {
    * @param \Civi\CCase\Event\CaseChangeEvent $event
    *
    * @throws \CiviCRM_API3_Exception
+   * @return void
    */
   public function onCaseChange(\Civi\CCase\Event\CaseChangeEvent $event) {
     /** @var \Civi\CCase\Analyzer $analyzer */
