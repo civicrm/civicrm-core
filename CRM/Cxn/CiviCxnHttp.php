@@ -79,6 +79,17 @@ class CRM_Cxn_CiviCxnHttp extends \Civi\Cxn\Rpc\Http\PhpHttp {
     return $result;
   }
 
+  /**
+   * Create stream options.
+   *
+   * @param string $verb
+   * @param string $url
+   * @param string $blob
+   * @param array $headers
+   *
+   * @return array
+   * @throws \Exception
+   */
   protected function createStreamOpts($verb, $url, $blob, $headers) {
     $result = parent::createStreamOpts($verb, $url, $blob, $headers);
 

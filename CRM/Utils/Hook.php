@@ -89,6 +89,9 @@ abstract class CRM_Utils_Hook {
     return self::$_singleton;
   }
 
+  /**
+   * CRM_Utils_Hook constructor.
+   */
   public function __construct() {
     $this->cache = CRM_Utils_Cache::create(array(
       'name' => 'hooks',

@@ -159,6 +159,16 @@ WHERE  cacheKey     = %3 AND
     CRM_Core_DAO::executeQuery($sql, $params);
   }
 
+  /**
+   * Mark contacts as being in conflict.
+   *
+   * @param int $id1
+   * @param int $id2
+   * @param string $cacheKey
+   * @param array $conflicts
+   *
+   * @return bool
+   */
   public static function markConflict($id1, $id2, $cacheKey, $conflicts) {
     if (empty($cacheKey) || empty($conflicts)) {
       return FALSE;

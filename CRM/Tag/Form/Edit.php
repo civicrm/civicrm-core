@@ -128,6 +128,11 @@ class CRM_Tag_Form_Edit extends CRM_Admin_Form {
     parent::buildQuickForm();
   }
 
+  /**
+   * Set default values for the form.
+   *
+   * @return array
+   */
   public function setDefaultValues() {
     $defaults = parent::setDefaultValues();
     if (empty($this->_id) || !CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Tag', $this->_id, 'color')) {
