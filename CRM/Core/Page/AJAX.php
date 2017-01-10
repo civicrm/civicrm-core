@@ -214,6 +214,16 @@ class CRM_Core_Page_AJAX {
     CRM_Utils_System::setHttpHeader('Cache-Control', "max-age=$ttl, public");
   }
 
+  /**
+   * Set defaults for sort and pager.
+   *
+   * @param int $defaultOffset
+   * @param int $defaultRowCount
+   * @param string $defaultSort
+   * @param string $defaultsortOrder
+   *
+   * @return array
+   */
   public static function defaultSortAndPagerParams($defaultOffset = 0, $defaultRowCount = 25, $defaultSort = NULL, $defaultsortOrder = 'asc') {
     $params = array(
       '_raw_values' => array(),

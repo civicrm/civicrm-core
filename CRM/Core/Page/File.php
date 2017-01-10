@@ -34,6 +34,9 @@
  */
 class CRM_Core_Page_File extends CRM_Core_Page {
 
+  /**
+   * Run page.
+   */
   public function run() {
     $fileName = CRM_Utils_Request::retrieve('filename', 'String', $this);
     $path = CRM_Core_Config::singleton()->customFileUploadDir . $fileName;

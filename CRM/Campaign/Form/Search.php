@@ -175,8 +175,12 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form_Search {
     CRM_Utils_System::setTitle(ts('Find Respondents To %1', array(1 => ucfirst($this->_operation))));
   }
 
+  /**
+   * Load the default survey for all actions.
+   *
+   * @return array
+   */
   public function setDefaultValues() {
-    //load the default survey for all actions.
     if (empty($this->_defaults)) {
       $defaultSurveyId = key(CRM_Campaign_BAO_Survey::getSurveys(TRUE, TRUE));
       if ($defaultSurveyId) {

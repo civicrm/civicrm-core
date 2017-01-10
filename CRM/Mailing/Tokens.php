@@ -64,6 +64,14 @@ class CRM_Mailing_Tokens extends \Civi\Token\AbstractTokenSubscriber {
     return !empty($processor->context['mailingId']) || !empty($processor->context['mailing']);
   }
 
+  /**
+   * Prefetch tokens.
+   *
+   * @param \Civi\Token\Event\TokenValueEvent $e
+   *
+   * @return array
+   * @throws \Exception
+   */
   public function prefetch(\Civi\Token\Event\TokenValueEvent $e) {
     $processor = $e->getTokenProcessor();
     $mailing = isset($processor->context['mailing'])
