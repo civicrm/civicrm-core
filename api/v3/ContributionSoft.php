@@ -62,6 +62,7 @@ function _civicrm_api3_contribution_soft_create_spec(&$params) {
  * Deletes an existing Soft Credit.
  *
  * @param array $params
+ * @throws API_Exception
  */
 function civicrm_api3_contribution_soft_delete($params) {
   // Non standard BAO - we have to write custom code to cope.

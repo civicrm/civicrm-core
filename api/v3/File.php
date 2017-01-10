@@ -125,9 +125,9 @@ function civicrm_api3_file_update($params) {
  *
  * @param array $params
  *   Array per getfields metadata.
- *
- * @return array
- *   API Result Array
+ * @return array API Result Array
+ * API Result Array
+ * @throws API_Exception
  */
 function civicrm_api3_file_delete($params) {
 

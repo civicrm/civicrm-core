@@ -544,6 +544,7 @@ function _civicrm_api3_contribution_completetransaction_spec(&$params) {
  * @param array $params
  *   Input parameters.
  *
+ * @return mixed
  * @throws API_Exception
  *   Api result array.
  */
