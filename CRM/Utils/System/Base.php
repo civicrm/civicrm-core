@@ -423,6 +423,13 @@ abstract class CRM_Utils_System_Base {
     throw new CRM_Core_Exception("Not implemented: {$className}->getUfId");
   }
 
+  /**
+   * Set the localisation from the user framework.
+   *
+   * @param string $civicrm_language
+   *
+   * @return bool
+   */
   public function setUFLocale($civicrm_language) {
     return TRUE;
   }

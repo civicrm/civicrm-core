@@ -417,6 +417,11 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
     }
   }
 
+  /**
+   * Group the fields.
+   *
+   * @param bool $includeSelectCol
+   */
   public function groupBy($includeSelectCol = TRUE) {
     $this->_groupBy = array();
     if (!empty($this->_params['group_bys']) &&

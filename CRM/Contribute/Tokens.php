@@ -88,12 +88,24 @@ class CRM_Contribute_Tokens extends \Civi\Token\AbstractTokenSubscriber {
     parent::__construct('contribution', $tokens);
   }
 
+  /**
+   * Check if the token processor is active.
+   *
+   * @param \Civi\Token\TokenProcessor $processor
+   *
+   * @return bool
+   */
   public function checkActive(\Civi\Token\TokenProcessor $processor) {
     return
       !empty($processor->context['actionMapping'])
       && $processor->context['actionMapping']->getEntity() === 'civicrm_contribution';
   }
 
+  /**
+   * Alter action schedule query.
+   *
+   * @param \Civi\ActionSchedule\Event\MailingQueryEvent $e
+   */
   public function alterActionScheduleQuery(\Civi\ActionSchedule\Event\MailingQueryEvent $e) {
     if ($e->mapping->getEntity() !== 'civicrm_contribution') {
       return;

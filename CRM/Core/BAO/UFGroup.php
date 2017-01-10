@@ -666,6 +666,11 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
     return $importableFields;
   }
 
+  /**
+   * Get the fields relating to locations.
+   *
+   * @return array
+   */
   public static function getLocationFields() {
     static $locationFields = array(
       'street_address',

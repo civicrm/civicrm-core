@@ -34,16 +34,18 @@
  */
 require_once 'CRM/Core/DAO.php';
 require_once 'CRM/Utils/Type.php';
+/**
+ * CRM_Contact_DAO_ACLContactCache constructor.
+ */
 class CRM_Contact_DAO_ACLContactCache extends CRM_Core_DAO {
   /**
-   * static instance to hold the table name
+   * Static instance to hold the table name.
    *
    * @var string
    */
   static $_tableName = 'civicrm_acl_contact_cache';
   /**
-   * static value to see if we should log any modifications to
-   * this table in the civicrm_log table
+   * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var boolean
    */
@@ -73,16 +75,14 @@ class CRM_Contact_DAO_ACLContactCache extends CRM_Core_DAO {
    */
   public $operation;
   /**
-   * class constructor
-   *
-   * @return civicrm_acl_contact_cache
+   * Class constructor.
    */
   function __construct() {
     $this->__table = 'civicrm_acl_contact_cache';
     parent::__construct();
   }
   /**
-   * Returns foreign keys and entity references
+   * Returns foreign keys and entity references.
    *
    * @return array
    *   [CRM_Core_Reference_Interface]

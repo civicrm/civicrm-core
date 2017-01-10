@@ -34,16 +34,18 @@
  */
 require_once 'CRM/Core/DAO.php';
 require_once 'CRM/Utils/Type.php';
+/**
+ * CRM_Contribute_DAO_PremiumsProduct constructor.
+ */
 class CRM_Contribute_DAO_PremiumsProduct extends CRM_Core_DAO {
   /**
-   * static instance to hold the table name
+   * Static instance to hold the table name.
    *
    * @var string
    */
   static $_tableName = 'civicrm_premiums_product';
   /**
-   * static value to see if we should log any modifications to
-   * this table in the civicrm_log table
+   * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var boolean
    */
@@ -78,16 +80,14 @@ class CRM_Contribute_DAO_PremiumsProduct extends CRM_Core_DAO {
    */
   public $financial_type_id;
   /**
-   * class constructor
-   *
-   * @return civicrm_premiums_product
+   * Class constructor.
    */
   function __construct() {
     $this->__table = 'civicrm_premiums_product';
     parent::__construct();
   }
   /**
-   * Returns foreign keys and entity references
+   * Returns foreign keys and entity references.
    *
    * @return array
    *   [CRM_Core_Reference_Interface]

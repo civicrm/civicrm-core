@@ -1098,6 +1098,14 @@ class CRM_Utils_Array {
     return $array;
   }
 
+  /**
+   * Build tree of elements.
+   *
+   * @param array $elements
+   * @param int|null $parentId
+   *
+   * @return array
+   */
   public static function buildTree($elements, $parentId = NULL) {
     $branch = array();
 
@@ -1114,6 +1122,15 @@ class CRM_Utils_Array {
     return $branch;
   }
 
+  /**
+   * Find search string in tree.
+   *
+   * @param string $search
+   * @param array $tree
+   * @param string $field
+   *
+   * @return array|null
+   */
   public static function findInTree($search, $tree, $field = 'id') {
     foreach ($tree as $item) {
       if ($item[$field] == $search) {

@@ -34,16 +34,18 @@
  */
 require_once 'CRM/Core/DAO.php';
 require_once 'CRM/Utils/Type.php';
+/**
+ * CRM_Queue_DAO_QueueItem constructor.
+ */
 class CRM_Queue_DAO_QueueItem extends CRM_Core_DAO {
   /**
-   * static instance to hold the table name
+   * Static instance to hold the table name.
    *
    * @var string
    */
   static $_tableName = 'civicrm_queue_item';
   /**
-   * static value to see if we should log any modifications to
-   * this table in the civicrm_log table
+   * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var boolean
    */
@@ -83,9 +85,7 @@ class CRM_Queue_DAO_QueueItem extends CRM_Core_DAO {
    */
   public $data;
   /**
-   * class constructor
-   *
-   * @return civicrm_queue_item
+   * Class constructor.
    */
   function __construct() {
     $this->__table = 'civicrm_queue_item';

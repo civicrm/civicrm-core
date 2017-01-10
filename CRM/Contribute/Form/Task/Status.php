@@ -218,7 +218,13 @@ AND    co.id IN ( $contribIDs )";
 
   /**
    * Process the form with submitted params.
+   *
    * Also supports unit test.
+   *
+   * @param CRM_Core_Form $form
+   * @param array $params
+   *
+   * @throws \Exception
    */
   public static function processForm($form, $params) {
     $statusID = CRM_Utils_Array::value('contribution_status_id', $params);

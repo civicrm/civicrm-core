@@ -10,6 +10,9 @@ class CRM_Admin_Page_ExtensionsUpgrade extends CRM_Core_Page {
   const END_URL = 'civicrm/admin/extensions';
   const END_PARAMS = 'reset=1';
 
+  /**
+   * Run Page.
+   */
   public function run() {
     $queue = CRM_Extension_Upgrades::createQueue();
     $runner = new CRM_Queue_Runner(array(
