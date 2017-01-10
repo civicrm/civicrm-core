@@ -51,7 +51,7 @@
       });
       $('input.crm-contact-tagset').each(function() {
         $.each($(this).select2('data'), function (i, tag) {
-          tags.push('<span class="crm-tag-item" title="' + (tag.description || '') + '"' + (tag.color ? 'style="color: #fff; background-color: ' + tag.color + ';"' : '') + '>' + tag.label + '</span>');
+          tags.push('<span class="crm-tag-item" title="' + (tag.description || '') + '"' + (tag.color ? 'style="color: ' + CRM.utils.colorContrast(tag.color) + '; background-color: ' + tag.color + ';"' : '') + '>' + tag.label + '</span>');
         });
       });
       // contact summary tabs and search forms both listen for this event
