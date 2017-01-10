@@ -306,6 +306,10 @@ class CRM_Core_OptionValue {
 
       $nameTitle = array();
       if ($mode == 'contribute') {
+        // This is part of a move towards standardising option values but we
+        // should derive them from the fields array so am deprecating it again...
+        // note that the reason this was needed was that payment_instrument_id was
+        // not set to exportable.
         $nameTitle = array(
           'payment_instrument' => array(
             'name' => 'payment_instrument',
