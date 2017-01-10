@@ -70,6 +70,7 @@ class WhitelistSubscriber implements EventSubscriberInterface {
    * @param array $rules
    *   Array of WhitelistRule.
    * @see WhitelistRule
+   * @throws \CRM_Core_Exception
    */
   public function __construct($rules) {
     $this->rules = array();

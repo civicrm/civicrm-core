@@ -49,6 +49,7 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
     $messageTokens = $e->getTokenProcessor()->getMessageTokens();
 
     foreach ($e->getRows() as $row) {
+      /** @var int $contactId */
       $contactId = $row->context['contactId'];
       if (empty($row->context['contact'])) {
         $params = array(
