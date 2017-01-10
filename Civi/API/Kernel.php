@@ -62,6 +62,14 @@ class Kernel {
 
   /**
    * @deprecated
+   * @param string $entity
+   *   Type of entities to deal with.
+   * @param string $action
+   *   Create, get, delete or some special action name.
+   * @param array $params
+   *   Array to be passed to API function.
+   * @param mixed $extra
+   *   Unused/deprecated.
    * @return array|int
    * @see runSafe
    */

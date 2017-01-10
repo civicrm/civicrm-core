@@ -201,6 +201,7 @@ class DynamicFKAuthorization implements EventSubscriberInterface {
    *   The target entity ID.
    * @param array $apiRequest
    *   The full API request.
+   * @throws \Exception
    * @throws \API_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
