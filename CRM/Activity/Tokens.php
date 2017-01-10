@@ -45,6 +45,9 @@
  */
 class CRM_Activity_Tokens extends \Civi\Token\AbstractTokenSubscriber {
 
+  /**
+   * CRM_Activity_Tokens constructor.
+   */
   public function __construct() {
     parent::__construct('activity', array(
       'activity_id' => ts('Activity ID'),

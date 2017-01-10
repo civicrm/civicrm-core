@@ -65,6 +65,11 @@ class CRM_Event_Page_ParticipantListing extends CRM_Core_Page {
     $this->assign('displayRecent', FALSE);
   }
 
+  /**
+   * Run listing page.
+   *
+   * @throws \Exception
+   */
   public function run() {
     $this->preProcess();
 

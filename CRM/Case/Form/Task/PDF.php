@@ -56,6 +56,11 @@ class CRM_Case_Form_Task_PDF extends CRM_Case_Form_Task {
     CRM_Contact_Form_Task_PDFLetterCommon::preProcess($this);
   }
 
+  /**
+   * Set defaults for the pdf.
+   *
+   * @return array
+   */
   public function setDefaultValues() {
     return CRM_Contact_Form_Task_PDFLetterCommon::setDefaultValues();
   }

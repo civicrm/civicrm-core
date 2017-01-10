@@ -134,7 +134,7 @@ class CRM_ACL_Form_WordPress_Permissions extends CRM_Core_Form {
         // Get the permissions into a format that matches what we get from WP
         $allWarningPermissions = CRM_Core_Permission::getAnonymousPermissionsWarnings();
         foreach ($allWarningPermissions as $key => $permission) {
-          $allWarningPermissions[$key] = CRM_utils_String::munge(strtolower($permission));
+          $allWarningPermissions[$key] = CRM_Utils_String::munge(strtolower($permission));
         }
         $warningPermissions = array_intersect($allWarningPermissions, array_keys($rolePermissions));
         $warningPermissionNames = array();

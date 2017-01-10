@@ -31,6 +31,9 @@ class CRM_Core_CodeGen_Reflection extends CRM_Core_CodeGen_BaseTask {
   }
 
 
+  /**
+   * Run generator.
+   */
   public function run() {
     echo "Generating table list\n";
     $template = new CRM_Core_CodeGen_Util_Template('php');
@@ -55,12 +58,19 @@ class CRM_Core_CodeGen_Reflection extends CRM_Core_CodeGen_BaseTask {
   }
 
   /**
+   * Get absolute file name.
+   *
    * @return string
    */
   protected function getAbsFileName() {
     return $this->config->CoreDAOCodePath . "AllCoreTables.data.php";
   }
 
+  /**
+   * Get the checksum for the schema.
+   *
+   * @return string
+   */
   protected function getSchemaChecksum() {
     if (!$this->checksum) {
       CRM_Utils_Array::flatten($this->tables, $flat);

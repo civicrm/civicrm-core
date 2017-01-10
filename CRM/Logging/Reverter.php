@@ -66,6 +66,11 @@ class CRM_Logging_Reverter {
     $this->diffs = $differ->diffsInTables($tables);
   }
 
+  /**
+   * Setter for diffs.
+   *
+   * @param array $diffs
+   */
   public function setDiffs($diffs) {
     $this->diffs = $diffs;
   }

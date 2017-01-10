@@ -158,6 +158,11 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
     return empty($errors) ? TRUE : $errors;
   }
 
+  /**
+   * Set the default values for the form.
+   *
+   * @return array
+   */
   public function setDefaultValues() {
     parent::setDefaultValues();
 
@@ -277,6 +282,8 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
   }
 
   /**
+   * Get the default locale options.
+   *
    * @return array
    */
   public static function getDefaultLocaleOptions() {
@@ -319,6 +326,14 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
     return $_currencySymbols;
   }
 
+  /**
+   * Update session and uf_match table when the locale is updated.
+   *
+   * @param string $oldLocale
+   * @param string $newLocale
+   * @param array $metadata
+   * @param int $domainID
+   */
   public static function onChangeLcMessages($oldLocale, $newLocale, $metadata, $domainID) {
     if ($oldLocale == $newLocale) {
       return;

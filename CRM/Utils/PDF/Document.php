@@ -33,6 +33,9 @@
 
 require_once 'TbsZip/tbszip.php';
 
+/**
+ * Class CRM_Utils_PDF_Document.
+ */
 class CRM_Utils_PDF_Document {
 
   public static $ooxmlMap = array(
@@ -51,6 +54,8 @@ class CRM_Utils_PDF_Document {
   );
 
   /**
+   * Convert html to a Doc file.
+   *
    * @param array $pages
    * @param string $fileName
    * @param array|int $format

@@ -171,6 +171,9 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form {
     $this->add('text', 'name', ts('Batch Name'));
   }
 
+  /**
+   * Set the default values for the form.
+   */
   public function setDefaultValues() {
     // do not setdefault unless it is open/reopened batch
     if (!in_array($this->_batchStatus, array('Open', 'Reopened'))) {

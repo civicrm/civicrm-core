@@ -53,6 +53,9 @@ class CRM_Financial_Page_Batch extends CRM_Core_Page_Basic {
     return 'CRM_Batch_BAO_Batch';
   }
 
+  /**
+   * Get links.
+   */
   public function &links() {
   }
 

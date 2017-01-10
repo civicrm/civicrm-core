@@ -35,6 +35,9 @@ class CRM_Extension_Manager_Report extends CRM_Extension_Manager_Base {
 
   const REPORT_GROUP_NAME = 'report_template';
 
+  /**
+   * CRM_Extension_Manager_Report constructor.
+   */
   public function __construct() {
     parent::__construct(TRUE);
     $this->groupId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup',

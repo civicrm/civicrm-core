@@ -115,7 +115,8 @@ class CRM_Admin_Form_Setting_Component extends CRM_Admin_Form_Setting {
   }
 
   /**
-   * @param $dsn
+   * Load case sample data.
+   *
    * @param string $fileName
    * @param bool $lineMode
    */

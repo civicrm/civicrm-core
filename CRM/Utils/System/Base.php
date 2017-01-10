@@ -287,6 +287,11 @@ abstract class CRM_Utils_System_Base {
     return 'left';
   }
 
+  /**
+   * Get the absolute path to the site's base url.
+   *
+   * @return bool|mixed|string
+   */
   public function getAbsoluteBaseURL() {
     if (!defined('CIVICRM_UF_BASEURL')) {
       return FALSE;
@@ -304,6 +309,11 @@ abstract class CRM_Utils_System_Base {
     return $url;
   }
 
+  /**
+   * Get the relative path to the sites base url.
+   *
+   * @return bool
+   */
   public function getRelativeBaseURL() {
     $absoluteBaseURL = $this->getAbsoluteBaseURL();
     if ($absoluteBaseURL === FALSE) {
