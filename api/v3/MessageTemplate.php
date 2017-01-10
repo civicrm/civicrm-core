@@ -99,6 +99,7 @@ function civicrm_api3_message_template_get($params) {
  * Sends a template.
  *
  * @param array $params
+ * @throws API_Exception
  */
 function civicrm_api3_message_template_send($params) {
   // Change external param names to internal ones

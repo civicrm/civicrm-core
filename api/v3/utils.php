@@ -1401,6 +1401,7 @@ function _civicrm_api3_basic_delete($bao_name, &$params) {
  *
  * @param array $returnArray
  *   Array to append custom data too - generally $result[4] where 4 is the entity id.
+ * @param $checkPermission
  * @param string $entity
  *   E.g membership, event.
  * @param int $entity_id
@@ -1497,12 +1498,15 @@ function _civicrm_api3_validate($entity, $action, $params) {
 
   return array($errors);
 }
+
 /**
  * Used by the Validate API.
+ * @param $fieldName
  * @param array $fieldInfo
  * @param string $entity
  * @param array $params
  *
+ * @throws API_Exception
  * @throws Exception
  */
 function _civicrm_api3_validate_switch_cases($fieldName, $fieldInfo, $entity, $params) {
