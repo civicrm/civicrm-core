@@ -117,6 +117,11 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
     }
   }
 
+  /**
+   * Set default values for the form.
+   *
+   * @return array
+   */
   public function setDefaultValues() {
     $params = array('id' => $this->_participantId);
 

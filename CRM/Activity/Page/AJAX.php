@@ -389,6 +389,11 @@ class CRM_Activity_Page_AJAX {
     return (array('error_msg' => $error_msg, 'newId' => $mainActivity->id));
   }
 
+  /**
+   * Get activities for the contact.
+   *
+   * @return array
+   */
   public static function getContactActivity() {
     $requiredParameters = array(
       'cid' => 'Integer',

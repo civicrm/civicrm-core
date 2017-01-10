@@ -317,6 +317,11 @@ class CRM_Core_Smarty extends Smarty {
     return $this;
   }
 
+  /**
+   * Get the locale for translation.
+   *
+   * @return string
+   */
   private function getLocale() {
     $tsLocale = CRM_Core_I18n::getLocale();
     if (!empty($tsLocale)) {

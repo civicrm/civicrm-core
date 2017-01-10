@@ -256,6 +256,14 @@ class CRM_Core_Page_AJAX {
     return $params;
   }
 
+  /**
+   * Validate ajax input parameters.
+   *
+   * @param array $requiredParams
+   * @param array $optionalParams
+   *
+   * @return array
+   */
   public static function validateParams($requiredParams = array(), $optionalParams = array()) {
     $params = array();
 

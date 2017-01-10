@@ -71,6 +71,11 @@ class CRM_Contact_Form_DedupeFind extends CRM_Admin_Form {
     );
   }
 
+  /**
+   * Set the default values for the form.
+   *
+   * @return array
+   */
   public function setDefaultValues() {
     $this->_defaults['limit'] = Civi::settings()->get('dedupe_default_limit');
     return $this->_defaults;
