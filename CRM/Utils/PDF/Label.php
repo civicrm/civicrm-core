@@ -255,6 +255,11 @@ class CRM_Utils_PDF_Label extends TCPDF {
     }
   }
 
+  /**
+   * Get the available font names.
+   *
+   * @return array
+   */
   public function getFontNames() {
     // Define labels for TCPDF core fonts
     $fontLabel = array(

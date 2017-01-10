@@ -36,7 +36,14 @@
  */
 class CRM_Core_I18n_SchemaStructure
 {ldelim}
-    static function &columns()
+
+    /**
+     * Get translatable columns.
+     *
+     * @return array
+     *   A table-indexed array of translatable columns.
+     */
+    public static function &columns()
     {ldelim}
         static $result = null;
         if (!$result) {ldelim}
@@ -52,7 +59,14 @@ class CRM_Core_I18n_SchemaStructure
         {rdelim}
         return $result;
     {rdelim}
-    static function &indices()
+
+    /**
+     * Get a table indexed array of the indices for translatable fields.
+     *
+     * @return array
+     *   Indices for translatable fields.
+     */
+    public static function &indices()
     {ldelim}
         static $result = null;
         if (!$result) {ldelim}
@@ -76,6 +90,13 @@ class CRM_Core_I18n_SchemaStructure
         {rdelim}
         return $result;
     {rdelim}
+
+    /**
+     * Get tables with translatable fields.
+     *
+     * @return array
+     *   Array of names of tables with fields that can be translated.
+     */
     static function &tables()
     {ldelim}
         static $result = null;
@@ -84,6 +105,13 @@ class CRM_Core_I18n_SchemaStructure
         {rdelim}
         return $result;
     {rdelim}
+
+    /**
+     * Get a list of widgets for editing translatable fields.
+     *
+     * @return array
+     *   Array of the widgets for editing translatable fields.
+     */
     static function &widgets()
     {ldelim}
         static $result = null;

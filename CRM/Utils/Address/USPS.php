@@ -43,16 +43,18 @@ class CRM_Utils_Address_USPS {
   protected static $_disabled = FALSE;
 
   /**
-   * @param $disabled
+   * Disable the USPS validation.
    *
-   * @return void
+   * @param bool $disable
    */
   public static function disable($disable = TRUE) {
     self::$_disabled = $disable;
   }
 
   /**
-   * @param $values
+   * Check address against USPS.
+   *
+   * @param array $values
    *
    * @return bool
    */

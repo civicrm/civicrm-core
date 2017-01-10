@@ -64,10 +64,11 @@ class CRM_Event_Form_EventFees {
   }
 
   /**
-   * This function sets the default values for the form in edit/view mode
-   * the default values are retrieved from the database
+   * This function sets the default values for the form in edit/view mode.
    *
    * @param CRM_Core_Form $form
+   *
+   * @return array
    */
   public static function setDefaultValues(&$form) {
     $defaults = array();
@@ -248,7 +249,6 @@ class CRM_Event_Form_EventFees {
 
   /**
    * This function sets the default values for price set.
-   *
    *
    * @param int $participantID
    * @param int $eventID

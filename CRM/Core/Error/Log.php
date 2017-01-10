@@ -33,6 +33,9 @@
  */
 class CRM_Core_Error_Log extends \Psr\Log\AbstractLogger {
 
+  /**
+   * CRM_Core_Error_Log constructor.
+   */
   public function __construct() {
     $this->map = array(
       \Psr\Log\LogLevel::DEBUG => PEAR_LOG_DEBUG,

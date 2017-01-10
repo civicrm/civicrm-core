@@ -138,6 +138,11 @@ class CRM_Core_Config_Runtime extends CRM_Core_Config_MagicMerge {
     $this->initialized = 1;
   }
 
+  /**
+   * Exit processing after a fatal event, outputting the message.
+   *
+   * @param string $message
+   */
   private function fatal($message) {
     echo $message;
     exit();

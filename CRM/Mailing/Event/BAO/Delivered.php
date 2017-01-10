@@ -44,6 +44,8 @@ class CRM_Mailing_Event_BAO_Delivered extends CRM_Mailing_Event_DAO_Delivered {
    *
    * @param array $params
    *   Associative array of delivery event values.
+   *
+   * @return \CRM_Mailing_Event_BAO_Delivered
    */
   public static function &create(&$params) {
     $q = &CRM_Mailing_Event_BAO_Queue::verify($params['job_id'],

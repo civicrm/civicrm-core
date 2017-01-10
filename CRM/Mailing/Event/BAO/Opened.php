@@ -44,6 +44,8 @@ class CRM_Mailing_Event_BAO_Opened extends CRM_Mailing_Event_DAO_Opened {
    *
    * @param int $queue_id
    *   The Queue Event ID of the recipient.
+   *
+   * @return bool
    */
   public static function open($queue_id) {
     // First make sure there's a matching queue event.
