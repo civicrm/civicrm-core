@@ -780,7 +780,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
     $dao = CRM_Core_DAO::executeQuery($sql, '');
     while ($dao->fetch()) {
       if ($dao->is_active != '1') {
-        return;
+        return FALSE;
       }
     }
     $discounted_priceset_ids = _cividiscount_get_discounted_priceset_ids();
