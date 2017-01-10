@@ -92,9 +92,8 @@ function civicrm_api3_group_get($params) {
  *
  * @param array $params
  *   [id]
- *
- * @return array
- *   API result array
+ * @return array API result array
+ * @throws API_Exception
  */
 function civicrm_api3_group_delete($params) {
   $group = civicrm_api3_group_get(array('id' => $params['id']));

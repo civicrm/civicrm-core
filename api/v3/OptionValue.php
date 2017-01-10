@@ -101,9 +101,8 @@ function _civicrm_api3_option_value_create_spec(&$params) {
  * Deletes an existing option value.
  *
  * @param array $params
- *
- * @return array
- *   API result array
+ * @return array API result array
+ * @throws API_Exception
  */
 function civicrm_api3_option_value_delete($params) {
   // We will get the option group id before deleting so we can flush pseudoconstants.
