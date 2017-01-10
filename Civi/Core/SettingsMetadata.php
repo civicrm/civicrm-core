@@ -112,7 +112,7 @@ class SettingsMetadata {
       $realFolder = realpath($metaDataFolder);
       if (is_dir($realFolder) && !isset($loadedFolders[$realFolder])) {
         $loadedFolders[$realFolder] = TRUE;
-        $settingsMetadata = $settingsMetadata + self::loadSettingsMetaData($metaDataFolder);
+        $settingsMetadata = $settingsMetadata + self::loadSettingsMetadata($metaDataFolder);
       }
     }
     return $settingsMetadata;

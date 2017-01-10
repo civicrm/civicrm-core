@@ -63,7 +63,7 @@ class Manager {
   }
 
   /**
-   * @param CRM_Core_DAO $dao
+   * @param \CRM_Core_DAO $dao
    *   Handle for the DB connection that will execute transaction statements.
    *   (all we really care about is the query() function)
    */
