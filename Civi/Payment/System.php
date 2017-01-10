@@ -77,7 +77,7 @@ class System {
    *
    * @param int $id
    *
-   * @return \Civi\Payment\CRM_Core_Payment|NULL
+   * @return \CRM_Core_Payment|NULL
    * @throws \CiviCRM_API3_Exception
    */
   public function getById($id) {
@@ -92,7 +92,7 @@ class System {
    * @param string $name
    * @param bool $is_test
    *
-   * @return \Civi\Payment\CRM_Core_Payment|NULL
+   * @return \CRM_Core_Payment|NULL
    * @throws \CiviCRM_API3_Exception
    */
   public function getByName($name, $is_test) {
