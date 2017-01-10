@@ -277,6 +277,8 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
   }
 
   /**
+   * Get the default locale options.
+   *
    * @return array
    */
   public static function getDefaultLocaleOptions() {

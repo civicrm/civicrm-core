@@ -288,6 +288,11 @@ class CRM_Utils_System_Backdrop extends CRM_Utils_System_DrupalBase {
     $base_url = str_replace('http://', 'https://', $base_url);
   }
 
+  /**
+   * Get the name of the table that stores the user details.
+   *
+   * @return string
+   */
   protected function getUsersTableName() {
     $userFrameworkUsersTableName = Civi::settings()->get('userFrameworkUsersTableName');
     if (empty($userFrameworkUsersTableName)) {
