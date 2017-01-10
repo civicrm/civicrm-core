@@ -123,7 +123,11 @@
               {elseif ( ( $n|substr:-5:5 eq '_date' ) OR ( $field.data_type eq 'Date' ) ) AND
               ( $form.formName neq 'Confirm' )  AND
               ( $form.formName neq 'ThankYou' ) }
-                {include file="CRM/common/jcalendar.tpl" elementName=$n}
+                {if ( $n|substr:-5:5 eq '_date' ) }
+                  {include file="CRM/common/jcalendar.tpl" elementName=$n}
+                {else}
+                  {$form.$n.html}
+                {/if}
               {elseif ( ( $n|substr:-5:5 eq '_date' ) OR ( $field.data_type eq 'Date' ) ) }
                 {assign var="date_value" value=$form.$n.value}
                 <span class="crm-frozen-field">
