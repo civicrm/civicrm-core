@@ -12,11 +12,12 @@
  *
  * @package CRM
  * @author Michael Morris and Gene Chi @ Phase2 Technology <mmorris@phase2technology.com>
- * $Id$
- *
  */
 require_once 'PayJunction/pjClasses.php';
 
+/**
+ * Class CRM_Core_Payment_PayJunction.
+ */
 class CRM_Core_Payment_PayJunction extends CRM_Core_Payment {
   # (not used, implicit in the API, might need to convert?)
   const CHARSET = 'UFT-8';

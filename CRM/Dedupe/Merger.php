@@ -651,6 +651,12 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     return $where;
   }
 
+  /**
+   * Update the statistics for the merge set.
+   *
+   * @param string $cacheKeyString
+   * @param array $result
+   */
   public static function updateMergeStats($cacheKeyString, $result = array()) {
     // gather latest stats
     $merged  = count($result['merged']);
@@ -695,6 +701,14 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     CRM_Core_BAO_PrevNextCache::deleteItem(NULL, "{$cacheKeyString}_stats");
   }
 
+  /**
+   * Get merge outcome statistics.
+   *
+   * @param string $cacheKeyString
+   *
+   * @return array
+   *   Array of how many were merged and how many were skipped.
+   */
   public static function getMergeStats($cacheKeyString) {
     $stats = CRM_Core_BAO_PrevNextCache::retrieve("{$cacheKeyString}_stats");
     if (!empty($stats)) {
@@ -703,6 +717,13 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     return $stats;
   }
 
+  /**
+   * Get merge statistics message.
+   *
+   * @param string $cacheKeyString
+   *
+   * @return string
+   */
   public static function getMergeStatsMsg($cacheKeyString) {
     $msg   = '';
     $stats = CRM_Dedupe_Merger::getMergeStats($cacheKeyString);

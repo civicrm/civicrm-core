@@ -186,6 +186,8 @@ class CRM_Contribute_Form_Task extends CRM_Core_Form {
 
   /**
    * Sets contribution Ids for unit test.
+   *
+   * @param array $contributionIds
    */
   public function setContributionIds($contributionIds) {
     $this->_contributionIds = $contributionIds;

@@ -585,6 +585,13 @@ class CRM_Utils_SQL_Select implements ArrayAccess {
     return $sql;
   }
 
+  /**
+   * Has an offset been set.
+   *
+   * @param string $offset
+   *
+   * @return bool
+   */
   public function offsetExists($offset) {
     return isset($this->params[$offset]);
   }

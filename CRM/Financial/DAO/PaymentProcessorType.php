@@ -34,16 +34,18 @@
  */
 require_once 'CRM/Core/DAO.php';
 require_once 'CRM/Utils/Type.php';
+/**
+ * CRM_Financial_DAO_PaymentProcessorType constructor.
+ */
 class CRM_Financial_DAO_PaymentProcessorType extends CRM_Core_DAO {
   /**
-   * static instance to hold the table name
+   * Static instance to hold the table name.
    *
    * @var string
    */
   static $_tableName = 'civicrm_payment_processor_type';
   /**
-   * static value to see if we should log any modifications to
-   * this table in the civicrm_log table
+   * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var boolean
    */
@@ -174,9 +176,7 @@ class CRM_Financial_DAO_PaymentProcessorType extends CRM_Core_DAO {
    */
   public $payment_instrument_id;
   /**
-   * class constructor
-   *
-   * @return civicrm_payment_processor_type
+   * Class constructor.
    */
   function __construct() {
     $this->__table = 'civicrm_payment_processor_type';

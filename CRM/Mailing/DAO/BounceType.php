@@ -34,16 +34,18 @@
  */
 require_once 'CRM/Core/DAO.php';
 require_once 'CRM/Utils/Type.php';
+/**
+ * CRM_Mailing_DAO_BounceType constructor.
+ */
 class CRM_Mailing_DAO_BounceType extends CRM_Core_DAO {
   /**
-   * static instance to hold the table name
+   * Static instance to hold the table name.
    *
    * @var string
    */
   static $_tableName = 'civicrm_mailing_bounce_type';
   /**
-   * static value to see if we should log any modifications to
-   * this table in the civicrm_log table
+   * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var boolean
    */
@@ -72,9 +74,7 @@ class CRM_Mailing_DAO_BounceType extends CRM_Core_DAO {
    */
   public $hold_threshold;
   /**
-   * class constructor
-   *
-   * @return civicrm_mailing_bounce_type
+   * Class constructor.
    */
   function __construct() {
     $this->__table = 'civicrm_mailing_bounce_type';
