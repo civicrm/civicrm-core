@@ -2315,6 +2315,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *
    * @param array $params
    *   Form input params, default to $this->_params.
+   *
+   * @return string
    */
   public function assignBillingName($params = array()) {
     $name = '';

@@ -4667,6 +4667,8 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
    * @param object $query
    * @param string $alias
    * @param bool $return
+   *
+   * @return string
    */
   public function getPermissionedFTQuery(&$query, $alias = NULL, $return = FALSE) {
     if (!CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
