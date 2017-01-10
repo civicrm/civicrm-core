@@ -68,7 +68,7 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
       'gid' => $gid,
       'limit' => $limit
     );
-    $this->assign('urlQuery', implode('&', $urlQry));
+    $this->assign('urlQuery', CRM_Utils_System::makeQueryString($urlQry));
 
     $session = CRM_Core_Session::singleton();
     $contactIds = $session->get('selectedSearchContactIds');
