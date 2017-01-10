@@ -816,7 +816,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
 
     curl_close($submit);
 
-    $responseFields = $this->_ParseArbReturn($response);
+    $responseFields = $this->_parseArbReturn($response);
     $message = "{$responseFields['code']}: {$responseFields['text']}";
 
     if ($responseFields['resultCode'] == 'Error') {

@@ -341,7 +341,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
       return TRUE;
     }
 
-    return parent::formrule($fields, $files, $self);
+    return parent::formRule($fields, $files, $self);
   }
 
   /**

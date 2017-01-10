@@ -41,7 +41,7 @@ class CRM_Case_Form_Task_Print extends CRM_Case_Form_Task {
    * Build all the data structures needed to build the form.
    */
   public function preProcess() {
-    parent::preprocess();
+    parent::preProcess();
 
     // set print view, so that print templates are called
     $this->controller->setPrint(1);
