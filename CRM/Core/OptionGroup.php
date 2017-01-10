@@ -108,10 +108,10 @@ class CRM_Core_OptionGroup {
    *   ignore cache entries and go back to DB.
    * @param string $keyColumnName
    *   the column to use for 'key'.
+   * @param string $orderBy
    *
    * @return array
-   *   the values as specified by the above params
-   * @void
+   *   The values as specified by the params
    */
   public static function &values(
     $name, $flip = FALSE, $grouping = FALSE,
