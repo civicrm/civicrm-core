@@ -66,7 +66,7 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
       'reset' => 1,
       'rgid' => $rgid,
       'gid' => $gid,
-      'limit' => $limit
+      'limit' => $limit,
     );
     $this->assign('urlQuery', CRM_Utils_System::makeQueryString($urlQry));
 
@@ -113,7 +113,7 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
       }
       else {
         $urlQry['action'] = 'map';
-        $urlQry['skipped'] =$skippedCount;
+        $urlQry['skipped'] = $skippedCount;
         $urlQry['merged'] = $mergedCount;
         CRM_Utils_System::jsRedirect(
           CRM_Utils_System::url('civicrm/contact/dedupefind', $urlQry),
