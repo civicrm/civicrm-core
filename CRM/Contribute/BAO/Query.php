@@ -44,7 +44,9 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
   static $_contribRecurPayment = NULL;
 
   /**
-   * Function get the import/export fields for contribution.
+   * Function get the searchable fields for contribution.
+   *
+   * This is basically the contribution fields plus some related entity fields.
    *
    * @param bool $checkPermission
    *
