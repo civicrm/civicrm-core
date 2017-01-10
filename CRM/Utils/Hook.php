@@ -2199,8 +2199,11 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
-   * This hook is called for bypass a few civicrm urls from IDS check
-   * @param array $skip list of civicrm url;
+   * This hook is called for bypass a few civicrm urls from IDS check.
+   *
+   * @param array $skip list of civicrm urls
+   *
+   * @return mixed
    */
   public static function idsException(&$skip) {
     return self::singleton()->invoke(1, $skip, self::$_nullObject,
@@ -2215,6 +2218,8 @@ abstract class CRM_Utils_Hook {
    * @param string $geoProvider
    * @param array $values
    * @param SimpleXMLElement $xml
+   *
+   * @return mixed
    */
   public static function geocoderFormat($geoProvider, &$values, $xml) {
     return self::singleton()->invoke(3, $geoProvider, $values, $xml,

@@ -3173,10 +3173,11 @@ AND        m.id = %1
   }
 
   /**
-   * Whitelist of possible values for the entity_table field
+   * White-list of possible values for the entity_table field.
+   *
    * @return array
    */
-  public static function mailingGroupEntityTables($context = NULL) {
+  public static function mailingGroupEntityTables() {
     return array(
       CRM_Contact_BAO_Group::getTableName() => 'Group',
       CRM_Mailing_BAO_Mailing::getTableName() => 'Mailing',
