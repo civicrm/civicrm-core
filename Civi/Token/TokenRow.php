@@ -134,6 +134,8 @@ class TokenRow {
    * @param string $baoName
    * @param array $baoField
    * @param mixed $fieldValue
+   * @return TokenRow
+   * @throws \CRM_Core_Exception
    */
   public function dbToken($tokenEntity, $tokenField, $baoName, $baoField, $fieldValue) {
     if ($fieldValue === NULL || $fieldValue === '') {

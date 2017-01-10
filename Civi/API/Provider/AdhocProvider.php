@@ -87,7 +87,7 @@ class AdhocProvider implements EventSubscriberInterface, ProviderInterface {
    *   Permissions required for invoking the action.
    * @param mixed $callback
    *   The function which executes the API.
-   * @return ReflectionProvider
+   * @return AdhocProvider
    */
   public function addAction($name, $perm, $callback) {
     $this->actions[strtolower($name)] = array(
