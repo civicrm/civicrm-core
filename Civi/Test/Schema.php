@@ -84,7 +84,7 @@ class Schema {
   }
 
   /**
-   * @return array
+   * @return Schema
    */
   public function truncateAll() {
     $tables = \Civi\Test::schema()->getTables('BASE TABLE');
