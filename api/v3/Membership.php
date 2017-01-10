@@ -55,7 +55,6 @@ function _civicrm_api3_membership_delete_spec(&$params) {
  * @param array $params
  *   Array array holding id - Id of the contact membership to be deleted.
  * @return array API result array.
- * API result array.
  * @throws API_Exception
  */
 function civicrm_api3_membership_delete($params) {

@@ -69,7 +69,6 @@ function civicrm_api3_participant_status_type_get($params) {
  * @param array $params
  *   [id]
  * @return array api result array
- * api result array
  * @throws API_Exception
  */
 function civicrm_api3_participant_status_type_delete($params) {
