@@ -544,9 +544,9 @@ function _civicrm_api3_contribution_completetransaction_spec(&$params) {
  * @param array $params
  *   Input parameters.
  *
- * @return mixed
- * @throws API_Exception
+ * @return array
  *   Api result array.
+ * @throws API_Exception
  */
 function civicrm_api3_contribution_repeattransaction(&$params) {
   $input = $ids = array();
