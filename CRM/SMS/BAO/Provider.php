@@ -34,8 +34,6 @@ class CRM_SMS_BAO_Provider extends CRM_SMS_DAO_Provider {
 
   /**
    * Class constructor.
-   *
-   * @return \CRM_SMS_DAO_Provider
    */
   public function __construct() {
     parent::__construct();

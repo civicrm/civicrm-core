@@ -87,10 +87,10 @@ class CRM_Utils_Check_Message {
    *   Printable message (short).
    * @param string $level
    *   The severity of the message. Use PSR-3 log levels.
+   * @param string $icon
    *
    * @see Psr\Log\LogLevel
    *
-   * @throws \CRM_Core_Exception
    */
   public function __construct($name, $message, $title, $level = \Psr\Log\LogLevel::WARNING, $icon = NULL) {
     $this->name = $name;

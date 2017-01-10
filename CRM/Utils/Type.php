@@ -144,7 +144,7 @@ class CRM_Utils_Type {
   }
 
   /**
-   * Helper function to call escape on arrays
+   * Helper function to call escape on arrays.
    *
    * @see escape
    */

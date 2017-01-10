@@ -1003,7 +1003,7 @@ WHERE  id = %1";
    *   Db column name/label.
    * @param bool $reset
    *   Reset relationship types if true.
-   * @param bool|NULL $isActive
+   * @param bool $isActive
    *   Filter by is_active. NULL to disable.
    *
    * @return array

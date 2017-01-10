@@ -96,6 +96,8 @@ class CRM_Financial_Form_Payment extends CRM_Core_Form {
 
   /**
    * Add JS to show icons for the accepted credit cards.
+   *
+   * @param int $paymentProcessorID
    */
   public static function addCreditCardJs($paymentProcessorID = NULL) {
     $creditCards = array();

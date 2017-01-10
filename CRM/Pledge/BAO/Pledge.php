@@ -1236,6 +1236,9 @@ SELECT  pledge.contact_id              as contact_id,
   /**
    * Get first payment date for pledge.
    *
+   * @param int $day
+   *
+   * @return bool|string
    */
   public static function getPaymentDate($day) {
     if ($day == 31) {
