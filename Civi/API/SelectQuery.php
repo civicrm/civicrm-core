@@ -114,7 +114,7 @@ abstract class SelectQuery {
   /**
    * Build & execute the query and return results array
    *
-   * @return array
+   * @return array|int
    * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \Exception
