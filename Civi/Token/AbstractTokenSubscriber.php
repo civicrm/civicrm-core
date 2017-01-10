@@ -163,12 +163,12 @@ abstract class AbstractTokenSubscriber implements EventSubscriberInterface {
   /**
    * Populate the custom field and other remaining entity token data.
    *
-   * @param TokenRow $e
+   * @param TokenRow $row
    *   The record for which we want token values.
    * @param string $entity
    *   The entity for which we want the token values
    * @param array $tokens
-   *   The array of tokens whose data need to be fetched 
+   *   The array of tokens whose data need to be fetched
    */
   public function evaluateExtraToken(TokenRow $row, $entity, $tokens) {
     if (empty($tokens)) {
