@@ -102,7 +102,6 @@ function _civicrm_api3_option_value_create_spec(&$params) {
  *
  * @param array $params
  * @return array API result array
- * API result array
  * @throws API_Exception
  */
 function civicrm_api3_option_value_delete($params) {
