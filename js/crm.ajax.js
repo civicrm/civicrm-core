@@ -402,6 +402,7 @@
         success: function(response) {
           if (response.content === undefined) {
             $el.trigger('crmFormSuccess', response);
+
             // Reset form for e.g. "save and new"
             if (response.userContext && (response.status === 'redirect' || (settings.refreshAction && $.inArray(response.buttonName, settings.refreshAction) >= 0))) {
               // Force reset of original url

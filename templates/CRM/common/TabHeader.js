@@ -59,6 +59,14 @@ CRM.$(function($) {
       $.each(data.updateTabs, CRM.tabHeader.resetTab);
     }
   });
+
+  $(document).on('crmFormSuccess', function(e) {
+    // refresh the active tab to show effect for saved data
+    var $activeTab = $("#mainTabContainer .ui-tabs-active");
+    if (typeof($activeTab) != 'undefined') {
+      CRM.tabHeader.resetTab($activeTab);
+    }
+  });
 });
 (function($) {
   // Utility functions
