@@ -104,7 +104,9 @@ class CRM_Financial_BAO_ExportFormat_CSV extends CRM_Financial_BAO_ExportFormat 
       fac.account_type_code AS from_credit_account_type_code,
       fac.accounting_code AS from_credit_account,
       fac.name AS from_credit_account_name,
-      fi.description AS item_description
+      fi.description AS item_description,
+      ftype.name AS financial_type_name,
+      ftype.financial_type_code
       FROM civicrm_entity_batch eb
       LEFT JOIN civicrm_financial_trxn ft ON (eb.entity_id = ft.id AND eb.entity_table = 'civicrm_financial_trxn')
       LEFT JOIN civicrm_financial_account fa_to ON fa_to.id = ft.to_financial_account_id
@@ -119,6 +121,9 @@ class CRM_Financial_BAO_ExportFormat_CSV extends CRM_Financial_BAO_ExportFormat 
       LEFT JOIN civicrm_financial_item fi ON fi.id = efti.entity_id
       LEFT JOIN civicrm_financial_account fac ON fac.id = fi.financial_account_id
       LEFT JOIN civicrm_financial_account fa ON fa.id = fi.financial_account_id
+      LEFT JOIN civicrm_entity_financial_trxn eft ON (eft.financial_trxn_id = ft.id AND eft.entity_table = 'civicrm_contribution')
+      LEFT JOIN civicrm_contribution contribution ON contribution.id = eft.entity_id
+      LEFT JOIN civicrm_financial_type ftype ON ftype.id = contribution.financial_type_id
       WHERE eb.batch_id = ( %1 )";
 
     CRM_Utils_Hook::batchQuery($sql);
@@ -220,6 +225,8 @@ class CRM_Financial_BAO_ExportFormat_CSV extends CRM_Financial_BAO_ExportFormat 
           'Credit Account Name' => $creditAccountName,
           'Credit Account Type' => $creditAccountType,
           'Item Description' => $dao->item_description,
+          'Financial Type Name' => $dao->financial_type_name,
+          'Financial Type Code' => $dao->financial_type_code,
         );
 
         end($financialItems);

@@ -59,7 +59,7 @@ CUST{$tabchar}{$contact.name}{$tabchar}{$tabchar}{$tabchar}{$tabchar}{$tabchar}{
 {foreach from=$journalEntries key=id item=je}
 TRNS{$tabchar}{$je.to_account.trxn_id}{$tabchar}GENERAL JOURNAL{$tabchar}{$je.to_account.trxn_date}{$tabchar}{$je.to_account.account_name}{$tabchar}{$je.to_account.contact_name}{$tabchar}{$tabchar}{$je.to_account.amount}{$tabchar}{$je.to_account.check_number}{$tabchar}{$tabchar}{$je.to_account.payment_instrument}
 {foreach from=$je.splits key=spl_id item=spl}
-SPL{$tabchar}{$spl.spl_id}{$tabchar}GENERAL JOURNAL{$tabchar}{$spl.trxn_date}{$tabchar}{$spl.account_name}{$tabchar}{$spl.contact_name}{$tabchar}{$tabchar}{$spl.amount}{$tabchar}{$spl.check_number}{$tabchar}{$spl.description}{$tabchar}{$spl.payment_instrument}
+SPL{$tabchar}{$spl.spl_id}{$tabchar}GENERAL JOURNAL{$tabchar}{$spl.trxn_date}{$tabchar}{$spl.account_name}{$tabchar}{$spl.contact_name}{$tabchar}{$spl.financial_type_code}{$tabchar}{$spl.amount}{$tabchar}{$spl.check_number}{$tabchar}{$spl.description}{$tabchar}{$spl.payment_instrument}
 {/foreach}
 ENDTRNS
 {/foreach}
