@@ -1673,4 +1673,15 @@ if (!CRM.vars) CRM.vars = {};
   CRM.utils.formatDate = function(input, outputFormat) {
     return input ? $.datepicker.formatDate(outputFormat || CRM.config.dateInputFormat, CRM.utils.makeDate(input)) : '';
   };
+
+  // Used to set appropriate text color for a given background
+  CRM.utils.colorContrast = function (hexcolor) {
+    hexcolor = hexcolor.replace(/[ #]/g, '');
+    var r = parseInt(hexcolor.substr(0, 2), 16),
+     g = parseInt(hexcolor.substr(2, 2), 16),
+     b = parseInt(hexcolor.substr(4, 2), 16),
+     yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+    return (yiq >= 128) ? 'black' : 'white';
+  };
+
 })(jQuery, _);
