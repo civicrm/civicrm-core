@@ -162,7 +162,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     $this->_freqUnits = CRM_Core_SelectValues::getRecurringFrequencyUnits();
 
     //reminder_interval
-    $this->add('number', 'start_action_offset', ts('When'), array('style' => 'width:5em'));
+    $this->add('number', 'start_action_offset', ts('When'), array('class' => 'six', 'min' => 1));
     $this->addRule('start_action_offset', ts('Value should be a positive number'), 'positiveInteger');
 
     $isActive = ts('Send email');
@@ -208,11 +208,11 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     );
 
     $this->add('select', 'repetition_frequency_unit', ts('every'), $freqUnitsDisplay);
-    $this->add('number', 'repetition_frequency_interval', ts('every'), array('style' => 'width:5em'));
+    $this->add('number', 'repetition_frequency_interval', ts('every'), array('class' => 'six', 'min' => 1));
     $this->addRule('repetition_frequency_interval', ts('Value should be a positive number'), 'positiveInteger');
 
     $this->add('select', 'end_frequency_unit', ts('until'), $freqUnitsDisplay);
-    $this->add('number', 'end_frequency_interval', ts('until'), array('style' => 'width:5em'));
+    $this->add('number', 'end_frequency_interval', ts('until'), array('class' => 'six', 'min' => 1));
     $this->addRule('end_frequency_interval', ts('Value should be a positive number'), 'positiveInteger');
 
     $this->add('select', 'end_action', ts('Repetition Condition'), $condition, TRUE);
