@@ -301,6 +301,18 @@ class CRM_Utils_System {
   }
 
   /**
+   * Path of the current page e.g. 'civicrm/contact/view'
+   *
+   * @return string|null
+   */
+  public static function getUrlPath() {
+    if (isset($_GET[CRM_Core_Config::singleton()->userFrameworkURLVar])) {
+      return $_GET[CRM_Core_Config::singleton()->userFrameworkURLVar];
+    }
+    return NULL;
+  }
+
+  /**
    * Get href.
    *
    * @param string $text
