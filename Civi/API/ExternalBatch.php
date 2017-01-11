@@ -52,6 +52,11 @@ class ExternalBatch {
     $this->settingsPath = defined('CIVICRM_SETTINGS_PATH') ? CIVICRM_SETTINGS_PATH : NULL;
     $this->defaultParams = $defaultParams;
     $this->env = $_ENV;
+    if (empty($_ENV)) {
+      // FIXME: If we upgrade to newer Symfony\Process and use the newer
+      // inheritEnv feature, then this becomes unnecessary.
+      throw new \CRM_Core_Exception('ExternalBatch cannot detect environment: $_ENV is missing. (Tip: Set variables_order=EGPCS in php.ini.)');
+    }
   }
 
   /**
