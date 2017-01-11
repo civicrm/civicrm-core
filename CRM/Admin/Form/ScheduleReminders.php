@@ -161,10 +161,10 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     //pass the mapping ID in UPDATE mode
     $mappings = CRM_Core_BAO_ActionSchedule::getMapping($mappingID);
 
-    $numericOptions = CRM_Core_SelectValues::getNumericOptions(0, 30);
-
     //reminder_interval
-    $this->add('select', 'start_action_offset', ts('When'), $numericOptions);
+    $this->add('text', 'start_action_offset', ts('When'), array('class' => 'six', 'min' => 1));
+    $this->addRule('start_action_offset', ts('Value should be a positive number'), 'positiveInteger');
+
     $isActive = ts('Send email');
     $recordActivity = ts('Record activity for automated email');
     if ($providersCount) {
@@ -208,9 +208,13 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     );
 
     $this->add('select', 'repetition_frequency_unit', ts('every'), $freqUnitsDisplay);
-    $this->add('select', 'repetition_frequency_interval', ts('every'), $numericOptions);
+    $this->add('text', 'repetition_frequency_interval', ts('every'), array('class' => 'six', 'min' => 1));
+    $this->addRule('repetition_frequency_interval', ts('Value should be a positive number'), 'positiveInteger');
+
     $this->add('select', 'end_frequency_unit', ts('until'), $freqUnitsDisplay);
-    $this->add('select', 'end_frequency_interval', ts('until'), $numericOptions);
+    $this->add('text', 'end_frequency_interval', ts('until'), array('class' => 'six', 'min' => 1));
+    $this->addRule('end_frequency_interval', ts('Value should be a positive number'), 'positiveInteger');
+
     $this->add('select', 'end_action', ts('Repetition Condition'), $condition, TRUE);
     $this->add('select', 'end_date', ts('Date Field'), $sel4, TRUE);
 
