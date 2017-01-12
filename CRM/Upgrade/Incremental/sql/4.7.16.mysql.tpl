@@ -20,3 +20,8 @@ UPDATE civicrm_option_value SET icon = 'fa-user-circle-o' WHERE option_group_id 
 UPDATE civicrm_option_value SET icon = 'fa-link' WHERE option_group_id = @option_group_id_act AND name = 'Link Cases';
 UPDATE civicrm_option_value SET icon = 'fa-tags' WHERE option_group_id = @option_group_id_act AND name = 'Change Case Tags';
 UPDATE civicrm_option_value SET icon = 'fa-users' WHERE option_group_id = @option_group_id_act AND name = 'Add Client To Case';
+
+-- CRM-17663 repair null dashlet names
+UPDATE `civicrm_dashboard`
+  SET name = CONCAT('report/', SUBSTRING_INDEX(SUBSTRING_INDEX(url, '?', 1), '/', -1))
+  WHERE name IS NULL AND url LIKE "civicrm/report/instance/%";
