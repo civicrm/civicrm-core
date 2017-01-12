@@ -62,17 +62,12 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
           throw new TokenException("Failed to generate token data. Invalid contact ID: " . $row->context['contactId']);
         }
 
-        $contactTokens = \CRM_Utils_Array::value('contact', $messageTokens);
-        if (!empty($contactTokens)) {
-          try {
-            $result = civicrm_api3('Contact', 'getsingle', array(
-              'id' => $contactId,
-              'return' => $contactTokens,
-            ));
-            $contact = array_merge($contact, $result);
-          }
-          catch (CiviCRM_API3_Exception $e) {
-            //do nothing
+        //update value of custom field token
+        if (!empty($messageTokens['contact'])) {
+          foreach ($messageTokens['contact'] as $token) {
+            if (\CRM_Core_BAO_CustomField::getKeyID($token)) {
+              $row->customToken('Contact', $token, $contactId);
+            }
           }
         }
       }

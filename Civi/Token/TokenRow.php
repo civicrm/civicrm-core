@@ -127,6 +127,22 @@ class TokenRow {
   }
 
   /**
+   * Update the value of a custom field token.
+   *
+   * @param string $entity
+   * @param string $fieldName
+   * @param string $entityID
+   * @return TokenRow
+   */
+  public function customToken($entity, $fieldName, $entityID) {
+    $fieldValue = civicrm_api3($entity, 'getvalue', array(
+      'return' => $fieldName,
+      'id' => $entityID,
+    ));
+    return $this->tokens($entity, $fieldName, $fieldValue);
+  }
+
+  /**
    * Update the value of a token. Apply formatting based on DB schema.
    *
    * @param string $tokenEntity
