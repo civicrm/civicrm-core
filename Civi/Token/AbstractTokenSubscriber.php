@@ -118,6 +118,22 @@ abstract class AbstractTokenSubscriber implements EventSubscriberInterface {
   }
 
   /**
+   * Get all custom field tokens of $entity
+   *
+   * @param string $entity
+   * @return array $customTokens
+   *   return custom field tokens in array('custom_N' => 'label') format
+   */
+  public function getCustomTokens($entity) {
+    $customTokens = array();
+    foreach (\CRM_Core_BAO_CustomField::getFields($entity) as $id => $info) {
+      $customTokens["custom_$id"] = $info['label'];
+    }
+
+    return $customTokens;
+  }
+
+  /**
    * Alter the query which prepopulates mailing data
    * for scheduled reminders.
    *
@@ -148,47 +164,13 @@ abstract class AbstractTokenSubscriber implements EventSubscriberInterface {
     }
 
     $activeTokens = array_intersect($messageTokens[$this->entity], array_keys($this->tokenNames));
-    $extraTokens = array_diff($messageTokens[$this->entity], array_keys($this->tokenNames));
 
     $prefetch = $this->prefetch($e);
 
     foreach ($e->getRows() as $row) {
-      $this->evaluateExtraToken($row, $this->entity, $extraTokens);
       foreach ((array) $activeTokens as $field) {
         $this->evaluateToken($row, $this->entity, $field, $prefetch);
       }
-    }
-  }
-
-  /**
-   * Populate the custom field and other remaining entity token data.
-   *
-   * @param TokenRow $row
-   *   The record for which we want token values.
-   * @param string $entity
-   *   The entity for which we want the token values
-   * @param array $tokens
-   *   The array of tokens whose data need to be fetched
-   */
-  public function evaluateExtraToken(TokenRow $row, $entity, $tokens) {
-    if (empty($tokens)) {
-      return;
-    }
-
-    $actionSearchResult = $row->context['actionSearchResult'];
-
-    try {
-      $result = civicrm_api3($entity, 'getsingle', array(
-        'id' => $actionSearchResult->entity_id,
-        'return' => $tokens,
-      ));
-    }
-    catch (CiviCRM_API3_Exception $e) {
-      return;
-    }
-
-    foreach ($tokens as $token) {
-      $row->tokens($entity, $token, \CRM_Utils_Array::value($token, $result, ''));
     }
   }
 

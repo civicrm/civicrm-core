@@ -85,6 +85,7 @@ class CRM_Contribute_Tokens extends \Civi\Token\AbstractTokenSubscriber {
     $tokens['source'] = ts('Contribution Source');
     $tokens['status'] = ts('Contribution Status');
     $tokens['type'] = ts('Financial Type');
+    $tokens = array_merge($tokens, $this->getCustomTokens('Contribution'));
     parent::__construct('contribution', $tokens);
   }
 
@@ -134,6 +135,9 @@ class CRM_Contribute_Tokens extends \Civi\Token\AbstractTokenSubscriber {
     }
     elseif (isset($aliasTokens[$field])) {
       $row->dbToken($entity, $field, 'CRM_Contribute_BAO_Contribution', $aliasTokens[$field], $fieldValue);
+    }
+    elseif (\CRM_Core_BAO_CustomField::getKeyID($field)) {
+      $row->customToken($entity, $field, $actionSearchResult->entity_id);
     }
     else {
       $row->dbToken($entity, $field, 'CRM_Contribute_BAO_Contribution', $field, $fieldValue);
