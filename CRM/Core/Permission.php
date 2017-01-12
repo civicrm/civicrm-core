@@ -134,8 +134,12 @@ class CRM_Core_Permission {
         return FALSE;
       }
       else {
+        // This is an individual permission
+        $granted = CRM_Core_Config::singleton()->userPermissionClass->check($permission);
+        // Call the permission_check hook to permit dynamic escalation (CRM-19256)
+        CRM_Utils_Hook::permission_check($permission, $granted);
         if (
-          !CRM_Core_Config::singleton()->userPermissionClass->check($permission)
+          !$granted
           && !($tempPerm && $tempPerm->check($permission))
         ) {
           //one of our 'and' conditions has not been met

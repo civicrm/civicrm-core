@@ -1750,6 +1750,25 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
+   * This hook is called when checking permissions; use this hook to dynamically
+   * escalate user permissions in certain use cases (cf. CRM-19256).
+   *
+   * @param string $permission
+   *   The name of an atomic permission, ie. 'access deleted contacts'
+   * @param bool $granted
+   *   Whether this permission is currently granted. The hook can change this value.
+   *
+   * @return null
+   *   The return value is ignored
+   */
+  public static function permission_check($permission, &$granted) {
+    return self::singleton()->invoke(2, $permission, $granted,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
+      'civicrm_permission_check'
+    );
+  }
+
+  /**
    * @param CRM_Core_Exception Exception $exception
    * @param mixed $request
    *   Reserved for future use.
