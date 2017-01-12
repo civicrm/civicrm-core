@@ -143,7 +143,7 @@ class CRM_Dashlet_Page_GettingStarted extends CRM_Core_Page {
         if (!empty(self::$_tokens[$categories][$token])) {
           $value = self::$_tokens[$categories][$token];
           if ($categories == 'crmurl') {
-            $value = CRM_Utils_System::url($value, "reset=1", FALSE, NULL, TRUE, TRUE);
+            $value = CRM_Utils_System::url($value, "reset=1");
           }
         }
         CRM_Utils_Token::token_replace($categories, $token, $value, $str);
