@@ -1090,88 +1090,74 @@ WHERE  id IN $groupIdString
     // Sort the groups into the correct storage by the parent
     // $roots represent the current leaf nodes that need to be checked for
     // children. $rows represent the unplaced nodes
-    $roots = $rows = $allGroups = array();
+    // $tree contains the child nodes based on their parent_id.
+    $roots = array();
+    $tree = array();
     while ($dao->fetch()) {
-      $allGroups[$dao->id] = array(
-        'title' => $dao->title,
-        'visibility' => $dao->visibility,
-        'description' => $dao->description,
-      );
-
-      if ($dao->parents == $parents) {
-        $roots[] = array(
+      if ($dao->parents) {
+        $parentArray = explode(',', $dao->parents);
+        $parent = $parentArray[0];
+        $tree[$parent][] = array(
           'id' => $dao->id,
-          'prefix' => '',
           'title' => $dao->title,
+          'visibility' => $dao->visibility,
+          'description' => $dao->description,
         );
       }
       else {
-        // group can have > 1 parent so $dao->parents may be comma separated list (eg. '1,2,5'). Grab and match on 1st parent.
-        $parentArray = explode(',', $dao->parents);
-        $parent = $parentArray[0];
-        $rows[] = array(
+        $roots[] = array(
           'id' => $dao->id,
-          'prefix' => '',
           'title' => $dao->title,
-          'parents' => $parent,
+          'visibility' => $dao->visibility,
+          'description' => $dao->description,
         );
       }
     }
     $dao->free();
-    // While we have nodes left to build, shift the first (alphabetically)
-    // node of the list, place it in our groups list and loop through the
-    // list of unplaced nodes to find its children. We make a copy to
-    // iterate through because we must modify the unplaced nodes list
-    // during the loop.
-    while (count($roots)) {
-      $new_roots = array();
-      $current_rows = $rows;
-      $root = array_shift($roots);
-      $groups[$root['id']] = array($root['prefix'], $root['title']);
 
-      // As you find the children, append them to the end of the new set
-      // of roots (maintain alphabetical ordering). Also remove the node
-      // from the set of unplaced nodes.
-      if (is_array($current_rows)) {
-        foreach ($current_rows as $key => $row) {
-          if ($row['parents'] == $root['id']) {
-            $new_roots[] = array(
-              'id' => $row['id'],
-              'prefix' => $groups[$root['id']][0] . $spacer,
-              'title' => $row['title'],
-            );
-            unset($rows[$key]);
-          }
-        }
-      }
+    $hierarchy = array();
+    for ($i = 0; $i < count($roots); $i++) {
+      self::buildGroupHierarchy($hierarchy, $roots[$i], $tree, $titleOnly, $spacer, 0);
+    }
+    return $hierarchy;
+  }
 
-      //As a group, insert the new roots into the beginning of the roots
-      //list. This maintains the hierarchical ordering of the tags.
-      $roots = array_merge($new_roots, $roots);
+  /**
+   * Build a list with groups on alphabetical order and child groups after the parent group.
+   *
+   * This is a recursive function filling the $hierarchy parameter.
+   *
+   * @param $hierarchy
+   * @param $group
+   * @param $tree
+   * @param $titleOnly
+   * @param $spacer
+   * @param $level
+   */
+  private static function buildGroupHierarchy(&$hierarchy, $group, $tree, $titleOnly, $spacer, $level) {
+    $spaces = str_repeat($spacer, $level);
+
+    if ($titleOnly) {
+      $hierarchy[$group['id']] = $spaces . $group['title'];
+    }
+    else {
+      $hierarchy[$group['id']] = array(
+        'title' => $spaces . $group['title'],
+        'description' => $group['description'],
+        'visibility' => $group['visibility'],
+      );
     }
 
-    // below is the redundant looping to ensure child groups are populated in the case where user does not have
-    // access to parent groups ( esp. using ACL permissions and logged in user can assess only child groups )
-    foreach ($rows as $value) {
-      $groups[$value['id']] = array($value['prefix'], $value['title']);
-    }
-    // Prefix titles with the calcuated spacing to give the visual
-    // appearance of ordering when transformed into HTML in the form layer. Add description and visibility.
-    $groupsReturn = array();
-    foreach ($groups as $key => $value) {
-      if ($titleOnly) {
-        $groupsReturn[$key] = $value[0] . $value[1];
-      }
-      else {
-        $groupsReturn[$key] = array(
-          'title' => $value[0] . $value[1],
-          'description' => $allGroups[$key]['description'],
-          'visibility' => $allGroups[$key]['visibility'],
-        );
+    // For performance reasons we use a for loop rather than a foreach.
+    // Metrics for performance in an installation with 2867 groups a foreach
+    // caused the function getGroupsHierarchy with a foreach execution takes
+    // around 2.2 seoonds (2,200 ms).
+    // Changing to a for loop execustion takes around 0.02 seconds (20 ms).
+    if (isset($tree[$group['id']]) && is_array($tree[$group['id']])) {
+      for ($i = 0; $i < count($tree[$group['id']]); $i++) {
+        self::buildGroupHierarchy($hierarchy, $tree[$group['id'][$i]], $tree, $titleOnly, $spacer, $level + 1);
       }
     }
-
-    return $groupsReturn;
   }
 
   /**
