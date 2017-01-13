@@ -66,7 +66,10 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
         if (!empty($messageTokens['contact'])) {
           foreach ($messageTokens['contact'] as $token) {
             if (\CRM_Core_BAO_CustomField::getKeyID($token)) {
-              $row->customToken('Contact', $token, $contactId);
+              $contact[$token] = civicrm_api3('Contact', 'getvalue', array(
+                'return' => $token,
+                'id' => $contactId,
+              ));
             }
           }
         }
@@ -112,12 +115,12 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
     $e->string = \CRM_Utils_Token::replaceDomainTokens($e->string, \CRM_Core_BAO_Domain::getDomain(), $isHtml, $e->message['tokens'], $useSmarty);
 
     if (!empty($e->context['contact'])) {
-      \CRM_Utils_Token::replaceGreetingTokens($e->string, $e->context['contact'], $e->context['contact']['contact_id'], NULL, FALSE);
-
-      $e->string = \CRM_Utils_Token::replaceContactTokens($e->string, $e->context['contact'], $isHtml, $e->message['tokens'], FALSE, $useSmarty);
+      $e->string = \CRM_Utils_Token::replaceContactTokens($e->string, $e->context['contact'], $isHtml, $e->message['tokens'], TRUE, $useSmarty);
 
       // FIXME: This may depend on $contact being merged with hook values.
       $e->string = \CRM_Utils_Token::replaceHookTokens($e->string, $e->context['contact'], $e->context['hookTokenCategories'], $isHtml, $useSmarty);
+
+      \CRM_Utils_Token::replaceGreetingTokens($e->string, $e->context['contact'], $e->context['contact']['contact_id'], NULL, $useSmarty);
     }
 
     if ($useSmarty) {
