@@ -4359,7 +4359,8 @@ civicrm_relationship.is_permission_a_b = 0
       $skipPermissions,
       TRUE, $smartGroupCache,
       NULL, 'AND',
-      $apiEntity
+      $apiEntity,
+   	  $useGroupBy = FALSE
     );
 
     //this should add a check for view deleted if permissions are enabled
@@ -4371,6 +4372,8 @@ civicrm_relationship.is_permission_a_b = 0
     // note : this modifies _fromClause and _simpleFromClause
     $query->includePseudoFieldsJoin($sort);
 
+	   $query->_useGroupBy = $useGroupBy;
+   
     list($select, $from, $where, $having) = $query->query($count);
 
     $options = $query->_options;
