@@ -110,8 +110,8 @@ class CRM_Activity_Tokens extends \Civi\Token\AbstractTokenSubscriber {
     elseif (isset($actionSearchResult->$field)) {
       $row->tokens($entity, $field, $actionSearchResult->$field);
     }
-    elseif (\CRM_Core_BAO_CustomField::getKeyID($field)) {
-      $row->customToken($entity, $field, $actionSearchResult->entity_id);
+    elseif ($cfID = \CRM_Core_BAO_CustomField::getKeyID($field)) {
+      $row->customToken($entity, $cfID, $actionSearchResult->entity_id);
     }
     else {
       $row->tokens($entity, $field, '');

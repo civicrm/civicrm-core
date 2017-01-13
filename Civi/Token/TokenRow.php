@@ -130,16 +130,23 @@ class TokenRow {
    * Update the value of a custom field token.
    *
    * @param string $entity
-   * @param string $fieldName
-   * @param string $entityID
+   * @param int $customFieldID
+   * @param int $entityID
    * @return TokenRow
    */
-  public function customToken($entity, $fieldName, $entityID) {
+  public function customToken($entity, $customFieldID, $entityID) {
+    $customFieldName = "custom_" . $customFieldID;
     $fieldValue = civicrm_api3($entity, 'getvalue', array(
-      'return' => $fieldName,
+      'return' => $customFieldName,
       'id' => $entityID,
     ));
-    return $this->tokens($entity, $fieldName, $fieldValue);
+
+    // format the raw custom field value into proper display value
+    if ($fieldValue) {
+      $fieldValue = \CRM_Core_BAO_CustomField::displayValue($fieldValue, $customFieldID);
+    }
+
+    return $this->tokens($entity, $customFieldName, $fieldValue);
   }
 
   /**
