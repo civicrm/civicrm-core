@@ -416,6 +416,8 @@ class CRM_Core_CodeGen_Specification {
         'callback',
         // Path to options edit form
         'optionEditPath',
+        //entity to which pseudoconstant belongs
+        'entity',
       );
       foreach ($validOptions as $pseudoOption) {
         if (!empty($fieldXML->pseudoconstant->$pseudoOption)) {

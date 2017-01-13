@@ -264,12 +264,15 @@
   </field>
   <field>
     <name>priority_id</name>
+    <uniqueName>activity_priority_id</uniqueName>
     <type>int unsigned</type>
     <title>Priority</title>
     <import>true</import>
+    <export>true</export>
     <comment>ID of the priority given to this activity. Foreign key to civicrm_option_value.</comment>
     <add>2.0</add>
     <pseudoconstant>
+      <entity>activity</entity>
       <optionGroupName>priority</optionGroupName>
     </pseudoconstant>
     <html>

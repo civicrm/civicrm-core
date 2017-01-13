@@ -1979,10 +1979,11 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
         $group->setAttribute('allowClear', TRUE);
       }
     }
-    elseif ($fieldName === 'prefix_id' || $fieldName === 'suffix_id') {
+    elseif (!empty($field['pseudoconstant']['optionGroupName']) && in_array($fieldName, array('prefix_id', 'suffix_id', 'activity_priority_id'), TRUE)) {
+      //@todo : provide support for other pseudo-constant entities (if applicable)
       $form->addSelect($name, array(
         'label' => $title,
-        'entity' => 'contact',
+        'entity' => CRM_Utils_Array::value('entity', $field['pseudoconstant']),
         'field' => $fieldName,
         'class' => 'six',
         'placeholder' => '',
@@ -2213,9 +2214,6 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     }
     elseif ($fieldName == 'activity_date_time') {
       $form->addDateTime($name, $title, $required, array('formatType' => 'activityDateTime'));
-    }
-    elseif ($fieldName == 'priority_id') {
-      $form->add('select', $name, $title, CRM_Activity_BAO_Activity::buildOptions('priority_id'), $required, $selectAttributes);
     }
     elseif ($fieldName == 'participant_status') {
       $cond = NULL;

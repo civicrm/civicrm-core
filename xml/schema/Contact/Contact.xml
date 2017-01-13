@@ -435,6 +435,7 @@
     <type>int unsigned</type>
     <comment>Prefix or Title for name (Ms, Mr...). FK to prefix ID</comment>
     <pseudoconstant>
+      <entity>contact</entity>
       <optionGroupName>individual_prefix</optionGroupName>
     </pseudoconstant>
     <html>
@@ -455,6 +456,7 @@
     <title>Individual Suffix</title>
     <type>int unsigned</type>
     <pseudoconstant>
+      <entity>contact</entity>
       <optionGroupName>individual_suffix</optionGroupName>
     </pseudoconstant>
     <html>
