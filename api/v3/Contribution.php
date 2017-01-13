@@ -553,11 +553,7 @@ function civicrm_api3_contribution_repeattransaction(&$params) {
   civicrm_api3_verify_one_mandatory($params, NULL, array('contribution_recur_id', 'original_contribution_id'));
   if (empty($params['original_contribution_id'])) {
     //  CRM-19873
-    $is_test = civicrm_api3('ContributionRecur', 'getvalue', array(
-      'sequential' => 1,
-      'return' => "is_test",
-      'id' => $params['contribution_recur_id'],
-     ));
+    $is_test = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionRecur', $params['contribution_recur_id'], 'is_test');
     $params['original_contribution_id'] = civicrm_api3('contribution', 'getvalue', array(
       'return' => 'id',
       'contribution_recur_id' => $params['contribution_recur_id'],
