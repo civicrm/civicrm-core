@@ -595,6 +595,28 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'subject' => 'subject send reminder every unit after membership_end_date',
     );
 
+    $customGroup = $this->callAPISuccess('CustomGroup', 'create', array(
+      'title' => ts('Test Contact Custom group'),
+      'name' => 'test_contact_cg',
+      'extends' => 'Contact',
+      'domain_id' => CRM_Core_Config::domainID(),
+      'is_active' => 1,
+      'collapse_adv_display' => 0,
+      'collapse_display' => 0,
+    ));
+    $customField = $this->callAPISuccess('CustomField', 'create', array(
+      'label' => 'Test Text',
+      'data_type' => 'String',
+      'html_type' => 'Text',
+      'custom_group_id' => $customGroup['id'],
+    ));
+    $this->fixtures['contact_custom_token'] = array(
+      'id' => $customField['id'],
+      'token' => sprintf('{contact.custom_%s}', $customField['id']),
+      'name' => sprintf('custom_%s', $customField['id']),
+      'value' => 'text ' . substr(sha1(rand()), 0, 7),
+    );
+
     $this->_setUp();
   }
 
@@ -616,6 +638,10 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'civicrm_event',
       'civicrm_email',
     ));
+    $this->callAPISuccess('CustomField', 'delete', array('id' => $this->fixtures['contact_custom_token']['id']));
+    $this->callAPISuccess('CustomGroup', 'delete', array(
+      'id' => CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', 'test_contact_cg', 'id', 'name'),
+    ));
     $this->_tearDown();
   }
 
@@ -634,11 +660,12 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     $manyTokensTmpl = implode(';;', array(
       $someTokensTmpl,
       '{contact.email_greeting}',
+      $this->fixture['contact_custom_token']['token'],
     ));
     // Note: The behavior of domain-tokens on a scheduled reminder is undefined. All we
     // can really do is check that it has something.
     $someTokensExpected = 'Churmondleia Ōtākou;;Female;;Female;;[a-zA-Z0-9 ]+;;Phone Call';
-    $manyTokensExpected = "$someTokensExpected;;Dear Churmondleia";
+    $manyTokensExpected = sprintf('%s;;Dear Churmondleia;;%s', $someTokensExpected, $this->fixture['contact_custom_token']['value']);
 
     // In this example, we use a lot of tokens cutting across multiple components.
     $cases[0] = array(
@@ -725,7 +752,12 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
 
     $activity = $this->createTestObject('CRM_Activity_DAO_Activity', $this->fixtures['phonecall']);
     $this->assertTrue(is_numeric($activity->id));
-    $contact = $this->callAPISuccess('contact', 'create', $this->fixtures['contact']);
+    $contact = $this->callAPISuccess('contact', 'create', array_merge(
+      $this->fixtures['contact'],
+      array(
+        $this->fixtures['contact_custom_token']['name'] => $this->fixtures['contact_custom_token']['value'],
+      )
+    ));
     $activity->save();
 
     $source['contact_id'] = $contact['id'];
