@@ -256,6 +256,9 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
       'noheader',
       // CRM-18347: ignore params unintentionally passed by wp CLI tool
       '',
+      // CRM-19877: ignore params extraneously passed by Joomla
+      'option',
+      'task',
     );
     $settingParams = array_diff_key($params, array_fill_keys($ignoredParams, TRUE));
     $getFieldsParams = array('version' => 3);
