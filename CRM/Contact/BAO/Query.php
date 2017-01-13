@@ -4336,6 +4336,8 @@ civicrm_relationship.is_permission_a_b = 0
    * @param string $apiEntity
    *   The api entity being called.
    *   This sort-of duplicates $mode in a confusing way. Probably not by design.
+   * @param bool $useGroupBy
+   *   Should the query be grouped by contact id?
    *
    * @return array
    */
@@ -4350,7 +4352,8 @@ civicrm_relationship.is_permission_a_b = 0
     $count = FALSE,
     $skipPermissions = TRUE,
     $mode = CRM_Contact_BAO_Query::MODE_CONTACTS,
-    $apiEntity = NULL
+    $apiEntity = NULL,
+    $useGroupBy = FALSE
   ) {
 
     $query = new CRM_Contact_BAO_Query(
@@ -4359,8 +4362,7 @@ civicrm_relationship.is_permission_a_b = 0
       $skipPermissions,
       TRUE, $smartGroupCache,
       NULL, 'AND',
-      $apiEntity,
-   	  $useGroupBy = FALSE
+      $apiEntity
     );
 
     //this should add a check for view deleted if permissions are enabled
@@ -4372,8 +4374,8 @@ civicrm_relationship.is_permission_a_b = 0
     // note : this modifies _fromClause and _simpleFromClause
     $query->includePseudoFieldsJoin($sort);
 
-	   $query->_useGroupBy = $useGroupBy;
-   
+    $query->_useGroupBy = $useGroupBy;
+
     list($select, $from, $where, $having) = $query->query($count);
 
     $options = $query->_options;
