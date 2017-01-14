@@ -119,6 +119,7 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
    * @param string $rev
    */
   public function upgrade_4_7_alpha1($rev) {
+    $this->addTask('Drop action scheudle mapping foreign key', 'dropActionScheudleMappingForeignKey');
     $this->addTask('Migrate \'on behalf of\' information to module_data', 'migrateOnBehalfOfInfo');
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
     $this->addTask(ts('Migrate Settings to %1', array(1 => $rev)), 'migrateSettings', $rev);
@@ -776,6 +777,21 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
         CRM_Core_DAO::executeQuery("ALTER TABLE `civicrm_price_field_value`
           ADD COLUMN `help_post` text COLLATE utf8_unicode_ci COMMENT 'Price field option post help text.'");
       }
+    }
+    return TRUE;
+  }
+
+  /**
+   * CRM-18464 Check if Foreign key exists and also drop any index of same name accidentially created.
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   *
+   * @return bool
+   */
+  public static function dropActionScheudleMappingForeignKey(CRM_Queue_TaskContext $ctx) {
+    CRM_Core_BAO_SchemaHandler::safeRemoveFK('civicrm_action_schedule', 'FK_civicrm_action_schedule_mapping_id');
+    if (CRM_Core_BAO_SchemaHandler::checkIfIndexExists('civicrm_action_schedule', 'FK_civicrm_action_schedule_mapping_id')) {
+      CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_action_schedule DROP INDEX FK_civicrm_action_schedule_mapping_id");
     }
     return TRUE;
   }
