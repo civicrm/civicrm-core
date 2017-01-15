@@ -44,21 +44,24 @@ class CRM_Event_Tokens extends \Civi\Token\AbstractTokenSubscriber {
    * Class constructor.
    */
   public function __construct() {
-    parent::__construct('event', array(
-      'event_type' => ts('Event Type'),
-      'title' => ts('Event Title'),
-      'event_id' => ts('Event ID'),
-      'start_date' => ts('Event Start Date'),
-      'end_date' => ts('Event End Date'),
-      'summary' => ts('Event Summary'),
-      'description' => ts('Event Description'),
-      'location' => ts('Event Location'),
-      'info_url' => ts('Event Info URL'),
-      'registration_url' => ts('Event Registration URL'),
-      'fee_amount' => ts('Event Fee'),
-      'contact_email' => ts('Event Contact (Email)'),
-      'contact_phone' => ts('Event Contact (Phone)'),
-      'balance' => ts('Event Balance'),
+    parent::__construct('event', array_merge(
+      array(
+        'event_type' => ts('Event Type'),
+        'title' => ts('Event Title'),
+        'event_id' => ts('Event ID'),
+        'start_date' => ts('Event Start Date'),
+        'end_date' => ts('Event End Date'),
+        'summary' => ts('Event Summary'),
+        'description' => ts('Event Description'),
+        'location' => ts('Event Location'),
+        'info_url' => ts('Event Info URL'),
+        'registration_url' => ts('Event Registration URL'),
+        'fee_amount' => ts('Event Fee'),
+        'contact_email' => ts('Event Contact (Email)'),
+        'contact_phone' => ts('Event Contact (Phone)'),
+        'balance' => ts('Event Balance'),
+      ),
+      $this->getCustomTokens('Event')
     ));
   }
 
@@ -147,6 +150,9 @@ LEFT JOIN civicrm_phone phone ON phone.id = lb.phone_id
     }
     elseif (isset($actionSearchResult->$field)) {
       $row->tokens($entity, $field, $actionSearchResult->$field);
+    }
+    elseif ($cfID = \CRM_Core_BAO_CustomField::getKeyID($field)) {
+      $row->customToken($entity, $cfID, $actionSearchResult->entity_id);
     }
     else {
       $row->tokens($entity, $field, '');
