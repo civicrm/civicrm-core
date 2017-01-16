@@ -6,12 +6,8 @@
       restrict: 'AE',
       require: 'ngModel',
       scope: {
-        crmAvailGroups: '@', // available groups
-        crmAvailMailings: '@', // available mailings
-        crmMandatoryGroups: '@', // hard-coded/mandatory groups
         ngRequired: '@'
       },
-      templateUrl: '~/crmMailing/Recipients.html',
       link: function(scope, element, attrs, ngModel) {
         scope.recips = ngModel.$viewValue;
         scope.groups = scope.$parent.$eval(attrs.crmAvailGroups);
@@ -127,9 +123,8 @@
           },
           multiple: true,
           initSelection: function(el, cb) {
-            var values = $(el).val().split(',');
+            var values = el.val().split(',');
             
-            var data = {};            
             var gids = [];
             var mids = [];
 

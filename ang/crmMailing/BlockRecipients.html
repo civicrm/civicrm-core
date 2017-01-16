@@ -9,8 +9,6 @@
     crm-mailing-recipients
     ng-model="mailing.recipients"
     crm-mandatory-groups="crmMailingConst.groupNames | filter:{is_hidden:1}"
-    crm-avail-groups="crmMailingConst.groupNames | filter:isMailingList | filter:{is_hidden:0}"
-    crm-avail-mailings="crmMailingConst.civiMails"
     crm-ui-id="{{crmMailingBlockRecipients.id}}"
     name="{{crmMailingBlockRecipients.name}}"
     ng-required="true"/>
