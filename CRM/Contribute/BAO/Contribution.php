@@ -3653,12 +3653,12 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
 
           // calculate financial item amount
           $amountParams = array(
-            'diff' => $diff,
+            'diff' => self::getMultiplier($params['contribution']->contribution_status_id, $context),
             'line_total' => $lineItemDetails['line_total'],
             'previous_line_total' => CRM_Utils_Array::value('line_total', CRM_Utils_Array::value($lineItemDetails['id'], $previousLineItem)),
             'item_amount' => $itemAmount,
           );
-          $amount = self::calcluateFinancialItemAmount($params, $amountParams, $context, $fieldValues);
+          $amount = self::calculateFinancialItemAmount($params, $amountParams, $context, $fieldValues);
           $itemParams = array(
             'transaction_date' => $receiveDate,
             'contact_id' => $params['prevContribution']->contact_id,
@@ -3675,7 +3675,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
           $params['line_item'][$fieldId][$fieldValueId]['financial_item_id'] = $financialItem->id;
 
           $taxAmount = CRM_Utils_Array::value('tax_amount', $lineItemDetails);
-          $diff = self::getMultiplier($params['contribution']->contribution_status_id, $context);
 
           if ($taxAmount && $taxAmount !== 'null') {
             $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
