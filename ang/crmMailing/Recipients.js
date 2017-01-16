@@ -117,13 +117,132 @@
         }
 
         $(element).select2({
+          width: '36em',
           dropdownAutoWidth: true,
           placeholder: "Groups or Past Recipients",
           formatResult: formatItem,
           formatSelection: formatItem,
           escapeMarkup: function(m) {
             return m;
-          }
+          },
+          multiple: true,
+          initSelection: function(el, cb) {
+            var values = $(el).val().split(',');
+            
+            var data = {};            
+            var gids = [];
+            var mids = [];
+
+            for (i in values) {
+              var dv = convertValueToObj(values[i]);
+              if (dv.entity_type == 'civicrm_group') {
+                gids.push(dv.entity_id);
+              }
+              else if (dv.entity_type == 'civicrm_mailing') {
+                mids.push(dv.entity_id);
+              }
+            }
+            CRM.api3('Group', 'getlist', { params: { id: { IN: gids } } }).then(
+              function(glist) {
+                CRM.api3('Mailing', 'getlist', { params: { id: { IN: mids } } }).then(
+                  function(mlist) {
+                    var datamap = [];
+
+                    var groupNames = [];
+                    var civiMails = [];
+                    
+                    $(glist.values).each(function (idx, group) {
+                      var key = group.id + ' civicrm_group include';
+                      groupNames.push({id: '' + group.id, title: group.label});
+                      
+                      if (values.indexOf(key) >= 0) {
+                        datamap.push({id: key, text: group.label});
+                      }
+                      
+                      key = group.id + ' civicrm_group exclude';
+                      if (values.indexOf(key) >= 0) {
+                        datamap.push({id: key, text: group.label});
+                      }
+                    });
+
+                    $(mlist.values).each(function (idx, group) {
+                      var key = group.id + ' civicrm_mailing include';
+                      civiMails.push({id: '' + group.id, name: group.label});
+                      
+                      if (values.indexOf(key) >= 0) {
+                        datamap.push({id: key, text: group.label});
+                      }
+                      
+                      key = group.id + ' civicrm_mailing exclude';
+                      if (values.indexOf(key) >= 0) {
+                        datamap.push({id: key, text: group.label});
+                      }
+                    });
+
+                    CRM.crmMailing.groupNames = groupNames;
+                    CRM.crmMailing.civiMails = civiMails;
+                    
+                    cb(datamap);
+                  })
+              });
+          },
+          ajax: {
+            url: CRM.url('civicrm/ajax/rest'),
+            quietMillis: 300,
+            data: function(input, page_num) {
+              var params = {
+                input: input,
+                page_num: page_num,
+                params: { is_hidden: 0 },
+              };
+              return params;
+            },
+            transport: function(params) {
+              CRM.api3('Group', 'getlist', params.data).then(function(groups) {
+
+                params.data.params.options = { sort: "is_archived asc, scheduled_date desc" };
+                
+                CRM.api3('Mailing', 'getlist', params.data).then(function(mailings) {
+                  return { groups: groups, mailings: mailings }
+                }, params.error).then(params.success, params.error)
+              }, params.error);
+            },
+            results: function(data) {
+              results = [];
+              if(data.groups.count) {
+                results.push({ text: ts('Include Group'),
+                               children: $.map(data.groups.values, function(obj) {
+                                 return { id: obj.id + ' civicrm_group include',
+                                          text: obj.label }
+                               })
+                             });
+                results.push({ text: ts('Exclude Group'),
+                               children: $.map(data.groups.values, function(obj) {
+                                 return { id: obj.id + ' civicrm_group exclude',
+                                          text: obj.label }
+                               }),
+                             });
+              }
+              if(data.mailings.count) {
+                results.push({ text: ts('Include Mailing'),
+                               children: $.map(data.mailings.values, function(obj) {
+                                 return { id: obj.id + ' civicrm_mailing include',
+                                          text: obj.label }
+                               }),
+                             });
+                results.push({ text: ts('Exclude Mailing'),
+                               children: $.map(data.mailings.values, function(obj) {
+                                 return { id: obj.id + ' civicrm_mailing exclude',
+                                          text: obj.label }
+                               }),
+                             });
+              }
+              return {
+                more: data.mailings.more_results || data.groups.more_results,
+                results: results,
+              }
+            },
+          },
         });
 
         $(element).on('select2-selecting', function(e) {
