@@ -2,9 +2,11 @@
 <menu>
   <item>
      <path>civicrm/pcp</path>
-     <page_callback>CRM_PCP_Form_PCP</page_callback>
-     <access_callback>1</access_callback>
-     <is_public>true</is_public>
+     <title>Manage Personal Campaign Pages</title>
+     <page_type>1</page_type>
+     <page_callback>CRM_PCP_Page_PCP</page_callback>
+     <access_arguments>access CiviCRM</access_arguments>
+     <weight>30</weight>
   </item>
   <item>
      <path>civicrm/pcp/campaign</path>
@@ -25,5 +27,10 @@
      <title>Personal Campaign Pages</title>
      <page_callback>CRM_PCP_Page_PCP</page_callback>
      <desc>View and manage existing personal campaign pages.</desc>
+  </item>
+  <item>
+     <path>civicrm/ajax/pcplist</path>
+     <page_callback>CRM_PCP_Page_AJAX::getPcpList</page_callback>
+     <access_arguments>access CiviCRM</access_arguments>
   </item>
 </menu>

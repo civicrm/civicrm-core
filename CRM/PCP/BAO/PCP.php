@@ -922,5 +922,286 @@ INNER JOIN civicrm_uf_group ufgroup
       return $ownerNotificationId;
     }
   }
+	
+	/**
+   * wrapper for ajax pcp selector.
+   *
+   * @param array $params
+   *   Associated array for params record id.
+   *
+   * @return array
+   *   associated array of pcp list
+   *   -rp = rowcount
+   *   -page= offset
+   * @todo there seems little reason for the small number of functions that call this to pass in
+   * params that then need to be translated in this function since they are coding them when calling
+   */
+  static public function getPcpListSelector(&$params) {
+    // format the params
+    $params['offset'] = ($params['page'] - 1) * $params['rp'];
+    $params['rowCount'] = $params['rp'];
+    $params['sort'] = CRM_Utils_Array::value('sortBy', $params);
+
+    // get pcps
+    $pcps = CRM_PCP_BAO_PCP::getPcpList($params);
+    $params['total'] = CRM_PCP_BAO_PCP::getPcpCount($params);
+
+    // format params and add links
+    $pcpList = array();
+    if (!empty($pcps)) {
+      foreach ($pcps as $id => $value) {
+        $value['class'][] = 'crm-entity';
+        $pcpList[$id]['class'] = $value['id'] . ',' . implode(' ', $value['class']);
+        $pcpList[$id]['pcp_id'] = $value['id'];
+        $pcpList[$id]['pcp_name'] = $value['pcp_title'];
+        $value['class'][] = 'crm-entity';
+        $pcpList[$id]['class'] = $value['id'] . ',' . implode(' ', $value['class']);
+        $pcpList[$id]['pcp_supporter'] = CRM_Utils_Array::value('pcp_supporter', $value);
+        $pcpList[$id]['pcp_page'] = CRM_Utils_Array::value('pcp_page', $value);
+        $pcpList[$id]['pcp_start_date'] = CRM_Utils_Array::value('pcp_start_date', $value);
+        $pcpList[$id]['pcp_end_date'] = CRM_Utils_Array::value('pcp_end_date', $value) ? $value['pcp_end_date'] : '(ongoing)';
+        $pcpList[$id]['pcp_status'] = CRM_Utils_Array::value('pcp_status', $value);
+        $pcpList[$id]['action'] = CRM_Utils_Array::value('action', $value);
+      }
+      return $pcpList;
+    }
+  }
+  
+    /**
+   * This function to get list of pcps.
+   *
+   * @param array $params
+   *   Associated array for params.
+   *
+   * @return array
+   */
+  public static function getPcpList(&$params) {
+    $config = CRM_Core_Config::singleton();
+
+    $whereClause = self::whereClause($params, FALSE);
+
+    //$this->pagerAToZ( $whereClause, $params );
+
+    if (!empty($params['rowCount']) &&
+      $params['rowCount'] > 0
+    ) {
+      $limit = " LIMIT {$params['offset']}, {$params['rowCount']} ";
+    }
+
+    $orderBy = ' ORDER BY pcps.title asc';
+    if (!empty($params['sort'])) {
+      $orderBy = ' ORDER BY ' . CRM_Utils_Type::escape($params['sort'], 'String');
+    }
+
+    $query = "
+        SELECT pcps.*, pcp_supporter.display_name,
+        CASE WHEN pcp_block.entity_table = 'civicrm_event' THEN event.title 
+        WHEN pcp_block.entity_table = 'civicrm_contribution_page' THEN contribution_page.title 
+        END as page,
+        CASE WHEN pcp_block.entity_table = 'civicrm_event' THEN event.registration_start_date 
+        WHEN pcp_block.entity_table = 'civicrm_contribution_page' THEN contribution_page.start_date 
+        END as start_date,
+        CASE WHEN pcp_block.entity_table = 'civicrm_event' THEN event.registration_end_date 
+        WHEN pcp_block.entity_table = 'civicrm_contribution_page' THEN contribution_page.end_date 
+        END as end_date
+        FROM  civicrm_pcp pcps
+        LEFT JOIN civicrm_contact pcp_supporter ON pcp_supporter.id = pcps.contact_id
+        LEFT JOIN civicrm_pcp_block pcp_block ON (pcp_block.id = pcps.pcp_block_id)
+        LEFT JOIN civicrm_event event ON (event.id = pcp_block.entity_id AND pcp_block.entity_table = 'civicrm_event')   
+        LEFT JOIN civicrm_contribution_page contribution_page ON (contribution_page.id = pcp_block.entity_id AND pcp_block.entity_table = 'civicrm_contribution_page')
+        LEFT JOIN civicrm_email supporter_email ON (pcp_supporter.id = supporter_email.contact_id AND supporter_email.is_primary = 1)
+        WHERE $whereClause
+        GROUP BY pcps.id
+        {$orderBy}
+        {$limit}";
+        
+    $object = CRM_Core_DAO::executeQuery($query, $params, TRUE, 'CRM_PCP_DAO_PCP');
+
+    while ($object->fetch()) {
+      $links = self::actionLinks();
+      
+      $approvedId = CRM_Core_OptionGroup::getValue('pcp_status', 'Approved', 'name');
+      $allowToDelete = CRM_Core_Permission::check('delete in CiviContribute');
+
+      CRM_Core_DAO::storeValues($object, $values[$object->id]);
+      
+      if ($object->page_type == 'contribute') {
+        $pageUrl = CRM_Utils_System::url('civicrm/' . $object->page_type . '/transact', 'reset=1&id=' . $object->page_id);
+      }
+      else {
+        $pageUrl = CRM_Utils_System::url('civicrm/' . $object->page_type . '/register', 'reset=1&id=' . $object->page_id);
+      }
+      $supporterUrl = CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid={$object->contact_id}");
+      $pcpUrl = CRM_Utils_System::url('civicrm/pcp/info', "reset=1&id={$object->id}");
+      $status = CRM_PCP_BAO_PCP::buildOptions('status_id', 'create');
+      $values[$object->id]['pcp_title'] = "<a href='{$pcpUrl}'>{$object->title}</a>";
+      $values[$object->id]['pcp_supporter'] = "<a href='{$supporterUrl}'>{$object->display_name}</a>";
+      $values[$object->id]['pcp_page'] = "<a href='{$pageUrl}'>{$object->page}</a>";
+      $values[$object->id]['pcp_start_date'] = CRM_Utils_Date::customFormat($object->start_date);
+      $values[$object->id]['pcp_end_date'] = CRM_Utils_Date::customFormat($object->end_date);
+      $values[$object->id]['pcp_status'] = $status[$object->status_id];
+      
+      $action = array_sum(array_keys($links));
+
+      $class = '';
+
+      if ($object->status_id != $approvedId || $object->is_active != 1) {
+        $class = 'disabled';
+      }
+
+      switch ($object->status_id) {
+        case 2:
+          $action -= CRM_Core_Action::RENEW;
+          break;
+
+        case 3:
+          $action -= CRM_Core_Action::REVERT;
+          break;
+      }
+
+      switch ($object->is_active) {
+        case 1:
+          $action -= CRM_Core_Action::ENABLE;
+          break;
+
+        case 0:
+          $values[$object->id]['class'][] = 'disabled';
+          $action -= CRM_Core_Action::DISABLE;
+          break;
+      }
+
+      if (!$allowToDelete) {
+        $action -= CRM_Core_Action::DELETE;
+      }
+      
+      $values[$object->id]['action'] = CRM_Core_Action::formLink($links,
+          $action,
+          array('id' => $object->id), ts('more'), FALSE, 'pcp.selector.row', 'PCP', $object->id
+        );
+
+    }
+    return $values;
+  }
+  
+   /**
+   * @param array $params
+   *
+   * @return NULL|string
+   */
+  public static function getPcpCount(&$params) {
+    $whereClause = self::whereClause($params, FALSE);
+    $query = "SELECT 
+      COUNT(pcps.id) FROM civicrm_pcp pcps 
+      INNER JOIN civicrm_contact pcp_supporter ON pcps.contact_id = pcp_supporter.id
+      LEFT JOIN civicrm_pcp_block pcp_block ON (pcp_block.id = pcps.pcp_block_id)
+      LEFT JOIN civicrm_event event ON (event.id = pcp_block.entity_id AND pcp_block.entity_table = 'civicrm_event')   
+      LEFT JOIN civicrm_contribution_page contribution_page ON (contribution_page.id = pcp_block.entity_id AND pcp_block.entity_table = 'civicrm_contribution_page')
+      LEFT JOIN civicrm_email supporter_email ON (pcp_supporter.id = supporter_email.contact_id AND supporter_email.is_primary = 1)";
+    $query .= "
+    WHERE {$whereClause}";
+    return CRM_Core_DAO::singleValueQuery($query, $params);
+  }
+  
+  /**
+   * Generate permissioned where clause for group search.
+   * @param array $params
+   * @param bool $sortBy
+   * @param bool $excludeHidden
+   *
+   * @return string
+   */
+  public static function whereClause(&$params, $sortBy = TRUE, $excludeHidden = TRUE) {
+    $values = array();
+    $title = CRM_Utils_Array::value('title', $params);
+    if ($title) {
+      $clauses[] = "pcps.title LIKE %1";
+      if (strpos($title, '%') !== FALSE) {
+        $params[1] = array($title, 'String', FALSE);
+      }
+      else {
+        $params[1] = array($title, 'String', TRUE);
+      }
+    }
+    $pageType = CRM_Utils_Array::value('page_type', $params);
+    if ($pageType) {
+      $clauses[] = 'pcps.page_type LIKE %2';
+      $params[2] = array($pageType, 'String');
+    }
+    $status = CRM_Utils_Array::value('status_id', $params);
+    if ($status) {
+      $clauses[] = 'pcps.status_id = %3';
+      $params[3] = array($status, 'Integer');
+    }
+    $page_id = CRM_Utils_Array::value('page_id', $params);
+    if ($page_id) {
+      $clauses[] = 'pcps.page_id = %4 AND pcps.page_type = "contribute"';
+      $params[4] = array($page_id, 'Integer');
+    }
+    $event_id = CRM_Utils_Array::value('event_id', $params);
+    if ($event_id) {
+      $clauses[] = 'pcps.page_id = %5 AND pcps.page_type = "event"';
+      $params[5] = array($event_id, 'Integer');
+    }
+    $supporter = CRM_Utils_Array::value('supporter', $params);
+    if ($supporter) {
+      $clauses[] = "(pcp_supporter.sort_name LIKE %6 OR supporter_email.email LIKE %6)";
+      if (strpos($supporter, '%') !== FALSE) {
+        $params[6] = array($supporter, 'String', FALSE);
+      }
+      else {
+        $params[6] = array($supporter, 'String', TRUE);
+      }
+    }
+    $start_date = CRM_Utils_Array::value('start_date', $params);
+    if ($start_date) {
+      $clauses[] = '(event.registration_start_date >= %7 OR contribution_page.start_date >= %7)';
+      $params[7] = array(CRM_Utils_Date::processDate($start_date), 'String'); 
+    }
+    $end_date = CRM_Utils_Array::value('end_date', $params);
+    if ($end_date) {
+      $clauses[] = '(event.registration_end_date <= %8 OR contribution_page.end_date <= %8)';
+      $params[8] = array(CRM_Utils_Date::processDate($end_date), 'String'); 
+    }
+    if (empty($clauses)) {
+      $clauses[] = '1';
+    }
+    return implode(' AND ', $clauses);
+  }
+  
+  public static function actionLinks() {
+    $links = array(
+      CRM_Core_Action::UPDATE => array(
+          'name' => ts('Edit'),
+          'url' => 'civicrm/pcp/info',
+          'qs' => 'action=update&reset=1&id=%%id%%&context=dashboard',
+          'title' => ts('Edit Personal Campaign Page'),
+        ),
+        CRM_Core_Action::RENEW => array(
+          'name' => ts('Approve'),
+          'title' => ts('Approve Personal Campaign Page'),
+        ),
+        CRM_Core_Action::REVERT => array(
+          'name' => ts('Reject'),
+          'title' => ts('Reject Personal Campaign Page'),
+        ),
+        CRM_Core_Action::DELETE => array(
+          'name' => ts('Delete'),
+          'url' => 'civicrm/pcp',
+          'qs' => 'action=delete&id=%%id%%',           
+          'title' => ts('Delete Personal Campaign Page'),
+        ),
+        CRM_Core_Action::ENABLE => array(
+          'name' => ts('Enable'),
+          'ref' => 'crm-enable-disable',
+          'title' => ts('Enable'),
+        ),
+        CRM_Core_Action::DISABLE => array(
+          'name' => ts('Disable'),
+          'ref' => 'crm-enable-disable',
+          'title' => ts('Disable'),
+        ),
+    );
+    return $links;
+  }
 
 }
