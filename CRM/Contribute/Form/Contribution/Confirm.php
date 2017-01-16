@@ -2252,6 +2252,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         $membershipParams['is_pay_later'] = 1;
       }
 
+      if (isset($this->_params['onbehalf_contact_id'])) {
+        $membershipParams['onbehalf_contact_id'] = $this->_params['onbehalf_contact_id'];
+      }
       //inherit campaign from contribution page.
       if (!array_key_exists('campaign_id', $membershipParams)) {
         $membershipParams['campaign_id'] = CRM_Utils_Array::value('campaign_id', $this->_values);
