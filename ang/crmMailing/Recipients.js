@@ -142,7 +142,8 @@
                 mids.push(dv.entity_id);
               }
             }
-            CRM.api3('Group', 'getlist', { params: { id: { IN: gids } } }).then(
+
+            CRM.api3('Group', 'getlist', { params: { id: { IN: gids } }, extra: ["is_hidden"] }).then(
               function(glist) {
                 CRM.api3('Mailing', 'getlist', { params: { id: { IN: mids } } }).then(
                   function(mlist) {
@@ -153,7 +154,7 @@
                     
                     $(glist.values).each(function (idx, group) {
                       var key = group.id + ' civicrm_group include';
-                      groupNames.push({id: '' + group.id, title: group.label});
+                      groupNames.push({id: parseInt(group.id), title: group.label, is_hidden: group.extra.is_hidden});
                       
                       if (values.indexOf(key) >= 0) {
                         datamap.push({id: key, text: group.label});
@@ -167,7 +168,7 @@
 
                     $(mlist.values).each(function (idx, group) {
                       var key = group.id + ' civicrm_mailing include';
-                      civiMails.push({id: '' + group.id, name: group.label});
+                      civiMails.push({id: parseInt(group.id), name: group.label});
                       
                       if (values.indexOf(key) >= 0) {
                         datamap.push({id: key, text: group.label});
@@ -179,8 +180,10 @@
                       }
                     });
 
-                    CRM.crmMailing.groupNames = groupNames;
-                    CRM.crmMailing.civiMails = civiMails;
+                    scope.$parent.crmMailingConst.groupNames = groupNames;
+                    scope.$parent.crmMailingConst.civiMails = civiMails;
+
+                    refreshMandatory();
                     
                     cb(datamap);
                   })
