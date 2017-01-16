@@ -55,7 +55,17 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
         $params = array(
           array('contact_id', '=', $contactId, 0, 0),
         );
-        list($contact, $_) = \CRM_Contact_BAO_Query::apiQuery($params);
+        // Pass required contact tokens in.
+        if (isset($messageTokens['contact'])) {
+          $contactTokens = array();
+          foreach ($messageTokens['contact'] as $name) {
+            $contactTokens[$name] = 1;
+          }
+        }
+        else {
+          $contactTokens = NULL;
+        }
+        list($contact, $_) = \CRM_Contact_BAO_Query::apiQuery($params, $contactTokens);
         $contact = reset($contact); //CRM-4524
         if (!$contact || is_a($contact, 'CRM_Core_Error')) {
           // FIXME: Need to differentiate errors which kill the batch vs the individual row.
@@ -104,12 +114,15 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
     $e->string = \CRM_Utils_Token::replaceDomainTokens($e->string, \CRM_Core_BAO_Domain::getDomain(), $isHtml, $e->message['tokens'], $useSmarty);
 
     if (!empty($e->context['contact'])) {
+      // ::replaceGreetingTokens() may return "Dear {contact.first_name}" so
+      // must precede ::replaceContactTokens.
+      //
+      // Note also inconsistent function signatures - see CRM-19768.
+      \CRM_Utils_Token::replaceGreetingTokens($e->string, NULL, $e->context['contact']['contact_id'], NULL, $useSmarty);
       $e->string = \CRM_Utils_Token::replaceContactTokens($e->string, $e->context['contact'], $isHtml, $e->message['tokens'], FALSE, $useSmarty);
 
       // FIXME: This may depend on $contact being merged with hook values.
       $e->string = \CRM_Utils_Token::replaceHookTokens($e->string, $e->context['contact'], $e->context['hookTokenCategories'], $isHtml, $useSmarty);
-
-      \CRM_Utils_Token::replaceGreetingTokens($e->string, NULL, $e->context['contact']['contact_id'], NULL, $useSmarty);
     }
 
     if ($useSmarty) {

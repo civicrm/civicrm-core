@@ -450,7 +450,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
     }
 
     // process greetings CRM-4575, cache greetings
-    self::processGreetings($contact);
+    $contact = self::processGreetings($contact);
 
     return $contact;
   }
@@ -2707,6 +2707,7 @@ AND       civicrm_openid.is_primary = 1";
       );
       $emailGreetingString = CRM_Core_DAO::escapeString(CRM_Utils_String::stripSpaces($emailGreetingString));
       $updateQueryString[] = " email_greeting_display = '{$emailGreetingString}'";
+      $contact->email_greeting_display = $emailGreetingString;
     }
 
     //postal greetings
@@ -2743,6 +2744,7 @@ AND       civicrm_openid.is_primary = 1";
       );
       $postalGreetingString = CRM_Core_DAO::escapeString(CRM_Utils_String::stripSpaces($postalGreetingString));
       $updateQueryString[] = " postal_greeting_display = '{$postalGreetingString}'";
+      $contact->postal_greeting_display = $postalGreetingString;
     }
 
     // addressee
@@ -2787,6 +2789,8 @@ AND       civicrm_openid.is_primary = 1";
       $queryString = "UPDATE civicrm_contact SET {$updateQueryString} WHERE id = {$contact->id}";
       CRM_Core_DAO::executeQuery($queryString);
     }
+
+    return $contact;
   }
 
   /**

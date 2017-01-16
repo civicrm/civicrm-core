@@ -601,6 +601,9 @@ FROM civicrm_action_schedule cas
    */
   protected static function sendReminderEmail($tokenRow, $schedule, $toContactID) {
     $toEmail = CRM_Contact_BAO_Contact::getPrimaryEmail($toContactID);
+    $contact = civicrm_api3('contact', 'get', array('id' => $toContactID, 'return' => 'display_name'));
+    $display_name = $contact['values'][$toContactID]['display_name'];
+
     if (!$toEmail) {
       return array("email_missing" => "Couldn't find recipient's email address.");
     }
@@ -615,12 +618,20 @@ FROM civicrm_action_schedule cas
     $mailParams = array(
       'groupName' => 'Scheduled Reminder Sender',
       'from' => self::pickFromEmail($schedule),
-      'toName' => $tokenRow->context['contact']['display_name'],
+      // CRM-19786
+      'toName' => $display_name,
       'toEmail' => $toEmail,
       'subject' => $tokenRow->render('subject'),
       'entity' => 'action_schedule',
       'entity_id' => $schedule->id,
     );
+
+    if (isset($tokenRow->context['contact'])) {
+      if (!isset($tokenRow->context['contact']['preferred_mail_format']) ||
+        $tokenRow->context['contact']['preferred_mail_format'] === NULL) {
+        $tokenRow->context['contact']['preferred_mail_format'] = 'Both';
+      }
+    }
 
     if (!$body_html || $tokenRow->context['contact']['preferred_mail_format'] == 'Text' ||
       $tokenRow->context['contact']['preferred_mail_format'] == 'Both'
