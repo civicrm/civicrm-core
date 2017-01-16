@@ -3590,7 +3590,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
             'previous_line_total' => CRM_Utils_Array::value('line_total', CRM_Utils_Array::value($fieldValues['id'], $previousLineItem)),
             'item_amount' => $itemAmount,
           );
-          $amount = self::calcluateFinancialItemAmount($params, $amountParams, $context, $fieldValues);
+          $amount = self::calculateFinancialItemAmount($params, $amountParams, $context, $fieldValues);
 
           $itemParams = array(
             'transaction_date' => $receiveDate,
@@ -5380,7 +5380,7 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
    *
    * @return float
    */
-  public static function calcluateFinancialItemAmount($params, $amountParams, $context, &$fieldValues) {
+  public static function calculateFinancialItemAmount($params, $amountParams, $context, &$fieldValues) {
     if (!empty($params['is_quick_config'])) {
       $amount = $amountParams['item_amount'];
       if (!empty($params['tax_amount']) && !CRM_Utils_System::isNull($params['tax_amount'])) {
