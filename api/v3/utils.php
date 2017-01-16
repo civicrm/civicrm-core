@@ -822,10 +822,19 @@ function _civicrm_api3_get_options_from_params(&$params, $queryObject = FALSE, $
     'return' => !empty($returnProperties) ? $returnProperties : array(),
   );
 
-  $finalSort = array();
   $options['sort'] = NULL;
   if (!empty($sort)) {
+    $finalSort = array();
     foreach ((array) $sort as $s) {
+      // qualify any sorting by id to the original entity request
+      if ($entity && $action == 'get') {
+        switch (trim(strtolower($s))) {
+          case 'id':
+          case 'id desc':
+          case 'id asc':
+            $s = str_replace('id', $lowercase_entity . '_id', $s);
+        }
+      }
       if (CRM_Utils_Rule::mysqlOrderBy($s)) {
         if ($entity && $action == 'get') {
           switch (trim(strtolower($s))) {
