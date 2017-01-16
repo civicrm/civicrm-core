@@ -5457,4 +5457,32 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
     }
   }
 
+  /**
+   * Calculate Tax when Financial Type is changed.
+   *
+   * @param array $params
+   * @param float $totalAmount
+   * @param array $oldTaxAmounts
+   * @param float $changeFTAmount
+   *
+   */
+  public static function calculateTaxForChangeInFinancialType(
+    &$params, &$totalAmount,
+    &$oldTaxAmounts, &$changeFTAmount
+  ) {
+    $taxAmountAfterFTChange = self::calculateTaxAfterChangeInFinancialTypeForLineItems($params['line_item'], $params['contribution']->id);
+    $previousTaxAmount = 0;
+    if (isset($params['prevContribution']->tax_amount)) {
+      $previousTaxAmount = $params['prevContribution']->tax_amount;
+    }
+    $taxDiff = $taxAmountAfterFTChange - $previousTaxAmount;
+    $changeFTAmount += $taxDiff;
+    $totalAmount -= $taxDiff;
+    if ($taxDiff > 0) {
+      $params['tax_amount'] = $taxAmountAfterFTChange;
+      $oldTaxAmounts['new_tax_amount'] -= $taxDiff;
+      $oldTaxAmounts['previous_tax_amount'] = $taxAmountAfterFTChange - $taxDiff;
+    }
+  }
+
 }
