@@ -5457,4 +5457,25 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
     }
   }
 
+  /**
+   * Calculate Tax for each item when Financial Type is changed.
+   *
+   * @param array $lineItem
+   *
+   * @param int $contributionId
+   *
+   */
+  public static function calculateTaxAfterChangeInFinancialTypeForLineItems($lineItem, $contributionId) {
+    $taxAmount = 0;
+    $previousLineItem = CRM_Price_BAO_LineItem::getLineItemsByContributionID($contributionId);
+    foreach ($lineItem as $items) {
+      foreach ($items as $item) {
+        $lineTotal = CRM_Utils_Array::value('line_total', CRM_Utils_Array::value($item['id'], $previousLineItem));
+        $lineTaxAmount = CRM_Contribute_BAO_Contribution_Utils::calculateTaxAmount($lineTotal, $item['tax_rate']);
+        $taxAmount += $lineTaxAmount['tax_amount'];
+      }
+    }
+    return $taxAmount;
+  }
+
 }
