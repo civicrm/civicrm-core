@@ -3273,9 +3273,13 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
             }
             self::updateFinancialAccounts($params, 'changeFinancialType');
             $params['financial_account_id'] = $newFinancialAccount;
-            list($changeFTAmount, $ignoreChangeAmount) = self::calcluateFTChangeAmount($params, $trxnParams['total_amount']);
+            list($changeFTAmount, $ignoreChangeAmount, $taxAmounts) = self::calculateFTChangeAmount($params, $trxnParams['total_amount'], $totalAmount);
             $params['total_amount'] = $params['trxnParams']['total_amount'] = $params['trxnParams']['net_amount'] = $changeFTAmount;
             self::updateFinancialAccounts($params);
+            if (isset($taxAmounts['new_tax_amount'])) {
+              $params['tax_amount'] = $taxAmounts['new_tax_amount'];
+              $params['prevContribution']->tax_amount = CRM_Utils_Array::value('previous_tax_amount', $taxAmounts);
+            }
             $params['trxnParams']['to_financial_account_id'] = $trxnParams['to_financial_account_id'];
             $updated = TRUE;
             $params['deferred_financial_account_id'] = $newFinancialAccount;
@@ -3456,7 +3460,8 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     }
     if ($context == 'changedAmount' || $context == 'changeFinancialType') {
       $itemAmount = $params['trxnParams']['total_amount'] = $params['trxnParams']['net_amount'] = $params['total_amount'] - $params['prevContribution']->total_amount;
-      if (isset($params['tax_amount'])) {
+
+      if (isset($params['prevContribution']->tax_amount) && $context != 'changeFinancialType') {
         $itemAmount -= CRM_Utils_Array::value('tax_amount', $params, 0);
       }
       if (isset($params['tax_amount'])) {
@@ -3593,7 +3598,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
             'previous_line_total' => CRM_Utils_Array::value('line_total', CRM_Utils_Array::value($fieldValues['id'], $previousLineItem)),
             'item_amount' => $itemAmount,
           );
-          $amount = self::calcluateFinancialItemAmount($params, $amountParams, $context);
+          $amount = self::calcluateFinancialItemAmount($params, $amountParams, $context, $fieldValues);
           $itemParams = array(
             'transaction_date' => $receiveDate,
             'contact_id' => $params['prevContribution']->contact_id,
@@ -5365,12 +5370,16 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
    * @param array $amountParams
    *
    * @param string $context
+   * @param array $fieldValues
    *
    * @return float
    */
-  public static function calculateFinancialItemAmount($params, $amountParams, $context) {
+  public static function calculateFinancialItemAmount($params, $amountParams, $context, &$fieldValues) {
     if (!empty($params['is_quick_config'])) {
       $amount = $amountParams['item_amount'];
+      if (!empty($params['tax_amount']) && !CRM_Utils_System::isNull($params['tax_amount'])) {
+        $fieldValues['tax_amount'] = $params['tax_amount'];
+      }
       if (!$amount) {
         $amount = $params['total_amount'];
         if ($context === NULL) {
