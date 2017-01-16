@@ -347,6 +347,7 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
       'contribution_trxn_id',
       'activity_type_id',
       'status_id',
+      'priority_id',
       'activity_subject',
       'activity_details',
       'contribution_page_id',
@@ -356,7 +357,10 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
       'contact_tags',
       'preferred_communication_method',
     );
-    $changeNames = array('status_id' => 'activity_status_id');
+    $changeNames = array(
+      'status_id' => 'activity_status_id',
+      'priority_id' => 'activity_priority_id',
+    );
     CRM_Contact_BAO_Query::processSpecialFormValue($this->_formValues, $specialParams, $changeNames);
 
     $taglist = CRM_Utils_Array::value('contact_taglist', $this->_formValues);
