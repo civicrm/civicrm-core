@@ -256,6 +256,11 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
           'details' => array(
             'title' => ts('Activity Details'),
           ),
+          'priority_id' => array(
+            'title' => ts('Priority'),
+            'default' => TRUE,
+            'type' => CRM_Utils_Type::T_STRING,
+          ),
         ),
         'filters' => array(
           'activity_date_time' => array(

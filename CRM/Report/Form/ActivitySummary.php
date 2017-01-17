@@ -125,6 +125,11 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
             'title' => ts('Duration'),
             'default' => TRUE,
           ),
+          'priority_id' => array(
+            'title' => ts('Priority'),
+            'default' => TRUE,
+            'type' => CRM_Utils_Type::T_STRING,
+          ),
           'id' => array(
             'title' => ts('Total Activities'),
             'required' => TRUE,
@@ -672,6 +677,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
     $entryFound = FALSE;
     $activityType = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE);
     $activityStatus = CRM_Core_PseudoConstant::activityStatus();
+    $priority = CRM_Core_PseudoConstant::get('CRM_Activity_DAO_Activity', 'priority_id');
     $onHover = ts('View Contact Summary for this Contact');
     foreach ($rows as $rowNum => $row) {
       // make count columns point to activity detail report
@@ -758,6 +764,13 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
       if (array_key_exists('civicrm_activity_status_id', $row)) {
         if ($value = $row['civicrm_activity_status_id']) {
           $rows[$rowNum]['civicrm_activity_status_id'] = $activityStatus[$value];
+          $entryFound = TRUE;
+        }
+      }
+
+      if (array_key_exists('civicrm_activity_priority_id', $row)) {
+        if ($value = $row['civicrm_activity_priority_id']) {
+          $rows[$rowNum]['civicrm_activity_priority_id'] = $priority[$value];
           $entryFound = TRUE;
         }
       }
