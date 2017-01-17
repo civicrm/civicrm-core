@@ -205,11 +205,11 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
 
     if (!empty($_POST)) {
       $this->_formValues = $this->controller->exportValues($this->_name);
-      foreach (array('activity_type_id', 'status_id', 'activity_subject') as $element) {
+      foreach (array('activity_type_id', 'status_id', 'activity_subject', 'priority_id') as $element) {
         $value = CRM_Utils_Array::value($element, $this->_formValues);
         if ($value) {
           if (is_array($value)) {
-            if ($element == 'status_id') {
+            if ($element == 'status_id' || $element == 'priority_id') {
               unset($this->_formValues[$element]);
               $this->_formValues['activity_' . $element] = $value;
             }
