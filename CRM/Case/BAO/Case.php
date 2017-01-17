@@ -1856,7 +1856,7 @@ SELECT civicrm_contact.id as casemanager_id,
  FROM civicrm_contact
  LEFT JOIN civicrm_relationship ON (civicrm_relationship.contact_id_b = civicrm_contact.id AND civicrm_relationship.relationship_type_id = %1)
  LEFT JOIN civicrm_case ON civicrm_case.id = civicrm_relationship.case_id
- WHERE civicrm_case.id = %2";
+ WHERE civicrm_case.id = %2 AND is_active = 1";
 
       $managerRoleParams = array(
         1 => array($managerRoleId, 'Integer'),
