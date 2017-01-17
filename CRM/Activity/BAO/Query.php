@@ -391,10 +391,10 @@ class CRM_Activity_BAO_Query {
         break;
 
       case 'activity_priority':
-       $from .= " $side JOIN civicrm_option_group option_group_activity_priority ON (option_group_activity_priority.name = 'priority')";
-       $from .= " $side JOIN civicrm_option_value activity_priority ON (civicrm_activity.priority_id = activity_priority.value
-       AND option_group_activity_priority.id = activity_priority.option_group_id ) ";
-       break;
+        $from .= " $side JOIN civicrm_option_group option_group_activity_priority ON (option_group_activity_priority.name = 'priority')";
+        $from .= " $side JOIN civicrm_option_value activity_priority ON (civicrm_activity.priority_id = activity_priority.value
+                              AND option_group_activity_priority.id = activity_priority.option_group_id ) ";
+        break;
 
       case 'civicrm_activity_tag':
         $from .= " $side JOIN civicrm_entity_tag as civicrm_activity_tag ON ( civicrm_activity_tag.entity_table = 'civicrm_activity' AND civicrm_activity_tag.entity_id = civicrm_activity.id ) ";
