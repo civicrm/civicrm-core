@@ -147,7 +147,7 @@
     <div class="crm-public-form-item crm-section {$form.is_recur.name}-section">
       <div class="label">&nbsp;</div>
       <div class="content">
-        {$form.is_recur.html} {$form.is_recur.label} {ts}every{/ts}
+        {$form.is_recur.html} {$form.is_recur.label} <label>{ts}every{/ts}
         {if $is_recur_interval}
           {$form.frequency_interval.html}
         {/if}
@@ -161,6 +161,7 @@
           {ts}for{/ts} {$form.installments.html} {$form.installments.label}
           </span>
         {/if}
+        </label>
         <div id="recurHelp" class="description">
           {ts}Your recurring contribution will be processed automatically.{/ts}
           {if $is_recur_installments}
