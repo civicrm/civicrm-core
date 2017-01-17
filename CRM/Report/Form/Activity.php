@@ -243,9 +243,9 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
             'type' => CRM_Utils_Type::T_TEXT,
           ),
           'priority_id' => array(
-          'title' => ts('Activity Priority'),
-          'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-          'options' => CRM_Core_PseudoConstant::get('CRM_Activity_DAO_Activity', 'priority_id'),
+            'title' => ts('Activity Priority'),
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => CRM_Core_PseudoConstant::get('CRM_Activity_DAO_Activity', 'priority_id'),
           ),
         ),
         'order_bys' => array(
