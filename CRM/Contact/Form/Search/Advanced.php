@@ -376,13 +376,14 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
       'contribution_trxn_id',
       'activity_type_id',
       'status_id',
+      'priority_id',
       'activity_subject',
     );
     foreach ($specialParams as $element) {
       $value = CRM_Utils_Array::value($element, $this->_formValues);
       if ($value) {
         if (is_array($value)) {
-          if ($element == 'status_id') {
+          if ($element == 'status_id' || $element == 'priority_id') {
             unset($this->_formValues[$element]);
             $element = 'activity_' . $element;
           }

@@ -216,6 +216,11 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
           'details' => array(
             'title' => ts('Activity Details'),
           ),
+          'priority_id' => array(
+            'title' => ts('Priority'),
+            'default' => TRUE,
+            'type' => CRM_Utils_Type::T_STRING,
+          ),
         ),
         'filters' => array(
           'activity_date_time' => array(
@@ -236,6 +241,11 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
           'details' => array(
             'title' => ts('Activity Details'),
             'type' => CRM_Utils_Type::T_TEXT,
+          ),
+          'priority_id' => array(
+            'title' => ts('Activity Priority'),
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => CRM_Core_PseudoConstant::get('CRM_Activity_DAO_Activity', 'priority_id'),
           ),
         ),
         'order_bys' => array(
@@ -790,6 +800,7 @@ GROUP BY civicrm_activity_id {$this->_having} {$this->_orderBy} {$this->_limit}"
     $entryFound = FALSE;
     $activityType = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE);
     $activityStatus = CRM_Core_PseudoConstant::activityStatus();
+    $priority = CRM_Core_PseudoConstant::get('CRM_Activity_DAO_Activity', 'priority_id');
     $viewLinks = FALSE;
     $context = CRM_Utils_Request::retrieve('context', 'String', $this, FALSE, 'report');
     $actUrl = '';
@@ -939,6 +950,13 @@ GROUP BY civicrm_activity_id {$this->_having} {$this->_orderBy} {$this->_limit}"
           $activityStatus[$row['civicrm_activity_status_id']] != 'Completed'
         ) {
           $rows[$rowNum]['class'] = "status-overdue";
+          $entryFound = TRUE;
+        }
+      }
+
+      if (array_key_exists('civicrm_activity_priority_id', $row)) {
+        if ($value = $row['civicrm_activity_priority_id']) {
+          $rows[$rowNum]['civicrm_activity_priority_id'] = $priority[$value];
           $entryFound = TRUE;
         }
       }

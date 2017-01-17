@@ -2182,6 +2182,12 @@ AND cl.modified_id  = c.id
             'name' => 'activity_status',
             'type' => CRM_Utils_Type::T_STRING,
           ),
+          'activity_priority' => array(
+            'title' => ts('Activity Priority'),
+            'name' => 'activity_priority',
+            'type' => CRM_Utils_Type::T_STRING,
+            'searchByLabel' => TRUE,
+          ),
         );
         $fields = array_merge($Activityfields, $exportableFields);
       }

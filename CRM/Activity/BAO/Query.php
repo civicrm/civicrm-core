@@ -153,6 +153,15 @@ class CRM_Activity_BAO_Query {
       $query->_whereTables['parent_id'] = 1;
       $query->_element['parent_id'] = 1;
     }
+
+    if (!empty($query->_returnProperties['activity_priority'])) {
+      $query->_select['activity_priority'] = 'activity_priority.label as activity_priority,
+      civicrm_activity.priority_id as priority_id';
+      $query->_element['activity_priority'] = 1;
+      $query->_tables['activity_priority'] = 1;
+      $query->_whereTables['activity_priority'] = 1;
+      $query->_tables['civicrm_activity'] = $query->_whereTables['civicrm_activity'] = 1;
+    }
   }
 
   /**
@@ -197,11 +206,12 @@ class CRM_Activity_BAO_Query {
       case 'activity_engagement_level':
       case 'activity_subject':
       case 'activity_id':
+      case 'activity_priority_id':
         $qillName = $name;
         if (in_array($name, array('activity_engagement_level', 'activity_id'))) {
           $name = $qillName = str_replace('activity_', '', $name);
         }
-        if (in_array($name, array('activity_status_id', 'activity_subject'))) {
+        if (in_array($name, array('activity_status_id', 'activity_subject', 'activity_priority_id'))) {
           $name = str_replace('activity_', '', $name);
           $qillName = str_replace('_id', '', $qillName);
         }
@@ -214,6 +224,7 @@ class CRM_Activity_BAO_Query {
 
       case 'activity_type':
       case 'activity_status':
+      case 'activity_priority':
         $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("$name.label", $op, $value, 'String');
         list($op, $value) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Activity_DAO_Activity', $name, $value, $op);
         $query->_qill[$grouping][] = ts('%1 %2 %3', array(1 => $fields[$name]['title'], 2 => $op, 3 => $value));
@@ -383,6 +394,12 @@ class CRM_Activity_BAO_Query {
                                AND option_group_activity_type.id = activity_type.option_group_id ) ";
         break;
 
+      case 'activity_priority':
+        $from .= " $side JOIN civicrm_option_group option_group_activity_priority ON (option_group_activity_priority.name = 'priority')";
+        $from .= " $side JOIN civicrm_option_value activity_priority ON (civicrm_activity.priority_id = activity_priority.value
+                              AND option_group_activity_priority.id = activity_priority.option_group_id ) ";
+        break;
+
       case 'civicrm_activity_tag':
         $from .= " $side JOIN civicrm_entity_tag as civicrm_activity_tag ON ( civicrm_activity_tag.entity_table = 'civicrm_activity' AND civicrm_activity_tag.entity_id = civicrm_activity.id ) ";
         break;
@@ -455,6 +472,11 @@ class CRM_Activity_BAO_Query {
         );
       }
     }
+
+    $priority = CRM_Core_PseudoConstant::get('CRM_Activity_DAO_Activity', 'priority_id');
+    $form->addSelect('priority_id',
+      array('entity' => 'activity', 'label' => ts('Priority'), 'multiple' => 'multiple', 'option_url' => NULL, 'placeholder' => ts('- any -'))
+    );
 
     $parentNames = CRM_Core_BAO_Tag::getTagSet('civicrm_activity');
     CRM_Core_Form_Tag::buildQuickForm($form, $parentNames, 'civicrm_activity', NULL, TRUE, TRUE);
@@ -544,6 +566,7 @@ class CRM_Activity_BAO_Query {
         'activity_location' => 1,
         'activity_details' => 1,
         'activity_status' => 1,
+        'activity_priority' => 1,
         'source_contact' => 1,
         'source_record_id' => 1,
         'activity_is_test' => 1,
