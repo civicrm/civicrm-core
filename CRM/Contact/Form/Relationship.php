@@ -618,7 +618,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
    */
   private function setEmploymentRelationship($params, $relationshipIds) {
     if (
-      isset($params['is_current_employer']) &&
+      !empty($params['is_current_employer']) &&
       $this->_allRelationshipNames[$params['relationship_type_id']]["name_a_b"] == 'Employee of') {
       $employerParams = array();
       foreach ($relationshipIds as $id) {
