@@ -68,12 +68,6 @@
              </tr>
      {/if}
         {/if}
-      {if $gName eq 'case_status'}
-            <tr class="crm-admin-options-form-block-grouping">
-              <td class="label">{$form.grouping.label}</td>
-                <td>{$form.grouping.html}</td>
-            </tr>
-      {/if}
 
       {if $form.value.html && $gName neq 'redaction_rule'}
         <tr class="crm-admin-options-form-block-value">
@@ -128,6 +122,12 @@
                 <td class="label">{$form.visibility_id.label}</td>
                 <td>{$form.visibility_id.html}</td>
               </tr>
+        {/if}
+        {if $form.grouping.html}
+          <tr class="crm-admin-options-form-block-grouping">
+            <td class="label">{$form.grouping.label}</td>
+            <td>{$form.grouping.html}</td>
+          </tr>
         {/if}
               <tr class="crm-admin-options-form-block-weight">
                 <td class="label">{$form.weight.label}</td>
