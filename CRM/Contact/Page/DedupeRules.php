@@ -215,7 +215,11 @@ class CRM_Contact_Page_DedupeRules extends CRM_Core_Page_Basic {
 
     $rgDao = new CRM_Dedupe_DAO_RuleGroup();
     $rgDao->id = $id;
-    $rgDao->delete();
+    if ($rgDao->find(TRUE)) {
+      $rgDao->delete();
+      CRM_Core_Session::setStatus(ts("The rule '%1' has been deleted.", array(1 => $rgDao->title)), ts('Rule Deleted'), 'success');
+      CRM_Utils_System::redirect(CRM_Utils_System::url($this->userContext(), 'reset=1'));
+    }
   }
 
 }
