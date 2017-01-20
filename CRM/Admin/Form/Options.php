@@ -488,6 +488,8 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
             1 => $this->_gLabel,
             2 => $optionValue->label,
           )), ts('Saved'), 'success');
+
+      $this->ajaxResponse['optionValue'] = $optionValue->toArray();
     }
   }
 

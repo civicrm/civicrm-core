@@ -50,7 +50,14 @@
           apiCalls: function($route, crmApi) {
             var reqs = {};
             reqs.actStatuses = ['OptionValue', 'get', {
-              option_group_id: 'activity_status'
+              option_group_id: 'activity_status',
+              sequential: 1,
+              options: {limit: 0}
+            }];
+            reqs.caseStatuses = ['OptionValue', 'get', {
+              option_group_id: 'case_status',
+              sequential: 1,
+              options: {limit: 0}
             }];
             reqs.actTypes = ['OptionValue', 'get', {
               option_group_id: 'activity_type',
@@ -126,7 +133,8 @@
   crmCaseType.controller('CaseTypeCtrl', function($scope, crmApi, apiCalls) {
     var ts = $scope.ts = CRM.ts(null);
 
-    $scope.activityStatuses = _.values(apiCalls.actStatuses.values);
+    $scope.activityStatuses = apiCalls.actStatuses.values;
+    $scope.caseStatuses = _.indexBy(apiCalls.caseStatuses.values, 'name');
     $scope.activityTypes = apiCalls.actTypes.values;
     $scope.activityTypeNames = _.pluck(apiCalls.actTypes.values, 'name');
     $scope.activityTypes = apiCalls.actTypes.values;
@@ -143,7 +151,12 @@
     $scope.caseType.definition.activityTypes = $scope.caseType.definition.activityTypes || [];
     $scope.caseType.definition.activitySets = $scope.caseType.definition.activitySets || [];
     $scope.caseType.definition.caseRoles = $scope.caseType.definition.caseRoles || [];
-    window.ct = $scope.caseType;
+    $scope.caseType.definition.statuses = $scope.caseType.definition.statuses || [];
+
+    $scope.selectedStatuses = {};
+    _.each(apiCalls.caseStatuses.values, function (status) {
+      $scope.selectedStatuses[status.name] = !$scope.caseType.definition.statuses.length || $scope.caseType.definition.statuses.indexOf(status.name) > -1;
+    });
 
     $scope.addActivitySet = function(workflow) {
       var activitySet = {};
@@ -222,6 +235,15 @@
       return !$scope.caseType.id || $scope.caseType.is_forkable;
     };
 
+    $scope.newStatus = function() {
+      CRM.loadForm(CRM.url('civicrm/admin/options/case_status', {action: 'add', reset: 1}))
+        .on('crmFormSuccess', function(e, data) {
+          $scope.caseStatuses[data.optionValue.name] = data.optionValue;
+          $scope.selectedStatuses[data.optionValue.name] = true;
+          $scope.$digest();
+        });
+    };
+
     $scope.isNewActivitySetAllowed = function(workflow) {
       switch (workflow) {
         case 'timeline':
@@ -274,6 +296,13 @@
     };
 
     $scope.save = function() {
+      // Add selected statuses
+      var selectedStatuses = [];
+      _.each($scope.selectedStatuses, function(v, k) {
+        if (v) selectedStatuses.push(k);
+      });
+      // Ignore if ALL or NONE selected
+      $scope.caseType.definition.statuses = selectedStatuses.length == _.size($scope.selectedStatuses) ? [] : selectedStatuses;
       var result = crmApi('CaseType', 'create', $scope.caseType, true);
       result.then(function(data) {
         if (data.is_error === 0 || data.is_error == '0') {
