@@ -336,7 +336,7 @@ SELECT f.id, f.label, f.data_type,
                 if ($field['data_type'] == 'String') {
                   $value = CRM_Utils_Type::escape($strtolower($value), 'String');
                 }
-                else {
+                elseif ($value) {
                   $value = CRM_Utils_Type::escape($value, 'Integer');
                 }
                 $value = str_replace(array('[', ']', ','), array('\[', '\]', '[:comma:]'), $value);
