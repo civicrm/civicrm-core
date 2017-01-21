@@ -272,6 +272,8 @@
        {/if}
      {literal}
      CRM.$(function($) {
+       var psid = $('#price_set_id').val();
+       showHideAmountBlock(psid, 'price_set_id');
        function checked_payment_processors() {
          var ids = [];
          $('.crm-contribution-contributionpage-amount-form-block-payment_processor input[type="checkbox"]').each(function(){
