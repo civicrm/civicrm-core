@@ -59,7 +59,7 @@ class CRM_Tag_Form_Edit extends CRM_Admin_Form {
     }
     else {
       $parentId = NULL;
-      $isTagsetChild = FALSE;
+      $isTagSetChild = FALSE;
 
       $this->_isTagSet = CRM_Utils_Request::retrieve('tagset', 'Positive', $this);
 
