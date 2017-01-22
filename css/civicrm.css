@@ -270,6 +270,7 @@ input.crm-form-entityref {
     border: 1px solid #FF0000;
 }
 .crm-container input.crm-form-text,
+.crm-container .crm-icon-picker-button,
 .crm-container input.dateplugin {
   border: 1px solid #999;
   vertical-align: middle;
