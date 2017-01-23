@@ -38,7 +38,7 @@ cj("#checkavailability").click(function() {
    var spchar = "\<|\>|\"|\'|\%|\;|\(|\)|\&|\\\\|\/";
 
    {/literal}{if $config->userSystem->is_drupal == "1"}{literal}
-   spchar = spchar + "|\~|\`|\:|\@|\!|\=|\#|\$|\^|\*|\{|\}|\\[|\\]|\+|\?|\,";
+   spchar = spchar + "|\~|\`|\:|\!|\=|\#|\$|\^|\*|\{|\}|\\[|\\]|\+|\?|\,";
    {/literal}{/if}{literal}
    var r = new RegExp( "["+spchar+"]", "i");
    /*regular expression \\ matches a single backslash. this becomes r = /\\/ or r = new RegExp("\\\\").*/
