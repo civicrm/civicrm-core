@@ -42,8 +42,7 @@
         $button.button('option', {
           label: split[0] || ts('None'),
           icons: {primary: $input.val()}
-        })
-          .css('color', split[0] ? '#3e3e3e' : '#9f9f9f');
+        });
         $style.toggle(!!split[0]).val(split[1] || '');
       }
 
