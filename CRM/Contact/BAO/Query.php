@@ -468,6 +468,10 @@ class CRM_Contact_BAO_Query {
 
   /**
    * Function which actually does all the work for the constructor.
+   *
+   * @param string $apiEntity
+   *   The api entity being called.
+   *   This sort-of duplicates $mode in a confusing way. Probably not by design.
    */
   public function initialize($apiEntity = NULL) {
     $this->_select = array();
@@ -525,7 +529,7 @@ class CRM_Contact_BAO_Query {
    * versus search builder.
    *
    * The direction we are going is having the form convert values to a standardised format &
-   * moving away from wierd & wonderful where clause switches.
+   * moving away from weird & wonderful where clause switches.
    *
    * Fix and handle contact deletion nicely.
    *
@@ -588,7 +592,7 @@ class CRM_Contact_BAO_Query {
         $this->_paramLookup[$value[0]] = array();
       }
       if ($value[0] !== 'group') {
-        // Just trying to unravel how group interacts here! This whole function is wieid.
+        // Just trying to unravel how group interacts here! This whole function is weird.
         $this->_paramLookup[$value[0]][] = $value;
       }
     }
@@ -596,6 +600,10 @@ class CRM_Contact_BAO_Query {
 
   /**
    * Some composite fields do not appear in the fields array hack to make them part of the query.
+   *
+   * @param $apiEntity
+   *   The api entity being called.
+   *   This sort-of duplicates $mode in a confusing way. Probably not by design.
    */
   public function addSpecialFields($apiEntity) {
     static $special = array('contact_type', 'contact_sub_type', 'sort_name', 'display_name');
@@ -624,6 +632,10 @@ class CRM_Contact_BAO_Query {
    * clauses. Note that since the where clause introduces new
    * tables, the initial attempt also retrieves all variables used
    * in the params list
+   *
+   * @param string $apiEntity
+   *   The api entity being called.
+   *   This sort-of duplicates $mode in a confusing way. Probably not by design.
    */
   public function selectClause($apiEntity = NULL) {
 
@@ -666,6 +678,9 @@ class CRM_Contact_BAO_Query {
       if (in_array($name, array('groups', 'tags', 'notes'))
         && isset($this->_returnProperties[substr($name, 0, -1)])
       ) {
+        // @todo instead of setting make exception to get us into
+        // an if clause that has handling for these fields buried with in it
+        // move the handling to here.
         $makeException = TRUE;
       }
 
@@ -865,6 +880,7 @@ class CRM_Contact_BAO_Query {
           }
         }
         elseif ($name === 'tags') {
+          //@todo move this handling outside the big IF & ditch $makeException
           $this->_useGroupBy = TRUE;
           $this->_select[$name] = "GROUP_CONCAT(DISTINCT(civicrm_tag.name)) as tags";
           $this->_element[$name] = 1;
@@ -872,6 +888,7 @@ class CRM_Contact_BAO_Query {
           $this->_tables['civicrm_entity_tag'] = 1;
         }
         elseif ($name === 'groups') {
+          //@todo move this handling outside the big IF & ditch $makeException
           $this->_useGroupBy = TRUE;
           // Duplicates will be created here but better to sort them out in php land.
           $this->_select[$name] = "
@@ -889,6 +906,7 @@ class CRM_Contact_BAO_Query {
           );
         }
         elseif ($name === 'notes') {
+          //@todo move this handling outside the big IF & ditch $makeException
           // if note field is subject then return subject else body of the note
           $noteColumn = 'note';
           if (isset($noteField) && $noteField == 'note_subject') {
@@ -2331,7 +2349,6 @@ class CRM_Contact_BAO_Query {
     }
   }
 
-
   /**
    * @param $where
    * @param $locType
@@ -2834,9 +2851,9 @@ class CRM_Contact_BAO_Query {
   }
 
   /**
-   * Where / qill clause for contact_sub_type
+   * Where / qill clause for contact_sub_type.
    *
-   * @param $values
+   * @param array $values
    */
   public function contactSubType(&$values) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
@@ -3140,7 +3157,7 @@ WHERE  $smartGroupClause
   }
 
   /**
-   * Where / qill clause for tag
+   * Where / qill clause for tag.
    *
    * @param array $values
    */
@@ -4299,6 +4316,9 @@ civicrm_relationship.is_permission_a_b = 0
    *   Should permissions be ignored or should the logged in user's permissions be applied.
    * @param int $mode
    *   This basically correlates to the component.
+   * @param string $apiEntity
+   *   The api entity being called.
+   *   This sort-of duplicates $mode in a confusing way. Probably not by design.
    *
    * @return array
    */
