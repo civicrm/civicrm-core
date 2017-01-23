@@ -4716,14 +4716,44 @@ LIMIT 1;";
       throw new CRM_Core_Exception('Contribution does not exist');
     }
     $contribution->loadRelatedObjects($input, $ids, TRUE);
-    // set receipt from e-mail and name in value
     if (!$returnMessageText) {
-      $userID = CRM_Core_Session::singleton()->getLoggedInContactID();
-      if (!empty($userID)) {
-        list($userName, $userEmail) = CRM_Contact_BAO_Contact_Location::getEmailDetails($userID);
-        $values['receipt_from_email'] = CRM_Utils_Array::value('receipt_from_email', $input, $userEmail);
-        $values['receipt_from_name'] = CRM_Utils_Array::value('receipt_from_name', $input, $userName);
+      // Try to retrieve a backup name and email address to use as the
+      // from address if no email address has been passed in (e.g. from the
+      // contribution page) via $input.
+
+      // First try the default "From email addresses".
+      $skipFatal = TRUE;
+      $backupEmailValues = CRM_Core_BAO_Domain::getNameAndEmail($skipFatal);
+
+      // getNameAndEmail returns an array with two empty values if no match
+      // is found - and that is not considered "empty" by php.
+      if ($backupEmailValues[1] == '') {
+        $backupEmailValues = NULL;
       }
+      if (empty($backupEmailValues)) {
+        // If those are not set, try the system wide domain email address.
+        $results = civicrm_api3('Domain', 'getsingle', array());
+        $backupEmailValues = array(
+          0 => $results['name'],
+          1 => $results['domain_email'],
+        );
+      }
+
+      if(empty($backupEmailValues)) {
+        // If these are still not set, try for values from the logged in user.
+        $userID = CRM_Core_Session::getLoggedInContactID();
+        if (!empty($userID)) {
+          $backupEmailValues = CRM_Contact_BAO_Contact_Location::getEmailDetails($userID);
+        }
+      }
+
+      if (!empty($backupEmailValues)) {
+        $userName = $backupEmailValues[0];
+        $userEmail = $backupEmailValues[1];
+      }
+
+      $values['receipt_from_email'] = CRM_Utils_Array::value('receipt_from_email', $input, $userEmail);
+      $values['receipt_from_name'] = CRM_Utils_Array::value('receipt_from_name', $input, $userName);
     }
 
     $return = $contribution->composeMessageArray($input, $ids, $values, $recur, $returnMessageText);
