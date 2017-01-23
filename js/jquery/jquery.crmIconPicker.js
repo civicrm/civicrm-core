@@ -27,7 +27,7 @@
       }
 
       var $input = $(this),
-        $button = $('<a href="#" />').button().attr('title', $input.attr('title')),
+        $button = $('<a class="crm-icon-picker-button" href="#" />').button().removeClass('ui-corner-all').attr('title', $input.attr('title')),
         $style = $('<select class="crm-form-select"></select>'),
         options = [
           {key: 'fa-rotate-90', value: ts('Rotate right')},
@@ -42,11 +42,12 @@
         $button.button('option', {
           label: split[0] || ts('None'),
           icons: {primary: $input.val()}
-        });
+        })
+          .css('color', split[0] ? '#3e3e3e' : '#9f9f9f');
         $style.toggle(!!split[0]).val(split[1] || '');
       }
 
-      $input.hide().addClass('iconpicker-widget').after($style).after($button).change(formatButton);
+      $input.hide().addClass('iconpicker-widget').after($style).after('&nbsp;').after($button).change(formatButton);
 
       CRM.utils.setOptions($style, options, ts('Normal'));
 
