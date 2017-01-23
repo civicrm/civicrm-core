@@ -4538,6 +4538,9 @@ LIMIT 1;";
             //CRM-17723 - reset static $relatedContactIds array()
             $var = TRUE;
             CRM_Member_BAO_Membership::createRelatedMemberships($var, $var, TRUE);
+            //MV:23/01/2017 - Here we need to hook and amend $membershipParams, $objects
+            require_once 'CRM/Utils/Hook.php';
+            CRM_Utils_Hook::preRenewMembership($membershipParams, $objects);            
             civicrm_api3('Membership', 'create', $membershipParams);
           }
         }

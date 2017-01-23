@@ -2172,4 +2172,18 @@ abstract class CRM_Utils_Hook {
     );
   }
 
+  /**
+   * This hook is called when a geocoder's format method is called.
+   *
+   * @param string $geoProvider
+   * @param array $values
+   * @param SimpleXMLElement $xml
+   */
+  public static function preRenewMembership(&$membershipParams, $objectRef) {
+    return self::singleton()->invoke(2, $membershipParams, $objectRef,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
+      'civicrm_preRenewMembership'
+    );
+  } 
+}
 }
