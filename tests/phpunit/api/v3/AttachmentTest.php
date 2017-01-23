@@ -404,6 +404,8 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
     $fileId = $createResult['id'];
     $this->assertTrue(is_numeric($fileId));
     $this->assertEquals(self::getFilePrefix() . 'weird_na_me.txt', $createResult['values'][$fileId]['name']);
+    // Check for appropriate icon
+    $this->assertEquals('fa-file-text-o', $createResult['values'][$fileId]['icon']);
   }
 
   /**
@@ -550,6 +552,36 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
     $this->assertAttachmentExistence(TRUE, $createResults['keepme']['second']);
     $this->assertAttachmentExistence(FALSE, $createResults['delme']['first']);
     $this->assertAttachmentExistence(FALSE, $createResults['delme']['second']);
+  }
+
+  /**
+   * Ensure mime type is converted to appropriate icon.
+   */
+  public function testGetIcon() {
+    $entity = CRM_Core_DAO::createTestObject('CRM_Activity_DAO_Activity');
+    $this->assertTrue(is_numeric($entity->id));
+
+    $createResult = $this->callAPISuccess('Attachment', 'create', array(
+      'name' => self::getFilePrefix() . 'hasIcon.docx',
+      'mime_type' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'description' => 'My test description',
+      'content' => 'My test content',
+      'entity_table' => 'civicrm_activity',
+      'entity_id' => $entity->id,
+    ));
+    $fileId = $createResult['id'];
+    $this->assertEquals('fa-file-word-o', $createResult['values'][$fileId]['icon']);
+    
+    $createResult = $this->callAPISuccess('Attachment', 'create', array(
+      'name' => self::getFilePrefix() . 'hasIcon.jpg',
+      'mime_type' => 'image/jpg',
+      'description' => 'My test description',
+      'content' => 'My test content',
+      'entity_table' => 'civicrm_activity',
+      'entity_id' => $entity->id,
+    ));
+    $fileId = $createResult['id'];
+    $this->assertEquals('fa-file-image-o', $createResult['values'][$fileId]['icon']);
   }
 
   /**
