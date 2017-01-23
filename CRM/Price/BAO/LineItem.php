@@ -298,7 +298,15 @@ WHERE li.contribution_id = %1";
         'tax_amount' => $dao->tax_amount,
         'price_set_id' => $dao->price_set_id,
       );
-      $lineItems[$dao->id]['tax_rate'] = CRM_Price_BAO_LineItem::calculateTaxRate($lineItems[$dao->id]);
+      $taxRates = CRM_Core_PseudoConstant::getTaxRates();
+      if (isset($lineItems[$dao->id]['financial_type_id']) && array_key_exists($lineItems[$dao->id]['financial_type_id'], $taxRates)) {
+        // We are close to output/display here - so apply some rounding at output/display level - to not show Tax Rate in all 8 decimals
+        $lineItems[$dao->id]['tax_rate'] = round($taxRates[$lineItems[$dao->id]['financial_type_id']], 3);
+      }
+      else {
+        // There is no Tax Rate associated with this Financial Type
+        $lineItems[$dao->id]['tax_rate'] = FALSE;
+      }
       $lineItems[$dao->id]['subTotal'] = $lineItems[$dao->id]['qty'] * $lineItems[$dao->id]['unit_price'];
       if ($lineItems[$dao->id]['tax_amount'] != '') {
         $getTaxDetails = TRUE;
@@ -595,28 +603,6 @@ WHERE li.contribution_id = %1";
         }
       }
     }
-  }
-
-  /**
-   * Calculate tax rate in percentage.
-   *
-   * @param array $lineItemId
-   *   An assoc array of lineItem.
-   *
-   * @return int|void
-   *   tax rate
-   */
-  public static function calculateTaxRate($lineItemId) {
-    if ($lineItemId['unit_price'] == 0 || $lineItemId['qty'] == 0) {
-      return FALSE;
-    }
-    if ($lineItemId['html_type'] == 'Text') {
-      $tax = round($lineItemId['tax_amount'] / ($lineItemId['unit_price'] * $lineItemId['qty']) * 100, 2);
-    }
-    else {
-      $tax = round(($lineItemId['tax_amount'] / $lineItemId['unit_price']) * 100, 2);
-    }
-    return $tax;
   }
 
 }

@@ -475,7 +475,8 @@ LIMIT 1
    */
   public static function calculateTaxAmount($amount, $taxRate) {
     $taxAmount = array();
-    $taxAmount['tax_amount'] = round(($taxRate / 100) * CRM_Utils_Rule::cleanMoney($amount), 2);
+    // There can not be any rounding at this stage - as this is prior to quantity multiplication
+    $taxAmount['tax_amount'] = ($taxRate / 100) * CRM_Utils_Rule::cleanMoney($amount);
 
     return $taxAmount;
   }
