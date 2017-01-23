@@ -370,6 +370,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
    *   the mode of operation, can be add, view, edit, delete
    * @param bool $force
    *
+   * @return bool
    */
   public static function checkPermissionedLineItems($id, $op, $force = TRUE) {
     if (!self::isACLFinancialTypeStatus()) {

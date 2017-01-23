@@ -201,7 +201,7 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
     'get' => array('access CiviCRM'),
     'default' => array(
       // nested array = OR
-      array('administer CiviCampaign', 'manage campaign')
+      array('administer CiviCampaign', 'manage campaign'),
     ),
   );
   $permissions['survey'] = $permissions['campaign'];

@@ -55,9 +55,12 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
   }
 
   /**
+   * Create mailing job.
+   *
    * @param array $params
    *
-   * @return CRM_Mailing_BAO_MailingJob
+   * @return \CRM_Mailing_BAO_MailingJob
+   * @throws \CRM_Core_Exception
    */
   static public function create($params) {
     $job = new CRM_Mailing_BAO_MailingJob();
@@ -78,10 +81,12 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
   }
 
   /**
-   * Initiate all pending/ready jobs
+   * Initiate all pending/ready jobs.
    *
    * @param array $testParams
-   * @param null $mode
+   * @param string $mode
+   *
+   * @return bool|null
    */
   public static function runJobs($testParams = NULL, $mode = NULL) {
     $job = new CRM_Mailing_BAO_MailingJob();
