@@ -168,7 +168,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_DAO_LineItem extends CRM_Core_DAO {
    *
    * @return array
    */
-  static function &fields() {
+  public static function &fields() {
     if (!(self::$_fields)) {
       self::$_fields = array(
         'id' => array(
