@@ -107,14 +107,24 @@ describe('crmMailingRadioDate', function() {
       var datenow = [year, month, day].join('-');
       var time = [hours, minutes, "00"].join(':');
       var currentDate = datenow + ' ' + time;
-      var ndate = new Date(datenow);
       model.the_date = currentDate;
 
       $rootScope.$digest();
       expect($rootScope.myForm.$valid).toBe(true);
       expect(element.find('.radio-now').prop('checked')).toBe(false);
       expect(element.find('.radio-at').prop('checked')).toBe(true);
-      expect(element.find('.crm-form-date').datepicker('getDate').toDateString()).toEqual(ndate.toDateString());
+
+      // PhantomJS (at least of as v1.9.8) doesn't work too well with timezones.
+      // A Date object created from a string in the format YYYY-MM-DD (i.e., the
+      // datenow variable) assumes a time of midnight and a GMT timezone, which
+      // makes valid comparisons between widget input and output impossible for
+      // those east of GMT.
+      var datePickerDate = new Date(element.find('.crm-form-date').datepicker('getDate'));
+      var dpMonth = '' + (datePickerDate.getMonth() + 1);
+      if (dpMonth.length < 2) dpMonth = '0' + dpMonth;
+      var dpDate = '' + datePickerDate.getDate();
+      if (dpDate.length < 2) dpDate = '0' + dpDate;
+      expect([datePickerDate.getFullYear(), dpMonth, dpDate].join('-')).toEqual(datenow);
       expect(element.find('.crm-hidden-date').val()).toEqual(currentDate);
     });
 
