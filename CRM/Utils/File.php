@@ -895,37 +895,16 @@ HTACCESS;
    * @return string
    */
   public static function getIconFromMimeType($mimeType) {
-    // List of official MIME Types: http://www.iana.org/assignments/media-types/media-types.xhtml
-    $iconClasses = array(
-      // Media
-      'image' => 'fa-file-image-o',
-      'audio' => 'fa-file-audio-o',
-      'video' => 'fa-file-video-o',
-      // Documents
-      'application/pdf' => 'fa-file-pdf-o',
-      'application/msword' => 'fa-file-word-o',
-      'application/vnd.ms-word' => 'fa-file-word-o',
-      'application/vnd.oasis.opendocument.text' => 'fa-file-word-o',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml' => 'fa-file-word-o',
-      'application/vnd.ms-excel' => 'fa-file-excel-o',
-      'application/vnd.openxmlformats-officedocument.spreadsheetml' => 'fa-file-excel-o',
-      'application/vnd.oasis.opendocument.spreadsheet' => 'fa-file-excel-o',
-      'application/vnd.ms-powerpoint' => 'fa-file-powerpoint-o',
-      'application/vnd.openxmlformats-officedocument.presentationml' => 'fa-file-powerpoint-o',
-      'application/vnd.oasis.opendocument.presentation' => 'fa-file-powerpoint-o',
-      'text/plain' => 'fa-file-text-o',
-      'text/html' => 'fa-file-code-o',
-      'application/json' => 'fa-file-code-o',
-      // Archives
-      'application/gzip' => 'fa-file-archive-o',
-      'application/zip' => 'fa-file-archive-o',
-    );
+    if (!isset(Civi::$statics[__CLASS__]['mimeIcons'])) {
+      Civi::$statics[__CLASS__]['mimeIcons'] = json_decode(file_get_contents(__DIR__ . '/File/mimeIcons.json'), TRUE);
+    }
+    $iconClasses = Civi::$statics[__CLASS__]['mimeIcons'];
     foreach ($iconClasses as $text => $icon) {
       if (strpos($mimeType, $text) === 0) {
         return $icon;
       }
     }
-    return 'fa-file-o';
+    return $iconClasses['*'];
   }
 
 }
