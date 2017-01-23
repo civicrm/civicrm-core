@@ -571,7 +571,7 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
     ));
     $fileId = $createResult['id'];
     $this->assertEquals('fa-file-word-o', $createResult['values'][$fileId]['icon']);
-    
+
     $createResult = $this->callAPISuccess('Attachment', 'create', array(
       'name' => self::getFilePrefix() . 'hasIcon.jpg',
       'mime_type' => 'image/jpg',
