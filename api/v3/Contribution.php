@@ -249,8 +249,21 @@ function civicrm_api3_contribution_get($params) {
     $contributions[$id] = array_merge($contribution, $softContribution);
     // format soft credit for backward compatibility
     _civicrm_api3_format_soft_credit($contributions[$id]);
+    _civicrm_api3_contribution_add_legacy_fields($contributions[$id]);
+
   }
   return civicrm_api3_create_success($contributions, $params, 'Contribution', 'get');
+}
+
+/**
+ * Support for legacy output variables.
+ *
+ * @param $contribution
+ */
+function _civicrm_api3_contribution_add_legacy_fields(&$contribution) {
+  if (!empty($contribution['payment_instrument_id'])) {
+    $contribution['instrument_id'] = $contribution['payment_instrument_id'];
+  }
 }
 
 /**

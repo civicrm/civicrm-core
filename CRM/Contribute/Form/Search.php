@@ -268,7 +268,6 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
       }
     }
 
-    $config = CRM_Core_Config::singleton();
     if (!empty($_POST)) {
       $specialParams = array(
         'financial_type_id',
