@@ -190,9 +190,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
         // and it decides when to use distinct based on input criteria, which needs
         // to be fixed and optimized.
 
-        foreach ($allCids[$cacheKey] as $cid => $ignore) {
-          $form->_contactIds[] = $cid;
-        }
+        $form->_contactIds = array_unique($allCids[$cacheKey]);
       }
     }
     elseif (CRM_Utils_Array::value('radio_ts', self::$_searchFormValues) == 'ts_sel') {
@@ -313,7 +311,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
 
     $contactIds = array();
     while ($dao->fetch()) {
-      $contactIds[$dao->contact_id] = $dao->contact_id;
+      $contactIds[] = $dao->contact_id;
     }
 
     return $contactIds;
