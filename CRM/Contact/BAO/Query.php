@@ -6132,6 +6132,7 @@ AND   displayRelType.is_active = 1
    */
   protected function prepareOrderBy($sort, $sortByChar, $sortOrder, $additionalFromClause) {
     $order = NULL;
+    $orderByArray = array();
     $config = CRM_Core_Config::singleton();
     if ($config->includeOrderByClause ||
       isset($this->_distinctComponentClause)
@@ -6168,62 +6169,64 @@ AND   displayRelType.is_active = 1
         }
       }
       elseif ($sortByChar) {
-        $order = " ORDER BY UPPER(LEFT(contact_a.sort_name, 1)) asc";
+        $orderByArray = array("UPPER(LEFT(contact_a.sort_name, 1)) asc");
       }
       else {
         $order = " ORDER BY contact_a.sort_name asc, contact_a.id";
       }
     }
+    if (!$order && empty($orderByArray)) {
+      return array($order, $additionalFromClause);
+    }
+    // Remove this here & add it at the end for simplicity.
+    $order = trim(str_replace('ORDER BY', '', $order));
 
     // hack for order clause
-    if ($order) {
-      $fieldStr = trim(str_replace('ORDER BY', '', $order));
-      $fieldOrder = explode(' ', $fieldStr);
-      $field = $fieldOrder[0];
+    $fieldOrder = explode(' ', $order);
+    $field = $fieldOrder[0];
 
-      if ($field) {
-        switch ($field) {
-          case 'city':
-          case 'postal_code':
-            $this->_tables["civicrm_address"] = $this->_whereTables["civicrm_address"] = 1;
-            $order = str_replace($field, "civicrm_address.{$field}", $order);
-            break;
+    if ($field) {
+      switch ($field) {
+        case 'city':
+        case 'postal_code':
+          $this->_tables["civicrm_address"] = $this->_whereTables["civicrm_address"] = 1;
+          $order = str_replace($field, "civicrm_address.{$field}", $order);
+          break;
 
-          case 'country':
-          case 'state_province':
-            $this->_tables["civicrm_{$field}"] = $this->_whereTables["civicrm_{$field}"] = 1;
-            if (is_array($this->_returnProperties) && empty($this->_returnProperties)) {
-              $additionalFromClause .= " LEFT JOIN civicrm_{$field} ON civicrm_{$field}.id = civicrm_address.{$field}_id";
+        case 'country':
+        case 'state_province':
+          $this->_tables["civicrm_{$field}"] = $this->_whereTables["civicrm_{$field}"] = 1;
+          if (is_array($this->_returnProperties) && empty($this->_returnProperties)) {
+            $additionalFromClause .= " LEFT JOIN civicrm_{$field} ON civicrm_{$field}.id = civicrm_address.{$field}_id";
+          }
+          $order = str_replace($field, "civicrm_{$field}.name", $order);
+          break;
+
+        case 'email':
+          $this->_tables["civicrm_email"] = $this->_whereTables["civicrm_email"] = 1;
+          $order = str_replace($field, "civicrm_email.{$field}", $order);
+          break;
+
+        default:
+          //CRM-12565 add "`" around $field if it is a pseudo constant
+          foreach ($this->_pseudoConstantsSelect as $key => $value) {
+            if (!empty($value['element']) && $value['element'] == $field) {
+              $order = str_replace($field, "`{$field}`", $order);
             }
-            $order = str_replace($field, "civicrm_{$field}.name", $order);
-            break;
-
-          case 'email':
-            $this->_tables["civicrm_email"] = $this->_whereTables["civicrm_email"] = 1;
-            $order = str_replace($field, "civicrm_email.{$field}", $order);
-            break;
-
-          default:
-            //CRM-12565 add "`" around $field if it is a pseudo constant
-            foreach ($this->_pseudoConstantsSelect as $key => $value) {
-              if (!empty($value['element']) && $value['element'] == $field) {
-                $order = str_replace($field, "`{$field}`", $order);
-              }
-            }
-        }
-        $this->_fromClause = self::fromClause($this->_tables, NULL, NULL, $this->_primaryLocation, $this->_mode);
-        $this->_simpleFromClause = self::fromClause($this->_whereTables, NULL, NULL, $this->_primaryLocation, $this->_mode);
+          }
       }
+      $this->_fromClause = self::fromClause($this->_tables, NULL, NULL, $this->_primaryLocation, $this->_mode);
+      $this->_simpleFromClause = self::fromClause($this->_whereTables, NULL, NULL, $this->_primaryLocation, $this->_mode);
     }
 
     // The above code relies on crazy brittle string manipulation of a peculiarly-encoded ORDER BY
     // clause. But this magic helper which forgivingly reescapes ORDER BY.
     // Note: $sortByChar implies that $order was hard-coded/trusted, so it can do funky things.
     if ($order && !$sortByChar) {
-      $order = ' ORDER BY ' . CRM_Utils_Type::escape(preg_replace('/^\s*ORDER BY\s*/', '', $order), 'MysqlOrderBy');
-      return array($order, $additionalFromClause);
+      $order = CRM_Utils_Type::escape($order, 'MysqlOrderBy');
+      return array(' ORDER BY ' . $order, $additionalFromClause);
     }
-    return array($order, $additionalFromClause);
+    return array(' ORDER BY ' . $order, $additionalFromClause);
   }
 
   /**
