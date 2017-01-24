@@ -32,8 +32,6 @@
  * @subpackage API_Job
  *
  * @copyright CiviCRM LLC (c) 2004-2017
- * @version $Id: Job.php 30879 2010-11-22 15:45:55Z shot $
- *
  */
 
 /**

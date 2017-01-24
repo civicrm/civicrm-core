@@ -32,13 +32,6 @@
  */
 class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
 
-  /**
-   * Static field for all the export/import contribution fields.
-   *
-   * @var array
-   */
-  static $_contributionFields = NULL;
-
   static $_contribOrSoftCredit = "only_contribs";
 
   static $_contribRecurPayment = NULL;
@@ -54,16 +47,12 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
    *   Associative array of contribution fields
    */
   public static function getFields($checkPermission = TRUE) {
-    if (!self::$_contributionFields) {
-      self::$_contributionFields = array();
-
-      $fields = CRM_Contribute_BAO_Contribution::exportableFields($checkPermission);
-
+    if (!isset(\Civi::$statics[__CLASS__]) || !isset(\Civi::$statics[__CLASS__]['fields']) || !isset(\Civi::$statics[__CLASS__]['contribution'])) {
+      $fields  = CRM_Contribute_BAO_Contribution::exportableFields($checkPermission);
       unset($fields['contribution_contact_id']);
-
-      self::$_contributionFields = $fields;
+      \Civi::$statics[__CLASS__]['fields']['contribution'] = $fields;
     }
-    return self::$_contributionFields;
+    return \Civi::$statics[__CLASS__]['fields']['contribution'];
   }
 
   /**
@@ -189,7 +178,6 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
    * @param CRM_Contact_BAO_Query $query
    */
   public static function where(&$query) {
-    $grouping = NULL;
     self::initializeAnySoftCreditClause($query);
     foreach (array_keys($query->_params) as $id) {
       if (empty($query->_params[$id][0])) {
@@ -212,7 +200,6 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
           continue;
         }
 
-        $grouping = $query->_params[$id][3];
         self::whereClauseSingle($query->_params[$id], $query);
       }
     }
@@ -299,6 +286,7 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
       case 'contribution_status':
         $name .= '_id';
       case 'financial_type_id':
+        // @todo we need to make this resemble a hook approach.
         CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes);
         $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_contribution.$name", 'IN', array_keys($financialTypes), 'String');
       case 'invoice_id':
