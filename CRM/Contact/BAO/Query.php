@@ -654,8 +654,6 @@ class CRM_Contact_BAO_Query {
         (substr($name, 0, 12) == 'participant_') ||
         (substr($name, 0, 7) == 'pledge_') ||
         (substr($name, 0, 5) == 'case_') ||
-        (substr($name, 0, 13) == 'contribution_' &&
-          (strpos($name, 'source') !== FALSE && strpos($name, 'recur') !== FALSE)) ||
         (substr($name, 0, 8) == 'payment_')
       ) {
         continue;
@@ -4340,7 +4338,7 @@ civicrm_relationship.is_permission_a_b = 0
     $smartGroupCache = TRUE,
     $count = FALSE,
     $skipPermissions = TRUE,
-    $mode = 1,
+    $mode = CRM_Contact_BAO_Query::MODE_CONTACTS,
     $apiEntity = NULL
   ) {
 

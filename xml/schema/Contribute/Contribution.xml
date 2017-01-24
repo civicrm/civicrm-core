@@ -78,7 +78,6 @@
   <field>
     <name>financial_type_id</name>
     <title>Financial Type</title>
-    <export>false</export>
     <type>int unsigned</type>
     <comment>FK to Financial Type for (total_amount - non_deductible_amount).</comment>
     <pseudoconstant>
@@ -86,6 +85,7 @@
       <keyColumn>id</keyColumn>
       <labelColumn>name</labelColumn>
     </pseudoconstant>
+    <export>true</export>
     <html>
       <type>Select</type>
     </html>
@@ -361,6 +361,7 @@
     <title>Recurring Contribution ID</title>
     <type>int unsigned</type>
     <comment>Conditional foreign key to civicrm_contribution_recur id. Each contribution made in connection with a recurring contribution carries a foreign key to the recurring contribution record. This assumes we can track these processor initiated events.</comment>
+    <export>true</export>
     <add>1.4</add>
   </field>
   <foreignKey>
@@ -419,10 +420,12 @@
   </index>
   <field>
     <name>address_id</name>
+    <uniqueName>contribution_address_id</uniqueName>
     <title>Contribution Address</title>
     <type>int unsigned</type>
     <comment>Conditional foreign key to civicrm_address.id. We insert an address record for each contribution when we have associated billing name and address data.</comment>
     <add>2.2</add>
+    <export>true</export>
   </field>
   <foreignKey>
     <name>address_id</name>
