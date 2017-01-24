@@ -598,7 +598,7 @@ WHERE ft.to_financial_account_id != {$toFinancialAccount} AND ft.to_financial_ac
    *
    * @param array $lineItems
    *
-   * @param array $contributionDetails
+   * @param CRM_Contribute_BAO_Contribution $contributionDetails
    *
    * @param bool $update
    *
@@ -607,7 +607,7 @@ WHERE ft.to_financial_account_id != {$toFinancialAccount} AND ft.to_financial_ac
    */
   public static function createDeferredTrxn($lineItems, $contributionDetails, $update = FALSE, $context = NULL) {
     if (empty($lineItems)) {
-      return FALSE;
+      return;
     }
     $revenueRecognitionDate = $contributionDetails->revenue_recognition_date;
     if (!CRM_Utils_System::isNull($revenueRecognitionDate)) {
