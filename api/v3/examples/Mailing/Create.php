@@ -51,7 +51,8 @@ function mailing_create_example() {
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
     return array(
-      'error' => $errorMessage,
+      'is_error' => 1,
+      'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
     );
@@ -84,13 +85,17 @@ function mailing_create_expectedresult() {
         'resubscribe_id' => '6',
         'optout_id' => '7',
         'name' => 'mailing name',
+        'mailing_type' => 'standalone',
         'from_name' => 'FIXME',
         'from_email' => 'info@EXAMPLE.ORG',
         'replyto_email' => 'info@EXAMPLE.ORG',
+        'template_type' => '',
+        'template_options' => '',
         'subject' => 'Hello {contact.display_name}',
         'body_text' => 'This is {contact.display_name}.
+https://civińcrm.org
 {domain.address}{action.optOutUrl}',
-        'body_html' => '<p>This is {contact.display_name}.</p><p>{domain.address}{action.optOutUrl}</p>',
+        'body_html' => '<p>This is {contact.display_name}.</p><p><a href=\'https://civińcrm.org/\'>CiviCRM.org</a></p><p>{domain.address}{action.optOutUrl}</p>',
         'url_tracking' => '1',
         'forward_replies' => '',
         'auto_responder' => '',

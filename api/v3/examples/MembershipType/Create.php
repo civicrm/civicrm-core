@@ -28,7 +28,8 @@ function membership_type_create_example() {
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
     return array(
-      'error' => $errorMessage,
+      'is_error' => 1,
+      'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
     );
@@ -72,7 +73,7 @@ function membership_type_create_expectedresult() {
         'receipt_text_signup' => '',
         'receipt_text_renewal' => '',
         'auto_renew' => '',
-        'is_active' => '',
+        'is_active' => '1',
         'contribution_type_id' => '1',
       ),
     ),

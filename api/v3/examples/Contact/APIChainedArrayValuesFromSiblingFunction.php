@@ -31,7 +31,8 @@ function contact_create_example() {
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
     return array(
-      'error' => $errorMessage,
+      'is_error' => 1,
+      'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
     );
@@ -66,7 +67,7 @@ function contact_create_expectedresult() {
         'is_opt_out' => 0,
         'legal_identifier' => '',
         'external_identifier' => '',
-        'sort_name' => '',
+        'sort_name' => 'batman',
         'display_name' => 'batman',
         'nick_name' => '',
         'legal_name' => '',

@@ -115,7 +115,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'currency' => 'NZD',
       'financial_type_id' => 1,
     );
-    $getResult = $this->callAPIAndDocument($this->_entity, 'get', $getParams, __FUNCTION__, __FILE__);
+    $getResult = $this->callAPISuccess($this->_entity, 'get', $getParams);
     $this->assertEquals(1, $getResult['count']);
   }
 
@@ -337,7 +337,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'cvv2' => 123,
     );
 
-    $this->callAPIAndDocument('contribution_page', 'submit', $submitParams, __FUNCTION__, __FILE__, 'submit contribution page', NULL);
+    $this->callAPISuccess('contribution_page', 'submit', $submitParams);
     $contribution = $this->callAPISuccess('contribution', 'getsingle', array('contribution_page_id' => $this->_ids['contribution_page']));
     $this->callAPISuccess('membership_payment', 'getsingle', array('contribution_id' => $contribution['id']));
     $mut->checkMailLog(array(
@@ -367,7 +367,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'email-Primary' => 'billy-goat@the-new-bridge.net',
     );
 
-    $this->callAPIAndDocument('contribution_page', 'submit', $submitParams, __FUNCTION__, __FILE__, 'submit contribution page', NULL);
+    $this->callAPISuccess('contribution_page', 'submit', $submitParams);
     $contribution = $this->callAPISuccess('contribution', 'getsingle', array('contribution_page_id' => $this->_ids['contribution_page']));
     $this->callAPISuccess('membership_payment', 'getsingle', array('contribution_id' => $contribution['id']));
     $mut->checkMailLog(array(
@@ -398,7 +398,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'selectMembership' => $this->_ids['membership_type'],
     );
 
-    $this->callAPIAndDocument('contribution_page', 'submit', $submitParams, __FUNCTION__, __FILE__, 'submit contribution page', NULL);
+    $this->callAPISuccess('contribution_page', 'submit', $submitParams);
     $contributions = $this->callAPISuccess('contribution', 'get', array('contribution_page_id' => $this->_ids['contribution_page']));
     $this->assertCount(2, $contributions['values']);
     $lines = $this->callAPISuccess('LineItem', 'get', array('sequential' => 1));
@@ -433,7 +433,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'cvv2' => 123,
     );
 
-    $this->callAPIAndDocument('contribution_page', 'submit', $submitParams, __FUNCTION__, __FILE__, 'submit contribution page', NULL);
+    $this->callAPISuccess('contribution_page', 'submit', $submitParams);
     $contributions = $this->callAPISuccess('contribution', 'get', array('contribution_page_id' => $this->_ids['contribution_page']));
     $this->assertCount(2, $contributions['values']);
     $membershipPayment = $this->callAPISuccess('membership_payment', 'getsingle', array());
