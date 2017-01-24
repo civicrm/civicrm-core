@@ -1,0 +1,35 @@
+<!--
+Controller: CaseTypeCtrl
+Required vars: selectedStatuses
+-->
+<table>
+  <thead>
+  <tr>
+    <th></th>
+    <th>{{ts('Name')}}</th>
+    <th>{{ts('Class')}}</th>
+  </tr>
+  </thead>
+
+  <tbody ng-model="selectedStatuses">
+  <tr ng-repeat="(status,sel) in selectedStatuses">
+    <td>
+      <input class="crm-form-checkbox" type="checkbox" ng-model="selectedStatuses[status]"/>
+    </td>
+    <td>
+      {{ caseStatuses[status].label }}
+    </td>
+    <td>
+      {{ caseStatuses[status].grouping }}
+    </td>
+  </tr>
+  </tbody>
+
+  <tfoot>
+  <tr>
+    <td></td>
+    <td><a class="crm-hover-button action-item" ng-click="newStatus()" href><i class="crm-i fa-plus"></i> {{ ts('New Status') }}</a></td>
+    <td></td>
+  </tr>
+  </tfoot>
+</table>

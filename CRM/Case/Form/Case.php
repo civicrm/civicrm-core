@@ -317,22 +317,18 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
     }
 
     if ($this->_action & CRM_Core_Action::DELETE) {
-      $statusMsg = NULL;
       $caseDelete = CRM_Case_BAO_Case::deleteCase($this->_caseId, TRUE);
       if ($caseDelete) {
-        $statusMsg = ts('The selected case has been moved to the Trash. You can view and / or restore deleted cases by checking the "Deleted Cases" option under Find Cases.<br />');
+        CRM_Core_Session::setStatus(ts('You can view and / or restore deleted cases by checking the "Deleted Cases" option under Find Cases.'), ts('Case Deleted'), 'success');
       }
-      CRM_Core_Session::setStatus($statusMsg, ts('Case Deleted'), 'success');
       return;
     }
 
     if ($this->_action & CRM_Core_Action::RENEW) {
-      $statusMsg = NULL;
       $caseRestore = CRM_Case_BAO_Case::restoreCase($this->_caseId);
       if ($caseRestore) {
-        $statusMsg = ts('The selected case has been restored.<br />');
+        CRM_Core_Session::setStatus(ts('The selected case has been restored.'), ts('Restored'), 'success');
       }
-      CRM_Core_Session::setStatus($statusMsg, ts('Restored'), 'success');
       return;
     }
     // store the submitted values in an array
@@ -348,7 +344,6 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
     if (!empty($params['hidden_custom']) &&
       !isset($params['custom'])
     ) {
-      $customFields = array();
       $params['custom'] = CRM_Core_BAO_CustomField::postProcess(
         $params,
         NULL,
@@ -388,8 +383,7 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
     $url = CRM_Utils_System::url('civicrm/contact/view/case',
       "reset=1&action=view&cid={$this->_currentlyViewedContactId}&id={$caseObj->id}"
     );
-    $session = CRM_Core_Session::singleton();
-    $session->pushUserContext($url);
+    CRM_Core_Session::singleton()->pushUserContext($url);
 
     // 3. format activity custom data
     if (!empty($params['hidden_custom'])) {
@@ -410,9 +404,6 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
       $className::endPostProcess($this, $params);
     }
 
-    // 5. auto populate activities
-
-    // 6. set status
     CRM_Core_Session::setStatus($params['statusMsg'], ts('Saved'), 'success');
   }
 
