@@ -296,7 +296,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $params = array(
       'contribution_id' => $this->_contribution['id'],
     );
-    $contribution = $this->callAPIAndDocument('contribution', 'get', $params, __FUNCTION__, __FILE__);
+    $contribution = $this->callAPISuccess('contribution', 'get', $params);
     $financialParams['id'] = $this->_financialTypeId;
     $default = NULL;
     CRM_Financial_BAO_FinancialType::retrieve($financialParams, $default);
@@ -496,7 +496,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'contribution_status_id' => 1,
     );
 
-    $contribution = $this->callAPIAndDocument('contribution', 'create', $params, __FUNCTION__, __FILE__);
+    $contribution = $this->callAPISuccess('contribution', 'create', $params);
     $this->assertEquals($contribution['values'][$contribution['id']]['contact_id'], $this->_individualId);
     $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 100.00);
     $this->assertEquals($contribution['values'][$contribution['id']]['financial_type_id'], 1);
@@ -870,7 +870,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'contribution_status_id' => 1,
     );
 
-    $contribution = $this->callAPIAndDocument('contribution', 'create', $params, __FUNCTION__, __FILE__);
+    $contribution = $this->callAPISuccess('contribution', 'create', $params);
     $this->assertEquals($contribution['values'][$contribution['id']]['contact_id'], $this->_individualId);
     $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 100.00);
     $this->assertEquals($contribution['values'][$contribution['id']]['fee_amount'], 50.00);
@@ -923,7 +923,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
     );
 
-    $contribution = $this->callAPIAndDocument('contribution', 'create', $params, __FUNCTION__, __FILE__);
+    $contribution = $this->callAPISuccess('contribution', 'create', $params);
     $this->assertEquals($contribution['values'][$contribution['id']]['contact_id'], $this->_individualId);
     $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 100.00);
     $this->assertEquals($contribution['values'][$contribution['id']]['financial_type_id'], 1);
@@ -1016,7 +1016,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'contribution_status_id' => 2,
     );
 
-    $contribution = $this->callAPIAndDocument('contribution', 'create', $params, __FUNCTION__, __FILE__);
+    $contribution = $this->callAPISuccess('contribution', 'create', $params);
     $this->assertEquals($contribution['values'][$contribution['id']]['contact_id'], $this->_individualId);
     $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 100.00);
     $this->assertEquals($contribution['values'][$contribution['id']]['financial_type_id'], 1);

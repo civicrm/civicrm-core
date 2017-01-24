@@ -33,7 +33,8 @@ function event_create_example() {
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
     return array(
-      'error' => $errorMessage,
+      'is_error' => 1,
+      'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
     );
@@ -105,10 +106,13 @@ function event_create_expectedresult() {
         'initial_amount_help_text' => '',
         'min_initial_amount' => '',
         'is_multiple_registrations' => '',
+        'max_additional_participants' => '',
         'allow_same_participant_emails' => '',
         'has_waitlist' => '',
         'requires_approval' => '',
         'expiration_time' => '',
+        'allow_selfcancelxfer' => '',
+        'selfcancelxfer_time' => '',
         'waitlist_text' => '',
         'approval_req_text' => '',
         'is_template' => 0,

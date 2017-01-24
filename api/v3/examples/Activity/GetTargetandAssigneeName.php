@@ -11,10 +11,10 @@ function activity_getsingle_example() {
   $params = array(
     'id' => 1,
     'return' => array(
-      'subject',
-      'source_contact_name',
-      'target_contact_name',
-      'assignee_contact_name',
+      '0' => 'source_contact_name',
+      '1' => 'target_contact_name',
+      '2' => 'assignee_contact_name',
+      '3' => 'subject',
     ),
   );
 

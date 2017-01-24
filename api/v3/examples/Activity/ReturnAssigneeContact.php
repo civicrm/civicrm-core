@@ -26,7 +26,8 @@ function activity_get_example() {
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
     return array(
-      'error' => $errorMessage,
+      'is_error' => 1,
+      'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
     );
@@ -63,6 +64,7 @@ function activity_get_expectedresult() {
         'is_auto' => 0,
         'is_current_revision' => '1',
         'is_deleted' => 0,
+        'is_star' => 0,
         'assignee_contact_id' => array(
           '0' => '3',
         ),
