@@ -370,6 +370,9 @@ class CRM_Contact_Form_Task_EmailCommon {
       }
     }
 
+    //Added for CRM-15984: Add campaign field
+    CRM_Campaign_BAO_Campaign::addCampaign($form);
+
     $form->addFormRule(array('CRM_Contact_Form_Task_EmailCommon', 'formRule'), $form);
     CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'templates/CRM/Contact/Form/Task/EmailCommon.js', 0, 'html-header');
   }
@@ -525,7 +528,8 @@ class CRM_Contact_Form_Task_EmailCommon {
       $cc,
       $bcc,
       array_keys($form->_toContactDetails),
-      $additionalDetails
+      $additionalDetails,
+      CRM_Utils_Array::value('campaign_id', $formValues)
     );
 
     $followupStatus = '';
