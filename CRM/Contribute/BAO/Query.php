@@ -189,7 +189,6 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
    * @param CRM_Contact_BAO_Query $query
    */
   public static function where(&$query) {
-    $grouping = NULL;
     self::initializeAnySoftCreditClause($query);
     foreach (array_keys($query->_params) as $id) {
       if (empty($query->_params[$id][0])) {
@@ -212,7 +211,6 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
           continue;
         }
 
-        $grouping = $query->_params[$id][3];
         self::whereClauseSingle($query->_params[$id], $query);
       }
     }
