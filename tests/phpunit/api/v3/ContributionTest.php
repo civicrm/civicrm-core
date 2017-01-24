@@ -147,25 +147,26 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'contribution_id' => $this->_contribution['id'],
     );
 
-    $contribution = $this->callAPIAndDocument('contribution', 'get', $params, __FUNCTION__, __FILE__);
+    $contributions = $this->callAPIAndDocument('contribution', 'get', $params, __FUNCTION__, __FILE__);
     $financialParams['id'] = $this->_financialTypeId;
     $default = NULL;
     CRM_Financial_BAO_FinancialType::retrieve($financialParams, $default);
 
-    $this->assertEquals(1, $contribution['count']);
-    $this->assertEquals($contribution['values'][$contribution['id']]['contact_id'], $this->_individualId);
+    $this->assertEquals(1, $contributions['count']);
+    $contribution = $contributions['values'][$contributions['id']];
+    $this->assertEquals($contribution['contact_id'], $this->_individualId);
     // Note there was an assertion converting financial_type_id to 'Donation' which wasn't working.
     // Passing back a string rather than an id seems like an error/cruft.
     // If it is to be introduced we should discuss.
-    $this->assertEquals($contribution['values'][$contribution['id']]['financial_type_id'], 1);
-    $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 100.00);
-    $this->assertEquals($contribution['values'][$contribution['id']]['non_deductible_amount'], 10.00);
-    $this->assertEquals($contribution['values'][$contribution['id']]['fee_amount'], 5.00);
-    $this->assertEquals($contribution['values'][$contribution['id']]['net_amount'], 95.00);
-    $this->assertEquals($contribution['values'][$contribution['id']]['trxn_id'], 23456);
-    $this->assertEquals($contribution['values'][$contribution['id']]['invoice_id'], 78910);
-    $this->assertEquals($contribution['values'][$contribution['id']]['contribution_source'], 'SSF');
-    $this->assertEquals($contribution['values'][$contribution['id']]['contribution_status'], 'Completed');
+    $this->assertEquals($contribution['financial_type_id'], 1);
+    $this->assertEquals($contribution['total_amount'], 100.00);
+    $this->assertEquals($contribution['non_deductible_amount'], 10.00);
+    $this->assertEquals($contribution['fee_amount'], 5.00);
+    $this->assertEquals($contribution['net_amount'], 95.00);
+    $this->assertEquals($contribution['trxn_id'], 23456);
+    $this->assertEquals($contribution['invoice_id'], 78910);
+    $this->assertEquals($contribution['contribution_source'], 'SSF');
+    $this->assertEquals($contribution['contribution_status'], 'Completed');
     // Create a second contribution - we are testing that 'id' gets the right contribution id (not the contact id).
     $p['trxn_id'] = '3847';
     $p['invoice_id'] = '3847';

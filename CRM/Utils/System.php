@@ -1428,7 +1428,7 @@ class CRM_Utils_System {
     CRM_Contact_BAO_Contact::$_importableFields = CRM_Contact_BAO_Contact::$_exportableFields
       = CRM_Contribute_BAO_Contribution::$_importableFields
         = CRM_Contribute_BAO_Contribution::$_exportableFields
-          = CRM_Pledge_BAO_Pledge::$_exportableFields = CRM_Contribute_BAO_Query::$_contributionFields
+          = CRM_Pledge_BAO_Pledge::$_exportableFields
             = CRM_Core_BAO_CustomField::$_importFields
               = CRM_Core_BAO_Cache::$_cache = CRM_Core_DAO::$_dbColumnValueCache = NULL;
 
