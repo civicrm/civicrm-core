@@ -61,7 +61,8 @@ function order_create_example() {
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
     return array(
-      'error' => $errorMessage,
+      'is_error' => 1,
+      'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
     );
@@ -113,6 +114,7 @@ function order_create_expectedresult() {
         'campaign_id' => '',
         'creditnote_id' => '',
         'tax_amount' => '',
+        'revenue_recognition_date' => '',
         'contribution_type_id' => '1',
       ),
     ),
@@ -123,7 +125,7 @@ function order_create_expectedresult() {
 
 /*
 * This example has been generated from the API test suite.
-* The test that created it is called "testAddOrderForPariticipant"
+* The test that created it is called "testAddOrderForParticipant"
 * and can be found at:
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/OrderTest.php
 *

@@ -19,7 +19,8 @@ function option_value_get_example() {
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
     return array(
-      'error' => $errorMessage,
+      'is_error' => 1,
+      'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
     );
@@ -46,6 +47,7 @@ function option_value_get_expectedresult() {
         'option_group_id' => '1',
         'label' => 'Phone',
         'value' => '1',
+        'name' => 'Phone',
         'filter' => 0,
         'weight' => '1',
         'is_optgroup' => 0,
@@ -57,6 +59,7 @@ function option_value_get_expectedresult() {
         'option_group_id' => '1',
         'label' => 'Email',
         'value' => '2',
+        'name' => 'Email',
         'filter' => 0,
         'weight' => '2',
         'is_optgroup' => 0,
@@ -68,6 +71,7 @@ function option_value_get_expectedresult() {
         'option_group_id' => '1',
         'label' => 'Postal Mail',
         'value' => '3',
+        'name' => 'Postal Mail',
         'filter' => 0,
         'weight' => '3',
         'is_optgroup' => 0,
@@ -79,6 +83,7 @@ function option_value_get_expectedresult() {
         'option_group_id' => '1',
         'label' => 'SMS',
         'value' => '4',
+        'name' => 'SMS',
         'filter' => 0,
         'weight' => '4',
         'is_optgroup' => 0,
@@ -90,6 +95,7 @@ function option_value_get_expectedresult() {
         'option_group_id' => '1',
         'label' => 'Fax',
         'value' => '5',
+        'name' => 'Fax',
         'filter' => 0,
         'weight' => '5',
         'is_optgroup' => 0,

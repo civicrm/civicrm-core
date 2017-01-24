@@ -51,7 +51,8 @@ function order_create_example() {
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
     return array(
-      'error' => $errorMessage,
+      'is_error' => 1,
+      'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
     );
@@ -103,6 +104,7 @@ function order_create_expectedresult() {
         'campaign_id' => '',
         'creditnote_id' => '',
         'tax_amount' => '',
+        'revenue_recognition_date' => '',
         'contribution_type_id' => '1',
       ),
     ),

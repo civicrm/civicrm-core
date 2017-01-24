@@ -25,7 +25,8 @@ function participant_create_example() {
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
     return array(
-      'error' => $errorMessage,
+      'is_error' => 1,
+      'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
     );
@@ -67,6 +68,7 @@ function participant_create_expectedresult() {
         'discount_amount' => '',
         'cart_id' => '',
         'must_wait' => '',
+        'transferred_to_contact_id' => '',
       ),
     ),
   );
