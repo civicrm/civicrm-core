@@ -29,18 +29,13 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2017
- * $Id$
- *
  */
 class CRM_UF_Form_AdvanceSetting extends CRM_UF_Form_Group {
 
   /**
-   * Build the form object for Advance Settings.
-   *
+   * Build the form object for Advanced Settings.
    *
    * @param CRM_Core_Form $form
-   *
-   * @return void
    */
   public static function buildAdvanceSetting(&$form) {
     // should mapping be enabled for this group

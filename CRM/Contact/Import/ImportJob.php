@@ -342,9 +342,12 @@ class CRM_Contact_Import_ImportJob {
   }
 
   /**
-   * @param $contactIds
+   * Add imported contacts.
+   *
+   * @param array $contactIds
    * @param string $newGroupName
-   * @param $newGroupDesc
+   * @param string $newGroupDesc
+   * @param string $newGroupType
    *
    * @return array|bool
    */
