@@ -668,6 +668,7 @@
     <add>1.1</add>
     <html>
       <type>Select Date</type>
+      <format>birth</format>
     </html>
   </field>
   <field>
@@ -693,6 +694,7 @@
     <add>1.5</add>
     <html>
       <type>Select Date</type>
+      <format>birth</format>
     </html>
   </field>
   <field>
