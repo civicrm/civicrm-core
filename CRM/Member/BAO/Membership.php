@@ -2173,8 +2173,8 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
     $statusLabels = CRM_Member_PseudoConstant::membershipStatus(NULL, NULL, 'label');
     $allTypes = CRM_Member_PseudoConstant::membershipType();
 
-    // get only memberships with active membership types
-    $query = "
+    // This query retrieves ALL memberships of active types.
+    $baseQuery = "
 SELECT     civicrm_membership.id                    as membership_id,
            civicrm_membership.is_override           as is_override,
            civicrm_membership.membership_type_id    as membership_type_id,
@@ -2191,134 +2191,132 @@ FROM       civicrm_membership
 INNER JOIN civicrm_contact ON ( civicrm_membership.contact_id = civicrm_contact.id )
 INNER JOIN civicrm_membership_type ON
   (civicrm_membership.membership_type_id = civicrm_membership_type.id AND civicrm_membership_type.is_active = 1)
-WHERE      civicrm_membership.is_test = 0";
-
-    $params = array();
-    $dao = CRM_Core_DAO::executeQuery($query, $params);
+WHERE      civicrm_membership.is_test = 0 ";
 
     $processCount = 0;
     $updateCount = 0;
 
+    // ??
     $smarty = CRM_Core_Smarty::singleton();
 
-    while ($dao->fetch()) {
+    // Handle membership status of deceased contacts.
+    $deceasedQuery = $baseQuery . " AND civicrm_contact.is_deceased <> 0 AND civicrm_membership.status_id <> %1 ";
+
+    $deceaseStatusId = array_search('Deceased', $allStatus);
+    if (!$deceaseStatusId) {
+      CRM_Core_Error::fatal(ts("Deceased Membership status is missing or not active. <a href='%1'>Click here to check</a>.", array(1 => CRM_Utils_System::url('civicrm/admin/member/membershipStatus', 'reset=1'))));
+    }
+    $pendingStatusId = array_search('Pending', $allStatus);
+    // CRM-15475
+    $cancelledStatusId = array_search(
+      'Cancelled',
+      CRM_Member_PseudoConstant::membershipStatus(NULL, " name = 'Cancelled' ", 'name', FALSE, TRUE)
+    );
+    $expiredStatusId = array_search('Expired', $allStatus);
+
+    $deceasedParams = array(
+      1 => array($deceaseStatusId, 'Integer'),
+    );
+    $dao1 = CRM_Core_DAO::executeQuery($deceasedQuery, $deceasedParams);
+
+    while ($dao1->fetch()) {
+      $processCount++;
+      //since there is change in status.
+      $statusChange = array('status_id' => $deceaseStatusId);
+      // I don't know what this is about. It was already there. :-/
+      $smarty->append_by_ref('memberParams', $statusChange, TRUE);
+
+      $deceasedMembership = array(
+        'id' => $dao1->membership_id,
+        'status_id' => $deceaseStatusId,
+        'skipStatusCal' => TRUE,
+        'skipRecentView' => TRUE,
+        'createActivity' => TRUE,
+        'version' => 3,
+      );
+
+      //process membership record.
+      civicrm_api('membership', 'create', $deceasedMembership);
+    }
+    $dao1->free();
+
+    //update membership records where status is NOT - Pending OR Cancelled.
+    //as well as membership is not override.
+    //skipping Expired membership records -> reduced extra processing( kiran )
+    //if membership has an owner,
+    //further processing is handle w/ main membership record.
+    $query = $baseQuery . " AND civicrm_membership.is_override IS NULL
+     AND civicrm_membership.status_id NOT IN (%1, %2, %3, %4)
+     AND civicrm_membership.owner_membership_id IS NULL ";
+    $params = array(
+      1 => array($pendingStatusId, 'Integer'),
+      2 => array($cancelledStatusId, 'Integer'),
+      3 => array($expiredStatusId, 'Integer'),
+      4 => array($deceaseStatusId, 'Integer'),
+    );
+    $dao2 = CRM_Core_DAO::executeQuery($query, $params);
+
+    while ($dao2->fetch()) {
       // echo ".";
       $processCount++;
 
       // Put common parameters into array for easy access
       $memberParams = array(
-        'id' => $dao->membership_id,
-        'status_id' => $dao->status_id,
-        'contact_id' => $dao->contact_id,
-        'membership_type_id' => $dao->membership_type_id,
-        'membership_type' => $allTypes[$dao->membership_type_id],
-        'join_date' => $dao->join_date,
-        'start_date' => $dao->start_date,
-        'end_date' => $dao->end_date,
-        'source' => $dao->source,
+        'id' => $dao2->membership_id,
+        'status_id' => $dao2->status_id,
+        'contact_id' => $dao2->contact_id,
+        'membership_type_id' => $dao2->membership_type_id,
+        'membership_type' => $allTypes[$dao2->membership_type_id],
+        'join_date' => $dao2->join_date,
+        'start_date' => $dao2->start_date,
+        'end_date' => $dao2->end_date,
+        'source' => $dao2->source,
         'skipStatusCal' => TRUE,
         'skipRecentView' => TRUE,
       );
 
       $smarty->assign_by_ref('memberParams', $memberParams);
 
-      //update membership record to Deceased if contact is deceased
-      if ($dao->is_deceased) {
-        // check for 'Deceased' membership status, CRM-5636
-        $deceaseStatusId = array_search('Deceased', $allStatus);
-        if (!$deceaseStatusId) {
-          CRM_Core_Error::fatal(ts("Deceased Membership status is missing or not active. <a href='%1'>Click here to check</a>.", array(1 => CRM_Utils_System::url('civicrm/admin/member/membershipStatus', 'reset=1'))));
-        }
+      // CRM-7248: added excludeIsAdmin param to the following fn call to prevent moving to admin statuses
+      //get the membership status as per id.
+      $newStatus = civicrm_api('membership_status', 'calc',
+        array(
+          'membership_id' => $dao2->membership_id,
+          'version' => 3,
+          'ignore_admin_only' => TRUE,
+        ), TRUE
+      );
+      $statusId = CRM_Utils_Array::value('id', $newStatus);
 
-        //process only when status change.
-        if ($dao->status_id != $deceaseStatusId) {
-          //take all params that need to save.
-          $deceasedMembership = $memberParams;
-          $deceasedMembership['status_id'] = $deceaseStatusId;
-          $deceasedMembership['createActivity'] = TRUE;
-          $deceasedMembership['version'] = 3;
-
-          //since there is change in status.
-          $statusChange = array('status_id' => $deceaseStatusId);
-          $smarty->append_by_ref('memberParams', $statusChange, TRUE);
-          unset(
-            $deceasedMembership['contact_id'],
-            $deceasedMembership['membership_type_id'],
-            $deceasedMembership['membership_type'],
-            $deceasedMembership['join_date'],
-            $deceasedMembership['start_date'],
-            $deceasedMembership['end_date'],
-            $deceasedMembership['source']
-          );
-
-          //process membership record.
-          civicrm_api('membership', 'create', $deceasedMembership);
-        }
-        continue;
-      }
-
-      //we fetch related, since we need to check for deceased
-      //now further processing is handle w/ main membership record.
-      if ($dao->owner_membership_id) {
-        continue;
-      }
-
-      //update membership records where status is NOT - Pending OR Cancelled.
-      //as well as membership is not override.
-      //skipping Expired membership records -> reduced extra processing( kiran )
-      if (!$dao->is_override &&
-        !in_array($dao->status_id, array(
-          array_search('Pending', $allStatus),
-          // CRM-15475
-          array_search(
-            'Cancelled',
-            CRM_Member_PseudoConstant::membershipStatus(NULL, " name = 'Cancelled' ", 'name', FALSE, TRUE)
-          ),
-          array_search('Expired', $allStatus),
-        ))
+      //process only when status change.
+      if ($statusId &&
+        $statusId != $dao2->status_id
       ) {
+        //take all params that need to save.
+        $memParams = $memberParams;
+        $memParams['status_id'] = $statusId;
+        $memParams['createActivity'] = TRUE;
+        $memParams['version'] = 3;
 
-        // CRM-7248: added excludeIsAdmin param to the following fn call to prevent moving to admin statuses
-        //get the membership status as per id.
-        $newStatus = civicrm_api('membership_status', 'calc',
-          array(
-            'membership_id' => $dao->membership_id,
-            'version' => 3,
-            'ignore_admin_only' => TRUE,
-          ), TRUE
+        // Unset columns which should remain unchanged from their current saved
+        // values. This avoids race condition in which these values may have
+        // been changed by other processes.
+        unset(
+          $memParams['contact_id'],
+          $memParams['membership_type_id'],
+          $memParams['membership_type'],
+          $memParams['join_date'],
+          $memParams['start_date'],
+          $memParams['end_date'],
+          $memParams['source']
         );
-        $statusId = CRM_Utils_Array::value('id', $newStatus);
+        //since there is change in status.
+        $statusChange = array('status_id' => $statusId);
+        $smarty->append_by_ref('memberParams', $statusChange, TRUE);
 
-        //process only when status change.
-        if ($statusId &&
-          $statusId != $dao->status_id
-        ) {
-          //take all params that need to save.
-          $memParams = $memberParams;
-          $memParams['status_id'] = $statusId;
-          $memParams['createActivity'] = TRUE;
-          $memParams['version'] = 3;
-
-          // Unset columns which should remain unchanged from their current saved
-          // values. This avoids race condition in which these values may have
-          // been changed by other processes.
-          unset(
-            $memParams['contact_id'],
-            $memParams['membership_type_id'],
-            $memParams['membership_type'],
-            $memParams['join_date'],
-            $memParams['start_date'],
-            $memParams['end_date'],
-            $memParams['source']
-          );
-          //since there is change in status.
-          $statusChange = array('status_id' => $statusId);
-          $smarty->append_by_ref('memberParams', $statusChange, TRUE);
-
-          //process member record.
-          civicrm_api('membership', 'create', $memParams);
-          $updateCount++;
-        }
+        //process member record.
+        civicrm_api('membership', 'create', $memParams);
+        $updateCount++;
       }
     }
     $result['is_error'] = 0;
