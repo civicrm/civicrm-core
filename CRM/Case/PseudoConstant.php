@@ -37,30 +37,6 @@
 class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
 
   /**
-   * Case statues
-   * @var array
-   */
-  static $caseStatus = array();
-
-  /**
-   * Redaction rules
-   * @var array
-   */
-  static $redactionRule;
-
-  /**
-   * Case type
-   * @var array
-   */
-  static $caseType = array();
-
-  /**
-   * Encounter Medium
-   * @var array
-   */
-  static $encounterMedium = array();
-
-  /**
    * Activity type
    * @var array
    */
@@ -79,19 +55,15 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
    *   array reference of all case statues
    */
   public static function caseStatus($column = 'label', $onlyActive = TRUE, $condition = NULL, $fresh = FALSE) {
-    $cacheKey = "{$column}_" . (int) $onlyActive;
     if (!$condition) {
       $condition = 'AND filter = 0';
     }
 
-    if (!isset(self::$caseStatus[$cacheKey]) || $fresh) {
-      self::$caseStatus[$cacheKey] = CRM_Core_OptionGroup::values('case_status',
-        FALSE, FALSE, FALSE, $condition,
-        $column, $onlyActive, $fresh
-      );
-    }
+    return CRM_Core_OptionGroup::values('case_status',
+      FALSE, FALSE, FALSE, $condition,
+      $column, $onlyActive, $fresh
+    );
 
-    return self::$caseStatus[$cacheKey];
   }
 
   /**
@@ -104,22 +76,15 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
    *   array reference of all redaction rules
    */
   public static function redactionRule($filter = NULL) {
-    // if ( ! self::$redactionRule ) {
-    self::$redactionRule = array();
-
+    $condition = NULL;
     if ($filter === 0) {
       $condition = "  AND (v.filter = 0 OR v.filter IS NULL)";
     }
     elseif ($filter === 1) {
       $condition = "  AND  v.filter = 1";
     }
-    elseif ($filter === NULL) {
-      $condition = NULL;
-    }
 
-    self::$redactionRule = CRM_Core_OptionGroup::values('redaction_rule', TRUE, FALSE, FALSE, $condition);
-    // }
-    return self::$redactionRule;
+    return CRM_Core_OptionGroup::values('redaction_rule', TRUE, FALSE, FALSE, $condition);
   }
 
   /**
@@ -166,15 +131,10 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
    *   array reference of all Encounter Medium.
    */
   public static function encounterMedium($column = 'label', $onlyActive = TRUE) {
-    $cacheKey = "{$column}_" . (int) $onlyActive;
-    if (!isset(self::$encounterMedium[$cacheKey])) {
-      self::$encounterMedium[$cacheKey] = CRM_Core_OptionGroup::values('encounter_medium',
-        FALSE, FALSE, FALSE, NULL,
-        $column, $onlyActive
-      );
-    }
-
-    return self::$encounterMedium[$cacheKey];
+    return CRM_Core_OptionGroup::values('encounter_medium',
+      FALSE, FALSE, FALSE, NULL,
+      $column, $onlyActive
+    );
   }
 
   /**

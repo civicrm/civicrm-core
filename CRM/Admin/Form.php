@@ -90,6 +90,7 @@ class CRM_Admin_Form extends CRM_Core_Form {
    * @return array
    */
   public function setDefaultValues() {
+    // Fetch defaults from the db
     if (isset($this->_id) && empty($this->_values)) {
       $this->_values = array();
       $params = array('id' => $this->_id);
@@ -97,6 +98,15 @@ class CRM_Admin_Form extends CRM_Core_Form {
       $baoName::retrieve($params, $this->_values);
     }
     $defaults = $this->_values;
+
+    // Allow defaults to be set from the url
+    if (empty($this->_id) && $this->_action & CRM_Core_Action::ADD) {
+      foreach ($_GET as $key => $val) {
+        if ($this->elementExists($key)) {
+          $defaults[$key] = $val;
+        }
+      }
+    }
 
     if ($this->_action == CRM_Core_Action::DELETE &&
       isset($defaults['name'])
