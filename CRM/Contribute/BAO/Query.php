@@ -32,13 +32,6 @@
  */
 class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
 
-  /**
-   * Static field for all the export/import contribution fields.
-   *
-   * @var array
-   */
-  static $_contributionFields = NULL;
-
   static $_contribOrSoftCredit = "only_contribs";
 
   static $_contribRecurPayment = NULL;
@@ -54,16 +47,12 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
    *   Associative array of contribution fields
    */
   public static function getFields($checkPermission = TRUE) {
-    if (!self::$_contributionFields) {
-      self::$_contributionFields = array();
-
-      $fields = CRM_Contribute_BAO_Contribution::exportableFields($checkPermission);
-
+    if (!isset(\Civi::$statics[__CLASS__]) || !isset(\Civi::$statics[__CLASS__]['fields']) || !isset(\Civi::$statics[__CLASS__]['contribution'])) {
+      $fields  = CRM_Contribute_BAO_Contribution::exportableFields($checkPermission);
       unset($fields['contribution_contact_id']);
-
-      self::$_contributionFields = $fields;
+      \Civi::$statics[__CLASS__]['fields']['contribution'] = $fields;
     }
-    return self::$_contributionFields;
+    return \Civi::$statics[__CLASS__]['fields']['contribution'];
   }
 
   /**
