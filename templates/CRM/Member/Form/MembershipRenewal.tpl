@@ -118,7 +118,8 @@
               <legend>{ts}Renewal Payment and Receipt{/ts}</legend>
       {/if}
       {include file="CRM/Member/Form/MembershipCommon.tpl"}
-      {if $emailExists and $outBound_option != 2}
+    </table>
+    {if $emailExists and $outBound_option != 2}
       <table class="form-layout">
         <tr class="crm-{$formClass}-form-block-send_receipt">
           <td class="label">{$form.send_receipt.label}</td>
