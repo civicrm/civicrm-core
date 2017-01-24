@@ -639,12 +639,17 @@ class CRM_Contact_BAO_Query {
    */
   public function selectClause($apiEntity = NULL) {
 
+    // @todo Tidy up this. This arises because 1) we are ignoring the $mode & adding a new
+    // param ($apiEntity) instead - presumably an oversight & 2 because
+    // contact is not implemented as a component.
     $this->addSpecialFields($apiEntity);
 
     foreach ($this->_fields as $name => $field) {
       // skip component fields
       // there are done by the alter query below
       // and need not be done on every field
+      // @todo remove these & handle using metadata - only obscure fields
+      // that are hack-added should need to be excluded from the main loop.
       if (
         (substr($name, 0, 12) == 'participant_') ||
         (substr($name, 0, 7) == 'pledge_') ||
@@ -736,18 +741,21 @@ class CRM_Contact_BAO_Query {
                 $this->_pseudoConstantsSelect[$name]['element'] = $name;
 
                 if ($tableName == 'email_greeting') {
+                  // @todo bad join.
                   $this->_pseudoConstantsSelect[$name]['join']
                     = " LEFT JOIN civicrm_option_group option_group_email_greeting ON (option_group_email_greeting.name = 'email_greeting')";
                   $this->_pseudoConstantsSelect[$name]['join'] .=
                     " LEFT JOIN civicrm_option_value email_greeting ON (contact_a.email_greeting_id = email_greeting.value AND option_group_email_greeting.id = email_greeting.option_group_id ) ";
                 }
                 elseif ($tableName == 'postal_greeting') {
+                  // @todo bad join.
                   $this->_pseudoConstantsSelect[$name]['join']
                     = " LEFT JOIN civicrm_option_group option_group_postal_greeting ON (option_group_postal_greeting.name = 'postal_greeting')";
                   $this->_pseudoConstantsSelect[$name]['join'] .=
                     " LEFT JOIN civicrm_option_value postal_greeting ON (contact_a.postal_greeting_id = postal_greeting.value AND option_group_postal_greeting.id = postal_greeting.option_group_id ) ";
                 }
                 elseif ($tableName == 'addressee') {
+                  // @todo bad join.
                   $this->_pseudoConstantsSelect[$name]['join']
                     = " LEFT JOIN civicrm_option_group option_group_addressee ON (option_group_addressee.name = 'addressee')";
                   $this->_pseudoConstantsSelect[$name]['join'] .=
@@ -5848,6 +5856,7 @@ AND   displayRelType.is_active = 1
         // FIX ME: we should potentially move this to component Query and write a wrapper function that
         // handles pseudoconstant fixes for all component
         elseif (in_array($value['pseudoField'], array('participant_role_id', 'participant_role'))) {
+          // @todo define bao on this & merge into the above condition.
           $viewValues = explode(CRM_Core_DAO::VALUE_SEPARATOR, $val);
 
           if ($value['pseudoField'] == 'participant_role') {
