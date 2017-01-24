@@ -825,15 +825,6 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
         ),
       );
 
-      $contributionRecurId = array(
-        'contribution_recur_id' => array(
-          'title' => ts('Recurring Contributions ID'),
-          'name' => 'contribution_recur_id',
-          'where' => 'civicrm_contribution.contribution_recur_id',
-          'data_type' => CRM_Utils_Type::T_INT,
-        ),
-      );
-
       $extraFields = array(
         'contribution_batch' => array(
           'title' => ts('Batch Name'),
@@ -893,7 +884,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       );
 
       $fields = array_merge($impFields, $typeField, $contributionStatus, $contributionPage, $optionField, $expFieldProduct,
-        $expFieldsContrib, $contributionNote, $contributionRecurId, $extraFields, $softCreditFields, $financialAccount, $premiums, $campaignTitle,
+        $expFieldsContrib, $contributionNote, $extraFields, $softCreditFields, $financialAccount, $premiums, $campaignTitle,
         CRM_Core_BAO_CustomField::getFieldsForImport('Contribution', FALSE, FALSE, FALSE, $checkPermission)
       );
 
