@@ -31,8 +31,10 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
   }
 
   /**
-   *  Test CRM_Contact_BAO_Query::searchQuery()
+   *  Test CRM_Contact_BAO_Query::searchQuery().
+   *
    * @dataProvider dataProvider
+   *
    * @param $fv
    * @param $count
    * @param $ids
@@ -331,7 +333,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
   }
 
   /**
-   * CRM-19562 ensure that only ids are used for contactid searching.
+   * CRM-19562 ensure that only ids are used for contact_id searching.
    */
   public function testContactIDClause() {
     $params = array(
