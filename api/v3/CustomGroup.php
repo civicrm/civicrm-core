@@ -52,7 +52,8 @@ function civicrm_api3_custom_group_create($params) {
     unset($params['extends']);
     $params['extends'] = $extends;
   }
-  if (!isset($params['extends'][0]) || !trim($params['extends'][0])) {
+  if (!isset($params['id']) && (!isset($params['extends'][0]) || !trim($params['extends'][0]))) {
+
     return civicrm_api3_create_error("First item in params['extends'] must be a class name (e.g. 'Contact').");
   }
   if (isset($params['extends_entity_column_value']) && !is_array($params['extends_entity_column_value'])) {
