@@ -1742,7 +1742,7 @@ class CRM_Report_Form extends CRM_Core_Form {
         if ($value !== NULL && count($value) > 0) {
           $value = CRM_Utils_Type::escapeAll($value, $type);
           $operator = $op == 'mnot' ? 'NOT' : '';
-          $regexp = "[[:cntrl:]]*" . implode('[[:>:]]*|[[:<:]]*', (array) $value) . "[[:cntrl:]]*";
+          $regexp = "([[:cntrl:]]|^)" . implode('([[:cntrl:]]|$)|([[:cntrl:]]|^)', (array) $value) . "([[:cntrl:]]|$)";
           $clause = "{$field['dbAlias']} {$operator} REGEXP '{$regexp}'";
         }
         break;
