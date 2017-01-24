@@ -251,9 +251,7 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
       ),
     );
 
-    $description = "Create Contribution with Nested Line Items.";
-    $subfile = "CreateWithNestedLineItems";
-    $config = &CRM_Core_Config::singleton();
+    $config = CRM_Core_Config::singleton();
     $config->userPermissionClass->permissions = array(
       'access CiviCRM',
       'access CiviContribute',
@@ -262,7 +260,7 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
       'add contributions of type Donation',
       'delete contributions of type Donation',
     );
-    $contribution = $this->callAPIFailure('contribution', 'create', $params, 'Error in call to LineItem_create : You do not have permission to create this line item');
+    $this->callAPIFailure('contribution', 'create', $params, 'Error in call to LineItem_create : You do not have permission to create this line item');
 
     // Check that the entire contribution has rolled back.
     $contribution = $this->callAPISuccess('contribution', 'get', array());
@@ -270,14 +268,14 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
 
     CRM_Financial_BAO_FinancialType::$_availableFinancialTypes = NULL;
 
-    $config = &CRM_Core_Config::singleton();
+    $config = CRM_Core_Config::singleton();
     $config->userPermissionClass->permissions = array_merge($config->userPermissionClass->permissions, array(
       'add contributions of type Member Dues',
       'view contributions of type Donation',
       'view contributions of type Member Dues',
       'delete contributions of type Member Dues',
     ));
-    $contribution = $this->callAPIAndDocument('contribution', 'create', $params, __FUNCTION__, __FILE__, $description, $subfile);
+    $contribution = $this->callAPISuccess('contribution', 'create', $params);
 
     $lineItemParams = array(
       'contribution_id' => $contribution['id'],
@@ -309,14 +307,14 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
       'check_permissions' => TRUE,
       'total_amount' => 200.00,
     );
-    $config = &CRM_Core_Config::singleton();
+    $config = CRM_Core_Config::singleton();
     $config->userPermissionClass->permissions = array(
       'access CiviCRM',
       'access CiviContribute',
       'edit contributions',
       'view contributions of type Donation',
     );
-    $contribution = $this->callAPIFailure('Contribution', 'create', $params);
+    $this->callAPIFailure('Contribution', 'create', $params);
 
     $config->userPermissionClass->permissions[] = 'edit contributions of type Donation';
     $contribution = $this->callAPISuccess('Contribution', 'create', $params);
@@ -329,7 +327,7 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
    */
   public function testDeleteACLContribution() {
     $this->setACL();
-    $config = &CRM_Core_Config::singleton();
+    $config = CRM_Core_Config::singleton();
     $config->userPermissionClass->permissions = array(
       'access CiviCRM',
       'access CiviContribute',
@@ -343,7 +341,7 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
       'check_permissions' => TRUE,
     );
     $config->userPermissionClass->permissions[3] = 'delete in CiviContribute';
-    $contribution = $this->callAPIFailure('Contribution', 'delete', $params);
+    $this->callAPIFailure('Contribution', 'delete', $params);
 
     $config->userPermissionClass->permissions[] = 'delete contributions of type Donation';
     $contribution = $this->callAPISuccess('Contribution', 'delete', $params);

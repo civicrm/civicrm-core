@@ -23,7 +23,8 @@ function group_contact_get_example() {
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
     return array(
-      'error' => $errorMessage,
+      'is_error' => 1,
+      'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
     );
@@ -64,9 +65,9 @@ function group_contact_get_expectedresult() {
               'description' => 'New Test Group Created',
               'is_active' => '1',
               'visibility' => 'Public Pages',
-              'where_clause' => ' ( `civicrm_group_contact-3`.group_id IN ( 3 ) AND `civicrm_group_contact-3`.status IN (\"Added\") ) ',
-              'select_tables' => 'a:8:{s:15:\"civicrm_contact\";i:1;s:15:\"civicrm_address\";i:1;s:15:\"civicrm_country\";i:1;s:13:\"civicrm_email\";i:1;s:13:\"civicrm_phone\";i:1;s:10:\"civicrm_im\";i:1;s:19:\"civicrm_worldregion\";i:1;s:25:\"`civicrm_group_contact-3`\";s:165:\" LEFT JOIN civicrm_group_contact `civicrm_group_contact-3` ON ( contact_a.id = `civicrm_group_contact-3`.contact_id AND `civicrm_group_contact-3`.group_id IN ( 3 ) )\";}',
-              'where_tables' => 'a:2:{s:15:\"civicrm_contact\";i:1;s:25:\"`civicrm_group_contact-3`\";s:165:\" LEFT JOIN civicrm_group_contact `civicrm_group_contact-3` ON ( contact_a.id = `civicrm_group_contact-3`.contact_id AND `civicrm_group_contact-3`.group_id IN ( 3 ) )\";}',
+              'where_clause' => ' ( `civicrm_group_contact-3`.group_id IN ( 3 )   ) ',
+              'select_tables' => 'a:8:{s:15:\"civicrm_contact\";i:1;s:15:\"civicrm_address\";i:1;s:15:\"civicrm_country\";i:1;s:13:\"civicrm_email\";i:1;s:13:\"civicrm_phone\";i:1;s:10:\"civicrm_im\";i:1;s:19:\"civicrm_worldregion\";i:1;s:25:\"`civicrm_group_contact-3`\";s:165:\" LEFT JOIN civicrm_group_contact `civicrm_group_contact-3` ON (contact_a.id = `civicrm_group_contact-3`.contact_id AND `civicrm_group_contact-3`.status IN (\'Added\'))\";}',
+              'where_tables' => 'a:2:{s:15:\"civicrm_contact\";i:1;s:25:\"`civicrm_group_contact-3`\";s:165:\" LEFT JOIN civicrm_group_contact `civicrm_group_contact-3` ON (contact_a.id = `civicrm_group_contact-3`.contact_id AND `civicrm_group_contact-3`.status IN (\'Added\'))\";}',
               'group_type' => array(
                 '0' => '1',
                 '1' => '2',

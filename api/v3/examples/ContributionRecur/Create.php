@@ -26,7 +26,8 @@ function contribution_recur_create_example() {
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
     return array(
-      'error' => $errorMessage,
+      'is_error' => 1,
+      'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
     );
@@ -59,10 +60,11 @@ function contribution_recur_create_expectedresult() {
         'installments' => '12',
         'start_date' => '2013-07-29 00:00:00',
         'create_date' => '20120130621222105',
-        'modified_date' => '',
+        'modified_date' => '2012-11-14 16:02:35',
         'cancel_date' => '',
         'end_date' => '',
         'processor_id' => '',
+        'payment_token_id' => '',
         'trxn_id' => '',
         'invoice_id' => '',
         'contribution_status_id' => '1',
