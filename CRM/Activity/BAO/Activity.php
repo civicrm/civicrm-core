@@ -2793,4 +2793,35 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
     return FALSE;
   }
 
+  /**
+   * Get a list of triggers for the activity table.
+   *
+   * @see hook_civicrm_triggerInfo
+   * @see CRM_Core_DAO::triggerRebuild
+   *
+   * @param $info
+   * @param null $tableName
+   */
+  public static function triggerInfo(&$info, $tableName = NULL) {
+    //during upgrade, first check for valid version and then create triggers
+    //i.e the column created_date is introduced in 4.7.17 so dont create triggers for older version
+    if (CRM_Core_Config::isUpgradeMode()) {
+      $currentVer = CRM_Core_BAO_Domain::version(TRUE);
+      //if current version is less than 4.7.17 dont create below triggers
+      if (version_compare($currentVer, '4.7.17') < 0) {
+        return;
+      }
+    }
+
+    // Update timestamp for civicrm_activiy row
+    if ($tableName == NULL || $tableName == self::getTableName()) {
+      $info[] = array(
+        'table' => array(self::getTableName()),
+        'when' => 'BEFORE',
+        'event' => array('INSERT'),
+        'sql' => "\nSET NEW.created_date = CURRENT_TIMESTAMP;\n",
+      );
+    }
+  }
+
 }
