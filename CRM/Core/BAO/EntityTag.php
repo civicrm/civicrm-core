@@ -228,6 +228,10 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
     $numEntitiesNotRemoved = 0;
     $entityIdsRemoved = array();
 
+    //invoke pre hook for entityTag
+    $preObject = array($entityIds, $entityTable);
+    CRM_Utils_Hook::pre('delete', 'EntityTag', $tagId, $preObject);
+
     foreach ($entityIds as $entityId) {
       // CRM-17350 - check if we have permission to edit the contact
       // that this tag belongs to.
