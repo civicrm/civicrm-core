@@ -196,6 +196,12 @@ class CRM_Activity_DAO_Activity extends CRM_Core_DAO {
    */
   public $is_star;
   /**
+   * When was the activity created.
+   *
+   * @var timestamp
+   */
+  public $created_date;
+  /**
    * Class constructor.
    */
   function __construct() {
@@ -616,6 +622,18 @@ class CRM_Activity_DAO_Activity extends CRM_Core_DAO {
           'table_name' => 'civicrm_activity',
           'entity' => 'Activity',
           'bao' => 'CRM_Activity_BAO_Activity',
+        ) ,
+        'created_date' => array(
+          'name' => 'created_date',
+          'type' => CRM_Utils_Type::T_TIMESTAMP,
+          'title' => ts('Created Date') ,
+          'description' => 'When was the activity created.',
+          'required' => false,
+          'export' => true,
+          'where' => 'civicrm_activity.created_date',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'default' => 'NULL',
         ) ,
       );
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);
