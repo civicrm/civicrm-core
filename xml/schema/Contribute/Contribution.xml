@@ -437,6 +437,7 @@
   <field>
     <name>check_number</name>
     <title>Check Number</title>
+    <uniqueName>contribution_check_number</uniqueName>
     <headerPattern>/check(.?number)?/i</headerPattern>
     <type>varchar</type>
     <length>255</length>

@@ -130,12 +130,6 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
       $query->_tables['contribution_payment_instrument'] = 1;
     }
 
-    if (!empty($query->_returnProperties['check_number'])) {
-      $query->_select['contribution_check_number'] = "civicrm_contribution.check_number as contribution_check_number";
-      $query->_element['contribution_check_number'] = 1;
-      $query->_tables['civicrm_contribution'] = 1;
-    }
-
     if (!empty($query->_returnProperties['contribution_campaign_id'])) {
       $query->_select['contribution_campaign_id'] = 'civicrm_contribution.campaign_id as contribution_campaign_id';
       $query->_element['contribution_campaign_id'] = 1;
@@ -840,7 +834,7 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
         // kittens
         'payment_instrument_id' => 1,
         // argh
-        'check_number' => 1,
+        'contribution_check_number' => 1,
         // no
         'non_deductible_amount' => 1,
         // not

@@ -657,7 +657,7 @@ function _civicrm_api3_map_profile_fields_to_entity(&$field) {
     'total_amount' => 'contribution',
     'receive_date' => 'contribution',
     'payment_instrument' => 'contribution',
-    'check_number' => 'contribution',
+    'contribution_check_number' => 'contribution',
     'contribution_status_id' => 'contribution',
     'soft_credit' => 'contribution',
     'soft_credit_type' => 'contribution_soft',
