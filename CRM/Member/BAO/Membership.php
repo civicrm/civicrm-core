@@ -2170,7 +2170,6 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
 
     //get all active statuses of membership, CRM-3984
     $allStatus = CRM_Member_PseudoConstant::membershipStatus();
-    $statusLabels = CRM_Member_PseudoConstant::membershipStatus(NULL, NULL, 'label');
     $allTypes = CRM_Member_PseudoConstant::membershipType();
 
     // This query retrieves ALL memberships of active types.
@@ -2196,9 +2195,6 @@ WHERE      civicrm_membership.is_test = 0 ";
     $processCount = 0;
     $updateCount = 0;
 
-    // ??
-    $smarty = CRM_Core_Smarty::singleton();
-
     // Handle membership status of deceased contacts.
     $deceasedQuery = $baseQuery . " AND civicrm_contact.is_deceased <> 0 AND civicrm_membership.status_id <> %1 ";
 
@@ -2221,10 +2217,6 @@ WHERE      civicrm_membership.is_test = 0 ";
 
     while ($dao1->fetch()) {
       $processCount++;
-      //since there is change in status.
-      $statusChange = array('status_id' => $deceaseStatusId);
-      // I don't know what this is about. It was already there. :-/
-      $smarty->append_by_ref('memberParams', $statusChange, TRUE);
 
       $deceasedMembership = array(
         'id' => $dao1->membership_id,
@@ -2275,8 +2267,6 @@ WHERE      civicrm_membership.is_test = 0 ";
         'skipRecentView' => TRUE,
       );
 
-      $smarty->assign_by_ref('memberParams', $memberParams);
-
       // CRM-7248: added excludeIsAdmin param to the following fn call to prevent moving to admin statuses
       //get the membership status as per id.
       $newStatus = civicrm_api('membership_status', 'calc',
@@ -2311,8 +2301,6 @@ WHERE      civicrm_membership.is_test = 0 ";
           $memParams['source']
         );
         //since there is change in status.
-        $statusChange = array('status_id' => $statusId);
-        $smarty->append_by_ref('memberParams', $statusChange, TRUE);
 
         //process member record.
         civicrm_api('membership', 'create', $memParams);
