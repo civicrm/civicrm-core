@@ -134,6 +134,7 @@
     <comment>Date and time this activity is scheduled to occur. Formerly named scheduled_date_time.</comment>
     <html>
       <type>Select Date</type>
+      <format>activityDateTime</format>
     </html>
     <add>2.0</add>
   </field>

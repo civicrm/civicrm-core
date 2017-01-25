@@ -111,12 +111,12 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
 {foreach from=$table.fields item=field}
 
 {if $field.uniqueName}
-                                            '{$field.uniqueName}'
+  '{$field.uniqueName}'
 {else}
                                             '{$field.name}'
 {/if}
                => array(
-                                                                      'name'      => '{$field.name}',
+                 'name'      => '{$field.name}',
                                                                       'type'      => {$field.crmType},
 {if $field.title}
                                                                       'title'     => ts('{$field.title}'),
@@ -163,6 +163,9 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
 {if $field.default}
                          'default'   => '{if ($field.default[0]=="'" or $field.default[0]=='"')}{$field.default|substring:1:-1}{else}{$field.default}{/if}',
 {/if} {* field.default *}
+  'table_name' => '{$table.name}',
+  'entity' => '{$table.entity}',
+  'bao' => '{$table.bao}',
 
 {if $field.FKClassName}
                       'FKClassName' => '{$field.FKClassName}',
@@ -181,8 +184,8 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
 'pseudoconstant' => array(
 {*{$pseudoOptions|@print_array}*}
 {foreach from=$pseudoOptions key=optionKey item=optionValue}
-                      '{$optionKey}' => '{$optionValue}',
-                      {/foreach}
+  '{$optionKey}' => '{$optionValue}',
+{/foreach}
                 )
 {/if} {* field.pseudoconstant *}                                                                    ),
 {/foreach} {* table.fields *}

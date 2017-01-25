@@ -119,6 +119,10 @@
     <type>datetime</type>
     <comment>When did contact register for event?</comment>
     <add>1.7</add>
+    <html>
+      <type>Select Date</type>
+      <format>activityDateTime</format>
+    </html>
   </field>
   <field>
     <name>source</name>
