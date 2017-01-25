@@ -79,6 +79,8 @@
          {help id="id-token-subject" tplFile=$tplFile isAdmin=$isAdmin file="CRM/Contact/Form/Task/Email.hlp"}
        </td>
     </tr>
+  {* CRM-15984 --add campaign to email activities *}
+  {include file="CRM/Campaign/Form/addCampaignToComponent.tpl" campaignTrClass="crm-contactEmail-form-block-campaign_id"}
 </table>
 
 {include file="CRM/Contact/Form/Task/EmailCommon.tpl"}
