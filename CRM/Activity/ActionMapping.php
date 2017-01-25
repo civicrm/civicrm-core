@@ -65,6 +65,7 @@ class CRM_Activity_ActionMapping extends \Civi\ActionSchedule\Mapping {
       'entity_status' => 'activity_status',
       'entity_status_label' => ts('Activity Status'),
       'entity_date_start' => 'activity_date_time',
+      'entity_date_end' => 'created_date',
     )));
   }
 
@@ -105,7 +106,7 @@ class CRM_Activity_ActionMapping extends \Civi\ActionSchedule\Mapping {
     $query['casContactIdField'] = 'r.contact_id';
     $query['casEntityIdField'] = 'e.id';
     $query['casContactTableAlias'] = NULL;
-    $query['casDateField'] = 'e.activity_date_time';
+    $query['casDateField'] = 'e.' . $schedule->start_action_date;
 
     if (!is_null($schedule->limit_to)) {
       $activityContacts = \CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
