@@ -335,19 +335,28 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
       // check if statusDate is in the range of start & end events.
       if ($startEvent && $endEvent) {
         if (($statusDate >= $startEvent) && ($statusDate <= $endEvent)) {
-          $membershipDetails['id'] = $statusId;
+          // I use strval because fixMembershipStatusBeforeRenew in
+          // CRM/Member/BAO/Membership.php:1193 expects the id to be
+          // a string (!== comparison).
+          // If I would just return the integer value, the unit test
+          // testCompleteTransactionMembershipPriceSet from
+          // api_v3_ContributionTest would fail, because a membership
+          // status will be changed to that same status, which causes
+          // too many entries in MembershipLog.
+          // This might be a bug in the Membership BAO.
+          $membershipDetails['id'] = strval($statusId);
           $membershipDetails['name'] = $statusName;
         }
       }
       elseif ($startEvent) {
         if ($statusDate >= $startEvent) {
-          $membershipDetails['id'] = $statusId;
+          $membershipDetails['id'] = strval($statusId);
           $membershipDetails['name'] = $statusName;
         }
       }
       elseif ($endEvent) {
         if ($statusDate <= $endEvent) {
-          $membershipDetails['id'] = $statusId;
+          $membershipDetails['id'] = strval($statusId);
           $membershipDetails['name'] = $statusName;
         }
       }
