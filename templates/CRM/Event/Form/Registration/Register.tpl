@@ -202,6 +202,10 @@
       }
     }
 
+    cj('input[name^="price_"]').on('change', function () {
+      skipPaymentMethod();
+    });
+
     cj('input[name="payment_processor"]').change(function () {
       toggleConfirmButton();
     });
@@ -219,11 +223,18 @@
     // Called from display() in Calculate.tpl, depends on display() having been called.
     function skipPaymentMethod() {
       // If we're in quick-config price set, we do not have the pricevalue hidden element, so just return.
-      if (cj('#pricevalue').length == 0) {
+
+      var quickConfig = "{/literal}{$quickConfig}{literal}";
+      if (quickConfig) {
+        currentTotal = cj('input[name^=price_]:checked').data('amount');
+      }
+      else if (cj('#pricevalue').length == 0) {
         return;
       }
-      // CRM-15433 Remove currency symbol, decimal separator so we can check for zero numeric total regardless of localization.
-      currentTotal = cj('#pricevalue').text().replace(/[^\/\d]/g,'');
+      else {
+        // CRM-15433 Remove currency symbol, decimal separator so we can check for zero numeric total regardless of localization.
+        currentTotal = cj('#pricevalue').text().replace(/[^\/\d]/g,'');
+      }
       var isMultiple = '{/literal}{$event.is_multiple_registrations}{literal}';
 
       var flag = 1;
