@@ -292,34 +292,35 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
       foreach ($events as $eve) {
         foreach ($dates as $dat) {
           // calculate start-event/date and end-event/date
-          if ((CRM_Member_PseudoConstant::membershipStatus($statusId, $eve . '_event') == $dat . '_date') &&
+          $statusEvent = CRM_Member_PseudoConstant::membershipStatus($statusId, NULL, $eve . '_event');
+          if (($statusEvent == $dat . '_date') &&
             ${$dat . 'Date'}
           ) {
-            if (CRM_Member_PseudoConstant::membershipStatus($statusId, $eve . '_event_adjust_unit') &&
-              CRM_Member_PseudoConstant::membershipStatus($statusId, $eve . '_event_adjust_interval')
+            if (CRM_Member_PseudoConstant::membershipStatus($statusId, NULL, $eve . '_event_adjust_unit') &&
+              CRM_Member_PseudoConstant::membershipStatus($statusId, NULL, $eve . '_event_adjust_interval')
             ) {
               // add in months
-              if (CRM_Member_PseudoConstant::membershipStatus($statusId, $eve . '_event_adjust_unit') == 'month') {
+              if (CRM_Member_PseudoConstant::membershipStatus($statusId, NULL, $eve . '_event_adjust_unit') == 'month') {
                 ${$eve . 'Event'} = date('Ymd', mktime($hour, $minute, $second,
-                  ${$dat . 'Month'} + CRM_Member_PseudoConstant::membershipStatus($statusId, $eve . '_event_adjust_interval'),
+                  ${$dat . 'Month'} + CRM_Member_PseudoConstant::membershipStatus($statusId, NULL, $eve . '_event_adjust_interval'),
                   ${$dat . 'Day'},
                   ${$dat . 'Year'}
                 ));
               }
               // add in days
-              if (CRM_Member_PseudoConstant::membershipStatus($statusId, $eve . '_event_adjust_unit') == 'day') {
+              if (CRM_Member_PseudoConstant::membershipStatus($statusId, NULL, $eve . '_event_adjust_unit') == 'day') {
                 ${$eve . 'Event'} = date('Ymd', mktime($hour, $minute, $second,
                   ${$dat . 'Month'},
-                  ${$dat . 'Day'} + CRM_Member_PseudoConstant::membershipStatus($statusId, $eve . '_event_adjust_interval'),
+                  ${$dat . 'Day'} + CRM_Member_PseudoConstant::membershipStatus($statusId, NULL, $eve . '_event_adjust_interval'),
                   ${$dat . 'Year'}
                 ));
               }
               // add in years
-              if (CRM_Member_PseudoConstant::membershipStatus($statusId, $eve . '_event_adjust_unit') == 'year') {
+              if (CRM_Member_PseudoConstant::membershipStatus($statusId, NULL, $eve . '_event_adjust_unit') == 'year') {
                 ${$eve . 'Event'} = date('Ymd', mktime($hour, $minute, $second,
                   ${$dat . 'Month'},
                   ${$dat . 'Day'},
-                  ${$dat . 'Year'} + CRM_Member_PseudoConstant::membershipStatus($statusId, $eve . '_event_adjust_interval')
+                  ${$dat . 'Year'} + CRM_Member_PseudoConstant::membershipStatus($statusId, NULL, $eve . '_event_adjust_interval')
                 ));
               }
               // if no interval and unit, present
