@@ -81,6 +81,9 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
 
     // dont save the object if it already exists, CRM-1276
     if (!$entityTag->find(TRUE)) {
+      //invoke pre hook
+      CRM_Utils_Hook::pre('create', 'EntityTag', $params['tag_id'], $params);
+
       $entityTag->save();
 
       //invoke post hook on entityTag
@@ -111,6 +114,11 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
    *   (reference ) an assoc array of name/value pairs.
    */
   public static function del(&$params) {
+    //invoke pre hook
+    if (!empty($params['tag_id'])) {
+      CRM_Utils_Hook::pre('delete', 'EntityTag', $params['tag_id'], $params);
+    }
+
     $entityTag = new CRM_Core_BAO_EntityTag();
     $entityTag->copyValues($params);
     $entityTag->delete();
@@ -141,6 +149,10 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
     $numEntitiesAdded = 0;
     $numEntitiesNotAdded = 0;
     $entityIdsAdded = array();
+
+    //invoke pre hook for entityTag
+    $preObject = array($entityIds, $entityTable);
+    CRM_Utils_Hook::pre('create', 'EntityTag', $tagId, $preObject);
 
     foreach ($entityIds as $entityId) {
       // CRM-17350 - check if we have permission to edit the contact
@@ -215,6 +227,10 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
     $numEntitiesRemoved = 0;
     $numEntitiesNotRemoved = 0;
     $entityIdsRemoved = array();
+
+    //invoke pre hook for entityTag
+    $preObject = array($entityIds, $entityTable);
+    CRM_Utils_Hook::pre('delete', 'EntityTag', $tagId, $preObject);
 
     foreach ($entityIds as $entityId) {
       // CRM-17350 - check if we have permission to edit the contact
