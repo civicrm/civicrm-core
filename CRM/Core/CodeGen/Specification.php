@@ -204,7 +204,6 @@ class CRM_Core_CodeGen_Specification {
       'objectName' => $klass,
       'labelName' => substr($name, 8),
       'className' => $this->classNames[$name],
-      'baopath' => $baoPath . $klass . '.php',
       'bao' => (file_exists($baoPath . $klass . '.php') ? str_replace('DAO', 'BAO', $this->classNames[$name]) : $this->classNames[$name]),
       'entity' => $klass,
       'attributes_simple' => trim($database['tableAttributes_simple']),
