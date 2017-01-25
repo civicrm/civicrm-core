@@ -37,7 +37,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     $created_date = $this->assertDBNotNull('CRM_Activity_DAO_Activity', 'Scheduling Meeting', 'created_date',
       'subject', 'Database check for created activity.'
     );
-    $this->assertApproxEquals(time(), strtotime($created_date), 5);
+    $this->assertApproxEquals(time(), strtotime($created_date), 5, 'Created date is not within 5 seconds of correct date/time.');
 
     // Now call create() to modify an existing Activity
 
