@@ -635,6 +635,18 @@ class CRM_Activity_DAO_Activity extends CRM_Core_DAO {
           'dataPattern' => '',
           'default' => 'NULL',
         ) ,
+        'created_date' => array(
+          'name' => 'created_date',
+          'type' => CRM_Utils_Type::T_TIMESTAMP,
+          'title' => ts('Created Date') ,
+          'description' => 'When was the activity created.',
+          'required' => false,
+          'export' => true,
+          'where' => 'civicrm_activity.created_date',
+          'headerPattern' => '',
+          'dataPattern' => '',
+          'default' => 'NULL',
+        ) ,
       );
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);
     }
