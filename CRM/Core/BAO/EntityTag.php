@@ -114,6 +114,11 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
    *   (reference ) an assoc array of name/value pairs.
    */
   public static function del(&$params) {
+    //invoke pre hook
+    if (!empty($params['tag_id'])) {
+      CRM_Utils_Hook::pre('delete', 'EntityTag', $params['tag_id'], $params);
+    }
+
     $entityTag = new CRM_Core_BAO_EntityTag();
     $entityTag->copyValues($params);
     $entityTag->delete();
