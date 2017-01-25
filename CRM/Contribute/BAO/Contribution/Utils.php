@@ -769,7 +769,7 @@ INNER JOIN   civicrm_contact contact ON ( contact.id = contrib.contact_id )
         }
 
         if (empty($params) && empty($transaction)) {
-          continue;
+          return;
         }
 
         if (!empty($transaction) && $category) {
