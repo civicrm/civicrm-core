@@ -196,7 +196,8 @@ class CRM_Core_BAO_ConfigSetting {
     // try to inherit the language from the hosting CMS
     if ($settings->get('inheritLocale')) {
       // FIXME: On multilanguage installs, CRM_Utils_System::getUFLocale() in many cases returns nothing if $dbLocale is not set
-      $dbLocale = $multiLang ? ("_" . $settings->get('lcMessages')) : '';
+      $lcMessages = $settings->get('lcMessages');
+      $dbLocale = $multiLang && $lcMessages ? "_{$lcMessages}" : '';
       $chosenLocale = CRM_Utils_System::getUFLocale();
       if ($activatedLocales and !in_array($chosenLocale, explode(CRM_Core_DAO::VALUE_SEPARATOR, $activatedLocales))) {
         $chosenLocale = NULL;
@@ -209,7 +210,7 @@ class CRM_Core_BAO_ConfigSetting {
     }
 
     // set suffix for table names - use views if more than one language
-    $dbLocale = $multiLang ? "_{$chosenLocale}" : '';
+    $dbLocale = $multiLang && $chosenLocale ? "_{$chosenLocale}" : '';
 
     // FIXME: an ugly hack to fix CRM-4041
     global $tsLocale;
