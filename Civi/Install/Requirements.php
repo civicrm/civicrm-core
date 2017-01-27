@@ -437,7 +437,7 @@ class Requirements {
       'details' => 'MySQL thread_stack is OK',
     );
 
-    $conn = @mysql_connect($db_config['server'], $db_config['username'], $db_config['password']);
+    $conn = @mysql_connect($db_config['host'], $db_config['username'], $db_config['password']);
     if (!$conn) {
       $results['severity'] = $this::REQUIREMENT_ERROR;
       $results['details'] = 'Could not connect to database';
@@ -478,7 +478,7 @@ class Requirements {
       'details' => 'Can successfully lock and unlock tables',
     );
 
-    $conn = @mysql_connect($db_config['server'], $db_config['username'], $db_config['password']);
+    $conn = @mysql_connect($db_config['host'], $db_config['username'], $db_config['password']);
     if (!$conn) {
       $results['severity'] = $this::REQUIREMENT_ERROR;
       $results['details'] = 'Could not connect to database';
