@@ -80,6 +80,13 @@ class CRM_Core_Page {
   protected $_print = FALSE;
 
   /**
+   * Do we need to reset the controller session for this request?
+   *
+   * @var boolean
+   */
+  protected $_reset = FALSE;
+
+  /**
    * Cache the smarty template for efficiency reasons
    *
    * @var CRM_Core_Smarty
@@ -134,28 +141,6 @@ class CRM_Core_Page {
       self::$_session = CRM_Core_Session::singleton();
     }
 
-    // FIXME - why are we messing with 'snippet'? Why not just pass it directly into $this->_print?
-    if (!empty($_REQUEST['snippet'])) {
-      if ($_REQUEST['snippet'] == CRM_Core_Smarty::PRINT_PDF) {
-        $this->_print = CRM_Core_Smarty::PRINT_PDF;
-      }
-      // FIXME - why does this number not match the constant?
-      elseif ($_REQUEST['snippet'] == 5) {
-        $this->_print = CRM_Core_Smarty::PRINT_NOFORM;
-      }
-      // Support 'json' as well as legacy value '6'
-      elseif (in_array($_REQUEST['snippet'], array(CRM_Core_Smarty::PRINT_JSON, 6))) {
-        $this->_print = CRM_Core_Smarty::PRINT_JSON;
-      }
-      else {
-        $this->_print = CRM_Core_Smarty::PRINT_SNIPPET;
-      }
-    }
-
-    // if the request has a reset value, initialize the controller session
-    if (!empty($_REQUEST['reset'])) {
-      $this->reset();
-    }
   }
 
   /**
@@ -164,6 +149,10 @@ class CRM_Core_Page {
    * This typically involves assigning the appropriate smarty variables :)
    */
   public function run() {
+    if ($this->_reset) {
+      $this->reset();
+    }
+
     if ($this->_embedded) {
       return NULL;
     }
@@ -179,13 +168,16 @@ class CRM_Core_Page {
     if ($this->_print) {
       if (in_array($this->_print, array(
         CRM_Core_Smarty::PRINT_SNIPPET,
-        CRM_Core_Smarty::PRINT_PDF,
         CRM_Core_Smarty::PRINT_NOFORM,
         CRM_Core_Smarty::PRINT_JSON,
+        CRM_Core_Smarty::PRINT_QFKEY,
+        CRM_Core_Smarty::PRINT_PAGE
       ))) {
+        // pull in the page's contents.
         $content = self::$_template->fetch('CRM/common/snippet.tpl');
       }
       else {
+        // Items that pull in this template trigger the client print dialog.
         $content = self::$_template->fetch('CRM/common/print.tpl');
       }
 
@@ -194,7 +186,7 @@ class CRM_Core_Page {
         $this->overrideExtraTemplateFileName()
       );
 
-      //its time to call the hook.
+      // It's time to call the hook.
       CRM_Utils_Hook::alterContent($content, 'page', $pageTemplateFile, $this);
 
       if ($this->_print == CRM_Core_Smarty::PRINT_PDF) {
@@ -206,15 +198,21 @@ class CRM_Core_Page {
         $this->ajaxResponse['content'] = $content;
         CRM_Core_Page_AJAX::returnJsonResponse($this->ajaxResponse);
       }
-      else {
-        echo $content;
+      elseif ($this->_print == CRM_Core_Smarty::PRINT_SNIPPET ||
+              $this->_print == CRM_Core_Smarty::PRINT_QFKEY ||
+              $this->_print == CRM_Core_Smarty::PRINT_PAGE
+      ) {
+        return $content;
       }
-      CRM_Utils_System::civiExit();
+      else
+      {
+	 CRM_Utils_System::civiExit();
+      }
     }
 
     $config = CRM_Core_Config::singleton();
 
-    // Intermittent alert to admins
+    // Show intermittent alerts to admins
     CRM_Utils_Check::singleton()->showPeriodicAlerts();
 
     if ($this->useLivePageJS && Civi::settings()->get('ajaxPopupsEnabled')) {
@@ -231,9 +229,10 @@ class CRM_Core_Page {
 
     //its time to call the hook.
     CRM_Utils_Hook::alterContent($content, 'page', $pageTemplateFile, $this);
+    CRM_Utils_System::theme($content, $this->_print);
 
-    echo CRM_Utils_System::theme($content, $this->_print);
-  }
+    return $content;
+}
 
   /**
    * Store the variable with the value in the form scope.
@@ -370,6 +369,15 @@ class CRM_Core_Page {
    */
   public function setPrint($print) {
     $this->_print = $print;
+  }
+
+  /**
+   * Setter for reset.
+   *
+   * @param bool $reset
+   */
+  public function setReset($reset) {
+    $this->_reset = $reset;
   }
 
   /**

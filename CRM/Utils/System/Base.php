@@ -210,7 +210,7 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
-   * If we are using a theming system, invoke theme, else just print the content.
+   * If we are using a theming system, invoke theme, else just print/return the content.
    *
    * @param string $content
    *   The content that will be themed.
@@ -233,9 +233,11 @@ abstract class CRM_Utils_System_Base {
     // TODO: Split up; this was copied verbatim from CiviCRM 4.0's multi-UF theming function
     // but the parts should be copied into cleaner subclass implementations
     $config = CRM_Core_Config::singleton();
+
     if (
       $config->userSystem->is_drupal &&
-      function_exists('theme') &&
+      // FIXME: for what is this true?
+      // function_exists('theme') &&
       !$print
     ) {
       if ($maintenance) {
