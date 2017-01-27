@@ -1,9 +1,9 @@
 <?php
-/**
+/*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,6 +23,16 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
+ */
+
+/**
+ * This api interacts with Prevem
+ *
+ * @package CiviCRM_APIv3
+ */
+
+/**
+ * @inheritDoc
  */
 function civicrm_api3_prevem_login($params) {
   $prevemUrl = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME, 'prevem_url');
