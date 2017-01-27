@@ -906,7 +906,7 @@ INNER JOIN civicrm_contact contact_target ON ( contact_target.id = act.contact_i
    */
   public static function clearContactCaches($contactID = NULL) {
     // clear acl cache if any.
-    CRM_ACL_BAO_Cache::resetCache();
+//    CRM_ACL_BAO_Cache::resetCache();
 
     if (empty($contactID)) {
       // also clear prev/next dedupe cache - if no contactID passed in
