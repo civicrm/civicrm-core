@@ -79,7 +79,8 @@ class CRM_Contact_Page_ImageFile extends CRM_Core_Page {
     if (!file_exists($file)) {
       header("HTTP/1.0 404 Not Found");
       return;
-    } elseif (!is_readable($file)) {
+    }
+    elseif (!is_readable($file)) {
       header('HTTP/1.0 403 Forbidden');
       return;
     }

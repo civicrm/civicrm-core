@@ -34,4 +34,5 @@ class SystemInstallEvent extends \Symfony\Component\EventDispatcher\Event {
    * The SystemInstallEvent fires once after installation - during the first page-view.
    */
   const EVENT_NAME = 'civi.core.install';
+
 }

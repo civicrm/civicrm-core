@@ -565,20 +565,6 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   /**
    * @inheritDoc
    */
-  public function getUniqueIdentifierFromUserObject($user) {
-    return $user->get('mail')->value;
-  }
-
-  /**
-   * @inheritDoc
-   */
-  public function getUserIDFromUserObject($user) {
-    return $user->get('uid')->value;
-  }
-
-  /**
-   * @inheritDoc
-   */
   public function synchronizeUsers() {
     $config = CRM_Core_Config::singleton();
     if (PHP_SAPI != 'cli') {
