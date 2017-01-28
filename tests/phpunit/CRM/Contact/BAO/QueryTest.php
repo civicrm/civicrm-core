@@ -365,4 +365,27 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
     $this->fail('Test failed for some reason which is not good');
   }
 
+  public function testGetSummaryQueryWithFinancialACLDisabled() {
+    $where = NULL;
+    $from = NULL;
+    $CRM_Contact_BAO_Query = new CRM_Contact_BAO_Query();
+    $query = $CRM_Contact_BAO_Query->getSummaryQuery($where, $from);
+    $this->assertEquals(" AND civicrm_contribution.financial_type_id IN (" . implode(',', array_keys($query[2])) . ") AND li.id IS NULL", $query[0]);
+  }
+
+  public function testGetSummaryQueryWithFinancialACLEnabled() {
+    $where = NULL;
+    $from = NULL;
+    $cid = $this->createLoggedInUser();
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('access CiviCRM', 'CiviCRM: view contributions of type Donation');
+    $CRM_Contact_BAO_Query = new CRM_Contact_BAO_Query();
+    $query = $CRM_Contact_BAO_Query->getSummaryQuery($where, $from);
+    $from  = $query[1];
+    $financialTypes = $query[2];
+    $this->assertEquals(
+      " LEFT JOIN civicrm_line_item li
+                  ON civicrm_contribution.id = li.contribution_id AND
+                     li.entity_table = 'civicrm_contribution' AND li.financial_type_id NOT IN (" . implode(',', array_keys($financialTypes)) . ") ", $from);
+  }
+
 }

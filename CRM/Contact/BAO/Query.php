@@ -4895,17 +4895,10 @@ SELECT COUNT( conts.total_amount ) as total_count,
     if ($context == 'search') {
       $where .= " AND contact_a.is_deleted = 0 ";
     }
-    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes);
-    if (!empty($financialTypes)) {
-      $where .= " AND civicrm_contribution.financial_type_id IN (" . implode(',', array_keys($financialTypes)) . ") AND li.id IS NULL";
-      $from .= " LEFT JOIN civicrm_line_item li
-                      ON civicrm_contribution.id = li.contribution_id AND
-                         li.entity_table = 'civicrm_contribution' AND li.financial_type_id NOT IN (" . implode(',', array_keys($financialTypes)) . ") ";
-    }
-    else {
-      $where .= " AND civicrm_contribution.financial_type_id IN (0)";
-    }
 
+    $query = $this->getSummaryQuery($where, $from);
+    $where = $query[0];
+    $from  = $query[1];
     // make sure contribution is completed - CRM-4989
     $completedWhere = $where . " AND civicrm_contribution.contribution_status_id = 1 ";
 
@@ -5033,6 +5026,31 @@ SELECT COUNT( conts.total_amount ) as cancel_count,
     }
 
     return $summary;
+  }
+
+  /**
+   * Function for getting the SummaryQuery of the respective financial type
+   *
+   * @param $where
+   * @param $from
+   *
+   * @return array
+   */
+  public function getSummaryQuery($where, $from) {
+    if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
+      $financialTypes = CRM_Contribute_PseudoConstant::financialType();
+    }
+    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes);
+    if (!empty($financialTypes)) {
+      $where .= " AND civicrm_contribution.financial_type_id IN (" . implode(',', array_keys($financialTypes)) . ") AND li.id IS NULL";
+      $from .= " LEFT JOIN civicrm_line_item li
+                  ON civicrm_contribution.id = li.contribution_id AND
+                     li.entity_table = 'civicrm_contribution' AND li.financial_type_id NOT IN (" . implode(',', array_keys($financialTypes)) . ") ";
+    }
+    else {
+      $where .= " AND civicrm_contribution.financial_type_id IN (0)";
+    }
+    return array($where, $from, $financialTypes);
   }
 
   /**
