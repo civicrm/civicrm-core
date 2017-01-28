@@ -386,7 +386,6 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
 
     $uid = $user->id();
     $contact_id = CRM_Core_BAO_UFMatch::getContactId($uid);
-
     // Store the contact id and user id in the session
     $session = CRM_Core_Session::singleton();
     $session->set('ufID', $uid);
@@ -560,6 +559,21 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
       }
     }
     return $modules;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function getUniqueIdentifierFromUserObject($user) {
+    print_r($user->get('mail')->value);
+    return $user->get('mail')->value;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function getUserIDFromUserObject($user) {
+    return $user->get('uid')->value;
   }
 
   /**
