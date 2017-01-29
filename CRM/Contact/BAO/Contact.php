@@ -3371,8 +3371,8 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
    * Ensures that is_primary gets assigned to another object if available
    * Also calls pre/post hooks
    *
-   * @var object $type
-   * @var int $id
+   * @param string $type
+   * @param int $id
    * @return bool
    */
   public static function deleteObjectWithPrimary($type, $id) {

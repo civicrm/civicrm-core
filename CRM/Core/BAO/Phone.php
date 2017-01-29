@@ -171,7 +171,9 @@ ORDER BY civicrm_phone.is_primary DESC,  phone_id ASC ";
   }
 
   /**
-   * Get all the phone numbers for a specified location_block id, with the primary phone being first
+   * Get all the phone numbers for a specified location_block id, with the primary phone being first.
+   *
+   * This is called from CRM_Core_BAO_Block as a calculated function.
    *
    * @param array $entityElements
    *   The array containing entity_id and.
