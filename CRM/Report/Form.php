@@ -4268,7 +4268,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
           $rowLabels = array();
           foreach ($rowValues as $rowValue) {
             if ($rowValue) {
-              $rowLabels[] = CRM_Core_Pseudoconstant::getLabel('CRM_Contact_BAO_Contact', $fieldName, $rowValue);
+              $rowLabels[] = CRM_Core_PseudoConstant::getLabel('CRM_Contact_BAO_Contact', $fieldName, $rowValue);
             }
           }
           $rows[$rowNum]['civicrm_contact_' . $fieldName] = implode(', ', $rowLabels);
@@ -4667,7 +4667,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
     CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes);
     if (empty($financialTypes)) {
       $contFTs = "0";
-      $liFTs = implode(',', array_keys(CRM_Contribute_Pseudoconstant::financialType()));
+      $liFTs = implode(',', array_keys(CRM_Contribute_PseudoConstant::financialType()));
     }
     else {
       $contFTs = $liFTs = implode(',', array_keys($financialTypes));
@@ -4874,7 +4874,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
     return implode(', ', array_filter($labels));
   }
 
-  /*
+  /**
    * Add statistics columns.
    *
    * If a group by is in play then add columns for the statistics fields.
