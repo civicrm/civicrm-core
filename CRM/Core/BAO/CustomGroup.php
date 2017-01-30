@@ -1884,12 +1884,6 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
       // add field information
       foreach ($value['fields'] as $k => $properties) {
         $properties['element_name'] = "custom_{$k}_-{$groupCount}";
-        if ($value = CRM_Utils_Request::retrieve($properties['element_name'], 'String', $form, FALSE, NULL, 'POST')) {
-          $formValues[$properties['element_name']] = $value;
-        }
-        elseif (isset($submittedValues[$properties['element_name']])) {
-          $properties['element_value'] = $submittedValues[$properties['element_name']];
-        }
         if (isset($properties['customValue']) &&
           !CRM_Utils_System::isNull($properties['customValue']) &&
           !isset($properties['element_value'])
@@ -1905,6 +1899,12 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
               $properties['element_value'] = $properties['customValue'][$groupCount]['data'];
             }
           }
+        }
+        if ($value = CRM_Utils_Request::retrieve($properties['element_name'], 'String', $form, FALSE, NULL, 'POST')) {
+          $formValues[$properties['element_name']] = $value;
+        }
+        elseif (isset($submittedValues[$properties['element_name']])) {
+          $properties['element_value'] = $submittedValues[$properties['element_name']];
         }
         unset($properties['customValue']);
         $formattedGroupTree[$key]['fields'][$k] = $properties;
