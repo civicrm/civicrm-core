@@ -303,6 +303,32 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
   }
 
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_4_7_17($rev) {
+    $this->addTask('CRM-19385 - Look at REMOVING id column from cache tables', 'removeIdFromCacheTables');
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
+  }
+
+  /**
+   * Remove id from Cache tables.
+   *
+   * @return bool
+   */
+  public static function removeIdFromCacheTables() {
+    $tables = array('civicrm_cache', 'civicrm_acl_contact_cache', 'civicrm_group_contact_cache');
+    foreach ($tables as $table) {
+      if (CRM_Core_BAO_SchemaHandler::checkIfFieldExists($table, 'id')) {
+        CRM_Core_DAO::executeQuery("ALTER TABLE `$table` DROP COLUMN `id`",
+        array(), TRUE, NULL, FALSE, FALSE);
+      }
+    }
+    return TRUE;
+  }
+
   /*
    * Important! All upgrade functions MUST add a 'runSql' task.
    * Uncomment and use the following template for a new upgrade version

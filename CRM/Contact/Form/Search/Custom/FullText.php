@@ -224,6 +224,10 @@ CREATE TEMPORARY TABLE {$this->_entityIDTableName} (
 ) ENGINE=HEAP DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci
 ";
     CRM_Core_DAO::executeQuery($sql);
+
+    if (!empty($this->_formValues['is_unit_test'])) {
+      $this->_tableNameForTest = $this->_tableName;
+    }
   }
 
   public function fillTable() {
