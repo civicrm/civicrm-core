@@ -500,7 +500,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
             ) {
               $entityId = $this->_activityId;
             }
-            $url = CRM_Core_BAO_CustomField::getFileURL($entityId, $key);
+            $url = CRM_Core_BAO_CustomField::getFileURL($entityId, $key, $value);
 
             if ($url) {
               $customFiles[$name]['displayURL'] = ts("Attached File") . ": {$url['file_url']}";
