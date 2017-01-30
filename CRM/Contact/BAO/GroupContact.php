@@ -134,6 +134,9 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
     $status = 'Added',
     $tracking = NULL
   ) {
+    if (empty($contactIds) || empty($groupId)) {
+      return array();
+    }
 
     CRM_Utils_Hook::pre('create', 'GroupContact', $groupId, $contactIds);
 
