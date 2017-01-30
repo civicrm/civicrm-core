@@ -1522,9 +1522,12 @@ if (!CRM.vars) CRM.vars = {};
         $(this).siblings('input:text').val('').trigger('change', ['crmClear']);
         return false;
       })
-      .on('change', 'input.crm-form-radio:checked, input[allowclear=1]', function(e, context) {
+      .on('change keyup', 'input.crm-form-radio:checked, input[allowclear=1]', function(e, context) {
         if (context !== 'crmClear' && ($(this).is(':checked') || ($(this).is('[allowclear=1]') && $(this).val()))) {
           $(this).siblings('.crm-clear-link').css({visibility: ''});
+        }
+        if (context !== 'crmClear' && $(this).is('[allowclear=1]') && $(this).val() === '') {
+          $(this).siblings('.crm-clear-link').css({visibility: 'hidden'});
         }
       })
 
