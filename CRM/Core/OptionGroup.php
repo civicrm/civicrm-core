@@ -145,8 +145,14 @@ WHERE  v.option_group_id = g.id
 
     if ($onlyActive) {
       $query .= " AND  v.is_active = 1 ";
-      $enabledComponents = '"' . implode('","', CRM_Core_Config::singleton()->enableComponents) . '"';
-      $query .= " AND  (v.component_id IS NULL OR v.component_id IN (SELECT id FROM civicrm_component WHERE name IN ($enabledComponents))) ";
+      // Only show options for enabled components
+      $componentClause = ' v.component_id IS NULL ';
+      $enabledComponents = CRM_Core_Config::singleton()->enableComponents;
+      if ($enabledComponents) {
+        $enabledComponents = '"' . implode('","', $enabledComponents) . '"';
+        $componentClause .= " OR v.component_id IN (SELECT id FROM civicrm_component WHERE name IN ($enabledComponents)) ";
+      }
+      $query .= " AND ($componentClause) ";
     }
     if (in_array($name, self::$_domainIDGroups)) {
       $query .= " AND v.domain_id = " . CRM_Core_Config::domainID();

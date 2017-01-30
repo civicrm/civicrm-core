@@ -213,6 +213,8 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
    * Check that component is honoured when fetching options.
    */
   public function testGetOptionWithComponent() {
+    $components = Civi::settings()->get('enable_components');
+    CRM_Core_BAO_ConfigSetting::enableComponent('CiviContribute');
     $this->callAPISuccess('option_group', 'get', array(
       'name' => 'gender',
       'api.option_value.create' => array(
@@ -226,6 +228,7 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
       'context' => 'create',
     ));
     $this->assertContains('Contrib', $genders['values']);
+
     // Disable relevant component
     CRM_Core_BAO_ConfigSetting::disableComponent('CiviContribute');
     CRM_Core_PseudoConstant::flush();
@@ -241,6 +244,19 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
       'context' => 'get',
     ));
     $this->assertContains('Contrib', $genders['values']);
+
+    // Now disable all components and ensure we can still fetch options with no errors
+    CRM_Core_BAO_ConfigSetting::setEnabledComponents(array());
+    CRM_Core_PseudoConstant::flush();
+    // New option should still be hidden for "create" context
+    $genders = $this->callAPISuccess('contact', 'getoptions', array(
+      'field' => 'gender_id',
+      'context' => 'create',
+    ));
+    $this->assertNotContains('Contrib', $genders['values']);
+
+    // Restore original state
+    CRM_Core_BAO_ConfigSetting::setEnabledComponents($components);
   }
 
   /**
