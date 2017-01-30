@@ -7,16 +7,6 @@
   <comment>Table to cache items for civicrm components.</comment>
   <add>2.1</add>
   <field>
-    <name>id</name>
-    <type>int unsigned</type>
-    <required>true</required>
-    <add>2.1</add>
-  </field>
-  <primaryKey>
-    <name>id</name>
-    <autoincrement>true</autoincrement>
-  </primaryKey>
-  <field>
     <name>group_name</name>
     <type>varchar</type>
     <length>32</length>
