@@ -754,7 +754,7 @@ class CRM_Utils_Token {
           $value = CRM_Core_PseudoConstant::getLabel('CRM_Contact_BAO_Contact', $token, $value);
         }
       }
-      elseif ($value && CRM_Utils_String::endsWith($token, '_date')) {
+      elseif ($value && preg_match('/_date$/', $token)) {
         $value = CRM_Utils_Date::customFormat($value);
       }
     }
@@ -1742,7 +1742,7 @@ class CRM_Utils_Token {
       default:
         if (in_array($token, self::$_tokens[$entity])) {
           $value = $membership[$token];
-          if (CRM_Utils_String::endsWith($token, '_date')) {
+          if (preg_match('/_date$/', $token)) {
             $value = CRM_Utils_Date::customFormat($value);
           }
         }
