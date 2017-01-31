@@ -1416,6 +1416,10 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $_SERVER['REQUEST_METHOD'] = 'GET';
     $this->controller = new CRM_Core_Controller();
 
+    if (CRM_Utils_Array::value('price_set_id', $params)) {
+      $this->_priceSet = current(CRM_Price_BAO_PriceSet::getSetDetail($params['price_set_id']));
+    }
+
     CRM_Contribute_Form_AdditionalInfo::buildPremium($this);
 
     $this->_fields = array();

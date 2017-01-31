@@ -1416,4 +1416,86 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     );
   }
 
+  /**
+   * Test form submission CRM-16228.
+   */
+  public function testSubmitContributionPageWithPriceSetHavingTaxCRM16228() {
+    $this->_priceSetParams['is_quick_config'] = 0;
+    $this->enableTaxAndInvoicing();
+    $financialType = $this->createFinancialType();
+    $financialAccount = $this->relationForFinancialTypeWithFinancialAccount($financialType['id'], 5);
+    $this->setUpContributionPage();
+    $submitParams = array(
+      'price_' . $this->_ids['price_field'][0] => reset($this->_ids['price_field_value']),
+      'id' => (int) $this->_ids['contribution_page'],
+      'first_name' => 'Billy',
+      'last_name' => 'Gruff',
+      'email' => 'billy@goat.gruff',
+      'is_pay_later' => TRUE,
+    );
+    $priceSetID = reset($this->_ids['price_set']);
+    $priceFieldId = $this->addTaxTextPriceFields($priceSetID, $financialType['id'], '16.85');
+    $submitParams['price_' . $priceFieldId] = 100;
+    $this->callAPISuccess('contribution_page', 'submit', $submitParams);
+    $contribution = $this->callAPISuccessGetSingle('contribution', array(
+      'contribution_page_id' => $this->_ids['contribution_page'],
+      'contribution_status_id' => 2,
+      'return' => array('total_amount', 'tax_amount'),
+    ));
+    $this->assertEquals($contribution['tax_amount'], '84.25', 'Wrong Tax amount is calculated and stored.');
+    // 10 + (100 * 16.85) + (100 * 16.85 * 0.05)
+    $this->assertEquals($contribution['total_amount'], '1779.25', 'Total amount no matching.');
+    $lineItem = $this->callAPISuccess('LineItem', 'get', array(
+      'contribution_id' => $contribution['id'],
+    ));
+    $lineTotal = array(1685, 10);
+    $lineTaxAmount = array('84.25', NULL);
+    foreach ($lineItem['values'] as $line) {
+      $this->assertEquals(CRM_Utils_Array::value('tax_amount', $line), array_pop($lineTaxAmount), 'Wrong Tax amount is calculated and stored.');
+      $this->assertEquals($line['line_total'], array_pop($lineTotal), 'Total amount no matching.');
+    }
+  }
+
+  /**
+   * Test form submission CRM-16228.
+   */
+  public function testSubmitContributionPageWithPriceSetHaving2PriceFieldTaxCRM16228() {
+    $this->_priceSetParams['is_quick_config'] = 0;
+    $this->enableTaxAndInvoicing();
+    $financialType = $this->createFinancialType();
+    $financialAccount = $this->relationForFinancialTypeWithFinancialAccount($financialType['id'], 5);
+    $this->setUpContributionPage();
+    $submitParams = array(
+      'price_' . $this->_ids['price_field'][0] => reset($this->_ids['price_field_value']),
+      'id' => (int) $this->_ids['contribution_page'],
+      'first_name' => 'Billy',
+      'last_name' => 'Gruff',
+      'email' => 'billy@goat.gruff',
+      'is_pay_later' => TRUE,
+    );
+    $priceSetID = reset($this->_ids['price_set']);
+    $priceFieldId = $this->addTaxTextPriceFields($priceSetID, $financialType['id'], '16.85');
+    $submitParams['price_' . $priceFieldId] = 100;
+    $priceFieldId = $this->addTaxTextPriceFields($priceSetID, $financialType['id'], '13.33');
+    $submitParams['price_' . $priceFieldId] = 10;
+    $this->callAPISuccess('contribution_page', 'submit', $submitParams);
+    $contribution = $this->callAPISuccessGetSingle('contribution', array(
+      'contribution_page_id' => $this->_ids['contribution_page'],
+      'contribution_status_id' => 2,
+      'return' => array('total_amount', 'tax_amount'),
+    ));
+    $this->assertEquals($contribution['tax_amount'], '90.92', 'Wrong Tax amount is calculated and stored.');
+    // 10 + (100 * 16.85) + (100 * 16.85 * 0.05) + (10 * 13.33) + (10 * 13.33 * 0.05)
+    $this->assertEquals($contribution['total_amount'], '1919.22', 'Total amount no matching.');
+    $lineItem = $this->callAPISuccess('LineItem', 'get', array(
+      'contribution_id' => $contribution['id'],
+    ));
+    $lineTotal = array('133.30', '1685', '10');
+    $lineTaxAmount = array('6.67', '84.25', NULL);
+    foreach ($lineItem['values'] as $line) {
+      $this->assertEquals(CRM_Utils_Array::value('tax_amount', $line), array_pop($lineTaxAmount), 'Wrong Tax amount is calculated and stored.');
+      $this->assertEquals($line['line_total'], array_pop($lineTotal), 'Total amount no matching.');
+    }
+  }
+
 }

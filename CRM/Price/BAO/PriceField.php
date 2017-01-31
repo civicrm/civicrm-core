@@ -597,7 +597,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
    * @return array
    *   array of options
    */
-  public static function getOptions($fieldId, $inactiveNeeded = FALSE, $reset = FALSE, $isDefaultContributionPriceSet = FALSE) {
+  public static function getOptions($fieldId, $inactiveNeeded = FALSE, $reset = FALSE, $isDefaultContributionPriceSet = FALSE, $htmlType = NULL) {
     static $options = array();
     if ($reset) {
       $options = array();
@@ -618,7 +618,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
       foreach ($options[$fieldId] as $priceFieldId => $priceFieldValues) {
         if (isset($priceFieldValues['financial_type_id']) && array_key_exists($priceFieldValues['financial_type_id'], $taxRates) && !$isDefaultContributionPriceSet) {
           $options[$fieldId][$priceFieldId]['tax_rate'] = $taxRates[$priceFieldValues['financial_type_id']];
-          $taxAmount = CRM_Contribute_BAO_Contribution_Utils::calculateTaxAmount($priceFieldValues['amount'], $options[$fieldId][$priceFieldId]['tax_rate']);
+          $taxAmount = CRM_Contribute_BAO_Contribution_Utils::calculateTaxAmount($priceFieldValues['amount'], $options[$fieldId][$priceFieldId]['tax_rate'], $htmlType);
           $options[$fieldId][$priceFieldId]['tax_amount'] = $taxAmount['tax_amount'];
         }
       }

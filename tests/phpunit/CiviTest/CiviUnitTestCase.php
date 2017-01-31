@@ -3674,13 +3674,13 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
    *
    * @return obj
    */
-  protected function relationForFinancialTypeWithFinancialAccount($financialTypeId) {
+  protected function relationForFinancialTypeWithFinancialAccount($financialTypeId, $taxRate = 10) {
     $params = array(
       'name' => 'Sales tax account ' . substr(sha1(rand()), 0, 4),
       'financial_account_type_id' => key(CRM_Core_PseudoConstant::accountOptionValues('financial_account_type', NULL, " AND v.name LIKE 'Liability' ")),
       'is_deductible' => 1,
       'is_tax' => 1,
-      'tax_rate' => 10,
+      'tax_rate' => $taxRate,
       'is_active' => 1,
     );
     $account = CRM_Financial_BAO_FinancialAccount::add($params);
@@ -3765,6 +3765,45 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     $this->_ids['price_field'] = array($priceField['id']);
 
     $this->_ids['membership_type'] = $membershipTypeID;
+  }
+
+  /**
+   * Function to add additional price fields to priceset with tax.
+   * @param int $priceSetID
+   * @param int $financialTypeId
+   * @param float $textFieldAmount
+   */
+  public function addTaxTextPriceFields($priceSetID, $financialTypeId, $textFieldAmount) {
+    $priceField = $this->callAPISuccess('price_field', 'create', array(
+      'price_set_id' => $priceSetID,
+      'label' => 'No. of Person(s)' . substr(sha1(rand()), 0, 7),
+      'html_type' => 'Text',
+    ));
+    $priceFieldValue = $this->callAPISuccess('price_field_value', 'create', array(
+      'price_set_id' => $priceSetID,
+      'price_field_id' => $priceField['id'],
+      'label' => 'No. of Person(s)' . substr(sha1(rand()), 0, 7),
+      'financial_type_id' => $financialTypeId,
+      'amount' => $textFieldAmount,
+    ));
+    // clear cached values in this function.
+    CRM_Price_BAO_PriceField::getOptions(NULL, FALSE, TRUE);
+    return $priceField['id'];
+  }
+
+  /**
+   * Add Contribution PriceSet.
+   * @param string $financialType
+   */
+  public function createContributionPriceSet($financialType = 'Donation') {
+    $params = array(
+      'is_quick_config' => 0,
+      'extends' => 'CiviContribute',
+      'financial_type_id' => $financialType,
+      'title' => 'Price-set-test' . substr(sha1(rand()), 0, 7),
+    );
+    $priceSet = $this->callAPISuccess('price_set', 'create', $params);
+    return $priceSet['id'];
   }
 
 }
