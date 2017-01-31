@@ -227,8 +227,7 @@ class Requirements {
       'details' => "Connected",
     );
 
-    $host = isset($db_config['server']) ? $db_config['server'] : $db_config['host'];
-    $conn = @mysqli_connect($host, $db_config['username'], $db_config['password']);
+    $conn = @mysqli_connect($host, $db_config['username'], $db_config['password'], $db_config['database'], $db_config['port']);
 
     if (!$conn) {
       $results['details'] = mysqli_connect_error();
@@ -257,8 +256,7 @@ class Requirements {
       'severity' => $this::REQUIREMENT_OK,
     );
 
-    $host = isset($db_config['server']) ? $db_config['server'] : $db_config['host'];
-    $conn = @mysqli_connect($host, $db_config['username'], $db_config['password']);
+    $conn = @mysqli_connect($host, $db_config['username'], $db_config['password'], $db_config['database'], $db_config['port']);
     if (!$conn || !($info = mysqli_get_server_info($conn))) {
       $results['severity'] = $this::REQUIREMENT_WARNING;
       $results['details'] = "Cannot determine the version of MySQL installed. Please ensure at least version {$min} is installed.";
@@ -287,7 +285,7 @@ class Requirements {
       'details' => 'Could not determine if MySQL has InnoDB support. Assuming none.',
     );
 
-    $conn = @mysqli_connect($db_config['host'], $db_config['username'], $db_config['password']);
+    $conn = @mysqli_connect($host, $db_config['username'], $db_config['password'], $db_config['database'], $db_config['port']);
     if (!$conn) {
       return $results;
     }
@@ -322,7 +320,7 @@ class Requirements {
       'details' => 'MySQL server supports temporary tables',
     );
 
-    $conn = @mysqli_connect($db_config['host'], $db_config['username'], $db_config['password']);
+    $conn = @mysqli_connect($host, $db_config['username'], $db_config['password'], $db_config['database'], $db_config['port']);
     if (!$conn) {
       $results['severity'] = $this::REQUIREMENT_ERROR;
       $results['details'] = "Could not connect to database";
@@ -358,7 +356,7 @@ class Requirements {
       'details' => 'Database supports MySQL triggers',
     );
 
-    $conn = @mysqli_connect($db_config['host'], $db_config['username'], $db_config['password']);
+    $conn = @mysqli_connect($host, $db_config['username'], $db_config['password'], $db_config['database'], $db_config['port']);
     if (!$conn) {
       $results['severity'] = $this::REQUIREMENT_ERROR;
       $results['details'] = 'Could not connect to database';
@@ -403,7 +401,7 @@ class Requirements {
       'details' => 'MySQL server auto_increment_increment is 1',
     );
 
-    $conn = @mysqli_connect($db_config['host'], $db_config['username'], $db_config['password']);
+    $conn = @mysqli_connect($host, $db_config['username'], $db_config['password'], $db_config['database'], $db_config['port']);
     if (!$conn) {
       $results['severity'] = $this::REQUIREMENT_ERROR;
       $results['details'] = 'Could not connect to database';
@@ -439,8 +437,7 @@ class Requirements {
       'details' => 'MySQL thread_stack is OK',
     );
 
-    $host = isset($db_config['server']) ? $db_config['server'] : $db_config['host'];
-    $conn = @mysqli_connect($host, $db_config['username'], $db_config['password']);
+    $conn = @mysqli_connect($host, $db_config['username'], $db_config['password'], $db_config['database'], $db_config['port']);
     if (!$conn) {
       $results['severity'] = $this::REQUIREMENT_ERROR;
       $results['details'] = 'Could not connect to database';
@@ -481,8 +478,7 @@ class Requirements {
       'details' => 'Can successfully lock and unlock tables',
     );
 
-    $host = isset($db_config['server']) ? $db_config['server'] : $db_config['host'];
-    $conn = @mysqli_connect($host, $db_config['username'], $db_config['password']);
+    $conn = @mysqli_connect($host, $db_config['username'], $db_config['password'], $db_config['database'], $db_config['port']);
     if (!$conn) {
       $results['severity'] = $this::REQUIREMENT_ERROR;
       $results['details'] = 'Could not connect to database';
