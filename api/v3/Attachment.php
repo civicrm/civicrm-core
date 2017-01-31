@@ -147,6 +147,7 @@ function civicrm_api3_attachment_create($params) {
   $fileDao->copyValues($file);
   if (!$id) {
     $fileDao->uri = CRM_Utils_File::makeFileName($name);
+    $fileDao->created_id = CRM_Core_Session::getLoggedInContactID();
   }
   $fileDao->save();
 
@@ -299,6 +300,7 @@ function __civicrm_api3_attachment_find($params, $id, $file, $entityFile, $isTru
       'cf.mime_type',
       'cf.description',
       'cf.upload_date',
+      'cf.created_id',
       'cef.entity_table',
       'cef.entity_id',
     ));
@@ -431,6 +433,7 @@ function _civicrm_api3_attachment_format_result($fileDao, $entityFileDao, $retur
     'entity_table' => $entityFileDao->entity_table,
     'entity_id' => $entityFileDao->entity_id,
     'icon' => CRM_Utils_File::getIconFromMimeType($fileDao->mime_type),
+    'created_id' => $fileDao->created_id,
   );
   $result['url'] = CRM_Utils_System::url(
     'civicrm/file', 'reset=1&id=' . $result['id'] . '&eid=' . $result['entity_id'],
