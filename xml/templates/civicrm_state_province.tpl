@@ -767,7 +767,6 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (2132, 1045, "37", "Shandong"),
 (2133, 1045, "14", "Shanxi"),
 (2134, 1045, "51", "Sichuan"),
-(2135, 1045, "71", "Taiwan"),
 (2136, 1045, "53", "Yunnan"),
 (2137, 1045, "33", "Zhejiang"),
 (2138, 1045, "45", "Guangxi"),
