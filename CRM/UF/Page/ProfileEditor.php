@@ -64,15 +64,15 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
       ->addScriptFile('civicrm', 'packages/jquery/plugins/jstree/jquery.jstree.js', 0, 'html-header', FALSE)
       ->addStyleFile('civicrm', 'packages/jquery/plugins/jstree/themes/default/style.css', 0, 'html-header')
       ->addStyleFile('civicrm', 'css/crm.designer.css', 140, 'html-header')
-      ->addScriptFile('civicrm', 'js/crm.backbone.js', 150)
-      ->addScriptFile('civicrm', 'js/model/crm.schema-mapped.js', 200)
-      ->addScriptFile('civicrm', 'js/model/crm.uf.js', 200)
-      ->addScriptFile('civicrm', 'js/model/crm.designer.js', 200)
-      ->addScriptFile('civicrm', 'js/model/crm.profile-selector.js', 200)
-      ->addScriptFile('civicrm', 'js/view/crm.designer.js', 200)
-      ->addScriptFile('civicrm', 'js/view/crm.profile-selector.js', 200)
-      ->addScriptFile('civicrm', 'js/jquery/jquery.crmProfileSelector.js', 250)
-      ->addScriptFile('civicrm', 'js/crm.designerapp.js', 250);
+      ->addScriptFile('civicrm', 'js/crm.backbone.js', 150, 'html-header', FALSE)
+      ->addScriptFile('civicrm', 'js/model/crm.schema-mapped.js', 200, 'html-header', FALSE)
+      ->addScriptFile('civicrm', 'js/model/crm.uf.js', 200, 'html-header', FALSE)
+      ->addScriptFile('civicrm', 'js/model/crm.designer.js', 200, 'html-header', FALSE)
+      ->addScriptFile('civicrm', 'js/model/crm.profile-selector.js', 200, 'html-header', FALSE)
+      ->addScriptFile('civicrm', 'js/view/crm.designer.js', 200, 'html-header', FALSE)
+      ->addScriptFile('civicrm', 'js/view/crm.profile-selector.js', 200, 'html-header', FALSE)
+      ->addScriptFile('civicrm', 'js/jquery/jquery.crmProfileSelector.js', 250, 'html-header', FALSE)
+      ->addScriptFile('civicrm', 'js/crm.designerapp.js', 250, 'html-header', FALSE);
 
     CRM_Core_Region::instance('page-header')->add(array(
       'template' => 'CRM/UF/Page/ProfileTemplates.tpl',
