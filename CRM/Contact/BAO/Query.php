@@ -656,7 +656,8 @@ class CRM_Contact_BAO_Query {
         (substr($name, 0, 5) == 'case_') ||
         (substr($name, 0, 13) == 'contribution_' &&
           (strpos($name, 'source') !== FALSE && strpos($name, 'recur') !== FALSE)) ||
-        (substr($name, 0, 8) == 'payment_')
+        (substr($name, 0, 8) == 'payment_') ||
+        (substr($name, 0, 6) == 'grant_')
       ) {
         continue;
       }
@@ -2557,11 +2558,9 @@ class CRM_Contact_BAO_Query {
     // add group_contact and group table is subscription history is present
     if (!empty($tables['civicrm_subscription_history']) && empty($tables['civicrm_group'])) {
       $tables = array_merge(array(
-          'civicrm_group' => 1,
-          'civicrm_group_contact' => 1,
-        ),
-        $tables
-      );
+        'civicrm_group' => 1,
+        'civicrm_group_contact' => 1,
+      ), $tables);
     }
 
     // to handle table dependencies of components
@@ -4052,8 +4051,7 @@ WHERE  $smartGroupClause
       //add contacts from static groups
       $this->_tables['civicrm_relationship_group_contact'] = $this->_whereTables['civicrm_relationship_group_contact']
         = " LEFT JOIN civicrm_group_contact civicrm_relationship_group_contact ON civicrm_relationship_group_contact.contact_id = contact_b.id AND civicrm_relationship_group_contact.status = 'Added'";
-      $groupWhere[] = "( civicrm_relationship_group_contact.group_id IN  (" .
-        implode(",", $targetGroup[2]) . ") ) ";
+      $groupWhere[] = "( civicrm_relationship_group_contact.group_id IN  (" . implode(",", $targetGroup[2]) . ") ) ";
 
       //add contacts from saved searches
       $ssWhere = $this->addGroupContactCache($targetGroup[2], "civicrm_relationship_group_contact_cache", "contact_b", $op);
@@ -5782,7 +5780,7 @@ AND   displayRelType.is_active = 1
   public static function parseSearchBuilderString($string, $dataType = 'Integer') {
     $string = trim($string);
     if (substr($string, 0, 1) != '(' || substr($string, -1, 1) != ')') {
-      Return FALSE;
+      return FALSE;
     }
 
     $string = substr($string, 1, -1);
