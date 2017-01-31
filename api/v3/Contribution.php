@@ -528,7 +528,7 @@ function _civicrm_api3_contribution_completetransaction_spec(&$params) {
   $params['trxn_date'] = array(
     'title' => 'Transaction Date',
     'description' => 'Date this transaction occurred',
-    'type' => CRM_Utils_Type::T_DATE,
+    'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
   );
 }
 
@@ -680,7 +680,7 @@ function _civicrm_api3_contribution_repeattransaction_spec(&$params) {
   $params['receive_date'] = array(
     'title' => 'Contribution Receive Date',
     'name' => 'receive_date',
-    'type' => CRM_Utils_Type::T_DATE,
+    'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
     'api.default' => 'now',
   );
   $params['trxn_id'] = array(
