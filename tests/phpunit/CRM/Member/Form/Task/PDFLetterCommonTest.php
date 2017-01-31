@@ -77,7 +77,7 @@ class CRM_Member_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
 
       // Form an expected array replacing tokens for each contact.
       foreach ($tokens as $key => $val) {
-        if (CRM_Utils_String::endsWith($val, '_date')) {
+        if (preg_match('/_date$/', $val)) {
           $formattedDate = CRM_Utils_Date::customFormat($params[$val]);
           $expected[$contactId][$val] = "{$key} - {$formattedDate}";
         }
