@@ -29,12 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2017
- * $Id$
- *
  */
 
 /**
- * Business object for managing price sets
+ * Business object for managing price sets.
  *
  */
 class CRM_Price_BAO_PriceSet extends CRM_Price_DAO_PriceSet {
@@ -191,7 +189,7 @@ WHERE       ps.name = '{$entityName}'
    *
    * @return array
    */
-  public static function &getUsedBy($id, $simpleReturn = FALSE) {
+  public static function getUsedBy($id, $simpleReturn = FALSE) {
     $usedBy = $forms = $tables = array();
     $queryString = "
 SELECT   entity_table, entity_id
@@ -374,7 +372,7 @@ WHERE     ct.id = cp.financial_type_id AND
   }
 
   /**
-   * Find a price_set_id associatied with the given table, id and usedFor
+   * Find a price_set_id associated with the given table, id and usedFor
    * Used For value for events:1, contribution:2, membership:3
    *
    * @param string $entityTable
@@ -624,7 +622,7 @@ WHERE  id = %1";
    */
   public static function getOnlyPriceFieldID(array $priceSet) {
     if (count($priceSet['fields']) > 1) {
-      throw new CRM_Core_Exception(ts('expected only one price field to be in priceset but multiple are present'));
+      throw new CRM_Core_Exception(ts('expected only one price field to be in price set but multiple are present'));
     }
     return (int) implode('_', array_keys($priceSet['fields']));
   }
@@ -640,7 +638,7 @@ WHERE  id = %1";
   public static function getOnlyPriceFieldValueID(array $priceSet) {
     $priceFieldID = self::getOnlyPriceFieldID($priceSet);
     if (count($priceSet['fields'][$priceFieldID]['options']) > 1) {
-      throw new CRM_Core_Exception(ts('expected only one price field to be in priceset but multiple are present'));
+      throw new CRM_Core_Exception(ts('expected only one price field to be in price set but multiple are present'));
     }
     return (int) implode('_', array_keys($priceSet['fields'][$priceFieldID]['options']));
   }
@@ -666,7 +664,7 @@ WHERE  id = %1";
       $priceSetId = self::getFor($entityTable, $id);
     }
 
-    //check if priceset is is_config
+    //check if price set is is_config
     if (is_numeric($priceSetId)) {
       if (CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $priceSetId, 'is_quick_config') && $form->getVar('_name') != 'Participant') {
         $form->assign('quickConfig', 1);
@@ -714,16 +712,16 @@ WHERE  id = %1";
         //get option count info.
         $form->_priceSet['optionsCountTotal'] = self::getPricesetCount($priceSetId);
         if ($form->_priceSet['optionsCountTotal']) {
-          $optionsCountDeails = array();
+          $optionsCountDetails = array();
           if (!empty($form->_priceSet['fields'])) {
             foreach ($form->_priceSet['fields'] as $field) {
               foreach ($field['options'] as $option) {
                 $count = CRM_Utils_Array::value('count', $option, 0);
-                $optionsCountDeails['fields'][$field['id']]['options'][$option['id']] = $count;
+                $optionsCountDetails['fields'][$field['id']]['options'][$option['id']] = $count;
               }
             }
           }
-          $form->_priceSet['optionsCountDetails'] = $optionsCountDeails;
+          $form->_priceSet['optionsCountDetails'] = $optionsCountDetails;
         }
 
         //get option max value info.
@@ -769,6 +767,7 @@ WHERE  id = %1";
    * @param string $component
    *   This parameter appears to only be relevant to determining whether memberships should be auto-renewed.
    *   (and is effectively a boolean for 'is_membership' which could be calculated from the line items.)
+   * @param int $priceSetID
    */
   public static function processAmount($fields, &$params, &$lineItem, $component = '', $priceSetID = NULL) {
     // using price set
@@ -1190,7 +1189,7 @@ WHERE  id = %1";
       return $defaults;
     }
 
-    foreach ($form->_priceSet['fields'] as $key => $val) {
+    foreach ($form->_priceSet['fields'] as $val) {
       foreach ($val['options'] as $keys => $values) {
         // build price field index which is passed via URL
         // url format will be appended by "&price_5=11"
@@ -1744,7 +1743,7 @@ WHERE       ps.id = %1
   public static function getNonDeductibleAmountFromPriceSet($priceSetId, $lineItem) {
     $nonDeductibleAmount = 0;
     if (!empty($lineItem[$priceSetId])) {
-      foreach ($lineItem[$priceSetId] as $fieldId => $options) {
+      foreach ($lineItem[$priceSetId] as $options) {
         $nonDeductibleAmount += $options['non_deductible_amount'] * $options['qty'];
       }
     }
