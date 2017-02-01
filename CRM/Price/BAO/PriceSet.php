@@ -226,7 +226,7 @@ WHERE     cpf.price_set_id = %1";
   }
 
   /**
-   * Delete the price set.
+   * Delete the price set, including the fields.
    *
    * @param int $id
    *   Price Set id.
@@ -237,19 +237,6 @@ WHERE     cpf.price_set_id = %1";
    *
    */
   public static function deleteSet($id) {
-    // remove from all inactive forms
-    $usedBy = self::getUsedBy($id);
-    if (isset($usedBy['civicrm_event'])) {
-      foreach ($usedBy['civicrm_event'] as $eventId => $unused) {
-        $eventDAO = new CRM_Event_DAO_Event();
-        $eventDAO->id = $eventId;
-        $eventDAO->find();
-        while ($eventDAO->fetch()) {
-          self::removeFrom('civicrm_event', $eventDAO->id);
-        }
-      }
-    }
-
     // delete price fields
     $priceField = new CRM_Price_DAO_PriceField();
     $priceField->price_set_id = $id;
