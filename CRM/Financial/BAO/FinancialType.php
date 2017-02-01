@@ -395,7 +395,33 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
   }
 
   /**
-   * Check if FT-ACL is turned on or off
+   * Check if the logged in user has permission to edit the given financial type.
+   *
+   * This is called when determining if they can edit things like option values
+   * in price sets. At the moment it is not possible to change an option value from
+   * a type you do not have permission to to a type that you do.
+   *
+   * @todo it is currently not possible to edit disabled types if you have ACLs on.
+   * Do ACLs still apply once disabled? That question should be resolved if tackling
+   * that gap.
+   *
+   * @param int $financialTypeID
+   *
+   * @return bool
+   */
+  public static function checkPermissionToEditFinancialType($financialTypeID) {
+    if (!self::isACLFinancialTypeStatus()) {
+      return TRUE;
+    }
+    // @todo consider adding back in disabled types here.
+    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes, CRM_Core_Action::UPDATE);
+    return isset($financialTypes[$financialTypeID]);
+  }
+
+  /**
+   * Check if FT-ACL is turned on or off.
+   *
+   * @todo rename this function e.g isFinancialTypeACLsEnabled.
    *
    * @return bool
    */
