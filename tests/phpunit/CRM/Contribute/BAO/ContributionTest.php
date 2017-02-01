@@ -1229,9 +1229,9 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
   }
 
   /**
-   * test for function calculateTaxAfterChangeInFinancialTypeForLineItems()
+   * test for function calculateTaxForLineItems()
    */
-  public function testcalculateTaxAfterChangeInFinancialTypeForLineItems() {
+  public function testcalculateTaxForLineItems() {
     list($contribution, $financialAccount) = $this->createContributionWithTax();
     $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($contribution['id']);
     foreach ($lineItems as $id => $lineItem) {
@@ -1239,14 +1239,14 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       $lineItems[$id]['tax_rate'] = 20;
       $lineItems[$id]['id'] = $id;
     }
-    $taxAmount = CRM_Contribute_BAO_Contribution::calculateTaxAfterChangeInFinancialTypeForLineItems(array($lineItems), $contribution['id']);
+    $taxAmount = CRM_Contribute_BAO_Contribution::calculateTaxForLineItems(array($lineItems), $contribution['id']);
     $this->assertEquals($taxAmount, 20.00, 'Amount does not match.');
     foreach ($lineItems as $id => $lineItem) {
       $lineItems[$id]['line_total'] = 300;
       $lineItems[$id]['tax_rate'] = 0;
       $lineItems[$id]['id'] = $id;
     }
-    $taxAmount = CRM_Contribute_BAO_Contribution::calculateTaxAfterChangeInFinancialTypeForLineItems(array($lineItems), $contribution['id']);
+    $taxAmount = CRM_Contribute_BAO_Contribution::calculateTaxForLineItems(array($lineItems), $contribution['id']);
     $this->assertEquals($taxAmount, 0, 'Amount does not match.');
   }
 

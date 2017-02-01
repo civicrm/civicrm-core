@@ -5458,14 +5458,17 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
   }
 
   /**
-   * Calculate Tax for each item when Financial Type is changed.
+   * Calculate tax for individual line items.
    *
    * @param array $lineItem
+   *   an array of lineitems
    *
    * @param int $contributionId
+   *   the id of the contribution
    *
+   * @return array
    */
-  public static function calculateTaxAfterChangeInFinancialTypeForLineItems($lineItem, $contributionId) {
+  public static function calculateTaxForLineItems($lineItem, $contributionId) {
     $taxAmount = 0;
     $previousLineItem = CRM_Price_BAO_LineItem::getLineItemsByContributionID($contributionId);
     foreach ($lineItem as $items) {
