@@ -190,22 +190,16 @@ WHERE       ps.name = '{$entityName}'
    * @return array
    */
   public static function getUsedBy($id, $simpleReturn = FALSE) {
-    $usedBy = $forms = $tables = array();
-    $queryString = "
-SELECT   entity_table, entity_id
-FROM     civicrm_price_set_entity
-WHERE    price_set_id = %1";
-    $params = array(1 => array($id, 'Integer'));
-    $crmFormDAO = CRM_Core_DAO::executeQuery($queryString, $params);
-
-    while ($crmFormDAO->fetch()) {
-      $forms[$crmFormDAO->entity_table][] = $crmFormDAO->entity_id;
-      $tables[] = $crmFormDAO->entity_table;
-    }
-    // Return only tables
+    $usedBy = array();
+    $forms = self::getFormsUsingPriceSet($id);
+    $tables = array_keys($forms);
+    // @todo - this is really clumsy overloading the signature like this. Instead
+    // move towards having a function that does not call reformatUsedByFormsWithEntityData
+    // and call that when that data is not used.
     if ($simpleReturn == 'table') {
       return $tables;
     }
+    // @todo - this is painfully slow in some cases.
     if (empty($forms)) {
       $queryString = "
 SELECT    cli.entity_table, cli.entity_id
@@ -222,68 +216,11 @@ WHERE     cpf.price_set_id = %1";
         return $usedBy;
       }
     }
-    // Return only entity data
+    // @todo - this is really clumsy overloading the signature like this. See above.
     if ($simpleReturn == 'entity') {
       return $forms;
     }
-    foreach ($forms as $table => $entities) {
-      switch ($table) {
-        case 'civicrm_event':
-          $ids = implode(',', $entities);
-          $queryString = "SELECT ce.id as id, ce.title as title, ce.is_public as isPublic, ce.start_date as startDate, ce.end_date as endDate, civicrm_option_value.label as eventType, ce.is_template as isTemplate, ce.template_title as templateTitle
-FROM       civicrm_event ce
-LEFT JOIN  civicrm_option_value ON
-           ( ce.event_type_id = civicrm_option_value.value )
-LEFT JOIN  civicrm_option_group ON
-           ( civicrm_option_group.id = civicrm_option_value.option_group_id )
-WHERE
-         civicrm_option_group.name = 'event_type' AND
-           ce.id IN ($ids) AND
-           ce.is_active = 1;";
-          $crmDAO = CRM_Core_DAO::executeQuery($queryString);
-          while ($crmDAO->fetch()) {
-            if ($crmDAO->isTemplate) {
-              $usedBy['civicrm_event_template'][$crmDAO->id]['title'] = $crmDAO->templateTitle;
-              $usedBy['civicrm_event_template'][$crmDAO->id]['eventType'] = $crmDAO->eventType;
-              $usedBy['civicrm_event_template'][$crmDAO->id]['isPublic'] = $crmDAO->isPublic;
-            }
-            else {
-              $usedBy[$table][$crmDAO->id]['title'] = $crmDAO->title;
-              $usedBy[$table][$crmDAO->id]['eventType'] = $crmDAO->eventType;
-              $usedBy[$table][$crmDAO->id]['startDate'] = $crmDAO->startDate;
-              $usedBy[$table][$crmDAO->id]['endDate'] = $crmDAO->endDate;
-              $usedBy[$table][$crmDAO->id]['isPublic'] = $crmDAO->isPublic;
-            }
-          }
-          break;
-
-        case 'civicrm_contribution_page':
-          $ids = implode(',', $entities);
-          $queryString = "SELECT cp.id as id, cp.title as title, cp.start_date as startDate, cp.end_date as endDate,ct.name as type
-FROM      civicrm_contribution_page cp, civicrm_financial_type ct
-WHERE     ct.id = cp.financial_type_id AND
-          cp.id IN ($ids) AND
-          cp.is_active = 1;";
-          $crmDAO = CRM_Core_DAO::executeQuery($queryString);
-          while ($crmDAO->fetch()) {
-            $usedBy[$table][$crmDAO->id]['title'] = $crmDAO->title;
-            $usedBy[$table][$crmDAO->id]['type'] = $crmDAO->type;
-            $usedBy[$table][$crmDAO->id]['startDate'] = $crmDAO->startDate;
-            $usedBy[$table][$crmDAO->id]['endDate'] = $crmDAO->endDate;
-          }
-          break;
-
-        case 'civicrm_contribution':
-        case 'civicrm_membership':
-        case 'civicrm_participant':
-          $usedBy[$table] = 1;
-          break;
-
-        default:
-          CRM_Core_Error::fatal("$table is not supported in PriceSet::usedBy()");
-          break;
-      }
-    }
+    $usedBy = self::reformatUsedByFormsWithEntityData($forms, $usedBy);
 
     return $usedBy;
   }
@@ -1749,6 +1686,113 @@ WHERE       ps.id = %1
     }
 
     return $nonDeductibleAmount;
+  }
+
+  /**
+   * Get an array of all forms using a given price set.
+   *
+   * @param int $id
+   *
+   * @return array
+   *   Pages using the price set, keyed by type. e.g
+   *   array('
+   *     'civicrm_contribution_page' => array(2,5,6),
+   *     'civicrm_event' => array(5,6),
+   *     'civicrm_event_template' => array(7),
+   *   )
+   */
+  public static function getFormsUsingPriceSet($id) {
+    $forms = array();
+    $queryString = "
+SELECT   entity_table, entity_id
+FROM     civicrm_price_set_entity
+WHERE    price_set_id = %1";
+    $params = array(1 => array($id, 'Integer'));
+    $crmFormDAO = CRM_Core_DAO::executeQuery($queryString, $params);
+
+    while ($crmFormDAO->fetch()) {
+      $forms[$crmFormDAO->entity_table][] = $crmFormDAO->entity_id;
+    }
+    return $forms;
+  }
+
+  /**
+   * @param array $forms
+   *   Array of forms that use a price set keyed by entity. e.g
+   *   array('
+   *     'civicrm_contribution_page' => array(2,5,6),
+   *     'civicrm_event' => array(5,6),
+   *     'civicrm_event_template' => array(7),
+   *   )
+   *
+   * @return mixed
+   *   Array of entities suppliemented with per entity information.
+   *   e.g
+   *   array('civicrm_event' => array(7 => array('title' => 'x'...))
+   *
+   * @throws \Exception
+   */
+  protected static function reformatUsedByFormsWithEntityData($forms) {
+    $usedBy = array();
+    foreach ($forms as $table => $entities) {
+      switch ($table) {
+        case 'civicrm_event':
+          $ids = implode(',', $entities);
+          $queryString = "SELECT ce.id as id, ce.title as title, ce.is_public as isPublic, ce.start_date as startDate, ce.end_date as endDate, civicrm_option_value.label as eventType, ce.is_template as isTemplate, ce.template_title as templateTitle
+FROM       civicrm_event ce
+LEFT JOIN  civicrm_option_value ON
+           ( ce.event_type_id = civicrm_option_value.value )
+LEFT JOIN  civicrm_option_group ON
+           ( civicrm_option_group.id = civicrm_option_value.option_group_id )
+WHERE
+         civicrm_option_group.name = 'event_type' AND
+           ce.id IN ($ids) AND
+           ce.is_active = 1;";
+          $crmDAO = CRM_Core_DAO::executeQuery($queryString);
+          while ($crmDAO->fetch()) {
+            if ($crmDAO->isTemplate) {
+              $usedBy['civicrm_event_template'][$crmDAO->id]['title'] = $crmDAO->templateTitle;
+              $usedBy['civicrm_event_template'][$crmDAO->id]['eventType'] = $crmDAO->eventType;
+              $usedBy['civicrm_event_template'][$crmDAO->id]['isPublic'] = $crmDAO->isPublic;
+            }
+            else {
+              $usedBy[$table][$crmDAO->id]['title'] = $crmDAO->title;
+              $usedBy[$table][$crmDAO->id]['eventType'] = $crmDAO->eventType;
+              $usedBy[$table][$crmDAO->id]['startDate'] = $crmDAO->startDate;
+              $usedBy[$table][$crmDAO->id]['endDate'] = $crmDAO->endDate;
+              $usedBy[$table][$crmDAO->id]['isPublic'] = $crmDAO->isPublic;
+            }
+          }
+          break;
+
+        case 'civicrm_contribution_page':
+          $ids = implode(',', $entities);
+          $queryString = "SELECT cp.id as id, cp.title as title, cp.start_date as startDate, cp.end_date as endDate,ct.name as type
+FROM      civicrm_contribution_page cp, civicrm_financial_type ct
+WHERE     ct.id = cp.financial_type_id AND
+          cp.id IN ($ids) AND
+          cp.is_active = 1;";
+          $crmDAO = CRM_Core_DAO::executeQuery($queryString);
+          while ($crmDAO->fetch()) {
+            $usedBy[$table][$crmDAO->id]['title'] = $crmDAO->title;
+            $usedBy[$table][$crmDAO->id]['type'] = $crmDAO->type;
+            $usedBy[$table][$crmDAO->id]['startDate'] = $crmDAO->startDate;
+            $usedBy[$table][$crmDAO->id]['endDate'] = $crmDAO->endDate;
+          }
+          break;
+
+        case 'civicrm_contribution':
+        case 'civicrm_membership':
+        case 'civicrm_participant':
+          $usedBy[$table] = 1;
+          break;
+
+        default:
+          CRM_Core_Error::fatal("$table is not supported in PriceSet::usedBy()");
+          break;
+      }
+    }
+    return $usedBy;
   }
 
 }
