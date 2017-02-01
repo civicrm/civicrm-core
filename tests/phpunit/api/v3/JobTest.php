@@ -269,7 +269,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
     }
     $this->callAPISuccess('action_schedule', 'create', array(
       'title' => " remind all Texans",
-      'subject' => "drawling renewal",
+      'subject' => "drawling renewal", // hey, now.
       'entity_value' => $membershipTypeID,
       'mapping_id' => 4,
       'start_action_date' => 'membership_start_date',
@@ -284,6 +284,78 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $this->assertEquals($successfulCronCount, 1);
     $sentToID = CRM_Core_DAO::singleValueQuery("SELECT contact_id FROM civicrm_action_log");
     $this->assertEquals($sentToID, $theChosenOneID);
+  }
+
+  /**
+   * Test that scheduled reminders can be sent based on activty.created_date.
+   *
+   * Create one Contact
+   * Create one activity: assignee = Contact; activity_date_time = 1 year in future.
+   * Adjust the created_date for this activity to 61 minutes in the past.
+   * Create a scheduled reminder for 1 hour after activity.created_date.
+   * Call Job.send_reminder api.
+   * Assert reminder was sent to contact.
+   */
+  public function testCallSendReminderForActivityCreatedDate() {
+    // Create a contact.
+    $contactID = $this->individualCreate();
+
+    // Create an activity.
+    $activity_status_id = 1;
+    $activity_type_id = 1;
+    $activity_result = $this->callAPISuccess('Activity', 'create', array(
+      'sequential' => 1,
+      'activity_type_id' => $activity_type_id,
+      'subject' => __FUNCTION__ . ' subject',
+      'activity_date_time' => date("Y-m-d H:i:s", strtotime('+1 year')),
+      'status_id' => $activity_status_id,
+      'source_contact_id' => $contactID,
+    ));
+    $activity = $activity_result['values'][0];
+
+    // Assign contact to activity.
+    $result = $this->callAPISuccess('ActivityContact', 'create', array(
+      'sequential' => 1,
+      'activity_id' => $activity['id'],
+      'contact_id' => $contactID,
+      'record_type_id' => "Activity Assignees",
+    ));
+
+    // Update activity.created_date to 61 minutes past.
+    // This value is auto-set when the activity is created, and can't be set in
+    // Activity.create api, so we do it here manually.
+    $result = $this->callAPISuccess('Activity', 'create', array(
+      'sequential' => 1,
+      'id' => $activity['id'],
+      'created_date' => date("Y-m-d H:i:s", strtotime('-61 minute')),
+    ));
+
+    // Create a scheduled reminder.
+    $result = $this->callAPISuccess('action_schedule', 'create', array(
+      'name' => __FUNCTION__ . ' name',
+      'title' => __FUNCTION__ . ' title',
+      'recipient' => '1',
+      'entity_value' => $activity_type_id,
+      'entity_status' => $activity_status_id,
+      'start_action_offset' => '1',
+      'start_action_unit' => 'hour',
+      'start_action_condition' => 'after',
+      'start_action_date' => 'created_date',
+      'is_active' => '1',
+      'body_html' => __FUNCTION__ . ' html',
+      'subject' => __FUNCTION__ . ' subject',
+      'record_activity' => '1',
+      'mapping_id' => '1',
+      'mode' => 'Email',
+      'limit_to' => TRUE,
+    ));
+
+    $ret = $this->callAPISuccess('job', 'send_reminder', array());
+
+    $successfulCronCount = CRM_Core_DAO::singleValueQuery("SELECT count(*) FROM civicrm_action_log");
+    $this->assertEquals($successfulCronCount, 1, 'Action log reports wrong number of rows.');
+    $sentToID = CRM_Core_DAO::singleValueQuery("SELECT contact_id FROM civicrm_action_log");
+    $this->assertEquals($sentToID, $contactID, 'Action log reports wrong contact_id.');
   }
 
   public function testCallDisableExpiredRelationships() {

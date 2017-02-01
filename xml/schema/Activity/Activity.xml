@@ -469,4 +469,13 @@
     <headerPattern>/(activity.)?(star|favorite)/i</headerPattern>
     <add>4.7</add>
   </field>
+  <field>
+    <name>created_date</name>
+    <type>timestamp</type>
+    <comment>When was the activity created.</comment>
+    <required>false</required>
+    <export>true</export>
+    <default>NULL</default>
+    <add>4.7</add>
+  </field>
 </table>
