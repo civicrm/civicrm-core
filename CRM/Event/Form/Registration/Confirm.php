@@ -1317,6 +1317,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       return array($result, $value);
     }
     catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
+      Civi::log()->error('Payment processor exception: ' . $e->getMessage());
       CRM_Core_Session::singleton()->setStatus($e->getMessage());
       CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/event/register', "id={$this->_eventId}"));
     }
