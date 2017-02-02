@@ -41,6 +41,10 @@
             </td>
         </tr>
         {/if}
+        <tr class="crm-uf-form-block-syncCMSEmail">
+           <td class="label">{$form.syncCMSEmail.label}</td>
+           <td>{$form.syncCMSEmail.html}</td>
+       </tr>
         </table>
             <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 <div class="spacer"></div>
