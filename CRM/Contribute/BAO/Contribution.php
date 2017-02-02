@@ -5459,7 +5459,7 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
 
   /**
    * Calculate Tax when Financial Type is changed.
-   * This function is responsible for re-calculating the taxes applied to the total amount when the financial type is changed. 
+   * This function is responsible for re-calculating the taxes applied to the total amount when the financial type is changed.
    * In some cases, different financial types have financial accounts assigned which possess different tax amounts.
    * It is therefore necessary we update the total amount and the tax charged when the financial type is changed provided it is taxable.
    *
