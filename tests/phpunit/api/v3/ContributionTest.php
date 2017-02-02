@@ -252,6 +252,11 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals('bouncer', $contribution['contribution_check_number']);
 
     $fields = CRM_Contribute_BAO_Contribution::fields();
+    // Re-add these 2 to the fields to check. They were locked in but the metadata changed so we
+    // need to specify them.
+    $fields['address_id'] = $fields['contribution_address_id'];
+    $fields['check_number'] = $fields['contribution_check_number'];
+
     $fieldsLockedIn = array(
       'contribution_id', 'contribution_contact_id', 'financial_type_id', 'contribution_page_id',
       'payment_instrument_id', 'receive_date', 'non_deductible_amount', 'total_amount',

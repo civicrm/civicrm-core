@@ -97,12 +97,6 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
       $query->_tables['contribution_batch'] = 1;
     }
 
-    if (!empty($query->_returnProperties['contribution_source'])) {
-      $query->_select['contribution_source'] = "civicrm_contribution.source as contribution_source";
-      $query->_element['contribution_source'] = 1;
-      $query->_tables['civicrm_contribution'] = 1;
-    }
-
     // get contribution_status
     if (!empty($query->_returnProperties['contribution_status_id'])) {
       $query->_select['contribution_status_id'] = "contribution_status.value as contribution_status_id";
@@ -136,12 +130,6 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
       $query->_tables['contribution_payment_instrument'] = 1;
     }
 
-    if (!empty($query->_returnProperties['check_number'])) {
-      $query->_select['contribution_check_number'] = "civicrm_contribution.check_number as contribution_check_number";
-      $query->_element['contribution_check_number'] = 1;
-      $query->_tables['civicrm_contribution'] = 1;
-    }
-
     if (!empty($query->_returnProperties['contribution_campaign_id'])) {
       $query->_select['contribution_campaign_id'] = 'civicrm_contribution.campaign_id as contribution_campaign_id';
       $query->_element['contribution_campaign_id'] = 1;
@@ -152,22 +140,6 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
       $query->_select['contribution_campaign_title'] = "civicrm_campaign.title as contribution_campaign_title";
       $query->_element['contribution_campaign_title'] = $query->_tables['civicrm_campaign'] = 1;
     }
-
-    // Adding address_id in a way that is more easily extendable since the above is a bit ... wordy.
-    $supportedBasicReturnValues = array('address_id');
-    foreach ($supportedBasicReturnValues as $fieldName) {
-      if (!empty($query->_returnProperties[$fieldName]) && empty($query->_select[$fieldName])) {
-        $query->_select[$fieldName] = "civicrm_contribution.{$fieldName} as $fieldName";
-        $query->_element[$fieldName] = $query->_tables['civicrm_contribution'] = 1;
-      }
-    }
-
-    //CRM-16116: get financial_type_id
-    if (!empty($query->_returnProperties['financial_type_id'])) {
-      $query->_select['financial_type_id'] = "civicrm_contribution.financial_type_id as financial_type_id";
-      $query->_element['financial_type_id'] = $query->_tables['civicrm_contribution'] = 1;
-    }
-    // LCD 716 END
 
     self::addSoftCreditFields($query);
   }
@@ -230,6 +202,10 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
         return;
       }
     }
+
+    $qillName = $name;
+    $pseudoExtraParam = array();
+
     switch ($name) {
       case 'contribution_date':
       case 'contribution_date_low':
@@ -304,8 +280,7 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
       case (strpos($name, '_amount') !== FALSE):
       case (strpos($name, '_date') !== FALSE && $name != 'contribution_fulfilled_date'):
       case 'contribution_campaign_id':
-        $qillName = $name;
-        $pseudoExtraParam = array();
+
         // @todo including names using a switch statement & then using an 'if' to filter them out is ... odd!
         if ((strpos($name, '_amount') !== FALSE) || (strpos($name, '_date') !== FALSE) || in_array($name,
             array(
@@ -320,10 +295,10 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
             )
           )
         ) {
-          $name = str_replace('contribution_', '', $name);
-          if (!in_array($name, array('source', 'id', 'contact_id', 'campaign_id'))) {
+          if (!isset($fields[$name])) {
             $qillName = str_replace('contribution_', '', $qillName);
           }
+          $name = str_replace('contribution_', '', $name);
         }
         if (in_array($name, array('contribution_currency', 'contribution_currency_type'))) {
           $qillName = $name = 'currency';
@@ -859,7 +834,7 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
         // kittens
         'payment_instrument_id' => 1,
         // argh
-        'check_number' => 1,
+        'contribution_check_number' => 1,
         // no
         'non_deductible_amount' => 1,
         // not
