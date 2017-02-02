@@ -1998,6 +1998,39 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * CRM-19873 Test repattransaction if contribution_recur_id is a test.
+   */
+  public function testRepeatTransactionTestRecurId() {
+    $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', array(
+      'contact_id' => $this->_individualId,
+      'frequency_interval' => '1',
+      'amount' => '1.00',
+      'contribution_status_id' => 1,
+      'start_date' => '2017-01-01 00:00:00',
+      'currency' => 'USD',
+      'frequency_unit' => 'month',
+      'payment_processor_id' => $this->paymentProcessorID,
+      'is_test' => 1,
+    ));
+    $this->callAPISuccess('contribution', 'create', array_merge(
+        $this->_params,
+        array(
+          'contribution_recur_id' => $contributionRecur['id'],
+          'is_test' => 1,
+        ))
+    );
+
+    $repeatedContribution = $this->callAPISuccess('contribution', 'repeattransaction', array(
+      'contribution_recur_id' => $contributionRecur['id'],
+      'contribution_status_id' => 'Completed',
+      'trxn_id' => uniqid(),
+    ));
+
+    $this->assertEquals($contributionRecur['values'][1]['is_test'], $repeatedContribution['values'][2]['is_test']);
+    $this->quickCleanUpFinancialEntities();
+  }
+
+  /**
    * CRM-16397 test appropriate action if total amount has changed for single line items.
    */
   public function testRepeatTransactionAlteredAmount() {
