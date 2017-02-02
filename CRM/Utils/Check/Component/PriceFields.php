@@ -1,9 +1,10 @@
 <?php
+
 /*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2016                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,77 +29,48 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
-
-/**
- * This class is to build the form for Deleting Set
- */
-class CRM_Price_Form_DeleteSet extends CRM_Core_Form {
+class CRM_Utils_Check_Component_PriceFields extends CRM_Utils_Check_Component {
 
   /**
-   * The set id.
+   * Display warning about invalid priceFields
    *
-   * @var int
    */
-  protected $_sid;
-
-  /**
-   * The title of the set being deleted.
-   *
-   * @var string
-   */
-  protected $_title;
-
-  /**
-   * Set up variables to build the form.
-   *
-   * @return void
-   */
-  public function preProcess() {
-    $this->_sid = $this->get('sid');
-
-    $this->_title = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet',
-      $this->_sid, 'title'
-    );
-  }
-
-  /**
-   * Build the form object.
-   *
-   * @return void
-   */
-  public function buildQuickForm() {
-    $this->assign('title', $this->_title);
-    $this->addButtons(array(
-      array(
-        'type' => 'next',
-        'name' => ts('Delete Price Set'),
-        'isDefault' => TRUE,
-      ),
-      array(
-        'type' => 'cancel',
-        'name' => ts('Cancel'),
-      ),
-    ));
-  }
-
-  /**
-   * Process the form when submitted.
-   *
-   * @return void
-   */
-  public function postProcess() {
-    if (CRM_Price_BAO_PriceSet::deleteSet($this->_sid)) {
-      CRM_Core_Session::setStatus(ts('The Price Set \'%1\' has been deleted.',
-        array(1 => $this->_title), ts('Deleted'), 'success'
-      ));
+  public function checkPriceFields() {
+    $sql = "SELECT DISTINCT ps.title as ps_title, ps.id as ps_id, psf.label as psf_label
+      FROM civicrm_price_set ps
+      INNER JOIN civicrm_price_field psf ON psf.price_set_id = ps.id
+      INNER JOIN civicrm_price_field_value pfv ON pfv.price_field_id = psf.id
+      LEFT JOIN civicrm_financial_type cft ON cft.id = pfv.financial_type_id
+      WHERE cft.id IS NULL OR cft.is_active = 0";
+    $dao = CRM_Core_DAO::executeQuery($sql);
+    $count = 0;
+    $html = '';
+    $messages = array();
+    while ($dao->fetch()) {
+      $count++;
+      $url = CRM_Utils_System::url('civicrm/admin/price/field', array(
+        'reset' => 1,
+        'action' => 'browse',
+        'sid' => $dao->ps_id));
+      $html .= "<tr><td>$dao->ps_title</td><td>$dao->psf_label</td><td><a href='$url'>View Price Set Fields</a></td></tr>";
     }
-    else {
-      CRM_Core_Session::setStatus(ts('The Price Set \'%1\' has not been deleted! You must delete all price fields in this set prior to deleting the set.',
-        array(1 => $this->_title)
-      ), 'Unable to Delete', 'error');
+    if ($count > 0) {
+      $msg = "<p>the following Price Set Fields use disabled or invalid financial types and need to be fixed if they are to still be used.<p>
+          <p><table><thead><tr><th>Price Set</th><th>Price Set Field</th><th>Action Link</th>
+          </tr></thead><tbody>
+          $html
+          </tbody></table></p>";
+      $messages[] = new CRM_Utils_Check_Message(
+        __FUNCTION__,
+       ts($msg),
+       ts('Invalid Price Fields'),
+       \Psr\Log\LogLevel::WARNING,
+       'fa-lock'
+      );
     }
+    return $messages;
   }
 
 }
