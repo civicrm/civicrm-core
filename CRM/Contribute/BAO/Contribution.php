@@ -5459,18 +5459,23 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
 
   /**
    * Calculate Tax when Financial Type is changed.
+   * This function is responsible for re-calculating the taxes applied to the total amount when the financial type is changed. 
+   * In some cases, different financial types have financial accounts assigned which possess different tax amounts.
+   * It is therefore necessary we update the total amount and the tax charged when the financial type is changed provided it is taxable.
    *
    * @param array $params
+   *   Contribution params - should contain details of current as well as previous contribution.
    * @param float $totalAmount
+   *   Contribution total amount.
    * @param array $oldTaxAmounts
+   *   Adds a reference to previous tax amount and new tax amount for further calculations.
    * @param float $changeFTAmount
-   *
    */
-  public static function calculateTaxForChangeInFinancialType(
+  public static function calculateNewTax(
     &$params, &$totalAmount,
     &$oldTaxAmounts, &$changeFTAmount
   ) {
-    $taxAmountAfterFTChange = self::calculateTaxAfterChangeInFinancialTypeForLineItems($params['line_item'], $params['contribution']->id);
+    $taxAmountAfterFTChange = self::calculateTaxForLineItems($params['line_item'], $params['contribution']->id);
     $previousTaxAmount = 0;
     if (isset($params['prevContribution']->tax_amount)) {
       $previousTaxAmount = $params['prevContribution']->tax_amount;

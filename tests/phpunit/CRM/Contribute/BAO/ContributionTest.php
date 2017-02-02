@@ -1229,15 +1229,15 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
   }
 
   /**
-   * test for function calculateTaxForChangeInFinancialType()
+   * test for function calculateNewTax()
    */
-  public function testcalculateTaxForChangeInFinancialType() {
+  public function testcalculateNewTax() {
     list($contribution, $financialAccount) = $this->createContributionWithTax();
     $params = $this->alterLineItemsAndOtherParams($contribution, 20, 300);
     $totalAmount = 360;
     $oldTaxAmounts = array('new_tax_amount' => 60);
     $changeFTAmount = 110;
-    CRM_Contribute_BAO_Contribution::calculateTaxForChangeInFinancialType($params, $totalAmount, $oldTaxAmounts, $changeFTAmount);
+    CRM_Contribute_BAO_Contribution::calculateNewTax($params, $totalAmount, $oldTaxAmounts, $changeFTAmount);
     $this->assertEquals($totalAmount, 350, 'Amount does not match.');
     $this->assertEquals($changeFTAmount, 120, 'Amount does not match.');
     $this->assertEquals($params['tax_amount'], 20, 'Amount does not match.');
@@ -1247,7 +1247,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $totalAmount = 300;
     $oldTaxAmounts = array('new_tax_amount' => NULL);
     $changeFTAmount = 110;
-    CRM_Contribute_BAO_Contribution::calculateTaxForChangeInFinancialType($params, $totalAmount, $oldTaxAmounts, $changeFTAmount);
+    CRM_Contribute_BAO_Contribution::calculateNewTax($params, $totalAmount, $oldTaxAmounts, $changeFTAmount);
     $this->assertEquals($totalAmount, 310, 'Amount does not match.');
     $this->assertEquals($changeFTAmount, 100, 'Amount does not match.');
     $this->assertEquals(CRM_Utils_Array::value('tax_amount', $params), NULL, 'Amount does not match.');
@@ -1265,7 +1265,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $totalAmount = 330;
     $oldTaxAmounts = array('new_tax_amount' => 30);
     $changeFTAmount = 100;
-    CRM_Contribute_BAO_Contribution::calculateTaxForChangeInFinancialType($params, $totalAmount, $oldTaxAmounts, $changeFTAmount);
+    CRM_Contribute_BAO_Contribution::calculateNewTax($params, $totalAmount, $oldTaxAmounts, $changeFTAmount);
     $this->assertEquals($totalAmount, 320, 'Amount does not match.');
     $this->assertEquals($changeFTAmount, 110, 'Amount does not match.');
     $this->assertEquals($params['tax_amount'], 10, 'Amount does not match.');
