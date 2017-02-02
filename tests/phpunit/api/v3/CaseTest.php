@@ -97,6 +97,38 @@ class api_v3_CaseTest extends CiviCaseTestCase {
   }
 
   /**
+   * Test Getlist with id and case_id
+   */
+  public function testCaseGetListById() {
+    $params = $this->_params;
+    $params['contact_id'] = $this->individualCreate();
+
+    //Create 3 sample Cases.
+    $case1 = $this->callAPISuccess('case', 'create', $params);
+    $params['subject'] = 'Test Case 2';
+    $case2 = $this->callAPISuccess('case', 'create', $params);
+    $params['subject'] = 'Test Case 3';
+    $case3 = $this->callAPISuccess('case', 'create', $params);
+
+    $getParams = array(
+      'id' => array($case1['id']),
+      'extra' => array('contact_id'),
+      'params' => array(
+        'version' => 3,
+        'case_id' => array('!=' => $case2['id']),
+        'case_id.is_deleted' => 0,
+        'case_id.status_id' => array('!=' => "Closed"),
+        'case_id.end_date' => array('IS NULL' => 1),
+      ),
+    );
+    $result = $this->callAPISuccess('case', 'getlist', $getParams);
+
+    //Only 1 case should be returned.
+    $this->assertEquals(count($result['values']), 1);
+    $this->assertEquals($result['values'][0]['id'], $case1['id']);
+  }
+
+  /**
    * Test create function with valid parameters.
    */
   public function testCaseCreate() {
