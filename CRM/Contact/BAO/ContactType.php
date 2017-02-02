@@ -842,7 +842,7 @@ LIMIT 1";
     $customSet = $subTypeClause = array();
     foreach ($subtypeSet as $subtype) {
       $subtype = CRM_Utils_Type::escape($subtype, 'String');
-      $subType = CRM_Core_DAO::VALUE_SEPARATOR . $subtype . CRM_Core_DAO::VALUE_SEPARATOR;
+      $subtype = CRM_Core_DAO::VALUE_SEPARATOR . $subtype . CRM_Core_DAO::VALUE_SEPARATOR;
       $subTypeClause[] = "extends_entity_column_value LIKE '%{$subtype}%' ";
     }
     $query = "SELECT table_name
