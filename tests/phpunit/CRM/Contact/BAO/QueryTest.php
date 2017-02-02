@@ -152,6 +152,62 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test searchByPrimaryEmailOnly setting.
+   */
+  public function testSearchByPrimaryEmailOnly() {
+    $contactID = $this->individualCreate();
+    $params = array(
+      'contact_id' => $contactID,
+      'email' => 'primary@example.com',
+      'is_primary' => 1,
+    );
+    $this->callAPISuccess('email', 'create', $params);
+
+    unset($params['is_primary']);
+    $params['email'] = 'secondary@team.com';
+    $this->callAPISuccess('email', 'create', $params);
+
+    foreach (array(0, 1) as $searchPrimary) {
+      Civi::settings()->set('searchPrimaryEmailOnly', $searchPrimary);
+
+      $params = array(
+        0 => array(
+          0 => 'email',
+          1 => 'LIKE',
+          2 => 'secondary@example.com',
+          3 => 0,
+          4 => 1,
+        ),
+      );
+      $returnProperties = array(
+        'contact_type' => 1,
+        'contact_sub_type' => 1,
+        'sort_name' => 1,
+      );
+
+      $queryObj = new CRM_Contact_BAO_Query($params, $returnProperties);
+      $resultDAO = $queryObj->searchQuery(0, 0, NULL,
+        FALSE, FALSE,
+        FALSE, FALSE,
+        FALSE);
+
+      if ($searchPrimary) {
+        $this->assertEquals($resultDAO->N, 0);
+      }
+      else {
+        //Assert secondary email gets included in search results.
+        while ($resultDAO->fetch()) {
+          $this->assertEquals('secondary@example.com', $resultDAO->email);
+        }
+      }
+
+      // API should always return primary email.
+      $result = $this->callAPISuccess('Contact', 'get', array('contact_id' => $contactID));
+      $this->assertEquals('primary@example.com', $result['values'][$contactID]['email']);
+    }
+  }
+
+  /**
    * CRM-14263 search builder failure with search profile & address in criteria
    * We are retrieving primary here - checking the actual sql seems super prescriptive - but since the massive query object has
    * so few tests detecting any change seems good here :-)
