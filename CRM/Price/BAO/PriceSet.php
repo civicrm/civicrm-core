@@ -471,17 +471,18 @@ WHERE     cpf.price_set_id = %1";
     $select = 'SELECT ' . implode(',', $priceFields);
     $from = ' FROM civicrm_price_field';
 
-    $params = array();
-    $params[1] = array($setID, 'Integer');
-    $where = '
+    $params = array(
+      1 => array($setID, 'Integer'),
+    );
+    $currentTime = date('YmdHis');
+    $where = "
 WHERE price_set_id = %1
 AND is_active = 1
-';
+AND ( active_on IS NULL OR active_on <= {$currentTime} )
+";
     $dateSelect = '';
     if ($validOnly) {
-      $currentTime = date('YmdHis');
       $dateSelect = "
-AND ( active_on IS NULL OR active_on <= {$currentTime} )
 AND ( expire_on IS NULL OR expire_on >= {$currentTime} )
 ";
     }
