@@ -514,7 +514,7 @@ class CRM_Contact_BAO_Query {
       CRM_Financial_BAO_FinancialType::buildPermissionedClause($this->_whereClause, $component);
     }
 
-    $this->_fromClause = self::fromClause($this->_tables, NULL, NULL, $this->_primaryLocation, $this->_mode);
+    $this->_fromClause = self::fromClause($this->_tables, NULL, NULL, $this->_primaryLocation, $this->_mode, $apiEntity);
     $this->_simpleFromClause = self::fromClause($this->_whereTables, NULL, NULL, $this->_primaryLocation, $this->_mode);
 
     $this->openedSearchPanes(TRUE);
@@ -2528,11 +2528,12 @@ class CRM_Contact_BAO_Query {
    *
    * @param bool $primaryLocation
    * @param int $mode
+   * @param string|NULL $apiEntity
    *
    * @return string
    *   the from clause
    */
-  public static function fromClause(&$tables, $inner = NULL, $right = NULL, $primaryLocation = TRUE, $mode = 1) {
+  public static function fromClause(&$tables, $inner = NULL, $right = NULL, $primaryLocation = TRUE, $mode = 1, $apiEntity = NULL) {
 
     $from = ' FROM civicrm_contact contact_a';
     if (empty($tables)) {
@@ -2639,7 +2640,11 @@ class CRM_Contact_BAO_Query {
           continue;
 
         case 'civicrm_email':
-          $from .= " $side JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_email.is_primary = 1) ";
+          $searchPrimary = '';
+          if (Civi::settings()->get('searchPrimaryEmailOnly') || $apiEntity) {
+            $searchPrimary = " AND civicrm_email.is_primary = 1";
+          }
+          $from .= " $side JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id) {$searchPrimary}";
           continue;
 
         case 'civicrm_im':
