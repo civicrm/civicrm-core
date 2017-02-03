@@ -2624,31 +2624,29 @@ class CRM_Contact_BAO_Query {
         }
         continue;
       }
+      $searchPrimary = '';
+      if (Civi::settings()->get('searchPrimaryLocTypes') || $apiEntity) {
+        $searchPrimary = "AND {$name}.is_primary = 1";
+      }
       switch ($name) {
         case 'civicrm_address':
-          if ($primaryLocation) {
-            $from .= " $side JOIN civicrm_address ON ( contact_a.id = civicrm_address.contact_id AND civicrm_address.is_primary = 1 )";
+          //CRM-14263 further handling of address joins further down...
+          if (!$primaryLocation) {
+            $searchPrimary = '';
           }
-          else {
-            //CRM-14263 further handling of address joins further down...
-            $from .= " $side JOIN civicrm_address ON ( contact_a.id = civicrm_address.contact_id ) ";
-          }
+          $from .= " $side JOIN civicrm_address ON ( contact_a.id = civicrm_address.contact_id {$searchPrimary} )";
           continue;
 
         case 'civicrm_phone':
-          $from .= " $side JOIN civicrm_phone ON (contact_a.id = civicrm_phone.contact_id AND civicrm_phone.is_primary = 1) ";
+          $from .= " $side JOIN civicrm_phone ON (contact_a.id = civicrm_phone.contact_id {$searchPrimary}) ";
           continue;
 
         case 'civicrm_email':
-          $searchPrimary = '';
-          if (Civi::settings()->get('searchPrimaryEmailOnly') || $apiEntity) {
-            $searchPrimary = " AND civicrm_email.is_primary = 1";
-          }
-          $from .= " $side JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id) {$searchPrimary}";
+          $from .= " $side JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id {$searchPrimary})";
           continue;
 
         case 'civicrm_im':
-          $from .= " $side JOIN civicrm_im ON (contact_a.id = civicrm_im.contact_id AND civicrm_im.is_primary = 1) ";
+          $from .= " $side JOIN civicrm_im ON (contact_a.id = civicrm_im.contact_id {$searchPrimary}) ";
           continue;
 
         case 'im_provider':
@@ -2658,7 +2656,7 @@ class CRM_Contact_BAO_Query {
           continue;
 
         case 'civicrm_openid':
-          $from .= " $side JOIN civicrm_openid ON ( civicrm_openid.contact_id = contact_a.id AND civicrm_openid.is_primary = 1 )";
+          $from .= " $side JOIN civicrm_openid ON ( civicrm_openid.contact_id = contact_a.id {$searchPrimary} )";
           continue;
 
         case 'civicrm_worldregion':
