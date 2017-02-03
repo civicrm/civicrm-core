@@ -197,18 +197,18 @@ return array(
     'description' => 'If set, this will be the default profile used for contact search.',
     'help_text' => NULL,
   ),
-  'searchPrimaryEmailOnly' => array(
+  'searchPrimaryLocTypes' => array(
     'group_name' => 'Search Preferences',
     'group' => 'Search Preferences',
-    'name' => 'searchPrimaryEmailOnly',
+    'name' => 'searchPrimaryLocTypes',
     'type' => 'Boolean',
     'quick_form_type' => 'YesNo',
     'default' => 1,
     'add' => '4.7',
-    'title' => 'Search Primary Email Only',
+    'title' => 'Search Primary Location Types Only',
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => 'If enabled, only primary email address will be included when users search by Email. Secondary emails will only be displayed in Full Text search results. Disabling this feature will allow searching by any emails attached to the contact.',
+    'description' => 'If enabled, only primary location types(email, phone, etc.) will be included in Basic and Advanced Search results. Disabling this feature will allow users to search by any location type values attached to the contact.',
     'help_text' => NULL,
   ),
 );
