@@ -152,9 +152,9 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test searchPrimaryLocTypes setting.
+   * Test searchPrimaryDetailsOnly setting.
    */
-  public function testSearchPrimaryLocTypes() {
+  public function testSearchPrimaryDetailsOnly() {
     $contactID = $this->individualCreate();
     $params = array(
       'contact_id' => $contactID,
@@ -168,7 +168,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
     $this->callAPISuccess('email', 'create', $params);
 
     foreach (array(0, 1) as $searchPrimary) {
-      Civi::settings()->set('searchPrimaryLocTypes', $searchPrimary);
+      Civi::settings()->set('searchPrimaryDetailsOnly', $searchPrimary);
 
       $params = array(
         0 => array(
