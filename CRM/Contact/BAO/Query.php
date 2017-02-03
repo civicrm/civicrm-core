@@ -2519,16 +2519,23 @@ class CRM_Contact_BAO_Query {
    * Create the from clause.
    *
    * @param array $tables
-   *   Tables that need to be included in this from clause.
-   *                      if null, return mimimal from clause (i.e. civicrm_contact)
+   *   Tables that need to be included in this from clause. If null,
+   *   return mimimal from clause (i.e. civicrm_contact).
    * @param array $inner
    *   Tables that should be inner-joined.
    * @param array $right
    *   Tables that should be right-joined.
-   *
    * @param bool $primaryLocation
+   *   Search on primary location. See note below.
    * @param int $mode
+   *   Determines search mode based on bitwise MODE_* constants.
    * @param string|NULL $apiEntity
+   *   Determines search mode based on entity by string.
+   *
+   * The $primaryLocation flag only seems to be used when
+   * locationType() has been called. This may be a search option
+   * exposed, or perhaps it's a "search all details" approach which
+   * predates decoupling of location types and primary fields?
    *
    * @return string
    *   the from clause
