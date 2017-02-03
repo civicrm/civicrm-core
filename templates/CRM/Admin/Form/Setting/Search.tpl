@@ -40,7 +40,7 @@
         <tr class="crm-search-setting-form-block-searchPrimaryDetailsOnly">
             <td class="label">{$form.searchPrimaryDetailsOnly.label}</td>
             <td>{$form.searchPrimaryDetailsOnly.html}<br />
-                <span class="description">{ts}If enabled, only primary location types(email, phone, etc.) will be included in Basic and Advanced Search results. Disabling this feature will allow users to search by any location type values attached to the contact.{/ts}</span>
+                <span class="description">{ts}If enabled, only primary details (eg contact's primary email, phone, etc) will be included in Basic and Advanced Search results. Disabling this feature will allow users to match contacts using any email, phone etc detail.{/ts}</span>
             </td>
         </tr>
         <tr  class="crm-search-setting-form-block-includeNickNameInName">
