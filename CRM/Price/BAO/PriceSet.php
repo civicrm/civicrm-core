@@ -1590,11 +1590,12 @@ WHERE       ps.id = %1
    * @return array
    */
   public static function setLineItem($field, $lineItem, $optionValueId, &$totalTax) {
+    // Here we round - i.e. after multiplying by quantity
     if ($field['html_type'] == 'Text') {
-      $taxAmount = $field['options'][$optionValueId]['tax_amount'] * $lineItem[$optionValueId]['qty'];
+      $taxAmount = round($field['options'][$optionValueId]['tax_amount'] * $lineItem[$optionValueId]['qty'], 2);
     }
     else {
-      $taxAmount = $field['options'][$optionValueId]['tax_amount'];
+      $taxAmount = round($field['options'][$optionValueId]['tax_amount'], 2);
     }
     $taxRate = $field['options'][$optionValueId]['tax_rate'];
     $lineItem[$optionValueId]['tax_amount'] = $taxAmount;
