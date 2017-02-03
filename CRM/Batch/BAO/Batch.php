@@ -743,6 +743,11 @@ LEFT JOIN civicrm_contribution_soft ON civicrm_contribution_soft.contribution_id
       }
     }
 
+    // CRM-19780 zero value contributions shouldn't generate a transaction to batch
+    if (empty($params['contribution_amount_low'])) {
+      $where .= ' AND civicrm_contribution.total_amount > 0';
+    }
+
     $sql = "
 SELECT {$select}
 FROM   {$from}
