@@ -373,4 +373,54 @@ LIMIT $limit";
     CRM_Utils_JSON::output($result);
   }
 
+  /**
+   * Outputs one branch in the tag tree
+   *
+   * Used by jstree to incrementally load tags
+   */
+  public static function getTagTree() {
+    $parent = CRM_Utils_Type::escape(CRM_Utils_Array::value('parent_id', $_GET, 0), 'Integer');
+    $result = array();
+
+    $parentClause = $parent ? "AND tag.parent_id = $parent" : 'AND tag.parent_id IS NULL';
+    $sql = "SELECT tag.*, child.id AS child, COUNT(et.id) as usages
+      FROM civicrm_tag tag
+      LEFT JOIN civicrm_entity_tag et ON et.tag_id = tag.id
+      LEFT JOIN civicrm_tag child ON child.parent_id = tag.id
+      WHERE tag.is_tagset <> 1 $parentClause
+      GROUP BY tag.id
+      ORDER BY tag.name";
+    $dao = CRM_Core_DAO::executeQuery($sql);
+    while ($dao->fetch()) {
+      $style = '';
+      if ($dao->color) {
+        $style = "background-color: {$dao->color}; color: " . CRM_Utils_Color::getContrast($dao->color);
+      }
+      $result[] = array(
+        'id' => $dao->id,
+        'text' => $dao->name,
+        'icon' => FALSE,
+        'li_attr' => array(
+          'title' => ((string) $dao->description) . ($dao->is_reserved ? ' (*' . ts('Reserved') . ')' : ''),
+          'class' => $dao->is_reserved ? 'is-reserved' : '',
+        ),
+        'a_attr' => array(
+          'style' => $style,
+          'class' => 'crm-tag-item',
+        ),
+        'children' => (bool) $dao->child,
+        'data' => array(
+          'description' => (string) $dao->description,
+          'is_selectable' => (bool) $dao->is_selectable,
+          'is_reserved' => (bool) $dao->is_reserved,
+          'used_for' => $dao->used_for ? explode(',', $dao->used_for) : array(),
+          'color' => $dao->color ? $dao->color : '#ffffff',
+          'usages' => (int) $dao->usages,
+        ),
+      );
+    }
+
+    CRM_Utils_JSON::output($result);
+  }
+
 }

@@ -395,8 +395,8 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
    *   (optional) the array that holds all the db ids - we are moving away from this in bao.
    * signatures
    *
-   * @return object
-   *   CRM_Core_DAO_Tag object on success, otherwise null
+   * @return CRM_Core_DAO_Tag|null
+   *   object on success, otherwise null
    */
   public static function add(&$params, $ids = array()) {
     $id = CRM_Utils_Array::value('id', $params, CRM_Utils_Array::value('tag', $ids));
@@ -410,6 +410,13 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
     if (!empty($params['parent_id'])) {
       // get parent details
       $params['used_for'] = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Tag', $params['parent_id'], 'used_for');
+    }
+    elseif (isset($params['used_for']) && is_array($params['used_for'])) {
+      $params['used_for'] = implode(',', $params['used_for']);
+    }
+
+    if (isset($params['color']) && strtolower($params['color']) === '#ffffff') {
+      $params['color'] = '';
     }
 
     $tag->copyValues($params);
@@ -428,10 +435,11 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
     CRM_Utils_Hook::post($hook, 'Tag', $tag->id, $tag);
 
     // if we modify parent tag, then we need to update all children
-    if ($tag->parent_id === 'null') {
+    $tag->find(TRUE);
+    if (!$tag->parent_id && $tag->used_for) {
       CRM_Core_DAO::executeQuery("UPDATE civicrm_tag SET used_for=%1 WHERE parent_id = %2",
         array(
-          1 => array($params['used_for'], 'String'),
+          1 => array($tag->used_for, 'String'),
           2 => array($tag->id, 'Integer'),
         )
       );
