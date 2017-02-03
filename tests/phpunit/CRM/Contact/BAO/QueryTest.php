@@ -154,7 +154,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
   /**
    * Test searchPrimaryDetailsOnly setting.
    */
-  public function testSearchPrimaryLocTypes() {
+  public function testSearchPrimaryDetailsOnly() {
     $contactID = $this->individualCreate();
     $params = array(
       'contact_id' => $contactID,
