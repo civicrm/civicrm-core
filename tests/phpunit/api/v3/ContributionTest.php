@@ -2609,7 +2609,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     );
     $this->setUpPendingContribution($this->_ids['price_field_value'][0]);
     $this->callAPISuccess('membership', 'getsingle', array('id' => $this->_ids['membership']));
-    // Case 1: Assert that Membership Signup Activity is created on Pending (Pay later) to Completed Contribution via backoffice
+    // Case 1: Assert that Membership Signup Activity is created on Pending to Completed Contribution via backoffice
     $activity = $this->callAPISuccess('Activity', 'get', array(
       'activity_type_id' => 'Membership Signup',
       'source_record_id' => $this->_ids['membership'],
@@ -2657,7 +2657,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     catch (Civi\Payment\Exception\PaymentProcessorException $e) {
       $error = TRUE;
     }
-    // Case 2: After successful payment for Pending (Pay later) backoffice there are three activities created
+    // Case 2: After successful payment for Pending backoffice there are three activities created
     //  2.a Update status of existing Scheduled Membership Signup (created in step 1) to Completed
     $activity = $this->callAPISuccess('Activity', 'get', array(
       'activity_type_id' => 'Membership Signup',

@@ -139,11 +139,11 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
     // reset the group contact cache since smart groups might be affected due to this
     CRM_Contact_BAO_GroupContactCache::opportunisticCacheFlush();
 
-    $activityParams = array();
     $allStatus = CRM_Member_BAO_Membership::buildOptions('status_id', 'get');
-    if (!empty($params['is_pay_later']) ||
-      in_array($allStatus[$membership->status_id], array('Pending', 'Grace'))
-    ) {
+    $activityParams = array(
+      'status_id' => CRM_Utils_Array::value('membership_activity_status', $params, 'Completed'),
+    );
+    if (in_array($allStatus[$membership->status_id], array('Pending', 'Grace'))) {
       $activityParams['status_id'] = CRM_Core_OptionGroup::getValue('activity_status', 'Scheduled', 'name');
     }
 
@@ -159,7 +159,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
           array(
             'subject' => "Status changed from {$allStatus[$oldStatus]} to {$allStatus[$membership->status_id]}",
             'source_contact_id' => $membershipLog['modified_id'],
-            'priority_id' => 2,
+            'priority_id' => 'Normal',
           )
         );
       }
@@ -171,7 +171,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
           array(
             'subject' => "Type changed from {$membershipTypes[$oldType]} to {$membershipTypes[$membership->membership_type_id]}",
             'source_contact_id' => $membershipLog['modified_id'],
-            'priority_id' => 2,
+            'priority_id' => 'Normal',
           )
         );
       }
@@ -1853,7 +1853,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
           'join_date' => $currentMembership['join_date'],
           'membership_type_id' => $membershipTypeID,
           'max_related' => !empty($membershipTypeDetails['max_related']) ? $membershipTypeDetails['max_related'] : NULL,
-          'is_pay_later' => $isPayLater,
+          'membership_activity_status' => $isPayLater ? 'Scheduled' : 'Completed',
         );
         if ($contributionRecurID) {
           $memParams['contribution_recur_id'] = $contributionRecurID;

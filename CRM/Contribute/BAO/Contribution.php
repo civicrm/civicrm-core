@@ -1900,10 +1900,14 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
                     'source_record_id' => $membership->id,
                     'activity_type_id' => $activityType,
                     'status_id' => 'Scheduled',
+                    'options' => array(
+                      'limit' => 1,
+                      'sort' => 'id DESC',
+                    ),
                   )
                 )
               );
-              // 1. Update Schedule Membership Signup/Renwal activity to completed on successful payment of pending membership
+              // 1. Update Schedule Membership Signup/Renewal activity to completed on successful payment of pending membership
               // 2. OR Create renewal activity scheduled if its membership renewal will be paid later
               if ($scheduledActivityID) {
                 CRM_Activity_BAO_Activity::addActivity($membership, $activityType, $membership->contact_id, array('id' => $scheduledActivityID));
@@ -1920,7 +1924,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
                 array(
                   'subject' => "Status changed from {$allStatus[$oldStatus]} to {$allStatus[$membership->status_id]}",
                   'source_contact_id' => $membershipLog['modified_id'],
-                  'priority_id' => 2,
+                  'priority_id' => 'Normal',
                 )
               );
             }

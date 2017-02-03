@@ -1786,7 +1786,7 @@ WHERE      activity.id IN ($activityIds)";
    *   For Membership Signup or Renewal.
    * @param int $targetContactID
    * @param array $params
-   *   Activity params to override
+   *   Activity params to override.
    *
    * @return bool|NULL
    */
@@ -1874,10 +1874,10 @@ WHERE      activity.id IN ($activityIds)";
   }
 
   /**
-   * Get activity subject on basis of component object
+   * Get activity subject on basis of component object.
    *
    * @param object $entityObj
-   *   (reference) particular component object.
+   *   particular component object.
    *
    * @return string
    */
