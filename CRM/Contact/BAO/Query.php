@@ -2625,8 +2625,8 @@ class CRM_Contact_BAO_Query {
         continue;
       }
       $searchPrimary = '';
-      if (Civi::settings()->get('searchPrimaryDetailsOnly') || $apiEntity) {
-        $searchPrimary = " AND {$name}.is_primary = 1";
+      if (Civi::settings()->get('searchPrimaryLocTypes') || $apiEntity) {
+        $searchPrimary = "AND {$name}.is_primary = 1";
       }
       switch ($name) {
         case 'civicrm_address':
