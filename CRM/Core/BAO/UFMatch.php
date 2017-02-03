@@ -256,7 +256,7 @@ AND    domain_id = %2
       if (!$found) {
         // Not sure why we're testing for this. Is there ever a case
         // in which $user is not an object?
-        if (Civi::settings()->get('syncCMSEmail') && is_object($user)) {
+        if (is_object($user)) {
           if ($config->userSystem->is_drupal) {
             $primary_email = $uniqId;
           }
