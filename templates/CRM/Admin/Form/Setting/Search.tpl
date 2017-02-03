@@ -37,9 +37,9 @@
             <td>{$form.includeEmailInName.html}<br />
                 <span class="description">{ts}If enabled, email addresses are automatically included when users search by Name. Disabling this feature will speed up search significantly for larger databases, but users will need to use the Email search fields (from Advanced Search, Search Builder, or Profiles) to find contacts by email address.{/ts}</span></td>
         </tr>
-        <tr class="crm-search-setting-form-block-searchPrimaryLocTypes">
-            <td class="label">{$form.searchPrimaryLocTypes.label}</td>
-            <td>{$form.searchPrimaryLocTypes.html}<br />
+        <tr class="crm-search-setting-form-block-searchPrimaryDetailsOnly">
+            <td class="label">{$form.searchPrimaryDetailsOnly.label}</td>
+            <td>{$form.searchPrimaryDetailsOnly.html}<br />
                 <span class="description">{ts}If enabled, only primary location types(email, phone, etc.) will be included in Basic and Advanced Search results. Disabling this feature will allow users to search by any location type values attached to the contact.{/ts}</span>
             </td>
         </tr>

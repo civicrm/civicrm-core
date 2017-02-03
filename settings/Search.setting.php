@@ -197,10 +197,10 @@ return array(
     'description' => 'If set, this will be the default profile used for contact search.',
     'help_text' => NULL,
   ),
-  'searchPrimaryLocTypes' => array(
+  'searchPrimaryDetailsOnly' => array(
     'group_name' => 'Search Preferences',
     'group' => 'Search Preferences',
-    'name' => 'searchPrimaryLocTypes',
+    'name' => 'searchPrimaryDetailsOnly',
     'type' => 'Boolean',
     'quick_form_type' => 'YesNo',
     'default' => 1,
