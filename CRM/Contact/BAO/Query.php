@@ -6224,7 +6224,7 @@ AND   displayRelType.is_active = 1
       $order = CRM_Utils_Type::escape($order, 'MysqlOrderBy');
       return array(' ORDER BY ' . $order, $additionalFromClause);
     }
-    return array(' ORDER BY ' . $order, $additionalFromClause);
+    return array($order, $additionalFromClause);
   }
 
   /**
