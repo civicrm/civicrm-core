@@ -188,20 +188,18 @@ class CRM_Core_I18n_Schema {
       }
     }
 
-    $dao = new CRM_Core_DAO();
     // deal with columns
     foreach ($columns[$table] as $column => $type) {
-      $queries[] = "ALTER TABLE {$table} CHANGE `{$column}_{$retain}` `{$column}` {$type}";
+      $queries[] = "ALTER TABLE {$table} ADD {$column} {$type}";
+      $queries[] = "UPDATE {$table} SET {$column} = {$column}_{$retain}";
       foreach ($locales as $loc) {
-        if (strcmp($loc, $retain) !== 0) {
-          $dropQueries[] = "ALTER TABLE {$table} DROP {$column}_{$loc}";
-        }
+        $dropQueries[] = "ALTER TABLE {$table} DROP {$column}_{$loc}";
       }
     }
 
     // drop views
     foreach ($locales as $loc) {
-      $queries[] = "DROP VIEW IF EXISTS {$table}_{$loc}";
+      $queries[] = "DROP VIEW {$table}_{$loc}";
     }
 
     // add original indices
