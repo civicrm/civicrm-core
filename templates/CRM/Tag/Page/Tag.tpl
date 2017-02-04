@@ -87,6 +87,11 @@
         var plugins,
           tagset = $panel.attr('id').split('-')[1] || 0;
 
+        function hasChildren(id) {
+          var $node = $('.tag-tree', $panel).jstree(true).get_node(id, true);
+          return !$node.hasClass('jstree-leaf');
+        }
+
         function changeColor() {
           var color = $(this).val().toLowerCase(),
             id = $(this).closest('.crm-entity').data('id'),
@@ -102,14 +107,36 @@
         }
 
         function changeSelection(e, data) {
+          var tplParams = {
+            tagset: tagset,
+            admin: CRM.checkPerm('administer reserved tags')
+          },
+            tree = $('.tag-tree', $panel).jstree(true),
+            $infoBox = $('.tag-info', $panel);
           if (!data.selected || !data.selected.length) {
-            $('.tag-info', $panel).html(noneSelectedTpl({parent: tagset || '', length: $('.tag-tree li', $panel).length}));
+            tplParams.is_reserved = tagset ? tagSets[tagset].is_reserved == 1 : false;
+            tplParams.length = $('.tag-tree li', $panel).length;
+            $infoBox.html(noneSelectedTpl(tplParams));
           } else if (data.selected.length === 1) {
-            $('.tag-info', $panel).html(oneSelectedTpl($.extend({}, data.node, {usedFor: usedFor, tagset: tagset})));
+            tplParams.usedFor = usedFor;
+            tplParams.hasChildren = hasChildren(data.node.id);
+            $infoBox.html(oneSelectedTpl($.extend({}, data.node, tplParams)));
           } else {
-            $('.tag-info', $panel).html(moreSelectedTpl({items: data.selected}));
+            tplParams.items = data.selected;
+            tplParams.hasChildren = 0;
+            tplParams.reserved = 0;
+            tplParams.usages = 0;
+            _.each(data.selected, function(id) {
+              var node = tree.get_node(id);
+              tplParams.usages += node.data.usages;
+              tplParams.reserved += node.data.is_reserved;
+              if (hasChildren(id)) {
+                tplParams.hasChildren++;
+              }
+            });
+            $infoBox.html(moreSelectedTpl(tplParams));
           }
-          $('.tag-info', $panel).trigger('crmLoad');
+          $infoBox.trigger('crmLoad');
         }
 
         function changeUsedFor() {
@@ -328,16 +355,16 @@
     <% {rdelim} %>
   </p>
   <div class="crm-submit-buttons">
-    <a href="{crmURL p="civicrm/tag/edit" q="action=add&parent_id="}<%= parent %>" class="button crm-popup">
+    <a href="{crmURL p="civicrm/tag/edit" q="action=add&parent_id="}<%= tagset || '' %>" class="button crm-popup">
       <span><i class="crm-i fa-plus"></i>&nbsp; {ts}Add Tag{/ts}</span>
     </a>
-    <% if(parent) {ldelim} %>
-      <a href="{crmURL p="civicrm/tag/edit" q="action=update&id="}<%= parent %>" class="button crm-popup tagset-action-update">
+    <% if(tagset) {ldelim} %>
+      <a href="{crmURL p="civicrm/tag/edit" q="action=update&id="}<%= tagset %>" class="button crm-popup tagset-action-update">
         <span><i class="crm-i fa-pencil"></i>&nbsp; {ts}Edit Set{/ts}</span>
       </a>
     <% {rdelim} %>
-    <% if(parent && !length) {ldelim} %>
-      <a href="{crmURL p="civicrm/tag/edit" q="action=delete&id="}<%= parent %>" class="button crm-popup small-popup tagset-action-delete">
+    <% if(tagset && !length && (!is_reserved || admin)) {ldelim} %>
+      <a href="{crmURL p="civicrm/tag/edit" q="action=delete&id="}<%= tagset %>" class="button crm-popup small-popup tagset-action-delete">
         <span><i class="crm-i fa-trash"></i>&nbsp; {ts}Delete Set{/ts}</span>
       </a>
     <% {rdelim} %>
@@ -358,7 +385,7 @@
       <span class="crm-editable" data-field="is_selectable" data-type="select"><% if (data.is_selectable) {ldelim} %> {ts}Yes{/ts} <% {rdelim} else {ldelim} %> {ts}No{/ts} <% {rdelim} %></span>
     </div>
     <div><span class="tdl">{ts}Reserved:{/ts}</span>
-      <span class="crm-editable" data-field="is_reserved" data-type="select"><% if (data.is_reserved) {ldelim} %> {ts}Yes{/ts} <% {rdelim} else {ldelim} %> {ts}No{/ts} <% {rdelim} %></span>
+      <span class="<% if (admin) {ldelim} %>crm-editable<% {rdelim} %>" data-field="is_reserved" data-type="select"><% if (data.is_reserved) {ldelim} %> {ts}Yes{/ts} <% {rdelim} else {ldelim} %> {ts}No{/ts} <% {rdelim} %></span>
     </div>
     <% if (parent === '#' && !tagset) {ldelim} %>
       <div>
@@ -385,22 +412,30 @@
     <a href="{crmURL p="civicrm/tag/edit" q="action=add&clone_from="}<%= id %>" class="button crm-popup">
       <span><i class="crm-i fa-copy"></i>&nbsp; {ts}Clone Tag{/ts}</span>
     </a>
-    <a href="{crmURL p="civicrm/tag/edit" q="action=delete&id="}<%= id %>" class="button crm-popup small-popup">
-      <span><i class="crm-i fa-trash"></i>&nbsp; {ts}Delete{/ts}</span>
-    </a>
+    <% if(!hasChildren && (!data.is_reserved || admin)) {ldelim} %>
+      <a href="{crmURL p="civicrm/tag/edit" q="action=delete&id="}<%= id %>" class="button crm-popup small-popup">
+        <span><i class="crm-i fa-trash"></i>&nbsp; {ts}Delete{/ts}</span>
+      </a>
+    <% {rdelim} %>
   </div>
 </script>
 
 <script type="text/template" id="moreSelectedTpl">
   <h4>{ts 1="<%= items.length %>"}%1 Tags Selected{/ts}</h4>
-  <hr /><br />
+  <hr />
+    <% if (reserved) {ldelim} %>
+      <p>* {ts 1="<%= reserved %>"}%1 reserved.{/ts}</p>
+    <% {rdelim} %>
+  <p><span class="tdl">{ts}Total Usage:{/ts}</span> <%= usages %></p>
   <div class="crm-submit-buttons">
     <a href="{crmURL p="civicrm/tag/merge" q="id="}<%= items.join() %>" class="button crm-popup small-popup">
       <span><i class="crm-i fa-compress"></i>&nbsp; {ts}Merge Tags{/ts}</span>
     </a>
-    <a href="{crmURL p="civicrm/tag/edit" q="action=delete&id="}<%= items.join() %>" class="button crm-popup small-popup">
-      <span><i class="crm-i fa-trash"></i>&nbsp; {ts}Delete All{/ts}</span>
-    </a>
+    <% if(!hasChildren && (!reserved || admin)) {ldelim} %>
+      <a href="{crmURL p="civicrm/tag/edit" q="action=delete&id="}<%= items.join() %>" class="button crm-popup small-popup">
+        <span><i class="crm-i fa-trash"></i>&nbsp; {ts}Delete All{/ts}</span>
+      </a>
+    <% {rdelim} %>
   </div>
 </script>
 
