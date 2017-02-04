@@ -193,7 +193,7 @@ class CRM_Core_I18n_Schema {
     foreach ($columns[$table] as $column => $type) {
       $queries[] = "ALTER TABLE {$table} CHANGE `{$column}_{$retain}` `{$column}` {$type}";
       foreach ($locales as $loc) {
-        if (strcmp($loc,$retain) !== 0) {
+        if (strcmp($loc, $retain) !== 0) {
           $dropQueries[] = "ALTER TABLE {$table} DROP {$column}_{$loc}";
         }
       }
