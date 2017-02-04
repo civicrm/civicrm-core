@@ -69,6 +69,7 @@ function civicrm_webtest_enable() {
    'edit all events',
    'edit contributions',
    'edit event participants',
+   'edit message templates',
    // 'edit grants',
    'edit groups',
    'edit memberships',
