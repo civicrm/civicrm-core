@@ -146,6 +146,36 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
   }
 
   /**
+   * Enable/Disable payment processor.
+   *
+   * @param int $paymentProcessorID
+   * @param bool $is_active
+   *
+   * @return null
+   */
+  public static function enable($paymentProcessorID, $is_active) {
+    if (!$paymentProcessorID) {
+      CRM_Core_Error::fatal(ts('Invalid value passed to enable function.'));
+    }
+
+    $dao = new CRM_Financial_DAO_PaymentProcessor();
+    $dao->id = $paymentProcessorID;
+    if (!$dao->find(TRUE)) {
+      return NULL;
+    }
+    self::setIsActive($dao->id, $is_active);
+
+    $testDAO = new CRM_Financial_DAO_PaymentProcessor();
+    $testDAO->name = $dao->name;
+    $testDAO->is_test = 1;
+      if (!$testDAO->find(TRUE)) {
+      return NULL;
+    }
+    self::setIsActive($testDAO->id, $is_active);
+    Civi\Payment\System::singleton()->flushProcessors();
+  }
+
+  /**
    * Retrieve the default payment processor.
    *
    * @return CRM_Financial_DAO_PaymentProcessor|null
