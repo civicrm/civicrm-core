@@ -742,6 +742,7 @@ HTACCESS;
         closedir($dh);
       }
     }
+    sort($result);
     return $result;
   }
 
