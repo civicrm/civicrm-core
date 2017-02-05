@@ -187,7 +187,8 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
 
       case self::AUTH_ERROR:
         $params['payment_status_id'] = array_search('Failed', $contributionStatus);
-        break;
+        $errormsg = $response_fields[2] . ' ' . $response_fields[3];
+        return self::error($response_fields[1], $errormsg);
 
       case self::AUTH_DECLINED:
         $errormsg = $response_fields[2] . ' ' . $response_fields[3];
