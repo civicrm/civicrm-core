@@ -76,6 +76,7 @@ function civicrm_webtest_enable() {
    'edit pledges',
    'import contacts',
    'make online contributions',
+   'manage tags',
    'merge duplicate contacts',
    'profile create',
    'profile edit',
