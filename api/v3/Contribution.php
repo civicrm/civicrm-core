@@ -487,6 +487,7 @@ function civicrm_api3_contribution_repeattransaction(&$params) {
   if (empty($params['original_contribution_id'])) {
     $params['original_contribution_id'] = civicrm_api3('contribution', 'getvalue', array(
       'return' => 'id',
+      'contribution_status_id' => array('IN' => array('Completed')),
       'contribution_recur_id' => $params['contribution_recur_id'],
       'options' => array('limit' => 1, 'sort' => 'id DESC'),
     ));
