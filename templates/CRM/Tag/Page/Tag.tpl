@@ -141,6 +141,11 @@
           $infoBox.trigger('crmLoad');
         }
 
+        function clearSelection(e) {
+          e.preventDefault();
+          $('.tag-tree', $panel).jstree(true).deselect_all();
+        }
+
         function changeUsedFor() {
           var vals = $('input[name=used_for]:checked', $panel).map(function(i, el) {
             return $(el).val();
@@ -191,6 +196,7 @@
           .append('<div class="tag-tree-wrapper"><div class="tag-tree"></div><div class="tag-info"></div></div>')
           .on('change', 'input[type=color]', changeColor)
           .on('change', 'input[name=used_for]', changeUsedFor)
+          .on('click', '.clear-tag-selection', clearSelection)
           .on('click', '.used-for-toggle', function() {
             $(this).attr('style', 'display: none !important;').next().show();
           })
@@ -305,6 +311,17 @@
     box-sizing: border-box;
     background: white;
   }
+  div.tag-info .clear-tag-selection {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    color: inherit;
+    opacity: .5;
+  }
+  div.tag-info .clear-tag-selection:hover,
+  div.tag-info .clear-tag-selection:active {
+    opacity: 1;
+  }
   .tag-tree-wrapper .tag-tree a.crm-tag-item {
     border-radius: 3px;
     margin: 2px 0;
@@ -332,6 +349,9 @@
   }
   div.tag-info .crm-editable-enabled[data-field=description] {
     min-width: 60%;
+  }
+  div.tag-info input[type=color] {
+    cursor: pointer;
   }
   div.tag-info .tdl {
     font-weight: bold;
@@ -409,6 +429,7 @@
       </div>
     <% {rdelim} %>
     <div><span class="tdl">{ts}Usage Count:{/ts}</span> <%= data.usages %></div>
+    <a class="clear-tag-selection" href="#" title="{ts}Clear selection{/ts}"><i class="crm-i fa-ban"></i></a>
   </div>
   <div class="crm-submit-buttons">
     <% if(!tagset) {ldelim} %>
@@ -434,6 +455,7 @@
       <p>* {ts 1="<%= reserved %>"}%1 reserved.{/ts}</p>
     <% {rdelim} %>
   <p><span class="tdl">{ts}Total Usage:{/ts}</span> <%= usages %></p>
+  <a class="clear-tag-selection" href="#" title="{ts}Clear selection{/ts}"><i class="crm-i fa-ban"></i></a>
   <div class="crm-submit-buttons">
     <a href="{crmURL p="civicrm/tag/merge" q="id="}<%= items.join() %>" class="button crm-popup small-popup" title="{ts}Combine tags into one{/ts}">
       <span><i class="crm-i fa-compress"></i>&nbsp; {ts}Merge Tags{/ts}</span>
