@@ -25,19 +25,6 @@
 *}
 {* this template is used for adding/editing tags  *}
 {literal}
-<style>
-  #tagtree,
-  #tagtree li.highlighted ul {
-    background-color: white;
-  }
-  #tagtree li.highlighted,
-  #tagtree li.highlighted-child.jstree-closed {
-    background-color: #fefcb0;
-  }
-  #tagtree ins.jstree-icon {
-    cursor: pointer;
-  }
-</style>
 <script type="text/javascript">
   (function($, _){{/literal}
     var entityID={$entityID},
