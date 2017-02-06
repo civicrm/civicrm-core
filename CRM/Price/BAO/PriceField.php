@@ -104,12 +104,12 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
       // update previous field values( if any )
       if ($fieldValue->find(TRUE)) {
         $optionsIds['id'] = $fieldValue->id;
-      }
 
-      //Update price_field_value label when edited inline.
-      if (!empty($params['id']) && $priceField->label != $fieldValue->label) {
-        $fieldValue->label = $priceField->label;
-        $fieldValue->save();
+        //Update price_field_value label when edited inline.
+        if (!empty($params['id']) && $priceField->label != $fieldValue->label) {
+          $fieldValue->label = $priceField->label;
+          $fieldValue->save();
+        }
       }
     }
     $defaultArray = array();
