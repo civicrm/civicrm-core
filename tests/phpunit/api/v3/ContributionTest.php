@@ -3217,7 +3217,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'minimum_fee' => 100,
     ));
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', array_merge(array(
-      'contact_id' => $newContact['id'], 
+      'contact_id' => $newContact['id'],
       'installments' => '12',
       'frequency_interval' => '1',
       'amount' => '100',
@@ -3241,7 +3241,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'contact_id' => $newContact['id'],
       'contribution_recur_id' => $contributionRecur['id'],
       'financial_type_id' => "Member Dues",
-      'membership_type_id' => $membershipType['id'], 
+      'membership_type_id' => $membershipType['id'],
       'num_terms' => 1,
     ));
 
