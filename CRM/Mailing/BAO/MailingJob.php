@@ -746,8 +746,9 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
           'job_id' => $this->id,
           'hash' => $field['hash'],
         );
+        $msg = $result->getMessage();
         $params = array_merge($params,
-          CRM_Mailing_BAO_BouncePattern::match($result->getMessage())
+          CRM_Mailing_BAO_BouncePattern::match($msg)
         );
         CRM_Mailing_Event_BAO_Bounce::create($params);
       }
