@@ -605,6 +605,7 @@ function civicrm_api3_contribution_repeattransaction(&$params) {
     //  CRM-19873 call with test mode.
     $params['original_contribution_id'] = civicrm_api3('contribution', 'getvalue', array(
       'return' => 'id',
+      'contribution_status_id' => array('IN' => array('Completed')),
       'contribution_recur_id' => $params['contribution_recur_id'],
       'contribution_test' => CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionRecur', $params['contribution_recur_id'], 'is_test'),
       'options' => array('limit' => 1, 'sort' => 'id DESC'),
