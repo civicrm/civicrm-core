@@ -25,8 +25,11 @@
 *}
 <div class="crm-content-block">
   <div class="help">
-    {ts 1=', '|implode:$usedFor}Tags are a convenient way to categorize data (%1).{/ts}<br />
-    {ts}Create predefined tags in the main tree, or click the <strong>+</strong> to add a set for free tagging.{/ts}
+    {ts 1=', '|implode:$usedFor}Tags are a convenient way to categorize data (%1).{/ts}
+    {if call_user_func(array('CRM_Core_Permission','check'), 'administer Tagsets')}
+      <br />
+      {ts}Create predefined tags in the main tree, or click the <strong>+</strong> to add a set for free tagging.{/ts}
+    {/if}
     {docURL page="user/organising-your-data/groups-and-tags"}
   </div>
 
@@ -40,9 +43,11 @@
           <a href="#tagset-{$set.id}">{$set.name}</a>
         </li>
       {/foreach}
-      <li class="ui-corner-all crm-tab-button" title="{ts}Add Tag Set{/ts}">
-        <a href="#new-tagset"><i class="crm-i fa-plus"></i></a>
-      </li>
+      {if call_user_func(array('CRM_Core_Permission','check'), 'administer Tagsets')}
+        <li class="ui-corner-all crm-tab-button" title="{ts}Add Tag Set{/ts}">
+          <a href="#new-tagset"><i class="crm-i fa-plus"></i></a>
+        </li>
+      {/if}
     </ul>
     <div id="tree">
       <div class="help">
@@ -109,13 +114,14 @@
         function changeSelection(e, data) {
           var tplParams = {
             tagset: tagset,
-            admin: CRM.checkPerm('administer reserved tags')
+            adminReserved: CRM.checkPerm('administer reserved tags')
           },
             tree = $('.tag-tree', $panel).jstree(true),
             $infoBox = $('.tag-info', $panel);
           if (!data.selected || !data.selected.length) {
             tplParams.is_reserved = tagset ? tagSets[tagset].is_reserved == 1 : false;
             tplParams.length = $('.tag-tree li', $panel).length;
+            tplParams.adminTagsets = CRM.checkPerm('administer Tagsets');
             $infoBox.html(noneSelectedTpl(tplParams));
           } else if (data.selected.length === 1) {
             tplParams.usedFor = usedFor;
@@ -123,16 +129,12 @@
             $infoBox.html(oneSelectedTpl($.extend({}, data.node, tplParams)));
           } else {
             tplParams.items = data.selected;
-            tplParams.hasChildren = 0;
-            tplParams.reserved = 0;
-            tplParams.usages = 0;
+            tplParams.hasChildren = tplParams.reserved = tplParams.usages = 0;
             _.each(data.selected, function(id) {
               var node = tree.get_node(id);
               tplParams.usages += node.data.usages;
               tplParams.reserved += node.data.is_reserved;
-              if (hasChildren(id)) {
-                tplParams.hasChildren++;
-              }
+              tplParams.hasChildren += hasChildren(id) ? 1 : 0;
             });
             $infoBox.html(moreSelectedTpl(tplParams));
           }
@@ -345,25 +347,25 @@
 {/literal}
 
 <script type="text/template" id="noneSelectedTpl">
-  <h4><% if (length) {ldelim} %> {ts}None Selected{/ts} <% {rdelim} else {ldelim} %> {ts}Empty Tag Set{/ts} <% {rdelim} %></h4>
-  <hr />
-  <p>
-    <% if (length) {ldelim} %>
-      {ts}Select one or more tags for details.{/ts}
-    <% {rdelim} else {ldelim} %>
-      {ts}No tags have been created in this set.{/ts}
-    <% {rdelim} %>
-  </p>
+  <% if (length) {ldelim} %>
+    <h4>{ts}None Selected{/ts}</h4>
+    <hr />
+    <p>{ts}Select one or more tags for details.{/ts}</p>
+  <% {rdelim} else {ldelim} %>
+    <h4>{ts}Empty Tag Set{/ts}</h4>
+    <hr />
+    <p>{ts}No tags have been created in this set.{/ts}</p>
+  <% {rdelim} %>
   <div class="crm-submit-buttons">
     <a href="{crmURL p="civicrm/tag/edit" q="action=add&parent_id="}<%= tagset || '' %>" class="button crm-popup">
       <span><i class="crm-i fa-plus"></i>&nbsp; {ts}Add Tag{/ts}</span>
     </a>
-    <% if(tagset) {ldelim} %>
+    <% if(tagset && adminTagsets) {ldelim} %>
       <a href="{crmURL p="civicrm/tag/edit" q="action=update&id="}<%= tagset %>" class="button crm-popup tagset-action-update">
         <span><i class="crm-i fa-pencil"></i>&nbsp; {ts}Edit Set{/ts}</span>
       </a>
     <% {rdelim} %>
-    <% if(tagset && !length && (!is_reserved || admin)) {ldelim} %>
+    <% if(tagset && !length && adminTagsets && (!is_reserved || adminReserved)) {ldelim} %>
       <a href="{crmURL p="civicrm/tag/edit" q="action=delete&id="}<%= tagset %>" class="button crm-popup small-popup tagset-action-delete">
         <span><i class="crm-i fa-trash"></i>&nbsp; {ts}Delete Set{/ts}</span>
       </a>
@@ -385,7 +387,7 @@
       <span class="crm-editable" data-field="is_selectable" data-type="select"><% if (data.is_selectable) {ldelim} %> {ts}Yes{/ts} <% {rdelim} else {ldelim} %> {ts}No{/ts} <% {rdelim} %></span>
     </div>
     <div><span class="tdl">{ts}Reserved:{/ts}</span>
-      <span class="<% if (admin) {ldelim} %>crm-editable<% {rdelim} %>" data-field="is_reserved" data-type="select"><% if (data.is_reserved) {ldelim} %> {ts}Yes{/ts} <% {rdelim} else {ldelim} %> {ts}No{/ts} <% {rdelim} %></span>
+      <span class="<% if (adminReserved) {ldelim} %>crm-editable<% {rdelim} %>" data-field="is_reserved" data-type="select"><% if (data.is_reserved) {ldelim} %> {ts}Yes{/ts} <% {rdelim} else {ldelim} %> {ts}No{/ts} <% {rdelim} %></span>
     </div>
     <% if (parent === '#' && !tagset) {ldelim} %>
       <div>
@@ -409,10 +411,15 @@
     <div><span class="tdl">{ts}Usage Count:{/ts}</span> <%= data.usages %></div>
   </div>
   <div class="crm-submit-buttons">
-    <a href="{crmURL p="civicrm/tag/edit" q="action=add&clone_from="}<%= id %>" class="button crm-popup">
+    <% if(!tagset) {ldelim} %>
+      <a href="{crmURL p="civicrm/tag/edit" q="action=add&parent_id="}<%= id %>" class="button crm-popup" title="{ts}Create new tag under this one{/ts}">
+        <span><i class="crm-i fa-plus"></i>&nbsp; {ts}Add Child{/ts}</span>
+      </a>
+    <% {rdelim} %>
+    <a href="{crmURL p="civicrm/tag/edit" q="action=add&clone_from="}<%= id %>" class="button crm-popup" title="{ts}Duplicate ths tag{/ts}">
       <span><i class="crm-i fa-copy"></i>&nbsp; {ts}Clone Tag{/ts}</span>
     </a>
-    <% if(!hasChildren && (!data.is_reserved || admin)) {ldelim} %>
+    <% if(!hasChildren && (!data.is_reserved || adminReserved)) {ldelim} %>
       <a href="{crmURL p="civicrm/tag/edit" q="action=delete&id="}<%= id %>" class="button crm-popup small-popup">
         <span><i class="crm-i fa-trash"></i>&nbsp; {ts}Delete{/ts}</span>
       </a>
@@ -428,10 +435,10 @@
     <% {rdelim} %>
   <p><span class="tdl">{ts}Total Usage:{/ts}</span> <%= usages %></p>
   <div class="crm-submit-buttons">
-    <a href="{crmURL p="civicrm/tag/merge" q="id="}<%= items.join() %>" class="button crm-popup small-popup">
+    <a href="{crmURL p="civicrm/tag/merge" q="id="}<%= items.join() %>" class="button crm-popup small-popup" title="{ts}Combine tags into one{/ts}">
       <span><i class="crm-i fa-compress"></i>&nbsp; {ts}Merge Tags{/ts}</span>
     </a>
-    <% if(!hasChildren && (!reserved || admin)) {ldelim} %>
+    <% if(!hasChildren && (!reserved || adminReserved)) {ldelim} %>
       <a href="{crmURL p="civicrm/tag/edit" q="action=delete&id="}<%= items.join() %>" class="button crm-popup small-popup">
         <span><i class="crm-i fa-trash"></i>&nbsp; {ts}Delete All{/ts}</span>
       </a>
