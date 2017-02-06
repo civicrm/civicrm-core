@@ -356,9 +356,10 @@ AND    domain_id    = %4
    *   Id of the contact to update.
    */
   public static function updateUFName($contactId) {
-    if (!$contactId) {
+    if (!Civi::settings()->get('syncCMSEmail') || !$contactId) {
       return;
     }
+
     $config = CRM_Core_Config::singleton();
     $ufName = CRM_Contact_BAO_Contact::getPrimaryEmail($contactId);
 
@@ -419,6 +420,11 @@ AND    domain_id    = %4
       // Save the email in UF Match table
       $ufmatch->uf_name = $emailAddress;
       CRM_Core_BAO_UFMatch::create((array) $ufmatch);
+
+      // If CMS integration is disabled skip Civi email update if CMS user email is changed
+      if (Civi::settings()->get('syncCMSEmail') == FALSE) {
+        return;
+      }
 
       //check if the primary email for the contact exists
       //$contactDetails[1] - email

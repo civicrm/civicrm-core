@@ -203,16 +203,11 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
       unset($params['enableComponents']);
     }
 
-    // verify ssl peer option
-    if (isset($params['verifySSL'])) {
-      Civi::settings()->set('verifySSL', $params['verifySSL']);
-      unset($params['verifySSL']);
-    }
-
-    // force secure URLs
-    if (isset($params['enableSSL'])) {
-      Civi::settings()->set('enableSSL', $params['enableSSL']);
-      unset($params['enableSSL']);
+    foreach (array('verifySSL', 'enableSSL') as $name) {
+      if (isset($params[$name])) {
+        Civi::settings()->set($name, $params[$name]);
+        unset($params[$name]);
+      }
     }
     $settings = array_intersect_key($params, $this->_settings);
     $result = civicrm_api('setting', 'create', $settings + array('version' => 3));
