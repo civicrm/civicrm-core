@@ -790,9 +790,6 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
    */
   public static function dropActionScheudleMappingForeignKey(CRM_Queue_TaskContext $ctx) {
     CRM_Core_BAO_SchemaHandler::safeRemoveFK('civicrm_action_schedule', 'FK_civicrm_action_schedule_mapping_id');
-    if (CRM_Core_BAO_SchemaHandler::checkIfIndexExists('civicrm_action_schedule', 'FK_civicrm_action_schedule_mapping_id')) {
-      CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_action_schedule DROP INDEX FK_civicrm_action_schedule_mapping_id");
-    }
     return TRUE;
   }
 
