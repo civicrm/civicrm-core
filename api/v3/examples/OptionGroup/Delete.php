@@ -7,7 +7,7 @@
  */
 function option_group_delete_example() {
   $params = array(
-    'id' => 98,
+    'id' => 97,
   );
 
   try{

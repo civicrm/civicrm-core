@@ -26,7 +26,8 @@ function price_field_value_create_example() {
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
     return array(
-      'error' => $errorMessage,
+      'is_error' => 1,
+      'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
     );
@@ -55,6 +56,8 @@ function price_field_value_create_expectedresult() {
         'name' => 'memType1',
         'label' => 'memType1',
         'description' => '',
+        'help_pre' => '',
+        'help_post' => '',
         'amount' => '90',
         'count' => '',
         'max_value' => '',
@@ -64,7 +67,7 @@ function price_field_value_create_expectedresult() {
         'is_default' => '',
         'is_active' => '1',
         'financial_type_id' => '2',
-        'deductible_amount' => '',
+        'non_deductible_amount' => '',
         'contribution_type_id' => '2',
       ),
     ),

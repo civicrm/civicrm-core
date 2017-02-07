@@ -8,9 +8,9 @@
 function pledge_create_example() {
   $params = array(
     'contact_id' => 11,
-    'pledge_create_date' => '20150222',
-    'start_date' => '20150222',
-    'scheduled_date' => '20150224',
+    'pledge_create_date' => '20170207',
+    'start_date' => '20170207',
+    'scheduled_date' => '20170209',
     'amount' => '100',
     'pledge_status_id' => '2',
     'pledge_financial_type_id' => '1',
@@ -31,7 +31,8 @@ function pledge_create_example() {
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
     return array(
-      'error' => $errorMessage,
+      'is_error' => 1,
+      'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
     );

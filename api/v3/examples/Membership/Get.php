@@ -7,7 +7,7 @@
  */
 function membership_get_example() {
   $params = array(
-    'membership_type_id' => 21,
+    'membership_type_id' => 23,
   );
 
   try{
@@ -45,19 +45,19 @@ function membership_get_expectedresult() {
     'values' => array(
       '1' => array(
         'id' => '1',
-        'contact_id' => '35',
-        'membership_type_id' => '21',
+        'contact_id' => '38',
+        'membership_type_id' => '23',
         'join_date' => '2009-01-21',
         'start_date' => '2013-07-29 00:00:00',
         'end_date' => '2013-08-04 00:00:00',
         'source' => 'Payment',
-        'status_id' => '18',
+        'status_id' => '19',
         'is_override' => '1',
         'is_test' => 0,
         'is_pay_later' => 0,
+        'custom_1' => 'custom string',
         'membership_name' => 'General',
         'relationship_name' => 'Child of',
-        'custom_1' => 'custom string',
         'custom_1_1' => 'custom string',
       ),
     ),

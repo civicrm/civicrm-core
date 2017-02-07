@@ -1527,6 +1527,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
       $i = 1;
       foreach ($membershipTypeIDs as $memType) {
+        $membershipLineItems = array();
         if ($i < count($membershipTypeIDs)) {
           $membershipLineItems[$priceSetID][$membershipLines[$memType]] = $unprocessedLineItems[$priceSetID][$membershipLines[$memType]];
           unset($unprocessedLineItems[$priceSetID][$membershipLines[$memType]]);

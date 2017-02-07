@@ -1416,4 +1416,66 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     );
   }
 
+  /**
+   * Test Tax Amount is calculated properly when using PriceSet with Field Type = Text/Numeric Quantity
+   */
+  public function testSubmitContributionPageWithPriceSetQuantity() {
+    $this->_priceSetParams['is_quick_config'] = 0;
+    $this->enableTaxAndInvoicing();
+    $financialType = $this->createFinancialType();
+    $financialTypeId = $financialType['id'];
+    // This function sets the Tax Rate at 10% - it currently has no way to pass Tax Rate into it - so let's work with 10%
+    $financialAccount = $this->relationForFinancialTypeWithFinancialAccount($financialType['id'], 5);
+
+    $this->setUpContributionPage();
+    $submitParams = array(
+      'price_' . $this->_ids['price_field'][0] => reset($this->_ids['price_field_value']),
+      'id' => (int) $this->_ids['contribution_page'],
+      'first_name' => 'J',
+      'last_name' => 'T',
+      'email' => 'JT@ohcanada.ca',
+      'is_pay_later' => TRUE,
+    );
+
+    // Create PriceSet/PriceField
+    $priceSetID = reset($this->_ids['price_set']);
+    $priceField = $this->callAPISuccess('price_field', 'create', array(
+      'price_set_id' => $priceSetID,
+      'label' => 'Printing Rights',
+      'html_type' => 'Text',
+    ));
+    $priceFieldValue = $this->callAPISuccess('price_field_value', 'create', array(
+      'price_set_id' => $priceSetID,
+      'price_field_id' => $priceField['id'],
+      'label' => 'Printing Rights',
+      'financial_type_id' => $financialTypeId,
+      'amount' => '16.95',
+    ));
+    $priceFieldId = $priceField['id'];
+
+    // Set quantity for our test
+    $submitParams['price_' . $priceFieldId] = 180;
+
+    // contribution_page submit requires amount and tax_amount - and that's ok we're not testing that - we're testing at the LineItem level
+    $submitParams['amount'] = 180 * 16.95;
+    // This is the correct Tax Amount - use it later to compare to what the CiviCRM Core came up with at the LineItem level
+    $submitParams['tax_amount'] = 180 * 16.95 * 0.10;
+
+    $this->callAPISuccess('contribution_page', 'submit', $submitParams);
+    $contribution = $this->callAPISuccessGetSingle('contribution', array(
+      'contribution_page_id' => $this->_ids['contribution_page'],
+    ));
+
+    // Retrieve the lineItem that belongs to the Printing Rights and check the tax_amount CiviCRM Core calculated for it
+    $lineItem = $this->callAPISuccess('LineItem', 'get', array(
+      'contribution_id' => $contribution['id'],
+      'label' => 'Printing Rights',
+    ));
+    $lineItemId = $lineItem['id'];
+    $lineItem_TaxAmount = round($lineItem['values'][$lineItemId]['tax_amount'], 2);
+
+    // Compare this to what it should be!
+    $this->assertEquals($lineItem_TaxAmount, round($submitParams['tax_amount'], 2), 'Wrong Sales Tax Amount is calculated and stored.');
+  }
+
 }

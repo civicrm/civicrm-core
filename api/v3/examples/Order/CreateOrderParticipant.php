@@ -9,7 +9,7 @@
  */
 function order_create_example() {
   $params = array(
-    'contact_id' => 10,
+    'contact_id' => 11,
     'receive_date' => '2010-01-20',
     'total_amount' => 300,
     'financial_type_id' => 1,
@@ -41,7 +41,7 @@ function order_create_example() {
           ),
         ),
         'params' => array(
-          'contact_id' => 10,
+          'contact_id' => 11,
           'event_id' => 1,
           'status_id' => 1,
           'role_id' => 1,
@@ -87,7 +87,7 @@ function order_create_expectedresult() {
     'values' => array(
       '1' => array(
         'id' => '1',
-        'contact_id' => '10',
+        'contact_id' => '11',
         'financial_type_id' => '1',
         'contribution_page_id' => '',
         'payment_instrument_id' => '4',

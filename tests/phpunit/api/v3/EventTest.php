@@ -296,9 +296,8 @@ class api_v3_EventTest extends CiviUnitTestCase {
       'api.Event.create' => $eventParams,
       'sequential' => 1,
     );
-    $createResult = $this->callAPIAndDocument('LocBlock', 'create', $locBlockParams, __FUNCTION__, __FILE__);
+    $createResult = $this->callAPISuccess('LocBlock', 'create', $locBlockParams);
     $locBlockId = $createResult['id'];
-    $addressId = $createResult['values'][0]['address_id'];
     $eventId = $createResult['values'][0]['api.Event.create']['id'];
 
     // request the event with its loc block:
@@ -426,7 +425,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $params['event_type_id'] = 1;
     $params['custom_' . $customField['id']] = "$contact_id";
 
-    $result = $this->callAPIAndDocument($this->_entity, 'create', $params, __FUNCTION__, __FILE__, $description, $subfile);
+    $this->callAPIAndDocument($this->_entity, 'create', $params, __FUNCTION__, __FILE__, $description, $subfile);
 
     // Retrieve the activity, search for the contact.
     $result = $this->callAPIAndDocument($this->_entity, 'get', array(
@@ -562,10 +561,10 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $this->assertArrayHasKey('id', $result['values'][$result['id']]);
     $result = $this->callAPISuccess($this->_entity, 'Get', array('id' => $result['id']));
     $this->callAPISuccess($this->_entity, 'Delete', array('id' => $result['id']));
-    $this->assertEquals('2008-10-21 00:00:00', $result['values'][$result['id']]['start_date'], 'start date is not set in line ' . __LINE__);
-    $this->assertEquals('2008-10-23 00:00:00', $result['values'][$result['id']]['end_date'], 'end date is not set in line ' . __LINE__);
-    $this->assertEquals('2008-06-01 00:00:00', $result['values'][$result['id']]['registration_start_date'], 'start date is not set in line ' . __LINE__);
-    $this->assertEquals('2008-10-15 00:00:00', $result['values'][$result['id']]['registration_end_date'], 'end date is not set in line ' . __LINE__);
+    $this->assertEquals('2008-10-21 00:00:00', $result['values'][$result['id']]['start_date'], 'start date is not set');
+    $this->assertEquals('2008-10-23 00:00:00', $result['values'][$result['id']]['end_date'], 'end date is not set');
+    $this->assertEquals('2008-06-01 00:00:00', $result['values'][$result['id']]['registration_start_date'], 'start date is not set');
+    $this->assertEquals('2008-10-15 00:00:00', $result['values'][$result['id']]['registration_end_date'], 'end date is not set');
   }
 
   /**
@@ -612,7 +611,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $params = array(
       'id' => $this->_eventIds[0],
     );
-    $result = $this->callAPIAndDocument('Event', 'Delete', $params, __FUNCTION__, __FILE__);
+    $this->callAPIAndDocument('Event', 'Delete', $params, __FUNCTION__, __FILE__);
   }
 
   /**
@@ -631,13 +630,13 @@ class api_v3_EventTest extends CiviUnitTestCase {
    */
   public function testDeleteWithExistingParticipant() {
     $contactID = $this->individualCreate();
-    $participantID = $this->participantCreate(
+    $this->participantCreate(
       array(
         'contactID' => $contactID,
         'eventID' => $this->_eventIds[0],
       )
     );
-    $result = $this->callAPISuccess('Event', 'Delete', array('id' => $this->_eventIds[0]));
+    $this->callAPISuccess('Event', 'Delete', array('id' => $this->_eventIds[0]));
   }
 
   public function testDeleteWithWrongEventId() {
@@ -647,8 +646,6 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $params = array('event_id' => $this->_eventIds[0]);
     $result = $this->callAPIFailure('Event', 'Delete', $params);
   }
-
-  ///////////////// civicrm_event_search methods
 
   /**
    * Test civicrm_event_search with wrong params type.

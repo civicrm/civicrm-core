@@ -51,17 +51,18 @@ function option_group_create_expectedresult() {
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
-    'id' => 93,
+    'id' => 92,
     'values' => array(
       '0' => array(
-        'id' => '93',
+        'id' => '92',
         'name' => 'civicrm_event.amount.560',
         'title' => '',
         'description' => '',
+        'data_type' => '',
         'is_reserved' => '1',
         'is_active' => '1',
         'is_locked' => '',
-        'api.OptionValue.create' => 784,
+        'api.OptionValue.create' => 849,
       ),
     ),
   );

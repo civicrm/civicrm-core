@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2017
- * $Id$
- *
  */
 
 /**
@@ -43,9 +41,9 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
    * Insert/update a new entry in the database.
    *
    * @param array $params
-   *   (reference), array $ids.
    *
-   * @param $ids
+   * @param array $ids
+   *  Deprecated variable.
    *
    * @return CRM_Price_DAO_PriceFieldValue
    */
@@ -157,7 +155,7 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
   }
 
   /**
-   * Retrive the all values for given field id.
+   * Retrieve all values for given field id.
    *
    * @param int $fieldId
    *   Price_field_id.

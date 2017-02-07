@@ -7,7 +7,7 @@
  */
 function entity_tag_get_example() {
   $params = array(
-    'contact_id' => 3,
+    'contact_id' => 15,
   );
 
   try{
@@ -41,10 +41,13 @@ function entity_tag_get_expectedresult() {
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
-    'id' => 6,
+    'id' => 5,
     'values' => array(
-      '6' => array(
-        'tag_id' => '6',
+      '5' => array(
+        'id' => '5',
+        'entity_table' => 'civicrm_contact',
+        'entity_id' => '15',
+        'tag_id' => '10',
       ),
     ),
   );

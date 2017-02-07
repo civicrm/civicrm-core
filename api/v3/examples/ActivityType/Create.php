@@ -49,13 +49,13 @@ function activity_type_create_expectedresult() {
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
-    'id' => 784,
+    'id' => 849,
     'values' => array(
-      '784' => array(
-        'id' => '784',
+      '849' => array(
+        'id' => '849',
         'option_group_id' => '2',
         'label' => 'send out letters',
-        'value' => '51',
+        'value' => '55',
         'name' => 'send out letters',
         'grouping' => '',
         'filter' => 0,
@@ -68,6 +68,8 @@ function activity_type_create_expectedresult() {
         'component_id' => '',
         'domain_id' => '',
         'visibility_id' => '',
+        'icon' => '',
+        'color' => '',
       ),
     ),
     'deprecated' => 'The ActivityType api is deprecated. Please use the OptionValue api instead.',

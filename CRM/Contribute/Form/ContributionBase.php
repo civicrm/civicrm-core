@@ -609,8 +609,11 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
         'total_amount' => 1,
         'amount_level' => 1,
         'contribution_status_id' => 1,
+        // @todo replace payment_instrument with payment instrument id.
+        // both are available now but the id field is the most consistent.
         'payment_instrument' => 1,
-        'check_number' => 1,
+        'payment_instrument_id' => 1,
+        'contribution_check_number' => 1,
         'financial_type' => 1,
       );
 
@@ -633,7 +636,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
         //remove common fields only if profile is not configured for onbehalf/honor
         if (!in_array($profileContactType, array('honor', 'onbehalf'))) {
-          $fields = array_diff_assoc($fields, $this->_fields);
+          $fields = array_diff_key($fields, $this->_fields);
         }
 
         CRM_Core_BAO_Address::checkContactSharedAddressFields($fields, $contactID);

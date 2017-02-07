@@ -8,7 +8,7 @@
 function activity_create_example() {
   $params = array(
     'source_contact_id' => 1,
-    'activity_type_id' => '51',
+    'activity_type_id' => '55',
     'subject' => 'test activity type id',
     'activity_date_time' => '2011-06-02 14:36:13',
     'status_id' => 2,
@@ -55,7 +55,7 @@ function activity_create_expectedresult() {
       '1' => array(
         'id' => '1',
         'source_record_id' => '',
-        'activity_type_id' => '51',
+        'activity_type_id' => '55',
         'subject' => 'test activity type id',
         'activity_date_time' => '20110602143613',
         'duration' => '120',
@@ -87,7 +87,7 @@ function activity_create_expectedresult() {
 
 /*
 * This example has been generated from the API test suite.
-* The test that created it is called "testActivityCreateCustom"
+* The test that created it is called "testActivityCreateCustomSubType"
 * and can be found at:
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ActivityTest.php
 *
