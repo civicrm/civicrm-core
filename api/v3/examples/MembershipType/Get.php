@@ -48,7 +48,7 @@ function membership_type_get_expectedresult() {
         'domain_id' => '1',
         'name' => 'General',
         'member_of_contact_id' => '4',
-        'financial_type_id' => '1',
+        'financial_type_id' => '2',
         'minimum_fee' => '0.00',
         'duration_unit' => 'year',
         'duration_interval' => '1',
@@ -56,6 +56,7 @@ function membership_type_get_expectedresult() {
         'visibility' => 'Public',
         'auto_renew' => 0,
         'is_active' => '1',
+        'contribution_type_id' => '2',
       ),
     ),
   );

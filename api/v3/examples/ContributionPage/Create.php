@@ -13,6 +13,9 @@ function contribution_page_create_example() {
     'goal_amount' => 34567,
     'is_pay_later' => 1,
     'is_monetary' => TRUE,
+    'is_email_receipt' => TRUE,
+    'receipt_from_email' => 'yourconscience@donate.com',
+    'receipt_from_name' => 'Ego Freud',
   );
 
   try{
@@ -77,11 +80,9 @@ function contribution_page_create_expectedresult() {
         'thankyou_title' => '',
         'thankyou_text' => '',
         'thankyou_footer' => '',
-        'is_for_organization' => '',
-        'for_organization' => '',
-        'is_email_receipt' => '',
-        'receipt_from_name' => '',
-        'receipt_from_email' => '',
+        'is_email_receipt' => '1',
+        'receipt_from_name' => 'Ego Freud',
+        'receipt_from_email' => 'yourconscience@donate.com',
         'cc_receipt' => '',
         'bcc_receipt' => '',
         'receipt_text' => '',

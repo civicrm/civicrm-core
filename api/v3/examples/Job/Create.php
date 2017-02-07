@@ -48,13 +48,14 @@ function job_create_expectedresult() {
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
-    'id' => 29,
+    'id' => 30,
     'values' => array(
       '0' => array(
-        'id' => '29',
+        'id' => '30',
         'domain_id' => '1',
         'run_frequency' => 'Daily',
         'last_run' => '',
+        'scheduled_run_date' => '',
         'name' => 'API_Test_Job',
         'description' => 'A long description written by hand in cursive',
         'api_entity' => 'ApiTestEntity',

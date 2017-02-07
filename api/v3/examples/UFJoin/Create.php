@@ -7,8 +7,8 @@
  */
 function uf_join_create_example() {
   $params = array(
-    'module' => 'CiviContribute',
-    'entity_table' => 'civicrm_contribution_page',
+    'module' => 'CiviCampaign',
+    'entity_table' => 'civicrm_survey',
     'entity_id' => 1,
     'weight' => 1,
     'uf_group_id' => 11,
@@ -25,7 +25,8 @@ function uf_join_create_example() {
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
     return array(
-      'error' => $errorMessage,
+      'is_error' => 1,
+      'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
     );
@@ -51,8 +52,8 @@ function uf_join_create_expectedresult() {
       '0' => array(
         'id' => '1',
         'is_active' => '1',
-        'module' => 'CiviContribute',
-        'entity_table' => 'civicrm_contribution_page',
+        'module' => 'CiviCampaign',
+        'entity_table' => 'civicrm_survey',
         'entity_id' => '1',
         'weight' => '1',
         'uf_group_id' => '11',
@@ -66,7 +67,7 @@ function uf_join_create_expectedresult() {
 
 /*
 * This example has been generated from the API test suite.
-* The test that created it is called "testCreateUFJoin"
+* The test that created it is called "testCreateSurveyUFJoin"
 * and can be found at:
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/UFJoinTest.php
 *

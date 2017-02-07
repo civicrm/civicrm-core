@@ -10,7 +10,7 @@
  */
 function contact_get_example() {
   $params = array(
-    'id' => 1,
+    'id' => 3,
     'api.website.getValue' => array(
       'return' => 'url',
     ),
@@ -51,10 +51,10 @@ function contact_get_expectedresult() {
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
-    'id' => 1,
+    'id' => 3,
     'values' => array(
-      '1' => array(
-        'contact_id' => '1',
+      '3' => array(
+        'contact_id' => '3',
         'contact_type' => 'Individual',
         'contact_sub_type' => '',
         'sort_name' => 'xyz3, abc3',
@@ -90,8 +90,8 @@ function contact_get_expectedresult() {
         'sic_code' => '',
         'contact_is_deleted' => 0,
         'current_employer' => '',
-        'address_id' => '2',
-        'street_address' => '1 my road',
+        'address_id' => '',
+        'street_address' => '',
         'supplemental_address_1' => '',
         'supplemental_address_2' => '',
         'city' => '',
@@ -119,7 +119,7 @@ function contact_get_expectedresult() {
         'state_province_name' => '',
         'state_province' => '',
         'country' => '',
-        'id' => '1',
+        'id' => '3',
         'api.website.getValue' => 'http://civicrm.org',
         'api.Contribution.getCount' => 2,
         'api.CustomValue.get' => array(

@@ -9,18 +9,19 @@ function mailing_create_example() {
   $params = array(
     'subject' => 'Hello {contact.display_name}',
     'body_text' => 'This is {contact.display_name}.
+https://civicrm.org
 {domain.address}{action.optOutUrl}',
-    'body_html' => '<p>This is {contact.display_name}.</p><p>{domain.address}{action.optOutUrl}</p>',
+    'body_html' => '<p>This is {contact.display_name}.</p><p><a href='https://civicrm.org/'>CiviCRM.org</a></p><p>{domain.address}{action.optOutUrl}</p>',
     'name' => 'mailing name',
-    'created_id' => 9,
+    'created_id' => 11,
     'header_id' => '',
     'footer_id' => '',
     'groups' => array(
       'include' => array(
-        '0' => 7,
+        '0' => 9,
       ),
       'exclude' => array(
-        '0' => 8,
+        '0' => 10,
       ),
     ),
     'mailings' => array(
@@ -73,10 +74,10 @@ function mailing_create_expectedresult() {
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
-    'id' => 4,
+    'id' => 5,
     'values' => array(
-      '4' => array(
-        'id' => '4',
+      '5' => array(
+        'id' => '5',
         'domain_id' => '1',
         'header_id' => '',
         'footer_id' => '',
@@ -93,9 +94,9 @@ function mailing_create_expectedresult() {
         'template_options' => '',
         'subject' => 'Hello {contact.display_name}',
         'body_text' => 'This is {contact.display_name}.
-https://civińcrm.org
+https://civicrm.org
 {domain.address}{action.optOutUrl}',
-        'body_html' => '<p>This is {contact.display_name}.</p><p><a href=\'https://civińcrm.org/\'>CiviCRM.org</a></p><p>{domain.address}{action.optOutUrl}</p>',
+        'body_html' => '<p>This is {contact.display_name}.</p><p><a href=\'https://civicrm.org/\'>CiviCRM.org</a></p><p>{domain.address}{action.optOutUrl}</p>',
         'url_tracking' => '1',
         'forward_replies' => '',
         'auto_responder' => '',
@@ -103,7 +104,7 @@ https://civińcrm.org
         'is_completed' => '',
         'msg_template_id' => '',
         'override_verp' => '1',
-        'created_id' => '9',
+        'created_id' => '11',
         'created_date' => '2013-07-28 08:49:19',
         'scheduled_id' => '',
         'scheduled_date' => '',
@@ -119,6 +120,7 @@ https://civińcrm.org
         'hash' => '',
         'location_type_id' => '',
         'email_selection_method' => '',
+        'language' => '',
         'api.mailing_job.create' => array(
           'is_error' => 0,
           'version' => 3,
@@ -127,7 +129,7 @@ https://civińcrm.org
           'values' => array(
             '0' => array(
               'id' => '5',
-              'mailing_id' => '4',
+              'mailing_id' => '5',
               'scheduled_date' => '20130728085413',
               'start_date' => '',
               'end_date' => '',
@@ -148,9 +150,9 @@ https://civińcrm.org
           'values' => array(
             '0' => array(
               'id' => '4',
-              'mailing_id' => '4',
-              'contact_id' => '10',
-              'email_id' => '10',
+              'mailing_id' => '5',
+              'contact_id' => '12',
+              'email_id' => '12',
               'api.contact.getvalue' => 'Mr. Includer Person II',
               'api.email.getvalue' => 'include.me@example.org',
             ),

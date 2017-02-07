@@ -23,7 +23,8 @@ function price_set_create_example() {
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
     return array(
-      'error' => $errorMessage,
+      'is_error' => 1,
+      'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
     );
@@ -59,6 +60,7 @@ function price_set_create_expectedresult() {
         'financial_type_id' => '',
         'is_quick_config' => '',
         'is_reserved' => '',
+        'min_amount' => '',
       ),
     ),
   );

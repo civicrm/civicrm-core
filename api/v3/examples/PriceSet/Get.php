@@ -19,7 +19,8 @@ function price_set_get_example() {
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
     return array(
-      'error' => $errorMessage,
+      'is_error' => 1,
+      'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
     );
@@ -50,6 +51,7 @@ function price_set_get_expectedresult() {
         'extends' => '2',
         'is_quick_config' => '1',
         'is_reserved' => '1',
+        'min_amount' => 0,
         'entity' => array(),
       ),
     ),

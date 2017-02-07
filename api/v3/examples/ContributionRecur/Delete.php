@@ -7,7 +7,7 @@
  */
 function contribution_recur_delete_example() {
   $params = array(
-    'id' => 3,
+    'id' => 4,
   );
 
   try{

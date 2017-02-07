@@ -23,7 +23,8 @@ function relationship_get_example() {
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
     return array(
-      'error' => $errorMessage,
+      'is_error' => 1,
+      'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
     );
@@ -48,12 +49,11 @@ function relationship_get_expectedresult() {
     'values' => array(
       '2' => array(
         'id' => '2',
-        'contact_id_a' => '83',
-        'contact_id_b' => '85',
-        'relationship_type_id' => '31',
+        'contact_id_a' => '95',
+        'contact_id_b' => '97',
+        'relationship_type_id' => '34',
         'start_date' => '2013-07-29 00:00:00',
         'is_active' => '1',
-        'description' => '',
         'is_permission_a_b' => 0,
         'is_permission_b_a' => 0,
       ),

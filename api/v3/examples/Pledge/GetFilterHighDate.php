@@ -9,7 +9,7 @@
  */
 function pledge_get_example() {
   $params = array(
-    'pledge_start_date_high' => '20150220231942',
+    'pledge_start_date_high' => '20170205024740',
   );
 
   try{
@@ -21,7 +21,8 @@ function pledge_get_example() {
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
     return array(
-      'error' => $errorMessage,
+      'is_error' => 1,
+      'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
     );
@@ -52,10 +53,11 @@ function pledge_get_expectedresult() {
         'display_name' => 'Mr. Anthony Anderson II',
         'pledge_id' => '2',
         'pledge_amount' => '100.00',
-        'pledge_create_date' => '2015-02-22 00:00:00',
+        'pledge_create_date' => '2017-02-07 00:00:00',
+        'pledge_start_date' => '2016-03-04 00:00:00',
         'pledge_status' => 'Overdue',
         'pledge_total_paid' => '',
-        'pledge_next_pay_date' => '2014-03-07 00:00:00',
+        'pledge_next_pay_date' => '2016-03-04 00:00:00',
         'pledge_next_pay_amount' => '20.00',
         'pledge_outstanding_amount' => '20.00',
         'pledge_financial_type' => 'Donation',

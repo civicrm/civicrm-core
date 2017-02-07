@@ -19,7 +19,8 @@ function price_field_value_get_example() {
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
     return array(
-      'error' => $errorMessage,
+      'is_error' => 1,
+      'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
     );
@@ -52,7 +53,8 @@ function price_field_value_get_expectedresult() {
         'is_default' => 0,
         'is_active' => '1',
         'financial_type_id' => '1',
-        'deductible_amount' => '0.00',
+        'non_deductible_amount' => '0.00',
+        'contribution_type_id' => '1',
       ),
     ),
   );

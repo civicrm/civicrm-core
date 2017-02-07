@@ -41,7 +41,7 @@ function activity_type_get_expectedresult() {
   $expectedResult = array(
     'is_error' => 0,
     'version' => 3,
-    'count' => 50,
+    'count' => 54,
     'values' => array(
       '1' => 'Meeting',
       '2' => 'Phone Call',

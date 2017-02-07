@@ -27,7 +27,8 @@ function report_template_getrows_example() {
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
     return array(
-      'error' => $errorMessage,
+      'is_error' => 1,
+      'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
     );
@@ -50,16 +51,16 @@ function report_template_getrows_expectedresult() {
     'count' => 2,
     'values' => array(
       '0' => array(
-        'civicrm_contact_sort_name' => 'Default Organization',
-        'civicrm_contact_id' => '1',
-        'civicrm_contact_sort_name_link' => '/index.php?q=civicrm/report/contact/detail&amp;reset=1&amp;force=1&amp;id_op=eq&amp;id_value=1',
-        'civicrm_contact_sort_name_hover' => 'View Constituent Detail Report for this contact.',
-      ),
-      '1' => array(
         'civicrm_contact_sort_name' => 'Second Domain',
         'civicrm_contact_id' => '2',
         'civicrm_contact_sort_name_link' => '/index.php?q=civicrm/report/contact/detail&amp;reset=1&amp;force=1&amp;id_op=eq&amp;id_value=2',
-        'civicrm_contact_sort_name_hover' => 'View Constituent Detail Report for this contact.',
+        'civicrm_contact_sort_name_hover' => 'View Contact Detail Report for this contact',
+      ),
+      '1' => array(
+        'civicrm_contact_sort_name' => 'Unit Test Organization',
+        'civicrm_contact_id' => '1',
+        'civicrm_contact_sort_name_link' => '/index.php?q=civicrm/report/contact/detail&amp;reset=1&amp;force=1&amp;id_op=eq&amp;id_value=1',
+        'civicrm_contact_sort_name_hover' => 'View Contact Detail Report for this contact',
       ),
     ),
     'metadata' => array(

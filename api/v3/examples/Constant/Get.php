@@ -43,7 +43,7 @@ function constant_get_expectedresult() {
   $expectedResult = array(
     'is_error' => 0,
     'version' => 3,
-    'count' => 32,
+    'count' => 36,
     'values' => array(
       '1' => 'Meeting',
       '2' => 'Phone Call',
