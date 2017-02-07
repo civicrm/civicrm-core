@@ -2292,8 +2292,7 @@ class CRM_Contact_BAO_Query {
       }
       else {
         if ($tableName == 'civicrm_contact') {
-          // LOWER roughly translates to 'hurt my database without deriving any benefit' See CRM-19811.
-          $fieldName = "LOWER(contact_a.{$fieldName})";
+          $fieldName = "contact_a.{$fieldName}";
         }
         else {
           if ($op != 'IN' && !is_numeric($value) && !is_array($value)) {

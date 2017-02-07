@@ -254,14 +254,30 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
    */
   public function testCaseInsensitive() {
     $orgID = $this->organizationCreate(array('organization_name' => 'BOb'));
-    $this->callAPISuccess('Contact', 'create', array('display_name' => 'Minnie Mouse', 'employer_id' => $orgID, 'contact_type' => 'Individual'));
-    $searchParams = array(array('current_employer', '=', 'bob', 0, 1));
-    $query = new CRM_Contact_BAO_Query($searchParams);
-    $result = $query->apiQuery($searchParams);
-    $this->assertEquals(1, count($result[0]));
-    $contact = reset($result[0]);
-    $this->assertEquals('Minnie Mouse', $contact['display_name']);
-    $this->assertEquals('BOb', $contact['current_employer']);
+    $params = array(
+      'display_name' => 'Minnie Mouse',
+      'first_name' => 'Minnie',
+      'last_name' => 'Mouse',
+      'employer_id' => $orgID,
+      'contact_type' => 'Individual',
+      'nick_name' => 'Mins',
+    );
+    $this->callAPISuccess('Contact', 'create', $params);
+    unset($params['contact_type']);
+    foreach ($params as $key => $value) {
+      if ($key == 'employer_id') {
+        $searchParams = array(array('current_employer', '=', 'bob', 0, 1));
+      }
+      else {
+        $searchParams = array(array($key, '=', strtolower($value), 0, 1));
+      }
+      $query = new CRM_Contact_BAO_Query($searchParams);
+      $result = $query->apiQuery($searchParams);
+      $this->assertEquals(1, count($result[0]), 'search for ' . $key);
+      $contact = reset($result[0]);
+      $this->assertEquals('Minnie Mouse', $contact['display_name']);
+      $this->assertEquals('BOb', $contact['current_employer']);
+    }
   }
 
   /**
