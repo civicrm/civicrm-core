@@ -148,10 +148,10 @@ function civicrm_api3_group_contact_create($params) {
 function civicrm_api3_group_contact_delete($params) {
   $checkParams = $params;
   if (!empty($checkParams['status']) && in_array($checkParams['status'], array('Removed', 'Deleted'))) {
-    $checkParams['status'] = 'Added';
+    $checkParams['status'] = array('IN' => array('Added', 'Pending'));
   }
   elseif (!empty($checkParams['status']) && $checkParams['status'] == 'Added') {
-    $checkParams['status'] = 'Removed';
+    $checkParams['status'] = array('IN' => array('Pending', 'Removed'));
   }
   elseif (!empty($checkParams['status'])) {
     unset($checkParams['status']);
@@ -161,8 +161,7 @@ function civicrm_api3_group_contact_delete($params) {
     $checkParams['status'] = 'removed';
   }
   $groupContact2 = civicrm_api3('GroupContact', 'get', $checkParams);
-  $groupContact3 = civicrm_api3('GroupContact', 'get', array_merge($checkParams, array('status' => 'Pending')));
-  if ($groupContact['count'] == 0 && $groupContact2['count'] == 0 && $groupContact3['count'] == 0) {
+  if ($groupContact['count'] == 0 && $groupContact2['count'] == 0) {
     throw new API_Exception('Cannot Delete GroupContact');
   }
   $params['status'] = CRM_Utils_Array::value('status', $params, empty($params['skip_undelete']) ? 'Removed' : 'Deleted');

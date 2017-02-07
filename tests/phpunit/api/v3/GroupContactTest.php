@@ -260,7 +260,6 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
     $this->callAPISuccess('groupContact', 'delete', array('id' => $groupGetContact['id'], 'status' => 'Removed'));
   }
 
-
   /**
    * CRM-16945 duplicate groups are showing up when contacts are hard-added to child groups or smart groups.
    *
