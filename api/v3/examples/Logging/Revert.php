@@ -8,7 +8,7 @@
 function logging_revert_example() {
   $params = array(
     'log_conn_id' => 'woot',
-    'log_date' => '2016-04-06 02:52:07',
+    'log_date' => '2017-02-07 02:35:06',
   );
 
   try{

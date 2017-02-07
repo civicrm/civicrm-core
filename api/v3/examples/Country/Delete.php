@@ -7,7 +7,7 @@
  */
 function country_delete_example() {
   $params = array(
-    'id' => 1253,
+    'id' => 1255,
   );
 
   try{

@@ -7,7 +7,7 @@
  */
 function participant_status_type_delete_example() {
   $params = array(
-    'id' => 18,
+    'id' => 19,
   );
 
   try{

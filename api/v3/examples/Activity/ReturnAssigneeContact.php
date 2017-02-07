@@ -52,7 +52,7 @@ function activity_get_expectedresult() {
     'values' => array(
       '0' => array(
         'id' => '1',
-        'activity_type_id' => '51',
+        'activity_type_id' => '55',
         'subject' => 'test activity type id',
         'activity_date_time' => '2011-06-02 14:36:13',
         'duration' => '120',

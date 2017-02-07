@@ -45,7 +45,7 @@ function order_cancel_expectedresult() {
     'values' => array(
       '1' => array(
         'id' => '1',
-        'contact_id' => '14',
+        'contact_id' => '16',
         'financial_type_id' => '1',
         'contribution_page_id' => '',
         'payment_instrument_id' => '4',

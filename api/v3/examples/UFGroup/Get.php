@@ -19,7 +19,8 @@ function uf_group_get_example() {
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
     return array(
-      'error' => $errorMessage,
+      'is_error' => 1,
+      'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
     );
@@ -61,7 +62,7 @@ function uf_group_get_expectedresult() {
         'is_cms_user' => '1',
         'notify' => 'admin@example.org',
         'is_reserved' => '1',
-        'name' => 'Test_Group_2',
+        'name' => 'Test_Group',
         'created_id' => '1',
         'created_date' => '2013-07-28 08:49:19',
         'is_proximity_search' => 0,

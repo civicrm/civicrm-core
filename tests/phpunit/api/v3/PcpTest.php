@@ -91,7 +91,7 @@ class api_v3_PcpTest extends CiviUnitTestCase {
     $checkCreated = $this->callAPISuccess($this->entity, 'get',
       array('id' => $entity['id']));
     $this->assertEquals(1, $checkCreated['count']);
-    $result = $this->callAPIAndDocument('Pcp', 'delete',
+    $this->callAPIAndDocument('Pcp', 'delete',
         array('id' => $entity['id']), __FUNCTION__, __FILE__);
     $checkDeleted = $this->callAPISuccess($this->entity, 'get',
         array('id' => $entity['id']));
@@ -109,8 +109,8 @@ class api_v3_PcpTest extends CiviUnitTestCase {
     $description = "Demonstrates get + delete in the same call.";
     $subfile = 'ChainedGetDelete';
     $params = array('title' => "Pcp title", 'api.Pcp.delete' => 1);
-    $result = $this->callAPISuccess('Pcp', 'create', $this->params);
-    $result = $this->callAPIAndDocument('Pcp', 'get', $params, __FUNCTION__,
+    $this->callAPISuccess('Pcp', 'create', $this->params);
+    $this->callAPIAndDocument('Pcp', 'get', $params, __FUNCTION__,
         __FILE__, $description, $subfile);
     $this->assertEquals(0, $this->callAPISuccess('Pcp', 'getcount', array()));
   }

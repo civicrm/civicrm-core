@@ -19,7 +19,8 @@ function contribution_delete_example() {
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
     return array(
-      'error' => $errorMessage,
+      'is_error' => 1,
+      'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
     );
@@ -53,7 +54,7 @@ function contribution_delete_expectedresult() {
 * This example has been generated from the API test suite.
 * The test that created it is called "testDeleteContribution"
 * and can be found at:
-* https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/TaxContributionPageTest.php
+* https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ContributionTest.php
 *
 * You can see the outcome of the API tests at
 * https://test.civicrm.org/job/CiviCRM-master-git/

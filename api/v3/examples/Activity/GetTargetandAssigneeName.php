@@ -48,16 +48,18 @@ function activity_getsingle_expectedresult() {
   $expectedResult = array(
     'id' => '1',
     'subject' => 'Make-it-Happen Meeting',
-    'source_contact_id' => '8',
+    'source_contact_id' => '6',
     'source_contact_name' => 'D Bug',
-    'target_contact_id' => array('5', '6'),
-    'target_contact_name' => array(
-      '5' => 'A Cat',
-      '6' => 'B Good',
+    'target_contact_id' => array(
+      '1' => '4',
     ),
-    'assignee_contact_id' => array('7'),
+    'target_contact_name' => array(
+      '3' => 'A Cat',
+      '4' => 'B Good',
+    ),
+    'assignee_contact_id' => array(),
     'assignee_contact_name' => array(
-      '7' => 'C Shore',
+      '5' => 'C Shore',
     ),
   );
 

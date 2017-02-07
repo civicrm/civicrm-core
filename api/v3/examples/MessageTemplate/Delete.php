@@ -7,7 +7,7 @@
  */
 function message_template_delete_example() {
   $params = array(
-    'id' => 70,
+    'id' => 72,
   );
 
   try{

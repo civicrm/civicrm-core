@@ -57,6 +57,9 @@ function contact_getfields_expectedresult() {
         'where' => 'civicrm_contact.id',
         'headerPattern' => '/internal|contact?|id$/i',
         'export' => TRUE,
+        'table_name' => 'civicrm_contact',
+        'entity' => 'Contact',
+        'bao' => 'CRM_Contact_BAO_Contact',
         'api.aliases' => array(
           '0' => 'contact_id',
         ),
@@ -70,6 +73,9 @@ function contact_getfields_expectedresult() {
         'size' => 30,
         'export' => TRUE,
         'where' => 'civicrm_contact.contact_type',
+        'table_name' => 'civicrm_contact',
+        'entity' => 'Contact',
+        'bao' => 'CRM_Contact_BAO_Contact',
         'html' => array(
           'type' => 'Select',
           'maxlength' => 64,
@@ -94,6 +100,9 @@ function contact_getfields_expectedresult() {
         'where' => 'civicrm_contact.contact_sub_type',
         'headerPattern' => '/C(ontact )?(subtype|sub-type|sub type)/i',
         'export' => TRUE,
+        'table_name' => 'civicrm_contact',
+        'entity' => 'Contact',
+        'bao' => 'CRM_Contact_BAO_Contact',
         'html' => array(
           'type' => 'Select',
           'maxlength' => 255,
@@ -115,6 +124,9 @@ function contact_getfields_expectedresult() {
         'headerPattern' => '/d(o )?(not )?(email)/i',
         'dataPattern' => '/^\\d{1,}$/',
         'export' => TRUE,
+        'table_name' => 'civicrm_contact',
+        'entity' => 'Contact',
+        'bao' => 'CRM_Contact_BAO_Contact',
         'html' => array(
           'type' => 'CheckBox',
         ),
@@ -128,6 +140,9 @@ function contact_getfields_expectedresult() {
         'headerPattern' => '/d(o )?(not )?(call|phone)/i',
         'dataPattern' => '/^\\d{1,}$/',
         'export' => TRUE,
+        'table_name' => 'civicrm_contact',
+        'entity' => 'Contact',
+        'bao' => 'CRM_Contact_BAO_Contact',
         'html' => array(
           'type' => 'CheckBox',
         ),
@@ -141,6 +156,9 @@ function contact_getfields_expectedresult() {
         'headerPattern' => '/^(d(o\\s)?n(ot\\s)?mail)|(\\w*)?bulk\\s?(\\w*)$/i',
         'dataPattern' => '/^\\d{1,}$/',
         'export' => TRUE,
+        'table_name' => 'civicrm_contact',
+        'entity' => 'Contact',
+        'bao' => 'CRM_Contact_BAO_Contact',
         'html' => array(
           'type' => 'CheckBox',
         ),
@@ -154,6 +172,9 @@ function contact_getfields_expectedresult() {
         'headerPattern' => '/d(o )?(not )?(sms)/i',
         'dataPattern' => '/^\\d{1,}$/',
         'export' => TRUE,
+        'table_name' => 'civicrm_contact',
+        'entity' => 'Contact',
+        'bao' => 'CRM_Contact_BAO_Contact',
         'html' => array(
           'type' => 'CheckBox',
         ),
@@ -167,6 +188,9 @@ function contact_getfields_expectedresult() {
         'headerPattern' => '/d(o )?(not )?(trade)/i',
         'dataPattern' => '/^\\d{1,}$/',
         'export' => TRUE,
+        'table_name' => 'civicrm_contact',
+        'entity' => 'Contact',
+        'bao' => 'CRM_Contact_BAO_Contact',
         'html' => array(
           'type' => 'CheckBox',
         ),
@@ -180,6 +204,9 @@ function contact_getfields_expectedresult() {
         'import' => TRUE,
         'where' => 'civicrm_contact.is_opt_out',
         'export' => TRUE,
+        'table_name' => 'civicrm_contact',
+        'entity' => 'Contact',
+        'bao' => 'CRM_Contact_BAO_Contact',
         'html' => array(
           'type' => 'CheckBox',
         ),
@@ -197,6 +224,9 @@ function contact_getfields_expectedresult() {
         'headerPattern' => '/legal\\s?id/i',
         'dataPattern' => '/\\w+?\\d{5,}/',
         'export' => TRUE,
+        'table_name' => 'civicrm_contact',
+        'entity' => 'Contact',
+        'bao' => 'CRM_Contact_BAO_Contact',
         'html' => array(
           'type' => 'Text',
           'maxlength' => 32,
@@ -215,6 +245,9 @@ function contact_getfields_expectedresult() {
         'headerPattern' => '/external\\s?id/i',
         'dataPattern' => '/^\\d{11,}$/',
         'export' => TRUE,
+        'table_name' => 'civicrm_contact',
+        'entity' => 'Contact',
+        'bao' => 'CRM_Contact_BAO_Contact',
         'html' => array(
           'type' => 'Text',
           'maxlength' => 64,
@@ -230,6 +263,9 @@ function contact_getfields_expectedresult() {
         'size' => 30,
         'export' => TRUE,
         'where' => 'civicrm_contact.sort_name',
+        'table_name' => 'civicrm_contact',
+        'entity' => 'Contact',
+        'bao' => 'CRM_Contact_BAO_Contact',
         'html' => array(
           'type' => 'Text',
           'maxlength' => 128,
@@ -245,6 +281,9 @@ function contact_getfields_expectedresult() {
         'size' => 30,
         'export' => TRUE,
         'where' => 'civicrm_contact.display_name',
+        'table_name' => 'civicrm_contact',
+        'entity' => 'Contact',
+        'bao' => 'CRM_Contact_BAO_Contact',
         'html' => array(
           'type' => 'Text',
           'maxlength' => 128,
@@ -263,6 +302,9 @@ function contact_getfields_expectedresult() {
         'headerPattern' => '/n(ick\\s)name|nick$/i',
         'dataPattern' => '/^\\w+$/',
         'export' => TRUE,
+        'table_name' => 'civicrm_contact',
+        'entity' => 'Contact',
+        'bao' => 'CRM_Contact_BAO_Contact',
         'html' => array(
           'type' => 'Text',
           'maxlength' => 128,
@@ -280,6 +322,9 @@ function contact_getfields_expectedresult() {
         'where' => 'civicrm_contact.legal_name',
         'headerPattern' => '/^legal|(l(egal\\s)?name)$/i',
         'export' => TRUE,
+        'table_name' => 'civicrm_contact',
+        'entity' => 'Contact',
+        'bao' => 'CRM_Contact_BAO_Contact',
         'html' => array(
           'type' => 'Text',
           'maxlength' => 128,
@@ -294,6 +339,9 @@ function contact_getfields_expectedresult() {
         'import' => TRUE,
         'where' => 'civicrm_contact.image_URL',
         'export' => TRUE,
+        'table_name' => 'civicrm_contact',
+        'entity' => 'Contact',
+        'bao' => 'CRM_Contact_BAO_Contact',
         'html' => array(
           'type' => 'File',
           'rows' => 2,
@@ -312,6 +360,9 @@ function contact_getfields_expectedresult() {
         'headerPattern' => '/^p(ref\\w*\\s)?c(omm\\w*)|( meth\\w*)$/i',
         'dataPattern' => '/^\\w+$/',
         'export' => TRUE,
+        'table_name' => 'civicrm_contact',
+        'entity' => 'Contact',
+        'bao' => 'CRM_Contact_BAO_Contact',
         'html' => array(
           'type' => 'Select',
           'maxlength' => 255,
@@ -333,6 +384,9 @@ function contact_getfields_expectedresult() {
         'where' => 'civicrm_contact.preferred_language',
         'headerPattern' => '/^lang/i',
         'export' => TRUE,
+        'table_name' => 'civicrm_contact',
+        'entity' => 'Contact',
+        'bao' => 'CRM_Contact_BAO_Contact',
         'html' => array(
           'type' => 'Select',
           'maxlength' => 5,
@@ -356,6 +410,9 @@ function contact_getfields_expectedresult() {
         'headerPattern' => '/^p(ref\\w*\\s)?m(ail\\s)?f(orm\\w*)$/i',
         'export' => TRUE,
         'default' => 'Both',
+        'table_name' => 'civicrm_contact',
+        'entity' => 'Contact',
+        'bao' => 'CRM_Contact_BAO_Contact',
         'html' => array(
           'type' => 'Select',
           'maxlength' => 8,
@@ -374,6 +431,9 @@ function contact_getfields_expectedresult() {
         'size' => 20,
         'export' => TRUE,
         'where' => 'civicrm_contact.hash',
+        'table_name' => 'civicrm_contact',
+        'entity' => 'Contact',
+        'bao' => 'CRM_Contact_BAO_Contact',
       ),
       'api_key' => array(
         'name' => 'api_key',
@@ -382,6 +442,9 @@ function contact_getfields_expectedresult() {
         'description' => 'API Key for validating requests related to this contact.',
         'maxlength' => 32,
         'size' => 20,
+        'table_name' => 'civicrm_contact',
+        'entity' => 'Contact',
+        'bao' => 'CRM_Contact_BAO_Contact',
       ),
       'first_name' => array(
         'name' => 'first_name',
@@ -395,6 +458,9 @@ function contact_getfields_expectedresult() {
         'headerPattern' => '/^first|(f(irst\\s)?name)$/i',
         'dataPattern' => '/^\\w+$/',
         'export' => TRUE,
+        'table_name' => 'civicrm_contact',
+        'entity' => 'Contact',
+        'bao' => 'CRM_Contact_BAO_Contact',
         'html' => array(
           'type' => 'Text',
           'maxlength' => 64,
@@ -413,6 +479,9 @@ function contact_getfields_expectedresult() {
         'headerPattern' => '/^middle|(m(iddle\\s)?name)$/i',
         'dataPattern' => '/^\\w+$/',
         'export' => TRUE,
+        'table_name' => 'civicrm_contact',
+        'entity' => 'Contact',
+        'bao' => 'CRM_Contact_BAO_Contact',
         'html' => array(
           'type' => 'Text',
           'maxlength' => 64,
@@ -431,6 +500,9 @@ function contact_getfields_expectedresult() {
         'headerPattern' => '/^last|(l(ast\\s)?name)$/i',
         'dataPattern' => '/^\\w+(\\s\\w+)?+$/',
         'export' => TRUE,
+        'table_name' => 'civicrm_contact',
+        'entity' => 'Contact',
+        'bao' => 'CRM_Contact_BAO_Contact',
         'html' => array(
           'type' => 'Text',
           'maxlength' => 64,
@@ -447,6 +519,9 @@ function contact_getfields_expectedresult() {
         'headerPattern' => '/^(prefix|title)/i',
         'dataPattern' => '/^(mr|ms|mrs|sir|dr)\\.?$/i',
         'export' => TRUE,
+        'table_name' => 'civicrm_contact',
+        'entity' => 'Contact',
+        'bao' => 'CRM_Contact_BAO_Contact',
         'html' => array(
           'type' => 'Select',
           'size' => 6,
@@ -471,6 +546,9 @@ function contact_getfields_expectedresult() {
         'headerPattern' => '/^suffix$/i',
         'dataPattern' => '/^(sr|jr)\\.?|i{2,}$/',
         'export' => TRUE,
+        'table_name' => 'civicrm_contact',
+        'entity' => 'Contact',
+        'bao' => 'CRM_Contact_BAO_Contact',
         'html' => array(
           'type' => 'Select',
           'size' => 6,
@@ -496,6 +574,9 @@ function contact_getfields_expectedresult() {
         'where' => 'civicrm_contact.formal_title',
         'headerPattern' => '/^title/i',
         'export' => TRUE,
+        'table_name' => 'civicrm_contact',
+        'entity' => 'Contact',
+        'bao' => 'CRM_Contact_BAO_Contact',
         'html' => array(
           'type' => 'Text',
           'maxlength' => 64,
@@ -509,6 +590,9 @@ function contact_getfields_expectedresult() {
         'description' => 'Communication style (e.g. formal vs. familiar) to use with this contact. FK to communication styles in civicrm_option_value.',
         'export' => TRUE,
         'where' => 'civicrm_contact.communication_style_id',
+        'table_name' => 'civicrm_contact',
+        'entity' => 'Contact',
+        'bao' => 'CRM_Contact_BAO_Contact',
         'html' => array(
           'type' => 'Select',
           'size' => 6,
@@ -524,6 +608,9 @@ function contact_getfields_expectedresult() {
         'type' => 1,
         'title' => 'Email Greeting ID',
         'description' => 'FK to civicrm_option_value.id, that has to be valid registered Email Greeting.',
+        'table_name' => 'civicrm_contact',
+        'entity' => 'Contact',
+        'bao' => 'CRM_Contact_BAO_Contact',
       ),
       'email_greeting_custom' => array(
         'name' => 'email_greeting_custom',
@@ -534,6 +621,9 @@ function contact_getfields_expectedresult() {
         'size' => 45,
         'import' => TRUE,
         'where' => 'civicrm_contact.email_greeting_custom',
+        'table_name' => 'civicrm_contact',
+        'entity' => 'Contact',
+        'bao' => 'CRM_Contact_BAO_Contact',
         'html' => array(
           'type' => 'Text',
           'maxlength' => 128,
@@ -547,6 +637,9 @@ function contact_getfields_expectedresult() {
         'description' => 'Cache Email Greeting.',
         'maxlength' => 255,
         'size' => 45,
+        'table_name' => 'civicrm_contact',
+        'entity' => 'Contact',
+        'bao' => 'CRM_Contact_BAO_Contact',
         'html' => array(
           'type' => 'Text',
           'maxlength' => 255,
@@ -558,6 +651,9 @@ function contact_getfields_expectedresult() {
         'type' => 1,
         'title' => 'Postal Greeting ID',
         'description' => 'FK to civicrm_option_value.id, that has to be valid registered Postal Greeting.',
+        'table_name' => 'civicrm_contact',
+        'entity' => 'Contact',
+        'bao' => 'CRM_Contact_BAO_Contact',
         'html' => array(
           'type' => 'Text',
           'size' => 6,
@@ -573,6 +669,9 @@ function contact_getfields_expectedresult() {
         'size' => 45,
         'import' => TRUE,
         'where' => 'civicrm_contact.postal_greeting_custom',
+        'table_name' => 'civicrm_contact',
+        'entity' => 'Contact',
+        'bao' => 'CRM_Contact_BAO_Contact',
         'html' => array(
           'type' => 'Text',
           'maxlength' => 128,
@@ -586,6 +685,9 @@ function contact_getfields_expectedresult() {
         'description' => 'Cache Postal greeting.',
         'maxlength' => 255,
         'size' => 45,
+        'table_name' => 'civicrm_contact',
+        'entity' => 'Contact',
+        'bao' => 'CRM_Contact_BAO_Contact',
         'html' => array(
           'type' => 'Text',
           'maxlength' => 255,
@@ -597,6 +699,9 @@ function contact_getfields_expectedresult() {
         'type' => 1,
         'title' => 'Addressee ID',
         'description' => 'FK to civicrm_option_value.id, that has to be valid registered Addressee.',
+        'table_name' => 'civicrm_contact',
+        'entity' => 'Contact',
+        'bao' => 'CRM_Contact_BAO_Contact',
       ),
       'addressee_custom' => array(
         'name' => 'addressee_custom',
@@ -607,6 +712,9 @@ function contact_getfields_expectedresult() {
         'size' => 45,
         'import' => TRUE,
         'where' => 'civicrm_contact.addressee_custom',
+        'table_name' => 'civicrm_contact',
+        'entity' => 'Contact',
+        'bao' => 'CRM_Contact_BAO_Contact',
         'html' => array(
           'type' => 'Text',
           'maxlength' => 128,
@@ -620,6 +728,9 @@ function contact_getfields_expectedresult() {
         'description' => 'Cache Addressee.',
         'maxlength' => 255,
         'size' => 45,
+        'table_name' => 'civicrm_contact',
+        'entity' => 'Contact',
+        'bao' => 'CRM_Contact_BAO_Contact',
         'html' => array(
           'type' => 'Text',
           'maxlength' => 255,
@@ -638,6 +749,9 @@ function contact_getfields_expectedresult() {
         'headerPattern' => '/^job|(j(ob\\s)?title)$/i',
         'dataPattern' => '//',
         'export' => TRUE,
+        'table_name' => 'civicrm_contact',
+        'entity' => 'Contact',
+        'bao' => 'CRM_Contact_BAO_Contact',
         'html' => array(
           'type' => 'Text',
           'maxlength' => 255,
@@ -653,6 +767,9 @@ function contact_getfields_expectedresult() {
         'where' => 'civicrm_contact.gender_id',
         'headerPattern' => '/^gender$/i',
         'export' => TRUE,
+        'table_name' => 'civicrm_contact',
+        'entity' => 'Contact',
+        'bao' => 'CRM_Contact_BAO_Contact',
         'html' => array(
           'type' => 'Select',
           'size' => 6,
@@ -676,8 +793,12 @@ function contact_getfields_expectedresult() {
         'headerPattern' => '/^birth|(b(irth\\s)?date)|D(\\W*)O(\\W*)B(\\W*)$/i',
         'dataPattern' => '/\\d{4}-?\\d{2}-?\\d{2}/',
         'export' => TRUE,
+        'table_name' => 'civicrm_contact',
+        'entity' => 'Contact',
+        'bao' => 'CRM_Contact_BAO_Contact',
         'html' => array(
           'type' => 'Select Date',
+          'format' => 'birth',
         ),
       ),
       'is_deceased' => array(
@@ -688,6 +809,9 @@ function contact_getfields_expectedresult() {
         'where' => 'civicrm_contact.is_deceased',
         'headerPattern' => '/i(s\\s)?d(eceased)$/i',
         'export' => TRUE,
+        'table_name' => 'civicrm_contact',
+        'entity' => 'Contact',
+        'bao' => 'CRM_Contact_BAO_Contact',
         'html' => array(
           'type' => 'CheckBox',
         ),
@@ -701,8 +825,12 @@ function contact_getfields_expectedresult() {
         'where' => 'civicrm_contact.deceased_date',
         'headerPattern' => '/^deceased|(d(eceased\\s)?date)$/i',
         'export' => TRUE,
+        'table_name' => 'civicrm_contact',
+        'entity' => 'Contact',
+        'bao' => 'CRM_Contact_BAO_Contact',
         'html' => array(
           'type' => 'Select Date',
+          'format' => 'birth',
         ),
       ),
       'household_name' => array(
@@ -717,6 +845,9 @@ function contact_getfields_expectedresult() {
         'headerPattern' => '/^household|(h(ousehold\\s)?name)$/i',
         'dataPattern' => '/^\\w+$/',
         'export' => TRUE,
+        'table_name' => 'civicrm_contact',
+        'entity' => 'Contact',
+        'bao' => 'CRM_Contact_BAO_Contact',
         'html' => array(
           'type' => 'Text',
           'maxlength' => 128,
@@ -728,6 +859,9 @@ function contact_getfields_expectedresult() {
         'type' => 1,
         'title' => 'Household Primary Contact ID',
         'description' => 'Optional FK to Primary Contact for this household.',
+        'table_name' => 'civicrm_contact',
+        'entity' => 'Contact',
+        'bao' => 'CRM_Contact_BAO_Contact',
         'FKClassName' => 'CRM_Contact_DAO_Contact',
         'html' => array(
           'type' => 'Select',
@@ -748,6 +882,9 @@ function contact_getfields_expectedresult() {
         'headerPattern' => '/^organization|(o(rganization\\s)?name)$/i',
         'dataPattern' => '/^\\w+$/',
         'export' => TRUE,
+        'table_name' => 'civicrm_contact',
+        'entity' => 'Contact',
+        'bao' => 'CRM_Contact_BAO_Contact',
         'html' => array(
           'type' => 'Text',
           'maxlength' => 128,
@@ -765,6 +902,9 @@ function contact_getfields_expectedresult() {
         'where' => 'civicrm_contact.sic_code',
         'headerPattern' => '/^sic|(s(ic\\s)?code)$/i',
         'export' => TRUE,
+        'table_name' => 'civicrm_contact',
+        'entity' => 'Contact',
+        'bao' => 'CRM_Contact_BAO_Contact',
         'html' => array(
           'type' => 'Text',
           'maxlength' => 8,
@@ -784,6 +924,9 @@ function contact_getfields_expectedresult() {
         'dataPattern' => '/^[\\w\\/\\:\\.]+$/',
         'export' => TRUE,
         'rule' => 'url',
+        'table_name' => 'civicrm_contact',
+        'entity' => 'Contact',
+        'bao' => 'CRM_Contact_BAO_Contact',
         'html' => array(
           'type' => 'Text',
           'maxlength' => 255,
@@ -799,6 +942,9 @@ function contact_getfields_expectedresult() {
         'export' => TRUE,
         'where' => 'civicrm_contact.created_date',
         'default' => 'NULL',
+        'table_name' => 'civicrm_contact',
+        'entity' => 'Contact',
+        'bao' => 'CRM_Contact_BAO_Contact',
       ),
       'modified_date' => array(
         'name' => 'modified_date',
@@ -809,6 +955,9 @@ function contact_getfields_expectedresult() {
         'export' => TRUE,
         'where' => 'civicrm_contact.modified_date',
         'default' => 'CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
+        'table_name' => 'civicrm_contact',
+        'entity' => 'Contact',
+        'bao' => 'CRM_Contact_BAO_Contact',
       ),
       'source' => array(
         'name' => 'source',
@@ -821,6 +970,9 @@ function contact_getfields_expectedresult() {
         'where' => 'civicrm_contact.source',
         'headerPattern' => '/(C(ontact\\s)?Source)$/i',
         'export' => TRUE,
+        'table_name' => 'civicrm_contact',
+        'entity' => 'Contact',
+        'bao' => 'CRM_Contact_BAO_Contact',
         'html' => array(
           'type' => 'Text',
           'maxlength' => 255,
@@ -835,6 +987,9 @@ function contact_getfields_expectedresult() {
         'description' => 'OPTIONAL FK to civicrm_contact record.',
         'export' => TRUE,
         'where' => 'civicrm_contact.employer_id',
+        'table_name' => 'civicrm_contact',
+        'entity' => 'Contact',
+        'bao' => 'CRM_Contact_BAO_Contact',
         'FKClassName' => 'CRM_Contact_DAO_Contact',
         'html' => array(
           'type' => 'EntityRef',
@@ -851,6 +1006,9 @@ function contact_getfields_expectedresult() {
         'required' => TRUE,
         'export' => TRUE,
         'where' => 'civicrm_contact.is_deleted',
+        'table_name' => 'civicrm_contact',
+        'entity' => 'Contact',
+        'bao' => 'CRM_Contact_BAO_Contact',
         'html' => array(
           'type' => 'CheckBox',
         ),
@@ -878,8 +1036,8 @@ function contact_getfields_expectedresult() {
         'table_name' => 'civicrm_value_select_test_g_1',
         'column_name' => 'our_special_field_1',
         'pseudoconstant' => array(
-          'optionGroupName' => 'our_special_field_20170124082923',
-          'optionEditPath' => 'civicrm/admin/options/our_special_field_20170124082923',
+          'optionGroupName' => 'our_special_field_20170207021937',
+          'optionEditPath' => 'civicrm/admin/options/our_special_field_20170207021937',
         ),
         'name' => 'custom_1',
         'title' => 'Our special field',

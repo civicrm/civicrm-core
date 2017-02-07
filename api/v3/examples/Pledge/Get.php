@@ -19,7 +19,8 @@ function pledge_get_example() {
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
     return array(
-      'error' => $errorMessage,
+      'is_error' => 1,
+      'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
     );
@@ -50,10 +51,11 @@ function pledge_get_expectedresult() {
         'display_name' => 'Mr. Anthony Anderson II',
         'pledge_id' => '1',
         'pledge_amount' => '100.00',
-        'pledge_create_date' => '2015-02-22 00:00:00',
+        'pledge_create_date' => '2017-02-07 00:00:00',
+        'pledge_start_date' => '2017-02-07 00:00:00',
         'pledge_status' => 'Pending',
         'pledge_total_paid' => '',
-        'pledge_next_pay_date' => '2015-02-24 00:00:00',
+        'pledge_next_pay_date' => '2017-02-09 00:00:00',
         'pledge_next_pay_amount' => '20.00',
         'pledge_outstanding_amount' => '',
         'pledge_financial_type' => 'Donation',

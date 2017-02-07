@@ -11,8 +11,8 @@ function relationship_get_example() {
   $params = array(
     'relationship_type_id' => array(
       'IN' => array(
-        '0' => 33,
-        '1' => 34,
+        '0' => 36,
+        '1' => 37,
       ),
     ),
   );
@@ -26,7 +26,8 @@ function relationship_get_example() {
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
     return array(
-      'error' => $errorMessage,
+      'is_error' => 1,
+      'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
     );
@@ -50,23 +51,21 @@ function relationship_get_expectedresult() {
     'values' => array(
       '2' => array(
         'id' => '2',
-        'contact_id_a' => '87',
-        'contact_id_b' => '89',
-        'relationship_type_id' => '33',
+        'contact_id_a' => '99',
+        'contact_id_b' => '101',
+        'relationship_type_id' => '36',
         'start_date' => '2013-07-29 00:00:00',
         'is_active' => '1',
-        'description' => '',
         'is_permission_a_b' => 0,
         'is_permission_b_a' => 0,
       ),
       '3' => array(
         'id' => '3',
-        'contact_id_a' => '87',
-        'contact_id_b' => '89',
-        'relationship_type_id' => '34',
+        'contact_id_a' => '99',
+        'contact_id_b' => '101',
+        'relationship_type_id' => '37',
         'start_date' => '2013-07-29 00:00:00',
         'is_active' => '1',
-        'description' => '',
         'is_permission_a_b' => 0,
         'is_permission_b_a' => 0,
       ),

@@ -7,11 +7,11 @@
  */
 function message_template_get_example() {
   $params = array(
-    'msg_title' => 'msg_title_166',
-    'msg_subject' => 'msg_subject_166',
-    'msg_text' => 'msg_text_166',
-    'msg_html' => 'msg_html_166',
-    'workflow_id' => 166,
+    'msg_title' => 'msg_title_285',
+    'msg_subject' => 'msg_subject_285',
+    'msg_text' => 'msg_text_285',
+    'msg_html' => 'msg_html_285',
+    'workflow_id' => 285,
     'is_default' => '1',
     'is_reserved' => 1,
   );
@@ -47,20 +47,20 @@ function message_template_get_expectedresult() {
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
-    'id' => 68,
+    'id' => 70,
     'values' => array(
-      '68' => array(
-        'id' => '68',
-        'msg_title' => 'msg_title_166',
-        'msg_subject' => 'msg_subject_166',
-        'msg_text' => 'msg_text_166',
-        'msg_html' => 'msg_html_166',
+      '70' => array(
+        'id' => '70',
+        'msg_title' => 'msg_title_285',
+        'msg_subject' => 'msg_subject_285',
+        'msg_text' => 'msg_text_285',
+        'msg_html' => 'msg_html_285',
         'is_active' => '1',
-        'workflow_id' => '166',
+        'workflow_id' => '285',
         'is_default' => '1',
         'is_reserved' => '1',
         'is_sms' => '1',
-        'pdf_format_id' => '166',
+        'pdf_format_id' => '285',
       ),
     ),
   );

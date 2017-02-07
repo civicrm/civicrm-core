@@ -43,10 +43,10 @@ function country_create_expectedresult() {
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
-    'id' => 1252,
+    'id' => 1254,
     'values' => array(
-      '1252' => array(
-        'id' => '1252',
+      '1254' => array(
+        'id' => '1254',
         'name' => 'Made Up Land',
         'iso_code' => 'ZZ',
         'country_code' => '',

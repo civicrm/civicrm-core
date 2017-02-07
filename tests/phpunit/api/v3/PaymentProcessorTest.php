@@ -57,8 +57,6 @@ class api_v3_PaymentProcessorTest extends CiviUnitTestCase {
     );
   }
 
-  ///////////////// civicrm_payment_processor_add methods
-
   /**
    * Check with no name.
    */
@@ -66,7 +64,7 @@ class api_v3_PaymentProcessorTest extends CiviUnitTestCase {
     $payProcParams = array(
       'is_active' => 1,
     );
-    $result = $this->callAPIFailure('payment_processor', 'create', $payProcParams);
+    $this->callAPIFailure('payment_processor', 'create', $payProcParams);
   }
 
   /**
@@ -76,8 +74,6 @@ class api_v3_PaymentProcessorTest extends CiviUnitTestCase {
     $params = $this->_params;
     $result = $this->callAPIAndDocument('payment_processor', 'create', $params, __FUNCTION__, __FILE__);
     $this->assertNotNull($result['id']);
-
-    //assertDBState compares expected values in $result to actual values in the DB
     $this->assertDBState('CRM_Financial_DAO_PaymentProcessor', $result['id'], $params);
     return $result['id'];
   }
@@ -92,8 +88,6 @@ class api_v3_PaymentProcessorTest extends CiviUnitTestCase {
     $this->assertAPISuccess($result);
   }
 
-  ///////////////// civicrm_payment_processor_delete methods
-
   /**
    * Check payment processor delete.
    */
@@ -103,10 +97,8 @@ class api_v3_PaymentProcessorTest extends CiviUnitTestCase {
       'id' => $id,
     );
 
-    $result = $this->callAPIAndDocument('payment_processor', 'delete', $params, __FUNCTION__, __FILE__);
+    $this->callAPIAndDocument('payment_processor', 'delete', $params, __FUNCTION__, __FILE__);
   }
-
-  ///////////////// civicrm_payment_processors_get methods
 
   /**
    * Check with valid params array.
@@ -121,8 +113,8 @@ class api_v3_PaymentProcessorTest extends CiviUnitTestCase {
     );
     $results = $this->callAPISuccess('payment_processor', 'get', $params);
 
-    $this->assertEquals(1, $results['count'], ' in line ' . __LINE__);
-    $this->assertEquals('test@test.com', $results['values'][$results['id']]['user_name'], ' in line ' . __LINE__);
+    $this->assertEquals(1, $results['count']);
+    $this->assertEquals('test@test.com', $results['values'][$results['id']]['user_name']);
   }
 
 }

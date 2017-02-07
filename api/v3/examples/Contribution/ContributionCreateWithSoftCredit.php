@@ -9,7 +9,7 @@
  */
 function contribution_create_example() {
   $params = array(
-    'contact_id' => 19,
+    'contact_id' => 24,
     'receive_date' => '20120511',
     'total_amount' => '100',
     'financial_type_id' => 1,
@@ -20,7 +20,7 @@ function contribution_create_example() {
     'contribution_status_id' => 1,
     'soft_credit' => array(
       '1' => array(
-        'contact_id' => 20,
+        'contact_id' => 25,
         'amount' => 50,
         'soft_credit_type_id' => 3,
       ),
@@ -36,7 +36,8 @@ function contribution_create_example() {
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
     return array(
-      'error' => $errorMessage,
+      'is_error' => 1,
+      'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
     );
@@ -61,7 +62,7 @@ function contribution_create_expectedresult() {
     'values' => array(
       '1' => array(
         'id' => '1',
-        'contact_id' => '19',
+        'contact_id' => '24',
         'financial_type_id' => '1',
         'contribution_page_id' => '',
         'payment_instrument_id' => '4',
@@ -88,6 +89,7 @@ function contribution_create_expectedresult() {
         'campaign_id' => '',
         'creditnote_id' => '',
         'tax_amount' => '',
+        'revenue_recognition_date' => '',
         'contribution_type_id' => '1',
       ),
     ),

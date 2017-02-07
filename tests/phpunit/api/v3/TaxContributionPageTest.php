@@ -241,7 +241,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
       'contribution_status_id' => 1,
     );
 
-    $contribution = $this->callAPIAndDocument('contribution', 'create', $params, __FUNCTION__, __FILE__);
+    $contribution = $this->callAPISuccess('contribution', 'create', $params);
     $this->_ids['contributionId'] = $contribution['id'];
     $this->assertEquals($contribution['values'][$contribution['id']]['contact_id'], $this->_individualId);
     $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 120.00);
@@ -284,9 +284,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
       ),
     );
 
-    $description = "Create Contribution with Nested Line Items.";
-    $subfile = "CreateWithNestedLineItems";
-    $contribution = $this->callAPIAndDocument('contribution', 'create', $params, __FUNCTION__, __FILE__, $description, $subfile);
+    $contribution = $this->callAPISuccess('contribution', 'create', $params);
 
     $lineItems = $this->callAPISuccess('line_item', 'get', array(
       'entity_id' => $contribution['id'],
@@ -311,7 +309,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
       'source' => 'SSF',
       'contribution_status_id' => 2,
     );
-    $contribution = $this->callAPIAndDocument('contribution', 'create', $params, __FUNCTION__, __FILE__);
+    $contribution = $this->callAPISuccess('contribution', 'create', $params, __FUNCTION__, __FILE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['contact_id'], $this->_individualId);
     $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 120.00);
     $this->assertEquals($contribution['values'][$contribution['id']]['financial_type_id'], $this->financialtypeID);
@@ -337,7 +335,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
       'contribution_status_id' => 2,
     );
 
-    $contribution = $this->callAPIAndDocument('contribution', 'create', $params, __FUNCTION__, __FILE__);
+    $contribution = $this->callAPISuccess('contribution', 'create', $params, __FUNCTION__, __FILE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['contact_id'], $this->_individualId);
     $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 120.00);
     $this->assertEquals($contribution['values'][$contribution['id']]['financial_type_id'], $this->financialtypeID);

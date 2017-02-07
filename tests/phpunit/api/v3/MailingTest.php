@@ -335,7 +335,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     );
     // END SAMPLE DATA
 
-    $create = $this->callAPIAndDocument('Mailing', 'create', $params, __FUNCTION__, __FILE__);
+    $create = $this->callAPISuccess('Mailing', 'create', $params);
 
     $preview = $create['values'][$create['id']]['api.MailingRecipients.get'];
     $this->assertEquals(1, $preview['count']);
@@ -758,7 +758,7 @@ SELECT event_queue_id, time_stamp FROM mail_{$type}_temp";
    * we can still have working click-trough URLs working (CRM-17959).
    */
   public function testUrlWithMissingTrackingHash() {
-    $mail = $this->callAPIAndDocument('mailing', 'create', $this->_params + array('scheduled_date' => 'now'), __FUNCTION__, __FILE__);
+    $mail = $this->callAPISuccess('mailing', 'create', $this->_params + array('scheduled_date' => 'now'), __FUNCTION__, __FILE__);
     $jobs = $this->callAPISuccess('mailing_job', 'get', array('mailing_id' => $mail['id']));
     $this->assertEquals(1, $jobs['count']);
 
@@ -792,10 +792,10 @@ SELECT event_queue_id, time_stamp FROM mail_{$type}_temp";
     $this->_params['body_text'] = str_replace("https://civicrm.org", $unicodeURL, $this->_params['body_text']);
     $this->_params['body_html'] = str_replace("https://civicrm.org", $unicodeURL, $this->_params['body_html']);
 
-    $mail = $this->callAPIAndDocument('mailing', 'create', $this->_params + array('scheduled_date' => 'now'), __FUNCTION__, __FILE__);
+    $mail = $this->callAPISuccess('mailing', 'create', $this->_params + array('scheduled_date' => 'now'));
 
     $params = array('mailing_id' => $mail['id'], 'test_email' => 'alice@example.org', 'test_group' => NULL);
-    $deliveredInfo = $this->callAPISuccess($this->_entity, 'send_test', $params);
+    $this->callAPISuccess($this->_entity, 'send_test', $params);
 
     $sql = "SELECT turl.id as url_id, turl.url, q.id as queue_id
       FROM civicrm_mailing_trackable_url as turl
