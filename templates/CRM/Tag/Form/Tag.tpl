@@ -25,19 +25,6 @@
 *}
 {* this template is used for adding/editing tags  *}
 {literal}
-<style>
-  #tagtree,
-  #tagtree li.highlighted ul {
-    background-color: white;
-  }
-  #tagtree li.highlighted,
-  #tagtree li.highlighted-child.jstree-closed {
-    background-color: #fefcb0;
-  }
-  #tagtree ins.jstree-icon {
-    cursor: pointer;
-  }
-</style>
 <script type="text/javascript">
   (function($, _){{/literal}
     var entityID={$entityID},
@@ -46,7 +33,7 @@
     {literal}
     CRM.updateContactSummaryTags = function() {
       var tags = [];
-      $('#tagtree input:checkbox:checked+span label').each(function() {
+      $('#tagtree input:checkbox:checked+a label').each(function() {
         tags.push('<span class="crm-tag-item" style="' + $(this).attr('style') + '" title="' + ($(this).attr('title') || '') + '">' + $(this).text() + '</span>');
       });
       $('input.crm-contact-tagset').each(function() {
@@ -83,8 +70,12 @@
       if (childTag) {
         //load js tree.
         $("#tagtree").jstree({
-          plugins : ["themes", "html_data"],
+          plugins : ["themes", "html_data", "search"],
           core: {animation: 100},
+          'search': {
+            'case_insensitive' : true,
+            'show_only_matches': true
+          },
           themes: {
             "theme": 'classic',
             "dots": false,
@@ -102,15 +93,37 @@
       {literal}
 
       $(document).on('change', 'input.crm-contact-tagset', CRM.updateContactSummaryTags);
+
+      $('input[name=filter_tag_tree]', '#Tag').on('keyup change', function() {
+        $("#tagtree").jstree('search', $(this).val());
+      });
     });
   })(CRM.$, CRM._);
   {/literal}
 </script>
 <div id="Tag" class="view-content">
-  <h3>{if !$hideContext}{ts}Tags{/ts}{/if}</h3>
-  <div id="tagtree">
-    {include file="CRM/Tag/Form/Tagtree.tpl" level=1}
-  </div>
-  <br />
-{include file="CRM/common/Tagset.tpl"}
+  <table class="">
+    <thead>
+      <tr>
+        <th>{ts}Tag Tree{/ts}</th>
+        {if $tagsetInfo.contact}<th>{ts}Tag Sets{/ts}</th>{/if}
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+          <input class="crm-form-text big" name="filter_tag_tree" placeholder="{ts}Filter List{/ts}" allowclear="1"/>
+          <a class="crm-hover-button crm-clear-link" style="visibility:hidden;" title="{ts}Clear{/ts}"><i class="crm-i fa-times"></i></a>
+          <div id="tagtree">
+            {include file="CRM/Tag/Form/Tagtree.tpl" level=1}
+          </div>
+        </td>
+        {if $tagsetInfo.contact}
+        <td>
+          {include file="CRM/common/Tagset.tpl"}
+        </td>
+        {/if}
+      </tr>
+    </tbody>
+  </table>
 </div>

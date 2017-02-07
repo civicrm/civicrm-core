@@ -1,5 +1,4 @@
-<?php
-/*
+{*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
@@ -23,55 +22,18 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
- */
-
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
- */
-
-/**
- * Page for managing tags.
- */
-class CRM_Tag_Page_Tag extends CRM_Core_Page {
-
-  /**
-   * Run page
-   */
-  public function run() {
-    CRM_Core_Resources::singleton()
-      ->addScriptFile('civicrm', 'bower_components/jstree/dist/jstree.min.js', 0, 'html-header')
-      ->addStyleFile('civicrm', 'bower_components/jstree/dist/themes/default/style.min.css')
-      ->addPermissions(array('administer reserved tags', 'administer Tagsets'));
-
-    $usedFor = $tagsets = array();
-
-    $result = civicrm_api3('OptionValue', 'get', array(
-      'return' => array("value", "name"),
-      'option_group_id' => "tag_used_for",
-    ));
-    foreach ($result['values'] as $value) {
-      $usedFor[$value['value']] = $value['name'];
-    }
-
-    $result = civicrm_api3('Tag', 'get', array(
-      'return' => array("name", "used_for", "description", "created_id.display_name", "created_date", "is_reserved"),
-      'is_tagset' => 1,
-      'options' => array('limit' => 0),
-    ));
-    foreach ($result['values'] as $id => $tagset) {
-      $used = explode(',', CRM_Utils_Array::value('used_for', $tagset, ''));
-      $tagset['used_for_label'] = array_values(array_intersect_key($usedFor, array_flip($used)));
-      $tagset['display_name'] = $tagset['created_id.display_name'];
-      unset($tagset['created_id.display_name']);
-      $tagsets[$id] = $tagset;
-    }
-
-    $this->assign('usedFor', $usedFor);
-    $this->assign('tagsets', $tagsets);
-
-    return parent::run();
-  }
-
-}
+*}
+{* this template is used for merging tags (admin)  *}
+<div class="crm-block crm-form-block crm-tag-form-block">
+  <div class="status">
+    {ts 1=$tags|@count}You are about to combine the following %1 tags into a single tag:{/ts}<br />
+    {', '|implode:$tags}
+  </div>
+  <table class="form-layout-compressed">
+    <tr class="crm-tag-form-block-label">
+      <td class="label">{$form.name.label}</td>
+      <td>{$form.name.html}</td>
+    </tr>
+  </table>
+  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
+</div>

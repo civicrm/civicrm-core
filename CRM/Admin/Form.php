@@ -91,7 +91,7 @@ class CRM_Admin_Form extends CRM_Core_Form {
    */
   public function setDefaultValues() {
     // Fetch defaults from the db
-    if (isset($this->_id) && empty($this->_values)) {
+    if (!empty($this->_id) && empty($this->_values) && CRM_Utils_Rule::positiveInteger($this->_id)) {
       $this->_values = array();
       $params = array('id' => $this->_id);
       $baoName = $this->_BAOName;

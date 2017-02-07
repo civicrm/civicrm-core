@@ -1522,9 +1522,12 @@ if (!CRM.vars) CRM.vars = {};
         $(this).siblings('input:text').val('').trigger('change', ['crmClear']);
         return false;
       })
-      .on('change', 'input.crm-form-radio:checked, input[allowclear=1]', function(e, context) {
+      .on('change keyup', 'input.crm-form-radio:checked, input[allowclear=1]', function(e, context) {
         if (context !== 'crmClear' && ($(this).is(':checked') || ($(this).is('[allowclear=1]') && $(this).val()))) {
           $(this).siblings('.crm-clear-link').css({visibility: ''});
+        }
+        if (context !== 'crmClear' && $(this).is('[allowclear=1]') && $(this).val() === '') {
+          $(this).siblings('.crm-clear-link').css({visibility: 'hidden'});
         }
       })
 
@@ -1658,8 +1661,11 @@ if (!CRM.vars) CRM.vars = {};
         return input;
 
       case 'string':
-        // convert iso format
-        return $.datepicker.parseDate('yy-mm-dd', input.substr(0, 10));
+        // convert iso format with or without dashes
+        if (input.indexOf('-') > 0) {
+          return $.datepicker.parseDate('yy-mm-dd', input.substr(0, 10));
+        }
+        return $.datepicker.parseDate('yymmdd', input.substr(0, 8));
 
       case 'number':
         // convert unix timestamp

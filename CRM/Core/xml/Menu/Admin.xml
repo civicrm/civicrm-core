@@ -654,11 +654,6 @@
      <access_arguments>access CiviCRM</access_arguments>
   </item>
   <item>
-     <path>civicrm/ajax/mergeTags</path>
-     <page_callback>CRM_Admin_Page_AJAX::mergeTags</page_callback>
-     <access_arguments>access CiviCRM</access_arguments>
-  </item>
-  <item>
      <path>civicrm/admin/price</path>
      <title>Price Sets</title>
      <page_callback>CRM_Price_Page_Set</page_callback>
@@ -686,11 +681,6 @@
      <path>civicrm/admin/price/field/option</path>
      <title>Price Field Options</title>
      <page_callback>CRM_Price_Page_Option</page_callback>
-  </item>
-  <item>
-       <path>civicrm/ajax/mergeTagList</path>
-       <page_callback>CRM_Admin_Page_AJAX::mergeTagList</page_callback>
-       <access_arguments>access CiviCRM</access_arguments>
   </item>
   <item>
      <path>civicrm/admin/tplstrings/add</path>

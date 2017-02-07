@@ -42,6 +42,7 @@
          <td>{$form.parent_id.html}</td>
        </tr>
    {/if}
+      {if $form.used_for}
        <tr class="crm-tag-form-block-used_for">
           <td class="label">{$form.used_for.label}</td>
           <td>{$form.used_for.html} <br />
@@ -52,6 +53,7 @@
             </span>
           </td>
         </tr>
+      {/if}
       {if $form.color.html}
         <tr class="crm-tag-form-block-color">
           <td class="label">{$form.color.label}</td>
@@ -81,7 +83,7 @@
         </table><br />
         {/if}
     {else}
-        <div class="status">{ts 1=$delName}Are you sure you want to delete <b>%1</b> Tag?{/ts}<br />{ts}This tag will be removed from any currently tagged contacts, and users will no longer be able to assign contacts to this tag.{/ts}</div>
+        <div class="status">{ts 1=$delName}Are you sure you want to delete <b>%1</b>?{/ts}<br />{ts}This tag will be removed from any currently tagged contacts, and users will no longer be able to assign contacts to this tag.{/ts}</div>
     {/if}
     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>
@@ -90,8 +92,9 @@
   CRM.$(function($) {
     var $form = $('form.{/literal}{$form.formClass}{literal}');
     function toggleUsedFor() {
-      $('.crm-tag-form-block-used_for', $form).toggle(!$(this).val());
-      if ($(this).val()) {
+      var value = $(this).val() && $(this).val() !== '0';
+      $('.crm-tag-form-block-used_for', $form).toggle(!value);
+      if (value) {
         $('select#used_for', $form).val('').change();
       }
     }
