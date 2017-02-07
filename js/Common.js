@@ -243,8 +243,16 @@ if (!CRM.vars) CRM.vars = {};
       var script = document.createElement('script');
       scriptsLoaded[url] = $.Deferred();
       script.onload = function () {
+        if (window.jQuery === CRM.$ && CRM.CMSjQuery) {
+          window.jQuery = CRM.CMSjQuery;
+        }
         scriptsLoaded[url].resolve();
       };
+      // Make jQuery global available while script is loading
+      if (window.jQuery !== CRM.$) {
+        CRM.CMSjQuery = window.jQuery;
+        window.jQuery = CRM.$;
+      }
       script.src = url;
       document.getElementsByTagName("head")[0].appendChild(script);
     }
@@ -635,188 +643,6 @@ if (!CRM.vars) CRM.vars = {};
     return combined;
   }
 
-  function copyAttributes($source, $target, attributes) {
-    _.each(attributes, function(name) {
-      if ($source.attr(name) !== undefined) {
-        $target.attr(name, $source.attr(name));
-      }
-    });
-  }
-
-  /**
-   * @see http://wiki.civicrm.org/confluence/display/CRMDOC/crmDatepicker
-   */
-  $.fn.crmDatepicker = function(options) {
-    return $(this).each(function() {
-      if ($(this).is('.crm-form-date-wrapper .crm-hidden-date')) {
-        // Already initialized - destroy
-        $(this)
-          .off('.crmDatepicker')
-          .css('display', '')
-          .removeClass('crm-hidden-date')
-          .siblings().remove();
-        $(this).unwrap();
-      }
-      if (options === 'destroy') {
-        return;
-      }
-      var
-        $dataField = $(this).wrap('<span class="crm-form-date-wrapper" />'),
-        settings = _.cloneDeep(options || {}),
-        $dateField = $(),
-        $timeField = $(),
-        $clearLink = $(),
-        hasDatepicker = settings.date !== false && settings.date !== 'yy',
-        type = hasDatepicker ? 'text' : 'number';
-
-      if (settings.allowClear !== undefined ? settings.allowClear : !$dataField.is('.required, [required]')) {
-        $clearLink = $('<a class="crm-hover-button crm-clear-link" title="'+ _.escape(ts('Clear')) +'"><i class="crm-i fa-times"></i></a>')
-          .insertAfter($dataField);
-      }
-      if (settings.time !== false) {
-        $timeField = $('<input>').insertAfter($dataField);
-        copyAttributes($dataField, $timeField, ['class', 'disabled']);
-        $timeField
-          .addClass('crm-form-text crm-form-time')
-          .attr('placeholder', $dataField.attr('time-placeholder') === undefined ? ts('Time') : $dataField.attr('time-placeholder'))
-          .change(updateDataField)
-          .timeEntry({
-            spinnerImage: '',
-            show24Hours: settings.time === true || settings.time === undefined ? CRM.config.timeIs24Hr : settings.time == '24'
-          });
-      }
-      if (settings.date !== false) {
-        // Render "number" field for year-only format, calendar popup for all other formats
-        $dateField = $('<input type="' + type + '">').insertAfter($dataField);
-        copyAttributes($dataField, $dateField, ['placeholder', 'style', 'class', 'disabled']);
-        $dateField.addClass('crm-form-' + type);
-        if (hasDatepicker) {
-          settings.minDate = settings.minDate ? CRM.utils.makeDate(settings.minDate) : null;
-          settings.maxDate = settings.maxDate ? CRM.utils.makeDate(settings.maxDate) : null;
-          settings.dateFormat = typeof settings.date === 'string' ? settings.date : CRM.config.dateInputFormat;
-          settings.changeMonth = _.includes(settings.dateFormat, 'm');
-          settings.changeYear = _.includes(settings.dateFormat, 'y');
-          if (!settings.yearRange && settings.minDate !== null && settings.maxDate !== null) {
-            settings.yearRange = '' + CRM.utils.formatDate(settings.minDate, 'yy') + ':' + CRM.utils.formatDate(settings.maxDate, 'yy');
-          }
-          $dateField.addClass('crm-form-date').datepicker(settings);
-        } else {
-          $dateField.attr('min', settings.minDate ? CRM.utils.formatDate(settings.minDate, 'yy') : '1000');
-          $dateField.attr('max', settings.maxDate ? CRM.utils.formatDate(settings.maxDate, 'yy') : '4000');
-        }
-        $dateField.change(updateDataField);
-      }
-      // Rudimentary validation. TODO: Roll into use of jQUery validate and ui.datepicker.validation
-      function isValidDate() {
-        // FIXME: parseDate doesn't work with incomplete date formats; skip validation if no month, day or year in format
-        var lowerFormat = settings.dateFormat.toLowerCase();
-        if (lowerFormat.indexOf('y') < 0 || lowerFormat.indexOf('m') < 0 || lowerFormat.indexOf('d') < 0) {
-          return true;
-        }
-        try {
-          $.datepicker.parseDate(settings.dateFormat, $dateField.val());
-          return true;
-        } catch (e) {
-          return false;
-        }
-      }
-      function updateInputFields(e, context) {
-        var val = $dataField.val(),
-          time = null;
-        if (context !== 'userInput' && context !== 'crmClear') {
-          if (hasDatepicker) {
-            $dateField.datepicker('setDate', _.includes(val, '-') ? $.datepicker.parseDate('yy-mm-dd', val) : null);
-          } else if ($dateField.length) {
-            $dateField.val(val.slice(0, 4));
-          }
-          if ($timeField.length) {
-            if (val.length === 8) {
-              time = val;
-            } else if (val.length === 19) {
-              time = val.split(' ')[1];
-            }
-            $timeField.timeEntry('setTime', time);
-          }
-        }
-        $clearLink.css('visibility', val ? 'visible' : 'hidden');
-      }
-      function updateDataField(e, context) {
-        // The crmClear event wipes all the field values anyway, so no need to respond
-        if (context !== 'crmClear') {
-          var val = '';
-          if ($dateField.val()) {
-            if (hasDatepicker && isValidDate()) {
-              val = $.datepicker.formatDate('yy-mm-dd', $dateField.datepicker('getDate'));
-              $dateField.removeClass('crm-error');
-            } else if (!hasDatepicker) {
-              val = $dateField.val() + '-01-01';
-            } else {
-              $dateField.addClass('crm-error');
-            }
-          }
-          if ($timeField.val()) {
-            val += (val ? ' ' : '') + $timeField.timeEntry('getTime').toTimeString().substr(0, 8);
-          }
-          $dataField.val(val).trigger('change', ['userInput']);
-        }
-      }
-      $dataField.hide().addClass('crm-hidden-date').on('change.crmDatepicker', updateInputFields);
-      updateInputFields();
-    });
-  };
-
-  $.fn.crmAjaxTable = function() {
-    // Strip the ids from ajax urls to make pageLength storage more generic
-    function simplifyUrl(ajax) {
-      // Datatables ajax prop could be a url string or an object containing the url
-      var url = typeof ajax === 'object' ? ajax.url : ajax;
-      return typeof url === 'string' ? url.replace(/[&?]\w*id=\d+/g, '') : null;
-    }
-
-    return $(this).each(function() {
-      // Recall pageLength for this table
-      var url = simplifyUrl($(this).data('ajax'));
-      if (url && window.localStorage && localStorage['dataTablePageLength:' + url]) {
-        $(this).data('pageLength', localStorage['dataTablePageLength:' + url]);
-      }
-      // Declare the defaults for DataTables
-      var defaults = {
-        "processing": true,
-        "serverSide": true,
-        "order": [],
-        "dom": '<"crm-datatable-pager-top"lfp>rt<"crm-datatable-pager-bottom"ip>',
-        "pageLength": 25,
-        "pagingType": "full_numbers",
-        "drawCallback": function(settings) {
-          //Add data attributes to cells
-          $('thead th', settings.nTable).each( function( index ) {
-            $.each(this.attributes, function() {
-              if(this.name.match("^cell-")) {
-                var cellAttr = this.name.substring(5);
-                var cellValue = this.value;
-                $('tbody tr', settings.nTable).each( function() {
-                  $('td:eq('+ index +')', this).attr( cellAttr, cellValue );
-                });
-              }
-            });
-          });
-          //Reload table after draw
-          $(settings.nTable).trigger('crmLoad');
-        }
-      };
-      //Include any table specific data
-      var settings = $.extend(true, defaults, $(this).data('table'));
-      // Remember pageLength
-      $(this).on('length.dt', function(e, settings, len) {
-        if (settings.ajax && window.localStorage) {
-          localStorage['dataTablePageLength:' + simplifyUrl(settings.ajax)] = len;
-        }
-      });
-      //Make the DataTables call
-      $(this).DataTable(settings);
-    });
-  };
-
   CRM.utils.formatSelect2Result = function (row) {
     var markup = '<div class="crm-select2-row">';
     if (row.image !== undefined) {
@@ -1037,14 +863,19 @@ if (!CRM.vars) CRM.vars = {};
       $('table.crm-ajax-table', e.target).each(function() {
         var
           $table = $(this),
+          script = CRM.config.resourceBase + 'js/jquery/jquery.crmAjaxTable.js',
           $accordion = $table.closest('.crm-accordion-wrapper.collapsed, .crm-collapsible.collapsed');
         // For tables hidden by collapsed accordions, wait.
         if ($accordion.length) {
           $accordion.one('crmAccordion:open', function() {
-            $table.crmAjaxTable();
+            CRM.loadScript(script).done(function() {
+              $table.crmAjaxTable();
+            });
           });
         } else {
-          $table.crmAjaxTable();
+          CRM.loadScript(script).done(function() {
+            $table.crmAjaxTable();
+          });
         }
       });
       if ($("input:radio[name=radio_ts]").size() == 1) {
@@ -1054,7 +885,18 @@ if (!CRM.vars) CRM.vars = {};
       $('.crm-form-entityref:not(.select2-offscreen, .select2-container)', e.target).crmEntityRef();
       $('select.crm-chain-select-control', e.target).off('.chainSelect').on('change.chainSelect', chainSelect);
       $('.crm-form-text[data-crm-datepicker]', e.target).each(function() {
-        $(this).crmDatepicker($(this).data('crmDatepicker'));
+        var $el = $(this);
+        CRM.loadScript(CRM.config.resourceBase + 'js/jquery/jquery.crmDatepicker.js').done(function() {
+          $el.crmDatepicker($el.data('crmDatepicker'));
+        });
+        // Hack to get translations for crmDatepicker.js since lazy-loaded js doesn't get preprocessed by php
+        ts('Clear');ts('Time');
+      });
+      $('.crm-editable', e.target).not('thead *').each(function() {
+        var $el = $(this);
+        CRM.loadScript(CRM.config.resourceBase + 'js/jquery/jquery.crmEditable.js').done(function() {
+          $el.crmEditable();
+        });
       });
       // Cache Form Input initial values
       $('form[data-warn-changes] :input', e.target).each(function() {
