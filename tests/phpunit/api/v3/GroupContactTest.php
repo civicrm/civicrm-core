@@ -258,6 +258,31 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
     $groupContact = $this->callAPISuccess('groupContact', 'create', $groupContactCreateParams);
     $groupGetContact = $this->CallAPISuccess('groupContact', 'get', $groupContactCreateParams);
     $this->callAPISuccess('groupContact', 'delete', array('id' => $groupGetContact['id'], 'status' => 'Removed'));
+    $this->callAPISuccess('groupContact', 'delete', array('id' => $groupGetContact['id'], 'skip_undelete' => TRUE));
+    $this->callAPISuccess('group', 'delete', array('id' => $groupId3));
+  }
+
+  /**
+   * CRM-19979 test that group cotnact delete action works when contact is in status of pendin and is a permanent delete.
+   */
+  public function testPermanentDeleteWithPending() {
+    $groupId3 = $this->groupCreate(array(
+      'name' => 'Test Group 3',
+      'domain_id' => 1,
+      'title' => 'New Test Group3 Created',
+      'description' => 'New Test Group3 Created',
+      'is_active' => 1,
+      'visibility' => 'User and User Admin Only',
+    ));
+    $groupContactCreateParams = array(
+      'contact_id' => $this->_contactId,
+      'group_id' => $groupId3,
+      'status' => 'Pending',
+    );
+    $groupContact = $this->callAPISuccess('groupContact', 'create', $groupContactCreateParams);
+    $groupGetContact = $this->CallAPISuccess('groupContact', 'get', $groupContactCreateParams);
+    $this->callAPISuccess('groupContact', 'delete', array('id' => $groupGetContact['id'], 'skip_undelete' => TRUE));
+    $this->callAPISuccess('group', 'delete', array('id' => $groupId3));
   }
 
   /**

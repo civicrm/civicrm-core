@@ -158,7 +158,7 @@ function civicrm_api3_group_contact_delete($params) {
   }
   $groupContact = civicrm_api3('GroupContact', 'get', $checkParams);
   if ($groupContact['count'] == 0 && !empty($params['skip_undelete'])) {
-    $checkParams['status'] = 'removed';
+    $checkParams['status'] = array('IN' => array('Removed', 'Pending'));
   }
   $groupContact2 = civicrm_api3('GroupContact', 'get', $checkParams);
   if ($groupContact['count'] == 0 && $groupContact2['count'] == 0) {
