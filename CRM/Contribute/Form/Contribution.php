@@ -776,7 +776,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     if ($this->_online) {
       $this->assign('hideCalender', TRUE);
     }
-    $checkNumber = $this->add('text', 'check_number', ts('Check Number'), $attributes['check_number']);
+    $checkNumber = $this->add('text', 'check_number', ts('Check Number'), $attributes['contribution_check_number']);
 
     $this->addDateTime('receipt_date', ts('Receipt Date'), FALSE, array('formatType' => 'activityDateTime'));
     $this->addDateTime('cancel_date', ts('Cancelled / Refunded Date'), FALSE, array('formatType' => 'activityDateTime'));

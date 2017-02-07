@@ -130,12 +130,6 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
       $query->_tables['contribution_payment_instrument'] = 1;
     }
 
-    if (!empty($query->_returnProperties['contribution_campaign_id'])) {
-      $query->_select['contribution_campaign_id'] = 'civicrm_contribution.campaign_id as contribution_campaign_id';
-      $query->_element['contribution_campaign_id'] = 1;
-      $query->_tables['civicrm_contribution'] = 1;
-    }
-
     if (!empty($query->_returnProperties['contribution_campaign_title'])) {
       $query->_select['contribution_campaign_title'] = "civicrm_campaign.title as contribution_campaign_title";
       $query->_element['contribution_campaign_title'] = $query->_tables['civicrm_campaign'] = 1;
@@ -202,7 +196,17 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
         return;
       }
     }
-
+    // These are legacy names.
+    // @todo enotices when these are hit so we can start to elimnate them.
+    $fieldAliases = array(
+      'financial_type' => 'financial_type_id',
+      'contribution_page' => 'contribution_page_id',
+      'payment_instrument' => 'payment_instrument_id',
+      // or payment_instrument_id?
+      'contribution_payment_instrument' => 'contribution_payment_instrument_id',
+      'contribution_status' => 'contribution_status_id',
+    );
+    $name = isset($fieldAliases[$name]) ? $fieldAliases[$name] : $name;
     $qillName = $name;
     $pseudoExtraParam = array();
 
@@ -255,12 +259,6 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
         $query->_tables['civicrm_contribution'] = $query->_whereTables['civicrm_contribution'] = 1;
         return;
 
-      case 'financial_type':
-      case 'contribution_page':
-      case 'payment_instrument':
-      case 'contribution_payment_instrument':
-      case 'contribution_status':
-        $name .= '_id';
       case 'financial_type_id':
         // @todo we need to make this resemble a hook approach.
         CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes);
@@ -281,19 +279,13 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
       case (strpos($name, '_date') !== FALSE && $name != 'contribution_fulfilled_date'):
       case 'contribution_campaign_id':
 
-        // @todo including names using a switch statement & then using an 'if' to filter them out is ... odd!
-        if ((strpos($name, '_amount') !== FALSE) || (strpos($name, '_date') !== FALSE) || in_array($name,
-            array(
-              'contribution_id',
-              'contribution_currency',
-              'contribution_source',
-              'contribution_trxn_id',
-              'contribution_check_number',
-              'contribution_payment_instrument_id',
-              'contribution_contact_id',
-              'contribution_campaign_id',
-            )
-          )
+        $fieldNamesNotToStripContributionFrom = array(
+          'contribution_currency_type',
+          'contribution_status_id',
+          'contribution_page_id',
+        );
+        // @todo these are mostly legacy params. Find a better way to deal with them.
+        if (!in_array($name, $fieldNamesNotToStripContributionFrom)
         ) {
           if (!isset($fields[$name])) {
             $qillName = str_replace('contribution_', '', $qillName);
