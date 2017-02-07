@@ -73,7 +73,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     $params = array(
       'contact_id' => 1,
     );
-    $result = $this->callAPIFailure('profile', 'get', $params,
+    $this->callAPIFailure('profile', 'get', $params,
       'Mandatory key(s) missing from params array: profile_id'
     );
   }
