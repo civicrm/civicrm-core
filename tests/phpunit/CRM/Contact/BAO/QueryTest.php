@@ -349,17 +349,20 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
       "display_name" => 1,
       "preferred_mail_format" => 1,
     );
-    $numberofContacts = 2;
+    $numberOfContacts = 2;
     $query = new CRM_Contact_BAO_Query($params, $returnProperties);
     try {
-      $query->apiQuery($params, $returnProperties, NULL, NULL, 0, $numberofContacts);
+      $query->apiQuery($params, $returnProperties, NULL, NULL, 0, $numberOfContacts);
     }
     catch (Exception $e) {
-      $this->assertEquals("A fatal error was triggered: One of parameters  (value: foo@example.com) is not of the type Positive",
-        $e->getMessage());
-      return $this->assertTrue(TRUE);
+      $this->assertEquals(
+        "A fatal error was triggered: One of parameters  (value: foo@example.com) is not of the type Positive",
+        $e->getMessage()
+      );
+      $this->assertTrue(TRUE);
+      return;
     }
-    return $this->fail('Test failed for some reason which is not good');
+    $this->fail('Test failed for some reason which is not good');
   }
 
 }
