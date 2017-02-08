@@ -566,8 +566,9 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
     $form->assign('is_recur_interval', CRM_Utils_Array::value('is_recur_interval', $form->_values));
     $form->assign('is_recur_installments', CRM_Utils_Array::value('is_recur_installments', $form->_values));
+    $form->assign('is_recur_default', CRM_Utils_Array::value('is_recur_default', $form->_values));
 
-    $form->add('checkbox', 'is_recur', ts('I want to contribute this amount'), NULL);
+    $form->add('checkbox', 'is_recur', ts('I want to contribute this amount'), NULL)->setChecked($form->_values['is_recur_default']);
 
     if (!empty($form->_values['is_recur_interval']) || $className == 'CRM_Contribute_Form_Contribution') {
       $form->add('text', 'frequency_interval', ts('Every'), $attributes['frequency_interval']);
