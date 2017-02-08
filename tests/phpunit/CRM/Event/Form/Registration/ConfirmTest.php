@@ -164,4 +164,69 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     $this->assertEquals($contribution['total_amount'], 440, 'Invalid Tax amount.');
   }
 
+  /**
+   * Test online registration for event with no price options selected as per CRM-19964.
+   */
+  public function testOnlineRegNoPrice() {
+    $paymentProcessorID = $this->processorCreate(array('is_default' => TRUE, 'user_name' => 'Test', 'is_test' => FALSE));
+    $paymentProcessorID = $this->processorCreate(array('is_default' => TRUE, 'user_name' => 'Test', 'is_test' => TRUE));
+    $params = array(
+      'start_date' => date('YmdHis', strtotime('+ 1 week')),
+      'end_date' => date('YmdHis', strtotime('+ 1 year')),
+      'registration_start_date' => date('YmdHis', strtotime('- 1 day')),
+      'registration_end_date' => date('YmdHis', strtotime('+ 1 year')),
+      'payment_processor_id' => $paymentProcessorID,
+      'is_monetary' => TRUE,
+      'financial_type_id' => 'Event Fee',
+    );
+    $event = $this->eventCreate($params);
+    $priceFieldOptions = array(
+      'option_label' => 'Price Field',
+      'option_value' => 100,
+      'is_required' => FALSE,
+      'html_type' => 'Text',
+    );
+    $this->createPriceSet('event', $event['id'], $priceFieldOptions);
+
+    $priceField = $this->callAPISuccess('PriceField', 'get',
+      array(
+        'label' => 'Price Field',
+      )
+    );
+    // Create online event registration.
+    CRM_Event_Form_Registration_Confirm::testSubmit(array(
+      'id' => $event['id'],
+      'contributeMode' => 'direct',
+      'registerByID' => $this->createLoggedInUser(),
+      'params' => array(
+        array(
+          'qfKey' => 'e6eb2903eae63d4c5c6cc70bfdda8741_2801',
+          'entryURL' => "http://dmaster.local/civicrm/event/register?reset=1&amp;id={$event['id']}",
+          'first_name' => 'Bruce',
+          'last_name' => 'Wayne',
+          'email-Primary' => 'bruce@gotham.com',
+          'price_' . $priceField['id'] => '',
+          'priceSetId' => $priceField['values'][$priceField['id']]['price_set_id'],
+          'payment_processor_id' => $paymentProcessorID,
+          'amount' => 0,
+          'bypass_payment' => '',
+          'MAX_FILE_SIZE' => '33554432',
+          'is_primary' => 1,
+          'is_pay_later' => 0,
+          'campaign_id' => NULL,
+          'defaultRole' => 1,
+          'participant_role_id' => '1',
+          'tax_amount' => NULL,
+          'ip_address' => '127.0.0.1',
+          'invoiceID' => '57adc34957a29171948e8643ce906332',
+          'button' => '_qf_Register_upload',
+          'scriptFee' => '',
+          'scriptArray' => '',
+        ),
+      ),
+    ));
+    $contribution = $this->callAPISuccess('Contribution', 'get', array('invoice_id' => '57adc34957a29171948e8643ce906332'));
+    $this->assertEquals($contribution['count'], '0', "Contribution should be created for zero fee event registration.");
+  }
+
 }
