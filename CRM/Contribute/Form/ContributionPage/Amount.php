@@ -131,6 +131,7 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
       );
       $this->addElement('checkbox', 'is_recur_interval', ts('Support recurring intervals'));
       $this->addElement('checkbox', 'is_recur_installments', ts('Offer installments'));
+      $this->addElement('checkbox', 'is_recur_default', ts('Tick recurring contributions checkbox by default'));
     }
 
     // add pay later options
@@ -473,6 +474,7 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
       'is_billing_required' => FALSE,
       'is_recur_interval' => FALSE,
       'is_recur_installments' => FALSE,
+      'is_recur_default' => FALSE,
       'recur_frequency_unit' => "null",
       'default_amount_id' => "null",
       'is_allow_other_amount' => FALSE,
@@ -509,6 +511,7 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
       );
       $params['is_recur_interval'] = CRM_Utils_Array::value('is_recur_interval', $params, FALSE);
       $params['is_recur_installments'] = CRM_Utils_Array::value('is_recur_installments', $params, FALSE);
+      $params['is_recur_default'] = CRM_Utils_Array::value('is_recur_default', $params, FALSE);
     }
 
     if (CRM_Utils_Array::value('adjust_recur_start_date', $params)) {

@@ -113,6 +113,10 @@
                         <td>{$form.is_recur_installments.html}<br />
                         <span class="description">{ts}Give the user a choice of installments (e.g. donate every month for 6 months)? If not, recurring donations will continue indefinitely.{/ts}</span></td>
                     </tr>
+                    <tr class="crm-contribution-form-block-is_recur_default"><th scope="row" class="label">{$form.is_recur_default.label}</th>
+                        <td>{$form.is_recur_default.html}<br />
+                        <span class="description">{ts}Select recurring contributions by default{/ts}</span></td>
+                    </tr>
                   </table>
                 </td>
         </tr>
