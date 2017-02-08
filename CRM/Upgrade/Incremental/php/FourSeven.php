@@ -303,6 +303,19 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
   }
 
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_4_7_17($rev) {
+    $tables = array('civicrm_cache', 'civicrm_acl_contact_cache', 'civicrm_group_contact_cache');
+    foreach ($tables as $table) {
+      $this->addTask("CRM-19385 - Remove id column from '$table' table", 'dropColumn', $table, 'id');
+    }
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
+  }
+
   /*
    * Important! All upgrade functions MUST add a 'runSql' task.
    * Uncomment and use the following template for a new upgrade version
