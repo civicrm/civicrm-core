@@ -226,7 +226,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
       ),
     ));
     $contribution = $this->callAPISuccess('Contribution', 'get', array('invoice_id' => '57adc34957a29171948e8643ce906332'));
-    $this->assertEquals($contribution['count'], '0', "Contribution should be created for zero fee event registration.");
+    $this->assertEquals($contribution['count'], '0', "Contribution should not be created for zero fee event registration when no price field selected.");
   }
 
 }
