@@ -2666,10 +2666,10 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     $this->select();
     $this->from();
     $this->customDataFrom();
-    $this->where();
     if (array_key_exists('civicrm_contribution', $this->getVar('_columns'))) {
-      $this->getPermissionedFTQuery($this);
+      self::getSelectWhereClause($this);
     }
+    $this->where();
     $this->groupBy();
     $this->orderBy();
 
@@ -4679,6 +4679,8 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
    * @param bool $return
    *
    * @return string
+   *
+   * TODO: This needs to be removed in favour of new hook approach.
    */
   public function getPermissionedFTQuery(&$query, $return = FALSE) {
     if (!CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
@@ -4955,6 +4957,24 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
       $alias = $this->_aliases['civicrm_line_item'];
     }
     $clauses[] = $alias . '.' . $clause;
+  }
+
+  /**
+   * Function to build select where clause for financial type ACL.
+   *
+   * @param object $query
+   *
+   */
+  public function getSelectWhereClause(&$query) {
+    $clauses = array();
+    $aliases = $query->getVar('_aliases');
+    CRM_Utils_Hook::selectWhereClause('aclReport', $clauses);
+    if (!empty($clauses)) {
+      foreach ($clauses as $field => $vals) {
+        $tableAlias = $aliases[$field];
+        $query->_whereClauses[] = "`$tableAlias`.`" . key($vals) . "` " . implode(" AND `$tableAlias`.`" . key($vals) . "` ", (array) $vals);
+      }
+    }
   }
 
 }
