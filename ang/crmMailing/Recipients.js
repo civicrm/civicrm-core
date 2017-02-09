@@ -112,6 +112,14 @@
           }
         }
 
+	var rcpAjaxState = {
+	  input: '',
+	  entity: 'civicrm_group',
+	  type: 'include',
+	  page_n: 0,
+	  page_i: 0,
+	};
+
         $(element).select2({
           width: '36em',
           dropdownAutoWidth: true,
@@ -124,7 +132,7 @@
           multiple: true,
           initSelection: function(el, cb) {
             var values = el.val().split(',');
-            
+
             var gids = [];
             var mids = [];
 
@@ -146,15 +154,15 @@
 
                     var groupNames = [];
                     var civiMails = [];
-                    
+
                     $(glist.values).each(function (idx, group) {
                       var key = group.id + ' civicrm_group include';
                       groupNames.push({id: parseInt(group.id), title: group.label, is_hidden: group.extra.is_hidden});
-                      
+
                       if (values.indexOf(key) >= 0) {
                         datamap.push({id: key, text: group.label});
                       }
-                      
+
                       key = group.id + ' civicrm_group exclude';
                       if (values.indexOf(key) >= 0) {
                         datamap.push({id: key, text: group.label});
@@ -164,11 +172,11 @@
                     $(mlist.values).each(function (idx, group) {
                       var key = group.id + ' civicrm_mailing include';
                       civiMails.push({id: parseInt(group.id), name: group.label});
-                      
+
                       if (values.indexOf(key) >= 0) {
                         datamap.push({id: key, text: group.label});
                       }
-                      
+
                       key = group.id + ' civicrm_mailing exclude';
                       if (values.indexOf(key) >= 0) {
                         datamap.push({id: key, text: group.label});
@@ -179,7 +187,7 @@
                     scope.$parent.crmMailingConst.civiMails = civiMails;
 
                     refreshMandatory();
-                    
+
                     cb(datamap);
                   })
               });
@@ -188,57 +196,62 @@
             url: CRM.url('civicrm/ajax/rest'),
             quietMillis: 300,
             data: function(input, page_num) {
+	      if (page_num <= 1) {
+		rcpAjaxState = {
+		  input: input,
+		  entity: 'civicrm_group',
+		  type: 'include',
+		  page_n: 0,
+		};
+	      }
+
+	      rcpAjaxState.page_i = page_num - rcpAjaxState.page_n;
+
               var params = {
                 input: input,
-                page_num: page_num,
+                page_num: rcpAjaxState.page_i,
                 params: { is_hidden: 0 },
               };
               return params;
             },
             transport: function(params) {
-              CRM.api3('Group', 'getlist', params.data).then(function(groups) {
+	      switch(rcpAjaxState.entity) {
+	      case 'civicrm_group':
+		CRM.api3('Group', 'getlist', params.data).then(params.success, params.error);
+		break;
 
+	      case 'civicrm_mailing':
                 params.data.params.options = { sort: "is_archived asc, scheduled_date desc" };
-                
-                CRM.api3('Mailing', 'getlist', params.data).then(function(mailings) {
-                  return { groups: groups, mailings: mailings }
-                }, params.error).then(params.success, params.error)
-              }, params.error);
+                CRM.api3('Mailing', 'getlist', params.data).then(params.success, params.error);
+		break;
+	      }
             },
             results: function(data) {
-              results = [];
-              if(data.groups.count) {
-                results.push({ text: ts('Include Group'),
-                               children: $.map(data.groups.values, function(obj) {
-                                 return { id: obj.id + ' civicrm_group include',
-                                          text: obj.label }
-                               })
-                             });
-                results.push({ text: ts('Exclude Group'),
-                               children: $.map(data.groups.values, function(obj) {
-                                 return { id: obj.id + ' civicrm_group exclude',
-                                          text: obj.label }
-                               }),
-                             });
-              }
-              if(data.mailings.count) {
-                results.push({ text: ts('Include Mailing'),
-                               children: $.map(data.mailings.values, function(obj) {
-                                 return { id: obj.id + ' civicrm_mailing include',
-                                          text: obj.label }
-                               }),
-                             });
-                results.push({ text: ts('Exclude Mailing'),
-                               children: $.map(data.mailings.values, function(obj) {
-                                 return { id: obj.id + ' civicrm_mailing exclude',
-                                          text: obj.label }
-                               }),
-                             });
-              }
-              return {
-                more: data.mailings.more_results || data.groups.more_results,
-                results: results,
-              }
+              results = {
+		children: $.map(data.values, function(obj) {
+                  return {   id: obj.id + ' ' + rcpAjaxState.entity + ' ' + rcpAjaxState.type,
+                             text: obj.label }
+		})
+	      };
+
+	      if(rcpAjaxState.page_i == 1 && data.count) {
+		results.text = ts((rcpAjaxState.type == 'include'? 'Include ' : 'Exclude ') +
+				     (rcpAjaxState.entity == 'civicrm_group'? 'Group' : 'Mailing'));
+	      }
+
+	      more = data.more_results || !(rcpAjaxState.entity == 'civicrm_mailing' && rcpAjaxState.type == 'exclude');
+
+	      if (more && !data.more_results) {
+		if (rcpAjaxState.type == 'include') {
+		  rcpAjaxState.type = 'exclude';
+		} else {
+		  rcpAjaxState.type = 'include';
+		  rcpAjaxState.entity = 'civicrm_mailing';
+		}
+		rcpAjaxState.page_n += rcpAjaxState.page_i;
+	      }
+
+              return { more: more, results: [ results ] };
             },
           },
         });
