@@ -229,13 +229,23 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
       'civicrm_batch' => array(
         'dao' => 'CRM_Batch_DAO_EntityBatch',
         'grouping' => 'contri-fields',
-        'filters' => array(
+        'fields' => array(
           'batch_id' => array(
+            'name' => 'batch_id',
+            'title' => ts('Batch Title'),
+          ),
+        ),
+        'filters' => array(
+          'bid' => array(
             'title' => ts('Batch Title'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Batch_BAO_Batch::getBatches(),
             'type' => CRM_Utils_Type::T_INT,
+            'dbAlias' => 'batch_civireport.batch_id',
           ),
+        ),
+        'group_bys' => array(
+          'batch_id' => array('title' => ts('Batch Title')),
         ),
       ),
       'civicrm_contribution_soft' => array(
@@ -495,14 +505,17 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
                         {$this->_aliases['civicrm_phone']}.is_primary = 1)";
 
     $this->addAddressFromClause();
-    if (!empty($this->_params['batch_id_value'])) {
+    //for contribution batches
+    if (!empty($this->_params['fields']['batch_id']) ||
+      !empty($this->_params['bid_value'])
+    ) {
       $this->_from .= "
-                 LEFT JOIN civicrm_entity_financial_trxn eft
-                        ON eft.entity_id = {$this->_aliases['civicrm_contribution']}.id AND
-                           eft.entity_table = 'civicrm_contribution'
-                 LEFT JOIN civicrm_entity_batch {$this->_aliases['civicrm_batch']}
-                        ON {$this->_aliases['civicrm_batch']}.entity_id = eft.financial_trxn_id AND
-                           {$this->_aliases['civicrm_batch']}.entity_table = 'civicrm_financial_trxn'\n";
+        LEFT JOIN civicrm_entity_financial_trxn eft
+          ON eft.entity_id = {$this->_aliases['civicrm_contribution']}.id AND
+            eft.entity_table = 'civicrm_contribution'
+        LEFT JOIN civicrm_entity_batch {$this->_aliases['civicrm_batch']}
+          ON ({$this->_aliases['civicrm_batch']}.entity_id = eft.financial_trxn_id
+          AND {$this->_aliases['civicrm_batch']}.entity_table = 'civicrm_financial_trxn')";
     }
   }
 
@@ -844,6 +857,7 @@ ROUND(AVG({$this->_aliases['civicrm_contribution_soft']}.amount), 2) as civicrm_
   public function alterDisplay(&$rows) {
     $entryFound = FALSE;
     $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus();
+    $batches = CRM_Batch_BAO_Batch::getBatches();
 
     foreach ($rows as $rowNum => $row) {
       // make count columns point to detail report
@@ -933,6 +947,12 @@ ROUND(AVG({$this->_aliases['civicrm_contribution_soft']}.amount), 2) as civicrm_
         if ($value = $row['civicrm_contribution_campaign_id']) {
           $rows[$rowNum]['civicrm_contribution_campaign_id'] = $this->activeCampaigns[$value];
         }
+        $entryFound = TRUE;
+      }
+
+      // convert batch id to batch title
+      if (!empty($row['civicrm_batch_batch_id'])) {
+        $rows[$rowNum]['civicrm_batch_batch_id'] = CRM_Utils_Array::value($row['civicrm_batch_batch_id'], $batches);
         $entryFound = TRUE;
       }
 
