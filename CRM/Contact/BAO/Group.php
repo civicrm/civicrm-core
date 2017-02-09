@@ -900,7 +900,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     $visibility = CRM_Core_SelectValues::ufVisibility();
 
     while ($object->fetch()) {
-      $permission = CRM_Contact_BAO_Group::checkPermission($object->id, $object->title);
+      $permission = CRM_Contact_BAO_Group::checkPermission($object->id, TRUE);
       //@todo CRM-12209 introduced an ACL check in the whereClause function
       // it may be that this checking is now obsolete - or that what remains
       // should be removed to the whereClause (which is also accessed by getCount)

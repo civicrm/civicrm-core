@@ -1063,7 +1063,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
           foreach ($groups as $g) {
             // CRM-8362: User and User Admin visibility groups should be included in display if user has
             // VIEW permission on that group
-            $groupPerm = CRM_Contact_BAO_Group::checkPermission($g['group_id'], $g['title']);
+            $groupPerm = CRM_Contact_BAO_Group::checkPermission($g['group_id'], TRUE);
 
             if ($g['visibility'] != 'User and User Admin Only' ||
               CRM_Utils_Array::key(CRM_Core_Permission::VIEW, $groupPerm)
