@@ -116,7 +116,7 @@ class CRM_Core_Payment_ProcessorForm {
       $isBillingAddressRequiredForPayLater = FALSE;
       $form->addElement('hidden', 'hidden_processor', 1);
     }
-    else if (!isset($processorId)) {
+    elseif (!isset($processorId)) {
       // If No Payment processor selected, then billing address is not required
       // e.g Fee amount is zero, then all Payment Method option get unchecked and Payment Options section is hidden
       $isBillingAddressRequiredForPayLater = FALSE;
