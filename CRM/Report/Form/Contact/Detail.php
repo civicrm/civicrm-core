@@ -239,7 +239,7 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
             'title' => ts('Membership Status'),
             'default' => TRUE,
           ),
-          'source' => array('title' => 'Membership Source'),
+          'source' => array('title' => ts('Membership Source')),
         ),
       ),
       'civicrm_participant' => array(
@@ -296,11 +296,11 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
             'default' => TRUE,
           ),
           'start_date' => array(
-            'title' => 'Start Date ',
+            'title' => ts('Start Date'),
             'type' => CRM_Report_Form::OP_DATE,
           ),
           'end_date' => array(
-            'title' => 'End Date ',
+            'title' => ts('End Date'),
             'type' => CRM_Report_Form::OP_DATE,
           ),
         ),
@@ -615,7 +615,6 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
       $this->_where .= " AND {$this->_aclWhere} ";
     }
 
-    $this->_where .= " GROUP BY {$this->_aliases['civicrm_contact']}.id ";
   }
 
   /**
