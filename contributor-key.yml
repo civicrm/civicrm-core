@@ -47,8 +47,9 @@
   organization: Nubay Services
   jira        : dtarrant
 - github      : edzelopez
-  name        : Edzel Lopez
+  name        : Edsel Lopez
   organization: JMA Consulting
+  jira        : edsel
 - github      : eileenmcnaughton
   name        : Eileen McNaughton
   organization: Fuzion
@@ -130,6 +131,9 @@
 - github      : michaelmcandrew
   name        : Michael McAndrew
   organization: Third Sector Design
+- github      : mi-kon
+  name        : Mike Kondrashin
+  organization: CompuCorp
 - github      : MiltoxBeyond
   name        : Milton Zurita
   jira        : MiltoxB
@@ -154,6 +158,7 @@
   jira        : ozyank
 - github      : PalanteJon
   name        : Jon Goldberg
+  organization: JMA Consulting
   jira        : palantejon
 - github      : petednz
   name        : Peter Davis
