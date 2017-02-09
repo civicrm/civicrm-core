@@ -3,7 +3,6 @@
 -- Add new columns for multilingual purpose
 ALTER TABLE `civicrm_action_schedule` ADD COLUMN `filter_contact_language` varchar(128) DEFAULT NULL COMMENT 'Used for multilingual installation';
 ALTER TABLE `civicrm_action_schedule` ADD COLUMN `communication_language` varchar(8) DEFAULT NULL COMMENT 'Used for multilingual installation';
-ALTER TABLE `civicrm_action_schedule` DROP FOREIGN KEY `FK_civicrm_action_schedule_mapping_id`;
 ALTER TABLE `civicrm_action_schedule` MODIFY COLUMN mapping_id varchar(64);
 -- Q: Should we validate that local civicrm_action_mapping records have expected IDs?
 
