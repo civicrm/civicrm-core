@@ -115,7 +115,7 @@
                     </tr>
                     <tr class="crm-contribution-form-block-is_recur_default"><th scope="row" class="label">{$form.is_recur_default.label}</th>
                         <td>{$form.is_recur_default.html}<br />
-                        <span class="description">{ts}Select recurring contributions by default{/ts}</span></td>
+                        <span class="description">{ts}Tick recurring contributions checkbox by default{/ts}</span></td>
                     </tr>
                   </table>
                 </td>

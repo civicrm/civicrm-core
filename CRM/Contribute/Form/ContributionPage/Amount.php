@@ -131,7 +131,7 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
       );
       $this->addElement('checkbox', 'is_recur_interval', ts('Support recurring intervals'));
       $this->addElement('checkbox', 'is_recur_installments', ts('Offer installments'));
-      $this->addElement('checkbox', 'is_recur_default', ts('Tick recurring contributions checkbox by default'));
+      $this->addElement('checkbox', 'is_recur_default', ts('Tick checkbox by default'));
     }
 
     // add pay later options
