@@ -148,17 +148,17 @@ function civicrm_api3_group_contact_create($params) {
 function civicrm_api3_group_contact_delete($params) {
   $checkParams = $params;
   if (!empty($checkParams['status']) && in_array($checkParams['status'], array('Removed', 'Deleted'))) {
-    $checkParams['status'] = 'Added';
+    $checkParams['status'] = array('IN' => array('Added', 'Pending'));
   }
   elseif (!empty($checkParams['status']) && $checkParams['status'] == 'Added') {
-    $checkParams['status'] = 'Removed';
+    $checkParams['status'] = array('IN' => array('Pending', 'Removed'));
   }
   elseif (!empty($checkParams['status'])) {
     unset($checkParams['status']);
   }
   $groupContact = civicrm_api3('GroupContact', 'get', $checkParams);
   if ($groupContact['count'] == 0 && !empty($params['skip_undelete'])) {
-    $checkParams['status'] = 'removed';
+    $checkParams['status'] = array('IN' => array('Removed', 'Pending'));
   }
   $groupContact2 = civicrm_api3('GroupContact', 'get', $checkParams);
   if ($groupContact['count'] == 0 && $groupContact2['count'] == 0) {
