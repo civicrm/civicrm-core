@@ -236,16 +236,15 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
           ),
         ),
         'filters' => array(
-          'bid' => array(
+          'batch_id' => array(
             'title' => ts('Batch Title'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Batch_BAO_Batch::getBatches(),
             'type' => CRM_Utils_Type::T_INT,
-            'dbAlias' => 'batch_civireport.batch_id',
           ),
         ),
         'group_bys' => array(
-          'batch_id' => array('title' => ts('Batch Title')),
+          'batch_id' => array('title' => ts('Batch ID')),
         ),
       ),
       'civicrm_contribution_soft' => array(
@@ -506,9 +505,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
 
     $this->addAddressFromClause();
     //for contribution batches
-    if (!empty($this->_params['fields']['batch_id']) ||
-      !empty($this->_params['bid_value'])
-    ) {
+    if ($this->isTableSelected('civicrm_batch')) {
       $this->_from .= "
         LEFT JOIN civicrm_entity_financial_trxn eft
           ON eft.entity_id = {$this->_aliases['civicrm_contribution']}.id AND
