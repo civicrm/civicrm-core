@@ -4968,7 +4968,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
   public function getSelectWhereClause(&$query) {
     $clauses = array();
     $aliases = $query->getVar('_aliases');
-    CRM_Utils_Hook::selectWhereClause('aclReport', $clauses);
+    CRM_Utils_Hook::selectWhereClause('Contribution', $clauses);
     if (!empty($clauses)) {
       foreach ($clauses as $field => $vals) {
         $tableAlias = $aliases[$field];
