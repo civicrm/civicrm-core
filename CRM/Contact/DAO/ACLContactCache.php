@@ -51,12 +51,6 @@ class CRM_Contact_DAO_ACLContactCache extends CRM_Core_DAO {
    */
   static $_log = false;
   /**
-   * primary key
-   *
-   * @var int unsigned
-   */
-  public $id;
-  /**
    * FK to civicrm_contact (could be null for anon user)
    *
    * @var int unsigned
@@ -104,17 +98,6 @@ class CRM_Contact_DAO_ACLContactCache extends CRM_Core_DAO {
   static function &fields() {
     if (!isset(Civi::$statics[__CLASS__]['fields'])) {
       Civi::$statics[__CLASS__]['fields'] = array(
-        'id' => array(
-          'name' => 'id',
-          'type' => CRM_Utils_Type::T_INT,
-          'title' => ts('ACL Contact Cache ID') ,
-          'description' => 'primary key',
-          'required' => true,
-          'table_name' => 'civicrm_acl_contact_cache',
-          'entity' => 'ACLContactCache',
-          'bao' => 'CRM_Contact_DAO_ACLContactCache',
-          'localizable' => 0,
-        ) ,
         'user_id' => array(
           'name' => 'user_id',
           'type' => CRM_Utils_Type::T_INT,
