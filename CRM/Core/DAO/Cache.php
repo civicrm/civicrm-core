@@ -29,13 +29,6 @@ class CRM_Core_DAO_Cache extends CRM_Core_DAO {
   public static $_log = FALSE;
 
   /**
-   * Unique table ID
-   *
-   * @var int
-   */
-  public $id;
-
-  /**
    * group name for cache element, useful in cleaning cache elements
    *
    * @var string
@@ -108,18 +101,6 @@ class CRM_Core_DAO_Cache extends CRM_Core_DAO {
   public static function &fields() {
     if (!isset(Civi::$statics[__CLASS__]['fields'])) {
       Civi::$statics[__CLASS__]['fields'] = [
-        'id' => [
-          'name' => 'id',
-          'type' => CRM_Utils_Type::T_INT,
-          'title' => ts('Cache ID'),
-          'description' => ts('Unique table ID'),
-          'required' => TRUE,
-          'where' => 'civicrm_cache.id',
-          'table_name' => 'civicrm_cache',
-          'entity' => 'Cache',
-          'bao' => 'CRM_Core_BAO_Cache',
-          'localizable' => 0,
-        ],
         'group_name' => [
           'name' => 'group_name',
           'type' => CRM_Utils_Type::T_STRING,
