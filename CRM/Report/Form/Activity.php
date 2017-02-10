@@ -285,6 +285,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
           ),
           'priority_id' => array(
             'title' => ts('Activity Priority'),
+            'type' => CRM_Utils_Type::T_STRING,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_PseudoConstant::get('CRM_Activity_DAO_Activity', 'priority_id'),
           ),
@@ -887,6 +888,7 @@ FROM civireport_activity_temp_target tar
     $entryFound = FALSE;
     $activityType = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE);
     $activityStatus = CRM_Core_PseudoConstant::activityStatus();
+    $priority = CRM_Core_PseudoConstant::get('CRM_Activity_DAO_Activity', 'priority_id');
     $viewLinks = FALSE;
     $context = CRM_Utils_Request::retrieve('context', 'String', $this, FALSE, 'report');
     $actUrl = '';
@@ -999,6 +1001,13 @@ FROM civireport_activity_temp_target tar
       if (array_key_exists('civicrm_activity_status_id', $row)) {
         if ($value = $row['civicrm_activity_status_id']) {
           $rows[$rowNum]['civicrm_activity_status_id'] = $activityStatus[$value];
+          $entryFound = TRUE;
+        }
+      }
+
+      if (array_key_exists('civicrm_activity_priority_id', $row)) {
+        if ($value = $row['civicrm_activity_priority_id']) {
+          $rows[$rowNum]['civicrm_activity_priority_id'] = $priority[$value];
           $entryFound = TRUE;
         }
       }
