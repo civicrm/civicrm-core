@@ -289,6 +289,24 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
           ),
         ),
       ),
+      'civicrm_financial_trxn' => array(
+        'dao' => 'CRM_Financial_DAO_FinancialTrxn',
+        'fields' => array(
+          'credit_card_type' => array('title' => ts('Credit Card Type')),
+        ),
+        'filters' => array(
+          'credit_card_type' => array(
+            'title' => ts('Credit Card Type'),
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialTrxn', 'credit_card_type'),
+            'default' => NULL,
+            'type' => CRM_Utils_Type::T_STRING,
+          ),
+        ),
+      ),
+      'civicrm_entity_financial_trxn' => array(
+        'dao' => 'CRM_Financial_DAO_EntityFinancialTrxn',
+      ),
       'civicrm_batch' => array(
         'dao' => 'CRM_Batch_DAO_EntityBatch',
         'grouping' => 'contri-fields',
@@ -673,6 +691,7 @@ UNION ALL
     $paymentInstruments = CRM_Contribute_PseudoConstant::paymentInstrument();
     $contributionPages = CRM_Contribute_PseudoConstant::contributionPage();
     $batches = CRM_Batch_BAO_Batch::getBatches();
+    $creditCardTypes = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialTrxn', 'credit_card_type');
     foreach ($rows as $rowNum => $row) {
       if (!empty($this->_noRepeats) && $this->_outputMode != 'csv') {
         // don't repeat contact details if its same as the previous row
@@ -745,6 +764,10 @@ UNION ALL
       }
       if (!empty($row['civicrm_batch_batch_id'])) {
         $rows[$rowNum]['civicrm_batch_batch_id'] = CRM_Utils_Array::value($row['civicrm_batch_batch_id'], $batches);
+        $entryFound = TRUE;
+      }
+      if (!empty($row['civicrm_financial_trxn_credit_card_type'])) {
+        $rows[$rowNum]['civicrm_financial_trxn_credit_card_type'] = CRM_Utils_Array::value($row['civicrm_financial_trxn_credit_card_type'], $creditCardTypes);
         $entryFound = TRUE;
       }
 
@@ -999,6 +1022,14 @@ WHERE  civicrm_contribution_contribution_id={$row['civicrm_contribution_contribu
         LEFT JOIN civicrm_entity_batch {$this->_aliases['civicrm_batch']}
           ON ({$this->_aliases['civicrm_batch']}.entity_id = eft.financial_trxn_id
           AND {$this->_aliases['civicrm_batch']}.entity_table = 'civicrm_financial_trxn')";
+    }
+    // for credit card type
+    if ($this->isTableSelected('civicrm_financial_trxn')) {
+      $this->_from .= "\n LEFT JOIN civicrm_entity_financial_trxn {$this->_aliases['civicrm_entity_financial_trxn']}
+                    ON ({$this->_aliases['civicrm_contribution']}.id = {$this->_aliases['civicrm_entity_financial_trxn']}.entity_id AND
+                        {$this->_aliases['civicrm_entity_financial_trxn']}.entity_table = 'civicrm_contribution')
+              LEFT JOIN civicrm_financial_trxn {$this->_aliases['civicrm_financial_trxn']}
+                    ON {$this->_aliases['civicrm_financial_trxn']}.id = {$this->_aliases['civicrm_entity_financial_trxn']}.financial_trxn_id";
     }
   }
 
