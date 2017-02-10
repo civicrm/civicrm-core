@@ -120,11 +120,15 @@
                 {include file="CRM/Profile/Form/GreetingType.tpl"}
               {elseif ($n eq 'group' && $form.group) || ($n eq 'tag' && $form.tag)}
                 {include file="CRM/Contact/Form/Edit/TagsAndGroups.tpl" type=$n title=null context="profile"}
-              {elseif ( $n|substr:-5:5 eq '_date' ) AND
+              {elseif ( ( $n|substr:-5:5 eq '_date' ) OR ( $field.data_type eq 'Date' ) ) AND
               ( $form.formName neq 'Confirm' )  AND
               ( $form.formName neq 'ThankYou' ) }
-                {include file="CRM/common/jcalendar.tpl" elementName=$n}
-              {elseif ( $n|substr:-5:5 eq '_date' ) }
+                {if ( $n|substr:-5:5 eq '_date' ) }
+                  {include file="CRM/common/jcalendar.tpl" elementName=$n}
+                {else}
+                  {$form.$n.html}
+                {/if}
+              {elseif ( ( $n|substr:-5:5 eq '_date' ) OR ( $field.data_type eq 'Date' ) ) }
                 {assign var="date_value" value=$form.$n.value}
                 <span class="crm-frozen-field">
                   {$date_value|date_format:"%Y-%m-%d"|crmDate:$config->dateformatshortdate}
