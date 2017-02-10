@@ -2132,6 +2132,47 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * CRM-19984 Tests repeattransaction doesn't give free membership.
+   */
+  public function testRepeatTransactionMembershipGratis() {
+    list($originalContribution, $membership) = $this->setUpAutoRenewMembership();
+
+    $this->callAPISuccess('membership', 'create', array(
+       'id' => $membership['id'],
+       'end_date' => 'yesterday',
+       'status_id' => 4,
+    ));
+    $errorCount = 0;
+    // While we're at it, let's test all the other contribtion statuses that shouldn't renew a membership. 
+    // 'In Progress' is not a valid contribution status.
+    $nonRenewing = ['Failed', 'Overdue', 'Refunded', 'Partially paid', 'Pending refund', 'Chargeback' ]; 
+    foreach ($nonRenewing as $statusId) {
+      $this->callAPISuccess('contribution', 'repeattransaction', array(
+        'contribution_recur_id' => $originalContribution['values'][1]['contribution_recur_id'],
+        'contribution_status_id' => $statusId,
+        'trxn_id' => uniqid(),
+      ));
+
+      $membershipStatus = $this->callAPISuccess('membership', 'getvalue', array(
+        'id' => $membership['id'],
+        'return' => 'status_id',
+      ));
+
+      if ($membershipStatus != 4) {
+        $errorCount++;
+        $this->callAPISuccess('membership', 'create', array(
+          'id' => $membership['id'],
+          'end_date' => 'yesterday',
+          'status_id' => 4,
+        ));
+      }
+    }
+    $this->assertEquals(0, $errorCount);
+    $this->quickCleanUpFinancialEntities();
+    $this->contactDelete($originalContribution['values'][1]['contact_id']);
+  }
+
+  /**
    * CRM-16397 test appropriate action if total amount has changed for single line items.
    */
   public function testRepeatTransactionAlteredAmount() {

@@ -640,6 +640,15 @@ function civicrm_api3_contribution_repeattransaction(&$params) {
     );
     $input = array_intersect_key($params, array_fill_keys($passThroughParams, NULL));
 
+    // CRM-19984 Don't give free memberships with repeattrasaction.
+    $notRenewing = ['Failed', 'In Progress','Overdue', 'Refunded', 'Partially paid', 'Pending refund', 'Chargeback' ];
+    $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+    // It's OK to throw away the membership array here becasue we decided that we
+    // will only be repeating competed contribtuions. (CRM-19945)
+    if (isset($params['contribution_status_id']) && isset($contribution->_relatedObjects['membership']) && in_array($contributionStatuses[$params['contribution_status_id']], $notRenewing)) {
+      unset($contribution->_relatedObjects['membership']);
+    }
+
     return _ipn_process_transaction($params, $contribution, $input, $ids, $original_contribution);
   }
   catch(Exception $e) {
