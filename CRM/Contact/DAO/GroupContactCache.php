@@ -29,13 +29,6 @@ class CRM_Contact_DAO_GroupContactCache extends CRM_Core_DAO {
   public static $_log = FALSE;
 
   /**
-   * primary key
-   *
-   * @var int
-   */
-  public $id;
-
-  /**
    * FK to civicrm_group
    *
    * @var int
@@ -81,18 +74,6 @@ class CRM_Contact_DAO_GroupContactCache extends CRM_Core_DAO {
   public static function &fields() {
     if (!isset(Civi::$statics[__CLASS__]['fields'])) {
       Civi::$statics[__CLASS__]['fields'] = [
-        'id' => [
-          'name' => 'id',
-          'type' => CRM_Utils_Type::T_INT,
-          'title' => ts('Group Contact Cache ID'),
-          'description' => ts('primary key'),
-          'required' => TRUE,
-          'where' => 'civicrm_group_contact_cache.id',
-          'table_name' => 'civicrm_group_contact_cache',
-          'entity' => 'GroupContactCache',
-          'bao' => 'CRM_Contact_BAO_GroupContactCache',
-          'localizable' => 0,
-        ],
         'group_id' => [
           'name' => 'group_id',
           'type' => CRM_Utils_Type::T_INT,

@@ -482,6 +482,12 @@ class CRM_Core_CodeGen_Specification {
   public function getPrimaryKey(&$primaryXML, &$fields, &$table) {
     $name = trim((string ) $primaryXML->name);
 
+    /** need to make sure there is a field of type name */
+    if (!array_key_exists($name, $fields)) {
+      echo "primary key $name in {$table['name']} does not have a field definition, ignoring\n";
+      return;
+    }
+
     // set the autoincrement property of the field
     $auto = $this->value('autoincrement', $primaryXML);
     if (isset($fields[$name])) {
