@@ -932,15 +932,31 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         break;
 
       case 'Radio':
-        $choice = array();
+      case 'CheckBox':
+        $choices = array();
+        $i = 0;
         foreach ($options as $v => $l) {
-          $choice[] = $qf->createElement('radio', NULL, '', $l, (string) $v, $field->attributes);
+          if ($widget == 'Radio') {
+            $choice = $qf->createElement('radio', NULL, '', $l, (string) $v, $field->attributes);
+          }
+          else {
+            $choice = $qf->addElement('advcheckbox', $v, NULL, $l, array('data-crm-custom' => $dataCrmCustomVal));
+          }
+          if ($i && !empty($field->options_per_line) && !($i % $field->options_per_line)) {
+            $choice->setPrefix('<br />');
+          }
+          $i++;
+          $choices[] = $choice;
         }
-        $element = $qf->addGroup($choice, $elementName, $label);
+        $element = $qf->addGroup($choices, $elementName, $label);
+        if (!empty($field->options_per_line)) {
+          $element->setPrefix('<div class="crm-multiline-options">');
+          $element->setSuffix('</div>');
+        }
         if ($useRequired && !$search) {
           $qf->addRule($elementName, ts('%1 is a required field.', array(1 => $label)), 'required');
         }
-        else {
+        elseif ($widget == 'Radio') {
           $element->setAttribute('allowClear', TRUE);
         }
         break;
@@ -980,17 +996,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         $element->setButtonAttributes('add', array('value' => ts('Add >>')));
         $element->setButtonAttributes('remove', array('value' => ts('<< Remove')));
 
-        if ($useRequired && !$search) {
-          $qf->addRule($elementName, ts('%1 is a required field.', array(1 => $label)), 'required');
-        }
-        break;
-
-      case 'CheckBox':
-        $check = array();
-        foreach ($options as $v => $l) {
-          $check[] = &$qf->addElement('advcheckbox', $v, NULL, $l, array('data-crm-custom' => $dataCrmCustomVal));
-        }
-        $element = $qf->addGroup($check, $elementName, $label);
         if ($useRequired && !$search) {
           $qf->addRule($elementName, ts('%1 is a required field.', array(1 => $label)), 'required');
         }

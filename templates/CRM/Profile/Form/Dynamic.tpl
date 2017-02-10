@@ -111,37 +111,6 @@
             <div class="content description">{$field.help_pre}</div>
           </div>
         {/if}
-        {if $field.options_per_line}
-          <div class="crm-section editrow_{$n}-section form-item" id="editrow-{$n}">
-            <div class="label">{$form.$n.label}</div>
-            <div class="content edit-value">
-              {assign var="count" value="1"}
-              {strip}
-                <table class="form-layout-compressed">
-                <tr>
-                {* sort by fails for option per line. Added a variable to iterate through the element array*}
-                  {assign var="index" value="1"}
-                  {foreach name=outer key=key item=item from=$form.$n}
-                    {if $index < 10}
-                      {assign var="index" value=`$index+1`}
-                    {else}
-                      <td class="labels font-light">{$form.$n.$key.html}</td>
-                      {if $count == $field.options_per_line}
-                      </tr>
-                      <tr>
-                        {assign var="count" value="1"}
-                        {else}
-                        {assign var="count" value=`$count+1`}
-                      {/if}
-                    {/if}
-                  {/foreach}
-                </tr>
-                </table>
-              {/strip}
-            </div>
-            <div class="clear"></div>
-          </div>{* end of main edit section div*}
-          {else}
           <div id="editrow-{$n}" class="crm-section editrow_{$n}-section form-item">
             <div class="label">
               {$form.$n.label}
@@ -191,7 +160,6 @@
             <div class="crm-section file_displayURL-section file_displayURL{$n}-section"><div class="content">{$customFiles.$n.displayURL}</div></div>
             <div class="crm-section file_deleteURL-section file_deleteURL{$n}-section"><div class="content">{$customFiles.$n.deleteURL}</div></div>
           {/if}
-        {/if}
 
       {* Show explanatory text for field if not in 'view' mode *}
         {if $field.help_post && $action neq 4 && $form.$n.html}

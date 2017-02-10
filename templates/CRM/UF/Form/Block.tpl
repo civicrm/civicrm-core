@@ -70,42 +70,6 @@
             <div class="content description">{$field.help_pre}</div>
           </div>
         {/if}
-        {if $field.options_per_line != 0}
-          <div class="crm-section editrow_{$n}-section form-item" id="editrow-{$n}">
-            <div class="label option-label">{if $prefix}{$form.$prefix.$n.label}{else}{$form.$n.label}{/if}</div>
-            <div class="content 3">
-              {assign var="count" value="1"}
-              {strip}
-                <table class="form-layout-compressed">
-                <tr>
-                {* sort by fails for option per line. Added a variable to iterate through the element array*}
-                  {assign var="index" value="1"}
-                  {if $prefix}
-                    {assign var="formElement" value=$form.$prefix.$n}
-                  {else}
-                    {assign var="formElement" value=$form.$n}
-                  {/if}
-                  {foreach name=outer key=key item=item from=$formElement}
-                    {if $index < 10}
-                      {assign var="index" value=`$index+1`}
-                    {else}
-                      <td class="labels font-light">{$formElement.$key.html}</td>
-                      {if $count == $field.options_per_line}
-                      </tr>
-                      <tr>
-                        {assign var="count" value="1"}
-                      {else}
-                        {assign var="count" value=`$count+1`}
-                      {/if}
-                    {/if}
-                  {/foreach}
-                </tr>
-                </table>
-              {/strip}
-            </div>
-            <div class="clear"></div>
-          </div>
-        {else}
           <div class="crm-section editrow_{$n}-section form-item" id="editrow-{$n}">
             <div class="label">
               {if $prefix}{$form.$prefix.$n.label}{else}{$form.$n.label}{/if}
@@ -162,7 +126,6 @@
           </div>
           <div class="clear"></div>
         </div>
-        {/if}
         {* Show explanatory text for field if not in 'view' or 'preview' modes *}
         {if $field.help_post && $action neq 4 && $action neq 1028}
           <div class="crm-section helprow-{$n}-section helprow-post" id="helprow-{$n}">
