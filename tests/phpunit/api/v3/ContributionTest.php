@@ -3213,6 +3213,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'financial_type_id' => "Member Dues",
       'duration_unit' => "month",
       'duration_interval' => 1,
+      'period_type' => 'rolling',
       'name' => "Standard Member",
       'minimum_fee' => 100,
     ));

@@ -66,6 +66,7 @@ function _civicrm_api3_membership_type_create_spec(&$params) {
   $params['name']['api.required'] = 1;
   $params['duration_unit']['api.required'] = 1;
   $params['duration_interval']['api.required'] = 1;
+  $params['period_type']['api.required'] = 1;
   $params['is_active']['api.default'] = 1;
 }
 

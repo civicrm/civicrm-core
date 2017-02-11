@@ -146,6 +146,21 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
   }
 
   /**
+   *  CRM-20010 Tests period_type is required for MemberType create
+   */
+  public function testMemberTypePeriodiTypeRequired() {
+    $this->callAPIFailure('MembershipType', 'create', array(
+      'domain_id' => "Default Domain Name",
+      'member_of_contact_id' => 1,
+      'financial_type_id' => "Member Dues",
+      'duration_unit' => "month",
+      'duration_interval' => 1,
+      'name' => "Standard Member",
+      'minimum_fee' => 100,
+    ));
+  }
+
+  /**
    * Test update.
    */
   public function testUpdate() {
