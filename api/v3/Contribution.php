@@ -640,7 +640,36 @@ function civicrm_api3_contribution_repeattransaction(&$params) {
     );
     $input = array_intersect_key($params, array_fill_keys($passThroughParams, NULL));
 
-    return _ipn_process_transaction($params, $contribution, $input, $ids, $original_contribution);
+    $notRenewing = array('Failed', 'Overdue', 'Refunded', 'Partially paid', 'Pending refund', 'Chargeback');
+    $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+
+    // CRM-20008 create pending memberships with pending contribution.
+    if (isset($params['contribution_status_id']) && isset($contribution->_relatedObjects['membership']) && ($contributionStatuses[$params['contribution_status_id']] == 'Pending')) {
+      $contribution->_relatedObjects['memberships_pending'] = $contribution->_relatedObjects['membership'];
+      unset($contribution->_relatedObjects['membership']);
+      foreach ($contribution->_relatedObjects['memberships_pending'] as $membership) {
+        $pendingMembership = civicrm_api3('Membership', 'create', array(
+          'id' => $membership->id,
+          'membership_type_id' => $membership->membership_type_id,
+          'contact_id' => $membership->contact_id,
+          'contribution_recur_id' => $membership->contribution_recur_id,
+          'num_terms' => 1,
+          'status_id' => 'Pending',
+        ));
+      }
+    }
+
+    $ipnProcessTransaction = _ipn_process_transaction($params, $contribution, $input, $ids, $original_contribution);
+    // Create any neccesary any Membership Payments now that we have a contribution id.
+    if (isset($params['contribution_status_id']) && isset($contribution->_relatedObjects['memberships_pending']) && ($contributionStatuses[$params['contribution_status_id']] == 'Pending')) {
+      foreach ($contribution->_relatedObjects['memberships_pending'] as $membership) {
+        civicrm_api3('MembershipPayment', 'create', array(
+           'contribution_id' => $ipnProcessTransaction['id'],
+           'membership_id' => $membership->id,
+        ));
+      }
+    }
+    return $ipnProcessTransaction;
   }
   catch(Exception $e) {
     throw new API_Exception('failed to load related objects' . $e->getMessage() . "\n" . $e->getTraceAsString());

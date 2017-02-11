@@ -2132,6 +2132,44 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * CRM-20008 Tests repeattransaction creates pending membership.
+   */
+  public function testRepeatTransactionPendingMembership() {
+    list($originalContribution, $membership) = $this->setUpAutoRenewMembership();
+
+    $this->callAPISuccess('membership', 'create', array(
+       'id' => $membership['id'],
+       'end_date' => 'yesterday',
+       'status_id' => 4,
+    ));
+
+    $repeatedContribution = $this->callAPISuccess('contribution', 'repeattransaction', array(
+       'contribution_recur_id' => $originalContribution['values'][1]['contribution_recur_id'],
+       'contribution_status_id' => 'Pending',
+       'trxn_id' => uniqid(),
+    ));
+
+    $membershipStatusId = $this->callAPISuccess('membership', 'getvalue', array(
+      'id' => $membership['id'],
+      'return' => 'status_id',
+    ));
+    // Return the name for our memebership status id.
+    $membershipStatusName = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipStatus',
+      $membershipStatusId,
+      'label', 'id'
+    );
+    // Let's see if the membership payments got created while we're at it.
+    $membershipPayments = $this->callAPISuccess('MembershipPayment', 'get', array(
+      'contribution_id' => $repeatedContribution['id'],
+    ));
+
+    $this->assertNotEquals(0, $membershipPayments['count']);
+    $this->assertEquals('Pending', $membershipStatusName);
+    $this->quickCleanUpFinancialEntities();
+    $this->contactDelete($originalContribution['values'][1]['contact_id']);
+  }
+
+  /**
    * CRM-16397 test appropriate action if total amount has changed for single line items.
    */
   public function testRepeatTransactionAlteredAmount() {
@@ -3213,6 +3251,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'financial_type_id' => "Member Dues",
       'duration_unit' => "month",
       'duration_interval' => 1,
+      'period_type' => 'rolling',
       'name' => "Standard Member",
       'minimum_fee' => 100,
     ));
