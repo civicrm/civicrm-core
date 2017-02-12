@@ -3340,7 +3340,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     ));
     $contribution1 = $this->callAPISuccess('contribution', 'create', array_merge(
         $this->_params,
-        array('contribution_recur_id' => $contributionRecur['id']))
+        array('contribution_recur_id' => $contributionRecur['id'], 'payment_instrument_id' => 2))
     );
     $paymentInstruments = CRM_Contribute_PseudoConstant::paymentInstrument('name');
     $contribution2 = $this->callAPISuccess('contribution', 'repeattransaction', array(
