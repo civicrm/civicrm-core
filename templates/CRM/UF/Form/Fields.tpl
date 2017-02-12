@@ -26,22 +26,22 @@
     {/if}
   {/if}
 
-  {assign var=n value=$field.name}
+  {assign var=profileFieldName value=$field.name}
 
   {if $field.field_type eq "Formatting"}
     {if $action neq 4 && $action neq 1028}
       {$field.help_pre}
     {/if}
-  {elseif $n}
+  {elseif $profileFieldName}
     {* Show explanatory text for field if not in 'view' or 'preview' modes *}
     {if $field.help_pre && $action neq 4 && $action neq 1028}
-      <div class="crm-section helprow-{$n}-section helprow-pre" id="helprow-{$n}">
+      <div class="crm-section helprow-{$profileFieldName}-section helprow-pre" id="helprow-{$profileFieldName}">
         <div class="content description">{$field.help_pre}</div>
       </div>
     {/if}
     {if $field.options_per_line != 0}
-      <div class="crm-section editrow_{$n}-section form-item" id="editrow-{$n}">
-        <div class="label option-label">{if $prefix}{$form.$prefix.$n.label}{else}{$form.$n.label}{/if}</div>
+      <div class="crm-section editrow_{$profileFieldName}-section form-item" id="editrow-{$profileFieldName}">
+        <div class="label option-label">{if $prefix}{$form.$prefix.$profileFieldName.label}{else}{$form.$profileFieldName.label}{/if}</div>
         <div class="content 3">
           {assign var="count" value="1"}
           {strip}
@@ -50,9 +50,9 @@
                 {* sort by fails for option per line. Added a variable to iterate through the element array*}
                 {assign var="index" value="1"}
                 {if $prefix}
-                  {assign var="formElement" value=$form.$prefix.$n}
+                  {assign var="formElement" value=$form.$prefix.$profileFieldName}
                 {else}
-                  {assign var="formElement" value=$form.$n}
+                  {assign var="formElement" value=$form.$profileFieldName}
                 {/if}
                 {foreach name=outer key=key item=item from=$formElement}
                 {if $index < 10}
@@ -75,57 +75,57 @@
         <div class="clear"></div>
       </div>
     {else}
-      <div class="crm-section editrow_{$n}-section form-item" id="editrow-{$n}">
+      <div class="crm-section editrow_{$profileFieldName}-section form-item" id="editrow-{$profileFieldName}">
         <div class="label">
-          {if $prefix}{$form.$prefix.$n.label}{else}{$form.$n.label}{/if}
+          {if $prefix}{$form.$prefix.$profileFieldName.label}{else}{$form.$profileFieldName.label}{/if}
         </div>
         <div class="content">
-          {if $n|substr:0:3 eq 'im-'}
-            {assign var="provider" value=$n|cat:"-provider_id"}
+          {if $profileFieldName|substr:0:3 eq 'im-'}
+            {assign var="provider" value=profileFieldNamen|cat:"-provider_id"}
             {$form.$provider.html}&nbsp;
           {/if}
 
-          {if $n eq 'email_greeting' or  $n eq 'postal_greeting' or $n eq 'addressee'}
+          {if $profileFieldName eq 'email_greeting' or  $profileFieldName eq 'postal_greeting' or $profileFieldName eq 'addressee'}
             {include file="CRM/Profile/Form/GreetingType.tpl"}
-          {elseif ($n eq 'group' && $form.group) || ($n eq 'tag' && $form.tag)}
-            {include file="CRM/Contact/Form/Edit/TagsAndGroups.tpl" type=$n title=null context="profile"}
-          {elseif ( $n|substr:-5:5 eq '_date' ) AND
+          {elseif ($profileFieldName eq 'group' && $form.group) || ($profileFieldName eq 'tag' && $form.tag)}
+            {include file="CRM/Contact/Form/Edit/TagsAndGroups.tpl" type=$profileFieldName title=null context="profile"}
+          {elseif ( $profileFieldName|substr:-5:5 eq '_date' ) AND
           ( $form.formName neq 'Confirm' )  AND
           ( $form.formName neq 'ThankYou' ) }
-            {include file="CRM/common/jcalendar.tpl" elementName=$n}
-          {elseif ( $n|substr:-5:5 eq '_date' ) }
-            {assign var="date_value" value=$form.$n.value}
+            {include file="CRM/common/jcalendar.tpl" elementName=$profileFieldName}
+          {elseif ( $profileFieldName|substr:-5:5 eq '_date' ) }
+            {assign var="date_value" value=$form.$profileFieldName.value}
             <span class="crm-frozen-field">
                   {$date_value|date_format:"%Y-%m-%d"|crmDate:$config->dateformatshortdate}
-              <input type="hidden" name="{$form.$n.name}" value="{$form.$n.value}" id="{$form.$n.name}">
+              <input type="hidden" name="{$form.$profileFieldName.name}" value="{$form.$profileFieldName.value}" id="{$form.$profileFieldName.name}">
                 </span>
-          {elseif $n|substr:0:5 eq 'phone'}
-            {assign var="phone_ext_field" value=$n|replace:'phone':'phone_ext'}
-            {if $prefix}{$form.$prefix.$n.html}{else}{$form.$n.html}{/if}
+          {elseif $profileFieldName|substr:0:5 eq 'phone'}
+            {assign var="phone_ext_field" value=$profileFieldName|replace:'phone':'phone_ext'}
+            {if $prefix}{$form.$prefix.$profileFieldName.html}{else}{$form.$profileFieldName.html}{/if}
             {if $form.$phone_ext_field.html}
               &nbsp;{$form.$phone_ext_field.html}
             {/if}
           {else}
             {if $prefix}
-              {if $n eq 'organization_name' && !empty($form.onbehalfof_id)}
+              {if $profileFieldName eq 'organization_name' && !empty($form.onbehalfof_id)}
                 {$form.onbehalfof_id.html}
               {/if}
               {if $field.html_type eq 'File' && $viewOnlyPrefixFileValues}
-                {$viewOnlyPrefixFileValues.$prefix.$n}
+                {$viewOnlyPrefixFileValues.$prefix.$profileFieldName}
               {else}
-                {$form.$prefix.$n.html}
+                {$form.$prefix.$profileFieldName.html}
               {/if}
             {elseif $field.html_type eq 'File' && $viewOnlyFileValues}
-              {$viewOnlyFileValues.$n}
+              {$viewOnlyFileValues.$profileFieldName}
             {else}
-              {$form.$n.html}
+              {$form.$profileFieldName.html}
             {/if}
           {/if}
 
           {*CRM-4564*}
           {if $field.html_type eq 'Autocomplete-Select'}
             {if $field.data_type eq 'ContactReference'}
-              {include file="CRM/Custom/Form/ContactReference.tpl" element_name = $n}
+              {include file="CRM/Custom/Form/ContactReference.tpl" element_name = $profileFieldName}
             {/if}
           {/if}
         </div>
@@ -134,7 +134,7 @@
     {/if}
     {* Show explanatory text for field if not in 'view' or 'preview' modes *}
     {if $field.help_post && $action neq 4 && $action neq 1028}
-      <div class="crm-section helprow-{$n}-section helprow-post" id="helprow-{$n}">
+      <div class="crm-section helprow-{$profileFieldName}-section helprow-post" id="helprow-{$profileFieldName}">
         <div class="content description">{$field.help_post}</div>
       </div>
     {/if}
