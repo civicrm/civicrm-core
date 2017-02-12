@@ -601,6 +601,9 @@ function _civicrm_api3_contribution_completetransaction_spec(&$params) {
 function civicrm_api3_contribution_repeattransaction(&$params) {
   $input = $ids = array();
   civicrm_api3_verify_one_mandatory($params, NULL, array('contribution_recur_id', 'original_contribution_id'));
+  if (CRM_Contribute_PseudoConstant::contributionStatus($params['contribution_status_id'], 'name') == 'In Progress') {
+    throw new API_Exception('In Progress is not a valid contribution status id. Not implemented.', array('error_code' => 'NOT_IMPLEMENTED'));
+  }
   if (empty($params['original_contribution_id'])) {
     //  CRM-19873 call with test mode.
     $params['original_contribution_id'] = civicrm_api3('contribution', 'getvalue', array(

@@ -2202,6 +2202,20 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * CRM-20009 test repeatransaction 'In Progress' returns not implemented.
+   */
+  public function testRepeatTransactionInProgressNotImplemented() {
+    $originalContribution = $this->setUpRecurringContribution();
+
+    $this->callAPIFailure('contribution', 'repeattransaction', array(
+      'original_contribution_id' => $originalContribution['id'],
+      'contribution_status_id' => 'In Progress',
+      'trxn_id' => uniqid(),
+      'financial_type_id' => 2,
+    ), 'In Progress is not a valid contribution status id. Not implemented.');
+  }
+
+  /**
    * CRM-17718 test appropriate action if financial type has changed for single line items.
    */
   public function testRepeatTransactionPassedInFinancialType() {
