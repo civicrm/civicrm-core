@@ -82,7 +82,7 @@
     <add>1.5</add>
     <html>
       <type>Select Date</type>
-      <format>activityDate</format>
+      <formatType>activityDate</formatType>
     </html>
   </field>
   <field>
@@ -97,7 +97,7 @@
     <add>1.5</add>
     <html>
       <type>Select Date</type>
-      <format>activityDate</format>
+      <formatType>activityDate</formatType>
     </html>
   </field>
   <field>
@@ -112,7 +112,7 @@
     <add>1.5</add>
     <html>
       <type>Select Date</type>
-      <format>activityDate</format>
+      <formatType>activityDate</formatType>
     </html>
   </field>
   <field>
