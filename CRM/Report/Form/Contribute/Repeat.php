@@ -280,6 +280,24 @@ class CRM_Report_Form_Contribute_Repeat extends CRM_Report_Form {
         ),
         'group_bys' => array('contribution_source' => NULL),
       ),
+      'civicrm_financial_trxn' => array(
+        'dao' => 'CRM_Financial_DAO_FinancialTrxn',
+        'fields' => array(
+          'card_type' => array(
+            'title' => ts('Credit Card Type'),
+            'dbAlias' => 'GROUP_CONCAT(financial_trxn_civireport.card_type SEPARATOR ",")',
+          ),
+        ),
+        'filters' => array(
+          'card_type' => array(
+            'title' => ts('Credit Card Type'),
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialTrxn', 'card_type'),
+            'default' => NULL,
+            'type' => CRM_Utils_Type::T_STRING,
+          ),
+        ),
+      ),
     );
 
     $this->_groupFilter = TRUE;
@@ -400,6 +418,16 @@ LEFT JOIN $this->tempTableRepeat1 {$this->_aliases['civicrm_contribution']}1
        .{$this->contributionJoinTableColumn}
 LEFT JOIN $this->tempTableRepeat2 {$this->_aliases['civicrm_contribution']}2
        ON {$this->groupByTableAlias}.$fromCol = {$this->_aliases['civicrm_contribution']}2.{$this->contributionJoinTableColumn}";
+
+    // for credit card type
+    if ($this->isTableSelected('civicrm_financial_trxn')) {
+      $this->_from .= "
+        LEFT JOIN civicrm_entity_financial_trxn eftcc
+          ON ({$this->_aliases['civicrm_contribution']}.id = eftcc.entity_id AND
+            eftcc.entity_table = 'civicrm_contribution')
+        LEFT JOIN civicrm_financial_trxn {$this->_aliases['civicrm_financial_trxn']}
+          ON {$this->_aliases['civicrm_financial_trxn']}.id = eftcc.financial_trxn_id";
+    }
   }
 
   /**
@@ -544,6 +572,7 @@ LEFT JOIN $this->tempTableRepeat2 {$this->_aliases['civicrm_contribution']}2
       'state_province_id' => array('country_id', 'state_province_id'),
       'contribution_source' => array('contribution_source'),
       'financial_type' => array('financial_type'),
+      'card_type' => array('card_type'),
     );
 
     $idMapping = array(
@@ -553,6 +582,7 @@ LEFT JOIN $this->tempTableRepeat2 {$this->_aliases['civicrm_contribution']}2
       'state_province_id' => ts('State/Province'),
       'contribution_source' => ts('Contribution Source'),
       'financial_type' => ts('Financial Type'),
+      'card_type' => ts('Credit Card Type'),
       'sort_name' => ts('Contact Name'),
       'email' => ts('Email'),
       'phone' => ts('Phone'),
@@ -984,6 +1014,12 @@ GROUP BY    currency
 
         $rows[$rowNum]['contact_civireport_sort_name_link'] = $url;
         $rows[$rowNum]['contact_civireport_sort_name_hover'] = ts("View Contribution details for this contact");
+      }
+
+      // convert credit card type to label
+      if (!empty($row['civicrm_financial_trxn_card_type'])) {
+        $rows[$rowNum]['civicrm_financial_trxn_card_type'] = $this->getLabels($row['civicrm_financial_trxn_card_type'], 'CRM_Financial_DAO_FinancialTrxn', 'card_type');
+        $entryFound = TRUE;
       }
     }
     // foreach ends
