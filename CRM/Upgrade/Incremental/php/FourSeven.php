@@ -304,6 +304,17 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
   }
 
+  /**
+   * Upgrade function
+   *
+   * @param string $rev
+   */
+  public function upgrade_4_7_17($rev) {
+    $this->addTask('CRM-xxxxx - Add is_recur_default column to civicrm_contribution_page', 'addColumn',
+      'civicrm_contribution_page', 'is_recur_default', "tinyint DEFAULT '0' COMMENT 'Enable recurring contribution checkbox by default.'");
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
+  }
+
   /*
    * Important! All upgrade functions MUST add a 'runSql' task.
    * Uncomment and use the following template for a new upgrade version
