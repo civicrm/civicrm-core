@@ -3323,4 +3323,33 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     return $contribution;
   }
 
+  /**
+   * Test repeat contribution uses the Payment Processor' payment_instrument setting.
+   */
+  public function testRepeatTransactionWithNonCreditCardDefault() {
+    $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', array(
+      'contact_id' => $this->_individualId,
+      'installments' => '12',
+      'frequency_interval' => '1',
+      'amount' => '100',
+      'contribution_status_id' => 1,
+      'start_date' => '2012-01-01 00:00:00',
+      'currency' => 'USD',
+      'frequency_unit' => 'month',
+      'payment_processor_id' => $this->paymentProcessorID,
+    ));
+    $contribution1 = $this->callAPISuccess('contribution', 'create', array_merge(
+        $this->_params,
+        array('contribution_recur_id' => $contributionRecur['id'], 'payment_instrument_id' => 2))
+    );
+    $paymentInstruments = CRM_Contribute_PseudoConstant::paymentInstrument('name');
+    $contribution2 = $this->callAPISuccess('contribution', 'repeattransaction', array(
+      'contribution_status_id' => 'Completed',
+      'trxn_id' => uniqid(),
+      'original_contribution_id' => $contribution1,
+    ));
+    $this->assertEquals(array_search('Debit Card', $paymentInstruments), $contribution2['values'][$contribution2['id']]['payment_instrument_id']);
+    $this->quickCleanUpFinancialEntities();
+  }
+
 }
