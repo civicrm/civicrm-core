@@ -648,6 +648,7 @@ GROUP BY  participant.event_id
           'title' => ts('Participant Note'),
           'name' => 'participant_note',
           'headerPattern' => '/(participant.)?note$/i',
+          'type' => 'text',
         ),
       );
 
