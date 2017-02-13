@@ -48,11 +48,7 @@
 
               {foreach from=$fields item=field key=fieldName}
                 {assign var=n value=$field.name}
-                {if ( $n eq 'thankyou_date' ) or ( $n eq 'cancel_date' ) or ( $n eq 'receipt_date' ) or ( $n eq 'receive_date' )}
-                   <td class="compressed">{include file="CRM/common/jcalendar.tpl" elementName=$n elementIndex=$cid batchUpdate=1}</td>
-                {else}
-                   <td class="compressed">{$form.field.$cid.$n.html}</td>
-                {/if}
+                 <td class="compressed">{$form.field.$cid.$n.html}</td>
               {/foreach}
              </tr>
             {/foreach}

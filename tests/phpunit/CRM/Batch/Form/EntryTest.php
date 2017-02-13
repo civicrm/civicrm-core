@@ -234,9 +234,9 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
 
     // explicitly specify start and end dates
     $params['field'][2]['membership_type'] = array(0 => $this->_orgContactID2, 1 => $this->_membershipTypeID2);
-    $params['field'][2]['membership_start_date'] = "04/01/2016";
-    $params['field'][2]['membership_end_date'] = "03/31/2017";
-    $params['field'][2]['receive_date'] = "04/01/2016";
+    $params['field'][2]['membership_start_date'] = "2016-04-01";
+    $params['field'][2]['membership_end_date'] = "2017-03-31";
+    $params['field'][2]['receive_date'] = "2016-04-01";
 
     $this->assertTrue($form->testProcessMembership($params));
     $result = $this->callAPISuccess('membership', 'get', array());
@@ -268,13 +268,13 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
       'field' => array(
         1 => array(
           'membership_type' => array(0 => $this->_orgContactID, 1 => $this->_membershipTypeID),
-          'join_date' => '07/22/2013',
+          'join_date' => '2013-07-22',
           'membership_start_date' => NULL,
           'membership_end_date' => NULL,
           'membership_source' => NULL,
           'financial_type' => 2,
           'total_amount' => 1,
-          'receive_date' => '07/24/2013',
+          'receive_date' => '2013-07-24',
           'receive_date_time' => NULL,
           'payment_instrument' => 1,
           'trxn_id' => 'TX101',
@@ -283,13 +283,13 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
         ),
         2 => array(
           'membership_type' => array(0 => $this->_orgContactID, 1 => $this->_membershipTypeID),
-          'join_date' => '07/03/2013',
-          'membership_start_date' => '02/03/2013',
+          'join_date' => '2013-07-03',
+          'membership_start_date' => '2013-02-03',
           'membership_end_date' => NULL,
           'membership_source' => NULL,
           'financial_type' => 2,
           'total_amount' => 1,
-          'receive_date' => '07/17/2013',
+          'receive_date' => '2013-07-17',
           'receive_date_time' => NULL,
           'payment_instrument' => NULL,
           'trxn_id' => 'TX102',
@@ -305,7 +305,7 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
           'membership_source' => NULL,
           'financial_type' => 2,
           'total_amount' => 1,
-          'receive_date' => '07/17/2013',
+          'receive_date' => '2013-07-17',
           'receive_date_time' => NULL,
           'payment_instrument' => NULL,
           'trxn_id' => 'TX103',
@@ -335,7 +335,7 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
         1 => array(
           'financial_type' => 1,
           'total_amount' => 15,
-          'receive_date' => '07/24/2013',
+          'receive_date' => '2013-07-24',
           'receive_date_time' => NULL,
           'payment_instrument' => 1,
           'check_number' => NULL,
@@ -344,7 +344,7 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
         2 => array(
           'financial_type' => 1,
           'total_amount' => 15,
-          'receive_date' => '07/24/2013',
+          'receive_date' => '2013-07-24',
           'receive_date_time' => NULL,
           'payment_instrument' => 1,
           'check_number' => NULL,

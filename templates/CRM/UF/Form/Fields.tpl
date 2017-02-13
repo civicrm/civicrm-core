@@ -97,8 +97,6 @@
                value="{$form.$profileFieldName.value}" id="{$form.$profileFieldName.name}"
               >
             </span>
-          {elseif $field.is_legacy_date}
-            {include file="CRM/common/jcalendar.tpl" elementName=$profileFieldName}
           {elseif $profileFieldName|substr:0:5 eq 'phone'}
             {assign var="phone_ext_field" value=$profileFieldName|replace:'phone':'phone_ext'}
             {if $prefix}{$form.$prefix.$profileFieldName.html}{else}{$form.$profileFieldName.html}{/if}

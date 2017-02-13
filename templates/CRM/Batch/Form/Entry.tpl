@@ -93,13 +93,7 @@
         {/if}
         {foreach from=$fields item=field key=fieldName}
           {assign var=n value=$field.name}
-          {if in_array( $n, array( 'thankyou_date', 'cancel_date', 'receipt_date', 'receive_date') ) }
-            <div class="compressed crm-grid-cell">
-              <span class="crm-batch-{$n}-{$rowNumber}">
-                {include file="CRM/common/jcalendar.tpl" elementName=$n elementIndex=$rowNumber batchUpdate=1}
-              </span>
-            </div>
-          {elseif $n eq 'soft_credit'}
+          {if $n eq 'soft_credit'}
             <div class="compressed crm-grid-cell">
               {$form.soft_credit_contact_id.$rowNumber.html|crmAddClass:big}
               {$form.soft_credit_amount.$rowNumber.label}&nbsp;{$form.soft_credit_amount.$rowNumber.html|crmAddClass:eight}

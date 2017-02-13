@@ -380,13 +380,12 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
     // for add mode set smart defaults
     if ($this->_action & CRM_Core_Action::ADD) {
-      list($currentDate, $currentTime) = CRM_Utils_Date::setDateDefaults(NULL, 'activityDateTime');
+      $currentDate = date('Y-m-d H-i-s');
 
       $completeStatus = CRM_Contribute_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
       $specialFields = array(
         'join_date' => date('Y-m-d'),
         'receive_date' => $currentDate,
-        'receive_date_time' => $currentTime,
         'contribution_status_id' => $completeStatus,
       );
 
@@ -447,12 +446,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    * @return bool
    */
   private function processContribution(&$params) {
-    $dates = array(
-      'receive_date',
-      'receipt_date',
-      'thankyou_date',
-      'cancel_date',
-    );
 
     // get the price set associated with offline contribution record.
     $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', 'default_contribution_amount', 'id', 'name');
@@ -503,12 +496,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
           NULL,
           'Contribution'
         );
-
-        foreach ($dates as $val) {
-          if (!empty($value[$val])) {
-            $value[$val] = CRM_Utils_Date::processDate($value[$val], $value[$val . '_time'], TRUE);
-          }
-        }
 
         if (!empty($value['send_receipt'])) {
           $value['receipt_date'] = date('Y-m-d His');
@@ -713,10 +700,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
           else {
             $value['soft_credit'][$key]['soft_credit_type_id'] = CRM_Core_OptionGroup::getValue('soft_credit_type', 'Gift', 'name');
           }
-        }
-
-        if (!empty($value['receive_date'])) {
-          $value['receive_date'] = CRM_Utils_Date::processDate($value['receive_date'], $value['receive_date_time'], TRUE);
         }
 
         $params['actualBatchTotal'] += $value['total_amount'];

@@ -519,9 +519,6 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
     );
 
     $formattedField = CRM_Utils_Date::addDateMetadataToField($fieldMetaData, $formattedField);
-    if (in_array($name, array_keys(self::getNonUpgradedDateFields()))) {
-      $formattedField['is_legacy_date'] = 1;
-    }
 
     //adding custom field property
     if (substr($field->field_name, 0, 6) == 'custom' ||
@@ -1890,7 +1887,6 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     $addressOptions = CRM_Core_BAO_Setting::valueOptions(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
       'address_options', TRUE, NULL, TRUE
     );
-    $legacyHandledDateFields = self::getNonUpgradedDateFields();
 
     if (substr($fieldName, 0, 14) === 'state_province') {
       $form->addChainSelect($name, array('label' => $title, 'required' => $required));
@@ -1952,9 +1948,6 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
           $form->freeze($name . '-provider_id');
         }
       }
-    }
-    elseif (isset($legacyHandledDateFields[$fieldName])) {
-      $form->addDate($name, $title, $required, array('formatType' => $legacyHandledDateFields[$fieldName]));
     }
     elseif (CRM_Utils_Array::value('name', $field) == 'membership_type') {
       list($orgInfo, $types) = CRM_Member_BAO_MembershipType::getMembershipTypeInfo();
@@ -2318,23 +2311,6 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
   }
 
   /**
-   * Get fields that have not been upgraded to use datepicker.
-   *
-   * Fields that use the old code have jcalendar in the tpl and
-   * the form uses a customised format. We are moving towards datepicker
-   * which among other things passes dates back and forth using a standardised
-   * format. Remove fields from here as they are tested and converted.
-   */
-  static public function getNonUpgradedDateFields() {
-    return array(
-      'receive_date' => 'activityDateTime',
-      'receipt_date' => 'activityDateTime',
-      'thankyou_date' => 'activityDateTime',
-      'cancel_date' => 'activityDateTime',
-    );
-  }
-
-  /**
    * Set profile defaults.
    *
    * @param int $contactId
@@ -2435,34 +2411,6 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
                     // seems like we need this for QF style checkboxes in profile where its multiindexed
                     // CRM-2969
                     $defaults["{$fldName}[{$item}]"] = 1;
-                  }
-                }
-                break;
-
-              case 'Select Date':
-                if (!in_array($name, array_keys(self::getNonUpgradedDateFields()))) {
-                  $defaults[$fldName] = $details[$name];
-                }
-                else {
-                  // Do legacy handling.
-                  // CRM-6681, set defult values according to date and time format (if any).
-                  $dateFormat = NULL;
-                  if (!empty($customFields[$customFieldId]['date_format'])) {
-                    $dateFormat = $customFields[$customFieldId]['date_format'];
-                  }
-
-                  if (empty($customFields[$customFieldId]['time_format'])) {
-                    list($defaults[$fldName]) = CRM_Utils_Date::setDateDefaults($details[$name], NULL,
-                      $dateFormat
-                    );
-                  }
-                  else {
-                    $timeElement = $fldName . '_time';
-                    if (substr($fldName, -1) == ']') {
-                      $timeElement = substr($fldName, 0, -1) . '_time]';
-                    }
-                    list($defaults[$fldName], $defaults[$timeElement]) = CRM_Utils_Date::setDateDefaults($details[$name],
-                      NULL, $dateFormat, $customFields[$customFieldId]['time_format']);
                   }
                 }
                 break;
@@ -3280,18 +3228,10 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     }
 
     $formattedGroupTree = array();
-    // @todo - as we put these on datepicker they need to be removed from here.
-    $dateTimeFields = array_keys(self::getNonUpgradedDateFields());
 
     foreach ($fields as $name => $field) {
       $fldName = $isStandalone ? $name : "field[$componentId][$name]";
-      if (in_array($name, $dateTimeFields)) {
-        $timefldName = $isStandalone ? "{$name}_time" : "field[$componentId][{$name}_time]";
-        if (!empty($values[$name])) {
-          list($defaults[$fldName], $defaults[$timefldName]) = CRM_Utils_Date::setDateDefaults($values[$name]);
-        }
-      }
-      elseif (array_key_exists($name, $values)) {
+      if (array_key_exists($name, $values)) {
         $defaults[$fldName] = $values[$name];
       }
       elseif ($name == 'participant_note') {
