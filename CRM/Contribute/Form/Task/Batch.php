@@ -217,6 +217,11 @@ class CRM_Contribute_Form_Task_Batch extends CRM_Contribute_Form_Task {
         foreach ($dates as $val) {
           if (isset($value[$val])) {
             $value[$val] = CRM_Utils_Date::processDate($value[$val]);
+
+            //CRM-20012 - allow setting empty value
+            if (empty($value[$val])) {
+              $value[$val] = 'null';
+            }
           }
         }
         if (!empty($value['financial_type'])) {
