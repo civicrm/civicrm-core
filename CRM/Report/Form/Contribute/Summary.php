@@ -854,7 +854,6 @@ ROUND(AVG({$this->_aliases['civicrm_contribution_soft']}.amount), 2) as civicrm_
   public function alterDisplay(&$rows) {
     $entryFound = FALSE;
     $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus();
-    $batches = CRM_Batch_BAO_Batch::getBatches();
 
     foreach ($rows as $rowNum => $row) {
       // make count columns point to detail report
@@ -949,7 +948,7 @@ ROUND(AVG({$this->_aliases['civicrm_contribution_soft']}.amount), 2) as civicrm_
 
       // convert batch id to batch title
       if (!empty($row['civicrm_batch_batch_id'])) {
-        $rows[$rowNum]['civicrm_batch_batch_id'] = CRM_Utils_Array::value($row['civicrm_batch_batch_id'], $batches);
+        $rows[$rowNum]['civicrm_batch_batch_id'] = CRM_Core_DAO::getFieldValue('CRM_Batch_BAO_Batch', $row['civicrm_batch_batch_id'], 'title');
         $entryFound = TRUE;
       }
 
