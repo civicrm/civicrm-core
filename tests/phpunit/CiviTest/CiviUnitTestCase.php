@@ -3396,7 +3396,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
    *
    * @return array
    */
-  protected function createPriceSet($component = 'contribution_page', $componentId = NULL) {
+  protected function createPriceSet($component = 'contribution_page', $componentId = NULL, $priceFieldOptions = array()) {
     $paramsSet['title'] = 'Price Set' . substr(sha1(rand()), 0, 7);
     $paramsSet['name'] = CRM_Utils_String::titleToVar($paramsSet['title']);
     $paramsSet['is_active'] = TRUE;
@@ -3408,7 +3408,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     $this->assertDBCompareValue('CRM_Price_BAO_PriceSet', $priceSetId, 'title',
       'id', $paramsSet['title'], 'Check DB for created priceset'
     );
-    $paramsField = array(
+    $paramsField = array_merge(array(
       'label' => 'Price Field',
       'name' => CRM_Utils_String::titleToVar('Price Field'),
       'html_type' => 'CheckBox',
@@ -3424,7 +3424,8 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
       'price_set_id' => $priceSet['id'],
       'is_enter_qty' => 1,
       'financial_type_id' => $this->getFinancialTypeId('Event Fee'),
-    );
+    ), $priceFieldOptions);
+
     $priceField = CRM_Price_BAO_PriceField::create($paramsField);
     if ($componentId) {
       CRM_Price_BAO_PriceSet::addTo('civicrm_' . $component, $componentId, $priceSetId);

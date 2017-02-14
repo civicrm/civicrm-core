@@ -639,9 +639,9 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           !$this->_allowWaitlist && !$this->_requireApproval
         ) {
           // transactionID & receive date required while building email template
-          $this->assign('trxn_id', $value['trxn_id']);
-          $this->assign('receive_date', CRM_Utils_Date::mysqlToIso($value['receive_date']));
-          $this->set('receiveDate', CRM_Utils_Date::mysqlToIso($value['receive_date']));
+          $this->assign('trxn_id', CRM_Utils_Array::value('trxn_id', $value));
+          $this->assign('receive_date', CRM_Utils_Date::mysqlToIso(CRM_Utils_Array::value('receive_date', $value)));
+          $this->set('receiveDate', CRM_Utils_Date::mysqlToIso(CRM_Utils_Array::value('receive_date', $value)));
           $this->set('trxnId', CRM_Utils_Array::value('trxn_id', $value));
         }
       }
