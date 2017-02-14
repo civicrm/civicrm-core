@@ -2993,7 +2993,7 @@ class CRM_Contact_BAO_Query {
         $gcTable = ($op == '!=') ? 'cgc' : $gcTable;
         $childClause = " OR {$gcTable}.group_id IN (" . implode(',', $childGroupIds) . ") ";
       }
-      $groupClause[] = sprintf($clause, $childClause);
+      $groupClause[] = '(' . sprintf($clause, $childClause) . ')';
     }
 
     //CRM-19589: contact(s) removed from a Smart Group, resides in civicrm_group_contact table
