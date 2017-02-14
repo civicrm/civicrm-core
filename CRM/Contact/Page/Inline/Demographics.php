@@ -54,12 +54,10 @@ class CRM_Contact_Page_Inline_Demographics extends CRM_Core_Page {
       $gender = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id');
       $defaults['gender_display'] = $gender[CRM_Utils_Array::value('gender_id', $defaults)];
     }
+    $this->assignFieldMetadataToTemplate('Contact');
 
     $this->assign('contactId', $contactId);
     $this->assign($defaults);
-
-    //for birthdate format with respect to birth format set
-    $this->assign('birthDateViewFormat', CRM_Utils_Array::value('qfMapping', CRM_Utils_Date::checkBirthDateFormat()));
 
     // check logged in user permission
     CRM_Contact_Page_View::checkUserPermission($this, $contactId);
