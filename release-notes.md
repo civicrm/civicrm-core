@@ -35,6 +35,7 @@ Released January 4, 2017
 
 Released December 7, 2016
 
+- **[Security advisories](release-notes/4.7.14.md#security)**
 - **[Features](release-notes/4.7.14.md#features)**
 - **[Bugs resolved](release-notes/4.7.14.md#bugs)**
 - **[Credits](release-notes/4.7.14.md#credits)**
