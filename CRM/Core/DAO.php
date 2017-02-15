@@ -2490,6 +2490,11 @@ SELECT contact_id
       $clauses[$field] = NULL;
       if ($vals) {
         $clauses[$field] = "`$tableAlias`.`$field` " . implode(" AND `$tableAlias`.`$field` ", (array) $vals);
+        // Hack around CRM-20027. (Don't care about the contact ID of an
+        // address if there is no contact ID.)
+        if ($field == 'contact_id' && $bao->tableName() == 'civicrm_address') {
+          $clauses[$field] = "`$tableAlias`.`$field` IS NULL OR (" . $clauses[$field] . ")";
+        }
       }
     }
     return $clauses;
