@@ -3199,15 +3199,18 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
 
   /**
    * Helper function to create new mailing.
-   * @return mixed
+   *
+   * @param array $params
+   *
+   * @return int
    */
-  public function createMailing() {
-    $params = array(
+  public function createMailing($params = array()) {
+    $params = array_merge(array(
       'subject' => 'maild' . rand(),
       'body_text' => 'bdkfhdskfhduew{domain.address}{action.optOutUrl}',
       'name' => 'mailing name' . rand(),
       'created_id' => 1,
-    );
+    ), $params);
 
     $result = $this->callAPISuccess('Mailing', 'create', $params);
     return $result['id'];
