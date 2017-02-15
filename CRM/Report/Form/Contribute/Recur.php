@@ -106,6 +106,24 @@ class CRM_Report_Form_Contribute_Recur extends CRM_Report_Form {
           ),
         ),
       ),
+      'civicrm_financial_trxn' => array(
+        'dao' => 'CRM_Financial_DAO_FinancialTrxn',
+        'fields' => array(
+          'card_type' => array(
+            'title' => ts('Credit Card Type'),
+            'dbAlias' => 'GROUP_CONCAT(financial_trxn_civireport.card_type SEPARATOR ",")',
+          ),
+        ),
+        'filters' => array(
+          'card_type' => array(
+            'title' => ts('Credit Card Type'),
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialTrxn', 'card_type'),
+            'default' => NULL,
+            'type' => CRM_Utils_Type::T_STRING,
+          ),
+        ),
+      ),
       'civicrm_contribution_recur' => array(
         'dao' => 'CRM_Contribute_DAO_ContributionRecur',
         'fields' => array(
@@ -263,6 +281,16 @@ class CRM_Report_Form_Contribute_Recur extends CRM_Report_Form {
       LEFT  JOIN civicrm_phone {$this->_aliases['civicrm_phone']}
         ON ({$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id AND
         {$this->_aliases['civicrm_phone']}.is_primary = 1)";
+
+    // for credit card type
+    if ($this->isTableSelected('civicrm_financial_trxn')) {
+      $this->_from .= "
+        LEFT JOIN civicrm_entity_financial_trxn eftcc
+          ON ({$this->_aliases['civicrm_contribution']}.id = eftcc.entity_id AND
+            eftcc.entity_table = 'civicrm_contribution')
+        LEFT JOIN civicrm_financial_trxn {$this->_aliases['civicrm_financial_trxn']}
+          ON {$this->_aliases['civicrm_financial_trxn']}.id = eftcc.financial_trxn_id";
+    }
   }
 
   public function groupBy() {
@@ -369,6 +397,10 @@ class CRM_Report_Form_Contribute_Recur extends CRM_Report_Form {
 
       if ($value = CRM_Utils_Array::value('civicrm_contribution_recur_amount', $row)) {
         $rows[$rowNum]['civicrm_contribution_recur_amount'] = CRM_Utils_Money::format($rows[$rowNum]['civicrm_contribution_recur_amount'], $rows[$rowNum]['civicrm_contribution_recur_currency']);
+      }
+
+      if (!empty($row['civicrm_financial_trxn_card_type'])) {
+        $rows[$rowNum]['civicrm_financial_trxn_card_type'] = $this->getLabels($row['civicrm_financial_trxn_card_type'], 'CRM_Financial_DAO_FinancialTrxn', 'card_type');
       }
     }
   }
