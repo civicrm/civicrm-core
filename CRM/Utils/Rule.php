@@ -100,10 +100,15 @@ class CRM_Utils_Rule {
       return FALSE;
     }
 
-    // Ensure the string contains only valid characters:
-    // For column names: alphanumeric and underscores
-    // For aliases: backticks, alphanumeric hyphens and underscores.
-    if (!preg_match('/^((`[\w-]{1,64}`|[\w-]{1,64})\.)?(`[\w-]{1,64}`|[\w-]{1,64})$/i', $str)) {
+    // Ensure $str conforms to expected format. Not a complete expression of
+    // what MySQL permits; this should permit the formats CiviCRM generates.
+    //
+    // * Table name prefix is optional.
+    // * Table & column names & aliases:
+    //   * Composed of alphanumeric chars, underscore and hyphens.
+    //   * Maximum length of 64 chars.
+    //   * Optionally surrounded by backticks, in which case spaces also OK.
+    if (!preg_match('/^((`[\w- ]{1,64}`|[\w-]{1,64})\.)?(`[\w- ]{1,64}`|[\w-]{1,64})$/i', $str)) {
       return FALSE;
     }
 
