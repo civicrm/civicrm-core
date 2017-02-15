@@ -375,6 +375,10 @@ function civicrm_api3_activity_get($params) {
  *   new activities list
  */
 function _civicrm_api3_activity_get_formatResult($params, $activities) {
+  if (!$activities) {
+    return $activities;
+  }
+
   $returns = CRM_Utils_Array::value('return', $params, array());
   if (!is_array($returns)) {
     $returns = str_replace(' ', '', $returns);
@@ -430,6 +434,18 @@ function _civicrm_api3_activity_get_formatResult($params, $activities) {
         }
         break;
 
+      case 'tag_id':
+        $tags = civicrm_api3('EntityTag', 'get', array(
+          'entity_table' => 'civicrm_activity',
+          'entity_id' => array('IN' => array_keys($activities)),
+          'return' => array('tag_id', 'entity_id'),
+          'options' => array('limit' => 0),
+        ));
+        foreach ($tags['values'] as $tag) {
+          $activities[$tag['entity_id']]['tag_id'][] = (int) $tag['tag_id'];
+        }
+        break;
+
       default:
         if (substr($n, 0, 6) == 'custom') {
           $returnProperties[$n] = $v;
@@ -451,7 +467,7 @@ function _civicrm_api3_activity_get_formatResult($params, $activities) {
     }
   }
 
-  if (!empty($activities) && (!empty($returnProperties) || !empty($params['contact_id']))) {
+  if (!empty($returnProperties) || !empty($params['contact_id'])) {
     foreach ($activities as $activityId => $values) {
       //@todo - should possibly load activity type id if not loaded (update with id)
       _civicrm_api3_custom_data_get($activities[$activityId], CRM_Utils_Array::value('check_permissions', $params), 'Activity', $activityId, NULL, CRM_Utils_Array::value('activity_type_id', $values));
