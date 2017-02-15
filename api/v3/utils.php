@@ -2062,7 +2062,7 @@ function _civicrm_api3_swap_out_aliases(&$apiRequest, $fields) {
  *
  * @throws API_Exception
  */
-function _civicrm_api3_validate_integer(&$params, &$fieldName, &$fieldInfo, $entity) {
+function _civicrm_api3_validate_integer(&$params, $fieldName, &$fieldInfo, $entity) {
   list($fieldValue, $op) = _civicrm_api3_field_value_check($params, $fieldName);
   if (strpos($op, 'NULL') !== FALSE || strpos($op, 'EMPTY') !== FALSE) {
     return;
