@@ -94,11 +94,12 @@ class CRM_Utils_EmailProcessorTest extends CiviUnitTestCase {
    */
   public function setUpMailing() {
     $this->contactID = $this->individualCreate(array('email' => 'undeliverable@example.com'));
-    $groupID =  $this->callAPISuccess('Group', 'create', array(
+    $groupID = $this->callAPISuccess('Group', 'create', array(
       'title' => 'Mailing group',
       'api.GroupContact.create' => array(
         'contact_id' => $this->contactID,
-    )));
+      ),
+    ));
     $this->createMailing(array('scheduled_date' => 'now', 'groups' => array('include' => array($groupID))));
     $this->callAPISuccess('job', 'process_mailing', array());
     $this->eventQueue = $this->callAPISuccess('MailingEventQueue', 'get', array('api.MailingEventQueue.create' => array('hash' => 'aaaaaaaaaaaaaaaa')));

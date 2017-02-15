@@ -136,11 +136,9 @@ class CRM_Utils_Mail_EmailProcessor {
     $usedfor = $dao->is_default;
 
     $emailActivityTypeId
-      = (defined('EMAIL_ACTIVITY_TYPE_ID') && EMAIL_ACTIVITY_TYPE_ID) ? EMAIL_ACTIVITY_TYPE_ID : CRM_Core_OptionGroup::getValue(
-      'activity_type',
-      'Inbound Email',
-      'name'
-    );
+      = (defined('EMAIL_ACTIVITY_TYPE_ID') && EMAIL_ACTIVITY_TYPE_ID)
+      ? EMAIL_ACTIVITY_TYPE_ID
+      : CRM_Core_OptionGroup::getValue('activity_type', 'Inbound Email', 'name');
 
     if (!$emailActivityTypeId) {
       CRM_Core_Error::fatal(ts('Could not find a valid Activity Type ID for Inbound Email'));
