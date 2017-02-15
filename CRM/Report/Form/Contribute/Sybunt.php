@@ -246,6 +246,26 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
         ),
       ),
     );
+    $this->_columns += array(
+      'civicrm_financial_trxn' => array(
+        'dao' => 'CRM_Financial_DAO_FinancialTrxn',
+        'fields' => array(
+          'card_type' => array(
+            'title' => ts('Credit Card Type'),
+            'dbAlias' => 'GROUP_CONCAT(financial_trxn_civireport.card_type SEPARATOR ",")',
+          ),
+        ),
+        'filters' => array(
+          'card_type' => array(
+            'title' => ts('Credit Card Type'),
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'default' => NULL,
+            'options' => CRM_Financial_DAO_FinancialTrxn::buildOptions('card_type'),
+            'type' => CRM_Utils_Type::T_STRING,
+          ),
+        ),
+      ),
+    );
 
     // If we have a campaign, build out the relevant elements
     if ($campaignEnabled && !empty($this->activeCampaigns)) {
@@ -344,6 +364,9 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
                       ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id AND
                          {$this->_aliases['civicrm_phone']}.is_primary = 1";
     }
+    // for credit card type
+    $this->addFinancialTrxnFromClause();
+
     $this->addAddressFromClause();
   }
 
@@ -609,6 +632,11 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
         if ($birthDate) {
           $rows[$rowNum]['civicrm_contact_birth_date'] = CRM_Utils_Date::customFormat($birthDate, '%Y%m%d');
         }
+        $entryFound = TRUE;
+      }
+
+      if (!empty($row['civicrm_financial_trxn_card_type'])) {
+        $rows[$rowNum]['civicrm_financial_trxn_card_type'] = $this->getLabels($row['civicrm_financial_trxn_card_type'], 'CRM_Financial_DAO_FinancialTrxn', 'card_type');
         $entryFound = TRUE;
       }
 
