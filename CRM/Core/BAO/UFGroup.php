@@ -1197,6 +1197,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
               'membership_end_date',
               'join_date',
             ))) {
+              // @todo this set should be determined from metadata, not hard-coded.
               $values[$index] = CRM_Utils_Date::customFormat($details->$name);
               $params[$index] = CRM_Utils_Date::isoToMysql($details->$name);
             }
@@ -2383,7 +2384,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
             $defaults[$fldName] = $details['worldregion_id'];
           }
           elseif ($customFieldId = CRM_Core_BAO_CustomField::getKeyID($name)) {
-            //fix for custom fields
+            // @todo retrieving the custom fields here seems obsolete - $field holds more data for the fields.
             $customFields = CRM_Core_BAO_CustomField::getFields(CRM_Utils_Array::value('contact_type', $details));
 
             // hack to add custom data for components
@@ -3254,6 +3255,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     }
 
     $formattedGroupTree = array();
+    // @todo - as we put these on datepicker they need to be removed from here.
     $dateTimeFields = array(
       'participant_register_date',
       'activity_date_time',
