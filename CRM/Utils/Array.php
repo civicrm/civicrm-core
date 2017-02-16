@@ -148,7 +148,12 @@ class CRM_Utils_Array {
       else {
         // make sure we escape value
         $value = self::escapeXML($value);
-        $xml .= "<{$name}>$value</{$name}>{$seperator}";
+        if (is_numeric($name) && is_numeric($value) && ctype_digit(substr($name, 0, 1))) {
+          $xml .= "<id>$value</id>{$seperator}";
+        }
+        else {
+          $xml .= "<{$name}>$value</{$name}>{$seperator}";
+        }
       }
     }
     return $xml;
