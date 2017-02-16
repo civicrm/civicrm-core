@@ -78,8 +78,8 @@ class CRM_Activity_Form_Task_Batch extends CRM_Activity_Form_Task {
     if (!empty($contactDetails)) {
       foreach ($contactDetails as $key => $value) {
         $assignee = CRM_Activity_BAO_ActivityAssignment::retrieveAssigneeIdsByActivityId($key);
-        foreach ($assignee as $keys => $values) {
-          $assigneeContact[] = CRM_Contact_BAO_Contact::displayname($values);
+        foreach ($assignee as $values) {
+          $assigneeContact[] = CRM_Contact_BAO_Contact::displayName($values);
         }
         $contactDetails[$key]['assignee_display_name'] = !empty($assigneeContact) ? implode(';', $assigneeContact) : NULL;
       }
@@ -138,7 +138,6 @@ class CRM_Activity_Form_Task_Batch extends CRM_Activity_Form_Task {
 
     $this->assign('profileTitle', $this->_title);
     $this->assign('componentIds', $this->_activityHolderIds);
-    $fileFieldExists = FALSE;
 
     // Load all campaigns.
     if (array_key_exists('activity_campaign_id', $this->_fields)) {
@@ -197,7 +196,6 @@ class CRM_Activity_Form_Task_Batch extends CRM_Activity_Form_Task {
 
     $defaults = array();
     foreach ($this->_activityHolderIds as $activityId) {
-      $details[$activityId] = array();
       CRM_Core_BAO_UFGroup::setProfileDefaults(NULL, $this->_fields, $defaults, FALSE, $activityId, 'Activity');
     }
 

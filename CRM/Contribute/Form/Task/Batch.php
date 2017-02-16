@@ -187,7 +187,6 @@ class CRM_Contribute_Form_Task_Batch extends CRM_Contribute_Form_Task {
 
     $defaults = array();
     foreach ($this->_contributionIds as $contributionId) {
-      $details[$contributionId] = array();
       CRM_Core_BAO_UFGroup::setProfileDefaults(NULL, $this->_fields, $defaults, FALSE, $contributionId, 'Contribute');
     }
 
