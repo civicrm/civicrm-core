@@ -476,6 +476,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
     if (isset($field->phone_type_id)) {
       $name .= "-{$field->phone_type_id}";
     }
+    $fieldMetaData = CRM_Utils_Array::value($name, $importableFields, (isset($importableFields[$field->field_name]) ? $importableFields[$field->field_name] : array()));
 
     // No lie: this is bizarre; why do we need to mix so many UFGroup properties into UFFields?
     // I guess to make field self sufficient with all the required data and avoid additional calls
@@ -513,7 +514,10 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
         CRM_Utils_Array::value($field->field_name, $importableFields)
       ),
       'skipDisplay' => 0,
+      'data_type' => CRM_Utils_Type::getDataTypeFromFieldMetadata($fieldMetaData),
     );
+
+    $formattedField = CRM_Utils_Date::addDateMetadataToField($fieldMetaData, $formattedField);
 
     //adding custom field property
     if (substr($field->field_name, 0, 6) == 'custom' ||
@@ -525,12 +529,16 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
         $formattedField['is_search_range'] = $customFields[$field->field_name]['is_search_range'];
         // fix for CRM-1994
         $formattedField['options_per_line'] = $customFields[$field->field_name]['options_per_line'];
-        $formattedField['data_type'] = $customFields[$field->field_name]['data_type'];
         $formattedField['html_type'] = $customFields[$field->field_name]['html_type'];
 
         if (CRM_Utils_Array::value('html_type', $formattedField) == 'Select Date') {
           $formattedField['date_format'] = $customFields[$field->field_name]['date_format'];
           $formattedField['time_format'] = $customFields[$field->field_name]['time_format'];
+          $formattedField['php_datetime_format'] = CRM_Utils_Date::getPhpDateFormatFromInputStyleDateFormat($customFields[$field->field_name]['date_format']);
+          if ($formattedField['time_format']) {
+            $formattedField['php_datetime_format'] .= ' H-i-s';
+          }
+          $formattedField['is_datetime_field'] = TRUE;
         }
 
         $formattedField['is_multi_summary'] = $field->is_multi_summary;
