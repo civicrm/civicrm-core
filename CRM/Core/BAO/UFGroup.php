@@ -348,9 +348,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
       $query = self::createUFFieldQuery($group->id, $searchable, $showAll, $visibility, $orderBy);
       $field = CRM_Core_DAO::executeQuery($query);
 
-      $profileType = CRM_Core_BAO_UFField::getProfileType($group->id);
-      $contactActivityProfile = CRM_Core_BAO_UFField::checkContactActivityProfileType($group->id);
-      $importableFields = self::getImportableFields($showAll, $profileType, $contactActivityProfile);
+      $importableFields = self::getProfileFieldMetadata($showAll);
       list($customFields, $addressCustomFields) = self::getCustomFields($ctype);
 
       while ($field->fetch()) {
@@ -636,13 +634,24 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
   }
 
   /**
+   * Get a list of filtered field metadata.
+   *
+   * @deprecated use getProfileFieldMetadata
+   *
    * @param $showAll
    * @param $profileType
    * @param $contactActivityProfile
+   * @param bool $filterMode
+   *   Filter mode means you are using importable fields for filtering rather than just getting metadata.
+   *   With filter mode = FALSE BOTH activity fields and component fields are returned.
+   *   I can't see why you would ever want to use this function in filter mode as the component fields are
+   *   still unfiltered. However, I feel scared enough to leave it as it is. I have marked this function as
+   *   deprecated and am recommending the wrapper 'getProfileFieldMetadata' in order to try to
+   *   send this confusion to history.
    *
    * @return array
    */
-  protected static function getImportableFields($showAll, $profileType, $contactActivityProfile) {
+  protected static function getImportableFields($showAll, $profileType, $contactActivityProfile, $filterMode = TRUE) {
     if (!$showAll) {
       $importableFields = CRM_Contact_BAO_Contact::importableFields('All', FALSE, FALSE, FALSE, TRUE, TRUE);
     }
@@ -650,20 +659,38 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
       $importableFields = CRM_Contact_BAO_Contact::importableFields('All', FALSE, TRUE, FALSE, TRUE, TRUE);
     }
 
-    if ($profileType == 'Activity' || $contactActivityProfile) {
-      $componentFields = CRM_Activity_BAO_Activity::getProfileFields();
+    $activityFields = CRM_Activity_BAO_Activity::getProfileFields();
+    $componentFields = CRM_Core_Component::getQueryFields();
+    if ($filterMode == TRUE) {
+      if ($profileType == 'Activity' || $contactActivityProfile) {
+        $importableFields = array_merge($importableFields, $activityFields);
+      }
+      else {
+        $importableFields = array_merge($importableFields, $componentFields);
+      }
     }
     else {
-      $componentFields = CRM_Core_Component::getQueryFields();
+      $importableFields = array_merge($importableFields, $activityFields, $componentFields);
     }
-
-    $importableFields = array_merge($importableFields, $componentFields);
 
     $importableFields['group']['title'] = ts('Group(s)');
     $importableFields['group']['where'] = NULL;
     $importableFields['tag']['title'] = ts('Tag(s)');
     $importableFields['tag']['where'] = NULL;
     return $importableFields;
+  }
+
+  /**
+   * Get the metadata for all potential profile fields.
+   *
+   * @param bool $isIncludeInactive
+   *   Should disabled fields be included.
+   *
+   * @return array
+   *   Field metadata for all fields that might potentially be in a profile.
+   */
+  protected static function getProfileFieldMetadata($isIncludeInactive) {
+    return self::getImportableFields($isIncludeInactive, NULL, NULL, NULL, TRUE);
   }
 
   /**
