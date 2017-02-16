@@ -942,7 +942,8 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
     $cc = NULL,
     $bcc = NULL,
     $contactIds = NULL,
-    $additionalDetails = NULL
+    $additionalDetails = NULL,
+    $contributionIds = NULL
   ) {
     // get the contact details of logged in contact, which we set as from email
     if ($userID == NULL) {
@@ -1049,10 +1050,29 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       $escapeSmarty = TRUE;
     }
 
+    $contributionDetails = array();
+    if (!empty($contributionIds)) {
+      $contributionDetails = CRM_Contribute_BAO_Contribution::replaceContributionTokens(
+        $contributionIds,
+        $subject,
+        $subjectToken,
+        $text,
+        $html,
+        $messageToken,
+        $escapeSmarty
+      );
+    }
+
     $sent = $notSent = array();
     foreach ($contactDetails as $values) {
       $contactId = $values['contact_id'];
       $emailAddress = $values['email'];
+
+      if (!empty($contributionDetails)) {
+        $subject = $contributionDetails[$contactId]['subject'];
+        $text = $contributionDetails[$contactId]['text'];
+        $html = $contributionDetails[$contactId]['html'];
+      }
 
       if (!empty($details) && is_array($details["{$contactId}"])) {
         // unset email from details since it always returns primary email address
