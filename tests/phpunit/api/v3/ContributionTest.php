@@ -3353,4 +3353,114 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->quickCleanUpFinancialEntities();
   }
 
+  /**
+   * Test sending a mail via the API.
+   */
+  public function testSendMailWithAPISetFromDetails() {
+    $mut = new CiviMailUtils($this, TRUE);
+    $contribution = $this->callAPISuccess('contribution', 'create', $this->_params);
+    $this->callAPISuccess('contribution', 'sendconfirmation', array(
+      'id' => $contribution['id'],
+      'receipt_from_email' => 'api@civicrm.org',
+      'receipt_from_name' => 'CiviCRM LLC',
+    ));
+    $mut->checkMailLog(array(
+        'From: CiviCRM LLC <api@civicrm.org>',
+        'Contribution Information',
+        'Please print this confirmation for your records',
+      ), array(
+        'Event',
+      )
+    );
+    $mut->stop();
+  }
+
+  /**
+   * Test sending a mail via the API.
+   */
+  public function testSendMailWithNoFromSetFallToDomain() {
+    $this->createLoggedInUser();
+    $mut = new CiviMailUtils($this, TRUE);
+    $contribution = $this->callAPISuccess('contribution', 'create', $this->_params);
+    $this->callAPISuccess('contribution', 'sendconfirmation', array(
+      'id' => $contribution['id'],
+    ));
+    $domain = $this->callAPISuccess('domain', 'getsingle', array('id' => 1));
+    $mut->checkMailLog(array(
+        'From: ' . $domain['from_name'] . ' <' . $domain['from_email'] . '>',
+        'Contribution Information',
+        'Please print this confirmation for your records',
+      ), array(
+        'Event',
+      )
+    );
+    $mut->stop();
+  }
+
+  /**
+   * Test sending a mail via the API.
+   */
+  public function testSendMailWithRepeatTransactionAPIFalltoDomain() {
+    $this->createLoggedInUser();
+    $mut = new CiviMailUtils($this, TRUE);
+    $contribution = $this->setUpRepeatTransaction(array(), 'single');
+    $this->callAPISuccess('contribution', 'repeattransaction', array(
+      'contribution_status_id' => 'Completed',
+      'trxn_id' => uniqid(),
+      'original_contribution_id' => $contribution,
+    ));
+    $domain = $this->callAPISuccess('domain', 'getsingle', array('id' => 1));
+    $mut->checkMailLog(array(
+        'From: ' . $domain['from_name'] . ' <' . $domain['from_email'] . '>',
+        'Contribution Information',
+        'Please print this confirmation for your records',
+      ), array(
+        'Event',
+      )
+    );
+    $mut->stop();
+  }
+
+  /**
+   * Test sending a mail via the API.
+   */
+  public function testSendMailWithRepeatTransactionAPIFalltoContributionPage() {
+    $mut = new CiviMailUtils($this, TRUE);
+    $contributionPage = $this->contributionPageCreate(array('receipt_from_name' => 'CiviCRM LLC', 'receipt_from_email' => 'contributionpage@civicrm.org', 'is_email_receipt' => 1));
+    $params['contribution_page_id'] = $contributionPage['id'];
+    $paymentProcessorID = $this->paymentProcessorCreate();
+    $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', array(
+      'contact_id' => $this->_individualId,
+      'installments' => '12',
+      'frequency_interval' => '1',
+      'amount' => '500',
+      'contribution_status_id' => 1,
+      'start_date' => '2012-01-01 00:00:00',
+      'currency' => 'USD',
+      'frequency_unit' => 'month',
+      'payment_processor_id' => $paymentProcessorID,
+    ));
+    $originalContribution = $this->callAPISuccess('contribution', 'create', array_merge(
+      $this->_params,
+      array(
+        'contribution_recur_id' => $contributionRecur['id'],
+        'contribution_page_id' => $contributionPage['id']))
+    );
+    $this->callAPISuccess('contribution', 'repeattransaction', array(
+      'contribution_status_id' => 'Completed',
+      'trxn_id' => uniqid(),
+      'original_contribution_id' => $originalContribution,
+      )
+    );
+    $mut->checkMailLog(array(
+        'From: CiviCRM LLC <contributionpage@civicrm.org>',
+        'Contribution Information',
+        'Please print this confirmation for your records',
+      ), array(
+        'Event',
+      )
+    );
+    $mut->stop();
+  }
+
 }
