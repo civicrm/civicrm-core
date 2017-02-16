@@ -311,7 +311,8 @@ class CRM_Core_SelectValues {
    * @return array
    *   the date array
    */
-  public static function date($type = NULL, $format = NULL, $minOffset = NULL, $maxOffset = NULL) {
+  public static function date($type = NULL, $format = NULL, $minOffset = NULL, $maxOffset = NULL, $context = 'display') {
+    // These options are deprecated. Definitely not used in datepicker. Possibly not even in jcalendar+addDateTime.
     $date = array(
       'addEmptyOption' => TRUE,
       'emptyOptionText' => ts('- select -'),
@@ -328,25 +329,34 @@ class CRM_Core_SelectValues {
         if (!$dao->find(TRUE)) {
           CRM_Core_Error::fatal();
         }
-      }
+        if (!$maxOffset) {
+          $maxOffset = $dao->end;
+        }
+        if (!$minOffset) {
+          $minOffset = $dao->start;
+        }
 
-      if ($type == 'creditCard') {
-        $minOffset = $dao->start;
-        $maxOffset = $dao->end;
         $date['format'] = $dao->date_format;
-        $date['addEmptyOption'] = TRUE;
-        $date['emptyOptionText'] = ts('- select -');
-        $date['emptyOptionValue'] = '';
+        $date['time'] = (bool) $dao->time_format;
       }
 
       if (empty($date['format'])) {
-        $date['format'] = 'M d';
+        if ($context == 'Input') {
+          $date['format'] = Civi::settings()->get('dateInputFormat');
+          $date['php_datetime_format'] = self::datePluginToPHPFormats(Civi::settings()->get('dateInputFormat'));
+        }
+        else {
+          $date['format'] = 'M d';
+        }
       }
+    }
+    if (!isset($date['time'])) {
+      $date['time'] = FALSE;
     }
 
     $year = date('Y');
-    $date['minYear'] = $year - $minOffset;
-    $date['maxYear'] = $year + $maxOffset;
+    $date['minYear'] = $year - (int) $minOffset;
+    $date['maxYear'] = $year + (int) $maxOffset;
     return $date;
   }
 
