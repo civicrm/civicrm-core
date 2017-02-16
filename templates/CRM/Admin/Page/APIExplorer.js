@@ -20,8 +20,7 @@
     docCodeTpl = _.template($('#doc-code-tpl').html()),
     joinTpl = _.template($('#join-tpl').html()),
 
-    // The following apis do not support the syntax for joins
-    // FIXME: the solution is to convert these apis to use _civicrm_api3_basic_get
+    // The following apis do not use Api3SelectQuery so do not support advanced features like joins or OR
     NO_JOINS = ['Contact', 'Contribution', 'Pledge', 'Participant'],
 
     // These types of entityRef don't require any input to open
@@ -660,6 +659,7 @@
       }
     });
     if (entity && action) {
+      handleAndOr();
       formatQuery();
     }
   }
@@ -879,7 +879,7 @@
    */
   function renderJoinSelector() {
     $('#api-join').hide();
-    if (!_.includes(NO_JOINS, entity) && _.includes(['get', 'getsingle'], action)) {
+    if (!_.includes(NO_JOINS, entity) && _.includes(['get', 'getsingle', 'getcount'], action)) {
       var joinable = {};
       (function recurse(fields, joinable, prefix, depth, entities) {
         _.each(fields, function(field) {
@@ -936,6 +936,40 @@
       renderJoinSelector();
       populateFields(fields, entity, action, '');
     }
+  }
+
+  function handleAndOr() {
+    if (!_.includes(NO_JOINS, entity) && _.includes(['get', 'getsingle', 'getcount'], action)) {
+      var or = [];
+      $('tr.api-param-row').each(function() {
+        if ($(this).next().is('tr.api-param-row') && $('input.api-param-name', this).val()) {
+          $('.api-and-or', this).show();
+        } else {
+          $(this).removeClass('or').find('.api-and-or').hide();
+        }
+      });
+      $('tr.api-param-row.or').each(function() {
+        var val = $(this).next().find('input.api-param-name').val();
+        if (val) {
+          if ($(this).prev().is('.or')) {
+            or[or.length - 1].push(val);
+          } else {
+            or.push([$('input.api-param-name', this).val(), val]);
+          }
+        }
+      });
+      if (or.length) {
+        params.options = params.options || {};
+        params.options.or = or;
+      }
+    } else {
+      $('.api-and-or').hide();
+    }
+  }
+
+  function toggleAndOr() {
+    $(this).closest('tr').toggleClass('or');
+    buildParams();
   }
 
   $(document).ready(function() {
@@ -996,7 +1030,13 @@
         $(this).closest('tr').remove();
         buildParams();
       })
-      .on('change', 'select.api-chain-entity', getChainedAction);
+      .on('click', '.api-and-or > span', toggleAndOr)
+      .on('change', 'select.api-chain-entity', getChainedAction)
+      .on('sortupdate', buildParams)
+      .sortable({
+        handle: '.api-sort-handle',
+        items: '.api-chain-row, .api-param-row'
+      });
     $('#api-join').on('change', 'input', onSelectJoin);
     $('#example-entity').on('change', getExamples);
     $('#example-action').on('change', getExample);
