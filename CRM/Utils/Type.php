@@ -144,6 +144,28 @@ class CRM_Utils_Type {
   }
 
   /**
+   * Get the data_type for the field.
+   *
+   * @param array $fieldMetadata
+   *   Metadata about the field.
+   *
+   * @return string
+   */
+  public static function getDataTypeFromFieldMetadata($fieldMetadata) {
+    if (isset($fieldMetadata['data_type'])) {
+      return $fieldMetadata['data_type'];
+    }
+    if (empty($fieldMetadata['type'])) {
+      // I would prefer to throw an e-notice but there is some,
+      // probably unnecessary logic, that only retrieves activity fields
+      // if they are 'in the profile' and probably they are not 'in'
+      // until they are added - which might lead to ? who knows!
+      return '';
+    }
+    return self::typeToString($fieldMetadata['type']);
+  }
+
+  /**
    * Helper function to call escape on arrays.
    *
    * @see escape
