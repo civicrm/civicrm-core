@@ -4485,6 +4485,12 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
     ));
     $contributionParams['payment_processor'] = $input['payment_processor'] = $paymentProcessorId;
 
+    // If paymentProcessor is not set then the payment_instrument_id would not be correct.
+    // not clear when or if this would occur if you encounter this please fix here & add a unit test.
+    if (empty($contributionParams['payment_instrument_id']) && isset($contribution->_relatedObjects['paymentProcessor']['payment_instrument_id'])) {
+      $contributionParams['payment_instrument_id'] = $contribution->_relatedObjects['paymentProcessor']['payment_instrument_id'];
+    }
+
     if ($recurringContributionID) {
       $contributionParams['contribution_recur_id'] = $recurringContributionID;
     }
