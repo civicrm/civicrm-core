@@ -229,13 +229,13 @@
 <div id="mainTabContainer">
   <ul>
     <li class="ui-corner-all" title="GUI to build and execute API calls">
-      <a href="#explorer-tab">{ts}Explorer{/ts}</a>
+      <a href="#explorer-tab"><i class="crm-i fa-search"></i> {ts}Explorer{/ts}</a>
     </li>
     <li class="ui-corner-all" title="Auto-generated examples from the test suite">
-      <a href="#examples-tab">{ts}Examples{/ts}</a>
+      <a href="#examples-tab"><i class="crm-i fa-book"></i> {ts}Examples{/ts}</a>
     </li>
     <li class="ui-corner-all" title="API source-code and code-level documentation">
-      <a href="#docs-tab">{ts}Code Docs{/ts}</a>
+      <a href="#docs-tab"><i class="crm-i fa-code"></i> {ts}Code Docs{/ts}</a>
     </li>
   </ul>
 
