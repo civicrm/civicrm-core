@@ -1289,4 +1289,33 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
     }
   }
 
+  public function testGetWithOr() {
+    $acts = array(
+      'test or 1' => 'orOperator',
+      'test or 2' => 'orOperator',
+      'test or 3' => 'nothing',
+    );
+    foreach ($acts as $subject => $details) {
+      $params = $this->_params;
+      $params['subject'] = $subject;
+      $params['details'] = $details;
+      $this->callAPISuccess('Activity', 'create', $params);
+    }
+    $result = $this->callAPISuccess('Activity', 'get', array(
+      'details' => 'orOperator',
+    ));
+    $this->assertEquals(2, $result['count']);
+    $result = $this->callAPISuccess('Activity', 'get', array(
+      'details' => 'orOperator',
+      'subject' => 'test or 3',
+    ));
+    $this->assertEquals(0, $result['count']);
+    $result = $this->callAPISuccess('Activity', 'get', array(
+      'details' => 'orOperator',
+      'subject' => 'test or 3',
+      'options' => array('or' => array(array('details', 'subject'))),
+    ));
+    $this->assertEquals(3, $result['count']);
+  }
+
 }
