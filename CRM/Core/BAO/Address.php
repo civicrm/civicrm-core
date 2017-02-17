@@ -569,6 +569,7 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
       'street_address' => $this->street_address,
       'supplemental_address_1' => $this->supplemental_address_1,
       'supplemental_address_2' => $this->supplemental_address_2,
+      'supplemental_address_3' => $this->supplemental_address_3,
       'city' => $this->city,
       'state_province_name' => isset($this->state_name) ? $this->state_name : "",
       'state_province' => isset($this->state) ? $this->state : "",
@@ -971,6 +972,7 @@ SELECT is_primary,
       'postal_code_suffix',
       'supplemental_address_1',
       'supplemental_address_2',
+      'supplemental_address_3',
     );
 
     foreach ($fields as $name => & $values) {

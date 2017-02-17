@@ -107,6 +107,7 @@ function mailing_gettokens_expectedresult() {
       '{contact.street_unit}' => 'Street Unit',
       '{contact.supplemental_address_1}' => 'Supplemental Address 1',
       '{contact.supplemental_address_2}' => 'Supplemental Address 2',
+      '{contact.supplemental_address_3}' => 'Supplemental Address 3',
       '{contact.city}' => 'City',
       '{contact.postal_code_suffix}' => 'Postal Code Suffix',
       '{contact.postal_code}' => 'Postal Code',

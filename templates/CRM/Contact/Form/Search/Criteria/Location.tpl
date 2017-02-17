@@ -58,6 +58,10 @@
           {$form.supplemental_address_2.html}
         </div>
         <div class="crm-field-wrapper">
+          {$form.supplemental_address_3.label}<br />
+          {$form.supplemental_address_3.html}
+        </div>
+        <div class="crm-field-wrapper">
           {$form.city.label}<br />
           {$form.city.html}
         </div>

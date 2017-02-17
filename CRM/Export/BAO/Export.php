@@ -329,6 +329,7 @@ class CRM_Export_BAO_Export {
         'street_address',
         'supplemental_address_1',
         'supplemental_address_2',
+        'supplemental_address_3',
         'city',
         'postal_code',
         'postal_code_suffix',

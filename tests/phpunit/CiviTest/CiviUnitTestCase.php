@@ -1680,6 +1680,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
         'state_province' => 'Michigan',
         'supplemental_address_1' => 'Hallmark Ct',
         'supplemental_address_2' => 'Jersey Village',
+        'supplemental_address_3' => 'My Town',
       ),
     );
 

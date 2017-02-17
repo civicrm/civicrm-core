@@ -85,6 +85,7 @@ class CRM_Utils_Address {
     $emptyFields = array(
       'supplemental_address_1',
       'supplemental_address_2',
+      'supplemental_address_3',
       'state_province_name',
       'county',
     );
@@ -142,6 +143,7 @@ class CRM_Utils_Address {
         'contact.street_address' => CRM_Utils_Array::value('street_address', $fields),
         'contact.supplemental_address_1' => CRM_Utils_Array::value('supplemental_address_1', $fields),
         'contact.supplemental_address_2' => CRM_Utils_Array::value('supplemental_address_2', $fields),
+        'contact.supplemental_address_3' => CRM_Utils_Array::value('supplemental_address_3', $fields),
         'contact.city' => CRM_Utils_Array::value('city', $fields),
         'contact.state_province_name' => CRM_Utils_Array::value('state_province_name', $fields),
         'contact.county' => CRM_Utils_Array::value('county', $fields),
@@ -186,6 +188,7 @@ class CRM_Utils_Address {
         'contact.street_address' => "<span class=\"street-address\">" . $fields['street_address'] . "</span>",
         'contact.supplemental_address_1' => "<span class=\"extended-address\">" . $fields['supplemental_address_1'] . "</span>",
         'contact.supplemental_address_2' => $fields['supplemental_address_2'],
+        'contact.supplemental_address_3' => $fields['supplemental_address_3'],
         'contact.city' => "<span class=\"locality\">" . $fields['city'] . "</span>",
         'contact.state_province_name' => "<span class=\"region\">" . $fields['state_province_name'] . "</span>",
         'contact.county' => "<span class=\"region\">" . $fields['county'],
@@ -304,6 +307,7 @@ class CRM_Utils_Address {
       'street_address',
       'supplemental_address_1',
       'supplemental_address_2',
+      'supplemental_address_3',
       'city',
       'county',
       'state_province',

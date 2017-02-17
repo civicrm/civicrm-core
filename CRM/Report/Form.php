@@ -4047,6 +4047,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
       'street_address' => ts('Street Address'),
       'supplemental_address_1' => ts('Supplementary Address Field 1'),
       'supplemental_address_2' => ts('Supplementary Address Field 2'),
+      'supplemental_address_3' => ts('Supplementary Address Field 3'),
       'street_number' => ts('Street Number'),
       'street_name' => ts('Street Name'),
       'street_unit' => ts('Street Unit'),

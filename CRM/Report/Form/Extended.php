@@ -760,6 +760,12 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
             'default' => CRM_Utils_Array::value('supplemental_address_2', $options['defaults'], FALSE),
             'name' => 'supplemental_address_2',
           ),
+          $options['prefix'] . 'supplemental_address_3' => array(
+            'title' => ts($options['prefix_label'] .
+              'Supplementary Address Field 3'),
+            'default' => CRM_Utils_Array::value('supplemental_address_3', $options['defaults'], FALSE),
+            'name' => 'supplemental_address_3',
+          ),
           $options['prefix'] . 'street_number' => array(
             'name' => 'street_number',
             'title' => ts($options['prefix_label'] . 'Street Number'),

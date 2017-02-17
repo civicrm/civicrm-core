@@ -212,6 +212,10 @@ function _civicrm_api3_contact_get_spec(&$params) {
     'title' => 'Primary Address Supplemental Address 2',
     'type' => CRM_Utils_Type::T_STRING,
   );
+  $params['supplemental_address_3'] = array(
+    'title' => 'Primary Address Supplemental Address 3',
+    'type' => CRM_Utils_Type::T_STRING,
+  );
   $params['current_employer'] = array(
     'title' => 'Current Employer',
     'type' => CRM_Utils_Type::T_STRING,

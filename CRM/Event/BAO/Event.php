@@ -794,6 +794,7 @@ SELECT
   civicrm_address.street_address as street_address,
   civicrm_address.supplemental_address_1 as supplemental_address_1,
   civicrm_address.supplemental_address_2 as supplemental_address_2,
+  civicrm_address.supplemental_address_3 as supplemental_address_3,
   civicrm_address.city as city,
   civicrm_address.postal_code as postal_code,
   civicrm_address.postal_code_suffix as postal_code_suffix,
@@ -872,6 +873,7 @@ WHERE civicrm_event.is_active = 1
           'street_address' => $dao->street_address,
           'supplemental_address_1' => $dao->supplemental_address_1,
           'supplemental_address_2' => $dao->supplemental_address_2,
+          'supplemental_address_3' => $dao->supplemental_address_3,
           'city' => $dao->city,
           'state_province' => $dao->state,
           'postal_code' => $dao->postal_code,
@@ -1877,7 +1879,7 @@ WHERE  id = $cfID
     $events = array();
 
     $query = "
-SELECT CONCAT_WS(' :: ' , ca.name, ca.street_address, ca.city, sp.name, ca.supplemental_address_1, ca.supplemental_address_2) title, ce.loc_block_id
+SELECT CONCAT_WS(' :: ' , ca.name, ca.street_address, ca.city, sp.name, ca.supplemental_address_1, ca.supplemental_address_2, ca.supplemental_address_3) title, ce.loc_block_id
 FROM   civicrm_event ce
 INNER JOIN civicrm_loc_block lb ON ce.loc_block_id = lb.id
 INNER JOIN civicrm_address ca   ON lb.address_id = ca.id

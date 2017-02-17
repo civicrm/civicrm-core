@@ -107,6 +107,9 @@ class CRM_Contact_Page_View_Vcard extends CRM_Contact_Page_View {
         if (!empty($location['supplemental_address_2'])) {
           $extend .= ', ' . $location['supplemental_address_2'];
         }
+        if (!empty($location['supplemental_address_3'])) {
+          $extend .= ', ' . $location['supplemental_address_3'];
+        }
         $street = CRM_Utils_Array::value('street_address', $location);
         $locality = CRM_Utils_Array::value('city', $location);
         $region = NULL;

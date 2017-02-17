@@ -173,7 +173,7 @@ class CRM_Contact_Form_SelectorTest extends CiviUnitTestCase {
     . ' IF ( contact_a.contact_type = \'Individual\', NULL, contact_a.organization_name ) as organization_name, contact_a.sic_code  as `sic_code`, contact_a.is_deleted  as `contact_is_deleted`,'
     . ' IF ( contact_a.contact_type = \'Individual\', contact_a.organization_name, NULL ) as current_employer, civicrm_address.id as address_id,'
     . ' civicrm_address.street_address as `street_address`, civicrm_address.supplemental_address_1 as `supplemental_address_1`, '
-    . 'civicrm_address.supplemental_address_2 as `supplemental_address_2`, civicrm_address.city as `city`, civicrm_address.postal_code_suffix as `postal_code_suffix`, '
+    . 'civicrm_address.supplemental_address_2 as `supplemental_address_2`, civicrm_address.supplemental_address_3 as `supplemental_address_3`, civicrm_address.city as `city`, civicrm_address.postal_code_suffix as `postal_code_suffix`, '
     . 'civicrm_address.postal_code as `postal_code`, civicrm_address.geo_code_1 as `geo_code_1`, civicrm_address.geo_code_2 as `geo_code_2`, '
     . 'civicrm_address.state_province_id as state_province_id, civicrm_address.country_id as country_id, civicrm_phone.id as phone_id, civicrm_phone.phone_type_id as phone_type_id, '
     . 'civicrm_phone.phone as `phone`, civicrm_email.id as email_id, civicrm_email.email as `email`, civicrm_email.on_hold as `on_hold`, civicrm_im.id as im_id, '

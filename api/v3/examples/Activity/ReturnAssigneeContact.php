@@ -116,6 +116,7 @@ function activity_get_expectedresult() {
               'street_address' => '',
               'supplemental_address_1' => '',
               'supplemental_address_2' => '',
+              'supplemental_address_3' => '',
               'city' => '',
               'postal_code_suffix' => '',
               'postal_code' => '',

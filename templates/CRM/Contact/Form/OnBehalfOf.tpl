@@ -140,6 +140,13 @@
             <div class="clear"></div>
         </div>
         {/if}
+        {if $addressSequence.supplemental_address_3}
+    <div class="crm-section {$form.address.$index.supplemental_address_3.id}-section">
+            <div class="label">{$form.address.$index.supplemental_address_3.label}</div>
+            <div class="content">{$form.address.$index.supplemental_address_3.html}</div>
+            <div class="clear"></div>
+        </div>
+        {/if}
         {if $addressSequence.city}
     <div class="crm-section {$form.address.$index.city.id}<-section">
             <div class="label">{$form.address.$index.city.label}</div>

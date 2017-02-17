@@ -64,12 +64,14 @@ class WebTest_Import_SavedMappingTest extends ImportCiviSeleniumTestCase {
       'mapper[7][1]' => '5',
       'mapper[8][0]' => 'supplemental_address_2',
       'mapper[8][1]' => '5',
-      'mapper[9][0]' => 'city',
+      'mapper[9][0]' => 'supplemental_address_3',
       'mapper[9][1]' => '5',
-      'mapper[10][0]' => 'state_province',
+      'mapper[10][0]' => 'city',
       'mapper[10][1]' => '5',
-      'mapper[11][0]' => 'country',
+      'mapper[11][0]' => 'state_province',
       'mapper[11][1]' => '5',
+      'mapper[12][0]' => 'country',
+      'mapper[12][1]' => '5',
     );
 
     // Import and check Individual contacts in Skip mode.
