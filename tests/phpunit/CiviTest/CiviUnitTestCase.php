@@ -1531,7 +1531,6 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       'receive_date' => date('Ymd'),
       'total_amount' => 100.00,
       'fee_amount' => 5.00,
-      'net_ammount' => 95.00,
       'financial_type_id' => 1,
       'payment_instrument_id' => 1,
       'non_deductible_amount' => 10.00,
