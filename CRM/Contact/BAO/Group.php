@@ -1019,7 +1019,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
       }
       // Exclude deleted contacts
       $where .= " and c.id = g.contact_id AND c.is_deleted = 0";
-      $dao = CRM_Core_DAO::executeQuery("SELECT g.group_id, COUNT(g.id) as `count` FROM $table g, civicrm_contact c WHERE $where GROUP BY g.group_id");
+      $dao = CRM_Core_DAO::executeQuery("SELECT g.group_id, COUNT(*) as `count` FROM $table g, civicrm_contact c WHERE $where GROUP BY g.group_id");
       while ($dao->fetch()) {
         $values[$dao->group_id]['count'] = $dao->count;
       }
