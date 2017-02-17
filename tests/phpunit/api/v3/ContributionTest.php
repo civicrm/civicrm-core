@@ -3427,7 +3427,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   public function testSendMailWithRepeatTransactionAPIFalltoContributionPage() {
     $mut = new CiviMailUtils($this, TRUE);
     $contributionPage = $this->contributionPageCreate(array('receipt_from_name' => 'CiviCRM LLC', 'receipt_from_email' => 'contributionpage@civicrm.org', 'is_email_receipt' => 1));
-    $params['contribution_page_id'] = $contributionPage['id'];
     $paymentProcessorID = $this->paymentProcessorCreate();
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', array(
       'contact_id' => $this->_individualId,
@@ -3454,6 +3453,34 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     );
     $mut->checkMailLog(array(
         'From: CiviCRM LLC <contributionpage@civicrm.org>',
+        'Contribution Information',
+        'Please print this confirmation for your records',
+      ), array(
+        'Event',
+      )
+    );
+    $mut->stop();
+  }
+
+  /**
+   * Test sending a mail via the API.
+   */
+  public function testSendMailWithRepeatTransactionAPIFalltoSystemFromNoDefaultFrom() {
+    $mut = new CiviMailUtils($this, TRUE);
+    $originalContribution = $contribution = $this->setUpRepeatTransaction(array(), 'single');
+    $fromEmail = $this->CallAPISuccess('optionValue', 'get', array('is_default' => 1, 'option_group_id' => 'from_email_address', 'sequential' => 1));
+    foreach ($fromEmail['values'] as $from) {
+      $this->callAPISuccess('optionValue', 'create', array('is_default' => 0, 'id' => $from['id']));
+    }
+    $domain = $this->callAPISuccess('domain', 'getsingle', array('id' => CRM_Core_Config::domainID()));
+    $this->callAPISuccess('contribution', 'repeattransaction', array(
+      'contribution_status_id' => 'Completed',
+      'trxn_id' => uniqid(),
+      'original_contribution_id' => $originalContribution,
+      )
+    );
+    $mut->checkMailLog(array(
+        'From: ' . $domain['name'] . ' <' . $domain['domain_email'] . '>',
         'Contribution Information',
         'Please print this confirmation for your records',
       ), array(
