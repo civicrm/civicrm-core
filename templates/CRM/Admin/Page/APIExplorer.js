@@ -886,7 +886,7 @@
           var name = prefix + field.name;
           addJoinInfo(field, name);
           var entity = field.FKApiName;
-          if (entity && field.is_core_field) {
+          if (entity && (field.is_core_field || field.supports_joins)) {
             joinable[name] = {
               title: field.title + ' (' + field.FKApiName + ')',
               entity: entity,

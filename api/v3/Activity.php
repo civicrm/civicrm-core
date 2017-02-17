@@ -235,6 +235,14 @@ function _civicrm_api3_activity_get_spec(&$params) {
     'type' => 1,
     'FKClassName' => 'CRM_Core_DAO_Tag',
     'FKApiName' => 'Tag',
+    'supports_joins' => TRUE,
+  );
+  $params['file_id'] = array(
+    'title' => 'Attached Files',
+    'description' => 'Find activities with attached files.',
+    'type' => 1,
+    'FKClassName' => 'CRM_Core_DAO_File',
+    'FKApiName' => 'File',
   );
   $params['case_id'] = array(
     'title' => 'Cases',
@@ -341,6 +349,16 @@ function civicrm_api3_activity_get($params) {
       $sql->where('a.id IN (SELECT entity_id FROM civicrm_entity_tag WHERE entity_table = "civicrm_activity" AND !clause)', array('!clause' => $clause));
     }
   }
+  if (!empty($params['file_id'])) {
+    _civicrm_api3_validate_integer($params, 'file_id', $extraFieldSpecs['file_id'], 'Activity');
+    if (!is_array($params['file_id'])) {
+      $params['file_id'] = array('=' => $params['file_id']);
+    }
+    $clause = \CRM_Core_DAO::createSQLFilter('file_id', $params['file_id']);
+    if ($clause) {
+      $sql->where('a.id IN (SELECT entity_id FROM civicrm_entity_file WHERE entity_table = "civicrm_activity" AND !clause)', array('!clause' => $clause));
+    }
+  }
   if (!empty($params['case_id'])) {
     _civicrm_api3_validate_integer($params, 'case_id', $extraFieldSpecs['case_id'], 'Activity');
     if (!is_array($params['case_id'])) {
@@ -401,6 +419,14 @@ function _civicrm_api3_activity_get_formatResult($params, $activities) {
     $returns['assignee_contact_id'] = 1;
   }
 
+  $tagGet = array('tag_id', 'entity_id');
+  foreach (array_keys($returns) as $key) {
+    if (strpos($key, 'tag_id.') === 0) {
+      $tagGet[] = $key;
+      $returns['tag_id'] = 1;
+    }
+  }
+
   foreach ($returns as $n => $v) {
     switch ($n) {
       case 'assignee_contact_id':
@@ -438,11 +464,21 @@ function _civicrm_api3_activity_get_formatResult($params, $activities) {
         $tags = civicrm_api3('EntityTag', 'get', array(
           'entity_table' => 'civicrm_activity',
           'entity_id' => array('IN' => array_keys($activities)),
-          'return' => array('tag_id', 'entity_id'),
+          'return' => $tagGet,
           'options' => array('limit' => 0),
         ));
         foreach ($tags['values'] as $tag) {
-          $activities[$tag['entity_id']]['tag_id'][] = (int) $tag['tag_id'];
+          $key = (int) $tag['entity_id'];
+          unset($tag['entity_id'], $tag['id']);
+          $activities[$key]['tag_id'][$tag['tag_id']] = $tag;
+        }
+        break;
+
+      case 'file_id':
+        $dao = CRM_Core_DAO::executeQuery("SELECT entity_id, file_id FROM civicrm_entity_file WHERE entity_table = 'civicrm_activity' AND entity_id IN (%1)",
+          array(1 => array(implode(',', array_keys($activities)), 'String', CRM_Core_DAO::QUERY_FORMAT_NO_QUOTES)));
+        while ($dao->fetch()) {
+          $activities[$dao->entity_id]['file_id'][] = $dao->file_id;
         }
         break;
 
@@ -453,7 +489,7 @@ function _civicrm_api3_activity_get_formatResult($params, $activities) {
     }
   }
 
-  // Legacy ouput
+  // Legacy extras
   if (!empty($params['contact_id'])) {
     $statusOptions = CRM_Activity_BAO_Activity::buildOptions('status_id', 'get');
     $typeOptions = CRM_Activity_BAO_Activity::buildOptions('activity_type_id', 'validate');
