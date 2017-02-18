@@ -124,14 +124,17 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
 
     $allDashlets = CRM_Utils_Array::index(array('name'), $getDashlets['values']);
     $defaultDashlets = array();
-    if (!$hasDashlets && CRM_Utils_Array::value('blog', $allDashlets)) {
-      $defaultDashlets['blog'] = array(
-        'dashboard_id' => $allDashlets['blog']['id'],
-        'is_active' => 1,
-        'column_no' => 1,
-        'contact_id' => $contactID,
-        'domain_id' => CRM_Core_Config::domainID(),
-      );
+    $defaults = array('blog' => 1, 'getting-started' => '0');
+    foreach ($defaults as $name => $column) {
+      if (!$hasDashlets && CRM_Utils_Array::value($name, $allDashlets)) {
+        $defaultDashlets[$name] = array(
+          'dashboard_id' => $allDashlets[$name]['id'],
+          'is_active' => 1,
+          'column_no' => $column,
+          'contact_id' => $contactID,
+          'domain_id' => CRM_Core_Config::domainID(),
+        );
+      }
     }
     CRM_Utils_Hook::dashboard_defaults($allDashlets, $defaultDashlets);
     if (is_array($defaultDashlets) && !empty($defaultDashlets)) {
