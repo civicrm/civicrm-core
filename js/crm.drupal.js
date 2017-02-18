@@ -10,5 +10,13 @@ CRM.$(function($) {
         // D7 hack, restore toolbar position (CRM-15341)
         $('#toolbar').css('z-index', '');
       }
-    });
+    })
+   // d8 Hack to hide title when it should be (CRM-19960)
+   .ready(function() {
+     var pageTitle = $('.page-title');
+     var title = $('.page-title').text();
+     if ('<span id="crm-remove-title" style="display:none">CiviCRM</span>' == title) {
+       pageTitle.hide();
+     }
+   });
 });
