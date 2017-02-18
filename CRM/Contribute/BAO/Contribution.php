@@ -4747,6 +4747,9 @@ LIMIT 1;";
     if (!empty($domain['from_email'])) {
       return array($domain['from_name'], $domain['from_email']);
     }
+    if (!empty($domain['domain_email'])) {
+      return array($domain['name'], $domain['domain_email']);
+    }
     $userID = CRM_Core_Session::singleton()->getLoggedInContactID();
     $userName = '';
     $userEmail = '';
