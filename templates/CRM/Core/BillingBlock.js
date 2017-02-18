@@ -7,7 +7,7 @@
    * Changes the icon depending on the credit card number.
    * Removes spaces and dashes from credit card numbers.
    */
-  function civicrm_billingblock_creditcard_helper() {
+  $(function civicrm_billingblock_creditcard_helper() {
     $.each(CRM.config.creditCardTypes, function(key, val) {
       var html = '<a href="#" title="' + val + '" class="crm-credit_card_type-icon-' + key + '"><span>' + val + '</span></a>';
       $('.crm-credit_card_type-icons').append(html);
@@ -37,7 +37,7 @@
 
       civicrm_billingblock_set_card_type(ccnumber);
     });
-  }
+  });
 
   function civicrm_billingblock_set_card_type(ccnumber) {
     // Based on http://davidwalsh.name/validate-credit-cards
