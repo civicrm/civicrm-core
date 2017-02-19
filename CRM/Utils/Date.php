@@ -1742,6 +1742,106 @@ class CRM_Utils_Date {
   }
 
   /**
+   * Convert a Civi-special date string to a standard php date string.
+   *
+   * For historical reasons CiviCRM has it's own (possibly Smarty derived)
+   * format for defined date strings. This renders something php can use.
+   *
+   * @param string $dateFormatString
+   *   e.g mm/dd/yy
+   *   These map to the values used in the date_format field in civicrm_custom_field.date_format.
+   *
+   * @return string
+   *   A proper php strotime formatted equivalent of the string.
+   *   eg m/d/y for the above.
+   *
+   *   http://php.net/manual/en/function.strtotime.php
+   */
+  public static function getPhpDateFormatFromInputStyleDateFormat($dateFormatString) {
+    $formats = CRM_Core_SelectValues::datePluginToPHPFormats();
+    return $formats[$dateFormatString];
+  }
+
+  /**
+   * Add the metadata about a date field to the field.
+   *
+   * This metadata will work with the call $form->add('datepicker', ...
+   *
+   * @param array $fieldMetaData
+   * @param array $field
+   *
+   * @return array
+   */
+  public static function addDateMetadataToField($fieldMetaData, $field) {
+    if (isset($fieldMetaData['html'])) {
+      $field['html_type'] = $fieldMetaData['html']['type'];
+      if ($field['html_type'] === 'Select Date' && !isset($field['date_format'])) {
+        $dateAttributes = CRM_Core_SelectValues::date($fieldMetaData['html']['formatType'], NULL, NULL, NULL, 'Input');
+        $field['start_date_years'] = $dateAttributes['minYear'];
+        $field['end_date_years'] = $dateAttributes['maxYear'];
+        $field['date_format'] = $dateAttributes['format'];
+        $field['is_datetime_field'] = TRUE;
+        $field['time_format'] = $dateAttributes['time'];
+        $field['php_datetime_format'] = CRM_Utils_Date::getPhpDateFormatFromInputStyleDateFormat($field['date_format']);
+        if ($field['time_format']) {
+          $field['php_datetime_format'] .= ' H-i-s';
+        }
+      }
+      $field['datepicker']['extra'] = self::getDatePickerExtra($field);
+      $field['datepicker']['attributes'] = self::getDatePickerAttributes($field);
+    }
+    return $field;
+  }
+
+
+  /**
+   * Get the fields required for the 'extra' parameter when adding a datepicker.
+   *
+   * @param array $field
+   *
+   * @return array
+   */
+  public static function getDatePickerExtra($field) {
+    $extra = array();
+    if (isset($field['date_format'])) {
+      $extra['date'] = $field['date_format'];
+      $extra['time'] = $field['time_format'];
+    }
+    $thisYear = date('Y');
+    if (isset($field['start_date_years'])) {
+      $extra['minDate'] = date('Y-m-d', strtotime('-' . ($thisYear - $field['start_date_years']) . ' years'));
+    }
+    if (isset($field['end_date_years'])) {
+      $extra['maxDate'] = date('Y-m-d', strtotime('-' . ($thisYear - $field['end_date_years']) . ' years'));
+    }
+    return $extra;
+  }
+
+  /**
+   * Get the attributes parameters required for datepicker.
+   *
+   * @param array $field
+   *   Field metadata
+   *
+   * @return array
+   *   Array ready to pass to $this->addForm('datepicker' as attributes.
+   */
+  public static function getDatePickerAttributes(&$field) {
+    $attributes = array();
+    $dateAttributes = array(
+      'start_date_years' => 'minYear',
+      'end_date_years' => 'maxYear',
+      'date_format' => 'format',
+    );
+    foreach ($dateAttributes as $dateAttribute => $mapTo) {
+      if (isset($field[$dateAttribute])) {
+        $attributes[$mapTo] = $field[$dateAttribute];
+      }
+    }
+    return $attributes;
+  }
+
+  /**
    * Function to convert mysql to date plugin format.
    *
    * @param string $mysqlDate

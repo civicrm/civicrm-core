@@ -115,6 +115,7 @@ class CRM_Utils_PDF_Document {
       $phpWord = \PhpOffice\PhpWord\IOFactory::load($fileName, $formats[$ext]);
     }
 
+    \PhpOffice\PhpWord\Settings::setOutputEscapingEnabled(TRUE); //CRM-20015
     $objWriter = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord, $formats[$ext]);
 
     CRM_Utils_System::setHttpHeader('Content-Type', "application/$ext");

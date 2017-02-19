@@ -1015,6 +1015,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         else {
           $submittedLineItems = array($lineItem);
         }
+        $submittedLineItems = array_filter($submittedLineItems);
         $this->set('lineItem', $submittedLineItems);
         $this->set('lineItemParticipantsCount', array($primaryParticipantCount));
       }

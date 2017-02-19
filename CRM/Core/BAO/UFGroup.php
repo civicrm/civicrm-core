@@ -348,9 +348,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
       $query = self::createUFFieldQuery($group->id, $searchable, $showAll, $visibility, $orderBy);
       $field = CRM_Core_DAO::executeQuery($query);
 
-      $profileType = CRM_Core_BAO_UFField::getProfileType($group->id);
-      $contactActivityProfile = CRM_Core_BAO_UFField::checkContactActivityProfileType($group->id);
-      $importableFields = self::getImportableFields($showAll, $profileType, $contactActivityProfile);
+      $importableFields = self::getProfileFieldMetadata($showAll);
       list($customFields, $addressCustomFields) = self::getCustomFields($ctype);
 
       while ($field->fetch()) {
@@ -478,6 +476,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
     if (isset($field->phone_type_id)) {
       $name .= "-{$field->phone_type_id}";
     }
+    $fieldMetaData = CRM_Utils_Array::value($name, $importableFields, (isset($importableFields[$field->field_name]) ? $importableFields[$field->field_name] : array()));
 
     // No lie: this is bizarre; why do we need to mix so many UFGroup properties into UFFields?
     // I guess to make field self sufficient with all the required data and avoid additional calls
@@ -515,7 +514,10 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
         CRM_Utils_Array::value($field->field_name, $importableFields)
       ),
       'skipDisplay' => 0,
+      'data_type' => CRM_Utils_Type::getDataTypeFromFieldMetadata($fieldMetaData),
     );
+
+    $formattedField = CRM_Utils_Date::addDateMetadataToField($fieldMetaData, $formattedField);
 
     //adding custom field property
     if (substr($field->field_name, 0, 6) == 'custom' ||
@@ -527,12 +529,16 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
         $formattedField['is_search_range'] = $customFields[$field->field_name]['is_search_range'];
         // fix for CRM-1994
         $formattedField['options_per_line'] = $customFields[$field->field_name]['options_per_line'];
-        $formattedField['data_type'] = $customFields[$field->field_name]['data_type'];
         $formattedField['html_type'] = $customFields[$field->field_name]['html_type'];
 
         if (CRM_Utils_Array::value('html_type', $formattedField) == 'Select Date') {
           $formattedField['date_format'] = $customFields[$field->field_name]['date_format'];
           $formattedField['time_format'] = $customFields[$field->field_name]['time_format'];
+          $formattedField['php_datetime_format'] = CRM_Utils_Date::getPhpDateFormatFromInputStyleDateFormat($customFields[$field->field_name]['date_format']);
+          if ($formattedField['time_format']) {
+            $formattedField['php_datetime_format'] .= ' H-i-s';
+          }
+          $formattedField['is_datetime_field'] = TRUE;
         }
 
         $formattedField['is_multi_summary'] = $field->is_multi_summary;
@@ -636,13 +642,24 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
   }
 
   /**
+   * Get a list of filtered field metadata.
+   *
+   * @deprecated use getProfileFieldMetadata
+   *
    * @param $showAll
    * @param $profileType
    * @param $contactActivityProfile
+   * @param bool $filterMode
+   *   Filter mode means you are using importable fields for filtering rather than just getting metadata.
+   *   With filter mode = FALSE BOTH activity fields and component fields are returned.
+   *   I can't see why you would ever want to use this function in filter mode as the component fields are
+   *   still unfiltered. However, I feel scared enough to leave it as it is. I have marked this function as
+   *   deprecated and am recommending the wrapper 'getProfileFieldMetadata' in order to try to
+   *   send this confusion to history.
    *
    * @return array
    */
-  protected static function getImportableFields($showAll, $profileType, $contactActivityProfile) {
+  protected static function getImportableFields($showAll, $profileType, $contactActivityProfile, $filterMode = TRUE) {
     if (!$showAll) {
       $importableFields = CRM_Contact_BAO_Contact::importableFields('All', FALSE, FALSE, FALSE, TRUE, TRUE);
     }
@@ -650,20 +667,38 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
       $importableFields = CRM_Contact_BAO_Contact::importableFields('All', FALSE, TRUE, FALSE, TRUE, TRUE);
     }
 
-    if ($profileType == 'Activity' || $contactActivityProfile) {
-      $componentFields = CRM_Activity_BAO_Activity::getProfileFields();
+    $activityFields = CRM_Activity_BAO_Activity::getProfileFields();
+    $componentFields = CRM_Core_Component::getQueryFields();
+    if ($filterMode == TRUE) {
+      if ($profileType == 'Activity' || $contactActivityProfile) {
+        $importableFields = array_merge($importableFields, $activityFields);
+      }
+      else {
+        $importableFields = array_merge($importableFields, $componentFields);
+      }
     }
     else {
-      $componentFields = CRM_Core_Component::getQueryFields();
+      $importableFields = array_merge($importableFields, $activityFields, $componentFields);
     }
-
-    $importableFields = array_merge($importableFields, $componentFields);
 
     $importableFields['group']['title'] = ts('Group(s)');
     $importableFields['group']['where'] = NULL;
     $importableFields['tag']['title'] = ts('Tag(s)');
     $importableFields['tag']['where'] = NULL;
     return $importableFields;
+  }
+
+  /**
+   * Get the metadata for all potential profile fields.
+   *
+   * @param bool $isIncludeInactive
+   *   Should disabled fields be included.
+   *
+   * @return array
+   *   Field metadata for all fields that might potentially be in a profile.
+   */
+  protected static function getProfileFieldMetadata($isIncludeInactive) {
+    return self::getImportableFields($isIncludeInactive, NULL, NULL, NULL, TRUE);
   }
 
   /**
@@ -1197,6 +1232,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
               'membership_end_date',
               'join_date',
             ))) {
+              // @todo this set should be determined from metadata, not hard-coded.
               $values[$index] = CRM_Utils_Date::customFormat($details->$name);
               $params[$index] = CRM_Utils_Date::isoToMysql($details->$name);
             }
@@ -2383,7 +2419,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
             $defaults[$fldName] = $details['worldregion_id'];
           }
           elseif ($customFieldId = CRM_Core_BAO_CustomField::getKeyID($name)) {
-            //fix for custom fields
+            // @todo retrieving the custom fields here seems obsolete - $field holds more data for the fields.
             $customFields = CRM_Core_BAO_CustomField::getFields(CRM_Utils_Array::value('contact_type', $details));
 
             // hack to add custom data for components
@@ -3254,6 +3290,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     }
 
     $formattedGroupTree = array();
+    // @todo - as we put these on datepicker they need to be removed from here.
     $dateTimeFields = array(
       'participant_register_date',
       'activity_date_time',

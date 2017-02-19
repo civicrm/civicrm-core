@@ -1531,7 +1531,6 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       'receive_date' => date('Ymd'),
       'total_amount' => 100.00,
       'fee_amount' => 5.00,
-      'net_ammount' => 95.00,
       'financial_type_id' => 1,
       'payment_instrument_id' => 1,
       'non_deductible_amount' => 10.00,
@@ -3199,15 +3198,18 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
 
   /**
    * Helper function to create new mailing.
-   * @return mixed
+   *
+   * @param array $params
+   *
+   * @return int
    */
-  public function createMailing() {
-    $params = array(
+  public function createMailing($params = array()) {
+    $params = array_merge(array(
       'subject' => 'maild' . rand(),
       'body_text' => 'bdkfhdskfhduew{domain.address}{action.optOutUrl}',
       'name' => 'mailing name' . rand(),
       'created_id' => 1,
-    );
+    ), $params);
 
     $result = $this->callAPISuccess('Mailing', 'create', $params);
     return $result['id'];
@@ -3396,7 +3398,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
    *
    * @return array
    */
-  protected function createPriceSet($component = 'contribution_page', $componentId = NULL) {
+  protected function createPriceSet($component = 'contribution_page', $componentId = NULL, $priceFieldOptions = array()) {
     $paramsSet['title'] = 'Price Set' . substr(sha1(rand()), 0, 7);
     $paramsSet['name'] = CRM_Utils_String::titleToVar($paramsSet['title']);
     $paramsSet['is_active'] = TRUE;
@@ -3408,7 +3410,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     $this->assertDBCompareValue('CRM_Price_BAO_PriceSet', $priceSetId, 'title',
       'id', $paramsSet['title'], 'Check DB for created priceset'
     );
-    $paramsField = array(
+    $paramsField = array_merge(array(
       'label' => 'Price Field',
       'name' => CRM_Utils_String::titleToVar('Price Field'),
       'html_type' => 'CheckBox',
@@ -3424,7 +3426,8 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
       'price_set_id' => $priceSet['id'],
       'is_enter_qty' => 1,
       'financial_type_id' => $this->getFinancialTypeId('Event Fee'),
-    );
+    ), $priceFieldOptions);
+
     $priceField = CRM_Price_BAO_PriceField::create($paramsField);
     if ($componentId) {
       CRM_Price_BAO_PriceSet::addTo('civicrm_' . $component, $componentId, $priceSetId);

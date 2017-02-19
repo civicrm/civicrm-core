@@ -337,6 +337,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @param bool $required
    * @param array $extra
    *   (attributes for select elements).
+   *   For datepicker elements this is consistent with the data
+   *   from CRM_Utils_Date::getDatePickerExtra
    *
    * @return HTML_QuickForm_Element
    *   Could be an error object

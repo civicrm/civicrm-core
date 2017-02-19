@@ -121,7 +121,7 @@
     <add>1.7</add>
     <html>
       <type>Select Date</type>
-      <format>activityDateTime</format>
+      <formatType>activityDateTime</formatType>
     </html>
   </field>
   <field>

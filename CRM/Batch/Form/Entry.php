@@ -382,9 +382,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     if ($this->_action & CRM_Core_Action::ADD) {
       list($currentDate, $currentTime) = CRM_Utils_Date::setDateDefaults(NULL, 'activityDateTime');
 
-      //get all status
-      $allStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
-      $completeStatus = array_search('Completed', $allStatus);
+      $completeStatus = CRM_Contribute_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
       $specialFields = array(
         'join_date' => $currentDate,
         'receive_date' => $currentDate,

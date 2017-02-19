@@ -136,11 +136,9 @@ class CRM_Utils_Mail_EmailProcessor {
     $usedfor = $dao->is_default;
 
     $emailActivityTypeId
-      = (defined('EMAIL_ACTIVITY_TYPE_ID') && EMAIL_ACTIVITY_TYPE_ID) ? EMAIL_ACTIVITY_TYPE_ID : CRM_Core_OptionGroup::getValue(
-        'activity_type',
-        'Inbound Email',
-        'name'
-      );
+      = (defined('EMAIL_ACTIVITY_TYPE_ID') && EMAIL_ACTIVITY_TYPE_ID)
+      ? EMAIL_ACTIVITY_TYPE_ID
+      : CRM_Core_OptionGroup::getValue('activity_type', 'Inbound Email', 'name');
 
     if (!$emailActivityTypeId) {
       CRM_Core_Error::fatal(ts('Could not find a valid Activity Type ID for Inbound Email'));
@@ -376,6 +374,14 @@ class CRM_Utils_Mail_EmailProcessor {
                 'hash' => $hash,
                 'body' => $text,
                 'version' => 3,
+                // Setting is_transactional means it will rollback if
+                // it crashes part way through creating the bounce.
+                // If the api were standard & had a create this would be the
+                // default. Adding the standard api & deprecating this one
+                // would probably be the
+                // most consistent way to address this - but this is
+                // a quick hack.
+                'is_transactional' => 1,
               );
               $result = civicrm_api('Mailing', 'event_bounce', $params);
               break;

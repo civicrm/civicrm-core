@@ -170,7 +170,7 @@ WHERE contact_id IN ({$contact_id_list})
     $tables = array();
     $whereTables = array();
 
-    $permission = CRM_ACL_API::whereClause($type, $tables, $whereTables);
+    $permission = CRM_ACL_API::whereClause($type, $tables, $whereTables, NULL, FALSE, FALSE, TRUE);
     $from = CRM_Contact_BAO_Query::fromClause($whereTables);
 
     $query = "
