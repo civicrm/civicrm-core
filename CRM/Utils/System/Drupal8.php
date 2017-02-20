@@ -618,7 +618,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * Drupal 8 has a different function to get current path, hence 
+   * Drupal 8 has a different function to get current path, hence
    * overriding the postURL function
    *
    * @param string $action
@@ -631,6 +631,6 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     }
     $current_path = \Drupal::service('path.current')->getPath();
     return $this->url($current_path);
-  } 
- 
+  }
+
 }
