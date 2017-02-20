@@ -48,7 +48,6 @@ class api_v3_ActivityTypeTest extends CiviUnitTestCase {
     $params = array();
     $result = $this->callAPIAndDocument('activity_type', 'get', $params, __FUNCTION__, __FILE__);
     $this->assertEquals($result['values']['1'], 'Meeting');
-    $this->assertEquals($result['values']['13'], 'Open Case');
   }
 
   /**
