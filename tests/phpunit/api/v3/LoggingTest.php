@@ -47,7 +47,7 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
    * Clean up log tables.
    */
   protected function tearDown() {
-    $this->quickCleanup(array('civicrm_email'));
+    $this->quickCleanup(array('civicrm_email', 'civicrm_address'));
     parent::tearDown();
     $this->callAPISuccess('Setting', 'create', array('logging' => FALSE));
     $schema = new CRM_Logging_Schema();
@@ -213,6 +213,9 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
 
   /**
    * Check the triggers were created and look OK.
+   *
+   * @param bool $unique
+   *   Is the site configured for unique logging connection IDs per CRM-18193?
    */
   protected function checkTriggersCreated($unique) {
     $dao = CRM_Core_DAO::executeQuery("SHOW TRIGGERS LIKE 'civicrm_contact'");
@@ -287,6 +290,57 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
     $this->callAPISuccess('Logging', 'revert', array('log_conn_id' => 'Wot woot'));
     $this->assertEquals('Anthony', $this->callAPISuccessGetValue('contact', array('id' => $contactId, 'return' => 'first_name')));
     $this->callAPISuccessGetCount('Email', array('id' => $email['id']), 0);
+  }
+
+  /**
+   * Ensure that a limited list of tables can be reverted.
+   *
+   * In this case ONLY civicrm_address is reverted and we check that email, contact and contribution
+   * entities have not been.
+   *
+   * @throws \Exception
+   */
+  public function testRevertRestrictedTables() {
+
+    CRM_Core_DAO::executeQuery("SET @uniqueID = 'temp name'");
+    $this->callAPISuccessGetValue('Setting', array('name' => 'logging_all_tables_uniquid'), TRUE);
+    $this->callAPISuccess('Setting', 'create', array('logging' => TRUE));
+
+    $contactId = $this->individualCreate(array('address' => array(array('street_address' => '27 Cool way', 'location_type_id' => 1))));
+    $contact = $this->callAPISuccessGetSingle('contact', array('id' => $contactId));
+    $this->assertEquals('Anthony', $contact['first_name']);
+    $this->assertEquals('anthony_anderson@civicrm.org', $contact['email']);
+    $this->assertEquals('27 Cool way', $contact['street_address']);
+
+    CRM_Core_DAO::executeQuery("SET @uniqueID = 'bitty bot bot'");
+    $this->callAPISuccess('Contact', 'create', array(
+        'id' => $contactId,
+        'first_name' => 'Dopey',
+        'address' => array(array('street_address' => '25 Dorky way', 'location_type_id' => 1)),
+        'email' => array('email' => array('email' => 'dopey@mail.com', 'location_type_id' => 1)),
+        'api.contribution.create' => array('financial_type_id' => 'Donation', 'receive_date' => 'now', 'total_amount' => 10),
+      )
+    );
+    $contact = $this->callAPISuccessGetSingle('contact', array('id' => $contactId, 'return' => array('first_name', 'email', 'modified_date', 'street_address')));
+    $this->assertEquals('Dopey', $contact['first_name']);
+    $this->assertEquals('dopey@mail.com', $contact['email']);
+    $this->assertEquals('25 Dorky way', $contact['street_address']);
+    $modifiedDate = $contact['modified_date'];
+    // To protect against the modified date not changing due to the updates being too close together.
+    sleep(1);
+    $loggings = $this->callAPISuccess('Logging', 'get', array('log_conn_id' => 'bitty bot bot', 'tables' => array('civicrm_address')));
+    $this->assertEquals('civicrm_address', $loggings['values'][0]['table'], CRM_Core_DAO::executeQuery('SELECT * FROM log_civicrm_address')->toArray());
+    $this->assertEquals(1, $loggings['count'], CRM_Core_DAO::executeQuery('SELECT * FROM log_civicrm_address')->toArray());
+    $this->assertEquals('27 Cool way', $loggings['values'][0]['from']);
+    $this->assertEquals('25 Dorky way', $loggings['values'][0]['to']);
+    $this->callAPISuccess('Logging', 'revert', array('log_conn_id' => 'bitty bot bot', 'tables' => array('civicrm_address')));
+
+    $contact = $this->callAPISuccessGetSingle('contact', array('id' => $contactId, 'return' => array('first_name', 'email', 'modified_date', 'street_address')));
+    $this->assertEquals('Dopey', $contact['first_name']);
+    $this->assertEquals('dopey@mail.com', $contact['email']);
+    $this->assertEquals('27 Cool way', $contact['street_address']);
+    $this->callAPISuccessGetCount('Contribution', array('contact_id' => $contactId), 1);
+    $this->assertTrue(strtotime($modifiedDate) < strtotime($contact['modified_date']));
   }
 
   /**
@@ -379,7 +433,7 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
    * @param string $table
    * @param string $column
    *
-   * @return \CRM_Core_DAO|object
+   * @return bool
    */
   protected function checkColumnExistsInTable($table, $column) {
     $dao = CRM_Core_DAO::executeQuery("SHOW columns FROM {$table} WHERE Field = '{$column}'");
