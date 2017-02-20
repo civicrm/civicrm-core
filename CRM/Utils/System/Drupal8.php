@@ -632,4 +632,5 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     $current_path = \Drupal::service('path.current')->getPath();
     return $this->url($current_path);
   } 
+ 
 }
