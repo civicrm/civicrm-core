@@ -376,6 +376,29 @@ function _civicrm_api3_contact_get_supportanomalies(&$params, &$options) {
     unset($params['filter.group_id']);
     $options['input_params']['group'] = $groups;
   }
+  if (isset($params['group'])) {
+    $groups = $params['group'];
+    $allGroups = CRM_Core_PseudoConstant::group();
+    if (is_array($groups) && in_array(key($groups), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
+      $groupsArray = $groups[key($groups)];
+      foreach ($groupsArray as $group => &$ignore) {
+        if (!is_numeric($group) && array_search($group, $allGroups)) {
+          $group = array_search($group, $allGroups);
+        }
+      }
+    }
+    elseif (is_array($groups)) {
+      foreach ($groups as $k => &$group) {
+        if (array_search($group, $allGroups)) {
+          $group = array_search($group, $allGroups);
+        }
+      }
+    }
+    elseif (!is_numeric($groups) &&  array_search($groups, $allGroups)) {
+      $groups = array_search($groups, $allGroups);
+    }
+    $params['group'] = $groups;
+  }
 }
 
 /**
