@@ -5418,7 +5418,8 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
   public static function createProportionalEntry($entityParams, $eftParams) {
     $paid = $entityParams['line_item_amount'] * ($entityParams['trxn_total_amount'] / $entityParams['contribution_total_amount']);
     // Record Entity Financial Trxn
-    $eftParams['amount'] = round($paid, 2);
+    // CRM-20145
+    $eftParams['amount'] = number_format((float)round($paid, 2), 2, '.', '');
     civicrm_api3('EntityFinancialTrxn', 'create', $eftParams);
   }
 
