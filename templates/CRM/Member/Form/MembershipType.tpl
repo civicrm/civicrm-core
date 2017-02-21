@@ -156,6 +156,7 @@
   </div>
 </div>
 
+{include file="CRM/common/deferredFinancialType.tpl" context='MembershipType'}
 {literal}
 <script type="text/javascript">
 CRM.$(function($) {

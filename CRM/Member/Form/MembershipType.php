@@ -204,6 +204,11 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
     $this->addFormRule(array('CRM_Member_Form_MembershipType', 'formRule'));
 
     $this->assign('membershipTypeId', $this->_id);
+
+    if (CRM_Contribute_BAO_Contribution::checkContributeSettings('deferred_revenue_enabled')) {
+      $deferredFinancialType = CRM_Financial_BAO_FinancialAccount::getDeferredFinancialType();
+      $this->assign('deferredFinancialType', array_keys($deferredFinancialType));
+    }
   }
 
   /**
@@ -280,14 +285,6 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
       if (!CRM_Utils_Rule::qfDate($params['fixed_period_rollover_day'])) {
         $errors['fixed_period_rollover_day'] = ts('Please enter valid Fixed Period Rollover Day');
       }
-    }
-
-    // CRM-16189
-    try {
-      CRM_Financial_BAO_FinancialAccount::validateFinancialType($params['financial_type_id']);
-    }
-    catch (CRM_Core_Exception $e) {
-      $errors['financial_type_id'] = $e->getMessage();
     }
 
     return empty($errors) ? TRUE : $errors;

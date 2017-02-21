@@ -247,6 +247,7 @@
 </div>
 </div>
 
+{include file="CRM/common/deferredFinancialType.tpl" context='Event'}
 {include file="CRM/common/showHide.tpl"}
 <script type="text/javascript">
     {if $price}

@@ -95,11 +95,6 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
       CRM_Utils_Hook::pre('create', 'Event', NULL, $params);
     }
 
-    // CRM-16189
-    if (!empty($params['financial_type_id'])) {
-      CRM_Financial_BAO_FinancialAccount::validateFinancialType($params['financial_type_id']);
-    }
-
     $event = new CRM_Event_DAO_Event();
 
     $event->copyValues($params);
