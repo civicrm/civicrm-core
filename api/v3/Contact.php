@@ -386,6 +386,7 @@ function _civicrm_api3_contact_get_supportanomalies(&$params, &$options) {
           $group = array_search($group, $allGroups);
         }
       }
+      $groups[key($groups)] = $groupsArray;
     }
     elseif (is_array($groups)) {
       foreach ($groups as $k => &$group) {
