@@ -132,7 +132,7 @@ class CRM_Report_Form_Instance {
       if (function_exists('user_roles')) {
         $user_roles_array = user_roles();
         foreach ($user_roles_array as $key => $value) {
-          $user_roles[$value] = $value;
+          $user_roles[$key] = $key;
         }
         $grouprole = &$form->addElement('advmultiselect',
           'grouprole',
