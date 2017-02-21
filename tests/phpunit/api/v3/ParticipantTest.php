@@ -245,6 +245,21 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test for exception when creating a participant twice.
+   */
+  public function testCreateParticipantTwice() {
+    $event = $this->eventCreate(NULL);
+    $this->callAPISuccess('participant', 'create', array(
+      'event_id' => $event['id'],
+      'contact_id' => $this->_contactID,
+    ));
+    $this->callAPIFailure('participant', 'create', array(
+      'event_id' => $event['id'],
+      'contact_id' => $this->_contactID,
+    ));
+  }
+
+  /**
    * Check Participant Get respects return properties.
    */
   public function testGetWithReturnProperties() {
