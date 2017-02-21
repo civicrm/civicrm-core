@@ -481,4 +481,19 @@ LIMIT 1
     return $taxAmount;
   }
 
+  /*
+   * Format monetary amount: round and return to desired decimal place
+   * CRM-20145
+   *
+   * @param float $amount
+   *   Monetary amount
+   * @param integer $decimals
+   *   How many decimal places to round to and return
+   *
+   * @return float
+   *   Amount rounded and returned with the desired decimal places
+   */
+  public static function formatAmount($amount, $decimals = 2) {
+    return number_format((float) round($amount, (int) $decimals), (int) $decimals, '.', '');
+  }
 }
