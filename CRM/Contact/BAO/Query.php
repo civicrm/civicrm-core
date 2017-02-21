@@ -2942,6 +2942,18 @@ class CRM_Contact_BAO_Query {
 
     $regularGroupIDs = $smartGroupIDs = array();
     foreach ((array) $value as $id) {
+      if (!is_numeric($id)) {
+        $check = civicrm_api3('group', 'get', array('name' => $id, 'options' => array('limit' => 1), 'sequential' => 1));
+        if (!empty($check['values'])) {
+          $id = $check['values'][0]['id'];
+        }
+        else {
+          $check = civicrm_api3('group', 'get', array('title' => $id, 'options' => array('limit' => 1), 'sequential' => 1));
+          if (!empty($check['values'])) {
+            $id = $check['values'][0]['id'];
+          }
+        }
+      }
       if (CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $id, 'saved_search_id')) {
         $smartGroupIDs[] = $id;
       }
@@ -2966,7 +2978,6 @@ class CRM_Contact_BAO_Query {
     else {
       $statii[] = "'Added'";
     }
-
     $groupClause = array();
     if (count($regularGroupIDs) || empty($value)) {
       $groupIds = implode(',', (array) $regularGroupIDs);
