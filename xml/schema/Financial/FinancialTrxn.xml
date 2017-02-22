@@ -233,6 +233,20 @@
     <add>4.3</add>
   </index>
   <field>
+    <name>card_type</name>
+    <uniqueName>financial_trxn_card_type</uniqueName>
+    <title>Card Type</title>
+    <type>int unsigned</type>
+    <comment>FK to accept_creditcard option group values</comment>
+    <pseudoconstant>
+      <optionGroupName>accept_creditcard</optionGroupName>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+    <add>4.7</add>
+  </field>
+  <field>
     <name>check_number</name>
     <uniqueName>financial_trxn_check_number</uniqueName>
     <title>Check Number</title>
@@ -250,4 +264,16 @@
     <fieldName>check_number</fieldName>
     <add>4.3</add>
   </index>
+  <field>
+    <name>pan_truncation</name>
+    <uniqueName>financial_trxn_pan_truncation</uniqueName>
+    <title>Pan Truncation</title>
+    <type>int unsigned</type>
+    <html>
+      <type>Text</type>
+      <size>4</size>
+    </html>
+    <comment>Last 4 digits of credit card</comment>
+    <add>4.7</add>
+  </field>
 </table>
