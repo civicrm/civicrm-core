@@ -696,4 +696,50 @@ WHERE ft.to_financial_account_id != {$toFinancialAccount} AND ft.to_financial_ac
     }
   }
 
+  /**
+   * Get Credit Card Details.
+   *
+   * @param int $contributionID
+   *   Contribution ID
+   *
+   * @return array
+   */
+  public static function getCreditCardDetails($contributionID) {
+    $sql = "SELECT credit_card_type, credit_card_number
+      FROM civicrm_financial_trxn cft
+        INNER JOIN civicrm_entity_financial_trxn ceft ON ceft.financial_trxn_id = cft.id
+      WHERE ceft.entity_table = 'civicrm_contribution'
+        AND ceft.entity_id = {$contributionID}
+        AND cft.is_payment = 1 AND from_financial_account_id IS NULL ORDER BY cft.id DESC LIMIT 1";
+    $dao = CRM_Core_DAO::executeQuery($sql);
+    $dao->fetch();
+    $creditCardDetails = array(
+      'credit_card_type' => $dao->credit_card_type,
+      'credit_card_number' => empty($dao->credit_card_number) ? NULL : ("**** **** **** " . $dao->credit_card_number),
+    );
+    return $creditCardDetails;
+  }
+
+  /**
+   * Format Credit Card type.
+   *
+   * @param array $params
+   *
+   */
+  public static function formatCreditCardDetails(&$params) {
+    $creditCardType = CRM_Utils_Array::value('credit_card_type', $params);
+    if ($creditCardType && !is_numeric($creditCardType)) {
+      $creditCardTypes = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialTrxn',
+        'credit_card_type',
+        array('labelColumn' => 'name')
+      );
+      $params['credit_card_type'] = array_search($creditCardType, $creditCardTypes);
+    }
+
+    $ccNumber = CRM_Utils_Array::value('credit_card_number', $params);
+    if ($ccNumber) {
+      $params['credit_card_number'] = substr($ccNumber, -4);
+    }
+  }
+
 }
