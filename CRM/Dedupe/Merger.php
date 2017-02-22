@@ -1165,7 +1165,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         $values = civicrm_api3($blockName, 'get', $searchParams);
         if ($values['count']) {
           $cnt = 0;
-          foreach ($values['values'] as $index => $value) {
+          foreach ($values['values'] as $value) {
             $locations[$moniker][$blockName][$cnt] = $value;
             // Fix address display
             if ($blockName == 'address') {
@@ -1519,10 +1519,9 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         CRM_Core_DAO::$_nullObject, NULL, -1
       );
     }
-    $cgTree = &$treeCache[$migrationInfo['main_details']['contact_type']];
 
     $cFields = array();
-    foreach ($cgTree as $key => $group) {
+    foreach ($treeCache[$migrationInfo['main_details']['contact_type']] as $key => $group) {
       if (!isset($group['fields'])) {
         continue;
       }

@@ -282,7 +282,7 @@ FROM   civicrm_prevnext_cache pn
 
       if (!empty($select)) {
         $extraData = array();
-        foreach ($select as $dfield => $sfield) {
+        foreach ($select as $sfield) {
           $extraData[$sfield]  = $dao->$sfield;
         }
         $main[$count] = array(
