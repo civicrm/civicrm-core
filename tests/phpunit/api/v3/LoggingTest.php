@@ -312,6 +312,7 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
     $this->assertEquals('anthony_anderson@civicrm.org', $contact['email']);
     $this->assertEquals('27 Cool way', $contact['street_address']);
 
+    sleep(1);
     CRM_Core_DAO::executeQuery("SET @uniqueID = 'bitty bot bot'");
     $this->callAPISuccess('Contact', 'create', array(
         'id' => $contactId,
