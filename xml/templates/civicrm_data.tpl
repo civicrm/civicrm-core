@@ -388,9 +388,6 @@ VALUES
   -- Activity Type for failed payment
    (@option_group_id_act, 'Failed Payment', 53, 'Failed Payment', NULL, 1, 0, 53, 'Failed Payment', 0, 1, 1, @contributeCompId, NULL, NULL),
 
-  -- Activity Type for Close Accounting Period
-   (@option_group_id_act, '{ts escape="sql"}Close Accounting Period{/ts}', 54, 'Close Accounting Period', NULL, 1, 0, 54, '{ts escape="sql"}Close Accounting Period{/ts}', 0, 1, 1, @contributeCompId, NULL, NULL),
-
    (@option_group_id_gender, '{ts escape="sql"}Female{/ts}', 1, 'Female', NULL, 0, NULL, 1, NULL, 0, 0, 1, NULL, NULL, NULL),
    (@option_group_id_gender, '{ts escape="sql"}Male{/ts}',   2, 'Male',   NULL, 0, NULL, 2, NULL, 0, 0, 1, NULL, NULL, NULL),
    (@option_group_id_gender, '{ts escape="sql"}Other{/ts}',  3, 'Other',  NULL, 0, NULL, 3, NULL, 0, 0, 1, NULL, NULL, NULL),
