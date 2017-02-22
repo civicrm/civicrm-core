@@ -393,8 +393,12 @@ function _civicrm_api3_contact_get_supportanomalies(&$params, &$options) {
     // handle format like 'group' => array('title1', 'title2').
     elseif (is_array($groups)) {
       foreach ($groups as $k => &$group) {
-        if (array_search($group, $allGroups)) {
+        if (!is_numeric($group) && array_search($group, $allGroups)) {
           $group = array_search($group, $allGroups);
+        }
+        if (!is_numeric($k) && array_search($k, $allGroups)) {
+          unset($groups[$k]);
+          $groups[array_search($k, $allGroups)] = $group;
         }
       }
     }
