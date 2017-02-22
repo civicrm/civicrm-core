@@ -1085,7 +1085,7 @@ function civicrm_api3_contact_merge($params) {
         'srcID' => $params['to_remove_id'],
         'dstID' => $params['to_keep_id'],
       ),
-    ), array(), $params['mode'], $params['auto_flip'])) != FALSE) {
+    ), array(), $params['mode'])) != FALSE) {
     return civicrm_api3_create_success($result, $params);
   }
   throw new CiviCRM_API3_Exception('Merge failed');
@@ -1110,10 +1110,6 @@ function _civicrm_api3_contact_merge_spec(&$params) {
     'api.required' => 1,
     'type' => CRM_Utils_Type::T_INT,
     'api.aliases' => array('other_id'),
-  );
-  $params['auto_flip'] = array(
-    'title' => 'Swap destination and source to retain lowest id?',
-    'api.default' => TRUE,
   );
   $params['mode'] = array(
     // @todo need more detail on what this means.
