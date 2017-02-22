@@ -96,3 +96,8 @@
 <em>{ts}Example: If you enter a payment of 60 when the scheduled amount is 50, the total pledge amount will be increased by 10.{/ts}</em>
 </p>
 {/htxt}
+{htxt id="pan_truncation"}
+  <p>
+    {ts}Enter only the last four digits of the card. This is used only as a reference. If you would like to process a transaction using a card, use the Submit Credit Card Contribution form.{/ts}
+  </p>
+{/htxt}

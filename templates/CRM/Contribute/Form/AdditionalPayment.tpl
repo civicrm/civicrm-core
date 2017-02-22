@@ -115,9 +115,19 @@
           </tr>
           <tr class="crm-payment-form-block-payment_instrument_id">
             <td class="label">{$form.payment_instrument_id.label}</td>
-            <td {$valueStyle}>{$form.payment_instrument_id.html} {help id="payment_instrument_id"}</td>
+            <td {$valueStyle}>{$form.payment_instrument_id.html} {help id="payment_instrument_id" file="CRM/Contribute/Page/Tab.hlp"}</td>
             </td>
           </tr>
+	  {if !$isOnline}
+            <tr id="cardType" class="crm-payment-form-block-credit_card_type">
+              <td class="label">{$form.credit_card_type.label}</td>
+              <td {$valueStyle}>{$form.credit_card_type.html}</td>
+            </tr>
+            <tr id="cardNumber" class="crm-payment-form-block-credit_card_number">
+              <td class="label">{$form.credit_card_number.label}</td>
+              <td {$valueStyle}>{$form.credit_card_number.html} {help id="pan_truncation" file="CRM/Contribute/Page/Tab.hlp"}</td>
+            </tr>
+          {/if}
           {if $showCheckNumber || !$isOnline}
             <tr id="checkNumber" class="crm-payment-form-block-check_number">
               <td class="label">{$form.check_number.label}</td>
@@ -126,7 +136,7 @@
           {/if}
           <tr class="crm-payment-form-block-trxn_id">
             <td class="label">{$form.trxn_id.label}</td>
-            <td {$valueStyle}>{$form.trxn_id.html} {help id="id-trans_id"}</td>
+            <td {$valueStyle}>{$form.trxn_id.html} {help id="id-trans_id" file="CRM/Contribute/Page/Tab.hlp"}</td>
           </tr>
           {if $email and $outBound_option != 2}
             <tr class="crm-payment-form-block-is_email_receipt">
@@ -249,17 +259,31 @@
           }
         });
       });
+      CRM.$(function($) {
+        onPaymentMethodChange();
+  	$("#payment_instrument_id").on("change",function(){
+    	  onPaymentMethodChange();
+  	});
 
+  	function onPaymentMethodChange() {
+    	  var paymentInstrument = $('#payment_instrument_id').val();
+    	  if (paymentInstrument == 4) {
+      	    $('tr#checkNumber').show();
+      	    $('tr#cardType').hide();
+      	    $('tr#cardNumber').hide();
+    	  }
+    	  else if (paymentInstrument == 1) {
+      	    $('tr#cardType').show();
+      	    $('tr#cardNumber').show();
+      	    $('tr#checkNumber').hide();
+    	  }
+    	  else {
+            $('tr#checkNumber').hide();
+      	    $('tr#cardType').hide();
+      	    $('tr#cardNumber').hide();
+          }
+        }
+      });
     </script>
     {/literal}
-      {if !$contributionMode}
-        {include file="CRM/common/showHideByFieldValue.tpl"
-        trigger_field_id    ="payment_instrument_id"
-        trigger_value       = '4'
-        target_element_id   ="checkNumber"
-        target_element_type ="table-row"
-        field_type          ="select"
-        invert              = 0
-        }
-    {/if}
 {/if}

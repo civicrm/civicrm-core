@@ -3087,6 +3087,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       $update = TRUE;
     }
 
+    CRM_Core_BAO_FinancialTrxn::formatCreditCardDetails($params);
     $statusId = $params['contribution']->contribution_status_id;
     // CRM-13964 partial payment
     if ($contributionStatus == 'Partially paid'
@@ -3117,6 +3118,8 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         $balanceTrxnParams['status_id'] = $statusId;
         $balanceTrxnParams['payment_instrument_id'] = $params['contribution']->payment_instrument_id;
         $balanceTrxnParams['check_number'] = CRM_Utils_Array::value('check_number', $params);
+        $balanceTrxnParams['card_type'] = CRM_Utils_Array::value('card_type', $params);
+        $balanceTrxnParams['pan_truncation'] = CRM_Utils_Array::value('pan_truncation', $params);
         if (!empty($balanceTrxnParams['from_financial_account_id']) &&
           ($statusId == array_search('Completed', $contributionStatuses) || $statusId == array_search('Partially paid', $contributionStatuses))
         ) {
@@ -3181,6 +3184,8 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         'status_id' => $statusId,
         'payment_instrument_id' => CRM_Utils_Array::value('payment_instrument_id', $params, $params['contribution']->payment_instrument_id),
         'check_number' => CRM_Utils_Array::value('check_number', $params),
+        'card_type' => CRM_Utils_Array::value('card_type', $params),
+        'pan_truncation' => CRM_Utils_Array::value('pan_truncation', $params),
       );
       if ($contributionStatus == 'Refunded' || $contributionStatus == 'Chargeback' || $contributionStatus == 'Cancelled') {
         $trxnParams['trxn_date'] = !empty($params['contribution']->cancel_date) ? $params['contribution']->cancel_date : date('YmdHis');
@@ -3354,6 +3359,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
               civicrm_api3('FinancialTrxn', 'create', array('id' => $refundIDs['financialTrxnId'], 'trxn_id' => $params['refund_trxn_id']));
             }
           }
+          CRM_Core_BAO_FinancialTrxn::updateCreditCardDetails($params);
         }
       }
 
@@ -3772,21 +3778,24 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     if (!$participantId) {
       $participantId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment', $contributionId, 'participant_id', 'contribution_id');
     }
-
+    CRM_Core_BAO_FinancialTrxn::formatCreditCardDetails($trxnsData);
+    // build params for recording financial trxn entry
+    $params['contribution'] = $contributionDAO;
+    $params = array_merge($defaults, $params);
+    $params['skipLineItem'] = TRUE;
+    $params['card_type'] = CRM_Utils_Array::value('card_type', $trxnsData);
+    $params['pan_truncation'] = CRM_Utils_Array::value('pan_truncation', $trxnsData);
+    $trxnsData['trxn_date'] = !empty($trxnsData['trxn_date']) ? $trxnsData['trxn_date'] : date('YmdHis');
+    $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Accounts Receivable Account is' "));
+    $arAccountId = CRM_Contribute_PseudoConstant::financialAccountType($contributionDAO->financial_type_id, $relationTypeId);
     if ($paymentType == 'owed') {
-      // build params for recording financial trxn entry
-      $params['contribution'] = $contributionDAO;
-      $params = array_merge($defaults, $params);
-      $params['skipLineItem'] = TRUE;
       $params['partial_payment_total'] = $contributionDAO->total_amount;
       $params['partial_amount_pay'] = $trxnsData['total_amount'];
-      $trxnsData['trxn_date'] = !empty($trxnsData['trxn_date']) ? $trxnsData['trxn_date'] : date('YmdHis');
       $trxnsData['net_amount'] = !empty($trxnsData['net_amount']) ? $trxnsData['net_amount'] : $trxnsData['total_amount'];
 
       // record the entry
       $financialTrxn = CRM_Contribute_BAO_Contribution::recordFinancialAccounts($params, $trxnsData);
-      $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Accounts Receivable Account is' "));
-      $toFinancialAccount = CRM_Contribute_PseudoConstant::financialAccountType($contributionDAO->financial_type_id, $relationTypeId);
+      $toFinancialAccount = $arAccountId;
 
       $trxnId = CRM_Core_BAO_FinancialTrxn::getBalanceTrxnAmt($contributionId, $contributionDAO->financial_type_id);
       if (!empty($trxnId)) {
@@ -3864,15 +3873,9 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
       }
     }
     elseif ($paymentType == 'refund') {
-      // build params for recording financial trxn entry
-      $params['contribution'] = $contributionDAO;
-      $params = array_merge($defaults, $params);
-      $params['skipLineItem'] = TRUE;
-      $trxnsData['trxn_date'] = !empty($trxnsData['trxn_date']) ? $trxnsData['trxn_date'] : date('YmdHis');
       $trxnsData['total_amount'] = -$trxnsData['total_amount'];
 
-      $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Accounts Receivable Account is' "));
-      $trxnsData['from_financial_account_id'] = CRM_Contribute_PseudoConstant::financialAccountType($contributionDAO->financial_type_id, $relationTypeId);
+      $trxnsData['from_financial_account_id'] = $arAccountId;
       $trxnsData['status_id'] = CRM_Core_OptionGroup::getValue('contribution_status', 'Refunded', 'name');
       // record the entry
       $financialTrxn = CRM_Contribute_BAO_Contribution::recordFinancialAccounts($params, $trxnsData);
@@ -4055,7 +4058,7 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
         SELECT GROUP_CONCAT(fa.`name`) as financial_account,
           ft.total_amount,
           ft.payment_instrument_id,
-          ft.trxn_date, ft.trxn_id, ft.status_id, ft.check_number, con.currency
+          ft.trxn_date, ft.trxn_id, ft.status_id, ft.check_number, con.currency, ft.pan_truncation, ft.card_type
 
         FROM civicrm_contribution con
           LEFT JOIN civicrm_entity_financial_trxn eft ON (eft.entity_id = con.id AND eft.entity_table = 'civicrm_contribution')
@@ -4077,6 +4080,14 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
       while ($resultDAO->fetch()) {
         $paidByLabel = CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_FinancialTrxn', 'payment_instrument_id', $resultDAO->payment_instrument_id);
         $paidByName = CRM_Core_PseudoConstant::getName('CRM_Core_BAO_FinancialTrxn', 'payment_instrument_id', $resultDAO->payment_instrument_id);
+        if ($resultDAO->card_type) {
+          $creditCardType = CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_FinancialTrxn', 'card_type', $resultDAO->card_type);
+          $paidByLabel .= " ({$creditCardType}";
+          if ($resultDAO->pan_truncation) {
+            $paidByLabel .= ": {$resultDAO->pan_truncation}";
+          }
+          $paidByLabel .= ')';
+        }
         $val = array(
           'total_amount' => $resultDAO->total_amount,
           'financial_type' => $resultDAO->financial_account,
@@ -4437,6 +4448,8 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
       'receive_date',
       'receipt_date',
       'contribution_status_id',
+      'credit_card_type',
+      'credit_card_number',
     );
     if (self::isSingleLineItem($primaryContributionID)) {
       $inputContributionWhiteList[] = 'financial_type_id';
