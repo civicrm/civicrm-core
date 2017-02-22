@@ -709,9 +709,10 @@ WHERE ft.to_financial_account_id != {$toFinancialAccount} AND ft.to_financial_ac
       FROM civicrm_financial_trxn cft
         INNER JOIN civicrm_entity_financial_trxn ceft ON ceft.financial_trxn_id = cft.id
       WHERE ceft.entity_table = 'civicrm_contribution'
-        AND ceft.entity_id = {$contributionID}
+        AND ceft.entity_id = %1
         AND cft.is_payment = 1 ORDER BY cft.id DESC LIMIT 1";
-    $dao = CRM_Core_DAO::executeQuery($sql);
+    $mysqlParams = array(1 => array($contributionID, 'Integer'));
+    $dao = CRM_Core_DAO::executeQuery($sql, $mysqlParams);
     $dao->fetch();
     $creditCardDetails = array(
       'credit_card_type' => $dao->card_type,
