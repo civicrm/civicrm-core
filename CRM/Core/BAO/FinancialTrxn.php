@@ -696,4 +696,28 @@ WHERE ft.to_financial_account_id != {$toFinancialAccount} AND ft.to_financial_ac
     }
   }
 
+  /**
+   * Get Credit Card Details.
+   *
+   * @param int $contributionID
+   *   Contribution ID
+   *
+   * @return array
+   */
+  public static function getCreditCardDetails($contributionID, $viewOnly = TRUE) {
+    $sql = "SELECT card_type, pan_truncation
+      FROM civicrm_financial_trxn cft
+        INNER JOIN civicrm_entity_financial_trxn ceft ON ceft.financial_trxn_id = cft.id
+      WHERE ceft.entity_table = 'civicrm_contribution'
+        AND ceft.entity_id = {$contributionID}
+        AND cft.is_payment = 1 ORDER BY cft.id DESC LIMIT 1";
+    $dao = CRM_Core_DAO::executeQuery($sql);
+    $dao->fetch();
+    $creditCardDetails = array(
+      'credit_card_type' => $dao->card_type,
+      'credit_card_number' => empty($dao->pan_truncation) ? NULL : $viewOnly ? ("**** **** **** " . $dao->pan_truncation) : $dao->pan_truncation,
+    );
+    return $creditCardDetails;
+  }
+
 }
