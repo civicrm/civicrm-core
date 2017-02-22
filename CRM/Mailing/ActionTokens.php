@@ -64,6 +64,13 @@ class CRM_Mailing_ActionTokens extends \Civi\Token\AbstractTokenSubscriber {
   /**
    * @inheritDoc
    */
+  public function checkActive(\Civi\Token\TokenProcessor $processor) {
+    return !empty($processor->context['mailingId']) || !empty($processor->context['mailing']);
+  }
+
+  /**
+   * @inheritDoc
+   */
   public function evaluateToken(
     \Civi\Token\TokenRow $row,
     $entity,
