@@ -380,14 +380,17 @@ function _civicrm_api3_contact_get_supportanomalies(&$params, &$options) {
     $groups = $params['group'];
     $allGroups = CRM_Core_PseudoConstant::group();
     if (is_array($groups) && in_array(key($groups), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
+      // Get the groups array.
       $groupsArray = $groups[key($groups)];
-      foreach ($groupsArray as $group => &$ignore) {
+      foreach ($groupsArray as &$group) {
         if (!is_numeric($group) && array_search($group, $allGroups)) {
           $group = array_search($group, $allGroups);
         }
       }
+      // Now reset the $groups array with the ids not the titles.
       $groups[key($groups)] = $groupsArray;
     }
+    // handle format like 'group' => array('title1', 'title2').
     elseif (is_array($groups)) {
       foreach ($groups as $k => &$group) {
         if (array_search($group, $allGroups)) {
