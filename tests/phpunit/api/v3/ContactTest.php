@@ -3313,21 +3313,21 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $contact_get2 = $this->callAPISuccess('contact', 'get', array('group' => array($createdGroupTitles[0] => 1, $createdGroupTitles[1] => 1), 'return' => 'group'));
     $this->assertEquals(1, $contact_get2['count']);
     $this->assertEquals($created_contact_id, $contact_get2['id']);
-    $contact_groups = explode(',', $contact_get2['values'][$created_contact_id]['groups']);
+    $contact_groups2 = explode(',', $contact_get2['values'][$created_contact_id]['groups']);
     foreach ($createdGroupsIds as $id) {
-      $this->assertContains((string) $id, $contact_groups);
+      $this->assertContains((string) $id, $contact_groups2);
     }
     $contact_get3 = $this->callAPISuccess('contact', 'get', array('group' => array($createdGroupsIds[0] => 1), 'return' => 'group'));
     $this->assertEquals($created_contact_id, $contact_get3['id']);
     $contact_groups3 = explode(',', $contact_get3['values'][$created_contact_id]['groups']);
     foreach ($createdGroupsIds as $id) {
-      $this->assertContains((string) $id, $contact_groups2);
+      $this->assertContains((string) $id, $contact_groups3);
     }
     $contact_get4 = $this->callAPISuccess('contact', 'get', array('group' => array($createdGroupsIds[0] => 1, $createdGroupsIds[1] => 1), 'return' => 'group'));
     $this->assertEquals($created_contact_id, $contact_get4['id']);
-    $contact_groups3 = explode(',', $contact_get4['values'][$created_contact_id]['groups']);
+    $contact_groups4 = explode(',', $contact_get4['values'][$created_contact_id]['groups']);
     foreach ($createdGroupsIds as $id) {
-      $this->assertContains((string) $id, $contact_groups2);
+      $this->assertContains((string) $id, $contact_groups4);
     }
     foreach ($createdGroupsIds as $id) {
       $this->callAPISuccess('group', 'delete', array('id' => $id));
