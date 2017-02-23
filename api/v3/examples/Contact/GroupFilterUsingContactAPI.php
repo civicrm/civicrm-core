@@ -9,9 +9,11 @@
  */
 function contact_get_example() {
   $params = array(
-    'filter.group_id' => array(
-      '0' => 1,
-      '1' => 26,
+    'group' => array(
+      'IN' => array(
+        '0' => 1,
+        '1' => 26,
+      ),
     ),
     'contact_type' => 'Individual',
   );

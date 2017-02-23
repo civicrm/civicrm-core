@@ -996,33 +996,33 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->callAPISuccess('contact', 'create', $params);
     // testing as integer
     $params = array(
-      'filter.group_id' => $groupId,
+      'group' => $groupId,
       'contact_type' => 'Individual',
     );
     $result = $this->callAPIAndDocument('contact', 'get', $params, __FUNCTION__, __FILE__, $description, $subFile);
     $this->assertEquals(1, $result['count']);
     // group 26 doesn't exist, but we can still search contacts in it.
     $params = array(
-      'filter.group_id' => 26,
+      'group' => 26,
       'contact_type' => 'Individual',
     );
     $this->callAPISuccess('contact', 'get', $params);
     // testing as string
     $params = array(
-      'filter.group_id' => "$groupId, 26",
+      'group' => array($groupId, 26),
       'contact_type' => 'Individual',
     );
     $result = $this->callAPIAndDocument('contact', 'get', $params, __FUNCTION__, __FILE__, $description, $subFile);
     $this->assertEquals(1, $result['count']);
     $params = array(
-      'filter.group_id' => "26,27",
+      'group' => array(26, 27),
       'contact_type' => 'Individual',
     );
     $this->callAPISuccess('contact', 'get', $params);
 
     // testing as string
     $params = array(
-      'filter.group_id' => array($groupId, 26),
+      'group' => array('IN' => array($groupId, 26)),
       'contact_type' => 'Individual',
     );
     $result = $this->callAPIAndDocument('contact', 'get', $params, __FUNCTION__, __FILE__, $description, $subFile);
@@ -1030,12 +1030,12 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
     //test in conjunction with other criteria
     $params = array(
-      'filter.group_id' => array($groupId, 26),
+      'group' => array($groupId, 26),
       'contact_type' => 'Organization',
     );
     $this->callAPISuccess('contact', 'get', $params);
     $params = array(
-      'filter.group_id' => array(26, 27),
+      'group' => array(26, 27),
       'contact_type' => 'Individual',
     );
     $result = $this->callAPISuccess('contact', 'get', $params);
