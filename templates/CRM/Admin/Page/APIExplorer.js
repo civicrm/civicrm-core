@@ -133,9 +133,10 @@
 
   function addJoinInfo(field, name) {
     if (field.name === 'entity_id') {
-      var entityTableParam = name.slice(0, -2) + 'table';
-      if (params[entityTableParam]) {
-        field.FKApiName = getField(entityTableParam).options[params[entityTableParam]];
+      var entityTableParam = name.slice(0, -2) + 'table',
+        entityField = params[entityTableParam] ? getField(entityTableParam) : {};
+      if (entityField.options) {
+        field.FKApiName = entityField.options[params[entityTableParam]];
       }
     }
     if (field.pseudoconstant && field.pseudoconstant.optionGroupName) {
