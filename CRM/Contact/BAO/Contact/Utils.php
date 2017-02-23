@@ -926,7 +926,7 @@ INNER JOIN civicrm_contact contact_target ON ( contact_target.id = act.contact_i
       CRM_Core_BAO_PrevNextCache::deleteItem();
     }
     // clear acl cache if any.
-    CRM_ACL_BAO_Cache::resetCache();
+    // CRM_ACL_BAO_Cache::resetCache();
     CRM_Contact_BAO_GroupContactCache::opportunisticCacheFlush();
   }
 
