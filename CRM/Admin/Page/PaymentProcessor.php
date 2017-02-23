@@ -70,12 +70,14 @@ class CRM_Admin_Page_PaymentProcessor extends CRM_Core_Page_Basic {
         ),
         CRM_Core_Action::DISABLE => array(
           'name' => ts('Disable'),
-          'ref' => 'crm-enable-disable',
+          'url' => 'civicrm/admin/paymentProcessor',
+          'qs' => 'action=disable&id=%%id%%',
           'title' => ts('Disable Payment Processor'),
         ),
         CRM_Core_Action::ENABLE => array(
           'name' => ts('Enable'),
-          'ref' => 'crm-enable-disable',
+          'url' => 'civicrm/admin/paymentProcessor',
+          'qs' => 'action=enable&id=%%id%%',
           'title' => ts('Enable Payment Processor'),
         ),
         CRM_Core_Action::DELETE => array(

@@ -34,8 +34,6 @@
 {if $rows}
 <div id="ltype">
         {strip}
-        {* handle enable/disable actions*}
-   {include file="CRM/common/enableDisableApi.tpl"}
         <table class="selector row-highlight">
         <tr class="columnheader">
             <th >{ts}Name{/ts}</th>
