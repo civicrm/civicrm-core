@@ -118,22 +118,6 @@ abstract class AbstractTokenSubscriber implements EventSubscriberInterface {
   }
 
   /**
-   * Get all custom field tokens of $entity
-   *
-   * @param string $entity
-   * @return array $customTokens
-   *   return custom field tokens in array('custom_N' => 'label') format
-   */
-  public function getCustomTokens($entity) {
-    $customTokens = array();
-    foreach (\CRM_Core_BAO_CustomField::getFields($entity) as $id => $info) {
-      $customTokens["custom_$id"] = $info['label'];
-    }
-
-    return $customTokens;
-  }
-
-  /**
    * Alter the query which prepopulates mailing data
    * for scheduled reminders.
    *
@@ -157,17 +141,10 @@ abstract class AbstractTokenSubscriber implements EventSubscriberInterface {
     if (!$this->checkActive($e->getTokenProcessor())) {
       return;
     }
-
-    $messageTokens = $e->getTokenProcessor()->getMessageTokens();
-    if (!isset($messageTokens[$this->entity])) {
-      return;
-    }
-
-    $activeTokens = array_intersect($messageTokens[$this->entity], array_keys($this->tokenNames));
-
+    // TODO: check if any tokens for $entity are actually used; short-circuit.
     $prefetch = $this->prefetch($e);
     foreach ($e->getRows() as $row) {
-      foreach ((array) $activeTokens as $field) {
+      foreach ($this->tokenNames as $field => $label) {
         $this->evaluateToken($row, $this->entity, $field, $prefetch);
       }
     }

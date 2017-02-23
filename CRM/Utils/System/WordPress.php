@@ -73,6 +73,54 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
+   * Moved from CRM_Utils_System_Base
+   */
+  public function getDefaultFileStorage() {
+    $config = CRM_Core_Config::singleton();
+    $cmsUrl = CRM_Utils_System::languageNegotiationURL($config->userFrameworkBaseURL, FALSE, TRUE);
+    $cmsPath = $this->cmsRootPath();
+    $filesPath = CRM_Utils_File::baseFilePath();
+    $filesRelPath = CRM_Utils_File::relativize($filesPath, $cmsPath);
+    $filesURL = rtrim($cmsUrl, '/') . '/' . ltrim($filesRelPath, ' /');
+    return array(
+      'url' => CRM_Utils_File::addTrailingSlash($filesURL, '/'),
+      'path' => CRM_Utils_File::addTrailingSlash($filesPath),
+    );
+  }
+
+  /**
+   * Determine the location of the CiviCRM source tree.
+   *
+   * @return array
+   *   - url: string. ex: "http://example.com/sites/all/modules/civicrm"
+   *   - path: string. ex: "/var/www/sites/all/modules/civicrm"
+   */
+  public function getCiviSourceStorage() {
+    global $civicrm_root;
+
+    // Don't use $config->userFrameworkBaseURL; it has garbage on it.
+    // More generally, we shouldn't be using $config here.
+    if (!defined('CIVICRM_UF_BASEURL')) {
+      throw new RuntimeException('Undefined constant: CIVICRM_UF_BASEURL');
+    }
+
+    $cmsPath = $this->cmsRootPath();
+
+    // $config  = CRM_Core_Config::singleton();
+    // overkill? // $cmsUrl = CRM_Utils_System::languageNegotiationURL($config->userFrameworkBaseURL, FALSE, TRUE);
+    $cmsUrl = CIVICRM_UF_BASEURL;
+    if (CRM_Utils_System::isSSL()) {
+      $cmsUrl = str_replace('http://', 'https://', $cmsUrl);
+    }
+    $civiRelPath = CRM_Utils_File::relativize(realpath($civicrm_root), realpath($cmsPath));
+    $civiUrl = rtrim($cmsUrl, '/') . '/' . ltrim($civiRelPath, ' /');
+    return array(
+      'url' => CRM_Utils_File::addTrailingSlash($civiUrl, '/'),
+      'path' => CRM_Utils_File::addTrailingSlash($civicrm_root),
+    );
+  }
+
+  /**
    * @inheritDoc
    */
   public function appendBreadCrumb($breadCrumbs) {

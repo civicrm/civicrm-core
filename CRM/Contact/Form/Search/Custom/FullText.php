@@ -224,10 +224,6 @@ CREATE TEMPORARY TABLE {$this->_entityIDTableName} (
 ) ENGINE=HEAP DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci
 ";
     CRM_Core_DAO::executeQuery($sql);
-
-    if (!empty($this->_formValues['is_unit_test'])) {
-      $this->_tableNameForTest = $this->_tableName;
-    }
   }
 
   public function fillTable() {
@@ -263,7 +259,7 @@ CREATE TEMPORARY TABLE {$this->_entityIDTableName} (
     $sql = "
 DELETE     t.*
 FROM       {$this->_tableName} t
-WHERE      NOT EXISTS ( SELECT c.contact_id
+WHERE      NOT EXISTS ( SELECT c.id
                         FROM civicrm_acl_contact_cache c
                         WHERE c.user_id = %1 AND t.contact_id = c.contact_id )
 ";
@@ -273,7 +269,7 @@ WHERE      NOT EXISTS ( SELECT c.contact_id
 DELETE     t.*
 FROM       {$this->_tableName} t
 WHERE      t.table_name = 'Activity' AND
-           NOT EXISTS ( SELECT c.contact_id
+           NOT EXISTS ( SELECT c.id
                         FROM civicrm_acl_contact_cache c
                         WHERE c.user_id = %1 AND ( t.target_contact_id = c.contact_id OR t.target_contact_id IS NULL ) )
 ";
@@ -283,7 +279,7 @@ WHERE      t.table_name = 'Activity' AND
 DELETE     t.*
 FROM       {$this->_tableName} t
 WHERE      t.table_name = 'Activity' AND
-           NOT EXISTS ( SELECT c.contact_id
+           NOT EXISTS ( SELECT c.id
                         FROM civicrm_acl_contact_cache c
                         WHERE c.user_id = %1 AND ( t.assignee_contact_id = c.contact_id OR t.assignee_contact_id IS NULL ) )
 ";

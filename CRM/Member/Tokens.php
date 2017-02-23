@@ -44,17 +44,14 @@ class CRM_Member_Tokens extends \Civi\Token\AbstractTokenSubscriber {
    * Class constructor.
    */
   public function __construct() {
-    parent::__construct('membership', array_merge(
-      array(
-        'fee' => ts('Membership Fee'),
-        'id' => ts('Membership ID'),
-        'join_date' => ts('Membership Join Date'),
-        'start_date' => ts('Membership Start Date'),
-        'end_date' => ts('Membership End Date'),
-        'status' => ts('Membership Status'),
-        'type' => ts('Membership Type'),
-      ),
-      $this->getCustomTokens('Membership')
+    parent::__construct('membership', array(
+      'fee' => ts('Membership Fee'),
+      'id' => ts('Membership ID'),
+      'join_date' => ts('Membership Join Date'),
+      'start_date' => ts('Membership Start Date'),
+      'end_date' => ts('Membership End Date'),
+      'status' => ts('Membership Status'),
+      'type' => ts('Membership Type'),
     ));
   }
 
@@ -106,9 +103,6 @@ class CRM_Member_Tokens extends \Civi\Token\AbstractTokenSubscriber {
     }
     elseif (isset($actionSearchResult->$field)) {
       $row->tokens($entity, $field, $actionSearchResult->$field);
-    }
-    elseif ($cfID = \CRM_Core_BAO_CustomField::getKeyID($field)) {
-      $row->customToken($entity, $cfID, $actionSearchResult->entity_id);
     }
     else {
       $row->tokens($entity, $field, '');

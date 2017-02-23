@@ -113,8 +113,14 @@ function _civicrm_api3_generic_getList_defaults($entity, &$request, $apiDefaults
   $request += $apiDefaults + $defaults;
   // Default api params
   $params = array(
+    'options' => array(
+      // Adding one extra result allows us to see if there are any more
+      'limit' => $resultsPerPage + 1,
+      // Because sql is zero-based
+      'offset' => ($request['page_num'] - 1) * $resultsPerPage,
+      'sort' => $request['label_field'],
+    ),
     'sequential' => 1,
-    'options' => array(),
   );
   // When searching e.g. autocomplete
   if ($request['input']) {
@@ -131,15 +137,6 @@ function _civicrm_api3_generic_getList_defaults($entity, &$request, $apiDefaults
     $params[$request['id_field']] = is_array($request['id']) ? array('IN' => $request['id']) : $request['id'];
   }
   $request['params'] += $params;
-
-  $request['params']['options'] += array(
-    // Add pagination parameters
-    'sort' => $request['label_field'],
-    // Adding one extra result allows us to see if there are any more
-    'limit' => $resultsPerPage + 1,
-    // Because sql is zero-based
-    'offset' => ($request['page_num'] - 1) * $resultsPerPage,
-  );
 }
 
 /**

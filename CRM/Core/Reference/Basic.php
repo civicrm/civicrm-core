@@ -78,16 +78,11 @@ class CRM_Core_Reference_Basic implements CRM_Core_Reference_Interface {
    */
   public function findReferences($targetDao) {
     $targetColumn = $this->getTargetKey();
-    $select = 'id';
-    // CRM-19385: Since id is removed, return all rows for cache tables.
-    if (!CRM_Core_BAO_SchemaHandler::checkIfFieldExists($this->getReferenceTable(), 'id')) {
-      $select = '*';
-    }
     $params = array(
       1 => array($targetDao->$targetColumn, 'String'),
     );
     $sql = <<<EOS
-SELECT {$select}
+SELECT id
 FROM {$this->getReferenceTable()}
 WHERE {$this->getReferenceKey()} = %1
 EOS;
@@ -108,7 +103,7 @@ EOS;
       1 => array($targetDao->$targetColumn, 'String'),
     );
     $sql = <<<EOS
-SELECT count(*)
+SELECT count(id)
 FROM {$this->getReferenceTable()}
 WHERE {$this->getReferenceKey()} = %1
 EOS;

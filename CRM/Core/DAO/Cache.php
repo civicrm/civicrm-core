@@ -49,6 +49,11 @@ class CRM_Core_DAO_Cache extends CRM_Core_DAO {
    */
   static $_log = false;
   /**
+   *
+   * @var int unsigned
+   */
+  public $id;
+  /**
    * group name for cache element, useful in cleaning cache elements
    *
    * @var string
@@ -115,6 +120,11 @@ class CRM_Core_DAO_Cache extends CRM_Core_DAO {
   static function &fields() {
     if (!isset(Civi::$statics[__CLASS__]['fields'])) {
       Civi::$statics[__CLASS__]['fields'] = array(
+        'id' => array(
+          'name' => 'id',
+          'type' => CRM_Utils_Type::T_INT,
+          'required' => true,
+        ) ,
         'group_name' => array(
           'name' => 'group_name',
           'type' => CRM_Utils_Type::T_STRING,

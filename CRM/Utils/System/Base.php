@@ -552,25 +552,60 @@ abstract class CRM_Utils_System_Base {
   /**
    * Determine the default location for file storage.
    *
+   * FIXME:
+   *  1. This was pulled out from a bigger function. It should be split
+   *     into even smaller pieces and marked abstract.
+   *  2. This would be easier to compute by a calling a CMS API, but
+   *     for whatever reason Civi gets it from config data.
+   *
    * @return array
    *   - url: string. ex: "http://example.com/sites/foo.com/files/civicrm"
    *   - path: string. ex: "/var/www/sites/foo.com/files/civicrm"
    */
   public function getDefaultFileStorage() {
+    global $civicrm_root;
     $config = CRM_Core_Config::singleton();
-    $cmsUrl = CRM_Utils_System::languageNegotiationURL($config->userFrameworkBaseURL, FALSE, TRUE);
-    $cmsPath = $this->cmsRootPath();
-    $filesPath = CRM_Utils_File::baseFilePath();
-    $filesRelPath = CRM_Utils_File::relativize($filesPath, $cmsPath);
-    $filesURL = rtrim($cmsUrl, '/') . '/' . ltrim($filesRelPath, ' /');
+    $baseURL = CRM_Utils_System::languageNegotiationURL($config->userFrameworkBaseURL, FALSE, TRUE);
+
+    $filesURL = NULL;
+    $filesPath = NULL;
+
+    if ($config->userFramework == 'Joomla') {
+      // gross hack
+      // we need to remove the administrator/ from the end
+      $tempURL = str_replace("/administrator/", "/", $baseURL);
+      $filesURL = $tempURL . "media/civicrm/";
+    }
+    elseif ($this->is_drupal) {
+      $siteName = $config->userSystem->parseDrupalSiteName($civicrm_root);
+      if ($siteName) {
+        $filesURL = $baseURL . "sites/$siteName/files/civicrm/";
+      }
+      else {
+        $filesURL = $baseURL . "sites/default/files/civicrm/";
+      }
+    }
+    elseif ($config->userFramework == 'UnitTests') {
+      $filesURL = $baseURL . "sites/default/files/civicrm/";
+    }
+    else {
+      throw new CRM_Core_Exception("Failed to locate default file storage ($config->userFramework)");
+    }
+
     return array(
-      'url' => CRM_Utils_File::addTrailingSlash($filesURL, '/'),
-      'path' => CRM_Utils_File::addTrailingSlash($filesPath),
+      'url' => $filesURL,
+      'path' => CRM_Utils_File::baseFilePath(),
     );
   }
 
   /**
    * Determine the location of the CiviCRM source tree.
+   *
+   * FIXME:
+   *  1. This was pulled out from a bigger function. It should be split
+   *     into even smaller pieces and marked abstract.
+   *  2. This would be easier to compute by a calling a CMS API, but
+   *     for whatever reason we take the hard way.
    *
    * @return array
    *   - url: string. ex: "http://example.com/sites/all/modules/civicrm"
@@ -578,25 +613,47 @@ abstract class CRM_Utils_System_Base {
    */
   public function getCiviSourceStorage() {
     global $civicrm_root;
+    $config = CRM_Core_Config::singleton();
 
     // Don't use $config->userFrameworkBaseURL; it has garbage on it.
-    // More generally, we shouldn't be using $config here.
+    // More generally, w shouldn't be using $config here.
     if (!defined('CIVICRM_UF_BASEURL')) {
       throw new RuntimeException('Undefined constant: CIVICRM_UF_BASEURL');
     }
-
-    $cmsPath = $this->cmsRootPath();
-
-    // $config  = CRM_Core_Config::singleton();
-    // overkill? // $cmsUrl = CRM_Utils_System::languageNegotiationURL($config->userFrameworkBaseURL, FALSE, TRUE);
-    $cmsUrl = CIVICRM_UF_BASEURL;
+    $baseURL = CRM_Utils_File::addTrailingSlash(CIVICRM_UF_BASEURL, '/');
     if (CRM_Utils_System::isSSL()) {
-      $cmsUrl = str_replace('http://', 'https://', $cmsUrl);
+      $baseURL = str_replace('http://', 'https://', $baseURL);
     }
-    $civiRelPath = CRM_Utils_File::relativize(realpath($civicrm_root), realpath($cmsPath));
-    $civiUrl = rtrim($cmsUrl, '/') . '/' . ltrim($civiRelPath, ' /');
+
+    if ($config->userFramework == 'Joomla') {
+      $userFrameworkResourceURL = $baseURL . "components/com_civicrm/civicrm/";
+    }
+    elseif ($config->userFramework == 'WordPress') {
+      $userFrameworkResourceURL = CIVICRM_PLUGIN_URL . "civicrm/";
+    }
+    elseif ($this->is_drupal) {
+      // Drupal setting
+      // check and see if we are installed in sites/all (for D5 and above)
+      // we dont use checkURL since drupal generates an error page and throws
+      // the system for a loop on lobo's macosx box
+      // or in modules
+      $cmsPath = $config->userSystem->cmsRootPath();
+      $userFrameworkResourceURL = $baseURL . str_replace("$cmsPath/", '',
+          str_replace('\\', '/', $civicrm_root)
+        );
+
+      $siteName = $config->userSystem->parseDrupalSiteName($civicrm_root);
+      if ($siteName) {
+        $civicrmDirName = trim(basename($civicrm_root));
+        $userFrameworkResourceURL = $baseURL . "sites/$siteName/modules/$civicrmDirName/";
+      }
+    }
+    else {
+      $userFrameworkResourceURL = NULL;
+    }
+
     return array(
-      'url' => CRM_Utils_File::addTrailingSlash($civiUrl, '/'),
+      'url' => CRM_Utils_File::addTrailingSlash($userFrameworkResourceURL),
       'path' => CRM_Utils_File::addTrailingSlash($civicrm_root),
     );
   }

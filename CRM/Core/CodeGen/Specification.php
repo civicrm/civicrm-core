@@ -462,16 +462,16 @@ class CRM_Core_CodeGen_Specification {
   }
 
   /**
-   * @param object $primaryXML
-   * @param array $fields
-   * @param array $table
+   * @param $primaryXML
+   * @param $fields
+   * @param $table
    */
   public function getPrimaryKey(&$primaryXML, &$fields, &$table) {
     $name = trim((string ) $primaryXML->name);
 
     /** need to make sure there is a field of type name */
     if (!array_key_exists($name, $fields)) {
-      echo "primary key $name in {$table['name']} does not have a field definition, ignoring\n";
+      echo "primary key $name in $table->name does not have a field definition, ignoring\n";
       return;
     }
 

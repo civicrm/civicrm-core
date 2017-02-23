@@ -5,24 +5,20 @@
       var first = true;
       var names = '';
       _.each(mailing.recipients.groups.include, function(id) {
+        if (!first) {
+          names = names + ', ';
+        }
         var group = _.where(CRM.crmMailing.groupNames, {id: '' + id});
-	if(group.length) {
-          if (!first) {
-            names = names + ', ';
-          }
-          names = names + group[0].title;
-          first = false;
-	}
+        names = names + group[0].title;
+        first = false;
       });
       _.each(mailing.recipients.mailings.include, function(id) {
-	var oldMailing = _.where(CRM.crmMailing.civiMails, {id: '' + id});
-	if(oldMailing.length) {
-          if (!first) {
-            names = names + ', ';
-          }
-          names = names + oldMailing[0].name;
-          first = false;
-	}
+        if (!first) {
+          names = names + ', ';
+        }
+        var oldMailing = _.where(CRM.crmMailing.civiMails, {id: '' + id});
+        names = names + oldMailing[0].name;
+        first = false;
       });
       return names;
     };
@@ -30,24 +26,20 @@
       var first = true;
       var names = '';
       _.each(mailing.recipients.groups.exclude, function(id) {
+        if (!first) {
+          names = names + ', ';
+        }
         var group = _.where(CRM.crmMailing.groupNames, {id: '' + id});
-	if(group.length) {
-          if (!first) {
-            names = names + ', ';
-          }
-          names = names + group[0].title;
-          first = false;
-	}
+        names = names + group[0].title;
+        first = false;
       });
       _.each(mailing.recipients.mailings.exclude, function(id) {
+        if (!first) {
+          names = names + ', ';
+        }
         var oldMailing = _.where(CRM.crmMailing.civiMails, {id: '' + id});
-	if(oldMailing.length) {
-          if (!first) {
-            names = names + ', ';
-          }
-          names = names + oldMailing[0].name;
-          first = false;
-	}
+        names = names + oldMailing[0].name;
+        first = false;
       });
       return names;
     };

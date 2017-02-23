@@ -549,7 +549,7 @@ WHERE  cacheKey LIKE %1
     $cacheKey = "civicrm search {$qfKey}";
 
     $query = "
-SELECT count(*)
+SELECT count(id)
 FROM   civicrm_prevnext_cache
 WHERE  cacheKey LIKE %1
   AND  is_selected = 1

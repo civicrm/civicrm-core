@@ -143,7 +143,7 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
     // also reset the acl cache
     $config = CRM_Core_Config::singleton();
     if (!$config->doNotResetCache) {
-      // CRM_ACL_BAO_Cache::resetCache();
+      CRM_ACL_BAO_Cache::resetCache();
     }
 
     // reset the group contact cache for all group(s)
@@ -245,7 +245,7 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
     // also reset the acl cache
     $config = CRM_Core_Config::singleton();
     if (!$config->doNotResetCache) {
-      // CRM_ACL_BAO_Cache::resetCache();
+      CRM_ACL_BAO_Cache::resetCache();
     }
 
     // reset the group contact cache for all group(s)
