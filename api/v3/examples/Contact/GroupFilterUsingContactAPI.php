@@ -9,11 +9,12 @@
  */
 function contact_get_example() {
   $params = array(
-    'filter.group_id' => array(
-      '0' => 1,
-      '1' => 26,
+    'group' => array(
+      'IN' => array(
+        '0' => 'Test group C',
+        '1' => 'Test group D',
+      ),
     ),
-    'contact_type' => 'Individual',
   );
 
   try{
@@ -53,8 +54,8 @@ function contact_get_expectedresult() {
         'contact_id' => '3',
         'contact_type' => 'Individual',
         'contact_sub_type' => '',
-        'sort_name' => 'man2@yahoo.com',
-        'display_name' => 'man2@yahoo.com',
+        'sort_name' => 'Groupmember, Test2',
+        'display_name' => 'Test2 Groupmember',
         'do_not_email' => 0,
         'do_not_phone' => 0,
         'do_not_mail' => 0,
@@ -69,9 +70,9 @@ function contact_get_expectedresult() {
         'preferred_communication_method' => '',
         'preferred_language' => 'en_US',
         'preferred_mail_format' => 'Both',
-        'first_name' => '',
+        'first_name' => 'Test2',
         'middle_name' => '',
-        'last_name' => '',
+        'last_name' => 'Groupmember',
         'prefix_id' => '',
         'suffix_id' => '',
         'formal_title' => '',
@@ -101,7 +102,7 @@ function contact_get_expectedresult() {
         'phone_type_id' => '',
         'phone' => '',
         'email_id' => '1',
-        'email' => 'man2@yahoo.com',
+        'email' => 'test@example.org',
         'on_hold' => 0,
         'im_id' => '',
         'provider_id' => '',
@@ -125,7 +126,7 @@ function contact_get_expectedresult() {
 
 /*
 * This example has been generated from the API test suite.
-* The test that created it is called "testGetGroupIDFromContact"
+* The test that created it is called "testContactGetWithGroupTitleMultipleGroups"
 * and can be found at:
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ContactTest.php
 *

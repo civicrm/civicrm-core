@@ -390,7 +390,7 @@ function civicrm_api3_job_fetch_activities($params) {
   }
   catch (Exception $e) {
     $lock->release();
-    return civicrm_api3_create_error('Process Activities failed');
+    return civicrm_api3_create_error($e->getMessage());
   }
 }
 
