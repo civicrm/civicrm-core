@@ -1228,4 +1228,45 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     return array($contribution, $financialAccount);
   }
 
+  /**
+   * function to test card_type and pan truncation.
+   */
+  public function testCardTypeAndPanTruncation() {
+    $contactId = $this->individualCreate();
+    $params = array(
+      'contact_id' => $contactId,
+      'receive_date' => '2016-01-20',
+      'total_amount' => 100,
+      'financial_type_id' => 1,
+      'payment_instrument_id' => 1,
+      'credit_card_type' => 'Visa',
+      'credit_card_number' => 4111111125484567,
+    );
+    $contribution = CRM_Contribute_BAO_Contribution::create($params);
+    $lastFinancialTrxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contribution->id, 'DESC');
+    $financialTrxn = $this->callAPISuccessGetSingle(
+      'FinancialTrxn',
+      array(
+        'id' => $lastFinancialTrxnId['financialTrxnId'],
+        'return' => array('card_type', 'pan_truncation'),
+      )
+    );
+    $this->assertEquals(CRM_Utils_Array::value('card_type', $financialTrxn), 1);
+    $this->assertEquals(CRM_Utils_Array::value('pan_truncation', $financialTrxn), 4567);
+    $params = array(
+      'id' => $contribution->id,
+      'credit_card_number' => 4111548725482345,
+    );
+    $contribution = CRM_Contribute_BAO_Contribution::create($params);
+    $financialTrxn = $this->callAPISuccessGetSingle(
+      'FinancialTrxn',
+      array(
+        'id' => $lastFinancialTrxnId['financialTrxnId'],
+        'return' => array('card_type', 'pan_truncation'),
+      )
+    );
+    $this->assertEquals(CRM_Utils_Array::value('card_type', $financialTrxn), 1);
+    $this->assertEquals(CRM_Utils_Array::value('pan_truncation', $financialTrxn), 2345);
+  }
+
 }

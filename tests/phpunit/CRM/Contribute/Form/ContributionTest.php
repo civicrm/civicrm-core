@@ -851,4 +851,104 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
     $this->assertTrue(empty($lineItem['tax_amount']));
   }
 
+  /**
+   * function to test card_type and pan truncation.
+   */
+  public function testCardTypeAndPanTruncation() {
+    $form = new CRM_Contribute_Form_Contribution();
+
+    $form->testSubmit(
+      array(
+        'total_amount' => 100,
+        'financial_type_id' => 3,
+        'receive_date' => '04/21/2015',
+        'receive_date_time' => '11:27PM',
+        'contact_id' => $this->_individualId,
+        'payment_instrument_id' => array_search('Credit Card', $this->paymentInstruments),
+        'contribution_status_id' => 1,
+        'credit_card_type' => 'Visa',
+        'credit_card_number' => 4111111125484567,
+        'price_set_id' => 0,
+      ),
+      CRM_Core_Action::ADD
+    );
+    $contribution = $this->callAPISuccessGetSingle('Contribution',
+      array(
+        'contact_id' => $this->_individualId,
+        'return' => array('id'),
+      )
+    );
+    $lastFinancialTrxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contribution['id'], 'DESC');
+    $financialTrxn = $this->callAPISuccessGetSingle(
+      'FinancialTrxn',
+      array(
+        'id' => $lastFinancialTrxnId['financialTrxnId'],
+        'return' => array('card_type', 'pan_truncation'),
+      )
+    );
+    $this->assertEquals(CRM_Utils_Array::value('card_type', $financialTrxn), 1);
+    $this->assertEquals(CRM_Utils_Array::value('pan_truncation', $financialTrxn), 4567);
+  }
+
+  /**
+   * function to test card_type and pan truncation.
+   */
+  public function testCardTypeAndPanTruncationLiveMode() {
+    $form = new CRM_Contribute_Form_Contribution();
+    $form->_mode = 'Live';
+    $error = FALSE;
+    $form->testSubmit(
+      array(
+        'total_amount' => 50,
+        'financial_type_id' => 1,
+        'receive_date' => '04/21/2015',
+        'receive_date_time' => '11:27PM',
+        'contact_id' => $this->_individualId,
+        'credit_card_number' => 4444333322221111,
+        'payment_instrument_id' => array_search('Credit Card', $this->paymentInstruments),
+        'cvv2' => 123,
+        'credit_card_exp_date' => array(
+          'M' => 9,
+          'Y' => 2025,
+        ),
+        'credit_card_type' => 'Visa',
+        'billing_first_name' => 'Junko',
+        'billing_middle_name' => '',
+        'billing_last_name' => 'Adams',
+        'billing_street_address-5' => '790L Lincoln St S',
+        'billing_city-5' => 'Maryknoll',
+        'billing_state_province_id-5' => 1031,
+        'billing_postal_code-5' => 10545,
+        'billing_country_id-5' => 1228,
+        'frequency_interval' => 1,
+        'frequency_unit' => 'month',
+        'installments' => '',
+        'hidden_AdditionalDetail' => 1,
+        'hidden_Premium' => 1,
+        'from_email_address' => '"civi45" <civi45@civicrm.com>',
+        'receipt_date' => '',
+        'receipt_date_time' => '',
+        'payment_processor_id' => $this->paymentProcessorID,
+        'currency' => 'USD',
+        'source' => 'bob sled race',
+      ),
+      CRM_Core_Action::ADD
+    );
+    $contribution = $this->callAPISuccessGetSingle('Contribution',
+      array(
+        'contact_id' => $this->_individualId,
+      )
+    );
+    $lastFinancialTrxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contribution['id'], 'DESC');
+    $financialTrxn = $this->callAPISuccessGetSingle(
+      'FinancialTrxn',
+      array(
+        'id' => $lastFinancialTrxnId['financialTrxnId'],
+        'return' => array('card_type', 'pan_truncation'),
+      )
+    );
+    $this->assertEquals(CRM_Utils_Array::value('card_type', $financialTrxn), 1);
+    $this->assertEquals(CRM_Utils_Array::value('pan_truncation', $financialTrxn), 1111);
+  }
+
 }
