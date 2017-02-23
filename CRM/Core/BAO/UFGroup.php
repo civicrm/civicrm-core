@@ -518,6 +518,9 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
     );
 
     $formattedField = CRM_Utils_Date::addDateMetadataToField($fieldMetaData, $formattedField);
+    if (in_array($name, array_keys(self::getNonUpgradedDateFields()))) {
+      $formattedField['is_legacy_date'] = 1;
+    }
 
     //adding custom field property
     if (substr($field->field_name, 0, 6) == 'custom' ||
@@ -1905,6 +1908,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     $addressOptions = CRM_Core_BAO_Setting::valueOptions(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
       'address_options', TRUE, NULL, TRUE
     );
+    $legacyHandledDateFields = self::getNonUpgradedDateFields();
 
     if (substr($fieldName, 0, 14) === 'state_province') {
       $form->addChainSelect($name, array('label' => $title, 'required' => $required));
@@ -1967,15 +1971,8 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
         }
       }
     }
-    elseif (($fieldName === 'birth_date') || ($fieldName === 'deceased_date')) {
-      $form->addDate($name, $title, $required, array('formatType' => 'birth'));
-    }
-    elseif (in_array($fieldName, array(
-      'membership_start_date',
-      'membership_end_date',
-      'join_date',
-    ))) {
-      $form->addDate($name, $title, $required, array('formatType' => 'activityDate'));
+    elseif (isset($legacyHandledDateFields[$fieldName])) {
+      $form->addDate($name, $title, $required, array('formatType' => $legacyHandledDateFields[$fieldName]));
     }
     elseif (CRM_Utils_Array::value('name', $field) == 'membership_type') {
       list($orgInfo, $types) = CRM_Member_BAO_MembershipType::getMembershipTypeInfo();
@@ -2151,14 +2148,6 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
         CRM_Core_BAO_CustomField::addQuickFormElement($form, $name, $customFieldID, $required, $search, $title);
       }
     }
-    elseif (in_array($fieldName, array(
-      'receive_date',
-      'receipt_date',
-      'thankyou_date',
-      'cancel_date',
-    ))) {
-      $form->addDateTime($name, $title, $required, array('formatType' => 'activityDateTime'));
-    }
     elseif ($fieldName == 'send_receipt') {
       $form->addElement('checkbox', $name, $title);
     }
@@ -2230,9 +2219,6 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
         ) + CRM_Contribute_PseudoConstant::contributionPage(), $required, 'class="big"'
       );
     }
-    elseif ($fieldName == 'participant_register_date') {
-      $form->addDateTime($name, $title, $required, array('formatType' => 'activityDateTime'));
-    }
     elseif ($fieldName == 'activity_status_id') {
       $form->add('select', $name, $title,
         array(
@@ -2246,9 +2232,6 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
           '' => ts('- select -'),
         ) + CRM_Campaign_PseudoConstant::engagementLevel(), $required
       );
-    }
-    elseif ($fieldName == 'activity_date_time') {
-      $form->addDateTime($name, $title, $required, array('formatType' => 'activityDateTime'));
     }
     elseif ($fieldName == 'participant_status') {
       $cond = NULL;
@@ -2345,6 +2328,30 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
         $form->addRule($name, ts('Please enter a valid %1', array(1 => $title)), $rule);
       }
     }
+  }
+
+  /**
+   * Get fields that have not been upgraded to use datepicker.
+   *
+   * Fields that use the old code have jcalendar in the tpl and
+   * the form uses a customised format. We are moving towards datepicker
+   * which among other things passes dates back and forth using a standardised
+   * format. Remove fields from here as they are tested and converted.
+   */
+  static public function getNonUpgradedDateFields() {
+    return array(
+      'birth_date' => 'birth',
+      'deceased_date' => 'birth',
+      'membership_start_date' => 'activityDate',
+      'membership_end_date' => 'activityDate',
+      'join_date' => 'activityDate',
+      'receive_date' => 'activityDateTime',
+      'receipt_date' => 'activityDateTime',
+      'thankyou_date' => 'activityDateTime',
+      'cancel_date' => 'activityDateTime',
+      'participant_register_date' => 'activityDateTime',
+      'activity_date_time' => 'activityDateTime',
+    );
   }
 
   /**

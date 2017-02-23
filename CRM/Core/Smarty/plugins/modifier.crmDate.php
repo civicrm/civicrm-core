@@ -57,7 +57,7 @@ function smarty_modifier_crmDate($dateString, $dateFormat = NULL, $onlyTime = FA
       $dateFormat = $config->dateformatTime;
     }
     // Handle possibility we only have a date function style date format.
-    if ($dateFormat && !stristr('%', $dateFormat)) {
+    if ($dateFormat && !stristr($dateFormat, '%')) {
       return date($dateFormat, strtotime($dateString));
     }
 
