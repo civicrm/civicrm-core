@@ -712,8 +712,20 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
       '',
       $config->userFrameworkBaseURL
     );
+    // CRM-19453 revisited. Under Windows, the pattern wasn't recognised.
+    // This is the original pattern, but it doesn't work under Windows.
+    // By setting the pattern to the one used before the change first and only
+    // changing it means that the change code only affects Windows users.
+    $pattern = '|/media/civicrm/.*$|';
+    if (DIRECTORY_SEPARATOR == '\\') {
+      // This regular expression will handle Windows as well as Linux
+      // and any combination of forward and back slashes in directory
+      // separators.  We only apply it if the directory separator is the one
+      // used by Windows.
+      $pattern = '|[\\\\/]media[\\\\/]civicrm[\\\\/].*$|';
+    }
     $siteRoot = preg_replace(
-      '|/media/civicrm/.*$|',
+      $pattern,
       '',
       $config->imageUploadDir
     );
