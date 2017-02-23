@@ -93,12 +93,15 @@
           ( $form.formName neq 'Confirm' )  AND
           ( $form.formName neq 'ThankYou' ) }
             {include file="CRM/common/jcalendar.tpl" elementName=$profileFieldName}
-          {elseif ( $profileFieldName|substr:-5:5 eq '_date' ) }
+          {elseif $field.is_datetime_field && $action == 4}
             {assign var="date_value" value=$form.$profileFieldName.value}
             <span class="crm-frozen-field">
-                  {$date_value|date_format:"%Y-%m-%d"|crmDate:$config->dateformatshortdate}
-              <input type="hidden" name="{$form.$profileFieldName.name}" value="{$form.$profileFieldName.value}" id="{$form.$profileFieldName.name}">
-                </span>
+              {$date_value|date_format:"%Y-%m-%d"|crmDate:$field.php_datetime_format}
+              <input type="hidden"
+               name="{$form.$profileFieldName.name}"
+               value="{$form.$profileFieldName.value}" id="{$form.$profileFieldName.name}"
+              >
+            </span>
           {elseif $profileFieldName|substr:0:5 eq 'phone'}
             {assign var="phone_ext_field" value=$profileFieldName|replace:'phone':'phone_ext'}
             {if $prefix}{$form.$prefix.$profileFieldName.html}{else}{$form.$profileFieldName.html}{/if}
