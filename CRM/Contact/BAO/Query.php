@@ -2966,7 +2966,6 @@ class CRM_Contact_BAO_Query {
     else {
       $statii[] = "'Added'";
     }
-
     $groupClause = array();
     if (count($regularGroupIDs) || empty($value)) {
       $groupIds = implode(',', (array) $regularGroupIDs);

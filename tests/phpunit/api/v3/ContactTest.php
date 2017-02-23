@@ -3166,4 +3166,173 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     }
   }
 
+  /**
+   * CRM-20144 Verify that passing title of group works as well as id
+   * Tests the following formats
+   * contact.get group='title1'
+   * contact.get group=id1
+   */
+  public function testContactGetWithGroupTitle() {
+    // Set up a contact, asser that they were created.
+    $contact_params = array(
+      'contact_type' => 'Individual',
+      'first_name' => 'Test2',
+      'last_name' => 'Groupmember',
+      'email' => 'test@example.org',
+    );
+    $create_contact = $this->callApiSuccess('Contact', 'create', $contact_params);
+    $created_contact_id = $create_contact['id'];
+    // Set up multiple groups, add the contact to the groups.
+    $test_groups = array('Test group C', 'Test group D');
+    foreach ($test_groups as $title) {
+      $group_params = array(
+        'title' => $title,
+        'created_id' => $created_contact_id,
+      );
+      $create_group = $this->callApiSuccess('Group', 'create', $group_params);
+      $created_group_id = $create_group['id'];
+
+      // Add contact to the new group.
+      $group_contact_params = array(
+        'contact_id' => $created_contact_id,
+        'group_id' => $create_group['id'],
+      );
+      $create_group_contact = $this->callApiSuccess('GroupContact', 'create', $group_contact_params);
+      $contact_get = $this->callAPISuccess('contact', 'get', array('group' => $title, 'return' => 'group'));
+      $this->assertEquals(1, $contact_get['count']);
+      $this->assertEquals($created_contact_id, $contact_get['id']);
+      $contact_groups = explode(',', $contact_get['values'][$created_contact_id]['groups']);
+      $this->assertContains((string) $create_group['id'], $contact_groups);
+      $contact_get2 = $this->callAPISuccess('contact', 'get', array('group' => $created_group_id, 'return' => 'group'));
+      $this->assertEquals($created_contact_id, $contact_get2['id']);
+      $contact_groups2 = explode(',', $contact_get2['values'][$created_contact_id]['groups']);
+      $this->assertContains((string) $create_group['id'], $contact_groups2);
+      $this->callAPISuccess('group', 'delete', array('id' => $created_group_id));
+    }
+    $this->callAPISuccess('contact', 'delete', array('id' => $created_contact_id, 'skip_undelete' => TRUE));
+  }
+
+  /**
+   * CRM-20144 Verify that passing title of group works as well as id
+   * Tests the following formats
+   * contact.get group=array('title1', title1)
+   * contact.get group=array('IN' => array('title1', 'title2)
+   */
+  public function testContactGetWithGroupTitleMultipleGroups() {
+    // Set up a contact, asser that they were created.
+    $contact_params = array(
+      'contact_type' => 'Individual',
+      'first_name' => 'Test2',
+      'last_name' => 'Groupmember',
+      'email' => 'test@example.org',
+    );
+    $create_contact = $this->callApiSuccess('Contact', 'create', $contact_params);
+    $created_contact_id = $create_contact['id'];
+    $createdGroupsTitles = $createdGroupsIds = array();
+    // Set up multiple groups, add the contact to the groups.
+    $test_groups = array('Test group C', 'Test group D');
+    foreach ($test_groups as $title) {
+      $group_params = array(
+        'title' => $title,
+        'created_id' => $created_contact_id,
+      );
+      $create_group = $this->callApiSuccess('Group', 'create', $group_params);
+      $created_group_id = $create_group['id'];
+      $createdGroupsIds[] = $create_group['id'];
+      $createdGroupTitles[] = $title;
+      // Add contact to the new group.
+      $group_contact_params = array(
+        'contact_id' => $created_contact_id,
+        'group_id' => $create_group['id'],
+      );
+      $create_group_contact = $this->callApiSuccess('GroupContact', 'create', $group_contact_params);
+    }
+    $contact_get = $this->callAPISuccess('contact', 'get', array('group' => $createdGroupTitles, 'return' => 'group'));
+    $this->assertEquals(1, $contact_get['count']);
+    $this->assertEquals($created_contact_id, $contact_get['id']);
+    $contact_groups = explode(',', $contact_get['values'][$created_contact_id]['groups']);
+    foreach ($createdGroupsIds as $id) {
+      $this->assertContains((string) $id, $contact_groups);
+    }
+    $contact_get2 = $this->callAPISuccess('contact', 'get', array('group' => array('IN' => $createdGroupTitles), 'return' => 'group'));
+    $this->assertEquals($created_contact_id, $contact_get2['id']);
+    $contact_groups2 = explode(',', $contact_get2['values'][$created_contact_id]['groups']);
+    foreach ($createdGroupsIds as $id) {
+      $this->assertContains((string) $id, $contact_groups2);
+    }
+    foreach ($createdGroupsIds as $id) {
+      $this->callAPISuccess('group', 'delete', array('id' => $id));
+    }
+    $this->callAPISuccess('contact', 'delete', array('id' => $created_contact_id, 'skip_undelete' => TRUE));
+  }
+
+  /**
+   * CRM-20144 Verify that passing title of group works as well as id
+   * Tests the following formats
+   * contact.get group=array('title1' => 1)
+   * contact.get group=array('titke1' => 1, 'title2' => 1)
+   * contact.get group=array('id1' => 1)
+   * contact.get group=array('id1' => 1, id2 => 1)
+   */
+  public function testContactGetWithGroupTitleMultipleGroupsLegacyFormat() {
+    // Set up a contact, asser that they were created.
+    $contact_params = array(
+      'contact_type' => 'Individual',
+      'first_name' => 'Test2',
+      'last_name' => 'Groupmember',
+      'email' => 'test@example.org',
+    );
+    $create_contact = $this->callApiSuccess('Contact', 'create', $contact_params);
+    $created_contact_id = $create_contact['id'];
+    $createdGroupsTitles = $createdGroupsIds = array();
+    // Set up multiple groups, add the contact to the groups.
+    $test_groups = array('Test group C', 'Test group D');
+    foreach ($test_groups as $title) {
+      $group_params = array(
+        'title' => $title,
+        'created_id' => $created_contact_id,
+      );
+      $create_group = $this->callApiSuccess('Group', 'create', $group_params);
+      $created_group_id = $create_group['id'];
+      $createdGroupsIds[] = $create_group['id'];
+      $createdGroupTitles[] = $title;
+      // Add contact to the new group.
+      $group_contact_params = array(
+        'contact_id' => $created_contact_id,
+        'group_id' => $create_group['id'],
+      );
+      $create_group_contact = $this->callApiSuccess('GroupContact', 'create', $group_contact_params);
+    }
+    $contact_get = $this->callAPISuccess('contact', 'get', array('group' => array($createdGroupTitles[0] => 1), 'return' => 'group'));
+    $this->assertEquals(1, $contact_get['count']);
+    $this->assertEquals($created_contact_id, $contact_get['id']);
+    $contact_groups = explode(',', $contact_get['values'][$created_contact_id]['groups']);
+    foreach ($createdGroupsIds as $id) {
+      $this->assertContains((string) $id, $contact_groups);
+    }
+    $contact_get2 = $this->callAPISuccess('contact', 'get', array('group' => array($createdGroupTitles[0] => 1, $createdGroupTitles[1] => 1), 'return' => 'group'));
+    $this->assertEquals(1, $contact_get2['count']);
+    $this->assertEquals($created_contact_id, $contact_get2['id']);
+    $contact_groups2 = explode(',', $contact_get2['values'][$created_contact_id]['groups']);
+    foreach ($createdGroupsIds as $id) {
+      $this->assertContains((string) $id, $contact_groups2);
+    }
+    $contact_get3 = $this->callAPISuccess('contact', 'get', array('group' => array($createdGroupsIds[0] => 1), 'return' => 'group'));
+    $this->assertEquals($created_contact_id, $contact_get3['id']);
+    $contact_groups3 = explode(',', $contact_get3['values'][$created_contact_id]['groups']);
+    foreach ($createdGroupsIds as $id) {
+      $this->assertContains((string) $id, $contact_groups3);
+    }
+    $contact_get4 = $this->callAPISuccess('contact', 'get', array('group' => array($createdGroupsIds[0] => 1, $createdGroupsIds[1] => 1), 'return' => 'group'));
+    $this->assertEquals($created_contact_id, $contact_get4['id']);
+    $contact_groups4 = explode(',', $contact_get4['values'][$created_contact_id]['groups']);
+    foreach ($createdGroupsIds as $id) {
+      $this->assertContains((string) $id, $contact_groups4);
+    }
+    foreach ($createdGroupsIds as $id) {
+      $this->callAPISuccess('group', 'delete', array('id' => $id));
+    }
+    $this->callAPISuccess('contact', 'delete', array('id' => $created_contact_id, 'skip_undelete' => TRUE));
+  }
+
 }
