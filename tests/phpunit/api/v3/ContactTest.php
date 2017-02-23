@@ -984,8 +984,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    */
   public function testGetGroupIDFromContact() {
     $groupId = $this->groupCreate();
-    $description = "Get all from group and display contacts.";
-    $subFile = "GroupFilterUsingContactAPI";
     $params = array(
       'email' => 'man2@yahoo.com',
       'contact_type' => 'Individual',
@@ -996,46 +994,46 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->callAPISuccess('contact', 'create', $params);
     // testing as integer
     $params = array(
-      'group' => $groupId,
+      'filter.group_id' => $groupId,
       'contact_type' => 'Individual',
     );
-    $result = $this->callAPIAndDocument('contact', 'get', $params, __FUNCTION__, __FILE__, $description, $subFile);
+    $result = $this->callAPISuccess('contact', 'get', $params);
     $this->assertEquals(1, $result['count']);
     // group 26 doesn't exist, but we can still search contacts in it.
     $params = array(
-      'group' => 26,
+      'filter.group_id' => 26,
       'contact_type' => 'Individual',
     );
     $this->callAPISuccess('contact', 'get', $params);
     // testing as string
     $params = array(
-      'group' => array($groupId, 26),
+      'filter.group_id' => "$groupId, 26",
       'contact_type' => 'Individual',
     );
-    $result = $this->callAPIAndDocument('contact', 'get', $params, __FUNCTION__, __FILE__, $description, $subFile);
+    $result = $this->callAPISuccess('contact', 'get', $params);
     $this->assertEquals(1, $result['count']);
     $params = array(
-      'group' => array(26, 27),
+      'filter.group_id' => "26,27",
       'contact_type' => 'Individual',
     );
     $this->callAPISuccess('contact', 'get', $params);
 
     // testing as string
     $params = array(
-      'group' => array('IN' => array($groupId, 26)),
+      'filter.group_id' => array($groupId, 26),
       'contact_type' => 'Individual',
     );
-    $result = $this->callAPIAndDocument('contact', 'get', $params, __FUNCTION__, __FILE__, $description, $subFile);
+    $result = $this->callAPISuccess('contact', 'get', $params);
     $this->assertEquals(1, $result['count']);
 
     //test in conjunction with other criteria
     $params = array(
-      'group' => array($groupId, 26),
+      'filter.group_id' => array($groupId, 26),
       'contact_type' => 'Organization',
     );
     $this->callAPISuccess('contact', 'get', $params);
     $params = array(
-      'group' => array(26, 27),
+      'filter.group_id' => array(26, 27),
       'contact_type' => 'Individual',
     );
     $result = $this->callAPISuccess('contact', 'get', $params);
@@ -3219,6 +3217,8 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * contact.get group=array('IN' => array('title1', 'title2)
    */
   public function testContactGetWithGroupTitleMultipleGroups() {
+    $description = "Get all from group and display contacts.";
+    $subFile = "GroupFilterUsingContactAPI";
     // Set up a contact, asser that they were created.
     $contact_params = array(
       'contact_type' => 'Individual',
@@ -3254,6 +3254,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     foreach ($createdGroupsIds as $id) {
       $this->assertContains((string) $id, $contact_groups);
     }
+    $contact_get2 = $this->callAPIAndDocument('contact', 'get', array('group' => array('IN' => $createdGroupTitles)), __FUNCTION__, __FILE__, $description, $subFile);
     $contact_get2 = $this->callAPISuccess('contact', 'get', array('group' => array('IN' => $createdGroupTitles), 'return' => 'group'));
     $this->assertEquals($created_contact_id, $contact_get2['id']);
     $contact_groups2 = explode(',', $contact_get2['values'][$created_contact_id]['groups']);
