@@ -8,7 +8,6 @@
 <xi:include href="SubscriptionHistory.xml"  parse="xml" />
 <xi:include href="GroupContact.xml"         parse="xml" />
 <xi:include href="GroupContactCache.xml"    parse="xml" />
-<xi:include href="ACLContactCache.xml"      parse="xml" />
 <xi:include href="GroupNesting.xml"         parse="xml" />
 <xi:include href="GroupOrganization.xml"    parse="xml" />
 <xi:include href="Relationship.xml"         parse="xml" />

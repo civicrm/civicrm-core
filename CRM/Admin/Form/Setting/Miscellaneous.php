@@ -45,6 +45,7 @@ class CRM_Admin_Form_Setting_Miscellaneous extends CRM_Admin_Form_Setting {
     'doNotAttachPDFReceipt' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'secondDegRelPermissions' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'checksum_timeout' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+    'acl_contact_cache_validity' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'recaptchaOptions' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'recaptchaPublicKey' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'recaptchaPrivateKey' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
@@ -89,6 +90,7 @@ class CRM_Admin_Form_Setting_Miscellaneous extends CRM_Admin_Form_Setting {
 
     parent::buildQuickForm();
     $this->addRule('checksum_timeout', ts('Value should be a positive number'), 'positiveInteger');
+    $this->addRule('acl_contact_cache_validity', ts('Value should be a positive number'), 'positiveInteger');
   }
 
   /**

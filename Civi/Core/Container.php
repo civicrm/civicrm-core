@@ -178,6 +178,8 @@ class Container {
     $container->setDefinition('pear_mail', new Definition('Mail'))
       ->setFactoryClass('CRM_Utils_Mail')->setFactoryMethod('createMailer');
 
+    $container->setDefinition('acl_contact_cache', new Definition('Civi\ACL\ContactCache'));
+
     if (empty(\Civi::$statics[__CLASS__]['boot'])) {
       throw new \RuntimeException("Cannot initialize container. Boot services are undefined.");
     }

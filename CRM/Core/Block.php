@@ -243,10 +243,6 @@ class CRM_Core_Block {
           ) {
             $hasAccess = FALSE;
           }
-          //validate across edit/view - CRM-5666
-          if ($hasAccess && ($id == self::ADD)) {
-            $hasAccess = CRM_Core_Permission::giveMeAllACLs();
-          }
           if (!$hasAccess) {
             continue;
           }
@@ -347,9 +343,7 @@ class CRM_Core_Block {
 
     if (!($shortCuts)) {
       if (CRM_Core_Permission::check('add contacts')) {
-        if (CRM_Core_Permission::giveMeAllACLs()) {
-          $shortCuts = CRM_Contact_BAO_ContactType::getCreateNewList();
-        }
+        $shortCuts = CRM_Contact_BAO_ContactType::getCreateNewList();
       }
 
       // new activity (select target contact)
@@ -596,10 +590,6 @@ class CRM_Core_Block {
         !CRM_Core_Permission::check('edit groups')
       ) {
         $hasAccess = FALSE;
-      }
-      //validate across edit/view - CRM-5666
-      if ($hasAccess) {
-        $hasAccess = CRM_Core_Permission::giveMeAllACLs();
       }
       if (!$hasAccess) {
         return NULL;

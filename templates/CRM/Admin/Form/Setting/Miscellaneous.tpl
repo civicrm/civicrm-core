@@ -35,6 +35,16 @@
     </table>
 
     <table class="form-layout">
+        <tr class="crm-miscellaneous-form-block-acl_contact_cache_validity">
+            <td class="label">{$form.acl_contact_cache_validity.label}</td>
+            <td>{$form.acl_contact_cache_validity.html}<br />
+                <span class="description">
+                    {ts}The number of minutes before an ACL Contact Cache refresh is done.{/ts}<br>
+                    {ts}This is default to 3 hours. This means that it would take up to 3 hours before a user with limited privileges would
+                    see new contacts.{/ts}<br>
+                    {ts}If this timeout is too long you can also set it to 1 minute meaning users with limited priviliges would see new contacts after a minute{/ts}
+                </span></td>
+        </tr>
         <tr class="crm-miscellaneous-form-block-contact_undelete">
           <td class="label">{$form.contact_undelete.label}</td>
           <td>

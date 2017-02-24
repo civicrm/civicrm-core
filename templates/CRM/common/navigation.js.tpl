@@ -25,32 +25,30 @@
 *}// http://civicrm.org/licensing
 {capture assign=menuMarkup}{strip}
   <ul id="civicrm-menu">
-    {if call_user_func(array('CRM_Core_Permission','giveMeAllACLs'))}
-      <li id="crm-qsearch" class="menumain">
-        <form action="{crmURL p='civicrm/contact/search/advanced' h=0 }" name="search_block" id="id_search_block" method="post">
-          <div id="quickSearch">
-            <input type="text" class="form-text" id="sort_name_navigation" placeholder="{ts}Contacts{/ts}" name="sort_name" style="width: 6em;" />
-            <input type="text" id="sort_contact_id" style="display: none" />
-            <input type="hidden" name="hidden_location" value="1" />
-            <input type="hidden" name="qfKey" value="" />
-            <div style="height:1px; overflow:hidden;"><input type="submit" value="{ts}Go{/ts}" name="_qf_Advanced_refresh" class="crm-form-submit default" /></div>
-          </div>
-        </form>
-        <ul>
-          <li><label class="crm-quickSearchField"><input type="radio" data-tablename="cc" checked="checked" value="" name="quickSearchField"> {if $includeEmail}{ts}Name/Email{/ts}{else}{ts}Name{/ts}{/if}</label></li>
-          <li><label class="crm-quickSearchField"><input type="radio" data-tablename="cc" value="contact_id" name="quickSearchField"> {ts}Contact ID{/ts}</label></li>
-          <li><label class="crm-quickSearchField"><input type="radio" data-tablename="cc" value="external_identifier" name="quickSearchField"> {ts}External ID{/ts}</label></li>
-          <li><label class="crm-quickSearchField"><input type="radio" data-tablename="cc" value="first_name" name="quickSearchField"> {ts}First Name{/ts}</label></li>
-          <li><label class="crm-quickSearchField"><input type="radio" data-tablename="cc" value="last_name" name="quickSearchField"> {ts}Last Name{/ts}</label></li>
-          <li><label class="crm-quickSearchField"><input type="radio" data-tablename="eml" value="email" name="quickSearchField"> {ts}Email{/ts}</label></li>
-          <li><label class="crm-quickSearchField"><input type="radio" data-tablename="phe" value="phone_numeric" name="quickSearchField"> {ts}Phone{/ts}</label></li>
-          <li><label class="crm-quickSearchField"><input type="radio" data-tablename="sts" value="street_address" name="quickSearchField"> {ts}Street Address{/ts}</label></li>
-          <li><label class="crm-quickSearchField"><input type="radio" data-tablename="sts" value="city" name="quickSearchField"> {ts}City{/ts}</label></li>
-          <li><label class="crm-quickSearchField"><input type="radio" data-tablename="sts" value="postal_code" name="quickSearchField"> {ts}Postal Code{/ts}</label></li>
-          <li><label class="crm-quickSearchField"><input type="radio" data-tablename="cc" value="job_title" name="quickSearchField"> {ts}Job Title{/ts}</label></li>
-        </ul>
-      </li>
-    {/if}
+    <li id="crm-qsearch" class="menumain">
+      <form action="{crmURL p='civicrm/contact/search/advanced' h=0 }" name="search_block" id="id_search_block" method="post">
+        <div id="quickSearch">
+          <input type="text" class="form-text" id="sort_name_navigation" placeholder="{ts}Contacts{/ts}" name="sort_name" style="width: 6em;" />
+          <input type="text" id="sort_contact_id" style="display: none" />
+          <input type="hidden" name="hidden_location" value="1" />
+          <input type="hidden" name="qfKey" value="" />
+          <div style="height:1px; overflow:hidden;"><input type="submit" value="{ts}Go{/ts}" name="_qf_Advanced_refresh" class="crm-form-submit default" /></div>
+        </div>
+      </form>
+      <ul>
+        <li><label class="crm-quickSearchField"><input type="radio" data-tablename="cc" checked="checked" value="" name="quickSearchField"> {if $includeEmail}{ts}Name/Email{/ts}{else}{ts}Name{/ts}{/if}</label></li>
+        <li><label class="crm-quickSearchField"><input type="radio" data-tablename="cc" value="contact_id" name="quickSearchField"> {ts}Contact ID{/ts}</label></li>
+        <li><label class="crm-quickSearchField"><input type="radio" data-tablename="cc" value="external_identifier" name="quickSearchField"> {ts}External ID{/ts}</label></li>
+        <li><label class="crm-quickSearchField"><input type="radio" data-tablename="cc" value="first_name" name="quickSearchField"> {ts}First Name{/ts}</label></li>
+        <li><label class="crm-quickSearchField"><input type="radio" data-tablename="cc" value="last_name" name="quickSearchField"> {ts}Last Name{/ts}</label></li>
+        <li><label class="crm-quickSearchField"><input type="radio" data-tablename="eml" value="email" name="quickSearchField"> {ts}Email{/ts}</label></li>
+        <li><label class="crm-quickSearchField"><input type="radio" data-tablename="phe" value="phone_numeric" name="quickSearchField"> {ts}Phone{/ts}</label></li>
+        <li><label class="crm-quickSearchField"><input type="radio" data-tablename="sts" value="street_address" name="quickSearchField"> {ts}Street Address{/ts}</label></li>
+        <li><label class="crm-quickSearchField"><input type="radio" data-tablename="sts" value="city" name="quickSearchField"> {ts}City{/ts}</label></li>
+        <li><label class="crm-quickSearchField"><input type="radio" data-tablename="sts" value="postal_code" name="quickSearchField"> {ts}Postal Code{/ts}</label></li>
+        <li><label class="crm-quickSearchField"><input type="radio" data-tablename="cc" value="job_title" name="quickSearchField"> {ts}Job Title{/ts}</label></li>
+      </ul>
+    </li>
     {$navigation}
   </ul>
 {/strip}{/capture}// <script> Generated {$smarty.now|date_format:'%d %b %Y %H:%M:%S'}

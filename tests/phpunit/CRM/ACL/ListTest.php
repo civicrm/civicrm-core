@@ -5,7 +5,6 @@
  *
  * This test focuses on testing the (new) ID list-based functions:
  *   CRM_Contact_BAO_Contact_Permission::allowList()
- *   CRM_Contact_BAO_Contact_Permission::relationshipList()
  * @group headless
  */
 class CRM_ACL_ListTest extends CiviUnitTestCase {
@@ -15,7 +14,6 @@ class CRM_ACL_ListTest extends CiviUnitTestCase {
    */
   public function setUp() {
     parent::setUp();
-    // $this->quickCleanup(array('civicrm_acl_contact_cache'), TRUE);
     $this->useTransaction(TRUE);
     $this->allowedContactsACL = array();
   }
@@ -126,9 +124,13 @@ class CRM_ACL_ListTest extends CiviUnitTestCase {
     }
 
     // run this for SECOND DEGREE relations
+    // As we have updated the second degree relationship setting we should refill the AclContactCache
+    $aclContactCache = \Civi::service('acl_contact_cache');
     $config->secondDegRelPermissions = TRUE;
     $this->assertTrue($config->secondDegRelPermissions);
     foreach ($permissions_to_check as $permission => $permission_label) {
+      // First make sure the acl contact cache is refreshed.
+      $aclContactCache->refreshCacheForCurrentUser($permission);
       $result = CRM_Contact_BAO_Contact_Permission::allowList($contacts, $permission);
       sort($result);
 

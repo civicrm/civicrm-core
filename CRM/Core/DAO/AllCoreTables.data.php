@@ -24,7 +24,7 @@
 | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
 +--------------------------------------------------------------------+
 */
-// (GenCodeChecksum:5a41993a5c97a2544f3cc2e4df8879e2)
+// (GenCodeChecksum:014908b645b9d73ffcd52375717e8f58)
 return array(
   'CRM_Core_DAO_AddressFormat' => array(
     'name' => 'AddressFormat',
@@ -116,15 +116,20 @@ return array(
     'class' => 'CRM_ACL_DAO_EntityRole',
     'table' => 'civicrm_acl_entity_role',
   ) ,
+  'CRM_ACL_DAO_Contacts' => array(
+    'name' => 'Contacts',
+    'class' => 'CRM_ACL_DAO_Contacts',
+    'table' => 'civicrm_acl_contacts',
+  ) ,
+  'CRM_ACL_DAO_ContactsValidity' => array(
+    'name' => 'ContactsValidity',
+    'class' => 'CRM_ACL_DAO_ContactsValidity',
+    'table' => 'civicrm_acl_contacts_validity',
+  ) ,
   'CRM_Contact_DAO_Contact' => array(
     'name' => 'Contact',
     'class' => 'CRM_Contact_DAO_Contact',
     'table' => 'civicrm_contact',
-  ) ,
-  'CRM_Contact_DAO_ACLContactCache' => array(
-    'name' => 'ACLContactCache',
-    'class' => 'CRM_Contact_DAO_ACLContactCache',
-    'table' => 'civicrm_acl_contact_cache',
   ) ,
   'CRM_Contact_DAO_RelationshipType' => array(
     'name' => 'RelationshipType',

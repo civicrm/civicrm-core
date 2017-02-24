@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/ACL</base>
+  <class>ContactsValidity</class>
+  <name>civicrm_acl_contacts_validity</name>
+  <comment>List of user and when the it was the last time civicrm_acl_contacts table was updated.</comment>
+  <add>4.7</add>
+  <log>false</log>
+  <field>
+    <name>domain_id</name>
+    <title>UF Match Domain ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Which Domain is this match entry for</comment>
+  </field>
+  <field>
+    <name>user_id</name>
+    <title>Contact ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>FK to civicrm_contact</comment>
+  </field>
+  <field>
+    <name>operation_type</name>
+    <title>Operation</title>
+    <type>int unsigned</type>
+    <length>11</length>
+    <required>true</required>
+    <comment>What operation does this user have permission on?</comment>
+  </field>
+  <field>
+    <name>modified_date</name>
+    <type>timestamp</type>
+    <comment>When was this record for the last modified</comment>
+    <required>true</required>
+    <default>CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP</default>
+    <add>4.3</add>
+  </field>
+  <primaryKey>
+    <name>pk_user_operation_type</name>
+    <fieldName>user_id</fieldName>
+    <fieldName>operation_type</fieldName>
+    <fieldName>domain_id</fieldName>
+  </primaryKey>
+</table>

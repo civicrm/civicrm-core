@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/ACL</base>
+  <class>Contacts</class>
+  <name>civicrm_acl_contacts</name>
+  <comment>List of contacts which a user has permission to view or edit. This table is automaticly populated and used as an inner join to speed up ACL queries.</comment>
+  <add>4.7</add>
+  <log>false</log>
+  <field>
+    <name>domain_id</name>
+    <title>UF Match Domain ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Which Domain is this match entry for</comment>
+  </field>
+  <field>
+    <name>user_id</name>
+    <title>Contact ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>FK to civicrm_contact</comment>
+  </field>
+  <field>
+    <name>contact_id</name>
+    <title>Contact ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>FK to civicrm_contact</comment>
+  </field>
+  <field>
+    <name>operation_type</name>
+    <title>Operation</title>
+    <type>int unsigned</type>
+    <length>11</length>
+    <required>true</required>
+    <comment>What operation does this user have permission on?</comment>
+  </field>
+  <primaryKey>
+    <name>pk_user_contact_operation_type</name>
+    <fieldName>user_id</fieldName>
+    <fieldName>operation_type</fieldName>
+    <fieldName>contact_id</fieldName>
+    <fieldName>domain_id</fieldName>
+  </primaryKey>
+</table>

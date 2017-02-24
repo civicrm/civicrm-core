@@ -929,11 +929,6 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
 
     if ($isTrashed) {
       CRM_Contact_BAO_GroupContactCache::removeContact($contactID);
-      // This has been moved to here from CRM_Contact_BAO_Contact_Permission as that was causing
-      // a table-locking query. It still seems a bit inadequate as it assumes the acl users can't see deleted
-      // but this should not cause any change as long as contacts are not being trashed outside the
-      // main functions for that.
-      CRM_Core_DAO::executeQuery('DELETE FROM civicrm_acl_contact_cache WHERE contact_id = %1', array(1 => array($contactID, 'Integer')));
     }
     else {
       CRM_Contact_BAO_GroupContactCache::opportunisticCacheFlush();
@@ -3425,8 +3420,16 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
   public function addSelectWhereClause() {
     // We always return an array with these keys, even if they are empty,
     // because this tells the query builder that we have considered these fields for acls
+    $cacheSubQuery = array();
+    $aclContactCache = \Civi::service('acl_contact_cache');
+    $aclWhere = $aclContactCache->getAclWhereClause(CRM_Core_Permission::VIEW, 'civicrm_contact');
+    $aclJoin = $aclContactCache->getAclJoin(CRM_Core_Permission::VIEW, 'civicrm_contact');
+    if (strlen($aclWhere)) {
+      $cacheSubQuery[] = " IN (SELECT civicrm_contact.id FROM civicrm_contact {$aclJoin} WHERE {$aclWhere})";
+    }
+
     $clauses = array(
-      'id' => (array) CRM_Contact_BAO_Contact_Permission::cacheSubquery(),
+      'id' => $cacheSubQuery,
       'is_deleted' => CRM_Core_Permission::check('access deleted contacts') ? array() : array('!= 1'),
     );
     CRM_Utils_Hook::selectWhereClause($this, $clauses);

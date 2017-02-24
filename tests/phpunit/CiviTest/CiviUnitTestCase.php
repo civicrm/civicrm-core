@@ -412,6 +412,9 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       CRM_Core_Transaction::forceRollbackIfEnabled();
       \Civi\Core\Transaction\Manager::singleton(TRUE);
 
+      $aclContactCache = \Civi::service('acl_contact_cache');
+      $aclContactCache->clearCache();
+
       $tablesToTruncate = array('civicrm_contact', 'civicrm_uf_match');
       $this->quickCleanup($tablesToTruncate);
       $this->createDomainContacts();
@@ -2974,9 +2977,8 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
       TRUNCATE civicrm_acl_cache
     ");
 
-    CRM_Core_DAO::executeQuery("
-      TRUNCATE civicrm_acl_contact_cache
-    ");
+    $aclContactCache = \Civi::service('acl_contact_cache');
+    $aclContactCache->clearCache();
 
     CRM_Core_DAO::executeQuery("
     INSERT INTO civicrm_acl_entity_role (

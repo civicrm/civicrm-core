@@ -84,10 +84,8 @@ class CRM_ACL_API {
    * @param bool $skipDeleteClause
    *   Don't add delete clause if this is true,.
    *   this means it is handled by generating query
-   * @param bool $skipOwnContactClause
-   *   Do not add 'OR contact_id = $userID' to the where clause.
-   *   This is a hideously inefficient query and should be avoided
-   *   wherever possible.
+   * @param string $tableAlias
+   *   The alias for the civicrm_contact table.
    *
    * @return string
    *   the group where clause for this user
@@ -99,17 +97,16 @@ class CRM_ACL_API {
     $contactID = NULL,
     $onlyDeleted = FALSE,
     $skipDeleteClause = FALSE,
-    $skipOwnContactClause = FALSE
+    $tableAlias = 'contact_a'
   ) {
-    // the default value which is valid for the final AND
     $deleteClause = ' ( 1 ) ';
     if (!$skipDeleteClause) {
       if (CRM_Core_Permission::check('access deleted contacts') and $onlyDeleted) {
-        $deleteClause = '(contact_a.is_deleted)';
+        $deleteClause = "({$tableAlias}.is_deleted)";
       }
       else {
         // CRM-6181
-        $deleteClause = '(contact_a.is_deleted = 0)';
+        $deleteClause = "({$tableAlias}.is_deleted = 0)";
       }
     }
 
@@ -120,29 +117,18 @@ class CRM_ACL_API {
       return $deleteClause;
     }
 
-    if (!$contactID) {
-      $contactID = CRM_Core_Session::getLoggedInContactID();
+    $aclContactCache = \Civi::service('acl_contact_cache');
+    $aclWhere = $aclContactCache->getAclWhereClause($type, $tableAlias);
+    $aclJoin = $aclContactCache->getAclJoin($type, $tableAlias);
+    if (strlen($aclWhere) && strlen($deleteClause)) {
+      $aclWhere .= " AND " . $deleteClause;
+    } elseif (strlen($deleteClause)) {
+      $aclWhere = $deleteClause;
     }
-    $contactID = (int) $contactID;
 
-    $where = implode(' AND ',
-      array(
-        CRM_ACL_BAO_ACL::whereClause($type,
-          $tables,
-          $whereTables,
-          $contactID
-        ),
-        $deleteClause,
-      )
-    );
-
-    // Add permission on self if we really hate our server or have hardly any contacts.
-    if (!$skipOwnContactClause && $contactID && (CRM_Core_Permission::check('edit my contact') ||
-        $type == self::VIEW && CRM_Core_Permission::check('view my contact'))
-    ) {
-      $where = "(contact_a.id = $contactID OR ($where))";
-    }
-    return $where;
+    $tables['civicrm_acl_contacts'] = $aclJoin;
+    $whereTables['civicrm_acl_contacts'] = $aclJoin;
+    return $aclWhere;
   }
 
   /**

@@ -44,10 +44,8 @@
     <input type="hidden" name="qfKey" value="{crmKey name='CRM_Contact_Controller_Search' addSequence=1}" />
   </div>
   <select class="form-select" id="fulltext_table" name="fulltext_table">
-{if call_user_func(array('CRM_Core_Permission','giveMeAllACLs'))}
       <option value="">{ts}All{/ts}</option>
       <option value="Contact">{ts}Contacts{/ts}</option>
-{/if}
       <option value="Activity">{ts}Activities{/ts}</option>
 {if call_user_func(array('CRM_Core_Permission','access'), 'CiviCase')}
       <option value="Case">{ts}Cases{/ts}</option>
