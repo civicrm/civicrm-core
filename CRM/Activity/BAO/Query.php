@@ -427,6 +427,15 @@ class CRM_Activity_BAO_Query {
       array('entity' => 'activity', 'label' => ts('Activity Type(s)'), 'multiple' => 'multiple', 'option_url' => NULL, 'placeholder' => ts('- any -'))
     );
 
+    $searchOptions = CRM_Activity_BAO_Activity::getFreeTextFields();
+
+    $form->add('select', 'activity_free_text_search', ts("Select condition"),
+        $searchOptions, FALSE,
+        array('id' => 'activity_free_text_select', 'class' => 'crm-select2')
+    );
+
+    $form->addElement('text', 'activity_free_text', ts('Text Search', array('placeholder' => ts('Enter text to search'))));
+
     CRM_Core_Form_Date::buildDateRange($form, 'activity_date', 1, '_low', '_high', ts('From'), FALSE, FALSE);
     $form->addElement('hidden', 'activity_date_range_error');
     $form->addFormRule(array('CRM_Activity_BAO_Query', 'formRule'), $form);

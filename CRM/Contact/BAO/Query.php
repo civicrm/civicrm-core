@@ -6273,4 +6273,53 @@ AND   displayRelType.is_active = 1
     ));
   }
 
+  /**
+   * Process free text search format
+   *
+   * @param string $option
+   * @param string $value
+   *
+   * @return array|string
+   */
+  public static function processFreeText($option, $value)
+  {
+    switch ($option) {
+      case '=':
+        return $value;
+        break;
+      case '!=':
+        return array('!=' => $value);
+        break;
+      case 'CONTAINS':
+        return array('LIKE' => $value);
+        break;
+      case 'CONTAINANYWORD':
+        return array('CONTAINANYWORD' => $value);
+        break;
+      case 'CONTAINALLWORDS':
+        return array('CONTAINALLWORDS' => $value);
+        break;
+      case 'LIKE%':
+        return array('LIKE' => $value . '%');
+        break;
+      case 'NOTLIKE%':
+        return array('NOT LIKE' => $value . '%');
+        break;
+      case 'NOT%LIKE%':
+        return array('NOT LIKE' => '%' . $value . '%');
+        break;
+      case 'LENGTH<':
+        return array('LENGTH(%s) <' => $value);
+        break;
+      case 'LENGTH>':
+        return array('LENGTH(%s) >' => $value);
+        break;
+      case 'REGEXP':
+        return array('REGEXP' => $value);
+        break;
+    }
+
+    return $value;
+  }
+
 }
