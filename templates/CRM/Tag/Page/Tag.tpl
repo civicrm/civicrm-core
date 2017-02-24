@@ -272,10 +272,6 @@
             plugins: plugins,
             dnd: {
               copy: false
-            },
-            themes: {
-              stripes: true,
-              dots: false
             }
           });
       }

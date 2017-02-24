@@ -55,14 +55,6 @@ class CRM_Admin_Page_AJAX {
   }
 
   /**
-   * Return menu tree as json data for editing.
-   */
-  public static function getNavigationList() {
-    echo CRM_Core_BAO_Navigation::buildNavigation(TRUE, FALSE);
-    CRM_Utils_System::civiExit();
-  }
-
-  /**
    * Process drag/move action for menu tree.
    */
   public static function menuTree() {
