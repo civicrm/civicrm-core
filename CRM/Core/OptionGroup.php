@@ -262,9 +262,9 @@ WHERE  v.option_group_id = g.id
   }
 
   /**
-   * Lookup titles OR ids for a set of option_value populated fields. The retrieved value
-   * is assigned a new fieldname by id or id's by title
-   * (each within a specificied option_group)
+   * Lookup titles OR ids for a set of option_value populated fields. The
+   * retrieved value is assigned a new field name by id or id's by title
+   * (each within a specified option_group).
    *
    * @param array $params
    *   Reference array of values submitted by the form. Based on.
@@ -274,10 +274,9 @@ WHERE  v.option_group_id = g.id
    *   If $flip = true, adds actual field name => id
    *
    * @param array $names
-   *   Reference array of fieldnames we want transformed.
+   *   Array of field names we want transformed.
    *   Array key = 'postName' (field name submitted by form in $params).
    *   Array value = array('newName' => $newName, 'groupName' => $groupName).
-   *
    *
    * @param bool $flip
    */
