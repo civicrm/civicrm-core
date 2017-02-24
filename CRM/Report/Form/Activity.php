@@ -694,19 +694,19 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
     $this->_aclFrom = '';
     $this->_aclWhere = '';
     $aclContactCache = \Civi::service('acl_contact_cache');
-    $i=1;
+    $i = 1;
     if (!is_array($tableAlias)) {
       $tableAlias = array($tableAlias);
     }
-    foreach($tableAlias as $table) {
+    foreach ($tableAlias as $table) {
       $aclWhere = $aclContactCache->getAclWhereClause(CRM_Core_Permission::VIEW, $table, 'id', 'civicrm_acl_contacts_'.$i);
       $aclJoin = $aclContactCache->getAclJoin(CRM_Core_Permission::VIEW, $table, 'id', 'civicrm_acl_contacts_'.$i);
       if (strlen($aclWhere)) {
         if (strlen($this->_aclWhere)) {
           $this->_aclWhere .= ' AND';
         }
-        $this->_aclWhere .= ' '.$aclWhere;
-        $this->_aclFrom .= ' '.$aclJoin;
+        $this->_aclWhere .= ' ' . $aclWhere;
+        $this->_aclFrom .= ' ' . $aclJoin;
         $i++;
       }
     }

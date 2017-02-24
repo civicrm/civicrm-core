@@ -3623,7 +3623,8 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
 
     if (strlen($aclWhere) && strlen($deleteClause)) {
       $aclWhere .= " AND " . $deleteClause;
-    } elseif (strlen($deleteClause)) {
+    }
+    elseif (strlen($deleteClause)) {
       $aclWhere = $deleteClause;
     }
 

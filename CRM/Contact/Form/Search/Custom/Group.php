@@ -648,7 +648,8 @@ WHERE  gcc.group_id = {$ssGroup->id}
 
     if (strlen($aclWhere) && strlen($deleteClause)) {
       $aclWhere .= " AND " . $deleteClause;
-    } elseif (strlen($deleteClause)) {
+    }
+    elseif (strlen($deleteClause)) {
       $aclWhere = $deleteClause;
     }
 

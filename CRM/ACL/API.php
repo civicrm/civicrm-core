@@ -122,7 +122,8 @@ class CRM_ACL_API {
     $aclJoin = $aclContactCache->getAclJoin($type, $tableAlias);
     if (strlen($aclWhere) && strlen($deleteClause)) {
       $aclWhere .= " AND " . $deleteClause;
-    } elseif (strlen($deleteClause)) {
+    }
+    elseif (strlen($deleteClause)) {
       $aclWhere = $deleteClause;
     }
 

@@ -463,7 +463,8 @@ class CRM_Contact_Form_Search_Custom_DateAdded extends CRM_Contact_Form_Search_C
 
     if (strlen($aclWhere) && strlen($deleteClause)) {
       $aclWhere .= " AND " . $deleteClause;
-    } elseif (strlen($deleteClause)) {
+    }
+    elseif (strlen($deleteClause)) {
       $aclWhere = $deleteClause;
     }
 

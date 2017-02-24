@@ -371,7 +371,8 @@ INNER JOIN {$this->_tableName} tempTable ON ( tempTable.contact_id = contact_a.i
 
     if (strlen($aclWhere) && strlen($deleteClause)) {
       $aclWhere .= " AND " . $deleteClause;
-    } elseif (strlen($deleteClause)) {
+    }
+    elseif (strlen($deleteClause)) {
       $aclWhere = $deleteClause;
     }
 

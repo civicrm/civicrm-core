@@ -831,7 +831,6 @@ function civicrm_api3_contact_getquick($params) {
   $limit = (int) CRM_Utils_Array::value('limit', $params);
   $limit = $limit > 0 ? $limit : Civi::settings()->get('search_autocomplete_count');
 
-
   // Build ACL Clause
   $deleteClause = '';
   if (!CRM_Core_Permission::check('access deleted contacts')) {
@@ -843,7 +842,8 @@ function civicrm_api3_contact_getquick($params) {
   $aclFrom = $aclContactCache->getAclJoin(CRM_Core_Permission::VIEW, 'cc');
   if (strlen($aclWhere) && strlen($deleteClause)) {
     $aclWhere .= " AND " . $deleteClause;
-  } elseif (strlen($deleteClause)) {
+  }
+  elseif (strlen($deleteClause)) {
     $aclWhere = $deleteClause;
   }
 

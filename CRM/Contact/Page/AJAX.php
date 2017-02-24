@@ -403,7 +403,8 @@ class CRM_Contact_Page_AJAX {
         $aclFrom = $aclContactCache->getAclJoin(CRM_Core_Permission::VIEW, 'cc');
         if (strlen($aclWhere) && strlen($deleteClause)) {
           $aclWhere .= " AND " . $deleteClause;
-        } elseif (strlen($deleteClause)) {
+        }
+        elseif (strlen($deleteClause)) {
           $aclWhere = $deleteClause;
         }
 
@@ -511,7 +512,8 @@ LIMIT {$offset}, {$rowCount}
       $aclFrom = $aclContactCache->getAclJoin(CRM_Core_Permission::VIEW, 'cc');
       if (strlen($aclWhere) && strlen($deleteClause)) {
         $aclWhere .= " AND " . $deleteClause;
-      } elseif (strlen($deleteClause)) {
+      }
+      elseif (strlen($deleteClause)) {
         $aclWhere = $deleteClause;
       }
       if ($aclWhere) {

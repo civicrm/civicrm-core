@@ -374,7 +374,8 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
         $aclJoin = $aclContactCache->getAclJoin(CRM_Core_Permission::VIEW, 'civicrm_contact');
         if (strlen($aclWhere) && strlen($deleteClause)) {
           $aclWhere .= " AND " . $deleteClause;
-        } elseif (strlen($deleteClause)) {
+        }
+        elseif (strlen($deleteClause)) {
           $aclWhere = $deleteClause;
         }
 
@@ -396,10 +397,10 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
         $this->_aclFrom = $this->_aclFrom . ' ' . $aclContactCache->getAclJoin(CRM_Core_Permission::VIEW, 'c2', 'id', 'civicrm_acl_contacts2');
 
         if (strlen($aclWhere1)) {
-          $this->_aclWhere .= ' AND '.$aclWhere1;
+          $this->_aclWhere .= ' AND ' . $aclWhere1;
         }
         if (strlen($aclWhere2)) {
-          $this->_aclWhere .= ' AND '.$aclWhere2;
+          $this->_aclWhere .= ' AND ' . $aclWhere2;
         }
       }
       $query = "SELECT IF(dedupe.id1 < dedupe.id2, dedupe.id1, dedupe.id2) as id1,

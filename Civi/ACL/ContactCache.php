@@ -25,7 +25,7 @@ class ContactCache implements ContactCacheInterface {
    */
   private $cacheInvalidTimeout = 180; // = 3 hours.
 
-  private static $alreadyRefreshedContactCache = false;
+  private static $alreadyRefreshedContactCache = FALSE;
 
   public function __construct() {
     $this->cacheInvalidTimeout = \Civi::settings()->get('acl_contact_cache_validity');
@@ -38,13 +38,13 @@ class ContactCache implements ContactCacheInterface {
    *  The operation View, Edit. @see CRM_Core_Permission::VIEW and CRM_Core_Permission::EDIT.
    * @param string $contact_table_alias
    *  The alias of the civicrm_contact table. - Optional default to 'civicrm_contact'
-   * @param string contact_id field
+   * @param string $contact_id field
    *  The field which holds the contact ID. - Optional default to 'id'
    * @param string $acl_contact_cache_alias
    *   The alias for the acl contact cache table
    * @return string
    */
-  public function getAclWhereClause($operation_type, $contact_table_alias='civicrm_contact', $contact_id_field='id', $acl_contact_cache_alias='civicrm_acl_contacts') {
+  public function getAclWhereClause($operation_type, $contact_table_alias = 'civicrm_contact', $contact_id_field = 'id', $acl_contact_cache_alias = 'civicrm_acl_contacts') {
     // first see if the contact has edit / view all contacts
     if (\CRM_Core_Permission::check('edit all contacts') || ($operation_type == \CRM_Core_Permission::VIEW && \CRM_Core_Permission::check('view all contacts'))) {
       return '';
@@ -58,7 +58,7 @@ class ContactCache implements ContactCacheInterface {
       $this->refreshCache($operation_type, $contactID, $domainID);
     }
 
-    return " `{$acl_contact_cache_alias}`.`operation_type` = '".$operation_type."' AND `{$acl_contact_cache_alias}`.`user_id` = '".$contactID."' AND `{$acl_contact_cache_alias}`.`domain_id` = '".$domainID."'";
+    return " `{$acl_contact_cache_alias}`.`operation_type` = '" . $operation_type . "' AND `{$acl_contact_cache_alias}`.`user_id` = '" . $contactID . "' AND `{$acl_contact_cache_alias}`.`domain_id` = '" . $domainID . "'";
   }
 
   /**
@@ -69,13 +69,13 @@ class ContactCache implements ContactCacheInterface {
    *  The operation View, Edit. @see CRM_Core_Permission::VIEW and CRM_Core_Permission::EDIT.
    * @param string $contact_table_alias
    *  The alias of the civicrm_contact table. - Optional default to 'civicrm_contact'
-   * @param string contact_id field
+   * @param string $contact_id field
    *  The field which holds the contact ID. - Optional default to 'id'
    * @param string $acl_contact_cache_alias
    *   The alias for the acl contact cache table
    * @return string
    */
-  public function getAclJoin($operation_type, $contact_table_alias='civicrm_contact', $contact_id_field='id', $acl_contact_cache_alias='civicrm_acl_contacts') {
+  public function getAclJoin($operation_type, $contact_table_alias = 'civicrm_contact', $contact_id_field = 'id', $acl_contact_cache_alias = 'civicrm_acl_contacts') {
     // first see if the contact has edit / view all contacts
     if (\CRM_Core_Permission::check('edit all contacts') || ($operation_type == \CRM_Core_Permission::VIEW && \CRM_Core_Permission::check('view all contacts'))) {
       return '';
@@ -122,10 +122,10 @@ class ContactCache implements ContactCacheInterface {
     $validityParams[3] = array($domainId, 'Integer');
     $validityParams[4] = array(
       $lastModifiedDate->format('Y-m-d H:i:s'),
-      'String'
+      'String',
     );
     $isValid = \CRM_Core_DAO::singleValueQuery("SELECT user_id FROM `civicrm_acl_contacts_validity` WHERE `user_id` = %1 AND `operation_type` = %2 AND `domain_id` = %3 AND `modified_date` >= %4", $validityParams);
-    return $isValid ? true : false;
+    return $isValid ? TRUE : FALSE;
   }
 
   /**
@@ -143,8 +143,8 @@ class ContactCache implements ContactCacheInterface {
     // We set a static variable when we have refreshed the cached and we
     // check that variable.
     if (!self::$alreadyRefreshedContactCache) {
-        $this->refreshCache($operation_type, $contactID, $domainID);
-        self::$alreadyRefreshedContactCache = true;
+      $this->refreshCache($operation_type, $contactID, $domainID);
+      self::$alreadyRefreshedContactCache = TRUE;
     }
   }
 
@@ -182,7 +182,6 @@ class ContactCache implements ContactCacheInterface {
 
     \CRM_Core_DAO::executeQuery("INSERT INTO `civicrm_acl_contacts` (domain_id, user_id, contact_id, operation_type) {$selectQuery}");
 
-
     //Update the acl_contacts_validity table
     \CRM_Core_DAO::executeQuery("INSERT INTO `civicrm_acl_contacts_validity` (domain_id, `user_id`, `modified_date`, `operation_type`) VALUES (%3, %1, CURRENT_TIMESTAMP(), %2)", $aclContactsParams);
   }
@@ -212,7 +211,7 @@ class ContactCache implements ContactCacheInterface {
     // add a select statement for each direection
     $directions = array(
       array('from' => 'a', 'to' => 'b'),
-      array('from' => 'b', 'to' => 'a')
+      array('from' => 'b', 'to' => 'a'),
     );
 
     // NORMAL/SINGLE DEGREE RELATIONSHIPS
