@@ -11,7 +11,7 @@ interface ContactCacheInterface {
    *  The operation View, Edit. @see CRM_Core_Permission::VIEW and CRM_Core_Permission::EDIT.
    * @param string $contact_table_alias
    *  The alias of the civicrm_contact table. - Optional default to 'civicrm_contact'
-   * @param string $contact_id field
+   * @param string $contact_id_field
    *  The field which holds the contact ID. - Optional default to 'id'
    * @param string $acl_contact_cache_alias
    *   The alias for the acl contact cache table
@@ -27,7 +27,7 @@ interface ContactCacheInterface {
    *  The operation View, Edit. @see CRM_Core_Permission::VIEW and CRM_Core_Permission::EDIT.
    * @param string $contact_table_alias
    *  The alias of the civicrm_contact table. - Optional default to 'civicrm_contact'
-   * @param string $contact_id field
+   * @param string $contact_id_field
    *  The field which holds the contact ID. - Optional default to 'id'
    * @param string $acl_contact_cache_alias
    *   The alias for the acl contact cache table

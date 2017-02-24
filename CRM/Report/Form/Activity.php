@@ -699,8 +699,8 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
       $tableAlias = array($tableAlias);
     }
     foreach ($tableAlias as $table) {
-      $aclWhere = $aclContactCache->getAclWhereClause(CRM_Core_Permission::VIEW, $table, 'id', 'civicrm_acl_contacts_'.$i);
-      $aclJoin = $aclContactCache->getAclJoin(CRM_Core_Permission::VIEW, $table, 'id', 'civicrm_acl_contacts_'.$i);
+      $aclWhere = $aclContactCache->getAclWhereClause(CRM_Core_Permission::VIEW, $table, 'id', 'civicrm_acl_contacts_' . $i);
+      $aclJoin = $aclContactCache->getAclJoin(CRM_Core_Permission::VIEW, $table, 'id', 'civicrm_acl_contacts_' . $i);
       if (strlen($aclWhere)) {
         if (strlen($this->_aclWhere)) {
           $this->_aclWhere .= ' AND';
