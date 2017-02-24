@@ -1647,6 +1647,40 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Ensure consistent return format for option group fields.
+   */
+  public function testPseudoFields() {
+    $params = array(
+      'preferred_communication_method' => array('Phone', 'SMS'),
+      'preferred_language' => 'en_US',
+      'gender_id' => 'Female',
+      'prefix_id' => 'Mrs.',
+      'suffix_id' => 'II',
+      'communication_style_id' => 'Formal',
+    );
+
+    $contact = $this->callAPISuccess('contact', 'create', array_merge($this->_params, $params));
+
+    $result = $this->callAPISuccess('contact', 'getsingle', array('id' => $contact['id']));
+    $this->assertEquals('Both', $result['preferred_mail_format']);
+
+    $this->assertEquals('en_US', $result['preferred_language']);
+    $this->assertEquals(1, $result['communication_style_id']);
+    $this->assertEquals(1, $result['gender_id']);
+    $this->assertEquals('Female', $result['gender']);
+    $this->assertEquals('Mrs.', $result['individual_prefix']);
+    $this->assertEquals(1, $result['prefix_id']);
+    $this->assertEquals('II', $result['individual_suffix']);
+    $this->assertEquals(CRM_Core_PseudoConstant::getKey("CRM_Contact_BAO_Contact", 'suffix_id', 'II'), $result['suffix_id']);
+    $this->callAPISuccess('contact', 'delete', $contact);
+    $this->assertEquals(array(
+      CRM_Core_PseudoConstant::getKey("CRM_Contact_BAO_Contact", 'preferred_communication_method', 'Phone'),
+      CRM_Core_PseudoConstant::getKey("CRM_Contact_BAO_Contact", 'preferred_communication_method', 'SMS'),
+    ), $result['preferred_communication_method']);
+  }
+
+
+  /**
    * Test birth date parameters.
    *
    * These include value, array & birth_date_high, birth_date_low
