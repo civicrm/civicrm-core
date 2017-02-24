@@ -83,7 +83,6 @@ function _civicrm_api3_extension_install_spec(&$fields) {
  *   API result
  */
 function civicrm_api3_extension_upgrade() {
-  CRM_Core_Invoke::rebuildMenuAndCaches(TRUE);
   $queue = CRM_Extension_Upgrades::createQueue();
   $runner = new CRM_Queue_Runner(array(
     'title' => 'Extension Upgrades',
