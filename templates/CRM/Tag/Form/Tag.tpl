@@ -24,6 +24,7 @@
  +--------------------------------------------------------------------+
 *}
 {* this template is used for adding/editing tags  *}
+{crmStyle file='bower_components/jstree/dist/themes/default/style.min.css'}
 {literal}
 <script type="text/javascript">
   (function($, _){{/literal}
@@ -31,71 +32,60 @@
       entityTable='{$entityTable}',
       $form = $('form.{$form.formClass}');
     {literal}
-    CRM.updateContactSummaryTags = function() {
-      var tags = [];
-      $('#tagtree input:checkbox:checked+a label').each(function() {
-        tags.push('<span class="crm-tag-item" style="' + $(this).attr('style') + '" title="' + ($(this).attr('title') || '') + '">' + $(this).text() + '</span>');
-      });
-      $('input.crm-contact-tagset').each(function() {
-        $.each($(this).select2('data'), function (i, tag) {
-          tags.push('<span class="crm-tag-item" title="' + (tag.description || '') + '"' + (tag.color ? 'style="color: ' + CRM.utils.colorContrast(tag.color) + '; background-color: ' + tag.color + ';"' : '') + '>' + tag.label + '</span>');
-        });
-      });
-      // contact summary tabs and search forms both listen for this event
-      $($form).closest('.crm-ajax-container').trigger('crmFormSuccess', {tabCount: tags.length});
-      // update summary tab
-      $("#contact-summary #tags").html(tags.join(' '));
-    };
 
     $(function() {
-      function highlightSelected() {
-        $("ul input:not(:checked)", '#tagtree').each(function () {
-          $(this).closest("li").removeClass('highlighted highlighted-child');
-        });
-        $("ul input:checked", '#tagtree').each(function () {
-          $(this).closest("li").addClass('highlighted');
-          $(this).parents("li[id^=tag]").addClass('highlighted-child');
-        });
-      }
-      highlightSelected();
 
-      $("#tagtree input").change(function(){
-        var tagid = this.id.replace("check_", "");
-        var op = (this.checked) ? 'create' : 'delete';
-        var api = CRM.api3('entity_tag', op, {entity_table: entityTable, entity_id: entityID, tag_id: tagid}, true);
-        highlightSelected();
-        CRM.updateContactSummaryTags();
-      });
-      var childTag = "{/literal}{$loadjsTree}{literal}";
-      if (childTag) {
-        //load js tree.
+      // Display tags on the contact summary
+      function updateContactSummaryTags() {
+        var tags = [],
+          selected = $("#tagtree").jstree(true).get_selected(true);
+        $.each(selected, function(k, item) {
+          var $tag = $(item.text);
+          tags.push('<span class="crm-tag-item" style="' + $tag.attr('style') + '" title="' + ($tag.attr('title') || '') + '">' + $tag.text() + '</span>');
+        });
+        $('input.crm-contact-tagset').each(function() {
+          $.each($(this).select2('data'), function (i, tag) {
+            tags.push('<span class="crm-tag-item" title="' + (tag.description || '') + '"' + (tag.color ? 'style="color: ' + CRM.utils.colorContrast(tag.color) + '; background-color: ' + tag.color + ';"' : '') + '>' + tag.label + '</span>');
+          });
+        });
+        // contact summary tabs and search forms both listen for this event
+        $($form).closest('.crm-ajax-container').trigger('crmFormSuccess', {tabCount: tags.length});
+        // update summary tab
+        $("#contact-summary #tags").html(tags.join(' '));
+      }
+
+      // Load js tree.
+      CRM.loadScript(CRM.config.resourceBase + 'bower_components/jstree/dist/jstree.min.js').done(function() {
         $("#tagtree").jstree({
-          plugins : ["themes", "html_data", "search"],
-          core: {animation: 100},
+          plugins : ['search', 'wholerow', 'checkbox'],
+          core: {
+            animation: 100,
+            themes: {
+              "theme": 'classic',
+              "dots": false,
+              "icons": false
+            }
+          },
           'search': {
             'case_insensitive' : true,
             'show_only_matches': true
           },
-          themes: {
-            "theme": 'classic',
-            "dots": false,
-            "icons": false,
-            "url": CRM.config.resourceBase + 'packages/jquery/plugins/jstree/themes/classic/style.css'
+          checkbox: {
+            three_state: false
           }
-        });
-      }
-      {/literal}
-      {if $permission neq 'edit'}
-        {literal}
-          $("#tagtree input").prop('disabled', true);
-        {/literal}
-      {/if}
-      {literal}
+        })
+          .on('select_node.jstree deselect_node.jstree', function(e, selected) {
+            var id = selected.node.a_attr.id.replace('tag_', ''),
+              op = e.type === 'select_node' ? 'create' : 'delete';
+            CRM.api3('entity_tag', op, {entity_table: entityTable, entity_id: entityID, tag_id: id}, true);
+            updateContactSummaryTags();
+          });
+      });
 
-      $(document).on('change', 'input.crm-contact-tagset', CRM.updateContactSummaryTags);
+      $(document).on('change', 'input.crm-contact-tagset', updateContactSummaryTags);
 
       $('input[name=filter_tag_tree]', '#Tag').on('keyup change', function() {
-        $("#tagtree").jstree('search', $(this).val());
+        $("#tagtree").jstree(true).search($(this).val());
       });
     });
   })(CRM.$, CRM._);

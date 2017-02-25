@@ -349,14 +349,7 @@ div#crm-contact-thumbnail {
   max-height: 500px;
   overflow: auto;
 }
-#tagtree,
-#tagtree li.highlighted ul {
-  background-color: white;
-}
-#tagtree li.highlighted,
-#tagtree li.highlighted-child.jstree-closed {
-  background-color: #fefcb0;
-}
+
 #tagtree li {
   margin-top: 5px;
 }
@@ -365,8 +358,11 @@ div#crm-contact-thumbnail {
   position: relative;
   top: -3px;
 }
-#tagtree input {
-  margin: 0;
+#tagtree .jstree-disabled {
+  cursor: not-allowed;
+}
+#tagtree .jstree-disabled > .jstree-checkbox {
+  opacity: .2;
 }
 
 #tagGroup table .label {
