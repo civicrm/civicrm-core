@@ -2446,6 +2446,8 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   public function testGetQuickExactFirst($searchParameters, $settings, $firstContact, $secondContact = NULL) {
     $this->getQuickSearchSampleData();
     $this->callAPISuccess('Setting', 'create', $settings);
+    $aclContactCache = \Civi::service('acl_contact_cache');
+    $aclContactCache->clearCache();
     $result = $this->callAPISuccess('contact', 'getquick', $searchParameters);
     $this->assertEquals($firstContact, $result['values'][0]['sort_name']);
     $this->assertEquals($secondContact, $result['values'][1]['sort_name']);
