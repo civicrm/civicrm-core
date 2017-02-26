@@ -5908,7 +5908,7 @@ AND   displayRelType.is_active = 1
         // This is a temporary routine for handling these fields while
         // we figure out how to handled them based on metadata in
         /// export and search builder. CRM-19815, CRM-19830.
-        if (isset($dao->$realField) && is_numeric($dao->$realField)) {
+        if (isset($dao->$realField) && is_numeric($dao->$realField) && isset($dao->$labelField)) {
           $dao->$realField = $dao->$labelField;
         }
       }
