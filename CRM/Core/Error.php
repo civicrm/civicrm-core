@@ -310,6 +310,11 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   /**
    * Display an error page with an error message describing what happened.
    *
+   * @deprecated
+   *  This is a really annoying function. We ❤ exceptions. Be exceptional!
+   *
+   * @see CRM-20181
+   *
    * @param string $message
    *   The error message.
    * @param string $code
