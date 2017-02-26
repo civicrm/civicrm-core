@@ -281,7 +281,7 @@ WHERE  v.option_group_id = g.id
    *
    * @param bool $flip
    */
-  public static function lookupValues(&$params, &$names, $flip = FALSE) {
+  public static function lookupValues(&$params, $names, $flip = FALSE) {
     foreach ($names as $postName => $value) {
       // See if $params field is in $names array (i.e. is a value that we need to lookup)
       if ($postalName = CRM_Utils_Array::value($postName, $params)) {
