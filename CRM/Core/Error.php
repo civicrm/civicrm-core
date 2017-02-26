@@ -318,6 +318,8 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    *   The email address to notify of this situation.
    *
    * @throws Exception
+   *
+   * @deprecated
    */
   public static function fatal($message = NULL, $code = NULL, $email = NULL) {
     $vars = array(
