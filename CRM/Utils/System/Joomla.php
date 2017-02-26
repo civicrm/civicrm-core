@@ -712,11 +712,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
       '',
       $config->userFrameworkBaseURL
     );
-    $siteRoot = preg_replace(
-      '|/media/civicrm/.*$|',
-      '',
-      $config->imageUploadDir
-    );
+    // CRM-19453 - This makes it OS independent.
+    $siteRoot = JPATH_SITE;
     return array($url, NULL, $siteRoot);
   }
 
