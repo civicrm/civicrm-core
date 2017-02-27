@@ -90,9 +90,8 @@
           {elseif ($profileFieldName eq 'group' && $form.group) || ($profileFieldName eq 'tag' && $form.tag)}
             {include file="CRM/Contact/Form/Edit/TagsAndGroups.tpl" type=$profileFieldName title=null context="profile"}
           {elseif $field.is_datetime_field && $action & 4}
-            {assign var="date_value" value=$form.$profileFieldName.value}
             <span class="crm-frozen-field">
-              {$date_value|date_format:"%Y-%m-%d"|crmDate:$config->dateformatshortdate}
+              {$form.$profileFieldName.value|crmDate:$field.smarty_view_format}
               <input type="hidden"
                name="{$form.$profileFieldName.name}"
                value="{$form.$profileFieldName.value}" id="{$form.$profileFieldName.name}"

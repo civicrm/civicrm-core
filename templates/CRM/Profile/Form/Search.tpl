@@ -65,9 +65,7 @@
             </td>
           {else}
             <td class="description">
-              {if ( $n eq 'birth_date' ) or ( $n eq 'deceased_date' ) }
-                {include file="CRM/common/jcalendar.tpl" elementName=$n}
-              {elseif $n|substr:0:5 eq 'phone'}
+              {if $n|substr:0:5 eq 'phone'}
                 {assign var="phone_ext_field" value=$n|replace:'phone':'phone_ext'}
                 {$form.$n.html}
                 {if $form.$phone_ext_field.html}
