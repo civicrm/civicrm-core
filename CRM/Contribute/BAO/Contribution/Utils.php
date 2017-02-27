@@ -487,7 +487,7 @@ LIMIT 1
    *
    * @param float $amount
    *   Monetary amount
-   * @param integer $decimals
+   * @param int $decimals
    *   How many decimal places to round to and return
    *
    * @return float
