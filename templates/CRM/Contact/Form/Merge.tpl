@@ -130,24 +130,22 @@
               $row.title|substr:0:5 == "Phone"}
 
             <td>
-
-              {* This is on one long line for address formatting *}
-              {if $row.title|substr:0:7 == "Address"}
-                <span style="white-space: pre" id="main_{$blockName}_{$blockId}">
-              {else}
-                <span id="main_{$blockName}_{$blockId}">
-              {/if}
-
-              {* @TODO check if this is ever an array or a fileName? *}
-              {if !is_array($row.main)}
-                {$row.main}
-              {elseif $row.main.fileName}
-                {$row.main.fileName}
-              {else}
-                {', '|implode:$row.main}
-              {/if}
-
-              </span>
+              {strip}
+                {if $row.title|substr:0:7 == "Address"}
+                  <span style="white-space: pre" id="main_{$blockName}_{$blockId}">
+                {else}
+                  <span id="main_{$blockName}_{$blockId}">
+                {/if}
+                {* @TODO check if this is ever an array or a fileName? *}
+                {if !is_array($row.main)}
+                  {$row.main}
+                {elseif $row.main.fileName}
+                  {$row.main.fileName}
+                {else}
+                  {', '|implode:$row.main}
+                {/if}
+                </span>
+              {/strip}
             </td>
 
             <td>
@@ -427,8 +425,9 @@
     });
 
     // Call mergeBlock whenever a location type is changed
-    $('select[id$="locTypeId"],select[id$="typeTypeId"],input[id$="[operation]"],input[id$="[set_other_primary]"]').on('change',
-      function(event){
+    // (This is applied to the body because the inputs can be added dynamically
+    // to the form, and we need to catch when they change.)
+    $('body').on('change', 'select[id$="locTypeId"],select[id$="typeTypeId"],input[id$="[operation]"],input[id$="[set_other_primary]"]', function(event){
 
       // All the information we need is held in the id, separated by underscores
       var nameSplit = this.name.split('[');
