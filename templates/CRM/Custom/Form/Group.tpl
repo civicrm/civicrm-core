@@ -113,6 +113,15 @@ CRM.$(function($) {
       showMultiple = "{/literal}{$showMultiple}{literal}",
       showMaxMultiple = "{/literal}{$showMaxMultiple}{literal}",
       isContact = ($.inArray(extend, contactTypes) >= 0);
+    
+    //MV:CRM-20190- now allow multiple for membership as well
+    if ( extend == 'Membership' ) {
+      $("tr#is_multiple_row").show();
+      $("select#style").val('Inline');
+    }
+    else {
+      $("tr#style_row, tr#is_multiple_row, tr#multiple_row").hide();
+    }
 
     if (isContact) {
       $("tr#style_row, tr#is_multiple_row").show();
