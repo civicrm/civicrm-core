@@ -243,6 +243,9 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         $this->_memType = $params['membership_type_id'][1];
       }
     }
+    //MV:CRM-20190, allow multiple custom set now, enable hidden custom in Params, this would allow add extra custom set values.
+    $_POST['hidden_custom'] = 1;
+
     // when custom data is included in this page
     if (!empty($_POST['hidden_custom'])) {
       CRM_Custom_Form_CustomData::preProcess($this, NULL, $this->_memType, 1, 'Membership', $this->_id);
@@ -946,7 +949,9 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       return;
     }
     // get the submitted form values.
-    $this->_params = $this->controller->exportValues($this->_name);
+    // $this->_params = $this->controller->exportValues($this->_name);
+    //MV:CRM-20190- multiple custom values are not getting in exportValues, think exportvalues getting from session.
+    $this->_params = $this->_submitValues;
 
     $this->submit();
 
