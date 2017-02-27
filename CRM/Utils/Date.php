@@ -1788,27 +1788,6 @@ class CRM_Utils_Date {
   }
 
   /**
-   * Convert a Civi-special date string to a standard php date string.
-   *
-   * For historical reasons CiviCRM has it's own (possibly Smarty derived)
-   * format for defined date strings. This renders something php can use.
-   *
-   * @param string $dateFormatString
-   *   e.g mm/dd/yy
-   *   These map to the values used in the date_format field in civicrm_custom_field.date_format.
-   *
-   * @return string
-   *   A proper php strotime formatted equivalent of the string.
-   *   eg m/d/y for the above.
-   *
-   *   http://php.net/manual/en/function.strtotime.php
-   */
-  public static function getPhpDateFormatFromInputStyleDateFormat($dateFormatString) {
-    $formats = CRM_Utils_Date::datePluginToPHPFormats();
-    return $formats[$dateFormatString];
-  }
-
-  /**
    * Add the metadata about a date field to the field.
    *
    * This metadata will work with the call $form->add('datepicker', ...
