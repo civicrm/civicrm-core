@@ -481,7 +481,7 @@ LIMIT 1
     return $taxAmount;
   }
 
-  /*
+  /**
    * Format monetary amount: round and return to desired decimal place
    * CRM-20145
    *
