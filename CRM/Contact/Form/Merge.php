@@ -68,8 +68,8 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
       CRM_Core_Error::fatal(ts('You do not have access to this page'));
     }
 
-    $cid = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
-    $oid = CRM_Utils_Request::retrieve('oid', 'Positive', $this, TRUE);
+    $this->_cid = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
+    $this->_oid = CRM_Utils_Request::retrieve('oid', 'Positive', $this, TRUE);
     $flip = CRM_Utils_Request::retrieve('flip', 'Positive', $this, FALSE);
 
     $this->_rgid = CRM_Utils_Request::retrieve('rgid', 'Positive', $this, FALSE);
@@ -78,9 +78,9 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
     $this->limit = CRM_Utils_Request::retrieve('limit', 'Positive', $this, FALSE);
     $urlParams = "reset=1&rgid={$this->_rgid}&gid={$this->_gid}&limit=" . $this->limit;
 
-    $this->bounceIfInvalid($cid, $oid);
+    $this->bounceIfInvalid($this->_cid, $this->_oid);
 
-    $this->_contactType = civicrm_api3('Contact', 'getvalue', array('id' => $cid, 'return' => 'contact_type'));
+    $this->_contactType = civicrm_api3('Contact', 'getvalue', array('id' => $this->_cid, 'return' => 'contact_type'));
 
     $browseUrl = CRM_Utils_System::url('civicrm/contact/dedupefind', $urlParams . '&action=browse');
 
@@ -103,14 +103,14 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
     $join = CRM_Dedupe_Merger::getJoinOnDedupeTable();
     $where = "de.id IS NULL";
 
-    $pos = CRM_Core_BAO_PrevNextCache::getPositions($cacheKey, $cid, $oid, $this->_mergeId, $join, $where, $flip);
+    $pos = CRM_Core_BAO_PrevNextCache::getPositions($cacheKey, $this->_cid, $this->_oid, $this->_mergeId, $join, $where, $flip);
 
     // get user info of main contact.
     $config = CRM_Core_Config::singleton();
     $config->doNotResetCache = 1;
 
     $viewUser = CRM_Core_Permission::check('access user profiles');
-    $mainUfId = CRM_Core_BAO_UFMatch::getUFId($cid);
+    $mainUfId = CRM_Core_BAO_UFMatch::getUFId($this->_cid);
     $mainUser = NULL;
     if ($mainUfId) {
       // d6 compatible
@@ -126,7 +126,7 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
     }
 
     $flipUrl = CRM_Utils_System::url('civicrm/contact/merge',
-      "reset=1&action=update&cid={$oid}&oid={$cid}&rgid={$this->_rgid}&gid={$gid}"
+      "reset=1&action=update&cid={$this->_oid}&oid={$this->_cid}&rgid={$this->_rgid}&gid={$gid}"
     );
     if (!$flip) {
       $flipUrl .= '&flip=1';
@@ -148,7 +148,7 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
     }
 
     // get user info of other contact.
-    $otherUfId = CRM_Core_BAO_UFMatch::getUFId($oid);
+    $otherUfId = CRM_Core_BAO_UFMatch::getUFId($this->_oid);
     $otherUser = NULL;
 
     if ($otherUfId) {
@@ -169,15 +169,15 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
 
     $session = CRM_Core_Session::singleton();
 
-    $rowsElementsAndInfo = CRM_Dedupe_Merger::getRowsElementsAndInfo($cid, $oid);
+    $rowsElementsAndInfo = CRM_Dedupe_Merger::getRowsElementsAndInfo($this->_cid, $this->_oid);
     $main = $this->_mainDetails = $rowsElementsAndInfo['main_details'];
     $other = $this->_otherDetails = $rowsElementsAndInfo['other_details'];
 
-    if ($main['contact_id'] != $cid) {
+    if ($main['contact_id'] != $this->_cid) {
       CRM_Core_Error::fatal(ts('The main contact record does not exist'));
     }
 
-    if ($other['contact_id'] != $oid) {
+    if ($other['contact_id'] != $this->_oid) {
       CRM_Core_Error::fatal(ts('The other contact record does not exist'));
     }
 
@@ -187,9 +187,6 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
     $this->assign('main_cid', $main['contact_id']);
     $this->assign('other_cid', $other['contact_id']);
     $this->assign('rgid', $this->_rgid);
-
-    $this->_cid = $cid;
-    $this->_oid = $oid;
 
     $this->addElement('checkbox', 'toggleSelect', NULL, NULL, array('class' => 'select-rows'));
 
