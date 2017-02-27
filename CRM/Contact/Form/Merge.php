@@ -109,7 +109,6 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
     $config = CRM_Core_Config::singleton();
     $config->doNotResetCache = 1;
 
-    $viewUser = CRM_Core_Permission::check('access user profiles');
     $mainUfId = CRM_Core_BAO_UFMatch::getUFId($this->_cid);
     $mainUser = NULL;
     if ($mainUfId) {
@@ -167,8 +166,6 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
     $cmsUser = ($mainUfId && $otherUfId) ? TRUE : FALSE;
     $this->assign('user', $cmsUser);
 
-    $session = CRM_Core_Session::singleton();
-
     $rowsElementsAndInfo = CRM_Dedupe_Merger::getRowsElementsAndInfo($this->_cid, $this->_oid);
     $main = $this->_mainDetails = $rowsElementsAndInfo['main_details'];
     $other = $this->_otherDetails = $rowsElementsAndInfo['other_details'];
@@ -225,7 +222,7 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
     }
 
     $this->assign('rel_tables', $rowsElementsAndInfo['rel_tables']);
-    $this->assign('userContextURL', $session->readUserContext());
+    $this->assign('userContextURL', CRM_Core_Session::singleton()->readUserContext());
   }
 
   public function addRules() {
