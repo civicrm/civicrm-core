@@ -78,23 +78,24 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
     $this->limit = CRM_Utils_Request::retrieve('limit', 'Positive', $this, FALSE);
     $urlParams = "reset=1&rgid={$this->_rgid}&gid={$this->_gid}&limit=" . $this->limit;
 
-    // Sanity check
-    if ($cid == $oid) {
-      CRM_Core_Error::statusBounce(ts('Cannot merge a contact with itself.'));
-    }
+    $this->bounceIfInvalid($cid, $oid);
 
-    if (!CRM_Dedupe_BAO_Rule::validateContacts($cid, $oid)) {
-      CRM_Core_Error::statusBounce(ts('The selected pair of contacts are marked as non duplicates. If these records should be merged, you can remove this exception on the <a href="%1">Dedupe Exceptions</a> page.', array(1 => CRM_Utils_System::url('civicrm/dedupe/exception', 'reset=1'))));
-    }
     $this->_contactType = civicrm_api3('Contact', 'getvalue', array('id' => $cid, 'return' => 'contact_type'));
-    $isFromDedupeScreen = TRUE;
+
+    $browseUrl = CRM_Utils_System::url('civicrm/contact/dedupefind', $urlParams . '&action=browse');
+
     if (!$this->_rgid) {
-      $isFromDedupeScreen = FALSE;
+      // Unset browse URL as we have come from the search screen.
+      $browseUrl = '';
       $this->_rgid = civicrm_api3('RuleGroup', 'getvalue', array(
         'contact_type' => $this->_contactType,
         'used' => 'Supervised',
         'return' => 'id',
       ));
+    }
+    $this->assign('browseUrl', $browseUrl);
+    if ($browseUrl) {
+      CRM_Core_Session::singleton()->pushUserContext($browseUrl);
     }
 
     $cacheKey = CRM_Dedupe_Merger::getMergeCacheKeyString($this->_rgid, $gid);
@@ -103,14 +104,6 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
     $where = "de.id IS NULL";
 
     $pos = CRM_Core_BAO_PrevNextCache::getPositions($cacheKey, $cid, $oid, $this->_mergeId, $join, $where, $flip);
-
-    // Block access if user does not have EDIT permissions for both contacts.
-    if (!(CRM_Contact_BAO_Contact_Permission::allow($cid, CRM_Core_Permission::EDIT) &&
-      CRM_Contact_BAO_Contact_Permission::allow($oid, CRM_Core_Permission::EDIT)
-    )
-    ) {
-      CRM_Utils_System::permissionDenied();
-    }
 
     // get user info of main contact.
     $config = CRM_Core_Config::singleton();
@@ -176,25 +169,9 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
 
     $session = CRM_Core_Session::singleton();
 
-    // context fixed.
-    if ($isFromDedupeScreen) {
-      $browseUrl = CRM_Utils_System::url('civicrm/contact/dedupefind', $urlParams . '&action=browse');
-      $session->pushUserContext($browseUrl);
-    }
-    $this->assign('browseUrl', empty($browseUrl) ? '' : $browseUrl);
-
-    // ensure that oid is not the current user, if so refuse to do the merge
-    if ($session->get('userID') == $oid) {
-      $display_name = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $oid, 'display_name');
-      $message = ts('The contact record which is linked to the currently logged in user account - \'%1\' - cannot be deleted.',
-        array(1 => $display_name)
-      );
-      CRM_Core_Error::statusBounce($message);
-    }
-
     $rowsElementsAndInfo = CRM_Dedupe_Merger::getRowsElementsAndInfo($cid, $oid);
-    $main = $this->_mainDetails = &$rowsElementsAndInfo['main_details'];
-    $other = $this->_otherDetails = &$rowsElementsAndInfo['other_details'];
+    $main = $this->_mainDetails = $rowsElementsAndInfo['main_details'];
+    $other = $this->_otherDetails = $rowsElementsAndInfo['other_details'];
 
     if ($main['contact_id'] != $cid) {
       CRM_Core_Error::fatal(ts('The main contact record does not exist'));
@@ -222,6 +199,19 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
 
     // add elements
     foreach ($rowsElementsAndInfo['elements'] as $element) {
+      // We could push this down to the getRowsElementsAndInfo function but it's
+      // already so overloaded - let's start moving towards doing form-things
+      // on the form.
+      if (substr($element[1], 0, 13) === 'move_location') {
+        $element[4] = array_merge(
+          (array) CRM_Utils_Array::value(4, $element, array()),
+          array('data-location' => substr($element[1], 14), 'data-is_location' => TRUE));
+      }
+      if (substr($element[1], 0, 15) === 'location_blocks') {
+        // @todo We could add some data elements here to make jquery manipulation more straight-forward
+        // @todo consider enabling if it is an add & defaulting to true.
+        $element[4] = array_merge((array) CRM_Utils_Array::value(4, $element, array()), array('disabled' => TRUE));
+      }
       $this->addElement($element[0],
         $element[1],
         array_key_exists('2', $element) ? $element[2] : NULL,
@@ -239,22 +229,6 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
 
     $this->assign('rel_tables', $rowsElementsAndInfo['rel_tables']);
     $this->assign('userContextURL', $session->readUserContext());
-  }
-
-  /**
-   * This virtual function is used to set the default values of
-   * various form elements
-   *
-   * access        public
-   *
-   * @return array
-   *   reference to the array of default values
-   */
-  /**
-   * @return array
-   */
-  public function setDefaultValues() {
-    return array('deleteOther' => 1);
   }
 
   public function addRules() {
@@ -364,6 +338,41 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
     }
 
     CRM_Utils_System::redirect($url);
+  }
+
+  /**
+   * Bounce if the merge action is invalid.
+   *
+   * We don't allow the merge if it is nonsensical, marked as a duplicate
+   * or outside the user's permission.
+   *
+   * @param int $cid
+   *   Contact ID to retain
+   * @param int $oid
+   *   Contact ID to delete.
+   */
+  public function bounceIfInvalid($cid, $oid) {
+    if ($cid == $oid) {
+      CRM_Core_Error::statusBounce(ts('Cannot merge a contact with itself.'));
+    }
+
+    if (!CRM_Dedupe_BAO_Rule::validateContacts($cid, $oid)) {
+      CRM_Core_Error::statusBounce(ts('The selected pair of contacts are marked as non duplicates. If these records should be merged, you can remove this exception on the <a href="%1">Dedupe Exceptions</a> page.', array(1 => CRM_Utils_System::url('civicrm/dedupe/exception', 'reset=1'))));
+    }
+
+    if (!(CRM_Contact_BAO_Contact_Permission::allow($cid, CRM_Core_Permission::EDIT) &&
+      CRM_Contact_BAO_Contact_Permission::allow($oid, CRM_Core_Permission::EDIT)
+    )
+    ) {
+      CRM_Utils_System::permissionDenied();
+    }
+    // ensure that oid is not the current user, if so refuse to do the merge
+    if (CRM_Core_Session::singleton()->getLoggedInContactID() == $oid) {
+      $message = ts('The contact record which is linked to the currently logged in user account - \'%1\' - cannot be deleted.',
+        array(1 => CRM_Core_Session::singleton()->getLoggedInContactDisplayName())
+      );
+      CRM_Core_Error::statusBounce($message);
+    }
   }
 
 }
