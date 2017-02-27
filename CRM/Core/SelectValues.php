@@ -349,7 +349,7 @@ class CRM_Core_SelectValues {
         }
       }
     }
-    $date['php_datetime_format'] = CRM_Utils_Date::getPhpDateFormatFromInputStyleDateFormat($date['format']);
+
     $date['smarty_view_format'] = CRM_Utils_Date::getDateFieldViewFormat($date['format']);
     if (!isset($date['time'])) {
       $date['time'] = FALSE;

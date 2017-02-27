@@ -1010,6 +1010,7 @@ class CRM_Utils_Date {
       "dd-mm" => 'd-m',
       "yy-mm" => 'Y-m',
       "M yy" => 'M Y',
+      "M Y" => 'M Y',
       "yy" => 'Y',
     );
     return $dateInputFormats;
@@ -1828,11 +1829,7 @@ class CRM_Utils_Date {
           $field['date_format'] = $dateAttributes['format'];
           $field['is_datetime_field'] = TRUE;
           $field['time_format'] = $dateAttributes['time'];
-          $field['php_datetime_format'] = $dateAttributes['php_datetime_format'];
           $field['smarty_view_format'] = $dateAttributes['smarty_view_format'];
-          if ($field['time_format']) {
-            $field['php_datetime_format'] .= ' H-i-s';
-          }
         }
         $field['datepicker']['extra'] = self::getDatePickerExtra($field);
         $field['datepicker']['attributes'] = self::getDatePickerAttributes($field);
