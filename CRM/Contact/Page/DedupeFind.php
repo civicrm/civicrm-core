@@ -88,7 +88,7 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
     }
     elseif ($action & CRM_Core_Action::MAP) {
       // do a batch merge if requested
-      $result = CRM_Dedupe_Merger::batchMerge($rgid, $gid, 'safe', TRUE, 75);
+      $result = CRM_Dedupe_Merger::batchMerge($rgid, $gid, 'safe', 75);
 
       $skippedCount = CRM_Utils_Request::retrieve('skipped', 'Positive', $this, FALSE, 0);
       $skippedCount = $skippedCount + count($result['skipped']);
