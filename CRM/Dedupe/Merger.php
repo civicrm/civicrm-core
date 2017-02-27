@@ -1058,8 +1058,8 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     $qfZeroBug = 'e8cddb72-a257-11dc-b9cc-0016d3330ee9';
     $fields = self::getMergeFieldsMetadata();
 
-    $main = self::getMergeContactDetails($mainId, 'main');
-    $other = self::getMergeContactDetails($otherId, 'main');
+    $main = self::getMergeContactDetails($mainId);
+    $other = self::getMergeContactDetails($otherId);
     $specialValues['main'] = self::getSpecialValues($main);
     $specialValues['other'] = self::getSpecialValues($other);
 
@@ -1992,13 +1992,12 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * Get the details of the contact to be merged.
    *
    * @param int $contact_id
-   * @param string $moniker
    *
    * @return array
    *
    * @throws CRM_Core_Exception
    */
-  public static function getMergeContactDetails($contact_id, $moniker) {
+  public static function getMergeContactDetails($contact_id) {
     $params = array(
       'contact_id' => $contact_id,
       'version' => 3,
@@ -2008,9 +2007,8 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
     // CRM-18480: Cancel the process if the contact is already deleted
     if (isset($result['values'][$contact_id]['contact_is_deleted']) && !empty($result['values'][$contact_id]['contact_is_deleted'])) {
-      throw new CRM_Core_Exception(ts('Cannot merge because the \'%1\' contact (ID %2) has been deleted.', array(
-        1 => $moniker,
-        2 => $contact_id,
+      throw new CRM_Core_Exception(ts('Cannot merge because one contact (ID %1) has been deleted.', array(
+        1 => $contact_id,
       )));
     }
 
