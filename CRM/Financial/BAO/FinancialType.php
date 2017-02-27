@@ -333,7 +333,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
       return FALSE;
     }
     if (is_array($whereClauses)) {
-      self::getAvailableFinancialTypes($types);
+      self::getAvailableFinancialTypes($types, CRM_Core_Action::ADD);
       if (empty($types)) {
         $whereClauses[] = ' ' . $alias . '.financial_type_id IN (0)';
       }
@@ -343,7 +343,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
     }
     else {
       if ($component == 'contribution') {
-        self::getAvailableFinancialTypes($types);
+        self::getAvailableFinancialTypes($types, CRM_Core_Action::ADD);
         $column = "financial_type_id";
       }
       if ($component == 'membership') {
