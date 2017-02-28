@@ -68,7 +68,8 @@
 {if $hookLinks}
    {foreach from=$hookLinks item=link}
     <li>
-        <a href="{$link.url}" data-tab="activity"{if !empty($link.title)} title="{$link.title}"{/if}>
+        <a href="{$link.url}" data-tab="activity"{if !empty($link.title)} title="{$link.title}"{/if}
+        {if !empty($link.class)} class="{$link.class}"{/if}>
           {if $link.img}
                 <img src="{$link.img}" alt="{$link.title}" />&nbsp;
           {/if}
