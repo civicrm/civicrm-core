@@ -515,6 +515,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
       ),
       'skipDisplay' => 0,
       'data_type' => CRM_Utils_Type::getDataTypeFromFieldMetadata($fieldMetaData),
+      'bao' => CRM_Utils_Array::value('bao', $fieldMetaData),
     );
 
     $formattedField = CRM_Utils_Date::addDateMetadataToField($fieldMetaData, $formattedField);
@@ -1076,19 +1077,6 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
           $values[$index] = $details->$name;
           $idx = $name . '_id';
           $params[$index] = $details->$idx;
-        }
-        elseif ($name === 'preferred_communication_method') {
-          $communicationFields = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'preferred_communication_method');
-          $compref = array();
-          $pref = explode(CRM_Core_DAO::VALUE_SEPARATOR, $details->$name);
-
-          foreach ($pref as $k) {
-            if ($k) {
-              $compref[] = $communicationFields[$k];
-            }
-          }
-          $params[$index] = $details->$name;
-          $values[$index] = implode(',', $compref);
         }
         elseif ($name === 'preferred_language') {
           $params[$index] = $details->$name;
