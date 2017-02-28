@@ -37,7 +37,13 @@
  * @group headless
  */
 class api_v3_ContactTest extends CiviUnitTestCase {
-  public $DBResetRequired = FALSE;
+
+  /**
+   * @var boolean
+   *  Reset the database before running any test.
+   */
+  public $DBResetRequired = TRUE;
+
   protected $_apiversion;
   protected $_entity;
   protected $_params;
@@ -72,6 +78,8 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    */
   public function tearDown() {
     $this->callAPISuccess('Setting', 'create', array('includeOrderByClause' => TRUE));
+    $aclContactCache = \Civi::service('acl_contact_cache');
+    $aclContactCache->clearCache();
     // truncate a few tables
     $tablesToTruncate = array(
       'civicrm_email',
@@ -2452,6 +2460,8 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->assertEquals($firstContact, $result['values'][0]['sort_name']);
     $this->assertEquals($secondContact, $result['values'][1]['sort_name']);
     $this->callAPISuccess('Setting', 'create', array('includeWildCardInName' => TRUE, 'includeOrderByClause' => TRUE));
+    $aclContactCache = \Civi::service('acl_contact_cache');
+    $aclContactCache->clearCache();
   }
 
   public function getSearchSortOptions() {
@@ -2660,6 +2670,8 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   public function testGetQuickFirstName() {
     $this->getQuickSearchSampleData();
     $this->callAPISuccess('Setting', 'create', array('includeOrderByClause' => TRUE));
+    $aclContactCache = \Civi::service('acl_contact_cache');
+    $aclContactCache->clearCache();
     $result = $this->callAPISuccess('contact', 'getquick', array(
       'name' => 'Bob',
       'field_name' => 'first_name',
@@ -2676,6 +2688,8 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       $this->assertEquals($value, $result['values'][$index]['sort_name']);
     }
     $this->callAPISuccess('Setting', 'create', array('includeOrderByClause' => FALSE));
+    $aclContactCache = \Civi::service('acl_contact_cache');
+    $aclContactCache->clearCache();
     $result = $this->callAPISuccess('contact', 'getquick', array('name' => 'bob'));
     $this->assertEquals('Bob, Bob', $result['values'][0]['sort_name']);
     $this->assertEquals('E Bobby, Bobby', $result['values'][1]['sort_name']);

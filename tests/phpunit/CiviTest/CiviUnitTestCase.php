@@ -306,6 +306,9 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     // reset all the caches
     CRM_Utils_System::flushCache();
 
+    $aclContactCache = \Civi::service('acl_contact_cache');
+    $aclContactCache->clearCache();
+
     // initialize the object once db is loaded
     \Civi::reset();
     $config = CRM_Core_Config::singleton(TRUE, TRUE); // ugh, performance
