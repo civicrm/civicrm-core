@@ -14,6 +14,7 @@ class CRM_Contact_BAO_QueryStateNameTest extends CiviUnitTestCase {
    */
   public function testStateName() {
     $state_name = 'Norfolk';
+    $state_abbreviation = 'NFK';
     $create_params = array(
       'contact_type' => 'Individual',
       'first_name' => 'John',
@@ -30,8 +31,9 @@ class CRM_Contact_BAO_QueryStateNameTest extends CiviUnitTestCase {
       'sequential' => 1,
     );
     $get_res = civicrm_api3('Contact', 'get', $get_params);
-
     $this->assertEquals($state_name, $get_res['values'][0]['state_province_name']);
+    // Lock in that state_provice should equal that of the abbreviation.
+    $this->assertEquals($state_abbreviation, $get_res['values'][0]['state_province']);
   }
 
 }
