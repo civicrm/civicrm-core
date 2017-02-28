@@ -314,6 +314,52 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test submit with a membership block in place works with renewal.
+   */
+  public function testSubmitMembershipBlockNotSeparatePaymentProcessorInstantRenew() {
+    $this->setUpMembershipContributionPage();
+    $dummyPP = Civi\Payment\System::singleton()->getByProcessor($this->_paymentProcessor);
+    $dummyPP->setDoDirectPaymentResult(array('payment_status_id' => 1));
+    $submitParams = array(
+      'price_' . $this->_ids['price_field'][0] => reset($this->_ids['price_field_value']),
+      'id' => (int) $this->_ids['contribution_page'],
+      'amount' => 10,
+      'billing_first_name' => 'Billy',
+      'billing_middle_name' => 'Goat',
+      'billing_last_name' => 'Gruff',
+      'selectMembership' => $this->_ids['membership_type'],
+      'payment_processor_id' => 1,
+      'credit_card_number' => '4111111111111111',
+      'credit_card_type' => 'Visa',
+      'credit_card_exp_date' => array('M' => 9, 'Y' => 2040),
+      'cvv2' => 123,
+    );
+
+    $this->callAPISuccess('contribution_page', 'submit', $submitParams);
+    $contribution = $this->callAPISuccess('contribution', 'getsingle', array('contribution_page_id' => $this->_ids['contribution_page']));
+    $membershipPayment = $this->callAPISuccess('membership_payment', 'getsingle', array('contribution_id' => $contribution['id']));
+    $this->callAPISuccessGetCount('LineItem', array(
+      'entity_table' => 'civicrm_membership',
+      'entity_id' => $membershipPayment['id'],
+    ), 1);
+
+    $submitParams['contact_id'] = $contribution['contact_id'];
+
+    $this->callAPISuccess('contribution_page', 'submit', $submitParams);
+    $this->callAPISuccessGetCount('LineItem', array(
+      'entity_table' => 'civicrm_membership',
+      'entity_id' => $membershipPayment['id'],
+    ), 2);
+    $membership = $this->callAPISuccessGetSingle('Membership', array(
+      'id' => $membershipPayment['membership_id'],
+      'return' => array('end_date', 'join_date', 'start_date'),
+    ));
+    $this->assertEquals(date('Y-m-d'), $membership['start_date']);
+    $this->assertEquals(date('Y-m-d'), $membership['join_date']);
+    $this->assertEquals(date('Y-m-d', strtotime('+ 2 year - 1 day')), $membership['end_date']);
+  }
+
+  /**
    * Test submit with a membership block in place.
    */
   public function testSubmitMembershipBlockNotSeparatePaymentWithEmail() {
