@@ -150,7 +150,8 @@ function calculateSelectLineItemValue(priceElement) {
  */
 function calculateText(priceElement) {
   //CRM-16034 - comma acts as decimal in price set text pricing
-  var textval = parseFloat(cj(priceElement).val().replace(thousandMarker, ''));
+  //CRM-19937 - dollar sign easy mistake to make by users.
+  var textval = parseFloat(cj(priceElement).val().replace(thousandMarker, '').replace(symbol, ''));
 
   if (isNaN(textval)) {
     textval = parseFloat(0);
