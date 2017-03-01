@@ -872,7 +872,7 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
       INNER JOIN civicrm_activity_contact {$this->_aliases['civicrm_activity_contact']} ON {$this->_aliases['civicrm_activity_contact']}.activity_id = {$this->_aliases['civicrm_activity']}.id
       AND {$this->_aliases['civicrm_activity_contact']}.record_type_id = {$sourceID}
       LEFT JOIN civicrm_contact contact_civireport ON contact_civireport.id = {$this->_aliases['civicrm_activity_contact']}.contact_id 
-      WHERE {$this->_aclWhere} {$groupByFromSelect} {$this->_having} {$this->_orderBy} {$this->_limit}";
+      WHERE (1) AND {$this->_aclWhere} {$groupByFromSelect} {$this->_having} {$this->_orderBy} {$this->_limit}";
 
     $this->buildRows($sql, $rows);
 
