@@ -3690,6 +3690,17 @@ div.m ul#civicrm-menu,
   max-height: 600px;
   overflow: auto;
 }
+
+#crm-container div.ui-notify-message-style.alert {
+  background-color: rgba(50, 30, 0, 0.898);
+  border: 3px solid #CC4400;
+}
+
+#crm-container div.ui-notify-message-style.error {
+  background-color: rgba(50, 0, 0, 0.898);
+  border: 3px solid #CC0000;
+}
+
 #crm-container div.ui-notify-message h1 {
   font-size: 14px;
   margin: 0;
