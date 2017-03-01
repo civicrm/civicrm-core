@@ -81,9 +81,11 @@
       function formatTagSet(info) {
         info.date = CRM.utils.formatDate(info.created_date);
         info.used_for_label = [];
-        _.each(info.used_for.split(','), function(item) {
-          info.used_for_label.push(usedFor[item]);
-        });
+        if (undefined !== info.used_for) {
+          _.each(info.used_for.split(','), function(item) {
+            info.used_for_label.push(usedFor[item]);
+          });
+        }
       }
 
       _.each(tagSets, formatTagSet);
@@ -471,6 +473,7 @@
 <script type="text/template" id="tagsetHelpTpl">
   <div class="help">
     <% if(is_reserved == 1) {ldelim} %><strong>{ts}Reserved{/ts}</strong><% {rdelim} %>
+    <% if(undefined === display_name) var display_name = null; %>
     {ts 1="<%= used_for_label.join(', ') %>" 2="<%= date %>" 3="<%= display_name %>"}Tag Set for %1 (created %2 by %3).{/ts}
     <% if(typeof description === 'string' && description.length) {ldelim} %><p><em><%- description %></em></p><% {rdelim} %>
   </div>

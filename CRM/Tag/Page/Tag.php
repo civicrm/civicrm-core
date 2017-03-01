@@ -63,7 +63,9 @@ class CRM_Tag_Page_Tag extends CRM_Core_Page {
     foreach ($result['values'] as $id => $tagset) {
       $used = explode(',', CRM_Utils_Array::value('used_for', $tagset, ''));
       $tagset['used_for_label'] = array_values(array_intersect_key($usedFor, array_flip($used)));
-      $tagset['display_name'] = $tagset['created_id.display_name'];
+      if (isset($tagset['created_id.display_name'])) {
+        $tagset['display_name'] = $tagset['created_id.display_name'];
+      }
       unset($tagset['created_id.display_name']);
       $tagsets[$id] = $tagset;
     }
