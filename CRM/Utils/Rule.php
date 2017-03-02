@@ -138,6 +138,21 @@ class CRM_Utils_Rule {
    * @return bool
    */
   public static function mysqlOrderBy($str) {
+    $matches = array();
+    // Using the field function in order by is valid.
+    // Look for a string like field(contribution_status_id,3,4,6).
+    // or field(civicrm_contribution.contribution_status_id,3,4,6)
+    if (preg_match('/field\([a-z_.]+,[0-9,]+\)/', $str, $matches)) {
+      // We have checked these. Remove them as they will fail the next lot.
+      // Our check currently only permits numbers & no back ticks. If we get a
+      // need for strings or backticks we can add.
+      $str = str_replace($matches, '', $str);
+    }
+    $str = trim($str);
+    if (!empty($matches) && empty($str)) {
+      // nothing left to check after the field check.
+      return TRUE;
+    }
     // Making a regex for a comma separated list is quite hard and not readable
     // at all, so we split and loop over.
     $parts = explode(',', $str);

@@ -381,7 +381,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
 
     if (($mappingType == 'Search Builder') || ($exportMode == CRM_Export_Form_Select::CONTRIBUTE_EXPORT)) {
       if (CRM_Core_Permission::access('CiviContribute')) {
-        $fields['Contribution'] = CRM_Contribute_BAO_Contribution::exportableFields();
+        $fields['Contribution'] = CRM_Contribute_BAO_Contribution::getExportableFieldsWithPseudoConstants();
         unset($fields['Contribution']['contribution_contact_id']);
         $compArray['Contribution'] = ts('Contribution');
       }

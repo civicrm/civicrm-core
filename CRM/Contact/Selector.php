@@ -488,6 +488,9 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
         elseif (isset($this->_query->_fields[$prop]) && isset($this->_query->_fields[$prop]['title'])) {
           $title = $this->_query->_fields[$prop]['title'];
         }
+        elseif (isset($this->_query->_pseudoConstantsSelect[$prop]) && isset($this->_query->_pseudoConstantsSelect[$prop]['pseudoconstant']['optionGroupName'])) {
+          $title = CRM_Core_BAO_OptionGroup::getTitleByName($this->_query->_pseudoConstantsSelect[$prop]['pseudoconstant']['optionGroupName']);
+        }
         else {
           $title = '';
         }

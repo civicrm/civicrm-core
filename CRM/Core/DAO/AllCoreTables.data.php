@@ -24,7 +24,7 @@
 | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
 +--------------------------------------------------------------------+
 */
-// (GenCodeChecksum:5a41993a5c97a2544f3cc2e4df8879e2)
+// (GenCodeChecksum:b66a5c6ab79bec53c7781738c148e525)
 return array(
   'CRM_Core_DAO_AddressFormat' => array(
     'name' => 'AddressFormat',

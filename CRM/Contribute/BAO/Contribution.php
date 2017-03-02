@@ -781,6 +781,15 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
   }
 
   /**
+   * Get exportable fields with pseudoconstants rendered as an extra field.
+   */
+  public static function getExportableFieldsWithPseudoConstants() {
+    $fields = self::exportableFields();
+    CRM_Core_DAO::appendPseudoConstantsToFields($fields);
+    return $fields;
+  }
+
+  /**
    * Combine all the exportable fields from the lower level objects.
    *
    * @param bool $checkPermission
@@ -799,14 +808,6 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       $expFieldsContrib = CRM_Contribute_DAO_ContributionProduct::export();
       $typeField = CRM_Financial_DAO_FinancialType::export();
       $financialAccount = CRM_Financial_DAO_FinancialAccount::export();
-      $optionField = CRM_Core_OptionValue::getFields($mode = 'contribute');
-      $contributionStatus = array(
-        'contribution_status' => array(
-          'title' => ts('Contribution Status'),
-          'name' => 'contribution_status',
-          'data_type' => CRM_Utils_Type::T_STRING,
-        ),
-      );
 
       $contributionPage = array(
         'contribution_page' => array(
@@ -883,7 +884,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
         ),
       );
 
-      $fields = array_merge($impFields, $typeField, $contributionStatus, $contributionPage, $optionField, $expFieldProduct,
+      $fields = array_merge($impFields, $typeField, $contributionPage, $expFieldProduct,
         $expFieldsContrib, $contributionNote, $extraFields, $softCreditFields, $financialAccount, $premiums, $campaignTitle,
         CRM_Core_BAO_CustomField::getFieldsForImport('Contribution', FALSE, FALSE, FALSE, $checkPermission)
       );
@@ -1137,6 +1138,8 @@ LEFT JOIN  civicrm_line_item i ON ( i.contribution_id = c.id AND i.entity_table 
    */
   public static function getContributionFields($addExtraFields = TRUE) {
     $contributionFields = CRM_Contribute_DAO_Contribution::export();
+    // @todo remove this - this line was added because payment_instrument_id was not
+    // set to exportable - but now it is.
     $contributionFields = array_merge($contributionFields, CRM_Core_OptionValue::getFields($mode = 'contribute'));
 
     if ($addExtraFields) {
@@ -3702,6 +3705,9 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
   public static function buildOptions($fieldName, $context = NULL, $props = array()) {
     $className = __CLASS__;
     $params = array();
+    if (isset($props['orderColumn'])) {
+      $params['orderColumn'] = $props['orderColumn'];
+    }
     switch ($fieldName) {
       // This field is not part of this object but the api supports it
       case 'payment_processor':
