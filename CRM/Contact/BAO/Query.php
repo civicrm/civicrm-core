@@ -4806,11 +4806,10 @@ civicrm_relationship.is_permission_a_b = 0
     $onlyDeleted = in_array(array('deleted_contacts', '=', '1', '0', '0'), $this->_params);
     list($select, $from, $where) = $this->query(FALSE, FALSE, FALSE, $onlyDeleted);
     $from = " FROM civicrm_prevnext_cache pnc INNER JOIN civicrm_contact contact_a ON contact_a.id = pnc.entity_id1 AND pnc.cacheKey = '$cacheKey' " . substr($from, 31);
-    $order = " ORDER BY pnc.id";
     $groupByCol = array('contact_a.id', 'pnc.id');
     $groupBy = self::getGroupByFromSelectColumns($this->_select, $groupByCol);
     $limit = " LIMIT $offset, $rowCount";
-    $query = "$select $from $where $groupBy $order $limit";
+    $query = "$select $from $where $groupBy $limit";
 
     return CRM_Core_DAO::executeQuery($query);
   }

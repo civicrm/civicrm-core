@@ -499,7 +499,6 @@ SELECT entity_id1, entity_id2 FROM civicrm_prevnext_cache
 WHERE cacheKey LIKE %1
       $actionGet
       $entity_whereClause
-ORDER BY id
 ";
       $params[1] = array("{$cacheKey}%", 'String');
 
