@@ -37,7 +37,7 @@
     <div class="crm-summary-row">
       <div class="crm-label">{$form.birth_date.label}</div>
       <div class="crm-content">
-        {include file="CRM/common/jcalendar.tpl" elementName=birth_date}
+        {$form.birth_date.html}
       </div>
     </div>
     <div class="crm-summary-row">
@@ -50,7 +50,7 @@
     <div class="crm-summary-row">
       <div class="crm-label crm-deceased-date">{$form.deceased_date.label}</div>
       <div class="crm-content crm-deceased-date">
-        {include file="CRM/common/jcalendar.tpl" elementName=deceased_date}
+        {$form.deceased_date.html}
       </div>
     </div>
   </div>

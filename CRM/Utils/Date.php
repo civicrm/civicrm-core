@@ -939,21 +939,21 @@ class CRM_Utils_Date {
   }
 
   /**
-   * Check given format is valid for bith date.
-   * and retrun supportable birth date format w/ qf mapping.
+   * Get the smarty view presentation mapping for the given format.
+   *
+   * Historically it was decided that where the view format is 'dd/mm/yy' or 'mm/dd/yy'
+   * they should be rendered using a longer date format. This is likely as much to
+   * do with the earlier date widget being unable to handle some formats as usablity.
+   * However, we continue to respect this.
    *
    * @param $format
    *   Given format ( eg 'M Y', 'Y M' ).
-   *   return array of qfMapping and date parts for date format.
    *
-   * @return array|null|string
+   * @return string|null
+   *   Smarty translation of the date format. Null is also valid and is translated
+   *   according to the available parts at the smarty layer.
    */
-  public static function &checkBirthDateFormat($format = NULL) {
-    $birthDateFormat = NULL;
-    if (!$format) {
-      $birthDateFormat = self::getDateFormat('birth');
-    }
-
+  public static function getDateFieldViewFormat($format) {
     $supportableFormats = array(
       'mm/dd' => '%B %E%f',
       'dd-mm' => '%E%f %B',
@@ -963,11 +963,57 @@ class CRM_Utils_Date {
       'dd/mm/yy' => '%E%f %B %Y',
     );
 
-    if (array_key_exists($birthDateFormat, $supportableFormats)) {
-      $birthDateFormat = array('qfMapping' => $supportableFormats[$birthDateFormat]);
-    }
+    return array_key_exists($format, $supportableFormats) ? $supportableFormats[$format] : self::pickBestSmartyFormat($format);
+  }
 
-    return $birthDateFormat;
+  /**
+   * Pick the smarty format from settings that best matches the time string we have.
+   *
+   * For view purposes we historically use the setting that most closely matches the data
+   * in the format from our settings, as opposed to the setting configured for the field.
+   *
+   * @param $format
+   * @return mixed
+   */
+  public static function pickBestSmartyFormat($format) {
+    if (stristr($format, 'h')) {
+      return Civi::settings()->get('dateformatDatetime');
+    }
+    if (stristr($format, 'd') || stristr($format, 'j')) {
+      return Civi::settings()->get('dateformatFull');
+    }
+    if (stristr($format, 'm')) {
+      return Civi::settings()->get('dateformatPartial');
+    }
+    return Civi::settings()->get('dateformatYear');
+  }
+
+  /**
+   * Map date plugin and actual format that is used by PHP.
+   *
+   * @return array
+   */
+  public static function datePluginToPHPFormats() {
+    $dateInputFormats = array(
+      "mm/dd/yy" => 'm/d/Y',
+      "dd/mm/yy" => 'd/m/Y',
+      "yy-mm-dd" => 'Y-m-d',
+      "dd-mm-yy" => 'd-m-Y',
+      "dd.mm.yy" => 'd.m.Y',
+      "M d" => 'M j',
+      "M d, yy" => 'M j, Y',
+      "d M yy" => 'j M Y',
+      "MM d, yy" => 'F j, Y',
+      "d MM yy" => 'j F Y',
+      "DD, d MM yy" => 'l, j F Y',
+      "mm/dd" => 'm/d',
+      "dd-mm" => 'd-m',
+      "yy-mm" => 'Y-m',
+      "M yy" => 'M Y',
+      "M Y" => 'M Y',
+      "yy" => 'Y',
+    );
+    return $dateInputFormats;
   }
 
   /**
@@ -1742,27 +1788,6 @@ class CRM_Utils_Date {
   }
 
   /**
-   * Convert a Civi-special date string to a standard php date string.
-   *
-   * For historical reasons CiviCRM has it's own (possibly Smarty derived)
-   * format for defined date strings. This renders something php can use.
-   *
-   * @param string $dateFormatString
-   *   e.g mm/dd/yy
-   *   These map to the values used in the date_format field in civicrm_custom_field.date_format.
-   *
-   * @return string
-   *   A proper php strotime formatted equivalent of the string.
-   *   eg m/d/y for the above.
-   *
-   *   http://php.net/manual/en/function.strtotime.php
-   */
-  public static function getPhpDateFormatFromInputStyleDateFormat($dateFormatString) {
-    $formats = CRM_Core_SelectValues::datePluginToPHPFormats();
-    return $formats[$dateFormatString];
-  }
-
-  /**
    * Add the metadata about a date field to the field.
    *
    * This metadata will work with the call $form->add('datepicker', ...
@@ -1783,10 +1808,7 @@ class CRM_Utils_Date {
           $field['date_format'] = $dateAttributes['format'];
           $field['is_datetime_field'] = TRUE;
           $field['time_format'] = $dateAttributes['time'];
-          $field['php_datetime_format'] = CRM_Utils_Date::getPhpDateFormatFromInputStyleDateFormat($field['date_format']);
-          if ($field['time_format']) {
-            $field['php_datetime_format'] .= ' H-i-s';
-          }
+          $field['smarty_view_format'] = $dateAttributes['smarty_view_format'];
         }
         $field['datepicker']['extra'] = self::getDatePickerExtra($field);
         $field['datepicker']['attributes'] = self::getDatePickerAttributes($field);
