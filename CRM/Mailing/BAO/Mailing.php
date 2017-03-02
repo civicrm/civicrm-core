@@ -1488,8 +1488,9 @@ ORDER BY   civicrm_email.is_bulkmail DESC
         $url .= '"';
       }
       $data = $url;
+      // CRM-20206 Fix ampersand encoding in plain text emails
       if (empty($html)) {
-        $data = str_replace('&amp;', '&', $data);
+        $data = CRM_Utils_String::unstupifyUrl($data);
       }
     }
     elseif ($type == 'url') {
