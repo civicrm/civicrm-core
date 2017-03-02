@@ -465,6 +465,14 @@ class CRM_Report_Form extends CRM_Core_Form {
    */
 
   protected $sqlArray;
+
+  /**
+   * Holds permissioned financial type.
+   *
+   */
+
+  protected $financialTypes = NULL;
+
   /**
    * Class constructor.
    */
@@ -2658,10 +2666,10 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     $this->select();
     $this->from();
     $this->customDataFrom();
-    $this->where();
     if (array_key_exists('civicrm_contribution', $this->getVar('_columns'))) {
-      $this->getPermissionedFTQuery($this);
+      self::getSelectWhereClause($this);
     }
+    $this->where();
     $this->groupBy();
     $this->orderBy();
 
@@ -4668,48 +4676,41 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
    * Generate temporary table to hold all contributions with permissioned FTs.
    *
    * @param object $query
-   * @param string $alias
    * @param bool $return
    *
    * @return string
+   *
+   * TODO: This needs to be removed in favour of new hook approach.
    */
-  public function getPermissionedFTQuery(&$query, $alias = NULL, $return = FALSE) {
+  public function getPermissionedFTQuery(&$query, $return = FALSE) {
     if (!CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
       return FALSE;
     }
-    $financialTypes = NULL;
-    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes);
-    if (empty($financialTypes)) {
+    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($this->financialTypes);
+    if (strpos($query->_from, 'civicrm_contribution') === FALSE) {
+      return FALSE;
+    }
+    if (empty($this->financialTypes)) {
       $contFTs = "0";
       $liFTs = implode(',', array_keys(CRM_Contribute_Pseudoconstant::financialType()));
     }
     else {
-      $contFTs = $liFTs = implode(',', array_keys($financialTypes));
-    }
-    $temp = CRM_Utils_Array::value('civicrm_line_item', $query->_aliases);
-    if ($alias) {
-      $query->_aliases['civicrm_line_item'] = $alias;
-    }
-    elseif (!$temp) {
-      $query->_aliases['civicrm_line_item'] = 'civicrm_line_item_civireport';
+      $contFTs = $liFTs = implode(',', array_keys($this->financialTypes));
     }
     if (empty($query->_where)) {
       $query->_where = "WHERE {$query->_aliases['civicrm_contribution']}.id IS NOT NULL ";
     }
     CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE IF EXISTS civicrm_contribution_temp");
-    $sql = "CREATE TEMPORARY TABLE civicrm_contribution_temp {$this->_databaseAttributes} AS SELECT {$query->_aliases['civicrm_contribution']}.id {$query->_from}
-              LEFT JOIN civicrm_line_item   {$query->_aliases['civicrm_line_item']}
-                      ON {$query->_aliases['civicrm_contribution']}.id = {$query->_aliases['civicrm_line_item']}.contribution_id AND
-                         {$query->_aliases['civicrm_line_item']}.entity_table = 'civicrm_contribution'
-                      AND {$query->_aliases['civicrm_line_item']}.financial_type_id NOT IN (" . $liFTs . ")
+    $sql = "CREATE TEMPORARY TABLE civicrm_contribution_temp AS SELECT {$query->_aliases['civicrm_contribution']}.id {$query->_from}
+              LEFT JOIN civicrm_line_item  civicrm_line_item_ft
+                      ON {$query->_aliases['civicrm_contribution']}.id = civicrm_line_item_ft.contribution_id AND
+                         civicrm_line_item_ft.entity_table = 'civicrm_contribution'
+                      AND civicrm_line_item_ft.financial_type_id NOT IN (" . $liFTs . ")
               {$query->_where}
                       AND {$query->_aliases['civicrm_contribution']}.financial_type_id IN (" . $contFTs . ")
-                      AND {$query->_aliases['civicrm_line_item']}.id IS NULL
+                      AND civicrm_line_item_ft.id IS NULL
               GROUP BY {$query->_aliases['civicrm_contribution']}.id";
     CRM_Core_DAO::executeQuery($sql);
-    if (isset($temp)) {
-      $query->_aliases['civicrm_line_item'] = $temp;
-    }
     $from = " INNER JOIN civicrm_contribution_temp temp ON {$query->_aliases['civicrm_contribution']}.id = temp.id ";
     if ($return) {
       return $from;
@@ -4863,6 +4864,115 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
         $this->_from .= "
           LEFT JOIN $this->groupTempTable group_temp_table
           ON $tableAlias.{$field} = group_temp_table.id ";
+      }
+    }
+  }
+
+  /**
+   * Function to alter from/where clause for contribution by adding checks for permissoned financial type.
+   *
+   * @return array
+   */
+  public function getPermissionedFromWhereClauseForContribution() {
+    $clause = $this->getPermissionedFTClause();
+    if (is_null($clause)) {
+      return array();
+    }
+
+    $join = " AND {$this->_aliases['civicrm_contribution']}.$clause
+      INNER JOIN civicrm_line_item ON civicrm_line_item.contribution_id = {$this->_aliases['civicrm_contribution']}.id
+      AND civicrm_line_item.$clause";
+
+    return $join;
+  }
+
+  /**
+   * Function to alter from/where clause for membership by adding checks for permissoned financial type.
+   *
+   *
+   * @return array
+   */
+  public function getPermissionedFromWhereClauseForMembership() {
+    $clause = $this->getPermissionedFTClause();
+    if (is_null($clause)) {
+      return array();
+    }
+
+    $join = " INNER JOIN civicrm_membership_type ON civicrm_membership_type.id = {$this->_aliases['civicrm_membership']}.membership_type_id AND civicrm_membership_type.$clause
+      LEFT JOIN civicrm_line_item ON civicrm_line_item.entity_id = {$this->_aliases['civicrm_membership']}.id AND 'civicrm_membership' = civicrm_line_item.entity_table";
+    $whereClause = " AND (civicrm_line_item.{$clause} OR civicrm_line_item.id IS NULL)";
+
+    return array($whereClause, $join);
+  }
+
+  /**
+   * Function to alter from/where clause for participant by adding checks for permissoned financial type.
+   *
+   *
+   * @return array
+   */
+  public function getPermissionedFromWhereClauseForParticipant() {
+    $clause = $this->getPermissionedFTClause();
+    if (is_null($clause)) {
+      return array();
+    }
+
+    $join = " LEFT JOIN civicrm_line_item ON civicrm_line_item.entity_id = {$this->_aliases['civicrm_participant']}.id AND 'civicrm_{participant}' = civicrm_line_item.entity_table";
+    $whereClause = " AND (civicrm_line_item.{$clause} OR civicrm_line_item.id IS NULL)";
+
+    return array($whereClause, $join);
+  }
+
+  /**
+   * Function to build clause for financial type.
+   *
+   *
+   * @return string
+   */
+  public function getPermissionedFTClause() {
+    if (empty($this->financialTypes)) {
+      return NULL;
+    }
+
+    $fTypes = implode(',', array_keys($this->financialTypes));
+    $clause = "financial_type_id IN ({$fTypes})";
+
+    return $clause;
+  }
+
+  /**
+   * Function to build where clause for financial type ACL.
+   *
+   * @param array $clauses
+   * @param string $alias
+   *
+   */
+  public function getPermissionedFTClauseForLineItem(&$clauses, $alias = NULL) {
+    if (!CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
+      return FALSE;
+    }
+    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($this->financialTypes);
+    $clause = $this->getPermissionedFTClause();
+    if (empty($alias)) {
+      $alias = $this->_aliases['civicrm_line_item'];
+    }
+    $clauses[] = $alias . '.' . $clause;
+  }
+
+  /**
+   * Function to build select where clause for financial type ACL.
+   *
+   * @param object $query
+   *
+   */
+  public function getSelectWhereClause(&$query) {
+    $clauses = array();
+    $aliases = $query->getVar('_aliases');
+    CRM_Utils_Hook::selectWhereClause('Contribution', $clauses);
+    if (!empty($clauses)) {
+      foreach ($clauses as $field => $vals) {
+        $tableAlias = $aliases[$field];
+        $query->_whereClauses[] = "`$tableAlias`.`" . key($vals) . "` " . implode(" AND `$tableAlias`.`" . key($vals) . "` ", (array) $vals);
       }
     }
   }

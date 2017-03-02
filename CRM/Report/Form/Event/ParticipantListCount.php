@@ -478,6 +478,7 @@ class CRM_Report_Form_Event_ParticipantListCount extends CRM_Report_Form_Event {
   public function storeWhereHavingClauseArray() {
     parent::storeWhereHavingClauseArray();
     $this->_whereClauses[] = "{$this->_aliases['civicrm_participant']}.is_test = 0";
+    $this->getPermissionedFTClauseForLineItem($this->_whereClauses);
   }
 
   public function groupBy() {
