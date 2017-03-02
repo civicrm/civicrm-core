@@ -473,7 +473,7 @@
 <script type="text/template" id="tagsetHelpTpl">
   <div class="help">
     <% if(is_reserved == 1) {ldelim} %><strong>{ts}Reserved{/ts}</strong><% {rdelim} %>
-    <% if(undefined === display_name) var display_name = null; %>
+    <% if(undefined === display_name) {ldelim} var display_name = null; {rdelim} %>
     {ts 1="<%= used_for_label.join(', ') %>" 2="<%= date %>" 3="<%= display_name %>"}Tag Set for %1 (created %2 by %3).{/ts}
     <% if(typeof description === 'string' && description.length) {ldelim} %><p><em><%- description %></em></p><% {rdelim} %>
   </div>
