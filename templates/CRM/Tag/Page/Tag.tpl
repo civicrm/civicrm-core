@@ -92,6 +92,7 @@
 
       function renderTree($panel) {
         var plugins,
+          selected = [],
           tagset = $panel.attr('id').split('-')[1] || 0;
 
         function hasChildren(id) {
@@ -116,10 +117,12 @@
         function changeSelection(e, data) {
           var tplParams = {
             tagset: tagset,
+            tagsetCount: _.keys(tagSets).length,
             adminReserved: CRM.checkPerm('administer reserved tags')
           },
             tree = $('.tag-tree', $panel).jstree(true),
             $infoBox = $('.tag-info', $panel);
+          selected = data.selected;
           if (!data.selected || !data.selected.length) {
             tplParams.is_reserved = tagset ? tagSets[tagset].is_reserved == 1 : false;
             tplParams.length = $('.tag-tree li', $panel).length;
@@ -194,11 +197,46 @@
           addHelp();
         }
 
+        function moveTagDialog(e) {
+          e.preventDefault();
+          var sets = [{key: '0', value: '{/literal}{ts escape='js'}Main Tag Tree{/ts}{literal}'}];
+          _.each(tagSets, function(tagSet) {
+            sets.push({key: tagSet.id, value: tagSet.name});
+          });
+          CRM.confirm({
+            title: '{/literal}{ts escape='js'}Move to Tagset{/ts}{literal}',
+            message: '<label for="select-tagset">{/literal}{ts escape='js'}Select Tagset{/ts}{literal}: '
+              + '<select id="select-tagset" class="crm-select2 big">'
+              + CRM.utils.renderOptions(sets, tagset)
+              + '</select>'
+          })
+            .on('crmConfirm:yes', function() {
+              var chosen = parseInt($('#select-tagset').val());
+              if (parseInt(tagset) !== chosen) {
+                var apiCalls = [];
+                _.each(selected, function(id) {
+                  apiCalls.push(['Tag', 'create', {id: id, parent_id: chosen || ''}]);
+                });
+                $('#mainTabContainer').block();
+                CRM.api3(apiCalls, true)
+                  .done(function() {
+                    $('.tag-tree', $panel).jstree(true).refresh();
+                    $('#mainTabContainer').unblock();
+                    var $otherPanel = $(chosen ? '#tagset-' + chosen : '#tree');
+                    if ($('.tag-tree', $otherPanel).length) {
+                      $('.tag-tree', $otherPanel).jstree(true).refresh();
+                    }
+                  });
+              }
+            });
+        }
+
         $panel
           .append('<div class="tag-tree-wrapper"><div class="tag-tree"></div><div class="tag-info"></div></div>')
           .on('change', 'input[type=color]', changeColor)
           .on('change', 'input[name=used_for]', changeUsedFor)
           .on('click', '.clear-tag-selection', clearSelection)
+          .on('click', '.move-tag-button', moveTagDialog)
           .on('click', '.used-for-toggle', function() {
             $(this).attr('style', 'display: none !important;').next().show();
           })
@@ -442,10 +480,17 @@
     <a href="{crmURL p="civicrm/tag/edit" q="action=add&clone_from="}<%= id %>" class="button crm-popup" title="{ts}Duplicate ths tag{/ts}">
       <span><i class="crm-i fa-copy"></i>&nbsp; {ts}Clone Tag{/ts}</span>
     </a>
-    <% if(!hasChildren && (!data.is_reserved || adminReserved)) {ldelim} %>
-      <a href="{crmURL p="civicrm/tag/edit" q="action=delete&id="}<%= id %>" class="button crm-popup small-popup">
-        <span><i class="crm-i fa-trash"></i>&nbsp; {ts}Delete{/ts}</span>
-      </a>
+    <% if(!data.is_reserved || adminReserved) {ldelim} %>
+      <% if(tagsetCount) {ldelim} %>
+        <a href="#move" class="button move-tag-button" title="{ts}Move to a different tagset{/ts}">
+          <span><i class="crm-i fa-share-square-o"></i>&nbsp; {ts}Move Tag{/ts}</span>
+        </a>
+      <% {rdelim} %>
+      <% if(!hasChildren) {ldelim} %>
+        <a href="{crmURL p="civicrm/tag/edit" q="action=delete&id="}<%= id %>" class="button crm-popup small-popup">
+          <span><i class="crm-i fa-trash"></i>&nbsp; {ts}Delete{/ts}</span>
+        </a>
+      <% {rdelim} %>
     <% {rdelim} %>
   </div>
 </script>
@@ -459,13 +504,20 @@
   <p><span class="tdl">{ts}Total Usage:{/ts}</span> <%= usages %></p>
   <a class="clear-tag-selection" href="#" title="{ts}Clear selection{/ts}"><i class="crm-i fa-ban"></i></a>
   <div class="crm-submit-buttons">
-    <a href="{crmURL p="civicrm/tag/merge" q="id="}<%= items.join() %>" class="button crm-popup small-popup" title="{ts}Combine tags into one{/ts}">
-      <span><i class="crm-i fa-compress"></i>&nbsp; {ts}Merge Tags{/ts}</span>
-    </a>
-    <% if(!hasChildren && (!reserved || adminReserved)) {ldelim} %>
-      <a href="{crmURL p="civicrm/tag/edit" q="action=delete&id="}<%= items.join() %>" class="button crm-popup small-popup">
-        <span><i class="crm-i fa-trash"></i>&nbsp; {ts}Delete All{/ts}</span>
+    <% if(!reserved || adminReserved) {ldelim} %>
+      <a href="{crmURL p="civicrm/tag/merge" q="id="}<%= items.join() %>" class="button crm-popup small-popup" title="{ts}Combine tags into one{/ts}">
+        <span><i class="crm-i fa-compress"></i>&nbsp; {ts}Merge Tags{/ts}</span>
       </a>
+      <% if(tagsetCount) {ldelim} %>
+        <a href="#move" class="button move-tag-button" title="{ts}Move to a different tagset{/ts}">
+          <span><i class="crm-i fa-share-square-o"></i>&nbsp; {ts}Move Tags{/ts}</span>
+        </a>
+      <% {rdelim} %>
+      <% if(!hasChildren) {ldelim} %>
+        <a href="{crmURL p="civicrm/tag/edit" q="action=delete&id="}<%= items.join() %>" class="button crm-popup small-popup">
+          <span><i class="crm-i fa-trash"></i>&nbsp; {ts}Delete All{/ts}</span>
+        </a>
+      <% {rdelim} %>
     <% {rdelim} %>
   </div>
 </script>
