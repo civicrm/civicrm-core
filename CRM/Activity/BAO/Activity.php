@@ -1046,6 +1046,9 @@ LEFT JOIN   civicrm_case_activity ON ( civicrm_case_activity.activity_id = tbl.a
       }
     }
 
+    $aclClauses = array_filter(CRM_Activity_BAO_Activity::getSelectWhereClause());
+    $commonClauses += $aclClauses;
+
     $commonClause = implode(' AND ', $commonClauses);
 
     $includeCaseActivities = FALSE;
