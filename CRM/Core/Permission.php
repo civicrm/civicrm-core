@@ -869,6 +869,10 @@ class CRM_Core_Permission {
         $prefix . ts('edit own api keys'),
         ts('Edit user\'s own API keys'),
       ),
+      'administer Accounting' => array(
+        $prefix . ts('administer Accounting'),
+        ts('Administer Accounting'),
+      ),
     );
 
     return $permissions;

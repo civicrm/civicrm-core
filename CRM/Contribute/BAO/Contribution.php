@@ -5128,9 +5128,13 @@ LIMIT 1;";
    * @return string
    *
    */
-  public static function checkContributeSettings($name = NULL) {
+  public static function checkContributeSettings($name = NULL, $updateField = array()) {
     $contributeSettings = Civi::settings()->get('contribution_invoice_settings');
-
+    if (!empty($updateField)) {
+      $contributeSettings = array_replace($contributeSettings, $updateField);
+      Civi::settings()->set('contribution_invoice_settings', $contributeSettings);
+      return NULL;
+    }
     if ($name) {
       return CRM_Utils_Array::value($name, $contributeSettings);
     }
