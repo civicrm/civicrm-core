@@ -43,12 +43,19 @@ class CRM_Tag_Form_Merge extends CRM_Core_Form {
     $this->_id = explode(',', $this->_id);
     $url = CRM_Utils_System::url('civicrm/tag');
     if (count($this->_id) < 2) {
-      CRM_Core_Error::statusBounce(ts("You must select at least 2 tags for merging"), $url);
+      CRM_Core_Error::statusBounce(ts("You must select at least 2 tags for merging."), $url);
     }
     $tags = civicrm_api3('Tag', 'get', array('id' => array('IN' => $this->_id), 'options' => array('limit' => 0)));
     $this->_tags = $tags['values'];
     if (count($this->_id) != count($this->_tags)) {
       CRM_Core_Error::statusBounce(ts("Unknown tag."), $url);
+    }
+    if (!CRM_Core_Permission::check('administer reserved tags')) {
+      foreach ($tags['values'] as $tag) {
+        if (!empty($tag['is_reserved'])) {
+          CRM_Core_Error::statusBounce(ts("You do not have permission to administer reserved tags."), $url);
+        }
+      }
     }
   }
 
