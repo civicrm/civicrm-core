@@ -480,7 +480,7 @@ class CRM_Core_DAO extends DB_DataObject {
 
       if ($hook) {
         $event = new \Civi\Core\DAO\Event\PostUpdate($this);
-        \Civi::service('dispatcher')->dispatch("DAO::post-update", $event);
+        \Civi::service('dispatcher')->dispatch("civi.dao.postUpdate", $event);
       }
     }
     else {
@@ -488,7 +488,7 @@ class CRM_Core_DAO extends DB_DataObject {
 
       if ($hook) {
         $event = new \Civi\Core\DAO\Event\PostUpdate($this);
-        \Civi::service('dispatcher')->dispatch("DAO::post-insert", $event);
+        \Civi::service('dispatcher')->dispatch("civi.dao.postInsert", $event);
       }
     }
     $this->free();
@@ -529,7 +529,7 @@ class CRM_Core_DAO extends DB_DataObject {
     $result = parent::delete($useWhere);
 
     $event = new \Civi\Core\DAO\Event\PostDelete($this, $result);
-    \Civi::service('dispatcher')->dispatch("DAO::post-delete", $event);
+    \Civi::service('dispatcher')->dispatch("civi.dao.postDelete", $event);
     $this->free();
 
     return $result;
