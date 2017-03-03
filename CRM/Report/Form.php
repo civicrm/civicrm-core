@@ -329,7 +329,7 @@ class CRM_Report_Form extends CRM_Core_Form {
    *
    * @var array
    */
-  protected $_selectedTables;
+  protected $_selectedTables = array();
 
   /**
    * Array of DAO tables having columns included in WHERE or HAVING clause
@@ -2658,6 +2658,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     $this->select();
     $this->from();
     $this->customDataFrom();
+    $this->buildPermissionClause();
     $this->where();
     if (array_key_exists('civicrm_contribution', $this->getVar('_columns'))) {
       $this->getPermissionedFTQuery($this);
@@ -3607,12 +3608,36 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
   }
 
   /**
-   * Build acl clauses.
+   * Buld contact acl clause
+   * @deprecated in favor of buildPermissionClause
    *
    * @param string $tableAlias
    */
   public function buildACLClause($tableAlias = 'contact_a') {
     list($this->_aclFrom, $this->_aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause($tableAlias);
+  }
+
+  /**
+   * Build the permision clause for all entities in this report
+   */
+  public function buildPermissionClause() {
+    $ret = array();
+    foreach ($this->selectedTables() as $tableName) {
+      $baoName = str_replace('_DAO_', '_BAO_', CRM_Core_DAO_AllCoreTables::getClassForTable($tableName));
+      if ($baoName && class_exists($baoName) && !empty($this->_columns[$tableName]['alias'])) {
+        $tableAlias = $this->_columns[$tableName]['alias'];
+        $clauses = array_filter($baoName::getSelectWhereClause($tableAlias));
+        foreach ($clauses as $field => $clause) {
+          // Skip contact_id field if redundant
+          if ($field != 'contact_id' || !in_array('civicrm_contact', $this->selectedTables())) {
+            $ret["$tableName.$field"] = $clause;
+          }
+        }
+      }
+    }
+    // Override output from buildACLClause
+    $this->_aclFrom = NULL;
+    $this->_aclWhere = implode(' AND ', $ret);
   }
 
   /**
