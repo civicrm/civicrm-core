@@ -338,6 +338,16 @@ class CRM_Dedupe_Finder {
             }
           }
         }
+        if ($table == 'civicrm_phone') {
+          $fixes = array(
+            'phone' => 'phone_numeric'
+          );
+          foreach ($fixes as $orig => $target) {
+            if (!empty($flat[$orig])) {
+              $params[$table][$target] = $flat[$orig];
+            }
+          }
+        }
         foreach ($fields as $field => $title) {
           if (!empty($flat[$field])) {
             $params[$table][$field] = $flat[$field];
