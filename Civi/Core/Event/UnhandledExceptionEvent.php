@@ -28,10 +28,10 @@
 namespace Civi\Core\Event;
 
 /**
- * Class AuthorizeEvent
+ * Class UnhandledExceptionEvent
  * @package Civi\API\Event
  */
-class UnhandledExceptionEvent extends \Symfony\Component\EventDispatcher\Event {
+class UnhandledExceptionEvent extends GenericHookEvent {
 
   /**
    * @var \Exception
@@ -50,6 +50,13 @@ class UnhandledExceptionEvent extends \Symfony\Component\EventDispatcher\Event {
   public function __construct($e, $request) {
     $this->request = $request;
     $this->exception = $e;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function getHookValues() {
+    return array($this->exception, $this->request);
   }
 
 }
