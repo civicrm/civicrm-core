@@ -106,6 +106,9 @@ class Container {
     $container->addObjectResource($this);
     $container->setParameter('civicrm_base_path', $civicrm_base_path);
     //$container->set(self::SELF, $this);
+
+    $container->addResource(new \Symfony\Component\Config\Resource\FileResource(__FILE__));
+
     $container->setDefinition(self::SELF, new Definition(
       'Civi\Core\Container',
       array()
@@ -134,7 +137,7 @@ class Container {
       ->setFactoryService(self::SELF)->setFactoryMethod('createAngularManager');
 
     $container->setDefinition('dispatcher', new Definition(
-      'Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher',
+      'Civi\Core\CiviEventDispatcher',
       array(new Reference('service_container'))
     ))
       ->setFactoryService(self::SELF)->setFactoryMethod('createEventDispatcher');
@@ -238,7 +241,7 @@ class Container {
    * @return \Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher
    */
   public function createEventDispatcher($container) {
-    $dispatcher = new ContainerAwareEventDispatcher($container);
+    $dispatcher = new CiviEventDispatcher($container);
     $dispatcher->addListener(SystemInstallEvent::EVENT_NAME, array('\Civi\Core\InstallationCanary', 'check'));
     $dispatcher->addListener(SystemInstallEvent::EVENT_NAME, array('\Civi\Core\DatabaseInitializer', 'initialize'));
     $dispatcher->addListener('hook_civicrm_post::Activity', array('\Civi\CCase\Events', 'fireCaseChange'));
