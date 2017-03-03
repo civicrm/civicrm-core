@@ -2261,4 +2261,70 @@ LEFT  JOIN  civicrm_price_field_value value ON ( value.id = lineItem.price_field
     return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
   }
 
+  /**
+   * Change revenue recognition date for participants.
+   *
+   * @param array $event
+   */
+  public static function updateDeferredTransactions($event) {
+    if (empty($event['id'])) {
+      return;
+    }
+    $sql = "SELECT ft.*, cpp.contribution_id, eft.amount
+      FROM civicrm_participant_payment cpp
+      INNER JOIN civicrm_participant cp ON cp.id = cpp.participant_id
+      INNER JOIN civicrm_entity_financial_trxn eft ON eft.entity_id = cpp.contribution_id AND eft.entity_table = 'civicrm_contribution'
+      INNER JOIN civicrm_financial_trxn ft ON ft.id = eft.financial_trxn_id
+      INNER JOIN civicrm_entity_financial_account efa ON efa.financial_account_id = ft.from_financial_account_id
+      LEFT JOIN civicrm_option_group og ON og.name = 'account_relationship'
+      INNER JOIN civicrm_option_value ov ON ov.value = efa.account_relationship AND ov.option_group_id = og.id AND ov.name = 'Deferred Revenue Account is'
+      LEFT JOIN civicrm_option_group cog ON cog.name = 'contribution_status'
+      INNER JOIN civicrm_option_value cov ON cov.option_group_id = cog.id AND cov.name = 'Completed'
+      WHERE cp.event_id = %1 AND ft.from_financial_account_id = efa.financial_account_id AND ft.status_id = cov.value";
+    $sqlParams = array(
+      1 => array($event['id'], 'Integer'),
+    );
+    $dao = CRM_Core_DAO::executeQuery($sql, $sqlParams);
+    while ($dao->fetch()) {
+      // Cancel the trxn.
+      $trxnParams = array(
+        'from_financial_account_id' => $dao->from_financial_account_id,
+        'to_financial_account_id' => $dao->to_financial_account_id,
+        'trxn_date' => date('Ymd'),
+        'total_amount' => -$dao->total_amount,
+        'net_amount' => $dao->net_amount,
+        'fee_amount' => $dao->fee_amount,
+        'currency' => $dao->currency,
+        'is_payment' => $dao->is_payment,
+        'trxn_id' => $dao->trxn_id,
+        'trxn_result_code' => $dao->trxn_result_code,
+        'status_id' => 'Cancelled',
+        'payment_processor_id' => $dao->payment_processor_id,
+        'payment_instrument_id' => $dao->payment_instrument_id,
+        'check_number' => $dao->check_number,
+      );
+      $trxn = civicrm_api3('FinancialTrxn', 'create', $trxnParams);
+
+      // Add entity financial trxn.
+      $entityParams = array(
+        'entity_table' => 'civicrm_contribution',
+        'financial_trxn_id' => $trxn['id'],
+        'entity_id' => $dao->contribution_id,
+        'amount' => -$dao->total_amount,
+      );
+      civicrm_api3('EntityFinancialTrxn', 'create', $entityParams);
+
+      // Create new deferred transaction.
+      $trxnParams['trxn_date'] = date('Ymd', strtotime($event['start_date']));
+      $trxnParams['total_amount'] = $dao->total_amount;
+      $trxnParams['status_id'] = 'Completed';
+      $trxn = civicrm_api3('FinancialTrxn', 'create', $trxnParams);
+
+      // Add entity financial trxn.
+      $entityParams['financial_trxn_id'] = $trxn['id'];
+      $entityParams['amount'] = $dao->total_amount;
+      civicrm_api3('EntityFinancialTrxn', 'create', $entityParams);
+    }
+  }
+
 }

@@ -3336,39 +3336,53 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
    *
    * @return array
    */
-  protected function createParticipantWithContribution() {
+  protected function createParticipantWithContribution($isPartial = TRUE) {
     // creating price set, price field
     $this->_contactId = $this->individualCreate();
     $event = $this->eventCreate();
     $this->_eventId = $event['id'];
+    $status = 1;
     $eventParams = array(
       'id' => $this->_eventId,
       'financial_type_id' => 4,
       'is_monetary' => 1,
+      'start_date' => date('Ymd', strtotime('+1 month')),
+      'end_date' => date('Ymd', strtotime('+3 month')),
     );
     $this->callAPISuccess('event', 'create', $eventParams);
     $priceFields = $this->createPriceSet('event', $this->_eventId);
+    if ($isPartial) {
+      $status = 14;
+    }
     $participantParams = array(
       'financial_type_id' => 4,
       'event_id' => $this->_eventId,
-      'role_id' => 1,
-      'status_id' => 14,
+      'status_id' => $status,
       'fee_currency' => 'USD',
       'contact_id' => $this->_contactId,
     );
     $participant = $this->callAPISuccess('Participant', 'create', $participantParams);
     $contributionParams = array(
-      'total_amount' => 150,
+      'total_amount' => 100,
       'currency' => 'USD',
       'contact_id' => $this->_contactId,
       'financial_type_id' => 4,
       'contribution_status_id' => 1,
-      'partial_payment_total' => 300.00,
-      'partial_amount_pay' => 150,
       'contribution_mode' => 'participant',
       'participant_id' => $participant['id'],
     );
+    if (CRM_Contribute_BAO_Contribution::checkContributeSettings('deferred_revenue_enabled')) {
+      $contributionParams['revenue_recognition_date'] = date('Ymd', strtotime('+1 month'));
+    }
+    if ($isPartial) {
+      $contributionParams['total_amount'] = 150.00;
+      $contributionParams['partial_payment_total'] = 300.00;
+      $contributionParams['partial_amount_pay'] = 150.00;
+    }
     foreach ($priceFields['values'] as $key => $priceField) {
+      if (!$isPartial && $priceField['amount'] != 100) {
+        continue;
+      }
       $lineItems[1][$key] = array(
         'price_field_id' => $priceField['price_field_id'],
         'price_field_value_id' => $priceField['id'],
