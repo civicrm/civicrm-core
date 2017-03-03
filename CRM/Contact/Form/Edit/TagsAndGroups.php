@@ -122,8 +122,8 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
           }
           else {
             $form->_tagGroup[$fName][$id]['description'] = $group['description'];
-            $elements[] = &$form->addElement('advcheckbox', $id, NULL, $group['title'], $attributes);
-          }
+            $elements[] = &$form->addElement('advcheckbox', $id,NULL, "<b>".$group['title'].'</b>'."<br/>"."<div class='description'>".$group['description']."</div>", $attributes);
+		  }
         }
 
         if ($groupElementType == 'select' && !empty($groupsOptions)) {
