@@ -92,8 +92,13 @@ function civicrm_main(&$config) {
     civicrm_setup(WP_PLUGIN_DIR . DIRECTORY_SEPARATOR . 'files');
   }
 
-  $dsn = "mysql://{$config['mysql']['username']}:{$config['mysql']['password']}@{$config['mysql']['server']}/{$config['mysql']['database']}?new_link=true";
+  $parts = explode(':', $config['mysql']['server']);
+  if (empty($parts[1])) {
+    $parts[1] = 3306;
+  }
+  $config['mysql']['server'] = implode(':', $parts);
 
+  $dsn = "mysql://{$config['mysql']['username']}:{$config['mysql']['password']}@{$config['mysql']['server']}/{$config['mysql']['database']}?new_link=true";
   civicrm_source($dsn, $sqlPath . DIRECTORY_SEPARATOR . 'civicrm.mysql');
 
   if (!empty($config['loadGenerated'])) {
