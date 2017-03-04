@@ -127,7 +127,8 @@ li.menu-separator{
   line-height: 0; /* for ie */
   margin: 2px 0;
 }
-#civicrm-menu .crm-logo-sm {
+#civicrm-menu .crm-logo-sm,
+.crm-container .crm-logo-sm {
   background: url('../i/item_sprites.png') no-repeat scroll -80px -16px;
   display: inline-block;
   width: 16px;

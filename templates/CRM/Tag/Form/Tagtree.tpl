@@ -26,12 +26,11 @@
 {* This tpl runs recursively to build each level of the tag tree *}
 <ul class="tree-level-{$level}">
   {foreach from=$tree item="node" key="id"}
-    <li id="tag_{$id}">
-      <input name="tagList[{$id}]" id="check_{$id}" type="checkbox" {if $node.is_selectable EQ 0}disabled=""{/if} {if $tagged[$id]}checked="checked"{/if}/>
-      <a>
-        <label for="check_{$id}" id="tagLabel_{$id}" class="crm-tag-item" {if !empty($allTags.$id.color)}style="background-color: {$allTags.$id.color}; color: {$allTags.$id.color|colorContrast};"{/if} title="{$node.description}">
+    <li>
+      <a id="tag_{$id}" class="{if !$node.is_selectable || $permission neq 'edit'}jstree-disabled{/if} {if $tagged[$id]}jstree-clicked{/if}">
+        <span class="crm-tag-item" {if !empty($allTags.$id.color)}style="background-color: {$allTags.$id.color}; color: {$allTags.$id.color|colorContrast};"{/if} title="{$node.description}">
           {$node.name}
-        </label>
+        </span>
       </a>
       {if $node.children}
         {* Recurse... *}

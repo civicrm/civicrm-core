@@ -637,12 +637,6 @@
      <access_arguments>access CiviCRM</access_arguments>
   </item>
   <item>
-     <path>civicrm/ajax/menu</path>
-     <page_callback>CRM_Admin_Page_AJAX::getNavigationList</page_callback>
-     <access_arguments>access CiviCRM,administer CiviCRM</access_arguments>
-     <page_type>3</page_type>
-  </item>
-  <item>
      <path>civicrm/ajax/menutree</path>
      <page_callback>CRM_Admin_Page_AJAX::menuTree</page_callback>
      <access_arguments>access CiviCRM,administer CiviCRM</access_arguments>
