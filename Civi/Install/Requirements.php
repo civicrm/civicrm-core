@@ -108,8 +108,15 @@ class Requirements {
    * @return object mysqli connection
    */
   protected function connect($db_config) {
-    $conn = @mysqli_connect($db_config['host'], $db_config['username'], $db_config['password'], $db_config['database'], isset($db_config['port']) ? $db_config['port'] : NULL);
-    return $donn;
+    $host = NULL;
+    if (!empty($db_config['host'])) {
+      $host = $db_config['host'];
+    }
+    elseif (!empty($db_config['server'])) {
+      $host = $db_config['server'];
+    }
+    $conn = @mysqli_connect($host, $db_config['username'], $db_config['password'], $db_config['database'], !empty($db_config['port']) ? $db_config['port'] : NULL);
+    return $conn;
   }
 
   /**
