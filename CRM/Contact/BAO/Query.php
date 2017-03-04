@@ -4806,8 +4806,7 @@ civicrm_relationship.is_permission_a_b = 0
     $onlyDeleted = in_array(array('deleted_contacts', '=', '1', '0', '0'), $this->_params);
     list($select, $from, $where) = $this->query(FALSE, FALSE, FALSE, $onlyDeleted);
     $from = " FROM civicrm_prevnext_cache pnc INNER JOIN civicrm_contact contact_a ON contact_a.id = pnc.entity_id1 AND pnc.cacheKey = '$cacheKey' " . substr($from, 31);
-    $groupByCol = array('contact_a.id', 'pnc.id');
-    $groupBy = self::getGroupByFromSelectColumns($this->_select, $groupByCol);
+    $groupBy = self::getGroupByFromSelectColumns($this->_select, array('contact_a.id'));
     $limit = " LIMIT $offset, $rowCount";
     $query = "$select $from $where $groupBy $limit";
 
