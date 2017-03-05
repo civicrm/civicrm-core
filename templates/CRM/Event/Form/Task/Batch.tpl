@@ -101,8 +101,6 @@
                       </table>
                     {/strip}
                   </td>
-                {elseif ( $n eq 'participant_register_date' ) }
-                  <td class="compressed">{include file="CRM/common/jcalendar.tpl" elementName=$n elementIndex=$pid batchUpdate=1}</td>
                 {else}
                   <td class="compressed">{$form.field.$pid.$n.html}</td>
                 {/if}

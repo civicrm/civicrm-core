@@ -2337,7 +2337,6 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       'receipt_date' => 'activityDateTime',
       'thankyou_date' => 'activityDateTime',
       'cancel_date' => 'activityDateTime',
-      'participant_register_date' => 'activityDateTime',
       'activity_date_time' => 'activityDateTime',
     );
   }
@@ -3289,17 +3288,8 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
 
     $formattedGroupTree = array();
     // @todo - as we put these on datepicker they need to be removed from here.
-    $dateTimeFields = array(
-      'participant_register_date',
-      'activity_date_time',
-      'receive_date',
-      'receipt_date',
-      'cancel_date',
-      'thankyou_date',
-      'membership_start_date',
-      'membership_end_date',
-      'join_date',
-    );
+    $dateTimeFields = array_keys(self::getNonUpgradedDateFields());
+
     foreach ($fields as $name => $field) {
       $fldName = $isStandalone ? $name : "field[$componentId][$name]";
       if (in_array($name, $dateTimeFields)) {
