@@ -319,6 +319,16 @@
             <td {$valueStyle}>{$form.payment_instrument_id.html} {help id="payment_instrument_id"}</td>
             </td>
           </tr>
+	  {if $form.credit_card_type}
+            <tr id="cardType" class="crm-contribution-form-block-card_type">
+              <td class="label">{$form.credit_card_type.label}</td>
+              <td {$valueStyle}>{$form.credit_card_type.html}</td>
+            </tr>
+            <tr id="cardNumber" class="crm-contribution-form-block-credit_card_number">
+              <td class="label">{$form.credit_card_number.label}</td>
+              <td {$valueStyle}>{$form.credit_card_number.html} {help id="pan_truncation"}</td>
+            </tr>
+          {/if}
           {if $showCheckNumber || !$isOnline}
             <tr id="checkNumber" class="crm-contribution-form-block-check_number">
               <td class="label">{$form.check_number.label}</td>
@@ -519,16 +529,6 @@
         {/literal}{/if}
       });
     </script>
-      {if !$contributionMode}
-        {include file="CRM/common/showHideByFieldValue.tpl"
-        trigger_field_id    ="payment_instrument_id"
-        trigger_value       = '4'
-        target_element_id   ="checkNumber"
-        target_element_type ="table-row"
-        field_type          ="select"
-        invert              = 0
-        }
-    {/if}
   {/if} {* not delete mode if*}
 
 {/if} {* closing of main custom data if *}
@@ -685,7 +685,35 @@ CRM.$(function($) {
 });
 {/literal}{/if}{literal}
 
+
 CRM.$(function($) {
+  onPaymentMethodChange();
+  $("#payment_instrument_id").on("change",function(){
+    onPaymentMethodChange();
+  });
+
+  function onPaymentMethodChange() {
+    var paymentInstrument = $('#payment_instrument_id').val();
+    {/literal}
+      {crmAPI var="checkVal" entity="OptionValue" action="getvalue" version="3" option_group_id="payment_instrument" name="Check" return="value"}
+      {crmAPI var="creditVal" entity="OptionValue" action="getvalue" version="3" option_group_id="payment_instrument" name="Credit Card" return="value"}
+    {literal}
+    if (paymentInstrument == {/literal}{$checkVal}{literal}) {
+      $('tr#checkNumber').show();
+      $('tr#cardType').hide();
+      $('tr#cardNumber').hide();
+    }
+    else if (paymentInstrument == {/literal}{$creditVal}{literal}) {
+      $('tr#cardType').show();
+      $('tr#cardNumber').show();
+      $('tr#checkNumber').hide();
+    }
+    else {
+      $('tr#checkNumber').hide();
+      $('tr#cardType').hide();
+      $('tr#cardNumber').hide();
+    }
+  }
   $('#price_set_id').click(function() {
     if( $('#price_set_id').val() ) {
       $('#totalAmountBlock').hide();

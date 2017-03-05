@@ -112,8 +112,6 @@ class CRM_Event_Form_EventFees {
         //set receipt text
         $defaults[$form->_pId]['receipt_text'] = $details[$form->_eventId]['confirm_email_text'];
       }
-
-      list($defaults[$form->_pId]['receive_date'], $defaults[$form->_pId]['receive_date_time']) = CRM_Utils_Date::setDateDefaults();
     }
 
     //CRM-11601 we should keep the record contribution
@@ -122,10 +120,6 @@ class CRM_Event_Form_EventFees {
       $defaults[$form->_pId]['record_contribution'] = 1;
     }
 
-    //CRM-13420
-    if (empty($defaults['payment_instrument_id'])) {
-      $defaults[$form->_pId]['payment_instrument_id'] = key(CRM_Core_OptionGroup::values('payment_instrument', FALSE, FALSE, FALSE, 'AND is_default = 1'));
-    }
     if ($form->_mode) {
       $config = CRM_Core_Config::singleton();
       // set default country from config if no country set
@@ -223,27 +217,7 @@ class CRM_Event_Form_EventFees {
     if (!empty($defaults[$form->_pId]['participant_fee_currency'])) {
       $form->assign('fee_currency', $defaults[$form->_pId]['participant_fee_currency']);
     }
-
-    // CRM-4395
-    if ($contriId = $form->get('onlinePendingContributionId')) {
-      $contribution = new CRM_Contribute_DAO_Contribution();
-      $contribution->id = $contriId;
-      $contribution->find(TRUE);
-      foreach (array(
-                 'financial_type_id',
-                 'payment_instrument_id',
-                 'contribution_status_id',
-                 'receive_date',
-                 'total_amount',
-               ) as $f) {
-        if ($f == 'receive_date') {
-          list($defaults[$form->_pId]['receive_date']) = CRM_Utils_Date::setDateDefaults($contribution->$f);
-        }
-        else {
-          $defaults[$form->_pId][$f] = $contribution->$f;
-        }
-      }
-    }
+    CRM_Contribute_Form_PaymentDetails::setDefaultValues($defaults[$form->_pId], $form->get('onlinePendingContributionId'));
     return $defaults[$form->_pId];
   }
 
@@ -417,63 +391,7 @@ SELECT  id, html_type
         $form->addElement('checkbox', 'record_contribution', ts('Record Payment?'), NULL,
           array('onclick' => "return showHideByValue('record_contribution','','payment_information','table-row','radio',false);")
         );
-        // Check permissions for financial type first
-        if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
-          CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes, $form->_action);
-        }
-        else {
-          $financialTypes = CRM_Contribute_PseudoConstant::financialType();
-        }
-
-        $form->add('select', 'financial_type_id',
-          ts('Financial Type'),
-          array('' => ts('- select -')) + $financialTypes
-        );
-
-        $form->addDateTime('receive_date', ts('Received'), FALSE, array('formatType' => 'activityDateTime'));
-
-        $form->add('select', 'payment_instrument_id',
-          ts('Payment Method'),
-          array('' => ts('- select -')) + CRM_Contribute_PseudoConstant::paymentInstrument(),
-          FALSE, array('onChange' => "return showHideByValue('payment_instrument_id','4','checkNumber','table-row','select',false);")
-        );
-        // don't show transaction id in batch update mode
-        $path = CRM_Utils_System::currentPath();
-        $form->assign('showTransactionId', FALSE);
-        if ($path != 'civicrm/contact/search/basic') {
-          $form->add('text', 'trxn_id', ts('Transaction ID'));
-          $form->addRule('trxn_id', ts('Transaction ID already exists in Database.'),
-            'objectExists', array('CRM_Contribute_DAO_Contribution', $form->_eventId, 'trxn_id')
-          );
-          $form->assign('showTransactionId', TRUE);
-        }
-
-        $status = CRM_Contribute_PseudoConstant::contributionStatus();
-
-        // CRM-14417 suppressing contribution statuses that are NOT relevant to new participant registrations
-        $statusName = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
-        foreach (array(
-                   'Cancelled',
-                   'Failed',
-                   'In Progress',
-                   'Overdue',
-                   'Refunded',
-                   'Pending refund',
-                 ) as $suppress) {
-          unset($status[CRM_Utils_Array::key($suppress, $statusName)]);
-        }
-
-        $form->add('select', 'contribution_status_id',
-          ts('Payment Status'), $status
-        );
-
-        $form->add('text', 'check_number', ts('Check Number'),
-          CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Contribution', 'check_number')
-        );
-
-        $form->add('text', 'total_amount', ts('Amount'),
-          CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Contribution', 'total_amount')
-        );
+        CRM_Contribute_Form_PaymentDetails::buildQuickForm($form);
       }
     }
     else {

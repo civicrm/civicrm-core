@@ -78,21 +78,7 @@
            <td class ='html-adjust' colspan=2>
            <fieldset><legend>{ts}Payment Information{/ts}</legend>
              <table id="recordContribution" class="form-layout" style="width:auto;">
-                <tr class="crm-event-eventfees-form-block-financial_type_id">
-                    <td class="label">{$form.financial_type_id.label}<span class="crm-marker"> *</span></td>
-                    <td>{$form.financial_type_id.html}<br /><span class="description">{ts}Select the appropriate financial type for this payment.{/ts}</span></td>
-                </tr>
-                <tr class="crm-event-eventfees-form-block-total_amount"><td class="label">{$form.total_amount.label}</td><td>{$form.total_amount.html|crmMoney:$currency}</td></tr>
-                <tr>
-                    <td class="label" >{$form.receive_date.label}</td>
-                    <td>{include file="CRM/common/jcalendar.tpl" elementName=receive_date}</td>
-                </tr>
-                <tr class="crm-event-eventfees-form-block-payment_instrument_id"><td class="label">{$form.payment_instrument_id.label}<span class="crm-marker"> *</span></td><td>{$form.payment_instrument_id.html} {help id="payment_instrument_id" file="CRM/Contribute/Page/Tab.hlp"}</td></tr>
-                <tr id="checkNumber" class="crm-event-eventfees-form-block-check_number"><td class="label">{$form.check_number.label}</td><td>{$form.check_number.html|crmAddClass:six}</td></tr>
-                {if $showTransactionId }
-                    <tr class="crm-event-eventfees-form-block-trxn_id"><td class="label">{$form.trxn_id.label}</td><td>{$form.trxn_id.html}</td></tr>
-                {/if}
-                <tr class="crm-event-eventfees-form-block-contribution_status_id"><td class="label">{$form.contribution_status_id.label}</td><td>{$form.contribution_status_id.html}</td></tr>
+	       {include file='CRM/Contribute/Form/PaymentDetails.tpl'}
              </table>
            </fieldset>
            </td>
@@ -186,17 +172,6 @@
     target_element_id   ="from-email"
     target_element_type ="table-row"
     field_type          ="radio"
-    invert              = 0
-}
-{/if}
-
-{if $paid and ($action eq 1 or ( $action eq 2 and !$hasPayment) ) and !$participantMode}
-{include file="CRM/common/showHideByFieldValue.tpl"
-    trigger_field_id    ="payment_instrument_id"
-    trigger_value       = '4'
-    target_element_id   ="checkNumber"
-    target_element_type ="table-row"
-    field_type          ="select"
     invert              = 0
 }
 {/if}

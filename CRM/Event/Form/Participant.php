@@ -1350,6 +1350,8 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
           'receive_date',
           'check_number',
           'campaign_id',
+          'credit_card_type',
+          'credit_card_number',
         );
 
         foreach ($recordContribution as $f) {
