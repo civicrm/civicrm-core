@@ -296,8 +296,8 @@ class CRM_Financial_Page_AJAX {
       'contact_a.contact_type',
       'contact_a.contact_sub_type',
       'civicrm_financial_trxn.trxn_date as transaction_date',
-      'name',
-      'civicrm_contribution.currency as currency',
+      'civicrm_financial_type.name',
+      'civicrm_financial_trxn.currency as currency',
       'civicrm_financial_trxn.status_id as status',
       'civicrm_financial_trxn.check_number as check_number',
     );
