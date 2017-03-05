@@ -725,13 +725,8 @@ LEFT JOIN civicrm_contribution_soft ON civicrm_contribution_soft.contribution_id
       $where = implode(' AND ', $query->_where[0]) .
         " AND civicrm_entity_batch.batch_id IS NULL ";
       $where = str_replace('civicrm_contribution.payment_instrument_id', 'civicrm_financial_trxn.payment_instrument_id', $where);
-      $searchValue = TRUE;
     }
     else {
-      $searchValue = FALSE;
-    }
-
-    if (!$searchValue) {
       if (!$notPresent) {
         $where = " civicrm_entity_batch.batch_id = {$entityID} ";
       }
