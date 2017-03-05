@@ -288,10 +288,16 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       array('' => ts('- select -')) + CRM_Contribute_PseudoConstant::paymentInstrument(),
       TRUE
     );
-    $this->addSelect('credit_card_type',
-      array('entity' => 'financialTrxn', 'label' => ts('Card Type'), 'option_url' => NULL, 'placeholder' => ts('- any -'))
+
+    $creditCardTypes = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialTrxn',
+        'card_type'
     );
-    $this->add('text', 'Credit Card Number', ts('Card Number'), array(
+    $this->add('select', 'credit_card_type',
+      ts('Card Type'),
+      $creditCardTypes,
+      FALSE
+    );
+    $this->add('text', 'credit_card_number', ts('Card Number'), array(
       'size' => 5,
       'maxlength' => 4,
       'autocomplete' => 'off',
