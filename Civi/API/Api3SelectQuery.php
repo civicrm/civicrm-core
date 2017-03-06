@@ -106,7 +106,7 @@ class Api3SelectQuery extends SelectQuery {
         continue;
       }
       $operator = is_array($value) ? \CRM_Utils_Array::first(array_keys($value)) : NULL;
-      if (!in_array($operator, \CRM_Core_DAO::acceptedSQLOperators())) {
+      if (!in_array($operator, \CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
         $value = array('=' => $value);
       }
       $filters[$key] = \CRM_Core_DAO::createSQLFilter("{$table_name}.{$column_name}", $value);
