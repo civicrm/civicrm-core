@@ -218,16 +218,18 @@ function civicrm_api3_case_get($params) {
 
   // Add clause to search by client
   if (!empty($params['contact_id'])) {
-    $contacts = array();
-    foreach ((array) $params['contact_id'] as $c) {
-      if (!CRM_Utils_Rule::positiveInteger($c)) {
-        throw new API_Exception('Invalid parameter: contact_id. Must provide numeric value(s).');
+    // Legacy support - this field historically supports a nonstandard format of array(1,2,3) as a synonym for array('IN' => array(1,2,3))
+    if (is_array($params['contact_id'])) {
+      $operator = CRM_Utils_Array::first(array_keys($params['contact_id']));
+      if (!in_array($operator, \CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
+        $params['contact_id'] = array('IN' => $params['contact_id']);
       }
-      $contacts[] = $c;
     }
-    $sql
-      ->join('civicrm_case_contact', 'INNER JOIN civicrm_case_contact ON civicrm_case_contact.case_id = a.id')
-      ->where('civicrm_case_contact.contact_id IN (' . implode(',', $contacts) . ')');
+    else {
+      $params['contact_id'] = array('=' => $params['contact_id']);
+    }
+    $clause = CRM_Core_DAO::createSQLFilter('contact_id', $params['contact_id']);
+    $sql->where("a.id IN (SELECT case_id FROM civicrm_case_contact WHERE $clause)");
   }
 
   // Add clause to search by activity
