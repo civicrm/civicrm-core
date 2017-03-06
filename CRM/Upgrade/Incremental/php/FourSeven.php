@@ -307,6 +307,16 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
   }
 
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_4_7_18($rev) {
+    $this->addTask('Update Kenyan Provinces', 'updateKenyanProvinces');
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
+  }
+
   /*
    * Important! All upgrade functions MUST add a 'runSql' task.
    * Uncomment and use the following template for a new upgrade version
@@ -981,6 +991,58 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
       file_put_contents($newFileName, $config);
     }
     return TRUE;
+  }
+
+  /**
+   * Update Kenyan Provinces to reflect changes per CRM-20062
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   */
+  public function updateKenyanProvinces(CRM_Queue_TaskContext $ctx) {
+    $kenyaCountryID = CRM_Core_DAO::singleValueQuery('SELECT max(id) from civicrm_country where iso_code = "KE"');
+    $oldProvinces = array(
+      'Nairobi Municipality',
+      'Coast',
+      'North-Eastern Kaskazini Mashariki',
+      'Rift Valley',
+      'Western Magharibi',
+    );
+    self::deprecateStateProvinces($kenyaCountryID, $oldProvinces);
+    return TRUE;
+  }
+
+  /**
+   * Deprecate provinces that no longer exist.
+   *
+   * @param int $countryID
+   * @param array $provinces
+   */
+  public static function deprecateStateProvinces($countryID, $provinces) {
+    foreach ($provinces as $province) {
+      $existingStateID = CRM_Core_DAO::singleValueQuery("
+        SELECT id FROM civicrm_state_province
+        WHERE country_id = %1
+        AND name = %2
+      ",
+      array(1 => array($countryID, 'Int'), 2 => array($province, 'String')));
+
+      if (!$existingStateID) {
+        continue;
+      }
+      if (!CRM_Core_DAO::singleValueQuery("
+       SELECT count(*) FROM civicrm_address
+       WHERE state_province_id = %1
+       ", array(1 => array($existingStateID, 'Int')))
+      ) {
+        CRM_Core_DAO::executeQuery("DELETE FROM civicrm_state_province WHERE id = %1", array(1 => array($existingStateID, 'Int')));
+      }
+      else {
+        $params = array('1' => array(ts("Former - $province"), 'String'));
+        CRM_Core_DAO::executeQuery("
+          UPDATE civicrm_state_province SET name = %1 WHERE id = $existingStateID
+        ", $params);
+      }
+    }
   }
 
 }
