@@ -1452,6 +1452,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    *
    * @param array $token_a
    * @param bool $html
+   *   Whether to encode the token result for use in HTML email
    * @param array $contact
    * @param string $verp
    * @param array $urls
