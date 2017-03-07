@@ -2125,7 +2125,10 @@ abstract class CRM_Utils_Hook {
    * @see http://symfony.com/doc/current/components/dependency_injection/index.html
    */
   public static function container(\Symfony\Component\DependencyInjection\ContainerBuilder $container) {
-    self::singleton()->invoke(1, $container, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_container');
+    // This hook fires during system bootstrap, after CRM_Extension_System
+    // initializes but before the container or dispatcher initialize. Therefore,
+    // we cannot use containerized services (like the dispatcher).
+    self::singleton()->invokeViaUF(1, $container, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_container');
   }
 
   /**
