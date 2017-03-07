@@ -156,8 +156,18 @@ abstract class CRM_Utils_Hook {
     &$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6,
     $fnSuffix
   ) {
-    $count = is_array($names) ? count($names) : $names;
-    return $this->invokeViaUF($count, $arg1, $arg2, $arg3, $arg4, $arg5, $arg6, $fnSuffix);
+    if (is_array($names) && !defined('CIVICRM_FORCE_LEGACY_HOOK')) {
+      $event = \Civi\Core\Event\GenericHookEvent::createOrdered(
+        $names,
+        array(&$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6)
+      );
+      \Civi::dispatcher()->dispatch('hook_' . $fnSuffix, $event);
+      return $event->getReturnValues();
+    }
+    else {
+      $count = is_array($names) ? count($names) : $names;
+      return $this->invokeViaUF($count, $arg1, $arg2, $arg3, $arg4, $arg5, $arg6, $fnSuffix);
+    }
   }
 
   /**
