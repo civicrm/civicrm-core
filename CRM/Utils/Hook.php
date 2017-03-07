@@ -596,7 +596,7 @@ abstract class CRM_Utils_Hook {
    *   the return value is ignored
    */
   public static function managed(&$entities) {
-    return self::singleton()->invoke(1, $entities,
+    return self::singleton()->invoke(array('entities'), $entities,
       self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
       'civicrm_managed'
     );
@@ -615,7 +615,7 @@ abstract class CRM_Utils_Hook {
    *   the html snippet to include in the dashboard
    */
   public static function dashboard($contactID, &$contentPlacement = self::DASHBOARD_BELOW) {
-    $retval = self::singleton()->invoke(2, $contactID, $contentPlacement,
+    $retval = self::singleton()->invoke(array('contactID', 'contentPlacement'), $contactID, $contentPlacement,
       self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
       'civicrm_dashboard'
     );
@@ -641,7 +641,7 @@ abstract class CRM_Utils_Hook {
    * @return array
    */
   public static function recent(&$recentArray) {
-    return self::singleton()->invoke(1, $recentArray,
+    return self::singleton()->invoke(array('recentArray'), $recentArray,
       self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
       'civicrm_recent'
     );
@@ -662,7 +662,7 @@ abstract class CRM_Utils_Hook {
    *   Return is not really intended to be used.
    */
   public static function referenceCounts($dao, &$refCounts) {
-    return self::singleton()->invoke(2, $dao, $refCounts,
+    return self::singleton()->invoke(array('dao', 'refCounts'), $dao, $refCounts,
       self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
       'civicrm_referenceCounts'
     );
@@ -681,7 +681,7 @@ abstract class CRM_Utils_Hook {
    * @return null
    */
   public static function buildAmount($pageType, &$form, &$amount) {
-    return self::singleton()->invoke(3, $pageType, $form, $amount, self::$_nullObject,
+    return self::singleton()->invoke(array('pageType', 'form', 'amount'), $pageType, $form, $amount, self::$_nullObject,
       self::$_nullObject, self::$_nullObject, 'civicrm_buildAmount');
   }
 
@@ -695,7 +695,7 @@ abstract class CRM_Utils_Hook {
    * @return null
    */
   public static function buildStateProvinceForCountry($countryID, &$states) {
-    return self::singleton()->invoke(2, $countryID, $states,
+    return self::singleton()->invoke(array('countryID', 'states'), $countryID, $states,
       self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
       'civicrm_buildStateProvinceForCountry'
     );
@@ -713,7 +713,7 @@ abstract class CRM_Utils_Hook {
    * @deprecated Use tabset() instead.
    */
   public static function tabs(&$tabs, $contactID) {
-    return self::singleton()->invoke(2, $tabs, $contactID,
+    return self::singleton()->invoke(array('tabs', 'contactID'), $tabs, $contactID,
       self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_tabs'
     );
   }
@@ -732,7 +732,7 @@ abstract class CRM_Utils_Hook {
    * @return null
    */
   public static function tabset($tabsetName, &$tabs, $context) {
-    return self::singleton()->invoke(3, $tabsetName, $tabs,
+    return self::singleton()->invoke(array('tabsetName', 'tabs', 'context'), $tabsetName, $tabs,
       $context, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_tabset'
     );
   }
@@ -746,7 +746,7 @@ abstract class CRM_Utils_Hook {
    * @return null
    */
   public static function tokens(&$tokens) {
-    return self::singleton()->invoke(1, $tokens,
+    return self::singleton()->invoke(array('tokens'), $tokens,
       self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_tokens'
     );
   }
