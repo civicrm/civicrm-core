@@ -340,7 +340,7 @@ class CRM_Dedupe_Finder {
         }
         if ($table == 'civicrm_phone') {
           $fixes = array(
-            'phone' => 'phone_numeric'
+            'phone' => 'phone_numeric',
           );
           foreach ($fixes as $orig => $target) {
             if (!empty($flat[$orig])) {
