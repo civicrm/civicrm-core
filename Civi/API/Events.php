@@ -45,7 +45,7 @@ class Events {
    *
    * @see AuthorizeEvent
    */
-  const AUTHORIZE = 'api.authorize';
+  const AUTHORIZE = 'civi.api.authorize';
 
   /**
    * Determine which API provider executes the given request. For successful
@@ -54,28 +54,28 @@ class Events {
    *
    * @see ResolveEvent
    */
-  const RESOLVE = 'api.resolve';
+  const RESOLVE = 'civi.api.resolve';
 
   /**
    * Apply pre-execution logic
    *
    * @see PrepareEvent
    */
-  const PREPARE = 'api.prepare';
+  const PREPARE = 'civi.api.prepare';
 
   /**
    * Apply post-execution logic
    *
    * @see RespondEvent
    */
-  const RESPOND = 'api.respond';
+  const RESPOND = 'civi.api.respond';
 
   /**
    * Handle any exceptions.
    *
    * @see ExceptionEvent
    */
-  const EXCEPTION = 'api.exception';
+  const EXCEPTION = 'civi.api.exception';
 
   /**
    * Weight - Early
