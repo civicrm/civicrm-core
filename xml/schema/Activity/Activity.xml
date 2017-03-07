@@ -138,6 +138,11 @@
     </html>
     <add>2.0</add>
   </field>
+  <index>
+    <name>index_activity_date_time</name>
+    <fieldName>activity_date_time</fieldName>
+    <add>4.7</add>
+  </index>
   <field>
     <name>due_date_time</name>
     <type>datetime</type>

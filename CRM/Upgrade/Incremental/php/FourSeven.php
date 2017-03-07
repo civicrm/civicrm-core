@@ -307,6 +307,16 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
   }
 
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_4_7_18($rev) {
+    $this->addTask('CRM-20204 Add index onto civicrm_activity for activivty_date_time column', 'activityDateTimeIndex');
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
+  }
+
   /*
    * Important! All upgrade functions MUST add a 'runSql' task.
    * Uncomment and use the following template for a new upgrade version
@@ -980,6 +990,11 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
       $newFileName = Civi::paths()->getPath('[civicrm.files]/persist/crm-ckeditor-default.js');
       file_put_contents($newFileName, $config);
     }
+    return TRUE;
+  }
+
+  public static function activityDateTimeIndex() {
+    CRM_Core_BAO_SchemaHandler::createIndexes(array('civicrm_activity' => 'activity_date_time'));
     return TRUE;
   }
 
