@@ -1286,7 +1286,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       );
     }
 
-    $message = new Mail_mime("\n");
+    $message = new Mail_mime("\r\n");
 
     $useSmarty = defined('CIVICRM_MAIL_SMARTY') && CIVICRM_MAIL_SMARTY ? TRUE : FALSE;
     if ($useSmarty) {
