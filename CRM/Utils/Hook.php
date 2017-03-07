@@ -101,7 +101,8 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
-   * Invoke hooks.
+   * Invoke a hook through the UF/CMS hook system and the extension-hook
+   * system.
    *
    * @param int $numParams
    *   Number of parameters to pass to the hook.
@@ -122,11 +123,42 @@ abstract class CRM_Utils_Hook {
    *
    * @return mixed
    */
-  public abstract function invoke(
+  public abstract function invokeViaUF(
     $numParams,
     &$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6,
     $fnSuffix
   );
+
+  /**
+   * Invoke a hook.
+   *
+   * This is a transitional adapter. It supports the legacy syntax
+   * but also accepts enough information to support Symfony Event
+   * dispatching.
+   *
+   * @param array|int $names
+   *   (Recommended) Array of parameter names, in order.
+   *   Using an array is recommended because it enables full
+   *   event-broadcasting behaviors.
+   *   (Legacy) Number of parameters to pass to the hook.
+   *   This is provided for transitional purposes.
+   * @param mixed $arg1
+   * @param mixed $arg2
+   * @param mixed $arg3
+   * @param mixed $arg4
+   * @param mixed $arg5
+   * @param mixed $arg6
+   * @param mixed $fnSuffix
+   * @return mixed
+   */
+  public function invoke(
+    $names,
+    &$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6,
+    $fnSuffix
+  ) {
+    $count = is_array($names) ? count($names) : $names;
+    return $this->invokeViaUF($count, $arg1, $arg2, $arg3, $arg4, $arg5, $arg6, $fnSuffix);
+  }
 
   /**
    * @param array $numParams
