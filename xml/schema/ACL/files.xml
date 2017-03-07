@@ -5,5 +5,7 @@
 <xi:include href="ACL.xml"           parse="xml" />
 <xi:include href="Cache.xml"         parse="xml" />
 <xi:include href="EntityRole.xml"    parse="xml" />
+<xi:include href="ACLContacts.xml" parse="xml" />
+<xi:include href="ACLContactsValidity.xml" parse="xml" />
 
 </tables>

@@ -133,9 +133,6 @@ WHERE contact_id = %1
     // rebuilds civicrm_acl_cache
     self::deleteEntry($id);
     self::build($id);
-
-    // rebuilds civicrm_acl_contact_cache
-    CRM_Contact_BAO_Contact_Permission::cache($id, CRM_Core_Permission::VIEW, TRUE);
   }
 
   /**
@@ -153,17 +150,6 @@ WHERE  modified_date IS NULL
 ";
     $params = array(1 => array(CRM_Contact_BAO_GroupContactCache::getCacheInvalidDateTime(), 'String'));
     CRM_Core_DAO::singleValueQuery($query, $params);
-
-    // CRM_Core_DAO::singleValueQuery("TRUNCATE TABLE civicrm_acl_contact_cache"); // No, force-commits transaction
-    // CRM_Core_DAO::singleValueQuery("DELETE FROM civicrm_acl_contact_cache"); // Transaction-safe
-    if (CRM_Core_Transaction::isActive()) {
-      CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_POST_COMMIT, function () {
-        CRM_Core_DAO::singleValueQuery("TRUNCATE TABLE civicrm_acl_contact_cache");
-      });
-    }
-    else {
-      CRM_Core_DAO::singleValueQuery("TRUNCATE TABLE civicrm_acl_contact_cache");
-    }
   }
 
 }

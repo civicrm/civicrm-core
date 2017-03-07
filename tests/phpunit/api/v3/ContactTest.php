@@ -37,7 +37,13 @@
  * @group headless
  */
 class api_v3_ContactTest extends CiviUnitTestCase {
-  public $DBResetRequired = FALSE;
+
+  /**
+   * @var boolean
+   *  Reset the database before running any test.
+   */
+  public $DBResetRequired = TRUE;
+
   protected $_apiversion;
   protected $_entity;
   protected $_params;
@@ -54,6 +60,8 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   public function setUp() {
     // Connect to the database.
     parent::setUp();
+    $aclContactCache = \Civi::service('acl_contact_cache');
+    $aclContactCache->clearCache();
     $this->_apiversion = 3;
     $this->_entity = 'contact';
     $this->_params = array(
@@ -70,6 +78,8 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    */
   public function tearDown() {
     $this->callAPISuccess('Setting', 'create', array('includeOrderByClause' => TRUE));
+    $aclContactCache = \Civi::service('acl_contact_cache');
+    $aclContactCache->clearCache();
     // truncate a few tables
     $tablesToTruncate = array(
       'civicrm_email',
@@ -80,7 +90,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'civicrm_uf_match',
       'civicrm_phone',
       'civicrm_address',
-      'civicrm_acl_contact_cache',
       'civicrm_activity_contact',
       'civicrm_activity',
     );
@@ -2445,10 +2454,14 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   public function testGetQuickExactFirst($searchParameters, $settings, $firstContact, $secondContact = NULL) {
     $this->getQuickSearchSampleData();
     $this->callAPISuccess('Setting', 'create', $settings);
+    $aclContactCache = \Civi::service('acl_contact_cache');
+    $aclContactCache->clearCache();
     $result = $this->callAPISuccess('contact', 'getquick', $searchParameters);
     $this->assertEquals($firstContact, $result['values'][0]['sort_name']);
     $this->assertEquals($secondContact, $result['values'][1]['sort_name']);
     $this->callAPISuccess('Setting', 'create', array('includeWildCardInName' => TRUE, 'includeOrderByClause' => TRUE));
+    $aclContactCache = \Civi::service('acl_contact_cache');
+    $aclContactCache->clearCache();
   }
 
   public function getSearchSortOptions() {
@@ -2580,13 +2593,15 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->getQuickSearchSampleData();
     $loggedInContactID = $this->createLoggedInUser();
     CRM_Core_Config::singleton()->userPermissionClass->permissions = array();
+    $aclContactCache = \Civi::service('acl_contact_cache');
+    $aclContactCache->clearCache();
     $result = $this->callAPISuccess('contact', 'getquick', array(
       'name' => 'c',
     ));
     $this->assertEquals(0, $result['count']);
 
     $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereNoBobH'));
-    CRM_Contact_BAO_Contact_Permission::cache($loggedInContactID, CRM_Core_Permission::VIEW, TRUE);
+    $aclContactCache->clearCache();
     $result = $this->callAPISuccess('contact', 'getquick', array(
       'name' => 'c',
     ));
@@ -2655,6 +2670,8 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   public function testGetQuickFirstName() {
     $this->getQuickSearchSampleData();
     $this->callAPISuccess('Setting', 'create', array('includeOrderByClause' => TRUE));
+    $aclContactCache = \Civi::service('acl_contact_cache');
+    $aclContactCache->clearCache();
     $result = $this->callAPISuccess('contact', 'getquick', array(
       'name' => 'Bob',
       'field_name' => 'first_name',
@@ -2671,6 +2688,8 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       $this->assertEquals($value, $result['values'][$index]['sort_name']);
     }
     $this->callAPISuccess('Setting', 'create', array('includeOrderByClause' => FALSE));
+    $aclContactCache = \Civi::service('acl_contact_cache');
+    $aclContactCache->clearCache();
     $result = $this->callAPISuccess('contact', 'getquick', array('name' => 'bob'));
     $this->assertEquals('Bob, Bob', $result['values'][0]['sort_name']);
     $this->assertEquals('E Bobby, Bobby', $result['values'][1]['sort_name']);
@@ -2684,6 +2703,8 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $userID = $this->createLoggedInUser();
     $this->callAPISuccess('Setting', 'create', array('includeOrderByClause' => TRUE, 'search_autocomplete_count' => 15));
     CRM_Core_Config::singleton()->userPermissionClass->permissions = array();
+    $aclContactCache = \Civi::service('acl_contact_cache');
+    $aclContactCache->clearCache();
     $result = $this->callAPISuccess('contact', 'getquick', array(
       'name' => 'Bob',
       'field_name' => 'first_name',
@@ -2692,7 +2713,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->assertEquals(0, $result['count']);
 
     $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereNoBobH'));
-    CRM_Contact_BAO_Contact_Permission::cache($userID, CRM_Core_Permission::VIEW, TRUE);
+    $aclContactCache->clearCache();
     $result = $this->callAPISuccess('contact', 'getquick', array(
       'name' => 'Bob',
       'field_name' => 'first_name',
@@ -2804,6 +2825,11 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       $contact['contact_type'] = 'Individual';
       $this->callAPISuccess('Contact', 'create', $contact);
     }
+
+    // Make sure the ACL Contact Cache is refreshed so that the data is not hold back by
+    // an outdated cache.
+    $aclContactCache = \Civi::service('acl_contact_cache');
+    $aclContactCache->clearCache();
   }
 
   /**

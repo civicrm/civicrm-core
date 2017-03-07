@@ -470,19 +470,48 @@ class CRM_Core_CodeGen_Specification {
   public function getPrimaryKey(&$primaryXML, &$fields, &$table) {
     $name = trim((string ) $primaryXML->name);
 
-    /** need to make sure there is a field of type name */
-    if (!array_key_exists($name, $fields)) {
-      echo "primary key $name in $table->name does not have a field definition, ignoring\n";
-      return;
-    }
-
     // set the autoincrement property of the field
     $auto = $this->value('autoincrement', $primaryXML);
-    $fields[$name]['autoincrement'] = $auto;
+    if (isset($fields[$name])) {
+      $fields[$name]['autoincrement'] = $auto;
+    }
     $primaryKey = array(
       'name' => $name,
       'autoincrement' => $auto,
     );
+
+    // populate fields
+    foreach ($primaryXML->fieldName as $v) {
+      $fieldName = (string) ($v);
+      $length = (string) ($v['length']);
+      if (strlen($length) > 0) {
+        $fieldName = "$fieldName($length)";
+      }
+      $primaryKey['field'][] = $fieldName;
+    }
+
+    // when field array is empty set it to the name of the primary key.
+    if (empty($primaryKey['field'])) {
+      $primaryKey['field'][] = $name;
+    }
+
+    // all fieldnames have to be defined and should exist in schema.
+    foreach ($primaryKey['field'] as $fieldName) {
+      if (!$fieldName) {
+        echo "Invalid field defination for index $name\n";
+        return;
+      }
+      $parenOffset = strpos($fieldName, '(');
+      if ($parenOffset > 0) {
+        $fieldName = substr($fieldName, 0, $parenOffset);
+      }
+      if (!array_key_exists($fieldName, $fields)) {
+        echo "Table does not contain $fieldName\n";
+        print_r($fields);
+        exit();
+      }
+    }
+
     $table['primaryKey'] = &$primaryKey;
   }
 

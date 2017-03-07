@@ -35,15 +35,6 @@ LOCK TABLES `civicrm_acl_cache` WRITE;
 UNLOCK TABLES;
 
 --
--- Dumping data for table `civicrm_acl_contact_cache`
---
-
-LOCK TABLES `civicrm_acl_contact_cache` WRITE;
-/*!40000 ALTER TABLE `civicrm_acl_contact_cache` DISABLE KEYS */;
-/*!40000 ALTER TABLE `civicrm_acl_contact_cache` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Dumping data for table `civicrm_acl_entity_role`
 --
 

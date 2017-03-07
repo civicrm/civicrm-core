@@ -183,7 +183,24 @@ class CRM_Contact_Form_Search_Custom_Basic extends CRM_Contact_Form_Search_Custo
    * @param string $tableAlias
    */
   public function buildACLClause($tableAlias = 'contact') {
-    list($this->_aclFrom, $this->_aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause($tableAlias);
+    $deleteClause = '';
+    if (!CRM_Core_Permission::check('access deleted contacts')) {
+      $deleteClause = "({$tableAlias}.is_deleted = '0')";
+    }
+
+    $aclContactCache = \Civi::service('acl_contact_cache');
+    $aclWhere = $aclContactCache->getAclWhereClause(CRM_Core_Permission::VIEW, $tableAlias);
+    $aclJoin = $aclContactCache->getAclJoin(CRM_Core_Permission::VIEW, $tableAlias);
+
+    if (strlen($aclWhere) && strlen($deleteClause)) {
+      $aclWhere .= " AND " . $deleteClause;
+    }
+    elseif (strlen($deleteClause)) {
+      $aclWhere = $deleteClause;
+    }
+
+    $this->_aclWhere = $aclWhere;
+    $this->_aclFrom = $aclJoin;
   }
 
 }

@@ -54,6 +54,18 @@ class CRM_Contact_Form_Search_Custom_FullText extends CRM_Contact_Form_Search_Cu
   protected $_tableFields = NULL;
 
   /**
+   * @var string
+   *   The ACL Where clause
+   */
+  private $aclWhere;
+
+  /**
+   * @var string
+   *   The ACL From part for the query
+   */
+  private $aclFrom;
+
+  /**
    * @var array|null NULL if no limit; or array(0 => $limit, 1 => $offset)
    */
   protected $_limitClause = NULL;
@@ -143,6 +155,14 @@ class CRM_Contact_Form_Search_Custom_FullText extends CRM_Contact_Form_Search_Cu
       $this->buildTempTable();
 
       $this->fillTable();
+
+      $aclContactCache = \Civi::service('acl_contact_cache');
+      $this->aclWhere = $aclContactCache->getAclWhereClause(CRM_Core_Permission::VIEW, 'contact_a', 'contact_id');
+      $this->aclFrom = $aclContactCache->getAclJoin(CRM_Core_Permission::VIEW, 'contact_a', 'contact_id');
+
+      if (empty($this->aclWhere)) {
+        $this->aclWhere = ' (1) ';
+      }
     }
   }
 
@@ -236,54 +256,6 @@ CREATE TEMPORARY TABLE {$this->_entityIDTableName} (
         }
       }
     }
-
-    $this->filterACLContacts();
-  }
-
-  public function filterACLContacts() {
-    if (CRM_Core_Permission::check('view all contacts')) {
-      CRM_Core_DAO::executeQuery("DELETE FROM {$this->_tableName} WHERE contact_id IN (SELECT id FROM civicrm_contact WHERE is_deleted = 1)");
-      return;
-    }
-
-    $session = CRM_Core_Session::singleton();
-    $contactID = $session->get('userID');
-    if (!$contactID) {
-      $contactID = 0;
-    }
-
-    CRM_Contact_BAO_Contact_Permission::cache($contactID);
-
-    $params = array(1 => array($contactID, 'Integer'));
-
-    $sql = "
-DELETE     t.*
-FROM       {$this->_tableName} t
-WHERE      NOT EXISTS ( SELECT c.id
-                        FROM civicrm_acl_contact_cache c
-                        WHERE c.user_id = %1 AND t.contact_id = c.contact_id )
-";
-    CRM_Core_DAO::executeQuery($sql, $params);
-
-    $sql = "
-DELETE     t.*
-FROM       {$this->_tableName} t
-WHERE      t.table_name = 'Activity' AND
-           NOT EXISTS ( SELECT c.id
-                        FROM civicrm_acl_contact_cache c
-                        WHERE c.user_id = %1 AND ( t.target_contact_id = c.contact_id OR t.target_contact_id IS NULL ) )
-";
-    CRM_Core_DAO::executeQuery($sql, $params);
-
-    $sql = "
-DELETE     t.*
-FROM       {$this->_tableName} t
-WHERE      t.table_name = 'Activity' AND
-           NOT EXISTS ( SELECT c.id
-                        FROM civicrm_acl_contact_cache c
-                        WHERE c.user_id = %1 AND ( t.assignee_contact_id = c.contact_id OR t.assignee_contact_id IS NULL ) )
-";
-    CRM_Core_DAO::executeQuery($sql, $params);
   }
 
   /**
@@ -365,7 +337,7 @@ WHERE      t.table_name = 'Activity' AND
     }
 
     // now iterate through the table and add entries to the relevant section
-    $sql = "SELECT * FROM {$this->_tableName}";
+    $sql = "SELECT * FROM {$this->_tableName} `contact_a` {$this->aclFrom} WHERE {$this->aclWhere}";
     if ($this->_table) {
       $sql .= " {$this->toLimit($this->_limitRowClause)} ";
     }
@@ -429,7 +401,7 @@ WHERE      t.table_name = 'Activity' AND
       return $this->_foundRows[$this->_table];
     }
     else {
-      return CRM_Core_DAO::singleValueQuery("SELECT count(id) FROM {$this->_tableName}");
+      return CRM_Core_DAO::singleValueQuery("SELECT count(`contact_a`.`id`) FROM {$this->_tableName} `contact_a` {$this->aclFrom} WHERE {$this->aclWhere}");
     }
   }
 
@@ -477,6 +449,8 @@ WHERE      t.table_name = 'Activity' AND
     $sql = "
 SELECT $select
 FROM   {$this->_tableName} contact_a
+{$this->aclFrom}
+WHERE {$this->aclWhere}
        {$this->toLimit($this->_limitRowClause)}
 ";
     return $sql;

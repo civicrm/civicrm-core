@@ -691,21 +691,25 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
       return;
     }
 
-    $session = CRM_Core_Session::singleton();
-    $contactID = $session->get('userID');
-    if (!$contactID) {
-      $contactID = 0;
+    $this->_aclFrom = '';
+    $this->_aclWhere = '';
+    $aclContactCache = \Civi::service('acl_contact_cache');
+    $i = 1;
+    if (!is_array($tableAlias)) {
+      $tableAlias = array($tableAlias);
     }
-    $contactID = CRM_Utils_Type::escape($contactID, 'Integer');
-
-    CRM_Contact_BAO_Contact_Permission::cache($contactID);
-    $clauses = array();
-    foreach ($tableAlias as $k => $alias) {
-      $clauses[] = " INNER JOIN civicrm_acl_contact_cache aclContactCache_{$k} ON ( {$alias}.id = aclContactCache_{$k}.contact_id OR {$alias}.id IS NULL ) AND aclContactCache_{$k}.user_id = $contactID ";
+    foreach ($tableAlias as $table) {
+      $aclWhere = $aclContactCache->getAclWhereClause(CRM_Core_Permission::VIEW, $table, 'id', 'civicrm_acl_contacts_' . $i);
+      $aclJoin = $aclContactCache->getAclJoin(CRM_Core_Permission::VIEW, $table, 'id', 'civicrm_acl_contacts_' . $i);
+      if (strlen($aclWhere)) {
+        if (strlen($this->_aclWhere)) {
+          $this->_aclWhere .= ' AND';
+        }
+        $this->_aclWhere .= ' ' . $aclWhere;
+        $this->_aclFrom .= ' ' . $aclJoin;
+        $i++;
+      }
     }
-
-    $this->_aclFrom = implode(" ", $clauses);
-    $this->_aclWhere = NULL;
   }
 
   /**

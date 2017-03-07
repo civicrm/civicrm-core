@@ -526,7 +526,10 @@ AND    $mg.mailing_id = {$mailing_id}
 
     $eq = new CRM_Mailing_Event_BAO_Queue();
 
-    list($aclFrom, $aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause();
+    $aclContactCache = \Civi::service('acl_contact_cache');
+    $aclWhere = $aclContactCache->getAclWhereClause(CRM_Core_Permission::VIEW, 'contact_a');
+    $aclFrom = $aclContactCache->getAclJoin(CRM_Core_Permission::VIEW, 'contact_a');
+
     $aclWhere = $aclWhere ? "WHERE {$aclWhere}" : '';
 
     if ($storeRecipients && $mailing_id) {

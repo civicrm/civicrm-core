@@ -394,7 +394,20 @@ class CRM_Contact_Page_AJAX {
         $offset = CRM_Utils_Type::escape($offset, 'Int');
 
         // add acl clause here
-        list($aclFrom, $aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause('cc');
+        $deleteClause = '';
+        if (!CRM_Core_Permission::check('access deleted contacts')) {
+          $deleteClause = "(cc.is_deleted = '0')";
+        }
+        $aclContactCache = \Civi::service('acl_contact_cache');
+        $aclWhere = $aclContactCache->getAclWhereClause(CRM_Core_Permission::VIEW, 'cc');
+        $aclFrom = $aclContactCache->getAclJoin(CRM_Core_Permission::VIEW, 'cc');
+        if (strlen($aclWhere) && strlen($deleteClause)) {
+          $aclWhere .= " AND " . $deleteClause;
+        }
+        elseif (strlen($deleteClause)) {
+          $aclWhere = $deleteClause;
+        }
+
         if ($aclWhere) {
           $aclWhere = " AND $aclWhere";
         }
@@ -490,7 +503,19 @@ LIMIT {$offset}, {$rowCount}
       $rowCount = CRM_Utils_Type::escape($rowCount, 'Int');
 
       // add acl clause here
-      list($aclFrom, $aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause('cc');
+      $deleteClause = '';
+      if (!CRM_Core_Permission::check('access deleted contacts')) {
+        $deleteClause = "(cc.is_deleted = '0')";
+      }
+      $aclContactCache = \Civi::service('acl_contact_cache');
+      $aclWhere = $aclContactCache->getAclWhereClause(CRM_Core_Permission::VIEW, 'cc');
+      $aclFrom = $aclContactCache->getAclJoin(CRM_Core_Permission::VIEW, 'cc');
+      if (strlen($aclWhere) && strlen($deleteClause)) {
+        $aclWhere .= " AND " . $deleteClause;
+      }
+      elseif (strlen($deleteClause)) {
+        $aclWhere = $deleteClause;
+      }
       if ($aclWhere) {
         $aclWhere = " AND $aclWhere";
       }

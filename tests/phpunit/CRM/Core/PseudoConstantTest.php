@@ -193,12 +193,6 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
           'sample' => 'CiviMail',
         ),
       ),
-      'CRM_Contact_DAO_ACLContactCache' => array(
-        array(
-          'fieldName' => 'operation',
-          'sample' => 'All',
-        ),
-      ),
       'CRM_Core_DAO_Setting' => array(
         array(
           'fieldName' => 'component_id',

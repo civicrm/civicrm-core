@@ -364,8 +364,23 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
 
     if ($this->params && !$this->noRules) {
       if ($checkPermission) {
-        list($this->_aclFrom, $this->_aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause('civicrm_contact');
-        $this->_aclWhere = $this->_aclWhere ? "AND {$this->_aclWhere}" : '';
+        $deleteClause = '';
+        if (!CRM_Core_Permission::check('access deleted contacts')) {
+          $deleteClause = "(cc.is_deleted = '0')";
+        }
+
+        $aclContactCache = \Civi::service('acl_contact_cache');
+        $aclWhere = $aclContactCache->getAclWhereClause(CRM_Core_Permission::VIEW, 'civicrm_contact');
+        $aclJoin = $aclContactCache->getAclJoin(CRM_Core_Permission::VIEW, 'civicrm_contact');
+        if (strlen($aclWhere) && strlen($deleteClause)) {
+          $aclWhere .= " AND " . $deleteClause;
+        }
+        elseif (strlen($deleteClause)) {
+          $aclWhere = $deleteClause;
+        }
+
+        $this->_aclFrom = $aclJoin;
+        $this->_aclWhere = $aclWhere ? "AND {$aclWhere}" : "{$aclWhere}";
       }
       $query = "SELECT dedupe.id1 as id
                 FROM dedupe JOIN civicrm_contact ON dedupe.id1 = civicrm_contact.id {$this->_aclFrom}
@@ -375,8 +390,18 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
     else {
       $this->_aclWhere = ' AND c1.is_deleted = 0 AND c2.is_deleted = 0';
       if ($checkPermission) {
-        list($this->_aclFrom, $this->_aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause(array('c1', 'c2'));
-        $this->_aclWhere = $this->_aclWhere ? "AND {$this->_aclWhere}" : '';
+        $aclContactCache = \Civi::service('acl_contact_cache');
+        $aclWhere1 = $aclContactCache->getAclWhereClause(CRM_Core_Permission::VIEW, 'c1', 'id', 'civicrm_acl_contacts1');
+        $this->_aclFrom = $this->_aclFrom . ' ' . $aclContactCache->getAclJoin(CRM_Core_Permission::VIEW, 'c1', 'id', 'civicrm_acl_contacts1');
+        $aclWhere2 = $aclContactCache->getAclWhereClause(CRM_Core_Permission::VIEW, 'c2', 'id', 'civicrm_acl_contacts2');
+        $this->_aclFrom = $this->_aclFrom . ' ' . $aclContactCache->getAclJoin(CRM_Core_Permission::VIEW, 'c2', 'id', 'civicrm_acl_contacts2');
+
+        if (strlen($aclWhere1)) {
+          $this->_aclWhere .= ' AND ' . $aclWhere1;
+        }
+        if (strlen($aclWhere2)) {
+          $this->_aclWhere .= ' AND ' . $aclWhere2;
+        }
       }
       $query = "SELECT IF(dedupe.id1 < dedupe.id2, dedupe.id1, dedupe.id2) as id1,
                 IF(dedupe.id1 < dedupe.id2, dedupe.id2, dedupe.id1) as id2, dedupe.weight

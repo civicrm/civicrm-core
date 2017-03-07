@@ -875,44 +875,6 @@ class CRM_Core_Permission {
   }
 
   /**
-   * Validate user permission across.
-   * edit or view or with supportable acls.
-   *
-   * @return bool
-   */
-  public static function giveMeAllACLs() {
-    if (CRM_Core_Permission::check('view all contacts') ||
-      CRM_Core_Permission::check('edit all contacts')
-    ) {
-      return TRUE;
-    }
-
-    $session = CRM_Core_Session::singleton();
-    $contactID = $session->get('userID');
-
-    //check for acl.
-    $aclPermission = self::getPermission();
-    if (in_array($aclPermission, array(
-      CRM_Core_Permission::EDIT,
-      CRM_Core_Permission::VIEW,
-    ))
-    ) {
-      return TRUE;
-    }
-
-    // run acl where hook and see if the user is supplying an ACL clause
-    // that is not false
-    $tables = $whereTables = array();
-    $where = NULL;
-
-    CRM_Utils_Hook::aclWhereClause(CRM_Core_Permission::VIEW,
-      $tables, $whereTables,
-      $contactID, $where
-    );
-    return empty($whereTables) ? FALSE : TRUE;
-  }
-
-  /**
    * Get component name from given permission.
    *
    * @param string $permission
