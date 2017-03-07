@@ -4,6 +4,7 @@
 - github      : adixon
   name        : Alan Dixon
   organization: Blackfly Solutions
+  jira        : adixon
 
 - github      : agh1
   name        : Andrew Hunt
@@ -15,9 +16,9 @@
   organization: Agileware
   jira        : agileware
 
-- github      : aydun
-  name        : Aidan Saunders
-  jira        : ayduns
+- github      : ajdavis
+  name        : A. Jesse Jiryu Davis
+  organization: MongoDB
 
 - github      : alifrumin
   name        : Alice Frumin
@@ -28,17 +29,37 @@
   name        : Andrew Cormick-Dockery
   jira        : andrew_dockery
 
+- github      : andrewpthompson
+  name        : Andrew Thompson
+  jira        : andrewpthompson
+
 - github      : artem3
   name        : Artem Goncharenko
+
+- github      : aydun
+  name        : Aidan Saunders
+  jira        : ayduns
 
 - github      : bhahumanists
   name        : Andrew West
   organization: British Humanist Association
   jira        : awestbha
 
+- github      : BorislavZlatanov
+  name        : Borislav Zlatanov
+  jira        : BorislavZlatanov
+
 - github      : bsilvern
   name        : Bob Silvern
   jira        : bobs0
+
+- github      : chagrawil
+  name        : Charlie Wilder
+  organization: Monadnock Developmental Services
+  jira        : chagrawil
+
+- github      : chanunc
+  name        : Chanun Chirattikanon
 
 - github      : christianwach
   name        : Christian Wach
@@ -66,6 +87,10 @@
   organization: Circle Interactive
   jira        : davej
 
+- github      : davialexandre
+  name        : Davi Alexandre
+  jira        : davialexandre
+
 - github      : davisagli
   name        : David Glick
   organization: Glick Software
@@ -90,6 +115,10 @@
   organization: Nubay Services
   jira        : dtarrant
 
+- github      : dkguru
+  organization: Jesper Angelo
+  jira        : dkguru
+
 - github      : edzelopez
   name        : Edsel Lopez
   organization: JMA Consulting
@@ -99,6 +128,10 @@
   name        : Eileen McNaughton
   organization: Fuzion
   jira        : eileen
+
+- name        : Ellen Hendricks
+  organization: Spry Digital
+  jira        : ehendricks
 
 - github      : ErichBSchulz
   name        : Erich Schulz
@@ -130,6 +163,10 @@
 - github      : ginkgomzd
   name        : Michael Z Daryabeygi
   organization: Ginkgo Street Labs
+
+- github      : h-c-c
+  name        : Peter Hartmann
+  organization: Hartmann Computer Consulting
 
 - github      : herbdool
   name        : Herb van den Dool
@@ -222,6 +259,10 @@
   organization: Klangsoft
   jira        : konadave
 
+- github      : kurund
+  name        : Kurund Jalmi
+  organization: CiviCRM
+
 - github      : lcdservices
   name        : Brian Shaughnessy
   organization: Lighthouse Design and Consulting
@@ -247,6 +288,9 @@
 - github      : magnolia61
   name        : Richard van Oosterhout
   jira        : magnolia61
+
+- github      : mattwire
+  name        : Matthew Wire
 
 - github      : michaelmcandrew
   name        : Michael McAndrew
@@ -343,9 +387,15 @@
   organization: Australian Greens
   jira        : seamuslee
 
+- github      : seanmadsen
+  name        : Sean Madsen
+
 - github      : sharique
   name        : Sharique Ahmed Farooqui
   jira        : sharique
+
+- github      : spalmstr
+  name        : Stephen Palmstrom
 
 - github      : sqweets
   name        : Ellen Hendricks
