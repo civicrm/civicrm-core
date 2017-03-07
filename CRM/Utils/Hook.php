@@ -387,7 +387,7 @@ abstract class CRM_Utils_Hook {
    *   the return value is ignored
    */
   public static function links($op, $objectName, &$objectId, &$links, &$mask = NULL, &$values = array()) {
-    return self::singleton()->invoke(6, $op, $objectName, $objectId, $links, $mask, $values, 'civicrm_links');
+    return self::singleton()->invoke(array('op', 'objectName', 'objectId', 'links', 'mask', 'values'), $op, $objectName, $objectId, $links, $mask, $values, 'civicrm_links');
   }
 
   /**
@@ -403,7 +403,7 @@ abstract class CRM_Utils_Hook {
    */
   public static function preProcess($formName, &$form) {
     return self::singleton()
-      ->invoke(2, $formName, $form, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_preProcess');
+      ->invoke(array('formName', 'form'), $formName, $form, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_preProcess');
   }
 
   /**
@@ -419,7 +419,7 @@ abstract class CRM_Utils_Hook {
    *   the return value is ignored
    */
   public static function buildForm($formName, &$form) {
-    return self::singleton()->invoke(2, $formName, $form,
+    return self::singleton()->invoke(array('formName', 'form'), $formName, $form,
       self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
       'civicrm_buildForm'
     );
@@ -438,7 +438,7 @@ abstract class CRM_Utils_Hook {
    *   the return value is ignored
    */
   public static function postProcess($formName, &$form) {
-    return self::singleton()->invoke(2, $formName, $form,
+    return self::singleton()->invoke(array('formName', 'form'), $formName, $form,
       self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
       'civicrm_postProcess'
     );
@@ -461,7 +461,8 @@ abstract class CRM_Utils_Hook {
    */
   public static function validateForm($formName, &$fields, &$files, &$form, &$errors) {
     return self::singleton()
-      ->invoke(5, $formName, $fields, $files, $form, $errors, self::$_nullObject, 'civicrm_validateForm');
+      ->invoke(array('formName', 'fields', 'files', 'form', 'errors'),
+        $formName, $fields, $files, $form, $errors, self::$_nullObject, 'civicrm_validateForm');
   }
 
   /**
@@ -481,7 +482,7 @@ abstract class CRM_Utils_Hook {
    */
   public static function custom($op, $groupID, $entityID, &$params) {
     return self::singleton()
-      ->invoke(4, $op, $groupID, $entityID, $params, self::$_nullObject, self::$_nullObject, 'civicrm_custom');
+      ->invoke(array('op', 'groupID', 'entityID', 'params'), $op, $groupID, $entityID, $params, self::$_nullObject, self::$_nullObject, 'civicrm_custom');
   }
 
   /**
@@ -504,7 +505,7 @@ abstract class CRM_Utils_Hook {
    */
   public static function aclWhereClause($type, &$tables, &$whereTables, &$contactID, &$where) {
     return self::singleton()
-      ->invoke(5, $type, $tables, $whereTables, $contactID, $where, self::$_nullObject, 'civicrm_aclWhereClause');
+      ->invoke(array('type', 'tables', 'whereTables', 'contactID', 'where'), $type, $tables, $whereTables, $contactID, $where, self::$_nullObject, 'civicrm_aclWhereClause');
   }
 
   /**
@@ -527,7 +528,7 @@ abstract class CRM_Utils_Hook {
    */
   public static function aclGroup($type, $contactID, $tableName, &$allGroups, &$currentGroups) {
     return self::singleton()
-      ->invoke(5, $type, $contactID, $tableName, $allGroups, $currentGroups, self::$_nullObject, 'civicrm_aclGroup');
+      ->invoke(array('type', 'contactID', 'tableName', 'allGroups', 'currentGroups'), $type, $contactID, $tableName, $allGroups, $currentGroups, self::$_nullObject, 'civicrm_aclGroup');
   }
 
   /**
@@ -537,7 +538,7 @@ abstract class CRM_Utils_Hook {
    */
   public static function selectWhereClause($entity, &$clauses) {
     $entityName = is_object($entity) ? _civicrm_api_get_entity_name_from_dao($entity) : $entity;
-    return self::singleton()->invoke(2, $entityName, $clauses,
+    return self::singleton()->invoke(array('entity', 'clauses'), $entityName, $clauses,
       self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
       'civicrm_selectWhereClause'
     );
@@ -553,7 +554,7 @@ abstract class CRM_Utils_Hook {
    *   the return value is ignored
    */
   public static function xmlMenu(&$files) {
-    return self::singleton()->invoke(1, $files,
+    return self::singleton()->invoke(array('files'), $files,
       self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
       'civicrm_xmlMenu'
     );
@@ -568,7 +569,7 @@ abstract class CRM_Utils_Hook {
    *   the return value is ignored
    */
   public static function alterMenu(&$items) {
-    return self::singleton()->invoke(1, $items,
+    return self::singleton()->invoke(array('items'), $items,
       self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
       'civicrm_alterMenu'
     );
