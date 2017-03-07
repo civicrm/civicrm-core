@@ -2337,7 +2337,6 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       'receipt_date' => 'activityDateTime',
       'thankyou_date' => 'activityDateTime',
       'cancel_date' => 'activityDateTime',
-      'activity_date_time' => 'activityDateTime',
     );
   }
 

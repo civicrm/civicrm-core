@@ -606,7 +606,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       'activity_subject' => 'Test Meeting',
       'activity_details' => 'a test activity details',
       'activity_duration' => '100',
-      'activity_date_time' => '03/08/2010',
+      'activity_date_time' => '2010-03-08 00:00:00',
       'activity_status_id' => '2',
     );
     $profileParams = array_merge($params, $updateParams);
@@ -799,7 +799,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       'assignee_contact_id' => $contactId,
       'activity_type_id' => '1',
       'subject' => 'Make-it-Happen Meeting',
-      'activity_date_time' => '20110316',
+      'activity_date_time' => '2011-03-16 00:00:00',
       'duration' => '120',
       'location' => 'Pensulvania',
       'details' => 'a test activity',
@@ -825,8 +825,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       'activity_subject' => 'Make-it-Happen Meeting',
       'activity_details' => 'a test activity',
       'activity_duration' => '120',
-      'activity_date_time_time' => '12:00AM',
-      'activity_date_time' => '03/16/2011',
+      'activity_date_time' => '2011-03-16 00:00:00',
       'activity_status_id' => '1',
     );
 
