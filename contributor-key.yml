@@ -19,6 +19,7 @@
 - github      : ajdavis
   name        : A. Jesse Jiryu Davis
   organization: MongoDB
+  jira        : jiryu
 
 - github      : alifrumin
   name        : Alice Frumin
@@ -164,9 +165,15 @@
   name        : Michael Z Daryabeygi
   organization: Ginkgo Street Labs
 
+- github      : guanhuan
+  name        : Guanhuan Chen
+  organization: CompuCorp
+  jira        : guanhuan
+
 - github      : h-c-c
   name        : Peter Hartmann
   organization: Hartmann Computer Consulting
+  jira        : peterhartmann
 
 - github      : herbdool
   name        : Herb van den Dool
@@ -183,6 +190,11 @@
   name        : Jaap Jansma
   organization: CiviCoop
   jira        : grapio
+
+- github      : jackaponte
+  name        : Jack Aponte
+  organization: Palante Technology Cooperative
+  jira        : jackaponte
 
 - github      : jackrabbithanna
   name        : Mark Hanna
@@ -231,6 +243,11 @@
   name        : Josh Gowans
   organization: CiviCRM
   jira        : jgowans
+
+- github      : josephlacey
+  name        : Joseph Lacey
+  organization: Palante Technology Cooperative
+  jira        : jlacey
 
 - github      : kainuk
   name        : Klaas Eikelboom
@@ -289,12 +306,17 @@
   name        : Richard van Oosterhout
   jira        : magnolia61
 
+- name        : Matt Allard
+  organization: City of Winnipeg, Manitoba
+  jira        : mattallard
+
 - github      : mattwire
   name        : Matthew Wire
 
 - github      : michaelmcandrew
   name        : Michael McAndrew
   organization: Third Sector Design
+  jira        : michaelmcandrew
 
 - github      : mi-kon
   name        : Mike Kondrashin
@@ -329,10 +351,19 @@
 - name        : Noah Miller
   jira        : noah
 
+- github      : ogomez78
+  name        : Osvaldo Gomez
+  organization: Upleaf
+  jira        : ogomez78
+
 - github      : omarabuhussein
   name        : Omar Abu Hussein
   organization: CompuCorp
   jira        : omarabuhussein
+
+- jira        : oskylark
+  name        : Owen Pearson
+  organization: Skylark Technology
 
 - name        : Dennis Gray
   jira        : ozyank
@@ -389,6 +420,7 @@
 
 - github      : seanmadsen
   name        : Sean Madsen
+  jira        : seanmadsen
 
 - github      : sharique
   name        : Sharique Ahmed Farooqui
@@ -396,6 +428,7 @@
 
 - github      : spalmstr
   name        : Stephen Palmstrom
+  jira        : spalmstr
 
 - github      : sqweets
   name        : Ellen Hendricks
@@ -456,6 +489,16 @@
   name        : Allen Shaw
   organization: Joinery
   jira        : allenshaw
+
+- github      : upperholme
+  name        : Graham Mitchell
+  organization: MC3
+  jira        : upperholme
+
+- github      : urlisse
+  name        : Stéphane Lussier
+  organization: Coop SymbioTIC
+  jira        : urlisse
 
 - name        : Vakees K
   jira        : vakeesan26
