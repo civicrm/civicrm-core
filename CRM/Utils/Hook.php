@@ -776,7 +776,7 @@ abstract class CRM_Utils_Hook {
     $className = NULL
   ) {
     return self::singleton()
-      ->invoke(5, $details, $contactIDs, $jobID, $tokens, $className, self::$_nullObject, 'civicrm_tokenValues');
+      ->invoke(array('details', 'contactIDs', 'jobID', 'tokens', 'className'), $details, $contactIDs, $jobID, $tokens, $className, self::$_nullObject, 'civicrm_tokenValues');
   }
 
   /**
@@ -789,7 +789,7 @@ abstract class CRM_Utils_Hook {
    * @return null
    */
   public static function pageRun(&$page) {
-    return self::singleton()->invoke(1, $page,
+    return self::singleton()->invoke(array('page'), $page,
       self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
       'civicrm_pageRun'
     );
@@ -807,7 +807,7 @@ abstract class CRM_Utils_Hook {
    * @return null
    */
   public static function copy($objectName, &$object) {
-    return self::singleton()->invoke(2, $objectName, $object,
+    return self::singleton()->invoke(array('objectName', 'object'), $objectName, $object,
       self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
       'civicrm_copy'
     );
@@ -833,7 +833,7 @@ abstract class CRM_Utils_Hook {
    */
   public static function unsubscribeGroups($op, $mailingId, $contactId, &$groups, &$baseGroups) {
     return self::singleton()
-      ->invoke(5, $op, $mailingId, $contactId, $groups, $baseGroups, self::$_nullObject, 'civicrm_unsubscribeGroups');
+      ->invoke(array('op', 'mailingId', 'contactId', 'groups', 'baseGroups'), $op, $mailingId, $contactId, $groups, $baseGroups, self::$_nullObject, 'civicrm_unsubscribeGroups');
   }
 
   /**
@@ -857,7 +857,8 @@ abstract class CRM_Utils_Hook {
    * @return mixed
    */
   public static function customFieldOptions($customFieldID, &$options, $detailedFormat = FALSE, $selectAttributes = array()) {
-    return self::singleton()->invoke(3, $customFieldID, $options, $detailedFormat,
+    // Weird: $selectAttributes is inputted but not outputted.
+    return self::singleton()->invoke(array('customFieldID', 'options', 'detailedFormat'), $customFieldID, $options, $detailedFormat,
       self::$_nullObject, self::$_nullObject, self::$_nullObject,
       'civicrm_customFieldOptions'
     );
@@ -874,7 +875,7 @@ abstract class CRM_Utils_Hook {
    * @return mixed
    */
   public static function fieldOptions($entity, $field, &$options, $params) {
-    return self::singleton()->invoke(5, $entity, $field, $options, $params,
+    return self::singleton()->invoke(array('entity', 'field', 'options', 'params'), $entity, $field, $options, $params,
       self::$_nullObject, self::$_nullObject,
       'civicrm_fieldOptions'
     );
@@ -900,7 +901,7 @@ abstract class CRM_Utils_Hook {
    * @return mixed
    */
   public static function searchTasks($objectType, &$tasks) {
-    return self::singleton()->invoke(2, $objectType, $tasks,
+    return self::singleton()->invoke(array('objectType', 'tasks'), $objectType, $tasks,
       self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
       'civicrm_searchTasks'
     );
@@ -913,7 +914,7 @@ abstract class CRM_Utils_Hook {
    * @return mixed
    */
   public static function eventDiscount(&$form, &$params) {
-    return self::singleton()->invoke(2, $form, $params,
+    return self::singleton()->invoke(array('form', 'params'), $form, $params,
       self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
       'civicrm_eventDiscount'
     );
@@ -932,7 +933,7 @@ abstract class CRM_Utils_Hook {
    * @return mixed
    */
   public static function mailingGroups(&$form, &$groups, &$mailings) {
-    return self::singleton()->invoke(3, $form, $groups, $mailings,
+    return self::singleton()->invoke(array('form', 'groups', 'mailings'), $form, $groups, $mailings,
       self::$_nullObject, self::$_nullObject, self::$_nullObject,
       'civicrm_mailingGroups'
     );
