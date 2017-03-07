@@ -402,6 +402,21 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
 
   /**
    * Is there a processor on this site with the specified capability.
+   *
+   * The capabilities are defined on CRM_Core_Payment and can be extended by
+   * processors.
+   *
+   * examples are
+   *  - supportsBackOffice
+   *  - supportsLiveMode
+   *  - supportsFutureRecurDate
+   *  - supportsCancelRecurring
+   *  - supportsRecurContributionsForPledges
+   *
+   * They are passed as array('BackOffice');
+   *
+   * Details of specific functions are in the docblocks on the CRM_Core_Payment class.
+   *
    * @param array $capabilities
    *
    * @return bool
