@@ -2154,6 +2154,30 @@ SELECT contact_id
     }
   }
 
+
+  /**
+   * Update the fields array to also hold keys for pseudoconstant fields that relate to contained fields.
+   *
+   * This is relevant where we want to offer both the ID field and the label field
+   * as an option, e.g. search builder.
+   *
+   * It is currently limited for optionGroupName for purposes keeping the scope of the
+   * change small, but is appropriate for other sorts of pseudoconstants.
+   *
+   * @param array $fields
+   */
+  protected static function appendPseudoConstantsToFields(&$fields) {
+    foreach ($fields as $field) {
+      if (!empty($field['pseudoconstant']) && !empty($field['pseudoconstant']['optionGroupName'])) {
+        $fields[$field['pseudoconstant']['optionGroupName']] = array(
+          'title' => CRM_Core_BAO_OptionGroup::getTitleByName($field['pseudoconstant']['optionGroupName']),
+          'name' => $field['pseudoconstant']['optionGroupName'],
+          'data_type' => CRM_Utils_Type::T_STRING,
+        );
+      }
+    }
+  }
+
   /**
    * Get options for the called BAO object's field.
    *

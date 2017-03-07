@@ -366,6 +366,7 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
     $allCampaigns = CRM_Campaign_BAO_Campaign::getCampaigns(NULL, NULL, FALSE, FALSE, FALSE, TRUE);
 
     while ($result->fetch()) {
+      $this->_query->convertToPseudoNames($result);
       $links = self::links($componentId,
           $componentAction,
           $qfKey,

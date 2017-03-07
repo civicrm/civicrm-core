@@ -97,39 +97,6 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
       $query->_tables['contribution_batch'] = 1;
     }
 
-    // get contribution_status
-    if (!empty($query->_returnProperties['contribution_status_id'])) {
-      $query->_select['contribution_status_id'] = "contribution_status.value as contribution_status_id";
-      $query->_element['contribution_status_id'] = 1;
-      $query->_tables['civicrm_contribution'] = 1;
-      $query->_tables['contribution_status'] = 1;
-    }
-
-    // get contribution_status label
-    if (!empty($query->_returnProperties['contribution_status'])) {
-      $query->_select['contribution_status'] = "contribution_status.label as contribution_status";
-      $query->_element['contribution_status'] = 1;
-      $query->_tables['civicrm_contribution'] = 1;
-      $query->_tables['contribution_status'] = 1;
-    }
-
-    // get payment instrument
-    if (!empty($query->_returnProperties['payment_instrument'])) {
-      $query->_select['payment_instrument'] = "contribution_payment_instrument.label as payment_instrument";
-      $query->_element['payment_instrument'] = 1;
-      $query->_tables['civicrm_contribution'] = 1;
-      $query->_tables['contribution_payment_instrument'] = 1;
-    }
-
-    // get payment instrument id
-    if (!empty($query->_returnProperties['payment_instrument_id'])) {
-      $query->_select['instrument_id'] = "contribution_payment_instrument.value as instrument_id";
-      $query->_select['payment_instrument_id'] = "contribution_payment_instrument.value as payment_instrument_id";
-      $query->_element['instrument_id'] = $query->_element['payment_instrument_id'] = 1;
-      $query->_tables['civicrm_contribution'] = 1;
-      $query->_tables['contribution_payment_instrument'] = 1;
-    }
-
     if (!empty($query->_returnProperties['contribution_campaign_title'])) {
       $query->_select['contribution_campaign_title'] = "civicrm_campaign.title as contribution_campaign_title";
       $query->_element['contribution_campaign_title'] = $query->_tables['civicrm_campaign'] = 1;
@@ -181,7 +148,7 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
     list($name, $op, $value, $grouping, $wildcard) = $values;
 
     $quoteValue = NULL;
-    $fields = array_merge(CRM_Contribute_BAO_Contribution::fields(), self::getFields());
+    $fields = self::getFields();
 
     if (!empty($value) && !is_array($value)) {
       $quoteValue = "\"$value\"";
@@ -576,18 +543,6 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
       case 'civicrm_product':
         $from = " $side  JOIN civicrm_contribution_product ON civicrm_contribution_product.contribution_id = civicrm_contribution.id";
         $from .= " $side  JOIN civicrm_product ON civicrm_contribution_product.product_id =civicrm_product.id ";
-        break;
-
-      case 'contribution_payment_instrument':
-        $from = " $side JOIN civicrm_option_group option_group_payment_instrument ON ( option_group_payment_instrument.name = 'payment_instrument')";
-        $from .= " $side JOIN civicrm_option_value contribution_payment_instrument ON (civicrm_contribution.payment_instrument_id = contribution_payment_instrument.value
-                               AND option_group_payment_instrument.id = contribution_payment_instrument.option_group_id ) ";
-        break;
-
-      case 'contribution_status':
-        $from = " $side JOIN civicrm_option_group option_group_contribution_status ON (option_group_contribution_status.name = 'contribution_status')";
-        $from .= " $side JOIN civicrm_option_value contribution_status ON (civicrm_contribution.contribution_status_id = contribution_status.value
-                               AND option_group_contribution_status.id = contribution_status.option_group_id ) ";
         break;
 
       case 'contribution_softcredit_type':

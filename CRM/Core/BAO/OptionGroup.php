@@ -184,4 +184,39 @@ class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup {
     }
   }
 
+  /**
+   * Get the title of an option group by name.
+   *
+   * @param string $name
+   *   The name value for the option group table.
+   *
+   * @return string
+   *   The relevant title.
+   */
+  public static function getTitleByName($name) {
+    $groups = self::getTitlesByNames();
+    return $groups[$name];
+  }
+
+  /**
+   * Get a cached mapping of all group titles indexed by their unique name.
+   *
+   * We tend to only have a limited number of option groups so memory caching
+   * makes more sense than multiple look-ups.
+   *
+   * @return array
+   *   Array of all group titles by name.
+   *   e.g
+   *   array('activity_status' => 'Activity Status', 'msg_mode' => 'Message Mode'....)
+   */
+  public static function getTitlesByNames() {
+    if (!isset(\Civi::$statics[__CLASS__]) || !isset(\Civi::$statics[__CLASS__]['titles_by_name'])) {
+      $dao = CRM_Core_DAO::executeQuery("SELECT name, title FROM civicrm_option_group");
+      while ($dao->fetch()) {
+        \Civi::$statics[__CLASS__]['titles_by_name'][$dao->name] = $dao->title;
+      }
+    }
+    return \Civi::$statics[__CLASS__]['titles_by_name'];
+  }
+
 }

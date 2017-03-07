@@ -69,6 +69,8 @@ class CRM_Utils_TypeTest extends CiviUnitTestCase {
       array('DESC', 'MysqlOrderByDirection', 'desc'),
       array('DESCc', 'MysqlOrderByDirection', NULL),
       array('table.civicrm_column_name desc', 'MysqlOrderBy', 'table.civicrm_column_name desc'),
+      array('field(civicrm_column_name,4,5,6)', 'MysqlOrderBy', 'field(civicrm_column_name,4,5,6)'),
+      array('field(table.civicrm_column_name,4,5,6)', 'MysqlOrderBy', 'field(table.civicrm_column_name,4,5,6)'),
       array('table.civicrm_column_name desc,other_column, another_column desc', 'MysqlOrderBy', 'table.civicrm_column_name desc,other_column, another_column desc'),
       array('table.`Home-street_address` asc, `table-alias`.`Home-street_address` desc,`table-alias`.column', 'MysqlOrderBy', 'table.`Home-street_address` asc, `table-alias`.`Home-street_address` desc,`table-alias`.column'),
       array('a string', 'String', 'a string'),
@@ -121,6 +123,8 @@ class CRM_Utils_TypeTest extends CiviUnitTestCase {
       array('DESC', 'MysqlOrderByDirection', 'desc'),
       array('DESCc', 'MysqlOrderByDirection', NULL),
       array('table.civicrm_column_name desc', 'MysqlOrderBy', '`table`.`civicrm_column_name` desc'),
+      array('field(contribution_status_id,4,5,6) asc', 'MysqlOrderBy', 'field(`contribution_status_id`,4,5,6) asc'),
+      array('field(contribution_status_id,4,5,6) asc, contact_id asc', 'MysqlOrderBy', 'field(`contribution_status_id`,4,5,6) asc, `contact_id` asc'),
       array('table.civicrm_column_name desc,other_column,another_column desc', 'MysqlOrderBy', '`table`.`civicrm_column_name` desc, `other_column`, `another_column` desc'),
       array('table.`Home-street_address` asc, `table-alias`.`Home-street_address` desc,`table-alias`.column', 'MysqlOrderBy', '`table`.`Home-street_address` asc, `table-alias`.`Home-street_address` desc, `table-alias`.`column`'),
     );

@@ -122,9 +122,11 @@
   <field>
     <name>payment_instrument_id</name>
     <uniqueName>payment_instrument_id</uniqueName>
-    <title>Payment Method</title>
+    <title>Payment Method ID</title>
     <type>int unsigned</type>
     <comment>FK to Payment Instrument</comment>
+    <export>true</export>
+    <headerPattern>/^payment|(p(ayment\s)?instrument)$/i</headerPattern>
     <pseudoconstant>
       <optionGroupName>payment_instrument</optionGroupName>
     </pseudoconstant>

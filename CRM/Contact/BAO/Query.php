@@ -653,8 +653,7 @@ class CRM_Contact_BAO_Query {
       if (
         (substr($name, 0, 12) == 'participant_') ||
         (substr($name, 0, 7) == 'pledge_') ||
-        (substr($name, 0, 5) == 'case_') ||
-        (substr($name, 0, 8) == 'payment_')
+        (substr($name, 0, 5) == 'case_')
       ) {
         continue;
       }
@@ -6203,10 +6202,17 @@ AND   displayRelType.is_active = 1
     $order = trim(str_replace('ORDER BY', '', $order));
 
     // hack for order clause
-    $fieldOrder = explode(' ', $order);
-    $field = $fieldOrder[0];
+    if (!empty($orderByArray)) {
+      $order = implode(', ', $orderByArray);
+    }
+    else {
+      $orderByArray = explode(',', $order);
+    }
+    foreach ($orderByArray as $orderByClause) {
+      $orderByClauseParts = explode(' ', trim($orderByClause));
+      $field = $orderByClauseParts[0];
+      $direction = isset($orderByClauseParts[1]) ? $orderByClauseParts[1] : 'asc';
 
-    if ($field) {
       switch ($field) {
         case 'city':
         case 'postal_code':
@@ -6229,25 +6235,47 @@ AND   displayRelType.is_active = 1
           break;
 
         default:
-          //CRM-12565 add "`" around $field if it is a pseudo constant
-          foreach ($this->_pseudoConstantsSelect as $key => $value) {
-            if (!empty($value['element']) && $value['element'] == $field) {
+          foreach ($this->_pseudoConstantsSelect as $key => $pseudoConstantMetadata) {
+            // By replacing the join to the option value table with the mysql construct
+            // ORDER BY field('contribution_status_id', 2,1,4)
+            // we can remove a join. In the case of the option value join it is
+            /// a join known to cause slow queries.
+            // @todo cover other pseudoconstant types. Limited to option group ones in the
+            // first instance for scope reasons. They require slightly different handling as the column (label)
+            // is not declared for them.
+            // @todo so far only integer fields are being handled. If we add string fields we need to look at
+            // escaping.
+            if (isset($pseudoConstantMetadata['pseudoconstant'])
+              && isset($pseudoConstantMetadata['pseudoconstant']['optionGroupName'])
+              && $field === CRM_Utils_Array::value('optionGroupName', $pseudoConstantMetadata['pseudoconstant'])
+            ) {
+              $sortedOptions = $pseudoConstantMetadata['bao']::buildOptions($pseudoConstantMetadata['pseudoField'], NULL, array(
+                'orderColumn' => 'label',
+              ));
+              $order = str_replace("$field $direction", "field({$pseudoConstantMetadata['pseudoField']}," . implode(',', array_keys($sortedOptions)) . ") $direction", $order);
+            }
+            //CRM-12565 add "`" around $field if it is a pseudo constant
+            // This appears to be for 'special' fields like locations with appended numbers or hyphens .. maybe.
+            if (!empty($pseudoConstantMetadata['element']) && $pseudoConstantMetadata['element'] == $field) {
               $order = str_replace($field, "`{$field}`", $order);
             }
           }
       }
-      $this->_fromClause = self::fromClause($this->_tables, NULL, NULL, $this->_primaryLocation, $this->_mode);
-      $this->_simpleFromClause = self::fromClause($this->_whereTables, NULL, NULL, $this->_primaryLocation, $this->_mode);
     }
+
+    $this->_fromClause = self::fromClause($this->_tables, NULL, NULL, $this->_primaryLocation, $this->_mode);
+    $this->_simpleFromClause = self::fromClause($this->_whereTables, NULL, NULL, $this->_primaryLocation, $this->_mode);
 
     // The above code relies on crazy brittle string manipulation of a peculiarly-encoded ORDER BY
     // clause. But this magic helper which forgivingly reescapes ORDER BY.
     // Note: $sortByChar implies that $order was hard-coded/trusted, so it can do funky things.
-    if ($order && !$sortByChar) {
+    if ($sortByChar) {
+      return array(' ORDER BY ' . $order, $additionalFromClause);
+    }
+    if ($order) {
       $order = CRM_Utils_Type::escape($order, 'MysqlOrderBy');
       return array(' ORDER BY ' . $order, $additionalFromClause);
     }
-    return array($order, $additionalFromClause);
   }
 
   /**
@@ -6310,10 +6338,6 @@ AND   displayRelType.is_active = 1
    */
   private function pseudoConstantNameIsInReturnProperties($field) {
     if (!isset($field['pseudoconstant']['optionGroupName'])) {
-      return FALSE;
-    }
-    if (empty($field['bao']) || $field['bao'] != 'CRM_Contact_BAO_Contact') {
-      // For now....
       return FALSE;
     }
 
