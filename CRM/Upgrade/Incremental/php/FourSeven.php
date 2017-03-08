@@ -507,6 +507,7 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
 
     $this->addTask('CRM-21733: Add status_override_end_date field to civicrm_membership table', 'addColumn', 'civicrm_membership', 'status_override_end_date',
       "date DEFAULT NULL COMMENT 'The end date of membership status override if (Override until selected date) override type is selected.'");
+    $this->addTask('CRM-19948 - Add created_id column to civicrm_file', 'addFileCreatedIdColumn');
   }
 
   /*
@@ -1410,6 +1411,27 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
       $dataType = 'datetime';
     }
     CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_mailing CHANGE created_date created_date {$dataType} NULL DEFAULT NULL COMMENT 'Date and time this mailing was created.'");
+
+    return TRUE;
+  }
+
+  public static function addFileCreatedIdColumn(CRM_Queue_TaskContext $ctx) {
+    self::addColumn($ctx, 'civicrm_file', 'created_id', "int unsigned COMMENT 'FK to civicrm_contact, who uploaded this file'");
+
+    $fileTable = 'civicrm_file';
+    $fkName = 'FK_civicrm_file_created_id';
+
+    CRM_Core_BAO_SchemaHandler::safeRemoveFK($fileTable, $fkName);
+
+    CRM_Core_DAO::executeQuery("
+      ALTER TABLE `{$fileTable}`
+        ADD CONSTRAINT `{$fkName}`
+        FOREIGN KEY (`created_id`)
+        REFERENCES `civicrm_contact`(`id`)
+        ON DELETE SET NULL
+        ON UPDATE CASCADE;
+    ");
+
     return TRUE;
   }
 

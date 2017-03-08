@@ -11,13 +11,8 @@ return [
     'name' => 'Extension',
     'class' => 'CRM_Core_DAO_Extension',
     'table' => 'civicrm_extension',
-  ],
-  'CRM_Core_DAO_File' => [
-    'name' => 'File',
-    'class' => 'CRM_Core_DAO_File',
-    'table' => 'civicrm_file',
-  ],
-  'CRM_Core_DAO_LocationType' => [
+  ) ,
+  'CRM_Core_DAO_LocationType' => array(
     'name' => 'LocationType',
     'class' => 'CRM_Core_DAO_LocationType',
     'table' => 'civicrm_location_type',
@@ -291,13 +286,13 @@ return [
     'name' => 'Email',
     'class' => 'CRM_Core_DAO_Email',
     'table' => 'civicrm_email',
-  ],
-  'CRM_Core_DAO_EntityFile' => [
-    'name' => 'EntityFile',
-    'class' => 'CRM_Core_DAO_EntityFile',
-    'table' => 'civicrm_entity_file',
-  ],
-  'CRM_Core_DAO_IM' => [
+  ) ,
+  'CRM_Core_DAO_File' => array(
+    'name' => 'File',
+    'class' => 'CRM_Core_DAO_File',
+    'table' => 'civicrm_file',
+  ) ,
+  'CRM_Core_DAO_IM' => array(
     'name' => 'IM',
     'class' => 'CRM_Core_DAO_IM',
     'table' => 'civicrm_im',
@@ -531,8 +526,13 @@ return [
     'name' => 'Discount',
     'class' => 'CRM_Core_DAO_Discount',
     'table' => 'civicrm_discount',
-  ],
-  'CRM_Core_DAO_EntityTag' => [
+  ) ,
+  'CRM_Core_DAO_EntityFile' => array(
+    'name' => 'EntityFile',
+    'class' => 'CRM_Core_DAO_EntityFile',
+    'table' => 'civicrm_entity_file',
+  ) ,
+  'CRM_Core_DAO_EntityTag' => array(
     'name' => 'EntityTag',
     'class' => 'CRM_Core_DAO_EntityTag',
     'table' => 'civicrm_entity_tag',
