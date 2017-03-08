@@ -520,9 +520,10 @@
       });
     </script>
       {if !$contributionMode}
+        {crmAPI var="checkVal" entity="OptionValue" action="getvalue" version="3" option_group_id="payment_instrument" name="Check" return="value"}
         {include file="CRM/common/showHideByFieldValue.tpl"
         trigger_field_id    ="payment_instrument_id"
-        trigger_value       = '4'
+        trigger_value       = $checkVal
         target_element_id   ="checkNumber"
         target_element_type ="table-row"
         field_type          ="select"
