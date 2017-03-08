@@ -2517,6 +2517,7 @@ AND       civicrm_openid.is_primary = 1";
         ),
       );
 
+      // @todo This can be figured out from metadata & we can avoid the uncached query.
       CRM_Core_OptionGroup::lookupValues($temp, $names, FALSE);
 
       $values['preferred_communication_method'] = $preffComm;
@@ -2540,14 +2541,6 @@ AND       civicrm_openid.is_primary = 1";
           $values['age']['y'] = CRM_Utils_Array::value('years', $age);
           $values['age']['m'] = CRM_Utils_Array::value('months', $age);
         }
-
-        list($values['birth_date']) = CRM_Utils_Date::setDateDefaults($contact->birth_date, 'birth');
-        $values['birth_date_display'] = $contact->birth_date;
-      }
-
-      if ($contact->deceased_date) {
-        list($values['deceased_date']) = CRM_Utils_Date::setDateDefaults($contact->deceased_date, 'birth');
-        $values['deceased_date_display'] = $contact->deceased_date;
       }
 
       $contact->contact_id = $contact->id;

@@ -406,4 +406,28 @@ class CRM_Core_Page {
     $this->$name = $value;
   }
 
+  /**
+   * Assign metadata about fields to the template.
+   *
+   * In order to allow the template to format fields we assign information about them to the template.
+   *
+   * At this stage only date field metadata is assigned as that is the only use-case in play and
+   * we don't want to assign a lot of unneeded data.
+   *
+   * @param string $entity
+   *   The entity being queried.
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected function assignFieldMetadataToTemplate($entity) {
+    $fields = civicrm_api3($entity, 'getfields', array('action' => 'get'));
+    $dateFields = array();
+    foreach ($fields['values'] as $fieldName => $fieldMetaData) {
+      if (isset($fieldMetaData['html']) && CRM_Utils_Array::value('type', $fieldMetaData['html']) == 'Select Date') {
+        $dateFields[$fieldName] = CRM_Utils_Date::addDateMetadataToField($fieldMetaData, $fieldMetaData);
+      }
+    }
+    $this->assign('fields', $dateFields);
+  }
+
 }

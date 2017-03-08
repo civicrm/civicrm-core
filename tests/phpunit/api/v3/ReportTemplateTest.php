@@ -236,6 +236,30 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test Lybunt report applies ACLs.
+   */
+  public function testLybuntReportWithDataAndACLFilter() {
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('administer CiviCRM');
+    $inInd = $this->individualCreate();
+    $outInd = $this->individualCreate();
+    $this->contributionCreate(array('contact_id' => $inInd, 'receive_date' => '2014-03-01'));
+    $this->contributionCreate(array('contact_id' => $outInd, 'receive_date' => '2015-03-01', 'trxn_id' => NULL, 'invoice_id' => NULL));
+    $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereHookNoResults'));
+    $params = array(
+      'report_id' => 'contribute/lybunt',
+      'yid_value' => 2015,
+      'yid_op' => 'calendar',
+      'options' => array('metadata' => array('sql')),
+      'check_permissions' => 1,
+    );
+
+    $rows = $this->callAPISuccess('report_template', 'getrows', $params);
+    $this->assertEquals(0, $rows['count'], "Report failed - the sql used to generate the results was " . print_r($rows['metadata']['sql'], TRUE));
+
+    CRM_Utils_Hook::singleton()->reset();
+  }
+
+  /**
    * Test Lybunt report to check basic inclusion of a contact who gave in the year before the chosen year.
    */
   public function testLybuntReportWithFYData() {

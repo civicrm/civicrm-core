@@ -252,7 +252,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
           'cms:view user account',
         ))
     ) {
-      return url('user/' . $uid);
+      return $this->url('user/' . $uid);
     };
   }
 

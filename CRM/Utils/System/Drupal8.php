@@ -617,4 +617,20 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     );
   }
 
+  /**
+   * Drupal 8 has a different function to get current path, hence
+   * overriding the postURL function
+   *
+   * @param string $action
+   *
+   * @return string
+   */
+  public function postURL($action) {
+    if (!empty($action)) {
+      return $action;
+    }
+    $current_path = \Drupal::service('path.current')->getPath();
+    return $this->url($current_path);
+  }
+
 }

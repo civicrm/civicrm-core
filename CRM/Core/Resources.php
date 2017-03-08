@@ -740,9 +740,7 @@ class CRM_Core_Resources {
       $items[] = "packages/jquery/plugins/jquery.tableHeader.js";
       $items[] = "packages/jquery/plugins/jquery.menu.min.js";
       $items[] = "css/civicrmNavigation.css";
-      $items[] = "packages/jquery/plugins/jquery.jeditable.min.js";
       $items[] = "packages/jquery/plugins/jquery.notify.min.js";
-      $items[] = "js/jquery/jquery.crmeditable.js";
     }
 
     // JS for multilingual installations

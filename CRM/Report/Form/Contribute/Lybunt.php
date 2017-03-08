@@ -581,6 +581,7 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
    */
   public function buildQuery($applyLimit = TRUE) {
     $this->buildGroupTempTable();
+    $this->buildPermissionClause();
     // Calling where & select before FROM allows us to build temp tables to use in from.
     $this->where();
     $this->select();
