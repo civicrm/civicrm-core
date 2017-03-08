@@ -267,7 +267,7 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
       $params['source_contact_id'] = $session->get('userID');
     }
 
-    $customFields = CRM_Core_BAO_CustomField::getFields(CRM_Utils_Array::value('contact_type', $params));
+    $customFields = CRM_Core_BAO_CustomField::getFields('Activity');
 
     foreach ($params as $key => $val) {
       if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($key)) {
