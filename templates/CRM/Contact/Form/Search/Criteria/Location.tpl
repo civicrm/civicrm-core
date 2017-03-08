@@ -50,6 +50,14 @@
         </div>
         {/if}
         <div class="crm-field-wrapper">
+          {$form.supplemental_address_1.label}<br />
+          {$form.supplemental_address_1.html}
+        </div>
+        <div class="crm-field-wrapper">
+          {$form.supplemental_address_2.label}<br />
+          {$form.supplemental_address_2.html}
+        </div>
+        <div class="crm-field-wrapper">
           {$form.city.label}<br />
           {$form.city.html}
         </div>
@@ -158,5 +166,3 @@
     </script>
   {/literal}
 {/if}
-
-
