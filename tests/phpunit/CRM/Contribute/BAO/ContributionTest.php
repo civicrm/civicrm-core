@@ -1006,39 +1006,6 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
   }
 
   /**
-   * Test calculateNetAmount.
-   */
-  public function testcalculateNetAmount() {
-    $testParams = array(
-      array(
-        'net_amount' => 100,
-        'tax_amount' => 10,
-        'expectedNetAmount' => 90,
-      ),
-      array(
-        'net_amount' => 200,
-        'tax_amount' => 0,
-        'expectedNetAmount' => 200,
-      ),
-      array(
-        'net_amount' => 300,
-        'tax_amount' => NULL,
-        'expectedNetAmount' => 300,
-      ),
-      array(
-        'net_amount' => -100,
-        'tax_amount' => 20,
-        'expectedNetAmount' => -120,
-      ),
-    );
-
-    foreach ($testParams as $params) {
-      $netAmount = CRM_Contribute_BAO_Contribution::calculateNetAmount($params['net_amount'], $params['tax_amount']);
-      $this->assertEquals($netAmount, $params['expectedNetAmount'], 'Invalid Net amount.');
-    }
-  }
-
-  /**
    * Test recording of amount with comma separator.
    */
   public function testCommaSeparatorAmount() {
