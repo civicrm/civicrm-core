@@ -1212,9 +1212,20 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
    *
    */
   public static function getRelatedContacts($caseID, $skipDetails = FALSE) {
+    $caseRoles = array();
+    if (!$skipDetails) {
+      $caseInfo = civicrm_api('Case', 'getsingle', array(
+        'id' => $caseID,
+        'version' => 3,
+        'return' => array('case_type_id', 'case_type_id.definition'),
+      ));
+      if (!empty($caseInfo['case_type_id.definition']['caseRoles'])) {
+        $caseRoles = CRM_Utils_Array::rekey($caseInfo['case_type_id.definition']['caseRoles'], 'name');
+      }
+    }
     $values = array();
     $query = '
-      SELECT cc.display_name as name, cc.sort_name as sort_name, cc.id, crt.label_b_a as role, ce.email
+      SELECT cc.display_name as name, cc.sort_name as sort_name, cc.id, cr.relationship_type_id, crt.label_b_a as role, ce.email
       FROM civicrm_relationship cr
       LEFT JOIN civicrm_relationship_type crt
         ON crt.id = cr.relationship_type_id
@@ -1233,13 +1244,20 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
         $values[$dao->id] = 1;
       }
       else {
-        $values[] = array(
+        $details = array(
           'contact_id' => $dao->id,
           'display_name' => $dao->name,
           'sort_name' => $dao->sort_name,
+          'relationship_type_id' => $dao->relationship_type_id,
           'role' => $dao->role,
           'email' => $dao->email,
         );
+        $role = CRM_Utils_Array::value($details['role'], $caseRoles);
+        if ($role) {
+          unset($role['name']);
+          $details += $role;
+        }
+        $values[] = $details;
       }
     }
     $dao->free();

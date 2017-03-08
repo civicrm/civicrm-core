@@ -925,17 +925,17 @@ class CRM_Utils_Array {
   }
 
   /**
-   * Rewrite the keys in an array by filtering through a function.
+   * Rewrite the keys in an array.
    *
    * @param array $array
-   * @param callable $func
-   *   Function($key, $value). Returns the new key.
+   * @param string|callable $indexBy
+   *   Either the value to key by, or a function($key, $value) that returns the new key.
    * @return array
    */
-  public static function rekey($array, $func) {
+  public static function rekey($array, $indexBy) {
     $result = array();
     foreach ($array as $key => $value) {
-      $newKey = $func($key, $value);
+      $newKey = is_callable($indexBy) ? $indexBy($key, $value) : $value[$indexBy];
       $result[$newKey] = $value;
     }
     return $result;
