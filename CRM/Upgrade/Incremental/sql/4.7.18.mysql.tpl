@@ -51,3 +51,20 @@ INSERT IGNORE INTO civicrm_state_province (country_id, abbreviation, name) VALUE
 (@country_id, "46", "Wajir"),
 (@country_id, "47", "West Pokot");
 
+-- CRM-19993 Fixes for ISO compliance with countries and counties
+INSERT INTO `civicrm_state_province` (`id`, `country_id`, `abbreviation`, `name`) VALUES
+(NULL, 1101, "CH", "Chandigarh"),
+(NULL, 1083, "CP", "Central"),
+(NULL, 1083, "EP", "Eastern"),
+(NULL, 1083, "NP", "Northern"),
+(NULL, 1083, "WP", "Western"),
+(NULL, 1181, "K", "Saint Kitts"),
+(NULL, 1181, "N", "Nevis"),
+(NULL, 1190, "E", "Eastern"),
+(NULL, 1190, "N", "Northern"),
+(NULL, 1190, "S", "Southern");
+
+UPDATE `civicrm_state_province` SET `name`='Uttarakhand', `abbreviation`='UT' WHERE `name` = 'Uttaranchal' AND `abbreviation`='UL';
+UPDATE `civicrm_state_province` SET `name`='Yunlin County' WHERE `name` = 'Yunlin Conuty';
+UPDATE `civicrm_country` SET `name`='Palestine, State of' WHERE `name` = 'Palestinian Territory';
+UPDATE `civicrm_country` SET `name`='Virgin Islands, British' WHERE `name` = 'Virgin Islands,British';

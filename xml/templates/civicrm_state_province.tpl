@@ -126,7 +126,7 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (1222, 1101, "SK", "Sikkim"),
 (1223, 1101, "TN", "Tamil Nadu"),
 (1224, 1101, "TR", "Tripura"),
-(1225, 1101, "UL", "Uttaranchal"),
+(1225, 1101, "UT", "Uttarakhand"),
 (1226, 1101, "UP", "Uttar Pradesh"),
 (1227, 1101, "WB", "West Bengal"),
 (1228, 1101, "AN", "Andaman and Nicobar Islands"),
@@ -3310,7 +3310,7 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (4860, 1208, "TPQ", "Taipei County"),
 (4861, 1208, "TTT", "Taitung County"),
 (4862, 1208, "TAO", "Taoyuan County"),
-(4863, 1208, "YUN", "Yunlin Conuty"),
+(4863, 1208, "YUN", "Yunlin County"),
 (4864, 1208, "KEE", "Keelung City"),
 (4865, 1210, "01", "Arusha"),
 (4866, 1210, "02", "Dar-es-Salaam"),
@@ -4064,4 +4064,17 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (NULL, 1112, "44", "Uasin Gishu"),
 (NULL, 1112, "45", "Vihiga"),
 (NULL, 1112, "46", "Wajir"),
-(NULL, 1112, "47", "West Pokot");
+(NULL, 1112, "47", "West Pokot"),
+
+-- CRM-19993 Fixes for ISO compliance with countries and counties
+-- Add states for: India, Ghana, Sierra Leone, Saint Kitts & Nevis
+(NULL, 1101, "CH", "Chandigarh"),
+(NULL, 1083, "CP", "Central"),
+(NULL, 1083, "EP", "Eastern"),
+(NULL, 1083, "NP", "Northern"),
+(NULL, 1083, "WP", "Western"),
+(NULL, 1181, "K", "Saint Kitts"),
+(NULL, 1181, "N", "Nevis"),
+(NULL, 1190, "E", "Eastern"),
+(NULL, 1190, "N", "Northern"),
+(NULL, 1190, "S", "Southern");
