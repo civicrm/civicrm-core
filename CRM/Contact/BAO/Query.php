@@ -39,22 +39,30 @@ class CRM_Contact_BAO_Query {
   /**
    * The various search modes.
    *
+   * As of February 2017, entries not present for 4, 32, 64, 1024.
+   *
+   * MODE_ALL is set to 17407, which can't be composed of available
+   * constants and excludes MODE_CASE, MODE_ACTIVITY, MODE_CAMPAIGN.
+   *
    * @var int
    */
   const
     NO_RETURN_PROPERTIES = 'CRM_Contact_BAO_Query::NO_RETURN_PROPERTIES',
     MODE_CONTACTS = 1,
     MODE_CONTRIBUTE = 2,
+    // There is no 4,
     MODE_MEMBER = 8,
     MODE_EVENT = 16,
+    // No 32, no 64.
     MODE_GRANT = 128,
     MODE_PLEDGEBANK = 256,
     MODE_PLEDGE = 512,
+    // There is no 1024,
     MODE_CASE = 2048,
-    MODE_ALL = 17407,
     MODE_ACTIVITY = 4096,
     MODE_CAMPAIGN = 8192,
-    MODE_MAILING = 16384;
+    MODE_MAILING = 16384,
+    MODE_ALL = 17407;
 
   /**
    * The default set of return properties.
@@ -82,6 +90,7 @@ class CRM_Contact_BAO_Query {
   public $_paramLookup;
 
   public $_sort;
+
   /**
    * The set of output params
    *
@@ -98,42 +107,42 @@ class CRM_Contact_BAO_Query {
 
   /**
    * The name of the elements that are in the select clause
-   * used to extract the values
+   * used to extract the values.
    *
    * @var array
    */
   public $_element;
 
   /**
-   * The tables involved in the query
+   * The tables involved in the query.
    *
    * @var array
    */
   public $_tables;
 
   /**
-   * The table involved in the where clause
+   * The table involved in the where clause.
    *
    * @var array
    */
   public $_whereTables;
 
   /**
-   * The where clause
+   * Array of WHERE clause components.
    *
    * @var array
    */
   public $_where;
 
   /**
-   * The where string
+   * The WHERE clause as a string.
    *
    * @var string
    */
   public $_whereClause;
 
   /**
-   * Additional permission Where Clause
+   * Additional WHERE clause for permissions.
    *
    * @var string
    */
@@ -514,7 +523,7 @@ class CRM_Contact_BAO_Query {
       CRM_Financial_BAO_FinancialType::buildPermissionedClause($this->_whereClause, $component);
     }
 
-    $this->_fromClause = self::fromClause($this->_tables, NULL, NULL, $this->_primaryLocation, $this->_mode);
+    $this->_fromClause = self::fromClause($this->_tables, NULL, NULL, $this->_primaryLocation, $this->_mode, $apiEntity);
     $this->_simpleFromClause = self::fromClause($this->_whereTables, NULL, NULL, $this->_primaryLocation, $this->_mode);
 
     $this->openedSearchPanes(TRUE);
@@ -2465,9 +2474,14 @@ class CRM_Contact_BAO_Query {
   }
 
   /**
-   * Where tables is sometimes used to create the from clause, but, not reliably, set this AND set tables
-   * It's unclear the intent - there is a 'simpleFrom' clause which takes whereTables into account & a fromClause which doesn't
-   * logic may have eroded
+   * Sometimes used to create the from clause, but, not reliably, set
+   * this AND set tables.
+   *
+   * It's unclear the intent - there is a 'simpleFrom' clause which
+   * takes whereTables into account & a fromClause which doesn't.
+   *
+   * logic may have eroded?
+   *
    * @return array
    */
   public function whereTables() {
@@ -2500,20 +2514,28 @@ class CRM_Contact_BAO_Query {
    * Create the from clause.
    *
    * @param array $tables
-   *   Tables that need to be included in this from clause.
-   *                      if null, return mimimal from clause (i.e. civicrm_contact)
+   *   Tables that need to be included in this from clause. If null,
+   *   return mimimal from clause (i.e. civicrm_contact).
    * @param array $inner
    *   Tables that should be inner-joined.
    * @param array $right
    *   Tables that should be right-joined.
-   *
    * @param bool $primaryLocation
+   *   Search on primary location. See note below.
    * @param int $mode
+   *   Determines search mode based on bitwise MODE_* constants.
+   * @param string|NULL $apiEntity
+   *   Determines search mode based on entity by string.
+   *
+   * The $primaryLocation flag only seems to be used when
+   * locationType() has been called. This may be a search option
+   * exposed, or perhaps it's a "search all details" approach which
+   * predates decoupling of location types and primary fields?
    *
    * @return string
    *   the from clause
    */
-  public static function fromClause(&$tables, $inner = NULL, $right = NULL, $primaryLocation = TRUE, $mode = 1) {
+  public static function fromClause(&$tables, $inner = NULL, $right = NULL, $primaryLocation = TRUE, $mode = 1, $apiEntity = NULL) {
 
     $from = ' FROM civicrm_contact contact_a';
     if (empty($tables)) {
@@ -2604,27 +2626,29 @@ class CRM_Contact_BAO_Query {
         }
         continue;
       }
+      $searchPrimary = '';
+      if (Civi::settings()->get('searchPrimaryDetailsOnly') || $apiEntity) {
+        $searchPrimary = " AND {$name}.is_primary = 1";
+      }
       switch ($name) {
         case 'civicrm_address':
-          if ($primaryLocation) {
-            $from .= " $side JOIN civicrm_address ON ( contact_a.id = civicrm_address.contact_id AND civicrm_address.is_primary = 1 )";
+          //CRM-14263 further handling of address joins further down...
+          if (!$primaryLocation) {
+            $searchPrimary = '';
           }
-          else {
-            //CRM-14263 further handling of address joins further down...
-            $from .= " $side JOIN civicrm_address ON ( contact_a.id = civicrm_address.contact_id ) ";
-          }
+          $from .= " $side JOIN civicrm_address ON ( contact_a.id = civicrm_address.contact_id {$searchPrimary} )";
           continue;
 
         case 'civicrm_phone':
-          $from .= " $side JOIN civicrm_phone ON (contact_a.id = civicrm_phone.contact_id AND civicrm_phone.is_primary = 1) ";
+          $from .= " $side JOIN civicrm_phone ON (contact_a.id = civicrm_phone.contact_id {$searchPrimary}) ";
           continue;
 
         case 'civicrm_email':
-          $from .= " $side JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_email.is_primary = 1) ";
+          $from .= " $side JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id {$searchPrimary})";
           continue;
 
         case 'civicrm_im':
-          $from .= " $side JOIN civicrm_im ON (contact_a.id = civicrm_im.contact_id AND civicrm_im.is_primary = 1) ";
+          $from .= " $side JOIN civicrm_im ON (contact_a.id = civicrm_im.contact_id {$searchPrimary}) ";
           continue;
 
         case 'im_provider':
@@ -2634,7 +2658,7 @@ class CRM_Contact_BAO_Query {
           continue;
 
         case 'civicrm_openid':
-          $from .= " $side JOIN civicrm_openid ON ( civicrm_openid.contact_id = contact_a.id AND civicrm_openid.is_primary = 1 )";
+          $from .= " $side JOIN civicrm_openid ON ( civicrm_openid.contact_id = contact_a.id {$searchPrimary} )";
           continue;
 
         case 'civicrm_worldregion':

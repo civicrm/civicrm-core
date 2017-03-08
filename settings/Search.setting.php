@@ -197,4 +197,18 @@ return array(
     'description' => 'If set, this will be the default profile used for contact search.',
     'help_text' => NULL,
   ),
+  'searchPrimaryDetailsOnly' => array(
+    'group_name' => 'Search Preferences',
+    'group' => 'Search Preferences',
+    'name' => 'searchPrimaryDetailsOnly',
+    'type' => 'Boolean',
+    'quick_form_type' => 'YesNo',
+    'default' => 1,
+    'add' => '4.7',
+    'title' => 'Search Primary Details Only',
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => 'If enabled, only primary details (eg contact\'s primary email, phone, etc) will be included in Basic and Advanced Search results. Disabling this feature will allow users to match contacts using any email, phone etc detail.',
+    'help_text' => NULL,
+  ),
 );
