@@ -5371,22 +5371,6 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
   }
 
   /**
-   * Calculate net amount.
-   *
-   * @param array $netAmount
-   *
-   * @param float $taxAmount
-   *
-   * @return array
-   */
-  public static function calculateNetAmount($netAmount, $taxAmount) {
-    if ($taxAmount) {
-      $netAmount -= $taxAmount;
-    }
-    return CRM_Utils_Money::format($netAmount, NULL, '%a');
-  }
-
-  /**
    * Retrieve Sales Tax Financial Accounts.
    *
    *

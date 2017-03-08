@@ -377,10 +377,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $defaults['fee_amount'] = CRM_Utils_Money::format($defaults['fee_amount'], NULL, '%a');
     }
 
-    if (isset($defaults['net_amount'])) {
-      $defaults['net_amount'] = CRM_Contribute_BAO_Contribution::calculateNetAmount($defaults['net_amount'], CRM_Utils_Array::value('tax_amount', $defaults));
-    }
-
     if ($this->_contributionType) {
       $defaults['financial_type_id'] = $this->_contributionType;
     }
@@ -1589,7 +1585,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
 
     if (!isset($submittedValues['total_amount'])) {
-      $submittedValues['total_amount'] = CRM_Utils_Array::value('total_amount', $this->_values);
+      $submittedValues['total_amount'] = CRM_Utils_Array::value('total_amount', $this->_values) - CRM_Utils_Array::value('tax_amount', $this->_values);
     }
     $this->assign('lineItem', !empty($lineItem) && !$isQuickConfig ? $lineItem : FALSE);
 
