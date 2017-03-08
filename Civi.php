@@ -55,6 +55,15 @@ class Civi {
   }
 
   /**
+   * Get the event dispatcher.
+   *
+   * @return \Symfony\Component\EventDispatcher\EventDispatcherInterface
+   */
+  public static function dispatcher() {
+    return Civi\Core\Container::singleton()->get('dispatcher');
+  }
+
+  /**
    * @return \Civi\Core\Lock\LockManager
    */
   public static function lockManager() {
