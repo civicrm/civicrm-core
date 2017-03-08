@@ -42,12 +42,28 @@ class CRM_Report_Form_Contribute_DeferredRevenue extends CRM_Report_Form {
   /**
    */
   public function __construct() {
-    $this->_autoIncludeIndexedFieldsAsOrderBys = 1;
+    $this->_exposeContactID = FALSE;
     $this->_deferredFinancialAccount = CRM_Financial_BAO_FinancialAccount::getAllDeferredFinancialAccount();
     $this->_columns = array(
       'civicrm_financial_account' => array(
         'dao' => 'CRM_Financial_DAO_FinancialAccount',
-        'alias' => 'financial_account_deferred',
+        'fields' => array(
+          'name' => array(
+            'title' => ts('Deferred Account'),
+            'required' => TRUE,
+            'no_display' => TRUE,
+          ),
+          'id' => array(
+            'title' => ts('Deferred Account ID'),
+            'required' => TRUE,
+            'no_display' => TRUE,
+          ),
+          'accounting_code' => array(
+            'title' => ts('Deferred Accounting Code'),
+            'required' => TRUE,
+            'no_display' => TRUE,
+          ),
+        ),
         'filters' => array(
           'id' => array(
             'title' => ts('Deferred Financial Account'),
@@ -57,131 +73,272 @@ class CRM_Report_Form_Contribute_DeferredRevenue extends CRM_Report_Form {
           ),
         ),
       ),
+      'civicrm_financial_account_1' => array(
+        'dao' => 'CRM_Financial_DAO_FinancialAccount',
+        'fields' => array(
+          'name' => array(
+            'title' => ts('Revenue Account'),
+            'required' => TRUE,
+            'no_display' => TRUE,
+          ),
+          'id' => array(
+            'title' => ts('Revenue Account ID'),
+            'required' => TRUE,
+            'no_display' => TRUE,
+          ),
+          'accounting_code' => array(
+            'title' => ts('Revenue Accounting code'),
+            'no_display' => TRUE,
+            'required' => TRUE,
+          ),
+        ),
+      ),
+      'civicrm_financial_item' => array(
+        'dao' => 'CRM_Financial_DAO_FinancialItem',
+        'fields' => array(
+          'status_id' => array(
+            'title' => ts('Status'),
+            'required' => TRUE,
+            'no_display' => TRUE,
+          ),
+          'id' => array(
+            'title' => ts('Financial Item ID'),
+            'required' => TRUE,
+            'no_display' => TRUE,
+          ),
+          'description' => array(
+            'title' => ts('Description'),
+            'required' => TRUE,
+            'no_display' => TRUE,
+          ),
+        ),
+      ),
+      'civicrm_financial_trxn_1' => array(
+        'dao' => 'CRM_Financial_DAO_FinancialTrxn',
+        'fields' => array(
+          'total_amount' => array(
+            'title' => ts('Deferred Transaction Amount'),
+            'required' => TRUE,
+            'no_display' => TRUE,
+            'dbAlias' => 'GROUP_CONCAT(financial_trxn_1_civireport.total_amount)',
+          ),
+          'trxn_date' => array(
+            'title' => ts('Deferred Transaction Date'),
+            'required' => TRUE,
+            'no_display' => TRUE,
+            'dbAlias' => 'GROUP_CONCAT(financial_trxn_1_civireport.trxn_date)',
+          ),
+        ),
+      ),
+      'civicrm_contact' => array(
+        'dao' => 'CRM_Contact_DAO_Contact',
+        'fields' => array(
+          'display_name' => array(
+            'title' => ts('Display_name'),
+            'required' => TRUE,
+            'no_display' => TRUE,
+          ),
+        ),
+      ),
+      'civicrm_membership' => array(
+        'dao' => 'CRM_Member_DAO_Membership',
+        'fields' => array(
+          'start_date' => array(
+            'title' => ts('Start Date'),
+            'required' => TRUE,
+            'no_display' => TRUE,
+            'dbAlias' => 'IFNULL(membership_civireport.start_date, event_civireport.start_date)',
+          ),
+          'end_date' => array(
+            'title' => ts('End Date'),
+            'required' => TRUE,
+            'no_display' => TRUE,
+            'dbdbAlias' => 'IFNULL(membership_civireport.end_date, event_civireport.end_date)',
+          ),
+        ),
+      ),
+      'civicrm_event' => array(
+        'dao' => 'CRM_Event_DAO_Event',
+      ),
+      'civicrm_participant' => array(
+        'dao' => 'CRM_Event_DAO_Participant',
+      ),
+      'civicrm_batch' => array(
+        'dao' => 'CRM_Batch_DAO_EntityBatch',
+        'grouping' => 'contri-fields',
+        'filters' => array(
+          'batch_id' => array(
+            'title' => ts('Batch Title'),
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => CRM_Batch_BAO_Batch::getBatches(),
+            'type' => CRM_Utils_Type::T_INT,
+          ),
+        ),
+      ),
+      'civicrm_contribution' => array(
+        'dao' => 'CRM_Contribute_DAO_Contribution',
+        'fields' => array(
+          'id' => array(
+            'title' => ts('Contribution ID'),
+            'required' => TRUE,
+            'no_display' => TRUE,
+          ),
+          'contact_id' => array(
+            'title' => ts('Contact ID'),
+            'required' => TRUE,
+            'no_display' => TRUE,
+          ),
+          'source' => array(
+            'title' => ts('Source'),
+            'required' => TRUE,
+            'no_display' => TRUE,
+          ),
+        ),
+        'filters' => array(
+          'receive_date' => array(
+            'title' => ts('Receive Date'),
+            'operatorType' => CRM_Report_Form::OP_DATE,
+            'type' => CRM_Utils_Type::T_DATE,
+          ),
+          'cancel_date' => array(
+            'title' => ts('Cancel Date'),
+            'operatorType' => CRM_Report_Form::OP_DATE,
+            'type' => CRM_Utils_Type::T_DATE,
+          ),
+          'revenue_recognition_date' => array(
+            'title' => ts('Revenue Recognition Date'),
+            'operatorType' => CRM_Report_Form::OP_DATE,
+            'type' => CRM_Utils_Type::T_DATE,
+          ),
+        ),
+      ),
+      'civicrm_financial_trxn' => array(
+        'dao' => 'CRM_Financial_DAO_FinancialTrxn',
+        'fields' => array(
+          'status_id' => array(
+            'title' => ts('Transaction Status'),
+            'required' => TRUE,
+            'no_display' => TRUE,
+          ),
+          'trxn_date' => array(
+            'title' => ts('Transaction Date'),
+            'required' => TRUE,
+            'no_display' => TRUE,
+          ),
+          'total_amount' => array(
+            'title' => ts('Transaction Amount'),
+            'required' => TRUE,
+            'no_display' => TRUE,
+          ),
+        ),
+        'filters' => array(
+          'trxn_date' => array(
+            'title' => ts('Transaction Date'),
+            'operatorType' => CRM_Report_Form::OP_DATE,
+            'type' => CRM_Utils_Type::T_DATE,
+          ),
+        ),
+      ),
     );
     parent::__construct();
   }
 
+  /**
+   * Pre process function.
+   *
+   * Called prior to build form.
+   */
   public function preProcess() {
     parent::preProcess();
   }
 
-  public function select() {
-    // TODO: add column
-    $this->_select = ' SELECT 
-financial_account_deferred_civireport.name deferred_account,
-financial_account_deferred_civireport.id deferred_account_id,
-financial_account_deferred_civireport.accounting_code deferred_account_code,
-financial_account_revenue.name revenue_account,
-financial_account_revenue.id revenue_account_id,
-financial_account_revenue.accounting_code revenue_account_code,
-financial_item.status_id,
-financial_item.id item_id,
-financial_trxn_contribution_1.status_id,
-financial_trxn_contribution_1.trxn_date transaction_date,
-financial_trxn_contribution_1.total_amount,
-contribution.id contribution_id,
-contribution.contact_id,
-contact.display_name,
-contribution.source,
-GROUP_CONCAT(financial_trxn.total_amount) trxn_amount,
-GROUP_CONCAT(financial_trxn.trxn_date) trxn_date,
-financial_item.description,
-IFNULL(membership.start_date, event.start_date) start_date,
-IFNULL(membership.end_date, event.end_date) end_date
-';
-  }
-
+  /**
+   * Build from clause.
+   */
   public function from() {
     $deferredRelationship = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Deferred Revenue Account is' "));
     $revenueRelationship = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Income Account is' "));
-    $this->_from = " FROM civicrm_financial_item financial_item
+    $this->_from = " FROM civicrm_financial_item {$this->_aliases['civicrm_financial_item']}
 INNER JOIN civicrm_entity_financial_account entity_financial_account_deferred
-  ON financial_item.financial_account_id = entity_financial_account_deferred.financial_account_id AND entity_financial_account_deferred.entity_table = 'civicrm_financial_type'
+  ON {$this->_aliases['civicrm_financial_item']}.financial_account_id = entity_financial_account_deferred.financial_account_id AND entity_financial_account_deferred.entity_table = 'civicrm_financial_type'
     AND entity_financial_account_deferred.account_relationship = {$deferredRelationship}
-INNER JOIN civicrm_financial_account financial_account_deferred_civireport
-  ON entity_financial_account_deferred.financial_account_id = financial_account_deferred_civireport.id
+INNER JOIN civicrm_financial_account {$this->_aliases['civicrm_financial_account']}
+  ON entity_financial_account_deferred.financial_account_id = {$this->_aliases['civicrm_financial_account']}.id
 INNER JOIN civicrm_entity_financial_account entity_financial_account_revenue
   ON entity_financial_account_deferred.entity_id = entity_financial_account_revenue.entity_id
     AND entity_financial_account_deferred.entity_table= entity_financial_account_revenue.entity_table
-INNER JOIN civicrm_financial_account financial_account_revenue
-  ON entity_financial_account_revenue.financial_account_id = financial_account_revenue.id
+INNER JOIN civicrm_financial_account {$this->_aliases['civicrm_financial_account_1']}
+  ON entity_financial_account_revenue.financial_account_id = {$this->_aliases['civicrm_financial_account_1']}.id
     AND {$revenueRelationship} = entity_financial_account_revenue.account_relationship
 INNER JOIN civicrm_entity_financial_trxn entity_financial_trxn_item
-  ON entity_financial_trxn_item.entity_id = financial_item.id AND entity_financial_trxn_item.entity_table = 'civicrm_financial_item'
-INNER JOIN civicrm_financial_trxn financial_trxn
-  ON financial_trxn.from_financial_account_id = financial_account_deferred_civireport.id AND financial_trxn.id =  entity_financial_trxn_item.financial_trxn_id 
+  ON entity_financial_trxn_item.entity_id = {$this->_aliases['civicrm_financial_item']}.id AND entity_financial_trxn_item.entity_table = 'civicrm_financial_item'
+INNER JOIN civicrm_financial_trxn {$this->_aliases['civicrm_financial_trxn_1']}
+  ON {$this->_aliases['civicrm_financial_trxn_1']}.from_financial_account_id = {$this->_aliases['civicrm_financial_account']}.id AND {$this->_aliases['civicrm_financial_trxn_1']}.id =  entity_financial_trxn_item.financial_trxn_id 
 INNER JOIN civicrm_entity_financial_trxn financial_trxn_contribution
-  ON financial_trxn_contribution.financial_trxn_id = financial_trxn.id AND financial_trxn_contribution.entity_table = 'civicrm_contribution'
-INNER JOIN civicrm_entity_financial_trxn entity_financial_trxn_contribution ON entity_financial_trxn_contribution.entity_id = financial_item.id and entity_financial_trxn_contribution.entity_table = 'civicrm_financial_item'  
-INNER JOIN civicrm_financial_trxn financial_trxn_contribution_1 ON financial_trxn_contribution_1.id = entity_financial_trxn_contribution.financial_trxn_id AND (financial_trxn_contribution_1.from_financial_account_id NOT IN (" . implode(',', array_keys($this->_deferredFinancialAccount)) . ") OR financial_trxn_contribution_1.from_financial_account_id IS NULL)
-INNER JOIN civicrm_contribution contribution 
-  ON contribution.id = financial_trxn_contribution.entity_id
-INNER JOIN civicrm_contact contact 
-  ON contact.id = contribution.contact_id
+  ON financial_trxn_contribution.financial_trxn_id = {$this->_aliases['civicrm_financial_trxn_1']}.id AND financial_trxn_contribution.entity_table = 'civicrm_contribution'
+INNER JOIN civicrm_entity_financial_trxn entity_financial_trxn_contribution ON entity_financial_trxn_contribution.entity_id = {$this->_aliases['civicrm_financial_item']}.id and entity_financial_trxn_contribution.entity_table = 'civicrm_financial_item'  
+INNER JOIN civicrm_financial_trxn {$this->_aliases['civicrm_financial_trxn']} ON {$this->_aliases['civicrm_financial_trxn']}.id = entity_financial_trxn_contribution.financial_trxn_id AND ({$this->_aliases['civicrm_financial_trxn']}.from_financial_account_id NOT IN (" . implode(',', array_keys($this->_deferredFinancialAccount)) . ") OR {$this->_aliases['civicrm_financial_trxn']}.from_financial_account_id IS NULL)
+INNER JOIN civicrm_contribution {$this->_aliases['civicrm_contribution']}
+  ON {$this->_aliases['civicrm_contribution']}.id = financial_trxn_contribution.entity_id
+INNER JOIN civicrm_contact {$this->_aliases['civicrm_contact']}
+  ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_contribution']}.contact_id
 INNER JOIN civicrm_line_item line_item 
-  ON line_item.contribution_id = contribution.id
-LEFT JOIN  civicrm_membership membership 
+  ON line_item.contribution_id = {$this->_aliases['civicrm_contribution']}.id
+LEFT JOIN  civicrm_membership {$this->_aliases['civicrm_membership']}
   ON CASE
     WHEN line_item.entity_table = 'civicrm_membership'
-    THEN line_item.entity_id = membership.id
-    ELSE membership.id = 0
+    THEN line_item.entity_id = {$this->_aliases['civicrm_membership']}.id
+    ELSE {$this->_aliases['civicrm_membership']}.id = 0
   END
-LEFT JOIN civicrm_participant participant
+LEFT JOIN civicrm_participant {$this->_aliases['civicrm_participant']}
   ON CASE
     WHEN line_item.entity_table = 'civicrm_participant'
-    THEN line_item.entity_id = participant.id
-    ELSE participant.id = 0
+    THEN line_item.entity_id = {$this->_aliases['civicrm_participant']}.id
+    ELSE {$this->_aliases['civicrm_participant']}.id = 0
   END
-LEFT JOIN civicrm_event event ON participant.event_id = event.id
+LEFT JOIN civicrm_event {$this->_aliases['civicrm_event']} ON {$this->_aliases['civicrm_participant']}.event_id = {$this->_aliases['civicrm_event']}.id
 ";
-  }
 
-  public function orderBy() {
-    parent::orderBy();
-  }
-
-  public function where() {
-    $clauses = array();
-    foreach ($this->_columns as $tableName => $table) {
-      if (array_key_exists('filters', $table)) {
-        foreach ($table['filters'] as $fieldName => $field) {
-          $clause = NULL;
-          if (CRM_Utils_Array::value('type', $field) & CRM_Utils_Type::T_DATE) {
-            $relative = CRM_Utils_Array::value("{$fieldName}_relative", $this->_params);
-            $from = CRM_Utils_Array::value("{$fieldName}_from", $this->_params);
-            $to = CRM_Utils_Array::value("{$fieldName}_to", $this->_params);
-
-            $clause = $this->dateClause($field['name'], $relative, $from, $to, $field['type']);
-          }
-          else {
-            $op = CRM_Utils_Array::value("{$fieldName}_op", $this->_params);
-            if ($op) {
-              $clause = $this->whereClause($field,
-                $op,
-                CRM_Utils_Array::value("{$fieldName}_value", $this->_params),
-                CRM_Utils_Array::value("{$fieldName}_min", $this->_params),
-                CRM_Utils_Array::value("{$fieldName}_max", $this->_params)
-              );
-            }
-          }
-          if (!empty($clause)) {
-            $clauses[] = $clause;
-          }
-        }
-      }
-    }
-    if (!empty($clauses)) {
-      $this->_where = 'WHERE ' . implode(' AND ', $clauses);
+    if (!empty($this->_params['batch_id_value'])) {
+      $this->_from .= "
+        LEFT JOIN civicrm_entity_batch {$this->_aliases['civicrm_batch']}
+          ON {$this->_aliases['civicrm_batch']}.entity_id = {$this->_aliases['civicrm_financial_trxn_1']}.id AND
+            {$this->_aliases['civicrm_batch']}.entity_table = 'civicrm_financial_trxn'\n";
     }
   }
 
+  /**
+   * Post process function.
+   */
   public function postProcess() {
     $this->_noFields = TRUE;
     parent::postProcess();
   }
 
+  /**
+   * Set limit.
+   *
+   * @param int $rowCount
+   */
+  public function limit($rowCount = self::ROW_COUNT_LIMIT) {
+    $this->_limit = NULL;
+  }
+
+  /**
+   * Build where clause.
+   */
+  public function where() {
+    parent::where();
+    $startDate = date('Y-m-01');
+    $endDate = date('Y-m-t', strtotime(date('ymd') . '+11 month'));
+    $this->_where .= " AND {$this->_aliases['civicrm_financial_trxn_1']}.trxn_date BETWEEN '{$startDate}' AND '{$endDate}'";
+  }
+
+  /**
+   * Build group by clause.
+   */
   public function groupBy() {
-    $this->_groupBy = "GROUP BY financial_account_deferred_civireport.id, financial_account_revenue.id, financial_item.id";
+    $this->_groupBy = "GROUP BY {$this->_aliases['civicrm_financial_account']}.id,  {$this->_aliases['civicrm_financial_account_1']}.id, {$this->_aliases['civicrm_financial_item']}.id";
   }
 
   /**
@@ -210,52 +367,38 @@ LEFT JOIN civicrm_event event ON participant.event_id = event.id
       'End Date' => 1,
     );
     $dateFormat = Civi::settings()->get('dateformatFinancialBatch');
+    for ($i = 0; $i < 12; $i++) {
+      //$columns[date('M, Y', strtotime("+1 month", date('Y-m-d')))] = 1;
+      $columns[date('M, Y', strtotime(date('Y-m-d') . "+{$i} month"))] = 1;
+    }
     while ($dao->fetch()) {
-      $arraykey = $dao->deferred_account_id . '_' . $dao->revenue_account_id;
+      $arraykey = $dao->civicrm_financial_account_id . '_' . $dao->civicrm_financial_account_1_id;
       if (empty($rows[$arraykey])) {
-        $rows[$arraykey]['label'] = "Deferred Revenue Account: {$dao->deferred_account} ({$dao->deferred_account_code}), Revenue Account: {$dao->revenue_account} {$dao->revenue_account_code}";
+        $rows[$arraykey]['label'] = "Deferred Revenue Account: {$dao->civicrm_financial_account_name} ({$dao->civicrm_financial_account_accounting_code}), Revenue Account: {$dao->civicrm_financial_account_1_name} {$dao->civicrm_financial_account_1_accounting_code}";
       }
-      $rows[$arraykey]['rows'][$dao->item_id] = array(
-        'Transaction' => $statuses[$dao->status_id],
-        'Date of Transaction' => CRM_Utils_Date::customFormat($dao->transaction_date, $dateFormat),
-        'Amount' => CRM_Utils_Money::format($dao->total_amount),
-        'Contribution ID' => $dao->contribution_id,
-        'Item' => $dao->description,
-        'Contact ID' => $dao->contact_id,
-        'Contact Name' => $dao->display_name,
-        'Source' => $dao->source,
-        'Start Date' => CRM_Utils_Date::customFormat($dao->start_date, $dateFormat),
-        'End Date' => CRM_Utils_Date::customFormat($dao->end_date, $dateFormat),
+      $rows[$arraykey]['rows'][$dao->civicrm_financial_item_id] = array(
+        'Transaction' => $statuses[$dao->civicrm_financial_trxn_status_id],
+        'Date of Transaction' => CRM_Utils_Date::customFormat($dao->civicrm_financial_trxn_trxn_date, $dateFormat),
+        'Amount' => CRM_Utils_Money::format($dao->civicrm_financial_trxn_total_amount),
+        'Contribution ID' => $dao->civicrm_contribution_id,
+        'Item' => $dao->civicrm_financial_item_description,
+        'Contact ID' => $dao->civicrm_contribution_contact_id,
+        'Contact Name' => $dao->civicrm_contact_display_name,
+        'Source' => $dao->civicrm_contribution_source,
+        'Start Date' => CRM_Utils_Date::customFormat($dao->civicrm_membership_start_date, $dateFormat),
+        'End Date' => CRM_Utils_Date::customFormat($dao->civicrm_membership_end_date, $dateFormat),
       );
-      $trxnDate = explode(',', $dao->trxn_date);
-      $trxnAmount = explode(',', $dao->trxn_amount);
+      $trxnDate = explode(',', $dao->civicrm_financial_trxn_1_trxn_date);
+      $trxnAmount = explode(',', $dao->civicrm_financial_trxn_1_total_amount);
       foreach ($trxnDate as $key => $date) {
         $keyDate = date('M, Y', strtotime($date));
-        $rows[$arraykey]['rows'][$dao->item_id][$keyDate] = CRM_Utils_Money::format($trxnAmount[$key]);
-        $dateColumn[date('Ymd', strtotime($date))] = 1;
+        if (!array_key_exists($keyDate, $columns)) {
+          continue;
+        }
+        $rows[$arraykey]['rows'][$dao->civicrm_financial_item_id][$keyDate] = CRM_Utils_Money::format($trxnAmount[$key]);
       }
-    }
-    ksort($dateColumn);
-    foreach ($dateColumn as $key => $ignore) {
-      $columns[date('M, Y', strtotime($key))] = 1;
     }
     $this->_columnHeaders = $columns;
   }
-  /**
-   * @param $rows
-   *
-   */
-  public function statistics(&$rows) {}
-
-  /**
-   * Alter display of rows.
-   *
-   * Iterate through the rows retrieved via SQL and make changes for display purposes,
-   * such as rendering contacts as links.
-   *
-   * @param array $rows
-   *   Rows generated by SQL, with an array for each row.
-   */
-  public function alterDisplay(&$rows) {}
 
 }
