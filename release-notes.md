@@ -20,6 +20,7 @@ Released March 8, 2017
 
 - **[Features](release-notes/4.7.17.md#features)**
 - **[Bugs resolved](release-notes/4.7.17.md#bugs)**
+- **[Miscellany](release-notes/4.7.17.md#misc)**
 - **[Credits](release-notes/4.7.17.md#credits)**
 
 ## CiviCRM 4.7.16

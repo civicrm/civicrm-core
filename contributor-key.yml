@@ -21,6 +21,10 @@
   organization: MongoDB
   jira        : jiryu
 
+- github      : AkA84
+  name        : Alessandro Verdura
+  organization: CompuCorp
+
 - github      : alifrumin
   name        : Alice Frumin
   organization: AGH Strategies
@@ -313,6 +317,10 @@
 - github      : mattwire
   name        : Matthew Wire
 
+- github      : mc0e
+  name        : Andrew McNaughton
+  jira        : mc0e
+
 - github      : michaelmcandrew
   name        : Michael McAndrew
   organization: Third Sector Design
@@ -436,7 +444,7 @@
 
 - github      : stevekessler
   name        : Steve Kessler
-  organization: Denver DataMan
+  organization: CiviDesk
   jira        : Skessler
 
 - github      : stoob
