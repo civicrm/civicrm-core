@@ -93,8 +93,17 @@
           <td>
             {if $groupElementType eq 'select'}
               <span class="label">{if $title}{$form.group.label}{/if}</span>
+              {$form.group.html}
+            {else}
+              {foreach key=key item=item from=$tagGroup.group}
+                <div class="group-wrapper">
+                  {$form.group.$key.html}
+                  {if $item.description}
+                    <div class="description">{$item.description}</div>
+                  {/if}
+                </div>
+              {/foreach}
             {/if}
-            {$form.group.html}
           </td>
         {/if}
         {if (!$type || $type eq 'tag') && $tree}
