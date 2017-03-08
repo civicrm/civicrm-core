@@ -128,7 +128,7 @@ class CRM_Group_Page_Group extends CRM_Core_Page_Basic {
     if (!empty($_GET['update_smart_groups'])) {
       CRM_Contact_BAO_GroupContactCache::loadAll();
     }
-    elseif (!CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_group_contact_cache LIMIT 1")) {
+    elseif (!CRM_Core_DAO::singleValueQuery("SELECT contact_id FROM civicrm_group_contact_cache LIMIT 1")) {
       CRM_Core_Session::setStatus(ts('Count data for smart groups is not currently calculated. You may click Update Smart Groups to generate it. Be aware this can cause significant server load'));
     }
 
