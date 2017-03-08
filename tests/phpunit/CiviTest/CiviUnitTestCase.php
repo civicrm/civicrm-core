@@ -3770,4 +3770,18 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     $this->_ids['membership_type'] = $membershipTypeID;
   }
 
+  /**
+   * No results returned.
+   *
+   * @implements CRM_Utils_Hook::aclWhereClause
+   *
+   * @param string $type
+   * @param array $tables
+   * @param array $whereTables
+   * @param int $contactID
+   * @param string $where
+   */
+  public function aclWhereHookNoResults($type, &$tables, &$whereTables, &$contactID, &$where) {
+  }
+
 }

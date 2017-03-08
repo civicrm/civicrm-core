@@ -73,8 +73,6 @@
             </table>
           {/strip}
         </td>
-      {elseif ( $n eq 'birth_date' or $n eq 'deceased_date' ) }
-        <td class="compressed">{include file="CRM/common/jcalendar.tpl" elementName=$n elementIndex=$cid batchUpdate=1}</td>
       {elseif $n|substr:0:5 eq 'phone'}
         <td class="compressed">
           {assign var="phone_ext_field" value=$n|replace:'phone':'phone_ext'}

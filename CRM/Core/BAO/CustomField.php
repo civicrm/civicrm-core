@@ -1218,7 +1218,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         // Or should we throw an exception here if it is?
         $value = is_array($value) ? CRM_Utils_Array::first($value) : $value;
 
-        $actualPHPFormats = CRM_Core_SelectValues::datePluginToPHPFormats();
+        $actualPHPFormats = CRM_Utils_Date::datePluginToPHPFormats();
         $format = CRM_Utils_Array::value('date_format', $field);
 
         if ($format) {

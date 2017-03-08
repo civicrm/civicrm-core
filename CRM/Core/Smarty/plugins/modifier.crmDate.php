@@ -56,10 +56,6 @@ function smarty_modifier_crmDate($dateString, $dateFormat = NULL, $onlyTime = FA
       $config = CRM_Core_Config::singleton();
       $dateFormat = $config->dateformatTime;
     }
-    // Handle possibility we only have a date function style date format.
-    if ($dateFormat && !stristr($dateFormat, '%')) {
-      return date($dateFormat, strtotime($dateString));
-    }
 
     return CRM_Utils_Date::customFormat($dateString, $dateFormat);
   }

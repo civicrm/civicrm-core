@@ -61,7 +61,6 @@
     }
 
     function enableDisable() {
-      $a = $(this);
       $row = $a.closest('.crm-entity');
       info = $a.crmEditableEntity();
       fieldLabel = info.label || info.title || info.display_name || info.name || {/literal}'{ts escape="js"}Record{/ts}'{literal};
@@ -79,13 +78,16 @@
       } else {
         save();
       }
-      return false;
     }
 
     // Because this is an inline script it may get added to the document more than once, so remove handler before adding
     $('body')
       .off('.crmEnableDisable')
-      .on('click.crmEnableDisable', '.action-item.crm-enable-disable', enableDisable);
+      .on('click.crmEnableDisable', '.action-item.crm-enable-disable', function(e) {
+        e.preventDefault();
+        $a = $(this);
+        CRM.loadScript(CRM.config.resourceBase + 'js/jquery/jquery.crmEditable.js').done(enableDisable);
+      });
   });
 </script>
 {/literal}

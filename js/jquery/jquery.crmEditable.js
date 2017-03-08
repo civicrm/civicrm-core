@@ -127,7 +127,7 @@
       }
       $i.addClass('crm-editable-enabled');
 
-      $i.editable(function(value, settings) {
+      function callback(value, settings) {
         $i.addClass('crm-editable-saving');
         var
           info = $i.crmEditableEntity(),
@@ -165,7 +165,11 @@
           .fail(function(data) {
             editableSettings.error.call($el[0], info.entity, info.field, value, data);
           });
-      }, settings);
+      }
+
+      CRM.loadScript(CRM.config.resourceBase + 'packages/jquery/plugins/jquery.jeditable.min.js').done(function() {
+        $i.editable(callback, settings);
+      });
 
       // CRM-15759 - Workaround broken textarea handling in jeditable 1.7.1
       $i.click(function() {
@@ -236,9 +240,5 @@
 
     });
   };
-
-  $(document).on('crmLoad', function(e) {
-    $('.crm-editable', e.target).not('thead *').crmEditable();
-  });
 
 })(jQuery, CRM._);

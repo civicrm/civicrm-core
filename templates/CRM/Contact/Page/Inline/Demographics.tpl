@@ -34,14 +34,12 @@
       <div class="crm-label">{ts}Gender{/ts}</div>
       <div class="crm-content crm-contact-gender_display">{$gender_display}</div>
     </div>
+
     <div class="crm-summary-row">
       <div class="crm-label">{ts}Date of Birth{/ts}</div>
       <div class="crm-content crm-contact-birth_date_display">
-          {if $birthDateViewFormat}
-            {$birth_date_display|crmDate:$birthDateViewFormat}
-          {else}
-            {$birth_date_display|crmDate}
-          {/if}
+         {assign var="date_format" value = $fields.birth_date.smarty_view_format}
+         {$birth_date|crmDate:$date_format}
           &nbsp;
       </div>
     </div>
@@ -50,11 +48,7 @@
           <div class="crm-summary-row">
             <div class="crm-label">{ts}Date Deceased{/ts}</div>
             <div class="crm-content crm-contact-deceased_date_display">
-            {if $birthDateViewFormat}
-              {$deceased_date_display|crmDate:$birthDateViewFormat}
-            {else}
-              {$deceased_date_display|crmDate}
-             {/if}
+              {$deceased_date}
             </div>
           </div>
         {else}

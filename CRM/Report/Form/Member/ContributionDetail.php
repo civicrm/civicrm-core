@@ -580,6 +580,7 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
     $this->tempTable();
     $this->from();
     $this->customDataFrom();
+    $this->buildPermissionClause();
     $this->where();
     $this->groupBy();
     $this->orderBy();

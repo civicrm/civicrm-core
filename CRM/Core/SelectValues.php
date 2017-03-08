@@ -343,13 +343,14 @@ class CRM_Core_SelectValues {
       if (empty($date['format'])) {
         if ($context == 'Input') {
           $date['format'] = Civi::settings()->get('dateInputFormat');
-          $date['php_datetime_format'] = self::datePluginToPHPFormats(Civi::settings()->get('dateInputFormat'));
         }
         else {
           $date['format'] = 'M d';
         }
       }
     }
+
+    $date['smarty_view_format'] = CRM_Utils_Date::getDateFieldViewFormat($date['format']);
     if (!isset($date['time'])) {
       $date['time'] = FALSE;
     }
@@ -759,32 +760,6 @@ class CRM_Core_SelectValues {
     gives proper result
      */
 
-    return $dateInputFormats;
-  }
-
-  /**
-   * Map date plugin and actual format that is used by PHP.
-   *
-   * @return array
-   */
-  public static function datePluginToPHPFormats() {
-    $dateInputFormats = array(
-      "mm/dd/yy" => 'm/d/Y',
-      "dd/mm/yy" => 'd/m/Y',
-      "yy-mm-dd" => 'Y-m-d',
-      "dd-mm-yy" => 'd-m-Y',
-      "dd.mm.yy" => 'd.m.Y',
-      "M d, yy" => 'M j, Y',
-      "d M yy" => 'j M Y',
-      "MM d, yy" => 'F j, Y',
-      "d MM yy" => 'j F Y',
-      "DD, d MM yy" => 'l, j F Y',
-      "mm/dd" => 'm/d',
-      "dd-mm" => 'd-m',
-      "yy-mm" => 'Y-m',
-      "M yy" => 'M Y',
-      "yy" => 'Y',
-    );
     return $dateInputFormats;
   }
 

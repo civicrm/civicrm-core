@@ -99,17 +99,6 @@ class CRM_Tag_Form_Tag extends CRM_Core_Form {
 
     $tags = new CRM_Core_BAO_Tag();
     $tree = $tags->getTree($this->_entityTable, TRUE);
-
-    // let's not load jstree if there are not children. This also fixes blank
-    // display at the beginning of checkboxes
-    $loadJsTree = CRM_Utils_Array::retrieveValueRecursive($tree, 'children');
-    $this->assign('loadjsTree', FALSE);
-    if (!empty($loadJsTree)) {
-      CRM_Core_Resources::singleton()
-        ->addScriptFile('civicrm', 'packages/jquery/plugins/jstree/jquery.jstree.js', 0, 'html-header', FALSE)
-        ->addStyleFile('civicrm', 'packages/jquery/plugins/jstree/themes/default/style.css', 0, 'html-header');
-      $this->assign('loadjsTree', TRUE);
-    }
     $this->assign('tree', $tree);
 
     $this->assign('allTags', $allTags);

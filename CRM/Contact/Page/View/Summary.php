@@ -119,8 +119,6 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
     CRM_Core_Resources::singleton()
       ->addScriptFile('civicrm', 'templates/CRM/Contact/Page/View/Summary.js', 2, 'html-header')
       ->addStyleFile('civicrm', 'css/contactSummary.css', 2, 'html-header')
-      ->addScriptFile('civicrm', 'packages/jquery/plugins/jstree/jquery.jstree.js', 0, 'html-header', FALSE)
-      ->addStyleFile('civicrm', 'packages/jquery/plugins/jstree/themes/default/style.css', 0, 'html-header')
       ->addScriptFile('civicrm', 'templates/CRM/common/TabHeader.js', 1, 'html-header')
       ->addSetting(array(
         'summaryPrint' => array('mode' => $this->_print),
@@ -130,10 +128,10 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
     $session = CRM_Core_Session::singleton();
     $url = CRM_Utils_System::url('civicrm/contact/view', 'reset=1&cid=' . $this->_contactId);
     $session->pushUserContext($url);
+    $this->assignFieldMetadataToTemplate('Contact');
 
     $params = array();
     $defaults = array();
-    $ids = array();
 
     $params['id'] = $params['contact_id'] = $this->_contactId;
     $params['noRelationships'] = $params['noNotes'] = $params['noGroups'] = TRUE;
@@ -259,9 +257,6 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
         $defaults['current_employer'] = $contact->organization_name;
         $defaults['current_employer_id'] = $contact->employer_id;
       }
-
-      //for birthdate format with respect to birth format set
-      $this->assign('birthDateViewFormat', CRM_Utils_Array::value('qfMapping', CRM_Utils_Date::checkBirthDateFormat()));
     }
 
     $defaults['external_identifier'] = $contact->external_identifier;
