@@ -401,6 +401,8 @@ class CRM_Core_SelectValues {
       'Welcome' => ts('Welcome Message'),
       'Unsubscribe' => ts('Unsubscribe Message'),
       'Resubscribe' => ts('Resubscribe Message'),
+      'T_Header' => ts('Transactional Header'),
+      'T_Footer' => ts('Transactional Footer'),
     );
   }
 

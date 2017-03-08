@@ -209,6 +209,10 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
         CRM_Utils_Token::getTokens($body_html),
         CRM_Utils_Token::getTokens($body_subject));
 
+      //replace header footer template tokens
+      $body_html = CRM_Utils_Token::replaceTemplateTokens($body_html, TRUE, $tokens, TRUE);
+      $body_text = CRM_Utils_Token::replaceTemplateTokens($body_text, FALSE, $tokens, TRUE);
+
       // get replacement text for these tokens
       $returnProperties = array("preferred_mail_format" => 1);
       if (isset($tokens['contact'])) {
@@ -400,13 +404,13 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
             )));
       }
     }
-
     $mailContent = array(
       'subject' => $dao->subject,
       'text' => $dao->text,
       'html' => $dao->html,
       'format' => $dao->format,
     );
+
     $dao->free();
 
     CRM_Utils_Hook::alterMailContent($mailContent);
@@ -475,6 +479,9 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
       );
       $contact = $contact[$contactID];
     }
+
+    $mailContent['text'] = CRM_Utils_Token::replaceTemplateTokens($mailContent['text'], FALSE, $tokens['text'], TRUE);
+    $mailContent['html'] = CRM_Utils_Token::replaceTemplateTokens($mailContent['html'], TRUE, $tokens['html'], TRUE);
 
     $mailContent['subject'] = CRM_Utils_Token::replaceDomainTokens($mailContent['subject'], $domain, FALSE, $tokens['text'], TRUE);
     $mailContent['text'] = CRM_Utils_Token::replaceDomainTokens($mailContent['text'], $domain, FALSE, $tokens['text'], TRUE);

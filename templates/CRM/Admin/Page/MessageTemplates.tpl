@@ -108,7 +108,9 @@
             {/if}
             {help id="id-intro"}
           {else}
-            {ts}System workflow message templates are used to generate the emails sent to constituents and administrators for contribution receipts, event confirmations and many other workflows. You can customize the style and wording of these messages here.{/ts} {help id="id-system-workflow"}
+            {ts}System workflow message templates are used to generate the emails sent to constituents and administrators for contribution receipts, event confirmations and many other workflows. You can customize the style and wording of these messages here.{/ts} {help id="id-system-workflow"}<br>
+            {capture assign=automatedMsgURL}{crmURL p='civicrm/admin/component' q="reset=1"}{/capture}
+            {ts 1=$automatedMsgURL}Configure transactional header and footer at <a href="%1">Administer > CiviMail > Headers, Footers and Automated Messages</a>{/ts}
           {/if}
           </div>
         <div>
