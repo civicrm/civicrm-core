@@ -891,7 +891,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
           if (!empty($form->_submitValues['onbehalfof_id'])) {
             $form->assign('submittedOnBehalf', $form->_submitValues['onbehalfof_id']);
           }
-          $form->assign('submittedOnBehalfInfo', json_encode($form->_submitValues['onbehalf']));
+          $form->assign('submittedOnBehalfInfo', json_encode($form->_submitValues['onbehalf'],JSON_HEX_APOS|JSON_HEX_QUOT));
         }
 
         $fieldTypes = array('Contact', 'Organization');
