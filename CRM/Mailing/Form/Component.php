@@ -78,9 +78,7 @@ class CRM_Mailing_Form_Component extends CRM_Core_Form {
     $this->add('textarea', 'body_text', ts('Body - TEXT Format'),
       CRM_Core_DAO::getAttribute('CRM_Mailing_DAO_Component', 'body_text')
     );
-    $this->add('textarea', 'body_html', ts('Body - HTML Format'),
-      CRM_Core_DAO::getAttribute('CRM_Mailing_DAO_Component', 'body_html')
-    );
+    $this->add('wysiwyg', 'body_html', ts('Body - HTML Format'),  CRM_Core_DAO::getAttribute('CRM_Mailing_DAO_Component', 'body_html'));
 
     $this->addYesNo('is_default', ts('Default?'));
     $this->addYesNo('is_active', ts('Enabled?'));
