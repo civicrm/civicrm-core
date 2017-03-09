@@ -17,8 +17,8 @@ class CRM_Utils_GeocodeTest extends CiviUnitTestCase {
     $params = array('state_province_id' => 1022, 'country' => 'U.S.A');
     $formatted = CRM_Utils_Geocode_Google::format($params);
     $this->assertTrue($formatted);
-    $this->assertEquals('46.729553', $params['geo_code_1']);
-    $this->assertEquals('-94.6858998', $params['geo_code_2']);
+    $this->assertApproxEquals('46.72', $params['geo_code_1'], 1);
+    $this->assertApproxEquals('-94.68', $params['geo_code_2'], 1);
   }
 
 }
