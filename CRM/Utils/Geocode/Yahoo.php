@@ -79,7 +79,7 @@ class CRM_Utils_Geocode_Yahoo {
       $whereComponents['city'] = $city;
     }
 
-    if (!empty($values['state_province'])) {
+    if (!empty($values['state_province']) || !empty($values['state_province_id'])) {
       if (!empty($values['state_province_id'])) {
         $stateProvince = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_StateProvince', $values['state_province_id']);
       }
