@@ -851,4 +851,58 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
     $this->assertTrue(empty($lineItem['tax_amount']));
   }
 
+  public function testReSubmitSaleTax() {
+    // KG I need to do an Edit of a View Contribution
+    $this->enableTaxAndInvoicing();
+    $this->relationForFinancialTypeWithFinancialAccount($this->_financialTypeId);
+    $form = new CRM_Contribute_Form_Contribution();
+
+    $form->testSubmit(array(
+      'total_amount' => 100,
+      'financial_type_id' => $this->_financialTypeId,
+      'receive_date' => '04/21/2015',
+      'receive_date_time' => '11:27PM',
+      'contact_id' => $this->_individualId,
+      'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
+      'contribution_status_id' => 1,
+      'price_set_id' => 0,
+    ),
+      CRM_Core_Action::ADD
+    );
+    $contribution = $this->callAPISuccessGetSingle('Contribution',
+      array(
+        'contribution_id' => 1,
+        'return' => array('tax_amount', 'total_amount', 'net_amount', 'financial_type_id', 'receive_date', 'payment_instrument_id'),
+      )
+    );
+
+    $test = 1;
+    $form->testSubmit(array(
+      'contribution_id' => $contribution['id'],
+      'total_amount' => $contribution['total_amount'],
+      'net_amount' => $contribution['net_amount'],
+      'tax_amount' => $contribution['tax_amount'],
+      'financial_type_id' => $contribution['financial_type_id'],
+      'receive_date' => $contribution['receive_date'],
+      'payment_instrument_id' => $contribution['payment_instrument_id'],
+      'price_set_id' => 0,
+      'check_number' => 12345,
+    ),
+      CRM_Core_Action::UPDATE
+    );
+    $contribution = $this->callAPISuccessGetSingle('Contribution',
+      array(
+        'contact_id' => $this->_individualId,
+      )
+    );
+
+    $this->assertEquals(110, $contribution['total_amount']);
+    $this->assertEquals(10, $contribution['tax_amount']);
+    $this->callAPISuccessGetCount('FinancialTrxn', array(), 1);
+    $this->callAPISuccessGetCount('FinancialItem', array(), 2);
+    $lineItem = $this->callAPISuccessGetSingle('LineItem', array('contribution_id' => $contribution['id']));
+    $this->assertEquals(100, $lineItem['line_total']);
+    $this->assertEquals(10, $lineItem['tax_amount']);
+  }
+
 }
