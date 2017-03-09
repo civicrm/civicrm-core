@@ -9,8 +9,8 @@ class CRM_Utils_GeocodeTest extends CiviUnitTestCase {
     parent::setUp();
   }
 
-  public function tareDown() {
-    parent::tareDown();
+  public function tearDown() {
+    parent::tearDown();
   }
 
   public function testStateProvinceFormat() {
