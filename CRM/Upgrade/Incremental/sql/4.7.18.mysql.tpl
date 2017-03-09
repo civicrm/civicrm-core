@@ -68,3 +68,7 @@ UPDATE `civicrm_state_province` SET `name`='Uttarakhand', `abbreviation`='UT' WH
 UPDATE `civicrm_state_province` SET `name`='Yunlin County' WHERE `name` = 'Yunlin Conuty';
 UPDATE `civicrm_country` SET `name`='Palestine, State of' WHERE `name` = 'Palestinian Territory';
 UPDATE `civicrm_country` SET `name`='Virgin Islands, British' WHERE `name` = 'Virgin Islands,British';
+
+--- CRM-19715 Remove Close Accounting Period code - now in an extension.
+DELETE FROM civicrm_navigation
+WHERE url = 'civicrm/admin/contribute/closeaccperiod?reset=1' AND name = 'Close Accounting Period';
