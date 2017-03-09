@@ -112,6 +112,7 @@ function contact_get_expectedresult() {
         'im' => '',
         'worldregion_id' => '',
         'world_region' => '',
+        'languages' => 'English (United States)',
         'individual_prefix' => '',
         'individual_suffix' => '',
         'communication_style' => '',

@@ -2,12 +2,14 @@
 /**
  * Test Generated example demonstrating the Contact.get API.
  *
+ * Get contact id of the current logged in user
+ *
  * @return array
  *   API result array
  */
 function contact_get_example() {
   $params = array(
-    'email' => 'man2@yahoo.com',
+    'id' => 'user_contact_id',
   );
 
   try{
@@ -47,8 +49,8 @@ function contact_get_expectedresult() {
         'contact_id' => '3',
         'contact_type' => 'Individual',
         'contact_sub_type' => '',
-        'sort_name' => 'man2@yahoo.com',
-        'display_name' => 'man2@yahoo.com',
+        'sort_name' => 'User 412074113, Logged In',
+        'display_name' => 'Mr. Logged In User 412074113 II',
         'do_not_email' => 0,
         'do_not_phone' => 0,
         'do_not_mail' => 0,
@@ -63,11 +65,11 @@ function contact_get_expectedresult() {
         'preferred_communication_method' => '',
         'preferred_language' => 'en_US',
         'preferred_mail_format' => 'Both',
-        'first_name' => '',
-        'middle_name' => '',
-        'last_name' => '',
-        'prefix_id' => '',
-        'suffix_id' => '',
+        'first_name' => 'Logged In',
+        'middle_name' => 'J.',
+        'last_name' => 'User 412074113',
+        'prefix_id' => '3',
+        'suffix_id' => '3',
         'formal_title' => '',
         'communication_style_id' => '',
         'job_title' => '',
@@ -95,7 +97,7 @@ function contact_get_expectedresult() {
         'phone_type_id' => '',
         'phone' => '',
         'email_id' => '1',
-        'email' => 'man2@yahoo.com',
+        'email' => 'anthony_anderson@civicrm.org',
         'on_hold' => 0,
         'im_id' => '',
         'provider_id' => '',
@@ -103,8 +105,8 @@ function contact_get_expectedresult() {
         'worldregion_id' => '',
         'world_region' => '',
         'languages' => 'English (United States)',
-        'individual_prefix' => '',
-        'individual_suffix' => '',
+        'individual_prefix' => 'Mr.',
+        'individual_suffix' => 'II',
         'communication_style' => '',
         'gender' => '',
         'state_province_name' => '',
@@ -120,7 +122,7 @@ function contact_get_expectedresult() {
 
 /*
 * This example has been generated from the API test suite.
-* The test that created it is called "testContactGetEmail"
+* The test that created it is called "testLoggedInUserAPISupportToken"
 * and can be found at:
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ContactTest.php
 *

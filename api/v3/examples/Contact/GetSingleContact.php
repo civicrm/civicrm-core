@@ -100,6 +100,7 @@ function contact_getsingle_expectedresult() {
     'im' => '',
     'worldregion_id' => '',
     'world_region' => '',
+    'languages' => '',
     'individual_prefix' => '',
     'individual_suffix' => '',
     'communication_style' => '',

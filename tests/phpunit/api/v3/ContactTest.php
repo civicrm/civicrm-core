@@ -3370,4 +3370,12 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->callAPISuccess('contact', 'delete', array('id' => $created_contact_id, 'skip_undelete' => TRUE));
   }
 
+  public function testLoggedInUserAPISupportToken() {
+    $description = "Get contact id of the current logged in user";
+    $subFile = "ContactIDOfLoggedInUserContactAPI";
+    $cid = $this->createLoggedInUser();
+    $contact = $this->callAPIAndDocument('contact', 'get', array('id' => 'user_contact_id'), __FUNCTION__, __FILE__, $description, $subFile);
+    $this->assertEquals($cid, $contact['id']);
+  }
+
 }
