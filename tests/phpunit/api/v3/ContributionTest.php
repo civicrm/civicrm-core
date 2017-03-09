@@ -1497,7 +1497,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * CHANGE: we require the API to do an incremental update
    */
   public function testCreateUpdateContribution() {
-
     $contributionID = $this->contributionCreate(array(
       'contact_id' => $this->_individualId,
       'trxn_id' => 212355,
@@ -1529,13 +1528,12 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $params = array(
       'id' => $contributionID,
       'contact_id' => $this->_individualId,
-      'total_amount' => 110.00,
+      'total_amount' => 105.00,
+      'fee_amount' => 7.00,
       'financial_type_id' => $this->_financialTypeId,
-      'non_deductible_amount' => 10.00,
-      'net_amount' => 100.00,
+      'non_deductible_amount' => 22.00,
       'contribution_status_id' => 1,
       'note' => 'Donating for Noble Cause',
-
     );
 
     $contribution = $this->callAPISuccess('contribution', 'create', $params);
@@ -1547,17 +1545,19 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $contribution = $this->callAPISuccessGetSingle('contribution', $new_params);
 
     $this->assertEquals($contribution['contact_id'], $this->_individualId);
-    $this->assertEquals($contribution['total_amount'], 110.00);
+    $this->assertEquals($contribution['total_amount'], 105.00);
     $this->assertEquals($contribution['financial_type_id'], $this->_financialTypeId);
     $this->assertEquals($contribution['financial_type'], 'Donation');
     $this->assertEquals($contribution['instrument_id'], $old_payment_instrument);
-    $this->assertEquals($contribution['non_deductible_amount'], 10.00);
-    $this->assertEquals($contribution['fee_amount'], $old_fee_amount);
-    $this->assertEquals($contribution['net_amount'], 100.00);
+    $this->assertEquals($contribution['non_deductible_amount'], 22.00);
+    $this->assertEquals($contribution['fee_amount'], 7.00);
     $this->assertEquals($contribution['trxn_id'], $old_trxn_id);
     $this->assertEquals($contribution['invoice_id'], $old_invoice_id);
     $this->assertEquals($contribution['contribution_source'], $old_source);
     $this->assertEquals($contribution['contribution_status'], 'Completed');
+
+    $this->assertEquals($contribution['net_amount'], $contribution['total_amount'] - $contribution['fee_amount']);
+
     $params = array(
       'contribution_id' => $contributionID,
 
