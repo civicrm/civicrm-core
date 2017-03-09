@@ -851,8 +851,12 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
     $this->assertTrue(empty($lineItem['tax_amount']));
   }
 
+  /**
+   * Create a contribution & then edit it via backoffice form, checking tax.
+   *
+   * @throws \Exception
+   */
   public function testReSubmitSaleTax() {
-    // KG I need to do an Edit of a View Contribution
     $this->enableTaxAndInvoicing();
     $this->relationForFinancialTypeWithFinancialAccount($this->_financialTypeId);
     $form = new CRM_Contribute_Form_Contribution();
@@ -875,10 +879,12 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
         'return' => array('tax_amount', 'total_amount', 'net_amount', 'financial_type_id', 'receive_date', 'payment_instrument_id'),
       )
     );
+    $this->assertEquals(110, $contribution['total_amount']);
+    $this->assertEquals(10, $contribution['tax_amount']);
 
-    $test = 1;
+    $mut = new CiviMailUtils($this, TRUE);
     $form->testSubmit(array(
-      'contribution_id' => $contribution['id'],
+      'id' => $contribution['id'],
       'total_amount' => $contribution['total_amount'],
       'net_amount' => $contribution['net_amount'],
       'tax_amount' => $contribution['tax_amount'],
@@ -887,6 +893,9 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
       'payment_instrument_id' => $contribution['payment_instrument_id'],
       'price_set_id' => 0,
       'check_number' => 12345,
+      'contribution_status_id' => 1,
+      'is_email_receipt' => 1,
+      'from_email_address' => 'demo@example.com',
     ),
       CRM_Core_Action::UPDATE
     );
@@ -895,7 +904,18 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
         'contact_id' => $this->_individualId,
       )
     );
+    $strings = array(
+      'Financial Type: Donation',
+      'Amount before Tax : $ 110.00',
+      'Sales Tax 10.00% : $ 11.00',
+      'Total Tax Amount : $ 11.00',
+      'Total Amount : $ 121.00',
+      'Date Received: April 21st, 2015',
+      'Paid By: Check',
+      'Check Number: 12345',
+    );
 
+    $mut->checkMailLog($strings);
     $this->assertEquals(110, $contribution['total_amount']);
     $this->assertEquals(10, $contribution['tax_amount']);
     $this->callAPISuccessGetCount('FinancialTrxn', array(), 1);

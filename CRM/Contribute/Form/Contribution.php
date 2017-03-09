@@ -283,10 +283,11 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       else {
         $lineItem = CRM_Price_BAO_LineItem::getLineItems($this->_id, 'contribution', 1, TRUE, TRUE);
       }
+      // wtf?
       empty($lineItem) ? NULL : $this->_lineItems[] = $lineItem;
     }
 
-    $this->assign('lineItem', empty($this->_lineItems) ? FALSE : $this->_lineItems);
+    $this->assign('lineItem', empty($lineItem) ? FALSE : $lineItem);
 
     // Set title
     if ($this->_mode && $this->_id) {
@@ -1432,7 +1433,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * @throws \Exception
    */
   protected function submit($submittedValues, $action, $pledgePaymentID) {
-    $softIDs = array();
+
     $pId = $contribution = $isRelatedId = FALSE;
     $this->_params = $submittedValues;
     $this->beginPostProcess();
@@ -1797,13 +1798,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
     $taxRate = array();
     $getTaxDetails = FALSE;
-    if ($action & CRM_Core_Action::ADD) {
-      $line = $lineItem;
-    }
-    elseif ($action & CRM_Core_Action::UPDATE) {
-      $line = $this->_lineItems;
-    }
-    foreach ($line as $key => $value) {
+
+    foreach ($lineItem as $key => $value) {
       foreach ($value as $v) {
         if (isset($taxRate[(string) CRM_Utils_Array::value('tax_rate', $v)])) {
           $taxRate[(string) $v['tax_rate']] = $taxRate[(string) $v['tax_rate']] + CRM_Utils_Array::value('tax_amount', $v);
