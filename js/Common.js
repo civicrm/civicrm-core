@@ -1050,6 +1050,7 @@ if (!CRM.vars) CRM.vars = {};
           if ($el.data('origSize')) {
             $el.dialog('option', $el.data('origSize'));
             $el.data('origSize', null);
+            $(this).button('option', 'icons', {primary: 'fa-expand'});
           } else {
             var menuHeight = $('#civicrm-menu').outerHeight();
             $el.data('origSize', {
@@ -1058,6 +1059,7 @@ if (!CRM.vars) CRM.vars = {};
               height: $el.dialog('option', 'height')
             });
             $el.dialog('option', {width: '100%', height: ($(window).height() - menuHeight), position: {my: "top", at: "top+"+menuHeight, of: window}});
+            $(this).button('option', 'icons', {primary: 'fa-compress'});
           }
           $el.trigger('dialogresize');
           e.preventDefault();
