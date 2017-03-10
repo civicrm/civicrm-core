@@ -44,12 +44,9 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
   protected $_ppDAO;
 
   /**
-   * Get the base entity being edited.
+   * Get the name of the base entity being edited.
    *
    * @return string
-   *   The entity being edited.
-   *
-   * @throws Exception
    */
   public function getDefaultEntity() {
     return 'PaymentProcessor';
