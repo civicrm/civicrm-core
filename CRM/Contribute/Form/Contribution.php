@@ -287,7 +287,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       empty($lineItem) ? NULL : $this->_lineItems[] = $lineItem;
     }
 
-    $this->assign('lineItem', empty($lineItem) ? FALSE : $lineItem);
+    $this->assign('lineItem', empty($lineItem) ? FALSE : array($lineItem));
 
     // Set title
     if ($this->_mode && $this->_id) {

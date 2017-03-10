@@ -852,7 +852,7 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
   }
 
   /**
-   * Create a contribution & then edit it via backoffice form, checking tax.
+   * Create a contribution & then edit it via backoffice form, checking tax with: default price_set
    *
    * @throws \Exception
    */
@@ -881,12 +881,12 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
     );
     $this->assertEquals(110, $contribution['total_amount']);
     $this->assertEquals(10, $contribution['tax_amount']);
+    $this->assertEquals(110, $contribution['net_amount']);
 
     $mut = new CiviMailUtils($this, TRUE);
+    // Testing here if when we edit something trivial like adding a check_number tax, net, total amount stay the same:
     $form->testSubmit(array(
       'id' => $contribution['id'],
-      'total_amount' => $contribution['total_amount'],
-      'net_amount' => $contribution['net_amount'],
       'tax_amount' => $contribution['tax_amount'],
       'financial_type_id' => $contribution['financial_type_id'],
       'receive_date' => $contribution['receive_date'],
@@ -901,28 +901,25 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
     );
     $contribution = $this->callAPISuccessGetSingle('Contribution',
       array(
-        'contact_id' => $this->_individualId,
+        'contribution_id' => 1,
+        'return' => array('tax_amount', 'total_amount', 'net_amount', 'financial_type_id', 'receive_date', 'payment_instrument_id'),
       )
     );
+    $this->assertEquals(110, $contribution['total_amount']);
+    $this->assertEquals(10, $contribution['tax_amount']);
+    $this->assertEquals(110, $contribution['net_amount']);
+
     $strings = array(
-      'Financial Type: Donation',
-      'Amount before Tax : $ 110.00',
-      'Sales Tax 10.00% : $ 11.00',
-      'Total Tax Amount : $ 11.00',
-      'Total Amount : $ 121.00',
+      'Total Tax Amount : $ 10.00',
+      'Total Amount : $ 110.00',
       'Date Received: April 21st, 2015',
       'Paid By: Check',
       'Check Number: 12345',
     );
 
     $mut->checkMailLog($strings);
-    $this->assertEquals(110, $contribution['total_amount']);
-    $this->assertEquals(10, $contribution['tax_amount']);
-    $this->callAPISuccessGetCount('FinancialTrxn', array(), 1);
+    $this->callAPISuccessGetCount('FinancialTrxn', array(), 3);
     $this->callAPISuccessGetCount('FinancialItem', array(), 2);
-    $lineItem = $this->callAPISuccessGetSingle('LineItem', array('contribution_id' => $contribution['id']));
-    $this->assertEquals(100, $lineItem['line_total']);
-    $this->assertEquals(10, $lineItem['tax_amount']);
   }
 
 }
