@@ -43,15 +43,17 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
 
   protected $_ppDAO;
 
+  /**
+   * Get the name of the base entity being edited.
+   *
+   * @return string
+   */
+  public function getDefaultEntity() {
+    return 'PaymentProcessor';
+  }
+
   public function preProcess() {
-    if (!CRM_Core_Permission::check('administer payment processors')) {
-      CRM_Core_Error::statusBounce('The \'administer payment processors\' permission is required to add or edit a payment processor.');
-    }
     parent::preProcess();
-
-    CRM_Utils_System::setTitle(ts('Settings - Payment Processor'));
-
-    // get the payment processor meta information
 
     if ($this->_id) {
       $this->_ppType = CRM_Utils_Request::retrieve('pp', 'String', $this, FALSE, NULL);
@@ -77,9 +79,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
     $this->_ppDAO = new CRM_Financial_DAO_PaymentProcessorType();
     $this->_ppDAO->id = $this->_ppType;
 
-    if (!$this->_ppDAO->find(TRUE)) {
-      CRM_Core_Error::fatal(ts('Could not find payment processor meta information'));
-    }
+    $this->_ppDAO->find(TRUE);
 
     if ($this->_id) {
       $refreshURL = CRM_Utils_System::url('civicrm/admin/paymentProcessor',
@@ -221,10 +221,13 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
         continue;
       }
 
-      $this->add('text', $field['name'],
-        $field['label'], $attributes[$field['name']]
-      );
-      $this->add('text', "test_{$field['name']}",
+      $this->addField($field['name'], array('label' => $field['label']));
+
+      $fieldSpec = civicrm_api3($this->getDefaultEntity(), 'getfield', array(
+        'name' => $field['name'],
+        'action' => 'create',
+      ));
+      $this->add($fieldSpec['values']['html']['type'], "test_{$field['name']}",
         $field['label'], $attributes[$field['name']]
       );
       if (!empty($field['rule'])) {
