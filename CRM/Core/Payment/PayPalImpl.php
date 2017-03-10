@@ -297,7 +297,8 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     }
     $params['payment_status'] = $result['paymentstatus'];
     $params['pending_reason'] = $result['pendingreason'];
-
+    // Initial payment is still pending until IPN.
+    $params['payment_status_id'] = 2;
     return $params;
   }
   //LCD end
