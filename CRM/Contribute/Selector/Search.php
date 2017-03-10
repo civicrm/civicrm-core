@@ -449,6 +449,14 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
         if ($row['contribution_status_name'] == 'Pending refund') {
           $buttonName = ts('Record Refund');
         }
+        elseif (CRM_Core_Config::isEnabledBackOfficeCreditCardPayments()) {
+          $links[CRM_Core_Action::BASIC] = array(
+            'name' => ts('Submit Credit Card payment'),
+            'url' => 'civicrm/payment/add',
+            'qs' => 'reset=1&id=%%id%%&cid=%%cid%%&action=add&component=contribution&mode=live',
+            'title' => ts('Submit Credit Card payment'),
+          );
+        }
         $links[CRM_Core_Action::ADD] = array(
           'name' => $buttonName,
           'url' => 'civicrm/payment',
