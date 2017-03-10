@@ -1641,6 +1641,10 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       // Since we have called the membership contribution (in a 2 contribution scenario) this is out
       // primary-contribution compared to that - but let's face it - it's all just too hard & confusing at the moment!
       $paymentParams = array_merge($form->_params, array('contributionID' => $form->_values['contribution_other_id']));
+
+      // CRM-19792 : set necessary fields for payment processor
+      CRM_Core_Payment_Form::mapParams($form->_bltID, $paymentParams, $paymentParams, TRUE);
+
       $paymentActionResult = $payment->doPayment($paymentParams, 'contribute');
       $paymentResults[] = array('contribution_id' => $paymentResult['contribution']->id, 'result' => $paymentActionResult);
       // Do not send an email if Recurring transaction is done via Direct Mode
@@ -1759,6 +1763,10 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         $contributionParams['payment_instrument_id'] = $form->_paymentProcessor['payment_instrument_id'];
       }
     }
+
+    // CRM-19792 : set necessary fields for payment processor
+    CRM_Core_Payment_Form::mapParams($form->_bltID, $form->_params, $tempParams, TRUE);
+
     $membershipContribution = CRM_Contribute_Form_Contribution_Confirm::processFormContribution($form,
       $tempParams,
       $tempParams,
