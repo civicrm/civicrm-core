@@ -238,6 +238,9 @@ class CRM_Financial_DAO_PaymentProcessor extends CRM_Core_DAO {
           'table_name' => 'civicrm_payment_processor',
           'entity' => 'PaymentProcessor',
           'bao' => 'CRM_Financial_BAO_PaymentProcessor',
+          'html' => array(
+            'type' => 'Text',
+          ) ,
         ) ,
         'description' => array(
           'name' => 'description',
@@ -300,6 +303,9 @@ class CRM_Financial_DAO_PaymentProcessor extends CRM_Core_DAO {
           'table_name' => 'civicrm_payment_processor',
           'entity' => 'PaymentProcessor',
           'bao' => 'CRM_Financial_BAO_PaymentProcessor',
+          'html' => array(
+            'type' => 'Text',
+          ) ,
         ) ,
         'password' => array(
           'name' => 'password',
@@ -310,14 +316,22 @@ class CRM_Financial_DAO_PaymentProcessor extends CRM_Core_DAO {
           'table_name' => 'civicrm_payment_processor',
           'entity' => 'PaymentProcessor',
           'bao' => 'CRM_Financial_BAO_PaymentProcessor',
+          'html' => array(
+            'type' => 'Text',
+          ) ,
         ) ,
         'signature' => array(
           'name' => 'signature',
           'type' => CRM_Utils_Type::T_TEXT,
           'title' => ts('Signature') ,
+          'rows' => 4,
+          'cols' => 40,
           'table_name' => 'civicrm_payment_processor',
           'entity' => 'PaymentProcessor',
           'bao' => 'CRM_Financial_BAO_PaymentProcessor',
+          'html' => array(
+            'type' => 'TextArea',
+          ) ,
         ) ,
         'url_site' => array(
           'name' => 'url_site',
@@ -328,6 +342,9 @@ class CRM_Financial_DAO_PaymentProcessor extends CRM_Core_DAO {
           'table_name' => 'civicrm_payment_processor',
           'entity' => 'PaymentProcessor',
           'bao' => 'CRM_Financial_BAO_PaymentProcessor',
+          'html' => array(
+            'type' => 'Text',
+          ) ,
         ) ,
         'url_api' => array(
           'name' => 'url_api',
@@ -338,6 +355,9 @@ class CRM_Financial_DAO_PaymentProcessor extends CRM_Core_DAO {
           'table_name' => 'civicrm_payment_processor',
           'entity' => 'PaymentProcessor',
           'bao' => 'CRM_Financial_BAO_PaymentProcessor',
+          'html' => array(
+            'type' => 'Text',
+          ) ,
         ) ,
         'url_recur' => array(
           'name' => 'url_recur',
@@ -348,6 +368,9 @@ class CRM_Financial_DAO_PaymentProcessor extends CRM_Core_DAO {
           'table_name' => 'civicrm_payment_processor',
           'entity' => 'PaymentProcessor',
           'bao' => 'CRM_Financial_BAO_PaymentProcessor',
+          'html' => array(
+            'type' => 'Text',
+          ) ,
         ) ,
         'url_button' => array(
           'name' => 'url_button',
@@ -358,6 +381,9 @@ class CRM_Financial_DAO_PaymentProcessor extends CRM_Core_DAO {
           'table_name' => 'civicrm_payment_processor',
           'entity' => 'PaymentProcessor',
           'bao' => 'CRM_Financial_BAO_PaymentProcessor',
+          'html' => array(
+            'type' => 'Text',
+          ) ,
         ) ,
         'subject' => array(
           'name' => 'subject',
@@ -368,6 +394,9 @@ class CRM_Financial_DAO_PaymentProcessor extends CRM_Core_DAO {
           'table_name' => 'civicrm_payment_processor',
           'entity' => 'PaymentProcessor',
           'bao' => 'CRM_Financial_BAO_PaymentProcessor',
+          'html' => array(
+            'type' => 'Text',
+          ) ,
         ) ,
         'class_name' => array(
           'name' => 'class_name',

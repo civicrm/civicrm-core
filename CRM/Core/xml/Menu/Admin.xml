@@ -454,12 +454,13 @@
   </item>
   <item>
      <path>civicrm/admin/paymentProcessor</path>
-     <title>Payment Processor</title>
+     <title>Settings - Payment Processor</title>
      <desc>Payment Processor setup for CiviCRM transactions</desc>
      <page_callback>CRM_Admin_Page_PaymentProcessor</page_callback>
      <adminGroup>System Settings</adminGroup>
      <icon>admin/small/online_contribution_pages.png</icon>
      <weight>30</weight>
+     <access_arguments>administer payment processors</access_arguments>
   </item>
   <item>
      <path>civicrm/admin/setting/mapping</path>
