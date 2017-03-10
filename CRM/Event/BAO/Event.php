@@ -1038,7 +1038,7 @@ WHERE civicrm_event.is_active = 1
           if (in_array($field, $htmlType)) {
             $fileValues = CRM_Core_BAO_File::path($value, $oldEventID);
             $customParams["custom_{$field}_-1"] = array(
-              'name' => $fileValues[0],
+              'name' => CRM_Utils_File::duplicate($fileValues[0]),
               'type' => $fileValues[1],
             );
           }

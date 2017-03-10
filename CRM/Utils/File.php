@@ -293,16 +293,19 @@ class CRM_Utils_File {
    *   The directory where the file should be saved.
    * @param string $contents
    *   Optional: the contents of the file.
+   * @param string $fileName
    *
    * @return string
    *   The filename saved, or FALSE on failure.
    */
-  public static function createFakeFile($dir, $contents = 'delete me') {
+  public static function createFakeFile($dir, $contents = 'delete me', $fileName = NULL) {
     $dir = self::addTrailingSlash($dir);
-    $file = 'delete-this-' . CRM_Utils_String::createRandom(10, CRM_Utils_String::ALPHANUMERIC);
-    $success = file_put_contents($dir . $file, $contents);
+    if (!$fileName) {
+      $fileName = 'delete-this-' . CRM_Utils_String::createRandom(10, CRM_Utils_String::ALPHANUMERIC);
+    }
+    $success = file_put_contents($dir . $fileName, $contents);
 
-    return ($success === FALSE) ? FALSE : $file;
+    return ($success === FALSE) ? FALSE : $fileName;
   }
 
   /**
@@ -459,6 +462,21 @@ class CRM_Utils_File {
     else {
       return CRM_Utils_String::munge("{$basename}_{$uniqID}", '_', 240) . "." . CRM_Utils_Array::value('extension', $info);
     }
+  }
+
+  /**
+   * Copies a file
+   *
+   * @param $filePath
+   * @return mixed
+   */
+  public static function duplicate($filePath) {
+    $oldName = pathinfo($filePath, PATHINFO_FILENAME);
+    $uniqID = md5(uniqid(rand(), TRUE));
+    $newName = preg_replace('/(_[\w]{32})$/', '', $oldName) . '_' . $uniqID;
+    $newPath = str_replace($oldName, $newName, $filePath);
+    copy($filePath, $newPath);
+    return $newPath;
   }
 
   /**

@@ -666,7 +666,7 @@ AND       CEF.entity_id    = %2";
       CRM_Core_Error::fatal('Request signature is invalid');
     }
 
-    CRM_Core_BAO_File::deleteEntityFile($params['entityTable'], $params['entityID'], NULL, $params['fileID']);
+    self::deleteEntityFile($params['entityTable'], $params['entityID'], NULL, $params['fileID']);
   }
 
 
