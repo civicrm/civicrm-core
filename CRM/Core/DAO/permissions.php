@@ -488,6 +488,13 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
     ),
   );
 
+  $permissions['payment_processor'] = array(
+    'get' => array(
+      'access CiviEvent',
+      'edit all events',
+    )
+  );
+
   // Pledge permissions
   $permissions['pledge'] = array(
     'create' => array(
