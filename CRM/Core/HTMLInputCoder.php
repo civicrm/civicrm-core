@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,23 +23,29 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
+
+/**
+ * Class CRM_Core_HTMLInputCoder
+ */
 class CRM_Core_HTMLInputCoder {
 
   /**
    * @param string $fldName
-   * @return bool TRUE if encoding should be skipped for this field
+   * @return bool
+   *   TRUE if encoding should be skipped for this field
    */
   public static function isSkippedField($fldName) {
     return CRM_Utils_API_HTMLInputCoder::singleton()->isSkippedField($fldName);
   }
 
   /**
-   * This function is going to filter the
+   * going to filter the
    * submitted values across XSS vulnerability.
    *
    * @param array|string $values
-   * @param bool $castToString If TRUE, all scalars will be filtered (and therefore cast to strings)
+   * @param bool $castToString
+   *   If TRUE, all scalars will be filtered (and therefore cast to strings).
    *    If FALSE, then non-string values will be preserved
    */
   public static function encodeInput(&$values, $castToString = TRUE) {

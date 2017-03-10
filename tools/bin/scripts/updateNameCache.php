@@ -1,9 +1,9 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.1                                               |
+  | CiviCRM version 4.7                                               |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2011                                |
+  | Copyright CiviCRM LLC (c) 2004-2017                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -31,7 +31,14 @@
  * This script recaches the display_name and sort_name values
  *
  */
+
+/**
+ * Class CRM_UpdateNameCache
+ */
 class CRM_UpdateNameCache {
+  /**
+   *
+   */
   function __construct() {
     // you can run this program either from an apache command, or from the cli
     if (php_sapi_name() == "cli") {

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,63 +23,61 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
- * This class generates task actions for CiviEvent
- *
+ * This class generates task actions for CiviEvent.
  */
 class CRM_Pledge_Form_Task extends CRM_Core_Form {
 
   /**
-   * the task being performed
+   * The task being performed.
    *
    * @var int
    */
   protected $_task;
 
   /**
-   * The additional clause that we restrict the search with
+   * The additional clause that we restrict the search with.
    *
    * @var string
    */
   protected $_componentClause = NULL;
 
   /**
-   * The array that holds all the component ids
+   * The array that holds all the component ids.
    *
    * @var array
    */
   protected $_componentIds;
 
   /**
-   * The array that holds all the pledge ids
+   * The array that holds all the pledge ids.
    *
    * @var array
    */
   protected $_pledgeIds;
 
   /**
-   * build all the data structures needed to build the form
-   *
-   * @param
-   *
-   * @return void
-   * @access public
+   * Build all the data structures needed to build the form.
    */
-  function preProcess() {
+  public function preProcess() {
     self::preProcessCommon($this);
   }
 
-  static function preProcessCommon(&$form, $useTable = FALSE) {
+  /**
+   * Common pre-processing.
+   *
+   * @param CRM_Core_Form $form
+   * @param bool $useTable
+   */
+  public static function preProcessCommon(&$form, $useTable = FALSE) {
     $form->_pledgeIds = array();
 
     $values = $form->controller->exportValues('Search');
@@ -98,9 +96,9 @@ class CRM_Pledge_Form_Task extends CRM_Core_Form {
     }
     else {
       $queryParams = $form->get('queryParams');
-      $sortOrder = null;
-      if ( $form->get( CRM_Utils_Sort::SORT_ORDER  ) ) {
-        $sortOrder = $form->get( CRM_Utils_Sort::SORT_ORDER );
+      $sortOrder = NULL;
+      if ($form->get(CRM_Utils_Sort::SORT_ORDER)) {
+        $sortOrder = $form->get(CRM_Utils_Sort::SORT_ORDER);
       }
       $query = new CRM_Contact_BAO_Query($queryParams, NULL, NULL, FALSE, FALSE,
         CRM_Contact_BAO_Query::MODE_PLEDGE
@@ -121,7 +119,7 @@ class CRM_Pledge_Form_Task extends CRM_Core_Form {
 
     $form->_pledgeIds = $form->_componentIds = $ids;
 
-    //set the context for redirection for any task actions
+    // set the context for redirection for any task actions
     $qfKey = CRM_Utils_Request::retrieve('qfKey', 'String', $form);
     $urlParams = 'force=1';
     if (CRM_Utils_Rule::qfKey($qfKey)) {
@@ -143,16 +141,16 @@ class CRM_Pledge_Form_Task extends CRM_Core_Form {
   }
 
   /**
-   * simple shell that derived classes can call to add buttons to
+   * Simple shell that derived classes can call to add buttons to
    * the form with a customized title for the main Submit
    *
-   * @param string $title title of the main button
-   * @param string $type  button type for the form after processing
-   *
-   * @return void
-   * @access public
+   * @param string $title
+   *   Title of the main button.
+   * @param string $nextType
+   * @param string $backType
+   * @param bool $submitOnce
    */
-  function addDefaultButtons($title, $nextType = 'next', $backType = 'back', $submitOnce = FALSE) {
+  public function addDefaultButtons($title, $nextType = 'next', $backType = 'back', $submitOnce = FALSE) {
     $this->addButtons(array(
         array(
           'type' => $nextType,
@@ -166,5 +164,5 @@ class CRM_Pledge_Form_Task extends CRM_Core_Form {
       )
     );
   }
-}
 
+}

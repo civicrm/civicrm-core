@@ -49,7 +49,7 @@
      <title>Create New Report from Template</title>
      <page_callback>CRM_Report_Page_TemplateList</page_callback>
      <desc>Component wise listing of all available templates</desc>
-     <access_arguments>access CiviReport</access_arguments>
+     <access_arguments>access CiviCRM,access CiviReport</access_arguments>
      <adminGroup>CiviReport</adminGroup>
      <icon>admin/small/report_template.gif</icon>
   </item>
@@ -58,7 +58,7 @@
      <title>Manage Templates</title>
      <page_callback>CRM_Report_Page_Options</page_callback>
      <desc>Browse, Edit and Delete the Report templates.</desc>
-     <access_arguments>access CiviReport</access_arguments>
+     <access_arguments>access CiviCRM,access CiviReport</access_arguments>
      <adminGroup>CiviReport</adminGroup>
      <icon>admin/small/template.png</icon>
   </item>
@@ -74,5 +74,5 @@
      <path>civicrm/report/chart</path>
      <page_callback>CRM_Report_Form::uploadChartImage</page_callback>
      <access_arguments>access CiviReport</access_arguments>
-  </item> 
+  </item>
 </menu>

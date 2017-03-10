@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,7 +24,7 @@
  +--------------------------------------------------------------------+
 *}
     {capture assign=newPageURL}{crmURL p='civicrm/admin/contribute/add' q='action=add&reset=1'}{/capture}
-    <div id="help">
+    <div class="help">
        {ts}CiviContribute allows you to create and maintain any number of Online Contribution Pages. You can create different pages for different programs or campaigns - and customize text, amounts, types of information collected from contributors, etc.{/ts} {help id="id-intro"}
     </div>
 
@@ -32,7 +32,7 @@
     {if NOT ($action eq 1 or $action eq 2) }
       <table class="form-layout-compressed">
       <tr>
-      <td><a href="{$newPageURL}" class="button"><span><div class="icon add-icon"></div>{ts}Add Contribution Page{/ts}</span></a></td>
+      <td><a href="{$newPageURL}" class="button"><span><i class="crm-i fa-plus-circle"></i> {ts}Add Contribution Page{/ts}</span></a></td>
             <td style="vertical-align: top"><a class="button" href="{crmURL p="civicrm/admin/pcp" q="reset=1"}"><span>{ts}Manage Personal Campaign Pages{/ts}</span></a> {help id="id-pcp-intro" file="CRM/PCP/Page/PCP.hlp"}</td>
       </tr>
       </table>
@@ -46,12 +46,11 @@
              {include file="CRM/common/pagerAToZ.tpl"}
              {* handle enable/disable actions *}
              {include file="CRM/common/enableDisableApi.tpl"}
-             {include file="CRM/common/crmeditable.tpl"}
        {include file="CRM/common/jsortable.tpl"}
              <table id="options" class="display">
                <thead>
                <tr>
-                 <th id="sortable">{ts}Title{/ts}</th>
+                 <th>{ts}Title{/ts}</th>
                <th>{ts}ID{/ts}</th>
                <th>{ts}Enabled?{/ts}</th>
              {if call_user_func(array('CRM_Campaign_BAO_Campaign','isCampaignEnable'))}

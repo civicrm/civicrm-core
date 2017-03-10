@@ -8,21 +8,23 @@
   <add>1.5</add>
   <log>true</log>
   <field>
-      <name>id</name>
-      <type>int unsigned</type>
-      <required>true</required>
-      <add>1.5</add>
+    <name>id</name>
+    <title>Membership Payment ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <add>1.5</add>
   </field>
   <primaryKey>
-      <name>id</name>
-      <autoincrement>true</autoincrement>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
   </primaryKey>
   <field>
-      <name>membership_id</name>
-      <type>int unsigned</type>
-      <required>true</required>
-      <comment>FK to Membership table</comment>
-      <add>1.5</add>
+    <name>membership_id</name>
+    <title>Membership</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>FK to Membership table</comment>
+    <add>1.5</add>
   </field>
   <foreignKey>
     <name>membership_id</name>
@@ -32,10 +34,11 @@
     <onDelete>CASCADE</onDelete>
   </foreignKey>
   <field>
-      <name>contribution_id</name>
-      <type>int unsigned</type>
-      <comment>FK to contribution table.</comment>
-      <add>2.0</add>
+    <name>contribution_id</name>
+    <title>Contribution</title>
+    <type>int unsigned</type>
+    <comment>FK to contribution table.</comment>
+    <add>2.0</add>
   </field>
   <foreignKey>
     <name>contribution_id</name>

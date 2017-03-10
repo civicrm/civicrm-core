@@ -1,9 +1,9 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.4                                                |
+  | CiviCRM version 4.7                                                |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2013                                |
+  | Copyright CiviCRM LLC (c) 2004-2017                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -23,14 +23,12 @@
   | GNU Affero General Public License or the licensing of CiviCRM,     |
   | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
   +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -39,32 +37,31 @@
 class CRM_Utils_Geocode_Google {
 
   /**
-   * server to retrieve the lat/long
+   * Server to retrieve the lat/long
    *
    * @var string
-   * @static
    */
   static protected $_server = 'maps.googleapis.com';
 
   /**
-   * uri of service
+   * Uri of service.
    *
    * @var string
-   * @static
    */
   static protected $_uri = '/maps/api/geocode/xml?sensor=false&address=';
 
   /**
-   * function that takes an address object and gets the latitude / longitude for this
+   * Function that takes an address object and gets the latitude / longitude for this
    * address. Note that at a later stage, we could make this function also clean up
    * the address into a more valid format
    *
-   * @param object $address
+   * @param array $values
+   * @param bool $stateName
    *
-   * @return boolean true if we modified the address, false otherwise
-   * @static
+   * @return bool
+   *   true if we modified the address, false otherwise
    */
-  static function format(&$values, $stateName = FALSE) {
+  public static function format(&$values, $stateName = FALSE) {
     // we need a valid country, else we ignore
     if (empty($values['country'])) {
       return FALSE;
@@ -85,7 +82,7 @@ class CRM_Utils_Geocode_Google {
       $add .= ',+';
     }
 
-    if (!empty($values['state_province'])) {
+    if (!empty($values['state_province']) || !empty($values['state_province_id'])) {
       if (!empty($values['state_province_id'])) {
         $stateProvince = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_StateProvince', $values['state_province_id']);
       }
@@ -118,7 +115,11 @@ class CRM_Utils_Geocode_Google {
       $add .= '+' . urlencode(str_replace('', '+', $values['country']));
     }
 
-    $query = 'http://' . self::$_server . self::$_uri . $add;
+    if (!empty($config->geoAPIKey)) {
+      $add .= '&key=' . urlencode($config->geoAPIKey);
+    }
+
+    $query = 'https://' . self::$_server . self::$_uri . $add;
 
     require_once 'HTTP/Request.php';
     $request = new HTTP_Request($query);
@@ -127,6 +128,7 @@ class CRM_Utils_Geocode_Google {
 
     libxml_use_internal_errors(TRUE);
     $xml = @simplexml_load_string($string);
+    CRM_Utils_Hook::geocoderFormat('Google', $values, $xml);
     if ($xml === FALSE) {
       // account blocked maybe?
       CRM_Core_Error::debug_var('Geocoding failed.  Message from Google:', $string);
@@ -141,22 +143,23 @@ class CRM_Utils_Geocode_Google {
       ) {
         $ret = $xml->result->geometry->location->children();
         if ($ret->lat && $ret->lng) {
-          $values['geo_code_1'] = (float)$ret->lat;
-          $values['geo_code_2'] = (float)$ret->lng;
+          $values['geo_code_1'] = (float) $ret->lat;
+          $values['geo_code_2'] = (float) $ret->lng;
           return TRUE;
         }
       }
-      elseif ($xml->status == 'OVER_QUERY_LIMIT') {
-        CRM_Core_Error::debug_var('Geocoding failed. Message from Google: ', (string ) $xml->status);
+      elseif ($xml->status == 'ZERO_RESULTS') {
+        // reset the geo code values if we did not get any good values
+        $values['geo_code_1'] = $values['geo_code_2'] = 'null';
+        return FALSE;
+      }
+      else {
+        CRM_Core_Error::debug_var("Geocoding failed. Message from Google: ({$xml->status})", (string ) $xml->error_message);
         $values['geo_code_1'] = $values['geo_code_2'] = 'null';
         $values['geo_code_error'] = $xml->status;
         return FALSE;
       }
     }
-
-    // reset the geo code values if we did not get any good values
-    $values['geo_code_1'] = $values['geo_code_2'] = 'null';
-    return FALSE;
   }
-}
 
+}

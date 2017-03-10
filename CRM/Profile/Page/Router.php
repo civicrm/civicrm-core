@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,13 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
+ * @copyright CiviCRM LLC (c) 2004-2017
  *
  */
 
@@ -41,14 +40,14 @@ class CRM_Profile_Page_Router extends CRM_Core_Page {
   /**
    * This is some kind of special-purpose router/front-controller for the various profile URLs.
    *
-   * @param $args array this array contains the arguments of the url
+   * @param array $args
+   *   this array contains the arguments of the url.
    *
-   * @static
-   * @access public
+   * @return string|void
    */
-  function run($args = NULL) {
+  public function run($args = NULL) {
     if ($args[1] !== 'profile') {
-      return;
+      return NULL;
     }
 
     $secondArg = CRM_Utils_Array::value(2, $args, '');
@@ -73,11 +72,9 @@ class CRM_Profile_Page_Router extends CRM_Core_Page {
         $profileGID = CRM_Utils_Request::retrieve('gid', 'Integer', $controller, TRUE);
       }
 
-
       // make sure that this profile enables mapping
       // CRM-8609
-      $isMap =
-        CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $profileGID, 'is_map');
+      $isMap = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $profileGID, 'is_map');
       if (!$isMap) {
         CRM_Core_Error::statusBounce(ts('This profile does not have the map feature turned on.'));
       }
@@ -99,27 +96,12 @@ class CRM_Profile_Page_Router extends CRM_Core_Page {
     }
 
     if ($secondArg == 'edit' || $secondArg == 'create') {
-      $buttonType = CRM_Utils_Array::value('_qf_Edit_cancel', $_POST);
-      // CRM-5849: we should actually check the button *type*, but we get the *value*, potentially translated;
-      // we should keep both English and translated checks just to make sure we also handle untranslated Cancels
-      if ($buttonType == 'Cancel' or $buttonType == ts('Cancel')) {
-        $cancelURL = CRM_Utils_Request::retrieve('cancelURL',
-          'String',
-          CRM_Core_DAO::$_nullObject,
-          FALSE,
-          NULL,
-          $_POST
-        );
-        if ($cancelURL) {
-          CRM_Utils_System::redirect($cancelURL);
-        }
-      }
-
+      $allowRemoteSubmit = Civi::settings()->get('remote_profile_submissions');
       if ($secondArg == 'edit') {
         $controller = new CRM_Core_Controller_Simple('CRM_Profile_Form_Edit',
           ts('Create Profile'),
           CRM_Core_Action::UPDATE,
-          FALSE, FALSE, TRUE
+          FALSE, FALSE, $allowRemoteSubmit
         );
         $controller->set('edit', 1);
         $controller->process();
@@ -131,7 +113,7 @@ class CRM_Profile_Page_Router extends CRM_Core_Page {
           ts('Create Profile'),
           array(
             'mode' => CRM_Core_Action::ADD,
-            'ignoreKey' => TRUE,
+            'ignoreKey' => $allowRemoteSubmit,
           )
         );
       }
@@ -143,7 +125,6 @@ class CRM_Profile_Page_Router extends CRM_Core_Page {
     }
 
     CRM_Utils_System::permissionDenied();
-    return;
   }
 
 }

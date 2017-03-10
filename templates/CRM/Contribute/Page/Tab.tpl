@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,14 +29,14 @@
     {include file="CRM/Contribute/Form/ContributionView.tpl"}
 {else}
     <div class="view-content">
-        <div id="help">
+        <div class="help">
             {if $permission EQ 'edit'}
               {capture assign=newContribURL}{crmURL p="civicrm/contact/view/contribution" q="reset=1&action=add&cid=`$contactId`&context=contribution"}{/capture}
-              {capture assign=link}class="action-item action-item-first" href="{$newContribURL}"{/capture}
+              {capture assign=link}class="action-item" href="{$newContribURL}"{/capture}
               {ts 1=$link}Click <a %1>Record Contribution</a> to record a new contribution received from this contact.{/ts}
                 {if $newCredit}
                   {capture assign=newCreditURL}{crmURL p="civicrm/contact/view/contribution" q="reset=1&action=add&cid=`$contactId`&context=contribution&mode=live"}{/capture}
-                  {capture assign=link}class="action-item action-item-first" href="{$newCreditURL}"{/capture}
+                  {capture assign=link}class="action-item" href="{$newCreditURL}"{/capture}
                   {ts 1=$link}Click <a %1>Submit Credit Card Contribution</a> to process a new contribution on behalf of the contributor using their credit card.{/ts}
                 {/if}
             {else}
@@ -46,9 +46,9 @@
 
         {if $action eq 16 and $permission EQ 'edit'}
             <div class="action-link">
-                <a accesskey="N" href="{$newContribURL}" class="button"><span><div class="icon add-icon"></div>{ts}Record Contribution (Check, Cash, EFT ...){/ts}</span></a>
+                <a accesskey="N" href="{$newContribURL}" class="button"><span><i class="crm-i fa-plus-circle"></i> {ts}Record Contribution (Check, Cash, EFT ...){/ts}</span></a>
                 {if $newCredit}
-                    <a accesskey="N" href="{$newCreditURL}" class="button"><span><div class="icon add-icon"></div>{ts}Submit Credit Card Contribution{/ts}</span></a>
+                    <a accesskey="N" href="{$newCreditURL}" class="button"><span><i class="crm-i fa-credit-card"></i> {ts}Submit Credit Card Contribution{/ts}</span></a>
                 {/if}
                 <br /><br />
             </div>

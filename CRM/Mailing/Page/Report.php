@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,69 +23,93 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
- * Page to display / edit the header / footer of a mailing
- *
+ * Page to display / edit the header / footer of a mailing.
  */
 class CRM_Mailing_Page_Report extends CRM_Core_Page_Basic {
   public $_mailing_id;
 
   /**
-   * Get BAO Name
+   * Get BAO Name.
    *
-   * @return string Classname of BAO
+   * @return string
+   *   Classname of BAO
    */
-  function getBAOName() {
+  public function getBAOName() {
     return 'CRM_Mailing_BAO_Mailing';
   }
 
-  function &links() {
+  /**
+   * An array of action links.
+   *
+   * @return null
+   */
+  public function &links() {
     return CRM_Core_DAO::$_nullObject;
   }
 
-  function editForm() {
+  /**
+   * @return null
+   */
+  public function editForm() {
     return NULL;
   }
 
-  function editName() {
+  /**
+   * @return string
+   */
+  public function editName() {
     return 'CiviMail Report';
   }
 
   /**
    * Get user context.
    *
-   * @return string user context.
+   * @param null $mode
+   *
+   * @return string
+   *   user context.
    */
-  function userContext($mode = NULL) {
+  public function userContext($mode = NULL) {
     return 'civicrm/mailing/report';
   }
 
-  function userContextParams($mode = NULL) {
+  /**
+   * @param null $mode
+   *
+   * @return string
+   */
+  public function userContextParams($mode = NULL) {
     return 'reset=1&mid=' . $this->_mailing_id;
   }
 
-  function run() {
+  /**
+   * @return string
+   */
+  public function run() {
     $this->_mailing_id = CRM_Utils_Request::retrieve('mid', 'Positive', $this);
-
+    //CRM-15979 - check if abtest exist for mailing then redirect accordingly
+    $abtest = CRM_Mailing_BAO_MailingAB::getABTest($this->_mailing_id);
+    if (!empty($abtest) && !empty($abtest->id)) {
+      CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/a/', NULL, TRUE, '/abtest/' . $abtest->id));
+    }
     // check that the user has permission to access mailing id
     CRM_Mailing_BAO_Mailing::checkPermission($this->_mailing_id);
 
     $report = CRM_Mailing_BAO_Mailing::report($this->_mailing_id);
 
-    //get contents of mailing
+    // get contents of mailing
     CRM_Mailing_BAO_Mailing::getMailingContent($report, $this);
 
-    //assign backurl
+    // assign backurl
     $context = CRM_Utils_Request::retrieve('context', 'String', $this);
     $cid = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
 
@@ -115,10 +139,11 @@ class CRM_Mailing_Page_Report extends CRM_Core_Page_Basic {
 
     $this->assign('report', $report);
     CRM_Utils_System::setTitle(ts('CiviMail Report: %1',
-        array(1 => $report['mailing']['name'])
-      ));
+      array(1 => $report['mailing']['name'])
+    ));
+    $this->assign('public_url', CRM_Mailing_BAO_Mailing::getPublicViewUrl($this->_mailing_id));
 
     return CRM_Core_Page::run();
   }
-}
 
+}

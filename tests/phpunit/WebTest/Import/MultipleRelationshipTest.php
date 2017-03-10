@@ -1,40 +1,44 @@
 <?php
 /*
- +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
- |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License along with this program; if not, contact CiviCRM LLC       |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
- +--------------------------------------------------------------------+
-*/
+  +--------------------------------------------------------------------+
+  | CiviCRM version 4.7                                                |
+  +--------------------------------------------------------------------+
+  | Copyright CiviCRM LLC (c) 2004-2017                                |
+  +--------------------------------------------------------------------+
+  | This file is a part of CiviCRM.                                    |
+  |                                                                    |
+  | CiviCRM is free software; you can copy, modify, and distribute it  |
+  | under the terms of the GNU Affero General Public License           |
+  | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+  |                                                                    |
+  | CiviCRM is distributed in the hope that it will be useful, but     |
+  | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+  | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+  | See the GNU Affero General Public License for more details.        |
+  |                                                                    |
+  | You should have received a copy of the GNU Affero General Public   |
+  | License along with this program; if not, contact CiviCRM LLC       |
+  | at info[AT]civicrm[DOT]org. If you have questions about the        |
+  | GNU Affero General Public License or the licensing of CiviCRM,     |
+  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+  +--------------------------------------------------------------------+
+ */
 
 require_once 'WebTest/Import/ImportCiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Import_MultipleRelationshipTest
+ */
 class WebTest_Import_MultipleRelationshipTest extends ImportCiviSeleniumTestCase {
 
   protected function setUp() {
     parent::setUp();
   }
 
-  /*
-    *  Test Multiple Relationship import for Individuals.
-    */
-  function testMultipleRelationshipImport() {
+  /**
+   * Test Multiple Relationship import for Individuals.
+   */
+  public function testMultipleRelationshipImport() {
     $this->webtestLogin();
 
     // Get sample import data.
@@ -44,12 +48,13 @@ class WebTest_Import_MultipleRelationshipTest extends ImportCiviSeleniumTestCase
     $this->importContacts($headers, $rows, 'Individual', 'Skip', $fieldMapper);
   }
 
-  /*
-   * Helper function to provide data for multiple relationship import
+  /**
+   * Helper function to provide data for multiple relationship import.
    * for Individuals.
-
+   *
+   * @return array
    */
-  function _individualRelationshipCSVData() {
+  public function _individualRelationshipCSVData() {
 
     $headers = array(
       'first_name' => 'First Name',
@@ -64,7 +69,8 @@ class WebTest_Import_MultipleRelationshipTest extends ImportCiviSeleniumTestCase
       'country' => 'Country',
       'contact_relationships' =>
       array(
-        '4_a_b' => array('organization_name' => 'Organization Name',
+        '4_a_b' => array(
+          'organization_name' => 'Organization Name',
           'organization_email' => 'Organization Email',
           'organization_add' => 'Organization Street Address',
           'organization_city' => 'Organization City',
@@ -92,7 +98,8 @@ class WebTest_Import_MultipleRelationshipTest extends ImportCiviSeleniumTestCase
     );
 
     $rows = array(
-      array('first_name' => substr(sha1(rand()), 0, 7),
+      array(
+        'first_name' => substr(sha1(rand()), 0, 7),
         'middle_name' => substr(sha1(rand()), 0, 7),
         'last_name' => 'Anderson',
         'email' => substr(sha1(rand()), 0, 7) . '@example.com',
@@ -101,33 +108,38 @@ class WebTest_Import_MultipleRelationshipTest extends ImportCiviSeleniumTestCase
         'address_2' => 'Add 2',
         'city' => 'Watson',
         'state' => 'NY',
-        'country' => 'United States',
+        'country' => 'UNITED STATES',
         'contact_relationships' =>
-        array('4_a_b' => array('organization_name' => 'Org ' . substr(sha1(rand()), 0, 7),
+        array(
+          '4_a_b' => array(
+            'organization_name' => 'Org ' . substr(sha1(rand()), 0, 7),
             'organization_email' => substr(sha1(rand()), 0, 7) . 'org@example.org',
             'organization_add' => 'Org Street Address',
             'organization_city' => 'Org City',
             'organization_state' => 'NY',
-            'organization_country' => 'United States',
+            'organization_country' => 'UNITED STATES',
           ),
-          '7_a_b' => array('household_name' => 'House ' . substr(sha1(rand()), 0, 7),
+          '7_a_b' => array(
+            'household_name' => 'House ' . substr(sha1(rand()), 0, 7),
             'household_email' => substr(sha1(rand()), 0, 7) . 'house@example.org',
             'household_add' => 'House Street Address',
             'household_city' => 'House City',
             'household_state' => 'NY',
-            'household_country' => 'United States',
+            'household_country' => 'UNITED STATES',
           ),
-          '2_a_b' => array('spouse_f_name' => substr(sha1(rand()), 0, 7),
+          '2_a_b' => array(
+            'spouse_f_name' => substr(sha1(rand()), 0, 7),
             'spouse_l_name' => substr(sha1(rand()), 0, 7),
             'spouse_email' => substr(sha1(rand()), 0, 7) . 'spouse@example.org',
             'spouse_add' => 'Spouse Street Address',
             'spouse_city' => 'Spouse City',
             'spouse_state' => 'NY',
-            'spouse_country' => 'United States',
+            'spouse_country' => 'UNITED STATES',
           ),
         ),
       ),
-      array('first_name' => substr(sha1(rand()), 0, 7),
+      array(
+        'first_name' => substr(sha1(rand()), 0, 7),
         'middle_name' => substr(sha1(rand()), 0, 7),
         'last_name' => 'Summerson',
         'email' => substr(sha1(rand()), 0, 7) . '@example.com',
@@ -136,34 +148,38 @@ class WebTest_Import_MultipleRelationshipTest extends ImportCiviSeleniumTestCase
         'address_2' => 'Add 2',
         'city' => 'Watson',
         'state' => 'NY',
-        'country' => 'United States',
+        'country' => 'UNITED STATES',
         'contact_relationships' =>
-        array('4_a_b' => array('organization_name' => 'Org ' . substr(sha1(rand()), 0, 7),
+        array(
+          '4_a_b' => array(
+            'organization_name' => 'Org ' . substr(sha1(rand()), 0, 7),
             'organization_email' => substr(sha1(rand()), 0, 7) . 'org@example.org',
             'organization_add' => 'Org Street Address',
             'organization_city' => 'Org City',
             'organization_state' => 'NY',
-            'organization_country' => 'United States',
+            'organization_country' => 'UNITED STATES',
           ),
-          '7_a_b' => array('household_name' => 'House ' . substr(sha1(rand()), 0, 7),
+          '7_a_b' => array(
+            'household_name' => 'House ' . substr(sha1(rand()), 0, 7),
             'household_email' => substr(sha1(rand()), 0, 7) . 'house@example.org',
             'household_add' => 'House Street Address',
             'household_city' => 'House City',
             'household_state' => 'NY',
-            'household_country' => 'United States',
+            'household_country' => 'UNITED STATES',
           ),
-          '2_a_b' => array('spouse_f_name' => substr(sha1(rand()), 0, 7),
+          '2_a_b' => array(
+            'spouse_f_name' => substr(sha1(rand()), 0, 7),
             'spouse_l_name' => substr(sha1(rand()), 0, 7),
             'spouse_email' => substr(sha1(rand()), 0, 7) . 'spouse@example.org',
             'spouse_add' => 'Spouse Street Address',
             'spouse_city' => 'Spouse City',
             'spouse_state' => 'NY',
-            'spouse_country' => 'United States',
+            'spouse_country' => 'UNITED STATES',
           ),
         ),
       ),
     );
-      // for Employee of relationship
+    // for Employee of relationship
     $fieldMapper = array(
       'mapper[10][0]' => '5_a_b',
       'mapper[10][1]' => 'organization_name',
@@ -209,5 +225,5 @@ class WebTest_Import_MultipleRelationshipTest extends ImportCiviSeleniumTestCase
 
     return array($headers, $rows, $fieldMapper);
   }
-}
 
+}

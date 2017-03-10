@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,40 +23,34 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
-
-require_once 'CiviTest/CiviUnitTestCase.php';
-
+ */
 
 /**
  *  Test APIv3 civicrm_tag_* functions
  *
- *  @package CiviCRM_APIv3
- *  @subpackage API_Core
+ * @package CiviCRM_APIv3
+ * @subpackage API_Core
+ * @group headless
  */
-
 class api_v3_TagTest extends CiviUnitTestCase {
-  protected $_apiversion =3;
+  protected $_apiversion = 3;
   /**
    * @ids array of values to be cleaned up in the tear down
    */
   protected $ids = array();
   /**
-   * tag id
+   * Tag id.
    * @var integer
    */
   protected $tag = array();
 
   protected $tagID;
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
+    $this->useTransaction(TRUE);
     $this->tag = $this->tagCreate();
     $this->ids['tag'][] = $this->tagID = $this->tag['id'];
-  }
-
-  function tearDown() {
-    $this->deleteFromIDSArray();
   }
 
   ///////////////// civicrm_tag_get methods
@@ -78,7 +72,7 @@ class api_v3_TagTest extends CiviUnitTestCase {
       'name' => $this->tag['name'],
     );
     $result = $this->callAPIAndDocument('tag', 'get', $params, __FUNCTION__, __FILE__);
-    $this->assertEquals($this->tag['description'], $result['values'][$this->tagID]['description'], 'In line ' . __LINE__);
+    $this->assertEquals($this->tag['description'], $result['values'][$this->tagID]['description']);
     $this->assertEquals($this->tag['name'], $result['values'][$this->tagID]['name']);
   }
 
@@ -86,8 +80,8 @@ class api_v3_TagTest extends CiviUnitTestCase {
    * Test civicrm_tag_get - success expected.
    */
   public function testGetReturnArray() {
-    $description = "demonstrates use of Return as an array";
-    $subfile     = "getReturnArray";
+    $description = "Demonstrates use of Return as an array.";
+    $subfile = "GetReturnArray";
 
     $params = array(
       'id' => $this->tagID,
@@ -104,54 +98,55 @@ class api_v3_TagTest extends CiviUnitTestCase {
   /**
    * Test civicrm_tag_create with empty params.
    */
-  function testCreateEmptyParams() {
-    $result = $this->callAPIFailure('tag', 'create', array(),'Mandatory key(s) missing from params array: name');
+  public function testCreateEmptyParams() {
+    $result = $this->callAPIFailure('tag', 'create', array(), 'Mandatory key(s) missing from params array: name');
   }
 
   /**
-   * Test civicrm_tag_create
+   * Test civicrm_tag_create.
    */
-  function testCreatePasstagInParams() {
+  public function testCreatePasstagInParams() {
     $params = array(
       'tag' => 10,
       'name' => 'New Tag23',
       'description' => 'This is description for New Tag 02',
     );
     $result = $this->callAPISuccess('tag', 'create', $params);
-    $this->assertEquals(10, $result['id'], 'In line ' . __LINE__);
+    $this->assertEquals(10, $result['id']);
   }
 
   /**
    * Test civicrm_tag_create - success expected.
    */
-  function testCreate() {
+  public function testCreate() {
     $params = array(
       'name' => 'Super Heros',
       'description' => 'Outside undie-wearers',
     );
     $result = $this->callAPIAndDocument('tag', 'create', $params, __FUNCTION__, __FILE__);
-    $this->assertNotNull($result['id'], 'In line ' . __LINE__);
+    $this->assertNotNull($result['id']);
     $params['used_for'] = 'civicrm_contact';
     $this->getAndCheck($params, $result['id'], 'tag');
   }
 
   /**
-   * Test civicrm_tag_create contribution tag- success expected. Test checks that used_for is set
-   * and not over-written by default on update
+   * Test civicrm_tag_create activity tag- success expected.
+   *
+   * Test checks that used_for is set and not over-written by default on update.
    */
-  function testCreateContributionTag() {
+  public function testCreateEntitySpecificTag() {
     $params = array(
       'name' => 'New Tag4',
-      'description' => 'This is description for New Cont tag',
-      'used_for' => 'civicrm_contribution',
+      'description' => 'This is description for New Activity tag',
+      'used_for' => 'civicrm_activity',
     );
     $result = $this->callAPISuccess('tag', 'create', $params);
-    $check = $this->callAPISuccess('tag', 'get', array());
+    $this->callAPISuccess('tag', 'get', array());
     $this->getAndCheck($params, $result['id'], 'tag', 0, __FUNCTION__ . ' tag first created');
     unset($params['used_for']);
     $params['id'] = $result['id'];
     $result = $this->callAPISuccess('tag', 'create', $params);
-    $params['used_for'] = 'civicrm_contribution';
+    $params['used_for'] = 'civicrm_activity';
     $this->getAndCheck($params, $result['id'], 'tag', 1, __FUNCTION__ . ' tag updated in line ' . __LINE__);
   }
   ///////////////// civicrm_tag_delete methods
@@ -159,14 +154,14 @@ class api_v3_TagTest extends CiviUnitTestCase {
   /**
    * Test civicrm_tag_delete without tag id.
    */
-  function testDeleteWithoutTagId() {
+  public function testDeleteWithoutTagId() {
     $result = $this->callAPIFailure('tag', 'delete', array(), 'Mandatory key(s) missing from params array: id');
   }
 
   /**
    * Test civicrm_tag_delete .
    */
-  function testTagDeleteOldSyntax() {
+  public function testTagDeleteOldSyntax() {
     $params = array(
       'tag_id' => $this->tagID,
     );
@@ -177,7 +172,7 @@ class api_v3_TagTest extends CiviUnitTestCase {
   /**
    * Test civicrm_tag_delete = $params['id'] is correct
    */
-  function testTagDeleteCorrectSyntax() {
+  public function testTagDeleteCorrectSyntax() {
     $params = array(
       'id' => $this->tagID,
     );
@@ -185,23 +180,23 @@ class api_v3_TagTest extends CiviUnitTestCase {
     unset($this->ids['tag']);
   }
 
-  function testTagGetfields() {
-    $description = "demonstrate use of getfields to interogate api";
-    $params      = array('action' => 'create');
-    $result      = $this->callAPIAndDocument('tag', 'getfields', $params, __FUNCTION__, __FILE__, $description, NULL, 'getfields');
+  public function testTagGetfields() {
+    $description = "Demonstrate use of getfields to interrogate api.";
+    $params = array('action' => 'create');
+    $result = $this->callAPIAndDocument('tag', 'getfields', $params, __FUNCTION__, __FILE__, $description, NULL);
     $this->assertEquals('civicrm_contact', $result['values']['used_for']['api.default']);
   }
 
-  function testTagGetList() {
-    $description = "Demonstrates use of api.getlist for autocomplete and quicksearch applications";
+  public function testTagGetList() {
+    $description = "Demonstrates use of api.getlist for autocomplete and quicksearch applications.";
     $params = array(
       'input' => $this->tag['name'],
-      'extra' => array('used_for')
+      'extra' => array('used_for'),
     );
     $result = $this->callAPIAndDocument('tag', 'getlist', $params, __FUNCTION__, __FILE__, $description);
-    $this->assertEquals($this->tag['id'], $result['values'][0]['id'], 'In line ' . __LINE__);
-    $this->assertEquals($this->tag['description'], $result['values'][0]['description'][0], 'In line ' . __LINE__);
-    $this->assertEquals($this->tag['used_for'], $result['values'][0]['extra']['used_for'], 'In line ' . __LINE__);
+    $this->assertEquals($this->tag['id'], $result['values'][0]['id']);
+    $this->assertEquals($this->tag['description'], $result['values'][0]['description'][0]);
+    $this->assertEquals($this->tag['used_for'], $result['values'][0]['extra']['used_for']);
   }
-}
 
+}

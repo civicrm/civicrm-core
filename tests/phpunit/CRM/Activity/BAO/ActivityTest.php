@@ -1,31 +1,25 @@
 <?php
-require_once 'CiviTest/CiviUnitTestCase.php';
-require_once 'CiviTest/Contact.php';
-class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
-  function get_info() {
-    return array(
-      'name' => 'Activity BAOs',
-      'description' => 'Test all Activity_BAO_Activity methods.',
-      'group' => 'CiviCRM BAO Tests',
-    );
-  }
 
-  function setUp() {
+/**
+ * Class CRM_Activity_BAO_ActivityTest
+ * @group headless
+ */
+class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
+  public function setUp() {
     parent::setUp();
   }
 
-  function tearDown() {
+  public function tearDown() {
     // truncate a few tables
     $tablesToTruncate = array('civicrm_contact', 'civicrm_activity', 'civicrm_activity_contact');
     $this->quickCleanup($tablesToTruncate);
   }
 
   /**
-   * testcases for create() method
-   * create() method Add/Edit activity.
+   * Test case for create() method.
    */
-  function testCreate() {
-    $contactId = Contact::createIndividual();
+  public function testCreate() {
+    $contactId = $this->individualCreate();
 
     $params = array(
       'source_contact_id' => $contactId,
@@ -41,7 +35,6 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
 
     // Now call create() to modify an existing Activity
 
-    $params = array();
     $params = array(
       'id' => $activityId,
       'source_contact_id' => $contactId,
@@ -57,20 +50,21 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     );
     $this->assertEquals($activityTypeId, 3, 'Verify activity type id is 3.');
 
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
   }
 
   /**
-   * testcase for getContactActivity() method.
-   * getContactActivity() method get activities detail for given target contact id
+   * Test case for getContactActivity() method.
+   *
+   * getContactActivity() method get activities detail for given target contact id.
    */
-  function testGetContactActivity() {
-    $contactId = Contact::createIndividual();
+  public function testGetContactActivity() {
+    $contactId = $this->individualCreate();
     $params = array(
       'first_name' => 'liz',
       'last_name' => 'hurleey',
     );
-    $targetContactId = Contact::createIndividual($params);
+    $targetContactId = $this->individualCreate($params);
 
     $params = array(
       'source_contact_id' => $contactId,
@@ -80,7 +74,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       'activity_date_time' => date('Ymd'),
     );
 
-    CRM_Activity_BAO_Activity::create($params);
+    $this->callAPISuccess('Activity', 'create', $params);
 
     $activityId = $this->assertDBNotNull('CRM_Activity_DAO_Activity', 'Scheduling Meeting',
       'id',
@@ -91,22 +85,23 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
 
     $this->assertEquals($activities[$activityId]['subject'], 'Scheduling Meeting', 'Verify activity subject is correct.');
 
-    Contact::delete($contactId);
-    Contact::delete($targetContactId);
+    $this->contactDelete($contactId);
+    $this->contactDelete($targetContactId);
   }
 
   /**
-   * testcase for retrieve() method.
-   * retrieve($params, $defaults) method return activity detail for given params
+   * Test case for retrieve() method.
+   *
+   * Retrieve($params, $defaults) method return activity detail for given params
    *                              and set defaults.
    */
-  function testRetrieve() {
-    $contactId = Contact::createIndividual();
+  public function testRetrieve() {
+    $contactId = $this->individualCreate();
     $params = array(
       'first_name' => 'liz',
       'last_name' => 'hurleey',
     );
-    $targetContactId = Contact::createIndividual($params);
+    $targetContactId = $this->individualCreate($params);
 
     $params = array(
       'source_contact_id' => $contactId,
@@ -139,21 +134,22 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
 
     $this->assertEquals($defaults['target_contact'][0], $targetContactId, 'Verify target contact id is correct.');
 
-    Contact::delete($contactId);
-    Contact::delete($targetContactId);
+    $this->contactDelete($contactId);
+    $this->contactDelete($targetContactId);
   }
 
   /**
-   * testcase for deleteActivity() method.
+   * Test case for deleteActivity() method.
+   *
    * deleteActivity($params) method deletes activity for given params.
    */
-  function testDeleteActivity() {
-    $contactId = Contact::createIndividual();
+  public function testDeleteActivity() {
+    $contactId = $this->individualCreate();
     $params = array(
       'first_name' => 'liz',
       'last_name' => 'hurleey',
     );
-    $targetContactId = Contact::createIndividual($params);
+    $targetContactId = $this->individualCreate($params);
 
     $params = array(
       'source_contact_id' => $contactId,
@@ -181,26 +177,27 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       'activity_type_id' => 2,
     );
 
-    $result = CRM_Activity_BAO_Activity::deleteActivity($params);
+    CRM_Activity_BAO_Activity::deleteActivity($params);
 
-    $activityId = $this->assertDBNull('CRM_Activity_DAO_Activity', 'Scheduling Meeting', 'id',
+    $this->assertDBNull('CRM_Activity_DAO_Activity', 'Scheduling Meeting', 'id',
       'subject', 'Database check for deleted activity.'
     );
-    Contact::delete($contactId);
-    Contact::delete($targetContactId);
+    $this->contactDelete($contactId);
+    $this->contactDelete($targetContactId);
   }
 
   /**
-   * testcase for deleteActivityTarget() method.
+   * Test case for deleteActivityTarget() method.
+   *
    * deleteActivityTarget($activityId) method deletes activity target for given activity id.
    */
-  function testDeleteActivityTarget() {
-    $contactId = Contact::createIndividual();
+  public function testDeleteActivityTarget() {
+    $contactId = $this->individualCreate();
     $params = array(
       'first_name' => 'liz',
       'last_name' => 'hurleey',
     );
-    $targetContactId = Contact::createIndividual($params);
+    $targetContactId = $this->individualCreate($params);
 
     $params = array(
       'source_contact_id' => $contactId,
@@ -227,21 +224,22 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       'contact_id', 'Database check for deleted activity target.'
     );
 
-    Contact::delete($contactId);
-    Contact::delete($targetContactId);
+    $this->contactDelete($contactId);
+    $this->contactDelete($targetContactId);
   }
 
   /**
-   * testcase for deleteActivityAssignment() method.
+   * Test case for deleteActivityAssignment() method.
+   *
    * deleteActivityAssignment($activityId) method deletes activity assignment for given activity id.
    */
-  function testDeleteActivityAssignment() {
-    $contactId = Contact::createIndividual();
+  public function testDeleteActivityAssignment() {
+    $contactId = $this->individualCreate();
     $params = array(
       'first_name' => 'liz',
       'last_name' => 'hurleey',
     );
-    $assigneeContactId = Contact::createIndividual($params);
+    $assigneeContactId = $this->individualCreate($params);
 
     $params = array(
       'source_contact_id' => $contactId,
@@ -268,17 +266,17 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       'contact_id', 'Database check for deleted activity assignment.'
     );
 
-    Contact::delete($contactId);
-    Contact::delete($assigneeContactId);
+    $this->contactDelete($contactId);
+    $this->contactDelete($assigneeContactId);
   }
 
   /**
-   * Function to test getActivitiesCount BAO method
+   * Test getActivitiesCount BAO method.
    */
-  function testGetActivitiesCountforAdminDashboard() {
+  public function testGetActivitiesCountforAdminDashboard() {
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
     $op->execute($this->_dbconn,
-      new PHPUnit_Extensions_Database_DataSet_FlatXMLDataSet(
+      $this->createFlatXMLDataSet(
         dirname(__FILE__) . '/activities_for_dashboard_count.xml'
       )
     );
@@ -298,16 +296,16 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     //since we are loading activities from dataset, we know total number of activities
     // 8 schedule activities that should be shown on dashboard
     $count = 8;
-    $this->assertEquals($count, $activityCount, 'In line ' . __LINE__);
+    $this->assertEquals($count, $activityCount);
   }
 
   /**
-   * Function to test getActivitiesCount BAO method
+   * Test getActivitiesCount BAO method.
    */
-  function testGetActivitiesCountforNonAdminDashboard() {
+  public function testGetActivitiesCountforNonAdminDashboard() {
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
     $op->execute($this->_dbconn,
-      new PHPUnit_Extensions_Database_DataSet_FlatXMLDataSet(
+      $this->createFlatXMLDataSet(
         dirname(__FILE__) . '/activities_for_dashboard_count.xml'
       )
     );
@@ -328,16 +326,16 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     //since we are loading activities from dataset, we know total number of activities for this contact
     // 5 activities ( 2 scheduled, 3 Completed ), note that dashboard shows only scheduled activities
     $count = 2;
-    $this->assertEquals($count, $activityCount, 'In line ' . __LINE__);
+    $this->assertEquals($count, $activityCount);
   }
 
   /**
-   * Function to test getActivitiesCount BAO method
+   * Test getActivitiesCount BAO method.
    */
-  function testGetActivitiesCountforContactSummary() {
+  public function testGetActivitiesCountforContactSummary() {
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
     $op->execute($this->_dbconn,
-      new PHPUnit_Extensions_Database_DataSet_FlatXMLDataSet(
+      $this->createFlatXMLDataSet(
         dirname(__FILE__) . '/activities_for_dashboard_count.xml'
       )
     );
@@ -357,16 +355,51 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     //since we are loading activities from dataset, we know total number of activities for this contact
     // 5 activities, Contact Summary should show all activities
     $count = 5;
-    $this->assertEquals($count, $activityCount, 'In line ' . __LINE__);
+    $this->assertEquals($count, $activityCount);
   }
 
   /**
-   * Function to test getActivitiesCount BAO method
+   * CRM-18706 - Test Include/Exclude Activity Filters
    */
-  function testGetActivitiesCountforContactSummaryWithNoActivities() {
+  public function testActivityFilters() {
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
     $op->execute($this->_dbconn,
-      new PHPUnit_Extensions_Database_DataSet_FlatXMLDataSet(
+      $this->createFlatXMLDataSet(
+        dirname(__FILE__) . '/activities_for_dashboard_count.xml'
+      )
+    );
+
+    global $_GET;
+    $_GET = array(
+      'cid' => 9,
+      'context' => 'activity',
+      'activity_type_id' => 1,
+      'is_unit_test' => 1,
+    );
+    $obj = new CRM_Activity_Page_AJAX();
+
+    $activities = $obj->getContactActivity();
+    // This should include activities of type Meeting only.
+    foreach ($activities['data'] as $key => $value) {
+      $this->assertContains('Meeting', $value['activity_type']);
+    }
+    unset($_GET['activity_type_id']);
+
+    $_GET['activity_type_exclude_id'] = 1;
+    $activities = $obj->getContactActivity();
+    // None of the activities should be of type Meeting.
+    foreach ($activities['data'] as $key => $value) {
+      $this->assertNotEquals('Meeting', $value['activity_type']);
+    }
+  }
+
+  /**
+   * Test getActivitiesCount BAO method.
+   */
+  public function testGetActivitiesCountforContactSummaryWithNoActivities() {
+    $op = new PHPUnit_Extensions_Database_Operation_Insert();
+    $op->execute($this->_dbconn,
+      $this->createFlatXMLDataSet(
         dirname(__FILE__) . '/activities_for_dashboard_count.xml'
       )
     );
@@ -385,16 +418,16 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
 
     //since we are loading activities from dataset, we know total number of activities for this contact
     // this contact does not have any activity
-    $this->assertEquals(0, $activityCount, 'In line ' . __LINE__);
+    $this->assertEquals(0, $activityCount);
   }
 
   /**
-   * Function to test getActivities BAO method
+   * Test getActivities BAO method.
    */
-  function testGetActivitiesforAdminDashboard() {
+  public function testGetActivitiesforAdminDashboard() {
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
     $op->execute($this->_dbconn,
-      new PHPUnit_Extensions_Database_DataSet_FlatXMLDataSet(
+      $this->createFlatXMLDataSet(
         dirname(__FILE__) . '/activities_for_dashboard_count.xml'
       )
     );
@@ -414,7 +447,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     //since we are loading activities from dataset, we know total number of activities
     // 8 schedule activities that should be shown on dashboard
     $count = 8;
-    $this->assertEquals($count, sizeof($activities), 'In line ' . __LINE__);
+    $this->assertEquals($count, count($activities));
 
     foreach ($activities as $key => $value) {
       $this->assertEquals($value['subject'], "subject {$key}", 'Verify activity subject is correct.');
@@ -424,12 +457,12 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
-   * Function to test getActivities BAO method
+   * Test getActivities BAO method.
    */
-  function testGetActivitiesforNonAdminDashboard() {
+  public function testGetActivitiesforNonAdminDashboard() {
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
     $op->execute($this->_dbconn,
-      new PHPUnit_Extensions_Database_DataSet_FlatXMLDataSet(
+      $this->createFlatXMLDataSet(
         dirname(__FILE__) . '/activities_for_dashboard_count.xml'
       )
     );
@@ -450,7 +483,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     //since we are loading activities from dataset, we know total number of activities for this contact
     // 5 activities ( 2 scheduled, 3 Completed ), note that dashboard shows only scheduled activities
     $count = 2;
-    $this->assertEquals($count, sizeof($activities), 'In line ' . __LINE__);
+    $this->assertEquals($count, count($activities));
 
     foreach ($activities as $key => $value) {
       $this->assertEquals($value['subject'], "subject {$key}", 'Verify activity subject is correct.');
@@ -467,12 +500,38 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
-   * Function to test getActivities BAO method
+   * Test target contact count.
    */
-  function testGetActivitiesforContactSummary() {
+  public function testTargetCountforContactSummary() {
+    $targetCount = 5;
+    $contactId = $this->individualCreate();
+    for ($i = 0; $i < $targetCount; $i++) {
+      $targetContactIDs[] = $this->individualCreate(array(), $i);
+    }
+    // create activities with 5 target contacts
+    $activityParams = array(
+      'source_contact_id' => $contactId,
+      'target_contact_id' => $targetContactIDs,
+    );
+    $this->activityCreate($activityParams);
+
+    $params = array(
+      'contact_id' => $contactId,
+      'context' => 'activity',
+    );
+    $activities = CRM_Activity_BAO_Activity::getActivities($params);
+
+    //verify target count
+    $this->assertEquals($targetCount, $activities[1]['target_contact_counter']);
+  }
+
+  /**
+   * Test getActivities BAO method.
+   */
+  public function testGetActivitiesforContactSummary() {
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
     $op->execute($this->_dbconn,
-      new PHPUnit_Extensions_Database_DataSet_FlatXMLDataSet(
+      $this->createFlatXMLDataSet(
         dirname(__FILE__) . '/activities_for_dashboard_count.xml'
       )
     );
@@ -493,7 +552,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     //since we are loading activities from dataset, we know total number of activities for this contact
     // 5 activities, Contact Summary should show all activities
     $count = 5;
-    $this->assertEquals($count, sizeof($activities), 'In line ' . __LINE__);
+    $this->assertEquals($count, count($activities));
 
     foreach ($activities as $key => $value) {
       $this->assertEquals($value['subject'], "subject {$key}", 'Verify activity subject is correct.');
@@ -522,12 +581,12 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
-   * Function to test getActivities BAO method
+   * Test getActivities BAO method.
    */
-  function testGetActivitiesforContactSummaryWithNoActivities() {
+  public function testGetActivitiesforContactSummaryWithNoActivities() {
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
     $op->execute($this->_dbconn,
-      new PHPUnit_Extensions_Database_DataSet_FlatXMLDataSet(
+      $this->createFlatXMLDataSet(
         dirname(__FILE__) . '/activities_for_dashboard_count.xml'
       )
     );
@@ -546,7 +605,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
 
     //since we are loading activities from dataset, we know total number of activities for this contact
     // This contact does not have any activities
-    $this->assertEquals(0, sizeof($activities), 'In line ' . __LINE__);
+    $this->assertEquals(0, count($activities));
   }
-}
 
+}

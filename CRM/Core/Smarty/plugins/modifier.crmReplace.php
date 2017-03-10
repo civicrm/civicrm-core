@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
  */
@@ -39,20 +39,19 @@
  * no replacement is mentioned the value is inserted at the end of
  * the form element
  *
- * @param string $string    the html to be tweaked with
- * @param string $attribute the attribute to modify
- * @param string $value     the new attribute value
+ * @param string $string
+ *   The html to be tweaked with.
+ * @param string $attribute
+ *   The attribute to modify.
+ * @param string $value
+ *   The new attribute value.
  *
- * @return string        the new modified html string
- * @access public
+ * @return string
+ *   the new modified html string
  */
 function smarty_modifier_crmReplace($string, $attribute, $value) {
-  static $endOfElement = '/>';
-
-  // if we know what attribute we need to replace
   // we need to search and replace the string: $attribute=XXX or $attribute="XXX"
   // with $attribute=\"$value\"
   $pattern = '/' . $attribute . '="([^"]+?)"/';
   return preg_replace($pattern, $attribute . '="' . $value . '"', $string);
 }
-

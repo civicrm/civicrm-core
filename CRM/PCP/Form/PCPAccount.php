@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,55 +23,42 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
  */
 
 /**
- * This class generates form components for processing a ontribution
- *
+ * This class generates form components for processing a contribution.
  */
 class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
 
   /**
-   *Variable defined for Contribution Page Id
-   *
+   * Variable defined for Contribution Page Id.
    */
-
   public $_pageId = NULL;
   public $_id = NULL;
   public $_component = NULL;
 
   /**
-   * are we in single form mode or wizard mode?
+   * Are we in single form mode or wizard mode?
    *
    * @var boolean
-   * @access protected
    */
   public $_single;
 
-  /**
-   * the default values for the form
-   *
-   * @var array
-   * @protected
-   */
-  protected $_defaults;
-
-
   public function preProcess() {
-    $session          = CRM_Core_Session::singleton();
-    $config           = CRM_Core_Config::singleton();
-    $this->_action    = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE);
-    $this->_pageId    = CRM_Utils_Request::retrieve('pageId', 'Positive', $this);
+    $session = CRM_Core_Session::singleton();
+    $config = CRM_Core_Config::singleton();
+    $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE);
+    $this->_pageId = CRM_Utils_Request::retrieve('pageId', 'Positive', $this);
     $this->_component = CRM_Utils_Request::retrieve('component', 'String', $this);
-    $this->_id        = CRM_Utils_Request::retrieve('id', 'Positive', $this);
+    $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
 
     if (!$this->_pageId && $config->userFramework == 'Joomla' && $config->userFrameworkFrontend) {
       $this->_pageId = $this->_id;
@@ -116,7 +103,10 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
     }
   }
 
-  function setDefaultValues() {
+  /**
+   * @return array
+   */
+  public function setDefaultValues() {
     $this->_defaults = array();
     if ($this->_contactID) {
       foreach ($this->_fields as $name => $dontcare) {
@@ -125,7 +115,6 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
 
       CRM_Core_BAO_UFGroup::setProfileDefaults($this->_contactID, $fields, $this->_defaults);
     }
-    $stateCountryMap = array();
     //set custom field defaults
     foreach ($this->_fields as $name => $field) {
       if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($name)) {
@@ -135,29 +124,14 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
           );
         }
       }
-      if ((substr($name, 0, 14) === 'state_province') || (substr($name, 0, 7) === 'country') || (substr($name, 0, 6) === 'county')) {
-        list($fieldName, $index) = CRM_Utils_System::explode('-', $name, 2);
-        if (!array_key_exists($index, $stateCountryMap)) {
-          $stateCountryMap[$index] = array();
-        }
-        $stateCountryMap[$index][$fieldName] = $name;
-      }
-
-      // also take care of state country widget
-      if (!empty($stateCountryMap)) {
-        CRM_Core_BAO_Address::addStateCountryMap($stateCountryMap, $this->_defaults);
-      }
     }
-    // now fix all state country selectors
-    CRM_Core_BAO_Address::fixAllStateSelects($this, $this->_defaults);
     return $this->_defaults;
   }
 
   /**
-   * Function to build the form
+   * Build the form object.
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $id = CRM_PCP_BAO_PCP::getSupporterProfileId($this->_pageId, $this->_component);
@@ -201,7 +175,6 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
       }
     }
 
-
     if ($this->_component == 'contribute') {
       $this->assign('campaignName', CRM_Contribute_PseudoConstant::contributionPage($this->_pageId));
     }
@@ -211,7 +184,8 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
 
     if ($this->_single) {
       $button = array(
-        array('type' => 'next',
+        array(
+          'type' => 'next',
           'name' => ts('Save'),
           'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
           'isDefault' => TRUE,
@@ -225,7 +199,7 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
     else {
       $button[] = array(
         'type' => 'next',
-        'name' => ts('Continue >>'),
+        'name' => ts('Continue'),
         'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
         'isDefault' => TRUE,
       );
@@ -235,17 +209,19 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
   }
 
   /**
-   * global form rule
+   * Global form rule.
    *
-   * @param array $fields  the input form values
-   * @param array $files   the uploaded files if any
-   * @param array $options additional user data
+   * @param array $fields
+   *   The input form values.
+   * @param array $files
+   *   The uploaded files if any.
+   * @param $self
    *
-   * @return true if no errors, else array of errors
-   * @access public
-   * @static
+   *
+   * @return bool|array
+   *   true if no errors, else array of errors
    */
-  static function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files, $self) {
     $errors = array();
     foreach ($fields as $key => $value) {
       if (strpos($key, 'email-') !== FALSE && !empty($value)) {
@@ -259,9 +235,8 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
   }
 
   /**
-   * Function to process the form
+   * Process the form submission.
    *
-   * @access public
    *
    * @return void
    */
@@ -291,6 +266,7 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
     }
 
     $dedupeParams = CRM_Dedupe_Finder::formatParams($params, 'Individual');
+    $dedupeParams['check_permission'] = FALSE;
     $ids = CRM_Dedupe_Finder::dupesByParams($dedupeParams, 'Individual', 'Unsupervised');
     if ($ids) {
       $this->_contactID = $ids['0'];
@@ -304,5 +280,5 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
 
     CRM_Contribute_BAO_Contribution_Utils::createCMSUser($params, $contactID, 'email');
   }
-}
 
+}

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,20 +23,15 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
-
-require_once 'CiviTest/CiviUnitTestCase.php';
+/**
+ * Class CRM_Member_BAO_MembershipTypeTest
+ * @group headless
+ */
 class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
-  function get_info() {
-    return array(
-      'name' => 'MembershipType BAOs',
-      'description' => 'Test all Member_BAO_MembershipType methods.',
-      'group' => 'CiviCRM BAO Tests',
-    );
-  }
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
 
     //create relationship
@@ -58,19 +53,19 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
   /**
    * Tears down the fixture, for example, closes a network connection.
    * This method is called after a test is executed.
-   *
    */
-  function tearDown() {
+  public function tearDown() {
     $this->relationshipTypeDelete($this->_relationshipTypeId);
     $this->membershipStatusDelete($this->_membershipStatusID);
     $this->contactDelete($this->_orgContactID);
     $this->contactDelete($this->_indiviContactID);
   }
 
-  /* check function add()
-     *
-     */
-  function testAdd() {
+  /**
+   * check function add()
+   *
+   */
+  public function testAdd() {
     $ids = array();
     $params = array(
       'name' => 'test type',
@@ -97,10 +92,11 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
     $this->membershipTypeDelete(array('id' => $membershipType->id));
   }
 
-  /* check function retrive()
-     *
-     */
-  function testRetrieve() {
+  /**
+   * check function retrive()
+   *
+   */
+  public function testRetrieve() {
     $ids = array();
     $params = array(
       'name' => 'General',
@@ -117,17 +113,18 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
     );
     $membershipType = CRM_Member_BAO_MembershipType::add($params, $ids);
 
-    $params  = array('name' => 'General');
+    $params = array('name' => 'General');
     $default = array();
-    $result  = CRM_Member_BAO_MembershipType::retrieve($params, $default);
+    $result = CRM_Member_BAO_MembershipType::retrieve($params, $default);
     $this->assertEquals($result->name, 'General', 'Verify membership type name.');
     $this->membershipTypeDelete(array('id' => $membershipType->id));
   }
 
-  /* check function isActive()
-     *
-     */
-  function testSetIsActive() {
+  /**
+   * check function isActive()
+   *
+   */
+  public function testSetIsActive() {
     $ids = array();
     $params = array(
       'name' => 'General',
@@ -156,10 +153,11 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
     $this->membershipTypeDelete(array('id' => $membership->id));
   }
 
-  /* check function del()
-     *
-     */
-  function testdel() {
+  /**
+   * check function del()
+   *
+   */
+  public function testdel() {
     $ids = array();
     $params = array(
       'name' => 'General',
@@ -182,10 +180,11 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
     $this->assertEquals($result, TRUE, 'Verify membership deleted.');
   }
 
-  /* check function convertDayFormat( )
-     *
-     */
-  function testConvertDayFormat() {
+  /**
+   * check function convertDayFormat( )
+   *
+   */
+  public function testConvertDayFormat() {
     $ids = array();
     $params = array(
       'name' => 'General',
@@ -212,10 +211,11 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
     $this->membershipTypeDelete(array('id' => $membership->id));
   }
 
-  /* check function getMembershipTypes( )
-     *
-     */
-  function testGetMembershipTypes() {
+  /**
+   * check function getMembershipTypes( )
+   *
+   */
+  public function testGetMembershipTypes() {
     $ids = array();
     $params = array(
       'name' => 'General',
@@ -237,10 +237,11 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
     $this->membershipTypeDelete(array('id' => $membership->id));
   }
 
-  /* check function getMembershipTypeDetails( )
-     *
-     */
-  function testGetMembershipTypeDetails() {
+  /**
+   * check function getMembershipTypeDetails( )
+   *
+   */
+  public function testGetMembershipTypeDetails() {
     $ids = array();
     $params = array(
       'name' => 'General',
@@ -264,10 +265,11 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
     $this->membershipTypeDelete(array('id' => $membership->id));
   }
 
-  /* check function getDatesForMembershipType( )
-     *
-     */
-  function testGetDatesForMembershipType() {
+  /**
+   * check function getDatesForMembershipType( )
+   *
+   */
+  public function testGetDatesForMembershipType() {
     $ids = array();
     $params = array(
       'name' => 'General',
@@ -290,10 +292,11 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
     $this->membershipTypeDelete(array('id' => $membership->id));
   }
 
-  /* check function getRenewalDatesForMembershipType( )
-     *
-     */
-  function testGetRenewalDatesForMembershipType() {
+  /**
+   * check function getRenewalDatesForMembershipType( )
+   *
+   */
+  public function testGetRenewalDatesForMembershipType() {
     $ids = array();
     $params = array(
       'name' => 'General',
@@ -333,10 +336,11 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
     $this->membershipTypeDelete(array('id' => $membershipType->id));
   }
 
-  /* check function getMembershipTypesByOrg( )
-     *
-     */
-  function testGetMembershipTypesByOrg() {
+  /**
+   * check function getMembershipTypesByOrg( )
+   *
+   */
+  public function testGetMembershipTypesByOrg() {
     $ids = array();
     $params = array(
       'name' => 'General',
@@ -362,5 +366,5 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
 
     $this->membershipTypeDelete(array('id' => $membershipType->id));
   }
-}
 
+}

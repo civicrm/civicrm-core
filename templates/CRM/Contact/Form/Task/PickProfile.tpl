@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,14 +23,14 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-{*Batch update for contact via profile*}
+{*Update multiple contacts*}
 <div class="crm-block crm-form-block crm-contact-task-pickprofile-form-block">
  <table class="form-layout-compressed">
     <tr class="crm-contact-task-pickprofile-form-block-uf_group_id">
        <td class="label">{$form.uf_group_id.label}</td>
        <td>{$form.uf_group_id.html}</td>
     </tr>
-    <tr> 
+    <tr>
         <td class="label"></td>
         <td>
             {include file="CRM/Contact/Form/Task.tpl"}

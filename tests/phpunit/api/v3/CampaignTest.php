@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
-| CiviCRM version 4.4                                                |
+| CiviCRM version 4.7                                                |
 +--------------------------------------------------------------------+
-| Copyright CiviCRM LLC (c) 2004-2013                                |
+| Copyright CiviCRM LLC (c) 2004-2017                                |
 +--------------------------------------------------------------------+
 | This file is a part of CiviCRM.                                    |
 |                                                                    |
@@ -23,10 +23,12 @@
 | GNU Affero General Public License or the licensing of CiviCRM,     |
 | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
 +--------------------------------------------------------------------+
-*/
+ */
 
-
-require_once 'CiviTest/CiviUnitTestCase.php';
+/**
+ * Class api_v3_CampaignTest
+ * @group headless
+ */
 class api_v3_CampaignTest extends CiviUnitTestCase {
   protected $_apiversion;
   protected $params;
@@ -34,7 +36,7 @@ class api_v3_CampaignTest extends CiviUnitTestCase {
 
   public $DBResetRequired = FALSE;
 
-  function setUp() {
+  public function setUp() {
     $this->_apiversion = 3;
     $this->params = array(
       'title' => "campaign title",
@@ -42,32 +44,33 @@ class api_v3_CampaignTest extends CiviUnitTestCase {
       'created_date' => 'first sat of July 2008',
     );
     parent::setUp();
+    $this->useTransaction(TRUE);
   }
 
-  function tearDown() {}
-
   public function testCreateCampaign() {
-    $description = "Create a campaign - Note use of relative dates here http://www.php.net/manual/en/datetime.formats.relative.php";
+    $description = "Create a campaign - Note use of relative dates here:
+      @link http://www.php.net/manual/en/datetime.formats.relative.php.";
     $result = $this->callAPIAndDocument('campaign', 'create', $this->params, __FUNCTION__, __FILE__, $description);
-    $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
-    $this->assertNotNull($result['values'][$result['id']]['id'], 'In line ' . __LINE__);
+    $this->assertEquals(1, $result['count']);
+    $this->assertNotNull($result['values'][$result['id']]['id']);
     $this->getAndCheck(array_merge($this->params, array('created_date' => '2008-07-05 00:00:00')), $result['id'], 'campaign', TRUE);
   }
 
   public function testGetCampaign() {
     $result = $this->callAPISuccess('campaign', 'create', $this->params);
     $result = $this->callAPIAndDocument('campaign', 'get', $this->params, __FUNCTION__, __FILE__);
-    $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
-    $this->assertNotNull($result['values'][$result['id']]['id'], 'In line ' . __LINE__);
+    $this->assertEquals(1, $result['count']);
+    $this->assertNotNull($result['values'][$result['id']]['id']);
   }
 
   public function testDeleteCampaign() {
+    $this->callAPISuccess('campaign', 'create', $this->params);
     $entity = $this->callAPISuccess('campaign', 'get', ($this->params));
     $delete = array('id' => $entity['id']);
     $result = $this->callAPIAndDocument('campaign', 'delete', $delete, __FUNCTION__, __FILE__);
 
     $checkDeleted = $this->callAPISuccess('campaign', 'get', array());
-    $this->assertEquals(0, $checkDeleted['count'], 'In line ' . __LINE__);
+    $this->assertEquals(0, $checkDeleted['count']);
   }
-}
 
+}

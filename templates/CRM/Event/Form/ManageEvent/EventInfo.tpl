@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -26,9 +26,6 @@
 {* Step 1 of New Event Wizard, and Edit Event Info form. *}
 
 <div class="crm-block crm-form-block crm-event-manage-eventinfo-form-block">
-{if $cdType}
-  {include file="CRM/Custom/Form/CustomData.tpl"}
-{else}
   {assign var=eventID value=$id}
         <div class="crm-submit-buttons">
         {include file="CRM/common/formButtons.tpl" location="top"}
@@ -75,7 +72,7 @@
       <td>{$form.summary.html}</td>
     </tr>
     <tr class="crm-event-manage-eventinfo-form-block-description">
-      <td class="label">{$form.description.label}</td>
+      <td class="label">{$form.description.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='description' id=$eventID}{/if}</td>
       <td>{$form.description.html}</td>
     </tr>
     {if !$isTemplate}
@@ -90,7 +87,12 @@
     {/if}
     <tr class="crm-event-manage-eventinfo-form-block-max_participants">
       <td class="label">{$form.max_participants.label} {help id="id-max_participants" waitlist=$waitlist}</td>
-      <td>{$form.max_participants.html|crmAddClass:four}</td>
+      <td>
+        {$form.max_participants.html|crmAddClass:four}
+        {if call_user_func(array('CRM_Core_Permission','check'), 'administer CiviCRM') }
+          <a class="crm-popup crm-hover-button" target="_blank" title="{ts}Edit Participant Status Options{/ts}" href="{crmURL p='civicrm/admin/participant_status' q='reset=1'}"><i class="crm-i fa-wrench"></i></a>
+        {/if}
+      </td>
     </tr>
     <tr id="id-waitlist" class="crm-event-manage-eventinfo-form-block-has_waitlist">
       {if $waitlist}
@@ -115,7 +117,7 @@
     </tr>
     <tr class="crm-event-manage-eventinfo-form-block-is_public">
       <td>&nbsp;</td>
-      <td>{$form.is_public.html} {$form.is_public.label}{help id="id-is_public"}</td>
+      <td>{$form.is_public.html} {$form.is_public.label} {help id="id-is_public"}</td>
     </tr>
     <tr class="crm-event-manage-eventinfo-form-block-is_share">
       <td>&nbsp;</td>
@@ -149,7 +151,7 @@
   {include file="CRM/common/customData.tpl"}
   {literal}
     <script type="text/javascript">
-      cj(document).ready(function() {
+      CRM.$(function($) {
         {/literal}
         {if $customDataSubType}
           CRM.buildCustomData( '{$customDataType}', {$customDataSubType} );
@@ -165,21 +167,17 @@
         </div>
     {include file="CRM/common/showHide.tpl" elemType="table-row"}
 
-    {* include jscript to warn if unsaved form field changes *}
-    {include file="CRM/common/formNavigate.tpl"}
-
     {include file="CRM/Form/validate.tpl"}
-{/if}
 </div>
 {literal}
 <script type="text/javascript">
-  cj(function($) {
-    $('#template_id', '#EventInfo').change(function() {
-      $('#crm-main-content-wrapper')
+  CRM.$(function($) {
+    var $form = $('form.{/literal}{$form.formClass}{literal}');
+    $('#template_id', $form).change(function() {
+      $(this).closest('.crm-ajax-container, #crm-main-content-wrapper')
         .crmSnippet({url: CRM.url('civicrm/event/add', {action: 'add', reset: 1, template_id: $(this).val()})})
         .crmSnippet('refresh');
     })
   });
 </script>
 {/literal}
-

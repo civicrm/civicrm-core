@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,22 +23,27 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Case_XMLProcessor_Settings extends CRM_Case_XMLProcessor {
 
   private $_settings = array();
 
-  // Input: The base filename without the .xml extension
-  // Output: An array of settings.
-  function run($filename = 'settings') {
+  /**
+   * Run.
+   *
+   * @param string $filename
+   *   The base filename without the .xml extension
+   *
+   * @return array
+   *   An array of settings.
+   */
+  public function run($filename = 'settings') {
     $xml = $this->retrieve($filename);
 
     // For now it's not an error. In the future it might be a required file.
@@ -55,5 +60,5 @@ class CRM_Case_XMLProcessor_Settings extends CRM_Case_XMLProcessor {
     }
     return $this->_settings;
   }
-}
 
+}

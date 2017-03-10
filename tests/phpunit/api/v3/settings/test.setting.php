@@ -9,7 +9,7 @@ return array(
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => 'Test Key',
-    'title' =>  'Test Key',
+    'title' => 'Test Key',
     'help_text' => '',
     'html_type' => 'Text',
     'quick_form_type' => 'Element',
@@ -59,4 +59,4 @@ return array(
     'html_type' => 'Text',
     'quick_form_type' => 'Element',
   ),
- );
+);

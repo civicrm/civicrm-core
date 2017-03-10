@@ -1,9 +1,9 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.4                                                |
+  | CiviCRM version 4.7                                                |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2013                                |
+  | Copyright CiviCRM LLC (c) 2004-2017                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -23,14 +23,12 @@
   | GNU Affero General Public License or the licensing of CiviCRM,     |
   | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
   +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -40,33 +38,33 @@
 class CRM_Utils_Geocode_Yahoo {
 
   /**
-   * server to retrieve the lat/long
+   * Server to retrieve the lat/long
    *
    * @var string
-   * @static
    */
   static protected $_server = 'query.yahooapis.com';
 
   /**
-   * uri of service
+   * Uri of service.
    *
    * @var string
-   * @static
    */
   static protected $_uri = '/v1/public/yql';
 
   /**
-   * function that takes an address array and gets the latitude / longitude
+   * Function that takes an address array and gets the latitude / longitude
    * and postal code for this address. Note that at a later stage, we could
    * make this function also clean up the address into a more valid format
    *
-   * @param array $values associative array of address data: country, street_address, city, state_province, postal code
-   * @param boolean $stateName this parameter currently has no function
+   * @param array $values
+   *   Associative array of address data: country, street_address, city, state_province, postal code.
+   * @param bool $stateName
+   *   This parameter currently has no function.
    *
-   * @return boolean true if we modified the address, false otherwise
-   * @static
+   * @return bool
+   *   true if we modified the address, false otherwise
    */
-  static function format(&$values, $stateName = FALSE) {
+  public static function format(&$values, $stateName = FALSE) {
     CRM_Utils_System::checkPHPVersion(5, TRUE);
 
     $config = CRM_Core_Config::singleton();
@@ -81,7 +79,7 @@ class CRM_Utils_Geocode_Yahoo {
       $whereComponents['city'] = $city;
     }
 
-    if (!empty($values['state_province'])) {
+    if (!empty($values['state_province']) || !empty($values['state_province_id'])) {
       if (!empty($values['state_province_id'])) {
         $stateProvince = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_StateProvince', $values['state_province_id']);
       }
@@ -118,7 +116,7 @@ class CRM_Utils_Geocode_Yahoo {
 
     $add = 'q=' . urlencode('select * from geo.placefinder where ');
 
-    $add .= join(urlencode(' and '), $whereComponents);
+    $add .= implode(urlencode(' and '), $whereComponents);
 
     $add .= "&appid=" . urlencode($config->mapAPIKey);
 
@@ -130,6 +128,7 @@ class CRM_Utils_Geocode_Yahoo {
     $string = $request->getResponseBody();
     // see CRM-11359 for why we suppress errors with @
     $xml = @simplexml_load_string($string);
+    CRM_Utils_Hook::geocoderFormat('Yahoo', $values, $xml);
 
     if ($xml === FALSE) {
       // account blocked maybe?
@@ -157,7 +156,7 @@ class CRM_Utils_Geocode_Yahoo {
       $values['geo_code_1'] = $ret['latitude'];
       $values['geo_code_2'] = $ret['longitude'];
 
-      if ($ret['postal']) {
+      if (!empty($ret['postal'])) {
         $current_pc = CRM_Utils_Array::value('postal_code', $values);
         $skip_postal = FALSE;
 
@@ -172,7 +171,7 @@ class CRM_Utils_Geocode_Yahoo {
             if (CRM_Utils_System::isUserLoggedIn()) {
               $msg = ts('The Yahoo Geocoding system returned a different postal code (%1) than the one you entered (%2). If you want the Yahoo value, please delete the current postal code and save again.', array(
                 1 => $ret['postal'],
-                2 => $current_pc_suffix ? "$current_pc-$current_pc_suffix" : $current_pc
+                2 => $current_pc_suffix ? "$current_pc-$current_pc_suffix" : $current_pc,
               ));
 
               CRM_Core_Session::setStatus($msg, ts('Postal Code Mismatch'), 'error');
@@ -185,11 +184,11 @@ class CRM_Utils_Geocode_Yahoo {
           $values['postal_code'] = $ret['postal'];
 
           /* the following logic to split the string was borrowed from
-             CRM/Core/BAO/Address.php -- CRM_Core_BAO_Address::fixAddress.
-             This is actually the function that calls the geocoding
-             script to begin with, but the postal code business takes
-             place before geocoding gets called.
-          */
+          CRM/Core/BAO/Address.php -- CRM_Core_BAO_Address::fixAddress.
+          This is actually the function that calls the geocoding
+          script to begin with, but the postal code business takes
+          place before geocoding gets called.
+           */
 
           if (preg_match('/^(\d{4,5})[+-](\d{4})$/',
             $ret['postal'],
@@ -208,4 +207,5 @@ class CRM_Utils_Geocode_Yahoo {
     $values['geo_code_1'] = $values['geo_code_2'] = 'null';
     return FALSE;
   }
+
 }

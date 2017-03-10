@@ -7,6 +7,7 @@
   <add>3.3</add>
   <field>
     <name>id</name>
+    <title>Price Field Value ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Price Field Value</comment>
@@ -18,6 +19,7 @@
   </primaryKey>
   <field>
     <name>price_field_id</name>
+    <title>Price Field</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>FK to civicrm_price_field</comment>
@@ -49,7 +51,7 @@
     <comment>Price field option label</comment>
     <html>
       <type>Text</type>
-    </html>    
+    </html>
     <add>3.3</add>
   </field>
   <field>
@@ -58,12 +60,38 @@
     <html>
       <type>TextArea</type>
       <rows>2</rows>
-    <cols>60</cols>
+      <cols>60</cols>
     </html>
-    <default>NULL</default>    
+    <default>NULL</default>
     <localizable>true</localizable>
     <comment>>Price field option description.</comment>
     <add>3.3</add>
+  </field>
+  <field>
+    <name>help_pre</name>
+    <type>text</type>
+    <html>
+      <type>TextArea</type>
+      <rows>2</rows>
+      <cols>60</cols>
+    </html>
+    <default>NULL</default>
+    <localizable>true</localizable>
+    <comment>Price field option pre help text.</comment>
+    <add>4.7</add>
+  </field>
+  <field>
+    <name>help_post</name>
+    <type>text</type>
+    <html>
+      <type>TextArea</type>
+      <rows>2</rows>
+      <cols>60</cols>
+    </html>
+    <default>NULL</default>
+    <localizable>true</localizable>
+    <comment>Price field option post field help.</comment>
+    <add>4.7</add>
   </field>
   <field>
     <name>amount</name>
@@ -72,7 +100,7 @@
     <length>512</length>
     <html>
       <type>Text</type>
-      <size>EIGHT</size>
+      <size>8</size>
     </html>
     <required>true</required>
     <comment>Price field option amount</comment>
@@ -100,6 +128,7 @@
   </field>
   <field>
     <name>weight</name>
+    <title>Order</title>
     <type>int</type>
     <default>1</default>
     <comment>Order in which the field options should appear</comment>
@@ -110,6 +139,7 @@
   </field>
   <field>
     <name>membership_type_id</name>
+    <title>Membership Type</title>
     <type>int unsigned</type>
     <default>NULL</default>
     <comment>FK to Membership Type</comment>
@@ -137,6 +167,7 @@
   </field>
   <field>
     <name>is_default</name>
+    <title>Is Default Price Field Option?</title>
     <type>boolean</type>
     <comment>Is this default price field option</comment>
     <default>0</default>
@@ -147,6 +178,7 @@
   </field>
   <field>
     <name>is_active</name>
+    <title>Price Field Value is Active</title>
     <type>boolean</type>
     <comment>Is this price field value active</comment>
     <default>1</default>
@@ -157,6 +189,11 @@
     <title>Financial Type</title>
     <type>int unsigned</type>
     <default>NULL</default>
+    <pseudoconstant>
+      <table>civicrm_financial_type</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+    </pseudoconstant>
     <comment>FK to Financial Type.</comment>
     <add>4.3</add>
     <html>
@@ -171,15 +208,15 @@
     <add>4.3</add>
   </foreignKey>
   <field>
-    <name>deductible_amount</name>
-    <title>Deductible Amount</title>
+    <name>non_deductible_amount</name>
+    <title>Non-deductible Amount</title>
     <type>decimal</type>
     <default>0.0</default>
-    <headerPattern>/unit?.?amoun/i</headerPattern>
+    <headerPattern>/non?.?deduct/i</headerPattern>
     <dataPattern>/^\d+(\.\d{2})?$/</dataPattern>
     <required>true</required>
-    <comment>Tax-deductible portion of the amount</comment>
-    <add>4.1</add>
+    <comment>Portion of total amount which is NOT tax deductible.</comment>
+    <add>4.7</add>
     <html>
       <type>Text</type>
     </html>

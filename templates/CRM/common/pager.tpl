@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -48,8 +48,8 @@
     {* Controller for 'Rows Per Page' *}
     {if $location eq 'bottom' and $pager->_totalItems > 25}
      <div class="form-item float-right">
-       <label for="{$form.formName}-rows-per-page-select">{ts}Rows per page:{/ts}</label> &nbsp;
-       <input class="crm-rows-per-page-select" id="{$form.formName}-rows-per-page-select" type="text" size="3" value="{$pager->_perPage}"/>
+       <label for="{$form.formClass}-rows-per-page-select">{ts}Rows per page:{/ts}</label> &nbsp;
+       <input class="crm-rows-per-page-select" id="{$form.formClass}-rows-per-page-select" type="text" size="3" value="{$pager->_perPage}"/>
      </div>
      <div class="clear"></div>
     {/if}
@@ -57,10 +57,10 @@
     {if $location neq 'top'}
       <script type="text/javascript">
         {literal}
-        cj(function($) {
+        CRM.$(function($) {
           {/literal}
           var
-            $form = $('#{$form.formName}'),
+            $form = $({if empty($form.formClass)}'#crm-main-content-wrapper'{else}'form.{$form.formClass}'{/if}),
             numPages = {$pager->_response.numPages},
             currentPage = {$pager->_response.currentPage},
             perPageCount = {$pager->_perPage},
@@ -72,7 +72,7 @@
             if (!refreshing) {
               refreshing = true;
               var options = url ? {url: url} : {};
-              $form.off().closest('.crm-ajax-container, #crm-main-content-wrapper').crmSnippet(options).crmSnippet('refresh');
+              $form.off('.crm-pager').closest('.crm-ajax-container, #crm-main-content-wrapper').crmSnippet(options).crmSnippet('refresh');
             }
           }
           function page(num) {
@@ -115,7 +115,7 @@
             })
             .on('keyup keydown keypress', preventSubmit);
           $form
-            .on('click', 'a.ui-spinner-button', function(e) {
+            .on('click.crm-pager', 'a.ui-spinner-button', function(e) {
               var $el = $(this);
               // Update after a short delay to allow multiple clicks
               spinning !== null && window.clearTimeout(spinning);
@@ -127,9 +127,10 @@
                 }
               }, 200);
             })
-            .on('click', 'a.crm-pager-link, #alpha-filter a', function() {
+            // Handle sorting, paging and alpha filtering links
+            .on('click.crm-pager', 'a.crm-pager-link, #alpha-filter a, th a.sorting, th a.sorting_desc, th a.sorting_asc', function(e) {
               refresh($(this).attr('href'));
-              return false;
+              e.preventDefault();
             });
         });
         {/literal}

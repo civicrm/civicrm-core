@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,19 +23,16 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
- * This class generates form components for Location Type
- *
+ * This class generates form components for Location Type.
  */
 class CRM_Mailing_Form_Component extends CRM_Core_Form {
 
@@ -47,30 +44,30 @@ class CRM_Mailing_Form_Component extends CRM_Core_Form {
   protected $_id;
 
   /**
-   * The name of the BAO object for this form
+   * The name of the BAO object for this form.
    *
    * @var string
    */
   protected $_BAOName;
 
-  function preProcess() {
+  public function preProcess() {
     $this->_id = $this->get('id');
     $this->_BAOName = $this->get('BAOName');
   }
 
   /**
-   * Function to build the form
-   *
-   * @return void
-   * @access public
+   * Build the form object.
    */
   public function buildQuickForm() {
-    $this->applyFilter('__ALL__', 'trim');
+    $this->applyFilter(array('name', 'subject', 'body_html'), 'trim');
 
     $this->add('text', 'name', ts('Name'),
       CRM_Core_DAO::getAttribute('CRM_Mailing_DAO_Component', 'name'), TRUE
     );
-    $this->addRule('name', ts('Name already exists in Database.'), 'objectExists', array('CRM_Mailing_DAO_Component', $this->_id));
+    $this->addRule('name', ts('Name already exists in Database.'), 'objectExists', array(
+        'CRM_Mailing_DAO_Component',
+        $this->_id,
+      ));
 
     $this->add('select', 'component_type', ts('Component Type'), CRM_Core_SelectValues::mailingComponents());
 
@@ -79,16 +76,16 @@ class CRM_Mailing_Form_Component extends CRM_Core_Form {
       TRUE
     );
     $this->add('textarea', 'body_text', ts('Body - TEXT Format'),
-      CRM_Core_DAO::getAttribute('CRM_Mailing_DAO_Component', 'body_text'),
-      TRUE
+      CRM_Core_DAO::getAttribute('CRM_Mailing_DAO_Component', 'body_text')
     );
     $this->add('textarea', 'body_html', ts('Body - HTML Format'),
       CRM_Core_DAO::getAttribute('CRM_Mailing_DAO_Component', 'body_html')
     );
 
-    $this->add('checkbox', 'is_default', ts('Default?'));
-    $this->add('checkbox', 'is_active', ts('Enabled?'));
+    $this->addYesNo('is_default', ts('Default?'));
+    $this->addYesNo('is_active', ts('Enabled?'));
 
+    $this->addFormRule(array('CRM_Mailing_Form_Component', 'formRule'));
     $this->addFormRule(array('CRM_Mailing_Form_Component', 'dataRule'));
 
     $this->addButtons(array(
@@ -106,13 +103,9 @@ class CRM_Mailing_Form_Component extends CRM_Core_Form {
   }
 
   /**
-   * This function sets the default values for the form.
-   *
-   * @access public
-   *
-   * @return void
+   * Set default values for the form.
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
     $params = array();
 
@@ -121,42 +114,45 @@ class CRM_Mailing_Form_Component extends CRM_Core_Form {
       $baoName = $this->_BAOName;
       $baoName::retrieve($params, $defaults);
     }
-    $defaults['is_active'] = 1;
+    else {
+      $defaults['is_active'] = 1;
+    }
 
     return $defaults;
   }
 
   /**
-   * Function to process the form
-   *
-   * @access public
-   *
-   * @return void
+   * Process the form submission.
    */
   public function postProcess() {
     // store the submitted values in an array
     $params = $this->controller->exportValues($this->_name);
 
-    $ids = array();
-
     if ($this->_action & CRM_Core_Action::UPDATE) {
-      $ids['id'] = $this->_id;
+      $params['id'] = $this->_id;
     }
 
-    CRM_Mailing_BAO_Component::add($params, $ids);
+    $component = CRM_Mailing_BAO_Component::add($params);
+    CRM_Core_Session::setStatus(ts('The mailing component \'%1\' has been saved.', array(
+        1 => $component->name,
+      )
+    ), ts('Saved'), 'success');
+
   }
-  //end of function
 
   /**
-   * Function for validation
+   * Validation.
    *
-   * @param array $params (ref.) an assoc array of name/value pairs
+   * @param array $params
+   *   (ref.) an assoc array of name/value pairs.
    *
-   * @return mixed true or array of errors
-   * @access public
-   * @static
+   * @param $files
+   * @param $options
+   *
+   * @return bool|array
+   *   mixed true or array of errors
    */
-  static function dataRule($params, $files, $options) {
+  public static function dataRule($params, $files, $options) {
     if ($params['component_type'] == 'Header' || $params['component_type'] == 'Footer') {
       $InvalidTokens = array();
     }
@@ -165,23 +161,47 @@ class CRM_Mailing_Form_Component extends CRM_Core_Form {
     }
     $errors = array();
     foreach (array(
-      'text', 'html') as $type) {
+               'text',
+               'html',
+             ) as $type) {
       $dataErrors = array();
       foreach ($InvalidTokens as $token => $desc) {
         if ($params['body_' . $type]) {
           if (preg_match('/' . preg_quote('{' . $token . '}') . '/', $params['body_' . $type])) {
             $dataErrors[] = '<li>' . ts('This message is having a invalid token - %1: %2', array(
-              1 => $token, 2 => $desc)) . '</li>';
+                1 => $token,
+                2 => $desc,
+              )) . '</li>';
           }
         }
       }
       if (!empty($dataErrors)) {
         $errors['body_' . $type] = ts('The following errors were detected in %1 message:', array(
-          1 => $type)) . '<ul>' . implode('', $dataErrors) . '</ul><br /><a href="' . CRM_Utils_System::docURL2('Tokens', TRUE, NULL, NULL, NULL, "wiki") . '">' . ts('More information on tokens...') . '</a>';
+            1 => $type,
+          )) . '<ul>' . implode('', $dataErrors) . '</ul><br /><a href="' . CRM_Utils_System::docURL2('Tokens', TRUE, NULL, NULL, NULL, "wiki") . '">' . ts('More information on tokens...') . '</a>';
       }
     }
-
     return empty($errors) ? TRUE : $errors;
   }
-}
 
+  /**
+   * Validates that either body text or body html is required.
+   * @param array $params
+   *   (ref.) an assoc array of name/value pairs.
+   *
+   * @param $files
+   * @param $options
+   *
+   * @return bool|array
+   *   mixed true or array of errors
+   */
+  public static function formRule($params, $files, $options) {
+    $errors = array();
+    if (empty($params['body_text']) && empty($params['body_html'])) {
+      $errors['body_text'] = ts("Please provide either HTML or TEXT format for the Body.");
+      $errors['body_html'] = ts("Please provide either HTML or TEXT format for the Body.");
+    }
+    return empty($errors) ? TRUE : $errors;
+  }
+
+}

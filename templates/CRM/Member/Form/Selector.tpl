@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 {/if}
 
 {strip}
-<table class="selector">
+<table class="selector row-highlight">
 <thead class="sticky">
 {if ! $single and $context eq 'Search' }
   <th scope="col" title="Select Rows">{$form.toggleSelect.html}</th>

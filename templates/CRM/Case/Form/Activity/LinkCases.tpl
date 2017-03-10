@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,7 +23,7 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-{* Template for to create a link between two cases. *}{debug}
+{* Template for to create a link between two cases. *}
    <div class="crm-block crm-form-block crm-case-linkcases-form-block">
     <tr class="crm-case-linkcases-form-block-link_to_case_id">
       <td class="label">{$form.link_to_case_id.label}</td>
@@ -32,27 +32,15 @@
 
 {literal}
 <script type="text/javascript">
-  cj(function($) {
-    var $form = $("#{/literal}{$form.formName}{literal}");
-    $('input[name=link_to_case_id]', $form).select2({
-      placeholder: {/literal}'{ts escape="js"}- select case -{/ts}'{literal},
-      minimumInputLength: 1,
-      ajax: {
-        url: {/literal}"{crmURL p='civicrm/case/ajax/unclosed' h=0}"{literal},
-        data: function(term) {
-          return {term: term, excludeCaseIds: "{/literal}{$excludeCaseIds}{literal}"};
-        },
-        results: function(response) {
-          return {results: response};
-        }
-      }
-    }).change(function() {
+  CRM.$(function($) {
+    var $form = $("form.{/literal}{$form.formClass}{literal}");
+    $('input[name=link_to_case_id]', $form).change(function() {
       if ($(this).val()) {
         var info = $(this).select2('data').extra;
         {/literal}{* Mix in variables and placeholders for clientside substitution *}
-        var subject = "{ts escape=js 1="%1" 2="%2" 3="%3" 4=$client.sort_name 5=$caseTypeLabel 6=$caseId}Create link between %1 - %2 (CaseID: %3) and %4 - %5 (CaseID: %6){/ts}";
+        var subject = "{ts escape=js 1="%1" 2="%2" 3="%3" 4=$sortName 5=$caseTypeLabel 6=$caseID}Create link between %1 - %2 (CaseID: %3) and %4 - %5 (CaseID: %6){/ts}";
         {literal}
-        $('#subject', $form).val(ts(subject, {1: info.sort_name, 2: info.case_type, 3: $(this).val()}));
+        $('#subject', $form).val(ts(subject, {1: info['contact_id.sort_name'], 2: info['case_id.case_type_id.title'], 3: $(this).val()}));
       }
     });
   });

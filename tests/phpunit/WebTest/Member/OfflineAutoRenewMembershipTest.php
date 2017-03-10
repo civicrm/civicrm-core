@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,16 +22,20 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Member_OfflineAutoRenewMembershipTest
+ */
 class WebTest_Member_OfflineAutoRenewMembershipTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
     parent::setUp();
   }
 
-  function testOfflineAutoRenewMembership() {
+  public function testOfflineAutoRenewMembership() {
     $this->webtestLogin();
 
     // We need a payment processor
@@ -39,10 +43,10 @@ class WebTest_Member_OfflineAutoRenewMembershipTest extends CiviSeleniumTestCase
     $this->webtestAddPaymentProcessor($processorName, 'AuthNet');
 
     // Create a membership type to use for this test
-    $periodType        = 'rolling';
+    $periodType = 'rolling';
     $duration_interval = 1;
-    $duration_unit     = 'year';
-    $auto_renew        = "optional";
+    $duration_unit = 'year';
+    $auto_renew = "optional";
 
     $memTypeParams = $this->webtestAddMembershipType($periodType, $duration_interval, $duration_unit, $auto_renew);
 
@@ -54,13 +58,12 @@ class WebTest_Member_OfflineAutoRenewMembershipTest extends CiviSeleniumTestCase
 
     $this->click('css=li#tab_member a');
 
-    $this->waitForElementPresent('link=Submit Credit Card Membership');
-    $this->click('link=Submit Credit Card Membership');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent('link=Add Membership');
 
     // since we don't have live credentials we will switch to test mode
-    $url = $this->getLocation();
-    $url = str_replace('mode=live', 'mode=test', $url);
+    $this->waitForElementPresent("xpath=//div[@class='view-content']//div[@class='action-link']/a[1]");
+    $url = $this->getAttribute("xpath=//a[contains(text(), 'Add Membership')]@href");
+    $url .= '&mode=test';
     $this->open($url);
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
@@ -69,6 +72,7 @@ class WebTest_Member_OfflineAutoRenewMembershipTest extends CiviSeleniumTestCase
     $this->select("payment_processor_id", "label={$processorName}");
 
     // fill in Membership Organization and Type
+    $this->waitForElementPresent('membership_type_id[0]');
     $this->select("membership_type_id[0]", "label={$memTypeParams['member_of_contact']}");
     // Wait for membership type select to reload
     $this->waitForTextPresent($memTypeParams['membership_type']);
@@ -79,30 +83,19 @@ class WebTest_Member_OfflineAutoRenewMembershipTest extends CiviSeleniumTestCase
 
     $this->waitForElementPresent('auto_renew');
     $this->click("auto_renew");
-
     $this->webtestAddCreditCardDetails();
 
-    // since country is not pre-selected for offline mode
-    $this->select("billing_country_id-5", "label=United States");
-    //wait for states to populate the select box
-    // Because it tends to cause problems, all uses of sleep() must be justified in comments
-    // Sleep should never be used for wait for anything to load from the server
-    // Justification for this instance: FIXME
-    sleep(2);
-    $this->click('billing_state_province_id-5');
     $this->webtestAddBillingDetails($firstName, NULL, $lastName);
 
-    $this->click("_qf_Membership_upload-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("_qf_Membership_upload-bottom");
 
     // Use Find Members to make sure membership exists
     $this->openCiviPage("member/search", "reset=1", "member_end_date_high");
 
-    $this->type("sort_name", "$firstName $lastName");
+    $this->type("sort_name", "$lastName, $firstName");
     $this->click("member_test");
     $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='memberSearch']/table/tbody/tr[1]/td[11]/span/a[text()='View']");
-    $this->click("xpath=//div[@id='memberSearch']/table/tbody/tr[1]/td[11]/span/a[text()='View']");
-    $this->waitForElementPresent("_qf_MembershipView_cancel-bottom");
+    $this->clickAjaxLink("xpath=//div[@id='memberSearch']/table/tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_MembershipView_cancel-bottom");
 
     // View Membership Record
     $verifyData = array(
@@ -117,7 +110,40 @@ class WebTest_Member_OfflineAutoRenewMembershipTest extends CiviSeleniumTestCase
         preg_quote($value)
       );
     }
-    $this->waitForElementPresent("_qf_MembershipView_cancel-bottom");
   }
-}
 
+  /**
+   * CRM-18050: create price set with auto-renewing memberships.
+   */
+  public function testCreatePriceSetWithAutoRenewMembershipType() {
+    $this->webtestLogin();
+
+    // Create a membership type to use for this test
+    $periodType = 'rolling';
+    $duration_interval = 1;
+    $duration_unit = 'year';
+    $auto_renew = "required";
+    $priceSetTitle = 'Membership PriceSet' . substr(sha1(rand()), 0, 7);
+    $memTypeParams = $this->webtestAddMembershipType($periodType, $duration_interval, $duration_unit, $auto_renew);
+
+    // Create a price set with membership type.
+    $this->openCiviPage("admin/price", "reset=1&action=add", '_qf_Set_cancel-bottom');
+    $this->type('title', $priceSetTitle);
+    $this->click("xpath=//table[@class='form-layout']/tbody//tr/td[2]/label[text()='Membership']");
+    $this->select('financial_type_id', "value=2");
+    $this->click("_qf_Set_next-bottom");
+    $this->waitForAjaxContent();
+    $this->waitForElementPresent('is_active');
+    $fieldLablel = 'Field Label' . substr(sha1(rand()), 0, 7);
+    $this->type('label', $fieldLablel);
+    $this->select('html_type', "value=Radio");
+    $this->waitForAjaxContent();
+    $this->waitForElementPresent('membership_type_id[1]');
+    $this->select('membership_type_id[1]', "label={$memTypeParams['membership_type']}");
+    $this->waitForAjaxContent();
+    $this->click("xpath=//div[@class='ui-dialog-buttonset']//button//span[text()='Save']");
+    $this->waitForElementPresent('field_page');
+    $this->assertElementContainsText("xpath=//div[@id='crm-main-content-wrapper']/div[@id='field_page']/table/tbody/tr/td[1]/div", "{$fieldLablel}");
+  }
+
+}

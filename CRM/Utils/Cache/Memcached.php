@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,21 +23,19 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
-class CRM_Utils_Cache_Memcached {
-  const DEFAULT_HOST    = 'localhost';
-  const DEFAULT_PORT    = 11211;
+class CRM_Utils_Cache_Memcached implements CRM_Utils_Cache_Interface {
+  const DEFAULT_HOST = 'localhost';
+  const DEFAULT_PORT = 11211;
   const DEFAULT_TIMEOUT = 3600;
-  const DEFAULT_PREFIX  = '';
-  const MAX_KEY_LEN     = 62;
+  const DEFAULT_PREFIX = '';
+  const MAX_KEY_LEN = 62;
 
   /**
    * The host name of the memcached server
@@ -72,19 +70,21 @@ class CRM_Utils_Cache_Memcached {
   protected $_prefix = self::DEFAULT_PREFIX;
 
   /**
-   * The actual memcache object
+   * The actual memcache object.
    *
-   * @var resource
+   * @var Memcached
    */
   protected $_cache;
 
   /**
-   * Constructor
+   * Constructor.
    *
-   * @param array   $config  an array of configuration params
-   * @return void
+   * @param array $config
+   *   An array of configuration params.
+   *
+   * @return \CRM_Utils_Cache_Memcached
    */
-  function __construct($config) {
+  public function __construct($config) {
     if (isset($config['host'])) {
       $this->_host = $config['host'];
     }
@@ -107,30 +107,52 @@ class CRM_Utils_Cache_Memcached {
     }
   }
 
-  function set($key, &$value) {
+  /**
+   * @param $key
+   * @param $value
+   *
+   * @return bool
+   * @throws Exception
+   */
+  public function set($key, &$value) {
     $key = $this->cleanKey($key);
     if (!$this->_cache->set($key, $value, $this->_timeout)) {
-      CRM_Core_Error::debug( 'Result Code: ', $this->_cache->getResultMessage());
-      CRM_Core_Error::fatal("memcached set failed, wondering why?, $key", $value );
+      CRM_Core_Error::debug('Result Code: ', $this->_cache->getResultMessage());
+      CRM_Core_Error::fatal("memcached set failed, wondering why?, $key", $value);
       return FALSE;
     }
     return TRUE;
   }
 
-  function &get($key) {
+  /**
+   * @param $key
+   *
+   * @return mixed
+   */
+  public function &get($key) {
     $key = $this->cleanKey($key);
     $result = $this->_cache->get($key);
     return $result;
   }
 
-  function delete($key) {
+  /**
+   * @param $key
+   *
+   * @return mixed
+   */
+  public function delete($key) {
     $key = $this->cleanKey($key);
     return $this->_cache->delete($key);
   }
 
-  function cleanKey($key) {
+  /**
+   * @param $key
+   *
+   * @return mixed|string
+   */
+  public function cleanKey($key) {
     $key = preg_replace('/\s+|\W+/', '_', $this->_prefix . $key);
-    if ( strlen($key) > self::MAX_KEY_LEN ) {
+    if (strlen($key) > self::MAX_KEY_LEN) {
       $md5Key = md5($key);  // this should be 32 characters in length
       $subKeyLen = self::MAX_KEY_LEN - 1 - strlen($md5Key);
       $key = substr($key, 0, $subKeyLen) . "_" . $md5Key;
@@ -138,7 +160,11 @@ class CRM_Utils_Cache_Memcached {
     return $key;
   }
 
-  function flush() {
+  /**
+   * @return mixed
+   */
+  public function flush() {
     return $this->_cache->flush();
   }
+
 }

@@ -39,6 +39,9 @@
     <required>true</required>
     <comment>Amount to be contributed or charged each recurrence.</comment>
     <add>1.6</add>
+    <html>
+      <type>Text</type>
+    </html>
   </field>
   <field>
     <name>currency</name>
@@ -52,7 +55,7 @@
       <table>civicrm_currency</table>
       <keyColumn>name</keyColumn>
       <labelColumn>full_name</labelColumn>
-      <nameColumn>numeric_code</nameColumn>
+      <nameColumn>name</nameColumn>
     </pseudoconstant>
     <html>
       <type>Select</type>
@@ -81,6 +84,9 @@
     <required>true</required>
     <comment>Number of time units for recurrence of payment.</comment>
     <add>1.6</add>
+    <html>
+      <type>Text</type>
+    </html>
   </field>
   <field>
     <name>installments</name>
@@ -88,6 +94,9 @@
     <type>int unsigned</type>
     <comment>Total number of payments to be made. Set this to 0 if this is an open-ended commitment i.e. no set end date.</comment>
     <add>1.6</add>
+    <html>
+      <type>Text</type>
+    </html>
   </field>
   <field>
     <name>start_date</name>
@@ -96,6 +105,9 @@
     <required>true</required>
     <comment>The date the first scheduled recurring contribution occurs.</comment>
     <add>1.6</add>
+    <html>
+      <type>Select Date</type>
+    </html>
   </field>
   <field>
     <name>create_date</name>
@@ -104,6 +116,9 @@
     <required>true</required>
     <comment>When this recurring contribution record was created.</comment>
     <add>1.6</add>
+    <html>
+      <type>Select Date</type>
+    </html>
   </field>
   <field>
     <name>modified_date</name>
@@ -111,6 +126,9 @@
     <type>datetime</type>
     <comment>Last updated date for this record. mostly the last time a payment was received</comment>
     <add>1.6</add>
+    <html>
+      <type>Select Date</type>
+    </html>
   </field>
   <field>
     <name>cancel_date</name>
@@ -118,6 +136,9 @@
     <type>datetime</type>
     <comment>Date this recurring contribution was cancelled by contributor- if we can get access to it</comment>
     <add>1.6</add>
+    <html>
+      <type>Select Date</type>
+    </html>
   </field>
   <field>
     <name>end_date</name>
@@ -125,15 +146,32 @@
     <type>datetime</type>
     <comment>Date this recurring contribution finished successfully</comment>
     <add>1.6</add>
+    <html>
+      <type>Select Date</type>
+    </html>
   </field>
   <field>
     <name>processor_id</name>
-    <title>Payment Processor</title>
+    <title>Processor ID</title>
     <type>varchar</type>
     <length>255</length>
     <comment>Possibly needed to store a unique identifier for this recurring payment order - if this is available from the processor??</comment>
     <add>1.6</add>
   </field>
+  <field>
+    <name>payment_token_id</name>
+    <title>Payment Token ID</title>
+    <type>int unsigned</type>
+    <comment>Optionally used to store a link to a payment token used for this recurring contribution.</comment>
+    <add>4.6</add>
+  </field>
+  <foreignKey>
+    <name>payment_token_id</name>
+    <table>civicrm_payment_token</table>
+    <key>id</key>
+    <add>4.6</add>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
   <field>
     <name>trxn_id</name>
     <title>Transaction ID</title>
@@ -184,6 +222,9 @@
     <type>boolean</type>
     <default>0</default>
     <import>true</import>
+    <html>
+      <type>CheckBox</type>
+    </html>
   </field>
   <field>
     <name>cycle_day</name>
@@ -193,6 +234,9 @@
     <required>true</required>
     <comment>Day in the period when the payment should be charged e.g. 1st of month, 15th etc.</comment>
     <add>1.6</add>
+    <html>
+      <type>Text</type>
+    </html>
   </field>
   <field>
     <name>next_sched_contribution</name>
@@ -207,6 +251,9 @@
     <type>datetime</type>
     <comment>Next scheduled date</comment>
     <add>4.4</add>
+    <html>
+      <type>Select Date</type>
+    </html>
   </field>
   <field>
     <name>failure_count</name>
@@ -215,6 +262,9 @@
     <default>0</default>
     <comment>Number of failed charge attempts since last success. Business rule could be set to deactivate on more than x failures.</comment>
     <add>1.6</add>
+    <html>
+      <type>Text</type>
+    </html>
   </field>
   <field>
     <name>failure_retry_date</name>
@@ -222,6 +272,9 @@
     <title>Retry Failed Attempt Date</title>
     <comment>Date to retry failed attempt</comment>
     <add>1.6</add>
+    <html>
+      <type>Select Date</type>
+    </html>
   </field>
   <field>
     <name>auto_renew</name>
@@ -231,6 +284,9 @@
     <default>0</default>
     <comment>Some systems allow contributor to set a number of installments - but then auto-renew the subscription or commitment if they do not cancel.</comment>
     <add>1.6</add>
+    <html>
+      <type>CheckBox</type>
+    </html>
   </field>
   <field>
     <name>payment_processor_id</name>
@@ -285,7 +341,7 @@
   </foreignKey>
   <field>
     <name>payment_instrument_id</name>
-    <title>Payment Instrument</title>
+    <title>Payment Method</title>
     <type>int unsigned</type>
     <comment>FK to Payment Instrument</comment>
     <pseudoconstant>
@@ -328,5 +384,8 @@
     <comment>if true, receipt is automatically emailed to contact on each successful payment</comment>
     <default>1</default>
     <add>4.1</add>
+    <html>
+      <type>CheckBox</type>
+    </html>
   </field>
 </table>

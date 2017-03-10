@@ -79,9 +79,11 @@
 class civicrm_api3 {
 
   /**
-   * @param array API configuration.
+   * Class constructor.
+   *
+   * @param array $config API configuration.
    */
-  function __construct($config = NULL) {
+  public function __construct($config = NULL) {
     $this->local      = TRUE;
     $this->input      = array();
     $this->lastResult = array();
@@ -95,7 +97,6 @@ class civicrm_api3 {
       else {
         $this->uri .= '/sites/all/modules/civicrm/extern/rest.php';
       }
-      $this->uri .= '?json=1';
       if (isset($config['key'])) {
         $this->key = $config['key'];
       }
@@ -111,7 +112,9 @@ class civicrm_api3 {
       return;
     }
     if (isset($config) && isset($config['conf_path'])) {
-      define('CIVICRM_SETTINGS_PATH', $config['conf_path'] . '/civicrm.settings.php');
+      if (!defined('CIVICRM_SETTINGS_PATH')) {
+        define('CIVICRM_SETTINGS_PATH', $config['conf_path'] . '/civicrm.settings.php');
+      }
       require_once CIVICRM_SETTINGS_PATH;
       require_once 'CRM/Core/ClassLoader.php';
       require_once 'api/api.php';
@@ -126,14 +129,21 @@ class civicrm_api3 {
   }
 
   /**
+   * Convert to string.
    *
+   * @return string
    */
   public function __toString() {
     return json_encode($this->lastResult);
   }
 
   /**
+   * Perform action.
    *
+   * @param $action
+   * @param $params
+   *
+   * @return bool
    */
   public function __call($action, $params) {
     // @TODO Check if it's a valid action.
@@ -146,34 +156,34 @@ class civicrm_api3 {
   }
 
   /**
-   *  As of PHP 5.3.0
-   */
-  public static function __callStatic($name, $arguments) {
-    // Should we implement it ?
-    echo "Calling static method '$name' " . implode(', ', $arguments) . "\n";
-  }
-
-  /**
+   * Call via rest.
    *
+   * @param $entity
+   * @param $action
+   * @param array $params
+   *
+   * @return \stdClass
    */
-  function remoteCall($entity, $action, $params = array()) {
-    $fields = "key={$this->key}&api_key={$this->api_key}";
-    $query = $this->uri . "&entity=$entity&action=$action";
-    foreach ($params as $k => $v) {
-      $fields .= "&$k=" . urlencode($v);
-    }
+  private function remoteCall($entity, $action, $params = array()) {
+    $query = $this->uri . "?entity=$entity&action=$action";
+    $fields = http_build_query(array(
+      'key' => $this->key,
+      'api_key' => $this->api_key,
+      'json' => json_encode($params),
+    ));
+
     if (function_exists('curl_init')) {
       // To facilitate debugging without leaking info, entity & action
       // are GET, other data is POST.
       $ch = curl_init();
       curl_setopt($ch, CURLOPT_URL, $query);
-      curl_setopt($ch, CURLOPT_POST, count($params) + 2);
+      curl_setopt($ch, CURLOPT_POST, TRUE);
       curl_setopt($ch, CURLOPT_POSTFIELDS, $fields);
       curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
       $result = curl_exec($ch);
       // CiviCRM expects to get back a CiviCRM error object.
       if (curl_errno($ch)) {
-        $res = new stdClass;
+        $res = new stdClass();
         $res->is_error = 1;
         $res->error_message = curl_error($ch);
         $res->level = "cURL";
@@ -188,7 +198,7 @@ class civicrm_api3 {
       $result = file_get_contents($query . '&' . $fields);
     }
     if (!$res = json_decode($result)) {
-      $res = new stdClass;
+      $res = new stdClass();
       $res->is_error = 1;
       $res->error_message = 'Unable to parse returned JSON';
       $res->level = 'json_decode';
@@ -198,7 +208,16 @@ class civicrm_api3 {
     return $res;
   }
 
-  function call($entity, $action = 'Get', $params = array()) {
+  /**
+   * Call api function.
+   *
+   * @param $entity
+   * @param string $action
+   * @param array $params
+   *
+   * @return bool
+   */
+  private function call($entity, $action = 'Get', $params = array()) {
     if (is_int($params)) {
       $params = array('id' => $params);
     }
@@ -232,7 +251,7 @@ class civicrm_api3 {
   /**
    * Helper method for long running programs (eg bots).
    */
-  function ping() {
+  public function ping() {
     global $_DB_DATAOBJECT;
     foreach ($_DB_DATAOBJECT['CONNECTIONS'] as & $c) {
       if (!$c->connection->ping()) {
@@ -246,20 +265,26 @@ class civicrm_api3 {
 
   /**
    * Return the last error message.
+   * @return string
    */
-  function errorMsg() {
+  public function errorMsg() {
     return $this->lastResult->error_message;
   }
 
   /**
-   *
+   * Initialize.
    */
-  function init() {
+  public function init() {
     CRM_Core_DAO::init($this->cfg->dsn);
   }
 
   /**
+   * Get attribute.
    *
+   * @param $name
+   * @param null $value
+   *
+   * @return $this
    */
   public function attr($name, $value = NULL) {
     if ($value === NULL) {
@@ -274,21 +299,31 @@ class civicrm_api3 {
   }
 
   /**
+   * Is this an error.
    *
+   * @return bool
    */
   public function is_error() {
     return (property_exists($this->lastResult, 'is_error') && $this->lastResult->is_error);
   }
 
   /**
+   * Check if var is set.
    *
+   * @param string $name
+   *
+   * @return bool
    */
   public function is_set($name) {
     return (isset($this->lastResult->$name));
   }
 
   /**
+   * Get object.
    *
+   * @param string $name
+   *
+   * @return $this
    */
   public function __get($name) {
     // @TODO Test if valid entity.
@@ -313,6 +348,7 @@ class civicrm_api3 {
 
   /**
    * Or use $api->value.
+   * @return array
    */
   public function values() {
     if (is_array($this->lastResult)) {
@@ -325,8 +361,10 @@ class civicrm_api3 {
 
   /**
    * Or use $api->result.
+   * @return array
    */
   public function result() {
     return $this->lastResult;
   }
+
 }

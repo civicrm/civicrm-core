@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
  */
@@ -44,7 +44,7 @@
 class CRM_UF_Page_Group extends CRM_Core_Page {
 
   /**
-   * The action links that we need to display for the browse screen
+   * The action links that we need to display for the browse screen.
    *
    * @var array
    */
@@ -55,10 +55,9 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
    *
    * @param
    *
-   * @return array $_actionLinks
-   *
+   * @return array
    */
-  function &actionLinks() {
+  public static function &actionLinks() {
     // check if variable _actionsLinks is populated
     if (!self::$_actionLinks) {
       // helper variable for nicer formatting
@@ -83,11 +82,25 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
           'title' => ts('Edit CiviCRM Profile Group'),
         ),
         CRM_Core_Action::ADD => array(
-          'name' => ts('Use Profile-Create Mode'),
+          'name' => ts('Use - Create Mode'),
           'url' => 'civicrm/profile/create',
           'qs' => 'gid=%%id%%&reset=1',
-          'title' => ts('Use Profile-Create Mode'),
-          'fe' => true,
+          'title' => ts('Use - Create Mode'),
+          'fe' => TRUE,
+        ),
+        CRM_Core_Action::ADVANCED => array(
+          'name' => ts('Use - Edit Mode'),
+          'url' => 'civicrm/profile/edit',
+          'qs' => 'gid=%%id%%&reset=1',
+          'title' => ts('Use - Edit Mode'),
+          'fe' => TRUE,
+        ),
+        CRM_Core_Action::BASIC => array(
+          'name' => ts('Use - Listings Mode'),
+          'url' => 'civicrm/profile',
+          'qs' => 'gid=%%id%%&reset=1',
+          'title' => ts('Use - Listings Mode'),
+          'fe' => TRUE,
         ),
         CRM_Core_Action::DISABLE => array(
           'name' => ts('Disable'),
@@ -105,20 +118,23 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
           'qs' => 'action=delete&id=%%id%%',
           'title' => ts('Delete CiviCRM Profile Group'),
         ),
-        CRM_Core_Action::PROFILE => array(
-          'name' => ts('HTML Form Snippet'),
-          'url' => 'civicrm/admin/uf/group',
-          'qs' => 'action=profile&gid=%%id%%',
-          'title' => ts('HTML Form Snippet for this Profile'),
-        ),
         CRM_Core_Action::COPY => array(
-          'name' => ts('Copy Profile'),
+          'name' => ts('Copy'),
           'url' => 'civicrm/admin/uf/group',
           'qs' => 'action=copy&gid=%%id%%',
           'title' => ts('Make a Copy of CiviCRM Profile Group'),
           'extra' => 'onclick = "return confirm(\'' . $copyExtra . '\');"',
         ),
       );
+      $allowRemoteSubmit = Civi::settings()->get('remote_profile_submissions');
+      if ($allowRemoteSubmit) {
+        self::$_actionLinks[CRM_Core_Action::PROFILE] = array(
+          'name' => ts('HTML Form Snippet'),
+          'url' => 'civicrm/admin/uf/group',
+          'qs' => 'action=profile&gid=%%id%%',
+          'title' => ts('HTML Form Snippet for this Profile'),
+        );
+      }
     }
     return self::$_actionLinks;
   }
@@ -133,9 +149,8 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
    * @param
    *
    * @return void
-   * @access public
    */
-  function run() {
+  public function run() {
     // get the requested action
     $action = CRM_Utils_Request::retrieve('action', 'String',
       $this, FALSE,
@@ -145,6 +160,7 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
 
     // assign vars to templates
     $this->assign('action', $action);
+    $this->assign('selectedChild', CRM_Utils_Request::retrieve('selectedChild', 'String', $this));
     $id = CRM_Utils_Request::retrieve('id', 'Positive',
       $this, FALSE, 0
     );
@@ -182,13 +198,12 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
   }
 
   /**
-   * This function is to make a copy of a profile, including
+   * make a copy of a profile, including
    * all the fields in the profile
    *
    * @return void
-   * @access public
    */
-  function copy() {
+  public function copy() {
     $gid = CRM_Utils_Request::retrieve('gid', 'Positive',
       $this, TRUE, 0, 'GET'
     );
@@ -198,12 +213,11 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
   }
 
   /**
-   * This function is for profile mode (standalone html form ) for uf group
+   * for profile mode (standalone html form ) for uf group
    *
    * @return void
-   * @access public
    */
-  function profile() {
+  public function profile() {
     $config = CRM_Core_Config::singleton();
 
     // reassign resource base to be the full url, CRM-4660
@@ -239,7 +253,17 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
       $profile = str_replace('/administrator/', '/index.php', $profile);
     }
     elseif ($config->userFramework == 'WordPress') {
-      $profile = str_replace('/wp-admin/admin.php', '/index.php', $profile);
+      //@todo remove this part when it is OK to deprecate CIVICRM_UF_WP_BASEPAGE-CRM-15933
+      if (defined('CIVICRM_UF_WP_BASEPAGE')) {
+        $wpbase = CIVICRM_UF_WP_BASEPAGE;
+      }
+      elseif (!empty($config->wpBasePage)) {
+        $wpbase = $config->wpBasePage;
+      }
+      else {
+        $wpbase = 'index.php';
+      }
+      $profile = str_replace('/wp-admin/admin.php', '/' . $wpbase . '/', $profile);
     }
 
     // add header files
@@ -262,15 +286,16 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
   }
 
   /**
-   * edit uf group
+   * Edit uf group.
    *
-   * @param int $id uf group id
-   * @param string $action the action to be invoked
+   * @param int $id
+   *   Uf group id.
+   * @param string $action
+   *   The action to be invoked.
    *
    * @return void
-   * @access public
    */
-  function edit($id, $action) {
+  public function edit($id, $action) {
     // create a simple controller for editing uf data
     $controller = new CRM_Core_Controller_Simple('CRM_UF_Form_Group', ts('CiviCRM Profile Group'), $action);
     $this->setContext($id, $action);
@@ -286,12 +311,9 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
    * @param
    *
    * @return void
-   * @access public
-   * @static
    */
-  function browse($action = NULL) {
+  public function browse($action = NULL) {
     $ufGroup = array();
-    $allUFGroups = array();
     $allUFGroups = CRM_Core_BAO_UFGroup::getModuleUFGroup();
     if (empty($allUFGroups)) {
       return;
@@ -312,7 +334,7 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
       $ufGroup[$id]['is_reserved'] = $value['is_reserved'];
 
       // form all action links
-      $action = array_sum(array_keys($this->actionLinks()));
+      $action = array_sum(array_keys(self::actionLinks()));
 
       // update enable/disable links depending on uf_group properties.
       if ($value['is_active']) {
@@ -330,35 +352,18 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
       }
 
       $groupTypes = self::extractGroupTypes($value['group_type']);
-      $groupComponents = array('Contribution', 'Membership', 'Activity', 'Participant');
 
-      // drop Create, Edit and View mode links if profile group_type is Contribution, Membership, Activities or Participant
-      $componentFound = array_intersect($groupComponents, array_keys($groupTypes));
-      if (!empty($componentFound)) {
+      // drop Create, Edit and View mode links if profile group_type is one of the following:
+      // Contribution, Membership, Activity, Participant, Case, Grant
+      $isMixedProfile = CRM_Core_BAO_UFField::checkProfileType($id);
+      if ($isMixedProfile) {
         $action -= CRM_Core_Action::ADD;
+        $action -= CRM_Core_Action::ADVANCED;
+        $action -= CRM_Core_Action::BASIC;
+        $action -= CRM_Core_Action::PROFILE;
       }
 
-      $groupTypesString = '';
-      if (!empty($groupTypes)) {
-        $groupTypesStrings = array();
-        foreach ($groupTypes as $groupType => $typeValues) {
-          if (is_array($typeValues)) {
-            if ($groupType == 'Participant') {
-              foreach ($typeValues as $subType => $subTypeValues) {
-                $groupTypesStrings[] = $subType . '::' . implode(': ', $subTypeValues);
-              }
-            }
-            else {
-              $groupTypesStrings[] = $groupType . '::' . implode(': ', current($typeValues));
-            }
-          }
-          else {
-            $groupTypesStrings[] = $groupType;
-          }
-        }
-        $groupTypesString = implode(', ', $groupTypesStrings);
-      }
-      $ufGroup[$id]['group_type'] = $groupTypesString;
+      $ufGroup[$id]['group_type'] = self::formatGroupTypes($groupTypes);
 
       $ufGroup[$id]['action'] = CRM_Core_Action::formLink(self::actionLinks(), $action,
         array('id' => $id),
@@ -376,14 +381,14 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
   }
 
   /**
-   * this function is for preview mode for ufoup
+   * for preview mode for ufoup.
    *
-   * @param int $id uf group id
+   * @param int $id
+   *   Uf group id.
    *
-   * @return void
-   * @access public
+   * @param int $action
    */
-  function preview($id, $action) {
+  public function preview($id, $action) {
     $controller = new CRM_Core_Controller_Simple('CRM_UF_Form_Preview', ts('CiviCRM Profile Group Preview'), NULL);
     $controller->set('id', $id);
     $controller->setEmbedded(TRUE);
@@ -391,7 +396,11 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
     $controller->run();
   }
 
-  function setContext($id, $action) {
+  /**
+   * @param int $id
+   * @param $action
+   */
+  public function setContext($id, $action) {
     $context = CRM_Utils_Request::retrieve('context', 'String', $this);
 
     //we need to differentiate context for update and preview profile.
@@ -410,7 +419,12 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
     $session->pushUserContext($url);
   }
 
-  static function extractGroupTypes($groupType) {
+  /**
+   * @param $groupType
+   *
+   * @return array
+   */
+  public static function extractGroupTypes($groupType) {
     $returnGroupTypes = array();
     if (!$groupType) {
       return $returnGroupTypes;
@@ -456,6 +470,11 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
             $typeName = 'Activity';
             $valueLabels = CRM_Core_PseudoConstant::ActivityType(TRUE, TRUE, FALSE, 'label', TRUE);
             break;
+
+          case 'CaseType':
+            $typeName = 'Case';
+            $valueLabels = CRM_Case_PseudoConstant::caseType();
+            break;
         }
 
         foreach ($valueParts as $val) {
@@ -472,5 +491,36 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
     }
     return $returnGroupTypes;
   }
-}
 
+  /**
+   * Format 'group_type' field for display
+   *
+   * @param array $groupTypes
+   *   output from self::extractGroupTypes
+   * @return string
+   */
+  public static function formatGroupTypes($groupTypes) {
+    $groupTypesString = '';
+    if (!empty($groupTypes)) {
+      $groupTypesStrings = array();
+      foreach ($groupTypes as $groupType => $typeValues) {
+        if (is_array($typeValues)) {
+          if ($groupType == 'Participant') {
+            foreach ($typeValues as $subType => $subTypeValues) {
+              $groupTypesStrings[] = $subType . '::' . implode(': ', $subTypeValues);
+            }
+          }
+          else {
+            $groupTypesStrings[] = $groupType . '::' . implode(': ', current($typeValues));
+          }
+        }
+        else {
+          $groupTypesStrings[] = $groupType;
+        }
+      }
+      $groupTypesString = implode(', ', $groupTypesStrings);
+    }
+    return $groupTypesString;
+  }
+
+}

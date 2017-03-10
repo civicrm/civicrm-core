@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,12 +25,7 @@
 *}
 {* Configure Membership signup/renewal block for an Online Contribution page *}
 <div id="form" class="crm-block crm-form-block crm-member-membershipblock-form-block">
-{if $isQuick}
-    <div id="memPopupContainer">
-    {ts}Once you switch to using a Price Set, you won't be able to switch back to your existing settings below except by re-entering them. Are you sure you want to switch to a Price Set?{/ts}
-    </div>
-{/if}
-<div id="help">
+<div class="help">
     {ts}Use this form to enable and configure a Membership Signup and Renewal section for this Online Contribution Page. If you're not using this page for membership signup, leave the <strong>Enabled</strong> box un-checked..{/ts} {docURL page="user/membership/setup"}
 </div>
   {if $form.membership_type.html}
@@ -84,6 +79,10 @@
       <td><div class="status message">{ts}Click <a id='memQuickconfig' href='#'>here</a> if you want to configure the Membership Types below as part of a Price Set, with the added flexibility and complexity that entails.{/ts}</div></td>
     </tr>
     {/if}
+          <tr id="membership_type-label" class="crm-member-membershipblock-form-block-membership_type_label">
+            <td class="label">{$form.membership_type_label.label}</td>
+            <td>{$form.membership_type_label.html}</td>
+          </tr>
           <tr id="membership_type-block" class="crm-member-membershipblock-form-block-membership_type">
               <td class="label">{$form.membership_type.label}</td>
               <td>
@@ -142,16 +141,16 @@
 
 {literal}
 <script type="text/javascript">
-    cj( function() {
+    CRM.$(function($) {
         //show/hide membership block
         showHideMembershipBlock();
-        cj('#member_is_active').click( function() {
+        $('#member_is_active').click( function() {
             showHideMembershipBlock();
         });
 
         //show/ hide blocks if price set is selected
         checkIfPriceSetIsSelected( );
-        cj('#member_price_set_id').change( function(){
+        $('#member_price_set_id').change( function(){
             checkIfPriceSetIsSelected( );
         });
     });
@@ -167,14 +166,14 @@
     // function to handle show/hide of membership type and related blocks if price set is selected
     function checkIfPriceSetIsSelected( ) {
         if ( cj('#member_price_set_id').val() ) {
+            cj('#membership_type-label').hide();
             cj('#membership_type-block').hide();
-            cj('#requiredSignup').hide();
             cj('#displayFee').hide();
             cj('#separatePayment').hide();
             cj('#quickConfigConvertMessage').hide();
         } else {
+            cj('#membership_type-label').show();
             cj('#membership_type-block').show();
-            cj('#requiredSignup').show();
             cj('#displayFee').show();
             cj('#separatePayment').show();
         }
@@ -182,47 +181,23 @@
 </script>
 {/literal}
 
-{* include jscript to warn if unsaved form field changes *}
-{include file="CRM/common/formNavigate.tpl"}
 {if $isQuick}
 {literal}
 <script type="text/javascript">
-cj( document ).ready( function( ) {
-  cj("#memPopupContainer").hide();
-});
-cj("#memQuickconfig").click(function(){
-  cj("#memPopupContainer").dialog({
-  title: "Selected Price Set",
-  width:400,
-  height:220,
-  modal: true,
-  overlay: {
-                 opacity: 0.5,
-                  background: "black"
-        },
-        buttons: {
-                   "Ok": function() {
-       var dataUrl  = {/literal}'{crmURL p="civicrm/ajax/rest" h=0 q="className=CRM_Core_Page_AJAX&fnName=setIsQuickConfig&context=civicrm_contribution_page&id=$contributionPageID" }';
-       var redirectUrl = '{crmURL p="civicrm/admin/price/field" h=0 q="reset=1&action=browse&sid=" }';                     {literal}
-
-       cj.ajax({
-      url: dataUrl,
-      async: false,
-      global: false,
-      success: function ( result ) {
-        if (result) {
-          window.location= redirectUrl+eval(result);
-        }
-      }
-       });
-                   },
-       "Close": function() {
-                     cj(this).dialog("close");
-                   }
-  }
+  CRM.$(function($) {
+    $("#memQuickconfig").click(function(e) {
+      e.preventDefault();
+      CRM.confirm({
+        width: 400,
+        message: {/literal}"{ts escape='js'}Once you switch to using a Price Set, you won't be able to switch back to your existing settings below except by re-entering them. Are you sure you want to switch to a Price Set?{/ts}"{literal}
+      }).on('crmConfirm:yes', function() {
+        {/literal}
+        var dataUrl = '{crmURL p="civicrm/ajax/rest" h=0 q="className=CRM_Core_Page_AJAX&fnName=setIsQuickConfig&context=civicrm_contribution_page&id=$contributionPageID" }';
+        {literal}
+        $.getJSON(dataUrl).done(function(result) {window.location = CRM.url("civicrm/admin/price/field", {reset: 1, action: 'browse', sid: result});});
+      });
+    });
   });
-return false;
-});
 </script>
 {/literal}
 {/if}

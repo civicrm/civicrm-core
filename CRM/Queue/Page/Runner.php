@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 
 require_once 'CRM/Core/Page.php';
@@ -48,24 +48,23 @@ class CRM_Queue_Page_Runner extends CRM_Core_Page {
    *
    * POST Param 'qrid': string, usually the name of the queue
    */
-  function run() {
+  public function run() {
     $qrid = CRM_Utils_Request::retrieve('qrid', 'String', $this, TRUE);
     $runner = CRM_Queue_Runner::instance($qrid);
-    // dpm(array( 'action' => 'CRM_Queue_Page_Runner::run()', 'session' => $_SESSION, 'runner' => $runner, 'qrid' => $qrid ));
     if (!is_object($runner)) {
       CRM_Core_Error::fatal('Queue runner must be configured before execution.');
     }
 
     CRM_Utils_System::setTitle($runner->title);
     $this->assign('queueRunnerData', array(
-        'qrid' => $runner->qrid,
-        'runNextAjax' => CRM_Utils_System::url($runner->pathPrefix . '/ajax/runNext', NULL, FALSE, NULL, FALSE ),
-        'skipNextAjax' => CRM_Utils_System::url($runner->pathPrefix . '/ajax/skipNext', NULL, FALSE, NULL, FALSE ),
-        'onEndAjax' => CRM_Utils_System::url($runner->pathPrefix . '/ajax/onEnd', NULL, FALSE, NULL, FALSE ),
-        'completed' => 0,
-        'numberOfItems' => $runner->queue->numberOfItems(),
-        'buttons' => $runner->buttons,
-      ));
+      'qrid' => $runner->qrid,
+      'runNextAjax' => CRM_Utils_System::url($runner->pathPrefix . '/ajax/runNext', NULL, FALSE, NULL, FALSE),
+      'skipNextAjax' => CRM_Utils_System::url($runner->pathPrefix . '/ajax/skipNext', NULL, FALSE, NULL, FALSE),
+      'onEndAjax' => CRM_Utils_System::url($runner->pathPrefix . '/ajax/onEnd', NULL, FALSE, NULL, FALSE),
+      'completed' => 0,
+      'numberOfItems' => $runner->queue->numberOfItems(),
+      'buttons' => $runner->buttons,
+    ));
 
     if ($runner->isMinimal) {
       // Render page header
@@ -80,4 +79,5 @@ class CRM_Queue_Page_Runner extends CRM_Core_Page {
       parent::run();
     }
   }
+
 }

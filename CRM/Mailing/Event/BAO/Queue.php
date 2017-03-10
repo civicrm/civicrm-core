@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,53 +23,52 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Mailing_Event_BAO_Queue extends CRM_Mailing_Event_DAO_Queue {
 
   /**
-   * class constructor
+   * Class constructor.
    */
-  function __construct() {
+  public function __construct() {
     parent::__construct();
   }
 
   /**
-   * Queue a new recipient
+   * Queue a new recipient.
    *
-   * @param array     The values of the new EventQueue
+   * @param array $params
+   *   Values of the new EventQueue.
    *
-   * @return object   The new EventQueue
-   * @access public
-   * @static
+   * @return CRM_Mailing_Event_BAO_Queue
+   *   The new EventQueue
    */
-  public static function &create(&$params) {
+  public static function create($params) {
     $eq = new CRM_Mailing_Event_BAO_Queue();
     $eq->copyValues($params);
-    $eq->hash = self::hash($params);
+    if (empty($params['id']) && empty($params['hash'])) {
+      $eq->hash = self::hash($params);
+    }
     $eq->save();
     return $eq;
   }
 
   /**
-   * Create a security hash from the job, email and contact ids
+   * Create a security hash from the job, email and contact ids.
    *
-   * @param array     The ids to be hashed
+   * @param array $params
    *
-   * @return int      The hash
-   * @access public
-   * @static
+   * @return int
+   *   The hash
    */
   public static function hash($params) {
-    $jobId     = $params['job_id'];
-    $emailId   = $params['email_id'];
+    $jobId = $params['job_id'];
+    $emailId = CRM_Utils_Array::value('email_id', $params, '');
     $contactId = $params['contact_id'];
 
     return substr(sha1("{$jobId}:{$emailId}:{$contactId}:" . time()),
@@ -78,23 +77,25 @@ class CRM_Mailing_Event_BAO_Queue extends CRM_Mailing_Event_DAO_Queue {
   }
 
   /**
-   * Verify that a queue event exists with the specified id/job id/hash
+   * Verify that a queue event exists with the specified id/job id/hash.
    *
-   * @param int $job_id       The job ID of the event to find
-   * @param int $queue_id     The Queue Event ID to find
-   * @param string $hash      The hash to validate against
+   * @param int $job_id
+   *   The job ID of the event to find.
+   * @param int $queue_id
+   *   The Queue Event ID to find.
+   * @param string $hash
+   *   The hash to validate against.
    *
-   * @return object|null      The queue event if verified, or null
-   * @access public
-   * @static
+   * @return object|null
+   *   The queue event if verified, or null
    */
   public static function &verify($job_id, $queue_id, $hash) {
     $success = NULL;
     $q = new CRM_Mailing_Event_BAO_Queue();
     if (!empty($job_id) && !empty($queue_id) && !empty($hash)) {
-      $q->id     = $queue_id;
+      $q->id = $queue_id;
       $q->job_id = $job_id;
-      $q->hash   = $hash;
+      $q->hash = $hash;
       if ($q->find(TRUE)) {
         $success = $q;
       }
@@ -105,15 +106,15 @@ class CRM_Mailing_Event_BAO_Queue extends CRM_Mailing_Event_DAO_Queue {
   /**
    * Given a queue event ID, find the corresponding email address.
    *
-   * @param int $queue_id         The queue event ID
+   * @param int $queue_id
+   *   The queue event ID.
    *
-   * @return string               The email address
-   * @access public
-   * @static
+   * @return string
+   *   The email address
    */
   public static function getEmailAddress($queue_id) {
     $email = CRM_Core_BAO_Email::getTableName();
-    $eq    = self::getTableName();
+    $eq = self::getTableName();
     $query = "  SELECT      $email.email as email
                     FROM        $email
                     INNER JOIN  $eq
@@ -130,21 +131,22 @@ class CRM_Mailing_Event_BAO_Queue extends CRM_Mailing_Event_DAO_Queue {
   }
 
   /**
-   * Count up events given a mailing id and optional job id
+   * Count up events given a mailing id and optional job id.
    *
-   * @param int $mailing_id       ID of the mailing to count
-   * @param int $job_id           Optional ID of a job to limit results
+   * @param int $mailing_id
+   *   ID of the mailing to count.
+   * @param int $job_id
+   *   Optional ID of a job to limit results.
    *
-   * @return int                  Number of matching events
-   * @access public
-   * @static
+   * @return int
+   *   Number of matching events
    */
   public static function getTotalCount($mailing_id, $job_id = NULL) {
     $dao = new CRM_Core_DAO();
 
-    $queue   = self::getTableName();
+    $queue = self::getTableName();
     $mailing = CRM_Mailing_BAO_Mailing::getTableName();
-    $job     = CRM_Mailing_BAO_MailingJob::getTableName();
+    $job = CRM_Mailing_BAO_MailingJob::getTableName();
 
     $dao->query("
             SELECT      COUNT(*) as queued
@@ -164,28 +166,33 @@ class CRM_Mailing_Event_BAO_Queue extends CRM_Mailing_Event_DAO_Queue {
   }
 
   /**
-   * Get rows for the event browser
+   * Get rows for the event browser.
    *
-   * @param int $mailing_id       ID of the mailing
-   * @param int $job_id           optional ID of the job
-   * @param int $offset           Offset
-   * @param int $rowCount         Number of rows
-   * @param array $sort           sort array
+   * @param int $mailing_id
+   *   ID of the mailing.
+   * @param int $job_id
+   *   Optional ID of the job.
+   * @param int $offset
+   *   Offset.
+   * @param int $rowCount
+   *   Number of rows.
+   * @param array $sort
+   *   Sort array.
    *
-   * @return array                Result set
-   * @access public
-   * @static
+   * @return array
+   *   Result set
    */
-  public static function &getRows($mailing_id, $job_id = NULL, $offset = NULL,
+  public static function &getRows(
+    $mailing_id, $job_id = NULL, $offset = NULL,
     $rowCount = NULL, $sort = NULL
   ) {
     $dao = new CRM_Core_Dao();
 
-    $queue   = self::getTableName();
+    $queue = self::getTableName();
     $mailing = CRM_Mailing_BAO_Mailing::getTableName();
-    $job     = CRM_Mailing_BAO_MailingJob::getTableName();
+    $job = CRM_Mailing_BAO_MailingJob::getTableName();
     $contact = CRM_Contact_BAO_Contact::getTableName();
-    $email   = CRM_Core_BAO_Email::getTableName();
+    $email = CRM_Core_BAO_Email::getTableName();
 
     $orderBy = "sort_name ASC, {$job}.start_date DESC";
     if ($sort) {
@@ -244,18 +251,18 @@ class CRM_Mailing_Event_BAO_Queue extends CRM_Mailing_Event_DAO_Queue {
   }
 
   /**
-   * Get the mailing object for this queue event instance
+   * Get the mailing object for this queue event instance.
    *
    * @param
    *
-   * @return object           Mailing BAO
-   * @access public
+   * @return object
+   *   Mailing BAO
    */
   public function &getMailing() {
-    $mailing  = new CRM_Mailing_BAO_Mailing();
-    $jobs     = CRM_Mailing_BAO_MailingJob::getTableName();
+    $mailing = new CRM_Mailing_BAO_Mailing();
+    $jobs = CRM_Mailing_BAO_MailingJob::getTableName();
     $mailings = CRM_Mailing_BAO_Mailing::getTableName();
-    $queue    = self::getTableName();
+    $queue = self::getTableName();
 
     $mailing->query("
                 SELECT      $mailings.*
@@ -269,6 +276,11 @@ class CRM_Mailing_Event_BAO_Queue extends CRM_Mailing_Event_DAO_Queue {
     return $mailing;
   }
 
+  /**
+   * @param int $queueID
+   *
+   * @return array
+   */
   public static function getContactInfo($queueID) {
     $query = "
 SELECT DISTINCT(civicrm_mailing_event_queue.contact_id) as contact_id,
@@ -281,7 +293,7 @@ SELECT DISTINCT(civicrm_mailing_event_queue.contact_id) as contact_id,
    AND civicrm_mailing_event_queue.email_id = civicrm_email.id
    AND civicrm_mailing_event_queue.id = " . CRM_Utils_Type::escape($queueID, 'Integer');
 
-    $dao = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
+    $dao = CRM_Core_DAO::executeQuery($query);
 
     $displayName = 'Unknown';
     $email = 'Unknown';
@@ -293,7 +305,11 @@ SELECT DISTINCT(civicrm_mailing_event_queue.contact_id) as contact_id,
     return array($displayName, $email);
   }
 
-  static function bulkCreate($params, $now = NULL) {
+  /**
+   * @param array $params
+   * @param null $now
+   */
+  public static function bulkCreate($params, $now = NULL) {
     if (!$now) {
       $now = time();
     }
@@ -302,16 +318,16 @@ SELECT DISTINCT(civicrm_mailing_event_queue.contact_id) as contact_id,
     $values = array();
     foreach ($params as $param) {
       $values[] = "( {$param[0]}, {$param[1]}, {$param[2]}, {$param[3]}, '" . substr(sha1("{$param[0]}:{$param[1]}:{$param[2]}:{$param[3]}:{$now}"),
-        0, 16
-      ) . "' )";
+          0, 16
+        ) . "' )";
     }
 
     while (!empty($values)) {
       $input = array_splice($values, 0, CRM_Core_DAO::BULK_INSERT_COUNT);
-      $str   = implode(',', $input);
-      $sql   = "INSERT INTO civicrm_mailing_event_queue ( job_id, email_id, contact_id, phone_id, hash ) VALUES $str;";
+      $str = implode(',', $input);
+      $sql = "INSERT INTO civicrm_mailing_event_queue ( job_id, email_id, contact_id, phone_id, hash ) VALUES $str;";
       CRM_Core_DAO::executeQuery($sql);
     }
   }
-}
 
+}

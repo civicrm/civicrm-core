@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,13 +25,17 @@
  */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Contribute_PCPAddTest
+ */
 class WebTest_Contribute_PCPAddTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
     parent::setUp();
   }
 
-  function testPCPAdd() {
+  public function testPCPAdd() {
     // open browser, login
     $this->webtestLogin();
 
@@ -58,8 +62,6 @@ class WebTest_Contribute_PCPAddTest extends CiviSeleniumTestCase {
     $hash = substr(sha1(rand()), 0, 7);
     $rand = $contributionAmount = 2 * rand(2, 50);
     $pageTitle = 'PCP Contribution' . $hash;
-    $processorType = 'Dummy';
-    $processorName = "Webtest Dummy" . substr(sha1(rand()), 0, 7);
     $amountSection = TRUE;
     $payLater = TRUE;
     $onBehalf = FALSE;
@@ -80,7 +82,7 @@ class WebTest_Contribute_PCPAddTest extends CiviSeleniumTestCase {
     $pageId = $this->webtestAddContributionPage($hash,
       $rand,
       $pageTitle,
-      array($processorName => $processorType),
+      array('Test Processor' => 'Dummy'),
       $amountSection,
       $payLater,
       $onBehalf,
@@ -105,7 +107,10 @@ class WebTest_Contribute_PCPAddTest extends CiviSeleniumTestCase {
 
     $this->click("xpath=//div[@class='crm-section other_amount-section']//div[2]/input");
     $this->type("xpath=//div[@class='crm-section other_amount-section']//div[2]/input", $contributionAmount);
+    $this->typeKeys("xpath=//div[@class='crm-section other_amount-section']//div[2]/input", $contributionAmount);
     $this->type("email-5", $email);
+    $this->click("xpath=//label[text()='Test Processor']");
+    $this->waitForAjaxContent();
 
     $this->webtestAddCreditCardDetails();
     $this->webtestAddBillingDetails($firstName, $middleName, $lastName);
@@ -129,9 +134,7 @@ class WebTest_Contribute_PCPAddTest extends CiviSeleniumTestCase {
       $this->type("cms_confirm_pass", $pass);
 
     }
-    $this->click("_qf_PCPAccount_next-bottom");
-
-    $this->waitForElementPresent("_qf_Campaign_upload-bottom");
+    $this->clickLink("_qf_PCPAccount_next-bottom", "_qf_Campaign_upload-bottom");
 
     $pcpTitle = 'PCPTitle' . substr(sha1(rand()), 0, 7);
     $this->type("pcp_title", $pcpTitle);
@@ -142,13 +145,11 @@ class WebTest_Contribute_PCPAddTest extends CiviSeleniumTestCase {
     $this->webtestLogin();
     $this->openCiviPage("admin/pcp", "reset=1", "_qf_PCP_refresh");
     $this->select('status_id', 'value=1');
-    $this->click("_qf_PCP_refresh");
-    $this->waitForElementPresent("_qf_PCP_refresh");
+    $this->clickLink("_qf_PCP_refresh", "_qf_PCP_refresh");
     $id = explode('id=', $this->getAttribute("xpath=//div[@id='option11_wrapper']/table[@id='option11']/tbody/tr/td/a[text()='$pcpTitle']@href"));
     $pcpId = trim($id[1]);
     $pcpUrl = "civicrm/contribute/pcp/info?reset=1&id=$pcpId";
-    $this->click("xpath=//td[@id=$pcpId]/span[1]/a[2]");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("xpath=//td[@id=$pcpId]/span[1]/a[2]");
     // logout
     $this->webtestLogout();
 
@@ -163,7 +164,10 @@ class WebTest_Contribute_PCPAddTest extends CiviSeleniumTestCase {
     $this->openCiviPage("contribute/transact", "reset=1&id=$pageId&pcpId=$id[1]", "_qf_Main_upload-bottom");
     $this->click("xpath=//div[@class='crm-section other_amount-section']//div[2]/input");
     $this->type("xpath=//div[@class='crm-section other_amount-section']//div[2]/input", $contributionAmount);
+    $this->typeKeys("xpath=//div[@class='crm-section other_amount-section']//div[2]/input", $contributionAmount);
     $this->type("email-5", $donorFirstName . "@example.com");
+    $this->click("xpath=//label[text()='Test Processor']");
+    $this->waitForAjaxContent();
 
     $this->webtestAddCreditCardDetails();
     $this->webtestAddBillingDetails($donorFirstName, $middleName, $donorLastName);
@@ -177,11 +181,12 @@ class WebTest_Contribute_PCPAddTest extends CiviSeleniumTestCase {
 
     //Find Contribution
     $this->openCiviPage("contribute/search", "reset=1", "contribution_date_low");
+    $this->waitForElementPresent('contribution_pcp_made_through_id');
+    $this->multiselect2('contribution_pcp_made_through_id', array($pcpTitle));
 
-    $this->select('contribution_pcp_made_through_id', "label={$pcpTitle}");
-
-    $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
-    $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_ContributionView_cancel-bottom");
+    $this->clickLink("_qf_Search_refresh", "xpath=//table[@class='selector row-highlight']/tbody/tr[1]//td/span/a[1][text()='View']");
+    $this->click("xpath=//table[@class='selector row-highlight']/tbody/tr[1]//td/span/a[1][text()='View']");
+    $this->waitForElementPresent("xpath=//div[@class='ui-dialog-buttonset']/button[3]/span[2]");
 
     // View Contribution Record and test for expected values
     $expected = array(
@@ -194,12 +199,12 @@ class WebTest_Contribute_PCPAddTest extends CiviSeleniumTestCase {
 
     //Check for SoftCredit
     $softCreditor = "{$firstName} {$lastName}";
-    $this->verifyText("xpath=//table[@class='crm-info-panel crm-soft-credit-listing']/tbody/tr/td[1]", preg_quote($softCreditor), 'In line ' . __LINE__);
-  
-    // Check PCP Summary Report
-    $this->openCiviPage('report/instance/16', 'reset=1');
-    $this->verifyText("PCP", preg_quote($pcpTitle));
-    $this->verifyText("PCP", preg_quote("{$lastName}, {$firstName}"));
-  }
-}
+    $this->verifyText("xpath=//div['PCPView']/div[2]/table[@class='crm-info-panel']/tbody/tr[2]/td[2]/a", preg_quote($softCreditor));
 
+    // Check PCP Summary Report
+    $this->openCiviPage('report/instance/17', 'reset=1');
+    $this->assertElementContainsText("PCP", $pcpTitle);
+    $this->assertElementContainsText("PCP", "{$lastName}, {$firstName}");
+  }
+
+}

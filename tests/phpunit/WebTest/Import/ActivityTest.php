@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,16 +22,20 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'WebTest/Import/ImportCiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Import_ActivityTest
+ */
 class WebTest_Import_ActivityTest extends ImportCiviSeleniumTestCase {
 
   protected function setUp() {
     parent::setUp();
   }
 
-  function testActivityImport() {
+  public function testActivityImport() {
 
     $this->webtestLogin();
 
@@ -46,7 +50,10 @@ class WebTest_Import_ActivityTest extends ImportCiviSeleniumTestCase {
     $this->importCSVComponent('Activity', $headers, $rows, NULL, NULL, $fieldMapper);
   }
 
-  function _activityCSVData() {
+  /**
+   * @return array
+   */
+  public function _activityCSVData() {
 
     $firstName1 = substr(sha1(rand()), 0, 7);
     $email1 = 'mail_' . substr(sha1(rand()), 0, 7) . '@example.com';
@@ -91,5 +98,5 @@ class WebTest_Import_ActivityTest extends ImportCiviSeleniumTestCase {
 
     return array($headers, $rows);
   }
-}
 
+}

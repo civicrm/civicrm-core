@@ -1,5 +1,4 @@
-(function($) {
-  var CRM = (window.CRM) ? (window.CRM) : (window.CRM = {});
+(function($, _) {
   if (!CRM.Designer) CRM.Designer = {};
 
   // TODO Optimize this class
@@ -71,7 +70,9 @@
         label: this.getLabel(),
         entity_name: this.get('entityName'),
         field_type: this.getFieldSchema().civiFieldType,
-        field_name: this.get('fieldName')
+        // For some reason the 'formatting' field gets a random number appended in core so we mimic that here.
+        // TODO: Why?
+        field_name: this.get('fieldName') == 'formatting' ? 'formatting_' + (Math.floor(Math.random() * 8999) + 1000) : this.get('fieldName')
       });
       return model;
     }
@@ -96,6 +97,9 @@
      * @return {CRM.Designer.PaletteFieldModel}
      */
     getFieldByName: function(entityName, fieldName) {
+      if (fieldName.indexOf('formatting') === 0) {
+        fieldName = 'formatting';
+      }
       return this.find(function(paletteFieldModel) {
         return ((!entityName || paletteFieldModel.get('entityName') == entityName) && paletteFieldModel.get('fieldName') == fieldName);
       });
@@ -114,4 +118,4 @@
       return fieldsByEntitySection;
     }
   });
-})(cj);
+})(CRM.$, CRM._);

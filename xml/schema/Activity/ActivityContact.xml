@@ -54,7 +54,7 @@
     <name>record_type_id</name>
     <type>int unsigned</type>
     <title>Record Type ID</title>
-    <comment>Contents vary depending on the activity type. Code using custom activities may use this field as they choose fit.</comment>
+    <comment>Nature of this contact's role in the activity: 1 assignee, 2 creator, 3 focus or target.</comment>
     <pseudoconstant>
       <optionGroupName>activity_contacts</optionGroupName>
     </pseudoconstant>

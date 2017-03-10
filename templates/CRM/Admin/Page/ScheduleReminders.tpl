@@ -1,9 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright (C) 2011 Marty Wright                                    |
- | Licensed to CiviCRM under the Academic Free License version 3.0.   |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,30 +24,38 @@
  +--------------------------------------------------------------------+
 *}
 {* this template is for configuring Scheduled Reminders *}
-
+{if $setTab eq 1}
+  {if $component eq 'event'}
+     {include file="CRM/Event/Form/ManageEvent/Tab.tpl"}
+  {/if}
+{else}
 {if $action eq 1 or $action eq 2 or $action eq 8 or $action eq 16384}
    {include file="CRM/Admin/Form/ScheduleReminders.tpl"}
 {else}
-{* include wysiwyg related files*}
-{include file="CRM/common/wysiwyg.tpl" includeWysiwygEditor=true}
-{capture assign=schedRemindersDocLink}{docURL page="user/current/email/scheduled-reminders/"}{/capture}
-<div class="help">
-  {ts}Scheduled reminders allow you to automatically send messages to contacts regarding their memberships, participation in events, or other activities.{/ts} {$schedRemindersDocLink}
-</div>
-{if $rows}
+  {if !$component}
+    {capture assign=schedRemindersDocLink}{docURL page="user/current/email/scheduled-reminders/"}{/capture}
+    <div class="help">
+      {ts}Scheduled reminders allow you to automatically send messages to contacts regarding their memberships, participation in events, or other activities.{/ts} {$schedRemindersDocLink}
+    </div>
+  {/if}
+  {if $rows}
     <div id="reminder">
       {include file="CRM/Admin/Page/Reminders.tpl"}
-      <div class="action-link">
-        <a href="{crmURL q="action=add&reset=1"}" id="newScheduleReminder" class="button"><span><div class="icon add-icon"></div>{ts}Add Reminder{/ts}</span></a>
-      </div>
-
     </div>
-
-{else}
+  {else}
     <div class="messages status no-popup">
       <div class="icon inform-icon"></div>
-        {capture assign=crmURL}href="{crmURL p='civicrm/admin/scheduleReminders' q="action=add&reset=1"}" class="action-item"{/capture}
-        {ts 1=$crmURL}There are no Scheduled Reminders configured. You can <a %1>add one</a>.{/ts}
+      {ts}None found.{/ts}
     </div>
+  {/if}
+  <div class="action-link">
+    {assign var='link' value="civicrm/admin/scheduleReminders"}
+    {if $component}
+      {assign var='urlParams' value="action=add&context=$component&compId=$id&reset=1"}
+    {else}
+      {assign var='urlParams' value="action=add&reset=1"}
+    {/if}
+    {crmButton p=$link q=$urlParams id="newScheduleReminder"  icon="plus-circle"}{ts}Add Reminder{/ts}{/crmButton}
+  </div>
 {/if}
 {/if}

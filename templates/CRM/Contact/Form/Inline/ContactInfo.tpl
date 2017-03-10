@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
     {include file="CRM/common/formButtons.tpl"}
   </div>
 
-  <div class="crm-clear">  
+  <div class="crm-clear">
     {if $contactType eq 'Individual'}
     <div class="crm-summary-row">
       <div class="crm-label">{$form.employer_id.label}&nbsp;{help id="id-current-employer" file="CRM/Contact/Form/Contact.hlp"}</div>
@@ -40,7 +40,7 @@
     <div class="crm-summary-row">
       <div class="crm-label">{$form.job_title.label}</div>
       <div class="crm-content">{$form.job_title.html}</div>
-    <div>
+    </div>
     {/if}
     <div class="crm-summary-row">
       <div class="crm-label">{$form.nick_name.label}</div>

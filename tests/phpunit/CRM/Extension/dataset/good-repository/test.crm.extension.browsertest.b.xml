@@ -1,7 +1,0 @@
-<extension key='test.crm.extension.browsertest.b' type='module'>
-  <file>moduletest</file>
-  <name>test_crm_extension_browsertest_b</name>
-  <version>1.2</version>
-  <downloadUrl>http://example.com/test.crm.extension.browsertest.b-1.2.zip</downloadUrl>
-  <description>Brought to you by the letter "B"</description>
-</extension>

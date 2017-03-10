@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,22 +23,45 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
-
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
  */
 
 /**
- * Address utilties
+ * @package CRM
+ * @copyright CiviCRM LLC (c) 2004-2017
+ */
+
+/**
+ * Address utilities.
  */
 class CRM_Utils_Address_USPS {
 
-  static function checkAddress(&$values) {
+  /**
+   * Whether USPS validation should be disabled during import.
+   *
+   * @var bool
+   */
+  protected static $_disabled = FALSE;
+
+  /**
+   * Disable the USPS validation.
+   *
+   * @param bool $disable
+   */
+  public static function disable($disable = TRUE) {
+    self::$_disabled = $disable;
+  }
+
+  /**
+   * Check address against USPS.
+   *
+   * @param array $values
+   *
+   * @return bool
+   */
+  public static function checkAddress(&$values) {
+    if (self::$_disabled) {
+      return FALSE;
+    }
     if (!isset($values['street_address']) ||
       (!isset($values['city']) &&
         !isset($values['state_province']) &&
@@ -48,13 +71,8 @@ class CRM_Utils_Address_USPS {
       return FALSE;
     }
 
-
-    $userID = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::ADDRESS_STANDARDIZATION_PREFERENCES_NAME,
-      'address_standardization_userid'
-    );
-    $url = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::ADDRESS_STANDARDIZATION_PREFERENCES_NAME,
-      'address_standardization_url'
-    );
+    $userID = Civi::settings()->get('address_standardization_userid');
+    $url = Civi::settings()->get('address_standardization_url');
 
     if (empty($userID) ||
       empty($url)
@@ -81,8 +99,8 @@ class CRM_Utils_Address_USPS {
     $code = $request->getResponseCode();
     if ($code != 200) {
       $session->setStatus(ts('USPS Address Lookup Failed with HTTP status code: %1',
-          array(1 => $code)
-        ));
+        array(1 => $code)
+      ));
       return FALSE;
     }
 
@@ -105,17 +123,17 @@ class CRM_Utils_Address_USPS {
       return FALSE;
     }
 
-    $values['street_address'] = (string)$xml->Address->Address2;
-    $values['city'] = (string)$xml->Address->City;
-    $values['state_province'] = (string)$xml->Address->State;
-    $values['postal_code'] = (string)$xml->Address->Zip5;
-    $values['postal_code_suffix'] = (string)$xml->Address->Zip4;
+    $values['street_address'] = (string) $xml->Address->Address2;
+    $values['city'] = (string) $xml->Address->City;
+    $values['state_province'] = (string) $xml->Address->State;
+    $values['postal_code'] = (string) $xml->Address->Zip5;
+    $values['postal_code_suffix'] = (string) $xml->Address->Zip4;
 
     if (array_key_exists('Address1', $xml->Address)) {
-      $values['supplemental_address_1'] = (string)$xml->Address->Address1;
+      $values['supplemental_address_1'] = (string) $xml->Address->Address1;
     }
 
     return TRUE;
   }
-}
 
+}

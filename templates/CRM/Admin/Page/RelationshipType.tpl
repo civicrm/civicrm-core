@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,14 +29,14 @@
 {if $action eq 1 or $action eq 2 or $action eq 4 or $action eq 8}
    {include file="CRM/Admin/Form/RelationshipType.tpl"}
 {else}
-  <div id="help">
+  <div class="help">
     <p>{ts}Relationship types describe relationships between people, households and organizations. Relationship types labels describe the relationship from the perspective of each of the two entities (e.g. Parent &gt;-&lt; Child, Employer &gt;-&lt; Employee). For some types of relationships, the labels may be the same in both directions (e.g. Spouse &gt;-&lt; Spouse).{/ts} {$docLink}</p>
     <p>{ts 1=$customURL}You can define as many additional relationships types as needed to cover the types of relationships you want to track. Once a relationship type is created, you may also define custom fields to extend relationship information for that type from <a href='%1'>Administer CiviCRM &raquo; Custom Data</a>.{/ts}{help id='id-relationship-types'} </p>
   </div>
 {if $rows}
 {if !($action eq 1 and $action eq 2)}
     <div class="action-link">
-      <a href="{crmURL q="action=add&reset=1"}" class="button newRelationshipType"><span><div class="icon add-icon"></div>{ts}Add Relationship Type{/ts}</span></a>
+      {crmButton q="action=add&reset=1" class="newRelationshipType" icon="plus-circle"}{ts}Add Relationship Type{/ts}{/crmButton}
     </div>
 {/if}
 
@@ -45,7 +45,6 @@
     {strip}
   {* handle enable/disable actions*}
   {include file="CRM/common/enableDisableApi.tpl"}
-  {include file="CRM/common/crmeditable.tpl"}
     {include file="CRM/common/jsortable.tpl"}
         <table id="options" class="display">
         <thead>
@@ -75,17 +74,15 @@
         </table>
         {/strip}
 
-        {if !($action eq 1 and $action eq 2)}
-            <div class="action-link">
-              <a href="{crmURL q="action=add&reset=1"}" class="button newRelationshipType"><span><div class="icon add-icon"></div>{ts}Add Relationship Type{/ts}</span></a>
-            </div>
-        {/if}
 </div>
 {else}
     <div class="messages status no-popup">
-        <div class="icon inform-icon"></div>
-        {capture assign=crmURL}{crmURL p='civicrm/admin/reltype' q="action=add&reset=1"}{/capture}
-        {ts 1=$crmURL}There are no relationship types present. You can <a href='%1'>add one</a>.{/ts}
+      <img src="{$config->resourceBase}i/Inform.gif" alt="{ts}status{/ts}"/>
+      {ts}None found.{/ts}
     </div>
 {/if}
+  <div class="action-link">
+    {crmButton q="action=add&reset=1" class="newRelationshipType" icon="plus-circle"}{ts}Add Relationship Type{/ts}{/crmButton}
+    {crmButton p="civicrm/admin" q="reset=1" class="cancel" icon="times"}{ts}Done{/ts}{/crmButton}
+  </div>
 {/if}

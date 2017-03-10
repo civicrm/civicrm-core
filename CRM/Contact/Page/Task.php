@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,33 +23,31 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
  * This is a dummy class that does nothing at the moment.
- * the template is used primarily for displaying result page
+ *
+ * The template is used primarily for displaying result page
  * of tasks performed on contacts. Contacts are searched/selected
  * and then subjected to Tasks/Actions.
- *
  */
 class CRM_Contact_Page_Task extends CRM_Core_Page {
 
   /**
-   * returns the page title
+   * Returns the page title.
    *
-   * @return string the title of the page
-   * @access public
+   * @return string
+   *   the title of the page
    */
-  function getTitle() {
+  public function getTitle() {
     return "Task Results";
   }
-}
 
+}

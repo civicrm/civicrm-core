@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2010                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -50,10 +50,10 @@
 {/htxt}
 
 {htxt id="id-onDuplicate-title"}
-  {ts}Duplicate Matching{/ts}
+  {ts}Matching to Contacts for Inserts and Updates{/ts}
 {/htxt}
 {htxt id="id-onDuplicate"}
-    <p>
-    {ts}For each import, you can either INSERT new participant records, or UPDATE existing records during the import session. If you are UPDATING existing records (to update participant status after an event, for example), you will need to include a column containing the unique CiviCRM-assigned participant ID to match to the existing record. This value is included whenever you Export participant records from Find Participants. Please note that you cannot use UPDATE if you wish to use the External ID field to match to existing contacts because the External ID links the incoming record to contact, and that contact may have more than one participant registration record.{/ts}
-    </p>
+    <p>{ts}For each import, you can either INSERT new event registration (participant) records, or UPDATE existing records. You can not do both types of operations in a single import session.{/ts}</p>
+    <p>{ts}If you are INSERTING new participant records, you will need to include a column in your data file containing the values used to link the event registration to an existing contact. You can use the 'Internal Contact ID', an 'External Identifier' (if you are using those in your contact records), OR the property defined in your Unsupervised Duplicate Matching rule (which is Email Address by default).{/ts}</p>
+    <p>{ts}If you are UPDATING existing participants, you will need to include a column containing the unique CiviCRM-assigned participant ID to match to the existing participant record.{/ts}</p>
 {/htxt}

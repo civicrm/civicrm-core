@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,7 +25,7 @@
 *}
 <p>
 
-{if $rows } 
+{if $rows }
 <div class="crm-submit-buttons element-right">{$form.buttons.html}</div>
 <div class="spacer"></div>
 <br />
@@ -38,7 +38,7 @@
     <td>{ts}Amount Requested{/ts}</td>
     <td>{ts}Amount Requested(orig. currency){/ts}</td>
     <td>{ts}Amount Granted{/ts}</td>
-    <td>{ts}Application Recieved{/ts}</td>
+    <td>{ts}Application Received{/ts}</td>
     <td>{ts}Money Transferred{/ts}</td>
   </tr>
 {foreach from=$rows item=row}

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,38 +23,36 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
  */
 class CRM_Core_BAO_Discount extends CRM_Core_DAO_Discount {
 
   /**
-   * class constructor
+   * Class constructor.
    */
-  function __construct() {
+  public function __construct() {
     parent::__construct();
   }
 
   /**
-   * Function to delete the discount
+   * Delete the discount.
    *
-   * @param int $id   discount id
+   * @param int $entityId
+   * @param string $entityTable
    *
-   * @return boolean
-   * @access public
-   * @static
-   *
+   * @return bool
    */
-  static function del($entityId,$entityTable) {
+  public static function del($entityId, $entityTable) {
     // delete all discount records with the selected discounted id
-    $discount = new CRM_Core_DAO_Discount( );
-    $discount->entity_id    = $entityId;
+    $discount = new CRM_Core_DAO_Discount();
+    $discount->entity_id = $entityId;
     $discount->entity_table = $entityTable;
     if ($discount->delete()) {
       return TRUE;
@@ -68,14 +66,14 @@ class CRM_Core_BAO_Discount extends CRM_Core_DAO_Discount {
    * discount object. the params array contains additional unused name/value
    * pairs
    *
-   * @param array  $params         (reference) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference) an assoc array of name/value pairs.
    *
-   * @return object    CRM_Core_DAO_Discount object on success, otherwise null
-   * @access public
-   * @static
+   * @return object
+   *   CRM_Core_DAO_Discount object on success, otherwise null
    */
-  static function add(&$params) {
-    $discount = new CRM_Core_DAO_Discount( );
+  public static function add(&$params) {
+    $discount = new CRM_Core_DAO_Discount();
     $discount->copyValues($params);
     $discount->save();
     return $discount;
@@ -85,16 +83,18 @@ class CRM_Core_BAO_Discount extends CRM_Core_DAO_Discount {
    * Determine whether the given table/id
    * has discount associated with it
    *
-   * @param  integer  $entityId      entity id to be searched
-   * @param  string   $entityTable   entity table to be searched
+   * @param int $entityId
+   *   Entity id to be searched.
+   * @param string $entityTable
+   *   Entity table to be searched.
    *
-   * @return array    $optionGroupIDs option group Ids associated with discount
-   *
+   * @return array
+   *   option group Ids associated with discount
    */
-  static function getOptionGroup($entityId, $entityTable) {
-    $optionGroupIDs    = array();
-    $dao = new CRM_Core_DAO_Discount( );
-    $dao->entity_id    = $entityId;
+  public static function getOptionGroup($entityId, $entityTable) {
+    $optionGroupIDs = array();
+    $dao = new CRM_Core_DAO_Discount();
+    $dao->entity_id = $entityId;
     $dao->entity_table = $entityTable;
     $dao->find();
     while ($dao->fetch()) {
@@ -104,25 +104,26 @@ class CRM_Core_BAO_Discount extends CRM_Core_DAO_Discount {
   }
 
   /**
-   * Determine in which discount set the registration date falls
+   * Determine in which discount set the registration date falls.
    *
-   * @param  integer  $entityId      entity id to be searched
-   * @param  string   $entityTable   entity table to be searched
+   * @param int $entityID
+   *   Entity id to be searched.
+   * @param string $entityTable
+   *   Entity table to be searched.
    *
-   * @return integer  $dao->id       discount id of the set which matches
+   * @return int
+   *   $dao->id       discount id of the set which matches
    *                                 the date criteria
    */
-  static function findSet($entityID, $entityTable) {
-    if (empty($entityID) ||
-      empty($entityTable)
-    ) {
+  public static function findSet($entityID, $entityTable) {
+    if (empty($entityID) || empty($entityTable)) {
       // adding this here, to trap errors if values are not sent
       CRM_Core_Error::fatal();
       return NULL;
     }
 
-    $dao = new CRM_Core_DAO_Discount( );
-    $dao->entity_id    = $entityID;
+    $dao = new CRM_Core_DAO_Discount();
+    $dao->entity_id = $entityID;
     $dao->entity_table = $entityTable;
     $dao->find();
 
@@ -141,4 +142,3 @@ class CRM_Core_BAO_Discount extends CRM_Core_DAO_Discount {
   }
 
 }
-

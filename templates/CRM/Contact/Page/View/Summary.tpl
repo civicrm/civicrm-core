@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,8 +28,6 @@
   {include file="CRM/Contact/Form/Contact.tpl"}
 {else}
 
-  {include file="CRM/common/wysiwyg.tpl" includeWysiwygEditor=true}
-
   <div class="crm-summary-contactname-block crm-inline-edit-container">
     <div class="crm-summary-block" id="contactname-block">
       {include file="CRM/Contact/Page/Inline/ContactName.tpl"}
@@ -54,40 +52,37 @@
               {include file="CRM/Contact/Page/Inline/Actions.tpl"}
             </li>
           {/if}
-          {* Include Edit button if contact has 'edit contacts' permission OR user is viewing their own contact AND has 'edit my contact' permission. *}
-          {if $permission EQ 'edit' || call_user_func(array('CRM_Core_Permission','check'), 'edit my contact')}
+          {* Include Edit button if contact has 'edit contacts' permission OR user is viewing their own contact AND has 'edit my contact' permission. CRM_Contact_Page_View::checkUserPermission handles this and assigns $permission true as needed. *}
+          {if $permission EQ 'edit'}
             <li>
-              {assign var='editParams' value=$urlParams|cat:"&action=update&cid=$contactId"}
-              <a href="{crmURL p='civicrm/contact/add' q=$editParams}" class="edit button" title="{ts}Edit{/ts}">
-              <span><div class="icon edit-icon"></div>{ts}Edit{/ts}</span>
-              </a>
+              {crmButton p='civicrm/contact/add' q="$urlParams&action=update&cid=$contactId" class="edit"}
+                {ts}Edit{/ts}
+              {/crmButton}
             </li>
           {/if}
         {/if}
 
         {* Check for permissions to provide Restore and Delete Permanently buttons for contacts that are in the trash. *}
-        {if (call_user_func(array('CRM_Core_Permission','check'), 'access deleted contacts') and
-          $is_deleted)}
+        {if call_user_func(array('CRM_Core_Permission','check'), 'access deleted contacts') and $is_deleted}
           <li class="crm-contact-restore">
-            <a href="{crmURL p='civicrm/contact/view/delete' q="reset=1&cid=$contactId&restore=1"}" class="delete button" title="{ts}Restore{/ts}">
-              <span><div class="icon restore-icon"></div>{ts}Restore from Trash{/ts}</span>
-            </a>
+            {crmButton p='civicrm/contact/view/delete' q="reset=1&cid=$contactId&restore=1" class="delete" icon="undo"}
+              {ts}Restore from Trash{/ts}
+            {/crmButton}
           </li>
 
           {if call_user_func(array('CRM_Core_Permission','check'), 'delete contacts')}
             <li class="crm-contact-permanently-delete">
-              <a href="{crmURL p='civicrm/contact/view/delete' q="reset=1&delete=1&cid=$contactId&skip_undelete=1"}" class="delete button" title="{ts}Delete Permanently{/ts}">
-                <span><div class="icon delete-icon"></div>{ts}Delete Permanently{/ts}</span>
-              </a>
+              {crmButton p='civicrm/contact/view/delete' q="reset=1&delete=1&cid=$contactId&skip_undelete=1" class="delete" icon="trash"}
+                {ts}Delete Permanently{/ts}
+              {/crmButton}
             </li>
           {/if}
 
         {elseif call_user_func(array('CRM_Core_Permission','check'), 'delete contacts')}
-          {assign var='deleteParams' value="&reset=1&delete=1&cid=$contactId"}
           <li class="crm-delete-action crm-contact-delete">
-            <a href="{crmURL p='civicrm/contact/view/delete' q=$deleteParams}" class="delete button" title="{ts}Delete{/ts}">
-              <span><div class="icon delete-icon"></div>{ts}Delete Contact{/ts}</span>
-            </a>
+            {crmButton p='civicrm/contact/view/delete' q="&reset=1&delete=1&cid=$contactId" class="delete" icon="trash"}
+              {ts}Delete Contact{/ts}
+            {/crmButton}
           </li>
         {/if}
 
@@ -98,28 +93,26 @@
           </li>
         {else}
           {if $nextContactID}
-            {assign var='viewParams' value=$urlParams|cat:"&cid=$nextContactID"}
             <li class="crm-next-action">
-              <a href="{crmURL p='civicrm/contact/view' q=$viewParams}" class="view button" title="{$nextContactName}">
-                <span title="{$nextContactName}"><div class="icon next-icon"></div>{ts}Next{/ts}</span>
-              </a>
+              {crmButton p='civicrm/contact/view' q="$urlParams&cid=$nextContactID" class="view" title=$nextContactName icon="chevron-right"}
+                {ts}Next{/ts}
+              {/crmButton}
             </li>
           {/if}
           {if $prevContactID}
-            {assign var='viewParams' value=$urlParams|cat:"&cid=$prevContactID"}
             <li class="crm-previous-action">
-              <a href="{crmURL p='civicrm/contact/view' q=$viewParams}" class="view button" title="{$prevContactName}">
-                <span title="{$prevContactName}"><div class="icon previous-icon"></div>{ts}Previous{/ts}</span>
-              </a>
+              {crmButton p='civicrm/contact/view' q="$urlParams&cid=$prevContactID" class="view" title=$prevContactName icon="chevron-left"}
+                {ts}Previous{/ts}
+              {/crmButton}
             </li>
           {/if}
         {/if}
 
         {if !empty($groupOrganizationUrl)}
           <li class="crm-contact-associated-groups">
-            <a href="{$groupOrganizationUrl}" class="associated-groups button" title="{ts}Associated Multi-Org Group{/ts}">
-              <span><div class="icon associated-groups-icon"></div>{ts}Associated Multi-Org Group{/ts}</span>
-            </a>
+            {crmButton href=$groupOrganizationUrl class="associated-groups" icon="cubes"}
+              {ts}Associated Multi-Org Group{/ts}
+            {/crmButton}
           </li>
         {/if}
       </ul>
@@ -130,17 +123,11 @@
   <div class="crm-block crm-content-block crm-contact-page crm-inline-edit-container">
     <div id="mainTabContainer">
       <ul class="crm-contact-tabs-list">
-        <li id="tab_summary" class="crm-tab-button ui-corner-all">
-          <a href="#contact-summary" title="{ts}Summary{/ts}">
-            <span> </span> {ts}Summary{/ts}
-            <em></em>
-          </a>
-        </li>
         {foreach from=$allTabs key=tabName item=tabValue}
           <li id="tab_{$tabValue.id}" class="crm-tab-button ui-corner-all crm-count-{$tabValue.count}{if isset($tabValue.class)} {$tabValue.class}{/if}">
             <a href="{$tabValue.url}" title="{$tabValue.title}">
-              <span> </span> {$tabValue.title}
-              <em>{$tabValue.count}</em>
+              {$tabValue.title}
+              {if empty($tabValue.hideCount)}<em>{$tabValue.count}</em>{/if}
             </a>
           </li>
         {/foreach}
@@ -177,7 +164,13 @@
                         <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=$contactId&selectedChild=tag"}"
                            title="{ts}Edit Tags{/ts}">{ts}Tags{/ts}</a>
                       </div>
-                      <div class="crm-content" id="tags">{$contactTag}</div>
+                      <div class="crm-content" id="tags">
+                        {foreach from=$contactTag item=tagName key=tagId}
+                          <span class="crm-tag-item" {if !empty($allTags.$tagId.color)}style="background-color: {$allTags.$tagId.color}; color: {$allTags.$tagId.color|colorContrast};"{/if} title="{$allTags.$tagId.description}">
+                            {$tagName}
+                          </span>
+                        {/foreach}
+                      </div>
                     </div>
                     <div class="crm-summary-row">
                       <div class="crm-label">{ts}Contact Type{/ts}</div>
@@ -187,7 +180,7 @@
                     </div>
                     <div class="crm-summary-row">
                       <div class="crm-label">
-                        {ts}CiviCRM ID{/ts}{if !empty($userRecordUrl)} / {ts}User ID{/ts}{/if}
+                        {ts}Contact ID{/ts}{if !empty($userRecordUrl)} / {ts}User ID{/ts}{/if}
                       </div>
                       <div class="crm-content">
                         <span class="crm-contact-contact_id">{$contactId}</span>
@@ -256,6 +249,7 @@
           </div><!-- #contact_panel -->
           {if $showAddress}
             <div class="contact_panel">
+              {crmRegion name="contact-addresses"}
               {assign var='locationIndex' value=1}
               {if $address}
                 {foreach from=$address item=add key=locationIndex}
@@ -272,26 +266,30 @@
                   {include file="CRM/Contact/Page/Inline/Address.tpl"}
                 </div>
               {/if}
-
+              {/crmRegion}
               </div> <!-- end of contact panel -->
             {/if}
             <div class="contact_panel">
               {if $showCommunicationPreferences}
                 <div class="contactCardLeft">
+                  {crmRegion name="contact-comm-pref"}
                   <div class="crm-summary-comm-pref-block">
                     <div class="crm-summary-block" id="communication-pref-block" >
                       {include file="CRM/Contact/Page/Inline/CommunicationPreferences.tpl"}
                     </div>
                   </div>
+                  {/crmRegion}
                 </div> <!-- contactCardLeft -->
               {/if}
               {if $contact_type eq 'Individual' AND $showDemographics}
                 <div class="contactCardRight">
+                  {crmRegion name="contact-demographic"}
                   <div class="crm-summary-demographic-block">
                     <div class="crm-summary-block" id="demographic-block">
                       {include file="CRM/Contact/Page/Inline/Demographics.tpl"}
                     </div>
                   </div>
+                  {/crmRegion}
                 </div> <!-- contactCardRight -->
               {/if}
               <div class="clear"></div>
@@ -330,7 +328,7 @@
 {* CRM-10560 *}
 {literal}
 <script type="text/javascript">
-cj(function($) {
+CRM.$(function($) {
   $('.crm-inline-edit-container').crmFormContactLock({
     ignoreLabel: "{/literal}{ts escape='js'}Ignore{/ts}{literal}",
     saveAnywayLabel: "{/literal}{ts escape='js'}Save Anyway{/ts}{literal}",
@@ -339,6 +337,3 @@ cj(function($) {
 });
 </script>
 {/literal}
-
-{* jQuery validate *}
-{include file="CRM/Form/validate.tpl" form=0}

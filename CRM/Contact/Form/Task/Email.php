@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,25 +23,23 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
- * This class provides the functionality to email a group of
- * contacts.
+ * This class provides the functionality to email a group of contacts.
  */
 class CRM_Contact_Form_Task_Email extends CRM_Contact_Form_Task {
 
   /**
-   * Are we operating in "single mode", i.e. sending email to one
-   * specific contact?
+   * Are we operating in "single mode".
+   *
+   * Single mode means sending email to one specific contact.
    *
    * @var boolean
    */
@@ -56,57 +54,78 @@ class CRM_Contact_Form_Task_Email extends CRM_Contact_Form_Task {
   public $_noEmails = FALSE;
 
   /**
-   * all the existing templates in the system
+   * All the existing templates in the system.
    *
    * @var array
    */
   public $_templates = NULL;
 
   /**
-   * store "to" contact details
+   * Store "to" contact details.
    * @var array
    */
   public $_toContactDetails = array();
 
   /**
-   * store all selected contact id's, that includes to, cc and bcc contacts
+   * Store all selected contact id's, that includes to, cc and bcc contacts
    * @var array
    */
   public $_allContactIds = array();
 
   /**
-   * store only "to" contact ids
+   * Store only "to" contact ids.
    * @var array
    */
   public $_toContactIds = array();
 
   /**
-   * store only "cc" contact ids
+   * Store only "cc" contact ids.
    * @var array
    */
   public $_ccContactIds = array();
 
   /**
-   * store only "bcc" contact ids
+   * Store only "bcc" contact ids.
    * @var array
    */
   public $_bccContactIds = array();
 
   /**
-   * build all the data structures needed to build the form
-   *
-   * @return void
-   * @access public
-   */ function preProcess() {
+   * Build all the data structures needed to build the form.
+   */
+  public function preProcess() {
     // store case id if present
-    $this->_caseId = CRM_Utils_Request::retrieve('caseid', 'Positive', $this, FALSE);
+    $this->_caseId = CRM_Utils_Request::retrieve('caseid', 'String', $this, FALSE);
     $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this);
 
-    $cid = CRM_Utils_Request::retrieve('cid', 'Positive', $this, FALSE);
-    if ($cid) {
-      CRM_Contact_Page_View::setTitle($cid);
+    $cid = CRM_Utils_Request::retrieve('cid', 'String', $this, FALSE);
+
+    // Allow request to specify email id rather than contact id
+    $toEmailId = CRM_Utils_Request::retrieve('email_id', 'String', $this);
+    if ($toEmailId) {
+      $toEmail = civicrm_api('email', 'getsingle', array('version' => 3, 'id' => $toEmailId));
+      if (!empty($toEmail['email']) && !empty($toEmail['contact_id'])) {
+        $this->_toEmail = $toEmail;
+      }
+      if (!$cid) {
+        $cid = $toEmail['contact_id'];
+        $this->set('cid', $cid);
+      }
     }
 
+    if ($cid) {
+      $cid = explode(',', $cid);
+      $displayName = array();
+
+      foreach ($cid as $val) {
+        $displayName[] = CRM_Contact_BAO_Contact::displayName($val);
+      }
+
+      CRM_Utils_System::setTitle(implode(',', $displayName) . ' - ' . ts('Email'));
+    }
+    else {
+      CRM_Utils_System::setTitle(ts('New Email'));
+    }
     CRM_Contact_Form_Task_EmailCommon::preProcessFromAddress($this);
 
     if (!$cid && $this->_context != 'standalone') {
@@ -125,11 +144,7 @@ class CRM_Contact_Form_Task_Email extends CRM_Contact_Form_Task {
   }
 
   /**
-   * Build the form
-   *
-   * @access public
-   *
-   * @return void
+   * Build the form object.
    */
   public function buildQuickForm() {
     //enable form element
@@ -140,14 +155,20 @@ class CRM_Contact_Form_Task_Email extends CRM_Contact_Form_Task {
   }
 
   /**
-   * process the form after the input has been submitted and validated
-   *
-   * @access public
-   *
-   * @return void
+   * Process the form after the input has been submitted and validated.
    */
   public function postProcess() {
     CRM_Contact_Form_Task_EmailCommon::postProcess($this);
   }
-}
 
+  /**
+   * List available tokens for this form.
+   *
+   * @return array
+   */
+  public function listTokens() {
+    $tokens = CRM_Core_SelectValues::contactTokens();
+    return $tokens;
+  }
+
+}

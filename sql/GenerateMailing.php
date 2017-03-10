@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
  */
@@ -54,7 +54,7 @@ $tables = array(
 );
 foreach ($tables as $t) {
   $query = "DELETE FROM $t";
-  CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
+  CRM_Core_DAO::executeQuery($query);
 }
 
 $prefix = 'Automated Mailing Gen: ';
@@ -89,6 +89,9 @@ for ($i = 1; $i <= $numGroups; $i++) {
   $group->save();
 }
 
+/**
+ * @return string
+ */
 function generateRandomDate() {
   $year  = 2006 + mt_rand(0, 2);
   $month = 1 + mt_rand(0, 11);
@@ -96,5 +99,5 @@ function generateRandomDate() {
 
   $date = sprintf("%4d%02d%02d", $year, $month, $day) . '000000';
   return $date;
-}
 
+}

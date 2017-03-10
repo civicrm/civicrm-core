@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
  */
@@ -47,14 +47,12 @@ class CRM_PCP_Page_PCPInfo extends CRM_Core_Page {
    * Finally it calls the parent's run method.
    *
    * @return void
-   * @access public
-   *
    */
-  function run() {
-    $session         = CRM_Core_Session::singleton();
-    $config          = CRM_Core_Config::singleton();
+  public function run() {
+    $session = CRM_Core_Session::singleton();
+    $config = CRM_Core_Config::singleton();
     $permissionCheck = FALSE;
-    $statusMessage   = '';
+    $statusMessage = '';
     if ($config->userFramework != 'Joomla') {
       $permissionCheck = CRM_Core_Permission::check('administer CiviCRM');
     }
@@ -108,9 +106,9 @@ class CRM_PCP_Page_PCPInfo extends CRM_Core_Page {
     if ($pcpInfo['status_id'] != $approvedId || !$pcpInfo['is_active']) {
       if ($pcpInfo['contact_id'] != $session->get('userID') && !$permissionCheck) {
         CRM_Core_Error::statusBounce($statusMessage, CRM_Utils_System::url($urlBase,
-            "reset=1&id=" . $pcpInfo['page_id'],
-            FALSE, NULL, FALSE, TRUE
-          ));
+          "reset=1&id=" . $pcpInfo['page_id'],
+          FALSE, NULL, FALSE, TRUE
+        ));
       }
     }
     else {
@@ -118,9 +116,9 @@ class CRM_PCP_Page_PCPInfo extends CRM_Core_Page {
       if (!$getStatus) {
         // PCP not enabled for this contribution page. Forward everyone to source page
         CRM_Core_Error::statusBounce($statusMessage, CRM_Utils_System::url($urlBase,
-            "reset=1&id=" . $pcpInfo['page_id'],
-            FALSE, NULL, FALSE, TRUE
-          ));
+          "reset=1&id=" . $pcpInfo['page_id'],
+          FALSE, NULL, FALSE, TRUE
+        ));
       }
     }
 
@@ -137,7 +135,12 @@ class CRM_PCP_Page_PCPInfo extends CRM_Core_Page {
       $page_class = 'CRM_Event_DAO_Event';
       $this->assign('pageName', CRM_Event_PseudoConstant::event($pcpInfo['page_id']));
       CRM_Core_DAO::commonRetrieveAll($page_class, 'id',
-        $pcpInfo['page_id'], $default, array('start_date', 'end_date', 'registration_start_date', 'registration_end_date')
+        $pcpInfo['page_id'], $default, array(
+          'start_date',
+          'end_date',
+          'registration_start_date',
+          'registration_end_date',
+        )
       );
     }
     elseif ($pcpBlock->entity_table == 'civicrm_contribution_page') {
@@ -161,6 +164,7 @@ class CRM_PCP_Page_PCPInfo extends CRM_Core_Page {
       $hints = array(
         CRM_Core_Action::UPDATE => ts('Change the content and appearance of your page'),
         CRM_Core_Action::DETACH => ts('Send emails inviting your friends to support your campaign!'),
+        CRM_Core_Action::VIEW => ts('Copy this link to share directly with your network!'),
         CRM_Core_Action::BROWSE => ts('Update your personal contact information'),
         CRM_Core_Action::DISABLE => ts('De-activate the page (you can re-activate it later)'),
         CRM_Core_Action::ENABLE => ts('Activate the page (you can de-activate it later)'),
@@ -194,17 +198,18 @@ class CRM_PCP_Page_PCPInfo extends CRM_Core_Page {
 
     $honor = CRM_PCP_BAO_PCP::honorRoll($this->_id);
 
-    if ($fileInfo = reset(CRM_Core_BAO_File::getEntityFile('civicrm_pcp', $this->_id))) {
+    $entityFile = CRM_Core_BAO_File::getEntityFile('civicrm_pcp', $this->_id);
+    if (!empty($entityFile)) {
+      $fileInfo = reset($entityFile);
       $fileId = $fileInfo['fileID'];
       $image = '<img src="' . CRM_Utils_System::url('civicrm/file',
-        "reset=1&id=$fileId&eid={$this->_id}"
-      ) . '" />';
+          "reset=1&id=$fileId&eid={$this->_id}"
+        ) . '" />';
       $this->assign('image', $image);
     }
 
     $totalAmount = CRM_PCP_BAO_PCP::thermoMeter($this->_id);
     $achieved = round($totalAmount / $pcpInfo['goal_amount'] * 100, 2);
-
 
     if ($pcpBlock->is_active == 1) {
       $linkTextUrl = CRM_Utils_System::url('civicrm/contribute/campaign',
@@ -232,7 +237,6 @@ class CRM_PCP_Page_PCPInfo extends CRM_Core_Page {
       $startDate = CRM_Utils_Date::unixTime(CRM_Utils_Array::value('start_date', $pageInfo));
       $endDate = CRM_Utils_Date::unixTime(CRM_Utils_Array::value('end_date', $pageInfo));
     }
-
 
     $now = time();
     $validDate = TRUE;
@@ -262,7 +266,6 @@ class CRM_PCP_Page_PCPInfo extends CRM_Core_Page {
     }
 
     $this->assign('parentURL', $parentUrl);
-
 
     if ($validDate) {
 
@@ -298,14 +301,14 @@ class CRM_PCP_Page_PCPInfo extends CRM_Core_Page {
     switch ($action) {
       case CRM_Core_Action::BROWSE:
         $subForm = 'PCPAccount';
-        $form    = "CRM_PCP_Form_$subForm";
-        $single  = TRUE;
+        $form = "CRM_PCP_Form_$subForm";
+        $single = TRUE;
         break;
 
       case CRM_Core_Action::UPDATE:
         $subForm = 'Campaign';
-        $form    = "CRM_PCP_Form_$subForm";
-        $single  = TRUE;
+        $form = "CRM_PCP_Form_$subForm";
+        $single = TRUE;
         break;
     }
 
@@ -328,7 +331,10 @@ class CRM_PCP_Page_PCPInfo extends CRM_Core_Page {
     parent::run();
   }
 
-  function getTemplateFileName() {
+  /**
+   * @return string
+   */
+  public function getTemplateFileName() {
     if ($this->_id) {
       $templateFile = "CRM/PCP/Page/{$this->_id}/PCPInfo.tpl";
       $template = &CRM_Core_Page::getTemplate();
@@ -338,5 +344,5 @@ class CRM_PCP_Page_PCPInfo extends CRM_Core_Page {
     }
     return parent::getTemplateFileName();
   }
-}
 
+}

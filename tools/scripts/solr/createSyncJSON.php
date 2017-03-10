@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.1                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2011                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -36,6 +36,8 @@ define('CHUNK_SIZE', 128);
 
 /**
  * Split a large array of contactIDs into more manageable smaller chunks
+ * @param $contactIDs
+ * @return array
  */
 function &splitContactIDs(&$contactIDs) {
   // contactIDs could be a real large array, so we split it up into
@@ -65,6 +67,11 @@ function &splitContactIDs(&$contactIDs) {
 
 /**
  * Given a set of contact IDs get the values
+ * @param $contactIDs
+ * @param $values
+ * @param $allContactIDs
+ * @param $addditionalContactIDs
+ * @return array
  */
 function getValues(&$contactIDs, &$values, &$allContactIDs, &$addditionalContactIDs) {
   $values = array();
@@ -86,6 +93,15 @@ function getValues(&$contactIDs, &$values, &$allContactIDs, &$addditionalContact
   return $values;
 }
 
+/**
+ * @param $contactIDs
+ * @param $values
+ * @param $tableName
+ * @param $fields
+ * @param $whereField
+ * @param null $additionalWhereCond
+ * @param bool $flat
+ */
 function getTableInfo(&$contactIDs, &$values, $tableName, &$fields,
   $whereField, $additionalWhereCond = NULL,
   $flat = FALSE
@@ -120,6 +136,10 @@ SELECT $selectString, $whereField as contact_id
   $dao->free();
 }
 
+/**
+ * @param $contactIDs
+ * @param $values
+ */
 function getContactInfo(&$contactIDs, &$values) {
   $fields = array('id' => NULL,
     'sort_name' => NULL,
@@ -138,6 +158,10 @@ function getContactInfo(&$contactIDs, &$values) {
   getTableInfo($contactIDs, $values, 'civicrm_contact', $fields, 'id', NULL, TRUE);
 }
 
+/**
+ * @param $contactIDs
+ * @param $values
+ */
 function getNoteInfo(&$contactIDs, &$values) {
   $ids = implode(',', $contactIDs);
 
@@ -164,6 +188,10 @@ AND   entity_table = 'civicrm_contact'
   $dao->free();
 }
 
+/**
+ * @param $contactIDs
+ * @param $values
+ */
 function getPhoneInfo(&$contactIDs, &$values) {
   $ids = implode(',', $contactIDs);
 
@@ -179,7 +207,7 @@ INNER JOIN civicrm_phone          p  ON p.contact_id        = c.id
 LEFT  JOIN civicrm_location_type  l  ON p.location_type_id  = l.id
 LEFT  JOIN civicrm_option_group   g  ON g.name = 'phone_type'
 LEFT  JOIN civicrm_option_value   v  ON v.option_group_id = g.id AND p.phone_type_id = v.value
-WHERE      c.id IN ( $ids ) 
+WHERE      c.id IN ( $ids )
 AND        p.phone IS NOT NULL
 ";
 
@@ -197,6 +225,10 @@ AND        p.phone IS NOT NULL
   $dao->free();
 }
 
+/**
+ * @param $contactIDs
+ * @param $values
+ */
 function getEmailInfo(&$contactIDs, &$values) {
   $ids = implode(',', $contactIDs);
 
@@ -209,7 +241,7 @@ SELECT
 FROM      civicrm_contact c
 INNER JOIN civicrm_email          e  ON e.contact_id        = c.id
 LEFT  JOIN civicrm_location_type  l  ON e.location_type_id  = l.id
-WHERE      c.id IN ( $ids ) 
+WHERE      c.id IN ( $ids )
 AND        e.email IS NOT NULL
 ";
 
@@ -225,6 +257,10 @@ AND        e.email IS NOT NULL
   $dao->free();
 }
 
+/**
+ * @param $contactIDs
+ * @param $values
+ */
 function getAddressInfo(&$contactIDs, &$values) {
   $ids = implode(',', $contactIDs);
 
@@ -232,7 +268,7 @@ function getAddressInfo(&$contactIDs, &$values) {
 SELECT     a.id as id,
            c.id as contact_id, l.name as location_type,
            a.street_address, a.supplemental_address_1, a.supplemental_address_2,
-           a.city, a.postal_code, 
+           a.city, a.postal_code,
            s.name as state, co.name as country
 FROM       civicrm_contact c
 INNER JOIN civicrm_address        a  ON a.contact_id        = c.id
@@ -263,6 +299,12 @@ WHERE c.id IN ( $ids )
   $dao->free();
 }
 
+/**
+ * @param $contactIDs
+ * @param $values
+ * @param $allContactIDs
+ * @param $additionalContacts
+ */
 function getRelationshipInfo(&$contactIDs, &$values, &$allContactIDs, &$additionalContacts) {
   // handle relationships only once
   static $_relationshipsHandled = array();
@@ -309,6 +351,12 @@ function getRelationshipInfo(&$contactIDs, &$values, &$allContactIDs, &$addition
   $dao->free();
 }
 
+/**
+ * @param $contactIDs
+ * @param $values
+ * @param $allContactIDs
+ * @param $additionalContacts
+ */
 function getActivityInfo(&$contactIDs, &$values, &$allContactIDs, &$additionalContacts) {
   static $_activitiesHandled = array();
 
@@ -393,6 +441,13 @@ function getActivityInfo(&$contactIDs, &$values, &$allContactIDs, &$additionalCo
   addAdditionalContacts($activityContacts, $allContactIDs, $additionalContacts);
 }
 
+/**
+ * @param $values
+ * @param $id
+ * @param $name
+ * @param $value
+ * @param bool $ignored
+ */
 function appendValue(&$values, $id, $name, $value, $ignored = FALSE) {
   if (empty($value)) {
     return;
@@ -405,6 +460,11 @@ function appendValue(&$values, $id, $name, $value, $ignored = FALSE) {
   $values[$name][] = array_values($value);
 }
 
+/**
+ * @param string $daoName
+ *
+ * @return mixed
+ */
 function getDBFields($daoName) {
   static $_fieldsRetrieved = array();
 
@@ -429,6 +489,11 @@ function getDBFields($daoName) {
   return $_fieldsRetrieved[$daoName];
 }
 
+/**
+ * @param $contactIDs
+ * @param $allContactIDs
+ * @param $additionalContacts
+ */
 function addAdditionalContacts($contactIDs, &$allContactIDs, &$additionalContacts) {
   foreach ($contactIDs as $cid) {
     if ($cid &&
@@ -440,6 +505,11 @@ function addAdditionalContacts($contactIDs, &$allContactIDs, &$additionalContact
   }
 }
 
+/**
+ * @param $values
+ * @param $contactIDs
+ * @param $allContactIDs
+ */
 function run(&$values, &$contactIDs, &$allContactIDs) {
   $chunks = &splitContactIDs($contactIDs);
 
@@ -461,7 +531,7 @@ $config->userFrameworkClass = 'CRM_Utils_System_Soap';
 $config->userHookClass = 'CRM_Utils_Hook_Soap';
 
 $sql = "
-SELECT id 
+SELECT id
 FROM civicrm_contact
 LIMIT 10
 ";

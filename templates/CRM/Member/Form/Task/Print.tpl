@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,7 +24,7 @@
  +--------------------------------------------------------------------+
 *}
 <p>
-{if $rows } 
+{if $rows }
 <div class="form-item">
      <span class="element-right">{include file="CRM/common/formButtons.tpl" location="top"}</span>
 </div>
@@ -44,12 +44,12 @@
 {foreach from=$rows item=row}
     <tr class="{cycle values="odd-row,even-row"} crm-membership">
         <td class="crm-membership-sort_name">{$row.sort_name}</td>
-        <td class="crm-membership-type crm-membership-type_{$row.membership_type_id}">{$row.membership_type_id}</td>
+        <td class="crm-membership-type crm-membership-type_{$row.membership_type}">{$row.membership_type}</td>
         <td class="crm-membership-join_date">{$row.join_date|truncate:10:''|crmDate}</td>
         <td class="crm-membership-start_date">{$row.membership_start_date|truncate:10:''|crmDate}</td>
         <td class="crm-membership-membership_end_date">{$row.membership_end_date|truncate:10:''|crmDate}</td>
         <td class="crm-membership-source">{$row.membership_source}</td>
-        <td class="crm-membership-status crm-membership-status_{$row.status_id}">{$row.status_id}</td>
+        <td class="crm-membership-status crm-membership-status_{$row.membership_status}">{$row.membership_status}</td>
     </tr>
 {/foreach}
 </table>

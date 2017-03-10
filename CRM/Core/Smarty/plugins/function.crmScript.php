@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -36,28 +36,31 @@
 /**
  * Add a Javascript file to a specific part of the page
  *
- * @param $params array with keys:
- *  - ext: string, extension name. see CRM_Core_Resources::addScriptFile
- *  - file: string, relative file path. see CRM_Core_Resources::addScriptFile
- *  - url: string. see CRM_Core_Resources::addScriptURL
- *  - weight: int; default: CRM_Core_Resources::DEFAULT_WEIGHT (0)
- *  - region: string; default: CRM_Core_Resources::DEFAULT_REGION ('html-header')
+ * @param array $params
+ *   Array with keys:
+ *   - ext: string, extension name. see CRM_Core_Resources::addScriptFile
+ *   - file: string, relative file path. see CRM_Core_Resources::addScriptFile
+ *   - url: string. see CRM_Core_Resources::addScriptURL
+ *   - weight: int; default: CRM_Core_Resources::DEFAULT_WEIGHT (0)
+ *   - region: string; default: CRM_Core_Resources::DEFAULT_REGION ('html-header')
+ * @param CRM_Core_Smarty $smarty
+ *
+ * @throws Exception
  */
 function smarty_function_crmScript($params, &$smarty) {
-  $res = CRM_Core_Resources::singleton();
-
-  if (empty($params['weight'])) {
-    $params['weight'] = CRM_Core_Resources::DEFAULT_WEIGHT;
-  }
-  if (empty($params['region'])) {
-    $params['region'] = CRM_Core_Resources::DEFAULT_REGION;
-  }
+  $params += array(
+    'weight' => CRM_Core_Resources::DEFAULT_WEIGHT,
+    'region' => CRM_Core_Resources::DEFAULT_REGION,
+    'ext' => 'civicrm',
+  );
 
   if (array_key_exists('file', $params)) {
-    $res->addScriptFile($params['ext'], $params['file'], $params['weight'], $params['region']);
-  } elseif (array_key_exists('url', $params)) {
-    $res->addScriptUrl($params['url'], $params['weight'], $params['region']);
-  } else {
+    Civi::resources()->addScriptFile($params['ext'], $params['file'], $params['weight'], $params['region']);
+  }
+  elseif (array_key_exists('url', $params)) {
+    Civi::resources()->addScriptUrl($params['url'], $params['weight'], $params['region']);
+  }
+  else {
     CRM_Core_Error::debug_var('crmScript_params', $params);
     throw new Exception("crmScript requires url or ext+file");
   }

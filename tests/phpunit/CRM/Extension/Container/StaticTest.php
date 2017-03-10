@@ -1,31 +1,34 @@
 <?php
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-
+/**
+ * Class CRM_Extension_Container_StaticTest
+ * @group headless
+ */
 class CRM_Extension_Container_StaticTest extends CiviUnitTestCase {
-  function setUp() {
+  public function setUp() {
     parent::setUp();
   }
 
-  function tearDown() {
+  public function tearDown() {
     parent::tearDown();
   }
 
-  function testGetKeysEmpty() {
+  public function testGetKeysEmpty() {
     $c = new CRM_Extension_Container_Static(array());
     $this->assertEquals($c->getKeys(), array());
   }
 
-  function testGetKeys() {
+  public function testGetKeys() {
     $c = $this->_createContainer();
     $this->assertEquals($c->getKeys(), array('test.foo', 'test.foo.bar'));
   }
 
-  function testGetPath() {
+  public function testGetPath() {
     $c = $this->_createContainer();
     try {
       $c->getPath('un.kno.wn');
-    } catch (CRM_Extension_Exception $e) {
+    }
+    catch (CRM_Extension_Exception $e) {
       $exc = $e;
     }
     $this->assertTrue(is_object($exc), 'Expected exception');
@@ -34,11 +37,12 @@ class CRM_Extension_Container_StaticTest extends CiviUnitTestCase {
     $this->assertEquals("/path/to/bar", $c->getPath('test.foo.bar'));
   }
 
-  function testGetResUrl() {
+  public function testGetResUrl() {
     $c = $this->_createContainer();
     try {
       $c->getResUrl('un.kno.wn');
-    } catch (CRM_Extension_Exception $e) {
+    }
+    catch (CRM_Extension_Exception $e) {
       $exc = $e;
     }
     $this->assertTrue(is_object($exc), 'Expected exception');
@@ -47,7 +51,10 @@ class CRM_Extension_Container_StaticTest extends CiviUnitTestCase {
     $this->assertEquals('http://foobar', $c->getResUrl('test.foo.bar'));
   }
 
-  function _createContainer() {
+  /**
+   * @return CRM_Extension_Container_Static
+   */
+  public function _createContainer() {
     return new CRM_Extension_Container_Static(array(
       'test.foo' => array(
         'path' => '/path/to/foo',
@@ -59,4 +66,5 @@ class CRM_Extension_Container_StaticTest extends CiviUnitTestCase {
       ),
     ));
   }
+
 }

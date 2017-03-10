@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,14 +23,14 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 
 /*
-* Copyright (C) 2010 Tech To The People
-* Licensed to CiviCRM under the Academic Free License version 3.0.
-*
-*/
+ * Copyright (C) 2010 Tech To The People
+ * Licensed to CiviCRM under the Academic Free License version 3.0.
+ *
+ */
 
 /**
  *
@@ -38,27 +38,41 @@
  *
  */
 class CRM_Event_Badge_NameTent extends CRM_Event_Badge {
-  function __construct() {
+  /**
+   */
+  public function __construct() {
     parent::__construct();
     // A4
-    $pw            = 297;
-    $ph            = 210;
+    $pw = 297;
+    $ph = 210;
     $this->lMargin = 10;
     $this->tMargin = 0;
-    $w             = $pw - 2 * $this->lMargin;
-    $h             = $ph - 2 * $this->tMargin;
-    $this->format  = array(
-      'name' => 'A4 horiz', 'paper-size' => 'A4', 'metric' => 'mm', 'lMargin' => 0,
-      'tMargin' => 0, 'NX' => 1, 'NY' => 1, 'SpaceX' => 0, 'SpaceY' => 0,
-      'width' => $w, 'height' => $h, 'font-size' => 36,
+    $w = $pw - 2 * $this->lMargin;
+    $h = $ph - 2 * $this->tMargin;
+    $this->format = array(
+      'name' => 'A4 horiz',
+      'paper-size' => 'A4',
+      'metric' => 'mm',
+      'lMargin' => 0,
+      'tMargin' => 0,
+      'NX' => 1,
+      'NY' => 1,
+      'SpaceX' => 0,
+      'SpaceY' => 0,
+      'width' => $w,
+      'height' => $h,
+      'font-size' => 36,
     );
     //      $this->setDebug ();
   }
 
-  function pdfExtraFormat() {
+  public function pdfExtraFormat() {
     $this->pdf->setPageFormat('A4', 'L');
   }
 
+  /**
+   * @param $participant
+   */
   protected function writeOneSide(&$participant) {
     $this->pdf->SetXY(0, $this->pdf->height / 2);
     $this->printBackground(TRUE);
@@ -71,6 +85,9 @@ class CRM_Event_Badge_NameTent extends CRM_Event_Badge {
     $this->pdf->Write(0, $participant['current_employer'], NULL, NULL, 'C');
   }
 
+  /**
+   * @param $participant
+   */
   public function generateLabel($participant) {
     $this->writeOneSide($participant);
     $this->pdf->StartTransform();
@@ -78,5 +95,5 @@ class CRM_Event_Badge_NameTent extends CRM_Event_Badge {
     $this->writeOneSide($participant);
     $this->pdf->StopTransform();
   }
-}
 
+}

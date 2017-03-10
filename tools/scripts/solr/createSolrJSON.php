@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.1                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2011                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -36,6 +36,8 @@ define('CHUNK_SIZE', 128);
 
 /**
  * Split a large array of contactIDs into more manageable smaller chunks
+ * @param $contactIDs
+ * @return array
  */
 function &splitContactIDs(&$contactIDs) {
   // contactIDs could be a real large array, so we split it up into
@@ -65,6 +67,8 @@ function &splitContactIDs(&$contactIDs) {
 
 /**
  * Given an array of values, generate the JSON in the Solr format
+ * @param $values
+ * @return string
  */
 function &generateSolrJSON($values) {
   $result = "[";
@@ -105,6 +109,11 @@ function &generateSolrJSON($values) {
   return $result;
 }
 
+/**
+ * @param $value
+ *
+ * @return mixed
+ */
 function escapeJsonString($value) {
   $escapers = array("\\", "/", "\"", "\n", "\r", "\t", "\x08", "\x0c");
   $replacements = array("\\\\", "\\/", "\\\"", "\\n", "\\r", "\\t", "\\f", "\\b");
@@ -113,6 +122,9 @@ function escapeJsonString($value) {
 
 /**
  * Given a set of contact IDs get the values
+ * @param $contactIDs
+ * @param $values
+ * @return array
  */
 function getValues(&$contactIDs, &$values) {
   $values = array();
@@ -130,6 +142,14 @@ function getValues(&$contactIDs, &$values) {
   return $values;
 }
 
+/**
+ * @param $contactIDs
+ * @param $values
+ * @param $tableName
+ * @param $fields
+ * @param $whereField
+ * @param null $additionalWhereCond
+ */
 function getTableInfo(&$contactIDs, &$values, $tableName, &$fields, $whereField, $additionalWhereCond = NULL) {
   $selectString = implode(',', array_keys($fields));
   $idString = implode(',', $contactIDs);
@@ -153,6 +173,10 @@ SELECT $selectString, $whereField as contact_id
   }
 }
 
+/**
+ * @param $contactIDs
+ * @param $values
+ */
 function getContactInfo(&$contactIDs, &$values) {
   $fields = array('sort_name' => NULL,
     'display_name' => NULL,
@@ -170,6 +194,10 @@ function getContactInfo(&$contactIDs, &$values) {
   getTableInfo($contactIDs, $values, 'civicrm_contact', $fields, 'id');
 }
 
+/**
+ * @param $contactIDs
+ * @param $values
+ */
 function getNoteInfo(&$contactIDs, &$values) {
   $ids = implode(',', $contactIDs);
 
@@ -191,6 +219,10 @@ AND   entity_table = 'civicrm_contact'
   }
 }
 
+/**
+ * @param $contactIDs
+ * @param $values
+ */
 function getPhoneInfo(&$contactIDs, &$values) {
   $ids = implode(',', $contactIDs);
 
@@ -205,7 +237,7 @@ INNER JOIN civicrm_phone          p  ON p.contact_id        = c.id
 LEFT  JOIN civicrm_location_type  l  ON p.location_type_id  = l.id
 LEFT  JOIN civicrm_option_group   g  ON g.name = 'phone_type'
 LEFT  JOIN civicrm_option_value   v  ON v.option_group_id = g.id AND p.phone_type_id = v.value
-WHERE      c.id IN ( $ids ) 
+WHERE      c.id IN ( $ids )
 AND        p.phone IS NOT NULL
 ";
 
@@ -227,6 +259,10 @@ AND        p.phone IS NOT NULL
   }
 }
 
+/**
+ * @param $contactIDs
+ * @param $values
+ */
 function getEmailInfo(&$contactIDs, &$values) {
   $ids = implode(',', $contactIDs);
 
@@ -238,7 +274,7 @@ SELECT
 FROM      civicrm_contact c
 INNER JOIN civicrm_email          e  ON e.contact_id        = c.id
 LEFT  JOIN civicrm_location_type  l  ON e.location_type_id  = l.id
-WHERE      c.id IN ( $ids ) 
+WHERE      c.id IN ( $ids )
 AND        e.email IS NOT NULL
 ";
 
@@ -255,13 +291,17 @@ AND        e.email IS NOT NULL
   }
 }
 
+/**
+ * @param $contactIDs
+ * @param $values
+ */
 function getAddressInfo(&$contactIDs, &$values) {
   $ids = implode(',', $contactIDs);
 
   $sql = "
 SELECT     c.id as contact_id, l.name as location_type,
            a.street_address, a.supplemental_address_1, a.supplemental_address_2,
-           a.city, a.postal_code, 
+           a.city, a.postal_code,
            s.name as state, co.name as country
 FROM       civicrm_contact c
 INNER JOIN civicrm_address        a  ON a.contact_id        = c.id
@@ -294,6 +334,12 @@ WHERE c.id IN ( $ids )
   }
 }
 
+/**
+ * @param $values
+ * @param $contactID
+ * @param $name
+ * @param $value
+ */
 function appendValue(&$values, $contactID, $name, $value) {
   if (empty($value)) {
     return;
@@ -312,6 +358,9 @@ function appendValue(&$values, $contactID, $name, $value) {
   }
 }
 
+/**
+ * @param $contactIDs
+ */
 function run(&$contactIDs) {
   $chunks = &splitContactIDs($contactIDs);
 
@@ -329,7 +378,7 @@ $config->userFrameworkClass = 'CRM_Utils_System_Soap';
 $config->userHookClass = 'CRM_Utils_Hook_Soap';
 
 $sql = <<<EOT
-SELECT id 
+SELECT id
 FROM civicrm_contact
 EOT;
 $dao = &CRM_Core_DAO::executeQuery($sql);

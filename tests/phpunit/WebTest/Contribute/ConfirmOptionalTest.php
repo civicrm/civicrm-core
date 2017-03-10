@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,9 +22,13 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Contribute_ConfirmOptionalTest
+ */
 class WebTest_Contribute_ConfirmOptionalTest extends CiviSeleniumTestCase {
   protected $pageId = 0;
 
@@ -32,7 +36,7 @@ class WebTest_Contribute_ConfirmOptionalTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testWithConfirm() {
+  public function testWithConfirm() {
     $this->_addContributionPage(TRUE);
     $this->_fillOutContributionPage();
 
@@ -47,7 +51,7 @@ class WebTest_Contribute_ConfirmOptionalTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isTextPresent("Your transaction has been processed successfully"), "Should load thank you page");
   }
 
-  function testWithoutConfirm() {
+  public function testWithoutConfirm() {
     $this->_addContributionPage(FALSE);
     $this->_fillOutContributionPage();
 
@@ -56,6 +60,9 @@ class WebTest_Contribute_ConfirmOptionalTest extends CiviSeleniumTestCase {
     $this->assertFalse($this->isTextPresent("Your contribution will not be completed until"), "Loaded confirmation page");
   }
 
+  /**
+   * @param $isConfirmEnabled
+   */
   protected function _addContributionPage($isConfirmEnabled) {
     // log in
     $this->webtestLogin();
@@ -84,14 +91,14 @@ class WebTest_Contribute_ConfirmOptionalTest extends CiviSeleniumTestCase {
       $isPcpApprovalNeeded = FALSE,
       $isSeparatePayment = FALSE,
       $honoreeSection = FALSE,
-      $allowOtherAmmount = TRUE,
+      $allowOtherAmount = TRUE,
       $isConfirmEnabled = $isConfirmEnabled
     );
   }
 
   protected function _fillOutContributionPage() {
     // load contribution page
-    $this->openCiviPage("contribute/transact", "reset=1&id={$this->pageId}", "_qf_Main_upload-bottom");
+    $this->openCiviPage("contribute/transact", "reset=1&id={$this->pageId}&action=preview", "_qf_Main_upload-bottom");
 
     // fill out info
     $this->type("xpath=//div[@class='crm-section other_amount-section']//div[2]/input", "30");
@@ -103,5 +110,5 @@ class WebTest_Contribute_ConfirmOptionalTest extends CiviSeleniumTestCase {
     $this->click("_qf_Main_upload-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
   }
-}
 
+}

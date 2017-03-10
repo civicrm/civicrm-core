@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
  */
@@ -39,17 +39,18 @@
  */
 class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
 
+  public $useLivePageJS = TRUE;
+
   /**
-   * Function to set variables up before form is built
+   * Set variables up before form is built.
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
-    $values        = $ids = array();
+    $values = $ids = array();
     $participantID = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
-    $contactID     = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
-    $params        = array('id' => $participantID);
+    $contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
+    $params = array('id' => $participantID);
 
     CRM_Event_BAO_Participant::getValues($params,
       $values,
@@ -68,7 +69,35 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
 
     $this->assign('contactId', $contactID);
     $this->assign('participantId', $participantID);
+
+    $paymentId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment',
+      $participantID, 'id', 'participant_id'
+    );
+    $this->assign('hasPayment', $paymentId);
+    $this->assign('componentId', $participantID);
+    $this->assign('component', 'event');
+
+    if ($parentParticipantId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant',
+      $participantID, 'registered_by_id'
+    )
+    ) {
+      $parentHasPayment = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment',
+        $parentParticipantId, 'id', 'participant_id'
+      );
+      $this->assign('parentHasPayment', $parentHasPayment);
+    }
+
     $statusId = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_Participant', $participantID, 'status_id', 'id');
+    $status = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_ParticipantStatusType', $statusId, 'name', 'id');
+    $status = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_ParticipantStatusType', $statusId, 'name', 'id');
+    if ($status == 'Transferred') {
+      $transferId = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_Participant', $participantID, 'transferred_to_contact_id', 'id');
+      $pid = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_Participant', $transferId, 'id', 'contact_id');
+      $transferName = current(CRM_Contact_BAO_Contact::getContactDetails($transferId));
+      $this->assign('pid', $pid);
+      $this->assign('transferId', $transferId);
+      $this->assign('transferName', $transferName);
+    }
     $participantStatuses = CRM_Event_PseudoConstant::participantStatus();
 
     if ($values[$participantID]['is_test']) {
@@ -79,7 +108,6 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
     $noteValue = CRM_Core_BAO_Note::getNote($participantID, 'civicrm_participant');
 
     $values[$participantID]['note'] = array_values($noteValue);
-
 
     // Get Line Items
     $lineItem = CRM_Price_BAO_LineItem::getLineItems($participantID);
@@ -114,19 +142,19 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
 
     foreach ($allRoleIDs as $k => $v) {
       $roleGroupTree = CRM_Core_BAO_CustomGroup::getTree('Participant', $this, $participantID, NULL, $v, $roleCustomDataTypeID);
-      $eventGroupTree = &CRM_Core_BAO_CustomGroup::getTree('Participant', $this, $participantID, NULL,
+      $eventGroupTree = CRM_Core_BAO_CustomGroup::getTree('Participant', $this, $participantID, NULL,
         $values[$participantID]['event_id'], $eventNameCustomDataTypeID
       );
-      $eventTypeID        = CRM_Core_DAO::getFieldValue("CRM_Event_DAO_Event", $values[$participantID]['event_id'], 'event_type_id', 'id');
+      $eventTypeID = CRM_Core_DAO::getFieldValue("CRM_Event_DAO_Event", $values[$participantID]['event_id'], 'event_type_id', 'id');
       $eventTypeGroupTree = CRM_Core_BAO_CustomGroup::getTree('Participant', $this, $participantID, NULL, $eventTypeID, $eventTypeCustomDataTypeID);
-      $groupTree          = CRM_Utils_Array::crmArrayMerge($roleGroupTree, $eventGroupTree);
-      $groupTree          = CRM_Utils_Array::crmArrayMerge($groupTree, $eventTypeGroupTree);
-      $groupTree          = CRM_Utils_Array::crmArrayMerge($groupTree, CRM_Core_BAO_CustomGroup::getTree('Participant', $this, $participantID));
+      $groupTree = CRM_Utils_Array::crmArrayMerge($roleGroupTree, $eventGroupTree);
+      $groupTree = CRM_Utils_Array::crmArrayMerge($groupTree, $eventTypeGroupTree);
+      $groupTree = CRM_Utils_Array::crmArrayMerge($groupTree, CRM_Core_BAO_CustomGroup::getTree('Participant', $this, $participantID));
       foreach ($groupTree as $treeId => $trees) {
         $finalTree[$treeId] = $trees;
       }
     }
-    CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $finalTree);
+    CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $finalTree, FALSE, NULL, NULL, NULL, $participantID);
     $eventTitle = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $values[$participantID]['event_id'], 'title');
     //CRM-7150, show event name on participant view even if the event is disabled
     if (empty($values[$participantID]['event'])) {
@@ -162,17 +190,24 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
     $displayName = CRM_Contact_BAO_Contact::displayName($values[$participantID]['contact_id']);
 
     $participantCount = array();
+    $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
+    $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
+    $totalTaxAmount = 0;
     foreach ($lineItem as $k => $v) {
       if (CRM_Utils_Array::value('participant_count', $lineItem[$k]) > 0) {
         $participantCount[] = $lineItem[$k]['participant_count'];
       }
+      $totalTaxAmount = $v['tax_amount'] + $totalTaxAmount;
+    }
+    if ($invoicing) {
+      $this->assign('totalTaxAmount', $totalTaxAmount);
     }
     if ($participantCount) {
       $this->assign('pricesetFieldsCount', $participantCount);
     }
     $this->assign('displayName', $displayName);
     // omitting contactImage from title for now since the summary overlay css doesn't work outside of our crm-container
-    CRM_Utils_System::setTitle(ts('View Event Registration for') .  ' ' . $displayName);
+    CRM_Utils_System::setTitle(ts('View Event Registration for') . ' ' . $displayName);
 
     $roleId = CRM_Utils_Array::value('role_id', $values[$participantID]);
     $title = $displayName . ' (' . CRM_Utils_Array::value($roleId, $participantRoles) . ' - ' . $eventTitle . ')';
@@ -196,13 +231,11 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
   }
 
   /**
-   * Function to build the form
+   * Build the form object.
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
-    CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
     $this->addButtons(array(
         array(
           'type' => 'cancel',
@@ -213,5 +246,5 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
       )
     );
   }
-}
 
+}

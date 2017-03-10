@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
-| CiviCRM version 4.4                                                |
+| CiviCRM version 4.7                                                |
 +--------------------------------------------------------------------+
-| Copyright CiviCRM LLC (c) 2004-2013                                |
+| Copyright CiviCRM LLC (c) 2004-2017                                |
 +--------------------------------------------------------------------+
 | This file is a part of CiviCRM.                                    |
 |                                                                    |
@@ -23,16 +23,19 @@
 | GNU Affero General Public License or the licensing of CiviCRM,     |
 | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
 +--------------------------------------------------------------------+
-*/
-require_once 'CiviTest/CiviUnitTestCase.php';
+ */
 
+/**
+ * Class CRM_Core_JobManagerTest
+ * @group headless
+ */
 class CRM_Core_JobManagerTest extends CiviUnitTestCase {
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
   }
 
-  function testHookCron() {
+  public function testHookCron() {
     $hook = $this->getMock('stdClass', array('civicrm_cron'));
     $hook->expects($this->once())
       ->method('civicrm_cron')
@@ -42,4 +45,5 @@ class CRM_Core_JobManagerTest extends CiviUnitTestCase {
     $jobManager = new CRM_Core_JobManager();
     $jobManager->execute(FALSE);
   }
+
 }

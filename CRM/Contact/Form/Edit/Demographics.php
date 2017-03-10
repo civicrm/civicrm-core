@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,56 +23,43 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
- * form helper class for an Demographics object
+ * Form helper class for an Demographics object.
  */
 class CRM_Contact_Form_Edit_Demographics {
 
   /**
-   * build the form elements for Demographics object
+   * Build the form object elements for Demographics object.
    *
-   * @param CRM_Core_Form $form       reference to the form object
-   *
-   * @return void
-   * @access public
-   * @static
+   * @param CRM_Core_Form $form
+   *   Reference to the form object.
    */
-  static function buildQuickForm(&$form) {
-    // radio button for gender
-    $genderOptions = array();
-    $gender = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id', array('localize' => TRUE));
-    foreach ($gender as $key => $var) {
-      $genderOptions[$key] = $form->createElement('radio', NULL,
-        ts('Gender'), $var, $key,
-        array('id' => "civicrm_gender_{$var}_{$key}")
-      );
-    }
-    $form->addGroup($genderOptions, 'gender_id', ts('Gender'))->setAttribute('unselectable', TRUE);
+  public static function buildQuickForm(&$form) {
+    $form->addField('gender_id', array('entity' => 'contact', 'type' => 'Radio', 'allowClear' => TRUE));
 
-    $form->addDate('birth_date', ts('Date of Birth'), FALSE, array('formatType' => 'birth'));
+    $form->addField('birth_date', array('entity' => 'contact'), FALSE, FALSE);
 
-    $form->addElement('checkbox', 'is_deceased', NULL, ts('Contact is deceased'), array('onclick' => "showDeceasedDate()"));
-    $form->addDate('deceased_date', ts('Deceased date'), FALSE, array('formatType' => 'birth'));
+    $form->addField('is_deceased', array('entity' => 'contact', 'label' => ts('Contact is Deceased'), 'onclick' => "showDeceasedDate()"));
+    $form->addField('deceased_date', array('entity' => 'contact'), FALSE, FALSE);
   }
 
   /**
-   * This function sets the default values for the form. Note that in edit/view mode
+   * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
-   * @return void
+   * @param CRM_Core_Form $form
+   * @param array $defaults
    */
-  static function setDefaultValues(&$form, &$defaults) {}
-}
+  public static function setDefaultValues(&$form, &$defaults) {
+  }
 
+}

@@ -1,9 +1,9 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.4                                                |
+  | CiviCRM version 4.7                                                |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2013                                |
+  | Copyright CiviCRM LLC (c) 2004-2017                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -23,12 +23,12 @@
   | GNU Affero General Public License or the licensing of CiviCRM,     |
   | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
   +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
  */
@@ -43,11 +43,12 @@ class CRM_Custom_Form_CustomData {
    * @param null|string $subName
    * @param null|string $subType
    * @param null|int $groupCount
-   * @param null|String $type
+   * @param string $type
    * @param null|int $entityID
-   * @return void
+   * @param null $onlySubType
    */
-  static function preProcess(&$form, $subName = NULL, $subType = NULL,
+  public static function preProcess(
+    &$form, $subName = NULL, $subType = NULL,
     $groupCount = NULL, $type = NULL, $entityID = NULL, $onlySubType = NULL
   ) {
     if ($type) {
@@ -89,7 +90,7 @@ class CRM_Custom_Form_CustomData {
     $form->assign('cgCount', $form->_groupCount);
 
     //carry qf key, since this form is not inhereting core form.
-    if ($qfKey = CRM_Utils_Request::retrieve('qfKey', 'String', CRM_Core_DAO::$_nullObject)) {
+    if ($qfKey = CRM_Utils_Request::retrieve('qfKey', 'String')) {
       $form->assign('qfKey', $qfKey);
     }
 
@@ -100,11 +101,12 @@ class CRM_Custom_Form_CustomData {
       $form->_entityId = CRM_Utils_Request::retrieve('entityID', 'Positive', $form);
     }
 
-    $typeCheck = CRM_Utils_Request::retrieve( 'type', 'String', CRM_Core_DAO::$_nullObject );
-    $urlGroupId = CRM_Utils_Request::retrieve('groupID', 'Positive', CRM_Core_DAO::$_nullObject);
-    if ( isset($typeCheck) && $urlGroupId) {
+    $typeCheck = CRM_Utils_Request::retrieve('type', 'String');
+    $urlGroupId = CRM_Utils_Request::retrieve('groupID', 'Positive');
+    if (isset($typeCheck) && $urlGroupId) {
       $form->_groupID = $urlGroupId;
-    } else {
+    }
+    else {
       $form->_groupID = CRM_Utils_Request::retrieve('groupID', 'Positive', $form);
     }
 
@@ -116,18 +118,65 @@ class CRM_Custom_Form_CustomData {
       $subType = str_replace(CRM_Core_DAO::VALUE_SEPARATOR, ',', trim($subType, CRM_Core_DAO::VALUE_SEPARATOR));
     }
 
-    $groupTree = &CRM_Core_BAO_CustomGroup::getTree($form->_type,
+    self::setGroupTree($form, $subType, $gid, $onlySubType, $getCachedTree);
+  }
+
+  /**
+   * @param CRM_Core_Form $form
+   *
+   * @return array
+   */
+  public static function setDefaultValues(&$form) {
+    $defaults = array();
+    CRM_Core_BAO_CustomGroup::setDefaults($form->_groupTree, $defaults, FALSE, FALSE, $form->get('action'));
+    return $defaults;
+  }
+
+  /**
+   * @param CRM_Core_Form $form
+   */
+  public static function buildQuickForm(&$form) {
+    $form->addElement('hidden', 'hidden_custom', 1);
+    $form->addElement('hidden', "hidden_custom_group_count[{$form->_groupID}]", $form->_groupCount);
+    CRM_Core_BAO_CustomGroup::buildQuickForm($form, $form->_groupTree);
+  }
+
+  /**
+   * @param $form
+   * @param $subType
+   * @param $gid
+   * @param $onlySubType
+   * @param $getCachedTree
+   *
+   * @return array
+   */
+  public static function setGroupTree(&$form, $subType, $gid, $onlySubType = NULL, $getCachedTree = FALSE) {
+    $singleRecord = NULL;
+    if (!empty($form->_groupCount) && !empty($form->_multiRecordDisplay) && $form->_multiRecordDisplay == 'single') {
+      $singleRecord = $form->_groupCount;
+    }
+    $mode = CRM_Utils_Request::retrieve('mode', 'String', $form);
+    // when a new record is being added for multivalued custom fields.
+    if (isset($form->_groupCount) && $form->_groupCount == 0 && $mode == 'add' &&
+      !empty($form->_multiRecordDisplay) && $form->_multiRecordDisplay == 'single') {
+      $singleRecord = 'new';
+    }
+
+    $groupTree = CRM_Core_BAO_CustomGroup::getTree($form->_type,
       $form,
       $form->_entityId,
       $gid,
       $subType,
       $form->_subName,
       $getCachedTree,
-      $onlySubType
+      $onlySubType,
+      FALSE,
+      TRUE,
+      $singleRecord
     );
 
     if (property_exists($form, '_customValueCount') && !empty($groupTree)) {
-      $form->_customValueCount = CRM_Core_BAO_CustomGroup::buildCustomDataView($form, $groupTree, TRUE, NULL, NULL);
+      $form->_customValueCount = CRM_Core_BAO_CustomGroup::buildCustomDataView($form, $groupTree, TRUE, NULL, NULL, NULL, $form->_entityId);
     }
     // we should use simplified formatted groupTree
     $groupTree = CRM_Core_BAO_CustomGroup::formatGroupTree($groupTree, $form->_groupCount, $form);
@@ -137,26 +186,12 @@ class CRM_Custom_Form_CustomData {
       foreach ($keys as $key) {
         $form->_groupTree[$key] = $groupTree[$key];
       }
+      return array($form, $groupTree);
     }
     else {
       $form->_groupTree = $groupTree;
+      return array($form, $groupTree);
     }
   }
 
-  static function setDefaultValues(&$form) {
-    $defaults = array();
-    CRM_Core_BAO_CustomGroup::setDefaults($form->_groupTree, $defaults, FALSE, FALSE, $form->get('action'));
-    return $defaults;
-  }
-
-  /**
-   * @param CRM_Core_Form $form
-   * @return void
-   */
-  static function buildQuickForm(&$form) {
-    $form->addElement('hidden', 'hidden_custom', 1);
-    $form->addElement('hidden', "hidden_custom_group_count[{$form->_groupID}]", $form->_groupCount);
-    CRM_Core_BAO_CustomGroup::buildQuickForm($form, $form->_groupTree);
-  }
 }
-

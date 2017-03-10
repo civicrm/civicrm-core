@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,18 +23,14 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
-
-
-
-
-require_once 'CiviTest/CiviUnitTestCase.php';
+ */
 
 /**
  * Test class for UFGroup API - civicrm_uf_*
  * @todo Split UFGroup and UFJoin tests
  *
- *  @package   CiviCRM
+ * @package   CiviCRM
+ * @group headless
  */
 class api_v3_UFMatchTest extends CiviUnitTestCase {
   // ids from the uf_group_test.xml fixture
@@ -43,7 +39,6 @@ class api_v3_UFMatchTest extends CiviUnitTestCase {
   protected $_contactId;
   protected $_apiversion;
   protected $_params = array();
-
 
 
   protected function setUp() {
@@ -59,10 +54,10 @@ class api_v3_UFMatchTest extends CiviUnitTestCase {
       )
     );
     $this->_contactId = $this->individualCreate();
-    $op = new PHPUnit_Extensions_Database_Operation_Insert;
+    $op = new PHPUnit_Extensions_Database_Operation_Insert();
     $op->execute(
       $this->_dbconn,
-      new PHPUnit_Extensions_Database_DataSet_FlatXMLDataSet(dirname(__FILE__) . '/dataset/uf_group_test.xml')
+      $this->createFlatXMLDataSet(dirname(__FILE__) . '/dataset/uf_group_test.xml')
     );
 
     $this->_params = array(
@@ -70,10 +65,10 @@ class api_v3_UFMatchTest extends CiviUnitTestCase {
       'uf_id' => '2',
       'uf_name' => 'blahdyblah@gmail.com',
       'domain_id' => 1,
-      );
+    );
   }
 
-  function tearDown() {
+  public function tearDown() {
     //  Truncate the tables
     $this->quickCleanup(
       array(
@@ -87,7 +82,7 @@ class api_v3_UFMatchTest extends CiviUnitTestCase {
   }
 
   /**
-   * fetch contact id by uf id
+   * Fetch contact id by uf id.
    */
   public function testGetUFMatchID() {
     $params = array(
@@ -97,13 +92,13 @@ class api_v3_UFMatchTest extends CiviUnitTestCase {
     $this->assertEquals($result['values'][$result['id']]['contact_id'], 69);
   }
 
-  function testGetUFMatchIDWrongParam() {
+  public function testGetUFMatchIDWrongParam() {
     $params = 'a string';
     $result = $this->callAPIFailure('uf_match', 'get', $params);
   }
 
   /**
-   * fetch uf id by contact id
+   * Fetch uf id by contact id.
    */
   public function testGetUFID() {
     $params = array(
@@ -113,34 +108,73 @@ class api_v3_UFMatchTest extends CiviUnitTestCase {
     $this->assertEquals($result['values'][$result['id']]['uf_id'], 42);
   }
 
-  function testGetUFIDWrongParam() {
+  public function testGetUFIDWrongParam() {
     $params = 'a string';
     $result = $this->callAPIFailure('uf_match', 'get', $params);
   }
 
   /**
-   *  Test civicrm_activity_create() using example code
+   * Test civicrm_activity_create() using example code
    */
-  function testUFMatchGetExample() {
+  public function testUFMatchGetExample() {
     require_once 'api/v3/examples/UFMatch/Get.php';
     $result = UF_match_get_example();
     $expectedResult = UF_match_get_expectedresult();
     $this->assertEquals($result, $expectedResult);
   }
 
-  function testCreate() {
+  public function testCreate() {
     $result = $this->callAPISuccess('uf_match', 'create', $this->_params);
     $this->getAndCheck($this->_params, $result['id'], 'uf_match');
   }
 
-  function testDelete() {
-    $result = $this->callAPISuccess('uf_match', 'create', $this->_params);
-    $this->assertEquals(1, $this->callAPISuccess('uf_match', 'getcount', array(      'id' => $result['id'],
-      )));
-    $this->callAPISuccess('uf_match', 'delete', array(      'id' => $result['id'],
-    ));
-    $this->assertEquals(0, $this->callAPISuccess('uf_match', 'getcount', array('id' => $result['id'],
-      )));
-  }
-}
+  /**
+   * Test Civi to CMS email sync optional
+   */
+  public function testUFNameMatchSync() {
+    $this->callAPISuccess('uf_match', 'create', $this->_params);
+    $email1 = substr(sha1(rand()), 0, 7) . '@test.com';
+    $email2 = substr(sha1(rand()), 0, 7) . '@test.com';
 
+    // Case A: Enable CMS integration
+    Civi::settings()->set('syncCMSEmail', TRUE);
+    $this->callAPISuccess('email', 'create', array(
+      'contact_id' => $this->_contactId,
+      'email' => $email1,
+      'is_primary' => 1,
+    ));
+    $ufName = $this->callAPISuccess('uf_match', 'getvalue', array(
+      'contact_id' => $this->_contactId,
+      'return' => 'uf_name',
+    ));
+    $this->assertEquals($email1, $ufName);
+
+    // Case B: Disable CMS integration
+    Civi::settings()->set('syncCMSEmail', FALSE);
+    $this->callAPISuccess('email', 'create', array(
+      'contact_id' => $this->_contactId,
+      'email' => $email2,
+      'is_primary' => 1,
+    ));
+    $ufName = $this->callAPISuccess('uf_match', 'getvalue', array(
+      'contact_id' => $this->_contactId,
+      'return' => 'uf_name',
+    ));
+    $this->assertNotEquals($email2, $ufName, 'primary email will not match if changed on disabled CMS integration setting');
+    $this->assertEquals($email1, $ufName);
+  }
+
+  public function testDelete() {
+    $result = $this->callAPISuccess('uf_match', 'create', $this->_params);
+    $this->assertEquals(1, $this->callAPISuccess('uf_match', 'getcount', array(
+      'id' => $result['id'],
+    )));
+    $this->callAPISuccess('uf_match', 'delete', array(
+      'id' => $result['id'],
+    ));
+    $this->assertEquals(0, $this->callAPISuccess('uf_match', 'getcount', array(
+      'id' => $result['id'],
+    )));
+  }
+
+}

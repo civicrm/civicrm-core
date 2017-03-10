@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,20 +23,18 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
- * This class provides the functionality to delete a group of
- * contributions. This class provides functionality for the actual
- * deletion.
+ * This class provides the functionality to delete a group of contributions.
+ *
+ * This class provides functionality for the actual deletion.
  */
 class CRM_Contribute_Form_Task_Delete extends CRM_Contribute_Form_Task {
 
@@ -49,46 +47,81 @@ class CRM_Contribute_Form_Task_Delete extends CRM_Contribute_Form_Task {
   protected $_single = FALSE;
 
   /**
-   * build all the data structures needed to build the form
-   *
-   * @return void
-   * @access public
-   */ function preProcess() {
+   * Build all the data structures needed to build the form.
+   */
+  public function preProcess() {
     //check for delete
     if (!CRM_Core_Permission::checkActionPermission('CiviContribute', CRM_Core_Action::DELETE)) {
-      CRM_Core_Error::fatal(ts('You do not have permission to access this page'));
+      CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
     }
     parent::preProcess();
   }
 
   /**
-   * Build the form
-   *
-   * @access public
-   *
-   * @return void
+   * Build the form object.
    */
-  function buildQuickForm() {
-    $this->addDefaultButtons(ts('Delete Contributions'), 'done');
+  public function buildQuickForm() {
+    $count = 0;
+    if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
+      foreach ($this->_contributionIds as $key => $id) {
+        $finTypeID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $id, 'financial_type_id');
+        if (!CRM_Core_Permission::check('delete contributions of type ' . CRM_Contribute_PseudoConstant::financialType($finTypeID))) {
+          unset($this->_contributionIds[$key]);
+          $count++;
+        }
+        // Now check for lineItems
+        if ($lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($id)) {
+          foreach ($lineItems as $items) {
+            if (!CRM_Core_Permission::check('delete contributions of type ' . CRM_Contribute_PseudoConstant::financialType($items['financial_type_id']))) {
+              unset($this->_contributionIds[$key]);
+              $count++;
+              break;
+            }
+          }
+        }
+      }
+    }
+    if ($count && empty($this->_contributionIds)) {
+      CRM_Core_Session::setStatus(ts('1 contribution could not be deleted.', array('plural' => '%count contributions could not be deleted.', 'count' => $count)), ts('Error'), 'error');
+      $this->addButtons(array(
+        array(
+          'type' => 'back',
+          'name' => ts('Cancel'),
+        ),
+       )
+      );
+    }
+    elseif ($count && !empty($this->_contributionIds)) {
+      CRM_Core_Session::setStatus(ts('1 contribution will not be deleted.', array('plural' => '%count contributions will not be deleted.', 'count' => $count)), ts('Warning'), 'warning');
+      $this->addDefaultButtons(ts('Delete Contributions'), 'done');
+    }
+    else {
+      $this->addDefaultButtons(ts('Delete Contributions'), 'done');
+    }
   }
 
   /**
-   * process the form after the input has been submitted and validated
-   *
-   * @access public
-   *
-   * @return void
+   * Process the form after the input has been submitted and validated.
    */
   public function postProcess() {
-    $deletedContributions = 0;
+    $deleted = $failed = 0;
     foreach ($this->_contributionIds as $contributionId) {
       if (CRM_Contribute_BAO_Contribution::deleteContribution($contributionId)) {
-        $deletedContributions++;
+        $deleted++;
+      }
+      else {
+        $failed++;
       }
     }
 
-    CRM_Core_Session::setStatus(ts('Deleted Contribution(s): %1', array(1 => $deletedContributions)), '', 'info');
-    CRM_Core_Session::setStatus(ts('Total Selected Contribution(s): %1', array(1 => count($this->_contributionIds))), '', 'info');
-  }
-}
+    if ($deleted) {
+      $msg = ts('%count contribution deleted.', array('plural' => '%count contributions deleted.', 'count' => $deleted));
+      CRM_Core_Session::setStatus($msg, ts('Removed'), 'success');
+    }
 
+    if ($failed) {
+      CRM_Core_Session::setStatus(ts('1 could not be deleted.', array('plural' => '%count could not be deleted.', 'count' => $failed)), ts('Error'), 'error');
+    }
+  }
+
+}

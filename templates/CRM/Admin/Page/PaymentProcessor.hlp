@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -33,7 +33,7 @@
   <li>{docURL page="Payment Processors" text="Processor comparison and setup guide" resource="wiki"}</li>
 </ul>
 <p>{ts}If you're not sure which processor to use - we recommend reviewing terms, limitations and coverage areas on each processor's website before proceeding.{/ts}</p>
-<p>{ts 1="http://civicrm.org/extensions/civicrm?cat=125"}If your desired processor is not in the list, check the <a href="%1">Extensions Directory</a> for more payment processors you can download. If you still can't find it, consider partnering with a developer and contributing a new extension.{/ts}</p>
+<p>{ts 1="https://civicrm.org/extensions/civicrm?cat=125"}If your desired processor is not in the list, check the <a href="%1">Extensions Directory</a> for more payment processors you can download. If you still can't find it, consider partnering with a developer and contributing a new extension.{/ts}</p>
 {/htxt}
 
 {htxt id='AuthNet-live-user-name'}
@@ -186,145 +186,6 @@
 <p>{ts}The Recurring Payments URL is not currently used.{/ts}</p>
 {/htxt}
 
-{htxt id='Google_Checkout-live-user-name'}
-<p>{ts}Enter the Merchant ID from your Live account.{/ts}</p>
-<p><strong>{ts}How do I Find my Merchant-ID?{/ts}</strong></p>
-<p>{ts}After signing in to your account, click on the Settings tab. Then click on the Integration link on the left side of the page. Your 10- or 15-digit Merchant ID and your Merchant Key will both be listed under the Account information header.{/ts}</p>
-{/htxt}
-{htxt id='Google_Checkout-live-password'}
-<p>{ts}Enter the Merchant Key from your Live account.{/ts}</p>
-<p><strong>{ts}How do I Find my Merchant Key?{/ts}</strong></p>
-<p>{ts}After signing in to your account, click on the Settings tab. Then click on the Integration link on the left side of the page. Your 10- or 15-digit Merchant ID and your Merchant Key will both be listed under the Account information header.{/ts}</p>
-{/htxt}
-{htxt id='Google_Checkout-test-user-name'}
-<p>{ts}Enter the Merchant ID from your Sandbox account.{/ts}</p>
-<p><strong>{ts}How do I Find my Merchant-ID?{/ts}</strong></p>
-<p>{ts}After signing in to your account, click on the Settings tab. Then click on the Integration link on the left side of the page. Your 10- or 15-digit Merchant ID and your Merchant Key will both be listed under the Account information header.{/ts}</p>
-{/htxt}
-{htxt id='Google_Checkout-test-password'}
-<p>{ts}Enter the Merchant Key from your Sandbox account.{/ts}</p>
-<p><strong>{ts}How do I Find my Merchant Key?{/ts}</strong></p>
-<p>{ts}After signing in to your account, click on the Settings tab. Then click on the Integration link on the left side of the page. Your 10- or 15-digit Merchant ID and your Merchant Key will both be listed under the Account information header.{/ts}</p>
-{/htxt}
-{htxt id='Google_Checkout-test-url-site'}
-{ts}The URL for Google Checkout's TEST Payment server. Use the default value unless otherwise indicated by Google.{/ts}
-{/htxt}
-{htxt id='Google_Checkout-live-url-site'}
-{ts}The URL for Google Checkout's LIVE Payment server. Use the default value unless otherwise indicated by Google.{/ts}
-{/htxt}
-{htxt id='Google_Checkout-test-url-button'}
-<p>{ts 1=http://sandbox.google.com/checkout/buttons/checkout.gif}The base URL for the <strong>TEST - Image</strong> is: %1{/ts}</p>
-<p>{ts}To display an image, you must add several parameters to this URL as name=value pairs.{/ts}</p>
-<table>
-<tr><th>{ts}Parameters{/ts}</th><th>{ts}Values{/ts}</th><th>{ts}Description{/ts}</th></tr>
-<tr>
-  <td>w</td>
-  <td>180/168/160 ({ts}large/medium/small{/ts})</td>
-  <td>{ts}width of the button in pixels{/ts}</td>
-</tr>
-<tr>
-  <td>h</td>
-  <td>46/44/43 ({ts}large/medium/small{/ts})</td>
-  <td>{ts}height of the button in pixels{/ts}</td>
-</tr>
-<tr>
-  <td>style</td>
-  <td>white/trans..</td>
-  <td>{ts}background color for the button{/ts}</td>
-</tr>
-<tr>
-  <td>variant</td>
-  <td>text/disabled</td>
-  <td>{ts}whether the button is clickable or disabled{/ts}</td>
-</tr>
-<tr>
-  <td>loc</td>
-  <td>en_US</td>
-  <td>{ts}a locale associated with the transaction (optional){/ts}</td>
-</tr>
-<tr>
-  <td>merchant_id</td>
-  <td>{ts 1=1234567890}(e.g %1){/ts}</td>
-  <td>{ts}Merchant ID{/ts}</td>
-</tr>
-</table>
-
-<p><strong>{ts}Example of a large Google Checkout button on a white background (For TEST Account):{/ts}</strong></p>
-<p>http://sandbox.google.com/checkout/buttons/checkout.gif?merchant_id=1234567890&amp;w=180&amp;h=46&amp;style=white&amp;variant=text&amp;loc=en_US</p>
-{/htxt}
-
-{htxt id='Google_Checkout-live-url-button'}
-<p>{ts 1=http://checkout.google.com/buttons/checkout.gif}The base URL for the <strong>LIVE - Image</strong> is: %1{/ts}</p>
-<p>{ts}To display an image, you must add several parameters to this URL as name=value pairs.{/ts}</p>
-<table>
-<tr><th>{ts}Parameters{/ts}</th><th>{ts}Values{/ts}</th><th>{ts}Description{/ts}</th></tr>
-<tr>
-  <td>w</td>
-  <td>180/168/160 ({ts}large/medium/small{/ts})</td>
-  <td>{ts}width of the button in pixels{/ts}</td>
-</tr>
-<tr>
-  <td>h</td>
-  <td>46/44/43 ({ts}large/medium/small{/ts})</td>
-  <td>{ts}height of the button in pixels{/ts}</td>
-</tr>
-<tr>
-  <td>style</td>
-  <td>white/trans..</td>
-  <td>{ts}background color for the button{/ts}</td>
-</tr>
-<tr>
-  <td>variant</td>
-  <td>text/disabled</td>
-  <td>{ts}whether the button is clickable or disabled{/ts}</td>
-</tr>
-<tr>
-  <td>loc</td>
-  <td>en_US</td>
-  <td>{ts}a locale associated with the transaction (optional){/ts}</td>
-</tr>
-<tr>
-  <td>merchant_id</td>
-  <td>{ts 1=1234567890}(e.g %1){/ts}</td>
-  <td>{ts}Merchant ID{/ts}</td>
-</tr>
-</table>
-<p><strong>{ts}Example of a large Google Checkout button on a white background (For LIVE Account):{/ts}</strong></p>
-<p>http://checkout.google.com/buttons/checkout.gif?merchant_id=1234567890&amp;w=180&amp;h=46&amp;style=white&amp;variant=text&amp;loc=en_US</p>
-{/htxt}
-
-{htxt id='Moneris-live-user-name'}
-<p>{ts}Moneris doesn't currently use the Username field. Enter 'ignoreme' as a placeholder since the field can't be left blank.{/ts}</p>
-{/htxt}
-{htxt id='Moneris-live-password'}
-<p>{ts}Enter the API Token from your live merchant account.{/ts}</p>
-{/htxt}
-{htxt id='Moneris-live-signature'}
-<p>{ts}Enter your live merchant account Store ID.{/ts}</p>
-{/htxt}
-{htxt id='Moneris-live-url-site'}
-{ts}The URL for the Moneris LIVE Payment server. Use the default value unless otherwise advised by the processor.{/ts}
-{/htxt}
-{htxt id='Moneris-live-url-recur'}
-<p>{ts}The Recurring Payments URL is not currently used for Moneris.{/ts}</p>
-{/htxt}
-{htxt id='Moneris-test-user-name'}
-<p>{ts}Moneris doesn't currently use the Username field. Enter 'ignoreme' as a placeholder since the field can't be left blank.{/ts}</p>
-{/htxt}
-{htxt id='Moneris-test-password'}
-<p>{ts 1='yesguy'}All Moneris test transactions are submitted to a shared test merchant account. Enter <strong>%1</strong> here, which is the API Token for this test account.{/ts}</p>
-{/htxt}
-{htxt id='Moneris-test-signature'}
-<p>{ts 1='store3' 2='store1' 3='store2'}All Moneris test transactions are submitted to a shared merchant account. You can use <strong>%1</strong> as your test store ID. '%2' and '%3' also work, but only '%1' accepts recurring payments.{/ts}</p>
-{/htxt}
-{htxt id='Moneris-test-url-site'}
-{ts}The URL for the Moneris TEST Payment server. Use the default value unless otherwise advised by the processor.{/ts}
-{/htxt}
-{htxt id='Moneris-test-url-recur'}
-<p>{ts}The Recurring Payments URL is not currently used for Moneris.{/ts}</p>
-{/htxt}
-
-
 {htxt id='Dummy-live-user-name'}
 {ts}Set up a 'Dummy' Processor if you want to test Online Contribution pages or Event Registration pages prior to selecting and configuring a real payment processor. You can enter any values for User Name and Site URL.{/ts}</p>
 {/htxt}
@@ -362,16 +223,12 @@
 {ts 1='4111111111111111' 2='76'}The test Credit Card number is %1 - this is the only credit card number that will work on the test gateway. The test Total Amount can be any amount except one that ends in a value of .%2 (e.g. $10.%2) - all amounts ending in .%2 will return a failed response.{/ts}
 {/htxt}
 
-{htxt id='Payment_Express-test-url-site'} {ts}This is the URL for accessing the DPS/Payment Express payment site.
-If you have been given a MAC key please fill in the Mac Key field, and use https://sec.paymentexpress.com/pxpay/pxpay.aspx for the Site URL.
-Otherwise use https://sec.paymentexpress.com/pxpay/pxaccess.aspx for the Site URL.{/ts} {/htxt}
+{htxt id='Payment_Express-test-url-site'} {ts}This is the URL for accessing the DPS/Payment Express payment site. If you have been given a MAC key please fill in the Mac Key field, and use https://sec.paymentexpress.com/pxpay/pxpay.aspx for the Site URL. Otherwise use https://sec.paymentexpress.com/pxpay/pxaccess.aspx for the Site URL.{/ts} {/htxt}
 
 {htxt id='Payment_Express-live-user-name'} {ts}Payment Express UserID (LIVE account):{/ts}
 {ts}This is the live user name provided to you by DPS/Payment Express.{/ts}{/htxt}
 
-{htxt id='Payment_Express-live-url-site'} {ts}This is the URL for accessing the DPS/Payment Express payment site.
-If you have been given a MAC key please fill in the Mac Key field, and use https://sec.paymentexpress.com/pxpay/pxpay.aspx for the Site URL.
-Otherwise use https://sec.paymentexpress.com/pxpay/pxaccess.aspx for the Site URL.{/ts} {/htxt}
+{htxt id='Payment_Express-live-url-site'} {ts}This is the URL for accessing the DPS/Payment Express payment site. If you have been given a MAC key please fill in the Mac Key field, and use https://sec.paymentexpress.com/pxpay/pxpay.aspx for the Site URL. Otherwise use https://sec.paymentexpress.com/pxpay/pxaccess.aspx for the Site URL.{/ts} {/htxt}
 
 {htxt id='Elavon-live-user-name'}
 <p>{ts}This is the LIVE <strong>Elavon Merchant ID</strong> associated with your Elavon account.{/ts}</p>

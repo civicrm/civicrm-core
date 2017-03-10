@@ -1,10 +1,9 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,63 +23,59 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
+ * @copyright CiviCRM LLC (c) 2004-2017
  *
  */
 
 /**
  * This implements the profile page for all contacts. It uses a selector
  * object to do the actual dispay. The fields displayd are controlled by
- * the admin
+ * the admin.
  */
 class CRM_Profile_Page_Listings extends CRM_Core_Page {
 
   /**
-   * all the fields that are listings related
+   * All the fields that are listings related.
    *
    * @var array
-   * @access protected
    */
   protected $_fields;
 
   /**
-   * the custom fields for this domain
+   * The custom fields for this domain.
    *
    * @var array
-   * @access protected
    */
   protected $_customFields;
 
   /**
-   * The input params from the request
+   * The input params from the request.
    *
    * @var array
-   * @access protected
    */
   protected $_params;
 
   /**
-   * The group id that we are editing
+   * The group id that we are editing.
    *
    * @var int
    */
   protected $_gid;
 
   /**
-   * state whether to display search form or not
+   * State whether to display search form or not.
    *
    * @var int
    */
   protected $_search;
 
   /**
-   * Should we display a map
+   * Should we display a map.
    *
    * @var int
    */
@@ -93,14 +88,11 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
   protected $_profileIds = array();
 
   /**
-   * extracts the parameters from the request and constructs information for
+   * Extracts the parameters from the request and constructs information for
    * the selector object to do a query
    *
-   * @return void
-   * @access public
-   *
    */
-  function preProcess() {
+  public function preProcess() {
 
     $this->_search = TRUE;
 
@@ -152,28 +144,31 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
     $this->_params = array();
 
     $resetArray = array(
-      'group', 'tag', 'preferred_communication_method', 'do_not_phone',
-      'do_not_email', 'do_not_mail', 'do_not_sms', 'do_not_trade', 'gender',
+      'group',
+      'tag',
+      'preferred_communication_method',
+      'do_not_phone',
+      'do_not_email',
+      'do_not_mail',
+      'do_not_sms',
+      'do_not_trade',
+      'gender',
     );
 
     foreach ($this->_fields as $name => $field) {
       if ((substr($name, 0, 6) == 'custom') && !empty($field['is_search_range'])) {
-        $from = CRM_Utils_Request::retrieve($name . '_from', 'String',
-          $this, FALSE, NULL, 'REQUEST'
-        );
-        $to = CRM_Utils_Request::retrieve($name . '_to', 'String',
-          $this, FALSE, NULL, 'REQUEST'
-        );
+        $from = CRM_Utils_Request::retrieve($name . '_from', 'String', $this);
+        $to = CRM_Utils_Request::retrieve($name . '_to', 'String', $this);
         $value = array();
         if ($from && $to) {
-          $value['from'] = $from;
-          $value['to'] = $to;
+          $value[$name . '_from'] = $from;
+          $value[$name . '_to'] = $to;
         }
         elseif ($from) {
-          $value['from'] = $from;
+          $value[$name . '_from'] = $from;
         }
         elseif ($to) {
-          $value['to'] = $to;
+          $value[$name . '_to'] = $to;
         }
       }
       elseif ((substr($name, 0, 7) == 'custom_') &&
@@ -182,8 +177,8 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
           ) == 'TextArea')
       ) {
         $value = trim(CRM_Utils_Request::retrieve($name, 'String',
-            $this, FALSE, NULL, 'REQUEST'
-          ));
+          $this, FALSE, NULL, 'REQUEST'
+        ));
         if (!empty($value) &&
           !((substr($value, 0, 1) == '%') &&
             (substr($value, -1, 1) == '%')
@@ -231,9 +226,9 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
         if ($customField) {
           // reset checkbox/radio because a form does not send null checkbox values
           if (in_array($customField['html_type'],
-              array('Multi-Select', 'CheckBox', 'Multi-Select State/Province', 'Multi-Select Country', 'Radio')
-            )) {
-            // only reset on a POST submission if we dont see any value
+            array('Multi-Select', 'CheckBox', 'Multi-Select State/Province', 'Multi-Select Country', 'Radio', 'Select')
+          )) {
+            // only reset on a POST submission if we don't see any value
             $value = NULL;
             $this->set($name, $value);
           }
@@ -248,15 +243,29 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
         if (!is_array($value)) {
           $value = trim($value);
         }
-        $this->_params[$name] = $this->_fields[$name]['value'] = $value;
+        $operator = CRM_Utils_Request::retrieve($name . '_operator', 'String', $this);
+        if ($operator) {
+          $this->_params[$name . '_operator'] = $operator;
+        }
+        if ((substr($name, 0, 6) == 'custom') && !empty($field['is_search_range'])) {
+          $this->_params += $value;
+        }
+        else {
+          $this->_params[$name] = $this->_fields[$name]['value'] = $value;
+        }
       }
     }
 
     // set the prox params
     // need to ensure proximity searching is enabled
     $proximityVars = array(
-      'street_address', 'city', 'postal_code', 'state_province_id',
-      'country_id', 'distance', 'distance_unit',
+      'street_address',
+      'city',
+      'postal_code',
+      'state_province_id',
+      'country_id',
+      'distance',
+      'distance_unit',
     );
     foreach ($proximityVars as $var) {
       $value = CRM_Utils_Request::retrieve("prox_{$var}",
@@ -268,22 +277,21 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
       }
     }
 
-
     // set the params in session
     $session = CRM_Core_Session::singleton();
     $session->set('profileParams', $this->_params);
   }
 
   /**
-   * run this page (figure out the action needed and perform it).
+   * Run this page (figure out the action needed and perform it).
    *
-   * @return void
    */
-  function run() {
+  public function run() {
     $this->preProcess();
 
     $this->assign('recentlyViewed', FALSE);
-    $this->assign('ufGroupName', 'unknown'); // override later (if possible)
+    // override later (if possible):
+    $this->assign('ufGroupName', 'unknown');
 
     if ($this->_gid) {
       $ufgroupDAO = new CRM_Core_DAO_UFGroup();
@@ -341,11 +349,11 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
         $gidString = implode(',', $this->_profileIds);
       }
 
-      $map      = 0;
+      $map = 0;
       $linkToUF = 0;
       $editLink = FALSE;
       if ($this->_gid) {
-        $map      = $ufgroupDAO->is_map;
+        $map = $ufgroupDAO->is_map;
         $linkToUF = $ufgroupDAO->is_uf_link;
         $editLink = $ufgroupDAO->is_edit_link;
       }
@@ -390,7 +398,7 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
       $controller->run();
     }
 
-    //CRM-6862 -run form cotroller after
+    //CRM-6862 -run form controller after
     //selector, since it erase $_POST
     $formController->run();
 
@@ -398,13 +406,13 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
   }
 
   /**
-   * Function to get the list of contacts for a profile
+   * Get the list of contacts for a profile.
    *
-   * @param $form object
+   * @param int $gid
    *
-   * @access public
+   * @return array
    */
-  function getProfileContact($gid) {
+  public static function getProfileContact($gid) {
     $session = CRM_Core_Session::singleton();
     $params = $session->get('profileParams');
 
@@ -456,7 +464,12 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
     return $contactIds;
   }
 
-  function checkTemplateFileExists($suffix = '') {
+  /**
+   * @param string $suffix
+   *
+   * @return null|string
+   */
+  public function checkTemplateFileExists($suffix = '') {
     if ($this->_gid) {
       $templateFile = "CRM/Profile/Page/{$this->_gid}/Listings.{$suffix}tpl";
       $template = CRM_Core_Page::getTemplate();
@@ -476,14 +489,25 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
     return NULL;
   }
 
-  function getTemplateFileName() {
+  /**
+   * Use the form name to create the tpl file name.
+   *
+   * @return string
+   */
+  public function getTemplateFileName() {
     $fileName = $this->checkTemplateFileExists();
     return $fileName ? $fileName : parent::getTemplateFileName();
   }
 
-  function overrideExtraTemplateFileName() {
+  /**
+   * Default extra tpl file basically just replaces .tpl with .extra.tpl
+   * i.e. we dont override
+   *
+   * @return string
+   */
+  public function overrideExtraTemplateFileName() {
     $fileName = $this->checkTemplateFileExists('extra.');
     return $fileName ? $fileName : parent::overrideExtraTemplateFileName();
   }
-}
 
+}

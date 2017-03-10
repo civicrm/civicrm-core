@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -86,6 +86,20 @@
   {$form.pledge_frequency_unit.label}
     <br /> {$form.pledge_frequency_interval.label} &nbsp; {$form.pledge_frequency_interval.html} &nbsp;
   {$form.pledge_frequency_unit.html}
+  </td>
+</tr>
+<tr>
+  <td colspan="2">
+    {ts}Number of Installments{/ts}
+    {$form.pledge_installments_low.label} {$form.pledge_installments_low.html}
+    &nbsp;&nbsp; {$form.pledge_installments_high.label} {$form.pledge_installments_high.html}
+  </td>
+</tr>
+
+<tr>
+  <td colspan="2">
+    <br /> {$form.pledge_acknowledge_date_is_not_null.label} &nbsp; {$form.pledge_acknowledge_date_is_not_null.html}
+    &nbsp;
   </td>
 </tr>
 

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,27 +23,21 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
  * This class generates form components for Synchronizing CMS Users
- *
  */
 class CRM_Admin_Form_CMSUser extends CRM_Core_Form {
 
   /**
-   * Function to build the form
-   *
-   * @return void
-   * @access public
+   * Build the form object.
    */
   public function buildQuickForm() {
 
@@ -62,14 +56,34 @@ class CRM_Admin_Form_CMSUser extends CRM_Core_Form {
   }
 
   /**
-   * Function to process the form
-   *
-   * @access public
-   *
-   * @return void
+   * Process the form submission.
    */
   public function postProcess() {
-    CRM_Core_BAO_CMSUser::synchronize();
-  }
-}
+    $result = CRM_Utils_System::synchronizeUsers();
 
+    $status = ts('Checked one user record.',
+        array(
+          'count' => $result['contactCount'],
+          'plural' => 'Checked %count user records.',
+        )
+      );
+    if ($result['contactMatching']) {
+      $status .= '<br />' . ts('Found one matching contact record.',
+          array(
+            'count' => $result['contactMatching'],
+            'plural' => 'Found %count matching contact records.',
+          )
+        );
+    }
+
+    $status .= '<br />' . ts('Created one new contact record.',
+        array(
+          'count' => $result['contactCreated'],
+          'plural' => 'Created %count new contact records.',
+        )
+      );
+    CRM_Core_Session::setStatus($status, ts('Synchronize Complete'), 'success');
+    CRM_Core_Session::singleton()->pushUserContext(CRM_Utils_System::url('civicrm/admin', 'reset=1'));
+  }
+
+}

@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2010                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,6 +23,7 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
+{capture assign=multiURL}{crmURL p="civicrm/import/custom" q="reset=1"}{/capture}
 {htxt id='choose-data-source-intro-title'}
   {ts}Import Wizard{/ts}
 {/htxt}
@@ -35,6 +36,9 @@
   </p>
   <p>
     {ts}After importing contacts, you may also want to import <strong>contributions, membership info and/or event participation</strong> data for these contacts. If so, first make sure that the corresponding CiviCRM component is enabled from Administer CiviCRM &raquo; System Settings &raquo; Enable CiviCRM Components. Enable CiviContribute, CiviMember, and/or CiviEvent. Then navigate to the Import option found in each component's menu (e.g. CiviContribute &raquo; Import Contributions).{/ts}
+  </p>
+  <p>
+    {ts 1=$multiURL}If you need to import <strong>Multi-value Custom Data</strong> for contacts (such as employment or education history), you will need to do that as a separate step from <a href="%1">here</a>.{/ts}
   </p>
 {/htxt}
 
@@ -100,19 +104,13 @@
   {ts}Dedupe Rule{/ts}
 {/htxt}
 {htxt id='id-dedupe_rule'}
-  {ts}If you have selected one of the dedupe options besides "no duplicate checking," CiviCRM will use a
-  predefined dedupe rule to determine possible matches for your imported records. Existing dedupe rules
-  may be reviewed, and new rules created, by visiting Contacts > Find and Merge Duplicate Contacts. When
-  selecting a dedupe rule, be sure to choose one that includes fields contained in your import file.
-  Also be aware that the update and fill options could have significant impact on your existing data.
-  You should define and select a rule that is strict enough to ensure there are no false positive matches.{/ts}
+  {ts}If you have selected one of the dedupe options besides "no duplicate checking," CiviCRM will use a predefined dedupe rule to determine possible matches for your imported records. Existing dedupe rules may be reviewed, and new rules created, by visiting Contacts > Find and Merge Duplicate Contacts.{/ts}
+  {ts}When selecting a dedupe rule, be sure to choose one that includes fields contained in your import file. Also be aware that the update and fill options could have significant impact on your existing data. You should define and select a rule that is strict enough to ensure there are no false positive matches.{/ts}
 {/htxt}
 
 {htxt id='id-fieldSeparator-title'}
   {ts}Field Separator{/ts}
 {/htxt}
 {htxt id='id-fieldSeparator'}
-  {ts}Enter the character used to separate data columns in your import file. By default, the field
-  will populate with the separator defined in your global settings. Common values include a comma, semicolon,
-  or pipe character. To import a tab separated file, enter "tab" (without quotes) in the field.{/ts}
+  {ts}Enter the character used to separate data columns in your import file. By default, the field will populate with the separator defined in your global settings. Common values include a comma, semicolon, or pipe character. To import a tab separated file, enter "tab" (without quotes) in the field.{/ts}
 {/htxt}

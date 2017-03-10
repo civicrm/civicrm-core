@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -37,9 +37,10 @@
         {strip}
             <table class="form-layout">
             <tr class="crm-case-search-form-block-sort_name">
-               <td class="font-size12pt" colspan="3">
-                   {$form.sort_name.label}&nbsp;&nbsp;{$form.sort_name.html|crmAddClass:'twenty'}&nbsp;&nbsp;&nbsp;{$form.buttons.html}
+               <td class="font-size12pt" colspan="2">
+                   {$form.sort_name.label}&nbsp;&nbsp;{$form.sort_name.html|crmAddClass:'twenty'}
                </td>
+              <td>{include file="CRM/common/formButtons.tpl" location="top"}</td>
             </tr>
             {include file="CRM/Case/Form/Search/Common.tpl"}
 
@@ -79,11 +80,4 @@
     {/if}
 </div>
 {/if}
-{literal}
-<script type="text/javascript">
-cj(function() {
-   cj().crmAccordions();
-});
-</script>
-{/literal}
 {/if}

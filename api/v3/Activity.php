@@ -1,11 +1,9 @@
 <?php
-// $Id$
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,29 +26,21 @@
  */
 
 /**
- * File for the CiviCRM APIv3 activity functions
+ * This api exposes CiviCRM Activity records.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_Activity
- * @copyright CiviCRM LLC (c) 2004-2013
- * @version $Id: Activity.php 30486 2010-11-02 16:12:09Z shot $
- *
  */
 
 
 /**
- * Creates or updates an Activity. See the example for usage
+ * Creates or updates an Activity.
  *
- * @param array  $params       Associative array of property name/value
- *                             pairs for the activity.
- * {@getfields activity_create}
+ * @param array $params
+ *   Array per getfields documentation.
  *
- * @return array Array containing 'is_error' to denote success or failure and details of the created activity
- *
- * @example ActivityCreate.php Standard create example
- * @example Activity/ContactRefCustomField.php Create example including setting a contact reference custom field
- * {@example ActivityCreate.php 0}
- *
+ * @throws API_Exception
+ * @return array
+ *   API result array
  */
 function civicrm_api3_activity_create($params) {
 
@@ -59,12 +49,12 @@ function civicrm_api3_activity_create($params) {
     civicrm_api3_verify_one_mandatory($params,
       NULL,
       array(
-        'activity_name', 'activity_type_id', 'activity_label',
+        'activity_name',
+        'activity_type_id',
+        'activity_label',
       )
     );
   }
-
-  $errors = array();
 
   // check for various error and required conditions
   // note that almost all the processing in there should be managed by the wrapper layer
@@ -77,9 +67,8 @@ function civicrm_api3_activity_create($params) {
     return $errors;
   }
 
-
   // processing for custom data
-  $values = array();
+  $values = $activityArray = array();
   _civicrm_api3_custom_format_params($params, $values, 'Activity');
 
   if (!empty($values['custom'])) {
@@ -93,9 +82,13 @@ function civicrm_api3_activity_create($params) {
   // If this is a case activity, see if there is an existing activity
   // and set it as an old revision. Also retrieve details we'll need.
   // this handling should all be moved to the BAO layer
-  $case_id           = '';
-  $createRevision    = FALSE;
+  $case_id = '';
+  $createRevision = FALSE;
   $oldActivityValues = array();
+  // Lookup case id if not supplied
+  if (!isset($params['case_id']) && !empty($params['id'])) {
+    $params['case_id'] = CRM_Core_DAO::singleValueQuery("SELECT case_id FROM civicrm_case_activity WHERE activity_id = " . (int) $params['id']);
+  }
   if (!empty($params['case_id'])) {
     $case_id = $params['case_id'];
     if (!empty($params['id'])) {
@@ -104,14 +97,17 @@ function civicrm_api3_activity_create($params) {
         CRM_Activity_BAO_Activity::retrieve($oldActivityParams, $oldActivityValues);
       }
       if (empty($oldActivityValues)) {
-        return civicrm_api3_create_error(ts("Unable to locate existing activity."), NULL, CRM_Core_DAO::$_nullObject);
+        throw new API_Exception(ts("Unable to locate existing activity."));
       }
       else {
         $activityDAO = new CRM_Activity_DAO_Activity();
         $activityDAO->id = $params['id'];
         $activityDAO->is_current_revision = 0;
         if (!$activityDAO->save()) {
-          return civicrm_api3_create_error(ts("Unable to revision existing case activity."), NULL, $activityDAO);
+          if (is_object($activityDAO)) {
+            $activityDAO->free();
+          }
+          throw new API_Exception(ts("Unable to revision existing case activity."));
         }
         $createRevision = TRUE;
       }
@@ -154,7 +150,7 @@ function civicrm_api3_activity_create($params) {
       $params['original_id'] = empty($oldActivityValues['original_id']) ? $oldActivityValues['id'] : $oldActivityValues['original_id'];
     }
     else {
-      return civicrm_api3_create_error(ts("Unable to create new revision of case activity."), NULL, CRM_Core_DAO::$_nullObject);
+      throw new API_Exception(ts("Unable to create new revision of case activity."));
     }
   }
 
@@ -169,85 +165,238 @@ function civicrm_api3_activity_create($params) {
     }
 
     _civicrm_api3_object_to_array($activityBAO, $activityArray[$activityBAO->id]);
-    return civicrm_api3_create_success($activityArray, $params, 'activity', 'get', $activityBAO);
+    return civicrm_api3_create_success($activityArray, $params, 'Activity', 'get', $activityBAO);
   }
 }
 
 /**
- * Specify Meta data for create. Note that this data is retrievable via the getfields function
- * and is used for pre-filling defaults and ensuring mandatory requirements are met.
- * @param array $params (reference) array of parameters determined by getfields
+ * Specify Meta data for create.
+ *
+ * Note that this data is retrievable via the getfields function and is used for pre-filling defaults and
+ * ensuring mandatory requirements are met.
+ *
+ * @param array $params
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_activity_create_spec(&$params) {
 
-  //default for source_contact_id = currently logged in user
+  // Default for source_contact_id = currently logged in user.
   $params['source_contact_id']['api.default'] = 'user_contact_id';
 
   $params['status_id']['api.aliases'] = array('activity_status');
 
   $params['assignee_contact_id'] = array(
     'name' => 'assignee_id',
-    'title' => 'assigned to',
+    'title' => 'Activity Assignee',
+    'description' => 'Contact(s) assigned to this activity.',
     'type' => 1,
-    'FKClassName' => 'CRM_Activity_DAO_ActivityContact',
+    'FKClassName' => 'CRM_Contact_DAO_Contact',
+    'FKApiName' => 'Contact',
   );
   $params['target_contact_id'] = array(
     'name' => 'target_id',
     'title' => 'Activity Target',
+    'description' => 'Contact(s) participating in this activity.',
     'type' => 1,
-    'FKClassName' => 'CRM_Activity_DAO_ActivityContact',
+    'FKClassName' => 'CRM_Contact_DAO_Contact',
+    'FKApiName' => 'Contact',
   );
 
   $params['source_contact_id'] = array(
-      'name' => 'source_contact_id',
-      'title' => 'Activity Source Contact',
-      'type' => 1,
-      'FKClassName' => 'CRM_Activity_DAO_ActivityContact',
-      'api.default' => 'user_contact_id',
+    'name' => 'source_contact_id',
+    'title' => 'Activity Source Contact',
+    'description' => 'Person who created this activity. Defaults to current user.',
+    'type' => 1,
+    'FKClassName' => 'CRM_Contact_DAO_Contact',
+    'api.default' => 'user_contact_id',
+    'FKApiName' => 'Contact',
+  );
+
+  $params['case_id'] = array(
+    'name' => 'case_id',
+    'title' => 'Case ID',
+    'description' => 'For creating an activity as part of a case.',
+    'type' => 1,
+    'FKClassName' => 'CRM_Case_DAO_Case',
+    'FKApiName' => 'Case',
   );
 
 }
 
 /**
- * Gets a CiviCRM activity according to parameters
+ * Specify Metadata for get.
  *
- * @param array  $params       Associative array of property name/value
- *                             pairs for the activity.
+ * @param array $params
+ */
+function _civicrm_api3_activity_get_spec(&$params) {
+  $params['tag_id'] = array(
+    'title' => 'Tags',
+    'description' => 'Find activities with specified tags.',
+    'type' => 1,
+    'FKClassName' => 'CRM_Core_DAO_Tag',
+    'FKApiName' => 'Tag',
+    'supports_joins' => TRUE,
+  );
+  $params['file_id'] = array(
+    'title' => 'Attached Files',
+    'description' => 'Find activities with attached files.',
+    'type' => 1,
+    'FKClassName' => 'CRM_Core_DAO_File',
+    'FKApiName' => 'File',
+  );
+  $params['case_id'] = array(
+    'title' => 'Cases',
+    'description' => 'Find activities within specified cases.',
+    'type' => 1,
+    'FKClassName' => 'CRM_Case_DAO_Case',
+    'FKApiName' => 'Case',
+  );
+  $params['contact_id'] = array(
+    'title' => 'Activity Contact ID',
+    'description' => 'Find activities involving this contact (as target, source, OR assignee).',
+    'type' => 1,
+    'FKClassName' => 'CRM_Contact_DAO_Contact',
+    'FKApiName' => 'Contact',
+  );
+  $params['target_contact_id'] = array(
+    'title' => 'Target Contact ID',
+    'description' => 'Find activities with specified target contact.',
+    'type' => 1,
+    'FKClassName' => 'CRM_Contact_DAO_Contact',
+    'FKApiName' => 'Contact',
+  );
+  $params['source_contact_id'] = array(
+    'title' => 'Source Contact ID',
+    'description' => 'Find activities with specified source contact.',
+    'type' => 1,
+    'FKClassName' => 'CRM_Contact_DAO_Contact',
+    'FKApiName' => 'Contact',
+  );
+  $params['assignee_contact_id'] = array(
+    'title' => 'Assignee Contact ID',
+    'description' => 'Find activities with specified assignee contact.',
+    'type' => 1,
+    'FKClassName' => 'CRM_Contact_DAO_Contact',
+    'FKApiName' => 'Contact',
+  );
+}
+
+/**
+ * Gets a CiviCRM activity according to parameters.
  *
- * @return array
+ * @param array $params
+ *   Array per getfields documentation.
  *
- * {@getfields activity_get}
- * @example ActivityGet.php Basic example
- * @example Activity/DateTimeHigh.php Example get with date filtering
- * {@example ActivityGet.php 0}
+ * @return array API result array
+ *   API result array
+ *
+ * @throws \API_Exception
+ * @throws \CiviCRM_API3_Exception
+ * @throws \Civi\API\Exception\UnauthorizedException
  */
 function civicrm_api3_activity_get($params) {
-  if (!empty($params['contact_id'])) {
-    $activities = CRM_Activity_BAO_Activity::getContactActivity($params['contact_id']);
-    //BAO function doesn't actually return a contact ID - hack api for now & add to test so when api re-write happens it won't get missed
-    foreach ($activities as $key => $activityArray) {
-      $activities[$key]['id'] = $key;
+  if (!empty($params['check_permissions']) && !CRM_Core_Permission::check('view all activities')) {
+    // In absence of view all activities permission it's possible to see a specific activity by ACL.
+    // Note still allowing view all activities to override ACLs is based on the 'don't change too much
+    // if you are not sure principle' and it could be argued that the ACLs should always be applied.
+    if (empty($params['id']) || !empty($params['contact_id'])) {
+      // We fall back to the original blunt permissions if we don't have an id to check or we are about
+      // to go to the weird place that the legacy 'contact_id' parameter takes us to.
+      throw new \Civi\API\Exception\UnauthorizedException(
+        "Cannot access activities. Required permission: 'view all activities''"
+      );
+    }
+
+    if (!CRM_Activity_BAO_Activity::checkPermission($params['id'], CRM_Core_Action::VIEW)) {
+      throw new \Civi\API\Exception\UnauthorizedException(
+        'You do not have permission to view this activity'
+      );
     }
   }
-  else {
-    $activities = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, FALSE);
+
+  $sql = CRM_Utils_SQL_Select::fragment();
+  // Support search by activity_contact
+  $extraFieldSpecs = array();
+  _civicrm_api3_activity_create_spec($extraFieldSpecs);
+  $options = civicrm_api3('ActivityContact', 'getoptions', array('field' => 'record_type_id'));
+  $options = $options['values'];
+  $activityContactOptions = array(
+    'contact_id' => NULL,
+    'target_contact_id' => array_search('Activity Targets', $options),
+    'source_contact_id' => array_search('Activity Source', $options),
+    'assignee_contact_id' => array_search('Activity Assignees', $options),
+  );
+  foreach ($activityContactOptions as $activityContactName => $activityContactValue) {
+    if (!empty($params[$activityContactName])) {
+      _civicrm_api3_validate_integer($params, $activityContactName, $extraFieldSpecs[$activityContactName], 'Activity');
+      if (!is_array($params[$activityContactName])) {
+        $params[$activityContactName] = array('=' => $params[$activityContactName]);
+      }
+      $clause = \CRM_Core_DAO::createSQLFilter('contact_id', $params[$activityContactName]);
+      $typeClause = $activityContactValue ? 'record_type_id = #typeId AND ' : '';
+      $sql->where("a.id IN (SELECT activity_id FROM civicrm_activity_contact WHERE $typeClause !clause)",
+        array('#typeId' => $activityContactValue, '!clause' => $clause)
+      );
+    }
+  }
+  if (!empty($params['tag_id'])) {
+    _civicrm_api3_validate_integer($params, 'tag_id', $extraFieldSpecs['tag_id'], 'Activity');
+    if (!is_array($params['tag_id'])) {
+      $params['tag_id'] = array('=' => $params['tag_id']);
+    }
+    $clause = \CRM_Core_DAO::createSQLFilter('tag_id', $params['tag_id']);
+    if ($clause) {
+      $sql->where('a.id IN (SELECT entity_id FROM civicrm_entity_tag WHERE entity_table = "civicrm_activity" AND !clause)', array('!clause' => $clause));
+    }
+  }
+  if (!empty($params['file_id'])) {
+    _civicrm_api3_validate_integer($params, 'file_id', $extraFieldSpecs['file_id'], 'Activity');
+    if (!is_array($params['file_id'])) {
+      $params['file_id'] = array('=' => $params['file_id']);
+    }
+    $clause = \CRM_Core_DAO::createSQLFilter('file_id', $params['file_id']);
+    if ($clause) {
+      $sql->where('a.id IN (SELECT entity_id FROM civicrm_entity_file WHERE entity_table = "civicrm_activity" AND !clause)', array('!clause' => $clause));
+    }
+  }
+  if (!empty($params['case_id'])) {
+    _civicrm_api3_validate_integer($params, 'case_id', $extraFieldSpecs['case_id'], 'Activity');
+    if (!is_array($params['case_id'])) {
+      $params['case_id'] = array('=' => $params['case_id']);
+    }
+    $clause = \CRM_Core_DAO::createSQLFilter('case_id', $params['case_id']);
+    if ($clause) {
+      $sql->where('a.id IN (SELECT activity_id FROM civicrm_case_activity WHERE !clause)', array('!clause' => $clause));
+    }
+  }
+  $activities = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, FALSE, 'Activity', $sql);
+  $options = _civicrm_api3_get_options_from_params($params, FALSE, 'Activity', 'get');
+  if ($options['is_count']) {
+    return civicrm_api3_create_success($activities, $params, 'Activity', 'get');
   }
 
   $activities = _civicrm_api3_activity_get_formatResult($params, $activities);
   //legacy custom data get - so previous formatted response is still returned too
-  return civicrm_api3_create_success($activities, $params, 'activity', 'get');
+  return civicrm_api3_create_success($activities, $params, 'Activity', 'get');
 }
 
 /**
- * Given a list of activities, append any extra data requested about the activities
+ * Given a list of activities, append any extra data requested about the activities.
  *
- * NOTE: Called by civicrm-core and CiviHR
+ * @note Called by civicrm-core and CiviHR
  *
- * @param array $params API request parameters
+ * @param array $params
+ *   API request parameters.
  * @param array $activities
- * @return array new activities list
+ *
+ * @return array
+ *   new activities list
  */
 function _civicrm_api3_activity_get_formatResult($params, $activities) {
+  if (!$activities) {
+    return $activities;
+  }
+
   $returns = CRM_Utils_Array::value('return', $params, array());
   if (!is_array($returns)) {
     $returns = str_replace(' ', '', $returns);
@@ -261,35 +410,104 @@ function _civicrm_api3_activity_get_formatResult($params, $activities) {
       $returns[$returnkey] = $v;
     }
   }
+
   $returns['source_contact_id'] = 1;
+  if (!empty($returns['target_contact_name'])) {
+    $returns['target_contact_id'] = 1;
+  }
+  if (!empty($returns['assignee_contact_name'])) {
+    $returns['assignee_contact_id'] = 1;
+  }
+
+  $tagGet = array('tag_id', 'entity_id');
+  foreach (array_keys($returns) as $key) {
+    if (strpos($key, 'tag_id.') === 0) {
+      $tagGet[] = $key;
+      $returns['tag_id'] = 1;
+    }
+  }
+
   foreach ($returns as $n => $v) {
     switch ($n) {
       case 'assignee_contact_id':
         foreach ($activities as $key => $activityArray) {
-          $activities[$key]['assignee_contact_id'] = CRM_Activity_BAO_ActivityAssignment::retrieveAssigneeIdsByActivityId($activityArray['id']);
+          $cids = $activities[$key]['assignee_contact_id'] = CRM_Activity_BAO_ActivityAssignment::retrieveAssigneeIdsByActivityId($activityArray['id']);
+          if ($cids && !empty($returns['assignee_contact_name'])) {
+            foreach ($cids as $cid) {
+              $activities[$key]['assignee_contact_name'][$cid] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $cid, 'display_name');
+            }
+          }
         }
         break;
+
       case 'target_contact_id':
         foreach ($activities as $key => $activityArray) {
-          $activities[$key]['target_contact_id'] = CRM_Activity_BAO_ActivityTarget::retrieveTargetIdsByActivityId($activityArray['id']);
+          $cids = $activities[$key]['target_contact_id'] = CRM_Activity_BAO_ActivityTarget::retrieveTargetIdsByActivityId($activityArray['id']);
+          if ($cids && !empty($returns['target_contact_name'])) {
+            foreach ($cids as $cid) {
+              $activities[$key]['target_contact_name'][$cid] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $cid, 'display_name');
+            }
+          }
         }
         break;
+
       case 'source_contact_id':
         foreach ($activities as $key => $activityArray) {
-          $activities[$key]['source_contact_id'] = CRM_Activity_BAO_Activity::getSourceContactID($activityArray['id']);
+          $cid = $activities[$key]['source_contact_id'] = CRM_Activity_BAO_Activity::getSourceContactID($activityArray['id']);
+          if ($cid && !empty($returns['source_contact_name'])) {
+            $activities[$key]['source_contact_name'] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $cid, 'display_name');
+          }
         }
         break;
+
+      case 'tag_id':
+        $tags = civicrm_api3('EntityTag', 'get', array(
+          'entity_table' => 'civicrm_activity',
+          'entity_id' => array('IN' => array_keys($activities)),
+          'return' => $tagGet,
+          'options' => array('limit' => 0),
+        ));
+        foreach ($tags['values'] as $tag) {
+          $key = (int) $tag['entity_id'];
+          unset($tag['entity_id'], $tag['id']);
+          $activities[$key]['tag_id'][$tag['tag_id']] = $tag;
+        }
+        break;
+
+      case 'file_id':
+        $dao = CRM_Core_DAO::executeQuery("SELECT entity_id, file_id FROM civicrm_entity_file WHERE entity_table = 'civicrm_activity' AND entity_id IN (%1)",
+          array(1 => array(implode(',', array_keys($activities)), 'String', CRM_Core_DAO::QUERY_FORMAT_NO_QUOTES)));
+        while ($dao->fetch()) {
+          $activities[$dao->entity_id]['file_id'][] = $dao->file_id;
+        }
+        break;
+
       default:
         if (substr($n, 0, 6) == 'custom') {
           $returnProperties[$n] = $v;
         }
     }
   }
-  if (!empty($activities) && (!empty($returnProperties) || !empty($params['contact_id']))) {
-    foreach ($activities as $activityId => $values) {
-      _civicrm_api3_custom_data_get($activities[$activityId], 'Activity', $activityId, NULL, $values['activity_type_id']);
+
+  // Legacy extras
+  if (!empty($params['contact_id'])) {
+    $statusOptions = CRM_Activity_BAO_Activity::buildOptions('status_id', 'get');
+    $typeOptions = CRM_Activity_BAO_Activity::buildOptions('activity_type_id', 'validate');
+    foreach ($activities as $key => &$activityArray) {
+      if (!empty($activityArray['status_id'])) {
+        $activityArray['status'] = $statusOptions[$activityArray['status_id']];
+      }
+      if (!empty($activityArray['activity_type_id'])) {
+        $activityArray['activity_name'] = $typeOptions[$activityArray['activity_type_id']];
+      }
     }
-    return $activities;
+  }
+
+  if (!empty($returnProperties) || !empty($params['contact_id'])) {
+    foreach ($activities as $activityId => $values) {
+      //@todo - should possibly load activity type id if not loaded (update with id)
+      _civicrm_api3_custom_data_get($activities[$activityId], CRM_Utils_Array::value('check_permissions', $params), 'Activity', $activityId, NULL, CRM_Utils_Array::value('activity_type_id', $values));
+    }
   }
   return $activities;
 }
@@ -298,44 +516,43 @@ function _civicrm_api3_activity_get_formatResult($params, $activities) {
 /**
  * Delete a specified Activity.
  *
- * @param array $params array holding 'id' of activity to be deleted
- * {@getfields activity_delete}
+ * @param array $params
+ *   Array holding 'id' of activity to be deleted.
  *
- * @return void|CRM_Core_Error  An error if 'activityName or ID' is invalid,
- *                         permissions are insufficient, etc. or CiviCRM success array
+ * @throws API_Exception
  *
- *
- *
- * @example ActivityDelete.php Standard Delete Example
- *
- *
+ * @return array
+ *   API result array
  */
 function civicrm_api3_activity_delete($params) {
 
   if (CRM_Activity_BAO_Activity::deleteActivity($params)) {
-    return civicrm_api3_create_success(1, $params, 'activity', 'delete');
+    return civicrm_api3_create_success(1, $params, 'Activity', 'delete');
   }
   else {
-    return civicrm_api3_create_error('Could not delete activity');
+    throw new API_Exception('Could not delete Activity');
   }
 }
 
 /**
- * Function to check for required params
+ * Check for required params.
  *
- * @param array   $params  associated array of fields
- * @param boolean $addMode true for add mode
+ * @param array $params
+ *   Associated array of fields.
  *
- * @return array $error array with errors
+ * @throws API_Exception
+ * @throws Exception
+ * @return array
+ *   array with errors
  */
 function _civicrm_api3_activity_check_params(&$params) {
 
   $contactIDFields = array_intersect_key($params,
-                     array(
-                       'source_contact_id' => 1,
-                       'assignee_contact_id' => 1,
-                       'target_contact_id' => 1,
-                     )
+    array(
+      'source_contact_id' => 1,
+      'assignee_contact_id' => 1,
+      'target_contact_id' => 1,
+    )
   );
 
   // this should be handled by wrapper layer & probably the api would already manage it
@@ -357,35 +574,34 @@ function _civicrm_api3_activity_check_params(&$params) {
       }
     }
 
-
     $sql = '
 SELECT  count(*)
   FROM  civicrm_contact
  WHERE  id IN (' . implode(', ', $contactIds) . ' )';
     if (count($contactIds) != CRM_Core_DAO::singleValueQuery($sql)) {
-      return civicrm_api3_create_error('Invalid ' .  ' Contact Id');
+      throw new API_Exception('Invalid Contact Id');
     }
   }
 
-
-  $activityIds = array('activity' => CRM_Utils_Array::value('id', $params),
-                 'parent' => CRM_Utils_Array::value('parent_id', $params),
-                 'original' => CRM_Utils_Array::value('original_id', $params),
+  $activityIds = array(
+    'activity' => CRM_Utils_Array::value('id', $params),
+    'parent' => CRM_Utils_Array::value('parent_id', $params),
+    'original' => CRM_Utils_Array::value('original_id', $params),
   );
 
   foreach ($activityIds as $id => $value) {
     if ($value &&
       !CRM_Core_DAO::getFieldValue('CRM_Activity_DAO_Activity', $value, 'id')
     ) {
-      return civicrm_api3_create_error('Invalid ' . ucfirst($id) . ' Id');
+      throw new API_Exception('Invalid ' . ucfirst($id) . ' Id');
     }
   }
   // this should be handled by wrapper layer & probably the api would already manage it
   //correctly by doing pseudoconstant validation
   // needs testing
   $activityTypes = CRM_Activity_BAO_Activity::buildOptions('activity_type_id', 'validate');
-  $activityName  = CRM_Utils_Array::value('activity_name', $params);
-  $activityName  = ucfirst($activityName);
+  $activityName = CRM_Utils_Array::value('activity_name', $params);
+  $activityName = ucfirst($activityName);
   $activityLabel = CRM_Utils_Array::value('activity_label', $params);
   if ($activityLabel) {
     $activityTypes = CRM_Activity_BAO_Activity::buildOptions('activity_type_id', 'create');
@@ -397,27 +613,26 @@ SELECT  count(*)
     $activityTypeIdInList = array_search(($activityName ? $activityName : $activityLabel), $activityTypes);
 
     if (!$activityTypeIdInList) {
-      $errorString = $activityName ? "Invalid Activity Name : $activityName"  : "Invalid Activity Type Label";
+      $errorString = $activityName ? "Invalid Activity Name : $activityName" : "Invalid Activity Type Label";
       throw new Exception($errorString);
     }
     elseif ($activityTypeId && ($activityTypeId != $activityTypeIdInList)) {
-      return civicrm_api3_create_error('Mismatch in Activity');
+      throw new API_Exception('Mismatch in Activity');
     }
     $params['activity_type_id'] = $activityTypeIdInList;
   }
   elseif ($activityTypeId &&
     !array_key_exists($activityTypeId, $activityTypes)
   ) {
-    return civicrm_api3_create_error('Invalid Activity Type ID');
+    throw new API_Exception('Invalid Activity Type ID');
   }
 
   // check for activity duration minutes
   // this should be validated @ the wrapper layer not here
   // needs testing
   if (isset($params['duration_minutes']) && !is_numeric($params['duration_minutes'])) {
-    return civicrm_api3_create_error('Invalid Activity Duration (in minutes)');
+    throw new API_Exception('Invalid Activity Duration (in minutes)');
   }
-
 
   //if adding a new activity & date_time not set make it now
   // this should be managed by the wrapper layer & setting ['api.default'] in speces
@@ -429,3 +644,67 @@ SELECT  count(*)
   return NULL;
 }
 
+/**
+ * Get parameters for activity list.
+ *
+ * @see _civicrm_api3_generic_getlist_params
+ *
+ * @param array $request
+ *   API request.
+ */
+function _civicrm_api3_activity_getlist_params(&$request) {
+  $fieldsToReturn = array(
+    'activity_date_time',
+    'activity_type_id',
+    'subject',
+    'source_contact_id',
+  );
+  $request['params']['return'] = array_unique(array_merge($fieldsToReturn, $request['extra']));
+  $request['params']['options']['sort'] = 'activity_date_time DESC';
+  $request['params'] += array(
+    'is_current_revision' => 1,
+    'is_deleted' => 0,
+  );
+}
+
+/**
+ * Get output for activity list.
+ *
+ * @see _civicrm_api3_generic_getlist_output
+ *
+ * @param array $result
+ * @param array $request
+ *
+ * @return array
+ */
+function _civicrm_api3_activity_getlist_output($result, $request) {
+  $output = array();
+  if (!empty($result['values'])) {
+    foreach ($result['values'] as $row) {
+      $data = array(
+        'id' => $row[$request['id_field']],
+        'label' => $row[$request['label_field']] ? $row[$request['label_field']] : ts('(no subject)'),
+        'description' => array(
+          CRM_Core_Pseudoconstant::getLabel('CRM_Activity_BAO_Activity', 'activity_type_id', $row['activity_type_id']),
+        ),
+      );
+      if (!empty($row['activity_date_time'])) {
+        $data['description'][0] .= ': ' . CRM_Utils_Date::customFormat($row['activity_date_time']);
+      }
+      if (!empty($row['source_contact_id'])) {
+        $data['description'][] = ts('By %1', array(
+          1 => CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $row['source_contact_id'], 'display_name'),
+        ));
+      }
+      // Add repeating info
+      $repeat = CRM_Core_BAO_RecurringEntity::getPositionAndCount($row['id'], 'civicrm_activity');
+      $data['extra']['is_recur'] = FALSE;
+      if ($repeat) {
+        $data['suffix'] = ts('(%1 of %2)', array(1 => $repeat[0], 2 => $repeat[1]));
+        $data['extra']['is_recur'] = TRUE;
+      }
+      $output[] = $data;
+    }
+  }
+  return $output;
+}

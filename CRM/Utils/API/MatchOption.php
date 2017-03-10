@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Implement the "match" and "match-mandatory" options. If the submitted record doesn't have an ID
@@ -49,11 +49,14 @@
  * @endcode
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 require_once 'api/Wrapper.php';
+
+/**
+ * Class CRM_Utils_API_MatchOption
+ */
 class CRM_Utils_API_MatchOption implements API_Wrapper {
 
   /**
@@ -62,6 +65,8 @@ class CRM_Utils_API_MatchOption implements API_Wrapper {
   private static $_singleton = NULL;
 
   /**
+   * Singleton function.
+   *
    * @return CRM_Utils_API_MatchOption
    */
   public static function singleton() {
@@ -72,12 +77,13 @@ class CRM_Utils_API_MatchOption implements API_Wrapper {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public function fromApiInput($apiRequest) {
+
     // Parse options.match or options.match-mandatory
-    $keys = NULL; // array of fields to match against
-    if (isset($apiRequest['params'], $apiRequest['params']['options'])) {
+    $keys = NULL;
+    if (isset($apiRequest['params'], $apiRequest['params']['options']) && is_array($apiRequest['params']['options'])) {
       if (isset($apiRequest['params']['options']['match-mandatory'])) {
         $isMandatory = TRUE;
         $keys = $apiRequest['params']['options']['match-mandatory'];
@@ -94,12 +100,13 @@ class CRM_Utils_API_MatchOption implements API_Wrapper {
     // If one of the options was specified, then try to match records.
     // Matching logic differs for 'create' and 'replace' actions.
     if ($keys !== NULL) {
-      switch($apiRequest['action']) {
+      switch ($apiRequest['action']) {
         case 'create':
           if (empty($apiRequest['params']['id'])) {
             $apiRequest['params'] = $this->match($apiRequest['entity'], $apiRequest['params'], $keys, $isMandatory);
           }
           break;
+
         case 'replace':
           // In addition to matching on the listed keys, also match on the set-definition keys.
           // For example, if the $apiRequest is to "replace the set of civicrm_emails for contact_id=123 while
@@ -112,14 +119,15 @@ class CRM_Utils_API_MatchOption implements API_Wrapper {
           ));
 
           // attempt to match each replacement item
-          foreach($apiRequest['params']['values'] as $offset => $createParams) {
+          foreach ($apiRequest['params']['values'] as $offset => $createParams) {
             $createParams = array_merge($baseParams, $createParams);
             $createParams = $this->match($apiRequest['entity'], $createParams, $keys, $isMandatory);
             $apiRequest['params']['values'][$offset] = $createParams;
           }
           break;
+
         default:
-          // be forgiveful of sloppily api calls
+          // be forgiving of sloppy api calls
       }
     }
 
@@ -133,7 +141,9 @@ class CRM_Utils_API_MatchOption implements API_Wrapper {
    * @param array $createParams
    * @param array $keys
    * @param bool $isMandatory
-   * @return array revised $createParams, including 'id' if known
+   *
+   * @return array
+   *   revised $createParams, including 'id' if known
    * @throws API_Exception
    */
   public function match($entity, $createParams, $keys, $isMandatory) {
@@ -156,7 +166,7 @@ class CRM_Utils_API_MatchOption implements API_Wrapper {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public function toApiOutput($apiRequest, $result) {
     return $result;
@@ -165,15 +175,20 @@ class CRM_Utils_API_MatchOption implements API_Wrapper {
   /**
    * Create APIv3 "get" parameters to lookup an existing record using $keys
    *
-   * @param array $apiRequest
-   * @param array $keys list of keys to match against
-   * @return array APIv3 $params
+   * @param array $origParams
+   *   Api request.
+   * @param array $keys
+   *   List of keys to match against.
+   *
+   * @return array
+   *   APIv3 $params
    */
-  function createGetParams($origParams, $keys) {
+  public function createGetParams($origParams, $keys) {
     $params = array('version' => 3);
     foreach ($keys as $key) {
       $params[$key] = CRM_Utils_Array::value($key, $origParams, '');
     }
     return $params;
   }
+
 }

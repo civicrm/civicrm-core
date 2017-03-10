@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.1                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2011                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -36,6 +36,8 @@ define('CHUNK_SIZE', 128);
 
 /**
  * Split a large array of contactIDs into more manageable smaller chunks
+ * @param $contactIDs
+ * @return array
  */
 function &splitContactIDs(&$contactIDs) {
   // contactIDs could be a real large array, so we split it up into
@@ -65,6 +67,8 @@ function &splitContactIDs(&$contactIDs) {
 
 /**
  * Given an array of values, generate the XML in the Solr format
+ * @param $values
+ * @return string
  */
 function &generateSolrXML($values) {
   $result = "<add>\n";
@@ -94,6 +98,9 @@ EOT;
 
 /**
  * Given a set of contact IDs get the values
+ * @param $contactIDs
+ * @param $values
+ * @return array
  */
 function getValues(&$contactIDs, &$values) {
   $values = array();
@@ -108,6 +115,14 @@ function getValues(&$contactIDs, &$values) {
   return $values;
 }
 
+/**
+ * @param $contactIDs
+ * @param $values
+ * @param $tableName
+ * @param $fields
+ * @param $whereField
+ * @param null $additionalWhereCond
+ */
 function getTableInfo(&$contactIDs, &$values, $tableName, &$fields, $whereField, $additionalWhereCond = NULL) {
   $selectString = implode(',', array_keys($fields));
   $idString = implode(',', $contactIDs);
@@ -122,7 +137,7 @@ SELECT $selectString, $whereField as contact_id
     $sql .= " AND $additionalWhereCond";
   }
 
-  $dao = &CRM_Core_DAO::executeQuery($sql, CRM_Core_DAO::$_nullArray);
+  $dao = CRM_Core_DAO::executeQuery($sql);
   while ($dao->fetch()) {
     foreach ($fields as $fld => $name) {
       if (empty($dao->$fld)) {
@@ -136,6 +151,10 @@ SELECT $selectString, $whereField as contact_id
   }
 }
 
+/**
+ * @param $contactIDs
+ * @param $values
+ */
 function getContactInfo(&$contactIDs, &$values) {
   $fields = array('sort_name' => NULL,
     'display_name' => NULL,
@@ -168,6 +187,10 @@ function getContactInfo(&$contactIDs, &$values) {
   getTableInfo($contactIDs, $values, 'civicrm_note', $fields, 'entity_id', "entity_table = 'civicrm_contact'");
 }
 
+/**
+ * @param $contactIDs
+ * @param $values
+ */
 function getLocationInfo(&$contactIDs, &$values) {
   $ids = implode(',', $contactIDs);
 
@@ -175,7 +198,7 @@ function getLocationInfo(&$contactIDs, &$values) {
 SELECT
   l.entity_id as contact_id, l.name as location_name,
   a.street_address, a.supplemental_address_1, a.supplemental_address_2,
-  a.city, a.postal_code, 
+  a.city, a.postal_code,
   co.name as county, s.name as state, c.name as country,
   e.email, p.phone, i.name as im
 FROM
@@ -195,7 +218,7 @@ WHERE l.entity_table = 'civicrm_contact'
     'supplemental_address_2', 'city', 'postal_code', 'county', 'state',
     'country', 'email', 'phone', 'im',
   );
-  $dao = &CRM_Core_DAO::executeQuery($sql, CRM_Core_DAO::$_nullArray);
+  $dao = CRM_Core_DAO::executeQuery($sql);
   while ($dao->fetch()) {
     foreach ($fields as $fld) {
       if (empty($dao->$fld)) {
@@ -206,6 +229,9 @@ WHERE l.entity_table = 'civicrm_contact'
   }
 }
 
+/**
+ * @param $contactIDs
+ */
 function run(&$contactIDs) {
   $chunks = &splitContactIDs($contactIDs);
 
@@ -223,10 +249,10 @@ $config->userFrameworkClass = 'CRM_Utils_System_Soap';
 $config->userHookClass = 'CRM_Utils_Hook_Soap';
 
 $sql = <<<EOT
-SELECT id 
+SELECT id
 FROM civicrm_contact
 EOT;
-$dao = &CRM_Core_DAO::executeQuery($sql, CRM_Core_DAO::$_nullArray);
+$dao = CRM_Core_DAO::executeQuery($sql);
 
 $contactIDs = array();
 while ($dao->fetch()) {

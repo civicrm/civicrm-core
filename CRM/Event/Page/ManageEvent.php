@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
  */
@@ -39,10 +39,9 @@
 class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
 
   /**
-   * The action links that we need to display for the browse screen
+   * The action links that we need to display for the browse screen.
    *
    * @var array
-   * @static
    */
   static $_actionLinks = NULL;
 
@@ -57,11 +56,12 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
   protected $_isTemplate = FALSE;
 
   /**
-   * Get action Links
+   * Get action Links.
    *
-   * @return array (reference) of action links
+   * @return array
+   *   (reference) of action links
    */
-  function &links() {
+  public function &links() {
     if (!(self::$_actionLinks)) {
       // helper variable for nicer formatting
       $copyExtra = ts('Are you sure you want to make a copy of this Event?');
@@ -98,58 +98,77 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
   }
 
   /**
-   * Get tab  Links for events
+   * Get tab  Links for events.
    *
-   * @return array (reference) of tab links
+   * @param $enableCart
+   *
+   * @return array
+   *   (reference) of tab links
    */
-  static function &tabs($enableCart) {
+  public static function &tabs($enableCart) {
     $cacheKey = $enableCart ? 1 : 0;
     if (!(self::$_tabLinks)) {
       self::$_tabLinks = array();
     }
     if (!isset(self::$_tabLinks[$cacheKey])) {
-      self::$_tabLinks[$cacheKey] = array(
-        'settings' => array(
+      self::$_tabLinks[$cacheKey]['settings']
+        = array(
           'title' => ts('Info and Settings'),
           'url' => 'civicrm/event/manage/settings',
-          'field' => 'id'
-        ),
-        'location' => array(
+          'field' => 'id',
+        );
+      self::$_tabLinks[$cacheKey]['location']
+        = array(
           'title' => ts('Location'),
           'url' => 'civicrm/event/manage/location',
           'field' => 'loc_block_id',
-        ),
-        'fee' => array(
+        );
+
+      self::$_tabLinks[$cacheKey]['fee']
+        = array(
           'title' => ts('Fees'),
           'url' => 'civicrm/event/manage/fee',
           'field' => 'is_monetary',
-        ),
-        'registration' => array(
+        );
+      self::$_tabLinks[$cacheKey]['registration']
+        = array(
           'title' => ts('Online Registration'),
           'url' => 'civicrm/event/manage/registration',
           'field' => 'is_online_registration',
-        ),
-        'reminder' => array(
-          'title' => ts('Schedule Reminders'),
-          'url' => 'civicrm/event/manage/reminder',
-          'field' => 'reminder',
-        ),
-        'conference' => array(
+        );
+
+      if (CRM_Core_Permission::check('administer CiviCRM') || CRM_Event_BAO_Event::checkPermission(NULL, CRM_Core_Permission::EDIT)) {
+        self::$_tabLinks[$cacheKey]['reminder']
+          = array(
+            'title' => ts('Schedule Reminders'),
+            'url' => 'civicrm/event/manage/reminder',
+            'field' => 'reminder',
+          );
+      }
+      self::$_tabLinks[$cacheKey]['conference']
+        = array(
           'title' => ts('Conference Slots'),
           'url' => 'civicrm/event/manage/conference',
           'field' => 'slot_label_id',
-        ),
-        'friend' => array(
+        );
+      self::$_tabLinks[$cacheKey]['friend']
+        = array(
           'title' => ts('Tell a Friend'),
           'url' => 'civicrm/event/manage/friend',
           'field' => 'friend',
-        ),
-        'pcp' => array(
+        );
+      self::$_tabLinks[$cacheKey]['pcp']
+        = array(
           'title' => ts('Personal Campaign Pages'),
           'url' => 'civicrm/event/manage/pcp',
           'field' => 'is_pcp_enabled',
-        ),
-      );
+        );
+      self::$_tabLinks[$cacheKey]['repeat']
+        = array(
+          'title' => ts('Repeat'),
+          'url' => 'civicrm/event/manage/repeat',
+          'field' => 'is_repeating_event',
+        );
     }
 
     if (!$enableCart) {
@@ -168,10 +187,8 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
    * Finally it calls the parent's run method.
    *
    * @return void
-   * @access public
-   *
    */
-  function run() {
+  public function run() {
     // get the requested action
     $action = CRM_Utils_Request::retrieve('action', 'String',
       // default to 'browse'
@@ -193,9 +210,12 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
     }
 
     if (!$this->_isTemplate && $id) {
-      $breadCrumb = array(array('title' => ts('Manage Events'),
+      $breadCrumb = array(
+        array(
+          'title' => ts('Manage Events'),
           'url' => CRM_Utils_System::url(CRM_Utils_System::currentPath(), 'reset=1'),
-        ));
+        ),
+      );
       CRM_Utils_System::appendBreadCrumb($breadCrumb);
     }
 
@@ -223,11 +243,13 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
   }
 
   /**
-   * browse all events
+   * Browse all events.
    *
    * @return void
    */
-  function browse() {
+  public function browse() {
+    Civi::resources()->addStyleFile('civicrm', 'css/searchForm.css', 1, 'html-header');
+
     $this->_sortByCharacter = CRM_Utils_Request::retrieve('sortByCharacter',
       'String',
       $this
@@ -281,7 +303,7 @@ ORDER BY start_date desc
     // get the list of active event pcps
     $eventPCPS = array();
 
-    $pcpDao = new CRM_PCP_DAO_PCPBlock;
+    $pcpDao = new CRM_PCP_DAO_PCPBlock();
     $pcpDao->entity_table = 'civicrm_event';
     $pcpDao->find();
 
@@ -289,15 +311,20 @@ ORDER BY start_date desc
       $eventPCPS[$pcpDao->entity_id] = $pcpDao->entity_id;
     }
     // check if we're in shopping cart mode for events
-    $enableCart = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::EVENT_PREFERENCES_NAME,
-      'enable_cart'
-    );
+    $enableCart = Civi::settings()->get('enable_cart');
     $this->assign('eventCartEnabled', $enableCart);
-    $mappingID = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_ActionMapping', 'civicrm_event', 'id', 'entity_value');
+    $mapping = CRM_Utils_Array::first(CRM_Core_BAO_ActionSchedule::getMappings(array(
+      'id' => CRM_Event_ActionMapping::EVENT_NAME_MAPPING_ID,
+    )));
     $eventType = CRM_Core_OptionGroup::values('event_type');
     while ($dao->fetch()) {
       if (in_array($dao->id, $permissions[CRM_Core_Permission::VIEW])) {
         $manageEvent[$dao->id] = array();
+        $repeat = CRM_Core_BAO_RecurringEntity::getPositionAndCount($dao->id, 'civicrm_event');
+        $manageEvent[$dao->id]['repeat'] = '';
+        if ($repeat) {
+          $manageEvent[$dao->id]['repeat'] = ts('Repeating (%1 of %2)', array(1 => $repeat[0], 2 => $repeat[1]));
+        }
         CRM_Core_DAO::storeValues($dao, $manageEvent[$dao->id]);
 
         // form all action links
@@ -346,10 +373,10 @@ ORDER BY start_date desc
 
         //show campaigns on selector.
         $manageEvent[$dao->id]['campaign'] = CRM_Utils_Array::value($dao->campaign_id, $allCampaigns);
-        $manageEvent[$dao->id]['reminder'] = CRM_Core_BAO_ActionSchedule::isConfigured($dao->id, $mappingID);
+        $manageEvent[$dao->id]['reminder'] = CRM_Core_BAO_ActionSchedule::isConfigured($dao->id, $mapping->getId());
         $manageEvent[$dao->id]['is_pcp_enabled'] = CRM_Utils_Array::value($dao->id, $eventPCPS);
         $manageEvent[$dao->id]['event_type'] = CRM_Utils_Array::value($manageEvent[$dao->id]['event_type_id'], $eventType);
-        
+        $manageEvent[$dao->id]['is_repeating_event'] = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_RecurringEntity', $dao->id, 'parent_id', 'entity_id');
         // allow hooks to set 'field' value which allows configuration pop-up to show a tab as enabled/disabled
         CRM_Utils_Hook::tabset('civicrm/event/manage/rows', $manageEvent, array('event_id' => $dao->id));
       }
@@ -358,21 +385,20 @@ ORDER BY start_date desc
     $manageEvent['tab'] = self::tabs($enableCart);
     $this->assign('rows', $manageEvent);
 
-    $statusTypes = CRM_Event_PseudoConstant::participantStatus(NULL, 'is_counted = 1');
-    $statusTypesPending = CRM_Event_PseudoConstant::participantStatus(NULL, 'is_counted = 0');
+    $statusTypes = CRM_Event_PseudoConstant::participantStatus(NULL, 'is_counted = 1', 'label');
+    $statusTypesPending = CRM_Event_PseudoConstant::participantStatus(NULL, 'is_counted = 0', 'label');
     $findParticipants['statusCounted'] = implode(', ', array_values($statusTypes));
     $findParticipants['statusNotCounted'] = implode(', ', array_values($statusTypesPending));
     $this->assign('findParticipants', $findParticipants);
   }
 
   /**
-   * This function is to make a copy of a Event, including
+   * make a copy of a Event, including
    * all the fields in the event wizard
    *
    * @return void
-   * @access public
    */
-  function copy() {
+  public function copy() {
     $id = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE, 0, 'GET');
 
     $urlString = 'civicrm/event/manage';
@@ -387,9 +413,8 @@ ORDER BY start_date desc
     return CRM_Utils_System::redirect(CRM_Utils_System::url($urlString, $urlParams));
   }
 
-  function search() {
-    if (isset($this->_action) &
-      (CRM_Core_Action::ADD |
+  public function search() {
+    if (isset($this->_action) & (CRM_Core_Action::ADD |
         CRM_Core_Action::UPDATE |
         CRM_Core_Action::DELETE
       )
@@ -404,10 +429,17 @@ ORDER BY start_date desc
     $form->run();
   }
 
-  function whereClause(&$params, $sortBy = TRUE, $force) {
-    $values    = array();
-    $clauses   = array();
-    $title     = $this->get('title');
+  /**
+   * @param array $params
+   * @param bool $sortBy
+   * @param $force
+   *
+   * @return string
+   */
+  public function whereClause(&$params, $sortBy = TRUE, $force) {
+    $values = array();
+    $clauses = array();
+    $title = $this->get('title');
     $createdId = $this->get('cid');
 
     if ($createdId) {
@@ -425,15 +457,9 @@ ORDER BY start_date desc
     }
 
     $value = $this->get('event_type_id');
-    $val = array();
     if ($value) {
       if (is_array($value)) {
-        foreach ($value as $k => $v) {
-          if ($v) {
-            $val[$k] = $k;
-          }
-        }
-        $type = implode(',', $val);
+        $type = implode(',', $value);
       }
       $clauses[] = "event_type_id IN ({$type})";
     }
@@ -444,13 +470,13 @@ ORDER BY start_date desc
 
         $from = $this->get('start_date');
         if (!CRM_Utils_System::isNull($from)) {
-          $clauses[] = '( start_date >= %3 OR start_date IS NULL )';
+          $clauses[] = '( end_date >= %3 OR end_date IS NULL )';
           $params[3] = array($from, 'String');
         }
 
         $to = $this->get('end_date');
         if (!CRM_Utils_System::isNull($to)) {
-          $clauses[] = '( end_date <= %4 OR end_date IS NULL )';
+          $clauses[] = '( start_date <= %4 OR start_date IS NULL )';
           $params[4] = array($to, 'String');
         }
       }
@@ -492,7 +518,11 @@ ORDER BY start_date desc
     return !empty($clauses) ? implode(' AND ', $clauses) : '(1)';
   }
 
-  function pager($whereClause, $whereParams) {
+  /**
+   * @param $whereClause
+   * @param array $whereParams
+   */
+  public function pager($whereClause, $whereParams) {
 
     $params['status'] = ts('Event %%StatusMessage%%');
     $params['csvString'] = NULL;
@@ -514,18 +544,22 @@ SELECT count(id)
     $this->assign_by_ref('pager', $this->_pager);
   }
 
-  function pagerAtoZ($whereClause, $whereParams) {
+  /**
+   * @param $whereClause
+   * @param array $whereParams
+   */
+  public function pagerAtoZ($whereClause, $whereParams) {
 
     $query = "
    SELECT DISTINCT UPPER(LEFT(title, 1)) as sort_name
      FROM civicrm_event
     WHERE $whereClause
- ORDER BY LEFT(title, 1)
+ ORDER BY UPPER(LEFT(title, 1))
 ";
     $dao = CRM_Core_DAO::executeQuery($query, $whereParams);
 
     $aToZBar = CRM_Utils_PagerAToZ::getAToZBar($dao, $this->_sortByCharacter, TRUE);
     $this->assign('aToZ', $aToZBar);
   }
-}
 
+}

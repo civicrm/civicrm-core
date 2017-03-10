@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | FirstData Core Payment Module for CiviCRM version 4.4              |
+ | FirstData Core Payment Module for CiviCRM version 4.7              |
  +--------------------------------------------------------------------+
  | Licensed to CiviCRM under the Academic Free License version 3.0    |
  |                                                                    |
@@ -12,94 +12,88 @@
  |                                                                    |
  |                                                                    |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
- Note that in order to use FirstData / LinkPoint you need a certificate (.pem) file issued by them
- and a store number. You can configure the path to the certificate and the store number
- through the front end of civiCRM. The path is as seen by the server not the url
- -----------------------------------------------------------------------------------------------
- The basic functionality of this processor is that variables from the $params object are transformed
- into xml using a function provided by the processor. The xml is submitted to the processor's https site
- using curl and the response is translated back into an array using the processor's function.
+ * Note that in order to use FirstData / LinkPoint you need a certificate (.pem) file issued by them
+ * and a store number. You can configure the path to the certificate and the store number
+ * through the front end of civiCRM. The path is as seen by the server not the url
+ * -----------------------------------------------------------------------------------------------
+ * The basic functionality of this processor is that variables from the $params object are transformed
+ * into xml using a function provided by the processor. The xml is submitted to the processor's https site
+ * using curl and the response is translated back into an array using the processor's function.
+ *
+ * If an array ($params) is returned to the calling function it is treated as a success and the values from
+ * the array are merged into the calling functions array.
+ *
+ * If an result of class error is returned it is treated as a failure
+ *
+ * -----------------------------------------------------------------------------------------------
+ */
 
- If an array ($params) is returned to the calling function it is treated as a success and the values from
- the array are merged into the calling functions array.
-
- If an result of class error is returned it is treated as a failure
-
- -----------------------------------------------------------------------------------------------
- **/
-
-/*From Payment processor documentation
-For testing purposes, you can use any of the card numbers listed below. The test card numbers
-will not result in any charges to the card. Use these card numbers with any expiration date in the
-future.
-     Visa Level 2 - 4275330012345675 (replies with a referral message)
-     JCB - 3566007770003510
-     Discover - 6011000993010978
-     MasterCard - 5424180279791765
-     Visa - 4005550000000019 or 4111111111111111
-     MasterCard Level 2 - 5404980000008386
-     Diners - 36555565010005
-     Amex - 372700997251009
-*
-***************************
-*Lines starting with CRM_Core_Error::debug_log_message output messages to files/upload/civicrm.log - you may with to comment them out once it is working satisfactorily
-
-*For live testing uncomment the result field below and set the value to the response you wish to get from the payment processor
-***************************/
+/**
+ * From Payment processor documentation
+ * For testing purposes, you can use any of the card numbers listed below. The test card numbers
+ * will not result in any charges to the card. Use these card numbers with any expiration date in the
+ * future.
+ *      Visa Level 2 - 4275330012345675 (replies with a referral message)
+ *      JCB - 3566007770003510
+ *      Discover - 6011000993010978
+ *      MasterCard - 5424180279791765
+ *      Visa - 4005550000000019 or 4111111111111111
+ *      MasterCard Level 2 - 5404980000008386
+ *      Diners - 36555565010005
+ *      Amex - 372700997251009
+ *
+ * **************************
+ * Lines starting with CRM_Core_Error::debug_log_message output messages to files/upload/civicrm.log - you may with to comment them out once it is working satisfactorily
+ *
+ * For live testing uncomment the result field below and set the value to the response you wish to get from the payment processor
+ * **************************
+ */
 class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
   # (not used, implicit in the API, might need to convert?)
-  CONST CHARSET = 'UFT-8';
+  const CHARSET = 'UFT-8';
 
   /**
    * We only need one instance of this object. So we use the singleton
    * pattern and cache the instance in this variable
    *
    * @var object
-   * @static
    */
   static private $_singleton = NULL;
 
-  /**********************************************************
-   * Constructor
+  /**
+   * Constructor.
    *
-   * @param string $mode the mode of operation: live or test
+   * @param string $mode
+   *   The mode of operation: live or test.
    *
-   * @return void
-   **********************************************************/ function __construct($mode, &$paymentProcessor) {
+   * @param $paymentProcessor
+   *
+   * @return \CRM_Core_Payment_FirstData *******************************************************
+   */
+  public function __construct($mode, &$paymentProcessor) {
     // live or test
     $this->_mode = $mode;
     $this->_paymentProcessor = $paymentProcessor;
   }
 
   /**
-   * singleton function used to manage this object
+   * Map fields from params array.
    *
-   * @param string $mode the mode of operation: live or test
-   *
-   * @return object
-   * @static
-   *
-   */
-  static function &singleton($mode, &$paymentProcessor) {
-    $processorName = $paymentProcessor['name'];
-    if (self::$_singleton[$processorName] === NULL) {
-      self::$_singleton[$processorName] = new CRM_Core_Payment_FirstData($mode, $paymentProcessor);
-    }
-    return self::$_singleton[$processorName];
-  }
-
-  /**********************************************************
    * This function is set up and put here to make the mapping of fields
-   * from the params object  as visually clear as possible for easy editing
+   * as visually clear as possible for easy editing
    *
    *  Comment out irrelevant fields
-   **********************************************************/
-  function mapProcessorFieldstoParams($params) {
+   *
+   * @param array $params
+   *
+   * @return array
+   */
+  public function mapProcessorFieldstoParams($params) {
     /*concatenate full customer name first  - code from EWAY gateway
-         */
+     */
 
     $credit_card_name = $params['first_name'] . " ";
     if (strlen($params['middle_name']) > 0) {
@@ -130,7 +124,7 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
     $requestFields['transactionorigin'] = "Eci";
     #32 character string
     $requestFields['invoice_number'] = $params['invoiceID'];
-    $requestFields['ordertype'] = $params['payment_action'];
+    $requestFields['ordertype'] = 'Sale';
     $requestFields['comments'] = $params['description'];
     //**********************set 'result' for live testing **************************
     //  $requestFields[       'result'  ]      =    "";  #set to "Good", "Decline" or "Duplicate"
@@ -151,13 +145,18 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
     return $requestFields;
   }
 
-  /**********************************************************
+  /**
    * This function sends request and receives response from
    * the processor
-   **********************************************************/
-  function doDirectPayment(&$params) {
+   *
+   * @param array $params
+   *
+   * @return array|object
+   * @throws \Exception
+   */
+  public function doDirectPayment(&$params) {
     if ($params['is_recur'] == TRUE) {
-      CRM_Core_Error::fatal(ts('%1 - recurring payments not implemented', array(1 => $paymentProcessor)));
+      CRM_Core_Error::fatal(ts('First Data - recurring payments not implemented'));
     }
 
     if (!defined('CURLOPT_SSLCERT')) {
@@ -187,11 +186,10 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
     $port = "1129";
     $host = $this->_paymentProcessor['url_site'] . ":" . $port . "/LSGSXML";
 
-
     //----------------------------------------------------------------------------------------------------
     // Check to see if we have a duplicate before we send
     //----------------------------------------------------------------------------------------------------
-    if ($this->_checkDupe($params['invoiceID'])) {
+    if ($this->checkDupe($params['invoiceID'], CRM_Utils_Array::value('contributionID', $params))) {
       return self::errorExit(9003, 'It appears that this transaction is a duplicate.  Have you already submitted the form once?  If so there may have been a connection problem.  Check your email for a receipt from eWAY.  If you do not receive a receipt within 2 hours you can try your transaction again.  If you continue to have problems please contact the site administrator.');
     }
     //----------------------------------------------------------------------------------------------------
@@ -199,25 +197,21 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
     //----------------------------------------------------------------------------------------------------
     $requestxml = lphp::buildXML($requestFields);
 
-
-
     /*----------------------------------------------------------------------------------------------------
-         // Send to the payment information using cURL
-         /----------------------------------------------------------------------------------------------------
-        */
-
+    // Send to the payment information using cURL
+    /----------------------------------------------------------------------------------------------------
+     */
 
     $ch = curl_init($host);
     if (!$ch) {
       return self::errorExit(9004, 'Could not initiate connection to payment gateway');
     }
 
-
     curl_setopt($ch, CURLOPT_POST, 1);
     curl_setopt($ch, CURLOPT_POSTFIELDS, $requestxml);
     curl_setopt($ch, CURLOPT_SSLCERT, $key);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'verifySSL') ? 2 : 0);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'verifySSL'));
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, Civi::settings()->get('verifySSL') ? 2 : 0);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, Civi::settings()->get('verifySSL'));
     // return the result on success, FALSE on failure
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
     curl_setopt($ch, CURLOPT_TIMEOUT, 36000);
@@ -241,12 +235,14 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
       $errorDesc = curl_error($ch);
 
       // Paranoia - in the unlikley event that 'curl' errno fails
-      if ($errorNum == 0)
-      $errorNum = 9005;
+      if ($errorNum == 0) {
+        $errorNum = 9005;
+      }
 
       // Paranoia - in the unlikley event that 'curl' error fails
-      if (strlen($errorDesc) == 0)
-      $errorDesc = "Connection to payment gateway failed";
+      if (strlen($errorDesc) == 0) {
+        $errorDesc = "Connection to payment gateway failed";
+      }
       if ($errorNum == 60) {
         return self::errorExit($errorNum, "Curl error - " . $errorDesc . " Try this link for more information http://curl.haxx.se/docs/sslcerts.html");
       }
@@ -316,22 +312,14 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
   // end function doDirectPayment
 
   /**
-   * Checks to see if invoice_id already exists in db
+   * Produces error message and returns from class.
    *
-   * @param  int     $invoiceId   The ID to check
+   * @param int $errorCode
+   * @param string $errorMessage
    *
-   * @return bool                  True if ID exists, else false
+   * @return object
    */
-  function _checkDupe($invoiceId) {
-    $contribution = new CRM_Contribute_DAO_Contribution();
-    $contribution->invoice_id = $invoiceId;
-    return $contribution->find();
-  }
-
-  /**************************************************
-   * Produces error message and returns from class
-   **************************************************/
-  function &errorExit($errorCode = NULL, $errorMessage = NULL) {
+  public function &errorExit($errorCode = NULL, $errorMessage = NULL) {
     $e = CRM_Core_Error::singleton();
 
     if ($errorCode) {
@@ -343,27 +331,21 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
     return $e;
   }
 
-  /**************************************************
-   * NOTE: 'doTransferCheckout' not implemented
-   **************************************************/
-  function doTransferCheckout(&$params, $component) {
-    CRM_Core_Error::fatal(ts('This function is not implemented'));
-  }
-
-  /********************************************************************************************
-   * This public function checks to see if we have the right processor config values set
+  /**
+   * This public function checks to see if we have the right processor config values set.
    *
    * NOTE: Called by Events and Contribute to check config params are set prior to trying
    *       register any credit card details
    *
-   * @param string $mode the mode we are operating in (live or test) - not used
+   * @return null|string
+   * @internal param string $mode the mode we are operating in (live or test) - not used
    *
    * returns string $errorMsg if any errors found - null if OK
    *
-   ********************************************************************************************/
-  //  function checkConfig( $mode )          // CiviCRM V1.9 Declaration
-  // CiviCRM V2.0 Declaration
-  function checkConfig() {
+   *  function checkConfig( $mode )           CiviCRM V1.9 Declaration
+   * CiviCRM V2.0 Declaration
+   */
+  public function checkConfig() {
     $errorMsg = array();
 
     if (empty($this->_paymentProcessor['user_name'])) {
@@ -381,8 +363,6 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
       return NULL;
     }
   }
+
 }
 // end class CRM_Core_Payment_FirstData
-
-
-

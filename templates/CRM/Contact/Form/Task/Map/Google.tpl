@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -32,7 +32,7 @@
 {/if}
 {assign var=defaultZoom value=16}
 {literal}
-<script src="//maps.googleapis.com/maps/api/js?{/literal}{if $mapKey}key={$mapKey}{/if}{literal}&sensor=false" type="text/javascript"></script>
+<script src="//maps.googleapis.com/maps/api/js?{/literal}{if $mapKey}key={$mapKey}{/if}{literal}&sensor=false&callback=initMap" type="text/javascript" defer="defer"></script>
 <script type="text/javascript">
     function initMap() {
         var latlng = new google.maps.LatLng({/literal}{$center.lat},{$center.lng}{literal});
@@ -109,12 +109,6 @@
   day = new Date();
   id  = day.getTime();
   eval("page" + id + " = window.open(URL, '" + id + "', 'toolbar=0,scrollbars=0,location=0,statusbar=0,menubar=0,resizable=0,width=780,height=640,left = 202,top = 100');");
-    }
-
-    if (window.addEventListener) {
-        window.addEventListener("load", initMap, false);
-    } else if (window.attachEvent) {
-        document.attachEvent("onreadystatechange", initMap);
     }
 </script>
 {/literal}

@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,19 +29,19 @@
         {$form.grant_report_received.html}
     </td>
     <td>
-        {$form.grant_status_id.label}<br />
+        <label>{ts}Grant Status(s){/ts}</label>
         {$form.grant_status_id.html}
     </td>
     <td>
-        {$form.grant_type_id.label}<br />
-        {$form.grant_type_id.html} 
+        <label>{ts}Grant Type(s){/ts}</label>
+        {$form.grant_type_id.html}
     </td>
 </tr>
 <tr>
     <td>
         {$form.grant_amount_low.label}<br />
         {$form.grant_amount_low.html}
-    </td> 
+    </td>
     <td colspan="2">
         {$form.grant_amount_high.label}<br />
         {$form.grant_amount_high.html}
@@ -56,7 +56,7 @@
         {$form.grant_application_received_date_high.label}<br />
         {include file="CRM/common/jcalendar.tpl" elementName=grant_application_received_date_high}
         &nbsp;{$form.grant_application_received_notset.html}&nbsp;&nbsp;{ts}Date is not set{/ts}
-    </td>          
+    </td>
 </tr>
 <tr>
     <td>
@@ -64,21 +64,21 @@
         {include file="CRM/common/jcalendar.tpl" elementName=grant_decision_date_low}
     </td>
     <td colspan="2">
-        {$form.grant_decision_date_high.label}<br /> 
+        {$form.grant_decision_date_high.label}<br />
         {include file="CRM/common/jcalendar.tpl" elementName=grant_decision_date_high}
         &nbsp;{$form.grant_decision_date_notset.html}&nbsp;&nbsp;{ts}Date is not set{/ts}
-    </td>          
+    </td>
 </tr>
 <tr>
-    <td> 
-        {$form.grant_money_transfer_date_low.label}<br /> 
+    <td>
+        {$form.grant_money_transfer_date_low.label}<br />
         {include file="CRM/common/jcalendar.tpl" elementName=grant_money_transfer_date_low}
     </td>
-    <td colspan="2">                 
-        {$form.grant_money_transfer_date_high.label}<br /> 
+    <td colspan="2">
+        {$form.grant_money_transfer_date_high.label}<br />
         {include file="CRM/common/jcalendar.tpl" elementName=grant_money_transfer_date_high}
         &nbsp;{$form.grant_money_transfer_date_notset.html}&nbsp;&nbsp;{ts}Date is not set{/ts}
-    </td>          
+    </td>
 </tr>
 <tr>
     <td>
@@ -89,7 +89,7 @@
         {$form.grant_due_date_high.label}<br />
         {include file="CRM/common/jcalendar.tpl" elementName=grant_due_date_high}
         &nbsp;{$form.grant_due_date_notset.html}&nbsp;&nbsp;{ts}Date is not set{/ts}
-    </td>          
+    </td>
 </tr>
 {if $grantGroupTree}
 <tr>

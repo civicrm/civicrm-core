@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,15 +24,9 @@
  +--------------------------------------------------------------------+
 *}
 {* this template is used for adding/editing other (custom) activities. *}
-{if $cdType }
-  {include file="CRM/Custom/Form/CustomData.tpl"}
-{else}
   {if $action eq 4}
     <div class="crm-block crm-content-block crm-activity-view-block">
   {else}
-    {if $context NEQ 'standalone'}
-    <h3>{if $action eq 1 or $action eq 1024}{ts 1=$activityTypeName}New activity: %1{/ts}{elseif $action eq 8}{ts 1=$activityTypeName}Delete %1{/ts}{else}{ts 1=$activityTypeName}Edit %1{/ts}{/if}</h3>
-    {/if}
     {if $activityTypeDescription }
       <div class="help">{$activityTypeDescription}</div>
     {/if}
@@ -48,7 +42,7 @@
   <table class="form-layout">
   <tr>
     <td colspan="2">
-      <div class="status">{ts 1=$delName}Are you sure you want to delete '%1'?{/ts}</div>
+      <div class="status">{ts}Are you sure you want to delete {/ts}{if $delName}'{$delName}'{/if}?</div>
     </td>
   </tr>
   {elseif $action eq 1 or $action eq 2  or $action eq 4 or $context eq 'search' or $context eq 'smog'}
@@ -56,7 +50,6 @@
   <table class="{if $action eq 4}crm-info-panel{else}form-layout{/if}">
 
   {if $action eq 4}
-  <h3>{$activityTypeName}</h3>
     {if $activityTypeDescription }
     <div class="help">{$activityTypeDescription}</div>
     {/if}
@@ -82,14 +75,15 @@
   </tr>
 
   <tr class="crm-activity-form-block-target_contact_id">
-      <td class="label">{$form.target_contact_id.label}</td>
-      <td class="view-value">
-        {$form.target_contact_id.html}
-        {if $action eq 1}
-        <br/>
+  <td class="label">{$form.target_contact_id.label}</td>
+    <td class="view-value">
+      {$form.target_contact_id.html}
+      {if $action eq 1 or $single eq false}
+      <div class="crm-is-multi-activity-wrapper">
         {$form.is_multi_activity.html}&nbsp;{$form.is_multi_activity.label} {help id="id-is_multi_activity"}
-        {/if}
-      </td>
+      </div>
+      {/if}
+    </td>
   </tr>
 
   <tr class="crm-activity-form-block-assignee_contact_id">
@@ -100,12 +94,14 @@
       <td>
         {$form.assignee_contact_id.html}
         {if $action neq 4}
-          <a href="#" class="crm-hover-button" id="swap_target_assignee" title="{ts}Swap Target and Assignee Contacts{/ts}" style="position:relative; bottom: 1em;">
-            <span><div class="icon swap-icon"></div></span>
-          </a>
+          {if !$form.target_contact_id.frozen}
+            <a href="#" class="crm-hover-button" id="swap_target_assignee" title="{ts}Swap Target and Assignee Contacts{/ts}" style="position:relative; bottom: 1em;">
+              <i class="crm-i fa-random"></i>
+            </a>
+          {/if}
           {if $activityAssigneeNotification}
             <br />
-            <span class="description"><span class="icon email-icon"></span>{ts}A copy of this activity will be emailed to each Assignee.{/ts}</span>
+            <span class="description"><i class="crm-i fa-paper-plane"></i> {ts}A copy of this activity will be emailed to each Assignee.{/ts}</span>
           {/if}
         {/if}
       </td>
@@ -139,7 +135,7 @@
     {if $action neq 4}
       <td class="view-value">{include file="CRM/common/jcalendar.tpl" elementName=activity_date_time}</td>
       {else}
-      <td class="view-value">{$form.activity_date_time.html|crmDate}</td>
+      <td class="view-value">{$form.activity_date_time.value|crmDate}</td>
     {/if}
   </tr>
   <tr class="crm-activity-form-block-duration">
@@ -156,13 +152,11 @@
     <td class="label">{$form.details.label}</td>
     {if $activityTypeName eq "Print PDF Letter"}
       <td class="view-value">
-      {* If using plain textarea, assign class=huge to make input large enough. *}
-      {if $defaultWysiwygEditor eq 0}{$form.details.html|crmAddClass:huge}{else}{$form.details.html}{/if}
+      {$form.details.html}
       </td>
       {else}
       <td class="view-value">
-      {* If using plain textarea, assign class=huge to make input large enough. *}
-       {if $defaultWysiwygEditor eq 0}{$form.details.html|crmStripAlternatives|crmAddClass:huge}{else}{$form.details.html|crmStripAlternatives}{/if}
+       {$form.details.html|crmStripAlternatives}
       </td>
     {/if}
   </tr>
@@ -183,8 +177,8 @@
   </tr>
   {/if}
 
-  {if $tagsetInfo_activity}
-  <tr class="crm-activity-form-block-tag_set"><td colspan="2">{include file="CRM/common/Tag.tpl" tagsetType='activity'}</td></tr>
+  {if $tagsetInfo.activity}
+  <tr class="crm-activity-form-block-tag_set">{include file="CRM/common/Tagset.tpl" tagsetType='activity' tableLayout=true}</tr>
   {/if}
 
   {if $action neq 4 OR $viewCustomData}
@@ -209,53 +203,38 @@
     </tr>
   {/if}
 
+  {if $action eq 2 OR $action eq 1}
+    <tr class="crm-activity-form-block-recurring_activity">
+      <td colspan="2">
+        {include file="CRM/Core/Form/RecurringEntity.tpl" recurringFormIsEmbedded=true}
+      </td>
+    </tr>
+  {/if}
+
   {if $action neq 4} {* Don't include "Schedule Follow-up" section in View mode. *}
   <tr class="crm-activity-form-block-schedule_followup">
     <td colspan="2">
-      <div class="crm-accordion-wrapper collapsed">
-        <div class="crm-accordion-header">
-          {ts}Schedule Follow-up{/ts}
-        </div><!-- /.crm-accordion-header -->
-        <div class="crm-accordion-body">
-          <table class="form-layout-compressed">
-            <tr><td class="label">{ts}Schedule Follow-up Activity{/ts}</td>
-              <td>{$form.followup_activity_type_id.html}&nbsp;&nbsp;{ts}on{/ts}
-              {include file="CRM/common/jcalendar.tpl" elementName=followup_date}
-              </td>
-            </tr>
-            <tr>
-              <td class="label">{$form.followup_activity_subject.label}</td>
-              <td>{$form.followup_activity_subject.html|crmAddClass:huge}</td>
-            </tr>
-              <tr>
-                  <td class="label">
-                    {$form.followup_assignee_contact_id.label}
-                    {edit}
-                    {/edit}
-                  </td>
-                  <td>
-                    {$form.followup_assignee_contact_id.html}
-                  </td>
-              </tr>
-          </table>
-        </div><!-- /.crm-accordion-body -->
-      </div><!-- /.crm-accordion-wrapper -->
+      {include file="CRM/Activity/Form/FollowUp.tpl" type=""}
       {literal}
         <script type="text/javascript">
-          cj(function($) {
-            cj().crmAccordions();
-            cj('.crm-accordion-body').each( function() {
+          CRM.$(function($) {
+            var $form = $('form.{/literal}{$form.formClass}{literal}');
+            $('.crm-accordion-body', $form).each( function() {
               //open tab if form rule throws error
-              if ( cj(this).children( ).find('span.crm-error').text( ).length > 0 ) {
-                cj(this).parent('.collapsed').crmAccordionToggle();
+              if ( $(this).children( ).find('span.crm-error').text( ).length > 0 ) {
+                $(this).parent('.collapsed').crmAccordionToggle();
               }
             });
-            $('#swap_target_assignee').click(function() {
-              var assignees = $('#assignee_contact_id').select2("data");
-              var targets = $('#target_contact_id').select2("data");
-              $('#assignee_contact_id').select2("data", targets);
-              $('#target_contact_id').select2("data", assignees);
-              return false;
+            function toggleMultiActivityCheckbox() {
+              $('.crm-is-multi-activity-wrapper').toggle(!!($(this).val() && $(this).val().indexOf(',') > 0));
+            }
+            $('[name=target_contact_id]', $form).each(toggleMultiActivityCheckbox).change(toggleMultiActivityCheckbox);
+            $('#swap_target_assignee').click(function(e) {
+              e.preventDefault();
+              var assignees = $('#assignee_contact_id', $form).select2("data");
+              var targets = $('#target_contact_id', $form).select2("data");
+              $('#assignee_contact_id', $form).select2("data", targets);
+              $('#target_contact_id', $form).select2("data", assignees).change();
             });
           });
         </script>
@@ -275,7 +254,7 @@
       {if ($context eq 'fulltext' || $context eq 'search') && $searchKey}
         {assign var='urlParams' value="reset=1&atype=$atype&action=update&reset=1&id=$entityID&cid=$contactId&context=$context&key=$searchKey"}
       {/if}
-      <a href="{crmURL p='civicrm/activity/add' q=$urlParams}" class="edit button" title="{ts}Edit{/ts}"><span><div class="icon edit-icon"></div>{ts}Edit{/ts}</span></a>
+      <a href="{crmURL p='civicrm/activity/add' q=$urlParams}" class="edit button" title="{ts}Edit{/ts}"><span><i class="crm-i fa-pencil"></i> {ts}Edit{/ts}</span></a>
     {/if}
 
     {if call_user_func(array('CRM_Core_Permission','check'), 'delete activities')}
@@ -283,8 +262,11 @@
       {if ($context eq 'fulltext' || $context eq 'search') && $searchKey}
         {assign var='urlParams' value="reset=1&atype=$atype&action=delete&reset=1&id=$entityID&cid=$contactId&context=$context&key=$searchKey"}
       {/if}
-      <a href="{crmURL p='civicrm/contact/view/activity' q=$urlParams}" class="delete button" title="{ts}Delete{/ts}"><span><div class="icon delete-icon"></div>{ts}Delete{/ts}</span></a>
+      <a href="{crmURL p='civicrm/contact/view/activity' q=$urlParams}" class="delete button" title="{ts}Delete{/ts}"><span><i class="crm-i fa-trash"></i> {ts}Delete{/ts}</span></a>
     {/if}
+  {/if}
+  {if $action eq 4 and call_user_func(array('CRM_Case_BAO_Case','checkPermission'), $activityId, 'File On Case', $atype)}
+    <a href="#" onclick="fileOnCase('file', {$activityId}, null, this); return false;" class="cancel button" title="{ts}File On Case{/ts}"><span><i class="crm-i fa-clipboard"></i> {ts}File on Case{/ts}</span></a>
   {/if}
   {include file="CRM/common/formButtons.tpl" location="bottom"}
   </div>
@@ -296,7 +278,7 @@
   {include file="CRM/common/customData.tpl"}
     {literal}
     <script type="text/javascript">
-    cj(function() {
+    CRM.$(function($) {
     {/literal}
     {if $customDataSubType}
       CRM.buildCustomData( '{$customDataType}', {$customDataSubType} );
@@ -308,8 +290,6 @@
     </script>
     {/literal}
   {/if}
-  {if ! $form.case_select}
-  {include file="CRM/common/formNavigate.tpl"}
-  {/if}
   </div>{* end of form block*}
-{/if} {* end of snippet if*}
+
+{include file="CRM/Event/Form/ManageEvent/ConfirmRepeatMode.tpl" entityID=$activityId entityTable="civicrm_activity"}

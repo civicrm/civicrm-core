@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,16 +23,14 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Class to handle encoding and decoding Variable Enveleope Return Path (VERP)
  * headers.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id: $
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Utils_Verp {
   /* Mapping of reserved characters to hex codes */
@@ -64,12 +62,13 @@ class CRM_Utils_Verp {
   /**
    * Encode the sender's address with the VERPed recipient.
    *
-   * @param string $sender    The address of the sender
-   * @param string $recipient The address of the recipient
+   * @param string $sender
+   *   The address of the sender.
+   * @param string $recipient
+   *   The address of the recipient.
    *
-   * @return string           The VERP encoded address
-   * @access public
-   * @static
+   * @return string
+   *   The VERP encoded address
    */
   public static function encode($sender, $recipient) {
     preg_match('/(.+)\@([^\@]+)$/', $sender, $match);
@@ -89,19 +88,19 @@ class CRM_Utils_Verp {
   }
 
   /**
-   * Decode the address and return the sender and recipient as an array
+   * Decode the address and return the sender and recipient as an array.
    *
-   * @param string $address   The address to be decoded
+   * @param string $address
+   *   The address to be decoded.
    *
-   * @return array            The tuple ($sender, $recipient)
-   * @access public
-   * @static
+   * @return array
+   *   The tuple ($sender, $recipient)
    */
   public static function &verpdecode($address) {
     preg_match('/^(.+)-([^=]+)=([^\@]+)\@(.+)/', $address, $match);
 
-    $slocal  = $match[1];
-    $rlocal  = $match[2];
+    $slocal = $match[1];
+    $rlocal = $match[2];
     $rdomain = $match[3];
     $sdomain = $match[4];
 
@@ -112,5 +111,5 @@ class CRM_Utils_Verp {
 
     return array("$slocal@$sdomain", "$rlocal@$rdomain");
   }
-}
 
+}

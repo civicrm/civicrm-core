@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,18 +23,16 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
- * Base class for admin forms
+ * Base class for admin forms.
  */
 class CRM_Admin_Form extends CRM_Core_Form {
 
@@ -46,50 +44,69 @@ class CRM_Admin_Form extends CRM_Core_Form {
   protected $_id;
 
   /**
-   * The default values for form fields
+   * The default values for form fields.
    *
    * @var int
    */
   protected $_values;
 
   /**
-   * The name of the BAO object for this form
+   * The name of the BAO object for this form.
    *
    * @var string
    */
   protected $_BAOName;
 
   /**
-   * Basic setup
+   * Explicitly declare the form context.
    */
-  function preProcess() {
-    $this->_id      = $this->get('id');
+  public function getDefaultContext() {
+    return 'create';
+  }
+
+  /**
+   * Basic setup.
+   */
+  public function preProcess() {
+    Civi::resources()->addStyleFile('civicrm', 'css/admin.css');
+    Civi::resources()->addScriptFile('civicrm', 'js/crm.admin.js');
+
+    $this->_id = $this->get('id');
     $this->_BAOName = $this->get('BAOName');
-    $this->_values  = array();
+    $this->_values = array();
     if (isset($this->_id)) {
       $params = array('id' => $this->_id);
       // this is needed if the form is outside the CRM name space
       $baoName = $this->_BAOName;
-      $baoName::retrieve($params, $this->_values );
+      $baoName::retrieve($params, $this->_values);
     }
   }
 
   /**
-   * This function sets the default values for the form. MobileProvider that in edit/view mode
+   * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return array
    */
-  function setDefaultValues() {
-    if (isset($this->_id) && empty($this->_values)) {
+  public function setDefaultValues() {
+    // Fetch defaults from the db
+    if (!empty($this->_id) && empty($this->_values) && CRM_Utils_Rule::positiveInteger($this->_id)) {
       $this->_values = array();
       $params = array('id' => $this->_id);
       $baoName = $this->_BAOName;
-      $baoName::retrieve($params, $this->_values );
+      $baoName::retrieve($params, $this->_values);
     }
     $defaults = $this->_values;
+
+    // Allow defaults to be set from the url
+    if (empty($this->_id) && $this->_action & CRM_Core_Action::ADD) {
+      foreach ($_GET as $key => $val) {
+        if ($this->elementExists($key)) {
+          $defaults[$key] = $val;
+        }
+      }
+    }
 
     if ($this->_action == CRM_Core_Action::DELETE &&
       isset($defaults['name'])
@@ -106,13 +123,10 @@ class CRM_Admin_Form extends CRM_Core_Form {
   }
 
   /**
-   * Add standard buttons
-   *
-   * @return void
-   * @access public
+   * Add standard buttons.
    */
   public function buildQuickForm() {
-    if ($this->_action & CRM_Core_Action::VIEW) {
+    if ($this->_action & CRM_Core_Action::VIEW || $this->_action & CRM_Core_Action::PREVIEW) {
       $this->addButtons(array(
           array(
             'type' => 'cancel',
@@ -137,5 +151,5 @@ class CRM_Admin_Form extends CRM_Core_Form {
       );
     }
   }
-}
 
+}

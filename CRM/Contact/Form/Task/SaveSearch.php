@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,35 +23,32 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
- * This class provides the functionality to save a search
+ * This class provides the functionality to save a search.
+ *
  * Saved Searches are used for saving frequently used queries
  */
 class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
 
   /**
-   * saved search id if any
+   * Saved search id if any.
    *
    * @var int
    */
   protected $_id;
 
   /**
-   * build all the data structures needed to build the form
-   *
-   * @return void
-   * @access public
-   */ function preProcess() {
+   * Build all the data structures needed to build the form.
+   */
+  public function preProcess() {
     $this->_id = NULL;
 
     // get the submitted values of the search form
@@ -75,27 +72,24 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
   }
 
   /**
-   * Build the form - it consists of
+   * Build the form object.
+   *
+   * It consists of
    *    - displaying the QILL (query in local language)
    *    - displaying elements for saving the search
-   *
-   * @access public
-   *
-   * @return void
    */
-  function buildQuickForm() {
-    // get the qill
+  public function buildQuickForm() {
+    // @todo sync this more with CRM_Group_Form_Edit.
     $query = new CRM_Contact_BAO_Query($this->get('queryParams'));
-    $qill = $query->qill();
+    $this->assign('qill', $query->qill());
 
-    // need to save qill for the smarty template
-    $this->assign('qill', $qill);
+    // Values from the search form
+    $formValues = $this->controller->exportValues();
 
     // the name and description are actually stored with the group and not the saved search
     $this->add('text', 'title', ts('Name'),
       CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Group', 'title'), TRUE
     );
-
 
     $this->addElement('textarea', 'description', ts('Description'),
       CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Group', 'description')
@@ -124,6 +118,7 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
 
     //CRM-14190
     CRM_Group_Form_Edit::buildParentGroups($this);
+    CRM_Group_Form_Edit::buildGroupOrganizations($this);
 
     // get the group id for the saved search
     $groupID = NULL;
@@ -137,6 +132,7 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
     }
     else {
       $this->addDefaultButtons(ts('Save Smart Group'));
+      $this->assign('partiallySelected', $formValues['radio_ts'] != 'ts_all');
     }
     $this->addRule('title', ts('Name already exists in Database.'),
       'objectExists', array('CRM_Contact_DAO_Group', $groupID, 'title')
@@ -144,11 +140,7 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
   }
 
   /**
-   * process the form after the input has been submitted and validated
-   *
-   * @access public
-   *
-   * @return void
+   * Process the form after the input has been submitted and validated.
    */
   public function postProcess() {
     // saved search form values
@@ -165,10 +157,14 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
 
       if (!$this->_id) {
         //save record in mapping table
-        $mappingParams = array('mapping_type' => 'Search Builder');
-        $temp          = array();
-        $mapping       = CRM_Core_BAO_Mapping::add($mappingParams, $temp);
-        $mappingId     = $mapping->id;
+        $mappingParams = array(
+          'mapping_type_id' => CRM_Core_OptionGroup::getValue('mapping_type',
+            'Search Builder',
+            'name'
+          ),
+        );
+        $mapping = CRM_Core_BAO_Mapping::add($mappingParams);
+        $mappingId = $mapping->id;
       }
       else {
         //get the mapping id from saved search
@@ -186,7 +182,25 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
     //save the search
     $savedSearch = new CRM_Contact_BAO_SavedSearch();
     $savedSearch->id = $this->_id;
-    $savedSearch->form_values = serialize($this->get('formValues'));
+    $queryParams = $this->get('queryParams');
+
+    // Use the query parameters rather than the form values - these have already been assessed / converted
+    // with the extra knowledge that the form has.
+    // Note that we want to move towards a standardised way of saving the query that is not
+    // an exact match for the form requirements & task the form layer with converting backwards and forwards.
+    // Ideally per CRM-17075 we will use entity reference fields heavily in the form layer & convert to the
+    // sql operator syntax at the query layer.
+    if (!$isSearchBuilder) {
+      CRM_Contact_BAO_SavedSearch::saveRelativeDates($queryParams, $formValues);
+      CRM_Contact_BAO_SavedSearch::saveSkippedElement($queryParams, $formValues);
+      $savedSearch->form_values = serialize($queryParams);
+    }
+    else {
+      // We want search builder to be able to convert back & forth at the form layer
+      // to a standardised style - but it can't yet!
+      $savedSearch->form_values = serialize($formValues);
+    }
+
     $savedSearch->mapping_id = $mappingId;
     $savedSearch->search_custom_id = $this->get('customSearchID');
     $savedSearch->save();
@@ -201,8 +215,8 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
       is_array($formValues['group_type'])
     ) {
       $params['group_type'] = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR,
-        array_keys($formValues['group_type'])
-      ) . CRM_Core_DAO::VALUE_SEPARATOR;
+          array_keys($formValues['group_type'])
+        ) . CRM_Core_DAO::VALUE_SEPARATOR;
     }
     else {
       $params['group_type'] = '';
@@ -220,13 +234,40 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
 
     $group = CRM_Contact_BAO_Group::create($params);
 
+    // Update mapping with the name and description of the group.
+    if ($mappingId && $group) {
+      $mappingParams = array(
+        'id' => $mappingId,
+        'name' => CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $group->id, 'name', 'id'),
+        'description' => CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $group->id, 'description', 'id'),
+        'mapping_type_id' => CRM_Core_OptionGroup::getValue('mapping_type',
+          'Search Builder',
+          'name'
+        ),
+      );
+      CRM_Core_BAO_Mapping::add($mappingParams);
+    }
+
     // CRM-9464
     $this->_id = $savedSearch->id;
 
     //CRM-14190
-    if ( !empty($formValues['parents']) ) {
+    if (!empty($formValues['parents'])) {
       CRM_Contact_BAO_GroupNestingCache::update();
     }
   }
-}
 
+  /**
+   * Set form defaults.
+   *
+   * return array
+   */
+  public function setDefaultValues() {
+    $defaults = array();
+    if (empty($defaults['parents'])) {
+      $defaults['parents'] = CRM_Core_BAO_Domain::getGroupId();
+    }
+    return $defaults;
+  }
+
+}

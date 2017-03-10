@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,23 +24,14 @@
  +--------------------------------------------------------------------+
 *}
 {* this template is used for building tabbed custom data *}
-{if $cdType }
+{if $cdType || $postedInfo}
    {include file="CRM/Custom/Form/CustomData.tpl"}
    {if $multiRecordDisplay eq 'single'}
-     <div class="html-adjust">{$form.buttons.html}</div>
-     {* for form rule handling *}
-     {include file="CRM/Form/validate.tpl"}
-     {literal}
-     <script type='text/javascript'>
-       cj(function($) {
-         $('#custom-record-dialog .crm-container-snippet #CustomData').validate(CRM.validate.params);
-       });
-     </script>
-     {/literal}
+     <div class="crm-submit-buttons">{$form.buttons.html}</div>
    {/if}
 {else}
     <div id="customData"></div>
-    <div class="html-adjust">{$form.buttons.html}</div>
+    <div class="crm-submit-buttons">{$form.buttons.html}</div>
 
     {*include custom data js file*}
     {include file="CRM/common/customData.tpl"}
@@ -48,17 +39,26 @@
   {if $customValueCount}
     {literal}
     <script type="text/javascript">
-      var customValueCount = {/literal}"{$customValueCount}"{literal};
-      var groupID = {/literal}"{$groupID}"{literal};
-      var contact_type = {/literal}"{$contact_type}"{literal};
-      var contact_subtype = {/literal}"{$contact_subtype}"{literal};
-      CRM.buildCustomData( contact_type, contact_subtype );
-      for ( var i = 1; i < customValueCount; i++ ) {
-        CRM.buildCustomData( contact_type, contact_subtype, null, i, groupID, true );
-      }
+      CRM.$(function() {
+        {/literal}
+        var customValueCount = "{$customValueCount}",
+          groupID = "{$groupID}",
+          contact_type = "{$contact_type}",
+          contact_subtype = "{$contact_subtype}",
+          i = 1;
+        {literal}
+        // FIXME: This is pretty terrible. Loading each item at a time via ajax.
+        // Building the complete form in php with no ajax would be way more efficient.
+        function loadNextRecord() {
+          if (i < customValueCount) {
+            CRM.buildCustomData(contact_type, contact_subtype, null, i++, groupID, true).one('crmLoad', loadNextRecord);
+          }
+        }
+        CRM.buildCustomData(contact_type, contact_subtype).one('crmLoad', loadNextRecord);
+      });
     </script>
     {/literal}
   {/if}
+  {include file="CRM/Form/attachmentjs.tpl"}
 {/if}
 
-{include file="CRM/Form/attachmentjs.tpl"}

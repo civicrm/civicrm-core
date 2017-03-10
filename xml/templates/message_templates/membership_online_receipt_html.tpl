@@ -91,8 +91,7 @@
          {$membership_amount|crmMoney}
         </td>
        </tr>
-       {if $amount}
-        {if ! $is_separate_payment }
+       {if $amount && !$is_separate_payment }
          <tr>
           <td {$labelStyle}>
            {ts}Contribution Amount{/ts}
@@ -101,25 +100,15 @@
            {$amount|crmMoney}
           </td>
          </tr>
-        {else}
          <tr>
-          <td {$labelStyle}>
-           {ts}Additional Contribution{/ts}
-          </td>
-          <td {$valueStyle}>
-           {$amount|crmMoney}
-          </td>
+           <td {$labelStyle}>
+           {ts}Total{/ts}
+            </td>
+            <td {$valueStyle}>
+            {$amount+$membership_amount|crmMoney}
+           </td>
          </tr>
-        {/if}
        {/if}
-       <tr>
-        <td {$labelStyle}>
-         {ts}Total{/ts}
-        </td>
-        <td {$valueStyle}>
-         {$amount+$membership_amount|crmMoney}
-        </td>
-       </tr>
 
       {elseif !$useForMember && $lineItem and $priceSetID and !$is_quick_config}
 
@@ -171,6 +160,12 @@
            <tr>
             <th>{ts}Item{/ts}</th>
             <th>{ts}Fee{/ts}</th>
+            {if $dataArray}
+              <th>{ts}SubTotal{/ts}</th>
+              <th>{ts}Tax Rate{/ts}</th>
+              <th>{ts}Tax Amount{/ts}</th>
+              <th>{ts}Total{/ts}</th>
+            {/if}
       <th>{ts}Membership Start Date{/ts}</th>
       <th>{ts}Membership End Date{/ts}</th>
            </tr>
@@ -182,6 +177,25 @@
              <td>
               {$line.line_total|crmMoney}
              </td>
+             {if $dataArray}
+              <td>
+               {$line.unit_price*$line.qty|crmMoney}
+              </td>
+              {if $line.tax_rate != "" || $line.tax_amount != ""}
+               <td>
+                {$line.tax_rate|string_format:"%.2f"}%
+               </td>
+               <td>
+                {$line.tax_amount|crmMoney}
+               </td>
+              {else}
+               <td></td>
+               <td></td>
+              {/if}
+              <td>
+               {$line.line_total+$line.tax_amount|crmMoney}
+              </td>
+             {/if}
              <td>
               {$line.start_date}
              </td>
@@ -194,6 +208,37 @@
          </td>
         </tr>
        {/foreach}
+       {if $dataArray}
+        <tr>
+         <td {$labelStyle}>
+          {ts}Amount Before Tax:{/ts}
+         </td>
+         <td {$valueStyle}>
+          {$amount-$totalTaxAmount|crmMoney}
+         </td>
+        </tr>
+        {foreach from=$dataArray item=value key=priceset}
+         <tr>
+         {if $priceset || $priceset == 0}
+           <td>&nbsp;{$taxTerm} {$priceset|string_format:"%.2f"}%</td>
+           <td>&nbsp;{$value|crmMoney:$currency}</td>
+         {else}
+           <td>&nbsp;{ts}NO{/ts} {$taxTerm}</td>
+           <td>&nbsp;{$value|crmMoney:$currency}</td>
+         {/if}
+         </tr>
+        {/foreach}
+       {/if}
+       {/if}
+       {if $totalTaxAmount}
+        <tr>
+         <td {$labelStyle}>
+          {ts}Total Tax Amount{/ts}
+         </td>
+         <td {$valueStyle}>
+          {$totalTaxAmount|crmMoney:$currency}
+         </td>
+        </tr>
        {/if}
        <tr>
         <td {$labelStyle}>
@@ -266,11 +311,13 @@
          {ts 1=$cancelSubscriptionUrl}This membership will be renewed automatically. You can cancel the auto-renewal option by <a href="%1">visiting this web page</a>.{/ts}
         </td>
        </tr>
-       <tr>
-        <td colspan="2" {$labelStyle}>
-         {ts 1=$updateSubscriptionBillingUrl}You can update billing details for this automatically renewed membership by <a href="%1">visiting this web page</a>.{/ts}
-        </td>
-       </tr>
+       {if $updateSubscriptionBillingUrl}
+         <tr>
+          <td colspan="2" {$labelStyle}>
+           {ts 1=$updateSubscriptionBillingUrl}You can update billing details for this automatically renewed membership by <a href="%1">visiting this web page</a>.{/ts}
+          </td>
+         </tr>
+       {/if}
       {/if}
      {/if}
 

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,25 +23,26 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
- * customize the output to meet our specific requirements
+ * Customize the output to meet our specific requirements.
  */
 class CRM_Admin_Form_Persistent extends CRM_Core_Form {
 
+  /**
+   * Pre-process form.
+   */
   public function preProcess() {
     $this->_indexID = CRM_Utils_Request::retrieve('id', 'Integer', $this, FALSE);
-    $this->_config  = CRM_Utils_Request::retrieve('config', 'Integer', $this, 0);
-    $this->_action  = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE);
+    $this->_config = CRM_Utils_Request::retrieve('config', 'Integer', $this, 0);
+    $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE);
 
     $session = CRM_Core_Session::singleton();
     $session->pushUserContext(CRM_Utils_System::url('civicrm/admin/tplstrings', 'reset=1'));
@@ -49,6 +50,11 @@ class CRM_Admin_Form_Persistent extends CRM_Core_Form {
     parent::preProcess();
   }
 
+  /**
+   * Set default values.
+   *
+   * @return array
+   */
   public function setDefaultValues() {
     $defaults = array();
 
@@ -97,5 +103,5 @@ class CRM_Admin_Form_Persistent extends CRM_Core_Form {
 
     CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/admin/tplstrings', "reset=1"));
   }
-}
 
+}

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,26 +23,22 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
-require_once 'CiviTest/CiviUnitTestCase.php';
+/**
+ * Class CRM_Contribute_BAO_ManagePremiumsTest
+ * @group headless
+ */
 class CRM_Contribute_BAO_ManagePremiumsTest extends CiviUnitTestCase {
-  function get_info() {
-    return array(
-      'name' => 'ManagePremiums BAOs',
-      'description' => 'Test all Contribute_BAO_Contribution methods.',
-      'group' => 'CiviCRM BAO Tests',
-    );
-  }
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
   }
 
   /**
-   * check method add()
+   * Check method add()
    */
-  function testAdd() {
+  public function testAdd() {
     $ids = array();
     $params = array(
       'name' => 'Test Product',
@@ -65,9 +61,9 @@ class CRM_Contribute_BAO_ManagePremiumsTest extends CiviUnitTestCase {
   }
 
   /**
-   * check method retrieve( )
+   * Check method retrieve( )
    */
-  function testRetrieve() {
+  public function testRetrieve() {
     $ids = array();
     $params = array(
       'name' => 'Test Product',
@@ -80,16 +76,16 @@ class CRM_Contribute_BAO_ManagePremiumsTest extends CiviUnitTestCase {
     );
 
     $product = CRM_Contribute_BAO_ManagePremiums::add($params, $ids);
-    $params  = array('id' => $product->id);
+    $params = array('id' => $product->id);
     $default = array();
-    $result  = CRM_Contribute_BAO_ManagePremiums::retrieve($params, $default);
+    $result = CRM_Contribute_BAO_ManagePremiums::retrieve($params, $default);
     $this->assertEquals(empty($result), FALSE, 'Verify products record.');
   }
 
   /**
-   * check method setIsActive( )
+   * Check method setIsActive( )
    */
-  function testSetIsActive() {
+  public function testSetIsActive() {
     $ids = array();
     $params = array(
       'name' => 'Test Product',
@@ -113,9 +109,9 @@ class CRM_Contribute_BAO_ManagePremiumsTest extends CiviUnitTestCase {
   }
 
   /**
-   * check method del( )
+   * Check method del( )
    */
-  function testDel() {
+  public function testDel() {
     $ids = array();
     $params = array(
       'name' => 'Test Product',
@@ -131,12 +127,11 @@ class CRM_Contribute_BAO_ManagePremiumsTest extends CiviUnitTestCase {
 
     CRM_Contribute_BAO_ManagePremiums::del($product->id);
 
-    $params  = array('id' => $product->id);
+    $params = array('id' => $product->id);
     $default = array();
-    $result  = CRM_Contribute_BAO_ManagePremiums::retrieve($params, $defaults);
+    $result = CRM_Contribute_BAO_ManagePremiums::retrieve($params, $defaults);
 
     $this->assertEquals(empty($result), TRUE, 'Verify product record deletion.');
   }
+
 }
-
-

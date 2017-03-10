@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,53 +23,31 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
- * CiviCRM Dashboard
- *
+ * CiviCRM Dashboard.
  */
 class CRM_Contact_Page_DashBoard extends CRM_Core_Page {
 
   /**
-   * Run dashboard
-   *
-   * @return void
-   * @access public
+   * Run dashboard.
    */
-  function run() {
+  public function run() {
     // Add dashboard js and css
     $resources = CRM_Core_Resources::singleton();
-    $resources->addScriptFile('civicrm', 'packages/jquery/plugins/jquery.dashboard.js', 0, 'html-header', FALSE);
-    $resources->addStyleFile('civicrm', 'packages/jquery/css/dashboard.css');
-
-    $config = CRM_Core_Config::singleton();
-
-    // Add dashlet-specific js files
-    // TODO: Need a much better way of managing on-the-fly js requirements. Require.js perhaps?
-    // Checking if a specific dashlet is enabled is a pain and including the js here sucks anyway
-    // So here's a compromise:
-    if (in_array('CiviCase', $config->enableComponents)) {
-      $resources->addScriptFile('civicrm', 'templates/CRM/Case/Form/ActivityChangeStatus.js');
-    }
-
-    $resetCache = CRM_Utils_Request::retrieve('resetCache', 'Positive', CRM_Core_DAO::$_nullObject);
+    $resources->addScriptFile('civicrm', 'js/jquery/jquery.dashboard.js', 0, 'html-header', FALSE);
+    $resources->addStyleFile('civicrm', 'css/dashboard.css');
+    $this->assign('contactDashlets', CRM_Core_BAO_Dashboard::getContactDashletsForJS());
 
     CRM_Utils_System::setTitle(ts('CiviCRM Home'));
-    $session = CRM_Core_Session::singleton();
-    $contactID = $session->get('userID');
-
-    if ($resetCache) {
-      CRM_Core_BAO_Dashboard::resetDashletCache($contactID);
-    }
+    $contactID = CRM_Core_Session::getLoggedInContactID();
 
     // call hook to get html from other modules
     // ignored but needed to prevent warnings
@@ -79,50 +57,6 @@ class CRM_Contact_Page_DashBoard extends CRM_Core_Page {
       $this->assign_by_ref('hookContent', $html);
       $this->assign('hookContentPlacement', $contentPlacement);
     }
-
-    //check that default FROM email address, owner (domain) organization name and default mailbox are configured.
-    $fromEmailOK      = TRUE;
-    $ownerOrgOK       = TRUE;
-    $defaultMailboxOK = TRUE;
-
-    // Don't put up notices if user doesn't have administer CiviCRM permission
-    if (CRM_Core_Permission::check('administer CiviCRM')) {
-      $destination = CRM_Utils_System::url(
-        'civicrm/dashboard',
-        'reset=1',
-        FALSE, NULL, FALSE
-      );
-
-      $destination = urlencode($destination);
-
-      list($domainEmailName, $domainEmailAddress) = CRM_Core_BAO_Domain::getNameAndEmail(TRUE);
-
-      if (!$domainEmailAddress || $domainEmailAddress == 'info@EXAMPLE.ORG') {
-        $fixEmailUrl = CRM_Utils_System::url("civicrm/admin/domain", "action=update&reset=1&civicrmDestination={$destination}");
-        $this->assign('fixEmailUrl', $fixEmailUrl);
-        $fromEmailOK = FALSE;
-      }
-
-      $domain = CRM_Core_BAO_Domain::getDomain();
-      $domainName = $domain->name;
-      if (!$domainName || $domainName == 'Default Domain Name') {
-        $fixOrgUrl = CRM_Utils_System::url("civicrm/admin/domain", "action=update&reset=1&civicrmDestination={$destination}");
-        $this->assign('fixOrgUrl', $fixOrgUrl);
-        $ownerOrgOK = FALSE;
-      }
-
-      if (in_array('CiviMail', $config->enableComponents) &&
-        CRM_Core_BAO_MailSettings::defaultDomain() == "EXAMPLE.ORG"
-      ) {
-        $fixDefaultMailbox = CRM_Utils_System::url('civicrm/admin/mailSettings', "reset=1&civicrmDestination={$destination}");
-        $this->assign('fixDefaultMailbox', $fixDefaultMailbox);
-        $defaultMailboxOK = FALSE;
-      }
-    }
-
-    $this->assign('fromEmailOK', $fromEmailOK);
-    $this->assign('ownerOrgOK', $ownerOrgOK);
-    $this->assign('defaultMailboxOK', $defaultMailboxOK);
 
     $communityMessages = CRM_Core_CommunityMessages::create();
     if ($communityMessages->isEnabled()) {
@@ -134,5 +68,5 @@ class CRM_Contact_Page_DashBoard extends CRM_Core_Page {
 
     return parent::run();
   }
-}
 
+}

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,103 +23,91 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Group_Page_Group extends CRM_Core_Page_Basic {
   protected $_sortByCharacter;
 
-  function getBAOName() {
+  /**
+   * Get BAO name.
+   *
+   * @return string
+   */
+  public function getBAOName() {
     return 'CRM_Contact_BAO_Group';
   }
 
   /**
-   * Function to define action links
+   * Define action links.
    *
-   * @return array self::$_links array of action links
-   * @access public
+   *   self::$_links array of action links
    */
-  function &links() {}
+  public function &links() {
+  }
 
   /**
-   * return class name of edit form
+   * Return class name of edit form.
    *
    * @return string
-   * @access public
    */
-  function editForm() {
+  public function editForm() {
     return 'CRM_Group_Form_Edit';
   }
 
   /**
-   * return name of edit form
+   * Return name of edit form.
    *
    * @return string
-   * @access public
    */
-  function editName() {
+  public function editName() {
     return ts('Edit Group');
   }
 
   /**
-   * return name of delete form
+   * Return name of delete form.
    *
    * @return string
-   * @access public
    */
-  function deleteName() {
+  public function deleteName() {
     return 'Delete Group';
   }
 
   /**
-   * return user context uri to return to
+   * Return user context uri to return to.
+   *
+   * @param null $mode
    *
    * @return string
-   * @access public
    */
-  function userContext($mode = NULL) {
+  public function userContext($mode = NULL) {
     return 'civicrm/group';
   }
 
   /**
-   * return user context uri params
+   * Return user context uri params.
+   *
+   * @param null $mode
    *
    * @return string
-   * @access public
    */
-  function userContextParams($mode = NULL) {
+  public function userContextParams($mode = NULL) {
     return 'reset=1&action=browse';
   }
 
   /**
-   * make sure that the user has permission to access this group
+   * Re-implement browse.
    *
-   * @param int $id   the id of the object
-   * @param int $name the name or title of the object
-   *
-   * @return string   the permission that the user has (or null)
-   * @access public
-   */
-  function checkPermission($id, $title) {
-    return CRM_Contact_BAO_Group::checkPermission($id, $title);
-  }
-
-  /**
    * We need to do slightly different things for groups vs saved search groups, hence we
-   * reimplement browse from Page_Basic
+   * re-implement browse from Page_Basic.
    *
    * @param int $action
-   *
-   * @return void
-   * @access public
    */
-  function browse($action = NULL) {
+  public function browse($action = NULL) {
     $groupPermission = CRM_Core_Permission::check('edit groups') ? CRM_Core_Permission::EDIT : CRM_Core_Permission::VIEW;
     $this->assign('groupPermission', $groupPermission);
 
@@ -136,12 +124,22 @@ class CRM_Group_Page_Group extends CRM_Core_Page_Basic {
     }
     $this->assign('showOrgInfo', $showOrgInfo);
 
+    // Refresh smart group cache
+    if (!empty($_GET['update_smart_groups'])) {
+      CRM_Contact_BAO_GroupContactCache::loadAll();
+    }
+    elseif (!CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_group_contact_cache LIMIT 1")) {
+      CRM_Core_Session::setStatus(ts('Count data for smart groups is not currently calculated. You may click Update Smart Groups to generate it. Be aware this can cause significant server load'));
+    }
+
     $this->search();
   }
 
-  function search() {
-    if ($this->_action &
-      (CRM_Core_Action::ADD |
+  /**
+   * Search for groups.
+   */
+  public function search() {
+    if ($this->_action & (CRM_Core_Action::ADD |
         CRM_Core_Action::UPDATE |
         CRM_Core_Action::DELETE
       )
@@ -155,5 +153,5 @@ class CRM_Group_Page_Group extends CRM_Core_Page_Basic {
     $form->process();
     $form->run();
   }
-}
 
+}

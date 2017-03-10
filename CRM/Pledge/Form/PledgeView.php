@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,27 +23,21 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
  * This class generates form components for Pledge
- *
  */
 class CRM_Pledge_Form_PledgeView extends CRM_Core_Form {
 
   /**
-   * Function to set variables up before form is built
-   *
-   * @return void
-   * @access public
+   * Set variables up before form is built.
    */
   public function preProcess() {
 
@@ -68,18 +62,18 @@ class CRM_Pledge_Form_PledgeView extends CRM_Core_Form {
       $values['honor_type'] = $honor[$values['honor_type_id']];
     }
 
-    //handle custom data.
+    // handle custom data.
     $groupTree = CRM_Core_BAO_CustomGroup::getTree('Pledge', $this, $params['id']);
-    CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree);
+    CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree, FALSE, NULL, NULL, NULL, $params['id']);
 
     if (!empty($values['contribution_page_id'])) {
       $values['contribution_page'] = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage', $values['contribution_page_id'], 'title');
     }
 
-        $values['financial_type'] = CRM_Utils_Array::value( $values['financial_type_id'], CRM_Contribute_PseudoConstant::financialType() );
+    $values['financial_type'] = CRM_Utils_Array::value($values['financial_type_id'], CRM_Contribute_PseudoConstant::financialType());
 
     if ($values['status_id']) {
-      $values['pledge_status'] = CRM_Utils_Array::value($values['status_id'], CRM_Contribute_PseudoConstant::contributionStatus());
+      $values['pledge_status'] = CRM_Core_PseudoConstant::getKey('CRM_Pledge_BAO_Pledge', 'status_id', $values['status_id']);
     }
 
     $url = CRM_Utils_System::url('civicrm/contact/view/pledge',
@@ -102,7 +96,7 @@ class CRM_Pledge_Form_PledgeView extends CRM_Core_Form {
     $this->assign('displayName', $displayName);
 
     $title = $displayName .
-      ' - (' . ts('Pledged') . ' ' . CRM_Utils_Money::format( $values['pledge_amount'] ) .
+      ' - (' . ts('Pledged') . ' ' . CRM_Utils_Money::format($values['pledge_amount']) .
       ' - ' . $values['financial_type'] . ')';
 
     // add Pledge to Recent Items
@@ -120,9 +114,9 @@ class CRM_Pledge_Form_PledgeView extends CRM_Core_Form {
       $displayName .= ' (' . ts('default organization') . ')';
     }
     // omitting contactImage from title for now since the summary overlay css doesn't work outside of our crm-container
-    CRM_Utils_System::setTitle(ts('View Pledge by') .  ' ' . $displayName);
+    CRM_Utils_System::setTitle(ts('View Pledge by') . ' ' . $displayName);
 
-    //do check for campaigns
+    // do check for campaigns
     if ($campaignId = CRM_Utils_Array::value('campaign_id', $values)) {
       $campaigns = CRM_Campaign_BAO_Campaign::getCampaigns($campaignId);
       $values['campaign'] = $campaigns[$campaignId];
@@ -132,10 +126,7 @@ class CRM_Pledge_Form_PledgeView extends CRM_Core_Form {
   }
 
   /**
-   * Function to build the form
-   *
-   * @return void
-   * @access public
+   * Build the form object.
    */
   public function buildQuickForm() {
     $this->addButtons(array(
@@ -148,5 +139,5 @@ class CRM_Pledge_Form_PledgeView extends CRM_Core_Form {
       )
     );
   }
-}
 
+}

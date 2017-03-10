@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,19 +23,20 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
-
-require_once "PEAR.php";
+/**
+ * Class CRM_Core_Session.
+ */
 class CRM_Core_Session {
 
   /**
-   * Cache of all the session names that we manage
+   * Cache of all the session names that we manage.
    */
   static $_managedNames = NULL;
 
   /**
-   * key is used to allow the application to have multiple top
+   * Key is used to allow the application to have multiple top
    * level scopes rather than a single scope. (avoids naming
    * conflicts). We also extend this idea further and have local
    * scopes within a global scope. Allows us to do cool things
@@ -45,7 +46,7 @@ class CRM_Core_Session {
    * @var string
    */
   protected $_key = 'CiviCRM';
-  CONST USER_CONTEXT = 'userContext';
+  const USER_CONTEXT = 'userContext';
 
   /**
    * This is just a reference to the real session. Allows us to
@@ -60,55 +61,51 @@ class CRM_Core_Session {
    * pattern and cache the instance in this variable
    *
    * @var object
-   * @static
    */
   static private $_singleton = NULL;
 
   /**
-   * Constructor
+   * Constructor.
    *
-   * Since we are now a client / module of drupal, drupal takes care
-   * of initiating the php session handler session_start ().
+   * The CMS takes care of initiating the php session handler session_start().
    *
-   * When using CiviCRM standalone (i.e. w/o Drupal), we start the session
+   * When using CiviCRM standalone (w/o a CMS), we start the session
    * in index.php and then pass it off to here.
    *
    * All crm code should always use the session using
-   * CRM_Core_Session. we prefix stuff to avoid collisions with drupal and also
-   * collisions with other crm modules!!
+   * CRM_Core_Session. we prefix stuff to avoid collisions with the CMS and also
+   * collisions with other crm modules!
+   *
    * This constructor is invoked whenever any module requests an instance of
    * the session and one is not available.
    *
-   * @return void
+   * @return CRM_Core_Session
    */
-  function __construct() {
-    $this->_session = null;
+  public function __construct() {
+    $this->_session = NULL;
   }
 
   /**
-   * singleton function used to manage this object
+   * Singleton function used to manage this object.
    *
    * @return CRM_Core_Session
-   * @static
    */
-  static function &singleton() {
+  public static function &singleton() {
     if (self::$_singleton === NULL) {
-      self::$_singleton = new CRM_Core_Session;
+      self::$_singleton = new CRM_Core_Session();
     }
     return self::$_singleton;
   }
 
   /**
-   * Creates an array in the session. All variables now will be stored
-   * under this array
+   * Creates an array in the session.
    *
-   * @param boolean isRead is this a read operation, in this case, the session will not be touched
+   * All variables now will be stored under this array.
    *
-   * @access private
-   *
-   * @return void
+   * @param bool $isRead
+   *   Is this a read operation, in this case, the session will not be touched.
    */
-  function initialize($isRead = FALSE) {
+  public function initialize($isRead = FALSE) {
     // lets initialize the _session variable just before we need it
     // hopefully any bootstrapping code will actually load the session from the CMS
     if (!isset($this->_session)) {
@@ -118,8 +115,13 @@ class CRM_Core_Session {
           return;
         }
         $config =& CRM_Core_Config::singleton();
+        // FIXME: This belongs in CRM_Utils_System_*
         if ($config->userSystem->is_drupal && function_exists('drupal_session_start')) {
-          drupal_session_start();
+          // https://issues.civicrm.org/jira/browse/CRM-14356
+          if (!(isset($GLOBALS['lazy_session']) && $GLOBALS['lazy_session'] == TRUE)) {
+            drupal_session_start();
+          }
+          $_SESSION = array();
         }
         else {
           session_start();
@@ -137,17 +139,14 @@ class CRM_Core_Session {
     ) {
       $this->_session[$this->_key] = array();
     }
-    return;
   }
 
   /**
-   * Resets the session store
+   * Resets the session store.
    *
-   * @access public
-   *
-   * @return void
+   * @param int $all
    */
-  function reset($all = 1) {
+  public function reset($all = 1) {
     if ($all != 1) {
       $this->initialize();
 
@@ -159,20 +158,17 @@ class CRM_Core_Session {
       $this->_session = array();
     }
 
-    return;
   }
 
   /**
-   * creates a session local scope
+   * Creates a session local scope.
    *
-   * @param string  prefix local scope name
-   * @param boolean isRead is this a read operation, in this case, the session will not be touched
-   *
-   * @access public
-   *
-   * @return void
+   * @param string $prefix
+   *   Local scope name.
+   * @param bool $isRead
+   *   Is this a read operation, in this case, the session will not be touched.
    */
-  function createScope($prefix, $isRead = FALSE) {
+  public function createScope($prefix, $isRead = FALSE) {
     $this->initialize($isRead);
 
     if ($isRead || empty($prefix)) {
@@ -185,14 +181,12 @@ class CRM_Core_Session {
   }
 
   /**
-   * resets the session local scope
+   * Resets the session local scope.
    *
-   * @param string local scope name
-   * @access public
-   *
-   * @return void
+   * @param string $prefix
+   *   Local scope name.
    */
-  function resetScope($prefix) {
+  public function resetScope($prefix) {
     $this->initialize();
 
     if (empty($prefix)) {
@@ -205,23 +199,22 @@ class CRM_Core_Session {
   }
 
   /**
-   * Store the variable with the value in the session scope
+   * Store the variable with the value in the session scope.
    *
    * This function takes a name, value pair and stores this
    * in the session scope. Not sure what happens if we try
    * to store complex objects in the session. I suspect it
    * is supported but we need to verify this
    *
-   * @access public
    *
-   * @param  string $name    name  of the variable
-   * @param  mixed  $value   value of the variable
-   * @param  string $prefix  a string to prefix the keys in the session with
-   *
-   * @return void
-   *
+   * @param string $name
+   *   Name of the variable.
+   * @param mixed $value
+   *   Value of the variable.
+   * @param string $prefix
+   *   A string to prefix the keys in the session with.
    */
-  function set($name, $value = NULL, $prefix = NULL) {
+  public function set($name, $value = NULL, $prefix = NULL) {
     // create session scope
     $this->createScope($prefix);
 
@@ -243,25 +236,25 @@ class CRM_Core_Session {
   }
 
   /**
-   * Gets the value of the named variable in the session scope
+   * Gets the value of the named variable in the session scope.
    *
    * This function takes a name and retrieves the value of this
    * variable from the session scope.
    *
-   * @access public
    *
-   * @param  string name  : name  of the variable
-   * @param  string prefix : adds another level of scope to the session
+   * @param string $name
+   *   name of the variable.
+   * @param string $prefix
+   *   adds another level of scope to the session.
    *
    * @return mixed
-   *
    */
-  function get($name, $prefix = NULL) {
+  public function get($name, $prefix = NULL) {
     // create session scope
     $this->createScope($prefix, TRUE);
 
     if (empty($this->_session) || empty($this->_session[$this->_key])) {
-      return null;
+      return NULL;
     }
 
     if (empty($prefix)) {
@@ -269,7 +262,7 @@ class CRM_Core_Session {
     }
     else {
       if (empty($this->_session[$this->_key][$prefix])) {
-        return null;
+        return NULL;
       }
       $session =& $this->_session[$this->_key][$prefix];
     }
@@ -278,18 +271,14 @@ class CRM_Core_Session {
   }
 
   /**
-   * Gets all the variables in the current session scope
-   * and stuffs them in an associate array
+   * Gets all the variables in the current session scope and stuffs them in an associate array.
    *
-   * @access public
-   *
-   * @param  array  vars : associative array to store name/value pairs
-   * @param  string  Strip prefix from the key before putting it in the return
-   *
-   * @return void
-   *
+   * @param array $vars
+   *   Associative array to store name/value pairs.
+   * @param string $prefix
+   *   Will be stripped from the key before putting it in the return.
    */
-  function getVars(&$vars, $prefix = '') {
+  public function getVars(&$vars, $prefix = '') {
     // create session scope
     $this->createScope($prefix, TRUE);
 
@@ -308,40 +297,40 @@ class CRM_Core_Session {
   }
 
   /**
-   * Set and check a timer. If it's expired, it will be set again.
+   * Set and check a timer.
+   *
+   * If it's expired, it will be set again.
+   *
    * Good for showing a message to the user every hour or day (so not bugging them on every page)
    * Returns true-ish values if the timer is not set or expired, and false if the timer is still running
    * If you want to get more nuanced, you can check the type of the return to see if it's 'not set' or actually expired at a certain time
    *
-   * @access public
    *
-   * @param  string name : name of the timer
-   * @param  int expire  : expiry time (in seconds)
+   * @param string $name
+   *   name of the timer.
+   * @param int $expire
+   *   expiry time (in seconds).
    *
    * @return mixed
-   *
    */
-  function timer($name, $expire) {
+  public function timer($name, $expire) {
     $ts = $this->get($name, 'timer');
     if (!$ts || $ts < time() - $expire) {
       $this->set($name, time(), 'timer');
       return $ts ? $ts : 'not set';
     }
-    return false;
+    return FALSE;
   }
 
   /**
-   * adds a userContext to the stack
+   * Adds a userContext to the stack.
    *
-   * @param string  $userContext the url to return to when done
-   * @param boolean $check       should we do a dupe checking with the top element
-   *
-   * @return void
-   *
-   * @access public
-   *
+   * @param string $userContext
+   *   The url to return to when done.
+   * @param bool $check
+   *   Should we do a dupe checking with the top element.
    */
-  function pushUserContext($userContext, $check = TRUE) {
+  public function pushUserContext($userContext, $check = TRUE) {
     if (empty($userContext)) {
       return;
     }
@@ -371,16 +360,12 @@ class CRM_Core_Session {
   }
 
   /**
-   * replace the userContext of the stack with the passed one
+   * Replace the userContext of the stack with the passed one.
    *
-   * @param string the url to return to when done
-   *
-   * @return void
-   *
-   * @access public
-   *
+   * @param string $userContext
+   *   The url to return to when done.
    */
-  function replaceUserContext($userContext) {
+  public function replaceUserContext($userContext) {
     if (empty($userContext)) {
       return;
     }
@@ -392,28 +377,24 @@ class CRM_Core_Session {
   }
 
   /**
-   * pops the top userContext stack
+   * Pops the top userContext stack.
    *
-   * @param void
-   *
-   * @return the top of the userContext stack (also pops the top element)
-   *
+   * @return string
+   *   the top of the userContext stack (also pops the top element)
    */
-  function popUserContext() {
+  public function popUserContext() {
     $this->createScope(self::USER_CONTEXT);
 
     return array_pop($this->_session[$this->_key][self::USER_CONTEXT]);
   }
 
   /**
-   * reads the top userContext stack
+   * Reads the top userContext stack.
    *
-   * @param void
-   *
-   * @return the top of the userContext stack
-   *
+   * @return string
+   *   the top of the userContext stack
    */
-  function readUserContext() {
+  public function readUserContext() {
     $this->createScope(self::USER_CONTEXT);
 
     $config = CRM_Core_Config::singleton();
@@ -422,9 +403,11 @@ class CRM_Core_Session {
   }
 
   /**
-   * dumps the session to the log
+   * Dumps the session to the log.
+   *
+   * @param int $all
    */
-  function debug($all = 1) {
+  public function debug($all = 1) {
     $this->initialize();
     if ($all != 1) {
       CRM_Core_Error::debug('CRM Session', $this->_session);
@@ -435,13 +418,15 @@ class CRM_Core_Session {
   }
 
   /**
-   * Fetches status messages
+   * Fetches status messages.
    *
-   * @param $reset boolean should we reset the status variable?
+   * @param bool $reset
+   *   Should we reset the status variable?.
    *
-   * @return string        the status message if any
+   * @return string
+   *   the status message if any
    */
-  function getStatus($reset = FALSE) {
+  public function getStatus($reset = FALSE) {
     $this->initialize();
 
     $status = NULL;
@@ -456,15 +441,15 @@ class CRM_Core_Session {
   }
 
   /**
-   * Stores an alert to be displayed to the user via crm-messages
+   * Stores an alert to be displayed to the user via crm-messages.
    *
-   * @param $text string
+   * @param string $text
    *   The status message
    *
-   * @param $title string
+   * @param string $title
    *   The optional title of this message
    *
-   * @param $type string
+   * @param string $type
    *   The type of this message (printed as a css class). Possible options:
    *     - 'alert' (default)
    *     - 'info'
@@ -473,19 +458,15 @@ class CRM_Core_Session {
    *               until the user dismisses it)
    *     - 'no-popup' (will display in the document like old-school)
    *
-   * @param $options array
+   * @param array $options
    *   Additional options. Possible values:
    *     - 'unique' (default: true) Check if this message was already set before adding
    *     - 'expires' how long to display this message before fadeout (in ms)
    *                 set to 0 for no expiration
    *                 defaults to 10 seconds for most messages, 5 if it has a title but no body,
    *                 or 0 for errors or messages containing links
-   *
-   * @static
-   *
-   * @return void
    */
-  static function setStatus($text, $title = '', $type = 'alert', $options = array()) {
+  public static function setStatus($text, $title = '', $type = 'alert', $options = array()) {
     // make sure session is initialized, CRM-8120
     $session = self::singleton();
     $session->initialize();
@@ -514,7 +495,12 @@ class CRM_Core_Session {
     }
   }
 
-  static function registerAndRetrieveSessionObjects($names) {
+  /**
+   * Register and retrieve session objects.
+   *
+   * @param string|array $names
+   */
+  public static function registerAndRetrieveSessionObjects($names) {
     if (!is_array($names)) {
       $names = array($names);
     }
@@ -529,7 +515,12 @@ class CRM_Core_Session {
     CRM_Core_BAO_Cache::restoreSessionFromCache($names);
   }
 
-  static function storeSessionObjects($reset = TRUE) {
+  /**
+   * Store session objects.
+   *
+   * @param bool $reset
+   */
+  public static function storeSessionObjects($reset = TRUE) {
     if (empty(self::$_managedNames)) {
       return;
     }
@@ -541,10 +532,44 @@ class CRM_Core_Session {
     self::$_managedNames = NULL;
   }
 
-  function isEmpty() {
-    // check if session is empty, if so we dont cache
-    // stuff that we can get away with
-    // helps proxies like varnish
-    return empty($_SESSION) ? TRUE : FALSE;
+  /**
+   * Retrieve contact id of the logged in user.
+   *
+   * @return int|NULL
+   *   contact ID of logged in user
+   */
+  public static function getLoggedInContactID() {
+    $session = CRM_Core_Session::singleton();
+    if (!is_numeric($session->get('userID'))) {
+      return NULL;
+    }
+    return $session->get('userID');
   }
+
+  /**
+   * Get display name of the logged in user.
+   *
+   * @return string
+   *
+   * @throws CiviCRM_API3_Exception
+   */
+  public function getLoggedInContactDisplayName() {
+    $userContactID = CRM_Core_Session::getLoggedInContactID();
+    if (!$userContactID) {
+      return '';
+    }
+    return civicrm_api3('Contact', 'getvalue', array('id' => $userContactID, 'return' => 'display_name'));
+  }
+
+  /**
+   * Check if session is empty.
+   *
+   * if so we don't cache stuff that we can get away with, helps proxies like varnish.
+   *
+   * @return bool
+   */
+  public function isEmpty() {
+    return empty($_SESSION);
+  }
+
 }

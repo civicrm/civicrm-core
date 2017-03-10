@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
     <div class="crm-actions-ribbon crm-event-manage-tab-actions-ribbon">
       <ul id="actions">
       <li><div id="crm-event-links-wrapper">
-            <a id="crm-event-links-link" class="button"><span><div class="icon dropdown-icon"></div>{ts}Event Links{/ts}</span></a>
+            {crmButton id="crm-event-links-link" href="#" icon="bars"}{ts}Event Links{/ts}{/crmButton}
             <div class="ac_results" id="crm-event-links-list">
                  <div class="crm-event-links-list-inner">
                    <ul>
@@ -44,7 +44,7 @@
         </div></li>
 
       <li><div id="crm-participant-wrapper">
-            <a id="crm-participant-link" class="button"><span><div class="icon dropdown-icon"></div>{ts}Find Participants{/ts}</span></a>
+            {crmButton id="crm-participant-link" href="#" icon="bars"}{ts}Find Participants{/ts}{/crmButton}
             <div class="ac_results" id="crm-participant-list">
                  <div class="crm-participant-list-inner">
                    <ul>
@@ -75,7 +75,7 @@
 
 {literal}
 <script>
-cj(function($) {
+CRM.$(function($) {
   $('body').click(function() {
     $('#crm-event-links-list, #crm-participant-list').hide();
   });
@@ -86,7 +86,7 @@ cj(function($) {
     event.stopPropagation();
     return false;
   });
-  
+
   $('#crm-participant-link').click(function(event) {
     $('#crm-participant-list').toggle();
     $('#crm-event-links-list').hide();
@@ -102,8 +102,8 @@ cj(function($) {
   $('#crm-main-content-wrapper').on('keyup change', 'input#title', function() {
     $('#crm-event-name-page-title').text($(this).val());
   });
-  
-  $().crmAccordions();
+
 });
 </script>
 {/literal}
+{include file="CRM/Event/Form/ManageEvent/ConfirmRepeatMode.tpl" entityID=$id entityTable="civicrm_event"}

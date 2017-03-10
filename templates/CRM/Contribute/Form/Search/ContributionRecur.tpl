@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -31,6 +31,9 @@
   </div>
   <div class="crm-accordion-body">
     <table class="form-layout-compressed">
+      <tr>
+        <td colspan="4">{$form.contribution_recur_payment_made.html}</td>
+      </tr>
       <tr>
         <td>{ts}Start Date{/ts}</td>
         <td>
@@ -67,9 +70,16 @@
           {include file="CRM/Core/DateRange.tpl" fieldName="contribution_recur_cancel_date" from='_low' to='_high'}
         </td>
       </tr>
+      {if $contributionRecurGroupTree}
+        <tr>
+          <td colspan="4">
+            {include file="CRM/Custom/Form/Search.tpl" groupTree=$contributionRecurGroupTree showHideLinks=false}
+          </td>
+        </tr>
+      {/if}
     </table>
   </div>
-  <!-- /.crm-accordion-body -->
+<!-- /.crm-accordion-body -->
 </div><!-- /.crm-accordion-wrapper -->
 
 

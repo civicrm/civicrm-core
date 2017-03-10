@@ -1,0 +1,177 @@
+<!--
+  Implicit Controller: CrmMailingABEditCtrl
+
+  An ABTest includes two mailings, but we don't require the user to enter two complete mailings. For
+  simplicity, the email composition UI generally displays A (unless we specifically decided to expose an
+  individual field from B). At the end of the composition process, the controller's "sync" operation will
+  merge shared settings from "A" into "B".
+-->
+<div ng-form="crmMailingABEdit">
+  <div class="crm-block crm-form-block crmMailing">
+    <div crm-ui-wizard>
+      <div crm-ui-wizard-step="10" crm-title="ts('Setup')" ng-form="setupForm">
+        <div
+          crm-mailing-ab-block-setup="{
+            help: 1,
+            abName: 1,
+            campaign: 1,
+            testing_criteria: 1
+          }"
+          crm-abtest="abtest"></div>
+      </div>
+      <div crm-ui-wizard-step="11" crm-title="ts('Target')" ng-form="targetForm">
+        <div
+          crm-mailing-ab-block-setup="{
+            recipients: 1,
+            group_percentage: 1
+          }"
+          crm-abtest="abtest"></div>
+      </div>
+      <div crm-ui-wizard-step="20" crm-title="ts('Compose')" ng-if="abtest.ab.testing_criteria != 'full_email'" ng-form="composeForm">
+        <div crm-ui-tab-set>
+          <div crm-ui-tab id="tab-mailing" crm-title="ts('Mailing')">
+            <div
+              ng-if="abtest.ab.testing_criteria == 'from'"
+              crm-mailing-ab-block-mailing="{
+                msg_template_id: 1,
+                fromAddressA: 1,
+                fromAddressB: 1,
+                subject: 1
+                }"
+              crm-abtest="abtest"></div>
+            <div
+              ng-if="abtest.ab.testing_criteria == 'subject'"
+              crm-mailing-ab-block-mailing="{
+                msg_template_id: 1,
+                fromAddress: 1,
+                replyTo: 1,
+                subjectA: 1,
+                subjectB: 1
+                }"
+              crm-abtest="abtest"></div>
+            <div crm-ui-accordion="{title: ts('HTML')}" >
+              <div crm-mailing-body-html crm-mailing="abtest.mailings.a"/>
+            </div>
+            <div crm-ui-accordion="{title: ts('Plain Text'), collapsed: !abtest.mailings.a.body_text}">
+              <div crm-mailing-body-text crm-mailing="abtest.mailings.a"/>
+            </div>
+          </div>
+          <!--
+          FIXME: Attachment UI works, but we haven't implemented backend logic for copying/sharing
+          of attachments among mailings A/B/C.
+          <div crm-ui-tab id="tab-attachment" crm-title="ts('Attachments')">
+            <div crm-attachments="abtest.attachments.a"/>
+          </div>
+          -->
+          <div crm-ui-tab id="tab-header" crm-title="ts('Header and Footer')">
+            <div crm-mailing-block-header-footer crm-mailing="abtest.mailings.a"/>
+          </div>
+          <div crm-ui-tab id="tab-pub" crm-title="ts('Publication')">
+            <div crm-mailing-block-publication crm-mailing="abtest.mailings.a"/>
+          </div>
+          <div crm-ui-tab id="tab-response" crm-title="ts('Responses')">
+            <div crm-mailing-block-responses crm-mailing="abtest.mailings.a"/>
+          </div>
+        </div>
+        <div crm-ui-accordion="{title: ts('Preview (A)')}" >
+          <div crm-mailing-block-preview crm-mailing="abtest.mailings.a" on-preview="previewMailing('a', preview.mode)" on-send="sendTest('a', preview.recipient)" />
+        </div>
+        <div crm-ui-accordion="{title: ts('Preview (B)')}" >
+          <div crm-mailing-block-preview crm-mailing="abtest.mailings.b" on-preview="previewMailing('b', preview.mode)" on-send="sendTest('b', preview.recipient)" />
+        </div>
+      </div>
+      <div crm-ui-wizard-step="21" crm-title="ts('Compose (A)')" ng-if="abtest.ab.testing_criteria == 'full_email'" ng-form="composeAForm">
+        <div crm-ui-tab-set>
+          <div crm-ui-tab id="tab-mailingA" crm-title="ts('Mailing')">
+            <div
+              crm-mailing-ab-block-mailing="{
+                msg_template_idA: 1,
+                fromAddressA: 1,
+                replyToA: 1,
+                subjectA: 1
+                }"
+              crm-abtest="abtest"></div>
+            <div crm-ui-accordion="{title: ts('HTML')}" >
+              <div crm-mailing-body-html crm-mailing="abtest.mailings.a"/>
+            </div>
+            <div crm-ui-accordion="{title: ts('Plain Text'), collapsed: !abtest.mailings.a.body_text}">
+              <div crm-mailing-body-text crm-mailing="abtest.mailings.a"/>
+            </div>
+          </div>
+          <div crm-ui-tab id="tab-attachmentA" crm-title="ts('Attachments')">
+            <div crm-attachments="abtest.attachments.a"/>
+          </div>
+          <div crm-ui-tab id="tab-headerA" crm-title="ts('Header and Footer')">
+            <div crm-mailing-block-header-footer crm-mailing="abtest.mailings.a"/>
+          </div>
+          <div crm-ui-tab id="tab-pubA" crm-title="ts('Publication')">
+            <div crm-mailing-block-publication crm-mailing="abtest.mailings.a"/>
+          </div>
+          <div crm-ui-tab id="tab-responseA" crm-title="ts('Responses')">
+            <div crm-mailing-block-responses crm-mailing="abtest.mailings.a"/>
+          </div>
+        </div>
+        <div crm-ui-accordion="{title: ts('Preview')}" >
+          <div crm-mailing-block-preview crm-mailing="abtest.mailings.a" on-preview="previewMailing('a', preview.mode)" on-send="sendTest('a', preview.recipient)" />
+        </div>
+      </div>
+      <div crm-ui-wizard-step="22" crm-title="ts('Compose (B)')" ng-if="abtest.ab.testing_criteria == 'full_email'" ng-form="composeBForm">
+        <div crm-ui-tab-set>
+          <div crm-ui-tab id="tab-mailingB" crm-title="ts('Mailing')">
+            <div
+              crm-mailing-ab-block-mailing="{
+                msg_template_idB: 1,
+                fromAddressB: 1,
+                replyToB: 1,
+                subjectB: 1
+                }"
+              crm-abtest="abtest"></div>
+            <div crm-ui-accordion="{title: ts('HTML')}" >
+              <div crm-mailing-body-html crm-mailing="abtest.mailings.b"/>
+            </div>
+            <div crm-ui-accordion="{title: ts('Plain Text'), collapsed: !abtest.mailings.b.body_text}">
+              <div crm-mailing-body-text crm-mailing="abtest.mailings.b"/>
+            </div>
+          </div>
+          <div crm-ui-tab id="tab-attachmentB" crm-title="ts('Attachments')">
+            <div crm-attachments="abtest.attachments.b"/>
+          </div>
+          <div crm-ui-tab id="tab-headerB" crm-title="ts('Header and Footer')">
+            <div crm-mailing-block-header-footer crm-mailing="abtest.mailings.b"/>
+          </div>
+          <div crm-ui-tab id="tab-pubB" crm-title="ts('Publication')">
+            <div crm-mailing-block-publication crm-mailing="abtest.mailings.b"/>
+          </div>
+          <div crm-ui-tab id="tab-responseB" crm-title="ts('Responses')">
+            <div crm-mailing-block-responses crm-mailing="abtest.mailings.b"/>
+          </div>
+        </div>
+        <div crm-ui-accordion="{title: ts('Preview')}" >
+          <div crm-mailing-block-preview crm-mailing="abtest.mailings.b" on-preview="previewMailing('b', preview.mode)" on-send="sendTest('b', preview.recipient)" />
+        </div>
+      </div>
+      <div crm-ui-wizard-step="30" crm-title="ts('Schedule')" ng-form="schedForm">
+        <div
+          crm-mailing-ab-block-setup="{
+            scheduled_date: 1,
+            declare_winning_time: 1
+          }"
+          crm-abtest="abtest"></div>
+        <center>
+          <a class="button crmMailing-submit-button" ng-click="submit()" ng-class="{blocking: block.check(), disabled: crmMailingAB.$invalid}">
+            <div>{{ts('Submit Mailing')}}</div>
+          </a>
+        </center>
+      </div>
+      <span crm-ui-wizard-buttons style="float:right;">
+        <button
+          crm-icon="fa-trash"
+          ng-show="checkPerm('delete in CiviMail')"
+          ng-disabled="block.check()"
+          crm-confirm="{title:ts('Delete Draft'), message:ts('Are you sure you want to permanently delete this mailing?')}"
+          on-yes="delete()">{{ts('Delete Draft')}}
+        </button>
+        <button crm-icon="fa-floppy-o" ng-disabled="block.check()" ng-click="save().then(leave) ">{{ts('Save Draft')}}</button>
+      </span>
+    </div>
+</div>

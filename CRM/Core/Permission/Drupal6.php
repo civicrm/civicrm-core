@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
  */
@@ -39,7 +39,7 @@
 class CRM_Core_Permission_Drupal6 extends CRM_Core_Permission_DrupalBase {
 
   /**
-   * is this user someone with access for the entire system
+   * Is this user someone with access for the entire system.
    *
    * @var boolean
    */
@@ -47,14 +47,14 @@ class CRM_Core_Permission_Drupal6 extends CRM_Core_Permission_DrupalBase {
   protected $_editAdminUser = FALSE;
 
   /**
-   * am in in view permission or edit permission?
+   * Am in in view permission or edit permission?
    * @var boolean
    */
   protected $_viewPermission = FALSE;
   protected $_editPermission = FALSE;
 
   /**
-   * the current set of permissioned groups for the user
+   * The current set of permissioned groups for the user.
    *
    * @var array
    */
@@ -62,14 +62,17 @@ class CRM_Core_Permission_Drupal6 extends CRM_Core_Permission_DrupalBase {
   protected $_editPermissionedGroups;
 
   /**
-   * given a permission string, check for access requirements
+   * Given a permission string, check for access requirements
    *
-   * @param string $str the permission to check
+   * @param string $str
+   *   The permission to check.
    *
-   * @return boolean true if yes, else false
-   * @access public
+   * @param int $contactID
+   *
+   * @return bool
+   *   true if yes, else false
    */
-  function check($str, $contactID = NULL) {
+  public function check($str, $contactID = NULL) {
     $str = $this->translatePermission($str, 'Drupal6', array(
       'view user account' => 'access user profiles',
       'administer users' => 'administer users',
@@ -89,13 +92,13 @@ class CRM_Core_Permission_Drupal6 extends CRM_Core_Permission_DrupalBase {
   /**
    * Given a roles array, check for access requirements
    *
-   * @param array $array the roles to check
+   * @param array $array
+   *   The roles to check.
    *
-   * @return boolean true if yes, else false
-   * @access public
+   * @return bool
+   *   true if yes, else false
    */
-
-  function checkGroupRole($array) {
+  public function checkGroupRole($array) {
     if (function_exists('user_load') && isset($array)) {
       $user = user_load(array('uid' => $GLOBALS['user']->uid));
       //if giver roles found in user roles - return true
@@ -109,11 +112,13 @@ class CRM_Core_Permission_Drupal6 extends CRM_Core_Permission_DrupalBase {
   }
 
   /**
-   * Get all the contact emails for users that have a specific role
+   * Get all the contact emails for users that have a specific role.
    *
-   * @param string $roleName name of the role we are interested in
+   * @param string $roleName
+   *   Name of the role we are interested in.
    *
-   * @return string a comma separated list of email addresses
+   * @return string
+   *   a comma separated list of email addresses
    */
   public function roleEmails($roleName) {
     static $_cache = array();
@@ -134,19 +139,21 @@ class CRM_Core_Permission_Drupal6 extends CRM_Core_Permission_DrupalBase {
 
     $query = db_query($sql);
     while ($result = db_fetch_object($query)) {
-    $uids[] = $result->uid;
-  }
+      $uids[] = $result->uid;
+    }
 
     $_cache[$roleName] = self::getContactEmails($uids);
     return $_cache[$roleName];
   }
 
   /**
-   * Get all the contact emails for users that have a specific permission
+   * Get all the contact emails for users that have a specific permission.
    *
-   * @param string $permissionName name of the permission we are interested in
+   * @param string $permissionName
+   *   Name of the permission we are interested in.
    *
-   * @return string a comma separated list of email addresses
+   * @return string
+   *   a comma separated list of email addresses
    */
   public function permissionEmails($permissionName) {
     static $_cache = array();
@@ -167,26 +174,26 @@ class CRM_Core_Permission_Drupal6 extends CRM_Core_Permission_DrupalBase {
 
     $query = db_query($sql);
     while ($result = db_fetch_object($query)) {
-    $uids[] = $result->uid;
-  }
+      $uids[] = $result->uid;
+    }
 
-  $_cache[$permissionName] = self::getContactEmails($uids);
-  return $_cache[$permissionName];
+    $_cache[$permissionName] = self::getContactEmails($uids);
+    return $_cache[$permissionName];
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public function isModulePermissionSupported() {
     return TRUE;
   }
 
   /**
-   * {@inheritdoc}
+   * @inheritDoc
    *
    * Does nothing in Drupal 6.
    */
-  function upgradePermissions($permissions) {
+  public function upgradePermissions($permissions) {
     // D6 allows us to be really lazy... things get cleaned up when the admin form is next submitted...
   }
 
@@ -194,9 +201,12 @@ class CRM_Core_Permission_Drupal6 extends CRM_Core_Permission_DrupalBase {
    * Get the permissions defined in the hook_civicrm_permission implementation
    * of the given module.
    *
-   * @return Array of permissions, in the same format as CRM_Core_Permission::getCorePermissions().
+   * @param $module
+   *
+   * @return array
+   *   Array of permissions, in the same format as CRM_Core_Permission::getCorePermissions().
    */
-  static function getModulePermissions($module) {
+  public static function getModulePermissions($module) {
     $return_permissions = array();
     $fn_name = "{$module}_civicrm_permission";
     if (function_exists($fn_name)) {
@@ -204,5 +214,5 @@ class CRM_Core_Permission_Drupal6 extends CRM_Core_Permission_DrupalBase {
     }
     return $return_permissions;
   }
-}
 
+}

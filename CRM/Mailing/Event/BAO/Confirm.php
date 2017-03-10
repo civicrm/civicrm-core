@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,36 +23,40 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 require_once 'Mail/mime.php';
+
+/**
+ * Class CRM_Mailing_Event_BAO_Confirm
+ */
 class CRM_Mailing_Event_BAO_Confirm extends CRM_Mailing_Event_DAO_Confirm {
 
   /**
-   * class constructor
+   * Class constructor.
    */
-  function __construct() {
+  public function __construct() {
     parent::__construct();
   }
 
   /**
-   * Confirm a pending subscription
+   * Confirm a pending subscription.
    *
-   * @param int $contact_id       The id of the contact
-   * @param int $subscribe_id     The id of the subscription event
-   * @param string $hash          The hash
+   * @param int $contact_id
+   *   The id of the contact.
+   * @param int $subscribe_id
+   *   The id of the subscription event.
+   * @param string $hash
+   *   The hash.
    *
-   * @return boolean              True on success
-   * @access public
-   * @static
+   * @return bool
+   *   True on success
    */
   public static function confirm($contact_id, $subscribe_id, $hash) {
     $se = &CRM_Mailing_Event_BAO_Subscribe::verify(
@@ -125,10 +129,10 @@ class CRM_Mailing_Event_BAO_Confirm extends CRM_Mailing_Event_DAO_Confirm {
       $text = CRM_Utils_String::htmlToText($component->body_html);
     }
 
-    $bao            = new CRM_Mailing_BAO_Mailing();
+    $bao = new CRM_Mailing_BAO_Mailing();
     $bao->body_text = $text;
     $bao->body_html = $html;
-    $tokens         = $bao->getTokens();
+    $tokens = $bao->getTokens();
 
     $html = CRM_Utils_Token::replaceDomainTokens($html, $domain, TRUE, $tokens['html']);
     $html = CRM_Utils_Token::replaceWelcomeTokens($html, $group->title, TRUE);
@@ -137,7 +141,8 @@ class CRM_Mailing_Event_BAO_Confirm extends CRM_Mailing_Event_DAO_Confirm {
     $text = CRM_Utils_Token::replaceWelcomeTokens($text, $group->title, FALSE);
 
     $mailParams = array(
-      'groupName' => 'Mailing Event ' . $component->component_type, 'subject' => $component->subject,
+      'groupName' => 'Mailing Event ' . $component->component_type,
+      'subject' => $component->subject,
       'from' => "\"$domainEmailName\" <do-not-reply@$emailDomain>",
       'toEmail' => $email,
       'toName' => $display_name,
@@ -151,5 +156,5 @@ class CRM_Mailing_Event_BAO_Confirm extends CRM_Mailing_Event_DAO_Confirm {
 
     return $group->title;
   }
-}
 
+}

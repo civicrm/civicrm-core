@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,19 +23,19 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
  */
 
 /**
  * Report hooks that allow extending a particular report.
- * Example: Adding new tables to log reports 
+ * Example: Adding new tables to log reports
  */
 class CRM_Report_BAO_Hook {
 
@@ -45,11 +45,9 @@ class CRM_Report_BAO_Hook {
   protected $_queryObjects = NULL;
 
   /**
-   * singleton function used to manage this object
+   * Singleton function used to manage this object.
    *
    * @return object
-   * @static
-   *
    */
   public static function singleton() {
     static $singleton = NULL;
@@ -59,11 +57,12 @@ class CRM_Report_BAO_Hook {
     return $singleton;
   }
 
- /**
-  * Get or build the list of search objects (via hook)
-  *
-  * @return array of CRM_Report_BAO_Hook_Interface objects
-  */
+  /**
+   * Get or build the list of search objects (via hook)
+   *
+   * @return array
+   *   Array of CRM_Report_BAO_Hook_Interface objects
+   */
   public function getSearchQueryObjects() {
     if ($this->_queryObjects === NULL) {
       $this->_queryObjects = array();
@@ -72,21 +71,34 @@ class CRM_Report_BAO_Hook {
     return $this->_queryObjects;
   }
 
+  /**
+   * @param $reportObj
+   * @param $logTables
+   */
   public function alterLogTables(&$reportObj, &$logTables) {
     foreach (self::getSearchQueryObjects() as $obj) {
       $obj->alterLogTables($reportObj, $logTables);
     }
   }
 
+  /**
+   * @param $reportObj
+   * @param $table
+   *
+   * @return array
+   */
   public function logDiffClause(&$reportObj, $table) {
     $contactIdClause = $join = '';
     foreach (self::getSearchQueryObjects() as $obj) {
       list($cidClause, $joinClause) = $obj->logDiffClause($reportObj, $table);
-      if ($joinClause) 
+      if ($joinClause) {
         $join .= $joinClause;
-      if ($cidClause) 
+      }
+      if ($cidClause) {
         $contactIdClause .= $cidClause;
+      }
     }
     return array($contactIdClause, $join);
   }
+
 }

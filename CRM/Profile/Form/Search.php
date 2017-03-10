@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,14 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -39,33 +37,24 @@
  * It delegates the work to lower level subclasses and integrates the changes
  * back in. It also uses a lot of functionality with the CRM API's, so any change
  * made here could potentially affect the API etc. Be careful, be aware, use unit tests.
- *
  */
 class CRM_Profile_Form_Search extends CRM_Profile_Form {
 
   /**
-   * pre processing work done here.
-   *
-   * @param
-   *
-   * @return void
-   *
-   * @access public
-   *
+   * Pre processing work done here.
    */
-  function preProcess() {
+  public function preProcess() {
     $this->_mode = CRM_Profile_Form::MODE_SEARCH;
     parent::preProcess();
   }
 
   /**
-   * Set the default form values
+   * Set the default form values.
    *
-   * @access protected
-   *
-   * @return array the default array reference
+   * @return array
+   *   the default array reference
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
     // note we intentionally overwrite value since we use it as defaults
     // and its all pass by value
@@ -91,7 +80,9 @@ class CRM_Profile_Form_Search extends CRM_Profile_Form {
         }
       }
       elseif (in_array($key, array(
-        'birth_date', 'deceased_date'))) {
+        'birth_date',
+        'deceased_date',
+      ))) {
         list($value) = CRM_Utils_Date::setDateDefaults($value);
       }
 
@@ -101,10 +92,7 @@ class CRM_Profile_Form_Search extends CRM_Profile_Form {
   }
 
   /**
-   * Function to actually build the form
-   *
-   * @return void
-   * @access public
+   * Build the form object.
    */
   public function buildQuickForm() {
     // Is proximity search enabled for this profile?
@@ -117,23 +105,20 @@ class CRM_Profile_Form_Search extends CRM_Profile_Form {
     }
 
     $this->addButtons(array(
-        array(
-          'type' => 'refresh',
-          'name' => ts('Search'),
-          'isDefault' => TRUE,
-        ),
-      ));
+      array(
+        'type' => 'refresh',
+        'name' => ts('Search'),
+        'isDefault' => TRUE,
+      ),
+    ));
 
     parent::buildQuickForm();
   }
 
   /**
-   *
-   *
-   * @access public
-   *
-   * @return void
+   * Post process function.
    */
-  public function postProcess() {}
-}
+  public function postProcess() {
+  }
 
+}

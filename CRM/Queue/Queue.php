@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * A queue is an object (usually backed by some persistent data store)
@@ -46,96 +46,104 @@ abstract class CRM_Queue_Queue {
    * usually call createQueue (if it's a new queue) or loadQueue (if it's
    * known to be an existing queue).
    *
-   * @param $queueSpec, array with keys:
-   *   - type: string, required, e.g. "interactive", "immediate", "stomp", "beanstalk"
+   * @param array $queueSpec
+   *   Array with keys:
+   *   - type: string, required, e.g. "interactive", "immediate", "stomp",
+   *     "beanstalk"
    *   - name: string, required, e.g. "upgrade-tasks"
-   *   - reset: bool, optional; if a queue is found, then it should be flushed; default to TRUE
-   *   - (additional keys depending on the queue provider)
-   */ function __construct($queueSpec) {
+   *   - reset: bool, optional; if a queue is found, then it should be
+   *     flushed; default to TRUE
+   *   - (additional keys depending on the queue provider).
+   */
+  public function __construct($queueSpec) {
     $this->_name = $queueSpec['name'];
   }
 
   /**
-   * Determine the string name of this queue
+   * Determine the string name of this queue.
    *
    * @return string
    */
-  function getName() {
+  public function getName() {
     return $this->_name;
   }
 
   /**
    * Perform any registation or resource-allocation for a new queue
    */
-  abstract function createQueue();
+  public abstract function createQueue();
 
   /**
    * Perform any loading or pre-fetch for an existing queue.
    */
-  abstract function loadQueue();
+  public abstract function loadQueue();
 
   /**
    * Release any resources claimed by the queue (memory, DB rows, etc)
    */
-  abstract function deleteQueue();
+  public abstract function deleteQueue();
 
   /**
-   * Check if the queue exists
+   * Check if the queue exists.
    *
    * @return bool
    */
-  abstract function existsQueue();
+  public abstract function existsQueue();
 
   /**
-   * Add a new item to the queue
+   * Add a new item to the queue.
    *
-   * @param $data serializable PHP object or array
-   * @param $options queue-dependent options; for example, if this is a
-   *   priority-queue, then $options might specify the item's priority
-   *
-   * @return bool, TRUE on success
+   * @param mixed $data
+   *   Serializable PHP object or array.
+   * @param array $options
+   *   Queue-dependent options; for example, if this is a
+   *   priority-queue, then $options might specify the item's priority.
    */
-  abstract function createItem($data, $options = array());
+  public abstract function createItem($data, $options = array());
 
   /**
-   * Determine number of items remaining in the queue
+   * Determine number of items remaining in the queue.
    *
    * @return int
    */
-  abstract function numberOfItems();
+  public abstract function numberOfItems();
 
   /**
-   * Get the next item
+   * Get the next item.
    *
-   * @param $lease_time seconds
+   * @param int $lease_time
+   *   Seconds.
    *
-   * @return object with key 'data' that matches the inputted data
+   * @return object
+   *   with key 'data' that matches the inputted data
    */
-  abstract function claimItem($lease_time = 3600);
+  public abstract function claimItem($lease_time = 3600);
 
   /**
    * Get the next item, even if there's an active lease
    *
-   * @param $lease_time seconds
+   * @param int $lease_time
+   *   Seconds.
    *
-   * @return object with key 'data' that matches the inputted data
+   * @return object
+   *   with key 'data' that matches the inputted data
    */
-  abstract function stealItem($lease_time = 3600);
+  public abstract function stealItem($lease_time = 3600);
 
   /**
-   * Remove an item from the queue
+   * Remove an item from the queue.
    *
-   * @param $item The item returned by claimItem
+   * @param object $item
+   *   The item returned by claimItem.
    */
-  abstract function deleteItem($item);
+  public abstract function deleteItem($item);
 
   /**
-   * Return an item that could not be processed
+   * Return an item that could not be processed.
    *
-   * @param $item The item returned by claimItem
-   *
-   * @return bool
+   * @param object $item
+   *   The item returned by claimItem.
    */
-  abstract function releaseItem($item);
+  public abstract function releaseItem($item);
+
 }
-

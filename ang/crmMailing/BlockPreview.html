@@ -1,0 +1,61 @@
+<!--
+Vars: mailing:obj, testContact:obj, testGroup:obj, crmMailing:FormController
+-->
+<div class="crmMailing-preview">
+  <!-- Note:
+  In Firefox (at least), clicking the preview buttons causes the browser to display validation warnings
+  for unrelated fields *and* display preview. To avoid this weird UX, we disable preview buttons when the form is incomplete/invalid.
+  -->
+  <div class="preview-popup">
+    <div ng-show="!mailing.body_html && !mailing.body_text">
+      <em>({{ts('No content to preview')}})</em>
+    </div>
+    <div ng-hide="!mailing.body_html">
+      <a class="crm-hover-button action-item" crm-icon="fa-television" ng-disabled="crmMailing.$invalid" ng-click="doPreview('html')">{{ts('Preview as HTML')}}</a>
+    </div>
+    <div ng-hide="!mailing.body_html && !mailing.body_text" style="margin-top: 1em;">
+      <a class="crm-hover-button action-item" crm-icon="fa-file-text-o" ng-disabled="crmMailing.$invalid" ng-click="doPreview('text')">{{ts('Preview as Plain Text')}}</a>
+    </div>
+    <!--
+    <div ng-hide="!mailing.body_html && !mailing.body_text">
+      <button ng-disabled="crmMailing.$invalid" ng-click="doPreview('full')">{{ts('Preview')}}</button>
+    </div>
+    -->
+  </div>
+  <div class="preview-contact" ng-form>
+    <div>
+      {{ts('Send test email to:')}}
+      <a crm-ui-help="hs({id: 'test', title: ts('Test Email')})"></a>
+    </div>
+    <div>
+      <input
+        name="preview_test_email"
+        type="email"
+        class="crm-form-text"
+        ng-model="testContact.email"
+        placeholder="example@example.org"
+        />
+    </div>
+    <button crm-icon="fa-paper-plane" title="{{crmMailing.$invalid || !testContact.email ? ts('Complete all required fields first') : ts('Send test message to %1', {1: testContact.email})}}" ng-disabled="crmMailing.$invalid || !testContact.email" ng-click="doSend({email: testContact.email})">{{ts('Send test')}}</button>
+  </div>
+  <div class="preview-group" ng-form>
+    <div>
+      {{ts('Send test email to group:')}}
+      <a crm-ui-help="hs({id: 'test', title: ts('Test Email')})"></a>
+    </div>
+    <div>
+      <select
+        name="preview_test_group"
+        ui-jq="crmSelect2"
+        ui-options="{dropdownAutoWidth : true, allowClear: true, placeholder: ts('Select Group')}"
+        ng-model="testGroup.gid"
+        ng-options="group.id as group.title for group in crmMailingConst.groupNames|orderBy:'title'"
+        class="crm-action-menu fa-envelope-o"
+        >
+        <option value=""></option>
+      </select>
+    </div>
+    <button crm-icon="fa-paper-plane" title="{{crmMailing.$invalid || !testGroup.gid ? ts('Complete all required fields first') : ts('Send test message to group')}}"ng-disabled="crmMailing.$invalid || !testGroup.gid" crm-confirm="{resizable: true, width: '40%', height: '40%', open: previewTestGroup}" on-yes="doSend({gid: testGroup.gid})">{{ts('Send test')}}</button>
+  </div>
+  <div class="clear"></div>
+</div>

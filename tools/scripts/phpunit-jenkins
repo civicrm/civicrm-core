@@ -24,7 +24,7 @@ set -ex
 ##    --tap \
 ##    --log-junit "${WORKSPACE}/build/junit.xml" \
 ##    CRM_AllTests
-## 
+##
 
 if [ -z "$EXECUTOR_NUMBER" -o -z "$WORKSPACE" ]; then
   echo "This script requires the following environment variables:"

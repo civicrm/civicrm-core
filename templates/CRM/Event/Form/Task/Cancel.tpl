@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -26,7 +26,7 @@
 {* Confirmation of Cancel Registration *}
 <div class="crm-block crm-form-block crm-event-cancel-form-block">
 <div class="crm-submit-buttons">
-  {include file="CRM/common/formButtons.tpl" location="top"} 
+  {include file="CRM/common/formButtons.tpl" location="top"}
 </div>
 <div class="messages status no-popup">
   <div class="icon inform-icon"></div>
@@ -37,6 +37,6 @@
 </div>
 
 <div class="crm-submit-buttons">
-  {include file="CRM/common/formButtons.tpl" location="bottom"} 
+  {include file="CRM/common/formButtons.tpl" location="bottom"}
 </div>
 </div>

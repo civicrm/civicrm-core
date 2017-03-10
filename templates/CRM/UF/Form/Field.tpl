@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,7 +23,6 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-<h3>{if $action eq 8}{ts}Delete Field{/ts} - {$fieldTitle}{elseif $action eq 1}{ts}Add Field{/ts}{elseif $action eq 2}{ts}Edit Field{/ts} - {$fieldTitle}{/if}</h3>
 <div class="crm-block crm-form-block crm-uf-field-form-block">
 {if $action eq 8}
   <div class="messages status no-popup">
@@ -34,7 +33,7 @@
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
   <table class="form-layout-compressed">
     <tr class="crm-uf-field-form-block-field_name">
-      <td class="label">{$form.field_name.label}</td>
+      <td class="label">{$form.field_name.label} {help id='field_name_0'}</td>
       <td>{$form.field_name.html}<br />
         <span class="description">&nbsp;{ts}Select the type of CiviCRM record and the field you want to include in this Profile.{/ts}</span></td>
     </tr>
@@ -91,12 +90,9 @@
 
 {literal}
 <script type="text/javascript">
-var otherModule = new Array( );
-{/literal}{foreach from=$otherModules item="mval" key="mkey"}{literal}
-otherModule[{/literal}{$mkey}{literal}] = '{/literal}{$mval}{literal}';
-{/literal}{/foreach}{literal}
 
-cj(function($) {
+CRM.$(function($) {
+  var otherModule = {/literal}{$otherModules|@json_encode}{literal};
   if ( $.inArray( "Profile", otherModule ) > -1 && $.inArray( "Search Profile", otherModule ) == -1 ){
     $('#profile_visibility').show();
   }
@@ -202,7 +198,7 @@ cj("#field_name_1").bind( 'change blur', function( ) {
   showHideSeletorSearch( );
 });
 
-cj( function( ) {
+CRM.$(function($) {
   cj("#field_name_1").addClass( 'huge' );
   viewOnlyShowHide( );
   cj("#is_view").click( function(){
@@ -216,7 +212,7 @@ cj("#field_name_1").change(
     multiSummaryToggle(cj(this).val());
   });
 
-cj( function( ) {
+CRM.$(function($) {
   var fieldId = cj("#field_name_1").val();
   multiSummaryToggle(fieldId);
 });
@@ -306,6 +302,3 @@ function verify( ) {
 
 </script>
 {/literal}
-
-{* include jscript to warn if unsaved form field changes *}
-{include file="CRM/common/formNavigate.tpl"}

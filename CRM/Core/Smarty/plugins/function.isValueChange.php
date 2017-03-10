@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * CiviCRM's Smarty looped value change plugin
@@ -32,7 +32,7 @@
  *
  * @package CRM
  * @author Allen Shaw <allen@nswebsolutions.com>
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  */
 
@@ -40,14 +40,15 @@
  * Smarty function for checking change in a property's value, for example
  * when looping through an array.
  *
- *
  * Smarty param:  string $key     unique identifier for this property (REQUIRED)
  * Smarty param:  mixed  $value   the current value of the property
  * Smarty param:  string $assign  name of template variable to which to assign result
  *
  *
- * @param array $params   template call's parameters
- * @param object $smarty  the Smarty object
+ * @param array $params
+ *   Template call's parameters.
+ * @param CRM_Core_Smarty $smarty
+ *   The Smarty object.
  *
  * @return NULL
  */
@@ -56,12 +57,12 @@ function smarty_function_isValueChange($params, &$smarty) {
 
   if (empty($params['key'])) {
     $smarty->trigger_error("Missing required parameter, 'key', in isValueChange plugin.");
-    return;
+    return NULL;
   }
 
   $is_changed = FALSE;
 
-  if (!array_key_exists($params['key'], $values) || $params['value'] != $values[$params['key']]) {
+  if (!array_key_exists($params['key'], $values) || strcasecmp($params['value'], $values[$params['key']]) !== 0) {
     // if we have a new value
 
     $is_changed = TRUE;
@@ -84,6 +85,5 @@ function smarty_function_isValueChange($params, &$smarty) {
     $smarty->assign($params['assign'], $is_changed);
   }
 
-  return;
+  return NULL;
 }
-

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,32 +23,37 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
- * This class generates form components for File System Path
- *
+ * This class generates form components for File System Path.
  */
 class CRM_Admin_Form_Setting_Path extends CRM_Admin_Form_Setting {
 
+  protected $_settings = array(
+    'uploadDir' => CRM_Core_BAO_Setting::DIRECTORY_PREFERENCES_NAME,
+    'imageUploadDir' => CRM_Core_BAO_Setting::DIRECTORY_PREFERENCES_NAME,
+    'customFileUploadDir' => CRM_Core_BAO_Setting::DIRECTORY_PREFERENCES_NAME,
+    'customTemplateDir' => CRM_Core_BAO_Setting::DIRECTORY_PREFERENCES_NAME,
+    'customPHPPathDir' => CRM_Core_BAO_Setting::DIRECTORY_PREFERENCES_NAME,
+    'extensionsDir' => CRM_Core_BAO_Setting::DIRECTORY_PREFERENCES_NAME,
+  );
+
   /**
-   * Function to build the form
-   *
-   * @return void
-   * @access public
+   * Build the form object.
    */
   public function buildQuickForm() {
     CRM_Utils_System::setTitle(ts('Settings - Upload Directories'));
+    parent::buildQuickForm();
 
-    $directories = array('uploadDir' => ts('Temporary Files'),
+    $directories = array(
+      'uploadDir' => ts('Temporary Files'),
       'imageUploadDir' => ts('Images'),
       'customFileUploadDir' => ts('Custom Files'),
       'customTemplateDir' => ts('Custom Templates'),
@@ -56,16 +61,15 @@ class CRM_Admin_Form_Setting_Path extends CRM_Admin_Form_Setting {
       'extensionsDir' => ts('CiviCRM Extensions Directory'),
     );
     foreach ($directories as $name => $title) {
-      $this->add('text', $name, $title);
+      //$this->add('text', $name, $title);
       $this->addRule($name,
         ts("'%1' directory does not exist",
           array(1 => $title)
         ),
-        'fileExists'
+        'settingPath'
       );
     }
 
-    parent::buildQuickForm();
   }
 
   public function postProcess() {
@@ -73,5 +77,5 @@ class CRM_Admin_Form_Setting_Path extends CRM_Admin_Form_Setting {
 
     parent::rebuildMenu();
   }
-}
 
+}

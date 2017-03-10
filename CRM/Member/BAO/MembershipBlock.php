@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,49 +23,51 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
  */
 class CRM_Member_BAO_MembershipBlock extends CRM_Member_DAO_MembershipBlock {
   /**
-   * class constructor
+   * Class constructor.
    */
-  function __construct() {
+  public function __construct() {
     parent::__construct();
   }
+
   /**
-   * function to add the membership Blocks
+   * Add the membership Blocks.
    *
-   * @param array $params reference array contains the values submitted by the form
+   * @param array $params
+   *   Reference array contains the values submitted by the form.
    *
-   * @access public
-   * @static
    *
    * @return object
    */
-  static function create(&$params) {
+  public static function create(&$params) {
     $hook = empty($params['id']) ? 'create' : 'edit';
     CRM_Utils_Hook::pre($hook, 'MembershipBlock', CRM_Utils_Array::value('id', $params), $params);
     $dao = new CRM_Member_DAO_MembershipBlock();
     $dao->copyValues($params);
     $dao->id = CRM_Utils_Array::value('id', $params);
+    $dao->save();
     CRM_Utils_Hook::post($hook, 'MembershipBlock', $dao->id, $dao);
     return $dao;
   }
 
   /**
-   * Function to delete membership Blocks
+   * Delete membership Blocks.
    *
    * @param int $id
-   * @static
+   *
+   * @return bool
    */
-  static function del($id) {
+  public static function del($id) {
     $dao = new CRM_Member_DAO_MembershipBlock();
     $dao->id = $id;
     $result = FALSE;

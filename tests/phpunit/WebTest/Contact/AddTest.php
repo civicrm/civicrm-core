@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,23 +22,30 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Contact_AddTest
+ */
 class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
     parent::setUp();
   }
 
-  function testIndividualAdd() {
+  public function testIndividualAdd() {
     $this->webtestLogin();
 
     $groupName = $this->WebtestAddGroup();
 
     // go to display preferences to enable Open ID field
     $this->openCiviPage('admin/setting/preferences/display', "reset=1", "_qf_Display_next-bottom");
-    $this->check("xpath=//ul[@id='contactEditBlocks']//li/span[2]/label[text()='Open ID']/../input");
+    $this->waitForAjaxContent();
+    if (!$this->isChecked("xpath=//ul[@id='contactEditBlocks']//li[@id='preference-10-contactedit']/span/input")) {
+      $this->click("xpath=//ul[@id='contactEditBlocks']//li/span/label[text()='Open ID']");
+    }
     $this->click("_qf_Display_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->openCiviPage('contact/add', 'reset=1&ct=Individual');
@@ -100,7 +107,7 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
     $this->click("address_1_country_id");
     $this->select("address_1_country_id", "value=" . $this->webtestGetValidCountryID());
 
-    if ($this->assertElementContainsText('address_1', "Latitude")) {
+    if ($this->assertElementContainsText('address_table_1', "Latitude")) {
       $this->type("address_1_geo_code_1", "1234");
       $this->type("address_1_geo_code_2", "5678");
     }
@@ -115,7 +122,7 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
     $this->click("address_2_country_id");
     $this->select("address_2_country_id", "value=" . $this->webtestGetValidCountryID());
 
-    if ($this->assertElementContainsText('address_2', "Latitude")) {
+    if ($this->assertElementContainsText('address_table_2', "Latitude")) {
       $this->type("address_2_geo_code_1", "1234");
       $this->type("address_2_geo_code_2", "5678");
     }
@@ -145,7 +152,7 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("subject");
     $this->type("subject", "test note");
     $this->type("note", "this is a test note contact webtest");
-    $this->assertElementContainsText('notesBlock', "Subject\n Notes");
+    $this->assertElementContainsText('notesBlock', "Subject\n Note");
 
     //Demographics section
     $this->click("//div[@class='crm-accordion-header' and contains(.,'Demographics')]");
@@ -157,7 +164,7 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
     $this->click("tagGroup");
 
     // select group
-    $this->select("crmasmSelect0", "label=$groupName");
+    $this->select("group", "label=$groupName");
     $this->click("tag[{$this->webtestGetValidEntityID('Tag')}]");
 
     // Clicking save.
@@ -167,14 +174,17 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
     $this->waitForText('crm-notification-container', "Contact Saved");
   }
 
-  function testHouseholdAdd() {
+  public function testHouseholdAdd() {
     $this->webtestLogin();
 
     $groupName = $this->WebtestAddGroup();
 
     // go to display preferences to enable Open ID field
     $this->openCiviPage('admin/setting/preferences/display', "reset=1", "_qf_Display_next-bottom");
-    $this->check("xpath=//ul[@id='contactEditBlocks']//li/span[2]/label[text()='Open ID']/../input");
+    $this->waitForAjaxContent();
+    if (!$this->isChecked("xpath=//ul[@id='contactEditBlocks']//li[@id='preference-10-contactedit']/span/input")) {
+      $this->click("xpath=//ul[@id='contactEditBlocks']//li/span/label[text()='Open ID']");
+    }
     $this->click("_qf_Display_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
@@ -199,7 +209,9 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
     $this->select("phone_1_phone_type_id", "value=" . $this->webtestGetFirstValueForOptionGroup('phone_type'));
 
     //fill in IM
-    $this->assertElementContainsText('im_1_provider_id', "Yahoo MSN AIM GTalk Jabber Skype");
+    foreach (array('Yahoo', 'MSN', 'AIM', 'GTalk', 'Jabber', 'Skype') as $option) {
+      $this->assertSelectHasOption('im_1_provider_id', $option);
+    }
     $this->type("im_1_name", "testSkype");
     $this->select("im_1_location_type_id", "value=3");
     $this->select("im_1_provider_id", "value=6");
@@ -231,7 +243,7 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
     $this->click("address_1_country_id");
     $this->select("address_1_country_id", "value=" . $this->webtestGetValidCountryID());
 
-    if ($this->assertElementContainsText('address_1', "Latitude")) {
+    if ($this->assertElementContainsText('address_table_1', "Latitude")) {
       $this->type("address_1_geo_code_1", "1234");
       $this->type("address_1_geo_code_2", "5678");
     }
@@ -257,13 +269,14 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
     $this->select("preferred_language", "value=fr_FR");
 
     //Notes section
-    $this->click("notesBlock");
+    $this->clickAt("//*[@id='Contact']/div[2]/div[6]/div[1]");
     $this->waitForElementPresent("subject");
     $this->type("subject", "Grant's note");
     $this->type("note", "This is a household contact webtest note.");
 
     // select group
-    $this->select("crmasmSelect0", "label=$groupName");
+    $this->clickAt("xpath=//div[text()='Tags and Groups']");
+    $this->select("group", "label=$groupName");
 
     //tags section
     $this->click("tag[{$this->webtestGetValidEntityID('Tag')}]");
@@ -275,14 +288,17 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
     $this->waitForText('crm-notification-container', "Contact Saved");
   }
 
-  function testOrganizationAdd() {
+  public function testOrganizationAdd() {
     $this->webtestLogin();
 
     $groupName = $this->WebtestAddGroup();
 
     // go to display preferences to enable Open ID field
     $this->openCiviPage('admin/setting/preferences/display', "reset=1", "_qf_Display_next-bottom");
-    $this->check("xpath=//ul[@id='contactEditBlocks']//li/span[2]/label[text()='Open ID']/../input");
+    $this->waitForAjaxContent();
+    if (!$this->isChecked("xpath=//ul[@id='contactEditBlocks']//li[@id='preference-10-contactedit']/span/input")) {
+      $this->click("xpath=//ul[@id='contactEditBlocks']//li/span/label[text()='Open ID']");
+    }
     $this->click("_qf_Display_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
@@ -339,7 +355,7 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
     $this->click("address_1_country_id");
     $this->select("address_1_country_id", "value=" . $this->webtestGetValidCountryID());
 
-    if ($this->assertElementContainsText('address_1', "Latitude")) {
+    if ($this->assertElementContainsText('address_table_1', "Latitude")) {
       $this->type("address_1_geo_code_1", "1234");
       $this->type("address_1_geo_code_2", "5678");
     }
@@ -368,7 +384,7 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
     $this->click("tagGroup");
 
     // select group
-    $this->select("crmasmSelect0", "label=$groupName");
+    $this->select("group", "label=$groupName");
 
     $this->click("tag[{$this->webtestGetValidEntityID('Tag')}]");
 
@@ -379,7 +395,7 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
     $this->waitForText('crm-notification-container', "Contact Saved");
   }
 
-  function testIndividualAddWithSharedAddress() {
+  public function testIndividualAddWithSharedAddress() {
     $this->webtestLogin();
 
     $this->openCiviPage('contact/add', "reset=1&ct=Individual");
@@ -402,8 +418,6 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
     //create new current employer
     $currentEmployer = substr(sha1(rand()), 0, 7) . "Web Access";
 
-    $this->type('current_employer', $currentEmployer);
-
     //fill in email
     $this->type("email_1_email", substr(sha1(rand()), 0, 7) . "john@gmail.com");
 
@@ -422,10 +436,11 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
     $this->click('address[1][use_shared_address]');
 
     // create new organization with dialog
-    $this->select("profiles_1", "label=New Organization");
+    $this->clickAt("xpath=//div[@id='s2id_address_1_master_contact_id']/a");
+    $this->click("xpath=//li[@class='select2-no-results']//a[contains(text(),' New Organization')]");
 
     // create new contact using dialog
-    $this->waitForElementPresent("css=div#contact-dialog-1");
+    $this->waitForElementPresent("css=div#crm-profile-block");
     $this->waitForElementPresent("_qf_Edit_next");
 
     $this->type('organization_name', $currentEmployer);
@@ -433,11 +448,11 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
     $this->type("email-Primary", "john@gmail.com" . substr(sha1(rand()), 0, 7));
     $this->type('city-1', 'Dumfries');
     $this->type('postal_code-1', '1234');
+    $this->select('state_province-1', 'value=1001');
 
     $this->click("_qf_Edit_next");
 
-    // Is new contact created?
-    $this->waitForText('crm-notification-container', "$currentEmployer has been created.");
+    $this->select2('employer_id', $currentEmployer);
 
     //make sure shared address is selected
     $this->waitForElementPresent('selected_shared_address-1');
@@ -451,10 +466,11 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
     $this->click('address[2][use_shared_address]');
 
     // create new household with dialog
-    $this->select('profiles_2', "label=New Household");
+    $this->clickAt("xpath=//div[@id='s2id_address_2_master_contact_id']/a");
+    $this->click("xpath=//li[@class='select2-no-results']//a[contains(text(),' New Household')]");
 
     // create new contact using dialog
-    $this->waitForElementPresent("css=div#contact-dialog-2");
+    $this->waitForElementPresent("css=div#crm-profile-block");
     $this->waitForElementPresent("_qf_Edit_next");
 
     $sharedHousehold = substr(sha1(rand()), 0, 7) . 'Smith Household';
@@ -463,11 +479,9 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
     $this->type("email-Primary", substr(sha1(rand()), 0, 7) . "john@gmail.com");
     $this->type('city-1', 'Birmingham');
     $this->type('postal_code-1', '3456');
+    $this->select('state_province-1', 'value=1001');
 
     $this->click("_qf_Edit_next");
-
-    // Is new contact created?
-    $this->waitForText('crm-notification-container', "$sharedHousehold has been created.");
 
     //make sure shared address is selected
     $this->waitForElementPresent('selected_shared_address-2');
@@ -489,8 +503,65 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
     // make sure relationships are created
     $this->click("xpath=id('tab_rel')/a");
     $this->waitForElementPresent('permission-legend');
-    $this->assertElementContainsText('option11', 'Employee of');
-    $this->assertElementContainsText('option11', 'Household Member of');
+    $this->assertElementContainsText('DataTables_Table_0', 'Employee of');
+    $this->assertElementContainsText('DataTables_Table_0', 'Household Member of');
   }
-}
 
+  public function testContactDeceased() {
+    $this->webtestLogin();
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->openCiviPage('contact/add', 'reset=1&ct=Individual');
+    //contact details section
+    //fill in first name
+    $fname = substr(sha1(rand()), 0, 7) . "John";
+    $lname = substr(sha1(rand()), 0, 7) . "Smith";
+    $this->type("first_name", $fname);
+    //fill in last name
+    $this->type("last_name", $lname);
+    //fill in email
+    $this->type("email_1_email", substr(sha1(rand()), 0, 7) . "john@gmail.com");
+    // Clicking save.
+    $this->click("_qf_Contact_upload_view");
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForText('crm-notification-container', "Contact Saved");
+    //Edit Contact
+    $cid = $this->urlArg('cid');
+    $dname = $fname . ' ' . $lname . ' (deceased)';
+    foreach (array('', 'deceased') as $val) {
+      $this->openCiviPage("contact/add", "reset=1&action=update&cid={$cid}");
+      if ($val) {
+        $this->assertElementContainsText('page-title', 'Edit ' . $dname);
+      }
+      // Click on the Demographics tab
+      $this->click('demographics');
+      $this->waitForElementPresent('is_deceased');
+      $this->click('is_deceased');
+      // Click on Save
+      $this->click('_qf_Contact_upload_view-bottom');
+      $this->waitForPageToLoad($this->getTimeoutMsec());
+      if (!$val) {
+        $this->assertElementContainsText('css=div.crm-summary-display_name', $dname);
+      }
+      else {
+        $this->assertTrue(($this->getText('css=div.crm-summary-display_name') != $dname));
+      }
+    }
+    foreach (array('', 'deceased') as $val) {
+      $this->mouseDown('crm-demographic-content');
+      $this->mouseUp('crm-demographic-content');
+      $this->waitForElementPresent("css=#crm-demographic-content .crm-container-snippet form");
+      $this->click('is_deceased');
+      $this->click("css=#crm-demographic-content input.crm-form-submit");
+      $this->waitForElementPresent("css=#crm-demographic-content > .crm-inline-block-content");
+      if (!$val) {
+        $this->assertElementContainsText('css=div.crm-summary-display_name', $dname);
+      }
+      else {
+        $this->assertTrue(($this->getText('css=div.crm-summary-display_name') != $dname));
+      }
+    }
+    $this->openCiviPage("contact/add", "reset=1&action=update&cid={$cid}");
+    $this->assertTrue(($this->getText('page-title') != $dname));
+  }
+
+}

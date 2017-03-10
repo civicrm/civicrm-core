@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,16 +24,13 @@
  +--------------------------------------------------------------------+
 *}
 {* Relationship tab within View Contact - browse, and view relationships for a contact *}
-{if !empty($cdType) }
-  {include file="CRM/Custom/Form/CustomData.tpl"}
-{elseif $action neq 16} {* add, update or view *}
+{if $action neq 16} {* add, update or view *}
   {include file="CRM/Contact/Form/Relationship.tpl"}
 {else}
-  <div class="view-content">
+  <div id="contact-summary-relationship-tab" class="view-content">
     {if $permission EQ 'edit'}
       <div class="action-link">
-        <a accesskey="N" href="{crmURL p='civicrm/contact/view/rel' q="cid=`$contactId`&action=add&reset=1"}"
-           class="button"><span><div class="icon add-icon"></div>{ts}Add Relationship{/ts}</span></a>
+        {crmButton accesskey="N"  p='civicrm/contact/view/rel' q="cid=`$contactId`&action=add&reset=1" icon="plus-circle"}{ts}Add Relationship{/ts}{/crmButton}
       </div>
     {/if}
 
@@ -54,5 +51,15 @@
   </div>
 
   {include file="CRM/common/enableDisableApi.tpl"}
+  {literal}
+  <script type="text/javascript">
+    CRM.$(function($) {
+      // Changing relationships may affect related members and contributions. Ensure they are refreshed.
+      $('#contact-summary-relationship-tab').on('crmPopupFormSuccess', function() {
+        CRM.tabHeader.resetTab('#tab_contribute');
+        CRM.tabHeader.resetTab('#tab_member');
+      });
+    });
+  </script>
+  {/literal}
 {/if} {* close of custom data else*}
-

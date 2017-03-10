@@ -1,16 +1,12 @@
 <?php
 
-require_once 'CiviTest/CiviUnitTestCase.php';
+/**
+ * Class CRM_Core_DAOTest
+ * @group headless
+ */
 class CRM_Core_DAOTest extends CiviUnitTestCase {
-  function get_info() {
-    return array(
-      'name'    => 'DAO',
-      'description' => 'Test core DAO functions',
-      'group'     => 'Core',
-    );
-  }
 
-  function testGetReferenceColumns() {
+  public function testGetReferenceColumns() {
     // choose CRM_Core_DAO_Email as an arbitrary example
     $emailRefs = CRM_Core_DAO_Email::getReferenceColumns();
     $refsByTarget = array();
@@ -21,10 +17,10 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     $contactRef = $refsByTarget['civicrm_contact'];
     $this->assertEquals('contact_id', $contactRef->getReferenceKey());
     $this->assertEquals('id', $contactRef->getTargetKey());
-    $this->assertEquals(FALSE, $contactRef->isGeneric());
+    $this->assertEquals('CRM_Core_Reference_Basic', get_class($contactRef));
   }
 
-  function testGetReferencesToTable() {
+  public function testGetReferencesToTable() {
     $refs = CRM_Core_DAO::getReferencesToTable(CRM_Financial_DAO_FinancialType::getTableName());
     $refsBySource = array();
     foreach ($refs as $refSpec) {
@@ -35,10 +31,10 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     $this->assertEquals('entity_id', $genericRef->getReferenceKey());
     $this->assertEquals('entity_table', $genericRef->getTypeColumn());
     $this->assertEquals('id', $genericRef->getTargetKey());
-    $this->assertEquals(TRUE, $genericRef->isGeneric());
+    $this->assertEquals('CRM_Core_Reference_Dynamic', get_class($genericRef));
   }
 
-  function testFindReferences() {
+  public function testFindReferences() {
     $params = array(
       'first_name' => 'Testy',
       'last_name' => 'McScallion',
@@ -69,7 +65,10 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     $this->assertEquals($contact->id, $refDao->contact_id);
   }
 
-  function composeQueryExamples() {
+  /**
+   * @return array
+   */
+  public function composeQueryExamples() {
     $cases = array();
     // $cases[] = array('Input-SQL', 'Input-Params', 'Expected-SQL');
 
@@ -133,20 +132,25 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
 
   /**
    * @dataProvider composeQueryExamples
+   * @param $inputSql
+   * @param $inputParams
+   * @param $expectSql
    */
-  function testComposeQuery($inputSql, $inputParams, $expectSql) {
+  public function testComposeQuery($inputSql, $inputParams, $expectSql) {
     $actualSql = CRM_Core_DAO::composeQuery($inputSql, $inputParams);
     $this->assertEquals($expectSql, $actualSql);
   }
 
-  // CASE: Two params where the %2 is already present in the query
-  // NOTE: This case should rightly FAIL, as using strstr in the replace mechanism will turn
-  // the query into: SELECT * FROM whatever WHERE name = 'Alice' AND title = 'Bob' AND year LIKE ''Bob'012'
-  // So, to avoid such ERROR, the query should be framed like:
-  // 'SELECT * FROM whatever WHERE name = %1 AND title = %3 AND year LIKE '%2012'
-  // $params[3] = array('Bob', 'String');
-  // i.e. the place holder should be unique and should not contain in any other operational use in query
-  function testComposeQueryFailure() {
+  /**
+   * CASE: Two params where the %2 is already present in the query
+   * NOTE: This case should rightly FAIL, as using strstr in the replace mechanism will turn
+   * the query into: SELECT * FROM whatever WHERE name = 'Alice' AND title = 'Bob' AND year LIKE ''Bob'012'
+   * So, to avoid such ERROR, the query should be framed like:
+   * 'SELECT * FROM whatever WHERE name = %1 AND title = %3 AND year LIKE '%2012'
+   * $params[3] = array('Bob', 'String');
+   * i.e. the place holder should be unique and should not contain in any other operational use in query
+   */
+  public function testComposeQueryFailure() {
     $cases[] = array(
       'SELECT * FROM whatever WHERE name = %1 AND title = %2 AND year LIKE \'%2012\' ',
       array(
@@ -160,23 +164,148 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     $this->assertFalse(($expectSql == $actualSql));
   }
 
-  function sqlNameDataProvider() {
+  /**
+   * @return array
+   */
+  public function sqlNameDataProvider() {
     return array(
       array('this is a long string', 30, FALSE, 'this is a long string'),
-
-      array('this is an even longer string which is exactly 60 character', 60, FALSE, 'this is an even longer string which is exactly 60 character'),
-      array('this is an even longer string which is exactly 60 character', 60, TRUE , 'this is an even longer string which is exactly 60 character'),
-
-      array('this is an even longer string which is a bit more than 60 character', 60, FALSE, 'this is an even longer string which is a bit more than 60 ch'),
-      array('this is an even longer string which is a bit more than 60 character', 60, TRUE , 'this is an even longer string which is a bit more th_c1cbd519'),
+      array(
+        'this is an even longer string which is exactly 60 character',
+        60,
+        FALSE,
+        'this is an even longer string which is exactly 60 character',
+      ),
+      array(
+        'this is an even longer string which is exactly 60 character',
+        60,
+        TRUE,
+        'this is an even longer string which is exactly 60 character',
+      ),
+      array(
+        'this is an even longer string which is a bit more than 60 character',
+        60,
+        FALSE,
+        'this is an even longer string which is a bit more than 60 ch',
+      ),
+      array(
+        'this is an even longer string which is a bit more than 60 character',
+        60,
+        TRUE,
+        'this is an even longer string which is a bit more th_c1cbd519',
+      ),
     );
   }
 
   /**
    * @dataProvider sqlNameDataProvider
+   * @param $inputData
+   * @param $length
+   * @param $makeRandom
+   * @param $expectedResult
    */
-  function testShortenSQLName($inputData, $length, $makeRandom, $expectedResult) {
+  public function testShortenSQLName($inputData, $length, $makeRandom, $expectedResult) {
     $this->assertEquals($expectedResult, CRM_Core_DAO::shortenSQLName($inputData, $length, $makeRandom));
+  }
+
+  public function testFindById() {
+    $params = $this->sampleContact('Individual', 4);
+    $existing_contact = CRM_Contact_BAO_Contact::add($params);
+    $contact = CRM_Contact_BAO_Contact::findById($existing_contact->id);
+    $this->assertEquals($existing_contact->id, $contact->id);
+    $deleted_contact_id = $existing_contact->id;
+    CRM_Contact_BAO_Contact::deleteContact($contact->id, FALSE, TRUE);
+    $exception_thrown = FALSE;
+    try {
+      $deleted_contact = CRM_Contact_BAO_Contact::findById($deleted_contact_id);
+    }
+    catch (Exception $e) {
+      $exception_thrown = TRUE;
+    }
+    $this->assertTrue($exception_thrown);
+  }
+
+  /**
+   * requireSafeDBName() method (to check valid database name)
+   */
+  public function testRequireSafeDBName() {
+    $databases = array(
+      'testdb' => TRUE,
+      'test_db' => TRUE,
+      'TEST_db' => TRUE,
+      '123testdb' => TRUE,
+      'test12db34' => TRUE,
+      'test_12_db34' => TRUE,
+      'test-db' => TRUE,
+      'test;db' => FALSE,
+      'test*&db' => FALSE,
+      'testdb;Delete test' => FALSE,
+      '123456' => FALSE,
+      'test#$%^&*' => FALSE,
+    );
+    $testDetails = array();
+    foreach ($databases as $database => $val) {
+      $this->assertEquals(CRM_Core_DAO::requireSafeDBName($database), $val);
+    }
+  }
+
+  /**
+   * Test the function designed to find myIsam tables.
+   */
+  public function testMyISAMCheck() {
+    // Cleanup previous, failed tests.
+    CRM_Core_DAO::executeQuery('DROP TABLE IF EXISTS civicrm_my_isam');
+
+    // A manually created MyISAM table should raise a redflag.
+    $this->assertEquals(0, CRM_Core_DAO::isDBMyISAM());
+    CRM_Core_DAO::executeQuery('CREATE TABLE civicrm_my_isam (`id` int(10) unsigned NOT NULL) ENGINE = MyISAM');
+    $this->assertEquals(1, CRM_Core_DAO::isDBMyISAM());
+    CRM_Core_DAO::executeQuery('DROP TABLE civicrm_my_isam');
+
+    // A temp table should not raise flag (static naming).
+    $tempName = CRM_Core_DAO::createTempTableName('civicrm', FALSE);
+    $this->assertEquals(0, CRM_Core_DAO::isDBMyISAM());
+    CRM_Core_DAO::executeQuery("CREATE TABLE $tempName (`id` int(10) unsigned NOT NULL) ENGINE = MyISAM");
+    $this->assertEquals(0, CRM_Core_DAO::isDBMyISAM()); // Ignore temp tables
+    CRM_Core_DAO::executeQuery("DROP TABLE $tempName");
+
+    // A temp table should not raise flag (randomized naming).
+    $tempName = CRM_Core_DAO::createTempTableName('civicrm', TRUE);
+    $this->assertEquals(0, CRM_Core_DAO::isDBMyISAM());
+    CRM_Core_DAO::executeQuery("CREATE TABLE $tempName (`id` int(10) unsigned NOT NULL) ENGINE = MyISAM");
+    $this->assertEquals(0, CRM_Core_DAO::isDBMyISAM()); // Ignore temp tables
+    CRM_Core_DAO::executeQuery("DROP TABLE $tempName");
+  }
+
+  /**
+   * CRM-19930: Test toArray() function with $format param
+   */
+  public function testDAOtoArray() {
+    $format = 'user[%s]';
+    $params = array(
+      'first_name' => 'Testy',
+      'last_name' => 'McScallion',
+      'contact_type' => 'Individual',
+    );
+
+    $dao = CRM_Contact_BAO_Contact::add($params);
+    $query = "SELECT contact_type, display_name FROM civicrm_contact WHERE id={$dao->id}";
+    $toArray = array(
+      'contact_type' => 'Individual',
+      'display_name' => 'Testy McScallion',
+    );
+    $modifiedKeyArray = array();
+    foreach ($toArray as $k => $v) {
+      $modifiedKeyArray[sprintf($format, $k)] = $v;
+    }
+
+    $dao = CRM_Core_DAO::executeQuery($query);
+    while ($dao->fetch()) {
+      $daoToArray = $dao->toArray();
+      $this->checkArrayEquals($toArray, $daoToArray);
+      $daoToArray = $dao->toArray($format);
+      $this->checkArrayEquals($modifiedKeyArray, $daoToArray);
+    }
   }
 
 }

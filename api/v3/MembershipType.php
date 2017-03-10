@@ -1,10 +1,9 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,56 +23,51 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
- * File for the CiviCRM APIv3 membership type functions
+ * This api exposes CiviCRM membership type.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_Membership
- *
- * @copyright CiviCRM LLC (c) 2004-2013
- * @version $Id: MembershipType.php 30171 2010-10-14 09:11:27Z mover $
- *
  */
 
 /**
- * API to Create or update a Membership Type
+ * API to Create or update a Membership Type.
  *
- * @param   array  $params  an associative array of name/value property values of civicrm_membership_type
+ * @param array $params
+ *   Array of name/value property values of civicrm_membership_type.
  *
- * @return array $result newly created or updated membership type property values.
- * @access public
- * {getfields MembershipType_get}
+ * @return array
+ *   API result array.
  */
 function civicrm_api3_membership_type_create($params) {
-  $ids['membershipType'] = CRM_Utils_Array::value('id', $params);
-  $ids['memberOfContact'] = CRM_Utils_Array::value('member_of_contact_id', $params);
-  $ids['contributionType'] = CRM_Utils_Array::value('financial_type_id', $params);
-
-  $membershipTypeBAO = CRM_Member_BAO_MembershipType::add($params, $ids);
-  $membershipType = array();
-  _civicrm_api3_object_to_array($membershipTypeBAO, $membershipType[$membershipTypeBAO->id]);
-  CRM_Member_PseudoConstant::membershipType(NULL, TRUE);
-  civicrm_api3('membership', 'getfields', array('cache_clear' => 1, 'fieldname' => 'membership_type_id'));
-  civicrm_api3('profile', 'getfields', array('action' => 'submit', 'cache_clear' => 1));
-  return civicrm_api3_create_success($membershipType, $params, 'membership_type', 'create', $membershipTypeBAO);
+  // Workaround for fields using nonstandard serialization
+  foreach (array('relationship_type_id', 'relationship_direction') as $field) {
+    if (isset($params[$field]) && is_array($params[$field])) {
+      $params[$field] = implode(CRM_Core_DAO::VALUE_SEPARATOR, $params[$field]);
+    }
+  }
+  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'Membership_type');
 }
 
 /**
- * Adjust Metadata for Create action
+ * Adjust Metadata for Create action.
  *
- * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * The metadata is used for setting defaults, documentation & validation.
+ *
+ * @param array $params
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_membership_type_create_spec(&$params) {
   // todo could set default here probably
   $params['domain_id']['api.required'] = 1;
   $params['member_of_contact_id']['api.required'] = 1;
-  $params['financial_type_id']['api.required'] =1;
+  $params['financial_type_id']['api.required'] = 1;
   $params['name']['api.required'] = 1;
   $params['duration_unit']['api.required'] = 1;
   $params['duration_interval']['api.required'] = 1;
+  $params['period_type']['api.required'] = 1;
+  $params['is_active']['api.default'] = 1;
 }
 
 /**
@@ -81,29 +75,54 @@ function _civicrm_api3_membership_type_create_spec(&$params) {
  *
  * This api is used for finding an existing membership type.
  *
- * @param  array $params  an associative array of name/value property values of civicrm_membership_type
- * {getfields MembershipType_get}
+ * @param array $params
+ *   Array of name/value property values of civicrm_membership_type.
  *
- * @return  Array of all found membership type property values.
- * @access public
+ * @return array
+ *   API result array.
  */
 function civicrm_api3_membership_type_get($params) {
-  return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+  $results = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+  if (!empty($results['values']) && is_array($results['values'])) {
+    foreach ($results['values'] as &$item) {
+      // Workaround for fields using nonstandard serialization
+      foreach (array('relationship_type_id', 'relationship_direction') as $field) {
+        if (isset($item[$field]) && !is_array($item[$field])) {
+          $item[$field] = (array) $item[$field];
+        }
+      }
+    }
+  }
+  return $results;
 }
 
 /**
- * Deletes an existing membership type
+ * Adjust input for getlist action.
  *
- * This API is used for deleting a membership type
- * Required parrmeters : id of a membership type
+ * We want to only return active membership types for getlist. It's a bit
+ * arguable whether this should be applied at the 'get' level but, since it's hard
+ * to unset we'll just do it here.
  *
- * @param  Array   $params  an associative array of name/value property values of civicrm_membership_type
+ * The usage of getlist is entity-reference fields & the like
+ * so using only active ones makes sense.
  *
- * @return boolean        true if success, else false
- * @access public
- * {getfields MembershipType_delete}
+ * @param array $request
+ *   Array of parameters determined by getfields.
+ */
+function _civicrm_api3_membership_type_getlist_params(&$request) {
+  if (!isset($request['params']['is_active']) && empty($request['params']['id'])) {
+    $request['params']['is_active'] = 1;
+  }
+}
+
+/**
+ * Deletes an existing membership type.
+ *
+ * @param array $params
+ *
+ * @return array
+ *   API result array.
  */
 function civicrm_api3_membership_type_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
-

@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -30,8 +30,7 @@
 <div class="crm-content-block">
 {if $action ne 1 and $action ne 2}
       <div class="action-link">
-        <a href="{crmURL p="civicrm/event/add" q="action=add&is_template=1&reset=1"}" id="newEventTemplate" class="button">
-        <span><div class="icon add-icon"></div>{ts}Add Event Template{/ts}</span></a>
+        {crmButton p="civicrm/event/add" q="action=add&is_template=1&reset=1" id="newEventTemplate"  icon="plus-circle"}{ts}Add Event Template{/ts}{/crmButton}
         <div class="clear"></div>
       </div>
 {/if}

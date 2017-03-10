@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -63,9 +63,9 @@
             <td>{$row.in_date|crmDate}</td>
             <td>
               {if $permission EQ 'edit'}
-                <a class="action-item action-item-first" href="#Removed" title="{ts 1=$displayName 2=$row.title}Remove %1 from %2? (status in this group will be changed to 'Removed').{/ts}">
+                <a class="action-item crm-hover-button" href="#Removed" title="{ts 1=$displayName 2=$row.title}Remove %1 from %2? (status in this group will be changed to 'Removed').{/ts}">
                   {ts}Remove{/ts}</a>
-                <a class="action-item" href="#Deleted" title="{ts 1=$displayName 2=$row.title}Delete %1 from %2? (remove contact AND delete their record of having been in this group).{/ts}">
+                <a class="action-item crm-hover-button" href="#Deleted" title="{ts 1=$displayName 2=$row.title}Delete %1 from %2? (remove contact AND delete their record of having been in this group).{/ts}">
                   {ts}Delete{/ts}</a>
               {/if}
             </td>
@@ -76,6 +76,7 @@
   {/if}
 
   {if $contactSmartGroupSettings neq 3}
+    <div class="spacer" style="height: 1.5em;"></div>
     <div class="accordion ui-accordion ui-widget ui-helper-reset">
       <div class="crm-accordion-wrapper crm-ajax-accordion crm-smartgroup-accordion {if $contactSmartGroupSettings eq 1}collapsed{/if}">
         <div class="crm-accordion-header" id="crm-contact_smartgroup" contact_id="{$contactId}">
@@ -83,7 +84,7 @@
         </div>
         <!-- /.crm-accordion-header -->
         <div class="crm-accordion-body">
-          <div class="crm-contact_smartgroup"></div>
+          <div class="crm-contact_smartgroup" style="min-height: 3em;"></div>
         </div>
         <!-- /.crm-accordion-body -->
       </div>
@@ -116,9 +117,9 @@
             <td>{$row.pending_date|crmDate}</td>
             <td>
               {if $permission EQ 'edit'}
-                <a class="action-item action-item-first" href="#Removed" title="{ts 1=$displayName 2=$row.title}Remove %1 from %2? (status in this group will be changed to 'Removed').{/ts}">
+                <a class="action-item crm-hover-button" href="#Removed" title="{ts 1=$displayName 2=$row.title}Remove %1 from %2? (status in this group will be changed to 'Removed').{/ts}">
                   {ts}Remove{/ts}</a>
-                <a class="action-item" href="#Deleted" title="{ts 1=$displayName 2=$row.title}Delete %1 from %2? (this group will no longer be listed under Pending Groups){/ts}">
+                <a class="action-item crm-hover-button" href="#Deleted" title="{ts 1=$displayName 2=$row.title}Delete %1 from %2? (this group will no longer be listed under Pending Groups){/ts}">
                   {ts}Delete{/ts}</a>
               {/if}
             </td>
@@ -151,12 +152,12 @@
               </a>
             </td>
             <td class="status-removed">{ts 1=$row.out_method}Removed (by %1){/ts}</td>
-            <td>{$row.date_added|crmDate}</td>
-            <td>{$row.out_date|crmDate}</td>
+            <td data-order="{$row.date_added}">{$row.date_added|crmDate}</td>
+            <td data-order="{$row.out_date}">{$row.out_date|crmDate}</td>
             <td>{if $permission EQ 'edit'}
-                <a class="action-item action-item-first" href="#Added" title="{ts 1=$displayName 2=$row.title}Add %1 back into %2?{/ts}">
+                <a class="action-item crm-hover-button" href="#Added" title="{ts 1=$displayName 2=$row.title}Add %1 back into %2?{/ts}">
                   {ts}Rejoin Group{/ts}</a>
-              <a class="action-item" href="#Deleted" title="{ts 1=$displayName 2=$row.title}Delete %1 from %2? (this group will no longer be listed under Past Groups).{/ts}">
+              <a class="action-item crm-hover-button" href="#Deleted" title="{ts 1=$displayName 2=$row.title}Delete %1 from %2? (this group will no longer be listed under Past Groups).{/ts}">
                 {ts}Delete{/ts}</a>{/if}
             </td>
           </tr>
@@ -169,14 +170,13 @@
 
 {literal}
 <script type="text/javascript">
-  cj(function($) {
+  CRM.$(function($) {
     // load panes function calls for snippet based on id of crm-accordion-header
     function loadPanes() {
-      var id = $(this).attr('id');
+      var $el = $(this).parent().find('div.crm-contact_smartgroup');
       var contactId = $(this).attr('contact_id');
-      if (!$('div.' + id).html()) {
-        var loading = '<img src="{/literal}{$config->resourceBase}i/loading.gif{literal}" alt="{/literal}{ts escape='js'}loading{/ts}{literal}" />&nbsp;{/literal}{ts escape='js'}Loading{/ts}{literal}...';
-        $('div.' + id).html(loading).load(CRM.url('civicrm/contact/view/smartgroup', {snippet: 4, cid: contactId}));
+      if (!$el.html()) {
+        CRM.loadPage(CRM.url('civicrm/contact/view/smartgroup', {cid: contactId}), {target: $el});
       }
     }
     // bind first click of accordion header to load crm-accordion-body with snippet
@@ -185,7 +185,7 @@
     // Handle enable/delete links
     var that;
     function refresh() {
-      $(that).closest('.crm-ajax-container, #crm-main-content-wrapper').crmSnippet().crmSnippet('refresh');
+      CRM.refreshParent(that);
     }
     function enableDisableGroup() {
       var params = {
@@ -199,11 +199,8 @@
         params.status = status;
       }
       // This api is weird - 'delete' actually works for updating as well as deleting
-      CRM.api('group_contact', 'delete', params, {success: function() {
-        refresh();
-        // Normally you wouldn't put a variable within ts() but this works due to smarty hack below
-        CRM.alert('', ts(status), 'success');
-      }});
+      // Normally you wouldn't put a variable within ts() but this works due to smarty hack below
+      CRM.api3('group_contact', 'delete', params, {success: ts(status)}).done(refresh);
     }
     $('.view-contact-groups a.action-item').click(function() {
       that = this;

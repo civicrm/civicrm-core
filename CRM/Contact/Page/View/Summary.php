@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,31 +23,25 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
  * Main page for viewing contact.
- *
  */
 class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
 
   /**
-   * Heart of the viewing process. The runner gets all the meta data for
-   * the contact and calls the appropriate type of page to view.
+   * Heart of the viewing process.
    *
-   * @return void
-   * @access public
-   *
+   * The runner gets all the meta data for the contact and calls the appropriate type of page to view.
    */
-  function preProcess() {
+  public function preProcess() {
     parent::preProcess();
 
     // actions buttom contextMenu
@@ -62,16 +56,14 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
         trim($entitySubType, CRM_Core_DAO::VALUE_SEPARATOR)
       );
     }
-    $groupTree = &CRM_Core_BAO_CustomGroup::getTree($entityType,
+    $groupTree = CRM_Core_BAO_CustomGroup::getTree($entityType,
       $this,
       $this->_contactId,
       NULL,
       $entitySubType
     );
 
-    CRM_Core_BAO_CustomGroup::buildCustomDataView($this,
-      $groupTree
-    );
+    CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree, FALSE, NULL, NULL, NULL, $this->_contactId);
 
     // also create the form element for the activity links box
     $controller = new CRM_Core_Controller_Simple(
@@ -87,14 +79,11 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
   }
 
   /**
-   * Heart of the viewing process. The runner gets all the meta data for
-   * the contact and calls the appropriate type of page to view.
+   * Heart of the viewing process.
    *
-   * @return void
-   * @access public
-   *
+   * The runner gets all the meta data for the contact and calls the appropriate type of page to view.
    */
-  function run() {
+  public function run() {
     $this->preProcess();
 
     if ($this->_action & CRM_Core_Action::UPDATE) {
@@ -108,12 +97,9 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
   }
 
   /**
-   * Edit name and address of a contact
-   *
-   * @return void
-   * @access public
+   * Edit name and address of a contact.
    */
-  function edit() {
+  public function edit() {
     // set the userContext stack
     $session = CRM_Core_Session::singleton();
     $url = CRM_Utils_System::url('civicrm/contact/view', 'reset=1&cid=' . $this->_contactId);
@@ -126,18 +112,14 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
   }
 
   /**
-   * View summary details of a contact
-   *
-   * @return void
-   * @access public
+   * View summary details of a contact.
    */
-  function view() {
+  public function view() {
     // Add js for tabs, in-place editing, and jstree for tags
     CRM_Core_Resources::singleton()
-      ->addScriptFile('civicrm', 'templates/CRM/Contact/Page/View/Summary.js')
-      ->addScriptFile('civicrm', 'packages/jquery/plugins/jstree/jquery.jstree.js', 0, 'html-header', FALSE)
-      ->addStyleFile('civicrm', 'packages/jquery/plugins/jstree/themes/default/style.css', 0, 'html-header')
-      ->addScriptFile('civicrm', 'templates/CRM/common/TabHeader.js')
+      ->addScriptFile('civicrm', 'templates/CRM/Contact/Page/View/Summary.js', 2, 'html-header')
+      ->addStyleFile('civicrm', 'css/contactSummary.css', 2, 'html-header')
+      ->addScriptFile('civicrm', 'templates/CRM/common/TabHeader.js', 1, 'html-header')
       ->addSetting(array(
         'summaryPrint' => array('mode' => $this->_print),
         'tabSettings' => array('active' => CRM_Utils_Request::retrieve('selectedChild', 'String', $this, FALSE, 'summary')),
@@ -146,14 +128,17 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
     $session = CRM_Core_Session::singleton();
     $url = CRM_Utils_System::url('civicrm/contact/view', 'reset=1&cid=' . $this->_contactId);
     $session->pushUserContext($url);
+    $this->assignFieldMetadataToTemplate('Contact');
 
-    $params   = array();
+    $params = array();
     $defaults = array();
-    $ids      = array();
 
     $params['id'] = $params['contact_id'] = $this->_contactId;
     $params['noRelationships'] = $params['noNotes'] = $params['noGroups'] = TRUE;
     $contact = CRM_Contact_BAO_Contact::retrieve($params, $defaults, TRUE);
+    // Let summary page know if outbound mail is disabled so email links can be built conditionally
+    $mailingBackend = Civi::settings()->get('mailing_backend');
+    $this->assign('mailingOutboundOption', $mailingBackend['outBound_option']);
 
     $communicationType = array(
       'phone' => array(
@@ -192,7 +177,7 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
         if (isset($value['customData'])) {
           foreach ($defaults[$key] as $blockId => $blockVal) {
             $idValue = $blockVal['id'];
-            if ( $key == 'address' ) {
+            if ($key == 'address') {
               if (!empty($blockVal['master_id'])) {
                 $idValue = $blockVal['master_id'];
               }
@@ -233,7 +218,8 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
     $contactTags = CRM_Core_BAO_EntityTag::getContactTags($this->_contactId);
 
     if (!empty($contactTags)) {
-      $defaults['contactTag'] = implode(', ', $contactTags);
+      $defaults['contactTag'] = $contactTags;
+      $defaults['allTags'] = CRM_Core_BAO_Tag::getTagsUsedFor('civicrm_contact', FALSE);
     }
 
     $defaults['privacy_values'] = CRM_Core_SelectValues::privacy();
@@ -271,11 +257,8 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
         $defaults['current_employer'] = $contact->organization_name;
         $defaults['current_employer_id'] = $contact->employer_id;
       }
-
-      //for birthdate format with respect to birth format set
-      $this->assign('birthDateViewFormat', CRM_Utils_Array::value('qfMapping', CRM_Utils_Date::checkBirthDateFormat()));
     }
-    
+
     $defaults['external_identifier'] = $contact->external_identifier;
     $this->assign($defaults);
 
@@ -328,8 +311,7 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
           'title' => $elem['title'],
           'weight' => $elem['weight'],
           'count' => CRM_Contact_BAO_Contact::getCountComponent($u, $this->_contactId),
-          // CiviCase UI not yet compatible with livePage popups
-          'class' => $u == 'case' ? '' : 'livePage',
+          'class' => 'livePage',
         );
         // make sure to get maximum weight, rest of tabs go after
         // FIXME: not very elegant again
@@ -395,12 +377,23 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
         'title' => $group['title'],
         'weight' => $weight,
         'count' => CRM_Contact_BAO_Contact::getCountComponent($id, $this->_contactId, $group['table_name']),
+        'hideCount' => !$group['is_multiple'],
+        'class' => 'livePage',
       );
       $weight += 10;
     }
 
+    $context = array('contact_id' => $this->_contactId);
     // see if any other modules want to add any tabs
     CRM_Utils_Hook::tabs($allTabs, $this->_contactId);
+    CRM_Utils_Hook::tabset('civicrm/contact/view', $allTabs, $context);
+
+    $allTabs[] = array(
+      'id' => 'summary',
+      'url' => '#contact-summary',
+      'title' => ts('Summary'),
+      'weight' => 0,
+    );
 
     // now sort the tabs based on weight
     usort($allTabs, array('CRM_Utils_Sort', 'cmpFunc'));
@@ -417,10 +410,12 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
     }
   }
 
-  function getTemplateFileName() {
+  /**
+   * @return string
+   */
+  public function getTemplateFileName() {
     if ($this->_contactId) {
-      $contactSubtypes = $this->get('contactSubtype') ? 
-        explode(CRM_Core_DAO::VALUE_SEPARATOR, $this->get('contactSubtype')) : array();
+      $contactSubtypes = $this->get('contactSubtype') ? explode(CRM_Core_DAO::VALUE_SEPARATOR, $this->get('contactSubtype')) : array();
 
       // there could be multiple subtypes. We check templates for each of the subtype, and return the first one found.
       foreach ($contactSubtypes as $csType) {
@@ -435,5 +430,5 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
     }
     return parent::getTemplateFileName();
   }
-}
 
+}

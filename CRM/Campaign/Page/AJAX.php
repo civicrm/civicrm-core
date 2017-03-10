@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2017
  *
  */
 
@@ -37,7 +37,7 @@
  */
 class CRM_Campaign_Page_AJAX {
 
-  static function registerInterview() {
+  public static function registerInterview() {
     $fields = array(
       'result',
       'voter_id',
@@ -53,8 +53,8 @@ class CRM_Campaign_Page_AJAX {
       $params[$fld] = CRM_Utils_Array::value($fld, $_POST);
     }
     $params['details'] = CRM_Utils_Array::value('note', $_POST);
-    $voterId           = $params['voter_id'];
-    $activityId        = $params['activity_id'];
+    $voterId = $params['voter_id'];
+    $activityId = $params['activity_id'];
 
     $customKey = "field_{$voterId}_custom";
     foreach ($_POST as $key => $value) {
@@ -92,8 +92,7 @@ class CRM_Campaign_Page_AJAX {
     $errors = CRM_Core_BAO_CustomField::validateCustomData($params);
     if (is_array($errors) && !empty($errors)) {
       $result['errors'] = $errors;
-      echo json_encode($result);
-      CRM_Utils_System::civiExit();
+      CRM_Utils_JSON::output($result);
     }
 
     //process the response/interview data.
@@ -102,15 +101,13 @@ class CRM_Campaign_Page_AJAX {
       $result['status'] = 'success';
     }
 
-    echo json_encode($result);
-
-    CRM_Utils_System::civiExit();
+    CRM_Utils_JSON::output($result);
   }
 
-  static function loadOptionGroupDetails() {
+  public static function loadOptionGroupDetails() {
 
-    $id       = CRM_Utils_Array::value('option_group_id', $_POST);
-    $status   = 'fail';
+    $id = CRM_Utils_Request::retrieve('option_group_id', 'Integer', CRM_Core_DAO::$_nullObject, FALSE, NULL, 'POST');
+    $status = 'fail';
     $opValues = array();
 
     if ($id) {
@@ -118,10 +115,10 @@ class CRM_Campaign_Page_AJAX {
       CRM_Core_OptionValue::getValues($groupParams, $opValues);
     }
 
-    $surveyId = CRM_Utils_Array::value('survey_id', $_POST);
+    $surveyId = CRM_Utils_Request::retrieve('survey_id', 'Integer', CRM_Core_DAO::$_nullObject, FALSE, NULL, 'POST');
     if ($surveyId) {
-      $survey            = new CRM_Campaign_DAO_Survey();
-      $survey->id        = $surveyId;
+      $survey = new CRM_Campaign_DAO_Survey();
+      $survey->id = $surveyId;
       $survey->result_id = $id;
       if ($survey->find(TRUE)) {
         if ($survey->recontact_interval) {
@@ -144,13 +141,13 @@ class CRM_Campaign_Page_AJAX {
       'result' => $opValues,
     );
 
-    echo json_encode($result);
-    CRM_Utils_System::civiExit();
+    CRM_Utils_JSON::output($result);
   }
 
-  function voterList() {
+  public function voterList() {
     //get the search criteria params.
-    $searchParams = explode(',', CRM_Utils_Array::value('searchCriteria', $_POST));
+    $searchCriteria = CRM_Utils_Request::retrieve('searchCriteria', 'String', CRM_Core_DAO::$_nullObject, FALSE, NULL, 'POST');
+    $searchParams = explode(',', $searchCriteria);
 
     $params = $searchRows = array();
     foreach ($searchParams as $param) {
@@ -161,7 +158,9 @@ class CRM_Campaign_Page_AJAX {
 
     //format multi-select group and contact types.
     foreach (array(
-      'group', 'contact_type') as $param) {
+               'group',
+               'contact_type',
+             ) as $param) {
       $paramValue = CRM_Utils_Array::value($param, $params);
       if ($paramValue) {
         unset($params[$param]);
@@ -174,7 +173,10 @@ class CRM_Campaign_Page_AJAX {
 
     $voterClauseParams = array();
     foreach (array(
-      'campaign_survey_id', 'survey_interviewer_id', 'campaign_search_voter_for') as $fld) {
+               'campaign_survey_id',
+               'survey_interviewer_id',
+               'campaign_search_voter_for',
+             ) as $fld) {
       $voterClauseParams[$fld] = CRM_Utils_Array::value($fld, $params);
     }
 
@@ -195,7 +197,9 @@ class CRM_Campaign_Page_AJAX {
         $groups = CRM_Utils_Array::value('group', $params);
         if ($campaignId && CRM_Utils_System::isNull($groups)) {
           $campaignGroups = CRM_Campaign_BAO_Campaign::getCampaignGroups($campaignId);
-          foreach ($campaignGroups as $id => $group) $params['group'][$id] = 1;
+          foreach ($campaignGroups as $id => $group) {
+            $params['group'][$id] = 1;
+          }
         }
 
         //apply filter of survey contact type for search.
@@ -230,7 +234,8 @@ class CRM_Campaign_Page_AJAX {
 
     // get the data table params.
     $dataTableParams = array(
-      'sEcho' => array('name' => 'sEcho',
+      'sEcho' => array(
+        'name' => 'sEcho',
         'type' => 'Integer',
         'default' => 0,
       ),
@@ -259,7 +264,9 @@ class CRM_Campaign_Page_AJAX {
       $$pName = $pValues['default'];
       if (!empty($_POST[$pValues['name']])) {
         $$pName = CRM_Utils_Type::escape($_POST[$pValues['name']], $pValues['type']);
-        if ($pName == 'sort')$$pName = $selectorCols[$$pName];
+        if ($pName == 'sort') {
+          $$pName = $selectorCols[$$pName];
+        }
       }
     }
 
@@ -285,8 +292,12 @@ class CRM_Campaign_Page_AJAX {
     $iTotal = $searchCount;
 
     $selectorCols = array(
-      'contact_type', 'sort_name', 'street_address',
-      'street_name', 'street_number', 'street_unit',
+      'contact_type',
+      'sort_name',
+      'street_address',
+      'street_name',
+      'street_number',
+      'street_unit',
     );
 
     $extraVoterColName = 'is_interview_conducted';
@@ -312,8 +323,7 @@ class CRM_Campaign_Page_AJAX {
       );
       while ($result->fetch()) {
         $contactID = $result->contact_id;
-        $typeImage = CRM_Contact_BAO_Contact_Utils::getImage($result->contact_sub_type ?
-          $result->contact_sub_type : $result->contact_type,
+        $typeImage = CRM_Contact_BAO_Contact_Utils::getImage($result->contact_sub_type ? $result->contact_sub_type : $result->contact_type,
           FALSE,
           $result->contact_id
         );
@@ -332,15 +342,15 @@ class CRM_Campaign_Page_AJAX {
           $voterExtraColHtml .= "&nbsp;<span id='success_msg_{$contactID}' class='ok' style='display:none;'>$msg</span>";
         }
         elseif ($searchVoterFor == 'gotv') {
-          $surveyActId       = $result->survey_activity_id;
+          $surveyActId = $result->survey_activity_id;
           $voterExtraColHtml = '<input type="checkbox" id="survey_activity[' . $surveyActId . ']" name="survey_activity[' . $surveyActId . ']" value=' . $surveyActId . ' onClick="processVoterData( this, \'gotv\' );" />';
-          $msg               = ts('Vote Recorded');
+          $msg = ts('Vote Recorded.');
           $voterExtraColHtml .= "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id='success_msg_{$surveyActId}' class='ok' style='display:none;'>$msg</span>";
         }
         else {
-          $surveyActId       = $result->survey_activity_id;
+          $surveyActId = $result->survey_activity_id;
           $voterExtraColHtml = '<input type="checkbox" id="survey_activity[' . $surveyActId . ']" name="survey_activity[' . $surveyActId . ']" value=' . $surveyActId . ' onClick="processVoterData( this, \'release\' );" />';
-          $msg               = ts('Vote Recorded');
+          $msg = ts('Vote Recorded.');
           $voterExtraColHtml .= "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id='success_msg_{$surveyActId}' class='ok' style='display:none;'>$msg</span>";
         }
         $searchRows[$contactID][$extraVoterColName] = $voterExtraColHtml;
@@ -351,11 +361,12 @@ class CRM_Campaign_Page_AJAX {
 
     $iFilteredTotal = $iTotal;
 
+    CRM_Utils_System::setHttpHeader('Content-Type', 'application/json');
     echo CRM_Utils_JSON::encodeDataTableSelector($searchRows, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
     CRM_Utils_System::civiExit();
   }
 
-  function processVoterData() {
+  public function processVoterData() {
     $status = NULL;
     $operation = CRM_Utils_Type::escape($_POST['operation'], 'String');
     if ($operation == 'release') {
@@ -406,8 +417,8 @@ class CRM_Campaign_Page_AJAX {
         }
       }
       if ($createActivity) {
-        $isReserved        = CRM_Utils_String::strtoboolstr(CRM_Utils_Type::escape($_POST['isReserved'], 'String'));
-        $activityStatus    = CRM_Core_PseudoConstant::activityStatus('name');
+        $isReserved = CRM_Utils_String::strtoboolstr(CRM_Utils_Type::escape($_POST['isReserved'], 'String'));
+        $activityStatus = CRM_Core_PseudoConstant::activityStatus('name');
         $scheduledStatusId = array_search('Scheduled', $activityStatus);
         if ($isReserved) {
           $surveyValues = array();
@@ -425,7 +436,7 @@ class CRM_Campaign_Page_AJAX {
             $surveytitle = $surveyValues['title'];
           }
 
-          $subject = ts('%1', array(1 => $surveytitle)) . ' - ' . ts('Respondent Reservation');
+          $subject = $surveytitle . ' - ' . ts('Respondent Reservation');
           $activityParams['subject'] = $subject;
           $activityParams['status_id'] = $scheduledStatusId;
           $activityParams['skipRecentView'] = 1;
@@ -480,17 +491,18 @@ class CRM_Campaign_Page_AJAX {
       }
     }
 
-    echo json_encode(array('status' => $status));
-    CRM_Utils_System::civiExit();
+    CRM_Utils_JSON::output(array('status' => $status));
   }
 
-  function allActiveCampaigns() {
+  public function allActiveCampaigns() {
     $currentCampaigns = CRM_Campaign_BAO_Campaign::getCampaigns();
-    $campaigns        = CRM_Campaign_BAO_Campaign::getCampaigns(NULL, NULL, TRUE, FALSE, TRUE);
-    $options          = array(
-      array('value' => '',
+    $campaigns = CRM_Campaign_BAO_Campaign::getCampaigns(NULL, NULL, TRUE, FALSE, TRUE);
+    $options = array(
+      array(
+        'value' => '',
         'title' => ts('- select -'),
-      ));
+      ),
+    );
     foreach ($campaigns as $value => $title) {
       $class = NULL;
       if (!array_key_exists($value, $currentCampaigns)) {
@@ -512,12 +524,10 @@ class CRM_Campaign_Page_AJAX {
       'campaigns' => $options,
     );
 
-    echo json_encode($results);
-
-    CRM_Utils_System::civiExit();
+    CRM_Utils_JSON::output($results);
   }
 
-  function campaignGroups() {
+  public function campaignGroups() {
     $surveyId = CRM_Utils_Request::retrieve('survey_id', 'Positive',
       CRM_Core_DAO::$_nullObject, FALSE, NULL, 'POST'
     );
@@ -535,9 +545,11 @@ class CRM_Campaign_Page_AJAX {
       $campGroups = CRM_Core_PseudoConstant::group();
     }
     $groups = array(
-      array('value' => '',
+      array(
+        'value' => '',
         'title' => ts('- select -'),
-      ));
+      ),
+    );
     foreach ($campGroups as $grpId => $title) {
       $groups[] = array(
         'value' => $grpId,
@@ -549,22 +561,21 @@ class CRM_Campaign_Page_AJAX {
       'groups' => $groups,
     );
 
-    echo json_encode($results);
-
-    CRM_Utils_System::civiExit();
+    CRM_Utils_JSON::output($results);
   }
 
   /**
-   * Retrieve campaigns as for campaign dashboard.
-   *
-   **/
-  function campaignList() {
+   * This function uses the deprecated v1 datatable api and needs updating. See CRM-16353.
+   * @deprecated
+   */
+  public static function campaignList() {
     //get the search criteria params.
-    $searchParams = explode(',', CRM_Utils_Array::value('searchCriteria', $_POST));
+    $searchCriteria = CRM_Utils_Request::retrieve('searchCriteria', 'String', CRM_Core_DAO::$_nullObject, FALSE, NULL, 'POST');
+    $searchParams = explode(',', $searchCriteria);
 
     $params = $searchRows = array();
     foreach ($searchParams as $param) {
-      if (!empty($_POST[$param])) {
+      if (isset($_POST[$param])) {
         $params[$param] = $_POST[$param];
       }
     }
@@ -588,7 +599,8 @@ class CRM_Campaign_Page_AJAX {
 
     // get the data table params.
     $dataTableParams = array(
-      'sEcho' => array('name' => 'sEcho',
+      'sEcho' => array(
+        'name' => 'sEcho',
         'type' => 'Integer',
         'default' => 0,
       ),
@@ -623,13 +635,17 @@ class CRM_Campaign_Page_AJAX {
       }
     }
     foreach (array(
-      'sort', 'offset', 'rowCount', 'sortOrder') as $sortParam) {
+               'sort',
+               'offset',
+               'rowCount',
+               'sortOrder',
+             ) as $sortParam) {
       $params[$sortParam] = $$sortParam;
     }
 
     $searchCount = CRM_Campaign_BAO_Campaign::getCampaignSummary($params, TRUE);
-    $campaigns   = CRM_Campaign_Page_DashBoard::getCampaignSummary($params);
-    $iTotal      = $searchCount;
+    $campaigns = CRM_Campaign_Page_DashBoard::getCampaignSummary($params);
+    $iTotal = $searchCount;
 
     if ($searchCount > 0) {
       if ($searchCount < $offset) {
@@ -646,17 +662,19 @@ class CRM_Campaign_Page_AJAX {
 
     $iFilteredTotal = $iTotal;
 
+    CRM_Utils_System::setHttpHeader('Content-Type', 'application/json');
     echo CRM_Utils_JSON::encodeDataTableSelector($searchRows, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
     CRM_Utils_System::civiExit();
   }
 
   /**
-   * Retrieve survey for survey dashboard.
-   *
-   **/
-  function surveyList() {
+   * This function uses the deprecated v1 datatable api and needs updating. See CRM-16353.
+   * @deprecated
+   */
+  public function surveyList() {
     //get the search criteria params.
-    $searchParams = explode(',', CRM_Utils_Array::value('searchCriteria', $_POST));
+    $searchCriteria = CRM_Utils_Request::retrieve('searchCriteria', 'String', CRM_Core_DAO::$_nullObject, FALSE, NULL, 'POST');
+    $searchParams = explode(',', $searchCriteria);
 
     $params = $searchRows = array();
     foreach ($searchParams as $param) {
@@ -686,7 +704,8 @@ class CRM_Campaign_Page_AJAX {
 
     // get the data table params.
     $dataTableParams = array(
-      'sEcho' => array('name' => 'sEcho',
+      'sEcho' => array(
+        'name' => 'sEcho',
         'type' => 'Integer',
         'default' => 0,
       ),
@@ -721,13 +740,17 @@ class CRM_Campaign_Page_AJAX {
       }
     }
     foreach (array(
-      'sort', 'offset', 'rowCount', 'sortOrder') as $sortParam) {
+               'sort',
+               'offset',
+               'rowCount',
+               'sortOrder',
+             ) as $sortParam) {
       $params[$sortParam] = $$sortParam;
     }
 
-    $surveys     = CRM_Campaign_Page_DashBoard::getSurveySummary($params);
+    $surveys = CRM_Campaign_Page_DashBoard::getSurveySummary($params);
     $searchCount = CRM_Campaign_BAO_Survey::getSurveySummary($params, TRUE);
-    $iTotal      = $searchCount;
+    $iTotal = $searchCount;
 
     if ($searchCount > 0) {
       if ($searchCount < $offset) {
@@ -744,17 +767,19 @@ class CRM_Campaign_Page_AJAX {
 
     $iFilteredTotal = $iTotal;
 
+    CRM_Utils_System::setHttpHeader('Content-Type', 'application/json');
     echo CRM_Utils_JSON::encodeDataTableSelector($searchRows, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
     CRM_Utils_System::civiExit();
   }
 
   /**
-   * Retrieve petitions for petition dashboard.
-   *
-   **/
-  function petitionList() {
+   * This function uses the deprecated v1 datatable api and needs updating. See CRM-16353.
+   * @deprecated
+   */
+  public function petitionList() {
     //get the search criteria params.
-    $searchParams = explode(',', CRM_Utils_Array::value('searchCriteria', $_POST));
+    $searchCriteria = CRM_Utils_Request::retrieve('searchCriteria', 'String', CRM_Core_DAO::$_nullObject, FALSE, NULL, 'POST');
+    $searchParams = explode(',', $searchCriteria);
 
     $params = $searchRows = array();
     foreach ($searchParams as $param) {
@@ -779,7 +804,8 @@ class CRM_Campaign_Page_AJAX {
 
     // get the data table params.
     $dataTableParams = array(
-      'sEcho' => array('name' => 'sEcho',
+      'sEcho' => array(
+        'name' => 'sEcho',
         'type' => 'Integer',
         'default' => 0,
       ),
@@ -814,13 +840,17 @@ class CRM_Campaign_Page_AJAX {
       }
     }
     foreach (array(
-      'sort', 'offset', 'rowCount', 'sortOrder') as $sortParam) {
+               'sort',
+               'offset',
+               'rowCount',
+               'sortOrder',
+             ) as $sortParam) {
       $params[$sortParam] = $$sortParam;
     }
 
-    $petitions   = CRM_Campaign_Page_DashBoard::getPetitionSummary($params);
+    $petitions = CRM_Campaign_Page_DashBoard::getPetitionSummary($params);
     $searchCount = CRM_Campaign_BAO_Petition::getPetitionSummary($params, TRUE);
-    $iTotal      = $searchCount;
+    $iTotal = $searchCount;
 
     if ($searchCount > 0) {
       if ($searchCount < $offset) {
@@ -837,8 +867,9 @@ class CRM_Campaign_Page_AJAX {
 
     $iFilteredTotal = $iTotal;
 
+    CRM_Utils_System::setHttpHeader('Content-Type', 'application/json');
     echo CRM_Utils_JSON::encodeDataTableSelector($searchRows, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
     CRM_Utils_System::civiExit();
   }
-}
 
+}

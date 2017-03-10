@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright (C) 2011 Marty Wright                                    |
  | Licensed to CiviCRM under the Academic Free License version 3.0.   |
@@ -35,17 +35,15 @@
   {if $rows}
     <div id="ltype">
       {strip}
-        {include file="CRM/common/jsortable.tpl"}
-        <table id="labelFormats" class="display">
+        <table id="labelFormats" class="row-highlight">
           <thead>
           <tr class="columnheader">
-            <th class="sortable">{ts}Name{/ts}</th>
-            <th class="sortable">{ts}Used for{/ts}</th>
-            <th class="sortable">{ts}Grouping{/ts}</th>
+            <th>{ts}Name{/ts}</th>
+            <th>{ts}Used for{/ts}</th>
+            <th>{ts}Order{/ts}</th>
+            <th>{ts}Grouping{/ts}</th>
             <th>{ts}Default?{/ts}</th>
             <th>{ts}Reserved?{/ts}</th>
-            <th id="order" class="sortable">{ts}Order{/ts}</th>
-            <th class="hiddenElement"></th>
             <th></th>
           </tr>
           </thead>
@@ -53,13 +51,12 @@
             <tr id="row_{$row.id}" class="crm-labelFormat {cycle values="odd-row,even-row"} {$row.class}">
               <td class="crm-labelFormat-name">{$row.label}</td>
               <td class="crm-labelFormat-name">{$row.groupName}</td>
+              <td class="crm-labelFormat-order nowrap">{$row.weight}</td>
               <td class="crm-labelFormat-description">{$row.grouping}</td>
-              <td class="crm-labelFormat-is_default">{if $row.is_default eq 1}<img
-                src="{$config->resourceBase}i/check.gif" alt="{ts}Default{/ts}"/>{/if}&nbsp;</td>
+              <td class="crm-labelFormat-is_default">{if $row.is_default eq 1}
+              <img src="{$config->resourceBase}i/check.gif" alt="{ts}Default{/ts}"/>{/if}&nbsp;</td>
               <td class="crm-labelFormat-is_reserved">{if $row.is_reserved eq 1}{ts}Yes{/ts}{else}{ts}No{/ts}{/if}
                 &nbsp;</td>
-              <td class="crm-labelFormat-order nowrap">{$row.order}</td>
-              <td class="order hiddenElement">{$row.weight}</td>
               <td>{$row.action|replace:'xx':$row.id}</td>
             </tr>
           {/foreach}
@@ -67,8 +64,7 @@
       {/strip}
 
       <div class="action-link">
-        <a href="{crmURL q="action=add&reset=1"}" id="newLabelFormat" class="button"><span><div
-              class="icon add-icon"></div>{ts}Add Label Format{/ts}</span></a>
+        {crmButton q="action=add&reset=1" id="newLabelFormat" icon="crm-i fa-plus-circle"}{ts}Add Label Format{/ts}{/crmButton}
       </div>
     </div>
   {else}

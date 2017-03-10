@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,22 +23,26 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Utils_Mail_Incoming {
-  CONST
+  const
     EMAILPROCESSOR_CREATE_INDIVIDUAL = 1,
     EMAILPROCESSOR_OVERRIDE = 2,
     EMAILPROCESSOR_IGNORE = 3;
 
-  function formatMail($mail, &$attachments) {
+  /**
+   * @param $mail
+   * @param $attachments
+   *
+   * @return string
+   */
+  public function formatMail($mail, &$attachments) {
     $t = '';
     $t .= "From:      " . self::formatAddress($mail->from) . "\n";
     $t .= "To:        " . self::formatAddresses($mail->to) . "\n";
@@ -52,7 +56,13 @@ class CRM_Utils_Mail_Incoming {
     return $t;
   }
 
-  function formatMailPart($part, &$attachments) {
+  /**
+   * @param $part
+   * @param $attachments
+   *
+   * @throws Exception
+   */
+  public static function formatMailPart($part, &$attachments) {
     if ($part instanceof ezcMail) {
       return self::formatMail($part, $attachments);
     }
@@ -73,10 +83,25 @@ class CRM_Utils_Mail_Incoming {
       return self::formatMailMultipart($part, $attachments);
     }
 
-    CRM_Core_Error::fatal(ts("No clue about the %1", array(1 => get_class($part))));
+    if ($part instanceof ezcMailDeliveryStatus) {
+      return self::formatMailDeliveryStatus($part);
+    }
+
+    // CRM-19111 - Handle blank emails with a subject.
+    if (!$part) {
+      return NULL;
+    }
+
+    return self::formatMailUnrecognisedPart($part);
   }
 
-  function formatMailMultipart($part, &$attachments) {
+  /**
+   * @param $part
+   * @param $attachments
+   *
+   * @throws Exception
+   */
+  public function formatMailMultipart($part, &$attachments) {
     if ($part instanceof ezcMailMultiPartAlternative) {
       return self::formatMailMultipartAlternative($part, $attachments);
     }
@@ -97,10 +122,20 @@ class CRM_Utils_Mail_Incoming {
       return self::formatMailMultipartReport($part, $attachments);
     }
 
-    CRM_Core_Error::fatal(ts("No clue about the %1", array(1 => get_class($part))));
+    if ($part instanceof ezcMailDeliveryStatus) {
+      return self::formatMailDeliveryStatus($part);
+    }
+
+    return self::formatMailUnrecognisedPart($part);
   }
 
-  function formatMailMultipartMixed($part, &$attachments) {
+  /**
+   * @param $part
+   * @param $attachments
+   *
+   * @return string
+   */
+  public function formatMailMultipartMixed($part, &$attachments) {
     $t = '';
     foreach ($part->getParts() as $key => $alternativePart) {
       $t .= self::formatMailPart($alternativePart, $attachments);
@@ -108,7 +143,13 @@ class CRM_Utils_Mail_Incoming {
     return $t;
   }
 
-  function formatMailMultipartRelated($part, &$attachments) {
+  /**
+   * @param $part
+   * @param $attachments
+   *
+   * @return string
+   */
+  public function formatMailMultipartRelated($part, &$attachments) {
     $t = '';
     $t .= "-RELATED MAIN PART-\n";
     $t .= self::formatMailPart($part->getMainPart(), $attachments);
@@ -120,7 +161,13 @@ class CRM_Utils_Mail_Incoming {
     return $t;
   }
 
-  function formatMailMultipartDigest($part, &$attachments) {
+  /**
+   * @param $part
+   * @param $attachments
+   *
+   * @return string
+   */
+  public function formatMailMultipartDigest($part, &$attachments) {
     $t = '';
     foreach ($part->getParts() as $key => $alternativePart) {
       $t .= "-DIGEST-$key-\n";
@@ -130,7 +177,13 @@ class CRM_Utils_Mail_Incoming {
     return $t;
   }
 
-  function formatMailRfc822Digest($part, &$attachments) {
+  /**
+   * @param $part
+   * @param $attachments
+   *
+   * @return string
+   */
+  public function formatMailRfc822Digest($part, &$attachments) {
     $t = '';
     $t .= "-DIGEST-ITEM-\n";
     $t .= "Item:\n\n";
@@ -139,7 +192,13 @@ class CRM_Utils_Mail_Incoming {
     return $t;
   }
 
-  function formatMailMultipartAlternative($part, &$attachments) {
+  /**
+   * @param $part
+   * @param $attachments
+   *
+   * @return string
+   */
+  public function formatMailMultipartAlternative($part, &$attachments) {
     $t = '';
     foreach ($part->getParts() as $key => $alternativePart) {
       $t .= "-ALTERNATIVE ITEM $key-\n";
@@ -149,12 +208,24 @@ class CRM_Utils_Mail_Incoming {
     return $t;
   }
 
-  function formatMailText($part, &$attachments) {
+  /**
+   * @param $part
+   * @param $attachments
+   *
+   * @return string
+   */
+  public static function formatMailText($part, &$attachments) {
     $t = "\n{$part->text}\n";
     return $t;
   }
 
-  function formatMailMultipartReport($part, &$attachments) {
+  /**
+   * @param $part
+   * @param $attachments
+   *
+   * @return string
+   */
+  public function formatMailMultipartReport($part, &$attachments) {
     $t = '';
     foreach ($part->getParts() as $key => $reportPart) {
       $t .= "-REPORT-$key-\n";
@@ -164,7 +235,36 @@ class CRM_Utils_Mail_Incoming {
     return $t;
   }
 
-  function formatMailFile($part, &$attachments) {
+  /**
+   * @param $part
+   *
+   * @return string
+   */
+  public function formatMailDeliveryStatus($part) {
+    $t = '';
+    $t .= "-DELIVERY STATUS BEGIN-\n";
+    $t .= $part->generateBody();
+    $t .= "-DELIVERY STATUS END-\n";
+    return $t;
+  }
+
+  /**
+   * @param $part
+   *
+   * @return string
+   */
+  public function formatUnrecognisedPart($part) {
+    CRM_Core_Error::debug_log_message(ts('CRM_Utils_Mail_Incoming: Unable to handle message part of type "%1".', array('%1' => get_class($part))));
+    return ts('Unrecognised message part of type "%1".', array('%1' => get_class($part)));
+  }
+
+  /**
+   * @param $part
+   * @param $attachments
+   *
+   * @return null
+   */
+  public function formatMailFile($part, &$attachments) {
     $attachments[] = array(
       'dispositionType' => $part->dispositionType,
       'contentType' => $part->contentType,
@@ -175,7 +275,12 @@ class CRM_Utils_Mail_Incoming {
     return NULL;
   }
 
-  function formatAddresses($addresses) {
+  /**
+   * @param $addresses
+   *
+   * @return string
+   */
+  public function formatAddresses($addresses) {
     $fa = array();
     foreach ($addresses as $address) {
       $fa[] = self::formatAddress($address);
@@ -183,7 +288,12 @@ class CRM_Utils_Mail_Incoming {
     return implode(', ', $fa);
   }
 
-  function formatAddress($address) {
+  /**
+   * @param $address
+   *
+   * @return string
+   */
+  public function formatAddress($address) {
     $name = '';
     if (!empty($address->name)) {
       $name = "{$address->name} ";
@@ -191,29 +301,32 @@ class CRM_Utils_Mail_Incoming {
     return $name . "<{$address->email}>";
   }
 
-  function &parse(&$file) {
+  /**
+   * @param $file
+   *
+   * @return array
+   * @throws Exception
+   */
+  public function &parse(&$file) {
 
     // check that the file exists and has some content
     if (!file_exists($file) ||
       !trim(file_get_contents($file))
     ) {
       return CRM_Core_Error::createAPIError(ts('%1 does not exists or is empty',
-          array(1 => $file)
-        ));
+        array(1 => $file)
+      ));
     }
 
-    require_once 'ezc/Base/src/ezc_bootstrap.php';
-    require_once 'ezc/autoload/mail_autoload.php';
-
     // explode email to digestable format
-    $set    = new ezcMailFileSet(array($file));
+    $set = new ezcMailFileSet(array($file));
     $parser = new ezcMailParser();
-    $mail   = $parser->parseMail($set);
+    $mail = $parser->parseMail($set);
 
     if (!$mail) {
       return CRM_Core_Error::createAPIError(ts('%1 could not be parsed',
-          array(1 => $file)
-        ));
+        array(1 => $file)
+      ));
     }
 
     // since we only have one fileset
@@ -223,7 +336,12 @@ class CRM_Utils_Mail_Incoming {
     return $mailParams;
   }
 
-  function parseMailingObject(&$mail) {
+  /**
+   * @param $mail
+   *
+   * @return array
+   */
+  public static function parseMailingObject(&$mail) {
 
     $config = CRM_Core_Config::singleton();
 
@@ -231,13 +349,21 @@ class CRM_Utils_Mail_Incoming {
     // and put it in a standardized format
     $params = array('is_error' => 0);
 
+    // Sometimes $mail->from is unset because ezcMail didn't handle format
+    // of From header. CRM-19215.
+    if (!isset($mail->from)) {
+      if (preg_match('/^([^ ]*)( (.*))?$/', $mail->getHeader('from'), $matches)) {
+        $mail->from = new ezcMailAddress($matches[1], trim($matches[2]));
+      }
+    }
+
     $params['from'] = array();
     self::parseAddress($mail->from, $field, $params['from'], $mail);
 
     // we definitely need a contact id for the from address
     // if we dont have one, skip this email
     if (empty($params['from']['id'])) {
-      return;
+      return NULL;
     }
 
     $emailFields = array('to', 'cc', 'bcc');
@@ -256,13 +382,13 @@ class CRM_Utils_Mail_Incoming {
 
     // format and move attachments to the civicrm area
     if (!empty($attachments)) {
-      $date = date('Ymdhis');
+      $date = date('YmdHis');
       $config = CRM_Core_Config::singleton();
       for ($i = 0; $i < count($attachments); $i++) {
         $attachNum = $i + 1;
-        $fileName  = basename($attachments[$i]['fullName']);
-        $newName   = CRM_Utils_File::makeFileName($fileName);
-        $location  = $config->uploadDir . $newName;
+        $fileName = basename($attachments[$i]['fullName']);
+        $newName = CRM_Utils_File::makeFileName($fileName);
+        $location = $config->uploadDir . $newName;
 
         // move file to the civicrm upload directory
         rename($attachments[$i]['fullName'], $location);
@@ -281,7 +407,13 @@ class CRM_Utils_Mail_Incoming {
     return $params;
   }
 
-  function parseAddress(&$address, &$params, &$subParam, &$mail) {
+  /**
+   * @param $address
+   * @param array $params
+   * @param $subParam
+   * @param $mail
+   */
+  public static function parseAddress(&$address, &$params, &$subParam, &$mail) {
     // CRM-9484
     if (empty($address->email)) {
       return;
@@ -289,7 +421,6 @@ class CRM_Utils_Mail_Incoming {
 
     $subParam['email'] = $address->email;
     $subParam['name'] = $address->name;
-
 
     $contactID = self::getContactID($subParam['email'],
       $subParam['name'],
@@ -299,7 +430,13 @@ class CRM_Utils_Mail_Incoming {
     $subParam['id'] = $contactID ? $contactID : NULL;
   }
 
-  function parseAddresses(&$addresses, $token, &$params, &$mail) {
+  /**
+   * @param $addresses
+   * @param $token
+   * @param array $params
+   * @param $mail
+   */
+  public static function parseAddresses(&$addresses, $token, &$params, &$mail) {
     $params[$token] = array();
 
     foreach ($addresses as $address) {
@@ -310,10 +447,18 @@ class CRM_Utils_Mail_Incoming {
   }
 
   /**
-   * retrieve a contact ID and if not present
-   * create one with this email
+   * Retrieve a contact ID and if not present.
+   *
+   * Create one with this email
+   *
+   * @param string $email
+   * @param string $name
+   * @param bool $create
+   * @param string $mail
+   *
+   * @return int|null
    */
-  function getContactID($email, $name = NULL, $create = TRUE, &$mail) {
+  public static function getContactID($email, $name = NULL, $create = TRUE, &$mail) {
     $dao = CRM_Contact_BAO_Contact::matchContactOnEmail($email, 'Individual');
 
     $contactID = NULL;
@@ -356,5 +501,5 @@ class CRM_Utils_Mail_Incoming {
       CRM_Core_DAO::$_nullArray
     );
   }
-}
 
+}

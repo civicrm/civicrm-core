@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,35 +23,34 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Contact_BAO_Household extends CRM_Contact_DAO_Contact {
 
   /**
-   * This is a contructor of the class.
+   * Class constructor.
    */
-  function __construct() {
+  public function __construct() {
     parent::__construct();
   }
 
   /**
-   * function to update the household with primary contact id
+   * Update the household with primary contact id.
    *
-   * @param integer $primaryContactId     null if deleting primary contact
-   * @param integer $contactId            contact id
+   * @param int $primaryContactId
+   *   Null if deleting primary contact.
+   * @param int $contactId
+   *   Contact id.
    *
-   * @return Object     DAO object on success
-   * @access public
-   * @static
+   * @return Object
+   *   DAO object on success
    */
-  static function updatePrimaryContact($primaryContactId, $contactId) {
+  public static function updatePrimaryContact($primaryContactId, $contactId) {
     $queryString = "UPDATE civicrm_contact
                            SET primary_contact_id = ";
 
@@ -69,5 +68,5 @@ class CRM_Contact_BAO_Household extends CRM_Contact_DAO_Contact {
 
     return CRM_Core_DAO::executeQuery($queryString, $params);
   }
-}
 
+}

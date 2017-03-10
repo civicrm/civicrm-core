@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -31,109 +31,85 @@
  * Serves as a wrapper between the UserFrameWork and Core CRM
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Core_Invoke {
 
   /**
-   * This is the main function that is called on every click action and based on the argument
-   * respective functions are called
+   * This is the main front-controller that integrates with the CMS. Any
+   * page-request that is sent to the CMS and intended for CiviCRM should
+   * be processed by invoke().
    *
-   * @param $args array this array contains the arguments of the url
-   * @return string, HTML
+   * @param array $args
+   *   The parts of the URL which identify the intended CiviCRM page
+   *   (e.g. array('civicrm', 'event', 'register')).
+   * @return string
+   *   HTML. For non-HTML content, invoke() may call print() and exit().
    *
-   * @static
-   * @access public
    */
-  static function invoke($args) {
+  public static function invoke($args) {
     try {
       return self::_invoke($args);
     }
-
     catch (Exception $e) {
-      return CRM_Core_Error::handleUnhandledException($e);
+      CRM_Core_Error::handleUnhandledException($e);
     }
   }
 
-  protected static function _invoke($args) {
+  /**
+   * This is the same as invoke(), but it does *not* include exception
+   * handling.
+   *
+   * @param array $args
+   *   The parts of the URL which identify the intended CiviCRM page
+   *   (e.g. array('civicrm', 'event', 'register')).
+   * @return string
+   *   HTML. For non-HTML content, invoke() may call print() and exit().
+   */
+  public static function _invoke($args) {
     if ($args[0] !== 'civicrm') {
-      return;
+      return NULL;
+    }
+    // CRM-15901: Turn off PHP errors display for all ajax calls
+    if (CRM_Utils_Array::value(1, $args) == 'ajax' || CRM_Utils_Array::value('snippet', $_REQUEST)) {
+      ini_set('display_errors', 0);
     }
 
     if (!defined('CIVICRM_SYMFONY_PATH')) {
-      try {
-        // Traditional Civi invocation path
-        self::hackMenuRebuild($args); // may exit
-        self::init($args);
-        self::hackStandalone($args);
-        $item = self::getItem($args);
-        return self::runItem($item);
-      }
-      catch (CRM_Core_EXCEPTION $e) {
-        $params = $e->getErrorData();
-        $message = $e->getMessage();
-        if (isset($params['legacy_status_bounce'])) {
-          //@todo remove this- see comments on
-          //https://github.com/eileenmcnaughton/civicrm-core/commit/ae686b09e2c987091612bb25ba0a58e520a203e7
-          CRM_Core_Error::statusBounce($params['message']);
-        }
-        else {
-          $session = CRM_Core_Session::singleton();
-          $session->setStatus(
-            $message,
-            CRM_Utils_Array::value('message_title', $params),
-            CRM_Utils_Array::value('message_type', $params, 'error')
-          );
-
-          // @todo remove this code - legacy redirect path is an interim measure for moving redirects out of BAO
-          // to somewhere slightly more acceptable. they should not be part of the exception class & should
-          // be managed @ the form level - if you find a form that is triggering this piece of code
-          // you should log a ticket for it to be removed with details about the form you were on.
-          if(!empty($params['legacy_redirect_path'])) {
-            if(CRM_Utils_System::isDevelopment()) {
-              // here we could set a message telling devs to log it per above
-            }
-            CRM_Utils_System::redirect($params['legacy_redirect_path'], $params['legacy_redirect_query']);
-          }
-        }
-      }
-      catch (Exception $e) {
-        // Recall: CRM_Core_Config is initialized before calling CRM_Core_Invoke
-        $config = CRM_Core_Config::singleton();
-        return CRM_Core_Error::handleUnhandledException($e);
-        /*
-        if ($config->backtrace) {
-          return CRM_Core_Error::formatHtmlException($e);
-        } else {
-         // TODO
-        }*/
-      }
-    } else {
+      // Traditional Civi invocation path
+      self::hackMenuRebuild($args); // may exit
+      self::init($args);
+      self::hackStandalone($args);
+      $item = self::getItem($args);
+      return self::runItem($item);
+    }
+    else {
       // Symfony-based invocation path
       require_once CIVICRM_SYMFONY_PATH . '/app/bootstrap.php.cache';
       require_once CIVICRM_SYMFONY_PATH . '/app/AppKernel.php';
-      $kernel = new AppKernel('dev', true);
+      $kernel = new AppKernel('dev', TRUE);
       $kernel->loadClassCache();
       $response = $kernel->handle(Symfony\Component\HttpFoundation\Request::createFromGlobals());
       if (preg_match(':^text/html:', $response->headers->get('Content-Type'))) {
         // let the CMS handle the trappings
         return $response->getContent();
-      } else {
+      }
+      else {
         $response->send();
         exit();
       }
     }
   }
+
   /**
    * Hackish support /civicrm/menu/rebuild
    *
-   * @param array $args list of path parts
+   * @param array $args
+   *   List of path parts.
    * @void
    */
   static public function hackMenuRebuild($args) {
-    if (array('civicrm','menu','rebuild') == $args || array('civicrm', 'clearcache') == $args) {
+    if (array('civicrm', 'menu', 'rebuild') == $args || array('civicrm', 'clearcache') == $args) {
       // ensure that the user has a good privilege level
       if (CRM_Core_Permission::check('administer CiviCRM')) {
         self::rebuildMenuAndCaches();
@@ -147,9 +123,10 @@ class CRM_Core_Invoke {
   }
 
   /**
-   * Perform general setup
+   * Perform general setup.
    *
-   * @param array $args list of path parts
+   * @param array $args
+   *   List of path parts.
    * @void
    */
   static public function init($args) {
@@ -168,7 +145,8 @@ class CRM_Core_Invoke {
   /**
    * Hackish support for /standalone/*
    *
-   * @param array $args list of path parts
+   * @param array $args
+   *   List of path parts.
    * @void
    */
   static public function hackStandalone($args) {
@@ -187,14 +165,16 @@ class CRM_Core_Invoke {
   /**
    * Determine which menu $item corresponds to $args
    *
-   * @param array $args list of path parts
+   * @param array $args
+   *   List of path parts.
    * @return array; see CRM_Core_Menu
    */
   static public function getItem($args) {
     if (is_array($args)) {
       // get the menu items
       $path = implode('/', $args);
-    } else {
+    }
+    else {
       $path = $args;
     }
     $item = CRM_Core_Menu::get($path);
@@ -212,7 +192,8 @@ class CRM_Core_Invoke {
   /**
    * Given a menu item, call the appropriate controller and return the response
    *
-   * @param array $item see CRM_Core_Menu
+   * @param array $item
+   *   See CRM_Core_Menu.
    * @return string, HTML
    */
   static public function runItem($item) {
@@ -234,9 +215,9 @@ class CRM_Core_Invoke {
     if ($item) {
       // CRM-7656 - make sure we send a clean sanitized path to create printer friendly url
       $printerFriendly = CRM_Utils_System::makeURL(
-        'snippet', FALSE, FALSE,
-        CRM_Utils_Array::value('path', $item)
-      ) . '2';
+          'snippet', FALSE, FALSE,
+          CRM_Utils_Array::value('path', $item)
+        ) . '2';
       $template->assign('printerFriendly', $printerFriendly);
 
       if (!array_key_exists('page_callback', $item)) {
@@ -247,7 +228,7 @@ class CRM_Core_Invoke {
       // check that we are permissioned to access this page
       if (!CRM_Core_Permission::checkMenuItem($item)) {
         CRM_Utils_System::permissionDenied();
-        return;
+        return NULL;
       }
 
       // check if ssl is set
@@ -274,7 +255,7 @@ class CRM_Core_Invoke {
       }
       else {
         $template->assign('urlIsPublic', FALSE);
-        self::versionCheck($template);
+        self::statusCheck($template);
       }
 
       if (isset($item['return_url'])) {
@@ -288,9 +269,11 @@ class CRM_Core_Invoke {
       }
 
       $result = NULL;
-      if (is_array($item['page_callback'])) {
-        require_once (str_replace('_', DIRECTORY_SEPARATOR, $item['page_callback'][0]) . '.php');
-        $result = call_user_func($item['page_callback']);
+      // WISHLIST: Refactor this. Instead of pattern-matching on page_callback, lookup
+      // page_callback via Civi\Core\Resolver and check the implemented interfaces. This
+      // would require rethinking the default constructor.
+      if (is_array($item['page_callback']) || strpos($item['page_callback'], ':')) {
+        $result = call_user_func(Civi\Core\Resolver::singleton()->get($item['page_callback']));
       }
       elseif (strstr($item['page_callback'], '_Form')) {
         $wrapper = new CRM_Utils_Wrapper();
@@ -302,25 +285,24 @@ class CRM_Core_Invoke {
       }
       else {
         $newArgs = explode('/', $_GET[$config->userFrameworkURLVar]);
-        require_once (str_replace('_', DIRECTORY_SEPARATOR, $item['page_callback']) . '.php');
         $mode = 'null';
         if (isset($pageArgs['mode'])) {
           $mode = $pageArgs['mode'];
           unset($pageArgs['mode']);
         }
         $title = CRM_Utils_Array::value('title', $item);
-        if (strstr($item['page_callback'], '_Page')) {
-          $object = new $item['page_callback'] ($title, $mode );
+        if (strstr($item['page_callback'], '_Page') || strstr($item['page_callback'], '\\Page\\')) {
+          $object = new $item['page_callback']($title, $mode);
           $object->urlPath = explode('/', $_GET[$config->userFrameworkURLVar]);
         }
-        elseif (strstr($item['page_callback'], '_Controller')) {
+        elseif (strstr($item['page_callback'], '_Controller') || strstr($item['page_callback'], '\\Controller\\')) {
           $addSequence = 'false';
           if (isset($pageArgs['addSequence'])) {
             $addSequence = $pageArgs['addSequence'];
             $addSequence = $addSequence ? 'true' : 'false';
             unset($pageArgs['addSequence']);
           }
-          $object = new $item['page_callback'] ($title, true, $mode, null, $addSequence );
+          $object = new $item['page_callback']($title, TRUE, $mode, NULL, $addSequence);
         }
         else {
           CRM_Core_Error::fatal();
@@ -338,14 +320,15 @@ class CRM_Core_Invoke {
   }
 
   /**
-   * This function contains the default action
+   * This function contains the default action.
    *
    * @param $action
    *
-   * @static
-   * @access public
+   * @param $contact_type
+   * @param $contact_sub_type
+   *
    */
-  static function form($action, $contact_type, $contact_sub_type) {
+  public static function form($action, $contact_type, $contact_sub_type) {
     CRM_Utils_System::setUserContext(array('civicrm/contact/search/basic', 'civicrm/contact/view'));
     $wrapper = new CRM_Utils_Wrapper();
 
@@ -359,39 +342,48 @@ class CRM_Core_Invoke {
   }
 
   /**
-   * Show the message about CiviCRM versions
+   * Show status in the footer (admin only)
    *
-   * @param obj: $template (reference)
+   * @param CRM_Core_Smarty $template
    */
-  static function versionCheck($template) {
-    if (CRM_Core_Config::isUpgradeMode()) {
+  public static function statusCheck($template) {
+    if (CRM_Core_Config::isUpgradeMode() || !CRM_Core_Permission::check('administer CiviCRM')) {
       return;
     }
-    $versionCheck = CRM_Utils_VersionCheck::singleton();
-    $newerVersion = $versionCheck->newerVersion();
-    $template->assign('newer_civicrm_version', $newerVersion);
+    // always use cached results - they will be refreshed by the session timer
+    $status = Civi::settings()->get('systemStatusCheckResult');
+    $template->assign('footer_status_severity', $status);
+    $template->assign('footer_status_message', CRM_Utils_Check::toStatusLabel($status));
   }
 
-  static function rebuildMenuAndCaches($triggerRebuild = FALSE, $sessionReset = FALSE) {
+  /**
+   * @param bool $triggerRebuild
+   * @param bool $sessionReset
+   *
+   * @throws Exception
+   */
+  public static function rebuildMenuAndCaches($triggerRebuild = FALSE, $sessionReset = FALSE) {
     $config = CRM_Core_Config::singleton();
     $config->clearModuleList();
+
+    // also cleanup all caches
+    $config->cleanupCaches($sessionReset || CRM_Utils_Request::retrieve('sessionReset', 'Boolean', CRM_Core_DAO::$_nullObject, FALSE, 0, 'GET'));
 
     CRM_Core_Menu::store();
 
     // also reset navigation
     CRM_Core_BAO_Navigation::resetNavigation();
 
-    // also cleanup all caches
-    $config->cleanupCaches($sessionReset || CRM_Utils_Request::retrieve('sessionReset', 'Boolean', CRM_Core_DAO::$_nullObject, FALSE, 0, 'GET'));
-
     // also cleanup module permissions
     $config->cleanupPermissions();
 
-    // also rebuild word replacement cache
-    CRM_Core_BAO_WordReplacement::rebuild();
+    // rebuild word replacement cache - pass false to prevent operations redundant with this fn
+    CRM_Core_BAO_WordReplacement::rebuild(FALSE);
 
-    CRM_Core_BAO_Setting::updateSettingsFromMetaData();
-    CRM_Core_Resources::singleton()->resetCacheCode();
+    Civi::service('settings_manager')->flush();
+    // Clear js caches
+    CRM_Core_Resources::singleton()->flushStrings()->resetCacheCode();
+    CRM_Case_XMLRepository::singleton(TRUE);
 
     // also rebuild triggers if requested explicitly
     if (
@@ -402,6 +394,9 @@ class CRM_Core_Invoke {
     }
     CRM_Core_DAO_AllCoreTables::reinitializeCache(TRUE);
     CRM_Core_ManagedEntities::singleton(TRUE)->reconcile();
-  }
-}
 
+    //CRM-16257 update Config.IDS.ini might be an old copy
+    CRM_Core_IDS::createConfigFile(TRUE);
+  }
+
+}

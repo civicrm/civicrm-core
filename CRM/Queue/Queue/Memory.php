@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * A queue implementation which stores items in the CiviCRM SQL database
@@ -31,37 +31,41 @@
 class CRM_Queue_Queue_Memory extends CRM_Queue_Queue {
 
   /**
-   * @var array(queueItemId => queueItemData)
+   * @var array
+   *   array(queueItemId => queueItemData)
    */
-  var $items;
+  public $items;
 
   /**
-   * @var array(
-     queueItemId => releaseTime), expressed in seconds since epoch
+   * @var array
+   *   array(queueItemId => releaseTime), expressed in seconds since epoch.
    */
-  var $releaseTimes;
+  public $releaseTimes;
 
-  var $nextQueueItemId = 1;
+  public $nextQueueItemId = 1;
 
   /**
    * Create a reference to queue. After constructing the queue, one should
    * usually call createQueue (if it's a new queue) or loadQueue (if it's
    * known to be an existing queue).
    *
-   * @param $queueSpec, array with keys:
-   *   - type: string, required, e.g. "interactive", "immediate", "stomp", "beanstalk"
+   * @param array $queueSpec
+   *   Array with keys:
+   *   - type: string, required, e.g. "interactive", "immediate", "stomp",
+   *     "beanstalk"
    *   - name: string, required, e.g. "upgrade-tasks"
-   *   - reset: bool, optional; if a queue is found, then it should be flushed; default to TRUE
-   *   - (additional keys depending on the queue provider)
+   *   - reset: bool, optional; if a queue is found, then it should be
+   *     flushed; default to TRUE
+   *   - (additional keys depending on the queue provider).
    */
-  function __construct($queueSpec) {
+  public function __construct($queueSpec) {
     parent::__construct($queueSpec);
   }
 
   /**
    * Perform any registation or resource-allocation for a new queue
    */
-  function createQueue() {
+  public function createQueue() {
     $this->items = array();
     $this->releaseTimes = array();
   }
@@ -69,7 +73,7 @@ class CRM_Queue_Queue_Memory extends CRM_Queue_Queue {
   /**
    * Perform any loading or pre-fetch for an existing queue.
    */
-  function loadQueue() {
+  public function loadQueue() {
     // $this->createQueue();
     throw new Exception('Unsupported: CRM_Queue_Queue_Memory::loadQueue');
   }
@@ -77,60 +81,62 @@ class CRM_Queue_Queue_Memory extends CRM_Queue_Queue {
   /**
    * Release any resources claimed by the queue (memory, DB rows, etc)
    */
-  function deleteQueue() {
+  public function deleteQueue() {
     $this->items = NULL;
     $this->releaseTimes = NULL;
   }
 
   /**
-   * Check if the queue exists
+   * Check if the queue exists.
    *
    * @return bool
    */
-  function existsQueue() {
+  public function existsQueue() {
     return is_array($this->items);
   }
 
   /**
-   * Add a new item to the queue
+   * Add a new item to the queue.
    *
-   * @param $data serializable PHP object or array
-   * @param $options queue-dependent options; for example, if this is a
-   *   priority-queue, then $options might specify the item's priority
-   *
-   * @return bool, TRUE on success
+   * @param mixed $data
+   *   Serializable PHP object or array.
+   * @param array $options
+   *   Queue-dependent options; for example, if this is a
+   *   priority-queue, then $options might specify the item's priority.
    */
-  function createItem($data, $options = array()) {
+  public function createItem($data, $options = array()) {
     $id = $this->nextQueueItemId++;
     // force copy, no unintendedsharing effects from pointers
     $this->items[$id] = serialize($data);
   }
 
   /**
-   * Determine number of items remaining in the queue
+   * Determine number of items remaining in the queue.
    *
    * @return int
    */
-  function numberOfItems() {
+  public function numberOfItems() {
     return count($this->items);
   }
 
   /**
-   * Get and remove the next item
+   * Get and remove the next item.
    *
-   * @param $leaseTime seconds
+   * @param int $leaseTime
+   *   Seconds.
    *
-   * @return object with key 'data' that matches the inputted data
+   * @return object
+   *   Includes key 'data' that matches the inputted data.
    */
-  function claimItem($leaseTime = 3600) {
+  public function claimItem($leaseTime = 3600) {
     // foreach hits the items in order -- but we short-circuit after the first
     foreach ($this->items as $id => $data) {
       $nowEpoch = CRM_Utils_Time::getTimeRaw();
       if (empty($this->releaseTimes[$id]) || $this->releaseTimes[$id] < $nowEpoch) {
         $this->releaseTimes[$id] = $nowEpoch + $leaseTime;
 
-        $item       = new stdClass();
-        $item->id   = $id;
+        $item = new stdClass();
+        $item->id = $id;
         $item->data = unserialize($data);
         return $item;
       }
@@ -144,20 +150,22 @@ class CRM_Queue_Queue_Memory extends CRM_Queue_Queue {
   }
 
   /**
-   * Get the next item
+   * Get the next item.
    *
-   * @param $leaseTime seconds
+   * @param int $leaseTime
+   *   Seconds.
    *
-   * @return object with key 'data' that matches the inputted data
+   * @return object
+   *   With key 'data' that matches the inputted data.
    */
-  function stealItem($leaseTime = 3600) {
+  public function stealItem($leaseTime = 3600) {
     // foreach hits the items in order -- but we short-circuit after the first
     foreach ($this->items as $id => $data) {
       $nowEpoch = CRM_Utils_Time::getTimeRaw();
       $this->releaseTimes[$id] = $nowEpoch + $leaseTime;
 
-      $item       = new stdClass();
-      $item->id   = $id;
+      $item = new stdClass();
+      $item->id = $id;
       $item->data = unserialize($data);
       return $item;
     }
@@ -166,24 +174,24 @@ class CRM_Queue_Queue_Memory extends CRM_Queue_Queue {
   }
 
   /**
-   * Remove an item from the queue
+   * Remove an item from the queue.
    *
-   * @param $item object The item returned by claimItem
+   * @param object $item
+   *   The item returned by claimItem.
    */
-  function deleteItem($item) {
+  public function deleteItem($item) {
     unset($this->items[$item->id]);
     unset($this->releaseTimes[$item->id]);
   }
 
   /**
-   * Return an item that could not be processed
+   * Return an item that could not be processed.
    *
-   * @param $dao object The item returned by claimItem
-   *
-   * @return bool
+   * @param CRM_Core_DAO $item
+   *   The item returned by claimItem.
    */
-  function releaseItem($item) {
+  public function releaseItem($item) {
     unset($this->releaseTimes[$item->id]);
   }
-}
 
+}

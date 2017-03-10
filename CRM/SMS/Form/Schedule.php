@@ -1,9 +1,9 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.4                                                |
+  | CiviCRM version 4.7                                                |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2013                                |
+  | Copyright CiviCRM LLC (c) 2004-2017                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -28,21 +28,12 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
- */
-
-/**
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_SMS_Form_Schedule extends CRM_Core_Form {
 
   /**
-   * Function to set variables up before form is built
-   *
-   * @return void
-   * @access public
+   * Set variables up before form is built.
    */
   public function preProcess() {
 
@@ -54,13 +45,9 @@ class CRM_SMS_Form_Schedule extends CRM_Core_Form {
   }
 
   /**
-   * This function sets the default values for the form.
-   *
-   * @access public
-   *
-   * @return void
+   * Set default values for the form.
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
 
     $count = $this->get('count');
@@ -71,12 +58,7 @@ class CRM_SMS_Form_Schedule extends CRM_Core_Form {
   }
 
   /**
-   * Build the form for the last step of the sms wizard
-   *
-   * @param
-   *
-   * @return void
-   * @access public
+   * Build the form object for the last step of the sms wizard.
    */
   public function buildQuickform() {
     $this->addDateTime('start_date', ts('Schedule SMS'), FALSE, array('formatType' => 'mailing'));
@@ -86,8 +68,9 @@ class CRM_SMS_Form_Schedule extends CRM_Core_Form {
     $this->addFormRule(array('CRM_SMS_Form_Schedule', 'formRule'), $this);
 
     $buttons = array(
-      array('type' => 'back',
-        'name' => ts('<< Previous'),
+      array(
+        'type' => 'back',
+        'name' => ts('Previous'),
       ),
       array(
         'type' => 'next',
@@ -104,8 +87,8 @@ class CRM_SMS_Form_Schedule extends CRM_Core_Form {
 
     $this->addButtons($buttons);
 
-    $preview            = array();
-    $preview['type']    = CRM_Core_DAO::getFieldValue('CRM_Mailing_DAO_Mailing', $this->_mailingID, 'body_html') ? 'html' : 'text';
+    $preview = array();
+    $preview['type'] = CRM_Core_DAO::getFieldValue('CRM_Mailing_DAO_Mailing', $this->_mailingID, 'body_html') ? 'html' : 'text';
     $preview['viewURL'] = CRM_Utils_System::url('civicrm/mailing/view', "reset=1&id={$this->_mailingID}");
     $this->assign_by_ref('preview', $preview);
   }
@@ -117,11 +100,15 @@ class CRM_SMS_Form_Schedule extends CRM_Core_Form {
    * Warning: if you make changes here, be sure to also make them in
    * Retry.php
    *
-   * @param array $params     The form values
+   * @param array $params
+   *   The form values.
    *
-   * @return boolean          True if either we deliver immediately, or the
-   *                          date is properly set.
-   * @static
+   * @param $files
+   * @param $self
+   *
+   * @return bool
+   *   True if either we deliver immediately, or the date is properly
+   *   set.
    */
   public static function formRule($params, $files, $self) {
     if (!empty($params['_qf_Schedule_submit'])) {
@@ -130,16 +117,16 @@ class CRM_SMS_Form_Schedule extends CRM_Core_Form {
       $url = CRM_Utils_System::url('civicrm/mailing/browse/unscheduled', 'scheduled=false&reset=1&sms=1');
       CRM_Utils_System::redirect($url);
     }
-    if (isset($params['now']) || CRM_Utils_Array::value('_qf_Schedule_back', $params) == '<< Previous') {
+    if (isset($params['now']) || CRM_Utils_Array::value('_qf_Schedule_back', $params) == ts('Previous')) {
       return TRUE;
     }
 
     if (CRM_Utils_Date::format(CRM_Utils_Date::processDate($params['start_date'],
-          $params['start_date_time']
-        )) < CRM_Utils_Date::format(date('YmdHi00'))) {
+        $params['start_date_time']
+      )) < CRM_Utils_Date::format(date('YmdHi00'))
+    ) {
       return array(
-        'start_date' =>
-        ts('Start date cannot be earlier than the current time.'),
+        'start_date' => ts('Start date cannot be earlier than the current time.'),
       );
     }
     return TRUE;
@@ -147,11 +134,6 @@ class CRM_SMS_Form_Schedule extends CRM_Core_Form {
 
   /**
    * Process the posted form values.  Create and schedule a Mass SMS.
-   *
-   * @param
-   *
-   * @return void
-   * @access public
    */
   public function postProcess() {
     $params = array();
@@ -192,24 +174,23 @@ class CRM_SMS_Form_Schedule extends CRM_Core_Form {
       $params['scheduled_date'] = CRM_Utils_Date::processDate($params['start_date'] . ' ' . $params['start_date_time']);
     }
 
-    /* Build the mailing object */
+    // Build the mailing object.
     CRM_Mailing_BAO_Mailing::create($params, $ids);
 
     $session = CRM_Core_Session::singleton();
     $session->pushUserContext(CRM_Utils_System::url('civicrm/mailing/browse/scheduled',
-        'reset=1&scheduled=true&sms=1'
-      ));
+      'reset=1&scheduled=true&sms=1'
+    ));
   }
 
   /**
-   * Display Name of the form
+   * Display Name of the form.
    *
-   * @access public
    *
    * @return string
    */
   public function getTitle() {
     return ts('Schedule or Send');
   }
-}
 
+}

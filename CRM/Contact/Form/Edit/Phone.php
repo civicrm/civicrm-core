@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,33 +23,30 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
- * form helper class for a phone object
+ * Form helper class for a phone object.
  */
 class CRM_Contact_Form_Edit_Phone {
 
   /**
-   * build the form elements for a phone object
+   * Build the form object elements for a phone object.
    *
-   * @param CRM_Core_Form $form       reference to the form object
-   * @param int           $addressBlockCount block number to build
-   * @param boolean       $blockEdit         is it block edit
-   *
-   * @return void
-   * @access public
-   * @static
+   * @param CRM_Core_Form $form
+   *   Reference to the form object.
+   * @param int $addressBlockCount
+   *   Block number to build.
+   * @param bool $blockEdit
+   *   Is it block edit.
    */
-  static function buildQuickForm(&$form, $addressBlockCount = NULL, $blockEdit = FALSE) {
+  public static function buildQuickForm(&$form, $addressBlockCount = NULL, $blockEdit = FALSE) {
     // passing this via the session is AWFUL. we need to fix this
     if (!$addressBlockCount) {
       $blockId = ($form->get('Phone_Block_Count')) ? $form->get('Phone_Block_Count') : 1;
@@ -61,16 +58,22 @@ class CRM_Contact_Form_Edit_Phone {
     $form->applyFilter('__ALL__', 'trim');
 
     //phone type select
-    $form->addSelect("phone[$blockId][phone_type_id]", array('entity' => 'phone', 'class' => 'eight', 'placeholder' => NULL));
-
+    $form->addField("phone[$blockId][phone_type_id]", array(
+      'entity' => 'phone',
+      'class' => 'eight',
+      'placeholder' => NULL,
+    ));
     //main phone number with crm_phone class
-    $form->add('text', "phone[$blockId][phone]", ts('Phone'), array_merge(CRM_Core_DAO::getAttribute('CRM_Core_DAO_Phone', 'phone'), array('class' => 'crm_phone twelve')));
-    // phone extension
-    $form->addElement('text', "phone[$blockId][phone_ext]", ts('Extension'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_Phone', 'phone_ext'));
-
+    $form->addField("phone[$blockId][phone]", array('entity' => 'phone', 'class' => 'crm_phone twelve'));
+    $form->addField("phone[$blockId][phone_ext]", array('entity' => 'phone'));
     if (isset($form->_contactType) || $blockEdit) {
       //Block type select
-      $form->addSelect("phone[$blockId][location_type_id]", array('entity' => 'phone', 'class' => 'eight', 'placeholder' => NULL));
+      $form->addField("phone[$blockId][location_type_id]", array(
+        'entity' => 'phone',
+          'class' => 'eight',
+          'placeholder' => NULL,
+          'option_url' => NULL,
+        ));
 
       //is_Primary radio
       $js = array('id' => 'Phone_' . $blockId . '_IsPrimary', 'onClick' => 'singleSelect( this.id );');
@@ -79,5 +82,5 @@ class CRM_Contact_Form_Edit_Phone {
     // TODO: set this up as a group, we need a valid phone_type_id if we have a  phone number
     // $form->addRule( "location[$locationId][phone][$locationId][phone]", ts('Phone number is not valid.'), 'phone' );
   }
-}
 
+}

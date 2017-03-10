@@ -1,15 +1,18 @@
 <?php
-require_once 'CiviTest/CiviUnitTestCase.php';
 
+/**
+ * Class CRM_UF_Page_ProfileEditorTest
+ * @group headless
+ */
 class CRM_UF_Page_ProfileEditorTest extends CiviUnitTestCase {
-  function setUp() {
+  public function setUp() {
     parent::setUp();
   }
 
   /**
-   * Spot check a few fields that should appear in schema
+   * Spot check a few fields that should appear in schema.
    */
-  function testGetSchema() {
+  public function testGetSchema() {
     $schema = CRM_UF_Page_ProfileEditor::getSchema(array('IndividualModel', 'ActivityModel'));
     foreach ($schema as $entityName => $entityDef) {
       foreach ($entityDef['schema'] as $fieldName => $fieldDef) {
@@ -40,4 +43,5 @@ class CRM_UF_Page_ProfileEditorTest extends CiviUnitTestCase {
     $this->assertTrue(empty($schema['ActivityModel']['schema']['street_address']));
 
   }
+
 }

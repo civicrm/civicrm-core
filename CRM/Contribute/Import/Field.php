@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,75 +23,80 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Contribute_Import_Field {
 
   /**#@+
-   * @access protected
    * @var string
    */
 
   /**
-   * name of the field
+   * Name of the field
    */
   public $_name;
 
   /**
-   * title of the field to be used in display
+   * Title of the field to be used in display
    */
   public $_title;
 
   /**
-   * type of field
+   * Type of field
    * @var enum
    */
   public $_type;
 
   /**
-   * is this field required
+   * Is this field required
    * @var boolean
    */
   public $_required;
 
   /**
-   * data to be carried for use by a derived class
+   * Data to be carried for use by a derived class
    * @var object
    */
   public $_payload;
 
   /**
-   * regexp to match the CSV header of this column/field
+   * Regexp to match the CSV header of this column/field
    * @var string
    */
   public $_headerPattern;
 
   /**
-   * regexp to match the pattern of data from various column/fields
+   * Regexp to match the pattern of data from various column/fields
    * @var string
    */
   public $_dataPattern;
 
   /**
-   * value of this field
+   * Value of this field
    * @var object
    */
   public $_value;
 
   /**
-   * this is soft credit field
+   * This is soft credit field
    * @var string
    */
   public $_softCreditField;
 
-  function __construct($name, $title, $type = CRM_Utils_Type::T_INT, $headerPattern = '//', $dataPattern = '//', $softCreditField = NULL) {
+  /**
+   * @param string $name
+   * @param $title
+   * @param int $type
+   * @param string $headerPattern
+   * @param string $dataPattern
+   * @param null $softCreditField
+   */
+  public function __construct($name, $title, $type = CRM_Utils_Type::T_INT, $headerPattern = '//', $dataPattern = '//', $softCreditField = NULL) {
     $this->_name = $name;
     $this->_title = $title;
     $this->_type = $type;
@@ -101,19 +106,28 @@ class CRM_Contribute_Import_Field {
     $this->_value = NULL;
   }
 
-  function resetValue() {
+  public function resetValue() {
     $this->_value = NULL;
   }
 
   /**
-   * the value is in string format. convert the value to the type of this field
+   * Set a value.
+   *
+   * The value is in string format. Convert the value to the type of this field
    * and set the field value with the appropriate type
+   *
+   * @param $value
    */
-  function setValue($value) {
+  public function setValue($value) {
     $this->_value = $value;
   }
 
-  function validate() {
+  /**
+   * Validate a field.
+   *
+   * @return bool
+   */
+  public function validate() {
 
     if (CRM_Utils_System::isNull($this->_value)) {
       return TRUE;
@@ -155,10 +169,10 @@ class CRM_Contribute_Import_Field {
       case 'currency':
         return CRM_Utils_Rule::currencyCode($this->_value);
 
-        case 'financial_type':
+      case 'financial_type':
         static $contributionTypes = NULL;
         if (!$contributionTypes) {
-                $contributionTypes = CRM_Contribute_PseudoConstant::financialType();
+          $contributionTypes = CRM_Contribute_PseudoConstant::financialType();
         }
         if (in_array($this->_value, $contributionTypes)) {
           return TRUE;
@@ -200,5 +214,5 @@ class CRM_Contribute_Import_Field {
 
     return TRUE;
   }
-}
 
+}

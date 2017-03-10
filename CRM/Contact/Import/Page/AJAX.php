@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,25 +23,23 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
- * This class contains all the function that are called using AJAX
+ * This class contains all the function that are called using AJAX.
  */
 class CRM_Contact_Import_Page_AJAX {
 
   /**
-   * Function to show import status
+   * Show import status.
    */
-  static function status() {
+  public static function status() {
     // make sure we get an id
     if (!isset($_GET['id'])) {
       return;
@@ -59,5 +57,5 @@ class CRM_Contact_Import_Page_AJAX {
     }
     CRM_Utils_System::civiExit();
   }
-}
 
+}

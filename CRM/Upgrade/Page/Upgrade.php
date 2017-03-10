@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,25 +23,34 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
-  function preProcess() {
+
+  /**
+   * Pre-process.
+   */
+  public function preProcess() {
     parent::preProcess();
   }
 
-  function run() {
+  /**
+   * Run upgrade.
+   *
+   * @throws \Exception
+   */
+  public function run() {
     // lets get around the time limit issue if possible for upgrades
     if (!ini_get('safe_mode')) {
       set_time_limit(0);
     }
+
+    Civi::resources()->addStyleFile('civicrm', 'css/admin.css');
 
     $upgrade = new CRM_Upgrade_Form();
     list($currentVer, $latestVer) = $upgrade->getUpgradeVersions();
@@ -78,9 +87,9 @@ class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
   }
 
   /**
-   * Display an introductory screen with any pre-upgrade messages
+   * Display an introductory screen with any pre-upgrade messages.
    */
-  function runIntro() {
+  public function runIntro() {
     $upgrade = new CRM_Upgrade_Form();
     $template = CRM_Core_Smarty::singleton();
     list($currentVer, $latestVer) = $upgrade->getUpgradeVersions();
@@ -89,17 +98,14 @@ class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
       CRM_Core_Error::fatal($error);
     }
 
-    // This could be removed in later rev
-    if ($currentVer == '2.1.6') {
-      $config = CRM_Core_Config::singleton();
-      // also cleanup the templates_c directory
-      $config->cleanupCaches();
-    } else {
-      $config = CRM_Core_Config::singleton();
-      // cleanup only the templates_c directory
-      $config->cleanup(1, FALSE);
-    }
-    // end of hack
+    $config = CRM_Core_Config::singleton();
+
+    // All cached content needs to be cleared because the civi codebase was just replaced
+    CRM_Core_Resources::singleton()->flushStrings()->resetCacheCode();
+    CRM_Core_Menu::store();
+
+    // cleanup only the templates_c directory
+    $config->cleanup(1, FALSE);
 
     $preUpgradeMessage = NULL;
     $upgrade->setPreUpgradeMessage($preUpgradeMessage, $currentVer, $latestVer);
@@ -117,7 +123,6 @@ class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
     }
 
     $template->assign('preUpgradeMessage', $preUpgradeMessage);
-    // $template->assign( 'message', $postUpgradeMessage );
 
     $content = $template->fetch('CRM/common/success.tpl');
     echo CRM_Utils_System::theme($content, $this->_print, TRUE);
@@ -126,7 +131,7 @@ class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
   /**
    * Begin the upgrade by building a queue of tasks and redirecting to the queue-runner
    */
-  function runBegin() {
+  public function runBegin() {
     $upgrade = new CRM_Upgrade_Form();
     list($currentVer, $latestVer) = $upgrade->getUpgradeVersions();
 
@@ -135,14 +140,8 @@ class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
     }
 
     $config = CRM_Core_Config::singleton();
-    // This could be removed in later rev
-    if ($currentVer == '2.1.6') {
-      // also cleanup the templates_c directory
-      $config->cleanupCaches();
-    }
-    // end of hack
 
-    $postUpgradeMessage = ts('CiviCRM upgrade was successful.');
+    $postUpgradeMessage = '<span class="bold">' . ts('Congratulations! Your upgrade was successful!') . '</span>';
 
     // lets drop all the triggers here
     CRM_Core_DAO::dropTriggers();
@@ -159,9 +158,9 @@ class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
       'queue' => CRM_Upgrade_Form::buildQueue($currentVer, $latestVer, $this->get('postUpgradeMessageFile')),
       'isMinimal' => TRUE,
       'pathPrefix' => 'civicrm/upgrade/queue',
-      'onEndUrl' => CRM_Utils_System::url('civicrm/upgrade', 'action=finish', FALSE, NULL, FALSE ),
+      'onEndUrl' => CRM_Utils_System::url('civicrm/upgrade', 'action=finish', FALSE, NULL, FALSE),
       'buttons' => array('retry' => $config->debug, 'skip' => $config->debug),
-      ));
+    ));
     $queueRunner->runAllViaWeb();
     CRM_Core_Error::fatal(ts('Upgrade failed to redirect'));
   }
@@ -169,7 +168,7 @@ class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
   /**
    * Display any final messages, clear caches, etc
    */
-  function runFinish() {
+  public function runFinish() {
     $upgrade = new CRM_Upgrade_Form();
     $template = CRM_Core_Smarty::singleton();
 
@@ -181,7 +180,8 @@ class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
 
       // This destroys $session, so do it after get('postUpgradeMessageFile')
       CRM_Upgrade_Form::doFinish();
-    } else {
+    }
+    else {
       $postUpgradeMessage = ''; // Session was destroyed! Can't recover messages.
     }
 
@@ -193,6 +193,7 @@ class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
 
     $template->assign('message', $postUpgradeMessage);
     $template->assign('upgraded', TRUE);
+    $template->assign('sid', CRM_Utils_System::getSiteID());
 
     // Render page header
     if (!defined('CIVICRM_UF_HEAD') && $region = CRM_Core_Region::instance('html-header', FALSE)) {
@@ -202,5 +203,5 @@ class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
     $content = $template->fetch('CRM/common/success.tpl');
     echo CRM_Utils_System::theme($content, $this->_print, TRUE);
   }
-}
 
+}

@@ -5,7 +5,7 @@
  *
  *  (PHP 5)
  *
- *   @package   CiviCRM
+ * @package   CiviCRM
  *
  *   This file is part of CiviCRM
  *
@@ -24,40 +24,26 @@
  *   <http://www.gnu.org/licenses/>.
  */
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-require_once 'CiviTest/Contact.php';
-require_once 'CiviTest/Membership.php';
-
 /**
  *  Test CRM/Member/BAO Membership Log add , delete functions
  *
- *  @package   CiviCRM
+ * @package   CiviCRM
+ * @group headless
  */
 class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
   /**
-   * Membership type name used in test function
+   * Membership type name used in test function.
    * @var String
    */
   protected $_membershipTypeName = NULL;
 
   /**
-   * Membership type id used in test function
+   * Membership type id used in test function.
    * @var String
    */
   protected $_membershipTypeID = NULL;
-  /**
-   * Describe test class
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'MembershipParserTest',
-      'description' => 'Test import parser function',
-      'group' => 'CiviCRM BAO Tests',
-    );
-  }
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
 
     $params = array(
@@ -83,7 +69,7 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
       'visibility' => 'Public',
       'is_active' => 1,
       'fixed_period_start_day' => 101,
-      'fixed_period_rollover_day' => 1231
+      'fixed_period_rollover_day' => 1231,
     );
     $ids = array();
     $membershipType = CRM_Member_BAO_MembershipType::add($params, $ids);
@@ -97,10 +83,14 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
   /**
    * Tears down the fixture, for example, closes a network connection.
    * This method is called after a test is executed.
-   *
    */
-  function tearDown() {
-    $tablesToTruncate = array('civicrm_membership', 'civicrm_membership_log', 'civicrm_contribution', 'civicrm_membership_payment');
+  public function tearDown() {
+    $tablesToTruncate = array(
+      'civicrm_membership',
+      'civicrm_membership_log',
+      'civicrm_contribution',
+      'civicrm_membership_payment',
+    );
     $this->quickCleanup($tablesToTruncate);
     $this->relationshipTypeDelete($this->_relationshipTypeId);
     $this->membershipTypeDelete(array('id' => $this->_membershipTypeID));
@@ -109,9 +99,9 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
   }
 
   /**
-   *  Test Import
+   *  Test Import.
    */
-  function testImport() {
+  public function testImport() {
     $contactId = $this->individualCreate();
     $contact2Params = array(
       'first_name' => 'Anthonita',
@@ -128,8 +118,8 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
     $params = array(
       array(
         'anthony_anderson@civicrm.org',
-         $this->_membershipTypeID,
-         date('Y-m-d'),
+        $this->_membershipTypeID,
+        date('Y-m-d'),
       ),
       array(
         $contact2Params['email'],
@@ -142,19 +132,19 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
       'mapper[1][0]' => 'membership_type_id',
       'mapper[2][0]' => 'membership_start_date',
     );
-/*
+    /*
 
     $params = array(
-      'contact_id' => $contactId,
-      'membership_type_id' => $this->_membershipTypeID,
-      'join_date' => '2006-01-21',
-      'start_date' => '2006-01-21',
-      'end_date' => '2006-12-21',
-      'source' => 'Payment',
-      'is_override' => 1,
-      'status_id' => $this->_mebershipStatusID,
+    'contact_id' => $contactId,
+    'membership_type_id' => $this->_membershipTypeID,
+    'join_date' => '2006-01-21',
+    'start_date' => '2006-01-21',
+    'end_date' => '2006-12-21',
+    'source' => 'Payment',
+    'is_override' => 1,
+    'status_id' => $this->_mebershipStatusID,
     );
-    */
+     */
     $importObject = new CRM_Member_Import_Parser_Membership($fieldMapper);
     $importObject->init();
     $importObject->_contactType = 'Individual';
@@ -164,5 +154,5 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('membership', 'get', array());
     $this->assertEquals(2, $result['count']);
   }
-}
 
+}

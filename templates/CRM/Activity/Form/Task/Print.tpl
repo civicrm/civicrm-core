@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -38,7 +38,7 @@
     <td>{ts}Subject{/ts}</td>
     <td>{ts}Added By{/ts}</td>
     <td>{ts}With{/ts}</td>
-    <td>{ts}Assigned To{/ts}</td>
+    <td>{ts}Assigned to{/ts}</td>
     <td>{ts}Date{/ts}</td>
     <td>{ts}Status{/ts}</td>
   </tr>

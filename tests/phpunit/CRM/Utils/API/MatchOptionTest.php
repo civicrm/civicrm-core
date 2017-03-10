@@ -1,8 +1,8 @@
 <?php
 
-require_once 'CiviTest/CiviUnitTestCase.php';
 /**
  * Test that the API accepts the 'match' and 'match-mandatory' options.
+ * @group headless
  */
 class CRM_Utils_API_MatchOptionTest extends CiviUnitTestCase {
 
@@ -11,7 +11,7 @@ class CRM_Utils_API_MatchOptionTest extends CiviUnitTestCase {
    */
   var $noise;
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
     $this->assertDBQuery(0, "SELECT count(*) FROM civicrm_contact WHERE first_name='Jeffrey' and last_name='Lebowski'");
 
@@ -20,14 +20,14 @@ class CRM_Utils_API_MatchOptionTest extends CiviUnitTestCase {
       'email' => 'ignore1@example.com',
       // 'street_address-1' => 'Irrelevant'
       'api.Address.create' => array(
-       'location_type_id' => 1,
+        'location_type_id' => 1,
         'street_address' => '123 Irrelevant Str',
         'supplemental_address_1' => 'Room 987',
       ),
     ));
   }
 
-  function tearDown() {
+  public function tearDown() {
     $noise = $this->callAPISuccess('Contact', 'get', array(
       'id' => $this->noise['individual'],
       'return' => array('email'),
@@ -39,7 +39,7 @@ class CRM_Utils_API_MatchOptionTest extends CiviUnitTestCase {
       $this->assertEquals(1, count($value['api.Address.get']['values']));
     }
     CRM_core_DAO::executeQuery('DELETE FROM civicrm_address WHERE contact_id=%1', array(
-      1 => array($this->noise['individual'], 'Positive')
+      1 => array($this->noise['individual'], 'Positive'),
     ));
     $this->callAPISuccess('Contact', 'delete', array(
       'id' => $this->noise['individual'],
@@ -50,7 +50,7 @@ class CRM_Utils_API_MatchOptionTest extends CiviUnitTestCase {
   /**
    * If there's no pre-existing record, then insert a new one.
    */
-  function testCreateMatch_none() {
+  public function testCreateMatch_none() {
     $result = $this->callAPISuccess('contact', 'create', array(
       'options' => array(
         'match' => array('first_name', 'last_name'),
@@ -68,7 +68,7 @@ class CRM_Utils_API_MatchOptionTest extends CiviUnitTestCase {
   /**
    * If there's no pre-existing record, then throw an error.
    */
-  function testCreateMatchMandatory_none() {
+  public function testCreateMatchMandatory_none() {
     $this->callAPIFailure('contact', 'create', array(
       'options' => array(
         'match-mandatory' => array('first_name', 'last_name'),
@@ -81,7 +81,10 @@ class CRM_Utils_API_MatchOptionTest extends CiviUnitTestCase {
     ), 'Failed to match existing record');
   }
 
-  function apiOptionNames() {
+  /**
+   * @return array
+   */
+  public function apiOptionNames() {
     return array(
       array('match'),
       array('match-mandatory'),
@@ -92,9 +95,10 @@ class CRM_Utils_API_MatchOptionTest extends CiviUnitTestCase {
    * If there's one pre-existing record, then update it.
    *
    * @dataProvider apiOptionNames
-   * @param string $apiOptionName e.g. "match" or "match-mandatory"
+   * @param string $apiOptionName
+   *   E.g. "match" or "match-mandatory".
    */
-  function testCreateMatch_one($apiOptionName) {
+  public function testCreateMatch_one($apiOptionName) {
     // create basic record
     $result1 = $this->callAPISuccess('contact', 'create', array(
       'contact_type' => 'Individual',
@@ -130,9 +134,10 @@ class CRM_Utils_API_MatchOptionTest extends CiviUnitTestCase {
    * If there's more than one pre-existing record, throw an error.
    *
    * @dataProvider apiOptionNames
-   * @param string $apiOptionName e.g. "match" or "match-mandatory"
+   * @param string $apiOptionName
+   *   E.g. "match" or "match-mandatory".
    */
-  function testCreateMatch_many($apiOptionName) {
+  public function testCreateMatch_many($apiOptionName) {
     // create the first Lebowski
     $result1 = $this->callAPISuccess('contact', 'create', array(
       'contact_type' => 'Individual',
@@ -170,7 +175,7 @@ class CRM_Utils_API_MatchOptionTest extends CiviUnitTestCase {
    * When replacing one set with another set, match items within
    * the set using a key.
    */
-  function testReplaceMatch_Email() {
+  public function testReplaceMatch_Email() {
     // Create contact with two emails (j1,j2)
     $createResult = $this->callAPISuccess('contact', 'create', array(
       'contact_type' => 'Individual',
@@ -180,7 +185,11 @@ class CRM_Utils_API_MatchOptionTest extends CiviUnitTestCase {
         'options' => array('match' => 'location_type_id'),
         'values' => array(
           array('location_type_id' => 1, 'email' => 'j1-a@example.com', 'signature_text' => 'The Dude abides.'),
-          array('location_type_id' => 2, 'email' => 'j2@example.com', 'signature_text' => 'You know, a lotta ins, a lotta outs, a lotta what-have-yous.'),
+          array(
+            'location_type_id' => 2,
+            'email' => 'j2@example.com',
+            'signature_text' => 'You know, a lotta ins, a lotta outs, a lotta what-have-yous.',
+          ),
         ),
       ),
     ));
@@ -247,7 +256,7 @@ class CRM_Utils_API_MatchOptionTest extends CiviUnitTestCase {
    * When replacing one set with another set, match items within
    * the set using a key.
    */
-  function testReplaceMatch_Address() {
+  public function testReplaceMatch_Address() {
     // Create contact with two addresses (j1,j2)
     $createResult = $this->callAPISuccess('contact', 'create', array(
       'contact_type' => 'Individual',
@@ -256,8 +265,16 @@ class CRM_Utils_API_MatchOptionTest extends CiviUnitTestCase {
       'api.Address.replace' => array(
         'options' => array('match' => 'location_type_id'),
         'values' => array(
-          array('location_type_id' => 1, 'street_address' => 'j1-a Example Ave', 'supplemental_address_1' => 'The Dude abides.'),
-          array('location_type_id' => 2, 'street_address' => 'j2 Example Ave', 'supplemental_address_1' => 'You know, a lotta ins, a lotta outs, a lotta what-have-yous.'),
+          array(
+            'location_type_id' => 1,
+            'street_address' => 'j1-a Example Ave',
+            'supplemental_address_1' => 'The Dude abides.',
+          ),
+          array(
+            'location_type_id' => 2,
+            'street_address' => 'j2 Example Ave',
+            'supplemental_address_1' => 'You know, a lotta ins, a lotta outs, a lotta what-have-yous.',
+          ),
         ),
       ),
     ));

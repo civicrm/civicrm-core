@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,41 +23,31 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
-
-require_once 'CiviTest/CiviUnitTestCase.php';
+ */
 
 /**
  * Test class for Group API - civicrm_group_*
  *
- *  @package CiviCRM_APIv3
+ * @package CiviCRM_APIv3
+ * @group headless
  */
-
 class api_v3_GroupTest extends CiviUnitTestCase {
   protected $_apiversion;
   protected $_groupID;
 
-  function get_info() {
-    return array(
-      'name' => 'Group Get',
-      'description' => 'Test all Group Get API methods.',
-      'group' => 'CiviCRM API Tests',
-    );
-  }
-
-  function setUp() {
+  public function setUp() {
     $this->_apiversion = 3;
 
     parent::setUp();
     $this->_groupID = $this->groupCreate();
   }
 
-  function tearDown() {
+  public function tearDown() {
 
     $this->groupDelete($this->_groupID);
   }
 
-  function testgroupCreateNoTitle() {
+  public function testgroupCreateNoTitle() {
     $params = array(
       'name' => 'Test Group No title ',
       'domain_id' => 1,
@@ -74,7 +64,7 @@ class api_v3_GroupTest extends CiviUnitTestCase {
   }
 
 
-  function testGetGroupWithEmptyParams() {
+  public function testGetGroupWithEmptyParams() {
     $group = $this->callAPISuccess('group', 'get', $params = array());
 
     $group = $group["values"];
@@ -84,7 +74,7 @@ class api_v3_GroupTest extends CiviUnitTestCase {
     $this->assertEquals($group[$this->_groupID]['visibility'], 'Public Pages');
   }
 
-  function testGetGroupParamsWithGroupId() {
+  public function testGetGroupParamsWithGroupId() {
     $params = array('id' => $this->_groupID);
     $group = $this->callAPISuccess('group', 'get', $params);
 
@@ -97,7 +87,7 @@ class api_v3_GroupTest extends CiviUnitTestCase {
     }
   }
 
-  function testGetGroupParamsWithGroupName() {
+  public function testGetGroupParamsWithGroupName() {
     $params = array(
       'name' => "Test Group 1",
     );
@@ -113,7 +103,7 @@ class api_v3_GroupTest extends CiviUnitTestCase {
     }
   }
 
-  function testGetGroupParamsWithReturnName() {
+  public function testGetGroupParamsWithReturnName() {
     $params = array();
     $params['id'] = $this->_groupID;
     $params['return.name'] = 1;
@@ -123,7 +113,7 @@ class api_v3_GroupTest extends CiviUnitTestCase {
     );
   }
 
-  function testGetGroupParamsWithGroupTitle() {
+  public function testGetGroupParamsWithGroupTitle() {
     $params = array();
     $params['title'] = 'New Test Group Created';
     $group = $this->callAPISuccess('group', 'get', $params);
@@ -137,22 +127,96 @@ class api_v3_GroupTest extends CiviUnitTestCase {
     }
   }
 
-  function testGetNonExistingGroup() {
+  /**
+   * Test Group create with Group Type and Parent
+   */
+  public function testGroupCreateWithTypeAndParent() {
+    $params = array(
+      'name' => 'Test Group type',
+      'title' => 'Test Group Type',
+      'description' => 'Test Group with Group Type',
+      'is_active' => 1,
+      //check for empty parent
+      'parents' => "",
+      'visibility' => 'Public Pages',
+      'group_type' => array(1, 2),
+    );
+
+    $result = $this->callAPISuccess('Group', 'create', $params);
+    $group = $result['values'][$result['id']];
+    $this->assertEquals($group['name'], "Test Group type");
+    $this->assertEquals($group['is_active'], 1);
+    $this->assertEquals($group['parents'], "");
+    $this->assertEquals($group['group_type'], $params['group_type']);
+
+    //Pass group_type param in checkbox format.
+    $params = array_merge($params, array(
+        'name' => 'Test Checkbox Format',
+        'title' => 'Test Checkbox Format',
+        'group_type' => array(2 => 1),
+      )
+    );
+    $result = $this->callAPISuccess('Group', 'create', $params);
+    $group = $result['values'][$result['id']];
+    $this->assertEquals($group['name'], "Test Checkbox Format");
+    $this->assertEquals($group['group_type'], array_keys($params['group_type']));
+
+    //assert single value for group_type and parent
+    $params = array_merge($params, array(
+        'name' => 'Test Group 2',
+        'title' => 'Test Group 2',
+        'group_type' => 2,
+        'parents' => $result['id'],
+      )
+    );
+    $result = $this->callAPISuccess('Group', 'create', $params);
+    $group = $result["values"][$result['id']];
+    $this->assertEquals($group['group_type'], array($params['group_type']));
+    $this->assertEquals($group['parents'], $params['parents']);
+  }
+
+  public function testGetNonExistingGroup() {
     $params = array();
     $params['title'] = 'No such group Exist';
     $group = $this->callAPISuccess('group', 'get', $params);
     $this->assertEquals(0, $group['count']);
   }
 
-  function testgroupdeleteParamsnoId() {
+  public function testgroupdeleteParamsnoId() {
     $group = $this->callAPIFailure('group', 'delete', array(), 'Mandatory key(s) missing from params array: id');
   }
 
-  function testgetfields() {
-    $description = "demonstrate use of getfields to interogate api";
+  public function testgetfields() {
+    $description = "Demonstrate use of getfields to interrogate api.";
     $params = array('action' => 'create');
-    $result = $this->callAPIAndDocument('group', 'getfields', $params, __FUNCTION__, __FILE__, $description, 'getfields', 'getfields');
+    $result = $this->callAPIAndDocument('group', 'getfields', $params, __FUNCTION__, __FILE__, $description);
     $this->assertEquals(1, $result['values']['is_active']['api.default']);
   }
-}
 
+  public function testIllegalParentsParams() {
+    $params = array(
+      'title' => 'Test illegal Group',
+      'domain_id' => 1,
+      'description' => 'Testing illegal Parents params',
+      'is_active' => 1,
+      'parents' => "(SELECT api_key FROM civicrm_contact where id = 1)",
+    );
+    $this->callAPIFailure('group', 'create', $params);
+    unset($params['parents']);
+    $this->callAPISuccess('group', 'create', $params);
+    $group1 = $this->callAPISuccess('group', 'get', array(
+      'title' => 'Test illegal Group',
+      'parents' => array('IS NOT NULL' => 1),
+    ));
+    $this->assertEquals(0, $group1['count']);
+    $params['title'] = 'Test illegal Group 2';
+    $params['parents'] = array();
+    $params['parents'][$this->_groupID] = 'test Group';
+    $params['parents']["(SELECT api_key FROM civicrm_contact where id = 1)"] = "Test";
+    $group2 = $this->callAPIFailure('group', 'create', $params);
+    unset($params['parents']["(SELECT api_key FROM civicrm_contact where id = 1)"]);
+    $group2 = $this->callAPISuccess('group', 'create', $params);
+    $this->assertEquals(count($group2['values'][$group2['id']]['parents']), 1);
+  }
+
+}

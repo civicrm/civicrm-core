@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,16 +22,20 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Contact_PrivacyOptionSearchTest
+ */
 class WebTest_Contact_PrivacyOptionSearchTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
     parent::setUp();
   }
 
-  function testPrivacyOptionSearch() {
+  public function testPrivacyOptionSearch() {
     $this->webtestLogin();
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
@@ -76,7 +80,6 @@ class WebTest_Contact_PrivacyOptionSearchTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("group_id");
     $this->select("group_id", "label=$groupName");
     $this->click("_qf_GroupContact_next");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Add Contact2.
     $fname2 = substr(sha1(rand()), 0, 7);
@@ -102,38 +105,29 @@ class WebTest_Contact_PrivacyOptionSearchTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("group_id");
     $this->select("group_id", "label=$groupName");
     $this->click("_qf_GroupContact_next");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Go to advance search, check for 'Exclude' option.
     $this->openCiviPage("contact/search/advanced", "reset=1");
 
-    $this->select("xpath=//form[@id='Advanced']//table[1]/tbody/tr[2]/td[2]//select[1]", "label={$groupName}");
+    $this->select("group", "label={$groupName}");
     $this->waitForTextPresent($groupName);
 
-    $this->select("xpath=//form[@id='Advanced']//table[1]/tbody/tr[5]/td[1]/table[1]/tbody/tr[2]/td[1]//select[1]", 'value=do_not_phone');
-    $this->waitForTextPresent('Do not phone');
-
-    $this->select("xpath=//form[@id='Advanced']//table[1]/tbody/tr[5]/td[1]/table[1]/tbody/tr[2]/td[1]//select[1]", 'value=do_not_email');
-    $this->waitForTextPresent('Do not email');
+    $this->multiselect2('privacy_options', array('Do not phone', 'Do not email'));
 
     $this->click("_qf_Advanced_refresh");
     $this->waitForPageToLoad(2 * $this->getTimeoutMsec());
 
-    $this->assertTrue($this->isTextPresent("No matches found"));
+    $this->assertTrue($this->isTextPresent("None found."));
 
     // Go to advance search, check for 'Include' + 'OR' options.
     $this->openCiviPage("contact/search/advanced", "reset=1");
 
-    $this->select("xpath=//form[@id='Advanced']//table[1]/tbody/tr[2]/td[2]//select[1]", "label={$groupName}");
+    $this->select("group", "label={$groupName}");
     $this->waitForTextPresent($groupName);
 
-    $this->click("xpath=//form[@id='Advanced']//table[1]/tbody/tr[5]/td[1]/table[1]/tbody/tr[1]/td[1]//input[2]");
+    $this->click("CIVICRM_QFID_2_privacy_toggle");
 
-    $this->select("xpath=//form[@id='Advanced']//table[1]/tbody/tr[5]/td[1]/table[1]/tbody/tr[2]/td[1]//select[1]", 'value=do_not_phone');
-    $this->waitForTextPresent('Do not phone');
-
-    $this->select("xpath=//form[@id='Advanced']//table[1]/tbody/tr[5]/td[1]/table[1]/tbody/tr[2]/td[1]//select[1]", 'value=do_not_email');
-    $this->waitForTextPresent('Do not email');
+    $this->multiselect2('privacy_options', array('Do not phone', 'Do not email'));
 
     $this->click("_qf_Advanced_refresh");
     $this->waitForPageToLoad(2 * $this->getTimeoutMsec());
@@ -144,16 +138,12 @@ class WebTest_Contact_PrivacyOptionSearchTest extends CiviSeleniumTestCase {
     // Go to advance search, check for 'Include' + 'AND' options.
     $this->openCiviPage("contact/search/advanced", "reset=1");
 
-    $this->select("xpath=//form[@id='Advanced']//table[1]/tbody/tr[2]/td[2]//select[1]", "label={$groupName}");
+    $this->select("group", "label={$groupName}");
     $this->waitForTextPresent($groupName);
 
-    $this->click("xpath=//form[@id='Advanced']//table[1]/tbody/tr[5]/td[1]/table[1]/tbody/tr[1]/td[1]//input[2]");
+    $this->click("CIVICRM_QFID_2_privacy_toggle");
 
-    $this->select("xpath=//form[@id='Advanced']//table[1]/tbody/tr[5]/td[1]/table[1]/tbody/tr[2]/td[1]//select[1]", 'value=do_not_phone');
-    $this->waitForTextPresent('Do not phone');
-
-    $this->select("xpath=//form[@id='Advanced']//table[1]/tbody/tr[5]/td[1]/table[1]/tbody/tr[2]/td[1]//select[1]", 'value=do_not_trade');
-    $this->waitForTextPresent('Do not trade');
+    $this->multiselect2('privacy_options', array('Do not phone', 'Do not trade'));
 
     $this->select('privacy_operator', 'value=AND');
 
@@ -162,5 +152,5 @@ class WebTest_Contact_PrivacyOptionSearchTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isTextPresent("1 Contact"));
     $this->assertTrue($this->isTextPresent("$lname2, $fname2"));
   }
-}
 
+}

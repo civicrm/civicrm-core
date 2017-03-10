@@ -1,10 +1,9 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,38 +26,33 @@
  */
 
 /**
- * File for the CiviCRM APIv3 user framework join functions
+ * This api exposes CiviCRM user framework join.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_UF
- *
- * @copyright CiviCRM LLC (c) 2004-2013
- * @version $Id: UFJoin.php 30171 2010-10-14 09:11:27Z mover $
- *
  */
 
 /**
- * takes an associative array and creates a uf join in the database
+ * Takes an associative array and creates a uf join in the database.
  *
- * @param array $params assoc array of name/value pairs
+ * @param array $params
+ *   Array per getfields metadata.
  *
- * @return array CRM_Core_DAO_UFJoin Array
- * @access public
- * @example UFJoinCreate.php
- *  {@getfields UFJoin_create}
- *
+ * @return array
+ *   CRM_Core_DAO_UFJoin Array
  */
 function civicrm_api3_uf_join_create($params) {
 
   $ufJoin = CRM_Core_BAO_UFJoin::create($params);
   _civicrm_api3_object_to_array($ufJoin, $ufJoinArray[]);
-  return civicrm_api3_create_success($ufJoinArray, $params, 'uf_join', 'create');
+  return civicrm_api3_create_success($ufJoinArray, $params, 'UFJoin', 'create');
 }
 
 /**
- * Adjust Metadata for Create action
+ * Adjust Metadata for Create action.
  *
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array of parameters determined by getfields.
+ *
  * @todo - suspect module, weight don't need to be required - need to test
  */
 function _civicrm_api3_uf_join_create_spec(&$params) {
@@ -68,16 +62,27 @@ function _civicrm_api3_uf_join_create_spec(&$params) {
 }
 
 /**
- * Get CiviCRM UF_Joins (ie joins between CMS user records & CiviCRM user record
+ * Get CiviCRM UF_Joins (ie joins between CMS user records & CiviCRM user record.
  *
- * @param array $params (reference) an assoc array of name/value pairs
+ * @param array $params
+ *   Array of name/value pairs.
  *
- * @return array $result CiviCRM Result Array or null
- * @todo Delete function missing
- * @access public
- * {getfields UFJoin_get}
+ * @return array
+ *   API result array.
  */
 function civicrm_api3_uf_join_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
+/**
+ * Delete a CiviCRM UF_Join.
+ *
+ * @param array $params
+ *   Array of name/value pairs.
+ *
+ * @return array
+ *   API result array.
+ */
+function civicrm_api3_uf_join_delete($params) {
+  return _civicrm_api3_basic_delete('CRM_Core_BAO_UFJoin', $params);
+}

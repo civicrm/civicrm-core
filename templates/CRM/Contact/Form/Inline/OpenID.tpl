@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -37,7 +37,7 @@
   <tr>
     <td>{ts}Open ID{/ts}&nbsp;
     {if $actualBlockCount lt 5 }
-      <span id="add-more-openid" title="{ts}click to add more{/ts}"><a class="crm-link-action add-more-inline">{ts}add{/ts}</a></span>
+      <span id="add-more-openid" title="{ts}click to add more{/ts}"><a class="crm-hover-button action-item add-more-inline" href="#">{ts}add{/ts}</a></span>
     {/if}
     </td>
     <td>{ts}Open ID Location{/ts}</td>
@@ -53,7 +53,7 @@
     <td align="center" id="OpenID-Primary-html" class="crm-openid-is_primary">{$form.openid.$blockId.is_primary.1.html}</td>
     <td>
       {if $blockId gt 1}
-        <a class="crm-delete-inline crm-link-action" title="{ts}Delete OpenID Block{/ts}">{ts}delete{/ts}</a>
+        <a class="crm-delete-inline crm-hover-button" href="#" title="{ts}Delete OpenID{/ts}"><span class="icon delete-icon"></span></a>
       {/if}
     </td>
   </tr>
@@ -62,7 +62,7 @@
 
 {literal}
 <script type="text/javascript">
-    cj(function($) {
+    CRM.$(function($) {
       // check first primary radio
       $('#OpenID_1_IsPrimary').prop('checked', true );
     });

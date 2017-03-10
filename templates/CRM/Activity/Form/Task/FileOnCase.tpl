@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,8 +24,8 @@
  +--------------------------------------------------------------------+
 *}
 <div class="crm-form crm-form-block crm-file-on-case-form-block">
-<div id="help">
-   File on Case
+<div class="help">
+   {ts}File on Case{/ts}
 </div>
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
    <table class="form-layout-compressed">
@@ -43,23 +43,3 @@
 </table>
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>
-{literal}
-<script type="text/javascript">
-cj(function($) {
-  var $form = $("#{/literal}{$form.formName}{literal}");
-  $('input[name=unclosed_case_id]', $form).select2({
-    placeholder: {/literal}'{ts escape="js"}- select case -{/ts}'{literal},
-    minimumInputLength: 1,
-    ajax: {
-      url: {/literal}"{crmURL p='civicrm/case/ajax/unclosed' h=0}"{literal},
-      data: function(term) {
-        return {term: term};
-      },
-      results: function(response) {
-        return {results: response};
-      }
-    }
-  });
-});
-{/literal}
-</script>

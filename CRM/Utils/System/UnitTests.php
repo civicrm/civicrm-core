@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
  */
@@ -36,45 +36,62 @@
 /**
  * Helper authentication class for unit tests
  */
-class CRM_Utils_System_UnitTests extends CRM_Utils_System_Drupal {
-  function __construct() {
+class CRM_Utils_System_UnitTests extends CRM_Utils_System_Base {
+  /**
+   */
+  public function __construct() {
     $this->is_drupal = FALSE;
-    $this->supports_form_extensions = False;
+    $this->supports_form_extensions = FALSE;
   }
 
-  function setTitle($title, $pageTitle = NULL) {
-    return;
-  }
-
-  static function authenticate($name, $password, $loadCMSBootstrap = FALSE, $realPath = NULL) {
+  /**
+   * @inheritDoc
+   */
+  public function authenticate($name, $password, $loadCMSBootstrap = FALSE, $realPath = NULL) {
     $retVal = array(1, 1, 12345);
     return $retVal;
   }
 
-  function appendBreadCrumb($breadCrumbs) {
-    return;
+  /**
+   * Bootstrap the phony CMS.
+   *
+   * @param string $name
+   *   Optional username for login.
+   * @param string $pass
+   *   Optional password for login.
+   *
+   * @return bool
+   */
+  public function loadBootStrap($name = NULL, $pass = NULL) {
+    return TRUE;
   }
 
-  function resetBreadCrumb() {
-    return;
-  }
-
-  function addHTMLHead($head) {
-    return;
-  }
-
-  function mapConfigToSSL() {
+  /**
+   * @inheritDoc
+   */
+  public function mapConfigToSSL() {
     global $base_url;
     $base_url = str_replace('http://', 'https://', $base_url);
   }
 
-  function postURL($action) {
-    return;
+  /**
+   * @inheritDoc
+   */
+  public function postURL($action) {
+    return NULL;
   }
 
-  function url($path = NULL, $query = NULL, $absolute = FALSE,
-    $fragment = NULL, $htmlize = TRUE,
-    $frontend = FALSE, $forceBackend = FALSE
+  /**
+   * @inheritDoc
+   */
+  public function url(
+    $path = NULL,
+    $query = NULL,
+    $absolute = FALSE,
+    $fragment = NULL,
+    $htmlize = TRUE,
+    $frontend = FALSE,
+    $forceBackend = FALSE
   ) {
     $config = CRM_Core_Config::singleton();
     static $script = 'index.php';
@@ -129,7 +146,10 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Drupal {
     }
   }
 
-  function getUserID($user) {
+  /**
+   * @param $user
+   */
+  public function getUserID($user) {
     //FIXME: look here a bit closer when testing UFMatch
 
     // this puts the appropriate values in the session, so
@@ -137,42 +157,19 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Drupal {
     CRM_Core_BAO_UFMatch::synchronize($user, TRUE, 'Standalone', 'Individual');
   }
 
-  function getAllowedToLogin($user) {
-    return TRUE;
-  }
-
-  function setMessage($message) {
-    return;
-  }
-
-  function permissionDenied() {
-    CRM_Core_Error::fatal(ts('You do not have permission to access this page'));
-  }
-
-  function logout() {
+  /**
+   * @inheritDoc
+   */
+  public function logout() {
     session_destroy();
-    header("Location:index.php");
-  }
-
-  function getUFLocale() {
-    return NULL;
-  }
-
-  function getModules() {
-    return array();
+    CRM_Utils_System::setHttpHeader("Location", "index.php");
   }
 
   /**
-   * Get user login URL for hosting CMS (method declared in each CMS system class)
-   *
-   * @param string $destination - if present, add destination to querystring (works for Drupal only)
-   *
-   * @return string - loginURL for the current CMS
-   * @static
+   * @inheritDoc
    */
   public function getLoginURL($destination = '') {
     throw new Exception("Method not implemented: getLoginURL");
   }
 
 }
-

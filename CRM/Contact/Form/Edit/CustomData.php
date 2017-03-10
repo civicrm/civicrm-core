@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,30 +23,27 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
- * form helper class for an Demographics object
+ * Form helper class for an Demographics object.
  */
 class CRM_Contact_Form_Edit_CustomData {
 
   /**
-   * build all the data structures needed to build the form
+   * Build all the data structures needed to build the form.
    *
-   * @return void
-   * @access public
+   * @param CRM_Core_Form $form
    */
-  static function preProcess(&$form) {
-    $form->_type = CRM_Utils_Request::retrieve('type', 'String', CRM_Core_DAO::$_nullObject);
-    $form->_subType = CRM_Utils_Request::retrieve('subType', 'String', CRM_Core_DAO::$_nullObject);
+  public static function preProcess(&$form) {
+    $form->_type = CRM_Utils_Request::retrieve('type', 'String');
+    $form->_subType = CRM_Utils_Request::retrieve('subType', 'String');
 
     //build the custom data as other blocks.
     //$form->assign( "addBlock", false );
@@ -65,23 +62,20 @@ class CRM_Contact_Form_Edit_CustomData {
   }
 
   /**
-   * build the form elements for CustomData object
+   * Build the form object elements for CustomData object.
    *
-   * @param CRM_Core_Form $form       reference to the form object
-   *
-   * @return void
-   * @access public
-   * @static
+   * @param CRM_Core_Form $form
+   *   Reference to the form object.
    */
-  static function buildQuickForm(&$form) {
-    if(!empty($form->_submitValues)) {
+  public static function buildQuickForm(&$form) {
+    if (!empty($form->_submitValues)) {
       if ($customValueCount = CRM_Utils_Array::value('hidden_custom_group_count', $form->_submitValues)) {
         if (is_array($customValueCount)) {
           if (array_key_exists(0, $customValueCount)) {
             unset($customValueCount[0]);
           }
           $form->_customValueCount = $customValueCount;
-          $form->assign( 'customValueCount', $customValueCount);
+          $form->assign('customValueCount', $customValueCount);
         }
       }
     }
@@ -100,15 +94,15 @@ class CRM_Contact_Form_Edit_CustomData {
   }
 
   /**
-   * This function sets the default values for the form. Note that in edit/view mode
+   * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
-   * @return void
+   * @param CRM_Core_Form $form
+   * @param array $defaults
    */
-  static function setDefaultValues(&$form, &$defaults) {
+  public static function setDefaultValues(&$form, &$defaults) {
     $defaults += CRM_Custom_Form_CustomData::setDefaultValues($form);
   }
-}
 
+}

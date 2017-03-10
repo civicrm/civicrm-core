@@ -8,87 +8,105 @@
   <add>1.1</add>
   <log>true</log>
   <field>
-      <name>id</name>
-      <type>int unsigned</type>
-      <required>true</required>
-      <comment>Note ID</comment>
-       <add>1.1</add>
+    <name>id</name>
+    <title>Note ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Note ID</comment>
+    <add>1.1</add>
   </field>
   <primaryKey>
-       <name>id</name>
-       <autoincrement>true</autoincrement>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
   </primaryKey>
   <field>
-       <name>entity_table</name>
-       <type>varchar</type>
-       <length>64</length>
-       <required>true</required>
-       <comment>Name of table where item being referenced is stored.</comment>
-       <add>1.1</add>
+    <name>entity_table</name>
+    <title>Note Entity</title>
+    <type>varchar</type>
+    <length>64</length>
+    <required>true</required>
+    <comment>Name of table where item being referenced is stored.</comment>
+    <pseudoconstant>
+      <callback>CRM_Core_BAO_Note::entityTables</callback>
+    </pseudoconstant>
+    <add>1.1</add>
   </field>
   <field>
-       <name>entity_id</name>
-       <type>int unsigned</type>
-       <required>true</required>
-       <comment>Foreign key to the referenced item.</comment>
-       <add>1.1</add>
+    <name>entity_id</name>
+    <title>Note Entity ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Foreign key to the referenced item.</comment>
+    <add>1.1</add>
   </field>
   <dynamicForeignKey>
-       <idColumn>entity_id</idColumn>
-       <typeColumn>entity_table</typeColumn>
-       <add>1.1</add>
+    <idColumn>entity_id</idColumn>
+    <typeColumn>entity_table</typeColumn>
+    <add>1.1</add>
   </dynamicForeignKey>
   <index>
-       <name>index_entity</name>
-       <fieldName>entity_table</fieldName>
-       <fieldName>entity_id</fieldName>
-       <add>1.1</add>
+    <name>index_entity</name>
+    <fieldName>entity_table</fieldName>
+    <fieldName>entity_id</fieldName>
+    <add>1.1</add>
   </index>
   <field>
-       <name>note</name>
-       <type>text</type>
-       <comment>Note and/or Comment.</comment>
-       <html>
-         <type>TextArea</type>
-         <rows>4</rows>
-         <cols>60</cols>
-       </html>
-       <import>true</import>
-       <headerPattern>/Note|Comment/i</headerPattern>
-       <dataPattern>//</dataPattern>
-       <add>1.1</add>
+    <name>note</name>
+    <title>Note</title>
+    <type>text</type>
+    <comment>Note and/or Comment.</comment>
+    <html>
+      <type>TextArea</type>
+      <rows>4</rows>
+      <cols>60</cols>
+    </html>
+    <import>true</import>
+    <headerPattern>/Note|Comment/i</headerPattern>
+    <dataPattern>//</dataPattern>
+    <add>1.1</add>
   </field>
   <field>
-       <name>contact_id</name>
-       <type>int unsigned</type>
-       <comment>FK to Contact ID creator</comment>
-       <add>1.1</add>
+    <name>contact_id</name>
+    <title>Note Created By</title>
+    <type>int unsigned</type>
+    <comment>FK to Contact ID creator</comment>
+    <add>1.1</add>
   </field>
   <foreignKey>
-       <name>contact_id</name>
-       <table>civicrm_contact</table>
-       <key>id</key>
-       <add>1.1</add>
-       <onDelete>SET NULL</onDelete>
+    <name>contact_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <add>1.1</add>
+    <onDelete>SET NULL</onDelete>
   </foreignKey>
   <field>
-       <name>modified_date</name>
-       <type>date</type>
-       <comment>When was this note last modified/edited</comment>
-       <add>1.1</add>
+    <name>modified_date</name>
+    <title>Note Modified By</title>
+    <type>date</type>
+    <comment>When was this note last modified/edited</comment>
+    <add>1.1</add>
   </field>
   <field>
-       <name>subject</name>
-       <type>varchar</type>
-       <length>255</length>
-       <comment>subject of note description</comment>
-       <add>1.5</add>
+    <name>subject</name>
+    <title>Subject</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>subject of note description</comment>
+    <html>
+      <type>Text</type>
+      <size>60</size>
+    </html>
+    <add>1.5</add>
   </field>
   <field>
-       <name>privacy</name>
-       <type>varchar</type>
-       <length>255</length>
-       <comment>Foreign Key to Note Privacy Level (which is an option value pair and hence an implicit FK)</comment>
-       <add>3.3</add>
+    <name>privacy</name>
+    <title>Privacy</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>Foreign Key to Note Privacy Level (which is an option value pair and hence an implicit FK)</comment>
+    <add>3.3</add>
+    <pseudoconstant>
+      <optionGroupName>note_privacy</optionGroupName>
+    </pseudoconstant>
   </field>
 </table>

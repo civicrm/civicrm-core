@@ -1,31 +1,25 @@
 <?php
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-
+/**
+ * Class CRM_Core_RegionTest
+ * @group headless
+ */
 class CRM_Core_RegionTest extends CiviUnitTestCase {
-  function get_info() {
-    return array(
-      'name'    => 'Region',
-      'description' => 'Smarty-region rendering test',
-      'group'     => 'Core',
-    );
-  }
-
-  function setUp() {
+  public function setUp() {
     parent::setUp();
     require_once 'CRM/Core/Smarty.php';
     require_once 'CRM/Core/Region.php';
 
     // Templates injected into regions should normally be file names, but for unit-testing it's handy to use "string:" notation
     require_once 'CRM/Core/Smarty/resources/String.php';
-    civicrm_smarty_register_string_resource( );
+    civicrm_smarty_register_string_resource();
   }
 
   /**
    * When a {crmRegion} is blank and when there are no extra snippets, the
    * output is blank.
    */
-  function testBlank() {
+  public function testBlank() {
     $smarty = CRM_Core_Smarty::singleton();
     $actual = $smarty->fetch('string:{crmRegion name=testBlank}{/crmRegion}');
     $expected = '';
@@ -36,7 +30,7 @@ class CRM_Core_RegionTest extends CiviUnitTestCase {
    * When a {crmRegion} is not blank and when there are no extra snippets,
    * the output is only determined by the {crmRegion} block.
    */
-  function testDefault() {
+  public function testDefault() {
     $smarty = CRM_Core_Smarty::singleton();
     $actual = $smarty->fetch('string:{crmRegion name=testDefault}default<br/>{/crmRegion}');
     $expected = 'default<br/>';
@@ -46,9 +40,9 @@ class CRM_Core_RegionTest extends CiviUnitTestCase {
   /**
    * Disable the normal content of a {crmRegion} and apply different content from a snippet
    */
-  function testOverride() {
+  public function testOverride() {
     CRM_Core_Region::instance('testOverride')->update('default', array(
-       'disabled' => TRUE,
+      'disabled' => TRUE,
     ));
     CRM_Core_Region::instance('testOverride')->add(array(
       'markup' => 'override<br/>',
@@ -61,9 +55,9 @@ class CRM_Core_RegionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test that each of the major content formats are correctly evaluated
+   * Test that each of the major content formats are correctly evaluated.
    */
-  function testAllTypes() {
+  public function testAllTypes() {
     CRM_Core_Region::instance('testAllTypes')->add(array(
       'markup' => 'some-markup<br/>',
     ));
@@ -75,15 +69,15 @@ class CRM_Core_RegionTest extends CiviUnitTestCase {
     CRM_Core_Region::instance('testAllTypes')->add(array(
       // note: returns a value which gets appended to the region
       'callback' => 'implode',
-      'arguments' => array('-', array('callback','with','specific','args<br/>')),
+      'arguments' => array('-', array('callback', 'with', 'specific', 'args<br/>')),
     ));
     CRM_Core_Region::instance('testAllTypes')->add(array(
       // note: returns a value which gets appended to the region
-      'callback' => create_function('&$spec, &$html', 'return "callback-return<br/>";')
+      'callback' => create_function('&$spec, &$html', 'return "callback-return<br/>";'),
     ));
     CRM_Core_Region::instance('testAllTypes')->add(array(
       // note: returns void; directly modifies region's $html
-      'callback' => create_function('&$spec, &$html', '$html = "callback-ref<br/>" . $html;')
+      'callback' => create_function('&$spec, &$html', '$html = "callback-ref<br/>" . $html;'),
     ));
     CRM_Core_Region::instance('testAllTypes')->add(array(
       'scriptUrl' => '/foo%20bar.js',
@@ -111,17 +105,16 @@ class CRM_Core_RegionTest extends CiviUnitTestCase {
       . "callback-return<br/>"
       . "<script type=\"text/javascript\" src=\"/foo%20bar.js\">\n</script>\n"
       . "<script type=\"text/javascript\">\nalert(\"hi\");\n</script>\n"
-      . "<script type=\"text/javascript\">\ncj(function(\$){\n\$(\"div\");\n});\n</script>\n"
+      . "<script type=\"text/javascript\">\nCRM.\$(function(\$) {\n\$(\"div\");\n});\n</script>\n"
       . "<link href=\"/foo%20bar.css\" rel=\"stylesheet\" type=\"text/css\"/>\n"
-      . "<style type=\"text/css\">\nbody { background: black; }\n</style>\n"
-      ;
+      . "<style type=\"text/css\">\nbody { background: black; }\n</style>\n";
     $this->assertEquals($expected, $actual);
   }
 
   /**
    * Test of nested arrangement in which one {crmRegion} directly includes another {crmRegion}
    */
-  function testDirectNest() {
+  public function testDirectNest() {
     CRM_Core_Region::instance('testDirectNestOuter')->add(array(
       'template' => 'string:O={$snippet.weight} ',
       'weight' => -5,
@@ -149,7 +142,7 @@ class CRM_Core_RegionTest extends CiviUnitTestCase {
   /**
    * Test of nested arrangement in which one {crmRegion} is enhanced with a snippet which, in turn, includes another {crmRegion}
    */
-  function testIndirectNest() {
+  public function testIndirectNest() {
     CRM_Core_Region::instance('testIndirectNestOuter')->add(array(
       // Note: all three $snippet references are bound to the $snippet which caused this template to be included,
       // regardless of any nested {crmRegion}s
@@ -169,7 +162,7 @@ class CRM_Core_RegionTest extends CiviUnitTestCase {
   /**
    * Output from an inner-region should not be executed verbatim; this is obvious but good to verify
    */
-  function testNoInjection() {
+  public function testNoInjection() {
     CRM_Core_Region::instance('testNoInjectionOuter')->add(array(
       'template' => 'string:{$snippet.scarystuff} ',
       'scarystuff' => '{$is_outer_scary}',
@@ -192,7 +185,7 @@ class CRM_Core_RegionTest extends CiviUnitTestCase {
    * Make sure that standard Smarty variables ($smarty->assign(...)) as well
    * as the magical $snippet variable both evaluate correctly.
    */
-  function testSmartyVars() {
+  public function testSmartyVars() {
     $smarty = CRM_Core_Smarty::singleton();
     $smarty->assign('extrainfo', 'one');
     CRM_Core_Region::instance('testSmartyVars')->add(array(
@@ -209,7 +202,7 @@ class CRM_Core_RegionTest extends CiviUnitTestCase {
     $this->assertEquals($expected, $actual);
   }
 
-  function testWeight() {
+  public function testWeight() {
     CRM_Core_Region::instance('testWeight')->add(array(
       'markup' => 'prepend-5<br/>',
       'weight' => -5,

@@ -8,6 +8,7 @@
 
   <field>
     <name>id</name>
+    <title>Campaign Group ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Campaign Group id.</comment>
@@ -20,6 +21,7 @@
 
   <field>
     <name>campaign_id</name>
+    <title>Campaign</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Foreign key to the activity Campaign.</comment>
@@ -40,6 +42,7 @@
 
   <field>
     <name>group_type</name>
+    <title>Campaign Group Type</title>
     <type>varchar</type>
     <length>8</length>
     <default>NULL</default>
@@ -54,6 +57,7 @@
 
   <field>
     <name>entity_table</name>
+    <title>Entity Table</title>
     <type>varchar</type>
     <length>64</length>
     <default>NULL</default>
@@ -63,6 +67,7 @@
 
   <field>
     <name>entity_id</name>
+    <title>Entity ID</title>
     <type>int unsigned</type>
     <default>NULL</default>
     <comment>Entity id of referenced table.</comment>

@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,7 +24,7 @@
  +--------------------------------------------------------------------+
 *}
 <div class="crm-block crm-form-block crm-member-task-batch-form-block">
-<div id="help">
+<div class="help">
     {ts}Update field values for each member as needed. Click <strong>Update Memberships</strong> below to save all your changes. To set a field to the same value for ALL rows, enter that value for the first member and then click the <strong>Copy icon</strong> (next to the column title).{/ts}
 </div>
          <div class="crm-submit-buttons">
@@ -51,7 +51,7 @@
 
               {foreach from=$fields item=field key=fieldName}
                 {assign var=n value=$field.name}
-                {if ( $fields.$n.data_type eq 'Date') or ($n eq 'join_date') or ($n eq 'membership_start_date') or ($n eq 'membership_end_date')}
+                {if ($n eq 'join_date') or ($n eq 'membership_start_date') or ($n eq 'membership_end_date')}
                    <td class="compressed">{include file="CRM/common/jcalendar.tpl" elementName=$n elementIndex=$mid batchUpdate=1}</td>
                 {else}
                   <td class="compressed">{$form.field.$mid.$n.html}</td>

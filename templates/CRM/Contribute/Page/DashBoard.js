@@ -1,7 +1,7 @@
 // http://civicrm.org/licensing
 /*jslint indent: 2 */
 /*global CRM, cj */
-cj(function ($) {
+(function($) {
   'use strict';
 
   var load = {
@@ -21,20 +21,31 @@ cj(function ($) {
     }
   };
 
-  $('#chart_view, #table_view').click(function() {
-    if ($(this).hasClass('ui-state-default')) {
-      $('.ui-tabs-selected', '#mainTabContainer').removeClass('ui-state-active ui-tabs-selected').addClass('ui-state-default');
-      $(this).removeClass('ui-state-default').addClass('ui-state-active ui-tabs-selected');
-      load[this.id]();
-    }
-  });
+  function refresh() {
+    $('#chart_view, #table_view').click(function () {
+      if ($(this).hasClass('ui-state-default')) {
+        $('.ui-tabs-selected', '#mainTabContainer').removeClass('ui-state-active ui-tabs-selected').addClass('ui-state-default');
+        $(this).removeClass('ui-state-default').addClass('ui-state-active ui-tabs-selected');
+        load[this.id]();
+      }
+    });
 
-  // Initialize chart or table based on url hash
-  if (window.location.hash === '#table_layout') {
-    $('#table_view').click();
+    // Initialize chart or table based on url hash
+    if (window.location.hash === '#table_layout') {
+      $('#table_view').click();
+    }
+    else {
+      load.chart_view();
+    }
   }
-  else {
-    load.chart_view();
-  }
-});
+
+  $(function () {
+    $('#crm-main-content-wrapper').on('crmLoad', function (e) {
+      if ($(e.target).is(this)) {
+        refresh();
+      }
+    });
+    refresh();
+  });
+})(CRM.$);
 

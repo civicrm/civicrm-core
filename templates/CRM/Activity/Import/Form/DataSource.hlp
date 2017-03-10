@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -35,6 +35,6 @@
     </p>
     <p>
         <strong>{ts}TIP - Matching Activities to Contact Records{/ts}</strong><br />
-        {ts}CiviCRM allows you to indicate which contact each activity record belongs to using either the unique CiviCRM-assigned Contact ID, a unique External ID which you assign, OR your configured 'strict' Dedupe Rule set (which uses email addresses by default). You must include at least one of these values as a column in your import file. If you are synchronizing (or migrating) contacts from another application to CiviCRM, and that application has assigned a unique ID to each contact, you can import that value into CiviCRM's External ID field. Then you can use that unique key as the 'match to contact' value when importing related data such as Activities.{/ts}
+        {ts}CiviCRM allows you to indicate which contact each activity record belongs to using either the unique CiviCRM-assigned Contact ID, a unique External ID which you assign, OR your configured Unsupervised Duplicate Matching Rule set (which uses email addresses by default). You must include at least one of these values as a column in your import file. If you are synchronizing (or migrating) contacts from another application to CiviCRM, and that application has assigned a unique ID to each contact, you can import that value into CiviCRM's External ID field. Then you can use that unique key as the 'match to contact' value when importing related data such as Activities.{/ts}
     <p>
 {/htxt}

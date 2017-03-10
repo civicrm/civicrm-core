@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -26,7 +26,7 @@
 <div class="crm-block crm-form-block crm-mailing-upload-form-block">
 {include file="CRM/common/WizardHeader.tpl"}
 
-<div id="help">
+<div class="help">
     {ts}You can either <strong>upload</strong> the sms content from your computer OR <strong>compose</strong> the content on this screen.{/ts} {help id="content-intro"}
 </div>
 
@@ -38,14 +38,15 @@
     </tr>
 
     <tr class="crm-mailing-upload-form-block-template">
-      <td class="label">{$form.template.label}</td>
-  <td>{$form.template.html}</td>
+      <td class="label">{$form.SMStemplate.label}</td>
+  <td>{$form.SMStemplate.html}</td>
     </tr>
     <tr class="crm-mailing-upload-form-block-upload_type"><td></td><td colspan="2">{$form.upload_type.label} {$form.upload_type.html} {help id="upload-compose"}</td></tr>
 </table>
 
 <fieldset id="compose_id"><legend>{ts}Compose On-screen{/ts}</legend>
 {include file="CRM/Contact/Form/Task/SMSCommon.tpl" upload=1 noAttach=1}
+{include file="CRM/Mailing/Form/InsertTokens.tpl"}
 </fieldset>
 
    <fieldset id="upload_id"><legend>{ts}Upload Content{/ts}</legend>
@@ -77,11 +78,7 @@
             cj('#compose_id').show();
       cj('.crm-mailing-upload-form-block-template').show();
       cj('#upload_id').hide();
-            verify( );
         }
     }
 </script>
 {/literal}
-
-{* include jscript to warn if unsaved form field changes *}
-{include file="CRM/common/formNavigate.tpl"}

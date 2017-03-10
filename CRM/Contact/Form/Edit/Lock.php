@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,48 +23,42 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
- * Auxilary class to provide support for locking (and ignoring locks on)
- * contact records.
+ * Auxiliary class to provide support for locking (and ignoring locks on) contact records.
  */
 class CRM_Contact_Form_Edit_Lock {
 
   /**
-   * This function provides the HTML form elements
+   * Build the form object.
    *
-   * @param object $form form object
-   * @param int $inlineEditMode ( 1 for contact summary
-   * top bar form and 2 for display name edit )
-   *
-   * @access public
-   * @return void
+   * @param CRM_Core_Form $form
+   *   Form object.
    */
   public static function buildQuickForm(&$form) {
-    $form->addElement('hidden', 'modified_date', '', array('id' => 'modified_date'));
+    $form->addField('modified_date', array('type' => 'hidden', 'id' => 'modified_date', 'label' => ''));
   }
 
   /**
-   * Ensure that modified_date hasn't changed in the underlying DB
+   * Ensure that modified_date has not changed in the underlying DB.
    *
-   * @param array $fields  the input form values
-   * @param array $files   the uploaded files if any
-   * @param array $options additional user data
+   * @param array $fields
+   *   The input form values.
+   * @param array $files
+   *   The uploaded files if any.
+   * @param int $contactID
    *
-   * @return true if no errors, else array of errors
-   * @access public
-   * @static
+   * @return bool|array
+   *   true if no errors, else array of errors
    */
-  static function formRule($fields, $files, $contactID = NULL) {
+  public static function formRule($fields, $files, $contactID = NULL) {
     $errors = array();
 
     $timestamps = CRM_Contact_BAO_Contact::getTimestamps($contactID);
@@ -77,4 +71,5 @@ class CRM_Contact_Form_Edit_Lock {
 
     return empty($errors) ? TRUE : $errors;
   }
+
 }

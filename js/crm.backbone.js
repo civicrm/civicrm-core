@@ -1,5 +1,4 @@
-(function($) {
-  var CRM = (window.CRM) ? (window.CRM) : (window.CRM = {});
+(function($, _) {
   if (!CRM.Backbone) CRM.Backbone = {};
 
   /**
@@ -16,8 +15,9 @@
   CRM.Backbone.sync = function(method, model, options) {
     var isCollection = _.isArray(model.models);
 
+    var apiOptions, params;
     if (isCollection) {
-      var apiOptions = {
+      apiOptions = {
         success: function(data) {
           // unwrap data
           options.success(_.toArray(data.values));
@@ -36,7 +36,7 @@
           break;
         // replace all entities matching "x.crmCriteria" with new entities in "x.models"
         case 'crm-replace':
-          var params = this.toCrmCriteria();
+          params = this.toCrmCriteria();
           params.version = 3;
           params.values = this.toJSON();
           CRM.api(model.crmEntityName, model.toCrmAction('replace'), params, apiOptions);
@@ -47,10 +47,10 @@
       }
     } else {
       // callback options to pass to CRM.api
-      var apiOptions = {
+      apiOptions = {
         success: function(data) {
           // unwrap data
-          var values = _.toArray(data['values']);
+          var values = _.toArray(data.values);
           if (data.count == 1) {
             options.success(values[0]);
           } else {
@@ -70,8 +70,8 @@
       switch (method) {
         case 'create': // pass-through
         case 'update':
-          var params = model.toJSON();
-          params.options || (params.options = {});
+          params = model.toJSON();
+          if (!params.options) params.options = {};
           params.options.reload = 1;
           if (!model._isDuplicate) {
             CRM.api(model.crmEntityName, model.toCrmAction('create'), params, apiOptions);
@@ -82,7 +82,7 @@
         case 'read':
         case 'delete':
           var apiAction = (method == 'delete') ? 'delete' : 'get';
-          var params = model.toCrmCriteria();
+          params = model.toCrmCriteria();
           if (!params.id) {
             apiOptions.error({is_error: 1, error_message: 'Missing ID for ' + model.crmEntityName});
             return;
@@ -123,7 +123,7 @@
       },
       toCrmCriteria: function() {
         var result = (this.get('id')) ? {id: this.get('id')} : {};
-        if (this.crmReturn != null) {
+        if (!_.isEmpty(this.crmReturn)) {
           result.return = this.crmReturn;
         }
         return result;
@@ -323,9 +323,9 @@
       },
       toCrmCriteria: function() {
         var result = (this.crmCriteria) ? _.extend({}, this.crmCriteria) : {};
-        if (this.crmReturn != null) {
+        if (!_.isEmpty(this.crmReturn)) {
           result.return = this.crmReturn;
-        } else if (this.model && this.model.prototype.crmReturn != null) {
+        } else if (this.model && !_.isEmpty(this.model.prototype.crmReturn)) {
           result.return = this.model.prototype.crmReturn;
         }
         return result;
@@ -360,7 +360,7 @@
        * @param Object options - accepts "success" and "error" callbacks
        */
       save: function(options) {
-        options || (options = {});
+        if (!options) options = {};
         var collection = this;
         var success = options.success;
         options.success = function(resp) {
@@ -371,14 +371,14 @@
         };
         wrapError(collection, options);
 
-        return this.sync('crm-replace', this, options)
+        return this.sync('crm-replace', this, options);
       }
     });
     // Overrides - if specified in CollectionClass, replace
     _.extend(CollectionClass.prototype, {
       sync: CRM.Backbone.sync,
       initialize: function(models, options) {
-        options || (options = {});
+        if (!options) options = {};
         if (options.crmCriteriaModel) {
           this.setCriteriaModel(options.crmCriteriaModel);
         } else if (options.crmCriteria) {
@@ -417,13 +417,13 @@
    *   - error: function(collection, error)
    */
    CRM.Backbone.findCreate = function(options) {
-     options || (options = {});
+     if (!options) options = {};
      var collection = new options.CollectionClass([], {
        crmCriteria: options.crmCriteria
      });
      collection.fetch({
       success: function(collection) {
-        if (collection.length == 0) {
+        if (collection.length === 0) {
           var attrs = _.extend({}, collection.crmCriteria, options.defaults || {});
           var model = collection._prepareModel(attrs, options);
           options.success(model);
@@ -565,8 +565,8 @@
   var wrapError = function (model, options) {
     var error = options.error;
     options.error = function(resp) {
-      if (error) error(model, resp, options);
+      if (error) error(model, resp, optio);
       model.trigger('error', model, resp, options);
     };
   };
-})(cj);
+})(CRM.$, CRM._);

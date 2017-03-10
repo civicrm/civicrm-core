@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,20 +23,28 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-{if $show eq 'event-payment'}
+{if $show eq 'payments'}
 {literal}
 <script type='text/javascript'>
-cj(function($){
-  var dataUrl = {/literal}'{crmURL p="civicrm/payment/view" h=0 q="action=browse&id=$participantId&cid=`$contactId`&component=event&context=payment_info&snippet=4"}'{literal};
-  cj.ajax({
-     url: dataUrl,
-     async: false,
-     success: function(html) {
-       cj("#payment-info").html(html);
-     }
-   });
+CRM.$(function($) {
+  if ($("#payment-info").length) {
+    var dataUrl = {/literal}'{crmURL p="civicrm/payment/view" h=0 q="action=browse&id=$componentId&cid=`$contactId`&component=$component&context=payment_info&snippet=4"}'{literal};
+    $.ajax({
+      url: dataUrl,
+      async: false,
+      success: function(html) {
+        $("#payment-info").html(html).trigger('crmLoad');
+      }
+    });
 
-  cj('.total_amount-section').remove();
+    var taxAmount = "{$totalTaxAmount}";
+    if (taxAmount) {
+      $('.total_amount-section').show();
+    }
+    else {
+      $('.total_amount-section').remove();
+    }
+  }
 });
 </script>
 {/literal}
@@ -46,6 +54,8 @@ cj(function($){
   <tr class="columnheader">
     {if $component eq "event"}
       <th>{ts}Total Fee(s){/ts}</th>
+    {else}
+      <th>{ts}Contribution Amount(s){/ts}</th>
     {/if}
     <th class="right">{ts}Total Paid{/ts}</th>
     <th class="right">{ts}Balance{/ts}</th>
@@ -54,18 +64,25 @@ cj(function($){
     <td>{$paymentInfo.total|crmMoney}</td>
     <td class='right'>
       {if $paymentInfo.paid > 0}
-        <a class='action-item' href='{crmURL p="civicrm/payment" q="view=transaction&cid=`$cid`&id=`$paymentInfo.id`&component=`$paymentInfo.component`&action=browse"}'>{$paymentInfo.paid|crmMoney}<br/>>> view payments</a>
+        {$paymentInfo.paid|crmMoney}
+        {if !$hideButtonLinks}
+          <br/>
+          <a class="crm-hover-button action-item crm-popup medium-popup" href='{crmURL p="civicrm/payment" q="view=transaction&cid=`$cid`&id=`$paymentInfo.id`&component=`$paymentInfo.component`&action=browse"}'>
+            <i class="crm-i fa-list"></i>
+            {ts}view payments{/ts}
+          </a>
+        {/if}
       {/if}
     </td>
-    <td class='right'>{$paymentInfo.balance|crmMoney}</td>
+    <td class="right" id="payment-info-balance" data-balance="{$paymentInfo.balance}">{$paymentInfo.balance|crmMoney}</td>
   </tr>
 </table>
-{if $paymentInfo.balance}
+{if $paymentInfo.balance and !$paymentInfo.payLater && !$hideButtonLinks}
   {if $paymentInfo.balance > 0}
      {assign var=paymentButtonName value='Record Payment'}
   {elseif $paymentInfo.balance < 0}
      {assign var=paymentButtonName value='Record Refund'}
   {/if}
-  <a class="button" href='{crmURL p="civicrm/payment" q="action=add&reset=1&component=`$component`&id=`$id`&cid=`$cid`"}' title="{ts}{$paymentButtonName}{/ts}"><span><div class="icon add-icon"></div> {ts}{$paymentButtonName}{/ts}</span></a>
+  <a class="action-item crm-hover-button" href='{crmURL p="civicrm/payment" q="action=add&reset=1&component=`$component`&id=`$id`&cid=`$cid`"}'><i class="crm-i fa-plus-circle"></i> {ts}{$paymentButtonName}{/ts}</a>
 {/if}
 {/if}

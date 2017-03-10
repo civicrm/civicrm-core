@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -33,7 +33,9 @@
    {if $newClient}
     <tr>
       <td>
-        <a href="{$newCaseURL}" class="button"><span>&raquo; {ts}New Case{/ts}</span></a>
+        <a href="{$newCaseURL}" class="button">
+          <span><i class="crm-i fa-plus-circle"></i> {ts}New Case{/ts}</span>
+        </a>
       </td>
     </tr>
    {/if}

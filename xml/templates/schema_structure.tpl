@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,14 +29,21 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2017
  *
  * Generated from {$smarty.template}
  * {$generated}
  */
 class CRM_Core_I18n_SchemaStructure
 {ldelim}
-    static function &columns()
+
+    /**
+     * Get translatable columns.
+     *
+     * @return array
+     *   A table-indexed array of translatable columns.
+     */
+    public static function &columns()
     {ldelim}
         static $result = null;
         if (!$result) {ldelim}
@@ -52,7 +59,14 @@ class CRM_Core_I18n_SchemaStructure
         {rdelim}
         return $result;
     {rdelim}
-    static function &indices()
+
+    /**
+     * Get a table indexed array of the indices for translatable fields.
+     *
+     * @return array
+     *   Indices for translatable fields.
+     */
+    public static function &indices()
     {ldelim}
         static $result = null;
         if (!$result) {ldelim}
@@ -76,11 +90,45 @@ class CRM_Core_I18n_SchemaStructure
         {rdelim}
         return $result;
     {rdelim}
+
+    /**
+     * Get tables with translatable fields.
+     *
+     * @return array
+     *   Array of names of tables with fields that can be translated.
+     */
     static function &tables()
     {ldelim}
         static $result = null;
         if (!$result) {ldelim}
             $result = array_keys(self::columns());
+        {rdelim}
+        return $result;
+    {rdelim}
+
+    /**
+     * Get a list of widgets for editing translatable fields.
+     *
+     * @return array
+     *   Array of the widgets for editing translatable fields.
+     */
+    static function &widgets()
+    {ldelim}
+        static $result = null;
+        if (!$result) {ldelim}
+          $result = array(
+            {foreach from=$widgets key=table item=columns}
+              '{$table}' => array(
+                {foreach from=$columns key=column item=widget}
+                  '{$column}' => array(
+                    {foreach from=$widget key=name item=value}
+                      '{$name}' => "{$value}",
+                    {/foreach}
+                  ),
+                {/foreach}
+              ),
+            {/foreach}
+          );
         {rdelim}
         return $result;
     {rdelim}

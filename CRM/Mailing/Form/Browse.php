@@ -1,10 +1,9 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,46 +23,35 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
- * Build the form for disable mail feature
- *
- * @param
- *
- * @return void
- * @access public
+ * Build the form object for disable mail feature
  */
 class CRM_Mailing_Form_Browse extends CRM_Core_Form {
 
   /**
    * Heart of the viewing process. The runner gets all the meta data for
    * the contact and calls the appropriate type of page to view.
-   *
-   * @return void
-   * @access public
-   *
    */
-  function preProcess() {
+  public function preProcess() {
     $this->_mailingId = CRM_Utils_Request::retrieve('mid', 'Positive', $this);
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this);
 
     // check for action permissions.
     if (!CRM_Core_Permission::checkActionPermission('CiviMail', $this->_action)) {
-      CRM_Core_Error::fatal(ts('You do not have permission to access this page'));
+      CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
     }
 
-    $mailing     = new CRM_Mailing_BAO_Mailing();
+    $mailing = new CRM_Mailing_BAO_Mailing();
     $mailing->id = $this->_mailingId;
-    $subject     = '';
+    $subject = '';
     if ($mailing->find(TRUE)) {
       $subject = $mailing->subject;
     }
@@ -71,12 +59,8 @@ class CRM_Mailing_Form_Browse extends CRM_Core_Form {
   }
 
   /**
-   * Function to actually build the form
-   *
-   * @return void
-   * @access public
+   * Build the form object.
    */
-
   public function buildQuickForm() {
     $this->addButtons(array(
         array(
@@ -92,12 +76,6 @@ class CRM_Mailing_Form_Browse extends CRM_Core_Form {
     );
   }
 
-  /**
-   *
-   * @access public
-   *
-   * @return void
-   */
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {
       CRM_Mailing_BAO_Mailing::del($this->_mailingId);
@@ -110,6 +88,5 @@ class CRM_Mailing_Form_Browse extends CRM_Core_Form {
       CRM_Core_DAO::setFieldValue('CRM_Mailing_DAO_Mailing', $this->_mailingId, 'is_archived', TRUE);
     }
   }
-  //end of function
-}
 
+}

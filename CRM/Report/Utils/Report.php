@@ -1,10 +1,9 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,18 +23,23 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
  */
 class CRM_Report_Utils_Report {
 
-  static function getValueFromUrl($instanceID = NULL) {
+  /**
+   * @param int $instanceID
+   *
+   * @return null|string
+   */
+  public static function getValueFromUrl($instanceID = NULL) {
     if ($instanceID) {
       $optionVal = CRM_Core_DAO::getFieldValue('CRM_Report_DAO_ReportInstance',
         $instanceID,
@@ -50,14 +54,19 @@ class CRM_Report_Utils_Report {
       array_shift($args);
       array_shift($args);
 
-      // put rest of arguement back in the form of url, which is how value
+      // put rest of argument back in the form of url, which is how value
       // is stored in option value table
       $optionVal = implode('/', $args);
     }
     return $optionVal;
   }
 
-  static function getValueIDFromUrl($instanceID = NULL) {
+  /**
+   * @param int $instanceID
+   *
+   * @return array|bool
+   */
+  public static function getValueIDFromUrl($instanceID = NULL) {
     $optionVal = self::getValueFromUrl($instanceID);
 
     if ($optionVal) {
@@ -68,7 +77,12 @@ class CRM_Report_Utils_Report {
     return FALSE;
   }
 
-  static function getInstanceIDForValue($optionVal) {
+  /**
+   * @param $optionVal
+   *
+   * @return mixed
+   */
+  public static function getInstanceIDForValue($optionVal) {
     static $valId = array();
 
     if (!array_key_exists($optionVal, $valId)) {
@@ -82,7 +96,12 @@ WHERE  report_id = %1";
     return $valId[$optionVal];
   }
 
-  static function getInstanceIDForPath($path = NULL) {
+  /**
+   * @param null $path
+   *
+   * @return mixed
+   */
+  public static function getInstanceIDForPath($path = NULL) {
     static $valId = array();
 
     // if $path is null, try to get it from url
@@ -99,14 +118,25 @@ WHERE  TRIM(BOTH '/' FROM CONCAT(report_id, '/', name)) = %1";
     return CRM_Utils_Array::value($path, $valId);
   }
 
-  static function getNextUrl($urlValue, $query = 'reset=1', $absolute = FALSE, $instanceID = NULL, $drilldownReport = array()) {
+  /**
+   * @param $urlValue
+   * @param string $query
+   * @param bool $absolute
+   * @param int $instanceID
+   * @param array $drilldownReport
+   *
+   * @return bool|string
+   */
+  public static function getNextUrl($urlValue, $query = 'reset=1', $absolute = FALSE, $instanceID = NULL, $drilldownReport = array()) {
     if ($instanceID) {
-      $drilldownInstanceID = false;
-      if (array_key_exists($urlValue, $drilldownReport))
+      $drilldownInstanceID = FALSE;
+      if (array_key_exists($urlValue, $drilldownReport)) {
         $drilldownInstanceID = CRM_Core_DAO::getFieldValue('CRM_Report_DAO_ReportInstance', $instanceID, 'drilldown_id', 'id');
+      }
 
-      if (!$drilldownInstanceID)
+      if (!$drilldownInstanceID) {
         $drilldownInstanceID = self::getInstanceIDForValue($urlValue);
+      }
 
       if ($drilldownInstanceID) {
         return CRM_Utils_System::url("civicrm/report/instance/{$drilldownInstanceID}",
@@ -124,9 +154,16 @@ WHERE  TRIM(BOTH '/' FROM CONCAT(report_id, '/', name)) = %1";
     }
   }
 
-  // get instance count for a template
-  static function getInstanceCount($optionVal) {
-    if (empty($optionVal)) return 0;
+  /**
+   * get instance count for a template.
+   * @param $optionVal
+   *
+   * @return int|null|string
+   */
+  public static function getInstanceCount($optionVal) {
+    if (empty($optionVal)) {
+      return 0;
+    }
 
     $sql = "
 SELECT count(inst.id)
@@ -138,15 +175,22 @@ WHERE  inst.report_id = %1";
     return $count;
   }
 
-  static function mailReport($fileContent, $instanceID = NULL, $outputMode = 'html', $attachments = array(
-    )) {
+  /**
+   * @param $fileContent
+   * @param int $instanceID
+   * @param string $outputMode
+   * @param array $attachments
+   *
+   * @return bool
+   */
+  public static function mailReport($fileContent, $instanceID = NULL, $outputMode = 'html', $attachments = array()) {
     if (!$instanceID) {
       return FALSE;
     }
 
     list($domainEmailName,
       $domainEmailAddress
-    ) = CRM_Core_BAO_Domain::getNameAndEmail();
+      ) = CRM_Core_BAO_Domain::getNameAndEmail();
 
     $params = array('id' => $instanceID);
     $instanceInfo = array();
@@ -155,13 +199,13 @@ WHERE  inst.report_id = %1";
       $instanceInfo
     );
 
-    $params              = array();
+    $params = array();
     $params['groupName'] = 'Report Email Sender';
-    $params['from']      = '"' . $domainEmailName . '" <' . $domainEmailAddress . '>';
+    $params['from'] = '"' . $domainEmailName . '" <' . $domainEmailAddress . '>';
     //$domainEmailName;
-    $params['toName']  = "";
+    $params['toName'] = "";
     $params['toEmail'] = CRM_Utils_Array::value('email_to', $instanceInfo);
-    $params['cc']      = CRM_Utils_Array::value('email_cc', $instanceInfo);
+    $params['cc'] = CRM_Utils_Array::value('email_cc', $instanceInfo);
     $params['subject'] = CRM_Utils_Array::value('email_subject', $instanceInfo);
     if (empty($instanceInfo['attachments'])) {
       $instanceInfo['attachments'] = array();
@@ -173,13 +217,17 @@ WHERE  inst.report_id = %1";
     return CRM_Utils_Mail::send($params);
   }
 
-  static function export2csv(&$form, &$rows) {
+  /**
+   * @param CRM_Core_Form $form
+   * @param $rows
+   */
+  public static function export2csv(&$form, &$rows) {
     //Mark as a CSV file.
-    header('Content-Type: text/csv');
+    CRM_Utils_System::setHttpHeader('Content-Type', 'text/csv');
 
     //Force a download and name the file using the current timestamp.
     $datetime = date('Ymd-Gi', $_SERVER['REQUEST_TIME']);
-    header('Content-Disposition: attachment; filename=Report_' . $datetime . '.csv');
+    CRM_Utils_System::setHttpHeader('Content-Disposition', 'attachment; filename=Report_' . $datetime . '.csv');
     echo self::makeCsv($form, $rows);
     CRM_Utils_System::civiExit();
   }
@@ -187,8 +235,13 @@ WHERE  inst.report_id = %1";
   /**
    * Utility function for export2csv and CRM_Report_Form::endPostProcess
    * - make CSV file content and return as string.
+   *
+   * @param CRM_Core_Form $form
+   * @param array $rows
+   *
+   * @return string
    */
-  static function makeCsv(&$form, &$rows) {
+  public static function makeCsv(&$form, &$rows) {
     $config = CRM_Core_Config::singleton();
     $csv = '';
 
@@ -203,8 +256,8 @@ WHERE  inst.report_id = %1";
     }
     // Add the headers.
     $csv .= implode($config->fieldSeparator,
-      $headers
-    ) . "\r\n";
+        $headers
+      ) . "\r\n";
 
     $displayRows = array();
     $value = NULL;
@@ -224,29 +277,38 @@ WHERE  inst.report_id = %1";
             elseif (CRM_Utils_Array::value('group_by', $form->_columnHeaders[$v]) == 'YEAR') {
               $value = CRM_Utils_Date::customFormat($value, $config->dateformatYear);
             }
+            elseif ($form->_columnHeaders[$v]['type'] == 12) {
+              // This is a datetime format
+              $value = CRM_Utils_Date::customFormat($value, '%Y-%m-%d %H:%i');
+            }
             else {
               $value = CRM_Utils_Date::customFormat($value, '%Y-%m-%d');
             }
           }
-          elseif (CRM_Utils_Array::value('type', $form->_columnHeaders[$v]) == 1024) {
-            $value = CRM_Utils_Money::format($value);
+          // Note the reference to a specific field does not belong in this generic class & does not work on all reports.
+          // @todo - fix this properly rather than just supressing the en-otice. Repeat transaction report is a good example.
+          elseif (CRM_Utils_Array::value('type', $form->_columnHeaders[$v]) == 1024 && !empty($row['civicrm_contribution_currency'])) {
+            $value = CRM_Utils_Money::format($value, $row['civicrm_contribution_currency']);
           }
           $displayRows[$v] = '"' . $value . '"';
         }
         else {
-          $displayRows[$v] = " ";
+          $displayRows[$v] = "";
         }
       }
       // Add the data row.
       $csv .= implode($config->fieldSeparator,
-        $displayRows
-      ) . "\r\n";
+          $displayRows
+        ) . "\r\n";
     }
 
     return $csv;
   }
 
-  static function getInstanceID() {
+  /**
+   * @return mixed
+   */
+  public static function getInstanceID() {
 
     $config = CRM_Core_Config::singleton();
     $arg = explode('/', $_GET[$config->userFrameworkURLVar]);
@@ -260,7 +322,10 @@ WHERE  inst.report_id = %1";
     }
   }
 
-  static function getInstancePath() {
+  /**
+   * @return string
+   */
+  public static function getInstancePath() {
     $config = CRM_Core_Config::singleton();
     $arg = explode('/', $_GET[$config->userFrameworkURLVar]);
 
@@ -273,7 +338,12 @@ WHERE  inst.report_id = %1";
     }
   }
 
-  static function isInstancePermissioned($instanceId) {
+  /**
+   * @param int $instanceId
+   *
+   * @return bool
+   */
+  public static function isInstancePermissioned($instanceId) {
     if (!$instanceId) {
       return TRUE;
     }
@@ -287,8 +357,8 @@ WHERE  inst.report_id = %1";
 
     if (!empty($instanceValues['permission']) &&
       (!(CRM_Core_Permission::check($instanceValues['permission']) ||
-          CRM_Core_Permission::check('administer Reports')
-        ))
+        CRM_Core_Permission::check('administer Reports')
+      ))
     ) {
       return FALSE;
     }
@@ -301,11 +371,12 @@ WHERE  inst.report_id = %1";
    *
    * @instanceId string $str the report instance to check
    *
-   * @return boolean true if yes, else false
-   * @static
-   * @access public
+   * @param int $instanceId
+   *
+   * @return bool
+   *   true if yes, else false
    */
-  static function isInstanceGroupRoleAllowed($instanceId) {
+  public static function isInstanceGroupRoleAllowed($instanceId) {
     if (!$instanceId) {
       return TRUE;
     }
@@ -330,7 +401,12 @@ WHERE  inst.report_id = %1";
     return TRUE;
   }
 
-  static function processReport($params) {
+  /**
+   * @param array $params
+   *
+   * @return array
+   */
+  public static function processReport($params) {
     $instanceId = CRM_Utils_Array::value('instanceId', $params);
 
     // hack for now, CRM-8358
@@ -345,8 +421,8 @@ WHERE  inst.report_id = %1";
     $messages = array("Report Mail Triggered...");
 
     $templateInfo = CRM_Core_OptionGroup::getRowValues('report_template', $optionVal, 'value');
-    $obj          = new CRM_Report_Page_Instance();
-    $is_error     = 0;
+    $obj = new CRM_Report_Page_Instance();
+    $is_error = 0;
     if (strstr(CRM_Utils_Array::value('name', $templateInfo), '_Form')) {
       $instanceInfo = array();
       CRM_Report_BAO_ReportInstance::retrieve(array('id' => $instanceId), $instanceInfo);
@@ -368,7 +444,7 @@ WHERE  inst.report_id = %1";
             'default' => 'null',
           ),
         ),
-        'ignoreKey' => TRUE
+        'ignoreKey' => TRUE,
       );
       $messages[] = $wrapper->run($templateInfo['name'], NULL, $arguments);
     }
@@ -394,13 +470,15 @@ WHERE  inst.report_id = %1";
    * stipulated in $_GET or in a report Preview, but which haven't yet been
    * saved in the report instance.
    *
-   * @param array $defaults The report criteria that aren't coming in as submitted form values, as in CRM_Report_Form::_defaults
-   * @param array $params All effective report criteria, as in CRM_Report_Form::_params
+   * @param array $defaults
+   *   The report criteria that aren't coming in as submitted form values, as in CRM_Report_Form::_defaults.
+   * @param array $params
+   *   All effective report criteria, as in CRM_Report_Form::_params.
    *
-   * @return string URL query string
+   * @return string
+   *   URL query string
    */
-  static function getPreviewCriteriaQueryParams($defaults = array(
-    ), $params = array()) {
+  public static function getPreviewCriteriaQueryParams($defaults = array(), $params = array()) {
     static $query_string;
     if (!isset($query_string)) {
       if (!empty($params)) {
@@ -420,8 +498,8 @@ WHERE  inst.report_id = %1";
         // (in other words, there's no point in propagating blank filters).
         foreach ($process_params as $field_name => $field_value) {
           $suffix_position = strrpos($field_name, '_');
-          $suffix          = substr($field_name, $suffix_position);
-          $basename        = substr($field_name, 0, $suffix_position);
+          $suffix = substr($field_name, $suffix_position);
+          $basename = substr($field_name, 0, $suffix_position);
           if ($suffix == '_min' || $suffix == '_max' ||
             $suffix == '_from' || $suffix == '_to' ||
             $suffix == '_relative'
@@ -469,10 +547,15 @@ WHERE  inst.report_id = %1";
     return $query_string;
   }
 
-  static function getInstanceList($reportUrl) {
+  /**
+   * @param $reportUrl
+   *
+   * @return mixed
+   */
+  public static function getInstanceList($reportUrl) {
     static $instanceDetails = array();
 
-    if (!array_key_exists($reportUrl, $instanceDetails )) {
+    if (!array_key_exists($reportUrl, $instanceDetails)) {
       $instanceDetails[$reportUrl] = array();
 
       $sql = "
@@ -480,10 +563,11 @@ SELECT id, title FROM civicrm_report_instance
 WHERE  report_id = %1";
       $params = array(1 => array($reportUrl, 'String'));
       $result = CRM_Core_DAO::executeQuery($sql, $params);
-      while( $result->fetch()) {
+      while ($result->fetch()) {
         $instanceDetails[$reportUrl][$result->id] = $result->title . " (ID: {$result->id})";
       }
     }
     return $instanceDetails[$reportUrl];
   }
+
 }

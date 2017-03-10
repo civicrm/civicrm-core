@@ -1,8 +1,8 @@
-{*
+﻿{*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2010                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -67,19 +67,33 @@
 <p>{ts}You can use different profile for the person who is registering than for "Additional Participants". For example, you may want to require an email address from the person entering the registration while not requiring (or even requesting) emails for additional participants (i.e. their "guests").{/ts}</p>
 {/htxt}
 
+{htxt id="id-max_additional-title"}
+  {ts}Maximum Additional Participants{/ts}
+{/htxt}
+{htxt id="id-max_additional"}
+  <p>{ts}Limit the number of additional participants that can be registered in a single booking.{/ts}</p>
+  <p>{ts}Eg: if you choose '2' then the lead booker can bring 2 guests; there would be a limit of 3 participants in total per booking.{/ts}</p>
+{/htxt}
+
 {htxt id="id-allow_same_email-title"}
   {ts}Allow Shared Email{/ts}
 {/htxt}
 {htxt id="id-allow_same_email"}
-<p>{ts}Check this box to allow a user to register multiple participants using the same email address. If you want additional participants to be registered <strong>without requiring an email address to be entered for each person</strong> - check the "Register multiple participants" option, AND include a profile in this registration form which <strong>includes First Name and Last Name fields</strong>.{/ts}</p>
-<p>{ts}You will also need to set the default supervised duplicate contact matching rule for Individuals to one that includes First Name and Last Name fields (Contacts &raquo; Find and Merge Duplicate Contacts).{/ts}</p>
+<p>{ts}Check this box to allow a user to register multiple participants using the same email address. Alternatively, if you want additional participants to be registered <strong>without requiring an email address to be entered for each person</strong> - check the "Register multiple participants" option, AND include a profile in this registration form which <strong>includes First Name and Last Name fields</strong>.{/ts}</p>
+{/htxt}
+
+{htxt id="id-dedupe_rule_group_id-title"}
+  {ts}Duplicate Matching Rule{/ts}
+{/htxt}
+{htxt id="id-dedupe_rule_group_id"}
+<p>{ts}By default, your event will use the Unsupervised duplicate matching rule to match participants in anonymous registrations with existing individuals. You may select another rule to use for this event instead. Make sure that your included profile(s) contain the fields needed by your matching rule.{/ts}</p>
 {/htxt}
 
 {htxt id="id-requires_approval-title"}
   {ts}Require Approval{/ts}
 {/htxt}
 {htxt id="id-requires_approval"}
-{ts}Check this box to require administrative approval for all the participants who self-register, prior to being able to complete the registration process. Participants will be placed in 'Awaiting Approval' status. You can review and approve participants from 'Find Participants' - select the 'Change Participant Status' task. Approved participants will move to 'Pending from approval' status, and will be sent an email with a link to complete their registration (including paying event fees - if any). {/ts}
+{ts}Check this box to require administrative approval for all the participants who self-register, prior to being able to complete the registration process. Participants will be placed in 'Awaiting Approval' status. You can review and approve participants from 'Find Participants' - select the 'Participant status - change' task. Approved participants will move to 'Pending from approval' status, and will be sent an email with a link to complete their registration (including paying event fees - if any). {/ts}
 {/htxt}
 
 {htxt id="id-expiration_time-title"}
@@ -87,4 +101,19 @@
 {/htxt}
 {htxt id="id-expiration_time"}
 {ts}Time limit <strong>in hours</strong> for confirming/finishing registration by participants with any of the pending statuses. Enter 0 (or leave empty) to disable this feature.{/ts}
+{/htxt}
+
+{htxt id="id-allow_selfcancelxfer-title"}
+  {ts}Allow Self-service Cancellation or Transfer?{/ts}
+{/htxt}
+{htxt id="id-allow_selfcancelxfer"}
+  <p>{ts}Check this box if you want to allow registered participants to either cancel their registration OR transfer it to another participant. If this feature is enabled, event confirmation emails will include a link to a Cancel or Transfer form.{/ts}</p>
+  <p>{ts}<strong>Automated refunds for cancellations are NOT currently supported.</strong> Participants who have paid for an event will be notified that cancellations are not refundable.{/ts}</p>
+{/htxt}
+
+{htxt id="id-selfcancelxfer_time-title"}
+  {ts}Cancellation or Transfer Time Limit{/ts}
+{/htxt}
+{htxt id="id-selfcancelxfer_time"}
+  {ts}Number of hours prior to event start date to allow self-service cancellation or transfer. Enter 0 (or leave empty) to allow cancellation or transfer up until the event has started.{/ts}
 {/htxt}

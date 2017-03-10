@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
  */
@@ -40,38 +40,34 @@
 class CRM_Member_Form_Task_Label extends CRM_Member_Form_Task {
 
   /**
-   * build all the data structures needed to build the form
+   * Build all the data structures needed to build the form.
    *
    * @return void
-   * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     parent::preProcess();
     $this->setContactIDs();
     CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'templates/CRM/Member/Form/Task/Label.js');
   }
 
   /**
-   * Build the form
+   * Build the form object.
    *
-   * @access public
    *
    * @return void
    */
-  function buildQuickForm() {
-    CRM_Contact_Form_Task_Label::buildQuickForm($this);
+  public function buildQuickForm() {
+    CRM_Contact_Form_Task_Label::buildLabelForm($this);
     $this->addElement('checkbox', 'per_membership', ts('Print one label per Membership (rather than per contact)'));
   }
 
   /**
-   * This function sets the default values for the form.
+   * Set default values for the form.
    *
-   * @param null
-   *
-   * @return array   array of default values
-   * @access public
+   * @return array
+   *   array of default values
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
     $format = CRM_Core_BAO_LabelFormat::getDefaultValues();
     $defaults['label_name'] = CRM_Utils_Array::value('name', $format);
@@ -82,21 +78,20 @@ class CRM_Member_Form_Task_Label extends CRM_Member_Form_Task {
   }
 
   /**
-   * process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated.
    *
-   * @access public
    *
    * @return void
    */
   public function postProcess() {
-    $formValues  = $this->controller->exportValues($this->_name);
+    $formValues = $this->controller->exportValues($this->_name);
     $locationTypeID = $formValues['location_type_id'];
     $respectDoNotMail = CRM_Utils_Array::value('do_not_mail', $formValues);
     $labelName = $formValues['label_name'];
     $mergeSameAddress = CRM_Utils_Array::value('merge_same_address', $formValues);
     $mergeSameHousehold = CRM_Utils_Array::value('merge_same_household', $formValues);
     $isPerMembership = CRM_Utils_Array::value('per_membership', $formValues);
-    if($isPerMembership && ($mergeSameAddress || $mergeSameHousehold)) {
+    if ($isPerMembership && ($mergeSameAddress || $mergeSameHousehold)) {
       // this shouldn't happen  - perhaps is could if JS is disabled
       CRM_Core_Session::setStatus(ts('As you are printing one label per membership your merge settings are being ignored'));
       $mergeSameAddress = $mergeSameHousehold = FALSE;
@@ -108,7 +103,7 @@ class CRM_Member_Form_Task_Label extends CRM_Member_Form_Task {
 
     $individualFormat = FALSE;
     if ($mergeSameAddress) {
-      CRM_Contact_Form_Task_LabelCommon::mergeSameAddress($rows);
+      CRM_Core_BAO_Address::mergeSameAddress($rows);
       $individualFormat = TRUE;
     }
     if ($mergeSameHousehold) {
@@ -116,9 +111,9 @@ class CRM_Member_Form_Task_Label extends CRM_Member_Form_Task {
       $individualFormat = TRUE;
     }
     // format the addresses according to CIVICRM_ADDRESS_FORMAT (CRM-1327)
-    foreach ($rows as $id => $row) {
+    foreach ((array) $rows as $id => $row) {
       if ($commMethods = CRM_Utils_Array::value('preferred_communication_method', $row)) {
-        $val  = array_filter(explode(CRM_Core_DAO::VALUE_SEPARATOR, $commMethods));
+        $val = array_filter(explode(CRM_Core_DAO::VALUE_SEPARATOR, $commMethods));
         $comm = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'preferred_communication_method');
         $temp = array();
         foreach ($val as $vals) {
@@ -130,20 +125,24 @@ class CRM_Member_Form_Task_Label extends CRM_Member_Form_Task {
       $formatted = CRM_Utils_Address::format($row, 'mailing_format', FALSE, TRUE, $individualFormat, $tokenFields);
       $rows[$id] = array($formatted);
     }
-
-    if($isPerMembership) {
+    if ($isPerMembership) {
       $labelRows = array();
-      $memberships = civicrm_api3('membership', 'get', array('id' => array('IN' => $this->_memberIds), 'return' => 'contact_id'));
+      $memberships = civicrm_api3('membership', 'get', array(
+        'id' => array('IN' => $this->_memberIds),
+        'return' => 'contact_id',
+      ));
       foreach ($memberships['values'] as $id => $membership) {
-        $labelRows[$id] = $rows[$membership['contact_id']];
+        if (isset($rows[$membership['contact_id']])) {
+          $labelRows[$id] = $rows[$membership['contact_id']];
+        }
       }
     }
-    else{
+    else {
       $labelRows = $rows;
     }
     //call function to create labels
     CRM_Contact_Form_Task_LabelCommon::createLabel($labelRows, $labelName);
     CRM_Utils_System::civiExit(1);
   }
-}
 
+}

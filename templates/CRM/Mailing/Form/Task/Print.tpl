@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,7 +25,7 @@
 *}
 <p>
 
-{if $rows} 
+{if $rows}
 <div class="form-item crm-block crm-form-block crm-mailing-form-block">
      <span class="element-right">{$form.buttons.html}</span>
 </div>
@@ -42,7 +42,7 @@
     <th>{ts}Completed Date{/ts}</th>
   </tr>
 {foreach from=$rows item=row}
-    <tr class="{cycle values="odd-row,even-row"} crm-mailing">       
+    <tr class="{cycle values="odd-row,even-row"} crm-mailing">
       <td class='crm-mailing-sort_name'>{$row.sort_name}</td>
       <td {if ($row.email_on_hold eq 1) or ($row.contact_opt_out eq 1)}class='font-red'{/if}>{$row.email}</td>
       <td class='crm-mailing-mailing_name'>{$row.mailing_name}</td>

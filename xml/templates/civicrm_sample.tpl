@@ -1,7 +1,7 @@
 -- +--------------------------------------------------------------------+
--- | CiviCRM version 4.4                                                |
+-- | CiviCRM version 4.7                                                |
 -- +--------------------------------------------------------------------+
--- | Copyright CiviCRM LLC (c) 2004-2013                                |
+-- | Copyright CiviCRM LLC (c) 2004-2017                                |
 -- +--------------------------------------------------------------------+
 -- | This file is a part of CiviCRM.                                    |
 -- |                                                                    |
@@ -19,7 +19,7 @@
 -- | with this program; if not, contact CiviCRM LLC                     |
 -- | at info[AT]civicrm[DOT]org. If you have questions about the        |
 -- | GNU Affero General Public License or the licensing of CiviCRM,     |
--- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+-- | see the CiviCRM license FAQ at https://civicrm.org/licensing        |
 -- +--------------------------------------------------------------------+
 --
 -- Generated from {$smarty.template}
@@ -60,11 +60,11 @@ VALUES
      (@priceFieldID, 'other_amount', 'Other Amount', 1, 3, 1, 0, 1);
 
 INSERT INTO civicrm_contribution_page
-  (title,intro_text,financial_type_id,is_monetary,is_allow_other_amount,default_amount_id,min_amount,max_amount,goal_amount,thankyou_title,thankyou_text,thankyou_footer,receipt_from_name,receipt_from_email,cc_receipt,bcc_receipt,receipt_text,is_active,footer_text,amount_block_is_active,honor_block_is_active,currency,is_email_receipt)
+  (title,intro_text,financial_type_id,is_monetary,is_allow_other_amount,default_amount_id,min_amount,max_amount,goal_amount,thankyou_title,thankyou_text,thankyou_footer,receipt_from_name,receipt_from_email,cc_receipt,bcc_receipt,receipt_text,is_active,footer_text,amount_block_is_active,currency,is_email_receipt)
 VALUES
-  ('Help Support CiviCRM!','Do you love CiviCRM? Do you use CiviCRM? Then please support CiviCRM and Contribute NOW by trying out our new online contribution features!',1,1,1,137,'10.00','10000.00','100000.00','Thanks for Your Support!','<p>Thank you for your support. Your contribution will help us build even better tools.</p><p>Please tell your friends and colleagues about CiviCRM!</p>','<p><a href=http://civicrm.org>Back to CiviCRM Home Page</a></p>','CiviCRM Fundraising Dept.','donationFake@civicrm.org','receipt@example.com','bcc@example.com','Your donation is tax deductible under IRS 501(c)(3) regulation. Our tax identification number is: 93-123-4567',1, NULL, 1,NULL, 'USD', 1),
-  ('Member Signup and Renewal', 'Members are the life-blood of our organization. If you''re not already a member - please consider signing up today. You can select the membership level the fits your budget and needs below.', 2, 1, NULL, NULL, NULL, NULL, NULL, 'Thanks for Your Support!', 'Thanks for supporting our organization with your membership. You can learn more about membership benefits from our members only page.', NULL, 'Membership Department', 'memberships@civicrm.org', NULL, NULL, 'Thanks for supporting our organization with your membership. You can learn more about membership benefits from our members only page.\r\n\r\nKeep this receipt for your records.', 1, NULL, 0, NULL, 'USD', 1),
-  ('Pledge for CiviCRM!','Do you love CiviCRM? Do you use CiviCRM? Then please support CiviCRM and Pledge NOW by trying out our online contribution features!',1,1,1,NULL,'10.00','10000.00','100000.00','Thanks for Your Support!','<p>Thank you for your support. Your contribution will help us build even better tools like Pledge.</p><p>Please tell your friends and colleagues about CiviPledge!</p>','<p><a href=http://civicrm.org>Back to CiviCRM Home Page</a></p>','CiviCRM Fundraising Dept.','donationFake@civicrm.org','receipt@example.com','bcc@example.com','Your donation is tax deductible under IRS 501(c)(3) regulation. Our tax identification number is: 93-123-4567',1, NULL, 1,NULL, 'USD', 1);
+  ('Help Support CiviCRM!','Do you love CiviCRM? Do you use CiviCRM? Then please support CiviCRM and Contribute NOW by trying out our new online contribution features!',1,1,1,137,'10.00','10000.00','100000.00','Thanks for Your Support!','<p>Thank you for your support. Your contribution will help us build even better tools.</p><p>Please tell your friends and colleagues about CiviCRM!</p>','<p><a href=https://civicrm.org>Back to CiviCRM Home Page</a></p>','CiviCRM Fundraising Dept.','donationFake@civicrm.org','receipt@example.com','bcc@example.com','Your donation is tax deductible under IRS 501(c)(3) regulation. Our tax identification number is: 93-123-4567',1, NULL, 1, 'USD', 1),
+  ('Member Signup and Renewal', 'Members are the life-blood of our organization. If you''re not already a member - please consider signing up today. You can select the membership level the fits your budget and needs below.', 2, 1, NULL, NULL, NULL, NULL, NULL, 'Thanks for Your Support!', 'Thanks for supporting our organization with your membership. You can learn more about membership benefits from our members only page.', NULL, 'Membership Department', 'memberships@civicrm.org', NULL, NULL, 'Thanks for supporting our organization with your membership. You can learn more about membership benefits from our members only page.\r\n\r\nKeep this receipt for your records.', 1, NULL, 0, 'USD', 1),
+  ('Pledge for CiviCRM!','Do you love CiviCRM? Do you use CiviCRM? Then please support CiviCRM and Pledge NOW by trying out our online contribution features!',1,1,1,NULL,'10.00','10000.00','100000.00','Thanks for Your Support!','<p>Thank you for your support. Your contribution will help us build even better tools like Pledge.</p><p>Please tell your friends and colleagues about CiviPledge!</p>','<p><a href=https://civicrm.org>Back to CiviCRM Home Page</a></p>','CiviCRM Fundraising Dept.','donationFake@civicrm.org','receipt@example.com','bcc@example.com','Your donation is tax deductible under IRS 501(c)(3) regulation. Our tax identification number is: 93-123-4567',1, NULL, 1, 'USD', 1);
 
 INSERT INTO `civicrm_tell_friend`
     (`entity_table`, `entity_id`, `title`, `intro`, `suggested_message`, `general_link`, `thankyou_title`, `thankyou_text`, `is_active`)
@@ -73,9 +73,9 @@ VALUES
     ('civicrm_event', 1, 'Tell A Friend', '<p>Help us spread the word about this event. Use the space below to personalize your email message - let your friends know why you''re attending. Then fill in the name(s) and email address(es) and click ''Send Your Message''.</p>', 'Thought you might be interested in checking out this event. I''m planning on attending.', NULL, 'Thanks for Spreading the Word', '<p>Thanks for spreading the word about this event to your friends.</p>', 1);
 
 INSERT INTO `civicrm_pcp_block`
-    (`id`, `entity_table`, `entity_id`, `supporter_profile_id`, `is_approval_needed`, `is_tellfriend_enabled`, `tellfriend_limit`, `link_text`, `is_active`, `target_entity_id` )
+    (`id`, `entity_table`, `entity_id`, `supporter_profile_id`, `owner_notify_id`, `is_approval_needed`, `is_tellfriend_enabled`, `tellfriend_limit`, `link_text`, `is_active`, `target_entity_id` )
 VALUES
-    (1, 'civicrm_contribution_page', 1, 2, 1, 1, 5, 'Create your own Personal Campaign Page!', 1, 1);
+    (1, 'civicrm_contribution_page', 1, 2, 1, 1, 1, 5, 'Create your own Personal Campaign Page!', 1, 1);
 
 INSERT INTO civicrm_membership_type
     (domain_id, name, description, member_of_contact_id, financial_type_id, minimum_fee, duration_unit, duration_interval, period_type, fixed_period_start_day, fixed_period_rollover_day, relationship_type_id, relationship_direction, visibility, weight, is_active)
@@ -97,7 +97,7 @@ VALUES
 INSERT INTO civicrm_premiums
     VALUES (1, 'civicrm_contribution_page', 1, 1, 'Thank-you Gifts', 'We appreciate your support and invite you to choose from the exciting collection of thank-you gifts below. Minimum contribution amounts for each selection are included in the descriptions. (NOTE: These gifts are shown as examples only. No gifts will be sent to donors.)', 'premiums@example.org', NULL, 1, 'No thank-you', 1);
 
-INSERT INTO civicrm_product VALUES (1, 'Coffee Mug', 'This heavy-duty mug is great for home or office, coffee or tea or hot chocolate. Show your support to family, friends and colleagues. Choose from three great colors.', 'MUG-101', 'White, Black, Green', NULL, NULL, 12.50, 'USD', NULL, 5.00, 2.25, 1, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO civicrm_product VALUES (1, 'Coffee Mug', 'This heavy-duty mug is great for home or office, coffee or tea or hot chocolate. Show your support to family, friends and colleagues. Choose from three great colors.', 'MUG-101', 'White, Black, Green', NULL, NULL, 12.50, 'USD', NULL, 5.00, NULL, 1, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO civicrm_premiums_product VALUES (1, 1, 1, 1, NULL);
 
 
@@ -107,9 +107,9 @@ SELECT @option_group_id_act  := max(id) from civicrm_option_group where name = '
 SELECT @option_value_max_val := max(ROUND(civicrm_option_value.value)) from civicrm_option_value where option_group_id = @option_group_id_act;
 
 INSERT INTO
-   `civicrm_option_value` (`option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`)
+   `civicrm_option_value` (`option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`, `icon`)
 VALUES
-   (@option_group_id_act, 'Interview', (SELECT @option_value_max_val := @option_value_max_val + 1), 'Interview',  NULL, 0, NULL, @option_value_max_val, 'Conduct a phone or in person interview.', 0, 0, 1);
+   (@option_group_id_act, 'Interview', (SELECT @option_value_max_val := @option_value_max_val + 1), 'Interview',  NULL, 0, NULL, @option_value_max_val, 'Conduct a phone or in person interview.', 0, 0, 1, 'fa-comment-o');
 
 INSERT INTO `civicrm_contact_type`
   ( `name`, `label`,`image_URL`, `parent_id`, `is_active`,`is_reserved`)
@@ -126,21 +126,21 @@ INSERT INTO `civicrm_contact_type`
     INSERT INTO `civicrm_navigation`
         ( domain_id, url, label, name,permission, permission_operator, parent_id, is_active, has_separator, weight )
     VALUES
-        (  @domain_id, 'civicrm/contact/add&ct=Individual&cst=Student&reset=1'  , 'New Student', 'New Student', 'add contacts', '', @nav_indi, '1', NULL, 1 ),
-        (  @domain_id, 'civicrm/contact/add&ct=Individual&cst=Parent&reset=1'   , 'New Parent' , 'New Parent' , 'add contacts', '', @nav_indi, '1', NULL, 2 ),
-        (  @domain_id, 'civicrm/contact/add&ct=Individual&cst=Staff&reset=1'    , 'New Staff'  , 'New Staff'  , 'add contacts', '', @nav_indi, '1', NULL, 3 ),
-        (  @domain_id, 'civicrm/contact/add&ct=Organization&cst=Team&reset=1'   , 'New Team'   , 'New Team'   , 'add contacts', '', @nav_org , '1', NULL, 1 ),
-        (  @domain_id, 'civicrm/contact/add&ct=Organization&cst=Sponsor&reset=1', 'New Sponsor', 'New Sponsor', 'add contacts', '', @nav_org , '1', NULL, 2 );
+        (  @domain_id, 'civicrm/contact/add?ct=Individual&cst=Student&reset=1'  , 'New Student', 'New Student', 'add contacts', '', @nav_indi, '1', NULL, 1 ),
+        (  @domain_id, 'civicrm/contact/add?ct=Individual&cst=Parent&reset=1'   , 'New Parent' , 'New Parent' , 'add contacts', '', @nav_indi, '1', NULL, 2 ),
+        (  @domain_id, 'civicrm/contact/add?ct=Individual&cst=Staff&reset=1'    , 'New Staff'  , 'New Staff'  , 'add contacts', '', @nav_indi, '1', NULL, 3 ),
+        (  @domain_id, 'civicrm/contact/add?ct=Organization&cst=Team&reset=1'   , 'New Team'   , 'New Team'   , 'add contacts', '', @nav_org , '1', NULL, 1 ),
+        (  @domain_id, 'civicrm/contact/add?ct=Organization&cst=Sponsor&reset=1', 'New Sponsor', 'New Sponsor', 'add contacts', '', @nav_org , '1', NULL, 2 );
 
 -- Add sample dashlets
 
 INSERT INTO `civicrm_dashboard`
-    ( `domain_id`, `name`, `label`, `url`, `permission`, `permission_operator`, `column_no`, `is_minimized`, `is_active`, `weight`, `is_fullscreen`, `fullscreen_url`)
+    ( `domain_id`, `name`, `label`, `url`, `permission`, `permission_operator`, `is_active`, `fullscreen_url`)
     VALUES
-    ( @domain_id, 'report/6', '{ts escape="sql"}Donor Summary{/ts}'       , 'civicrm/report/instance/6&reset=1&section=1&snippet=5&charts=barChart',  'access CiviContribute', 'AND', 0, 0,'1', 4, '1', 'civicrm/report/instance/6&reset=1&section=1&snippet=5&charts=barChart&context=dashletFullscreen'),
-    ( @domain_id, 'report/13', '{ts escape="sql"}Top Donors{/ts}'            , 'civicrm/report/instance/13&reset=1&section=2&snippet=5',                 'access CiviContribute', 'AND', 0, 0,'1', 5, '1', 'civicrm/report/instance/13&reset=1&section=2&snippet=5&context=dashletFullscreen'),
-    ( @domain_id, 'report/25', '{ts escape="sql"}Event Income Summary{/ts}', 'civicrm/report/instance/25&reset=1&section=1&snippet=5&charts=pieChart', 'access CiviEvent'     , 'AND', 0, 0,'1', 6, '1', 'civicrm/report/instance/25&reset=1&section=1&snippet=5&charts=pieChart&context=dashletFullscreen'),
-    ( @domain_id, 'report/20', '{ts escape="sql"}Membership Summary{/ts}'  , 'civicrm/report/instance/20&reset=1&section=2&snippet=5',                 'access CiviMember'    , 'AND', 0, 0,'1', 7, '1', 'civicrm/report/instance/20&reset=1&section=2&snippet=5&context=dashletFullscreen');
+    ( @domain_id, 'report/7',  '{ts escape="sql"}Donor Summary{/ts}',        'civicrm/report/instance/7?reset=1&section=1&charts=barChart',  'access CiviContribute', 'AND', '1', 'civicrm/report/instance/7?reset=1&section=1&charts=barChart&context=dashletFullscreen'),
+    ( @domain_id, 'report/14', '{ts escape="sql"}Top Donors{/ts}',           'civicrm/report/instance/14?reset=1&section=2',                 'access CiviContribute', 'AND', '1', 'civicrm/report/instance/14?reset=1&section=2&context=dashletFullscreen'),
+    ( @domain_id, 'report/27', '{ts escape="sql"}Event Income Summary{/ts}', 'civicrm/report/instance/27?reset=1&section=1&charts=pieChart', 'access CiviEvent'     , 'AND', '1', 'civicrm/report/instance/27?reset=1&section=1&charts=pieChart&context=dashletFullscreen'),
+    ( @domain_id, 'report/22', '{ts escape="sql"}Membership Summary{/ts}',   'civicrm/report/instance/22?reset=1&section=2',                 'access CiviMember'    , 'AND', '1', 'civicrm/report/instance/22?reset=1&section=2&context=dashletFullscreen');
 
 -- INSERT sample data for membership
 

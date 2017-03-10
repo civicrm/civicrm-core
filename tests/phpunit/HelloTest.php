@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * @file HelloTest.php
@@ -39,36 +39,48 @@
  * UR DOIN IT RIGHT!
  */
 
-require_once 'PHPUnit/Framework/TestCase.php';
+/**
+ * Class HelloTest
+ */
 class HelloTest extends PHPUnit_Framework_TestCase {
   // contains the object handle of the string class
   var $abc;
-  function __construct($name = NULL) {
+
+  /**
+   * @param string|null $name
+   */
+  public function __construct($name = NULL) {
     parent::__construct($name);
   }
 
-  // called before the test functions will be executed
-  // this function is defined in PHPUnit_TestCase and overwritten
-  // here
-  function setUp() {
+  /**
+   * Called before the test functions will be executed.
+   * this function is defined in PHPUnit_TestCase and overwritten
+   * here
+   */
+  public function setUp() {
     // create a new instance of String with the
     // string 'abc'
     $this->abc = "hello";
   }
 
-  // called after the test functions are executed
-  // this function is defined in PHPUnit_TestCase and overwritten
-  // here
-  function tearDown() {
+  /**
+   * Called after the test functions are executed.
+   * this function is defined in PHPUnit_TestCase and overwritten
+   * here.
+   */
+  public function tearDown() {
     // delete your instance
     unset($this->abc);
   }
 
-  // test the toString function
-  function testHello() {
+  /**
+   * test the toString function.
+   */
+  public function testHello() {
     $result = $this->abc;
     $expected = 'hello';
     $this->assertEquals($result, $expected);
   }
-}
 
+}

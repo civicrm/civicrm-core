@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,11 +27,11 @@
 {if !$hasPetitions}
     <div class="messages status no-popup">
         <div class="icon inform-icon"></div> &nbsp;
-        {ts}No petitions found.{/ts}
+        {ts}None found.{/ts}
     </div>
 
     <div class="action-link">
-         <a href="{crmURL p='civicrm/petition/add' q='reset=1' h=0 }" class="button"><span><div class="icon add-icon"></div>{ts}Add Petition{/ts}</span></a>
+         {crmButton p='civicrm/petition/add' q='reset=1' h=0  icon="plus-circle"}{ts}Add Petition{/ts}{/crmButton}
     </div>
 
 {elseif $buildSelector}
@@ -42,17 +42,16 @@
        {* load petition selector *}
 
        {include file="CRM/common/enableDisableApi.tpl"}
-       {include file="CRM/common/crmeditable.tpl"}
 
        {literal}
        <script type="text/javascript">
-       cj( function( ){
+       CRM.$(function($) {
            loadPetitionList( );
        });
        </script>
        {/literal}
 
-       <table id="petitions">
+       <table class="petitions">
            <thead>
               <tr class="columnheader">
             <th class="hiddenElement">{ts}Petition ID{/ts}</th>
@@ -73,7 +72,7 @@
 {else}
 
    <div class="action-link">
-      <a href="{crmURL p='civicrm/petition/add' q='reset=1' h=0 }" class="button"><span><div class="icon add-icon"></div>{ts}Add Petition{/ts}</span></a>
+      {crmButton p='civicrm/petition/add' q='reset=1' h=0  icon="plus-circle"}{ts}Add Petition{/ts}{/crmButton}
    </div>
 
     {* build search form here *}
@@ -123,15 +122,11 @@
 {literal}
 <script type="text/javascript">
 
- cj(function() {
-    cj().crmAccordions();
- });
-
  {/literal}
  {* load selector when force *}
  {if $force and !$buildSelector}
  {literal}
- cj( function( ) {
+ CRM.$(function($) {
     searchPetitions( {/literal}'{$qfKey}'{literal} );
  });
 
@@ -146,12 +141,12 @@ function searchPetitions( qfKey )
       //lets carry qfKey to retain form session.
       if ( qfKey ) dataUrl = dataUrl + '&qfKey=' + qfKey;
 
-      cj.get( dataUrl, null, function( petitionList ) {
-        cj( '#petitionList' ).html( petitionList );
+      CRM.$.get( dataUrl, null, function( petitionList ) {
+        CRM.$( '#petitionList' ).html( petitionList ).trigger('crmLoad');
 
         //collapse the search form.
         var searchFormName = '#search_form_' + {/literal}'{$searchFor}'{literal};
-        cj( searchFormName + '.crm-accordion-wrapper:not(.collapsed)').crmAccordionToggle();
+        CRM.$( searchFormName + '.crm-accordion-wrapper:not(.collapsed)').crmAccordionToggle();
       }, 'html' );
 }
 
@@ -168,32 +163,32 @@ function loadPetitionList( )
      noRecordFoundMsg += '<div class="qill">';
 
      var count = 0;
-     var searchQill = new Array( );
+     var searchQill = [];
      for ( param in searchParams ) {
-        if ( val = cj( '#' + param ).val( ) ) {
-      if ( param == 'petition_campaign_id' ) val = campaigns[val];
-      searchQill[count++] = searchParams[param] + ' : ' + val;
-  }
+       if ( val = CRM.$( '#' + param ).val( ) ) {
+         if ( param == 'petition_campaign_id' ) val = campaigns[val];
+         searchQill[count++] = searchParams[param] + ' : ' + val;
+       }
      }
      noRecordFoundMsg += searchQill.join( '<span class="font-italic"> ...AND... </span></div><div class="qill">' );
-
-     cj( '#petitions' ).dataTable({
+     CRM.$( 'table.petitions', '#petitionList').dataTable({
              "bFilter"    : false,
              "bAutoWidth" : false,
              "bProcessing": false,
              "bLengthChange": false,
              "aaSorting": [],
-             "aoColumns":[{sClass:'crm-petition-id                          hiddenElement' },
-                 {sClass:'crm-petition-title'                                     },
-           {sClass:'crm-petition-campaign_id                 hiddenElement' },
-           {sClass:'crm-petition-campaign'                                  },
-           {sClass:'crm-petition-activity_type_id            hiddenElement' },
-           {sClass:'crm-petition-activity_type               hiddenElement' },
-           {sClass:'crm-petition-is_default'                                },
-           {sClass:'crm-petition-is_active                   hiddenElement' },
-           {sClass:'crm-petition-isActive'                                  },
-           {sClass:'crm-petition-action',                    bSortable:false}
-           ],
+             "aoColumns":[
+                 {sClass:'crm-petition-id                          hiddenElement' },
+                 {sClass:'crmf-title'                                     },
+                 {sClass:'crm-petition-campaign_id                 hiddenElement' },
+                 {sClass:'crmf-campaign_id'                                  },
+                 {sClass:'crm-petition-activity_type_id            hiddenElement' },
+                 {sClass:'crm-petition-activity_type               hiddenElement' },
+                 {sClass:'crm-petition-is_default'                                },
+                 {sClass:'crm-petition-is_active                   hiddenElement' },
+                 {sClass:'crm-petition-isActive'                                  },
+                 {sClass:'crm-petition-action',                    bSortable:false}
+             ],
              "sPaginationType": "full_numbers",
              "sDom"       : 'rt<"crm-datatable-pager-bottom"ip>',
              "bServerSide": true,
@@ -202,17 +197,23 @@ function loadPetitionList( )
              "asStripClasses" : [ "odd-row", "even-row" ],
              "oLanguage":{"sEmptyTable"  : noRecordFoundMsg,
                  "sZeroRecords" : noRecordFoundMsg },
-             "fnDrawCallback": function() { cj().crmtooltip(); },
+             "fnDrawCallback": function() {
+               $(this).trigger('crmLoad');
+             },
              "fnRowCallback": function( nRow, aData, iDisplayIndex ) {
+
+               // Crm-editable
+               CRM.$(nRow).children().eq(1).addClass('crm-editable');
+
          //insert the id for each row for enable/disable.
-         var rowId = 'petition_row_' + aData[0];
-         cj(nRow).attr( 'id', rowId );
+         var rowId = 'survey-' + aData[0];
+         CRM.$(nRow).attr( 'id', rowId).addClass('crm-entity');
          //handled disabled rows.
          var isActive = Boolean(Number(aData[7]));
-         if ( !isActive ) cj(nRow).addClass( 'disabled' );
+         if ( !isActive ) CRM.$(nRow).addClass( 'disabled' );
 
          //add id for yes/no column.
-         cj(nRow).children().eq(8).attr( 'id', rowId + '_status' );
+         CRM.$(nRow).children().eq(8).attr( 'id', rowId + '_status' );
 
          return nRow;
     },
@@ -221,7 +222,7 @@ function loadPetitionList( )
       var dataLength = aoData.length;
 
       var count = 1;
-      var searchCriteria = new Array( );
+      var searchCriteria = [];
 
       //get the search criteria.
                         var searchParams = {/literal}{$searchParams}{literal};
@@ -229,7 +230,7 @@ function loadPetitionList( )
           fldName = param;
           if ( param == 'petition_title' ) fldName = 'title';
           if ( param == 'petition_campaign_id' ) fldName = 'campaign_id';
-                            if ( val = cj( '#' + param ).val( ) ) {
+                            if ( val = CRM.$( '#' + param ).val( ) ) {
             aoData[dataLength++] = {name: fldName, value: val};
           }
           searchCriteria[count++] = fldName;
@@ -241,7 +242,7 @@ function loadPetitionList( )
       //lets transfer search criteria.
       aoData[dataLength++] = {name: 'searchCriteria', value:searchCriteria.join(',')};
 
-      cj.ajax( {
+      CRM.$.ajax( {
         "dataType": 'json',
         "type": "POST",
         "url": sSource,

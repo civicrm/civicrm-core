@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,16 +22,20 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Member_BatchUpdateViaProfileTest
+ */
 class WebTest_Member_BatchUpdateViaProfileTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
     parent::setUp();
   }
 
-  function testMemberAdd() {
+  public function testMemberAdd() {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -42,10 +46,9 @@ class WebTest_Member_BatchUpdateViaProfileTest extends CiviSeleniumTestCase {
 
     // Add new individual using Quick Add block on the main page
     $firstName1 = "John_" . substr(sha1(rand()), 0, 7);
-    $lastName   = "Smith_" . substr(sha1(rand()), 0, 7);
-    $Name1      = $lastName . ', ' . $firstName1;
+    $lastName = "Smith_" . substr(sha1(rand()), 0, 7);
+    $Name1 = $lastName . ', ' . $firstName1;
     $this->webtestAddContact($firstName1, $lastName, "$firstName1.$lastName@example.com");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Add membership for this individual
     $this->_addMembership($memTypeParams);
@@ -68,7 +71,6 @@ class WebTest_Member_BatchUpdateViaProfileTest extends CiviSeleniumTestCase {
     $firstName2 = "John_" . substr(sha1(rand()), 0, 7);
     $Name2 = $lastName . ', ' . $firstName2;
     $this->webtestAddContact($firstName2, $lastName, "$firstName2.$lastName@example.com");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Add membership for this individual
     $this->_addMembership($memTypeParams);
@@ -97,15 +99,14 @@ class WebTest_Member_BatchUpdateViaProfileTest extends CiviSeleniumTestCase {
 
     $this->type('sort_name', $lastName);
     $this->click('_qf_Search_refresh');
-    $this->waitForElementPresent('_qf_Search_next_print');
 
-    // Batch Update Via Profile
+    // Update multiple memberships
+    $this->waitForElementPresent("xpath=//div[@id='search-status']/table/tbody/tr[2]/td[2]/input");
     $this->click("xpath=//div[@id='search-status']/table/tbody/tr[2]/td[2]/input");
     //$this->click('CIVICRM_QFID_ts_all_10');
-    $this->select('task', "label=Batch Update Members Via Profile");
-    $this->click('Go');
+    $this->select('task', "label=Update multiple memberships");
     $this->waitForElementPresent('_qf_PickProfile_back-bottom');
-
+    $this->waitForElementPresent('uf_group_id');
     $this->select('uf_group_id', "label={$profileTitle}");
     $this->click('_qf_PickProfile_next-bottom');
 
@@ -119,10 +120,10 @@ class WebTest_Member_BatchUpdateViaProfileTest extends CiviSeleniumTestCase {
     $this->click('_qf_Batch_next-bottom');
     $this->waitForElementPresent('_qf_Result_done');
     $this->click('_qf_Result_done');
-    $this->waitForElementPresent('_qf_Search_next_print');
 
     // View Membership
-    $this->click("xpath=//div[@id='memberSearch']/table/tbody//tr/td[3]/a[text()='{$Name1}']/../../td[11]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//div[@id='memberSearch']/table/tbody//tr/td[3]/a[text()='{$Name1}']/../../td[11]/span[1]/a[1][text()='View']");
+    $this->click("xpath=//div[@id='memberSearch']/table/tbody//tr/td[3]/a[text()='{$Name1}']/../../td[11]/span[1]/a[1][text()='View']");
     $this->waitForElementPresent('_qf_MembershipView_cancel-bottom');
 
     // Verify End date
@@ -134,7 +135,6 @@ class WebTest_Member_BatchUpdateViaProfileTest extends CiviSeleniumTestCase {
     $this->webtestVerifyTabularData($verifyData);
 
     $this->click('_qf_MembershipView_cancel-bottom');
-    $this->waitForElementPresent('_qf_Search_next_print');
 
     // View Membership
     $this->click("xpath=//div[@id='memberSearch']/table/tbody//tr/td[3]/a[text()='{$Name2}']/../../td[11]/span/a[text()='View']");
@@ -149,7 +149,10 @@ class WebTest_Member_BatchUpdateViaProfileTest extends CiviSeleniumTestCase {
     $this->webtestVerifyTabularData($verifyData);
   }
 
-  function _addMembership($memTypeParams) {
+  /**
+   * @param array $memTypeParams
+   */
+  public function _addMembership($memTypeParams) {
     // click through to the membership view screen
     $this->click("css=li#tab_member a");
     $this->waitForElementPresent("link=Add Membership");
@@ -177,13 +180,16 @@ class WebTest_Member_BatchUpdateViaProfileTest extends CiviSeleniumTestCase {
 
     // Clicking save.
     $this->click("_qf_Membership_upload");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // page was loaded
     $this->waitForTextPresent($sourceText);
   }
 
-  function _addProfile($profileTitle, $customDataParams) {
+  /**
+   * @param $profileTitle
+   * @param array $customDataParams
+   */
+  public function _addProfile($profileTitle, $customDataParams) {
 
     $this->openCiviPage("admin/uf/group", "reset=1");
 
@@ -191,10 +197,17 @@ class WebTest_Member_BatchUpdateViaProfileTest extends CiviSeleniumTestCase {
     // Add membership custom data field to profile
     $this->waitForElementPresent('_qf_Group_cancel-bottom');
     $this->type('title', $profileTitle);
-    $this->click('_qf_Group_next-bottom');
+    $this->click('uf_group_type_Profile');
+    $this->clickLink('_qf_Group_next-bottom');
 
-    $this->waitForElementPresent('_qf_Field_cancel-bottom');
     $this->waitForText('crm-notification-container', "Your CiviCRM Profile '{$profileTitle}' has been added. You can add fields to this profile now.");
+    $gid = $this->urlArg('gid');
+
+    $this->openCiviPage('admin/uf/group/field/add', array(
+        'action' => 'add',
+        'reset' => 1,
+        'gid' => $gid,
+      ), 'field_name[0]');
 
     $this->select('field_name[0]', "value=Membership");
     $this->select('field_name[1]', "label={$customDataParams[0]} :: {$customDataParams[1]}");
@@ -203,7 +216,6 @@ class WebTest_Member_BatchUpdateViaProfileTest extends CiviSeleniumTestCase {
 
     // Clicking save and new
     $this->click('_qf_Field_next_new-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForText('crm-notification-container', "Your CiviCRM Profile Field '{$customDataParams[0]}' has been saved to '{$profileTitle}'.");
 
     // Add membership status field to profile - CRM-8618
@@ -213,11 +225,13 @@ class WebTest_Member_BatchUpdateViaProfileTest extends CiviSeleniumTestCase {
     $this->click('label');
     // Clicking save
     $this->click('_qf_Field_next-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForText('crm-notification-container', "Your CiviCRM Profile Field 'Membership Status' has been saved to '{$profileTitle}'.");
   }
 
-  function _addCustomData() {
+  /**
+   * @return array
+   */
+  public function _addCustomData() {
     $customGroupTitle = 'Custom_' . substr(sha1(rand()), 0, 4);
 
     $this->openCiviPage('admin/custom/group', 'reset=1');
@@ -253,12 +267,12 @@ class WebTest_Member_BatchUpdateViaProfileTest extends CiviSeleniumTestCase {
     $this->click('is_searchable');
 
     //clicking save
-    $this->click('_qf_Field_next');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->click('_qf_Field_done-bottom');
 
     //Is custom field created
-    $this->waitForText('crm-notification-container', "Your custom field '$textFieldLabel' has been saved.");
+    $this->waitForText('crm-notification-container', "Custom field '$textFieldLabel' has been saved.");
 
     return array($textFieldLabel, $customGroupTitle);
   }
+
 }

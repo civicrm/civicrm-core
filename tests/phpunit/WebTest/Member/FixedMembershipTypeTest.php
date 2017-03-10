@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,16 +22,20 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Member_FixedMembershipTypeTest
+ */
 class WebTest_Member_FixedMembershipTypeTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
     parent::setUp();
   }
 
-  function testMembershipTypeScenario1() {
+  public function testMembershipTypeScenario1() {
     // Scenario 1
     // Rollover Date < Start Date
     // Join Date > Rollover Date and Join Date < Start Date
@@ -55,17 +59,14 @@ class WebTest_Member_FixedMembershipTypeTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent('_qf_MembershipType_cancel-bottom');
 
     $this->type('name', "Membership Type $title");
-    $this->type('member_of_contact', $title);
-    $this->click('member_of_contact');
-    $this->waitForElementPresent("css=div.ac_results-inner li");
-    $this->click("css=div.ac_results-inner li");
+    $this->select2('member_of_contact_id', $title);
 
     $this->type('minimum_fee', '100');
-    $this->select( 'financial_type_id', 'value=2' );
+    $this->select('financial_type_id', 'value=2');
     $this->type('duration_interval', 1);
     $this->select('duration_unit', "label=year");
 
-    $this->select('period_type', "label=fixed");
+    $this->select('period_type', "value=fixed");
     $this->waitForElementPresent('fixed_period_rollover_day[d]');
 
     // fixed period start set to April 1
@@ -77,7 +78,7 @@ class WebTest_Member_FixedMembershipTypeTest extends CiviSeleniumTestCase {
 
     $this->click('_qf_MembershipType_upload-bottom');
     $this->waitForElementPresent('link=Add Membership Type');
-    $this->assertTrue($this->isTextPresent("The membership type 'Membership Type $title' has been saved."));
+    $this->waitForText('crm-notification-container', "The membership type 'Membership Type $title' has been saved.");
 
     $this->openCiviPage("contact/add", "reset=1&ct=Individual");
 
@@ -119,10 +120,10 @@ class WebTest_Member_FixedMembershipTypeTest extends CiviSeleniumTestCase {
     require_once 'CRM/Core/Config.php';
     require_once 'CRM/Utils/Array.php';
     require_once 'CRM/Utils/Date.php';
-    $currentYear  = date('Y');
+    $currentYear = date('Y');
     $currentMonth = date('m');
     $previousYear = $currentYear - 1;
-    $nextYear     = $currentYear + 1;
+    $nextYear = $currentYear + 1;
 
     $todayDate = date('Y-m-d');
 
@@ -135,10 +136,12 @@ class WebTest_Member_FixedMembershipTypeTest extends CiviSeleniumTestCase {
     // expected calc'd end date
     $endDate = date('Y-m-d', mktime(0, 0, 0, 3, 31, $nextYear));
 
-    $configVars = new CRM_Core_Config_Variables();
     foreach (array(
-      'joinDate', 'startDate', 'endDate') as $date) {
-      $$date = CRM_Utils_Date::customFormat($$date, $configVars->dateformatFull);
+               'joinDate',
+               'startDate',
+               'endDate',
+             ) as $date) {
+      $$date = CRM_Utils_Date::customFormat($$date, $this->webtestGetSetting('dateformatFull'));
     }
 
     $query = "
@@ -164,11 +167,11 @@ SELECT end_event_adjust_interval
 
     // Clicking save.
     $this->click('_qf_Membership_upload');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // page was loaded
     $this->waitForTextPresent($sourceText);
 
+    $this->waitForElementPresent("xpath=//div[@id='memberships']//table//tbody/tr[1]/td[9]/span/a[text()='View']");
     // Is status message correct?
     $this->assertTrue($this->isTextPresent("Membership Type $title membership for $firstName $lastName has been added."),
       "Status message didn't show up after saving!"
@@ -190,7 +193,7 @@ SELECT end_event_adjust_interval
     );
   }
 
-  function testMembershipTypeScenario2() {
+  public function testMembershipTypeScenario2() {
     // Scenario 2
     // Rollover Date < Join Date
 
@@ -213,18 +216,15 @@ SELECT end_event_adjust_interval
     $this->waitForElementPresent('_qf_MembershipType_cancel-bottom');
 
     $this->type('name', "Membership Type $title");
-    $this->type('member_of_contact', $title);
-    $this->click('member_of_contact');
-    $this->waitForElementPresent("css=div.ac_results-inner li");
-    $this->click("css=div.ac_results-inner li");
+    $this->select2('member_of_contact_id', $title);
 
     $this->type('minimum_fee', '100');
-    $this->select( 'financial_type_id', 'value=2' );
+    $this->select('financial_type_id', 'value=2');
 
     $this->type('duration_interval', 2);
     $this->select('duration_unit', "label=year");
 
-    $this->select('period_type', "label=fixed");
+    $this->select('period_type', "value=fixed");
     $this->waitForElementPresent('fixed_period_rollover_day[d]');
 
     $this->select('fixed_period_start_day[M]', 'value=9');
@@ -235,7 +235,7 @@ SELECT end_event_adjust_interval
 
     $this->click('_qf_MembershipType_upload-bottom');
     $this->waitForElementPresent('link=Add Membership Type');
-    $this->assertTrue($this->isTextPresent("The membership type 'Membership Type $title' has been saved."));
+    $this->waitForText('crm-notification-container', "The membership type 'Membership Type $title' has been saved.");
 
     $this->openCiviPage("contact/add", "reset=1&ct=Individual");
 
@@ -280,7 +280,7 @@ SELECT end_event_adjust_interval
     require_once 'CRM/Core/Config.php';
     require_once 'CRM/Utils/Array.php';
     require_once 'CRM/Utils/Date.php';
-    $currentYear  = date('Y');
+    $currentYear = date('Y');
     $currentMonth = date('m');
     $previousYear = $currentYear - 1;
 
@@ -294,10 +294,12 @@ SELECT end_event_adjust_interval
 
     // expected calc'd end date
     $endDate = date('Y-m-d', mktime(0, 0, 0, 8, 31, $currentYear + 2));
-    $configVars = new CRM_Core_Config_Variables();
     foreach (array(
-      'joinDate', 'startDate', 'endDate') as $date) {
-      $$date = CRM_Utils_Date::customFormat($$date, $configVars->dateformatFull);
+               'joinDate',
+               'startDate',
+               'endDate',
+             ) as $date) {
+      $$date = CRM_Utils_Date::customFormat($$date, $this->webtestGetSetting('dateformatFull'));
     }
 
     $query = "
@@ -323,7 +325,7 @@ SELECT end_event_adjust_interval
 
     // Clicking save.
     $this->click('_qf_Membership_upload');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent("xpath=//div[@id='memberships']//table//tbody/tr[1]/td[9]/span/a[text()='View']");
 
     // page was loaded
     $this->waitForTextPresent($sourceText);
@@ -349,7 +351,7 @@ SELECT end_event_adjust_interval
     );
   }
 
-  function testMembershipTypeScenario3() {
+  public function testMembershipTypeScenario3() {
     // Scenario 3
     // Standard Fixed scenario - Jan 1 Fixed Period Start and October 31 rollover
     // Join Date is later than Rollover Date
@@ -373,17 +375,14 @@ SELECT end_event_adjust_interval
     $this->waitForElementPresent('_qf_MembershipType_cancel-bottom');
 
     $this->type('name', "Membership Type $title");
-    $this->type('member_of_contact', $title);
-    $this->click('member_of_contact');
-    $this->waitForElementPresent("css=div.ac_results-inner li");
-    $this->click("css=div.ac_results-inner li");
+    $this->select2('member_of_contact_id', $title);
 
     $this->type('minimum_fee', '100');
-    $this->select( 'financial_type_id', 'value=2' );
+    $this->select('financial_type_id', 'value=2');
     $this->type('duration_interval', 1);
     $this->select('duration_unit', "label=year");
 
-    $this->select('period_type', "label=fixed");
+    $this->select('period_type', "value=fixed");
     $this->waitForElementPresent('fixed_period_rollover_day[d]');
 
     $this->select('fixed_period_rollover_day[M]', 'value=10');
@@ -393,8 +392,8 @@ SELECT end_event_adjust_interval
 
     $this->click('_qf_MembershipType_upload-bottom');
     $this->waitForElementPresent('link=Add Membership Type');
-    $this->assertTrue($this->isTextPresent("The membership type 'Membership Type $title' has been saved."));
 
+    $this->waitForText('crm-notification-container', "The membership type 'Membership Type $title' has been saved.");
     $this->openCiviPage("contact/add", "reset=1&ct=Individual");
 
     $firstName = "John_" . substr(sha1(rand()), 0, 7);
@@ -438,18 +437,20 @@ SELECT end_event_adjust_interval
     require_once 'CRM/Core/Config.php';
     require_once 'CRM/Utils/Array.php';
     require_once 'CRM/Utils/Date.php';
-    $currentYear  = date('Y');
+    $currentYear = date('Y');
     $currentMonth = date('m');
     $previousYear = $currentYear - 1;
-    $nextYear     = $currentYear + 1;
-    $todayDate    = date('Y-m-d');
-    $joinDate     = date('Y-m-d', mktime(0, 0, 0, 11, 15, $currentYear));
-    $startDate    = date('Y-m-d', mktime(0, 0, 0, 1, 1, $currentYear));
-    $endDate      = date('Y-m-d', mktime(0, 0, 0, 12, 31, $nextYear));
-    $configVars   = new CRM_Core_Config_Variables();
+    $nextYear = $currentYear + 1;
+    $todayDate = date('Y-m-d');
+    $joinDate = date('Y-m-d', mktime(0, 0, 0, 11, 15, $currentYear));
+    $startDate = date('Y-m-d', mktime(0, 0, 0, 1, 1, $currentYear));
+    $endDate = date('Y-m-d', mktime(0, 0, 0, 12, 31, $nextYear));
     foreach (array(
-      'joinDate', 'startDate', 'endDate') as $date) {
-      $$date = CRM_Utils_Date::customFormat($$date, $configVars->dateformatFull);
+               'joinDate',
+               'startDate',
+               'endDate',
+             ) as $date) {
+      $$date = CRM_Utils_Date::customFormat($$date, $this->webtestGetSetting('dateformatFull'));
     }
 
     $query = "
@@ -475,7 +476,7 @@ SELECT end_event_adjust_interval
 
     // Clicking save.
     $this->click('_qf_Membership_upload');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent("xpath=//div[@id='memberships']//table//tbody/tr[1]/td[9]/span/a[text()='View']");
 
     // page was loaded
     $this->waitForTextPresent($sourceText);
@@ -501,7 +502,7 @@ SELECT end_event_adjust_interval
     );
   }
 
-  function testMembershipTypeScenario4() {
+  public function testMembershipTypeScenario4() {
     // Scenario 4
     // Standard Fixed scenario - Jan 1 Fixed Period Start and October 31 rollover
     // Join Date is earlier than Rollover Date
@@ -522,20 +523,17 @@ SELECT end_event_adjust_interval
     $this->openCiviPage("admin/member/membershipType", "reset=1&action=browse");
 
     $this->click("link=Add Membership Type");
-    $this->waitForElementPresent('_qf_MembershipType_cancel-bottom');
+    $this->waitForElementPresent("xpath=//button//span[contains(text(),'Cancel')]");
 
     $this->type('name', "Membership Type $title");
-    $this->type('member_of_contact', $title);
-    $this->click('member_of_contact');
-    $this->waitForElementPresent("css=div.ac_results-inner li");
-    $this->click("css=div.ac_results-inner li");
+    $this->select2('member_of_contact_id', $title);
 
     $this->type('minimum_fee', '100');
-    $this->select( 'financial_type_id', 'value=2' );
+    $this->select('financial_type_id', 'value=2');
     $this->type('duration_interval', 1);
     $this->select('duration_unit', "label=year");
 
-    $this->select('period_type', "label=fixed");
+    $this->select('period_type', "value=fixed");
     $this->waitForElementPresent('fixed_period_rollover_day[d]');
 
     $this->select('fixed_period_start_day[M]', 'value=1');
@@ -546,7 +544,7 @@ SELECT end_event_adjust_interval
 
     $this->click('_qf_MembershipType_upload-bottom');
     $this->waitForElementPresent('link=Add Membership Type');
-    $this->assertTrue($this->isTextPresent("The membership type 'Membership Type $title' has been saved."));
+    $this->waitForText('crm-notification-container', "The membership type 'Membership Type $title' has been saved.");
 
     $this->openCiviPage("contact/add", "reset=1&ct=Individual");
 
@@ -589,21 +587,23 @@ SELECT end_event_adjust_interval
     require_once 'CRM/Core/Config.php';
     require_once 'CRM/Utils/Array.php';
     require_once 'CRM/Utils/Date.php';
-    $currentYear  = date('Y');
+    $currentYear = date('Y');
     $currentMonth = date('m');
-    $nextYear     = $currentYear + 1;
-    $todayDate    = date('Y-m-d');
+    $nextYear = $currentYear + 1;
+    $todayDate = date('Y-m-d');
 
     // the member-since date we will type in to membership form
     $joinDate = date('Y-m-d', mktime(0, 0, 0, 1, 15, $currentYear));
 
     // expected calc'd start and end dates
-    $startDate  = date('Y-m-d', mktime(0, 0, 0, 1, 1, $currentYear));
-    $endDate    = date('Y-m-d', mktime(0, 0, 0, 12, 31, $currentYear));
-    $configVars = new CRM_Core_Config_Variables();
+    $startDate = date('Y-m-d', mktime(0, 0, 0, 1, 1, $currentYear));
+    $endDate = date('Y-m-d', mktime(0, 0, 0, 12, 31, $currentYear));
     foreach (array(
-      'joinDate', 'startDate', 'endDate') as $date) {
-      $$date = CRM_Utils_Date::customFormat($$date, $configVars->dateformatFull);
+               'joinDate',
+               'startDate',
+               'endDate',
+             ) as $date) {
+      $$date = CRM_Utils_Date::customFormat($$date, $this->webtestGetSetting('dateformatFull'));
     }
 
     $query = "
@@ -629,7 +629,7 @@ SELECT end_event_adjust_interval
 
     // Clicking save.
     $this->click('_qf_Membership_upload');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent("xpath=//div[@id='memberships']//table//tbody/tr[1]/td[9]/span/a[text()='View']");
 
     // page was loaded
     $this->waitForTextPresent($sourceText);
@@ -654,5 +654,5 @@ SELECT end_event_adjust_interval
       )
     );
   }
-}
 
+}

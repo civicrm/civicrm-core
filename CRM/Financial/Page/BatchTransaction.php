@@ -1,9 +1,9 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.4                                                |
+  | CiviCRM version 4.7                                                |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2013                                |
+  | Copyright CiviCRM LLC (c) 2004-2017                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -23,14 +23,12 @@
   | GNU Affero General Public License or the licensing of CiviCRM,     |
   | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
   +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 
@@ -39,41 +37,43 @@
  */
 class CRM_Financial_Page_BatchTransaction extends CRM_Core_Page_Basic {
   /**
-   * The action links that we need to display for the browse screen
+   * The action links that we need to display for the browse screen.
    *
    * @var array
-   * @static
    */
-  static $_links = null;
+  static $_links = NULL;
   static $_entityID;
 
-  static $_columnHeader = null;
-  static $_returnvalues = null;
+  static $_columnHeader = NULL;
+  static $_returnvalues = NULL;
+
   /**
-   * Get BAO Name
+   * Get BAO Name.
    *
-   * @return string Classname of BAO.
+   * @return string
+   *   Classname of BAO.
    */
-  function getBAOName() {
+  public function getBAOName() {
     return 'CRM_Batch_BAO_Batch';
   }
 
   /**
-   * Get action Links
+   * Get action Links.
    *
-   * @return array (reference) of action links
+   * @return array
+   *   (reference) of action links
    */
-  function &links() {
+  public function &links() {
     if (!(self::$_links)) {
       self::$_links = array(
-        'view'  => array(
-          'name'  => ts('View'),
-          'url'   => 'civicrm/contact/view/contribution',
-          'qs'    => 'reset=1&id=%%contid%%&cid=%%cid%%&action=view&context=contribution&selectedChild=contribute',
+        'view' => array(
+          'name' => ts('View'),
+          'url' => 'civicrm/contact/view/contribution',
+          'qs' => 'reset=1&id=%%contid%%&cid=%%cid%%&action=view&context=contribution&selectedChild=contribute',
           'title' => ts('View Contribution'),
         ),
-        'remove'  => array(
-          'name'  => ts('Remove'),
+        'remove' => array(
+          'name' => ts('Remove'),
           'title' => ts('Remove Transaction'),
           'extra' => 'onclick = "assignRemove( %%id%%,\'' . 'remove' . '\' );"',
         ),
@@ -88,29 +88,25 @@ class CRM_Financial_Page_BatchTransaction extends CRM_Core_Page_Basic {
    * This method is called after the page is created. It checks for the
    * type of action and executes that action.
    * Finally it calls the parent's run method.
-   *
-   * @return void
-   * @access public
-   *
    */
-  function run() {
+  public function run() {
     // get the requested action
-    $action = CRM_Utils_Request::retrieve('action', 'String', $this, false, 'browse'); // default to 'browse'
+    $action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse'); // default to 'browse'
 
     // assign vars to templates
     $this->assign('action', $action);
 
-    self::$_entityID = CRM_Utils_Request::retrieve('bid' , 'Positive');
+    self::$_entityID = CRM_Utils_Request::retrieve('bid', 'Positive');
     if (isset(self::$_entityID)) {
       $statusID = CRM_Core_DAO::getFieldValue('CRM_Batch_BAO_Batch', self::$_entityID, 'status_id');
     }
-    $breadCrumb =
-      array(
+    $breadCrumb
+      = array(
         array(
           'title' => ts('Accounting Batches'),
           'url' => CRM_Utils_System::url('civicrm/financial/financialbatches',
             "reset=1&batchStatus=$statusID"),
-        )
+        ),
       );
 
     CRM_Utils_System::appendBreadCrumb($breadCrumb);
@@ -119,42 +115,35 @@ class CRM_Financial_Page_BatchTransaction extends CRM_Core_Page_Basic {
   }
 
   /**
-   * Browse all financial batch transactions
+   * Get name of edit form.
    *
-   *
-   * @return void
-   * @access public
-   * @static
+   * @return string
+   *   Classname of edit form.
    */
-  function browse() {
-  }
-
-  /**
-   * Get name of edit form
-   *
-   * @return string Classname of edit form.
-   */
-  function editForm() {
+  public function editForm() {
     return 'CRM_Financial_Form_BatchTransaction';
   }
 
   /**
-   * Get edit form name
+   * Get edit form name.
    *
-   * @return string name of this page.
+   * @return string
+   *   name of this page.
    */
-  function editName() {
+  public function editName() {
     return 'Batch';
   }
 
   /**
    * Get user context.
    *
-   * @return string user context.
+   * @param null $mode
+   *
+   * @return string
+   *   user context.
    */
-  function userContext($mode = null) {
+  public function userContext($mode = NULL) {
     return 'civicrm/batchtransaction';
   }
+
 }
-
-

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Perform an upgrade without using the web-frontend
@@ -33,11 +33,13 @@ class CRM_Upgrade_Headless {
   /**
    * Perform an upgrade without using the web-frontend
    *
+   * @param bool $enablePrint
+   *
+   * @throws Exception
    * @return array, with keys:
    *   - message: string, HTML-ish blob
-   * @throws Exception
    */
-  function run($enablePrint = TRUE) {
+  public function run($enablePrint = TRUE) {
     // lets get around the time limit issue if possible for upgrades
     if (!ini_get('safe_mode')) {
       set_time_limit(0);
@@ -59,25 +61,27 @@ class CRM_Upgrade_Headless {
 
     $postUpgradeMessageFile = CRM_Utils_File::tempnam('civicrm-post-upgrade');
     $queueRunner = new CRM_Queue_Runner(array(
-        'title' => ts('CiviCRM Upgrade Tasks'),
-        'queue' => CRM_Upgrade_Form::buildQueue($currentVer, $latestVer, $postUpgradeMessageFile),
-      ));
+      'title' => ts('CiviCRM Upgrade Tasks'),
+      'queue' => CRM_Upgrade_Form::buildQueue($currentVer, $latestVer, $postUpgradeMessageFile),
+    ));
     $queueResult = $queueRunner->runAll();
     if ($queueResult !== TRUE) {
       $errorMessage = CRM_Core_Error::formatTextException($queueResult['exception']);
       CRM_Core_Error::debug_log_message($errorMessage);
       if ($enablePrint) {
-        print($errorMessage);
-    }
+        print ($errorMessage);
+      }
       throw $queueResult['exception']; // FIXME test
     }
 
     CRM_Upgrade_Form::doFinish();
 
+    $message = file_get_contents($postUpgradeMessageFile);
     return array(
       'latestVer' => $latestVer,
-      'message' => file_get_contents($postUpgradeMessageFile),
+      'message' => $message,
+      'text' => CRM_Utils_String::htmlToText($message),
     );
   }
-}
 
+}

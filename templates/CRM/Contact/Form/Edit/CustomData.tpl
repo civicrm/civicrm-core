@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,13 +24,12 @@
  +--------------------------------------------------------------------+
 *}
 
-<script type="text/javascript">var showTab = Array();</script>
 {foreach from=$groupTree item=cd_edit key=group_id}
   {if $cd_edit.is_multiple eq 1}
     {assign var=tableID value=$cd_edit.table_id}
     {assign var=divName value=$group_id|cat:"_$tableID"}
     <div></div>
-    <div id="{$cd_edit.name|cat:'_$divName'}"
+    <div
      class="crm-accordion-wrapper crm-custom-accordion {if $cd_edit.collapse_display and !$skipTitle}collapsed{/if}">
   {else}
     <div id="{$cd_edit.name}"
@@ -44,17 +43,11 @@
       {if $cd_edit.is_multiple eq 1}
         {if $cd_edit.table_id}
           <table class="no-border">
-            <tr id="statusmessg_{$group_id|cat:"_$tableID"}" class="hiddenElement">
-              <td><span class="success-status"></span></td>
-            </tr>
             <tr>
-              <div class="crm-submit-buttons">
-                <a href="#"
-                   onclick="showDelete( {$tableID}, '{$cd_edit.name}_{$group_id|cat:"_$tableID"}', {$group_id}, {$contactId} ); return false;"
-                   class="button delete-button" title="{ts 1=$cv_edit.title}Delete this %1 record{/ts}">
-                  <span><div class="icon delete-icon"></div>{ts}Delete{/ts}</span>
-                </a>
-              </div>
+              <a href="#" class="crm-hover-button crm-custom-value-del" title="{ts 1=$cd_edit.title}Delete %1{/ts}"
+               data-post='{ldelim}"valueID": "{$tableID}", "groupID": "{$group_id}", "contactId": "{$contactId}", "key": "{crmKey name='civicrm/ajax/customvalue'}"{rdelim}'>
+                <span class="icon delete-icon"></span> {ts}Delete{/ts}
+              </a>
               <!-- crm-submit-buttons -->
             </tr>
           </table>
@@ -69,35 +62,5 @@
   {/foreach}
 
   {include file="CRM/common/customData.tpl"}
-  <script type="text/javascript">
-    {literal}
-
-    function hideStatus(valueID, groupID) {
-      cj('#statusmessg_' + groupID + '_' + valueID).hide();
-    }
-
-    function showDelete(valueID, elementID, groupID, contactID) {
-      var confirmMsg = '{/literal}{ts escape='js'}Are you sure you want to delete this record?{/ts}{literal} &nbsp; <a href="#" onclick="deleteCustomValue( ' + valueID + ',\'' + elementID + '\',' + groupID + ',' + contactID + ' ); return false;" style="text-decoration: underline;">{/literal}{ts escape='js'}Yes{/ts}{literal}</a>&nbsp;&nbsp;&nbsp;<a href="#" onclick="hideStatus( ' + valueID + ', ' + groupID + ' ); return false;" style="text-decoration: underline;">{/literal}{ts escape='js'}No{/ts}{literal}</a>';
-      cj('tr#statusmessg_' + groupID + '_' + valueID).show().children().find('span').html(confirmMsg);
-    }
-
-    function deleteCustomValue(valueID, elementID, groupID, contactID) {
-      var postUrl = {/literal}"{crmURL p='civicrm/ajax/customvalue' h=0 }"{literal};
-      cj.ajax({
-        type: "POST",
-        data: "valueID=" + valueID + "&groupID=" + groupID + "&contactId=" + contactID + "&key={/literal}{crmKey name='civicrm/ajax/customvalue'}{literal}",
-        url: postUrl,
-        success: function (html) {
-          cj('#' + elementID).hide();
-          hideStatus(valueID, groupID);
-          CRM.alert('', '{/literal}{ts escape="js"}Record Deleted{/ts}{literal}', 'success');
-          var element = cj('.ui-tabs-nav #tab_custom_' + groupID + ' a');
-          cj(element).html(cj(element).attr('title') + ' (' + html + ') ');
-        }
-      });
-    }
-
-    {/literal}
-  </script>
 
   {include file="CRM/Form/attachmentjs.tpl"}

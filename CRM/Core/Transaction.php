@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,125 +23,173 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2017
  * @copyright David Strauss <david@fourkitchens.com> (c) 2007
  * $Id$
  *
- * This file has its origins in Donald Lobo's conversation with David
- * Strauss over IRC and the CRM_Core_DAO::transaction() function.
+ * (Note: This has been considerably rewritten; the interface is preserved
+ * for backward compatibility.)
  *
- * David went on and abstracted this into a class which can be used in PHP 5
- * (since destructors are called automagically at the end of the script).
- * Lobo modified the code and used CiviCRM coding standards. David's
- * PressFlow Transaction module is available at
- * http://drupal.org/project/pressflow_transaction
+ * Transaction management in Civi is divided among three classes:
+ *  - CRM_Core_Transaction: API. This binds to __construct() + __destruct()
+ *    and notifies the transaction manager when it's OK to begin/end a transaction.
+ *  - Civi\Core\Transaction\Manager: Tracks pending transaction-frames
+ *  - Civi\Core\Transaction\Frame: A nestable transaction (e.g. based on BEGIN/COMMIT/ROLLBACK
+ *    or SAVEPOINT/ROLLBACK TO SAVEPOINT).
+ *
+ * Examples:
+ *
+ * @code
+ * // Some business logic using the helper functions
+ * function my_business_logic() {
+ *   CRM_Core_Transaction::create()->run(function($tx) {
+ *     ...do work...
+ *    if ($error) throw new Exception();
+ *   });
+ * }
+ *
+ * // Some business logic which returns an error-value
+ * // and explicitly manages the transaction.
+ * function my_business_logic() {
+ *   $tx = new CRM_Core_Transaction();
+ *   ...do work...
+ *   if ($error) {
+ *     $tx->rollback();
+ *     return error_value;
+ *   }
+ * }
+ *
+ * // Some business logic which uses exceptions
+ * // and explicitly manages the transaction.
+ * function my_business_logic() {
+ *   $tx = new CRM_Core_Transaction();
+ *   try {
+ *     ...do work...
+ *   } catch (Exception $ex) {
+ *     $tx->rollback()->commit();
+ *     throw $ex;
+ *   }
+ * }
+ *
+ * @endcode
+ *
+ * Note: As of 4.6, the transaction manager supports both reference-counting and nested
+ * transactions (SAVEPOINTs). In the past, it only supported reference-counting. The two cases
+ * may exhibit different systemic effects with respect to unhandled exceptions.
  */
 class CRM_Core_Transaction {
 
   /**
-   * These constants represent phases at which callbacks can be invoked
+   * These constants represent phases at which callbacks can be invoked.
    */
-  CONST PHASE_PRE_COMMIT = 1;
-  CONST PHASE_POST_COMMIT = 2;
-  CONST PHASE_PRE_ROLLBACK = 4;
-  CONST PHASE_POST_ROLLBACK = 8;
-
-  /**
-   * Keep track of the number of opens and close
-   *
-   * @var int
-   */
-  private static $_count = 0;
-
-  /**
-   * Keep track if we need to commit or rollback
-   *
-   * @var boolean
-   */
-  private static $_doCommit = TRUE;
-
-  /**
-   * hold a dao singleton for query operations
-   *
-   * @var object
-   */
-  private static $_dao = NULL;
-
-  /**
-   * Array of callbacks to invoke when the transaction commits or rolls back.
-   * Array keys are phase constants.
-   * Array values are arrays of callbacks.
-   */
-  private static $_callbacks = NULL;
+  const PHASE_PRE_COMMIT = 1;
+  const PHASE_POST_COMMIT = 2;
+  const PHASE_PRE_ROLLBACK = 4;
+  const PHASE_POST_ROLLBACK = 8;
 
   /**
    * Whether commit() has been called on this instance
    * of CRM_Core_Transaction
    */
   private $_pseudoCommitted = FALSE;
-  function __construct() {
-    if (!self::$_dao) {
-      self::$_dao = new CRM_Core_DAO();
-    }
 
-    if (self::$_count == 0) {
-      self::$_dao->query('BEGIN');
-      self::$_callbacks = array(
-        self::PHASE_PRE_COMMIT => array(),
-        self::PHASE_POST_COMMIT => array(),
-        self::PHASE_PRE_ROLLBACK => array(),
-        self::PHASE_POST_ROLLBACK => array(),
-      );
-    }
-
-    self::$_count++;
+  /**
+   * Ensure that an SQL transaction is started.
+   *
+   * This is a thin wrapper around __construct() which allows more fluent coding.
+   *
+   * @param bool $nest
+   *   Determines what to do if there's currently an active transaction:.
+   *   - If true, then make a new nested transaction ("SAVEPOINT")
+   *   - If false, then attach to the existing transaction
+   * @return \CRM_Core_Transaction
+   */
+  public static function create($nest = FALSE) {
+    return new self($nest);
   }
 
-  function __destruct() {
+  /**
+   * Ensure that an SQL transaction is started.
+   *
+   * @param bool $nest
+   *   Determines what to do if there's currently an active transaction:.
+   *   - If true, then make a new nested transaction ("SAVEPOINT")
+   *   - If false, then attach to the existing transaction
+   */
+  public function __construct($nest = FALSE) {
+    \Civi\Core\Transaction\Manager::singleton()->inc($nest);
+  }
+
+  public function __destruct() {
     $this->commit();
   }
 
-  function commit() {
-    if (self::$_count > 0 && !$this->_pseudoCommitted) {
+  /**
+   * Immediately commit or rollback.
+   *
+   * (Note: Prior to 4.6, return void)
+   *
+   * @return \CRM_Core_Exception this
+   */
+  public function commit() {
+    if (!$this->_pseudoCommitted) {
       $this->_pseudoCommitted = TRUE;
-      self::$_count--;
-
-      if (self::$_count == 0) {
-
-        // It's possible that, say, a POST_COMMIT callback creates another
-        // transaction. That transaction will need its own list of callbacks.
-        $oldCallbacks = self::$_callbacks;
-        self::$_callbacks = NULL;
-
-        if (self::$_doCommit) {
-          self::invokeCallbacks(self::PHASE_PRE_COMMIT, $oldCallbacks);
-          self::$_dao->query('COMMIT');
-          self::invokeCallbacks(self::PHASE_POST_COMMIT, $oldCallbacks);
-        }
-        else {
-          self::invokeCallbacks(self::PHASE_PRE_ROLLBACK, $oldCallbacks);
-          self::$_dao->query('ROLLBACK');
-          self::invokeCallbacks(self::PHASE_POST_ROLLBACK, $oldCallbacks);
-        }
-        // this transaction is complete, so reset doCommit flag
-        self::$_doCommit = TRUE;
-      }
+      \Civi\Core\Transaction\Manager::singleton()->dec();
     }
+    return $this;
   }
 
+  /**
+   * @param $flag
+   */
   static public function rollbackIfFalse($flag) {
-    if ($flag === FALSE) {
-      self::$_doCommit = FALSE;
+    $frame = \Civi\Core\Transaction\Manager::singleton()->getFrame();
+    if ($flag === FALSE && $frame !== NULL) {
+      $frame->setRollbackOnly();
     }
   }
 
+  /**
+   * Mark the transaction for rollback.
+   *
+   * (Note: Prior to 4.6, return void)
+   * @return \CRM_Core_Transaction
+   */
   public function rollback() {
-    self::$_doCommit = FALSE;
+    $frame = \Civi\Core\Transaction\Manager::singleton()->getFrame();
+    if ($frame !== NULL) {
+      $frame->setRollbackOnly();
+    }
+    return $this;
+  }
+
+  /**
+   * Execute a function ($callable) within the scope of a transaction. If
+   * $callable encounters an unhandled exception, then rollback the transaction.
+   *
+   * After calling run(), the CRM_Core_Transaction object is "used up"; do not
+   * use it again.
+   *
+   * @param string $callable
+   *   Should exception one parameter (CRM_Core_Transaction $tx).
+   * @return CRM_Core_Transaction
+   * @throws Exception
+   */
+  public function run($callable) {
+    try {
+      $callable($this);
+    }
+    catch (Exception $ex) {
+      $this->rollback()->commit();
+      throw $ex;
+    }
+    $this->commit();
+    return $this;
   }
 
   /**
@@ -156,51 +204,51 @@ class CRM_Core_Transaction {
    * a call to exit().
    */
   static public function forceRollbackIfEnabled() {
-    if (self::$_count > 0) {
-      $oldCallbacks = self::$_callbacks;
-      self::$_callbacks = NULL;
-      self::invokeCallbacks(self::PHASE_PRE_ROLLBACK, $oldCallbacks);
-      self::$_dao->query('ROLLBACK');
-      self::invokeCallbacks(self::PHASE_POST_ROLLBACK, $oldCallbacks);
-      self::$_count = 0;
-      self::$_doCommit = TRUE;
+    if (\Civi\Core\Transaction\Manager::singleton()->getFrame() !== NULL) {
+      \Civi\Core\Transaction\Manager::singleton()->forceRollback();
     }
   }
 
+  /**
+   * @return bool
+   */
   static public function willCommit() {
-    return self::$_doCommit;
+    $frame = \Civi\Core\Transaction\Manager::singleton()->getFrame();
+    return ($frame === NULL) ? TRUE : !$frame->isRollbackOnly();
   }
 
   /**
-   * Determine whether there is a pending transaction
+   * Determine whether there is a pending transaction.
    */
   static public function isActive() {
-    return (self::$_count > 0);
+    $frame = \Civi\Core\Transaction\Manager::singleton()->getFrame();
+    return ($frame !== NULL);
   }
 
   /**
-   * Add a transaction callback
+   * Add a transaction callback.
+   *
+   * Note: It's conceivable to add callbacks to the main/overall transaction
+   * (aka $manager->getBaseFrame()) or to the innermost nested transaction
+   * (aka $manager->getFrame()). addCallback() has been used in the past to
+   * work-around deadlocks. This may or may not be necessary now -- but it
+   * seems more consistent (for b/c purposes) to attach callbacks to the
+   * main/overall transaction.
    *
    * Pre-condition: isActive()
    *
-   * @param $phase A constant; one of: self::PHASE_{PRE,POST}_{COMMIT,ROLLBACK}
-   * @param $callback A PHP callback
-   * @param mixed $params Optional values to pass to callback.
+   * @param int $phase
+   *   A constant; one of: self::PHASE_{PRE,POST}_{COMMIT,ROLLBACK}.
+   * @param string $callback
+   *   A PHP callback.
+   * @param mixed $params
+   *   Optional values to pass to callback.
    *          See php manual call_user_func_array for details.
+   * @param int $id
    */
-  static public function addCallback($phase, $callback, $params = null) {
-    self::$_callbacks[$phase][] = array(
-      'callback' => $callback,
-      'parameters' => (is_array($params) ? $params : array($params))
-    );
+  static public function addCallback($phase, $callback, $params = NULL, $id = NULL) {
+    $frame = \Civi\Core\Transaction\Manager::singleton()->getBaseFrame();
+    $frame->addCallback($phase, $callback, $params, $id);
   }
 
-  static protected function invokeCallbacks($phase, $callbacks) {
-    if (is_array($callbacks[$phase])) {
-      foreach ($callbacks[$phase] as $cb) {
-        call_user_func_array($cb['callback'], $cb['parameters']);
-      }
-    }
-  }
 }
-

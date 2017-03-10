@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,14 +25,15 @@
 *}
 {* this template used to build location block *}
 {if !$addBlock}
-   <div id="help">
+   <div class="help">
         {ts}Use this form to configure the location and optional contact information for the event. This information will be displayed on the Event Information page. It will also be included in online registration pages and confirmation emails if these features are enabled.{/ts}
     </div>
 {/if}
-<div class="crm-block crm-form-block crm-event-manage-location-form-block">
+
 {if $addBlock}
 {include file="CRM/Contact/Form/Edit/$blockName.tpl"}
 {else}
+<div class="crm-block crm-form-block crm-event-manage-location-form-block">
 <div class="crm-submit-buttons">
    {include file="CRM/common/formButtons.tpl" location="top"}
 </div>
@@ -58,7 +59,6 @@
       </tr>
       <tr>
         <td id="locUsedMsg" colspan="3">
-        {assign var=locUsedMsgTxt value="<strong>Note:</strong> This location is used by multiple events. Modifying location information will change values for all events."}
         </td>
       </tr>
 
@@ -95,72 +95,112 @@
 {* Include Javascript to hide and display the appropriate blocks as directed by the php code *}
 {*include file="CRM/common/showHide.tpl"*}
 {if $locEvents}
+  {* include common additional blocks tpl *}
+  {include file="CRM/common/additionalBlocks.tpl"}
+
 <script type="text/javascript">
 {literal}
-var locUsedMsgTxt = {/literal}"{$locUsedMsgTxt}"{literal};
-var locBlockId    = {/literal}"{$form.loc_event_id.value.0}"{literal};
+CRM.$(function($) {
+  //FIX ME: by default load 2 blocks and hide add and delete links
+  //we should make additional block function more flexible to set max block limit
+  buildBlocks('Email');
+  buildBlocks('Phone');
 
-if ( {/literal}"{$locUsed}"{literal} ) {
-   displayMessage( true );
-}
+  var $form = $('form.{/literal}{$form.formClass}{literal}'),
+    locBlockId = {/literal}"{$form.loc_event_id.value.0}"{literal};
 
-cj(document).ready(function() {
-  cj('#loc_event_id').change(function() {
-    cj.ajax({
+  displayMessage({/literal}{$locUsed}{literal});
+
+  // build blocks only if it is not built
+  function buildBlocks(element) {
+    if (!$('[id='+ element +'_Block_2]').length) {
+      buildAdditionalBlocks(element, 'CRM_Event_Form_ManageEvent_Location');
+    }
+  }
+
+  hideAddDeleteLinks('Email');
+  hideAddDeleteLinks('Phone');
+  function hideAddDeleteLinks(element) {
+    $('#add'+ element, $form).hide();
+    $('[id='+ element +'_Block_2] a:last', $form).hide();
+  }
+
+  $('#loc_event_id', $form).change(function() {
+    $.ajax({
       url: CRM.url('civicrm/ajax/locBlock', 'reset=1'),
-      type: 'POST',
-      data: {'lbid': cj(this).val()},
+      data: {'lbid': $(this).val()},
       dataType: 'json',
       success: function(data) {
-        var selectLocBlockId = cj('#loc_event_id').val();
+        var selectLocBlockId = $('#loc_event_id').val();
+        // Only change state when options are loaded
+        if (data.address_1_state_province_id) {
+          var defaultState = data.address_1_state_province_id;
+          $('#address_1_state_province_id', $form).one('crmOptionsUpdated', function() {
+            $(this).val(defaultState).change();
+          });
+          delete data.address_1_state_province_id;
+        }
         for(i in data) {
           if ( i == 'count_loc_used' ) {
-            if ( ((selectLocBlockId == locBlockId) && data['count_loc_used'] > 1) ||
-                 ((selectLocBlockId != locBlockId) && data['count_loc_used'] > 0) ) {
-              displayMessage( true );
+            if ( ((selectLocBlockId == locBlockId) && data.count_loc_used > 1) ||
+                 ((selectLocBlockId != locBlockId) && data.count_loc_used > 0) ) {
+              displayMessage(data.count_loc_used);
             } else {
-              displayMessage( false );
+              displayMessage(0);
             }
           } else {
-            cj('#'+i).val(data[i]);
+            $('#'+i, $form).val(data[i]).change();
           }
         }
       }
     });
     return false;
   });
+
+  function showLocFields(clear) {
+    var createNew = document.getElementsByName("location_option")[0].checked;
+    if (createNew) {
+      $('#existingLoc', $form).hide();
+      //clear all location fields values.
+      if (clear !== false) {
+        $(":input[id *= 'address_1_'], :input[id *= 'email_1_'], :input[id *= 'phone_1_']", $form).val("").change();
+        {/literal}{if $config->defaultContactCountry}
+          {if $config->defaultContactStateProvince}
+            // Set default state once options are loaded
+            var defaultState = {$config->defaultContactStateProvince}
+            {literal}
+              $('#address_1_state_province_id', $form).one('crmOptionsUpdated', function() {
+                $(this).val(defaultState).change();
+              });
+            {/literal}
+          {/if}
+          // Set default country
+          $('#address_1_country_id', $form).val({$config->defaultContactCountry}).change();
+        {/if}{literal}
+      }
+      displayMessage(0);
+    } else {
+      $('#existingLoc', $form).show();
+      if (clear !== false) {
+        $('#loc_event_id', $form).change();
+      }
+    }
+  }
+
+  $('input[name=location_option]').click(showLocFields);
+  showLocFields(false);
+
+  function displayMessage(count) {
+    if (count) {
+      var msg = {/literal}'{ts escape="js" 1="%1"}This location is used by %1 other events. Modifying location information will change values for all events.{/ts}'{literal};
+      $('#locUsedMsg', $form).text(ts(msg, {1: count})).addClass('status');
+    } else {
+      $('#locUsedMsg', $form).text(' ').removeClass('status');
+    }
+  }
 });
-
-function displayMessage( set ) {
-   cj(document).ready(function() {
-     if ( set ) {
-       cj('#locUsedMsg').html( locUsedMsgTxt ).addClass('status');
-     } else {
-       cj('#locUsedMsg').html( ' ' ).removeClass('status');
-     }
-   });
-}
-
-function showLocFields( ) {
-   var createNew = document.getElementsByName("location_option")[0].checked;
-   var useExisting = document.getElementsByName("location_option")[1].checked;
-   if ( createNew ) {
-     cj('#existingLoc').hide();
-     displayMessage(false);
-   } else if ( useExisting ) {
-     cj('#existingLoc').show();
-   }
-}
-
-showLocFields( );
 {/literal}
 </script>
 {/if}
-
-{* include common additional blocks tpl *}
-{include file="CRM/common/additionalBlocks.tpl"}
-
-{* include jscript to warn if unsaved form field changes *}
-{include file="CRM/common/formNavigate.tpl"}
 
 {/if} {* add block if end*}

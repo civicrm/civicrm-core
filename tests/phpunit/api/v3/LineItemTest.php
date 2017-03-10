@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
-| CiviCRM version 4.4                                                |
+| CiviCRM version 4.7                                                |
 +--------------------------------------------------------------------+
-| Copyright CiviCRM LLC (c) 2004-2013                                |
+| Copyright CiviCRM LLC (c) 2004-2017                                |
 +--------------------------------------------------------------------+
 | This file is a part of CiviCRM.                                    |
 |                                                                    |
@@ -23,9 +23,12 @@
 | GNU Affero General Public License or the licensing of CiviCRM,     |
 | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
 +--------------------------------------------------------------------+
-*/
+ */
 
-require_once 'CiviTest/CiviUnitTestCase.php';
+/**
+ * Class api_v3_LineItemTest
+ * @group headless
+ */
 class api_v3_LineItemTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
   protected $testAmount = 34567;
@@ -33,13 +36,14 @@ class api_v3_LineItemTest extends CiviUnitTestCase {
   protected $id = 0;
   protected $contactIds = array();
   protected $_entity = 'line_item';
-  protected $contribution_result = null;
+  protected $contribution_result = NULL;
 
   public $DBResetRequired = TRUE;
   protected $_financialTypeId = 1;
 
   public function setUp() {
     parent::setUp();
+    $this->useTransaction(TRUE);
     $this->_individualId = $this->individualCreate();
     $contributionParams = array(
       'contact_id' => $this->_individualId,
@@ -52,7 +56,7 @@ class api_v3_LineItemTest extends CiviUnitTestCase {
       'source' => 'SSF',
       'contribution_status_id' => 1,
     );
-    $contribution = $this->callAPISuccess('contribution','create', $contributionParams);
+    $contribution = $this->callAPISuccess('contribution', 'create', $contributionParams);
     $this->params = array(
       'price_field_value_id' => 1,
       'price_field_id' => 1,
@@ -64,29 +68,10 @@ class api_v3_LineItemTest extends CiviUnitTestCase {
     );
   }
 
-  function tearDown() {
-
-    foreach ($this->contactIds as $id) {
-      $this->callAPISuccess('contact', 'delete', array('id' => $id));
-    }
-    $this->quickCleanup(
-        array(
-            'civicrm_contact',
-            'civicrm_contribution',
-            'civicrm_line_item',
-        )
-    );
-  }
-
   public function testCreateLineItem() {
-    $this->quickCleanup(
-        array(
-            'civicrm_line_item',
-        )
-    );
     $result = $this->callAPIAndDocument($this->_entity, 'create', $this->params + array('debug' => 1), __FUNCTION__, __FILE__);
-    $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
-    $this->assertNotNull($result['values'][$result['id']]['id'], 'In line ' . __LINE__);
+    $this->assertEquals(1, $result['count']);
+    $this->assertNotNull($result['values'][$result['id']]['id']);
     $this->getAndCheck($this->params, $result['id'], $this->_entity);
   }
 
@@ -95,37 +80,23 @@ class api_v3_LineItemTest extends CiviUnitTestCase {
       'entity_table' => 'civicrm_contribution',
     );
     $getResult = $this->callAPIAndDocument($this->_entity, 'get', $getParams, __FUNCTION__, __FILE__);
-    $this->assertEquals(1, $getResult['count'], 'In line ' . __LINE__);
+    $this->assertEquals(1, $getResult['count']);
   }
 
   public function testDeleteLineItem() {
-    $getParams = array(        'entity_table' => 'civicrm_contribution',
+    $getParams = array(
+      'entity_table' => 'civicrm_contribution',
     );
     $getResult = $this->callAPISuccess($this->_entity, 'get', $getParams);
     $deleteParams = array('id' => $getResult['id']);
     $deleteResult = $this->callAPIAndDocument($this->_entity, 'delete', $deleteParams, __FUNCTION__, __FILE__);
     $checkDeleted = $this->callAPISuccess($this->_entity, 'get', array());
-    $this->assertEquals(0, $checkDeleted['count'], 'In line ' . __LINE__);
+    $this->assertEquals(0, $checkDeleted['count']);
   }
 
   public function testGetFieldsLineItem() {
-    $result = $this->callAPISuccess($this->_entity, 'getfields', array('action' => 'create', 'action' => 'create'));
+    $result = $this->callAPISuccess($this->_entity, 'getfields', array('action' => 'create'));
     $this->assertEquals(1, $result['values']['entity_id']['api.required']);
   }
 
-  public static function setUpBeforeClass() {
-      // put stuff here that should happen before all tests in this unit
-  }
-
-  public static function tearDownAfterClass(){
-    $tablesToTruncate = array(
-      'civicrm_contact',
-      'civicrm_financial_type',
-      'civicrm_contribution',
-      'civicrm_line_item',
-    );
-    $unitTest = new CiviUnitTestCase();
-    $unitTest->quickCleanup($tablesToTruncate);
-  }
 }
-

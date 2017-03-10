@@ -1,10 +1,9 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,38 +23,34 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
-
-/**
- * File for the CiviCRM APIv3 email functions
- *
- * @package CiviCRM_APIv3
- * @subpackage API_Email
- *
- * @copyright CiviCRM LLC (c) 2004-2013
- * @version $Id: Email.php 2011-02-16 ErikHommel $
  */
 
 /**
- * Add an Email for a contact
+ * This api exposes CiviCRM email records.
  *
- * Allowed @params array keys are:
+ * @package CiviCRM_APIv3
+ */
+
+/**
+ * Add an Email for a contact.
  *
- * @example EmailCreate.php Standard Create Example
+ * @param array $params
+ *   Array per getfields metadata.
  *
- * @return array API result array
- * {@getfields email_create}
- * @access public
+ * @return array
+ *   API result array
  */
 function civicrm_api3_email_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
- * Adjust Metadata for Create action
+ * Adjust Metadata for Create action.
  *
- * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * The metadata is used for setting defaults, documentation & validation.
+ *
+ * @param array $params
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_email_create_spec(&$params) {
   // TODO a 'clever' default should be introduced
@@ -65,36 +60,27 @@ function _civicrm_api3_email_create_spec(&$params) {
 }
 
 /**
- * Deletes an existing Email
+ * Deletes an existing Email.
  *
- * @param  array  $params
+ * @param array $params
+ *   Array per getfields metadata.
  *
- * @example EmailDelete.php Standard Delete Example
- *
- * @return boolean | error  true if successfull, error otherwise
- * {@getfields email_delete}
- * @access public
+ * @return array
+ *   API result array.
  */
 function civicrm_api3_email_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
- * Retrieve one or more emails
+ * Retrieve one or more emails.
  *
- * @param  array input parameters
+ * @param array $params
+ *   Array per getfields metadata.
  *
- *
- * @example EmailGet.php Standard Get Example
- *
- * @param  array $params  an associative array of name/value pairs.
- *
- * @return  array api result array
- * {@getfields email_get}
- * @access public
+ * @return array
+ *   api result array
  */
 function civicrm_api3_email_get($params) {
-
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
-

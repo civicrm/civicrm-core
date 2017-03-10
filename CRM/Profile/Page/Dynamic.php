@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,14 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -44,34 +42,30 @@
 class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
 
   /**
-   * The contact id of the person we are viewing
+   * The contact id of the person we are viewing.
    *
    * @var int
-   * @access protected
    */
   protected $_id;
 
   /**
-   * the profile group are are interested in
+   * The profile group are are interested in.
    *
    * @var int
-   * @access protected
    */
   protected $_gid;
 
   /**
-   * The profile types we restrict this page to display
+   * The profile types we restrict this page to display.
    *
    * @var string
-   * @access protected
    */
   protected $_restrict;
 
   /**
-   * Should we bypass permissions
+   * Should we bypass permissions.
    *
    * @var boolean
-   * @access protected
    */
   protected $_skipPermission;
 
@@ -89,7 +83,7 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
   protected $_isContactActivityProfile = FALSE;
 
   /**
-   * Activity Id connected to the profile
+   * Activity Id connected to the profile.
    *
    * @var string
    */
@@ -105,15 +99,20 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
   protected $_allFields = NULL;
 
   /**
-   * class constructor
+   * Class constructor.
    *
-   * @param int $id  the contact id
-   * @param int $gid the group id
+   * @param int $id
+   *   The contact id.
+   * @param int $gid
+   *   The group id.
    *
-   * @return void
-   * @access public
+   * @param $restrict
+   * @param bool $skipPermission
+   * @param null $profileIds
+   *
+   * @return \CRM_Profile_Page_Dynamic
    */
-  function __construct($id, $gid, $restrict, $skipPermission = FALSE, $profileIds = NULL) {
+  public function __construct($id, $gid, $restrict, $skipPermission = FALSE, $profileIds = NULL) {
     parent::__construct();
 
     $this->_id = $id;
@@ -134,14 +133,13 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
     //specifies the action being done on a multi record field
     $multiRecordAction = CRM_Utils_Request::retrieve('multiRecord', 'String', $this);
 
-    $this->_multiRecord = (!is_numeric($multiRecordAction)) ?
-      CRM_Core_Action::resolve($multiRecordAction) : $multiRecordAction;
+    $this->_multiRecord = (!is_numeric($multiRecordAction)) ? CRM_Core_Action::resolve($multiRecordAction) : $multiRecordAction;
     if ($this->_multiRecord) {
       $this->set('multiRecord', $this->_multiRecord);
     }
 
     if ($this->_multiRecord & CRM_Core_Action::VIEW) {
-      $this->_recordId  = CRM_Utils_Request::retrieve('recordId', 'Positive', $this);
+      $this->_recordId = CRM_Utils_Request::retrieve('recordId', 'Positive', $this);
       $this->_allFields = CRM_Utils_Request::retrieve('allFields', 'Integer', $this);
     }
 
@@ -165,10 +163,9 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
   /**
    * Get the action links for this page.
    *
-   * @return array $_actionLinks
-   *
+   * @return array
    */
-  function &actionLinks() {
+  public function &actionLinks() {
     return NULL;
   }
 
@@ -178,11 +175,8 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
    * This method is called after the page is created. It checks for the
    * type of action and executes that action.
    *
-   * @return void
-   * @access public
-   *
    */
-  function run() {
+  public function run() {
     $template = CRM_Core_Smarty::singleton();
     if ($this->_id && $this->_gid) {
 
@@ -195,8 +189,9 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
       if ($limitListingsGroupsID) {
 
         if (!CRM_Contact_BAO_GroupContact::isContactInGroup($this->_id,
-            $limitListingsGroupsID
-          )) {
+          $limitListingsGroupsID
+        )
+        ) {
           CRM_Utils_System::setTitle(ts('Profile View - Permission Denied'));
           return CRM_Core_Session::setStatus(ts('You do not have permission to view this contact record. Contact the site administrator if you need assistance.'), ts('Permission Denied'), 'error');
         }
@@ -205,12 +200,18 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
       $session = CRM_Core_Session::singleton();
       $userID = $session->get('userID');
 
-      $this->_isPermissionedChecksum = FALSE;
+      $this->_isPermissionedChecksum = $allowPermission = FALSE;
       $permissionType = CRM_Core_Permission::VIEW;
+      if (CRM_Core_Permission::check('administer users') || CRM_Core_Permission::check('view all contacts') || CRM_Contact_BAO_Contact_Permission::allow($this->_id)) {
+        $allowPermission = TRUE;
+      }
       if ($this->_id != $userID) {
         // do not allow edit for anon users in joomla frontend, CRM-4668, unless u have checksum CRM-5228
         if ($config->userFrameworkFrontend) {
           $this->_isPermissionedChecksum = CRM_Contact_BAO_Contact_Permission::validateOnlyChecksum($this->_id, $this, FALSE);
+          if (!$this->_isPermissionedChecksum) {
+            $this->_isPermissionedChecksum = $allowPermission;
+          }
         }
         else {
           $this->_isPermissionedChecksum = CRM_Contact_BAO_Contact_Permission::validateChecksumContact($this->_id, $this, FALSE);
@@ -228,12 +229,7 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
 
       // make sure we dont expose all fields based on permission
       $admin = FALSE;
-      if ((!$config->userFrameworkFrontend &&
-          (CRM_Core_Permission::check('administer users') ||
-            CRM_Core_Permission::check('view all contacts') ||
-            CRM_Contact_BAO_Contact_Permission::allow($this->_id)
-          )
-        ) ||
+      if ((!$config->userFrameworkFrontend && $allowPermission) ||
         $this->_id == $userID ||
         $this->_isPermissionedChecksum
       ) {
@@ -301,7 +297,8 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
             $copyFields = $fields;
             CRM_Core_BAO_UFGroup::shiftMultiRecordFields($copyFields, $multiRecordFields);
             $fieldKey = key($multiRecordFields);
-          } else {
+          }
+          else {
             $fieldKey = key($fields);
           }
           if ($fieldID = CRM_Core_BAO_CustomField::getKeyID($fieldKey)) {
@@ -318,7 +315,17 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
       $labels = array();
 
       foreach ($fields as $name => $field) {
-        $labels[$field['title']] = preg_replace('/\s+|\W+/', '_', $name);
+        //CRM-14338
+        // Create a unique, non-empty index for each field.
+        $index = $field['title'];
+        if ($index === '') {
+          $index = ' ';
+        }
+        while (array_key_exists($index, $labels)) {
+          $index .= ' ';
+        }
+
+        $labels[$index] = preg_replace('/\s+|\W+/', '_', $name);
       }
 
       foreach ($values as $title => $value) {
@@ -344,8 +351,9 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
       $fieldDetail = reset($fields);
       $fieldId = CRM_Core_BAO_CustomField::getKeyID($fieldDetail['name']);
       $customGroupDetails = CRM_Core_BAO_CustomGroup::getGroupTitles(array($fieldId));
-      $title = $customGroupDetails[$fieldId]['groupTitle'];
-    } else {
+      $multiRecTitle = $customGroupDetails[$fieldId]['groupTitle'];
+    }
+    else {
       $title = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $this->_gid, 'title');
     }
 
@@ -366,6 +374,7 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
       $title .= ' - ' . $displayName;
     }
 
+    $title = isset($multiRecTitle) ? ts('View %1 Record', array(1 => $multiRecTitle)) : $title;
     CRM_Utils_System::setTitle($title);
 
     // invoke the pagRun hook, CRM-3906
@@ -374,7 +383,12 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
     return trim($template->fetch($this->getHookedTemplateFileName()));
   }
 
-  function checkTemplateFileExists($suffix = '') {
+  /**
+   * @param string $suffix
+   *
+   * @return null|string
+   */
+  public function checkTemplateFileExists($suffix = '') {
     if ($this->_gid) {
       $templateFile = "CRM/Profile/Page/{$this->_gid}/Dynamic.{$suffix}tpl";
       $template = CRM_Core_Page::getTemplate();
@@ -394,14 +408,25 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
     return NULL;
   }
 
-  function getTemplateFileName() {
+  /**
+   * Use the form name to create the tpl file name.
+   *
+   * @return string
+   */
+  public function getTemplateFileName() {
     $fileName = $this->checkTemplateFileExists();
     return $fileName ? $fileName : parent::getTemplateFileName();
   }
 
-  function overrideExtraTemplateFileName() {
+  /**
+   * Default extra tpl file basically just replaces .tpl with .extra.tpl
+   * i.e. we dont override
+   *
+   * @return string
+   */
+  public function overrideExtraTemplateFileName() {
     $fileName = $this->checkTemplateFileExists('extra.');
     return $fileName ? $fileName : parent::overrideExtraTemplateFileName();
   }
-}
 
+}

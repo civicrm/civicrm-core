@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -30,7 +30,7 @@
             {if $primaryParticipantProfile.CustomPre}
                <fieldset class="label-left no-border"><div class="bold crm-profile-view-title">{$primaryParticipantProfile.CustomPreGroupTitle}</div>
                    {foreach from=$primaryParticipantProfile.CustomPre item=value key=field}
-                      <div class="crm-section {$field}-section">
+                      <div class="crm-public-form-item crm-section {$field}-section">
                           <div class="label">{$field}</div>
                           <div class="content">{$value}</div>
                           <div class="clear"></div>
@@ -43,7 +43,7 @@
                   <fieldset class="label-left no-border"><div class="bold crm-profile-view-title">{$primaryParticipantProfile.CustomPostGroupTitle.$field.groupTitle}</div>
                     <div class="crm-profile-view">
                       {foreach from=$primaryParticipantProfile.CustomPost.$field item=value key=field}
-                        <div class="crm-section {$field}-section">
+                        <div class="crm-public-form-item crm-section {$field}-section">
                           <div class="label">{$field}</div>
                           <div class="content">{$value}</div>
                           <div class="clear"></div>
@@ -68,7 +68,7 @@
               <fieldset class="label-left no-border"><div class="bold crm-additional-profile-view-title">{$participant.additionalCustomPreGroupTitle}</div>
                 <div class="crm-profile-view">
                   {foreach from=$participant.additionalCustomPre item=value key=field}
-                    <div class="crm-section {$field}-section">
+                    <div class="crm-public-form-item crm-section {$field}-section">
                       <div class="label">{$field}</div>
                       <div class="content">{$value}</div>
                       <div class="clear"></div>
@@ -83,7 +83,7 @@
                 <fieldset class="label-left no-border"><div class="bold crm-additional-profile-view-title">{$participant.additionalCustomPostGroupTitle.$field.groupTitle}</div>
                   <div class="crm-profile-view">
                     {foreach from=$participant.additionalCustomPost.$field item=value key=field}
-                      <div class="crm-section {$field}-section">
+                      <div class="crm-public-form-item crm-section {$field}-section">
                         <div class="label">{$field}</div>
                         <div class="content">{$value}</div>
                         <div class="clear"></div>

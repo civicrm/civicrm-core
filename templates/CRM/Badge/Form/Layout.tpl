@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -52,7 +52,7 @@
          <table>
            <tr>
             <td>{$form.image_1.html}
-               <a href="#" class="crm-hover-button clear-image" title="{ts}Clear{/ts}"><span class="icon close-icon"></span></a>
+               <a href="#" class="crm-hover-button clear-image" title="{ts}Clear{/ts}"><i class="crm-i fa-times"></i></a>
              <br/>
              <span class="description">{ts}Click above and select a file by double clicking on it.{/ts}</span>
             </td>
@@ -63,7 +63,7 @@
               {$form.height_image_1.html}</br>{$form.height_image_1.label}
             </td>
            </tr>
-         </table> 
+         </table>
         </td>
       </tr>
       <tr class="crm-badge-layout-form-block-image_2">
@@ -72,7 +72,7 @@
          <table>
           <tr>
            <td>{$form.image_2.html}
-              <a href="#" class="crm-hover-button clear-image" title="{ts}Clear{/ts}"><span class="icon close-icon"></span></a>
+              <a href="#" class="crm-hover-button clear-image" title="{ts}Clear{/ts}"><i class="crm-i fa-times"></i></a>
             <br/>
             <span class="description">{ts}Click above and select a file by double clicking on it.{/ts}</span>
            </td>
@@ -83,7 +83,29 @@
             {$form.height_image_2.html}<br/>{$form.height_image_2.label}
            </td>
           </tr>
-         </table> 
+         </table>
+        </td>
+      </tr>
+      <tr class="crm-badge-layout-form-block-participant_image">
+        <td class="label">{$form.show_participant_image.label}</td>
+        <td>
+         <table>
+           <tr>
+            <td>{$form.show_participant_image.html}
+             <br/>
+             <span class="description">{ts}Select this option if you want to use a contact's image on their name badge.{/ts}</span>
+            </td>
+            <td>
+             {$form.width_participant_image.html}<br/>{$form.width_participant_image.label}
+            </td>
+           <td>
+              {$form.height_participant_image.html}</br>{$form.height_participant_image.label}
+            </td>
+           <td>
+              {$form.alignment_participant_image.html}</br>{$form.alignment_participant_image.label}
+            </td>
+           </tr>
+         </table>
         </td>
       </tr>
       <tr class="crm-badge-layout-form-block-elements">

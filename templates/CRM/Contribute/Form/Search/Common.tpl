@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,7 +24,7 @@
  +--------------------------------------------------------------------+
 *}
 
-<tr><td><label>{ts}Contribution Dates{/ts}</label></td></tr>
+<tr><td><label>{ts}Date Received{/ts}</label></td></tr>
 <tr>
 {include file="CRM/Core/DateRange.tpl" fieldName="contribution_date" from='_low' to='_high'}
 </tr>
@@ -34,14 +34,14 @@
   {$form.contribution_amount_low.html} &nbsp;&nbsp;
   {$form.contribution_amount_high.label}
   {$form.contribution_amount_high.html} </td>
-  <td><label>{ts}Contribution Status{/ts}</label> <br />
+  <td><label>{$form.contribution_status_id.label}</label> <br />
   {$form.contribution_status_id.html} </td>
 </tr>
 <tr>
   <td>
     <div class="float-left">
-      <label>{ts}Payment Method{/ts}</label> <br />
-      {$form.contribution_payment_instrument_id.html|crmAddClass:twenty}
+      <label>{$form.payment_instrument_id.label}</label> <br />
+      {$form.payment_instrument_id.html|crmAddClass:twenty}
     </div>
     <div class="float-left" id="contribution_check_number_wrapper">
       {$form.contribution_check_number.label} <br />
@@ -49,20 +49,22 @@
     </div>
   </td>
   <td>
-    {$form.contribution_transaction_id.label} <br />
-    {$form.contribution_transaction_id.html}
+    {$form.contribution_trxn_id.label} <br />
+    {$form.contribution_trxn_id.html}
   </td>
 </tr>
 <tr>
   <td>
     {$form.contribution_or_softcredits.label} <br />
-    {$form.contribution_or_softcredits.html}
-  </td>
-  <td>
+    {$form.contribution_or_softcredits.html}<br />
     <div class="float-left" id="contribution_soft_credit_type_wrapper">
       {$form.contribution_soft_credit_type_id.label} <br />
       {$form.contribution_soft_credit_type_id.html|crmAddClass:twenty}
-    </div>  
+    </div>
+  </td>
+  <td>
+    {$form.invoice_id.label} <br />
+    {$form.invoice_id.html}
   </td>
 </tr>
 <tr>
@@ -121,18 +123,19 @@
 </tr>
 <tr>
   <td>
-    {$form.contribution_in_honor_of.label} <br />
-    {$form.contribution_in_honor_of.html|crmAddClass:twenty}
-  </td>
-  <td>
     {$form.contribution_source.label} <br />
     {$form.contribution_source.html|crmAddClass:twenty}
+  </td>
+  <td>
+    {$form.contribution_product_id.label} <br />
+    {$form.contribution_product_id.html|crmAddClass:twenty}
   </td>
 </tr>
 <tr>
   <td>
     {$form.contribution_pcp_made_through_id.label} <br />
-    {$form.contribution_pcp_made_through_id.html|crmAddClass:twenty}
+    {$form.contribution_pcp_made_through_id.html}
+    {include file="CRM/Contribute/Form/PCP.js.tpl"}
   </td>
   <td>
     {$form.contribution_pcp_display_in_roll.label}
@@ -157,17 +160,20 @@
 {include file="CRM/Campaign/Form/addCampaignToComponent.tpl" campaignContext="componentSearch"
 campaignTrClass='' campaignTdClass=''}
 
+{* contribution recurring search *}
 <tr>
   <td colspan="2">
-{include file="CRM/Contribute/Form/Search/ContributionRecur.tpl"}
+    {include file="CRM/Contribute/Form/Search/ContributionRecur.tpl"}
+  </td>
 </tr>
 
-{if $contributeGroupTree}
+{if $contributionGroupTree}
 <tr>
   <td colspan="2">
-  {include file="CRM/Custom/Form/Search.tpl" groupTree=$contributeGroupTree showHideLinks=false}</td>
+  {include file="CRM/Custom/Form/Search.tpl" groupTree=$contributionGroupTree showHideLinks=false}</td>
 </tr>
 {/if}
+
 {literal}
 <script type="text/javascript">
   cj('#contribution_payment_instrument_id').change(function() {

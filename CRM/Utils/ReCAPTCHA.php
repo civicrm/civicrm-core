@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,14 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Utils_ReCAPTCHA {
 
@@ -43,41 +41,39 @@ class CRM_Utils_ReCAPTCHA {
   protected $_phrase = NULL;
 
   /**
+   * Singleton.
+   *
    * We only need one instance of this object. So we use the singleton
    * pattern and cache the instance in this variable
    *
-   * @var object
-   * @static
+   * @var CRM_Utils_ReCAPTCHA
    */
   static private $_singleton = NULL;
 
   /**
-   * singleton function used to manage this object
-   *
-   * @param string the key to permit session scope's
+   * Singleton function used to manage this object.
    *
    * @return object
-   * @static
-   *
    */
-  static function &singleton() {
+  public static function &singleton() {
     if (self::$_singleton === NULL) {
       self::$_singleton = new CRM_Utils_ReCAPTCHA();
     }
     return self::$_singleton;
   }
 
-  function __construct() {}
-
   /**
-   * Add element to form
+   * Add element to form.
    *
+   * @param CRM_Core_Form $form
    */
-  static function add(&$form) {
-    $error  = NULL;
+  public static function add(&$form) {
+    $error = NULL;
     $config = CRM_Core_Config::singleton();
     $useSSL = FALSE;
-    require_once 'packages/recaptcha/recaptchalib.php';
+    if (!function_exists('recaptcha_get_html')) {
+      require_once 'packages/recaptcha/recaptchalib.php';
+    }
 
     // See if we are using SSL
     if (CRM_Utils_System::isSSL()) {
@@ -89,35 +85,18 @@ class CRM_Utils_ReCAPTCHA {
     $form->assign('recaptchaOptions', $config->recaptchaOptions);
     $form->add(
       'text',
-      'recaptcha_challenge_field',
-      NULL,
+      'g-recaptcha-response',
+      'reCaptcha',
       NULL,
       TRUE
     );
-    $form->add(
-      'hidden',
-      'recaptcha_response_field',
-      'manual_challenge'
-    );
-
     $form->registerRule('recaptcha', 'callback', 'validate', 'CRM_Utils_ReCAPTCHA');
-    $form->addRule(
-      'recaptcha_challenge_field',
-      ts('Input text must match the phrase in the image. Please review the image and re-enter matching text.'),
-      'recaptcha',
-      $form
-    );
+    if ($form->isSubmitted() && empty($form->_submitValues['g-recaptcha-response'])) {
+      $form->setElementError(
+        'g-recaptcha-response',
+        ts('Please go back and complete the CAPTCHA at the bottom of this form.')
+      );
+    }
   }
 
-  static function validate($value, $form) {
-    $config = CRM_Core_Config::singleton();
-
-    $resp = recaptcha_check_answer($config->recaptchaPrivateKey,
-      $_SERVER['REMOTE_ADDR'],
-      $_POST["recaptcha_challenge_field"],
-      $_POST["recaptcha_response_field"]
-    );
-    return $resp->is_valid;
-  }
 }
-

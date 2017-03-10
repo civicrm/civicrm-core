@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,18 +28,16 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
- *
+ * Batch BAO class.
  */
 class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
 
   /**
-   * Cache for the current batch object
+   * Cache for the current batch object.
    */
   static $_batch = NULL;
 
@@ -50,16 +48,18 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   static $_exportFormat = NULL;
 
   /**
-   * Create a new batch
+   * Create a new batch.
    *
-   * @param array  $params associated array
-   * @param array  $ids associated array of ids
-   * @param string $context string
+   * @param array $params
+   * @param array $ids
+   *   Associated array of ids.
+   * @param string $context
+   *   String.
    *
-   * @return object $batch batch object
-   * @access public
+   * @return object
+   *   $batch batch object
    */
-  static function create(&$params, $ids = NULL, $context = NULL) {
+  public static function create(&$params, $ids = NULL, $context = NULL) {
     if (empty($params['id'])) {
       $params['name'] = CRM_Utils_String::titleToVar($params['title']);
     }
@@ -75,16 +75,17 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   }
 
   /**
-   * Retrieve the information about the batch
+   * Retrieve the information about the batch.
    *
-   * @param array $params   (reference ) an assoc array of name/value pairs
-   * @param array $defaults (reference ) an assoc array to hold the flattened values
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $defaults
+   *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return array CRM_Batch_BAO_Batch object on success, null otherwise
-   * @access public
-   * @static
+   * @return array
+   *   CRM_Batch_BAO_Batch object on success, null otherwise
    */
-  static function retrieve(&$params, &$defaults) {
+  public static function retrieve(&$params, &$defaults) {
     $batch = new CRM_Batch_DAO_Batch();
     $batch->copyValues($params);
     if ($batch->find(TRUE)) {
@@ -95,24 +96,27 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   }
 
   /**
-   * Get profile id associated with the batch type
+   * Get profile id associated with the batch type.
    *
-   * @param int   $batchTypeId batch type id
+   * @param int $batchTypeId
+   *   Batch type id.
    *
-   * @return int  $profileId   profile id
-   * @static
+   * @return int
+   *   $profileId   profile id
    */
-  static function getProfileId($batchTypeId) {
+  public static function getProfileId($batchTypeId) {
     //retrieve the profile specific to batch type
     switch ($batchTypeId) {
       case 1:
-        //batch profile used for contribution
+      case 3:
+        //batch profile used for pledges
         $profileName = "contribution_batch_entry";
         break;
 
       case 2:
         //batch profile used for memberships
         $profileName = "membership_batch_entry";
+        break;
     }
 
     // get and return the profile id
@@ -120,24 +124,24 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   }
 
   /**
-   * generate batch name
+   * Generate batch name.
    *
-   * @return batch name
-   * @static
+   * @return string
+   *   batch name
    */
-  static function generateBatchName() {
+  public static function generateBatchName() {
     $sql = "SELECT max(id) FROM civicrm_batch";
     $batchNo = CRM_Core_DAO::singleValueQuery($sql) + 1;
     return ts('Batch %1', array(1 => $batchNo)) . ': ' . date('Y-m-d');
   }
 
   /**
-   * create entity batch entry
-   * @param array $params associated array
-   * @return batch array
-   * @access public
+   * Create entity batch entry.
+   *
+   * @param array $params
+   * @return array
    */
-  static function addBatchEntity(&$params) {
+  public static function addBatchEntity(&$params) {
     $entityBatch = new CRM_Batch_DAO_EntityBatch();
     $entityBatch->copyValues($params);
     $entityBatch->save();
@@ -145,11 +149,11 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   }
 
   /**
-   * Remove entries from entity batch
-   * @param array $params associated array
-   * @return object CRM_Batch_DAO_EntityBatch
+   * Remove entries from entity batch.
+   * @param array $params
+   * @return CRM_Batch_DAO_EntityBatch
    */
-  static function removeBatchEntity($params) {
+  public static function removeBatchEntity($params) {
     $entityBatch = new CRM_Batch_DAO_EntityBatch();
     $entityBatch->copyValues($params);
     $entityBatch->delete();
@@ -157,28 +161,29 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   }
 
   /**
-   * function to delete batch entry
+   * Delete batch entry.
    *
-   * @param int $batchId batch id
+   * @param int $batchId
+   *   Batch id.
    *
-   * @return void
-   * @access public
+   * @return bool
    */
-  static function deleteBatch($batchId) {
+  public static function deleteBatch($batchId) {
     // delete entry from batch table
     $batch = new CRM_Batch_DAO_Batch();
     $batch->id = $batchId;
     $batch->delete();
-    return true;
+    return TRUE;
   }
 
   /**
-   * This function is a wrapper for ajax batch selector
+   * wrapper for ajax batch selector.
    *
-   * @param  array   $params associated array for params record id.
+   * @param array $params
+   *   Associated array for params record id.
    *
-   * @return array   $batchList associated array of batch list
-   * @access public
+   * @return array
+   *   associated array of batch list
    */
   public function getBatchListSelector(&$params) {
     // format the params
@@ -191,9 +196,14 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
 
     // get batch totals for open batches
     $fetchTotals = array();
+    $batchStatus = CRM_Core_PseudoConstant::get('CRM_Batch_DAO_Batch', 'status_id', array('labelColumn' => 'name'));
+    $batchStatus = array(
+      array_search('Open', $batchStatus),
+      array_search('Reopened', $batchStatus),
+    );
     if ($params['context'] == 'financialBatch') {
       foreach ($batches as $id => $batch) {
-        if ($batch['status_id'] == 1) {
+        if (in_array($batch['status_id'], $batchStatus)) {
           $fetchTotals[] = $id;
         }
       }
@@ -212,9 +222,10 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
         $batch['check'] = $value['check'];
       }
       $batch['batch_name'] = $value['title'];
-      $batch['total'] = $batch['item_count'] = '';
+      $batch['total'] = '';
       $batch['payment_instrument'] = $value['payment_instrument'];
       $batch['item_count'] = CRM_Utils_Array::value('item_count', $value);
+      $batch['type'] = $value['batch_type'];
       if (!empty($value['total'])) {
         $batch['total'] = CRM_Utils_Money::format($value['total']);
       }
@@ -233,12 +244,14 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   }
 
   /**
-   * Get list of batches
+   * Get list of batches.
    *
-   * @param  array   $params associated array for params
-   * @access public
+   * @param array $params
+   *   Associated array for params.
+   *
+   * @return array
    */
-  static function getBatchList(&$params) {
+  public static function getBatchList(&$params) {
     $whereClause = self::whereClause($params);
 
     if (!empty($params['rowCount']) && is_numeric($params['rowCount'])
@@ -270,6 +283,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
 
     $batchTypes = CRM_Core_PseudoConstant::get('CRM_Batch_DAO_Batch', 'type_id');
     $batchStatus = CRM_Core_PseudoConstant::get('CRM_Batch_DAO_Batch', 'status_id');
+    $batchStatusByName = CRM_Core_PseudoConstant::get('CRM_Batch_DAO_Batch', 'status_id', array('labelColumn' => 'name'));
     $paymentInstrument = CRM_Contribute_PseudoConstant::paymentInstrument();
 
     $results = array();
@@ -279,26 +293,27 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
       CRM_Core_DAO::storeValues($object, $values);
       $action = array_sum(array_keys($newLinks));
 
-      if ($values['status_id'] == 2 && $params['context'] != 'financialBatch') {
+      if ($values['status_id'] == array_search('Closed', $batchStatusByName) && $params['context'] != 'financialBatch') {
         $newLinks = array();
       }
       elseif ($params['context'] == 'financialBatch') {
-        $values['check'] =
-          "<input type='checkbox' id='check_" .
+        $values['check'] = "<input type='checkbox' id='check_" .
           $object->id .
           "' name='check_" .
           $object->id .
           "' value='1'  data-status_id='" .
-          $values['status_id']."' class='select-row'></input>";
+          $values['status_id'] . "' class='select-row'></input>";
 
-        switch ($values['status_id']) {
-          case '1':
+        switch ($batchStatusByName[$values['status_id']]) {
+          case 'Open':
             CRM_Utils_Array::remove($newLinks, 'reopen', 'download');
             break;
-          case '2':
+
+          case 'Closed':
             CRM_Utils_Array::remove($newLinks, 'close', 'edit', 'download');
             break;
-          case '5':
+
+          case 'Exported':
             CRM_Utils_Array::remove($newLinks, 'close', 'edit', 'reopen', 'export');
         }
       }
@@ -312,8 +327,8 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
         $values['payment_instrument'] = $paymentInstrument[$object->payment_instrument_id];
       }
       $tokens = array('id' => $object->id, 'status' => $values['status_id']);
-      if ($values['status_id'] == CRM_Core_OptionGroup::getValue('batch_status', 'Exported')) {
-        $aid = CRM_Core_OptionGroup::getValue('activity_type','Export Accounting Batch');
+      if ($values['status_id'] == array_search('Exported', $batchStatusByName)) {
+        $aid = CRM_Core_OptionGroup::getValue('activity_type', 'Export Accounting Batch');
         $activityParams = array('source_record_id' => $object->id, 'activity_type_id' => $aid);
         $exportActivity = CRM_Activity_BAO_Activity::retrieve($activityParams, $val);
         $fid = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_EntityFile', $exportActivity->id, 'file_id', 'entity_id');
@@ -336,10 +351,12 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   }
 
   /**
-   * Get count of batches
+   * Get count of batches.
    *
-   * @param  array   $params associated array for params
-   * @access public
+   * @param array $params
+   *   Associated array for params.
+   *
+   * @return null|string
    */
   public static function getBatchCount(&$params) {
     $args = array();
@@ -351,16 +368,19 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   }
 
   /**
-   * Format where clause for getting lists of batches
+   * Format where clause for getting lists of batches.
    *
-   * @param  array   $params associated array for params
-   * @access public
+   * @param array $params
+   *   Associated array for params.
+   *
+   * @return string
    */
   public static function whereClause($params) {
     $clauses = array();
     // Exclude data-entry batches
+    $batchStatus = CRM_Core_PseudoConstant::get('CRM_Batch_DAO_Batch', 'status_id', array('labelColumn' => 'name'));
     if (empty($params['status_id'])) {
-      $clauses[] = 'batch.status_id <> 3';
+      $clauses[] = 'batch.status_id <> ' . array_search('Data Entry', $batchStatus);
     }
 
     $fields = array(
@@ -383,7 +403,12 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
           $clauses[] = "$table.$field = '$value'";
         }
         elseif ($value) {
-          $clauses[] = "$table.$field = $value";
+          if ($field == 'status_id' && $value == array_search('Open', $batchStatus)) {
+            $clauses[] = "$table.$field IN ($value," . array_search('Reopened', $batchStatus) . ')';
+          }
+          else {
+            $clauses[] = "$table.$field = $value";
+          }
         }
       }
     }
@@ -391,56 +416,58 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   }
 
   /**
-   * Function to define action links
+   * Define action links.
    *
-   * @return array $links array of action links
-   * @access public
+   * @param null $context
+   *
+   * @return array
+   *   array of action links
    */
-  function links($context = NULL) {
+  public function links($context = NULL) {
     if ($context == 'financialBatch') {
       $links = array(
-        'transaction' =>  array(
-          'name'  => ts('Transactions'),
-          'url'   => 'civicrm/batchtransaction',
-          'qs'    => 'reset=1&bid=%%id%%',
+        'transaction' => array(
+          'name' => ts('Transactions'),
+          'url' => 'civicrm/batchtransaction',
+          'qs' => 'reset=1&bid=%%id%%',
           'title' => ts('View/Add Transactions to Batch'),
         ),
-        'edit' =>    array(
-          'name'  => ts('Edit'),
-          'url'   => 'civicrm/financial/batch',
-          'qs'    => 'reset=1&action=update&id=%%id%%&context=1',
+        'edit' => array(
+          'name' => ts('Edit'),
+          'url' => 'civicrm/financial/batch',
+          'qs' => 'reset=1&action=update&id=%%id%%&context=1',
           'title' => ts('Edit Batch'),
         ),
-        'close' =>   array(
-          'name'  => ts('Close'),
+        'close' => array(
+          'name' => ts('Close'),
           'title' => ts('Close Batch'),
-          'url'   => '#',
+          'url' => '#',
           'extra' => 'rel="close"',
         ),
-        'export' =>  array(
-          'name'  => ts('Export'),
+        'export' => array(
+          'name' => ts('Export'),
           'title' => ts('Export Batch'),
-          'url'   => '#',
+          'url' => '#',
           'extra' => 'rel="export"',
         ),
-        'reopen' =>  array(
-          'name'  => ts('Re-open'),
+        'reopen' => array(
+          'name' => ts('Re-open'),
           'title' => ts('Re-open Batch'),
-          'url'   => '#',
+          'url' => '#',
           'extra' => 'rel="reopen"',
         ),
-        'delete' =>  array(
-          'name'  => ts('Delete'),
+        'delete' => array(
+          'name' => ts('Delete'),
           'title' => ts('Delete Batch'),
-          'url'   => '#',
+          'url' => '#',
           'extra' => 'rel="delete"',
         ),
         'download' => array(
-          'name'  => ts('Download'),
-          'url'   => 'civicrm/file',
-          'qs'    => 'reset=1&id=%%fid%%&eid=%%eid%%',
+          'name' => ts('Download'),
+          'url' => 'civicrm/file',
+          'qs' => 'reset=1&id=%%fid%%&eid=%%eid%%',
           'title' => ts('Download Batch'),
-        )
+        ),
       );
     }
     else {
@@ -462,44 +489,43 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
           'url' => 'civicrm/batch',
           'qs' => 'action=delete&id=%%id%%',
           'title' => ts('Delete Batch'),
-        )
+        ),
       );
     }
     return $links;
   }
 
   /**
-   * function to get batch list
+   * Get batch list.
    *
-   * @return array array of all batches
-   * excluding batches with data entry in progress
+   * @return array
+   *   all batches excluding batches with data entry in progress
    */
-  static function getBatches() {
-    $dataEntryStatusId = CRM_Core_OptionGroup::getValue('batch_status','Data Entry');
+  public static function getBatches() {
+    $dataEntryStatusId = CRM_Core_OptionGroup::getValue('batch_status', 'Data Entry', 'name');
     $query = "SELECT id, title
       FROM civicrm_batch
       WHERE item_count >= 1
       AND status_id != {$dataEntryStatusId}
-      ORDER BY id DESC";
+      ORDER BY title";
 
     $batches = array();
     $dao = CRM_Core_DAO::executeQuery($query);
-    while ( $dao->fetch( ) ) {
+    while ($dao->fetch()) {
       $batches[$dao->id] = $dao->title;
     }
     return $batches;
   }
 
 
-
   /**
-   * Calculate sum of all entries in a batch
+   * Calculate sum of all entries in a batch.
    * Used to validate and update item_count and total when closing an accounting batch
    *
    * @param array $batchIds
    * @return array
    */
-  static function batchTotals($batchIds) {
+  public static function batchTotals($batchIds) {
     $totals = array_fill_keys($batchIds, array('item_count' => 0, 'total' => 0));
     if ($batchIds) {
       $sql = "SELECT eb.batch_id, COUNT(tx.id) AS item_count, SUM(tx.total_amount) AS total
@@ -517,13 +543,15 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   }
 
   /**
-   * Format markup for comparing two totals
+   * Format markup for comparing two totals.
    *
-   * @param $actual: calculated total
-   * @param $expected: user-entered total
+   * @param $actual
+   *   calculated total
+   * @param $expected
+   *   user-entered total
    * @return array
    */
-  static function displayTotals($actual, $expected) {
+  public static function displayTotals($actual, $expected) {
     $class = 'actual-value';
     if ($expected && $expected != $actual) {
       $class .= ' crm-error';
@@ -541,15 +569,12 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
    * Function for exporting financial accounts, currently we support CSV and IIF format
    * @see http://wiki.civicrm.org/confluence/display/CRM/CiviAccounts+Specifications+-++Batches#CiviAccountsSpecifications-Batches-%C2%A0Overviewofimplementation
    *
-   * @param array  $batchIds associated array of batch ids
-   * @param string $exportFormat export format
-   *
-   * @return void
-   *
-   * @static
-   * @access public
+   * @param array $batchIds
+   *   Associated array of batch ids.
+   * @param string $exportFormat
+   *   Export format.
    */
-  static function exportFinancialBatch($batchIds, $exportFormat) {
+  public static function exportFinancialBatch($batchIds, $exportFormat) {
     if (empty($batchIds)) {
       CRM_Core_Error::fatal(ts('No batches were selected.'));
       return;
@@ -562,53 +587,48 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
 
     // Instantiate appropriate exporter based on user-selected format.
     $exporterClass = "CRM_Financial_BAO_ExportFormat_" . self::$_exportFormat;
-    if ( class_exists( $exporterClass ) ) {
+    if (class_exists($exporterClass)) {
       $exporter = new $exporterClass();
     }
     else {
       CRM_Core_Error::fatal("Could not locate exporter: $exporterClass");
     }
-    switch (self::$_exportFormat) {
-      case 'CSV':
-        foreach ($batchIds as $batchId) {
-          $export[$batchId] = $exporter->generateExportQuery($batchId);
-        }
-        $exporter->makeCSV($export);
-        break;
-
-      case 'IIF':
-        foreach ($batchIds as $batchId) {
-          $export[$batchId] = $exporter->generateExportQuery($batchId);
-        }
-        $exporter->makeIIF($export);
-        break;
+    foreach ($batchIds as $batchId) {
+      $export[$batchId] = $exporter->generateExportQuery($batchId);
     }
+    $exporter->makeExport($export);
   }
 
-  static function closeReOpen($batchIds = array(), $status) {
+  /**
+   * @param array $batchIds
+   * @param $status
+   */
+  public static function closeReOpen($batchIds = array(), $status) {
     $batchStatus = CRM_Core_PseudoConstant::get('CRM_Batch_DAO_Batch', 'status_id');
-    $params['status_id'] = CRM_Utils_Array::key( $status, $batchStatus );
-    $session = CRM_Core_Session::singleton( );
+    $params['status_id'] = CRM_Utils_Array::key($status, $batchStatus);
+    $session = CRM_Core_Session::singleton();
     $params['modified_date'] = date('YmdHis');
-    $params['modified_id'] = $session->get( 'userID' );
+    $params['modified_id'] = $session->get('userID');
     foreach ($batchIds as $key => $value) {
       $params['id'] = $ids['batchID'] = $value;
       self::create($params, $ids);
     }
-    $url = CRM_Utils_System::url('civicrm/financial/financialbatches',"reset=1&batchStatus={$params['status_id']}");
+    $url = CRM_Utils_System::url('civicrm/financial/financialbatches', "reset=1&batchStatus={$params['status_id']}");
     CRM_Utils_System::redirect($url);
   }
 
   /**
-   * Function to retrieve financial items assigned for a batch
+   * Retrieve financial items assigned for a batch.
    *
    * @param int $entityID
    * @param array $returnValues
-   * @param null $notPresent
-   * @param null $params
-   * @return Object
+   * @param bool $notPresent
+   * @param array $params
+   * @param bool $getCount
+   *
+   * @return CRM_Core_DAO
    */
-  static function getBatchFinancialItems($entityID, $returnValues, $notPresent = NULL, $params = NULL, $getCount = FALSE) {
+  public static function getBatchFinancialItems($entityID, $returnValues, $notPresent = NULL, $params = NULL, $getCount = FALSE) {
     if (!$getCount) {
       if (!empty($params['rowCount']) &&
         $params['rowCount'] > 0
@@ -618,8 +638,8 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
     }
     // action is taken depending upon the mode
     $select = 'civicrm_financial_trxn.id ';
-    if (!empty( $returnValues)) {
-      $select .= " , ".implode(' , ', $returnValues);
+    if (!empty($returnValues)) {
+      $select .= " , " . implode(' , ', $returnValues);
     }
 
     $orderBy = " ORDER BY civicrm_financial_trxn.id";
@@ -628,42 +648,43 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
     }
 
     $from = "civicrm_financial_trxn
-LEFT JOIN civicrm_entity_financial_trxn ON civicrm_entity_financial_trxn.financial_trxn_id = civicrm_financial_trxn.id
-LEFT JOIN civicrm_entity_batch ON civicrm_entity_batch.entity_id = civicrm_financial_trxn.id
-LEFT JOIN civicrm_contribution ON civicrm_contribution.id = civicrm_entity_financial_trxn.entity_id
+INNER JOIN civicrm_entity_financial_trxn ON civicrm_entity_financial_trxn.financial_trxn_id = civicrm_financial_trxn.id
+INNER JOIN civicrm_contribution ON (civicrm_contribution.id = civicrm_entity_financial_trxn.entity_id
+  AND civicrm_entity_financial_trxn.entity_table='civicrm_contribution')
+LEFT JOIN civicrm_entity_batch ON civicrm_entity_batch.entity_table = 'civicrm_financial_trxn'
+AND civicrm_entity_batch.entity_id = civicrm_financial_trxn.id
 LEFT JOIN civicrm_financial_type ON civicrm_financial_type.id = civicrm_contribution.financial_type_id
 LEFT JOIN civicrm_contact contact_a ON contact_a.id = civicrm_contribution.contact_id
 LEFT JOIN civicrm_contribution_soft ON civicrm_contribution_soft.contribution_id = civicrm_contribution.id
 ";
 
-    $searchFields =
-      array(
-        'sort_name',
-        'financial_type_id',
-        'contribution_page_id',
-        'contribution_payment_instrument_id',
-        'contribution_transaction_id',
-        'contribution_source',
-        'contribution_currency_type',
-        'contribution_pay_later',
-        'contribution_recurring',
-        'contribution_test',
-        'contribution_thankyou_date_is_not_null',
-        'contribution_receipt_date_is_not_null',
-        'contribution_pcp_made_through_id',
-        'contribution_pcp_display_in_roll',
-        'contribution_date_relative',
-        'contribution_amount_low',
-        'contribution_amount_high',
-        'contribution_in_honor_of',
-        'contact_tags',
-        'group',
-        'contribution_date_relative',
-        'contribution_date_high',
-        'contribution_date_low',
-        'contribution_check_number',
-        'contribution_status_id',
-      );
+    $searchFields = array(
+      'sort_name',
+      'financial_type_id',
+      'contribution_page_id',
+      'payment_instrument_id',
+      'contribution_trxn_id',
+      'contribution_source',
+      'contribution_currency_type',
+      'contribution_pay_later',
+      'contribution_recurring',
+      'contribution_test',
+      'contribution_thankyou_date_is_not_null',
+      'contribution_receipt_date_is_not_null',
+      'contribution_pcp_made_through_id',
+      'contribution_pcp_display_in_roll',
+      'contribution_date_relative',
+      'contribution_amount_low',
+      'contribution_amount_high',
+      'contribution_in_honor_of',
+      'contact_tags',
+      'group',
+      'contribution_date_relative',
+      'contribution_date_high',
+      'contribution_date_low',
+      'contribution_check_number',
+      'contribution_status_id',
+    );
     $values = array();
     foreach ($searchFields as $field) {
       if (isset($params[$field])) {
@@ -688,10 +709,12 @@ LEFT JOIN civicrm_contribution_soft ON civicrm_contribution_soft.contribution_id
           $values['contribution_date_high'] = $date['to'];
         }
         $searchParams = CRM_Contact_BAO_Query::convertFormValues($values);
+        // @todo the use of defaultReturnProperties means the search will be inefficient
+        // as slow-unneeded properties are included.
         $query = new CRM_Contact_BAO_Query($searchParams,
           CRM_Contribute_BAO_Query::defaultReturnProperties(CRM_Contact_BAO_Query::MODE_CONTRIBUTE,
             FALSE
-          ),NULL, FALSE, FALSE,CRM_Contact_BAO_Query::MODE_CONTRIBUTE
+          ), NULL, FALSE, FALSE, CRM_Contact_BAO_Query::MODE_CONTRIBUTE
         );
         if ($field == 'contribution_date_high' || $field == 'contribution_date_low') {
           $query->dateQueryBuilder($params[$field], 'civicrm_contribution', 'contribution_date', 'receive_date', 'Contribution Date');
@@ -700,23 +723,15 @@ LEFT JOIN civicrm_contribution_soft ON civicrm_contribution_soft.contribution_id
     }
     if (!empty($query->_where[0])) {
       $where = implode(' AND ', $query->_where[0]) .
-        " AND civicrm_entity_batch.batch_id IS NULL
-         AND civicrm_entity_financial_trxn.entity_table = 'civicrm_contribution'";
-      $searchValue = TRUE;
+        " AND civicrm_entity_batch.batch_id IS NULL ";
+      $where = str_replace('civicrm_contribution.payment_instrument_id', 'civicrm_financial_trxn.payment_instrument_id', $where);
     }
     else {
-      $searchValue = FALSE;
-    }
-
-    if (!$searchValue) {
       if (!$notPresent) {
-        $where =  " ( civicrm_entity_batch.batch_id = {$entityID}
-        AND civicrm_entity_batch.entity_table = 'civicrm_financial_trxn'
-        AND civicrm_entity_financial_trxn.entity_table = 'civicrm_contribution') ";
+        $where = " civicrm_entity_batch.batch_id = {$entityID} ";
       }
       else {
-        $where = " ( civicrm_entity_batch.batch_id IS NULL
-        AND civicrm_entity_financial_trxn.entity_table = 'civicrm_contribution')";
+        $where = " civicrm_entity_batch.batch_id IS NULL ";
       }
     }
 
@@ -736,41 +751,44 @@ WHERE  {$where}
   }
 
   /**
-   * function to get batch names
+   * Get batch names.
    * @param string $batchIds
    *
-   * @return array array of batches
+   * @return array
+   *   array of batches
    */
-  static function getBatchNames($batchIds) {
+  public static function getBatchNames($batchIds) {
     $query = 'SELECT id, title
       FROM civicrm_batch
-      WHERE id IN ('. $batchIds . ')';
+      WHERE id IN (' . $batchIds . ')';
 
     $batches = array();
     $dao = CRM_Core_DAO::executeQuery($query);
-    while ( $dao->fetch( ) ) {
+    while ($dao->fetch()) {
       $batches[$dao->id] = $dao->title;
     }
     return $batches;
   }
 
   /**
-   * Function get batch statuses
+   * Function get batch statuses.
    *
    * @param string $batchIds
    *
-   * @return array array of batches
+   * @return array
+   *   array of batches
    */
-  static function getBatchStatuses($batchIds) {
+  public static function getBatchStatuses($batchIds) {
     $query = 'SELECT id, status_id
       FROM civicrm_batch
-      WHERE id IN ('.$batchIds.')';
+      WHERE id IN (' . $batchIds . ')';
 
     $batches = array();
     $dao = CRM_Core_DAO::executeQuery($query);
-    while ( $dao->fetch( ) ) {
+    while ($dao->fetch()) {
       $batches[$dao->id] = $dao->status_id;
     }
     return $batches;
   }
+
 }

@@ -1,0 +1,256 @@
+## This file contains a list of INI fields that may
+## be returned by the System.get API.
+# Omit: SMTP
+allow_call_time_pass_reference
+allow_url_fopen
+allow_url_include
+always_populate_raw_post_data
+apc.cache_by_default
+apc.canonicalize
+apc.coredump_unmap
+apc.enable_cli
+apc.enabled
+apc.file_md5
+apc.file_update_protection
+# Omit: apc.filters
+apc.gc_ttl
+apc.include_once_override
+apc.lazy_classes
+apc.lazy_functions
+apc.max_file_size
+# Omit: apc.mmap_file_mask
+apc.num_files_hint
+# Omit: apc.preload_path
+apc.report_autofilter
+apc.rfc1867
+apc.rfc1867_freq
+# Omit: apc.rfc1867_name
+# Omit: apc.rfc1867_prefix
+apc.rfc1867_ttl
+apc.serializer
+apc.shm_segments
+apc.shm_size
+apc.slam_defense
+apc.stat
+apc.stat_ctime
+apc.ttl
+apc.use_request_time
+apc.user_entries_hint
+apc.user_ttl
+apc.write_lock
+arg_separator.input
+arg_separator.output
+asp_tags
+assert.active
+assert.bail
+# Omit: assert.callback
+assert.quiet_eval
+assert.warning
+# Omit: auto_append_file
+auto_detect_line_endings
+auto_globals_jit
+# Omit: auto_prepend_file
+bcmath.scale
+# Omit: browscap
+# Omit: curl.cainfo
+date.default_latitude
+date.default_longitude
+date.sunrise_zenith
+date.sunset_zenith
+date.timezone
+# Omit: dba.default_handler
+default_charset
+default_mimetype
+default_socket_timeout
+define_syslog_variables
+disable_classes
+disable_functions
+display_errors
+display_startup_errors
+# Omit: doc_root
+# Omit: docref_ext
+# Omit: docref_root
+enable_dl
+enable_post_data_reading
+# Omit: error_append_string
+# Omit: error_log
+# Omit: error_prepend_string
+error_reporting
+exif.decode_jis_intel
+exif.decode_jis_motorola
+exif.decode_unicode_intel
+exif.decode_unicode_motorola
+exif.encode_jis
+exif.encode_unicode
+exit_on_timeout
+expose_php
+# Omit: extension_dir
+file_uploads
+filter.default
+filter.default_flags
+# Omit: from
+gd.jpeg_ignore_warning
+highlight.bg
+highlight.comment
+highlight.default
+highlight.html
+highlight.keyword
+highlight.string
+html_errors
+iconv.input_encoding
+iconv.internal_encoding
+iconv.output_encoding
+ignore_repeated_errors
+ignore_repeated_source
+ignore_user_abort
+implicit_flush
+# Omit: include_path
+intl.default_locale
+intl.error_level
+ldap.max_links
+log_errors
+log_errors_max_len
+magic_quotes_gpc
+magic_quotes_runtime
+magic_quotes_sybase
+mail.add_x_header
+# Omit: mail.force_extra_parameters
+# Omit: mail.log
+max_execution_time
+max_file_uploads
+max_input_nesting_level
+max_input_time
+max_input_vars
+mbstring.detect_order
+mbstring.encoding_translation
+mbstring.func_overload
+mbstring.http_input
+mbstring.http_output
+mbstring.http_output_conv_mimetypes
+mbstring.internal_encoding
+mbstring.language
+mbstring.strict_detection
+mbstring.substitute_character
+# Omit: mcrypt.algorithms_dir
+# Omit: mcrypt.modes_dir
+memory_limit
+mysql.allow_local_infile
+mysql.allow_persistent
+mysql.connect_timeout
+# Omit: mysql.default_host
+# Omit: mysql.default_password
+# Omit: mysql.default_port
+# Omit: mysql.default_socket
+# Omit: mysql.default_user
+mysql.max_links
+mysql.max_persistent
+mysql.trace_mode
+mysqli.allow_local_infile
+mysqli.allow_persistent
+# Omit: mysqli.default_host
+# Omit: mysqli.default_port
+# Omit: mysqli.default_pw
+# Omit: mysqli.default_socket
+# Omit: mysqli.default_user
+mysqli.max_links
+mysqli.max_persistent
+mysqli.reconnect
+# Omit: open_basedir
+output_buffering
+output_handler
+pcre.backtrack_limit
+pcre.recursion_limit
+# Omit: pdo_mysql.default_socket
+pgsql.allow_persistent
+pgsql.auto_reset_persistent
+pgsql.ignore_notice
+pgsql.log_notice
+pgsql.max_links
+pgsql.max_persistent
+# Omit: phar.cache_list
+phar.readonly
+phar.require_hash
+post_max_size
+precision
+realpath_cache_size
+realpath_cache_ttl
+register_argc_argv
+register_globals
+register_long_arrays
+report_memleaks
+report_zend_debug
+request_order
+safe_mode
+# Omit: safe_mode_allowed_env_vars
+# Omit: safe_mode_exec_dir
+safe_mode_gid
+# Omit: safe_mode_include_dir
+# Omit: safe_mode_protected_env_vars
+# Omit: sendmail_from
+# Omit: sendmail_path
+serialize_precision
+session.auto_start
+session.bug_compat_42
+session.bug_compat_warn
+session.cache_expire
+# Omit: session.cache_limiter
+# Omit: session.cookie_domain
+session.cookie_httponly
+session.cookie_lifetime
+# Omit: session.cookie_path
+session.cookie_secure
+# Omit: session.entropy_file
+# Omit: session.entropy_length
+session.gc_divisor
+session.gc_maxlifetime
+session.gc_probability
+# Omit: session.hash_bits_per_character
+session.hash_function
+# Omit: session.name
+session.referer_check
+# Omit: session.save_handler
+# Omit: session.save_path
+session.serialize_handler
+session.upload_progress.cleanup
+session.upload_progress.enabled
+session.upload_progress.freq
+session.upload_progress.min_freq
+# Omit: session.upload_progress.name
+# Omit: session.upload_progress.prefix
+session.use_cookies
+session.use_only_cookies
+session.use_trans_sid
+short_open_tag
+# Omit: smtp_port
+soap.wsdl_cache
+# Omit: soap.wsdl_cache_dir
+soap.wsdl_cache_enabled
+soap.wsdl_cache_limit
+soap.wsdl_cache_ttl
+sql.safe_mode
+# Omit: sqlite3.extension_dir
+track_errors
+# Omit: unserialize_callback_func
+upload_max_filesize
+# Omit: upload_tmp_dir
+url_rewriter.tags
+user_agent
+# Omit: user_dir
+user_ini.cache_ttl
+# Omit: user_ini.filename
+variables_order
+xmlrpc_error_number
+xmlrpc_errors
+# Omit:'xsl.security_prefs
+y2k_compliance
+yaz.keepalive
+# Omit: yaz.log_file
+yaz.log_mask
+yaz.max_links
+zend.detect_unicode
+zend.enable_gc
+zend.multibyte
+zend.script_encoding
+zlib.output_compression
+zlib.output_compression_level
+# Omit: zlib.output_handler

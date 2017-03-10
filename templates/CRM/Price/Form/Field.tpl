@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -67,7 +67,6 @@
   }
 </script>
 {/literal}
-<h3>{if $action eq 1}{ts}Add Field{/ts}{elseif $action eq 2}{ts}Edit Field{/ts}{/if}</h3>
 <div class="crm-block crm-form-block crm-price-field-form-block">
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
   <table class="form-layout">
@@ -91,7 +90,7 @@
   </table>
 
   <div class="spacer"></div>
-  <div id="price-block" {if $action eq 2 && $form.html_type.value.0 eq 'Text'} class="show-block" {else} class="hide-block" {/if}>
+  <div id="price-block" {if $action eq 2 && $form.html_type.value.0 eq 'Text'} class="show-block" {else} class="hiddenElement" {/if}>
     <table class="form-layout">
       <tr class="crm-price-field-form-block-price">
         <td class="label">{$form.price.label} <span class="crm-marker" title="{ts}This field is required.{/ts}">*</span></td>
@@ -100,6 +99,10 @@
           <br /><span class="description">{ts}Unit price.{/ts}</span> {help id="id-negative"}
         {/if}
         </td>
+      </tr>
+      <tr class="crm-price-field-form-block-non-deductible-amount">
+        <td class="label">{$form.non_deductible_amount.label}</td>
+        <td>{$form.non_deductible_amount.html}</td>
       </tr>
     {if $useForEvent}
       <tr class="crm-price-field-form-block-count">
@@ -131,7 +134,7 @@
 
 {if $action eq 1}
 {* Conditionally show table for setting up selection options - for field types = radio, checkbox or select *}
-  <div id='showoption' class="hide-block">{ include file="CRM/Price/Form/OptionFields.tpl"}</div>
+  <div id='showoption' class="hiddenElement">{ include file="CRM/Price/Form/OptionFields.tpl"}</div>
 {/if}
   <table class="form-layout">
     <tr id="optionsPerLine" class="crm-price-field-form-block-options_per_line">

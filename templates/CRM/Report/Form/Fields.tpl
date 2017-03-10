@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,58 +24,59 @@
  +--------------------------------------------------------------------+
 *}
 {if !$printOnly} {* NO print section starts *}
-{if $criteriaForm}
-<div> {* criteria section starts *}
-<div class="crm-accordion-wrapper crm-report_criteria-accordion {if $rows}collapsed{/if}">
- <div class="crm-accordion-header">
-    {ts}Report Criteria{/ts}
-   </div><!-- /.crm-accordion-header -->
- <div class="crm-accordion-body">
-        <div id="id_{$formTpl}"> {* search section starts *}
-                {include file="CRM/Report/Form/Criteria.tpl"}
-        </div> {* search div section ends *}
-  </div><!-- /.crm-accordion-body -->
-</div><!-- /.crm-accordion-wrapper -->
-</div> {* criteria section ends *}
-{/if}
+  {if $criteriaForm}
+    <div class="crm-report-criteria"> {* criteria section starts *}
+      <div id="mainTabContainer">
+        {*tab navigation bar*}
+        <ul>
+          {foreach from=$tabs item='tab'}
+            <li class="ui-corner-all">
+              <a title="{$tab.title}" href="#report-tab-{$tab.div_label}">{$tab.title}</a>
+            </li>
+          {/foreach}
+          {if $instanceForm OR $instanceFormError}
+            <li id="tab_settings" class="ui-corner-all">
+              <a title="{ts}Title and Format{/ts}" href="#report-tab-format">{ts}Title and Format{/ts}</a>
+            </li>
+            <li class="ui-corner-all">
+              <a title="{ts}Email Delivery{/ts}" href="#report-tab-email">{ts}Email Delivery{/ts}</a>
+            </li>
+            <li class="ui-corner-all">
+              <a title="{ts}Access{/ts}" href="#report-tab-access">{ts}Access{/ts}</a>
+            </li>
+          {/if}
+        </ul>
 
-{if $instanceForm OR $instanceFormError} {* settings section starts *}
-<div class="crm-accordion-wrapper crm-report_setting-accordion {if $rows}collapsed{/if}">
- <div class="crm-accordion-header" {if $updateReportButton} onclick="cj('#update-button').hide(); return false;" {/if} >
-    {if $mode eq 'template'}{ts}Create Report{/ts}{else}{ts}Report Settings{/ts}{/if}
-     </div><!-- /.crm-accordion-header -->
- <div class="crm-accordion-body">
-        <div id="id_{$instanceForm}">
-                <div id="instanceForm">
-                    {include file="CRM/Report/Form/Instance.tpl"}
-                    {assign var=save value="_qf_"|cat:$form.formName|cat:"_submit_save"}
-                    {assign var=next value="_qf_"|cat:$form.formName|cat:"_submit_next"}
-                        <div class="crm-submit-buttons">
-                            {$form.$save.html}
-                            {if $mode neq 'template' && $form.$next}
-                                {$form.$next.html}
-                            {/if}
-                        </div>
-                </div>
-        </div>
- </div><!-- /.crm-accordion-body -->
-</div><!-- /.crm-accordion-wrapper -->
-{if $updateReportButton}
-<div id='update-button' class="crm-submit-buttons">
-   {$form.$save.html}
-   {if $mode neq 'template' && $form.$next} {* Removed Save a Copy button here since user doesn't have chance to set a new title. *}
-       <span class="description">{ts}To save a copy with updated criteria click Report Settings above and update the Report Title. Then click Save a Copy.{/ts}</span>
-   {/if}
-</div>
-{/if}
-{/if} {* settings section ends *}
+        {*criteria*}
+        {include file="CRM/Report/Form/Criteria.tpl"}
+
+        {*settings*}
+        {if $instanceForm OR $instanceFormError}
+          {include file="CRM/Report/Form/Tabs/Instance.tpl"}
+        {/if}
+      </div> {* end mainTabContainer *}
+
+      <div class="crm-submit-buttons">
+        {$form.buttons.html}
+      </div>
+    </div> {* criteria section ends *}
+  {/if}
 
 {literal}
-<script type="text/javascript">
-cj(function() {
-   cj().crmAccordions();
-});
-</script>
+  <script type="text/javascript">
+    CRM.$(function($) {
+      var tabSettings = {
+        collapsible: true,
+        active: {/literal}{if $rows}false{else}0{/if}{literal}
+      };
+      // If a tab contains an error, open it
+      if ($('.civireport-criteria .crm-error', '#mainTabContainer').length) {
+        tabSettings.active = $('.civireport-criteria').index($('.civireport-criteria:has(".crm-error")')[0]);
+      }
+      $("#mainTabContainer").tabs(tabSettings);
+    });
+
+  </script>
 {/literal}
 
 {/if} {* NO print section ends *}

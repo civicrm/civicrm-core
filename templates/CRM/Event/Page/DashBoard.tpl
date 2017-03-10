@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -32,15 +32,15 @@
 {capture assign=htmlFeed}{crmURL p='civicrm/event/ical' q="reset=1&list=1&html=1" fe=1 a=1}{/capture}
 
 {if $eventSummary.total_events}
-    <div class="float-right">
-  <table class="form-layout-compressed">
-     <tr>
-    <td><a href="{$configPagesURL}" class="button"><span>{ts}Manage Events{/ts}</span></a></td>
-    <td><a href="{$newEventURL}" class="button"><span><div class="icon add-icon"></div>{ts}New Event{/ts}</span></a></td>
-     </tr>
-  </table>
-    </div>
-    <h3>{ts}Event Summary{/ts}  {help id="id-event-intro"}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="{$htmlFeed}"  target="_blank" title="{ts}HTML listing of current and future public events.{/ts}"><img src="{$config->resourceBase}i/applications-internet.png" alt="{ts}HTML listing of current and future public events.{/ts}" /></a>&nbsp;&nbsp;<a href="{$rssFeed}"  target="_blank" title="{ts}Get RSS 2.0 feed for current and future public events.{/ts}"><img src="{$config->resourceBase}i/feed-icon.png" alt="{ts}Get RSS 2.0 feed for current and future public events.{/ts}" /></a>&nbsp;&nbsp;<a href="{$icalFile}" title="{ts}Download iCalendar file for current and future public events.{/ts}"><img src="{$config->resourceBase}i/office-calendar.png" alt="{ts}Download iCalendar file for current and future public events.{/ts}" /></a>&nbsp;&nbsp;<a href="{$icalFeed}"  target="_blank" title="{ts}Get iCalendar feed for current and future public events.{/ts}"><img src="{$config->resourceBase}i/ical_feed.gif" alt="{ts}Get iCalendar feed for current and future public events.{/ts}" /></a></h3>
+    <a href="{$configPagesURL}" class="button no-popup"><span><i class="crm-i fa-th-list"></i> {ts}Manage Events{/ts}</span></a>
+    <a href="{$newEventURL}" class="button"><span><i class="crm-i fa-calendar-plus-o"></i> {ts}New Event{/ts}</span></a>
+    <div class="clear">&nbsp;</div>
+    <h3 id="crm-event-dashboard-heading">{ts}Event Summary{/ts}
+      {help id="id-event-intro"}
+      <a href="{$htmlFeed}"  target="_blank" title="{ts}HTML listing of current and future public events.{/ts}" class="crm-event-feed-link"><i class="crm-i fa-lg fa-calendar"></i></a>
+      <a href="{$rssFeed}"  target="_blank" title="{ts}Get RSS 2.0 feed for current and future public events.{/ts}" class="crm-event-feed-link"><i class="crm-i fa-lg fa-rss"></i></a>
+      <a href="{$icalFile}" title="{ts}Download iCalendar file for current and future public events.{/ts}" class="crm-event-feed-link"><i class="crm-i fa-lg fa-download"></i></a>
+      <a href="{$icalFeed}"  target="_blank" title="{ts}Get iCalendar feed for current and future public events.{/ts}" class="crm-event-feed-link"><i class="crm-i fa-lg fa-calendar-o"></i></a></h3>
     {include file="CRM/common/jsortable.tpl"}
     <table id="options" class="display">
     <thead>
@@ -57,7 +57,16 @@
     <tbody>
     {foreach from=$eventSummary.events item=values key=id}
     <tr class="crm-event_{$id}">
-        <td class="crm-event-eventTitle"><a href="{crmURL p="civicrm/event/info" q="reset=1&id=`$id`"}" title="{ts}View event info page{/ts}">{$values.eventTitle}</a></td>
+        <td class="crm-event-eventTitle"><a href="{crmURL p="civicrm/event/info" q="reset=1&id=`$id`"}" title="{ts}View event info page{/ts}">{$values.eventTitle}</a>
+            {if $values.is_repeating_event}
+                <br/>
+                {if $values.is_repeating_event eq $id}
+                    <span>{ts}Repeating Event{/ts} - ({ts}Parent{/ts})</span>
+                {else}
+                    <span>{ts}Repeating Event{/ts} - ({ts}Child{/ts})</span>
+                {/if}
+            {/if}
+        </td>
         <td class="crm-event-id">{$id}</td>
         <td class="crm-event-eventType">{$values.eventType}</td>
         <td class="crm-event-isPublic">{$values.isPublic}</td>
@@ -90,7 +99,7 @@
             {foreach from=$values.statuses item=class}
                 {if $class}
                     {foreach from=$class item=status}
-                        <a href="{$status.url}" title="{ts 1=$status.name}List %1 participants{/ts}">{$status.name}: {$status.count}</a>
+                        <a href="{$status.url}" title="{ts 1=$status.label}List %1 participants{/ts}">{$status.label}: {$status.count}</a>
                     {/foreach}
                     <hr />
                 {/if}
@@ -105,13 +114,19 @@
           {/if}
           {if $values.configure}
             <div class="crm-configure-actions">
-                <span id="{$id}" class="btn-slide">{ts}Configure{/ts}
+                <span id="{$id}" class="btn-slide crm-hover-button">{ts}Configure{/ts}
                   <ul class="panel" id="panel_info_{$id}">
                     {foreach from=$eventSummary.tab key=k item=v}
                       {assign var="fld" value=$v.field}
                       {if NOT $values.$fld}{assign var="status" value="disabled"}{else}{assign var="status" value="enabled"}{/if}
-                      <li><a title="{$v.title}" class="action-item-wrap {$status}"
-                             href="{crmURL p="`$v.url`" q="reset=1&action=update&id=`$id`"}">{$v.title}</a></li>
+                      {* Schedule Reminders requires a different query string. *}
+                      {if $v.url EQ 'civicrm/event/manage/reminder'}
+                        <li><a title="{$v.title}" class="action-item crm-hover-button no-popup {$status}"
+                            href="{crmURL p="`$v.url`" q="reset=1&action=browse&setTab=1&id=`$id`"}">{$v.title}</a></li>
+                      {else}
+                        <li><a title="{$v.title}" class="action-item crm-hover-button no-popup {$status}"
+                            href="{crmURL p="`$v.url`" q="reset=1&action=update&id=`$id`"}">{$v.title}</a></li>
+                      {/if}
                     {/foreach}
                   </ul>
                 </span>

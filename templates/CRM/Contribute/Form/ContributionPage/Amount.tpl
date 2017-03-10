@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,13 +24,9 @@
  +--------------------------------------------------------------------+
 *}
 {capture assign="adminPriceSets"}{crmURL p='civicrm/admin/price' q="reset=1"}{/capture}
+{crmRegion name="contribute-form-contributionpage-amount-main"}
 <div class="crm-block crm-form-block crm-contribution-contributionpage-amount-form-block">
-{if $isQuick}
-    <div id="popupContainer">
-    {ts}Once you switch to using a Price Set, you won't be able to switch back to your existing settings below except by re-entering them. Are you sure you want to switch to a Price Set?{/ts}
-    </div>
-{/if}
-<div id="help">
+<div class="help">
     {ts}Use this form to configure Contribution Amount options. You can give contributors the ability to enter their own contribution amounts - and/or provide a fixed list of amounts. For fixed amounts, you can enter a label for each 'level' of contribution (e.g. Friend, Sustainer, etc.). If you allow people to enter their own dollar amounts, you can also set minimum and maximum values. Depending on your choice of Payment Processor, you may be able to offer a recurring contribution option.{/ts} {docURL page="user/contributions/payment-processors"}
 </div>
     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
@@ -63,13 +59,17 @@
         <tr id="payLaterFields" class="crm-contribution-form-block-payLaterFields"><td>&nbsp;</td>
             <td>
             <table class="form-layout">
-                <tr class="crm-contribution-contributionpage-amount-form-block-pay_later_text"><th scope="row" class="label">{$form.pay_later_text.label} <span class="marker" title="This field is required.">*</span> {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_contribution_page' field='pay_later_text' id=$contributionPageID}{/if}</th>
+                <tr class="crm-contribution-contributionpage-amount-form-block-pay_later_text"><th scope="row" class="label">{$form.pay_later_text.label} <span class="crm-marker" title="This field is required.">*</span> {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_contribution_page' field='pay_later_text' id=$contributionPageID}{/if}</th>
                 <td>{$form.pay_later_text.html|crmAddClass:big}<br />
                     <span class="description">{ts}Text displayed next to the checkbox for the 'pay later' option on the contribution form. You may include HTML formatting tags.{/ts}</span></td></tr>
-                <tr class="crm-contribution-contributionpage-amount-form-block-pay_later_receipt"><th scope="row" class="label">{$form.pay_later_receipt.label} <span class="marker" title="This field is required.">*</span> {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_contribution_page' field='pay_later_receipt' id=$contributionPageID}{/if}</th>
+                <tr class="crm-contribution-contributionpage-amount-form-block-pay_later_receipt"><th scope="row" class="label">{$form.pay_later_receipt.label} <span class="crm-marker" title="This field is required.">*</span> {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_contribution_page' field='pay_later_receipt' id=$contributionPageID}{/if}</th>
                 <td>{$form.pay_later_receipt.html|crmAddClass:big}<br />
                   <span class="description">{ts}Instructions added to Confirmation and Thank-you pages, as well as the confirmation email, when the user selects the 'pay later' option (e.g. 'Mail your check to ... within 3 business days.').{/ts}</span></td></tr>
 
+                <tr><th scope="row" class="label">{$form.is_billing_required.label}</th>
+                <td>{$form.is_billing_required.html}<br />
+                    <span class="description">{ts}Check this box to require users who select the pay later option to provide billing name and address.{/ts}</span>
+                </td></tr>
             </table>
             </td>
         </tr>
@@ -101,7 +101,7 @@
         <tr id="recurFields" class="crm-contribution-form-block-recurFields"><td>&nbsp;</td>
                <td>
                   <table class="form-layout-compressed">
-            <tr class="crm-contribution-form-block-recur_frequency_unit"><th scope="row" class="label">{$form.recur_frequency_unit.label}<span class="marker" title="This field is required.">*</span></th>
+            <tr class="crm-contribution-form-block-recur_frequency_unit"><th scope="row" class="label">{$form.recur_frequency_unit.label}<span class="crm-marker" title="This field is required.">*</span></th>
                         <td>{$form.recur_frequency_unit.html}<br />
                         <span class="description">{ts}Select recurring units supported for recurring payments.{/ts}</span></td>
                     </tr>
@@ -120,6 +120,10 @@
 
         </table>
     </div>
+{if $futurePaymentProcessor}
+    <span id="pledge_calendar_date_field">&nbsp;&nbsp;{include file="CRM/common/jcalendar.tpl" elementName=pledge_calendar_date}</span>
+    <span id="pledge_calendar_month_field">&nbsp;&nbsp;{$form.pledge_calendar_month.html}<br/><span class="description">{ts}Recurring payment will be processed this day of the month following submission of this contribution page.{/ts}</span></span>
+{/if}
 
 
     <div id="amountFields">
@@ -133,7 +137,7 @@
             </tr>
             <tr id="pledgeFields" class="crm-contribution-form-block-pledgeFields"><td></td><td>
                 <table class="form-layout-compressed">
-                    <tr class="crm-contribution-form-block-pledge_frequency_unit"><th scope="row" class="label">{$form.pledge_frequency_unit.label}<span class="marker"> *</span></th>
+                    <tr class="crm-contribution-form-block-pledge_frequency_unit"><th scope="row" class="label">{$form.pledge_frequency_unit.label}<span class="crm-marker"> *</span></th>
                         <td>{$form.pledge_frequency_unit.html}<br />
                             <span class="description">{ts}Which frequencies can the user pick from (e.g. every 'week', every 'month', every 'year')?{/ts}</span></td>
                     </tr>
@@ -143,23 +147,43 @@
                     </tr>
                     <tr class="crm-contribution-form-block-initial_reminder_day"><th scope="row" class="label">{$form.initial_reminder_day.label}</th>
                         <td>{$form.initial_reminder_day.html}
-                            <span class="label">{ts}days prior to each scheduled payment due date.{/ts}</span></td>
+                            <span class="label">{ts}Days prior to each scheduled payment due date.{/ts}</span></td>
                     </tr>
                     <tr class="crm-contribution-form-block-max_reminders"><th scope="row" class="label">{$form.max_reminders.label}</th>
                         <td>{$form.max_reminders.html}
-                            <span class="label">{ts}reminders for each scheduled payment.{/ts}</span></td>
+                            <span class="label">{ts}Reminders for each scheduled payment.{/ts}</span></td>
                     </tr>
                     <tr class="crm-contribution-form-block-additional_reminder_day"><th scope="row" class="label">{$form.additional_reminder_day.label}</th>
                         <td>{$form.additional_reminder_day.html}
-                            <span class="label">{ts}days after the last one sent, up to the maximum number of reminders.{/ts}</span></td>
+                            <span class="label">{ts}Days after the last one sent, up to the maximum number of reminders.{/ts}</span></td>
                     </tr>
+                {if $futurePaymentProcessor}
+                    <tr id="adjustRecurringFields" class="crm-contribution-form-block-adjust_recur_start_date"><th scope="row" class="label">{$form.adjust_recur_start_date.label}</th>
+                        <td>{$form.adjust_recur_start_date.html}<br/>
+			  <div id="recurDefaults">
+                            <span class="description">{$form.pledge_default_toggle.label}</span>
+                            <table class="form-layout-compressed">
+                              <tr class="crm-contribution-form-block-date_of_recurring_contribution">
+                                <td>{$form.pledge_default_toggle.html}</td>
+                              </tr>
+                              <tr class="crm-contribution-form-block-is_pledge_start_date_visible">
+                                <td>{$form.is_pledge_start_date_visible.html}&nbsp;{$form.is_pledge_start_date_visible.label}</td>
+                              </tr>
+                              <tr class="crm-contribution-form-block-is_pledge_start_date_visible">
+                                <td>{$form.is_pledge_start_date_editable.html}&nbsp;{$form.is_pledge_start_date_editable.label}</td>
+                              </tr>
+                            </table>
+                          </div>
+                        </td>
+                    </tr>
+                {/if}
                 </table>
                 </td>
             </tr>
             {/if}
 
       <tr class="crm-contribution-form-block-amount_label">
-              <th scope="row" class="label" width="20%">{$form.amount_label.label}<span class="marker"> *</span></th>
+              <th scope="row" class="label" width="20%">{$form.amount_label.label}<span class="crm-marker"> *</span></th>
         <td>{$form.amount_label.html}</td>
       </tr>
             <tr class="crm-contribution-form-block-is_allow_other_amount"><th scope="row" class="label" width="20%">{$form.is_allow_other_amount.label}</th>
@@ -192,10 +216,54 @@
       </div>
       <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>
-
 {literal}
 <script type="text/javascript">
-   var paymentProcessorMapper = new Array( );
+
+   var futurePaymentProcessorMapper = [];
+   {/literal}{if $futurePaymentProcessor}
+   {foreach from=$futurePaymentProcessor item="futurePaymentProcessor" key="index"}{literal}
+     futurePaymentProcessorMapper[{/literal}{$index}{literal}] = '{/literal}{$futurePaymentProcessor}{literal}';
+   {/literal}{/foreach}
+   {literal}
+   CRM.$(function($) {
+     var defId = $('input[name="pledge_default_toggle"][value="contribution_date"]').attr('id');
+     var calId = $('input[name="pledge_default_toggle"][value="calendar_date"]').attr('id');
+     var monId = $('input[name="pledge_default_toggle"][value="calendar_month"]').attr('id');
+
+     $("label[for='" + calId + "']").append($('#pledge_calendar_date_field'));
+     $("label[for='" + monId + "']").append($('#pledge_calendar_month_field'));
+
+     setDateDefaults();
+
+     $("#" + defId).click( function() {
+       if ($(this).is(':checked')) {
+         $('#pledge_calendar_month').prop('disabled', 'disabled');
+         $('#pledge_calendar_date').prop('disabled', 'disabled');
+         $("#pledge_calendar_date").next('input').prop('disabled', 'disabled');
+       }
+     });
+
+     $("#" + calId).click( function() {
+       if ($(this).is(':checked')) {
+         $('#pledge_calendar_month').prop('disabled', 'disabled');
+         $('#pledge_calendar_date').prop('disabled', false);
+         $("#pledge_calendar_date").next('input').prop('disabled', false);
+       }
+     });
+
+     $("#" + monId).click( function() {
+       if ($(this).is(':checked')) {
+         $('#pledge_calendar_month').prop('disabled', false);
+         $("#pledge_calendar_date").next('input').prop('disabled', 'disabled');
+         $('#pledge_calendar_date').prop('disabled', 'disabled');
+       }
+     });
+
+
+   });
+{/literal}{/if}{literal}
+
+   var paymentProcessorMapper = [];
      {/literal}
        {if $recurringPaymentProcessor}
            {foreach from=$recurringPaymentProcessor item="paymentProcessor" key="index"}{literal}
@@ -203,24 +271,27 @@
            {/literal}{/foreach}
        {/if}
      {literal}
-    cj( document ).ready( function( ) {
-    cj("#popupContainer").hide();
-        function checked_payment_processors() {
-            var ids = [];
-            cj('.crm-contribution-contributionpage-amount-form-block-payment_processor input[type="checkbox"]').each(function(){
-                if(cj(this).prop('checked')) {
-                    var id = cj(this).attr('id').split('_')[2];
-        ids.push(id);
-                }
-            });
-            return ids;
-        }
+     CRM.$(function($) {
+       var psid = $('#price_set_id').val();
+       showHideAmountBlock(psid, 'price_set_id');
+       function checked_payment_processors() {
+         var ids = [];
+         $('.crm-contribution-contributionpage-amount-form-block-payment_processor input[type="checkbox"]').each(function(){
+           if($(this).prop('checked')) {
+             var id = $(this).attr('id').split('_')[2];
+             ids.push(id);
+           }
+         });
+         return ids;
+       }
 
         // show/hide recurring block
-        cj('.crm-contribution-contributionpage-amount-form-block-payment_processor input[type="checkbox"]').change(function(){
-            showRecurring( checked_payment_processors() )
+        $('.crm-contribution-contributionpage-amount-form-block-payment_processor input[type="checkbox"]').change(function(){
+            showRecurring( checked_payment_processors() );
+            showAdjustRecurring( checked_payment_processors() );
         });
-        showRecurring( checked_payment_processors() )
+        showRecurring( checked_payment_processors() );
+        showAdjustRecurring( checked_payment_processors() );
     });
   var element_other_amount = document.getElementsByName('is_allow_other_amount');
     if (! element_other_amount[0].checked) {
@@ -239,7 +310,7 @@
      cj('#amountFields').hide();
   }
 
-  cj(function() {
+  CRM.$(function($) {
     payLater('is_pay_later');
   });
 
@@ -329,6 +400,38 @@
         }
     }
 
+    function showAdjustRecurring( paymentProcessorIds ) {
+        var display = true;
+        cj.each(paymentProcessorIds, function(k, id){
+            if( cj.inArray(id, futurePaymentProcessorMapper) == -1 ) {
+                display = false;
+            }
+        });
+
+        if(display) {
+            cj( '#adjustRecurringFields' ).show( );
+        } else {
+            if ( cj( '#adjust_recur_start_date' ).prop('checked' ) ) {
+                cj( '#adjust_recur_start_date' ).prop('checked', false);
+                cj( '#recurDefaults' ).hide( );
+            }
+            cj( '#adjustRecurringFields' ).hide( );
+        }
+    }
+
+{/literal}{if $futurePaymentProcessor}{literal}
+    function setDateDefaults() {
+     {/literal}{if !$pledge_calendar_date}{literal}
+       cj('#pledge_calendar_date').prop('disabled', 'disabled');
+       cj("#pledge_calendar_date").next('input').prop('disabled', 'disabled'); 
+     {/literal}{/if}
+
+     {if !$pledge_calendar_month}{literal}
+       cj('#pledge_calendar_month').prop('disabled', 'disabled');
+     {/literal}{/if}{literal}
+    }
+{/literal}{/if}{literal}
+
 </script>
 {/literal}
 {if $form.is_recur}
@@ -336,6 +439,16 @@
     trigger_field_id    ="is_recur"
     trigger_value       ="true"
     target_element_id   ="recurFields"
+    target_element_type ="table-row"
+    field_type          ="radio"
+    invert              = "false"
+}
+{/if}
+{if $form.adjust_recur_start_date}
+{include file="CRM/common/showHideByFieldValue.tpl"
+    trigger_field_id    ="adjust_recur_start_date"
+    trigger_value       ="true"
+    target_element_id   ="recurDefaults"
     target_element_type ="table-row"
     field_type          ="radio"
     invert              = "false"
@@ -352,44 +465,26 @@
 }
 {/if}
 
-{* include jscript to warn if unsaved form field changes *}
-{include file="CRM/common/formNavigate.tpl"}
 {if $isQuick}
 {literal}
 <script type="text/javascript">
-cj("#quickconfig").click(function(){
-cj("#popupContainer").dialog({
-  title: "Selected Price Set",
-  width:400,
-  height:220,
-  modal: true,
-  overlay: {
-                 opacity: 0.5,
-                  background: "black"
-        },
-        buttons: {
-                   "Ok": function() {
-       var dataUrl  = {/literal}'{crmURL p="civicrm/ajax/rest" h=0 q="className=CRM_Core_Page_AJAX&fnName=setIsQuickConfig&context=civicrm_contribution_page&id=$contributionPageID" }';
-        var redirectUrl = '{crmURL p="civicrm/admin/price/field" h=0 q="reset=1&action=browse&sid=" }';
-       {literal}
-       cj.ajax({
-      url: dataUrl,
-      async: false,
-      global: false,
-      success: function ( result ) {
-        if (result) {
-          window.location= redirectUrl+eval(result);
-        }
-      }
-       });
-                   },
-       "Close": function() {
-                     cj(this).dialog("close");
-                   }
-  }
-});
-return false;
-});
+  CRM.$(function($) {
+    $("#quickconfig").click(function(e) {
+      e.preventDefault();
+      CRM.confirm({
+        width: 400,
+        message: {/literal}"{ts escape='js'}Once you switch to using a Price Set, you won't be able to switch back to your existing settings below except by re-entering them. Are you sure you want to switch to a Price Set?{/ts}"{literal}
+      }).on('crmConfirm:yes', function() {
+        {/literal}
+        var dataUrl = '{crmURL p="civicrm/ajax/rest" h=0 q="className=CRM_Core_Page_AJAX&fnName=setIsQuickConfig&context=civicrm_contribution_page&id=$contributionPageID" }';
+        {literal}
+        $.getJSON(dataUrl).done(function(result) {window.location = CRM.url("civicrm/admin/price/field", {reset: 1, action: 'browse', sid: result});});
+      });
+    });
+  });
 </script>
 {/literal}
 {/if}
+{/crmRegion}
+{crmRegion name="contribute-form-contributionpage-amount-post"}
+{/crmRegion}

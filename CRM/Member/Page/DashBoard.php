@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
  */
@@ -43,15 +43,13 @@ class CRM_Member_Page_DashBoard extends CRM_Core_Page {
    * the contact and calls the appropriate type of page to view.
    *
    * @return void
-   * @access public
-   *
    */
-  function preProcess() {
+  public function preProcess() {
 
     //CRM-13901 don't show dashboard to contacts with limited view writes & it does not relect
     //what they have access to
     //@todo implement acls on dashboard querys (preferably via api to enhance that at the same time)
-    if(!CRM_Core_Permission::check(array('view all contacts', 'edit all contacts'))) {
+    if (!CRM_Core_Permission::check('view all contacts') && !CRM_Core_Permission::check('edit all contacts')) {
       $this->showMembershipSummary = FALSE;
       $this->assign('membershipSummary', FALSE);
       return;
@@ -103,65 +101,76 @@ class CRM_Member_Page_DashBoard extends CRM_Core_Page {
 
     foreach ($membershipTypes as $key => $value) {
 
-      $membershipSummary[$key]['premonth']['new'] = array('count' => CRM_Member_BAO_Membership::getMembershipJoins($key, $preMonth, $preMonthEnd),
+      $membershipSummary[$key]['premonth']['new'] = array(
+        'count' => CRM_Member_BAO_Membership::getMembershipJoins($key, $preMonth, $preMonthEnd),
         'name' => $value,
       );
 
-      $membershipSummary[$key]['premonth']['renew'] = array('count' => CRM_Member_BAO_Membership::getMembershipRenewals($key, $preMonth, $preMonthEnd),
+      $membershipSummary[$key]['premonth']['renew'] = array(
+        'count' => CRM_Member_BAO_Membership::getMembershipRenewals($key, $preMonth, $preMonthEnd),
         'name' => $value,
       );
 
-      $membershipSummary[$key]['premonth']['total'] = array('count' => CRM_Member_BAO_Membership::getMembershipStarts($key, $preMonth, $preMonthEnd),
+      $membershipSummary[$key]['premonth']['total'] = array(
+        'count' => CRM_Member_BAO_Membership::getMembershipStarts($key, $preMonth, $preMonthEnd),
         'name' => $value,
       );
 
-
-      $membershipSummary[$key]['month']['new'] = array('count' => CRM_Member_BAO_Membership::getMembershipJoins($key, $monthStart, $ymd),
+      $membershipSummary[$key]['month']['new'] = array(
+        'count' => CRM_Member_BAO_Membership::getMembershipJoins($key, $monthStart, $ymd),
         'name' => $value,
       );
 
-      $membershipSummary[$key]['month']['renew'] = array('count' => CRM_Member_BAO_Membership::getMembershipRenewals($key, $monthStart, $ymd),
+      $membershipSummary[$key]['month']['renew'] = array(
+        'count' => CRM_Member_BAO_Membership::getMembershipRenewals($key, $monthStart, $ymd),
         'name' => $value,
       );
 
-      $membershipSummary[$key]['month']['total'] = array('count' => CRM_Member_BAO_Membership::getMembershipStarts($key, $monthStart, $ymd),
+      $membershipSummary[$key]['month']['total'] = array(
+        'count' => CRM_Member_BAO_Membership::getMembershipStarts($key, $monthStart, $ymd),
         'name' => $value,
       );
 
-
-      $membershipSummary[$key]['year']['new'] = array('count' => CRM_Member_BAO_Membership::getMembershipJoins($key, $yearStart, $ymd),
+      $membershipSummary[$key]['year']['new'] = array(
+        'count' => CRM_Member_BAO_Membership::getMembershipJoins($key, $yearStart, $ymd),
         'name' => $value,
       );
 
-      $membershipSummary[$key]['year']['renew'] = array('count' => CRM_Member_BAO_Membership::getMembershipRenewals($key, $yearStart, $ymd),
+      $membershipSummary[$key]['year']['renew'] = array(
+        'count' => CRM_Member_BAO_Membership::getMembershipRenewals($key, $yearStart, $ymd),
         'name' => $value,
       );
 
-      $membershipSummary[$key]['year']['total'] = array('count' => CRM_Member_BAO_Membership::getMembershipStarts($key, $yearStart, $ymd),
+      $membershipSummary[$key]['year']['total'] = array(
+        'count' => CRM_Member_BAO_Membership::getMembershipStarts($key, $yearStart, $ymd),
         'name' => $value,
       );
 
-
-      $membershipSummary[$key]['current']['total'] = array('count' => CRM_Member_BAO_Membership::getMembershipCount($key, $current),
+      $membershipSummary[$key]['current']['total'] = array(
+        'count' => CRM_Member_BAO_Membership::getMembershipCount($key, $current),
         'name' => $value,
       );
 
       $membershipSummary[$key]['total']['total'] = array('count' => CRM_Member_BAO_Membership::getMembershipCount($key, $ymd));
 
       //LCD also get summary stats for membership owners
-      $membershipSummary[$key]['premonth_owner']['premonth_owner'] = array('count' => CRM_Member_BAO_Membership::getMembershipStarts($key, $preMonth, $preMonthEnd, 0, 1),
+      $membershipSummary[$key]['premonth_owner']['premonth_owner'] = array(
+        'count' => CRM_Member_BAO_Membership::getMembershipStarts($key, $preMonth, $preMonthEnd, 0, 1),
         'name' => $value,
       );
 
-      $membershipSummary[$key]['month_owner']['month_owner'] = array('count' => CRM_Member_BAO_Membership::getMembershipStarts($key, $monthStart, $ymd, 0, 1),
+      $membershipSummary[$key]['month_owner']['month_owner'] = array(
+        'count' => CRM_Member_BAO_Membership::getMembershipStarts($key, $monthStart, $ymd, 0, 1),
         'name' => $value,
       );
 
-      $membershipSummary[$key]['year_owner']['year_owner'] = array('count' => CRM_Member_BAO_Membership::getMembershipStarts($key, $yearStart, $ymd, 0, 1),
+      $membershipSummary[$key]['year_owner']['year_owner'] = array(
+        'count' => CRM_Member_BAO_Membership::getMembershipStarts($key, $yearStart, $ymd, 0, 1),
         'name' => $value,
       );
 
-      $membershipSummary[$key]['current_owner']['current_owner'] = array('count' => CRM_Member_BAO_Membership::getMembershipCount($key, $current, 0, 1),
+      $membershipSummary[$key]['current_owner']['current_owner'] = array(
+        'count' => CRM_Member_BAO_Membership::getMembershipCount($key, $current, 0, 1),
         'name' => $value,
       );
 
@@ -169,12 +178,11 @@ class CRM_Member_Page_DashBoard extends CRM_Core_Page {
       //LCD end
     }
 
-    // LCD debug
-    //CRM_Core_Error::debug($membershipSummary);
     $status = CRM_Member_BAO_MembershipStatus::getMembershipStatusCurrent();
     $status = implode(',', $status);
 
-    /* Disabled for lack of appropriate search
+    /*@codingStandardsIgnoreStart
+     Disabled for lack of appropriate search
 
        The Membership search isn't able to properly filter by join or renewal events.
        Until that works properly, the subtotals shouldn't get links.
@@ -247,7 +255,7 @@ class CRM_Member_Page_DashBoard extends CRM_Core_Page {
         }
       }
     }
-    */
+    @codingStandardsIgnoreEnd */
 
     // Temporary replacement for current totals column
 
@@ -276,17 +284,17 @@ class CRM_Member_Page_DashBoard extends CRM_Core_Page {
     $totalCountPreMonth = $totalCountMonth = $totalCountYear = $totalCountCurrent = $totalCountTotal = 0;
     $totalCountPreMonth_owner = $totalCountMonth_owner = $totalCountYear_owner = $totalCountCurrent_owner = $totalCountTotal_owner = 0;
     foreach ($membershipSummary as $key => $value) {
-      $newCountPreMonth   = $newCountPreMonth + $value['premonth']['new']['count'];
+      $newCountPreMonth = $newCountPreMonth + $value['premonth']['new']['count'];
       $renewCountPreMonth = $renewCountPreMonth + $value['premonth']['renew']['count'];
       $totalCountPreMonth = $totalCountPreMonth + $value['premonth']['total']['count'];
-      $newCountMonth      = $newCountMonth + $value['month']['new']['count'];
-      $renewCountMonth    = $renewCountMonth + $value['month']['renew']['count'];
-      $totalCountMonth    = $totalCountMonth + $value['month']['total']['count'];
-      $newCountYear       = $newCountYear + $value['year']['new']['count'];
-      $renewCountYear     = $renewCountYear + $value['year']['renew']['count'];
-      $totalCountYear     = $totalCountYear + $value['year']['total']['count'];
-      $totalCountCurrent  = $totalCountCurrent + $value['current']['total']['count'];
-      $totalCountTotal    = $totalCountTotal + $value['total']['total']['count'];
+      $newCountMonth = $newCountMonth + $value['month']['new']['count'];
+      $renewCountMonth = $renewCountMonth + $value['month']['renew']['count'];
+      $totalCountMonth = $totalCountMonth + $value['month']['total']['count'];
+      $newCountYear = $newCountYear + $value['year']['new']['count'];
+      $renewCountYear = $renewCountYear + $value['year']['renew']['count'];
+      $totalCountYear = $totalCountYear + $value['year']['total']['count'];
+      $totalCountCurrent = $totalCountCurrent + $value['current']['total']['count'];
+      $totalCountTotal = $totalCountTotal + $value['total']['total']['count'];
 
       //LCD add owner values
       $totalCountPreMonth_owner = $totalCountPreMonth_owner + $value['premonth_owner']['premonth_owner']['count'];
@@ -387,33 +395,33 @@ class CRM_Member_Page_DashBoard extends CRM_Core_Page {
     //LCD add owner values
     $totalCount['premonth_owner']['premonth_owner'] = array(
       'count' => $totalCountPreMonth_owner,
-    //  'url' => CRM_Utils_System::url('civicrm/member/search', "reset=1&force=1&status=$status&start=$preMonth&end=$preMonthEnd&owner=1"),
+      //  'url' => CRM_Utils_System::url('civicrm/member/search', "reset=1&force=1&status=$status&start=$preMonth&end=$preMonthEnd&owner=1"),
     );
 
     $totalCount['month_owner']['month_owner'] = array(
       'count' => $totalCountMonth_owner,
-    //  'url' => CRM_Utils_System::url('civicrm/member/search', "reset=1&force=1&status=$status&start=$monthStart&end=$ymd&owner=1"),
+      //  'url' => CRM_Utils_System::url('civicrm/member/search', "reset=1&force=1&status=$status&start=$monthStart&end=$ymd&owner=1"),
     );
 
     $totalCount['year_owner']['year_owner'] = array(
       'count' => $totalCountYear_owner,
-    //  'url' => CRM_Utils_System::url('civicrm/member/search', "reset=1&force=1&status=$status&start=$yearStart&end=$ymd&owner=1"),
+      //  'url' => CRM_Utils_System::url('civicrm/member/search', "reset=1&force=1&status=$status&start=$yearStart&end=$ymd&owner=1"),
     );
 
     $totalCount['current_owner']['current_owner'] = array(
       'count' => $totalCountCurrent_owner,
-    //  'url' => CRM_Utils_System::url('civicrm/member/search', "reset=1&force=1&status=$status&owner=1"),
+      //  'url' => CRM_Utils_System::url('civicrm/member/search', "reset=1&force=1&status=$status&owner=1"),
     );
 
     $totalCount['total_owner']['total_owner'] = array(
       'count' => $totalCountTotal_owner,
-    //  'url' => CRM_Utils_System::url('civicrm/member/search', "reset=1&force=1&status=$status&owner=1"),
+      //  'url' => CRM_Utils_System::url('civicrm/member/search', "reset=1&force=1&status=$status&owner=1"),
     );
 
     if (!$isCurrentMonth) {
       $totalCount['total_owner']['total_owner'] = array(
         'count' => $totalCountTotal_owner,
-      //  'url' => CRM_Utils_System::url('civicrm/member/search', "reset=1&force=1&status=$status&start=&end=$ymd&owner=1"),
+        //  'url' => CRM_Utils_System::url('civicrm/member/search', "reset=1&force=1&status=$status&start=&end=$ymd&owner=1"),
       );
     }
     //LCD end
@@ -430,13 +438,12 @@ class CRM_Member_Page_DashBoard extends CRM_Core_Page {
   }
 
   /**
-   * This function is the main function that is called when the page loads,
+   * the main function that is called when the page loads,
    * it decides the which action has to be taken for the page.
    *
-   * return null
-   * @access public
+   * @return null
    */
-  function run() {
+  public function run() {
     $this->preProcess();
 
     $controller = new CRM_Core_Controller_Simple('CRM_Member_Form_Search', ts('Member'), NULL);
@@ -450,5 +457,5 @@ class CRM_Member_Page_DashBoard extends CRM_Core_Page {
 
     return parent::run();
   }
-}
 
+}

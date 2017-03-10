@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,27 +23,21 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
- * This class generates form components for Extensions
- *
+ * This class generates form components for Extensions.
  */
 class CRM_Admin_Form_Extensions extends CRM_Admin_Form {
 
   /**
-   * Function to for pre-processing
-   *
-   * @return void
-   * @access public
+   * Form pre-processing.
    */
   public function preProcess() {
     parent::preProcess();
@@ -58,7 +52,6 @@ class CRM_Admin_Form_Extensions extends CRM_Admin_Form {
     $this->assign('id', $this->_id);
     $this->assign('key', $this->_key);
 
-
     switch ($this->_action) {
       case CRM_Core_Action::ADD:
       case CRM_Core_Action::DELETE:
@@ -70,7 +63,7 @@ class CRM_Admin_Form_Extensions extends CRM_Admin_Form {
         break;
 
       case CRM_Core_Action::UPDATE:
-        if (! CRM_Extension_System::singleton()->getBrowser()->isEnabled()) {
+        if (!CRM_Extension_System::singleton()->getBrowser()->isEnabled()) {
           CRM_Core_Error::fatal(ts('The system administrator has disabled this feature.'));
         }
         $info = CRM_Extension_System::singleton()->getBrowser()->getExtension($this->_key);
@@ -85,50 +78,51 @@ class CRM_Admin_Form_Extensions extends CRM_Admin_Form {
   }
 
   /**
-   * This function sets the default values for the form.
-   * the default values are retrieved from the database
-   *
-   * @access public
-   *
-   * @return void
+   * Set default values for the form.
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
     return $defaults;
   }
 
   /**
-   * Function to build the form
-   *
-   * @return void
-   * @access public
+   * Build the form object.
    */
   public function buildQuickForm() {
-
     switch ($this->_action) {
       case CRM_Core_Action::ADD:
         $buttonName = ts('Install');
-        $title = ts('Install Extension');
+        $title = ts('Install "%1"?', array(
+          1 => $this->_key,
+        ));
         break;
 
       case CRM_Core_Action::UPDATE:
         $buttonName = ts('Download and Install');
-        $title = ts('Download and Install Extension');
+        $title = ts('Download and Install "%1"?', array(
+          1 => $this->_key,
+        ));
         break;
 
       case CRM_Core_Action::DELETE:
         $buttonName = ts('Uninstall');
-        $title = ts('Uninstall Extension');
+        $title = ts('Uninstall "%1"?', array(
+          1 => $this->_key,
+        ));
         break;
 
       case CRM_Core_Action::ENABLE:
         $buttonName = ts('Enable');
-        $title = ts('Enable Extension');
+        $title = ts('Enable "%1"?', array(
+          1 => $this->_key,
+        ));
         break;
 
       case CRM_Core_Action::DISABLE:
-        $buttonName = 'Disable';
-        $title = ts('Disable Extension');
+        $buttonName = ts('Disable');
+        $title = ts('Disable "%1"?', array(
+          1 => $this->_key,
+        ));
         break;
     }
 
@@ -148,28 +142,26 @@ class CRM_Admin_Form_Extensions extends CRM_Admin_Form {
   }
 
   /**
-   * global form rule
+   * Global form rule.
    *
-   * @param array $fields  the input form values
-   * @param array $files   the uploaded files if any
-   * @param array $self    this object.
+   * @param array $fields
+   *   The input form values.
+   * @param array $files
+   *   The uploaded files if any.
+   * @param array $self
+   *   This object.
    *
-   * @return true if no errors, else an array of errors
-   * @access public
-   * @static
+   * @return bool|array
+   *   true if no errors, else an array of errors
    */
-  static function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files, $self) {
     $errors = array();
 
     return empty($errors) ? TRUE : $errors;
   }
 
   /**
-   * Function to process the form
-   *
-   * @access public
-   *
-   * @return void
+   * Process the form submission.
    */
   public function postProcess() {
     CRM_Utils_System::flushCache();
@@ -178,7 +170,8 @@ class CRM_Admin_Form_Extensions extends CRM_Admin_Form {
       try {
         CRM_Extension_System::singleton()->getManager()->uninstall(array($this->_key));
         CRM_Core_Session::setStatus("", ts('Extension Uninstalled'), "success");
-      } catch (CRM_Extension_Exception_DependencyException $e) {
+      }
+      catch (CRM_Extension_Exception_DependencyException $e) {
         // currently only thrown for payment-processor dependencies
         CRM_Core_Session::setStatus(ts('Cannot uninstall this extension - there is at least one payment processor using the payment processor type provided by it.'), ts('Uninstall Error'), 'error');
       }
@@ -204,9 +197,10 @@ class CRM_Admin_Form_Extensions extends CRM_Admin_Form {
         'version' => 3,
         'key' => $this->_key,
       ));
-      if (! CRM_Utils_Array::value('is_error', $result, FALSE)) {
+      if (!CRM_Utils_Array::value('is_error', $result, FALSE)) {
         CRM_Core_Session::setStatus("", ts('Extension Upgraded'), "success");
-      } else {
+      }
+      else {
         CRM_Core_Session::setStatus($result['error_message'], ts('Extension Upgrade Failed'), "error");
       }
     }
@@ -218,5 +212,5 @@ class CRM_Admin_Form_Extensions extends CRM_Admin_Form {
       )
     );
   }
-}
 
+}

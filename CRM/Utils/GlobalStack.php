@@ -1,8 +1,8 @@
 <?php /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,7 +22,13 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
+
+/**
+ *
+ * @package CRM
+ * @copyright CiviCRM LLC (c) 2004-2017
+ */
 
 /**
  * Temporarily change a global variable.
@@ -46,14 +52,13 @@ class CRM_Utils_GlobalStack {
    * We don't have a container or dependency-injection, so use singleton instead
    *
    * @var object
-   * @static
    */
   private static $_singleton = NULL;
 
   private $backups = array();
 
   /**
-   * Get or set the single instance of CRM_Utils_GlobalStack
+   * Get or set the single instance of CRM_Utils_GlobalStack.
    *
    * @return CRM_Utils_GlobalStack
    */
@@ -64,6 +69,9 @@ class CRM_Utils_GlobalStack {
     return self::$_singleton;
   }
 
+  /**
+   * @param $newFrame
+   */
   public function push($newFrame) {
     $this->backups[] = $this->createBackup($newFrame);
     $this->applyFrame($newFrame);
@@ -74,8 +82,10 @@ class CRM_Utils_GlobalStack {
   }
 
   /**
-   * @param array $new the new, incoming frame
-   * @return array frame
+   * @param array $new
+   *   The new, incoming frame.
+   * @return array
+   *   frame
    */
   public function createBackup($new) {
     $frame = array();
@@ -84,22 +94,28 @@ class CRM_Utils_GlobalStack {
         foreach ($values as $key => $value) {
           $frame[$globalKey][$key] = CRM_Utils_Array::value($key, $GLOBALS[$globalKey]);
         }
-      } else {
+      }
+      else {
         $frame[$globalKey] = CRM_Utils_Array::value($globalKey, $GLOBALS);
       }
     }
     return $frame;
   }
 
+  /**
+   * @param $newFrame
+   */
   public function applyFrame($newFrame) {
     foreach ($newFrame as $globalKey => $values) {
       if (is_array($values)) {
         foreach ($values as $key => $value) {
           $GLOBALS[$globalKey][$key] = $value;
         }
-      } else {
+      }
+      else {
         $GLOBALS[$globalKey] = $values;
       }
     }
   }
+
 }

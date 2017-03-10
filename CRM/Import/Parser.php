@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,120 +23,116 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
-
-
 abstract class CRM_Import_Parser {
   /**
    * Settings
    */
-  CONST MAX_ERRORS = 250, MAX_WARNINGS = 25, DEFAULT_TIMEOUT = 30;
+  const MAX_ERRORS = 250, MAX_WARNINGS = 25, DEFAULT_TIMEOUT = 30;
 
   /**
    * Return codes
    */
-  CONST VALID = 1, WARNING = 2, ERROR = 4, CONFLICT = 8, STOP = 16, DUPLICATE = 32, MULTIPLE_DUPE = 64, NO_MATCH = 128, UNPARSED_ADDRESS_WARNING = 256;
+  const VALID = 1, WARNING = 2, ERROR = 4, CONFLICT = 8, STOP = 16, DUPLICATE = 32, MULTIPLE_DUPE = 64, NO_MATCH = 128, UNPARSED_ADDRESS_WARNING = 256;
 
   /**
    * Parser modes
    */
-  CONST MODE_MAPFIELD = 1, MODE_PREVIEW = 2, MODE_SUMMARY = 4, MODE_IMPORT = 8;
+  const MODE_MAPFIELD = 1, MODE_PREVIEW = 2, MODE_SUMMARY = 4, MODE_IMPORT = 8;
 
   /**
    * Codes for duplicate record handling
    */
-  CONST DUPLICATE_SKIP = 1, DUPLICATE_REPLACE = 2, DUPLICATE_UPDATE = 4, DUPLICATE_FILL = 8, DUPLICATE_NOCHECK = 16;
+  const DUPLICATE_SKIP = 1, DUPLICATE_REPLACE = 2, DUPLICATE_UPDATE = 4, DUPLICATE_FILL = 8, DUPLICATE_NOCHECK = 16;
 
   /**
    * Contact types
    */
-  CONST CONTACT_INDIVIDUAL = 1, CONTACT_HOUSEHOLD = 2, CONTACT_ORGANIZATION = 4;
+  const CONTACT_INDIVIDUAL = 1, CONTACT_HOUSEHOLD = 2, CONTACT_ORGANIZATION = 4;
 
 
   /**
-   * total number of non empty lines
+   * Total number of non empty lines
    */
   protected $_totalCount;
 
   /**
-   * running total number of valid lines
+   * Running total number of valid lines
    */
   protected $_validCount;
 
   /**
-   * running total number of invalid rows
+   * Running total number of invalid rows
    */
   protected $_invalidRowCount;
 
   /**
-   * maximum number of non-empty/comment lines to process
+   * Maximum number of non-empty/comment lines to process
    *
    * @var int
    */
   protected $_maxLinesToProcess;
 
   /**
-   * maximum number of invalid rows to store
+   * Maximum number of invalid rows to store
    */
   protected $_maxErrorCount;
 
   /**
-   * array of error lines, bounded by MAX_ERROR
+   * Array of error lines, bounded by MAX_ERROR
    */
   protected $_errors;
 
   /**
-   * total number of conflict lines
+   * Total number of conflict lines
    */
   protected $_conflictCount;
 
   /**
-   * array of conflict lines
+   * Array of conflict lines
    */
   protected $_conflicts;
 
   /**
-   * total number of duplicate (from database) lines
+   * Total number of duplicate (from database) lines
    */
   protected $_duplicateCount;
 
   /**
-   * array of duplicate lines
+   * Array of duplicate lines
    */
   protected $_duplicates;
 
   /**
-   * running total number of warnings
+   * Running total number of warnings
    */
   protected $_warningCount;
 
   /**
-   * maximum number of warnings to store
+   * Maximum number of warnings to store
    */
   protected $_maxWarningCount = self::MAX_WARNINGS;
 
   /**
-   * array of warning lines, bounded by MAX_WARNING
+   * Array of warning lines, bounded by MAX_WARNING
    */
   protected $_warnings;
 
   /**
-   * array of all the fields that could potentially be part
+   * Array of all the fields that could potentially be part
    * of this import process
    * @var array
    */
   protected $_fields;
 
   /**
-   * array of the fields that are actually part of the import process
+   * Array of the fields that are actually part of the import process
    * the position in the array also dictates their position in the import
    * file
    * @var array
@@ -144,72 +140,115 @@ abstract class CRM_Import_Parser {
   protected $_activeFields;
 
   /**
-   * cache the count of active fields
+   * Cache the count of active fields
    *
    * @var int
    */
   protected $_activeFieldCount;
 
   /**
-   * cache of preview rows
+   * Cache of preview rows
    *
    * @var array
    */
   protected $_rows;
 
   /**
-   * filename of error data
+   * Filename of error data
    *
    * @var string
    */
   protected $_errorFileName;
 
   /**
-   * filename of conflict data
+   * Filename of conflict data
    *
    * @var string
    */
   protected $_conflictFileName;
 
   /**
-   * filename of duplicate data
+   * Filename of duplicate data
    *
    * @var string
    */
   protected $_duplicateFileName;
 
   /**
-   * contact type
+   * Contact type
    *
    * @var int
    */
   public $_contactType;
+  /**
+   * Contact sub-type
+   *
+   * @var int
+   */
+  public $_contactSubType;
 
   /**
-   * Class constructor
+   * Class constructor.
    */
-  function __construct() {
+  public function __construct() {
     $this->_maxLinesToProcess = 0;
     $this->_maxErrorCount = self::MAX_ERRORS;
   }
 
   /**
-   * Abstract function definitions
+   * Abstract function definitions.
    */
-  abstract function init();
-  abstract function fini();
-  abstract function mapField(&$values);
-  abstract function preview(&$values);
-  abstract function summary(&$values);
-  abstract function import($onDuplicate, &$values);
+  abstract protected function init();
 
   /**
-   * Set and validate field values
-   *
-   * @param $elements: array
-   * @param $erroneousField: reference
+   * @return mixed
    */
-  function setActiveFieldValues($elements, &$erroneousField) {
+  abstract protected function fini();
+
+  /**
+   * Map field.
+   *
+   * @param array $values
+   *
+   * @return mixed
+   */
+  abstract protected function mapField(&$values);
+
+  /**
+   * Preview.
+   *
+   * @param array $values
+   *
+   * @return mixed
+   */
+  abstract protected function preview(&$values);
+
+  /**
+   * @param $values
+   *
+   * @return mixed
+   */
+  abstract protected function summary(&$values);
+
+  /**
+   * @param $onDuplicate
+   * @param $values
+   *
+   * @return mixed
+   */
+  abstract protected function import($onDuplicate, &$values);
+
+  /**
+   * Set and validate field values.
+   *
+   * @param array $elements
+   *   array.
+   * @param $erroneousField
+   *   reference.
+   *
+   * @return int
+   */
+  public function setActiveFieldValues($elements, &$erroneousField) {
     $maxCount = count($elements) < $this->_activeFieldCount ? count($elements) : $this->_activeFieldCount;
     for ($i = 0; $i < $maxCount; $i++) {
       $this->_activeFields[$i]->setValue($elements[$i]);
@@ -234,12 +273,12 @@ abstract class CRM_Import_Parser {
   }
 
   /**
-   * Format the field values for input to the api
+   * Format the field values for input to the api.
    *
-   * @return array (reference) associative array of name/value pairs
-   * @access public
+   * @return array
+   *   (reference) associative array of name/value pairs
    */
-  function &getActiveFieldParams() {
+  public function &getActiveFieldParams() {
     $params = array();
     for ($i = 0; $i < $this->_activeFieldCount; $i++) {
       if (isset($this->_activeFields[$i]->_value)
@@ -253,7 +292,10 @@ abstract class CRM_Import_Parser {
     return $params;
   }
 
-  function getSelectValues() {
+  /**
+   * @return array
+   */
+  public function getSelectValues() {
     $values = array();
     foreach ($this->_fields as $name => $field) {
       $values[$name] = $field->_title;
@@ -261,7 +303,10 @@ abstract class CRM_Import_Parser {
     return $values;
   }
 
-  function getSelectTypes() {
+  /**
+   * @return array
+   */
+  public function getSelectTypes() {
     $values = array();
     foreach ($this->_fields as $name => $field) {
       if (isset($field->_hasLocationType)) {
@@ -271,7 +316,10 @@ abstract class CRM_Import_Parser {
     return $values;
   }
 
-  function getHeaderPatterns() {
+  /**
+   * @return array
+   */
+  public function getHeaderPatterns() {
     $values = array();
     foreach ($this->_fields as $name => $field) {
       if (isset($field->_headerPattern)) {
@@ -281,7 +329,10 @@ abstract class CRM_Import_Parser {
     return $values;
   }
 
-  function getDataPatterns() {
+  /**
+   * @return array
+   */
+  public function getDataPatterns() {
     $values = array();
     foreach ($this->_fields as $name => $field) {
       $values[$name] = $field->_dataPattern;
@@ -290,16 +341,14 @@ abstract class CRM_Import_Parser {
   }
 
   /**
-   * Remove single-quote enclosures from a value array (row)
+   * Remove single-quote enclosures from a value array (row).
    *
    * @param array $values
    * @param string $enclosure
    *
    * @return void
-   * @static
-   * @access public
    */
-  static function encloseScrub(&$values, $enclosure = "'") {
+  public static function encloseScrub(&$values, $enclosure = "'") {
     if (empty($values)) {
       return;
     }
@@ -310,25 +359,23 @@ abstract class CRM_Import_Parser {
   }
 
   /**
-   * setter function
+   * Setter function.
    *
    * @param int $max
    *
    * @return void
-   * @access public
    */
-  function setMaxLinesToProcess($max) {
+  public function setMaxLinesToProcess($max) {
     $this->_maxLinesToProcess = $max;
   }
 
   /**
-   * Determines the file extension based on error code
+   * Determines the file extension based on error code.
    *
    * @var $type error code constant
    * @return string
-   * @static
    */
-  static function errorFileName($type) {
+  public static function errorFileName($type) {
     $fileName = NULL;
     if (empty($type)) {
       return $fileName;
@@ -362,13 +409,12 @@ abstract class CRM_Import_Parser {
   }
 
   /**
-   * Determines the file name based on error code
+   * Determines the file name based on error code.
    *
    * @var $type error code constant
    * @return string
-   * @static
    */
-  static function saveFileName($type) {
+  public static function saveFileName($type) {
     $fileName = NULL;
     if (empty($type)) {
       return $fileName;

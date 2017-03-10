@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,16 +23,13 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
-
 class CRM_Utils_Cache_NoCache implements CRM_Utils_Cache_Interface {
 
   /**
@@ -40,34 +37,53 @@ class CRM_Utils_Cache_NoCache implements CRM_Utils_Cache_Interface {
    * pattern and cache the instance in this variable
    *
    * @var object
-   * @static
    */
   static private $_singleton = NULL;
 
   /**
-   * Constructor
+   * Constructor.
    *
-   * @param array   $config  an array of configuration params
+   * @param array $config
+   *   An array of configuration params.
    *
-   * @return void
+   * @return \CRM_Utils_Cache_NoCache
    */
-  function __construct($config) {
+  public function __construct($config) {
   }
 
-  function set($key, &$value) {
+  /**
+   * @param string $key
+   * @param mixed $value
+   *
+   * @return bool
+   */
+  public function set($key, &$value) {
     return FALSE;
   }
 
-  function get($key) {
+  /**
+   * @param string $key
+   *
+   * @return null
+   */
+  public function get($key) {
     return NULL;
   }
 
-  function delete($key) {
+  /**
+   * @param string $key
+   *
+   * @return bool
+   */
+  public function delete($key) {
     return FALSE;
   }
 
-  function flush() {
+  /**
+   * @return bool
+   */
+  public function flush() {
     return FALSE;
   }
+
 }
-

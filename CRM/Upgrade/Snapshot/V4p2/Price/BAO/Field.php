@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,39 +23,34 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
  * Business objects for managing price fields.
- *
  */
 class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field {
 
   protected $_options;
 
   /**
-   * takes an associative array and creates a price field object
+   * Takes an associative array and creates a price field object.
    *
    * the function extract all the params it needs to initialize the create a
    * price field object. the params array could contain additional unused name/value
    * pairs
    *
-   * @param array  $params    (reference ) an assoc array of name/value pairs
-   * @param array  $ids       the array that holds all the db ids
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
    *
-   * @return object CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field object
-   * @access public
-   * @static
+   * @return CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field
    */
-  static function &add(&$params) {
+  public static function &add(&$params) {
     $priceFieldBAO = new CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field();
 
     $priceFieldBAO->copyValues($params);
@@ -69,17 +64,16 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
   }
 
   /**
-   * takes an associative array and creates a price field object
+   * Takes an associative array and creates a price field object.
    *
    * This function is invoked from within the web form layer and also from the api layer
    *
-   * @param array $params (reference) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference) an assoc array of name/value pairs.
    *
-   * @return object CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field object
-   * @access public
-   * @static
+   * @return CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field
    */
-  static function create(&$params) {
+  public static function create(&$params) {
 
     $transaction = new CRM_Core_Transaction();
 
@@ -122,10 +116,10 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
     for ($index = 1; $index <= $maxIndex; $index++) {
 
       if (array_key_exists('option_amount', $params) &&
-          array_key_exists($index, $params['option_amount']) &&
-          (CRM_Utils_Array::value($index, CRM_Utils_Array::value('option_label', $params)) || !empty($params['is_quick_config'])) &&
-          !CRM_Utils_System::isNull($params['option_amount'][$index])
-          ) {
+        array_key_exists($index, $params['option_amount']) &&
+        (CRM_Utils_Array::value($index, CRM_Utils_Array::value('option_label', $params)) || !empty($params['is_quick_config'])) &&
+        !CRM_Utils_System::isNull($params['option_amount'][$index])
+      ) {
         $options = array(
           'price_field_id' => $priceField->id,
           'label' => trim($params['option_label'][$index]),
@@ -144,7 +138,9 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
           if ($opId = CRM_Utils_Array::value($index, $opIds)) {
             $optionsIds['id'] = $opId;
           }
-          else $optionsIds['id'] = NULL;
+          else {
+            $optionsIds['id'] = NULL;
+          }
         }
         CRM_Upgrade_Snapshot_V4p2_Price_BAO_FieldValue::create($options, $optionsIds);
       }
@@ -155,74 +151,74 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
   }
 
   /**
-   * Takes a bunch of params that are needed to match certain criteria and
-   * retrieves the relevant objects. Typically the valid params are only
-   * contact_id. We'll tweak this function to be more full featured over a period
-   * of time. This is the inverse function of create. It also stores all the retrieved
-   * values in the default array
+   * Fetch object based on array of properties.
    *
-   * @param array $params   (reference ) an assoc array of name/value pairs
-   * @param array $defaults (reference ) an assoc array to hold the flattened values
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $defaults
+   *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return object CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field object
-   * @access public
-   * @static
+   * @return CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field
    */
-  static function retrieve(&$params, &$defaults) {
+  public static function retrieve(&$params, &$defaults) {
     return CRM_Core_DAO::commonRetrieve('CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field', $params, $defaults);
   }
 
   /**
-   * update the is_active flag in the db
+   * Update the is_active flag in the db.
    *
-   * @param int      $id         Id of the database record
-   * @param boolean  $is_active  Value we want to set the is_active field
+   * @param int $id
+   *   Id of the database record.
+   * @param bool $is_active
+   *   Value we want to set the is_active field.
    *
-   * @return   Object            DAO object on sucess, null otherwise
-   *
-   * @access public
-   * @static
+   * @return Object
+   *   DAO object on success, null otherwise
    */
-  static function setIsActive($id, $is_active) {
+  public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field', $id, 'is_active', $is_active);
   }
 
   /**
    * Get the field title.
    *
-   * @param int $id id of field.
+   * @param int $id
+   *   Id of field.
    *
-   * @return string name
-   *
-   * @access public
-   * @static
-   *
+   * @return string
+   *   name
    */
   public static function getTitle($id) {
     return CRM_Core_DAO::getFieldValue('CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field', $id, 'label');
   }
 
   /**
-   * This function for building custom fields
+   * This function for building custom fields.
    *
-   * @param object  $qf             form object (reference)
-   * @param string  $elementName    name of the custom field
-   * @param boolean $inactiveNeeded
-   * @param boolean $useRequired    true if required else false
-   * @param boolean $search         true if used for search else false
-   * @param string  $label          label for custom field
+   * @param CRM_Core_Form $qf
+   *   Form object (reference).
+   * @param string $elementName
+   *   Name of the custom field.
+   * @param int $fieldId
+   * @param bool $inactiveNeeded
+   * @param bool $useRequired
+   *   True if required else false.
+   * @param string $label
+   *   Label for custom field.
+   * @param null $fieldOptions
+   * @param array $freezeOptions
    *
-   * @access public
-   * @static
+   * @return null
    */
-  public static function addQuickFormElement(&$qf,
+  public static function addQuickFormElement(
+    &$qf,
     $elementName,
     $fieldId,
     $inactiveNeeded,
-    $useRequired  = TRUE,
-    $label        = NULL,
+    $useRequired = TRUE,
+    $label = NULL,
     $fieldOptions = NULL,
-    $feezeOptions = array()
+    $freezeOptions = array()
   ) {
 
     $field = new CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field();
@@ -240,11 +236,11 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
     $currencyName = $config->defaultCurrency;
 
     if (!isset($label)) {
-      $label = (property_exists($qf,'_membershipBlock') && !empty($qf->_membershipBlock['is_separate_payment']) && $field->name == 'contribution_amount' && empty($otherAmount['is_allow_other_amount'])) ? ts('Additional Contribution') : $field->label;
+      $label = (property_exists($qf, '_membershipBlock') && !empty($qf->_membershipBlock['is_separate_payment']) && $field->name == 'contribution_amount' && empty($otherAmount['is_allow_other_amount'])) ? ts('Additional Contribution') : $field->label;
     }
 
     if ($field->name == 'contribution_amount') {
-        $qf->_contributionAmount = 1;
+      $qf->_contributionAmount = 1;
     }
 
     if (isset($qf->_online) && $qf->_online) {
@@ -262,22 +258,23 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
     switch ($field->html_type) {
       case 'Text':
         $optionKey = key($customOption);
-        $count     = CRM_Utils_Array::value('count', $customOption[$optionKey], '');
+        $count = CRM_Utils_Array::value('count', $customOption[$optionKey], '');
         $max_value = CRM_Utils_Array::value('max_value', $customOption[$optionKey], '');
-        $priceVal  = implode($seperator, array($customOption[$optionKey][$valueFieldName], $count, $max_value));
+        $priceVal = implode($seperator, array($customOption[$optionKey][$valueFieldName], $count, $max_value));
 
         $extra = array();
-        if (property_exists($qf,'_quickConfig') && $qf->_quickConfig && property_exists($qf,'_contributionAmount') && $qf->_contributionAmount) {
+        if (property_exists($qf, '_quickConfig') && $qf->_quickConfig && property_exists($qf, '_contributionAmount') && $qf->_contributionAmount) {
           $qf->assign('priceset', $elementName);
           $extra = array('onclick' => 'useAmountOther();');
         }
 
-        // if seperate membership payment is used with quick config priceset then change the other amount label
-        if (property_exists($qf,'_membershipBlock') && !empty($qf->_membershipBlock['is_separate_payment']) && $qf->_quickConfig && $field->name == 'other_amount' && !property_exists($qf,'_contributionAmount')) {
-            $label = ts('Additional Contribution');
-            $useRequired = 0;
-        } elseif (!empty($fieldOptions[$optionKey]['label'])) {      //check for label.
-            $label = $fieldOptions[$optionKey]['label'];
+        // if separate membership payment is used with quick config priceset then change the other amount label
+        if (property_exists($qf, '_membershipBlock') && !empty($qf->_membershipBlock['is_separate_payment']) && $qf->_quickConfig && $field->name == 'other_amount' && !property_exists($qf, '_contributionAmount')) {
+          $label = ts('Additional Contribution');
+          $useRequired = 0;
+        }
+        elseif (!empty($fieldOptions[$optionKey]['label'])) {
+          $label = $fieldOptions[$optionKey]['label'];
         }
 
         if ($field->is_display_amounts) {
@@ -287,7 +284,8 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
 
         $element = &$qf->add('text', $elementName, $label,
           array_merge($extra,
-            array('price' => json_encode(array($optionKey, $priceVal)),
+            array(
+              'price' => json_encode(array($optionKey, $priceVal)),
               'size' => '4',
             )
           ),
@@ -295,7 +293,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
         );
 
         // CRM-6902
-        if (in_array($optionKey, $feezeOptions)) {
+        if (in_array($optionKey, $freezeOptions)) {
           $element->freeze();
         }
 
@@ -303,7 +301,8 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
         if (property_exists($qf, '_quickConfig') && $qf->_quickConfig) {
           $message = ts("Please enter a valid amount.");
           $type = "money";
-        } else {
+        }
+        else {
           $message = ts('%1 must be an integer (whole number).', array(1 => $label));
           $type = "positiveInteger";
         }
@@ -314,7 +313,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
       case 'Radio':
         $choice = array();
 
-        if (property_exists($qf, '_quickConfig') && $qf->_quickConfig && property_exists($qf,'_contributionAmount') && $qf->_contributionAmount) {
+        if (property_exists($qf, '_quickConfig') && $qf->_quickConfig && property_exists($qf, '_contributionAmount') && $qf->_contributionAmount) {
           $qf->assign('contriPriceset', $elementName);
         }
 
@@ -323,25 +322,28 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
             $opt['label'] = !empty($opt['label']) ? $opt['label'] . '&nbsp;-&nbsp;' : '';
             $opt['label'] .= CRM_Utils_Money::format($opt[$valueFieldName]);
           }
-          $count     = CRM_Utils_Array::value('count', $opt, '');
+          $count = CRM_Utils_Array::value('count', $opt, '');
           $max_value = CRM_Utils_Array::value('max_value', $opt, '');
-          $priceVal  = implode($seperator, array($opt[$valueFieldName], $count, $max_value));
-          $extra = array('price' => json_encode(array($elementName, $priceVal)),
-                         'data-amount' => $opt[$valueFieldName],
-                         'data-currency' => $currencyName,
-                         );
+          $priceVal = implode($seperator, array($opt[$valueFieldName], $count, $max_value));
+          $extra = array(
+            'price' => json_encode(array($elementName, $priceVal)),
+            'data-amount' => $opt[$valueFieldName],
+            'data-currency' => $currencyName,
+          );
           if (property_exists($qf, '_quickConfig') && $qf->_quickConfig && $field->name == 'contribution_amount') {
             $extra += array('onclick' => 'clearAmountOther();');
-          } elseif (property_exists($qf, '_quickConfig') && $qf->_quickConfig && $field->name == 'membership_amount') {
-            $extra += array('onclick' => "return showHideAutoRenew({$opt['membership_type_id']});",
-                            'membership-type' => $opt['membership_type_id'],
-                            );
-            $qf->assign('membershipFieldID',$field->id);
+          }
+          elseif (property_exists($qf, '_quickConfig') && $qf->_quickConfig && $field->name == 'membership_amount') {
+            $extra += array(
+              'onclick' => "return showHideAutoRenew({$opt['membership_type_id']});",
+              'membership-type' => $opt['membership_type_id'],
+            );
+            $qf->assign('membershipFieldID', $field->id);
           }
           $choice[$opId] = $qf->createElement('radio', NULL, '', $opt['label'], $opt['id'], $extra);
 
           // CRM-6902
-          if (in_array($opId, $feezeOptions)) {
+          if (in_array($opId, $freezeOptions)) {
             $choice[$opId]->freeze();
           }
         }
@@ -358,9 +360,11 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
           // add "none" option
           if (!empty($otherAmount['is_allow_other_amount']) && $field->name == 'contribution_amount') {
             $none = ts('Other Amount');
-          } elseif (property_exists($qf, '_membershipBlock') && empty($qf->_membershipBlock['is_required']) && $field->name == 'membership_amount') {
+          }
+          elseif (property_exists($qf, '_membershipBlock') && empty($qf->_membershipBlock['is_required']) && $field->name == 'membership_amount') {
             $none = ts('No thank you');
-          } else {
+          }
+          else {
             $none = ts('-none-');
           }
 
@@ -395,20 +399,19 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
           }
           $selectOption[$opt['id']] = $opt['label'];
 
-          if (!in_array($opt['id'], $feezeOptions)) {
+          if (!in_array($opt['id'], $freezeOptions)) {
             $allowedOptions[] = $opt['id'];
           }
         }
         $element = &$qf->add('select', $elementName, $label,
-          array(
-            '' => ts('- select -')) + $selectOption,
+          array('' => ts('- select -')) + $selectOption,
           $useRequired && $field->is_required,
           array('price' => json_encode($priceVal))
         );
 
         // CRM-6902
         $button = substr($qf->controller->getButtonName(), -4);
-        if (!empty($feezeOptions) && $button != 'skip') {
+        if (!empty($freezeOptions) && $button != 'skip') {
           $qf->addRule($elementName, ts('Sorry, this option is currently sold out.'), 'regex', "/" . implode('|', $allowedOptions) . "/");
         }
         break;
@@ -417,23 +420,24 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
 
         $check = array();
         foreach ($customOption as $opId => $opt) {
-          $count     = CRM_Utils_Array::value('count', $opt, '');
+          $count = CRM_Utils_Array::value('count', $opt, '');
           $max_value = CRM_Utils_Array::value('max_value', $opt, '');
-          $priceVal  = implode($seperator, array($opt[$valueFieldName], $count, $max_value));
+          $priceVal = implode($seperator, array($opt[$valueFieldName], $count, $max_value));
 
           if ($field->is_display_amounts) {
             $opt['label'] .= '&nbsp;-&nbsp;';
             $opt['label'] .= CRM_Utils_Money::format($opt[$valueFieldName]);
           }
           $check[$opId] = &$qf->createElement('checkbox', $opt['id'], NULL, $opt['label'],
-            array('price' => json_encode(array($opt['id'], $priceVal)),
+            array(
+              'price' => json_encode(array($opt['id'], $priceVal)),
               'data-amount' => $opt[$valueFieldName],
               'data-currency' => $currencyName,
             )
           );
 
           // CRM-6902
-          if (in_array($opId, $feezeOptions)) {
+          if (in_array($opId, $freezeOptions)) {
             $check[$opId]->freeze();
           }
         }
@@ -449,13 +453,17 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
   }
 
   /**
-   * Retrieve a list of options for the specified field
+   * Retrieve a list of options for the specified field.
    *
-   * @param int $fieldId price field ID
-   * @param bool $inactiveNeeded include inactive options
-   * @param bool $reset ignore stored values\
+   * @param int $fieldId
+   *   Price field ID.
+   * @param bool $inactiveNeeded
+   *   Include inactive options.
+   * @param bool $reset
+   *   Ignore stored values\.
    *
-   * @return array array of options
+   * @return array
+   *   array of options
    */
   public static function getOptions($fieldId, $inactiveNeeded = FALSE, $reset = FALSE) {
     static $options = array();
@@ -469,6 +477,12 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
     return $options[$fieldId];
   }
 
+  /**
+   * @param $optionLabel
+   * @param int $fid
+   *
+   * @return mixed
+   */
   public static function getOptionId($optionLabel, $fid) {
     if (!$optionLabel || !$fid) {
       return;
@@ -487,7 +501,10 @@ WHERE
     AND option_group.id    = option_value.option_group_id
     AND option_value.label = %2";
 
-    $dao = CRM_Core_DAO::executeQuery($query, array(1 => array($optionGroupName, 'String'), 2 => array($optionLabel, 'String')));
+    $dao = CRM_Core_DAO::executeQuery($query, array(
+        1 => array($optionGroupName, 'String'),
+        2 => array($optionLabel, 'String'),
+      ));
 
     while ($dao->fetch()) {
       return $dao->id;
@@ -497,13 +514,11 @@ WHERE
   /**
    * Delete the price set field.
    *
-   * @param   int   $id    Field Id
+   * @param int $id
+   *   Field Id.
    *
-   * @return  boolean
-   *
-   * @access public
-   * @static
-   *
+   * @return mixed
+   *   Boolean-ish
    */
   public static function deleteField($id) {
     $field = new CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field();
@@ -525,7 +540,10 @@ WHERE
     return NULL;
   }
 
-  static function &htmlTypes() {
+  /**
+   * @return array
+   */
+  public static function &htmlTypes() {
     static $htmlTypes = NULL;
     if (!$htmlTypes) {
       $htmlTypes = array(
@@ -539,17 +557,12 @@ WHERE
   }
 
   /**
-   * Validate the priceset
+   * Validate the priceset.
    *
-   * @param int $priceSetId, array $fields
-   *
-   * retrun the error string
-   *
-   * @access public
-   * @static
-   *
+   * @param int $priceSetId
+   * @param array $fields
+   * @param array $error
    */
-
   public static function priceSetValidation($priceSetId, $fields, &$error) {
     // check for at least one positive
     // amount price field should be selected.
@@ -617,5 +630,5 @@ WHERE  id IN (" . implode(',', array_keys($priceFields)) . ')';
       $error['_qf_default'] = ts("Please select at least one option from price set.");
     }
   }
-}
 
+}

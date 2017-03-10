@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,7 +24,7 @@
  +--------------------------------------------------------------------+
 *}
 <div class="crm-block crm-form-block crm-contact-task-addtoOrganization-form-block">
-<div id="help">
+<div class="help">
     {ts}Choose Relationship Type and Target Organization{/ts}
 </div>
 <table class="form-layout-compressed">
@@ -80,7 +80,7 @@
                 {else} {* no valid matches for name + contact_type *}
                         </div></fieldset>
                         {capture assign=infoTitle}{ts}No matching results for{/ts}{/capture}
-                        {capture assign=infoMessage}<ul><li>{ts 1=$form.name.value}Name like: %1{/ts}</li><li>{ts}Contact type{/ts}: {$contact_type_display}</li></ul>{ts}Check your spelling, or try fewer letters for the target contact name.{/ts}{/capture}
+                        {capture assign=infoMessage}<ul><li>{ts 1=$form.name.value}Name like: %1{/ts}</li><li>{ts 1=$contact_type_display}Contact Type: %1{/ts}</li></ul>{ts}Check your spelling, or try fewer letters for the target contact name.{/ts}{/capture}
                         {include file="CRM/common/info.tpl"}
                 {/if} {* end if searchCount *}
               {else}

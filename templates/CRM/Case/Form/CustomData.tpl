@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,8 +23,7 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-
-<form action="{crmURL p='civicrm/case/cd/edit' q="cgcount=1&action=update&reset=1&entityID=`$entityID`&groupID=`$groupID`&cid=`$contactID`&subType=`$subType`"}" method="post" id="id_case_custom_dialog" >
-    {include file="CRM/Custom/Form/CustomData.tpl"}
-    <div class="html-adjust">{$form.buttons.html}</div>
-</form>
+<div class="crm-block crm-form-block crm-case-custom-form-block">
+  {include file="CRM/Custom/Form/CustomData.tpl" skipTitle=1}
+  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
+</div>

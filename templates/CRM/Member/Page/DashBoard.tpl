@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -248,7 +248,7 @@
 
     </tr>
     <tr><td colspan='11'>
-      Primary member counts (those who "own" the membership rather than receiving via relationship) are in [brackets].
+      {ts}Primary member counts (those who "own" the membership rather than receiving via relationship) are in [brackets].{/ts}
     </td></tr>
   </table>
 {/if}

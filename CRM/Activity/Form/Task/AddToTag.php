@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,14 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -41,27 +39,23 @@
 class CRM_Activity_Form_Task_AddToTag extends CRM_Activity_Form_Task {
 
   /**
-   * name of the tag
+   * Name of the tag.
    *
    * @var string
    */
   protected $_name;
 
   /**
-   * all the tags in the system
+   * All the tags in the system.
    *
    * @var array
    */
   protected $_tags;
 
   /**
-   * Build the form
-   *
-   * @access public
-   *
-   * @return void
+   * Build the form object.
    */
-  function buildQuickForm() {
+  public function buildQuickForm() {
     // add select for tag
     $this->_tags = CRM_Core_BAO_Tag::getTags('civicrm_activity');
 
@@ -76,11 +70,17 @@ class CRM_Activity_Form_Task_AddToTag extends CRM_Activity_Form_Task {
     $this->addDefaultButtons(ts('Tag Activities'));
   }
 
-  function addRules() {
+  public function addRules() {
     $this->addFormRule(array('CRM_Activity_Form_Task_AddToTag', 'formRule'));
   }
 
-  static function formRule($form, $rule) {
+  /**
+   * @param CRM_Core_Form $form
+   * @param $rule
+   *
+   * @return array
+   */
+  public static function formRule($form, $rule) {
     $errors = array();
     if (empty($form['tag']) && empty($form['activity_taglist'])) {
       $errors['_qf_default'] = ts("Please select at least one tag.");
@@ -89,14 +89,10 @@ class CRM_Activity_Form_Task_AddToTag extends CRM_Activity_Form_Task {
   }
 
   /**
-   * process the form after the input has been submitted and validated
-   *
-   * @access public
-   *
-   * @return void
+   * Process the form after the input has been submitted and validated.
    */
   public function postProcess() {
-    //get the submitted values in an array
+    // Get the submitted values in an array.
     $params = $this->controller->exportValues($this->_name);
     $activityTags = $tagList = array();
 
@@ -139,17 +135,20 @@ class CRM_Activity_Form_Task_AddToTag extends CRM_Activity_Form_Task {
     foreach ($allTags as $key => $dnc) {
       $this->_name[] = $this->_tags[$key];
 
-      list($total, $added, $notAdded) = CRM_Core_BAO_EntityTag::addEntitiesToTag($this->_activityHolderIds, $key, 'civicrm_activity');
+      list($total, $added, $notAdded) = CRM_Core_BAO_EntityTag::addEntitiesToTag($this->_activityHolderIds, $key,
+        'civicrm_activity', FALSE);
 
-      $status = array(ts('%count activities tagged', array('count' => $added, 'plural' => '%count activities tagged')));
+      $status = array(ts('Activity tagged', array('count' => $added, 'plural' => '%count activities tagged')));
       if ($notAdded) {
-        $status[] = ts('%count activities already had this tag', array('count' => $notAdded, 'plural' => '%count activities already had this tag'));
+        $status[] = ts('1 activity already had this tag', array(
+          'count' => $notAdded,
+          'plural' => '%count activities already had this tag',
+        ));
       }
       $status = '<ul><li>' . implode('</li><li>', $status) . '</li></ul>';
       CRM_Core_Session::setStatus($status, ts("Added Tag <em>%1</em>", array(1 => $this->_tags[$key])), 'success', array('expires' => 0));
     }
 
   }
-  //end of function
-}
 
+}

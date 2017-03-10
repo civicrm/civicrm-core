@@ -1,0 +1,196 @@
+<!--
+Required vars: abtest, fields
+
+Note: Much of this file is duplicated in crmMailing and crmMailingAB with variations on placement/title/binding.
+It could perhaps be thinned by 30-60% by making more directives.
+
+This template follows a basic pattern. For each included field, there are three variants, as in this example:
+ - fromAddress: The default From: address shared by both mailings (representatively mapped to mailing A)
+ - fromAddressA: The From: address for mailing A
+ - fromAddressB: The From: address for mailing B
+Each variant is guarded with "ng-if='fields.fieldName'"; if true, the field will be displayed and
+processed by Angular; if false, the field will be hidden and completely ignored by Angular.
+-->
+<div class="crm-block" ng-form="subform" crm-ui-id-scope>
+  <div class="crm-group">
+
+
+    <div crm-ui-field="{name: 'subform.msg_template_id', title: ts('Template')}" ng-if="fields.msg_template_id">
+      <div ng-controller="MsgTemplateCtrl">
+        <select
+          crm-ui-id="subform.msg_template_id"
+          name="msg_template_id"
+          class="fa-clipboard"
+          crm-ui-select="{dropdownAutoWidth : true, allowClear: true, placeholder: ts('Message Template')}"
+          ng-model="abtest.mailings.a.msg_template_id"
+          ng-change="loadTemplate(abtest.mailings.a, abtest.mailings.a.msg_template_id)"
+          >
+          <option value=""></option>
+          <option ng-repeat="frm in crmMsgTemplates.getAll() | orderBy:'msg_title'" ng-value="frm.id">{{frm.msg_title}}</option>
+        </select>
+        <a crm-icon="fa-floppy-o" ng-click="saveTemplate(abtest.mailings.a)" class="crm-hover-button" title="{{ts('Save As')}}"></a>
+      </div>
+    </div>
+    <div crm-ui-field="{name: 'subform.msg_template_idA', title: ts('Template (A)')}" ng-if="fields.msg_template_idA">
+      <div ng-controller="MsgTemplateCtrl">
+        <select
+          crm-ui-id="subform.msg_template_idA"
+          name="msg_template_idA"
+          class="fa-clipboard"
+          crm-ui-select="{dropdownAutoWidth : true, allowClear: true, placeholder: ts('Message Template')}"
+          ng-model="abtest.mailings.a.msg_template_id"
+          ng-change="loadTemplate(abtest.mailings.a, abtest.mailings.a.msg_template_id)"
+          >
+          <option value=""></option>
+          <option ng-repeat="frm in crmMsgTemplates.getAll() | orderBy:'msg_title'" ng-value="frm.id">{{frm.msg_title}}</option>
+        </select>
+        <a crm-icon="fa-floppy-o" ng-click="saveTemplate(abtest.mailings.a)" class="crm-hover-button" title="{{ts('Save As')}}"></a>
+      </div>
+    </div>
+    <div crm-ui-field="{name: 'subform.msg_template_idB', title: ts('Template (B)')}" ng-if="fields.msg_template_idB">
+      <div ng-controller="MsgTemplateCtrl">
+        <select
+          crm-ui-id="subform.msg_template_idB"
+          name="msg_template_idB"
+          class="fa-clipboard"
+          crm-ui-select="{dropdownAutoWidth : true, allowClear: true, placeholder: ts('Message Template')}"
+          ng-model="abtest.mailings.b.msg_template_id"
+          ng-change="loadTemplate(abtest.mailings.b, abtest.mailings.b.msg_template_id)"
+          >
+          <option value=""></option>
+          <option ng-repeat="frm in crmMsgTemplates.getAll() | orderBy:'msg_title'" ng-value="frm.id">{{frm.msg_title}}</option>
+        </select>
+        <a crm-icon="fa-floppy-o" ng-click="saveTemplate(abtest.mailings.b)" class="crm-hover-button" title="{{ts('Save As')}}"></a>
+      </div>
+    </div>
+
+
+    <div crm-ui-field="{name: 'subform.fromAddress', title: ts('From'), help: hs('from_email')}" ng-if="fields.fromAddress">
+      <span ng-controller="EmailAddrCtrl" crm-mailing-from-address="fromPlaceholder" crm-mailing="abtest.mailings.a">
+        <select
+          crm-ui-id="subform.fromAddress"
+          crm-ui-select="{dropdownAutoWidth : true, allowClear: false, placeholder: ts('Email address')}"
+          name="fromAddress"
+          ng-model="fromPlaceholder.label"
+          required>
+          <option value=""></option>
+          <option ng-repeat="frm in crmFromAddresses.getAll() | filter:{is_active:1} | orderBy:'weight'" value="{{frm.label}}">{{frm.label}}</option>
+        </select>
+      </span>
+    </div>
+    <div crm-ui-field="{name: 'subform.fromAddressA', title: ts('From (A)'), help: hs('from_email')}" ng-if="fields.fromAddressA">
+      <span ng-controller="EmailAddrCtrl" crm-mailing-from-address="fromPlaceholder" crm-mailing="abtest.mailings.a">
+        <select
+          crm-ui-id="subform.fromAddressA"
+          crm-ui-select="{dropdownAutoWidth : true, allowClear: false, placeholder: ts('Email address')}"
+          name="fromAddressA"
+          ng-model="fromPlaceholder.label"
+          required>
+          <option value=""></option>
+          <option ng-repeat="frm in crmFromAddresses.getAll() | filter:{is_active:1} | orderBy:'weight'" value="{{frm.label}}">{{frm.label}}</option>
+        </select>
+      </span>
+    </div>
+    <div crm-ui-field="{name: 'subform.fromAddressB', title: ts('From (B)'), help: hs('from_email')}" ng-if="fields.fromAddressB">
+      <span ng-controller="EmailAddrCtrl" crm-mailing-from-address="fromPlaceholder" crm-mailing="abtest.mailings.b">
+        <select
+          crm-ui-id="subform.fromAddressB"
+          crm-ui-select="{dropdownAutoWidth : true, allowClear: false, placeholder: ts('Email address')}"
+          name="fromAddressB"
+          ng-model="fromPlaceholder.label"
+          required>
+          <option value=""></option>
+          <option ng-repeat="frm in crmFromAddresses.getAll() | filter:{is_active:1} | orderBy:'weight'" value="{{frm.label}}">{{frm.label}}</option>
+        </select>
+      </span>
+    </div>
+
+
+    <div crm-ui-field="{name: 'subform.replyTo', title: ts('Reply-To')}" ng-show="crmMailingConst.enableReplyTo" ng-if="fields.replyTo">
+      <span ng-controller="EmailAddrCtrl">
+        <select
+          crm-ui-id="subform.replyTo"
+          crm-ui-select="{dropdownAutoWidth : true, allowClear: true, placeholder: ts('Email address')}"
+          name="replyTo"
+          ng-change="checkReplyToChange(abtest.mailings.a)"
+          ng-model="abtest.mailings.a.replyto_email"
+          >
+          <option value=""></option>
+          <option ng-repeat="frm in crmFromAddresses.getAll() | filter:{is_active:1} | orderBy:'weight'" value="{{frm.label}}">{{frm.label}}</option>
+        </select>
+      </span>
+    </div>
+    <div crm-ui-field="{name: 'subform.replyToA', title: ts('Reply-To (A)')}" ng-show="crmMailingConst.enableReplyTo" ng-if="fields.replyToA">
+      <span ng-controller="EmailAddrCtrl">
+        <select
+          crm-ui-id="subform.replyToA"
+          crm-ui-select="{dropdownAutoWidth : true, allowClear: true, placeholder: ts('Email address')}"
+          name="replyToA"
+          ng-change="checkReplyToChange(abtest.mailings.a)"
+          ng-model="abtest.mailings.a.replyto_email"
+          >
+          <option value=""></option>
+          <option ng-repeat="frm in crmFromAddresses.getAll() | filter:{is_active:1} | orderBy:'weight'" value="{{frm.label}}">{{frm.label}}</option>
+        </select>
+      </span>
+    </div>
+    <div crm-ui-field="{name: 'subform.replyToB', title: ts('Reply-To (B)')}" ng-show="crmMailingConst.enableReplyTo" ng-if="fields.replyToB">
+      <span ng-controller="EmailAddrCtrl">
+        <select
+          crm-ui-id="subform.replyToB"
+          crm-ui-select="{dropdownAutoWidth : true, allowClear: true, placeholder: ts('Email address')}"
+          name="replyToB"
+          ng-change="checkReplyToChange(abtest.mailings.b)"
+          ng-model="abtest.mailings.b.replyto_email"
+          >
+          <option value=""></option>
+          <option ng-repeat="frm in crmFromAddresses.getAll() | filter:{is_active:1} | orderBy:'weight'" value="{{frm.label}}">{{frm.label}}</option>
+        </select>
+      </span>
+    </div>
+
+
+    <div crm-ui-field="{name: 'subform.subject', title: ts('Subject')}" ng-if="fields.subject">
+      <div style="float: right;">
+        <input crm-mailing-token on-select="$broadcast('insert:subject', token.name)" tabindex="-1">
+      </div>
+      <input
+        crm-ui-id="subform.subject"
+        crm-ui-insert-rx="insert:subject"
+        type="text"
+        class="crm-form-text"
+        ng-model="abtest.mailings.a.subject"
+        required
+        placeholder="Subject"
+        name="subject" >
+    </div>
+    <div crm-ui-field="{name: 'subform.subjectA', title: ts('Subject (A)')}" ng-if="fields.subjectA">
+      <div style="float: right;">
+        <input crm-mailing-token on-select="$broadcast('insert:subjectA', token.name)" tabindex="-1">
+      </div>
+      <input
+        crm-ui-id="subform.subjectA"
+        crm-ui-insert-rx="insert:subjectA"
+        type="text"
+        class="crm-form-text"
+        ng-model="abtest.mailings.a.subject"
+        required
+        placeholder="Subject"
+        name="subjectA" >
+    </div>
+    <div crm-ui-field="{name: 'subform.subjectB', title: ts('Subject (B)')}" ng-if="fields.subjectB">
+      <div style="float: right;">
+        <input crm-mailing-token on-select="$broadcast('insert:subjectB', token.name)" tabindex="-1">
+      </div>
+      <input
+        crm-ui-id="subform.subjectB"
+        crm-ui-insert-rx="insert:subjectB"
+        type="text"
+        class="crm-form-text"
+        ng-model="abtest.mailings.b.subject"
+        required
+        placeholder="Subject"
+        name="subjectB" >
+    </div>
+  </div>
+</div>

@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -74,9 +74,9 @@
             {if !$wizard.steps[step].valid}
                 {assign var="stepClass" value="$stepClass not-valid"}
             {/if}
-            {* wizard.steps[step].link value is passed for wizards/steps which allow clickable navigation *} 
+            {* wizard.steps[step].link value is passed for wizards/steps which allow clickable navigation *}
             <li class="{$stepClass}">{$stepPrefix}{if $wizard.steps[step].link}<a href="{$wizard.steps[step].link}">{/if}{$title}{if $wizard.steps[step].link}</a>{/if}</li>
-        {/if} 
+        {/if}
     {/section}
    </ul>
 </div>

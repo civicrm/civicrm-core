@@ -1,11 +1,11 @@
 {* common dupe contacts processing *}
-<div id='processDupes' class="success-status" style="display:none;"></div>
+<div id='processDupes' style="display:none;"></div>
 {literal}
 <script type='text/javascript'>
 
 cj( '#processDupes' ).hide( );
 
-function processDupes( cid, oid, oper, context, reloadURL ) {
+function processDupes(cid, oid, oper, context, reloadURL) {
         //currently we are doing in a single way.
         //later we might want two way operations.
 
@@ -22,11 +22,6 @@ function processDupes( cid, oid, oper, context, reloadURL ) {
   cj("#processDupes").dialog({
     title: title,
     modal: true,
-    bgiframe: true,
-    overlay: {
-      opacity: 0.5,
-      background: "black"
-    },
 
     open:function() {
        cj( '#processDupes' ).show( ).html( msg );
@@ -42,6 +37,13 @@ function processDupes( cid, oid, oper, context, reloadURL ) {
         if ( context == 'merge-contact' && reloadURL ) {
                                      // redirect after a small delay
                                      setTimeout("window.location.href = '" + reloadURL + "'", 500);
+        }
+        else {
+          //CRM-15113 this has the effect of causing the alert to display. Also, as they are already 'actioned' Civi sensibly returns the browser to the
+          //search screen
+          setTimeout(function(){
+            window.location.reload();
+          }, 500);
         }
       }
     }

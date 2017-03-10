@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -31,9 +31,9 @@
             <div class="description font-italic">
                 {ts}Complete OR partial Contribution Page title.{/ts}
             </div>
-            <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl"}</div>  
+            <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl"}</div>
         </td>
-        
+
         <td>
             <label>{ts}Financial Type{/ts}</label>
             <div class="listing-box">
@@ -47,7 +47,7 @@
     </tr>
 
     {* campaign in contribution page search *}
-    {include file="CRM/Campaign/Form/addCampaignToComponent.tpl" 
+    {include file="CRM/Campaign/Form/addCampaignToComponent.tpl"
     campaignContext="componentSearch" campaignTrClass='' campaignTdClass=''}
 
  </table>

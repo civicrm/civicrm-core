@@ -56,7 +56,7 @@
   </item>
   <item>
      <path>civicrm/file/delete</path>
-     <title>Delete file</title>
+     <title>Delete File</title>
      <access_arguments>access CiviCRM</access_arguments>
      <page_callback>CRM_Core_BAO_File::deleteAttachment</page_callback>
   </item>
@@ -81,19 +81,24 @@
     <access_arguments>translate CiviCRM</access_arguments>
   </item>
   <item>
-     <path>civicrm/ajax/doc</path>
-     <page_callback>CRM_Utils_REST::ajaxDoc</page_callback>
-     <access_arguments>access CiviCRM</access_arguments>
+    <path>civicrm/ajax/attachment</path>
+    <page_callback>CRM_Core_Page_AJAX_Attachment::attachFile</page_callback>
+    <access_arguments>access CiviCRM;access AJAX API</access_arguments>
   </item>
   <item>
-     <path>civicrm/api/explorer</path>
+     <path>civicrm/api</path>
      <page_callback>CRM_Admin_Page_APIExplorer</page_callback>
      <access_arguments>access CiviCRM</access_arguments>
+     <title>CiviCRM API</title>
   </item>
   <item>
-     <path>civicrm/api/doc</path>
-     <aapage_callback>CRM_Utils_REST::APIDoc</aapage_callback>
-     <page_callback>CRM_Admin_Page_APIDoc</page_callback>
+     <path>civicrm/ajax/apiexample</path>
+     <page_callback>CRM_Admin_Page_APIExplorer::getExampleFile</page_callback>
+     <access_arguments>access CiviCRM</access_arguments>
+  </item>
+  <item>
+     <path>civicrm/ajax/apidoc</path>
+     <page_callback>CRM_Admin_Page_APIExplorer::getDoc</page_callback>
      <access_arguments>access CiviCRM</access_arguments>
   </item>
   <item>
@@ -169,5 +174,37 @@
     <page_callback>CRM_UF_Page_ProfileEditor::getSchemaJSON</page_callback>
     <title>ProfileEditor</title>
     <access_arguments>access CiviCRM</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/a</path>
+    <page_callback>\Civi\Angular\Page\Main</page_callback>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/ajax/angular-modules</path>
+    <page_callback>\Civi\Angular\Page\Modules</page_callback>
+    <access_arguments>*always allow*</access_arguments>
+  </item>
+  <item>
+     <path>civicrm/ajax/recurringentity/update-mode</path>
+     <page_callback>CRM_Core_Page_AJAX_RecurringEntity::updateMode</page_callback>
+     <access_arguments>access CiviCRM</access_arguments>
+  </item>
+  <item>
+     <path>civicrm/recurringentity/preview</path>
+     <page_callback>CRM_Core_Page_RecurringEntityPreview</page_callback>
+     <access_arguments>access CiviCRM,access CiviEvent</access_arguments>
+     <title>Confirm dates</title>
+  </item>
+  <item>
+    <path>civicrm/ajax/l10n-js</path>
+    <page_callback>CRM_Core_Resources::outputLocalizationJS</page_callback>
+    <access_callback>1</access_callback>
+  </item>
+  <item>
+    <path>civicrm/shortcode</path>
+    <page_callback>CRM_Core_Form_ShortCode</page_callback>
+    <access_arguments>access CiviCRM</access_arguments>
+    <title>Insert CiviCRM Content</title>
   </item>
 </menu>

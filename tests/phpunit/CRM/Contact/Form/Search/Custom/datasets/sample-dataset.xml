@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<dataset>
+    <!--  State: none  -->
+    <civicrm_contact
+        id="9"
+        contact_type="Household"
+        is_opt_out="0"
+        display_name="Household 9"
+        sort_name="Household 9"
+        household_name="Household 9"
+    />
+    <!--  State: California -->
+    <civicrm_contact
+        id="10"
+        contact_type="Household"
+        is_opt_out="0"
+        display_name="Household 10"
+        sort_name="Household 10"
+        household_name="Household 10"
+    />
+    <!--  State: California -->
+    <civicrm_contact
+        id="11"
+        contact_type="Household"
+        is_opt_out="0"
+        display_name="Household 11"
+        sort_name="Household 11"
+        household_name="Household 11"
+    />
+    <!--  State: New York -->
+    <civicrm_contact
+        id="12"
+        contact_type="Household"
+        is_opt_out="0"
+        display_name="Household 12"
+        sort_name="Household 12"
+        household_name="Household 12"
+    />
+    <!-- Save Search in quick value format -->
+    <!-- Household name: Household 12, State: New York -->
+    <civicrm_saved_search
+        id="1"
+        form_values='a:7:{i:0;a:5:{i:0;s:4:"csid";i:1;s:1:"=";i:2;s:1:"1";i:3;i:0;i:4;i:0;}i:2;a:5:{i:0;s:14:"household_name";i:1;s:1:"=";i:2;s:12:"Household 12";i:3;i:0;i:4;i:0;}i:3;a:5:{i:0;s:17:"state_province_id";i:1;s:1:"=";i:2;s:4:"1031";i:3;i:0;i:4;i:0;}i:4;a:5:{i:0;s:12:"toggleSelect";i:1;s:1:"=";i:2;s:1:"1";i:3;i:0;i:4;i:0;}i:5;a:5:{i:0;s:9:"mark_x_46";i:1;s:1:"=";i:2;s:1:"1";i:3;i:0;i:4;i:0;}i:6;a:5:{i:0;s:14:"customSearchID";i:1;s:1:"=";i:2;s:1:"1";i:3;i:0;i:4;i:0;}i:7;a:5:{i:0;s:17:"customSearchClass";i:1;s:1:"=";i:2;s:37:"CRM_Contact_Form_Search_Custom_Sample";i:3;i:0;i:4;i:0;}}'
+    />
+    <!-- Save Search in array(name=>value) format -->
+    <!-- State: California -->
+    <civicrm_saved_search
+        id="2"
+        form_values='a:8:{s:4:"csid";s:1:"1";s:5:"qfKey";s:37:"e195ef289c06af4f80197148086cc8db_3783";s:14:"household_name";s:0:"";s:17:"state_province_id";s:4:"1004";s:4:"task";s:2:"13";s:8:"radio_ts";s:6:"ts_all";s:12:"toggleSelect";s:1:"1";s:9:"mark_x_46";s:1:"1";}'
+    />
+    <civicrm_address
+        id="3"
+        contact_id="10"
+        location_type_id="1"
+        state_province_id="1004"
+        is_primary="1"
+    />
+    <civicrm_address
+        id="4"
+        contact_id="11"
+        location_type_id="1"
+        state_province_id="1004"
+        is_primary="1"
+    />
+    <civicrm_address
+        id="5"
+        contact_id="12"
+        location_type_id="1"
+        state_province_id="1031"
+        is_primary="1"
+    />
+    <civicrm_option_group
+       id="25"
+       name="custom_search"
+       description="Custom Search"
+       is_reserved="0"
+       is_active="1"
+    />
+    <civicrm_option_value
+       id="213"
+       option_group_id="25"
+       label="CRM_Contact_Form_Search_Custom_Sample"
+       value="1"
+       name="CRM_Contact_Form_Search_Custom_Sample"
+       filter="0"
+       weight="1"
+       description="Household Name and State"
+       is_optgroup="0"
+       is_reserved="0"
+       is_active="1"
+    />
+</dataset>

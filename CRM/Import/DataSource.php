@@ -1,15 +1,15 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
  | CiviCRM is free software; you can copy, modify, and distribute it  |
  | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2009.                                       |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
  |                                                                    |
  | CiviCRM is distributed in the hope that it will be useful, but     |
  | WITHOUT ANY WARRANTY; without even the implied warranty of         |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
  */
@@ -40,37 +40,49 @@
 abstract class CRM_Import_DataSource {
 
   /**
-   * Provides information about the data source
+   * Provides information about the data source.
    *
-   * @return array collection of info about this data source
-   *
-   * @access public
+   * @return array
+   *   Description of this data source, including:
+   *   - title: string, translated, required
+   *   - permissions: array, optional
    *
    */
   abstract public function getInfo();
 
   /**
-   * Function to set variables up before form is built
+   * Set variables up before form is built.
    *
-   * @access public
+   * @param CRM_Core_Form $form
    */
   abstract public function preProcess(&$form);
 
   /**
-   * This is function is called by the form object to get the DataSource's
-   * form snippet. It should add all fields necesarry to get the data
-   * uploaded to the temporary table in the DB.
+   * This is function is called by the form object to get the DataSource's form snippet.
    *
-   * @return void (operates directly on form argument)
-   * @access public
+   * It should add all fields necessary to get the data uploaded to the temporary table in the DB.
+   *
+   * @param CRM_Core_Form $form
    */
   abstract public function buildQuickForm(&$form);
 
   /**
-   * Function to process the form
+   * Process the form submission.
    *
-   * @access public
+   * @param array $params
+   * @param string $db
+   * @param CRM_Core_Form $form
    */
   abstract public function postProcess(&$params, &$db, &$form);
-}
 
+  /**
+   * Determine if the current user has access to this data source.
+   *
+   * @return bool
+   */
+  public function checkPermission() {
+    $info = $this->getInfo();
+    return empty($info['permissions']) || CRM_Core_Permission::check($info['permissions']);
+  }
+
+}

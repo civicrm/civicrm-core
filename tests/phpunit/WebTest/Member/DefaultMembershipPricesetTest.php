@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,24 +22,28 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Member_DefaultMembershipPricesetTest
+ */
 class WebTest_Member_DefaultMembershipPricesetTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
     parent::setUp();
   }
 
-  function testDefaultPricesetSelection() {
+  public function testDefaultPricesetSelection() {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
-    $title            = substr(sha1(rand()), 0, 7);
-    $setTitle         = "Membership Fees - $title";
-    $usedFor          = 'Membership';
+    $title = substr(sha1(rand()), 0, 7);
+    $setTitle = "Membership Fees - $title";
+    $usedFor = 'Membership';
     $contributionType = 'Member Dues';
-    $setHelp          = 'Select your membership options.';
+    $setHelp = 'Select your membership options.';
     $this->_testAddSet($setTitle, $usedFor, $contributionType, $setHelp);
 
     // Get the price set id ($sid) by retrieving and parsing the URL of the New Price Field form
@@ -60,9 +64,9 @@ class WebTest_Member_DefaultMembershipPricesetTest extends CiviSeleniumTestCase 
     $memPriceSetId = $sid;
     $membershipContributionPageId = $this->webtestAddContributionPage($hash, $rand, $pageTitle, array($processorName => 'Dummy'), TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, $memPriceSetId, FALSE, NULL, NULL, TRUE, FALSE, FALSE, TRUE, FALSE, FALSE, TRUE);
 
-    $firstName     = 'John_' . substr(sha1(rand()), 0, 7);
-    $lastName      = 'Anderson_' . substr(sha1(rand()), 0, 7);
-    $email         = "{$firstName}.{$lastName}@example.com";
+    $firstName = 'John_' . substr(sha1(rand()), 0, 7);
+    $lastName = 'Anderson_' . substr(sha1(rand()), 0, 7);
+    $email = "{$firstName}.{$lastName}@example.com";
     $contactParams = array(
       'first_name' => $firstName,
       'last_name' => $lastName,
@@ -77,49 +81,57 @@ class WebTest_Member_DefaultMembershipPricesetTest extends CiviSeleniumTestCase 
     $this->assertType('numeric', $cid);
 
     //senario 1
-    $this->openCiviPage("contribute/transact", "reset=1&id={$membershipContributionPageId}&cid={$cid}", "_qf_Main_upload-bottom");
+    $this->openCiviPage("contribute/transact", "reset=1&id={$membershipContributionPageId}&cid={$cid}&action=preview", "_qf_Main_upload-bottom");
 
-    $this->_testDefaultSenarios("National_Membership_{$title}-section", 2);
+    $this->_testDefaultSenarios("national_membership_{$title}-section", 2);
     $this->contactInfoFill($firstName, $lastName, $email, $contactParams, $streetAddress);
     $this->clickLink("_qf_Main_upload-bottom", "_qf_Confirm_next-bottom");
     $this->click("_qf_Confirm_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //senario 2
-    $this->openCiviPage("contribute/transact", "reset=1&id={$membershipContributionPageId}&cid={$cid}", "_qf_Main_upload-bottom");
+    $this->openCiviPage("contribute/transact", "reset=1&id={$membershipContributionPageId}&cid={$cid}&action=preview", "_qf_Main_upload-bottom");
     // checking
-    $this->checkOptions("National_Membership_{$title}-section", 2);
+    $this->checkOptions("national_membership_{$title}-section", 2);
     // senario 1
-    $this->_testDefaultSenarios("National_Membership_{$title}-section", 4);
-    $this->_testDefaultSenarios("Second_Membership_{$title}-section", 2);
+    $this->_testDefaultSenarios("national_membership_{$title}-section", 4);
+    $this->_testDefaultSenarios("second_membership_{$title}-section", 2);
     $this->contactInfoFill($firstName, $lastName, $email, $contactParams, $streetAddress);
     $this->clickLink("_qf_Main_upload-bottom", "_qf_Confirm_next-bottom");
     $this->click("_qf_Confirm_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //senario 3
-    $this->openCiviPage("contribute/transact", "reset=1&id={$membershipContributionPageId}&cid={$cid}", "_qf_Main_upload-bottom");
+    $this->openCiviPage("contribute/transact", "reset=1&id={$membershipContributionPageId}&cid={$cid}&action=preview", "_qf_Main_upload-bottom");
     // checking
-    $this->checkOptions("Second_Membership_{$title}-section", 2);
+    $this->checkOptions("second_membership_{$title}-section", 2);
     // senario 2
 
-    $this->_testDefaultSenarios("National_Membership_{$title}-section", 3);
+    $this->_testDefaultSenarios("national_membership_{$title}-section", 3);
     $this->contactInfoFill($firstName, $lastName, $email, $contactParams, $streetAddress);
     $this->clickLink("_qf_Main_upload-bottom", "_qf_Confirm_next-bottom");
     $this->click("_qf_Confirm_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //senario 4
-    $this->openCiviPage("contribute/transact", "reset=1&id={$membershipContributionPageId}&cid={$cid}", "_qf_Main_upload-bottom");
+    $this->openCiviPage("contribute/transact", "reset=1&id={$membershipContributionPageId}&cid={$cid}&action=preview", "_qf_Main_upload-bottom");
     // checking senario 3
     $this->assertTrue($this->isTextPresent("You have a current Lifetime Membership which does not need to be renewed."));
 
-    $this->_testDefaultSenarios("National_Membership_{$title}-section", 1);
+    $this->_testDefaultSenarios("national_membership_{$title}-section", 1);
     $this->contactInfoFill($firstName, $lastName, $email, $contactParams, $streetAddress);
-    $this->clickLink("_qf_Main_upload-bottom", "_qf_Confirm_next-bottom");
+    $this->clickLink("_qf_Main_upload-bottom", "_qf_Main_upload-bottom");
+    $this->assertTrue($this->isTextPresent("You already have a lifetime membership and cannot select a membership with a shorter term."));
   }
 
-  function contactInfoFill($firstName, $lastName, $email, $contactParams, $streetAddress) {
+  /**
+   * @param string $firstName
+   * @param string $lastName
+   * @param $email
+   * @param array $contactParams
+   * @param $streetAddress
+   */
+  public function contactInfoFill($firstName, $lastName, $email, $contactParams, $streetAddress) {
     //Credit Card Info
     $this->select("credit_card_type", "value=Visa");
     $this->type("credit_card_number", "4111111111111111");
@@ -137,15 +149,29 @@ class WebTest_Member_DefaultMembershipPricesetTest extends CiviSeleniumTestCase 
     $this->type("billing_postal_code-5", "94129");
   }
 
-  function checkOptions($priceSetSection, $optionNumber) {
+  /**
+   * @param $priceSetSection
+   * @param $optionNumber
+   */
+  public function checkOptions($priceSetSection, $optionNumber) {
     $this->assertChecked("xpath=//div[@id='priceset']/div[@class='crm-section {$priceSetSection}']/div[2]/div[{$optionNumber}]/span/input");
   }
 
-  function _testDefaultSenarios($priceSetSection, $optionNumber) {
+  /**
+   * @param $priceSetSection
+   * @param $optionNumber
+   */
+  public function _testDefaultSenarios($priceSetSection, $optionNumber) {
     $this->click("xpath=//div[@id='priceset']/div[@class='crm-section {$priceSetSection}']/div[2]/div[{$optionNumber}]/span/input");
   }
 
-  function _testAddSet($setTitle, $usedFor, $contributionType = NULL, $setHelp) {
+  /**
+   * @param $setTitle
+   * @param $usedFor
+   * @param null $contributionType
+   * @param $setHelp
+   */
+  public function _testAddSet($setTitle, $usedFor, $contributionType = NULL, $setHelp) {
     $this->openCiviPage("admin/price", "reset=1&action=add", '_qf_Set_next-bottom');
 
     // Enter Priceset fields (Title, Used For ...)
@@ -158,18 +184,29 @@ class WebTest_Member_DefaultMembershipPricesetTest extends CiviSeleniumTestCase 
     }
     elseif ($usedFor == 'Membership') {
       $this->click('extends[3]');
-      $this->waitForElementPresent( 'financial_type_id' );
-      $this->select("css=select.form-select", "label={$contributionType}");
+      $this->waitForElementPresent('financial_type_id');
+      $this->select("css=select.crm-form-select", "label={$contributionType}");
     }
 
     $this->type('help_pre', $setHelp);
 
     $this->assertChecked('is_active', 'Verify that Is Active checkbox is set.');
-    $this->clickLink('_qf_Set_next-bottom', '_qf_Field_next-bottom');
+    $this->clickLink('_qf_Set_next-bottom');
     $this->assertTrue($this->isTextPresent("Your Set '{$setTitle}' has been added. You can add fields to this set now."));
   }
 
-  function _testAddPriceFields(&$fields, &$validateString, $dateSpecificFields = FALSE, $title, $sid, $defaultPriceSet = FALSE, $contributionType) {
+  /**
+   * @param $fields
+   * @param $validateString
+   * @param bool $dateSpecificFields
+   * @param $title
+   * @param int $sid
+   * @param bool $defaultPriceSet
+   * @param $contributionType
+   *
+   * @return array
+   */
+  public function _testAddPriceFields(&$fields, &$validateString, $dateSpecificFields = FALSE, $title, $sid, $defaultPriceSet = FALSE, $contributionType) {
     if ($defaultPriceSet) {
 
       $memTypeTitle1 = 'General';
@@ -183,19 +220,19 @@ class WebTest_Member_DefaultMembershipPricesetTest extends CiviSeleniumTestCase 
     }
     elseif (!$defaultPriceSet) {
       $memTypeParams1 = $this->webtestAddMembershipType();
-      $memTypeTitle1  = $memTypeParams1['membership_type'];
-      $memTypeId1     = explode('&id=', $this->getAttribute("xpath=//div[@id='membership_type']/div[2]/table/tbody//tr/td[text()='{$memTypeTitle1}']/../td[12]/span/a[3]@href"));
-      $memTypeId1     = $memTypeId1[1];
+      $memTypeTitle1 = $memTypeParams1['membership_type'];
+      $memTypeId1 = explode('&id=', $this->getAttribute("xpath=//div[@id='membership_type']/table/tbody//tr/td/div[text()='{$memTypeTitle1}']/../../td[12]/span/a[3]@href"));
+      $memTypeId1 = $memTypeId1[1];
 
       $memTypeParams2 = $this->webtestAddMembershipType();
-      $memTypeTitle2  = $memTypeParams2['membership_type'];
-      $memTypeId2     = explode('&id=', $this->getAttribute("xpath=//div[@id='membership_type']/div[2]/table/tbody//tr/td[text()='{$memTypeTitle2}']/../td[12]/span/a[3]@href"));
-      $memTypeId2     = $memTypeId2[1];
+      $memTypeTitle2 = $memTypeParams2['membership_type'];
+      $memTypeId2 = explode('&id=', $this->getAttribute("xpath=//div[@id='membership_type']/table/tbody//tr/td/div[text()='{$memTypeTitle2}']/../../td[12]/span/a[3]@href"));
+      $memTypeId2 = $memTypeId2[1];
 
       $memTypeParams3 = $this->webtestAddMembershipType();
-      $memTypeTitle3  = $memTypeParams3['membership_type'];
-      $memTypeId3     = explode('&id=', $this->getAttribute("xpath=//div[@id='membership_type']/div[2]/table/tbody//tr/td[text()='{$memTypeTitle3}']/../td[12]/span/a[3]@href"));
-      $memTypeId3     = $memTypeId3[1];
+      $memTypeTitle3 = $memTypeParams3['membership_type'];
+      $memTypeId3 = explode('&id=', $this->getAttribute("xpath=//div[@id='membership_type']/table/tbody//tr/td/div[text()='{$memTypeTitle3}']/../../td[12]/span/a[3]@href"));
+      $memTypeId3 = $memTypeId3[1];
     }
 
     $this->openCiviPage("admin/price/field", "reset=1&action=add&sid={$sid}");
@@ -209,7 +246,8 @@ class WebTest_Member_DefaultMembershipPricesetTest extends CiviSeleniumTestCase 
       switch ($type) {
         case 'Radio':
           $options = array(
-            1 => array('label' => "$memTypeTitle1",
+            1 => array(
+              'label' => "$memTypeTitle1",
               'membership_type_id' => $memTypeId1,
               'amount' => '100.00',
             ),
@@ -229,7 +267,8 @@ class WebTest_Member_DefaultMembershipPricesetTest extends CiviSeleniumTestCase 
 
         case 'CheckBox':
           $options = array(
-            1 => array('label' => "$memTypeTitle1",
+            1 => array(
+              'label' => "$memTypeTitle1",
               'membership_type_id' => $memTypeId1,
               'amount' => '100.00',
             ),
@@ -256,5 +295,5 @@ class WebTest_Member_DefaultMembershipPricesetTest extends CiviSeleniumTestCase 
     }
     return array($memTypeTitle1, $memTypeTitle2, $memTypeTitle3);
   }
-}
 
+}

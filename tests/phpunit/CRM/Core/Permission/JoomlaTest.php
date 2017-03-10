@@ -1,11 +1,14 @@
 <?php
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-
+/**
+ * Class CRM_Core_Permission_JoomlaTest
+ * @group headless
+ */
 class CRM_Core_Permission_JoomlaTest extends CiviUnitTestCase {
 
   /**
-   * @return array (0 => input to translatePermission, 1 => expected output from translatePermission)
+   * @return array
+   *   (0 => input to translatePermission, 1 => expected output from translatePermission)
    */
   public function translateData() {
     $cases = array();
@@ -16,7 +19,7 @@ class CRM_Core_Permission_JoomlaTest extends CiviUnitTestCase {
     $cases[] = array("cms:unknown universal name", CRM_Core_Permission::ALWAYS_DENY_PERMISSION);
     $cases[] = array(
       "Joomla:civicrmplusplus.extragood:com_civicrmplusplus",
-      array("civicrmplusplus.extragood", "com_civicrmplusplus")
+      array("civicrmplusplus.extragood", "com_civicrmplusplus"),
     );
     $cases[] = array("otherruntime:foo", CRM_Core_Permission::ALWAYS_DENY_PERMISSION);
     $cases[] = array(CRM_Core_Permission::ALWAYS_DENY_PERMISSION, CRM_Core_Permission::ALWAYS_DENY_PERMISSION);
@@ -27,12 +30,15 @@ class CRM_Core_Permission_JoomlaTest extends CiviUnitTestCase {
 
   /**
    * @dataProvider translateData
-   * @param string $input the name of a permission which should be translated
-   * @param string $expected the name of an actual permission (based on translation matrix for "runtime")
+   * @param string $input
+   *   The name of a permission which should be translated.
+   * @param string $expected
+   *   The name of an actual permission (based on translation matrix for "runtime").
    */
   public function testTranslate($input, $expected) {
     $perm = new CRM_Core_Permission_Joomla();
     $actual = $perm->translateJoomlaPermission($input);
     $this->assertEquals($expected, $actual);
   }
+
 }

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,39 +23,33 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Contact_BAO_RelationshipType extends CRM_Contact_DAO_RelationshipType {
 
   /**
-   * class constructor
+   * Class constructor.
    */
-  function __construct() {
+  public function __construct() {
     parent::__construct();
   }
 
   /**
-   * Takes a bunch of params that are needed to match certain criteria and
-   * retrieves the relevant objects. Typically the valid params are only
-   * contact_id. We'll tweak this function to be more full featured over a period
-   * of time. This is the inverse function of create. It also stores all the retrieved
-   * values in the default array
+   * Fetch object based on array of properties.
    *
-   * @param array $params   (reference ) an assoc array of name/value pairs
-   * @param array $defaults (reference ) an assoc array to hold the flattened values
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $defaults
+   *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return object CRM_Contact_BAO_RelationshipType object
-   * @access public
-   * @static
+   * @return CRM_Contact_BAO_RelationshipType
    */
-  static function retrieve(&$params, &$defaults) {
+  public static function retrieve(&$params, &$defaults) {
     $relationshipType = new CRM_Contact_DAO_RelationshipType();
     $relationshipType->copyValues($params);
     if ($relationshipType->find(TRUE)) {
@@ -67,30 +61,31 @@ class CRM_Contact_BAO_RelationshipType extends CRM_Contact_DAO_RelationshipType 
   }
 
   /**
-   * update the is_active flag in the db
+   * Update the is_active flag in the db.
    *
-   * @param int      $id        id of the database record
-   * @param boolean  $is_active value we want to set the is_active field
+   * @param int $id
+   *   Id of the database record.
+   * @param bool $is_active
+   *   Value we want to set the is_active field.
    *
-   * @return Object             DAO object on sucess, null otherwise
-   * @static
+   * @return Object
+   *   DAO object on success, null otherwise
    */
-  static function setIsActive($id, $is_active) {
+  public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_Contact_DAO_RelationshipType', $id, 'is_active', $is_active);
   }
 
   /**
-   * Function to add the relationship type in the db
+   * Add the relationship type in the db.
    *
-   * @param array $params (reference ) an assoc array of name/value pairs
-   * @param array $ids    the array that holds all the db ids
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $ids
+   *   The array that holds all the db ids.
    *
-   * @return object CRM_Contact_DAO_RelationshipType
-   * @access public
-   * @static
-   *
+   * @return CRM_Contact_DAO_RelationshipType
    */
-  static function add(&$params, &$ids) {
+  public static function add(&$params, &$ids) {
     //to change name, CRM-3336
     if (empty($params['label_a_b']) && !empty($params['name_a_b'])) {
       $params['label_a_b'] = $params['name_a_b'];
@@ -126,23 +121,29 @@ class CRM_Contact_BAO_RelationshipType extends CRM_Contact_DAO_RelationshipType 
 
     $relationshipType->id = CRM_Utils_Array::value('relationshipType', $ids);
 
-    return $relationshipType->save();
+    $result = $relationshipType->save();
+
+    CRM_Core_PseudoConstant::relationshipType('label', TRUE);
+    CRM_Core_PseudoConstant::relationshipType('name', TRUE);
+    CRM_Case_XMLProcessor::flushStaticCaches();
+    return $result;
   }
 
   /**
-   * Function to delete Relationship Types
+   * Delete Relationship Types.
    *
    * @param int $relationshipTypeId
-   * @static
+   *
+   * @throws CRM_Core_Exception
+   * @return mixed
    */
-  static function del($relationshipTypeId) {
+  public static function del($relationshipTypeId) {
     // make sure relationshipTypeId is an integer
     // @todo review this as most delete functions rely on the api & form layer for this
     // or do a find first & throw error if no find
     if (!CRM_Utils_Rule::positiveInteger($relationshipTypeId)) {
       throw new CRM_Core_Exception(ts('Invalid relationship type'));
     }
-
 
     //check dependencies
 
@@ -151,14 +152,20 @@ class CRM_Contact_BAO_RelationshipType extends CRM_Contact_DAO_RelationshipType 
     $relationship->relationship_type_id = $relationshipTypeId;
     $relationship->delete();
 
-    // set all membership_type to null
-    $query = "
-UPDATE civicrm_membership_type
-  SET  relationship_type_id = NULL
- WHERE relationship_type_id = %1
-";
-    $params = array(1 => array(CRM_Core_DAO::VALUE_SEPARATOR . $relationshipTypeId . CRM_Core_DAO::VALUE_SEPARATOR, 'String'));
-    CRM_Core_DAO::executeQuery($query, $params);
+    // remove this relationship type from membership types
+    $mems = civicrm_api3('MembershipType', 'get', array(
+      'relationship_type_id' => array('LIKE' => "%{$relationshipTypeId}%"),
+      'return' => array('id', 'relationship_type_id', 'relationship_direction'),
+    ));
+    foreach ($mems['values'] as $membershipTypeId => $membershipType) {
+      $pos = array_search($relationshipTypeId, $membershipType['relationship_type_id']);
+      // Api call may have returned false positives but currently the relationship_type_id uses
+      // nonstandard serialization which makes anything more accurate impossible.
+      if ($pos !== FALSE) {
+        unset($membershipType['relationship_type_id'][$pos], $membershipType['relationship_direction'][$pos]);
+        civicrm_api3('MembershipType', 'create', $membershipType);
+      }
+    }
 
     //fixed for CRM-3323
     $mappingField = new CRM_Core_DAO_MappingField();
@@ -172,5 +179,5 @@ UPDATE civicrm_membership_type
     $relationshipType->id = $relationshipTypeId;
     return $relationshipType->delete();
   }
-}
 
+}

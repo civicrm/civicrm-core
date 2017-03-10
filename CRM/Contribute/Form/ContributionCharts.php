@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,32 +23,30 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Contribute_Form_ContributionCharts extends CRM_Core_Form {
 
   /**
-   *  Year of chart
+   *  Year of chart.
    *
    * @var int
    */
   protected $_year = NULL;
 
   /**
-   *  The type of chart
+   *  The type of chart.
    *
    * @var string
    */
   protected $_chartType = NULL;
 
-  function preProcess() {
+  public function preProcess() {
     $this->_year = CRM_Utils_Request::retrieve('year', 'Int', $this);
     $this->_chartType = CRM_Utils_Request::retrieve('type', 'String', $this);
 
@@ -62,11 +60,7 @@ class CRM_Contribute_Form_ContributionCharts extends CRM_Core_Form {
   }
 
   /**
-   * Build the form
-   *
-   * @access public
-   *
-   * @return void
+   * Build the form object.
    */
   public function buildQuickForm() {
     //p3 = Three dimensional pie chart.
@@ -88,22 +82,18 @@ class CRM_Contribute_Form_ContributionCharts extends CRM_Core_Form {
         krsort($this->_years);
       }
       foreach ($this->_years as $k => $v) {
-        $years[substr($k,0,4)] = substr($k,0,4);
+        $years[substr($k, 0, 4)] = substr($k, 0, 4);
       }
     }
 
     $this->addElement('select', 'select_year', ts('Select Year (for monthly breakdown)'), $years);
     $this->setDefaults(array(
       'select_year' => ($this->_year) ? $this->_year : $currentYear,
-      ));
+    ));
   }
 
   /**
-   * process the form after the input has been submitted and validated
-   *
-   * @access public
-   *
-   * @return void
+   * Process the form after the input has been submitted and validated.
    */
   public function postProcess() {
     $config = CRM_Core_Config::singleton();
@@ -174,9 +164,10 @@ class CRM_Contribute_Form_ContributionCharts extends CRM_Core_Form {
       if ($chartKey == 'by_year') {
         $yearlyChart = TRUE;
         if (!empty($config->fiscalYearStart) && ($config->fiscalYearStart['M'] !== 1 || $config->fiscalYearStart['d'] !== 1)) {
-          $values['xLabelAngle'] = 45 ;
-        } else {
-          $values['xLabelAngle'] = 0 ;
+          $values['xLabelAngle'] = 45;
+        }
+        else {
+          $values['xLabelAngle'] = 0;
         }
       }
       if ($chartKey == 'by_month') {
@@ -195,18 +186,18 @@ class CRM_Contribute_Form_ContributionCharts extends CRM_Core_Form {
         $urlParams = NULL;
         if ($chartKey == 'by_month') {
           $monthPosition = array_search($index, $abbrMonthNames);
-          $startDate     = CRM_Utils_Date::format(array('Y' => $selectedYear, 'M' => $monthPosition));
-          $endDate       = date('Ymd', mktime(0, 0, 0, $monthPosition + 1, 0, $selectedYear));
-          $urlParams     = "reset=1&force=1&status=1&start={$startDate}&end={$endDate}&test=0";
+          $startDate = CRM_Utils_Date::format(array('Y' => $selectedYear, 'M' => $monthPosition));
+          $endDate = date('Ymd', mktime(0, 0, 0, $monthPosition + 1, 0, $selectedYear));
+          $urlParams = "reset=1&force=1&status=1&start={$startDate}&end={$endDate}&test=0";
         }
         elseif ($chartKey == 'by_year') {
           if (!empty($config->fiscalYearStart) && ($config->fiscalYearStart['M'] != 1 || $config->fiscalYearStart['d'] != 1)) {
-            $startDate = date('Ymd', mktime(0, 0, 0, $config->fiscalYearStart['M'], $config->fiscalYearStart['d'], substr($index,0,4)));
-            $endDate   = date('Ymd', mktime(0, 0, 0, $config->fiscalYearStart['M'], $config->fiscalYearStart['d'], substr($index,0,4)+1));
+            $startDate = date('Ymd', mktime(0, 0, 0, $config->fiscalYearStart['M'], $config->fiscalYearStart['d'], substr($index, 0, 4)));
+            $endDate = date('Ymd', mktime(0, 0, 0, $config->fiscalYearStart['M'], $config->fiscalYearStart['d'], (substr($index, 0, 4)) + 1));
           }
           else {
-            $startDate = CRM_Utils_Date::format(array('Y' => substr($index,0,4)));
-            $endDate   = date('Ymd', mktime(0, 0, 0, 13, 0, substr($index,0,4)));
+            $startDate = CRM_Utils_Date::format(array('Y' => substr($index, 0, 4)));
+            $endDate = date('Ymd', mktime(0, 0, 0, 13, 0, substr($index, 0, 4)));
           }
           $urlParams = "reset=1&force=1&status=1&start={$startDate}&end={$endDate}&test=0";
         }
@@ -243,5 +234,5 @@ class CRM_Contribute_Form_ContributionCharts extends CRM_Core_Form {
     $this->assign('hasOpenFlashChart', empty($chartData) ? FALSE : TRUE);
     $this->assign('openFlashChartData', json_encode($chartData));
   }
-}
 
+}

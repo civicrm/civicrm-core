@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,10 +25,9 @@
 *}
 <div class="crm-block crm-form-block crm-activity-task-batch-form-block">
 <fieldset>
-<div id="help">
+<div class="help">
     {ts}Update field values for each Activities as needed. Click <strong>Update Activities</strong> below to save all your changes. To set a field to the same value for ALL rows, enter that value for the first Activity and then click the <strong>Copy icon</strong> (next to the column title).{/ts}
 </div>
-    <legend>{$profileTitle}</legend>
     <div class="crm-submit-buttons">{if $fields}{$form._qf_Batch_refresh.html}{/if}{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
     <table class="crm-copy-fields">
     <thead class="sticky">
@@ -48,12 +47,8 @@
            <td>{$contactDetails.$activityId.$fName}</td>
         {/foreach}
                 {foreach from=$fields item=field key=fieldName}
-                {assign var=n value=$field.name}
-                {if ( $fields.$n.data_type eq 'Date') or (  $fields.$n.name eq 'activity_date_time' ) }
-                <td class="compressed">{include file="CRM/common/jcalendar.tpl" elementName=$fieldName elementIndex=$activityId batchUpdate=1}</td>
-                {else}
+                  {assign var=n value=$field.name}
                    <td class="compressed">{$form.field.$activityId.$n.html}</td>
-                {/if}
               {/foreach}
              </tr>
               {/foreach}

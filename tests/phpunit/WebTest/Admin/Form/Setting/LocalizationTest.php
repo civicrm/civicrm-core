@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,37 +22,41 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Admin_Form_Setting_LocalizationTest
+ */
 class WebTest_Admin_Form_Setting_LocalizationTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
     parent::setUp();
   }
 
-  function testDefaultCountryIsEnabled() {
+  public function testDefaultCountryIsEnabled() {
     $this->webtestLogin();
     $this->openCiviPage("admin/setting/localization", "reset=1");
-    $this->addSelection("countryLimit-t", "label=United States");
-    $this->click("//select[@id='countryLimit-t']/option");
-    $this->click("//input[@name='remove' and @value='<< Remove' and @type='button' and @onclick=\"QFAMS.moveSelection('countryLimit', this.form.elements['countryLimit-f[]'], this.form.elements['countryLimit-t[]'], this.form.elements['countryLimit[]'], 'remove', 'none'); return false;\"]");
-    $this->addSelection("countryLimit-f", "label=Afghanistan");
-    $this->removeSelection("countryLimit-f", "label=Afghanistan");
-    $this->addSelection("countryLimit-f", "label=Cambodia");
-    $this->removeSelection("countryLimit-f", "label=Cambodia");
-    $this->addSelection("countryLimit-f", "label=Cameroon");
-    $this->removeSelection("countryLimit-f", "label=Cameroon");
-    $this->addSelection("countryLimit-f", "label=Canada");
-    $this->click("//input[@name='add' and @value='Add >>' and @type='button' and @onclick=\"QFAMS.moveSelection('countryLimit', this.form.elements['countryLimit-f[]'], this.form.elements['countryLimit-t[]'], this.form.elements['countryLimit[]'], 'add', 'none'); return false;\"]");
+    $this->addSelection("countryLimit", "label=UNITED STATES");
+    $this->click("//select[@id='countryLimit']/option");
+    $this->click("//input[@name='remove']");
+    $this->addSelection("countryLimit", "label=AFGHANISTAN");
+    $this->removeSelection("countryLimit", "label=AFGHANISTAN");
+    $this->addSelection("countryLimit", "label=CAMBODIA");
+    $this->removeSelection("countryLimit", "label=CAMBODIA");
+    $this->addSelection("countryLimit", "label=CAMEROON");
+    $this->removeSelection("countryLimit", "label=CAMEROON");
+    $this->addSelection("countryLimit", "label=CANADA");
+    $this->click("//input[@name='add']");
     $this->click("_qf_Localization_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     try {
       $this->assertFalse($this->isTextPresent("Your changes have been saved."));
     }
-    catch(PHPUnit_Framework_AssertionFailedError$e) {
+    catch (PHPUnit_Framework_AssertionFailedError$e) {
       array_push($this->verificationErrors, $e->toString());
     }
   }
-}
 
+}

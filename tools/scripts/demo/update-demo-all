@@ -52,7 +52,7 @@ if [ $JOOMLA_DEMO_DBNAME ]; then
   echo "Dropping civicrm_* tables from civicrm-joomla-demo db.."
   mysql $JOOMLA_DEMO_DBNAME < civicrm_drop.mysql
   echo "Reloading civicrm-joomla-demo with fresh civicrm_* tables.."
-  mysql $JOOMLA_DEMO_DBNAME < $TMP_DUMP_FILE 
+  mysql $JOOMLA_DEMO_DBNAME < $TMP_DUMP_FILE
   echo "Taking civicrm-joomla-demo db dump.."
   mysqldump $JOOMLA_DEMO_DBNAME > $TMP_DUMP_FILE
   if [ -f $JOOMLA_DEMO_PRISTINE ]; then

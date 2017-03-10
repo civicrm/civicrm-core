@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,19 +22,23 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'WebTest/Import/ImportCiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Import_MemberTest
+ */
 class WebTest_Import_MemberTest extends ImportCiviSeleniumTestCase {
 
   protected function setUp() {
     parent::setUp();
   }
 
-  /*
-     *  Test participant import for Individuals.
-     */
-  function testMemberImportIndividual() {
+  /**
+   *  Test participant import for Individuals.
+   */
+  public function testMemberImportIndividual() {
 
     $this->webtestLogin();
 
@@ -45,10 +49,10 @@ class WebTest_Import_MemberTest extends ImportCiviSeleniumTestCase {
     $this->importCSVComponent('Membership', $headers, $rows, 'Individual', 'Skip', $fieldMapper);
   }
 
-  /*
-     *  Test participant import for Households.
-     */
-  function testMemberImportHousehold() {
+  /**
+   *  Test participant import for Households.
+   */
+  public function testMemberImportHousehold() {
 
     $this->webtestLogin();
 
@@ -59,10 +63,10 @@ class WebTest_Import_MemberTest extends ImportCiviSeleniumTestCase {
     $this->importCSVComponent('Membership', $headers, $rows, 'Household', 'Skip', $fieldMapper);
   }
 
-  /*
-     *  Test participant import for Organizations.
-     */
-  function testMemberImportOrganization() {
+  /**
+   *  Test participant import for Organizations.
+   */
+  public function testMemberImportOrganization() {
 
     $this->webtestLogin();
 
@@ -73,10 +77,12 @@ class WebTest_Import_MemberTest extends ImportCiviSeleniumTestCase {
     $this->importCSVComponent('Membership', $headers, $rows, 'Organization', 'Skip', $fieldMapper);
   }
 
-  /*
-     * Helper function to provide data for Membeship import for Individuals.
-     */
-  function _memberIndividualCSVData() {
+  /**
+   * Helper function to provide data for Membeship import for Individuals.
+   *
+   * @return array
+   */
+  public function _memberIndividualCSVData() {
     $memTypeParams = $this->webtestAddMembershipType();
 
     $firstName1 = substr(sha1(rand()), 0, 7);
@@ -117,10 +123,12 @@ class WebTest_Import_MemberTest extends ImportCiviSeleniumTestCase {
     return array($headers, $rows, $fieldMapper);
   }
 
-  /*
-     * Helper function to provide data for Membeship import for Households.
-     */
-  function _memberHouseholdCSVData() {
+  /**
+   * Helper function to provide data for Membeship import for Households.
+   *
+   * @return array
+   */
+  public function _memberHouseholdCSVData() {
     $memTypeParams = $this->webtestAddMembershipType();
 
     $household1 = substr(sha1(rand()), 0, 7) . ' home';
@@ -159,10 +167,12 @@ class WebTest_Import_MemberTest extends ImportCiviSeleniumTestCase {
     return array($headers, $rows, $fieldMapper);
   }
 
-  /*
-     * Helper function to provide data for Membeship import for Organizations.
-     */
-  function _memberOrganizationCSVData() {
+  /**
+   * Helper function to provide data for Membeship import for Organizations.
+   *
+   * @return array
+   */
+  public function _memberOrganizationCSVData() {
     $memTypeParams = $this->webtestAddMembershipType();
 
     $organization1 = substr(sha1(rand()), 0, 7) . ' org';
@@ -200,5 +210,5 @@ class WebTest_Import_MemberTest extends ImportCiviSeleniumTestCase {
     );
     return array($headers, $rows, $fieldMapper);
   }
-}
 
+}

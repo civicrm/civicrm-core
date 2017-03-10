@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,26 +23,21 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
- * form helper class for contact name section
+ * Form helper class for contact name section.
  */
 class CRM_Contact_Form_Inline_ContactName extends CRM_Contact_Form_Inline {
 
   /**
-   * build the form elements
-   *
-   * @return void
-   * @access public
+   * Build the form object elements.
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -50,20 +45,42 @@ class CRM_Contact_Form_Inline_ContactName extends CRM_Contact_Form_Inline {
     // Build contact type specific fields
     $class = 'CRM_Contact_Form_Edit_' . $this->_contactType;
     $class::buildQuickForm($this, 1);
+    $this->addFormRule(array('CRM_Contact_Form_Inline_ContactName', 'formRule'), $this);
   }
 
   /**
-   * process the form
+   * Global validation rules for the form.
    *
-   * @return void
-   * @access public
+   * @param array $fields
+   *   Posted values of the form.
+   * @param array $errors
+   *   List of errors to be posted back to the form.
+   * @param CRM_Contact_Form_Inline_ContactName $form
+   *
+   * @return array
+   */
+  public static function formRule($fields, $errors, $form) {
+    if (empty($fields['first_name']) && empty($fields['last_name'])
+      && empty($fields['organization_name'])
+      && empty($fields['household_name'])) {
+      $emails = civicrm_api3('Email', 'getcount', array('contact_id' => $form->_contactId));
+      if (!$emails) {
+        $errorField = $form->_contactType == 'Individual' ? 'last' : strtolower($form->_contactType);
+        $errors[$errorField . '_name'] = ts('Contact with no email must have a name.');
+      }
+    }
+    return $errors;
+  }
+
+  /**
+   * Process the form.
    */
   public function postProcess() {
     $params = $this->exportValues();
 
     // Process / save contact info
     $params['contact_type'] = $this->_contactType;
-    $params['contact_id']   = $this->_contactId;
+    $params['contact_id'] = $this->_contactId;
 
     if (!empty($this->_contactSubType)) {
       $params['contact_sub_type'] = $this->_contactSubType;
@@ -73,4 +90,5 @@ class CRM_Contact_Form_Inline_ContactName extends CRM_Contact_Form_Inline {
 
     $this->response();
   }
+
 }

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,35 +23,29 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
- * This class handle activity view mode
- *
+ * This class handle activity view mode.
  */
 class CRM_Activity_Form_ActivityView extends CRM_Core_Form {
 
   /**
-   * Function to set variables up before form is built
-   *
-   * @return void
-   * @access public
+   * Set variables up before form is built.
    */
   public function preProcess() {
-    //get the activity values
+    // Get the activity values.
     $activityId = CRM_Utils_Request::retrieve('id', 'Positive', $this);
-    $context    = CRM_Utils_Request::retrieve('context', 'String', $this);
-    $cid        = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
+    $context = CRM_Utils_Request::retrieve('context', 'String', $this);
+    $cid = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
 
-    //check for required permissions, CRM-6264
+    // Check for required permissions, CRM-6264.
     if ($activityId &&
       !CRM_Activity_BAO_Activity::checkPermission($activityId, CRM_Core_Action::VIEW)
     ) {
@@ -60,7 +54,11 @@ class CRM_Activity_Form_ActivityView extends CRM_Core_Form {
 
     $session = CRM_Core_Session::singleton();
     if (!in_array($context, array(
-      'home', 'dashlet', 'dashletFullscreen'))) {
+      'home',
+      'dashlet',
+      'dashletFullscreen',
+    ))
+    ) {
       $url = CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid={$cid}&selectedChild=activity");
     }
     else {
@@ -72,7 +70,7 @@ class CRM_Activity_Form_ActivityView extends CRM_Core_Form {
     $params = array('id' => $activityId);
     CRM_Activity_BAO_Activity::retrieve($params, $defaults);
 
-    //set activity type name and description to template
+    // Set activity type name and description to template.
     list($activityTypeName, $activityTypeDescription) = CRM_Core_BAO_OptionValue::getActivityTypeDetails($defaults['activity_type_id']);
 
     $this->assign('activityTypeName', $activityTypeName);
@@ -86,10 +84,10 @@ class CRM_Activity_Form_ActivityView extends CRM_Core_Form {
 
       $full_open_report = CRM_Mailing_Event_BAO_Opened::getRows(
         $this->_mailing_id, NULL, FALSE, NULL, NULL, NULL, $cid);
-      $this->assign('openreport',$full_open_report);
+      $this->assign('openreport', $full_open_report);
 
-      $click_thru_report = CRM_Mailing_Event_BAO_TrackableURLOpen::getRows( $this->_mailing_id, NULL, FALSE, NULL, NULL, NULL, NULL, $cid);
-      $this->assign('clickreport',$click_thru_report);
+      $click_thru_report = CRM_Mailing_Event_BAO_TrackableURLOpen::getRows($this->_mailing_id, NULL, FALSE, NULL, NULL, NULL, NULL, $cid);
+      $this->assign('clickreport', $click_thru_report);
     }
 
     foreach ($defaults as $key => $value) {
@@ -98,7 +96,7 @@ class CRM_Activity_Form_ActivityView extends CRM_Core_Form {
       }
     }
 
-    //get the campaign
+    // Get the campaign.
     if ($campaignId = CRM_Utils_Array::value('campaign_id', $defaults)) {
       $campaigns = CRM_Campaign_BAO_Campaign::getCampaigns($campaignId);
       $values['campaign'] = $campaigns[$campaignId];
@@ -113,10 +111,7 @@ class CRM_Activity_Form_ActivityView extends CRM_Core_Form {
   }
 
   /**
-   * Function to build the form
-   *
-   * @return void
-   * @access public
+   * Build the form object.
    */
   public function buildQuickForm() {
     $this->addButtons(array(
@@ -129,5 +124,5 @@ class CRM_Activity_Form_ActivityView extends CRM_Core_Form {
       )
     );
   }
-}
 
+}

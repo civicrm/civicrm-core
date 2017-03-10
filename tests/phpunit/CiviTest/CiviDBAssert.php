@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
  */
@@ -43,15 +43,20 @@ class CiviDBAssert {
    * @match    array    Associative array of field name => expected value. Empty if asserting
    *                      that a DELETE occurred
    * @delete   boolean  True if we're checking that a DELETE action occurred.
+   * @param $testCase
+   * @param $daoName
+   * @param $id
+   * @param $match
+   * @param bool $delete
    */
-  function assertDBState(&$testCase, $daoName, $id, $match, $delete = FALSE) {
+  public function assertDBState(&$testCase, $daoName, $id, $match, $delete = FALSE) {
     if (empty($id)) {
       // adding this here since developers forget to check for an id
       // and hence we get the first value in the db
       $testCase->fail('ID not populated. Please fix your assertDBState usage!!!');
     }
 
-    $object   = new $daoName();
+    $object = new $daoName();
     $object->id = $id;
     $verifiedCount = 0;
 
@@ -90,8 +95,15 @@ class CiviDBAssert {
 
   /**
    * Request a record from the DB by seachColumn+searchValue. Success if a record is found.
+   * @param $testCase
+   * @param $daoName
+   * @param $searchValue
+   * @param $returnColumn
+   * @param $searchColumn
+   * @param $message
+   * @return null|string
    */
-  function assertDBNotNull(&$testCase, $daoName, $searchValue, $returnColumn, $searchColumn, $message) {
+  public function assertDBNotNull(&$testCase, $daoName, $searchValue, $returnColumn, $searchColumn, $message) {
     if (empty($searchValue)) {
       $testCase->fail("empty value passed to assertDBNotNull");
     }
@@ -103,24 +115,43 @@ class CiviDBAssert {
 
   /**
    * Request a record from the DB by seachColumn+searchValue. Success if returnColumn value is NULL.
+   * @param $testCase
+   * @param $daoName
+   * @param $searchValue
+   * @param $returnColumn
+   * @param $searchColumn
+   * @param $message
    */
-  function assertDBNull(&$testCase, $daoName, $searchValue, $returnColumn, $searchColumn, $message) {
+  public function assertDBNull(&$testCase, $daoName, $searchValue, $returnColumn, $searchColumn, $message) {
     $value = CRM_Core_DAO::getFieldValue($daoName, $searchValue, $returnColumn, $searchColumn);
     $testCase->assertNull($value, $message);
   }
 
   /**
    * Request a record from the DB by id. Success if row not found.
+   * @param $testCase
+   * @param $daoName
+   * @param $id
+   * @param $message
    */
-  function assertDBRowNotExist(&$testCase, $daoName, $id, $message) {
+  public function assertDBRowNotExist(&$testCase, $daoName, $id, $message) {
     $value = CRM_Core_DAO::getFieldValue($daoName, $id, 'id', 'id');
     $testCase->assertNull($value, $message);
   }
 
   /**
-   * Compare a single column value in a retrieved DB record to an expected value
+   * Compare a single column value in a retrieved DB record to an expected value.
+   *
+   * @param $testCase
+   * @param string $daoName
+   * @param $searchValue
+   * @param $returnColumn
+   * @param $searchColumn
+   * @param $expectedValue
+   * @param string $message
    */
-  function assertDBCompareValue(&$testCase, $daoName, $searchValue, $returnColumn, $searchColumn,
+  public function assertDBCompareValue(
+    &$testCase, $daoName, $searchValue, $returnColumn, $searchColumn,
     $expectedValue, $message
   ) {
     $value = CRM_Core_DAO::getFieldValue($daoName, $searchValue, $returnColumn, $searchColumn);
@@ -128,19 +159,27 @@ class CiviDBAssert {
   }
 
   /**
-   * Compare all values in a single retrieved DB record to an array of expected values
+   * Compare all values in a single retrieved DB record to an array of expected values.
+   * @param $testCase
+   * @param $daoName
+   * @param $searchParams
+   * @param $expectedValues
    */
-  function assertDBCompareValues(&$testCase, $daoName, $searchParams, $expectedValues) {
+  public function assertDBCompareValues(&$testCase, $daoName, $searchParams, $expectedValues) {
     //get the values from db
     $dbValues = array();
     CRM_Core_DAO::commonRetrieve($daoName, $searchParams, $dbValues);
-
 
     // compare db values with expected values
     self::assertAttributesEquals($testCase, $expectedValues, $dbValues);
   }
 
-  function assertAttributesEquals(&$testCase, &$expectedValues, &$actualValues) {
+  /**
+   * @param $testCase
+   * @param $expectedValues
+   * @param $actualValues
+   */
+  public function assertAttributesEquals(&$testCase, &$expectedValues, &$actualValues) {
     foreach ($expectedValues as $paramName => $paramValue) {
       if (isset($actualValues[$paramName])) {
         $testCase->assertEquals($paramValue, $actualValues[$paramName]);
@@ -150,4 +189,5 @@ class CiviDBAssert {
       }
     }
   }
+
 }

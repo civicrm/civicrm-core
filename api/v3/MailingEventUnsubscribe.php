@@ -1,10 +1,9 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,28 +23,23 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * APIv3 functions for registering/processing mailing group events.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_MailerGroup
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
  */
 
 /**
- * Unsubscribe from mailing group
+ * Unsubscribe from mailing group.
  *
- * @param array $params  Associative array of property
- *                       name/value pairs to insert in new 'survey'
+ * @param array $params
+ *   Array per getfields metadata.
  *
- * @return array api result array
- * {@getfields mailing_event_unsubscribe_create}
- * @access public
+ * @return array
+ *   Api result array
  */
 function civicrm_api3_mailing_event_unsubscribe_create($params) {
 
@@ -69,19 +63,31 @@ function civicrm_api3_mailing_event_unsubscribe_create($params) {
     return civicrm_api3_create_success($params);
   }
 
-
   return civicrm_api3_create_error('Queue event could not be found');
 }
 
 /**
- * Adjust Metadata for Create action
+ * Adjust Metadata for Create action.
  *
- * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * The metadata is used for setting defaults, documentation & validation.
+ *
+ * @param array $params
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_mailing_event_unsubscribe_create_spec(&$params) {
-  $params['job_id']['api.required'] = 1;
-  $params['hash']['api.required'] = 1;
-  $params['event_queue_id']['api.required'] = 1;
+  $params['job_id'] = array(
+    'api.required' => 1,
+    'title' => 'Mailing Job ID',
+    'type' => CRM_Utils_Type::T_INT,
+  );
+  $params['hash'] = array(
+    'api.required' => 1,
+    'title' => 'Mailing Hash',
+    'type' => CRM_Utils_Type::T_STRING,
+  );
+  $params['event_queue_id'] = array(
+    'api.required' => 1,
+    'title' => 'Mailing Queue ID',
+    'type' => CRM_Utils_Type::T_INT,
+  );
 }
-

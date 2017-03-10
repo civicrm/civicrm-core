@@ -1,23 +1,27 @@
 <?php
+
+/**
+ * Class CRM_Custom_Import_Form_Preview
+ */
 class CRM_Custom_Import_Form_Preview extends CRM_Import_Form_Preview {
   public $_parser = 'CRM_Custom_Import_Parser_Api';
   protected $_importParserUrl = '&parser=CRM_Custom_Import_Parser';
+
   /**
-   * Function to set variables up before form is built
+   * Set variables up before form is built.
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     $skipColumnHeader = $this->controller->exportValue('DataSource', 'skipColumnHeader');
 
     //get the data from the session
-    $dataValues       = $this->get('dataValues');
-    $mapper           = $this->get('mapper');
-    $invalidRowCount  = $this->get('invalidRowCount');
+    $dataValues = $this->get('dataValues');
+    $mapper = $this->get('mapper');
+    $invalidRowCount = $this->get('invalidRowCount');
     $conflictRowCount = $this->get('conflictRowCount');
-    $mismatchCount    = $this->get('unMatchCount');
-    $entity    = $this->get('_entity');
+    $mismatchCount = $this->get('unMatchCount');
+    $entity = $this->get('_entity');
 
     //get the mapping name displayed if the mappingId is set
     $mappingId = $this->get('loadMappingId');
@@ -54,9 +58,12 @@ class CRM_Custom_Import_Form_Preview extends CRM_Import_Form_Preview {
 
     $properties = array(
       'mapper',
-      'dataValues', 'columnCount',
-      'totalRowCount', 'validRowCount',
-      'invalidRowCount', 'conflictRowCount',
+      'dataValues',
+      'columnCount',
+      'totalRowCount',
+      'validRowCount',
+      'invalidRowCount',
+      'conflictRowCount',
       'downloadErrorRecordsUrl',
       'downloadConflictRecordsUrl',
       'downloadMismatchRecordsUrl',
@@ -68,22 +75,19 @@ class CRM_Custom_Import_Form_Preview extends CRM_Import_Form_Preview {
   }
 
   /**
-   * Process the mapped fields and map it into the uploaded file
+   * Process the mapped fields and map it into the uploaded file.
    * preview the file and extract some summary statistics
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
-    $fileName         = $this->controller->exportValue('DataSource', 'uploadFile');
+    $fileName = $this->controller->exportValue('DataSource', 'uploadFile');
+    $separator = $this->controller->exportValue('DataSource', 'fieldSeparator');
     $skipColumnHeader = $this->controller->exportValue('DataSource', 'skipColumnHeader');
-    $invalidRowCount  = $this->get('invalidRowCount');
+    $invalidRowCount = $this->get('invalidRowCount');
     $conflictRowCount = $this->get('conflictRowCount');
-    $onDuplicate      = $this->get('onDuplicate');
-    $entity           = $this->get('_entity');
-
-    $config = CRM_Core_Config::singleton();
-    $separator = $config->fieldSeparator;
+    $onDuplicate = $this->get('onDuplicate');
+    $entity = $this->get('_entity');
 
     $mapper = $this->controller->exportValue('MapField', 'mapper');
     $mapperKeys = array();
@@ -115,7 +119,7 @@ class CRM_Custom_Import_Form_Preview extends CRM_Import_Form_Preview {
     // add all the necessary variables to the form
     $parser->set($this, CRM_Import_Parser::MODE_IMPORT);
 
-    // check if there is any error occured
+    // check if there is any error occurred
 
     $errorStack = CRM_Core_Error::singleton();
     $errors = $errorStack->getErrors();
@@ -142,4 +146,5 @@ class CRM_Custom_Import_Form_Preview extends CRM_Import_Form_Preview {
       $this->set('downloadMismatchRecordsUrl', CRM_Utils_System::url('civicrm/export', $urlParams));
     }
   }
+
 }

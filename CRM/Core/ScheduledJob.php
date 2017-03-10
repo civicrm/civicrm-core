@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,14 +23,14 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * This interface defines methods that need to be implemented
  * by every scheduled job (cron task) in CiviCRM.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
  */
@@ -44,14 +44,9 @@ class CRM_Core_ScheduledJob {
 
   var $remarks = array();
 
-  /*
-     * Class constructor
-     *
-     * @param string $namespace namespace prefix for component's files
-     * @access public
-     *
-     */
-
+  /**
+   * @param array $params
+   */
   public function __construct($params) {
     foreach ($params as $name => $param) {
       $this->$name = $param;
@@ -72,7 +67,7 @@ class CRM_Core_ScheduledJob {
 
       foreach ($lines as $line) {
         $pair = explode("=", $line);
-        if (empty($pair[0]) || empty($pair[1])) {
+        if ($pair === FALSE || count($pair) != 2 || trim($pair[0]) == '' || trim($pair[1]) == '') {
           $this->remarks[] .= 'Malformed parameters!';
           break;
         }
@@ -81,14 +76,43 @@ class CRM_Core_ScheduledJob {
     }
   }
 
+  /**
+   * @param null $date
+   */
   public function saveLastRun($date = NULL) {
-    $dao           = new CRM_Core_DAO_Job();
-    $dao->id       = $this->id;
+    $dao = new CRM_Core_DAO_Job();
+    $dao->id = $this->id;
     $dao->last_run = ($date == NULL) ? CRM_Utils_Date::currentDBDate() : CRM_Utils_Date::currentDBDate($date);
     $dao->save();
   }
 
+  /**
+   * @return void
+   */
+  public function clearScheduledRunDate() {
+    CRM_Core_DAO::executeQuery('UPDATE civicrm_job SET scheduled_run_date = NULL WHERE id = %1',
+      array(
+        '1' => array($this->id, 'Integer'),
+      ));
+  }
+
+  /**
+   * @return bool
+   */
   public function needsRunning() {
+
+    // CRM-17686
+    // check if the job has a specific scheduled date/time
+    if (!empty($this->scheduled_run_date)) {
+      if (strtotime($this->scheduled_run_date) <= time()) {
+        $this->clearScheduledRunDate();
+        return TRUE;
+      }
+      else {
+        return FALSE;
+      }
+    }
+
     // run if it was never run
     if (empty($this->last_run)) {
       return TRUE;
@@ -99,26 +123,40 @@ class CRM_Core_ScheduledJob {
       case 'Always':
         return TRUE;
 
-      case 'Hourly':
-        $now     = CRM_Utils_Date::currentDBDate();
-        $hourAgo = strtotime('-1 hour', strtotime($now));
-        $lastRun = strtotime($this->last_run);
-        if ($lastRun < $hourAgo) {
-          return TRUE;
-        }
+      // CRM-17669
+      case 'Yearly':
+        $offset = '+1 year';
+        break;
+
+      case 'Quarter':
+        $offset = '+3 months';
+        break;
+
+      case 'Monthly':
+        $offset = '+1 month';
+        break;
+
+      case 'Weekly':
+        $offset = '+1 week';
+        break;
 
       case 'Daily':
-        $now     = CRM_Utils_Date::currentDBDate();
-        $dayAgo  = strtotime('-1 day', strtotime($now));
-        $lastRun = strtotime($this->last_run);
-        if ($lastRun < $dayAgo) {
-          return TRUE;
-        }
+        $offset = '+1 day';
+        break;
+
+      case 'Hourly':
+        $offset = '+1 hour';
+        break;
     }
 
-    return FALSE;
+    $now = strtotime(CRM_Utils_Date::currentDBDate());
+    $lastTime = strtotime($this->last_run);
+    $nextTime = strtotime($offset, $lastTime);
+
+    return ($now >= $nextTime);
   }
 
-  public function __destruct() {}
-}
+  public function __destruct() {
+  }
 
+}

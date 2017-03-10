@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,30 +23,29 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
+ * Joomla class.
  *
+ * (clearly copied & pasted from a drupal class).
+ *
+ * Still used?
  */
 class CRM_Core_Joomla {
 
   /**
-   * Reuse drupal blocks into a left sidebar. Assign the generated template
-   * to the smarty instance
+   * Reuse drupal blocks into a left sidebar.
    *
-   * @return void
-   * @access public
-   * @static
+   * Assign the generated template to the smarty instance.
    */
-  static function sidebarLeft() {
+  public static function sidebarLeft() {
     $config = CRM_Core_Config::singleton();
 
     if ($config->userFrameworkFrontend) {
@@ -73,5 +72,5 @@ class CRM_Core_Joomla {
     $sidebarLeft = $template->fetch('CRM/Block/blocks.tpl');
     $template->assign_by_ref('sidebarLeft', $sidebarLeft);
   }
-}
 
+}

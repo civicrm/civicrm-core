@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,36 +23,48 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * This class stores logic for managing CiviCRM extensions.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Extension_Manager_Module extends CRM_Extension_Manager_Base {
 
+  /**
+   * @param CRM_Extension_Mapper $mapper
+   */
   public function __construct(CRM_Extension_Mapper $mapper) {
     parent::__construct(FALSE);
     $this->mapper = $mapper;
   }
 
+  /**
+   * @param CRM_Extension_Info $info
+   */
   public function onPreInstall(CRM_Extension_Info $info) {
     $this->callHook($info, 'install');
     $this->callHook($info, 'enable');
   }
 
+  /**
+   * @param CRM_Extension_Info $info
+   */
   public function onPostPostInstall(CRM_Extension_Info $info) {
     $this->callHook($info, 'postInstall');
   }
 
+  /**
+   * @param CRM_Extension_Info $info
+   * @param string $hookName
+   */
   private function callHook(CRM_Extension_Info $info, $hookName) {
     try {
       $file = $this->mapper->keyToPath($info->key);
-    } catch (CRM_Extension_Exception $e) {
+    }
+    catch (CRM_Extension_Exception $e) {
       return;
     }
     if (!file_exists($file)) {
@@ -65,20 +77,34 @@ class CRM_Extension_Manager_Module extends CRM_Extension_Manager_Base {
     }
   }
 
+  /**
+   * @param CRM_Extension_Info $info
+   *
+   * @return bool
+   */
   public function onPreUninstall(CRM_Extension_Info $info) {
     $this->callHook($info, 'uninstall');
     return TRUE;
   }
 
+  /**
+   * @param CRM_Extension_Info $info
+   */
   public function onPostUninstall(CRM_Extension_Info $info) {
   }
 
+  /**
+   * @param CRM_Extension_Info $info
+   */
   public function onPreDisable(CRM_Extension_Info $info) {
     $this->callHook($info, 'disable');
   }
 
+  /**
+   * @param CRM_Extension_Info $info
+   */
   public function onPreEnable(CRM_Extension_Info $info) {
     $this->callHook($info, 'enable');
   }
-}
 
+}

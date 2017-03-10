@@ -31,7 +31,7 @@
     <dataPattern>/^\d+$/</dataPattern>
     <comment>FK to Contact ID</comment>
     <html>
-       <type>Autocomplete-Select</type>
+       <type>EntityRef</type>
      </html>
     <add>1.3</add>
   </field>
@@ -78,7 +78,6 @@
   <field>
     <name>financial_type_id</name>
     <title>Financial Type</title>
-    <export>false</export>
     <type>int unsigned</type>
     <comment>FK to Financial Type for (total_amount - non_deductible_amount).</comment>
     <pseudoconstant>
@@ -86,6 +85,7 @@
       <keyColumn>id</keyColumn>
       <labelColumn>name</labelColumn>
     </pseudoconstant>
+    <export>true</export>
     <html>
       <type>Select</type>
     </html>
@@ -99,7 +99,7 @@
   </foreignKey>
   <field>
     <name>contribution_page_id</name>
-    <title>Contribution Page</title>
+    <title>Contribution Page ID</title>
     <type>int unsigned</type>
     <import>true</import>
     <comment>The Contribution Page which triggered this contribution</comment>
@@ -121,10 +121,12 @@
   </foreignKey>
   <field>
     <name>payment_instrument_id</name>
-    <uniqueName>contribution_payment_instrument_id</uniqueName>
-    <title>Payment Instrument</title>
+    <uniqueName>payment_instrument_id</uniqueName>
+    <title>Payment Method ID</title>
     <type>int unsigned</type>
     <comment>FK to Payment Instrument</comment>
+    <export>true</export>
+    <headerPattern>/^payment|(p(ayment\s)?instrument)$/i</headerPattern>
     <pseudoconstant>
       <optionGroupName>payment_instrument</optionGroupName>
     </pseudoconstant>
@@ -140,14 +142,16 @@
   </index>
   <field>
     <name>receive_date</name>
+    <title>Date Received</title>
     <type>datetime</type>
     <import>true</import>
     <headerPattern>/receive(.?date)?/i</headerPattern>
     <dataPattern>/^\d{4}-?\d{2}-?\d{2} ?(\d{2}:?\d{2}:?(\d{2})?)?$/</dataPattern>
-    <comment>when was gift received</comment>
+    <comment>Date contribution was received - not necessarily the creation date of the record</comment>
     <add>1.3</add>
     <html>
      <type>Select Date</type>
+     <formatType>activityDateTime</formatType>
    </html>
   </field>
   <field>
@@ -177,6 +181,12 @@
      <type>Text</type>
    </html>
   </field>
+  <index>
+    <name>index_total_amount_receive_date</name>
+    <fieldName>total_amount</fieldName>
+    <fieldName>receive_date</fieldName>
+    <add>4.7</add>
+  </index>
   <field>
     <name>fee_amount</name>
     <type>decimal</type>
@@ -224,7 +234,7 @@
     <comment>unique invoice id, system generated or passed in</comment>
     <html>
       <type>Text</type>
-    </html>  
+    </html>
     <add>1.3</add>
     </field>
   <field>
@@ -241,7 +251,7 @@
       <table>civicrm_currency</table>
       <keyColumn>name</keyColumn>
       <labelColumn>full_name</labelColumn>
-      <nameColumn>numeric_code</nameColumn>
+      <nameColumn>name</nameColumn>
     </pseudoconstant>
     <html>
       <type>Select</type>
@@ -257,6 +267,7 @@
     <add>1.3</add>
     <html>
       <type>Select Date</type>
+      <formatType>activityDateTime</formatType>
     </html>
   </field>
   <field>
@@ -267,7 +278,7 @@
     <html>
       <type>Text</type>
     </html>
-    <add>1.3</add>    
+    <add>1.3</add>
   </field>
   <field>
     <name>receipt_date</name>
@@ -278,8 +289,9 @@
     <comment>when (if) receipt was sent. populated automatically for online donations w/ automatic receipting</comment>
     <html>
       <type>Select Date</type>
+      <formatType>activityDateTime</formatType>
     </html>
-    <add>1.3</add>    
+    <add>1.3</add>
   </field>
   <field>
     <name>thankyou_date</name>
@@ -292,6 +304,7 @@
     <add>1.3</add>
     <html>
       <type>Select Date</type>
+      <formatType>activityDateTime</formatType>
     </html>
   </field>
   <field>
@@ -308,6 +321,11 @@
       <type>Text</type>
     </html>
   </field>
+  <index>
+    <name>index_source</name>
+    <fieldName>source</fieldName>
+    <add>4.7</add>
+  </index>
   <field>
     <name>amount_level</name>
     <title>Amount Label</title>
@@ -342,8 +360,10 @@
   </index>
   <field>
     <name>contribution_recur_id</name>
+    <title>Recurring Contribution ID</title>
     <type>int unsigned</type>
     <comment>Conditional foreign key to civicrm_contribution_recur id. Each contribution made in connection with a recurring contribution carries a foreign key to the recurring contribution record. This assumes we can track these processor initiated events.</comment>
+    <export>true</export>
     <add>1.4</add>
   </field>
   <foreignKey>
@@ -376,7 +396,7 @@
   </field>
   <field>
     <name>contribution_status_id</name>
-    <title>Contribution Status</title>
+    <title>Contribution Status ID</title>
     <type>int unsigned</type>
     <default>1</default>
     <import>true</import>
@@ -402,9 +422,12 @@
   </index>
   <field>
     <name>address_id</name>
+    <uniqueName>contribution_address_id</uniqueName>
+    <title>Contribution Address</title>
     <type>int unsigned</type>
     <comment>Conditional foreign key to civicrm_address.id. We insert an address record for each contribution when we have associated billing name and address data.</comment>
     <add>2.2</add>
+    <export>true</export>
   </field>
   <foreignKey>
     <name>address_id</name>
@@ -416,12 +439,13 @@
   <field>
     <name>check_number</name>
     <title>Check Number</title>
+    <uniqueName>contribution_check_number</uniqueName>
     <headerPattern>/check(.?number)?/i</headerPattern>
     <type>varchar</type>
     <length>255</length>
     <html>
       <type>Text</type>
-      <size>SIX</size>
+      <size>6</size>
     </html>
     <import>true</import>
     <add>2.2</add>
@@ -448,10 +472,54 @@
       <type>Select</type>
     </html>
   </field>
+  <field>
+    <name>creditnote_id</name>
+    <title>Credit Note ID</title>
+    <type>varchar</type>
+    <length>255</length>
+    <import>true</import>
+    <headerPattern>/creditnote(.?id)?/i</headerPattern>
+    <comment>unique credit note id, system generated or passed in</comment>
+    <add>4.6</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <index>
+    <name>index_creditnote_id</name>
+    <fieldName>creditnote_id</fieldName>
+    <add>4.7</add>
+  </index>
+  <field>
+    <name>tax_amount</name>
+    <title>Tax Amount</title>
+    <type>decimal</type>
+    <import>true</import>
+    <headerPattern>/tax(.?am(ou)?nt)?/i</headerPattern>
+    <dataPattern>/^\d+(\.\d{2})?$/</dataPattern>
+    <comment>Total tax amount of this contribution.</comment>
+    <add>4.6</add>
+    <html>
+     <type>Text</type>
+   </html>
+  </field>
   <foreignKey>
     <name>campaign_id</name>
     <table>civicrm_campaign</table>
     <key>id</key>
     <onDelete>SET NULL</onDelete>
   </foreignKey>
+  <field>
+    <name>revenue_recognition_date</name>
+    <type>datetime</type>
+    <import>true</import>
+    <headerPattern>/revenue(.?date)?/i</headerPattern>
+    <dataPattern>/^\d{4}-?\d{2}-?\d{2} ?(\d{2}:?\d{2}:?(\d{2})?)?$/</dataPattern>
+    <comment>Stores the date when revenue should be recognized.</comment>
+    <html>
+      <type>Select Date</type>
+        <formatType>activityDateTime</formatType>
+    </html>
+    <add>4.7</add>
+  </field>
 </table>

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
  */
@@ -36,13 +36,17 @@
 /**
  * Format the given monetary amount (and currency) for display
  *
- * @param float $amount     the monetary amount up for display
- * @param string $currency  the (optional) currency
+ * @param float $amount
+ *   The monetary amount up for display.
+ * @param string $currency
+ *   The (optional) currency.
  *
- * @return string  formatted monetary amount
- * @access public
+ * @param null $format
+ * @param bool $onlyNumber
+ *
+ * @return string
+ *   formatted monetary amount
  */
 function smarty_modifier_crmMoney($amount, $currency = NULL, $format = NULL, $onlyNumber = FALSE) {
   return CRM_Utils_Money::format($amount, $currency, $format, $onlyNumber);
 }
-

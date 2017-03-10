@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,19 +23,16 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
- * This class generates form components for Activity Filter
- *
+ * This class generates form components for Activity Filter.
  */
 class CRM_Activity_Form_ActivityFilter extends CRM_Core_Form {
   public function buildQuickForm() {
@@ -48,20 +45,25 @@ class CRM_Activity_Form_ActivityFilter extends CRM_Core_Form {
     $this->assign('suppressForm', TRUE);
   }
 
-  function setDefaultValues() {
+  /**
+   * This virtual function is used to set the default values of
+   * various form elements
+   *
+   * access        public
+   *
+   * @return array
+   *   reference to the array of default values
+   */
+  public function setDefaultValues() {
     // CRM-11761 retrieve user's activity filter preferences
     $defaults = array();
-    $session = CRM_Core_Session::singleton();
-    $userID = $session->get('userID');
+    $userID = CRM_Core_Session::getLoggedInContactID();
     if ($userID) {
-      $defaults = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::PERSONAL_PREFERENCES_NAME,
-        'activity_tab_filter',
-        NULL,
-        NULL,
-        $userID
-      );
+      $defaults = Civi::service('settings_manager')
+        ->getBagByContact(NULL, $userID)
+        ->get('activity_tab_filter');
     }
     return $defaults;
   }
-}
 
+}

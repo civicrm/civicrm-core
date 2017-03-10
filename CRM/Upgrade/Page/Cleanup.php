@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,26 +23,42 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
-class CRM_Upgrade_Page_Cleanup  extends CRM_Core_Page {
+ */
+
+/**
+ * Class CRM_Upgrade_Page_Cleanup
+ */
+class CRM_Upgrade_Page_Cleanup extends CRM_Core_Page {
   public function cleanup425() {
-    $rows     = CRM_Upgrade_Incremental_php_FourTwo::deleteInvalidPairs();
+    $rows = CRM_Upgrade_Incremental_php_FourTwo::deleteInvalidPairs();
     $template = CRM_Core_Smarty::singleton();
 
-    $columnHeaders = array("Contact ID", "ContributionID", "Contribution Status", "MembershipID",
-                           "Membership Type", "Start Date", "End Date", "Membership Status", "Action");
+    $columnHeaders = array(
+      "Contact ID",
+      "ContributionID",
+      "Contribution Status",
+      "MembershipID",
+      "Membership Type",
+      "Start Date",
+      "End Date",
+      "Membership Status",
+      "Action",
+    );
     $template->assign('columnHeaders', $columnHeaders);
     $template->assign('rows', $rows);
 
     $preMessage = !empty($rows) ? ts('The following records have been processed. Membership records with action = Un-linked have been disconnected from the listed contribution record:') : ts('Could not find any records to process.');
     $template->assign('preMessage', $preMessage);
 
-    $postMessage =  ts('You can <a href="%1">click here</a> to try running the 4.2 upgrade script again. <a href="%2" target="_blank">(Review upgrade documentation)</a>',
-                    array(1 => CRM_Utils_System::url('civicrm/upgrade', 'reset=1'),
-                          2 => 'http://wiki.civicrm.org/confluence/display/CRMDOC/Installation+and+Upgrades'));
+    $postMessage = ts('You can <a href="%1">click here</a> to try running the 4.2 upgrade script again. <a href="%2" target="_blank">(Review upgrade documentation)</a>',
+      array(
+        1 => CRM_Utils_System::url('civicrm/upgrade', 'reset=1'),
+        2 => 'http://wiki.civicrm.org/confluence/display/CRMDOC/Installation+and+Upgrades',
+      ));
     $template->assign('postMessage', $postMessage);
 
     $content = $template->fetch('CRM/common/upgradeCleanup.tpl');
     echo CRM_Utils_System::theme($content, FALSE, TRUE);
   }
+
 }

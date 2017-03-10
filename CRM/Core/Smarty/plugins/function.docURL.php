@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
  */
@@ -37,18 +37,19 @@
  * Given one of: ( page, title, text ) parameters, generates
  * an HTML link to documentation.
  *
- * @param array  $params the function params
- * @param object $smarty reference to the smarty object
+ * @param array $params
+ *   The function params.
+ * @param CRM_Core_Smarty $smarty
+ *   Reference to the smarty object.
  *
- * @return string HTML code of a link to documentation
- * @access public
+ * @return string|NULL
+ *   HTML code of a link to documentation
  */
 function smarty_function_docURL($params, &$smarty) {
   if (!isset($smarty)) {
-    return;
+    return NULL;
   }
   else {
     return CRM_Utils_System::docURL($params);
   }
 }
-

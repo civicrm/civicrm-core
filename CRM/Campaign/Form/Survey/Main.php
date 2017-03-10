@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,35 +23,39 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
- * This class generates form components for processing a survey
- *
+ * This class generates form components for processing a survey.
  */
 class CRM_Campaign_Form_Survey_Main extends CRM_Campaign_Form_Survey {
 
   /* values
-     *
-     * @var array
-     */
+   *
+   * @var array
+   */
 
   public $_values;
 
   /**
-   * context
+   * Context.
    *
    * @var string
    */
   protected $_context;
+
+  /**
+   * Explicitly declare the entity api name.
+   */
+  public function getDefaultEntity() {
+    return 'Survey';
+  }
 
   public function preProcess() {
     parent::preProcess();
@@ -64,13 +68,6 @@ class CRM_Campaign_Form_Survey_Main extends CRM_Campaign_Form_Survey {
 
     if ($this->_action & CRM_Core_Action::UPDATE) {
       CRM_Utils_System::setTitle(ts('Configure Survey') . ' - ' . $this->_surveyTitle);
-    }
-
-    $this->_cdType = CRM_Utils_Array::value('type', $_GET);
-    $this->assign('cdType', FALSE);
-    if ($this->_cdType) {
-      $this->assign('cdType', TRUE);
-      return CRM_Custom_Form_CustomData::preProcess($this);
     }
 
     // when custom data is included in this page
@@ -101,18 +98,13 @@ class CRM_Campaign_Form_Survey_Main extends CRM_Campaign_Form_Survey {
   }
 
   /**
-   * This function sets the default values for the form. Note that in edit/view mode
+   * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @param null
-   *
-   * @return array    array of default values
-   * @access public
+   * @return array
+   *   array of default values
    */
-  function setDefaultValues() {
-    if ($this->_cdType) {
-      return CRM_Custom_Form_CustomData::setDefaultValues($this);
-    }
+  public function setDefaultValues() {
 
     $defaults = $this->_values;
 
@@ -141,33 +133,25 @@ class CRM_Campaign_Form_Survey_Main extends CRM_Campaign_Form_Survey {
   }
 
   /**
-   * Function to actually build the form
-   *
-   * @param null
-   *
-   * @return void
-   * @access public
+   * Build the form object.
    */
   public function buildQuickForm() {
-    if ($this->_cdType) {
-      return CRM_Custom_Form_CustomData::buildQuickForm($this);
-    }
 
     $this->add('text', 'title', ts('Title'), CRM_Core_DAO::getAttribute('CRM_Campaign_DAO_Survey', 'title'), TRUE);
 
     $surveyActivityTypes = CRM_Campaign_BAO_Survey::getSurveyActivityType();
     // Activity Type id
-    $this->addSelect('activity_type_id', array(), TRUE);
+    $this->addSelect('activity_type_id', array('option_url' => 'civicrm/admin/campaign/surveyType'), TRUE);
 
     // Campaign id
     $campaigns = CRM_Campaign_BAO_Campaign::getCampaigns(CRM_Utils_Array::value('campaign_id', $this->_values));
     $this->add('select', 'campaign_id', ts('Campaign'), array('' => ts('- select -')) + $campaigns);
 
     // script / instructions
-    $this->addWysiwyg('instructions', ts('Instructions for interviewers'), array('rows' => 5, 'cols' => 40));
+    $this->add('wysiwyg', 'instructions', ts('Instructions for interviewers'), array('rows' => 5, 'cols' => 40));
 
     // release frequency
-    $this->add('text', 'release_frequency', ts('Release frequency'), CRM_Core_DAO::getAttribute('CRM_Campaign_DAO_Survey', 'release_frequency'));
+    $this->add('text', 'release_frequency', ts('Release Frequency'), CRM_Core_DAO::getAttribute('CRM_Campaign_DAO_Survey', 'release_frequency'));
 
     $this->addRule('release_frequency', ts('Release Frequency interval should be a positive number.'), 'positiveInteger');
 
@@ -189,12 +173,7 @@ class CRM_Campaign_Form_Survey_Main extends CRM_Campaign_Form_Survey {
   }
 
   /**
-   * Process the form
-   *
-   * @param null
-   *
-   * @return void
-   * @access public
+   * Process the form.
    */
   public function postProcess() {
     // store the submitted values in an array
@@ -217,7 +196,6 @@ class CRM_Campaign_Form_Survey_Main extends CRM_Campaign_Form_Survey {
     $params['is_default'] = CRM_Utils_Array::value('is_default', $params, 0);
 
     $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
-      $customFields,
       $this->_surveyId,
       'Survey'
     );
@@ -226,11 +204,13 @@ class CRM_Campaign_Form_Survey_Main extends CRM_Campaign_Form_Survey {
 
     if (!empty($this->_values['result_id'])) {
       $query = "SELECT COUNT(*) FROM civicrm_survey WHERE result_id = %1";
-      $countSurvey = (int)CRM_Core_DAO::singleValueQuery($query,
+      $countSurvey = (int) CRM_Core_DAO::singleValueQuery($query,
         array(
-          1 => array($this->_values['result_id'],
+          1 => array(
+            $this->_values['result_id'],
             'Positive',
-          ))
+          ),
+        )
       );
       // delete option group if no any survey is using it.
       if (!$countSurvey) {
@@ -240,5 +220,5 @@ class CRM_Campaign_Form_Survey_Main extends CRM_Campaign_Form_Survey {
 
     parent::endPostProcess();
   }
-}
 
+}

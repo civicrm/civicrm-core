@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,10 +27,11 @@
 
 {if $surveys}
   <div class="action-link">
-    <a href="{$addSurveyUrl}" class="button"><span>&raquo; {ts}Add Survey{/ts}</span></a>
+    <a href="{$addSurveyUrl}" class="button">
+      <span><i class="crm-i fa-plus-circle"></i> {ts}Add Survey{/ts}</span>
+    </a>
   </div>
  {include file="CRM/common/enableDisableApi.tpl"}
- {include file="CRM/common/crmeditable.tpl"}
  {include file="CRM/common/jsortable.tpl"}
   <div id="surveyList">
     <table id="options" class="display">
@@ -65,9 +66,11 @@
 
 {else}
   <div class="status">
-    <div class="icon inform-icon"></div>&nbsp;{ts}No survey found.{/ts}
+    <div class="icon inform-icon"></div>&nbsp;{ts}None found.{/ts}
   </div>
 {/if}
 <div class="action-link">
-   <a href="{$addSurveyUrl}" class="button"><span>&raquo; {ts}Add Survey{/ts}</span></a>
+  <a href="{$addSurveyUrl}" class="button">
+    <span><i class="crm-i fa-plus-circle"></i> {ts}Add Survey{/ts}</span>
+  </a>
 </div>

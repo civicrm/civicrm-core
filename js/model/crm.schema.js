@@ -1,5 +1,4 @@
-(function($) {
-  var CRM = (window.CRM) ? (window.CRM) : (window.CRM = {});
+(function($, _) {
   if (!CRM.Schema) CRM.Schema = {};
 
   /**
@@ -49,4 +48,4 @@
     initialize: function() {
     }
   });
-})(cj);
+})(CRM.$, CRM._);

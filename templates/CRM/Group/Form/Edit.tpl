@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,7 +25,7 @@
 *}
 {* this template is used for adding/editing group (name and description only)  *}
 <div class="crm-block crm-form-block crm-group-form-block">
-    <div id="help">
+    <div class="help">
   {if $action eq 2}
       {capture assign=crmURL}class="no-popup" href="{crmURL p="civicrm/group/search" q="reset=1&force=1&context=smog&gid=`$group.id`"}"{/capture}
       {ts 1=$crmURL}You can edit the Name and Description for this group here. Click <a %1>Contacts in this Group</a> to view, add or remove contacts in this group.{/ts}
@@ -88,23 +88,12 @@
     </table>
 
   {*CRM-14190*}
-  {include file="CRM/Group/Form/ParentGroups.tpl"}
-
-    {if $form.organization_id}
-  <h3>{ts}Associated Organization{/ts} {help id="id-group-organization" file="CRM/Group/Page/Group.hlp"}</h3>
-          <table class="form-layout-compressed">
-        <tr class="crm-group-form-block-organization">
-            <td class="label">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{$form.organization_id.label}</td>
-      <td>{$form.organization_id.html|crmAddClass:huge}
-      </td>
-        </tr>
-    </table>
-    {/if}
+  {include file="CRM/Group/Form/GroupsCommon.tpl"}
 
     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
     {if $action neq 1}
   <div class="action-link">
-      <a class="no-popup" href="{$crmURL}">&raquo; {ts}Contacts in this Group{/ts}</a>
+      <a {$crmURL}>&raquo; {ts}Contacts in this Group{/ts}</a>
       {if $group.saved_search_id}
           <br />
     {if $group.mapping_id}
@@ -118,7 +107,6 @@
       {/if}
   </div>
     {/if}
-</fieldset>
 
 {literal}
 <script type="text/javascript">

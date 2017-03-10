@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,13 +23,13 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
  */
@@ -41,45 +41,40 @@
 class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
 
   /**
-   * how many locationBlocks should we display?
+   * How many locationBlocks should we display?
    *
    * @var int
    * @const
    */
-  CONST LOCATION_BLOCKS = 1;
+  const LOCATION_BLOCKS = 1;
 
   /**
-   * the variable, for storing the location array
+   * The variable, for storing the location array
    *
    * @var array
    */
   protected $_locationIds = array();
 
   /**
-   * the variable, for storing location block id with event
+   * The variable, for storing location block id with event
    *
    * @var int
    */
   protected $_oldLocBlockId = 0;
 
   /**
-   * get the db values for this form
-   *
+   * Get the db values for this form.
    */
   public $_values = array();
 
   /**
-   * Function to set variables up before form is built
-   *
-   * @return void
-   * @access public
+   * Set variables up before form is built.
    */
-  function preProcess() {
+  public function preProcess() {
     parent::preProcess();
 
     $this->_values = $this->get('values');
     if ($this->_id && empty($this->_values)) {
-
       //get location values.
       $params = array(
         'entity_id' => $this->_id,
@@ -98,22 +93,17 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
   }
 
   /**
-   * This function sets the default values for the form. Note that in edit/view mode
-   * the default values are retrieved from the database
+   * Set default values for the form.
    *
-   * @access public
-   *
-   * @return void
+   * Note that in edit/view mode the default values are retrieved from the database.
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = $this->_values;
 
     if (!empty($defaults['loc_block_id'])) {
       $defaults['loc_event_id'] = $defaults['loc_block_id'];
       $countLocUsed = CRM_Event_BAO_Event::countEventsUsingLocBlockId($defaults['loc_block_id']);
-      if ($countLocUsed > 1) {
-        $this->assign('locUsed', TRUE);
-      }
+      $this->assign('locUsed', $countLocUsed);
     }
 
     $config = CRM_Core_Config::singleton();
@@ -125,56 +115,36 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
       $defaults['address'][1]['state_province_id'] = $config->defaultContactStateProvince;
     }
 
-    if (!empty($defaults['address'])) {
-      foreach ($defaults['address'] as $key => $value) {
-        CRM_Contact_Form_Edit_Address::fixStateSelect($this,
-          "address[$key][country_id]",
-          "address[$key][state_province_id]",
-          "address[$key][county_id]",
-          CRM_Utils_Array::value('country_id', $value,
-            $config->defaultContactCountry
-          ),
-          CRM_Utils_Array::value('state_province_id', $value)
-        );
-      }
-    }
     $defaults['location_option'] = $this->_oldLocBlockId ? 2 : 1;
 
     return $defaults;
   }
 
   /**
-   * Add local and global form rules
-   *
-   * @access protected
-   *
-   * @return void
+   * Add local and global form rules.
    */
-  function addRules() {
+  public function addRules() {
     $this->addFormRule(array('CRM_Event_Form_ManageEvent_Location', 'formRule'));
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form.
    *
-   * @param array $fields posted values of the form
+   * @param array $fields
+   *   Posted values of the form.
    *
-   * @return array list of errors to be posted back to the form
-   * @static
-   * @access public
+   * @return array
+   *   list of errors to be posted back to the form
    */
-  static function formRule($fields) {
+  public static function formRule($fields) {
     // check for state/country mapping
-    $errors = CRM_Contact_Form_Edit_Address::formRule($fields, CRM_Core_DAO::$_nullArray, CRM_Core_DAO::$_nullObject);
+    $errors = CRM_Contact_Form_Edit_Address::formRule($fields);
 
     return empty($errors) ? TRUE : $errors;
   }
 
   /**
-   *  function to build location block
-   *
-   * @return void
-   * @access public
+   * Function to build location block.
    */
   public function buildQuickForm() {
     //load form for child blocks
@@ -217,31 +187,24 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
     $events = array();
     if (!empty($locationEvents)) {
       $this->assign('locEvents', TRUE);
-      $optionTypes = array('1' => ts('Create new location'),
+      $optionTypes = array(
+        '1' => ts('Create new location'),
         '2' => ts('Use existing location'),
       );
 
-      $this->addRadio('location_option', ts("Choose Location"), $optionTypes,
-        array(
-          'onclick' => "showLocFields();"), '<br/>', FALSE
-      );
+      $this->addRadio('location_option', ts("Choose Location"), $optionTypes);
 
       if (!isset($locationEvents[$this->_oldLocBlockId]) || (!$this->_oldLocBlockId)) {
-        $locationEvents = array(
-          '' => ts('- select -')) + $locationEvents;
+        $locationEvents = array('' => ts('- select -')) + $locationEvents;
       }
-      $this->add('select', 'loc_event_id', ts('Use Location'), $locationEvents);
+      $this->add('select', 'loc_event_id', ts('Use Location'), $locationEvents, FALSE, array('class' => 'crm-select2'));
     }
     $this->addElement('advcheckbox', 'is_show_location', ts('Show Location?'));
     parent::buildQuickForm();
   }
 
   /**
-   * Function to process the form
-   *
-   * @access public
-   *
-   * @return void
+   * Process the form submission.
    */
   public function postProcess() {
     $params = $this->exportValues();
@@ -281,7 +244,10 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
 
     $defaultLocationType = CRM_Core_BAO_LocationType::getDefault();
     foreach (array(
-      'address', 'phone', 'email') as $block) {
+               'address',
+               'phone',
+               'email',
+             ) as $block) {
       if (empty($params[$block]) || !is_array($params[$block])) {
         continue;
       }
@@ -305,16 +271,14 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
     $this->ajaxResponse['tabValid'] = TRUE;
     parent::endPostProcess();
   }
-  //end of function
 
   /**
    * Return a descriptive name for the page, used in wizard header
    *
    * @return string
-   * @access public
    */
   public function getTitle() {
     return ts('Event Location');
   }
-}
 
+}

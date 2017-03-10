@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,9 +23,9 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-{ts 1=$totalSelectedMembers}Number of selected members: %1{/ts}
+{ts 1=$totalSelectedMembers}Number of selected memberships: %1{/ts}
 
-{if $rows } 
+{if $rows }
 <div class="form-item">
 <table width="30%">
   <tr class="columnheader">

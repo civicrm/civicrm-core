@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,14 +23,14 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 
 /*
-* Copyright (C) 2010 Tech To The People
-* Licensed to CiviCRM under the Academic Free License version 3.0.
-*
-*/
+ * Copyright (C) 2010 Tech To The People
+ * Licensed to CiviCRM under the Academic Free License version 3.0.
+ *
+ */
 
 /**
  *
@@ -39,6 +39,9 @@
  */
 class CRM_Event_Badge_Simple extends CRM_Event_Badge {
 
+  /**
+   * @param $participant
+   */
   public function generateLabel($participant) {
     $date = CRM_Utils_Date::customFormat($participant['event_start_date'], "%e %b");
     $this->pdf->SetFontSize(8);
@@ -55,5 +58,5 @@ class CRM_Event_Badge_Simple extends CRM_Event_Badge {
     $this->pdf->Cell($this->pdf->width, $this->pdf->lineHeight, $participant['current_employer'], 0, 2, "C");
     //$this->pdf->MultiCell ($this->pdf->width, $this->pdf->lineHeight, $txt,1,"L");
   }
-}
 
+}

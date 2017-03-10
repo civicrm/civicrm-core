@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,14 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Contact_Form_Search_Custom_Base {
 
@@ -40,19 +38,51 @@ class CRM_Contact_Form_Search_Custom_Base {
 
   protected $_stateID;
 
-  function __construct(&$formValues) {
+  /**
+   * Class constructor.
+   *
+   * @param array $formValues
+   */
+  public function __construct(&$formValues) {
     $this->_formValues = &$formValues;
   }
 
-  function count() {
+  /**
+   * Builds the list of tasks or actions that a searcher can perform on a result set.
+   *
+   * The returned array completely replaces the task list, so a child class that
+   * wants to modify the existing list should manipulate the result of this method.
+   *
+   * @param CRM_Core_Form_Search $form
+   * @return array
+   */
+  public function buildTaskList(CRM_Core_Form_Search $form) {
+    return $form->getVar('_taskList');
+  }
+
+  /**
+   * @return null|string
+   */
+  public function count() {
     return CRM_Core_DAO::singleValueQuery($this->sql('count(distinct contact_a.id) as total'));
   }
 
-  function summary() {
+  /**
+   * @return null
+   */
+  public function summary() {
     return NULL;
   }
 
-  function contactIDs($offset = 0, $rowcount = 0, $sort = NULL, $returnSQL = FALSE) {
+  /**
+   * @param int $offset
+   * @param int $rowcount
+   * @param null $sort
+   * @param bool $returnSQL
+   *
+   * @return string
+   */
+  public function contactIDs($offset = 0, $rowcount = 0, $sort = NULL, $returnSQL = FALSE) {
     $sql = $this->sql(
       'contact_a.id as contact_id',
       $offset,
@@ -68,13 +98,23 @@ class CRM_Contact_Form_Search_Custom_Base {
     return CRM_Core_DAO::composeQuery($sql, CRM_Core_DAO::$_nullArray);
   }
 
-  function sql(
+  /**
+   * @param $selectClause
+   * @param int $offset
+   * @param int $rowcount
+   * @param null $sort
+   * @param bool $includeContactIDs
+   * @param null $groupBy
+   *
+   * @return string
+   */
+  public function sql(
     $selectClause,
-    $offset   = 0,
+    $offset = 0,
     $rowcount = 0,
     $sort = NULL,
     $includeContactIDs = FALSE,
-    $groupBy           = NULL
+    $groupBy = NULL
   ) {
 
     $sql = "SELECT $selectClause " . $this->from();
@@ -97,15 +137,22 @@ class CRM_Contact_Form_Search_Custom_Base {
     return $sql;
   }
 
-  function templateFile() {
+  /**
+   * @return null
+   */
+  public function templateFile() {
     return NULL;
   }
 
-  function &columns() {
+  public function &columns() {
     return $this->_columns;
   }
 
-  static function includeContactIDs(&$sql, &$formValues) {
+  /**
+   * @param $sql
+   * @param $formValues
+   */
+  public static function includeContactIDs(&$sql, &$formValues) {
     $contactIDs = array();
     foreach ($formValues as $id => $value) {
       if ($value &&
@@ -121,7 +168,13 @@ class CRM_Contact_Form_Search_Custom_Base {
     }
   }
 
-  function addSortOffset(&$sql, $offset, $rowcount, $sort) {
+  /**
+   * @param $sql
+   * @param $offset
+   * @param $rowcount
+   * @param $sort
+   */
+  public function addSortOffset(&$sql, $offset, $rowcount, $sort) {
     if (!empty($sort)) {
       if (is_string($sort)) {
         $sort = CRM_Utils_Type::escape($sort, 'String');
@@ -140,7 +193,13 @@ class CRM_Contact_Form_Search_Custom_Base {
     }
   }
 
-  function validateUserSQL(&$sql, $onlyWhere = FALSE) {
+  /**
+   * @param $sql
+   * @param bool $onlyWhere
+   *
+   * @throws Exception
+   */
+  public function validateUserSQL(&$sql, $onlyWhere = FALSE) {
     $includeStrings = array('contact_a');
     $excludeStrings = array('insert', 'delete', 'update');
 
@@ -151,27 +210,51 @@ class CRM_Contact_Form_Search_Custom_Base {
     foreach ($includeStrings as $string) {
       if (stripos($sql, $string) === FALSE) {
         CRM_Core_Error::fatal(ts('Could not find \'%1\' string in SQL clause.',
-            array(1 => $string)
-          ));
+          array(1 => $string)
+        ));
       }
     }
 
     foreach ($excludeStrings as $string) {
       if (preg_match('/(\s' . $string . ')|(' . $string . '\s)/i', $sql)) {
         CRM_Core_Error::fatal(ts('Found illegal \'%1\' string in SQL clause.',
-            array(1 => $string)
-          ));
+          array(1 => $string)
+        ));
       }
     }
   }
 
-  function whereClause(&$where, &$params) {
+  /**
+   * @param $where
+   * @param array $params
+   *
+   * @return string
+   */
+  public function whereClause(&$where, &$params) {
     return CRM_Core_DAO::composeQuery($where, $params, TRUE);
   }
 
-  // override this method to define the contact query object
-  // used for creating $sql
-  function getQueryObj() {
+  /**
+   * override this method to define the contact query object
+   * used for creating $sql
+   * @return null
+   */
+  public function getQueryObj() {
     return NULL;
   }
+
+  /**
+   * Set the title.
+   *
+   * @param string $title
+   */
+  public function setTitle($title) {
+    if ($title) {
+      CRM_Utils_System::setTitle($title);
+    }
+    else {
+      CRM_Utils_System::setTitle(ts('Search'));
+    }
+  }
+
 }

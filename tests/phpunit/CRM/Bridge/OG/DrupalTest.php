@@ -6,10 +6,10 @@
  *
  *  (PHP 5)
  *
- *   @copyright Copyright CiviCRM LLC (C) 2009
- *   @license   http://www.fsf.org/licensing/licenses/agpl-3.0.html
+ * @copyright Copyright CiviCRM LLC (C) 2009
+ * @license   http://www.fsf.org/licensing/licenses/agpl-3.0.html
  *              GNU Affero General Public License version 3
- *   @package CiviCRM
+ * @package CiviCRM
  *
  *   This file is part of CiviCRM
  *
@@ -31,23 +31,24 @@
 /**
  *  Include parent class definition
  */
-require_once 'CiviTest/CiviUnitTestCase.php';
+
 require_once 'api/api.php';
 
 /**
  *  Test contact custom search functions
  *
- *  @package CiviCRM
+ * @package CiviCRM
+ * @group headless
  */
 class CRM_Bridge_OG_DrupalTest extends CiviUnitTestCase {
-  /*
+  /**
    * Test that one (ane only one) role (option value) is deleted by the updateCiviACLRole function
    */
-  function testACLRoleDeleteFunctionality() {
+  public function testACLRoleDeleteFunctionality() {
     $optionGroup = civicrm_api('OptionGroup', 'Get', array(
-        'version' => 3,
-        'name' => 'acl_role',
-        'api.OptionValue.Create' =>
+      'version' => 3,
+      'name' => 'acl_role',
+      'api.OptionValue.Create' =>
         array(
           array(
             'label' => 'OG',
@@ -60,7 +61,7 @@ class CRM_Bridge_OG_DrupalTest extends CiviUnitTestCase {
             'description' => 'OG Sync Group ACL :1969:',
           ),
         ),
-      ));
+    ));
     $getOptionGroupParams = array('version' => 3, 'option_group_id' => $optionGroup['id']);
     $originalCount = civicrm_api('OptionValue', 'GetCount', $getOptionGroupParams);
     $params = array('source' => 'OG Sync Group ACL :1969:');
@@ -76,5 +77,5 @@ class CRM_Bridge_OG_DrupalTest extends CiviUnitTestCase {
     civicrm_api('OptionValue', 'Get', array('version' => 3, 'label' => 'OG', 'api.option_value.delete'));
     civicrm_api('OptionValue', 'Get', array('version' => 3, 'label' => 'OG2', 'api.option_value.delete'));
   }
-}
 
+}

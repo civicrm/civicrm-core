@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -47,7 +47,7 @@ function pollLoop( ){
 }
 
 function verify( ) {
-    if (! confirm('{/literal}{ts escape='js'}Are you sure you want to Import now{/ts}{literal}?') ) {
+    if (! confirm('Backing up your database before importing is recommended, as there is no Undo for this. {/literal}{ts escape='js'}Are you sure you want to Import now{/ts}{literal}?') ) {
         return false;
     }
 
@@ -56,10 +56,8 @@ function verify( ) {
     width         : 350,
     height        : 160,
     resizable     : false,
-    bgiframe      : true,
     draggable     : true,
     closeOnEscape : false,
-    overlay       : { opacity: 0.5, background: "black" },
     open          : function ( ) {
         cj("#id-processing").dialog().parents(".ui-dialog").find(".ui-dialog-titlebar").remove();
     }
@@ -76,7 +74,7 @@ function verify( ) {
 
  {* WizardHeader.tpl provides visual display of steps thru the wizard as well as title for current step *}
  {include file="CRM/common/WizardHeader.tpl"}
-<div id="help">
+<div class="help">
     <p>
     {ts}The information below previews the results of importing your data in CiviCRM. Review the totals to ensure that they represent your expected results.{/ts}
     </p>
@@ -161,6 +159,10 @@ function verify( ) {
                <td class="description label">{$form.newGroupDesc.label}</td>
                <td>{$form.newGroupDesc.html}</td>
              </tr>
+             <tr>
+               <td class="description label">{$form.newGroupType.label}</td>
+               <td>{$form.newGroupType.html}</td>
+             </tr>
             </table>
  </div><!-- /.crm-accordion-body -->
 </div><!-- /.crm-accordion-wrapper -->
@@ -230,9 +232,6 @@ function verify( ) {
 
 {literal}
 <script type="text/javascript">
-cj(function() {
-   cj().crmAccordions();
-});
 
 {/literal}{if $invalidGroupName}{literal}
 cj("#new-group.collapsed").crmAccordionToggle();

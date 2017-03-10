@@ -1,5 +1,5 @@
 <table class="crm-info-panel">
-    {if $action EQ 1}
+    {if $extension.name}
     <tr>
         <td class="label">{ts}Name (key){/ts}</td><td>{$extension.name} ({$extension.key})</td>
     </tr>

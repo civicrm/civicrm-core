@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,90 +24,106 @@
  +--------------------------------------------------------------------+
 *}
 
-{* add single row *}
+{* template for a single row *}
 {if $soInstance}
-<tr id="string_override_row_{$soInstance}">
-  <td class="even-row checkbox">{$form.enabled.$soInstance.html}</td>
-  <td class="even-row">{$form.old.$soInstance.html}</td>
-  <td class="even-row">{$form.new.$soInstance.html}</td>
-  <td class="even-row checkbox">{$form.cb.$soInstance.html}</td>
-</tr>
+  <tr class="string-override-row {if $soInstance % 2}odd{else}even{/if}-row" data-row="{$soInstance}"
+      xmlns="http://www.w3.org/1999/html">
+    <td>{$form.enabled.$soInstance.html}</td>
+    <td>{$form.old.$soInstance.html}</td>
+    <td>{$form.new.$soInstance.html}</td>
+    <td>{$form.cb.$soInstance.html}</td>
+  </tr>
 
 {else}
-{* this template is used for adding/editing string overrides  *}
-<div class="crm-form crm-form-block crm-string_override-form-block">
-<div id="help">
-    {ts}Use <strong>Word Replacements</strong> to change all occurrences of a word or phrase in CiviCRM screens (e.g. replace all occurences of 'Contribution' with 'Donation').{/ts} {help id="id-word_replace"}
-</div>
-<table class="form-layout-compressed">
-  <tr>
-      <td>
-            <table>
-        <tr class="columnheader">
-            <td>{ts}Enabled{/ts}</td>
-            <td>{ts}Original{/ts}</td>
-            <td>{ts}Replacement{/ts}</td>
-            <td>{ts}Exact Match?{/ts}</td>
-        </tr>
-
-         {section name="numStrings" start=1 step=1 loop=$numStrings+1}
-        {assign var='soInstance' value=$smarty.section.numStrings.index}
-
-        <tr id="string_override_row_{$soInstance}">
-            <td class="even-row checkbox">{$form.enabled.$soInstance.html}</td>
-              <td class="even-row">{$form.old.$soInstance.html}</td>
-              <td class="even-row">{$form.new.$soInstance.html}</td>
-            <td class="even-row checkbox">{$form.cb.$soInstance.html}</td>
-        </tr>
-
-          {/section}
+  {* this template is used for adding/editing string overrides  *}
+  <div class="crm-form crm-form-block crm-string_override-form-block">
+    <div class="help">
+      {ts}Use <strong>Word Replacements</strong> to change all occurrences of a word or phrase in CiviCRM screens (e.g. replace all occurrences of 'Contribution' with 'Donation').{/ts} {help id="id-word_replace"}
+    </div>
+    <div class="crm-submit-buttons">
+      {include file="CRM/common/formButtons.tpl" location='top'}
+    </div>
+    <table class="form-layout-compressed">
+      <tr>
+        <td>
+          <table class="string-override-table row-highlight">
+            <thead>
+              <tr class="columnheader">
+                <th>{ts}Enabled{/ts}</th>
+                <th>{ts}Original{/ts}</th>
+                <th>{ts}Replacement{/ts}</th>
+                <th>{ts}Exact Match{/ts}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {section name="numStrings" start=1 step=1 loop=$numStrings+1}
+                {include file="CRM/Admin/Form/WordReplacements.tpl" soInstance=$smarty.section.numStrings.index}
+              {/section}
+            </tbody>
           </table>
-         </td>
-  </tr>
-</table>
- <div class="crm-submit-buttons" ><a class="button" onClick="Javascript:buildStringOverrideRow( false );return false;"><span><div class="icon add-icon"></div>{ts}Add row{/ts}</span></a>{include file="CRM/common/formButtons.tpl"} </div>
+          &nbsp;&nbsp;&nbsp;<a class="action-item crm-hover-button buildStringOverrideRow" href="#"><i class="crm-i fa-plus-circle"></i> {ts}Add row{/ts}</a>
+        </td>
+      </tr>
+    </table>
+    <div class="crm-submit-buttons">
+      {include file="CRM/common/formButtons.tpl" location='bottom'}
+    </div>
 
-</div>
-{/if}
-
+  </div>
 {literal}
-<script type="text/javascript">
-function buildStringOverrideRow( curInstance )
-{
-   var rowId = 'string_override_row_';
+  <script type="text/javascript">
+    CRM.$(function($) {
+      {/literal}
+      {if $stringOverrideInstances}
+        {* Rebuild necessary rows in case of form error *}
+        {foreach from=$stringOverrideInstances key="index" item="instance"}
+          buildStringOverrideRow( {$instance} );
+        {/foreach}
+      {/if}
+      {literal}
 
-   if ( curInstance ) {
-      if ( curInstance <= 10 ) return;
-      currentInstance  = curInstance;
-      previousInstance = currentInstance - 1;
-   } else {
-      var previousInstance = cj( '[id^="'+ rowId +'"]:last' ).attr('id').slice( rowId.length );
-      var currentInstance = parseInt( previousInstance ) + 1;
-   }
+      function buildStringOverrideRow( curInstance ) {
+        var newRowNum;
 
-   var dataUrl  = {/literal}"{crmURL q='snippet=4' h=0}"{literal} ;
-   dataUrl     += "&instance="+currentInstance;
+        if (curInstance) {
+          // Don't fetch if already present
+          if ($('tr.string-override-row[data-row=' + curInstance + ']').length) {
+            return;
+          }
+          newRowNum = curInstance;
+        } else {
+          newRowNum = 1 + $('tr.string-override-row:last').data('row');
+        }
 
-   var prevInstRowId = '#string_override_row_' + previousInstance;
+        var dataUrl = {/literal}"{crmURL q='snippet=4' h=0}"{literal};
+        dataUrl += "&instance="+newRowNum;
 
-   cj.ajax({ url     : dataUrl,
-             async   : false,
-             success : function( html ) {
-       cj( prevInstRowId ).after( html );
-       cj('#old_'+currentInstance).TextAreaResizer();
-       cj('#new_'+currentInstance).TextAreaResizer();
-       }
-   });
-}
+        $.ajax({
+          url: dataUrl,
+          async: false,
+          success: function(html) {
+            $('.string-override-table tbody').append(html);
+            $('tr.string-override-row:last').trigger('crmLoad');
+          }
+        });
+      }
 
-cj( function( ) {
-  {/literal}
-  {if $stringOverrideInstances}
-     {foreach from=$stringOverrideInstances key="index" item="instance"}
-        buildStringOverrideRow( {$instance} );
-     {/foreach}
-  {/if}
-  {literal}
-});
-</script>
+      $('.buildStringOverrideRow').click(function(e) {
+        buildStringOverrideRow(false);
+        e.preventDefault();
+      });
+
+      // Auto-check new items
+      $('.string-override-table').on('keyup', 'textarea', function() {
+        if (!$(this).data('crm-initial-value')) {
+          var otherValue = $(this).closest('tr').find('textarea').not(this).val();
+          if ($(this).val() && otherValue) {
+            $(this).closest('tr').find('input[type=checkbox]').first().prop('checked', true);
+          }
+        }
+      });
+
+    });
+  </script>
 {/literal}
+{/if}

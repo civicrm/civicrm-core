@@ -1,10 +1,9 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,50 +26,34 @@
  */
 
 /**
- * File for the CiviCRM APIv3 group functions
+ * This api exposes CiviCRM Groups.
+ *
+ * This api is for creating/deleting groups or fetching a list of existing groups.
+ * To add/remove contacts to a group, use the GroupContact api instead.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_Group
- * @copyright CiviCRM LLC (c) 2004-2013
- * @version $Id: Group.php 30171 2010-10-14 09:11:27Z mover $
  */
 
 /**
- * create/update group
+ * Create/update group.
  *
- * This API is used to create new group or update any of the existing
- * In case of updating existing group, id of that particular grop must
- * be in $params array. Either id or name is required field in the
- * $params array
+ * @param array $params
+ *   name/value pairs to insert in new 'Group'
  *
- * @param array $params  (referance) Associative array of property
- *                       name/value pairs to insert in new 'group'
- *
- * @return array   returns id of the group created if success,
- *                 error message otherwise
- *@example GroupCreate.php
- *{@getfields group_create}
- * @access public
+ * @return array
+ *   API result array
  */
 function civicrm_api3_group_create($params) {
-
-  $group = CRM_Contact_BAO_Group::create($params);
-
-  if (is_null($group)) {
-    return civicrm_api3_create_error('Group not created');
-  }
-  else {
-    $values = array();
-    _civicrm_api3_object_to_array_unique_fields($group, $values[$group->id]);
-    return civicrm_api3_create_success($values, $params, 'group', 'create', $group);
-  }
+  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'Group');
 }
 
 /**
- * Adjust Metadata for Create action
+ * Adjust Metadata for Create action.
  *
- * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * The metadata is used for setting defaults, documentation & validation.
+ *
+ * @param array $params
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_group_create_spec(&$params) {
   $params['is_active']['api.default'] = 1;
@@ -78,67 +61,45 @@ function _civicrm_api3_group_create_spec(&$params) {
 }
 
 /**
- * Returns array of groups  matching a set of one or more group properties
+ * Returns array of groups matching a set of one or more Group properties.
  *
- * @param array $params  (referance) Array of one or more valid
- *                       property_name=>value pairs. If $params is set
- *                       as null, all groups will be returned
+ * @param array $params
+ *   Array of properties. If empty, all records will be returned.
  *
- * @return array  Array of matching groups
- * @example GroupGet.php
- * {@getfields group_get}
- * @access public
+ * @return array
+ *   Array of matching groups
  */
 function civicrm_api3_group_get($params) {
-
-  $options          = _civicrm_api3_get_options_from_params($params, TRUE, 'group', 'get');
-  $sort             = CRM_Utils_Array::value('sort', $options, NULL);
-  $offset           = CRM_Utils_Array::value('offset', $options);
-  $rowCount         = CRM_Utils_Array::value('limit', $options);
-  $returnProperties = CRM_Utils_Array::value('return', $options, NULL);
-  $inputParams      = CRM_Utils_Array::value('input_params', $options, array());
-  if(is_array($returnProperties) && !empty($returnProperties)){
-    // group function takes $returnProperties in non standard format & doesn't add id
-    unset($returnProperties['group_id']);
-    $returnProperties['id'] = 1;
-    $returnProperties = array_keys($returnProperties);
-  }
-  if (!empty($inputParams['group_id'])) {
-    $inputParams['id'] = $inputParams['group_id'];
-  }
-  $groupObjects = CRM_Contact_BAO_Group::getGroups($inputParams, $returnProperties, $sort, $offset, $rowCount);
-  if (empty($groupObjects)) {
-    return civicrm_api3_create_success(FALSE);
-  }
-  $groups = array();
-  foreach ($groupObjects as $group) {
-    _civicrm_api3_object_to_array($group, $groups[$group->id]);
-    _civicrm_api3_custom_data_get($groups[$group->id], 'Group', $group->id);
+  $options = _civicrm_api3_get_options_from_params($params, TRUE, 'Group', 'get');
+  if ((empty($options['return']) || !in_array('member_count', $options['return'])) && empty($params['check_permissions'])) {
+    return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, TRUE, 'Group');
   }
 
-
-  return civicrm_api3_create_success($groups, $params, 'group', 'create');
+  $groups = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, FALSE, 'Group');
+  foreach ($groups as $id => $group) {
+    if (!empty($params['check_permissions']) && !CRM_Contact_BAO_Group::checkPermission($group['id'])) {
+      unset($groups[$id]);
+    }
+    elseif (!empty($options['return']) && in_array('member_count', $options['return'])) {
+      $groups[$id]['member_count'] = CRM_Contact_BAO_Group::memberCount($id);
+    }
+  }
+  return civicrm_api3_create_success($groups, $params, 'Group', 'get');
 }
 
 /**
- * delete an existing group
+ * Delete an existing Group.
  *
- * This method is used to delete any existing group. id of the group
- * to be deleted is required field in $params array
- *
- * @param array $params  (referance) array containing id of the group
- *                       to be deleted
- *
- * @return array  (referance) returns flag true if successfull, error
- *                message otherwise
- *@example GroupDelete.php
- *{@getfields group_delete}
- *
- * @access public
+ * @param array $params
+ *   [id]
+ * @return array API result array
+ * @throws API_Exception
  */
 function civicrm_api3_group_delete($params) {
-
+  $group = civicrm_api3_group_get(array('id' => $params['id']));
+  if ($group['count'] == 0) {
+    throw new API_Exception('Could not delete group ' . $params['id']);
+  }
   CRM_Contact_BAO_Group::discard($params['id']);
   return civicrm_api3_create_success(TRUE);
 }
-

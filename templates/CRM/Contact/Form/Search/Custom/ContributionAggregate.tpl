@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -35,27 +35,16 @@
             {foreach from=$elements item=element}
                 <tr class="crm-contact-custom-search-form-row-{$element}">
                     <td class="label">{$form.$element.label}</td>
-                    {if $element eq 'start_date'}
-                        <td>{include file="CRM/common/jcalendar.tpl" elementName=start_date}</td>
-                    {elseif $element eq 'end_date'}
-                        <td>{include file="CRM/common/jcalendar.tpl" elementName=end_date}</td>
-                    {else}
-                        <td>{$form.$element.html}</td>
-                    {/if}
+                    <td>{$form.$element.html}</td>
                 </tr>
             {/foreach}
+            <tr class="crm-contact-custom-search-contributionDetails-form-block-receive_date">
+              <td class="label">{ts}Contribution Dates{/ts}</td>
+              {include file="CRM/Core/DateRange.tpl" fieldName="contribution_date" from='_low' to='_high'}
+            </tr>
             <tr class="crm-contact-custom-search-contributionDetails-form-block-financial_type">
                 <td class="label">{ts}Financial Type{/ts}</td>
-                <td>
-                    <div class="listing-box">
-                        {foreach from=$form.financial_type_id item="financial_type_val"}
-                            <div class="{cycle values="odd-row,even-row"}">
-                                {$financial_type_val.html}
-                            </div>
-                        {/foreach}
-                    </div>
-                    <div class="spacer"></div>
-                </td>
+                <td>{$form.financial_type_id.html|crmAddClass:twenty}</td>
             </tr>
         </table>
         <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
@@ -91,7 +80,7 @@
         {/if}
 
         {strip}
-        <table class="selector" summary="{ts}Search results listings.{/ts}">
+        <table class="selector row-highlight" summary="{ts}Search results listings.{/ts}">
             <thead class="sticky">
                 <tr>
                 <th scope="col" title="Select All Rows">{$form.toggleSelect.html}</th>
@@ -117,7 +106,7 @@
                     {foreach from=$columnHeaders item=header}
                         {assign var=fName value=$header.sort}
                         {if $fName eq 'sort_name'}
-                            <td><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.contact_id`"}">{$row.sort_name}</a></td>
+                            <td><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.contact_id`&key=`$qfKey`"}">{$row.sort_name}</a></td>
                         {else}
                             <td>{$row.$fName}</td>
                         {/if}
@@ -141,10 +130,3 @@
 
 </div>
 {/if}
-{literal}
-<script type="text/javascript">
-cj(function() {
-   cj().crmAccordions();
-});
-</script>
-{/literal}

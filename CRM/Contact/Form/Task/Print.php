@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,14 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -40,12 +38,9 @@
 class CRM_Contact_Form_Task_Print extends CRM_Contact_Form_Task {
 
   /**
-   * build all the data structures needed to build the form
-   *
-   * @return void
-   * @access public
+   * Build all the data structures needed to build the form.
    */
-  function preProcess() {
+  public function preProcess() {
     parent::preprocess();
 
     // set print view, so that print templates are called
@@ -57,12 +52,15 @@ class CRM_Contact_Form_Task_Print extends CRM_Contact_Form_Task {
     if (!empty($this->_contactIds)) {
       //using _contactIds field for creating params for query so that multiple selections on multiple pages
       //can be printed.
-    foreach ($this->_contactIds as $contactId) {
+      foreach ($this->_contactIds as $contactId) {
         $params[] = array(
           CRM_Core_Form::CB_PREFIX . $contactId,
           '=',
-          1, 0, 0);
-    }
+          1,
+          0,
+          0,
+        );
+      }
     }
 
     // create the selector, controller and run - store results in session
@@ -82,17 +80,17 @@ class CRM_Contact_Form_Task_Print extends CRM_Contact_Form_Task {
     }
 
     $selectorName = $this->controller->selectorName();
-    require_once (str_replace('_', DIRECTORY_SEPARATOR, $selectorName) . '.php');
+    require_once str_replace('_', DIRECTORY_SEPARATOR, $selectorName) . '.php';
 
     $returnP = isset($returnPropeties) ? $returnPropeties : "";
     $customSearchClass = $this->get('customSearchClass');
-    $selector   = new $selectorName( $customSearchClass,
-                 $fv,
-                 $params,
-                 $returnP,
-                 $this->_action,
-                 $includeContactIds
-      );
+    $selector = new $selectorName($customSearchClass,
+      $fv,
+      $params,
+      $returnP,
+      $this->_action,
+      $includeContactIds
+    );
     $controller = new CRM_Core_Selector_Controller($selector,
       NULL,
       $sortID,
@@ -105,15 +103,11 @@ class CRM_Contact_Form_Task_Print extends CRM_Contact_Form_Task {
   }
 
   /**
-   * Build the form - it consists of
+   * Build the form object - it consists of
    *    - displaying the QILL (query in local language)
    *    - displaying elements for saving the search
-   *
-   * @access public
-   *
-   * @return void
    */
-  function buildQuickForm() {
+  public function buildQuickForm() {
     //
     // just need to add a javacript to popup the window for printing
     //
@@ -133,14 +127,10 @@ class CRM_Contact_Form_Task_Print extends CRM_Contact_Form_Task {
   }
 
   /**
-   * process the form after the input has been submitted and validated
-   *
-   * @access public
-   *
-   * @return void
+   * Process the form after the input has been submitted and validated.
    */
   public function postProcess() {
     // redirect to the main search page after printing is over
   }
-}
 
+}

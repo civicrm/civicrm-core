@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -32,12 +32,12 @@
 {/if}
 {if $extendTargetContacts > 0}
    <div class="status">
-        <p>{ts count=$extendTargetContacts plural='SMS will NOT be sent to contacts of %count Acitivites - (There are more than one Target contacts).'}SMS will NOT be sent to contacts of %count Acitivity - (There are more than one Target contacts).{/ts}</p>
+        <p>{ts count=$extendTargetContacts plural='SMS will NOT be sent to contacts of %count Activities - (there are more than one Target contact).'}SMS will NOT be sent to contacts of %count Activity - (there are more than one Target contact).{/ts}</p>
    </div>
 {/if}
 {if $invalidActivity > 0}
     <div class="status"><p>
-   {ts count=$invalidActivity plural='SMS will NOT be sent to contacts of %count selected acitvites as they are of invalid for this task action.'}SMS will NOT be sent to contacts of %count selected acitvity as they are of invalid for this task action.{/ts}
+   {ts count=$invalidActivity plural='SMS will NOT be sent to contacts of %count selected activities as they are invalid for this task action.'}SMS will NOT be sent to contacts of %count selected activity as they are invalid for this task action.{/ts}
 </p></div>
 {/if}
 
@@ -49,7 +49,7 @@
     <tr class="crm-contactsms-form-block-recipient">
        <td class="label">{if $single eq false}{ts}Recipient(s){/ts}{else}{$form.to.label}{/if}</td>
        <td>{$form.to.html}
-    <div class="spacer"></div> 
+    <div class="spacer"></div>
       </td>
      </tr>
    <tr><td class="label">{$form.activity_subject.label}</td>
@@ -59,13 +59,14 @@
 
 {if $SMSTask}
     <tr class="crm-contactPhone-form-block-template">
-        <td class="label">{$form.template.label}</td>
-        <td>{$form.template.html}</td>
+        <td class="label">{$form.SMStemplate.label}</td>
+        <td>{$form.SMStemplate.html}</td>
     </tr>
 {/if}
-    
+
 </table>
 {include file="CRM/Contact/Form/Task/SMSCommon.tpl"}
+{include file="CRM/Mailing/Form/InsertTokens.tpl"}
 
 <div class="spacer"> </div>
 
@@ -77,11 +78,11 @@
 {/if}
 
 {if $invalidActivity > 0}
-   {ts count=$invalidActivity plural='SMS will NOT be sent to contacts of %count selected acitvites as they are invalid for this task action.'}SMS will NOT be sent to contacts of %count selected acitvity as they are invalid for this task action.{/ts}
+   {ts count=$invalidActivity plural='SMS will NOT be sent to contacts of %count selected activities as they are invalid for this task action.'}SMS will NOT be sent to contacts of %count selected activity as they are invalid for this task action.{/ts}
 {/if}
 
 {if $extendTargetContacts > 0}
-   {ts count=$extendTargetContacts plural='SMS will NOT be sent to contacts of %count selected acitvites.'}SMS will NOT be sent to contacts of %count selected acitvites.{/ts}
+   {ts count=$extendTargetContacts plural='SMS will NOT be sent to contacts of %count selected activities.'}SMS will NOT be sent to contacts of %count selected activity.{/ts}
 {/if}
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>
@@ -92,13 +93,24 @@
 {/if}
 
 {literal}
-
-var hintText = "{/literal}{ts escape='js'}Type in a partial or complete name or email address of an existing contact.{/ts}{literal}";
-var sourceDataUrl = "{/literal}{crmURL p='civicrm/ajax/checkphone' h=0 }{literal}";
-var toDataUrl     = "{/literal}{crmURL p='civicrm/ajax/checkphone' q='id=1' h=0 }{literal}";
-
-cj( "#to"     ).tokenInput( toDataUrl,     { prePopulate: toContact,  theme: 'facebook', hintText: hintText });
-cj( 'ul.token-input-list-facebook, div.token-input-dropdown-facebook' ).css( 'width', '450px' );
+CRM.$(function($){
+  var sourceDataUrl = "{/literal}{crmURL p='civicrm/ajax/checkphone' h=0 }{literal}";
+  function phoneSelect(el){
+    $(el).data('api-entity', 'contact').crmSelect2({
+      minimumInputLength: 1,
+      multiple: true,
+      ajax: {
+        url: sourceDataUrl,
+        data: function(term) {
+          return { name: term,};
+        },
+        results: function(response) {
+          return { results: response };
+        }
+      }
+    }).select2('data', toContact);
+  }
+  phoneSelect('#to');
+});
 </script>
 {/literal}
-{include file="CRM/common/formNavigate.tpl"}

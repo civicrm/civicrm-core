@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,60 +23,50 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Mailing_Controller_Send extends CRM_Core_Controller {
 
   /**
-   * class constructor
+   * Class constructor.
+   *
+   * @param null $title
+   * @param bool|int $action
+   * @param bool $modal
+   *
+   * @throws \Exception
    */
-  function __construct($title = NULL, $action = CRM_Core_Action::NONE, $modal = TRUE) {
+  public function __construct($title = NULL, $action = CRM_Core_Action::NONE, $modal = TRUE) {
     parent::__construct($title, $modal, NULL, FALSE, TRUE);
 
-    $mailingID = CRM_Utils_Request::retrieve('mid', 'String', $this, FALSE, NULL);
-
-    // also get the text and html file
-    $txtFile = CRM_Utils_Request::retrieve('txtFile', 'String',
-      CRM_Core_DAO::$_nullObject, FALSE, NULL
-    );
-    $htmlFile = CRM_Utils_Request::retrieve('htmlFile', 'String',
-      CRM_Core_DAO::$_nullObject, FALSE, NULL
-    );
-
-    $config = CRM_Core_Config::singleton();
-    if ($txtFile &&
-      file_exists($config->uploadDir . $txtFile)
-    ) {
-      $this->set('textFilePath', $config->uploadDir . $txtFile);
+    // New:            civicrm/mailing/send?reset=1
+    // Re-use:         civicrm/mailing/send?reset=1&mid=%%mid%%
+    // Continue:       civicrm/mailing/send?reset=1&mid=%%mid%%&continue=true
+    $mid = CRM_Utils_Request::retrieve('mid', 'Positive');
+    $continue = CRM_Utils_Request::retrieve('continue', 'String');
+    if (!$mid) {
+      CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/a/', NULL, TRUE, '/mailing/new'));
     }
-
-    if ($htmlFile &&
-      file_exists($config->uploadDir . $htmlFile)
-    ) {
-      $this->set('htmlFilePath', $config->uploadDir . $htmlFile);
+    if ($mid && $continue) {
+      //CRM-15979 - check if abtest exist for mailing then redirect accordingly
+      $abtest = CRM_Mailing_BAO_MailingAB::getABTest($mid);
+      if (!empty($abtest) && !empty($abtest->id)) {
+        $redirect = CRM_Utils_System::url('civicrm/a/', NULL, TRUE, '/abtest/' . $abtest->id);
+      }
+      else {
+        $redirect = CRM_Utils_System::url('civicrm/a/', NULL, TRUE, '/mailing/' . $mid);
+      }
+      CRM_Utils_System::redirect($redirect);
     }
-
-    $this->_stateMachine = new CRM_Mailing_StateMachine_Send($this, $action, $mailingID);
-
-    // create and instantiate the pages
-    $this->addPages($this->_stateMachine, $action);
-
-    // add all the actions
-    $uploadNames = array_merge(array('textFile', 'htmlFile'),
-      CRM_Core_BAO_File::uploadNames()
-    );
-
-    $config = CRM_Core_Config::singleton();
-    $this->addActions($config->uploadDir,
-      $uploadNames
-    );
+    if ($mid && !$continue) {
+      $clone = civicrm_api3('Mailing', 'clone', array('id' => $mid));
+      CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/a/', NULL, TRUE, '/mailing/' . $clone['id']));
+    }
   }
-}
 
+}

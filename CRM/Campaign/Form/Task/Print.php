@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,14 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -39,12 +37,9 @@
 class CRM_Campaign_Form_Task_Print extends CRM_Campaign_Form_Task {
 
   /**
-   * build all the data structures needed to build the form
-   *
-   * @return void
-   * @access public
+   * Build all the data structures needed to build the form.
    */
-  function preProcess() {
+  public function preProcess() {
     parent::preprocess();
 
     // set print view, so that print templates are called
@@ -76,15 +71,13 @@ class CRM_Campaign_Form_Task_Print extends CRM_Campaign_Form_Task {
   }
 
   /**
-   * Build the form - it consists of
+   * Build the form object.
+   *
+   * It consists of
    *    - displaying the QILL (query in local language)
    *    - displaying elements for saving the search
-   *
-   * @access public
-   *
-   * @return void
    */
-  function buildQuickForm() {
+  public function buildQuickForm() {
     //
     // just need to add a javacript to popup the window for printing
     //
@@ -104,14 +97,10 @@ class CRM_Campaign_Form_Task_Print extends CRM_Campaign_Form_Task {
   }
 
   /**
-   * process the form after the input has been submitted and validated
-   *
-   * @access public
-   *
-   * @return void
+   * Process the form after the input has been submitted and validated.
    */
   public function postProcess() {
     // redirect to the main search page after printing is over
   }
-}
 
+}

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,17 +22,23 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Event_MultipleEventRegistrationbyCartTest
+ */
 class WebTest_Event_MultipleEventRegistrationbyCartTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
     parent::setUp();
   }
 
-  // this functionality is broken hence skipping the test
-  function skiptestAuthenticatedMultipleEvent() {
+  /**
+   * this functionality is broken hence skipping the test.
+   */
+  public function skiptestAuthenticatedMultipleEvent() {
 
     // Log in using webtestLogin() method
     $this->webtestLogin();
@@ -43,8 +49,8 @@ class WebTest_Event_MultipleEventRegistrationbyCartTest extends CiviSeleniumTest
     $this->click("_qf_Event_next-top");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    // We need a payment processor
-    $processorName = "Webtest Dummy" . substr(sha1(rand()), 0, 7);
+    // Use default payment processor
+    $processorName = 'Test Processor';
     $this->webtestAddPaymentProcessor($processorName);
 
     //event 1
@@ -124,8 +130,10 @@ class WebTest_Event_MultipleEventRegistrationbyCartTest extends CiviSeleniumTest
     $this->_checkContributionsandEventRegistration($value[0], $value[1], $events);
   }
 
-  // this functionality is broken hence skipping the test
-  function skiptestAnonymousMultipleEvent() {
+  /**
+   * this functionality is broken hence skipping the test.
+   */
+  public function skiptestAnonymousMultipleEvent() {
     // This is the path where our testing install resides.
     // The rest of URL is defined in CiviSeleniumTestCase base class, in
     // class attributes.
@@ -133,8 +141,8 @@ class WebTest_Event_MultipleEventRegistrationbyCartTest extends CiviSeleniumTest
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
-    // We need a payment processor
-    $processorName = "Webtest Dummy" . substr(sha1(rand()), 0, 7);
+    // Use default payment processor
+    $processorName = 'Test Processor';
     $this->webtestAddPaymentProcessor($processorName);
 
     //event 1
@@ -228,7 +236,11 @@ class WebTest_Event_MultipleEventRegistrationbyCartTest extends CiviSeleniumTest
     $this->_checkContributionsandEventRegistration($value[0], $value[1], $events);
   }
 
-  function _testAddEventInfo($eventTitle, $eventDescription) {
+  /**
+   * @param $eventTitle
+   * @param $eventDescription
+   */
+  public function _testAddEventInfo($eventTitle, $eventDescription) {
     $this->waitForElementPresent("_qf_EventInfo_upload-bottom");
 
     $this->select("event_type_id", "value=1");
@@ -253,7 +265,10 @@ class WebTest_Event_MultipleEventRegistrationbyCartTest extends CiviSeleniumTest
     $this->click("_qf_EventInfo_upload-bottom");
   }
 
-  function _testAddLocation($streetAddress) {
+  /**
+   * @param $streetAddress
+   */
+  public function _testAddLocation($streetAddress) {
     // Wait for Location tab form to load
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForElementPresent("_qf_Location_upload-bottom");
@@ -271,7 +286,12 @@ class WebTest_Event_MultipleEventRegistrationbyCartTest extends CiviSeleniumTest
     $this->waitForTextPresent("'Location' information has been saved.");
   }
 
-  function _testAddFees($discount = FALSE, $priceSet = FALSE, $processorName = "PP Pro") {
+  /**
+   * @param bool $discount
+   * @param bool $priceSet
+   * @param string $processorName
+   */
+  public function _testAddFees($discount = FALSE, $priceSet = FALSE, $processorName = "PP Pro") {
     // Go to Fees tab
     $this->click("link=Fees");
     $this->waitForElementPresent("_qf_Fee_upload-bottom");
@@ -309,7 +329,11 @@ class WebTest_Event_MultipleEventRegistrationbyCartTest extends CiviSeleniumTest
     $this->waitForTextPresent("'Fee' information has been saved.");
   }
 
-  function _testAddOnlineRegistration($registerIntro, $multipleRegistrations = FALSE) {
+  /**
+   * @param $registerIntro
+   * @param bool $multipleRegistrations
+   */
+  public function _testAddOnlineRegistration($registerIntro, $multipleRegistrations = FALSE) {
     // Go to Online Registration tab
     $this->click("link=Online Registration");
     $this->waitForElementPresent("_qf_Registration_upload-bottom");
@@ -333,7 +357,12 @@ class WebTest_Event_MultipleEventRegistrationbyCartTest extends CiviSeleniumTest
     $this->waitForTextPresent("'Registration' information has been saved.");
   }
 
-  function _AddEventToCart($eventTitle, $eventInfoStrings, $eventFees = NULL) {
+  /**
+   * @param $eventTitle
+   * @param $eventInfoStrings
+   * @param null $eventFees
+   */
+  public function _AddEventToCart($eventTitle, $eventInfoStrings, $eventFees = NULL) {
     // verify event input on info page
     // start at Manage Events listing
     $this->openCiviPage("event/manage", "reset=1");
@@ -343,7 +372,14 @@ class WebTest_Event_MultipleEventRegistrationbyCartTest extends CiviSeleniumTest
     $this->assertTrue($this->isTextPresent("$eventTitle has been added to your cart"));
   }
 
-  function _testVerifyEventInfo($eventTitle, $eventInfoStrings, $eventFees = NULL) {
+  /**
+   * @param $eventTitle
+   * @param $eventInfoStrings
+   * @param null $eventFees
+   *
+   * @return string
+   */
+  public function _testVerifyEventInfo($eventTitle, $eventInfoStrings, $eventFees = NULL) {
     // verify event input on info page
     // start at Manage Events listing
     $this->openCiviPage("event/manage", "reset=1");
@@ -361,7 +397,12 @@ class WebTest_Event_MultipleEventRegistrationbyCartTest extends CiviSeleniumTest
     return $this->getLocation();
   }
 
-  function _testOnlineRegistration($registerUrl, $numberRegistrations = 1, $anonymous = TRUE) {
+  /**
+   * @param $registerUrl
+   * @param int $numberRegistrations
+   * @param bool $anonymous
+   */
+  public function _testOnlineRegistration($registerUrl, $numberRegistrations = 1, $anonymous = TRUE) {
     if ($anonymous) {
       $this->webtestLogout();
     }
@@ -372,7 +413,10 @@ class WebTest_Event_MultipleEventRegistrationbyCartTest extends CiviSeleniumTest
     $this->waitForPageToLoad($this->getTimeoutMsec());
   }
 
-  function _testCheckOut() {
+  /**
+   * @return array
+   */
+  public function _testCheckOut() {
     //View the Cart
     $this->click("xpath=//div[@id='messages']/div/div/a[text()='View your cart.']");
 
@@ -411,7 +455,12 @@ class WebTest_Event_MultipleEventRegistrationbyCartTest extends CiviSeleniumTest
     return array($firstName, $lastName);
   }
 
-  function _checkContributionsandEventRegistration($firstName, $lastName, $events) {
+  /**
+   * @param string $firstName
+   * @param string $lastName
+   * @param $events
+   */
+  public function _checkContributionsandEventRegistration($firstName, $lastName, $events) {
     //Type the registered participant's email in autocomplete.
     $this->click('sort_name_navigation');
     $this->type('css=input#sort_name_navigation', "{$firstName}.{$lastName}@home.com");
@@ -461,4 +510,5 @@ class WebTest_Event_MultipleEventRegistrationbyCartTest extends CiviSeleniumTest
     $this->click("enable_cart");
     $this->click("_qf_Event_next-top");
   }
+
 }

@@ -1,10 +1,9 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,20 +26,18 @@
  */
 
 /**
- * File for the CiviCRM APIv3 domain functions
+ * This api exposes CiviCRM Domain configuration settings.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_Domain
- *
- * @copyright CiviCRM LLC (c) 2004-2013
- * @version $Id: Domain.php 30171 2010-10-14 09:11:27Z mover $
- *
  */
 
 /**
- * Get CiviCRM domain details
- * {@getfields domain_create}
- * @example DomainGet.php
+ * Get CiviCRM Domain details.
+ *
+ * @param array $params
+ *
+ * @return array
+ * @throws \API_Exception
  */
 function civicrm_api3_domain_get($params) {
 
@@ -52,97 +49,123 @@ function civicrm_api3_domain_get($params) {
     $domainBAO = CRM_Core_Config::domainID();
     $params['id'] = $domainBAO;
   }
+  if (!empty($params['options']) && !empty($params['options']['is_count'])) {
+    return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+  }
 
-  _civicrm_api3_dao_set_filter($bao, $params, true, 'domain');
-  $domains = _civicrm_api3_dao_to_array($bao, $params, true,'domain');
+  _civicrm_api3_dao_set_filter($bao, $params, TRUE);
+  $domains = _civicrm_api3_dao_to_array($bao, $params, TRUE, 'Domain');
 
   foreach ($domains as $domain) {
-    if(!empty($domain['contact_id'])){
+    if (!empty($domain['contact_id'])) {
       $values = array();
       $locparams = array(
-        'contact_id' => $domain['contact_id']
+        'contact_id' => $domain['contact_id'],
       );
       $values['location'] = CRM_Core_BAO_Location::getValues($locparams, TRUE);
-
       $address_array = array(
         'street_address', 'supplemental_address_1', 'supplemental_address_2',
         'city', 'state_province_id', 'postal_code', 'country_id',
         'geo_code_1', 'geo_code_2',
       );
 
-      if ( !empty( $values['location']['email'] ) ) {
+      if (!empty($values['location']['email'])) {
         $domain['domain_email'] = CRM_Utils_Array::value('email', $values['location']['email'][1]);
       }
 
-      if ( !empty( $values['location']['phone'] ) ) {
+      if (!empty($values['location']['phone'])) {
         $domain['domain_phone'] = array(
-          'phone_type' => CRM_Core_OptionGroup::getLabel(
-          'phone_type',
-          CRM_Utils_Array::value(
-            'phone_type_id',
-          $values['location']['phone'][1]
-        )
-      ),
-        'phone' => CRM_Utils_Array::value(
-          'phone',
-        $values['location']['phone'][1]
-        )
-    );
-    }
-
-    if ( !empty( $values['location']['address'] ) ) {
-      foreach ($address_array as $value) {
-        $domain['domain_address'][$value] = CRM_Utils_Array::value($value,
-          $values['location']['address'][1]
+          'phone_type' => CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_Phone', 'phone_type_id',
+            CRM_Utils_Array::value(
+              'phone_type_id',
+              $values['location']['phone'][1]
+            )
+          ),
+          'phone' => CRM_Utils_Array::value(
+            'phone',
+            $values['location']['phone'][1]
+          ),
         );
       }
-    }
+
+      if (!empty($values['location']['address'])) {
+        foreach ($address_array as $value) {
+          $domain['domain_address'][$value] = CRM_Utils_Array::value($value,
+          $values['location']['address'][1]
+          );
+        }
+      }
 
       list($domain['from_name'],
         $domain['from_email']
       ) = CRM_Core_BAO_Domain::getNameAndEmail(TRUE);
+
+      // Rename version to domain_version, see CRM-17430.
+      $domain['domain_version'] = $domain['version'];
+      unset($domain['version']);
       $domains[$domain['id']] = array_merge($domains[$domain['id']], $domain);
     }
   }
 
-
-  return civicrm_api3_create_success($domains, $params, 'domain', 'get', $bao);
+  return civicrm_api3_create_success($domains, $params, 'Domain', 'get', $bao);
 }
 
 /**
- * Adjust Metadata for Get action
+ * Adjust Metadata for Get action.
  *
- * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * The metadata is used for setting defaults, documentation & validation.
+ *
+ * @param array $params
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_domain_get_spec(&$params) {
-  $params['current_domain'] = array('title' => "get loaded domain");
+  $params['current_domain'] = array(
+    'title' => "Current Domain",
+    'description' => "get loaded domain",
+  );
 }
 
 /**
- * Create a new domain
+ * Create a new Domain.
  *
  * @param array $params
  *
  * @return array
- * @example DomainCreate.php
- * {@getfields domain_create}
  */
 function civicrm_api3_domain_create($params) {
-  $params['version'] = $params['domain_version'];
-  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+  if (isset($params['domain_version'])) {
+    $params['version'] = $params['domain_version'];
+  }
+  else {
+    unset($params['version']);
+  }
+  $result = _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+
+  $result_value = CRM_Utils_Array::first($result['values']);
+  if (isset($result_value['version'])) {
+    // Rename version to domain_version, see CRM-17430.
+    $result_value['domain_version'] = $result_value['version'];
+    unset($result_value['version']);
+    $result['values'][$result['id']] = $result_value;
+  }
+  return $result;
 }
 
 /**
- * Adjust Metadata for Create action
+ * Adjust Metadata for Create action.
  *
- * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * The metadata is used for setting defaults, documentation & validation.
+ *
+ * @param array $params
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_domain_create_spec(&$params) {
-  $params['domain_version'] = $params['version'];
+  $params['domain_version'] = array(
+    'title' => "CiviCRM Version",
+    'description' => "The civicrm version this instance is running",
+    'type' => CRM_Utils_Type::T_STRING,
+  );
   $params['domain_version']['api.required'] = 1;
   unset($params['version']);
   $params['name']['api.required'] = 1;
 }
-

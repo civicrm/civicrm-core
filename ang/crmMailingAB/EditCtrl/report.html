@@ -1,0 +1,194 @@
+<!--
+  Implicit Controller: CrmMailingABEditCtrl
+-->
+<div class="messages help">
+  <div class="msg-title crm-title">{{ts('A/B Test Results')}}: {{abtest.ab.name}}</div>
+  {{ts('This report displays the current results for your A/B test. You can return to this page to view the latest statistics by navigating to "Manage A/B Tests" and clicking "Results".')}}
+</div>
+<div ng-controller="CrmMailingABReportCtrl">
+  <table class="crm-mailing-ab-table">
+    <thead>
+    <tr ng-show="abtest.ab.status == 'Testing'">
+      <td></td>
+      <td ng-repeat="am in getActiveMailings()">
+        <button crm-icon="fa-trophy" ng-click="selectWinner(am.name)">{{ts('Select as Final')}}</button>
+      </td>
+      <td></td>
+    </tr>
+    </thead>
+
+    <thead>
+    <tr>
+      <th>{{ts('Delivery')}}</th>
+      <th ng-repeat="am in getActiveMailings()" class="crm-mailing-ab-col">{{am.title}}</th>
+      <th ng-show="abtest.ab.status == 'Testing'">{{ts('Final')}}</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    <tr>
+      <td>{{ts('Status')}}</td>
+      <td ng-repeat="am in getActiveMailings()">
+        <span ng-repeat="job in am.mailing.jobs" ng-hide="job.is_test == 1 || job.parent_id != null">{{job.status}}</span>
+      </td>
+      <td ng-show="abtest.ab.status == 'Testing'">{{ts('Not selected')}}</td>
+    </tr>
+    <tr>
+      <td>{{ts('Scheduled')}}</td>
+      <td ng-repeat="am in getActiveMailings()">
+        <div ng-repeat="job in am.mailing.jobs" ng-hide="job.is_test == 1 || job.parent_id != null">{{job.scheduled_date}}</div>
+      </td>
+      <td ng-show="abtest.ab.status == 'Testing'"></td>
+    </tr>
+    <tr>
+      <td>{{ts('Started at')}}</td>
+      <td ng-repeat="am in getActiveMailings()">
+        <div ng-repeat="job in am.mailing.jobs" ng-hide="job.is_test == 1 || job.parent_id != null">{{job.start_date || ts('Not started')}}</div>
+      </td>
+      <td ng-show="abtest.ab.status == 'Testing'"></td>
+    </tr>
+    <tr>
+      <td>{{ts('Completed at')}}</td>
+      <td ng-repeat="am in getActiveMailings()">
+        <div ng-repeat="job in am.mailing.jobs" ng-hide="job.is_test == 1 || job.parent_id != null">{{job.end_date || ts('Not completed')}}</div>
+      </td>
+      <td ng-show="abtest.ab.status == 'Testing'"></td>
+    </tr>
+    </tbody>
+
+    <thead>
+    <tr>
+      <th>{{ts('Performance')}}</th>
+      <th ng-repeat="am in getActiveMailings()" class="crm-mailing-ab-col">{{am.title}}</th>
+      <th ng-show="abtest.ab.status == 'Testing'">{{ts('Final')}}</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr ng-repeat="statType in statTypes">
+      <td>{{statType.title}}</td>
+      <td ng-repeat="am in getActiveMailings()">
+        <a
+          class="crm-hover-button action-item"
+          ng-href="{{statUrl(am.mailing, statType, 'search')}}"
+          ng-if="checkPerm('view all contacts') || checkPerm('edit all contacts')"
+          title="{{ts('Search for contacts using \'%1\'', {1: statType.title})}}"
+          crm-icon="fa-search"
+          ></a>
+        <a
+          class="crm-hover-button action-item"
+          ng-href="{{statUrl(am.mailing, statType, 'events')}}"
+          title="{{ts('Browse events of type \'%1\'', {1: statType.title})}}"
+          >{{stats[am.name][statType.name] || ts('n/a')}}</a>
+        <a
+          class="crm-hover-button action-item"
+          ng-href="{{statUrl(am.mailing, statType, 'report')}}"
+          title="{{ts('Reports for \'%1\'', {1: statType.title})}}"
+          crm-icon="clipboard"
+          ></a>
+      </td>
+      <td ng-show="abtest.ab.status == 'Testing'"></td>
+    </tr>
+    </tbody>
+
+    <thead>
+    <tr>
+      <th>{{ts('Details')}}</th>
+      <th ng-repeat="am in getActiveMailings()" class="crm-mailing-ab-col">{{am.title}}</th>
+      <th ng-show="abtest.ab.status == 'Testing'">{{ts('Final')}}</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    <tr>
+      <td>{{ts('Mailing Name')}}</td>
+      <td ng-repeat="am in getActiveMailings()">
+        {{am.mailing.name}}
+      </td>
+      <td ng-show="abtest.ab.status == 'Testing'"></td>
+    </tr>
+    <tr>
+      <td>{{ts('From')}}</td>
+      <td ng-repeat="am in getActiveMailings()">
+        "{{am.mailing.from_name}}" &lt;{{am.mailing.from_email}}&gt;
+      </td>
+      <td ng-show="abtest.ab.status == 'Testing'"></td>
+    </tr>
+    <tr>
+      <td>{{ts('Subject')}}</td>
+      <td ng-repeat="am in getActiveMailings()">
+        {{am.mailing.subject}}
+      </td>
+      <td ng-show="abtest.ab.status == 'Testing'"></td>
+    </tr>
+    <tr ng-controller="ViewRecipCtrl">
+      <td>{{ts('Recipients')}}</td>
+      <td ng-repeat="am in getActiveMailings()">
+        <div ng-show="getIncludesAsString(am.mailing)">
+          <strong>{{ts('Include:')}}</strong> {{getIncludesAsString(am.mailing)}}
+        </div>
+        <div ng-show="getExcludesAsString(am.mailing)">
+          <strong>{{ts('Exclude:')}}</strong> <s>{{getExcludesAsString(am.mailing)}}</s>
+        </div>
+      </td>
+      <td ng-show="abtest.ab.status == 'Testing'"></td>
+    </tr>
+    <tr>
+      <td>{{ts('Content')}}</td>
+      <td ng-repeat="am in getActiveMailings()">
+        <a crm-icon="fa-television" class="crm-hover-button action-item" ng-click="previewMailing(am.name,'html')" ng-show="am.mailing.body_html">{{ts('HTML')}}</a>
+        <a crm-icon="fa-file-text-o" class="crm-hover-button action-item" ng-click="previewMailing(am.name,'text')" ng-show="am.mailing.body_text">{{ts('Text')}}</a>
+      </td>
+      <td ng-show="abtest.ab.status == 'Testing'"></td>
+    </tr>
+    <tr>
+      <td>{{ts('Attachments')}}</td>
+      <td ng-repeat="am in getActiveMailings()">
+        <div ng-repeat="file in am.attachments.files"><a ng-href="{{file.url}}" target="_blank">{{file.name}}</a></div>
+      </td>
+      <td ng-show="abtest.ab.status == 'Testing'"></td>
+    </tr>
+    <tr>
+      <td>{{ts('Tracking')}}</td>
+      <td ng-repeat="am in getActiveMailings()">
+        <div crm-mailing-review-bool crm-on="am.mailing.url_tracking=='1'" crm-title="ts('Click-Throughs')"></div>
+        <div crm-mailing-review-bool crm-on="am.mailing.open_tracking=='1'" crm-title="ts('Opens')"></div>
+      </td>
+      <td ng-show="abtest.ab.status == 'Testing'"></td>
+    </tr>
+    <tr>
+      <td>{{ts('Responding')}}</td>
+      <td ng-repeat="am in getActiveMailings()">
+        <div crm-mailing-review-bool crm-on="am.mailing.override_verp=='0'" crm-title="ts('Track Replies')"></div>
+        <div crm-mailing-review-bool crm-on="am.mailing.override_verp=='0' && mailing.forward_replies=='1'" crm-title="ts('Forward Replies')"></div>
+        <div ng-controller="PreviewComponentCtrl">
+          <div ng-show="am.mailing.override_verp == '0' && mailing.auto_responder"><a crm-icon="fa-envelope" class="crm-hover-button action-item" ng-click="previewComponent(ts('Auto-Respond'), am.mailing.reply_id)">{{ts('Auto-Respond')}}</a></div>
+          <div><a crm-icon="fa-envelope" class="crm-hover-button action-item" ng-click="previewComponent(ts('Opt-out'), am.mailing.optout_id)">{{ts('Opt-out')}}</a></div>
+          <div><a crm-icon="fa-envelope" class="crm-hover-button action-item" ng-click="previewComponent(ts('Resubscribe'), am.mailing.resubscribe_id)">{{ts('Resubscribe')}}</a></div>
+          <div><a crm-icon="fa-envelope" class="crm-hover-button action-item" ng-click="previewComponent(ts('Unsubscribe'), am.mailing.unsubscribe_id)">{{ts('Unsubscribe')}}</a></div>
+        </div>
+      </td>
+      <td ng-show="abtest.ab.status == 'Testing'"></td>
+    </tr>
+    <tr>
+      <td>{{ts('Publication')}}</td>
+      <td ng-repeat="am in getActiveMailings()">
+        {{am.mailing.visibility}}
+      </td>
+      <td ng-show="abtest.ab.status == 'Testing'"></td>
+    </tr>
+    </tbody>
+
+  </table>
+
+  <!--
+  <div crm-ui-tab-set>
+    <div crm-ui-tab id="tab-opens" crm-title="ts('Opens (WIP)')">
+      <div crm-mailing-ab-stats="{criteria: 'open', split_count: 5}" crm-abtest="abtest"></div>
+    </div>
+    <div crm-ui-tab id="tab-clicks" crm-title="ts('Total Clicks (WIP)')">
+      <div crm-mailing-ab-stats="{criteria: 'total unique clicks', split_count: 5}" crm-abtest="abtest"></div>
+    </div>
+  </div>
+  -->
+
+</div>

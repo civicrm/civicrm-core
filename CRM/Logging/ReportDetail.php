@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,17 +23,24 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Logging_ReportDetail extends CRM_Report_Form {
   protected $cid;
+
+  /**
+   * Other contact ID.
+   *
+   * This would be set if we are viewing a merge of 2 contacts.
+   *
+   * @var int
+   */
+  protected $oid;
   protected $db;
   protected $log_conn_id;
   protected $log_date;
@@ -49,57 +56,61 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
   protected $detail;
   protected $summary;
 
-  function __construct() {
-    // don’t display the ‘Add these Contacts to Group’ button
-    $this->_add2groupSupported = FALSE;
+  /**
+   * Instance of Differ.
+   *
+   * @var CRM_Logging_Differ
+   */
+  protected $differ;
 
-    $dsn = defined('CIVICRM_LOGGING_DSN') ? DB::parseDSN(CIVICRM_LOGGING_DSN) : DB::parseDSN(CIVICRM_DSN);
-    $this->db = $dsn['database'];
+  /**
+   * Array of changes made.
+   *
+   * @var array
+   */
+  protected $diffs = array();
 
-    $this->log_conn_id = CRM_Utils_Request::retrieve('log_conn_id', 'Integer', CRM_Core_DAO::$_nullObject);
-    $this->log_date    = CRM_Utils_Request::retrieve('log_date', 'String', CRM_Core_DAO::$_nullObject);
-    $this->cid         = CRM_Utils_Request::retrieve('cid', 'Integer', CRM_Core_DAO::$_nullObject);
-    $this->raw         = CRM_Utils_Request::retrieve('raw', 'Boolean', CRM_Core_DAO::$_nullObject);
+  /**
+   * Don't display the Add these contacts to Group button.
+   *
+   * @var bool
+   */
+  protected $_add2groupSupported = FALSE;
 
-    $this->altered_name  = CRM_Utils_Request::retrieve('alteredName', 'String',  CRM_Core_DAO::$_nullObject);
-    $this->altered_by    = CRM_Utils_Request::retrieve('alteredBy',   'String',  CRM_Core_DAO::$_nullObject);
-    $this->altered_by_id = CRM_Utils_Request::retrieve('alteredById', 'Integer', CRM_Core_DAO::$_nullObject);
- 
+  /**
+   * Class constructor.
+   */
+  public function __construct() {
+
+    $this->storeDB();
+
+    $this->parsePropertiesFromUrl();
+
     parent::__construct();
 
     CRM_Utils_System::resetBreadCrumb();
-    $breadcrumb =
+    $breadcrumb = array(
       array(
-            array('title' => ts('Home'),
-                  'url' => CRM_Utils_System::url()),
-            array('title' => ts('CiviCRM'),
-                  'url' => CRM_Utils_System::url('civicrm', 'reset=1')),
-            array('title' => ts('View Contact'),
-                  'url' => CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid={$this->cid}")),
-            array('title' => ts('Search Results'),
-                  'url' => CRM_Utils_System::url('civicrm/contact/search', "force=1")),
-            );
+        'title' => ts('Home'),
+        'url' => CRM_Utils_System::url(),
+      ),
+      array(
+        'title' => ts('CiviCRM'),
+        'url' => CRM_Utils_System::url('civicrm', 'reset=1'),
+      ),
+      array(
+        'title' => ts('View Contact'),
+        'url' => CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid={$this->cid}"),
+      ),
+      array(
+        'title' => ts('Search Results'),
+        'url' => CRM_Utils_System::url('civicrm/contact/search', "force=1"),
+      ),
+    );
     CRM_Utils_System::appendBreadCrumb($breadcrumb);
 
-    if (CRM_Utils_Request::retrieve('revert', 'Boolean', CRM_Core_DAO::$_nullObject)) {
-      $reverter = new CRM_Logging_Reverter($this->log_conn_id, $this->log_date);
-      $reverter->revert($this->tables);
-      CRM_Core_Session::setStatus(ts('The changes have been reverted.'), ts('Reverted'), 'success');
-      if ($this->cid) {
-        CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contact/view', "reset=1&selectedChild=log&cid={$this->cid}", FALSE, NULL, FALSE));
-      }
-      else {
-        CRM_Utils_System::redirect(CRM_Report_Utils_Report::getNextUrl($this->summary, 'reset=1', FALSE, TRUE));
-      }
-    }
-
-    // make sure the report works even without the params
-    if (!$this->log_conn_id or !$this->log_date) {
-      $dao = new CRM_Core_DAO;
-      $dao->query("SELECT log_conn_id, log_date FROM `{$this->db}`.log_{$this->tables[0]} WHERE log_action = 'Update' ORDER BY log_date DESC LIMIT 1");
-      $dao->fetch();
-      $this->log_conn_id = $dao->log_conn_id;
-      $this->log_date = $dao->log_date;
+    if (CRM_Utils_Request::retrieve('revert', 'Boolean')) {
+      $this->revert();
     }
 
     $this->_columnHeaders = array(
@@ -109,44 +120,81 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
     );
   }
 
-  function buildQuery($applyLimit = TRUE) {}
-
-  function buildRows($sql, &$rows) {
-    // safeguard for when there aren’t any log entries yet
-    if (!$this->log_conn_id or !$this->log_date) {
-      return;
-    }
-
-    if (empty($rows)) {
-
-      $rows = array();
-
-    }
-
-    foreach ($this->tables as $table) {
-      $rows = array_merge($rows, $this->diffsInTable($table));
-    }
+  /**
+   * Build query for report.
+   *
+   * We override this to be empty & calculate the rows in the buildRows function.
+   *
+   * @param bool $applyLimit
+   */
+  public function buildQuery($applyLimit = TRUE) {
   }
 
+  /**
+   * Build rows from query.
+   *
+   * @param string $sql
+   * @param array $rows
+   */
+  public function buildRows($sql, &$rows) {
+    // safeguard for when there aren’t any log entries yet
+    if (!$this->log_conn_id && !$this->log_date) {
+      return;
+    }
+    $this->getDiffs();
+    $rows = $this->convertDiffsToRows();
+  }
+
+  /**
+   * Get the diffs for the report, calculating them if not already done.
+   *
+   * Note that contact details report now uses a more comprehensive method but
+   * the contribution logging details report still uses this.
+   *
+   * @return array
+   */
+  protected function getDiffs() {
+    if (empty($this->diffs)) {
+      foreach ($this->tables as $table) {
+        $this->diffs = array_merge($this->diffs, $this->diffsInTable($table));
+      }
+    }
+    return $this->diffs;
+  }
+
+  /**
+   * @param $table
+   *
+   * @return array
+   */
   protected function diffsInTable($table) {
-    $rows = array();
+    $this->setDiffer();
+    return $this->differ->diffsInTable($table, $this->cid);
+  }
 
-    $differ = new CRM_Logging_Differ($this->log_conn_id, $this->log_date, $this->interval);
-    $diffs = $differ->diffsInTable($table, $this->cid);
-
+  /**
+   * Convert the diffs to row format.
+   *
+   * @return array
+   */
+  protected function convertDiffsToRows() {
     // return early if nothing found
-    if (empty($diffs)) {
-      return $rows;
+    if (empty($this->diffs)) {
+      return array();
     }
 
-    list($titles, $values) = $differ->titlesAndValuesForTable($table);
-
     // populate $rows with only the differences between $changed and $original (skipping certain columns and NULL ↔ empty changes unless raw requested)
-    $skipped = array('contact_id', 'entity_id', 'id');
-    foreach ($diffs as $diff) {
+    $skipped = array('id');
+    foreach ($this->diffs as $diff) {
+      $table = $diff['table'];
+      if (empty($metadata[$table])) {
+        list($metadata[$table]['titles'], $metadata[$table]['values']) = $this->differ->titlesAndValuesForTable($table, $diff['log_date']);
+      }
+      $values = CRM_Utils_Array::value('values', $metadata[$diff['table']], array());
+      $titles = $metadata[$diff['table']]['titles'];
       $field = $diff['field'];
-      $from  = $diff['from'];
-      $to    = $diff['to'];
+      $from = $diff['from'];
+      $to = $diff['to'];
 
       if ($this->raw) {
         $field = "$table.$field";
@@ -161,10 +209,11 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
         }
 
         // special-case for multiple values. Also works for CRM-7251: preferred_communication_method
-        if ((substr($from, 0, 1) == CRM_Core_DAO::VALUE_SEPARATOR && 
-            substr($from, -1, 1) == CRM_Core_DAO::VALUE_SEPARATOR) || 
-          (substr($to, 0, 1) == CRM_Core_DAO::VALUE_SEPARATOR && 
-            substr($to, -1, 1) == CRM_Core_DAO::VALUE_SEPARATOR)) {
+        if ((substr($from, 0, 1) == CRM_Core_DAO::VALUE_SEPARATOR &&
+            substr($from, -1, 1) == CRM_Core_DAO::VALUE_SEPARATOR) ||
+          (substr($to, 0, 1) == CRM_Core_DAO::VALUE_SEPARATOR &&
+            substr($to, -1, 1) == CRM_Core_DAO::VALUE_SEPARATOR)
+        ) {
           $froms = $tos = array();
           foreach (explode(CRM_Core_DAO::VALUE_SEPARATOR, trim($from, CRM_Core_DAO::VALUE_SEPARATOR)) as $val) {
             $froms[] = CRM_Utils_Array::value($val, $values[$field]);
@@ -173,7 +222,7 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
             $tos[] = CRM_Utils_Array::value($val, $values[$field]);
           }
           $from = implode(', ', array_filter($froms));
-          $to   = implode(', ', array_filter($tos));
+          $to = implode(', ', array_filter($tos));
         }
 
         if (isset($values[$field][$from])) {
@@ -199,24 +248,118 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
     return $rows;
   }
 
-  function buildQuickForm() {
+  public function buildQuickForm() {
     parent::buildQuickForm();
 
-    $params = array(
-      1 => array($this->log_conn_id, 'Integer'),
-      2 => array($this->log_date, 'String'),
-    );
-
     $this->assign('whom_url', CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid={$this->cid}"));
-    $this->assign('who_url',  CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid={$this->altered_by_id}"));
+    $this->assign('who_url', CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid={$this->altered_by_id}"));
     $this->assign('whom_name', $this->altered_name);
-    $this->assign('who_name',  $this->altered_by);
+    $this->assign('who_name', $this->altered_by);
 
     $this->assign('log_date', CRM_Utils_Date::mysqlToIso($this->log_date));
 
     $q = "reset=1&log_conn_id={$this->log_conn_id}&log_date={$this->log_date}";
+    if ($this->oid) {
+      $q .= '&oid=' . $this->oid;
+    }
     $this->assign('revertURL', CRM_Report_Utils_Report::getNextUrl($this->detail, "$q&revert=1", FALSE, TRUE));
-    $this->assign('revertConfirm', ts('Are you sure you want to revert all these changes?'));
+    $this->assign('revertConfirm', ts('Are you sure you want to revert all changes?'));
   }
-}
 
+  /**
+   * Store the dsn for the logging database in $this->db.
+   */
+  protected function storeDB() {
+    $dsn = defined('CIVICRM_LOGGING_DSN') ? DB::parseDSN(CIVICRM_LOGGING_DSN) : DB::parseDSN(CIVICRM_DSN);
+    $this->db = $dsn['database'];
+  }
+
+  /**
+   * Calculate all the contact related diffs for the change.
+   */
+  protected function calculateContactDiffs() {
+    $this->diffs = $this->getAllContactChangesForConnection();
+  }
+
+
+  /**
+   * Get an array of changes made in the mysql connection.
+   *
+   * @return mixed
+   */
+  public function getAllContactChangesForConnection() {
+    if (empty($this->log_conn_id)) {
+      return array();
+    }
+    $this->setDiffer();
+    try {
+      return $this->differ->getAllChangesForConnection($this->tables);
+    }
+    catch (CRM_Core_Exception $e) {
+      CRM_Core_Error::statusBounce(ts($e->getMessage()));
+    }
+  }
+
+  /**
+   * Make sure the differ is defined.
+   */
+  protected function setDiffer() {
+    if (empty($this->differ)) {
+      $this->differ = new CRM_Logging_Differ($this->log_conn_id, $this->log_date, $this->interval);
+    }
+  }
+
+  /**
+   * Set this tables to reflect tables changed in a merge.
+   */
+  protected function setTablesToContactRelatedTables() {
+    $schema = new CRM_Logging_Schema();
+    $this->tables = $schema->getLogTablesForContact();
+    // allow tables to be extended by report hook query objects.
+    // This is a report specific hook. It's unclear how it interacts to / overlaps the main one.
+    // It probably precedes the main one and was never reconciled with it....
+    CRM_Report_BAO_Hook::singleton()->alterLogTables($this, $this->tables);
+  }
+
+  /**
+   * Revert the changes defined by the parameters.
+   */
+  protected function revert() {
+    $reverter = new CRM_Logging_Reverter($this->log_conn_id, $this->log_date);
+    $reverter->calculateDiffsFromLogConnAndDate($this->tables);
+    $reverter->revert();
+    CRM_Core_Session::setStatus(ts('The changes have been reverted.'), ts('Reverted'), 'success');
+    if ($this->cid) {
+      if ($this->oid) {
+        CRM_Utils_System::redirect(CRM_Utils_System::url(
+          'civicrm/contact/merge',
+          "reset=1&cid={$this->cid}&oid={$this->oid}",
+          FALSE,
+          NULL,
+          FALSE)
+        );
+      }
+      else {
+        CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contact/view', "reset=1&selectedChild=log&cid={$this->cid}", FALSE, NULL, FALSE));
+      }
+    }
+    else {
+      CRM_Utils_System::redirect(CRM_Report_Utils_Report::getNextUrl($this->summary, 'reset=1', FALSE, TRUE));
+    }
+  }
+
+  /**
+   * Get the properties that might be in the URL.
+   */
+  protected function parsePropertiesFromUrl() {
+    $this->log_conn_id = CRM_Utils_Request::retrieve('log_conn_id', 'String');
+    $this->log_date = CRM_Utils_Request::retrieve('log_date', 'String');
+    $this->cid = CRM_Utils_Request::retrieve('cid', 'Integer');
+    $this->raw = CRM_Utils_Request::retrieve('raw', 'Boolean');
+
+    $this->altered_name = CRM_Utils_Request::retrieve('alteredName', 'String');
+    $this->altered_by = CRM_Utils_Request::retrieve('alteredBy', 'String');
+    $this->altered_by_id = CRM_Utils_Request::retrieve('alteredById', 'Integer');
+  }
+
+}

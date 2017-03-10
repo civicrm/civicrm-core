@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
  */
@@ -39,18 +39,16 @@
 class CRM_UF_Form_Group extends CRM_Core_Form {
 
   /**
-   * the form id saved to the session for an update
+   * The form id saved to the session for an update.
    *
    * @var int
-   * @access protected
    */
   protected $_id;
 
   /**
-   * the title for group
+   * The title for group.
    *
    * @var int
-   * @access protected
    */
   protected $_title;
   protected $_groupElement;
@@ -58,10 +56,9 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
   protected $_allPanes;
 
   /**
-   * Function to set variables up before form is built
+   * Set variables up before form is built.
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     // current form id
@@ -83,8 +80,8 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
     }
     elseif ($this->_action & (CRM_Core_Action::DISABLE | CRM_Core_Action::DELETE)) {
       $ufGroup['module'] = implode(' , ', CRM_Core_BAO_UFGroup::getUFJoinRecord($this->_id, TRUE));
-      $status            = 0;
-      $status            = CRM_Core_BAO_UFGroup::usedByModule($this->_id);
+      $status = 0;
+      $status = CRM_Core_BAO_UFGroup::usedByModule($this->_id);
       if ($this->_action & (CRM_Core_Action::DISABLE)) {
         if ($status) {
           $message = 'This profile is currently used for ' . $ufGroup['module'] . '. If you disable the profile - it will be removed from these forms and/or modules. Do you want to continue?';
@@ -109,10 +106,9 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
   }
 
   /**
-   * Function to actually build the form
+   * Build the form object.
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     if ($this->_action & (CRM_Core_Action::DISABLE | CRM_Core_Action::DELETE)) {
@@ -123,18 +119,17 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
         $display = 'Delete Profile';
       }
       $this->addButtons(array(
-          array(
-            'type' => 'next',
-            'name' => $display,
-            'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-            'isDefault' => TRUE,
-          ),
-          array(
-            'type' => 'cancel',
-            'name' => ts('Cancel'),
-          ),
-        )
-      );
+        array(
+          'type' => 'next',
+          'name' => $display,
+          'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
+          'isDefault' => TRUE,
+        ),
+        array(
+          'type' => 'cancel',
+          'name' => ts('Cancel'),
+        ),
+      ));
       return;
     }
     $this->applyFilter('__ALL__', 'trim');
@@ -142,7 +137,6 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
     // title
     $this->add('text', 'title', ts('Profile Name'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_UFGroup', 'title'), TRUE);
     $this->add('textarea', 'description', ts('Description'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_UFGroup', 'description'));
-
 
     //add checkboxes
     $uf_group_type = array();
@@ -153,8 +147,8 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
     $this->addGroup($uf_group_type, 'uf_group_type', ts('Used For'), '&nbsp;');
 
     // help text
-    $this->addWysiwyg('help_pre', ts('Pre-form Help'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_UFGroup', 'help_post'));
-    $this->addWysiwyg('help_post', ts('Post-form Help'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_UFGroup', 'help_post'));
+    $this->add('wysiwyg', 'help_pre', ts('Pre-form Help'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_UFGroup', 'help_post'));
+    $this->add('wysiwyg', 'help_post', ts('Post-form Help'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_UFGroup', 'help_post'));
 
     // weight
     $this->add('text', 'weight', ts('Order'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_UFJoin', 'weight'), TRUE);
@@ -185,18 +179,17 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
     }
 
     $this->addButtons(array(
-        array(
-          'type' => 'next',
-          'name' => ts('Save'),
-          'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-          'isDefault' => TRUE,
-        ),
-        array(
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ),
-      )
-    );
+      array(
+        'type' => 'next',
+        'name' => ts('Save'),
+        'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
+        'isDefault' => TRUE,
+      ),
+      array(
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ),
+    ));
 
     // views are implemented as frozen form
     if ($this->_action & CRM_Core_Action::VIEW) {
@@ -208,14 +201,13 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
   }
 
   /**
-   * This function sets the default values for the form. Note that in edit/view mode
+   * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return void
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
     $showHide = new CRM_Core_ShowHideBlocks();
 
@@ -257,9 +249,16 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
 
       $showAdvanced = 0;
       $advFields = array(
-        'group', 'post_URL', 'cancel_URL',
-        'add_captcha', 'is_map', 'is_uf_link', 'is_edit_link',
-        'is_update_dupe', 'is_cms_user', 'is_proximity_search',
+        'group',
+        'post_URL',
+        'cancel_URL',
+        'add_captcha',
+        'is_map',
+        'is_uf_link',
+        'is_edit_link',
+        'is_update_dupe',
+        'is_cms_user',
+        'is_proximity_search',
       );
       foreach ($advFields as $key) {
         if (!empty($defaults[$key])) {
@@ -284,17 +283,19 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
   }
 
   /**
-   * global form rule
+   * Global form rule.
    *
-   * @param array $fields  the input form values
-   * @param array $files   the uploaded files if any
-   * @param array $self    current form object.
+   * @param array $fields
+   *   The input form values.
+   * @param array $files
+   *   The uploaded files if any.
+   * @param array $self
+   *   Current form object.
    *
-   * @return true if no errors, else array of errors
-   * @access public
-   * @static
+   * @return bool|array
+   *   true if no errors, else array of errors
    */
-  static function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files, $self) {
     $errors = array();
 
     //validate profile title as well as name.
@@ -302,9 +303,10 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
     $name = CRM_Utils_String::munge($title, '_', 56);
     $name .= $self->_id ? '_' . $self->_id : '';
     $query = 'select count(*) from civicrm_uf_group where ( name like %1 ) and id != %2';
-    $pCnt = CRM_Core_DAO::singleValueQuery($query, array(1 => array($name, 'String'),
-        2 => array((int)$self->_id, 'Integer'),
-      ));
+    $pCnt = CRM_Core_DAO::singleValueQuery($query, array(
+      1 => array($name, 'String'),
+      2 => array((int) $self->_id, 'Integer'),
+    ));
     if ($pCnt) {
       $errors['title'] = ts('Profile \'%1\' already exists in Database.', array(1 => $title));
     }
@@ -313,10 +315,9 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
   }
 
   /**
-   * Process the form
+   * Process the form.
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {
@@ -368,10 +369,12 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
         CRM_Core_Session::setStatus(ts("Your CiviCRM Profile '%1' has been saved.", array(1 => $ufGroup->title)), ts('Profile Saved'), 'success');
       }
       else {
-        $url = CRM_Utils_System::url('civicrm/admin/uf/group/field/add', 'reset=1&action=add&gid=' . $ufGroup->id);
+        // Jump directly to adding a field if popups are disabled
+        $action = CRM_Core_Resources::singleton()->ajaxPopupsEnabled ? '' : '/add';
+        $url = CRM_Utils_System::url("civicrm/admin/uf/group/field$action", 'reset=1&new=1&gid=' . $ufGroup->id . '&action=' . ($action ? 'add' : 'browse'));
         CRM_Core_Session::setStatus(ts('Your CiviCRM Profile \'%1\' has been added. You can add fields to this profile now.',
-            array(1 => $ufGroup->title)
-          ), ts('Profile Added'), 'success');
+          array(1 => $ufGroup->title)
+        ), ts('Profile Added'), 'success');
       }
       $session = CRM_Core_Session::singleton();
       $session->replaceUserContext($url);
@@ -380,5 +383,5 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
     // update cms integration with registration / my account
     CRM_Utils_System::updateCategories();
   }
-}
 
+}

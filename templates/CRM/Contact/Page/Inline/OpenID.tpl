@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
   <div class="crm-clear crm-inline-block-content" {if $permission EQ 'edit'}title="{ts}Add or edit OpenID{/ts}"{/if}>
     {if $permission EQ 'edit'}
       <div class="crm-edit-help">
-        <span class="batch-edit"></span>{if empty($openid)}{ts}Add OpenID{/ts}{else}{ts}Add or edit OpenID{/ts}{/if}
+        <span class="crm-i fa-pencil"></span> {if empty($openid)}{ts}Add OpenID{/ts}{else}{ts}Add or edit OpenID{/ts}{/if}
       </div>
     {/if}
     {if empty($openid)}
@@ -39,9 +39,9 @@
     {/if}
     {foreach from=$openid item=item}
       {if $item.openid}
-      <div class="crm-summary-row">
+      <div class="crm-summary-row {if $item.is_primary eq 1} primary{/if}">
         <div class="crm-label">{$item.location_type}&nbsp;{ts}OpenID{/ts}</div>
-        <div class="crm-content crm-contact_openid {if $item.is_primary eq 1} primary{/if}">
+        <div class="crm-content crm-contact_openid">
           <a href="{$item.openid}">{$item.openid|mb_truncate:40}</a>
         </div>
       </div>

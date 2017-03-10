@@ -26,7 +26,7 @@
     {elseif $formValues.receipt_text_renewal}
      <p>{$formValues.receipt_text_renewal|htmlize}</p>
     {else}
-     <p>{ts}Thanks for your support.{/ts}</p>
+     <p>{ts}Thank you for your support.{/ts}</p>
     {/if}
     {if ! $cancelled}
      <p>{ts}Please print this receipt for your records.{/ts}</p>

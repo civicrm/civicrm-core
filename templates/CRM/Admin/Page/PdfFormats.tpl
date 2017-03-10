@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright (C) 2011 Marty Wright                                    |
  | Licensed to CiviCRM under the Academic Free License version 3.0.   |
@@ -35,15 +35,13 @@
 {if $rows}
     <div id="ltype">
         {strip}
-        {include file="CRM/common/jsortable.tpl"}
-        <table id="pdfFormats" class="display">
+        <table id="pdfFormats" class="row-highlight">
         <thead>
         <tr class="columnheader">
-            <th  class="sortable">{ts}Name{/ts}</th>
-            <th id="nosort">{ts}Description{/ts}</th>
+            <th>{ts}Name{/ts}</th>
+            <th>{ts}Description{/ts}</th>
             <th >{ts}Default?{/ts}</th>
-            <th id="order" class="sortable">{ts}Order{/ts}</th>
-            <th class="hiddenElement"></th>
+            <th>{ts}Order{/ts}</th>
             <th ></th>
         </tr>
         </thead>
@@ -52,8 +50,7 @@
             <td class="crm-pdfFormat-name">{$row.name}</td>
             <td class="crm-pdfFormat-description">{$row.description}</td>
             <td class="crm-pdfFormat-is_default">{if $row.is_default eq 1}<img src="{$config->resourceBase}i/check.gif" alt="{ts}Default{/ts}" />{/if}&nbsp;</td>
-          <td class="crm-pdfFormat-order nowrap">{$row.order}</td>
-          <td class="order hiddenElement">{$row.weight}</td>
+          <td class="crm-pdfFormat-order nowrap">{$row.weight}</td>
           <td>{$row.action|replace:'xx':$row.id}</td>
         </tr>
         {/foreach}
@@ -63,12 +60,12 @@
 {else}
     <div class="messages status no-popup">
       <div class="icon inform-icon"></div>
-        {capture assign=link}href="{crmURL q="action=add&reset=1"}" class="action-item action-item-first"{/capture}
-        {ts 1=$link}There are no PDF Page Formats configured. You can <a %1>add one</a>.{/ts}
+      {ts}None found.{/ts}
     </div>
 {/if}
     <div class="spacer"></div>
     <div class="action-link">
-        <a href="{crmURL q="action=add&reset=1"}" id="newPdfFormat" class="button"><span><div class="icon add-icon"></div>{ts}Add PDF Page Format{/ts}</span></a>
+      {crmButton q="action=add&reset=1" id="newPdfFormat"  icon="plus-circle"}{ts}Add PDF Page Format{/ts}{/crmButton}
+      {crmButton p="civicrm/admin" q="reset=1" class="cancel" icon="times"}{ts}Done{/ts}{/crmButton}
     </div>
 {/if}

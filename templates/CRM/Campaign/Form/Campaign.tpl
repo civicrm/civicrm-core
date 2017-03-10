@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,10 +25,6 @@
 *}
 <div class="crm-block crm-form-block crm-campaign-form-block">
 
-{* load the custom data *}
-{if $cdType}
-    {include file="CRM/Custom/Form/CustomData.tpl"}
-{else}
 
 {if $action eq 8}
   <table class="form-layout">
@@ -112,17 +108,13 @@
 
 {literal}
 <script type="text/javascript">
-cj( document ).ready( function( ) {
+  CRM.$(function($) {
     {/literal}{if $customDataSubType}
-     CRM.buildCustomData( '{$customDataType}', {$customDataSubType} );
-        {else}
-     CRM.buildCustomData( '{$customDataType}' );
-        {/if}
+      CRM.buildCustomData( '{$customDataType}', {$customDataSubType} );
+    {else}
+      CRM.buildCustomData( '{$customDataType}' );
+    {/if}
     {literal}
-});
+  });
 </script>
 {/literal}
-
-
-{/if} {* load custom data *}
-

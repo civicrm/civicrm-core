@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,21 +23,18 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
  * This class is used to retrieve and display a range of
  * contacts that match the given criteria (specifically for
  * results of advanced search options.
- *
  */
 class CRM_Mailing_Selector_Search extends CRM_Core_Selector_Base implements CRM_Core_Selector_API {
 
@@ -45,112 +42,111 @@ class CRM_Mailing_Selector_Search extends CRM_Core_Selector_Base implements CRM_
    * This defines two actions- View and Edit.
    *
    * @var array
-   * @static
    */
   static $_links = NULL;
 
   /**
-   * we use desc to remind us what that column is, name is used in the tpl
+   * We use desc to remind us what that column is, name is used in the tpl
    *
    * @var array
-   * @static
    */
   static $_columnHeaders;
 
   /**
    * Properties of contact we're interested in displaying
    * @var array
-   * @static
    */
   static $_properties = array(
     'contact_id',
     'mailing_id',
     'mailing_name',
+    'language',
     'sort_name',
     'email',
     'mailing_subject',
     'email_on_hold',
     'contact_opt_out',
     'mailing_job_status',
-    'mailing_job_end_date'
+    'mailing_job_end_date',
   );
 
   /**
-   * are we restricting ourselves to a single contact
+   * Are we restricting ourselves to a single contact
    *
-   * @access protected
    * @var boolean
    */
   protected $_single = FALSE;
 
   /**
-   * are we restricting ourselves to a single contact
+   * Are we restricting ourselves to a single contact
    *
-   * @access protected
    * @var boolean
    */
   protected $_limit = NULL;
 
   /**
-   * what context are we being invoked from
+   * What context are we being invoked from
    *
-   * @access protected
    * @var string
    */
   protected $_context = NULL;
 
   /**
-   * what component context are we being invoked from
+   * What component context are we being invoked from
    *
-   * @access protected
    * @var string
    */
   protected $_compContext = NULL;
 
   /**
-   * queryParams is the array returned by exportValues called on
+   * QueryParams is the array returned by exportValues called on
    * the HTML_QuickForm_Controller for that page.
    *
    * @var array
-   * @access protected
    */
   public $_queryParams;
 
   /**
-   * represent the type of selector
+   * Represent the type of selector.
    *
    * @var int
-   * @access protected
    */
   protected $_action;
 
   /**
-   * The additional clause that we restrict the search with
+   * The additional clause that we restrict the search with.
    *
    * @var string
    */
   protected $_mailingClause = NULL;
 
   /**
-   * The query object
+   * The query object.
    *
    * @var string
    */
   protected $_query;
 
   /**
-   * Class constructor
+   * Class constructor.
    *
-   * @param array $queryParams array of parameters for query
-   * @param int   $action - action of search basic or advanced.
-   * @param string   $mailingClause if the caller wants to further restrict the search
-   * @param boolean $single are we dealing only with one contact?
-   * @param int     $limit  how many mailing do we want returned
+   * @param array $queryParams
+   *   Array of parameters for query.
+   * @param \const|int $action - action of search basic or advanced.
+   * @param string $mailingClause
+   *   If the caller wants to further restrict the search.
+   * @param bool $single
+   *   Are we dealing only with one contact?.
+   * @param int $limit
+   *   How many mailing do we want returned.
    *
-   * @return CRM_Contact_Selector
-   * @access public
+   * @param string $context
+   * @param null $compContext
+   *
+   * @return \CRM_Mailing_Selector_Search
    */
-  function __construct(&$queryParams,
+  public function __construct(
+    &$queryParams,
     $action = CRM_Core_Action::NONE,
     $mailingClause = NULL,
     $single = FALSE,
@@ -161,9 +157,9 @@ class CRM_Mailing_Selector_Search extends CRM_Core_Selector_Base implements CRM_
     // submitted form values
     $this->_queryParams = &$queryParams;
 
-    $this->_single      = $single;
-    $this->_limit       = $limit;
-    $this->_context     = $context;
+    $this->_single = $single;
+    $this->_limit = $limit;
+    $this->_context = $context;
     $this->_compContext = $compContext;
 
     $this->_mailingClause = $mailingClause;
@@ -180,7 +176,6 @@ class CRM_Mailing_Selector_Search extends CRM_Core_Selector_Base implements CRM_
 
     $this->_query->_distinctComponentClause = " civicrm_mailing_recipients.id ";
   }
-  //end of constructor
 
   /**
    * This method returns the links that are given for each search row.
@@ -190,47 +185,44 @@ class CRM_Mailing_Selector_Search extends CRM_Core_Selector_Base implements CRM_
    * - Edit
    *
    * @return array
-   * @access public
-   *
    */
-  static function &links() {
+  public static function &links() {
     if (!(self::$_links)) {
-    list($context, $key) = func_get_args();
-    $extraParams = ($key) ? "&key={$key}" : NULL;
-    $searchContext = ($context) ? "&context=$context" : NULL;
+      list($context, $key) = func_get_args();
+      $extraParams = ($key) ? "&key={$key}" : NULL;
+      $searchContext = ($context) ? "&context=$context" : NULL;
 
-    self::$_links = array(
-      CRM_Core_Action::VIEW => array(
-        'name' => ts('View'),
-        'url' => 'civicrm/contact/view',
-        'qs' => "reset=1&cid=%%cid%%{$searchContext}{$extraParams}",
-        'title' => ts('View Contact Details'),
-      ),
-      CRM_Core_Action::UPDATE => array(
-        'name' => ts('Edit'),
-        'url' => 'civicrm/contact/add',
-        'qs' => "reset=1&action=update&cid=%%cid%%{$searchContext}{$extraParams}",
-        'title' => ts('Edit Contact Details'),
-      ),
-      CRM_Core_Action::DELETE => array(
-        'name' => ts('Delete'),
-        'url' => 'civicrm/contact/view/delete',
-        'qs' => "reset=1&delete=1&cid=%%cid%%{$searchContext}{$extraParams}",
-        'title' => ts('Delete Contact'),
-      ),
-    );
+      self::$_links = array(
+        CRM_Core_Action::VIEW => array(
+          'name' => ts('View'),
+          'url' => 'civicrm/contact/view',
+          'qs' => "reset=1&cid=%%cid%%{$searchContext}{$extraParams}",
+          'title' => ts('View Contact Details'),
+        ),
+        CRM_Core_Action::UPDATE => array(
+          'name' => ts('Edit'),
+          'url' => 'civicrm/contact/add',
+          'qs' => "reset=1&action=update&cid=%%cid%%{$searchContext}{$extraParams}",
+          'title' => ts('Edit Contact Details'),
+        ),
+        CRM_Core_Action::DELETE => array(
+          'name' => ts('Delete'),
+          'url' => 'civicrm/contact/view/delete',
+          'qs' => "reset=1&delete=1&cid=%%cid%%{$searchContext}{$extraParams}",
+          'title' => ts('Delete Contact'),
+        ),
+      );
     }
     return self::$_links;
   }
-  //end of function
 
   /**
-   * getter for array of the parameters required for creating pager.
+   * Getter for array of the parameters required for creating pager.
    *
-   * @param
-   * @access public
+   * @param $action
+   * @param array $params
    */
-  function getPagerParams($action, &$params) {
+  public function getPagerParams($action, &$params) {
     $params['status'] = ts('Mailing Recipient') . ' %%StatusMessage%%';
     $params['csvString'] = NULL;
     if ($this->_limit) {
@@ -243,17 +235,16 @@ class CRM_Mailing_Selector_Search extends CRM_Core_Selector_Base implements CRM_
     $params['buttonTop'] = 'PagerTopButton';
     $params['buttonBottom'] = 'PagerBottomButton';
   }
-  //end of function
 
   /**
    * Returns total number of rows for the query.
    *
-   * @param
+   * @param string $action
    *
-   * @return int Total number of rows
-   * @access public
+   * @return int
+   *   Total number of rows
    */
-  function getTotalCount($action) {
+  public function getTotalCount($action) {
     return $this->_query->searchQuery(0, 0, NULL,
       TRUE, FALSE,
       FALSE, FALSE,
@@ -263,17 +254,23 @@ class CRM_Mailing_Selector_Search extends CRM_Core_Selector_Base implements CRM_
   }
 
   /**
-   * returns all the rows in the given offset and rowCount
+   * Returns all the rows in the given offset and rowCount.
    *
-   * @param enum   $action   the action being performed
-   * @param int    $offset   the row number to start from
-   * @param int    $rowCount the number of rows to return
-   * @param string $sort     the sql string that describes the sort order
-   * @param enum   $output   what should the result set include (web/email/csv)
+   * @param string $action
+   *   The action being performed.
+   * @param int $offset
+   *   The row number to start from.
+   * @param int $rowCount
+   *   The number of rows to return.
+   * @param string $sort
+   *   The sql string that describes the sort order.
+   * @param string $output
+   *   What should the result set include (web/email/csv).
    *
-   * @return int   the total number of rows for this action
+   * @return int
+   *   the total number of rows for this action
    */
-  function &getRows($action, $offset, $rowCount, $sort, $output = NULL) {
+  public function &getRows($action, $offset, $rowCount, $sort, $output = NULL) {
     $result = $this->_query->searchQuery($offset, $rowCount, $sort,
       FALSE, FALSE,
       FALSE, FALSE,
@@ -290,7 +287,7 @@ class CRM_Mailing_Selector_Search extends CRM_Core_Selector_Base implements CRM_
     $mask = CRM_Core_Action::mask($permissions);
     $qfKey = $this->_key;
 
-    While ($result->fetch()) {
+    while ($result->fetch()) {
       $row = array();
       // the columns we are interested in
       foreach (self::$_properties as $property) {
@@ -308,7 +305,7 @@ class CRM_Mailing_Selector_Search extends CRM_Core_Selector_Base implements CRM_
 
       $row['action'] = CRM_Core_Action::formLink(
         self::links($qfKey, $this->_context),
-        $mask, 
+        $mask,
         $actions,
         ts('more'),
         FALSE,
@@ -316,8 +313,7 @@ class CRM_Mailing_Selector_Search extends CRM_Core_Selector_Base implements CRM_
         'Contact',
         $result->contact_id
       );
-      $row['contact_type'] = CRM_Contact_BAO_Contact_Utils::getImage($result->contact_sub_type ?
-        $result->contact_sub_type : $result->contact_type, FALSE, $result->contact_id
+      $row['contact_type'] = CRM_Contact_BAO_Contact_Utils::getImage($result->contact_sub_type ? $result->contact_sub_type : $result->contact_type, FALSE, $result->contact_id
       );
 
       $rows[] = $row;
@@ -326,26 +322,23 @@ class CRM_Mailing_Selector_Search extends CRM_Core_Selector_Base implements CRM_
   }
 
   /**
-   *
-   * @return array   $qill         which contains an array of strings
-   * @access public
+   * @inheritDoc
    */
-
-  // the current internationalisation is bad, but should more or less work
-  // for most of "European" languages
   public function getQILL() {
     return $this->_query->qill();
   }
 
   /**
-   * returns the column headers as an array of tuples:
+   * Returns the column headers as an array of tuples:
    * (name, sortName (key to the sort array))
    *
-   * @param string $action the action being performed
-   * @param enum   $output what should the result set include (web/email/csv)
+   * @param string $action
+   *   The action being performed.
+   * @param string $output
+   *   What should the result set include (web/email/csv).
    *
-   * @return array the column headers that need to be displayed
-   * @access public
+   * @return array
+   *   the column headers that need to be displayed
    */
   public function &getColumnHeaders($action = NULL, $output = NULL) {
     if (!isset(self::$_columnHeaders)) {
@@ -364,6 +357,11 @@ class CRM_Mailing_Selector_Search extends CRM_Core_Selector_Base implements CRM_
         array(
           'name' => ts('Mailing Name'),
           'sort' => 'mailing_name',
+          'direction' => CRM_Utils_Sort::DONTCARE,
+        ),
+        array(
+          'name' => ts('Language'),
+          'sort' => 'language',
           'direction' => CRM_Utils_Sort::DONTCARE,
         ),
         array(
@@ -387,22 +385,31 @@ class CRM_Mailing_Selector_Search extends CRM_Core_Selector_Base implements CRM_
     return self::$_columnHeaders;
   }
 
-  function alphabetQuery() {
+  /**
+   * @return mixed
+   */
+  public function alphabetQuery() {
     return $this->_query->searchQuery(NULL, NULL, NULL, FALSE, FALSE, TRUE);
   }
 
-  function &getQuery() {
+  /**
+   * @return string
+   */
+  public function &getQuery() {
     return $this->_query;
   }
 
   /**
-   * name of export file.
+   * Name of export file.
    *
-   * @param string $output type of output
+   * @param string $output
+   *   Type of output.
    *
-   * @return string name of the file
+   * @return string
+   *   name of the file
    */
-  function getExportFileName($output = 'csv') {
+  public function getExportFileName($output = 'csv') {
     return ts('CiviCRM Mailing Search');
   }
+
 }

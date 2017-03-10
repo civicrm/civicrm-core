@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,16 +22,20 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Contact_PrevNextTest
+ */
 class WebTest_Contact_PrevNextTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
     parent::setUp();
   }
 
-  function testPrevNext() {
+  public function testPrevNext() {
     $this->webtestLogin();
 
     /* add new group */
@@ -62,7 +66,6 @@ class WebTest_Contact_PrevNextTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent('_qf_GroupContact_next');
     $this->select('group_id', "label={$groupName}");
     $this->click('_qf_GroupContact_next');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForText('crm-notification-container', "Added to Group");
 
     // Individual 2
@@ -74,7 +77,6 @@ class WebTest_Contact_PrevNextTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent('_qf_GroupContact_next');
     $this->select('group_id', "label={$groupName}");
     $this->click('_qf_GroupContact_next');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForText('crm-notification-container', "Added to Group");
 
     // Individual 3
@@ -86,7 +88,6 @@ class WebTest_Contact_PrevNextTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent('_qf_GroupContact_next');
     $this->select('group_id', "label={$groupName}");
     $this->click('_qf_GroupContact_next');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForText('crm-notification-container', "Added to Group");
 
     // Search contacts
@@ -125,5 +126,5 @@ class WebTest_Contact_PrevNextTest extends CiviSeleniumTestCase {
     $this->assertElementContainsText('css=div.crm-summary-display_name', "{$contact1} AAA");
     $this->assertElementContainsText('css=li.crm-next-action a span', "Next");
   }
-}
 
+}

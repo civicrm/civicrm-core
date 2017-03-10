@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,12 +28,15 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Batch_Form_Search extends CRM_Core_Form {
-  function setDefaultValues() {
+  /**
+   * Set default values.
+   *
+   * @return array
+   */
+  public function setDefaultValues() {
     $defaults = array();
 
     $status = CRM_Utils_Request::retrieve('status', 'Positive', CRM_Core_DAO::$_nullObject, FALSE, 1);
@@ -60,5 +63,5 @@ class CRM_Batch_Form_Search extends CRM_Core_Form {
     parent::buildQuickForm();
     $this->assign('suppressForm', TRUE);
   }
-}
 
+}

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
  */
@@ -36,11 +36,11 @@
 /**
  * Grab the button type from a passed button element 'name' by checking for reserved QF button type strings
  *
- * @param string $btnId
+ * @param string $btnName
  *
- * @return string  button type, one of: 'upload', 'next', 'back', 'cancel', 'refresh'
+ * @return string
+ *   button type, one of: 'upload', 'next', 'back', 'cancel', 'refresh'
  *                                      'submit', 'done', 'display', 'jump' 'process'
- * @access public
  */
 function smarty_modifier_crmBtnType($btnName) {
   // split the string into 5 or more
@@ -51,4 +51,3 @@ function smarty_modifier_crmBtnType($btnName) {
 
   return $substr[3];
 }
-

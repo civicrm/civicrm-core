@@ -1,0 +1,23 @@
+<div ng-controller="CrmCxnConfirmReconnectCtrl">
+  <p>{{ts('Are you sure you want to reconnect \"%1\"?', {1: appMeta.title})}}</p>
+
+  <p>{{ts('Reconnecting will change the connection details (such as callback URLs and permissions). This can be useful in a few cases, such as:')}}</p>
+
+  <ul>
+    <li>{{ts('After your site has migrated to a new URL.')}}</li>
+    <li>{{ts('After the application has migrated to a new URL.')}}</li>
+    <li>{{ts('After the application has changed permission requirements.')}}</li>
+    <li>{{ts('After the application has a major failure or reset.')}}</li>
+  </ul>
+
+  <div crm-ui-accordion="{title: ts('Permissions: Summary'), collapsed: true}">
+    <div ng-bind-html="appMeta.perm.desc"></div>
+  </div>
+  <div crm-ui-accordion="{title: ts('Permissions: Details'), collapsed: true}">
+    <div crm-cxn-perm-table="{perm: appMeta.perm}"></div>
+  </div>
+  <div crm-ui-accordion="{title: ts('Advanced'), collapsed: true}">
+    <div crm-cxn-adv-table="{appMeta: appMeta}"></div>
+  </div>
+
+</div>

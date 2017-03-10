@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,14 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -40,21 +38,38 @@
 class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
 
   /**
-   * insert/update a new entry in the database.
+   * Insert/update a new entry in the database.
    *
-   * @param array $params (reference), array $ids
+   * @param array $params
    *
-   * @return object CRM_Price_DAO_PriceFieldValue object
-   * @access public
-   * @static
+   * @param array $ids
+   *  Deprecated variable.
+   *
+   * @return CRM_Price_DAO_PriceFieldValue
    */
-  static function &add(&$params, $ids) {
+  public static function add(&$params, $ids = array()) {
 
     $fieldValueBAO = new CRM_Price_BAO_PriceFieldValue();
     $fieldValueBAO->copyValues($params);
 
     if ($id = CRM_Utils_Array::value('id', $ids)) {
       $fieldValueBAO->id = $id;
+      $prevLabel = self::getOptionLabel($id);
+      if (!empty($params['label']) && $prevLabel != $params['label']) {
+        self::updateAmountAndFeeLevel($id, $prevLabel, $params['label']);
+      }
+    }
+    // CRM-16189
+    $priceFieldID = CRM_Utils_Array::value('price_field_id', $params);
+    if (!$priceFieldID) {
+      $priceFieldID = CRM_Core_DAO::getFieldValue('CRM_Price_BAO_PriceFieldValue', $id, 'price_field_id');
+    }
+    if (!empty($params['financial_type_id'])) {
+      CRM_Financial_BAO_FinancialAccount::validateFinancialType(
+        $params['financial_type_id'],
+        $priceFieldID,
+        'PriceField'
+      );
     }
     if (!empty($params['is_default'])) {
       $query = 'UPDATE civicrm_price_field_value SET is_default = 0 WHERE  price_field_id = %1';
@@ -63,26 +78,34 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
     }
 
     $fieldValueBAO->save();
+    // Reset the cached values in this function.
+    CRM_Price_BAO_PriceField::getOptions(CRM_Utils_Array::value('price_field_id', $params), FALSE, TRUE);
     return $fieldValueBAO;
   }
 
   /**
    * Creates a new entry in the database.
    *
-   * @param array $params (reference), array $ids
+   * @param array $params
+   *   (reference), array $ids.
    *
-   * @return object CRM_Price_DAO_PriceFieldValue object
-   * @access public
-   * @static
+   * @param $ids
+   *
+   * @return CRM_Price_DAO_PriceFieldValue
    */
-  static function create(&$params, $ids) {
-
+  public static function create(&$params, $ids = array()) {
+    $id = CRM_Utils_Array::value('id', $params, CRM_Utils_Array::value('id', $ids));
     if (!is_array($params) || empty($params)) {
-      return;
+      return NULL;
+    }
+    if (!$id && empty($params['name'])) {
+      $params['name'] = strtolower(CRM_Utils_String::munge($params['label'], '_', 242));
     }
 
-    if ($id = CRM_Utils_Array::value('id', $ids)) {
-      if (isset($params['name']))unset($params['name']);
+    if ($id && !empty($params['weight'])) {
+      if (isset($params['name'])) {
+        unset($params['name']);
+      }
 
       $oldWeight = NULL;
       if ($id) {
@@ -93,49 +116,72 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
       $params['weight'] = CRM_Utils_Weight::updateOtherWeights('CRM_Price_DAO_PriceFieldValue', $oldWeight, $params['weight'], $fieldValues);
     }
     else {
-      if (empty($params['name'])) {
-        $params['name'] = CRM_Utils_String::munge(CRM_Utils_Array::value('label', $params), '_', 64);
-      }
-      if (empty($params['weight'])) {
-        $params['weight'] = 1;
+      if (!$id) {
+        CRM_Core_DAO::setCreateDefaults($params, self::getDefaults());
+        if (empty($params['name'])) {
+          $params['name'] = CRM_Utils_String::munge(CRM_Utils_Array::value('label', $params), '_', 64);
+        }
       }
     }
-    $params['is_active'] = CRM_Utils_Array::value('is_active', $params, 0);
-
     return self::add($params, $ids);
   }
 
   /**
-   * Takes a bunch of params that are needed to match certain criteria and
-   * retrieves the relevant objects.
-   *
-   * @param array $params   (reference ) an assoc array
-   * @param array $defaults (reference ) an assoc array to hold the flattened values
-   *
-   * @return object CRM_Price_DAO_PriceFieldValue object
-   * @access public
-   * @static
+   * Get defaults for new entity.
+   * @return array
    */
-  static function retrieve(&$params, &$defaults) {
+  public static function getDefaults() {
+    return array(
+      'is_active' => 1,
+      'weight' => 1,
+    );
+
+  }
+
+  /**
+   * Retrieve DB object based on input parameters.
+   *
+   * It also stores all the retrieved values in the default array.
+   *
+   * @param array $params
+   *   (reference ) an assoc array.
+   * @param array $defaults
+   *   (reference ) an assoc array to hold the flattened values.
+   *
+   * @return CRM_Price_DAO_PriceFieldValue
+   */
+  public static function retrieve(&$params, &$defaults) {
     return CRM_Core_DAO::commonRetrieve('CRM_Price_DAO_PriceFieldValue', $params, $defaults);
   }
 
   /**
-   * Retrive the all values for given field id
+   * Retrieve all values for given field id.
    *
-   * @param int $fieldId price_field_id
-   * @param array $values (reference ) to hold the values
-   * @param string $orderBy for order by, default weight
-   * @param int $isActive is_active, default false
+   * @param int $fieldId
+   *   Price_field_id.
+   * @param array $values
+   *   (reference ) to hold the values.
+   * @param string $orderBy
+   *   For order by, default weight.
+   * @param bool|int $isActive is_active, default false
    *
-   * @return array $values
+   * @return array
    *
-   * @access public
-   * @static
    */
-  static function getValues($fieldId, &$values, $orderBy = 'weight', $isActive = FALSE) {
+  public static function getValues($fieldId, &$values, $orderBy = 'weight', $isActive = FALSE) {
+    $sql = "SELECT cs.id FROM civicrm_price_set cs INNER JOIN civicrm_price_field cp ON cp.price_set_id = cs.id 
+              WHERE cs.name IN ('default_contribution_amount', 'default_membership_type_amount') AND cp.id = {$fieldId} ";
+    $setId = CRM_Core_DAO::singleValueQuery($sql);
     $fieldValueDAO = new CRM_Price_DAO_PriceFieldValue();
     $fieldValueDAO->price_field_id = $fieldId;
+    if (!$setId) {
+      CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes);
+      $addWhere = "financial_type_id IN (0)";
+      if (!empty($financialTypes)) {
+        $addWhere = "financial_type_id IN (" . implode(',', array_keys($financialTypes)) . ")";
+      }
+      $fieldValueDAO->whereAdd($addWhere);
+    }
     $fieldValueDAO->orderBy($orderBy, 'label');
     if ($isActive) {
       $fieldValueDAO->is_active = 1;
@@ -152,12 +198,11 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
   /**
    * Get the price field option label.
    *
-   * @param int $id id of field option.
+   * @param int $id
+   *   Id of field option.
    *
-   * @return string name
-   *
-   * @access public
-   * @static
+   * @return string
+   *   name
    *
    */
   public static function getOptionLabel($id) {
@@ -165,33 +210,32 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
   }
 
   /**
-   * update the is_active flag in the db
+   * Update the is_active flag in the db.
    *
-   * @param int      $id         Id of the database record
-   * @param boolean  $is_active  Value we want to set the is_active field
+   * @param int $id
+   *   Id of the database record.
+   * @param bool $is_active
+   *   Value we want to set the is_active field.
    *
-   * @return   Object            DAO object on sucess, null otherwise
+   * @return Object
+   *   DAO object on success, null otherwise
    *
-   * @access public
-   * @static
    */
-  static function setIsActive($id, $is_active) {
+  public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_Price_DAO_PriceFieldValue', $id, 'is_active', $is_active);
   }
 
   /**
-   * delete all values of the given field id
+   * Delete all values of the given field id.
    *
-   * @param  int    $fieldId    Price field id
+   * @param int $fieldId
+   *   Price field id.
    *
-   * @return boolean
    *
-   * @access public
-   * @static
    */
-  static function deleteValues($fieldId) {
+  public static function deleteValues($fieldId) {
     if (!$fieldId) {
-      return FALSE;
+      return;
     }
 
     $fieldValueDAO = new CRM_Price_DAO_PriceFieldValue();
@@ -202,14 +246,13 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
   /**
    * Delete the value.
    *
-   * @param   int   $id  Id
+   * @param int $id
+   *   Id.
    *
-   * @return  boolean
+   * @return bool
    *
-   * @access public
-   * @static
    */
-  static function del($id) {
+  public static function del($id) {
     if (!$id) {
       return FALSE;
     }
@@ -218,21 +261,22 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
     $fieldValueDAO->id = $id;
     return $fieldValueDAO->delete();
   }
-  
+
   /**
-   * Update civicrm_price_field_value.financial_type_id 
+   * Update civicrm_price_field_value.financial_type_id
    * when financial_type_id of contribution_page or event is changed
    *
-   * @param   int   $entityId  Id
-   * @param   String $entityTable  entity table
-   * @param   String $financialTypeID financial type id
+   * @param int $entityId
+   *   Id.
+   * @param string $entityTable table.
+   *   Entity table.
+   * @param string $financialTypeID type id.
+   *   Financial type id.
    *
-   * @access public
-   * @static
    */
-  static function updateFinancialType($entityId, $entityTable, $financialTypeID) {
+  public static function updateFinancialType($entityId, $entityTable, $financialTypeID) {
     if (!$entityId || !$entityTable || !$financialTypeID) {
-      return FALSE;
+      return;
     }
     $params = array(
       1 => array($entityId, 'Integer'),
@@ -245,8 +289,8 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
       $join = " LEFT JOIN civicrm_discount cd ON cd.price_set_id = cps.id AND cd.entity_id = %1  AND cd.entity_table = %2 ";
       $where = ' OR cd.id IS NOT NULL ';
     }
-    $sql = "UPDATE civicrm_price_set cps 
-LEFT JOIN civicrm_price_set_entity cpse ON cpse.price_set_id = cps.id AND cpse.entity_id = %1 AND cpse.entity_table = %2 
+    $sql = "UPDATE civicrm_price_set cps
+LEFT JOIN civicrm_price_set_entity cpse ON cpse.price_set_id = cps.id AND cpse.entity_id = %1 AND cpse.entity_table = %2
 LEFT JOIN civicrm_price_field cpf ON cpf.price_set_id = cps.id
 LEFT JOIN civicrm_price_field_value cpfv ON cpf.id = cpfv.price_field_id
 {$join}
@@ -257,8 +301,43 @@ SET cpfv.financial_type_id = CASE
 END,
 cps.financial_type_id = %3
 WHERE cpse.id IS NOT NULL {$where}";
-    
+
     CRM_Core_DAO::executeQuery($sql, $params);
   }
-}
 
+  /**
+   * Update price option label in line_item, civicrm_contribution and civicrm_participant.
+   *
+   * @param int $id - id of the price_field_value
+   * @param string $prevLabel
+   * @param string $newLabel
+   *
+   */
+  public static function updateAmountAndFeeLevel($id, $prevLabel, $newLabel) {
+    // update price field label in line item.
+    $lineItem = new CRM_Price_DAO_LineItem();
+    $lineItem->price_field_value_id = $id;
+    $lineItem->label = $prevLabel;
+    $lineItem->find();
+    while ($lineItem->fetch()) {
+      $lineItemParams['id'] = $lineItem->id;
+      $lineItemParams['label'] = $newLabel;
+      CRM_Price_BAO_LineItem::create($lineItemParams);
+
+      // update amount and fee level in civicrm_contribution and civicrm_participant
+      $params = array(
+        1 => array(CRM_Core_DAO::VALUE_SEPARATOR . $prevLabel . ' -', 'String'),
+        2 => array(CRM_Core_DAO::VALUE_SEPARATOR . $newLabel . ' -', 'String'),
+      );
+      // Update contribution
+      if (!empty($lineItem->contribution_id)) {
+        CRM_Core_DAO::executeQuery("UPDATE `civicrm_contribution` SET `amount_level` = REPLACE(amount_level, %1, %2) WHERE id = {$lineItem->contribution_id}", $params);
+      }
+      // Update participant
+      if ($lineItem->entity_table == 'civicrm_participant') {
+        CRM_Core_DAO::executeQuery("UPDATE `civicrm_participant` SET `fee_level` = REPLACE(fee_level, %1, %2) WHERE id = {$lineItem->entity_id}", $params);
+      }
+    }
+  }
+
+}

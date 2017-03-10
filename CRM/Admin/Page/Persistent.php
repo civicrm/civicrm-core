@@ -1,9 +1,9 @@
 <?php
 /*
 +--------------------------------------------------------------------+
-| CiviCRM version 4.4                                                |
+| CiviCRM version 4.7                                                |
 +--------------------------------------------------------------------+
-| Copyright CiviCRM LLC (c) 2004-2013                                |
+| Copyright CiviCRM LLC (c) 2004-2017                                |
 +--------------------------------------------------------------------+
 | This file is a part of CiviCRM.                                    |
 |                                                                    |
@@ -23,14 +23,12 @@
 | GNU Affero General Public License or the licensing of CiviCRM,     |
 | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
 +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -39,19 +37,20 @@
 class CRM_Admin_Page_Persistent extends CRM_Core_Page {
 
   /**
-   * The action links that we need to display for the browse screen
+   * The action links that we need to display for the browse screen.
    *
    * @var array
-   * @static
    */
   private static $_stringActionLinks;
   private static $_customizeActionLinks;
 
   /**
-   * Get action Links
+   * Get action Links.
    *
-   * @return array (reference) of action links
-   */ function &stringActionLinks() {
+   * @return array
+   *   (reference) of action links
+   */
+  public function &stringActionLinks() {
     // check if variable _actionsLinks is populated
     if (!isset(self::$_stringActionLinks)) {
 
@@ -67,7 +66,10 @@ class CRM_Admin_Page_Persistent extends CRM_Core_Page {
     return self::$_stringActionLinks;
   }
 
-  function &customizeActionLinks() {
+  /**
+   * @return array
+   */
+  public function &customizeActionLinks() {
     // check if variable _actionsLinks is populated
     if (!isset(self::$_customizeActionLinks)) {
 
@@ -85,24 +87,17 @@ class CRM_Admin_Page_Persistent extends CRM_Core_Page {
 
   /**
    * Run the basic page (run essentially starts execution for that page).
-   *
-   * @return void
    */
-  function run() {
+  public function run() {
     CRM_Utils_System::setTitle(ts('DB Template Strings'));
     $this->browse();
     return parent::run();
   }
 
   /**
-   * Browse all options
-   *
-   *
-   * @return void
-   * @access public
-   * @static
+   * Browse all options.
    */
-  function browse() {
+  public function browse() {
     $permission = FALSE;
     $this->assign('editClass', FALSE);
     if (CRM_Core_Permission::check('access CiviCRM')) {
@@ -148,5 +143,5 @@ class CRM_Admin_Page_Persistent extends CRM_Core_Page {
     );
     $this->assign('rows', $rows);
   }
-}
 
+}

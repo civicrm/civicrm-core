@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -56,11 +56,18 @@
         {/if}
       </td>
     </tr>
+    <tr class="crm-paymentProcessor-form-block-payment-instrument-id">
+      <td class="label">{$form.payment_instrument_id.label}</td><td>{$form.payment_instrument_id.html}</td>
+    </tr>
     <tr class="crm-paymentProcessor-form-block-is_active">
         <td></td><td>{$form.is_active.html}&nbsp;{$form.is_active.label}</td>
     </tr>
     <tr class="crm-paymentProcessor-form-block-is_default">
         <td></td><td>{$form.is_default.html}&nbsp;{$form.is_default.label}</td>
+    </tr>
+    <tr class="crm-paymentProcessor-form-block-accept_credit_cards">
+        <td class="label">{$form.accept_credit_cards.label}</td><td>{$form.accept_credit_cards.html}<br />
+        <span class="description">{ts}Select Credit Card Types that this payment processor can accept{/ts}</span></td>
     </tr>
   </table>
 <fieldset>
@@ -150,17 +157,15 @@
 </div>
 
 {if $action eq 1  or $action eq 2}
-<script type="text/javascript" >
-{literal}
+  <script type="text/javascript">
+  {literal}
     function reload(refresh) {
-        var paymentProcessorType = document.getElementById("payment_processor_type_id");
-        var url = {/literal}"{$refreshURL}"{literal}
-        var post = url + "&pp=" + paymentProcessorType.value;
-        if( refresh ) {
-            window.location= post;
-        }
+      var paymentProcessorType = cj("#payment_processor_type_id");
+      var url = {/literal}"{$refreshURL}"{literal} + "&pp=" + paymentProcessorType.val();
+      paymentProcessorType.closest('form').attr('data-warn-changes', 'false');
+      window.location.href = url;
     }
-{/literal}
-    </script>
+  {/literal}
+  </script>
 
 {/if}

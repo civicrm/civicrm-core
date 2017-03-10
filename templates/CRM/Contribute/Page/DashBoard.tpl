@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -66,15 +66,14 @@
 
 <div class="float-right">
 <table class="form-layout-compressed">
-<tr>
+  <tr>
     <td>
-     <a href="{$configPagesURL}" class="button"><span>{ts}Manage Contribution Pages{/ts}
-       </span></a>
+      <a href="{$configPagesURL}" class="button no-popup"><span>{ts}Manage Contribution Pages{/ts}</span></a>
     </td>
-    <td><a href="{$newPageURL}" class="button"><span><div class="icon add-icon"></div>{ts}Add Contribution Page{/ts}
-        </span></a>
+    <td>
+      <a href="{$newPageURL}" class="button no-popup"><span><i class="crm-i fa-plus-circle"></i> {ts}Add Contribution Page{/ts}</span></a>
     </td>
-</tr>
+  </tr>
 </table>
 </div>
 {/if}

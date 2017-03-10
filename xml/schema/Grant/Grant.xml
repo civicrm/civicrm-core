@@ -30,7 +30,7 @@
     <comment>Contact ID of contact record given grant belongs to.</comment>
     <add>1.8</add>
     <html>
-       <type>Autocomplete-Select</type>
+       <type>EntityRef</type>
      </html>
   </field>
   <foreignKey>
@@ -61,6 +61,7 @@
   </field>
   <field>
     <name>money_transfer_date</name>
+    <uniqueName>grant_money_transfer_date</uniqueName>
     <title>Grant Money transfer date</title>
     <type>date</type>
     <comment>Date on which grant money transfer was made.</comment>
@@ -101,7 +102,7 @@
     <html>
       <type>Select</type>
     </html>
-    <export>false</export>
+    <export>true</export>
     <required>true</required>
     <comment>Type of grant. Implicit FK to civicrm_option_value in grant_type option_group.</comment>
     <add>1.8</add>
@@ -109,12 +110,6 @@
   <index>
     <name>index_grant_type_id</name>
     <fieldName>grant_type_id</fieldName>
-    <pseudoconstant>
-      <optionGroupName>grant_type</optionGroupName>
-    </pseudoconstant>
-    <html>
-      <type>Select</type>
-    </html>
     <add>1.8</add>
   </index>
   <field>
@@ -165,7 +160,7 @@
         <table>civicrm_currency</table>
         <keyColumn>name</keyColumn>
         <labelColumn>full_name</labelColumn>
-        <nameColumn>numeric_code</nameColumn>
+        <nameColumn>name</nameColumn>
       </pseudoconstant>
       <html>
         <type>Select</type>
@@ -220,6 +215,11 @@
     <title>Financial Type</title>
     <type>int unsigned</type>
     <default>NULL</default>
+    <pseudoconstant>
+      <table>civicrm_financial_type</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+    </pseudoconstant>
     <comment>FK to Financial Type.</comment>
     <add>4.3</add>
   </field>

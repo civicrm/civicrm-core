@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,38 +23,33 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
- * This class previews the uploaded file and returns summary
- * statistics
+ * This class previews the uploaded file and returns summary statistics.
  */
 class CRM_Contribute_Import_Form_Preview extends CRM_Import_Form_Preview {
 
   /**
-   * Function to set variables up before form is built
-   *
-   * @return void
-   * @access public
+   * Set variables up before form is built.
    */
   public function preProcess() {
     $skipColumnHeader = $this->controller->exportValue('DataSource', 'skipColumnHeader');
 
     //get the data from the session
-    $dataValues       = $this->get('dataValues');
-    $mapper           = $this->get('mapper');
+    $dataValues = $this->get('dataValues');
+    $mapper = $this->get('mapper');
     $softCreditFields = $this->get('softCreditFields');
-    $invalidRowCount  = $this->get('invalidRowCount');
+    $mapperSoftCreditType = $this->get('mapperSoftCreditType');
+    $invalidRowCount = $this->get('invalidRowCount');
     $conflictRowCount = $this->get('conflictRowCount');
-    $mismatchCount    = $this->get('unMatchCount');
+    $mismatchCount = $this->get('unMatchCount');
 
     //get the mapping name displayed if the mappingId is set
     $mappingId = $this->get('loadMappingId');
@@ -90,10 +85,15 @@ class CRM_Contribute_Import_Form_Preview extends CRM_Import_Form_Preview {
     }
 
     $properties = array(
-      'mapper', 'softCreditFields',
-      'dataValues', 'columnCount',
-      'totalRowCount', 'validRowCount',
-      'invalidRowCount', 'conflictRowCount',
+      'mapper',
+      'softCreditFields',
+      'mapperSoftCreditType',
+      'dataValues',
+      'columnCount',
+      'totalRowCount',
+      'validRowCount',
+      'invalidRowCount',
+      'conflictRowCount',
       'downloadErrorRecordsUrl',
       'downloadConflictRecordsUrl',
       'downloadMismatchRecordsUrl',
@@ -105,21 +105,16 @@ class CRM_Contribute_Import_Form_Preview extends CRM_Import_Form_Preview {
   }
 
   /**
-   * Process the mapped fields and map it into the uploaded file
-   * preview the file and extract some summary statistics
-   *
-   * @return void
-   * @access public
+   * Process the mapped fields and map it into the uploaded file preview the file and extract some summary statistics.
    */
   public function postProcess() {
-    $fileName         = $this->controller->exportValue('DataSource', 'uploadFile');
+    $fileName = $this->controller->exportValue('DataSource', 'uploadFile');
+    $seperator = $this->controller->exportValue('DataSource', 'fieldSeparator');
     $skipColumnHeader = $this->controller->exportValue('DataSource', 'skipColumnHeader');
-    $invalidRowCount  = $this->get('invalidRowCount');
+    $invalidRowCount = $this->get('invalidRowCount');
     $conflictRowCount = $this->get('conflictRowCount');
-    $onDuplicate      = $this->get('onDuplicate');
-
-    $config = CRM_Core_Config::singleton();
-    $seperator = $config->fieldSeparator;
+    $onDuplicate = $this->get('onDuplicate');
+    $mapperSoftCreditType = $this->get('mapperSoftCreditType');
 
     $mapper = $this->controller->exportValue('MapField', 'mapper');
     $mapperKeys = array();
@@ -128,15 +123,16 @@ class CRM_Contribute_Import_Form_Preview extends CRM_Import_Form_Preview {
 
     foreach ($mapper as $key => $value) {
       $mapperKeys[$key] = $mapper[$key][0];
-      if (isset($mapper[$key][0]) && $mapper[$key][0] == 'soft_credit') {
-        $mapperSoftCredit[$key] = $mapper[$key][1];
+      if (isset($mapper[$key][0]) && $mapper[$key][0] == 'soft_credit' && isset($mapper[$key])) {
+        $mapperSoftCredit[$key] = isset($mapper[$key][1]) ? $mapper[$key][1] : '';
+        $mapperSoftCreditType[$key] = $mapperSoftCreditType[$key]['value'];
       }
       else {
-        $mapperSoftCredit[$key] = NULL;
+        $mapperSoftCredit[$key] = $mapperSoftCreditType[$key] = NULL;
       }
     }
 
-    $parser = new CRM_Contribute_Import_Parser_Contribution($mapperKeys, $mapperSoftCredit, $mapperPhoneType);
+    $parser = new CRM_Contribute_Import_Parser_Contribution($mapperKeys, $mapperSoftCredit, $mapperPhoneType, $mapperSoftCreditType);
 
     $mapFields = $this->get('fields');
 
@@ -155,10 +151,10 @@ class CRM_Contribute_Import_Form_Preview extends CRM_Import_Form_Preview {
       $onDuplicate
     );
 
-    // add all the necessary variables to the form
+    // Add all the necessary variables to the form.
     $parser->set($this, CRM_Import_Parser::MODE_IMPORT);
 
-    // check if there is any error occured
+    // Check if there is any error occurred.
 
     $errorStack = CRM_Core_Error::singleton();
     $errors = $errorStack->getErrors();
@@ -185,5 +181,5 @@ class CRM_Contribute_Import_Form_Preview extends CRM_Import_Form_Preview {
       $this->set('downloadMismatchRecordsUrl', CRM_Utils_System::url('civicrm/export', $urlParams));
     }
   }
-}
 
+}

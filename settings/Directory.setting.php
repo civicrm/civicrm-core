@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
  */
@@ -38,95 +38,100 @@
 
 return array(
   'uploadDir' => array(
+    'bootstrap_comment' => 'This is a boot setting which may be loaded during bootstrap. Defaults are loaded via SettingsBag::getSystemDefaults().',
     'group_name' => 'Directory Preferences',
     'group' => 'directory',
     'name' => 'uploadDir',
-    'type' => 'Url',
+    'type' => 'String',
     'html_type' => 'Text',
-    'default' => null,
+    'quick_form_type' => 'Element',
+    'default' => NULL,
     'add' => '4.1',
-    'prefetch' => 1,
-    'title' => null,
+    'title' => 'Temporary Files Directory',
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => null,
-    'help_text' => 'If set, new contacts that are created when signing a petition are assigned a tag of this name.',
+    'description' => NULL,
+    'help_text' => 'File system path where temporary CiviCRM files - such as import data files - are uploaded.',
   ),
   'imageUploadDir' => array(
+    'bootstrap_comment' => 'This is a boot setting which may be loaded during bootstrap. Defaults are loaded via SettingsBag::getSystemDefaults().',
     'group_name' => 'Directory Preferences',
     'group' => 'directory',
     'name' => 'imageUploadDir',
-    'type' => 'Url',
+    'type' => 'String',
     'html_type' => 'Text',
-    'default' => null,
+    'quick_form_type' => 'Element',
+    'default' => NULL,
     'add' => '4.1',
-    'prefetch' => 1,
-    'title' => null,
+    'title' => 'Image Directory',
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => null,
-    'help_text' => null,
+    'description' => 'File system path where image files are uploaded. Currently, this path is used for images associated with premiums (CiviContribute thank-you gifts).',
+    'help_text' => NULL,
   ),
   'customFileUploadDir' => array(
+    'bootstrap_comment' => 'This is a boot setting which may be loaded during bootstrap. Defaults are loaded via SettingsBag::getSystemDefaults().',
     'group_name' => 'Directory Preferences',
     'group' => 'directory',
     'name' => 'customFileUploadDir',
-    'type' => 'Url',
+    'type' => 'String',
     'html_type' => 'Text',
-    'default' => null,
+    'quick_form_type' => 'Element',
+    'default' => NULL,
     'add' => '4.1',
-    'prefetch' => 1,
-    'title' => null,
+    'title' => 'Custom Files Directory',
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => null,
-    'help_text' => null,
+    'description' => 'Path where documents and images which are attachments to contact records are stored (e.g. contact photos, resumes, contracts, etc.). These attachments are defined using \'file\' type custom fields.',
+    'help_text' => NULL,
   ),
   'customTemplateDir' => array(
+    'bootstrap_comment' => 'This is a boot setting which may be loaded during bootstrap. Defaults are loaded via SettingsBag::getSystemDefaults().',
     'group_name' => 'Directory Preferences',
     'group' => 'directory',
     'name' => 'customTemplateDir',
-    'type' => 'Url',
+    'type' => 'String',
     'html_type' => 'Text',
-    'default' => null,
+    'quick_form_type' => 'Element',
+    'default' => NULL,
     'add' => '4.1',
-    'prefetch' => 1,
-    'title' => null,
+    'title' => 'Custom Template Directory',
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => null,
-    'help_text' => null,
+    'description' => 'Path where site specific templates are stored if any. This directory is searched first if set. Custom JavaScript code can be added to templates by creating files named templateFile.extra.tpl. (learn more...)',
+    'help_text' => NULL,
   ),
   'customPHPPathDir' => array(
+    'bootstrap_comment' => 'This is a boot setting which may be loaded during bootstrap. Defaults are loaded via SettingsBag::getSystemDefaults().',
     'group_name' => 'Directory Preferences',
     'group' => 'directory',
     'name' => 'customPHPPathDir',
-    'type' => 'Url',
+    'type' => 'String',
     'html_type' => 'Text',
-    'default' => null,
+    'quick_form_type' => 'Element',
+    'default' => NULL,
     'add' => '4.1',
-    'prefetch' => 1,
-    'title' => null,
+    'title' => 'Custom PHP Directory',
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => null,
-    'help_text' => null,
+    'description' => 'Path where site specific PHP code files are stored if any. This directory is searched first if set.',
+    'help_text' => NULL,
   ),
   'extensionsDir' => array(
+    'bootstrap_comment' => 'This is a boot setting which may be loaded during bootstrap. Defaults are loaded via SettingsBag::getSystemDefaults().',
     'group_name' => 'Directory Preferences',
     'group' => 'directory',
     'name' => 'extensionsDir',
-    'type' => 'Url',
+    'type' => 'String',
     'html_type' => 'Text',
-    'default' => null,
+    'quick_form_type' => 'Element',
+    'default' => NULL,
     'add' => '4.1',
-    'prefetch' => 1,
-    'title' => null,
+    'title' => 'Extensions Directory',
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => null,
-    'help_text' => null,
+    'description' => 'Path where CiviCRM extensions are stored.',
+    'help_text' => NULL,
   ),
-
 
 );

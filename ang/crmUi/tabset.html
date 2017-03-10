@@ -1,0 +1,12 @@
+<div ui-jq="tabs" class="crm-tabset">
+  <ul>
+    <li ng-repeat="tab in tabs" class="ui-corner-all crm-tab-button crm-count-{{tab.count}}">
+      <a href="#{{tab.id}}">
+        <i ng-if="tab.crmIcon" class="crm-i {{tab.crmIcon}}"></i>
+        {{tab.$parent.$eval(tab.crmTitle)}}
+        <em ng-if="tab.count">{{tab.count}}</em>
+      </a>
+    </li>
+  </ul>
+  <div ng-transclude/>
+</div>

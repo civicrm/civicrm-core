@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -51,7 +51,7 @@
         <th> {ts}Label{/ts}</th>
         <th> {ts}Value{/ts}</th>
   <th> {ts}Recontact Interval{/ts}</th>
-        <th> {ts}Weight{/ts}</th>
+        <th> {ts}Order{/ts}</th>
     </tr>
 
   {section name=rowLoop start=1 loop=12}
@@ -59,7 +59,7 @@
   <tr id="optionField_{$index}" class="form-item {cycle values="odd-row,even-row"}">
         <td>
         {if $index GT 1}
-            <a onclick="showHideRow({$index}); return false;" name="optionField_{$index}" href="#" class="form-link"><img src="{$config->resourceBase}i/TreeMinus.gif" class="action-icon" alt="{ts}hide field or section{/ts}"/></a>
+            <a onclick="showHideRow({$index}); return false;" name="optionField_{$index}" href="#" class="form-link"><i class="crm-i fa-trash" title="{ts}hide field or section{/ts}"></i></a>
         {/if}
         </td>
       <td>
@@ -76,7 +76,7 @@
     {/section}
     </table>
   <div id="optionFieldLink" class="add-remove-link">
-        <a onclick="showHideRow(); return false;" name="optionFieldLink" href="#" class="form-link"><img src="{$config->resourceBase}i/TreePlus.gif" class="action-icon" alt="{ts}show field or section{/ts}"/>{ts}another choice{/ts}</a>
+        <a onclick="showHideRow(); return false;" name="optionFieldLink" href="#" class="form-link"><i class="crm-i fa-plus-circle"></i> {ts}add another choice{/ts}</a>
     </div>
   <span id="additionalOption" class="description">
     {ts}If you need additional options - you can add them after you Save your current entries.{/ts}
@@ -88,8 +88,8 @@
 </tr>
 
 <script type="text/javascript">
-    var showRows   = new Array({$showBlocks});
-    var hideBlocks = new Array({$hideBlocks});
+    var showRows   = [{$showBlocks}];
+    var hideBlocks = [{$hideBlocks}];
     var rowcounter = 0;
     var surveyId   = {if $surveyId}{$surveyId}{else}''{/if};
 
@@ -163,7 +163,7 @@
       }, "json" );
   }
 
-    cj(document).ready( function( ) {
+    CRM.$(function($) {
         showOptionSelect( );
     });
 

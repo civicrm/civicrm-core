@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,123 +23,120 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
  * This class is used to retrieve and display a range of
  * contacts that match the given criteria (specifically for
  * results of advanced search options.
- *
  */
 class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_Core_Selector_API {
 
   /**
-   * array of supported links, currenly null
+   * Array of supported links, currently null
    *
    * @var array
-   * @static
    */
   static $_links = NULL;
 
   /**
-   * what event type are we browsing?
+   * What event type are we browsing?
    */
   private $_event;
 
   /**
-   * should we only count distinct contacts?
+   * Should we only count distinct contacts?
    */
   private $_is_distinct;
 
   /**
-   * which mailing are we browsing events from?
+   * Which mailing are we browsing events from?
    */
   private $_mailing_id;
 
   /**
-   * do we want events tied to a specific job?
+   * Do we want events tied to a specific job?
    */
   private $_job_id;
 
   /**
-   * for click-through events, do we only want those from a specific url?
+   * For click-through events, do we only want those from a specific url?
    */
   private $_url_id;
 
   /**
-   * we use desc to remind us what that column is, name is used in the tpl
+   * We use desc to remind us what that column is, name is used in the tpl
    *
    * @var array
    */
   public $_columnHeaders;
 
   /**
-   * Class constructor
+   * Class constructor.
    *
-   * @param string $event         The event type (queue/delivered/open...)
-   * @param boolean $distinct     Count only distinct contact events?
-   * @param int $mailing          ID of the mailing to query
-   * @param int $job              ID of the job to query.  If null, all jobs from $mailing are queried.
-   * @param int $url              If the event type is a click-through, do we want only those from a specific url?
+   * @param string $event
+   *   The event type (queue/delivered/open...).
+   * @param bool $distinct
+   *   Count only distinct contact events?.
+   * @param int $mailing
+   *   ID of the mailing to query.
+   * @param int $job
+   *   ID of the job to query. If null, all jobs from $mailing are queried.
+   * @param int $url
+   *   If the event type is a click-through, do we want only those from a specific url?.
    *
-   * @return CRM_Contact_Selector_Profile
-   * @access public
+   * @return \CRM_Mailing_Selector_Event
    */
-  function __construct($event, $distinct, $mailing, $job = NULL, $url = NULL) {
-    $this->_event_type  = $event;
+  public function __construct($event, $distinct, $mailing, $job = NULL, $url = NULL) {
+    $this->_event_type = $event;
     $this->_is_distinct = $distinct;
-    $this->_mailing_id  = $mailing;
-    $this->_job_id      = $job;
-    $this->_url_id      = $url;
+    $this->_mailing_id = $mailing;
+    $this->_job_id = $job;
+    $this->_url_id = $url;
   }
-  //end of constructor
 
   /**
    * This method returns the links that are given for each search row.
    *
    * @return array
-   * @access public
-   * @static
    */
-  static function &links() {
+  public static function &links() {
     return self::$_links;
   }
-  //end of function
 
   /**
-   * getter for array of the parameters required for creating pager.
+   * Getter for array of the parameters required for creating pager.
    *
-   * @param
-   * @access public
+   * @param $action
+   * @param array $params
    */
-  function getPagerParams($action, &$params) {
+  public function getPagerParams($action, &$params) {
     $params['csvString'] = NULL;
-    $params['rowCount']  = CRM_Utils_Pager::ROWCOUNT;
-    $params['status']    = ts('%1 %%StatusMessage%%', array(1 => $this->eventToTitle()));
+    $params['rowCount'] = CRM_Utils_Pager::ROWCOUNT;
+    $params['status'] = ts('%1 %%StatusMessage%%', array(1 => $this->eventToTitle()));
     $params['buttonTop'] = 'PagerTopButton';
     $params['buttonBottom'] = 'PagerBottomButton';
   }
-  //end of function
 
   /**
-   * returns the column headers as an array of tuples:
+   * Returns the column headers as an array of tuples:
    * (name, sortName (key to the sort array))
    *
-   * @param string $action the action being performed
-   * @param enum   $output what should the result set include (web/email/csv)
+   * @param string $action
+   *   The action being performed.
+   * @param string $output
+   *   What should the result set include (web/email/csv).
    *
-   * @return array the column headers that need to be displayed
-   * @access public
+   * @return array
+   *   the column headers that need to be displayed
    */
-  function &getColumnHeaders($action = NULL, $output = NULL) {
+  public function &getColumnHeaders($action = NULL, $output = NULL) {
     $mailing = CRM_Mailing_BAO_Mailing::getTableName();
 
     $contact = CRM_Contact_BAO_Contact::getTableName();
@@ -150,12 +147,12 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
     if (!isset($this->_columnHeaders)) {
 
       $this->_columnHeaders = array(
-        array(
+        'sort_name' => array(
           'name' => ts('Contact'),
           'sort' => $contact . '.sort_name',
           'direction' => CRM_Utils_Sort::ASCENDING,
         ),
-        array(
+        'email' => array(
           'name' => ts('Email Address'),
           'sort' => $email . '.email',
           'direction' => CRM_Utils_Sort::DONTCARE,
@@ -168,6 +165,13 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
           break;
 
         case 'delivered':
+          $this->_columnHeaders = array(
+            'contact_id' => array(
+              'name' => ts('Internal Contact ID'),
+              'sort' => $contact . '.id',
+              'direction' => CRM_Utils_Sort::ASCENDING,
+            ),
+          ) + $this->_columnHeaders;
           $dateSort = CRM_Mailing_Event_BAO_Delivered::getTableName() . '.time_stamp';
           break;
 
@@ -209,42 +213,40 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
           $dateSort = CRM_Mailing_Event_BAO_Unsubscribe::getTableName() . '.time_stamp';
           $this->_columnHeaders = array_merge($this->_columnHeaders, array(
             array(
-                'name' => ts('Unsubscribe'),
-              ),
-            ));
+              'name' => ts('Unsubscribe'),
+            ),
+          ));
           break;
 
         case 'optout':
           $dateSort = CRM_Mailing_Event_BAO_Unsubscribe::getTableName() . '.time_stamp';
           $this->_columnHeaders = array_merge($this->_columnHeaders, array(
             array(
-                'name' => ts('Opt-Out'),
-              ),
-            ));
+              'name' => ts('Opt-Out'),
+            ),
+          ));
           break;
 
         case 'click':
           $dateSort = CRM_Mailing_Event_BAO_TrackableURLOpen::getTableName() . '.time_stamp';
           $this->_columnHeaders = array_merge($this->_columnHeaders, array(
             array(
-                'name' => ts('URL'),
-              ),
-            ));
+              'name' => ts('URL'),
+            ),
+          ));
           break;
 
         default:
           return 0;
       }
 
-      $this->_columnHeaders = array_merge($this->_columnHeaders,
-        array(
-          array(
-            'name' => ts('Date'),
-            'sort' => $dateSort,
-            'direction' => CRM_Utils_Sort::DESCENDING,
-          ),
-        )
-      );
+      $this->_columnHeaders = array_merge($this->_columnHeaders, array(
+        'date' => array(
+          'name' => ts('Date'),
+          'sort' => $dateSort,
+          'direction' => CRM_Utils_Sort::DESCENDING,
+        ),
+      ));
     }
     return $this->_columnHeaders;
   }
@@ -252,85 +254,85 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
   /**
    * Returns total number of rows for the query.
    *
-   * @param
+   * @param string $action
    *
-   * @return int Total number of rows
-   * @access public
+   * @return int
+   *   Total number of rows
    */
-  function getTotalCount($action) {
+  public function getTotalCount($action) {
     switch ($this->_event_type) {
       case 'queue':
         $event = new CRM_Mailing_Event_BAO_Queue();
-        return $event->getTotalCount($this->_mailing_id,
+        $result = $event->getTotalCount($this->_mailing_id,
           $this->_job_id
         );
-      break;
+        return $result;
 
       case 'delivered':
         $event = new CRM_Mailing_Event_BAO_Delivered();
-        return $event->getTotalCount($this->_mailing_id,
+        $result = $event->getTotalCount($this->_mailing_id,
           $this->_job_id,
           $this->_is_distinct
         );
-      break;
+        return $result;
 
       case 'opened':
         $event = new CRM_Mailing_Event_BAO_Opened();
-        return $event->getTotalCount($this->_mailing_id,
+        $result = $event->getTotalCount($this->_mailing_id,
           $this->_job_id,
           $this->_is_distinct
         );
-      break;
+        return $result;
 
       case 'bounce':
         $event = new CRM_Mailing_Event_BAO_Bounce();
-        return $event->getTotalCount($this->_mailing_id,
+        $result = $event->getTotalCount($this->_mailing_id,
           $this->_job_id,
           $this->_is_distinct
         );
-      break;
+        return $result;
 
       case 'forward':
         $event = new CRM_Mailing_Event_BAO_Forward();
-        return $event->getTotalCount($this->_mailing_id,
+        $result = $event->getTotalCount($this->_mailing_id,
           $this->_job_id,
           $this->_is_distinct
         );
-      break;
+        return $result;
 
       case 'reply':
         $event = new CRM_Mailing_Event_BAO_Reply();
-        return $event->getTotalCount($this->_mailing_id,
+        $result = $event->getTotalCount($this->_mailing_id,
           $this->_job_id,
           $this->_is_distinct
         );
-      break;
+        return $result;
 
       case 'unsubscribe':
         $event = new CRM_Mailing_Event_BAO_Unsubscribe();
-        return $event->getTotalCount($this->_mailing_id,
+        $result = $event->getTotalCount($this->_mailing_id,
           $this->_job_id,
           $this->_is_distinct
         );
-      break;
+        return $result;
 
       case 'optout':
         $event = new CRM_Mailing_Event_BAO_Unsubscribe();
-        return $event->getTotalCount($this->_mailing_id,
+        $result = $event->getTotalCount($this->_mailing_id,
           $this->_job_id,
           $this->_is_distinct,
           FALSE
         );
-      break;
+        return $result;
 
       case 'click':
         $event = new CRM_Mailing_Event_BAO_TrackableURLOpen();
-        return $event->getTotalCount($this->_mailing_id,
+        $result = $event->getTotalCount($this->_mailing_id,
           $this->_job_id,
           $this->_is_distinct,
           $this->_url_id
         );
-      break;
+        return $result;
 
       default:
         return 0;
@@ -338,79 +340,86 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
   }
 
   /**
-   * returns all the rows in the given offset and rowCount
+   * Returns all the rows in the given offset and rowCount.
    *
-   * @param enum   $action   the action being performed
-   * @param int    $offset   the row number to start from
-   * @param int    $rowCount the number of rows to return
-   * @param string $sort     the sql string that describes the sort order
-   * @param enum   $output   what should the result set include (web/email/csv)
+   * @param string $action
+   *   The action being performed.
+   * @param int $offset
+   *   The row number to start from.
+   * @param int $rowCount
+   *   The number of rows to return.
+   * @param string $sort
+   *   The sql string that describes the sort order.
+   * @param string $output
+   *   What should the result set include (web/email/csv).
    *
-   * @return int   the total number of rows for this action
+   * @return int
+   *   the total number of rows for this action
    */
-  function &getRows($action, $offset, $rowCount, $sort, $output = NULL) {
+  public function &getRows($action, $offset, $rowCount, $sort, $output = NULL) {
     switch ($this->_event_type) {
       case 'queue':
-        return CRM_Mailing_Event_BAO_Queue::getRows($this->_mailing_id,
+        $rows = CRM_Mailing_Event_BAO_Queue::getRows($this->_mailing_id,
           $this->_job_id, $offset, $rowCount, $sort
         );
-      break;
+        return $rows;
 
       case 'delivered':
-        return CRM_Mailing_Event_BAO_Delivered::getRows($this->_mailing_id,
+        $rows = CRM_Mailing_Event_BAO_Delivered::getRows($this->_mailing_id,
           $this->_job_id, $this->_is_distinct,
           $offset, $rowCount, $sort
         );
-      break;
+        return $rows;
 
       case 'opened':
-        return CRM_Mailing_Event_BAO_Opened::getRows($this->_mailing_id,
+        $rows = CRM_Mailing_Event_BAO_Opened::getRows($this->_mailing_id,
           $this->_job_id, $this->_is_distinct,
           $offset, $rowCount, $sort
         );
-      break;
+        return $rows;
 
       case 'bounce':
-        return CRM_Mailing_Event_BAO_Bounce::getRows($this->_mailing_id,
+        $rows = CRM_Mailing_Event_BAO_Bounce::getRows($this->_mailing_id,
           $this->_job_id, $this->_is_distinct,
           $offset, $rowCount, $sort
         );
-      break;
+        return $rows;
 
       case 'forward':
-        return CRM_Mailing_Event_BAO_Forward::getRows($this->_mailing_id,
+        $rows = CRM_Mailing_Event_BAO_Forward::getRows($this->_mailing_id,
           $this->_job_id, $this->_is_distinct,
           $offset, $rowCount, $sort
         );
+        return $rows;
 
       case 'reply':
-        return CRM_Mailing_Event_BAO_Reply::getRows($this->_mailing_id,
+        $rows = CRM_Mailing_Event_BAO_Reply::getRows($this->_mailing_id,
           $this->_job_id, $this->_is_distinct,
           $offset, $rowCount, $sort
         );
-      break;
+        return $rows;
 
       case 'unsubscribe':
-        return CRM_Mailing_Event_BAO_Unsubscribe::getRows($this->_mailing_id,
+        $rows = CRM_Mailing_Event_BAO_Unsubscribe::getRows($this->_mailing_id,
           $this->_job_id, $this->_is_distinct,
           $offset, $rowCount, $sort, TRUE
         );
-      break;
+        return $rows;
 
       case 'optout':
-        return CRM_Mailing_Event_BAO_Unsubscribe::getRows($this->_mailing_id,
+        $rows = CRM_Mailing_Event_BAO_Unsubscribe::getRows($this->_mailing_id,
           $this->_job_id, $this->_is_distinct,
           $offset, $rowCount, $sort, FALSE
         );
-      break;
+        return $rows;
 
       case 'click':
-        return CRM_Mailing_Event_BAO_TrackableURLOpen::getRows(
+        $rows = CRM_Mailing_Event_BAO_TrackableURLOpen::getRows(
           $this->_mailing_id, $this->_job_id,
           $this->_is_distinct, $this->_url_id,
           $offset, $rowCount, $sort
         );
-      break;
+        return $rows;
 
       default:
         return NULL;
@@ -418,15 +427,24 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
   }
 
   /**
-   * name of export file.
+   * Name of export file.
    *
-   * @param string $output type of output
+   * @param string $output
+   *   Type of output.
    *
-   * @return string name of the file
+   * @return string|NULL
+   *   name of the file
    */
-  function getExportFileName($output = 'csv') {}
+  public function getExportFileName($output = 'csv') {
+    return NULL;
+  }
 
-  function eventToTitle() {
+  /**
+   * Get the title for the mailing event type.
+   *
+   * @return string
+   */
+  public function eventToTitle() {
     static $events = NULL;
 
     if (empty($events)) {
@@ -435,25 +453,23 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
         'delivered' => ts('Successful Deliveries'),
         'bounce' => ts('Bounces'),
         'forward' => ts('Forwards'),
-        'reply' => $this->_is_distinct
-         ? ts('Unique Replies')
-         : ts('Replies'),
+        'reply' => $this->_is_distinct ? ts('Unique Replies') : ts('Replies'),
         'unsubscribe' => ts('Unsubscribe Requests'),
         'optout' => ts('Opt-out Requests'),
-        'click' => $this->_is_distinct
-         ? ts('Unique Click-throughs')
-         : ts('Click-throughs'),
-        'opened' => $this->_is_distinct
-         ? ts('Unique Tracked Opens')
-         : ts('Tracked Opens'),
+        'click' => $this->_is_distinct ? ts('Unique Click-throughs') : ts('Click-throughs'),
+        'opened' => $this->_is_distinct ? ts('Unique Tracked Opens') : ts('Total Tracked Opens'),
       );
     }
     return $events[$this->_event_type];
   }
 
-  function getTitle() {
+  /**
+   * Get the title of the event.
+   *
+   * @return string
+   */
+  public function getTitle() {
     return $this->eventToTitle();
   }
-}
-//end of class
 
+}

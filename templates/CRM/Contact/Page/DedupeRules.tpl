@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 {elseif $action eq 4}
 {include file="CRM/Contact/Form/DedupeFind.tpl"}
 {else}
-    <div id="help">
+    <div class="help">
        {ts}Manage the rules used to identify potentially duplicate contact records. Scan for duplicates using a selected rule and merge duplicate contact data as needed.{/ts} {help id="id-dedupe-intro"}
     </div>
     {if $hasperm_administer_dedupe_rules}
@@ -42,7 +42,7 @@
       <div id="browseValues_{$contactType}">
         <div>
         {strip}
-          <table id="options_{$contactType}" class="display">
+          <table id="options_{$contactType}" class="display mergecontact">
             <thead>
             <tr>
               <th>{ts 1=$contactType}%1 Rules{/ts}</th>
@@ -61,7 +61,7 @@
         {/strip}
        </div>
        <div style="float:right">
-            <a href="{crmURL q="action=add&contact_type=$contactType&reset=1"}" class="button"><span><div class="icon add-icon"></div>{ts 1=$contactType}Add Rule for %1s{/ts}</span></a>
+            {crmButton q="action=add&contact_type=$contactType&reset=1" icon="plus-circle"}{ts 1=$contactType}Add Rule for %1s{/ts}{/crmButton}
         </div>
       </div>
     {/foreach}

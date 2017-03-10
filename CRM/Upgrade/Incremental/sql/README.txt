@@ -1,7 +1,7 @@
 +--------------------------------------------------------------------+
-| CiviCRM version 4.4                                                |
+| CiviCRM version 4.7                                                |
 +--------------------------------------------------------------------+
-| Copyright CiviCRM LLC (c) 2004-2013                                |
+| Copyright CiviCRM LLC (c) 2004-2017                                |
 +--------------------------------------------------------------------+
 | This file is a part of CiviCRM.                                    |
 |                                                                    |
@@ -93,6 +93,7 @@ SELECT @max_wt     := max(weight) from civicrm_option_value where option_group_i
 INSERT INTO civicrm_option_value
   (option_group_id,                {localize field='label'}label{/localize}, {localize field='description'}description{/localize}, value,                           name,               weight,                        filter, component_id)
 VALUES
-    (@option_group_id_activity_type, {localize}'Change Custom Data'{/localize},{localize}''{/localize}, (SELECT @max_val := @max_val+1), 'Change Custom Data', (SELECT @max_wt := @max_wt+1), 0, @caseCompId);
+    (@option_group_id_activity_type, {localize}'{ts escape="sql"}Change Custom Data{/ts}'{/localize},{localize}''{/localize}, (SELECT @max_val := @max_val+1), 'Change Custom Data', (SELECT @max_wt := @max_wt+1), 0, @caseCompId);
 
 ------------------------------------------------------------------------------
+More details on the wiki: http://wiki.civicrm.org/confluence/display/CRMDOC/Internationalisation+for+Developers#InternationalisationforDevelopers-Localisedfieldsschemachanges

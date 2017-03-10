@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,21 +23,19 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Contribute_Form_ContributionPage_Widget extends CRM_Contribute_Form_ContributionPage {
   protected $_colors;
 
   protected $_widget;
 
-  function preProcess() {
+  public function preProcess() {
     parent::preProcess();
 
     $this->_widget = new CRM_Contribute_DAO_Widget();
@@ -63,64 +61,78 @@ class CRM_Contribute_Form_ContributionPage_Widget extends CRM_Contribute_Form_Co
       'title'
     );
 
-    $this->_fields = array('title' => array(ts('Title'),
+    $this->_fields = array(
+      'title' => array(
+        ts('Title'),
         'text',
         FALSE,
         $title,
       ),
-      'url_logo' => array(ts('URL to Logo Image'),
+      'url_logo' => array(
+        ts('URL to Logo Image'),
         'text',
         FALSE,
         NULL,
       ),
-      'button_title' => array(ts('Button Title'),
+      'button_title' => array(
+        ts('Button Title'),
         'text',
         FALSE,
         ts('Contribute!'),
       ),
     );
 
-    $this->_colorFields = array('color_title' => array(ts('Title Text Color'),
+    $this->_colorFields = array(
+      'color_title' => array(
+        ts('Title Text Color'),
         'text',
         FALSE,
         '#2786C2',
       ),
-      'color_bar' => array(ts('Progress Bar Color'),
+      'color_bar' => array(
+        ts('Progress Bar Color'),
+        'text',
+        FALSE,
+        '#2786C2',
+      ),
+      'color_main_text' => array(
+        ts('Additional Text Color'),
         'text',
         FALSE,
         '#FFFFFF',
       ),
-      'color_main_text' => array(ts('Additional Text Color'),
-        'text',
-        FALSE,
-        '#FFFFFF',
-      ),
-      'color_main' => array(ts('Background Color'),
+      'color_main' => array(
+        ts('Background Color'),
         'text',
         FALSE,
         '#96C0E7',
       ),
-      'color_main_bg' => array(ts('Background Color Top Area'),
+      'color_main_bg' => array(
+        ts('Background Color Top Area'),
         'text',
         FALSE,
         '#B7E2FF',
       ),
-      'color_bg' => array(ts('Border Color'),
+      'color_bg' => array(
+        ts('Border Color'),
         'text',
         FALSE,
         '#96C0E7',
       ),
-      'color_about_link' => array(ts('Button Link Color'),
+      'color_about_link' => array(
+        ts('Button Text Color'),
         'text',
         FALSE,
         '#556C82',
       ),
-      'color_button' => array(ts('Button Background Color'),
+      'color_button' => array(
+        ts('Button Background Color'),
         'text',
         FALSE,
         '#FFFFFF',
       ),
-      'color_homepage_link' => array(ts('Homepage Link Color'),
+      'color_homepage_link' => array(
+        ts('Homepage Link Color'),
         'text',
         FALSE,
         '#FFFFFF',
@@ -128,7 +140,10 @@ class CRM_Contribute_Form_ContributionPage_Widget extends CRM_Contribute_Form_Co
     );
   }
 
-  function setDefaultValues() {
+  /**
+   * Set default values for the form.
+   */
+  public function setDefaultValues() {
     $defaults = array();
     // check if there is a widget already created
     if ($this->_widget) {
@@ -153,7 +168,7 @@ class CRM_Contribute_Form_ContributionPage_Widget extends CRM_Contribute_Form_Co
     return $defaults;
   }
 
-  function buildQuickForm() {
+  public function buildQuickForm() {
     $attributes = CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Widget');
 
     $this->addElement('checkbox',
@@ -163,7 +178,7 @@ class CRM_Contribute_Form_ContributionPage_Widget extends CRM_Contribute_Form_Co
       array('onclick' => "widgetBlock(this)")
     );
 
-    $this->addWysiwyg('about', ts('About'), $attributes['about']);
+    $this->add('wysiwyg', 'about', ts('About'), $attributes['about']);
 
     foreach ($this->_fields as $name => $val) {
       $this->add($val[1],
@@ -195,13 +210,16 @@ class CRM_Contribute_Form_ContributionPage_Widget extends CRM_Contribute_Form_Co
   }
 
   /**
-   * Function for validation
+   * Validation.
    *
-   * @param array $params (ref.) an assoc array of name/value pairs
+   * @param array $params
+   *   (ref.) an assoc array of name/value pairs.
    *
-   * @return mixed true or array of errors
-   * @access public
-   * @static
+   * @param $files
+   * @param $self
+   *
+   * @return bool|array
+   *   mixed true or array of errors
    */
   public static function formRule($params, $files, $self) {
     $errors = array();
@@ -222,7 +240,7 @@ class CRM_Contribute_Form_ContributionPage_Widget extends CRM_Contribute_Form_Co
     return empty($errors) ? TRUE : $errors;
   }
 
-  function postProcess() {
+  public function postProcess() {
     //to reset quickform elements of next (pcp) page.
     if ($this->controller->getNextName('Widget') == 'PCP') {
       $this->controller->resetPage('PCP');
@@ -253,10 +271,9 @@ class CRM_Contribute_Form_ContributionPage_Widget extends CRM_Contribute_Form_Co
    * Return a descriptive name for the page, used in wizard header
    *
    * @return string
-   * @access public
    */
   public function getTitle() {
     return ts('Widget Settings');
   }
-}
 
+}

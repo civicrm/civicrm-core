@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,93 +23,42 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
- * Soap specific stuff goes here
+ * Soap specific stuff goes here.
  */
 class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
 
   /**
-   * UF container variables
+   * UF container variables.
    */
   static $uf = NULL;
   static $ufClass = NULL;
 
   /**
-   * sets the title of the page
+   * Given a permission string, check for access requirements
    *
-   * @param string $title title  for page
-   * @paqram string $pageTitle
+   * @param string $str
+   *   The permission to check.
    *
-   * @return void
-   * @access public
+   * @return bool
+   *   true if yes, else false
    */
-  function setTitle($title, $pageTitle) {
-    return;
-  }
-
-  /**
-   * given a permission string, check for access requirements
-   *
-   * @param string $str the permission to check
-   *
-   * @return boolean true if yes, else false
-   * @static
-   * @access public
-   */
-  function checkPermission($str) {
+  public function checkPermission($str) {
     return TRUE;
   }
 
   /**
-   * Append an additional breadcrumb tag to the existing breadcrumb
-   *
-   * @param string $title
-   * @param string $url
-   *
-   * @return void
-   * @access public
+   * @inheritDoc
    */
-  function appendBreadCrumb($title, $url) {
-    return;
-  }
-
-  /**
-   * Append a string to the head of the html file
-   *
-   * @param string $head the new string to be appended
-   *
-   * @return void
-   * @access public
-   */
-  function addHTMLHead($head) {
-    return;
-  }
-
-  /**
-   * Generate an internal CiviCRM URL
-   *
-   * @param $path     string   The path being linked to, such as "civicrm/add"
-   * @param $query    string   A query string to append to the link.
-   * @param $absolute boolean  Whether to force the output to be an absolute link (beginning with http:).
-   *                           Useful for links that will be displayed outside the site, such as in an
-   *                           RSS feed.
-   * @param $fragment string   A fragment identifier (named anchor) to append to the link.
-   *
-   * @return string            an HTML string containing a link to the given path.
-   * @access public
-   *
-   */
-  function url($path = NULL, $query = NULL, $absolute = TRUE, $fragment = NULL) {
+  public function url($path = NULL, $query = NULL, $absolute = TRUE, $fragment = NULL) {
     if (isset(self::$ufClass)) {
       $className = self::$ufClass;
       $url = $className::url($path, $query, $absolute, $fragment);
@@ -121,37 +70,26 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
   }
 
   /**
-   * figure out the post url for the form
-   *
-   * @param the default action if one is pre-specified
-   *
-   * @return string the url to post the form
-   * @access public
+   * FIXME: Can this override be removed in favor of the parent?
+   * @inheritDoc
    */
-  function postURL($action) {
+  public function postURL($action) {
     return NULL;
   }
 
   /**
-   * Function to set the email address of the user
+   * Set the email address of the user.
    *
-   * @param object $user handle to the user object
-   *
-   * @return void
-   * @access public
+   * @param object $user
+   *   Handle to the user object.
    */
-  function setEmail(&$user) {}
+  public function setEmail(&$user) {
+  }
 
   /**
-   * Authenticate a user against the real UF
-   *
-   * @param string $name      Login name
-   * @param string $pass      Login password
-   *
-   * @return array            Result array
-   * @access public
+   * @inheritDoc
    */
-  function &authenticate($name, $pass) {
+  public function authenticate($name, $pass) {
     if (isset(self::$ufClass)) {
       $className = self::$ufClass;
       $result =& $className::authenticate($name, $pass);
@@ -163,9 +101,7 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
   }
 
   /**
-   * Swap the current UF for soap
-   *
-   * @access public
+   * Swap the current UF for soap.
    */
   public function swapUF() {
     $config = CRM_Core_Config::singleton();
@@ -178,24 +114,14 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
   }
 
   /**
-   * Get the locale set in the hosting CMS
-   *
-   * @return null  as the language is set elsewhere
-   */
-  function getUFLocale() {
-    return NULL;
-  }
-
-  /**
    * Get user login URL for hosting CMS (method declared in each CMS system class)
    *
-   * @param string $destination - if present, add destination to querystring (works for Drupal only)
+   * @param string $destination
    *
-   * @return string - loginURL for the current CMS
-   * @static
+   * @throws Exception
    */
   public function getLoginURL($destination = '') {
     throw new Exception("Method not implemented: getLoginURL");
   }
-}
 
+}

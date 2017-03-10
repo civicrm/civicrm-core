@@ -1,10 +1,9 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,21 +23,35 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
-
-/**
- *
- * APIv3 functions for registering/processing mailing group events.
- *
- * @package CiviCRM_APIv3
- * @subpackage API_MailerGroup
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
  */
 
 /**
- * Handle an unsubscribe event
+ * APIv3 functions for registering/processing mailing group events.
+ *
+ * @deprecated
+ * @package CiviCRM_APIv3
+ */
+
+/**
+ * Declare deprecated functions.
+ *
+ * @deprecated api notice
+ * @return string
+ *   to indicate this entire api entity is deprecated
+ */
+function _civicrm_api3_mailing_group_deprecation() {
+  $message = 'This action is deprecated. Use the mailing_event API instead.';
+  return array(
+    'event_unsubscribe' => $message,
+    'event_domain_unsubscribe' => $message,
+    'event_resubscribe' => $message,
+    'event_subscribe' => $message,
+  );
+}
+
+/**
+ * Handle an unsubscribe event.
+ *
  * @deprecated
  *
  * @param array $params
@@ -50,7 +63,8 @@ function civicrm_api3_mailing_group_event_unsubscribe($params) {
 }
 
 /**
- * Handle a site-level unsubscribe event
+ * Handle a site-level unsubscribe event.
+ *
  * @deprecated
  *
  * @param array $params
@@ -63,7 +77,8 @@ function civicrm_api3_mailing_group_event_domain_unsubscribe($params) {
 }
 
 /**
- * Handle a resubscription event
+ * Handle a re-subscription event.
+ *
  * @deprecated
  *
  * @param array $params
@@ -75,7 +90,8 @@ function civicrm_api3_mailing_group_event_resubscribe($params) {
 }
 
 /**
- * Handle a subscription event
+ * Handle a subscription event.
+ *
  * @deprecated
  *
  * @param array $params
@@ -86,23 +102,37 @@ function civicrm_api3_mailing_group_event_subscribe($params) {
   return civicrm_api('mailing_event_subscribe', 'create', $params);
 }
 
-function civicrm_api3_mailing_group_getfields($params) {
-  $dao = _civicrm_api3_get_DAO('Subscribe');
-  $d = new $dao();
-  $fields = $d->fields();
-  $d->free();
-
-  $dao = _civicrm_api3_get_DAO('Unsubscribe');
-  $d = new $dao();
-  $fields = $fields + $d->fields();
-  $d->free();
-
-  // CRM-13830 - prevent the api wrapper from helping out with pseudoconstants
-  // Since these fields don't belong to this entity it will fail
-  foreach ($fields as &$field) {
-    unset($field['pseudoconstant']);
-  }
-
-  return civicrm_api3_create_success($fields);
+/**
+ * Create mailing group.
+ *
+ * @param array $params
+ *
+ * @return array
+ * @throws \API_Exception
+ */
+function civicrm_api3_mailing_group_create($params) {
+  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
+/**
+ * Get mailing group.
+ *
+ * @param array $params
+ *
+ * @return array
+ */
+function civicrm_api3_mailing_group_get($params) {
+  return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+}
+
+/**
+ * Delete mailing group.
+ *
+ * @param array $params
+ *
+ * @return array
+ * @throws \API_Exception
+ */
+function civicrm_api3_mailing_group_delete($params) {
+  return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+}

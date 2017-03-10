@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,7 +24,7 @@
  +--------------------------------------------------------------------+
 *}
 {* add/update price set *}
-<div id="help">
+<div class="help">
     {ts}Use this form to edit the title and group-level help for a set of Price fields.{/ts}
 </div>
 {capture assign="enableComponents"}{crmURL p='civicrm/admin/setting/component' q="reset=1"}{/capture}
@@ -52,8 +52,12 @@
           {/if}
           </td>
         </tr>
-  <tr id="financial_type_id_row" class="crm-price-set-form-block-contribution_type_id crm-price-set-form-block-financial_type_id">
-     <td class="label">{$form.financial_type_id.label}</td>
+        <tr id="min_amount" class="crm-price-set-form-block-min_amount">
+           <td class="label">{$form.min_amount.label}</td>
+           <td>{$form.min_amount.html}</td>
+        </tr>
+        <tr id="financial_type_id_row" class="crm-price-set-form-block-contribution_type_id crm-price-set-form-block-financial_type_id">
+          <td class="label">{$form.financial_type_id.label}</td>
            <td>{$form.financial_type_id.html}</td>
            <td>&nbsp;</td>
         </tr>

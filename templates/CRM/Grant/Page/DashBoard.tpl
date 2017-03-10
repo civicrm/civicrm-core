@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -62,7 +62,7 @@ You have {$grantSummary.total_grants} grant(s) registered in your database.
 
 
 {if $pager->_totalItems}
-    
+
     <h3>{ts}Recent Grants{/ts}</h3>
     <div class="form-item">
         {include file="CRM/Grant/Form/Selector.tpl" context="DashBoard"}

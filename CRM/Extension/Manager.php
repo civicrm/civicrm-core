@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,25 +23,23 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * The extension manager handles installing, disabling enabling, and
  * uninstalling extensions.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Extension_Manager {
   /**
-   * The extension is fully installed and enabled
+   * The extension is fully installed and enabled.
    */
   const STATUS_INSTALLED = 'installed';
 
   /**
-   * The extension config has been applied to database but deactivated
+   * The extension config has been applied to database but deactivated.
    */
   const STATUS_DISABLED = 'disabled';
 
@@ -101,9 +99,12 @@ class CRM_Extension_Manager {
   public $statuses;
 
   /**
+   * @param CRM_Extension_Container_Interface $fullContainer
    * @param CRM_Extension_Container_Basic|FALSE $defaultContainer
+   * @param CRM_Extension_Mapper $mapper
+   * @param $typeManagers
    */
-  function __construct(CRM_Extension_Container_Interface $fullContainer, $defaultContainer, CRM_Extension_Mapper $mapper, $typeManagers) {
+  public function __construct(CRM_Extension_Container_Interface $fullContainer, $defaultContainer, CRM_Extension_Mapper $mapper, $typeManagers) {
     $this->fullContainer = $fullContainer;
     $this->defaultContainer = $defaultContainer;
     $this->mapper = $mapper;
@@ -116,12 +117,12 @@ class CRM_Extension_Manager {
    *
    * This only works if the extension is stored in the default container.
    *
-   * @param string $tmpCodeDir path to a local directory containing a copy of the new (inert) code
-   * @return void
+   * @param string $tmpCodeDir
+   *   Path to a local directory containing a copy of the new (inert) code.
    * @throws CRM_Extension_Exception
    */
   public function replace($tmpCodeDir) {
-    if (! $this->defaultContainer) {
+    if (!$this->defaultContainer) {
       throw new CRM_Extension_Exception("Default extension container is not configured");
     }
 
@@ -136,7 +137,7 @@ class CRM_Extension_Manager {
         // There is an old copy of the extension. Try to install in the same place -- but it must go somewhere in the default-container
         list ($oldInfo, $typeManager) = $this->_getInfoTypeHandler($newInfo->key); // throws Exception
         $tgtPath = $this->fullContainer->getPath($newInfo->key);
-        if (! CRM_Utils_File::isChildPath($this->defaultContainer->getBaseDir(), $tgtPath)) {
+        if (!CRM_Utils_File::isChildPath($this->defaultContainer->getBaseDir(), $tgtPath)) {
           // force installation in the default-container
           $oldPath = $tgtPath;
           $tgtPath = $this->defaultContainer->getBaseDir() . DIRECTORY_SEPARATOR . $newInfo->key;
@@ -146,17 +147,20 @@ class CRM_Extension_Manager {
           )));
         }
         break;
+
       case self::STATUS_INSTALLED_MISSING:
       case self::STATUS_DISABLED_MISSING:
-      // the extension does not exist in any container; we're free to put it anywhere
+        // the extension does not exist in any container; we're free to put it anywhere
         $tgtPath = $this->defaultContainer->getBaseDir() . DIRECTORY_SEPARATOR . $newInfo->key;
         list ($oldInfo, $typeManager) = $this->_getMissingInfoTypeHandler($newInfo->key); // throws Exception
         break;
+
       case self::STATUS_UNKNOWN:
-      // the extension does not exist in any container; we're free to put it anywhere
+        // the extension does not exist in any container; we're free to put it anywhere
         $tgtPath = $this->defaultContainer->getBaseDir() . DIRECTORY_SEPARATOR . $newInfo->key;
         $oldInfo = $typeManager = NULL;
         break;
+
       default:
         throw new CRM_Extension_Exception("Cannot install or enable extension: {$newInfo->key}");
     }
@@ -170,6 +174,7 @@ class CRM_Extension_Manager {
           throw new CRM_Extension_Exception("Failed to move $tmpCodeDir to $tgtPath");
         }
         break;
+
       case self::STATUS_INSTALLED:
       case self::STATUS_INSTALLED_MISSING:
       case self::STATUS_DISABLED:
@@ -182,18 +187,20 @@ class CRM_Extension_Manager {
         $this->_updateExtensionEntry($newInfo);
         $typeManager->onPostReplace($oldInfo, $newInfo);
         break;
+
       default:
         throw new CRM_Extension_Exception("Cannot install or enable extension: {$newInfo->key}");
     }
 
     $this->refresh();
+    CRM_Core_Invoke::rebuildMenuAndCaches(TRUE);
   }
 
   /**
    * Add records of the extension to the database -- and enable it
    *
-   * @param array $keys list of extension keys
-   * @return void
+   * @param array $keys
+   *   List of extension keys.
    * @throws CRM_Extension_Exception
    */
   public function install($keys) {
@@ -209,18 +216,21 @@ class CRM_Extension_Manager {
         case self::STATUS_INSTALLED:
           // ok, nothing to do
           break;
+
         case self::STATUS_DISABLED:
           // re-enable it
           $typeManager->onPreEnable($info);
           $this->_setExtensionActive($info, 1);
           $typeManager->onPostEnable($info);
           break;
+
         case self::STATUS_UNINSTALLED:
           // install anew
           $typeManager->onPreInstall($info);
           $this->_createExtensionEntry($info);
           $typeManager->onPostInstall($info);
           break;
+
         case self::STATUS_UNKNOWN:
         default:
           throw new CRM_Extension_Exception("Cannot install or enable extension: $key");
@@ -230,22 +240,26 @@ class CRM_Extension_Manager {
     $this->statuses = NULL;
     $this->mapper->refresh();
     CRM_Core_Invoke::rebuildMenuAndCaches(TRUE);
+    $schema = new CRM_Logging_Schema();
+    $schema->fixSchemaDifferences();
 
     foreach ($keys as $key) {
       list ($info, $typeManager) = $this->_getInfoTypeHandler($key); // throws Exception
-      //print_r(array('post post?', $info, 'k' => $key, 'os'=> $origStatuses[$key]));
 
       switch ($origStatuses[$key]) {
         case self::STATUS_INSTALLED:
           // ok, nothing to do
           break;
+
         case self::STATUS_DISABLED:
           // re-enable it
           break;
+
         case self::STATUS_UNINSTALLED:
           // install anew
           $typeManager->onPostPostInstall($info);
           break;
+
         case self::STATUS_UNKNOWN:
         default:
           throw new CRM_Extension_Exception("Cannot install or enable extension: $key");
@@ -257,8 +271,8 @@ class CRM_Extension_Manager {
   /**
    * Add records of the extension to the database -- and enable it
    *
-   * @param array $keys list of extension keys
-   * @return void
+   * @param array $keys
+   *   List of extension keys.
    * @throws CRM_Extension_Exception
    */
   public function enable($keys) {
@@ -268,8 +282,8 @@ class CRM_Extension_Manager {
   /**
    * Add records of the extension to the database -- and enable it
    *
-   * @param array $keys list of extension keys
-   * @return void
+   * @param array $keys
+   *   List of extension keys.
    * @throws CRM_Extension_Exception
    */
   public function disable($keys) {
@@ -286,17 +300,20 @@ class CRM_Extension_Manager {
           $this->_setExtensionActive($info, 0);
           $typeManager->onPostDisable($info);
           break;
+
         case self::STATUS_INSTALLED_MISSING:
           list ($info, $typeManager) = $this->_getMissingInfoTypeHandler($key); // throws Exception
           $typeManager->onPreDisable($info);
           $this->_setExtensionActive($info, 0);
           $typeManager->onPostDisable($info);
           break;
+
         case self::STATUS_DISABLED:
         case self::STATUS_DISABLED_MISSING:
         case self::STATUS_UNINSTALLED:
           // ok, nothing to do
           break;
+
         case self::STATUS_UNKNOWN:
         default:
           throw new CRM_Extension_Exception("Cannot disable unknown extension: $key");
@@ -309,12 +326,12 @@ class CRM_Extension_Manager {
   }
 
   /**
-   * Remove all database references to an extension
+   * Remove all database references to an extension.
    *
    * Add records of the extension to the database -- and enable it
    *
-   * @param array $keys list of extension keys
-   * @return void
+   * @param array $keys
+   *   List of extension keys.
    * @throws CRM_Extension_Exception
    */
   public function uninstall($keys) {
@@ -323,27 +340,30 @@ class CRM_Extension_Manager {
     // TODO: to mitigate the risk of crashing during installation, scan
     // keys/statuses/types before doing anything
 
-   foreach ($keys as $key) {
+    foreach ($keys as $key) {
       switch ($origStatuses[$key]) {
         case self::STATUS_INSTALLED:
         case self::STATUS_INSTALLED_MISSING:
           throw new CRM_Extension_Exception("Cannot uninstall extension; disable it first: $key");
-          break;
+
         case self::STATUS_DISABLED:
           list ($info, $typeManager) = $this->_getInfoTypeHandler($key); // throws Exception
           $typeManager->onPreUninstall($info);
           $this->_removeExtensionEntry($info);
           $typeManager->onPostUninstall($info);
           break;
+
         case self::STATUS_DISABLED_MISSING:
           list ($info, $typeManager) = $this->_getMissingInfoTypeHandler($key); // throws Exception
           $typeManager->onPreUninstall($info);
           $this->_removeExtensionEntry($info);
           $typeManager->onPostUninstall($info);
           break;
+
         case self::STATUS_UNINSTALLED:
           // ok, nothing to do
           break;
+
         case self::STATUS_UNKNOWN:
         default:
           throw new CRM_Extension_Exception("Cannot disable unknown extension: $key");
@@ -356,23 +376,28 @@ class CRM_Extension_Manager {
   }
 
   /**
-   * Determine the status of an extension
+   * Determine the status of an extension.
    *
-   * @return string constant (STATUS_INSTALLED, STATUS_DISABLED, STATUS_UNINSTALLED, STATUS_UNKNOWN)
+   * @param $key
+   *
+   * @return string
+   *   constant (STATUS_INSTALLED, STATUS_DISABLED, STATUS_UNINSTALLED, STATUS_UNKNOWN)
    */
   public function getStatus($key) {
     $statuses = $this->getStatuses();
     if (array_key_exists($key, $statuses)) {
       return $statuses[$key];
-    } else {
+    }
+    else {
       return self::STATUS_UNKNOWN;
     }
   }
 
   /**
-   * Determine the status of all extensions
+   * Determine the status of all extensions.
    *
-   * @return array ($key => status_constant)
+   * @return array
+   *   ($key => status_constant)
    */
   public function getStatuses() {
     if (!is_array($this->statuses)) {
@@ -391,12 +416,14 @@ class CRM_Extension_Manager {
         try {
           $path = $this->fullContainer->getPath($dao->full_name);
           $codeExists = !empty($path) && is_dir($path);
-        } catch (CRM_Extension_Exception $e) {
+        }
+        catch (CRM_Extension_Exception $e) {
           $codeExists = FALSE;
         }
         if ($dao->is_active) {
           $this->statuses[$dao->full_name] = $codeExists ? self::STATUS_INSTALLED : self::STATUS_INSTALLED_MISSING;
-        } else {
+        }
+        else {
           $this->statuses[$dao->full_name] = $codeExists ? self::STATUS_DISABLED : self::STATUS_DISABLED_MISSING;
         }
       }
@@ -415,14 +442,18 @@ class CRM_Extension_Manager {
   /**
    * Find the $info and $typeManager for a $key
    *
-   * @return array (0 => CRM_Extension_Info, 1 => CRM_Extension_Manager_Interface)
+   * @param $key
+   *
    * @throws CRM_Extension_Exception
+   * @return array
+   *   (0 => CRM_Extension_Info, 1 => CRM_Extension_Manager_Interface)
    */
   private function _getInfoTypeHandler($key) {
     $info = $this->mapper->keyToInfo($key); // throws Exception
     if (array_key_exists($info->type, $this->typeManagers)) {
       return array($info, $this->typeManagers[$info->type]);
-    } else {
+    }
+    else {
       throw new CRM_Extension_Exception("Unrecognized extension type: " . $info->type);
     }
   }
@@ -430,22 +461,32 @@ class CRM_Extension_Manager {
   /**
    * Find the $info and $typeManager for a $key
    *
-   * @return array (0 => CRM_Extension_Info, 1 => CRM_Extension_Manager_Interface)
+   * @param $key
+   *
    * @throws CRM_Extension_Exception
+   * @return array
+   *   (0 => CRM_Extension_Info, 1 => CRM_Extension_Manager_Interface)
    */
   private function _getMissingInfoTypeHandler($key) {
     $info = $this->createInfoFromDB($key);
     if ($info) {
       if (array_key_exists($info->type, $this->typeManagers)) {
         return array($info, $this->typeManagers[$info->type]);
-      } else {
+      }
+      else {
         throw new CRM_Extension_Exception("Unrecognized extension type: " . $info->type);
       }
-    } else {
+    }
+    else {
       throw new CRM_Extension_Exception("Failed to reconstruct missing extension: " . $key);
     }
   }
 
+  /**
+   * @param CRM_Extension_Info $info
+   *
+   * @return bool
+   */
   private function _createExtensionEntry(CRM_Extension_Info $info) {
     $dao = new CRM_Core_DAO_Extension();
     $dao->label = $info->label;
@@ -457,6 +498,11 @@ class CRM_Extension_Manager {
     return (bool) ($dao->insert());
   }
 
+  /**
+   * @param CRM_Extension_Info $info
+   *
+   * @return bool
+   */
   private function _updateExtensionEntry(CRM_Extension_Info $info) {
     $dao = new CRM_Core_DAO_Extension();
     $dao->full_name = $info->key;
@@ -468,23 +514,34 @@ class CRM_Extension_Manager {
       $dao->file = $info->file;
       $dao->is_active = 1;
       return (bool) ($dao->update());
-    } else {
+    }
+    else {
       return $this->_createExtensionEntry($info);
     }
   }
 
+  /**
+   * @param CRM_Extension_Info $info
+   *
+   * @throws CRM_Extension_Exception
+   */
   private function _removeExtensionEntry(CRM_Extension_Info $info) {
     $dao = new CRM_Core_DAO_Extension();
     $dao->full_name = $info->key;
     if ($dao->find(TRUE)) {
       if (CRM_Core_BAO_Extension::del($dao->id)) {
         CRM_Core_Session::setStatus(ts('Selected option value has been deleted.'), ts('Deleted'), 'success');
-      } else {
+      }
+      else {
         throw new CRM_Extension_Exception("Failed to remove extension entry");
       }
     } // else: post-condition already satisified
   }
 
+  /**
+   * @param CRM_Extension_Info $info
+   * @param $isActive
+   */
   private function _setExtensionActive(CRM_Extension_Info $info, $isActive) {
     CRM_Core_DAO::executeQuery('UPDATE civicrm_extension SET is_active = %1 where full_name = %2', array(
       1 => array($isActive, 'Integer'),
@@ -496,6 +553,7 @@ class CRM_Extension_Manager {
    * Auto-generate a place-holder for a missing extension using info from
    * database.
    *
+   * @param $key
    * @return CRM_Extension_Info|NULL
    */
   public function createInfoFromDB($key) {
@@ -504,8 +562,10 @@ class CRM_Extension_Manager {
     if ($dao->find(TRUE)) {
       $info = new CRM_Extension_Info($dao->full_name, $dao->type, $dao->name, $dao->label, $dao->file);
       return $info;
-    } else {
+    }
+    else {
       return NULL;
     }
   }
+
 }

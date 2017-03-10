@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,18 +23,16 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
- * Delegate query functions based on hook system
+ * Delegate query functions based on hook system.
  */
 class CRM_Contact_BAO_Query_Hook {
 
@@ -44,11 +42,9 @@ class CRM_Contact_BAO_Query_Hook {
   protected $_queryObjects = NULL;
 
   /**
-   * singleton function used to manage this object
+   * Singleton function used to manage this object.
    *
    * @return object
-   * @static
-   *
    */
   public static function singleton() {
     static $singleton = NULL;
@@ -58,11 +54,12 @@ class CRM_Contact_BAO_Query_Hook {
     return $singleton;
   }
 
- /**
-  * Get or build the list of search objects (via hook)
-  *
-  * @return array of CRM_Contact_BAO_Query_Interface objects
-  */
+  /**
+   * Get or build the list of search objects (via hook).
+   *
+   * @return array
+   *   Array of CRM_Contact_BAO_Query_Interface objects
+   */
   public function getSearchQueryObjects() {
     if ($this->_queryObjects === NULL) {
       $this->_queryObjects = array();
@@ -71,6 +68,9 @@ class CRM_Contact_BAO_Query_Hook {
     return $this->_queryObjects;
   }
 
+  /**
+   * @return array
+   */
   public function &getFields() {
     $extFields = array();
     foreach (self::getSearchQueryObjects() as $obj) {
@@ -80,18 +80,35 @@ class CRM_Contact_BAO_Query_Hook {
     return $extFields;
   }
 
+  /**
+   * @param $apiEntities
+   * @param $fieldOptions
+   */
   public function alterSearchBuilderOptions(&$apiEntities, &$fieldOptions) {
     foreach (self::getSearchQueryObjects() as $obj) {
       $obj->alterSearchBuilderOptions($apiEntities, $fieldOptions);
     }
   }
 
+  /**
+   * Alter search query.
+   *
+   * @param string $query
+   * @param string $fnName
+   */
   public function alterSearchQuery(&$query, $fnName) {
     foreach (self::getSearchQueryObjects() as $obj) {
       $obj->$fnName($query);
     }
   }
 
+  /**
+   * @param string $fieldName
+   * @param $mode
+   * @param $side
+   *
+   * @return string
+   */
   public function buildSearchfrom($fieldName, $mode, $side) {
     $from = '';
     foreach (self::getSearchQueryObjects() as $obj) {
@@ -100,33 +117,51 @@ class CRM_Contact_BAO_Query_Hook {
     return $from;
   }
 
+  /**
+   * @param $tables
+   */
   public function setTableDependency(&$tables) {
     foreach (self::getSearchQueryObjects() as $obj) {
       $obj->setTableDependency($tables);
     }
   }
 
+  /**
+   * @param $panes
+   */
   public function registerAdvancedSearchPane(&$panes) {
     foreach (self::getSearchQueryObjects() as $obj) {
       $obj->registerAdvancedSearchPane($panes);
     }
   }
 
+  /**
+   * @param $panes
+   */
   public function getPanesMapper(&$panes) {
     foreach (self::getSearchQueryObjects() as $obj) {
       $obj->getPanesMapper($panes);
     }
   }
 
+  /**
+   * @param CRM_Core_Form $form
+   * @param $type
+   */
   public function buildAdvancedSearchPaneForm(&$form, $type) {
     foreach (self::getSearchQueryObjects() as $obj) {
       $obj->buildAdvancedSearchPaneForm($form, $type);
     }
   }
 
+  /**
+   * @param $paneTemplatePathArray
+   * @param $type
+   */
   public function setAdvancedSearchPaneTemplatePath(&$paneTemplatePathArray, $type) {
     foreach (self::getSearchQueryObjects() as $obj) {
       $obj->setAdvancedSearchPaneTemplatePath($paneTemplatePathArray, $type);
     }
   }
+
 }

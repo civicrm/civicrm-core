@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,9 +24,7 @@
  +--------------------------------------------------------------------+
 *}
 {* this template is used for adding/editing/viewing relationships  *}
-{if $cdType }
-  {include file="CRM/Custom/Form/CustomData.tpl"}
-{else}
+
   {if $action eq 4 } {* action = view *}
     <div class="crm-block crm-content-block crm-relationship-view-block">
       <table class="crm-info-panel">
@@ -139,13 +137,13 @@
     </div>
   {/if}
   {if ($action EQ 1) OR ($action EQ 2) }
-    {*include custom data js file - setting includeWysiwygEditor=TRUE because it's already been loaded*}
-    {include file="CRM/common/customData.tpl" includeWysiwygEditor=TRUE}
+    {*include custom data js file *}
+    {include file="CRM/common/customData.tpl"}
     <script type="text/javascript">
       {literal}
-      cj(function($) {
+      CRM.$(function($) {
         var
-          $form = $("form#{/literal}{$form.formName}{literal}"),
+          $form = $("form.{/literal}{$form.formClass}{literal}"),
           relationshipData = {/literal}{$relationshipData|@json_encode}{literal};
         $('[name=relationship_type_id]', $form).change(function() {
           var
@@ -174,12 +172,11 @@
               if (contact_sub_type) {
                 api.params.contact_sub_type = contact_sub_type;
               }
-              // Todo: pass sub-type to new contact profile otherwise relationship create will fail. Disabling it completely for now.
-              $contactField.data('create-links', !contact_sub_type);
               $contactField
                 .val('')
                 .prop('disabled', false)
                 .data('api-params', api)
+                .data('user-filter', {})
                 .attr('placeholder', relationshipData[rType]['placeholder_' + target])
                 .change();
             }
@@ -205,5 +202,3 @@
     </div>
   {/if}
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
-{/if} {* close of custom data else*}
-

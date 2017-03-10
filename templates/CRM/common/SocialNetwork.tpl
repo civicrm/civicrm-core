@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,7 +24,7 @@
  +--------------------------------------------------------------------+
 *}
 {* Adds social networking buttons (Facebook like, Twitter tweet, Google +1, LinkedIn) to public pages (online contributions, event info) *}
-<script type="text/javascript" src="https://apis.google.com/js/plusone.js"></script>
+
 <div class="crm-section crm-socialnetwork help">
     <h3 class="nobackground">{ts}Help spread the word{/ts}</h3>
     <div class="description">
@@ -35,13 +35,14 @@
     <div class="crm-fb-tweet-buttons">
         {if $emailMode eq true}
             {*use images for email*}
-            <a href="http://twitter.com/share?url={$url}&amp;text={$title}" id="crm_tweet">
-                <img title="Twitter Tweet Button" src="{$config->userFrameworkResourceURL}/i/tweet.png" width="55px" height="20px"  alt="Tweet Button">
+            <a href="https://twitter.com/share?url={$url|escape:'url'}&amp;text={$title}" id="crm_tweet">
+                <img title="Twitter Tweet Button" src="{$config->userFrameworkResourceURL|replace:'https://':'http://'}/i/tweet.png" width="55px" height="20px"  alt="Tweet Button">
             </a>
-            <a href="http://www.facebook.com/plugins/like.php?href={$url}" target="_blank">
-                <img title="Facebook Like Button" src="{$config->userFrameworkResourceURL}/i/fblike.png" alt="Facebook Button" />
+            <a href="https://www.facebook.com/plugins/like.php?href={$url}" target="_blank">
+                <img title="Facebook Like Button" src="{$config->userFrameworkResourceURL|replace:'https://':'http://'}/i/fblike.png" alt="Facebook Button" />
             </a>
         {else}
+            <script type="text/javascript" src="https://apis.google.com/js/plusone.js"></script>
             {*use advanced buttons for pages*}
             <div class="label">
                 <iframe allowtransparency="true" frameborder="0" scrolling="no"

@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,7 +25,7 @@
 *}
 <div class="crm-block crm-form-block crm-mailing-schedule-form-block">
 {include file="CRM/common/WizardHeader.tpl"}
-<div id="help">
+<div class="help">
     {ts}You can schedule this mailing to be sent starting at a specific date and time, OR you can request that it be sent as soon as possible by checking &quot;Send Immediately&quot;.{/ts} {help id="sending"}
 </div>
 {include file="CRM/Mailing/Form/Count.tpl"}
@@ -68,35 +68,21 @@
     </div><!-- /.crm-accordion-body -->
 </div><!-- /.crm-accordion-wrapper -->
 {/if}
-
-{* include jscript to warn if unsaved form field changes *}
-{include file="CRM/common/formNavigate.tpl"}
-
 </div>
 
 <script type="text/javascript">
-{if $preview}
 {literal}
-cj(function() {
-   cj().crmAccordions();
-});
-{/literal}
-{/if}
-
-{literal}
-cj(function() {
-   cj('#start_date_display').change( function( ) {
-       if ( cj(this).val( ) ) {
-          cj('#now').prop('checked', false );
-       }
-   });
-   cj('#now').change( function( ) { 
-       if ( cj('#now').prop('checked', true ) ) {
-          cj('#start_date_display').val( '' );
-          cj('#start_date').val( '' );
-          cj('#start_date_time').val( '' );
-       }
-   });
-});
+  CRM.$(function($) {
+    $('#start_date_display').change(function() {
+      $('#now').prop('checked', !$(this).val());
+    });
+    $('#now').change(function() {
+      if ($(this).prop('checked')) {
+        $('#start_date_display, #start_date, #start_date_time').val('');
+      } else {
+        $('#start_date_display').focus();
+      }
+    });
+  });
 {/literal}
 </script>

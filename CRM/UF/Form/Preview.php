@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
  */
@@ -41,18 +41,15 @@
 class CRM_UF_Form_Preview extends CRM_UF_Form_AbstractPreview {
 
   /**
-   * pre processing work done here.
+   * Pre processing work done here.
    *
    * gets session variables for group or field id
    *
    * @param
    *
    * @return void
-   *
-   * @access public
-   *
    */
-  function preProcess() {
+  public function preProcess() {
     $flag = FALSE;
     $gid = $this->get('id');
     $this->set('gid', $gid);
@@ -92,7 +89,7 @@ class CRM_UF_Form_Preview extends CRM_UF_Form_AbstractPreview {
         'county',
         'phone',
         'email',
-        'im'
+        'im',
       );
 
       if ($fieldDAO->location_type_id) {
@@ -126,22 +123,20 @@ class CRM_UF_Form_Preview extends CRM_UF_Form_AbstractPreview {
   }
 
   /**
-   * Function to actually build the form
+   * Build the form object.
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
 
     $this->addButtons(array(
-        array(
-          'type' => 'cancel',
-          'name' => ts('Done with Preview'),
-          'isDefault' => TRUE,
-        ),
-      )
-    );
+      array(
+        'type' => 'cancel',
+        'name' => ts('Done with Preview'),
+        'isDefault' => TRUE,
+      ),
+    ));
   }
 
 }

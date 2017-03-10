@@ -60,8 +60,7 @@
           <li><a href="{$loginUrl}">{ts}Login to your account{/ts}</a></li>
           <li><a href="{$pcpInfoURL}">{ts}Go to your page{/ts}</a></li>
          </ol>
-         <p>{ts}When you view your campaign page WHILE LOGGED IN, the page includes links to edit
-your page, tell friends, and update your contact info.{/ts}</p>
+         <p>{ts}When you view your campaign page WHILE LOGGED IN, the page includes links to edit your page, tell friends, and update your contact info.{/ts}</p>
         </td>
        </tr>
        </tr>

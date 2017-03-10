@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,31 +23,27 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
-Class CRM_Core_Form_Date {
+class CRM_Core_Form_Date {
 
   /**
-   * various Date Formats
+   * Various Date Formats.
    */
-  CONST DATE_yyyy_mm_dd = 1, DATE_mm_dd_yy = 2, DATE_mm_dd_yyyy = 4, DATE_Month_dd_yyyy = 8, DATE_dd_mon_yy = 16, DATE_dd_mm_yyyy = 32;
+  const DATE_yyyy_mm_dd = 1, DATE_mm_dd_yy = 2, DATE_mm_dd_yyyy = 4, DATE_Month_dd_yyyy = 8, DATE_dd_mon_yy = 16, DATE_dd_mm_yyyy = 32;
 
   /**
-   * This function is to build the date-format form
+   * Build the date-format form.
    *
-   * @param Object  $form   the form object that we are operating on
-   *
-   * @static
-   * @access public
+   * @param CRM_Core_Form $form
+   *   The form object that we are operating on.
    */
-  static function buildAllowedDateFormats(&$form) {
+  public static function buildAllowedDateFormats(&$form) {
 
     $dateOptions = array();
 
@@ -71,32 +67,29 @@ Class CRM_Core_Form_Date {
 
 
   /**
-   * This function is to retrieve the date range - relative or absolute
-   * and assign it to the form
-   * @param object $form - the form the dates should be added to
+   * Retrieve the date range - relative or absolute and assign it to the form.
+   *
+   * @param CRM_Core_Form $form
+   *   The form the dates should be added to.
    * @param string $fieldName
-   * @param integer $count
+   * @param int $count
    * @param string $from
    * @param string $to
    * @param string $fromLabel
-   * @param boolean $required
-   * @param array $operators Additional value pairs to add
+   * @param bool $required
+   * @param array $operators
+   *   Additional value pairs to add.
    * @param string $dateFormat
-   * @param string $displayTime
-   *
-   *
-   * @static
-   * @access public
+   * @param bool|string $displayTime
    */
-
-  static function buildDateRange(
+  public static function buildDateRange(
     &$form, $fieldName, $count = 1,
     $from = '_from', $to = '_to', $fromLabel = 'From:',
     $required = FALSE, $operators = array(),
     $dateFormat = 'searchDate', $displayTime = FALSE
   ) {
-    $selector =
-      CRM_Core_Form_Date::returnDateRangeSelector(
+    $selector
+      = CRM_Core_Form_Date::returnDateRangeSelector(
         $form, $fieldName, $count,
         $from, $to, $fromLabel,
         $required, $operators,
@@ -110,74 +103,38 @@ Class CRM_Core_Form_Date {
   }
 
   /**
-   * This function is to build the date range array that will provide the form option values
-   * It can be - relative or absolute
+   * Build the date range array that will provide the form option values.
    *
-   * @param Object  $form   the form object that we are operating on
+   * It can be - relative or absolute.
+   *
+   * @param CRM_Core_Form $form
+   *   The form object that we are operating on.
    * @param string $fieldName
-   * @param integer $count
-   * @param String $from
-   * @param String $to
-   * @param String $fromLabel
-   * @param Boolean $required
-   * @param Array $operators Additional Operator Selections to add
-   * @param String $dateFormat
-   * @param Boolean $displayTime
-   * @return array Values for Selector
+   * @param int $count
+   * @param string $from
+   * @param string $to
+   * @param string $fromLabel
+   * @param bool $required
+   * @param array $operators
+   *   Additional Operator Selections to add.
+   * @param string $dateFormat
+   * @param bool $displayTime
+   *
+   * @return array
+   *   Values for Selector
    */
-  static function returnDateRangeSelector(
+  public static function returnDateRangeSelector(
     &$form, $fieldName, $count = 1,
     $from = '_from', $to = '_to', $fromLabel = 'From:',
     $required = FALSE, $operators = array(),
     $dateFormat = 'searchDate', $displayTime = FALSE
   ) {
-    $selector =
-      array(
-        '' => ts('- any -'),
-        0 => ts('Choose Date Range'),
-        'this.year' => ts('This Year'),
-        'this.fiscal_year' => ts('This Fiscal Year'),
-        'this.quarter' => ts('This Quarter'),
-        'this.month' => ts('This Month'),
-        'this.week' => ts('This Week'),
-        'this.day' => ts('This Day'),
-        'previous.year' => ts('Previous Year'),
-        'previous.fiscal_year' => ts('Previous Fiscal Year'),
-        'previous.quarter' => ts('Previous Quarter'),
-        'previous.month' => ts('Previous Month'),
-        'previous.week' => ts('Previous Week'),
-        'previous.day' => ts('Previous Day'),
-        'previous_before.year' => ts('Prior to Previous Year'),
-        'previous_before.quarter' => ts('Prior to Previous Quarter'),
-        'previous_before.month' => ts('Prior to Previous Month'),
-        'previous_before.week' => ts('Prior to Previous Week'),
-        'previous_before.day' => ts('Prior to Previous Day'),
-        'previous_2.year' => ts('Previous 2 Years'),
-        'previous_2.quarter' => ts('Previous 2 Quarters'),
-        'previous_2.month' => ts('Previous 2 Months'),
-        'previous_2.week' => ts('Previous 2 Weeks'),
-        'previous_2.day' => ts('Previous 2 Days'),
-        'earlier.year' => ts('To End of Prior Year'),
-        'earlier.quarter' => ts('To End of Prior Quarter'),
-        'earlier.month' => ts('To End of Prior Month'),
-        'earlier.week' => ts('To End of Prior Week'),
-        'earlier.day' => ts('To End of Prior Day'),
-        'greater.year' => ts('From Start of Current Year'),
-        'greater.quarter' => ts('From Start of Current Quarter'),
-        'greater.month' => ts('From Start of Current Month'),
-        'greater.week' => ts('From Start of Current Week'),
-        'greater.day' => ts('From Start of Current Day'),
-        'current.year' => ts('Current Year to-date'),
-        'current.quarter' => ts('Current Quarter to-date'),
-        'current.month' => ts('Current Month to-date'),
-        'current.week' => ts('Current Week to-date'),
-        'ending_3.year' => ts('Last 3 Years'),
-        'ending_2.year' => ts('Last 2 Years'),
-        'ending.year' => ts('Last 12 Months'),
-        'ending.quarter' => ts('Last 3 Months'),
-        'ending.month' => ts('Last Month'),
-        'ending.week' => ts('Last 7 days'),
-      );
+    $selector = array(
+      '' => ts('- any -'),
+      0 => ts('Choose Date Range'),
+    );
+    // CRM-16195 Pull relative date filters from an option group
+    $selector = $selector + CRM_Core_OptionGroup::values('relative_date_filters');
 
     if (is_array($operators)) {
       $selector = array_merge($selector, $operators);
@@ -194,31 +151,31 @@ Class CRM_Core_Form_Date {
   }
 
   /**
-   * This function is to build the date range - relative or absolute
+   * Build the date range - relative or absolute.
    *
-   * @param CRM_Core_Form  $form   the form object that we are operating on
+   * @param CRM_Core_Form $form
+   *   The form object that we are operating on.
    * @param string $fieldName
-   * @param Array $selector array of option values to add
-   * @param integer $count
+   * @param array $selector
+   *   Array of option values to add.
    * @param string $from
-   * @param stringe $to
-   * @param string $from Label
-   * @param boolean $required
+   *   Label.
+   * @param string $to
+   * @param string $fromLabel
+   * @param bool $required
    * @param string $dateFormat
-   * @param boolean $displayTime
-   * @return null
+   * @param bool $displayTime
    */
-  static function addDateRangeToForm(&$form, $fieldName, $selector, $from = '_from', $to = '_to', $fromLabel = 'From:', $required = FALSE, $dateFormat = 'searchDate', $displayTime = FALSE) {
+  public static function addDateRangeToForm(&$form, $fieldName, $selector, $from = '_from', $to = '_to', $fromLabel = 'From:', $required = FALSE, $dateFormat = 'searchDate', $displayTime = FALSE) {
     $form->add('select',
       "{$fieldName}_relative",
       ts('Relative Date Range'),
       $selector,
       $required,
       array('class' => 'crm-select2')
-      );
+    );
 
-      $form->addDateRange($fieldName, $from, $to, $fromLabel, $dateFormat, FALSE, $displayTime);
+    $form->addDateRange($fieldName, $from, $to, $fromLabel, $dateFormat, FALSE, $displayTime);
   }
 
 }
-

@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -52,11 +52,11 @@
 </div>
 {literal}
 <script type="text/javascript">
-  cj(function(){
-    cj('input[name="export_format"]').filter('[value=IIF]').prop('checked', true);
-    cj('#_qf_Export_next').click(function(){
-      cj(this).hide();
-      cj('#_qf_Export_cancel').val('{/literal}{ts}Done{/ts}{literal}');
+  CRM.$(function($) {
+    $('input[name="export_format"]').filter('[value=IIF]').prop('checked', true);
+    $('#_qf_Export_next').click(function(){
+      $(this).hide();
+      $('#_qf_Export_cancel').val('{/literal}{ts}Done{/ts}{literal}');
     });
   });
 </script>

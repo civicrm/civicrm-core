@@ -1,10 +1,9 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,51 +26,42 @@
  */
 
 /**
- * File for the CiviCRM APIv3 user framework group functions
+ * This api exposes CiviCRM user framework match.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_UF
- *
- * @copyright CiviCRM LLC (c) 2004-2013
- * @version $Id: UFGroup.php 30171 2010-10-14 09:11:27Z mover $
- *
  */
 
 /**
- * get the contact_id given a uf_id or vice versa
+ * Get the contact_id given a uf_id or vice versa.
  *
  * @param array $params
  *
- * @return array $result
- * @access public
- * {@getfields UFMatch_get}
- * @example UFMatchGet.php
- * @todo this class is missing delete & create functions (do after exisitng functions upgraded to v3)
+ * @return array
  */
 function civicrm_api3_uf_match_get($params) {
   return _civicrm_api3_basic_get('CRM_Core_BAO_UFMatch', $params);
 }
 
 /**
- * Create or update a UF Match record
+ * Create or update a UF Match record.
  *
- * @param array $params  Associative array of property
- *                       name/value pairs to insert in new 'survey'
- * @example UFMatch.php Std Create example
+ * @param array $params
+ *   Array per getfields metadata.
  *
- * @return array api result array
- * {@getfields uf_match_create}
- * @access public
+ * @return array
+ *   Api result array
  */
 function civicrm_api3_uf_match_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
- * Adjust Metadata for Create action
+ * Adjust Metadata for Create action.
  *
- * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * The metadata is used for setting defaults, documentation & validation.
+ *
+ * @param array $params
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_uf_match_create_spec(&$params) {
   $params['contact_id']['api.required'] = 1;
@@ -80,17 +70,13 @@ function _civicrm_api3_uf_match_create_spec(&$params) {
 }
 
 /**
- * Create or update a survey
+ * Delete a UF Match record.
  *
- * @param array $params  Associative array of property
- *                       name/value pairs to insert in new 'survey'
- * @example UFMatch.php Std Create example
+ * @param array $params
  *
- * @return array api result array
- * {@getfields uf_match_create}
- * @access public
+ * @return array
+ *   Api result array.
  */
 function civicrm_api3_uf_match_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
-

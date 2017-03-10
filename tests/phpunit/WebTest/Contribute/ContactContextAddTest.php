@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,16 +22,20 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Contribute_ContactContextAddTest
+ */
 class WebTest_Contribute_ContactContextAddTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
     parent::setUp();
   }
 
-  function testContactContextAdd() {
+  public function testContactContextAdd() {
 
     // Log in using webtestLogin() method
     $this->webtestLogin();
@@ -45,8 +49,8 @@ class WebTest_Contribute_ContactContextAddTest extends CiviSeleniumTestCase {
     // We're using Quick Add block on the main page for this.
     $firstName = substr(sha1(rand()), 0, 7);
     // Add new Financial Account
-    $orgName = 'Alberta '.substr(sha1(rand()), 0, 7);
-    $financialAccountTitle = 'Financial Account '.substr(sha1(rand()), 0, 4);
+    $orgName = 'Alberta ' . substr(sha1(rand()), 0, 7);
+    $financialAccountTitle = 'Financial Account ' . substr(sha1(rand()), 0, 4);
     $financialAccountDescription = "{$financialAccountTitle} Description";
     $accountingCode = 1033;
     $financialAccountType = 'Asset';
@@ -57,7 +61,7 @@ class WebTest_Contribute_ContactContextAddTest extends CiviSeleniumTestCase {
     $isDefault = FALSE;
 
     //Add new organisation
-    if($orgName) {
+    if ($orgName) {
       $this->webtestAddOrganization($orgName);
     }
     $this->_testAddFinancialAccount($financialAccountTitle,
@@ -72,7 +76,7 @@ class WebTest_Contribute_ContactContextAddTest extends CiviSeleniumTestCase {
       $isDefault
     );
 
-    $this->webtestAddContact($firstName, "Anderson", true);
+    $this->webtestAddContact($firstName, "Anderson", TRUE);
 
     // Get the contact id of the new contact
     $contactUrl = $this->parseURL();
@@ -107,7 +111,8 @@ class WebTest_Contribute_ContactContextAddTest extends CiviSeleniumTestCase {
     $this->type("trxn_id", "P20901X1" . rand(100, 10000));
 
     // soft credit
-    $this->webtestFillAutocomplete("{$softCreditLname}, {$softCreditFname}", 'soft_credit_contact_1');
+    $this->webtestFillAutocomplete("{$softCreditLname}, {$softCreditFname}", 'soft_credit_contact_id_1');
+    $this->type("soft_credit_amount_1", "100");
 
     //Custom Data
     //$this->waitForElementPresent('CIVICRM_QFID_3_6');
@@ -123,16 +128,6 @@ class WebTest_Contribute_ContactContextAddTest extends CiviSeleniumTestCase {
     $this->type("invoice_id", time());
     $this->webtestFillDate('thankyou_date');
 
-    //Honoree section
-    $this->click("Honoree");
-    $this->waitForElementPresent("honor_email");
-
-    $this->click("CIVICRM_QFID_1_2");
-    $this->select("honor_prefix_id", "label=Ms.");
-    $this->type("honor_first_name", "Foo");
-    $this->type("honor_last_name", "Bar");
-    $this->type("honor_email", "foo@bar.com");
-
     //Premium section
     $this->click("Premium");
     $this->waitForElementPresent("fulfilled_date");
@@ -141,14 +136,16 @@ class WebTest_Contribute_ContactContextAddTest extends CiviSeleniumTestCase {
     $this->webtestFillDate('fulfilled_date');
 
     // Clicking save.
-    $this->clickLink("_qf_Contribution_upload-bottom", 'civicrm-footer');
+    $this->clickLink("_qf_Contribution_upload-bottom", 'civicrm-footer', FALSE);
     // Is status message correct?
     $this->waitForText('crm-notification-container', "The contribution record has been saved");
-
-    $this->waitForElementPresent("xpath=//div[@id='Contributions']//table/tbody/tr/td[8]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//form[@class='CRM_Contribute_Form_Search crm-search-form']/div[2]/table[2]/tbody/tr/td[8]/span//a[text()='View']");
+    $viewUrl = $this->parseURL($this->getAttribute("xpath=//form[@class='CRM_Contribute_Form_Search crm-search-form']/div[2]/table[2]/tbody/tr/td[8]/span//a[text()='View']@href"));
+    $id = $viewUrl['queryString']['id'];
+    $this->assertType('numeric', $id);
 
     // click through to the Contribution view screen
-    $this->click("xpath=//div[@id='Contributions']//table/tbody/tr/td[8]/span/a[text()='View']");
+    $this->click("xpath=//div[@class='view-content']/table[2]/tbody/tr/td[8]/span/a[text()='View']");
     $this->waitForElementPresent('_qf_ContributionView_cancel-bottom');
 
     // verify Contribution created. Non-deductible amount derived from market value of selected 'sample' coffee mug premium (CRM-11956)
@@ -156,21 +153,16 @@ class WebTest_Contribute_ContactContextAddTest extends CiviSeleniumTestCase {
       'From' => $firstName . " Anderson",
       'Financial Type' => 'Donation',
       'Contribution Status' => 'Completed',
-      'Paid By' => 'Check',
+      'Payment Method' => 'Check',
       'Total Amount' => '$ 100.00',
       'Non-deductible Amount' => '$ 12.50',
       'Check Number' => 'check #1041',
     );
     foreach ($verifyData as $label => $value) {
-      $this->verifyText("xpath=//form[@id='ContributionView']//table/tbody/tr/td[text()='{$label}']/following-sibling::td",
-        preg_quote($value)
-      );
+      $this->assertElementContainsText("xpath=//form[@id='ContributionView']//table/tbody/tr/td[text()='{$label}']/following-sibling::td", $value);
     }
 
     // check values of contribution record in the DB
-    $viewUrl = $this->parseURL();
-    $id = $viewUrl['queryString']['id'];
-    $this->assertType('numeric', $id);
 
     $searchParams = array('id' => $id);
     $compareParams = array(
@@ -180,7 +172,7 @@ class WebTest_Contribute_ContactContextAddTest extends CiviSeleniumTestCase {
     $this->assertDBCompareValues('CRM_Contribute_DAO_Contribution', $searchParams, $compareParams);
 
     // go to soft creditor contact view page
-    $this->click("css=table.crm-soft-credit-listing tbody tr td a");
+    $this->clickLink("css=table.crm-soft-credit-listing tbody tr td a");
 
     // go to contribution tab
     $this->waitForElementPresent("css=li#tab_contribute a");
@@ -189,14 +181,14 @@ class WebTest_Contribute_ContactContextAddTest extends CiviSeleniumTestCase {
 
     // verify soft credit details
     $expected = array(
-      3 => 'Donation',
+      4 => 'Donation',
       2 => '100.00',
-      5 => 'Completed',
+      6 => 'Completed',
       1 => "{$firstName} Anderson",
     );
     foreach ($expected as $value => $label) {
-      $this->verifyText("xpath=id('Search')/div[2]/table[2]/tbody/tr[2]/td[$value]", preg_quote($label));
+      $this->assertElementContainsText("xpath=id('Search')/div[2]/table[2]/tbody//tr/td[$value]", $label);
     }
   }
-}
 
+}

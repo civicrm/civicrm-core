@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
  */
@@ -39,27 +39,26 @@
 class CRM_Price_Form_DeleteField extends CRM_Core_Form {
 
   /**
-   * the field id
+   * The field id.
    *
    * @var int
    */
   protected $_fid;
 
   /**
-   * The title of the group being deleted
+   * The title of the group being deleted.
    *
    * @var string
    */
   protected $_title;
 
   /**
-   * set up variables to build the form
-   *
-   * @param null
+   * Set up variables to build the form.
    *
    * @return void
-   * @acess protected
-   */ function preProcess() {
+   * @access protected
+   */
+  public function preProcess() {
     $this->_fid = $this->get('fid');
 
     $this->_title = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField',
@@ -73,41 +72,33 @@ class CRM_Price_Form_DeleteField extends CRM_Core_Form {
   }
 
   /**
-   * Function to actually build the form
-   *
-   * @param null
+   * Build the form object.
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $this->addButtons(array(
-        array(
-          'type' => 'next',
-          'name' => ts('Delete Price Field'),
-          'isDefault' => TRUE,
-        ),
-        array(
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ),
-      )
-    );
+      array(
+        'type' => 'next',
+        'name' => ts('Delete Price Field'),
+        'isDefault' => TRUE,
+      ),
+      array(
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ),
+    ));
   }
 
   /**
-   * Process the form when submitted
-   *
-   * @param null
+   * Process the form when submitted.
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
-
     if (CRM_Price_BAO_PriceField::deleteField($this->_fid)) {
       CRM_Core_Session::setStatus(ts('The Price Field \'%1\' has been deleted.', array(1 => $this->_title)), '', 'success');
     }
   }
-}
 
+}

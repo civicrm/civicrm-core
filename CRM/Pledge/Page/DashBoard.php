@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,35 +23,30 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
- * This is page is for Pledge Dashboard
+ * This page is for the Pledge Dashboard.
  */
 class CRM_Pledge_Page_DashBoard extends CRM_Core_Page {
 
   /**
-   * Heart of the viewing process. The runner gets all the meta data for
-   * the contact and calls the appropriate type of page to view.
+   * Heart of the viewing process.
    *
-   * @return void
-   * @access public
-   *
+   * The runner gets all the meta data for the contact and calls the appropriate type of page to view.
    */
-  function preProcess() {
+  public function preProcess() {
     CRM_Utils_System::setTitle(ts('CiviPledge'));
 
-    $startToDate    = array();
-    $yearToDate     = array();
-    $monthToDate    = array();
+    $startToDate = array();
+    $yearToDate = array();
+    $monthToDate = array();
     $previousToDate = array();
 
     $prefixes = array('start', 'month', 'year', 'previous');
@@ -62,13 +57,12 @@ class CRM_Pledge_Page_DashBoard extends CRM_Core_Page {
     $startDateEnd = NULL;
 
     // current year - prefix = 'year'
-    $config   = CRM_Core_Config::singleton();
-    $yearDate = $config->fiscalYearStart;
-    $year     = array('Y' => date('Y'));
+    $yearDate = \Civi::settings()->get('fiscalYearStart');
+    $year = array('Y' => date('Y'));
     $this->assign('curYear', $year['Y']);
-    $yearDate    = array_merge($year, $yearDate);
-    $yearDate    = CRM_Utils_Date::format($yearDate);
-    $yearDate    = $yearDate . '000000';
+    $yearDate = array_merge($year, $yearDate);
+    $yearDate = CRM_Utils_Date::format($yearDate);
+    $yearDate = $yearDate . '000000';
     $yearDateEnd = $year['Y'] . '1231235959';
 
     // current month - prefix = 'month'
@@ -78,16 +72,15 @@ class CRM_Pledge_Page_DashBoard extends CRM_Core_Page {
     $monthDateEnd = CRM_Utils_Date::customFormat(date("Y-m-t", mktime(0, 0, 0, date("m"), 01, date("Y"))), '%Y%m%d') . '235959';
 
     // previous month - prefix = 'previous'
-    $previousDate    = CRM_Utils_Date::customFormat(date("Y-m-d", mktime(0, 0, 0, date("m") - 1, 01, date("Y"))), '%Y%m%d') . '000000';
+    $previousDate = CRM_Utils_Date::customFormat(date("Y-m-d", mktime(0, 0, 0, date("m") - 1, 01, date("Y"))), '%Y%m%d') . '000000';
     $previousDateEnd = CRM_Utils_Date::customFormat(date("Y-m-t", mktime(0, 0, 0, date("m") - 1, 01, date("Y"))), '%Y%m%d') . '235959';
-    $previousMonth   = date("F Y", mktime(0, 0, 0, date("m") - 1, 01, date("Y")));
+    $previousMonth = date("F Y", mktime(0, 0, 0, date("m") - 1, 01, date("Y")));
     $this->assign('previousMonthYear', $previousMonth);
 
-
     foreach ($prefixes as $prefix) {
-      $aName     = $prefix . 'ToDate';
+      $aName = $prefix . 'ToDate';
       $startName = $prefix . 'Date';
-      $endName   = $prefix . 'DateEnd';
+      $endName = $prefix . 'DateEnd';
       foreach ($status as $s) {
         ${$aName}[str_replace(" ", "", $s)] = CRM_Pledge_BAO_Pledge::getTotalAmountAndCount($s, $$startName, $$endName);
       }
@@ -96,13 +89,13 @@ class CRM_Pledge_Page_DashBoard extends CRM_Core_Page {
   }
 
   /**
-   * This function is the main function that is called when the page loads,
-   * it decides the which action has to be taken for the page.
+   * The main function that is called when the page loads.
    *
-   * return null
-   * @access public
+   * it decides which action has to be taken for the page.
+   *
+   * @return null
    */
-  function run() {
+  public function run() {
     $this->preProcess();
 
     $controller = new CRM_Core_Controller_Simple('CRM_Pledge_Form_Search',
@@ -119,5 +112,5 @@ class CRM_Pledge_Page_DashBoard extends CRM_Core_Page {
 
     return parent::run();
   }
-}
 
+}

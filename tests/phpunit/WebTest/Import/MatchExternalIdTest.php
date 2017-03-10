@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,19 +22,23 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'WebTest/Import/ImportCiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Import_MatchExternalIdTest
+ */
 class WebTest_Import_MatchExternalIdTest extends ImportCiviSeleniumTestCase {
 
   protected function setUp() {
     parent::setUp();
   }
 
-  /*
-     *  Test participant import for Individuals matching on external identifier.
-     */
-  function testContributionImport() {
+  /**
+   *  Test participant import for Individuals matching on external identifier.
+   */
+  public function testContributionImport() {
     $this->webtestLogin();
 
     // Get sample import data.
@@ -44,10 +48,10 @@ class WebTest_Import_MatchExternalIdTest extends ImportCiviSeleniumTestCase {
     $this->importCSVComponent('Contribution', $headers, $rows, 'Individual', 'Insert new contributions', $fieldMapper);
   }
 
-  /*
-     *  Test membership import for Individuals matching on external identifier.
-     */
-  function testMemberImportIndividual() {
+  /**
+   *  Test membership import for Individuals matching on external identifier.
+   */
+  public function testMemberImportIndividual() {
     $this->webtestLogin();
 
     // Get membership import data for Individuals.
@@ -57,10 +61,10 @@ class WebTest_Import_MatchExternalIdTest extends ImportCiviSeleniumTestCase {
     $this->importCSVComponent('Membership', $headers, $rows, 'Individual', 'Skip', $fieldMapper);
   }
 
-  /*
-     *  Test participant import for Individuals matching on external identifier.
-     */
-  function testParticipantImportIndividual() {
+  /**
+   *  Test participant import for Individuals matching on external identifier.
+   */
+  public function testParticipantImportIndividual() {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -71,18 +75,20 @@ class WebTest_Import_MatchExternalIdTest extends ImportCiviSeleniumTestCase {
     $this->importCSVComponent('Event', $headers, $rows, 'Individual', 'Skip', $fieldMapper);
   }
 
-  /*
-      *  Helper function to provide data for contribution  import for Individual.
-      */
-  function _contributionIndividualCSVData() {
-    $firstName1  = substr(sha1(rand()), 0, 7);
-    $lastName1   = substr(sha1(rand()), 0, 7);
+  /**
+   * Helper function to provide data for contribution  import for Individual.
+   *
+   * @return array
+   */
+  public function _contributionIndividualCSVData() {
+    $firstName1 = substr(sha1(rand()), 0, 7);
+    $lastName1 = substr(sha1(rand()), 0, 7);
     $externalId1 = substr(sha1(rand()), 0, 4);
 
     $this->_addContact($firstName1, $lastName1, $externalId1);
 
-    $firstName2  = substr(sha1(rand()), 0, 7);
-    $lastName2   = substr(sha1(rand()), 0, 7);
+    $firstName2 = substr(sha1(rand()), 0, 7);
+    $lastName2 = substr(sha1(rand()), 0, 7);
     $externalId2 = substr(sha1(rand()), 0, 4);
 
     $this->_addContact($firstName2, $lastName2, $externalId2);
@@ -90,7 +96,7 @@ class WebTest_Import_MatchExternalIdTest extends ImportCiviSeleniumTestCase {
     $headers = array(
       'external_identifier' => 'External Identifier',
       'fee_amount' => 'Fee Amount',
-                          'financial_type'         => 'Financial Type',
+      'financial_type' => 'Financial Type',
       'contribution_status_id' => 'Contribution Status',
       'total_amount' => 'Total Amount',
     );
@@ -99,42 +105,44 @@ class WebTest_Import_MatchExternalIdTest extends ImportCiviSeleniumTestCase {
       array(
         'external_identifier' => $externalId1,
         'fee_amount' => '200',
-                             'financial_type'         => 'Donation',
+        'financial_type' => 'Donation',
         'contribution_status_id' => 'Completed',
         'total_amount' => '200',
       ),
       array(
         'external_identifier' => $externalId2,
         'fee_amount' => '400',
-                             'financial_type'         => 'Donation',
+        'financial_type' => 'Donation',
         'contribution_status_id' => 'Completed',
         'total_amount' => '400',
       ),
     );
     $fieldMapper = array(
       'mapper[0][0]' => 'external_identifier',
-                              'mapper[2][0]' => 'financial_type',
+      'mapper[2][0]' => 'financial_type',
       'mapper[4][0]' => 'total_amount',
     );
     return array($headers, $rows, $fieldMapper);
   }
 
-  /*
-     *  Helper function to provide data for membership import for Individual.
-     */
-  function _memberIndividualCSVData() {
+  /**
+   * Helper function to provide data for membership import for Individual.
+   *
+   * @return array
+   */
+  public function _memberIndividualCSVData() {
     $memTypeParams = $this->webtestAddMembershipType();
 
-    $firstName1  = substr(sha1(rand()), 0, 7);
-    $lastName1   = substr(sha1(rand()), 0, 7);
+    $firstName1 = substr(sha1(rand()), 0, 7);
+    $lastName1 = substr(sha1(rand()), 0, 7);
     $externalId1 = substr(sha1(rand()), 0, 4);
 
     $this->_addContact($firstName1, $lastName1, $externalId1);
     $startDate1 = date('Y-m-d');
     $year = date('Y') - 1;
 
-    $firstName2  = substr(sha1(rand()), 0, 7);
-    $lastName2   = substr(sha1(rand()), 0, 7);
+    $firstName2 = substr(sha1(rand()), 0, 7);
+    $lastName2 = substr(sha1(rand()), 0, 7);
     $externalId2 = substr(sha1(rand()), 0, 4);
 
     $this->_addContact($firstName2, $lastName2, $externalId2);
@@ -166,20 +174,22 @@ class WebTest_Import_MatchExternalIdTest extends ImportCiviSeleniumTestCase {
     return array($headers, $rows, $fieldMapper);
   }
 
-  /*
-     *  Helper function to provide data for participant import for Individual.
-     */
-  function _participantIndividualCSVData() {
+  /**
+   * Helper function to provide data for participant import for Individual.
+   *
+   * @return array
+   */
+  public function _participantIndividualCSVData() {
     $eventInfo = $this->_addNewEvent();
 
-    $firstName1  = substr(sha1(rand()), 0, 7);
-    $lastName1   = substr(sha1(rand()), 0, 7);
+    $firstName1 = substr(sha1(rand()), 0, 7);
+    $lastName1 = substr(sha1(rand()), 0, 7);
     $externalId1 = substr(sha1(rand()), 0, 4);
 
     $this->_addContact($firstName1, $lastName1, $externalId1);
 
-    $firstName2  = substr(sha1(rand()), 0, 7);
-    $lastName2   = substr(sha1(rand()), 0, 7);
+    $firstName2 = substr(sha1(rand()), 0, 7);
+    $lastName2 = substr(sha1(rand()), 0, 7);
     $externalId2 = substr(sha1(rand()), 0, 4);
 
     $this->_addContact($firstName2, $lastName2, $externalId2);
@@ -222,14 +232,17 @@ class WebTest_Import_MatchExternalIdTest extends ImportCiviSeleniumTestCase {
     return array($headers, $rows, $fieldMapper);
   }
 
-  /*
-     * Helper function to add new contact
-     *
-     * @params $firstName, $lastName, $externalId
-     *
-     * @return int external id
-     */
-  function _addContact($firstName, $lastName, $externalId) {
+  /**
+   * Helper function to add new contact.
+   *
+   * @param string $firstName
+   * @param string $lastName
+   * @param int $externalId
+   *
+   * @return int
+   *   external id
+   */
+  public function _addContact($firstName, $lastName, $externalId) {
     $this->openCiviPage('contact/add', 'reset=1&ct=Individual');
 
     //fill in first name
@@ -249,19 +262,19 @@ class WebTest_Import_MatchExternalIdTest extends ImportCiviSeleniumTestCase {
     return $externalId;
   }
 
-  /*
-     * Helper function to add new event
-     *
-     * @params array $params parameters to create an event
-     *
-     * @return array $params event details of newly created event
-     */
-  function _addNewEvent($params = array(
-    )) {
+  /**
+   * Helper function to add new event.
+   *
+   * @param array $params
+   *
+   * @return array
+   *   event details of newly created event
+   */
+  public function _addNewEvent($params = array()) {
     if (empty($params)) {
 
-      // We need a payment processor
-      $processorName = "Webtest Dummy" . substr(sha1(rand()), 0, 7);
+      // Use default payment processor
+      $processorName = 'Test Processor';
       $this->webtestAddPaymentProcessor($processorName);
 
       // create an event
@@ -306,8 +319,8 @@ class WebTest_Import_MatchExternalIdTest extends ImportCiviSeleniumTestCase {
     $this->click("link=Fees");
     $this->waitForElementPresent("_qf_Fee_upload-bottom");
     $this->click("CIVICRM_QFID_1_is_monetary");
-    $this->click("xpath=//tr[@class='crm-event-manage-fee-form-block-payment_processor']/td[2]/label[text()='$processorName']");
-        $this->select( "financial_type_id", "value=4" );
+    $this->select2('payment_processor', $processorName, TRUE);
+    $this->select("financial_type_id", "value=4");
 
     $counter = 1;
     foreach ($params['fee_level'] as $label => $amount) {
@@ -317,16 +330,16 @@ class WebTest_Import_MatchExternalIdTest extends ImportCiviSeleniumTestCase {
     }
 
     $this->click("_qf_Fee_upload-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent("_qf_Fee_upload-bottom");
 
     // Go to Online Registration tab
     $this->click("link=Online Registration");
     $this->waitForElementPresent("_qf_Registration_upload-bottom");
 
-    $this->check("is_online_registration");
+    $this->click("is_online_registration");
     $this->assertChecked("is_online_registration");
 
-    $this->fillRichTextField("intro_text", "Fill in all the fields below and click Continue.");
+    $this->fillRichTextField("intro_text", "Fill in all the fields below and click Continue.", 'CKEditor', TRUE);
 
     // enable confirmation email
     $this->click("CIVICRM_QFID_1_is_email_confirm");
@@ -334,13 +347,13 @@ class WebTest_Import_MatchExternalIdTest extends ImportCiviSeleniumTestCase {
     $this->type("confirm_from_email", "jane.doe@example.org");
 
     $this->click("_qf_Registration_upload-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForText('crm-notification-container', "Saved");
+    $this->waitForElementPresent("_qf_Registration_upload-bottom");
+    $this->waitForText('crm-notification-container', "'Online Registration' information has been saved");
 
     // verify event input on info page
     // start at Manage Events listing
     $this->openCiviPage('event/manage', 'reset=1');
-    $this->type("xpath=//div[@class='crm-block crm-form-block crm-event-searchevent-form-block']/table/tbody/tr/td/input",$params['title']);
+    $this->type("xpath=//div[@class='crm-block crm-form-block crm-event-searchevent-form-block']/table/tbody/tr/td/input", $params['title']);
     $this->click("_qf_SearchEvent_refresh");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->clickLink("link=" . $params['title'], NULL);
@@ -349,5 +362,5 @@ class WebTest_Import_MatchExternalIdTest extends ImportCiviSeleniumTestCase {
 
     return $params;
   }
-}
 
+}

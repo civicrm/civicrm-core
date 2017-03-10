@@ -1,10 +1,9 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,33 +23,17 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
  */
 class CRM_Report_Form_Event extends CRM_Report_Form {
-  /**
-   * Get a standardized array of <select> options for "Event Title"
-   * filter values.
-   * @return Array
-   */
-  function getEventFilterOptions() {
-    $events = array();
-    $query = "
-        select id, start_date, title from civicrm_event
-        where (is_template IS NULL OR is_template = 0) AND is_active
-        order by title ASC, start_date
-    ";
-    $dao = CRM_Core_DAO::executeQuery($query);
-    while($dao->fetch()) {
-       $events[$dao->id] = "{$dao->title} - " . CRM_Utils_Date::customFormat(substr($dao->start_date, 0, 10)) . " (ID {$dao->id})";
-    }
-    return $events;
-  }
-}
+  // Nothing here.
+  // FIXME: Do these reports really have nothing in common? Really?
 
+}

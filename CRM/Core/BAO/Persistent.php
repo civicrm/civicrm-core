@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,32 +23,28 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
  */
 class CRM_Core_BAO_Persistent extends CRM_Core_DAO_Persistent {
 
   /**
-   * Takes a bunch of params that are needed to match certain criteria and
-   * retrieves the relevant objects. Typically the valid params are only
-   * contact_id. We'll tweak this function to be more full featured over a period
-   * of time. This is the inverse function of create. It also stores all the retrieved
-   * values in the default array
+   * Fetch object based on array of properties.
    *
-   * @param array $params   (reference ) an assoc array of name/value pairs
-   * @param array $defaults (reference ) an assoc array to hold the flattened values
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $defaults
+   *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return object CRM_Core_BAO_Persistent object
-   * @access public
-   * @static
+   * @return CRM_Core_BAO_Persistent
    */
-  static function retrieve(&$params, &$defaults) {
+  public static function retrieve(&$params, &$defaults) {
     $dao = new CRM_Core_DAO_Persistent();
     $dao->copyValues($params);
 
@@ -63,17 +59,17 @@ class CRM_Core_BAO_Persistent extends CRM_Core_DAO_Persistent {
   }
 
   /**
-   * function to add the Persistent Record
+   * Add the Persistent Record.
    *
-   * @param array $params reference array contains the values submitted by the form
-   * @param array $ids    reference array contains the id
+   * @param array $params
+   *   Reference array contains the values submitted by the form.
+   * @param array $ids
+   *   Reference array contains the id.
    *
-   * @access public
-   * @static
    *
    * @return object
    */
-  static function add(&$params, &$ids) {
+  public static function add(&$params, &$ids) {
     if (CRM_Utils_Array::value('is_config', $params) == 1) {
       $params['data'] = serialize(explode(',', $params['data']));
     }
@@ -85,7 +81,13 @@ class CRM_Core_BAO_Persistent extends CRM_Core_DAO_Persistent {
     return $persistentDAO;
   }
 
-  static function getContext($context, $name = NULL) {
+  /**
+   * @param $context
+   * @param null $name
+   *
+   * @return mixed
+   */
+  public static function getContext($context, $name = NULL) {
     static $contextNameData = array();
 
     if (!array_key_exists($context, $contextNameData)) {
@@ -105,5 +107,5 @@ class CRM_Core_BAO_Persistent extends CRM_Core_DAO_Persistent {
       return CRM_Utils_Array::value($name, $contextNameData[$context]);
     }
   }
-}
 
+}

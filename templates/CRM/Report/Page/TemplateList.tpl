@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,52 +24,45 @@
  +--------------------------------------------------------------------+
 *}
 <div class="crm-block crm-form-block crm-report-templateList-form-block">
-<div class="help">
-{ts}Create reports for your users from any of the report templates listed below. Click on a template title to get started. Click Existing Report(s) to see any reports that have already been created from that template.{/ts}
-</div>
-{strip}
-{if $list}
-{counter start=0 skip=1 print=false}
-    {foreach from=$list item=rows key=report}
-<div class="crm-accordion-wrapper crm-accordion_{$report}-accordion ">
- <div class="crm-accordion-header">
-  {if $report}{if $report EQ 'Contribute'}{ts}Contribution{/ts}{else}{$report}{/if}{else}Contact{/if} Report Templates
- </div><!-- /.crm-accordion-header -->
- <div class="crm-accordion-body">
-  <div id="{$report}" class="boxBlock">
-      <table class="report-layout">
-    {foreach from=$rows item=row}
-        <tr id="row_{counter}" class="crm-report-templateList">
-      <td class="crm-report-templateList-title" style="width:35%;">
-          <a href="{$row.url}" title="{ts}Create report from this template{/ts}">&raquo; <strong>{$row.title}</strong></a>
-          {if $row.instanceUrl}
-        <div style="font-size:10px;text-align:right;margin-top:3px;">
-            <a href="{$row.instanceUrl}">{ts}Existing Report(s){/ts}</a>
-        </div>
-          {/if}
-      </td>
-      <td style="cursor:help;" class="crm-report-templateList-description">
-          {$row.description}
-      </td>
-        </tr>
-    {/foreach}
-      </table>
+  <div class="help">
+    {ts}Create reports for your users from any of the report templates listed below. Click on a template title to get started. Click Existing Report(s) to see any reports that have already been created from that template.{/ts}
   </div>
- </div><!-- /.crm-accordion-body -->
-</div><!-- /.crm-accordion-wrapper -->
-{/foreach}
-{else}
-    <div class="messages status no-popup">
+  {strip}
+    {if $list}
+      {counter start=0 skip=1 print=false}
+      {foreach from=$list item=rows key=report}
+        <div class="crm-accordion-wrapper crm-accordion_{$report}-accordion ">
+          <div class="crm-accordion-header">
+            {if $report}{if $report EQ 'Contribute'}{ts}Contribution{/ts}{else}{$report}{/if}{else}Contact{/if} Report Templates
+          </div><!-- /.crm-accordion-header -->
+          <div class="crm-accordion-body">
+            <div id="{$report}" class="boxBlock">
+              <table class="report-layout">
+                {foreach from=$rows item=row}
+                  <tr id="row_{counter}" class="crm-report-templateList">
+                    <td class="crm-report-templateList-title" style="width:35%;">
+                      <a href="{$row.url}" title="{ts}Create report from this template{/ts}">&raquo; <strong>{$row.title}</strong></a>
+                      {if $row.instanceUrl}
+                        <div style="font-size:10px;text-align:right;margin-top:3px;">
+                          <a href="{$row.instanceUrl}">{ts}Existing Report(s){/ts}</a>
+                        </div>
+                      {/if}
+                    </td>
+                    <td style="cursor:help;" class="crm-report-templateList-description">
+                      {$row.description}
+                    </td>
+                  </tr>
+                {/foreach}
+              </table>
+            </div>
+          </div><!-- /.crm-accordion-body -->
+        </div><!-- /.crm-accordion-wrapper -->
+      {/foreach}
+    {else}
+      <div class="messages status no-popup">
         <div class="icon inform-icon"></div>&nbsp; {ts}There are currently no Report Templates.{/ts}
-    </div>
-{/if}
-{/strip}
+      </div>
+    {/if}
+  {/strip}
 
-{literal}
-<script type="text/javascript">
-cj(function() {
-   cj().crmAccordions();
-});
-</script>
-{/literal}
 </div>

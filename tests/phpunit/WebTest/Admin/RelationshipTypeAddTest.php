@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,16 +22,20 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Admin_RelationshipTypeAddTest
+ */
 class WebTest_Admin_RelationshipTypeAddTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
     parent::setUp();
   }
 
-  function testRelationshipTypeAdd() {
+  public function testRelationshipTypeAdd() {
 
     $this->webtestLogin();
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -44,7 +48,7 @@ class WebTest_Admin_RelationshipTypeAddTest extends CiviSeleniumTestCase {
 
     //load the form to add new relationship type.
     $this->click('link=Add Relationship Type');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent('_qf_RelationshipType_next-bottom');
 
     //enter the relationship type values.
     $labelAB = 'Test Relationship Type A - B -' . rand();
@@ -57,11 +61,11 @@ class WebTest_Admin_RelationshipTypeAddTest extends CiviSeleniumTestCase {
 
     //save the data.
     $this->click('_qf_RelationshipType_next-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //does data saved.
     $this->waitForText('crm-notification-container', 'The Relationship Type has been saved.');
 
+    $this->waitForElementPresent('link=Add Relationship Type');
     //validate data.
     $data = array(
       'Relationship A to B' => $labelAB,
@@ -70,11 +74,11 @@ class WebTest_Admin_RelationshipTypeAddTest extends CiviSeleniumTestCase {
       'Contact Type B' => 'Individual',
     );
     foreach ($data as $param => $val) {
-      $this->assertElementContainsText('option11', $val, "Could not able to save $param");
+      $this->assertElementContainsText("xpath=//table[@class='display dataTable no-footer']", $val, "Could not able to save $param");
     }
   }
 
-  function testRelationshipTypeAddValidateFormRules() {
+  public function testRelationshipTypeAddValidateFormRules() {
 
     $this->webtestLogin();
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -87,7 +91,7 @@ class WebTest_Admin_RelationshipTypeAddTest extends CiviSeleniumTestCase {
 
     //validate form rules.
     $this->click('link=Add Relationship Type');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent('_qf_RelationshipType_next-bottom');
 
     $this->select('contact_types_a', 'value=Individual');
     $this->select('contact_types_b', 'value=Individual');
@@ -95,8 +99,7 @@ class WebTest_Admin_RelationshipTypeAddTest extends CiviSeleniumTestCase {
     $this->type('description', $description);
 
     $this->click('_qf_RelationshipType_next-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForText('crm-notification-container', 'Relationship Label-A to B is a required field.');
+    $this->waitForText("xpath=//*[@id='RelationshipType']/div[2]/table/tbody/tr[1]/td[2]/label[@class='crm-inline-error']", 'This field is required.');
 
     //enter the relationship type values.
     $labelAB = 'Test Relationship Type A - B - DUPLICATE TO BE' . rand();
@@ -107,18 +110,17 @@ class WebTest_Admin_RelationshipTypeAddTest extends CiviSeleniumTestCase {
     $this->select('contact_types_b', "value=Individual");
     $this->type('description', 'Test Relationship Type Description');
     $this->click('_qf_RelationshipType_next-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent('link=Add Relationship Type');
 
     $this->openCiviPage('admin/reltype', 'reset=1&action=browse');
     $this->click('link=Add Relationship Type');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent('_qf_RelationshipType_next-bottom');
 
     $this->type('label_a_b', $labelAB);
     $this->type('label_b_a', $labelBA);
     $this->click('_qf_RelationshipType_next-bottom');
 
-    $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForText('crm-notification-container', 'Label already exists in Database.');
   }
-}
 
+}

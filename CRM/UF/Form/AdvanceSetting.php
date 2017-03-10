@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,30 +23,26 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_UF_Form_AdvanceSetting extends CRM_UF_Form_Group {
 
   /**
-   * Function to build the form for Advance Settings.
+   * Build the form object for Advanced Settings.
    *
-   * @access public
-   *
-   * @return void
+   * @param CRM_Core_Form $form
    */
   public static function buildAdvanceSetting(&$form) {
     // should mapping be enabled for this group
     $form->addElement('checkbox', 'is_map', ts('Enable mapping for this profile?'));
 
     // should we allow updates on a exisitng contact
-    $options   = array();
+    $options = array();
     $options[] = $form->createElement('radio', NULL, NULL, ts('Issue warning and do not save'), 0);
     $options[] = $form->createElement('radio', NULL, NULL, ts('Update the matching contact'), 1);
     $options[] = $form->createElement('radio', NULL, NULL, ts('Allow duplicate contact to be created'), 2);
@@ -57,8 +53,7 @@ class CRM_UF_Form_AdvanceSetting extends CRM_UF_Form_Group {
     $form->addElement('text', 'cancel_URL', ts('Cancel Redirect URL'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_UFGroup', 'cancel_URL'));
 
     // add select for groups
-    $group = array(
-      '' => ts('- select -')) + $form->_group;
+    $group = array('' => ts('- select -')) + $form->_group;
     $form->_groupElement = &$form->addElement('select', 'group', ts('Limit listings to a specific Group?'), $group);
 
     //add notify field
@@ -84,7 +79,7 @@ class CRM_UF_Form_AdvanceSetting extends CRM_UF_Form_Group {
       $form->_cmsId = TRUE;
     }
 
-    $options   = array();
+    $options = array();
     $options[] = $form->createElement('radio', NULL, NULL, ts('No account create option'), 0);
     $options[] = $form->createElement('radio', NULL, NULL, ts('Give option, but not required'), 1);
     $options[] = $form->createElement('radio', NULL, NULL, ts('Account creation required'), 2);
@@ -92,12 +87,12 @@ class CRM_UF_Form_AdvanceSetting extends CRM_UF_Form_Group {
     $form->addGroup($options, 'is_cms_user', ts('%1 user account registration option?', array(1 => $config->userFramework)));
 
     // options for including Proximity Search in the profile search form
-    $proxOptions   = array();
+    $proxOptions = array();
     $proxOptions[] = $form->createElement('radio', NULL, NULL, ts('None'), 0);
     $proxOptions[] = $form->createElement('radio', NULL, NULL, ts('Optional'), 1);
     $proxOptions[] = $form->createElement('radio', NULL, NULL, ts('Required'), 2);
 
-    $form->addGroup($proxOptions, 'is_proximity_search', ts('Proximity search'));
+    $form->addGroup($proxOptions, 'is_proximity_search', ts('Proximity Search'));
   }
-}
 
+}

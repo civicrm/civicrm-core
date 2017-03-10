@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
  */
@@ -36,10 +36,14 @@
 /**
  * Convert the date string "YYYY-MM-DD" to "MM<long> DD, YYYY".
  *
- * @param string $dateString date which needs to converted to human readable format
+ * @param string $dateString
+ *   Date which needs to converted to human readable format.
  *
- * @return string human readable date format | invalid date message
- * @access public
+ * @param null $dateFormat
+ * @param bool $onlyTime
+ *
+ * @return string
+ *   human readable date format | invalid date message
  */
 function smarty_modifier_crmDate($dateString, $dateFormat = NULL, $onlyTime = FALSE) {
   if ($dateString) {
@@ -57,4 +61,3 @@ function smarty_modifier_crmDate($dateString, $dateFormat = NULL, $onlyTime = FA
   }
   return '';
 }
-

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,16 +22,20 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Contact_SearchBuilderTest
+ */
 class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
     parent::setUp();
   }
 
-  function testSearchBuilderOptions() {
+  public function testSearchBuilderOptions() {
     $this->webtestLogin();
 
     $groupName = $this->WebtestAddGroup();
@@ -40,20 +44,20 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     $this->openCiviPage('contact/search/builder', 'reset=1');
 
     $this->enterValues(1, 1, 'Contacts', 'Group(s)', NULL, '=', array($groupName));
-    $this->enterValues(1, 2, 'Contacts', 'Country', NULL, '=', array('United States'));
+    $this->enterValues(1, 2, 'Contacts', 'Country', NULL, '=', array('UNITED STATES'));
     $this->enterValues(1, 3, 'Individual', 'Gender', NULL, '=', array('Male'));
     $this->click('_qf_Builder_refresh');
     $this->waitForPageToLoad();
 
     // We should get no results. But check the options are all still set
-    $this->waitForTextPresent('No matches found');
-    foreach (array($groupName, 'United States', 'Male') as $i => $label) {
+    $this->waitForTextPresent('No matches found for:');
+    foreach (array($groupName, 'UNITED STATES', 'Male') as $i => $label) {
       $this->waitForElementPresent("//span[@id='crm_search_value_1_$i']/select/option[2]");
       $this->assertSelectedLabel("//span[@id='crm_search_value_1_$i']/select", $label);
     }
   }
 
-  function testSearchBuilderRLIKE() {
+  public function testSearchBuilderRLIKE() {
     $this->webtestLogin();
 
     // Adding contact
@@ -67,8 +71,11 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     $this->_searchBuilder("Postal Code", "100[0-9]", $sortName, "RLIKE");
   }
 
-  // function to create contact with details (contact details, address, Constituent information ...)
-  function createDetailContact($firstName = NULL) {
+  /**
+   * function to create contact with details (contact details, address, Constituent information ...)
+   * @param null $firstName
+   */
+  public function createDetailContact($firstName = NULL) {
 
     if (!$firstName) {
       $firstName = substr(sha1(rand()), 0, 7);
@@ -83,7 +90,7 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     $this->type("first_name", "$firstName");
     $this->type("middle_name", "mid$firstName");
     $this->type("last_name", "adv$firstName");
-    $this->select("contact_sub_type", "label=- $Subtype");
+    $this->select("contact_sub_type", "label=$Subtype");
     $this->type("email_1_email", "$firstName@advsearch.co.in");
     $this->type("phone_1_phone", "123456789");
     $this->type("external_identifier", "extid$firstName");
@@ -96,7 +103,7 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     $this->type("address_1_supplemental_address_2", "street supplement 2 $firstName");
     $this->type("address_1_city", "city$firstName");
     $this->type("address_1_postal_code", "100100");
-    $this->select("address_1_country_id", "United States");
+    $this->select("address_1_country_id", "UNITED STATES");
     $this->select("address_1_state_province_id", "Alaska");
 
     // save contact
@@ -105,7 +112,7 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isTextPresent("$firstName adv$firstName"));
   }
 
-  function testSearchBuilderContacts() {
+  public function testSearchBuilderContacts() {
     $this->webtestLogin();
 
     //Individual
@@ -159,8 +166,6 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     $this->click("_qf_Contact_upload_view");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->_searchBuilder('Email', NULL, NULL, 'IS NULL');
-    $this->click("xpath=//div[@class='crm-search-results']/div[4]/a[2]");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
     $names = array(
       1 => $firstName1,
       2 => $firstName2,
@@ -176,8 +181,6 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     }
     //searching contacts whose phone field is not empty
     $this->_searchBuilder('Phone', NULL, $firstName, 'IS NOT EMPTY');
-    $this->click("xpath=//div[@class='crm-search-results']/div[4]/a[2]");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->assertTrue($this->isTextPresent($firstName));
 
     $firstName4 = "AB" . substr(sha1(rand()), 0, 7);
@@ -196,16 +199,23 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
 
     $firstName8 = "abcc" . substr(sha1(rand()), 0, 7);
     $this->_createContact('Individual', $firstName8, "$firstName8@advsearch.co.in", NULL);
-    $this->_searchBuilder('Note(s): Body and Subject', "this is notes by $firstName8", $firstName8, 'LIKE');
-    $this->_searchBuilder('Note(s): Subject only', "this is subject by $firstName8", $firstName8, 'LIKE');
-    $this->_searchBuilder('Note(s): Body only', "this is notes by $firstName8", $firstName8, 'LIKE');
-    $this->_advancedSearch("this is notes by $firstName8", $firstName8, NULL, NULL, 'note_body', 'notes');
-    $this->_advancedSearch("this is subject by $firstName8", $firstName8, NULL, NULL, 'note_subject', 'notes');
-    $this->_advancedSearch("this is notes by $firstName8", $firstName8, NULL, NULL, 'note_both', 'notes');
-    $this->_advancedSearch("this is notes by $firstName8", $firstName8, NULL, NULL, 'note_both', 'notes');
+    $this->_searchBuilder('Note(s): Body and Subject', "this is notes by $firstName8 adv$firstName8", $firstName8, 'LIKE');
+    $this->_searchBuilder('Note(s): Subject Only', "this is subject by $firstName8 adv$firstName8", $firstName8, 'LIKE');
+    $this->_searchBuilder('Note(s): Body Only', "this is notes by $firstName8 adv$firstName8", $firstName8, 'LIKE');
+    $this->_advancedSearch("this is notes by $firstName8 adv$firstName8", $firstName8, NULL, NULL, 'note_body', 'notes');
+    $this->_advancedSearch("this is subject by $firstName8 adv$firstName8", $firstName8, NULL, NULL, 'note_subject', 'notes');
+    $this->_advancedSearch("this is notes by $firstName8 adv$firstName8", $firstName8, NULL, NULL, 'note_both', 'notes');
+    $this->_advancedSearch("this is notes by $firstName8 adv$firstName8", $firstName8, NULL, NULL, 'note_both', 'notes');
   }
 
-  function _searchBuilder($field, $fieldValue = NULL, $name = NULL, $op = '=', $count = NULL) {
+  /**
+   * @param $field
+   * @param null $fieldValue
+   * @param null $name
+   * @param string $op
+   * @param null $count
+   */
+  public function _searchBuilder($field, $fieldValue = NULL, $name = NULL, $op = '=', $count = NULL) {
     // search builder using contacts(not using contactType)
     $this->openCiviPage("contact/search/builder", "reset=1");
     $this->enterValues(1, 1, 'Contacts', $field, NULL, $op, "$fieldValue");
@@ -223,9 +233,16 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * Enter form values in a Search Builder row
+   * Enter form values in a Search Builder row.
+   * @param $set
+   * @param $row
+   * @param $entity
+   * @param $field
+   * @param $loc
+   * @param $op
+   * @param string $value
    */
-  function enterValues($set, $row, $entity, $field, $loc, $op, $value = '') {
+  public function enterValues($set, $row, $entity, $field, $loc, $op, $value = '') {
     if ($set > 1 && $row == 1) {
       $this->click('addBlock');
     }
@@ -264,11 +281,18 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     }
   }
 
-  function _advancedSearch($fieldValue = NULL, $name = NULL, $contactType = NULL, $count = NULL, $field) {
+  /**
+   * @param null $fieldValue
+   * @param null $name
+   * @param null $contactType
+   * @param null $count
+   * @param $field
+   */
+  public function _advancedSearch($fieldValue = NULL, $name = NULL, $contactType = NULL, $count = NULL, $field) {
     //advanced search by selecting the contactType
     $this->openCiviPage("contact/search/advanced", "reset=1");
     if (isset($contactType)) {
-      $this->select("id=crmasmSelect0", "value=$contactType");
+      $this->select("id=contact_type", "value=$contactType");
     }
     if (substr($field, 0, 5) == 'note_') {
       $this->click("notes");
@@ -286,7 +310,7 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     }
     else {
       $this->click("location");
-      $this->waitForElementPresent("xpath=//div[@id='location']/table/tbody/tr[2]/td/table/tbody/tr[4]/td[2]/select");
+      $this->waitForElementPresent("$field");
       if ($contactType == 'Individual') {
         $this->type("$field", $fieldValue);
       }
@@ -309,7 +333,14 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     }
   }
 
-  function _createContact($contactType, $name, $email, $streetName = NULL, $postalCode = NULL) {
+  /**
+   * @param $contactType
+   * @param string $name
+   * @param $email
+   * @param null $streetName
+   * @param null $postalCode
+   */
+  public function _createContact($contactType, $name, $email, $streetName = NULL, $postalCode = NULL) {
     $this->openCiviPage('contact/add', array('reset' => 1, 'ct' => $contactType), '_qf_Contact_cancel');
 
     if ($contactType == 'Individual') {
@@ -328,7 +359,7 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     $this->type("email_1_email", $email);
     $this->type("phone_1_phone", "9876543210");
     $this->type("address_1_street_address", $streetName);
-    $this->select("address_1_country_id", "United States");
+    $this->select("address_1_country_id", "UNITED STATES");
     $this->select("address_1_state_province_id", "Alaska");
     $this->type("address_1_postal_code", $postalCode);
 
@@ -343,16 +374,10 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isTextPresent("$name has been created."));
   }
 
-  /*
+  /**
    * Webtest for CRM-12148
-   *
    */
-  function testSearchBuilderfinancialType() {
-    // Logging in. Remember to wait for page to load. In most cases,
-    // you can rely on 30000 as the value that allows your test to pass, however,
-    // sometimes your test might fail because of this. In such cases, it's better to pick one element
-    // somewhere at the end of page and use waitForElementPresent on it - this assures you, that whole
-    // page contents loaded and you can continue your test execution.
+  public function testSearchBuilderfinancialType() {
     $this->webtestLogin();
 
     // add financial type
@@ -376,8 +401,7 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
         $financialType = $financialTypeName2;
       }
       // create new contact using dialog
-      $firstName = substr(sha1(rand()), 0, 7);
-      $this->webtestNewDialogContact($firstName, 'Contributor', $firstName . '@example.com');
+      $this->createDialogContact();
       $this->select('financial_type_id', $financialType);
       $this->type('total_amount', 100 * $i);
       $this->clickLink('_qf_Contribution_upload_new', '_qf_Contribution_upload_new');
@@ -385,32 +409,30 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     $this->openCiviPage("contact/search/builder", "reset=1", "_qf_Builder_refresh");
 
     $this->enterValues(1, 1, 'Contribution', 'Financial Type', NULL, '=', array($financialTypeName1));
-    $this->click('_qf_Builder_refresh');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink('_qf_Builder_refresh');
 
     $this->assertTrue($this->isTextPresent('3 Contacts'), 'Missing text: ' . '3 Contacts');
 
     $this->click("xpath=//div[@class='crm-accordion-header crm-master-accordion-header']");
     $this->enterValues(1, 1, 'Contribution', 'Financial Type', NULL, '=', array($financialTypeName2));
-    $this->click('_qf_Builder_refresh');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink('_qf_Builder_refresh');
+
     $this->assertTrue($this->isTextPresent('3 Contacts'), 'Missing text: ' . '3 Contacts');
 
     $this->click("xpath=//div[@class='crm-accordion-header crm-master-accordion-header']");
     $this->enterValues(1, 1, 'Contribution', 'Financial Type', NULL, 'IN', array(
       $financialTypeName1,
-      $financialTypeName2
+      $financialTypeName2,
     ));
-    $this->click('_qf_Builder_refresh');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink('_qf_Builder_refresh');
+
     $this->assertTrue($this->isTextPresent('6 Contacts'), 'Missing text: ' . '6 Contacts');
   }
 
-  /*
+  /**
    * Webtest for CRM-12588
-   *
    */
-  function testSearchBuilderMembershipType() {
+  public function testSearchBuilderMembershipType() {
     $this->webtestLogin();
 
     // create first contact
@@ -433,9 +455,11 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     $this->webtestFillAutocomplete($firstName1);
 
     // fill in Membership Organization
+    $this->waitForElementPresent("membership_type_id[0]");
     $this->select("membership_type_id[0]", "label={$membershipTypes['member_of_contact']}");
 
     // select membership type
+    $this->waitForElementPresent("membership_type_id[1]");
     $this->select("membership_type_id[1]", "label={$membershipTypes['membership_type']}");
 
     // fill in Source
@@ -472,24 +496,30 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     $this->enterValues(1, 1, 'Membership', 'Membership Type', NULL, '=', array($membershipTypes['membership_type']));
 
     $this->clickLink('_qf_Builder_refresh');
-    $this->waitForText('search-status', "2 Contacts");
+    $this->waitForAjaxContent();
+    $this->assertElementContainsText("xpath=//div[@id='search-status']/table/tbody/tr[1]/td", "2 Contacts");
 
     $this->click("xpath=//div[@class='crm-accordion-header crm-master-accordion-header']");
     $this->enterValues(1, 2, 'Membership', 'Membership Status', NULL, '=', array('New'));
     $this->clickLink('_qf_Builder_refresh');
-    $this->waitForText('search-status', "1 Contact");
+    $this->waitForAjaxContent();
+    $this->assertElementContainsText("xpath=//div[@id='search-status']/table/tbody/tr[1]/td", "1 Contact");
 
     $this->enterValues(1, 2, 'Membership', 'Membership Status', NULL, '=', array('Grace'));
     $this->clickLink('_qf_Builder_refresh');
-    $this->waitForText('search-status', "1 Contact");
+    $this->waitForAjaxContent();
+    $this->assertElementContainsText("xpath=//div[@id='search-status']/table/tbody/tr[1]/td", "1 Contact");
 
     $this->click("xpath=//div[@class='crm-accordion-header crm-master-accordion-header']");
+    $this->waitForElementPresent("xpath=//div[@id='map-field']/div[1]/table/tbody/tr[2]/td/a");
     $this->click("xpath=//div[@id='map-field']/div[1]/table/tbody/tr[2]/td/a");
     $this->enterValues(1, 2, 'Membership', 'Membership Status', NULL, 'IN', array('New', 'Grace'));
     $this->clickLink('_qf_Builder_refresh');
-    $this->waitForText('search-status', "2 Contacts");
+    $this->waitForAjaxContent();
+    $this->assertElementContainsText("xpath=//div[@id='search-status']/table/tbody/tr[1]/td", "2 Contacts");
 
     $this->click("xpath=//div[@class='crm-accordion-header crm-master-accordion-header']");
+    $this->waitForElementPresent("xpath=//div[@id='map-field']/div[1]/table/tbody/tr[2]/td/a");
     $this->click("xpath=//div[@id='map-field']/div[1]/table/tbody/tr[2]/td/a");
     $this->enterValues(1, 2, 'Membership', 'Membership Status', NULL, 'IN', array('Current', 'Expired'));
     $this->clickLink('_qf_Builder_refresh');
@@ -497,20 +527,24 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
 
     // Find Membership
     $this->openCiviPage("member/search", "reset=1", "_qf_Search_refresh");
-    $this->click("xpath=//label[text()='{$membershipTypes['membership_type']}']");
+    $this->select2('membership_type_id', $membershipTypes['membership_type'], TRUE);
     $this->clickLink('_qf_Search_refresh');
-    $this->waitForText('search-status', "2 Results");
+    $this->assertElementContainsText("xpath=//div[@id='search-status']/table/tbody/tr[1]/td[1]", "2 Result");
 
     $this->click("xpath=//div[@class='crm-accordion-header crm-master-accordion-header']");
-    $this->click("xpath=//label[text()='New']");
-    $this->click("xpath=//label[text()='Grace']");
+    $this->multiselect2("membership_status_id", array("New", "Grace"));
     $this->clickLink('_qf_Search_refresh');
-    $this->waitForText('search-status', "2 Results");
+    $this->waitForAjaxContent();
+    $this->assertElementContainsText("xpath=//div[@id='search-status']/table/tbody/tr[1]/td", "2 Results");
 
+    $this->openCiviPage("member/search", "reset=1", "_qf_Search_refresh");
+    $this->waitForAjaxContent();
     $this->click("xpath=//div[@class='crm-accordion-header crm-master-accordion-header']");
-    $this->click("xpath=//label[text()='New']");
-    $this->clickLink('_qf_Search_refresh');
-    $this->waitForText('search-status', "1 Result");
+    $this->select2('membership_type_id', $membershipTypes['membership_type'], TRUE);
+    $this->multiselect2("membership_status_id", array("New"));
+    $this->click('_qf_Search_refresh');
+    $this->waitForAjaxContent();
+    $this->assertElementContainsText("xpath=//div[@id='search-status']/table/tbody/tr[1]/td", "1 Result");
   }
 
 }

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,21 +23,19 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
- * Page for displaying Petition Signatures
+ * Page for displaying Petition Signatures.
  */
 class CRM_Campaign_Page_Petition extends CRM_Core_Page {
-  function browse() {
+  public function browse() {
 
     //get the survey id
     $surveyId = CRM_Utils_Request::retrieve('sid', 'Positive', $this);
@@ -47,7 +45,10 @@ class CRM_Campaign_Page_Petition extends CRM_Core_Page {
     $this->assign('signatures', $signatures);
   }
 
-  function run() {
+  /**
+   * @return string
+   */
+  public function run() {
     $action = CRM_Utils_Request::retrieve('action', 'String',
       $this, FALSE, 0
     );
@@ -56,5 +57,5 @@ class CRM_Campaign_Page_Petition extends CRM_Core_Page {
 
     return parent::run();
   }
-}
 
+}

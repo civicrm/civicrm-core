@@ -7,56 +7,60 @@
   <comment>Join table cache for contacts that a user has permission on.</comment>
   <add>3.1</add>
   <field>
-      <name>id</name>
-      <type>int unsigned</type>
-      <required>true</required>
-      <comment>primary key</comment>
-       <add>3.1</add>
+    <name>id</name>
+    <title>ACL Contact Cache ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>primary key</comment>
+    <add>3.1</add>
   </field>
   <primaryKey>
-       <name>id</name>
-       <autoincrement>true</autoincrement>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
   </primaryKey>
   <field>
-      <name>user_id</name>
-      <type>int unsigned</type>
-      <comment>FK to civicrm_contact (could be null for anon user)</comment>
-       <add>3.1</add>
+    <name>user_id</name>
+    <title>Contact ID</title>
+    <type>int unsigned</type>
+    <comment>FK to civicrm_contact (could be null for anon user)</comment>
+    <add>3.1</add>
   </field>
   <foreignKey>
-       <name>user_id</name>
-       <table>civicrm_contact</table>
-       <key>id</key>
-       <add>3.1</add>
-       <onDelete>CASCADE</onDelete>
+    <name>user_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <add>3.1</add>
+    <onDelete>CASCADE</onDelete>
   </foreignKey>
   <field>
-      <name>contact_id</name>
-      <type>int unsigned</type>
-      <required>true</required>
-      <comment>FK to civicrm_contact</comment>
-       <add>3.1</add>
+    <name>contact_id</name>
+    <title>Contact ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>FK to civicrm_contact</comment>
+    <add>3.1</add>
   </field>
   <foreignKey>
-       <name>contact_id</name>
-       <table>civicrm_contact</table>
-       <key>id</key>
-       <add>3.1</add>
-       <onDelete>CASCADE</onDelete>
+    <name>contact_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <add>3.1</add>
+    <onDelete>CASCADE</onDelete>
   </foreignKey>
   <field>
-      <name>operation</name>
-      <type>varchar</type>
-      <length>8</length>
-      <required>true</required>
-      <comment>What operation does this user have permission on?</comment>
-      <pseudoconstant>
-        <callback>CRM_ACL_BAO_ACL::operation</callback>
-      </pseudoconstant>
-      <add>1.6</add>
-      <html>
-        <type>Select</type>
-      </html>
+    <name>operation</name>
+    <title>Operation</title>
+    <type>varchar</type>
+    <length>8</length>
+    <required>true</required>
+    <comment>What operation does this user have permission on?</comment>
+    <pseudoconstant>
+      <callback>CRM_ACL_BAO_ACL::operation</callback>
+    </pseudoconstant>
+    <add>1.6</add>
+    <html>
+      <type>Select</type>
+    </html>
   </field>
   <index>
     <name>UI_user_contact_operation</name>

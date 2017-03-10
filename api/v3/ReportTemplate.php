@@ -1,18 +1,43 @@
 <?php
+/*
+ +--------------------------------------------------------------------+
+ | CiviCRM version 4.7                                                |
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
+ +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
+ | CiviCRM is free software; you can copy, modify, and distribute it  |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ +--------------------------------------------------------------------+
+ */
 
 /**
- * Retrieve a report template
+ * This api exposes CiviCRM report templates.
  *
- * FIXME This is a bare-minimum placeholder
+ * @package CiviCRM_APIv3
+ */
+
+/**
+ * Retrieve a report template.
  *
- * @param  array  $ params input parameters
+ * @param array $params
  *
- * {@example OptionValueGet.php 0}
- * @example OptionValueGet.php
- *
- * @return  array details of found Option Values
- * {@getfields OptionValue_get}
- * @access public
+ * @return array
+ *   API result array
  */
 function civicrm_api3_report_template_get($params) {
   require_once 'api/v3/OptionValue.php';
@@ -23,15 +48,14 @@ function civicrm_api3_report_template_get($params) {
 }
 
 /**
- *  Add a OptionValue. OptionValues are used to classify CRM entities (including Contacts, Groups and Actions).
+ * Add an OptionValue.
  *
- * Allowed @params array keys are:
+ * OptionValues are used to classify CRM entities (including Contacts, Groups and Actions).
  *
- * {@example OptionValueCreate.php}
+ * @param array $params
  *
- * @return array of newly created option_value property values.
- * {@getfields OptionValue_create}
- * @access public
+ * @return array
+ *   API result array
  */
 function civicrm_api3_report_template_create($params) {
   require_once 'api/v3/OptionValue.php';
@@ -46,10 +70,12 @@ function civicrm_api3_report_template_create($params) {
 }
 
 /**
- * Adjust Metadata for Create action
+ * Adjust Metadata for Create action.
  *
- * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * The metadata is used for setting defaults, documentation & validation.
+ *
+ * @param array $params
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_report_template_create_spec(&$params) {
   require_once 'api/v3/OptionValue.php';
@@ -63,15 +89,12 @@ function _civicrm_api3_report_template_create_spec(&$params) {
 }
 
 /**
- * Deletes an existing ReportTemplate
+ * Deletes an existing ReportTemplate.
  *
- * @param  array  $params
+ * @param array $params
  *
- * {@example ReportTemplateDelete.php 0}
- *
- * @return array Api result
- * {@getfields ReportTemplate_create}
- * @access public
+ * @return array
+ *   API result array
  */
 function civicrm_api3_report_template_delete($params) {
   require_once 'api/v3/OptionValue.php';
@@ -79,33 +102,43 @@ function civicrm_api3_report_template_delete($params) {
 }
 
 /**
- * Retrieve rows from a report template
+ * Retrieve rows from a report template.
  *
- * @param  array  $params input parameters
+ * @param array $params
+ *   Input parameters.
  *
- * @return  array details of found instances
- * @access public
+ * @return array
+ *   API result array
  */
 function civicrm_api3_report_template_getrows($params) {
   civicrm_api3_verify_one_mandatory($params, NULL, array('report_id', 'instance_id'));
   list($rows, $instance, $metadata) = _civicrm_api3_report_template_getrows($params);
-  return civicrm_api3_create_success($rows, $params, 'report_template', 'getrows', CRM_Core_DAO::$_nullObject, $metadata);
+  return civicrm_api3_create_success($rows, $params, 'ReportTemplate', 'getrows', CRM_Core_DAO::$_nullObject, $metadata);
 }
 
+/**
+ * Get report template rows.
+ *
+ * @param array $params
+ *
+ * @return array
+ * @throws API_Exception
+ * @throws CiviCRM_API3_Exception
+ */
 function _civicrm_api3_report_template_getrows($params) {
-  if(empty($params['report_id'])) {
+  if (empty($params['report_id'])) {
     $params['report_id'] = civicrm_api3('report_instance', 'getvalue', array('id' => $params['instance_id'], 'return' => 'report_id'));
   }
 
-  $class = civicrm_api3('option_value', 'getvalue', array(
-    'option_group_id' => 'report_template',
+  $class = (string) civicrm_api3('option_value', 'getvalue', array(
+    'option_group_name' => 'report_template',
     'return' => 'name',
     'value' => $params['report_id'],
     )
   );
 
   $reportInstance = new $class();
-  if(!empty($params['instance_id'])) {
+  if (!empty($params['instance_id'])) {
     $reportInstance->setID($params['instance_id']);
   }
   $reportInstance->setParams($params);
@@ -113,42 +146,53 @@ function _civicrm_api3_report_template_getrows($params) {
   $reportInstance->preProcess();
   $reportInstance->setDefaultValues(FALSE);
   $reportInstance->setParams(array_merge($reportInstance->getDefaultValues(), $params));
-  $options = _civicrm_api3_get_options_from_params($params, TRUE,'report_template','get');
+  $options = _civicrm_api3_get_options_from_params($params, TRUE, 'ReportTemplate', 'get');
   $reportInstance->setLimitValue($options['limit']);
+  $reportInstance->setAddPaging(FALSE);
   $reportInstance->setOffsetValue($options['offset']);
   $reportInstance->beginPostProcessCommon();
   $sql = $reportInstance->buildQuery();
   $rows = $metadata = $requiredMetadata  = array();
   $reportInstance->buildRows($sql, $rows);
-  $requiredMetadata = array();
-  if(isset($params['options']) && !empty($params['options']['metadata'])) {
+  $reportInstance->formatDisplay($rows);
+
+  if (isset($params['options']) && !empty($params['options']['metadata'])) {
     $requiredMetadata = $params['options']['metadata'];
-    if(in_array('title', $requiredMetadata)) {
+    if (in_array('title', $requiredMetadata)) {
       $metadata['metadata']['title'] = $reportInstance->getTitle();
     }
-    if(in_array('labels', $requiredMetadata)) {
+    if (in_array('labels', $requiredMetadata)) {
       foreach ($reportInstance->_columnHeaders as $key => $header) {
-        //would be better just to expect reports to provide titles but reports are not consistent so we anticipate empty
+        // Would be better just to expect reports to provide titles but reports are not consistent so we anticipate empty
         //NB I think these are already translated
         $metadata['metadata']['labels'][$key] = !empty($header['title']) ? $header['title'] : '';
       }
+    }
+    if (in_array('sql', $requiredMetadata)) {
+      $metadata['metadata']['sql'] = $reportInstance->getReportSql();
     }
   }
   return array($rows, $reportInstance, $metadata);
 }
 
+/**
+ * Get statistics from a given report.
+ *
+ * @param array $params
+ *
+ * @return array
+ *   API result array
+ */
 function civicrm_api3_report_template_getstatistics($params) {
   list($rows, $reportInstance, $metadata) = _civicrm_api3_report_template_getrows($params);
   $stats = $reportInstance->statistics($rows);
-  return civicrm_api3_create_success($stats, $params, 'report_template', 'getstatistics', CRM_Core_DAO::$_nullObject, $metadata);
+  return civicrm_api3_create_success($stats, $params, 'ReportTemplate', 'getstatistics', CRM_Core_DAO::$_nullObject, $metadata);
 }
 /**
- * Retrieve rows from a report template
+ * Adjust metadata for template getrows action.
  *
- * @param  array  $params input parameters
- *
- * @return  array details of found instances
- * @access public
+ * @param array $params
+ *   Input parameters.
  */
 function _civicrm_api3_report_template_getrows_spec(&$params) {
   $params['report_id'] = array(
@@ -156,7 +200,7 @@ function _civicrm_api3_report_template_getrows_spec(&$params) {
   );
 }
 
-/*
+/* @codingStandardsIgnoreStart
 function civicrm_api3_report_template_getfields($params) {
   return civicrm_api3_create_success(array(
     'id' => array(
@@ -253,4 +297,5 @@ function civicrm_api3_report_template_getfields($params) {
       'default' => 'UL',
     ),
   ));
-}*/
+}
+@codingStandardsIgnoreEnd */

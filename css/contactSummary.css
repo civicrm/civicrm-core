@@ -1,0 +1,373 @@
+/* Styles specific to contact Summary/Edit/Inline-Edit pages */
+
+.crm-container .primary .crm-label {
+  font-weight: bold;
+}
+
+.crm-container .upper {
+  text-transform: uppercase;
+}
+
+div#crm-contact-thumbnail {
+  padding: 4px;
+  float: right;
+}
+
+.crm-container div.contact_panel {
+  display: block;
+}
+
+.crm-container div.contact_panel td {
+  border-bottom: 1px solid #FFF;
+}
+
+#crm-container div.crm-inline-edit {
+  border: 2px dashed transparent;
+  background: none;
+  position: relative;
+}
+
+#crm-container .crm-edit-ready .crm-inline-edit:hover {
+  cursor: pointer;
+  border: 2px dashed lightgrey;
+}
+
+#crm-container div.crm-inline-edit.form {
+  cursor: default;
+  border: 2px dashed #6665BF;
+  overflow: auto;
+}
+
+#crm-container .crm-inline-edit.add-new {
+  min-height: 2.5em;
+}
+
+#crm-container div.crm-inline-edit .crm-edit-help {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: 0;
+  opacity: .8;
+  padding: .4em .9em;
+  border-bottom-left-radius: 1em;
+}
+
+#crm-container .crm-inline-edit.add-new .crm-edit-help {
+  display: block;
+  background-color: #EBEBEB;
+}
+
+#crm-container .crm-edit-ready .crm-inline-edit:hover .crm-edit-help {
+  display: block;
+  background-color: #DFE1FF;
+}
+
+#crm-container div.crm-inline-edit.form .crm-edit-help {
+  display: none !important;
+}
+
+#crm-container span.crm-custom-greeting {
+  font-size: 9px;
+}
+
+#crm-container table.crm-inline-edit-form td,
+#crm-container div.crm-inline-edit-form {
+  background-color: #efefe5;
+  white-space: nowrap;
+}
+#crm-container table.crm-inline-edit-form td.crm-label,
+#crm-container div.crm-inline-edit-form .crm-label {
+  white-space: normal;
+}
+
+#crm-container div.crm-inline-edit-field {
+  display: inline-block;
+  padding: 4px 5px;
+}
+
+#crm-container div.crm-summary-contactname-block {
+  padding-bottom: 8px;
+  margin-top: -10px;
+}
+
+#crm-container div.crm-summary-display_name {
+  font-size: 19px;
+  padding-bottom: 10px;
+}
+
+#crm-container div.contactCardLeft,
+#crm-container div#Top {
+  width: 49%;
+  display: block;
+  float: left;
+  clear: both;
+}
+
+#crm-container div.contactCardRight {
+  width: 49%;
+  display: block;
+  float: right;
+}
+
+#crm-container div.contact_panel table {
+  margin-bottom: 0;
+}
+
+#crm-container div.contactCardLeft .label,
+#crm-container div.contactCardRight .label {
+  color: #2f2f2f;
+  font-weight: normal;
+  font-size: 11px;
+  vertical-align: top;
+  margin-right: 10px;
+}
+
+#crm-container div.contactCardLeft .grouplabel,
+#crm-container div.contactCardRight .grouplabel {
+  border-bottom: grey 1px solid;
+  width: 100%;
+  font-size: 0.95em;
+  font-weight: bold;
+  background-color: #ddd;
+}
+
+#crm-container div.contact_panel .spacer {
+  padding: 8px;
+}
+
+#crm-container div.contact_panel td {
+  padding: 4px;
+  vertical-align: top;
+  border-bottom: 1px solid #E2E2E2;
+}
+
+#crm-container div.contact_panel td.label {
+  width: 28%;
+}
+
+#crm-container div.contact_panel td.last {
+  border-bottom: 0;
+}
+
+#crm-container #customFields {
+  width: 100%;
+}
+
+#crm-container #customFields div.contact_panel td.talabel {
+  padding: 4px 0 0 4px;
+  border: 0;
+}
+
+#crm-container #customFields .contact_panel .customFieldGroup {
+  line-height: 1.4em;
+  padding: 4px;
+  width: 100%;
+}
+.crm-container div.contact_panel td.grouplabel {
+  border-bottom: 2px solid #D7D7D0 !important;
+}
+
+#crm-container div.contact_panel .crm-address-block {
+  margin-bottom: 6px;
+}
+#crm-container .crm-add-address-wrapper {
+  height: 25px;
+}
+
+.crm-container .crm-summary-row:after {
+  clear: both;
+  content: ".";
+  display: block;
+  height: 0;
+  visibility: hidden;
+}
+
+#crm-container div.crm-summary-row {
+  background-color: #F4F4ED;
+  border-top: 1px solid #ffffff;
+  margin-bottom: 1px;
+  min-height: 17px;
+}
+
+#crm-container div.crm-summary-row div.crm-label {
+  background-color: #FAFAFA;
+  color: #777760;
+  text-align: left;
+  width: 122px;
+  float: left;
+  padding: 4px;
+}
+
+#crm-container div.crm-summary-row div.crm-content {
+  padding: 4px;
+  margin-left: 130px;
+}
+
+.crm-container #customFields div.contact_panel td {
+  border-bottom: 1px solid #FFFFFF;
+  padding: 4px;
+  vertical-align: top;
+}
+
+#crm-record-log {
+  padding: 0.8em 0.8em 0 0;
+  text-align: right;
+}
+
+#crm-container .geotag {
+  padding: 2px 0 2px 20px !important;
+  background: url('../i/geotag_16.png') left center no-repeat;
+  font-size: .9em;
+}
+
+/* contact actions */
+
+#crm-contact-actions-wrapper {
+  position: relative;
+}
+
+#crm-contact-actions-list {
+  width: 495px;
+}
+
+#crm-contact-actions-list ul {
+  width: auto;
+}
+
+#crm-contact-actions-list .crm-contact_activities-list ul {
+  padding-right: 4px;
+}
+#crm-contact-actions-list .crm-contact_print-list ul,
+#crm-contact-actions-list .crm-contact_actions-list ul {
+  padding-left: 4px;
+}
+
+#crm-contact-actions-list .crm-contact_activities-list {
+  float: left;
+}
+#crm-contact-actions-list .crm-contact_print-list {
+  float: right;
+}
+#crm-contact-actions-list .crm-contact_actions-list {
+  margin-left: 160px;
+  margin-right: 161px;
+  border-left: 1px solid #a7a7a7;
+  border-right: 1px solid #a7a7a7;
+}
+
+#crm-contact-actions-list .crm-contact_activities-list select {
+  margin-top: 4px;
+}
+
+#crm-contact-actions-list .crm-contact_activities-list,
+#crm-contact-actions-list .crm-contact_print-list,
+#crm-contact-actions-list .crm-contact_actions-list {
+  width: 160px;
+}
+
+.crm-container table.crm-address-element {
+  border: none;
+  margin-bottom: .25em;
+}
+
+#crm-contact-actions-list .icon {
+  background-image: url("../i/icons/jquery-ui-FFFFFF.png");
+}
+
+.crm-container .restore-icon {
+  background-position: 0 -66px;
+}
+.crm-container .button:hover .restore-icon {
+  background-image: url("../i/icons/jquery-ui-91CE00.png");
+}
+
+/* Responsive layout changes */
+
+#crm-container .contact_basic_information-section.narrowform table.form-layout-compressed,
+#crm-container .contact_basic_information-section.narrowform table.form-layout-compressed tbody,
+#crm-container .contact_basic_information-section.narrowform.xnarrowform table.form-layout-compressed tr {
+  display: block;
+  width: 100%;
+}
+
+#crm-container .contact_basic_information-section.narrowform table.form-layout-compressed tr {
+  display: inline-block;
+  width: 49%;
+  vertical-align: top;
+}
+
+#crm-container .contact_basic_information-section.narrowform table.form-layout-compressed td {
+  display: block;
+  clear: left;
+  vertical-align: top;
+  margin-bottom: .5ex;
+}
+
+#crm-container .contact_basic_information-section.narrowform table.form-layout-compressed td.hashelpicon {
+  position: relative;
+}
+
+#crm-container .contact_basic_information-section.narrowform table.form-layout-compressed td.hashelpicon label {
+  padding-bottom: 16px;
+}
+
+#crm-container .contact_basic_information-section.narrowform table.form-layout-compressed td .helpicon {
+  position: absolute;
+  bottom: -12px;
+  left: 2px;
+}
+
+#crm-container .contact_basic_information-section.narrowform table.form-layout-compressed td br {
+  display: none;
+}
+
+#crm-container .contact_basic_information-section.narrowform table.form-layout-compressed td label {
+  display: block;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  width: 25%;
+  float: left;
+  padding-right: 1%;
+}
+
+#crm-container .contact_basic_information-section.narrowform table.form-layout-compressed td input {
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  width: 75%;
+}
+
+#crm-container #mainTabContainer.narrowpage #contact-summary div.customFieldGroup,
+#crm-container #mainTabContainer.narrowpage #contact-summary div.contactCardLeft,
+#crm-container #mainTabContainer.narrowpage #contact-summary div.contactCardRight {
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  float: none;
+  width: 100%;
+}
+
+#tagtree {
+  max-height: 500px;
+  overflow: auto;
+}
+
+#tagtree li {
+  margin-top: 5px;
+}
+#tagtree ins.jstree-icon {
+  cursor: pointer;
+  position: relative;
+  top: -3px;
+}
+#tagtree .jstree-disabled {
+  cursor: not-allowed;
+}
+#tagtree .jstree-disabled > .jstree-checkbox {
+  opacity: .2;
+}
+
+#tagGroup table .label {
+  color: #FFF;
+}
+#tagGroup table {
+  color: #000;
+}

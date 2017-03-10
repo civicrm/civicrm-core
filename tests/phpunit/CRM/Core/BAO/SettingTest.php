@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,34 +23,28 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
-
-require_once 'CiviTest/CiviUnitTestCase.php';
+/**
+ * Class CRM_Core_BAO_SettingTest
+ * @group headless
+ */
 class CRM_Core_BAO_SettingTest extends CiviUnitTestCase {
-  function get_info() {
-    return array(
-      'name' => 'Setting BAO',
-      'description' => 'Test set/get on setting variables.',
-      'group' => 'CiviCRM BAO Tests',
-    );
-  }
-
-  function setUp() {
+  public function setUp() {
     parent::setUp();
     global $civicrm_setting;
     $this->origSetting = $civicrm_setting;
     CRM_Utils_Cache::singleton()->flush();
   }
 
-  function tearDown() {
+  public function tearDown() {
     global $civicrm_setting;
     $civicrm_setting = $this->origSetting;
     CRM_Utils_Cache::singleton()->flush();
     parent::tearDown();
   }
 
-  function testEnableComponentValid() {
+  public function testEnableComponentValid() {
     $config = CRM_Core_Config::singleton(TRUE, TRUE);
 
     $result = CRM_Core_BAO_ConfigSetting::enableComponent('CiviCampaign');
@@ -58,7 +52,7 @@ class CRM_Core_BAO_SettingTest extends CiviUnitTestCase {
     $this->assertTrue($result);
   }
 
-  function testEnableComponentAlreadyPresent() {
+  public function testEnableComponentAlreadyPresent() {
     $config = CRM_Core_Config::singleton(TRUE, TRUE);
 
     $result = CRM_Core_BAO_ConfigSetting::enableComponent('CiviCampaign');
@@ -67,7 +61,7 @@ class CRM_Core_BAO_SettingTest extends CiviUnitTestCase {
     $this->assertTrue($result);
   }
 
-  function testEnableComponentInvalid() {
+  public function testEnableComponentInvalid() {
     $config = CRM_Core_Config::singleton(TRUE, TRUE);
 
     $result = CRM_Core_BAO_ConfigSetting::enableComponent('CiviFake');
@@ -79,126 +73,51 @@ class CRM_Core_BAO_SettingTest extends CiviUnitTestCase {
    * Ensure that overrides in $civicrm_setting apply when
    * using getItem($group,$name).
    */
-  function testGetItem_Override() {
+  public function testGetItem_Override() {
     global $civicrm_setting;
     $civicrm_setting[CRM_Core_BAO_Setting::DIRECTORY_PREFERENCES_NAME]['imageUploadDir'] = '/test/override';
+    Civi::service('settings_manager')->useMandatory();
     $value = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::DIRECTORY_PREFERENCES_NAME, 'imageUploadDir');
     $this->assertEquals('/test/override', $value);
+
+    // CRM-14974 test suite
+    $civicrm_setting['Test Preferences']['overrideSetting'] = '/test/override';
+    Civi::service('settings_manager')->useMandatory();
+    $values = CRM_Core_BAO_Setting::getItem('Test Preferences');
+    $this->assertEquals('/test/override', $values['overrideSetting']);
+    Civi::settings()->set('databaseSetting', '/test/database');
+    $values = CRM_Core_BAO_Setting::getItem('Test Preferences');
+    $this->assertEquals('/test/override', $values['overrideSetting']);
+    $this->assertEquals('/test/database', $values['databaseSetting']);
+    $civicrm_setting['Test Preferences']['databaseSetting'] = '/test/dataride';
+    Civi::service('settings_manager')->useMandatory();
+    $values = CRM_Core_BAO_Setting::getItem('Test Preferences');
+    $this->assertEquals('/test/override', $values['overrideSetting']);
+    $this->assertEquals('/test/dataride', $values['databaseSetting']);
+    // CRM-14974 tear down
+    unset($civicrm_setting['Test Preferences']);
+    $query = "DELETE FROM civicrm_setting WHERE name IN ('overrideSetting', 'databaseSetting');";
+    CRM_Core_DAO::executeQuery($query);
   }
 
   /**
    * Ensure that overrides in $civicrm_setting apply when
    * using getItem($group).
    */
-  function testGetItemGroup_Override() {
+  public function testGetItemGroup_Override() {
     global $civicrm_setting;
     $civicrm_setting[CRM_Core_BAO_Setting::DIRECTORY_PREFERENCES_NAME]['imageUploadDir'] = '/test/override';
+    Civi::service('settings_manager')->useMandatory();
     $values = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::DIRECTORY_PREFERENCES_NAME);
     $this->assertEquals('/test/override', $values['imageUploadDir']);
   }
 
-  /**
-   * Ensure that overrides in $civicrm_setting apply when
-   * when using retrieveDirectoryAndURLPreferences().
-   */
-  function testRetrieveDirectoryAndURLPreferences_Override() {
-    global $civicrm_setting;
-    $civicrm_setting[CRM_Core_BAO_Setting::DIRECTORY_PREFERENCES_NAME]['imageUploadDir'] = '/test/override';
-
-    $params = array();
-    CRM_Core_BAO_Setting::retrieveDirectoryAndURLPreferences($params);
-    $this->assertEquals('/test/override', $params['imageUploadDir']);
+  public function testDefaults() {
+    CRM_Core_DAO::executeQuery('DELETE FROM civicrm_setting WHERE name = "max_attachments"');
+    Civi::service('settings_manager')->flush();
+    $this->assertEquals(3, Civi::settings()->get('max_attachments'));
+    $this->assertEquals(3, CRM_Core_Config::singleton()->maxAttachments);
   }
-
-  /**
-   * This test checks that CRM_Core_BAO_Setting::updateSettingsFromMetaData();
-   * 1) Removes 'maxAttachments' from config (because 'prefetch' is not set in the metadata it should
-   * be removed
-   *  2) for current domain setting max_attachments is set to the value that $config->maxAttachments
-   *    had (6)
-   *  3) for other domain (2) max_attachments is set to the configured default (3)
-   *
-   *
-   **/
-  function testConvertAndFillSettings() {
-    $settings = array('maxAttachments' => 6);
-    CRM_Core_BAO_ConfigSetting::add($settings);
-    $config = CRM_Core_Config::singleton(TRUE, TRUE);
-    $this->assertEquals(6, $config->maxAttachments);
-    $checkSQL = "SELECT  count(*) FROM civicrm_domain WHERE config_backend LIKE '%\"maxAttachments\";i:6%' AND id = 1
-    ";
-    $checkresult = CRM_Core_DAO::singleValueQuery($checkSQL);
-    $this->assertEquals(1, $checkresult, "Check that maxAttachments has been saved to database not just stored in config");
-    $sql = " DELETE FROM civicrm_setting WHERE name = 'max_attachments'";
-    CRM_Core_DAO::executeQuery($sql);
-
-    $currentDomain = CRM_Core_Config::domainID();
-    // we are setting up an artificial situation here as we are trying to drive out
-    // previous memory of this setting so we need to flush it out
-    $cachekey =  CRM_Core_BAO_Setting::inCache('CiviCRM Preferences', 'max_attachments', NULL, NULL, TRUE, $currentDomain);
-    CRM_Core_BAO_Setting::flushCache($cachekey);
-    CRM_Core_BAO_Setting::updateSettingsFromMetaData();
-    //check current domain
-    $value = civicrm_api('setting', 'getvalue', array(
-      'version' => 3,
-      'name' => 'max_attachments',
-      'group' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-    ));
-
-    $this->assertEquals(6, $value);
-    // check alternate domain
-    $value = civicrm_api('setting', 'getvalue', array(
-      'version' => 3,
-      'name' => 'max_attachments',
-      'group' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-      'domain_id' => 2
-    ));
-
-    $this->assertEquals(3, $value);
-
-    //some caching inconsistency here
-    $config = CRM_Core_Config::singleton(TRUE, TRUE);
-    $maxAttachments = empty($config->maxAttachments) ? NULL : $config->maxAttachments;
-    $this->assertEmpty($maxAttachments, "Config item still Set to $maxAttachments
-    . This works fine when test run alone");
-  }
-
-  /**
-   * Ensure that overrides in $civicrm_setting apply when
-   * when using retrieveDirectoryAndURLPreferences().
-   */
-  function testConvertConfigToSettingNoPrefetch() {
-    $settings = array('maxAttachments' => 6);
-    CRM_Core_BAO_ConfigSetting::add($settings);
-    $config = CRM_Core_Config::singleton(TRUE, TRUE);
-    $this->assertEquals(6, $config->maxAttachments);
-
-    CRM_Core_BAO_Setting::convertConfigToSetting('max_attachments');
-    $value = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'max_attachments');
-    $this->assertEquals(6, $value);
-
-    $this->callAPISuccess('system', 'flush', array());
-    $config = CRM_Core_Config::singleton(TRUE, TRUE);
-    $maxAttachments = empty($config->maxAttachments) ? NULL : $config->maxAttachments;
-    $this->assertEmpty($maxAttachments);
-  }
-
-  /*
-   * Check that setting is converted without config value being removed
-   *
-  function testConvertConfigToSettingPrefetch() {
-    $settings = array('debug' => 1);
-    CRM_Core_BAO_ConfigSetting::add($settings);
-    $config = CRM_Core_Config::singleton(true, true);
-    $this->assertEquals(1, $config->debug);
-    CRM_Core_BAO_Setting::convertConfigToSetting('debug_is_enabled');
-    $value = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::DEBUG_PREFERENCES_NAME, 'debug_is_enabled');
-    $this->assertEquals(1, $value);
-    civicrm_api('system', 'flush', array('version' => 3));
-    $config = CRM_Core_Config::singleton(true, true);
-    $this->assertEmpty($config->debug);
-  }
-   */
 
   /**
    * Ensure that on_change callbacks fire.
@@ -207,7 +126,7 @@ class CRM_Core_BAO_SettingTest extends CiviUnitTestCase {
    * are very similar, but they exercise different codepaths. The first uses the API
    * and setItems [plural]; the second uses setItem [singular].
    */
-  function testOnChange() {
+  public function testOnChange() {
     global $_testOnChange_hookCalls;
     $this->setMockSettingsMetaData(array(
       'onChangeExample' => array(
@@ -224,30 +143,22 @@ class CRM_Core_BAO_SettingTest extends CiviUnitTestCase {
         'is_contact' => 0,
         'description' => NULL,
         'help_text' => NULL,
-        'on_change' => array( // list of callbacks
-          array(__CLASS__, '_testOnChange_onChangeExample')
+        'on_change' => array(// list of callbacks
+          array(__CLASS__, '_testOnChange_onChangeExample'),
         ),
       ),
     ));
 
     // set initial value
     $_testOnChange_hookCalls = array('count' => 0);
-    CRM_Core_BAO_Setting::setItem(
-      array('First', 'Value'),
-      'CiviCRM Preferences',
-      'onChangeExample'
-    );
+    Civi::settings()->set('onChangeExample', array('First', 'Value'));
     $this->assertEquals(1, $_testOnChange_hookCalls['count']);
     $this->assertEquals(array('First', 'Value'), $_testOnChange_hookCalls['newValue']);
     $this->assertEquals('List of Components', $_testOnChange_hookCalls['metadata']['title']);
 
     // change value
     $_testOnChange_hookCalls = array('count' => 0);
-    CRM_Core_BAO_Setting::setItem(
-      array('Second', 'Value'),
-      'CiviCRM Preferences',
-      'onChangeExample'
-    );
+    Civi::settings()->set('onChangeExample', array('Second', 'Value'));
     $this->assertEquals(1, $_testOnChange_hookCalls['count']);
     $this->assertEquals(array('First', 'Value'), $_testOnChange_hookCalls['oldValue']);
     $this->assertEquals(array('Second', 'Value'), $_testOnChange_hookCalls['newValue']);
@@ -261,7 +172,7 @@ class CRM_Core_BAO_SettingTest extends CiviUnitTestCase {
    * @param $newValue
    * @param $metadata
    */
-  static function _testOnChange_onChangeExample($oldValue, $newValue, $metadata) {
+  public static function _testOnChange_onChangeExample($oldValue, $newValue, $metadata) {
     global $_testOnChange_hookCalls;
     $_testOnChange_hookCalls['count']++;
     $_testOnChange_hookCalls['oldValue'] = $oldValue;
@@ -270,4 +181,3 @@ class CRM_Core_BAO_SettingTest extends CiviUnitTestCase {
   }
 
 }
-

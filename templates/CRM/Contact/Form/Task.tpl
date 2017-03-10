@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,7 +27,7 @@
 
 {if $searchtype eq 'ts_sel'}
 <div id="popupContainer">
-  <table id="selectedRecords" class="display crm-copy-fields">
+  <table id="selectedRecords-{$group.id}" class="display crm-copy-fields crm-sortable">
     <thead>
     <tr class="columnheader">
       <th class="contact_details">{ts}Name{/ts}</th>
@@ -50,15 +50,15 @@
 {if $searchtype eq 'ts_sel'}
 {literal}
 <script type="text/javascript">
-  cj(function($) {
+  CRM.$(function($) {
     $("#popupContainer").css({
       "background-color":"#E0E0E0",
-      'display':'none',
+      'display':'none'
     });
 
     $("#popup-button").click(function() {
       $("#popupContainer").dialog({
-        title: "Selected Contacts",
+        title: {/literal}"{ts escape='js'}Selected Contacts{/ts}"{literal},
         width:700,
         height:500,
         modal: true,
@@ -71,7 +71,7 @@
     });
 
     var count = 0; var columns = ''; var sortColumn = '';
-    $('#selectedRecords th').each(function() {
+    $('#selectedRecords-{/literal}{$group.id}{literal} th').each(function() {
       if ($(this).attr('class') == 'contact_details') {
         sortColumn += '[' + count + ', "asc" ],';
         columns += '{"sClass": "contact_details"},';
@@ -82,19 +82,6 @@
       count++;
     });
 
-    columns    = columns.substring(0, columns.length - 1 );
-    sortColumn = sortColumn.substring(0, sortColumn.length - 1 );
-    eval('sortColumn =[' + sortColumn + ']');
-    eval('columns =[' + columns + ']');
-
-    //load jQuery data table.
-    $('#selectedRecords').dataTable( {
-      "sPaginationType": "full_numbers",
-      "bJQueryUI"  : true,
-      "aaSorting"  : sortColumn,
-      "aoColumns"  : columns,
-      "bFilter"    : false
-    });
   });
 
 </script>

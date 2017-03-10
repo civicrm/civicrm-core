@@ -1,20 +1,22 @@
 <?php
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-
+/**
+ * Class CRM_Utils_Cache_SqlGroupTest
+ * @group headless
+ */
 class CRM_Utils_Cache_SqlGroupTest extends CiviUnitTestCase {
-  function setUp() {
+  public function setUp() {
     parent::setUp();
   }
 
-  function tearDown() {
+  public function tearDown() {
     parent::tearDown();
   }
 
   /**
-   * Add and remove two items from the same cache instance
+   * Add and remove two items from the same cache instance.
    */
-  function testSameInstance() {
+  public function testSameInstance() {
     $a = new CRM_Utils_Cache_SqlGroup(array(
       'group' => 'testSameInstance',
     ));
@@ -37,9 +39,9 @@ class CRM_Utils_Cache_SqlGroupTest extends CiviUnitTestCase {
   }
 
   /**
-   * Add item to one cache instance then read with another
+   * Add item to one cache instance then read with another.
    */
-  function testTwoInstance() {
+  public function testTwoInstance() {
     $a = new CRM_Utils_Cache_SqlGroup(array(
       'group' => 'testTwoInstance',
     ));
@@ -57,7 +59,7 @@ class CRM_Utils_Cache_SqlGroupTest extends CiviUnitTestCase {
   /**
    * Add item to one cache instance then read (with or without prefetch) from another
    */
-  function testPrefetch() {
+  public function testPrefetch() {
     // 1. put data in cache
     $a = new CRM_Utils_Cache_SqlGroup(array(
       'group' => 'testPrefetch',
@@ -84,4 +86,5 @@ class CRM_Utils_Cache_SqlGroupTest extends CiviUnitTestCase {
     $this->assertEquals($fooValue, $c->get('foo')); // should work b/c value is fetched on demand
     $this->assertEquals($fooValue, $c->getFromFrontCache('foo')); // should work b/c value was fetched on demand
   }
+
 }

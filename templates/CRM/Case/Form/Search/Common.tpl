@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -35,25 +35,13 @@
 
 <tr id='case_search_form'>
   <td colspan="2" class="crm-case-common-form-block-case_type" width="25%">
-    <label>{ts}Case Type{/ts}</label><br />
-    <div class="listing-box">
-      {foreach from=$form.case_type_id item="case_type_id_val"}
-        <div class="{cycle values='odd-row,even-row'}">
-          {$case_type_id_val.html}
-        </div>
-      {/foreach}
-    </div><br />
+     <label>{$form.case_type_id.label}</label> <br />
+      {$form.case_type_id.html}
   </td>
 
   <td class="crm-case-common-form-block-case_status_id" width="25%">
-    <label>{ts}Status{/ts}</label><br />
-    <div class="listing-box">
-      {foreach from=$form.case_status_id item="case_status_id_val"}
-        <div class="{cycle values='odd-row,even-row'}">
-          {$case_status_id_val.html}
-        </div>
-      {/foreach}
-    </div>
+      <label>{$form.case_status_id.label}</label> <br />
+      {$form.case_status_id.html}
     {if $accessAllCases}
       <br />
       {$form.case_owner.html}
@@ -77,7 +65,7 @@
   {/if}
 </tr>
 
-<tr><td colspan="3">{include file="CRM/common/Tag.tpl" tagsetType='case'}</td></tr>
+<tr><td colspan="3">{include file="CRM/common/Tagset.tpl" tagsetType='case'}</td></tr>
 
   {if $caseGroupTree}
   <tr>

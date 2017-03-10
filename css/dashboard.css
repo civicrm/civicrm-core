@@ -1,0 +1,229 @@
+/**
+* @file
+*    CSS for the jQuery.dashboard() plugin.
+*
+* Released under the GNU General Public License.  See LICENSE.txt.
+*/
+
+#crm-container .column {
+  float: left;
+  margin: 0;
+  /* padding-bottom and min-height make sure that there is always a sizable drop zone. */
+  min-height: 200px;
+  padding: 0 0 40px;
+  list-style-type: none;
+}
+
+#crm-container .column-0 {
+  width: 40%;
+}
+
+#crm-container .column-1 {
+  width: 60%;
+}
+
+/* The placeholder that indicates where a dragged widget will land if dropped now. */
+#crm-container .placeholder {
+  margin: 5px;
+  border: 3px dashed #CDE8FE;
+}
+
+/* Spacing between widgets. */
+#crm-container li.widget,
+#crm-container li.empty-placeholder {
+  margin: 0 3px 10px 3px;
+}
+#crm-container li.widget {
+  padding: 0;
+}
+
+/* Spacing inside widgets. */
+#crm-container .widget-wrapper {
+  padding: 0;
+  overflow: hidden;
+  margin-right: .25em;
+  box-shadow: 1px 1px 4px 1px rgba(0,0,0,0.2);
+  border-radius: 3px;
+}
+
+#crm-container .widget-wrapper.db-hover-handle {
+  box-shadow: 1px 1px 8px 3px rgba(0,0,0,0.2);
+}
+
+#crm-container .ui-sortable-helper .widget-wrapper {
+  box-shadow: 1px 1px 8px 3px rgba(0,0,0,0.5);
+}
+
+/* widget header / title */
+#crm-container .widget-header {
+  background: transparent none repeat scroll 0 0;
+  cursor: move;
+  margin: 0 50px 0 0;
+  padding: 0;
+  color: #fcfcfc;
+}
+
+/* widget content / body*/
+#crm-container .widget-content {
+  background-color: #ffffff;
+  padding:0.5em;
+  overflow-x:auto;
+  min-height: 10em;
+}
+
+#crm-container .widget-content .crm-accordion-header {
+  background-color: #EFEFE5;
+  background-image: url("../i/TreeMinus.gif");
+  color: #080808;
+}
+
+#crm-container .widget-content .crm-accordion-wrapper.collapsed .crm-accordion-header {
+  background-image: url("../i/TreePlus.gif");
+}
+
+#crm-container .widget-content .crm-accordion-header:hover {
+  background-color: #e8e8de;
+}
+
+#crm-container .widget-content .crm-accordion-body {
+  border-color: #e8e8de;
+  padding: 4px .5em;
+}
+
+#crm-container .widget-controls {
+  background-color: #5D677B;
+  /* Standards-browsers do this anyway because all inner block elements are floated.  IE doesn't because it's crap. */
+  display: block;
+  padding: 5px 0;
+}
+
+#crm-container .widget-icon, #crm-container .full-screen-close-icon img {
+  display: block;
+  float: right;
+  margin-left: 2px;
+  margin-top: 2px;
+  cursor: pointer;
+}
+
+#full-screen-header {
+  display: block;
+  padding: .2em .4em;
+  background: #F0F0E8;
+  /* Although this is an <a> link, it doesn't have an href="" attribute. */
+  cursor: pointer;
+}
+
+/* Make the throbber in-yer-face. */
+#crm-container .throbber {
+  text-align: right;
+  background:url("../packages/jquery/css/images/throbber.gif") no-repeat scroll 0 0 transparent;
+  height:20px;
+  width:20px;
+}
+
+#crm-container p.loadtext {
+  margin:1.6em 0 0 26px;
+}
+
+#crm-container .widget-controls .crm-i {
+  font-size: 14px;
+  padding: 0 6px;
+  font-weight: normal;
+  float: left;
+  cursor: pointer;
+  color: #fcfcfc;
+  opacity: .7;
+}
+
+#crm-container .widget-controls:hover .crm-i {
+  opacity: 1;
+}
+
+#crm-container .widget-controls .crm-i.fa-expand,
+#crm-container .widget-controls .crm-i.fa-times {
+  float:right;
+}
+
+/* CSS for Dashlets */
+
+#crm-container #available-dashlets {
+  width: 98%;
+  border: 2px dashed #CDE8FE;
+  background-color: #999999;
+  min-height:40px;
+}
+
+#crm-container .dash-column {
+  border: 2px solid #696969;
+  min-height: 100px;
+  background-color: #EEEEEE
+}
+
+#crm-container .dashlets-header {
+  font-weight: bold;
+}
+
+#crm-container #dashlets-header-col-0 {
+  float: left;
+  width: 40%;
+}
+
+#crm-container #dashlets-header-col-1 {
+  margin-left: 42%;
+  width: 56%;
+}
+
+#crm-container #existing-dashlets-col-0 {
+  float: left;
+  width: 40%;
+}
+
+#crm-container #existing-dashlets-col-1 {
+  margin-left: 42%;
+  width: 56%;
+}
+
+#crm-container .portlet {
+  margin: .5em;
+  width: 75%;
+  display: inline-block;
+}
+
+#crm-container .portlet-header {
+  margin: 0.3em;
+  padding: 0.5em;
+  cursor: pointer;
+}
+
+#crm-container #available-dashlets .portlet {
+  width: auto;
+}
+
+#crm-container .portlet-header .crm-i {
+  float: right;
+  color: #52534D;
+}
+
+#crm-container .portlet-content {
+  padding: 0.4em;
+}
+
+#crm-container .ui-sortable-placeholder {
+  border: 1px dotted black;
+  visibility: visible !important;
+  height: 50px !important;
+}
+
+#crm-container .ui-sortable-placeholder * {
+  visibility: hidden;
+}
+
+@media screen and (max-device-width: 50em), screen and (max-width: 50em) {
+  #crm-container .column {
+    width: 100%;
+    min-height: 0;
+  }
+  #crm-container .column-0 {
+    padding: 0;
+  }
+}

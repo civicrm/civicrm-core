@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,26 +23,26 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
  * This class generates form components for Message templates
  * used by membership, contributions, event registrations, etc.
- *
  */
 class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
   // which (and whether) mailing workflow this template belongs to
   protected $_workflow_id = NULL;
 
-  function preProcess() {
+  // Is document file is already loaded as default value?
+  protected $_is_document = FALSE;
+
+  public function preProcess() {
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
     $this->_action = CRM_Utils_Request::retrieve('action', 'String',
       $this, FALSE, 'add'
@@ -55,18 +55,18 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
   }
 
   /**
-   * This function sets the default values for the form.
+   * Set default values for the form.
+   *
    * The default values are retrieved from the database.
-   *
-   * @access public
-   *
-   * @return void
    */
   public function setDefaultValues() {
     $defaults = $this->_values;
 
     if (empty($defaults['pdf_format_id'])) {
       $defaults['pdf_format_id'] = 'null';
+    }
+    if (empty($defaults['file_type'])) {
+      $defaults['file_type'] = 0;
     }
 
     $this->_workflow_id = CRM_Utils_Array::value('workflow_id', $defaults);
@@ -76,8 +76,8 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
       //set the context for redirection after form submit or cancel
       $session = CRM_Core_Session::singleton();
       $session->replaceUserContext(CRM_Utils_System::url('civicrm/admin/messageTemplates',
-          'selectedChild=user&reset=1'
-        ));
+        'selectedChild=user&reset=1'
+      ));
     }
 
     // FIXME: we need to fix the Cancel button here as we don’t know whether it’s a workflow template in buildQuickForm()
@@ -88,12 +88,20 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
       else {
         $selectedChild = 'user';
       }
+
+      $documentInfo = CRM_Core_BAO_File::getEntityFile('civicrm_msg_template', $this->_id, TRUE);
+      if (!empty($documentInfo)) {
+        $defaults['file_type'] = 1;
+        $this->_is_document = TRUE;
+        $this->assign('attachment', $documentInfo);
+      }
+
       $cancelURL = CRM_Utils_System::url('civicrm/admin/messageTemplates', "selectedChild={$selectedChild}&reset=1");
       $cancelURL = str_replace('&amp;', '&', $cancelURL);
       $this->addButtons(
         array(
           array(
-            'type' => 'next',
+            'type' => 'upload',
             'name' => ts('Save'),
             'isDefault' => TRUE,
           ),
@@ -110,10 +118,7 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
   }
 
   /**
-   * Function to build the form
-   *
-   * @return void
-   * @access public
+   * Build the form object.
    */
   public function buildQuickForm() {
 
@@ -133,22 +138,45 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
       );
     }
     else {
-      parent::buildQuickForm();
+      $this->addButtons(array(
+          array(
+            'type' => 'upload',
+            'name' => $this->_action & CRM_Core_Action::DELETE ? ts('Delete') : ts('Save'),
+            'isDefault' => TRUE,
+          ),
+          array(
+            'type' => 'cancel',
+            'name' => ts('Cancel'),
+          ),
+        )
+      );
     }
 
     if ($this->_action & CRM_Core_Action::DELETE) {
       return;
     }
 
-    $breadCrumb = array(array('title' => ts('Message Templates'),
+    $breadCrumb = array(
+      array(
+        'title' => ts('Message Templates'),
         'url' => CRM_Utils_System::url('civicrm/admin/messageTemplates',
           'action=browse&reset=1'
         ),
-      ));
+      ),
+    );
     CRM_Utils_System::appendBreadCrumb($breadCrumb);
 
     $this->applyFilter('__ALL__', 'trim');
     $this->add('text', 'msg_title', ts('Message Title'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_MessageTemplate', 'msg_title'), TRUE);
+
+    $options = array(ts('Compose On-screen'), ts('Upload Document'));
+    $element = $this->addRadio('file_type', ts('Source'), $options);
+    if ($this->_id) {
+      $element->freeze();
+    }
+
+    $this->addElement('file', "file_id", ts('Upload Document'), 'size=30 maxlength=255');
+    $this->addUploadElement("file_id");
 
     $this->add('text', 'msg_subject',
       ts('Message Subject'),
@@ -159,10 +187,6 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
     $tokens = CRM_Core_SelectValues::contactTokens();
 
     $this->assign('tokens', CRM_Utils_Token::formatTokensForDisplay($tokens));
-
-    $this->add('textarea', 'msg_text', ts('Text Message'),
-      "cols=50 rows=6"
-    );
 
     // if not a system message use a wysiwyg editor, CRM-5971
     if ($this->_id &&
@@ -176,20 +200,29 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
       );
     }
     else {
-      $this->addWysiwyg('msg_html', ts('HTML Message'),
+      $this->add('wysiwyg', 'msg_html', ts('HTML Message'),
         array(
-          'cols' => '80', 'rows' => '8',
+          'cols' => '80',
+          'rows' => '8',
           'onkeyup' => "return verify(this)",
+          'preset' => 'civimail',
         )
       );
     }
 
+    $this->add('textarea', 'msg_text', ts('Text Message'),
+      "cols=50 rows=6"
+    );
+
     $this->add('select', 'pdf_format_id', ts('PDF Page Format'),
       array(
-        'null' => ts('- default -')) + CRM_Core_BAO_PdfFormat::getList(TRUE), FALSE
+        'null' => ts('- default -'),
+      ) + CRM_Core_BAO_PdfFormat::getList(TRUE), FALSE
     );
 
     $this->add('checkbox', 'is_active', ts('Enabled?'));
+
+    $this->addFormRule(array(__CLASS__, 'formRule'), $this);
 
     if ($this->_action & CRM_Core_Action::VIEW) {
       $this->freeze();
@@ -198,11 +231,37 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
   }
 
   /**
-   * Function to process the form
+   * Global form rule.
    *
-   * @access public
+   * @param array $params
+   *   The input form values.
+   * @param array $files
+   *   The uploaded files if any.
+   * @param array $self
    *
-   * @return void
+   * @return array
+   *   array of errors
+   */
+  public static function formRule($params, $files, $self) {
+    $errors = array();
+
+    // If user uploads non-document file other than odt/docx
+    if (!empty($files['file_id']['tmp_name']) &&
+      array_search($files['file_id']['type'], CRM_Core_SelectValues::documentApplicationType()) == NULL
+    ) {
+      $error['file_id'] = ts('Invalid document file format');
+    }
+    // If default is not set and no document file is uploaded
+    elseif (empty($files['file_id']['tmp_name']) && !empty($params['file_type']) && !$self->_is_document) {
+      //On edit page of docx/odt message template if user changes file type but forgot to upload document
+      $errors['file_id'] = ts('Please upload document');
+    }
+
+    return $errors;
+  }
+
+  /**
+   * Process the form submission.
    */
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {
@@ -216,10 +275,29 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
       $params = array();
 
       // store the submitted values in an array
-      $params = $this->exportValues();
+      $params = $this->controller->exportValues($this->_name);
 
       if ($this->_action & CRM_Core_Action::UPDATE) {
         $params['id'] = $this->_id;
+      }
+
+      if (!empty($params['file_type'])) {
+        unset($params['msg_html']);
+        unset($params['msg_text']);
+        CRM_Utils_File::formatFile($params, 'file_id');
+      }
+      // delete related file refernces if html/text/pdf template are chosen over document
+      elseif (!empty($this->_id)) {
+        $entityFileDAO = new CRM_Core_DAO_EntityFile();
+        $entityFileDAO->entity_id = $this->_id;
+        $entityFileDAO->entity_table = 'civicrm_msg_template';
+        if ($entityFileDAO->find(TRUE)) {
+          $fileDAO = new CRM_Core_DAO_File();
+          $fileDAO->id = $entityFileDAO->file_id;
+          $fileDAO->find(TRUE);
+          $entityFileDAO->delete();
+          $fileDAO->delete();
+        }
       }
 
       if ($this->_workflow_id) {
@@ -238,5 +316,5 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
       }
     }
   }
-}
 
+}

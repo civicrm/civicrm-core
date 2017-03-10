@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,39 +23,31 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
- * This class does pre processing for viewing an activity or their revisions
- *
+ * This class does pre processing for viewing an activity or their revisions.
  */
 class CRM_Case_Form_ActivityView extends CRM_Core_Form {
 
   /**
-   * Function to process the view
-   *
-   * @access public
-   *
-   * @return void
+   * Process the view.
    */
   public function preProcess() {
-    $contactID       = CRM_Utils_Request::retrieve('cid', 'Integer', $this, TRUE);
-    $activityID      = CRM_Utils_Request::retrieve('aid', 'Integer', $this, TRUE);
-    $revs            = CRM_Utils_Request::retrieve('revs', 'Boolean', CRM_Core_DAO::$_nullObject);
-    $caseID          = CRM_Utils_Request::retrieve('caseID', 'Boolean', CRM_Core_DAO::$_nullObject);
+    $contactID = CRM_Utils_Request::retrieve('cid', 'Integer', $this, TRUE);
+    $activityID = CRM_Utils_Request::retrieve('aid', 'Integer', $this, TRUE);
+    $revs = CRM_Utils_Request::retrieve('revs', 'Boolean');
+    $caseID = CRM_Utils_Request::retrieve('caseID', 'Boolean');
     $activitySubject = CRM_Core_DAO::getFieldValue('CRM_Activity_DAO_Activity',
       $activityID,
       'subject'
     );
-    $type = CRM_Utils_Request::retrieve('type', 'String', CRM_Core_DAO::$_nullObject);
 
     //check for required permissions, CRM-6264
     if ($activityID &&
@@ -66,7 +58,6 @@ class CRM_Case_Form_ActivityView extends CRM_Core_Form {
 
     $this->assign('contactID', $contactID);
     $this->assign('caseID', $caseID);
-    $this->assign('type', $type);
     // CRM-9145
     $this->assign('activityID', $activityID);
 
@@ -108,8 +99,8 @@ class CRM_Case_Form_ActivityView extends CRM_Core_Form {
     }
 
     if ($revs) {
+      CRM_Utils_System::setTitle(ts('Activity Revision History'));
       $this->assign('revs', $revs);
-
       $this->assign('result', $viewPriorActivities);
       $this->assign('subject', $activitySubject);
       $this->assign('latestRevisionID', $latestRevisionID);
@@ -182,5 +173,5 @@ class CRM_Case_Form_ActivityView extends CRM_Core_Form {
       $recentOther
     );
   }
-}
 
+}

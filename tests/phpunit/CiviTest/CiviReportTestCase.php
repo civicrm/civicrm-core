@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,25 +23,35 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-
+/**
+ * Class CiviReportTestCase
+ */
 class CiviReportTestCase extends CiviUnitTestCase {
-  function setUp() {
+  public function setUp() {
     parent::setUp();
     $this->_sethtmlGlobals();
   }
 
-  function tearDown() {
+  public function tearDown() {
     // TODO Figure out how to automatically drop all temporary tables.
     // Note that MySQL doesn't provide a way to list them, so we would need
     // to keep track ourselves (eg CRM_Core_TemporaryTableManager) or reset
     // the MySQL connection between test runs.
+
+    $this->quickCleanup($this->_tablesToTruncate);
     parent::tearDown();
   }
 
-  function getReportOutputAsCsv($reportClass, $inputParams) {
+  /**
+   * @param $reportClass
+   * @param array $inputParams
+   *
+   * @return string
+   * @throws Exception
+   */
+  public function getReportOutputAsCsv($reportClass, $inputParams) {
     $config = CRM_Core_Config::singleton();
     $config->keyDisable = TRUE;
     $controller = new CRM_Core_Controller_Simple($reportClass, ts('some title'));
@@ -78,7 +88,8 @@ class CiviReportTestCase extends CiviUnitTestCase {
       $tmpFile = $this->createTempDir() . CRM_Utils_File::makeFileName('CiviReport.csv');
       $csvContent = CRM_Report_Utils_Report::makeCsv($reportObj, $rows);
       file_put_contents($tmpFile, $csvContent);
-    } catch (Exception $e) {
+    }
+    catch (Exception $e) {
       // print_r($e->getCause()->getUserInfo());
       CRM_Utils_GlobalStack::singleton()->pop();
       throw $e;
@@ -88,7 +99,12 @@ class CiviReportTestCase extends CiviUnitTestCase {
     return $tmpFile;
   }
 
-  function getArrayFromCsv($csvFile) {
+  /**
+   * @param $csvFile
+   *
+   * @return array
+   */
+  public function getArrayFromCsv($csvFile) {
     $arrFile = array();
     if (($handle = fopen($csvFile, "r")) !== FALSE) {
       while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
@@ -100,26 +116,51 @@ class CiviReportTestCase extends CiviUnitTestCase {
   }
 
   /**
-   * @param array $expectedCsvArray two-dimensional array representing a CSV table
-   * @param array $actualCsvArray two-dimensional array representing a CSV table
+   * @param array $expectedCsvArray
+   *   Two-dimensional array representing a CSV table.
+   * @param array $actualCsvArray
+   *   Two-dimensional array representing a CSV table.
    */
   public function assertCsvArraysEqual($expectedCsvArray, $actualCsvArray) {
     // TODO provide better debug output
 
+    $flatData = "\n===== EXPECTED DATA ====\n"
+      . $this->flattenCsvArray($expectedCsvArray)
+      . "\n===== ACTUAL DATA ====\n"
+      . $this->flattenCsvArray($actualCsvArray);
+
     $this->assertEquals(
       count($actualCsvArray),
       count($expectedCsvArray),
-      'Arrays have different number of rows; in line ' . __LINE__
+      'Arrays have different number of rows; in line ' . __LINE__ . '; data: ' . $flatData
     );
 
     foreach ($actualCsvArray as $intKey => $strVal) {
-      $this->assertNotNull($expectedCsvArray[$intKey], 'In line ' . __LINE__);
+      $rowData = var_export(array(
+        'expected' => $expectedCsvArray[$intKey],
+        'actual' => $actualCsvArray[$intKey],
+      ), TRUE);
+      $this->assertNotNull($expectedCsvArray[$intKey]);
       $this->assertEquals(
         count($actualCsvArray[$intKey]),
         count($expectedCsvArray[$intKey]),
-        'Arrays have different number of columns at row ' . $intKey . '; in line ' . __LINE__
+        'Arrays have different number of columns at row ' . $intKey . '; in line ' . __LINE__ . '; data: ' . $rowData
       );
       $this->assertEquals($expectedCsvArray[$intKey], $strVal);
     }
   }
+
+  /**
+   * @param $rows
+   *
+   * @return string
+   */
+  public function flattenCsvArray($rows) {
+    $result = '';
+    foreach ($rows as $row) {
+      $result .= implode(',', $row) . "\n";
+    }
+    return $result;
+  }
+
 }

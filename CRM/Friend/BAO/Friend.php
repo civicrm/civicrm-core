@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
  */
@@ -38,24 +38,25 @@
  *
  */
 class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
-  function __construct() {
+  /**
+   */
+  public function __construct() {
     parent::__construct();
   }
 
   /**
-   * takes an associative array and creates a friend object
+   * Takes an associative array and creates a friend object.
    *
    * the function extract all the params it needs to initialize the create a
    * friend object. the params array could contain additional unused name/value
    * pairs
    *
-   * @param array  $params (reference ) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
    *
-   * @return object CRM_Friend_BAO_Friend object
-   * @access public
-   * @static
+   * @return CRM_Friend_BAO_Friend
    */
-  static function add(&$params) {
+  public static function add(&$params) {
     $friend = CRM_Contact_BAO_Contact::createProfileContact($params, CRM_Core_DAO::$_nullArray);
     return $friend;
   }
@@ -64,14 +65,15 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
    * Given the list of params in the params array, fetch the object
    * and store the values in the values array
    *
-   * @param array  $params input parameters to find object
-   * @param array  $values output values of the object
+   * @param array $params
+   *   Input parameters to find object.
+   * @param array $values
+   *   Output values of the object.
    *
-   * @return array $values values
-   * @access public
-   * @static
+   * @return array
+   *   values
    */
-  static function retrieve(&$params, &$values) {
+  public static function retrieve(&$params, &$values) {
     $friend = new CRM_Friend_DAO_Friend();
 
     $friend->copyValues($params);
@@ -84,15 +86,14 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
   }
 
   /**
-   * takes an associative array and creates a friend object
+   * Takes an associative array and creates a friend object.
    *
-   * @param array $params (reference ) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
    *
-   * @return object CRM_Contact_BAO_Contact object
-   * @access public
-   * @static
+   * @return void
    */
-  static function create(&$params) {
+  public static function create(&$params) {
     $transaction = new CRM_Core_Transaction();
 
     $mailParams = array();
@@ -115,7 +116,6 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
     $frndParams['entity_id'] = $params['entity_id'];
     $frndParams['entity_table'] = $params['entity_table'];
     self::getValues($frndParams);
-
 
     $activityTypeId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionValue', 'Tell a Friend', 'value', 'name');
 
@@ -153,8 +153,8 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
       // attempt to save activity targets
       $targetParams = array(
         'activity_id' => $activity->id,
-        'contact_id'  => $contact,
-        'record_type_id' => $targetID
+        'contact_id' => $contact,
+        'record_type_id' => $targetID,
       );
 
       // See if it already exists
@@ -233,20 +233,20 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
   }
 
   /**
-   * Function to build the form
+   * Build the form object.
    *
-   * @param object $form form object
+   * @param CRM_Core_Form $form
+   *   Form object.
    *
    * @return void
-   * @access public
    */
-  static function buildFriendForm($form) {
+  public static function buildFriendForm($form) {
     $form->addElement('checkbox', 'tf_is_active', ts('Tell a Friend enabled?'), NULL, array('onclick' => "friendBlock(this)"));
     // name
     $form->add('text', 'tf_title', ts('Title'), CRM_Core_DAO::getAttribute('CRM_Friend_DAO_Friend', 'title'), TRUE);
 
     // intro-text and thank-you text
-    $form->addWysiwyg('intro', ts('Introduction'), CRM_Core_DAO::getAttribute('CRM_Friend_DAO_Friend', 'intro'), TRUE);
+    $form->add('wysiwyg', 'intro', ts('Introduction'), CRM_Core_DAO::getAttribute('CRM_Friend_DAO_Friend', 'intro') + array('class' => 'collapsed'));
 
     $form->add('textarea', 'suggested_message', ts('Suggested Message'),
       CRM_Core_DAO::getAttribute('CRM_Friend_DAO_Friend', 'suggested_message'), FALSE
@@ -256,7 +256,7 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
 
     $form->add('text', 'tf_thankyou_title', ts('Thank-you Title'), CRM_Core_DAO::getAttribute('CRM_Friend_DAO_Friend', 'thankyou_title'), TRUE);
 
-    $form->addWysiwyg('tf_thankyou_text', ts('Thank-you Message'), CRM_Core_DAO::getAttribute('CRM_Friend_DAO_Friend', 'thankyou_text'), TRUE);
+    $form->add('wysiwyg', 'tf_thankyou_text', ts('Thank-you Message'), CRM_Core_DAO::getAttribute('CRM_Friend_DAO_Friend', 'thankyou_text') + array('class' => 'collapsed'));
 
     if ($form->_friendId) {
       // CRM-14200 the i18n dialogs need this for translation
@@ -267,11 +267,13 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
   /**
    * The function sets the deafult values of the form.
    *
-   * @param array   $defaults (reference) the default values.
+   * @param array $defaults
+   *   (reference) the default values.
    *
-   * @return booelan  whether anything was found
+   * @return booelan
+   *   whether anything was found
    */
-  static function getValues(&$defaults) {
+  public static function getValues(&$defaults) {
     if (empty($defaults)) {
       return NULL;
     }
@@ -285,13 +287,12 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
   /**
    * Process that send tell a friend e-mails
    *
-   * @params int     $contactId      contact id
-   * @params array   $values         associative array of name/value pair
+   * @param int $contactID
+   * @param array $values
    *
    * @return void
-   * @access public
    */
-  static function sendMail($contactID, &$values) {
+  public static function sendMail($contactID, &$values) {
     list($fromName, $email) = CRM_Contact_BAO_Contact::getContactDetails($contactID);
     // if no $fromName (only email collected from originating contact) - list returns single space
     if (trim($fromName) == '') {
@@ -330,19 +331,18 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
   }
 
   /**
-   * takes an associative array and creates a tell a friend object
+   * Takes an associative array and creates a tell a friend object.
    *
    * the function extract all the params it needs to initialize the create/edit a
    * friend object. the params array could contain additional unused name/value
    * pairs
    *
-   * @param array  $params (reference ) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
    *
-   * @return object CRM_Friend_BAO_Friend object
-   * @access public
-   * @static
+   * @return CRM_Friend_BAO_Friend
    */
-  static function addTellAFriend(&$params) {
+  public static function addTellAFriend(&$params) {
     $friendDAO = new CRM_Friend_DAO_Friend();
 
     $friendDAO->copyValues($params);
@@ -352,5 +352,5 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
 
     return $friendDAO;
   }
-}
 
+}

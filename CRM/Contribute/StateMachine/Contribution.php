@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,14 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -40,14 +38,14 @@
 class CRM_Contribute_StateMachine_Contribution extends CRM_Core_StateMachine {
 
   /**
-   * class constructor
+   * Class constructor.
    *
-   * @param object  CRM_Contact_Import_Controller
-   * @param int     $action
+   * @param CRM_Core_Controller $controller
+   * @param \const|int $action
    *
-   * @return object CRM_Contact_Import_StateMachine
+   * @return CRM_Contribute_StateMachine_Contribution
    */
-  function __construct($controller, $action = CRM_Core_Action::NONE) {
+  public function __construct($controller, $action = CRM_Core_Action::NONE) {
     parent::__construct($controller, $action);
 
     $this->_pages = array(
@@ -58,5 +56,5 @@ class CRM_Contribute_StateMachine_Contribution extends CRM_Core_StateMachine {
 
     $this->addSequentialPages($this->_pages, $action);
   }
-}
 
+}

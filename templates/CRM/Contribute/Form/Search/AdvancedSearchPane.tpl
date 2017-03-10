@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,7 +25,7 @@
 *}
 {if $validCiviContribute}
     <div id="contributeForm" class="crm-contribution-search-advanced_search-form-block">
-    <table class="form-layout"> 
+    <table class="form-layout">
        {include file="CRM/Contribute/Form/Search/Common.tpl"}
     </table>
     </div>

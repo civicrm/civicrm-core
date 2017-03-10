@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,19 +23,14 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
-
-require_once 'CiviTest/CiviUnitTestCase.php';
-
+ */
 
 /**
  *  Test APIv3 civicrm_survey_* functions
  *
- *  @package CiviCRM_APIv3
- *  @subpackage API_Campaign
+ * @package CiviCRM_APIv3
+ * @subpackage API_Campaign
  */
-
-require_once 'CiviTest/CiviUnitTestCase.php';
 
 /**
  * All API should contain at minimum a success test for each
@@ -47,6 +42,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  *
  * @author eileen
  *
+ * @group headless
  */
 class api_v3_SurveyTest extends CiviUnitTestCase {
   protected $params;
@@ -54,8 +50,13 @@ class api_v3_SurveyTest extends CiviUnitTestCase {
   public $DBResetRequired = FALSE;
 
 
-  function setUp() {
-    $phoneBankActivityTypeID = $this->callAPISuccessGetValue('Option_value', array('label' => 'PhoneBank', 'return' => 'id'), 'integer');
+  public function setUp() {
+    $phoneBankActivityTypeID = $this->callAPISuccessGetValue('Option_value', array(
+        'label' => 'PhoneBank',
+        'return' => 'value',
+      ), 'integer');
+    $this->useTransaction();
+    $this->enableCiviCampaign();
     $this->params = array(
       'title' => "survey title",
       'activity_type_id' => $phoneBankActivityTypeID,
@@ -65,18 +66,8 @@ class api_v3_SurveyTest extends CiviUnitTestCase {
     parent::setUp();
   }
 
-/**
- * Here we clean up any test data we created.
- * Note that the quickCleanup function turns off Foreign keys first
- * so will not remove related entities
- */
-  function tearDown() {
-    $tablesToTruncate = array('civicrm_survey');
-    $this->quickCleanup($tablesToTruncate);
-  }
-
   /**
-   * test create function succeeds
+   * Test create function succeeds.
    */
   public function testCreateSurvey() {
     $result = $this->callAPIAndDocument('survey', 'create', $this->params, __FUNCTION__, __FILE__);
@@ -84,46 +75,46 @@ class api_v3_SurveyTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test get function succeeds (this is actually largely tested in the get
+   * Test get function succeeds.
+   *
+   * This is actually largely tested in the get
    * action on create. Add extra checks for any 'special' return values or
    * behaviours
-   *
    */
   public function testGetSurvey() {
     $this->createTestEntity();
     $result = $this->callAPIAndDocument('survey', 'get', $this->params, __FUNCTION__, __FILE__);
-    $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
-    $this->assertNotNull($result['values'][$result['id']]['id'], 'In line ' . __LINE__);
-  }
-
-/**
- * Check the delete function succeeds
- */
-  public function testDeleteSurvey() {
-    $entity = $this->createTestEntity();
-    $result = $this->callAPIAndDocument('survey', 'delete', array('id' => $entity['id']), __FUNCTION__, __FILE__);
-    $checkDeleted = $this->callAPISuccess($this->entity, 'get', array(
-      ));
-    $this->assertEquals(0, $checkDeleted['count'], 'In line ' . __LINE__);
+    $this->assertEquals(1, $result['count']);
+    $this->assertNotNull($result['values'][$result['id']]['id']);
   }
 
   /**
-   * test & document chained delete pattern. Note that explanation of the pattern
-   * is best put in the $description variable as it will then be displayed in the
-   * test generated examples. (these are to be found in the api/examples folder)
+   * Check the delete function succeeds.
+   */
+  public function testDeleteSurvey() {
+    $entity = $this->createTestEntity();
+    $result = $this->callAPIAndDocument('survey', 'delete', array('id' => $entity['id']), __FUNCTION__, __FILE__);
+    $checkDeleted = $this->callAPISuccess($this->entity, 'get', array());
+    $this->assertEquals(0, $checkDeleted['count']);
+  }
+
+  /**
+   * Test & document chained delete pattern.
    *
+   * Note that explanation of the pattern
+   * is best put in the $description variable as it will then be displayed in the
+   * test generated examples. (these are to be found in the api/examples folder).
    */
   public function testGetSurveyChainDelete() {
-    $description = "demonstrates get + delete in the same call";
-    $subfile     = 'ChainedGetDelete';
-    $params      = array(
+    $description = "Demonstrates get + delete in the same call.";
+    $subfile = 'ChainedGetDelete';
+    $params = array(
       'title' => "survey title",
       'api.survey.delete' => 1,
     );
     $result = $this->callAPISuccess('survey', 'create', $this->params);
     $result = $this->callAPIAndDocument('survey', 'get', $params, __FUNCTION__, __FILE__, $description, $subfile);
-    $this->assertEquals(0, $this->callAPISuccess('survey', 'getcount', array()), 'In line ' . __LINE__);
+    $this->assertEquals(0, $this->callAPISuccess('survey', 'getcount', array()));
   }
 
 }
-

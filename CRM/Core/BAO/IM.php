@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
  */
@@ -39,15 +39,15 @@
 class CRM_Core_BAO_IM extends CRM_Core_DAO_IM {
 
   /**
-   * takes an associative array and adds im
+   * Takes an associative array and adds im.
    *
-   * @param array  $params         (reference ) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
    *
-   * @return object       CRM_Core_BAO_IM object on success, null otherwise
-   * @access public
-   * @static
+   * @return object
+   *   CRM_Core_BAO_IM object on success, null otherwise
    */
-  static function add(&$params) {
+  public static function add(&$params) {
     $hook = empty($params['id']) ? 'create' : 'edit';
     CRM_Utils_Hook::pre($hook, 'IM', CRM_Utils_Array::value('id', $params), $params);
 
@@ -63,26 +63,26 @@ class CRM_Core_BAO_IM extends CRM_Core_DAO_IM {
    * Given the list of params in the params array, fetch the object
    * and store the values in the values array
    *
-   * @param array entityBlock input parameters to find object
+   * @param array $entityBlock input parameters to find object
    *
-   * @return boolean
-   * @access public
-   * @static
+   * @return bool
    */
-  static function &getValues($entityBlock) {
+  public static function &getValues($entityBlock) {
     return CRM_Core_BAO_Block::getValues('im', $entityBlock);
   }
 
   /**
    * Get all the ims for a specified contact_id, with the primary im being first
    *
-   * @param int $id the contact id
+   * @param int $id
+   *   The contact id.
    *
-   * @return array  the array of im details
-   * @access public
-   * @static
+   * @param bool $updateBlankLocInfo
+   *
+   * @return array
+   *   the array of im details
    */
-  static function allIMs($id, $updateBlankLocInfo = FALSE) {
+  public static function allIMs($id, $updateBlankLocInfo = FALSE) {
     if (!$id) {
       return NULL;
     }
@@ -100,8 +100,8 @@ ORDER BY
   civicrm_im.is_primary DESC, im_id ASC ";
     $params = array(1 => array($id, 'Integer'));
 
-    $ims   = $values = array();
-    $dao   = CRM_Core_DAO::executeQuery($query, $params);
+    $ims = $values = array();
+    $dao = CRM_Core_DAO::executeQuery($query, $params);
     $count = 1;
     while ($dao->fetch()) {
       $values = array(
@@ -126,23 +126,19 @@ ORDER BY
   /**
    * Get all the ims for a specified location_block id, with the primary im being first
    *
-   * @param array  $entityElements the array containing entity_id and
-   * entity_table name
+   * @param array $entityElements
+   *   The array containing entity_id and.
+   *   entity_table name
    *
-   * @return array  the array of im details
-   * @access public
-   * @static
+   * @return array
+   *   the array of im details
    */
-  static function allEntityIMs(&$entityElements) {
+  public static function allEntityIMs(&$entityElements) {
     if (empty($entityElements)) {
       return NULL;
     }
-
-
     $entityId = $entityElements['entity_id'];
     $entityTable = $entityElements['entity_table'];
-
-
     $sql = "SELECT cim.name as im, ltype.name as locationType, cim.is_primary as is_primary, cim.id as im_id, cim.location_type_id as locationTypeId
 FROM civicrm_loc_block loc, civicrm_im cim, civicrm_location_type ltype, {$entityTable} ev
 WHERE ev.id = %1
@@ -168,10 +164,14 @@ ORDER BY cim.is_primary DESC, im_id ASC ";
   }
 
   /**
-   * Call common delete function
+   * Call common delete function.
+   *
+   * @param int $id
+   *
+   * @return bool
    */
-  static function del($id) {
+  public static function del($id) {
     return CRM_Contact_BAO_Contact::deleteObjectWithPrimary('IM', $id);
   }
-}
 
+}

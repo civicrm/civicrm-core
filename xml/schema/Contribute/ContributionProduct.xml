@@ -8,6 +8,7 @@
   <log>true</log>
   <field>
     <name>id</name>
+    <title>Contribution Product ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <add>1.4</add>
@@ -18,12 +19,14 @@
   </primaryKey>
   <field>
     <name>product_id</name>
+    <title>Product ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <add>1.4</add>
   </field>
   <field>
     <name>contribution_id</name>
+    <title>Contribution ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <add>1.4</add>
@@ -67,6 +70,7 @@
   <field>
     <name>fulfilled_date</name>
     <type>date</type>
+    <title>Fulfilled Date</title>
     <export>true</export>
     <comment>Optional. Can be used to record the date this product was fulfilled or shipped.</comment>
     <add>1.4</add>
@@ -74,6 +78,7 @@
   <field>
     <name>start_date</name>
     <uniqueName>contribution_start_date</uniqueName>
+    <title>Start date for premium</title>
     <type>date</type>
     <export>true</export>
     <comment>Actual start date for a time-delimited premium (subscription, service or membership)</comment>
@@ -83,12 +88,14 @@
     <name>end_date</name>
     <uniqueName>contribution_end_date</uniqueName>
     <type>date</type>
+    <title>End date for premium</title>
     <export>true</export>
     <comment>Actual end date for a time-delimited premium (subscription, service or membership)</comment>
     <add>1.4</add>
   </field>
   <field>
     <name>comment</name>
+    <title>Premium comment</title>
     <type>text</type>
     <add>1.4</add>
   </field>
@@ -97,6 +104,11 @@
     <title>Financial Type</title>
     <type>int unsigned</type>
     <default>NULL</default>
+    <pseudoconstant>
+      <table>civicrm_financial_type</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+    </pseudoconstant>
     <comment>FK to Financial Type(for membership price sets only).</comment>
     <add>4.3</add>
   </field>

@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -44,6 +44,15 @@
         <td class="label">{$form.dedupe_email.label}</td>
         <td>{$form.dedupe_email.html} {help id="dedupe-email"}</td>
     </tr>
+    <tr class="crm-mailing-group-form-block-locationTypeId">
+        <td class="label">{$form.location_type_id.label}</td>
+        <td>{$form.location_type_id.html}</td>
+    </tr>
+    <tr class="crm-mailing-group-form-block-locationSelectionMethod">
+        <td class="label">{$form.email_selection_method.label}</td>
+        <td>{$form.email_selection_method.html} {help id="email-selection"}</td>
+    </tr>
+
   </table>
 
 {if ($groupCount > 0|| $mailingCount > 0)}
@@ -76,16 +85,5 @@
 {/if}
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl"}</div>
 </div>
-
-{literal}
-<script type="text/javascript">
-cj(function() {
-   cj().crmAccordions();
-});
-</script>
-{/literal}
-
-{* include jscript to warn if unsaved form field changes *}
-{include file="CRM/common/formNavigate.tpl"}
 </div>
 

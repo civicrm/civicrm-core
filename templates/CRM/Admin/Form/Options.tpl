@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 *}
 {* this template is used for adding/editing options *}
-<h3>{if $action eq 1}{ts 1=$gLabel}New %1 Option{/ts}{elseif $action eq 8}{ts 1=$gLabel}Delete %1 Option{/ts}{else}{ts 1=$gLabel}Edit %1 Option{/ts}{/if}</h3>
 <div class="crm-block crm-form-block crm-admin-options-form-block">
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
   {if $action eq 8}
@@ -69,12 +68,18 @@
              </tr>
      {/if}
         {/if}
-      {if $gName eq 'case_status'}
-            <tr class="crm-admin-options-form-block-grouping">
-              <td class="label">{$form.grouping.label}</td>
-                <td>{$form.grouping.html}</td>
-            </tr>
+
+      {if $form.value.html && $gName neq 'redaction_rule'}
+        <tr class="crm-admin-options-form-block-value">
+          <td class="label">{$form.value.label}</td>
+          <td>{$form.value.html}<br />
+            {if $action == 2}
+              <span class="description"><i class="crm-i fa-exclamation-triangle"></i> {ts}Changing the Value field will unlink records which have been marked with this option. This change can not be undone except by restoring the previous value.{/ts}</span>
+            {/if}
+          </td>
+        </tr>
       {/if}
+
         {if $gName eq 'custom_search'}
            <tr class="crm-admin-options-form-block-search_title">
              <td class="label">{ts}Search Title{/ts}</td>
@@ -83,21 +88,14 @@
              </td>
            </tr>
         {else}
-           {if $gName eq 'redaction_rule'}
-              <tr class="crm-admin-options-form-block-replacement">
-                 <td class="label">{ts}Replacement (prefix){/ts}</td>
-                 <td>{$form.value.html}<br />
-                   <span class="description">{ts}Matched values are replaced with this prefix plus a unique code. EX: If replacement prefix for &quot;Vancouver&quot; is <em>city_</em>, occurrences will be replaced with <em>city_39121</em>.{/ts}</span>
-                 </td>
-              </tr>
-            {elseif $form.value.html}
-              <tr class="crm-admin-options-form-block-value">
-                <td class="label">{$form.value.label}</td>
-                <td>{$form.value.html}<br />
-                    <span class="description">{ts}The option value is stored in your database.{/ts}</span>
-                </td>
-              </tr>
-            {/if}
+          {if $gName eq 'redaction_rule'}
+            <tr class="crm-admin-options-form-block-replacement">
+               <td class="label">{ts}Replacement (prefix){/ts}</td>
+               <td>{$form.value.html}<br />
+                 <span class="description">{ts}Matched values are replaced with this prefix plus a unique code. EX: If replacement prefix for &quot;Vancouver&quot; is <em>city_</em>, occurrences will be replaced with <em>city_39121</em>.{/ts}</span>
+               </td>
+            </tr>
+          {/if}
             {if $form.name.html} {* Get the name value also *}
               <tr class="crm-admin-options-form-block-name">
                 <td class="label">{$form.name.label}</td>
@@ -127,10 +125,28 @@
                 <td>{$form.visibility_id.html}</td>
               </tr>
         {/if}
+        {if $form.grouping.html}
+          <tr class="crm-admin-options-form-block-grouping">
+            <td class="label">{$form.grouping.label}</td>
+            <td>{$form.grouping.html}</td>
+          </tr>
+        {/if}
               <tr class="crm-admin-options-form-block-weight">
                 <td class="label">{$form.weight.label}</td>
                 <td>{$form.weight.html}</td>
               </tr>
+        {if $form.icon.html}
+          <tr class="crm-admin-options-form-block-icon">
+            <td class="label">{$form.icon.label}</td>
+            <td>{$form.icon.html}</td>
+          </tr>
+        {/if}
+        {if $form.color.html}
+          <tr class="crm-admin-options-form-block-color">
+            <td class="label">{$form.color.label}</td>
+            <td>{$form.color.html}</td>
+          </tr>
+        {/if}
         {if $form.component_id.html} {* Component ID is exposed for activity types if CiviCase is enabled. *}
               <tr class="crm-admin-options-form-block-component_id">
                 <td class="label">{$form.component_id.label}</td>

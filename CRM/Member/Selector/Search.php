@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,21 +23,18 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
  * This class is used to retrieve and display a range of
  * contacts that match the given criteria (specifically for
  * results of advanced search options.
- *
  */
 class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_Core_Selector_API {
 
@@ -45,22 +42,19 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
    * This defines two actions- View and Edit.
    *
    * @var array
-   * @static
    */
   static $_links = NULL;
 
   /**
-   * we use desc to remind us what that column is, name is used in the tpl
+   * We use desc to remind us what that column is, name is used in the tpl
    *
    * @var array
-   * @static
    */
   static $_columnHeaders;
 
   /**
    * Properties of contact we're interested in displaying
    * @var array
-   * @static
    */
   static $_properties = array(
     'contact_id',
@@ -80,83 +74,85 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
   );
 
   /**
-   * are we restricting ourselves to a single contact
+   * Are we restricting ourselves to a single contact
    *
-   * @access protected
    * @var boolean
    */
   protected $_single = FALSE;
 
   /**
-   * are we restricting ourselves to a single contact
+   * Are we restricting ourselves to a single contact
    *
-   * @access protected
    * @var boolean
    */
   protected $_limit = NULL;
 
   /**
-   * what context are we being invoked from
+   * What context are we being invoked from
    *
-   * @access protected
    * @var string
    */
   protected $_context = NULL;
 
   /**
-   * queryParams is the array returned by exportValues called on
+   * QueryParams is the array returned by exportValues called on
    * the HTML_QuickForm_Controller for that page.
    *
    * @var array
-   * @access protected
    */
   public $_queryParams;
 
   /**
-   * represent the type of selector
+   * Represent the type of selector.
    *
    * @var int
-   * @access protected
    */
   protected $_action;
 
   /**
-   * The additional clause that we restrict the search with
+   * The additional clause that we restrict the search with.
    *
    * @var string
    */
   protected $_memberClause = NULL;
 
   /**
-   * The query object
+   * The query object.
    *
    * @var string
    */
   protected $_query;
 
   /**
-   * Class constructor
+   * Class constructor.
    *
-   * @param array   $queryParams array of parameters for query
-   * @param int     $action - action of search basic or advanced.
-   * @param string  $memberClause if the caller wants to further restrict the search (used in memberships)
-   * @param boolean $single are we dealing only with one contact?
-   * @param int     $limit  how many memberships do we want returned
+   * @param array $queryParams
+   *   Array of parameters for query.
+   * @param \const|int $action - action of search basic or advanced.
+   * @param string $memberClause
+   *   If the caller wants to further restrict the search (used in memberships).
+   * @param bool $single
+   *   Are we dealing only with one contact?.
+   * @param int $limit
+   *   How many memberships do we want returned.
    *
-   * @return CRM_Contact_Selector
-   * @access public
-   */ function __construct(&$queryParams,
-    $action       = CRM_Core_Action::NONE,
+   * @param string $context
+   *
+   * @return \CRM_Member_Selector_Search
+   */
+  public function __construct(
+    &$queryParams,
+    $action = CRM_Core_Action::NONE,
     $memberClause = NULL,
-    $single       = FALSE,
-    $limit        = NULL,
-    $context      = 'search'
+    $single = FALSE,
+    $limit = NULL,
+    $context = 'search'
   ) {
     // submitted form values
     $this->_queryParams = &$queryParams;
 
-    $this->_single  = $single;
-    $this->_limit   = $limit;
+    $this->_single = $single;
+    $this->_limit = $limit;
     $this->_context = $context;
 
     $this->_memberClause = $memberClause;
@@ -174,26 +170,31 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
     $this->_query->_distinctComponentClause = " civicrm_membership.id";
     $this->_query->_groupByComponentClause = " GROUP BY civicrm_membership.id ";
   }
-  //end of constructor
 
   /**
    * This method returns the links that are given for each search row.
-   * currently the links added for each row are
+   *
+   * Currently the links added for each row are
    *
    * - View
    * - Edit
    *
-   * @return array
-   * @access public
+   * @param string $status
+   * @param bool $isPaymentProcessor
+   * @param null $accessContribution
+   * @param null $qfKey
+   * @param null $context
+   * @param bool $isCancelSupported
    *
+   * @return array
    */
-  static
-  function &links($status = 'all',
+  public static function &links(
+    $status = 'all',
     $isPaymentProcessor = NULL,
     $accessContribution = NULL,
-    $qfKey              = NULL,
-    $context            = NULL,
-    $isCancelSupported  = FALSE
+    $qfKey = NULL,
+    $context = NULL,
+    $isCancelSupported = FALSE
   ) {
     $extraParams = NULL;
     if ($context == 'search') {
@@ -263,15 +264,14 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
 
     return self::$_links[$status];
   }
-  //end of function
 
   /**
-   * getter for array of the parameters required for creating pager.
+   * Getter for array of the parameters required for creating pager.
    *
-   * @param
-   * @access public
+   * @param int $action
+   * @param array $params
    */
-  function getPagerParams($action, &$params) {
+  public function getPagerParams($action, &$params) {
     $params['status'] = ts('Member') . ' %%StatusMessage%%';
     $params['csvString'] = NULL;
     if ($this->_limit) {
@@ -284,17 +284,16 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
     $params['buttonTop'] = 'PagerTopButton';
     $params['buttonBottom'] = 'PagerBottomButton';
   }
-  //end of function
 
   /**
    * Returns total number of rows for the query.
    *
-   * @param
+   * @param int $action
    *
-   * @return int Total number of rows
-   * @access public
+   * @return int
+   *   Total number of rows
    */
-  function getTotalCount($action) {
+  public function getTotalCount($action) {
     return $this->_query->searchQuery(0, 0, NULL,
       TRUE, FALSE,
       FALSE, FALSE,
@@ -304,17 +303,23 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
   }
 
   /**
-   * returns all the rows in the given offset and rowCount
+   * Returns all the rows in the given offset and rowCount.
    *
-   * @param enum   $action   the action being performed
-   * @param int    $offset   the row number to start from
-   * @param int    $rowCount the number of rows to return
-   * @param string $sort     the sql string that describes the sort order
-   * @param enum   $output   what should the result set include (web/email/csv)
+   * @param string $action
+   *   The action being performed.
+   * @param int $offset
+   *   The row number to start from.
+   * @param int $rowCount
+   *   The number of rows to return.
+   * @param string $sort
+   *   The sql string that describes the sort order.
+   * @param string $output
+   *   What should the result set include (web/email/csv).
    *
-   * @return int   the total number of rows for this action
+   * @return int
+   *   the total number of rows for this action
    */
-  function &getRows($action, $offset, $rowCount, $sort, $output = NULL) {
+  public function &getRows($action, $offset, $rowCount, $sort, $output = NULL) {
     // check if we can process credit card registration
     $processors = CRM_Core_PseudoConstant::paymentProcessor(FALSE, FALSE,
       "billing_mode IN ( 1, 3 )"
@@ -385,20 +390,35 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
         }
 
         $isCancelSupported = CRM_Member_BAO_Membership::isCancelSubscriptionSupported($row['membership_id']);
-        $row['action'] = CRM_Core_Action::formLink(self::links('all',
-            $this->_isPaymentProcessor,
-            $this->_accessContribution,
-            $this->_key,
-            $this->_context,
-            $isCancelSupported
-          ),
+        $links = self::links('all',
+          $this->_isPaymentProcessor,
+          $this->_accessContribution,
+          $this->_key,
+          $this->_context,
+          $isCancelSupported
+        );
+
+        // check permissions
+        $finTypeId = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $result->membership_type_id, 'financial_type_id');
+        $finType = CRM_Contribute_PseudoConstant::financialType($finTypeId);
+        if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()
+          && !CRM_Core_Permission::check('edit contributions of type ' . $finType)
+        ) {
+          unset($links[CRM_Core_Action::UPDATE]);
+        }
+        if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus() &&
+          !CRM_Core_Permission::check('delete contributions of type ' . $finType)
+        ) {
+          unset($links[CRM_Core_Action::DELETE]);
+        }
+        $row['action'] = CRM_Core_Action::formLink($links,
           $currentMask,
           array(
             'id' => $result->membership_id,
             'cid' => $result->contact_id,
             'cxt' => $this->_context,
           ),
-          ts('more'),
+          ts('Renew') . '...',
           FALSE,
           'membership.selector.row',
           'Membership',
@@ -406,7 +426,8 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
         );
       }
       else {
-        $row['action'] = CRM_Core_Action::formLink(self::links('view'), $mask,
+        $links = self::links('view');
+        $row['action'] = CRM_Core_Action::formLink($links, $mask,
           array(
             'id' => $result->membership_id,
             'cid' => $result->contact_id,
@@ -423,14 +444,13 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
       //does membership have auto renew CRM-7137.
       $autoRenew = FALSE;
       if (isset($result->membership_recur_id) && $result->membership_recur_id &&
-          !CRM_Member_BAO_Membership::isSubscriptionCancelled($row['membership_id'])
+        !CRM_Member_BAO_Membership::isSubscriptionCancelled($row['membership_id'])
       ) {
         $autoRenew = TRUE;
       }
       $row['auto_renew'] = $autoRenew;
 
-      $row['contact_type'] = CRM_Contact_BAO_Contact_Utils::getImage($result->contact_sub_type ?
-        $result->contact_sub_type : $result->contact_type, FALSE, $result->contact_id
+      $row['contact_type'] = CRM_Contact_BAO_Contact_Utils::getImage($result->contact_sub_type ? $result->contact_sub_type : $result->contact_type, FALSE, $result->contact_id
       );
 
       $rows[] = $row;
@@ -440,36 +460,35 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
   }
 
   /**
-   *
-   * @return array              $qill         which contains an array of strings
-   * @access public
+   * @inheritDoc
    */
-
-  // the current internationalisation is bad, but should more or less work
-  // for most of "European" languages
   public function getQILL() {
     return $this->_query->qill();
   }
 
   /**
-   * returns the column headers as an array of tuples:
+   * Returns the column headers as an array of tuples.
+   *
    * (name, sortName (key to the sort array))
    *
-   * @param string $action the action being performed
-   * @param enum   $output what should the result set include (web/email/csv)
+   * @param string $action
+   *   The action being performed.
+   * @param string $output
+   *   What should the result set include (web/email/csv).
    *
-   * @return array the column headers that need to be displayed
-   * @access public
+   * @return array
+   *   the column headers that need to be displayed
    */
   public function &getColumnHeaders($action = NULL, $output = NULL) {
     if (!isset(self::$_columnHeaders)) {
       self::$_columnHeaders = array(
         array(
           'name' => ts('Type'),
-          'sort' => 'membership_type_id',
+          'sort' => 'membership_type',
           'direction' => CRM_Utils_Sort::DONTCARE,
         ),
-        array('name' => ts('Member Since'),
+        array(
+          'name' => ts('Member Since'),
           'sort' => 'join_date',
           'direction' => CRM_Utils_Sort::DESCENDING,
         ),
@@ -490,7 +509,7 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
         ),
         array(
           'name' => ts('Status'),
-          'sort' => 'status_id',
+          'sort' => 'membership_status',
           'direction' => CRM_Utils_Sort::DONTCARE,
         ),
         array(
@@ -514,24 +533,35 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
     return self::$_columnHeaders;
   }
 
-  function alphabetQuery() {
+  /**
+   * Alphabet query.
+   *
+   * @return mixed
+   */
+  public function alphabetQuery() {
     return $this->_query->searchQuery(NULL, NULL, NULL, FALSE, FALSE, TRUE);
   }
 
-  function &getQuery() {
+  /**
+   * Get query.
+   *
+   * @return string
+   */
+  public function &getQuery() {
     return $this->_query;
   }
 
   /**
-   * name of export file.
+   * Name of export file.
    *
-   * @param string $output type of output
+   * @param string $output
+   *   Type of output.
    *
-   * @return string name of the file
+   * @return string
+   *   name of the file
    */
-  function getExportFileName($output = 'csv') {
+  public function getExportFileName($output = 'csv') {
     return ts('CiviCRM Member Search');
   }
-}
-//end of class
 
+}

@@ -25,7 +25,7 @@
     {if $formValues.receipt_text}
      <p>{$formValues.receipt_text|htmlize}</p>
     {else}
-     <p>{ts}Thanks for your support.{/ts}</p>
+     <p>{ts}Thank you for your support.{/ts}</p>
     {/if}
 
     <p>{ts}Please print this receipt for your records.{/ts}</p>
@@ -58,6 +58,11 @@
            <th>{ts}Item{/ts}</th>
            <th>{ts}Qty{/ts}</th>
            <th>{ts}Each{/ts}</th>
+           {if $getTaxDetails}
+             <th>{ts}Subtotal{/ts}</th>
+             <th>{ts}Tax Rate{/ts}</th>
+             <th>{ts}Tax Amount{/ts}</th>
+           {/if}
            <th>{ts}Total{/ts}</th>
           </tr>
           {foreach from=$value item=line}
@@ -71,8 +76,24 @@
             <td>
              {$line.unit_price|crmMoney:$currency}
             </td>
+            {if $getTaxDetails}
+              <td>
+                {$line.unit_price*$line.qty|crmMoney:$currency}
+              </td>
+              {if $line.tax_rate != "" || $line.tax_amount != ""}
+                <td>
+                  {$line.tax_rate|string_format:"%.2f"}%
+                </td>
+                <td>
+                  {$line.tax_amount|crmMoney:$currency}
+                </td>
+              {else}
+                <td></td>
+                <td></td>
+              {/if}
+            {/if}
             <td>
-             {$line.line_total|crmMoney:$currency}
+             {$line.line_total+$line.tax_amount|crmMoney:$currency}
             </td>
            </tr>
           {/foreach}
@@ -80,6 +101,39 @@
         </td>
        </tr>
       {/foreach}
+     {/if}
+     {if $getTaxDetails && $dataArray}
+       <tr>
+         <td {$labelStyle}>
+           {ts} Amount before Tax : {/ts}
+         </td>
+         <td {$valueStyle}>
+           {$formValues.total_amount-$totalTaxAmount|crmMoney:$currency}
+         </td>
+       </tr>
+
+      {foreach from=$dataArray item=value key=priceset}
+        <tr>
+        {if $priceset ||  $priceset == 0 || $value != ''}
+          <td>&nbsp;{$taxTerm} {$priceset|string_format:"%.2f"}%</td>
+          <td>&nbsp;{$value|crmMoney:$currency}</td>
+        {else}
+          <td>&nbsp;{ts}No{/ts} {$taxTerm}</td>
+          <td>&nbsp;{$value|crmMoney:$currency}</td>
+        {/if}
+        </tr>
+      {/foreach}
+     {/if}
+
+     {if isset($totalTaxAmount) && $totalTaxAmount !== 'null'}
+      <tr>
+        <td {$labelStyle}>
+          {ts}Total Tax Amount{/ts}
+        </td>
+        <td {$valueStyle}>
+          {$totalTaxAmount|crmMoney:$currency}
+        </td>
+      </tr>
      {/if}
 
      <tr>
@@ -94,7 +148,7 @@
      {if $receive_date}
       <tr>
        <td {$labelStyle}>
-        {ts}Received Date{/ts}
+        {ts}Date Received{/ts}
        </td>
        <td {$valueStyle}>
         {$receive_date|truncate:10:''|crmDate}

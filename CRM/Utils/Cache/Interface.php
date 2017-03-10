@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,46 +23,67 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
+ * @copyright CiviCRM LLC (c) 2004-2017
  *
+ * CRM_Utils_Cache_Interface
+ *
+ * PHP-FIG has been developing a draft standard for caching,
+ * PSR-6. The standard has not been ratified yet. When
+ * making changes to this interface, please take care to
+ * avoid *conflicst* with PSR-6's CacheItemPoolInterface. At
+ * time of writing, they do not conflict. Avoiding conflicts
+ * will enable more transition paths where Civi
+ * simultaneously supports both interfaces in the same
+ * implementation.
+ *
+ * For example, the current interface defines:
+ *
+ *   function get($key) => mixed $value
+ *
+ * and PSR-6 defines:
+ *
+ *   function getItem($key) => ItemInterface $item
+ *
+ * These are different styles (e.g. "weak item" vs "strong item"),
+ * but the two methods do not *conflict*. They can coexist,
+ * and you can trivially write adapters between the two.
+ *
+ * @see https://github.com/php-fig/fig-standards/blob/master/proposed/cache.md
  */
 interface CRM_Utils_Cache_Interface {
 
   /**
-   * Set the value in the cache
+   * Set the value in the cache.
    *
    * @param string $key
    * @param mixed $value
-   * @return void
    */
-  function set($key, &$value);
+  public function set($key, &$value);
 
   /**
-   * Get a value from the cache
+   * Get a value from the cache.
    *
    * @param string $key
-   * @return mixed NULL if $key has not been previously set
+   * @return mixed
+   *   NULL if $key has not been previously set
    */
-  function get($key);
+  public function get($key);
 
   /**
-   * Delete a value from the cache
+   * Delete a value from the cache.
    *
    * @param string $key
-   * @return void
    */
-  function delete($key);
+  public function delete($key);
 
   /**
-   * Delete all values from the cache
-   *
-   * @return void
+   * Delete all values from the cache.
    */
-  function flush();
+  public function flush();
+
 }

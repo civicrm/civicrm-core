@@ -1,14 +1,21 @@
 <?php
+
+/**
+ * Class CRM_Event_Cart_Page_CheckoutAJAX
+ */
 class CRM_Event_Cart_Page_CheckoutAJAX {
-  function add_participant_to_cart() {
-    require 'CRM/Core/Transaction.php';
+  public function add_participant_to_cart() {
     $transaction = new CRM_Core_Transaction();
-    $cart_id     = $_GET['cart_id'];
-    $event_id    = $_GET['event_id'];
+    $cart_id = CRM_Utils_Request::retrieve('cart_id', 'Integer');
+    $event_id = CRM_Utils_Request::retrieve('event_id', 'Integer');
 
-    $cart = CRM_Event_Cart_BAO_Cart::find_by_id($_GET['cart_id']);
+    $cart = CRM_Event_Cart_BAO_Cart::find_by_id($cart_id);
 
-	  $params_array = array('cart_id' => $cart->id, 'contact_id' => CRM_Event_Cart_Form_Cart::find_or_create_contact(), 'event_id' => $event_id);
+    $params_array = array(
+      'cart_id' => $cart->id,
+      'contact_id' => CRM_Event_Cart_Form_Cart::find_or_create_contact(),
+      'event_id' => $event_id,
+    );
 
     //XXX security?
     $participant = CRM_Event_Cart_BAO_MerParticipant::create($params_array);
@@ -28,9 +35,8 @@ class CRM_Event_Cart_Page_CheckoutAJAX {
     $requiredTemplate = file_get_contents($templateDir . '/CRM/Form/label.tpl');
     $renderer->setRequiredTemplate($requiredTemplate);
 
-    $form->accept($renderer);
     $template = CRM_Core_Smarty::singleton();
-    $template->assign('form', $renderer->toArray());
+    $template->assign('form', $form->toSmarty());
     $template->assign('participant', $participant);
     $output = $template->fetch("CRM/Event/Cart/Form/Checkout/Participant.tpl");
     $transaction->commit();
@@ -38,11 +44,12 @@ class CRM_Event_Cart_Page_CheckoutAJAX {
     CRM_Utils_System::civiExit();
   }
 
-  function remove_participant_from_cart() {
-    $participant = CRM_Event_Cart_BAO_MerParticipant::get_by_id($_GET['id']);
+  public function remove_participant_from_cart() {
+    $id = CRM_Utils_Request::retrieve('id', 'Integer');
+    $participant = CRM_Event_Cart_BAO_MerParticipant::get_by_id($id);
     $participant->delete();
 
     CRM_Utils_System::civiExit();
   }
-}
 
+}

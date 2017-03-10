@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -47,34 +47,31 @@
 
 {literal}
 <script type="text/javascript">
-   cj( function( ) {
+   CRM.$(function($) {
      buildChart( );
 
-     cj("input[id$='submit_print'],input[id$='submit_pdf']").bind('click', function(e){
+     $("input[id$='submit_print'],input[id$='submit_pdf']").bind('click', function(e){
        // image creator php file path and append image name
        var url = CRM.url('civicrm/report/chart', 'name=' + '{/literal}{$chartId}{literal}' + '.png');
 
        //fetch object and 'POST' image
        swfobject.getObjectById("open_flash_chart_{/literal}{$uniqueId}{literal}").post_image(url, true, false);
      });
+
+     function buildChart( ) {
+       var chartData = {/literal}{$openFlashChartData}{literal};
+       $.each( chartData, function( chartID, chartValues ) {
+         var divName = {/literal}"open_flash_chart_{$uniqueId}"{literal};
+         var loadDataFunction  = {/literal}"loadData{$uniqueId}"{literal};
+
+         createSWFObject( chartID, divName, chartValues.size.xSize, chartValues.size.ySize, loadDataFunction );
+       });
+     }
    });
-
-  function buildChart( ) {
-     var chartData = {/literal}{$openFlashChartData}{literal};
-     cj.each( chartData, function( chartID, chartValues ) {
-       var xSize   = eval( "chartValues.size.xSize" );
-       var ySize   = eval( "chartValues.size.ySize" );
-       var divName = {/literal}"open_flash_chart_{$uniqueId}"{literal};
-
-       var loadDataFunction  = {/literal}"loadData{$uniqueId}"{literal};
-       createSWFObject( chartID, divName, xSize, ySize, loadDataFunction );
-     });
-  }
 
   function loadData{/literal}{$uniqueId}{literal}( chartID ) {
       var allData = {/literal}{$openFlashChartData}{literal};
-      var data    = eval( "allData." + chartID + ".object" );
-      return JSON.stringify( data );
+      return JSON.stringify(allData[chartID].object);
   }
 </script>
 {/literal}

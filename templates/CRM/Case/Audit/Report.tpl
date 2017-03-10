@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -124,6 +124,20 @@
         </tr>
       {/foreach}
     </table>
+{/if}
+
+{if $caseCustomFields}
+  {foreach from=$caseCustomFields item=group}
+    <h2>{$group.title}</h2>
+      <table class ="report-layout">
+        {foreach from=$group.values item=row}
+          <tr>
+            <th class="label">{$row.label}</td>
+            <td class="crm-case-report-custom-field">{$row.value}</td>
+          </tr>
+        {/foreach}
+    </table>
+  {/foreach}
 {/if}
 
 <h2>{ts}Case Activities{/ts}</h2>

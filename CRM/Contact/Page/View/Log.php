@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,32 +23,29 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Contact_Page_View_Log extends CRM_Core_Page {
 
   /**
-   * This function is called when action is browse
+   * Called when action is browse.
    *
-   * return null
-   * @access public
+   * @return null
    */
-  function browse() {
+  public function browse() {
     $loggingReport = CRM_Core_BAO_Log::useLoggingReport();
     $this->assign('useLogging', $loggingReport);
 
     if ($loggingReport) {
       $this->assign('instanceUrl',
-                    CRM_Utils_System::url("civicrm/report/instance/{$loggingReport}",
-                                          "reset=1&force=1&snippet=4&section=2&altered_contact_id_op=eq&altered_contact_id_value={$this->_contactId}&cid={$this->_contactId}", FALSE, NULL, FALSE));
-      return;
+        CRM_Utils_System::url("civicrm/report/instance/{$loggingReport}",
+          "reset=1&force=1&snippet=4&section=2&altered_contact_id_op=eq&altered_contact_id_value={$this->_contactId}&cid={$this->_contactId}", FALSE, NULL, FALSE));
+      return NULL;
     }
 
     $log = new CRM_Core_DAO_Log();
@@ -70,10 +67,12 @@ class CRM_Contact_Page_View_Log extends CRM_Core_Page {
     }
 
     $this->assign('logCount', count($logEntries));
+    $this->ajaxResponse['tabCount'] = count($logEntries);
+    $this->ajaxResponse += CRM_Contact_Form_Inline::renderFooter($this->_contactId, FALSE);
     $this->assign_by_ref('log', $logEntries);
   }
 
-  function preProcess() {
+  public function preProcess() {
     $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
     $this->assign('contactId', $this->_contactId);
 
@@ -88,17 +87,16 @@ class CRM_Contact_Page_View_Log extends CRM_Core_Page {
   }
 
   /**
-   * This function is the main function that is called when the page loads, it decides the which action has to be taken for the page.
+   * the main function that is called when the page loads, it decides the which action has to be taken for the page.
    *
-   * return null
-   * @access public
+   * @return null
    */
-  function run() {
+  public function run() {
     $this->preProcess();
 
     $this->browse();
 
     return parent::run();
   }
-}
 
+}

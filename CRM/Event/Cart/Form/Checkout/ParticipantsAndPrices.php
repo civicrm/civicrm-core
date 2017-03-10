@@ -1,9 +1,16 @@
 <?php
+
+/**
+ * Class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices
+ */
 class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_Form_Cart {
   public $price_fields_for_event;
   public $_values = NULL;
 
-  function preProcess() {
+  /**
+   * Pre process function.
+   */
+  public function preProcess() {
     parent::preProcess();
 
     $this->cid = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
@@ -13,7 +20,10 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
     }
   }
 
-  function buildQuickForm() {
+  /**
+   * Build quick form.
+   */
+  public function buildQuickForm() {
     $this->price_fields_for_event = array();
     foreach ($this->cart->get_main_event_participants() as $participant) {
       $form = new CRM_Event_Cart_Form_MerParticipant($participant);
@@ -22,15 +32,15 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
     foreach ($this->cart->get_main_events_in_carts() as $event_in_cart) {
       $this->price_fields_for_event[$event_in_cart->event_id] = $this->build_price_options($event_in_cart->event);
     }
-    // XXX
-    $this->addElement('text', 'discountcode', ts('If you have a discount code, enter it here'));
+    //If events in cart have discounts the textbox for discount code will be displayed at the top, as long as this
+    //form name is added to cividiscount
     $this->assign('events_in_carts', $this->cart->get_main_events_in_carts());
     $this->assign('price_fields_for_event', $this->price_fields_for_event);
     $this->addButtons(
       array(
         array(
           'type' => 'upload',
-          'name' => ts('Continue >>'),
+          'name' => ts('Continue'),
           'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
           'isDefault' => TRUE,
         ),
@@ -38,15 +48,22 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
     );
 
     if ($this->cid) {
-      $params         = array('id' => $this->cid);
-      $contact        = CRM_Contact_BAO_Contact::retrieve($params, $defaults);
+      $params = array('id' => $this->cid);
+      $contact = CRM_Contact_BAO_Contact::retrieve($params, $defaults);
       $contact_values = array();
       CRM_Core_DAO::storeValues($contact, $contact_values);
       $this->assign('contact', $contact_values);
     }
   }
 
-  static function primary_email_from_contact($contact) {
+  /**
+   * Get the primary emil for the contact.
+   *
+   * @param CRM_Contact_BAO_Contact $contact
+   *
+   * @return string
+   */
+  public static function primary_email_from_contact($contact) {
     foreach ($contact->email as $email) {
       if ($email['is_primary']) {
         return $email['email'];
@@ -56,25 +73,45 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
     return NULL;
   }
 
-  function build_price_options($event) {
+  /**
+   * Build price options.
+   *
+   * @param CRM_Event_BAO_Event $event
+   *
+   * @return array
+   */
+  public function build_price_options($event) {
     $price_fields_for_event = array();
     $base_field_name = "event_{$event->id}_amount";
     $price_set_id = CRM_Price_BAO_PriceSet::getFor('civicrm_event', $event->id);
+    //CRM-14492 display admin fields only if user is admin
+    $adminFieldVisible = FALSE;
+    if (CRM_Core_Permission::check('administer CiviCRM')) {
+      $adminFieldVisible = TRUE;
+    }
     if ($price_set_id) {
       $price_sets = CRM_Price_BAO_PriceSet::getSetDetail($price_set_id, TRUE, TRUE);
-      $price_set  = $price_sets[$price_set_id];
-      $index      = -1;
+      $price_set = $price_sets[$price_set_id];
+      $index = -1;
       foreach ($price_set['fields'] as $field) {
         $index++;
-        $field_name = "event_{$event->id}_price_{$field['id']}";
-        CRM_Price_BAO_PriceField::addQuickFormElement($this, $field_name, $field['id'], FALSE);
-        $price_fields_for_event[] = $field_name;
+        if (CRM_Utils_Array::value('visibility', $field) == 'public' ||
+           (CRM_Utils_Array::value('visibility', $field) == 'admin' && $adminFieldVisible == TRUE)) {
+          $field_name = "event_{$event->id}_price_{$field['id']}";
+          CRM_Price_BAO_PriceField::addQuickFormElement($this, $field_name, $field['id'], FALSE);
+          $price_fields_for_event[] = $field_name;
+        }
       }
     }
     return $price_fields_for_event;
   }
 
-  function validate() {
+  /**
+   * Validate values.
+   *
+   * @return bool
+   */
+  public function validate() {
     parent::validate();
     if ($this->_errors) {
       return FALSE;
@@ -126,7 +163,11 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
           while ($participant->fetch()) {
             if (array_key_exists($participant->status_id, $statusTypes)) {
               $form = $mer_participant->get_form();
-              $this->_errors[$form->html_field_name('email')] = ts("The participant %1 is already registered for %2 (%3).", array(1 => $participant_fields['email'], 2 => $event_in_cart->event->title, 3 => $event_in_cart->event->start_date));
+              $this->_errors[$form->html_field_name('email')] = ts("The participant %1 is already registered for %2 (%3).", array(
+                  1 => $participant_fields['email'],
+                  2 => $event_in_cart->event->title,
+                  3 => $event_in_cart->event->start_date,
+                ));
             }
           }
         }
@@ -135,6 +176,11 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
     return empty($this->_errors);
   }
 
+  /**
+   * Set default values.
+   *
+   * @return array
+   */
   public function setDefaultValues() {
     $this->loadCart();
 
@@ -160,11 +206,40 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
         $participant->contact_id = self::find_or_create_contact($this->getContactID());
       }
       $defaults += $form->setDefaultValues();
+      //Set price defaults if any
+      foreach ($this->cart->get_main_events_in_carts() as $event_in_cart) {
+        $event_id = $event_in_cart->event_id;
+        $price_set_id = CRM_Event_BAO_Event::usesPriceSet($event_in_cart->event_id);
+        if ($price_set_id) {
+          $price_sets = CRM_Price_BAO_PriceSet::getSetDetail($price_set_id, TRUE, TRUE);
+          $price_set  = $price_sets[$price_set_id];
+          foreach ($price_set['fields'] as $field) {
+            $options = CRM_Utils_Array::value('options', $field);
+            if (!is_array($options)) {
+              continue;
+            }
+            $field_name = "event_{$event_id}_price_{$field['id']}";
+            foreach ($options as $value) {
+              if ($value['is_default']) {
+                if ($field['html_type'] == 'Checkbox') {
+                  $defaults[$field_name] = 1;
+                }
+                else {
+                  $defaults[$field_name] = $value['id'];
+                }
+              }
+            }
+          }
+        }
+      }
     }
     return $defaults;
   }
 
-  function postProcess() {
+  /**
+   * Post process function.
+   */
+  public function postProcess() {
     if (!array_key_exists('event', $this->_submitValues)) {
       return;
     }
@@ -182,8 +257,8 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
 
         $participant = $this->cart->get_event_in_cart_by_event_id($event_id)->get_participant_by_id($participant_id);
         if ($participant->contact_id && $contact_id != $participant->contact_id) {
-          $defaults          = array();
-          $params            = array('id' => $participant->contact_id);
+          $defaults = array();
+          $params = array('id' => $participant->contact_id);
           $temporary_contact = CRM_Contact_BAO_Contact::retrieve($params, $defaults);
 
           foreach ($this->cart->get_subparticipants($participant) as $subparticipant) {
@@ -195,9 +270,9 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
           $participant->save();
 
           if ($temporary_contact->is_deleted) {
-            #ARGH a permissions check prevents us from using skipUndelete,
-            #so we potentially leave records pointing to this contact for now
-            #CRM_Contact_BAO_Contact::deleteContact($temporary_contact->id);
+            // ARGH a permissions check prevents us from using skipUndelete,
+            // so we potentially leave records pointing to this contact for now
+            // CRM_Contact_BAO_Contact::deleteContact($temporary_contact->id);
             $temporary_contact->delete();
           }
         }
@@ -224,5 +299,5 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
     }
     $this->cart->save();
   }
-}
 
+}

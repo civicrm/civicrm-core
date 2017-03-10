@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,7 +24,7 @@
  +--------------------------------------------------------------------+
 *}
 <div class="crm-block crm-form-block crm-uf-form-block">
-<div id="help">
+<div class="help">
     {ts}These settings define the CMS variables that are used with CiviCRM.{/ts}
 </div>
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
@@ -41,6 +41,10 @@
             </td>
         </tr>
         {/if}
+        <tr class="crm-uf-form-block-syncCMSEmail">
+           <td class="label">{$form.syncCMSEmail.label}</td>
+           <td>{$form.syncCMSEmail.html}</td>
+       </tr>
         </table>
             <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 <div class="spacer"></div>

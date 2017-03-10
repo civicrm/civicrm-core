@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,23 +23,19 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
-
-
-require_once 'CiviTest/CiviUnitTestCase.php';
+ */
 
 /**
  * Test class for CRM_Event_BAO_ParticipantStatus BAO
  *
- *  @package   CiviCRM
+ * @package   CiviCRM
+ * @group headless
  */
 class CRM_Event_BAO_ParticipantStatusTest extends CiviUnitTestCase {
 
   /**
    * Sets up the fixture, for example, opens a network connection.
    * This method is called before a test is executed.
-   *
-   * @access protected
    */
   protected function setUp() {
     parent::setUp();
@@ -48,26 +44,14 @@ class CRM_Event_BAO_ParticipantStatusTest extends CiviUnitTestCase {
   /**
    * Tears down the fixture, for example, closes a network connection.
    * This method is called after a test is executed.
-   *
-   * @access protected
    */
-  protected function tearDown() {}
-
-  /**
-   *  test info
-   */
-  function get_info() {
-    return array(
-      'name' => 'ParticipantStatus BAOs',
-      'description' => 'Test all Event_BAO_ParticipantStatusType methods.',
-      'group' => 'CiviCRM BAO Tests',
-    );
+  protected function tearDown() {
   }
 
   /**
    *  create() and deleteParticipantStatusType() method
    */
-  function testCreateAndDelete() {
+  public function testCreateAndDelete() {
 
     // create using required params
     $params = array(
@@ -94,7 +78,7 @@ class CRM_Event_BAO_ParticipantStatusTest extends CiviUnitTestCase {
   /**
    *  add() method (add and edit modes of participant status type)
    */
-  function testAddStatusType() {
+  public function testAddStatusType() {
 
     $params = array(
       'name' => 'testStatus',
@@ -131,9 +115,9 @@ class CRM_Event_BAO_ParticipantStatusTest extends CiviUnitTestCase {
   }
 
   /**
-   * retrieve() method of participant status type
+   * Retrieve() method of participant status type
    */
-  function testRetrieveStatusType() {
+  public function testRetrieveStatusType() {
 
     $params = array(
       'name' => 'testStatus',
@@ -148,8 +132,8 @@ class CRM_Event_BAO_ParticipantStatusTest extends CiviUnitTestCase {
     $statusType = CRM_Event_BAO_ParticipantStatusType::create($params);
 
     // retrieve status type
-    $retrieveParams     = array('id' => $statusType->id);
-    $default            = array();
+    $retrieveParams = array('id' => $statusType->id);
+    $default = array();
     $retrieveStatusType = CRM_Event_BAO_ParticipantStatusType::retrieve($retrieveParams, $default);
 
     // check on retrieve values
@@ -159,9 +143,9 @@ class CRM_Event_BAO_ParticipantStatusTest extends CiviUnitTestCase {
   }
 
   /**
-   * setIsActive() method of participant status type
+   * SetIsActive() method of participant status type
    */
-  function testSetIsActiveStatusType() {
+  public function testSetIsActiveStatusType() {
 
     $params = array(
       'name' => 'testStatus',
@@ -184,5 +168,5 @@ class CRM_Event_BAO_ParticipantStatusTest extends CiviUnitTestCase {
       'id', $isActive, 'Check DB for is_Active value'
     );
   }
-}
 
+}

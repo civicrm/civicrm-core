@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,11 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -84,10 +83,14 @@ class CRM_Extension_Container_Basic implements CRM_Extension_Container_Interface
   public $relUrls = FALSE;
 
   /**
-   * @param string $baseDir local path to the container
-   * @param string $baseUrl public URL of the container
+   * @param string $baseDir
+   *   Local path to the container.
+   * @param string $baseUrl
+   *   Public URL of the container.
    * @param CRM_Utils_Cache_Interface $cache
-   * @param string $cacheKey unique name for this container
+   *   Cache in which to store extension metadata.
+   * @param string $cacheKey
+   *   Unique name for this container.
    */
   public function __construct($baseDir, $baseUrl, CRM_Utils_Cache_Interface $cache = NULL, $cacheKey = NULL) {
     $this->cache = $cache;
@@ -97,7 +100,9 @@ class CRM_Extension_Container_Basic implements CRM_Extension_Container_Interface
   }
 
   /**
-   * {@inheritdoc}
+   * @inheritDoc
+   *
+   * @return array
    */
   public function checkRequirements() {
     $errors = array();
@@ -119,24 +124,26 @@ class CRM_Extension_Container_Basic implements CRM_Extension_Container_Interface
   }
 
   /**
-   * {@inheritdoc}
+   * @inheritDoc
+   *
+   * @return array_keys
    */
   public function getKeys() {
     return array_keys($this->getRelPaths());
   }
 
   /**
-   * {@inheritdoc}
+   * @inheritDoc
    */
   public function getPath($key) {
     return $this->baseDir . $this->getRelPath($key);
   }
 
   /**
-   * {@inheritdoc}
+   * @inheritDoc
    */
   public function getResUrl($key) {
-    if (! $this->baseUrl) {
+    if (!$this->baseUrl) {
       CRM_Core_Session::setStatus(
         ts('Failed to determine URL for extension (%1). Please update <a href="%2">Resource URLs</a>.',
           array(
@@ -150,7 +157,7 @@ class CRM_Extension_Container_Basic implements CRM_Extension_Container_Interface
   }
 
   /**
-   * {@inheritdoc}
+   * @inheritDoc
    */
   public function refresh() {
     $this->relPaths = NULL;
@@ -167,10 +174,13 @@ class CRM_Extension_Container_Basic implements CRM_Extension_Container_Interface
   }
 
   /**
-   * Determine the relative path of an extension directory
+   * Determine the relative path of an extension directory.
    *
+   * @param string $key
+   *   Extension name.
+   *
+   * @throws CRM_Extension_Exception_MissingException
    * @return string
-   * @throws CRM_Extension_Exception
    */
   protected function getRelPath($key) {
     $keypaths = $this->getRelPaths();
@@ -183,7 +193,8 @@ class CRM_Extension_Container_Basic implements CRM_Extension_Container_Interface
   /**
    * Scan $basedir for a list of extension-keys
    *
-   * @return array($key => $relPath)
+   * @return array
+   *   ($key => $relPath)
    */
   protected function getRelPaths() {
     if (!is_array($this->relPaths)) {
@@ -197,7 +208,8 @@ class CRM_Extension_Container_Basic implements CRM_Extension_Container_Interface
           $relPath = CRM_Utils_File::relativize(dirname($infoPath), $this->baseDir);
           try {
             $info = CRM_Extension_Info::loadFromFile($infoPath);
-          } catch (CRM_Extension_Exception_ParseException $e) {
+          }
+          catch (CRM_Extension_Exception_ParseException $e) {
             CRM_Core_Session::setStatus(ts('Parse error in extension: %1', array(
               1 => $e->getMessage(),
             )), '', 'error');
@@ -215,10 +227,13 @@ class CRM_Extension_Container_Basic implements CRM_Extension_Container_Interface
   }
 
   /**
-   * Determine the relative path of an extension directory
+   * Determine the relative path of an extension directory.
    *
+   * @param string $key
+   *   Extension name.
+   *
+   * @throws CRM_Extension_Exception_MissingException
    * @return string
-   * @throws CRM_Extension_Exception
    */
   protected function getRelUrl($key) {
     $relUrls = $this->getRelUrls();
@@ -231,8 +246,8 @@ class CRM_Extension_Container_Basic implements CRM_Extension_Container_Interface
   /**
    * Scan $basedir for a list of extension-keys
    *
-   * @param string $dirSep the local system's directory separator
-   * @return array($key => $relUrl)
+   * @return array
+   *   ($key => $relUrl)
    */
   protected function getRelUrls() {
     if (DIRECTORY_SEPARATOR == '/') {
@@ -250,8 +265,11 @@ class CRM_Extension_Container_Basic implements CRM_Extension_Container_Interface
    * Note: Treat as private. This is only public to facilitate testing.
    *
    * @param string $dirSep
-   * @param array $relPaths ($key => $relPath)
-   * @return array($key => $relUrl)
+   *   Directory separator ("/" or "\").
+   * @param array $relPaths
+   *   Array($key => $relPath).
+   * @return array
+   *   Array($key => $relUrl).
    */
   public static function convertPathsToUrls($dirSep, $relPaths) {
     $relUrls = array();
@@ -260,4 +278,5 @@ class CRM_Extension_Container_Basic implements CRM_Extension_Container_Interface
     }
     return $relUrls;
   }
+
 }

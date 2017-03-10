@@ -1,0 +1,82 @@
+<!--
+Controller: EditMailingCtrl
+Required vars: mailing, crmMailingConst
+-->
+<div class="crm-block" ng-form="responseForm" crm-ui-id-scope>
+  <div class="crm-group">
+    <div crm-ui-field="{title: ts('Track Replies'), help: hs('override_verp')}" crm-layout="checkbox">
+      <!-- Comparing data-model and UI of "override_verp", note that true/false are inverted (enabled==0,disabled==1) -->
+      <span ng-controller="EmailAddrCtrl">
+        <input
+          name="override_verp"
+          type="checkbox"
+          ng-change="checkVerpChange(mailing)"
+          ng-model="mailing.override_verp"
+          ng-true-value="'0'"
+          ng-false-value="'1'"
+          />
+      </span>
+    </div>
+    <div crm-ui-field="{title: ts('Forward Replies'), help: hs('forward_replies')}" crm-layout="checkbox" ng-show="'0' == mailing.override_verp">
+      <input name="forward_replies" type="checkbox" ng-model="mailing.forward_replies" ng-true-value="'1'" ng-false-value="'0'" />
+    </div>
+    <div crm-ui-field="{title: ts('Auto-Respond to Replies'), help: hs('auto_responder')}" crm-layout="checkbox" ng-show="'0' == mailing.override_verp">
+      <input name="auto_responder" type="checkbox" ng-model="mailing.auto_responder" ng-true-value="'1'" ng-false-value="'0'" />
+    </div>
+  </div>
+</div>
+
+<hr/>
+
+<div class="crm-block" ng-form="subform" crm-ui-id-scope>
+  <div class="crm-group">
+    <div crm-ui-field="{name: 'subform.reply_id', title: ts('Auto-Respond Message')}" ng-show="'0' == mailing.override_verp && '1' == mailing.auto_responder">
+      <select
+        crm-ui-id="subform.reply_id"
+        name="reply_id"
+        ui-jq="select2"
+        ui-options="{dropdownAutoWidth : true}"
+        ng-model="mailing.reply_id"
+        ng-options="mc.id as mc.name for mc in crmMailingConst.headerfooterList | filter:{component_type: 'Reply'}"
+        required>
+        <option value=""></option>
+      </select>
+    </div>
+    <div crm-ui-field="{name: 'subform.optout_id', title: ts('Opt-out Message')}">
+      <select
+        crm-ui-id="subform.optout_id"
+        name="optout_id"
+        ui-jq="select2"
+        ui-options="{dropdownAutoWidth : true}"
+        ng-model="mailing.optout_id"
+        ng-options="mc.id as mc.name for mc in crmMailingConst.headerfooterList | filter:{component_type: 'OptOut'}"
+        required>
+        <option value=""></option>
+      </select>
+    </div>
+    <div crm-ui-field="{name: 'subform.resubscribe_id', title: ts('Resubscribe Message')}">
+      <select
+        crm-ui-id="subform.resubscribe_id"
+        name="resubscribe_id"
+        ui-jq="select2"
+        ui-options="{dropdownAutoWidth : true}"
+        ng-model="mailing.resubscribe_id"
+        ng-options="mc.id as mc.name for mc in crmMailingConst.headerfooterList | filter:{component_type: 'Resubscribe'}"
+        required>
+        <option value=""></option>
+      </select>
+    </div>
+    <div crm-ui-field="{name: 'subform.unsubscribe_id', title: ts('Unsubscribe Message')}">
+      <select
+        crm-ui-id="subform.unsubscribe_id"
+        name="unsubscribe_id"
+        ui-jq="select2"
+        ui-options="{dropdownAutoWidth : true}"
+        ng-model="mailing.unsubscribe_id"
+        ng-options="mc.id as mc.name for mc in crmMailingConst.headerfooterList | filter:{component_type: 'Unsubscribe'}"
+        required>
+        <option value=""></option>
+      </select>
+    </div>
+  </div>
+</div>

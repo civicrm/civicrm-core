@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,31 +23,25 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
  * Main page for viewing contact.
- *
  */
 class CRM_Contact_Page_View_Print extends CRM_Contact_Page_View_Summary {
 
   /**
-   * Heart of the viewing process. The runner gets all the meta data for
-   * the contact and calls the appropriate type of page to view.
+   * Heart of the viewing process.
    *
-   * @return void
-   * @access public
-   *
+   * The runner gets all the meta data for the contact and calls the appropriate type of page to view.
    */
-  function run() {
+  public function run() {
     $this->_print = CRM_Core_Smarty::PRINT_PAGE;
 
     $this->preProcess();
@@ -58,15 +52,12 @@ class CRM_Contact_Page_View_Print extends CRM_Contact_Page_View_Summary {
   }
 
   /**
-   * View summary details of a contact
-   *
-   * @return void
-   * @access public
+   * View summary details of a contact.
    */
-  function view() {
-    $params   = array();
+  public function view() {
+    $params = array();
     $defaults = array();
-    $ids      = array();
+    $ids = array();
 
     $params['id'] = $params['contact_id'] = $this->_contactId;
     $contact = CRM_Contact_BAO_Contact::retrieve($params, $defaults, $ids);
@@ -75,5 +66,5 @@ class CRM_Contact_Page_View_Print extends CRM_Contact_Page_View_Summary {
 
     return parent::view();
   }
-}
 
+}

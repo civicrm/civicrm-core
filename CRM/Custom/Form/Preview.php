@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
  */
@@ -44,30 +44,27 @@
 class CRM_Custom_Form_Preview extends CRM_Core_Form {
 
   /**
-   * the group tree data
+   * The group tree data.
    *
    * @var array
    */
   protected $_groupTree;
 
   /**
-   * pre processing work done here.
+   * Pre processing work done here.
    *
    * gets session variables for group or field id
    *
-   * @param null
-   *
    * @return void
-   * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     // get the controller vars
     $this->_groupId = $this->get('groupId');
     $this->_fieldId = $this->get('fieldId');
     if ($this->_fieldId) {
       // field preview
       $defaults = array();
-      $params   = array('id' => $this->_fieldId);
+      $params = array('id' => $this->_fieldId);
       $fieldDAO = new CRM_Core_DAO_CustomField();
       CRM_Core_DAO::commonRetrieve('CRM_Core_DAO_CustomField', $params, $defaults);
 
@@ -93,14 +90,12 @@ class CRM_Custom_Form_Preview extends CRM_Core_Form {
   }
 
   /**
-   * Set the default form values
+   * Set the default form values.
    *
-   * @param null
-   *
-   * @return array   the default array reference
-   * @access protected
+   * @return array
+   *   the default array reference
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
 
     CRM_Core_BAO_CustomGroup::setDefaults($this->_groupTree, $defaults, FALSE, FALSE);
@@ -109,18 +104,15 @@ class CRM_Custom_Form_Preview extends CRM_Core_Form {
   }
 
   /**
-   * Function to actually build the form
-   *
-   * @param null
+   * Build the form object.
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     if (is_array($this->_groupTree[$this->_groupId])) {
       foreach ($this->_groupTree[$this->_groupId]['fields'] as & $field) {
         //add the form elements
-        CRM_Core_BAO_CustomField::addQuickFormElement($this, $field['element_name'], $field['id'], FALSE, CRM_Utils_Array::value('is_required', $field));
+        CRM_Core_BAO_CustomField::addQuickFormElement($this, $field['element_name'], $field['id'], CRM_Utils_Array::value('is_required', $field));
       }
 
       $this->assign('groupTree', $this->_groupTree);
@@ -134,5 +126,5 @@ class CRM_Custom_Form_Preview extends CRM_Core_Form {
       )
     );
   }
-}
 
+}

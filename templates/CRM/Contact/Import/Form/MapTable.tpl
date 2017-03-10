@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -168,14 +168,14 @@
 
       {* // Set default location type *}
       {literal}
-      cj(function() {
+      CRM.$(function($) {
         var defaultLocationType = "{/literal}{$defaultLocationType}{literal}";
         if (defaultLocationType.length) {
-          cj('#map-field').on('change', 'select[id^="mapper"][id$="_0"]', function() {
-            var select = cj(this).next();
-            cj('option', select).each(function() {
-              if (cj(this).attr('value') == defaultLocationType
-              && cj(this).text() == "{/literal}{$defaultLocationTypeLabel}{literal}") {
+          $('#map-field').on('change', 'select[id^="mapper"][id$="_0"]', function() {
+            var select = $(this).next();
+            $('option', select).each(function() {
+              if ($(this).attr('value') == defaultLocationType
+              && $(this).text() == "{/literal}{$defaultLocationTypeLabel}{literal}") {
                 select.val(defaultLocationType);
               }
             });

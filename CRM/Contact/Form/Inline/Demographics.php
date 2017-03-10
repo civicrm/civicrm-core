@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,26 +23,21 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
- * form helper class for demographics section
+ * Form helper class for demographics section.
  */
 class CRM_Contact_Form_Inline_Demographics extends CRM_Contact_Form_Inline {
 
   /**
-   * build the form elements
-   *
-   * @return void
-   * @access public
+   * Build the form object elements.
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -50,10 +45,7 @@ class CRM_Contact_Form_Inline_Demographics extends CRM_Contact_Form_Inline {
   }
 
   /**
-   * process the form
-   *
-   * @return void
-   * @access public
+   * Process the form.
    */
   public function postProcess() {
     $params = $this->exportValues();
@@ -75,4 +67,5 @@ class CRM_Contact_Form_Inline_Demographics extends CRM_Contact_Form_Inline {
 
     $this->response();
   }
+
 }

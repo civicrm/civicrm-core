@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
@@ -24,13 +24,21 @@
 *}
 <div class="block-civicrm crm-container">
 <div id="crm-create-new-wrapper">
-  <a id="crm-create-new-link" class="button" href="#"><span><div class="icon dropdown-icon"></div>{ts}Create New{/ts}</span></a>
-    <div id="crm-create-new-list" class="ac_results">
+  {crmButton id="crm-create-new-link" href="#" icon="bars"}{ts}Create New{/ts}{/crmButton}
+    <div id="crm-create-new-list">
       <div class="crm-create-new-list-inner">
       <ul>
-      {foreach from=$shortCuts item=short}
-            <li><a href="{$short.url}" class="crm-{$short.ref}">{$short.title}</a></li>
-          {/foreach}
+        {foreach from=$shortCuts item=short}
+          <li><a href="{$short.url}" class="crm-{$short.ref}">{$short.title}</a>
+            {if $short.shortCuts}
+              <ul>
+                {foreach from=$short.shortCuts item=shortCut}
+                  <li><a href="{$shortCut.url}" class="crm-{$shortCut.ref}">{$shortCut.title}</a></li>
+                {/foreach}
+              </ul>
+            {/if}
+          </li>
+        {/foreach}
       </ul>
       </div>
     </div>
@@ -39,26 +47,17 @@
 <div class='clear'></div>
 {literal}
 <script>
-
-cj('body').click(function() {
-     cj('#crm-create-new-list').hide();
-     });
-
-   cj('#crm-create-new-list').click(function(event){
-       event.stopPropagation();
-     });
-
-cj('#crm-create-new-list li').hover(
-  function(){ cj(this).addClass('ac_over');},
-  function(){ cj(this).removeClass('ac_over');}
-  );
-
-cj('#crm-create-new-link').click(function(event) {
-  cj('#crm-create-new-list').toggle();
-  event.stopPropagation();
-  return false;
+(function ($) {
+  $('#crm-create-new-list > div > ul').menu();
+  $('#crm-create-new-link').click(function (event) {
+    $('#crm-create-new-list').toggle();
+    $('body:not(#crm-create-new-list)').click(function () {
+      $('#crm-create-new-list').hide();
+    });
+    event.stopPropagation();
+    return false;
   });
-
+})(CRM.$);
 </script>
 
 {/literal}

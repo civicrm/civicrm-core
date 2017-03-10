@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,27 +23,21 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
- * Choose include / exclude groups and mass sms
- *
+ * Choose include / exclude groups and mass sms.
  */
 class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
 
   /**
-   * Function to set variables up before form is built
-   *
-   * @return void
-   * @access public
+   * Set variables up before form is built.
    */
   public function preProcess() {
     if (!CRM_SMS_BAO_Provider::activeProviderCount()) {
@@ -55,14 +49,10 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
   }
 
   /**
-   * This function sets the default values for the form.
-   * the default values are retrieved from the database
-   *
-   * @access public
-   *
-   * @return void
+   * Set default values for the form.
+   * The default values are retrieved from the database.
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $mailingID = CRM_Utils_Request::retrieve('mid', 'Integer', $this, FALSE, NULL);
     $continue = CRM_Utils_Request::retrieve('continue', 'String', $this, FALSE, NULL);
 
@@ -103,14 +93,11 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
   }
 
   /**
-   * Function to actually build the form
-   *
-   * @return void
-   * @access public
+   * Build the form object.
    */
   public function buildQuickForm() {
 
-    //get the context
+    // Get the context.
     $context = $this->get('context');
 
     $this->assign('context', $context);
@@ -120,10 +107,10 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
       TRUE
     );
 
-    //get the mailing groups.
-    $groups = CRM_Core_PseudoConstant::group('Mailing');
+    // Get the mailing groups.
+    $groups = CRM_Core_PseudoConstant::nestedGroup('Mailing');
 
-    //get the sms mailing list
+    // Get the sms mailing list.
     $mailings = CRM_Mailing_PseudoConstant::completed('sms');
     if (!$mailings) {
       $mailings = array();
@@ -132,62 +119,46 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
     // run the groups through a hook so users can trim it if needed
     CRM_Utils_Hook::mailingGroups($this, $groups, $mailings);
 
-    $inG = &$this->addElement('advmultiselect', 'includeGroups',
-      ts('Include Group(s)') . ' ',
+    $select2style = array(
+      'multiple' => TRUE,
+      'style' => 'width: 100%; max-width: 60em;',
+      'class' => 'crm-select2',
+      'placeholder' => ts('- select -'),
+    );
+
+    $this->add('select', 'includeGroups',
+      ts('Include Group(s)'),
       $groups,
-      array(
-        'size' => 5,
-        'style' => 'width:240px',
-        'class' => 'advmultiselect',
-      )
+      TRUE,
+      $select2style
     );
 
-    $this->addRule('includeGroups', ts('Please select a group to be SMSed.'), 'required');
-
-    $outG = &$this->addElement('advmultiselect', 'excludeGroups',
-      ts('Exclude Group(s)') . ' ',
+    $this->add('select', 'excludeGroups',
+      ts('Exclude Group(s)'),
       $groups,
-      array(
-        'size' => 5,
-        'style' => 'width:240px',
-        'class' => 'advmultiselect',
-      )
+      FALSE,
+      $select2style
     );
 
-    $inG->setButtonAttributes('add', array('value' => ts('Add >>')));
-    $outG->setButtonAttributes('add', array('value' => ts('Add >>')));
-    $inG->setButtonAttributes('remove', array('value' => ts('<< Remove')));
-    $outG->setButtonAttributes('remove', array('value' => ts('<< Remove')));
-
-    $inM = &$this->addElement('advmultiselect', 'includeMailings',
-      ts('INCLUDE Recipients of These Mailing(s)') . ' ',
+    $this->add('select', 'includeMailings',
+      ts('INCLUDE Recipients of These Message(s)'),
       $mailings,
-      array(
-        'size' => 5,
-        'style' => 'width:240px',
-        'class' => 'advmultiselect',
-      )
+      FALSE,
+      $select2style
     );
-    $outM = &$this->addElement('advmultiselect', 'excludeMailings',
-      ts('EXCLUDE Recipients of These Mailing(s)') . ' ',
+    $this->add('select', 'excludeMailings',
+      ts('EXCLUDE Recipients of These Message(s)'),
       $mailings,
-      array(
-        'size' => 5,
-        'style' => 'width:240px',
-        'class' => 'advmultiselect',
-      )
+      FALSE,
+      $select2style
     );
-
-    $inM->setButtonAttributes('add', array('value' => ts('Add >>')));
-    $outM->setButtonAttributes('add', array('value' => ts('Add >>')));
-    $inM->setButtonAttributes('remove', array('value' => ts('<< Remove')));
-    $outM->setButtonAttributes('remove', array('value' => ts('<< Remove')));
 
     $this->addFormRule(array('CRM_SMS_Form_Group', 'formRule'));
 
     $buttons = array(
-      array('type' => 'next',
-        'name' => ts('Next >>'),
+      array(
+        'type' => 'next',
+        'name' => ts('Next'),
         'spacing' => '&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;',
         'isDefault' => TRUE,
       ),
@@ -209,7 +180,10 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
     $groups = array();
 
     foreach (array(
-      'name', 'group_id', 'is_sms') as $n) {
+      'name',
+      'group_id',
+      'is_sms',
+    ) as $n) {
       if (!empty($values[$n])) {
         $params[$n] = $values[$n];
       }
@@ -218,9 +192,9 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
     $qf_Group_submit = $this->controller->exportValue($this->_name, '_qf_Group_submit');
     $this->set('name', $params['name']);
 
-    $inGroups    = $values['includeGroups'];
-    $outGroups   = $values['excludeGroups'];
-    $inMailings  = $values['includeMailings'];
+    $inGroups = $values['includeGroups'];
+    $outGroups = $values['excludeGroups'];
+    $inMailings = $values['includeMailings'];
     $outMailings = $values['excludeMailings'];
 
     if (is_array($inGroups)) {
@@ -254,10 +228,10 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
       }
     }
 
-    $session            = CRM_Core_Session::singleton();
-    $params['groups']   = $groups;
+    $session = CRM_Core_Session::singleton();
+    $params['groups'] = $groups;
     $params['mailings'] = $mailings;
-    $ids                = array();
+    $ids = array();
     if ($this->get('mailing_id')) {
 
       // don't create a new mass sms if already exists
@@ -268,9 +242,11 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
 
       // delete previous includes/excludes, if mailing already existed
       foreach (array(
-        'groups', 'mailings') as $entity) {
-        $mg               = new CRM_Mailing_DAO_MailingGroup();
-        $mg->mailing_id   = $ids['mailing_id'];
+        'groups',
+        'mailings',
+      ) as $entity) {
+        $mg = new CRM_Mailing_DAO_MailingGroup();
+        $mg->mailing_id = $ids['mailing_id'];
         $mg->entity_table = ($entity == 'groups') ? $groupTableName : $mailingTableName;
         $mg->find();
         while ($mg->fetch()) {
@@ -292,8 +268,6 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
     // also compute the recipients and store them in the mailing recipients table
     CRM_Mailing_BAO_Mailing::getRecipients($mailing->id,
       $mailing->id,
-      NULL,
-      NULL,
       TRUE,
       FALSE,
       'sms'
@@ -314,9 +288,8 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
   }
 
   /**
-   * Display Name of the form
+   * Display Name of the form.
    *
-   * @access public
    *
    * @return string
    */
@@ -325,15 +298,15 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form.
    *
-   * @param array $fields posted values of the form
+   * @param array $fields
+   *   Posted values of the form.
    *
-   * @return array list of errors to be posted back to the form
-   * @static
-   * @access public
+   * @return array
+   *   list of errors to be posted back to the form
    */
-  static function formRule($fields) {
+  public static function formRule($fields) {
     $errors = array();
     if (isset($fields['includeGroups']) &&
       is_array($fields['includeGroups']) &&
@@ -361,5 +334,5 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
 
     return empty($errors) ? TRUE : $errors;
   }
-}
 
+}

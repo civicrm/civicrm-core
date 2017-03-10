@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,30 +23,25 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
- * This class summarizes the import results
+ * This class summarizes the import results.
  */
 class CRM_Contact_Import_Form_Summary extends CRM_Import_Form_Summary {
 
   /**
-   * Function to set variables up before form is built
-   *
-   * @return void
-   * @access public
+   * Set variables up before form is built.
    */
   public function preProcess() {
     // set the error message path to display
-    $errorFile = $this->assign('errorFile', $this->get('errorFile'));
+    $this->assign('errorFile', $this->get('errorFile'));
 
     $totalRowCount = $this->get('totalRowCount');
     $relatedCount = $this->get('relatedCount');
@@ -101,7 +96,21 @@ class CRM_Contact_Import_Form_Summary extends CRM_Import_Form_Summary {
 
     $this->assign('dupeActionString', $dupeActionString);
 
-    $properties = array('totalRowCount', 'validRowCount', 'invalidRowCount', 'conflictRowCount', 'downloadConflictRecordsUrl', 'downloadErrorRecordsUrl', 'duplicateRowCount', 'downloadDuplicateRecordsUrl', 'downloadMismatchRecordsUrl', 'groupAdditions', 'tagAdditions', 'unMatchCount', 'unparsedAddressCount');
+    $properties = array(
+      'totalRowCount',
+      'validRowCount',
+      'invalidRowCount',
+      'conflictRowCount',
+      'downloadConflictRecordsUrl',
+      'downloadErrorRecordsUrl',
+      'duplicateRowCount',
+      'downloadDuplicateRecordsUrl',
+      'downloadMismatchRecordsUrl',
+      'groupAdditions',
+      'tagAdditions',
+      'unMatchCount',
+      'unparsedAddressCount',
+    );
     foreach ($properties as $property) {
       $this->assign($property, $this->get($property));
     }
@@ -111,10 +120,7 @@ class CRM_Contact_Import_Form_Summary extends CRM_Import_Form_Summary {
   }
 
   /**
-   * Clean up the import table we used
-   *
-   * @return void
-   * @access public
+   * Clean up the import table we used.
    */
   public function postProcess() {
     $dao = new CRM_Core_DAO();
@@ -129,4 +135,3 @@ class CRM_Contact_Import_Form_Summary extends CRM_Import_Form_Summary {
   }
 
 }
-

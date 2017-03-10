@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,14 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -39,52 +37,16 @@
 class CRM_Pledge_Page_AJAX {
 
   /**
-   * Function for building Pledge Name combo box
+   * Function to setDefaults according to Pledge Id
+   * for batch entry pledges
    */
-  static function pledgeName() {
-
-    $getRecords = FALSE;
-    if (isset($_GET['name']) && $_GET['name']) {
-      $name        = CRM_Utils_Type::escape($_GET['name'], 'String');
-      $name        = str_replace('*', '%', $name);
-      $whereClause = "p.creator_pledge_desc LIKE '%$name%' ";
-      $getRecords  = TRUE;
+  public function getPledgeDefaults() {
+    $details = array();
+    if (!empty($_POST['pid'])) {
+      $pledgeID = CRM_Utils_Type::escape($_POST['pid'], 'Integer');
+      $details = CRM_Pledge_BAO_PledgePayment::getOldestPledgePayment($pledgeID);
     }
-
-    if (isset($_GET['id']) && is_numeric($_GET['id'])) {
-      $pledgeId    = CRM_Utils_Type::escape($_GET['id'], 'Integer');
-      $whereClause = "p.id = {$pledgeId} ";
-      $getRecords  = TRUE;
-    }
-
-    if ($getRecords) {
-      $query = "
-SELECT p.creator_pledge_desc, p.id
-FROM civicrm_pb_pledge p
-WHERE {$whereClause}
-";
-      $dao = CRM_Core_DAO::executeQuery($query);
-      $elements = array();
-      while ($dao->fetch()) {
-        $elements[] = array(
-          'name' => $dao->creator_pledge_desc,
-          'value' => $dao->id,
-        );
-      }
-    }
-
-    if (empty($elements)) {
-      $name = $_GET['name'];
-      if (!$name && isset($_GET['id'])) {
-        $name = $_GET['id'];
-      }
-      $elements[] = array('name' => trim($name, '*'),
-        'value' => trim($name, '*'),
-      );
-    }
-
-    echo CRM_Utils_JSON::encode($elements, 'value');
-    CRM_Utils_System::civiExit();
+    CRM_Utils_JSON::output($details);
   }
-}
 
+}

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,23 +22,27 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Contact_TaskActionAddToGroupTest
+ */
 class WebTest_Contact_TaskActionAddToGroupTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
     parent::setUp();
   }
 
-  function testAddContactsToGroup() {
+  public function testAddContactsToGroup() {
 
     $this->webtestLogin();
     $newGroupName = 'Group_' . substr(sha1(rand()), 0, 7);
     $this->WebtestAddGroup($newGroupName);
 
     // Create two new contacts with a common random string in email address
-    $emailString = substr(sha1(rand()), 0, 7) . '@example.com_';
+    $emailString = substr(sha1(rand()), 0, 7) . '@example.com';
     $cids = array();
     for ($i = 0; $i < 2; $i++) {
       // create new contact
@@ -48,8 +52,7 @@ class WebTest_Contact_TaskActionAddToGroupTest extends CiviSeleniumTestCase {
       $cids[] = $this->urlArg('cid');
 
       // update email of new contact
-      $this->waitForElementPresent("//ul[@id='actions']/li/a/span[text()='Edit']");
-      $this->click("//ul[@id='actions']/li/a/span[text()='Edit']");
+      $this->click("xpath=//ul[@id='actions']/li[2]/a");
       $this->waitForPageToLoad($this->getTimeoutMsec());
       $this->type("email_1_email", $emailString . $i . 'webtest');
       $this->click("_qf_Contact_upload_view");
@@ -67,13 +70,12 @@ class WebTest_Contact_TaskActionAddToGroupTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isTextPresent("2 Contacts"), 'Looking for 2 results with email like ' . $emailString);
 
     // Click "check all" box and act on "Add to group" action
+    $this->waitForAjaxContent();
     $this->click('toggleSelect');
-    $this->select("task", "label=Add Contacts to Group");
-    // Because it tends to cause problems, all uses of sleep() must be justified in comments
-    // Sleep should never be used for wait for anything to load from the server
-    // Justification for this instance: FIXME
-    sleep(1);
-    $this->click("Go");
+    $this->waitForAjaxContent();
+    $this->waitForText("xpath=//input[@value='ts_sel']/following-sibling::label/span", '2');
+    $this->waitForAjaxContent();
+    $this->select("task", "label=Group - add contacts");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Select the new group and click to add
@@ -88,7 +90,7 @@ class WebTest_Contact_TaskActionAddToGroupTest extends CiviSeleniumTestCase {
 
     // Search by group membership in newly created group
     $this->openCiviPage('contact/search/advanced', 'reset=1');
-    $this->select("crmasmSelect1", "label=" . $newGroupName);
+    $this->select("group", "label=" . $newGroupName);
     $this->click("_qf_Advanced_refresh");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
@@ -104,41 +106,41 @@ class WebTest_Contact_TaskActionAddToGroupTest extends CiviSeleniumTestCase {
 
   }
 
-  function testMultiplePageContactSearchAddContactsToGroup() {
+  public function testMultiplePageContactSearchAddContactsToGroup() {
     $this->webtestLogin();
     $newGroupName = 'Group_' . substr(sha1(rand()), 0, 7);
     $this->WebtestAddGroup($newGroupName);
 
     $this->openCiviPage('contact/search', 'reset=1');
-    $this->click("_qf_Basic_refresh");
+    $this->clickLink("_qf_Basic_refresh");
+    $this->waitForElementPresent("xpath=//*[@id='CRM_Contact_Form_Search_Basic-rows-per-page-select']");
+    $this->type("xpath=//*[@id='CRM_Contact_Form_Search_Basic-rows-per-page-select']", '25');
+    $this->waitForElementPresent("toggleSelect");
+    $this->click("toggleSelect");
+    $this->waitForAjaxContent();
+    $this->waitForText("xpath=//div[@class='crm-content-block']/div/div[2]/div/span[2]/a", "Next >");
+    $this->click("toggleSelect");
+    $this->waitForAjaxContent();
+    $this->waitForText("xpath=//input[@value='ts_sel']/following-sibling::label/span", '50');
+    $this->select("task", "label=Group - add contacts");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->click("xpath=//div[@class='form-item float-right']/a[text()='25']");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->click("toggleSelect");
-    $this->click("xpath=//div[@class='crm-content-block']/div/div[2]/div/span[2]/a");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->click("toggleSelect");
-    $this->select("task", "label=Add Contacts to Group");
-    $this->click("Go");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-     // Select the new group and click to add
+    // Select the new group and click to add
+    $this->waitForElementPresent("group_id");
     $this->click("group_id");
     $this->select("group_id", "label=" . $newGroupName);
     $this->click("_qf_AddToGroup_next-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Check status messages are as expected
     $this->waitForText('crm-notification-container', "Added Contacts to {$newGroupName}");
     $this->waitForText('crm-notification-container', "50 contacts added to group");
 
     $this->openCiviPage('contact/search/advanced', 'reset=1');
-    $this->select("crmasmSelect1", "label=" . $newGroupName);
+    $this->select("group", "label=" . $newGroupName);
     $this->click("_qf_Advanced_refresh");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     $this->assertTrue($this->isTextPresent("50 Contacts"), 'Looking for 50 results belonging to group: ' . $newGroupName);
   }
-}
 
+}

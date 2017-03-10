@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,11 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -66,9 +65,13 @@ class CRM_Extension_Container_Collection implements CRM_Extension_Container_Inte
   public $k2c;
 
   /**
-   * @param array $containers array($name => CRM_Extension_Container_Interface) in order from highest priority (winners) to lowest priority (losers)
+   * @param array $containers
+   *   Array($name => CRM_Extension_Container_Interface) in order from highest
+   *   priority (winners) to lowest priority (losers).
    * @param CRM_Utils_Cache_Interface $cache
-   * @param string $cacheKey unique name for this container
+   *   Cache in which to store extension metadata.
+   * @param string $cacheKey
+   *   Unique name for this container.
    */
   public function __construct($containers, CRM_Utils_Cache_Interface $cache = NULL, $cacheKey = NULL) {
     $this->containers = $containers;
@@ -77,7 +80,9 @@ class CRM_Extension_Container_Collection implements CRM_Extension_Container_Inte
   }
 
   /**
-   * {@inheritdoc}
+   * @inheritDoc
+   *
+   * @return array
    */
   public function checkRequirements() {
     $errors = array();
@@ -88,7 +93,9 @@ class CRM_Extension_Container_Collection implements CRM_Extension_Container_Inte
   }
 
   /**
-   * {@inheritdoc}
+   * @inheritDoc
+   *
+   * @return array_keys
    */
   public function getKeys() {
     $k2c = $this->getKeysToContainer();
@@ -96,21 +103,25 @@ class CRM_Extension_Container_Collection implements CRM_Extension_Container_Inte
   }
 
   /**
-   * {@inheritdoc}
+   * @inheritDoc
+   *
+   * @param string $key
    */
   public function getPath($key) {
     return $this->getContainer($key)->getPath($key);
   }
 
   /**
-   * {@inheritdoc}
+   * @inheritDoc
+   *
+   * @param string $key
    */
   public function getResUrl($key) {
     return $this->getContainer($key)->getResUrl($key);
   }
 
   /**
-   * {@inheritdoc}
+   * @inheritDoc
    */
   public function refresh() {
     if ($this->cache) {
@@ -122,16 +133,20 @@ class CRM_Extension_Container_Collection implements CRM_Extension_Container_Inte
   }
 
   /**
-   * Get the container which defines a particular key
+   * Get the container which defines a particular key.
    *
+   * @param string $key
+   *   Extension name.
+   *
+   * @throws CRM_Extension_Exception_MissingException
    * @return CRM_Extension_Container_Interface
-   * @throws CRM_Extension_Exception
    */
   public function getContainer($key) {
     $k2c = $this->getKeysToContainer();
     if (isset($k2c[$key]) && isset($this->containers[$k2c[$key]])) {
       return $this->containers[$k2c[$key]];
-    } else {
+    }
+    else {
       throw new CRM_Extension_Exception_MissingException("Unknown extension: $key");
     }
   }
@@ -140,13 +155,14 @@ class CRM_Extension_Container_Collection implements CRM_Extension_Container_Inte
    * Get a list of all keys in these containers -- and the
    * name of the container which defines each key.
    *
-   * @return array ($key => $containerName)
+   * @return array
+   *   ($key => $containerName)
    */
   public function getKeysToContainer() {
     if ($this->cache) {
       $k2c = $this->cache->get($this->cacheKey);
     }
-    if (!is_array($k2c)) {
+    if (!isset($k2c) || !is_array($k2c)) {
       $k2c = array();
       $containerNames = array_reverse(array_keys($this->containers));
       foreach ($containerNames as $name) {
@@ -161,4 +177,5 @@ class CRM_Extension_Container_Collection implements CRM_Extension_Container_Inte
     }
     return $k2c;
   }
+
 }

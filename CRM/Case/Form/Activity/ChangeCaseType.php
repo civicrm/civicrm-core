@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,37 +23,40 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
- * This class generates form components for OpenCase Activity
- *
+ * This class generates form components for OpenCase Activity.
  */
 class CRM_Case_Form_Activity_ChangeCaseType {
 
-  static function preProcess(&$form) {
+  /**
+   * @param CRM_Core_Form $form
+   *
+   * @throws Exception
+   */
+  public static function preProcess(&$form) {
     if (!isset($form->_caseId)) {
       CRM_Core_Error::fatal(ts('Case Id not found.'));
     }
   }
 
   /**
-   * This function sets the default values for the form. For edit/view mode
-   * the default values are retrieved from the database
+   * Set default values for the form.
    *
-   * @access public
+   * For edit/view mode the default values are retrieved from the database.
    *
-   * @return void
+   * @param CRM_Core_Form $form
+   *
+   * @return array
    */
-  static function setDefaultValues(&$form) {
+  public static function setDefaultValues(&$form) {
     $defaults = array();
 
     $defaults['is_reset_timeline'] = 1;
@@ -65,23 +68,24 @@ class CRM_Case_Form_Activity_ChangeCaseType {
     return $defaults;
   }
 
-  static function buildQuickForm(&$form) {
+  /**
+   * @param CRM_Core_Form $form
+   */
+  public static function buildQuickForm(&$form) {
     $form->removeElement('status_id');
     $form->removeElement('priority_id');
 
-    $form->_caseType = CRM_Case_PseudoConstant::caseType();
-    $caseTypeId = explode(CRM_Case_BAO_Case::VALUE_SEPARATOR, CRM_Core_DAO::getFieldValue('CRM_Case_DAO_Case',
-        $form->_caseId,
-        'case_type_id'
-      ));
-    $form->_caseTypeId = $caseTypeId[1];
+    $caseId = CRM_Utils_Array::first($form->_caseId);
+    $form->_caseType = CRM_Case_BAO_Case::buildOptions('case_type_id', 'create');
+    $form->_caseTypeId = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_Case',
+      $caseId,
+      'case_type_id'
+    );
     if (!in_array($form->_caseTypeId, $form->_caseType)) {
-      $form->_caseType[$form->_caseTypeId] = CRM_Core_OptionGroup::getLabel('case_type', $form->_caseTypeId, FALSE);
+      $form->_caseType[$form->_caseTypeId] = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_CaseType', $form->_caseTypeId, 'title');
     }
 
-    $form->add('select', 'case_type_id', ts('New Case Type'),
-      $form->_caseType, TRUE
-    );
+    $form->addField('case_type_id', array('context' => 'create', 'entity' => 'Case'));
 
     // timeline
     $form->addYesNo('is_reset_timeline', ts('Reset Case Timeline?'), NULL, TRUE, array('onclick' => "return showHideByValue('is_reset_timeline','','resetTimeline','table-row','radio',false);"));
@@ -89,26 +93,29 @@ class CRM_Case_Form_Activity_ChangeCaseType {
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form.
    *
-   * @param array $values posted values of the form
+   * @param array $values
+   *   Posted values of the form.
    *
-   * @return array list of errors to be posted back to the form
-   * @static
-   * @access public
+   * @param $files
+   * @param CRM_Core_Form $form
+   *
+   * @return array
+   *   list of errors to be posted back to the form
    */
-  static function formRule($values, $files, $form) {
+  public static function formRule($values, $files, $form) {
     return TRUE;
   }
 
   /**
-   * Function to process the form
+   * Process the form submission.
    *
-   * @access public
    *
-   * @return void
+   * @param CRM_Core_Form $form
+   * @param array $params
    */
-  static function beginPostProcess(&$form, &$params) {
+  public static function beginPostProcess(&$form, &$params) {
     if ($form->_context == 'case') {
       $params['id'] = $form->_id;
     }
@@ -123,20 +130,21 @@ class CRM_Case_Form_Activity_ChangeCaseType {
   }
 
   /**
-   * Function to process the form
+   * Process the form submission.
    *
-   * @access public
    *
-   * @return void
+   * @param CRM_Core_Form $form
+   * @param array $params
+   * @param $activity
    */
-  static function endPostProcess(&$form, &$params, $activity) {
+  public static function endPostProcess(&$form, &$params, $activity) {
     if (!$form->_caseId) {
       // always expecting a change, so case-id is a must.
       return;
     }
 
     $caseTypes = CRM_Case_PseudoConstant::caseType('name');
-    $allCaseTypes = CRM_Case_PseudoConstant::caseType('label', FALSE);
+    $allCaseTypes = CRM_Case_PseudoConstant::caseType('title', FALSE);
 
     if (!empty($caseTypes[$params['case_type_id']])) {
       $caseType = $caseTypes[$params['case_type_id']];
@@ -157,7 +165,8 @@ class CRM_Case_Form_Activity_ChangeCaseType {
 
     if ($activity->subject == 'null') {
       $activity->subject = ts('Case type changed from %1 to %2',
-        array(1 => CRM_Utils_Array::value($form->_defaults['case_type_id'], $allCaseTypes),
+        array(
+          1 => CRM_Utils_Array::value($form->_defaults['case_type_id'], $allCaseTypes),
           2 => CRM_Utils_Array::value($params['case_type_id'], $allCaseTypes),
         )
       );
@@ -166,13 +175,14 @@ class CRM_Case_Form_Activity_ChangeCaseType {
 
     // 1. initiate xml processor
     $xmlProcessor = new CRM_Case_XMLProcessor_Process();
+    $caseId = CRM_Utils_Array::first($form->_caseId);
     $xmlProcessorParams = array(
       'clientID' => $form->_currentlyViewedContactId,
       'creatorID' => $form->_currentUserId,
       'standardTimeline' => 1,
       'activityTypeName' => 'Change Case Type',
       'activity_date_time' => CRM_Utils_Array::value('reset_date_time', $params),
-      'caseID' => $form->_caseId,
+      'caseID' => $caseId,
       'resetTimeline' => CRM_Utils_Array::value('is_reset_timeline', $params),
     );
 
@@ -180,5 +190,5 @@ class CRM_Case_Form_Activity_ChangeCaseType {
     // status msg
     $params['statusMsg'] = ts('Case Type changed successfully.');
   }
-}
 
+}

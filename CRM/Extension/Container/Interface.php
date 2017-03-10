@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,11 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -39,35 +38,33 @@ interface CRM_Extension_Container_Interface {
 
   /**
    * Determine if any unmet requirements prevent use of this container.
-   *
-   * @return array list of error messages; empty if OK
    */
   public function checkRequirements();
 
   /**
-   * Get a list of extensions available in this container
-   *
-   * @return array list of keys (strings)
+   * Get a list of extensions available in this container.
    */
   public function getKeys();
 
   /**
    * Determine the main .php file for an extension
    *
-   * @param string $key fully-qualified extension name
-   * @return string local path to the extension's main .php file
-   * @throws Exception
+   * @param string $key
+   *   Fully-qualified extension name.
    */
   public function getPath($key);
 
   /**
-   * Determine the base URL for resources provided by the extension
+   * Determine the base URL for resources provided by the extension.
    *
-   * @param string $key fully-qualified extension name
-   * @return string public URL
-   * @throws Exception
+   * @param string $key
+   *   Fully-qualified extension name.
    */
   public function getResUrl($key);
 
+  /**
+   * Scan the container for available extensions.
+   */
   public function refresh();
+
 }

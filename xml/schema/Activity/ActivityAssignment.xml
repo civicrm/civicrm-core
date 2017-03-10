@@ -27,7 +27,7 @@
     <comment>Name of table where item being referenced is stored (activity, phonecall or meeting).</comment>
     <add>1.8</add>
     <drop>2.0</drop>
-   </field>
+  </field>
 
   <field>
     <name>activity_entity_id</name>
@@ -53,33 +53,33 @@
     <comment>Name of table where item being referenced is stored (contact assigned to given activity).</comment>
     <add>1.8</add>
     <drop>2.0</drop>
-   </field>
+  </field>
 
-   <field>
+  <field>
     <name>target_entity_id</name>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Foreign key to the referenced item.</comment>
     <add>1.1</add>
     <drop>2.0</drop>
-   </field>
+  </field>
 
-   <dynamicForeignKey>
+  <dynamicForeignKey>
     <idColumn>target_entity_id</idColumn>
     <typeColumn>target_entity_table</typeColumn>
     <add>1.8</add>
     <drop>2.0</drop>
-   </dynamicForeignKey>
+  </dynamicForeignKey>
 
-   <field>
+  <field>
     <name>activity_id</name>
     <type>int unsigned</type>
     <title>Activity ID</title>
     <required>true</required>
     <comment>Foreign key to the activity for this assignment.</comment>
     <add>2.0</add>
-   </field>
-   <foreignKey>
+  </field>
+  <foreignKey>
     <name>activity_id</name>
     <table>civicrm_activity</table>
     <key>id</key>
@@ -87,15 +87,15 @@
     <onDelete>CASCADE</onDelete>
   </foreignKey>
 
-   <field>
+  <field>
     <name>assignee_contact_id</name>
     <type>int unsigned</type>
     <title>Assignee Contact ID</title>
     <required>true</required>
     <comment>Foreign key to the contact for this assignment.</comment>
     <add>2.0</add>
-   </field>
-   <foreignKey>
+  </field>
+  <foreignKey>
     <name>assignee_contact_id</name>
     <table>civicrm_contact</table>
     <key>id</key>
@@ -104,11 +104,11 @@
   </foreignKey>
 
   <index>
-       <name>UI_activity_assignee_contact_id</name>
-       <fieldName>assignee_contact_id</fieldName>
-       <fieldName>activity_id</fieldName>
-       <unique>true</unique>
-       <add>2.0</add>
+    <name>UI_activity_assignee_contact_id</name>
+    <fieldName>assignee_contact_id</fieldName>
+    <fieldName>activity_id</fieldName>
+    <unique>true</unique>
+    <add>2.0</add>
   </index>
 
 

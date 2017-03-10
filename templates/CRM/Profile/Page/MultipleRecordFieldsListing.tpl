@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -30,40 +30,76 @@
   {else}
      {assign var='dialogId' value='profile-dialog'}
   {/if}
-  {if $records and $headers}
+  {if ($records and $headers) or ($pageViewType eq 'customDataView')}
     {include file="CRM/common/jsortable.tpl"}
-    <div id="browseValues">
+    <div id="custom-{$customGroupId}-table-wrapper" {if $pageViewType eq 'customDataView'}class="crm-entity" data-entity="contact" data-id="{$contactId}"{/if}>
       <div>
         {strip}
-          <table id="records" class="display">
+          <table id="records-{$customGroupId}" class={if $pageViewType eq 'customDataView'}"crm-multifield-selector crm-ajax-table"{else}'display'{/if}>
             <thead>
-            <tr>
+            {if $pageViewType eq 'customDataView'}
+              {foreach from=$headers key=recId item=head}
+                <th data-data={ts}'{$headerAttr.$recId.columnName}'{/ts}
+                {if !empty($headerAttr.$recId.dataType)}cell-data-type="{$headerAttr.$recId.dataType}"{/if}
+                {if !empty($headerAttr.$recId.dataEmptyOption)}cell-data-empty-option="{$headerAttr.$recId.dataEmptyOption}"{/if}>{ts}{$head}{/ts}
+                </th>
+              {/foreach}
+              <th data-data="action" data-orderable="false">&nbsp;</th>
+            </thead>
+              {literal}
+              <script type="text/javascript">
+                (function($) {
+                  var ZeroRecordText = {/literal}'{ts 1=$customGroupTitle}No records of type \'%1\' found.{/ts}'{literal};
+                  var $table = $('#records-' + {/literal}'{$customGroupId}'{literal});
+                  $('table.crm-multifield-selector').data({
+                    "ajax": {
+                      "url": {/literal}'{crmURL p="civicrm/ajax/multirecordfieldlist" h=0 q="snippet=4&cid=$contactId&cgid=$customGroupId"}'{literal},
+                    },
+                    "language": {
+                      "emptyTable": ZeroRecordText,
+                    },
+                    //Add class attributes to cells
+                    "rowCallback": function(row, data) {
+                      $('thead th', $table).each(function(index) {
+                        var fName = $(this).attr('data-data');
+                        var cell = $('td:eq(' + index + ')', row);
+                        if (typeof data[fName] == 'object') {
+                          if (typeof data[fName].data != 'undefined') {
+                            $(cell).html(data[fName].data);
+                          }
+                          if (typeof data[fName].cellClass != 'undefined') {
+                            $(cell).attr('class', data[fName].cellClass);
+                          }
+                        }
+                      });
+                    },
+                  })
+                })(CRM.$);
+              </script>
+              {/literal}
+
+            {else}
               {foreach from=$headers key=recId item=head}
                 <th>{ts}{$head}{/ts}</th>
               {/foreach}
-              <th></th>
+
               {foreach from=$dateFields key=fieldId item=v}
                 <th class='hiddenElement'></th>
               {/foreach}
-            </tr>
-            </thead>
-            {foreach from=$records key=recId item=rows}
-              <tr class="{cycle values="odd-row,even-row"}">
-                {foreach from=$headers key=hrecId item=head}
-                  {if $dateFieldsVals.$hrecId.$recId}
-                    <td>{$rows.$hrecId|crmDate:"%b %d, %Y %l:%M %P"}</td>
-                  {else}
-                    <td>{$rows.$hrecId}</td>
-                  {/if}
-                {/foreach}
-                <td>{$rows.action}</td>
-                {foreach from=$dateFieldsVals key=fid item=rec}
-                  {if $rec.$recId}
-                    <td class='crm-field-{$fid}_date hiddenElement'>{$rec.$recId}</td>
-                  {/if}
-                {/foreach}
-              </tr>
-            {/foreach}
+              <th>&nbsp;</th>
+              </thead>
+              {foreach from=$records key=recId item=rows}
+                <tr class="{cycle values="odd-row,even-row"}">
+                  {foreach from=$headers key=hrecId item=head}
+                    <td {crmAttributes a=$attributes.$hrecId.$recId}>{$rows.$hrecId}</td>
+                  {/foreach}
+                  <td>{$rows.action}</td>
+                  {foreach from=$dateFieldsVals key=fid item=rec}
+                      <td class='crm-field-{$fid}_date hiddenElement'>{$rec.$recId}</td>
+                  {/foreach}
+                </tr>
+              {/foreach}
+            {/if}
           </table>
         {/strip}
       </div>
@@ -79,82 +115,15 @@
   {/if}
 
   {if !$reachedMax}
-    {if $pageViewType eq 'customDataView'}
-      <br/><a accesskey="N" title="{ts 1=$customGroupTitle}Add %1 Record{/ts}" href="{crmURL p='civicrm/contact/view/cd/edit' q="reset=1&snippet=1&type=$ctype&groupID=$customGroupId&entityID=$contactId&cgcount=$cgcount&multiRecordDisplay=single"}" 
-       class="button action-item"><span><div class="icon add-icon"></div>{ts 1=$customGroupTitle}Add %1 Record{/ts}</span></a>
-    {else}
-      <a accesskey="N" href="{crmURL p='civicrm/profile/edit' q="reset=1&id=`$contactId`&multiRecord=add&gid=`$gid`&snippet=1&context=multiProfileDialog&onPopupClose=`$onPopupClose`"}"
-       class="button action-item"><span><div class="icon add-icon"></div>{ts}Add New Record{/ts}</span></a>
-    {/if}
+    <div class="action-link">
+      {if $pageViewType eq 'customDataView'}
+        <br/><a accesskey="N" title="{ts 1=$customGroupTitle}Add %1 Record{/ts}" href="{crmURL p='civicrm/contact/view/cd/edit' q="reset=1&type=$ctype&groupID=$customGroupId&entityID=$contactId&cgcount=$newCgCount&multiRecordDisplay=single&mode=add"}"
+         class="button action-item"><span><i class="crm-i fa-plus-circle"></i> {ts 1=$customGroupTitle}Add %1 Record{/ts}</span></a>
+      {else}
+        <a accesskey="N" href="{crmURL p='civicrm/profile/edit' q="reset=1&id=`$contactId`&multiRecord=add&gid=`$gid`&context=multiProfileDialog&onPopupClose=`$onPopupClose`"}"
+         class="button action-item"><span><i class="crm-i fa-plus-circle"></i> {ts}Add New Record{/ts}</span></a>
+      {/if}
+    </div>
+    <br />
   {/if}
 {/if}
-{literal}
-  <script type='text/javascript'>
-    cj(function () {
-      var dialogId = '{/literal}{$dialogId}{literal}';
-      var pageViewType = '{/literal}{$pageViewType}{literal}';
-      // NOTE: Triggers two events, "profile-dialog:FOO:open" and "profile-dialog:FOO:close",
-      // where "FOO" is the internal name of a profile form
-      function formDialog(dialogName, dataURL, dialogTitle) {
-        cj.ajax({
-          url: dataURL,
-          success: function (content) {
-            cj('#' + dialogId).show().html(content).dialog({
-              title: dialogTitle,
-              modal: true,
-              width: 750,
-              overlay: {
-                opacity: 0.5,
-                background: "black"
-              },
-              open: function(event, ui) {
-                cj('#' + dialogId).trigger({
-                  type: "crmFormLoad",
-                  profileName: dialogName
-                });
-              },
-              close: function (event, ui) {
-                cj('#' + dialogId).trigger({
-                  type: "crmFormClose",
-                  profileName: dialogName
-                });
-                cj('#' + dialogId).html('');
-              }
-            });
-            cj('.action-link').hide();
-            if (pageViewType == 'customDataView') {
-              var labelElement = cj('#custom-record-dialog .html-adjust label').css('display', 'inline');
-            }
-            else {
-              var labelElement = cj('#profile-dialog #crm-profile-block .edit-value label').css('display', 'inline');
-            }
-          }
-        });
-      }
-
-      var profileName = {/literal}"{$ufGroupName}"{literal};
-      cj('.action-item').each(function () {
-        if (!cj(this).attr('jshref') && !cj(this).hasClass('ignore-jshref')) {
-          cj(this).attr('jshref', cj(this).attr('href'));
-          cj(this).attr('href', '#browseValues');
-        }
-      });
-
-      if (pageViewType == 'customDataView') {
-        var actionItemHeirarchy = '.action-item';
-        profileName = 'customRecordView';
-      }
-      else {
-        var actionItemHeirarchy = '.crm-profile-name-' + profileName + ' .action-item';
-      }
-
-      cj(actionItemHeirarchy).click(function () {
-        dataURL = cj(this).attr('jshref');
-        dialogTitle = cj(this).attr('title');
-        if (!cj(this).hasClass('ignore-jshref')) {
-          formDialog(profileName, dataURL, dialogTitle);
-        }
-      });
-    });
-    </script>
-  {/literal}

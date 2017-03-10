@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,52 +23,51 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Redefine the display action.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Core_QuickForm_Action_Display extends CRM_Core_QuickForm_Action {
 
   /**
-   * the template to display the required "red" asterick
+   * The template to display the required "red" asterick.
    * @var string
    */
   static $_requiredTemplate = NULL;
 
   /**
-   * the template to display error messages inline with the form element
+   * The template to display error messages inline with the form element.
    * @var string
    */
   static $_errorTemplate = NULL;
 
   /**
-   * class constructor
+   * Class constructor.
    *
-   * @param object $stateMachine reference to state machine object
+   * @param object $stateMachine
+   *   Reference to state machine object.
    *
-   * @return object
-   * @access public
+   * @return \CRM_Core_QuickForm_Action_Display
    */
-  function __construct(&$stateMachine) {
+  public function __construct(&$stateMachine) {
     parent::__construct($stateMachine);
   }
 
   /**
    * Processes the request.
    *
-   * @param  object    $page       CRM_Core_Form the current form-page
-   * @param  string    $actionName Current action name, as one Action object can serve multiple actions
+   * @param CRM_Core_Form $page
+   *   CRM_Core_Form the current form-page.
+   * @param string $actionName
+   *   Current action name, as one Action object can serve multiple actions.
    *
-   * @return void
-   * @access public
+   * @return object|void
    */
-  function perform(&$page, $actionName) {
+  public function perform(&$page, $actionName) {
     $pageName = $page->getAttribute('id');
 
     // If the original action was 'display' and we have values in container then we load them
@@ -101,32 +100,28 @@ class CRM_Core_QuickForm_Action_Display extends CRM_Core_QuickForm_Action {
   }
 
   /**
-   * render the page using a custom templating
-   * system
+   * Render the page using a custom templating system.
    *
-   * @param object  $page the CRM_Core_Form page
-   * @param boolean $ret  should we echo or return output
-   *
-   * @return void
-   * @access public
+   * @param CRM_Core_Form $page
+   *   The CRM_Core_Form page.
    */
-  function renderForm(&$page) {
+  public function renderForm(&$page) {
     $this->_setRenderTemplates($page);
     $template = CRM_Core_Smarty::singleton();
     $form = $page->toSmarty();
 
     // Deprecated - use snippet=6 instead of json=1
-    $json = CRM_Utils_Request::retrieve('json', 'Boolean', CRM_Core_DAO::$_nullObject);
+    $json = CRM_Utils_Request::retrieve('json', 'Boolean');
     if ($json) {
-      echo json_encode($form);
-      CRM_Utils_System::civiExit();
+      CRM_Utils_JSON::output($form);
     }
 
     $template->assign('form', $form);
     $template->assign('isForm', 1);
 
     $controller = &$page->controller;
-    if ($controller->getEmbedded()) {
+    // Stop here if we are in embedded mode. Exception: displaying form errors via ajax
+    if ($controller->getEmbedded() && !(!empty($form['errors']) && $controller->_QFResponseType == 'json')) {
       return;
     }
 
@@ -187,14 +182,12 @@ class CRM_Core_QuickForm_Action_Display extends CRM_Core_QuickForm_Action {
   }
 
   /**
-   * set the various rendering templates
+   * Set the various rendering templates.
    *
-   * @param object  $page the CRM_Core_Form page
-   *
-   * @return void
-   * @access public
+   * @param CRM_Core_Form $page
+   *   The CRM_Core_Form page.
    */
-  function _setRenderTemplates(&$page) {
+  public function _setRenderTemplates(&$page) {
     if (self::$_requiredTemplate === NULL) {
       $this->initializeTemplates();
     }
@@ -206,14 +199,9 @@ class CRM_Core_QuickForm_Action_Display extends CRM_Core_QuickForm_Action {
   }
 
   /**
-   * initialize the various templates
-   *
-   * @param object  $page the CRM_Core_Form page
-   *
-   * @return void
-   * @access public
+   * Initialize the various templates.
    */
-  function initializeTemplates() {
+  public function initializeTemplates() {
     if (self::$_requiredTemplate !== NULL) {
       return;
     }
@@ -228,5 +216,5 @@ class CRM_Core_QuickForm_Action_Display extends CRM_Core_QuickForm_Action {
     self::$_requiredTemplate = file_get_contents($templateDir . '/CRM/Form/label.tpl');
     self::$_errorTemplate = file_get_contents($templateDir . '/CRM/Form/error.tpl');
   }
-}
 
+}

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
  */
@@ -36,39 +36,73 @@ class CRM_Member_BAO_MembershipPayment extends CRM_Member_DAO_MembershipPayment 
 
 
   /**
-   * class constructor
+   * Class constructor.
    */
-  function __construct() {
+  public function __construct() {
     parent::__construct();
   }
+
   /**
-   * function to add the membership Payments
+   * Add the membership Payments.
    *
-   * @param array $params reference array contains the values submitted by the form
+   * @param array $params
+   *   Reference array contains the values submitted by the form.
    *
-   * @access public
-   * @static
    *
    * @return object
    */
-  static function create(&$params) {
+  public static function create($params) {
     $hook = empty($params['id']) ? 'create' : 'edit';
     CRM_Utils_Hook::pre($hook, 'MembershipPayment', CRM_Utils_Array::value('id', $params), $params);
     $dao = new CRM_Member_DAO_MembershipPayment();
     $dao->copyValues($params);
-    $dao->id = CRM_Utils_Array::value('id', $params);
-    $dao->save();
+    // We check for membership_id in case we are being called too early in the process. This is
+    // cludgey but is part of the deprecation process (ie. we are trying to do everything
+    // from LineItem::create with a view to eventually removing this fn & the table.
+    if (!civicrm_api3('Membership', 'getcount', array('id' => $params['membership_id']))) {
+      return $dao;
+    }
+
+    //Fixed for avoiding duplicate entry error when user goes
+    //back and forward during payment mode is notify
+    if (!$dao->find(TRUE)) {
+      $dao->save();
+    }
     CRM_Utils_Hook::post($hook, 'MembershipPayment', $dao->id, $dao);
+    // CRM-14197 we are in the process on phasing out membershipPayment in favour of storing both contribution_id & entity_id (membership_id) on the line items
+    // table. However, at this stage we have both - there is still quite a bit of refactoring to do to set the line_iten entity_id right the first time
+    // however, we can assume at this stage that any contribution id will have only one line item with that membership type in the line item table
+    // OR the caller will have taken responsibility for updating the line items themselves so we will update using SQL here
+    if (!isset($params['membership_type_id'])) {
+      $membership_type_id = civicrm_api3('membership', 'getvalue', array(
+        'id' => $dao->membership_id,
+        'return' => 'membership_type_id',
+      ));
+    }
+    else {
+      $membership_type_id = $params['membership_type_id'];
+    }
+    $sql = "UPDATE civicrm_line_item li
+      LEFT JOIN civicrm_price_field_value pv ON pv.id = li.price_field_value_id
+      SET entity_table = 'civicrm_membership', entity_id = %1
+      WHERE pv.membership_type_id = %2
+      AND contribution_id = %3";
+    CRM_Core_DAO::executeQuery($sql, array(
+      1 => array($dao->membership_id, 'Integer'),
+      2 => array($membership_type_id, 'Integer'),
+      3 => array($dao->contribution_id, 'Integer'),
+    ));
     return $dao;
   }
 
   /**
-   * Function to delete membership Payments
+   * Delete membership Payments.
    *
    * @param int $id
-   * @static
+   *
+   * @return bool
    */
-  static function del($id) {
+  public static function del($id) {
     $dao = new CRM_Member_DAO_MembershipPayment();
     $dao->id = $id;
     $result = FALSE;
@@ -79,6 +113,4 @@ class CRM_Member_BAO_MembershipPayment extends CRM_Member_DAO_MembershipPayment 
     return $result;
   }
 
-
 }
-

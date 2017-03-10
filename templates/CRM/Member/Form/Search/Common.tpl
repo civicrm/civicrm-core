@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,23 +24,11 @@
  +--------------------------------------------------------------------+
 *}
 <tr>
-  <td><label>{ts}Membership Type(s){/ts}</label><br />
-    <div class="listing-box">
-    {foreach from=$form.member_membership_type_id item="membership_type_val"}
-      <div class="{cycle values='odd-row,even-row'}">
-        {$membership_type_val.html}
-      </div>
-    {/foreach}
-    </div>
+  <td><label>{$form.membership_type_id.label}</label><br />
+      {$form.membership_type_id.html|crmAddClass:twenty}
   </td>
-  <td><label>{ts}Membership Status{/ts}</label><br />
-    <div class="listing-box">
-    {foreach from=$form.member_status_id item="membership_status_val"}
-      <div class="{cycle values='odd-row,even-row'}">
-        {$membership_status_val.html}
-      </div>
-    {/foreach}
-    </div>
+  <td><label>{$form.membership_status_id.label}</label><br />
+      {$form.membership_status_id.html}
   </td>
 </tr>
 
@@ -54,6 +42,10 @@
   </td>
   <td>
     <p>
+    {$form.membership_is_current_member.label}
+    {$form.membership_is_current_member.html}
+    </p>
+    <p>
     {$form.member_is_primary.label}
     {help id="id-member_is_primary" file="CRM/Member/Form/Search.hlp"}
     {$form.member_is_primary.html}
@@ -62,9 +54,22 @@
     {$form.member_pay_later.label}&nbsp;{$form.member_pay_later.html}
     </p>
     <p>
-    {$form.member_auto_renew.label}&nbsp;{$form.member_auto_renew.html}
+      {if $form.member_auto_renew}
+          <label>{$form.member_auto_renew.label}</label>
+          {help id="id-member_auto_renew" file="CRM/Member/Form/Search.hlp"}
+          <br/>
+          {$form.member_auto_renew.html}
+        {/if}
+    </p>
+    <p>
+    {$form.member_is_override.label}
+    {help id="id-member_is_override" file="CRM/Member/Form/Search.hlp"}
+    {$form.member_is_override.html}
     </p>
   </td>
+</tr>
+
+<tr><td><label>{$form.membership_id.label}</label> {$form.membership_id.html}</td>
 </tr>
 
 <tr><td><label>{ts}Member Since{/ts}</label></td></tr>

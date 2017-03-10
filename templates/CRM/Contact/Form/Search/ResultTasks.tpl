@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -58,7 +58,7 @@
         {if $savedSearch.name}{$savedSearch.name} ({ts}smart group{/ts}) - {/if}
         {ts count=$pager->_totalItems plural='%count Contacts'}%count Contact{/ts}
     </td>
-    
+
     {* Search criteria are passed to tpl in the $qill array *}
     <td class="nowrap">
     {if $qill}
@@ -69,7 +69,11 @@
   <tr>
     <td class="font-size11pt"> {ts}Select Records{/ts}:</td>
     <td class="nowrap">
-        {$form.radio_ts.ts_all.html} <label for="{$ts_all_id}">{ts count=$pager->_totalItems plural='All %count records'}The found record{/ts}</label> &nbsp; {if $pager->_totalItems > 1} {$form.radio_ts.ts_sel.html} <label for="{$ts_sel_id}">{ts}Selected records only{/ts}</label>{/if}
+      {assign var="checked" value=$selectedContactIds|@count}
+      {$form.radio_ts.ts_all.html} <label for="{$ts_all_id}">{ts count=$pager->_totalItems plural='All %count records'}The found record{/ts}</label>
+      {if $pager->_totalItems > 1}
+        &nbsp; {$form.radio_ts.ts_sel.html} <label for="{$ts_sel_id}">{ts 1="<span>$checked</span>"}%1 Selected records only{/ts}</label>
+      {/if}
     </td>
   </tr>
   <tr>
@@ -91,11 +95,3 @@
   </tr>
   </table>
  </div>
-
-{literal}
-<script type="text/javascript">
-cj(function() {
-  toggleTaskAction( );
-});
-</script>
-{/literal}

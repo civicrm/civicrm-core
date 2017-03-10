@@ -8,6 +8,7 @@
   <add>3.3</add>
   <field>
     <name>id</name>
+    <title>Batch ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Unique Address ID</comment>
@@ -19,6 +20,7 @@
   </primaryKey>
   <field>
     <name>name</name>
+    <title>Batch Name</title>
     <type>varchar</type>
     <length>64</length>
     <comment>Variable name/programmatic handle for this batch.</comment>
@@ -44,6 +46,7 @@
   </field>
   <field>
     <name>title</name>
+    <title>Batch Title</title>
     <type>varchar</type>
     <length>64</length>
     <localizable>true</localizable>
@@ -55,6 +58,7 @@
   </field>
   <field>
     <name>description</name>
+    <title>Batch Description</title>
     <type>text</type>
     <comment>Description of this batch set.</comment>
     <localizable>true</localizable>
@@ -67,6 +71,7 @@
   </field>
   <field>
     <name>created_id</name>
+    <title>Batch Created By</title>
     <type>int unsigned</type>
     <comment>FK to Contact ID</comment>
     <add>3.3</add>
@@ -80,6 +85,7 @@
   </foreignKey>
   <field>
     <name>created_date</name>
+    <title>Batch Created Date</title>
     <type>datetime</type>
     <comment>When was this item created</comment>
     <add>3.3</add>
@@ -89,12 +95,14 @@
   </field>
   <field>
     <name>modified_id</name>
+    <title>Batch Modified By</title>
     <type>int unsigned</type>
     <comment>FK to Contact ID</comment>
     <add>3.3</add>
   </field>
   <field>
     <name>modified_date</name>
+    <title>Batch Modified Date</title>
     <type>datetime</type>
     <comment>When was this item created</comment>
     <add>3.3</add>
@@ -108,11 +116,12 @@
   </foreignKey>
   <field>
     <name>saved_search_id</name>
+    <title>Batch Smart Group</title>
     <type>int unsigned</type>
     <comment>FK to Saved Search ID</comment>
     <add>4.1</add>
     <html>
-      <type>Autocomplete-Select</type>
+      <type>EntityRef</type>
     </html>
   </field>
   <foreignKey>
@@ -124,6 +133,7 @@
   </foreignKey>
   <field>
     <name>status_id</name>
+    <title>Batch Status</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>fk to Batch Status options in civicrm_option_values</comment>
@@ -137,6 +147,7 @@
   </field>
   <field>
     <name>type_id</name>
+    <title>Batch Type</title>
     <type>int unsigned</type>
     <comment>fk to Batch Type options in civicrm_option_values</comment>
     <add>4.2</add>
@@ -149,6 +160,7 @@
   </field>
   <field>
     <name>mode_id</name>
+    <title>Batch Mode</title>
     <type>int unsigned</type>
     <comment>fk to Batch mode options in civicrm_option_values</comment>
     <add>4.2</add>
@@ -161,6 +173,7 @@
   </field>
   <field>
     <name>total</name>
+    <title>Batch Total</title>
     <type>decimal</type>
     <comment>Total amount for this batch.</comment>
     <add>4.2</add>
@@ -170,6 +183,7 @@
   </field>
   <field>
     <name>item_count</name>
+    <title>Batch Number of Items</title>
     <type>int unsigned</type>
     <comment>Number of items in a batch.</comment>
     <add>4.2</add>
@@ -179,6 +193,7 @@
   </field>
   <field>
     <name>payment_instrument_id</name>
+    <title>Batch Payment Method</title>
     <type>int unsigned</type>
     <comment>fk to Payment Instrument options in civicrm_option_values</comment>
     <pseudoconstant>
@@ -191,11 +206,13 @@
   </field>
   <field>
     <name>exported_date</name>
+    <title>Batch Exported Date</title>
     <type>datetime</type>
     <add>4.3</add>
   </field>
   <field>
     <name>data</name>
+    <title>Batch Data</title>
     <type>longtext</type>
     <comment>cache entered data</comment>
     <add>4.4</add>

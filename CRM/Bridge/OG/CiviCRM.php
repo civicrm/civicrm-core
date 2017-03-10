@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,18 +23,21 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Bridge_OG_CiviCRM {
 
-  static function group($groupID, $group, $op) {
+  /**
+   * @param int $groupID
+   * @param $group
+   * @param $op
+   */
+  public static function group($groupID, $group, $op) {
     if ($op == 'add') {
       self::groupAdd($groupID, $group);
     }
@@ -43,7 +46,11 @@ class CRM_Bridge_OG_CiviCRM {
     }
   }
 
-  static function groupAdd($groupID, $group) {
+  /**
+   * @param int $groupID
+   * @param $group
+   */
+  public static function groupAdd($groupID, $group) {
     $ogID = CRM_Bridge_OG_Utils::ogID($groupID, FALSE);
 
     $node = new StdClass();
@@ -52,9 +59,9 @@ class CRM_Bridge_OG_CiviCRM {
     }
 
     global $user;
-    $node->uid    = $user->uid;
-    $node->title  = $group->title;
-    $node->type   = 'og';
+    $node->uid = $user->uid;
+    $node->title = $group->title;
+    $node->type = 'og';
     $node->status = 1;
 
     // set the og values
@@ -73,7 +80,11 @@ class CRM_Bridge_OG_CiviCRM {
     );
   }
 
-  static function groupDelete($groupID, $group) {
+  /**
+   * @param int $groupID
+   * @param $group
+   */
+  public static function groupDelete($groupID, $group) {
     $ogID = CRM_Bridge_OG_Utils::ogID($groupID, FALSE);
     if (!$ogID) {
       return;
@@ -82,7 +93,12 @@ class CRM_Bridge_OG_CiviCRM {
     node_delete($ogID);
   }
 
-  static function groupContact($groupID, $contactIDs, $op) {
+  /**
+   * @param int $groupID
+   * @param $contactIDs
+   * @param $op
+   */
+  public static function groupContact($groupID, $contactIDs, $op) {
     $config = CRM_Core_Config::singleton();
     $ogID = CRM_Bridge_OG_Utils::ogID($groupID, FALSE);
 
@@ -102,5 +118,5 @@ class CRM_Bridge_OG_CiviCRM {
       }
     }
   }
-}
 
+}

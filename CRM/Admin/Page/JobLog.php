@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,44 +23,43 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
- * Page for displaying list of jobs
+ * Page for displaying list of jobs.
  */
 class CRM_Admin_Page_JobLog extends CRM_Core_Page_Basic {
 
   /**
-   * The action links that we need to display for the browse screen
+   * The action links that we need to display for the browse screen.
    *
    * @var array
-   * @static
    */
   static $_links = NULL;
 
   /**
-   * Get BAO Name
+   * Get BAO Name.
    *
-   * @return string Classname of BAO.
+   * @return string
+   *   Classname of BAO.
    */
-  function getBAOName() {
+  public function getBAOName() {
     return 'CRM_Core_BAO_Job';
   }
 
   /**
-   * Get action Links
+   * Get action Links.
    *
-   * @return array (reference) of action links
+   * @return array
+   *   (reference) of action links
    */
-  function &links() {
+  public function &links() {
     return self::$_links;
   }
 
@@ -70,19 +69,18 @@ class CRM_Admin_Page_JobLog extends CRM_Core_Page_Basic {
    * This method is called after the page is created. It checks for the
    * type of action and executes that action.
    * Finally it calls the parent's run method.
-   *
-   * @return void
-   * @access public
-   *
    */
-  function run() {
+  public function run() {
     // set title and breadcrumb
     CRM_Utils_System::setTitle(ts('Settings - Scheduled Jobs Log'));
-    $breadCrumb = array(array('title' => ts('Administration'),
+    $breadCrumb = array(
+      array(
+        'title' => ts('Administration'),
         'url' => CRM_Utils_System::url('civicrm/admin',
           'reset=1'
         ),
-      ));
+      ),
+    );
     CRM_Utils_System::appendBreadCrumb($breadCrumb);
     return parent::run();
   }
@@ -90,11 +88,9 @@ class CRM_Admin_Page_JobLog extends CRM_Core_Page_Basic {
   /**
    * Browse all jobs.
    *
-   * @return void
-   * @access public
-   * @static
+   * @param null $action
    */
-  function browse($action = NULL) {
+  public function browse($action = NULL) {
 
     $jid = CRM_Utils_Request::retrieve('jid', 'Positive', $this);
 
@@ -102,8 +98,7 @@ class CRM_Admin_Page_JobLog extends CRM_Core_Page_Basic {
 
     $jobName = NULL;
     if ($jid) {
-      $jobName =
-        CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Job', $jid);
+      $jobName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Job', $jid);
     }
 
     $this->assign('jobName', $jobName);
@@ -119,7 +114,6 @@ class CRM_Admin_Page_JobLog extends CRM_Core_Page_Basic {
     }
     $dao->find();
 
-
     $rows = array();
     while ($dao->fetch()) {
       unset($row);
@@ -132,30 +126,35 @@ class CRM_Admin_Page_JobLog extends CRM_Core_Page_Basic {
   }
 
   /**
-   * Get name of edit form
+   * Get name of edit form.
    *
-   * @return string Classname of edit form.
+   * @return string
+   *   Classname of edit form.
    */
-  function editForm() {
+  public function editForm() {
     return 'CRM_Admin_Form_Job';
   }
 
   /**
-   * Get edit form name
+   * Get edit form name.
    *
-   * @return string name of this page.
+   * @return string
+   *   name of this page.
    */
-  function editName() {
+  public function editName() {
     return 'Scheduled Jobs';
   }
 
   /**
    * Get user context.
    *
-   * @return string user context.
+   * @param null $mode
+   *
+   * @return string
+   *   user context.
    */
-  function userContext($mode = NULL) {
+  public function userContext($mode = NULL) {
     return 'civicrm/admin/job';
   }
-}
 
+}

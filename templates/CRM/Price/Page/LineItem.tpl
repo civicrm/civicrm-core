@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -34,50 +34,89 @@
       <strong>{ts}Participant {$priceset+1}{/ts}</strong> {$part.$priceset.info}
     {/if}
     <table>
-            <tr class="columnheader">
+      <tr class="columnheader">
         <th>{ts}Item{/ts}</th>
-              {if $context EQ "Membership"}
-        <th class="right">{ts}Fee{/ts}</th>
-                {else}
-        <th class="right">{ts}Qty{/ts}</th>
-                    <th class="right">{ts}Unit Price{/ts}</th>
-        <th class="right">{ts}Total Price{/ts}</th>
-    {/if}
+        {if $displayLineItemFinancialType}
+          <th>{ts}Financial Type{/ts}</th>
+        {/if}
+        {if $context EQ "Membership"}
+          <th class="right">{ts}Fee{/ts}</th>
+        {else}
+          <th class="right">{ts}Qty{/ts}</th>
+          <th class="right">{ts}Unit Price{/ts}</th>
+          {if !$getTaxDetails}
+            <th class="right">{ts}Total Price{/ts}</th>
+          {/if}
+        {/if}
 
-     {if $pricesetFieldsCount}
-        <th class="right">{ts}Total Participants{/ts}</th>{/if}
-            </tr>
-            {foreach from=$value item=line}
-            <tr>
-                <td>{if $line.html_type eq 'Text'}{$line.label}{else}{$line.field_title} - {$line.label}{/if} {if $line.description}<div class="description">{$line.description}</div>{/if}</td>
-    {if $context NEQ "Membership"}
-        <td class="right">{$line.qty}</td>
-                    <td class="right">{$line.unit_price|crmMoney}</td>
+        {if $getTaxDetails}
+          <th class="right">{ts}Subtotal{/ts}</th>
+          <th class="right">{ts}Tax Rate{/ts}</th>
+          <th class="right">{ts}Tax Amount{/ts}</th>
+          <th class="right">{ts}Total Amount{/ts}</th>
+        {/if}
+
+        {if $pricesetFieldsCount}
+          <th class="right">{ts}Total Participants{/ts}</th>
+        {/if}
+      </tr>
+      {foreach from=$value item=line}
+        <tr{if $line.qty EQ 0} class="cancelled"{/if}>
+          <td>{if $line.html_type eq 'Text'}{$line.label}{else}{$line.field_title} - {$line.label}{/if} {if $line.description}<div class="description">{$line.description}</div>{/if}</td>
+          {if $displayLineItemFinancialType}
+            <td>{$line.financial_type}</td>
+          {/if}
+          {if $context NEQ "Membership"}
+            <td class="right">{$line.qty}</td>
+            <td class="right">{$line.unit_price|crmMoney}</td>
+    {else}
+            <td class="right">{$line.line_total|crmMoney}</td>
+          {/if}
+    {if !$getTaxDetails && $context NEQ "Membership"}
+      <td class="right">{$line.line_total|crmMoney}</td>
     {/if}
-                <td class="right">{$line.line_total|crmMoney}</td>
-           {if $pricesetFieldsCount}<td class="right">{$line.participant_count}</td> {/if}
-            </tr>
-            {/foreach}
+    {if $getTaxDetails}
+      <td class="right">{$line.line_total|crmMoney}</td>
+      {if $line.tax_rate != "" || $line.tax_amount != ""}
+        <td class="right">{$taxTerm} ({$line.tax_rate|string_format:"%.3f"}%)</td>
+        <td class="right">{$line.tax_amount|crmMoney}</td>
+      {else}
+        <td></td>
+        <td></td>
+      {/if}
+      <td class="right">{$line.line_total+$line.tax_amount|crmMoney}</td>
+    {/if}
+          {if $pricesetFieldsCount}
+            <td class="right">{$line.participant_count}</td>
+          {/if}
+        </tr>
+      {/foreach}
     </table>
-    {/if}
+  {/if}
 {/foreach}
 
 <div class="crm-section no-label total_amount-section">
-    <div class="content bold">
-        {if $context EQ "Contribution"}
-            {ts}Contribution Total{/ts}:
-        {elseif $context EQ "Event"}
-            {ts}Event Total{/ts}:
-   {elseif $context EQ "Membership"}
-            {ts}Membership Fee Total{/ts}:
-        {else}
-            {ts}Total Amount{/ts}:
-        {/if}
+  <div class="content bold">
+    {if $getTaxDetails && $totalTaxAmount}
+      {ts}Total Tax Amount{/ts}: {$totalTaxAmount|crmMoney}<br />
+    {/if}
+    {if $context EQ "Contribution"}
+      {ts}Contribution Total{/ts}:
+    {elseif $context EQ "Event"}
+      {if $totalTaxAmount}
+        {ts}Event SubTotal: {$totalAmount-$totalTaxAmount|crmMoney}{/ts}<br />
+      {/if}
+      {ts}Event Total{/ts}:
+    {elseif $context EQ "Membership"}
+      {ts}Membership Fee Total{/ts}:
+    {else}
+      {ts}Total Amount{/ts}:
+    {/if}
     {$totalAmount|crmMoney}
-    </div>
-    <div class="clear"></div>
-    <div class="content bold">
-      {if $pricesetFieldsCount}
+  </div>
+  <div class="clear"></div>
+  <div class="content bold">
+    {if $pricesetFieldsCount}
       {ts}Total Participants{/ts}:
       {foreach from=$lineItem item=pcount}
         {if $pcount neq 'skip'}
@@ -93,19 +132,19 @@
         {/if}
       {/foreach}
       {$totalcount}
-      {/if}
-    </div>
-    <div class="clear"></div>
+    {/if}
+  </div>
+  <div class="clear"></div>
 </div>
 
 {if $hookDiscount.message}
   <div class="crm-section hookDiscount-section">
-      <em>({$hookDiscount.message})</em>
+    <em>({$hookDiscount.message})</em>
   </div>
 {/if}
 {literal}
 <script type="text/javascript">
-cj(document).ready(function($) {
+CRM.$(function($) {
   {/literal}
     var comma = '{$config->monetaryThousandSeparator}';
     var dot = '{$config->monetaryDecimalPoint}';

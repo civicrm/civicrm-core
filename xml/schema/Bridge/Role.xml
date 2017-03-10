@@ -7,26 +7,26 @@
   <comment>An FK table that links between civicrm group and drupal roles</comment>
   <add>2.0</add>
   <field>
-      <name>id</name>
-      <type>int unsigned</type>
-      <required>true</required>
-      <comment>Unique table ID</comment>
-      <add>2.0</add>
+    <name>id</name>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Unique table ID</comment>
+    <add>2.0</add>
   </field>
   <primaryKey>
-       <name>id</name>
-       <autoincrement>true</autoincrement>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
   </primaryKey>
   <field>
-       <name>drupal_role_id</name>
-       <type>int unsigned</type>
-       <comment>Foreign key to the drupal role.</comment>
-       <add>2.0</add>
+    <name>drupal_role_id</name>
+    <type>int unsigned</type>
+    <comment>Foreign key to the drupal role.</comment>
+    <add>2.0</add>
   </field>
   <index>
-       <name>index_drupal_role_id</name>
-       <fieldName>index_drupal_role_id</fieldName>
-       <add>2.0</add>
+    <name>index_drupal_role_id</name>
+    <fieldName>index_drupal_role_id</fieldName>
+    <add>2.0</add>
   </index>
   <field>
     <name>group_id</name>
@@ -44,9 +44,9 @@
     </html>
   </field>
   <foreignKey>
-       <name>group_id</name>
-       <table>civicrm_group</table>
-       <key>id</key>
-       <add>2.0</add>
+    <name>group_id</name>
+    <table>civicrm_group</table>
+    <key>id</key>
+    <add>2.0</add>
   </foreignKey>
 </table>

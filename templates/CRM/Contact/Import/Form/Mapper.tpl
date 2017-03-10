@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -45,9 +45,9 @@
        {/literal}
 
      {/section}
-   </dl>    
+   </dl>
 </div>
-    
+
 <div id="crm-submit-buttons" class="form-item">
 <dl>
    <dt>&nbsp;</dt><dd>{$form.buttons.html}</dd>

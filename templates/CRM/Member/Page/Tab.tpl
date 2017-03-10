@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -35,13 +35,13 @@
       {capture assign=newURL}{crmURL p="civicrm/contact/view/membership" q="reset=1&action=add&cid=`$contactId`&context=membership"}{/capture}{/if}
 
     {if $action ne 1 and $action ne 2 and $permission EQ 'edit'}
-        <div id="help">
+        <div class="help">
             {if $permission EQ 'edit'}
-              {capture assign="link"}class="action-item action-item-first" href="{$newURL}"{/capture}
+              {capture assign="link"}class="action-item" href="{$newURL}"{/capture}
               {ts 1=$link}Click <a %1>Add Membership</a> to record a new membership.{/ts}
               {if $newCredit}
                 {capture assign=newCreditURL}{crmURL p="civicrm/contact/view/membership" q="reset=1&action=add&cid=`$contactId`&context=membership&mode=live"}{/capture}
-                {capture assign="link"}class="action-item action-item-first" href="{$newCreditURL}"{/capture}
+                {capture assign="link"}class="action-item" href="{$newCreditURL}"{/capture}
                 {ts 1=$link}Click <a %1>Submit Credit Card Membership</a> to process a Membership on behalf of the member using their credit card.{/ts}
                 {/if}
             {else}
@@ -50,9 +50,9 @@
         </div>
 
         <div class="action-link">
-            <a accesskey="N" href="{$newURL}" class="button"><span><div class="icon add-icon"></div>{ts}Add Membership{/ts}</span></a>
+            <a accesskey="N" href="{$newURL}" class="button"><span><i class="crm-i fa-plus-circle"></i> {ts}Add Membership{/ts}</span></a>
             {if $accessContribution and $newCredit}
-                <a accesskey="N" href="{$newCreditURL}" class="button"><span><div class="icon add-icon"></div>{ts}Submit Credit Card Membership{/ts}</span></a><br /><br />
+                <a accesskey="N" href="{$newCreditURL}" class="button"><span><i class="crm-i fa-credit-card"></i> {ts}Submit Credit Card Membership{/ts}</span></a><br /><br />
             {else}
                 <br/ ><br/ >
             {/if}
@@ -89,9 +89,9 @@
                     {$activeMember.membership_type}
                     {if $activeMember.owner_membership_id}<br />({ts}by relationship{/ts}){/if}
                 </td>
-                <td class="crm-membership-join_date">{$activeMember.join_date|crmDate}</td>
-                <td class="crm-membership-start_date">{$activeMember.start_date|crmDate}</td>
-                <td class="crm-membership-end_date">{$activeMember.end_date|crmDate}</td>
+                <td class="crm-membership-join_date" data-order="{$activeMember.join_date}">{$activeMember.join_date|crmDate}</td>
+                <td class="crm-membership-start_date" data-order="{$activeMember.start_date}">{$activeMember.start_date|crmDate}</td>
+                <td class="crm-membership-end_date" data-order="{$activeMember.end_date}">{$activeMember.end_date|crmDate}</td>
                 <td class="crm-membership-status">{$activeMember.status}</td>
                 <td class="crm-membership-source">{$activeMember.source}</td>
                 <td class="crm-membership-auto_renew">{if $activeMember.auto_renew}<img src="{$config->resourceBase}i/check.gif" alt="{ts}Auto-renew{/ts}" /> {/if}</td>
@@ -99,7 +99,7 @@
     <td>
                     {$activeMember.action|replace:'xx':$activeMember.id}
                     {if $activeMember.owner_membership_id}
-                      <a href="{crmURL p='civicrm/membership/view' q="reset=1&id=`$activeMember.owner_membership_id`&action=view&context=membership&selectedChild=member"}" title="{ts}View Primary member record{/ts}" class="action-item">{ts}View Primary{/ts}</a>
+                      <a href="{crmURL p='civicrm/membership/view' q="reset=1&id=`$activeMember.owner_membership_id`&action=view&context=membership&selectedChild=member"}" title="{ts}View Primary member record{/ts}" class="crm-hover-button action-item">{ts}View Primary{/ts}</a>
                     {/if}
                 </td>
             </tr>
@@ -131,14 +131,14 @@
                 <td class="crm-membership-membership_type">{$inActiveMember.membership_type}
         {if $inActiveMember.owner_membership_id}<br />({ts}by relationship{/ts}){/if}
     </td>
-                <td class="crm-membership-start_date">{$inActiveMember.start_date|crmDate}</td>
-                <td class="crm-membership-end_date">{$inActiveMember.end_date|crmDate}</td>
+                <td class="crm-membership-start_date" data-order="{$inActiveMember.start_date}">{$inActiveMember.start_date|crmDate}</td>
+                <td class="crm-membership-end_date" data-order="{$inActiveMember.end_date}">{$inActiveMember.end_date|crmDate}</td>
                 <td class="crm-membership-status">{$inActiveMember.status}</td>
                 <td class="crm-membership-source">{$inActiveMember.source}</td>
                 <td class="crm-membership-auto_renew">{if $inActiveMember.auto_renew}<img src="{$config->resourceBase}i/check.gif" alt="{ts}Auto-renew{/ts}" /> {/if}</td>
     <td>{$inActiveMember.action|replace:'xx':$inActiveMember.id}
     {if $inActiveMember.owner_membership_id}
-      <a href="{crmURL p='civicrm/membership/view' q="reset=1&id=`$inActiveMember.owner_membership_id`&action=view&context=membership&selectedChild=member"}" title="{ts}View Primary member record{/ts}" class="action-item">{ts}View Primary{/ts}
+      <a href="{crmURL p='civicrm/membership/view' q="reset=1&id=`$inActiveMember.owner_membership_id`&action=view&context=membership&selectedChild=member"}" title="{ts}View Primary member record{/ts}" class="crm-hover-button action-item">{ts}View Primary{/ts}
       </a>
     {/if}
     </td>

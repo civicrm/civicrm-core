@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright U.S. PIRG Education Fund (c) 2007                        |
  | Licensed to CiviCRM under the Academic Free License version 3.0.   |
@@ -24,7 +24,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -34,13 +34,19 @@
  *
  */
 class CRM_Core_QuickForm_GroupMultiSelect extends CRM_Core_QuickForm_NestedAdvMultiSelect {
-  function toHtml() {
+  /**
+   * Returns the HTML generated for the advanced multiple select component.
+   *
+   * @return string
+   * @since      version 0.4.0 (2005-06-25)
+   */
+  public function toHtml() {
     if ($this->_flagFrozen) {
       return $this->getFrozenHtml();
     }
 
-    $tabs    = $this->_getTabs();
-    $tab     = $this->_getTab();
+    $tabs = $this->_getTabs();
+    $tab = $this->_getTab();
     $strHtml = '';
 
     if ($this->getComment() != '') {
@@ -68,7 +74,7 @@ class CRM_Core_QuickForm_GroupMultiSelect extends CRM_Core_QuickForm_NestedAdvMu
           }
         }
 
-        if (is_array($this->_values) && in_array((string)$option['attr']['value'], $this->_values)) {
+        if (is_array($this->_values) && in_array((string) $option['attr']['value'], $this->_values)) {
           // The items is *selected*
           $checked = ' checked="checked"';
         }
@@ -80,10 +86,10 @@ class CRM_Core_QuickForm_GroupMultiSelect extends CRM_Core_QuickForm_NestedAdvMu
       }
       $strHtmlSelected .= $tab . '</div>' . PHP_EOL;
 
-      $strHtmlHidden     = '';
+      $strHtmlHidden = '';
       $strHtmlUnselected = '';
-      $strHtmlAdd        = '';
-      $strHtmlRemove     = '';
+      $strHtmlAdd = '';
+      $strHtmlRemove = '';
 
       // build the select all button with all its attributes
       $attributes = array('onclick' => "{$this->_jsPrefix}{$this->_jsPostfix}('" . $this->getName() . "', 1);");
@@ -110,17 +116,26 @@ class CRM_Core_QuickForm_GroupMultiSelect extends CRM_Core_QuickForm_NestedAdvMu
       // ... or a dual multi-select
 
       // set name of Select From Box
-      $this->_attributesUnselected = array('name' => '__' . $selectName, 'ondblclick' => "{$this->_jsPrefix}{$this->_jsPostfix}(this.form.elements['__" . $selectName . "'], this.form.elements['_" . $selectName . "'], this.form.elements['" . $selectName . "'], 'add')");
+      $this->_attributesUnselected = array(
+        'name' => '__' . $selectName,
+        'ondblclick' => "{$this->_jsPrefix}{$this->_jsPostfix}(this.form.elements['__" . $selectName . "'], this.form.elements['_" . $selectName . "'], this.form.elements['" . $selectName . "'], 'add')",
+      );
       $this->_attributesUnselected = array_merge($this->_attributes, $this->_attributesUnselected);
       $attrUnselected = $this->_getAttrString($this->_attributesUnselected);
 
       // set name of Select To Box
-      $this->_attributesSelected = array('name' => '_' . $selectName, 'ondblclick' => "{$this->_jsPrefix}{$this->_jsPostfix}(this.form.elements['__" . $selectName . "'], this.form.elements['_" . $selectName . "'], this.form.elements['" . $selectName . "'], 'remove')");
+      $this->_attributesSelected = array(
+        'name' => '_' . $selectName,
+        'ondblclick' => "{$this->_jsPrefix}{$this->_jsPostfix}(this.form.elements['__" . $selectName . "'], this.form.elements['_" . $selectName . "'], this.form.elements['" . $selectName . "'], 'remove')",
+      );
       $this->_attributesSelected = array_merge($this->_attributes, $this->_attributesSelected);
       $attrSelected = $this->_getAttrString($this->_attributesSelected);
 
       // set name of Select hidden Box
-      $this->_attributesHidden = array('name' => $selectName, 'style' => 'overflow: hidden; visibility: hidden; width: 1px; height: 0;');
+      $this->_attributesHidden = array(
+        'name' => $selectName,
+        'style' => 'overflow: hidden; visibility: hidden; width: 1px; height: 0;',
+      );
       $this->_attributesHidden = array_merge($this->_attributes, $this->_attributesHidden);
       $attrHidden = $this->_getAttrString($this->_attributesHidden);
 
@@ -140,7 +155,7 @@ class CRM_Core_QuickForm_GroupMultiSelect extends CRM_Core_QuickForm_NestedAdvMu
 
         foreach ($this->_options as $option) {
           if (is_array($this->_values) &&
-            in_array((string)$option['attr']['value'], $this->_values)
+            in_array((string) $option['attr']['value'], $this->_values)
           ) {
             // Get the post order
             $key = array_search($option['attr']['value'], $this->_values);
@@ -245,7 +260,7 @@ class CRM_Core_QuickForm_GroupMultiSelect extends CRM_Core_QuickForm_NestedAdvMu
     // render extra labels, if any
     if (is_array($labels)) {
       foreach ($labels as $key => $text) {
-        $key     = is_int($key) ? $key + 2 : $key;
+        $key = is_int($key) ? $key + 2 : $key;
         $strHtml = str_replace("{label_{$key}}", $text, $strHtml);
         $strHtml = str_replace("<!-- BEGIN label_{$key} -->", '', $strHtml);
         $strHtml = str_replace("<!-- END label_{$key} -->", '', $strHtml);
@@ -257,23 +272,37 @@ class CRM_Core_QuickForm_GroupMultiSelect extends CRM_Core_QuickForm_NestedAdvMu
     }
 
     $placeHolders = array(
-      '{stylesheet}', '{javascript}', '{class}',
-      '{unselected}', '{selected}',
-      '{add}', '{remove}',
-      '{all}', '{none}', '{toggle}',
-      '{moveup}', '{movedown}',
+      '{stylesheet}',
+      '{javascript}',
+      '{class}',
+      '{unselected}',
+      '{selected}',
+      '{add}',
+      '{remove}',
+      '{all}',
+      '{none}',
+      '{toggle}',
+      '{moveup}',
+      '{movedown}',
     );
     $htmlElements = array(
-      $this->getElementCss(FALSE), $this->getElementJs(FALSE), $this->_tableAttributes,
-      $strHtmlUnselected, $strHtmlSelected . $strHtmlHidden,
-      $strHtmlAdd, $strHtmlRemove,
-      $strHtmlAll, $strHtmlNone, $strHtmlToggle,
-      $strHtmlMoveUp, $strHtmlMoveDown,
+      $this->getElementCss(FALSE),
+      $this->getElementJs(FALSE),
+      $this->_tableAttributes,
+      $strHtmlUnselected,
+      $strHtmlSelected . $strHtmlHidden,
+      $strHtmlAdd,
+      $strHtmlRemove,
+      $strHtmlAll,
+      $strHtmlNone,
+      $strHtmlToggle,
+      $strHtmlMoveUp,
+      $strHtmlMoveDown,
     );
 
     $strHtml = str_replace($placeHolders, $htmlElements, $strHtml);
 
     return $strHtml;
   }
-}
 
+}

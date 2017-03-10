@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -36,7 +36,7 @@
     <tr>
       <td>{ts}Instant Messenger{/ts}&nbsp;
       {if $actualBlockCount lt 5 }
-        <span id="add-more-im" title="{ts}click to add more{/ts}"><a class="crm-link-action add-more-inline">{ts}add{/ts}</a></span>
+        <span id="add-more-im" title="{ts}click to add more{/ts}"><a class="crm-hover-button action-item add-more-inline" href="#">{ts}add{/ts}</a></span>
       {/if}
       </td>
       <td>{ts}IM Location{/ts}</td>
@@ -53,7 +53,7 @@
         <td align="center" class="crm-im-is_primary">{$form.im.$blockId.is_primary.1.html}</td>
         <td>
           {if $blockId gt 1}
-            <a class="crm-delete-inline crm-link-action" title="{ts}delete im block{/ts}">{ts}delete{/ts}</a>
+            <a class="crm-delete-inline crm-hover-button" href="#" title="{ts}Delete IM{/ts}"><span class="icon delete-icon"></span></a>
           {/if}
         </td>
     </tr>
@@ -62,7 +62,7 @@
 
 {literal}
 <script type="text/javascript">
-    cj(function($) {
+    CRM.$(function($) {
       // check first primary radio
       $('#IM_1_IsPrimary').prop('checked', true );
     });

@@ -1,3 +1,3 @@
 <div class="action-link">
-    <a href="{crmURL q="reset=1"}" id="new" class="button crm-extensions-refresh"><span><div class="icon refresh-icon"></div>{ts}Refresh{/ts}</span></a>
+    {crmButton q="reset=1" id="new" class="crm-extensions-refresh" icon="refresh"}{ts}Refresh{/ts}{/crmButton}
 </div>

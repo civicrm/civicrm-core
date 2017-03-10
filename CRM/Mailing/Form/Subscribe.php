@@ -1,10 +1,9 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,19 +23,17 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Mailing_Form_Subscribe extends CRM_Core_Form {
   protected $_groupID = NULL;
 
-  function preProcess() {
+  public function preProcess() {
     parent::preProcess();
     $this->_groupID = CRM_Utils_Request::retrieve('gid', 'Integer', $this,
       FALSE, NULL, 'REQUEST'
@@ -47,7 +44,6 @@ class CRM_Mailing_Form_Subscribe extends CRM_Core_Form {
     if (!$this->controller->getDestination()) {
       $this->controller->setDestination(NULL, TRUE);
     }
-
 
     if ($this->_groupID) {
       $groupTypeCondition = CRM_Contact_BAO_Group::groupTypeCondition('Mailing');
@@ -60,7 +56,7 @@ SELECT   title, description
    AND   visibility != 'User and User Admin Only'
    AND   $groupTypeCondition";
 
-      $dao = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
+      $dao = CRM_Core_DAO::executeQuery($query);
       if ($dao->fetch()) {
         $this->assign('groupName', $dao->title);
         CRM_Utils_System::setTitle(ts('Subscribe to Mailing List - %1', array(1 => $dao->title)));
@@ -78,10 +74,7 @@ SELECT   title, description
   }
 
   /**
-   * Function to actually build the form
-   *
-   * @return void
-   * @access public
+   * Build the form object.
    */
   public function buildQuickForm() {
     // add the email address
@@ -93,7 +86,7 @@ SELECT   title, description
       ),
       TRUE
     );
-    $this->addRule('email', ts("Please enter a valid email address (e.g. 'yourname@example.com')."), 'email');
+    $this->addRule('email', ts("Please enter a valid email address."), 'email');
 
     if (!$this->_groupID) {
       // create a selector box of all public groups
@@ -107,14 +100,14 @@ SELECT   id, title, description
    AND   visibility != 'User and User Admin Only'
    AND   $groupTypeCondition
 ORDER BY title";
-      $dao = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
+      $dao = CRM_Core_DAO::executeQuery($query);
       $rows = array();
       while ($dao->fetch()) {
-        $row                = array();
-        $row['id']          = $dao->id;
-        $row['title']       = $dao->title;
+        $row = array();
+        $row['id'] = $dao->id;
+        $row['title'] = $dao->title;
         $row['description'] = $dao->description;
-        $row['checkbox']    = CRM_Core_Form::CB_PREFIX . $row['id'];
+        $row['checkbox'] = CRM_Core_Form::CB_PREFIX . $row['id'];
         $this->addElement('checkbox',
           $row['checkbox'],
           NULL, NULL
@@ -133,18 +126,19 @@ ORDER BY title";
     // if recaptcha is not configured, then dont add it
     // CRM-11316 Only enable ReCAPTCHA for anonymous visitors
     $config = CRM_Core_Config::singleton();
-    $session   = CRM_Core_Session::singleton();
+    $session = CRM_Core_Session::singleton();
     $contactID = $session->get('userID');
-    
+
     if (empty($config->recaptchaPublicKey) ||
       empty($config->recaptchaPrivateKey) ||
-      $contactID) {
+      $contactID
+    ) {
       $addCaptcha = FALSE;
     }
     else {
-      // if this is POST request and came from a block,
-      // lets add recaptcha only if already present
-      // gross hack for now
+      // If this is POST request and came from a block,
+      // lets add recaptcha only if already present.
+      // Gross hack for now.
       if (!empty($_POST) &&
         !array_key_exists('recaptcha_challenge_field', $_POST)
       ) {
@@ -173,7 +167,12 @@ ORDER BY title";
     );
   }
 
-  static function formRule($fields) {
+  /**
+   * @param $fields
+   *
+   * @return array|bool
+   */
+  public static function formRule($fields) {
     foreach ($fields as $name => $dontCare) {
       if (substr($name, 0, CRM_Core_Form::CB_PREFIX_LEN) == CRM_Core_Form::CB_PREFIX) {
         return TRUE;
@@ -182,12 +181,6 @@ ORDER BY title";
     return array('_qf_default' => 'Please select one or more mailing lists.');
   }
 
-  /**
-   *
-   * @access public
-   *
-   * @return void
-   */
   public function postProcess() {
     $params = $this->controller->exportValues($this->_name);
 
@@ -205,5 +198,5 @@ ORDER BY title";
 
     CRM_Mailing_Event_BAO_Subscribe::commonSubscribe($groups, $params);
   }
-}
 
+}

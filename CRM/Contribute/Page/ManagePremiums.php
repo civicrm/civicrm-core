@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,44 +23,45 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
- * Page for displaying list of Premiums
+ * Page for displaying list of Premiums.
  */
 class CRM_Contribute_Page_ManagePremiums extends CRM_Core_Page_Basic {
 
+  public $useLivePageJS = TRUE;
+
   /**
-   * The action links that we need to display for the browse screen
+   * The action links that we need to display for the browse screen.
    *
    * @var array
-   * @static
    */
   static $_links = NULL;
 
   /**
-   * Get BAO Name
+   * Get BAO Name.
    *
-   * @return string Classname of BAO.
+   * @return string
+   *   Classname of BAO.
    */
-  function getBAOName() {
+  public function getBAOName() {
     return 'CRM_Contribute_BAO_ManagePremiums';
   }
 
   /**
-   * Get action Links
+   * Get action Links.
    *
-   * @return array (reference) of action links
+   * @return array
+   *   (reference) of action links
    */
-  function &links() {
+  public function &links() {
     if (!(self::$_links)) {
       self::$_links = array(
         CRM_Core_Action::UPDATE => array(
@@ -102,12 +103,8 @@ class CRM_Contribute_Page_ManagePremiums extends CRM_Core_Page_Basic {
    * This method is called after the page is created. It checks for the
    * type of action and executes that action.
    * Finally it calls the parent's run method.
-   *
-   * @return void
-   * @access public
-   *
    */
-  function run() {
+  public function run() {
 
     // get the requested action
     $action = CRM_Utils_Request::retrieve('action', 'String',
@@ -134,14 +131,8 @@ class CRM_Contribute_Page_ManagePremiums extends CRM_Core_Page_Basic {
 
   /**
    * Browse all custom data groups.
-   *
-   *
-   * @return void
-   * @access public
-   * @static
    */
-  function browse() {
-    CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
+  public function browse() {
     // get all custom groups sorted by weight
     $premiums = array();
     $dao = new CRM_Contribute_DAO_Product();
@@ -153,7 +144,6 @@ class CRM_Contribute_Page_ManagePremiums extends CRM_Core_Page_Basic {
       CRM_Core_DAO::storeValues($dao, $premiums[$dao->id]);
       // form all action links
       $action = array_sum(array_keys($this->links()));
-
 
       if ($dao->is_active) {
         $action -= CRM_Core_Action::ENABLE;
@@ -171,40 +161,45 @@ class CRM_Contribute_Page_ManagePremiums extends CRM_Core_Page_Basic {
         'Premium',
         $dao->id
       );
-           //Financial Type
-                if( !empty( $dao->financial_type_id )  ){
-                    require_once 'CRM/Core/DAO.php';
-                    $premiums[$dao->id]['financial_type_id'] = CRM_Core_DAO::getFieldValue( 'CRM_Financial_DAO_FinancialType', $dao->financial_type_id, 'name' );
+      //Financial Type
+      if (!empty($dao->financial_type_id)) {
+        require_once 'CRM/Core/DAO.php';
+        $premiums[$dao->id]['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType', $dao->financial_type_id, 'name');
+      }
     }
-        }
     $this->assign('rows', $premiums);
   }
 
   /**
-   * Get name of edit form
+   * Get name of edit form.
    *
-   * @return string Classname of edit form.
+   * @return string
+   *   Classname of edit form.
    */
-  function editForm() {
+  public function editForm() {
     return 'CRM_Contribute_Form_ManagePremiums';
   }
 
   /**
-   * Get edit form name
+   * Get edit form name.
    *
-   * @return string name of this page.
+   * @return string
+   *   name of this page.
    */
-  function editName() {
+  public function editName() {
     return 'Manage Premiums';
   }
 
   /**
    * Get user context.
    *
-   * @return string user context.
+   * @param null $mode
+   *
+   * @return string
+   *   user context.
    */
-  function userContext($mode = NULL) {
+  public function userContext($mode = NULL) {
     return 'civicrm/admin/contribute/managePremiums';
   }
-}
 
+}

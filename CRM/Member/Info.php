@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * This class introduces component to the system and provides all the
@@ -31,16 +31,29 @@
  * abstract class.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
  */
 class CRM_Member_Info extends CRM_Core_Component_Info {
 
-  // docs inherited from interface
+  /**
+   * @inheritDoc
+   */
   protected $keyword = 'member';
 
-  // docs inherited from interface
+  /**
+   * @inheritDoc
+   * Provides base information about the component.
+   * Needs to be implemented in component's information
+   * class.
+   *
+   * @return array
+   *   collection of required component settings
+   */
+  /**
+   * @return array
+   */
   public function getInfo() {
     return array(
       'name' => 'CiviMember',
@@ -52,18 +65,62 @@ class CRM_Member_Info extends CRM_Core_Component_Info {
   }
 
 
-  // docs inherited from interface
-  public function getPermissions($getAllUnconditionally = FALSE) {
-    return array(
-      'access CiviMember',
-      'edit memberships',
-      'delete in CiviMember',
+  /**
+   * @inheritDoc
+   * Provides permissions that are used by component.
+   * Needs to be implemented in component's information
+   * class.
+   *
+   * NOTE: if using conditionally permission return,
+   * implementation of $getAllUnconditionally is required.
+   *
+   * @param bool $getAllUnconditionally
+   * @param bool $descriptions
+   *   Whether to return permission descriptions
+   *
+   * @return array|null
+   *   collection of permissions, null if none
+   */
+  public function getPermissions($getAllUnconditionally = FALSE, $descriptions = FALSE) {
+    $permissions = array(
+      'access CiviMember' => array(
+        ts('access CiviMember'),
+        ts('View memberships'),
+      ),
+      'edit memberships' => array(
+        ts('edit memberships'),
+        ts('Create and update memberships'),
+      ),
+      'delete in CiviMember' => array(
+        ts('delete in CiviMember'),
+        ts('Delete memberships'),
+      ),
     );
+
+    if (!$descriptions) {
+      foreach ($permissions as $name => $attr) {
+        $permissions[$name] = array_shift($attr);
+      }
+    }
+
+    return $permissions;
   }
 
-  // docs inherited from interface
+  /**
+   * @inheritDoc
+   * Provides information about user dashboard element
+   * offered by this component.
+   *
+   * @return array|null
+   *   collection of required dashboard settings,
+   *                    null if no element offered
+   */
+  /**
+   * @return array|null
+   */
   public function getUserDashboardElement() {
-    return array('name' => ts('Memberships'),
+    return array(
+      'name' => ts('Memberships'),
       'title' => ts('Your Membership(s)'),
       // this is CiviContribute specific permission, since
       // there is no permission that could be checked for
@@ -73,47 +130,88 @@ class CRM_Member_Info extends CRM_Core_Component_Info {
     );
   }
 
-  // docs inherited from interface
+  /**
+   * @inheritDoc
+   * Provides information about user dashboard element
+   * offered by this component.
+   *
+   * @return array|null
+   *   collection of required dashboard settings,
+   *                    null if no element offered
+   */
+  /**
+   * @return array|null
+   */
   public function registerTab() {
-    return array('title' => ts('Memberships'),
+    return array(
+      'title' => ts('Memberships'),
       'url' => 'membership',
       'weight' => 30,
     );
   }
 
-  // docs inherited from interface
+  /**
+   * @inheritDoc
+   * Provides information about advanced search pane
+   * offered by this component.
+   *
+   * @return array|null
+   *   collection of required pane settings,
+   *                    null if no element offered
+   */
+  /**
+   * @return array|null
+   */
   public function registerAdvancedSearchPane() {
-    return array('title' => ts('Memberships'),
+    return array(
+      'title' => ts('Memberships'),
       'weight' => 30,
     );
   }
 
-  // docs inherited from interface
+  /**
+   * @inheritDoc
+   * Provides potential activity types that this
+   * component might want to register in activity history.
+   * Needs to be implemented in component's information
+   * class.
+   *
+   * @return array|null
+   *   collection of activity types
+   */
+  /**
+   * @return array|null
+   */
   public function getActivityTypes() {
     return NULL;
   }
 
-  // add shortcut to Create New
+  /**
+   * add shortcut to Create New.
+   * @param $shortCuts
+   * @param $newCredit
+   */
   public function creatNewShortcut(&$shortCuts, $newCredit) {
     if (CRM_Core_Permission::check('access CiviMember') &&
       CRM_Core_Permission::check('edit memberships')
     ) {
-      $shortCuts = array_merge($shortCuts, array(
-        array('path' => 'civicrm/member/add',
-            'query' => "reset=1&action=add&context=standalone",
-            'ref' => 'new-membership',
-            'title' => ts('Membership'),
-          )));
+      $shortCut[] = array(
+        'path' => 'civicrm/member/add',
+        'query' => "reset=1&action=add&context=standalone",
+        'ref' => 'new-membership',
+        'title' => ts('Membership'),
+      );
       if ($newCredit) {
         $title = ts('Membership') . '<br />&nbsp;&nbsp;(' . ts('credit card') . ')';
-        $shortCuts = array_merge($shortCuts, array(
-          array('path' => 'civicrm/member/add',
-              'query' => "reset=1&action=add&context=standalone&mode=live",
-              'ref' => 'new-membership-cc',
-              'title' => $title,
-            )));
+        $shortCut[0]['shortCuts'][] = array(
+          'path' => 'civicrm/member/add',
+          'query' => "reset=1&action=add&context=standalone&mode=live",
+          'ref' => 'new-membership-cc',
+          'title' => $title,
+        );
       }
+      $shortCuts = array_merge($shortCuts, $shortCut);
     }
   }
-}
 
+}

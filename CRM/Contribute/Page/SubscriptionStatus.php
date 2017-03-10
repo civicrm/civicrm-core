@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,41 +23,37 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
-
 class CRM_Contribute_Page_SubscriptionStatus extends CRM_Core_Page {
 
   /**
-   * This function is the main function that is called when the page loads,
+   * the main function that is called when the page loads,
    * it decides the which action has to be taken for the page.
    *
-   * return null
-   * @access public
+   * @return null
    */
-  function run() {
-    $task    = CRM_Utils_Request::retrieve('task', 'String',   CRM_Core_DAO::$_nullObject);
-    $result  = CRM_Utils_Request::retrieve('result', 'Integer',  CRM_Core_DAO::$_nullObject);
+  public function run() {
+    $task = CRM_Utils_Request::retrieve('task', 'String');
+    $result = CRM_Utils_Request::retrieve('result', 'Integer');
 
-    $this->assign('task',   $task);
+    $this->assign('task', $task);
     $this->assign('result', $result);
 
-    if ( $task == 'billing' ) {
-      $session   = CRM_Core_Session::singleton();
+    if ($task == 'billing') {
+      $session = CRM_Core_Session::singleton();
       $tplParams = $session->get('resultParams');
-      foreach ( $tplParams as $key => $val ) {
+      foreach ($tplParams as $key => $val) {
         $this->assign($key, $val);
       }
     }
 
     return parent::run();
   }
-}
 
+}

@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
   <table class="form-layout crm-edit-address-form crm-inline-edit-form">
     <tr>
       <td>
-        <div class="crm-submit-buttons"> 
+        <div class="crm-submit-buttons">
           {include file="CRM/common/formButtons.tpl"}
           {if $addressId}
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -50,10 +50,10 @@
            <span class="crm-address-element is_billing-address-element">{$form.address.$blockId.is_billing.html}</span>
         </td>
      </tr>
-     
+
      {* include shared address template *}
      {include file="CRM/Contact/Form/ShareAddress.tpl"}
- 
+
      <tr>
       <td>
         <table id="address_table_{$blockId}" class="form-layout-compressed">
@@ -66,10 +66,10 @@
       </td>
      </tr>
   </table>
-  
-  <div class="crm-edit-address-custom_data crm-inline-edit-form crm-address-custom-set-block-{$blockId}"> 
+
+  <div class="crm-edit-address-custom_data crm-inline-edit-form crm-address-custom-set-block-{$blockId}">
     {include file="CRM/Contact/Form/Edit/Address/CustomData.tpl"}
-  </div> 
+  </div>
 {literal}
 <script type="text/javascript">
   {/literal}{* // Enforce unique location_type_id fields *}{literal}
@@ -94,14 +94,14 @@
     }
   });
   {/literal}{* // Enforce unique is_primary fields *}{literal}
-  cj(':checkbox[id*="[is_primary"]', 'form#Address_{/literal}{$blockId}{literal}').change(function() {
+  cj(':checkbox[id*="[is_primary"]', 'form[name=Address_{/literal}{$blockId}{literal}]').change(function() {
     if (this.defaultChecked) {
       cj(this).crmError("{/literal} {ts escape='js'}Please choose another address to be primary before changing this one.{/ts}{literal}");
       cj(this).prop('checked', true);
     }
   });
   {/literal}{* // Reset location_type_id when cancel button pressed *}{literal}
-  cj(':submit[name$=cancel]', 'form#Address_{/literal}{$blockId}{literal}').click(function() {
+  cj(':submit[name$=cancel]', 'form[name=Address_{/literal}{$blockId}{literal}]').click(function() {
     var container = cj(this).closest('div.crm-inline-edit.address');
     var origValue = container.attr('data-location-type-id') || '';
     container.data('location-type-id', origValue);

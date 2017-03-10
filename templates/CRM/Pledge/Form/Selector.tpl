@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,14 +23,13 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-{if $context EQ 'Search'}
     {include file="CRM/common/pager.tpl" location="top"}
-{/if}
 
-{capture assign=iconURL}<img src="{$config->resourceBase}i/TreePlus.gif" alt="{ts}open section{/ts}"/>{/capture}
-{ts 1=$iconURL}Click %1 to view pledge payments.{/ts}
+<p class="description">
+  {ts}Click arrow to view pledge payments.{/ts}
+</p>
 {strip}
-<table class="selector">
+<table class="selector row-highlight">
     <thead class="sticky">
         {if ! $single and $context eq 'Search' }
             <th scope="col" title="Select Rows">{$form.toggleSelect.html}</th>
@@ -58,23 +57,13 @@
                 <td>{$form.$cbName.html}</td>
             {/if}
             <td>
-                {if ! $single }
-                    &nbsp;{$row.contact_type}<br/>
-                {/if}
-                <span id="{$row.pledge_id}_show">
-                    <a href="#" onclick="cj('#paymentDetails{$row.pledge_id},#minus{$row.pledge_id}_hide,#{$row.pledge_id}_hide').show();
-                        buildPaymentDetails('{$row.pledge_id}','{$row.contact_id}');
-                        cj('#{$row.pledge_id}_show').hide();
-                        return false;"><img src="{$config->resourceBase}i/TreePlus.gif" class="action-icon" alt="{ts}open section{/ts}"/></a>
-                </span>
-                <span id="minus{$row.pledge_id}_hide">
-                    <a href="#" onclick="cj('#paymentDetails{$row.pledge_id},#{$row.pledge_id}_hide,#minus{$row.pledge_id}_hide').hide();
-                            cj('#{$row.pledge_id}_show').show();
-                            return false;"><img src="{$config->resourceBase}i/TreeMinus.gif" class="action-icon" alt="{ts}open section{/ts}"/></a>
-                </span>
+                <a class="crm-expand-row" title="{ts}view payments{/ts}" href="{crmURL p='civicrm/pledge/payment' q="action=browse&context=`$context`&pledgeId=`$row.pledge_id`&cid=`$row.contact_id`"}"></a>
             </td>
             {if ! $single }
-                <td><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.contact_id`"}">{$row.sort_name}</a></td>
+                <td>
+                    {$row.contact_type} &nbsp;
+                    <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.contact_id`"}">{$row.sort_name}</a>
+                </td>
             {/if}
             <td class="right">{$row.pledge_amount|crmMoney:$row.pledge_currency}</td>
             <td class="right">{$row.pledge_total_paid|crmMoney:$row.pledge_currency}</td>
@@ -86,14 +75,6 @@
             <td>{$row.pledge_status}</td>
             <td>{$row.action|replace:'xx':$row.pledge_id}</td>
         </tr>
-        <tr id="{$row.pledge_id}_hide" class='{$rowClass}'>
-            <td style="border-right: none;"></td>
-            <td colspan= {if $context EQ 'Search'} "10" {else} "8" {/if} class="enclosingNested" id="paymentDetails{$row.pledge_id}">&nbsp;</td>
-        </tr>
-        <script type="text/javascript">
-            cj('#{$row.pledge_id}_hide').hide();
-            cj('#minus{$row.pledge_id}_hide').hide();
-        </script>
     {/foreach}
 
     {* Dashboard only lists 10 most recent pledges. *}
@@ -106,29 +87,6 @@
 </table>
 {/strip}
 
-{if $context EQ 'Search'}
     {include file="CRM/common/pager.tpl" location="bottom"}
-{/if}
 
-{* Build pledge payment details*}
-{literal}
-<script type="text/javascript">
-
-    function buildPaymentDetails( pledgeId, contactId )
-    {
-        var dataUrl = {/literal}"{crmURL p='civicrm/pledge/payment' h=0 q="action=browse&snippet=4&context=`$context`&pledgeId="}"{literal} + pledgeId + '&cid=' + contactId;
-
-        cj.ajax({
-                url     : dataUrl,
-                dataType: "html",
-                timeout : 5000, //Time in milliseconds
-                success : function( data ){
-                            cj( '#paymentDetails' + pledgeId ).html( data );
-                          },
-                error   : function( XMLHttpRequest, textStatus, errorThrown ) {
-                            console.error( 'Error: '+ textStatus );
-                          }
-             });
-    }
-</script>
-{/literal}
+{crmScript file='js/crm.expandRow.js'}

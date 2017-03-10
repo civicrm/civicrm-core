@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,28 +23,30 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
-
 class CRM_Utils_XML {
 
   /**
    * Read a well-formed XML file
    *
-   * @return array (0 => SimpleXMLElement|FALSE, 1 => errorMessage|FALSE)
+   * @param $file
+   *
+   * @return array
+   *   (0 => SimpleXMLElement|FALSE, 1 => errorMessage|FALSE)
    */
   public static function parseFile($file) {
     $xml = FALSE; // SimpleXMLElement
     $error = FALSE; // string
 
-    if (! file_exists($file)) {
+    if (!file_exists($file)) {
       $error = 'File ' . $file . ' does not exist.';
-    } else {
+    }
+    else {
       $oldLibXMLErrors = libxml_use_internal_errors();
       libxml_use_internal_errors(TRUE);
 
@@ -64,7 +66,10 @@ class CRM_Utils_XML {
   /**
    * Read a well-formed XML file
    *
-   * @return array (0 => SimpleXMLElement|FALSE, 1 => errorMessage|FALSE)
+   * @param $string
+   *
+   * @return array
+   *   (0 => SimpleXMLElement|FALSE, 1 => errorMessage|FALSE)
    */
   public static function parseString($string) {
     $xml = FALSE; // SimpleXMLElement
@@ -85,6 +90,11 @@ class CRM_Utils_XML {
     return array($xml, $error);
   }
 
+  /**
+   * @param $errors
+   *
+   * @return string
+   */
   protected static function formatErrors($errors) {
     $messages = array();
 
@@ -95,7 +105,7 @@ class CRM_Utils_XML {
 
       $parts = array();
       if ($error->file) {
-          $parts[] = "File=$error->file";
+        $parts[] = "File=$error->file";
       }
       $parts[] = "Line=$error->line";
       $parts[] = "Column=$error->column";
@@ -108,9 +118,11 @@ class CRM_Utils_XML {
   }
 
   /**
-   * Convert an XML element to an array
+   * Convert an XML element to an array.
    *
-   * @pararm $obj SimpleXMLElement
+   * @param $obj
+   *   SimpleXMLElement.
+   *
    * @return array
    */
   public static function xmlObjToArray($obj) {
@@ -133,4 +145,5 @@ class CRM_Utils_XML {
     }
     return $arr;
   }
+
 }

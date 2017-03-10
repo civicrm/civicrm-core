@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -21,7 +21,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 
 /*
@@ -32,32 +32,60 @@
  * Grateful acknowledgements go to Donald Lobo for invaluable assistance
  * in creating this payment processor module
  */
+
+/**
+ * Class CRM_Core_Payment_PaymentExpressUtils
+ */
 class CRM_Core_Payment_PaymentExpressUtils {
 
-  static function _valueXml($element, $value = NULL) {
+  /**
+   * @param $element
+   * @param null $value
+   *
+   * @return string
+   */
+  public static function _valueXml($element, $value = NULL) {
     $nl = "\n";
 
     if (is_array($element)) {
       $xml = '';
       foreach ($element as $elem => $value) {
-          $xml .= self::_valueXml($elem, $value);
+        $xml .= self::_valueXml($elem, $value);
       }
       return $xml;
     }
     return "<" . $element . ">" . $value . "</" . $element . ">" . $nl;
   }
 
-  static function _xmlElement($xml, $name) {
+  /**
+   * @param $xml
+   * @param string $name
+   *
+   * @return mixed
+   */
+  public static function _xmlElement($xml, $name) {
     $value = preg_replace('/.*<' . $name . '[^>]*>(.*)<\/' . $name . '>.*/', '\1', $xml);
     return $value;
   }
 
-  static function _xmlAttribute($xml, $name) {
+  /**
+   * @param $xml
+   * @param string $name
+   *
+   * @return mixed|null
+   */
+  public static function _xmlAttribute($xml, $name) {
     $value = preg_replace('/<.*' . $name . '="([^"]*)".*>/', '\1', $xml);
     return $value != $xml ? $value : NULL;
   }
 
-  static function &_initCURL($query, $url) {
+  /**
+   * @param $query
+   * @param $url
+   *
+   * @return resource
+   */
+  public static function &_initCURL($query, $url) {
     $curl = curl_init();
 
     curl_setopt($curl, CURLOPT_URL, $url);
@@ -70,11 +98,11 @@ class CRM_Core_Payment_PaymentExpressUtils {
       curl_setopt($curl, CURLOPT_FOLLOWLOCATION, FALSE);
     }
     curl_setopt($curl, CURLOPT_HEADER, 0);
-    curl_setopt($curl, CURLOPT_SSLVERSION, 3);
+    curl_setopt($curl, CURLOPT_SSLVERSION, 0);
 
     if (strtoupper(substr(@php_uname('s'), 0, 3)) === 'WIN') {
-      curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'verifySSL'));
-      curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'verifySSL') ? 2 : 0);
+      curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, Civi::settings()->get('verifySSL'));
+      curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, Civi::settings()->get('verifySSL') ? 2 : 0);
     }
     return $curl;
   }

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
  */
@@ -38,17 +38,18 @@
  */
 class CRM_Core_Permission_WordPress extends CRM_Core_Permission_Base {
   /**
-   * given a permission string, check for access requirements
+   * Given a permission string, check for access requirements
    *
-   * @param string $str the permission to check
+   * @param string $str
+   *   The permission to check.
    *
-   * @return boolean true if yes, else false
-   * @access public
+   * @return bool
+   *   true if yes, else false
    */
-  function check($str) {
-    // Generic cms 'administer users' role tranlates to 'administrator' WordPress role
+  public function check($str) {
+    // Generic cms 'administer users' role tranlates to users with the 'edit_users' capability' in WordPress
     $str = $this->translatePermission($str, 'WordPress', array(
-      'administer users' => 'administrator',
+      'administer users' => 'edit_users',
     ));
     if ($str == CRM_Core_Permission::ALWAYS_DENY_PERMISSION) {
       return FALSE;
@@ -56,6 +57,17 @@ class CRM_Core_Permission_WordPress extends CRM_Core_Permission_Base {
     if ($str == CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION) {
       return TRUE;
     }
+
+    // CRM-15629
+    // During some extern/* calls we don't bootstrap CMS hence
+    // below constants are not set. In such cases, we don't need to
+    // check permission, hence directly return TRUE
+    if (!defined('ABSPATH') || !defined('WPINC')) {
+      require_once 'CRM/Utils/System.php';
+      CRM_Utils_System::loadBootStrap();
+    }
+
+    require_once ABSPATH . WPINC . '/pluggable.php';
 
     // for administrators give them all permissions
     if (!function_exists('current_user_can')) {
@@ -69,7 +81,7 @@ class CRM_Core_Permission_WordPress extends CRM_Core_Permission_Base {
     // Make string lowercase and convert spaces into underscore
     $str = CRM_Utils_String::munge(strtolower($str));
 
-    if ( is_user_logged_in() ) {
+    if (is_user_logged_in()) {
       // Check whether the logged in user has the capabilitity
       if (current_user_can($str)) {
         return TRUE;
@@ -87,17 +99,18 @@ class CRM_Core_Permission_WordPress extends CRM_Core_Permission_Base {
     }
     return FALSE;
   }
+
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public function isModulePermissionSupported() {
     return TRUE;
   }
 
   /**
-   * {@inheritdoc}
+   * @inheritDoc
    */
-  function upgradePermissions($permissions) {
-    return;
+  public function upgradePermissions($permissions) {
   }
+
 }

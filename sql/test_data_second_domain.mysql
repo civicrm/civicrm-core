@@ -61,68 +61,14 @@ VALUES
     ( @domainID, 'Always' , NULL, 'Process Survey Respondents',   'Releases reserved survey respondents when they have been reserved for longer than the Release Frequency days specified for that survey.', 'job', 'process_respondent',NULL, 0),
     ( @domainID, 'Hourly' , NULL, 'Clean-up Temporary Data and Files','Removes temporary data and files, and clears old data from cache tables. Recommend running this job every hour to help prevent database and file system bloat.', 'job', 'cleanup', NULL, 0);
   -- Initial default state of system settings
-INSERT INTO civicrm_setting
-  ( domain_id, contact_id, is_domain, group_name, name, value )
-VALUES
-  ( @domainID, NULL, 1, 'CiviCRM Preferences', 'contact_view_options', 's:28:"123456789101113";' ),
-  ( @domainID, NULL, 1, 'CiviCRM Preferences', 'contact_edit_options', 's:22:"12345678911";' ),
-  ( @domainID, NULL, 1, 'CiviCRM Preferences', 'advanced_search_options', 's:46:"123456789101112131516171819";' ),
-  ( @domainID, NULL, 1, 'CiviCRM Preferences', 'user_dashboard_options', 's:15:"1234578";' ),
-  ( @domainID, NULL, 1, 'CiviCRM Preferences', 'address_options', 's:23:"123456891011";' ),
-  ( @domainID, NULL, 1, 'CiviCRM Preferences', 'address_format', 's:198:"{contact.address_name}
-{contact.street_address}
-{contact.supplemental_address_1}
-{contact.supplemental_address_2}
-{contact.city}{, }{contact.state_province}{ }{contact.postal_code}
-{contact.country}";' ),
-  ( @domainID, NULL, 1, 'CiviCRM Preferences', 'mailing_format', 's:195:"{contact.addressee}
-{contact.street_address}
-{contact.supplemental_address_1}
-{contact.supplemental_address_2}
-{contact.city}{, }{contact.state_province}{ }{contact.postal_code}
-{contact.country}";' ),
-  ( @domainID, NULL, 1, 'CiviCRM Preferences', 'display_name_format', 's:102:"{contact.individual_prefix}{ }{contact.first_name}{ }{contact.last_name}{ }{contact.individual_suffix}";' ),
-  ( @domainID, NULL, 1, 'CiviCRM Preferences', 'sort_name_format', 's:43:"{contact.last_name}{, }{contact.first_name}";' ),
-  ( @domainID, NULL, 1, 'CiviCRM Preferences', 'editor_id', 's:1:"2";' ),
-  ( @domainID, NULL, 1, 'CiviCRM Preferences', 'contact_ajax_check_similar', 's:1:"1";' ),
-  ( @domainID, NULL, 1, 'CiviCRM Preferences', 'activity_assignee_notification', 's:1:"1";' ),
-  ( @domainID, NULL, 1, 'CiviCRM Preferences', 'contact_autocomplete_options', 's:5:"12";' ),
-  ( @domainID, NULL, 1, 'CiviCRM Preferences', 'contact_reference_options', 's:5:"12";' ),
-  ( @domainID, NULL, 1, 'Address Standardization Preferences', 'address_standardization_provider', NULL ),
-  ( @domainID, NULL, 1, 'Address Standardization Preferences', 'address_standardization_userid', NULL ),
-  ( @domainID, NULL, 1, 'Address Standardization Preferences', 'address_standardization_url', NULL ),
-  ( @domainID, NULL, 1, 'Campaign Preferences', 'tag_unconfirmed', 's:11:"Unconfirmed";' ),
-  ( @domainID, NULL, 1, 'Campaign Preferences', 'petition_contacts', 's:17:"Petition Contacts";' ),
-  ( @domainID, NULL, 1, 'Event Preferences'   , 'enable_cart', 's:1:"0";' ),
-  ( @domainID, NULL, 1, 'Mailing Preferences', 'profile_double_optin', 's:1:"1";' ),
-  ( @domainID, NULL, 1, 'Mailing Preferences', 'profile_add_to_group_double_optin', 's:1:"0";' ),
-  ( @domainID, NULL, 1, 'Mailing Preferences', 'track_civimail_replies', 's:1:"0";' ),
-  ( @domainID, NULL, 1, 'Mailing Preferences', 'civimail_workflow', 's:1:"0";' ),
-  ( @domainID, NULL, 1, 'Mailing Preferences', 'civimail_server_wide_lock', 's:1:"0";' ),
-  ( @domainID, NULL, 1, 'Mailing Preferences', 'mailing_backend', 'a:1:{s:15:"outBound_option";s:1:"3";}' ),
-  ( @domainID, NULL, 1, 'Member Preferences' , 'default_renewal_contribution_page', NULL ),
-  ( @domainID, NULL, 1, 'Multi Site Preferences', 'is_enabled', 's:1:"0";' ),
-  ( @domainID, NULL, 1, 'Multi Site Preferences', 'uniq_email_per_site', 's:1:"0";' ),
-  ( @domainID, NULL, 1, 'Multi Site Preferences', 'domain_group_id', 's:1:"0";' ),
-  ( @domainID, NULL, 1, 'Multi Site Preferences', 'event_price_set_domain_id', 's:1:"0";' ),
-  ( @domainID, NULL, 1, 'Directory Preferences', 'uploadDir'          , NULL ),
-  ( @domainID, NULL, 1, 'Directory Preferences', 'imageUploadDir'     , NULL ),
-  ( @domainID, NULL, 1, 'Directory Preferences', 'customFileUploadDir', NULL ),
-  ( @domainID, NULL, 1, 'Directory Preferences', 'customTemplateDir'  , NULL ),
-  ( @domainID, NULL, 1, 'Directory Preferences', 'customPHPPathDir'   , NULL ),
-  ( @domainID, NULL, 1, 'Directory Preferences', 'extensionsDir'      , NULL ),
-  ( @domainID, NULL, 1, 'URL Preferences', 'userFrameworkResourceURL' , NULL ),
-  ( @domainID, NULL, 1, 'URL Preferences', 'imageUploadURL'           , NULL ),
-  ( @domainID, NULL, 1, 'URL Preferences', 'customCSSURL'             , NULL ),
-  ( @domainID, NULL, 1, 'URL Preferences', 'extensionsURL'            , NULL );
 
   INSERT INTO `civicrm_dashboard`
-    ( `domain_id`, `label`, `url`, `permission`, `permission_operator`, `column_no`, `is_minimized`, `is_active`, `weight`, `fullscreen_url`, `is_fullscreen`, `is_reserved`)
+    ( `domain_id`, `label`, `url`, `permission`, `permission_operator`,  `is_active`, `fullscreen_url`, `is_reserved`)
     VALUES
-    ( @domainID, 'Activities', 'civicrm/dashlet/activity&reset=1&snippet=5', 'access CiviCRM', NULL, 0, 0, 1, 1, 'civicrm/dashlet/activity&reset=1&snippet=5&context=dashletFullscreen', 1, 1),
-    ( @domainID, 'My Cases', 'civicrm/dashlet/myCases&reset=1&snippet=5', 'access my cases and activities', NULL , 0, 0, 1, 2, 'civicrm/dashlet/myCases&reset=1&snippet=5&context=dashletFullscreen', 1, 1),
-    ( @domainID, 'All Cases', 'civicrm/dashlet/allCases&reset=1&snippet=5', 'access all cases and activities', NULL , 0, 0, 1, 3, 'civicrm/dashlet/allCases&reset=1&snippet=5&context=dashletFullscreen', 1, 1),
-    ( @domainID, 'Case Dashboard Dashlet', 'civicrm/dashlet/casedashboard&reset=1&snippet=5', 'access CiviCase', NULL , 0, 0, 1, 4, 'civicrm/dashlet/casedashboard&reset=1&snippet=5&context=dashletFullscreen', 1, 1);
+    ( @domainID, 'Activities', 'civicrm/dashlet/activity&reset=1&snippet=5', 'access CiviCRM', NULL, 1, 'civicrm/dashlet/activity&reset=1&snippet=5&context=dashletFullscreen', 1),
+    ( @domainID, 'My Cases', 'civicrm/dashlet/myCases&reset=1&snippet=5', 'access my cases and activities', NULL, 1, 'civicrm/dashlet/myCases&reset=1&snippet=5&context=dashletFullscreen', 1),
+    ( @domainID, 'All Cases', 'civicrm/dashlet/allCases&reset=1&snippet=5', 'access all cases and activities', NULL, 1, 'civicrm/dashlet/allCases&reset=1&snippet=5&context=dashletFullscreen', 1),
+    ( @domainID, 'Case Dashboard Dashlet', 'civicrm/dashlet/casedashboard&reset=1&snippet=5', 'access my cases and activities,access all cases and activities', 'OR', 1, 'civicrm/dashlet/casedashboard&reset=1&snippet=5&context=dashletFullscreen', 1);
 
 -- navigation
 
@@ -268,7 +214,7 @@ VALUES
     ( @domainID, 'civicrm/member&reset=1',                              'Dashboard',           'Dashboard',       'access CiviMember', '', @memberlastID, '1', NULL, 1 ), 
     ( @domainID, 'civicrm/member/add&reset=1&action=add&context=standalone', 'New Membership', 'New Membership',  'access CiviMember,edit memberships', 'AND', @memberlastID, '1', NULL, 2 ), 
     ( @domainID, 'civicrm/member/search&reset=1',                       'Find Memberships',    'Find Memberships','access CiviMember', '', @memberlastID, '1', NULL, 3 ), 
-    ( @domainID, 'civicrm/batch&reset=1',                       'Batches',    'Batches','access CiviMember,acess CiviContribute', '', @memberlastID, '1', NULL, 4 ), 
+    ( @domainID, 'civicrm/batch&reset=1',                       'Batches',    'Batches','access CiviMember,access CiviContribute', '', @memberlastID, '1', NULL, 4 ), 
     ( @domainID, 'civicrm/member/import&reset=1',                       'Import Memberships',  'Import Members',  'access CiviMember,edit memberships', 'AND', @memberlastID, '1', 1, 5 ),
     ( @domainID, 'civicrm/admin/price&reset=1&action=add',              'New Price Set',       'New Price Set',   'access CiviMember,administer CiviCRM', 'AND',  @memberlastID, '1', NULL, 6 ),
     ( @domainID, 'civicrm/admin/price&reset=1',                         'Manage Price Sets',   'Manage Price Sets', 'access CiviMember,administer CiviCRM', 'AND',  @memberlastID, '1', NULL, 7 );
@@ -1017,5 +963,4 @@ INSERT INTO civicrm_navigation
 VALUES
     ( @domainID, CONCAT('civicrm/report/instance/', @instanceID,'&reset=1'), 'Mailing Detail Report', 'Mailing Detail Report', 'administer CiviMail', 'OR', @reportlastID, '1', NULL, @instanceID+2 );
 UPDATE civicrm_report_instance SET navigation_id = LAST_INSERT_ID() WHERE id = @instanceID;
-UPDATE civicrm_domain SET version = '4.3.alpha1';
-  
+UPDATE civicrm_domain SET version = '4.6.alpha1';

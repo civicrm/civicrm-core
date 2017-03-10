@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * This class introduces component to the system and provides all the
@@ -31,16 +31,21 @@
  * abstract class.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
  */
 class CRM_Event_Info extends CRM_Core_Component_Info {
 
-  // docs inherited from interface
+  /**
+   * @inheritDoc
+   */
   protected $keyword = 'event';
 
-  // docs inherited from interface
+  /**
+   * @inheritDoc
+   * @return array
+   */
   public function getInfo() {
     return array(
       'name' => 'CiviEvent',
@@ -51,74 +56,143 @@ class CRM_Event_Info extends CRM_Core_Component_Info {
     );
   }
 
-  // docs inherited from interface
-  public function getPermissions($getAllUnconditionally = FALSE) {
+  /**
+   * @inheritDoc
+   * @param bool $getAllUnconditionally
+   * @param bool $descriptions
+   *   Whether to return permission descriptions
+   *
+   * @return array
+   */
+  public function getPermissions($getAllUnconditionally = FALSE, $descriptions = FALSE) {
+    $permissions = array(
+      'access CiviEvent' => array(
+        ts('access CiviEvent'),
+        ts('Create events, view all events, and view participant records (for visible contacts)'),
+      ),
+      'edit event participants' => array(
+        ts('edit event participants'),
+        ts('Record and update backend event registrations'),
+      ),
+      'edit all events' => array(
+        ts('edit all events'),
+        ts('Edit events even without specific ACL granted'),
+      ),
+      'register for events' => array(
+        ts('register for events'),
+        ts('Register for events online'),
+      ),
+      'view event info' => array(
+        ts('view event info'),
+        ts('View online event information pages'),
+      ),
+      'view event participants' => array(
+        ts('view event participants'),
+      ),
+      'delete in CiviEvent' => array(
+        ts('delete in CiviEvent'),
+        ts('Delete participants and events that you can edit'),
+      ),
+      'manage event profiles' => array(
+        ts('manage event profiles'),
+        ts('Allow users to create, edit and copy event-related profile forms used for online event registration.'),
+      ),
+    );
+
+    if (!$descriptions) {
+      foreach ($permissions as $name => $attr) {
+        $permissions[$name] = array_shift($attr);
+      }
+    }
+
+    return $permissions;
+  }
+
+  /**
+   * @return array
+   */
+  public function getAnonymousPermissionWarnings() {
     return array(
       'access CiviEvent',
-      'edit event participants',
-      'edit all events',
-      'register for events',
-      'view event info',
-      'view event participants',
-      'delete in CiviEvent',
     );
   }
 
-  // docs inherited from interface
+  /**
+   * @inheritDoc
+   * @return array
+   */
   public function getUserDashboardElement() {
-    return array('name' => ts('Events'),
+    return array(
+      'name' => ts('Events'),
       'title' => ts('Your Event(s)'),
       'perm' => array('register for events'),
       'weight' => 20,
     );
   }
 
-  // docs inherited from interface
+  /**
+   * @inheritDoc
+   * @return array
+   */
   public function registerTab() {
-    return array('title' => ts('Events'),
+    return array(
+      'title' => ts('Events'),
       'id' => 'participant',
       'url' => 'participant',
       'weight' => 40,
     );
   }
 
-  // docs inherited from interface
+  /**
+   * @inheritDoc
+   * @return array
+   */
   public function registerAdvancedSearchPane() {
-    return array('title' => ts('Events'),
+    return array(
+      'title' => ts('Events'),
       'weight' => 40,
     );
   }
 
-  // docs inherited from interface
+  /**
+   * @inheritDoc
+   * @return array
+   */
   public function getActivityTypes() {
     $types = array();
-    $types['Event'] = array('title' => ts('Event'),
+    $types['Event'] = array(
+      'title' => ts('Event'),
       'callback' => 'CRM_Event_Page_EventInfo::run()',
     );
     return $types;
   }
 
-  // add shortcut to Create New
+  /**
+   * add shortcut to Create New.
+   * @param $shortCuts
+   * @param $newCredit
+   */
   public function creatNewShortcut(&$shortCuts, $newCredit) {
     if (CRM_Core_Permission::check('access CiviEvent') &&
       CRM_Core_Permission::check('edit event participants')
     ) {
-      $shortCuts = array_merge($shortCuts, array(
-        array('path' => 'civicrm/participant/add',
-            'query' => "reset=1&action=add&context=standalone",
-            'ref' => 'new-participant',
-            'title' => ts('Event Registration'),
-          )));
+      $shortCut[] = array(
+        'path' => 'civicrm/participant/add',
+        'query' => "reset=1&action=add&context=standalone",
+        'ref' => 'new-participant',
+        'title' => ts('Event Registration'),
+      );
       if ($newCredit) {
         $title = ts('Event Registration') . '<br />&nbsp;&nbsp;(' . ts('credit card') . ')';
-        $shortCuts = array_merge($shortCuts, array(
-          array('path' => 'civicrm/participant/add',
-              'query' => "reset=1&action=add&context=standalone&mode=live",
-              'ref' => 'new-participant-cc',
-              'title' => $title,
-            )));
+        $shortCut[0]['shortCuts'][] = array(
+          'path' => 'civicrm/participant/add',
+          'query' => "reset=1&action=add&context=standalone&mode=live",
+          'ref' => 'new-participant-cc',
+          'title' => $title,
+        );
       }
+      $shortCuts = array_merge($shortCuts, $shortCut);
     }
   }
-}
 
+}

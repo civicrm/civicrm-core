@@ -1,12 +1,16 @@
 <?php
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Event_EventListingTest
+ */
 class WebTest_Event_EventListingTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
     parent::setUp();
   }
 
-  function testEventListing() {
+  public function testEventListing() {
     // Log in using webtestLogin() method
     $this->webtestLogin('admin');
 
@@ -22,16 +26,16 @@ class WebTest_Event_EventListingTest extends CiviSeleniumTestCase {
     $eventTitle3 = 'My Conference - ' . substr(sha1(rand()), 0, 7);
     $this->_testCreateEvent($eventTitle3, '-1 day', '+12 months');
 
-    //Upcomming Event
+    //Upcoming Event
     $eventTitle4 = 'My Conference - ' . substr(sha1(rand()), 0, 7);
     $this->_testCreateEvent($eventTitle4, '+6 months', '+12 months');
 
-    //Upcomming Event
+    //Upcoming Event
     $eventTitle5 = 'My Conference - ' . substr(sha1(rand()), 0, 7);
     $this->_testCreateEvent($eventTitle5, '+3 months', '+6 months');
 
     //go to manage event and check for presence of ongoing and
-    //upcomming events
+    //upcoming events
     $this->openCiviPage("event/manage", "reset=1");
     $this->type("xpath=//div[@class='crm-block crm-form-block crm-event-searchevent-form-block']/table/tbody/tr/td/input", $eventTitle1);
     $this->click("_qf_SearchEvent_refresh");
@@ -69,7 +73,7 @@ class WebTest_Event_EventListingTest extends CiviSeleniumTestCase {
     $this->assertFalse($this->isTextPresent("{$eventTitle4}"));
     $this->assertFalse($this->isTextPresent("{$eventTitle5}"));
 
-    //go to ical and check for presence of ongoing and upcomming events
+    //go to ical and check for presence of ongoing and upcoming events
     $this->openCiviPage("event/ical", "reset=1&page=1&html=1", NULL);
     $this->assertFalse($this->isTextPresent("{$eventTitle1}"));
     $this->assertFalse($this->isTextPresent("{$eventTitle2}"));
@@ -77,7 +81,7 @@ class WebTest_Event_EventListingTest extends CiviSeleniumTestCase {
     $this->waitForText("option11", "{$eventTitle4}");
     $this->waitForText("option11", "{$eventTitle5}");
 
-    //go to block listing to enable Upcomming Events Block
+    //go to block listing to enable Upcoming Events Block
     // you need to be admin user for below operation
     $this->webtestLogout();
     $this->webtestLogin('admin');
@@ -93,7 +97,7 @@ class WebTest_Event_EventListingTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForTextPresent("The block settings have been updated.");
 
-    //go to civicrm home and check for presence of upcomming events
+    //go to civicrm home and check for presence of upcoming events
     $this->openCiviPage("dashboard", "reset=1");
     $this->assertFalse($this->isTextPresent("{$eventTitle1}"));
     $this->assertFalse($this->isTextPresent("{$eventTitle2}"));
@@ -101,7 +105,7 @@ class WebTest_Event_EventListingTest extends CiviSeleniumTestCase {
     $this->waitForText("block-civicrm-6", "{$eventTitle4}");
     $this->waitForText("block-civicrm-6", "{$eventTitle5}");
 
-    //go to block listing to disable Upcomming Events Block
+    //go to block listing to disable Upcoming Events Block
     $this->open($this->sboxPath . 'admin/structure/block');
     $this->select('edit-blocks-civicrm-6-region', 'value=-1');
     $this->click('edit-submit');
@@ -109,7 +113,12 @@ class WebTest_Event_EventListingTest extends CiviSeleniumTestCase {
     $this->waitForTextPresent("The block settings have been updated.");
   }
 
-  function _testCreateEvent($eventTitle, $startdate, $enddate) {
+  /**
+   * @param $eventTitle
+   * @param $startdate
+   * @param $enddate
+   */
+  public function _testCreateEvent($eventTitle, $startdate, $enddate) {
 
     $this->openCiviPage("event/add", "reset=1&action=add");
 
@@ -151,7 +160,7 @@ class WebTest_Event_EventListingTest extends CiviSeleniumTestCase {
 
     // Wait for "saved" status msg
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForTextPresent("'Location' information has been saved.");
+    $this->waitForText("crm-notification-container", "'Event Location' information has been saved.");
   }
-}
 
+}

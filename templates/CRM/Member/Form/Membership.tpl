@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -31,14 +31,12 @@
   </div>
 {/if}
 <div class="spacer"></div>
-{if $cdType }
-  {include file="CRM/Custom/Form/CustomData.tpl"}
-{elseif $priceSetId}
+{if $priceSetId}
   {include file="CRM/Price/Form/PriceSet.tpl" context="standalone" extends="Membership"}
   {literal}
   <script type="text/javascript">
-  cj( function() {
-    var membershipValues = new Array;
+  CRM.$(function($) {
+    var membershipValues = [];
     {/literal}{foreach from=$optionsMembershipTypes item=memType key=opId}{literal}
       membershipValues[{/literal}{$opId}{literal}] = {/literal}{$memType}{literal};
     {/literal}{/foreach}{literal}
@@ -61,11 +59,8 @@
     <p>{ts}You will not be able to send an automatic email receipt for this Membership because there is no email address recorded for this contact. If you want a receipt to be sent when this Membership is recorded, click Cancel and then click Edit from the Summary tab to add an email address before recording the Membership.{/ts}</p>
   </div>
   {/if}
-  {if $context NEQ 'standalone'}
-  <h3>{if $action eq 1}{ts}New Membership{/ts}{elseif $action eq 2}{ts}Edit Membership{/ts}{else}{ts}Delete Membership{/ts}{/if}</h3>
-  {/if}
   {if $membershipMode}
-  <div id="help">
+  <div class="help">
     {ts 1=$displayName 2=$registerMode}Use this form to submit Membership Record on behalf of %1. <strong>A %2 transaction will be submitted</strong> using the selected payment processor.{/ts}
   </div>
   {/if}
@@ -85,14 +80,14 @@
             <td class="font-size12pt label"><strong>{ts}Member{/ts}</strong></td><td class="font-size12pt"><strong>{$displayName}</strong></td>
           </tr>
         {else}
-          {if !$membershipMode and !$emailExists and $outBound_option != 2}
-            {assign var='profileCreateCallback' value=1 }
-          {/if}
           <td class="label">{$form.contact_id.label}</td>
           <td>{$form.contact_id.html}</td>
         {/if}
         {if $membershipMode}
-          <tr><td class="label">{$form.payment_processor_id.label}</td><td>{$form.payment_processor_id.html}</td></tr>
+          <tr>
+            <td class="label">{$form.payment_processor_id.label}</td>
+            <td>{$form.payment_processor_id.html}</td>
+          </tr>
         {/if}
         <tr class="crm-membership-form-block-membership_type_id">
           <td class="label">{$form.membership_type_id.label}</td>
@@ -141,18 +136,21 @@
           <br />
           <span class="description">{ts}First day of current continuous membership period. Start Date will be automatically set based on Membership Type if you don't select a date.{/ts}</span></td></tr>
         <tr class="crm-membership-form-block-end_date"><td class="label">{$form.end_date.label}</td>
-          <td>{if $isRecur && $endDate}{$endDate|crmDate}{else}{include file="CRM/common/jcalendar.tpl" elementName=end_date}{/if}
+          <td id="end-date-readonly">
+              {$endDate|crmDate}
+              <a href="#" class="crm-hover-button action-item override-date" id="show-end-date">
+                {ts}Over-ride end date{/ts}
+              </a>
+              {help id="override_end_date"}
+          </td>
+          <td id="end-date-editable">
+            {include file="CRM/common/jcalendar.tpl" elementName=end_date}
             <br />
-            <span class="description">{ts}Latest membership period expiration date. End Date will be automatically set based on Membership Type if you don't select a date.{/ts}</span></td></tr>
-        <tr id="autoRenew" class="crm-membership-form-block-auto_renew">
-          <td class="label"> {$form.auto_renew.label} </td>
-          <td> {$form.auto_renew.html} {help id="id-auto_renew" file="CRM/Member/Form/Membership.hlp" action=$action} </td>
+            <span class="description">{ts}Latest membership period expiration date. End Date will be automatically set based on Membership Type if you don't select a date.{/ts}</span>
+          </td>
         </tr>
-        {if ! $membershipMode}
-          <tr><td class="label">{$form.is_override.label}</td><td>{$form.is_override.html}&nbsp;&nbsp;{help id="id-status-override"}</td></tr>
-        {/if}
-
-        {if ! $membershipMode}
+        {if !$membershipMode}
+          <tr><td class="label">{$form.is_override.label} {help id="id-status-override"}</td><td>{$form.is_override.html}</td></tr>
           {* Show read-only Status block - when action is UPDATE and is_override is FALSE *}
           <tr id="memberStatus_show">
             {if $action eq 2}
@@ -163,46 +161,9 @@
           {* Show editable status field when is_override is TRUE *}
           <tr id="memberStatus"><td class="label">{$form.status_id.label}</td><td>{$form.status_id.html}<br />
             <span class="description">{ts}If <strong>Status Override</strong> is checked, the selected status will remain in force (it will NOT be modified by the automated status update script).{/ts}</span></td></tr>
-
-          {elseif $membershipMode}
-          <tr class="crm-membership-form-block-financial_type_id-mode">
-            <td class="label">{$form.financial_type_id.label}</td>
-            <td>{$form.financial_type_id.html}<br />
-              <span class="description">{ts}Select the appropriate financial type for this payment.{/ts}</span></td>
-          </tr>
-          <tr class="crm-membership-form-block-total_amount">
-            <td class="label">{$form.total_amount.label}</td>
-            <td>{$form.total_amount.html}<br />
-              <span class="description">{ts}Membership payment amount.{/ts}</span></td>
-          </tr>
-          {if $context neq 'standalone'}
-            <tr class="crm-membership-form-block-contribution-contact">
-              <td class="label">{$form.is_different_contribution_contact.label}</td>
-              <td>{$form.is_different_contribution_contact.html}&nbsp;&nbsp;{help id="id-contribution_contact"}</td>
-            </tr>
-            <tr id="record-different-contact">
-              <td>&nbsp;</td>
-              <td>
-                <table class="compressed">
-                  <tr class="crm-membership-form-block-soft-credit-type">
-                    <td class="label">{$form.soft_credit_type.label}</td>
-                    <td>{$form.soft_credit_type.html}</td>
-                  </tr>
-                  <tr class="crm-membership-form-block-soft-credit-contact-id">
-                    <td class="label">{$form.soft_credit_contact_id.label}</td>
-                    <td>{$form.soft_credit_contact_id.html}</td>
-                  </tr>
-                </table>
-              </td>
-            </tr>
-          {/if}
-          <tr class="crm-membership-form-block-billing">
-            <td colspan="2">
-            {include file='CRM/Core/BillingBlock.tpl'}
-            </td>
-          </tr>
         {/if}
-        {if $accessContribution and ! $membershipMode AND ($action neq 2 or !$rows.0.contribution_id or $onlinePendingContributionId)}
+
+        {if $accessContribution and !$membershipMode AND ($action neq 2 or (!$rows.0.contribution_id AND !$softCredit) or $onlinePendingContributionId)}
           <tr id="contri">
             <td class="label">{if $onlinePendingContributionId}{ts}Update Payment Status{/ts}{else}{$form.record_contribution.label}{/if}</td>
             <td>{$form.record_contribution.html}<br />
@@ -210,74 +171,20 @@
           </tr>
           <tr class="crm-membership-form-block-record_contribution"><td colspan="2">
             <fieldset id="recordContribution"><legend>{ts}Membership Payment and Receipt{/ts}</legend>
-              <table>{if $context neq 'standalone'}
-                <tr class="crm-membership-form-block-contribution-contact">
-                  <td class="label">{$form.is_different_contribution_contact.label}</td>
-                  <td>{$form.is_different_contribution_contact.html}&nbsp;&nbsp;{help id="id-contribution_contact"}</td>
-                </tr>
-                <tr id="record-different-contact">
-                  <td>&nbsp;</td>
-                  <td>
-                    <table class="compressed">
-                      <tr class="crm-membership-form-block-soft-credit-type">
-                        <td class="label">{$form.soft_credit_type_id.label}</td>
-                        <td>{$form.soft_credit_type_id.html}</td>
-                      </tr>
-                      <tr class="crm-membership-form-block-soft-credit-contact-id">
-                        <td class="label">{$form.soft_credit_contact_id.label}</td>
-                        <td>{$form.soft_credit_contact_id.html}</td>
-                      </tr>
-                    </table>
-                  </td>
-                </tr>{/if}
-                  <tr class="crm-membership-form-block-financial_type_id">
-                      <td class="label">{$form.financial_type_id.label}</td>
-                      <td>{$form.financial_type_id.html}<br />
-                      <span class="description">{ts}Select the appropriate financial type for this payment.{/ts}</span></td>
-                </tr>
-                <tr class="crm-membership-form-block-total_amount">
-                  <td class="label">{$form.total_amount.label}</td>
-                  <td>{$form.total_amount.html}<br />
-                    <span class="description">{ts}Membership payment amount. A contribution record will be created for this amount.{/ts}</span></td>
-                </tr>
-                <tr class="crm-membership-form-block-receive_date">
-                  <td class="label">{$form.receive_date.label}</td>
-                  <td>{include file="CRM/common/jcalendar.tpl" elementName=receive_date}</td>
-                </tr>
-                <tr class="crm-membership-form-block-payment_instrument_id">
-                  <td class="label">{$form.payment_instrument_id.label}<span class="marker"> *</span></td>
-                  <td>{$form.payment_instrument_id.html} {help id="payment_instrument_id" file="CRM/Contribute/Page/Tab.hlp"}</td>
-                </tr>
-                <tr id="checkNumber" class="crm-membership-form-block-check_number">
-                  <td class="label">{$form.check_number.label}</td>
-                  <td>{$form.check_number.html|crmAddClass:six}</td>
-                </tr>
-                {if $action neq 2 }
-                  <tr class="crm-membership-form-block-trxn_id">
-                    <td class="label">{$form.trxn_id.label}</td>
-                    <td>{$form.trxn_id.html}</td>
-                  </tr>
-                {/if}
-                <tr class="crm-membership-form-block-contribution_status_id">
-                  <td class="label">{$form.contribution_status_id.label}</td>
-                  <td>{$form.contribution_status_id.html}</td>
-                </tr>
-              </table>
-            </fieldset>
-          </td></tr>
-          {else}
-          <div class="spacer"></div>
         {/if}
+        {include file="CRM/Member/Form/MembershipCommon.tpl"}
 
-        {if $emailExists and $outBound_option != 2 }
+        {if $emailExists and $isEmailEnabledForSite}
           <tr id="send-receipt" class="crm-membership-form-block-send_receipt">
             <td class="label">{$form.send_receipt.label}</td><td>{$form.send_receipt.html}<br />
-            <span class="description">{ts 1=$emailExists}Automatically email a membership confirmation and receipt to %1?{/ts}</span></td>
+            <span class="description">{ts 1=$emailExists}Automatically email a membership confirmation and receipt to %1? OR if the payment is from a different contact, this email will only go to them.{/ts}</span></td>
+            <span class="auto-renew-text">{ts}For auto-renewing memberships the emails are sent when each payment is received{/ts}</span>
           </tr>
-          {elseif $context eq 'standalone' and $outBound_option != 2 }
+          {elseif $context eq 'standalone' and $isEmailEnabledForSite}
           <tr id="email-receipt" style="display:none;">
             <td class="label">{$form.send_receipt.label}</td><td>{$form.send_receipt.html}<br />
-            <span class="description">{ts}Automatically email a membership confirmation and receipt to {/ts}<span id="email-address"></span>?</span></td>
+            <span class="description">{ts}Automatically email a membership confirmation and receipt to {/ts}<span id="email-address"></span>? {ts}OR if the payment is from a different contact, this email will only go to them.{/ts}</span></td>
+            <span class="auto-renew-text">{ts}For auto-renewing memberships the emails are sent when each payment is received{/ts}</span>
           </tr>
         {/if}
         <tr id="fromEmail" style="display:none;">
@@ -285,9 +192,9 @@
           <td>{$form.from_email_address.html}</td>
         </tr>
         <tr id='notice' style="display:none;">
-          <td class="label">{$form.receipt_text_signup.label}</td>
+          <td class="label">{$form.receipt_text.label}</td>
           <td class="html-adjust"><span class="description">{ts}If you need to include a special message for this member, enter it here. Otherwise, the confirmation email will include the standard receipt message configured under System Message Templates.{/ts}</span>
-            {$form.receipt_text_signup.html|crmAddClass:huge}</td>
+            {$form.receipt_text.html|crmAddClass:huge}</td>
         </tr>
       </table>
       <div id="customData"></div>
@@ -295,7 +202,7 @@
       {include file="CRM/common/customData.tpl"}
       {literal}
       <script type="text/javascript">
-      cj(function() {
+      CRM.$(function($) {
       {/literal}
         CRM.buildCustomData( '{$customDataType}' );
         {if $customDataSubType}
@@ -306,9 +213,16 @@
       </script>
       {/literal}
       {if $accessContribution and $action eq 2 and $rows.0.contribution_id}
-        <fieldset>
-        {include file="CRM/Contribute/Form/Selector.tpl" context="Search"}
-        </fieldset>
+        <div class="crm-accordion-wrapper">
+          <div class="crm-accordion-header">{ts}Related Contributions{/ts}</div>
+          <div class="crm-accordion-body">{include file="CRM/Contribute/Form/Selector.tpl" context="Search"}</div>
+        </div>
+      {/if}
+      {if $softCredit}
+        <div class="crm-accordion-wrapper">
+          <div class="crm-accordion-header">{ts}Related Soft Contributions{/ts}</div>
+          <div class="crm-accordion-body">{include file="CRM/Contribute/Page/ContributionSoft.tpl" context="membership"}</div>
+       </div>
       {/if}
     {/if}
 
@@ -339,10 +253,10 @@
 
     {literal}
     <script type="text/javascript">
-
       function setPaymentBlock(mode, checkboxEvent) {
         var memType = parseInt(cj('#membership_type_id_1').val( ));
         var isPriceSet = 0;
+        var existingAmount = {/literal}{if !empty($onlinePendingContributionId)}1{else}0{/if}{literal};
 
         if ( cj('#price_set_id').length > 0 && cj('#price_set_id').val() ) {
           isPriceSet = 1;
@@ -353,7 +267,7 @@
         }
 
         var allMemberships = {/literal}{$allMembershipInfo}{literal};
-        if ( !mode ) {
+        if (!mode) {
           //check the record_contribution checkbox if membership is a paid one
           {/literal}{if $action eq 1}{literal}
           if (!checkboxEvent) {
@@ -372,17 +286,42 @@
         // skip this for test and live modes because financial type is set automatically
         cj("#financial_type_id").val(allMemberships[memType]['financial_type_id']);
         var term = cj('#num_terms').val();
-        if ( term ) {
-          var feeTotal = allMemberships[memType]['total_amount_numeric'] * term;
-          cj("#total_amount").val( feeTotal.toFixed(2) );
+        var taxRates = '{/literal}{$taxRates}{literal}';
+        var taxTerm = '{/literal}{$taxTerm}{literal}';
+        var taxRates = JSON.parse(taxRates);
+        var taxRate = taxRates[allMemberships[memType]['financial_type_id']];
+        var currency = '{/literal}{$currency}{literal}';
+        var taxAmount = (taxRate/100)*allMemberships[memType]['total_amount_numeric'];
+        taxAmount = isNaN (taxAmount) ? 0:taxAmount;
+        if (term) {
+          if (!taxRate) {
+            var feeTotal = allMemberships[memType]['total_amount_numeric'] * term;
+          }
+          else {
+            var feeTotal = Number((taxRate/100) * (allMemberships[memType]['total_amount_numeric'] * term))+Number
+           (allMemberships[memType]['total_amount_numeric'] * term );
+          }
+          cj("#total_amount").val(CRM.formatMoney(feeTotal, true));
         }
         else {
-          cj("#total_amount").val( allMemberships[memType]['total_amount'] );
+          if (taxRate) {
+            var feeTotal = parseFloat(Number((taxRate/100) * allMemberships[memType]['total_amount'])+Number(allMemberships[memType]['total_amount_numeric'])).toFixed(2);
+            cj("#total_amount").val(CRM.formatMoney(feeTotal, true));
+          }
+          else {
+            var feeTotal = allMemberships[memType]['total_amount'];
+            if (!existingAmount) {
+              // CRM-16680 don't set amount if there is an existing contribution.
+              cj("#total_amount").val(allMemberships[memType]['total_amount']);
+            }
+          }
         }
+        var taxMessage = taxRate!=undefined ? 'Includes '+taxTerm+' amount of '+currency+' '+taxAmount:'';
+        cj('.totaltaxAmount').html(taxMessage);
       }
 
 
-      cj( function( ) {
+      CRM.$(function($) {
       var mode   = {/literal}'{$membershipMode}'{literal};
       if ( !mode ) {
         // Offline form (mode = false) has the record_contribution checkbox
@@ -410,6 +349,24 @@
       cj('#is_different_contribution_contact').change( function() {
         setDifferentContactBlock();
       });
+
+      // give option to override end-date for auto-renew memberships
+      {/literal}
+      {if $isRecur && $endDate}
+        cj('#end-date-readonly').show();
+        cj('#end-date-editable').hide();
+      {else}
+        cj('#end-date-readonly').hide();
+        cj('#end-date-editable').show();
+      {/if}
+      {literal}
+
+      cj('#show-end-date').click( function( e ) {
+        e.preventDefault();
+        cj('#end-date-readonly').hide();
+        cj('#end-date-editable').show();
+      });
+
     });
 
     function setDifferentContactBlock( ) {
@@ -421,35 +378,37 @@
         cj('#record-different-contact').hide();
       }
     }
+
+    function showEmailOptions() {
+      {/literal}
+      // @todo emailExists refers to the primary contact for the page.
+      // elsewhere some script determines if there is a paying contact the
+      // email should go to instead (e.g gift membership). This should be checked for here
+      // and that merged into that code as currently behaviour is inconsistent.
+      var emailExists = '{$emailExists}';
+      var isStandalone = ('{$context}' == 'standalone');
+      var isEmailEnabledForSite = {if $isEmailEnabledForSite}true{else}false{/if};
+
+      {literal}
+      var isEmailable = (isEmailEnabledForSite && (emailExists || isStandalone));
+
+      if (isEmailable && cj('#send_receipt').prop('checked') && !cj('#auto_renew').prop('checked')) {
+        // Hide extra message and from email for recurring as they cannot be stored until use.
+        cj('#notice').show();
+        cj('#fromEmail').show();
+      }
+      else {
+        cj('#notice').hide();
+        cj('#fromEmail').hide();
+      }
+    }
     </script>
-    {/literal}
-
-    {if ($emailExists and $outBound_option != 2) OR $context eq 'standalone' }
-    {include file="CRM/common/showHideByFieldValue.tpl"
-    trigger_field_id    ="send_receipt"
-    trigger_value       =""
-    target_element_id   ="notice"
-    target_element_type ="table-row"
-    field_type          ="radio"
-    invert              = 0
-    }
-    {include file="CRM/common/showHideByFieldValue.tpl"
-    trigger_field_id    ="send_receipt"
-    trigger_value       =""
-    target_element_id   ="fromEmail"
-    target_element_type ="table-row"
-    field_type          ="radio"
-    invert              = 0
-    }
-    {/if}
-    {literal}
-
     <script type="text/javascript">
 
     {/literal}{if !$membershipMode}{literal}
     showHideMemberStatus();
     function showHideMemberStatus() {
-      if ( cj( "#is_override" ).prop('checked' ) ) {
+      if ( cj( "#is_override" ).prop('checked') ) {
         cj('#memberStatus').show( );
         cj('#memberStatus_show').hide( );
       }
@@ -460,69 +419,93 @@
     }
     {/literal}{/if}
 
-    {if $context eq 'standalone' and $outBound_option != 2 }
+    {if $context eq 'standalone' and $isEmailEnabledForSite }
     {literal}
-    cj( function( ) {
-      cj("#contact_1").blur( function( ) {
-        checkEmail( );
-      } );
+    CRM.$(function($) {
+      var $form = $("form.{/literal}{$form.formClass}{literal}");
+      $("#contact_id", $form).change(checkEmail);
       checkEmail( );
+
+      function checkEmail( ) {
+        var data = $("#contact_id", $form).select2('data');
+        if (data && data.extra && data.extra.email && data.extra.email.length) {
+          $("#email-receipt", $form).show();
+          if ($("#send_receipt", $form).is(':checked')) {
+            $("#notice", $form).show();
+          }
+          $("#email-address", $form).html(data.extra.email);
+        }
+        else {
+          $("#email-receipt, #notice", $form).hide();
+        }
+      }
     });
 
-    function checkEmail( ) {
-      var contactID = cj("input[name='contact_select_id[1]']").val();
-      if ( contactID ) {
-        var postUrl = "{/literal}{crmURL p='civicrm/ajax/checkemail' h=0}{literal}";
-        cj.post( postUrl, {contact_id: contactID},
-          function ( response ) {
-            if ( response ) {
-              cj("#email-receipt").show( );
-              if ( cj("#send_receipt").is(':checked') ) {
-                cj("#notice").show( );
-              }
-              cj("#email-address").html( response );
-            }
-            else {
-              cj("#email-receipt").hide( );
-              cj("#notice").hide( );
-            }
-          }
-        );
-  }
-  else {
-        cj("#email-receipt").hide( );
-        cj("#notice").hide( );
-      }
-    }
-
-    function profileCreateCallback( blockNo ) {
-      checkEmail( );
-    }
     {/literal}
     {/if}
 
     {literal}
     //keep read only always checked.
-    cj( function( ) {
+    CRM.$(function($) {
+      var $form = $("form.{/literal}{$form.formClass}{literal}");
       var allowAutoRenew   = {/literal}'{$allowAutoRenew}'{literal};
       var alreadyAutoRenew = {/literal}'{$alreadyAutoRenew}'{literal};
       if ( allowAutoRenew || alreadyAutoRenew ) {
-        cj( "#auto_renew" ).click(function( ) {
-          if ( cj(this).attr( 'readonly' ) ) {
-            cj(this).prop('checked', true );
+        $( "#auto_renew" ).click(function( ) {
+          if ( $(this).attr( 'readonly' ) ) {
+            $(this).prop('checked', true );
           }
+          showEmailOptions();
         });
       }
+
+      {/literal}
+      {if !empty($existingContactMemberships)}
+
+      var alert, memberorgs = {$existingContactMemberships|@json_encode};
+
+      {literal}
+      $("select[name='membership_type_id[0]']").change(checkExistingMemOrg);
+
+
+
+      function checkExistingMemOrg () {
+        alert && alert.close && alert.close();
+        var selectedorg = $("select[name='membership_type_id[0]']").val();
+        if (selectedorg in memberorgs) {
+          var andEndDate = '',
+            endDate = memberorgs[selectedorg].membership_end_date,
+            org = $('option:selected', "select[name='membership_type_id[0]']").text();
+          if (endDate) {
+            andEndDate = '{/literal}{ts escape='js' 1='%1'}and end date of %1{/ts}{literal}';
+            andEndDate = ' ' + ts(andEndDate, {1:endDate});
+          }
+
+          alert = CRM.alert(
+            // Mixing client-side variables with a translated string in smarty is awkward!
+            ts({/literal}'{ts escape='js' 1='%1' 2='%2' 3='%3' 4='%4'}This contact has an existing %1 membership at %2 with %3 status%4.{/ts}'{literal}, {1:memberorgs[selectedorg].membership_type, 2: org, 3: memberorgs[selectedorg].membership_status, 4: andEndDate})
+              + '<ul><li><a href="' + memberorgs[selectedorg].renewUrl + '">'
+              + {/literal}'{ts escape='js'}Renew the existing membership instead{/ts}'
+              + '</a></li><li><a href="' + memberorgs[selectedorg].membershipTab + '">'
+              + '{ts escape='js'}View all existing and / or expired memberships for this contact{/ts}'{literal}
+              + '</a></li></ul>',
+            '{/literal}{ts escape='js'}Duplicate Membership?{/ts}{literal}', 'alert');
+        }
+      }
+      checkExistingMemOrg();
+      {/literal}
+      {/if}
+
+      {literal}
+
     });
     {/literal}
 
     {if $membershipMode or $action eq 2}
+
+    buildAutoRenew( null, null, '{$membershipMode}');
     {literal}
-
-    buildAutoRenew( null, null );
-
-    function buildAutoRenew( membershipType, processorId ) {
-      var mode   = {/literal}'{$membershipMode}'{literal};
+    function buildAutoRenew( membershipType, processorId, mode ) {
       var action = {/literal}'{$action}'{literal};
 
       //for update lets hide it when not already recurring.
@@ -547,6 +530,7 @@
       if ( !processorId || !membershipType ) {
         cj("#auto_renew").prop('checked', false );
         cj("#autoRenew").hide( );
+        showEmailOptions();
         return;
       }
 
@@ -556,7 +540,7 @@
 
       if ( !currentOption || !recurProcessors[processorId] ) {
         cj("#auto_renew").prop('checked', false );
-        cj("#autoRenew").hide( );
+        cj("#autoRenew").hide();
         return;
       }
 
@@ -576,36 +560,12 @@
         cj("#auto_renew").prop('checked', false );
         cj("#autoRenew").hide( );
       }
-
-      //play w/ receipt option.
-      if ( cj("#auto_renew").prop('checked' ) ) {
-        cj("#notice").hide( );
-        cj("#send_receipt").prop('checked', false );
-        cj("#send-receipt").hide( );
-      }
-      else {
-        cj("#send-receipt").show( );
-        if ( cj("#send_receipt").prop('checked' ) ) {
-          cj("#notice").show( );
-        }
-      }
+      showEmailOptions();
     }
     {/literal}
     {/if}
 
     {literal}
-    function buildReceiptANDNotice( ) {
-      if ( cj("#auto_renew").prop('checked' ) ) {
-        cj("#notice").hide( );
-        cj("#send-receipt").hide( );
-      }
-      else {
-        cj("#send-receipt").show( );
-        if ( cj("#send_receipt").prop('checked' ) ) {
-          cj("#notice").show( );
-        }
-      }
-    }
 
     var customDataType = '{/literal}{$customDataType}{literal}';
 
@@ -677,19 +637,22 @@
       if ((memType > 0) && (allMemberships[memType]['has_related'])) {
         if (setDefault) cj('#max_related').val(allMemberships[memType]['max_related']);
         cj('#maxRelated').show();
-        if(CRM.ids.contact > 0) {
-          CRM.api('relationship', 'getcount', {'contact_id' : CRM.ids.contact, 'membership_type_id' : memType}, {
+        var cid = {/literal}{if $contactID}{$contactID}{else}null{/if}{literal};
+        if (cid) {
+          CRM.api('relationship', 'getcount', {contact_id: cid, membership_type_id: memType}, {
             success: function(result) {
-              var relatable = ' ' + result.result + ts(' contacts are ');
-              if(result.result === 0) {
-                relatable = ts(' No contacts are ');
+              var relatable;
+              if (result.result === 0) {
+                relatable = '{/literal}{ts escape='js'}No contacts are currently eligible to inherit this relationship.{/ts}{literal}';
               }
-              if(result.result === 1) {
-                relatable = ts(' One contact is ');
+              else if (result.result === 1) {
+                relatable = '{/literal}{ts escape='js'}One contact is currently eligible to inherit this relationship.{/ts}{literal}';
               }
-
-              var others = relatable + ts('currently eligible to inherit this relationship.');
-              cj('#max_related').siblings('.description').append(others);
+              else {
+                relatable = '{/literal}{ts escape='js' 1='%1'}%1 contacts are currently eligible to inherit this relationship.{/ts}{literal}';
+                relatable = ts(relatable, {1: result});
+              }
+              cj('#max_related').siblings('.description').append(' ' + relatable);
             }
           });
         }
@@ -699,12 +662,12 @@
       }
     }
 
-    var lastMembershipTypes = new Array;
-    var optionsMembershipTypes = new Array;
+    var lastMembershipTypes = [];
+    var optionsMembershipTypes = [];
 
     // function to load custom data for selected membership types through priceset
     function processMembershipPriceset( membershipValues, autoRenewOption, reload ) {
-      var currentMembershipType = new Array;
+      var currentMembershipType = [];
       var count = 0;
       var loadCustomData = 0;
       if ( membershipValues ) {
@@ -712,7 +675,7 @@
       }
 
       if ( reload ) {
-        lastMembershipTypes = new Array;
+        lastMembershipTypes = [];
         {/literal}{if $allowAutoRenew}{literal}
         cj('#autoRenew').hide();
         var autoRenew = cj("#auto_renew");

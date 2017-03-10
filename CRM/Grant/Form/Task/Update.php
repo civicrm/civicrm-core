@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
  */
@@ -41,28 +41,26 @@
 class CRM_Grant_Form_Task_Update extends CRM_Grant_Form_Task {
 
   /**
-   * build all the data structures needed to build the form
+   * Build all the data structures needed to build the form.
    *
    * @return void
-   * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     parent::preProcess();
 
     //check permission for update.
     if (!CRM_Core_Permission::checkActionPermission('CiviGrant', CRM_Core_Action::UPDATE)) {
-      CRM_Core_Error::fatal(ts('You do not have permission to access this page'));
+      CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
     }
   }
 
   /**
-   * Build the form
+   * Build the form object.
    *
-   * @access public
    *
    * @return void
    */
-  function buildQuickForm() {
+  public function buildQuickForm() {
     $grantStatus = CRM_Core_PseudoConstant::get('CRM_Grant_DAO_Grant', 'status_id');
     $this->addElement('select', 'status_id', ts('Grant Status'), array('' => '') + $grantStatus);
 
@@ -78,9 +76,8 @@ class CRM_Grant_Form_Task_Update extends CRM_Grant_Form_Task {
   }
 
   /**
-   * process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated.
    *
-   * @access public
    *
    * @return void
    */
@@ -101,19 +98,16 @@ class CRM_Grant_Form_Task_Update extends CRM_Grant_Form_Task {
         $values[$key] = $value;
       }
       foreach ($this->_grantIds as $grantId) {
-        $ids['grant'] = $grantId;
+        $ids['grant_id'] = $grantId;
 
         CRM_Grant_BAO_Grant::add($values, $ids);
         $updatedGrants++;
       }
     }
 
-    $status = array(
-      ts('Updated Grant(s): %1', array(1 => $updatedGrants)),
-      ts('Total Selected Grant(s): %1', array(1 => count($this->_grantIds))),
-    );
-    CRM_Core_Session::setStatus($status);
+    $status = ts('Updated Grant(s): %1 (Total Selected: %2)', array(1 => $updatedGrants, 2 => count($this->_grantIds)));
+    CRM_Core_Session::setStatus($status, '', 'info');
     CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/grant/search', 'force=1&qfKey=' . $qfKey));
   }
-}
 
+}

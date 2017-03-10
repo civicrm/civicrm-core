@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,16 +22,20 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Contribute_OnlineRecurContributionTest
+ */
 class WebTest_Contribute_OnlineRecurContributionTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
     parent::setUp();
   }
 
-  function testOnlineRecurContribution() {
+  public function testOnlineRecurContribution() {
     require_once 'ContributionPageAddTest.php';
 
     // a random 7-char string and an even number to make this pass unique
@@ -55,7 +59,7 @@ class WebTest_Contribute_OnlineRecurContributionTest extends CiviSeleniumTestCas
     $pcp = FALSE;
 
     // open browser, login
-    $this->webtestLogin();
+    $this->webtestLogin('admin');
 
     // create a new online contribution page with recurring enabled (using a newly created AuthNet processor)
     // create contribution page with randomized title and default params
@@ -108,7 +112,7 @@ class WebTest_Contribute_OnlineRecurContributionTest extends CiviSeleniumTestCas
 
     // Confirmation page
     $this->waitForElementPresent("_qf_Confirm_next-bottom");
-    $text = 'I want to contribute this amount every 1 month(s) for 12 installments.';
+    $text = 'I want to contribute this amount every month for 12 installments.';
     $this->assertTrue($this->isTextPresent($text), 'Missing recurring contribution text (confirmation): ' . $text);
     $text = $rand;
     $this->assertTrue($this->isTextPresent($contributionAmount), 'Missing contribution amount (confirmation): ' . $contributionAmount);
@@ -117,7 +121,7 @@ class WebTest_Contribute_OnlineRecurContributionTest extends CiviSeleniumTestCas
     // Thank-you page
     $this->waitForElementPresent("thankyou_footer");
     $this->assertTrue($this->isElementPresent('tell-a-friend'), 'Missing tell-a-friend div');
-    $text = 'This recurring contribution will be automatically processed every 1 month(s) for a total 12 installments';
+    $text = 'This recurring contribution will be automatically processed every month for a total 12 installments';
     $this->assertTrue($this->isTextPresent($text), 'Missing recurring contribution text (thank-you): ' . $text);
     $this->assertTrue($this->isTextPresent($contributionAmount), 'Missing contribution amount (thank-you): ' . $contributionAmount);
 
@@ -129,17 +133,17 @@ class WebTest_Contribute_OnlineRecurContributionTest extends CiviSeleniumTestCas
     $this->click("contribution_test");
     $this->click("_qf_Search_refresh");
 
-    $this->waitForElementPresent('css=#contributionSearch table tbody tr td span a.action-item-first');
-    $this->click('css=#contributionSearch table tbody tr td span a.action-item-first');
+    $this->waitForElementPresent('css=#contributionSearch table tbody tr td a.action-item:first-child');
+    $this->click('css=#contributionSearch table tbody tr td a.action-item:first-child');
     $this->waitForElementPresent("_qf_ContributionView_cancel-bottom");
 
     // View Recurring Contribution Record
     $verifyData = array(
       'From' => "$contactName",
-                          'Financial Type' => 'Donation (test)',
+      'Financial Type' => 'Donation (test)',
       'Total Amount' => 'Installments: 12, Interval: 1 month(s)',
       'Contribution Status' => 'Pending : Incomplete Transaction',
-      'Paid By' => 'Credit Card',
+      'Payment Method' => 'Credit Card',
       'Online Contribution Page' => $pageTitle,
     );
     foreach ($verifyData as $label => $value) {
@@ -148,5 +152,5 @@ class WebTest_Contribute_OnlineRecurContributionTest extends CiviSeleniumTestCas
       );
     }
   }
-}
 
+}

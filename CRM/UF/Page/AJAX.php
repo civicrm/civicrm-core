@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
  */
@@ -39,15 +39,15 @@
 class CRM_UF_Page_AJAX {
 
   /**
-   * Function the check whether the field belongs
+   * Function the check whether the field belongs.
    * to multi-record custom set
    */
-  function checkIsMultiRecord() {
+  public function checkIsMultiRecord() {
     $customId = $_GET['customId'];
 
     $isMultiple = CRM_Core_BAO_CustomField::isMultiRecordField($customId);
     $isMultiple = array('is_multi' => $isMultiple);
-    echo json_encode($isMultiple);
-    CRM_Utils_System::civiExit();
+    CRM_Utils_JSON::output($isMultiple);
   }
+
 }

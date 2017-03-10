@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,30 +23,35 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
-
-/**
- * Definition of the ActivityType part of the CRM API.
- * More detailed documentation can be found
- * {@link http://objectledge.org/confluence/display/CRM/CRM+v1.0+Public+APIs
- * here}
- *
- * @package CiviCRM_APIv3
- * @subpackage API_Activity
- *
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id: ActivityType.php 30171 2010-10-14 09:11:27Z mover $
- *
  */
 
 /**
- * Function to retrieve activity types
+ * The ActivityType api is deprecated. Please use the OptionValue api instead.
  *
- * @return array $activityTypes activity types keyed by id
- * @access public
+ * @deprecated
  *
- * @example ActivityTypeGet.php
- * @deprecated - use getoptions
+ * @package CiviCRM_APIv3
+ */
+
+/**
+ * Notification of deprecated function.
+ *
+ * @deprecated api notice
+ * @return string
+ *   to indicate this entire api entity is deprecated
+ */
+function _civicrm_api3_activity_type_deprecation() {
+  return 'The ActivityType api is deprecated. Please use the OptionValue api instead.';
+}
+
+/**
+ * Retrieve activity types.
+ *
+ * @param array $params
+ *
+ * @return array
+ *   activity types keyed by id
+ * @deprecated - use the getoptions action instead
  */
 function civicrm_api3_activity_type_get($params) {
 
@@ -55,16 +60,14 @@ function civicrm_api3_activity_type_get($params) {
 }
 
 /**
- * Function to create activity type (
+ * Create activity type.
  *
- * @param array   $params  associated array of fields
- *                 $params['option_value_id'] is required for updation of activity type
+ * @param array $params
  *
- * @return array $activityType created / updated activity type
+ * @return array
+ *   created / updated activity type
  *
- * @access public
- *
- * @deprecated - we will introduce OptionValue Create - plse consider helping with this if not done
+ * @deprecated use the OptionValue api instead
  */
 function civicrm_api3_activity_type_create($params) {
 
@@ -82,28 +85,39 @@ function civicrm_api3_activity_type_create($params) {
 }
 
 /**
- * Adjust Metadata for Create action
+ * Adjust Metadata for Create action.
  *
- * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * The metadata is used for setting defaults, documentation & validation.
+ *
+ * @param array $params
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_activity_type_create_spec(&$params) {
-  $params['label']['api.required'] = 1;
-  $params['weight']['api.required'] = 1;
+  $params['label'] = array(
+    'api.required' => 1,
+    'title' => 'Label',
+    'type' => CRM_Utils_Type::T_STRING,
+  );
+  $params['weight'] = array(
+    'api.required' => 1,
+    'title' => 'Weight',
+    'type' => CRM_Utils_Type::T_STRING,
+  );
 }
 
 /**
- * Function to delete activity type
+ * Delete ActivityType.
  *
- * @param array $params array including id of activity_type to delete
-
+ * @param array $params
+ *   Array including id of activity_type to delete.
  * @return array API result array
- *
- * @access public
- *
- * @deprecated - we will introduce OptionValue Delete- plse consider helping with this if not done
+ * @throws API_Exception
+ * @deprecated use OptionValue api
  */
 function civicrm_api3_activity_type_delete($params) {
-  return civicrm_api3_create_success(CRM_Core_BAO_OptionValue::del($params['id']), $params);
+  $result = CRM_Core_BAO_OptionValue::del($params['id']);
+  if ($result) {
+    return civicrm_api3_create_success(TRUE, $params);
+  }
+  throw new API_Exception("Failure to delete activity type id {$params['id']}");
 }
-

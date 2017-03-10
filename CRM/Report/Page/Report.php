@@ -1,10 +1,9 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,27 +23,23 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
- * Page for invoking report templates
+ * Page for invoking report templates.
  */
 class CRM_Report_Page_Report extends CRM_Core_Page {
 
   /**
-   * run this page (figure out the action needed and perform it).
-   *
-   * @return void
+   * Run this page (figure out the action needed and perform it).
    */
-  function run() {
+  public function run() {
     if (!CRM_Core_Permission::check('administer Reports')) {
       return CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/report/list', 'reset=1'));
     }
@@ -52,7 +47,7 @@ class CRM_Report_Page_Report extends CRM_Core_Page {
     $optionVal = CRM_Report_Utils_Report::getValueFromUrl();
 
     $templateInfo = CRM_Core_OptionGroup::getRowValues('report_template', "{$optionVal}", 'value',
-      'String', FALSE
+      'String', FALSE, TRUE
     );
 
     $extKey = strpos(CRM_Utils_Array::value('name', $templateInfo), '.');
@@ -66,7 +61,7 @@ class CRM_Report_Page_Report extends CRM_Core_Page {
     }
 
     if (strstr(CRM_Utils_Array::value('name', $templateInfo), '_Form') || !is_null($reportClass)) {
-      CRM_Utils_System::setTitle($templateInfo['label'] . ' - Template');
+      CRM_Utils_System::setTitle(ts('%1 - Template', array(1 => $templateInfo['label'])));
       $this->assign('reportTitle', $templateInfo['label']);
 
       $session = CRM_Core_Session::singleton();
@@ -82,5 +77,5 @@ class CRM_Report_Page_Report extends CRM_Core_Page {
     }
     return CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/report/list', 'reset=1'));
   }
-}
 
+}

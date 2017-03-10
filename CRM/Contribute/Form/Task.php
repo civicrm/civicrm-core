@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,80 +23,90 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
- * This class generates form components for relationship
- *
+ * This class generates form components for relationship.
  */
 class CRM_Contribute_Form_Task extends CRM_Core_Form {
 
   /**
-   * the task being performed
+   * The task being performed.
    *
    * @var int
    */
   protected $_task;
 
   /**
-   * The additional clause that we restrict the search with
+   * The additional clause that we restrict the search with.
    *
    * @var string
    */
   protected $_componentClause = NULL;
 
   /**
-   * The array that holds all the component ids
+   * The array that holds all the component ids.
    *
    * @var array
    */
   protected $_componentIds;
 
   /**
-   * The array that holds all the contribution ids
+   * The array that holds all the contribution ids.
    *
    * @var array
    */
   protected $_contributionIds;
 
   /**
-   * The array that holds all the contact ids
+   * The array that holds all the contact ids.
    *
    * @var array
    */
   public $_contactIds;
 
   /**
-   * build all the data structures needed to build the form
+   * The array that holds all the mapping contribution and contact ids.
    *
-   * @param
-   *
-   * @return void
-   * @access public
+   * @var array
    */
-  function preProcess() {
+  protected $_contributionContactIds = array();
+
+  /**
+   * The flag to tell if there are soft credits included.
+   *
+   * @var boolean
+   */
+  public $_includesSoftCredits = FALSE;
+
+  /**
+   * Build all the data structures needed to build the form.
+   */
+  public function preProcess() {
     self::preProcessCommon($this);
   }
 
-  static function preProcessCommon(&$form, $useTable = FALSE) {
+  /**
+   * @param CRM_Core_Form $form
+   * @param bool $useTable
+   */
+  public static function preProcessCommon(&$form, $useTable = FALSE) {
     $form->_contributionIds = array();
 
     $values = $form->controller->exportValues($form->get('searchFormName'));
 
-    $form->_task = $values['task'];
+    $form->_task = CRM_Utils_Array::value('task', $values);
     $contributeTasks = CRM_Contribute_Task::tasks();
-    $form->assign('taskName', $contributeTasks[$form->_task]);
+    $form->assign('taskName', CRM_Utils_Array::value($form->_task, $contributeTasks));
 
     $ids = array();
-    if ($values['radio_ts'] == 'ts_sel') {
+    if (isset($values['radio_ts']) && $values['radio_ts'] == 'ts_sel') {
       foreach ($values as $name => $value) {
         if (substr($name, 0, CRM_Core_Form::CB_PREFIX_LEN) == CRM_Core_Form::CB_PREFIX) {
           $ids[] = substr($name, CRM_Core_Form::CB_PREFIX_LEN);
@@ -105,21 +115,55 @@ class CRM_Contribute_Form_Task extends CRM_Core_Form {
     }
     else {
       $queryParams = $form->get('queryParams');
-      $sortOrder = null;
-      if ( $form->get( CRM_Utils_Sort::SORT_ORDER  ) ) {
-        $sortOrder = $form->get( CRM_Utils_Sort::SORT_ORDER );
+      $isTest = FALSE;
+      foreach ($queryParams as $fields) {
+        if ($fields[0] == 'contribution_test') {
+          $isTest = TRUE;
+          break;
+        }
+      }
+      if (!$isTest) {
+        $queryParams[] = array(
+          'contribution_test',
+          '=',
+          0,
+          0,
+          0,
+        );
+      }
+      $returnProperties = array('contribution_id' => 1);
+      $sortOrder = $sortCol = NULL;
+      if ($form->get(CRM_Utils_Sort::SORT_ORDER)) {
+        $sortOrder = $form->get(CRM_Utils_Sort::SORT_ORDER);
+        //Include sort column in select clause.
+        $sortCol = trim(str_replace(array('`', 'asc', 'desc'), '', $sortOrder));
+        $returnProperties[$sortCol] = 1;
       }
 
-      $query = new CRM_Contact_BAO_Query($queryParams, NULL, NULL, FALSE, FALSE,
+      $form->_includesSoftCredits = CRM_Contribute_BAO_Query::isSoftCreditOptionEnabled($queryParams);
+      $query = new CRM_Contact_BAO_Query($queryParams, $returnProperties, NULL, FALSE, FALSE,
         CRM_Contact_BAO_Query::MODE_CONTRIBUTE
       );
-      $query->_distinctComponentClause = ' civicrm_contribution.id';
-      $query->_groupByComponentClause = ' GROUP BY civicrm_contribution.id ';
-
+      // @todo the function CRM_Contribute_BAO_Query::isSoftCreditOptionEnabled should handle this
+      // can we remove? if not why not?
+      if ($form->_includesSoftCredits) {
+        $contactIds = $contributionContactIds = array();
+        $query->_rowCountClause = " count(civicrm_contribution.id)";
+        $query->_groupByComponentClause = " GROUP BY contribution_search_scredit_combined.id, contribution_search_scredit_combined.contact_id, contribution_search_scredit_combined.scredit_id ";
+      }
+      else {
+        $query->_distinctComponentClause = ' civicrm_contribution.id';
+        $query->_groupByComponentClause = ' GROUP BY civicrm_contribution.id ';
+      }
       $result = $query->searchQuery(0, 0, $sortOrder);
       while ($result->fetch()) {
         $ids[] = $result->contribution_id;
+        if ($form->_includesSoftCredits) {
+          $contactIds[$result->contact_id] = $result->contact_id;
+          $contributionContactIds["{$result->contact_id}-{$result->contribution_id}"] = $result->contribution_id;
+        }
       }
+      $result->free();
       $form->assign('totalSelectedContributions', $form->get('rowCount'));
     }
 
@@ -128,8 +172,13 @@ class CRM_Contribute_Form_Task extends CRM_Core_Form {
 
       $form->assign('totalSelectedContributions', count($ids));
     }
+    if (!empty($form->_includesSoftCredits) && !empty($contactIds)) {
+      $form->_contactIds = $contactIds;
+      $form->_contributionContactIds = $contributionContactIds;
+    }
 
     $form->_contributionIds = $form->_componentIds = $ids;
+    $form->set('contributionIds', $form->_contributionIds);
 
     //set the context for redirection for any task actions
     $session = CRM_Core_Session::singleton();
@@ -146,9 +195,18 @@ class CRM_Contribute_Form_Task extends CRM_Core_Form {
     }
     else {
       $session->replaceUserContext(CRM_Utils_System::url("civicrm/contact/search/$searchFormName",
-          $urlParams
-        ));
+        $urlParams
+      ));
     }
+  }
+
+  /**
+   * Sets contribution Ids for unit test.
+   *
+   * @param array $contributionIds
+   */
+  public function setContributionIds($contributionIds) {
+    $this->_contributionIds = $contributionIds;
   }
 
   /**
@@ -156,22 +214,26 @@ class CRM_Contribute_Form_Task extends CRM_Core_Form {
    * since its used for things like send email
    */
   public function setContactIDs() {
-    $this->_contactIds = &CRM_Core_DAO::getContactIDsFromComponent($this->_contributionIds,
-      'civicrm_contribution'
-    );
+    if (!$this->_includesSoftCredits) {
+      $this->_contactIds = &CRM_Core_DAO::getContactIDsFromComponent(
+        $this->_contributionIds,
+        'civicrm_contribution'
+      );
+    }
   }
 
   /**
-   * simple shell that derived classes can call to add buttons to
+   * Simple shell that derived classes can call to add buttons to
    * the form with a customized title for the main Submit
    *
-   * @param string $title title of the main button
-   * @param string $type  button type for the form after processing
-   *
-   * @return void
-   * @access public
+   * @param string $title
+   *   Title of the main button.
+   * @param string $nextType
+   *   Button type for the form after processing.
+   * @param string $backType
+   * @param bool $submitOnce
    */
-  function addDefaultButtons($title, $nextType = 'next', $backType = 'back', $submitOnce = FALSE) {
+  public function addDefaultButtons($title, $nextType = 'next', $backType = 'back', $submitOnce = FALSE) {
     $this->addButtons(array(
         array(
           'type' => $nextType,
@@ -185,5 +247,5 @@ class CRM_Contribute_Form_Task extends CRM_Core_Form {
       )
     );
   }
-}
 
+}

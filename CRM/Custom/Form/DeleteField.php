@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
  */
@@ -39,48 +39,41 @@
 class CRM_Custom_Form_DeleteField extends CRM_Core_Form {
 
   /**
-   * the group id
+   * The group id.
    *
    * @var int
    */
   protected $_id;
 
   /**
-   * The title of the group being deleted
+   * The title of the group being deleted.
    *
    * @var string
    */
   protected $_title;
 
   /**
-   * set up variables to build the form
-   *
-   * @param null
+   * Set up variables to build the form.
    *
    * @return void
-   * @acess protected
+   * @access protected
    */
-  function preProcess() {
+  public function preProcess() {
     $this->_id = $this->get('id');
-
 
     $defaults = array();
     $params = array('id' => $this->_id);
     CRM_Core_BAO_CustomField::retrieve($params, $defaults);
 
     $this->_title = CRM_Utils_Array::value('label', $defaults);
-    $this->assign('title', $this->_title);
 
-    CRM_Utils_System::setTitle(ts('Confirm Custom Field Delete'));
+    CRM_Utils_System::setTitle(ts('Delete %1', array(1 => $this->_title)));
   }
 
   /**
-   * Function to actually build the form
-   *
-   * @param null
+   * Build the form object.
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
 
@@ -99,12 +92,9 @@ class CRM_Custom_Form_DeleteField extends CRM_Core_Form {
   }
 
   /**
-   * Process the form when submitted
-   *
-   * @param null
+   * Process the form when submitted.
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     $field = new CRM_Core_DAO_CustomField();
@@ -117,5 +107,5 @@ class CRM_Custom_Form_DeleteField extends CRM_Core_Form {
     CRM_Core_Session::setStatus(ts('The custom field \'%1\' has been deleted.', array(1 => $field->label)), '', 'success');
 
   }
-}
 
+}

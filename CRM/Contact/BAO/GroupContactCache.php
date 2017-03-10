@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,28 +23,44 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Contact_BAO_GroupContactCache extends CRM_Contact_DAO_GroupContactCache {
 
   static $_alreadyLoaded = array();
 
   /**
-   * Check to see if we have cache entries for this group
-   * if not, regenerate, else return
+   * Get a list of caching modes.
    *
-   * @param int $groupID groupID of group that we are checking against
-   *
-   * @return boolean true if we did not regenerate, false if we did
+   * @return array
    */
-  static function check($groupIDs) {
+  public static function getModes() {
+    return array(
+      // Flush expired caches in response to user actions.
+      'opportunistic' => ts('Opportunistic Flush'),
+
+      // Flush expired caches via background cron jobs.
+      'deterministic' => ts('Cron Flush'),
+    );
+  }
+
+  /**
+   * Check to see if we have cache entries for this group.
+   *
+   * If not, regenerate, else return.
+   *
+   * @param array $groupIDs
+   *   Of group that we are checking against.
+   *
+   * @return bool
+   *   TRUE if we did not regenerate, FALSE if we did
+   */
+  public static function check($groupIDs) {
     if (empty($groupIDs)) {
       return TRUE;
     }
@@ -53,30 +69,31 @@ class CRM_Contact_BAO_GroupContactCache extends CRM_Contact_DAO_GroupContactCach
   }
 
   /**
-   * Common function that formulates the query to see which groups needs to be refreshed
-   * based on their cache date and the smartGroupCacheTimeOut
+   * Formulate the query to see which groups needs to be refreshed.
    *
-   * @param string $groupIDClause the clause which limits which groups we need to evaluate
-   * @param boolean $includeHiddenGroups hidden groups are excluded by default
+   * The calculation is based on their cache date and the smartGroupCacheTimeOut
    *
-   * @return string the sql query which lists the groups that need to be refreshed
-   * @static
-   * @public
+   * @param string $groupIDClause
+   *   The clause which limits which groups we need to evaluate.
+   * @param bool $includeHiddenGroups
+   *   Hidden groups are excluded by default.
+   *
+   * @return string
+   *   the sql query which lists the groups that need to be refreshed
    */
-  static function groupRefreshedClause($groupIDClause = null, $includeHiddenGroups = FALSE) {
-    $smartGroupCacheTimeout = self::smartGroupCacheTimeout();
-    $now = CRM_Utils_Date::getUTCTime();
+  public static function groupRefreshedClause($groupIDClause = NULL, $includeHiddenGroups = FALSE) {
+    $smartGroupCacheTimeoutDateTime = self::getCacheInvalidDateTime();
 
     $query = "
 SELECT  g.id
 FROM    civicrm_group g
 WHERE   ( g.saved_search_id IS NOT NULL OR g.children IS NOT NULL )
 AND     g.is_active = 1
-AND     ( g.cache_date IS NULL OR
-          ( TIMESTAMPDIFF(MINUTE, g.cache_date, $now) >= $smartGroupCacheTimeout ) OR
-          ( $now >= g.refresh_date )
-        )
-";
+AND (
+  g.cache_date IS NULL
+  OR cache_date <= $smartGroupCacheTimeoutDateTime
+  OR NOW() >= g.refresh_date
+)";
 
     if (!$includeHiddenGroups) {
       $query .= "AND (g.is_hidden = 0 OR g.is_hidden IS NULL)";
@@ -90,18 +107,20 @@ AND     ( g.cache_date IS NULL OR
   }
 
   /**
-   * Checks to see if a group has been refreshed recently. This is primarily used
-   * in a locking scenario when some other process might have refreshed things underneath
+   * Check to see if a group has been refreshed recently.
+   *
+   * This is primarily used in a locking scenario when some other process might have refreshed things underneath
    * this process
    *
-   * @param int $groupID the group ID
-   * @param boolean $includeHiddenGroups hidden groups are excluded by default
+   * @param int $groupID
+   *   The group ID.
+   * @param bool $includeHiddenGroups
+   *   Hidden groups are excluded by default.
    *
-   * @return string the sql query which lists the groups that need to be refreshed
-   * @static
-   * @public
+   * @return string
+   *   the sql query which lists the groups that need to be refreshed
    */
-  static function shouldGroupBeRefreshed($groupID, $includeHiddenGroups = FALSE) {
+  public static function shouldGroupBeRefreshed($groupID, $includeHiddenGroups = FALSE) {
     $query = self::groupRefreshedClause("g.id = %1", $includeHiddenGroups);
     $params = array(1 => array($groupID, 'Integer'));
 
@@ -110,28 +129,31 @@ AND     ( g.cache_date IS NULL OR
   }
 
   /**
-   * Check to see if we have cache entries for this group
+   * Check to see if we have cache entries for this group.
+   *
    * if not, regenerate, else return
    *
-   * @param int/array $groupID groupID of group that we are checking against
+   * @param int|array $groupIDs groupIDs of group that we are checking against
    *                           if empty, all groups are checked
-   * @param int       $limit   limits the number of groups we evaluate
+   * @param int $limit
+   *   Limits the number of groups we evaluate.
    *
-   * @return boolean true if we did not regenerate, false if we did
+   * @return bool
+   *   TRUE if we did not regenerate, FALSE if we did
    */
-  static function loadAll($groupIDs = null, $limit = 0) {
+  public static function loadAll($groupIDs = NULL, $limit = 0) {
     // ensure that all the smart groups are loaded
     // this function is expensive and should be sparingly used if groupIDs is empty
     if (empty($groupIDs)) {
-      $groupIDClause = null;
-      $groupIDs = array( );
+      $groupIDClause = NULL;
+      $groupIDs = array();
     }
     else {
       if (!is_array($groupIDs)) {
         $groupIDs = array($groupIDs);
       }
 
-      // note escapeString is a must here and we can't send the imploded value as second arguement to
+      // note escapeString is a must here and we can't send the imploded value as second argument to
       // the executeQuery(), since that would put single quote around the string and such a string
       // of comma separated integers would not work.
       $groupIDString = CRM_Core_DAO::escapeString(implode(', ', $groupIDs));
@@ -169,7 +191,7 @@ AND     ( g.cache_date IS NULL OR
 
     if (!empty($refreshGroupIDs)) {
       $refreshGroupIDString = CRM_Core_DAO::escapeString(implode(', ', $refreshGroupIDs));
-      $time  = CRM_Utils_Date::getUTCTime(self::smartGroupCacheTimeout() * 60);
+      $time = self::getRefreshDateTime();
       $query = "
 UPDATE civicrm_group g
 SET    g.refresh_date = $time
@@ -188,7 +210,12 @@ AND    g.refresh_date IS NULL
     }
   }
 
-  static function add($groupID) {
+  /**
+   * Build the smart group cache for a given group.
+   *
+   * @param int $groupID
+   */
+  public static function add($groupID) {
     // first delete the current cache
     self::remove($groupID);
     if (!is_array($groupID)) {
@@ -197,13 +224,22 @@ AND    g.refresh_date IS NULL
 
     $returnProperties = array('contact_id');
     foreach ($groupID as $gid) {
-      $params = array(array('group', 'IN', array($gid => 1), 0, 0));
+      $params = array(array('group', 'IN', array($gid), 0, 0));
       // the below call updates the cache table as a byproduct of the query
       CRM_Contact_BAO_Query::apiQuery($params, $returnProperties, NULL, NULL, 0, 0, FALSE);
     }
   }
 
-  static function store(&$groupID, &$values) {
+  /**
+   * Store values into the group contact cache.
+   *
+   * @todo review use of INSERT IGNORE. This function appears to be slower that inserting
+   * with a left join. Also, 200 at once seems too little.
+   *
+   * @param int $groupID
+   * @param array $values
+   */
+  public static function store(&$groupID, &$values) {
     $processed = FALSE;
 
     // sort the values so we put group IDs in front and hence optimize
@@ -213,30 +249,30 @@ AND    g.refresh_date IS NULL
     // to avoid long strings, lets do BULK_INSERT_COUNT values at a time
     while (!empty($values)) {
       $processed = TRUE;
-      $input     = array_splice($values, 0, CRM_Core_DAO::BULK_INSERT_COUNT);
-      $str       = implode(',', $input);
-      $sql       = "INSERT IGNORE INTO civicrm_group_contact_cache (group_id,contact_id) VALUES $str;";
+      $input = array_splice($values, 0, CRM_Core_DAO::BULK_INSERT_COUNT);
+      $str = implode(',', $input);
+      $sql = "INSERT IGNORE INTO civicrm_group_contact_cache (group_id,contact_id) VALUES $str;";
       CRM_Core_DAO::executeQuery($sql);
     }
     self::updateCacheTime($groupID, $processed);
   }
 
   /**
-   * Change the cache_date
+   * Change the cache_date.
    *
-   * @param $groupID array(int)
-   * @param $processed bool, whether the cache data was recently modified
+   * @param array $groupID
+   * @param bool $processed
+   *   Whether the cache data was recently modified.
    */
-  static function updateCacheTime($groupID, $processed) {
+  public static function updateCacheTime($groupID, $processed) {
     // only update cache entry if we had any values
     if ($processed) {
       // also update the group with cache date information
-      //make sure to give original timezone settings again.
-      $now     = CRM_Utils_Date::getUTCTime();
+      $now = date('YmdHis');
       $refresh = 'null';
     }
     else {
-      $now     = 'null';
+      $now = 'null';
       $refresh = 'null';
     }
 
@@ -250,25 +286,30 @@ WHERE  id IN ( $groupIDs )
   }
 
   /**
-   * Removes all the cache entries pertaining to a specific group
+   * Removes all the cache entries pertaining to a specific group.
+   *
    * If no groupID is passed in, removes cache entries for all groups
    * Has an optimization to bypass repeated invocations of this function.
    * Note that this function is an advisory, i.e. the removal respects the
    * cache date, i.e. the removal is not done if the group was recently
    * loaded into the cache.
    *
-   * @param $groupID  int the groupID to delete cache entries, NULL for all groups
-   * @param $onceOnly boolean run the function exactly once for all groups.
+   * In fact it turned out there is little overlap between the code when group is passed in
+   * and group is not so it makes more sense as separate functions.
    *
-   * @public
-   * @return void
-   * @static
+   * @todo remove last call to this function from outside the class then make function protected,
+   * enforce groupID as an array & remove non group handling.
+   *
+   * @param int $groupID
+   *   the groupID to delete cache entries, NULL for all groups.
+   * @param bool $onceOnly
+   *   run the function exactly once for all groups.
    */
-  static function remove($groupID = NULL, $onceOnly = TRUE) {
+  public static function remove($groupID = NULL, $onceOnly = TRUE) {
     static $invoked = FALSE;
 
     // typically this needs to happy only once per instance
-    // this is especially true in import, where we dont need
+    // this is especially TRUE in import, where we don't need
     // to do this all the time
     // this optimization is done only when no groupID is passed
     // i.e. cache is reset for all groups
@@ -282,25 +323,27 @@ WHERE  id IN ( $groupIDs )
 
     if ($groupID == NULL) {
       $invoked = TRUE;
-    } else if (is_array($groupID)) {
+    }
+    elseif (is_array($groupID)) {
       foreach ($groupID as $gid) {
         unset(self::$_alreadyLoaded[$gid]);
       }
-    } else if ($groupID && array_key_exists($groupID, self::$_alreadyLoaded)) {
+    }
+    elseif ($groupID && array_key_exists($groupID, self::$_alreadyLoaded)) {
       unset(self::$_alreadyLoaded[$groupID]);
     }
 
-    $refresh = null;
-    $params  = array();
+    $refresh = NULL;
     $smartGroupCacheTimeout = self::smartGroupCacheTimeout();
-
-    $now         = CRM_Utils_Date::getUTCTime();
-    $refreshTime = CRM_Utils_Date::getUTCTime($smartGroupCacheTimeout * 60);
+    $params = array(
+      1 => array(self::getCacheInvalidDateTime(), 'String'),
+      2 => array(self::getRefreshDateTime(), 'String'),
+    );
 
     if (!isset($groupID)) {
       if ($smartGroupCacheTimeout == 0) {
         $query = "
-TRUNCATE civicrm_group_contact_cache
+DELETE FROM civicrm_group_contact_cache
 ";
         $update = "
 UPDATE civicrm_group g
@@ -309,22 +352,23 @@ SET    cache_date = null,
 ";
       }
       else {
+
         $query = "
 DELETE     gc
 FROM       civicrm_group_contact_cache gc
 INNER JOIN civicrm_group g ON g.id = gc.group_id
-WHERE      TIMESTAMPDIFF(MINUTE, g.cache_date, $now) >= $smartGroupCacheTimeout
+WHERE      g.cache_date <= %1
 ";
         $update = "
 UPDATE civicrm_group g
 SET    cache_date = null,
        refresh_date = null
-WHERE  TIMESTAMPDIFF(MINUTE, cache_date, $now) >= $smartGroupCacheTimeout
+WHERE  g.cache_date <= %1
 ";
         $refresh = "
 UPDATE civicrm_group g
-SET    refresh_date = $refreshTime
-WHERE  TIMESTAMPDIFF(MINUTE, cache_date, $now) < $smartGroupCacheTimeout
+SET    refresh_date = %2
+WHERE  g.cache_date < %1
 AND    refresh_date IS NULL
 ";
       }
@@ -369,24 +413,158 @@ WHERE  id = %1
   }
 
   /**
-   * load the smart group cache for a saved search
+   * Refresh the smart group cache tables.
    *
-   * @param object  $group - the smart group that needs to be loaded
-   * @param boolean $force - should we force a search through
+   * This involves clearing out any aged entries (based on the site timeout setting) and resetting the time outs.
    *
+   * This function should be called via the opportunistic or deterministic cache refresh function to make the intent
+   * clear.
    */
-  static function load(&$group, $force = FALSE) {
+  protected static function flushCaches() {
+    try {
+      $lock = self::getLockForRefresh();
+    }
+    catch (CRM_Core_Exception $e) {
+      // Someone else is kindly doing the refresh for us right now.
+      return;
+    }
+    $params = array(1 => array(self::getCacheInvalidDateTime(), 'String'));
+    // @todo this is consistent with previous behaviour but as the first query could take several seconds the second
+    // could become inaccurate. It seems to make more sense to fetch them first & delete from an array (which would
+    // also reduce joins). If we do this we should also consider how best to iterate the groups. If we do them one at
+    // a time we could call a hook, allowing people to manage the frequency on their groups, or possibly custom searches
+    // might do that too. However, for 2000 groups that's 2000 iterations. If we do all once we potentially create a
+    // slow query. It's worth noting the speed issue generally relates to the size of the group but if one slow group
+    // is in a query with 500 fast ones all 500 get locked. One approach might be to calculate group size or the
+    // number of groups & then process all at once or many query runs depending on what is found. Of course those
+    // preliminary queries would need speed testing.
+    CRM_Core_DAO::executeQuery(
+      "
+        DELETE gc
+        FROM civicrm_group_contact_cache gc
+        INNER JOIN civicrm_group g ON g.id = gc.group_id
+        WHERE g.cache_date <= %1
+      ",
+      $params
+    );
+
+    // Clear these out without resetting them because we are not building caches here, only clearing them,
+    // so the state is 'as if they had never been built'.
+    CRM_Core_DAO::executeQuery(
+      "
+        UPDATE civicrm_group g
+        SET    cache_date = NULL,
+        refresh_date = NULL
+        WHERE  g.cache_date <= %1
+      ",
+      $params
+    );
+    $lock->release();
+  }
+
+  /**
+   * Check if the refresh is already initiated.
+   *
+   * We have 2 imperfect methods for this:
+   *   1) a static variable in the function. This works fine within a request
+   *   2) a mysql lock. This works fine as long as CiviMail is not running, or if mysql is version 5.7+
+   *
+   * Where these 2 locks fail we get 2 processes running at the same time, but we have at least minimised that.
+   *
+   * @return \Civi\Core\Lock\LockInterface
+   * @throws \CRM_Core_Exception
+   */
+  protected static function getLockForRefresh() {
+    if (!isset(Civi::$statics[__CLASS__])) {
+      Civi::$statics[__CLASS__] = array('is_refresh_init' => FALSE);
+    }
+
+    if (Civi::$statics[__CLASS__]['is_refresh_init']) {
+      throw new CRM_Core_Exception('A refresh has already run in this process');
+    }
+    $lock = Civi::lockManager()->acquire('data.core.group.refresh');
+    if ($lock->isAcquired()) {
+      Civi::$statics[__CLASS__]['is_refresh_init'] = TRUE;
+      return $lock;
+    }
+    throw new CRM_Core_Exception('Mysql lock unavailable');
+  }
+
+  /**
+   * Do an opportunistic cache refresh if the site is configured for these.
+   *
+   * Sites that do not run the smart group clearing cron job should refresh the caches under an opportunistic mode, akin
+   * to a poor man's cron. The user session will be forced to wait on this so it is less desirable.
+   */
+  public static function opportunisticCacheFlush() {
+    if (Civi::settings()->get('smart_group_cache_refresh_mode') == 'opportunistic') {
+      self::flushCaches();
+    }
+  }
+
+  /**
+   * Do a forced cache refresh.
+   *
+   * This function is appropriate to be called by system jobs & non-user sessions.
+   */
+  public static function deterministicCacheFlush() {
+    if (self::smartGroupCacheTimeout() == 0) {
+      CRM_Core_DAO::executeQuery("TRUNCATE civicrm_group_contact_cache");
+      CRM_Core_DAO::executeQuery("
+        UPDATE civicrm_group g
+        SET cache_date = null, refresh_date = null");
+    }
+    else {
+      self::flushCaches();
+    }
+  }
+
+  /**
+   * Remove one or more contacts from the smart group cache.
+   *
+   * @param int|array $cid
+   * @param int $groupId
+   *
+   * @return bool
+   *   TRUE if successful.
+   */
+  public static function removeContact($cid, $groupId = NULL) {
+    $cids = array();
+    // sanitize input
+    foreach ((array) $cid as $c) {
+      $cids[] = CRM_Utils_Type::escape($c, 'Integer');
+    }
+    if ($cids) {
+      $condition = count($cids) == 1 ? "= {$cids[0]}" : "IN (" . implode(',', $cids) . ")";
+      if ($groupId) {
+        $condition .= " AND group_id = " . CRM_Utils_Type::escape($groupId, 'Integer');
+      }
+      $sql = "DELETE FROM civicrm_group_contact_cache WHERE contact_id $condition";
+      CRM_Core_DAO::executeQuery($sql);
+      return TRUE;
+    }
+    return FALSE;
+  }
+
+  /**
+   * Load the smart group cache for a saved search.
+   *
+   * @param object $group
+   *   The smart group that needs to be loaded.
+   * @param bool $force
+   *   Should we force a search through.
+   */
+  public static function load(&$group, $force = FALSE) {
     $groupID = $group->id;
     $savedSearchID = $group->saved_search_id;
     if (array_key_exists($groupID, self::$_alreadyLoaded) && !$force) {
       return;
     }
 
-    // grab a lock so other processes dont compete and do the same query
-    $lockName = "civicrm.group.{$groupID}";
-    $lock = new CRM_Core_Lock($lockName);
+    // grab a lock so other processes don't compete and do the same query
+    $lock = Civi::lockManager()->acquire("data.core.group.{$groupID}");
     if (!$lock->isAcquired()) {
-      // this can cause inconsistent results since we dont know if the other process
+      // this can cause inconsistent results since we don't know if the other process
       // will fill up the cache before our calling routine needs it.
       // however this routine does not return the status either, so basically
       // its a "lets return and hope for the best"
@@ -395,7 +573,7 @@ WHERE  id = %1
 
     self::$_alreadyLoaded[$groupID] = 1;
 
-    // we now have the lock, but some other proces could have actually done the work
+    // we now have the lock, but some other process could have actually done the work
     // before we got here, so before we do any work, lets ensure that work needs to be
     // done
     // we allow hidden groups here since we dont know if the caller wants to evaluate an
@@ -405,8 +583,8 @@ WHERE  id = %1
       return;
     }
 
-    $sql         = NULL;
-    $idName      = 'id';
+    $sql = NULL;
+    $idName = 'id';
     $customClass = NULL;
     if ($savedSearchID) {
       $ssParams = CRM_Contact_BAO_SavedSearch::getSearchParams($savedSearchID);
@@ -416,7 +594,6 @@ WHERE  id = %1
       if (!empty($ssParams)) {
         CRM_Contact_BAO_ProximityQuery::fixInputParams($ssParams);
       }
-
 
       $returnProperties = array();
       if (CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_SavedSearch', $savedSearchID, 'mapping_id')) {
@@ -430,34 +607,44 @@ WHERE  id = %1
         // we split it up and store custom class
         // so temp tables are not destroyed if they are used
         // hence customClass is defined above at top of function
-        $customClass =
-          CRM_Contact_BAO_SearchCustom::customClass($ssParams['customSearchID'], $savedSearchID);
+        $customClass = CRM_Contact_BAO_SearchCustom::customClass($ssParams['customSearchID'], $savedSearchID);
         $searchSQL = $customClass->contactIDs();
+        $searchSQL = str_replace('ORDER BY contact_a.id ASC', '', $searchSQL);
+        if (!strstr($searchSQL, 'WHERE')) {
+          $searchSQL .= " WHERE ( 1 ) ";
+        }
         $idName = 'contact_id';
       }
       else {
         $formValues = CRM_Contact_BAO_SavedSearch::getFormValues($savedSearchID);
-
-        $query =
-          new CRM_Contact_BAO_Query(
+        // CRM-17075 using the formValues in this way imposes extra logic and complexity.
+        // we have the where_clause and where tables stored in the saved_search table
+        // and should use these rather than re-processing the form criteria (which over-works
+        // the link between the form layer & the query layer too).
+        // It's hard to think of when you would want to use anything other than return
+        // properties = array('contact_id' => 1) here as the point would appear to be to
+        // generate the list of contact ids in the group.
+        // @todo review this to use values in saved_search table (preferably for 4.8).
+        $query
+          = new CRM_Contact_BAO_Query(
             $ssParams, $returnProperties, NULL,
             FALSE, FALSE, 1,
             TRUE, TRUE,
             FALSE,
             CRM_Utils_Array::value('display_relationship_type', $formValues),
             CRM_Utils_Array::value('operator', $formValues, 'AND')
-        );
+          );
         $query->_useDistinct = FALSE;
-        $query->_useGroupBy  = FALSE;
-        $searchSQL           =
-          $query->searchQuery(
+        $query->_useGroupBy = FALSE;
+        $searchSQL
+          = $query->searchQuery(
             0, 0, NULL,
-          FALSE, FALSE,
-          FALSE, TRUE,
-          TRUE,
-          NULL, NULL, NULL,
-          TRUE
-        );
+            FALSE, FALSE,
+            FALSE, TRUE,
+            TRUE,
+            NULL, NULL, NULL,
+            TRUE
+          );
       }
       $groupID = CRM_Utils_Type::escape($groupID, 'Integer');
       $sql = $searchSQL . " AND contact_a.id NOT IN (
@@ -481,19 +668,19 @@ WHERE  civicrm_group_contact.status = 'Added'
     $groupIDs = array($groupID);
     self::remove($groupIDs);
     $processed = FALSE;
-    $tempTable = 'civicrm_temp_group_contact_cache' . rand(0,2000);
+    $tempTable = 'civicrm_temp_group_contact_cache' . rand(0, 2000);
     foreach (array($sql, $sqlB) as $selectSql) {
       if (!$selectSql) {
         continue;
       }
       $insertSql = "CREATE TEMPORARY TABLE $tempTable ($selectSql);";
       $processed = TRUE;
-      $result = CRM_Core_DAO::executeQuery($insertSql);
+      CRM_Core_DAO::executeQuery($insertSql);
       CRM_Core_DAO::executeQuery(
         "INSERT IGNORE INTO civicrm_group_contact_cache (contact_id, group_id)
         SELECT DISTINCT $idName, group_id FROM $tempTable
       ");
-      CRM_Core_DAO::executeQuery(" DROP TABLE $tempTable");
+      CRM_Core_DAO::executeQuery(" DROP TEMPORARY TABLE $tempTable");
     }
 
     self::updateCacheTime($groupIDs, $processed);
@@ -531,33 +718,45 @@ AND  civicrm_group_contact.group_id = $groupID ";
     $lock->release();
   }
 
-  static function smartGroupCacheTimeout() {
+  /**
+   * Retrieve the smart group cache timeout in minutes.
+   *
+   * This checks if a timeout has been configured. If one has then smart groups should not
+   * be refreshed more frequently than the time out. If a group was recently refreshed it should not
+   * refresh again within that period.
+   *
+   * @return int
+   */
+  public static function smartGroupCacheTimeout() {
     $config = CRM_Core_Config::singleton();
 
     if (
       isset($config->smartGroupCacheTimeout) &&
-      is_numeric($config->smartGroupCacheTimeout) &&
-      $config->smartGroupCacheTimeout > 0) {
+      is_numeric($config->smartGroupCacheTimeout)
+    ) {
       return $config->smartGroupCacheTimeout;
     }
 
-    // lets have a min cache time of 5 mins if not set
+    // Default to 5 minutes.
     return 5;
   }
 
   /**
-   * Get all the smart groups that this contact belongs to
+   * Get all the smart groups that this contact belongs to.
+   *
    * Note that this could potentially be a super slow function since
    * it ensure that all contact groups are loaded in the cache
    *
-   * @param int     $contactID
-   * @param boolean $showHidden - hidden groups are shown only if this flag is set
+   * @param int $contactID
+   * @param bool $showHidden
+   *   Hidden groups are shown only if this flag is set.
    *
-   * @return array an array of groups that this contact belongs to
+   * @return array
+   *   an array of groups that this contact belongs to
    */
-  static function contactGroup($contactID, $showHidden = FALSE) {
+  public static function contactGroup($contactID, $showHidden = FALSE) {
     if (empty($contactID)) {
-      return;
+      return NULL;
     }
 
     if (is_array($contactID)) {
@@ -586,7 +785,7 @@ ORDER BY   gc.contact_id, g.children
 
     $dao = CRM_Core_DAO::executeQuery($sql);
     $contactGroup = array();
-    $prevContactID = null;
+    $prevContactID = NULL;
     while ($dao->fetch()) {
       if (
         $prevContactID &&
@@ -596,16 +795,16 @@ ORDER BY   gc.contact_id, g.children
       }
       $prevContactID = $dao->contact_id;
       if (!array_key_exists($dao->contact_id, $contactGroup)) {
-        $contactGroup[$dao->contact_id] =
-          array( 'group' => array(), 'groupTitle' => array());
+        $contactGroup[$dao->contact_id]
+          = array('group' => array(), 'groupTitle' => array());
       }
 
-      $contactGroup[$dao->contact_id]['group'][] =
-        array(
+      $contactGroup[$dao->contact_id]['group'][]
+        = array(
           'id' => $dao->group_id,
           'title' => $dao->title,
           'description' => $dao->description,
-          'children' => $dao->children
+          'children' => $dao->children,
         );
       $contactGroup[$dao->contact_id]['groupTitle'][] = $dao->title;
     }
@@ -614,7 +813,7 @@ ORDER BY   gc.contact_id, g.children
       $contactGroup[$prevContactID]['groupTitle'] = implode(', ', $contactGroup[$prevContactID]['groupTitle']);
     }
 
-    if (is_numeric($contactID)) {
+    if ((!empty($contactGroup[$contactID]) && is_numeric($contactID))) {
       return $contactGroup[$contactID];
     }
     else {
@@ -622,5 +821,27 @@ ORDER BY   gc.contact_id, g.children
     }
   }
 
-}
+  /**
+   * Get the datetime from which the cache should be considered invalid.
+   *
+   * Ie if the smartgroup cache timeout is 5 minutes ago then the cache is invalid if it was
+   * refreshed 6 minutes ago, but not if it was refreshed 4 minutes ago.
+   *
+   * @return string
+   */
+  public static function getCacheInvalidDateTime() {
+    return date('YmdHis', strtotime("-" . self::smartGroupCacheTimeout() . " Minutes"));
+  }
 
+  /**
+   * Get the date when the cache should be refreshed from.
+   *
+   * Ie. now + the offset & we will delete anything prior to then.
+   *
+   * @return string
+   */
+  public static function getRefreshDateTime() {
+    return date('YmdHis', strtotime("+ " . self::smartGroupCacheTimeout() . " Minutes"));
+  }
+
+}

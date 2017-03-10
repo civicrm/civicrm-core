@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -34,9 +34,9 @@
             {capture assign=editSmartGroupURL}{crmURL p="civicrm/contact/search/custom" q="reset=1&force=1&ssID=`$ssID`"}{/capture}
         {else}
             {capture assign=editSmartGroupURL}{crmURL p="civicrm/contact/search/advanced" q="reset=1&force=1&ssID=`$ssID`"}{/capture}
-        {/if} 
+        {/if}
         <div class="crm-submit-buttons">
-            <a href="{$editSmartGroupURL}" class="button"><span><div class="icon edit-icon"></div> {ts 1=$group.title}Edit Smart Group Search Criteria for %1{/ts}</span></a>
+            <a href="{$editSmartGroupURL}" class="button no-popup"><span><i class="crm-i fa-pencil"></i> {ts 1=$group.title}Edit Smart Group Search Criteria for %1{/ts}</span></a>
             {help id="id-edit-smartGroup"}
         </div>
     {/if}
@@ -44,7 +44,7 @@
     {if $permissionedForGroup}
         {capture assign=addMembersURL}{crmURL q="context=amtg&amtgID=`$group.id`&reset=1"}{/capture}
         <div class="crm-submit-buttons">
-            <a href="{$addMembersURL}" class="button"><span><div class="icon add-icon"></div> {ts 1=$group.title}Add Contacts to %1{/ts}</span></a>
+            <a href="{$addMembersURL}" class="button no-popup"><span><i class="crm-i fa-user-plus"></i> {ts 1=$group.title}Add Contacts to %1{/ts}</span></a>
             {if $ssID}{help id="id-add-to-smartGroup"}{/if}
         </div>
     {/if}

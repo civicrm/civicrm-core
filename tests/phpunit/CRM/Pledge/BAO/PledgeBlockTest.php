@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,53 +23,37 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
-
-
-require_once 'CiviTest/CiviUnitTestCase.php';
-require_once 'CiviTest/ContributionPage.php';
+ */
 
 /**
  * Test class for CRM_Pledge_BAO_PledgeBlock BAO
  *
- *  @package   CiviCRM
+ * @package   CiviCRM
+ * @group headless
  */
 class CRM_Pledge_BAO_PledgeBlockTest extends CiviUnitTestCase {
 
   /**
    * Sets up the fixture, for example, opens a network connection.
    * This method is called before a test is executed.
-   *
-   * @access protected
    */
   protected function setUp() {
     parent::setUp();
-    $this->_contributionPageId = ContributionPage::create();
+    $contributionPage = $this->contributionPageCreate();
+    $this->_contributionPageId = $contributionPage['id'];
   }
 
   /**
    * Tears down the fixture, for example, closes a network connection.
    * This method is called after a test is executed.
-   *
-   * @access protected
    */
-  protected function tearDown() {}
-
-  /**
-   *  test info
-   */
-  function get_info() {
-    return array(
-      'name' => 'PledgeBlock BAOs',
-      'description' => 'Test all Pledge_BAO_PledgeBlock methods.',
-      'group' => 'CiviCRM BAO Tests',
-    );
+  protected function tearDown() {
   }
 
   /**
    *  create() and deletepledgeblock() method
    */
-  function testCreateAndDeletePledgeBlock() {
+  public function testCreateAndDeletePledgeBlock() {
 
     $pledgeFrequencyUnit = array(
       'week' => 1,
@@ -88,21 +72,21 @@ class CRM_Pledge_BAO_PledgeBlockTest extends CiviUnitTestCase {
 
     //Checking for pledgeBlock id in the Pledge_block table.
     $pledgeBlock = CRM_Pledge_BAO_PledgeBlock::create($params);
-    $pledgeBlockId = $this->assertDBNotNull('CRM_Pledge_DAO_PledgeBlock', $pledgeBlock->id, 'id',
+    $this->assertDBNotNull('CRM_Pledge_DAO_PledgeBlock', $pledgeBlock->id, 'id',
       'id', 'Check DB for Pledge block id'
     );
 
     //Checking for pledgeBlock id after delete.
     CRM_Pledge_BAO_PledgeBlock::deletePledgeBlock($pledgeBlock->id);
-    $pledgeBlockId = $this->assertDBNull('CRM_Pledge_DAO_PledgeBlock', $pledgeBlock->id, 'id',
+    $this->assertDBNull('CRM_Pledge_DAO_PledgeBlock', $pledgeBlock->id, 'id',
       'id', 'Check DB for Pledge block id'
     );
   }
 
   /**
-   * add() method (add and edit modes of pledge block)
+   * Add() method (add and edit modes of pledge block)
    */
-  function testAddPledgeBlock() {
+  public function testAddPledgeBlock() {
 
     $pledgeFrequencyUnit = array(
       'week' => 1,
@@ -144,9 +128,9 @@ class CRM_Pledge_BAO_PledgeBlockTest extends CiviUnitTestCase {
   }
 
   /**
-   * retrieve() and getPledgeBlock() method of  pledge block
+   * Retrieve() and getPledgeBlock() method of  pledge block
    */
-  function testRetrieveAndGetPledgeBlock() {
+  public function testRetrieveAndGetPledgeBlock() {
 
     $pledgeFrequencyUnit = array(
       'week' => 1,
@@ -186,5 +170,5 @@ class CRM_Pledge_BAO_PledgeBlockTest extends CiviUnitTestCase {
     $this->assertEquals($pledgeBlock->id, $retrievePledgeBlock->id);
     $this->assertEquals($pledgeBlock->id, $getPledgeBlock['id']);
   }
-}
 
+}

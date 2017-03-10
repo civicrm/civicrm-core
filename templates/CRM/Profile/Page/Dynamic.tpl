@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,7 +23,7 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-{if ! empty( $row )} 
+{if ! empty( $row )}
 {* wrap in crm-container div so crm styles are used *}
     {if $overlayProfile }
         {include file="CRM/Profile/Page/Overlay.tpl"}
@@ -46,5 +46,5 @@
             </div>
         </div>
     {/if}
-{/if} 
+{/if}
 {* fields array is not empty *}

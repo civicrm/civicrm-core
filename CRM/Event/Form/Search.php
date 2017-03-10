@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
  */
@@ -40,103 +40,47 @@
 /**
  * This file is for civievent search
  */
-class CRM_Event_Form_Search extends CRM_Core_Form {
+class CRM_Event_Form_Search extends CRM_Core_Form_Search {
 
   /**
-   * Are we forced to run a search
-   *
-   * @var int
-   * @access protected
-   */
-  protected $_force;
-
-  /**
-   * name of search button
-   *
-   * @var string
-   * @access protected
-   */
-  protected $_searchButtonName;
-
-  /**
-   * name of action button
-   *
-   * @var string
-   * @access protected
-   */
-  protected $_actionButtonName;
-
-  /**
-   * form values that we will be using
+   * The params that are sent to the query.
    *
    * @var array
-   * @access protected
-   */
-  protected $_formValues;
-
-  /**
-   * the params that are sent to the query
-   *
-   * @var array
-   * @access protected
    */
   protected $_queryParams;
 
   /**
-   * have we already done this search
+   * Are we restricting ourselves to a single contact.
    *
-   * @access protected
-   * @var boolean
-   */
-  protected $_done;
-
-  /**
-   * are we restricting ourselves to a single contact
-   *
-   * @access protected
    * @var boolean
    */
   protected $_single = FALSE;
 
   /**
-   * are we restricting ourselves to a single contact
+   * Are we restricting ourselves to a single contact.
    *
-   * @access protected
    * @var boolean
    */
   protected $_limit = NULL;
 
   /**
-   * what context are we being invoked from
-   *
-   * @access protected
-   * @var string
-   */
-  protected $_context = NULL;
-
-  /**
-   * prefix for the controller
-   *
+   * Prefix for the controller.
    */
   protected $_prefix = "event_";
 
-  protected $_defaults;
-
   /**
-   * the saved search ID retrieved from the GET vars
+   * The saved search ID retrieved from the GET vars.
    *
    * @var int
-   * @access protected
    */
   protected $_ssID;
 
   /**
-   * processing needed for buildForm and later
+   * Processing needed for buildForm and later.
    *
    * @return void
-   * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     $this->set('searchFormName', 'Search');
 
     /**
@@ -152,11 +96,11 @@ class CRM_Event_Form_Search extends CRM_Core_Form {
      * we allow the controller to set force/reset externally, useful when we are being
      * driven by the wizard framework
      */
-    $this->_reset   = CRM_Utils_Request::retrieve('reset', 'Boolean', CRM_Core_DAO::$_nullObject);
-    $this->_force   = CRM_Utils_Request::retrieve('force', 'Boolean', $this, FALSE);
-    $this->_limit   = CRM_Utils_Request::retrieve('limit', 'Positive', $this);
+    $this->_reset = CRM_Utils_Request::retrieve('reset', 'Boolean');
+    $this->_force = CRM_Utils_Request::retrieve('force', 'Boolean', $this, FALSE);
+    $this->_limit = CRM_Utils_Request::retrieve('limit', 'Positive', $this);
     $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this, FALSE, 'search');
-    $this->_ssID    = CRM_Utils_Request::retrieve('ssID', 'Positive', $this);
+    $this->_ssID = CRM_Utils_Request::retrieve('ssID', 'Positive', $this);
     $this->assign("context", $this->_context);
 
     // get user submitted values
@@ -186,7 +130,7 @@ class CRM_Event_Form_Search extends CRM_Core_Form {
       );
     }
 
-    $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues);
+    $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues, 0, FALSE, NULL, array('event_id'));
     $selector = new CRM_Event_Selector_Search($this->_queryParams,
       $this->_action,
       NULL,
@@ -217,41 +161,29 @@ class CRM_Event_Form_Search extends CRM_Core_Form {
   }
 
   /**
-   * Build the form
+   * Build the form object.
    *
-   * @access public
    *
    * @return void
    */
-  function buildQuickForm() {
-    $this->addElement('text', 'sort_name', ts('Participant Name or Email'), CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'sort_name'));
+  public function buildQuickForm() {
+    parent::buildQuickForm();
+    $this->addSortNameField();
+
+    if (CRM_Core_Permission::check('access deleted contacts') and Civi::settings()->get('contact_undelete')) {
+      $this->addElement('checkbox', 'deleted_contacts', ts('Search in Trash') . '<br />' . ts('(deleted contacts)'));
+    }
 
     CRM_Event_BAO_Query::buildSearchForm($this);
 
-    /*
-     * add form checkboxes for each row. This is needed out here to conform to QF protocol
-     * of all elements being declared in builQuickForm
-     */
     $rows = $this->get('rows');
     if (is_array($rows)) {
-      CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.searchForm.js');
       $lineItems = $eventIds = array();
       if (!$this->_single) {
-        $this->addElement('checkbox',
-          'toggleSelect',
-          NULL,
-          NULL,
-          array('onclick' => "toggleTaskAction( true );", 'class' => 'select-rows')
-        );
+        $this->addRowSelectors($rows);
       }
       foreach ($rows as $row) {
         $eventIds[$row['event_id']] = $row['event_id'];
-        if (!$this->_single) {
-          $this->addElement('checkbox', $row['checkbox'],
-            NULL, NULL,
-            array('onclick' => "toggleTaskAction( true );", 'class' => 'select-row')
-          );
-        }
         if (CRM_Event_BAO_Event::usesPriceSet($row['event_id'])) {
           // add line item details if applicable
           $lineItems[$row['participant_id']] = CRM_Price_BAO_LineItem::getLineItems($row['participant_id']);
@@ -263,33 +195,43 @@ class CRM_Event_Form_Search extends CRM_Core_Form {
       if (count($eventIds) == 1) {
         //convert form values to clause.
         $seatClause = array();
-        // Filter on is_test if specified in search form
-        if (CRM_Utils_Array::value('participant_test', $this->_formValues) == '1' || CRM_Utils_Array::value('participant_test', $this->_formValues) == '0' ) {
+        if (CRM_Utils_Array::value('participant_test', $this->_formValues) == '1' || CRM_Utils_Array::value('participant_test', $this->_formValues) == '0') {
           $seatClause[] = "( participant.is_test = {$this->_formValues['participant_test']} )";
         }
         if (!empty($this->_formValues['participant_status_id'])) {
-          $statuses = array_keys($this->_formValues['participant_status_id']);
-          $seatClause[] = '( participant.status_id IN ( ' . implode(' , ', $statuses) . ' ) )';
+          $seatClause[] = CRM_Contact_BAO_Query::buildClause("participant.status_id", '=', $this->_formValues['participant_status_id'], 'Int');
+          if ($status = CRM_Utils_Array::value('IN', $this->_formValues['participant_status_id'])) {
+            $this->_formValues['participant_status_id'] = $status;
+          }
         }
         if (!empty($this->_formValues['participant_role_id'])) {
-          $roles = array_keys($this->_formValues['participant_role_id']);
-          $seatClause[] = '( participant.role_id IN ( ' . implode(' , ', $roles) . ' ) )';
-        }
-        $clause = NULL;
-        if (!empty($seatClause)) {
-          $clause = implode(' AND ', $seatClause);
+          $escapedRoles = array();
+          foreach ((array) $this->_formValues['participant_role_id'] as $participantRole) {
+            $escapedRoles[] = CRM_Utils_Type::escape($participantRole, 'String');
+          }
+          $seatClause[] = "( participant.role_id IN ( '" . implode("' , '", $escapedRoles) . "' ) )";
         }
 
-        $participantCount = CRM_Event_BAO_Event::eventTotalSeats(array_pop($eventIds), $clause);
+        // CRM-15379
+        if (!empty($this->_formValues['participant_fee_id'])) {
+          $participant_fee_id = $this->_formValues['participant_fee_id'];
+          foreach ($participant_fee_id as $k => &$val) {
+            $val = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $val, 'label');
+            $val = CRM_Core_DAO::escapeString(trim($val));
+          }
+          $feeLabel = implode('|', $participant_fee_id);
+          $seatClause[] = "( participant.fee_level REGEXP '{$feeLabel}' )";
+        }
+
+        $seatClause = implode(' AND ', $seatClause);
+        $participantCount = CRM_Event_BAO_Event::eventTotalSeats(array_pop($eventIds), $seatClause);
       }
       $this->assign('participantCount', $participantCount);
       $this->assign('lineItems', $lineItems);
 
-      $total = $cancel = 0;
-
       $permission = CRM_Core_Permission::getPermission();
 
-      $tasks = array('' => ts('- actions -')) + CRM_Event_Task::permissionedTaskTitles($permission);
+      $tasks = CRM_Event_Task::permissionedTaskTitles($permission);
       if (isset($this->_ssID)) {
         if ($permission == CRM_Core_Permission::EDIT) {
           $tasks = $tasks + CRM_Event_Task::optionalTaskTitle();
@@ -303,32 +245,31 @@ class CRM_Event_Form_Search extends CRM_Core_Form {
         $this->assign('ssID', $this->_ssID);
       }
 
-      $this->add('select', 'task', ts('Actions:') . ' ', $tasks);
-      $this->add('submit', $this->_actionButtonName, ts('Go'),
-        array(
-          'class' => 'form-submit',
-          'id' => 'Go',
-          'onclick' => "return checkPerformAction('mark_x', '" . $this->getName() . "', 0);",
-        )
-      );
-
-      // need to perform tasks on all or selected items ? using radio_ts(task selection) for it
-      $this->addElement('radio', 'radio_ts', NULL, '', 'ts_sel',
-        array('checked' => 'checked')
-      );
-      $this->addElement('radio', 'radio_ts', NULL, '', 'ts_all',
-        array('class' => 'select-rows', 'onclick' => $this->getName() . ".toggleSelect.checked = false; toggleTaskAction( true );")
-      );
+      $this->addTaskMenu($tasks);
     }
 
-    // add buttons
-    $this->addButtons(array(
-        array(
-          'type' => 'refresh',
-          'name' => ts('Search'),
-          'isDefault' => TRUE,
-        ),
-      ));
+  }
+
+  /**
+   * Get the label for the sortName field if email searching is on.
+   *
+   * (email searching is a setting under search preferences).
+   *
+   * @return string
+   */
+  protected function getSortNameLabelWithEmail() {
+    return ts('Participant Name or Email');
+  }
+
+  /**
+   * Get the label for the sortName field if email searching is off.
+   *
+   * (email searching is a setting under search preferences).
+   *
+   * @return string
+   */
+  protected function getSortNameLabelWithOutEmail() {
+    return ts('Participant Name');
   }
 
   /**
@@ -346,9 +287,8 @@ class CRM_Event_Form_Search extends CRM_Core_Form {
    * @param
    *
    * @return void
-   * @access public
    */
-  function postProcess() {
+  public function postProcess() {
     if ($this->_done) {
       return;
     }
@@ -357,6 +297,7 @@ class CRM_Event_Form_Search extends CRM_Core_Form {
 
     if (!empty($_POST)) {
       $this->_formValues = $this->controller->exportValues($this->_name);
+      CRM_Contact_BAO_Query::processSpecialFormValue($this->_formValues, array('participant_status_id'));
     }
 
     if (empty($this->_formValues)) {
@@ -375,9 +316,9 @@ class CRM_Event_Form_Search extends CRM_Core_Form {
       $this->_formValues["participant_test"] = 0;
     }
 
-    CRM_Core_BAO_CustomValue::fixFieldValueOfTypeMemo($this->_formValues);
+    CRM_Core_BAO_CustomValue::fixCustomFieldValue($this->_formValues);
 
-    $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues);
+    $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues, 0, FALSE, NULL, array('event_id'));
 
     $this->set('formValues', $this->_formValues);
     $this->set('queryParams', $this->_queryParams);
@@ -400,7 +341,7 @@ class CRM_Event_Form_Search extends CRM_Core_Form {
       );
     }
 
-    $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues);
+    $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues, 0, FALSE, NULL, array('event_id'));
 
     $selector = new CRM_Event_Selector_Search($this->_queryParams,
       $this->_action,
@@ -438,43 +379,39 @@ class CRM_Event_Form_Search extends CRM_Core_Form {
   }
 
   /**
-   * This function is used to add the rules (mainly global rules) for form.
+   * add the rules (mainly global rules) for form.
    * All local rules are added near the element
    *
    * @return void
-   * @access public
    * @see valid_date
    */
-  function addRules() {}
+  public function addRules() {
+  }
 
   /**
-   * Set the default form values
+   * Set the default form values.
    *
-   * @access protected
    *
-   * @return array the default array reference
+   * @return array
+   *   the default array reference
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
     $defaults = $this->_formValues;
     return $defaults;
   }
 
-  function fixFormValues() {
+  public function fixFormValues() {
     // if this search has been forced
     // then see if there are any get values, and if so over-ride the post values
     // note that this means that GET over-rides POST :)
-    $event = CRM_Utils_Request::retrieve('event', 'Positive',
-      CRM_Core_DAO::$_nullObject
-    );
+    $event = CRM_Utils_Request::retrieve('event', 'Positive');
     if ($event) {
       $this->_formValues['event_id'] = $event;
       $this->_formValues['event_name'] = CRM_Event_PseudoConstant::event($event, TRUE);
     }
 
-    $status = CRM_Utils_Request::retrieve('status', 'String',
-      CRM_Core_DAO::$_nullObject
-    );
+    $status = CRM_Utils_Request::retrieve('status', 'String');
 
     if (isset($status)) {
       if ($status === 'true') {
@@ -484,19 +421,15 @@ class CRM_Event_Form_Search extends CRM_Core_Form {
         $statusTypes = CRM_Event_PseudoConstant::participantStatus(NULL, "is_counted = 0");
       }
       elseif (is_numeric($status)) {
-        $status = (int) $status;
-        $statusTypes = array($status => CRM_Event_PseudoConstant::participantStatus($status));
+        $statusTypes = (int) $status;
       }
-      $status = array();
-      foreach ($statusTypes as $key => $value) {
-        $status[$key] = 1;
+      elseif (is_array($status) && !array_key_exists('IN', $status)) {
+        $statusTypes = array_keys($status);
       }
-      $this->_formValues['participant_status_id'] = $status;
+      $this->_formValues['participant_status_id'] = is_array($statusTypes) ? array('IN' => array_keys($statusTypes)) : $statusTypes;
     }
 
-    $role = CRM_Utils_Request::retrieve('role', 'String',
-      CRM_Core_DAO::$_nullObject
-    );
+    $role = CRM_Utils_Request::retrieve('role', 'String');
 
     if (isset($role)) {
       if ($role === 'true') {
@@ -506,19 +439,12 @@ class CRM_Event_Form_Search extends CRM_Core_Form {
         $roleTypes = CRM_Event_PseudoConstant::participantRole(NULL, "filter = 0");
       }
       elseif (is_numeric($role)) {
-        $role = (int) $role;
-        $roleTypes = array($role => CRM_Event_PseudoConstant::participantRole($role));
+        $roleTypes = (int) $role;
       }
-      $role = array();
-      foreach ($roleTypes as $key => $value) {
-        $role[$key] = 1;
-      }
-      $this->_formValues['participant_role_id'] = $role;
+      $this->_formValues['participant_role_id'] = is_array($roleTypes) ? array_keys($roleTypes) : $roleTypes;
     }
 
-    $type = CRM_Utils_Request::retrieve('type', 'Positive',
-      CRM_Core_DAO::$_nullObject
-    );
+    $type = CRM_Utils_Request::retrieve('type', 'Positive');
     if ($type) {
       $this->_formValues['event_type'] = $type;
     }
@@ -536,7 +462,10 @@ class CRM_Event_Form_Search extends CRM_Core_Form {
     }
   }
 
-  function getFormValues() {
+  /**
+   * @return null
+   */
+  public function getFormValues() {
     return NULL;
   }
 
@@ -544,10 +473,9 @@ class CRM_Event_Form_Search extends CRM_Core_Form {
    * Return a descriptive name for the page, used in wizard header
    *
    * @return string
-   * @access public
    */
   public function getTitle() {
     return ts('Find Participants');
   }
-}
 
+}

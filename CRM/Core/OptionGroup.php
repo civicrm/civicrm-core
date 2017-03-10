@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,30 +23,36 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Core_OptionGroup {
   static $_values = array();
   static $_cache = array();
 
-  /*
+  /**
    * $_domainIDGroups array maintains the list of option groups for whom
    * domainID is to be considered.
-   *
    */
   static $_domainIDGroups = array(
     'from_email_address',
     'grant_type',
   );
 
-  static function &valuesCommon(
+  /**
+   * @param CRM_Core_DAO $dao
+   * @param bool $flip
+   * @param bool $grouping
+   * @param bool $localize
+   * @param string $valueColumnName
+   *
+   * @return array
+   */
+  public static function &valuesCommon(
     $dao, $flip = FALSE, $grouping = FALSE,
     $localize = FALSE, $valueColumnName = 'label'
   ) {
@@ -81,30 +87,41 @@ class CRM_Core_OptionGroup {
    * This function retrieves all the values for the specific option group by name
    * this is primarily used to create various html based form elements
    * (radio, select, checkbox etc). OptionGroups for most cases have the
-   * 'label' in the label colum and the 'id' or 'name' in the value column
+   * 'label' in the label column and the 'id' or 'name' in the value column
    *
-   * @param $name       string  name of the option group
-   * @param $flip       boolean results are return in id => label format if false
+   * @param string $name
+   *   name of the option group.
+   * @param bool $flip
+   *   results are return in id => label format if false.
    *                            if true, the results are reversed
-   * @param $grouping   boolean if true, return the value in 'grouping' column
-   * @param $localize   boolean if true, localize the results before returning
-   * @param $condition  string  add another condition to the sql query
-   * @param $labelColumnName string the column to use for 'label'
-   * @param $onlyActive boolean return only the action option values
-   * @param $fresh      boolean ignore cache entries and go back to DB
-   * @param $keyColumnName string the column to use for 'key'
+   * @param bool $grouping
+   *   if true, return the value in 'grouping' column.
+   * @param bool $localize
+   *   if true, localize the results before returning.
+   * @param string $condition
+   *   add another condition to the sql query.
+   * @param string $labelColumnName
+   *   the column to use for 'label'.
+   * @param bool $onlyActive
+   *   return only the action option values.
+   * @param bool $fresh
+   *   ignore cache entries and go back to DB.
+   * @param string $keyColumnName
+   *   the column to use for 'key'.
+   * @param string $orderBy
+   *   the column to use for ordering.
    *
-   * @return array      the values as specified by the above params
-   * @static
-   * @void
+   * @return array
+   *   The values as specified by the params
    */
-  static function &values(
+  public static function &values(
     $name, $flip = FALSE, $grouping = FALSE,
     $localize = FALSE, $condition = NULL,
-    $labelColumnName = 'label', $onlyActive = TRUE, $fresh = FALSE, $keyColumnName = 'value'
+    $labelColumnName = 'label', $onlyActive = TRUE, $fresh = FALSE, $keyColumnName = 'value',
+    $orderBy = 'weight'
   ) {
     $cache = CRM_Utils_Cache::singleton();
-    $cacheKey = self::createCacheKey($name, $flip, $grouping, $localize, $condition, $labelColumnName, $onlyActive, $keyColumnName);
+    $cacheKey = self::createCacheKey($name, $flip, $grouping, $localize, $condition, $labelColumnName, $onlyActive, $keyColumnName, $orderBy);
 
     if (!$fresh) {
       // Fetch from static var
@@ -128,6 +145,14 @@ WHERE  v.option_group_id = g.id
 
     if ($onlyActive) {
       $query .= " AND  v.is_active = 1 ";
+      // Only show options for enabled components
+      $componentClause = ' v.component_id IS NULL ';
+      $enabledComponents = CRM_Core_Config::singleton()->enableComponents;
+      if ($enabledComponents) {
+        $enabledComponents = '"' . implode('","', $enabledComponents) . '"';
+        $componentClause .= " OR v.component_id IN (SELECT id FROM civicrm_component WHERE name IN ($enabledComponents)) ";
+      }
+      $query .= " AND ($componentClause) ";
     }
     if (in_array($name, self::$_domainIDGroups)) {
       $query .= " AND v.domain_id = " . CRM_Core_Config::domainID();
@@ -137,7 +162,7 @@ WHERE  v.option_group_id = g.id
       $query .= $condition;
     }
 
-    $query .= " ORDER BY v.weight";
+    $query .= " ORDER BY v.{$orderBy}";
 
     $p = array(1 => array($name, 'String'));
     $dao = CRM_Core_DAO::executeQuery($query, $p);
@@ -156,13 +181,14 @@ WHERE  v.option_group_id = g.id
   /**
    * Counterpart to values() which removes the item from the cache
    *
-   * @param $name
+   * @param string $name
    * @param $flip
    * @param $grouping
    * @param $localize
    * @param $condition
-   * @param $labelColumnName
+   * @param string $labelColumnName
    * @param $onlyActive
+   * @param string $keyColumnName
    */
   protected static function flushValues($name, $flip, $grouping, $localize, $condition, $labelColumnName, $onlyActive, $keyColumnName = 'value') {
     $cacheKey = self::createCacheKey($name, $flip, $grouping, $localize, $condition, $labelColumnName, $onlyActive, $keyColumnName);
@@ -171,29 +197,39 @@ WHERE  v.option_group_id = g.id
     unset(self::$_cache[$cacheKey]);
   }
 
+  /**
+   * @return string
+   */
   protected static function createCacheKey() {
     $cacheKey = "CRM_OG_" . serialize(func_get_args());
     return $cacheKey;
   }
 
   /**
-   * This function retrieves all the values for the specific option group by id
+   * This function retrieves all the values for the specific option group by id.
    * this is primarily used to create various html based form elements
    * (radio, select, checkbox etc). OptionGroups for most cases have the
-   * 'label' in the label colum and the 'id' or 'name' in the value column
+   * 'label' in the label column and the 'id' or 'name' in the value column
    *
-   * @param $id         integer id of the option group
-   * @param $flip       boolean results are return in id => label format if false
-   *                            if true, the results are reversed
-   * @param $grouping   boolean if true, return the value in 'grouping' column
-   * @param $localize   boolean if true, localize the results before returning
-   * @param $labelColumnName string the column to use for 'label'
+   * @param int $id
+   *   id of the option group.
+   * @param bool $flip
+   *   results are return in id => label format if false.
+   *   if true, the results are reversed
+   * @param bool $grouping
+   *   if true, return the value in 'grouping' column.
+   * @param bool $localize
+   *   if true, localize the results before returning.
+   * @param string $labelColumnName
+   *   the column to use for 'label'.
+   * @param bool $onlyActive
+   * @param bool $fresh
    *
-   * @return array      the values as specified by the above params
-   * @static
+   * @return array
+   *   Array of values as specified by the above params
    * @void
    */
-  static function &valuesByID($id, $flip = FALSE, $grouping = FALSE, $localize = FALSE, $labelColumnName = 'label', $onlyActive = TRUE, $fresh = FALSE) {
+  public static function &valuesByID($id, $flip = FALSE, $grouping = FALSE, $localize = FALSE, $labelColumnName = 'label', $onlyActive = TRUE, $fresh = FALSE) {
     $cacheKey = self::createCacheKey($id, $flip, $grouping, $localize, $labelColumnName, $onlyActive);
 
     $cache = CRM_Utils_Cache::singleton();
@@ -226,30 +262,25 @@ WHERE  v.option_group_id = g.id
   }
 
   /**
-   * Function to lookup titles OR ids for a set of option_value populated fields. The retrieved value
-   * is assigned a new fieldname by id or id's by title
-   * (each within a specificied option_group)
+   * Lookup titles OR ids for a set of option_value populated fields. The
+   * retrieved value is assigned a new field name by id or id's by title
+   * (each within a specified option_group).
    *
-   * @param  array   $params   Reference array of values submitted by the form. Based on
-   *                           $flip, creates new elements in $params for each field in
-   *                           the $names array.
-   *                           If $flip = false, adds     root field name     => title
-   *                           If $flip = true, adds      actual field name   => id
+   * @param array $params
+   *   Reference array of values submitted by the form. Based on.
+   *   $flip, creates new elements in $params for each field in
+   *   the $names array.
+   *   If $flip = false, adds root field name => title
+   *   If $flip = true, adds actual field name => id
    *
-   * @param  array   $names    Reference array of fieldnames we want transformed.
-   *                           Array key = 'postName' (field name submitted by form in $params).
-   *                           Array value = array(
-     'newName' => $newName, 'groupName' => $groupName).
+   * @param array $names
+   *   Array of field names we want transformed.
+   *   Array key = 'postName' (field name submitted by form in $params).
+   *   Array value = array('newName' => $newName, 'groupName' => $groupName).
    *
-   *
-   * @param  boolean $flip
-   *
-   * @return void
-   *
-   * @access public
-   * @static
+   * @param bool $flip
    */
-  static function lookupValues(&$params, &$names, $flip = FALSE) {
+  public static function lookupValues(&$params, $names, $flip = FALSE) {
     foreach ($names as $postName => $value) {
       // See if $params field is in $names array (i.e. is a value that we need to lookup)
       if ($postalName = CRM_Utils_Array::value($postName, $params)) {
@@ -274,14 +305,14 @@ WHERE  v.option_group_id = g.id
           }
 
           if ($flip) {
-            $p        = array(1 => array($postValue, 'String'));
+            $p = array(1 => array($postValue, 'String'));
             $lookupBy = 'v.label= %1';
-            $select   = "v.value";
+            $select = "v.value";
           }
           else {
-            $p        = array(1 => array($postValue, 'Integer'));
+            $p = array(1 => array($postValue, 'Integer'));
             $lookupBy = 'v.value = %1';
-            $select   = "v.label";
+            $select = "v.label";
           }
 
           $p[2] = array($value['groupName'], 'String');
@@ -301,7 +332,16 @@ WHERE  v.option_group_id = g.id
     }
   }
 
-  static function getLabel($groupName, $value, $onlyActiveValue = TRUE) {
+  /**
+   * @deprecated - use CRM_Core_Pseudoconstant::getLabel
+   *
+   * @param string $groupName
+   * @param $value
+   * @param bool $onlyActiveValue
+   *
+   * @return null
+   */
+  public static function getLabel($groupName, $value, $onlyActiveValue = TRUE) {
     if (empty($groupName) ||
       empty($value)
     ) {
@@ -320,7 +360,8 @@ WHERE  v.option_group_id = g.id
     if ($onlyActiveValue) {
       $query .= " AND  v.is_active = 1 ";
     }
-    $p = array(1 => array($groupName, 'String'),
+    $p = array(
+      1 => array($groupName, 'String'),
       2 => array($value, 'Integer'),
     );
     $dao = CRM_Core_DAO::executeQuery($query, $p);
@@ -330,10 +371,24 @@ WHERE  v.option_group_id = g.id
     return NULL;
   }
 
-  static function getValue($groupName,
+  /**
+   * @deprecated
+   *
+   * This function is not cached.
+   *
+   * @param string $groupName
+   * @param $label
+   * @param string $labelField
+   * @param string $labelType
+   * @param string $valueField
+   *
+   * @return null
+   */
+  public static function getValue(
+    $groupName,
     $label,
     $labelField = 'label',
-    $labelType  = 'String',
+    $labelType = 'String',
     $valueField = 'value'
   ) {
     if (empty($label)) {
@@ -351,7 +406,8 @@ WHERE  v.option_group_id = g.id
   AND  v.$labelField     = %2
 ";
 
-    $p = array(1 => array($groupName, 'String'),
+    $p = array(
+      1 => array($groupName, 'String'),
       2 => array($label, $labelType),
     );
     $dao = CRM_Core_DAO::executeQuery($query, $p);
@@ -366,14 +422,14 @@ WHERE  v.option_group_id = g.id
   /**
    * Get option_value.value from default option_value row for an option group
    *
-   * @param string $groupName the name of the option group
+   * @param string $groupName
+   *   The name of the option group.
    *
-   * @access public
-   * @static
    *
-   * @return string   the value from the row where is_default = true
+   * @return string
+   *   the value from the row where is_default = true
    */
-  static function getDefaultValue($groupName) {
+  public static function getDefaultValue($groupName) {
     if (empty($groupName)) {
       return NULL;
     }
@@ -396,12 +452,14 @@ WHERE  v.option_group_id = g.id
   }
 
   /**
-   * Creates a new option group with the passed in values
+   * Creates a new option group with the passed in values.
    * @TODO: Should update the group if it already exists intelligently, so multi-lingual is
    * not messed up. Currently deletes the old group
    *
-   * @param string $groupName the name of the option group - make sure there is no conflict
-   * @param array  $values    the associative array that has information on the option values
+   * @param string $groupName
+   *   The name of the option group - make sure there is no conflict.
+   * @param array $values
+   *   The associative array that has information on the option values.
    *                          the keys of this array are:
    *                          string 'title'       (required)
    *                          string 'value'       (required)
@@ -410,23 +468,23 @@ WHERE  v.option_group_id = g.id
    *                          int    'weight'      (optional) - the order in which the value are displayed
    *                          bool   'is_default'  (optional) - is this the default one to display when rendered in form
    *                          bool   'is_active'   (optional) - should this element be rendered
-   * @param int    $defaultID (reference) - the option value ID of the default element (if set) is returned else 'null'
-   * @param string $groupLabel            - the optional label of the option group else set to group name
+   * @param int $defaultID
+   *   (reference) - the option value ID of the default element (if set) is returned else 'null'.
+   * @param null $groupTitle
+   *   The optional label of the option group else set to group name.
    *
-   * @access public
-   * @static
    *
-   * @return int   the option group ID
-   *
+   * @return int
+   *   the option group ID
    */
-  static function createAssoc($groupName, &$values, &$defaultID, $groupTitle = NULL) {
+  public static function createAssoc($groupName, &$values, &$defaultID, $groupTitle = NULL) {
     self::deleteAssoc($groupName);
     if (!empty($values)) {
-      $group              = new CRM_Core_DAO_OptionGroup();
-      $group->name        = $groupName;
-      $group->title       = empty($groupTitle) ? $groupName : $groupTitle;
+      $group = new CRM_Core_DAO_OptionGroup();
+      $group->name = $groupName;
+      $group->title = empty($groupTitle) ? $groupName : $groupTitle;
       $group->is_reserved = 1;
-      $group->is_active   = 1;
+      $group->is_active = 1;
       $group->save();
 
       foreach ($values as $v) {
@@ -453,7 +511,13 @@ WHERE  v.option_group_id = g.id
     return $group->id;
   }
 
-  static function getAssoc($groupName, &$values, $flip = FALSE, $field = 'name') {
+  /**
+   * @param string $groupName
+   * @param $values
+   * @param bool $flip
+   * @param string $field
+   */
+  public static function getAssoc($groupName, &$values, $flip = FALSE, $field = 'name') {
     $query = "
 SELECT v.id as amount_id, v.value, v.label, v.name, v.description, v.weight
   FROM civicrm_option_group g,
@@ -493,7 +557,11 @@ ORDER BY v.weight
     }
   }
 
-  static function deleteAssoc($groupName, $operator = "=") {
+  /**
+   * @param string $groupName
+   * @param string $operator
+   */
+  public static function deleteAssoc($groupName, $operator = "=") {
     $query = "
 DELETE g, v
   FROM civicrm_option_group g,
@@ -506,22 +574,20 @@ DELETE g, v
     $dao = CRM_Core_DAO::executeQuery($query, $params);
   }
 
-  static function optionLabel($groupName, $value) {
-    $query = "
-SELECT v.label
-  FROM civicrm_option_group g,
-       civicrm_option_value v
- WHERE g.id = v.option_group_id
-   AND g.name  = %1
-   AND v.value = %2";
-    $params = array(1 => array($groupName, 'String'),
-      2 => array($value, 'String'),
-    );
-    return CRM_Core_DAO::singleValueQuery($query, $params);
-  }
-
-  static function getRowValues($groupName, $fieldValue, $field = 'name',
-    $fieldType = 'String', $active = TRUE
+  /**
+   * @param string $groupName
+   * @param $fieldValue
+   * @param string $field
+   * @param string $fieldType
+   * @param bool $active
+   * @param bool $localize
+   *   if true, localize the results before returning.
+   *
+   * @return array
+   */
+  public static function getRowValues(
+    $groupName, $fieldValue, $field = 'name',
+    $fieldType = 'String', $active = TRUE, $localize = FALSE
   ) {
     $query = "
 SELECT v.id, v.label, v.value, v.name, v.weight, v.description
@@ -537,7 +603,8 @@ WHERE  v.option_group_id = g.id
       $query .= " AND  v.is_active = 1";
     }
 
-    $p = array(1 => array($groupName, 'String'),
+    $p = array(
+      1 => array($groupName, 'String'),
       2 => array($fieldValue, $fieldType),
     );
     $dao = CRM_Core_DAO::executeQuery($query, $p);
@@ -545,23 +612,36 @@ WHERE  v.option_group_id = g.id
 
     if ($dao->fetch()) {
       foreach (array(
-        'id', 'name', 'value', 'label', 'weight', 'description') as $fld) {
+                 'id',
+                 'name',
+                 'value',
+                 'label',
+                 'weight',
+                 'description',
+               ) as $fld) {
         $row[$fld] = $dao->$fld;
+        if ($localize && in_array($fld, array('label', 'description'))) {
+          $row[$fld] = ts($row[$fld]);
+        }
       }
     }
+
     return $row;
   }
 
-  /*
-   * Wrapper for calling values with fresh set to true to empty the given value
+  /**
+   * Wrapper for calling values with fresh set to true to empty the given value.
    *
    * Since there appears to be some inconsistency
    * (@todo remove inconsistency) around the pseudoconstant operations
    * (for example CRM_Contribution_Pseudoconstant::paymentInstrument doesn't specify isActive
    * which is part of the cache key
    * will do a couple of variations & aspire to someone cleaning it up later
+   *
+   * @param string $name
+   * @param array $params
    */
-  static function flush($name, $params = array()){
+  public static function flush($name, $params = array()) {
     $defaults = array(
       'flip' => FALSE,
       'grouping' => FALSE,
@@ -593,10 +673,10 @@ WHERE  v.option_group_id = g.id
     );
   }
 
-  static function flushAll() {
+  public static function flushAll() {
     self::$_values = array();
     self::$_cache = array();
     CRM_Utils_Cache::singleton()->flush();
   }
-}
 
+}

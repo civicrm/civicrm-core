@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,7 +24,7 @@
  +--------------------------------------------------------------------+
 *}
 {if $outputMode eq 'html' && !$rows}
-    <div class="messages status no-popup">
-        <div class="icon inform-icon"></div>&nbsp; {ts}Sorry. No results found.{/ts}
-    </div>
+  <div class="messages status no-popup">
+    <div class="icon inform-icon"></div>&nbsp; {ts}None found.{/ts}
+  </div>
 {/if}

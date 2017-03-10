@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,33 +23,31 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
- * form helper class for an OpenID object
+ * Form helper class for an OpenID object.
  */
 class CRM_Contact_Form_Inline_OpenID extends CRM_Contact_Form_Inline {
 
   /**
-   * ims of the contact that is been viewed
+   * Ims of the contact that is been viewed.
    */
   private $_openids = array();
 
   /**
-   * No of openid blocks for inline edit
+   * No of openid blocks for inline edit.
    */
   private $_blockCount = 6;
 
   /**
-   * call preprocess
+   * Call preprocess.
    */
   public function preProcess() {
     parent::preProcess();
@@ -62,10 +60,7 @@ class CRM_Contact_Form_Inline_OpenID extends CRM_Contact_Form_Inline {
   }
 
   /**
-   * build the form elements for openID object
-   *
-   * @return void
-   * @access public
+   * Build the form object elements for openID object.
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -97,16 +92,16 @@ class CRM_Contact_Form_Inline_OpenID extends CRM_Contact_Form_Inline {
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form.
    *
-   * @param array $fields     posted values of the form
-   * @param array $errors     list of errors to be posted back to the form
+   * @param array $fields
+   *   Posted values of the form.
+   * @param array $errors
+   *   List of errors to be posted back to the form.
    *
-   * @return $errors
-   * @static
-   * @access public
+   * @return array
    */
-  static function formRule($fields, $errors) {
+  public static function formRule($fields, $errors) {
     $hasData = $hasPrimary = $errors = array();
     if (!empty($fields['openid']) && is_array($fields['openid'])) {
       foreach ($fields['openid'] as $instance => $blockValues) {
@@ -117,7 +112,7 @@ class CRM_Contact_Form_Inline_OpenID extends CRM_Contact_Form_Inline {
           if (!empty($blockValues['is_primary'])) {
             $hasPrimary[] = $instance;
             if (!$primaryID && !empty($blockValues['openid'])) {
-                $primaryID = $blockValues['openid'];
+              $primaryID = $blockValues['openid'];
             }
           }
         }
@@ -128,17 +123,16 @@ class CRM_Contact_Form_Inline_OpenID extends CRM_Contact_Form_Inline {
       }
 
       if (count($hasPrimary) > 1) {
-        $errors["openid[".array_pop($hasPrimary)."][is_primary]"] = ts('Only one OpenID can be marked as primary.');
+        $errors["openid[" . array_pop($hasPrimary) . "][is_primary]"] = ts('Only one OpenID can be marked as primary.');
       }
     }
     return $errors;
   }
 
   /**
-   * set defaults for the form
+   * Set defaults for the form.
    *
    * @return array
-   * @access public
    */
   public function setDefaultValues() {
     $defaults = array();
@@ -156,10 +150,7 @@ class CRM_Contact_Form_Inline_OpenID extends CRM_Contact_Form_Inline {
   }
 
   /**
-   * process the form
-   *
-   * @return void
-   * @access public
+   * Process the form.
    */
   public function postProcess() {
     $params = $this->exportValues();
@@ -167,9 +158,16 @@ class CRM_Contact_Form_Inline_OpenID extends CRM_Contact_Form_Inline {
     // Process / save openID
     $params['contact_id'] = $this->_contactId;
     $params['updateBlankLocInfo'] = TRUE;
+    $params['openid']['isIdSet'] = TRUE;
+    foreach ($this->_openids as $count => $value) {
+      if (!empty($value['id']) && isset($params['openid'][$count])) {
+        $params['openid'][$count]['id'] = $value['id'];
+      }
+    }
     CRM_Core_BAO_Block::create('openid', $params);
 
     $this->log();
     $this->response();
   }
+
 }

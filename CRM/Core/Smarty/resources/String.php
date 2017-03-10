@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,30 +23,54 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
+ * @param $tpl_name
+ * @param $tpl_source
+ * @param $smarty_obj
+ *
+ * @return bool
  */
 function civicrm_smarty_resource_string_get_template($tpl_name, &$tpl_source, &$smarty_obj) {
   $tpl_source = $tpl_name;
   return TRUE;
 }
 
+/**
+ * @param string $tpl_name
+ * @param $tpl_timestamp
+ * @param CRM_Core_Smarty $smarty_obj
+ *
+ * @return bool
+ */
 function civicrm_smarty_resource_string_get_timestamp($tpl_name, &$tpl_timestamp, &$smarty_obj) {
   $tpl_timestamp = time();
   return TRUE;
 }
 
+/**
+ * @param string $tpl_name
+ * @param CRM_Core_Smarty $smarty_obj
+ *
+ * @return bool
+ */
 function civicrm_smarty_resource_string_get_secure($tpl_name, &$smarty_obj) {
   return TRUE;
 }
 
-function civicrm_smarty_resource_string_get_trusted($tpl_name, &$smarty_obj) {}
+/**
+ * @param string $tpl_name
+ * @param CRM_Core_Smarty $smarty_obj
+ */
+function civicrm_smarty_resource_string_get_trusted($tpl_name, &$smarty_obj) {
+
+}
 
 function civicrm_smarty_register_string_resource() {
   $template = CRM_Core_Smarty::singleton();
@@ -58,4 +82,3 @@ function civicrm_smarty_register_string_resource() {
     )
   );
 }
-

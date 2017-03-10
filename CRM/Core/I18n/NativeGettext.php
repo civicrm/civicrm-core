@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,25 +23,35 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
  * Convenience class for PHP-Gettext compatibility.
  */
 class CRM_Core_I18n_NativeGettext {
-  function translate($string) {
+  /**
+   * @param $string
+   *
+   * @return string
+   */
+  public function translate($string) {
     return gettext($string);
   }
 
   /**
    * Based on php-gettext, since native gettext does not support this as is.
+   *
+   * @param $context
+   * @param $text
+   *
+   * @return string
    */
-  function pgettext($context, $text) {
+  public function pgettext($context, $text) {
     $key = $context . chr(4) . $text;
     $ret = $this->translate($key);
 
@@ -53,8 +63,15 @@ class CRM_Core_I18n_NativeGettext {
     }
   }
 
-  function ngettext($text, $plural, $count) {
+  /**
+   * @param $text
+   * @param $plural
+   * @param $count
+   *
+   * @return string
+   */
+  public function ngettext($text, $plural, $count) {
     return ngettext($text, $plural, $count);
   }
-}
 
+}

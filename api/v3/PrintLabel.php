@@ -1,10 +1,9 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,53 +23,53 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
-
-/**
- * File for the CiviCRM APIv3 print_label functions
- *
- * @package CiviCRM_APIv3
- * @subpackage API_print_label
- *
  */
 
 /**
- * Save a print_label
+ * This api exposes CiviCRM PrintLabel.
  *
- * Allowed @params array keys are:
- * {@getfields print_label_create}
- * @example print_labelCreate.php
+ * @package CiviCRM_APIv3
+ */
+
+/**
+ * Save a PrintLabel.
  *
- * @return array of newly created print_label property values.
- * @access public
+ * @param array $params
+ *
+ * @return array
  */
 function civicrm_api3_print_label_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
- * Get a print_label
+ * Adjust metadata for navigation create action.
  *
- * Allowed @params array keys are:
- * {@getfields print_label_get}
- * @example print_labelCreate.php
+ * @param array $params
+ */
+function _civicrm_api3_print_label_create_spec(&$params) {
+  $params['name']['api.required'] = 1;
+}
+
+/**
+ * Get a PrintLabel.
  *
- * @return array of retrieved print_label property values.
- * @access public
+ * @param array $params
+ *
+ * @return array
+ *   Array of retrieved PrintLabel property values.
  */
 function civicrm_api3_print_label_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
- * Delete a print_label
+ * Delete a PrintLabel.
  *
- * Allowed @params array keys are:
- * {@getfields print_label_delete}
- * @example print_labelCreate.php
+ * @param array $params
  *
- * @return array of deleted values.
- * @access public
+ * @return array
+ *   Array of deleted values.
  */
 function civicrm_api3_print_label_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);

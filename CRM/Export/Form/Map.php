@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
  */
@@ -39,45 +39,49 @@
 class CRM_Export_Form_Map extends CRM_Core_Form {
 
   /**
-   * mapper fields
+   * Mapper fields
    *
    * @var array
-   * @access protected
    */
   protected $_mapperFields;
 
   /**
-   * number of columns in import file
+   * Number of columns in import file
    *
    * @var int
-   * @access protected
    */
   protected $_exportColumnCount;
 
   /**
-   * loaded mapping ID
+   * Loaded mapping ID
    *
    * @var int
-   * @access protected
    */
   protected $_mappingId;
 
   /**
-   * Function to actually build the form
+   * Build the form object.
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     $this->_exportColumnCount = $this->get('exportColumnCount');
+    $this->_mappingId = $this->get('mappingId');
+
     if (!$this->_exportColumnCount) {
-      $this->_exportColumnCount = 10;
+      // Set default from saved mapping
+      if ($this->_mappingId) {
+        $mapping = new CRM_Core_DAO_MappingField();
+        $mapping->mapping_id = $this->_mappingId;
+        $this->_exportColumnCount = $mapping->count();
+      }
+      else {
+        $this->_exportColumnCount = 10;
+      }
     }
     else {
-      $this->_exportColumnCount = $this->_exportColumnCount + 10;
+      $this->_exportColumnCount += 10;
     }
-
-    $this->_mappingId = $this->get('mappingId');
   }
 
   public function buildQuickForm() {
@@ -85,22 +89,23 @@ class CRM_Export_Form_Map extends CRM_Core_Form {
       'Export',
       $this->_mappingId,
       $this->_exportColumnCount,
-      $blockCnt = 2,
+      2,
       $this->get('exportMode')
     );
 
     $this->addButtons(array(
         array(
           'type' => 'back',
-          'name' => ts('<< Previous'),
+          'name' => ts('Previous'),
         ),
         array(
           'type' => 'next',
-          'name' => ts('Export >>'),
+          'name' => ts('Export'),
           'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
         ),
         array(
           'type' => 'done',
+          'icon' => 'fa-times',
           'name' => ts('Done'),
         ),
       )
@@ -108,15 +113,18 @@ class CRM_Export_Form_Map extends CRM_Core_Form {
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form.
    *
-   * @param array $fields posted values of the form
+   * @param array $fields
+   *   Posted values of the form.
    *
-   * @return array list of errors to be posted back to the form
-   * @static
-   * @access public
+   * @param $values
+   * @param int $mappingTypeId
+   *
+   * @return array
+   *   list of errors to be posted back to the form
    */
-  static function formRule($fields, $values, $mappingTypeId) {
+  public static function formRule($fields, $values, $mappingTypeId) {
     $errors = array();
 
     if (!empty($fields['saveMapping']) && !empty($fields['_qf_Map_next'])) {
@@ -144,10 +152,9 @@ class CRM_Export_Form_Map extends CRM_Core_Form {
   }
 
   /**
-   * Process the uploaded file
+   * Process the uploaded file.
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     $params = $this->controller->exportValues($this->_name);
@@ -239,7 +246,8 @@ class CRM_Export_Form_Map extends CRM_Core_Form {
       $this->get('componentTable'),
       $this->get('mergeSameAddress'),
       $this->get('mergeSameHousehold'),
-      $exportParams
+      $exportParams,
+      $this->get('queryOperator')
     );
   }
 
@@ -247,10 +255,9 @@ class CRM_Export_Form_Map extends CRM_Core_Form {
    * Return a descriptive name for the page, used in wizard header
    *
    * @return string
-   * @access public
    */
   public function getTitle() {
     return ts('Select Fields to Export');
   }
-}
 
+}

@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,12 +25,9 @@
 *}
 {* Confirmation of membership deletes  *}
 <div class="crm-block crm-form-block crm-member-task-delete-form-block">
-<div class="crm-submit-buttons">
-    {include file="CRM/common/formButtons.tpl" location="top"}
-  </div>
   <div class="messages status no-popup">
      <div class="icon inform-icon"></div>
-        <span>{ts}Are you sure you want to delete the selected memberships? This delete operation cannot be undone and will delete all transactions and activity associated with these members.{/ts}</span>
+        <span>{ts}Are you sure you want to delete the selected memberships? This delete operation cannot be undone and will delete all transactions and activity associated with these memberships.{/ts}</span>
         <p>{include file="CRM/Member/Form/Task.tpl"}</p>
   </div>
   <div class="crm-submit-buttons">

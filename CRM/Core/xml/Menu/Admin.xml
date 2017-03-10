@@ -89,21 +89,6 @@
      <weight>0</weight>
   </item>
   <item>
-     <path>civicrm/admin/tag</path>
-     <title>Tags (Categories)</title>
-     <desc>Tags are useful for segmenting the contacts in your database into categories (e.g. Staff Member, Donor, Volunteer, etc.). Create and edit available tags here.</desc>
-     <page_callback>CRM_Admin_Page_Tag</page_callback>
-     <adminGroup>Customize Data and Screens</adminGroup>
-     <icon>admin/small/11.png</icon>
-     <weight>25</weight>
-  </item>
-  <item>
-     <path>civicrm/admin/tag/add</path>
-     <title>New Tag</title>
-     <page_callback>CRM_Admin_Page_Tag</page_callback>
-     <path_arguments>action=add</path_arguments>
-  </item>
-  <item>
      <path>civicrm/admin/options/activity_type</path>
      <title>Activity Types</title>
      <desc>CiviCRM has several built-in activity types (meetings, phone calls, emails sent). Track other types of interactions by creating custom activity types here.</desc>
@@ -132,7 +117,7 @@
   <item>
      <path>civicrm/admin/options/gender</path>
      <title>Gender Options</title>
-     <desc>Options for assigning gender to individual contacts (e.g. Male, Female, Transgender).</desc>
+     <desc>Options for assigning gender to individual contacts (e.g. Male, Female, Other).</desc>
      <page_callback>CRM_Admin_Page_Options</page_callback>
      <adminGroup>Customize Data and Screens</adminGroup>
      <icon>admin/small/01.png</icon>
@@ -218,6 +203,14 @@
      <weight>95</weight>
   </item>
   <item>
+     <path>civicrm/admin/setting/preferences/date</path>
+     <title>Date Preferences</title>
+     <page_callback>CRM_Admin_Form_PreferencesDate</page_callback>
+     <adminGroup>Customize Data and Screens</adminGroup>
+     <icon>admin/small/36.png</icon>
+     <weight>97</weight>
+  </item>
+  <item>
      <path>civicrm/admin/menu</path>
      <title>Navigation Menu</title>
      <desc>Add or remove menu items, and modify the order of items on the navigation menu.</desc>
@@ -269,6 +262,7 @@
      <page_callback>CRM_Admin_Page_MessageTemplates</page_callback>
      <adminGroup>Communications</adminGroup>
      <icon>admin/small/template.png</icon>
+     <access_arguments>edit message templates</access_arguments>
      <weight>30</weight>
   </item>
   <item>
@@ -276,6 +270,7 @@
      <title>Message Templates</title>
      <desc>Add/Edit Message Templates</desc>
      <page_callback>CRM_Admin_Form_MessageTemplates</page_callback>
+     <access_arguments>edit message templates</access_arguments>
      <weight>262</weight>
   </item>
   <item>
@@ -283,6 +278,8 @@
      <title>Schedule Reminders</title>[A
      <desc>Schedule Reminders.</desc>
      <page_callback>CRM_Admin_Page_ScheduleReminders</page_callback>
+     <access_callback>1</access_callback>
+     <access_arguments>administer CiviCRM;edit all events</access_arguments>
      <adminGroup>Communications</adminGroup>
      <icon>admin/small/template.png</icon>
      <weight>40</weight>
@@ -356,7 +353,7 @@
   </item>
   <item>
      <path>civicrm/admin/setting/localization</path>
-     <title>Languages, Currency, Location</title>
+     <title>Languages, Currency, Locations</title>
      <page_callback>CRM_Admin_Form_Setting_Localization</page_callback>
      <adminGroup>Localization</adminGroup>
      <icon>admin/small/36.png</icon>
@@ -407,7 +404,7 @@
      <path>civicrm/admin/synchUser</path>
      <title>Synchronize Users to Contacts</title>
      <desc>Automatically create a CiviCRM contact record for each CMS user record.</desc>
-     <page_callback>CRM_Admin_Page_CMSUser</page_callback>
+     <page_callback>CRM_Admin_Form_CMSUser</page_callback>
      <adminGroup>Users and Permissions</adminGroup>
      <icon>admin/small/Synch_user.png</icon>
      <weight>20</weight>
@@ -461,7 +458,6 @@
      <desc>Payment Processor setup for CiviCRM transactions</desc>
      <page_callback>CRM_Admin_Page_PaymentProcessor</page_callback>
      <adminGroup>System Settings</adminGroup>
-     <access_arguments>administer payment processors</access_arguments>
      <icon>admin/small/online_contribution_pages.png</icon>
      <weight>30</weight>
   </item>
@@ -476,7 +472,7 @@
   <item>
      <path>civicrm/admin/setting/misc</path>
      <title>Misc (Undelete, PDFs, Limits, Logging, Captcha, etc.)</title>
-   <desc>Enable undelete/move to trash feature, detailed change logging, ReCAPTCHA to protect forms.</desc>
+     <desc>Enable undelete/move to trash feature, detailed change logging, ReCAPTCHA to protect forms.</desc>
      <page_callback>CRM_Admin_Form_Setting_Miscellaneous</page_callback>
      <adminGroup>System Settings</adminGroup>
      <icon>admin/small/36.png</icon>
@@ -503,7 +499,7 @@
      <title>Cleanup Caches and Update Paths</title>
      <desc>Reset the Base Directory Path and Base URL settings - generally when a CiviCRM site is moved to another location in the file system and/or to another domain.</desc>
      <page_callback>CRM_Admin_Form_Setting_UpdateConfigBackend</page_callback>
-     <adminGroup>Configure</adminGroup>
+     <adminGroup>System Settings</adminGroup>
      <icon>admin/small/updatepath.png</icon>
      <weight>80</weight>
   </item>
@@ -641,12 +637,6 @@
      <access_arguments>access CiviCRM</access_arguments>
   </item>
   <item>
-     <path>civicrm/ajax/menu</path>
-     <page_callback>CRM_Admin_Page_AJAX::getNavigationList</page_callback>
-     <access_arguments>access CiviCRM,administer CiviCRM</access_arguments>
-     <page_type>3</page_type>
-  </item>
-  <item>
      <path>civicrm/ajax/menutree</path>
      <page_callback>CRM_Admin_Page_AJAX::menuTree</page_callback>
      <access_arguments>access CiviCRM,administer CiviCRM</access_arguments>
@@ -658,16 +648,11 @@
      <access_arguments>access CiviCRM</access_arguments>
   </item>
   <item>
-     <path>civicrm/ajax/mergeTags</path>
-     <page_callback>CRM_Admin_Page_AJAX::mergeTags</page_callback>
-     <access_arguments>access CiviCRM</access_arguments>
-  </item>
-  <item>
      <path>civicrm/admin/price</path>
      <title>Price Sets</title>
      <page_callback>CRM_Price_Page_Set</page_callback>
      <desc>Price sets allow you to offer multiple options with associated fees (e.g. pre-conference workshops, additional meals, etc.). Configure Price Sets for events which need more than a single set of fee levels.</desc>
-     <access_arguments>administer CiviCRM;access CiviEvent</access_arguments>
+     <access_arguments>access CiviCRM,access CiviEvent</access_arguments>
      <adminGroup>Customize</adminGroup>
      <icon>admin/small/price_sets.png</icon>
      <weight>380</weight>
@@ -677,7 +662,7 @@
      <title>New Price Set</title>
      <page_callback>CRM_Price_Page_Set</page_callback>
      <desc>Price sets allow you to offer multiple options with associated fees (e.g. pre-conference workshops, additional meals, etc.). Configure Price Sets for events which need more than a single set of fee levels.</desc>
-     <access_arguments>administer CiviCRM;access CiviEvent</access_arguments>
+     <access_arguments>access CiviCRM,access CiviEvent</access_arguments>
      <path_arguments>action=add</path_arguments>
   </item>
   <item>
@@ -690,22 +675,6 @@
      <path>civicrm/admin/price/field/option</path>
      <title>Price Field Options</title>
      <page_callback>CRM_Price_Page_Option</page_callback>
-  </item>
-  <item>
-       <path>civicrm/ajax/taglist</path>
-       <page_callback>CRM_Admin_Page_AJAX::getTagList</page_callback>
-       <access_arguments>access CiviCRM</access_arguments>
-  </item>
-  <item>
-       <path>civicrm/ajax/mergeTagList</path>
-       <page_callback>CRM_Admin_Page_AJAX::mergeTagList</page_callback>
-       <access_arguments>access CiviCRM</access_arguments>
-  </item>
-  <item>
-       <path>civicrm/ajax/processTags</path>
-       <page_callback>CRM_Admin_Page_AJAX::processTags</page_callback>
-       <access_arguments>access CiviCRM</access_arguments>
-       <page_type>3</page_type>
   </item>
   <item>
      <path>civicrm/admin/tplstrings/add</path>
@@ -723,13 +692,8 @@
      <access_arguments>administer CiviCRM,access CiviCRM</access_arguments>
   </item>
   <item>
-     <path>civicrm/ajax/mapping1</path>
-     <page_callback>CRM_Admin_Page_AJAX::mappingList1</page_callback>
-     <access_arguments>administer CiviCRM,access CiviCRM</access_arguments>
-  </item>
-  <item>
-     <path>civicrm/ajax/populateRecipient</path>
-     <page_callback>CRM_Admin_Page_AJAX::recipient</page_callback>
+     <path>civicrm/ajax/recipientListing</path>
+     <page_callback>CRM_Admin_Page_AJAX::recipientListing</page_callback>
      <access_arguments>administer CiviCRM,access CiviCRM</access_arguments>
   </item>
   <item>
@@ -764,6 +728,12 @@
   <item>
     <path>civicrm/admin/badgelayout/add</path>
     <page_callback>CRM_Badge_Form_Layout</page_callback>
+    <access_arguments>administer CiviCRM</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/admin/ckeditor</path>
+    <title>Configure CKEditor</title>
+    <page_callback>CRM_Admin_Page_CKEditorConfig</page_callback>
     <access_arguments>administer CiviCRM</access_arguments>
   </item>
 </menu>

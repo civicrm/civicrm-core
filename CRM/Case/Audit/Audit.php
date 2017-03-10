@@ -1,14 +1,26 @@
 <?php
 
+/**
+ * Class CRM_Case_Audit_Audit
+ */
 class CRM_Case_Audit_Audit {
   private $auditConfig;
   private $xmlString;
 
+  /**
+   * @param $xmlString
+   * @param string $confFilename
+   */
   public function __construct($xmlString, $confFilename) {
     $this->xmlString = $xmlString;
     $this->auditConfig = new CRM_Case_Audit_AuditConfig($confFilename);
   }
 
+  /**
+   * @param bool $printReport
+   *
+   * @return array
+   */
   public function getActivities($printReport = FALSE) {
     $retval = array();
 
@@ -37,11 +49,11 @@ class CRM_Case_Audit_Audit {
 
         $ifBlankReplacements = array();
 
-        $completed  = FALSE;
+        $completed = FALSE;
         $sortValues = array('1970-01-01');
-        $category   = '';
+        $category = '';
         $fieldindex = 1;
-        $fields     = $activity->getElementsByTagName("Field");
+        $fields = $activity->getElementsByTagName("Field");
         foreach ($fields as $field) {
           $datatype_elements = $field->getElementsByTagName("Type");
           $datatype = $datatype_elements->item(0)->nodeValue;
@@ -53,7 +65,7 @@ class CRM_Case_Audit_Audit {
           $value = $value_elements->item(0)->nodeValue;
 
           $category_elements = $field->getElementsByTagName("Category");
-          if (!empty($category_elements)) {
+          if (!empty($category_elements->length)) {
             $category = $category_elements->item(0)->nodeValue;
           }
 
@@ -87,7 +99,10 @@ class CRM_Case_Audit_Audit {
               //CRM-4570
               if ($printReport) {
                 if (!in_array($label, array(
-                  'Activity Type', 'Status'))) {
+                  'Activity Type',
+                  'Status',
+                ))
+                ) {
                   $caseActivities[$activityindex][$fieldindex] = array();
                   $caseActivities[$activityindex][$fieldindex]['label'] = $label;
                   $caseActivities[$activityindex][$fieldindex]['datatype'] = $datatype;
@@ -170,9 +185,14 @@ class CRM_Case_Audit_Audit {
    *
    * This is intended to be called as a sort callback function, returning whether an activity's date is earlier or later than another's.
    * The type of date to use is specified in the config.
-   *
    */
 
+  /**
+   * @param $a
+   * @param $b
+   *
+   * @return int
+   */
   public function compareActivities($a, $b) {
     // This should work
     foreach ($this->auditConfig->getSortByLabels() as $label) {
@@ -181,7 +201,7 @@ class CRM_Case_Audit_Audit {
     }
 
     if ($aval < $bval) {
-      return - 1;
+      return -1;
     }
     elseif ($aval > $bval) {
       return 1;
@@ -191,13 +211,20 @@ class CRM_Case_Audit_Audit {
     }
   }
 
-  static
-  function run($xmlString, $clientID, $caseID, $printReport = FALSE) {
+  /**
+   * @param string $xmlString
+   * @param int $clientID
+   * @param int $caseID
+   * @param bool $printReport
+   *
+   * @return mixed
+   */
+  public static function run($xmlString, $clientID, $caseID, $printReport = FALSE) {
     /*
-$fh = fopen('C:/temp/audit2.xml', 'w');
-fwrite($fh, $xmlString);
-fclose($fh);
-*/
+    $fh = fopen('C:/temp/audit2.xml', 'w');
+    fwrite($fh, $xmlString);
+    fclose($fh);
+     */
 
     $audit = new CRM_Case_Audit_Audit($xmlString, 'audit.conf.xml');
     $activities = $audit->getActivities($printReport);
@@ -215,4 +242,5 @@ fclose($fh);
     }
     return $contents;
   }
+
 }

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,16 +22,20 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Contribute_OfflineRecurContributionTest
+ */
 class WebTest_Contribute_OfflineRecurContributionTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
     parent::setUp();
   }
 
-  function testOfflineRecurContribution() {
+  public function testOfflineRecurContribution() {
     $this->webtestLogin();
 
     // We need a payment processor
@@ -39,21 +43,18 @@ class WebTest_Contribute_OfflineRecurContributionTest extends CiviSeleniumTestCa
     $this->webtestAddPaymentProcessor($processorName, 'AuthNet');
 
     // create a new contact for whom recurring contribution is to be created
-    $firstName  = 'Jane' . substr(sha1(rand()), 0, 7);
+    $firstName = 'Jane' . substr(sha1(rand()), 0, 7);
     $middleName = 'Middle';
-    $lastName   = 'Recuroff_' . substr(sha1(rand()), 0, 7);
+    $lastName = 'Recuroff_' . substr(sha1(rand()), 0, 7);
     $this->webtestAddContact($firstName, $lastName, "{$firstName}@example.com");
     $contactName = "$firstName $lastName";
 
     $this->click('css=li#tab_contribute a');
 
-    $this->waitForElementPresent('link=Submit Credit Card Contribution');
-    $this->click('link=Submit Credit Card Contribution');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
+    $this->waitForElementPresent('link=Record Contribution (Check, Cash, EFT ...)');
     // since we don't have live credentials we will switch to test mode
-    $url = $this->getLocation();
-    $url = str_replace('mode=live', 'mode=test', $url);
+    $url = $this->getAttribute("xpath=//*[@id='Search']/div[2]/div[2]/a[1]@href");
+    $url .= '&mode=test';
     $this->open($url);
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
@@ -61,8 +62,8 @@ class WebTest_Contribute_OfflineRecurContributionTest extends CiviSeleniumTestCa
     $this->waitForElementPresent('payment_processor_id');
     $this->select('payment_processor_id', "label={$processorName}");
 
-      $this->click('financial_type_id');
-      $this->select('financial_type_id', 'label=Donation');
+    $this->click('financial_type_id');
+    $this->select('financial_type_id', 'label=Donation');
     $this->type('total_amount', '10');
 
     // recurring contribution fields
@@ -72,7 +73,7 @@ class WebTest_Contribute_OfflineRecurContributionTest extends CiviSeleniumTestCa
     $this->type('installments', '12');
 
     $this->click('is_email_receipt');
-      $this->waitForElementPresent('credit_card_type');
+    $this->waitForElementPresent('credit_card_type');
 
     // enter credit card info on form
     $this->webtestAddCreditCardDetails();
@@ -80,7 +81,8 @@ class WebTest_Contribute_OfflineRecurContributionTest extends CiviSeleniumTestCa
     // billing address
     $this->webtestAddBillingDetails($firstName, $middleName, $lastName);
     $this->click('_qf_Contribution_upload-bottom');
-
+    $this->waitForElementPresent('link=Edit');
+    $this->waitForText('crm-notification-container', "The contribution record has been saved.");
     // Use Find Contributions to make sure test recurring contribution exists
     $this->openCiviPage("contribute/search", "reset=1", 'contribution_currency_type');
 
@@ -88,24 +90,22 @@ class WebTest_Contribute_OfflineRecurContributionTest extends CiviSeleniumTestCa
     $this->click('contribution_test');
     $this->click('_qf_Search_refresh');
 
-    $this->waitForElementPresent('css=#contributionSearch table tbody tr td span a.action-item-first');
-    $this->click('css=#contributionSearch table tbody tr td span a.action-item-first');
+    $this->waitForElementPresent('css=#contributionSearch table tbody tr td span a.action-item:first-child');
+    $this->click('css=#contributionSearch table tbody tr td span a.action-item:first-child');
     $this->waitForElementPresent('_qf_ContributionView_cancel-bottom');
 
     // View Recurring Contribution Record
     $verifyData = array(
       'From' => "$contactName",
-                          'Financial Type'    => 'Donation (test)',
+      'Financial Type' => 'Donation (test)',
       'Total Amount' => 'Installments: 12, Interval: 1 month(s)',
       'Contribution Status' => 'Pending : Incomplete Transaction',
-      'Paid By' => 'Credit Card',
+      'Payment Method' => 'Credit Card',
     );
 
     foreach ($verifyData as $label => $value) {
-      $this->verifyText("xpath=//form[@id='ContributionView']//table/tbody/tr/td[text()='{$label}']/following-sibling::td",
-        preg_quote($value)
-      );
+      $this->assertElementContainsText("xpath=//form[@id='ContributionView']//table/tbody/tr/td[text()='{$label}']/following-sibling::td", $value);
     }
   }
-}
 
+}

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,29 +23,24 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
- * This class provides the functionality to Merge Contacts.
+ * This class provides the functionality to Merge contacts.
  *
  */
 class CRM_Contact_Form_Task_Merge extends CRM_Contact_Form_Task {
 
   /**
-   * build all the data structures needed to build the form
-   *
-   * @return void
-   * @access public
+   * Build all the data structures needed to build the form.
    */
-  function preProcess() {
+  public function preProcess() {
     parent::preProcess();
     $statusMsg = NULL;
     $contactIds = array();
@@ -63,8 +58,9 @@ class CRM_Contact_Form_Task_Merge extends CRM_Contact_Form_Task {
       $contact = CRM_Core_DAO::executeQuery($sql);
       while ($contact->fetch()) {
         $contactTypes[$contact->contact_type] = TRUE;
-        if (count($contactTypes) > 1)
-        break;
+        if (count($contactTypes) > 1) {
+          break;
+        }
       }
       if (count($contactTypes) > 1) {
         $statusMsg = ts('Selected records must all be the same contact type (i.e. all Individuals).');
@@ -90,5 +86,5 @@ class CRM_Contact_Form_Task_Merge extends CRM_Contact_Form_Task {
     // redirect to merge page.
     CRM_Utils_System::redirect($url);
   }
-}
 
+}

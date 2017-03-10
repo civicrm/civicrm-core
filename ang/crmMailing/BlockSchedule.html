@@ -1,0 +1,13 @@
+<div class="crmMailing-schedule-outer" crm-mailing-radio-date="schedule" ng-model="mailing.scheduled_date">
+  <div class="crmMailing-schedule-inner">
+    <div>
+      <input ng-model="schedule.mode" type="radio" name="send" value="now" id="schedule-send-now"/>
+      <label for="schedule-send-now">{{ts('Send immediately')}}</label>
+    </div>
+    <div>
+      <input ng-model="schedule.mode" type="radio" name="send" value="at" id="schedule-send-at"/>
+      <label for="schedule-send-at">{{ts('Send at:')}}</label>
+      <input crm-ui-datepicker ng-model="schedule.datetime" ng-required="schedule.mode == 'at'"/>
+    </div>
+  </div>
+</div>

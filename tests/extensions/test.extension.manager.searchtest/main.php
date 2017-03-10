@@ -1,18 +1,26 @@
 <?php
 
 require_once 'CRM/Contact/Form/Search/Custom/Base.php';
+
+/**
+ * Class test_extension_manager_searchtest
+ */
 class test_extension_manager_searchtest extends CRM_Contact_Form_Search_Custom_Base implements CRM_Contact_Form_Search_Interface {
-  function __construct(&$formValues) {
+  /**
+   * @param $formValues
+   */
+  public function __construct(&$formValues) {
     parent::__construct($formValues);
   }
 
   /**
-   * Prepare a set of search fields
+   * Prepare a set of search fields.
    *
-   * @param CRM_Core_Form $form modifiable
+   * @param CRM_Core_Form $form
+   *   Modifiable.
    * @return void
    */
-  function buildForm(&$form) {
+  public function buildForm(&$form) {
     CRM_Utils_System::setTitle(ts('My Search Title'));
 
     $form->add('text',
@@ -38,13 +46,13 @@ class test_extension_manager_searchtest extends CRM_Contact_Form_Search_Custom_B
   }
 
   /**
-   * Get a list of summary data points
+   * Get a list of summary data points.
    *
    * @return mixed; NULL or array with keys:
-   *  - summary: string
-   *  - total: numeric
+   *   - summary: string
+   *   - total: numeric
    */
-  function summary() {
+  public function summary() {
     return NULL;
     // return array(
     //   'summary' => 'This is a summary',
@@ -53,14 +61,14 @@ class test_extension_manager_searchtest extends CRM_Contact_Form_Search_Custom_B
   }
 
   /**
-   * Get a list of displayable columns
+   * Get a list of displayable columns.
    *
    * @return array, keys are printable column headers and values are SQL column names
    */
-  function &columns() {
+  public function &columns() {
     // return by reference
     $columns = array(
-      ts('Contact Id') => 'contact_id',
+      ts('Contact ID') => 'contact_id',
       ts('Contact Type') => 'contact_type',
       ts('Name') => 'sort_name',
       ts('State') => 'state_province',
@@ -69,21 +77,26 @@ class test_extension_manager_searchtest extends CRM_Contact_Form_Search_Custom_B
   }
 
   /**
-   * Construct a full SQL query which returns one page worth of results
+   * Construct a full SQL query which returns one page worth of results.
+   *
+   * @param int $offset
+   * @param int $rowcount
+   * @param null $sort
+   * @param bool $includeContactIDs
    *
    * @return string, sql
    */
-  function all($offset = 0, $rowcount = 0, $sort = NULL, $includeContactIDs = FALSE) {
+  public function all($offset = 0, $rowcount = 0, $sort = NULL, $includeContactIDs = FALSE) {
     // delegate to $this->sql(), $this->select(), $this->from(), $this->where(), etc.
     return $this->sql($this->select(), $offset, $rowcount, $sort, $includeContactIDs, NULL);
   }
 
   /**
-   * Construct a SQL SELECT clause
+   * Construct a SQL SELECT clause.
    *
    * @return string, sql fragment with SELECT arguments
    */
-  function select() {
+  public function select() {
     return "
       contact_a.id           as contact_id  ,
       contact_a.contact_type as contact_type,
@@ -93,11 +106,11 @@ class test_extension_manager_searchtest extends CRM_Contact_Form_Search_Custom_B
   }
 
   /**
-   * Construct a SQL FROM clause
+   * Construct a SQL FROM clause.
    *
    * @return string, sql fragment with FROM and JOIN clauses
    */
-  function from() {
+  public function from() {
     return "
       FROM      civicrm_contact contact_a
       LEFT JOIN civicrm_address address ON ( address.contact_id       = contact_a.id AND
@@ -109,11 +122,13 @@ class test_extension_manager_searchtest extends CRM_Contact_Form_Search_Custom_B
   }
 
   /**
-   * Construct a SQL WHERE clause
+   * Construct a SQL WHERE clause.
+   *
+   * @param bool $includeContactIDs
    *
    * @return string, sql fragment with conditional expressions
    */
-  function where($includeContactIDs = FALSE) {
+  public function where($includeContactIDs = FALSE) {
     $params = array();
     $where = "contact_a.contact_type   = 'Household'";
 
@@ -153,21 +168,22 @@ class test_extension_manager_searchtest extends CRM_Contact_Form_Search_Custom_B
   }
 
   /**
-   * Determine the Smarty template for the search screen
+   * Determine the Smarty template for the search screen.
    *
    * @return string, template path (findable through Smarty template path)
    */
-  function templateFile() {
+  public function templateFile() {
     return 'CRM/Contact/Form/Search/Custom.tpl';
   }
 
   /**
-   * Modify the content of each row
+   * Modify the content of each row.
    *
-   * @param array $row modifiable SQL result row
+   * @param array $row
+   *   Modifiable SQL result row.
    * @return void
    */
-  function alterRow(&$row) {
+  public function alterRow(&$row) {
     $row['sort_name'] .= ' ( altered )';
   }
 

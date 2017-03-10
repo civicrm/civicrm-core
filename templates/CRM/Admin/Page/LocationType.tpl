@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -26,16 +26,15 @@
 {if $action eq 1 or $action eq 2 or $action eq 8}
    {include file="CRM/Admin/Form/LocationType.tpl"}
 {else}
-  <div id="help">
+  <div class="help">
     {ts}Location types provide convenient labels to differentiate contacts' location(s). Administrators may define as many additional types as appropriate for your constituents (examples might be Main Office, School, Vacation Home...).{/ts}
   </div>
 
-{if $rows}
-<div id="ltype">
+  {if $rows}
+  <div id="ltype">
     {strip}
   {* handle enable/disable actions*}
    {include file="CRM/common/enableDisableApi.tpl"}
-   {include file="CRM/common/crmeditable.tpl"}
     {include file="CRM/common/jsortable.tpl"}
     <table id="options" class="display">
     <thead>
@@ -50,30 +49,27 @@
     </tr>
     </thead>
     {foreach from=$rows item=row}
-    <tr id="location_type-{$row.id}" class="{cycle values="odd-row,even-row"} {$row.class} crm-entity {if NOT $row.is_active} disabled{/if}">
-        <td class="crm-locationType-name">{$row.name}</td>
-        <td class="crm-locationType-display_name">{$row.display_name}</td>
-        <td class="crm-locationType-vcard_name">{$row.vcard_name}</td>
-        <td class="crm-locationType-description">{$row.description}</td>
-        <td id="row_{$row.id}_status" class="crm-locationType-is_active">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
-        <td class="crm-locationType-is_default" >{if $row.is_default eq 1}<img src="{$config->resourceBase}i/check.gif" alt="{ts}Default{/ts}" />{/if}&nbsp;</td>
+    <tr id="location_type-{$row.id}"  data-action="setvalue" class="{cycle values="odd-row,even-row"} {$row.class} crm-entity {if NOT $row.is_active} disabled{/if}">
+        <td class="crmf-name">{$row.name}</td>
+        <td class="crmf-display_name crm-editable">{$row.display_name}</td>
+        <td class="crmf-vcard_name crm-editable">{$row.vcard_name}</td>
+        <td class="crmf-description crm-editable">{$row.description}</td>
+        <td id="row_{$row.id}_status" class="crmf-is_active">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
+        <td class="crmf-is_default" >{if $row.is_default eq 1}<img src="{$config->resourceBase}i/check.gif" alt="{ts}Default{/ts}" />{/if}&nbsp;</td>
         <td>{$row.action|replace:'xx':$row.id}</td>
     </tr>
     {/foreach}
     </table>
     {/strip}
-
-    {if $action ne 1 and $action ne 2}
-    <div class="action-link">
-  <a href="{crmURL q="action=add&reset=1"}" id="newLocationType" class="button"><span>&raquo; {ts}New Location Type{/ts}</span></a>
-    </div>
-    {/if}
-</div>
-{else}
+  </div>
+  {else}
     <div class="messages status no-popup">
-          <img src="{$config->resourceBase}i/Inform.gif" alt="{ts}status{/ts}"/>
-        {capture assign=crmURL}{crmURL p='civicrm/admin/locationType' q="action=add&reset=1"}{/capture}
-        {ts 1=$crmURL}There are no Location Types entered for this Contact. You can <a href='%1'>add one</a>.{/ts}
+        <img src="{$config->resourceBase}i/Inform.gif" alt="{ts}status{/ts}"/>
+        {ts}None found.{/ts}
     </div>
-{/if}
+  {/if}
+  <div class="action-link">
+    {crmButton q="action=add&reset=1" id="newLocationType" icon="plus-circle"}{ts}Add Option{/ts}{/crmButton}
+    {crmButton p="civicrm/admin" q="reset=1" class="cancel" icon="times"}{ts}Done{/ts}{/crmButton}
+  </div>
 {/if}

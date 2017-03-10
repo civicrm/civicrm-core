@@ -221,7 +221,7 @@ a:hover {
     <html>
         <head>
             <title>Unit Test Results: Class <xsl:value-of select="$class.name"/></title>
-            <xsl:if test="$output.sorttable = 1">           
+            <xsl:if test="$output.sorttable = 1">
                 <script language="JavaScript" src="http://www.phing.info/support/sorttable.js"/>
             </xsl:if>
             <xsl:call-template name="create.stylesheet.link">

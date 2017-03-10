@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,31 +23,24 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
-
-require_once 'CiviTest/CiviUnitTestCase.php';
-require_once 'CiviTest/Contact.php';
+/**
+ * Class CRM_Core_BAO_AddressTest
+ * @group headless
+ */
 class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
-  function get_info() {
-    return array(
-      'name' => 'Address BAOs',
-      'description' => 'Test all Core_BAO_Address methods.',
-      'group' => 'CiviCRM BAO Tests',
-    );
-  }
-
-  function setUp() {
+  public function setUp() {
     parent::setUp();
 
     $this->quickCleanup(array('civicrm_contact', 'civicrm_address'));
   }
 
   /**
-   * create() method (create and update modes)
+   * Create() method (create and update modes)
    */
-  function testCreate() {
-    $contactId = Contact::createIndividual();
+  public function testCreate() {
+    $contactId = $this->individualCreate();
 
     $params = array();
     $params['address']['1'] = array(
@@ -66,7 +59,6 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
     );
 
     $params['contact_id'] = $contactId;
-
 
     $fixAddress = TRUE;
 
@@ -95,23 +87,22 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
     );
     $params['contact_id'] = $contactId;
 
-
     $block = CRM_Core_BAO_Address::create($params, $fixAddress, $entity = NULL);
 
-    $cid = $this->assertDBNotNull('CRM_Core_DAO_Address', $contactId, 'id', 'contact_id',
+    $this->assertDBNotNull('CRM_Core_DAO_Address', $contactId, 'id', 'contact_id',
       'Database check for updated address by contactId.'
     );
-    $addressId = $this->assertDBNotNull('CRM_Core_DAO_Address', '120 Terminal Road', 'id', 'street_address',
+    $this->assertDBNotNull('CRM_Core_DAO_Address', '120 Terminal Road', 'id', 'street_address',
       'Database check for updated address by street_name.'
     );
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
   }
 
   /**
    * Add() method ( )
    */
-  function testAdd() {
-    $contactId = Contact::createIndividual();
+  public function testAdd() {
+    $contactId = $this->individualCreate();
 
     $fixParams = array(
       'street_address' => 'E 906N Pine Pl W',
@@ -143,14 +134,14 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
     $this->assertEquals($addAddress->geo_code_1, '31.694842', 'In line' . __LINE__);
     $this->assertEquals($addAddress->geo_code_2, '-106.29998', 'In line' . __LINE__);
     $this->assertEquals($addAddress->country_id, '1228', 'In line' . __LINE__);
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
   }
 
   /**
    * AllAddress() method ( )
    */
-  function testallAddress() {
-    $contactId = Contact::createIndividual();
+  public function testallAddress() {
+    $contactId = $this->individualCreate();
 
     $fixParams = array(
       'street_address' => 'E 906N Pine Pl W',
@@ -201,14 +192,14 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
 
     $this->assertEquals(count($allAddress), 2, 'Checking number of returned addresses.');
 
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
   }
 
   /**
    * AllAddress() method ( ) with null value
    */
-  function testnullallAddress() {
-    $contactId = Contact::createIndividual();
+  public function testnullallAddress() {
+    $contactId = $this->individualCreate();
 
     $fixParams = array(
       'street_address' => 'E 906N Pine Pl W',
@@ -239,14 +230,14 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
 
     $this->assertEquals($allAddress, NULL, 'Checking null for returned addresses.');
 
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
   }
 
   /**
-   * getValues() method (get Address fields)
+   * GetValues() method (get Address fields)
    */
-  function testGetValues() {
-    $contactId = Contact::createIndividual();
+  public function testGetValues() {
+    $contactId = $this->individualCreate();
 
     $params = array();
     $params['address']['1'] = array(
@@ -279,13 +270,13 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
     $this->assertEquals($address[1]['id'], $addressId);
     $this->assertEquals($address[1]['contact_id'], $contactId);
     $this->assertEquals($address[1]['street_address'], 'Oberoi Garden');
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
   }
 
   /**
-   * parseStreetAddress() method (get street address parsed)
+   * ParseStreetAddress() method (get street address parsed)
    */
-  function testParseStreetAddress() {
+  public function testParseStreetAddress() {
 
     // valid Street address to be parsed ( without locale )
     $street_address = "54A Excelsior Ave. Apt 1C";
@@ -296,8 +287,8 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
     $this->assertEquals($parsedStreetAddress['street_number_suffix'], 'A');
 
     // valid Street address to be parsed ( $locale = 'en_US' )
-    $street_address      = "54A Excelsior Ave. Apt 1C";
-    $locale              = 'en_US';
+    $street_address = "54A Excelsior Ave. Apt 1C";
+    $locale = 'en_US';
     $parsedStreetAddress = CRM_Core_BAO_Address::parseStreetAddress($street_address, $locale);
     $this->assertEquals($parsedStreetAddress['street_name'], 'Excelsior Ave.');
     $this->assertEquals($parsedStreetAddress['street_unit'], 'Apt 1C');
@@ -305,8 +296,8 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
     $this->assertEquals($parsedStreetAddress['street_number_suffix'], 'A');
 
     // invalid Street address ( $locale = 'en_US' )
-    $street_address      = "West St. Apt 1";
-    $locale              = 'en_US';
+    $street_address = "West St. Apt 1";
+    $locale = 'en_US';
     $parsedStreetAddress = CRM_Core_BAO_Address::parseStreetAddress($street_address, $locale);
     $this->assertEquals($parsedStreetAddress['street_name'], 'West St.');
     $this->assertEquals($parsedStreetAddress['street_unit'], 'Apt 1');
@@ -314,8 +305,8 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
     $this->assertNotContains('street_number_suffix', $parsedStreetAddress);
 
     // valid Street address to be parsed ( $locale = 'fr_CA' )
-    $street_address      = "2-123CA Main St";
-    $locale              = 'fr_CA';
+    $street_address = "2-123CA Main St";
+    $locale = 'fr_CA';
     $parsedStreetAddress = CRM_Core_BAO_Address::parseStreetAddress($street_address, $locale);
     $this->assertEquals($parsedStreetAddress['street_name'], 'Main St');
     $this->assertEquals($parsedStreetAddress['street_unit'], '2');
@@ -323,14 +314,13 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
     $this->assertEquals($parsedStreetAddress['street_number_suffix'], 'CA');
 
     // invalid Street address ( $locale = 'fr_CA' )
-    $street_address      = "123 Main St";
-    $locale              = 'fr_CA';
+    $street_address = "123 Main St";
+    $locale = 'fr_CA';
     $parsedStreetAddress = CRM_Core_BAO_Address::parseStreetAddress($street_address, $locale);
     $this->assertEquals($parsedStreetAddress['street_name'], 'Main St');
     $this->assertEquals($parsedStreetAddress['street_number'], '123');
     $this->assertNotContains('street_unit', $parsedStreetAddress);
     $this->assertNotContains('street_number_suffix', $parsedStreetAddress);
   }
+
 }
-
-

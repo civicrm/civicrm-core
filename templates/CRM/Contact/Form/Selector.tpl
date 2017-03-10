@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -26,7 +26,7 @@
 {include file="CRM/common/pager.tpl" location="top"}
 
 {include file="CRM/common/pagerAToZ.tpl"}
-<a href="#" onclick=" return toggleContactSelection( 'resetSel', 'civicrm search {$qfKey}', 'reset' );">{ts}Reset all selections{/ts}</a>
+<a href="#" class="crm-selection-reset crm-hover-button"><i class="crm-i fa-times-circle-o"></i> {ts}Reset all selections{/ts}</a>
 
 <table summary="{ts}Search results listings.{/ts}" class="selector row-highlight">
   <thead class="sticky">
@@ -146,62 +146,15 @@
 
 <script type="text/javascript">
   {literal}
-  cj(function($) {
-    cj("#toggleSelect, input[id^=mark_x_]").prop('checked', false);
-    var cids = [];
-    var i = 0;
-    {/literal}
-    {foreach from=$selectedContactIds item=selectedContactId}
-      cids[i++] = "#mark_x_{$selectedContactId}";
-    {/foreach}
-    {literal}
-    $(cids.join(',')).prop('checked', true);
+  CRM.$(function($) {
+    // Clear any old selection that may be lingering in quickform
+    $("input.select-row, input.select-rows", 'form.crm-search-form').prop('checked', false).closest('tr').removeClass('crm-row-selected');
+    // Retrieve stored checkboxes
+    var cids = {/literal}{$selectedContactIds|@json_encode}{literal};
     if (cids.length > 0) {
-      $('input[name=radio_ts][value=ts_sel]').prop('checked', true);
+      $('#mark_x_' + cids.join(',#mark_x_') + ',input[name=radio_ts][value=ts_sel]').prop('checked', true);
     }
-    var params = {getCount: cids.length};
-    countSelections(params);
   });
-function countSelections(obj) {
-  var label = cj('label[for*=ts_sel]');
-  if (typeof(obj) == 'undefined') {
-    return parseInt(cj('span', label).text());
-  }
-  if (obj && typeof(obj.getCount) != 'undefined' && label.length > 0) {
-    if (cj('span', label).length < 1) {
-      label.prepend('<span>' + obj.getCount + '</span> ');
-    }
-    else {
-      cj('span', label).html(obj.getCount);
-    }
-    toggleTaskAction(obj.getCount);
-  }
-}
-function toggleContactSelection(name, qfKey, selection) {
-  var url = CRM.url('civicrm/ajax/markSelection');
-  var params = {qfKey: qfKey};
-  if (!(cj('#' + name).is(':checked'))) {
-    params.action = 'unselect';
-    params.state = 'unchecked';
-  }
-  if (selection == 'multiple') {
-     var rowArr = new Array( );
-     {/literal}{foreach from=$rows item=row  key=keyVal}
-     {literal}rowArr[{/literal}{$keyVal}{literal}] = '{/literal}{$row.checkbox}{literal}';
-     {/literal}{/foreach}{literal}
-     params.name = rowArr.join('-');
-     params.variableType = 'multiple';
-  }
-  else if (name == 'resetSel' && selection == 'reset') {
-    params.variableType = 'multiple';
-    cj("#toggleSelect, input[id^=mark_x_]").prop('checked', false);
-  }
-  else {
-    params.name = name;
-  }
-  cj.getJSON(url, params, countSelections);
-  return false;
-}
 {/literal}
 </script>
 {include file="CRM/common/pager.tpl" location="bottom"}

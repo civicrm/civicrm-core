@@ -1,10 +1,9 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,53 +23,62 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
-
-/**
- * File for the CiviCRM APIv3 product functions
- *
- * @package CiviCRM_APIv3
- * @subpackage API_product
- *
  */
 
 /**
- * Save a product
+ * This api exposes CiviCRM premium products.
  *
- * Allowed @params array keys are:
- * {@getfields product_create}
- * @example productCreate.php
+ * Premiums are used as incentive gifts on contribution pages.
+ * Use chaining to create a premium and related products in one api call.
  *
- * @return array of newly created product property values.
- * @access public
+ * @package CiviCRM_APIv3
+ */
+
+/**
+ * Save a product.
+ *
+ * @param array $params
+ *
+ * @throws API_Exception
+ * @return array
  */
 function civicrm_api3_product_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
- * Get a product
+ * Adjust Metadata for Create action.
  *
- * Allowed @params array keys are:
- * {@getfields product_get}
- * @example productCreate.php
+ * The metadata is used for setting defaults, documentation & validation.
  *
- * @return array of retrieved product property values.
- * @access public
+ * @param array $params
+ *   Array of parameters determined by getfields.
+ */
+function _civicrm_api3_product_create_spec(&$params) {
+  $params['is_active']['api.default'] = 1;
+  $params['name']['api.required'] = 1;
+}
+
+/**
+ * Get a product.
+ *
+ * @param array $params
+ *
+ * @return array
+ *   Array of retrieved product property values.
  */
 function civicrm_api3_product_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
- * Delete a product
+ * Delete a product.
  *
- * Allowed @params array keys are:
- * {@getfields product_delete}
- * @example productCreate.php
+ * @param array $params
  *
- * @return array of deleted values.
- * @access public
+ * @throws API_Exception
+ * @return array
+ *   Array of deleted values.
  */
 function civicrm_api3_product_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);

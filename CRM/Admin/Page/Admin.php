@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,38 +23,30 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
- * Page for displaying Administer CiviCRM Control Panel
+ * Page for displaying Administer CiviCRM Control Panel.
  */
 class CRM_Admin_Page_Admin extends CRM_Core_Page {
-  function run() {
-    $errorMessage = '';
-    // ensure that all CiviCRM tables are InnoDB, else abort
-    // this is not a very fast operation, so we do it randomly 10% of the times
-    // but we do it for most / all tables
-    // http://bugs.mysql.com/bug.php?id=43664
-    if (rand(1, 10) == 3 &&
-      CRM_Core_DAO::isDBMyISAM(150)
-    ) {
-      $errorMessage = ts('Your database is configured to use the MyISAM database engine. CiviCRM requires InnoDB. You will need to convert any MyISAM tables in your database to InnoDB. Using MyISAM tables will result in data integrity issues.');
-      CRM_Core_Session::setStatus($errorMessage, ts('Warning'), "alert");
-    }
+  /**
+   * Run page.
+   *
+   * @return string
+   */
+  public function run() {
+    Civi::resources()->addStyleFile('civicrm', 'css/admin.css');
 
-    if (!CRM_Utils_System::isDBVersionValid($errorMessage)) {
-      CRM_Core_Session::setStatus($errorMessage, ts('Warning'), "alert", array('expires' => 0));
-    }
+    $this->assign('registerSite', htmlspecialchars('https://civicrm.org/register-your-site?src=iam&sid=' . CRM_Utils_System::getSiteID()));
 
-    $groups = array('Customize Data and Screens' => ts('Customize Data and Screens'),
+    $groups = array(
+      'Customize Data and Screens' => ts('Customize Data and Screens'),
       'Communications' => ts('Communications'),
       'Localization' => ts('Localization'),
       'Users and Permissions' => ts('Users and Permissions'),
@@ -104,7 +96,8 @@ class CRM_Admin_Page_Admin extends CRM_Core_Page {
         $adminPanel[$groupId]['show'] = $v['show'];
         $adminPanel[$groupId]['hide'] = $v['hide'];
         $adminPanel[$groupId]['title'] = $title;
-      } else {
+      }
+      else {
         $adminPanel[$groupId] = array();
         $adminPanel[$groupId]['show'] = '';
         $adminPanel[$groupId]['hide'] = '';
@@ -115,5 +108,5 @@ class CRM_Admin_Page_Admin extends CRM_Core_Page {
     $this->_showHide->addToTemplate();
     return parent::run();
   }
-}
 
+}

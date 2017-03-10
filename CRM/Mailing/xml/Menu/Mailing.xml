@@ -15,7 +15,7 @@
     <title>Mailer Settings</title>
     <page_callback>CRM_Admin_Form_Setting_Mail</page_callback>
     <desc>Configure spool period, throttling and other mailer settings.</desc>
-    <access_arguments>access CiviMail</access_arguments>
+    <access_arguments>access CiviCRM,access CiviMail</access_arguments>
     <adminGroup>CiviMail</adminGroup>
     <icon>admin/small/07.png</icon>
     <weight>400</weight>
@@ -25,7 +25,7 @@
     <title>Headers, Footers, and Automated Messages</title>
     <page_callback>CRM_Mailing_Page_Component</page_callback>
     <desc>Configure the header and footer used for mailings. Customize the content of automated Subscribe, Unsubscribe, Resubscribe and Opt-out messages.</desc>
-    <access_arguments>access CiviMail</access_arguments>
+    <access_arguments>access CiviCRM,access CiviMail</access_arguments>
     <adminGroup>CiviMail</adminGroup>
     <icon>admin/small/Profile.png</icon>
     <weight>410</weight>
@@ -44,7 +44,7 @@
     <title>Mail Accounts</title>
     <page_callback>CRM_Admin_Page_MailSettings</page_callback>
     <desc>Configure email account setting.</desc>
-    <access_arguments>access CiviMail</access_arguments>
+    <access_arguments>access CiviCRM,access CiviMail</access_arguments>
     <adminGroup>CiviMail</adminGroup>
     <icon>admin/small/07.png</icon>
     <weight>420</weight>
@@ -103,7 +103,7 @@
   <item>
     <path>civicrm/mailing/unsubscribe</path>
     <title>Unsubscribe</title>
-    <page_callback>CRM_Mailing_Page_Unsubscribe</page_callback>
+    <page_callback>CRM_Mailing_Form_Unsubscribe</page_callback>
     <access_arguments>access CiviMail subscribe/unsubscribe pages</access_arguments>
     <is_public>true</is_public>
     <weight>640</weight>
@@ -118,8 +118,8 @@
   </item>
   <item>
     <path>civicrm/mailing/optout</path>
-    <title>Optout</title>
-    <page_callback>CRM_Mailing_Page_Optout</page_callback>
+    <title>Opt-out</title>
+    <page_callback>CRM_Mailing_Form_Optout</page_callback>
     <access_arguments>access CiviMail subscribe/unsubscribe pages</access_arguments>
     <is_public>true</is_public>
     <weight>650</weight>
@@ -183,13 +183,6 @@
     <access_arguments>access CiviCRM</access_arguments>
   </item>
   <item>
-    <path>civicrm/mailing/schedule</path>
-    <title>Schedule Mailing</title>
-    <page_callback>CRM_Mailing_Form_Schedule</page_callback>
-    <access_arguments>schedule mailings</access_arguments>
-    <weight>700</weight>
-  </item>
-  <item>
     <path>civicrm/mailing/view</path>
     <title>View Mailing</title>
     <page_callback>CRM_Mailing_Page_View</page_callback>
@@ -201,7 +194,7 @@
     <path>civicrm/mailing/approve</path>
     <title>Approve Mailing</title>
     <page_callback>CRM_Mailing_Form_Approve</page_callback>
-    <access_arguments>approve mailings</access_arguments>
+    <access_arguments>access CiviMail;approve mailings</access_arguments>
     <weight>850</weight>
   </item>
   <item>

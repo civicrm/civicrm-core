@@ -9,6 +9,7 @@
   <log>true</log>
   <field>
     <name>id</name>
+    <title>Group Organization ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Relationship ID</comment>
@@ -20,6 +21,7 @@
   </primaryKey>
   <field>
     <name>group_id</name>
+    <title>Group</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>ID of the group</comment>
@@ -42,6 +44,7 @@
   </foreignKey>
   <field>
     <name>organization_id</name>
+    <title>Organization</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>ID of the Organization Contact</comment>

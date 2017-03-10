@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
   <div class="crm-clear crm-inline-block-content" {if $permission EQ 'edit'}title="{ts}Add or edit IM{/ts}"{/if}>
     {if $permission EQ 'edit'}
       <div class="crm-edit-help">
-        <span class="batch-edit"></span>{if empty($im)}{ts}Add IM{/ts}{else}{ts}Add or edit IM{/ts}{/if}
+        <span class="crm-i fa-pencil"></span> {if empty($im)}{ts}Add IM{/ts}{else}{ts}Add or edit IM{/ts}{/if}
       </div>
     {/if}
     {if empty($im)}
@@ -40,9 +40,9 @@
     {foreach from=$im item=item}
       {if $item.name or $item.provider}
         {if $item.name}
-        <div class="crm-summary-row">
+        <div class="crm-summary-row {if $item.is_primary eq 1} primary{/if}">
           <div class="crm-label">{$item.provider}&nbsp;({$item.location_type})</div>
-          <div class="crm-content crm-contact_im {if $item.is_primary eq 1} primary{/if}">{$item.name}</div>
+          <div class="crm-content crm-contact_im">{$item.name}</div>
         </div>
         {/if}
       {/if}

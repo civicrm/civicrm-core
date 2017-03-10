@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,14 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Utils_Migrate_ImportJSON {
 
@@ -38,17 +36,25 @@ class CRM_Utils_Migrate_ImportJSON {
 
   protected $_saveMapping;
 
-  function __construct() {
+  /**
+   * Class constructor.
+   */
+  public function __construct() {
     $this->_lookupCache = array();
     $this->_saveMapping = array();
   }
 
-  function run($file) {
+  /**
+   * Run import.
+   *
+   * @param string $file
+   */
+  public function run($file) {
     $json = file_get_contents($file);
 
     $decodedContacts = json_decode($json);
 
-    //migrate contact data
+    // migrate contact data
     $this->contact($decodedContacts->civicrm_contact);
     $this->email($decodedContacts->civicrm_email);
     $this->phone($decodedContacts->civicrm_phone);
@@ -69,7 +75,10 @@ class CRM_Utils_Migrate_ImportJSON {
     CRM_Core_Config::clearDBCache();
   }
 
-  function contact(&$contact) {
+  /**
+   * @param $contact
+   */
+  public function contact(&$contact) {
     $this->restore($contact,
       'CRM_Contact_DAO_Contact',
       array('id' => 'civicrm_contact'),
@@ -77,28 +86,40 @@ class CRM_Utils_Migrate_ImportJSON {
     );
   }
 
-  function email(&$email) {
+  /**
+   * @param $email
+   */
+  public function email(&$email) {
     $this->restore($email,
       'CRM_Core_DAO_Email',
       array('contact_id' => 'civicrm_contact')
     );
   }
 
-  function phone(&$phone) {
+  /**
+   * @param $phone
+   */
+  public function phone(&$phone) {
     $this->restore($phone,
       'CRM_Core_DAO_Phone',
       array('contact_id' => 'civicrm_contact')
     );
   }
 
-  function address(&$address) {
+  /**
+   * @param $address
+   */
+  public function address(&$address) {
     $this->restore($address,
       'CRM_Core_DAO_Address',
       array('contact_id' => 'civicrm_contact')
     );
   }
 
-  function note(&$note) {
+  /**
+   * @param $note
+   */
+  public function note(&$note) {
     $this->restore($note,
       'CRM_Core_DAO_Note',
       array('contact_id' => 'civicrm_contact'),
@@ -106,7 +127,10 @@ class CRM_Utils_Migrate_ImportJSON {
     );
   }
 
-  function relationship(&$relationship) {
+  /**
+   * @param $relationship
+   */
+  public function relationship(&$relationship) {
     $this->restore($relationship,
       'CRM_Contact_DAO_Relationship',
       array(
@@ -116,7 +140,11 @@ class CRM_Utils_Migrate_ImportJSON {
     );
   }
 
-  function activity($activity, $activityContacts) {
+  /**
+   * @param $activity
+   * @param $activityContacts
+   */
+  public function activity($activity, $activityContacts) {
     $this->restore($activity,
       'CRM_Activity_DAO_Activity',
       NULL,
@@ -132,7 +160,11 @@ class CRM_Utils_Migrate_ImportJSON {
     );
   }
 
-  function group($group, $groupContact) {
+  /**
+   * @param $group
+   * @param $groupContact
+   */
+  public function group($group, $groupContact) {
     $this->restore($group,
       'CRM_Contact_DAO_Group',
       NULL,
@@ -148,7 +180,11 @@ class CRM_Utils_Migrate_ImportJSON {
     );
   }
 
-  function tag($tag, $entityTag) {
+  /**
+   * @param $tag
+   * @param $entityTag
+   */
+  public function tag($tag, $entityTag) {
     $this->restore($tag,
       'CRM_Core_DAO_Tag',
       array(
@@ -166,8 +202,14 @@ class CRM_Utils_Migrate_ImportJSON {
     );
   }
 
-  function restore(&$chunk, $daoName, $lookUpMapping = NULL, $dateFields = NULL) {
-    $object   = new $daoName();
+  /**
+   * @param $chunk
+   * @param string $daoName
+   * @param null $lookUpMapping
+   * @param null $dateFields
+   */
+  public function restore(&$chunk, $daoName, $lookUpMapping = NULL, $dateFields = NULL) {
+    $object = new $daoName();
     $tableName = $object->__table;
 
     if (is_array($lookUpMapping)) {
@@ -185,7 +227,7 @@ class CRM_Utils_Migrate_ImportJSON {
     $columns = $chunk[0];
     foreach ($chunk as $key => $value) {
       if ($key) {
-        $object   = new $daoName();
+        $object = new $daoName();
         foreach ($columns as $k => $column) {
           if ($column == 'id') {
             $childID = $value[$k];
@@ -219,7 +261,7 @@ class CRM_Utils_Migrate_ImportJSON {
     }
   }
 
-  function saveCache() {
+  public function saveCache() {
     $sql = "INSERT INTO civicrm_migration_mapping (master_id, slave_id, entity_table ) VALUES ";
 
     foreach ($this->_lookupCache as $tableName => & $values) {
@@ -237,7 +279,10 @@ class CRM_Utils_Migrate_ImportJSON {
     }
   }
 
-  function populateCache($tableName) {
+  /**
+   * @param string $tableName
+   */
+  public function populateCache($tableName) {
     if (isset($this->_lookupCache[$tableName])) {
       return;
     }
@@ -255,5 +300,5 @@ WHERE entity_table = '{$tableName}'
       $this->_lookupCache[$dao->slave_id] = $dao->master_id;
     }
   }
-}
 
+}

@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -34,7 +34,7 @@ SUMMARY:{$activity->subject|crmICalText}
 CALSCALE:GREGORIAN
 DTSTAMP;VALUE=DATE-TIME:{$smarty.now|date_format:'%Y-%m-%d %H:%M:%S'|crmICalDate}
 DTSTART;VALUE=DATE-TIME:{$activity->activity_date_time|crmICalDate}
-DTEND;VALUE=DATE-TIME:{$activity->activity_date_time|crmICalDate}
+DURATION:PT{$activity->duration}M
 {if $activity->location}
 LOCATION:{$activity->location|crmICalText}
 {/if}

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
  */
@@ -40,7 +40,7 @@
 class CRM_Friend_Form_Contribute extends CRM_Contribute_Form_ContributionPage {
 
   /**
-   * tell a friend id in db
+   * Tell a friend id in db.
    *
    * @var int
    */
@@ -51,17 +51,13 @@ class CRM_Friend_Form_Contribute extends CRM_Contribute_Form_ContributionPage {
   }
 
   /**
-   * This function sets the default values for the form. Note that in edit/view mode
+   * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return void
    */
   public function setDefaultValues() {
-    $title = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage', $this->_id, 'title');
-    CRM_Utils_System::setTitle(ts('Tell a Friend') . " ($title)");
-
     $defaults = array();
 
     if (isset($this->_id)) {
@@ -87,10 +83,9 @@ class CRM_Friend_Form_Contribute extends CRM_Contribute_Form_ContributionPage {
   }
 
   /**
-   * Function to build the form
+   * Build the form object.
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     if (isset($this->_id)) {
@@ -105,9 +100,8 @@ class CRM_Friend_Form_Contribute extends CRM_Contribute_Form_ContributionPage {
   }
 
   /**
-   * Function to process the form
+   * Process the form submission.
    *
-   * @access public
    *
    * @return void
    */
@@ -134,10 +128,9 @@ class CRM_Friend_Form_Contribute extends CRM_Contribute_Form_ContributionPage {
    * Return a descriptive name for the page, used in wizard header
    *
    * @return string
-   * @access public
    */
   public function getTitle() {
     return ts('Tell a Friend');
   }
-}
 
+}

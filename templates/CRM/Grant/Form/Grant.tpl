@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,23 +25,11 @@
 *}
 {* this template is used for adding/editing/deleting grant *}
 
-{if $cdType}
-  {include file="CRM/Custom/Form/CustomData.tpl"}
-{else}
-
-{if $action eq 1 and $context ne 'standalone'}
-   <h3>{ts}New Grant{/ts}</h3>
-{elseif $action eq 2}
-   <h3>{ts}Edit Grant{/ts}</h3>
-{elseif $action eq 8}
-   <h3>{ts}Delete Grant{/ts}</h3>
-{/if}
-
 <div class="crm-block crm-form-block crm-grant-form-block">
   {if $action eq 8}
      <div class="messages status">
          <p><div class="icon inform-icon"></div>&nbsp;
-         {ts}Are you sure you want to delete this Grant?{/ts} {ts}This operation cannot be undone.{/ts}</p>
+         {ts}Are you sure you want to delete this Grant?{/ts} {ts}This action cannot be undone.{/ts}</p>
          <p>{include file="CRM/Grant/Form/Task.tpl"}</p>
      </div>
   {else}
@@ -78,7 +66,7 @@
          <td>{if $hideCalendar neq true}
                       {include file="CRM/common/jcalendar.tpl" elementName=application_received_date}
                    {else}
-                      {$form.application_received_date.html|crmDate}
+                      {$form.application_received_date.value|crmDate}
                    {/if}</td>
       </tr>
       <tr class="crm-grant-form-block-decision_date">
@@ -86,7 +74,7 @@
          <td>{if $hideCalendar neq true}
                       {include file="CRM/common/jcalendar.tpl" elementName=decision_date}
                    {else}
-                      {$form.decision_date.html|crmDate}
+                      {$form.decision_date.value|crmDate}
                    {/if}<br />
                    <span class="description">{ts}Date on which the grant decision was finalized.{/ts}</span></td>
       </tr>
@@ -94,14 +82,14 @@
         <td>{if $hideCalendar neq true}
                        {include file="CRM/common/jcalendar.tpl" elementName=money_transfer_date}
                     {else}
-                       {$form.money_transfer_date.html|crmDate}
+                       {$form.money_transfer_date.value|crmDate}
                     {/if}<br /><span class="description">{ts}Date on which the grant money was transferred.{/ts}</span></td>
       </tr>
       <tr class="crm-grant-form-block-grant_due_date"><td class="label">{$form.grant_due_date.label}</td>
     <td>{if $hideCalendar neq true}
                        {include file="CRM/common/jcalendar.tpl" elementName=grant_due_date}
                     {else}
-                       {$form.grant_due_date.html|crmDate}
+                       {$form.grant_due_date.value|crmDate}
                     {/if}</td>
       </tr>
       <tr class="crm-grant-form-block-grant_report_received">
@@ -124,7 +112,7 @@
 
 {literal}
 <script type="text/javascript">
-    cj( function( ) {
+    CRM.$(function($) {
         {/literal}
         CRM.buildCustomData( '{$customDataType}' );
         {if $customDataSubType}
@@ -133,9 +121,6 @@
         {literal}
     });
 
-    cj(function() {
-       cj().crmAccordions();
-    });
 </script>
 {/literal}
 
@@ -146,5 +131,3 @@
    {/if}
  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>
-
-{/if} {* closing of main custom data if *}

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,13 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
+ * @copyright CiviCRM LLC (c) 2004-2017
  *
  */
 
@@ -40,14 +39,14 @@
 class CRM_Profile_Page_View extends CRM_Core_Page {
 
   /**
-   * The id of the contact
+   * The id of the contact.
    *
    * @var int
    */
   protected $_id;
 
   /**
-   * The group id that we are editing
+   * The group id that we are editing.
    *
    * @var int
    */
@@ -57,10 +56,8 @@ class CRM_Profile_Page_View extends CRM_Core_Page {
    * Heart of the viewing process. The runner gets all the meta data for
    * the contact and calls the appropriate type of page to view.
    *
-   * @return void
-   * @access public
-   *
-   */ function preProcess() {
+   */
+  public function preProcess() {
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive',
       $this, FALSE
     );
@@ -120,8 +117,9 @@ class CRM_Profile_Page_View extends CRM_Core_Page {
         );
       }
       if (CRM_Core_Permission::ufGroupValid($this->_gid,
-          CRM_Core_Permission::SEARCH
-        )) {
+        CRM_Core_Permission::SEARCH
+      )
+      ) {
         $this->assign('listingURL',
           CRM_Utils_System::url("civicrm/profile",
             "force=1&gid={$gidString}"
@@ -163,18 +161,20 @@ class CRM_Profile_Page_View extends CRM_Core_Page {
   }
 
   /**
-   * build the outcome basing on the CRM_Profile_Page_Dynamic's HTML
-   *
-   * @return void
-   * @access public
+   * Build the outcome basing on the CRM_Profile_Page_Dynamic's HTML.
    *
    */
-  function run() {
+  public function run() {
     $this->preProcess();
     return parent::run();
   }
 
-  function checkTemplateFileExists($suffix = '') {
+  /**
+   * @param string $suffix
+   *
+   * @return null|string
+   */
+  public function checkTemplateFileExists($suffix = '') {
     if ($this->_gid) {
       $templateFile = "CRM/Profile/Page/{$this->_gid}/View.{$suffix}tpl";
       $template = CRM_Core_Page::getTemplate();
@@ -194,14 +194,25 @@ class CRM_Profile_Page_View extends CRM_Core_Page {
     return NULL;
   }
 
-  function getTemplateFileName() {
+  /**
+   * Use the form name to create the tpl file name.
+   *
+   * @return string
+   */
+  public function getTemplateFileName() {
     $fileName = $this->checkTemplateFileExists();
     return $fileName ? $fileName : parent::getTemplateFileName();
   }
 
-  function overrideExtraTemplateFileName() {
+  /**
+   * Default extra tpl file basically just replaces .tpl with .extra.tpl
+   * i.e. we dont override
+   *
+   * @return string
+   */
+  public function overrideExtraTemplateFileName() {
     $fileName = $this->checkTemplateFileExists('extra.');
     return $fileName ? $fileName : parent::overrideExtraTemplateFileName();
   }
-}
 
+}

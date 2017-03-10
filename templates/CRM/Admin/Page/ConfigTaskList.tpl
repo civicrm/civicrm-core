@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,16 +25,6 @@
 *}
 {capture assign="linkTitle"}{ts}Edit settings{/ts}{/capture}
 {capture assign="adminMenu"}{crmURL p="civicrm/admin" q="reset=1"}{/capture}
-{if $fromEmailId}
-    {assign var='fromAction' value="&action=update&id=`$fromEmailId`"}
-{else}
-    {assign var='fromAction' value="&action=add"}
-{/if}
-{if $payPalProId}
-    {assign var='defaultPPUrl' value="action=add&pp=`$payPalProId`&reset=1"}
-{else}
-    {assign var='defaultPPUrl' value="reset=1"}
-{/if}
 
 <div id="help" class="description">
     {ts 1=$adminMenu}Use this checklist to review and complete configuration tasks for your site. You will be redirected back to this checklist after saving each setting. Settings which you have not yet reviewed will be <span class="status-overdue">displayed in red</span>. After you have visited a page, the links will <span class="status-pending">display in green</span>  (although you may still need to revisit the page to complete or update the settings). You can access this page again from the <a href="%1">Administer CiviCRM</a> menu at any time.{/ts}
@@ -42,21 +32,23 @@
 
 <table class="selector">
     <tr class="columnheader">
-        <td colspan="2">{ts}Site Configuration{/ts}</td>
+        <td colspan="2">{ts}Site Configuration and Registration{/ts}</td>
     </tr>
     <tr class="even">
         <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/setting/localization" q="reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle}">{ts}Localization{/ts}</a></td>
         <td>{ts}Localization settings include user language, default currency and available countries for address input.{/ts}</td>
     </tr>
     <tr class="even">
-        <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/domain" q="action=update&reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle}">{ts}Organization Address and Contact Info
-        {/ts}</a></td>
+        <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/domain" q="action=update&reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle}">{ts}Organization Address and Contact Info{/ts}</a></td>
         <td>{ts}Organization name, email address for system-generated emails, organization address{/ts}</td>
     </tr>
     <tr class="even">
-        <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/setting/component" q="action=update&reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle}">{ts}Enable components
-        {/ts}</a></td>
+        <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/setting/component" q="action=update&reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle}">{ts}Enable components{/ts}</a></td>
         <td>{ts}Enable the required CiviCRM components.(CiviContribute, CiviEvent etc.){/ts}</td>
+    </tr>
+    <tr class="even">
+        <td class="tasklist nowrap"><a href="{$registerSite}" title="{ts}Register your site at CiviCRM.org. Opens in a new window.{/ts}" target="_blank">{ts}Register your site{/ts}</a></td>
+        <td>{ts}Register your site, join the community, and help CiviCRM remain a leading CRM for organizations worldwide.{/ts}</td>
     </tr>
 
     <tr class="columnheader">
@@ -95,7 +87,7 @@
         <td>{ts}Settings for outbound email - either SMTP server, port and authentication or Sendmail path and argument.{/ts}</td>
     </tr>
     <tr class="even">
-        <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/options/from_email_address" q="reset=1`$fromAction`&civicrmDestination=`$destination`"}" title="{$linkTitle}">{ts}From Email Addresses{/ts}</a></td>
+        <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/options/from_email_address" q="reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle}">{ts}From Email Addresses{/ts}</a></td>
         <td>{ts}Define general email address(es) that can be used as the FROM address when sending email to contacts from within CiviCRM (e.g. info@example.org){/ts}</td>
     </tr>
 
@@ -103,7 +95,7 @@
         <td colspan="2">{ts}Online Contributions / Online Membership Signup / Online Event Registration{/ts}</td>
     </tr>
     <tr class="even">
-        <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/paymentProcessor" q="`$defaultPPUrl`&civicrmDestination=`$destination`"}" title="{$linkTitle}">{ts}Payment Processors{/ts}</a></td>
+        <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/paymentProcessor" q="reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle}">{ts}Payment Processors{/ts}</a></td>
         <td>{ts}Select and configure one or more payment processing services for online contributions, events and / or membership fees.{/ts}</td>
     </tr>
     {if $config->userSystem->is_drupal EQ '1'}
@@ -133,7 +125,7 @@
         <td colspan="2">{ts}Organize your contacts{/ts}</td>
     </tr>
     <tr class="even">
-        <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/tag" q="reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle}">{ts}Tags (Categories){/ts}</a></td>
+        <td class="tasklist nowrap"><a href="{crmURL p="civicrm/tag" q="reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle}">{ts}Tags (Categories){/ts}</a></td>
         <td>{ts}Tags can be assigned to any contact record, and are a convenient way to find contacts. You can create as many tags as needed to organize and segment your records.{/ts}</td>
     </tr>
     <tr class="even">

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,22 +23,29 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Contact_Form_Search_Custom_Proximity extends CRM_Contact_Form_Search_Custom_Base implements CRM_Contact_Form_Search_Interface {
 
   protected $_latitude = NULL;
   protected $_longitude = NULL;
   protected $_distance = NULL;
+  protected $_aclFrom = NULL;
+  protected $_aclWhere = NULL;
 
-  function __construct(&$formValues) {
+  /**
+   * Class constructor.
+   *
+   * @param array $formValues
+   *
+   * @throws Exception
+   */
+  public function __construct(&$formValues) {
     parent::__construct($formValues);
 
     // unset search profile and other search params if set
@@ -91,7 +98,10 @@ class CRM_Contact_Form_Search_Custom_Proximity extends CRM_Contact_Form_Search_C
     );
   }
 
-  function buildForm(&$form) {
+  /**
+   * @param CRM_Core_Form $form
+   */
+  public function buildForm(&$form) {
 
     $config = CRM_Core_Config::singleton();
     $countryDefault = $config->defaultContactCountry;
@@ -115,34 +125,21 @@ class CRM_Contact_Form_Search_Custom_Proximity extends CRM_Contact_Form_Search_C
       'postal_code',
       ts('Postal Code')
     );
-    $stateCountryMap = array();
-    $stateCountryMap[] = array(
-      'state_province' => 'state_province_id',
-      'country' => 'country_id',
-    );
+
     $defaults = array();
     if ($countryDefault) {
-      $stateProvince = array('' => ts('- select -')) + CRM_Core_PseudoConstant::stateProvinceForCountry($countryDefault);
       $defaults['country_id'] = $countryDefault;
     }
-    else {
-      $stateProvince = array('' => ts('- select -')) + CRM_Core_PseudoConstant::stateProvince();
-    }
-    $form->addElement('select', 'state_province_id', ts('State/Province'), $stateProvince);
+    $form->addChainSelect('state_province_id');
 
     $country = array('' => ts('- select -')) + CRM_Core_PseudoConstant::country();
-    $form->add('select', 'country_id', ts('Country'), $country, TRUE);
+    $form->add('select', 'country_id', ts('Country'), $country, TRUE, array('class' => 'crm-select2'));
 
-    $group = array('' => ts('- any group -')) + CRM_Core_PseudoConstant::group();
-    $form->addElement('select', 'group', ts('Group'), $group);
+    $group = array('' => ts('- any group -')) + CRM_Core_PseudoConstant::nestedGroup();
+    $form->addElement('select', 'group', ts('Group'), $group, array('class' => 'crm-select2 huge'));
 
     $tag = array('' => ts('- any tag -')) + CRM_Core_PseudoConstant::get('CRM_Core_DAO_EntityTag', 'tag_id', array('onlyActive' => FALSE));
-    $form->addElement('select', 'tag', ts('Tag'), $tag);
-
-
-    // state country js, CRM-5233
-    CRM_Core_BAO_Address::addStateCountryMap($stateCountryMap);
-    CRM_Core_BAO_Address::fixAllStateSelects($form, $defaults);
+    $form->addElement('select', 'tag', ts('Tag'), $tag, array('class' => 'crm-select2 huge'));
 
     /**
      * You can define a custom title for the search form
@@ -155,18 +152,28 @@ class CRM_Contact_Form_Search_Custom_Proximity extends CRM_Contact_Form_Search_C
      */
     $form->assign('elements', array(
       'distance',
-        'prox_distance_unit',
-        'street_address',
-        'city',
-        'postal_code',
-        'country_id',
-        'state_province_id',
-        'group',
-        'tag',
-      ));
+      'prox_distance_unit',
+      'street_address',
+      'city',
+      'postal_code',
+      'country_id',
+      'state_province_id',
+      'group',
+      'tag',
+    ));
   }
 
-  function all($offset = 0, $rowcount = 0, $sort = NULL,
+  /**
+   * @param int $offset
+   * @param int $rowcount
+   * @param null $sort
+   * @param bool $includeContactIDs
+   * @param bool $justIDs
+   *
+   * @return string
+   */
+  public function all(
+    $offset = 0, $rowcount = 0, $sort = NULL,
     $includeContactIDs = FALSE, $justIDs = FALSE
   ) {
     if ($justIDs) {
@@ -190,13 +197,17 @@ country.name           as country
     );
   }
 
-  function from() {
+  /**
+   * @return string
+   */
+  public function from() {
+    $this->buildACLClause('contact_a');
     $f = "
 FROM      civicrm_contact contact_a
 LEFT JOIN civicrm_address address ON ( address.contact_id       = contact_a.id AND
                                        address.is_primary       = 1 )
 LEFT JOIN civicrm_state_province state_province ON state_province.id = address.state_province_id
-LEFT JOIN civicrm_country country               ON country.id        = address.country_id
+LEFT JOIN civicrm_country country               ON country.id        = address.country_id {$this->_aclFrom}
 ";
 
     // This prevents duplicate rows when contacts have more than one tag any you select "any tag"
@@ -214,7 +225,12 @@ LEFT JOIN civicrm_group_contact cgc ON ( cgc.contact_id = contact_a.id AND cgc.s
     return $f;
   }
 
-  function where($includeContactIDs = FALSE) {
+  /**
+   * @param bool $includeContactIDs
+   *
+   * @return string
+   */
+  public function where($includeContactIDs = FALSE) {
     $params = array();
     $clause = array();
 
@@ -237,14 +253,27 @@ AND cgc.group_id = {$this->_group}
 
     $where .= " AND contact_a.is_deleted != 1 ";
 
+    if ($this->_aclWhere) {
+      $where .= " AND {$this->_aclWhere} ";
+    }
+
     return $this->whereClause($where, $params);
   }
 
-  function templateFile() {
+  /**
+   * @return string
+   */
+  public function templateFile() {
     return 'CRM/Contact/Form/Search/Custom/Proximity.tpl';
   }
 
-  function setDefaultValues() {
+  /**
+   * @return array|null
+   */
+  public function setDefaultValues() {
+    if (!empty($this->_formValues)) {
+      return $this->_formValues;
+    }
     $config = CRM_Core_Config::singleton();
     $countryDefault = $config->defaultContactCountry;
     $stateprovinceDefault = $config->defaultContactStateProvince;
@@ -266,9 +295,16 @@ AND cgc.group_id = {$this->_group}
     return NULL;
   }
 
-  function alterRow(&$row) {}
+  /**
+   * @param $row
+   */
+  public function alterRow(&$row) {
+  }
 
-  function setTitle($title) {
+  /**
+   * @param $title
+   */
+  public function setTitle($title) {
     if ($title) {
       CRM_Utils_System::setTitle($title);
     }
@@ -276,5 +312,12 @@ AND cgc.group_id = {$this->_group}
       CRM_Utils_System::setTitle(ts('Search'));
     }
   }
-}
 
+  /**
+   * @param string $tableAlias
+   */
+  public function buildACLClause($tableAlias = 'contact') {
+    list($this->_aclFrom, $this->_aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause($tableAlias);
+  }
+
+}

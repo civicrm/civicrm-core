@@ -24,15 +24,38 @@
 class CRM_Core_TemporaryErrorScope {
   static $oldFrames;
 
+  /**
+   * @return CRM_Core_TemporaryErrorScope
+   */
   public static function useException() {
+    return self::create(array('CRM_Core_Error', 'exceptionHandler'), 1);
+  }
+
+  /**
+   * @return CRM_Core_TemporaryErrorScope
+   */
+  public static function ignoreException() {
+    return self::create(array('CRM_Core_Error', 'nullHandler'));
+  }
+
+  /**
+   * @param mixed $callback
+   * @param null $modeException
+   *
+   * @return CRM_Core_TemporaryErrorScope
+   */
+  public static function create($callback, $modeException = NULL) {
     $newFrame = array(
       '_PEAR_default_error_mode' => PEAR_ERROR_CALLBACK,
-      '_PEAR_default_error_options' => array('CRM_Core_Error', 'exceptionHandler'),
-      'modeException' => 1,
+      '_PEAR_default_error_options' => $callback,
+      'modeException' => $modeException,
     );
     return new CRM_Core_TemporaryErrorScope($newFrame);
   }
 
+  /**
+   * @param $newFrame
+   */
   public function __construct($newFrame) {
     self::$oldFrames[] = self::getActive();
     self::setActive($newFrame);
@@ -49,17 +72,20 @@ class CRM_Core_TemporaryErrorScope {
   public static function getActive() {
     return array(
       '_PEAR_default_error_mode' => $GLOBALS['_PEAR_default_error_mode'],
-      '_PEAR_default_error_options' =>$GLOBALS['_PEAR_default_error_options'],
+      '_PEAR_default_error_options' => $GLOBALS['_PEAR_default_error_options'],
       'modeException' => CRM_Core_Error::$modeException,
     );
   }
 
   /**
    * Set the active error-handler settings
+   *
+   * @param string $frame
    */
   public static function setActive($frame) {
     $GLOBALS['_PEAR_default_error_mode'] = $frame['_PEAR_default_error_mode'];
     $GLOBALS['_PEAR_default_error_options'] = $frame['_PEAR_default_error_options'];
     CRM_Core_Error::$modeException = $frame['modeException'];
   }
+
 }

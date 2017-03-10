@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,37 +23,34 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
- * This class is for activity assignment functions
- *
+ * This class is for activity assignment functions.
  */
 class CRM_Activity_BAO_ActivityContact extends CRM_Activity_DAO_ActivityContact {
 
   /**
-   * class constructor
+   * Class constructor.
    */
-  function __construct() {
+  public function __construct() {
     parent::__construct();
   }
 
   /**
-   * funtion to add activity contact
+   * Function to add activity contact.
    *
-   * @param array  $params      the values for this table: activity id, contact id, record type
+   * @param array $params
+   *   The values for this table: activity id, contact id, record type.
    *
-   * @return object activity_contact object
-   * @access public
-   *
+   * @return object
+   *   activity_contact object
    */
   public static function create(&$params) {
     $activityContact = new CRM_Activity_DAO_ActivityContact();
@@ -66,19 +63,17 @@ class CRM_Activity_BAO_ActivityContact extends CRM_Activity_DAO_ActivityContact 
   }
 
   /**
-   * function to retrieve names of contact by activity_id
+   * Retrieve names of contact by activity_id.
    *
-   * @param int    $id   ID of the activity
-   * @param string $type type of interaction
+   * @param int $activityID
+   * @param int $recordTypeID
+   * @param bool $alsoIDs
    *
    * @return array
-   *
-   * @access public
-   *
    */
-  static function getNames($activityID, $recordTypeID, $alsoIDs = FALSE) {
+  public static function getNames($activityID, $recordTypeID, $alsoIDs = FALSE) {
     $names = array();
-    $ids   = array();
+    $ids = array();
 
     if (empty($activityID)) {
       return $alsoIDs ? array($names, $ids) : $names;
@@ -94,7 +89,7 @@ AND        contact_a.is_deleted = 0
 ";
     $params = array(
       1 => array($activityID, 'Integer'),
-      2 => array($recordTypeID, 'Integer')
+      2 => array($recordTypeID, 'Integer'),
     );
 
     $dao = CRM_Core_DAO::executeQuery($query, $params);
@@ -107,19 +102,18 @@ AND        contact_a.is_deleted = 0
   }
 
   /**
-   * function to retrieve id of target contact by activity_id
+   * Retrieve id of target contact by activity_id.
    *
-   * @param int    $id  ID of the activity
+   * @param int $activityID
+   * @param int $recordTypeID
    *
    * @return mixed
-   *
-   * @access public
-   *
    */
-  static function retrieveContactIdsByActivityId($activityID, $recordTypeID) {
+  public static function retrieveContactIdsByActivityId($activityID, $recordTypeID) {
     $activityContact = array();
     if (!CRM_Utils_Rule::positiveInteger($activityID) ||
-        !CRM_Utils_Rule::positiveInteger($recordTypeID)) {
+      !CRM_Utils_Rule::positiveInteger($recordTypeID)
+    ) {
       return $activityContact;
     }
 
@@ -132,7 +126,7 @@ AND        civicrm_contact.is_deleted = 0
 ";
     $params = array(
       1 => array($activityID, 'Integer'),
-      2 => array($recordTypeID, 'Integer')
+      2 => array($recordTypeID, 'Integer'),
     );
 
     $dao = CRM_Core_DAO::executeQuery($sql, $params);
@@ -142,8 +136,24 @@ AND        civicrm_contact.is_deleted = 0
     return $activityContact;
   }
 
-  function links() {
+  /**
+   * Get the links associate array  as defined by the links.ini file.
+   *
+   * Experimental... -
+   * Should look a bit like
+   *       [local_col_name] => "related_tablename:related_col_name"
+   *
+   * @see DB_DataObject::getLinks()
+   * @see DB_DataObject::getLink()
+   *
+   * @return array|null
+   *           array       = if there are links defined for this table.
+   *           empty array - if there is a links.ini file, but no links on this table
+   *           null        - if no links.ini exists for this database (hence try auto_links).
+   */
+  public function links() {
     $link = array('activity_id' => 'civicrm_activity:id');
     return $link;
   }
+
 }

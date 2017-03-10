@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,14 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -39,52 +37,70 @@
 class CRM_Utils_Time {
 
   /**
-   * @var int, the seconds offset from the real world time
+   * @var int
+   *   the seconds offset from the real world time
    */
   static private $_delta = 0;
 
   /**
-   * get the time
+   * Get the time.
    *
-   * @param string $returnFormat format in which date is to be retrieved
+   * @param string $returnFormat
+   *   Format in which date is to be retrieved.
    *
    * @return date
-   *
-   * @static
    */
-  static function getTime($returnFormat = 'YmdHis') {
+  public static function getTime($returnFormat = 'YmdHis') {
     return date($returnFormat, self::getTimeRaw());
   }
 
   /**
-   * Get the time
+   * Get the time.
    *
-   * @return int, seconds since epoch
+   * @return int
+   *   seconds since epoch
    */
-  static function getTimeRaw() {
+  public static function getTimeRaw() {
     return time() + self::$_delta;
   }
 
   /**
-   * set the given time
+   * Set the given time.
    *
-   * @param string $newDateTime  a date formatted with strtotime
-   * @param string $returnFormat format in which date is to be retrieved
+   * @param string $newDateTime
+   *   A date formatted with strtotime.
+   * @param string $returnFormat
+   *   Format in which date is to be retrieved.
    *
    * @return date
-   *
-   * @static
    */
-  static function setTime($newDateTime, $returnFormat = 'YmdHis') {
+  public static function setTime($newDateTime, $returnFormat = 'YmdHis') {
     self::$_delta = strtotime($newDateTime) - time();
     return self::getTime($returnFormat);
   }
 
   /**
-   * Remove any time overrides
+   * Remove any time overrides.
    */
-  static function resetTime() {
+  public static function resetTime() {
     self::$_delta = 0;
   }
-}
 
+  /**
+   * Approximate time-comparison. $a and $b are considered equal if they
+   * are within $threshold seconds of each other.
+   *
+   * @param string $a
+   *   Time which can be parsed by strtotime.
+   * @param string $b
+   *   Time which can be parsed by strtotime.
+   * @param int $threshold
+   *   Maximum allowed difference (in seconds).
+   * @return bool
+   */
+  public static function isEqual($a, $b, $threshold = 0) {
+    $diff = strtotime($b) - strtotime($a);
+    return (abs($diff) <= $threshold);
+  }
+
+}

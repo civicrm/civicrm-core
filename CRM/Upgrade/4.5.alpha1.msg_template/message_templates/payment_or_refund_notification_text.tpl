@@ -30,6 +30,7 @@ Dear {$contactDisplayName}
 {ts}This Payment Amount{/ts}: {$paymentAmount|crmMoney}
 ------------------------------------------------------------------------------------
 {ts}Balance Owed{/ts}: {$amountOwed|crmMoney} {* This will be zero after final payment. *}
+
 {if $paymentsComplete}
 
 {ts}Thank-you. This completes your payment for {/ts}{if $component eq 'event'}{$event.event_title}{/if}.
@@ -47,7 +48,7 @@ Dear {$contactDisplayName}
 {if $checkNumber}
 {ts}Check Number{/ts}: {$checkNumber}
 {/if}
-{if $contributeMode ne 'notify' and !$isAmountzero}
+{if $contributeMode eq 'direct' and !$isAmountzero}
 
 ===============================================================================
 

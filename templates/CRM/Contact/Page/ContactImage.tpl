@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,9 +25,7 @@
 *}
 {* This form is for displaying contact Image *}
 <div class="crm-contact_image crm-contact_image-block">
-  <a href="{$imageURL}" class='crm-image-popup'>
-    <img src="{$imageURL}" height={$imageThumbHeight} width={$imageThumbWidth}>
-  </a>
+  {$imageURL}
 </div>
 {if $action eq 0 or $action eq 2}
   <div class='crm-contact_image-block crm-contact_image crm-contact_image-delete'>{$deleteURL}</div>

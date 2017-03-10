@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,14 +23,11 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
- *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id: $
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -40,9 +37,15 @@ class CRM_Utils_Network {
   /**
    * Try connecting to a TCP service; if it fails, retry. Repeat until serverStartupTimeOut elapses.
    *
-   * @param int $serverStartupTimeOut seconds
-   * @param float $interval seconds to wait in between pollings
-   * @return bool TRUE if service is online
+   * @param $host
+   * @param $port
+   * @param int $serverStartupTimeOut
+   *   Seconds.
+   * @param float $interval
+   *   Seconds to wait in between pollings.
+   *
+   * @return bool
+   *   TRUE if service is online
    */
   public static function waitForServiceStartup($host, $port, $serverStartupTimeOut, $interval = 0.333) {
     $start = time();
@@ -61,7 +64,13 @@ class CRM_Utils_Network {
   }
 
   /**
-   * Check whether a TCP service is available on $host and $port
+   * Check whether a TCP service is available on $host and $port.
+   *
+   * @param string $host
+   * @param string $port
+   * @param string $serverConnectionTimeOut
+   *
+   * @return bool
    */
   public static function checkService($host, $port, $serverConnectionTimeOut) {
     $old_error_reporting = error_reporting();
@@ -73,9 +82,11 @@ class CRM_Utils_Network {
         error_reporting($old_error_reporting);
         return TRUE;
       }
-    } catch (Exception $e) {
+    }
+    catch (Exception $e) {
     }
     error_reporting($old_error_reporting);
     return FALSE;
   }
+
 }

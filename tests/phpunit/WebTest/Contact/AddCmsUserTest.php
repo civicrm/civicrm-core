@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,16 +22,20 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Contact_AddCmsUserTest
+ */
 class WebTest_Contact_AddCmsUserTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
     parent::setUp();
   }
 
-  function testAuthenticAddUser() {
+  public function testAuthenticAddUser() {
 
     $this->webtestLogin('admin');
 
@@ -64,7 +68,7 @@ class WebTest_Contact_AddCmsUserTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
   }
 
-  function testAnonymousAddUser() {
+  public function testAnonymousAddUser() {
     // Make sure Drupal account settings allow visitors to register for account w/o admin approval
     // login as admin
     $this->webtestLogin('admin');
@@ -97,7 +101,7 @@ class WebTest_Contact_AddCmsUserTest extends CiviSeleniumTestCase {
     $this->type('street_address-1', '902C El Camino Way SW');
     $this->type('city-1', 'Dumfries');
     $this->type('postal_code-1', '1234');
-    $this->assertTrue($this->isTextPresent('United States'));
+    $this->assertTrue($this->isTextPresent('UNITED STATES'));
     $this->select('state_province-1', 'value=1019');
 
     $this->click('edit-submit');
@@ -119,5 +123,5 @@ class WebTest_Contact_AddCmsUserTest extends CiviSeleniumTestCase {
     $this->assertElementContainsText('css=.crm-search-results', 'Dumfries');
     $this->assertElementContainsText('css=.crm-search-results', '1234');
   }
-}
 
+}

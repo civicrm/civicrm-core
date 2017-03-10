@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -63,7 +63,7 @@
     {/if}
      <tr>
         <td>
-     <table id="address_{$blockId}" style="display:block" class="form-layout-compressed">
+     <table id="address_table_{$blockId}" class="form-layout-compressed">
          {* build address block w/ address sequence. *}
          {foreach item=addressElement from=$addressSequence}
               {include file=CRM/Contact/Form/Edit/Address/$addressElement.tpl}
@@ -81,7 +81,7 @@
 
   {if $className eq 'CRM_Contact_Form_Contact'}
       <div id="addMoreAddress{$blockId}" class="crm-add-address-wrapper">
-          <a href="#" class="button" onclick="buildAdditionalBlocks( 'Address', '{$className}' );return false;"><span><div class="icon add-icon"></div>{ts}Another Address{/ts}</span></a>
+          <a href="#" class="button" onclick="buildAdditionalBlocks( 'Address', '{$className}' );return false;"><span><i class="crm-i fa-plus-circle"></i> {ts}Another Address{/ts}</span></a>
       </div>
   {/if}
 
@@ -109,11 +109,3 @@ function checkLocation( object, noAlert ) {
 }
 </script>
 {/literal}
-{literal}
-<script type="text/javascript">
-cj(function() {
-   cj().crmAccordions();
-});
-</script>
-{/literal}
-

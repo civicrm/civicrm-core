@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,35 +23,39 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Mailing_MailStore {
   // flag to decide whether to print debug messages
   var $_debug = FALSE;
 
   /**
-   * Return the proper mail store implementation, based on config settings
+   * Return the proper mail store implementation, based on config settings.
    *
-   * @param  string $name  name of the settings set from civimail_mail_settings to use (null for default)
+   * @param string $name
+   *   Name of the settings set from civimail_mail_settings to use (null for default).
    *
-   * @return object        mail store implementation for processing CiviMail-bound emails
+   * @throws Exception
+   * @return object
+   *   mail store implementation for processing CiviMail-bound emails
    */
-  function getStore($name = NULL) {
-    $dao               = new CRM_Core_DAO_MailSettings;
-    $dao->domain_id    = CRM_Core_Config::domainID();
+  public static function getStore($name = NULL) {
+    $dao = new CRM_Core_DAO_MailSettings();
+    $dao->domain_id = CRM_Core_Config::domainID();
     $name ? $dao->name = $name : $dao->is_default = 1;
     if (!$dao->find(TRUE)) {
       throw new Exception("Could not find entry named $name in civicrm_mail_settings");
     }
 
     $protocols = CRM_Core_PseudoConstant::get('CRM_Core_DAO_MailSettings', 'protocol');
+    if (empty($protocols[$dao->protocol])) {
+      throw new Exception("Empty mail protocol");
+    }
 
     switch ($protocols[$dao->protocol]) {
       case 'IMAP':
@@ -78,32 +82,35 @@ class CRM_Mailing_MailStore {
   }
 
   /**
-   * Return all emails in the mail store
+   * Return all emails in the mail store.
    *
-   * @return array  array of ezcMail objects
+   * @return array
+   *   array of ezcMail objects
    */
-  function allMails() {
+  public function allMails() {
     return $this->fetchNext(0);
   }
 
   /**
-   * Expunge the messages marked for deletion; stub function to be redefined by IMAP store
+   * Expunge the messages marked for deletion; stub function to be redefined by IMAP store.
    */
-  function expunge() {}
+  public function expunge() {
+  }
 
   /**
-   * Return the next X messages from the mail store
+   * Return the next X messages from the mail store.
    *
-   * @param int $count  number of messages to fetch (0 to fetch all)
+   * @param int $count
+   *   Number of messages to fetch (0 to fetch all).
    *
-   * @return array      array of ezcMail objects
+   * @return array
+   *   array of ezcMail objects
    */
-  function fetchNext($count = 1) {
+  public function fetchNext($count = 1) {
+    $offset = 1;
     if (isset($this->_transport->options->uidReferencing) and $this->_transport->options->uidReferencing) {
-      $offset = array_shift($this->_transport->listUniqueIdentifiers());
-    }
-    else {
-      $offset = 1;
+      $offset = $this->_transport->listUniqueIdentifiers();
+      $offset = array_shift($offset);
     }
     try {
       $set = $this->_transport->fetchFromOffset($offset, $count);
@@ -111,14 +118,14 @@ class CRM_Mailing_MailStore {
         print "fetching $count messages\n";
       }
     }
-    catch(ezcMailOffsetOutOfRangeException$e) {
+    catch (ezcMailOffsetOutOfRangeException$e) {
       if ($this->_debug) {
         print "got to the end of the mailbox\n";
       }
       return array();
     }
     $mails = array();
-    $parser = new ezcMailParser;
+    $parser = new ezcMailParser();
     //set property text attachment as file CRM-5408
     $parser->options->parseTextAttachmentsAsFiles = TRUE;
 
@@ -135,15 +142,21 @@ class CRM_Mailing_MailStore {
   /**
    * Point to (and create if needed) a local Maildir for storing retrieved mail
    *
-   * @param string $name  name of the Maildir
+   * @param string $name
+   *   Name of the Maildir.
    *
-   * @return string       path to the Maildir's cur directory
+   * @throws Exception
+   * @return string
+   *   path to the Maildir's cur directory
    */
-  function maildir($name) {
+  public function maildir($name) {
     $config = CRM_Core_Config::singleton();
     $dir = $config->customFileUploadDir . DIRECTORY_SEPARATOR . $name;
     foreach (array(
-      'cur', 'new', 'tmp') as $sub) {
+               'cur',
+               'new',
+               'tmp',
+             ) as $sub) {
       if (!file_exists($dir . DIRECTORY_SEPARATOR . $sub)) {
         if ($this->_debug) {
           print "creating $dir/$sub\n";
@@ -155,5 +168,5 @@ class CRM_Mailing_MailStore {
     }
     return $dir . DIRECTORY_SEPARATOR . 'cur';
   }
-}
 
+}

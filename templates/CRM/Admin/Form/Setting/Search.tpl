@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -37,6 +37,12 @@
             <td>{$form.includeEmailInName.html}<br />
                 <span class="description">{ts}If enabled, email addresses are automatically included when users search by Name. Disabling this feature will speed up search significantly for larger databases, but users will need to use the Email search fields (from Advanced Search, Search Builder, or Profiles) to find contacts by email address.{/ts}</span></td>
         </tr>
+        <tr class="crm-search-setting-form-block-searchPrimaryDetailsOnly">
+            <td class="label">{$form.searchPrimaryDetailsOnly.label}</td>
+            <td>{$form.searchPrimaryDetailsOnly.html}<br />
+                <span class="description">{ts}If enabled, only primary details (eg contact's primary email, phone, etc) will be included in Basic and Advanced Search results. Disabling this feature will allow users to match contacts using any email, phone etc detail.{/ts}</span>
+            </td>
+        </tr>
         <tr  class="crm-search-setting-form-block-includeNickNameInName">
             <td class="label">{$form.includeNickNameInName.label}</td>
             <td>{$form.includeNickNameInName.html}<br />
@@ -63,13 +69,13 @@
                 <span class="description">{ts}The number of minutes to cache smart group contacts. We strongly recommend that this value be greater than zero, since a value of zero means no caching at all. If your contact data changes frequently, you should set this value to at least 5 minutes.{/ts}</span></td>
         </tr>
         <tr class="crm-search-setting-form-block-autocompleteContactSearch">
-            <td class="label">{$form.autocompleteContactSearch.label}</td>
-            <td>{$form.autocompleteContactSearch.html}<br/>
+            <td class="label">{$form.contact_autocomplete_options.label}</td>
+            <td>{$form.contact_autocomplete_options.html}<br/>
             <span class="description">{ts}Selected fields will be displayed in back-office autocomplete dropdown search results (Quick Search, etc.). Contact Name is always included.{/ts}</span></td>
         </tr>
         <tr class="crm-search-setting-form-block-autocompleteContactReference">
-            <td class="label">{$form.autocompleteContactReference.label}</td>
-            <td>{$form.autocompleteContactReference.html}<br/>
+            <td class="label">{$form.contact_reference_options.label}</td>
+            <td>{$form.contact_reference_options.html}<br/>
             <span class="description">{ts}Selected fields will be displayed in autocomplete dropdown search results for 'Contact Reference' custom fields. Contact Name is always included. NOTE: You must assign 'access contact reference fields' permission to the anonymous role if you want to use custom contact reference fields in profiles on public pages. For most situations, you should use the 'Limit List to Group' setting when configuring a contact reference field which will be used in public forms to prevent exposing your entire contact list.{/ts}</span></td>
         </tr>
         <tr class="crm-search-setting-form-block-search_autocomplete_count">
@@ -77,6 +83,14 @@
             <td>{$form.search_autocomplete_count.html}<br />
             <span class="description">{ts}The maximum number of contacts to show at a time when typing in an autocomplete field.{/ts}</span></td>
         </tr>
+        <tr class="crm-miscellaneous-form-block-enable_innodb_fts">
+            <td class="label">{$form.enable_innodb_fts.label}</td>
+            <td>{$form.enable_innodb_fts.html}<br />
+                <p class="description">{$enable_innodb_fts_description}</p>
+            </td>
+        </tr>
+
+
        </table>
             <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 

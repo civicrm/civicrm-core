@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Core</base>
+  <class>SystemLog</class>
+  <name>civicrm_system_log</name>
+  <add>4.5</add>
+  <field>
+    <name>id</name>
+    <type>int unsigned</type>
+    <title>System Log ID</title>
+    <required>true</required>
+    <comment>Primary key ID</comment>
+    <add>4.4</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>message</name>
+    <title>System Log Message</title>
+    <required>true</required>
+    <type>varchar</type>
+    <length>128</length>
+    <comment>Standardized message</comment>
+    <add>4.5</add>
+  </field>
+  <field>
+    <name>context</name>
+    <title>Detailed Log Data</title>
+    <type>longtext</type>
+    <comment>JSON encoded data</comment>
+    <add>4.5</add>
+  </field>
+  <field>
+    <name>level</name>
+    <title>Detailed Log Data</title>
+    <comment>error level per PSR3</comment>
+    <type>varchar</type>
+    <length>9</length>
+    <default>'info'</default>
+    <add>4.5</add>
+  </field>
+  <field>
+    <name>timestamp</name>
+    <title>Log Timestamp</title>
+    <type>timestamp</type>
+    <comment>Timestamp of when event occurred.</comment>
+    <default>CURRENT_TIMESTAMP</default>
+    <add>4.5</add>
+  </field>
+  <field>
+    <name>contact_id</name>
+    <title>Log Contact ID</title>
+    <type>int unsigned</type>
+    <length>11</length>
+    <comment>Optional Contact ID that created the log. Not an FK as we keep this regardless</comment>
+    <add>4.5</add>
+  </field>
+  <field>
+    <name>hostname</name>
+    <title>Log Host</title>
+    <type>varchar</type>
+    <length>128</length>
+    <comment>Optional Name of logging host</comment>
+    <add>4.5</add>
+  </field>
+</table>

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
  */
@@ -40,17 +40,18 @@
 class CRM_Event_StateMachine_Registration extends CRM_Core_StateMachine {
 
   /**
-   * class constructor
+   * Class constructor.
    *
-   * @param object  CRM_Event_Controller
-   * @param int     $action
+   * @param object $controller
+   * @param \const|int $action
    *
-   * @return object CRM_Event_StateMachine
+   * @return \CRM_Event_StateMachine_Registration CRM_Event_StateMachine
    */
-  function __construct($controller, $action = CRM_Core_Action::NONE) {
+  public function __construct($controller, $action = CRM_Core_Action::NONE) {
     parent::__construct($controller, $action);
     $id = CRM_Utils_Request::retrieve('id', 'Positive', $controller, TRUE);
     $is_monetary = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $id, 'is_monetary');
+    $is_confirm_enabled = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $id, 'is_confirm_enabled');
 
     $pages = array('CRM_Event_Form_Registration_Register' => NULL);
 
@@ -89,11 +90,12 @@ class CRM_Event_StateMachine_Registration extends CRM_Core_StateMachine {
 
     $pages = array_merge($pages, $additionalPages);
 
-    if (!$is_monetary) {
+    // CRM-11182 - Optional confirmation screen
+    if (!$is_confirm_enabled && !$is_monetary) {
       unset($pages['CRM_Event_Form_Registration_Confirm']);
     }
 
     $this->addSequentialPages($pages, $action);
   }
-}
 
+}

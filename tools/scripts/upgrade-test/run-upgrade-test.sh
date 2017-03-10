@@ -2,13 +2,13 @@
 
 SELF=$(cd $(dirname $0); pwd -P)/$(basename $0)
 
-# define your database name here, will be overriden by 
+# define your database name here, will be overriden by
 # FIRST command line argument if given
 DBNAME=
-# define your database usernamename here, will be overriden by 
+# define your database usernamename here, will be overriden by
 # SECOND command line argument if given
 DBUSER=
-# define your database password here, will be overriden by 
+# define your database password here, will be overriden by
 # THIRD command line argument if given
 DBPASS=
 

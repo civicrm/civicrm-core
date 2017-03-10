@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.1                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2010                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -84,6 +84,10 @@ function run() {
   processPhones($config, $prefix);
 }
 
+/**
+ * @param $config
+ * @param null $prefix
+ */
 function processPhones(&$config, $prefix = NULL) {
   // ignore null phones and phones that already match what we are doing
   $query = "
@@ -113,6 +117,12 @@ AND        phone NOT REGEXP '^[[:digit:]]{3}-[[:digit:]]{3}-[[:digit:]]{4}$'
   }
 }
 
+/**
+ * @param $phone
+ * @param null $prefix
+ *
+ * @return bool|string
+ */
 function processPhone($phone, $prefix = NULL) {
   // eliminate all white space and non numeric charaters
   $cleanPhone = preg_replace('/[^\d]+/s', '', $phone);

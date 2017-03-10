@@ -1,9 +1,11 @@
 <?php
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-
+/**
+ * Class CRM_Extension_Manager_ReportTest
+ * @group headless
+ */
 class CRM_Extension_Manager_ReportTest extends CiviUnitTestCase {
-  function setUp() {
+  public function setUp() {
     parent::setUp();
     //if (class_exists('test_extension_manager_reporttest')) {
     //  test_extension_manager_reporttest::$counts = array();
@@ -14,14 +16,14 @@ class CRM_Extension_Manager_ReportTest extends CiviUnitTestCase {
     ));
   }
 
-  function tearDown() {
+  public function tearDown() {
     parent::tearDown();
   }
 
   /**
-   * Install an extension with a valid type name
+   * Install an extension with a valid type name.
    */
-  function testInstallDisableUninstall() {
+  public function testInstallDisableUninstall() {
     $manager = $this->system->getManager();
     $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_option_value WHERE name = "test.extension.manager.reporttest"');
 
@@ -37,9 +39,9 @@ class CRM_Extension_Manager_ReportTest extends CiviUnitTestCase {
   }
 
   /**
-   * Install an extension with a valid type name
+   * Install an extension with a valid type name.
    */
-  function testInstallDisableEnable() {
+  public function testInstallDisableEnable() {
     $manager = $this->system->getManager();
     $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_option_value WHERE name = "test.extension.manager.reporttest"');
 
@@ -54,4 +56,5 @@ class CRM_Extension_Manager_ReportTest extends CiviUnitTestCase {
     $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_option_value WHERE name = "test.extension.manager.reporttest"');
     $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_option_value WHERE name = "test.extension.manager.reporttest" AND is_active = 1');
   }
+
 }

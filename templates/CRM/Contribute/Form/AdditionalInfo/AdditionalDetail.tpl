@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -38,6 +38,8 @@
             <span class="description">{ts}Net value of the contribution (Total Amount minus Fee).{/ts}</span></td></tr>
         <tr class="crm-contribution-form-block-invoice_id"><td class="label">{$form.invoice_id.label}</td><td{$valueStyle}>{$form.invoice_id.html}<br />
             <span class="description">{ts}Unique internal reference ID for this contribution.{/ts}</span></td></tr>
+        <tr class="crm-contribution-form-block-creditnote_id"><td class="label">{$form.creditnote_id.label}</td><td{$valueStyle}>{$form.creditnote_id.html}<br />
+            <span class="description">{ts}Unique internal Credit Note ID for this contribution.{/ts}</span></td></tr>
         <tr class="crm-contribution-form-block-thankyou_date"><td class="label">{$form.thankyou_date.label}</td><td>{include file="CRM/common/jcalendar.tpl" elementName=thankyou_date}<br />
             <span class="description">{ts}Date that a thank-you message was sent to the contributor.{/ts}</span></td></tr>
     </table>

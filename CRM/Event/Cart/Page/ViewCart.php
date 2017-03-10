@@ -1,6 +1,13 @@
 <?php
+
+/**
+ * Class CRM_Event_Cart_Page_ViewCart
+ */
 class CRM_Event_Cart_Page_ViewCart extends CRM_Core_Page {
-  function run() {
+  /**
+   * @return string
+   */
+  public function run() {
     $transaction = new CRM_Core_Transaction();
 
     $cart = CRM_Event_Cart_BAO_Cart::find_or_create_for_current_session();
@@ -12,7 +19,5 @@ class CRM_Event_Cart_Page_ViewCart extends CRM_Core_Page {
 
     return parent::run();
   }
+
 }
-
-
-

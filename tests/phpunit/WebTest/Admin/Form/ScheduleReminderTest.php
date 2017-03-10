@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,16 +22,20 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Admin_Form_ScheduleReminderTest
+ */
 class WebTest_Admin_Form_ScheduleReminderTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
     parent::setUp();
   }
 
-  function testScheduleReminder() {
+  public function testScheduleReminder() {
     $this->webtestLogin();
 
     // Add new Schedule Reminder
@@ -39,6 +43,7 @@ class WebTest_Admin_Form_ScheduleReminderTest extends CiviSeleniumTestCase {
 
     // Fill Title
     $title = 'Title' . substr(sha1(rand()), 0, 4);
+    $htmlMessage = "Schedule Reminder Test";
     $this->type('title', $title);
 
     // Fill Entity Details
@@ -56,12 +61,13 @@ class WebTest_Admin_Form_ScheduleReminderTest extends CiviSeleniumTestCase {
     // Fill Subject
     $subject = 'subject' . substr(sha1(rand()), 0, 4);
     $this->type('subject', $subject);
+    $this->waitForElementPresent("html_message");
+    $this->fillRichTextField("html_message", $htmlMessage);
 
     //click on save
     $this->click('_qf_ScheduleReminders_next-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    $this->click("//div[@id='reminder']//div[@class='dataTables_wrapper']/table/tbody//tr/td[1][text()='{$title}']/../td[7]/span/a[text()='Edit']");
+    $this->waitForElementPresent("xpath=//div[@id='reminder']/div/table/tbody//tr/td[1]/div[text()='{$title}']/../../td[7]/span/a[text()='Edit']");
+    $this->click("xpath=//div[@id='reminder']/div/table/tbody//tr/td[1]/div[text()='{$title}']/../../td[7]/span/a[text()='Edit']");
     $this->waitForElementPresent('_qf_ScheduleReminders_cancel-bottom');
 
     $this->assertEquals($title, $this->getValue('id=title'));
@@ -82,5 +88,5 @@ class WebTest_Admin_Form_ScheduleReminderTest extends CiviSeleniumTestCase {
     $this->assertEquals('1', $this->getSelectedValue('id=recipient'));
     $this->assertChecked('is_active');
   }
-}
 
+}

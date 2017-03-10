@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -55,6 +55,9 @@
     {/if}
     <td>{ts}Email{/ts}</td>
     <td>{ts}Phone{/ts}</td>
+    <td>{ts}Do Not Email{/ts}</td>
+    <td>{ts}Do Not Phone{/ts}</td>
+    <td>{ts}Do Not mail{/ts}</td>
 {/if}
   </tr>
 {foreach from=$rows item=row}
@@ -86,6 +89,21 @@
         {/if}
         <td>{$row.email}</td>
         <td>{$row.phone}</td>
+        {if $row.do_not_email == 1}
+          <td>{$row.do_not_email}</td>
+        {else}
+          <td>&nbsp;</td>
+        {/if}
+        {if $row.do_not_phone == 1}
+          <td>{$row.do_not_phone}</td>
+        {else}
+          <td>&nbsp;</td>
+        {/if}
+        {if $row.do_not_mail == 1}
+          <td>{$row.do_not_mail}</td>
+        {else}
+          <td>&nbsp;</td>
+        {/if}
 {/if}
     </tr>
 {/foreach}

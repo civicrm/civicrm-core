@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,15 +23,15 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
- * To ensure that PHP errors or unhandled exceptions are reported in JSON format,
- * wrap this around your code. For example:
+ * To ensure that PHP errors or unhandled exceptions are reported in JSON
+ * format, wrap this around your code. For example:
  *
  * @code
  * $errorContainer = new CRM_Queue_ErrorPolicy();
- * $errorContainer->call(function(){
+ * $errorContainer->call(function() {
  *    ...include some files, do some work, etc...
  * });
  * @endcode
@@ -42,8 +42,13 @@
  * will be necessary to get reuse from the other parts of this class.
  */
 class CRM_Queue_ErrorPolicy {
-  var $active;
-  function __construct($level = NULL) {
+  public $active;
+
+  /**
+   * @param null|int $level
+   *   PHP error level to capture (e.g. E_PARSE|E_USER_ERROR).
+   */
+  public function __construct($level = NULL) {
     register_shutdown_function(array($this, 'onShutdown'));
     if ($level === NULL) {
       $level = E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR;
@@ -51,11 +56,17 @@ class CRM_Queue_ErrorPolicy {
     $this->level = $level;
   }
 
-  function activate() {
+  /**
+   * Enable the error policy.
+   */
+  public function activate() {
     $this->active = TRUE;
     $this->backup = array();
     foreach (array(
-      'display_errors', 'html_errors', 'xmlrpc_errors') as $key) {
+               'display_errors',
+               'html_errors',
+               'xmlrpc_errors',
+             ) as $key) {
       $this->backup[$key] = ini_get($key);
       ini_set($key, 0);
     }
@@ -64,22 +75,37 @@ class CRM_Queue_ErrorPolicy {
     $this->errorScope = CRM_Core_TemporaryErrorScope::useException();
   }
 
-  function deactivate() {
+  /**
+   * Disable the error policy.
+   */
+  public function deactivate() {
     $this->errorScope = NULL;
     restore_error_handler();
     foreach (array(
-      'display_errors', 'html_errors', 'xmlrpc_errors') as $key) {
+               'display_errors',
+               'html_errors',
+               'xmlrpc_errors',
+             ) as $key) {
       ini_set($key, $this->backup[$key]);
     }
     $this->active = FALSE;
   }
 
-  function call($callable) {
+  /**
+   * Execute the callable. Activate and deactivate the error policy
+   * automatically.
+   *
+   * @param callable|array|string $callable
+   *   A callback function.
+   *
+   * @return mixed
+   */
+  public function call($callable) {
     $this->activate();
     try {
       $result = $callable();
     }
-    catch(Exception$e) {
+    catch (Exception$e) {
       $this->reportException($e);
     }
     $this->deactivate();
@@ -87,11 +113,19 @@ class CRM_Queue_ErrorPolicy {
   }
 
   /**
-   * Receive (semi) recoverable error notices
+   * Receive (semi) recoverable error notices.
    *
    * @see set_error_handler
+   *
+   * @param string $errno
+   * @param string $errstr
+   * @param string $errfile
+   * @param int $errline
+   *
+   * @return bool
+   * @throws \Exception
    */
-  function onError($errno, $errstr, $errfile, $errline) {
+  public function onError($errno, $errstr, $errfile, $errline) {
     if (!(error_reporting() & $errno)) {
       return TRUE;
     }
@@ -104,7 +138,7 @@ class CRM_Queue_ErrorPolicy {
    * @see register_shutdown_function
    * @see error_get_last
    */
-  function onShutdown() {
+  public function onShutdown() {
     if (!$this->active) {
       return;
     }
@@ -115,11 +149,12 @@ class CRM_Queue_ErrorPolicy {
   }
 
   /**
-   * Print a fatal error
+   * Print a fatal error.
    *
-   * @param $error
+   * @param array $error
+   *   The PHP error (with "type", "message", etc).
    */
-  function reportError($error) {
+  public function reportError($error) {
     $response = array(
       'is_error' => 1,
       'is_continue' => 0,
@@ -135,11 +170,12 @@ class CRM_Queue_ErrorPolicy {
   }
 
   /**
-   * Print an unhandled exception
+   * Print an unhandled exception.
    *
-   * @param $e
+   * @param Exception $e
+   *   The unhandled exception.
    */
-  function reportException(Exception $e) {
+  public function reportException(Exception $e) {
     CRM_Core_Error::debug_var('CRM_Queue_ErrorPolicy_reportException', CRM_Core_Error::formatTextException($e));
 
     $response = array(
@@ -159,8 +195,7 @@ class CRM_Queue_ErrorPolicy {
     if (is_object($activeQueueRunner)) {
       $response['last_task_title'] = $activeQueueRunner->lastTaskTitle;
     }
-    echo json_encode($response);
-    CRM_Utils_System::civiExit();
+    CRM_Utils_JSON::output($response);
   }
-}
 
+}

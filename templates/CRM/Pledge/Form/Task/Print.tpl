@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -38,7 +38,7 @@
     <th>{ts}Amount{/ts}</th>
     <th>{ts}Create Date{/ts}</th>
     <th>{ts}To Be Paid{/ts}</th>
-    <th>{ts}Begining Date{/ts}</th>
+    <th>{ts}Beginning Date{/ts}</th>
     <th>{ts}Status{/ts}</th>
   </tr>
 {foreach from=$rows item=row}

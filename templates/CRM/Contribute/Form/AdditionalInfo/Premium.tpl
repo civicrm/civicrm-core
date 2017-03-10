@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -36,7 +36,7 @@
         <table class="form-layout-compressed">
     <tr class="crm-contribution-form-block-min_amount">
              <td class="label">{$form.min_amount.label}</td>
-       <td class="html-adjust">{$form.min_amount.html|crmAddClass:texttolabel|crmMoney:$currency}</td>
+       <td class="html-adjust">{$form.min_amount.html|crmAddClass:'no-border'|crmMoney:$currency}</td>
           </tr>
         </table>
         <div class="spacer"></div>
@@ -59,7 +59,7 @@
                var min_amount = document.getElementById("min_amount");
 
 
-               var amount = new Array();
+               var amount = [];
                amount[0] = '';
 
                if( product_id > 0 ) {

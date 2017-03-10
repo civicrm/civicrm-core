@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,21 +22,27 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
-//Tests for the ability to add a CMS user from a contact's record
-//See http://issues.civicrm.org/jira/browse/CRM-8723
+/**
+ * Tests for the ability to add a CMS user from a contact's record
+ * See http://issues.civicrm.org/jira/browse/CRM-8723
+ * Class WebTest_Contact_CreateCmsUserFromContactTest
+ */
 class WebTest_Contact_CreateCmsUserFromContactTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
     parent::setUp();
   }
 
-  //Test that option to create a cms user is present on a contact who does not
-  //have a cms account already( in this case, a new contact )
-  function testCreateContactLinkPresent() {
+  /**
+   * Test that option to create a cms user is present on a contact who.
+   * does not have a cms account already (in this case, a new
+   * contact).
+   */
+  public function testCreateContactLinkPresent() {
 
     //login
     $this->webtestLogin('admin');
@@ -53,9 +59,11 @@ class WebTest_Contact_CreateCmsUserFromContactTest extends CiviSeleniumTestCase 
     $this->assertElementContainsText("css=#actions li.crm-contact-user-record", "Create User Record", "Create User Record link not in action menu of new contact");
   }
 
-  //Test that the action link is missing for users who already have a contact
-  //record. The contact record for drupal user 1 is used
-  function testCreateContactLinkMissing() {
+  /**
+   * Test that the action link is missing for users who already have a
+   * contact record. The contact record for drupal user 1 is used.
+   */
+  public function testCreateContactLinkMissing() {
 
     //login
     $this->webtestLogin('admin');
@@ -63,9 +71,9 @@ class WebTest_Contact_CreateCmsUserFromContactTest extends CiviSeleniumTestCase 
     // go to My Account page
     $this->open($this->sboxPath . "user");
 
-    // click "View Contact Record" link
-    $this->waitForElementPresent("xpath=//div[@class='profile']/span/a[text()='View Contact Record']");
-    $this->click("xpath=//div[@class='profile']/span/a[text()='View Contact Record']");
+    // click "View contact record" link
+    $this->waitForElementPresent("xpath=//div[@class='profile']/span/a[text()='View contact record']");
+    $this->click("xpath=//div[@class='profile']/span/a[text()='View contact record']");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //Assert that the user actually does have a CMS Id displayed
@@ -75,8 +83,10 @@ class WebTest_Contact_CreateCmsUserFromContactTest extends CiviSeleniumTestCase 
     $this->assertElementNotContainsText("css=#actions li.crm-contact-user-record", "Create User Record", "Create User Record link not in action menu of new contact");
   }
 
-  //Test the ajax "check username availibity" link when adding cms user
-  function testCheckUsernameAvailability() {
+  /**
+   * Test the ajax "check username availibity" link when adding cms user.
+   */
+  public function testCheckUsernameAvailability() {
     $this->webtestLogin('admin');
 
     $email = $this->_createUserAndGotoForm();
@@ -98,8 +108,10 @@ class WebTest_Contact_CreateCmsUserFromContactTest extends CiviSeleniumTestCase 
     $this->assertElementContainsText("msgbox", "This username is currently available", "Available username is indicated as being taken");
   }
 
-  //Test form submission when the username is taken
-  function testTakenUsernameSubmission() {
+  /**
+   * Test form submission when the username is taken.
+   */
+  public function testTakenUsernameSubmission() {
 
     //login
     $this->webtestLogin('admin');
@@ -115,15 +127,17 @@ class WebTest_Contact_CreateCmsUserFromContactTest extends CiviSeleniumTestCase 
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //the civicrm messages should indicate the username is taken
-    $this->assertElementContainsText("css=#crm-notification-container", "already taken", "CiviCRM Message does not indicate the username is in user");
 
+    $this->assertElementContainsText("xpath=//span[@class = 'crm-error']", "already taken", "CiviCRM Message does not indicate the username is in user");
     //check the uf match table that no contact has been created
     $results = $this->webtest_civicrm_api("UFMatch", "get", array('contact_id' => $cid));
     $this->assertTrue($results['count'] == 0);
   }
 
-  //Test form sumbission when user passwords dont match
-  function testMismatchPasswordSubmission() {
+  /**
+   * Test form sumbission when user passwords dont match.
+   */
+  public function testMismatchPasswordSubmission() {
 
     //login
     $this->webtestLogin('admin');
@@ -139,14 +153,14 @@ class WebTest_Contact_CreateCmsUserFromContactTest extends CiviSeleniumTestCase 
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //check that that there is a password mismatch text
-    $this->assertElementContainsText("css=#crm-notification-container", "Password mismatch", "No form error given on password missmatch");
+    $this->assertElementContainsText("xpath=//table[@class='form-layout-compressed']/tbody/tr[3]/td/span[@class='crm-error']", "Password mismatch", "No form error given on password missmatch");
 
     //check that no user was created;
     $results = $this->webtest_civicrm_api("UFMatch", "get", array('contact_id' => $cid));
     $this->assertTrue($results['count'] == 0);
   }
 
-  function testMissingDataSubmission() {
+  public function testMissingDataSubmission() {
 
     //login
     $this->webtestLogin('admin');
@@ -161,21 +175,23 @@ class WebTest_Contact_CreateCmsUserFromContactTest extends CiviSeleniumTestCase 
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //the civicrm messages section should not indicate that a user has been created
-    $this->assertElementNotContainsText("css=#crm-notification-container", "User has been added", "CiviCRM messages say that a user was created when username left blank");
+    $this->assertElementNotContainsText("xpath=//span[@class='crm-error']", "User has been added", "CiviCRM messages say that a user was created when username left blank");
 
     //the civicrm message should say username is required
-    $this->assertElementContainsText("css=#crm-notification-container", "Username is required", "The CiviCRM messae does not indicate that the username is required");
+    $this->assertElementContainsText("xpath=//span[@class='crm-error']", "Username is required", "The CiviCRM messae does not indicate that the username is required");
 
     //the civicrm message should say password is required
-    $this->assertElementContainsText("css=#crm-notification-container", "Password is required", "The CiviCRM messae does not indicate that the password is required");
+    $this->assertElementContainsText("xpath=//table[@class='form-layout-compressed']/tbody/tr[3]/td/span[@class='crm-error']", "Password is required", "The CiviCRM messae does not indicate that the password is required");
 
     //check that no user was created;
     $results = $this->webtest_civicrm_api("UFMatch", "get", array('contact_id' => $cid));
     $this->assertTrue($results['count'] == 0);
   }
 
-  //Test a valid (username unique and passwords match) submission
-  function testValidSubmission() {
+  /**
+   * Test a valid (username unique and passwords match) submission.
+   */
+  public function testValidSubmission() {
 
     //login
     $this->webtestLogin('admin');
@@ -186,6 +202,7 @@ class WebTest_Contact_CreateCmsUserFromContactTest extends CiviSeleniumTestCase 
 
     //submit with matching passwords
     $this->_fillCMSUserForm($firstName, $password, $password);
+    $this->waitForAjaxContent();
     $this->click("_qf_Useradd_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
@@ -200,13 +217,21 @@ class WebTest_Contact_CreateCmsUserFromContactTest extends CiviSeleniumTestCase 
     $this->assertTrue($results['count'] == 1);
   }
 
-  function _fillCMSUserForm($username, $password, $confirm_password) {
+  /**
+   * @param string $username
+   * @param $password
+   * @param $confirm_password
+   */
+  public function _fillCMSUserForm($username, $password, $confirm_password) {
     $this->type("cms_name", $username);
     $this->type("cms_pass", $password);
     $this->type("cms_confirm_pass", $confirm_password);
   }
 
-  function _createUserAndGoToForm() {
+  /**
+   * @return array
+   */
+  public function _createUserAndGoToForm() {
     $firstName = substr(sha1(rand()), 0, 7) . "John";
     $lastName = substr(sha1(rand()), 0, 7) . "Smith";
     $email = $this->webtestAddContact($firstName, $lastName, TRUE);
@@ -219,5 +244,5 @@ class WebTest_Contact_CreateCmsUserFromContactTest extends CiviSeleniumTestCase 
 
     return array($cid, $firstName, $lastName, $email);
   }
-}
 
+}

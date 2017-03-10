@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -32,7 +32,7 @@
   {/if}
   <div class="crm-form-block crm-search-form-block">
     {if call_user_func(array('CRM_Core_Permission','check'), 'administer CiviCRM') }
-      <a href='{crmURL p="civicrm/admin/setting/preferences/display" q="reset=1"}' title="{ts}Click here to configure the panes.{/ts}"><span class="icon settings-icon"></span></a>
+      <a href='{crmURL p="civicrm/admin/setting/preferences/display" q="reset=1"}' title="{ts}Click here to configure the panes.{/ts}"><i class="crm-i fa-wrench"></i></a>
     {/if}
     <span style="float:right;"><a href="#expand" id="expand">{ts}Expand all tabs{/ts}</a></span>
     <div class="crm-submit-buttons">
@@ -62,7 +62,10 @@
                 {$form.external_identifier.html}
               </td>
               {if $contactId}
-                <td><label for="internal_identifier_display">{ts}CiviCRM ID{/ts}{help id="id-internal-id"}</label><br /><input id="internal_identifier_display" type="text" class="form-text eight" size="8" disabled="disabled" value="{$contactId}"></td>
+                <td>
+                  <label for="internal_identifier_display">{ts}Contact ID{/ts} {help id="id-internal-id"}</label><br />
+                  <input id="internal_identifier_display" type="text" class="crm-form-text six" size="6" readonly="readonly" value="{$contactId}">
+                </td>
               {/if}
             </tr>
           </table>
@@ -107,9 +110,9 @@
   {literal}
 
   <script type="text/javascript" >
-  cj(function($) {
+  CRM.$(function($) {
+    var $form = $("form.{/literal}{$form.formClass}{literal}");
     var action = "{/literal}{$action}{literal}";
-    $().crmAccordions();
 
     $('.crm-accordion-body').each( function() {
       //remove tab which doesn't have any element
@@ -188,29 +191,32 @@
     });
 
     $('.customDataPresent').change(function() {
-      //$('.crm-custom-accordion').remove();
       var values = $("#contact_sub_type").val();
-      var contactType = {/literal}"{$contactType}"{literal};
-      CRM.buildCustomData(contactType, values);
-      loadMultiRecordFields(values);
-      $('.crm-custom-accordion').each(function() {
+      CRM.buildCustomData({/literal}"{$contactType}"{literal}, values).one('crmLoad', function() {
         highlightTabs(this);
+        loadMultiRecordFields(values);
       });
     });
 
     function loadMultiRecordFields(subTypeValues) {
-      if (subTypeValues == false) {
-        var subTypeValues = null;
+      if (subTypeValues === false) {
+        subTypeValues = null;
       }
-        else if (!subTypeValues) {
-        var subTypeValues = {/literal}"{$paramSubType}"{literal};
+      else if (!subTypeValues) {
+        subTypeValues = {/literal}"{$paramSubType}"{literal};
+      }
+      function loadNextRecord(i, groupValue, groupCount) {
+        if (i < groupCount) {
+          CRM.buildCustomData({/literal}"{$contactType}"{literal}, subTypeValues, null, i, groupValue, true).one('crmLoad', function() {
+            highlightTabs(this);
+            loadNextRecord(i+1, groupValue, groupCount);
+          });
+        }
       }
       {/literal}
       {foreach from=$customValueCount item="groupCount" key="groupValue"}
       {if $groupValue}{literal}
-        for ( var i = 1; i < {/literal}{$groupCount}{literal}; i++ ) {
-          CRM.buildCustomData( {/literal}"{$contactType}"{literal}, subTypeValues, null, i, {/literal}{$groupValue}{literal}, true );
-        }
+        loadNextRecord(1, {/literal}{$groupValue}{literal}, {/literal}{$groupCount}{literal});
       {/literal}
       {/if}
       {/foreach}
@@ -231,11 +237,27 @@
         }
       });
       if ( warning ) {
-        return confirm({/literal}'{ts escape="js"}One or more contact subtypes have been de-selected from the list for this contact. Any custom data associated with de-selected subtype will be removed. Click OK to proceed, or Cancel to review your changes before saving.{/ts}'{literal});
+        return confirm({/literal}'{ts escape="js"}One or more contact subtypes have been de-selected from the list for this contact. Any custom data associated with de-selected subtype will be removed as long as the contact does not have a contact subtype still selected. Click OK to proceed, or Cancel to review your changes before saving.{/ts}'{literal});
       }
       return true;
     });
     {/literal}{/if}{literal}
+
+    // Handle delete of multi-record custom data
+    $form.on('click', '.crm-custom-value-del', function(e) {
+      e.preventDefault();
+      var $el = $(this),
+        msg = '{/literal}{ts escape="js"}The record will be deleted immediately. This action cannot be undone.{/ts}{literal}';
+      CRM.confirm({title: $el.attr('title'), message: msg})
+        .on('crmConfirm:yes', function() {
+          var url = CRM.url('civicrm/ajax/customvalue');
+          var request = $.post(url, $el.data('post'));
+          CRM.status({success: '{/literal}{ts escape="js"}Record Deleted{/ts}{literal}'}, request);
+          var addClass = '.add-more-link-' + $el.data('post').groupID;
+          $el.closest('div.crm-custom-accordion').remove();
+          $('div' + addClass).last().show();
+        });
+    });
   });
 
 </script>
@@ -246,8 +268,5 @@
 
 {* include common additional blocks tpl *}
 {include file="CRM/common/additionalBlocks.tpl"}
-
-{* include jscript to warn if unsaved form field changes *}
-{include file="CRM/common/formNavigate.tpl"}
 
 {/if}

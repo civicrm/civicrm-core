@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,23 +23,21 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id: $
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
- *
+ * Class for configuring jobs.
  */
 class CRM_Admin_Form_Job extends CRM_Admin_Form {
   protected $_id = NULL;
 
-  function preProcess() {
+  public function preProcess() {
 
     parent::preProcess();
 
@@ -62,10 +60,9 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
   }
 
   /**
-   * Function to build the form
+   * Build the form object.
    *
-   * @return void
-   * @access public
+   * @param bool $check
    */
   public function buildQuickForm($check = FALSE) {
     parent::buildQuickForm();
@@ -80,7 +77,10 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
       $attributes['name'], TRUE
     );
 
-    $this->addRule('name', ts('Name already exists in Database.'), 'objectExists', array('CRM_Core_DAO_Job', $this->_id));
+    $this->addRule('name', ts('Name already exists in Database.'), 'objectExists', array(
+        'CRM_Core_DAO_Job',
+        $this->_id,
+      ));
 
     $this->add('text', 'description', ts('Description'),
       $attributes['description']
@@ -96,6 +96,9 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
 
     $this->add('select', 'run_frequency', ts('Run frequency'), CRM_Core_SelectValues::getJobFrequency());
 
+    // CRM-17686
+    $this->add('datepicker', 'scheduled_run_date', ts('Scheduled Run Date'), NULL, FALSE, array('minDate' => time()));
+
     $this->add('textarea', 'parameters', ts('Command parameters'),
       "cols=50 rows=6"
     );
@@ -106,19 +109,25 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
     $this->addFormRule(array('CRM_Admin_Form_Job', 'formRule'));
   }
 
-  static function formRule($fields) {
+  /**
+   * @param $fields
+   *
+   * @return array|bool
+   * @throws API_Exception
+   */
+  public static function formRule($fields) {
 
     $errors = array();
 
     require_once 'api/api.php';
 
-    $apiRequest = array();
-    $apiRequest['entity']  = CRM_Utils_String::munge($fields['api_entity']);
-    $apiRequest['action']  = CRM_Utils_String::munge($fields['api_action']);
-    $apiRequest['version'] = 3;
-    $apiRequest += _civicrm_api_resolve($apiRequest);    // look up function, file, is_generic
-
-    if( !$apiRequest['function'] ) {
+    /** @var \Civi\API\Kernel $apiKernel */
+    $apiKernel = \Civi::service('civi_api_kernel');
+    $apiRequest = \Civi\API\Request::create($fields['api_entity'], $fields['api_action'], array('version' => 3), NULL);
+    try {
+      $apiKernel->resolve($apiRequest);
+    }
+    catch (\Civi\API\Exception\NotImplementedException $e) {
       $errors['api_action'] = ts('Given API command is not defined.');
     }
 
@@ -129,7 +138,10 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
     return empty($errors) ? TRUE : $errors;
   }
 
-  function setDefaultValues() {
+  /**
+   * @return array
+   */
+  public function setDefaultValues() {
     $defaults = array();
 
     if (!$this->_id) {
@@ -138,14 +150,20 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
     }
     $domainID = CRM_Core_Config::domainID();
 
-    $dao            = new CRM_Core_DAO_Job();
-    $dao->id        = $this->_id;
+    $dao = new CRM_Core_DAO_Job();
+    $dao->id = $this->_id;
     $dao->domain_id = $domainID;
     if (!$dao->find(TRUE)) {
       return $defaults;
     }
 
     CRM_Core_DAO::storeValues($dao, $defaults);
+
+    // CRM-17686
+    if (!empty($dao->scheduled_run_date)) {
+      $ts = strtotime($dao->scheduled_run_date);
+      $defaults['scheduled_run_date'] = date("Y-m-d H:i:s", $ts);
+    }
 
     // CRM-10708
     // job entity thats shipped with core is all lower case.
@@ -158,11 +176,7 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
   }
 
   /**
-   * Function to process the form
-   *
-   * @access public
-   *
-   * @return void
+   * Process the form submission.
    */
   public function postProcess() {
 
@@ -179,15 +193,39 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
 
     $dao = new CRM_Core_DAO_Job();
 
-    $dao->id            = $this->_id;
-    $dao->domain_id     = $domainID;
+    $dao->id = $this->_id;
+    $dao->domain_id = $domainID;
     $dao->run_frequency = $values['run_frequency'];
-    $dao->parameters    = $values['parameters'];
-    $dao->name          = $values['name'];
-    $dao->api_entity    = $values['api_entity'];
-    $dao->api_action    = $values['api_action'];
-    $dao->description   = $values['description'];
-    $dao->is_active     = CRM_Utils_Array::value('is_active', $values, 0);
+    $dao->parameters = $values['parameters'];
+    $dao->name = $values['name'];
+    $dao->api_entity = $values['api_entity'];
+    $dao->api_action = $values['api_action'];
+    $dao->description = $values['description'];
+    $dao->is_active = CRM_Utils_Array::value('is_active', $values, 0);
+
+    // CRM-17686
+    $ts = strtotime($values['scheduled_run_date']);
+    // if a date/time is supplied and not in the past, then set the next scheduled run...
+    if ($ts > time()) {
+      $dao->scheduled_run_date = CRM_Utils_Date::currentDBDate($ts);
+      // warn about monthly/quarterly scheduling, if applicable
+      if (($dao->run_frequency == 'Monthly') || ($dao->run_frequency == 'Quarter')) {
+        $info = getdate($ts);
+        if ($info['mday'] > 28) {
+          CRM_Core_Session::setStatus(
+            ts('Relative month values are calculated based on the length of month(s) that they pass through.
+              The result will land on the same day of the month except for days 29-31 when the target month contains fewer days than the previous month.
+              For example, if a job is scheduled to run on August 31st, the following invocation will occur on October 1st, and then the 1st of every month thereafter.
+              To avoid this issue, please schedule Monthly and Quarterly jobs to run within the first 28 days of the month.'),
+            ts('Warning'), 'info', array('expires' => 0));
+        }
+      }
+    }
+    // ...otherwise, if this isn't a new scheduled job, clear the next scheduled run
+    elseif ($dao->id) {
+      $job = new CRM_Core_ScheduledJob(array('id' => $dao->id));
+      $job->clearScheduledRunDate();
+    }
 
     $dao->save();
 
@@ -199,8 +237,6 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
       CRM_Core_Session::setStatus($msg, ts('Warning: Update Greeting job enabled'), 'alert');
     }
 
-
   }
-  //end of function
-}
 
+}

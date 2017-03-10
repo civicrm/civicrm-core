@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,16 +22,20 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Profile_ProfileGroupSubscriptionTest
+ */
 class WebTest_Profile_ProfileGroupSubscriptionTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
     parent::setUp();
   }
 
-  function testProfileGroupSubscription() {
+  public function testProfileGroupSubscription() {
     $this->webtestLogin();
 
     // Add new profile.
@@ -44,6 +48,7 @@ class WebTest_Profile_ProfileGroupSubscriptionTest extends CiviSeleniumTestCase 
     //Name of profile
     $profileTitle = 'profile_' . substr(sha1(rand()), 0, 7);
     $this->type('title', $profileTitle);
+    $this->click('uf_group_type_Profile');
 
     //Drupal user account registration option
     $this->click('CIVICRM_QFID_0_8');
@@ -71,6 +76,7 @@ class WebTest_Profile_ProfileGroupSubscriptionTest extends CiviSeleniumTestCase 
     $this->waitForText('crm-notification-container', "Your CiviCRM Profile '{$profileTitle}' has been added. You can add fields to this profile now.");
 
     //Add email field to profile
+    $this->waitForElementPresent("field_name[0]");
     $this->click('field_name[0]');
     $this->select('field_name[0]', 'value=Contact');
     $this->click("//option[@value='Contact']");
@@ -80,20 +86,21 @@ class WebTest_Profile_ProfileGroupSubscriptionTest extends CiviSeleniumTestCase 
 
     //click on save
     $this->click('_qf_Field_next_new-top');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForText('crm-notification-container', "Your CiviCRM Profile Field 'Email' has been saved to '$profileTitle'.");
 
     //Add email field to profile
     $this->click('field_name[0]');
     $this->select('field_name[0]', 'value=Contact');
     $this->click("//option[@value='Contact']");
 
+    $this->waitForElementPresent("field_name[1]");
     $this->select('field_name[1]', 'value=group');
     $this->click("//option[@value='group']");
 
     //click on save
     $this->click('_qf_Field_next');
 
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent("xpath=//div[@id='field_page']/div/a[4]/span");
 
     //now use profile create mode for group subscription
     $this->click("xpath=//div[@id='field_page']/div/a[4]/span");
@@ -113,27 +120,27 @@ class WebTest_Profile_ProfileGroupSubscriptionTest extends CiviSeleniumTestCase 
 
     $this->click('_qf_Edit_next');
 
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
     // assert for subscription message
-    $this->assertElementContainsText('css=div.messages', "Your subscription request has been submitted for",
-      "Subscription message is not shown");
 
+    $this->isTextPresent("Your subscription request has been submitted for");
     //check if profile is saved
-    $this->assertElementContainsText('css=span.msg-text', 'Your information has been saved.', 'Profile is not saved');
+    $this->isTextPresent("Your information has been saved.");
 
     // delete the profile
     $this->openCiviPage('admin/uf/group', 'reset=1');
     $this->_testdeleteProfile($profileTitle);
   }
 
-  function _testdeleteProfile($profileTitle) {
-    $this->waitForElementPresent("xpath=//div[@id='user-profiles']/div/div/table/tbody//tr/td/span[text() = '$profileTitle']/../../td[7]/span[2][text()='more']/ul/li[4]/a[text()='Delete']");
-    $this->click("xpath=//div[@id='user-profiles']/div/div/table/tbody//tr/td/span[text() = '$profileTitle']/../../td[7]/span[2][text()='more']/ul/li[4]/a[text()='Delete']");
+  /**
+   * @param $profileTitle
+   */
+  public function _testdeleteProfile($profileTitle) {
+    $this->waitForElementPresent("xpath=//div[@id='user-profiles']/div/div[1]/table/tbody//tr/td[1]/div[text() = '$profileTitle']/../../td[7]/span[2][text()='more']/ul//li/a[text()='Delete']");
+    $this->click("xpath=//div[@id='user-profiles']/div/div[1]/table/tbody//tr/td[1]/div[text() = '$profileTitle']/../../td[7]/span[2][text()='more']/ul//li/a[text()='Delete']");
     $this->waitForElementPresent('_qf_Group_next-bottom');
     $this->click('_qf_Group_next-bottom');
     $this->waitForElementPresent('newCiviCRMProfile-bottom');
     $this->waitForText('crm-notification-container', "Your CiviCRM Profile '{$profileTitle}' has been deleted.");
   }
-}
 
+}

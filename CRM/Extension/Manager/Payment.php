@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,30 +23,33 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * This class stores logic for managing CiviCRM extensions.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Extension_Manager_Payment extends CRM_Extension_Manager_Base {
 
   /**
-   @var CRM_Extension_Mapper
+   * @var CRM_Extension_Mapper
    */
   protected $mapper;
 
+  /**
+   * @param CRM_Extension_Mapper $mapper
+   */
   public function __construct(CRM_Extension_Mapper $mapper) {
     parent::__construct(TRUE);
     $this->mapper = $mapper;
   }
 
   /**
-   * {@inheritdoc}
+   * @inheritDoc
+   *
+   * @param CRM_Extension_Info $info
    */
   public function onPreInstall(CRM_Extension_Info $info) {
     $paymentProcessorTypes = $this->_getAllPaymentProcessorTypes('class_name');
@@ -62,10 +65,10 @@ class CRM_Extension_Manager_Payment extends CRM_Extension_Manager_Base {
 
     $dao = new CRM_Financial_DAO_PaymentProcessorType();
 
-    $dao->is_active   = 1;
-    $dao->class_name  = trim($info->key);
-    $dao->title       = trim($info->name) . ' (' . trim($info->key) . ')';
-    $dao->name        = trim($info->name);
+    $dao->is_active = 1;
+    $dao->class_name = trim($info->key);
+    $dao->title = trim($info->name) . ' (' . trim($info->key) . ')';
+    $dao->name = trim($info->name);
     $dao->description = trim($info->description);
 
     $dao->user_name_label = trim($info->typeInfo['userNameLabel']);
@@ -105,14 +108,18 @@ class CRM_Extension_Manager_Payment extends CRM_Extension_Manager_Base {
   }
 
   /**
-   * {@inheritdoc}
+   * @inheritDoc
+   *
+   * @param CRM_Extension_Info $info
    */
   public function onPostInstall(CRM_Extension_Info $info) {
     $this->_runPaymentHook($info, 'install');
   }
 
   /**
-   * {@inheritdoc}
+   * @inheritDoc
+   *
+   * @param CRM_Extension_Info $info
    */
   public function onPreUninstall(CRM_Extension_Info $info) {
     $paymentProcessorTypes = $this->_getAllPaymentProcessorTypes('class_name');
@@ -132,7 +139,9 @@ class CRM_Extension_Manager_Payment extends CRM_Extension_Manager_Base {
   }
 
   /**
-   * {@inheritdoc}
+   * @inheritDoc
+   *
+   * @param CRM_Extension_Info $info
    */
   public function onPreDisable(CRM_Extension_Info $info) {
     // HMM? // if ($this->type == 'payment' && $this->status != 'missing') {
@@ -143,7 +152,9 @@ class CRM_Extension_Manager_Payment extends CRM_Extension_Manager_Base {
   }
 
   /**
-   * {@inheritdoc}
+   * @inheritDoc
+   *
+   * @param CRM_Extension_Info $info
    */
   public function onPreEnable(CRM_Extension_Info $info) {
     $paymentProcessorTypes = $this->_getAllPaymentProcessorTypes('class_name');
@@ -151,7 +162,9 @@ class CRM_Extension_Manager_Payment extends CRM_Extension_Manager_Base {
   }
 
   /**
-   * {@inheritdoc}
+   * @inheritDoc
+   *
+   * @param CRM_Extension_Info $info
    */
   public function onPostEnable(CRM_Extension_Info $info) {
     // HMM? // if ($this->type == 'payment' && $this->status != 'missing') {
@@ -159,8 +172,10 @@ class CRM_Extension_Manager_Payment extends CRM_Extension_Manager_Base {
   }
 
   /**
-   * @param string $attr the attribute used to key the array
-   * @return array ($$attr => $id)
+   * @param string $attr
+   *   The attribute used to key the array.
+   * @return array
+   *   ($attr => $id)
    */
   private function _getAllPaymentProcessorTypes($attr) {
     $ppt = array();
@@ -173,86 +188,68 @@ class CRM_Extension_Manager_Payment extends CRM_Extension_Manager_Base {
   }
 
   /**
-   * Function to run hooks in the payment processor class
+   * Run hooks in the payment processor class.
    * Load requested payment processor and call the method specified.
    *
-   * @param string $method - the method to call in the payment processor class
-   * @private
+   * @param CRM_Extension_Info $info
+   * @param string $method
+   *   The method to call in the payment processor class.
    */
   private function _runPaymentHook(CRM_Extension_Info $info, $method) {
-    // Not concerned about performance at this stage, as these are seldomly performed tasks
+    // Not concerned about performance at this stage, as these are seldom performed tasks
     // (payment processor enable/disable/install/uninstall). May wish to implement some
     // kind of registry/caching system if more hooks are added.
 
     try {
       $paymentClass = $this->mapper->keyToClass($info->key, 'payment');
       $file = $this->mapper->classToPath($paymentClass);
-      if (! file_exists($file)) {
-        CRM_Core_Session::setStatus(ts('Failed to load file (%3) for payment processor (%1) while running "%2"', array(1 => $info->key, 2 => $method, 3 => $file)), '', 'error');
+      if (!file_exists($file)) {
+        CRM_Core_Session::setStatus(ts('Failed to load file (%3) for payment processor (%1) while running "%2"', array(
+              1 => $info->key,
+              2 => $method,
+              3 => $file,
+            )), '', 'error');
         return;
-      } else {
+      }
+      else {
         require_once $file;
       }
-    } catch (CRM_Extension_Exception $e) {
-      CRM_Core_Session::setStatus(ts('Failed to determine file path for payment processor (%1) while running "%2"', array(1 => $info->key, 2 => $method)), '', 'error');
+    }
+    catch (CRM_Extension_Exception $e) {
+      CRM_Core_Session::setStatus(ts('Failed to determine file path for payment processor (%1) while running "%2"', array(
+            1 => $info->key,
+            2 => $method,
+          )), '', 'error');
       return;
     }
 
-    // See if we have any instances of this PP defined ..
-    if ($processor_id = CRM_Core_DAO::singleValueQuery("
-                SELECT pp.id
+    $processorDAO = CRM_Core_DAO::executeQuery(
+      "                SELECT pp.id, ppt.class_name
                   FROM civicrm_extension ext
             INNER JOIN civicrm_payment_processor_type ppt
                     ON ext.name = ppt.name
-            INNER JOIN civicrm_payment_processor pp
+            LEFT JOIN civicrm_payment_processor pp
                     ON ppt.id = pp.payment_processor_type_id
                  WHERE ext.type = 'payment'
                    AND ext.full_name = %1
         ",
-        array(
-          1 => array($info->key, 'String'),
-        )
-      )) {
-      // If so, load params in the usual way ..
-      $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($processor_id, NULL);
+      array(
+        1 => array($info->key, 'String'),
+      )
+    );
+
+    while ($processorDAO->fetch()) {
+      $class_name = $processorDAO->class_name;
+      $processor_id = $processorDAO->id;
     }
-    else {
-      // Otherwise, do the best we can to construct some ..
-      $dao = CRM_Core_DAO::executeQuery("
-                    SELECT ppt.*
-                      FROM civicrm_extension ext
-                INNER JOIN civicrm_payment_processor_type ppt
-                        ON ppt.name = ext.name
-                     WHERE ext.name = %1
-                       AND ext.type = 'payment'
-            ",
-        array(
-          1 => array($info->name, 'String'),
-        )
-      );
-      if ($dao->fetch()) $paymentProcessor = array(
-        'id' => -1,
-        'name' => $dao->title,
-        'payment_processor_type_id' => $dao->id,
-        'user_name' => 'nothing',
-        'password' => 'nothing',
-        'signature' => '',
-        'url_site' => $dao->url_site_default,
-        'url_api' => $dao->url_api_default,
-        'url_recur' => $dao->url_recur_default,
-        'url_button' => $dao->url_button_default,
-        'subject' => '',
-        'class_name' => $dao->class_name,
-        'is_recur' => $dao->is_recur,
-        'billing_mode' => $dao->billing_mode,
-        'payment_type' => $dao->payment_type,
-      );
-      else CRM_Core_Error::fatal("Unable to find payment processor in " . __CLASS__ . '::' . __METHOD__);
+
+    if (empty($class_name)) {
+      CRM_Core_Error::fatal("Unable to find payment processor in " . __CLASS__ . '::' . __METHOD__);
     }
 
     // In the case of uninstall, check for instances of PP first.
     // Don't run hook if any are found.
-    if ($method == 'uninstall' && $paymentProcessor['id'] > 0) {
+    if ($method == 'uninstall' && $processor_id > 0) {
       return;
     }
 
@@ -261,22 +258,25 @@ class CRM_Extension_Manager_Payment extends CRM_Extension_Manager_Base {
       case 'uninstall':
       case 'enable':
       case 'disable':
-
-        // Instantiate PP
-        $processorInstance = $paymentClass::singleton(NULL, $paymentProcessor);
+        // Instantiate PP - the getClass function allows us to do this when no payment processor instances exist.
+        $processorInstance = Civi\Payment\System::singleton()->getByClass($class_name);
 
         // Does PP implement this method, and can we call it?
         if (method_exists($processorInstance, $method) && is_callable(array(
-          $processorInstance, $method))) {
+            $processorInstance,
+            $method,
+          ))
+        ) {
           // If so, call it ...
           $processorInstance->$method();
         }
         break;
 
       default:
-        CRM_Core_Session::setStatus(ts( "Unrecognized payment hook (%1) in %2::%3",
-                        array(1 => $method, 2 =>  __CLASS__ , 3 => __METHOD__) ),
-                        '', 'error');
+        CRM_Core_Session::setStatus(ts("Unrecognized payment hook (%1) in %2::%3",
+            array(1 => $method, 2 => __CLASS__, 3 => __METHOD__)),
+          '', 'error');
     }
   }
+
 }

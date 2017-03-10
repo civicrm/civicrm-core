@@ -141,7 +141,7 @@
   </item>
   <item>
     <path>civicrm/admin/options/payment_instrument</path>
-    <title>Payment Instruments</title>
+    <title>Payment Methods</title>
     <page_callback>CRM_Admin_Page_Options</page_callback>
     <desc>You may choose to record the payment instrument used for each contribution. Common payment methods are installed by default (e.g. Check, Cash, Credit Card...). If your site requires additional payment methods, add them here.</desc>
     <adminGroup>CiviContribute</adminGroup>
@@ -225,11 +225,6 @@
     <access_arguments>make online contributions</access_arguments>
   </item>
   <item>
-    <path>civicrm/ajax/employer</path>
-    <page_callback>CRM_Contact_Page_AJAX::getPermissionedEmployer</page_callback>
-    <access_arguments>make online contributions</access_arguments>
-  </item>
-  <item>
     <path>civicrm/contribute/unsubscribe</path>
     <title>Cancel Subscription</title>
     <page_callback>CRM_Contribute_Form_CancelSubscription</page_callback>
@@ -296,5 +291,36 @@
     <access_arguments>access CiviContribute</access_arguments>
     <page_type>1</page_type>
     <component>CiviContribute</component>
+  </item>
+  <item>
+    <path>civicrm/admin/setting/preferences/contribute</path>
+    <title>CiviContribute Component Settings</title>
+    <page_callback>CRM_Admin_Form_Preferences_Contribute</page_callback>
+    <desc>Configure global CiviContribute behaviors.</desc>
+    <access_arguments>access CiviContribute,administer CiviCRM</access_arguments>
+    <adminGroup>CiviContribute</adminGroup>
+  </item>
+  <item>
+    <path>civicrm/contribute/invoice</path>
+    <title>PDF Invoice</title>
+    <page_callback>CRM_Contribute_Form_Task_Invoice::getPrintPDF</page_callback>
+    <access_callback>CRM_Core_Permission::checkDownloadInvoice</access_callback>
+    <page_type>1</page_type>
+    <weight>620</weight>
+    <component>CiviContribute</component>
+  </item>
+  <item>
+    <path>civicrm/contribute/invoice/email</path>
+    <title>Email Invoice</title>
+    <page_callback>CRM_Contribute_Form_Task_Invoice</page_callback>
+    <access_arguments>access CiviContribute</access_arguments>
+    <page_type>1</page_type>
+    <weight>630</weight>
+    <component>CiviContribute</component>
+  </item>
+  <item>
+    <path>civicrm/ajax/softcontributionlist</path>
+    <page_callback>CRM_Contribute_Page_AJAX::getSoftContributionRows</page_callback>
+    <access_arguments>access CiviCRM</access_arguments>
   </item>
 </menu>

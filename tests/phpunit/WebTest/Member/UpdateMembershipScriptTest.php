@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,16 +22,20 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Member_UpdateMembershipScriptTest
+ */
 class WebTest_Member_UpdateMembershipScriptTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
     parent::setUp();
   }
 
-  function testAddMembership() {
+  public function testAddMembership() {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -60,7 +64,6 @@ class WebTest_Member_UpdateMembershipScriptTest extends CiviSeleniumTestCase {
 
     // Clicking save.
     $this->click('_qf_Membership_upload');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Is status message correct?
     $this->waitForText('crm-notification-container', "{$memTypeParams['membership_type']} membership for $firstName Anderson has been added.");
@@ -81,7 +84,10 @@ class WebTest_Member_UpdateMembershipScriptTest extends CiviSeleniumTestCase {
     );
   }
 
-  function addMembershipType() {
+  /**
+   * @return array
+   */
+  public function addMembershipType() {
     $membershipTitle = substr(sha1(rand()), 0, 7);
     $membershipOrg = $membershipTitle . ' memorg';
     $this->webtestAddOrganization($membershipOrg, TRUE);
@@ -101,21 +107,18 @@ class WebTest_Member_UpdateMembershipScriptTest extends CiviSeleniumTestCase {
 
     // New membership type
     $this->type('name', $memTypeParams['membership_type']);
-    $this->type('member_of_contact', $membershipTitle);
-    $this->click('member_of_contact');
-    $this->waitForElementPresent("css=div.ac_results-inner li");
-    $this->click("css=div.ac_results-inner li");
+    $this->select2('member_of_contact_id', $membershipTitle);
 
     // Membership fees
     $this->type('minimum_fee', '100');
-    $this->select( 'financial_type_id', "value={$memTypeParams['financial_type']}" );
+    $this->select('financial_type_id', "value={$memTypeParams['financial_type']}");
 
     // Duration for which the membership will be active
     $this->type('duration_interval', 1);
     $this->select('duration_unit', "label=year");
 
     // Membership period type
-    $this->select('period_type', "label=rolling");
+    $this->select('period_type', "value=rolling");
     $this->click('relationship_type_id', "value={$memTypeParams['relationship_type']}");
 
     // Clicking save
@@ -125,4 +128,5 @@ class WebTest_Member_UpdateMembershipScriptTest extends CiviSeleniumTestCase {
 
     return $memTypeParams;
   }
+
 }

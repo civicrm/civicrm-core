@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,10 +23,6 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-{* include wysiwyg related files*}
-{if !$includeWysiwygEditor}
-  {include file="CRM/common/wysiwyg.tpl" includeWysiwygEditor=true}
-{/if}
 {* Custom Data view mode*}
 {foreach from=$viewCustomData item=customValues key=customGroupId}
   {foreach from=$customValues item=cd_edit key=cvID}
@@ -48,111 +44,20 @@
                 {/foreach}
               </td>
               {else}
-              <td class="label">{$element.field_title}</td>
-              {if $element.field_type == 'File'}
-                {if $element.field_value.displayURL}
-                  <td class="html-adjust">
-                    <a href="{$element.field_value.displayURL}" class='crm-image-popup'>
-                      <img src="{$element.field_value.displayURL}" height = "100" width="100">
-                    </a>
-                  </td>
-                  {else}
-                  <td class="html-adjust">
-                    <a href="{$element.field_value.fileURL}">{$element.field_value.fileName}</a>
-                  </td>
-                {/if}
-                {else}
+                <td class="label">{$element.field_title}</td>
                 <td class="html-adjust">{$element.field_value}</td>
-              {/if}
             {/if}
           </tr>
         </table>
       {/foreach}
       <div>
-        <a href="#" class="button" style="margin-left: 6px;"
-           onclick="updateCaseCustom({$caseID}, {$customGroupId}, {$contactID}, {$caseTypeID}); return false;">
-          <span><div class="icon edit-icon"></div>{ts}Edit{/ts}</span>
-        </a>
+        {crmButton p="civicrm/case/cd/edit" q="cgcount=1&action=update&reset=1&type=Case&entityID=$caseID&groupID=$customGroupId&cid=$contactID&subType=$caseTypeID" icon="pencil"}{ts}Edit{/ts}{/crmButton}
       </div>
       <br/>
+      <div class="clear"></div>
     </div>
-    <div class="clear"></div>
   </div>
 
   {/foreach}
 {/foreach}
 <div id="case_custom_edit"></div>
-
-{literal}
-<script type="text/javascript">
-  cj(function() {
-    cj().crmAccordions();
-  });
-</script>
-{/literal}
-{*currently delete is available only for tab custom data*}
-{if $groupId}
-<script type="text/javascript">
-  {literal}
-  function hideStatus(valueID, groupID) {
-    cj('#statusmessg_' + groupID + '_' + valueID).hide( );
-  }
-
-  function showDelete(valueID, elementID, groupID, contactID) {
-    var confirmMsg = '{/literal}{ts escape='js'}Are you sure you want to delete this record?{/ts}{literal} &nbsp; <a href="#" onclick="deleteCustomValue( ' + valueID + ',\'' + elementID + '\',' + groupID + ',' + contactID + ' ); return false;" style="text-decoration: underline;">{/literal}{ts escape='js'}Yes{/ts}{literal}</a>&nbsp;&nbsp;&nbsp;<a href="#" onclick="hideStatus( ' + valueID + ', ' +  groupID + ' ); return false;" style="text-decoration: underline;">{/literal}{ts escape='js'}No{/ts}{literal}</a>';
-    cj('tr#statusmessg_' + groupID + '_' + valueID).show( ).children().find('span').html( confirmMsg );
-  }
-
-  function deleteCustomValue( valueID, elementID, groupID, contactID ) {
-    var postUrl = {/literal}"{crmURL p='civicrm/ajax/customvalue' h=0 }"{literal};
-    cj.ajax({
-      type: "POST",
-      data:  "valueID=" + valueID + "&groupID=" + groupID +"&contactId=" + contactID + "&key={/literal}{crmKey name='civicrm/ajax/customvalue'}{literal}",
-      url: postUrl,
-      success: function(html){
-        cj('#'+ elementID).hide();
-        hideStatus(valueID, groupID);
-        CRM.alert('', '{/literal}{ts escape="js"}Record Deleted{/ts}{literal}', 'success');
-        var element = cj( '.ui-tabs-nav #tab_custom_' + groupID + ' a' );
-        cj(element).html(cj(element).attr('title') + ' ('+ html+') ');
-      }
-    });
-  }
-  {/literal}
-</script>
-  {else}
-<script type="text/javascript">
-  {literal}
-  function updateCaseCustom( entityID, groupID, contactID, subType ) {
-    var dataURL = {/literal}"{crmURL p="civicrm/case/cd/edit" q="snippet=5&cgcount=1&action=update&reset=1" h=0}"{literal};
-    dataURL = dataURL + '&type=Case&entityID=' + entityID + '&groupID=' + groupID + '&cid=' + contactID + ( subType ? '&subType=' + subType  : '');
-
-    cj.ajax({
-      url: dataURL,
-      success: function(content) {
-        cj('#case_custom_edit').show( ).html(content).dialog({
-          title: "{/literal}{ts escape='js'}Update Case Information{/ts}{literal}",
-          modal: true,
-          width: 680,
-          overlay: {
-            opacity: 0.5,
-            background: "black"
-          },
-          open: function() {
-            var dialog = this;
-            cj('#_qf_CustomData_cancel').click(function() {
-              cj(dialog).dialog('close');
-              return false;
-            });
-          },
-          close: function(event, ui) {
-            cj(this).dialog('destroy');
-          }
-        });
-      }
-    });
-  }
-  {/literal}
-</script>
-{/if}
-

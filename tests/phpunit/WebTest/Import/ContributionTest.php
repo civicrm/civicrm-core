@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,16 +22,20 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'WebTest/Import/ImportCiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Import_ContributionTest
+ */
 class WebTest_Import_ContributionTest extends ImportCiviSeleniumTestCase {
 
   protected function setUp() {
     parent::setUp();
   }
 
-  function testContributionImportIndividual() {
+  public function testContributionImportIndividual() {
 
     $this->webtestLogin();
 
@@ -47,7 +51,7 @@ class WebTest_Import_ContributionTest extends ImportCiviSeleniumTestCase {
     $this->importCSVComponent('Contribution', $headers, $rows, 'Individual', 'Insert new contributions', $fieldMapper);
   }
 
-  function testContributionImportOrganization() {
+  public function testContributionImportOrganization() {
 
     $this->webtestLogin();
 
@@ -55,13 +59,13 @@ class WebTest_Import_ContributionTest extends ImportCiviSeleniumTestCase {
     list($headers, $rows) = $this->_contributionOrganizationCSVData();
     $fieldMapper = array(
       'mapper[0][0]' => 'organization_name',
-                              'mapper[2][0]' => 'financial_type',
+      'mapper[2][0]' => 'financial_type',
       'mapper[4][0]' => 'total_amount',
     );
     $this->importCSVComponent('Contribution', $headers, $rows, 'Organization', 'Insert new contributions', $fieldMapper);
   }
 
-  function testContributionImportHousehold() {
+  public function testContributionImportHousehold() {
 
     $this->webtestLogin();
 
@@ -69,13 +73,16 @@ class WebTest_Import_ContributionTest extends ImportCiviSeleniumTestCase {
     list($headers, $rows) = $this->_contributionHouseholdCSVData();
     $fieldMapper = array(
       'mapper[0][0]' => 'household_name',
-                              'mapper[2][0]' => 'financial_type',
+      'mapper[2][0]' => 'financial_type',
       'mapper[4][0]' => 'total_amount',
     );
     $this->importCSVComponent('Contribution', $headers, $rows, 'Household', 'Insert new contributions', $fieldMapper);
   }
 
-  function _contributionIndividualCSVData() {
+  /**
+   * @return array
+   */
+  public function _contributionIndividualCSVData() {
     $firstName1 = substr(sha1(rand()), 0, 7);
     $email1 = 'mail_' . substr(sha1(rand()), 0, 7) . '@example.com';
     $this->webtestAddContact($firstName1, 'Anderson', $email1);
@@ -96,14 +103,14 @@ class WebTest_Import_ContributionTest extends ImportCiviSeleniumTestCase {
       array(
         'email' => $email1,
         'fee_amount' => '200',
-        'financial_type'         => 'Donation',
+        'financial_type' => 'Donation',
         'contribution_status_id' => 'Completed',
         'total_amount' => '200',
       ),
       array(
         'email' => $email2,
         'fee_amount' => '400',
-        'financial_type'         => 'Donation',
+        'financial_type' => 'Donation',
         'contribution_status_id' => 'Completed',
         'total_amount' => '400',
       ),
@@ -112,7 +119,10 @@ class WebTest_Import_ContributionTest extends ImportCiviSeleniumTestCase {
     return array($headers, $rows);
   }
 
-  function _contributionHouseholdCSVData() {
+  /**
+   * @return array
+   */
+  public function _contributionHouseholdCSVData() {
     $household1 = substr(sha1(rand()), 0, 7) . ' home';
     $this->webtestAddHousehold($household1, TRUE);
 
@@ -131,14 +141,14 @@ class WebTest_Import_ContributionTest extends ImportCiviSeleniumTestCase {
       array(
         'household' => $household1,
         'fee_amount' => '200',
-                         'financial_type'         => 'Donation',
+        'financial_type' => 'Donation',
         'contribution_status_id' => 'Completed',
         'total_amount' => '200',
       ),
       array(
         'household' => $household2,
         'fee_amount' => '400',
-                         'financial_type'         => 'Donation',
+        'financial_type' => 'Donation',
         'contribution_status_id' => 'Completed',
         'total_amount' => '400',
       ),
@@ -147,7 +157,10 @@ class WebTest_Import_ContributionTest extends ImportCiviSeleniumTestCase {
     return array($headers, $rows);
   }
 
-  function _contributionOrganizationCSVData() {
+  /**
+   * @return array
+   */
+  public function _contributionOrganizationCSVData() {
     $organization1 = substr(sha1(rand()), 0, 7) . ' org';
     $this->webtestAddOrganization($organization1, TRUE);
 
@@ -166,14 +179,14 @@ class WebTest_Import_ContributionTest extends ImportCiviSeleniumTestCase {
       array(
         'organization' => $organization1,
         'fee_amount' => '200',
-                         'financial_type'         => 'Donation',
+        'financial_type' => 'Donation',
         'contribution_status_id' => 'Completed',
         'total_amount' => '200',
       ),
       array(
         'organization' => $organization2,
         'fee_amount' => '400',
-                         'financial_type'         => 'Donation',
+        'financial_type' => 'Donation',
         'contribution_status_id' => 'Completed',
         'total_amount' => '400',
       ),
@@ -181,5 +194,5 @@ class WebTest_Import_ContributionTest extends ImportCiviSeleniumTestCase {
 
     return array($headers, $rows);
   }
-}
 
+}

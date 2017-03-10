@@ -1,0 +1,32 @@
+<div ng-controller="PreviewRecipCtrl">
+  <!--
+  Controller: PreviewRecipCtrl
+  Required vars: model.sample
+  -->
+
+  <div class="help">
+    <p>{{ts('Based on current data, approximately %1 contacts will receive a copy of the mailing.', {1: model.count})}}</p>
+
+    <p ng-show="model.sample.length == model.sampleLimit">{{ts('Below is a sample of the first %1 recipients.', {1: model.sampleLimit})}}</p>
+
+    <p>{{ts('If individual contacts are separately modified, added, or removed, then the final list may change.')}}</p>
+  </div>
+
+  <div ng-show="model.sample == 0">
+    {{ts('No recipients')}}
+  </div>
+  <table ng-show="model.sample.length > 0">
+    <thead>
+      <tr>
+        <th>{{ts('Name')}}</th>
+        <th>{{ts('Email')}}</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="recipient in model.sample">
+        <td>{{recipient['api.contact.getvalue']}}</td>
+        <td>{{recipient['api.email.getvalue']}}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

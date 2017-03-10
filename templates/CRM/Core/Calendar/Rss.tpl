@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -34,12 +34,12 @@
 <docs>http://blogs.law.harvard.edu/tech/rss</docs>
 {foreach from=$events key=uid item=event}
 <item>
-<title>{$event.title|escape:'htmlall'}</title>
+<title>{$event.title|escape:'html'}</title>
 <link>{crmURL p='civicrm/event/info' q="reset=1&id=`$event.event_id`" fe=1 a=1}</link>
 <description>
-{if $event.summary}{$event.summary|escape:'htmlall'}
+{if $event.summary}{$event.summary|escape:'html'}
 {/if}
-{if $event.description}{$event.description|escape:'htmlall'}
+{if $event.description}{$event.description|escape:'html'}
 {/if}
 {if $event.start_date}{ts}When{/ts}: {$event.start_date|crmDate}{if $event.end_date} {ts}through{/ts} {strip}
         {* Only show end time if end date = start date *}
@@ -50,10 +50,10 @@
         {/if}{/strip}
     {/if}
 {/if}
-{if $event.is_show_location EQ 1 && $event.location}{ts}Where{/ts}: {$event.location|escape:'htmlall'}
+{if $event.is_show_location EQ 1 && $event.location}{ts}Where{/ts}: {$event.location|escape:'html'}
 {/if}
 </description>
-{if $event.event_type}<category>{$event.event_type|escape:'htmlall'}</category>
+{if $event.event_type}<category>{$event.event_type|escape:'html'}</category>
 {/if}
 {if $event.contact_email}<author>{$event.contact_email}</author>
 {/if}

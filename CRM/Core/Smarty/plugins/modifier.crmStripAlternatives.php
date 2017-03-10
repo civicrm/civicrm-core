@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
  */
@@ -37,11 +37,12 @@
  * Given an ezComponents-parsed representation of
  * a text with alternatives return only the first one
  *
- * @param string $full  all alternatives as a long string (or some other text)
+ * @param string $full
+ *   All alternatives as a long string (or some other text).
  *
- * @return string       only the first alternative found (or the text without alternatives)
+ * @return string
+ *   only the first alternative found (or the text without alternatives)
  */
 function smarty_modifier_crmStripAlternatives($full) {
   return CRM_Utils_String::stripAlternatives($full);
 }
-

@@ -1,10 +1,9 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,38 +23,34 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
- * This implements the profile page for all contacts. It uses a selector
- * object to do the actual dispay. The fields displayd are controlled by
+ * This implements the profile page for all contacts.
+ *
+ * It uses a selector object to do the actual display. The fields displayed are controlled by
  * the admin
  */
 class CRM_Mailing_Page_Event extends CRM_Core_Page {
 
   /**
-   * all the fields that are listings related
+   * All the fields that are listings related.
    *
    * @var array
-   * @access protected
    */
   protected $_fields;
 
   /**
-   * run this page (figure out the action needed and perform it).
-   *
-   * @return void
+   * Run this page (figure out the action needed and perform it).
    */
-  function run() {
-    $selector = &new CRM_Mailing_Selector_Event(
+  public function run() {
+    $selector = new CRM_Mailing_Selector_Event(
       CRM_Utils_Request::retrieve('event', 'String', $this),
       CRM_Utils_Request::retrieve('distinct', 'Boolean', $this),
       CRM_Utils_Request::retrieve('mid', 'Positive', $this),
@@ -65,7 +60,6 @@ class CRM_Mailing_Page_Event extends CRM_Core_Page {
 
     $mailing_id = CRM_Utils_Request::retrieve('mid', 'Positive', $this);
 
-    //assign backurl
     $context = CRM_Utils_Request::retrieve('context', 'String', $this);
 
     if ($context == 'activitySelector') {
@@ -77,6 +71,14 @@ class CRM_Mailing_Page_Event extends CRM_Core_Page {
       $cid = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
       $backUrl = CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid={$cid}&selectedChild=mailing");
       $backUrlTitle = ts('Back to Mailing');
+    }
+    elseif ($context == 'angPage') {
+      $angPage = CRM_Utils_Request::retrieve('angPage', 'String', $this);
+      if (!preg_match(':^[a-zA-Z0-9\-_/]+$:', $angPage)) {
+        CRM_Core_Error::fatal('Malformed return URL');
+      }
+      $backUrl = CRM_Utils_System::url('civicrm/a/#/' . $angPage);
+      $backUrlTitle = ts('Back to Report');
     }
     else {
       $backUrl = CRM_Utils_System::url('civicrm/mailing/report', "reset=1&mid={$mailing_id}");
@@ -111,5 +113,5 @@ class CRM_Mailing_Page_Event extends CRM_Core_Page {
 
     return parent::run();
   }
-}
 
+}

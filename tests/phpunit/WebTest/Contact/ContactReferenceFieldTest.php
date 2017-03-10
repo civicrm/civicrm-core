@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,16 +22,20 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Contact_ContactReferenceFieldTest
+ */
 class WebTest_Contact_ContactReferenceFieldTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
     parent::setUp();
   }
 
-  function testContactReferenceField() {
+  public function testContactReferenceField() {
     $this->webtestLogin();
 
     /* add new group */
@@ -62,7 +66,6 @@ class WebTest_Contact_ContactReferenceFieldTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent('_qf_GroupContact_next');
     $this->select('group_id', "label={$groupName}");
     $this->click('_qf_GroupContact_next');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForText('crm-notification-container', "Added to Group");
 
     // Individual 1
@@ -89,7 +92,7 @@ class WebTest_Contact_ContactReferenceFieldTest extends CiviSeleniumTestCase {
     $this->select("extends[0]", "value=Contact");
     $this->click("//option[@value='Contact']");
     $this->click("_qf_Group_next-bottom");
-    $this->waitForElementPresent("_qf_Field_cancel-bottom");
+    $this->waitForElementPresent("newCustomField");
 
     //Is custom group created?
     $this->waitForText('crm-notification-container', "Your custom field set '{$customGroupTitle}' has been added. You can add custom fields now.");
@@ -98,70 +101,76 @@ class WebTest_Contact_ContactReferenceFieldTest extends CiviSeleniumTestCase {
 
     // Add contact reference fields
     $contactRefFieldLabel1 = 'contact_ref_' . substr(sha1(rand()), 0, 4);
+    $this->waitForElementPresent("label");
     $this->click("label");
+    $this->waitForElementPresent("label");
     $this->type("label", $contactRefFieldLabel1);
+    $this->waitForElementPresent("data_type[0]");
     $this->select("data_type[0]", "label=Contact Reference");
 
     $this->waitForElementPresent("group_id");
     $this->select("group_id", $groupName);
 
     //clicking save
-    $this->click("_qf_Field_next_new-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->click("xpath=//div[@class='ui-dialog-buttonset']/button[2]/span[2]/");
 
     //Is custom field created?
-    $this->waitForText('crm-notification-container', "Your custom field '$contactRefFieldLabel1' has been saved.");
-
+    $this->waitForText('crm-notification-container', "Custom field '$contactRefFieldLabel1' has been saved.");
+    $this->waitForElementPresent("xpath=//div[@class='ui-dialog-buttonset']/button[3]/span[2]/");
     //add custom field - alphanumeric checkbox
     $contactRefFieldLabel2 = 'contact_ref_' . substr(sha1(rand()), 0, 4);
+
     $this->click("label");
+    $this->waitForElementPresent("label");
     $this->type("label", $contactRefFieldLabel2);
+    $this->waitForElementPresent("data_type[0]");
     $this->select("data_type[0]", "label=Contact Reference");
 
     $this->waitForElementPresent("group_id");
     $this->click("xpath=//form[@id='Field']//a[text()='Advanced Filter']");
     $this->waitForElementPresent("filter");
 
-    $this->type("filter", "action=lookup&contact_type=Organization");
+    $this->type("filter", "action=get&contact_type=Organization");
 
     //clicking save
-    $this->click("_qf_Field_next-bottom");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->click("xpath=//div[@class='ui-dialog-buttonset']/button[1]/span[2]/");
 
     //Is custom field created?
-    $this->waitForText('crm-notification-container', "Your custom field '$contactRefFieldLabel2' has been saved.");
+    $this->waitForText('crm-notification-container', "Custom field '$contactRefFieldLabel2' has been saved.");
 
     $this->openCiviPage('admin/custom/group/field', "reset=1&action=browse&gid={$customGroupId}");
 
-    $this->click("xpath=//div[@id='field_page']//table/tbody/tr[1]/td[8]/span[1]/a[text()='Edit Field']");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $fieldid1 = explode("&id=", $this->getAttribute("xpath=//div[@id='field_page']//table/tbody/tr[1]/td[8]/span[1]/a[text()='Edit Field']@href"));
+    $fieldid1 = $fieldid1[1];
 
-    $contactRefFieldID1 = $this->urlArg('id');
+    $contactRefFieldID1 = $fieldid1;
 
     $this->openCiviPage('admin/custom/group/field', "reset=1&action=browse&gid={$customGroupId}");
 
-    $this->click("xpath=//div[@id='field_page']//table/tbody/tr[2]/td[8]/span[1]/a[text()='Edit Field']");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $fieldid2 = explode("&id=", $this->getAttribute("xpath=//div[@id='field_page']//table/tbody/tr[2]/td[8]/span[1]/a[text()='Edit Field']@href"));
+    $fieldid2 = $fieldid2[1];
 
-    $contactRefFieldID2 = $this->urlArg('id');
+    $contactRefFieldID2 = $fieldid2;
 
     // Visit custom group preview page
     $this->openCiviPage('admin/custom/group', "action=preview&reset=1&id={$customGroupId}");
 
-    $this->type("custom_{$contactRefFieldID1}_-1", "Anderson");
-    $this->fireEvent("custom_{$contactRefFieldID1}_-1", "focus");
-    $this->click("custom_{$contactRefFieldID1}_-1");
-    $this->waitForElementPresent("css=div.ac_results-inner li");
-    $this->assertElementContainsText("css=div.ac_results-inner li", "{$contact1}@example.com");
-    $this->assertElementNotContainsText("css=div.ac_results-inner ul li", "{$contact2}@example.com");
+    $this->clickAt("//*[@id='custom_{$contactRefFieldID1}_-1']/../div/a");
+    $this->keyDown("//*[@id='select2-drop']/div/input", " ");
+    $this->type("//*[@id='select2-drop']/div/input", "Anderson");
+    $this->typeKeys("//*[@id='select2-drop']/div/input", "Anderson");
+    $this->waitForElementPresent("css=div.select2-result-label span");
+    $this->assertElementContainsText("css=div.select2-result-label", "{$contact1}@example.com");
+    $this->assertElementNotContainsText("css=div.select2-result-label", "{$contact2}@example.com");
 
     $this->openCiviPage('admin/custom/group', "action=preview&reset=1&id={$customGroupId}");
 
-    $this->type("custom_{$contactRefFieldID2}_-1", $org1);
-    $this->fireEvent("custom_{$contactRefFieldID2}_-1", "focus");
-    $this->click("custom_{$contactRefFieldID2}_-1");
-    $this->waitForElementPresent("css=div.ac_results-inner li");
-    $this->assertElementContainsText("css=div.ac_results-inner li", "{$org1}@example.com");
+    $this->clickAt("//*[@id='custom_{$contactRefFieldID2}_-1']/../div/a");
+    $this->keyDown("//*[@id='select2-drop']/div/input", " ");
+    $this->type("//*[@id='select2-drop']/div/input", $org1);
+    $this->typeKeys("//*[@id='select2-drop']/div/input", $org1);
+    $this->waitForElementPresent("css=div.select2-result-label");
+    $this->assertElementContainsText("css=div.select2-result-label", "{$org1}@example.com");
   }
-}
 
+}

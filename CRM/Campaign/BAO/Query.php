@@ -1,10 +1,9 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,27 +23,24 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Campaign_BAO_Query {
   //since normal activity clause clause get collides.
-  CONST
+  const
     CIVICRM_ACTIVITY = 'civicrm_survey_activity',
     CIVICRM_ACTIVITY_TARGET = 'civicrm_survey_activity_target',
     CIVICRM_ACTIVITY_ASSIGNMENT = 'civicrm_survey_activity_assignment';
 
   /**
-   * static field for all the campaign fields
+   * Static field for all the campaign fields.
    *
    * @var array
-   * @static
    */
   static $_campaignFields = NULL;
 
@@ -53,10 +49,10 @@ class CRM_Campaign_BAO_Query {
   /**
    * Function get the fields for campaign.
    *
-   * @return array self::$_campaignFields  an associative array of campaign fields
-   * @static
+   * @return array
+   *   self::$_campaignFields  an associative array of campaign fields
    */
-  static function &getFields() {
+  public static function &getFields() {
     if (!isset(self::$_campaignFields)) {
       self::$_campaignFields = array();
     }
@@ -65,12 +61,11 @@ class CRM_Campaign_BAO_Query {
   }
 
   /**
-   * if survey, campaign are involved, add the specific fields.
+   * If survey, campaign are involved, add the specific fields.
    *
-   * @return void
-   * @access public
+   * @param CRM_Contact_BAO_Contact $query
    */
-  static function select(&$query) {
+  public static function select(&$query) {
     self::$_applySurveyClause = FALSE;
     if (is_array($query->_params)) {
       foreach ($query->_params as $values) {
@@ -86,8 +81,10 @@ class CRM_Campaign_BAO_Query {
       }
     }
     // CRM-13810 Translate campaign_id to label for search builder
-    if (is_array($query->_select)) {
-      foreach($query->_select as $field => $queryString) {
+    // CRM-14238 Only translate when we are in contact mode
+    // Other modes need the untranslated data for export and other functions
+    if (is_array($query->_select) && $query->_mode == CRM_Contact_BAO_Query::MODE_CONTACTS) {
+      foreach ($query->_select as $field => $queryString) {
         if (substr($field, -11) == 'campaign_id') {
           $query->_pseudoConstantsSelect[$field] = array(
             'pseudoField' => 'campaign_id',
@@ -97,7 +94,6 @@ class CRM_Campaign_BAO_Query {
         }
       }
     }
-
 
     //get survey clause in force,
     //only when we have survey id.
@@ -140,7 +136,10 @@ class CRM_Campaign_BAO_Query {
     $query->_whereTables['civicrm_campaign'] = 1;
   }
 
-  static function where(&$query) {
+  /**
+   * @param $query
+   */
+  public static function where(&$query) {
     //get survey clause in force,
     //only when we have survey id.
     if (!self::$_applySurveyClause) {
@@ -157,7 +156,11 @@ class CRM_Campaign_BAO_Query {
     }
   }
 
-  static function whereClauseSingle(&$values, &$query) {
+  /**
+   * @param $values
+   * @param $query
+   */
+  public static function whereClauseSingle(&$values, &$query) {
     //get survey clause in force,
     //only when we have survey id.
     if (!self::$_applySurveyClause) {
@@ -203,7 +206,14 @@ class CRM_Campaign_BAO_Query {
     }
   }
 
-  static function from($name, $mode, $side) {
+  /**
+   * @param string $name
+   * @param $mode
+   * @param $side
+   *
+   * @return null|string
+   */
+  public static function from($name, $mode, $side) {
     $from = NULL;
     //get survey clause in force,
     //only when we have survey id.
@@ -224,8 +234,8 @@ class CRM_Campaign_BAO_Query {
 
       case self::CIVICRM_ACTIVITY:
         $surveyActivityTypes = CRM_Campaign_PseudoConstant::activityType();
-        $surveyKeys          = "(" . implode(',', array_keys($surveyActivityTypes)) . ")";
-        $from                = " INNER JOIN civicrm_activity ON ( civicrm_activity.id = civicrm_activity_target.activity_id
+        $surveyKeys = "(" . implode(',', array_keys($surveyActivityTypes)) . ")";
+        $from = " INNER JOIN civicrm_activity ON ( civicrm_activity.id = civicrm_activity_target.activity_id
                                  AND civicrm_activity.activity_type_id IN $surveyKeys ) ";
         break;
 
@@ -247,7 +257,14 @@ civicrm_activity_assignment.record_type_id = $assigneeID ) ";
     return $from;
   }
 
-  static function defaultReturnProperties($mode,
+  /**
+   * @param $mode
+   * @param bool $includeCustomFields
+   *
+   * @return array|null
+   */
+  public static function defaultReturnProperties(
+    $mode,
     $includeCustomFields = TRUE
   ) {
     $properties = NULL;
@@ -281,10 +298,23 @@ civicrm_activity_assignment.record_type_id = $assigneeID ) ";
     return $properties;
   }
 
-  static function tableNames(&$tables) {}
-  static function searchAction(&$row, $id) {}
+  /**
+   * @param $tables
+   */
+  public static function tableNames(&$tables) {
+  }
 
-  static function info(&$tables) {
+  /**
+   * @param $row
+   * @param int $id
+   */
+  public static function searchAction(&$row, $id) {
+  }
+
+  /**
+   * @param $tables
+   */
+  public static function info(&$tables) {
     //get survey clause in force,
     //only when we have survey id.
     if (!self::$_applySurveyClause) {
@@ -300,16 +330,12 @@ civicrm_activity_assignment.record_type_id = $assigneeID ) ";
   }
 
   /**
-   * add all the elements shared between,
+   * Add all the elements shared between,
    * normal voter search and voter listing (GOTV form)
    *
-   * @access public
-   *
    * @param CRM_Core_Form $form
-   * @return void
-   * @static
    */
-  static function buildSearchForm(&$form) {
+  public static function buildSearchForm(&$form) {
 
     $attributes = CRM_Core_DAO::getAttribute('CRM_Core_DAO_Address');
     $className = CRM_Utils_System::getClassName($form);
@@ -322,15 +348,18 @@ civicrm_activity_assignment.record_type_id = $assigneeID ) ";
     $form->add('text', 'street_unit', ts('Street Unit'), $attributes['street_unit']);
     $form->add('text', 'street_address', ts('Street Address'), $attributes['street_address']);
     $form->add('text', 'city', ts('City'), $attributes['city']);
-    $form->add('text', 'postal_code', ts('Zip / Postal Code'), $attributes['postal_code']);
+    $form->add('text', 'postal_code', ts('Postal Code'), $attributes['postal_code']);
 
-    $contactTypes = CRM_Contact_BAO_ContactType::getSelectElements();
+    //@todo FIXME - using the CRM_Core_DAO::VALUE_SEPARATOR creates invalid html - if you can find the form
+    // this is loaded onto then replace with something like '__' & test
+    $separator = CRM_Core_DAO::VALUE_SEPARATOR;
+    $contactTypes = CRM_Contact_BAO_ContactType::getSelectElements(FALSE, TRUE, $separator);
     $form->add('select', 'contact_type', ts('Contact Type(s)'), $contactTypes, FALSE,
       array('id' => 'contact_type', 'multiple' => 'multiple', 'class' => 'crm-select2')
     );
-    $groups = CRM_Core_PseudoConstant::group();
+    $groups = CRM_Core_PseudoConstant::nestedGroup();
     $form->add('select', 'group', ts('Groups'), $groups, FALSE,
-      array('id' => 'group', 'multiple' => 'multiple', 'class' => 'crm-select2')
+      array('multiple' => 'multiple', 'class' => 'crm-select2')
     );
 
     $showInterviewer = FALSE;
@@ -370,12 +399,14 @@ INNER JOIN  civicrm_custom_group grp on fld.custom_group_id = grp.id
     $customSearchFields = array();
     while ($dao->fetch()) {
       foreach (array(
-        'ward', 'precinct') as $name) {
+                 'ward',
+                 'precinct',
+               ) as $name) {
         if (stripos($name, $dao->label) !== FALSE) {
           $fieldId = $dao->id;
           $fieldName = 'custom_' . $dao->id;
           $customSearchFields[$name] = $fieldName;
-          CRM_Core_BAO_CustomField::addQuickFormElement($form, $fieldName, $fieldId, FALSE, FALSE);
+          CRM_Core_BAO_CustomField::addQuickFormElement($form, $fieldName, $fieldId, FALSE);
           break;
         }
       }
@@ -412,9 +443,14 @@ INNER JOIN  civicrm_custom_group grp on fld.custom_group_id = grp.id
    * Retrieve all valid voter ids,
    * and build respective clause to restrict search.
    *
-   * @param  array  $criteria an array
+   * @param array $criteria
+   *   An array.
    * @return $voterClause as a string
-   * @static
+   */
+  /**
+   * @param array $params
+   *
+   * @return array
    */
   static public function voterClause($params) {
     $voterClause = array();
@@ -422,7 +458,7 @@ INNER JOIN  civicrm_custom_group grp on fld.custom_group_id = grp.id
     if (!is_array($params) || empty($params)) {
       return $voterClause;
     }
-    $surveyId       = CRM_Utils_Array::value('campaign_survey_id', $params);
+    $surveyId = CRM_Utils_Array::value('campaign_survey_id', $params);
     $searchVoterFor = CRM_Utils_Array::value('campaign_search_voter_for', $params);
 
     //get the survey activities.
@@ -465,8 +501,8 @@ INNER JOIN  civicrm_custom_group grp on fld.custom_group_id = grp.id
               $values['status_id'] == $completedStatusId
             ) {
               $recontactIntSeconds = $numOfDays * 24 * 3600;
-              $actDateTimeSeconds  = CRM_Utils_Date::unixTime($values['activity_date_time']);
-              $totalSeconds        = $recontactIntSeconds + $actDateTimeSeconds;
+              $actDateTimeSeconds = CRM_Utils_Date::unixTime($values['activity_date_time']);
+              $totalSeconds = $recontactIntSeconds + $actDateTimeSeconds;
               //don't consider completed survey activity
               //unless it fulfill recontact interval criteria.
               if ($totalSeconds <= time()) {
@@ -485,7 +521,7 @@ INNER JOIN  civicrm_custom_group grp on fld.custom_group_id = grp.id
 
         //create temporary table to store voter ids.
         $tempTableName = CRM_Core_DAO::createTempTableName('civicrm_survey_respondent');
-        CRM_Core_DAO::executeQuery("DROP TABLE IF EXISTS {$tempTableName}");
+        CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE IF EXISTS {$tempTableName}");
 
         $query = "
      CREATE TEMPORARY TABLE {$tempTableName} (
@@ -526,60 +562,4 @@ INNER JOIN  civicrm_custom_group grp on fld.custom_group_id = grp.id
     return $voterClause;
   }
 
-  /**
-   * Build the campaign clause for component serach.
-   *
-   **/
-  public static function componentSearchClause(&$params, &$query) {
-    $op        = CRM_Utils_Array::value('op', $params, '=');
-    $campaign  = CRM_Utils_Array::value('campaign', $params);
-    $tableName = CRM_Utils_Array::value('tableName', $params);
-    $grouping  = CRM_Utils_Array::value('grouping', $params);
-    if (CRM_Utils_System::isNull($campaign) || empty($tableName)) {
-      return;
-    }
-
-    // fixme - what is the purpose of this code? $campaign should be
-    // an integer, not an array
-    if (is_array($campaign)) {
-      foreach (array(
-        'current_campaign', 'past_campaign') as $ignore) {
-        $index = array_search($ignore, $campaign);
-        if ($index !== FALSE)unset($campaign[$index]);
-      }
-    }
-
-    $allCampaigns = CRM_Campaign_BAO_Campaign::getCampaigns(NULL, NULL, FALSE, FALSE, FALSE, TRUE);
-
-    $campaignIds = $campaignTitles = array();
-    if (is_array($campaign)) {
-      foreach ($campaign as $campId) {
-        $campaignIds[$campId] = $campId;
-        $campaignTitles[$campId] = $allCampaigns[$campId];
-      }
-      if (count($campaignIds) > 1) {
-        $op = 'IN';
-        $campaignIds = '(' . implode(',', $campaignIds) . ')';
-      }
-      else {
-        $campaignIds = reset($campaignIds);
-      }
-    }
-    else {
-      $campaignIds = $campaign;
-      if (array_key_exists($campaignIds, $allCampaigns)) {
-        $campaignTitles[$campaignIds] = $allCampaigns[$campaignIds];
-      }
-    }
-    $query->_qill[$grouping][] = ts('Campaigns %1',
-      array(1 => $op)
-    ) . ' ' . implode(' ' . ts('or') . ' ', $campaignTitles);
-    $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("{$tableName}.campaign_id",
-      $op,
-      $campaignIds,
-      'Integer'
-    );
-    $query->_tables[$tableName] = $query->_whereTables[$tableName] = 1;
-  }
 }
-

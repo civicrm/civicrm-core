@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,19 +22,23 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'WebTest/Import/ImportCiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Import_ContactTest
+ */
 class WebTest_Import_ContactTest extends ImportCiviSeleniumTestCase {
 
   protected function setUp() {
     parent::setUp();
   }
 
-  /*
+  /**
    *  Test contact import for Individuals.
    */
-  function testIndividualImport() {
+  public function testIndividualImport() {
     $this->webtestLogin();
 
     // Get sample import data.
@@ -118,10 +122,10 @@ class WebTest_Import_ContactTest extends ImportCiviSeleniumTestCase {
     $this->importContacts($headers, $rows, 'Individual', 'No Duplicate Checking');
   }
 
-  /*
+  /**
    *  Test contact import for Organization.
    */
-  function testOrganizationImport() {
+  public function testOrganizationImport() {
 
     $this->webtestLogin();
 
@@ -199,10 +203,10 @@ class WebTest_Import_ContactTest extends ImportCiviSeleniumTestCase {
     $this->importContacts($headers, $rows, 'Organization', 'No Duplicate Checking');
   }
 
-  /*
+  /**
    *  Test contact import for Household.
    */
-  function testHouseholdImport() {
+  public function testHouseholdImport() {
 
     $this->webtestLogin();
 
@@ -283,7 +287,10 @@ class WebTest_Import_ContactTest extends ImportCiviSeleniumTestCase {
   /*
    *  Helper function to provide data for contact import for Individuals.
    */
-  function _individualCSVData() {
+  /**
+   * @return array
+   */
+  public function _individualCSVData() {
     $headers = array(
       'first_name' => 'First Name',
       'middle_name' => 'Middle Name',
@@ -298,7 +305,8 @@ class WebTest_Import_ContactTest extends ImportCiviSeleniumTestCase {
     );
 
     $rows = array(
-      array('first_name' => substr(sha1(rand()), 0, 7),
+      array(
+        'first_name' => substr(sha1(rand()), 0, 7),
         'middle_name' => substr(sha1(rand()), 0, 7),
         'last_name' => 'Anderson',
         'email' => substr(sha1(rand()), 0, 7) . '@example.com',
@@ -307,9 +315,10 @@ class WebTest_Import_ContactTest extends ImportCiviSeleniumTestCase {
         'address_2' => 'Add 2',
         'city' => 'Watson',
         'state' => 'NY',
-        'country' => 'United States',
+        'country' => 'UNITED STATES',
       ),
-      array('first_name' => substr(sha1(rand()), 0, 7),
+      array(
+        'first_name' => substr(sha1(rand()), 0, 7),
         'middle_name' => substr(sha1(rand()), 0, 7),
         'last_name' => 'Summerson',
         'email' => substr(sha1(rand()), 0, 7) . '@example.com',
@@ -318,7 +327,7 @@ class WebTest_Import_ContactTest extends ImportCiviSeleniumTestCase {
         'address_2' => 'Add 2',
         'city' => 'Watson',
         'state' => 'NY',
-        'country' => 'United States',
+        'country' => 'UNITED STATES',
       ),
     );
 
@@ -328,7 +337,10 @@ class WebTest_Import_ContactTest extends ImportCiviSeleniumTestCase {
   /*
    *  Helper function to provide data for contact import for Organizations.
    */
-  function _organizationCSVData() {
+  /**
+   * @return array
+   */
+  public function _organizationCSVData() {
     $headers = array(
       'organization_name' => 'Organization Name',
       'email' => 'Email',
@@ -341,23 +353,25 @@ class WebTest_Import_ContactTest extends ImportCiviSeleniumTestCase {
     );
 
     $rows = array(
-      array('organization_name' => 'org_' . substr(sha1(rand()), 0, 7),
+      array(
+        'organization_name' => 'org_' . substr(sha1(rand()), 0, 7),
         'email' => substr(sha1(rand()), 0, 7) . '@example.org',
         'phone' => '9949912154',
         'address_1' => 'Add 1',
         'address_2' => 'Add 2',
         'city' => 'Watson',
         'state' => 'NY',
-        'country' => 'United States',
+        'country' => 'UNITED STATES',
       ),
-      array('organization_name' => 'org_' . substr(sha1(rand()), 0, 7),
+      array(
+        'organization_name' => 'org_' . substr(sha1(rand()), 0, 7),
         'email' => substr(sha1(rand()), 0, 7) . '@example.org',
         'phone' => '6949412154',
         'address_1' => 'Add 1',
         'address_2' => 'Add 2',
         'city' => 'Watson',
         'state' => 'NY',
-        'country' => 'United States',
+        'country' => 'UNITED STATES',
       ),
     );
 
@@ -367,7 +381,10 @@ class WebTest_Import_ContactTest extends ImportCiviSeleniumTestCase {
   /*
    *  Helper function to provide data for contact import for Household.
    */
-  function _householdCSVData() {
+  /**
+   * @return array
+   */
+  public function _householdCSVData() {
     $headers = array(
       'household_name' => 'Household Name',
       'email' => 'Email',
@@ -380,27 +397,29 @@ class WebTest_Import_ContactTest extends ImportCiviSeleniumTestCase {
     );
 
     $rows = array(
-      array('household_name' => 'household_' . substr(sha1(rand()), 0, 7),
+      array(
+        'household_name' => 'household_' . substr(sha1(rand()), 0, 7),
         'email' => substr(sha1(rand()), 0, 7) . '@example.org',
         'phone' => '3949912154',
         'address_1' => 'Add 1',
         'address_2' => 'Add 2',
         'city' => 'Watson',
         'state' => 'NY',
-        'country' => 'United States',
+        'country' => 'UNITED STATES',
       ),
-      array('household_name' => 'household_' . substr(sha1(rand()), 0, 7),
+      array(
+        'household_name' => 'household_' . substr(sha1(rand()), 0, 7),
         'email' => substr(sha1(rand()), 0, 7) . '@example.org',
         'phone' => '5949412154',
         'address_1' => 'Add 1',
         'address_2' => 'Add 2',
         'city' => 'Watson',
         'state' => 'NY',
-        'country' => 'United States',
+        'country' => 'UNITED STATES',
       ),
     );
 
     return array($headers, $rows);
   }
-}
 
+}

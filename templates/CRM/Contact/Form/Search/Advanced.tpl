@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -77,7 +77,7 @@
         {include file="CRM/Contact/Form/Search/ResultTasks.tpl"}
       {/if}
     </div>
-    
+
     {* This section displays the rows along and includes the paging controls *}
     <div class="crm-search-results">
       {if $resultFile}

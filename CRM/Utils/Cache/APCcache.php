@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,21 +23,19 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
-class CRM_Utils_Cache_APCcache {
+class CRM_Utils_Cache_APCcache implements CRM_Utils_Cache_Interface {
   const DEFAULT_TIMEOUT = 3600;
-  const DEFAULT_PREFIX  = '';
+  const DEFAULT_PREFIX = '';
 
   /**
-   * The default timeout to use
+   * The default timeout to use.
    *
    * @var int
    */
@@ -55,13 +53,14 @@ class CRM_Utils_Cache_APCcache {
   protected $_prefix = self::DEFAULT_PREFIX;
 
   /**
-   * Constructor
+   * Constructor.
    *
-   * @param array   $config  an array of configuration params
+   * @param array $config
+   *   An array of configuration params.
    *
-   * @return void
+   * @return \CRM_Utils_Cache_APCcache
    */
-  function __construct(&$config) {
+  public function __construct(&$config) {
     if (isset($config['timeout'])) {
       $this->_timeout = intval($config['timeout']);
     }
@@ -70,22 +69,38 @@ class CRM_Utils_Cache_APCcache {
     }
   }
 
-  function set($key, &$value) {
+  /**
+   * @param $key
+   * @param $value
+   *
+   * @return bool
+   */
+  public function set($key, &$value) {
     if (!apc_store($this->_prefix . $key, $value, $this->_timeout)) {
       return FALSE;
     }
     return TRUE;
   }
 
-  function &get($key) {
+  /**
+   * @param $key
+   *
+   * @return mixed
+   */
+  public function get($key) {
     return apc_fetch($this->_prefix . $key);
   }
 
-  function delete($key) {
+  /**
+   * @param $key
+   *
+   * @return bool|string[]
+   */
+  public function delete($key) {
     return apc_delete($this->_prefix . $key);
   }
 
-  function flush() {
+  public function flush() {
     $allinfo = apc_cache_info('user');
     $keys = $allinfo['cache_list'];
     $prefix = $this->_prefix . "CRM_";  // Our keys follows this pattern: ([A-Za-z0-9_]+)?CRM_[A-Za-z0-9_]+
@@ -93,9 +108,11 @@ class CRM_Utils_Cache_APCcache {
 
     foreach ($keys as $key) {
       $name = $key['info'];
-      if ($prefix == substr($name,0,$lp)) {  // Ours?
+      if ($prefix == substr($name, 0, $lp)) {
+        // Ours?
         apc_delete($this->_prefix . $name);
       }
     }
   }
+
 }

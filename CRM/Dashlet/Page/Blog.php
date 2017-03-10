@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
  */
@@ -40,54 +40,47 @@ class CRM_Dashlet_Page_Blog extends CRM_Core_Page {
 
   const CHECK_TIMEOUT = 5;
   const CACHE_DAYS = 1;
-  const BLOG_URL = 'https://civicrm.org/blog/feed';
+  const NEWS_URL = 'https://civicrm.org/news-feed.rss';
 
   /**
-   * Get the final, usable URL string (after interpolating any variables)
+   * Gets url for blog feed.
    *
-   * @return FALSE|string
+   * @return string
    */
-  public function getBlogUrl() {
-    // Note: We use "*default*" as the default (rather than self::BLOG_URL) so that future
-    // developers can change BLOG_URL without needing to update {civicrm_setting}.
-    $url = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'blogUrl', NULL, '*default*');
+  public function getNewsUrl() {
+    // Note: We use "*default*" as the default (rather than self::NEWS_URL) so that future
+    // developers can change NEWS_URL without needing to update {civicrm_setting}.
+    $url = Civi::settings()->get('blogUrl');
     if ($url === '*default*') {
-      $url = self::BLOG_URL;
+      $url = self::NEWS_URL;
     }
     return CRM_Utils_System::evalUrl($url);
   }
 
   /**
-   * List blog articles as dashlet
-   *
-   * @access public
+   * Output data to template.
    */
-  function run() {
-    $context = CRM_Utils_Request::retrieve('context', 'String', $this, FALSE, 'dashlet');
-    $this->assign('context', $context);
-
-    $this->assign('blog', $this->_getBlog());
-
+  public function run() {
+    $this->assign('feeds', $this->getData());
     return parent::run();
   }
 
   /**
-   * Load blog articles from cache
-   * Refresh cache if expired
+   * Load feeds from cache.
+   *
+   * Refresh cache if expired.
    *
    * @return array
-   *
-   * @access private
    */
-  private function _getBlog() {
+  protected function getData() {
     // Fetch data from cache
     $cache = CRM_Core_DAO::executeQuery("SELECT data, created_date FROM civicrm_cache
-      WHERE group_name = 'dashboard' AND path = 'blog'");
+      WHERE group_name = 'dashboard' AND path = 'newsfeed'");
     if ($cache->fetch()) {
       $expire = time() - (60 * 60 * 24 * self::CACHE_DAYS);
       // Refresh data after CACHE_DAYS
       if (strtotime($cache->created_date) < $expire) {
-        $new_data = $this->_getFeed($this->getBlogUrl());
+        $new_data = $this->getFeeds();
         // If fetching the new rss feed was successful, return it
         // Otherwise use the old cached data - it's better than nothing
         if ($new_data) {
@@ -96,37 +89,76 @@ class CRM_Dashlet_Page_Blog extends CRM_Core_Page {
       }
       return unserialize($cache->data);
     }
-    return $this->_getFeed($this->getBlogUrl());
+    return $this->getFeeds();
   }
 
   /**
-   * Parse rss feed and cache results
+   * Fetch all feeds & cache results.
    *
-   * @return array|NULL array of blog items; or NULL if not available
-   *
-   * @access public
+   * @return array
    */
-  public function _getFeed($url) {
+  protected function getFeeds() {
+    $newsFeed = $this->getFeed($this->getNewsUrl());
+    // If unable to fetch the feed, return empty results.
+    if (!$newsFeed) {
+      return array();
+    }
+    $feeds = $this->formatItems($newsFeed);
+    CRM_Core_BAO_Cache::setItem($feeds, 'dashboard', 'newsfeed');
+    return $feeds;
+  }
+
+  /**
+   * Parse a single rss feed.
+   *
+   * @param $url
+   *
+   * @return array|NULL
+   *   array of blog items; or NULL if not available
+   */
+  protected function getFeed($url) {
     $httpClient = new CRM_Utils_HttpClient(self::CHECK_TIMEOUT);
     list ($status, $rawFeed) = $httpClient->get($url);
     if ($status !== CRM_Utils_HttpClient::STATUS_OK) {
       return NULL;
     }
-    $feed = @simplexml_load_string($rawFeed);
+    return @simplexml_load_string($rawFeed);
+  }
 
-    $blog = array();
-    if ($feed && !empty($feed->channel->item)) {
-      foreach ($feed->channel->item as $item) {
-        $item = (array) $item;
-        // Clean up description - remove tags that would break dashboard layout
-        $description = preg_replace('#<h[1-3][^>]*>(.+?)</h[1-3][^>]*>#s', '<h4>$1</h4>', $item['description']);
-        $item['description'] = strip_tags($description, "<a><p><h4><h5><h6><b><i><em><strong><ol><ul><li><dd><dt><code><pre><br>");
-        $blog[] = $item;
-      }
-      if ($blog) {
-        CRM_Core_BAO_Cache::setItem($blog, 'dashboard', 'blog');
+  /**
+   * @param string $feed
+   * @return array
+   */
+  protected function formatItems($feed) {
+    $result = array();
+    if ($feed && !empty($feed->channel)) {
+      foreach ($feed->channel as $channel) {
+        $content = array(
+          'title' => (string) $channel->title,
+          'description' => (string) $channel->description,
+          'name' => strtolower(CRM_Utils_String::munge($channel->title, '-')),
+          'items' => array(),
+        );
+        foreach ($channel->item as $item) {
+          $item = (array) $item;
+          $item['title'] = strip_tags($item['title']);
+          // Clean up description - remove tags & styles that would break dashboard layout
+          $description = preg_replace('#<h[1-3][^>]*>(.+?)</h[1-3][^>]*>#s', '<h4>$1</h4>', $item['description']);
+          $description = strip_tags($description, "<a><p><h4><h5><h6><b><i><em><strong><ol><ul><li><dd><dt><code><pre><br><hr>");
+          $description = preg_replace('/(<[^>]+) style=["\'].*?["\']/i', '$1', $description);
+          // Add paragraph markup if it's missing.
+          if (strpos($description, '<p') === FALSE) {
+            $description = '<p>' . $description . '</p>';
+          }
+          $item['description'] = $description;
+          $content['items'][] = $item;
+        }
+        if ($content['items']) {
+          $result[] = $content;
+        }
       }
     }
-    return $blog;
+    return $result;
   }
+
 }

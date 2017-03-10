@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,49 +23,39 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
  * This class handle mailing and contact related functions
- *
  */
 class CRM_Mailing_Page_Tab extends CRM_Contact_Page_View {
   /**
-   * The action links that we need to display for the browse screen
+   * The action links that we need to display for the browse screen.
    *
    * @var array
-   * @static
    */
   static $_links = NULL;
   public $_permission = NULL;
   public $_contactId = NULL;
 
   /**
-   * This function is called when action is browse
-   *
-   * return null
-   * @access public
+   * Called when action is browse.
    */
-  function browse() {
+  public function browse() {
   }
 
   /**
-   * build all the data structures needed to build the form
-   *
-   * @return void
-   * @access public
+   * Build all the data structures needed to build the form.
    */
-  function preProcess() {
+  public function preProcess() {
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse');
-    $this->_id     = CRM_Utils_Request::retrieve('id', 'Positive', $this);
+    $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
 
     $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
     $displayName = CRM_Contact_BAO_Contact::displayName($this->_contactId);
@@ -73,25 +63,21 @@ class CRM_Mailing_Page_Tab extends CRM_Contact_Page_View {
     $this->assign('contactId', $this->_contactId);
     $this->assign('displayName', $displayName);
 
-    // check logged in url permission
+    // Check logged in url permission.
     CRM_Contact_Page_View::checkUserPermission($this);
 
-    // set page title
     CRM_Utils_System::setTitle(ts('Mailings sent to %1', array(1 => $displayName)));
   }
 
   /**
-   * This function is the main function that is called when the page loads,
-   * it decides the which action has to be taken for the page.
+   * The main function that is called when the page loads.
    *
-   * return null
-   * @access public
+   * It decides the which action has to be taken for the page.
    */
-  function run() {
+  public function run() {
     $this->preProcess();
     $this->browse();
-
-    return parent::run();
+    parent::run();
   }
-}
 
+}

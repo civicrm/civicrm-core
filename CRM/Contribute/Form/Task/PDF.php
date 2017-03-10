@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,13 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -49,11 +48,9 @@ class CRM_Contribute_Form_Task_PDF extends CRM_Contribute_Form_Task {
   protected $_rows;
 
   /**
-   * build all the data structures needed to build the form
-   *
-   * @return void
-   * @access public
-   */ function preProcess() {
+   * Build all the data structures needed to build the form.
+   */
+  public function preProcess() {
     $id = CRM_Utils_Request::retrieve('id', 'Positive',
       $this, FALSE
     );
@@ -79,8 +76,6 @@ AND    {$this->_componentClause}";
       CRM_Core_Error::statusBounce("Please select only online contributions with Completed status.");
     }
 
-    // we have all the contribution ids, so now we get the contact ids
-    parent::setContactIDs();
     $this->assign('single', $this->_single);
 
     $qfKey = CRM_Utils_Request::retrieve('qfKey', 'String', $this);
@@ -91,25 +86,27 @@ AND    {$this->_componentClause}";
 
     $url = CRM_Utils_System::url('civicrm/contribute/search', $urlParams);
     $breadCrumb = array(
-      array('url' => $url,
+      array(
+        'url' => $url,
         'title' => ts('Search Results'),
-      ));
-
+      ),
+    );
+    CRM_Contact_Form_Task_EmailCommon ::preProcessFromAddress($this, FALSE);
+    // we have all the contribution ids, so now we get the contact ids
+    parent::setContactIDs();
     CRM_Utils_System::appendBreadCrumb($breadCrumb);
     CRM_Utils_System::setTitle(ts('Print Contribution Receipts'));
   }
 
   /**
-   * Build the form
-   *
-   * @access public
-   *
-   * @return void
+   * Build the form object.
    */
   public function buildQuickForm() {
 
     $this->addElement('radio', 'output', NULL, ts('Email Receipts'), 'email_receipt',
-      array('onClick' => "document.getElementById('selectPdfFormat').style.display = 'none';")
+      array(
+        'onClick' => "document.getElementById('selectPdfFormat').style.display = 'none';
+        document.getElementById('selectEmailFrom').style.display = 'block';")
     );
     $this->addElement('radio', 'output', NULL, ts('PDF Receipts'), 'pdf_receipt',
       array('onClick' => "document.getElementById('selectPdfFormat').style.display = 'block';")
@@ -119,6 +116,10 @@ AND    {$this->_componentClause}";
     $this->add('select', 'pdf_format_id', ts('Page Format'),
       array(0 => ts('- default -')) + CRM_Core_BAO_PdfFormat::getList(TRUE)
     );
+    $this->add('checkbox', 'receipt_update', ts('Update receipt dates for these contributions'), FALSE);
+    $this->add('checkbox', 'override_privacy', ts('Override privacy setting? (Do not email / Do not mail)'), FALSE);
+
+    $this->add('select', 'fromEmailAddress', ts('From Email'), $this->_fromEmails, FALSE, array('class' => 'crm-select2 huge'));
 
     $this->addButtons(array(
         array(
@@ -135,62 +136,28 @@ AND    {$this->_componentClause}";
   }
 
   /**
-   * Set default values
+   * Set default values.
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaultFormat = CRM_Core_BAO_PdfFormat::getDefaultValues();
-    return array('pdf_format_id' => $defaultFormat['id']);
+    return array('pdf_format_id' => $defaultFormat['id'], 'receipt_update' => 1, 'override_privacy' => 0);
   }
 
   /**
-   * process the form after the input has been submitted and validated
-   *
-   * @access public
-   *
-   * @return void
+   * Process the form after the input has been submitted and validated.
    */
   public function postProcess() {
     // get all the details needed to generate a receipt
-    $contribIDs = implode(',', $this->_contributionIds);
-
-    $details = CRM_Contribute_Form_Task_Status::getDetails($contribIDs);
-
-    $baseIPN = new CRM_Core_Payment_BaseIPN();
-
     $message = array();
     $template = CRM_Core_Smarty::singleton();
 
     $params = $this->controller->exportValues($this->_name);
+    $elements = self::getElements($this->_contributionIds, $params, $this->_contactIds);
 
-    $createPdf = FALSE;
-    if ($params['output'] == "pdf_receipt") {
-      $createPdf = TRUE;
-    }
-
-    $excludeContactIds = array();
-    if (!$createPdf) {
-      $returnProperties = array(
-        'email' => 1,
-        'do_not_email' => 1,
-        'is_deceased' => 1,
-        'on_hold' => 1,
-      );
-
-      list($contactDetails) = CRM_Utils_Token::getTokenDetails($this->_contactIds, $returnProperties, FALSE, FALSE);
-      $suppressedEmails = 0;
-      foreach ($contactDetails as $id => $values) {
-        if (empty($values['email']) || !empty($values['do_not_email']) ||
-          CRM_Utils_Array::value('is_deceased', $values) || !empty($values['on_hold'])) {
-          $suppressedEmails++;
-          $excludeContactIds[] = $values['contact_id'];
-        }
-      }
-    }
-
-    foreach ($details as $contribID => $detail) {
+    foreach ($elements['details'] as $contribID => $detail) {
       $input = $ids = $objects = array();
 
-      if (in_array($detail['contact'], $excludeContactIds)) {
+      if (in_array($detail['contact'], $elements['excludeContactIds'])) {
         continue;
       }
 
@@ -204,29 +171,43 @@ AND    {$this->_componentClause}";
       $ids['participant'] = CRM_Utils_Array::value('participant', $detail);
       $ids['event'] = CRM_Utils_Array::value('event', $detail);
 
-      if (!$baseIPN->validateData($input, $ids, $objects, FALSE)) {
+      if (!$elements['baseIPN']->validateData($input, $ids, $objects, FALSE)) {
         CRM_Core_Error::fatal();
       }
 
       $contribution = &$objects['contribution'];
-      // CRM_Core_Error::debug('o',$objects);
-
 
       // set some fake input values so we can reuse IPN code
-      $input['amount']     = $contribution->total_amount;
-      $input['is_test']    = $contribution->is_test;
+      $input['amount'] = $contribution->total_amount;
+      $input['is_test'] = $contribution->is_test;
       $input['fee_amount'] = $contribution->fee_amount;
       $input['net_amount'] = $contribution->net_amount;
-      $input['trxn_id']    = $contribution->trxn_id;
-      $input['trxn_date']  = isset($contribution->trxn_date) ? $contribution->trxn_date : NULL;
+      $input['trxn_id'] = $contribution->trxn_id;
+      $input['trxn_date'] = isset($contribution->trxn_date) ? $contribution->trxn_date : NULL;
+      $input['receipt_update'] = $params['receipt_update'];
+      $input['contribution_status_id'] = $contribution->contribution_status_id;
+      $input['paymentProcessor'] = empty($contribution->trxn_id) ? NULL :
+        CRM_Core_DAO::singleValueQuery("SELECT payment_processor_id
+          FROM civicrm_financial_trxn
+          WHERE trxn_id = %1
+          LIMIT 1", array(
+            1 => array($contribution->trxn_id, 'String')));
 
       // CRM_Contribute_BAO_Contribution::composeMessageArray expects mysql formatted date
       $objects['contribution']->receive_date = CRM_Utils_Date::isoToMysql($objects['contribution']->receive_date);
 
-      // CRM_Core_Error::debug('input',$input);
-
       $values = array();
-      $mail = $baseIPN->sendMail($input, $ids, $objects, $values, FALSE, $createPdf);
+      if (isset($params['fromEmailAddress']) && !$elements['createPdf']) {
+        // CRM-19129 Allow useres the choice of From Email to send the receipt from.
+        $fromEmail = $params['fromEmailAddress'];
+        $from = CRM_Utils_Array::value($fromEmail, $this->_emails);
+        $fromDetails = explode(' <', $from);
+        $input['receipt_from_email'] = substr(trim($fromDetails[1]), 0, -1);
+        $input['receipt_from_name'] = str_replace('"', '', $fromDetails[0]);
+      }
+
+      $mail = CRM_Contribute_BAO_Contribution::sendMail($input, $ids, $objects['contribution']->id, $values, FALSE,
+        $elements['createPdf']);
 
       if ($mail['html']) {
         $message[] = $mail['html'];
@@ -238,17 +219,18 @@ AND    {$this->_componentClause}";
       // reset template values before processing next transactions
       $template->clearTemplateVars();
     }
-    if ($createPdf) {
+
+    if ($elements['createPdf']) {
       CRM_Utils_PDF_Utils::html2pdf($message,
         'civicrmContributionReceipt.pdf',
         FALSE,
-        $params['pdf_format_id']
+        $elements['params']['pdf_format_id']
       );
       CRM_Utils_System::civiExit();
     }
     else {
-      if ($suppressedEmails) {
-        $status = ts('Email was NOT sent to %1 contacts (no email address on file, or communication preferences specify DO NOT EMAIL, or contact is deceased).', array(1 => $suppressedEmails));
+      if ($elements['suppressedEmails']) {
+        $status = ts('Email was NOT sent to %1 contacts (no email address on file, or communication preferences specify DO NOT EMAIL, or contact is deceased).', array(1 => $elements['suppressedEmails']));
         $msgTitle = ts('Email Error');
         $msgType = 'error';
       }
@@ -260,5 +242,67 @@ AND    {$this->_componentClause}";
       CRM_Core_Session::setStatus($status, $msgTitle, $msgType);
     }
   }
-}
 
+  /**
+   * Declaration of common variables for Invoice and PDF.
+   *
+   *
+   * @param array $contribIds
+   *   Contribution Id.
+   * @param array $params
+   *   Parameter for pdf or email invoices.
+   * @param array $contactIds
+   *   Contact Id.
+   *
+   * @return array
+   *   array of common elements
+   *
+   */
+  static public function getElements($contribIds, $params, $contactIds) {
+    $pdfElements = array();
+
+    $pdfElements['contribIDs'] = implode(',', $contribIds);
+
+    $pdfElements['details'] = CRM_Contribute_Form_Task_Status::getDetails($pdfElements['contribIDs']);
+
+    $pdfElements['baseIPN'] = new CRM_Core_Payment_BaseIPN();
+
+    $pdfElements['params'] = $params;
+
+    $pdfElements['createPdf'] = FALSE;
+    if (!empty($pdfElements['params']['output']) &&
+      ($pdfElements['params']['output'] == "pdf_invoice" || $pdfElements['params']['output'] == "pdf_receipt")
+    ) {
+      $pdfElements['createPdf'] = TRUE;
+    }
+
+    $excludeContactIds = array();
+    if (!$pdfElements['createPdf']) {
+      $returnProperties = array(
+        'email' => 1,
+        'do_not_email' => 1,
+        'is_deceased' => 1,
+        'on_hold' => 1,
+      );
+
+      list($contactDetails) = CRM_Utils_Token::getTokenDetails($contactIds, $returnProperties, FALSE, FALSE);
+      $pdfElements['suppressedEmails'] = 0;
+      $suppressedEmails = 0;
+      foreach ($contactDetails as $id => $values) {
+        if (empty($values['email']) ||
+          (empty($params['override_privacy']) && !empty($values['do_not_email']))
+          || CRM_Utils_Array::value('is_deceased', $values)
+          || !empty($values['on_hold'])
+        ) {
+          $suppressedEmails++;
+          $pdfElements['suppressedEmails'] = $suppressedEmails;
+          $excludeContactIds[] = $values['contact_id'];
+        }
+      }
+    }
+    $pdfElements['excludeContactIds'] = $excludeContactIds;
+
+    return $pdfElements;
+  }
+
+}

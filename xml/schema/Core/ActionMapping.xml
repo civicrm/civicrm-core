@@ -7,69 +7,78 @@
   <comment>Table to store mapping for the reminder.</comment>
   <add>3.4</add>
   <field>
-      <name>id</name>
-      <type>int unsigned</type>
-      <required>true</required>
-      <add>3.4</add>
+    <name>id</name>
+    <title>Action Mapping ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <add>3.4</add>
   </field>
   <primaryKey>
-       <name>id</name>
-       <autoincrement>true</autoincrement>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
   </primaryKey>
   <field>
-       <name>entity</name>
-       <type>varchar</type>
-       <length>64</length>
-       <comment>Entity for which the reminder is created</comment>
-       <add>3.4</add>
+    <name>entity</name>
+    <title>Action Mapping Entity</title>
+    <type>varchar</type>
+    <length>64</length>
+    <comment>Entity for which the reminder is created</comment>
+    <add>3.4</add>
   </field>
   <field>
-       <name>entity_value</name>
-       <type>varchar</type>
-       <length>64</length>
-       <comment>Entity value</comment>
-       <add>3.4</add>
+    <name>entity_value</name>
+    <title>Action Mapping Entity Value</title>
+    <type>varchar</type>
+    <length>64</length>
+    <comment>Entity value</comment>
+    <add>3.4</add>
   </field>
   <field>
-       <name>entity_value_label</name>
-       <type>varchar</type>
-       <length>64</length>
-       <comment>Entity value label</comment>
-       <add>3.4</add>
+    <name>entity_value_label</name>
+    <title>Value Label</title>
+    <type>varchar</type>
+    <length>64</length>
+    <comment>Entity value label</comment>
+    <add>3.4</add>
   </field>
   <field>
-       <name>entity_status</name>
-       <type>varchar</type>
-       <length>64</length>
-       <comment>Entity status</comment>
-       <add>3.4</add>
+    <name>entity_status</name>
+    <title>Status</title>
+    <type>varchar</type>
+    <length>64</length>
+    <comment>Entity status</comment>
+    <add>3.4</add>
   </field>
   <field>
-       <name>entity_status_label</name>
-       <type>varchar</type>
-       <length>64</length>
-       <comment>Entity status label</comment>
-       <add>3.4</add>
+    <name>entity_status_label</name>
+    <title>Status Label</title>
+    <type>varchar</type>
+    <length>64</length>
+    <comment>Entity status label</comment>
+    <add>3.4</add>
   </field>
   <field>
-       <name>entity_date_start</name>
-       <type>varchar</type>
-       <length>64</length>
-       <comment>Entity date</comment>
-       <add>3.4</add>
+    <name>entity_date_start</name>
+      <title>Entity Start Date</title>
+      <type>varchar</type>
+    <length>64</length>
+    <comment>Entity date</comment>
+    <add>3.4</add>
   </field>
   <field>
-       <name>entity_date_end</name>
-       <type>varchar</type>
-       <length>64</length>
-       <comment>Entity date</comment>
-       <add>3.4</add>
+    <name>entity_date_end</name>
+    <title>Entity End Date</title>
+    <type>varchar</type>
+    <length>64</length>
+    <comment>Entity date</comment>
+    <add>3.4</add>
   </field>
   <field>
-       <name>entity_recipient</name>
-       <type>varchar</type>
-       <length>64</length>
-       <comment>Entity recipient</comment>
-       <add>3.4</add>
+    <name>entity_recipient</name>
+    <title>Entity Recipient</title>
+    <type>varchar</type>
+    <length>64</length>
+    <comment>Entity recipient</comment>
+    <add>3.4</add>
   </field>
 </table>

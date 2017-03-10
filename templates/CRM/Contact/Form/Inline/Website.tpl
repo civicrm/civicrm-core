@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 <table class="crm-inline-edit-form">
     <tr>
       <td colspan="5">
-        <div class="crm-submit-buttons"> 
+        <div class="crm-submit-buttons">
           {include file="CRM/common/formButtons.tpl"}
         </div>
       </td>
@@ -38,7 +38,7 @@
       <td>{ts}Website{/ts}
         {help id="id-website" file="CRM/Contact/Form/Contact.hlp"}
         {if $actualBlockCount lt 5 }
-          &nbsp;&nbsp;<span id="add-more-website" title="{ts}click to add more{/ts}"><a class="crm-link-action add-more-inline">{ts}add{/ts}</a></span>
+          &nbsp;&nbsp;<span id="add-more-website" title="{ts}click to add more{/ts}"><a class="crm-hover-button action-item add-more-inline" href="#">{ts}add{/ts}</a></span>
         {/if}
       </td>
       <td>{ts}Website Type{/ts}</td>
@@ -46,13 +46,13 @@
     </tr>
 
     {section name='i' start=1 loop=$totalBlocks}
-    {assign var='blockId' value=$smarty.section.i.index} 
+    {assign var='blockId' value=$smarty.section.i.index}
     <tr id="Website_Block_{$blockId}" {if $blockId gt $actualBlockCount}class="hiddenElement"{/if}>
       <td>{$form.website.$blockId.url.html|crmAddClass:url}&nbsp;</td>
       <td>{$form.website.$blockId.website_type_id.html}</td>
       <td>
-        {if $blockId > 1} 
-          <a class="crm-delete-inline crm-link-action" title="{ts}delete website block{/ts}">{ts}delete{/ts}</a>
+        {if $blockId > 1}
+          <a class="crm-delete-inline crm-hover-button action-item" href="#" title="{ts}Delete Website{/ts}"><span class="icon delete-icon"></span></a>
         {/if}
        </td>
     </tr>
@@ -61,12 +61,12 @@
 
 {literal}
 <script type="text/javascript">
-    cj(function($) {
+    CRM.$(function($) {
       // error handling / show hideen elements duing form validation
       $('tr[id^="Website_Block_"]' ).each( function() {
           if( $(this).find('td:first span').length > 0 ) {
             $(this).removeClass('hiddenElement');
-          } 
+          }
       });
     });
 </script>

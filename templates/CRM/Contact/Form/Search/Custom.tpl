@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -38,10 +38,8 @@
             {foreach from=$elements item=element}
                 <tr class="crm-contact-custom-search-form-row-{$element}">
                     <td class="label">{$form.$element.label}</td>
-                    {if $element eq 'start_date'}
-                        <td>{include file="CRM/common/jcalendar.tpl" elementName=start_date}</td>
-                    {elseif $element eq 'end_date'}
-                        <td>{include file="CRM/common/jcalendar.tpl" elementName=end_date}</td>
+                    {if $element|strstr:'_date'}
+                        <td>{include file="CRM/common/jcalendar.tpl" elementName=$element}</td>
                     {else}
                         <td>{$form.$element.html}</td>
                     {/if}
@@ -81,7 +79,7 @@
         {/if}
 
         {strip}
-        <table class="selector" summary="{ts}Search results listings.{/ts}">
+        <table class="selector row-highlight" summary="{ts}Search results listings.{/ts}">
             <thead class="sticky">
                 <tr>
                 <th scope="col" title="Select All Rows">{$form.toggleSelect.html}</th>
@@ -107,7 +105,7 @@
                     {foreach from=$columnHeaders item=header}
                         {assign var=fName value=$header.sort}
                         {if $fName eq 'sort_name'}
-                            <td><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.contact_id`"}">{$row.sort_name}</a></td>
+                            <td><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.contact_id`&key=`$qfKey`&context=custom"}">{$row.sort_name}</a></td>
                         {else}
                             <td>{$row.$fName}</td>
                         {/if}
@@ -130,48 +128,3 @@
 
 </div>
 {/if}
-{literal}
-<script type="text/javascript">
-cj(function() {
-   cj().crmAccordions();
-});
-
-function toggleContactSelection( name, qfKey, selection ){
-  var Url  = "{/literal}{crmURL p='civicrm/ajax/markSelection' h=0}{literal}";
-
-  if ( selection == 'multiple' ) {
-    var rowArr = new Array( );
-    {/literal}{foreach from=$rows item=row  key=keyVal}
-      {literal}rowArr[{/literal}{$keyVal}{literal}] = '{/literal}{$row.checkbox}{literal}';
-    {/literal}{/foreach}{literal}
-    var elements = rowArr.join('-');
-
-    if ( cj('#' + name).is(':checked') ){
-      cj.post( Url, { name: elements , qfKey: qfKey , variableType: 'multiple' } );
-    }
-    else {
-      cj.post( Url, { name: elements , qfKey: qfKey , variableType: 'multiple' , action: 'unselect' } );
-    }
-  }
-  else if ( selection == 'single' ) {
-    if ( cj('#' + name).is(':checked') ){
-      cj.post( Url, { name: name , qfKey: qfKey } );
-    }
-    else {
-      cj.post( Url, { name: name , qfKey: qfKey , state: 'unchecked' } );
-    }
-  }
-  else if ( name == 'resetSel' && selection == 'reset' ) {
-    cj.post( Url, {  qfKey: qfKey , variableType: 'multiple' , action: 'unselect' } );
-    {/literal}
-    {foreach from=$rows item=row}{literal}
-      cj("#{/literal}{$row.checkbox}{literal}").prop('checked', false);{/literal}
-    {/foreach}
-    {literal}
-    cj("#toggleSelect").prop('checked', false);
-  }
-  return false;
-}
-</script>
-
-{/literal}

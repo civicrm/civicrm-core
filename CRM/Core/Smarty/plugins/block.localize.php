@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
  */
@@ -38,11 +38,15 @@
  * The string passed in $text is repeated locale-number times, with the
  * param field (if provided) appended with a different locale every time.
  *
- * @param array  $params   template call's parameters
- * @param string $text     {ts} block contents from the template
- * @param object $smarty   the Smarty object
+ * @param array $params
+ *   Template call's parameters.
+ * @param string $text
+ *   {ts} block contents from the template.
+ * @param CRM_Core_Smarty $smarty
+ *   The Smarty object.
  *
- * @return string  multilingualized query
+ * @return string
+ *   multilingualized query
  */
 function smarty_block_localize($params, $text, &$smarty) {
   if (!$smarty->_tpl_vars['multilingual']) {
@@ -64,4 +68,3 @@ function smarty_block_localize($params, $text, &$smarty) {
 
   return implode(', ', $lines);
 }
-

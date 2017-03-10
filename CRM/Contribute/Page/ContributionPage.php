@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,14 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -47,7 +45,7 @@
 class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
 
   /**
-   * The action links that we need to display for the browse screen
+   * The action links that we need to display for the browse screen.
    *
    * @var array
    */
@@ -56,18 +54,22 @@ class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
   private static $_configureActionLinks;
   private static $_onlineContributionLinks;
 
-  private static $_links = NULL;
-
+  /**
+   * @var CRM_Utils_Pager
+   */
   protected $_pager = NULL;
 
+  /**
+   * @var string
+   */
   protected $_sortByCharacter;
 
   /**
    * Get the action links for this page.
    *
-   * @return array $_actionLinks
-   *
-   */ function &actionLinks() {
+   * @return array
+   */
+  public static function &actionLinks() {
     // check if variable _actionsLinks is populated
     if (!isset(self::$_actionLinks)) {
       // helper variable for nicer formatting
@@ -107,10 +109,9 @@ class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
   /**
    * Get the configure action links for this page.
    *
-   * @return array $_configureActionLinks
-   *
+   * @return array
    */
-  function &configureActionLinks() {
+  public function &configureActionLinks() {
     // check if variable _actionsLinks is populated
     if (!isset(self::$_configureActionLinks)) {
       $urlString = 'civicrm/admin/contribute/';
@@ -181,6 +182,11 @@ class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
           'uniqueName' => 'pcp',
         ),
       );
+      $context = array(
+        'urlString' => $urlString,
+        'urlParams' => $urlParams,
+      );
+      CRM_Utils_Hook::tabset('civicrm/admin/contribute', self::$_configureActionLinks, $context);
     }
 
     return self::$_configureActionLinks;
@@ -189,10 +195,9 @@ class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
   /**
    * Get the online contribution links.
    *
-   * @return array $_onlineContributionLinks.
-   *
+   * @return array
    */
-  function &onlineContributionLinks() {
+  public function &onlineContributionLinks() {
     if (!isset(self::$_onlineContributionLinks)) {
       $urlString = 'civicrm/contribute/transact';
       $urlParams = 'reset=1&id=%%id%%';
@@ -221,10 +226,9 @@ class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
   /**
    * Get the contributions links.
    *
-   * @return array $_contributionLinks
-   *
+   * @return array
    */
-  function &contributionLinks() {
+  public function &contributionLinks() {
     if (!isset(self::$_contributionLinks)) {
       //get contribution dates.
       $dates = CRM_Contribute_BAO_Contribution::getContributionDates();
@@ -271,11 +275,9 @@ class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
    * type of action and executes that action.
    * Finally it calls the parent's run method.
    *
-   * @return void
-   * @access public
-   *
+   * @return mixed
    */
-  function run() {
+  public function run() {
     // get the requested action
     $action = CRM_Utils_Request::retrieve('action', 'String',
       // default to 'browse'
@@ -289,18 +291,21 @@ class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
     );
 
     // set breadcrumb to append to 2nd layer pages
-    $breadCrumb = array(array('title' => ts('Manage Contribution Pages'),
+    $breadCrumb = array(
+      array(
+        'title' => ts('Manage Contribution Pages'),
         'url' => CRM_Utils_System::url(CRM_Utils_System::currentPath(),
           'reset=1'
         ),
-      ));
+      ),
+    );
 
     // what action to take ?
     if ($action & CRM_Core_Action::ADD) {
       $session = CRM_Core_Session::singleton();
       $session->pushUserContext(CRM_Utils_System::url(CRM_Utils_System::currentPath(),
-          'action=browse&reset=1'
-        ));
+        'action=browse&reset=1'
+      ));
 
       $controller = new CRM_Contribute_Controller_ContributionPage(NULL, $action);
       CRM_Utils_System::setTitle(ts('Manage Contribution Page'));
@@ -319,6 +324,9 @@ class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
       }
     }
     elseif ($action & CRM_Core_Action::COPY) {
+      // @todo Unused local variable can be safely removed.
+      // But are there any side effects of CRM_Core_Session::singleton() that we
+      // need to preserve?
       $session = CRM_Core_Session::singleton();
       CRM_Core_Session::setStatus(ts('A copy of the contribution page has been created'), ts('Successfully Copied'), 'success');
       $this->copy();
@@ -328,8 +336,8 @@ class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
 
       $session = CRM_Core_Session::singleton();
       $session->pushUserContext(CRM_Utils_System::url(CRM_Utils_System::currentPath(),
-          'reset=1&action=browse'
-        ));
+        'reset=1&action=browse'
+      ));
 
       $id = CRM_Utils_Request::retrieve('id', 'Positive',
         $this, FALSE, 0
@@ -367,13 +375,9 @@ AND         cp.page_type = 'contribute'
   }
 
   /**
-   * This function is to make a copy of a contribution page, including
-   * all the fields in the page
-   *
-   * @return void
-   * @access public
+   * Make a copy of a contribution page, including all the fields in the page.
    */
-  function copy() {
+  public function copy() {
     $gid = CRM_Utils_Request::retrieve('gid', 'Positive',
       $this, TRUE, 0, 'GET'
     );
@@ -384,22 +388,26 @@ AND         cp.page_type = 'contribute'
   }
 
   /**
-   * Browse all contribution pages
+   * Browse all contribution pages.
    *
-   * @return void
-   * @access public
-   * @static
+   * @param mixed $action
+   *   Unused parameter.
    */
-  function browse($action = NULL) {
+  public function browse($action = NULL) {
+    Civi::resources()->addStyleFile('civicrm', 'css/searchForm.css', 1, 'html-header');
+
     $this->_sortByCharacter = CRM_Utils_Request::retrieve('sortByCharacter',
       'String',
       $this
     );
+    // @todo Unused local variable can be safely removed.
+    // But are there any side effects of CRM_Utils_Request::retrieve() that we
+    // need to preserve?
     $createdId = CRM_Utils_Request::retrieve('cid', 'Positive',
       $this, FALSE, 0
     );
 
-    if ($this->_sortByCharacter == 1 ||
+    if ($this->_sortByCharacter == 'all' ||
       !empty($_POST)
     ) {
       $this->_sortByCharacter = '';
@@ -426,6 +434,7 @@ AND         cp.page_type = 'contribute'
   SELECT  id
     FROM  civicrm_contribution_page
    WHERE  $whereClause
+   ORDER BY is_active desc, title asc
    LIMIT  $offset, $rowCount";
     $contribPage = CRM_Core_DAO::executeQuery($query, $params, TRUE, 'CRM_Contribute_DAO_ContributionPage');
     $contribPageIds = array();
@@ -439,7 +448,7 @@ AND         cp.page_type = 'contribute'
 SELECT *
 FROM civicrm_contribution_page
 WHERE $whereClause
-ORDER BY title asc
+ORDER BY is_active desc, title asc
    LIMIT $offset, $rowCount";
 
     $dao = CRM_Core_DAO::executeQuery($query, $params, TRUE, 'CRM_Contribute_DAO_ContributionPage');
@@ -455,7 +464,7 @@ ORDER BY title asc
       CRM_Core_DAO::storeValues($dao, $contribution[$dao->id]);
 
       // form all action links
-      $action = array_sum(array_keys($this->actionLinks()));
+      $action = array_sum(array_keys(self::actionLinks()));
 
       //add configure actions links.
       $action += array_sum(array_keys($configureActionLinks));
@@ -467,15 +476,15 @@ ORDER BY title asc
       $action += array_sum(array_keys(self::contributionLinks()));
 
       if ($dao->is_active) {
-        $action -= CRM_Core_Action::ENABLE;
+        $action -= (int) CRM_Core_Action::ENABLE;
       }
       else {
-        $action -= CRM_Core_Action::DISABLE;
+        $action -= (int) CRM_Core_Action::DISABLE;
       }
 
       //CRM-4418
       if (!$allowToDelete) {
-        $action -= CRM_Core_Action::DELETE;
+        $action -= (int) CRM_Core_Action::DELETE;
       }
 
       //build the configure links.
@@ -532,9 +541,8 @@ ORDER BY title asc
     }
   }
 
-  function search() {
-    if (isset($this->_action) &
-      (CRM_Core_Action::ADD |
+  public function search() {
+    if (isset($this->_action) & (CRM_Core_Action::ADD |
         CRM_Core_Action::UPDATE |
         CRM_Core_Action::DELETE
       )
@@ -552,9 +560,16 @@ ORDER BY title asc
     $form->run();
   }
 
-  function whereClause(&$params, $sortBy = TRUE) {
-    $values    = $clauses = array();
-    $title     = $this->get('title');
+  /**
+   * @param array $params
+   * @param bool $sortBy
+   *
+   * @return int|string
+   */
+  public function whereClause(&$params, $sortBy = TRUE) {
+    // @todo Unused local variable can be safely removed.
+    $values = $clauses = array();
+    $title = $this->get('title');
     $createdId = $this->get('cid');
 
     if ($createdId) {
@@ -571,7 +586,7 @@ ORDER BY title asc
       }
     }
 
-        $value = $this->get( 'financial_type_id' );
+    $value = $this->get('financial_type_id');
     $val = array();
     if ($value) {
       if (is_array($value)) {
@@ -582,22 +597,17 @@ ORDER BY title asc
         }
         $type = implode(',', $val);
       }
-
-             $clauses[] = "financial_type_id IN ({$type})";
+      // @todo Variable 'type' might not have been defined.
+      $clauses[] = "financial_type_id IN ({$type})";
     }
 
-    if ($sortBy &&
-      $this->_sortByCharacter !== NULL
-    ) {
+    if ($sortBy && $this->_sortByCharacter !== NULL) {
       $clauses[] = "title LIKE '" . strtolower(CRM_Core_DAO::escapeWildCardString($this->_sortByCharacter)) . "%'";
     }
 
-    $campainIds = $this->get('campaign_id');
-    if (!CRM_Utils_System::isNull($campainIds)) {
-      if (!is_array($campainIds)) {
-        $campaignIds = array($campaignIds);
-      }
-      $clauses[] = '( campaign_id IN ( ' . implode(' , ', array_values($campainIds)) . ' ) )';
+    $campaignIds = $this->getCampaignIds();
+    if (count($campaignIds) >= 1) {
+      $clauses[] = '( campaign_id IN ( ' . implode(' , ', $campaignIds) . ' ) )';
     }
 
     if (empty($clauses)) {
@@ -612,7 +622,28 @@ ORDER BY title asc
     return implode(' AND ', $clauses);
   }
 
-  function pager($whereClause, $whereParams) {
+  /**
+   * Gets the campaign ids from the session.
+   *
+   * @return int[]
+   */
+  public function getCampaignIds() {
+    // The unfiltered value from the session cannot be trusted, it needs to be
+    // processed to get a clean array of positive integers.
+    $ids = array();
+    foreach ((array) $this->get('campaign_id') as $id) {
+      if ((string) (int) $id === (string) $id && $id > 0) {
+        $ids[] = $id;
+      }
+    }
+    return $ids;
+  }
+
+  /**
+   * @param $whereClause
+   * @param array $whereParams
+   */
+  public function pager($whereClause, $whereParams) {
 
     $params['status'] = ts('Contribution %%StatusMessage%%');
     $params['csvString'] = NULL;
@@ -625,8 +656,8 @@ ORDER BY title asc
 
     $query = "
 SELECT count(id)
-  FROM civicrm_contribution_page
- WHERE $whereClause";
+FROM civicrm_contribution_page
+WHERE $whereClause";
 
     $params['total'] = CRM_Core_DAO::singleValueQuery($query, $whereParams);
 
@@ -634,13 +665,17 @@ SELECT count(id)
     $this->assign_by_ref('pager', $this->_pager);
   }
 
-  function pagerAtoZ($whereClause, $whereParams) {
+  /**
+   * @param $whereClause
+   * @param array $whereParams
+   */
+  public function pagerAtoZ($whereClause, $whereParams) {
 
     $query = "
-   SELECT DISTINCT UPPER(LEFT(title, 1)) as sort_name
-     FROM civicrm_contribution_page
-    WHERE $whereClause
- ORDER BY LEFT(title, 1)
+SELECT DISTINCT UPPER(LEFT(title, 1)) as sort_name
+FROM civicrm_contribution_page
+WHERE $whereClause
+ORDER BY UPPER(LEFT(title, 1))
 ";
     $dao = CRM_Core_DAO::executeQuery($query, $whereParams);
 
@@ -648,18 +683,18 @@ SELECT count(id)
     $this->assign('aToZ', $aToZBar);
   }
 
-  function formatConfigureLinks($sectionsInfo) {
-    //build the formatted configure links.
+  /**
+   * @param array $sectionsInfo
+   *
+   * @return array
+   */
+  public function formatConfigureLinks($sectionsInfo) {
+    // build the formatted configure links.
     $formattedConfLinks = self::configureActionLinks();
     foreach ($formattedConfLinks as $act => & $link) {
       $sectionName = CRM_Utils_Array::value('uniqueName', $link);
       if (!$sectionName) {
         continue;
-      }
-
-      $classes = array();
-      if (isset($link['class'])) {
-        $classes = $link['class'];
       }
 
       if (empty($sectionsInfo[$sectionName])) {
@@ -673,5 +708,5 @@ SELECT count(id)
 
     return $formattedConfLinks;
   }
-}
 
+}

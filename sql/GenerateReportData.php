@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
  */
@@ -111,39 +111,43 @@ require_once 'CRM/Contact/DAO/Relationship.php';
 require_once 'CRM/Event/DAO/Participant.php';
 require_once 'CRM/Contribute/DAO/ContributionSoft.php';
 require_once 'CRM/Member/DAO/MembershipPayment.php';
+
+/**
+ * Class CRM_GCD
+ */
 class CRM_GCD {
 
   /*******************************************************
    * constants
    *******************************************************/
-  CONST DATA_FILENAME = "sample_data.xml";
-  CONST NUM_DOMAIN = 1;
-  CONST NUM_CONTACT = 5000;
-  CONST NUM_CONTRIBUTION = 2000;
-  CONST NUM_MEMBERSHIP = 2000;
-  CONST NUM_PARTICIPANT = 2000;
-  CONST INDIVIDUAL_PERCENT = 75;
-  CONST HOUSEHOLD_PERCENT = 15;
-  CONST ORGANIZATION_PERCENT = 10;
-  CONST NUM_INDIVIDUAL_PER_HOUSEHOLD = 4;
-  CONST NUM_ACTIVITY = 150;
+  const DATA_FILENAME = "sample_data.xml";
+  const NUM_DOMAIN = 1;
+  const NUM_CONTACT = 5000;
+  const NUM_CONTRIBUTION = 2000;
+  const NUM_MEMBERSHIP = 2000;
+  const NUM_PARTICIPANT = 2000;
+  const INDIVIDUAL_PERCENT = 75;
+  const HOUSEHOLD_PERCENT = 15;
+  const ORGANIZATION_PERCENT = 10;
+  const NUM_INDIVIDUAL_PER_HOUSEHOLD = 4;
+  const NUM_ACTIVITY = 150;
 
   // relationship types from the table crm_relationship_type
-  CONST CHILD_OF = 1;
-  CONST SPOUSE_OF = 2;
-  CONST SIBLING_OF = 3;
-  CONST HEAD_OF_HOUSEHOLD = 6;
-  CONST MEMBER_OF_HOUSEHOLD = 7;
+  const CHILD_OF = 1;
+  const SPOUSE_OF = 2;
+  const SIBLING_OF = 3;
+  const HEAD_OF_HOUSEHOLD = 6;
+  const MEMBER_OF_HOUSEHOLD = 7;
 
 
   // location types from the table crm_location_type
-  CONST HOME = 1;
-  CONST WORK = 2;
-  CONST MAIN = 3;
-  CONST OTHER = 4;
-  CONST ADD_TO_DB = TRUE;
+  const HOME = 1;
+  const WORK = 2;
+  const MAIN = 3;
+  const OTHER = 4;
+  const ADD_TO_DB = TRUE;
   //const ADD_TO_DB=FALSE;
-  CONST DEBUG_LEVEL = 1;
+  const DEBUG_LEVEL = 1;
 
   /*********************************
    * private members
@@ -208,21 +212,21 @@ class CRM_GCD {
   private $numStrictIndividual = 0;
 
   private $CSC = array(
-      // united states
+    // united states
     1228 => array(
       // california
       1004 => array('San Francisco', 'Los Angeles', 'Palo Alto'),
       // new york
       1031 => array('New York', 'Albany'),
     ),
-      // india
+    // india
     1101 => array(
       // maharashtra
       1113 => array('Mumbai', 'Pune', 'Nasik'),
       // karnataka
       1114 => array('Bangalore', 'Mangalore', 'Udipi'),
     ),
-      // poland
+    // poland
     1172 => array(
       // mazowieckie
       1115 => array('Warszawa', 'Płock'),
@@ -236,9 +240,16 @@ class CRM_GCD {
 
   /*********************************
    * private methods
-   *********************************/
+   ********************************
+   * @param int $size
+   * @return string
+   */
 
-  // get a randomly generated string
+  /**
+   * Get a randomly generated string.
+   *
+   * @param int $size
+   */
   private function _getRandomString($size = 32) {
     $string = "";
 
@@ -255,24 +266,43 @@ class CRM_GCD {
     return $string;
   }
 
+  /**
+   * @return string
+   */
   private function _getRandomChar() {
     return chr(mt_rand(65, 90));
   }
 
+  /**
+   * @return int
+   */
   private function getRandomBoolean() {
     return mt_rand(0, 1);
   }
 
+  /**
+   * @param $array1
+   *
+   * @return mixed
+   */
   private function _getRandomElement(&$array1) {
     return $array1[mt_rand(1, count($array1)) - 1];
   }
 
+  /**
+   * @param $array1
+   *
+   * @return int
+   */
   private function _getRandomIndex(&$array1) {
     return mt_rand(1, count($array1));
   }
 
 
   // country state city combo
+  /**
+   * @return array
+   */
   private function _getRandomCSC() {
     $array1 = array();
 
@@ -322,7 +352,7 @@ class CRM_GCD {
     // number of seconds for 2 year
     $numSecond = 63072000;
 
-    $dateFormat = "Ymdhis";
+    $dateFormat = "YmdHis";
     $today = time();
 
     // both are defined
@@ -347,10 +377,13 @@ class CRM_GCD {
 
 
   // insert data into db's
+  /**
+   * @param $dao
+   */
   private function _insert(&$dao) {
     if (self::ADD_TO_DB) {
       if (!$dao->insert()) {
-        echo "ERROR INSERT: " . mysql_error() . "\n";
+        echo "ERROR INSERT: " . mysqli_error($dao->getConnection()->connection) . "\n";
         print_r($dao);
         exit(1);
       }
@@ -358,10 +391,13 @@ class CRM_GCD {
   }
 
   // update data into db's
+  /**
+   * @param $dao
+   */
   private function _update($dao) {
     if (self::ADD_TO_DB) {
       if (!$dao->update()) {
-        echo "ERROR UPDATE: " . mysql_error() . "\n";
+        echo "ERROR UPDATE: " . mysqli_error($dao->getConnection()->connection) . "\n";
         print_r($dao);
         exit(1);
       }
@@ -374,10 +410,8 @@ class CRM_GCD {
    *   Helper function which randomly populates "note" and
    *   "date_modified" and inserts it.
    *
-   * @param  CRM_DAO_Note DAO object for Note
+   * @param  $note
    * @access private
-   *
-   * @return none
    *
    */
   private function _insertNote($note) {
@@ -386,14 +420,12 @@ class CRM_GCD {
     $this->_insert($note);
   }
 
-  /*******************************************************
+  /**
    *
    * Start of public functions
    *
-   *******************************************************/
-  // constructor
-  function __construct() {
-
+   */
+  public function __construct() {
     // initialize all the vars
     $this->numIndividual = self::INDIVIDUAL_PERCENT * self::NUM_CONTACT / 100;
     $this->numHousehold = self::HOUSEHOLD_PERCENT * self::NUM_CONTACT / 100;
@@ -480,7 +512,6 @@ class CRM_GCD {
       $this->activity_type[] = trim($activity_type);
     }
 
-
     // module
     foreach ($sampleData->modules->module as $module) {
       $this->module[] = trim($module);
@@ -523,6 +554,11 @@ class CRM_GCD {
     }
   }
 
+  /**
+   * @param $id
+   *
+   * @return string
+   */
   public function getContactType($id) {
     if (in_array($id, $this->individual)) {
       return 'Individual';
@@ -540,7 +576,7 @@ class CRM_GCD {
     $config = CRM_Core_Config::singleton();
   }
 
-  /*******************************************************
+  /**
    *
    * this function creates arrays for the following
    *
@@ -555,7 +591,7 @@ class CRM_GCD {
    * contact_task uuid
    * contact_note uuid
    *
-   *******************************************************/
+   */
   public function initID() {
 
     // may use this function in future if needed to get
@@ -584,14 +620,14 @@ class CRM_GCD {
     $this->householdIndividual = array_combine($this->household, $this->householdIndividual);
   }
 
-  /*******************************************************
+  /**
    *
    * addDomain()
    *
    * This method adds NUM_DOMAIN domains and then adds NUM_REVISION
    * revisions for each domain with the latest revision being the last one..
    *
-   *******************************************************/
+   */
   public function addDomain() {
 
     /* Add a location for domain 1 */
@@ -613,6 +649,9 @@ class CRM_GCD {
     }
   }
 
+  /**
+   * @return string
+   */
   public function randomName() {
     $prefix      = $this->_getRandomIndex($this->prefix);
     $first_name  = ucfirst($this->_getRandomElement($this->firstName));
@@ -623,7 +662,7 @@ class CRM_GCD {
     return $this->prefix[$prefix] . " $first_name $middle_name $last_name " . $this->suffix[$suffix];
   }
 
-  /*******************************************************
+  /**
    *
    * addContact()
    *
@@ -633,7 +672,7 @@ class CRM_GCD {
    * contact_type 'Individual' 'Household' 'Organization'
    * preferred_communication (random 1 to 3)
    *
-   *******************************************************/
+   */
   public function addContact() {
 
     // add contacts
@@ -650,7 +689,7 @@ class CRM_GCD {
     }
   }
 
-  /*******************************************************
+  /**
    *
    * addIndividual()
    *
@@ -667,7 +706,7 @@ class CRM_GCD {
    * greeting_type - randomly select from the enum values
    * custom_greeting - "custom greeting $contact_uuid'
    *
-   *******************************************************/
+   */
   public function addIndividual() {
 
     $contact = new CRM_Contact_DAO_Contact();
@@ -693,7 +732,7 @@ class CRM_GCD {
     }
   }
 
-  /*******************************************************
+  /**
    *
    * addHousehold()
    *
@@ -707,7 +746,7 @@ class CRM_GCD {
    * nick_name 'nick $contact_uuid'
    * primary_contact_uuid = $household_individual[$contact_uuid][0];
    *
-   *******************************************************/
+   */
   public function addHousehold() {
 
     $contact = new CRM_Contact_DAO_Contact();
@@ -734,7 +773,7 @@ class CRM_GCD {
     }
   }
 
-  /*******************************************************
+  /**
    *
    * addOrganization()
    *
@@ -750,7 +789,7 @@ class CRM_GCD {
    * sic_code 'sic $contact_uuid'
    * primary_contact_id - random individual contact uuid
    *
-   *******************************************************/
+   */
   public function addOrganization() {
 
     $contact = new CRM_Contact_DAO_Contact();
@@ -768,7 +807,7 @@ class CRM_GCD {
     }
   }
 
-  /*******************************************************
+  /**
    *
    * addRelationship()
    *
@@ -776,7 +815,7 @@ class CRM_GCD {
    *
    * it adds the following fields
    *
-   *******************************************************/
+   */
   public function addRelationship() {
 
     $relationship = new CRM_Contact_DAO_Relationship();
@@ -830,13 +869,13 @@ class CRM_GCD {
     }
   }
 
-  /*******************************************************
+  /**
    *
    * addLocation()
    *
    * This method adds data to the location table
    *
-   *******************************************************/
+   */
   public function addLocation() {
     // strict individuals
     foreach ($this->strictIndividual as $contactId) {
@@ -855,12 +894,18 @@ class CRM_GCD {
 
     // some individuals.
     $someIndividual = array_diff($this->individual, $this->strictIndividual);
-    $someIndividual = array_slice($someIndividual, 0, (int)(75 * ($this->numIndividual - $this->numStrictIndividual) / 100));
+    $someIndividual = array_slice($someIndividual, 0, (int) (75 * ($this->numIndividual - $this->numStrictIndividual) / 100));
     foreach ($someIndividual as $contactId) {
       $this->_addLocation(self::HOME, $contactId, FALSE, TRUE);
     }
   }
 
+  /**
+   * @param $locationTypeId
+   * @param $contactId
+   * @param bool $domain
+   * @param bool $isPrimary
+   */
   private function _addLocation($locationTypeId, $contactId, $domain = FALSE, $isPrimary = TRUE) {
     $this->_addAddress($locationTypeId, $contactId, $isPrimary);
 
@@ -882,6 +927,13 @@ class CRM_GCD {
     }
   }
 
+  /**
+   * @param $locationTypeId
+   * @param $contactId
+   * @param bool $isPrimary
+   * @param null $locationBlockID
+   * @param int $offset
+   */
   private function _addAddress($locationTypeId, $contactId, $isPrimary = FALSE, $locationBlockID = NULL, $offset = 1) {
     $addressDAO = new CRM_Core_DAO_Address();
 
@@ -910,11 +962,24 @@ class CRM_GCD {
     $this->_insert($addressDAO);
   }
 
+  /**
+   * @param $sortName
+   *
+   * @return mixed
+   */
   private function _sortNameToEmail($sortName) {
     $email = preg_replace("([^a-zA-Z0-9_-]*)", "", $sortName);
     return $email;
   }
 
+  /**
+   * @param $locationTypeId
+   * @param $contactId
+   * @param $phoneType
+   * @param bool $isPrimary
+   * @param null $locationBlockID
+   * @param int $offset
+   */
   private function _addPhone($locationTypeId, $contactId, $phoneType, $isPrimary = FALSE, $locationBlockID = NULL, $offset = 1) {
     if ($contactId % 3) {
       $phone = new CRM_Core_DAO_Phone();
@@ -927,6 +992,14 @@ class CRM_GCD {
     }
   }
 
+  /**
+   * @param $locationTypeId
+   * @param $contactId
+   * @param $sortName
+   * @param bool $isPrimary
+   * @param null $locationBlockID
+   * @param int $offset
+   */
   private function _addEmail($locationTypeId, $contactId, $sortName, $isPrimary = FALSE, $locationBlockID = NULL, $offset = 1) {
     if ($contactId % 2) {
       $email = new CRM_Core_DAO_Email();
@@ -942,13 +1015,13 @@ class CRM_GCD {
     }
   }
 
-  /*******************************************************
+  /**
    *
    * addTagEntity()
    *
    * This method populates the crm_entity_tag table
    *
-   *******************************************************/
+   */
   public function addEntityTag() {
 
     $entity_tag = new CRM_Core_DAO_EntityTag();
@@ -979,13 +1052,13 @@ class CRM_GCD {
     }
   }
 
-  /*******************************************************
+  /**
    *
    * addGroup()
    *
    * This method populates the crm_entity_tag table
    *
-   *******************************************************/
+   */
   public function addGroup() {
     // add the 3 groups first
     $numGroup = count($this->group);
@@ -1010,7 +1083,6 @@ class CRM_GCD {
       $groupContact->contact_id = $this->individual[$i];
       // membership status
       $groupContact->status = $this->_getRandomElement($this->groupMembershipStatus);
-
 
       $subscriptionHistory = new CRM_Contact_DAO_SubscriptionHistory();
       $subscriptionHistory->contact_id = $groupContact->contact_id;
@@ -1079,13 +1151,13 @@ class CRM_GCD {
     CRM_Core_BAO_Cache::deleteGroup('contact fields');
   }
 
-  /*******************************************************
+  /**
    *
    * addNote()
    *
    * This method populates the crm_note table
    *
-   *******************************************************/
+   */
   public function addNote() {
 
     $note               = new CRM_Core_DAO_Note();
@@ -1100,13 +1172,13 @@ class CRM_GCD {
     }
   }
 
-  /*******************************************************
+  /**
    *
    * addActivity()
    *
    * This method populates the crm_activity_history table
    *
-   *******************************************************/
+   */
   public function addActivity() {
     $contactDAO = new CRM_Contact_DAO_Contact();
     $contactDAO->contact_type = 'Individual';
@@ -1160,7 +1232,10 @@ class CRM_GCD {
     }
   }
 
-  static function getZipCodeInfo() {
+  /**
+   * @return array
+   */
+  public static function getZipCodeInfo() {
     $stateID = mt_rand(1000, 5132);
     $offset = mt_rand(1, 4132);
 
@@ -1174,7 +1249,12 @@ class CRM_GCD {
     return array();
   }
 
-  static function getLatLong($zipCode) {
+  /**
+   * @param $zipCode
+   *
+   * @return array
+   */
+  public static function getLatLong($zipCode) {
     $query = "http://maps.google.com/maps?q=$zipCode&output=js";
     $userAgent = "Mozilla/5.0 (Macintosh; U; PPC Mac OS X Mach-O; en-US; rv:1.7.5) Gecko/20041107 Firefox/1.0";
 
@@ -1202,7 +1282,7 @@ class CRM_GCD {
     return array(NULL, NULL);
   }
 
-  function addMembershipType() {
+  public function addMembershipType() {
     $organizationDAO = new CRM_Contact_DAO_Contact();
     $organizationDAO->id = 5;
     $organizationDAO->find(TRUE);
@@ -1218,7 +1298,7 @@ class CRM_GCD {
     CRM_Core_DAO::executeQuery($membershipType, CRM_Core_DAO::$_nullArray);
   }
 
-  function addMembership() {
+  public function addMembership() {
     $contact = new CRM_Contact_DAO_Contact();
     $contact->query("SELECT id FROM civicrm_contact where contact_type = 'Individual'");
     while ($contact->fetch()) {
@@ -1297,12 +1377,17 @@ VALUES
     CRM_Core_DAO::executeQuery($activity, CRM_Core_DAO::$_nullArray);
   }
 
-  static function repairDate($date) {
+  /**
+   * @param $date
+   *
+   * @return string
+   */
+  public static function repairDate($date) {
     $dropArray = array('-' => '', ':' => '', ' ' => '');
     return strtr($date, $dropArray);
   }
 
-  function addMembershipLog() {
+  public function addMembershipLog() {
     $membership = new CRM_Member_DAO_Membership();
     $membership->query("SELECT id FROM civicrm_membership");
     while ($membership->fetch()) {
@@ -1326,7 +1411,7 @@ VALUES
     }
   }
 
-  function createEvent() {
+  public function createEvent() {
     $event = "INSERT INTO civicrm_address ( contact_id, location_type_id, is_primary, is_billing, street_address, street_number, street_number_suffix, street_number_predirectional, street_name, street_type, street_number_postdirectional, street_unit, supplemental_address_1, supplemental_address_2, supplemental_address_3, city, county_id, state_province_id, postal_code_suffix, postal_code, usps_adc, country_id, geo_code_1, geo_code_2, timezone)
       VALUES
       ( NULL, 1, 1, 1, 'S 14S El Camino Way E', 14, 'S', NULL, 'El Camino', 'Way', NULL, NULL, NULL, NULL, NULL, 'Collinsville', NULL, 1006, NULL, '6022', NULL, 1228, 41.8328, -72.9253, NULL),
@@ -1397,7 +1482,6 @@ VALUES
 ";
     CRM_Core_DAO::executeQuery($optionGroup, CRM_Core_DAO::$_nullArray);
 
-
     $sql = "SELECT max(id) from civicrm_option_group where name = 'civicrm_event.amount.1'";
     $page1 = CRM_Core_DAO::singleValueQuery($sql, CRM_Core_DAO::$_nullArray);
 
@@ -1406,7 +1490,6 @@ VALUES
 
     $sql = "SELECT max(id) from civicrm_option_group where name = 'civicrm_event.amount.3'";
     $page3 = CRM_Core_DAO::singleValueQuery($sql, CRM_Core_DAO::$_nullArray);
-
 
     $optionValue = "INSERT INTO civicrm_option_value (option_group_id, label, value, is_default, weight, is_optgroup, is_reserved, is_active)
       VALUES
@@ -1434,14 +1517,14 @@ VALUES
     $event = "INSERT INTO civicrm_event
         ( title, summary, description, event_type_id, participant_listing_id, is_public, start_date, end_date, is_online_registration, registration_link_text, max_participants, event_full_text, is_monetary, financial_type_id, is_map, is_active, fee_label, is_show_location, loc_block_id,intro_text, footer_text, confirm_title, confirm_text, confirm_footer_text, is_email_confirm, confirm_email_text, confirm_from_name, confirm_from_email, cc_confirm, bcc_confirm, default_fee_id, thankyou_title, thankyou_text, thankyou_footer_text, is_pay_later, pay_later_text, pay_later_receipt, is_multiple_registrations, allow_same_participant_emails )
         VALUES
-        ( 'Fall Fundraiser Dinner', 'Kick up your heels at our Fall Fundraiser Dinner/Dance at Glen Echo Park! Come by yourself or bring a partner, friend or the entire family!', 'This event benefits our teen programs. Admission includes a full 3 course meal and wine or soft drinks. Grab your dancing shoes, bring the kids and come join the party!', 3, 1, 1, '2010-11-21 17:00:00', '2010-11-21 23:00:00', 1, 'Register Now', 100, 'Sorry! The Fall Fundraiser Dinner is full. Please call Jane at 204 222-1000 ext 33 if you want to be added to the waiting list.', 1, 4, 1, 1, 'Dinner Contribution', 1 ,$eventLok1,'Fill in the information below to join as at this wonderful dinner event.', NULL, 'Confirm Your Registration Information', 'Review the information below carefully.', NULL, 1, 'Contact the Development Department if you need to make any changes to your registration.', 'Fundraising Dept.', 'development@example.org', NULL, NULL, {$defaultFee1}, 'Thanks for Registering!', '<p>Thank you for your support. Your contribution will help us build even better tools.</p><p>Please tell your friends and colleagues about this wonderful event.</p>', '<p><a href=http://civicrm.org>Back to CiviCRM Home Page</a></p>', 1, 'I will send payment by check', 'Send a check payable to Our Organization within 3 business days to hold your reservation. Checks should be sent to: 100 Main St., Suite 3, San Francisco CA 94110', 0, 0 ),
-        ( 'Summer Solstice Festival Day Concert', 'Festival Day is coming! Join us and help support your parks.', 'We will gather at noon, learn a song all together,  and then join in a joyous procession to the pavilion. We will be one of many groups performing at this wonderful concert which benefits our city parks.', 5, 1, 1, '2011-06-01 12:00:00', '2011-06-01 17:00:00', 1, 'Register Now', 50, 'We have all the singers we can handle. Come to the pavilion anyway and join in from the audience.', 1, 2, NULL, 1, 'Festival Fee', 1, $eventLok2, 'Complete the form below and click Continue to register online for the festival. Or you can register by calling us at 204 222-1000 ext 22.', '', 'Confirm Your Registration Information', '', '', 1, 'This email confirms your registration. If you have questions or need to change your registration - please do not hesitate to call us.', 'Event Dept.', 'events@example.org', '', NULL, {$defaultFee2}, 'Thanks for Your Joining In!', '<p>Thank you for your support. Your participation will help build new parks.</p><p>Please tell your friends and colleagues about the concert.</p>', '<p><a href=http://civicrm.org>Back to CiviCRM Home Page</a></p>', 0, NULL, NULL, 1, 0 ),
-        ( 'Rain-forest Cup Youth Soccer Tournament', 'Sign up your team to participate in this fun tournament which benefits several Rain-forest protection groups in the Amazon basin.', 'This is a FYSA Sanctioned Tournament, which is open to all USSF/FIFA affiliated organizations for boys and girls in age groups: U9-U10 (6v6), U11-U12 (8v8), and U13-U17 (Full Sided).', 3, 1, 1, '2011-12-27 07:00:00', '2011-12-29 17:00:00', 1, 'Register Now', 500, 'Sorry! All available team slots for this tournament have been filled. Contact Jill Futbol for information about the waiting list and next years event.', 1, 4, NULL, 1, 'Tournament Fees',1, $eventLok3, 'Complete the form below to register your team for this year''s tournament.', '<em>A Soccer Youth Event</em>', 'Review and Confirm Your Registration Information', '', '<em>A Soccer Youth Event</em>', 1, 'Contact our Tournament Director for eligibility details.', 'Tournament Director', 'tournament@example.org', '', NULL, {$defaultFee3}, 'Thanks for Your Support!', '<p>Thank you for your support. Your participation will help save thousands of acres of rainforest.</p>', '<p><a href=http://civicrm.org>Back to CiviCRM Home Page</a></p>', 0, NULL, NULL, 0, 0 )
+        ( 'Fall Fundraiser Dinner', 'Kick up your heels at our Fall Fundraiser Dinner/Dance at Glen Echo Park! Come by yourself or bring a partner, friend or the entire family!', 'This event benefits our teen programs. Admission includes a full 3 course meal and wine or soft drinks. Grab your dancing shoes, bring the kids and come join the party!', 3, 1, 1, '2010-11-21 17:00:00', '2010-11-21 23:00:00', 1, 'Register Now', 100, 'Sorry! The Fall Fundraiser Dinner is full. Please call Jane at 204 222-1000 ext 33 if you want to be added to the waiting list.', 1, 4, 1, 1, 'Dinner Contribution', 1 ,$eventLok1,'Fill in the information below to join as at this wonderful dinner event.', NULL, 'Confirm Your Registration Information', 'Review the information below carefully.', NULL, 1, 'Contact the Development Department if you need to make any changes to your registration.', 'Fundraising Dept.', 'development@example.org', NULL, NULL, {$defaultFee1}, 'Thanks for Registering!', '<p>Thank you for your support. Your contribution will help us build even better tools.</p><p>Please tell your friends and colleagues about this wonderful event.</p>', '<p><a href=https://civicrm.org>Back to CiviCRM Home Page</a></p>', 1, 'I will send payment by check', 'Send a check payable to Our Organization within 3 business days to hold your reservation. Checks should be sent to: 100 Main St., Suite 3, San Francisco CA 94110', 0, 0 ),
+        ( 'Summer Solstice Festival Day Concert', 'Festival Day is coming! Join us and help support your parks.', 'We will gather at noon, learn a song all together,  and then join in a joyous procession to the pavilion. We will be one of many groups performing at this wonderful concert which benefits our city parks.', 5, 1, 1, '2011-06-01 12:00:00', '2011-06-01 17:00:00', 1, 'Register Now', 50, 'We have all the singers we can handle. Come to the pavilion anyway and join in from the audience.', 1, 2, NULL, 1, 'Festival Fee', 1, $eventLok2, 'Complete the form below and click Continue to register online for the festival. Or you can register by calling us at 204 222-1000 ext 22.', '', 'Confirm Your Registration Information', '', '', 1, 'This email confirms your registration. If you have questions or need to change your registration - please do not hesitate to call us.', 'Event Dept.', 'events@example.org', '', NULL, {$defaultFee2}, 'Thanks for Your Joining In!', '<p>Thank you for your support. Your participation will help build new parks.</p><p>Please tell your friends and colleagues about the concert.</p>', '<p><a href=https://civicrm.org>Back to CiviCRM Home Page</a></p>', 0, NULL, NULL, 1, 0 ),
+        ( 'Rain-forest Cup Youth Soccer Tournament', 'Sign up your team to participate in this fun tournament which benefits several Rain-forest protection groups in the Amazon basin.', 'This is a FYSA Sanctioned Tournament, which is open to all USSF/FIFA affiliated organizations for boys and girls in age groups: U9-U10 (6v6), U11-U12 (8v8), and U13-U17 (Full Sided).', 3, 1, 1, '2011-12-27 07:00:00', '2011-12-29 17:00:00', 1, 'Register Now', 500, 'Sorry! All available team slots for this tournament have been filled. Contact Jill Futbol for information about the waiting list and next years event.', 1, 4, NULL, 1, 'Tournament Fees',1, $eventLok3, 'Complete the form below to register your team for this year''s tournament.', '<em>A Soccer Youth Event</em>', 'Review and Confirm Your Registration Information', '', '<em>A Soccer Youth Event</em>', 1, 'Contact our Tournament Director for eligibility details.', 'Tournament Director', 'tournament@example.org', '', NULL, {$defaultFee3}, 'Thanks for Your Support!', '<p>Thank you for your support. Your participation will help save thousands of acres of rainforest.</p>', '<p><a href=https://civicrm.org>Back to CiviCRM Home Page</a></p>', 0, NULL, NULL, 0, 0 )
          ";
     CRM_Core_DAO::executeQuery($event, CRM_Core_DAO::$_nullArray);
   }
 
-  function addParticipant() {
+  public function addParticipant() {
     // add participant
     $participant = new CRM_Event_DAO_Participant();
 
@@ -1473,23 +1556,23 @@ VALUES
     }
   }
 
-  function addPCP() {
+  public function addPCP() {
     $query = "
 INSERT INTO `civicrm_pcp`
     (contact_id, status_id, title, intro_text, page_text, donate_link_text, contribution_page_id, is_thermometer, is_honor_roll, goal_amount, referer, is_active)
 VALUES
-    ({$this->individual[3]}, 2, 'My Personal Civi Fundraiser', 'I''m on a mission to get all my friends and family to help support my favorite open-source civic sector CRM.', '<p>Friends and family - please help build much needed infrastructure for the civic sector by supporting my personal campaign!</p>\r\n<p><a href=\"http://civicrm.org\">You can learn more about CiviCRM here</a>.</p>\r\n<p>Then click the <strong>Contribute Now</strong> button to go to our easy-to-use online contribution form.</p>', 'Contribute Now', 1, 1, 1, 5000.00, NULL, 1);
+    ({$this->individual[3]}, 2, 'My Personal Civi Fundraiser', 'I''m on a mission to get all my friends and family to help support my favorite open-source civic sector CRM.', '<p>Friends and family - please help build much needed infrastructure for the civic sector by supporting my personal campaign!</p>\r\n<p><a href=\"https://civicrm.org\">You can learn more about CiviCRM here</a>.</p>\r\n<p>Then click the <strong>Contribute Now</strong> button to go to our easy-to-use online contribution form.</p>', 'Contribute Now', 1, 1, 1, 5000.00, NULL, 1);
 ";
-    CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
+    CRM_Core_DAO::executeQuery($query);
   }
 
-  function addContribution() {
+  public function addContribution() {
     // add contributions
     $contribution = new CRM_Contribute_DAO_Contribution();
 
     for ($id = 1; $id <= self::NUM_CONTRIBUTION; $id++) {
       $contribution->contact_id = mt_rand(1, self::NUM_CONTACT);
-            $contribution->financial_type_id   = mt_rand(1, 4);
+      $contribution->financial_type_id   = mt_rand(1, 4);
       $contribution->contribution_page_id = mt_rand(1, 3);
       $contribution->payment_instrument_id = mt_rand(1, 5);
       $contribution->receive_date = $this->_getRandomDate();
@@ -1500,7 +1583,7 @@ VALUES
     }
   }
 
-  function addSoftContribution() {
+  public function addSoftContribution() {
     $pcpRollNickNAme = array('Jones Family', 'Annie and the kids', 'Anonymous', 'Adam Family');
 
     $pcpPersonalNote = array('Helping Hands', 'Annie Helps', 'Anonymous', 'Adam Helps');
@@ -1528,7 +1611,7 @@ VALUES
     }
   }
 
-  function addPledge() {
+  public function addPledge() {
     $pledge = "INSERT INTO civicrm_pledge
         (contact_id, financial_type_id, contribution_page_id, amount, frequency_unit, frequency_interval, frequency_day, installments, start_date, create_date, acknowledge_date, modified_date, cancel_date, end_date, honor_contact_id, honor_type_id, status_id, is_test)
         VALUES
@@ -1539,7 +1622,7 @@ VALUES
     CRM_Core_DAO::executeQuery($pledge, CRM_Core_DAO::$_nullArray);
   }
 
-  function addPledgePayment() {
+  public function addPledgePayment() {
     $pledgePayment = "INSERT INTO civicrm_pledge_payment
         ( pledge_id, contribution_id, scheduled_amount, scheduled_date, reminder_date, reminder_count, status_id)
        VALUES
@@ -1555,13 +1638,13 @@ VALUES
     CRM_Core_DAO::executeQuery($pledgePayment, CRM_Core_DAO::$_nullArray);
   }
 
-  function addMembershipPayment() {
+  public function addMembershipPayment() {
     $amount = array('50', '100', '1200');
 
     $contribution = new CRM_Contribute_DAO_Contribution();
     for ($id = 1; $id <= 200; $id++) {
       $contribution->contact_id = mt_rand(1, self::NUM_CONTACT);
-            $contribution->financial_type_id   = mt_rand(1, 4);
+      $contribution->financial_type_id   = mt_rand(1, 4);
       $contribution->payment_instrument_id = mt_rand(1, 5);
       $contribution->receive_date = $this->_getRandomDate();
       $contribution->total_amount = $this->_getRandomElement($amount);
@@ -1601,12 +1684,21 @@ VALUES
       }
     }
   }
+
 }
 
+/**
+ * @param null $str
+ *
+ * @return bool
+ */
 function user_access($str = NULL) {
   return TRUE;
 }
 
+/**
+ * @return array
+ */
 function module_list() {
   return array();
 }
@@ -1639,4 +1731,3 @@ $obj1->addPledge();
 $obj1->addPledgePayment();
 $obj1->addMembershipPayment();
 echo ("Ending data generation on " . date("F dS h:i:s A") . "\n");
-

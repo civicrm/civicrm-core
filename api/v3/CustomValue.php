@@ -1,10 +1,9 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,48 +26,41 @@
  */
 
 /**
- * File for the CiviCRM APIv3 custom value functions
+ * This api exposes CiviCRM custom value.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_CustomField
- *
- * @copyright CiviCRM LLC (c) 2004-2013
- * @version $Id: CustomField.php 30879 2010-11-22 15:45:55Z shot $
- */
-
-/**
- * Files required for this package
  */
 
 
 /**
  * Sets custom values for an entity.
  *
+ * @param array $params
+ *   Expected keys are in format custom_fieldID:recordID or custom_groupName:fieldName:recordID.
  *
- * @param $params  expected keys are in format custom_fieldID:recordID or custom_groupName:fieldName:recordID
- * for example:
- // entity ID. You do not need to specify entity type, we figure it out based on the fields you're using
- * 'entity_id' => 123,
- // (omitting :id) inserts or updates a field in a single-valued group
- * 'custom_6' => 'foo',
- // custom_24 is checkbox or multiselect, so pass items as an array
- * 'custom_24' => array('bar', 'baz'),
- // in this case custom_33 is part of a multi-valued group, and we're updating record id 5
- * 'custom_33:5' => value,
- // inserts new record in multi-valued group
- * 'custom_33:-1' => value,
- // inserts another new record in multi-valued group
- * 'custom_33:-2' => value,
- // you can use group_name:field_name instead of ID
- * 'custom_some_group:my_field => 'myinfo',
- // updates record ID 8 in my_other_field in multi-valued some_big_group
- * 'custom_some_big_group:my_other_field:8 => 'myinfo',
+ * @example:
+ * @code
+ *   // entity ID. You do not need to specify entity type, we figure it out based on the fields you're using
+ *   'entity_id' => 123,
+ *   // (omitting :id) inserts or updates a field in a single-valued group
+ *   'custom_6' => 'foo',
+ *   // custom_24 is checkbox or multiselect, so pass items as an array
+ *   'custom_24' => array('bar', 'baz'),
+ *   // in this case custom_33 is part of a multi-valued group, and we're updating record id 5
+ *   'custom_33:5' => value,
+ *   // inserts new record in multi-valued group
+ *   'custom_33:-1' => value,
+ *   // inserts another new record in multi-valued group
+ *   'custom_33:-2' => value,
+ *   // you can use group_name:field_name instead of ID
+ *   'custom_some_group:my_field' => 'myinfo',
+ *   // updates record ID 8 in my_other_field in multi-valued some_big_group
+ *   'custom_some_big_group:my_other_field:8' => 'myinfo',
+ * @endcode
  *
- *
- * @return array('values' => TRUE) or array('is_error' => 1, 'error_message' => 'what went wrong')
- *
- * @access public
- *
+ * @throws Exception
+ * @return array
+ *   ['values' => TRUE] or ['is_error' => 1, 'error_message' => 'what went wrong']
  */
 function civicrm_api3_custom_value_create($params) {
   // @todo it's not clear where the entity_table is used as  CRM_Core_BAO_CustomValueTable::setValues($create)
@@ -110,32 +102,36 @@ function civicrm_api3_custom_value_create($params) {
   if ($result['is_error']) {
     throw new Exception($result['error_message']);
   }
-  return civicrm_api3_create_success(TRUE, $params);
+  return civicrm_api3_create_success(TRUE, $params, 'CustomValue');
 }
 
 /**
- * Adjust Metadata for Create action
+ * Adjust Metadata for Create action.
  *
- * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * The metadata is used for setting defaults, documentation & validation.
+ *
+ * @param array $params
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_custom_value_create_spec(&$params) {
   $params['entity_id']['api.required'] = 1;
+  $params['entity_id']['title'] = 'Entity ID';
 }
+
 /**
  * Use this API to get existing custom values for an entity.
  *
- * @param $params  array specifying the entity_id
- * Optionally include entity_type param, i.e. 'entity_type' => 'Activity'
- * If no entity_type is supplied, it will be determined based on the fields you request.
- * If no entity_type is supplied and no fields are specified, 'Contact' will be assumed.
- * Optionally include the desired custom data to be fetched (or else all custom data for this entity will be returned)
- * Example: 'entity_id' => 123, 'return.custom_6' => 1, 'return.custom_33' => 1
- * If you do not know the ID, you may use group name : field name, for example 'return.foo_stuff:my_field' => 1
+ * @param array $params
+ *   Array specifying the entity_id.
+ *   Optionally include entity_type param, i.e. 'entity_type' => 'Activity'
+ *   If no entity_type is supplied, it will be determined based on the fields you request.
+ *   If no entity_type is supplied and no fields are specified, 'Contact' will be assumed.
+ *   Optionally include the desired custom data to be fetched (or else all custom data for this entity will be returned)
+ *   Example: 'entity_id' => 123, 'return.custom_6' => 1, 'return.custom_33' => 1
+ *   If you do not know the ID, you may use group name : field name, for example 'return.foo_stuff:my_field' => 1
  *
- * @return array.
- *
- * @access public
+ * @throws API_Exception
+ * @return array
  */
 function civicrm_api3_custom_value_get($params) {
 
@@ -173,7 +169,7 @@ function civicrm_api3_custom_value_get($params) {
   if ($result['is_error']) {
     if ($result['error_message'] == "No values found for the specified entity ID and custom field(s).") {
       $values = array();
-      return civicrm_api3_create_success($values, $params);
+      return civicrm_api3_create_success($values, $params, 'CustomValue');
     }
     else {
       throw new API_Exception($result['error_message']);
@@ -202,7 +198,7 @@ function civicrm_api3_custom_value_get($params) {
         $n = 0;
         $id = $fieldNumber;
       }
-      else{
+      else {
         $n = $idArray[2];
         $id = $fieldNumber . "." . $idArray[2];
       }
@@ -214,23 +210,26 @@ function civicrm_api3_custom_value_get($params) {
       }
       $values[$id]['entity_id'] = $getParams['entityID'];
       if (!empty($getParams['entityType'])) {
-        $values[$n]['entity_table'] = $getParams['entityType'];
+        $values[$id]['entity_table'] = $getParams['entityType'];
       }
       //set 'latest' -useful for multi fields but set for single for consistency
       $values[$id]['latest'] = $value;
       $values[$id]['id'] = $id;
       $values[$id][$n] = $value;
     }
-    return civicrm_api3_create_success($values, $params);
+    return civicrm_api3_create_success($values, $params, 'CustomValue');
   }
 }
 
 /**
- * Adjust Metadata for Get action
+ * Adjust Metadata for Get action.
  *
- * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * The metadata is used for setting defaults, documentation & validation.
+ *
+ * @param array $params
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_custom_value_get_spec(&$params) {
   $params['entity_id']['api.required'] = 1;
+  $params['entity_id']['title'] = 'Entity ID';
 }

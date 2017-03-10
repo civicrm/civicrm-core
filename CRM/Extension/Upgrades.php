@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,26 +23,24 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * This class stores logic for managing schema upgrades in CiviCRM extensions.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Extension_Upgrades {
 
   const QUEUE_NAME = 'ext-upgrade';
 
   /**
-   * Determine whether any extensions have pending upgrades
+   * Determine whether any extensions have pending upgrades.
    *
    * @return bool
    */
-  static function hasPending() {
+  public static function hasPending() {
     $checks = CRM_Utils_Hook::upgrade('check');
     if (is_array($checks)) {
       foreach ($checks as $check) {
@@ -56,11 +54,11 @@ class CRM_Extension_Upgrades {
   }
 
   /**
-   * Fill a queue with upgrade tasks
+   * Fill a queue with upgrade tasks.
    *
    * @return CRM_Queue_Queue
    */
-  static function createQueue() {
+  public static function createQueue() {
     $queue = CRM_Queue_Service::singleton()->create(array(
       'type' => 'Sql',
       'name' => self::QUEUE_NAME,
