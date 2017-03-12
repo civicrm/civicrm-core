@@ -2416,7 +2416,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    * @param array $values
    *   Any values that may have already been compiled by calling process.
    *   This is augmented by values 'gathered' by gatherMessageValues
-   * @param bool $recur
    * @param bool $returnMessageText
    *   Distinguishes between whether to send message or return.
    *   message text. We are working towards this function ALWAYS returning message text & calling
@@ -4705,9 +4704,8 @@ LIMIT 1;";
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public static function sendMail(&$input, &$ids, $contributionID, &$values, $recur = FALSE,
+  public static function sendMail(&$input, &$ids, $contributionID, &$values,
                                   $returnMessageText = FALSE) {
-    $input['is_recur'] = $recur;
 
     $contribution = new CRM_Contribute_BAO_Contribution();
     $contribution->id = $contributionID;
