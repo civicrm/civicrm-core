@@ -822,6 +822,9 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->callAPISuccess('contact', 'delete', array('id' => $contact2['id']));
   }
 
+  /**
+   * Test creating contribution with Soft Credit by passing in honor_contact_id.
+   */
   public function testCreateContributionWithHonoreeContact() {
     $description = "Demonstrates creating contribution with Soft Credit by passing in honor_contact_id.";
     $subfile = "ContributionCreateWithHonoreeContact";
@@ -839,7 +842,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     // Default soft credit amount = contribution.total_amount
     // Legacy mode in create api (honor_contact_id param) uses the standard "In Honor of" soft credit type
     $this->assertEquals($this->_params['total_amount'], $result['values'][0]['soft_credit'][1]['amount']);
-    $this->assertEquals(CRM_Core_OptionGroup::getValue('soft_credit_type', 'in_honor_of', 'name'), $result['values'][0]['soft_credit'][1]['soft_credit_type']);
+    $softCreditValueTypeID = $result['values'][0]['soft_credit'][1]['soft_credit_type'];
+    $this->assertEquals('in_honor_of', CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_ContributionSoft', 'soft_credit_type_id', $softCreditValueTypeID));
 
     $this->callAPISuccess('contribution', 'delete', array('id' => $contribution['id']));
     $this->callAPISuccess('contact', 'delete', array('id' => $contact2['id']));
