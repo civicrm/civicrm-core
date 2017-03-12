@@ -2428,16 +2428,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * CRM-1960 - Test to ensure that completetransaction respects the is_email_receipt setting
    */
   public function testCompleteTransactionWithEmailReceiptInput() {
-    // Create a Contribution Page with is_email_receipt = TRUE
-    $contributionPage = $this->callAPISuccess('ContributionPage', 'create', array(
-      'receipt_from_name' => 'Mickey Mouse',
-      'receipt_from_email' => 'mickey@mouse.com',
-      'title' => "Test Contribution Page",
-      'financial_type_id' => 1,
-      'currency' => 'CAD',
-      'is_monetary' => TRUE,
-      'is_email_receipt' => TRUE,
-    ));
+    $contributionPage = $this->createReceiptableContributionPage();
+
     $this->_params['contribution_page_id'] = $contributionPage['id'];
     $params = array_merge($this->_params, array('contribution_status_id' => 2));
     $contribution = $this->callAPISuccess('contribution', 'create', $params);
@@ -2451,6 +2443,35 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     // Check if a receipt was issued
     $receipt_date = $this->callAPISuccess('Contribution', 'getvalue', array('id' => $contribution['id'], 'return' => 'receipt_date'));
     $this->assertEquals('', $receipt_date);
+  }
+
+  /**
+   * Test that $is_recur is assigned to the receipt.
+   */
+  public function testCompleteTransactionForRecurring() {
+
+    $this->swapMessageTemplateForTestTemplate();
+    $recurring = $this->setUpRecurringContribution();
+    $contributionPage = $this->createReceiptableContributionPage(array('is_recur' => TRUE, 'recur_frequency_unit' => 'month', 'recur_interval' => 1));
+
+    $this->_params['contribution_page_id'] = $contributionPage['id'];
+    $this->_params['contribution_recur_id'] = $recurring['id'];
+
+    $contribution = $this->setUpForCompleteTransaction();
+
+    $this->callAPISuccess('contribution', 'completetransaction', array(
+      'id' => $contribution['id'],
+      'trxn_date' => date('2011-04-09'),
+      'trxn_id' => 'kazam',
+      'is_email_receipt' => 1,
+    ));
+
+    $this->mut->checkMailLog(array(
+      'is_recur:::1',
+      'cancelSubscriptionUrl:::http://dummy.com',
+    ));
+    $this->mut->stop();
+    $this->revertTemplateToReservedTemplate();
   }
 
   /**
@@ -3492,6 +3513,27 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       )
     );
     $mut->stop();
+  }
+
+  /**
+   * Create a Contribution Page with is_email_receipt = TRUE.
+   *
+   * @param array $params
+   *   Params to overwrite with.
+   *
+   * @return array|int
+   */
+  protected function createReceiptableContributionPage($params = array()) {
+    $contributionPage = $this->callAPISuccess('ContributionPage', 'create', array_merge(array(
+      'receipt_from_name' => 'Mickey Mouse',
+      'receipt_from_email' => 'mickey@mouse.com',
+      'title' => "Test Contribution Page",
+      'financial_type_id' => 1,
+      'currency' => 'CAD',
+      'is_monetary' => TRUE,
+      'is_email_receipt' => TRUE,
+    ), $params));
+    return $contributionPage;
   }
 
 }
