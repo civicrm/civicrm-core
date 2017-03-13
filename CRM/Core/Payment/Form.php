@@ -386,6 +386,9 @@ class CRM_Core_Payment_Form {
         }
       }
     }
+
+    //CRM-19469 provide option for returning modified params
+    return $dst;
   }
 
   /**
