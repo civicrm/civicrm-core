@@ -252,7 +252,7 @@ AND    hold_date IS NULL
           $email->reset_date = 'null';
         }
       }
-      elseif ($email->on_hold == 'null') {
+      elseif ($email->on_hold == 'null' || empty($email->on_hold) {
         $sql = "
 SELECT id
 FROM   civicrm_email
