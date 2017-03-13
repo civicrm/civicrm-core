@@ -1136,6 +1136,12 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $this->assign('displayName', $this->userDisplayName);
     }
 
+    //CRM-20035 get preferred communication methods so existing values retained
+    $this->_params['preferred_communication_method'] =
+      CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $contactID,
+        'preferred_communication_method'
+      );
+
     $this->_contributorEmail = $this->userEmail;
     $this->_contributorContactID = $contactID;
     $this->processBillingAddress();
