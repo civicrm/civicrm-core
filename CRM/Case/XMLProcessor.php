@@ -56,7 +56,7 @@ class CRM_Case_XMLProcessor {
    * This appears to be "label_b_a", but IMHO "name_b_a" would be more
    * sensible.
    */
-  const REL_TYPE_CNAME = 'label_b_a';
+  const REL_TYPE_CNAME = 'label_a_b';
 
   /**
    * @param $caseType
