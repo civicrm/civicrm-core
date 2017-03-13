@@ -2432,9 +2432,14 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     if (empty($this->_component)) {
       $this->_component = CRM_Utils_Array::value('component', $input);
     }
+    if (isset($input['is_email_receipt'])) {
+      $values['is_email_receipt'] = $input['is_email_receipt'];
+    }
 
+    // Store values in a temp variable, so they don't get lost after _gatherMessageValues
+    $tmp_values = $values;
     //not really sure what params might be passed in but lets merge em into values
-    $values = array_merge($this->_gatherMessageValues($input, $values, $ids), $values);
+    $values = array_merge($this->_gatherMessageValues($input, $values, $ids), $tmp_values);
     if (!empty($input['receipt_date'])) {
       $values['receipt_date'] = $input['receipt_date'];
     }
@@ -2499,6 +2504,11 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       // perhaps we should throw an e-notice if amount is set & force total_amount?
       if (!empty($input['amount'])) {
         $values['totalAmount'] = $input['amount'];
+      }
+
+      // Set the value of is_email_confirm to the argument supplied in is_email_receipt, if available.
+      if (isset($input['is_email_receipt'])) {
+        $values['event']['is_email_confirm'] = $input['is_email_receipt'];
       }
 
       if ($values['event']['is_email_confirm']) {
@@ -4443,6 +4453,7 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
       'receive_date',
       'receipt_date',
       'contribution_status_id',
+      'is_email_receipt',
     );
     if (self::isSingleLineItem($primaryContributionID)) {
       $inputContributionWhiteList[] = 'financial_type_id';
@@ -4672,6 +4683,7 @@ LIMIT 1;";
       civicrm_api3('Contribution', 'sendconfirmation', array(
         'id' => $contribution->id,
         'payment_processor_id' => $paymentProcessorId,
+        'is_email_receipt' => CRM_Utils_Array::value('is_email_receipt', $values),
       ));
       CRM_Core_Error::debug_log_message("Receipt sent");
     }
