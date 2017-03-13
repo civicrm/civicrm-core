@@ -42,6 +42,11 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
    */
   protected $mapper;
 
+  /**
+   * @var string for testing cache buster generation
+   */
+  protected $cacheBusterString = 'xBkdk3';
+
   public function setUp() {
     parent::setUp();
 
@@ -318,4 +323,38 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
     return array($basedir, $c, $mapper);
   }
 
+  /**
+   * @param string $url
+   * @param string $expected
+   *
+   * @dataProvider urlForCacheCodeProvider
+   */
+  public function testAddingCacheCode($url, $expected) {
+    $resources = CRM_Core_Resources::singleton();
+    $this->assertEquals($expected, $resources->addCacheCode($url));
+  }
+
+  /**
+   * @return array
+   */
+  public function urlForCacheCodeProvider() {
+    return array(
+      array(
+        'http://www.civicrm.org',
+        'http://www.civicrm.org?r=' . $this->cacheBusterString,
+      ),
+      array(
+        'www.civicrm.org/custom.css?foo=bar',
+        'www.civicrm.org/custom.css?foo=bar&r=' . $this->cacheBusterString,
+      ),
+      array(
+        'civicrm.org/custom.css?r=old&foo=bar',
+        'civicrm.org/custom.css?r=' . $this->cacheBusterString . '&foo=bar',
+      ),
+      array(
+        'civicrm.org/custom.css?car=blue&foo=bar',
+        'civicrm.org/custom.css?car=blue&foo=bar&r=' . $this->cacheBusterString,
+      ),
+    );
+  }
 }
