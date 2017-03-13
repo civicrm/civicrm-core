@@ -141,18 +141,6 @@ class CRM_Financial_DAO_FinancialAccount extends CRM_Core_DAO {
    */
   public $is_default;
   /**
-   * Contains the opening balance for this financial account
-   *
-   * @var float
-   */
-  public $opening_balance;
-  /**
-   * Contains the opening balance for the current period for this financial account
-   *
-   * @var float
-   */
-  public $current_period_opening_balance;
-  /**
    * Class constructor.
    */
   function __construct() {
@@ -347,32 +335,6 @@ class CRM_Financial_DAO_FinancialAccount extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Default Financial Account') ,
           'description' => 'Is this account the default one (or default tax one) for its financial_account_type?',
-          'table_name' => 'civicrm_financial_account',
-          'entity' => 'FinancialAccount',
-          'bao' => 'CRM_Financial_BAO_FinancialAccount',
-        ) ,
-        'opening_balance' => array(
-          'name' => 'opening_balance',
-          'type' => CRM_Utils_Type::T_MONEY,
-          'title' => ts('Opening Balance') ,
-          'description' => 'Contains the opening balance for this financial account',
-          'precision' => array(
-            20,
-            2
-          ) ,
-          'table_name' => 'civicrm_financial_account',
-          'entity' => 'FinancialAccount',
-          'bao' => 'CRM_Financial_BAO_FinancialAccount',
-        ) ,
-        'current_period_opening_balance' => array(
-          'name' => 'current_period_opening_balance',
-          'type' => CRM_Utils_Type::T_MONEY,
-          'title' => ts('Current period opening Balance') ,
-          'description' => 'Contains the opening balance for the current period for this financial account',
-          'precision' => array(
-            20,
-            2
-          ) ,
           'table_name' => 'civicrm_financial_account',
           'entity' => 'FinancialAccount',
           'bao' => 'CRM_Financial_BAO_FinancialAccount',
