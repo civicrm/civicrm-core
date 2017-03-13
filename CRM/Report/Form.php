@@ -2290,6 +2290,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
           if ($tableName == 'civicrm_address') {
+            // deprecated, use $this->isTableSelected.
             $this->_addressField = TRUE;
           }
           if ($tableName == 'civicrm_email') {
