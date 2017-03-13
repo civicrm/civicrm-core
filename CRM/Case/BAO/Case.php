@@ -1214,10 +1214,9 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
   public static function getRelatedContacts($caseID, $skipDetails = FALSE) {
     $caseRoles = array();
     if (!$skipDetails) {
-      $caseInfo = civicrm_api('Case', 'getsingle', array(
+      $caseInfo = civicrm_api3('Case', 'getsingle', array(
         'id' => $caseID,
-        'version' => 3,
-        'return' => array('case_type_id', 'case_type_id.definition'),
+        'return' => array('case_type_id', 'case_type_id.name', 'case_type_id.definition'),
       ));
       if (!empty($caseInfo['case_type_id.definition']['caseRoles'])) {
         $caseRoles = CRM_Utils_Array::rekey($caseInfo['case_type_id.definition']['caseRoles'], 'name');

@@ -425,8 +425,8 @@ function _civicrm_api3_case_read(&$case, $options) {
       list($xml) = CRM_Utils_XML::parseString($case['case_type_id.definition']);
     }
     else {
-      $caseType = !empty($case['case_type_id']) ? $case['case_type_id'] : CRM_Core_DAO::getFieldValue('CRM_Case_DAO_Case', $case['id'], 'case_type_id');
-      $caseTypeName = !empty($case['case_type_id.name']) ? $case['case_type_id.name'] : CRM_Core_DAO::getFieldValue('CRM_Case_DAO_CaseType', $caseType['id'], 'name');
+      $caseTypeId = !empty($case['case_type_id']) ? $case['case_type_id'] : CRM_Core_DAO::getFieldValue('CRM_Case_DAO_Case', $case['id'], 'case_type_id');
+      $caseTypeName = !empty($case['case_type_id.name']) ? $case['case_type_id.name'] : CRM_Core_DAO::getFieldValue('CRM_Case_DAO_CaseType', $caseTypeId, 'name');
       $xml = CRM_Case_XMLRepository::singleton()->retrieve($caseTypeName);
     }
     $case['case_type_id.definition'] = array();
