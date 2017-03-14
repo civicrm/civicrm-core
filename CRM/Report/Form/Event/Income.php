@@ -124,7 +124,7 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
 
             WHERE      civicrm_event.id IN( {$eventID}) {$groupBy}";
 
-    $eventDAO = CRM_Core_DAO::executeQuery($sql);
+    $eventDAO = $this->executeReportQuery($sql);
     $currency = array();
     while ($eventDAO->fetch()) {
       $eventSummary[$eventDAO->event_id]['Title'] = $eventDAO->event_title;
@@ -150,7 +150,7 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
             GROUP BY civicrm_participant.event_id
              ";
 
-    $counteDAO = CRM_Core_DAO::executeQuery($pariticipantCount);
+    $counteDAO = $this->executeReportQuery($pariticipantCount);
     while ($counteDAO->fetch()) {
       $count[$counteDAO->event_id] = $counteDAO->count;
     }
@@ -170,7 +170,7 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
             GROUP BY civicrm_participant.role_id, civicrm_participant.event_id, civicrm_participant.fee_currency
             ";
 
-    $roleDAO = CRM_Core_DAO::executeQuery($role);
+    $roleDAO = $this->executeReportQuery($role);
 
     while ($roleDAO->fetch()) {
       // fix for multiple role, CRM-6507
@@ -214,7 +214,7 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
             GROUP BY civicrm_participant.status_id, civicrm_participant.event_id
             ";
 
-    $statusDAO = CRM_Core_DAO::executeQuery($status);
+    $statusDAO = $this->executeReportQuery($status);
 
     while ($statusDAO->fetch()) {
       $statusRows[$statusDAO->event_id][$participantStatus[$statusDAO->STATUSID]]['total'] = $statusDAO->participant;
@@ -244,7 +244,7 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
             GROUP BY  c.payment_instrument_id, civicrm_participant.event_id
             ";
 
-    $instrumentDAO = CRM_Core_DAO::executeQuery($paymentInstrument);
+    $instrumentDAO = $this->executeReportQuery($paymentInstrument);
 
     while ($instrumentDAO->fetch()) {
       //allow only if instrument is present in contribution table
