@@ -43,6 +43,7 @@
     <import>true</import>
     <export>false</export>
     <title>Case Type</title>
+    <required>true</required>
     <comment>FK to civicrm_case_type.id</comment>
     <html>
       <type>Select</type>
@@ -64,7 +65,6 @@
     <table>civicrm_case_type</table>
     <key>id</key>
     <add>4.5</add>
-    <onDelete>SET NULL</onDelete>
   </foreignKey>
   <field>
     <name>casetag1_id</name>

@@ -69,6 +69,11 @@ UPDATE `civicrm_state_province` SET `name`='Yunlin County' WHERE `name` = 'Yunli
 UPDATE `civicrm_country` SET `name`='Palestine, State of' WHERE `name` = 'Palestinian Territory';
 UPDATE `civicrm_country` SET `name`='Virgin Islands, British' WHERE `name` = 'Virgin Islands,British';
 
+-- CRM-20102 make case_type_id required
+ALTER TABLE `civicrm_case` DROP FOREIGN KEY `FK_civicrm_case_case_type_id`;
+ALTER TABLE `civicrm_case` MODIFY `case_type_id` int(10) unsigned NOT NULL COMMENT 'FK to civicrm_case_type.id';
+ALTER TABLE `civicrm_case` ADD CONSTRAINT `FK_civicrm_case_case_type_id` FOREIGN KEY (`case_type_id`) REFERENCES `civicrm_case_type` (`id`);
+
 --- CRM-19715 Remove Close Accounting Period code - now in an extension.
 DELETE FROM civicrm_navigation
 WHERE url = 'civicrm/admin/contribute/closeaccperiod?reset=1' AND name = 'Close Accounting Period';
