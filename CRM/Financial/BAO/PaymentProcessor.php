@@ -84,7 +84,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
       $test_id = self::getTestProcessorId($params['id']);
       $testDAO = new CRM_Financial_DAO_PaymentProcessor();
       $testDAO->id = $test_id;
-      if ($testDAO->find(true)) {
+      if ($testDAO->find(TRUE)) {
         $testDAO->is_active = $params['is_active'];
         $testDAO->save();
       }
