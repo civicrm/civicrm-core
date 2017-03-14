@@ -361,6 +361,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
    */
   public function testAddingCacheCode($url, $expected) {
     $resources = CRM_Core_Resources::singleton();
+    $resources->setCacheCode($this->cacheBusterString);
     $this->assertEquals($expected, $resources->addCacheCode($url));
   }
 
