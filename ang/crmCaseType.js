@@ -136,7 +136,7 @@
     $scope.activityTypes = _.indexBy(apiCalls.actTypes.values, 'name');
     $scope.activityTypeOptions = _.map(apiCalls.actTypes.values, formatActivityTypeOption);
     $scope.relationshipTypeOptions = _.map(apiCalls.relTypes.values, function(type) {
-      return {id: type[REL_TYPE_CNAME], text: type.label_b_a};
+      return {id: type[REL_TYPE_CNAME], text: type.label_a_b};
     });
     $scope.locks = {caseTypeName: true, activitySetName: true};
 
