@@ -112,7 +112,8 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
     $isHtml = ($e->message['format'] == 'text/html');
     $useSmarty = !empty($e->context['smarty']);
 
-    $e->string = \CRM_Utils_Token::replaceDomainTokens($e->string, \CRM_Core_BAO_Domain::getDomain(), $isHtml, $e->message['tokens'], $useSmarty);
+    $domain = \CRM_Core_BAO_Domain::getDomain();
+    $e->string = \CRM_Utils_Token::replaceDomainTokens($e->string, $domain, $isHtml, $e->message['tokens'], $useSmarty);
 
     if (!empty($e->context['contact'])) {
       $e->string = \CRM_Utils_Token::replaceContactTokens($e->string, $e->context['contact'], $isHtml, $e->message['tokens'], TRUE, $useSmarty);

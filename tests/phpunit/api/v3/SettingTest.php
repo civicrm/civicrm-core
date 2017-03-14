@@ -366,27 +366,6 @@ class api_v3_SettingTest extends CiviUnitTestCase {
   /**
    * Setting api should set & fetch settings stored in config as well as those in settings table
    */
-  public function testSetConfigSetting() {
-    $config = CRM_Core_Config::singleton();
-    $this->assertFalse($config->debug == 1);
-
-    $params = array(
-      'domain_id' => $this->_domainID2,
-      'debug_enabled' => 1,
-    );
-    $result = $this->callAPISuccess('setting', 'create', $params);
-
-    $this->assertEquals(1, Civi::settings($this->_domainID2)->get('debug_enabled'));
-
-    CRM_Core_BAO_Domain::setDomain($this->_domainID2);
-    $config = CRM_Core_Config::singleton(TRUE, TRUE);
-    CRM_Core_BAO_Domain::resetDomain();
-    $this->assertEquals(1, $config->debug);
-  }
-
-  /**
-   * Setting api should set & fetch settings stored in config as well as those in settings table
-   */
   public function testGetConfigSetting() {
     $settings = $this->callAPISuccess('setting', 'get', array(
         'name' => 'defaultCurrency',
