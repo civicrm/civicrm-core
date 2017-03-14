@@ -500,7 +500,7 @@ class CRM_Core_Resources {
       $file = '';
     }
     if ($addCacheCode) {
-      $file .= '?r=' . $this->getCacheCode();
+      $file = $this->addCacheCode($file);
     }
     // TODO consider caching results
     $base = $this->paths->hasVariable($ext)
@@ -643,7 +643,8 @@ class CRM_Core_Resources {
       // Load custom or core css
       $config = CRM_Core_Config::singleton();
       if (!empty($config->customCSSURL)) {
-        $this->addStyleUrl($config->customCSSURL, 99, $region);
+        $customCSSURL = $this->addCacheCode($config->customCSSURL);
+        $this->addStyleUrl($customCSSURL, 99, $region);
       }
       if (!Civi::settings()->get('disable_core_css')) {
         $this->addStyleFile('civicrm', 'css/civicrm.css', -99, $region);
@@ -879,6 +880,29 @@ class CRM_Core_Resources {
         $fileName = $nonMiniFile;
       }
     }
+  }
+
+  /**
+   * @param string $url
+   * @return string
+   */
+  public function addCacheCode($url) {
+    parse_str(parse_url($url, PHP_URL_QUERY), $queryParts);
+    $existing = isset($queryParts['r']) ? $queryParts['r'] : NULL;
+    $latest = $this->cacheCode;
+
+    if ($existing) {
+      if ($existing === $latest) {
+        return $url; // no need to update
+      }
+      else {
+        return str_replace('r=' . $existing, 'r=' . $latest, $url);
+      }
+    }
+
+    $operator = empty($queryParts) ? '?' : '&';
+
+    return $url . $operator . 'r=' . $latest;
   }
 
 }
