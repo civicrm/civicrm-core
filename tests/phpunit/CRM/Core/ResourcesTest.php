@@ -357,4 +357,5 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
       ),
     );
   }
+
 }

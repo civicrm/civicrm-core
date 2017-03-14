@@ -816,13 +816,14 @@ class CRM_Core_Resources {
    */
   public function addCacheCode($url) {
     parse_str(parse_url($url, PHP_URL_QUERY), $queryParts);
-    $existing = isset($queryParts['r']) ? $queryParts['r'] : null;
+    $existing = isset($queryParts['r']) ? $queryParts['r'] : NULL;
     $latest = $this->cacheCode;
 
     if ($existing) {
       if ($existing === $latest) {
         return $url; // no need to update
-      } else {
+      }
+      else {
         return str_replace('r=' . $existing, 'r=' . $latest, $url);
       }
     }
@@ -831,4 +832,5 @@ class CRM_Core_Resources {
 
     return $url . $operator . 'r=' . $latest;
   }
+
 }
