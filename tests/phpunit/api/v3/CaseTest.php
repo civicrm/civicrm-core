@@ -284,12 +284,12 @@ class api_v3_CaseTest extends CiviCaseTestCase {
    */
   public function testCaseActivityCreate() {
     $params = $this->_params;
-    $this->callAPISuccess('case', 'create', $params);
+    $case = $this->callAPISuccess('case', 'create', $params);
     $params = array(
-      'case_id' => 1,
+      'case_id' => $case['id'],
       // follow up
       'activity_type_id' => $this->followup_activity_type_value,
-      'subject' => 'Test followup',
+      'subject' => 'Test followup 123',
       'source_contact_id' => $this->_loggedInUser,
       'target_contact_id' => $this->_params['contact_id'],
     );
@@ -301,7 +301,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
 
     // Check other DB tables populated properly - is there a better way to do this? assertDBState() requires that we know the id already.
     $dao = new CRM_Case_DAO_CaseActivity();
-    $dao->case_id = 1;
+    $dao->case_id = $case['id'];
     $dao->activity_id = $this->_caseActivityId;
     $this->assertEquals($dao->find(), 1, 'case_activity table not populated correctly in line ' . __LINE__);
     $dao->free();
@@ -313,7 +313,14 @@ class api_v3_CaseTest extends CiviCaseTestCase {
     $this->assertEquals($dao->find(), 1, 'activity_contact table not populated correctly in line ' . __LINE__);
     $dao->free();
 
-    // TODO: There's more things we could check
+    // Check that fetching an activity by case id works, as well as returning case_id
+    $result = $this->callAPISuccessGetSingle('Activity', array(
+      'case_id' => $case['id'],
+      'activity_type_id' => $this->followup_activity_type_value,
+      'subject' => 'Test followup 123',
+      'return' => array('case_id'),
+    ));
+    $this->assertEquals($case['id'], $result['case_id']);
   }
 
   /**
@@ -426,6 +433,54 @@ class api_v3_CaseTest extends CiviCaseTestCase {
       'status_id' => "Open",
     ));
     $this->assertEquals($case1['id'], $result['id']);
+  }
+
+  public function testCaseGetWithRoles() {
+    $case1 = $this->callAPISuccess('Case', 'create', array(
+      'contact_id' => 17,
+      'subject' => "Test case with roles",
+      'case_type_id' => $this->caseTypeId,
+      'status_id' => "Open",
+    ));
+    $result = $this->callAPISuccessGetSingle('Case', array(
+      'id' => $case1['id'],
+      'status_id' => "Open",
+      'return' => array('contacts'),
+    ));
+    foreach ($result['contacts'] as $contact) {
+      if ($contact['role'] == 'Client') {
+        $this->assertEquals(17, $contact['contact_id']);
+      }
+      elseif ($contact['role'] == 'Homeless Services Coordinator') {
+        $this->assertEquals(1, $contact['creator']);
+        $this->assertEquals(1, $contact['manager']);
+      }
+    }
+  }
+
+  public function testCaseGetWithDefinition() {
+    $case1 = $this->callAPISuccess('Case', 'create', array(
+      'contact_id' => 17,
+      'subject' => "Test case with definition",
+      'case_type_id' => $this->caseTypeId,
+      'status_id' => "Open",
+    ));
+    $result1 = $this->callAPISuccessGetSingle('Case', array(
+      'id' => $case1['id'],
+      'status_id' => "Open",
+      'return' => array('case_type_id.definition'),
+    ));
+    $result2 = $this->callAPISuccessGetSingle('Case', array(
+      'id' => $case1['id'],
+      'status_id' => "Open",
+      'return' => array('case_type_id', 'case_type_id.definition'),
+    ));
+    $this->assertEquals($result1['case_type_id.definition'], $result2['case_type_id.definition']);
+    $def = $result1['case_type_id.definition'];
+    $this->assertEquals(array('name' => 'Open Case', 'max_instances' => 1), $def['activityTypes'][0]);
+    $this->assertNotEmpty($def['activitySets'][0]['activityTypes']);
+    $this->assertNotEmpty($def['caseRoles'][0]['manager']);
+    $this->assertNotEmpty($def['caseRoles'][0]['creator']);
   }
 
 }

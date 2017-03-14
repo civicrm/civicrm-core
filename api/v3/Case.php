@@ -218,16 +218,18 @@ function civicrm_api3_case_get($params) {
 
   // Add clause to search by client
   if (!empty($params['contact_id'])) {
-    $contacts = array();
-    foreach ((array) $params['contact_id'] as $c) {
-      if (!CRM_Utils_Rule::positiveInteger($c)) {
-        throw new API_Exception('Invalid parameter: contact_id. Must provide numeric value(s).');
+    // Legacy support - this field historically supports a nonstandard format of array(1,2,3) as a synonym for array('IN' => array(1,2,3))
+    if (is_array($params['contact_id'])) {
+      $operator = CRM_Utils_Array::first(array_keys($params['contact_id']));
+      if (!in_array($operator, \CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
+        $params['contact_id'] = array('IN' => $params['contact_id']);
       }
-      $contacts[] = $c;
     }
-    $sql
-      ->join('civicrm_case_contact', 'INNER JOIN civicrm_case_contact ON civicrm_case_contact.case_id = a.id')
-      ->where('civicrm_case_contact.contact_id IN (' . implode(',', $contacts) . ')');
+    else {
+      $params['contact_id'] = array('=' => $params['contact_id']);
+    }
+    $clause = CRM_Core_DAO::createSQLFilter('contact_id', $params['contact_id']);
+    $sql->where("a.id IN (SELECT case_id FROM civicrm_case_contact WHERE $clause)");
   }
 
   // Add clause to search by activity
@@ -415,6 +417,21 @@ function _civicrm_api3_case_read(&$case, $options) {
     $dao = CRM_Core_DAO::executeQuery($query, array(1 => array($case['id'], 'Integer')));
     while ($dao->fetch()) {
       $case['activities'][] = $dao->activity_id;
+    }
+  }
+  // Properly render this joined field
+  if (!empty($options['return']['case_type_id.definition'])) {
+    if (!empty($case['case_type_id.definition'])) {
+      list($xml) = CRM_Utils_XML::parseString($case['case_type_id.definition']);
+    }
+    else {
+      $caseTypeId = !empty($case['case_type_id']) ? $case['case_type_id'] : CRM_Core_DAO::getFieldValue('CRM_Case_DAO_Case', $case['id'], 'case_type_id');
+      $caseTypeName = !empty($case['case_type_id.name']) ? $case['case_type_id.name'] : CRM_Core_DAO::getFieldValue('CRM_Case_DAO_CaseType', $caseTypeId, 'name');
+      $xml = CRM_Case_XMLRepository::singleton()->retrieve($caseTypeName);
+    }
+    $case['case_type_id.definition'] = array();
+    if ($xml) {
+      $case['case_type_id.definition'] = CRM_Case_BAO_CaseType::convertXmlToDefinition($xml);
     }
   }
 }

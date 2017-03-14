@@ -318,13 +318,13 @@ function civicrm_api3_activity_get($params) {
   // Support search by activity_contact
   $extraFieldSpecs = array();
   _civicrm_api3_activity_create_spec($extraFieldSpecs);
-  $options = civicrm_api3('ActivityContact', 'getoptions', array('field' => 'record_type_id'));
-  $options = $options['values'];
+  $recordTypes = civicrm_api3('ActivityContact', 'getoptions', array('field' => 'record_type_id'));
+  $recordTypes = $recordTypes['values'];
   $activityContactOptions = array(
     'contact_id' => NULL,
-    'target_contact_id' => array_search('Activity Targets', $options),
-    'source_contact_id' => array_search('Activity Source', $options),
-    'assignee_contact_id' => array_search('Activity Assignees', $options),
+    'target_contact_id' => array_search('Activity Targets', $recordTypes),
+    'source_contact_id' => array_search('Activity Source', $recordTypes),
+    'assignee_contact_id' => array_search('Activity Assignees', $recordTypes),
   );
   foreach ($activityContactOptions as $activityContactName => $activityContactValue) {
     if (!empty($params[$activityContactName])) {
@@ -375,7 +375,7 @@ function civicrm_api3_activity_get($params) {
     return civicrm_api3_create_success($activities, $params, 'Activity', 'get');
   }
 
-  $activities = _civicrm_api3_activity_get_formatResult($params, $activities);
+  $activities = _civicrm_api3_activity_get_formatResult($params, $activities, $options);
   //legacy custom data get - so previous formatted response is still returned too
   return civicrm_api3_create_success($activities, $params, 'Activity', 'get');
 }
@@ -392,18 +392,12 @@ function civicrm_api3_activity_get($params) {
  * @return array
  *   new activities list
  */
-function _civicrm_api3_activity_get_formatResult($params, $activities) {
+function _civicrm_api3_activity_get_formatResult($params, $activities, $options) {
   if (!$activities) {
     return $activities;
   }
 
-  $returns = CRM_Utils_Array::value('return', $params, array());
-  if (!is_array($returns)) {
-    $returns = str_replace(' ', '', $returns);
-    $returns = explode(',', $returns);
-  }
-  $returns = array_fill_keys($returns, 1);
-
+  $returns = $options['return'];
   foreach ($params as $n => $v) {
     if (substr($n, 0, 7) == 'return.') {
       $returnkey = substr($n, 7);
@@ -479,6 +473,14 @@ function _civicrm_api3_activity_get_formatResult($params, $activities) {
           array(1 => array(implode(',', array_keys($activities)), 'String', CRM_Core_DAO::QUERY_FORMAT_NO_QUOTES)));
         while ($dao->fetch()) {
           $activities[$dao->entity_id]['file_id'][] = $dao->file_id;
+        }
+        break;
+
+      case 'case_id':
+        $dao = CRM_Core_DAO::executeQuery("SELECT activity_id, case_id FROM civicrm_case_activity WHERE activity_id IN (%1)",
+          array(1 => array(implode(',', array_keys($activities)), 'String', CRM_Core_DAO::QUERY_FORMAT_NO_QUOTES)));
+        while ($dao->fetch()) {
+          $activities[$dao->activity_id]['case_id'] = $dao->case_id;
         }
         break;
 

@@ -1204,17 +1204,28 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
    *
    * @param int $caseID
    *   Case id.
-   * @param bool $skipDetails
+   * @param bool $includeDetails
    *   If true include details of contacts.
    *
    * @return array
    *   array of return properties
    *
    */
-  public static function getRelatedContacts($caseID, $skipDetails = FALSE) {
+  public static function getRelatedContacts($caseID, $includeDetails = TRUE) {
+    $caseRoles = array();
+    if ($includeDetails) {
+      $caseInfo = civicrm_api3('Case', 'getsingle', array(
+        'id' => $caseID,
+        // Most efficient way of retrieving definition is to also include case type id and name so the api doesn't have to look it up separately
+        'return' => array('case_type_id', 'case_type_id.name', 'case_type_id.definition'),
+      ));
+      if (!empty($caseInfo['case_type_id.definition']['caseRoles'])) {
+        $caseRoles = CRM_Utils_Array::rekey($caseInfo['case_type_id.definition']['caseRoles'], 'name');
+      }
+    }
     $values = array();
     $query = '
-      SELECT cc.display_name as name, cc.sort_name as sort_name, cc.id, crt.label_b_a as role, ce.email
+      SELECT cc.display_name as name, cc.sort_name as sort_name, cc.id, cr.relationship_type_id, crt.label_b_a as role, ce.email
       FROM civicrm_relationship cr
       LEFT JOIN civicrm_relationship_type crt
         ON crt.id = cr.relationship_type_id
@@ -1229,17 +1240,25 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
     $dao = CRM_Core_DAO::executeQuery($query, $params);
 
     while ($dao->fetch()) {
-      if ($skipDetails) {
+      if (!$includeDetails) {
         $values[$dao->id] = 1;
       }
       else {
-        $values[] = array(
+        $details = array(
           'contact_id' => $dao->id,
           'display_name' => $dao->name,
           'sort_name' => $dao->sort_name,
+          'relationship_type_id' => $dao->relationship_type_id,
           'role' => $dao->role,
           'email' => $dao->email,
         );
+        // Add more info about the role (creator, manager)
+        $role = CRM_Utils_Array::value($details['role'], $caseRoles);
+        if ($role) {
+          unset($role['name']);
+          $details += $role;
+        }
+        $values[] = $details;
       }
     }
     $dao->free();
@@ -1465,7 +1484,7 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
 
       // TODO: May want to replace this with a call to getRelatedAndGlobalContacts() when this feature is revisited.
       // (Or for efficiency call the global one outside the loop and then union with this each time.)
-      $contactDetails = self::getRelatedContacts($caseId, TRUE);
+      $contactDetails = self::getRelatedContacts($caseId, FALSE);
 
       if (!empty($contactDetails[$result['from']['id']])) {
         $params = array();
