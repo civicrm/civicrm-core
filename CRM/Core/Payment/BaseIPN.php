@@ -471,9 +471,9 @@ class CRM_Core_Payment_BaseIPN {
   }
 
   /**
-   * Send receipt from contribution.
-   *
    * @deprecated
+   *
+   * @todo confirm this function is not being used by any payment processor outside core & remove.
    *
    * Note that the compose message part has been moved to contribution
    * In general LoadObjects is called first to get the objects but the composeMessageArray function now calls it
@@ -494,7 +494,7 @@ class CRM_Core_Payment_BaseIPN {
    * @return array
    */
   public function sendMail(&$input, &$ids, &$objects, &$values, $recur = FALSE, $returnMessageText = FALSE) {
-    return CRM_Contribute_BAO_Contribution::sendMail($input, $ids, $objects['contribution']->id, $values, $recur,
+    return CRM_Contribute_BAO_Contribution::sendMail($input, $ids, $objects['contribution']->id, $values,
       $returnMessageText);
   }
 

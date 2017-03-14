@@ -2416,7 +2416,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    * @param array $values
    *   Any values that may have already been compiled by calling process.
    *   This is augmented by values 'gathered' by gatherMessageValues
-   * @param bool $recur
    * @param bool $returnMessageText
    *   Distinguishes between whether to send message or return.
    *   message text. We are working towards this function ALWAYS returning message text & calling
@@ -2426,7 +2425,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    *   messages
    * @throws Exception
    */
-  public function composeMessageArray(&$input, &$ids, &$values, $recur = FALSE, $returnMessageText = TRUE) {
+  public function composeMessageArray(&$input, &$ids, &$values, $returnMessageText = TRUE) {
     $this->loadRelatedObjects($input, $ids);
 
     if (empty($this->_component)) {
@@ -2439,11 +2438,10 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       $values['receipt_date'] = $input['receipt_date'];
     }
 
-    $template = CRM_Core_Smarty::singleton();
-    $this->_assignMessageVariablesToTemplate($values, $input, $template, $recur, $returnMessageText);
+    $template = $this->_assignMessageVariablesToTemplate($values, $input, $returnMessageText);
     //what does recur 'mean here - to do with payment processor return functionality but
     // what is the importance
-    if ($recur && !empty($this->_relatedObjects['paymentProcessor'])) {
+    if (!empty($this->contribution_recur_id) && !empty($this->_relatedObjects['paymentProcessor'])) {
       $paymentObject = Civi\Payment\System::singleton()->getByProcessor($this->_relatedObjects['paymentProcessor']);
 
       $entityID = $entity = NULL;
@@ -2552,7 +2550,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
               $values['is_pay_later'] = 1;
             }
 
-            if ($recur && $paymentObject) {
+            if (!empty($this->contribution_recur_id) && $paymentObject) {
               $url = $paymentObject->subscriptionURL($membership->id, 'membership', 'cancel');
               $template->assign('cancelSubscriptionUrl', $url);
               $url = $paymentObject->subscriptionURL($membership->id, 'membership', 'billing');
@@ -2788,13 +2786,12 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    *
    * @param $values
    * @param $input
-   * @param CRM_Core_SMARTY $template
-   * @param bool $recur
    * @param bool $returnMessageText
    *
    * @return mixed
    */
-  public function _assignMessageVariablesToTemplate(&$values, $input, &$template, $recur = FALSE, $returnMessageText = TRUE) {
+  public function _assignMessageVariablesToTemplate(&$values, $input, $returnMessageText = TRUE) {
+    $template = CRM_Core_Smarty::singleton();
     $template->assign('first_name', $this->_relatedObjects['contact']->first_name);
     $template->assign('last_name', $this->_relatedObjects['contact']->last_name);
     $template->assign('displayName', $this->_relatedObjects['contact']->display_name);
@@ -2889,7 +2886,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       )
     );
     $template->assign('is_monetary', 1);
-    $template->assign('is_recur', (bool) $recur);
+    $template->assign('is_recur', !empty($this->contribution_recur_id));
     $template->assign('currency', $this->currency);
     $template->assign('address', CRM_Utils_Address::format($input));
     if (!empty($values['customGroup'])) {
@@ -4699,8 +4696,6 @@ LIMIT 1;";
    * @param int $contributionID
    * @param array $values
    *   Values related to objects that have already been loaded.
-   * @param bool $recur
-   *   Is it part of a recurring contribution.
    * @param bool $returnMessageText
    *   Should text be returned instead of sent. This.
    *   is because the function is also used to generate pdfs
@@ -4709,9 +4704,8 @@ LIMIT 1;";
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public static function sendMail(&$input, &$ids, $contributionID, &$values, $recur = FALSE,
+  public static function sendMail(&$input, &$ids, $contributionID, &$values,
                                   $returnMessageText = FALSE) {
-    $input['is_recur'] = $recur;
 
     $contribution = new CRM_Contribute_BAO_Contribution();
     $contribution->id = $contributionID;
@@ -4723,7 +4717,7 @@ LIMIT 1;";
     if (!$returnMessageText) {
       list($values['receipt_from_name'], $values['receipt_from_email']) = self::generateFromEmailAndName($input, $contribution);
     }
-    $return = $contribution->composeMessageArray($input, $ids, $values, $recur, $returnMessageText);
+    $return = $contribution->composeMessageArray($input, $ids, $values, $returnMessageText);
     // Contribution ID should really always be set. But ?
     if (!$returnMessageText && (!isset($input['receipt_update']) || $input['receipt_update']) && empty($contribution->receipt_date)) {
       civicrm_api3('Contribution', 'create', array('receipt_date' => 'now', 'id' => $contribution->id));
