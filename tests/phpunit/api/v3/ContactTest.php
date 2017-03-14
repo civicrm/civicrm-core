@@ -517,6 +517,25 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * CRM-20035 test that communication method is not unset when not passed in.
+   */
+  public function testCreatePreferredCommunicationNotUnset() {
+    $contact = $this->callAPISuccess('Contact', 'create', array(
+        'first_name' => 'Snoop',
+        'last_name' => 'Dog',
+        'contact_type' => 'Individual',
+        'preferred_communication_method' => array('Phone', 'Fax')
+      )
+    );
+    $result = $this->callAPISuccessGetSingle('Contact', array('id' => $contact['id'], 'return' => 'preferred_communication_method'));
+    $this->assertEquals(array('Phone', 'Fax'), $result['preferred_communication_method']);
+
+    $this->callAPISuccess('Contact', 'create', array('id' => $contact['id'], 'first_name' => 'Hot Diggity'));
+    $result = $this->callAPISuccessGetSingle('Contact', array('id' => $contact['id'], 'return' => 'preferred_communication_method'));
+    $this->assertEquals(array('Phone', 'Fax'), $result['preferred_communication_method']);
+  }
+
+  /**
    * CRM-14232 test preferred language returns setting if not passed where setting is NULL.
    */
   public function testCreatePreferredLanguageNull() {
