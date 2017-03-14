@@ -79,6 +79,17 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
       CRM_Financial_BAO_FinancialTypeAccount::add($values);
     }
 
+    if (isset($params['id']) && isset($params['is_active']) && !isset($params['is_test'])) {
+      // check if is_active has changed & if so update test instance is_active too.
+      $test_id = self::getTestProcessorId($params['id']);
+      $testDAO = new CRM_Financial_DAO_PaymentProcessor();
+      $testDAO->id = $test_id;
+      if ($testDAO->find(true)) {
+        $testDAO->is_active = $params['is_active'];
+        $testDAO->save();
+      }
+    }
+
     Civi\Payment\System::singleton()->flushProcessors();
     return $processor;
   }
@@ -252,6 +263,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
     return civicrm_api3('payment_processor', 'getvalue', array(
       'return' => 'id',
       'name' => $liveProcessorName,
+      'is_test' => 1,
       'domain_id' => CRM_Core_Config::domainID(),
     ));
   }
