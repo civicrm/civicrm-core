@@ -123,7 +123,7 @@
  function setLocationDetails(contactID , reset) {
    resetValues();
    var locationUrl = {/literal}'{$locDataURL}'{literal} + contactID;
-   var submittedOnBehalfInfo = {/literal}'{$submittedOnBehalfInfo}'{literal};
+   var submittedOnBehalfInfo = {/literal}'{$submittedOnBehalfInfo|escape:'javascript'}'{literal};
    var submittedCID = {/literal}"{$submittedOnBehalf}"{literal};
 
    if (submittedOnBehalfInfo) {
