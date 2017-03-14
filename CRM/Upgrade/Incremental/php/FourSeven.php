@@ -314,6 +314,7 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
    */
   public function upgrade_4_7_18($rev) {
     $this->addTask('Update Kenyan Provinces', 'updateKenyanProvinces');
+    $this->addTask('CRM-19948 - Add created_id column to civicrm_file', 'addFileCreatedIdColumn');
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
   }
 
@@ -1043,6 +1044,33 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
         ", $params);
       }
     }
+  }
+
+  /**
+   * CRM-19948 - Add created_id column to civicrm_file
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   *
+   * @return bool
+   */
+  public static function addFileCreatedIdColumn(CRM_Queue_TaskContext $ctx) {
+    self::addColumn($ctx, 'civicrm_file', 'created_id', "int unsigned COMMENT 'FK to civicrm_contact, who uploaded this file'");
+
+    $fileTable = 'civicrm_file';
+    $fkName = 'FK_civicrm_file_created_id';
+
+    CRM_Core_BAO_SchemaHandler::safeRemoveFK($fileTable, $fkName);
+
+    CRM_Core_DAO::executeQuery("
+      ALTER TABLE `{$fileTable}`
+        ADD CONSTRAINT `{$fkName}`
+        FOREIGN KEY (`created_id`)
+        REFERENCES `civicrm_contact`(`id`)
+        ON DELETE SET NULL
+        ON UPDATE CASCADE;
+    ");
+
+    return TRUE;
   }
 
 }

@@ -24,7 +24,7 @@
 | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
 +--------------------------------------------------------------------+
 */
-// (GenCodeChecksum:b66a5c6ab79bec53c7781738c148e525)
+// (GenCodeChecksum:cdd565cc888810bd9a78e59bab5c7af3)
 return array(
   'CRM_Core_DAO_AddressFormat' => array(
     'name' => 'AddressFormat',
@@ -35,11 +35,6 @@ return array(
     'name' => 'Extension',
     'class' => 'CRM_Core_DAO_Extension',
     'table' => 'civicrm_extension',
-  ) ,
-  'CRM_Core_DAO_File' => array(
-    'name' => 'File',
-    'class' => 'CRM_Core_DAO_File',
-    'table' => 'civicrm_file',
   ) ,
   'CRM_Core_DAO_LocationType' => array(
     'name' => 'LocationType',
@@ -321,10 +316,10 @@ return array(
     'class' => 'CRM_Core_DAO_Email',
     'table' => 'civicrm_email',
   ) ,
-  'CRM_Core_DAO_EntityFile' => array(
-    'name' => 'EntityFile',
-    'class' => 'CRM_Core_DAO_EntityFile',
-    'table' => 'civicrm_entity_file',
+  'CRM_Core_DAO_File' => array(
+    'name' => 'File',
+    'class' => 'CRM_Core_DAO_File',
+    'table' => 'civicrm_file',
   ) ,
   'CRM_Core_DAO_IM' => array(
     'name' => 'IM',
@@ -625,6 +620,11 @@ return array(
     'name' => 'Discount',
     'class' => 'CRM_Core_DAO_Discount',
     'table' => 'civicrm_discount',
+  ) ,
+  'CRM_Core_DAO_EntityFile' => array(
+    'name' => 'EntityFile',
+    'class' => 'CRM_Core_DAO_EntityFile',
+    'table' => 'civicrm_entity_file',
   ) ,
   'CRM_Core_DAO_EntityTag' => array(
     'name' => 'EntityTag',
