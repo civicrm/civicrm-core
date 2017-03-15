@@ -379,10 +379,6 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
         'www.civicrm.org/custom.css?foo=bar&r=' . $this->cacheBusterString,
       ),
       array(
-        'civicrm.org/custom.css?r=old&foo=bar',
-        'civicrm.org/custom.css?r=' . $this->cacheBusterString . '&foo=bar',
-      ),
-      array(
         'civicrm.org/custom.css?car=blue&foo=bar',
         'civicrm.org/custom.css?car=blue&foo=bar&r=' . $this->cacheBusterString,
       ),
