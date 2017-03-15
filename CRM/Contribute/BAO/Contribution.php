@@ -3540,14 +3540,14 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
           'entity_table' => 'civicrm_financial_item',
         );
         foreach ($params['line_item'] as $fieldId => $fields) {
-          foreach ($fields as $fieldValueId => $fieldValues) {
+          foreach ($fields as $fieldValueId => $lineItemDetails) {
             $fparams = array(
               1 => array(CRM_Core_PseudoConstant::getKey('CRM_Financial_BAO_FinancialItem', 'status_id', 'Paid'), 'Integer'),
-              2 => array($fieldValues['id'], 'Integer'),
+              2 => array($lineItemDetails['id'], 'Integer'),
             );
             CRM_Core_DAO::executeQuery($query, $fparams);
             $fparams = array(
-              1 => array($fieldValues['id'], 'Integer'),
+              1 => array($lineItemDetails['id'], 'Integer'),
             );
             $financialItem = CRM_Core_DAO::executeQuery($sql, $fparams);
             while ($financialItem->fetch()) {
@@ -3570,14 +3570,14 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       $itemParams['entity_table'] = 'civicrm_line_item';
       $trxnIds['id'] = $params['entity_id'];
       foreach ($params['line_item'] as $fieldId => $fields) {
-        foreach ($fields as $fieldValueId => $fieldValues) {
-          $prevFinancialItem = CRM_Financial_BAO_FinancialItem::getPreviousFinancialItem($fieldValues['id']);
+        foreach ($fields as $fieldValueId => $lineItemDetails) {
+          $prevFinancialItem = CRM_Financial_BAO_FinancialItem::getPreviousFinancialItem($lineItemDetails['id']);
           $receiveDate = CRM_Utils_Date::isoToMysql($params['prevContribution']->receive_date);
           if ($params['contribution']->receive_date) {
             $receiveDate = CRM_Utils_Date::isoToMysql($params['contribution']->receive_date);
           }
 
-          $financialAccount = self::getFinancialAccountForStatusChangeTrxn($params, $prevFinancialItem);
+          $financialAccount = self::getFinancialAccountForStatusChangeTrxn($params, $prevFinancialItem['financial_account_id']);
 
           $currency = $params['prevContribution']->currency;
           if ($params['contribution']->currency) {
@@ -3594,7 +3594,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
             }
           }
           else {
-            $amount = $diff * $fieldValues['line_total'];
+            $amount = $diff * $lineItemDetails['line_total'];
           }
 
           $itemParams = array(
@@ -3602,23 +3602,23 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
             'contact_id' => $params['prevContribution']->contact_id,
             'currency' => $currency,
             'amount' => $amount,
-            'description' => $prevFinancialItem->description,
-            'status_id' => $prevFinancialItem->status_id,
+            'description' => $prevFinancialItem['description'],
+            'status_id' => $prevFinancialItem['status_id'],
             'financial_account_id' => $financialAccount,
             'entity_table' => 'civicrm_line_item',
-            'entity_id' => $fieldValues['id'],
+            'entity_id' => $lineItemDetails['id'],
           );
           $financialItem = CRM_Financial_BAO_FinancialItem::create($itemParams, NULL, $trxnIds);
           $params['line_item'][$fieldId][$fieldValueId]['deferred_line_total'] = $amount;
           $params['line_item'][$fieldId][$fieldValueId]['financial_item_id'] = $financialItem->id;
 
-          if ($fieldValues['tax_amount']) {
+          if ($lineItemDetails['tax_amount']) {
             $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
             $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
-            $itemParams['amount'] = $diff * $fieldValues['tax_amount'];
+            $itemParams['amount'] = $diff * $lineItemDetails['tax_amount'];
             $itemParams['description'] = $taxTerm;
-            if ($fieldValues['financial_type_id']) {
-              $itemParams['financial_account_id'] = self::getFinancialAccountId($fieldValues['financial_type_id']);
+            if ($lineItemDetails['financial_type_id']) {
+              $itemParams['financial_account_id'] = self::getFinancialAccountId($lineItemDetails['financial_type_id']);
             }
             CRM_Financial_BAO_FinancialItem::create($itemParams, NULL, $trxnIds);
           }
@@ -5020,11 +5020,11 @@ LIMIT 1;";
    * Get the financial account for the item associated with the new transaction.
    *
    * @param array $params
-   * @param CRM_Financial_BAO_FinancialItem $prevFinancialItem
+   * @param int $default
    *
    * @return int
    */
-  public static function getFinancialAccountForStatusChangeTrxn($params, $prevFinancialItem) {
+  public static function getFinancialAccountForStatusChangeTrxn($params, $default) {
 
     if (!empty($params['financial_account_id'])) {
       return $params['financial_account_id'];
@@ -5041,7 +5041,7 @@ LIMIT 1;";
         $preferredAccountsRelationships[$contributionStatus]
       );
     }
-    return $prevFinancialItem->financial_account_id;
+    return $default;
   }
 
   /**

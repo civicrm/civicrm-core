@@ -859,26 +859,7 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
   public function testReSubmitSaleTax() {
     $this->enableTaxAndInvoicing();
     $this->relationForFinancialTypeWithFinancialAccount($this->_financialTypeId);
-    $form = new CRM_Contribute_Form_Contribution();
-
-    $form->testSubmit(array(
-      'total_amount' => 100,
-      'financial_type_id' => $this->_financialTypeId,
-      'receive_date' => '04/21/2015',
-      'receive_date_time' => '11:27PM',
-      'contact_id' => $this->_individualId,
-      'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
-      'contribution_status_id' => 1,
-      'price_set_id' => 0,
-    ),
-      CRM_Core_Action::ADD
-    );
-    $contribution = $this->callAPISuccessGetSingle('Contribution',
-      array(
-        'contribution_id' => 1,
-        'return' => array('tax_amount', 'total_amount', 'net_amount', 'financial_type_id', 'receive_date', 'payment_instrument_id'),
-      )
-    );
+    list($form, $contribution) = $this->doInitialSubmit();
     $this->assertEquals(110, $contribution['total_amount']);
     $this->assertEquals(10, $contribution['tax_amount']);
     $this->assertEquals(110, $contribution['net_amount']);
@@ -919,7 +900,116 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
 
     $mut->checkMailLog($strings);
     $this->callAPISuccessGetCount('FinancialTrxn', array(), 3);
-    $this->callAPISuccessGetCount('FinancialItem', array(), 2);
+    $items = $this->callAPISuccess('FinancialItem', 'get', array('sequential' => 1));
+    $this->assertEquals(2, $items['count']);
+    $this->assertEquals('Contribution Amount', $items['values'][0]['description']);
+    $this->assertEquals('Sales Tax', $items['values'][1]['description']);
+
+    $this->assertEquals(100, $items['values'][0]['amount']);
+    $this->assertEquals(10, $items['values'][1]['amount']);
+  }
+
+  /**
+   * Create a contribution & then edit it via backoffice form, checking tax with: default price_set
+   *
+   * @throws \Exception
+   */
+  public function testReSubmitSaleTaxAlteredAmount() {
+    $this->enableTaxAndInvoicing();
+    $this->relationForFinancialTypeWithFinancialAccount($this->_financialTypeId);
+    list($form, $contribution) = $this->doInitialSubmit();
+
+    $mut = new CiviMailUtils($this, TRUE);
+    // Testing here if when we edit something trivial like adding a check_number tax, net, total amount stay the same:
+    $form->testSubmit(array(
+      'id' => $contribution['id'],
+      'total_amount' => 200,
+      'tax_amount' => 20,
+      'financial_type_id' => $contribution['financial_type_id'],
+      'receive_date' => $contribution['receive_date'],
+      'payment_instrument_id' => $contribution['payment_instrument_id'],
+      'price_set_id' => 0,
+      'check_number' => 12345,
+      'contribution_status_id' => 1,
+      'is_email_receipt' => 1,
+      'from_email_address' => 'demo@example.com',
+    ),
+      CRM_Core_Action::UPDATE
+    );
+    $contribution = $this->callAPISuccessGetSingle('Contribution',
+      array(
+        'contribution_id' => 1,
+        'return' => array('tax_amount', 'total_amount', 'net_amount', 'financial_type_id', 'receive_date', 'payment_instrument_id'),
+      )
+    );
+    $this->assertEquals(220, $contribution['total_amount']);
+    $this->assertEquals(20, $contribution['tax_amount']);
+    $this->assertEquals(220, $contribution['net_amount']);
+
+    $strings = array(
+      'Total Tax Amount : $ 20.00',
+      'Total Amount : $ 220.00',
+      'Date Received: April 21st, 2015',
+      'Paid By: Check',
+      'Check Number: 12345',
+    );
+
+    $mut->checkMailLog($strings);
+    $this->callAPISuccessGetCount('FinancialTrxn', array(), 4);
+    $items = $this->callAPISuccess('FinancialItem', 'get', array('sequential' => 1));
+    $this->assertEquals(4, $items['count']);
+    $this->assertEquals('Contribution Amount', $items['values'][0]['description']);
+    $this->assertEquals('Sales Tax', $items['values'][1]['description']);
+    $this->assertEquals('Contribution Amount', $items['values'][0]['description']);
+    $this->assertEquals('Sales Tax', $items['values'][1]['description']);
+
+    $this->assertEquals(100, $items['values'][0]['amount']);
+    $this->assertEquals(10, $items['values'][1]['amount']);
+    // @todo what should the amount BE? I believe this is incorrect elsewhere too.
+    // currently it is $120 - ie the first one not incremented. This is consistent
+    // with my testing on CRM-19723
+    $this->assertEquals(20, $items['values'][3]['amount']);
+  }
+
+  /**
+   * Do the first contributions, in preparation for an edit-submit.
+   *
+   * @return array
+   *
+   * @throws \Exception
+   */
+  protected function doInitialSubmit() {
+    $form = new CRM_Contribute_Form_Contribution();
+
+    $form->testSubmit(array(
+      'total_amount' => 100,
+      'financial_type_id' => $this->_financialTypeId,
+      'receive_date' => '04/21/2015',
+      'receive_date_time' => '11:27PM',
+      'contact_id' => $this->_individualId,
+      'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
+      'contribution_status_id' => 1,
+      'price_set_id' => 0,
+    ),
+      CRM_Core_Action::ADD
+    );
+    $contribution = $this->callAPISuccessGetSingle('Contribution',
+      array(
+        'contribution_id' => 1,
+        'return' => array(
+          'tax_amount',
+          'total_amount',
+          'net_amount',
+          'financial_type_id',
+          'receive_date',
+          'payment_instrument_id',
+        ),
+      )
+    );
+    $this->assertEquals(110, $contribution['total_amount']);
+    $this->assertEquals(10, $contribution['tax_amount']);
+    $this->assertEquals(110, $contribution['net_amount']);
+    return array($form, $contribution);
   }
 
   /**

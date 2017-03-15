@@ -1075,14 +1075,14 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $previousLineItem = CRM_Financial_BAO_FinancialItem::getPreviousFinancialItem($contribution['id']);
     $eftParams = array(
       'entity_table' => 'civicrm_financial_item',
-      'entity_id' => $previousLineItem->id,
+      'entity_id' => $previousLineItem['id'],
       'financial_trxn_id' => $financialTrxn['id'],
     );
     CRM_Contribute_BAO_Contribution::createProportionalEntry($entityParams, $eftParams);
     $trxnTestArray = array_merge($eftParams, array(
       'amount' => 50,
     ));
-    $entityFinancialTrxn = $this->callAPISuccessGetSingle('EntityFinancialTrxn', $eftParams, $trxnTestArray);
+    $this->callAPISuccessGetSingle('EntityFinancialTrxn', $eftParams, $trxnTestArray);
   }
 
   /**

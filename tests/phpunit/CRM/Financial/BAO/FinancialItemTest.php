@@ -296,9 +296,9 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
 
     $contribution = CRM_Contribute_BAO_Contribution::create($params);
     $financialItem = CRM_Financial_BAO_FinancialItem::getPreviousFinancialItem($contribution->id);
-    $params = array('id' => $financialItem->id);
+    $params = array('id' => $financialItem['id']);
     $financialItem = $this->callAPISuccess('FinancialItem', 'get', $params);
-    $this->assertEquals($financialItem['values'][$financialItem['id']]['amount'], 200.00, "The amounts do not match.");
+    $this->assertEquals(200.00, $financialItem['values'][$financialItem['id']]['amount'], "The amounts do not match.");
   }
 
 }
