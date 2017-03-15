@@ -167,4 +167,109 @@ class CRM_Contribute_Form_Search extends CiviUnitTestCase {
     }
   }
 
+  /**
+   *  CRM-20286: Test CRM_Contribute_Form_Search Card type filters
+   */
+  public function testCardTypeFilter() {
+    $this->quickCleanup($this->_tablesToTruncate);
+    $contactID1 = $this->individualCreate(array(), 1);
+    $contactID2 = $this->individualCreate(array(), 2);
+    $Contribution1 = $this->callAPISuccess('Contribution', 'create', array(
+      'financial_type_id' => 1,
+      'total_amount' => 100,
+      'receive_date' => date('Ymd'),
+      'receive_date_time' => NULL,
+      'payment_instrument' => 1,
+      'contribution_status_id' => 1,
+      'contact_id' => $contactID1,
+    ));
+    $params = array(
+      'to_financial_account_id' => 1,
+      'status_id' => 1,
+      'contribution_id' => $Contribution1['id'],
+      'payment_instrument_id' => 1,
+      'card_type' => 1,
+      'total_amount' => 100,
+    );
+    CRM_Core_BAO_FinancialTrxn::create($params);
+    $Contribution2 = $this->callAPISuccess('Contribution', 'create', array(
+      'financial_type_id' => 1,
+      'total_amount' => 150,
+      'receive_date' => date('Ymd'),
+      'receive_date_time' => NULL,
+      'payment_instrument' => 1,
+      'contribution_status_id' => 1,
+      'contact_id' => $contactID1,
+    ));
+    $Contribution3 = civicrm_api3('Contribution', 'create', array(
+      'financial_type_id' => 1,
+      'total_amount' => 200,
+      'receive_date' => date('Ymd'),
+      'receive_date_time' => NULL,
+      'payment_instrument' => 1,
+      'contribution_status_id' => 1,
+      'contact_id' => $contactID2,
+    ));
+    $params = array(
+      'to_financial_account_id' => 1,
+      'status_id' => 1,
+      'contribution_id' => $Contribution3['id'],
+      'payment_instrument_id' => 1,
+      'card_type' => 2,
+      'total_amount' => 200,
+    );
+    CRM_Core_BAO_FinancialTrxn::create($params);
+
+    $useCases = array(
+      // Case 1: Search for ONLY those contributions which have card type
+      array(
+        'form_value' => array('financial_trxn_card_type' => 'IS NOT NULL'),
+        'expected_count' => 2,
+        'expected_contribution' => array($Contribution1['id'], $Contribution3['id']),
+        'expected_qill' => 'Card Type Not Null',
+      ),
+      // Case 2: Search for ONLY those contributions which have Card Type as Visa
+      array(
+        'form_value' => array('financial_trxn_card_type' => array(1)),
+        'expected_count' => 1,
+        'expected_contribution' => array($Contribution1['id']),
+        'expected_qill' => 'Card Type In Visa',
+      ),
+      // Case 3: Search for ONLY those contributions which have Card Type as Amex
+      array(
+        'form_value' => array('financial_trxn_card_type' => array(3)),
+        'expected_count' => 0,
+        'expected_contribution' => array(),
+        'expected_qill' => 'Card Type In Amex',
+      ),
+      // Case 4: Search for ONLY those contributions which have Card Type as Visa or MasterCard
+      array(
+        'form_value' => array('financial_trxn_card_type' => array(1, 2)),
+        'expected_count' => 2,
+        'expected_contribution' => array($Contribution1['id'], $Contribution3['id']),
+        'expected_qill' => 'Card Type In Visa, MasterCard',
+      ),
+    );
+
+    foreach ($useCases as $case) {
+      $fv = $case['form_value'];
+      CRM_Contact_BAO_Query::processSpecialFormValue($fv, array('financial_trxn_card_type'));
+      $query = new CRM_Contact_BAO_Query(CRM_Contact_BAO_Query::convertFormValues($fv));
+      list($select, $from, $where, $having) = $query->query();
+
+      // get and assert contribution count
+      $contributions = CRM_Core_DAO::executeQuery(sprintf('SELECT DISTINCT civicrm_contribution.id %s %s AND civicrm_contribution.id IS NOT NULL', $from, $where))->fetchAll();
+      foreach ($contributions as $key => $value) {
+        $contributions[$key] = $value['id'];
+      }
+      // assert the contribution count
+      $this->assertEquals($case['expected_count'], count($contributions));
+      // assert the contribution IDs
+      $this->checkArrayEquals($case['expected_contribution'], $contributions);
+      // get and assert qill string
+      $qill = trim(implode($query->getOperator(), CRM_Utils_Array::value(0, $query->qill())));
+      $this->assertEquals($case['expected_qill'], $qill);
+    }
+  }
+
 }
