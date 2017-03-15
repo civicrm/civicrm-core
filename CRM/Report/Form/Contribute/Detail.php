@@ -292,7 +292,10 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
       'civicrm_financial_trxn' => array(
         'dao' => 'CRM_Financial_DAO_FinancialTrxn',
         'fields' => array(
-          'credit_card_type' => array('title' => ts('Credit Card Type')),
+          'credit_card_type' => array(
+            'title' => ts('Credit Card Type'),
+            'dbAlias' => 'GROUP_CONCAT(financial_trxn_civireport.credit_card_type SEPARATOR ",")',
+          ),
         ),
         'filters' => array(
           'credit_card_type' => array(
@@ -691,7 +694,6 @@ UNION ALL
     $paymentInstruments = CRM_Contribute_PseudoConstant::paymentInstrument();
     $contributionPages = CRM_Contribute_PseudoConstant::contributionPage();
     $batches = CRM_Batch_BAO_Batch::getBatches();
-    $creditCardTypes = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialTrxn', 'credit_card_type');
     foreach ($rows as $rowNum => $row) {
       if (!empty($this->_noRepeats) && $this->_outputMode != 'csv') {
         // don't repeat contact details if its same as the previous row
@@ -767,7 +769,7 @@ UNION ALL
         $entryFound = TRUE;
       }
       if (!empty($row['civicrm_financial_trxn_credit_card_type'])) {
-        $rows[$rowNum]['civicrm_financial_trxn_credit_card_type'] = CRM_Utils_Array::value($row['civicrm_financial_trxn_credit_card_type'], $creditCardTypes);
+        $rows[$rowNum]['civicrm_financial_trxn_credit_card_type'] = $this->getGroupCreditCardType($row['civicrm_financial_trxn_credit_card_type']);
         $entryFound = TRUE;
       }
 
