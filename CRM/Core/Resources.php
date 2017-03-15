@@ -887,9 +887,10 @@ class CRM_Core_Resources {
    * @return string
    */
   public function addCacheCode($url) {
-    $hasQuery = strpos($url, '?') !== false;
+    $hasQuery = strpos($url, '?') !== FALSE;
     $operator = $hasQuery ? '&' : '?';
 
     return $url . $operator . 'r=' . $this->cacheCode;
   }
+
 }
