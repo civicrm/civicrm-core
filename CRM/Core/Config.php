@@ -44,6 +44,7 @@ require_once 'api/api.php';
  * Class CRM_Core_Config
  *
  * @property CRM_Utils_System_Base $userSystem
+ * @property CRM_Core_Permission_Base $userPermissionClass
  * @property array $enableComponents
  * @property array $languageLimit
  * @property bool $debug
