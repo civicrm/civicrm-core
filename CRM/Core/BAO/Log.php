@@ -28,9 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2016
  */
 
 /**
@@ -166,16 +164,16 @@ UPDATE civicrm_log
   }
 
   /**
-   * Function for find out whether to use logging schema entries for contact.
-   * summary, instead of normal log entries.
+   * Get the id of the report to use to display the change log.
    *
-   * @return int
-   *   report id of Contact Logging Report (Summary) / false
+   * If logging is not enabled a return value of FALSE means to use the
+   * basic change log view.
+   *
+   * @return int|FALSE
+   *   report id of Contact Logging Report (Summary)
    */
   public static function useLoggingReport() {
-    // first check if logging is enabled
-    $config = CRM_Core_Config::singleton();
-    if (!$config->logging) {
+    if (!\Civi::settings()->get('logging')) {
       return FALSE;
     }
 
