@@ -5468,4 +5468,28 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
     }
   }
 
+  /**
+   * Calculate tax for individual line items.
+   *
+   * @param array $lineItem
+   *   an array of lineitems
+   *
+   * @param int $contributionId
+   *   the id of the contribution
+   *
+   * @return array
+   */
+  public static function calculateTaxForLineItems($lineItem, $contributionId) {
+    $taxAmount = 0;
+    $previousLineItem = CRM_Price_BAO_LineItem::getLineItemsByContributionID($contributionId);
+    foreach ($lineItem as $items) {
+      foreach ($items as $item) {
+        $lineTotal = CRM_Utils_Array::value('line_total', CRM_Utils_Array::value($item['id'], $previousLineItem));
+        $lineTaxAmount = CRM_Contribute_BAO_Contribution_Utils::calculateTaxAmount($lineTotal, $item['tax_rate']);
+        $taxAmount += $lineTaxAmount['tax_amount'];
+      }
+    }
+    return $taxAmount;
+  }
+
 }
