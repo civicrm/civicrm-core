@@ -4893,4 +4893,25 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
     }
   }
 
+  /**
+   * Get all labels for fields that are used in a group concat.
+   *
+   * @param string $options
+   *   comma separated option values.
+   * @param string $baoName
+   *   The BAO name for the field.
+   * @param string $fieldName
+   *   The name of the field for which labels should be retrieved.
+   *
+   * return string
+   */
+  public function getLabels($options, $baoName, $fieldName) {
+    $types = explode(',', $options);
+    $labels = array();
+    foreach ($types as $value) {
+      $labels[$value] = CRM_Core_PseudoConstant::getLabel($baoName, $fieldName, $value);
+    }
+    return implode(', ', array_filter($labels));
+  }
+
 }
