@@ -33,7 +33,6 @@
 
 /**
  * Base class for offline membership / membership type / membership renewal and membership status forms
- *
  */
 class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
 
@@ -280,6 +279,31 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
       $this->_contributorDisplayName = $this->_memberDisplayName;
       $this->_contributorEmail = $this->_memberEmail;
     }
+  }
+
+  /**
+   * Assign price set to page.
+   *
+   * @return array
+   */
+  protected function assignPriceSet() {
+    if ($this->_action & CRM_Core_Action::ADD || $this->_action == CRM_Core_Action::RENEW) {
+      $buildPriceSet = FALSE;
+      $priceSets = CRM_Price_BAO_PriceSet::getAssoc(FALSE, 'CiviMember');
+      if (empty($priceSets)) {
+        $this->assign('hasPriceSets', FALSE);
+      }
+      else {
+        $this->add('select', 'price_set_id', ts('Choose price set'),
+          array(
+            '' => ts('Choose price set'),
+          ) + $priceSets,
+          NULL, array('onchange' => "buildAmount( this.value );")
+        );
+        $this->assign('hasPriceSets', $buildPriceSet);
+      }
+    }
+    return empty($priceSets);
   }
 
   /**

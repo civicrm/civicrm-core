@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<menu>
+    <item>
+        <path>civicrm/priceset/display</path>
+        <access_callback>1</access_callback>
+        <page_callback>CRM_Price_Form_PriceSetDisplay</page_callback>
+        <is_public>true</is_public>
+        <weight>0</weight>
+    </item>
+</menu>
