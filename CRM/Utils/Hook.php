@@ -1833,7 +1833,7 @@ abstract class CRM_Utils_Hook {
    *   The return value is ignored
    */
   public static function entityTypes(&$entityTypes) {
-    return self::singleton()->invoke(1, $entityTypes, self::$_nullObject, self::$_nullObject,
+    return self::singleton()->invoke(array('entityTypes'), $entityTypes, self::$_nullObject, self::$_nullObject,
       self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_entityTypes'
     );
   }
@@ -1845,7 +1845,7 @@ abstract class CRM_Utils_Hook {
    * @return mixed
    */
   public static function buildProfile($name) {
-    return self::singleton()->invoke(1, $name, self::$_nullObject, self::$_nullObject, self::$_nullObject,
+    return self::singleton()->invoke(array('name'), $name, self::$_nullObject, self::$_nullObject, self::$_nullObject,
       self::$_nullObject, self::$_nullObject, 'civicrm_buildProfile');
   }
 
@@ -1856,7 +1856,7 @@ abstract class CRM_Utils_Hook {
    * @return mixed
    */
   public static function validateProfile($name) {
-    return self::singleton()->invoke(1, $name, self::$_nullObject, self::$_nullObject, self::$_nullObject,
+    return self::singleton()->invoke(array('name'), $name, self::$_nullObject, self::$_nullObject, self::$_nullObject,
       self::$_nullObject, self::$_nullObject, 'civicrm_validateProfile');
   }
 
@@ -1867,7 +1867,7 @@ abstract class CRM_Utils_Hook {
    * @return mixed
    */
   public static function processProfile($name) {
-    return self::singleton()->invoke(1, $name, self::$_nullObject, self::$_nullObject, self::$_nullObject,
+    return self::singleton()->invoke(array('name'), $name, self::$_nullObject, self::$_nullObject, self::$_nullObject,
       self::$_nullObject, self::$_nullObject, 'civicrm_processProfile');
   }
 
@@ -1878,7 +1878,7 @@ abstract class CRM_Utils_Hook {
    * @return mixed
    */
   public static function viewProfile($name) {
-    return self::singleton()->invoke(1, $name, self::$_nullObject, self::$_nullObject, self::$_nullObject,
+    return self::singleton()->invoke(array('name'), $name, self::$_nullObject, self::$_nullObject, self::$_nullObject,
       self::$_nullObject, self::$_nullObject, 'civicrm_viewProfile');
   }
 
@@ -1889,7 +1889,7 @@ abstract class CRM_Utils_Hook {
    * @return mixed
    */
   public static function searchProfile($name) {
-    return self::singleton()->invoke(1, $name, self::$_nullObject, self::$_nullObject, self::$_nullObject,
+    return self::singleton()->invoke(array('name'), $name, self::$_nullObject, self::$_nullObject, self::$_nullObject,
       self::$_nullObject, self::$_nullObject, 'civicrm_searchProfile');
   }
 
@@ -1910,7 +1910,7 @@ abstract class CRM_Utils_Hook {
    */
   public static function alterBadge($labelName, &$label, &$format, &$participant) {
     return self::singleton()
-      ->invoke(4, $labelName, $label, $format, $participant, self::$_nullObject, self::$_nullObject, 'civicrm_alterBadge');
+      ->invoke(array('labelName', 'label', 'format', 'participant'), $labelName, $label, $format, $participant, self::$_nullObject, self::$_nullObject, 'civicrm_alterBadge');
   }
 
 
@@ -1927,7 +1927,7 @@ abstract class CRM_Utils_Hook {
    * @return mixed
    */
   public static function alterBarcode(&$data, $type = 'barcode', $context = 'name_badge') {
-    return self::singleton()->invoke(3, $data, $type, $context, self::$_nullObject,
+    return self::singleton()->invoke(array('data', 'type', 'context'), $data, $type, $context, self::$_nullObject,
       self::$_nullObject, self::$_nullObject, 'civicrm_alterBarcode');
   }
 
@@ -1946,7 +1946,7 @@ abstract class CRM_Utils_Hook {
    */
   public static function alterMailer(&$mailer, $driver, $params) {
     return self::singleton()
-      ->invoke(3, $mailer, $driver, $params, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_alterMailer');
+      ->invoke(array('mailer', 'driver', 'params'), $mailer, $driver, $params, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_alterMailer');
   }
 
   /**
@@ -1979,7 +1979,7 @@ abstract class CRM_Utils_Hook {
    */
   public static function queryObjects(&$queryObjects, $type = 'Contact') {
     return self::singleton()
-      ->invoke(2, $queryObjects, $type, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_queryObjects');
+      ->invoke(array('queryObjects', 'type'), $queryObjects, $type, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_queryObjects');
   }
 
   /**
