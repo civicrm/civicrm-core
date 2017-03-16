@@ -443,6 +443,7 @@ function civicrm_api3_contribution_sendconfirmation($params) {
     'payment_processor_id',
   );
   $input = array_intersect_key($params, array_flip($allowedParams));
+  $input['is_email_receipt'] = TRUE;
   CRM_Contribute_BAO_Contribution::sendMail($input, $ids, $params['id'], $values);
 }
 
