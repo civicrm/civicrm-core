@@ -1352,7 +1352,7 @@ abstract class CRM_Utils_Hook {
    * @return mixed
    */
   public static function alterAPIPermissions($entity, $action, &$params, &$permissions) {
-    return self::singleton()->invoke(4, $entity, $action, $params, $permissions,
+    return self::singleton()->invoke(array('entity', 'action', 'params', 'permissions'), $entity, $action, $params, $permissions,
       self::$_nullObject, self::$_nullObject,
       'civicrm_alterAPIPermissions'
     );
@@ -1365,7 +1365,7 @@ abstract class CRM_Utils_Hook {
    */
   public static function postSave(&$dao) {
     $hookName = 'civicrm_postSave_' . $dao->getTableName();
-    return self::singleton()->invoke(1, $dao,
+    return self::singleton()->invoke(array('dao'), $dao,
       self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
       $hookName
     );
@@ -1382,7 +1382,7 @@ abstract class CRM_Utils_Hook {
    * @return mixed
    */
   public static function summaryActions(&$actions, $contactID = NULL) {
-    return self::singleton()->invoke(2, $actions, $contactID,
+    return self::singleton()->invoke(array('actions', 'contactID'), $actions, $contactID,
       self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
       'civicrm_summaryActions'
     );
@@ -1410,7 +1410,7 @@ abstract class CRM_Utils_Hook {
    *   modify the header and values object to pass the data you need
    */
   public static function searchColumns($objectName, &$headers, &$rows, &$selector) {
-    return self::singleton()->invoke(4, $objectName, $headers, $rows, $selector,
+    return self::singleton()->invoke(array('objectName', 'headers', 'rows', 'selector'), $objectName, $headers, $rows, $selector,
       self::$_nullObject, self::$_nullObject,
       'civicrm_searchColumns'
     );
@@ -1427,7 +1427,7 @@ abstract class CRM_Utils_Hook {
    * @return null
    */
   public static function buildUFGroupsForModule($moduleName, &$ufGroups) {
-    return self::singleton()->invoke(2, $moduleName, $ufGroups,
+    return self::singleton()->invoke(array('moduleName', 'ufGroups'), $moduleName, $ufGroups,
       self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
       'civicrm_buildUFGroupsForModule'
     );
@@ -1452,7 +1452,7 @@ abstract class CRM_Utils_Hook {
    * @return null
    */
   public static function emailProcessorContact($email, $contactID, &$result) {
-    return self::singleton()->invoke(3, $email, $contactID, $result,
+    return self::singleton()->invoke(array('email', 'contactID', 'result'), $email, $contactID, $result,
       self::$_nullObject, self::$_nullObject, self::$_nullObject,
       'civicrm_emailProcessorContact'
     );
@@ -1492,7 +1492,7 @@ abstract class CRM_Utils_Hook {
    * @return mixed
    */
   public static function alterMailingLabelParams(&$args) {
-    return self::singleton()->invoke(1, $args,
+    return self::singleton()->invoke(array('args'), $args,
       self::$_nullObject, self::$_nullObject,
       self::$_nullObject, self::$_nullObject, self::$_nullObject,
       'civicrm_alterMailingLabelParams'
@@ -1514,7 +1514,7 @@ abstract class CRM_Utils_Hook {
    * @return mixed
    */
   public static function alterContent(&$content, $context, $tplName, &$object) {
-    return self::singleton()->invoke(4, $content, $context, $tplName, $object,
+    return self::singleton()->invoke(array('content', 'context', 'tplName', 'object'), $content, $context, $tplName, $object,
       self::$_nullObject, self::$_nullObject,
       'civicrm_alterContent'
     );
@@ -1536,7 +1536,7 @@ abstract class CRM_Utils_Hook {
    * @return mixed
    */
   public static function alterTemplateFile($formName, &$form, $context, &$tplName) {
-    return self::singleton()->invoke(4, $formName, $form, $context, $tplName,
+    return self::singleton()->invoke(array('formName', 'form', 'context', 'tplName'), $formName, $form, $context, $tplName,
       self::$_nullObject, self::$_nullObject,
       'civicrm_alterTemplateFile'
     );
@@ -1561,7 +1561,7 @@ abstract class CRM_Utils_Hook {
    * @return mixed
    */
   public static function triggerInfo(&$info, $tableName = NULL) {
-    return self::singleton()->invoke(2, $info, $tableName,
+    return self::singleton()->invoke(array('info', 'tableName'), $info, $tableName,
       self::$_nullObject, self::$_nullObject, self::$_nullObject,
       self::$_nullObject,
       'civicrm_triggerInfo'
@@ -1575,7 +1575,7 @@ abstract class CRM_Utils_Hook {
    * @return mixed
    */
   public static function alterLogTables(&$logTableSpec) {
-    return self::singleton()->invoke(1, $logTableSpec, $_nullObject,
+    return self::singleton()->invoke(array('logTableSpec'), $logTableSpec, $_nullObject,
       self::$_nullObject, self::$_nullObject, self::$_nullObject,
       self::$_nullObject,
       'civicrm_alterLogTables'
