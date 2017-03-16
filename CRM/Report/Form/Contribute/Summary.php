@@ -966,7 +966,7 @@ ROUND(AVG({$this->_aliases['civicrm_contribution_soft']}.amount), 2) as civicrm_
       }
 
       if (!empty($row['civicrm_financial_trxn_card_type'])) {
-        $rows[$rowNum]['civicrm_financial_trxn_card_type'] = $this->getGroupCreditCardType($row['civicrm_financial_trxn_card_type']);
+        $rows[$rowNum]['civicrm_financial_trxn_card_type'] = $this->getLabels($row['civicrm_financial_trxn_card_type'], 'CRM_Financial_DAO_FinancialTrxn', 'card_type');
         $entryFound = TRUE;
       }
 

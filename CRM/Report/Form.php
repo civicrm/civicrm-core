@@ -4894,20 +4894,22 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
   }
 
   /**
-   * Get all labels for credit card type rows in report.
+   * Get all labels for fields that are used in a group concat.
    *
-   * @param string $creditCardTypes
-   *   comma separated option values of option group "credit_card_type".
+   * @param string $options
+   *   comma separated option values.
+   * @param string $baoName
+   *   The BAO name for the field.
+   * @param string $fieldName
+   *   The name of the field for which labels should be retrieved.
+   *
+   * return string
    */
-  public function getGroupCreditCardType($creditCardTypes) {
-    $cardTypes = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialTrxn', 'card_type');
-    $types = explode(',', $creditCardTypes);
+  public function getLabels($options, $baoName, $fieldName) {
+    $types = explode(',', $options);
     $labels = array();
     foreach ($types as $value) {
-      $label = CRM_Utils_Array::value($value, $cardTypes);
-      if (!in_array($label, $labels)) {
-        $labels[] = $label;
-      }
+      $labels[$value] = CRM_Core_PseudoConstant::getLabel($baoName, $fieldName, $value);
     }
     return implode(', ', array_filter($labels));
   }
