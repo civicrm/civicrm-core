@@ -1642,7 +1642,7 @@ abstract class CRM_Utils_Hook {
    * @return mixed
    */
   public static function alterReportVar($varType, &$var, &$object) {
-    return self::singleton()->invoke(3, $varType, $var, $object,
+    return self::singleton()->invoke(array('varType', 'var', 'object'), $varType, $var, $object,
       self::$_nullObject,
       self::$_nullObject, self::$_nullObject,
       'civicrm_alterReportVar'
@@ -1663,7 +1663,7 @@ abstract class CRM_Utils_Hook {
    *   FALSE, if $op is 'check' and upgrades are not pending.
    */
   public static function upgrade($op, CRM_Queue_Queue $queue = NULL) {
-    return self::singleton()->invoke(2, $op, $queue,
+    return self::singleton()->invoke(array('op', 'queue'), $op, $queue,
       self::$_nullObject, self::$_nullObject, self::$_nullObject,
       self::$_nullObject,
       'civicrm_upgrade'
@@ -1681,7 +1681,7 @@ abstract class CRM_Utils_Hook {
    * @return mixed
    */
   public static function postEmailSend(&$params) {
-    return self::singleton()->invoke(1, $params,
+    return self::singleton()->invoke(array('params'), $params,
       self::$_nullObject, self::$_nullObject,
       self::$_nullObject, self::$_nullObject, self::$_nullObject,
       'civicrm_postEmailSend'
@@ -1697,7 +1697,7 @@ abstract class CRM_Utils_Hook {
    * @return mixed
    */
   public static function postMailing($mailingId) {
-    return self::singleton()->invoke(1, $mailingId,
+    return self::singleton()->invoke(array('mailingId'), $mailingId,
       self::$_nullObject, self::$_nullObject,
       self::$_nullObject, self::$_nullObject, self::$_nullObject,
       'civicrm_postMailing'
@@ -1713,7 +1713,7 @@ abstract class CRM_Utils_Hook {
    * @return mixed
    */
   public static function alterSettingsFolders(&$settingsFolders) {
-    return self::singleton()->invoke(1, $settingsFolders,
+    return self::singleton()->invoke(array('settingsFolders'), $settingsFolders,
       self::$_nullObject, self::$_nullObject,
       self::$_nullObject, self::$_nullObject, self::$_nullObject,
       'civicrm_alterSettingsFolders'
@@ -1732,7 +1732,7 @@ abstract class CRM_Utils_Hook {
    * @return mixed
    */
   public static function alterSettingsMetaData(&$settingsMetaData, $domainID, $profile) {
-    return self::singleton()->invoke(3, $settingsMetaData,
+    return self::singleton()->invoke(array('settingsMetaData', 'domainID', 'profile'), $settingsMetaData,
       $domainID, $profile,
       self::$_nullObject, self::$_nullObject, self::$_nullObject,
       'civicrm_alterSettingsMetaData'
@@ -1751,7 +1751,7 @@ abstract class CRM_Utils_Hook {
    */
   public static function apiWrappers(&$wrappers, $apiRequest) {
     return self::singleton()
-      ->invoke(2, $wrappers, $apiRequest, self::$_nullObject, self::$_nullObject, self::$_nullObject,
+      ->invoke(array('wrappers', 'apiRequest'), $wrappers, $apiRequest, self::$_nullObject, self::$_nullObject, self::$_nullObject,
         self::$_nullObject, 'civicrm_apiWrappers'
       );
   }
@@ -1765,7 +1765,7 @@ abstract class CRM_Utils_Hook {
    *   The return value is ignored.
    */
   public static function cron($jobManager) {
-    return self::singleton()->invoke(1,
+    return self::singleton()->invoke(array('jobManager'),
       $jobManager, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
       'civicrm_cron'
     );
@@ -1783,7 +1783,7 @@ abstract class CRM_Utils_Hook {
    *   The return value is ignored
    */
   public static function permission(&$permissions) {
-    return self::singleton()->invoke(1, $permissions,
+    return self::singleton()->invoke(array('permissions'), $permissions,
       self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
       'civicrm_permission'
     );
@@ -1802,7 +1802,7 @@ abstract class CRM_Utils_Hook {
    *   The return value is ignored
    */
   public static function permission_check($permission, &$granted) {
-    return self::singleton()->invoke(2, $permission, $granted,
+    return self::singleton()->invoke(array('permission', 'granted'), $permission, $granted,
       self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
       'civicrm_permission_check'
     );
