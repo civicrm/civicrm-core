@@ -1158,7 +1158,7 @@ abstract class CRM_Utils_Hook {
    * @return mixed
    */
   public static function config(&$config) {
-    return self::singleton()->invoke(1, $config,
+    return self::singleton()->invoke(array('config'), $config,
       self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
       'civicrm_config'
     );
@@ -1177,7 +1177,7 @@ abstract class CRM_Utils_Hook {
    * @return mixed
    */
   public static function optionValues(&$options, $name) {
-    return self::singleton()->invoke(2, $options, $name,
+    return self::singleton()->invoke(array('options', 'name'), $options, $name,
       self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
       'civicrm_optionValues'
     );
@@ -1192,7 +1192,7 @@ abstract class CRM_Utils_Hook {
    * @return mixed
    */
   public static function navigationMenu(&$params) {
-    return self::singleton()->invoke(1, $params,
+    return self::singleton()->invoke(array('params'), $params,
       self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
       'civicrm_navigationMenu'
     );
@@ -1215,7 +1215,7 @@ abstract class CRM_Utils_Hook {
    * @return mixed
    */
   public static function merge($type, &$data, $mainId = NULL, $otherId = NULL, $tables = NULL) {
-    return self::singleton()->invoke(5, $type, $data, $mainId, $otherId, $tables, self::$_nullObject, 'civicrm_merge');
+    return self::singleton()->invoke(array('type', 'data', 'mainId', 'otherId', 'tables'), $type, $data, $mainId, $otherId, $tables, self::$_nullObject, 'civicrm_merge');
   }
 
   /**
@@ -1233,7 +1233,7 @@ abstract class CRM_Utils_Hook {
    * @return mixed
    */
   public static function alterLocationMergeData(&$blocksDAO, $mainId, $otherId, $migrationInfo) {
-    return self::singleton()->invoke(4, $blocksDAO, $mainId, $otherId, $migrationInfo, self::$_nullObject, self::$_nullObject, 'civicrm_alterLocationMergeData');
+    return self::singleton()->invoke(array('blocksDAO', 'mainId', 'otherId', 'migrationInfo'), $blocksDAO, $mainId, $otherId, $migrationInfo, self::$_nullObject, self::$_nullObject, 'civicrm_alterLocationMergeData');
   }
 
   /**
@@ -1245,7 +1245,7 @@ abstract class CRM_Utils_Hook {
    * @return mixed
    */
   public static function notePrivacy(&$noteValues) {
-    return self::singleton()->invoke(1, $noteValues,
+    return self::singleton()->invoke(array('noteValues'), $noteValues,
       self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
       'civicrm_notePrivacy'
     );
@@ -1266,7 +1266,7 @@ abstract class CRM_Utils_Hook {
    * @return mixed
    */
   public static function export(&$exportTempTable, &$headerRows, &$sqlColumns, &$exportMode) {
-    return self::singleton()->invoke(4, $exportTempTable, $headerRows, $sqlColumns, $exportMode,
+    return self::singleton()->invoke(array('exportTempTable', 'headerRows', 'sqlColumns', 'exportMode'), $exportTempTable, $headerRows, $sqlColumns, $exportMode,
       self::$_nullObject, self::$_nullObject,
       'civicrm_export'
     );
@@ -1285,7 +1285,7 @@ abstract class CRM_Utils_Hook {
    * @return mixed
    */
   public static function dupeQuery($obj, $type, &$query) {
-    return self::singleton()->invoke(3, $obj, $type, $query,
+    return self::singleton()->invoke(array('obj', 'type', 'query'), $obj, $type, $query,
       self::$_nullObject, self::$_nullObject, self::$_nullObject,
       'civicrm_dupeQuery'
     );
@@ -1307,7 +1307,7 @@ abstract class CRM_Utils_Hook {
    */
   public static function emailProcessor($type, &$params, $mail, &$result, $action = NULL) {
     return self::singleton()
-      ->invoke(5, $type, $params, $mail, $result, $action, self::$_nullObject, 'civicrm_emailProcessor');
+      ->invoke(array('type', 'params', 'mail', 'result', 'action'), $type, $params, $mail, $result, $action, self::$_nullObject, 'civicrm_emailProcessor');
   }
 
   /**
@@ -1332,7 +1332,7 @@ abstract class CRM_Utils_Hook {
    * @return mixed
    */
   public static function import($object, $usage, &$objectRef, &$params) {
-    return self::singleton()->invoke(4, $object, $usage, $objectRef, $params,
+    return self::singleton()->invoke(array('object', 'usage', 'objectRef', 'params'), $object, $usage, $objectRef, $params,
       self::$_nullObject, self::$_nullObject,
       'civicrm_import'
     );
