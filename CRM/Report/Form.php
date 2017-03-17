@@ -2763,6 +2763,16 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
 
         if (!empty($orderByField)) {
           $this->_orderByFields[$orderByField['tplField']] = $orderByField;
+          if ($orderByField['name'] == 'street_number') {
+            // First order by Odd/Even - list even numbers first, then odd numbers
+            $orderBys[] = "{$orderByField['dbAlias']} % 2 {$orderBy['order']}";
+            // Next order numerically, so all even numbers are listed in numeric
+            // order, followed by all odd numbers in numeric order.
+            $orderBys[] = "{$orderByField['dbAlias']} {$orderBy['order']}";
+          }
+          else {
+            $orderBys[] = "{$orderByField['dbAlias']} {$orderBy['order']}";
+          }
           $orderBys[] = "{$orderByField['dbAlias']} {$orderBy['order']}";
 
           // Record any section headers for assignment to the template
