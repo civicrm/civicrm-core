@@ -51,7 +51,7 @@
                 {if in_array("Profile",$otherModules) or in_array("Search Profile",$otherModules) }
                 <th>{ts}Visibility{/ts}</th>
                 <th>{ts}Searchable?{/ts}</th>
-                <th>{ts}In Selector?{/ts}</th>
+                <th>{ts}Results Column?{/ts}</th>
                 {/if}
                 <th>{ts}Order{/ts}</th>
                 <th>{ts}Required{/ts}</th>
