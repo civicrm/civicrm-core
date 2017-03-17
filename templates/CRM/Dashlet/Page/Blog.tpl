@@ -104,12 +104,17 @@
                 $(this).one('crmAccordion:open', function () {
                   $('.crm-news-feed-item-title', this).css('font-weight', '');
                   $('em', $tab).text(--count);
+                  if (!count) {
+                    $('em', $tab).remove();
+                  }
                   opened[key].push(itemKey);
                   localStorage.newsFeed = JSON.stringify(opened);
                 });
               }
             });
-            $tab.html($tab.text() + ' <em>' + count + '</em>');
+            if (count) {
+              $tab.html($tab.text() + ' <em>' + count + '</em>');
+            }
             // Remove items from localstorage that are no longer in the current feed
             $.each(opened[key], function(i, itemKey) {
               if (!$('a[href="' + itemKey + '"]', $content).length) {
