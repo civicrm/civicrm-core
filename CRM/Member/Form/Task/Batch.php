@@ -133,7 +133,6 @@ class CRM_Member_Form_Task_Batch extends CRM_Member_Form_Task {
 
     $this->assign('profileTitle', $this->_title);
     $this->assign('componentIds', $this->_memberIds);
-    $fileFieldExists = FALSE;
 
     //load all campaigns.
     if (array_key_exists('member_campaign_id', $this->_fields)) {
@@ -194,7 +193,6 @@ class CRM_Member_Form_Task_Batch extends CRM_Member_Form_Task {
 
     $defaults = array();
     foreach ($this->_memberIds as $memberId) {
-      $details[$memberId] = array();
       CRM_Core_BAO_UFGroup::setProfileDefaults(NULL, $this->_fields, $defaults, FALSE, $memberId, 'Membership');
     }
 
