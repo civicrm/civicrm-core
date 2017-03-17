@@ -26,7 +26,8 @@
  */
 
 /**
- * This api exposes CiviCRM Order records.
+ * This api exposes CiviCRM Order objects, an abstract entity
+ * comprised of contributions and related line items.
  *
  * @package CiviCRM_APIv3
  */
