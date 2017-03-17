@@ -251,6 +251,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
           'batch_id' => array(
             'name' => 'batch_id',
             'title' => ts('Batch Title'),
+            'dbAlias' => 'GROUP_CONCAT(batch_civireport.batch_id SEPARATOR ",")',
           ),
         ),
         'filters' => array(
@@ -981,7 +982,7 @@ ROUND(AVG({$this->_aliases['civicrm_contribution_soft']}.amount), 2) as civicrm_
 
       // convert batch id to batch title
       if (!empty($row['civicrm_batch_batch_id'])) {
-        $rows[$rowNum]['civicrm_batch_batch_id'] = CRM_Core_DAO::getFieldValue('CRM_Batch_BAO_Batch', $row['civicrm_batch_batch_id'], 'title');
+        $rows[$rowNum]['civicrm_batch_batch_id'] = $this->getLabels($row['civicrm_batch_batch_id'], 'CRM_Batch_BAO_Batch', 'title');
         $entryFound = TRUE;
       }
 
