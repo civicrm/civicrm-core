@@ -47,6 +47,10 @@
       {$form.contribution_check_number.label} <br />
       {$form.contribution_check_number.html}
     </div>
+    <div class="float-left" id="financial_trxn_card_type_wrapper">
+      {$form.financial_trxn_card_type.label} <br />
+      {$form.financial_trxn_card_type.html}
+    </div>
   </td>
   <td>
     {$form.contribution_trxn_id.label} <br />
