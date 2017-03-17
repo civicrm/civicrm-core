@@ -293,12 +293,11 @@ DELETE FROM civicrm_contact_type
    * Success expected
    */
   public function testCRM19133() {
-    $customGroupName = md5(microtime());
     $subtypesToPreserve = array($this->student, $this->parent);
 
     // Create custom group that extends student and parent subtype
     $apiParams = array(
-      'title' => $customGroupName,
+      'title' => 'custom group',
       'extends' => array('Individual', $subtypesToPreserve),
       'is_active' => TRUE,
     );
@@ -309,7 +308,7 @@ DELETE FROM civicrm_contact_type
     $apiParams = array(
       'debug' => 1,
       'custom_group_id' => $result['id'],
-      'label' => $customGroupName,
+      'label' => 'custom field',
       'html_type' => 'Text',
       'data_type' => 'String',
       'is_active' => TRUE,
