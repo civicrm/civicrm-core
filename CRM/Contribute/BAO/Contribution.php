@@ -2322,22 +2322,11 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
 
     $ids['contributionType'] = $this->financial_type_id;
     $ids['financialType'] = $this->financial_type_id;
-
-    $entities = array(
-      'contact' => 'CRM_Contact_BAO_Contact',
-      'contributionRecur' => 'CRM_Contribute_BAO_ContributionRecur',
-      'contributionType' => 'CRM_Financial_BAO_FinancialType',
-      'financialType' => 'CRM_Financial_BAO_FinancialType',
-    );
-    foreach ($entities as $entity => $bao) {
-      if (!empty($ids[$entity])) {
-        $this->_relatedObjects[$entity] = new $bao();
-        $this->_relatedObjects[$entity]->id = $ids[$entity];
-        if (!$this->_relatedObjects[$entity]->find(TRUE)) {
-          throw new CRM_Core_Exception($entity . ' could not be loaded');
-        }
-      }
+    if ($this->contribution_page_id) {
+      $ids['contributionPage'] = $this->contribution_page_id;
     }
+
+    $this->loadRelatedEntitiesByID($ids);
 
     if (!empty($ids['contributionRecur']) && !$paymentProcessorID) {
       $paymentProcessorID = $this->_relatedObjects['contributionRecur']->payment_processor_id;
@@ -2434,6 +2423,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
 
     //not really sure what params might be passed in but lets merge em into values
     $values = array_merge($this->_gatherMessageValues($input, $values, $ids), $values);
+    $values['is_email_receipt'] = $this->isEmailReceipt($input, $values);
     if (!empty($input['receipt_date'])) {
       $values['receipt_date'] = $input['receipt_date'];
     }
@@ -2498,7 +2488,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       if (!empty($input['amount'])) {
         $values['totalAmount'] = $input['amount'];
       }
-
+      // @todo set this in is_email_receipt, based on $this->_relatedObjects.
       if ($values['event']['is_email_confirm']) {
         $values['is_email_receipt'] = 1;
       }
@@ -2611,8 +2601,14 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         $values['softContributions'] = $softContributions['soft_credit'];
       }
       if (isset($this->contribution_page_id)) {
+        // This is a call we want to use less, in favour of loading related objects.
         $values = $this->addContributionPageValuesToValuesHeavyHandedly($values);
         if ($this->contribution_page_id) {
+          // This is precautionary as there are some legacy flows, but it should really be
+          // loaded by now.
+          if (!isset($this->_relatedObjects['contributionPage'])) {
+            $this->loadRelatedEntitiesByID(array('contributionPage' => $this->contribution_page_id));
+          }
           // CRM-8254 - override default currency if applicable
           $config = CRM_Core_Config::singleton();
           $config->defaultCurrency = CRM_Utils_Array::value(
@@ -2625,7 +2621,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       // no contribution page -probably back office
       else {
         // Handle re-print receipt for offline contributions (call from PDF.php - no contribution_page_id)
-        $values['is_email_receipt'] = 1;
         $values['title'] = 'Contribution';
       }
       // set lineItem for contribution
@@ -5057,7 +5052,6 @@ LIMIT 1;";
       // These are the values that I believe to be useful.
       'id',
       'title',
-      'is_email_receipt',
       'pay_later_receipt',
       'pay_later_text',
       'receipt_from_email',
@@ -5466,6 +5460,49 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
         self::createProportionalEntry($entityParams, $eftParams);
       }
     }
+  }
+
+  /**
+   * Load entities related to the contribution into $this->_relatedObjects.
+   *
+   * @param array $ids
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function loadRelatedEntitiesByID($ids) {
+    $entities = array(
+      'contact' => 'CRM_Contact_BAO_Contact',
+      'contributionRecur' => 'CRM_Contribute_BAO_ContributionRecur',
+      'contributionType' => 'CRM_Financial_BAO_FinancialType',
+      'financialType' => 'CRM_Financial_BAO_FinancialType',
+      'contributionPage' => 'CRM_Contribute_BAO_ContributionPage',
+    );
+    foreach ($entities as $entity => $bao) {
+      if (!empty($ids[$entity])) {
+        $this->_relatedObjects[$entity] = new $bao();
+        $this->_relatedObjects[$entity]->id = $ids[$entity];
+        if (!$this->_relatedObjects[$entity]->find(TRUE)) {
+          throw new CRM_Core_Exception($entity . ' could not be loaded');
+        }
+      }
+    }
+  }
+
+  /**
+   * Should an email receipt be sent for this contribution when complete.
+   *
+   * @param array $input
+   *
+   * @return mixed
+   */
+  protected function isEmailReceipt($input) {
+    if (isset($input['is_email_receipt'])) {
+      return $input['is_email_receipt'];
+    }
+    if (!empty($this->_relatedObjects['contribution_page_id'])) {
+      return $this->_relatedObjects['contribution_page_id']->is_email_receipt;
+    }
+    return TRUE;
   }
 
 }
