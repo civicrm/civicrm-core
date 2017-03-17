@@ -62,7 +62,7 @@
       </tr>
       {foreach from=$value item=line}
         <tr{if $line.qty EQ 0} class="cancelled"{/if}>
-          <td>{if $line.html_type eq 'Text'}{$line.label}{else}{$line.field_title} - {$line.label}{/if} {if $line.description}<div class="description">{$line.description}</div>{/if}</td>
+          <td>{if $line.field_title && $line.html_type neq 'Text'}{$line.field_title} &ndash; {$line.label}{else}{$line.label}{/if} {if $line.description}<div class="description">{$line.description}</div>{/if}</td>
           {if $displayLineItemFinancialType}
             <td>{$line.financial_type}</td>
           {/if}
