@@ -2764,15 +2764,17 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
         if (!empty($orderByField)) {
           $this->_orderByFields[$orderByField['tplField']] = $orderByField;
           if ($orderByField['name'] == 'street_number') {
-            // First order by Odd/Even - list even numbers first, then odd numbers
+            // First order by Even/Odd - list even numbers first, then odd
+            // numbers. Even numbered addresses are on one side of the
+            // street and odd numbered addresses are on the other side of 
+            // the street so, when door knocking, it is easier to do streets
+            // one side at a time.
             $orderBys[] = "{$orderByField['dbAlias']} % 2 {$orderBy['order']}";
-            // Next order numerically, so all even numbers are listed in numeric
-            // order, followed by all odd numbers in numeric order.
-            $orderBys[] = "{$orderByField['dbAlias']} {$orderBy['order']}";
+            // Below, add order clause as it normally would be added, so all
+            // even numbers are listed in numeric order, followed by all odd
+            // numbers in numeric order.
           }
-          else {
-            $orderBys[] = "{$orderByField['dbAlias']} {$orderBy['order']}";
-          }
+          $orderBys[] = "{$orderByField['dbAlias']} {$orderBy['order']}";
 
           // Record any section headers for assignment to the template
           if (!empty($orderBy['section'])) {
