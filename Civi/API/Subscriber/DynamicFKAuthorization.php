@@ -218,30 +218,8 @@ class DynamicFKAuthorization implements EventSubscriberInterface {
       return;
     }
 
-    /**
-     * @var \Exception $exception
-     */
-    $exception = NULL;
-    $self = $this;
-    \CRM_Core_Transaction::create(TRUE)->run(function($tx) use ($entity, $action, $entityId, &$exception, $self) {
-      $tx->rollback(); // Just to be safe.
-
-      $params = array(
-        'version' => 3,
-        'check_permissions' => 1,
-        'id' => $entityId,
-      );
-
-      $result = $self->kernel->run($entity, $self->getDelegatedAction($action), $params);
-      if ($result['is_error'] || empty($result['values'])) {
-        $exception = new \Civi\API\Exception\UnauthorizedException("Authorization failed on ($entity,$entityId)", array(
-          'cause' => $result,
-        ));
-      }
-    });
-
-    if ($exception) {
-      throw $exception;
+    if (!$this->isAuthorized($entity, $action, $entityId)) {
+      throw new \Civi\API\Exception\UnauthorizedException("Authorization failed on ($entity,$entityId)");
     }
   }
 
@@ -370,6 +348,23 @@ class DynamicFKAuthorization implements EventSubscriberInterface {
       );
     }
     return $rows;
+  }
+
+  /**
+   * @param string $entity
+   * @param string $action
+   * @param int $entityId
+   *
+   * @return bool
+   */
+  private function isAuthorized($entity, $action, $entityId) {
+    $params = array(
+      'version' => 3,
+      'check_permissions' => 1,
+      'id' => $entityId,
+    );
+
+    return $this->kernel->runAuthorize($entity, $this->getDelegatedAction($action), $params);
   }
 
 }
