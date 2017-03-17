@@ -36,7 +36,7 @@
   {ts}Intro Content{/ts}
 {/htxt}
 {htxt id="id-intro_msg"}
-{ts}Enter content for the introductory message. This will be displayed below the page title. You can include images, as long as they are already uploaded to a server - click the "Image" button in the button bar.{/ts}
+{ts}Enter content for the introductory message. This will be displayed below the page title. You can include images, as long as they are already uploaded to a server: click the "Image" button in the button bar.{/ts}
 {/htxt}
 
 {htxt id="id-footer_msg-title"}
@@ -83,4 +83,3 @@
 <p>{ts}When enabled, links allowing people to share this online contribution page with their social network will be displayed (e.g. Facebook "Like", Google+, and Twitter).{/ts}</p>
 <p>{ts}Social media links will be included on the Contribution Thank-you page, Tell-a-Friend page (if enabled), and in contribution receipt emails.{/ts}</p>
 {/htxt}
-

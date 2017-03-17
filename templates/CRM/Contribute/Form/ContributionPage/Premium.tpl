@@ -68,7 +68,7 @@
             </td>
             <td class="html-adjust">{$form.premiums_intro_text.html}<br/>
             <span class="description">
-              {ts}Enter content for the introductory message. This will be displayed below the Premiums section title. You may include HTML formatting tags. You can also include images, as long as they are already uploaded to a server - reference them using complete URLs.{/ts}
+              {ts}Enter content for the introductory message. This will be displayed below the Premiums section title. You may include HTML formatting tags. You can also include images, as long as they are already uploaded to a server&mdash;reference them using complete URLs.{/ts}
             </span>
             </td>
           </tr>
