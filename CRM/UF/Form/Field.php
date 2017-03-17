@@ -789,7 +789,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
       'Activity',
     ))
     ) {
-      $errors['in_selector'] = ts("'In Selector' cannot be checked for %1 fields.", array(1 => $entityName));
+      $errors['in_selector'] = ts("'Results Column' cannot be checked for %1 fields.", array(1 => $entityName));
     }
 
     $isCustomField = FALSE;
