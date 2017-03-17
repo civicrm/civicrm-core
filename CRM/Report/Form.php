@@ -2773,7 +2773,6 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
           else {
             $orderBys[] = "{$orderByField['dbAlias']} {$orderBy['order']}";
           }
-          $orderBys[] = "{$orderByField['dbAlias']} {$orderBy['order']}";
 
           // Record any section headers for assignment to the template
           if (!empty($orderBy['section'])) {
