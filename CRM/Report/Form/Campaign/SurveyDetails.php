@@ -203,7 +203,7 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
         ),
         'grouping' => 'survey-activity-fields',
       ),
-    ) + $this->addAddressFields();
+    ) + $this->getAddressColumns();
     parent::__construct();
   }
 
