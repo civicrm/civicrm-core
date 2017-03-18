@@ -29,22 +29,22 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2017
- * $Id$
- *
  */
 
 /**
- * BAO object for civicrm_prevnext_cache table
+ * BAO object for civicrm_prevnext_cache table.
  */
 class CRM_Core_BAO_PrevNextCache extends CRM_Core_DAO_PrevNextCache {
 
   /**
-   * @param $cacheKey
-   * @param $id1
-   * @param $id2
+   * Get the previous and next keys.
+   *
+   * @param string $cacheKey
+   * @param int $id1
+   * @param int $id2
    * @param int $mergeId
-   * @param NULL $join
-   * @param NULL $where
+   * @param string $join
+   * @param string $where
    * @param bool $flip
    *
    * @return array
@@ -113,8 +113,10 @@ WHERE  cacheKey     = %3 AND
   }
 
   /**
+   * Delete an item from the prevnext cache table based on the entity.
+   *
    * @param int $id
-   * @param NULL $cacheKey
+   * @param string $cacheKey
    * @param string $entityTable
    */
   public static function deleteItem($id = NULL, $cacheKey = NULL, $entityTable = 'civicrm_contact') {
@@ -136,9 +138,11 @@ WHERE  cacheKey     = %3 AND
   }
 
   /**
-   * @param $id1
-   * @param $id2
-   * @param NULL $cacheKey
+   * Delete from the previous next cache table for a pair of ids.
+   *
+   * @param int $id1
+   * @param int $id2
+   * @param string $cacheKey
    * @param bool $isViceVersa
    * @param string $entityTable
    */
@@ -224,6 +228,7 @@ WHERE  cacheKey     = %3 AND
    * @param bool $includeConflicts
    *   Should we return rows that have already been idenfified as having a conflict.
    *   When this is TRUE you should be careful you do not set up a loop.
+   * @param array $params
    *
    * @return array
    */
@@ -321,7 +326,9 @@ FROM   civicrm_prevnext_cache pn
   }
 
   /**
-   * @param $cacheKey
+   * Get count of matching rows.
+   *
+   * @param string $cacheKey
    * @param string $join
    * @param string $where
    * @param string $op
