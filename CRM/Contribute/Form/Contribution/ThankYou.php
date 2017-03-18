@@ -117,7 +117,7 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
     if ($invoicing) {
       $getTaxDetails = FALSE;
       $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
-      foreach ($this->_lineItem as $key => $value) {
+      foreach ($this->_lineItem as $value) {
         foreach ($value as $v) {
           if (isset($v['tax_rate'])) {
             if ($v['tax_rate'] != '') {
@@ -131,7 +131,6 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
       $this->assign('totalTaxAmount', $params['tax_amount']);
     }
     if (!empty($this->_values['honoree_profile_id']) && !empty($params['soft_credit_type_id'])) {
-      $honorName = NULL;
       $softCreditTypes = CRM_Core_OptionGroup::values("soft_credit_type", FALSE);
 
       $this->assign('soft_credit_type', $softCreditTypes[$params['soft_credit_type_id']]);
@@ -283,6 +282,28 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
       }
       $this->assign('friendURL', $url);
     }
+
+    $isPendingOutcome = TRUE;
+    try {
+      // A payment notification update could have come in at any time. Check at the last minute.
+      $contributionStatusID = civicrm_api3('Contribution', 'getvalue', array(
+        'id' => CRM_Utils_Array::value('contributionID', $params),
+        'return' => 'contribution_status_id',
+        'invoice_id' => CRM_Utils_Array::value('invoiceID', $params),
+      ));
+      if (CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contributionStatusID) === 'Pending'
+        && !empty($params['payment_processor_id'])
+      ) {
+        $isPendingOutcome = TRUE;
+      }
+      else {
+        $isPendingOutcome = FALSE;
+      }
+    }
+    catch (CiviCRM_API3_Exception $e) {
+
+    }
+    $this->assign('isPendingOutcome', $isPendingOutcome);
 
     $this->freeze();
 
