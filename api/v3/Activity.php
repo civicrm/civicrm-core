@@ -315,9 +315,6 @@ function civicrm_api3_activity_get($params) {
   }
 
   $sql = CRM_Utils_SQL_Select::fragment();
-  // Support search by activity_contact
-  $extraFieldSpecs = array();
-  _civicrm_api3_activity_create_spec($extraFieldSpecs);
   $recordTypes = civicrm_api3('ActivityContact', 'getoptions', array('field' => 'record_type_id'));
   $recordTypes = $recordTypes['values'];
   $activityContactOptions = array(
@@ -328,7 +325,6 @@ function civicrm_api3_activity_get($params) {
   );
   foreach ($activityContactOptions as $activityContactName => $activityContactValue) {
     if (!empty($params[$activityContactName])) {
-      _civicrm_api3_validate_integer($params, $activityContactName, $extraFieldSpecs[$activityContactName], 'Activity');
       if (!is_array($params[$activityContactName])) {
         $params[$activityContactName] = array('=' => $params[$activityContactName]);
       }
@@ -340,7 +336,6 @@ function civicrm_api3_activity_get($params) {
     }
   }
   if (!empty($params['tag_id'])) {
-    _civicrm_api3_validate_integer($params, 'tag_id', $extraFieldSpecs['tag_id'], 'Activity');
     if (!is_array($params['tag_id'])) {
       $params['tag_id'] = array('=' => $params['tag_id']);
     }
@@ -350,7 +345,6 @@ function civicrm_api3_activity_get($params) {
     }
   }
   if (!empty($params['file_id'])) {
-    _civicrm_api3_validate_integer($params, 'file_id', $extraFieldSpecs['file_id'], 'Activity');
     if (!is_array($params['file_id'])) {
       $params['file_id'] = array('=' => $params['file_id']);
     }
@@ -360,7 +354,6 @@ function civicrm_api3_activity_get($params) {
     }
   }
   if (!empty($params['case_id'])) {
-    _civicrm_api3_validate_integer($params, 'case_id', $extraFieldSpecs['case_id'], 'Activity');
     if (!is_array($params['case_id'])) {
       $params['case_id'] = array('=' => $params['case_id']);
     }
