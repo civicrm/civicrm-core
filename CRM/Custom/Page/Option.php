@@ -273,7 +273,7 @@ WHERE  option_group_id = %1";
       // no browse for edit/update/view
       $this->edit($action);
     }
-    else if ($action & CRM_Core_Action::MAP) {
+    elseif ($action & CRM_Core_Action::MAP) {
       $this->alphabetize();
     }
     else {
