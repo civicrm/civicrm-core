@@ -693,6 +693,8 @@ function _ipn_process_transaction(&$params, $contribution, $input, $ids, $firstC
     $input['receipt_from_name'] = CRM_Utils_Array::value('receipt_from_name', $params, $domainFromName);
     $input['receipt_from_email'] = CRM_Utils_Array::value('receipt_from_email', $params, $domainFromEmail);
   }
+  $input['card_type'] = CRM_Utils_Array::value('card_type', $params);
+  $input['pan_truncation'] = CRM_Utils_Array::value('pan_truncation', $params);
   $transaction = new CRM_Core_Transaction();
   return CRM_Contribute_BAO_Contribution::completeOrder($input, $ids, $objects, $transaction, !empty
   ($contribution->contribution_recur_id), $contribution,
