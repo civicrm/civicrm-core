@@ -146,6 +146,14 @@ function _civicrm_api3_case_get_spec(&$params) {
     'description' => 'Id of an activity in the case',
     'type' => CRM_Utils_Type::T_INT,
   );
+  $params['tag_id'] = array(
+    'title' => 'Tags',
+    'description' => 'Find activities with specified tags.',
+    'type' => 1,
+    'FKClassName' => 'CRM_Core_DAO_Tag',
+    'FKApiName' => 'Tag',
+    'supports_joins' => TRUE,
+  );
 }
 
 /**
@@ -247,9 +255,22 @@ function civicrm_api3_case_get($params) {
       ->where("civicrm_case_activity.activity_id IN ($activityId)");
   }
 
-  $foundcases = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, TRUE, 'Case', $sql);
+  // Clause to search by tag
+  if (!empty($params['tag_id'])) {
+    $dummySpec = array();
+    _civicrm_api3_validate_integer($params, 'tag_id', $dummySpec, 'Case');
+    if (!is_array($params['tag_id'])) {
+      $params['tag_id'] = array('=' => $params['tag_id']);
+    }
+    $clause = \CRM_Core_DAO::createSQLFilter('tag_id', $params['tag_id']);
+    if ($clause) {
+      $sql->where('a.id IN (SELECT entity_id FROM civicrm_entity_tag WHERE entity_table = "civicrm_case" AND !clause)', array('!clause' => $clause));
+    }
+  }
 
-  if (empty($options['is_count'])) {
+  $cases = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), array('sequential' => 0) + $params, TRUE, 'Case', $sql);
+
+  if (empty($options['is_count']) && !empty($cases['values'])) {
     // For historic reasons we return these by default only when fetching a case by id
     if (!empty($params['id']) && empty($options['return'])) {
       $options['return'] = array(
@@ -259,12 +280,15 @@ function civicrm_api3_case_get($params) {
       );
     }
 
-    foreach ($foundcases['values'] as &$case) {
-      _civicrm_api3_case_read($case, $options);
+    _civicrm_api3_case_read($cases['values'], $options);
+
+    // We disabled sequential to keep the list indexed for case_read(). Now add it back.
+    if (!empty($params['sequential'])) {
+      $cases['values'] = array_values($cases['values']);
     }
   }
 
-  return $foundcases;
+  return $cases;
 }
 
 /**
@@ -394,44 +418,71 @@ function civicrm_api3_case_delete($params) {
 }
 
 /**
- * Augment a case with extra data.
+ * Augment case results with extra data.
  *
- * @param array $case
+ * @param array $cases
  * @param array $options
  */
-function _civicrm_api3_case_read(&$case, $options) {
-  if (empty($options['return']) || !empty($options['return']['contact_id'])) {
-    // Legacy support for client_id - TODO: in apiv4 remove 'client_id'
-    $case['client_id'] = $case['contact_id'] = CRM_Case_BAO_Case::retrieveContactIdsByCaseId($case['id']);
+function _civicrm_api3_case_read(&$cases, $options) {
+  foreach ($cases as &$case) {
+    if (empty($options['return']) || !empty($options['return']['contact_id'])) {
+      // Legacy support for client_id - TODO: in apiv4 remove 'client_id'
+      $case['client_id'] = $case['contact_id'] = CRM_Case_BAO_Case::retrieveContactIdsByCaseId($case['id']);
+    }
+    if (!empty($options['return']['contacts'])) {
+      //get case contacts
+      $contacts = CRM_Case_BAO_Case::getcontactNames($case['id']);
+      $relations = CRM_Case_BAO_Case::getRelatedContacts($case['id']);
+      $case['contacts'] = array_unique(array_merge($contacts, $relations), SORT_REGULAR);
+    }
+    if (!empty($options['return']['activities'])) {
+      // add case activities array - we'll populate them in bulk below
+      $case['activities'] = array();
+    }
+    // Properly render this joined field
+    if (!empty($options['return']['case_type_id.definition'])) {
+      if (!empty($case['case_type_id.definition'])) {
+        list($xml) = CRM_Utils_XML::parseString($case['case_type_id.definition']);
+      }
+      else {
+        $caseTypeId = !empty($case['case_type_id']) ? $case['case_type_id'] : CRM_Core_DAO::getFieldValue('CRM_Case_DAO_Case', $case['id'], 'case_type_id');
+        $caseTypeName = !empty($case['case_type_id.name']) ? $case['case_type_id.name'] : CRM_Core_DAO::getFieldValue('CRM_Case_DAO_CaseType', $caseTypeId, 'name');
+        $xml = CRM_Case_XMLRepository::singleton()->retrieve($caseTypeName);
+      }
+      $case['case_type_id.definition'] = array();
+      if ($xml) {
+        $case['case_type_id.definition'] = CRM_Case_BAO_CaseType::convertXmlToDefinition($xml);
+      }
+    }
   }
-  if (!empty($options['return']['contacts'])) {
-    //get case contacts
-    $contacts = CRM_Case_BAO_Case::getcontactNames($case['id']);
-    $relations = CRM_Case_BAO_Case::getRelatedContacts($case['id']);
-    $case['contacts'] = array_merge($contacts, $relations);
-  }
+  // Bulk-load activities
   if (!empty($options['return']['activities'])) {
-    //get case activities
-    $case['activities'] = array();
-    $query = "SELECT activity_id FROM civicrm_case_activity WHERE case_id = %1";
-    $dao = CRM_Core_DAO::executeQuery($query, array(1 => array($case['id'], 'Integer')));
+    $query = "SELECT case_id, activity_id FROM civicrm_case_activity WHERE case_id IN (%1)";
+    $params = array(1 => array(implode(',', array_keys($cases)), 'String', CRM_Core_DAO::QUERY_FORMAT_NO_QUOTES));
+    $dao = CRM_Core_DAO::executeQuery($query, $params);
     while ($dao->fetch()) {
-      $case['activities'][] = $dao->activity_id;
+      $cases[$dao->case_id]['activities'][] = $dao->activity_id;
     }
   }
-  // Properly render this joined field
-  if (!empty($options['return']['case_type_id.definition'])) {
-    if (!empty($case['case_type_id.definition'])) {
-      list($xml) = CRM_Utils_XML::parseString($case['case_type_id.definition']);
+  // Bulk-load tags. Supports joins onto the tag entity.
+  $tagGet = array('tag_id', 'entity_id');
+  foreach (array_keys($options['return']) as $key) {
+    if (strpos($key, 'tag_id.') === 0) {
+      $tagGet[] = $key;
+      $options['return']['tag_id'] = 1;
     }
-    else {
-      $caseTypeId = !empty($case['case_type_id']) ? $case['case_type_id'] : CRM_Core_DAO::getFieldValue('CRM_Case_DAO_Case', $case['id'], 'case_type_id');
-      $caseTypeName = !empty($case['case_type_id.name']) ? $case['case_type_id.name'] : CRM_Core_DAO::getFieldValue('CRM_Case_DAO_CaseType', $caseTypeId, 'name');
-      $xml = CRM_Case_XMLRepository::singleton()->retrieve($caseTypeName);
-    }
-    $case['case_type_id.definition'] = array();
-    if ($xml) {
-      $case['case_type_id.definition'] = CRM_Case_BAO_CaseType::convertXmlToDefinition($xml);
+  }
+  if (!empty($options['return']['tag_id'])) {
+    $tags = civicrm_api3('EntityTag', 'get', array(
+      'entity_table' => 'civicrm_case',
+      'entity_id' => array('IN' => array_keys($cases)),
+      'return' => $tagGet,
+      'options' => array('limit' => 0),
+    ));
+    foreach ($tags['values'] as $tag) {
+      $key = (int) $tag['entity_id'];
+      unset($tag['entity_id'], $tag['id']);
+      $cases[$key]['tag_id'][$tag['tag_id']] = $tag;
     }
   }
 }
