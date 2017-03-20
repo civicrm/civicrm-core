@@ -155,6 +155,9 @@ class CRM_Contact_Form_DedupeRules extends CRM_Admin_Form {
         break;
       }
     }
+    if (empty($fields['threshold'])) {
+      $errors['threshold'] = ts('Threshold weight cannot be empty or zero.');
+    }
 
     if (!$fieldSelected) {
       $errors['_qf_default'] = ts('Please select at least one field.');
