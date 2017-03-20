@@ -888,7 +888,7 @@ class CRM_Core_Permission {
    *  Note: some APIs declare other actions as well
    *
    * Permissions should use arrays for AND and arrays of arrays for OR
-   * @see CRM_Core_Permission::check for more documentation
+   * @see CRM_Core_Permission::check
    *
    * @return array of permissions
    */
