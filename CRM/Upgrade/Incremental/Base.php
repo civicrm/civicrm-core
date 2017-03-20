@@ -149,4 +149,20 @@ class CRM_Upgrade_Incremental_Base {
     return TRUE;
   }
 
+  /**
+   * Drop a column from a table if it exist.
+   *
+   * @param CRM_Queue_TaskContext $ctx
+   * @param string $table
+   * @param string $column
+   * @return bool
+   */
+  public static function dropColumn($ctx, $table, $column) {
+    if (CRM_Core_BAO_SchemaHandler::checkIfFieldExists($table, $column)) {
+      CRM_Core_DAO::executeQuery("ALTER TABLE `$table` DROP COLUMN `$column`",
+        array(), TRUE, NULL, FALSE, FALSE);
+    }
+    return TRUE;
+  }
+
 }
