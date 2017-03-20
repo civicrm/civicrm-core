@@ -260,7 +260,15 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
           $this->_params['organization_id'] = $this->_params['onbehalfof_id'];
         }
         else {
-          $this->_params['organization_id'] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_params['onbehalf']['organization_name'], 'id', 'display_name');
+          $contactTypes = CRM_Contact_BAO_ContactType::basicTypePairs();
+          $org = new CRM_Contact_DAO_Contact();
+          $org->display_name = $this->_params['onbehalf']['organization_name'];
+          $org->contact_type = CRM_Utils_Array::value('Organization', $contactTypes);
+          $org->is_deleted = 0;
+          $org->find();
+          if ($org->fetch()) {
+            $this->_params['organization_id'] = $org->id;
+          }
         }
       }
 
