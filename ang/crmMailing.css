@@ -111,3 +111,11 @@ input[name=preview_test_email]:-ms-input-placeholder {
   margin: 0.5em;
   color: red;
 }
+
+.crmMailing img.fadedIcon {
+  opacity: 0.6;
+}
+
+.crmMailing img.clearIcon {
+  opacity: 1;
+}

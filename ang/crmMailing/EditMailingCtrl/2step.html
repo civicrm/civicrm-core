@@ -47,6 +47,9 @@
           </a>
         </center>
       </div>
+      <div crm-ui-accordion="{title: ts('Email Preview Cluster')}" ng-if="accessToken">
+          <div crm-mailing-block-email-preview-cluster crm-mailing="mailing" on-request="previewCluster(mailing)" />
+      </div>
 
       <span crm-ui-wizard-buttons style="float:right;">
         <button

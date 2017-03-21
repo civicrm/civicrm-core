@@ -124,6 +124,7 @@ class api_v3_MultilingualTest extends CiviUnitTestCase {
       'UFField', // throw error for help_post column
       'UFGroup', //throw error for title
       'User', // need loggedIn user id
+      'Prevem',
     );
     // fetch all entities
     $entities = $this->callAPISuccess('Entity', 'get', array());

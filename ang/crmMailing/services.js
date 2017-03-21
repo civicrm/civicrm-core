@@ -93,7 +93,7 @@
   });
 
   // The crmMailingMgr service provides business logic for loading, saving, previewing, etc
-  angular.module('crmMailing').factory('crmMailingMgr', function ($q, crmApi, crmFromAddresses, crmQueue) {
+  angular.module('crmMailing').factory('crmMailingMgr', function ($q, $http, crmApi, crmFromAddresses, crmQueue) {
     var qApi = crmQueue(crmApi);
     var pickDefaultMailComponent = function pickDefaultMailComponent(type) {
       var mcs = _.where(CRM.crmMailing.headerfooterList, {
@@ -259,6 +259,40 @@
         });
       },
 
+      composerPreviewBatch: function composerPreviewBatch(prevemCredentials, id, message, renderers) {
+        var prevemURL = prevemCredentials.values.url;
+        var postURL = prevemURL + '/api/PreviewBatches';
+        var consumerId = prevemCredentials.values.consumerId;
+        var accessToken = prevemCredentials.values.token;
+        var accessTokenUrlExtension = 'access_token=' + accessToken;
+        var batchId = consumerId + ':' + id;     //unique everytime. Needs to be saved in order for the composer to be able to look the batch up.
+        var Interval;
+        var postData = {
+          "batchId" : batchId,
+          "consumerId" : consumerId,
+          "message" : message,
+          "renderers" : renderers
+        };
+        $http.post(postURL+'?'+accessTokenUrlExtension, postData)
+          .success(function(data, status, headers, config){
+            /*called for result & error because 200 status*/
+            console.log(status);
+            if (data.result){
+              //handle success here
+              console.log(data.result);
+            } else if (data.error) {
+              //handle error here
+              console.log(status);
+            }
+          })
+          .error(function(data, status, headers, config){
+              /*handle non 200 statuses*/
+              console.log(data);
+          });
+          return;
+      },
+
+
       // @param mailing Object (per APIv3)
       // @return Promise an object with "subject", "body_text", "body_html"
       preview: function preview(mailing) {
@@ -414,6 +448,23 @@
   // The preview manager performs preview actions while putting up a visible UI (e.g. dialogs & status alerts)
   angular.module('crmMailing').factory('crmMailingPreviewMgr', function (dialogService, crmMailingMgr, crmStatus) {
     return {
+
+      previewCluster: function previewCluster(mailing, prevemCredentials){
+        var message = {
+          subject: mailing.subject,
+          html: mailing.body_html,
+          text: mailing.body_text
+        };
+        var renderers = [];
+        for(var index in mailing.renderers) { 
+            if (mailing.renderers[index]) {
+              renderers.push(index);
+            }
+        }
+        var p = crmMailingMgr;
+          p.composerPreviewBatch(prevemCredentials, mailing.id, message, renderers);
+      },
+
       // @param mode string one of 'html', 'text', or 'full'
       // @return Promise
       preview: function preview(mailing, mode) {

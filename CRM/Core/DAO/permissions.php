@@ -366,6 +366,7 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
   $permissions['mailing_group'] = $permissions['mailing'];
   $permissions['mailing_job'] = $permissions['mailing'];
   $permissions['mailing_recipients'] = $permissions['mailing'];
+  $permissions['prevem'] = $permissions['mailing'];
 
   $permissions['mailing_a_b'] = array(
     'get' => array(

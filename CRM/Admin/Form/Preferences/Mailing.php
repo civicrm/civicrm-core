@@ -108,6 +108,12 @@ class CRM_Admin_Form_Preferences_Mailing extends CRM_Admin_Form_Preferences {
           'weight' => 11,
           'description' => 'If enabled, a randomized hash key will be used to reference the mailing URL in the mailing.viewUrl token, instead of the mailing ID',
         ),
+        'prevem_url' => array(
+          'html_type' => 'text',
+          'title' => ts('Prevem URL'),
+          'weight' => 12,
+          'description' => ts('The URL of the email-preview service. (Ex: "http://consumerId:consumerPass@localhost:3000")'),
+        ),
       ),
     );
 
