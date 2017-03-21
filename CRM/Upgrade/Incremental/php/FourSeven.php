@@ -315,6 +315,7 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
   public function upgrade_4_7_18($rev) {
     $this->addTask('Update Kenyan Provinces', 'updateKenyanProvinces');
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
+    $this->addTask('Add unique constraint on civicrm_entity_financial_account', 'addIndexEntityFinancialAccount');
   }
 
   /*
@@ -671,6 +672,19 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
     CRM_Core_BAO_SchemaHandler::createIndexes(array(
       'civicrm_financial_item' => array(array('entity_id', 'entity_table')),
     ));
+    return TRUE;
+  }
+
+  /**
+   * CRM-19357 Add unique index to civicrm_entity_financial_account.
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   *
+   * @return bool
+   */
+  public static function addIndexEntityFinancialAccount(CRM_Queue_TaskContext $ctx) {
+    $tables = array('civicrm_entity_financial_account' => array(array('entity_id', 'entity_table', 'account_relationship')));
+    CRM_Core_BAO_SchemaHandler::createIndexes($tables);
     return TRUE;
   }
 
