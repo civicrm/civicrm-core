@@ -179,7 +179,7 @@ class CRM_Utils_Hook_WordPress extends CRM_Utils_Hook {
         if (!empty($config->customPHPPathDir) &&
           file_exists("{$config->customPHPPathDir}/civicrmHooks.php")
         ) {
-          @include_once 'civicrmHooks.php';
+          @include_once "{$config->customPHPPathDir}/civicrmHooks.php";
         }
 
         // initialise with the pre-existing 'wordpress' prefix
