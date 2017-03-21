@@ -61,8 +61,44 @@ class CRM_Core_BAO_SchemaHandlerTest extends CiviUnitTestCase {
    */
   public function testGetIndexes() {
     $indexes = CRM_Core_BAO_SchemaHandler::getIndexes(array('civicrm_contact'));
-    $this->assertTrue(in_array('index_contact_type', $indexes['civicrm_contact']));
+    $this->assertTrue(array_key_exists('index_contact_type', $indexes['civicrm_contact']));
   }
+
+  /**
+   * Test CRM_Core_BAO_SchemaHandler::getMissingIndexes() function
+   */
+  // public function testGetMissingIndexes() {
+  //   $missing = CRM_Core_BAO_SchemaHandler::getMissingIndexes(array('civicrm_contact' => array('rabbit', 'contact_type')));
+  //   $fields = CRM_Utils_Array::collect('field', $missing['civicrm_contact']);
+  //   $this->assertEquals(1, count($fields));
+  //   $this->assertTrue(in_array('rabbit', $fields));
+  //   $this->assertFalse(in_array('contact_type', $fields));
+  // }
+
+  /**
+   * Test CRM_Core_BAO_SchemaHandler::checkIndices() function
+   */
+  // public function testCheckIndices() {
+  //   $data = array(
+  //     'civicrm_contact' => array(
+  //       'index_contact_type' => array(
+  //         'name' => 'index_contact_type',
+  //         'field' => array('contact_type'),
+  //         'localizable' => NULL,
+  //       ),
+  //       'index_rabbit' => array(
+  //         'name' => 'index_rabbit',
+  //         'field' => array('rabbit'),
+  //         'localizable' => NULL,
+  //       ),
+  //     ),
+  //   );
+  //   $missing = CRM_Core_BAO_SchemaHandler::checkIndices($data);
+  //   $fields = CRM_Utils_Array::collect('field', $missing['civicrm_contact']);
+  //   $this->assertEquals(1, count($fields));
+  //   $this->assertTrue(in_array('rabbit', $fields));
+  //   $this->assertFalse(in_array('contact_type', $fields));
+  // }
 
   /**
    * Test creating an index.
@@ -101,14 +137,14 @@ class CRM_Core_BAO_SchemaHandlerTest extends CiviUnitTestCase {
   /**
    * Test the drop index if exists function for a non-existent index.
    */
-  public function testCHeckIndexNotExists() {
+  public function testCheckIndexNotExists() {
     $this->assertFalse(CRM_Core_BAO_SchemaHandler::checkIfIndexExists('civicrm_contact', 'magic_button'));
   }
 
   /**
    * Test the drop index if exists function for a non-existent index.
    */
-  public function testCHeckIndexExists() {
+  public function testCheckIndexExists() {
     $this->assertTrue(CRM_Core_BAO_SchemaHandler::checkIfIndexExists('civicrm_contact', 'index_hash'));
   }
 
@@ -178,6 +214,71 @@ class CRM_Core_BAO_SchemaHandlerTest extends CiviUnitTestCase {
     else {
       $this->assertTrue(CRM_Core_BAO_SchemaHandler::safeRemoveFK('civicrm_mailing_recipients', $key));
     }
+  }
+
+  /**
+   * Check there are no missing indices
+   */
+  public function testGetMissingIndices() {
+    $m = CRM_Core_BAO_SchemaHandler::getMissingIndices();
+    // print_r($m);
+    $this->assertTrue(empty(CRM_Core_BAO_SchemaHandler::getMissingIndices()));
+  }
+
+  /**
+   * Test that missing indices are correctly created
+   */
+  public function testCreateMissingIndices() {
+    $indices = array(
+      'test_table' => array(
+        'test_index1' => array(
+          'name' => 'test_index1',
+          'field' => array(
+            'title',
+          ),
+          'unique' => FALSE,
+        ),
+        'test_index2' => array(
+          'name' => 'test_index2',
+          'field' => array(
+            'title',
+          ),
+          'unique' => TRUE,
+        ),
+        'test_index3' => array(
+          'name' => 'test_index3',
+          'field' => array(
+            'title(3)',
+            'name',
+          ),
+          'unique' => FALSE,
+        ),
+      ),
+    );
+    CRM_Core_DAO::executeQuery('drop table if exists `test_table`');
+    CRM_Core_DAO::executeQuery('create table `test_table` (`title` varchar(255), `name` varchar(255))');
+    CRM_Core_BAO_SchemaHandler::createMissingIndices($indices);
+    $actualIndices = CRM_Core_BAO_SchemaHandler::getIndexes(array('test_table'));
+    // print_r(array('actualIndices' => $actualIndices));
+    $this->assertEquals($actualIndices, $indices);
+  }
+
+  /**
+   * Test index signatures are added correctly
+   */
+  public function testAddIndexSignatures() {
+    $indices = array(
+      'one' => array(
+        'field' => array('id', 'name(3)'),
+        'unique' => TRUE,
+      ),
+      'two' => array(
+        'field' => array('title'),
+      ),
+    );
+    CRM_Core_BAO_SchemaHandler::addIndexSignature('my_table', $indices);
+    $this->assertEquals($indices['one']['sig'], 'my_table::1::id::name(3)');
+    $this->assertEquals($indices['two']['sig'], 'my_table::0::title');
   }
 
 }

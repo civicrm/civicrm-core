@@ -242,6 +242,7 @@ class CRM_Core_CodeGen_Specification {
 
         $this->getIndex($indexXML, $fields, $index);
       }
+      CRM_Core_BAO_SchemaHandler::addIndexSignature($name, $index);
       $table['index'] = &$index;
     }
 

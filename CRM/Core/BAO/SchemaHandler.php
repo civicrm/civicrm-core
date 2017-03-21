@@ -521,9 +521,13 @@ ADD UNIQUE INDEX `unique_entity_id` ( `entity_id` )";
 
       $tableIndexes = array();
       while ($dao->fetch()) {
-        $tableIndexes[] = $dao->Key_name;
+        $tableIndexes[$dao->Key_name]['name'] = $dao->Key_name;
+        $tableIndexes[$dao->Key_name]['field'][] = $dao->Column_name .
+         ($dao->Sub_part ? '(' . $dao->Sub_part . ')' : '');
+        $tableIndexes[$dao->Key_name]['unique'] = ($dao->Non_unique == 0 ? 1 : 0);
       }
       $indexes[$table] = $tableIndexes;
+      $dao->free();
     }
     return $indexes;
   }
@@ -664,6 +668,77 @@ MODIFY      {$columnName} varchar( $length )
       return TRUE;
     }
     return FALSE;
+  }
+
+  /**
+   * Add index signature hash
+   * @param string $table table name
+   * @param array $indices index array spec
+   */
+  public static function addIndexSignature($table, &$indices) {
+    foreach ($indices as $indexName => $index) {
+      $indices[$indexName]['sig'] = $table . "::" .
+        (array_key_exists('unique', $index) ? $index['unique'] : 0) . "::" .
+        implode("::", $index['field']);
+    }
+  }
+
+  /**
+   * Compare the indices specified in the XML files with those in the DB
+   * @return array index specifications
+   */
+  public static function getMissingIndices() {
+    // Get the indices defined (originally) in the xml files
+    $requiredIndices = CRM_Core_DAO_AllCoreTables::indices();
+    foreach ($requiredIndices as $table => $indices) {
+      $reqSigs[] = CRM_Utils_Array::collect('sig', $indices);
+    }
+    CRM_Utils_Array::flatten($reqSigs, $requiredSigs);
+
+    // Get the indices in the database
+    $existingIndices = CRM_Core_BAO_SchemaHandler::getIndexes(array_keys($requiredIndices));
+    foreach ($existingIndices as $table => $indices) {
+      CRM_Core_BAO_SchemaHandler::addIndexSignature($table, $indices);
+      $extSigs[] = CRM_Utils_Array::collect('sig', $indices);
+    }
+    CRM_Utils_Array::flatten($extSigs, $existingSigs);
+
+    // Compare
+    $missingSigs = array_diff($requiredSigs, $existingSigs);
+    // Get missing indices
+    $missingIndices = array();
+    foreach ($missingSigs as $sig) {
+      $sigParts = explode('::', $sig);
+      foreach ($requiredIndices[$sigParts[0]] as $index) {
+        if ($index['sig'] == $sig) {
+          $missingIndices[$sigParts[0]][] = $index;
+          continue;
+        }
+      }
+    }
+    return $missingIndices;
+  }
+
+  /**
+   * create missing indices
+   * @param array $missingIndices as returned by getMissingIndices()
+   */
+  public static function createMissingIndices($missingIndices) {
+    foreach ($missingIndices as $table => $indexList) {
+      foreach ($indexList as $index) {
+        $queries[] = "CREATE " .
+        (array_key_exists('unique', $index) && $index['unique'] ? 'UNIQUE ' : '') .
+        "INDEX {$index['name']} ON {$table} (" .
+          implode(", ", $index['field']) .
+        ")";
+      }
+    }
+    /* FIXME potential problem if index name already exists, so check before creating */
+    $dao = new CRM_Core_DAO();
+    foreach ($queries as $query) {
+      $dao->query($query, FALSE);
+    }
+    $dao->free();
   }
 
 }
