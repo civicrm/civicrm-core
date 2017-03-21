@@ -166,6 +166,7 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
   'table_name' => '{$table.name}',
   'entity' => '{$table.entity}',
   'bao' => '{$table.bao}',
+  'localizable' => {if ($field.localizable)}{1}{else}{0}{/if},
 
 {if $field.FKClassName}
                       'FKClassName' => '{$field.FKClassName}',
@@ -262,6 +263,11 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
             return $r;
       {rdelim}
 
+      /**
+       * Returns the list of indices
+       */
+      public static function indices($localize = TRUE) {ldelim}
+        $indices = {$indicesPhp};
+        return ($localize && !empty($indices)) ? CRM_Core_DAO_AllCoreTables::multilingualize(__CLASS__, $indices) : $indices;
+      {rdelim}
 {rdelim}
-
-
