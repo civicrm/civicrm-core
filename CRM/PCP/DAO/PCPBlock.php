@@ -167,6 +167,7 @@ class CRM_PCP_DAO_PCPBlock extends CRM_Core_DAO {
           'table_name' => 'civicrm_pcp_block',
           'entity' => 'PCPBlock',
           'bao' => 'CRM_PCP_BAO_PCPBlock',
+          'localizable' => 0,
         ) ,
         'entity_table' => array(
           'name' => 'entity_table',
@@ -177,6 +178,7 @@ class CRM_PCP_DAO_PCPBlock extends CRM_Core_DAO {
           'table_name' => 'civicrm_pcp_block',
           'entity' => 'PCPBlock',
           'bao' => 'CRM_PCP_BAO_PCPBlock',
+          'localizable' => 0,
         ) ,
         'entity_id' => array(
           'name' => 'entity_id',
@@ -187,6 +189,7 @@ class CRM_PCP_DAO_PCPBlock extends CRM_Core_DAO {
           'table_name' => 'civicrm_pcp_block',
           'entity' => 'PCPBlock',
           'bao' => 'CRM_PCP_BAO_PCPBlock',
+          'localizable' => 0,
         ) ,
         'target_entity_type' => array(
           'name' => 'target_entity_type',
@@ -200,6 +203,7 @@ class CRM_PCP_DAO_PCPBlock extends CRM_Core_DAO {
           'table_name' => 'civicrm_pcp_block',
           'entity' => 'PCPBlock',
           'bao' => 'CRM_PCP_BAO_PCPBlock',
+          'localizable' => 0,
         ) ,
         'target_entity_id' => array(
           'name' => 'target_entity_id',
@@ -210,6 +214,7 @@ class CRM_PCP_DAO_PCPBlock extends CRM_Core_DAO {
           'table_name' => 'civicrm_pcp_block',
           'entity' => 'PCPBlock',
           'bao' => 'CRM_PCP_BAO_PCPBlock',
+          'localizable' => 0,
         ) ,
         'supporter_profile_id' => array(
           'name' => 'supporter_profile_id',
@@ -220,6 +225,7 @@ class CRM_PCP_DAO_PCPBlock extends CRM_Core_DAO {
           'table_name' => 'civicrm_pcp_block',
           'entity' => 'PCPBlock',
           'bao' => 'CRM_PCP_BAO_PCPBlock',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Core_DAO_UFGroup',
         ) ,
         'owner_notify_id' => array(
@@ -230,6 +236,7 @@ class CRM_PCP_DAO_PCPBlock extends CRM_Core_DAO {
           'table_name' => 'civicrm_pcp_block',
           'entity' => 'PCPBlock',
           'bao' => 'CRM_PCP_BAO_PCPBlock',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Radio',
           ) ,
@@ -247,6 +254,7 @@ class CRM_PCP_DAO_PCPBlock extends CRM_Core_DAO {
           'table_name' => 'civicrm_pcp_block',
           'entity' => 'PCPBlock',
           'bao' => 'CRM_PCP_BAO_PCPBlock',
+          'localizable' => 0,
         ) ,
         'is_tellfriend_enabled' => array(
           'name' => 'is_tellfriend_enabled',
@@ -257,6 +265,7 @@ class CRM_PCP_DAO_PCPBlock extends CRM_Core_DAO {
           'table_name' => 'civicrm_pcp_block',
           'entity' => 'PCPBlock',
           'bao' => 'CRM_PCP_BAO_PCPBlock',
+          'localizable' => 0,
         ) ,
         'tellfriend_limit' => array(
           'name' => 'tellfriend_limit',
@@ -267,6 +276,7 @@ class CRM_PCP_DAO_PCPBlock extends CRM_Core_DAO {
           'table_name' => 'civicrm_pcp_block',
           'entity' => 'PCPBlock',
           'bao' => 'CRM_PCP_BAO_PCPBlock',
+          'localizable' => 0,
         ) ,
         'link_text' => array(
           'name' => 'link_text',
@@ -279,6 +289,7 @@ class CRM_PCP_DAO_PCPBlock extends CRM_Core_DAO {
           'table_name' => 'civicrm_pcp_block',
           'entity' => 'PCPBlock',
           'bao' => 'CRM_PCP_BAO_PCPBlock',
+          'localizable' => 1,
         ) ,
         'is_active' => array(
           'name' => 'is_active',
@@ -289,6 +300,7 @@ class CRM_PCP_DAO_PCPBlock extends CRM_Core_DAO {
           'table_name' => 'civicrm_pcp_block',
           'entity' => 'PCPBlock',
           'bao' => 'CRM_PCP_BAO_PCPBlock',
+          'localizable' => 0,
         ) ,
         'notify_email' => array(
           'name' => 'notify_email',
@@ -301,6 +313,7 @@ class CRM_PCP_DAO_PCPBlock extends CRM_Core_DAO {
           'table_name' => 'civicrm_pcp_block',
           'entity' => 'PCPBlock',
           'bao' => 'CRM_PCP_BAO_PCPBlock',
+          'localizable' => 0,
         ) ,
       );
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);
@@ -356,5 +369,12 @@ class CRM_PCP_DAO_PCPBlock extends CRM_Core_DAO {
   static function &export($prefix = false) {
     $r = CRM_Core_DAO_AllCoreTables::getExports(__CLASS__, 'pcp_block', $prefix, array());
     return $r;
+  }
+  /**
+   * Returns the list of indices
+   */
+  public static function indices($localize = TRUE) {
+    $indices = array();
+    return ($localize && !empty($indices)) ? CRM_Core_DAO_AllCoreTables::multilingualize(__CLASS__, $indices) : $indices;
   }
 }

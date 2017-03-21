@@ -167,6 +167,7 @@ class CRM_Member_DAO_MembershipBlock extends CRM_Core_DAO {
           'table_name' => 'civicrm_membership_block',
           'entity' => 'MembershipBlock',
           'bao' => 'CRM_Member_BAO_MembershipBlock',
+          'localizable' => 0,
         ) ,
         'entity_table' => array(
           'name' => 'entity_table',
@@ -178,6 +179,7 @@ class CRM_Member_DAO_MembershipBlock extends CRM_Core_DAO {
           'table_name' => 'civicrm_membership_block',
           'entity' => 'MembershipBlock',
           'bao' => 'CRM_Member_BAO_MembershipBlock',
+          'localizable' => 0,
         ) ,
         'entity_id' => array(
           'name' => 'entity_id',
@@ -188,6 +190,7 @@ class CRM_Member_DAO_MembershipBlock extends CRM_Core_DAO {
           'table_name' => 'civicrm_membership_block',
           'entity' => 'MembershipBlock',
           'bao' => 'CRM_Member_BAO_MembershipBlock',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Contribute_DAO_ContributionPage',
         ) ,
         'membership_types' => array(
@@ -200,6 +203,7 @@ class CRM_Member_DAO_MembershipBlock extends CRM_Core_DAO {
           'table_name' => 'civicrm_membership_block',
           'entity' => 'MembershipBlock',
           'bao' => 'CRM_Member_BAO_MembershipBlock',
+          'localizable' => 0,
         ) ,
         'membership_type_default' => array(
           'name' => 'membership_type_default',
@@ -209,6 +213,7 @@ class CRM_Member_DAO_MembershipBlock extends CRM_Core_DAO {
           'table_name' => 'civicrm_membership_block',
           'entity' => 'MembershipBlock',
           'bao' => 'CRM_Member_BAO_MembershipBlock',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Member_DAO_MembershipType',
         ) ,
         'display_min_fee' => array(
@@ -220,6 +225,7 @@ class CRM_Member_DAO_MembershipBlock extends CRM_Core_DAO {
           'table_name' => 'civicrm_membership_block',
           'entity' => 'MembershipBlock',
           'bao' => 'CRM_Member_BAO_MembershipBlock',
+          'localizable' => 0,
         ) ,
         'is_separate_payment' => array(
           'name' => 'is_separate_payment',
@@ -230,6 +236,7 @@ class CRM_Member_DAO_MembershipBlock extends CRM_Core_DAO {
           'table_name' => 'civicrm_membership_block',
           'entity' => 'MembershipBlock',
           'bao' => 'CRM_Member_BAO_MembershipBlock',
+          'localizable' => 0,
         ) ,
         'new_title' => array(
           'name' => 'new_title',
@@ -241,6 +248,7 @@ class CRM_Member_DAO_MembershipBlock extends CRM_Core_DAO {
           'table_name' => 'civicrm_membership_block',
           'entity' => 'MembershipBlock',
           'bao' => 'CRM_Member_BAO_MembershipBlock',
+          'localizable' => 1,
         ) ,
         'new_text' => array(
           'name' => 'new_text',
@@ -250,6 +258,7 @@ class CRM_Member_DAO_MembershipBlock extends CRM_Core_DAO {
           'table_name' => 'civicrm_membership_block',
           'entity' => 'MembershipBlock',
           'bao' => 'CRM_Member_BAO_MembershipBlock',
+          'localizable' => 1,
         ) ,
         'renewal_title' => array(
           'name' => 'renewal_title',
@@ -261,6 +270,7 @@ class CRM_Member_DAO_MembershipBlock extends CRM_Core_DAO {
           'table_name' => 'civicrm_membership_block',
           'entity' => 'MembershipBlock',
           'bao' => 'CRM_Member_BAO_MembershipBlock',
+          'localizable' => 1,
         ) ,
         'renewal_text' => array(
           'name' => 'renewal_text',
@@ -270,6 +280,7 @@ class CRM_Member_DAO_MembershipBlock extends CRM_Core_DAO {
           'table_name' => 'civicrm_membership_block',
           'entity' => 'MembershipBlock',
           'bao' => 'CRM_Member_BAO_MembershipBlock',
+          'localizable' => 1,
         ) ,
         'is_required' => array(
           'name' => 'is_required',
@@ -279,6 +290,7 @@ class CRM_Member_DAO_MembershipBlock extends CRM_Core_DAO {
           'table_name' => 'civicrm_membership_block',
           'entity' => 'MembershipBlock',
           'bao' => 'CRM_Member_BAO_MembershipBlock',
+          'localizable' => 0,
         ) ,
         'is_active' => array(
           'name' => 'is_active',
@@ -289,6 +301,7 @@ class CRM_Member_DAO_MembershipBlock extends CRM_Core_DAO {
           'table_name' => 'civicrm_membership_block',
           'entity' => 'MembershipBlock',
           'bao' => 'CRM_Member_BAO_MembershipBlock',
+          'localizable' => 0,
         ) ,
       );
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);
@@ -344,5 +357,12 @@ class CRM_Member_DAO_MembershipBlock extends CRM_Core_DAO {
   static function &export($prefix = false) {
     $r = CRM_Core_DAO_AllCoreTables::getExports(__CLASS__, 'membership_block', $prefix, array());
     return $r;
+  }
+  /**
+   * Returns the list of indices
+   */
+  public static function indices($localize = TRUE) {
+    $indices = array();
+    return ($localize && !empty($indices)) ? CRM_Core_DAO_AllCoreTables::multilingualize(__CLASS__, $indices) : $indices;
   }
 }

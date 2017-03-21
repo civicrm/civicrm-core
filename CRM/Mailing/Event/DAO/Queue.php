@@ -125,6 +125,7 @@ class CRM_Mailing_Event_DAO_Queue extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_event_queue',
           'entity' => 'Queue',
           'bao' => 'CRM_Mailing_Event_BAO_Queue',
+          'localizable' => 0,
         ) ,
         'job_id' => array(
           'name' => 'job_id',
@@ -135,6 +136,7 @@ class CRM_Mailing_Event_DAO_Queue extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_event_queue',
           'entity' => 'Queue',
           'bao' => 'CRM_Mailing_Event_BAO_Queue',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Mailing_DAO_MailingJob',
         ) ,
         'email_id' => array(
@@ -146,6 +148,7 @@ class CRM_Mailing_Event_DAO_Queue extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_event_queue',
           'entity' => 'Queue',
           'bao' => 'CRM_Mailing_Event_BAO_Queue',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Core_DAO_Email',
         ) ,
         'contact_id' => array(
@@ -157,6 +160,7 @@ class CRM_Mailing_Event_DAO_Queue extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_event_queue',
           'entity' => 'Queue',
           'bao' => 'CRM_Mailing_Event_BAO_Queue',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Contact_DAO_Contact',
         ) ,
         'hash' => array(
@@ -170,6 +174,7 @@ class CRM_Mailing_Event_DAO_Queue extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_event_queue',
           'entity' => 'Queue',
           'bao' => 'CRM_Mailing_Event_BAO_Queue',
+          'localizable' => 0,
         ) ,
         'phone_id' => array(
           'name' => 'phone_id',
@@ -180,6 +185,7 @@ class CRM_Mailing_Event_DAO_Queue extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_event_queue',
           'entity' => 'Queue',
           'bao' => 'CRM_Mailing_Event_BAO_Queue',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Core_DAO_Phone',
         ) ,
       );
@@ -236,5 +242,12 @@ class CRM_Mailing_Event_DAO_Queue extends CRM_Core_DAO {
   static function &export($prefix = false) {
     $r = CRM_Core_DAO_AllCoreTables::getExports(__CLASS__, 'mailing_event_queue', $prefix, array());
     return $r;
+  }
+  /**
+   * Returns the list of indices
+   */
+  public static function indices($localize = TRUE) {
+    $indices = array();
+    return ($localize && !empty($indices)) ? CRM_Core_DAO_AllCoreTables::multilingualize(__CLASS__, $indices) : $indices;
   }
 }

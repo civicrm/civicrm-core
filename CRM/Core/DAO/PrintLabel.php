@@ -152,6 +152,7 @@ class CRM_Core_DAO_PrintLabel extends CRM_Core_DAO {
           'table_name' => 'civicrm_print_label',
           'entity' => 'PrintLabel',
           'bao' => 'CRM_Core_DAO_PrintLabel',
+          'localizable' => 0,
         ) ,
         'title' => array(
           'name' => 'title',
@@ -163,6 +164,7 @@ class CRM_Core_DAO_PrintLabel extends CRM_Core_DAO {
           'table_name' => 'civicrm_print_label',
           'entity' => 'PrintLabel',
           'bao' => 'CRM_Core_DAO_PrintLabel',
+          'localizable' => 0,
         ) ,
         'name' => array(
           'name' => 'name',
@@ -174,6 +176,7 @@ class CRM_Core_DAO_PrintLabel extends CRM_Core_DAO {
           'table_name' => 'civicrm_print_label',
           'entity' => 'PrintLabel',
           'bao' => 'CRM_Core_DAO_PrintLabel',
+          'localizable' => 0,
         ) ,
         'description' => array(
           'name' => 'description',
@@ -183,6 +186,7 @@ class CRM_Core_DAO_PrintLabel extends CRM_Core_DAO {
           'table_name' => 'civicrm_print_label',
           'entity' => 'PrintLabel',
           'bao' => 'CRM_Core_DAO_PrintLabel',
+          'localizable' => 0,
         ) ,
         'label_format_name' => array(
           'name' => 'label_format_name',
@@ -194,6 +198,7 @@ class CRM_Core_DAO_PrintLabel extends CRM_Core_DAO {
           'table_name' => 'civicrm_print_label',
           'entity' => 'PrintLabel',
           'bao' => 'CRM_Core_DAO_PrintLabel',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -210,6 +215,7 @@ class CRM_Core_DAO_PrintLabel extends CRM_Core_DAO {
           'table_name' => 'civicrm_print_label',
           'entity' => 'PrintLabel',
           'bao' => 'CRM_Core_DAO_PrintLabel',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -226,6 +232,7 @@ class CRM_Core_DAO_PrintLabel extends CRM_Core_DAO {
           'table_name' => 'civicrm_print_label',
           'entity' => 'PrintLabel',
           'bao' => 'CRM_Core_DAO_PrintLabel',
+          'localizable' => 0,
         ) ,
         'is_default' => array(
           'name' => 'is_default',
@@ -236,6 +243,7 @@ class CRM_Core_DAO_PrintLabel extends CRM_Core_DAO {
           'table_name' => 'civicrm_print_label',
           'entity' => 'PrintLabel',
           'bao' => 'CRM_Core_DAO_PrintLabel',
+          'localizable' => 0,
         ) ,
         'is_active' => array(
           'name' => 'is_active',
@@ -246,6 +254,7 @@ class CRM_Core_DAO_PrintLabel extends CRM_Core_DAO {
           'table_name' => 'civicrm_print_label',
           'entity' => 'PrintLabel',
           'bao' => 'CRM_Core_DAO_PrintLabel',
+          'localizable' => 0,
         ) ,
         'is_reserved' => array(
           'name' => 'is_reserved',
@@ -256,6 +265,7 @@ class CRM_Core_DAO_PrintLabel extends CRM_Core_DAO {
           'table_name' => 'civicrm_print_label',
           'entity' => 'PrintLabel',
           'bao' => 'CRM_Core_DAO_PrintLabel',
+          'localizable' => 0,
         ) ,
         'created_id' => array(
           'name' => 'created_id',
@@ -265,6 +275,7 @@ class CRM_Core_DAO_PrintLabel extends CRM_Core_DAO {
           'table_name' => 'civicrm_print_label',
           'entity' => 'PrintLabel',
           'bao' => 'CRM_Core_DAO_PrintLabel',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Contact_DAO_Contact',
         ) ,
       );
@@ -321,5 +332,12 @@ class CRM_Core_DAO_PrintLabel extends CRM_Core_DAO {
   static function &export($prefix = false) {
     $r = CRM_Core_DAO_AllCoreTables::getExports(__CLASS__, 'print_label', $prefix, array());
     return $r;
+  }
+  /**
+   * Returns the list of indices
+   */
+  public static function indices($localize = TRUE) {
+    $indices = array();
+    return ($localize && !empty($indices)) ? CRM_Core_DAO_AllCoreTables::multilingualize(__CLASS__, $indices) : $indices;
   }
 }

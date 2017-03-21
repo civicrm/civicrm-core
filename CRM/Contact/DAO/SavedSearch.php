@@ -130,6 +130,7 @@ class CRM_Contact_DAO_SavedSearch extends CRM_Core_DAO {
           'table_name' => 'civicrm_saved_search',
           'entity' => 'SavedSearch',
           'bao' => 'CRM_Contact_BAO_SavedSearch',
+          'localizable' => 0,
         ) ,
         'form_values' => array(
           'name' => 'form_values',
@@ -144,6 +145,7 @@ class CRM_Contact_DAO_SavedSearch extends CRM_Core_DAO {
           'table_name' => 'civicrm_saved_search',
           'entity' => 'SavedSearch',
           'bao' => 'CRM_Contact_BAO_SavedSearch',
+          'localizable' => 0,
         ) ,
         'mapping_id' => array(
           'name' => 'mapping_id',
@@ -153,6 +155,7 @@ class CRM_Contact_DAO_SavedSearch extends CRM_Core_DAO {
           'table_name' => 'civicrm_saved_search',
           'entity' => 'SavedSearch',
           'bao' => 'CRM_Contact_BAO_SavedSearch',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Core_DAO_Mapping',
         ) ,
         'search_custom_id' => array(
@@ -163,6 +166,7 @@ class CRM_Contact_DAO_SavedSearch extends CRM_Core_DAO {
           'table_name' => 'civicrm_saved_search',
           'entity' => 'SavedSearch',
           'bao' => 'CRM_Contact_BAO_SavedSearch',
+          'localizable' => 0,
         ) ,
         'where_clause' => array(
           'name' => 'where_clause',
@@ -172,6 +176,7 @@ class CRM_Contact_DAO_SavedSearch extends CRM_Core_DAO {
           'table_name' => 'civicrm_saved_search',
           'entity' => 'SavedSearch',
           'bao' => 'CRM_Contact_BAO_SavedSearch',
+          'localizable' => 0,
         ) ,
         'select_tables' => array(
           'name' => 'select_tables',
@@ -181,6 +186,7 @@ class CRM_Contact_DAO_SavedSearch extends CRM_Core_DAO {
           'table_name' => 'civicrm_saved_search',
           'entity' => 'SavedSearch',
           'bao' => 'CRM_Contact_BAO_SavedSearch',
+          'localizable' => 0,
         ) ,
         'where_tables' => array(
           'name' => 'where_tables',
@@ -190,6 +196,7 @@ class CRM_Contact_DAO_SavedSearch extends CRM_Core_DAO {
           'table_name' => 'civicrm_saved_search',
           'entity' => 'SavedSearch',
           'bao' => 'CRM_Contact_BAO_SavedSearch',
+          'localizable' => 0,
         ) ,
       );
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);
@@ -245,5 +252,12 @@ class CRM_Contact_DAO_SavedSearch extends CRM_Core_DAO {
   static function &export($prefix = false) {
     $r = CRM_Core_DAO_AllCoreTables::getExports(__CLASS__, 'saved_search', $prefix, array());
     return $r;
+  }
+  /**
+   * Returns the list of indices
+   */
+  public static function indices($localize = TRUE) {
+    $indices = array();
+    return ($localize && !empty($indices)) ? CRM_Core_DAO_AllCoreTables::multilingualize(__CLASS__, $indices) : $indices;
   }
 }

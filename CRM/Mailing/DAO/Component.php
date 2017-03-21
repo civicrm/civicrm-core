@@ -119,6 +119,7 @@ class CRM_Mailing_DAO_Component extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_component',
           'entity' => 'Component',
           'bao' => 'CRM_Mailing_BAO_Component',
+          'localizable' => 0,
         ) ,
         'name' => array(
           'name' => 'name',
@@ -130,6 +131,7 @@ class CRM_Mailing_DAO_Component extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_component',
           'entity' => 'Component',
           'bao' => 'CRM_Mailing_BAO_Component',
+          'localizable' => 0,
         ) ,
         'component_type' => array(
           'name' => 'component_type',
@@ -141,6 +143,7 @@ class CRM_Mailing_DAO_Component extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_component',
           'entity' => 'Component',
           'bao' => 'CRM_Mailing_BAO_Component',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -157,6 +160,7 @@ class CRM_Mailing_DAO_Component extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_component',
           'entity' => 'Component',
           'bao' => 'CRM_Mailing_BAO_Component',
+          'localizable' => 0,
         ) ,
         'body_html' => array(
           'name' => 'body_html',
@@ -168,6 +172,7 @@ class CRM_Mailing_DAO_Component extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_component',
           'entity' => 'Component',
           'bao' => 'CRM_Mailing_BAO_Component',
+          'localizable' => 0,
           'html' => array(
             'type' => 'TextArea',
           ) ,
@@ -182,6 +187,7 @@ class CRM_Mailing_DAO_Component extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_component',
           'entity' => 'Component',
           'bao' => 'CRM_Mailing_BAO_Component',
+          'localizable' => 0,
           'html' => array(
             'type' => 'TextArea',
           ) ,
@@ -194,6 +200,7 @@ class CRM_Mailing_DAO_Component extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_component',
           'entity' => 'Component',
           'bao' => 'CRM_Mailing_BAO_Component',
+          'localizable' => 0,
         ) ,
         'is_active' => array(
           'name' => 'is_active',
@@ -203,6 +210,7 @@ class CRM_Mailing_DAO_Component extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_component',
           'entity' => 'Component',
           'bao' => 'CRM_Mailing_BAO_Component',
+          'localizable' => 0,
         ) ,
       );
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);
@@ -258,5 +266,12 @@ class CRM_Mailing_DAO_Component extends CRM_Core_DAO {
   static function &export($prefix = false) {
     $r = CRM_Core_DAO_AllCoreTables::getExports(__CLASS__, 'mailing_component', $prefix, array());
     return $r;
+  }
+  /**
+   * Returns the list of indices
+   */
+  public static function indices($localize = TRUE) {
+    $indices = array();
+    return ($localize && !empty($indices)) ? CRM_Core_DAO_AllCoreTables::multilingualize(__CLASS__, $indices) : $indices;
   }
 }

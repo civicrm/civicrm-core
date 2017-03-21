@@ -150,6 +150,7 @@ class CRM_Contribute_DAO_Premium extends CRM_Core_DAO {
           'table_name' => 'civicrm_premiums',
           'entity' => 'Premium',
           'bao' => 'CRM_Contribute_BAO_Premium',
+          'localizable' => 0,
         ) ,
         'entity_table' => array(
           'name' => 'entity_table',
@@ -162,6 +163,7 @@ class CRM_Contribute_DAO_Premium extends CRM_Core_DAO {
           'table_name' => 'civicrm_premiums',
           'entity' => 'Premium',
           'bao' => 'CRM_Contribute_BAO_Premium',
+          'localizable' => 0,
         ) ,
         'entity_id' => array(
           'name' => 'entity_id',
@@ -171,6 +173,7 @@ class CRM_Contribute_DAO_Premium extends CRM_Core_DAO {
           'table_name' => 'civicrm_premiums',
           'entity' => 'Premium',
           'bao' => 'CRM_Contribute_BAO_Premium',
+          'localizable' => 0,
         ) ,
         'premiums_active' => array(
           'name' => 'premiums_active',
@@ -181,6 +184,7 @@ class CRM_Contribute_DAO_Premium extends CRM_Core_DAO {
           'table_name' => 'civicrm_premiums',
           'entity' => 'Premium',
           'bao' => 'CRM_Contribute_BAO_Premium',
+          'localizable' => 0,
         ) ,
         'premiums_intro_title' => array(
           'name' => 'premiums_intro_title',
@@ -192,6 +196,7 @@ class CRM_Contribute_DAO_Premium extends CRM_Core_DAO {
           'table_name' => 'civicrm_premiums',
           'entity' => 'Premium',
           'bao' => 'CRM_Contribute_BAO_Premium',
+          'localizable' => 1,
         ) ,
         'premiums_intro_text' => array(
           'name' => 'premiums_intro_text',
@@ -201,6 +206,7 @@ class CRM_Contribute_DAO_Premium extends CRM_Core_DAO {
           'table_name' => 'civicrm_premiums',
           'entity' => 'Premium',
           'bao' => 'CRM_Contribute_BAO_Premium',
+          'localizable' => 1,
         ) ,
         'premiums_contact_email' => array(
           'name' => 'premiums_contact_email',
@@ -212,6 +218,7 @@ class CRM_Contribute_DAO_Premium extends CRM_Core_DAO {
           'table_name' => 'civicrm_premiums',
           'entity' => 'Premium',
           'bao' => 'CRM_Contribute_BAO_Premium',
+          'localizable' => 0,
         ) ,
         'premiums_contact_phone' => array(
           'name' => 'premiums_contact_phone',
@@ -223,6 +230,7 @@ class CRM_Contribute_DAO_Premium extends CRM_Core_DAO {
           'table_name' => 'civicrm_premiums',
           'entity' => 'Premium',
           'bao' => 'CRM_Contribute_BAO_Premium',
+          'localizable' => 0,
         ) ,
         'premiums_display_min_contribution' => array(
           'name' => 'premiums_display_min_contribution',
@@ -233,6 +241,7 @@ class CRM_Contribute_DAO_Premium extends CRM_Core_DAO {
           'table_name' => 'civicrm_premiums',
           'entity' => 'Premium',
           'bao' => 'CRM_Contribute_BAO_Premium',
+          'localizable' => 0,
         ) ,
         'premiums_nothankyou_label' => array(
           'name' => 'premiums_nothankyou_label',
@@ -244,6 +253,7 @@ class CRM_Contribute_DAO_Premium extends CRM_Core_DAO {
           'table_name' => 'civicrm_premiums',
           'entity' => 'Premium',
           'bao' => 'CRM_Contribute_BAO_Premium',
+          'localizable' => 1,
         ) ,
         'premiums_nothankyou_position' => array(
           'name' => 'premiums_nothankyou_position',
@@ -253,6 +263,7 @@ class CRM_Contribute_DAO_Premium extends CRM_Core_DAO {
           'table_name' => 'civicrm_premiums',
           'entity' => 'Premium',
           'bao' => 'CRM_Contribute_BAO_Premium',
+          'localizable' => 0,
         ) ,
       );
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);
@@ -308,5 +319,12 @@ class CRM_Contribute_DAO_Premium extends CRM_Core_DAO {
   static function &export($prefix = false) {
     $r = CRM_Core_DAO_AllCoreTables::getExports(__CLASS__, 'premiums', $prefix, array());
     return $r;
+  }
+  /**
+   * Returns the list of indices
+   */
+  public static function indices($localize = TRUE) {
+    $indices = array();
+    return ($localize && !empty($indices)) ? CRM_Core_DAO_AllCoreTables::multilingualize(__CLASS__, $indices) : $indices;
   }
 }

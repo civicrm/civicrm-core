@@ -192,6 +192,7 @@ class CRM_Price_DAO_PriceFieldValue extends CRM_Core_DAO {
           'table_name' => 'civicrm_price_field_value',
           'entity' => 'PriceFieldValue',
           'bao' => 'CRM_Price_BAO_PriceFieldValue',
+          'localizable' => 0,
         ) ,
         'price_field_id' => array(
           'name' => 'price_field_id',
@@ -202,6 +203,7 @@ class CRM_Price_DAO_PriceFieldValue extends CRM_Core_DAO {
           'table_name' => 'civicrm_price_field_value',
           'entity' => 'PriceFieldValue',
           'bao' => 'CRM_Price_BAO_PriceFieldValue',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Price_DAO_PriceField',
         ) ,
         'name' => array(
@@ -214,6 +216,7 @@ class CRM_Price_DAO_PriceFieldValue extends CRM_Core_DAO {
           'table_name' => 'civicrm_price_field_value',
           'entity' => 'PriceFieldValue',
           'bao' => 'CRM_Price_BAO_PriceFieldValue',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -228,6 +231,7 @@ class CRM_Price_DAO_PriceFieldValue extends CRM_Core_DAO {
           'table_name' => 'civicrm_price_field_value',
           'entity' => 'PriceFieldValue',
           'bao' => 'CRM_Price_BAO_PriceFieldValue',
+          'localizable' => 1,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -243,6 +247,7 @@ class CRM_Price_DAO_PriceFieldValue extends CRM_Core_DAO {
           'table_name' => 'civicrm_price_field_value',
           'entity' => 'PriceFieldValue',
           'bao' => 'CRM_Price_BAO_PriceFieldValue',
+          'localizable' => 1,
           'html' => array(
             'type' => 'TextArea',
           ) ,
@@ -258,6 +263,7 @@ class CRM_Price_DAO_PriceFieldValue extends CRM_Core_DAO {
           'table_name' => 'civicrm_price_field_value',
           'entity' => 'PriceFieldValue',
           'bao' => 'CRM_Price_BAO_PriceFieldValue',
+          'localizable' => 1,
           'html' => array(
             'type' => 'TextArea',
           ) ,
@@ -273,6 +279,7 @@ class CRM_Price_DAO_PriceFieldValue extends CRM_Core_DAO {
           'table_name' => 'civicrm_price_field_value',
           'entity' => 'PriceFieldValue',
           'bao' => 'CRM_Price_BAO_PriceFieldValue',
+          'localizable' => 1,
           'html' => array(
             'type' => 'TextArea',
           ) ,
@@ -288,6 +295,7 @@ class CRM_Price_DAO_PriceFieldValue extends CRM_Core_DAO {
           'table_name' => 'civicrm_price_field_value',
           'entity' => 'PriceFieldValue',
           'bao' => 'CRM_Price_BAO_PriceFieldValue',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -301,6 +309,7 @@ class CRM_Price_DAO_PriceFieldValue extends CRM_Core_DAO {
           'table_name' => 'civicrm_price_field_value',
           'entity' => 'PriceFieldValue',
           'bao' => 'CRM_Price_BAO_PriceFieldValue',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -314,6 +323,7 @@ class CRM_Price_DAO_PriceFieldValue extends CRM_Core_DAO {
           'table_name' => 'civicrm_price_field_value',
           'entity' => 'PriceFieldValue',
           'bao' => 'CRM_Price_BAO_PriceFieldValue',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -327,6 +337,7 @@ class CRM_Price_DAO_PriceFieldValue extends CRM_Core_DAO {
           'table_name' => 'civicrm_price_field_value',
           'entity' => 'PriceFieldValue',
           'bao' => 'CRM_Price_BAO_PriceFieldValue',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -340,6 +351,7 @@ class CRM_Price_DAO_PriceFieldValue extends CRM_Core_DAO {
           'table_name' => 'civicrm_price_field_value',
           'entity' => 'PriceFieldValue',
           'bao' => 'CRM_Price_BAO_PriceFieldValue',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Member_DAO_MembershipType',
           'html' => array(
             'type' => 'Select',
@@ -354,6 +366,7 @@ class CRM_Price_DAO_PriceFieldValue extends CRM_Core_DAO {
           'table_name' => 'civicrm_price_field_value',
           'entity' => 'PriceFieldValue',
           'bao' => 'CRM_Price_BAO_PriceFieldValue',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -366,6 +379,7 @@ class CRM_Price_DAO_PriceFieldValue extends CRM_Core_DAO {
           'table_name' => 'civicrm_price_field_value',
           'entity' => 'PriceFieldValue',
           'bao' => 'CRM_Price_BAO_PriceFieldValue',
+          'localizable' => 0,
           'html' => array(
             'type' => 'CheckBox',
           ) ,
@@ -379,6 +393,7 @@ class CRM_Price_DAO_PriceFieldValue extends CRM_Core_DAO {
           'table_name' => 'civicrm_price_field_value',
           'entity' => 'PriceFieldValue',
           'bao' => 'CRM_Price_BAO_PriceFieldValue',
+          'localizable' => 0,
         ) ,
         'financial_type_id' => array(
           'name' => 'financial_type_id',
@@ -389,6 +404,7 @@ class CRM_Price_DAO_PriceFieldValue extends CRM_Core_DAO {
           'table_name' => 'civicrm_price_field_value',
           'entity' => 'PriceFieldValue',
           'bao' => 'CRM_Price_BAO_PriceFieldValue',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Financial_DAO_FinancialType',
           'html' => array(
             'type' => 'Select',
@@ -413,6 +429,7 @@ class CRM_Price_DAO_PriceFieldValue extends CRM_Core_DAO {
           'table_name' => 'civicrm_price_field_value',
           'entity' => 'PriceFieldValue',
           'bao' => 'CRM_Price_BAO_PriceFieldValue',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -471,5 +488,12 @@ class CRM_Price_DAO_PriceFieldValue extends CRM_Core_DAO {
   static function &export($prefix = false) {
     $r = CRM_Core_DAO_AllCoreTables::getExports(__CLASS__, 'price_field_value', $prefix, array());
     return $r;
+  }
+  /**
+   * Returns the list of indices
+   */
+  public static function indices($localize = TRUE) {
+    $indices = array();
+    return ($localize && !empty($indices)) ? CRM_Core_DAO_AllCoreTables::multilingualize(__CLASS__, $indices) : $indices;
   }
 }

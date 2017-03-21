@@ -167,6 +167,7 @@ class CRM_Mailing_DAO_MailingAB extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_abtest',
           'entity' => 'MailingAB',
           'bao' => 'CRM_Mailing_BAO_MailingAB',
+          'localizable' => 0,
         ) ,
         'name' => array(
           'name' => 'name',
@@ -178,6 +179,7 @@ class CRM_Mailing_DAO_MailingAB extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_abtest',
           'entity' => 'MailingAB',
           'bao' => 'CRM_Mailing_BAO_MailingAB',
+          'localizable' => 0,
         ) ,
         'status' => array(
           'name' => 'status',
@@ -189,6 +191,7 @@ class CRM_Mailing_DAO_MailingAB extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_abtest',
           'entity' => 'MailingAB',
           'bao' => 'CRM_Mailing_BAO_MailingAB',
+          'localizable' => 0,
           'pseudoconstant' => array(
             'callback' => 'CRM_Mailing_PseudoConstant::abStatus',
           )
@@ -201,6 +204,7 @@ class CRM_Mailing_DAO_MailingAB extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_abtest',
           'entity' => 'MailingAB',
           'bao' => 'CRM_Mailing_BAO_MailingAB',
+          'localizable' => 0,
         ) ,
         'mailing_id_b' => array(
           'name' => 'mailing_id_b',
@@ -210,6 +214,7 @@ class CRM_Mailing_DAO_MailingAB extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_abtest',
           'entity' => 'MailingAB',
           'bao' => 'CRM_Mailing_BAO_MailingAB',
+          'localizable' => 0,
         ) ,
         'mailing_id_c' => array(
           'name' => 'mailing_id_c',
@@ -219,6 +224,7 @@ class CRM_Mailing_DAO_MailingAB extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_abtest',
           'entity' => 'MailingAB',
           'bao' => 'CRM_Mailing_BAO_MailingAB',
+          'localizable' => 0,
         ) ,
         'domain_id' => array(
           'name' => 'domain_id',
@@ -228,6 +234,7 @@ class CRM_Mailing_DAO_MailingAB extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_abtest',
           'entity' => 'MailingAB',
           'bao' => 'CRM_Mailing_BAO_MailingAB',
+          'localizable' => 0,
         ) ,
         'testing_criteria' => array(
           'name' => 'testing_criteria',
@@ -238,6 +245,7 @@ class CRM_Mailing_DAO_MailingAB extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_abtest',
           'entity' => 'MailingAB',
           'bao' => 'CRM_Mailing_BAO_MailingAB',
+          'localizable' => 0,
           'pseudoconstant' => array(
             'callback' => 'CRM_Mailing_PseudoConstant::abTestCriteria',
           )
@@ -251,6 +259,7 @@ class CRM_Mailing_DAO_MailingAB extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_abtest',
           'entity' => 'MailingAB',
           'bao' => 'CRM_Mailing_BAO_MailingAB',
+          'localizable' => 0,
           'pseudoconstant' => array(
             'callback' => 'CRM_Mailing_PseudoConstant::abWinnerCriteria',
           )
@@ -265,6 +274,7 @@ class CRM_Mailing_DAO_MailingAB extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_abtest',
           'entity' => 'MailingAB',
           'bao' => 'CRM_Mailing_BAO_MailingAB',
+          'localizable' => 0,
         ) ,
         'declare_winning_time' => array(
           'name' => 'declare_winning_time',
@@ -274,6 +284,7 @@ class CRM_Mailing_DAO_MailingAB extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_abtest',
           'entity' => 'MailingAB',
           'bao' => 'CRM_Mailing_BAO_MailingAB',
+          'localizable' => 0,
         ) ,
         'group_percentage' => array(
           'name' => 'group_percentage',
@@ -282,6 +293,7 @@ class CRM_Mailing_DAO_MailingAB extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_abtest',
           'entity' => 'MailingAB',
           'bao' => 'CRM_Mailing_BAO_MailingAB',
+          'localizable' => 0,
         ) ,
         'created_id' => array(
           'name' => 'created_id',
@@ -291,6 +303,7 @@ class CRM_Mailing_DAO_MailingAB extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_abtest',
           'entity' => 'MailingAB',
           'bao' => 'CRM_Mailing_BAO_MailingAB',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Contact_DAO_Contact',
         ) ,
         'created_date' => array(
@@ -301,6 +314,7 @@ class CRM_Mailing_DAO_MailingAB extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_abtest',
           'entity' => 'MailingAB',
           'bao' => 'CRM_Mailing_BAO_MailingAB',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select Date',
           ) ,
@@ -359,5 +373,12 @@ class CRM_Mailing_DAO_MailingAB extends CRM_Core_DAO {
   static function &export($prefix = false) {
     $r = CRM_Core_DAO_AllCoreTables::getExports(__CLASS__, 'mailing_abtest', $prefix, array());
     return $r;
+  }
+  /**
+   * Returns the list of indices
+   */
+  public static function indices($localize = TRUE) {
+    $indices = array();
+    return ($localize && !empty($indices)) ? CRM_Core_DAO_AllCoreTables::multilingualize(__CLASS__, $indices) : $indices;
   }
 }

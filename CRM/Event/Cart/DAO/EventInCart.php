@@ -107,6 +107,7 @@ class CRM_Event_Cart_DAO_EventInCart extends CRM_Core_DAO {
           'table_name' => 'civicrm_events_in_carts',
           'entity' => 'EventInCart',
           'bao' => 'CRM_Event_Cart_BAO_EventInCart',
+          'localizable' => 0,
         ) ,
         'event_id' => array(
           'name' => 'event_id',
@@ -116,6 +117,7 @@ class CRM_Event_Cart_DAO_EventInCart extends CRM_Core_DAO {
           'table_name' => 'civicrm_events_in_carts',
           'entity' => 'EventInCart',
           'bao' => 'CRM_Event_Cart_BAO_EventInCart',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Event_DAO_Event',
         ) ,
         'event_cart_id' => array(
@@ -126,6 +128,7 @@ class CRM_Event_Cart_DAO_EventInCart extends CRM_Core_DAO {
           'table_name' => 'civicrm_events_in_carts',
           'entity' => 'EventInCart',
           'bao' => 'CRM_Event_Cart_BAO_EventInCart',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Event_Cart_DAO_Cart',
         ) ,
       );
@@ -182,5 +185,12 @@ class CRM_Event_Cart_DAO_EventInCart extends CRM_Core_DAO {
   static function &export($prefix = false) {
     $r = CRM_Core_DAO_AllCoreTables::getExports(__CLASS__, 'events_in_carts', $prefix, array());
     return $r;
+  }
+  /**
+   * Returns the list of indices
+   */
+  public static function indices($localize = TRUE) {
+    $indices = array();
+    return ($localize && !empty($indices)) ? CRM_Core_DAO_AllCoreTables::multilingualize(__CLASS__, $indices) : $indices;
   }
 }

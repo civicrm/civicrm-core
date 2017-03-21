@@ -172,6 +172,7 @@ class CRM_Core_DAO_MailSettings extends CRM_Core_DAO {
           'table_name' => 'civicrm_mail_settings',
           'entity' => 'MailSettings',
           'bao' => 'CRM_Core_BAO_MailSettings',
+          'localizable' => 0,
         ) ,
         'domain_id' => array(
           'name' => 'domain_id',
@@ -182,6 +183,7 @@ class CRM_Core_DAO_MailSettings extends CRM_Core_DAO {
           'table_name' => 'civicrm_mail_settings',
           'entity' => 'MailSettings',
           'bao' => 'CRM_Core_BAO_MailSettings',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Core_DAO_Domain',
           'pseudoconstant' => array(
             'table' => 'civicrm_domain',
@@ -199,6 +201,7 @@ class CRM_Core_DAO_MailSettings extends CRM_Core_DAO {
           'table_name' => 'civicrm_mail_settings',
           'entity' => 'MailSettings',
           'bao' => 'CRM_Core_BAO_MailSettings',
+          'localizable' => 0,
         ) ,
         'is_default' => array(
           'name' => 'is_default',
@@ -208,6 +211,7 @@ class CRM_Core_DAO_MailSettings extends CRM_Core_DAO {
           'table_name' => 'civicrm_mail_settings',
           'entity' => 'MailSettings',
           'bao' => 'CRM_Core_BAO_MailSettings',
+          'localizable' => 0,
         ) ,
         'domain' => array(
           'name' => 'domain',
@@ -219,6 +223,7 @@ class CRM_Core_DAO_MailSettings extends CRM_Core_DAO {
           'table_name' => 'civicrm_mail_settings',
           'entity' => 'MailSettings',
           'bao' => 'CRM_Core_BAO_MailSettings',
+          'localizable' => 0,
         ) ,
         'localpart' => array(
           'name' => 'localpart',
@@ -230,6 +235,7 @@ class CRM_Core_DAO_MailSettings extends CRM_Core_DAO {
           'table_name' => 'civicrm_mail_settings',
           'entity' => 'MailSettings',
           'bao' => 'CRM_Core_BAO_MailSettings',
+          'localizable' => 0,
         ) ,
         'return_path' => array(
           'name' => 'return_path',
@@ -241,6 +247,7 @@ class CRM_Core_DAO_MailSettings extends CRM_Core_DAO {
           'table_name' => 'civicrm_mail_settings',
           'entity' => 'MailSettings',
           'bao' => 'CRM_Core_BAO_MailSettings',
+          'localizable' => 0,
         ) ,
         'protocol' => array(
           'name' => 'protocol',
@@ -252,6 +259,7 @@ class CRM_Core_DAO_MailSettings extends CRM_Core_DAO {
           'table_name' => 'civicrm_mail_settings',
           'entity' => 'MailSettings',
           'bao' => 'CRM_Core_BAO_MailSettings',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -270,6 +278,7 @@ class CRM_Core_DAO_MailSettings extends CRM_Core_DAO {
           'table_name' => 'civicrm_mail_settings',
           'entity' => 'MailSettings',
           'bao' => 'CRM_Core_BAO_MailSettings',
+          'localizable' => 0,
         ) ,
         'port' => array(
           'name' => 'port',
@@ -279,6 +288,7 @@ class CRM_Core_DAO_MailSettings extends CRM_Core_DAO {
           'table_name' => 'civicrm_mail_settings',
           'entity' => 'MailSettings',
           'bao' => 'CRM_Core_BAO_MailSettings',
+          'localizable' => 0,
         ) ,
         'username' => array(
           'name' => 'username',
@@ -290,6 +300,7 @@ class CRM_Core_DAO_MailSettings extends CRM_Core_DAO {
           'table_name' => 'civicrm_mail_settings',
           'entity' => 'MailSettings',
           'bao' => 'CRM_Core_BAO_MailSettings',
+          'localizable' => 0,
         ) ,
         'password' => array(
           'name' => 'password',
@@ -301,6 +312,7 @@ class CRM_Core_DAO_MailSettings extends CRM_Core_DAO {
           'table_name' => 'civicrm_mail_settings',
           'entity' => 'MailSettings',
           'bao' => 'CRM_Core_BAO_MailSettings',
+          'localizable' => 0,
         ) ,
         'is_ssl' => array(
           'name' => 'is_ssl',
@@ -310,6 +322,7 @@ class CRM_Core_DAO_MailSettings extends CRM_Core_DAO {
           'table_name' => 'civicrm_mail_settings',
           'entity' => 'MailSettings',
           'bao' => 'CRM_Core_BAO_MailSettings',
+          'localizable' => 0,
         ) ,
         'source' => array(
           'name' => 'source',
@@ -321,6 +334,7 @@ class CRM_Core_DAO_MailSettings extends CRM_Core_DAO {
           'table_name' => 'civicrm_mail_settings',
           'entity' => 'MailSettings',
           'bao' => 'CRM_Core_BAO_MailSettings',
+          'localizable' => 0,
         ) ,
       );
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);
@@ -376,5 +390,12 @@ class CRM_Core_DAO_MailSettings extends CRM_Core_DAO {
   static function &export($prefix = false) {
     $r = CRM_Core_DAO_AllCoreTables::getExports(__CLASS__, 'mail_settings', $prefix, array());
     return $r;
+  }
+  /**
+   * Returns the list of indices
+   */
+  public static function indices($localize = TRUE) {
+    $indices = array();
+    return ($localize && !empty($indices)) ? CRM_Core_DAO_AllCoreTables::multilingualize(__CLASS__, $indices) : $indices;
   }
 }

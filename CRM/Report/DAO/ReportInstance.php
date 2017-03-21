@@ -217,6 +217,7 @@ class CRM_Report_DAO_ReportInstance extends CRM_Core_DAO {
           'table_name' => 'civicrm_report_instance',
           'entity' => 'ReportInstance',
           'bao' => 'CRM_Report_BAO_ReportInstance',
+          'localizable' => 0,
         ) ,
         'domain_id' => array(
           'name' => 'domain_id',
@@ -227,6 +228,7 @@ class CRM_Report_DAO_ReportInstance extends CRM_Core_DAO {
           'table_name' => 'civicrm_report_instance',
           'entity' => 'ReportInstance',
           'bao' => 'CRM_Report_BAO_ReportInstance',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Core_DAO_Domain',
           'pseudoconstant' => array(
             'table' => 'civicrm_domain',
@@ -244,6 +246,7 @@ class CRM_Report_DAO_ReportInstance extends CRM_Core_DAO {
           'table_name' => 'civicrm_report_instance',
           'entity' => 'ReportInstance',
           'bao' => 'CRM_Report_BAO_ReportInstance',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -259,6 +262,7 @@ class CRM_Report_DAO_ReportInstance extends CRM_Core_DAO {
           'table_name' => 'civicrm_report_instance',
           'entity' => 'ReportInstance',
           'bao' => 'CRM_Report_BAO_ReportInstance',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -273,6 +277,7 @@ class CRM_Report_DAO_ReportInstance extends CRM_Core_DAO {
           'table_name' => 'civicrm_report_instance',
           'entity' => 'ReportInstance',
           'bao' => 'CRM_Report_BAO_ReportInstance',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -287,6 +292,7 @@ class CRM_Report_DAO_ReportInstance extends CRM_Core_DAO {
           'table_name' => 'civicrm_report_instance',
           'entity' => 'ReportInstance',
           'bao' => 'CRM_Report_BAO_ReportInstance',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -301,6 +307,7 @@ class CRM_Report_DAO_ReportInstance extends CRM_Core_DAO {
           'table_name' => 'civicrm_report_instance',
           'entity' => 'ReportInstance',
           'bao' => 'CRM_Report_BAO_ReportInstance',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -315,6 +322,7 @@ class CRM_Report_DAO_ReportInstance extends CRM_Core_DAO {
           'table_name' => 'civicrm_report_instance',
           'entity' => 'ReportInstance',
           'bao' => 'CRM_Report_BAO_ReportInstance',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -329,6 +337,7 @@ class CRM_Report_DAO_ReportInstance extends CRM_Core_DAO {
           'table_name' => 'civicrm_report_instance',
           'entity' => 'ReportInstance',
           'bao' => 'CRM_Report_BAO_ReportInstance',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -346,6 +355,7 @@ class CRM_Report_DAO_ReportInstance extends CRM_Core_DAO {
           'table_name' => 'civicrm_report_instance',
           'entity' => 'ReportInstance',
           'bao' => 'CRM_Report_BAO_ReportInstance',
+          'localizable' => 0,
         ) ,
         'is_active' => array(
           'name' => 'is_active',
@@ -355,6 +365,7 @@ class CRM_Report_DAO_ReportInstance extends CRM_Core_DAO {
           'table_name' => 'civicrm_report_instance',
           'entity' => 'ReportInstance',
           'bao' => 'CRM_Report_BAO_ReportInstance',
+          'localizable' => 0,
           'html' => array(
             'type' => 'CheckBox',
           ) ,
@@ -367,6 +378,7 @@ class CRM_Report_DAO_ReportInstance extends CRM_Core_DAO {
           'table_name' => 'civicrm_report_instance',
           'entity' => 'ReportInstance',
           'bao' => 'CRM_Report_BAO_ReportInstance',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Contact_DAO_Contact',
         ) ,
         'owner_id' => array(
@@ -377,6 +389,7 @@ class CRM_Report_DAO_ReportInstance extends CRM_Core_DAO {
           'table_name' => 'civicrm_report_instance',
           'entity' => 'ReportInstance',
           'bao' => 'CRM_Report_BAO_ReportInstance',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Contact_DAO_Contact',
         ) ,
         'email_subject' => array(
@@ -389,6 +402,7 @@ class CRM_Report_DAO_ReportInstance extends CRM_Core_DAO {
           'table_name' => 'civicrm_report_instance',
           'entity' => 'ReportInstance',
           'bao' => 'CRM_Report_BAO_ReportInstance',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -401,6 +415,7 @@ class CRM_Report_DAO_ReportInstance extends CRM_Core_DAO {
           'table_name' => 'civicrm_report_instance',
           'entity' => 'ReportInstance',
           'bao' => 'CRM_Report_BAO_ReportInstance',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -413,6 +428,7 @@ class CRM_Report_DAO_ReportInstance extends CRM_Core_DAO {
           'table_name' => 'civicrm_report_instance',
           'entity' => 'ReportInstance',
           'bao' => 'CRM_Report_BAO_ReportInstance',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -427,6 +443,7 @@ class CRM_Report_DAO_ReportInstance extends CRM_Core_DAO {
           'table_name' => 'civicrm_report_instance',
           'entity' => 'ReportInstance',
           'bao' => 'CRM_Report_BAO_ReportInstance',
+          'localizable' => 0,
           'html' => array(
             'type' => 'TextArea',
           ) ,
@@ -441,6 +458,7 @@ class CRM_Report_DAO_ReportInstance extends CRM_Core_DAO {
           'table_name' => 'civicrm_report_instance',
           'entity' => 'ReportInstance',
           'bao' => 'CRM_Report_BAO_ReportInstance',
+          'localizable' => 0,
           'html' => array(
             'type' => 'TextArea',
           ) ,
@@ -458,6 +476,7 @@ class CRM_Report_DAO_ReportInstance extends CRM_Core_DAO {
           'table_name' => 'civicrm_report_instance',
           'entity' => 'ReportInstance',
           'bao' => 'CRM_Report_BAO_ReportInstance',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Core_DAO_Navigation',
         ) ,
         'drilldown_id' => array(
@@ -473,6 +492,7 @@ class CRM_Report_DAO_ReportInstance extends CRM_Core_DAO {
           'table_name' => 'civicrm_report_instance',
           'entity' => 'ReportInstance',
           'bao' => 'CRM_Report_BAO_ReportInstance',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Report_DAO_ReportInstance',
         ) ,
         'is_reserved' => array(
@@ -482,6 +502,7 @@ class CRM_Report_DAO_ReportInstance extends CRM_Core_DAO {
           'table_name' => 'civicrm_report_instance',
           'entity' => 'ReportInstance',
           'bao' => 'CRM_Report_BAO_ReportInstance',
+          'localizable' => 0,
           'html' => array(
             'type' => 'CheckBox',
           ) ,
@@ -540,5 +561,12 @@ class CRM_Report_DAO_ReportInstance extends CRM_Core_DAO {
   static function &export($prefix = false) {
     $r = CRM_Core_DAO_AllCoreTables::getExports(__CLASS__, 'report_instance', $prefix, array());
     return $r;
+  }
+  /**
+   * Returns the list of indices
+   */
+  public static function indices($localize = TRUE) {
+    $indices = array();
+    return ($localize && !empty($indices)) ? CRM_Core_DAO_AllCoreTables::multilingualize(__CLASS__, $indices) : $indices;
   }
 }

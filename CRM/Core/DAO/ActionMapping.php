@@ -126,6 +126,7 @@ class CRM_Core_DAO_ActionMapping extends CRM_Core_DAO {
           'table_name' => 'civicrm_action_mapping',
           'entity' => 'ActionMapping',
           'bao' => 'CRM_Core_DAO_ActionMapping',
+          'localizable' => 0,
         ) ,
         'entity' => array(
           'name' => 'entity',
@@ -137,6 +138,7 @@ class CRM_Core_DAO_ActionMapping extends CRM_Core_DAO {
           'table_name' => 'civicrm_action_mapping',
           'entity' => 'ActionMapping',
           'bao' => 'CRM_Core_DAO_ActionMapping',
+          'localizable' => 0,
         ) ,
         'entity_value' => array(
           'name' => 'entity_value',
@@ -148,6 +150,7 @@ class CRM_Core_DAO_ActionMapping extends CRM_Core_DAO {
           'table_name' => 'civicrm_action_mapping',
           'entity' => 'ActionMapping',
           'bao' => 'CRM_Core_DAO_ActionMapping',
+          'localizable' => 0,
         ) ,
         'entity_value_label' => array(
           'name' => 'entity_value_label',
@@ -159,6 +162,7 @@ class CRM_Core_DAO_ActionMapping extends CRM_Core_DAO {
           'table_name' => 'civicrm_action_mapping',
           'entity' => 'ActionMapping',
           'bao' => 'CRM_Core_DAO_ActionMapping',
+          'localizable' => 0,
         ) ,
         'entity_status' => array(
           'name' => 'entity_status',
@@ -170,6 +174,7 @@ class CRM_Core_DAO_ActionMapping extends CRM_Core_DAO {
           'table_name' => 'civicrm_action_mapping',
           'entity' => 'ActionMapping',
           'bao' => 'CRM_Core_DAO_ActionMapping',
+          'localizable' => 0,
         ) ,
         'entity_status_label' => array(
           'name' => 'entity_status_label',
@@ -181,6 +186,7 @@ class CRM_Core_DAO_ActionMapping extends CRM_Core_DAO {
           'table_name' => 'civicrm_action_mapping',
           'entity' => 'ActionMapping',
           'bao' => 'CRM_Core_DAO_ActionMapping',
+          'localizable' => 0,
         ) ,
         'entity_date_start' => array(
           'name' => 'entity_date_start',
@@ -192,6 +198,7 @@ class CRM_Core_DAO_ActionMapping extends CRM_Core_DAO {
           'table_name' => 'civicrm_action_mapping',
           'entity' => 'ActionMapping',
           'bao' => 'CRM_Core_DAO_ActionMapping',
+          'localizable' => 0,
         ) ,
         'entity_date_end' => array(
           'name' => 'entity_date_end',
@@ -203,6 +210,7 @@ class CRM_Core_DAO_ActionMapping extends CRM_Core_DAO {
           'table_name' => 'civicrm_action_mapping',
           'entity' => 'ActionMapping',
           'bao' => 'CRM_Core_DAO_ActionMapping',
+          'localizable' => 0,
         ) ,
         'entity_recipient' => array(
           'name' => 'entity_recipient',
@@ -214,6 +222,7 @@ class CRM_Core_DAO_ActionMapping extends CRM_Core_DAO {
           'table_name' => 'civicrm_action_mapping',
           'entity' => 'ActionMapping',
           'bao' => 'CRM_Core_DAO_ActionMapping',
+          'localizable' => 0,
         ) ,
       );
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);
@@ -269,5 +278,12 @@ class CRM_Core_DAO_ActionMapping extends CRM_Core_DAO {
   static function &export($prefix = false) {
     $r = CRM_Core_DAO_AllCoreTables::getExports(__CLASS__, 'action_mapping', $prefix, array());
     return $r;
+  }
+  /**
+   * Returns the list of indices
+   */
+  public static function indices($localize = TRUE) {
+    $indices = array();
+    return ($localize && !empty($indices)) ? CRM_Core_DAO_AllCoreTables::multilingualize(__CLASS__, $indices) : $indices;
   }
 }

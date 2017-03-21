@@ -107,6 +107,7 @@ class CRM_Contact_DAO_GroupNesting extends CRM_Core_DAO {
           'table_name' => 'civicrm_group_nesting',
           'entity' => 'GroupNesting',
           'bao' => 'CRM_Contact_BAO_GroupNesting',
+          'localizable' => 0,
         ) ,
         'child_group_id' => array(
           'name' => 'child_group_id',
@@ -117,6 +118,7 @@ class CRM_Contact_DAO_GroupNesting extends CRM_Core_DAO {
           'table_name' => 'civicrm_group_nesting',
           'entity' => 'GroupNesting',
           'bao' => 'CRM_Contact_BAO_GroupNesting',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Contact_DAO_Group',
         ) ,
         'parent_group_id' => array(
@@ -128,6 +130,7 @@ class CRM_Contact_DAO_GroupNesting extends CRM_Core_DAO {
           'table_name' => 'civicrm_group_nesting',
           'entity' => 'GroupNesting',
           'bao' => 'CRM_Contact_BAO_GroupNesting',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Contact_DAO_Group',
         ) ,
       );
@@ -184,5 +187,12 @@ class CRM_Contact_DAO_GroupNesting extends CRM_Core_DAO {
   static function &export($prefix = false) {
     $r = CRM_Core_DAO_AllCoreTables::getExports(__CLASS__, 'group_nesting', $prefix, array());
     return $r;
+  }
+  /**
+   * Returns the list of indices
+   */
+  public static function indices($localize = TRUE) {
+    $indices = array();
+    return ($localize && !empty($indices)) ? CRM_Core_DAO_AllCoreTables::multilingualize(__CLASS__, $indices) : $indices;
   }
 }

@@ -117,6 +117,7 @@ class CRM_Mailing_Event_DAO_Subscribe extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_event_subscribe',
           'entity' => 'Subscribe',
           'bao' => 'CRM_Mailing_Event_BAO_Subscribe',
+          'localizable' => 0,
         ) ,
         'group_id' => array(
           'name' => 'group_id',
@@ -127,6 +128,7 @@ class CRM_Mailing_Event_DAO_Subscribe extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_event_subscribe',
           'entity' => 'Subscribe',
           'bao' => 'CRM_Mailing_Event_BAO_Subscribe',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Contact_DAO_Group',
           'html' => array(
             'type' => 'Select',
@@ -146,6 +148,7 @@ class CRM_Mailing_Event_DAO_Subscribe extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_event_subscribe',
           'entity' => 'Subscribe',
           'bao' => 'CRM_Mailing_Event_BAO_Subscribe',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Contact_DAO_Contact',
         ) ,
         'hash' => array(
@@ -159,6 +162,7 @@ class CRM_Mailing_Event_DAO_Subscribe extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_event_subscribe',
           'entity' => 'Subscribe',
           'bao' => 'CRM_Mailing_Event_BAO_Subscribe',
+          'localizable' => 0,
         ) ,
         'time_stamp' => array(
           'name' => 'time_stamp',
@@ -169,6 +173,7 @@ class CRM_Mailing_Event_DAO_Subscribe extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_event_subscribe',
           'entity' => 'Subscribe',
           'bao' => 'CRM_Mailing_Event_BAO_Subscribe',
+          'localizable' => 0,
         ) ,
       );
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);
@@ -224,5 +229,12 @@ class CRM_Mailing_Event_DAO_Subscribe extends CRM_Core_DAO {
   static function &export($prefix = false) {
     $r = CRM_Core_DAO_AllCoreTables::getExports(__CLASS__, 'mailing_event_subscribe', $prefix, array());
     return $r;
+  }
+  /**
+   * Returns the list of indices
+   */
+  public static function indices($localize = TRUE) {
+    $indices = array();
+    return ($localize && !empty($indices)) ? CRM_Core_DAO_AllCoreTables::multilingualize(__CLASS__, $indices) : $indices;
   }
 }

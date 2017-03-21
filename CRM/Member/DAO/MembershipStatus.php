@@ -163,6 +163,7 @@ class CRM_Member_DAO_MembershipStatus extends CRM_Core_DAO {
           'table_name' => 'civicrm_membership_status',
           'entity' => 'MembershipStatus',
           'bao' => 'CRM_Member_BAO_MembershipStatus',
+          'localizable' => 0,
         ) ,
         'membership_status' => array(
           'name' => 'name',
@@ -179,6 +180,7 @@ class CRM_Member_DAO_MembershipStatus extends CRM_Core_DAO {
           'table_name' => 'civicrm_membership_status',
           'entity' => 'MembershipStatus',
           'bao' => 'CRM_Member_BAO_MembershipStatus',
+          'localizable' => 0,
         ) ,
         'label' => array(
           'name' => 'label',
@@ -190,6 +192,7 @@ class CRM_Member_DAO_MembershipStatus extends CRM_Core_DAO {
           'table_name' => 'civicrm_membership_status',
           'entity' => 'MembershipStatus',
           'bao' => 'CRM_Member_BAO_MembershipStatus',
+          'localizable' => 1,
         ) ,
         'start_event' => array(
           'name' => 'start_event',
@@ -201,6 +204,7 @@ class CRM_Member_DAO_MembershipStatus extends CRM_Core_DAO {
           'table_name' => 'civicrm_membership_status',
           'entity' => 'MembershipStatus',
           'bao' => 'CRM_Member_BAO_MembershipStatus',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -218,6 +222,7 @@ class CRM_Member_DAO_MembershipStatus extends CRM_Core_DAO {
           'table_name' => 'civicrm_membership_status',
           'entity' => 'MembershipStatus',
           'bao' => 'CRM_Member_BAO_MembershipStatus',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -233,6 +238,7 @@ class CRM_Member_DAO_MembershipStatus extends CRM_Core_DAO {
           'table_name' => 'civicrm_membership_status',
           'entity' => 'MembershipStatus',
           'bao' => 'CRM_Member_BAO_MembershipStatus',
+          'localizable' => 0,
         ) ,
         'end_event' => array(
           'name' => 'end_event',
@@ -244,6 +250,7 @@ class CRM_Member_DAO_MembershipStatus extends CRM_Core_DAO {
           'table_name' => 'civicrm_membership_status',
           'entity' => 'MembershipStatus',
           'bao' => 'CRM_Member_BAO_MembershipStatus',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -261,6 +268,7 @@ class CRM_Member_DAO_MembershipStatus extends CRM_Core_DAO {
           'table_name' => 'civicrm_membership_status',
           'entity' => 'MembershipStatus',
           'bao' => 'CRM_Member_BAO_MembershipStatus',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -276,6 +284,7 @@ class CRM_Member_DAO_MembershipStatus extends CRM_Core_DAO {
           'table_name' => 'civicrm_membership_status',
           'entity' => 'MembershipStatus',
           'bao' => 'CRM_Member_BAO_MembershipStatus',
+          'localizable' => 0,
         ) ,
         'is_current_member' => array(
           'name' => 'is_current_member',
@@ -285,6 +294,7 @@ class CRM_Member_DAO_MembershipStatus extends CRM_Core_DAO {
           'table_name' => 'civicrm_membership_status',
           'entity' => 'MembershipStatus',
           'bao' => 'CRM_Member_BAO_MembershipStatus',
+          'localizable' => 0,
         ) ,
         'is_admin' => array(
           'name' => 'is_admin',
@@ -294,6 +304,7 @@ class CRM_Member_DAO_MembershipStatus extends CRM_Core_DAO {
           'table_name' => 'civicrm_membership_status',
           'entity' => 'MembershipStatus',
           'bao' => 'CRM_Member_BAO_MembershipStatus',
+          'localizable' => 0,
         ) ,
         'weight' => array(
           'name' => 'weight',
@@ -302,6 +313,7 @@ class CRM_Member_DAO_MembershipStatus extends CRM_Core_DAO {
           'table_name' => 'civicrm_membership_status',
           'entity' => 'MembershipStatus',
           'bao' => 'CRM_Member_BAO_MembershipStatus',
+          'localizable' => 0,
         ) ,
         'is_default' => array(
           'name' => 'is_default',
@@ -311,6 +323,7 @@ class CRM_Member_DAO_MembershipStatus extends CRM_Core_DAO {
           'table_name' => 'civicrm_membership_status',
           'entity' => 'MembershipStatus',
           'bao' => 'CRM_Member_BAO_MembershipStatus',
+          'localizable' => 0,
         ) ,
         'is_active' => array(
           'name' => 'is_active',
@@ -321,6 +334,7 @@ class CRM_Member_DAO_MembershipStatus extends CRM_Core_DAO {
           'table_name' => 'civicrm_membership_status',
           'entity' => 'MembershipStatus',
           'bao' => 'CRM_Member_BAO_MembershipStatus',
+          'localizable' => 0,
         ) ,
         'is_reserved' => array(
           'name' => 'is_reserved',
@@ -330,6 +344,7 @@ class CRM_Member_DAO_MembershipStatus extends CRM_Core_DAO {
           'table_name' => 'civicrm_membership_status',
           'entity' => 'MembershipStatus',
           'bao' => 'CRM_Member_BAO_MembershipStatus',
+          'localizable' => 0,
         ) ,
       );
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);
@@ -385,5 +400,12 @@ class CRM_Member_DAO_MembershipStatus extends CRM_Core_DAO {
   static function &export($prefix = false) {
     $r = CRM_Core_DAO_AllCoreTables::getExports(__CLASS__, 'membership_status', $prefix, array());
     return $r;
+  }
+  /**
+   * Returns the list of indices
+   */
+  public static function indices($localize = TRUE) {
+    $indices = array();
+    return ($localize && !empty($indices)) ? CRM_Core_DAO_AllCoreTables::multilingualize(__CLASS__, $indices) : $indices;
   }
 }

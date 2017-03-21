@@ -119,6 +119,7 @@ class CRM_Financial_DAO_EntityFinancialAccount extends CRM_Core_DAO {
           'table_name' => 'civicrm_entity_financial_account',
           'entity' => 'EntityFinancialAccount',
           'bao' => 'CRM_Financial_DAO_EntityFinancialAccount',
+          'localizable' => 0,
         ) ,
         'entity_table' => array(
           'name' => 'entity_table',
@@ -136,6 +137,7 @@ class CRM_Financial_DAO_EntityFinancialAccount extends CRM_Core_DAO {
           'table_name' => 'civicrm_entity_financial_account',
           'entity' => 'EntityFinancialAccount',
           'bao' => 'CRM_Financial_DAO_EntityFinancialAccount',
+          'localizable' => 0,
         ) ,
         'entity_id' => array(
           'name' => 'entity_id',
@@ -146,6 +148,7 @@ class CRM_Financial_DAO_EntityFinancialAccount extends CRM_Core_DAO {
           'table_name' => 'civicrm_entity_financial_account',
           'entity' => 'EntityFinancialAccount',
           'bao' => 'CRM_Financial_DAO_EntityFinancialAccount',
+          'localizable' => 0,
         ) ,
         'account_relationship' => array(
           'name' => 'account_relationship',
@@ -156,6 +159,7 @@ class CRM_Financial_DAO_EntityFinancialAccount extends CRM_Core_DAO {
           'table_name' => 'civicrm_entity_financial_account',
           'entity' => 'EntityFinancialAccount',
           'bao' => 'CRM_Financial_DAO_EntityFinancialAccount',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -173,6 +177,7 @@ class CRM_Financial_DAO_EntityFinancialAccount extends CRM_Core_DAO {
           'table_name' => 'civicrm_entity_financial_account',
           'entity' => 'EntityFinancialAccount',
           'bao' => 'CRM_Financial_DAO_EntityFinancialAccount',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Financial_DAO_FinancialAccount',
           'html' => array(
             'type' => 'Select',
@@ -237,5 +242,12 @@ class CRM_Financial_DAO_EntityFinancialAccount extends CRM_Core_DAO {
   static function &export($prefix = false) {
     $r = CRM_Core_DAO_AllCoreTables::getExports(__CLASS__, 'entity_financial_account', $prefix, array());
     return $r;
+  }
+  /**
+   * Returns the list of indices
+   */
+  public static function indices($localize = TRUE) {
+    $indices = array();
+    return ($localize && !empty($indices)) ? CRM_Core_DAO_AllCoreTables::multilingualize(__CLASS__, $indices) : $indices;
   }
 }

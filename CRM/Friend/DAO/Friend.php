@@ -146,6 +146,7 @@ class CRM_Friend_DAO_Friend extends CRM_Core_DAO {
           'table_name' => 'civicrm_tell_friend',
           'entity' => 'Friend',
           'bao' => 'CRM_Friend_BAO_Friend',
+          'localizable' => 0,
         ) ,
         'entity_table' => array(
           'name' => 'entity_table',
@@ -158,6 +159,7 @@ class CRM_Friend_DAO_Friend extends CRM_Core_DAO {
           'table_name' => 'civicrm_tell_friend',
           'entity' => 'Friend',
           'bao' => 'CRM_Friend_BAO_Friend',
+          'localizable' => 0,
         ) ,
         'entity_id' => array(
           'name' => 'entity_id',
@@ -168,6 +170,7 @@ class CRM_Friend_DAO_Friend extends CRM_Core_DAO {
           'table_name' => 'civicrm_tell_friend',
           'entity' => 'Friend',
           'bao' => 'CRM_Friend_BAO_Friend',
+          'localizable' => 0,
         ) ,
         'title' => array(
           'name' => 'title',
@@ -178,6 +181,7 @@ class CRM_Friend_DAO_Friend extends CRM_Core_DAO {
           'table_name' => 'civicrm_tell_friend',
           'entity' => 'Friend',
           'bao' => 'CRM_Friend_BAO_Friend',
+          'localizable' => 1,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -190,6 +194,7 @@ class CRM_Friend_DAO_Friend extends CRM_Core_DAO {
           'table_name' => 'civicrm_tell_friend',
           'entity' => 'Friend',
           'bao' => 'CRM_Friend_BAO_Friend',
+          'localizable' => 1,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -202,6 +207,7 @@ class CRM_Friend_DAO_Friend extends CRM_Core_DAO {
           'table_name' => 'civicrm_tell_friend',
           'entity' => 'Friend',
           'bao' => 'CRM_Friend_BAO_Friend',
+          'localizable' => 1,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -221,6 +227,7 @@ class CRM_Friend_DAO_Friend extends CRM_Core_DAO {
           'table_name' => 'civicrm_tell_friend',
           'entity' => 'Friend',
           'bao' => 'CRM_Friend_BAO_Friend',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -235,6 +242,7 @@ class CRM_Friend_DAO_Friend extends CRM_Core_DAO {
           'table_name' => 'civicrm_tell_friend',
           'entity' => 'Friend',
           'bao' => 'CRM_Friend_BAO_Friend',
+          'localizable' => 1,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -247,6 +255,7 @@ class CRM_Friend_DAO_Friend extends CRM_Core_DAO {
           'table_name' => 'civicrm_tell_friend',
           'entity' => 'Friend',
           'bao' => 'CRM_Friend_BAO_Friend',
+          'localizable' => 1,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -258,6 +267,7 @@ class CRM_Friend_DAO_Friend extends CRM_Core_DAO {
           'table_name' => 'civicrm_tell_friend',
           'entity' => 'Friend',
           'bao' => 'CRM_Friend_BAO_Friend',
+          'localizable' => 0,
           'html' => array(
             'type' => 'CheckBox',
           ) ,
@@ -316,5 +326,12 @@ class CRM_Friend_DAO_Friend extends CRM_Core_DAO {
   static function &export($prefix = false) {
     $r = CRM_Core_DAO_AllCoreTables::getExports(__CLASS__, 'tell_friend', $prefix, array());
     return $r;
+  }
+  /**
+   * Returns the list of indices
+   */
+  public static function indices($localize = TRUE) {
+    $indices = array();
+    return ($localize && !empty($indices)) ? CRM_Core_DAO_AllCoreTables::multilingualize(__CLASS__, $indices) : $indices;
   }
 }

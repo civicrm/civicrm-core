@@ -139,6 +139,7 @@ class CRM_Core_DAO_MessageTemplate extends CRM_Core_DAO {
           'table_name' => 'civicrm_msg_template',
           'entity' => 'MessageTemplate',
           'bao' => 'CRM_Core_BAO_MessageTemplate',
+          'localizable' => 0,
         ) ,
         'msg_title' => array(
           'name' => 'msg_title',
@@ -150,6 +151,7 @@ class CRM_Core_DAO_MessageTemplate extends CRM_Core_DAO {
           'table_name' => 'civicrm_msg_template',
           'entity' => 'MessageTemplate',
           'bao' => 'CRM_Core_BAO_MessageTemplate',
+          'localizable' => 0,
         ) ,
         'msg_subject' => array(
           'name' => 'msg_subject',
@@ -159,6 +161,7 @@ class CRM_Core_DAO_MessageTemplate extends CRM_Core_DAO {
           'table_name' => 'civicrm_msg_template',
           'entity' => 'MessageTemplate',
           'bao' => 'CRM_Core_BAO_MessageTemplate',
+          'localizable' => 0,
         ) ,
         'msg_text' => array(
           'name' => 'msg_text',
@@ -168,6 +171,7 @@ class CRM_Core_DAO_MessageTemplate extends CRM_Core_DAO {
           'table_name' => 'civicrm_msg_template',
           'entity' => 'MessageTemplate',
           'bao' => 'CRM_Core_BAO_MessageTemplate',
+          'localizable' => 0,
           'html' => array(
             'type' => 'TextArea',
           ) ,
@@ -180,6 +184,7 @@ class CRM_Core_DAO_MessageTemplate extends CRM_Core_DAO {
           'table_name' => 'civicrm_msg_template',
           'entity' => 'MessageTemplate',
           'bao' => 'CRM_Core_BAO_MessageTemplate',
+          'localizable' => 0,
           'html' => array(
             'type' => 'RichTextEditor',
           ) ,
@@ -192,6 +197,7 @@ class CRM_Core_DAO_MessageTemplate extends CRM_Core_DAO {
           'table_name' => 'civicrm_msg_template',
           'entity' => 'MessageTemplate',
           'bao' => 'CRM_Core_BAO_MessageTemplate',
+          'localizable' => 0,
         ) ,
         'workflow_id' => array(
           'name' => 'workflow_id',
@@ -201,6 +207,7 @@ class CRM_Core_DAO_MessageTemplate extends CRM_Core_DAO {
           'table_name' => 'civicrm_msg_template',
           'entity' => 'MessageTemplate',
           'bao' => 'CRM_Core_BAO_MessageTemplate',
+          'localizable' => 0,
         ) ,
         'is_default' => array(
           'name' => 'is_default',
@@ -211,6 +218,7 @@ class CRM_Core_DAO_MessageTemplate extends CRM_Core_DAO {
           'table_name' => 'civicrm_msg_template',
           'entity' => 'MessageTemplate',
           'bao' => 'CRM_Core_BAO_MessageTemplate',
+          'localizable' => 0,
         ) ,
         'is_reserved' => array(
           'name' => 'is_reserved',
@@ -220,6 +228,7 @@ class CRM_Core_DAO_MessageTemplate extends CRM_Core_DAO {
           'table_name' => 'civicrm_msg_template',
           'entity' => 'MessageTemplate',
           'bao' => 'CRM_Core_BAO_MessageTemplate',
+          'localizable' => 0,
         ) ,
         'is_sms' => array(
           'name' => 'is_sms',
@@ -229,6 +238,7 @@ class CRM_Core_DAO_MessageTemplate extends CRM_Core_DAO {
           'table_name' => 'civicrm_msg_template',
           'entity' => 'MessageTemplate',
           'bao' => 'CRM_Core_BAO_MessageTemplate',
+          'localizable' => 0,
         ) ,
         'pdf_format_id' => array(
           'name' => 'pdf_format_id',
@@ -238,6 +248,7 @@ class CRM_Core_DAO_MessageTemplate extends CRM_Core_DAO {
           'table_name' => 'civicrm_msg_template',
           'entity' => 'MessageTemplate',
           'bao' => 'CRM_Core_BAO_MessageTemplate',
+          'localizable' => 0,
           'pseudoconstant' => array(
             'optionGroupName' => 'pdf_format',
             'keyColumn' => 'id',
@@ -298,5 +309,12 @@ class CRM_Core_DAO_MessageTemplate extends CRM_Core_DAO {
   static function &export($prefix = false) {
     $r = CRM_Core_DAO_AllCoreTables::getExports(__CLASS__, 'msg_template', $prefix, array());
     return $r;
+  }
+  /**
+   * Returns the list of indices
+   */
+  public static function indices($localize = TRUE) {
+    $indices = array();
+    return ($localize && !empty($indices)) ? CRM_Core_DAO_AllCoreTables::multilingualize(__CLASS__, $indices) : $indices;
   }
 }

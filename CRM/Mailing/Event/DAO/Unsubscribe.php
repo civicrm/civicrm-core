@@ -110,6 +110,7 @@ class CRM_Mailing_Event_DAO_Unsubscribe extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_event_unsubscribe',
           'entity' => 'Unsubscribe',
           'bao' => 'CRM_Mailing_Event_BAO_Unsubscribe',
+          'localizable' => 0,
         ) ,
         'event_queue_id' => array(
           'name' => 'event_queue_id',
@@ -120,6 +121,7 @@ class CRM_Mailing_Event_DAO_Unsubscribe extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_event_unsubscribe',
           'entity' => 'Unsubscribe',
           'bao' => 'CRM_Mailing_Event_BAO_Unsubscribe',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Mailing_Event_DAO_Queue',
         ) ,
         'org_unsubscribe' => array(
@@ -131,6 +133,7 @@ class CRM_Mailing_Event_DAO_Unsubscribe extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_event_unsubscribe',
           'entity' => 'Unsubscribe',
           'bao' => 'CRM_Mailing_Event_BAO_Unsubscribe',
+          'localizable' => 0,
         ) ,
         'time_stamp' => array(
           'name' => 'time_stamp',
@@ -141,6 +144,7 @@ class CRM_Mailing_Event_DAO_Unsubscribe extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_event_unsubscribe',
           'entity' => 'Unsubscribe',
           'bao' => 'CRM_Mailing_Event_BAO_Unsubscribe',
+          'localizable' => 0,
         ) ,
       );
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);
@@ -196,5 +200,12 @@ class CRM_Mailing_Event_DAO_Unsubscribe extends CRM_Core_DAO {
   static function &export($prefix = false) {
     $r = CRM_Core_DAO_AllCoreTables::getExports(__CLASS__, 'mailing_event_unsubscribe', $prefix, array());
     return $r;
+  }
+  /**
+   * Returns the list of indices
+   */
+  public static function indices($localize = TRUE) {
+    $indices = array();
+    return ($localize && !empty($indices)) ? CRM_Core_DAO_AllCoreTables::multilingualize(__CLASS__, $indices) : $indices;
   }
 }

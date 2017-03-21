@@ -159,6 +159,7 @@ class CRM_Contact_DAO_Relationship extends CRM_Core_DAO {
           'table_name' => 'civicrm_relationship',
           'entity' => 'Relationship',
           'bao' => 'CRM_Contact_BAO_Relationship',
+          'localizable' => 0,
         ) ,
         'contact_id_a' => array(
           'name' => 'contact_id_a',
@@ -169,6 +170,7 @@ class CRM_Contact_DAO_Relationship extends CRM_Core_DAO {
           'table_name' => 'civicrm_relationship',
           'entity' => 'Relationship',
           'bao' => 'CRM_Contact_BAO_Relationship',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Contact_DAO_Contact',
         ) ,
         'contact_id_b' => array(
@@ -180,6 +182,7 @@ class CRM_Contact_DAO_Relationship extends CRM_Core_DAO {
           'table_name' => 'civicrm_relationship',
           'entity' => 'Relationship',
           'bao' => 'CRM_Contact_BAO_Relationship',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Contact_DAO_Contact',
           'html' => array(
             'type' => 'EntityRef',
@@ -194,6 +197,7 @@ class CRM_Contact_DAO_Relationship extends CRM_Core_DAO {
           'table_name' => 'civicrm_relationship',
           'entity' => 'Relationship',
           'bao' => 'CRM_Contact_BAO_Relationship',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Contact_DAO_RelationshipType',
           'html' => array(
             'type' => 'Select',
@@ -207,6 +211,7 @@ class CRM_Contact_DAO_Relationship extends CRM_Core_DAO {
           'table_name' => 'civicrm_relationship',
           'entity' => 'Relationship',
           'bao' => 'CRM_Contact_BAO_Relationship',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select Date',
           ) ,
@@ -219,6 +224,7 @@ class CRM_Contact_DAO_Relationship extends CRM_Core_DAO {
           'table_name' => 'civicrm_relationship',
           'entity' => 'Relationship',
           'bao' => 'CRM_Contact_BAO_Relationship',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select Date',
           ) ,
@@ -232,6 +238,7 @@ class CRM_Contact_DAO_Relationship extends CRM_Core_DAO {
           'table_name' => 'civicrm_relationship',
           'entity' => 'Relationship',
           'bao' => 'CRM_Contact_BAO_Relationship',
+          'localizable' => 0,
           'html' => array(
             'type' => 'CheckBox',
           ) ,
@@ -246,6 +253,7 @@ class CRM_Contact_DAO_Relationship extends CRM_Core_DAO {
           'table_name' => 'civicrm_relationship',
           'entity' => 'Relationship',
           'bao' => 'CRM_Contact_BAO_Relationship',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -260,6 +268,7 @@ class CRM_Contact_DAO_Relationship extends CRM_Core_DAO {
           'table_name' => 'civicrm_relationship',
           'entity' => 'Relationship',
           'bao' => 'CRM_Contact_BAO_Relationship',
+          'localizable' => 0,
           'html' => array(
             'type' => 'CheckBox',
           ) ,
@@ -274,6 +283,7 @@ class CRM_Contact_DAO_Relationship extends CRM_Core_DAO {
           'table_name' => 'civicrm_relationship',
           'entity' => 'Relationship',
           'bao' => 'CRM_Contact_BAO_Relationship',
+          'localizable' => 0,
           'html' => array(
             'type' => 'CheckBox',
           ) ,
@@ -287,6 +297,7 @@ class CRM_Contact_DAO_Relationship extends CRM_Core_DAO {
           'table_name' => 'civicrm_relationship',
           'entity' => 'Relationship',
           'bao' => 'CRM_Contact_BAO_Relationship',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Case_DAO_Case',
         ) ,
       );
@@ -343,5 +354,12 @@ class CRM_Contact_DAO_Relationship extends CRM_Core_DAO {
   static function &export($prefix = false) {
     $r = CRM_Core_DAO_AllCoreTables::getExports(__CLASS__, 'relationship', $prefix, array());
     return $r;
+  }
+  /**
+   * Returns the list of indices
+   */
+  public static function indices($localize = TRUE) {
+    $indices = array();
+    return ($localize && !empty($indices)) ? CRM_Core_DAO_AllCoreTables::multilingualize(__CLASS__, $indices) : $indices;
   }
 }

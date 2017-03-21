@@ -104,6 +104,7 @@ class CRM_Mailing_DAO_BouncePattern extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_bounce_pattern',
           'entity' => 'BouncePattern',
           'bao' => 'CRM_Mailing_BAO_BouncePattern',
+          'localizable' => 0,
         ) ,
         'bounce_type_id' => array(
           'name' => 'bounce_type_id',
@@ -114,6 +115,7 @@ class CRM_Mailing_DAO_BouncePattern extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_bounce_pattern',
           'entity' => 'BouncePattern',
           'bao' => 'CRM_Mailing_BAO_BouncePattern',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Mailing_DAO_BounceType',
         ) ,
         'pattern' => array(
@@ -126,6 +128,7 @@ class CRM_Mailing_DAO_BouncePattern extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_bounce_pattern',
           'entity' => 'BouncePattern',
           'bao' => 'CRM_Mailing_BAO_BouncePattern',
+          'localizable' => 0,
         ) ,
       );
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);
@@ -181,5 +184,12 @@ class CRM_Mailing_DAO_BouncePattern extends CRM_Core_DAO {
   static function &export($prefix = false) {
     $r = CRM_Core_DAO_AllCoreTables::getExports(__CLASS__, 'mailing_bounce_pattern', $prefix, array());
     return $r;
+  }
+  /**
+   * Returns the list of indices
+   */
+  public static function indices($localize = TRUE) {
+    $indices = array();
+    return ($localize && !empty($indices)) ? CRM_Core_DAO_AllCoreTables::multilingualize(__CLASS__, $indices) : $indices;
   }
 }

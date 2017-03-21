@@ -360,6 +360,7 @@ class CRM_Contribute_DAO_ContributionPage extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_page',
           'entity' => 'ContributionPage',
           'bao' => 'CRM_Contribute_BAO_ContributionPage',
+          'localizable' => 0,
         ) ,
         'title' => array(
           'name' => 'title',
@@ -371,6 +372,7 @@ class CRM_Contribute_DAO_ContributionPage extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_page',
           'entity' => 'ContributionPage',
           'bao' => 'CRM_Contribute_BAO_ContributionPage',
+          'localizable' => 1,
         ) ,
         'intro_text' => array(
           'name' => 'intro_text',
@@ -382,6 +384,7 @@ class CRM_Contribute_DAO_ContributionPage extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_page',
           'entity' => 'ContributionPage',
           'bao' => 'CRM_Contribute_BAO_ContributionPage',
+          'localizable' => 1,
           'html' => array(
             'type' => 'RichTextEditor',
           ) ,
@@ -394,6 +397,7 @@ class CRM_Contribute_DAO_ContributionPage extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_page',
           'entity' => 'ContributionPage',
           'bao' => 'CRM_Contribute_BAO_ContributionPage',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Financial_DAO_FinancialType',
           'html' => array(
             'type' => 'Select',
@@ -414,6 +418,7 @@ class CRM_Contribute_DAO_ContributionPage extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_page',
           'entity' => 'ContributionPage',
           'bao' => 'CRM_Contribute_BAO_ContributionPage',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -431,6 +436,7 @@ class CRM_Contribute_DAO_ContributionPage extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_page',
           'entity' => 'ContributionPage',
           'bao' => 'CRM_Contribute_BAO_ContributionPage',
+          'localizable' => 0,
         ) ,
         'is_monetary' => array(
           'name' => 'is_monetary',
@@ -441,6 +447,7 @@ class CRM_Contribute_DAO_ContributionPage extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_page',
           'entity' => 'ContributionPage',
           'bao' => 'CRM_Contribute_BAO_ContributionPage',
+          'localizable' => 0,
         ) ,
         'is_recur' => array(
           'name' => 'is_recur',
@@ -450,6 +457,7 @@ class CRM_Contribute_DAO_ContributionPage extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_page',
           'entity' => 'ContributionPage',
           'bao' => 'CRM_Contribute_BAO_ContributionPage',
+          'localizable' => 0,
         ) ,
         'is_confirm_enabled' => array(
           'name' => 'is_confirm_enabled',
@@ -460,6 +468,7 @@ class CRM_Contribute_DAO_ContributionPage extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_page',
           'entity' => 'ContributionPage',
           'bao' => 'CRM_Contribute_BAO_ContributionPage',
+          'localizable' => 0,
         ) ,
         'recur_frequency_unit' => array(
           'name' => 'recur_frequency_unit',
@@ -471,6 +480,7 @@ class CRM_Contribute_DAO_ContributionPage extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_page',
           'entity' => 'ContributionPage',
           'bao' => 'CRM_Contribute_BAO_ContributionPage',
+          'localizable' => 0,
         ) ,
         'is_recur_interval' => array(
           'name' => 'is_recur_interval',
@@ -480,6 +490,7 @@ class CRM_Contribute_DAO_ContributionPage extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_page',
           'entity' => 'ContributionPage',
           'bao' => 'CRM_Contribute_BAO_ContributionPage',
+          'localizable' => 0,
         ) ,
         'is_recur_installments' => array(
           'name' => 'is_recur_installments',
@@ -489,6 +500,7 @@ class CRM_Contribute_DAO_ContributionPage extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_page',
           'entity' => 'ContributionPage',
           'bao' => 'CRM_Contribute_BAO_ContributionPage',
+          'localizable' => 0,
         ) ,
         'adjust_recur_start_date' => array(
           'name' => 'adjust_recur_start_date',
@@ -498,6 +510,7 @@ class CRM_Contribute_DAO_ContributionPage extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_page',
           'entity' => 'ContributionPage',
           'bao' => 'CRM_Contribute_BAO_ContributionPage',
+          'localizable' => 0,
         ) ,
         'is_pay_later' => array(
           'name' => 'is_pay_later',
@@ -507,6 +520,7 @@ class CRM_Contribute_DAO_ContributionPage extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_page',
           'entity' => 'ContributionPage',
           'bao' => 'CRM_Contribute_BAO_ContributionPage',
+          'localizable' => 0,
         ) ,
         'pay_later_text' => array(
           'name' => 'pay_later_text',
@@ -516,6 +530,7 @@ class CRM_Contribute_DAO_ContributionPage extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_page',
           'entity' => 'ContributionPage',
           'bao' => 'CRM_Contribute_BAO_ContributionPage',
+          'localizable' => 1,
         ) ,
         'pay_later_receipt' => array(
           'name' => 'pay_later_receipt',
@@ -525,6 +540,7 @@ class CRM_Contribute_DAO_ContributionPage extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_page',
           'entity' => 'ContributionPage',
           'bao' => 'CRM_Contribute_BAO_ContributionPage',
+          'localizable' => 1,
         ) ,
         'is_partial_payment' => array(
           'name' => 'is_partial_payment',
@@ -534,6 +550,7 @@ class CRM_Contribute_DAO_ContributionPage extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_page',
           'entity' => 'ContributionPage',
           'bao' => 'CRM_Contribute_BAO_ContributionPage',
+          'localizable' => 0,
         ) ,
         'initial_amount_label' => array(
           'name' => 'initial_amount_label',
@@ -545,6 +562,7 @@ class CRM_Contribute_DAO_ContributionPage extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_page',
           'entity' => 'ContributionPage',
           'bao' => 'CRM_Contribute_BAO_ContributionPage',
+          'localizable' => 1,
         ) ,
         'initial_amount_help_text' => array(
           'name' => 'initial_amount_help_text',
@@ -554,6 +572,7 @@ class CRM_Contribute_DAO_ContributionPage extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_page',
           'entity' => 'ContributionPage',
           'bao' => 'CRM_Contribute_BAO_ContributionPage',
+          'localizable' => 1,
         ) ,
         'min_initial_amount' => array(
           'name' => 'min_initial_amount',
@@ -567,6 +586,7 @@ class CRM_Contribute_DAO_ContributionPage extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_page',
           'entity' => 'ContributionPage',
           'bao' => 'CRM_Contribute_BAO_ContributionPage',
+          'localizable' => 0,
         ) ,
         'is_allow_other_amount' => array(
           'name' => 'is_allow_other_amount',
@@ -576,6 +596,7 @@ class CRM_Contribute_DAO_ContributionPage extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_page',
           'entity' => 'ContributionPage',
           'bao' => 'CRM_Contribute_BAO_ContributionPage',
+          'localizable' => 0,
         ) ,
         'default_amount_id' => array(
           'name' => 'default_amount_id',
@@ -585,6 +606,7 @@ class CRM_Contribute_DAO_ContributionPage extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_page',
           'entity' => 'ContributionPage',
           'bao' => 'CRM_Contribute_BAO_ContributionPage',
+          'localizable' => 0,
         ) ,
         'min_amount' => array(
           'name' => 'min_amount',
@@ -598,6 +620,7 @@ class CRM_Contribute_DAO_ContributionPage extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_page',
           'entity' => 'ContributionPage',
           'bao' => 'CRM_Contribute_BAO_ContributionPage',
+          'localizable' => 0,
         ) ,
         'max_amount' => array(
           'name' => 'max_amount',
@@ -611,6 +634,7 @@ class CRM_Contribute_DAO_ContributionPage extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_page',
           'entity' => 'ContributionPage',
           'bao' => 'CRM_Contribute_BAO_ContributionPage',
+          'localizable' => 0,
         ) ,
         'goal_amount' => array(
           'name' => 'goal_amount',
@@ -624,6 +648,7 @@ class CRM_Contribute_DAO_ContributionPage extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_page',
           'entity' => 'ContributionPage',
           'bao' => 'CRM_Contribute_BAO_ContributionPage',
+          'localizable' => 0,
         ) ,
         'thankyou_title' => array(
           'name' => 'thankyou_title',
@@ -635,6 +660,7 @@ class CRM_Contribute_DAO_ContributionPage extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_page',
           'entity' => 'ContributionPage',
           'bao' => 'CRM_Contribute_BAO_ContributionPage',
+          'localizable' => 1,
         ) ,
         'thankyou_text' => array(
           'name' => 'thankyou_text',
@@ -646,6 +672,7 @@ class CRM_Contribute_DAO_ContributionPage extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_page',
           'entity' => 'ContributionPage',
           'bao' => 'CRM_Contribute_BAO_ContributionPage',
+          'localizable' => 1,
           'html' => array(
             'type' => 'RichTextEditor',
           ) ,
@@ -660,6 +687,7 @@ class CRM_Contribute_DAO_ContributionPage extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_page',
           'entity' => 'ContributionPage',
           'bao' => 'CRM_Contribute_BAO_ContributionPage',
+          'localizable' => 1,
           'html' => array(
             'type' => 'RichTextEditor',
           ) ,
@@ -672,6 +700,7 @@ class CRM_Contribute_DAO_ContributionPage extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_page',
           'entity' => 'ContributionPage',
           'bao' => 'CRM_Contribute_BAO_ContributionPage',
+          'localizable' => 0,
         ) ,
         'receipt_from_name' => array(
           'name' => 'receipt_from_name',
@@ -683,6 +712,7 @@ class CRM_Contribute_DAO_ContributionPage extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_page',
           'entity' => 'ContributionPage',
           'bao' => 'CRM_Contribute_BAO_ContributionPage',
+          'localizable' => 1,
         ) ,
         'receipt_from_email' => array(
           'name' => 'receipt_from_email',
@@ -694,6 +724,7 @@ class CRM_Contribute_DAO_ContributionPage extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_page',
           'entity' => 'ContributionPage',
           'bao' => 'CRM_Contribute_BAO_ContributionPage',
+          'localizable' => 0,
         ) ,
         'cc_receipt' => array(
           'name' => 'cc_receipt',
@@ -705,6 +736,7 @@ class CRM_Contribute_DAO_ContributionPage extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_page',
           'entity' => 'ContributionPage',
           'bao' => 'CRM_Contribute_BAO_ContributionPage',
+          'localizable' => 0,
         ) ,
         'bcc_receipt' => array(
           'name' => 'bcc_receipt',
@@ -716,6 +748,7 @@ class CRM_Contribute_DAO_ContributionPage extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_page',
           'entity' => 'ContributionPage',
           'bao' => 'CRM_Contribute_BAO_ContributionPage',
+          'localizable' => 0,
         ) ,
         'receipt_text' => array(
           'name' => 'receipt_text',
@@ -727,6 +760,7 @@ class CRM_Contribute_DAO_ContributionPage extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_page',
           'entity' => 'ContributionPage',
           'bao' => 'CRM_Contribute_BAO_ContributionPage',
+          'localizable' => 1,
           'html' => array(
             'type' => 'TextArea',
           ) ,
@@ -739,6 +773,7 @@ class CRM_Contribute_DAO_ContributionPage extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_page',
           'entity' => 'ContributionPage',
           'bao' => 'CRM_Contribute_BAO_ContributionPage',
+          'localizable' => 0,
         ) ,
         'footer_text' => array(
           'name' => 'footer_text',
@@ -750,6 +785,7 @@ class CRM_Contribute_DAO_ContributionPage extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_page',
           'entity' => 'ContributionPage',
           'bao' => 'CRM_Contribute_BAO_ContributionPage',
+          'localizable' => 1,
           'html' => array(
             'type' => 'RichTextEditor',
           ) ,
@@ -763,6 +799,7 @@ class CRM_Contribute_DAO_ContributionPage extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_page',
           'entity' => 'ContributionPage',
           'bao' => 'CRM_Contribute_BAO_ContributionPage',
+          'localizable' => 0,
         ) ,
         'start_date' => array(
           'name' => 'start_date',
@@ -772,6 +809,7 @@ class CRM_Contribute_DAO_ContributionPage extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_page',
           'entity' => 'ContributionPage',
           'bao' => 'CRM_Contribute_BAO_ContributionPage',
+          'localizable' => 0,
         ) ,
         'end_date' => array(
           'name' => 'end_date',
@@ -781,6 +819,7 @@ class CRM_Contribute_DAO_ContributionPage extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_page',
           'entity' => 'ContributionPage',
           'bao' => 'CRM_Contribute_BAO_ContributionPage',
+          'localizable' => 0,
         ) ,
         'created_id' => array(
           'name' => 'created_id',
@@ -790,6 +829,7 @@ class CRM_Contribute_DAO_ContributionPage extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_page',
           'entity' => 'ContributionPage',
           'bao' => 'CRM_Contribute_BAO_ContributionPage',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Contact_DAO_Contact',
         ) ,
         'created_date' => array(
@@ -800,6 +840,7 @@ class CRM_Contribute_DAO_ContributionPage extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_page',
           'entity' => 'ContributionPage',
           'bao' => 'CRM_Contribute_BAO_ContributionPage',
+          'localizable' => 0,
         ) ,
         'currency' => array(
           'name' => 'currency',
@@ -812,6 +853,7 @@ class CRM_Contribute_DAO_ContributionPage extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_page',
           'entity' => 'ContributionPage',
           'bao' => 'CRM_Contribute_BAO_ContributionPage',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -830,6 +872,7 @@ class CRM_Contribute_DAO_ContributionPage extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_page',
           'entity' => 'ContributionPage',
           'bao' => 'CRM_Contribute_BAO_ContributionPage',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Campaign_DAO_Campaign',
           'pseudoconstant' => array(
             'table' => 'civicrm_campaign',
@@ -846,6 +889,7 @@ class CRM_Contribute_DAO_ContributionPage extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_page',
           'entity' => 'ContributionPage',
           'bao' => 'CRM_Contribute_BAO_ContributionPage',
+          'localizable' => 0,
         ) ,
         'is_billing_required' => array(
           'name' => 'is_billing_required',
@@ -855,6 +899,7 @@ class CRM_Contribute_DAO_ContributionPage extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_page',
           'entity' => 'ContributionPage',
           'bao' => 'CRM_Contribute_BAO_ContributionPage',
+          'localizable' => 0,
         ) ,
       );
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);
@@ -910,5 +955,12 @@ class CRM_Contribute_DAO_ContributionPage extends CRM_Core_DAO {
   static function &export($prefix = false) {
     $r = CRM_Core_DAO_AllCoreTables::getExports(__CLASS__, 'contribution_page', $prefix, array());
     return $r;
+  }
+  /**
+   * Returns the list of indices
+   */
+  public static function indices($localize = TRUE) {
+    $indices = array();
+    return ($localize && !empty($indices)) ? CRM_Core_DAO_AllCoreTables::multilingualize(__CLASS__, $indices) : $indices;
   }
 }

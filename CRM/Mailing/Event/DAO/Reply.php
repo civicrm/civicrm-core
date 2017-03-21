@@ -104,6 +104,7 @@ class CRM_Mailing_Event_DAO_Reply extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_event_reply',
           'entity' => 'Reply',
           'bao' => 'CRM_Mailing_Event_BAO_Reply',
+          'localizable' => 0,
         ) ,
         'event_queue_id' => array(
           'name' => 'event_queue_id',
@@ -114,6 +115,7 @@ class CRM_Mailing_Event_DAO_Reply extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_event_reply',
           'entity' => 'Reply',
           'bao' => 'CRM_Mailing_Event_BAO_Reply',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Mailing_Event_DAO_Queue',
         ) ,
         'time_stamp' => array(
@@ -125,6 +127,7 @@ class CRM_Mailing_Event_DAO_Reply extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_event_reply',
           'entity' => 'Reply',
           'bao' => 'CRM_Mailing_Event_BAO_Reply',
+          'localizable' => 0,
         ) ,
       );
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);
@@ -180,5 +183,12 @@ class CRM_Mailing_Event_DAO_Reply extends CRM_Core_DAO {
   static function &export($prefix = false) {
     $r = CRM_Core_DAO_AllCoreTables::getExports(__CLASS__, 'mailing_event_reply', $prefix, array());
     return $r;
+  }
+  /**
+   * Returns the list of indices
+   */
+  public static function indices($localize = TRUE) {
+    $indices = array();
+    return ($localize && !empty($indices)) ? CRM_Core_DAO_AllCoreTables::multilingualize(__CLASS__, $indices) : $indices;
   }
 }

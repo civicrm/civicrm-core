@@ -119,6 +119,7 @@ class CRM_Contribute_DAO_PremiumsProduct extends CRM_Core_DAO {
           'table_name' => 'civicrm_premiums_product',
           'entity' => 'PremiumsProduct',
           'bao' => 'CRM_Contribute_DAO_PremiumsProduct',
+          'localizable' => 0,
         ) ,
         'premiums_id' => array(
           'name' => 'premiums_id',
@@ -129,6 +130,7 @@ class CRM_Contribute_DAO_PremiumsProduct extends CRM_Core_DAO {
           'table_name' => 'civicrm_premiums_product',
           'entity' => 'PremiumsProduct',
           'bao' => 'CRM_Contribute_DAO_PremiumsProduct',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Contribute_DAO_Premium',
         ) ,
         'product_id' => array(
@@ -140,6 +142,7 @@ class CRM_Contribute_DAO_PremiumsProduct extends CRM_Core_DAO {
           'table_name' => 'civicrm_premiums_product',
           'entity' => 'PremiumsProduct',
           'bao' => 'CRM_Contribute_DAO_PremiumsProduct',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Contribute_DAO_Product',
         ) ,
         'weight' => array(
@@ -150,6 +153,7 @@ class CRM_Contribute_DAO_PremiumsProduct extends CRM_Core_DAO {
           'table_name' => 'civicrm_premiums_product',
           'entity' => 'PremiumsProduct',
           'bao' => 'CRM_Contribute_DAO_PremiumsProduct',
+          'localizable' => 0,
         ) ,
         'financial_type_id' => array(
           'name' => 'financial_type_id',
@@ -160,6 +164,7 @@ class CRM_Contribute_DAO_PremiumsProduct extends CRM_Core_DAO {
           'table_name' => 'civicrm_premiums_product',
           'entity' => 'PremiumsProduct',
           'bao' => 'CRM_Contribute_DAO_PremiumsProduct',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Financial_DAO_FinancialType',
           'pseudoconstant' => array(
             'table' => 'civicrm_financial_type',
@@ -221,5 +226,12 @@ class CRM_Contribute_DAO_PremiumsProduct extends CRM_Core_DAO {
   static function &export($prefix = false) {
     $r = CRM_Core_DAO_AllCoreTables::getExports(__CLASS__, 'premiums_product', $prefix, array());
     return $r;
+  }
+  /**
+   * Returns the list of indices
+   */
+  public static function indices($localize = TRUE) {
+    $indices = array();
+    return ($localize && !empty($indices)) ? CRM_Core_DAO_AllCoreTables::multilingualize(__CLASS__, $indices) : $indices;
   }
 }

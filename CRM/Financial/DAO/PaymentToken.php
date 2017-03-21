@@ -167,6 +167,7 @@ class CRM_Financial_DAO_PaymentToken extends CRM_Core_DAO {
           'table_name' => 'civicrm_payment_token',
           'entity' => 'PaymentToken',
           'bao' => 'CRM_Financial_DAO_PaymentToken',
+          'localizable' => 0,
         ) ,
         'contact_id' => array(
           'name' => 'contact_id',
@@ -177,6 +178,7 @@ class CRM_Financial_DAO_PaymentToken extends CRM_Core_DAO {
           'table_name' => 'civicrm_payment_token',
           'entity' => 'PaymentToken',
           'bao' => 'CRM_Financial_DAO_PaymentToken',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Contact_DAO_Contact',
         ) ,
         'payment_processor_id' => array(
@@ -187,6 +189,7 @@ class CRM_Financial_DAO_PaymentToken extends CRM_Core_DAO {
           'table_name' => 'civicrm_payment_token',
           'entity' => 'PaymentToken',
           'bao' => 'CRM_Financial_DAO_PaymentToken',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Financial_DAO_PaymentProcessor',
         ) ,
         'token' => array(
@@ -200,6 +203,7 @@ class CRM_Financial_DAO_PaymentToken extends CRM_Core_DAO {
           'table_name' => 'civicrm_payment_token',
           'entity' => 'PaymentToken',
           'bao' => 'CRM_Financial_DAO_PaymentToken',
+          'localizable' => 0,
         ) ,
         'created_date' => array(
           'name' => 'created_date',
@@ -210,6 +214,7 @@ class CRM_Financial_DAO_PaymentToken extends CRM_Core_DAO {
           'table_name' => 'civicrm_payment_token',
           'entity' => 'PaymentToken',
           'bao' => 'CRM_Financial_DAO_PaymentToken',
+          'localizable' => 0,
         ) ,
         'created_id' => array(
           'name' => 'created_id',
@@ -219,6 +224,7 @@ class CRM_Financial_DAO_PaymentToken extends CRM_Core_DAO {
           'table_name' => 'civicrm_payment_token',
           'entity' => 'PaymentToken',
           'bao' => 'CRM_Financial_DAO_PaymentToken',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Contact_DAO_Contact',
         ) ,
         'expiry_date' => array(
@@ -229,6 +235,7 @@ class CRM_Financial_DAO_PaymentToken extends CRM_Core_DAO {
           'table_name' => 'civicrm_payment_token',
           'entity' => 'PaymentToken',
           'bao' => 'CRM_Financial_DAO_PaymentToken',
+          'localizable' => 0,
         ) ,
         'email' => array(
           'name' => 'email',
@@ -240,6 +247,7 @@ class CRM_Financial_DAO_PaymentToken extends CRM_Core_DAO {
           'table_name' => 'civicrm_payment_token',
           'entity' => 'PaymentToken',
           'bao' => 'CRM_Financial_DAO_PaymentToken',
+          'localizable' => 0,
         ) ,
         'billing_first_name' => array(
           'name' => 'billing_first_name',
@@ -251,6 +259,7 @@ class CRM_Financial_DAO_PaymentToken extends CRM_Core_DAO {
           'table_name' => 'civicrm_payment_token',
           'entity' => 'PaymentToken',
           'bao' => 'CRM_Financial_DAO_PaymentToken',
+          'localizable' => 0,
         ) ,
         'billing_middle_name' => array(
           'name' => 'billing_middle_name',
@@ -262,6 +271,7 @@ class CRM_Financial_DAO_PaymentToken extends CRM_Core_DAO {
           'table_name' => 'civicrm_payment_token',
           'entity' => 'PaymentToken',
           'bao' => 'CRM_Financial_DAO_PaymentToken',
+          'localizable' => 0,
         ) ,
         'billing_last_name' => array(
           'name' => 'billing_last_name',
@@ -273,6 +283,7 @@ class CRM_Financial_DAO_PaymentToken extends CRM_Core_DAO {
           'table_name' => 'civicrm_payment_token',
           'entity' => 'PaymentToken',
           'bao' => 'CRM_Financial_DAO_PaymentToken',
+          'localizable' => 0,
         ) ,
         'masked_account_number' => array(
           'name' => 'masked_account_number',
@@ -284,6 +295,7 @@ class CRM_Financial_DAO_PaymentToken extends CRM_Core_DAO {
           'table_name' => 'civicrm_payment_token',
           'entity' => 'PaymentToken',
           'bao' => 'CRM_Financial_DAO_PaymentToken',
+          'localizable' => 0,
         ) ,
         'ip_address' => array(
           'name' => 'ip_address',
@@ -295,6 +307,7 @@ class CRM_Financial_DAO_PaymentToken extends CRM_Core_DAO {
           'table_name' => 'civicrm_payment_token',
           'entity' => 'PaymentToken',
           'bao' => 'CRM_Financial_DAO_PaymentToken',
+          'localizable' => 0,
         ) ,
       );
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);
@@ -350,5 +363,12 @@ class CRM_Financial_DAO_PaymentToken extends CRM_Core_DAO {
   static function &export($prefix = false) {
     $r = CRM_Core_DAO_AllCoreTables::getExports(__CLASS__, 'payment_token', $prefix, array());
     return $r;
+  }
+  /**
+   * Returns the list of indices
+   */
+  public static function indices($localize = TRUE) {
+    $indices = array();
+    return ($localize && !empty($indices)) ? CRM_Core_DAO_AllCoreTables::multilingualize(__CLASS__, $indices) : $indices;
   }
 }

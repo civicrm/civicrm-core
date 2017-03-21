@@ -119,6 +119,7 @@ class CRM_Campaign_DAO_CampaignGroup extends CRM_Core_DAO {
           'table_name' => 'civicrm_campaign_group',
           'entity' => 'CampaignGroup',
           'bao' => 'CRM_Campaign_DAO_CampaignGroup',
+          'localizable' => 0,
         ) ,
         'campaign_id' => array(
           'name' => 'campaign_id',
@@ -129,6 +130,7 @@ class CRM_Campaign_DAO_CampaignGroup extends CRM_Core_DAO {
           'table_name' => 'civicrm_campaign_group',
           'entity' => 'CampaignGroup',
           'bao' => 'CRM_Campaign_DAO_CampaignGroup',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Campaign_DAO_Campaign',
           'pseudoconstant' => array(
             'table' => 'civicrm_campaign',
@@ -147,6 +149,7 @@ class CRM_Campaign_DAO_CampaignGroup extends CRM_Core_DAO {
           'table_name' => 'civicrm_campaign_group',
           'entity' => 'CampaignGroup',
           'bao' => 'CRM_Campaign_DAO_CampaignGroup',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -165,6 +168,7 @@ class CRM_Campaign_DAO_CampaignGroup extends CRM_Core_DAO {
           'table_name' => 'civicrm_campaign_group',
           'entity' => 'CampaignGroup',
           'bao' => 'CRM_Campaign_DAO_CampaignGroup',
+          'localizable' => 0,
         ) ,
         'entity_id' => array(
           'name' => 'entity_id',
@@ -175,6 +179,7 @@ class CRM_Campaign_DAO_CampaignGroup extends CRM_Core_DAO {
           'table_name' => 'civicrm_campaign_group',
           'entity' => 'CampaignGroup',
           'bao' => 'CRM_Campaign_DAO_CampaignGroup',
+          'localizable' => 0,
         ) ,
       );
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);
@@ -230,5 +235,12 @@ class CRM_Campaign_DAO_CampaignGroup extends CRM_Core_DAO {
   static function &export($prefix = false) {
     $r = CRM_Core_DAO_AllCoreTables::getExports(__CLASS__, 'campaign_group', $prefix, array());
     return $r;
+  }
+  /**
+   * Returns the list of indices
+   */
+  public static function indices($localize = TRUE) {
+    $indices = array();
+    return ($localize && !empty($indices)) ? CRM_Core_DAO_AllCoreTables::multilingualize(__CLASS__, $indices) : $indices;
   }
 }

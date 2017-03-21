@@ -315,6 +315,7 @@ class CRM_Core_DAO_ActionSchedule extends CRM_Core_DAO {
           'table_name' => 'civicrm_action_schedule',
           'entity' => 'ActionSchedule',
           'bao' => 'CRM_Core_BAO_ActionSchedule',
+          'localizable' => 0,
         ) ,
         'name' => array(
           'name' => 'name',
@@ -326,6 +327,7 @@ class CRM_Core_DAO_ActionSchedule extends CRM_Core_DAO {
           'table_name' => 'civicrm_action_schedule',
           'entity' => 'ActionSchedule',
           'bao' => 'CRM_Core_BAO_ActionSchedule',
+          'localizable' => 0,
         ) ,
         'title' => array(
           'name' => 'title',
@@ -337,6 +339,7 @@ class CRM_Core_DAO_ActionSchedule extends CRM_Core_DAO {
           'table_name' => 'civicrm_action_schedule',
           'entity' => 'ActionSchedule',
           'bao' => 'CRM_Core_BAO_ActionSchedule',
+          'localizable' => 0,
         ) ,
         'recipient' => array(
           'name' => 'recipient',
@@ -348,6 +351,7 @@ class CRM_Core_DAO_ActionSchedule extends CRM_Core_DAO {
           'table_name' => 'civicrm_action_schedule',
           'entity' => 'ActionSchedule',
           'bao' => 'CRM_Core_BAO_ActionSchedule',
+          'localizable' => 0,
         ) ,
         'limit_to' => array(
           'name' => 'limit_to',
@@ -357,6 +361,7 @@ class CRM_Core_DAO_ActionSchedule extends CRM_Core_DAO {
           'table_name' => 'civicrm_action_schedule',
           'entity' => 'ActionSchedule',
           'bao' => 'CRM_Core_BAO_ActionSchedule',
+          'localizable' => 0,
         ) ,
         'entity_value' => array(
           'name' => 'entity_value',
@@ -368,6 +373,7 @@ class CRM_Core_DAO_ActionSchedule extends CRM_Core_DAO {
           'table_name' => 'civicrm_action_schedule',
           'entity' => 'ActionSchedule',
           'bao' => 'CRM_Core_BAO_ActionSchedule',
+          'localizable' => 0,
         ) ,
         'entity_status' => array(
           'name' => 'entity_status',
@@ -379,6 +385,7 @@ class CRM_Core_DAO_ActionSchedule extends CRM_Core_DAO {
           'table_name' => 'civicrm_action_schedule',
           'entity' => 'ActionSchedule',
           'bao' => 'CRM_Core_BAO_ActionSchedule',
+          'localizable' => 0,
         ) ,
         'start_action_offset' => array(
           'name' => 'start_action_offset',
@@ -388,6 +395,7 @@ class CRM_Core_DAO_ActionSchedule extends CRM_Core_DAO {
           'table_name' => 'civicrm_action_schedule',
           'entity' => 'ActionSchedule',
           'bao' => 'CRM_Core_BAO_ActionSchedule',
+          'localizable' => 0,
         ) ,
         'start_action_unit' => array(
           'name' => 'start_action_unit',
@@ -399,6 +407,7 @@ class CRM_Core_DAO_ActionSchedule extends CRM_Core_DAO {
           'table_name' => 'civicrm_action_schedule',
           'entity' => 'ActionSchedule',
           'bao' => 'CRM_Core_BAO_ActionSchedule',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -416,6 +425,7 @@ class CRM_Core_DAO_ActionSchedule extends CRM_Core_DAO {
           'table_name' => 'civicrm_action_schedule',
           'entity' => 'ActionSchedule',
           'bao' => 'CRM_Core_BAO_ActionSchedule',
+          'localizable' => 0,
         ) ,
         'start_action_date' => array(
           'name' => 'start_action_date',
@@ -427,6 +437,7 @@ class CRM_Core_DAO_ActionSchedule extends CRM_Core_DAO {
           'table_name' => 'civicrm_action_schedule',
           'entity' => 'ActionSchedule',
           'bao' => 'CRM_Core_BAO_ActionSchedule',
+          'localizable' => 0,
         ) ,
         'is_repeat' => array(
           'name' => 'is_repeat',
@@ -435,6 +446,7 @@ class CRM_Core_DAO_ActionSchedule extends CRM_Core_DAO {
           'table_name' => 'civicrm_action_schedule',
           'entity' => 'ActionSchedule',
           'bao' => 'CRM_Core_BAO_ActionSchedule',
+          'localizable' => 0,
         ) ,
         'repetition_frequency_unit' => array(
           'name' => 'repetition_frequency_unit',
@@ -446,6 +458,7 @@ class CRM_Core_DAO_ActionSchedule extends CRM_Core_DAO {
           'table_name' => 'civicrm_action_schedule',
           'entity' => 'ActionSchedule',
           'bao' => 'CRM_Core_BAO_ActionSchedule',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -461,6 +474,7 @@ class CRM_Core_DAO_ActionSchedule extends CRM_Core_DAO {
           'table_name' => 'civicrm_action_schedule',
           'entity' => 'ActionSchedule',
           'bao' => 'CRM_Core_BAO_ActionSchedule',
+          'localizable' => 0,
         ) ,
         'end_frequency_unit' => array(
           'name' => 'end_frequency_unit',
@@ -472,6 +486,7 @@ class CRM_Core_DAO_ActionSchedule extends CRM_Core_DAO {
           'table_name' => 'civicrm_action_schedule',
           'entity' => 'ActionSchedule',
           'bao' => 'CRM_Core_BAO_ActionSchedule',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -487,6 +502,7 @@ class CRM_Core_DAO_ActionSchedule extends CRM_Core_DAO {
           'table_name' => 'civicrm_action_schedule',
           'entity' => 'ActionSchedule',
           'bao' => 'CRM_Core_BAO_ActionSchedule',
+          'localizable' => 0,
         ) ,
         'end_action' => array(
           'name' => 'end_action',
@@ -498,6 +514,7 @@ class CRM_Core_DAO_ActionSchedule extends CRM_Core_DAO {
           'table_name' => 'civicrm_action_schedule',
           'entity' => 'ActionSchedule',
           'bao' => 'CRM_Core_BAO_ActionSchedule',
+          'localizable' => 0,
         ) ,
         'end_date' => array(
           'name' => 'end_date',
@@ -509,6 +526,7 @@ class CRM_Core_DAO_ActionSchedule extends CRM_Core_DAO {
           'table_name' => 'civicrm_action_schedule',
           'entity' => 'ActionSchedule',
           'bao' => 'CRM_Core_BAO_ActionSchedule',
+          'localizable' => 0,
         ) ,
         'is_active' => array(
           'name' => 'is_active',
@@ -519,6 +537,7 @@ class CRM_Core_DAO_ActionSchedule extends CRM_Core_DAO {
           'table_name' => 'civicrm_action_schedule',
           'entity' => 'ActionSchedule',
           'bao' => 'CRM_Core_BAO_ActionSchedule',
+          'localizable' => 0,
         ) ,
         'recipient_manual' => array(
           'name' => 'recipient_manual',
@@ -530,6 +549,7 @@ class CRM_Core_DAO_ActionSchedule extends CRM_Core_DAO {
           'table_name' => 'civicrm_action_schedule',
           'entity' => 'ActionSchedule',
           'bao' => 'CRM_Core_BAO_ActionSchedule',
+          'localizable' => 0,
         ) ,
         'recipient_listing' => array(
           'name' => 'recipient_listing',
@@ -541,6 +561,7 @@ class CRM_Core_DAO_ActionSchedule extends CRM_Core_DAO {
           'table_name' => 'civicrm_action_schedule',
           'entity' => 'ActionSchedule',
           'bao' => 'CRM_Core_BAO_ActionSchedule',
+          'localizable' => 0,
         ) ,
         'body_text' => array(
           'name' => 'body_text',
@@ -550,6 +571,7 @@ class CRM_Core_DAO_ActionSchedule extends CRM_Core_DAO {
           'table_name' => 'civicrm_action_schedule',
           'entity' => 'ActionSchedule',
           'bao' => 'CRM_Core_BAO_ActionSchedule',
+          'localizable' => 0,
         ) ,
         'body_html' => array(
           'name' => 'body_html',
@@ -559,6 +581,7 @@ class CRM_Core_DAO_ActionSchedule extends CRM_Core_DAO {
           'table_name' => 'civicrm_action_schedule',
           'entity' => 'ActionSchedule',
           'bao' => 'CRM_Core_BAO_ActionSchedule',
+          'localizable' => 0,
         ) ,
         'sms_body_text' => array(
           'name' => 'sms_body_text',
@@ -568,6 +591,7 @@ class CRM_Core_DAO_ActionSchedule extends CRM_Core_DAO {
           'table_name' => 'civicrm_action_schedule',
           'entity' => 'ActionSchedule',
           'bao' => 'CRM_Core_BAO_ActionSchedule',
+          'localizable' => 0,
         ) ,
         'subject' => array(
           'name' => 'subject',
@@ -579,6 +603,7 @@ class CRM_Core_DAO_ActionSchedule extends CRM_Core_DAO {
           'table_name' => 'civicrm_action_schedule',
           'entity' => 'ActionSchedule',
           'bao' => 'CRM_Core_BAO_ActionSchedule',
+          'localizable' => 0,
         ) ,
         'record_activity' => array(
           'name' => 'record_activity',
@@ -589,6 +614,7 @@ class CRM_Core_DAO_ActionSchedule extends CRM_Core_DAO {
           'table_name' => 'civicrm_action_schedule',
           'entity' => 'ActionSchedule',
           'bao' => 'CRM_Core_BAO_ActionSchedule',
+          'localizable' => 0,
         ) ,
         'mapping_id' => array(
           'name' => 'mapping_id',
@@ -600,6 +626,7 @@ class CRM_Core_DAO_ActionSchedule extends CRM_Core_DAO {
           'table_name' => 'civicrm_action_schedule',
           'entity' => 'ActionSchedule',
           'bao' => 'CRM_Core_BAO_ActionSchedule',
+          'localizable' => 0,
         ) ,
         'group_id' => array(
           'name' => 'group_id',
@@ -609,6 +636,7 @@ class CRM_Core_DAO_ActionSchedule extends CRM_Core_DAO {
           'table_name' => 'civicrm_action_schedule',
           'entity' => 'ActionSchedule',
           'bao' => 'CRM_Core_BAO_ActionSchedule',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Contact_DAO_Group',
           'html' => array(
             'type' => 'Select',
@@ -627,6 +655,7 @@ class CRM_Core_DAO_ActionSchedule extends CRM_Core_DAO {
           'table_name' => 'civicrm_action_schedule',
           'entity' => 'ActionSchedule',
           'bao' => 'CRM_Core_BAO_ActionSchedule',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Core_DAO_MessageTemplate',
         ) ,
         'sms_template_id' => array(
@@ -637,6 +666,7 @@ class CRM_Core_DAO_ActionSchedule extends CRM_Core_DAO {
           'table_name' => 'civicrm_action_schedule',
           'entity' => 'ActionSchedule',
           'bao' => 'CRM_Core_BAO_ActionSchedule',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Core_DAO_MessageTemplate',
         ) ,
         'absolute_date' => array(
@@ -647,6 +677,7 @@ class CRM_Core_DAO_ActionSchedule extends CRM_Core_DAO {
           'table_name' => 'civicrm_action_schedule',
           'entity' => 'ActionSchedule',
           'bao' => 'CRM_Core_BAO_ActionSchedule',
+          'localizable' => 0,
         ) ,
         'from_name' => array(
           'name' => 'from_name',
@@ -658,6 +689,7 @@ class CRM_Core_DAO_ActionSchedule extends CRM_Core_DAO {
           'table_name' => 'civicrm_action_schedule',
           'entity' => 'ActionSchedule',
           'bao' => 'CRM_Core_BAO_ActionSchedule',
+          'localizable' => 0,
         ) ,
         'from_email' => array(
           'name' => 'from_email',
@@ -669,6 +701,7 @@ class CRM_Core_DAO_ActionSchedule extends CRM_Core_DAO {
           'table_name' => 'civicrm_action_schedule',
           'entity' => 'ActionSchedule',
           'bao' => 'CRM_Core_BAO_ActionSchedule',
+          'localizable' => 0,
         ) ,
         'mode' => array(
           'name' => 'mode',
@@ -681,6 +714,7 @@ class CRM_Core_DAO_ActionSchedule extends CRM_Core_DAO {
           'table_name' => 'civicrm_action_schedule',
           'entity' => 'ActionSchedule',
           'bao' => 'CRM_Core_BAO_ActionSchedule',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -696,6 +730,7 @@ class CRM_Core_DAO_ActionSchedule extends CRM_Core_DAO {
           'table_name' => 'civicrm_action_schedule',
           'entity' => 'ActionSchedule',
           'bao' => 'CRM_Core_BAO_ActionSchedule',
+          'localizable' => 0,
           'FKClassName' => 'CRM_SMS_DAO_Provider',
           'html' => array(
             'type' => 'Select',
@@ -711,6 +746,7 @@ class CRM_Core_DAO_ActionSchedule extends CRM_Core_DAO {
           'table_name' => 'civicrm_action_schedule',
           'entity' => 'ActionSchedule',
           'bao' => 'CRM_Core_BAO_ActionSchedule',
+          'localizable' => 0,
         ) ,
         'filter_contact_language' => array(
           'name' => 'filter_contact_language',
@@ -722,6 +758,7 @@ class CRM_Core_DAO_ActionSchedule extends CRM_Core_DAO {
           'table_name' => 'civicrm_action_schedule',
           'entity' => 'ActionSchedule',
           'bao' => 'CRM_Core_BAO_ActionSchedule',
+          'localizable' => 0,
         ) ,
         'communication_language' => array(
           'name' => 'communication_language',
@@ -733,6 +770,7 @@ class CRM_Core_DAO_ActionSchedule extends CRM_Core_DAO {
           'table_name' => 'civicrm_action_schedule',
           'entity' => 'ActionSchedule',
           'bao' => 'CRM_Core_BAO_ActionSchedule',
+          'localizable' => 0,
         ) ,
       );
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);
@@ -788,5 +826,12 @@ class CRM_Core_DAO_ActionSchedule extends CRM_Core_DAO {
   static function &export($prefix = false) {
     $r = CRM_Core_DAO_AllCoreTables::getExports(__CLASS__, 'action_schedule', $prefix, array());
     return $r;
+  }
+  /**
+   * Returns the list of indices
+   */
+  public static function indices($localize = TRUE) {
+    $indices = array();
+    return ($localize && !empty($indices)) ? CRM_Core_DAO_AllCoreTables::multilingualize(__CLASS__, $indices) : $indices;
   }
 }

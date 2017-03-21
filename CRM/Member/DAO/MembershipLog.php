@@ -143,6 +143,7 @@ class CRM_Member_DAO_MembershipLog extends CRM_Core_DAO {
           'table_name' => 'civicrm_membership_log',
           'entity' => 'MembershipLog',
           'bao' => 'CRM_Member_BAO_MembershipLog',
+          'localizable' => 0,
         ) ,
         'membership_id' => array(
           'name' => 'membership_id',
@@ -153,6 +154,7 @@ class CRM_Member_DAO_MembershipLog extends CRM_Core_DAO {
           'table_name' => 'civicrm_membership_log',
           'entity' => 'MembershipLog',
           'bao' => 'CRM_Member_BAO_MembershipLog',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Member_DAO_Membership',
         ) ,
         'status_id' => array(
@@ -164,6 +166,7 @@ class CRM_Member_DAO_MembershipLog extends CRM_Core_DAO {
           'table_name' => 'civicrm_membership_log',
           'entity' => 'MembershipLog',
           'bao' => 'CRM_Member_BAO_MembershipLog',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Member_DAO_MembershipStatus',
         ) ,
         'start_date' => array(
@@ -174,6 +177,7 @@ class CRM_Member_DAO_MembershipLog extends CRM_Core_DAO {
           'table_name' => 'civicrm_membership_log',
           'entity' => 'MembershipLog',
           'bao' => 'CRM_Member_BAO_MembershipLog',
+          'localizable' => 0,
         ) ,
         'end_date' => array(
           'name' => 'end_date',
@@ -183,6 +187,7 @@ class CRM_Member_DAO_MembershipLog extends CRM_Core_DAO {
           'table_name' => 'civicrm_membership_log',
           'entity' => 'MembershipLog',
           'bao' => 'CRM_Member_BAO_MembershipLog',
+          'localizable' => 0,
         ) ,
         'modified_id' => array(
           'name' => 'modified_id',
@@ -192,6 +197,7 @@ class CRM_Member_DAO_MembershipLog extends CRM_Core_DAO {
           'table_name' => 'civicrm_membership_log',
           'entity' => 'MembershipLog',
           'bao' => 'CRM_Member_BAO_MembershipLog',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Contact_DAO_Contact',
         ) ,
         'modified_date' => array(
@@ -202,6 +208,7 @@ class CRM_Member_DAO_MembershipLog extends CRM_Core_DAO {
           'table_name' => 'civicrm_membership_log',
           'entity' => 'MembershipLog',
           'bao' => 'CRM_Member_BAO_MembershipLog',
+          'localizable' => 0,
         ) ,
         'membership_type_id' => array(
           'name' => 'membership_type_id',
@@ -211,6 +218,7 @@ class CRM_Member_DAO_MembershipLog extends CRM_Core_DAO {
           'table_name' => 'civicrm_membership_log',
           'entity' => 'MembershipLog',
           'bao' => 'CRM_Member_BAO_MembershipLog',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Member_DAO_MembershipType',
         ) ,
         'max_related' => array(
@@ -221,6 +229,7 @@ class CRM_Member_DAO_MembershipLog extends CRM_Core_DAO {
           'table_name' => 'civicrm_membership_log',
           'entity' => 'MembershipLog',
           'bao' => 'CRM_Member_BAO_MembershipLog',
+          'localizable' => 0,
         ) ,
       );
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);
@@ -276,5 +285,12 @@ class CRM_Member_DAO_MembershipLog extends CRM_Core_DAO {
   static function &export($prefix = false) {
     $r = CRM_Core_DAO_AllCoreTables::getExports(__CLASS__, 'membership_log', $prefix, array());
     return $r;
+  }
+  /**
+   * Returns the list of indices
+   */
+  public static function indices($localize = TRUE) {
+    $indices = array();
+    return ($localize && !empty($indices)) ? CRM_Core_DAO_AllCoreTables::multilingualize(__CLASS__, $indices) : $indices;
   }
 }

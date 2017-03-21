@@ -148,6 +148,7 @@ class CRM_Core_DAO_ActionLog extends CRM_Core_DAO {
           'table_name' => 'civicrm_action_log',
           'entity' => 'ActionLog',
           'bao' => 'CRM_Core_BAO_ActionLog',
+          'localizable' => 0,
         ) ,
         'contact_id' => array(
           'name' => 'contact_id',
@@ -157,6 +158,7 @@ class CRM_Core_DAO_ActionLog extends CRM_Core_DAO {
           'table_name' => 'civicrm_action_log',
           'entity' => 'ActionLog',
           'bao' => 'CRM_Core_BAO_ActionLog',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Contact_DAO_Contact',
         ) ,
         'entity_id' => array(
@@ -168,6 +170,7 @@ class CRM_Core_DAO_ActionLog extends CRM_Core_DAO {
           'table_name' => 'civicrm_action_log',
           'entity' => 'ActionLog',
           'bao' => 'CRM_Core_BAO_ActionLog',
+          'localizable' => 0,
         ) ,
         'entity_table' => array(
           'name' => 'entity_table',
@@ -179,6 +182,7 @@ class CRM_Core_DAO_ActionLog extends CRM_Core_DAO {
           'table_name' => 'civicrm_action_log',
           'entity' => 'ActionLog',
           'bao' => 'CRM_Core_BAO_ActionLog',
+          'localizable' => 0,
         ) ,
         'action_schedule_id' => array(
           'name' => 'action_schedule_id',
@@ -189,6 +193,7 @@ class CRM_Core_DAO_ActionLog extends CRM_Core_DAO {
           'table_name' => 'civicrm_action_log',
           'entity' => 'ActionLog',
           'bao' => 'CRM_Core_BAO_ActionLog',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Core_DAO_ActionSchedule',
         ) ,
         'action_date_time' => array(
@@ -199,6 +204,7 @@ class CRM_Core_DAO_ActionLog extends CRM_Core_DAO {
           'table_name' => 'civicrm_action_log',
           'entity' => 'ActionLog',
           'bao' => 'CRM_Core_BAO_ActionLog',
+          'localizable' => 0,
         ) ,
         'is_error' => array(
           'name' => 'is_error',
@@ -208,6 +214,7 @@ class CRM_Core_DAO_ActionLog extends CRM_Core_DAO {
           'table_name' => 'civicrm_action_log',
           'entity' => 'ActionLog',
           'bao' => 'CRM_Core_BAO_ActionLog',
+          'localizable' => 0,
         ) ,
         'message' => array(
           'name' => 'message',
@@ -217,6 +224,7 @@ class CRM_Core_DAO_ActionLog extends CRM_Core_DAO {
           'table_name' => 'civicrm_action_log',
           'entity' => 'ActionLog',
           'bao' => 'CRM_Core_BAO_ActionLog',
+          'localizable' => 0,
         ) ,
         'repetition_number' => array(
           'name' => 'repetition_number',
@@ -226,6 +234,7 @@ class CRM_Core_DAO_ActionLog extends CRM_Core_DAO {
           'table_name' => 'civicrm_action_log',
           'entity' => 'ActionLog',
           'bao' => 'CRM_Core_BAO_ActionLog',
+          'localizable' => 0,
         ) ,
         'reference_date' => array(
           'name' => 'reference_date',
@@ -236,6 +245,7 @@ class CRM_Core_DAO_ActionLog extends CRM_Core_DAO {
           'table_name' => 'civicrm_action_log',
           'entity' => 'ActionLog',
           'bao' => 'CRM_Core_BAO_ActionLog',
+          'localizable' => 0,
         ) ,
       );
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);
@@ -291,5 +301,12 @@ class CRM_Core_DAO_ActionLog extends CRM_Core_DAO {
   static function &export($prefix = false) {
     $r = CRM_Core_DAO_AllCoreTables::getExports(__CLASS__, 'action_log', $prefix, array());
     return $r;
+  }
+  /**
+   * Returns the list of indices
+   */
+  public static function indices($localize = TRUE) {
+    $indices = array();
+    return ($localize && !empty($indices)) ? CRM_Core_DAO_AllCoreTables::multilingualize(__CLASS__, $indices) : $indices;
   }
 }

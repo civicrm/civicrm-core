@@ -152,6 +152,7 @@ class CRM_Core_DAO_Dashboard extends CRM_Core_DAO {
           'table_name' => 'civicrm_dashboard',
           'entity' => 'Dashboard',
           'bao' => 'CRM_Core_BAO_Dashboard',
+          'localizable' => 0,
         ) ,
         'domain_id' => array(
           'name' => 'domain_id',
@@ -162,6 +163,7 @@ class CRM_Core_DAO_Dashboard extends CRM_Core_DAO {
           'table_name' => 'civicrm_dashboard',
           'entity' => 'Dashboard',
           'bao' => 'CRM_Core_BAO_Dashboard',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Core_DAO_Domain',
           'pseudoconstant' => array(
             'table' => 'civicrm_domain',
@@ -179,6 +181,7 @@ class CRM_Core_DAO_Dashboard extends CRM_Core_DAO {
           'table_name' => 'civicrm_dashboard',
           'entity' => 'Dashboard',
           'bao' => 'CRM_Core_BAO_Dashboard',
+          'localizable' => 0,
         ) ,
         'label' => array(
           'name' => 'label',
@@ -190,6 +193,7 @@ class CRM_Core_DAO_Dashboard extends CRM_Core_DAO {
           'table_name' => 'civicrm_dashboard',
           'entity' => 'Dashboard',
           'bao' => 'CRM_Core_BAO_Dashboard',
+          'localizable' => 1,
         ) ,
         'url' => array(
           'name' => 'url',
@@ -201,6 +205,7 @@ class CRM_Core_DAO_Dashboard extends CRM_Core_DAO {
           'table_name' => 'civicrm_dashboard',
           'entity' => 'Dashboard',
           'bao' => 'CRM_Core_BAO_Dashboard',
+          'localizable' => 0,
         ) ,
         'permission' => array(
           'name' => 'permission',
@@ -212,6 +217,7 @@ class CRM_Core_DAO_Dashboard extends CRM_Core_DAO {
           'table_name' => 'civicrm_dashboard',
           'entity' => 'Dashboard',
           'bao' => 'CRM_Core_BAO_Dashboard',
+          'localizable' => 0,
         ) ,
         'permission_operator' => array(
           'name' => 'permission_operator',
@@ -223,6 +229,7 @@ class CRM_Core_DAO_Dashboard extends CRM_Core_DAO {
           'table_name' => 'civicrm_dashboard',
           'entity' => 'Dashboard',
           'bao' => 'CRM_Core_BAO_Dashboard',
+          'localizable' => 0,
         ) ,
         'fullscreen_url' => array(
           'name' => 'fullscreen_url',
@@ -234,6 +241,7 @@ class CRM_Core_DAO_Dashboard extends CRM_Core_DAO {
           'table_name' => 'civicrm_dashboard',
           'entity' => 'Dashboard',
           'bao' => 'CRM_Core_BAO_Dashboard',
+          'localizable' => 0,
         ) ,
         'is_active' => array(
           'name' => 'is_active',
@@ -243,6 +251,7 @@ class CRM_Core_DAO_Dashboard extends CRM_Core_DAO {
           'table_name' => 'civicrm_dashboard',
           'entity' => 'Dashboard',
           'bao' => 'CRM_Core_BAO_Dashboard',
+          'localizable' => 0,
         ) ,
         'is_reserved' => array(
           'name' => 'is_reserved',
@@ -252,6 +261,7 @@ class CRM_Core_DAO_Dashboard extends CRM_Core_DAO {
           'table_name' => 'civicrm_dashboard',
           'entity' => 'Dashboard',
           'bao' => 'CRM_Core_BAO_Dashboard',
+          'localizable' => 0,
         ) ,
         'cache_minutes' => array(
           'name' => 'cache_minutes',
@@ -263,6 +273,7 @@ class CRM_Core_DAO_Dashboard extends CRM_Core_DAO {
           'table_name' => 'civicrm_dashboard',
           'entity' => 'Dashboard',
           'bao' => 'CRM_Core_BAO_Dashboard',
+          'localizable' => 0,
         ) ,
       );
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);
@@ -318,5 +329,12 @@ class CRM_Core_DAO_Dashboard extends CRM_Core_DAO {
   static function &export($prefix = false) {
     $r = CRM_Core_DAO_AllCoreTables::getExports(__CLASS__, 'dashboard', $prefix, array());
     return $r;
+  }
+  /**
+   * Returns the list of indices
+   */
+  public static function indices($localize = TRUE) {
+    $indices = array();
+    return ($localize && !empty($indices)) ? CRM_Core_DAO_AllCoreTables::multilingualize(__CLASS__, $indices) : $indices;
   }
 }

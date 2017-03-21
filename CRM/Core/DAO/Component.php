@@ -92,6 +92,7 @@ class CRM_Core_DAO_Component extends CRM_Core_DAO {
           'table_name' => 'civicrm_component',
           'entity' => 'Component',
           'bao' => 'CRM_Core_DAO_Component',
+          'localizable' => 0,
         ) ,
         'name' => array(
           'name' => 'name',
@@ -104,6 +105,7 @@ class CRM_Core_DAO_Component extends CRM_Core_DAO {
           'table_name' => 'civicrm_component',
           'entity' => 'Component',
           'bao' => 'CRM_Core_DAO_Component',
+          'localizable' => 0,
         ) ,
         'namespace' => array(
           'name' => 'namespace',
@@ -117,6 +119,7 @@ class CRM_Core_DAO_Component extends CRM_Core_DAO {
           'table_name' => 'civicrm_component',
           'entity' => 'Component',
           'bao' => 'CRM_Core_DAO_Component',
+          'localizable' => 0,
         ) ,
       );
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);
@@ -172,5 +175,12 @@ class CRM_Core_DAO_Component extends CRM_Core_DAO {
   static function &export($prefix = false) {
     $r = CRM_Core_DAO_AllCoreTables::getExports(__CLASS__, 'component', $prefix, array());
     return $r;
+  }
+  /**
+   * Returns the list of indices
+   */
+  public static function indices($localize = TRUE) {
+    $indices = array();
+    return ($localize && !empty($indices)) ? CRM_Core_DAO_AllCoreTables::multilingualize(__CLASS__, $indices) : $indices;
   }
 }

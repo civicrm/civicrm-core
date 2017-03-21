@@ -128,6 +128,7 @@ class CRM_Event_DAO_ParticipantStatusType extends CRM_Core_DAO {
           'table_name' => 'civicrm_participant_status_type',
           'entity' => 'ParticipantStatusType',
           'bao' => 'CRM_Event_BAO_ParticipantStatusType',
+          'localizable' => 0,
         ) ,
         'participant_status' => array(
           'name' => 'name',
@@ -144,6 +145,7 @@ class CRM_Event_DAO_ParticipantStatusType extends CRM_Core_DAO {
           'table_name' => 'civicrm_participant_status_type',
           'entity' => 'ParticipantStatusType',
           'bao' => 'CRM_Event_BAO_ParticipantStatusType',
+          'localizable' => 0,
         ) ,
         'label' => array(
           'name' => 'label',
@@ -155,6 +157,7 @@ class CRM_Event_DAO_ParticipantStatusType extends CRM_Core_DAO {
           'table_name' => 'civicrm_participant_status_type',
           'entity' => 'ParticipantStatusType',
           'bao' => 'CRM_Event_BAO_ParticipantStatusType',
+          'localizable' => 1,
         ) ,
         'class' => array(
           'name' => 'class',
@@ -166,6 +169,7 @@ class CRM_Event_DAO_ParticipantStatusType extends CRM_Core_DAO {
           'table_name' => 'civicrm_participant_status_type',
           'entity' => 'ParticipantStatusType',
           'bao' => 'CRM_Event_BAO_ParticipantStatusType',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -181,6 +185,7 @@ class CRM_Event_DAO_ParticipantStatusType extends CRM_Core_DAO {
           'table_name' => 'civicrm_participant_status_type',
           'entity' => 'ParticipantStatusType',
           'bao' => 'CRM_Event_BAO_ParticipantStatusType',
+          'localizable' => 0,
         ) ,
         'is_active' => array(
           'name' => 'is_active',
@@ -191,6 +196,7 @@ class CRM_Event_DAO_ParticipantStatusType extends CRM_Core_DAO {
           'table_name' => 'civicrm_participant_status_type',
           'entity' => 'ParticipantStatusType',
           'bao' => 'CRM_Event_BAO_ParticipantStatusType',
+          'localizable' => 0,
         ) ,
         'is_counted' => array(
           'name' => 'is_counted',
@@ -200,6 +206,7 @@ class CRM_Event_DAO_ParticipantStatusType extends CRM_Core_DAO {
           'table_name' => 'civicrm_participant_status_type',
           'entity' => 'ParticipantStatusType',
           'bao' => 'CRM_Event_BAO_ParticipantStatusType',
+          'localizable' => 0,
         ) ,
         'weight' => array(
           'name' => 'weight',
@@ -210,6 +217,7 @@ class CRM_Event_DAO_ParticipantStatusType extends CRM_Core_DAO {
           'table_name' => 'civicrm_participant_status_type',
           'entity' => 'ParticipantStatusType',
           'bao' => 'CRM_Event_BAO_ParticipantStatusType',
+          'localizable' => 0,
         ) ,
         'visibility_id' => array(
           'name' => 'visibility_id',
@@ -219,6 +227,7 @@ class CRM_Event_DAO_ParticipantStatusType extends CRM_Core_DAO {
           'table_name' => 'civicrm_participant_status_type',
           'entity' => 'ParticipantStatusType',
           'bao' => 'CRM_Event_BAO_ParticipantStatusType',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -281,5 +290,12 @@ class CRM_Event_DAO_ParticipantStatusType extends CRM_Core_DAO {
   static function &export($prefix = false) {
     $r = CRM_Core_DAO_AllCoreTables::getExports(__CLASS__, 'participant_status_type', $prefix, array());
     return $r;
+  }
+  /**
+   * Returns the list of indices
+   */
+  public static function indices($localize = TRUE) {
+    $indices = array();
+    return ($localize && !empty($indices)) ? CRM_Core_DAO_AllCoreTables::multilingualize(__CLASS__, $indices) : $indices;
   }
 }
