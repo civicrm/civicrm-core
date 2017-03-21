@@ -3689,10 +3689,20 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     $account = CRM_Financial_BAO_FinancialAccount::add($params);
     $entityParams = array(
       'entity_table' => 'civicrm_financial_type',
-      'account_relationship' => key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Sales Tax Account is' ")),
       'entity_id' => $financialTypeId,
-      'financial_account_id' => $account->id,
+      'account_relationship' => key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Sales Tax Account is' ")),
     );
+
+    //CRM-20313: As per unique index added in civicrm_entity_financial_account table,
+    //  first check if there's any record on basis of unique key (entity_table, account_relationship, entity_id)
+    $dao = new CRM_Financial_DAO_EntityFinancialAccount();
+    $dao->copyValues($entityParams);
+    $dao->find();
+    if ($dao->fetch()) {
+      $entityParams['id'] = $dao->id;
+    }
+    $entityParams['financial_account_id'] = $account->id;
+
     return CRM_Financial_BAO_FinancialTypeAccount::add($entityParams);
   }
 
