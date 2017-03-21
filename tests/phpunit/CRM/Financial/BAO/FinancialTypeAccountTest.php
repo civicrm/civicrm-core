@@ -195,8 +195,17 @@ class CRM_Financial_BAO_FinancialTypeAccountTest extends CiviUnitTestCase {
         'entity_table' => 'civicrm_financial_type',
         'entity_id' => $financialType->id,
         'account_relationship' => array_search($relationType, $relationTypes),
-        'financial_account_id' => $financialAccount->id,
       );
+
+      //CRM-20313: As per unique index added in civicrm_entity_financial_account table,
+      //  first check if there's any record on basis of unique key (entity_table, account_relationship, entity_id)
+      $dao = new CRM_Financial_DAO_EntityFinancialAccount();
+      $dao->copyValues($financialParams);
+      $dao->find();
+      if ($dao->fetch()) {
+        $financialParams['id'] = $dao->id;
+      }
+      $financialParams['financial_account_id'] = $financialAccount->id;
       $financialAccountType = CRM_Financial_BAO_FinancialTypeAccount::add($financialParams);
     }
     return array($financialAccount, $financialType, $financialAccountType);

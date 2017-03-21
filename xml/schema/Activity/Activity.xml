@@ -253,6 +253,11 @@
       <type>Select</type>
     </html>
   </field>
+  <index>
+    <name>index_status_id</name>
+    <fieldName>status_id</fieldName>
+    <add>4.7</add>
+  </index>
   <field>
     <name>priority_id</name>
     <type>int unsigned</type>
