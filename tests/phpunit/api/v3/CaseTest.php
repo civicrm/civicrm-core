@@ -483,4 +483,34 @@ class api_v3_CaseTest extends CiviCaseTestCase {
     $this->assertNotEmpty($def['caseRoles'][0]['creator']);
   }
 
+  public function testCaseGetTags() {
+    $case1 = $this->callAPISuccess('Case', 'create', array(
+      'contact_id' => 17,
+      'subject' => "Test case with tags",
+      'case_type_id' => $this->caseTypeId,
+      'status_id' => "Open",
+    ));
+    $tag1 = $this->tagCreate(array(
+      'name' => 'CaseTag1',
+      'used_for' => 'civicrm_case',
+    ));
+    $tag2 = $this->tagCreate(array(
+      'name' => 'CaseTag2',
+      'used_for' => 'civicrm_case',
+    ));
+    $this->callAPISuccess('EntityTag', 'create', array(
+      'entity_table' => 'civicrm_case',
+      'entity_id' => $case1['id'],
+      'tag_id' => $tag1['id'],
+    ));
+    $this->callAPIFailure('Case', 'getsingle', array(
+      'tag_id' => $tag2['id'],
+    ));
+    $result = $this->callAPISuccessGetSingle('Case', array(
+      'tag_id' => $tag1['id'],
+      'return' => 'tag_id.name',
+    ));
+    $this->assertEquals('CaseTag1', $result['tag_id'][$tag1['id']]['tag_id.name']);
+  }
+
 }
