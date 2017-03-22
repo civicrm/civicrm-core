@@ -4548,43 +4548,52 @@ LIMIT 1;";
             }
             $dao->free();
 
-            $membershipParams['num_terms'] = $contribution->getNumTermsByContributionAndMembershipType(
-              $membershipParams['membership_type_id'],
-              $primaryContributionID
-            );
-            $dates = array_fill_keys(array('join_date', 'start_date', 'end_date'), NULL);
-            if ($currentMembership) {
-              /*
-               * Fixed FOR CRM-4433
-               * In BAO/Membership.php(renewMembership function), we skip the extend membership date and status
-               * when Contribution mode is notify and membership is for renewal )
-               */
-              CRM_Member_BAO_Membership::fixMembershipStatusBeforeRenew($currentMembership, $changeDate);
+            if (CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_Contribution', 'contribution_status_id', CRM_Utils_Array::value('contribution_status_id', $input)) === 'Pending') {
+              $membershipParams['num_terms'] = 0;
+            }
+            else {
+              $membershipParams['num_terms'] = $contribution->getNumTermsByContributionAndMembershipType(
+                $membershipParams['membership_type_id'],
+                $primaryContributionID
+              );
+              // @todo remove all this stuff in favour of letting the api call further down handle in
+              // (it is a duplication of what the api does).
+              $dates = array_fill_keys(array('join_date', 'start_date', 'end_date'), NULL);
+              if ($currentMembership) {
+                /*
+                 * Fixed FOR CRM-4433
+                 * In BAO/Membership.php(renewMembership function), we skip the extend membership date and status
+                 * when Contribution mode is notify and membership is for renewal )
+                 */
+                CRM_Member_BAO_Membership::fixMembershipStatusBeforeRenew($currentMembership, $changeDate);
 
-              // @todo - we should pass membership_type_id instead of null here but not
-              // adding as not sure of testing
-              $dates = CRM_Member_BAO_MembershipType::getRenewalDatesForMembershipType($membershipParams['id'],
-                $changeDate, NULL, $membershipParams['num_terms']
+                // @todo - we should pass membership_type_id instead of null here but not
+                // adding as not sure of testing
+                $dates = CRM_Member_BAO_MembershipType::getRenewalDatesForMembershipType($membershipParams['id'],
+                  $changeDate, NULL, $membershipParams['num_terms']
+                );
+
+                $dates['join_date'] = $currentMembership['join_date'];
+              }
+
+              //get the status for membership.
+              $calcStatus = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate($dates['start_date'],
+                $dates['end_date'],
+                $dates['join_date'],
+                'today',
+                TRUE,
+                $membershipParams['membership_type_id'],
+                $membershipParams
               );
 
-              $dates['join_date'] = $currentMembership['join_date'];
+              unset($dates['end_date']);
+              $membershipParams['status_id'] = CRM_Utils_Array::value('id', $calcStatus, 'New');
+              //we might be renewing membership,
+              //so make status override false.
+              $membershipParams['is_override'] = FALSE;
             }
-
-            //get the status for membership.
-            $calcStatus = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate($dates['start_date'],
-              $dates['end_date'],
-              $dates['join_date'],
-              'today',
-              TRUE,
-              $membershipParams['membership_type_id'],
-              $membershipParams
-            );
-
-            $membershipParams['status_id'] = CRM_Utils_Array::value('id', $calcStatus, 'New');
-            //we might be renewing membership,
-            //so make status override false.
-            $membershipParams['is_override'] = FALSE;
             //CRM-17723 - reset static $relatedContactIds array()
+            // @todo move it to Civi Statics.
             $var = TRUE;
             CRM_Member_BAO_Membership::createRelatedMemberships($var, $var, TRUE);
             civicrm_api3('Membership', 'create', $membershipParams);

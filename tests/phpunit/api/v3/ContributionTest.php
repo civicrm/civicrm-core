@@ -3420,6 +3420,45 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * CRM-20008 Tests repeattransaction creates pending membership.
+   */
+  public function testRepeatTransactionPendingMembership() {
+    list($originalContribution, $membership) = $this->setUpAutoRenewMembership();
+    $this->callAPISuccess('membership', 'create', array(
+      'id' => $membership['id'],
+      'end_date' => 'yesterday',
+      'status_id' => 'Expired',
+    ));
+    $repeatedContribution = $this->callAPISuccess('contribution', 'repeattransaction', array(
+      'contribution_recur_id' => $originalContribution['values'][1]['contribution_recur_id'],
+      'contribution_status_id' => 'Pending',
+      'trxn_id' => uniqid(),
+    ));
+    $membershipStatusId = $this->callAPISuccess('membership', 'getvalue', array(
+      'id' => $membership['id'],
+      'return' => 'status_id',
+    ));
+
+    // Let's see if the membership payments got created while we're at it.
+    $membershipPayments = $this->callAPISuccess('MembershipPayment', 'get', array(
+      'memberhip_id' => $membership['id'],
+    ));
+    $this->assertEquals(2, $membershipPayments['count']);
+
+    $this->assertEquals('Expired', CRM_Core_PseudoConstant::getLabel('CRM_Member_BAO_Membership', 'status_id', $membershipStatusId));
+    $this->callAPISuccess('Contribution', 'completetransaction', array('id' => $repeatedContribution['id']));
+    $membership = $this->callAPISuccessGetSingle('membership', array(
+      'id' => $membership['id'],
+      'return' => 'status_id, end_date',
+    ));
+    $this->assertEquals('New', CRM_Core_PseudoConstant::getLabel('CRM_Member_BAO_Membership', 'status_id', $membership['status_id']));
+    $this->assertEquals(date('Y-m-d', strtotime('yesterday + 1 month')), $membership['end_date']);
+
+    $this->quickCleanUpFinancialEntities();
+    $this->contactDelete($originalContribution['values'][1]['contact_id']);
+  }
+
+  /**
    * Test sending a mail via the API.
    */
   public function testSendMailWithAPISetFromDetails() {
