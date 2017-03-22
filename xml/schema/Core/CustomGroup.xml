@@ -214,4 +214,12 @@
     <comment>Is this a reserved Custom Group?</comment>
     <add>4.4</add>
   </field>
+  <field>
+    <name>is_public</name>
+    <type>boolean</type>
+    <title>Custom Group Is Public?</title>
+    <default>1</default>
+    <comment>Is this property public?</comment>
+    <add>4.7</add>
+  </field>
 </table>
