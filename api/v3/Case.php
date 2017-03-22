@@ -272,7 +272,7 @@ function civicrm_api3_case_get($params) {
 
   if (empty($options['is_count']) && !empty($cases['values'])) {
     // For historic reasons we return these by default only when fetching a case by id
-    if (!empty($params['id']) && empty($options['return'])) {
+    if (!empty($params['id']) && is_numeric($params['id']) && empty($options['return'])) {
       $options['return'] = array(
         'contacts' => 1,
         'activities' => 1,

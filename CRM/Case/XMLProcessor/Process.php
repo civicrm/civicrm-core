@@ -437,12 +437,7 @@ AND        a.is_deleted = 0
       $statusName = 'Scheduled';
     }
 
-    if ($this->_isMultiClient) {
-      $client = $params['clientID'];
-    }
-    else {
-      $client = array(1 => $params['clientID']);
-    }
+    $client = (array) $params['clientID'];
 
     //set order
     $orderVal = '';
