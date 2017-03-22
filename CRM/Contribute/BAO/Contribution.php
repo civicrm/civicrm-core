@@ -4532,6 +4532,8 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
 
             // CRM-8141 update the membership type with the value recorded in log when membership created/renewed
             // this picks up membership type changes during renewals
+            // @todo this is almost certainly an obsolete sql call, the pre-change
+            // membership is accessible via $this->_relatedObjects
             $sql = "
 SELECT    membership_type_id
 FROM      civicrm_membership_log

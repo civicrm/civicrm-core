@@ -2100,17 +2100,18 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
   /**
    * CRM-19945 Tests repeattransaction is using a completed contribution for the template.
+   *
    *  ( Tests membership is renewed after repeattransaction. )
    */
   public function testRepeatTransactionUsesCompleted() {
     list($originalContribution, $membership) = $this->setUpAutoRenewMembership();
 
     $this->callAPISuccess('contribution', 'create', array(
-          'contact_id' => $originalContribution['values'][1]['contact_id'],
-          'financial_type_id' => $originalContribution['values'][1]['financial_type_id'],
-          'total_amount' => $originalContribution['values'][1]['total_amount'],
-          'contribution_recur_id' => $originalContribution['values'][1]['contribution_recur_id'],
-          'contribution_status_id' => "Failed",
+      'contact_id' => $originalContribution['values'][1]['contact_id'],
+      'financial_type_id' => $originalContribution['values'][1]['financial_type_id'],
+      'total_amount' => $originalContribution['values'][1]['total_amount'],
+      'contribution_recur_id' => $originalContribution['values'][1]['contribution_recur_id'],
+      'contribution_status_id' => "Failed",
     ));
 
     $this->callAPISuccess('membership', 'create', array(
@@ -2119,18 +2120,22 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
        'status_id' => 4,
     ));
 
-    $this->callAPISuccess('contribution', 'repeattransaction', array(
+    $contribution = $this->callAPISuccess('contribution', 'repeattransaction', array(
        'contribution_recur_id' => $originalContribution['values'][1]['contribution_recur_id'],
        'contribution_status_id' => 'Completed',
-       'trxn_id' => uniqid(),
+       'trxn_id' => 'bobsled',
     ));
 
-    $membershipStatus = $this->callAPISuccess('membership', 'getvalue', array(
+    $membershipStatusId = $this->callAPISuccess('membership', 'getvalue', array(
       'id' => $membership['id'],
       'return' => 'status_id',
     ));
 
-    $this->assertEquals('1', $membershipStatus);
+    $this->assertEquals('New', CRM_Core_PseudoConstant::getLabel('CRM_Member_BAO_Membership', 'status_id', $membershipStatusId));
+
+    $lineItem = $this->callAPISuccessGetSingle('LineItem', array('contribution_id' => $contribution['id']));
+    $this->assertEquals('civicrm_membership', $lineItem['entity_table']);
+    $this->callAPISuccessGetCount('MembershipPayment', array('membership_id' => $membership['id']));
     $this->quickCleanUpFinancialEntities();
     $this->contactDelete($originalContribution['values'][1]['contact_id']);
   }
@@ -3251,17 +3256,17 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    */
   protected function setUpAutoRenewMembership($generalParams = array(), $recurParams = array()) {
     $newContact = $this->callAPISuccess('Contact', 'create', array(
-       'contact_type' => 'Individual',
-       'sort_name' => 'McTesterson, Testy',
-       'display_name' => 'Testy McTesterson',
-       'preferred_language' => 'en_US',
-       'preferred_mail_format' => 'Both',
-       'first_name' => 'Testy',
-       'last_name' => 'McTesterson',
-       'contact_is_deleted' => '0',
-       'email_id' => '4',
-       'email' => 'tmctesterson@example.com',
-       'on_hold' => '0',
+     'contact_type' => 'Individual',
+     'sort_name' => 'McTesterson, Testy',
+     'display_name' => 'Testy McTesterson',
+     'preferred_language' => 'en_US',
+     'preferred_mail_format' => 'Both',
+     'first_name' => 'Testy',
+     'last_name' => 'McTesterson',
+     'contact_is_deleted' => '0',
+     'email_id' => '4',
+     'email' => 'tmctesterson@example.com',
+     'on_hold' => '0',
     ));
     $membershipType = $this->callAPISuccess('MembershipType', 'create', array(
       'domain_id' => "Default Domain Name",
@@ -3284,6 +3289,17 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'frequency_unit' => 'month',
       'payment_processor_id' => $this->paymentProcessorID,
     ), $generalParams, $recurParams));
+
+    $membership = $this->callAPISuccess('membership', 'create', array(
+      'contact_id' => $newContact['id'],
+      'contribution_recur_id' => $contributionRecur['id'],
+      'financial_type_id' => "Member Dues",
+      'membership_type_id' => $membershipType['id'],
+      'num_terms' => 1,
+      'skipLineItem' => TRUE,
+    ));
+
+    CRM_Price_BAO_LineItem::getLineItemArray($this->_params, NULL, 'membership', $membershipType['id']);
     $originalContribution = $this->callAPISuccess('contribution', 'create', array_merge(
       $this->_params,
       array(
@@ -3294,18 +3310,12 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
         'invoice_id' => uniqid(),
       ), $generalParams)
     );
-    $membership = $this->callAPISuccess('membership', 'create', array(
-      'contact_id' => $newContact['id'],
-      'contribution_recur_id' => $contributionRecur['id'],
-      'financial_type_id' => "Member Dues",
-      'membership_type_id' => $membershipType['id'],
-      'num_terms' => 1,
-    ));
+    $lineItem = $this->callAPISuccess('LineItem', 'getsingle', array());
+    $this->assertEquals('civicrm_membership', $lineItem['entity_table']);
+    $membership = $this->callAPISuccess('Membership', 'getsingle', array('id' => $lineItem['entity_id']));
+    $this->callAPISuccess('LineItem', 'getsingle', array());
+    $this->callAPISuccessGetCount('MembershipPayment', array('membership_id' => $membership['id']), 1);
 
-    $this->callAPISuccess('MembershipPayment', 'create', array(
-        'contribution_id' => $originalContribution['id'],
-        'membership_id' => $membership['id'],
-    ));
     return array($originalContribution, $membership);
   }
   /**
