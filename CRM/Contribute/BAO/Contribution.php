@@ -1732,9 +1732,9 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
               'target_contact_id' => $membership->contact_id,
               'source_record_id' => $membership->id,
               'activity_type_id' => 'Change Membership Status',
-              'status_id' => 2,
-              'priority_id' => 2,
-              'activity_date_time' => date('Y-m-d H:i:s'),
+              'status_id' => 'Completed',
+              'priority_id' => 'Normal',
+              'activity_date_time' => 'now',
             );
 
             $membership->status_id = $newStatus;
