@@ -1216,9 +1216,6 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
             elseif (in_array($name, array(
               'birth_date',
               'deceased_date',
-              'membership_start_date',
-              'membership_end_date',
-              'join_date',
             ))) {
               // @todo this set should be determined from metadata, not hard-coded.
               $values[$index] = CRM_Utils_Date::customFormat($details->$name);
@@ -2330,9 +2327,6 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    */
   static public function getNonUpgradedDateFields() {
     return array(
-      'membership_start_date' => 'activityDate',
-      'membership_end_date' => 'activityDate',
-      'join_date' => 'activityDate',
       'receive_date' => 'activityDateTime',
       'receipt_date' => 'activityDateTime',
       'thankyou_date' => 'activityDateTime',
@@ -3321,7 +3315,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       elseif ($name == 'membership_status') {
         $defaults[$fldName] = $values['status_id'];
       }
-      elseif ($customFieldInfo = CRM_Core_BAO_CustomField::getKeyID($name, TRUE)) {
+      elseif (CRM_Core_BAO_CustomField::getKeyID($name, TRUE) !== array(NULL, NULL)) {
         if (empty($formattedGroupTree)) {
           //get the groupTree as per subTypes.
           $groupTree = array();
@@ -3372,6 +3366,9 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
             }
           }
         }
+      }
+      elseif (isset($values[$fldName])) {
+        $defaults[$fldName] = $values[$fldName];
       }
     }
   }

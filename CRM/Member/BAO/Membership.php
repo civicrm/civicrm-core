@@ -1942,7 +1942,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
         // Insert renewed dates for CURRENT membership
         $memParams = array();
         $memParams['join_date'] = CRM_Utils_Date::isoToMysql($membership->join_date);
-        $memParams['start_date'] = CRM_Utils_Date::isoToMysql($membership->start_date);
+        $memParams['start_date'] = CRM_Utils_Array::value('start_date', $formDates, CRM_Utils_Date::isoToMysql($membership->start_date));
         $memParams['end_date'] = CRM_Utils_Array::value('end_date', $formDates);
         if (empty($memParams['end_date'])) {
           $memParams['end_date'] = CRM_Utils_Array::value('end_date', $dates);
