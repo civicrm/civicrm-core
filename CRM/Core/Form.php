@@ -272,12 +272,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * Generate ID for some reason & purpose that is unknown & undocumented.
-   */
-  public static function generateID() {
-  }
-
-  /**
    * Add one or more css classes to the form.
    *
    * @param string $className
