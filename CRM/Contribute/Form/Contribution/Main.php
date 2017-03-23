@@ -566,11 +566,13 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
     $form->assign('is_recur_interval', CRM_Utils_Array::value('is_recur_interval', $form->_values));
     $form->assign('is_recur_installments', CRM_Utils_Array::value('is_recur_installments', $form->_values));
-
-    $form->assign('recurringHelpText', $form->_paymentObject->getText('contributionPageRecurringHelp', array(
-      'is_recur_installments' => !empty($form->_values['is_recur_installments']),
-      'is_email_receipt' => !empty($form->_values['is_email_receipt']),
-    )));
+    $paymentObject = $form->getVar('_paymentObject');
+    if ($paymentObject) {
+      $form->assign('recurringHelpText', $paymentObject->getText('contributionPageRecurringHelp', array(
+        'is_recur_installments' => !empty($form->_values['is_recur_installments']),
+        'is_email_receipt' => !empty($form->_values['is_email_receipt']),
+      )));
+    }
 
     $form->add('checkbox', 'is_recur', ts('I want to contribute this amount'), NULL);
 
