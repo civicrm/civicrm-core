@@ -5,7 +5,41 @@
  * @group headless
  */
 class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
-  public function testFuzzyDupes() {
+
+  /**
+   * IDs of created contacts.
+   *
+   * @var array
+   */
+  protected $contactIDs = array();
+
+  /**
+   * ID of the group holding the contacts.
+   *
+   * @var int
+   */
+  protected $groupID;
+
+  /**
+   * Clean up after the test.
+   */
+  public function tearDown() {
+
+    foreach ($this->contactIDs as $contactId) {
+      $this->contactDelete($contactId);
+    }
+    if ($this->groupID) {
+      $this->callAPISuccess('group', 'delete', array('id' => $this->groupID));
+    }
+    parent::tearDown();
+  }
+
+  /**
+   * Test the unsupervised dedupe rule against a group.
+   *
+   * @throws \Exception
+   */
+  public function testUnsupervisedDupes() {
     // make dupe checks based on based on following contact sets:
     // FIRST - LAST - EMAIL
     // ---------------------------------
@@ -16,89 +50,23 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
     // will   - dale - dale@example.com
     // will   - dale - will@example.com
     // will   - dale - will@example.com
+    $this->setupForGroupDedupe();
 
-    // create a group to hold contacts, so that dupe checks don't consider any other contacts in the DB
-    $params = array(
-      'name' => 'Dupe Group',
-      'title' => 'New Test Dupe Group',
-      'domain_id' => 1,
-      'is_active' => 1,
-      'visibility' => 'Public Pages',
-    );
+    $ruleGroup = $this->callAPISuccessGetSingle('RuleGroup', array('is_reserved' => 1, 'contact_type' => 'Individual', 'used' => 'Unsupervised'));
 
-    $result = $this->callAPISuccess('group', 'create', $params);
-    $groupId = $result['id'];
+    $foundDupes = CRM_Dedupe_Finder::dupesInGroup($ruleGroup['id'], $this->groupID);
+    $this->assertEquals(count($foundDupes), 3, 'Check Individual-Fuzzy dupe rule for dupesInGroup().');
+  }
 
-    // contact data set
-    // FIXME: move create params to separate function
-    $params = array(
-      array(
-        'first_name' => 'robin',
-        'last_name' => 'hood',
-        'email' => 'robin@example.com',
-        'contact_type' => 'Individual',
-      ),
-      array(
-        'first_name' => 'robin',
-        'last_name' => 'hood',
-        'email' => 'hood@example.com',
-        'contact_type' => 'Individual',
-      ),
-      array(
-        'first_name' => 'robin',
-        'last_name' => 'dale',
-        'email' => 'robin@example.com',
-        'contact_type' => 'Individual',
-      ),
-      array(
-        'first_name' => 'little',
-        'last_name' => 'dale',
-        'email' => 'dale@example.com',
-        'contact_type' => 'Individual',
-      ),
-      array(
-        'first_name' => 'will',
-        'last_name' => 'dale',
-        'email' => 'dale@example.com',
-        'contact_type' => 'Individual',
-      ),
-      array(
-        'first_name' => 'will',
-        'last_name' => 'dale',
-        'email' => 'will@example.com',
-        'contact_type' => 'Individual',
-      ),
-      array(
-        'first_name' => 'will',
-        'last_name' => 'dale',
-        'email' => 'will@example.com',
-        'contact_type' => 'Individual',
-      ),
-    );
-
-    $count = 1;
-    foreach ($params as $param) {
-      $contact = $this->callAPISuccess('contact', 'create', $param);
-      $contactIds[$count++] = $contact['id'];
-
-      $grpParams = array(
-        'contact_id' => $contact['id'],
-        'group_id' => $groupId,
-      );
-      $this->callAPISuccess('group_contact', 'create', $grpParams);
-    }
-
-    // verify that all contacts have been created separately
-    $this->assertEquals(count($contactIds), 7, 'Check for number of contacts.');
-
-    $dao = new CRM_Dedupe_DAO_RuleGroup();
-    $dao->contact_type = 'Individual';
-    $dao->level = 'Fuzzy';
-    $dao->is_default = 1;
-    $dao->find(TRUE);
-
-    $foundDupes = CRM_Dedupe_Finder::dupesInGroup($dao->id, $groupId);
-
+  /**
+   * Test the supervised dedupe rule against a group.
+   *
+   * @throws \Exception
+   */
+  public function testSupervisedDupes() {
+    $this->setupForGroupDedupe();
+    $ruleGroup = $this->callAPISuccessGetSingle('RuleGroup', array('s_reserved' => 1, 'contact_type' => 'Individual', 'used' => 'Supervised'));
+    $foundDupes = CRM_Dedupe_Finder::dupesInGroup($ruleGroup['id'], $this->groupID);
     // -------------------------------------------------------------------------
     // default dedupe rule: threshold = 20 => (First + Last + Email) Matches ( 1 pair )
     // --------------------------------------------------------------------------
@@ -106,15 +74,11 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
     // will   - dale - will@example.com
     // so 1 pair for - first + last + mail
     $this->assertEquals(count($foundDupes), 1, 'Check Individual-Fuzzy dupe rule for dupesInGroup().');
-
-    foreach ($contactIds as $contactId) {
-      $this->contactDelete($contactId);
-    }
-    // delete dupe group
-    $params = array('id' => $groupId, 'version' => 3);
-    civicrm_api('group', 'delete', $params);
   }
 
+  /**
+   * Test dupesByParams function.
+   */
   public function testDupesByParams() {
     // make dupe checks based on based on following contact sets:
     // FIRST - LAST - EMAIL
@@ -212,6 +176,82 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
     foreach ($contactIds as $contactId) {
       $this->contactDelete($contactId);
     }
+  }
+
+  /**
+   * Set up a group of dedupable contacts.
+   */
+  protected function setupForGroupDedupe() {
+    $params = array(
+      'name' => 'Dupe Group',
+      'title' => 'New Test Dupe Group',
+      'domain_id' => 1,
+      'is_active' => 1,
+      'visibility' => 'Public Pages',
+    );
+
+    $result = $this->callAPISuccess('group', 'create', $params);
+    $this->groupID = $result['id'];
+
+    $params = array(
+      array(
+        'first_name' => 'robin',
+        'last_name' => 'hood',
+        'email' => 'robin@example.com',
+        'contact_type' => 'Individual',
+      ),
+      array(
+        'first_name' => 'robin',
+        'last_name' => 'hood',
+        'email' => 'hood@example.com',
+        'contact_type' => 'Individual',
+      ),
+      array(
+        'first_name' => 'robin',
+        'last_name' => 'dale',
+        'email' => 'robin@example.com',
+        'contact_type' => 'Individual',
+      ),
+      array(
+        'first_name' => 'little',
+        'last_name' => 'dale',
+        'email' => 'dale@example.com',
+        'contact_type' => 'Individual',
+      ),
+      array(
+        'first_name' => 'will',
+        'last_name' => 'dale',
+        'email' => 'dale@example.com',
+        'contact_type' => 'Individual',
+      ),
+      array(
+        'first_name' => 'will',
+        'last_name' => 'dale',
+        'email' => 'will@example.com',
+        'contact_type' => 'Individual',
+      ),
+      array(
+        'first_name' => 'will',
+        'last_name' => 'dale',
+        'email' => 'will@example.com',
+        'contact_type' => 'Individual',
+      ),
+    );
+
+    $count = 1;
+    foreach ($params as $param) {
+      $contact = $this->callAPISuccess('contact', 'create', $param);
+      $this->contactIDs[$count++] = $contact['id'];
+
+      $grpParams = array(
+        'contact_id' => $contact['id'],
+        'group_id' => $this->groupID,
+      );
+      $this->callAPISuccess('group_contact', 'create', $grpParams);
+    }
+
+    // verify that all contacts have been created separately
+    $this->assertEquals(count($this->contactIDs), 7, 'Check for number of contacts.');
   }
 
 }
