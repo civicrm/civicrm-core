@@ -1053,6 +1053,15 @@ LEFT JOIN  civicrm_line_item i ON ( i.contribution_id = c.id AND i.entity_table 
       'source_contact_id' => CRM_Core_Session::getLoggedInContactID() ? CRM_Core_Session::getLoggedInContactID() :
         $contactID,
     ));
+
+    // CRM-20336 Make sure that the contribution status is Failed, not Pending.
+    $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+    $failed = array_search('Failed', $contributionStatus);
+
+    civicrm_api3('contribution', 'create', array(
+      'id' => $contributionID,
+      'contribution_status_id' => $failed,
+    ));
   }
 
   /**
