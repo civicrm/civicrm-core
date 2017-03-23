@@ -3426,4 +3426,53 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
     return $clauses;
   }
 
+  /**
+   * Get any existing duplicate contacts based on the input parameters.
+   *
+   * @param array $input
+   *   Input parameters to be matched.
+   * @param string $contactType
+   * @param string $rule
+   *  - Supervised
+   *  - Unsupervised
+   * @param $excludedContactIDs
+   *   An array of ids not to be included in the results.
+   * @param bool $checkPermissions
+   * @param int $ruleGroupID
+   *   ID of the rule group to be used if an override is desirable.
+   *
+   * @return array
+   */
+  public static function getDuplicateContacts($input, $contactType, $rule = 'Unsupervised', $excludedContactIDs = array(), $checkPermissions = TRUE, $ruleGroupID = NULL) {
+    $dedupeParams = CRM_Dedupe_Finder::formatParams($input, $contactType);
+    $dedupeParams['check_permission'] = $checkPermissions;
+    $ids = CRM_Dedupe_Finder::dupesByParams($dedupeParams, $contactType, $rule, $excludedContactIDs, $ruleGroupID);
+    return $ids;
+  }
+
+  /**
+   * Get the first duplicate contacts based on the input parameters.
+   *
+   * @param array $input
+   *   Input parameters to be matched.
+   * @param string $contactType
+   * @param string $rule
+   *  - Supervised
+   *  - Unsupervised
+   * @param $excludedContactIDs
+   *   An array of ids not to be included in the results.
+   * @param bool $checkPermissions
+   * @param int $ruleGroupID
+   *   ID of the rule group to be used if an override is desirable.
+   *
+   * @return int|NULL
+   */
+  public static function getFirstDuplicateContact($input, $contactType, $rule = 'Unsupervised', $excludedContactIDs = array(), $checkPermissions = TRUE, $ruleGroupID = NULL) {
+    $ids = self::getDuplicateContacts($input, $contactType, $rule, $excludedContactIDs, $checkPermissions, $ruleGroupID);
+    if (empty($ids)) {
+      return NULL;
+    }
+    return $ids[0];
+  }
+
 }

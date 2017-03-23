@@ -203,8 +203,7 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
       'street_address' => 'Ambachtstraat 23',
     );
     CRM_Core_TemporaryErrorScope::useException();
-    $dedupeParams = CRM_Dedupe_Finder::formatParams($fields, 'Individual');
-    $ids = CRM_Dedupe_Finder::dupesByParams($dedupeParams, 'Individual', 'General');
+    $ids = CRM_Contact_BAO_Contact::getDuplicateContacts($fields, 'Individual', 'General');
 
     // Check with default Individual-General rule
     $this->assertEquals(count($ids), 2, 'Check Individual-General rule for dupesByParams().');
