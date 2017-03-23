@@ -1331,11 +1331,10 @@ ORDER BY   civicrm_email.is_bulkmail DESC
 
     $mailParams['attachments'] = $attachments;
 
-    $mailingSubject = CRM_Utils_Array::value('subject', $pEmails);
-    if (is_array($mailingSubject)) {
-      $mailingSubject = implode('', $mailingSubject);
+    $mailParams['Subject'] = CRM_Utils_Array::value('subject', $pEmails);
+    if (is_array($mailParams['Subject'])) {
+      $mailParams['Subject'] = implode('', $mailParams['Subject']);
     }
-    $mailParams['Subject'] = $mailingSubject;
 
     $mailParams['toName'] = CRM_Utils_Array::value('display_name',
       $contact
@@ -1404,7 +1403,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
 
     //CRM-5058
     //token replacement of subject
-    $headers['Subject'] = $mailingSubject;
+    $headers['Subject'] = $mailParams['Subject'];
 
     CRM_Utils_Mail::setMimeParams($message);
     $headers = $message->headers($headers);
