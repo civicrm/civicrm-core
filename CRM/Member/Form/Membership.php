@@ -1314,7 +1314,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       }
 
       if (empty($params['is_override']) &&
-        CRM_Utils_Array::value('contribution_status_id', $params) == array_search('Pending', CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name'))
+        CRM_Utils_Array::value('contribution_status_id', $params) != array_search('Completed', $allContributionStatus)
       ) {
         $params['status_id'] = array_search('Pending', $allMemberStatus);
         $params['skipStatusCal'] = TRUE;
