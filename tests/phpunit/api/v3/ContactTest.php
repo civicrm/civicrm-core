@@ -3015,6 +3015,30 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->callAPIFailure('Contact', 'create', array_merge($harry, array('dupe_check' => 1)));
   }
 
+  /**
+   * Test the duplicate check function.
+   */
+  public function testDuplicateCheckRuleNotReserved() {
+    $harry = array(
+      'first_name' => 'Harry',
+      'last_name' => 'Potter',
+      'email' => 'harry@hogwarts.edu',
+      'contact_type' => 'Individual',
+    );
+    $defaultRule = $this->callAPISuccess('RuleGroup', 'getsingle', array('used' => 'Unsupervised', 'is_reserved' => 1));
+    $this->callAPISuccess('RuleGroup', 'create', array('id' => $defaultRule['id'], 'is_reserved' => 0));
+    $this->callAPISuccess('Contact', 'create', $harry);
+    $result = $this->callAPISuccess('Contact', 'duplicatecheck', array(
+      'match' => $harry,
+    ));
+
+    $this->assertEquals(1, $result['count']);
+    $this->callAPISuccess('RuleGroup', 'create', array('id' => $defaultRule['id'], 'is_reserved' => 1));
+  }
+
+  /**
+   * Test variants on retrieving contact by type.
+   */
   public function testGetByContactType() {
     $individual = $this->callAPISuccess('Contact', 'create', array(
       'email' => 'individual@test.com',
