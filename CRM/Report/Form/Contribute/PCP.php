@@ -178,14 +178,11 @@ class CRM_Report_Form_Contribute_PCP extends CRM_Report_Form {
           'card_type' => array(
             'title' => ts('Credit Card Type'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialTrxn', 'card_type'),
+            'options' => CRM_Financial_DAO_FinancialTrxn::buildOptions('card_type'),
             'default' => NULL,
             'type' => CRM_Utils_Type::T_STRING,
           ),
         ),
-      ),
-      'civicrm_entity_financial_trxn' => array(
-        'dao' => 'CRM_Financial_DAO_EntityFinancialTrxn',
       ),
     );
 
@@ -213,14 +210,7 @@ LEFT JOIN civicrm_contribution_page {$this->_aliases['civicrm_contribution_page'
              {$this->_aliases['civicrm_contribution_page']}.id";
 
     // for credit card type
-    if ($this->isTableSelected('civicrm_financial_trxn')) {
-      $this->_from .= "
-        LEFT JOIN civicrm_entity_financial_trxn eftcc
-          ON ({$this->_aliases['civicrm_contribution']}.id = eftcc.entity_id AND
-            eftcc.entity_table = 'civicrm_contribution')
-        LEFT JOIN civicrm_financial_trxn {$this->_aliases['civicrm_financial_trxn']}
-          ON {$this->_aliases['civicrm_financial_trxn']}.id = eftcc.financial_trxn_id";
-    }
+    $this->addFinancialTrxnFromClause();
   }
 
   public function groupBy() {
