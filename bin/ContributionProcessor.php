@@ -188,10 +188,15 @@ class CiviContributeProcessor {
             $params['transaction']['is_test'] = 0;
           }
 
-          if (self::processAPIContribution($params)) {
-            CRM_Core_Error::debug_log_message("Processed - {$trxnDetails['email']}, {$trxnDetails['amt']}, {$value} ..<p>", TRUE);
+          try {
+            if (self::processAPIContribution($params)) {
+              CRM_Core_Error::debug_log_message("Processed - {$trxnDetails['email']}, {$trxnDetails['amt']}, {$value} ..<p>", TRUE);
+            }
+            else {
+              CRM_Core_Error::debug_log_message("Skipped - {$trxnDetails['email']}, {$trxnDetails['amt']}, {$value} ..<p>", TRUE);
+            }
           }
-          else {
+          catch (CiviCRM_API3_Exception $e) {
             CRM_Core_Error::debug_log_message("Skipped - {$trxnDetails['email']}, {$trxnDetails['amt']}, {$value} ..<p>", TRUE);
           }
         }
@@ -399,6 +404,10 @@ class CiviContributeProcessor {
   }
 
   /**
+   * @deprecated function.
+   *
+   * This function has probably been defunct for quite a long time.
+   *
    * @param array $params
    *
    * @return bool
@@ -408,33 +417,16 @@ class CiviContributeProcessor {
       return FALSE;
     }
 
-    // add contact using dedupe rule
-    $dedupeParams = CRM_Dedupe_Finder::formatParams($params, 'Individual');
-    $dedupeParams['check_permission'] = FALSE;
-    $dupeIds = CRM_Dedupe_Finder::dupesByParams($dedupeParams, 'Individual');
-    // if we find more than one contact, use the first one
-    if (!empty($dupeIds[0])) {
-      $params['contact_id'] = $dupeIds[0];
-    }
-    $contact = CRM_Contact_BAO_Contact::create($params);
-    if (!$contact->id) {
-      return FALSE;
-    }
+    $params['contact_id'] = CRM_Contact_BAO_Contact::getFirstDuplicateContact($params, 'Individual', 'Unsupervised', array(), FALSE);
+
+    $contact = civicrm_api3('Contact', 'create', $params);
 
     // only pass transaction params to contribution::create, if available
     if (array_key_exists('transaction', $params)) {
       $params = $params['transaction'];
-      $params['contact_id'] = $contact->id;
+      $params['contact_id'] = $contact['id'];
     }
 
-    // handle contribution custom data
-    $customFields = CRM_Core_BAO_CustomField::getFields('Contribution',
-      FALSE,
-      FALSE,
-      CRM_Utils_Array::value('financial_type_id',
-        $params
-      )
-    );
     $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
       CRM_Utils_Array::value('id', $params, NULL),
       'Contribution'
