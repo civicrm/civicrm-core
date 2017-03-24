@@ -632,7 +632,8 @@ FROM civicrm_action_schedule cas
         $tokenRow->context['contact']['preferred_mail_format'] == 'Both'
       )
     ) {
-      $mailParams['html'] = $body_html;
+      //CRM-19345 : unsanitize HTML tags for HTML content
+      $mailParams['html'] = htmlspecialchars($body_html);
     }
     $result = CRM_Utils_Mail::send($mailParams);
     if (!$result || is_a($result, 'PEAR_Error')) {
