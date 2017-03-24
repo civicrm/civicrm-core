@@ -2848,163 +2848,235 @@ AND       civicrm_openid.is_primary = 1";
    */
   public static function contextMenu($contactId = NULL) {
     $menu = array(
-      'view' => array(
-        'title' => ts('View Contact'),
-        'weight' => 0,
-        'ref' => 'view-contact',
-        'class' => 'no-popup',
-        'key' => 'view',
-        'permissions' => array('view all contacts'),
-      ),
-      'add' => array(
-        'title' => ts('Edit Contact'),
-        'weight' => 0,
-        'ref' => 'edit-contact',
-        'class' => 'no-popup',
-        'key' => 'add',
-        'permissions' => array('edit all contacts'),
-      ),
-      'delete' => array(
-        'title' => ts('Delete Contact'),
-        'weight' => 0,
-        'ref' => 'delete-contact',
-        'key' => 'delete',
-        'permissions' => array('access deleted contacts', 'delete contacts'),
-      ),
-      'contribution' => array(
-        'title' => ts('Add Contribution'),
-        'weight' => 5,
-        'ref' => 'new-contribution',
-        'key' => 'contribution',
-        'tab' => 'contribute',
-        'component' => 'CiviContribute',
-        'href' => CRM_Utils_System::url('civicrm/contact/view/contribution',
-          'reset=1&action=add&context=contribution'
+      'moreActions' => array(
+        'view' => array(
+          'title' => ts('View Contact'),
+          'weight' => 0,
+          'ref' => 'view-contact',
+          'class' => 'no-popup',
+          'key' => 'view',
+          'permissions' => array('view all contacts'),
         ),
-        'permissions' => array(
-          'access CiviContribute',
-          'edit contributions',
+        'add' => array(
+          'title' => ts('Edit Contact'),
+          'weight' => 0,
+          'ref' => 'edit-contact',
+          'class' => 'no-popup',
+          'key' => 'add',
+          'permissions' => array('edit all contacts'),
+        ),
+        'delete' => array(
+          'title' => ts('Delete Contact'),
+          'weight' => 0,
+          'ref' => 'delete-contact',
+          'key' => 'delete',
+          'permissions' => array('access deleted contacts', 'delete contacts'),
+        ),
+        'contribution' => array(
+          'title' => ts('Add Contribution'),
+          'weight' => 5,
+          'ref' => 'new-contribution',
+          'key' => 'contribution',
+          'tab' => 'contribute',
+          'component' => 'CiviContribute',
+          'href' => CRM_Utils_System::url('civicrm/contact/view/contribution',
+            'reset=1&action=add&context=contribution'
+          ),
+          'permissions' => array(
+            'access CiviContribute',
+            'edit contributions',
+          ),
+        ),
+        'participant' => array(
+          'title' => ts('Register for Event'),
+          'weight' => 10,
+          'ref' => 'new-participant',
+          'key' => 'participant',
+          'tab' => 'participant',
+          'component' => 'CiviEvent',
+          'href' => CRM_Utils_System::url('civicrm/contact/view/participant', 'reset=1&action=add&context=participant'),
+          'permissions' => array(
+            'access CiviEvent',
+            'edit event participants',
+          ),
+        ),
+        'activity' => array(
+          'title' => ts('Record Activity'),
+          'weight' => 35,
+          'ref' => 'new-activity',
+          'key' => 'activity',
+          'permissions' => array('edit all contacts'),
+        ),
+        'pledge' => array(
+          'title' => ts('Add Pledge'),
+          'weight' => 15,
+          'ref' => 'new-pledge',
+          'key' => 'pledge',
+          'tab' => 'pledge',
+          'href' => CRM_Utils_System::url('civicrm/contact/view/pledge',
+            'reset=1&action=add&context=pledge'
+          ),
+          'component' => 'CiviPledge',
+          'permissions' => array(
+            'access CiviPledge',
+            'edit pledges',
+          ),
+        ),
+        'membership' => array(
+          'title' => ts('Add Membership'),
+          'weight' => 20,
+          'ref' => 'new-membership',
+          'key' => 'membership',
+          'tab' => 'member',
+          'component' => 'CiviMember',
+          'href' => CRM_Utils_System::url('civicrm/contact/view/membership',
+            'reset=1&action=add&context=membership'
+          ),
+          'permissions' => array(
+            'access CiviMember',
+            'edit memberships',
+          ),
+        ),
+        'case' => array(
+          'title' => ts('Add Case'),
+          'weight' => 25,
+          'ref' => 'new-case',
+          'key' => 'case',
+          'tab' => 'case',
+          'component' => 'CiviCase',
+          'href' => CRM_Utils_System::url('civicrm/case/add', 'reset=1&action=add&context=case'),
+          'permissions' => array('add cases'),
+        ),
+        'grant' => array(
+          'title' => ts('Add Grant'),
+          'weight' => 26,
+          'ref' => 'new-grant',
+          'key' => 'grant',
+          'tab' => 'grant',
+          'component' => 'CiviGrant',
+          'href' => CRM_Utils_System::url('civicrm/contact/view/grant',
+            'reset=1&action=add&context=grant'
+          ),
+          'permissions' => array('edit grants'),
+        ),
+        'rel' => array(
+          'title' => ts('Add Relationship'),
+          'weight' => 30,
+          'ref' => 'new-relationship',
+          'key' => 'rel',
+          'tab' => 'rel',
+          'href' => CRM_Utils_System::url('civicrm/contact/view/rel',
+            'reset=1&action=add'
+          ),
+          'permissions' => array('edit all contacts'),
+        ),
+        'note' => array(
+          'title' => ts('Add Note'),
+          'weight' => 40,
+          'ref' => 'new-note',
+          'key' => 'note',
+          'tab' => 'note',
+          'class' => 'medium-popup',
+          'href' => CRM_Utils_System::url('civicrm/contact/view/note',
+            'reset=1&action=add'
+          ),
+          'permissions' => array('edit all contacts'),
+        ),
+        'email' => array(
+          'title' => ts('Send an Email'),
+          'weight' => 45,
+          'ref' => 'new-email',
+          'key' => 'email',
+          'permissions' => array('view all contacts'),
+        ),
+        'group' => array(
+          'title' => ts('Add to Group'),
+          'weight' => 50,
+          'ref' => 'group-add-contact',
+          'key' => 'group',
+          'tab' => 'group',
+          'permissions' => array('edit groups'),
+        ),
+        'tag' => array(
+          'title' => ts('Tag Contact'),
+          'weight' => 55,
+          'ref' => 'tag-contact',
+          'key' => 'tag',
+          'tab' => 'tag',
+          'permissions' => array('edit all contacts'),
         ),
       ),
-      'participant' => array(
-        'title' => ts('Register for Event'),
-        'weight' => 10,
-        'ref' => 'new-participant',
-        'key' => 'participant',
-        'tab' => 'participant',
-        'component' => 'CiviEvent',
-        'href' => CRM_Utils_System::url('civicrm/contact/view/participant', 'reset=1&action=add&context=participant'),
-        'permissions' => array(
-          'access CiviEvent',
-          'edit event participants',
+      'otherActions' => array(
+        'print' => array(
+          'title' => ts('Print Summary'),
+          'description' => ts('Printer-friendly view of this page.'),
+          'weight' => 5,
+          'ref' => 'crm-contact-print',
+          'key' => 'print',
+          'tab' => 'print',
+          'href' => CRM_Utils_System::url('civicrm/contact/view/print',
+            "reset=1&print=1"
+          ),
+          'class' => 'print',
+          'icon' => 'crm-i fa-print',
         ),
-      ),
-      'activity' => array(
-        'title' => ts('Record Activity'),
-        'weight' => 35,
-        'ref' => 'new-activity',
-        'key' => 'activity',
-        'permissions' => array('edit all contacts'),
-      ),
-      'pledge' => array(
-        'title' => ts('Add Pledge'),
-        'weight' => 15,
-        'ref' => 'new-pledge',
-        'key' => 'pledge',
-        'tab' => 'pledge',
-        'href' => CRM_Utils_System::url('civicrm/contact/view/pledge',
-          'reset=1&action=add&context=pledge'
+        'vcard' => array(
+          'title' => ts('vCard'),
+          'description' => ts('vCard record for this contact.'),
+          'weight' => 10,
+          'ref' => 'crm-contact-vcard',
+          'key' => 'vcard',
+          'tab' => 'vcard',
+          'href' => CRM_Utils_System::url('civicrm/contact/view/vcard',
+            "reset=1"
+          ),
+          'class' => 'vcard',
+          'icon' => 'crm-i fa-list-alt',
         ),
-        'component' => 'CiviPledge',
-        'permissions' => array(
-          'access CiviPledge',
-          'edit pledges',
-        ),
-      ),
-      'membership' => array(
-        'title' => ts('Add Membership'),
-        'weight' => 20,
-        'ref' => 'new-membership',
-        'key' => 'membership',
-        'tab' => 'member',
-        'component' => 'CiviMember',
-        'href' => CRM_Utils_System::url('civicrm/contact/view/membership',
-          'reset=1&action=add&context=membership'
-        ),
-        'permissions' => array(
-          'access CiviMember',
-          'edit memberships',
-        ),
-      ),
-      'case' => array(
-        'title' => ts('Add Case'),
-        'weight' => 25,
-        'ref' => 'new-case',
-        'key' => 'case',
-        'tab' => 'case',
-        'component' => 'CiviCase',
-        'href' => CRM_Utils_System::url('civicrm/case/add', 'reset=1&action=add&context=case'),
-        'permissions' => array('add cases'),
-      ),
-      'grant' => array(
-        'title' => ts('Add Grant'),
-        'weight' => 26,
-        'ref' => 'new-grant',
-        'key' => 'grant',
-        'tab' => 'grant',
-        'component' => 'CiviGrant',
-        'href' => CRM_Utils_System::url('civicrm/contact/view/grant',
-          'reset=1&action=add&context=grant'
-        ),
-        'permissions' => array('edit grants'),
-      ),
-      'rel' => array(
-        'title' => ts('Add Relationship'),
-        'weight' => 30,
-        'ref' => 'new-relationship',
-        'key' => 'rel',
-        'tab' => 'rel',
-        'href' => CRM_Utils_System::url('civicrm/contact/view/rel',
-          'reset=1&action=add'
-        ),
-        'permissions' => array('edit all contacts'),
-      ),
-      'note' => array(
-        'title' => ts('Add Note'),
-        'weight' => 40,
-        'ref' => 'new-note',
-        'key' => 'note',
-        'tab' => 'note',
-        'class' => 'medium-popup',
-        'href' => CRM_Utils_System::url('civicrm/contact/view/note',
-          'reset=1&action=add'
-        ),
-        'permissions' => array('edit all contacts'),
-      ),
-      'email' => array(
-        'title' => ts('Send an Email'),
-        'weight' => 45,
-        'ref' => 'new-email',
-        'key' => 'email',
-        'permissions' => array('view all contacts'),
-      ),
-      'group' => array(
-        'title' => ts('Add to Group'),
-        'weight' => 50,
-        'ref' => 'group-add-contact',
-        'key' => 'group',
-        'tab' => 'group',
-        'permissions' => array('edit groups'),
-      ),
-      'tag' => array(
-        'title' => ts('Tag Contact'),
-        'weight' => 55,
-        'ref' => 'tag-contact',
-        'key' => 'tag',
-        'tab' => 'tag',
-        'permissions' => array('edit all contacts'),
       ),
     );
+
+    if ($dashboardURL = CRM_Core_Smarty::singleton()->get_template_vars('dashboardURL')) {
+      $menu['otherActions']['dashboard'] = array(
+        'title' => ts('Contact Dashboard'),
+        'description' => ts('Contact Dashboard'),
+        'weight' => 15,
+        'ref' => 'crm-contact-dashboard',
+        'key' => 'dashboard',
+        'tab' => 'dashboard',
+        'class' => 'dashboard',
+        'href' => $dashboardURL,
+        'icon' => 'crm-i fa-tachometer',
+      );
+    }
+
+    if ($userRecordUrl = CRM_Core_Smarty::singleton()->get_template_vars('userRecordUrl')) {
+      $menu['otherActions']['user-record'] = array(
+        'title' => ts('User Record'),
+        'description' => ts('User Record'),
+        'weight' => 20,
+        'ref' => 'crm-contact-user-record',
+        'key' => 'user-record',
+        'tab' => 'user-record',
+        'class' => 'user-record',
+        'href' => $userRecordUrl,
+        'icon' => 'crm-i fa-user',
+      );
+    }
+
+    if ($userAddUrl = CRM_Core_Smarty::singleton()->get_template_vars('userAddUrl')) {
+      $menu['otherActions']['user-add'] = array(
+        'title' => ts('Create User Record'),
+        'description' => ts('Create User Record'),
+        'weight' => 25,
+        'ref' => 'crm-contact-user-add',
+        'key' => 'user-add',
+        'tab' => 'user-add',
+        'class' => 'user-add',
+        'href' => $userAddUrl,
+        'icon' => 'crm-i fa-user-plus',
+      );
+    }
 
     CRM_Utils_Hook::summaryActions($menu, $contactId);
     //1. check for component is active.
@@ -3026,82 +3098,86 @@ AND       civicrm_openid.is_primary = 1";
     $config = CRM_Core_Config::singleton();
 
     $contextMenu = array();
-    foreach ($menu as $key => $values) {
-      $componentName = CRM_Utils_Array::value('component', $values);
+    foreach ($menu as $key => $items) {
+      foreach ($items as $values) {
+        $componentName = CRM_Utils_Array::value('component', $values);
 
-      // if component action - make sure component is enable.
-      if ($componentName && !in_array($componentName, $config->enableComponents)) {
-        continue;
-      }
-
-      // make sure user has all required permissions.
-      $hasAllPermissions = FALSE;
-
-      $permissions = CRM_Utils_Array::value('permissions', $values);
-      if (!is_array($permissions) || empty($permissions)) {
-        $hasAllPermissions = TRUE;
-      }
-
-      // iterate for required permissions in given permissions array.
-      if (!$hasAllPermissions) {
-        $hasPermissions = 0;
-        foreach ($permissions as $permission) {
-          if (CRM_Core_Permission::check($permission)) {
-            $hasPermissions++;
-          }
+        // if component action - make sure component is enable.
+        if ($componentName && !in_array($componentName, $config->enableComponents)) {
+          continue;
         }
 
-        if (count($permissions) == $hasPermissions) {
+        // make sure user has all required permissions.
+        $hasAllPermissions = FALSE;
+
+        $permissions = CRM_Utils_Array::value('permissions', $values);
+        if (!is_array($permissions) || empty($permissions)) {
           $hasAllPermissions = TRUE;
         }
 
-        // if still user does not have required permissions, check acl.
-        if (!$hasAllPermissions && $values['ref'] != 'delete-contact') {
-          if (in_array($values['ref'], $aclPermissionedTasks) &&
-            $corePermission == CRM_Core_Permission::EDIT
-          ) {
+        // iterate for required permissions in given permissions array.
+        if (!$hasAllPermissions) {
+          $hasPermissions = 0;
+          foreach ($permissions as $permission) {
+            if (CRM_Core_Permission::check($permission)) {
+              $hasPermissions++;
+            }
+          }
+
+          if (count($permissions) == $hasPermissions) {
             $hasAllPermissions = TRUE;
           }
-          elseif (in_array($values['ref'], array(
-            'new-email',
-          ))) {
-            // grant permissions for these tasks.
-            $hasAllPermissions = TRUE;
+
+          // if still user does not have required permissions, check acl.
+          if (!$hasAllPermissions && $values['ref'] != 'delete-contact') {
+            if (in_array($values['ref'], $aclPermissionedTasks) &&
+                $corePermission == CRM_Core_Permission::EDIT
+                ) {
+              $hasAllPermissions = TRUE;
+            }
+            elseif (in_array($values['ref'], array(
+              'new-email',
+            ))) {
+              // grant permissions for these tasks.
+              $hasAllPermissions = TRUE;
+            }
           }
         }
-      }
 
-      // user does not have necessary permissions.
-      if (!$hasAllPermissions) {
-        continue;
-      }
+        // user does not have necessary permissions.
+        if (!$hasAllPermissions) {
+          continue;
+        }
 
-      // build directly accessible action menu.
-      if (in_array($values['ref'], array(
-        'view-contact',
-        'edit-contact',
-      ))) {
-        $contextMenu['primaryActions'][$key] = array(
+        // build directly accessible action menu.
+        if (in_array($values['ref'], array(
+          'view-contact',
+          'edit-contact',
+        ))) {
+          $contextMenu['primaryActions'][$key] = array(
+            'title' => $values['title'],
+            'ref' => $values['ref'],
+            'class' => CRM_Utils_Array::value('class', $values),
+            'key' => $values['key'],
+          );
+          continue;
+        }
+
+        // finally get menu item for -more- action widget.
+        $contextMenu[$key][$values['weight']] = array(
           'title' => $values['title'],
           'ref' => $values['ref'],
+          'href' => CRM_Utils_Array::value('href', $values),
+          'tab' => CRM_Utils_Array::value('tab', $values),
           'class' => CRM_Utils_Array::value('class', $values),
+          'icon' => CRM_Utils_Array::value('icon', $values),
           'key' => $values['key'],
         );
-        continue;
       }
-
-      // finally get menu item for -more- action widget.
-      $contextMenu['moreActions'][$values['weight']] = array(
-        'title' => $values['title'],
-        'ref' => $values['ref'],
-        'href' => CRM_Utils_Array::value('href', $values),
-        'tab' => CRM_Utils_Array::value('tab', $values),
-        'class' => CRM_Utils_Array::value('class', $values),
-        'key' => $values['key'],
-      );
     }
 
     ksort($contextMenu['moreActions']);
+    ksort($contextMenu['otherActions']);
 
     return $contextMenu;
   }
