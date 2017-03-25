@@ -69,13 +69,13 @@
 
     function initMap() {
         var map = new OpenLayers.Map("osm_map");
-        map.addLayer(new OpenLayers.Layer.OSM("MapQuest OSM", [
-            "https://otile1-s.mqcdn.com/tiles/1.0.0/map/${z}/${x}/${y}.jpg",
-            "https://otile2-s.mqcdn.com/tiles/1.0.0/map/${z}/${x}/${y}.jpg",
-            "https://otile3-s.mqcdn.com/tiles/1.0.0/map/${z}/${x}/${y}.jpg",
-            "https://otile4-s.mqcdn.com/tiles/1.0.0/map/${z}/${x}/${y}.jpg",
+        map.addLayer(new OpenLayers.Layer.OSM("CARTO OSM", [
+          "https://cartodb-basemaps-1.global.ssl.fastly.net/light_all/${z}/${x}/${y}.png",
+          "https://cartodb-basemaps-2.global.ssl.fastly.net/light_all/${z}/${x}/${y}.png",
+          "https://cartodb-basemaps-3.global.ssl.fastly.net/light_all/${z}/${x}/${y}.png",
+          "https://cartodb-basemaps-4.global.ssl.fastly.net/light_all/${z}/${x}/${y}.png",
         ], {
-            attribution: "<p>Tiles Courtesy of <a href='http://www.mapquest.com/' target='_blank'>MapQuest</a>. Data &copy; <a href='http://www.openstreetmap.org/' target='_blank'>OpenStreetMap</a> contributors.</p>"
+            attribution: 'Data &copy; <a href="http://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>. Map tiles &copy; <a href="https://carto.com/attribution" target="_blank">CARTO</a>.'
         }));
 
         var lonLat = new OpenLayers.LonLat(
