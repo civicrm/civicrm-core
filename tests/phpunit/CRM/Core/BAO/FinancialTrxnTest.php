@@ -171,4 +171,34 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
     $this->assertEquals(date('Ymd', strtotime($trxn['values'][$trxn['id']]['trxn_date'])), date('Ymd', strtotime("+1 month")));
   }
 
+  /**
+   * Test for createTrialBalanceExport().
+   */
+  public function testcreateTrialBalanceExport() {
+    $cid = $this->individualCreate();
+    $params = array(
+      'contact_id' => $cid,
+      'receive_date' => '2016-01-20',
+      'total_amount' => 622,
+      'financial_type_id' => 4,
+    );
+    $contribution = CRM_Contribute_BAO_Contribution::create($params);
+    $params = array(
+      'total_amount' => 100,
+      'id' => $contribution->id,
+    );
+    $contribution = CRM_Contribute_BAO_Contribution::create($params);
+    $fileName = CRM_Core_BAO_FinancialTrxn::createTrialBalanceExport();
+    require_once 'CiviTest/CiviReportTestCase.php';
+    $obj = new CiviReportTestCase();
+    $csvArray = $obj->getArrayFromCsv($fileName);
+    $expectedOutputCsvArray = $obj->getArrayFromCsv(dirname(__FILE__) . "/fixtures/TrialBalance.csv");
+    $obj->assertCsvArraysEqual($expectedOutputCsvArray, $csvArray);
+    $financialAccount = civicrm_api3('FinancialAccount', 'getsingle', array(
+      'name' => 'Deposit Bank Account',
+      'return' => array("current_period_opening_balance"),
+    ));
+    $this->assertEquals('100.00', $financialAccount['current_period_opening_balance']);
+  }
+
 }
