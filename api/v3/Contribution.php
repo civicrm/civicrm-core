@@ -581,6 +581,14 @@ function _civicrm_api3_contribution_completetransaction_spec(&$params) {
     'description' => 'Date this transaction occurred',
     'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
   );
+  $params['card_type'] = array(
+    'title' => 'Card Type ID',
+    'description' => 'Providing Credit Card Type ID',
+    'type' => CRM_Utils_Type::T_INT,
+    'pseudoconstant' => array(
+      'optionGroupName' => 'accept_creditcard',
+    ),
+  );
 }
 
 /**

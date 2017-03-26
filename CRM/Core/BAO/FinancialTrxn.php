@@ -731,4 +731,18 @@ WHERE ft.to_financial_account_id != {$toFinancialAccount} AND ft.to_financial_ac
     civicrm_api3('FinancialTrxn', 'create', $trxnparams);
   }
 
+  /**
+   * Format Credit Card type.
+   *
+   * @param string|NULL|int $creditCardType
+   *
+   * @return int|NULL
+   */
+  public static function formatCreditCardDetails($creditCardType) {
+    if ($creditCardType && !is_numeric($creditCardType)) {
+      $creditCardType = CRM_Core_PseudoConstant::getKey('CRM_Financial_DAO_FinancialTrxn', 'card_type', $creditCardType);
+    }
+    return $creditCardType;
+  }
+
 }

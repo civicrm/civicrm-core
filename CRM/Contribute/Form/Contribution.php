@@ -1049,21 +1049,14 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $errors['financial_type_id'] = ' ';
       $errors['_qf_default'] = $e->getMessage();
     }
-    if (!$self->_mode && !empty($fields['pan_truncation'])
-    ) {
-      $contributionDoneViaPaymentProcesor = FALSE;
+    if (!$self->_mode && !empty($fields['pan_truncation'])) {
+      // on edit form fetch the latest payment
+      $financialTrxn = $self->_id ? $self->getlatestPayment() : NULL;
 
-      
-      if ($self->_id) {
-        $financialTrxn = $self->getlatestPayment();
-        if (!empty($financialTrxn['financial_trxn_id.payment_processor_id'])) {
-          $contributionDoneViaPaymentProcesor = TRUE;
-        }
-      }
-      if (!$contributionDoneViaPaymentProcesor
-        && (!is_numeric($fields['pan_truncation'])
-          || strlen($fields['pan_truncation']) != 4
-        )
+      // On edit or new contribution backoffice form, if the earlier payment wasn't done by using payment processor
+      //  and the value of pan_truncation isn't 4 digit numeric number then throw the desired validation error
+      if (empty($financialTrxn['financial_trxn_id.payment_processor_id']) &&
+        (!is_numeric($fields['pan_truncation']) || (strlen($fields['pan_truncation']) != 4))
       ) {
         $errors['pan_truncation'] = ts('Please enter valid last 4 digit card number.');
       }
