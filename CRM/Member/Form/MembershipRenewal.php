@@ -181,8 +181,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     // set renewal_date and receive_date to today in correct input format (setDateDefaults uses today if no value passed)
     list($now, $currentTime) = CRM_Utils_Date::setDateDefaults();
     $defaults['renewal_date'] = $now;
-    $defaults['receive_date'] = $now;
-    $defaults['receive_date_time'] = $currentTime;
 
     if ($defaults['id']) {
       $defaults['record_contribution'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipPayment',
@@ -207,11 +205,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
 
     $defaults['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $this->_memType, 'financial_type_id');
 
-    //CRM-13420
-    if (empty($defaults['payment_instrument_id'])) {
-      $defaults['payment_instrument_id'] = key(CRM_Core_OptionGroup::values('payment_instrument', FALSE, FALSE, FALSE, 'AND is_default = 1'));
-    }
-
+    CRM_Contribute_Form_PaymentDetails::setDefaultValues($defaults, NULL);
     $defaults['total_amount'] = CRM_Utils_Money::format(CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType',
       $this->_memType,
       'minimum_fee'
@@ -350,29 +344,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
 
     if (CRM_Core_Permission::access('CiviContribute') && !$this->_mode) {
       $this->addElement('checkbox', 'record_contribution', ts('Record Renewal Payment?'), NULL, array('onclick' => "checkPayment();"));
-
-      $this->add('text', 'total_amount', ts('Amount'));
-      $this->addRule('total_amount', ts('Please enter a valid amount.'), 'money');
-
-      $this->addDate('receive_date', ts('Received'), FALSE, array('formatType' => 'activityDateTime'));
-
-      $this->add('select', 'payment_instrument_id', ts('Payment Method'),
-        array('' => ts('- select -')) + CRM_Contribute_PseudoConstant::paymentInstrument(),
-        FALSE, array('onChange' => "return showHideByValue('payment_instrument_id','4','checkNumber','table-row','select',false);")
-      );
-
-      $this->add('text', 'trxn_id', ts('Transaction ID'));
-      $this->addRule('trxn_id', ts('Transaction ID already exists in Database.'),
-        'objectExists', array('CRM_Contribute_DAO_Contribution', $this->_id, 'trxn_id')
-      );
-
-      $this->add('select', 'contribution_status_id', ts('Payment Status'),
-        CRM_Contribute_PseudoConstant::contributionStatus()
-      );
-
-      $this->add('text', 'check_number', ts('Check Number'),
-        CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Contribution', 'check_number')
-      );
+      CRM_Contribute_Form_PaymentDetails::buildQuickForm($this);
     }
     else {
       $this->add('text', 'total_amount', ts('Amount'));
@@ -431,15 +403,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     //total amount condition arise when membership type having no
     //minimum fee
     if (isset($params['record_contribution'])) {
-      if (!$params['financial_type_id']) {
-        $errors['financial_type_id'] = ts('Please select a Financial Type.');
-      }
-      if (!$params['total_amount']) {
-        $errors['total_amount'] = ts('Please enter a Contribution Amount.');
-      }
-      if (empty($params['payment_instrument_id'])) {
-        $errors['payment_instrument_id'] = ts('Payment Method is a required field.');
-      }
+      CRM_Contribute_Form_PaymentDetails::formRule($params, $errors);
     }
     return empty($errors) ? TRUE : $errors;
   }
@@ -552,6 +516,8 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
 
       $this->_params['contribution_status_id'] = $result['payment_status_id'];
       $this->_params['trxn_id'] = $result['trxn_id'];
+      $this->_params['card_type'] = CRM_Utils_Array::value('credit_card_type', $this->_params);
+      $this->_params['pan_truncation'] = substr(CRM_Utils_Array::value('credit_card_number', $this->_params), -4);
       $this->_params['is_test'] = ($this->_mode == 'live') ? 0 : 1;
       $this->set('params', $this->_params);
       $this->assign('trxn_id', $result['trxn_id']);
