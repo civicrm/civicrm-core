@@ -210,7 +210,8 @@ VALUES
    ('msg_mode'                      , '{ts escape="sql"}Message Mode{/ts}'                       , NULL, 1, 1, 0),
    ('contact_date_reminder_options' , '{ts escape="sql"}Contact Date Reminder Options{/ts}'      , NULL, 1, 1, 1),
    ('wysiwyg_presets'               , '{ts escape="sql"}WYSIWYG Editor Presets{/ts}'             , NULL, 1, 1, 0),
-   ('relative_date_filters'         , '{ts escape="sql"}Relative Date Filters{/ts}'              , NULL, 1, 1, 0);
+   ('relative_date_filters'         , '{ts escape="sql"}Relative Date Filters{/ts}'              , NULL, 1, 1, 0),
+   ('email_on_hold'                 , '{ts escape="sql"}Email On Hold Options{/ts}'              , NULL, 1, 1, 1);
 
 SELECT @option_group_id_pcm            := max(id) from civicrm_option_group where name = 'preferred_communication_method';
 SELECT @option_group_id_act            := max(id) from civicrm_option_group where name = 'activity_type';
@@ -289,6 +290,7 @@ SELECT @option_group_id_communication_style := max(id) from civicrm_option_group
 SELECT @option_group_id_msg_mode := max(id) from civicrm_option_group where name = 'msg_mode';
 SELECT @option_group_id_contactDateMode := max(id) from civicrm_option_group where name = 'contact_date_reminder_options';
 SELECT @option_group_id_date_filter    := max(id) from civicrm_option_group where name = 'relative_date_filters';
+SELECT @option_group_id_email_on_hold  := max(id) from civicrm_option_group where name = 'email_on_hold';
 SELECT @option_group_id_wysiwyg_presets    := max(id) from civicrm_option_group where name = 'wysiwyg_presets';
 
 SELECT @contributeCompId := max(id) FROM civicrm_component where name = 'CiviContribute';
@@ -1028,7 +1030,12 @@ VALUES
    (@option_group_id_date_filter, '{ts escape="sql"}From end of previous week{/ts}', 'greater_previous.week', 'greater_previous.week', NULL, NULL, NULL,59, NULL, 0, 0, 1, NULL, NULL, NULL),
    (@option_group_id_date_filter, '{ts escape="sql"}From end of previous calendar month{/ts}', 'greater_previous.month', 'greater_previous.month', NULL, NULL, NULL,60, NULL, 0, 0, 1, NULL, NULL, NULL),
    (@option_group_id_date_filter, '{ts escape="sql"}From end of previous quarter{/ts}', 'greater_previous.quarter', 'greater_previous.quarter', NULL, NULL, NULL,61, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_date_filter, '{ts escape="sql"}From end of previous calendar year{/ts}', 'greater_previous.year', 'greater_previous.year', NULL, NULL, NULL,62, NULL, 0, 0, 1, NULL, NULL, NULL);
+   (@option_group_id_date_filter, '{ts escape="sql"}From end of previous calendar year{/ts}', 'greater_previous.year', 'greater_previous.year', NULL, NULL, NULL,62, NULL, 0, 0, 1, NULL, NULL, NULL),
+
+-- Email On Hold Options
+   (@option_group_id_email_on_hold, '{ts escape="sql"}No{/ts}', '0', 'on_hold_no', NULL, NULL, NULL, 63, NULL, 0, 1, 1, NULL, NULL, NULL),
+   (@option_group_id_email_on_hold, '{ts escape="sql"}On Hold Bounce{/ts}', '1', 'on_hold_bounce', NULL, NULL, NULL, 64, NULL, 0, 1, 1, NULL, NULL, NULL),
+   (@option_group_id_email_on_hold, '{ts escape="sql"}On Hold Opt Out{/ts}', '2', 'on_hold_opt_out', NULL, NULL, NULL, 65, NULL, 0, 1, 1, NULL, NULL, NULL);
 
 -- financial accounts
 SELECT @opval := value FROM civicrm_option_value WHERE name = 'Revenue' and option_group_id = @option_group_id_fat;
