@@ -3799,6 +3799,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     $params['skipLineItem'] = TRUE;
     $trxnsData['trxn_date'] = !empty($trxnsData['trxn_date']) ? $trxnsData['trxn_date'] : date('YmdHis');
     $arAccountId = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($contributionDAO->financial_type_id, 'Accounts Receivable Account is');
+
     if ($paymentType == 'owed') {
       $params['partial_payment_total'] = $contributionDAO->total_amount;
       $params['partial_amount_pay'] = $trxnsData['total_amount'];
