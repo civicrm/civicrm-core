@@ -4882,12 +4882,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
     $types = explode(',', $options);
     $labels = array();
     foreach ($types as $value) {
-      if ($labelValue = CRM_Core_PseudoConstant::getLabel($baoName, $fieldName, $value)) {
-        $labels[$value] = $labelValue;
-      }
-      else {
-        $labels[$value] = CRM_Core_DAO::getFieldValue($baoName, $value, $fieldName);
-      }
+      $labels[$value] = CRM_Core_PseudoConstant::getLabel($baoName, $fieldName, $value);
     }
     return implode(', ', array_filter($labels));
   }
