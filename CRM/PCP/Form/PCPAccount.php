@@ -265,12 +265,8 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
       }
     }
 
-    $dedupeParams = CRM_Dedupe_Finder::formatParams($params, 'Individual');
-    $dedupeParams['check_permission'] = FALSE;
-    $ids = CRM_Dedupe_Finder::dupesByParams($dedupeParams, 'Individual', 'Unsupervised');
-    if ($ids) {
-      $this->_contactID = $ids['0'];
-    }
+    $this->_contactID  = CRM_Contact_BAO_Contact::getFirstDuplicateContact($params, 'Individual', 'Unsupervised', array(), FALSE);
+
     $contactID = CRM_Contact_BAO_Contact::createProfileContact($params, $this->_fields, $this->_contactID);
     $this->set('contactID', $contactID);
 

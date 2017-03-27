@@ -205,9 +205,7 @@ class CRM_Core_BAO_UFMatch extends CRM_Core_DAO_UFMatch {
         $params = $_POST;
         $params['email'] = $uniqId;
 
-        $dedupeParams = CRM_Dedupe_Finder::formatParams($params, 'Individual');
-        $dedupeParams['check_permission'] = FALSE;
-        $ids = CRM_Dedupe_Finder::dupesByParams($dedupeParams, 'Individual');
+        $ids = CRM_Contact_BAO_Contact::getDuplicateContacts($params, 'Individual', 'Unsupervised', array(), FALSE);
 
         if (!empty($ids) && Civi::settings()->get('uniq_email_per_site')) {
           // restrict dupeIds to ones that belong to current domain/site.

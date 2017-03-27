@@ -1182,9 +1182,7 @@ function _civicrm_api3_deprecated_duplicate_formatted_contact($params) {
     }
   }
   else {
-    require_once 'CRM/Dedupe/Finder.php';
-    $dedupeParams = CRM_Dedupe_Finder::formatParams($params, $params['contact_type']);
-    $ids = CRM_Dedupe_Finder::dupesByParams($dedupeParams, $params['contact_type'], 'Unsupervised');
+    $ids = CRM_Contact_BAO_Contact::getDuplicateContacts($params, $params['contact_type'], 'Unsupervised');
 
     if (!empty($ids)) {
       $ids = implode(',', $ids);
@@ -1455,24 +1453,10 @@ function _civicrm_api3_deprecated_contact_check_params(
   }
 
   if ($dupeCheck) {
-    // @todo switch to using api version by uncommenting these lines & removing following 11.
-    // Any change here is too scary for a stable release.
+    // @todo switch to using api version
     // $dupes = civicrm_api3('Contact', 'duplicatecheck', (array('match' => $params, 'dedupe_rule_id' => $dedupeRuleGroupID)));
     // $ids = $dupes['count'] ? implode(',', array_keys($dupes['values'])) : NULL;
-    // check for record already existing
-    require_once 'CRM/Dedupe/Finder.php';
-    $dedupeParams = CRM_Dedupe_Finder::formatParams($params, $params['contact_type']);
-
-    // CRM-6431
-    // setting 'check_permission' here means that the dedupe checking will be carried out even if the
-    // person does not have permission to carry out de-dupes
-    // this is similar to the front end form
-    if (isset($params['check_permission'])) {
-      $dedupeParams['check_permission'] = $params['check_permission'];
-    }
-
-    $ids = implode(',', CRM_Dedupe_Finder::dupesByParams($dedupeParams, $params['contact_type'], 'Unsupervised', array(), $dedupeRuleGroupID));
-
+    $ids = CRM_Contact_BAO_Contact::getDuplicateContacts($params, $params['contact_type'], 'Unsupervised', array(), CRM_Utils_Array::value('check_permissions', $params, $dedupeRuleGroupID));
     if ($ids != NULL) {
       if ($dupeErrorArray) {
         $error = CRM_Core_Error::createError("Found matching contacts: $ids",
@@ -1488,14 +1472,8 @@ function _civicrm_api3_deprecated_contact_check_params(
 
   // check for organisations with same name
   if (!empty($params['current_employer'])) {
-    $organizationParams = array();
-    $organizationParams['organization_name'] = $params['current_employer'];
-
-    require_once 'CRM/Dedupe/Finder.php';
-    $dedupParams = CRM_Dedupe_Finder::formatParams($organizationParams, 'Organization');
-
-    $dedupParams['check_permission'] = FALSE;
-    $dupeIds = CRM_Dedupe_Finder::dupesByParams($dedupParams, 'Organization', 'Supervised');
+    $organizationParams = array('organization_name' => $params['current_employer']);
+    $dupeIds = CRM_Contact_BAO_Contact::getDuplicateContacts($organizationParams, 'Organization', 'Supervised', array(), FALSE);
 
     // check for mismatch employer name and id
     if (!empty($params['employer_id']) && !in_array($params['employer_id'], $dupeIds)
