@@ -93,6 +93,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
         'civicrm_membership',
         'civicrm_membership_payment',
         'civicrm_membership_log',
+        'civicrm_uf_match',
       ),
       TRUE
     );
@@ -161,6 +162,47 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $this->assertDBRowExist('CRM_Contribute_DAO_Contribution', $ContributionCreate['values'][0]['id']);
     $this->callAPISuccess('Contribution', 'delete', $contribParams);
     $this->assertDBRowNotExist('CRM_Contribute_DAO_Contribution', $ContributionCreate['values'][0]['id']);
+  }
+
+  /**
+   * Test Activity creation on cancellation of membership contribution.
+   */
+  public function testActivityForCancelledContribution() {
+    $contactId = $this->createLoggedInUser();
+    $membershipID = $this->contactMembershipCreate($this->_params);
+    $this->assertDBRowExist('CRM_Member_DAO_Membership', $membershipID);
+
+    $ContributionCreate = $this->callAPISuccess('Contribution', 'create', array(
+      'financial_type_id' => "Member Dues",
+      'total_amount' => 100,
+      'contact_id' => $this->_params['contact_id'],
+    ));
+    $membershipPaymentCreate = $this->callAPISuccess('MembershipPayment', 'create', array(
+      'sequential' => 1,
+      'contribution_id' => $ContributionCreate['id'],
+      'membership_id' => $membershipID,
+    ));
+    $instruments = $this->callAPISuccess('contribution', 'getoptions', array('field' => 'payment_instrument_id'));
+    $this->paymentInstruments = $instruments['values'];
+
+    $form = new CRM_Contribute_Form_Contribution();
+    $form->_id = $ContributionCreate['id'];
+    $form->testSubmit(array(
+      'total_amount' => 100,
+      'financial_type_id' => 1,
+      'receive_date' => '04/21/2015',
+      'receive_date_time' => '11:27PM',
+      'contact_id' => $contactId,
+      'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
+      'contribution_status_id' => 3,
+    ),
+    CRM_Core_Action::UPDATE);
+
+    $activity = $this->callAPISuccess('Activity', 'get', array(
+      'activity_type_id' => "Change Membership Status",
+      'source_record_id' => $membershipID,
+    ));
+    $this->assertNotEmpty($activity['values']);
   }
 
   /**
