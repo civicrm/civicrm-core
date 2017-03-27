@@ -371,17 +371,7 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
       $ids[0] = $this->_contactId;
     }
     else {
-      // dupeCheck - check if contact record already exists
-      // code modified from api/v2/Contact.php-function civicrm_contact_check_params()
-      $params['contact_type'] = $this->_ctype;
-      //TODO - current dedupe finds soft deleted contacts - adding param is_deleted not working
-      // ignore soft deleted contacts
-      //$params['is_deleted'] = 0;
-      $dedupeParams = CRM_Dedupe_Finder::formatParams($params, $params['contact_type']);
-      $dedupeParams['check_permission'] = '';
-
-      //dupesByParams($params, $ctype, $level = 'Unsupervised', $except = array())
-      $ids = CRM_Dedupe_Finder::dupesByParams($dedupeParams, $params['contact_type']);
+      $ids = CRM_Contact_BAO_Contact::getDuplicateContacts($params, $this->_ctype, 'Unsupervised', array(), FALSE);
     }
 
     $petition_params['id'] = $this->_surveyId;

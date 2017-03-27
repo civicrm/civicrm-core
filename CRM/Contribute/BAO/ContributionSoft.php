@@ -150,18 +150,22 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
     if (!empty($form->_values['honoree_profile_id']) && !empty($params['soft_credit_type_id'])) {
       $honorId = NULL;
 
+      // @todo fix use of deprecated function.
       $contributionSoftParams['soft_credit_type_id'] = CRM_Core_OptionGroup::getValue('soft_credit_type', 'pcp', 'name');
       //check if there is any duplicate contact
-      $profileContactType = CRM_Core_BAO_UFGroup::getContactType($form->_values['honoree_profile_id']);
-      $dedupeParams = CRM_Dedupe_Finder::formatParams($params['honor'], $profileContactType);
-      $dedupeParams['check_permission'] = FALSE;
       // honoree should never be the donor
       $exceptKeys = array(
         'contactID' => 0,
         'onbehalf_contact_id' => 0,
       );
       $except = array_values(array_intersect_key($params, $exceptKeys));
-      $ids = CRM_Dedupe_Finder::dupesByParams($dedupeParams, $profileContactType, 'Unsupervised', $except);
+      $ids = CRM_Contact_BAO_Contact::getDuplicateContacts(
+        $params['honor'],
+        CRM_Core_BAO_UFGroup::getContactType($form->_values['honoree_profile_id']),
+        'Unsupervised',
+        $except,
+        FALSE
+      );
       if (count($ids)) {
         $honorId = CRM_Utils_Array::value(0, $ids);
       }
