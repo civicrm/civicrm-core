@@ -1722,8 +1722,24 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
       if (is_array($memberships)) {
         foreach ($memberships as $membership) {
           if ($membership) {
-            $membership->status_id = array_search('Cancelled', $membershipStatuses);
+            $newStatus = array_search('Cancelled', $membershipStatuses);
+
+            // Create activity
+            $allStatus = CRM_Member_BAO_Membership::buildOptions('status_id', 'get');
+            $activityParam = array(
+              'subject' => "Status changed from {$allStatus[$membership->status_id]} to {$allStatus[$newStatus]}",
+              'source_contact_id' => CRM_Core_Session::singleton()->get('userID'),
+              'target_contact_id' => $membership->contact_id,
+              'source_record_id' => $membership->id,
+              'activity_type_id' => 'Change Membership Status',
+              'status_id' => 'Completed',
+              'priority_id' => 'Normal',
+              'activity_date_time' => 'now',
+            );
+
+            $membership->status_id = $newStatus;
             $membership->save();
+            civicrm_api3('activity', 'create', $activityParam);
 
             $updateResult['updatedComponents']['CiviMember'] = $membership->status_id;
             if ($processContributionObject) {
