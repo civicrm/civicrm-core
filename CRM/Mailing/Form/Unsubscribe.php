@@ -88,7 +88,7 @@ class CRM_Mailing_Form_Unsubscribe extends CRM_Core_Form {
     $buttons = array(
       array(
         'type' => 'next',
-        'name' => 'Unsubscribe',
+        'name' => ts('Unsubscribe'),
         'isDefault' => TRUE,
       ),
       array(
