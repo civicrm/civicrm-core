@@ -188,6 +188,7 @@ function buildTransactionSelectorAssign(filterSearch) {
   "bDestroy"   : true,
   "bFilter"    : false,
   "bAutoWidth" : false,
+  "lengthMenu": [ 10, 25, 50, 100, 250, 500, 1000, 2000 ],
   "aaSorting"  : [[5, 'desc']],
   "aoColumns"  : [
     {sClass:'crm-transaction-checkbox', bSortable:false},
