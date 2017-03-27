@@ -240,6 +240,35 @@ function civicrm_api3_case_get($params) {
     $sql->where("a.id IN (SELECT case_id FROM civicrm_case_contact WHERE $clause)");
   }
 
+  // Order by case contact (primary client)
+  // Ex: "contact_id", "contact_id.display_name", "contact_id.sort_name DESC".
+  if (!empty($options['sort']) && strpos($options['sort'], 'contact_id') !== FALSE) {
+    $sort = explode(', ', $options['sort']);
+    $contactSort = NULL;
+    foreach ($sort as $index => $sortString) {
+      if (strpos($sortString, 'contact_id') === 0) {
+        $contactSort = $sortString;
+        unset($sort[$index]);
+        // Get sort field and direction
+        list($sortField, $dir) = array_pad(explode(' ', $contactSort), 2, 'ASC');
+        list(, $sortField) = array_pad(explode('.', $sortField), 2, 'id');
+        // Validate inputs
+        if (!array_key_exists($sortField, CRM_Contact_DAO_Contact::fieldKeys()) || ($dir != 'ASC' && $dir != 'DESC')) {
+          throw new API_Exception("Unknown field specified for sort. Cannot order by '$contactSort'");
+        }
+        $sql->orderBy("case_contact.$sortField $dir");
+      }
+    }
+    // Remove contact sort params so the basic_get function doesn't see them
+    $params['options']['sort'] = implode(', ', $sort);
+    unset($params['option_sort'], $params['option.sort'], $params['sort']);
+    // Add necessary joins to the first case client
+    if ($contactSort) {
+      $sql->join('ccc', 'LEFT JOIN (SELECT * FROM civicrm_case_contact WHERE id IN (SELECT MIN(id) FROM civicrm_case_contact GROUP BY case_id)) AS ccc ON ccc.case_id = a.id');
+      $sql->join('case_contact', 'LEFT JOIN civicrm_contact AS case_contact ON ccc.contact_id = case_contact.id');
+    }
+  }
+
   // Add clause to search by activity
   if (!empty($params['activity_id'])) {
     if (!CRM_Utils_Rule::positiveInteger($params['activity_id'])) {
