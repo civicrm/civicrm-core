@@ -215,14 +215,18 @@ function _civicrm_api3_case_delete_spec(&$params) {
  *   'client_id' => finds all cases with a specific client
  *   'activity_id' => returns the case containing a specific activity
  *   'contact_id' => finds all cases associated with a contact (in any role, not just client)
+ * $params CRM_Utils_SQL_Select $sql
+ *   Other apis wishing to wrap & extend this one can pass in a $sql object with extra clauses
  *
  * @throws API_Exception
  * @return array
  *   (get mode, case_id provided): Array with case details, case roles, case activity ids, (search mode, case_id not provided): Array of cases found
  */
-function civicrm_api3_case_get($params) {
+function civicrm_api3_case_get($params, $sql = NULL) {
   $options = _civicrm_api3_get_options_from_params($params);
-  $sql = CRM_Utils_SQL_Select::fragment();
+  if (!is_a($sql, 'CRM_Utils_SQL_Select')) {
+    $sql = CRM_Utils_SQL_Select::fragment();
+  }
 
   // Add clause to search by client
   if (!empty($params['contact_id'])) {
