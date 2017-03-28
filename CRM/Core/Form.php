@@ -1251,7 +1251,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     if ($action & (CRM_Core_Action::UPDATE + CRM_Core_Action::ADD)) {
       return 'create';
     }
-    if ($action & (CRM_Core_Action::BROWSE + CRM_Core_Action::BASIC + CRM_Core_Action::ADVANCED + CRM_Core_Action::PREVIEW)) {
+    if ($action & (CRM_Core_Action::VIEW + CRM_Core_Action::BROWSE + CRM_Core_Action::BASIC + CRM_Core_Action::ADVANCED + CRM_Core_Action::PREVIEW)) {
       return 'get';
     }
     // If you get this exception try adding more cases above.
