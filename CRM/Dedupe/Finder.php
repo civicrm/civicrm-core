@@ -405,4 +405,90 @@ class CRM_Dedupe_Finder {
     return $mainContacts;
   }
 
+  /**
+   * Repopulate the cache of merge prospects.
+   *
+   * @param int $rgid
+   * @param int $gid
+   * @param NULL $cacheKeyString
+   * @param array $criteria
+   *   Additional criteria to filter by.
+   *
+   * @param bool $checkPermissions
+   *   Respect logged in user's permissions.
+   *
+   * @return bool
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   */
+  public static function refillCache($rgid, $gid, $cacheKeyString, $criteria, $checkPermissions) {
+    if (!$cacheKeyString && $rgid) {
+      $cacheKeyString = CRM_Dedupe_Merger::getMergeCacheKeyString($rgid, $gid, $criteria, $checkPermissions);
+    }
+
+    if (!$cacheKeyString) {
+      return FALSE;
+    }
+
+    // 1. Clear cache if any
+    $sql = "DELETE FROM civicrm_prevnext_cache WHERE  cacheKey LIKE %1";
+    CRM_Core_DAO::executeQuery($sql, array(1 => array("{$cacheKeyString}%", 'String')));
+
+    // FIXME: we need to start using temp tables / queries here instead of arrays.
+    // And cleanup code in CRM/Contact/Page/DedupeFind.php
+
+    // 2. FILL cache
+    $foundDupes = array();
+    if ($rgid && $gid) {
+      $foundDupes = CRM_Dedupe_Finder::dupesInGroup($rgid, $gid);
+    }
+    elseif ($rgid) {
+      $contactIDs = array();
+      if (!empty($criteria)) {
+        $contacts = civicrm_api3('Contact', 'get', array_merge(array('options' => array('limit' => 0), 'return' => 'id'), $criteria['contact']));
+        $contactIDs = array_keys($contacts['values']);
+      }
+      $foundDupes = CRM_Dedupe_Finder::dupes($rgid, $contactIDs, $checkPermissions);
+    }
+
+    if (!empty($foundDupes)) {
+      CRM_Dedupe_Finder::parseAndStoreDupePairs($foundDupes, $cacheKeyString);
+    }
+  }
+
+  /**
+   * Get Duplicate Pairs based on a rule for a group.
+   *
+   * @param int $rule_group_id
+   * @param int $group_id
+   * @param bool $reloadCacheIfEmpty
+   * @param int $batchLimit
+   * @param bool $isSelected
+   * @param array|string $orderByClause
+   * @param bool $includeConflicts
+   * @param array $criteria
+   *   Additional criteria to narrow down the merge group.
+   *
+   * @param bool $checkPermissions
+   *   Respect logged in user permissions.
+   *
+   * @return array
+   *    Array of matches meeting the criteria.
+   */
+  public static function getDuplicatePairs($rule_group_id, $group_id, $reloadCacheIfEmpty, $batchLimit, $isSelected, $orderByClause = '', $includeConflicts = TRUE, $criteria = array(), $checkPermissions = TRUE) {
+    $where = self::getWhereString($batchLimit, $isSelected);
+    $cacheKeyString = self::getMergeCacheKeyString($rule_group_id, $group_id, $criteria, $checkPermissions);
+    $join = self::getJoinOnDedupeTable();
+    $dupePairs = CRM_Core_BAO_PrevNextCache::retrieve($cacheKeyString, $join, $where, 0, 0, array(), $orderByClause, $includeConflicts);
+    if (empty($dupePairs) && $reloadCacheIfEmpty) {
+      // If we haven't found any dupes, probably cache is empty.
+      // Try filling cache and give another try. We don't need to specify include conflicts here are there will not be any
+      // until we have done some processing.
+      CRM_Dedupe_Finder::refillCache($rule_group_id, $group_id, $cacheKeyString, $criteria, $checkPermissions);
+      $dupePairs = CRM_Core_BAO_PrevNextCache::retrieve($cacheKeyString, $join, $where, 0, 0, array(), $orderByClause, $includeConflicts);
+      return $dupePairs;
+    }
+    return $dupePairs;
+  }
+
 }
