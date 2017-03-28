@@ -80,6 +80,41 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
   public $_paymentFields = array();
 
   /**
+   * Get the contact id for the registration.
+   *
+   * @param array $fields
+   * @param CRM_Core_Form $self
+   * @param bool $isAdditional
+   *
+   * @return int|null
+   */
+  protected static function getRegistrationContactID($fields, $self, $isAdditional) {
+
+    $contactID = NULL;
+    if (!$isAdditional) {
+      $contactID = $self->getContactID();
+    }
+    if (!$contactID && is_array($fields) && $fields) {
+
+      //CRM-14134 use Unsupervised rule for everyone
+      $dedupeParams = CRM_Dedupe_Finder::formatParams($fields, 'Individual');
+
+      // disable permission based on cache since event registration is public page/feature.
+      $dedupeParams['check_permission'] = FALSE;
+
+      // find event dedupe rule
+      if (CRM_Utils_Array::value('dedupe_rule_group_id', $self->_values['event'], 0) > 0) {
+        $ids = CRM_Dedupe_Finder::dupesByParams($dedupeParams, 'Individual', 'Unsupervised', array(), $self->_values['event']['dedupe_rule_group_id']);
+      }
+      else {
+        $ids = CRM_Dedupe_Finder::dupesByParams($dedupeParams, 'Individual', 'Unsupervised');
+      }
+      $contactID = CRM_Utils_Array::value(0, $ids);
+    }
+    return $contactID;
+  }
+
+  /**
    * Set variables up before form is built.
    */
   public function preProcess() {
@@ -1157,30 +1192,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       return FALSE;
     }
 
-    $contactID = NULL;
-    $session = CRM_Core_Session::singleton();
-    if (!$isAdditional) {
-      $contactID = $self->getContactID();
-    }
-
-    if (!$contactID && is_array($fields) && $fields) {
-
-      //CRM-14134 use Unsupervised rule for everyone
-      $dedupeParams = CRM_Dedupe_Finder::formatParams($fields, 'Individual');
-
-      // disable permission based on cache since event registration is public page/feature.
-      $dedupeParams['check_permission'] = FALSE;
-
-      // find event dedupe rule
-      if (CRM_Utils_Array::value('dedupe_rule_group_id', $self->_values['event'], 0) > 0) {
-        $ids = CRM_Dedupe_Finder::dupesByParams($dedupeParams, 'Individual', 'Unsupervised', array(), $self->_values['event']['dedupe_rule_group_id']);
-      }
-      else {
-        $ids = CRM_Dedupe_Finder::dupesByParams($dedupeParams, 'Individual', 'Unsupervised');
-      }
-      $contactID = CRM_Utils_Array::value(0, $ids);
-
-    }
+    $contactID = self::getRegistrationContactID($fields, $self, $isAdditional);
 
     if ($returnContactId) {
       // CRM-7377
