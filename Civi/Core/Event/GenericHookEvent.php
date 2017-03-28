@@ -38,30 +38,50 @@ namespace Civi\Core\Event;
  *
  *   function hook_civicrm_foo($bar, &$whiz, &$bang);
  *
- * Symfony Events are based on a class with properties and methods. This
- * requires some kind of mapping.
- *
- * Implementing new event classes for every hook would produce a large
- * amount of boilerplate. Symfony Events have an interesting solution to
- * that problem: use `GenericEvent` instead of custom event classes.
- * This class (`GenericHookEvent`) is conceptually similar to `GenericEvent`,
- * but it adds support for (a) altering fields and (b) mapping to hook
- * notation.
+ * The notation for Symfony Events is based on a class with properties
+ * and methods. This requires some kind of mapping. `GenericHookEvent`
+ * maps each parameter to a field (using magic methods):
  *
  * @code
+ * // Creating an event object.
  * $event = GenericHookEvent::create(array(
- *   'first' => $readOnlyData,
- *   'second' => &readWriteData,
- * ));
+ *   'bar' => 'abc',
+ *   'whiz' => &$whiz,
+ *   'bang' => &$bang,
+ * );
+ *
+ * // Accessing event properties.
+ * echo $event->bar;
+ * $event->whiz['array_field'] = 123;
+ * $event->bang->objProperty = 'abcd';
+ *
+ * // Dispatching an event.
  * Civi::service('dispatcher')->dispatch('hook_civicrm_foo', $event);
- * print_r($event->getReturnValues());
+ * @endCode
+ *
+ * Design Discussion:
+ *
+ * 1. Implementing new event classes for every hook would produce a
+ * large amount of boilerplate. Symfony Events have an interesting solution to
+ * that problem: use `GenericEvent` instead of custom event classes.
+ * `GenericHookEvent` is conceptually similar to `GenericEvent`, but it adds
+ * support for (a) altering properties and (b) mapping properties to hook notation
+ * (an ordered parameter list).
+ *
+ * 2. A handful of hooks define a return-value. The return-value is treated
+ * as an array, and all the returned values are merged into one big array.
+ * You can add and retrieve return-values using these methods:
+ *
+ * @code
+ * $event->addReturnValues(array(...));
+ * foreach ($event->getReturnValues() as $retVal) { ... }
  * @endCode
  */
 class GenericHookEvent extends \Symfony\Component\EventDispatcher\Event {
 
   /**
    * @var array
-   *   Ex: array('contactID' => &$contactID, 'contentPlacement' => &$contentPlacement).
+   *   Ex: array(0 => &$contactID, 1 => &$contentPlacement).
    */
   protected $hookValues;
 
