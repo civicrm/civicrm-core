@@ -49,7 +49,6 @@ class CRM_Utils_ICalendar {
    */
   public static function formatText($text) {
     $text = strip_tags($text);
-    $text = str_replace("\"", "DQUOTE", $text);
     $text = str_replace("\\", "\\\\", $text);
     $text = str_replace(',', '\,', $text);
     $text = str_replace(';', '\;', $text);
