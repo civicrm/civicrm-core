@@ -95,21 +95,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       $contactID = $self->getContactID();
     }
     if (!$contactID && is_array($fields) && $fields) {
-
-      //CRM-14134 use Unsupervised rule for everyone
-      $dedupeParams = CRM_Dedupe_Finder::formatParams($fields, 'Individual');
-
-      // disable permission based on cache since event registration is public page/feature.
-      $dedupeParams['check_permission'] = FALSE;
-
-      // find event dedupe rule
-      if (CRM_Utils_Array::value('dedupe_rule_group_id', $self->_values['event'], 0) > 0) {
-        $ids = CRM_Dedupe_Finder::dupesByParams($dedupeParams, 'Individual', 'Unsupervised', array(), $self->_values['event']['dedupe_rule_group_id']);
-      }
-      else {
-        $ids = CRM_Dedupe_Finder::dupesByParams($dedupeParams, 'Individual', 'Unsupervised');
-      }
-      $contactID = CRM_Utils_Array::value(0, $ids);
+      $contactID = CRM_Contact_BAO_Contact::getFirstDuplicateContact($fields, 'Individual', 'Unsupervised', array(), FALSE, CRM_Utils_Array::value('dedupe_rule_group_id', $self->_values['event']));
     }
     return $contactID;
   }
