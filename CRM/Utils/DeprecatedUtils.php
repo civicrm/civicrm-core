@@ -1375,8 +1375,6 @@ function _civicrm_api3_deprecated_contact_check_custom_params($params, $csType =
 /**
  * @param array $params
  * @param bool $dupeCheck
- * @param bool $dupeErrorArray
- * @param bool $requiredCheck
  * @param int $dedupeRuleGroupID
  *
  * @return array|null
@@ -1384,9 +1382,10 @@ function _civicrm_api3_deprecated_contact_check_custom_params($params, $csType =
 function _civicrm_api3_deprecated_contact_check_params(
   &$params,
   $dupeCheck = TRUE,
-  $dupeErrorArray = FALSE,
-  $requiredCheck = TRUE,
   $dedupeRuleGroupID = NULL) {
+
+  $requiredCheck = TRUE;
+
   if (isset($params['id']) && is_numeric($params['id'])) {
     $requiredCheck = FALSE;
   }
@@ -1458,15 +1457,11 @@ function _civicrm_api3_deprecated_contact_check_params(
     // $ids = $dupes['count'] ? implode(',', array_keys($dupes['values'])) : NULL;
     $ids = CRM_Contact_BAO_Contact::getDuplicateContacts($params, $params['contact_type'], 'Unsupervised', array(), CRM_Utils_Array::value('check_permissions', $params, $dedupeRuleGroupID));
     if ($ids != NULL) {
-      if ($dupeErrorArray) {
-        $error = CRM_Core_Error::createError("Found matching contacts: $ids",
-          CRM_Core_Error::DUPLICATE_CONTACT,
-          'Fatal', $ids
-        );
-        return civicrm_api3_create_error($error->pop());
-      }
-
-      return civicrm_api3_create_error("Found matching contacts: $ids");
+      $error = CRM_Core_Error::createError("Found matching contacts: " . implode(',', $ids),
+        CRM_Core_Error::DUPLICATE_CONTACT,
+        'Fatal', $ids
+      );
+      return civicrm_api3_create_error($error->pop());
     }
   }
 
