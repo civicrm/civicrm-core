@@ -19,16 +19,11 @@ Required vars: caseType
 
   <div ng-include="'~/crmCaseType/caseTypeDetails.html'"></div>
 
-  <h2 ng-show="isForkable()">{{ts('Roles')}}</h2>
-
-  <div ng-show="isForkable()" ng-include="'~/crmCaseType/rolesTable.html'"></div>
-
-  <h2 ng-show="isForkable()">{{ts('Activities')}}</h2>
-
   <div ng-show="isForkable()" class="crmCaseType-acttab" ui-jq="tabs" ui-options="{show: true, hide: true}">
     <ul>
+      <li><a href="#acttab-roles">{{ts('Case Roles')}}</a></li>
+      <li><a href="#acttab-statuses">{{ts('Case Statuses')}}</a></li>
       <li><a href="#acttab-actType">{{ts('Activity Types')}}</a></li>
-      <li><a href="#acttab-statuses">{{ts('Statuses')}}</a></li>
       <li ng-repeat="activitySet in caseType.definition.activitySets">
         <a href="#acttab-{{$index}}">{{ activitySet.label }}</a>
         <span class="crm-i fa-trash" title="{{ts('Remove')}}"
@@ -46,6 +41,8 @@ Required vars: caseType
         <option value="sequence" ng-show="isNewActivitySetAllowed('sequence')">{{ts('Sequence')}}</option>
       </select>
     </ul>
+
+    <div id="acttab-roles" ng-include="'~/crmCaseType/rolesTable.html'"></div>
 
     <div id="acttab-actType" ng-include="'~/crmCaseType/activityTypesTable.html'"></div>
 
