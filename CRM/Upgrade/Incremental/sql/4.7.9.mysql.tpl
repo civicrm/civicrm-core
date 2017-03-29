@@ -42,11 +42,3 @@ VALUES
   ('Deferred Revenue - Event Fee', @domainContactId, @opLiability, 'Event revenue to be recognized in future months when the events occur', '2730', 'OCLIAB', 0, 1, 0, 0),
   ('Deferred Revenue - Member Dues', @domainContactId, @opLiability, 'Membership revenue to be recognized in future months', '2740', 'OCLIAB', 0, 1, 0, 0);
 
--- CRM-16189 Financial account relationship
-SELECT @option_group_id_act           := max(id) from civicrm_option_group where name = 'activity_type';
-SELECT @option_group_id_act_wt  := MAX(weight) FROM civicrm_option_value WHERE option_group_id = @option_group_id_act;
-SELECT @option_group_id_act_val := MAX(CAST( `value` AS UNSIGNED )) FROM civicrm_option_value WHERE option_group_id = @option_group_id_act;
-INSERT INTO
-  `civicrm_option_value` (`option_group_id`, {localize field='label'}label{/localize}, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, {localize field='description'}`description`{/localize}, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `visibility_id`)
-VALUES
-(@option_group_id_act, {localize}'{ts escape="sql"}Close Accounting Period{/ts}'{/localize}, @option_group_id_act_val+1, 'Close Accounting Period', NULL, 0, 0, @option_group_id_act_wt+1, {localize}'Close Accounting Period'{/localize}, 0, 1, 1, 2, NULL);
