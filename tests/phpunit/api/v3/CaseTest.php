@@ -631,4 +631,70 @@ class api_v3_CaseTest extends CiviCaseTestCase {
     $this->assertCount(3, $result['values']);
   }
 
+  /**
+   * Test the ability to add a timeline to an existing case.
+   *
+   * See the case.addtimeline api.
+   *
+   * @throws \Exception
+   */
+  public function testCaseAddtimeline() {
+    $caseSpec = array(
+      'title' => 'Application with Definition',
+      'name' => 'Application_with_Definition',
+      'is_active' => 1,
+      'weight' => 4,
+      'definition' => array(
+        'activityTypes' => array(
+          array('name' => 'Follow up'),
+        ),
+        'activitySets' => array(
+          array(
+            'name' => 'set1',
+            'label' => 'Label 1',
+            'timeline' => 1,
+            'activityTypes' => array(
+              array('name' => 'Open Case', 'status' => 'Completed'),
+            ),
+          ),
+          array(
+            'name' => 'set2',
+            'label' => 'Label 2',
+            'timeline' => 1,
+            'activityTypes' => array(
+              array('name' => 'Follow up'),
+            ),
+          ),
+        ),
+        'caseRoles' => array(
+          array('name' => 'Homeless Services Coordinator', 'creator' => 1, 'manager' => 1),
+        ),
+      ),
+    );
+    $cid = $this->individualCreate();
+    $caseType = $this->callAPISuccess('CaseType', 'create', $caseSpec);
+    $case = $this->callAPISuccess('Case', 'create', array(
+      'case_type_id' => $caseType['id'],
+      'contact_id' => $cid,
+      'subject' => 'Test case with timeline',
+    ));
+    // Created case should only have 1 activity per the spec
+    $result = $this->callAPISuccessGetSingle('Activity', array('case_id' => $case['id'], 'return' => 'activity_type_id.name'));
+    $this->assertEquals('Open Case', $result['activity_type_id.name']);
+    // Add timeline
+    $timeline = civicrm_api('Case', 'addtimeline', array(
+      'case_id' => $case['id'],
+      'timeline' => 'set2',
+      'version' => 3,
+    ));
+    $result = $this->callAPISuccess('Activity', 'get', array(
+      'case_id' => $case['id'],
+      'return' => 'activity_type_id.name',
+      'sequential' => 1,
+      'options' => array('sort' => 'id'),
+    ));
+    $this->assertEquals(2, $result['count']);
+    $this->assertEquals('Follow up', $result['values'][1]['activity_type_id.name']);
+  }
+
 }

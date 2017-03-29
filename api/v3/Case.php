@@ -342,6 +342,63 @@ function civicrm_api3_case_activity_create($params) {
 }
 
 /**
+ * Add a timeline to a case.
+ *
+ * @param array $params
+ *
+ * @throws API_Exception
+ * @return array
+ */
+function civicrm_api3_case_addtimeline($params) {
+  $caseType = CRM_Case_BAO_Case::getCaseType($params['case_id'], 'name');
+  $xmlProcessor = new CRM_Case_XMLProcessor_Process();
+  $xmlProcessorParams = array(
+    'clientID' => CRM_Case_BAO_Case::getCaseClients($params['case_id']),
+    'creatorID' => $params['creator_id'],
+    'standardTimeline' => 0,
+    'activity_date_time' => $params['activity_date_time'],
+    'caseID' => $params['case_id'],
+    'caseType' => $caseType,
+    'activitySetName' => $params['timeline'],
+  );
+  $xmlProcessor->run($caseType, $xmlProcessorParams);
+  return civicrm_api3_create_success();
+}
+
+/**
+ * Adjust Metadata for addtimeline action.
+ *
+ * @param array $params
+ *   Array of parameters determined by getfields.
+ */
+function _civicrm_api3_case_addtimeline_spec(&$params) {
+  $params['case_id'] = array(
+    'title' => 'Case ID',
+    'description' => 'Id of case to update',
+    'type' => CRM_Utils_Type::T_INT,
+    'api.required' => 1,
+  );
+  $params['timeline'] = array(
+    'title' => 'Timeline',
+    'description' => 'Name of activity set',
+    'type' => CRM_Utils_Type::T_STRING,
+    'api.required' => 1,
+  );
+  $params['activity_date_time'] = array(
+    'api.default' => 'now',
+    'title' => 'Activity date time',
+    'description' => 'Timeline start date',
+    'type' => CRM_Utils_Type::T_DATE,
+  );
+  $params['creator_id'] = array(
+    'api.default' => 'user_contact_id',
+    'title' => 'Activity creator',
+    'description' => 'Contact id of timeline creator',
+    'type' => CRM_Utils_Type::T_INT,
+  );
+}
+
+/**
  * Declare deprecated api functions.
  *
  * @deprecated api notice
