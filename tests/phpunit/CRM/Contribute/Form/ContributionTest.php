@@ -378,7 +378,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
       $this->callAPISuccessGetCount('Contribution', array(
         'contact_id' => $this->_individualId,
-        'contribution_status_id' => 'Pending',
+        'contribution_status_id' => 'Failed',
       ), 1);
       $lineItem = $this->callAPISuccessGetSingle('line_item', array());
       $this->assertEquals('50.00', $lineItem['unit_price']);
