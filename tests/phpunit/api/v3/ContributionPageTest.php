@@ -646,7 +646,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->callAPISuccess('contribution_page', 'submit', $submitParams);
     $contribution = $this->callAPISuccessGetSingle('contribution', array(
       'contribution_page_id' => $this->_ids['contribution_page'],
-      'contribution_status_id' => 2,
+      'contribution_status_id' => 'Failed',
     ));
 
     $this->callAPISuccessGetSingle('activity', array(
