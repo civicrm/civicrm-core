@@ -138,6 +138,11 @@ class CRM_Contribute_Form_Task_Batch extends CRM_Contribute_Form_Task {
       );
     }
 
+    // It is possible to have fields that are required in CiviCRM not be required in the
+    // profile. Overriding that here. Perhaps a better approach would be to
+    // make them required in the schema & read that up through getFields functionality.
+    $requiredFields = array('receive_date');
+
     //fix for CRM-2752
     $customFields = CRM_Core_BAO_CustomField::getFields('Contribution');
     foreach ($this->_contributionIds as $contributionId) {
@@ -160,6 +165,9 @@ class CRM_Contribute_Form_Task_Batch extends CRM_Contribute_Form_Task {
         }
         else {
           // handle non custom fields
+          if (in_array($field['name'], $requiredFields)) {
+            $field['is_required'] = TRUE;
+          }
           CRM_Core_BAO_UFGroup::buildProfile($this, $field, NULL, $contributionId);
         }
       }
@@ -198,57 +206,28 @@ class CRM_Contribute_Form_Task_Batch extends CRM_Contribute_Form_Task {
    */
   public function postProcess() {
     $params = $this->exportValues();
-    $dates = array(
-      'receive_date',
-      'receipt_date',
-      'thankyou_date',
-      'cancel_date',
-    );
     if (isset($params['field'])) {
-      foreach ($params['field'] as $key => $value) {
+      foreach ($params['field'] as $contributionID => $value) {
 
-        $value['custom'] = CRM_Core_BAO_CustomField::postProcess($value,
-          $key,
-          'Contribution'
-        );
-
-        $ids['contribution'] = $key;
-        foreach ($dates as $val) {
-          if (isset($value[$val])) {
-            $value[$val] = CRM_Utils_Date::processDate($value[$val]);
-          }
-        }
+        $value['id'] = $contributionID;
         if (!empty($value['financial_type'])) {
           $value['financial_type_id'] = $value['financial_type'];
         }
 
-        if (!empty($value['payment_instrument'])) {
-          $value['payment_instrument_id'] = $value['payment_instrument'];
-        }
+        $value['options'] = array(
+          'reload' => 1,
+        );
+        $contribution = civicrm_api3('Contribution', 'create', $value);
+        $contribution = $contribution['values'][$contributionID];
 
-        if (!empty($value['contribution_source'])) {
-          $value['source'] = $value['contribution_source'];
-        }
-
-        unset($value['financial_type']);
-        unset($value['contribution_source']);
-        $contribution = CRM_Contribute_BAO_Contribution::add($value, $ids);
-
+        // @todo add check as to whether the status is updated.
         if (!empty($value['contribution_status_id'])) {
-          CRM_Contribute_BAO_Contribution::transitionComponentWithReturnMessage($contribution->id,
+          // @todo - use completeorder api or make api call do this.
+          CRM_Contribute_BAO_Contribution::transitionComponentWithReturnMessage($contribution['id'],
             $value['contribution_status_id'],
-            CRM_Utils_Array::value("field[{$key}][contribution_status_id]",
-              $this->_defaultValues
-            ),
-            $contribution->receive_date
+            CRM_Utils_Array::value("field[{$contributionID}][contribution_status_id]", $this->_defaultValues),
+            $contribution['receive_date']
           );
-        }
-
-        // add custom field values
-        if (!empty($value['custom']) &&
-          is_array($value['custom'])
-        ) {
-          CRM_Core_BAO_CustomValueTable::store($value['custom'], 'civicrm_contribution', $contribution->id);
         }
       }
       CRM_Core_Session::setStatus(ts("Your updates have been saved."), ts('Saved'), 'success');
