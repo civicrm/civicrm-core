@@ -249,10 +249,10 @@ function civicrm_api3_case_get($params, $sql = NULL) {
   if (!empty($options['sort']) && strpos($options['sort'], 'contact_id') !== FALSE) {
     $sort = explode(', ', $options['sort']);
     $contactSort = NULL;
-    foreach ($sort as $index => $sortString) {
+    foreach ($sort as $index => &$sortString) {
       if (strpos($sortString, 'contact_id') === 0) {
         $contactSort = $sortString;
-        unset($sort[$index]);
+        $sortString = '(1)';
         // Get sort field and direction
         list($sortField, $dir) = array_pad(explode(' ', $contactSort), 2, 'ASC');
         list(, $sortField) = array_pad(explode('.', $sortField), 2, 'id');
@@ -260,7 +260,7 @@ function civicrm_api3_case_get($params, $sql = NULL) {
         if (!array_key_exists($sortField, CRM_Contact_DAO_Contact::fieldKeys()) || ($dir != 'ASC' && $dir != 'DESC')) {
           throw new API_Exception("Unknown field specified for sort. Cannot order by '$contactSort'");
         }
-        $sql->orderBy("case_contact.$sortField $dir");
+        $sql->orderBy("case_contact.$sortField $dir", NULL, $index);
       }
     }
     // Remove contact sort params so the basic_get function doesn't see them

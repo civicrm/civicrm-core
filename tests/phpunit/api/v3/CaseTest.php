@@ -570,7 +570,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
    */
   public function testCaseGetOrderByClient() {
     $contact1 = $this->individualCreate(array('first_name' => 'Aa', 'last_name' => 'Zz'));
-    $contact2 = $this->individualCreate(array('first_name' => 'Bb', 'last_name' => 'Yy'));
+    $contact2 = $this->individualCreate(array('first_name' => 'Bb', 'last_name' => 'Zz'));
     $contact3 = $this->individualCreate(array('first_name' => 'Cc', 'last_name' => 'Xx'));
 
     $case1 = $this->callAPISuccess('Case', 'create', array(
@@ -603,7 +603,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
       'contact_id' => array('IN' => array($contact1, $contact2, $contact3)),
       'sequential' => 1,
       'return' => 'id',
-      'options' => array('sort' => 'contact_id.last_name ASC'),
+      'options' => array('sort' => 'contact_id.last_name ASC, contact_id.first_name DESC'),
     ));
     $this->assertEquals($case1['id'], $result['values'][2]['id']);
     $this->assertEquals($case2['id'], $result['values'][1]['id']);
@@ -623,7 +623,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
       'contact_id' => array('IN' => array($contact1, $contact2, $contact3)),
       'sequential' => 1,
       'return' => 'id',
-      'options' => array('sort' => 'contact_id DESC'),
+      'options' => array('sort' => 'case_type_id, contact_id DESC, status_id'),
     ));
     $this->assertEquals($case1['id'], $result['values'][2]['id']);
     $this->assertEquals($case2['id'], $result['values'][1]['id']);

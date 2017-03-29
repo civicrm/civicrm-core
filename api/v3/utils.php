@@ -825,8 +825,11 @@ function _civicrm_api3_get_options_from_params(&$params, $queryObject = FALSE, $
   $finalSort = array();
   $options['sort'] = NULL;
   if (!empty($sort)) {
-    foreach ((array) $sort as $s) {
-      if (CRM_Utils_Rule::mysqlOrderBy($s)) {
+    if (!is_array($sort)) {
+      $sort = array_map('trim', explode(',', $sort));
+    }
+    foreach ($sort as $s) {
+      if ($s == '(1)' || CRM_Utils_Rule::mysqlOrderBy($s)) {
         if ($entity && $action == 'get') {
           switch (trim(strtolower($s))) {
             case 'id':

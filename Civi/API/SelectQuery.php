@@ -402,21 +402,24 @@ abstract class SelectQuery {
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   protected function buildOrderBy() {
-    $orderBy = array();
     $sortParams = is_string($this->orderBy) ? explode(',', $this->orderBy) : (array) $this->orderBy;
-    foreach ($sortParams as $item) {
-      $words = preg_split("/[\s]+/", trim($item));
+    foreach ($sortParams as $index => $item) {
+      $item = trim($item);
+      if ($item == '(1)') {
+        continue;
+      }
+      $words = preg_split("/[\s]+/", $item);
       if ($words) {
         // Direction defaults to ASC unless DESC is specified
         $direction = strtoupper(\CRM_Utils_Array::value(1, $words, '')) == 'DESC' ? ' DESC' : '';
         $field = $this->getField($words[0]);
         if ($field) {
-          $orderBy[] = self::MAIN_TABLE_ALIAS . '.' . $field['name'] . $direction;
+          $this->query->orderBy(self::MAIN_TABLE_ALIAS . '.' . $field['name'] . $direction, NULL, $index);
         }
         elseif (strpos($words[0], '.')) {
           $join = $this->addFkField($words[0], 'LEFT');
           if ($join) {
-            $orderBy[] = "`{$join[0]}`.`{$join[1]}`$direction";
+            $this->query->orderBy("`{$join[0]}`.`{$join[1]}`$direction", NULL, $index);
           }
         }
         else {
@@ -424,7 +427,6 @@ abstract class SelectQuery {
         }
       }
     }
-    $this->query->orderBy($orderBy);
   }
 
   /**
