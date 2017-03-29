@@ -8,7 +8,7 @@
 function activity_get_example() {
   $params = array(
     'contact_id' => 1,
-    'activity_type_id' => '55',
+    'activity_type_id' => 9999,
     'sequential' => 1,
     'return.custom_1' => 1,
   );
@@ -47,17 +47,24 @@ function activity_get_expectedresult() {
     'id' => 1,
     'values' => array(
       '0' => array(
-        'source_contact_id' => '1',
         'id' => '1',
-        'activity_type_id' => '55',
+        'activity_type_id' => '9999',
         'subject' => 'test activity type id',
-        'location' => 'Pennsylvania',
         'activity_date_time' => '2011-06-02 14:36:13',
+        'duration' => '120',
+        'location' => 'Pennsylvania',
         'details' => 'a test activity',
         'status_id' => '2',
-        'activity_name' => 'Test activity type',
-        'status' => 'Completed',
+        'priority_id' => '1',
+        'is_test' => 0,
+        'is_auto' => 0,
+        'is_current_revision' => '1',
+        'is_deleted' => 0,
+        'is_star' => 0,
         'custom_1' => 'custom string',
+        'source_contact_id' => '1',
+        'status' => 'Completed',
+        'activity_name' => 'Test activity type',
         'custom_1_1' => 'custom string',
       ),
     ),
