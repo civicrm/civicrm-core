@@ -34,39 +34,17 @@
         <div class="crm-contact_activities-list">
         {include file="CRM/Activity/Form/ActivityLinks.tpl" as_select=false}
         </div>
-
-              <div class="crm-contact_print-list">
-              <ul class="contact-print">
-                  <li class="crm-contact-print">
-                     <a class="print" title="{ts}Printer-friendly view of this page.{/ts}" href='{crmURL p='civicrm/contact/view/print' q="reset=1&print=1&cid=$contactId"}'>
-                     <span><i class="crm-i fa-print"></i> {ts}Print Summary{/ts}</span>
-                     </a>
-                  </li>
-                  <li>
-                        <a class="vcard " title="{ts}vCard record for this contact.{/ts}" href="{crmURL p='civicrm/contact/view/vcard' q="reset=1&cid=$contactId"}"><span><i class="crm-i fa-list-alt"></i> {ts}vCard{/ts}</span>
-                        </a>
-                  </li>
-                 {if !empty($dashboardURL)}
-                   <li class="crm-contact-dashboard">
-                      <a href="{$dashboardURL}" class="dashboard " title="{ts}dashboard{/ts}">
-                         <span><i class="crm-i fa-tachometer"></i> {ts}Contact Dashboard{/ts}</span>
-                       </a>
-                   </li>
-                 {/if}
-                 {if !empty($userRecordUrl)}
-                   <li class="crm-contact-user-record">
-                      <a href="{$userRecordUrl}" class="user-record " title="{ts}User Record{/ts}">
-                         <span><i class="crm-i fa-user"></i> {ts}User Record{/ts}</span>
-                      </a>
-                   </li>
-                 {/if}
-                 {if !empty($userAddUrl)}
-                   <li class="crm-contact-user-record">
-                      <a href="{$userAddUrl}" class="user-record " title="{ts}Create User Record{/ts}">
-                         <span><i class="crm-i fa-user-plus"></i> {ts}Create User Record{/ts}</span>
-                      </a>
-                   </li>
+        <div class="crm-contact_print-list">
+          <ul class="contact-print">
+            {foreach from=$actionsMenuList.otherActions item='row'}
+              {if !empty($row.href) or !empty($row.tab)}
+              <li class="crm-contact-{$row.ref}">
+                <a href="{if !empty($row.href)}{$row.href}&cid={$contactId}{else}#{/if}" title="{$row.title}" data-tab="{$row.tab}" {if !empty($row.class)}class="{$row.class}"{/if}>
+                  <span><i {if !empty($row.icon)}class="{$row.icon}"{/if}></i> {$row.title}</span>
+                </a>
+              </li>
               {/if}
+            {/foreach}
         </ul>
         </div>
         <div class="crm-contact_actions-list">
