@@ -192,7 +192,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    *
    * @var bool
    */
-  public  $_emailExists = FALSE;
+  public $_emailExists = FALSE;
   /**
    * Set variables up before form is built.
    *
@@ -629,7 +629,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
       if ($fields) {
         // determine if email exists in profile so we know if we need to manually insert CRM-2888, CRM-15067
-        foreach ($fields as $key=>$field) {
+        foreach ($fields as $key => $field) {
           if (substr($key, 0, 6) == 'email-' &&
             !in_array($profileContactType, array('honor', 'onbehalf'))
           ) {
