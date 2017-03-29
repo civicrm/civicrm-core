@@ -60,17 +60,18 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
 
     $this->_contactID = $this->individualCreate();
     //create activity types
+    $this->test_activity_type_value = 9999;
     $activityTypes = $this->callAPISuccess('option_value', 'create', array(
       'option_group_id' => 2,
       'name' => 'Test activity type',
       'label' => 'Test activity type',
+      'value' => $this->test_activity_type_value,
       'sequential' => 1,
     ));
-    $this->test_activity_type_value = $activityTypes['values'][0]['value'];
     $this->test_activity_type_id = $activityTypes['id'];
     $this->_params = array(
       'source_contact_id' => $this->_contactID,
-      'activity_type_id' => $this->test_activity_type_value,
+      'activity_type_id' => 'Test activity type',
       'subject' => 'test activity type id',
       'activity_date_time' => '2011-06-02 14:36:13',
       'status_id' => 2,
@@ -402,16 +403,6 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test civicrm_activity_create() using example code.
-   */
-  public function testActivityCreateExample() {
-    require_once 'api/v3/examples/Activity/Create.php';
-    $result = activity_create_example();
-    $expectedResult = activity_create_expectedresult();
-    $this->assertEquals($result, $expectedResult);
-  }
-
-  /**
    * Test civicrm_activity_create() with valid parameters and custom data.
    */
   public function testActivityCreateCustom() {
@@ -427,6 +418,16 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
 
     $this->customFieldDelete($ids['custom_field_id']);
     $this->customGroupDelete($ids['custom_group_id']);
+  }
+
+  /**
+   * Test civicrm_activity_create() using example code.
+   */
+  public function testActivityCreateExample() {
+    require_once 'api/v3/examples/Activity/Create.php';
+    $result = activity_create_example();
+    $expectedResult = activity_create_expectedresult();
+    $this->assertEquals($result, $expectedResult);
   }
 
   /**
@@ -1170,7 +1171,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
     $this->assertEquals(1, count($target), ' in line ' . __LINE__);
     $this->assertEquals(TRUE, in_array($contact3, $assignee), ' in line ' . __LINE__);
     $this->assertEquals(TRUE, in_array($contact4, $target), ' in line ' . __LINE__);
-
+    $this->_params['activity_type_id'] = $this->test_activity_type_value;
     foreach ($this->_params as $fld => $val) {
       $this->assertEquals($val, $result['values'][$result['id']][$fld]);
     }
