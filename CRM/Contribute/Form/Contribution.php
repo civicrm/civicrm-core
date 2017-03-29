@@ -464,7 +464,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
 
     if ($this->_id) {
-      $financialTrxn = $this->getlatestPayments();
+      $financialTrxn = $this->getlatestPayment();
       if ($financialTrxn) {
         $paymentProcessorID = CRM_Utils_Array::value('financial_trxn_id.payment_processor_id', $financialTrxn);
         $result = civicrm_api3('FinancialTrxn', 'getsingle', array(
@@ -474,7 +474,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         $defaults['card_type'] = CRM_Utils_Array::value('card_type', $result);
         $defaults['pan_truncation'] = CRM_Utils_Array::value('pan_truncation', $result);
 
+        // if payment is done via payment processor then freeze these two fields
         if ($paymentProcessorID) {
+          // if last 4 digit of credit card number found then append with with '*' string
           if ($defaults['pan_truncation']) {
             $defaults['pan_truncation'] = "**** **** **** " . $defaults['pan_truncation'];
           }
@@ -1050,8 +1052,10 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     if (!$self->_mode && !empty($fields['pan_truncation'])
     ) {
       $contributionDoneViaPaymentProcesor = FALSE;
+
+      
       if ($self->_id) {
-        $financialTrxn = $self->getlatestPayments();
+        $financialTrxn = $self->getlatestPayment();
         if (!empty($financialTrxn['financial_trxn_id.payment_processor_id'])) {
           $contributionDoneViaPaymentProcesor = TRUE;
         }
@@ -1890,7 +1894,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    *
    * @return array
    */
-  protected function getlatestPayments() {
+  protected function getlatestPayment() {
     $financialTrxn = civicrm_api3('EntityFinancialTrxn', 'get', array(
        'return' => array('financial_trxn_id.payment_processor_id', 'financial_trxn_id'),
        'entity_table' => 'civicrm_contribution',

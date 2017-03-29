@@ -252,6 +252,14 @@
             <td {$valueStyle}>{$form.payment_instrument_id.html} {help id="payment_instrument_id"}</td>
             </td>
           </tr>
+          <tr id="cardType" class="crm-contribution-form-block-card_type">
+            <td class="label">{$form.card_type.label}</td>
+            <td {$valueStyle}>{$form.card_type.html}</td>
+          </tr>
+          <tr id="cardNumber" class="crm-contribution-form-block-credit_card_number">
+            <td class="label">{$form.pan_truncation.label}</td>
+            <td {$valueStyle}>{$form.pan_truncation.html} {help id="pan_truncation"}</td>
+          </tr>
           {if $showCheckNumber || !$isOnline}
             <tr id="checkNumber" class="crm-contribution-form-block-check_number">
               <td class="label">{$form.check_number.label}</td>
@@ -357,73 +365,6 @@
       {include file="CRM/Contribute/Form/PCP.js.tpl"}
     {/if}
     <!-- end of PCP -->
-
-    {if !$contributionMode}
-    <div class="crm-accordion-wrapper crm-accordion_title-accordion crm-accordion-processed" id="paymentDetails_Information">
-      <div class="crm-accordion-header">
-        {ts}Payment Details{/ts}
-      </div>
-      <div class="crm-accordion-body">
-        <table class="form-layout-compressed" >
-          <tr class="crm-contribution-form-block-receive_date">
-            <td class="label">{$form.receive_date.label}</td>
-            <td {$valueStyle}>{include file="CRM/common/jcalendar.tpl" elementName=receive_date}<br />
-              <span class="description">{ts}The date this contribution was received.{/ts}</span>
-            </td>
-          </tr>
-          <tr class="crm-contribution-form-block-payment_instrument_id">
-            <td class="label">{$form.payment_instrument_id.label}</td>
-            <td {$valueStyle}>{$form.payment_instrument_id.html} {help id="payment_instrument_id"}</td>
-            </td>
-          </tr>
-          {if $form.card_type}
-            <tr id="cardType" class="crm-contribution-form-block-card_type">
-              <td class="label">{$form.card_type.label}</td>
-              <td {$valueStyle}>{$form.card_type.html}</td>
-            </tr>
-            <tr id="cardNumber" class="crm-contribution-form-block-credit_card_number">
-              <td class="label">{$form.pan_truncation.label}</td>
-              <td {$valueStyle}>{$form.pan_truncation.html} {help id="pan_truncation"}</td>
-            </tr>
-          {/if}
-          {if $showCheckNumber || !$isOnline}
-            <tr id="checkNumber" class="crm-contribution-form-block-check_number">
-              <td class="label">{$form.check_number.label}</td>
-              <td>{$form.check_number.html}</td>
-            </tr>
-          {/if}
-          <tr class="crm-contribution-form-block-trxn_id">
-            <td class="label">{$form.trxn_id.label}</td>
-            <td {$valueStyle}>{$form.trxn_id.html} {help id="id-trans_id"}</td>
-          </tr>
-          {if $email and $outBound_option != 2}
-            <tr class="crm-contribution-form-block-is_email_receipt">
-              <td class="label">
-                {$form.is_email_receipt.label}</td><td>{$form.is_email_receipt.html}&nbsp;
-                <span class="description">{ts 1=$email}Automatically email a receipt for this payment to %1?{/ts}</span>
-              </td>
-            </tr>
-            {elseif $context eq 'standalone' and $outBound_option != 2 }
-            <tr id="email-receipt" style="display:none;" class="crm-contribution-form-block-is_email_receipt">
-              <td class="label">{$form.is_email_receipt.label}</td>
-              <td>{$form.is_email_receipt.html} <span class="description">{ts}Automatically email a receipt for this payment to {/ts}<span id="email-address"></span>?</span>
-              </td>
-            </tr>
-          {/if}
-          <tr id="receiptDate" class="crm-contribution-form-block-receipt_date">
-            <td class="label">{$form.receipt_date.label}</td>
-            <td>{include file="CRM/common/jcalendar.tpl" elementName=receipt_date}<br />
-              <span class="description">{ts}Date that a receipt was sent to the contributor.{/ts}</span>
-            </td>
-          </tr>
-          <tr id="fromEmail" class="crm-contribution-form-block-receipt_date" style="display:none;">
-            <td class="label">{$form.from_email_address.label}</td>
-            <td>{$form.from_email_address.html}</td>
-          </tr>
-        </table>
-      </div>
-    </div>
-    {/if}
 
   {if !$payNow}
     <div id="customData" class="crm-contribution-form-block-customData"></div>
@@ -756,18 +697,14 @@ CRM.$(function($) {
     {literal}
     if (paymentInstrument == {/literal}{$checkVal}{literal}) {
       $('tr#checkNumber').show();
-      $('tr#cardType').hide();
-      $('tr#cardNumber').hide();
+      $('tr#cardType, tr#cardNumber').hide();
     }
     else if (paymentInstrument == {/literal}{$creditVal}{literal}) {
-      $('tr#cardType').show();
-      $('tr#cardNumber').show();
+      $('tr#cardType, tr#cardNumber').show();
       $('tr#checkNumber').hide();
     }
     else {
-      $('tr#checkNumber').hide();
-      $('tr#cardType').hide();
-      $('tr#cardNumber').hide();
+      $('tr#checkNumber, tr#cardType, tr#cardNumber').hide();
     }
   }
   $('#price_set_id').click(function() {
