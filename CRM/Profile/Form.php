@@ -928,7 +928,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
       if (!$ctype) {
         $ctype = 'Individual';
       }
-      $dedupeParams = CRM_Dedupe_Finder::formatParams($fields, $ctype);
+
       if ($form->_mode == CRM_Profile_Form::MODE_CREATE) {
         // fix for CRM-2888
         $exceptions = array();
@@ -938,17 +938,11 @@ class CRM_Profile_Form extends CRM_Core_Form {
         $exceptions = array($form->_session->get('userID'));
       }
 
-      // for dialog mode we should always use fuzzy rule.
-      $ruleType = 'Unsupervised';
-      if ($form->_context == 'dialog') {
-        $ruleType = 'Supervised';
-      }
-
-      $dedupeParams['check_permission'] = FALSE;
-      $ids = CRM_Dedupe_Finder::dupesByParams($dedupeParams,
-        $ctype,
-        $ruleType,
+      $ids = CRM_Contact_BAO_Contact::getDuplicateContacts(
+        $fields, $ctype,
+        ($form->_context === 'dialog' ? 'Supervised' : 'Unsupervised'),
         $exceptions,
+        FALSE,
         $form->_ruleGroupID
       );
       if ($ids) {
