@@ -80,6 +80,27 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
   public $_paymentFields = array();
 
   /**
+   * Get the contact id for the registration.
+   *
+   * @param array $fields
+   * @param CRM_Core_Form $self
+   * @param bool $isAdditional
+   *
+   * @return int|null
+   */
+  protected static function getRegistrationContactID($fields, $self, $isAdditional) {
+
+    $contactID = NULL;
+    if (!$isAdditional) {
+      $contactID = $self->getContactID();
+    }
+    if (!$contactID && is_array($fields) && $fields) {
+      $contactID = CRM_Contact_BAO_Contact::getFirstDuplicateContact($fields, 'Individual', 'Unsupervised', array(), FALSE, CRM_Utils_Array::value('dedupe_rule_group_id', $self->_values['event']));
+    }
+    return $contactID;
+  }
+
+  /**
    * Set variables up before form is built.
    */
   public function preProcess() {
@@ -930,7 +951,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     if (!$this->_allowConfirmation) {
       // check if the participant is already registered
       if (!$this->_skipDupeRegistrationCheck) {
-        $params['contact_id'] = self::checkRegistration($params, $this, FALSE, TRUE, TRUE);
+        $params['contact_id'] = self::getRegistrationContactID($params, $this, FALSE);
       }
     }
 
@@ -1141,52 +1162,19 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    *   Event data.
    * @param bool $isAdditional
    *   Treat isAdditional participants a bit differently.
-   * @param bool $returnContactId
-   *   Just find and return the contactID match to use.
-   * @param bool $useDedupeRules
-   *   Force usage of dedupe rules.
    *
    * @return int
    */
-  public static function checkRegistration($fields, &$self, $isAdditional = FALSE, $returnContactId = FALSE, $useDedupeRules = FALSE) {
+  public static function checkRegistration($fields, &$self, $isAdditional = FALSE) {
     // CRM-3907, skip check for preview registrations
     // CRM-4320 participant need to walk wizard
-    if (!$returnContactId &&
+    if (
       ($self->_mode == 'test' || $self->_allowConfirmation)
     ) {
       return FALSE;
     }
 
-    $contactID = NULL;
-    $session = CRM_Core_Session::singleton();
-    if (!$isAdditional) {
-      $contactID = $self->getContactID();
-    }
-
-    if (!$contactID && is_array($fields) && $fields) {
-
-      //CRM-14134 use Unsupervised rule for everyone
-      $dedupeParams = CRM_Dedupe_Finder::formatParams($fields, 'Individual');
-
-      // disable permission based on cache since event registration is public page/feature.
-      $dedupeParams['check_permission'] = FALSE;
-
-      // find event dedupe rule
-      if (CRM_Utils_Array::value('dedupe_rule_group_id', $self->_values['event'], 0) > 0) {
-        $ids = CRM_Dedupe_Finder::dupesByParams($dedupeParams, 'Individual', 'Unsupervised', array(), $self->_values['event']['dedupe_rule_group_id']);
-      }
-      else {
-        $ids = CRM_Dedupe_Finder::dupesByParams($dedupeParams, 'Individual', 'Unsupervised');
-      }
-      $contactID = CRM_Utils_Array::value(0, $ids);
-
-    }
-
-    if ($returnContactId) {
-      // CRM-7377
-      // return contactID if contact already exists
-      return $contactID;
-    }
+    $contactID = self::getRegistrationContactID($fields, $self, $isAdditional);
 
     if ($contactID) {
       $participant = new CRM_Event_BAO_Participant();
@@ -1212,7 +1200,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
             }
 
             $status = ts("It looks like you are already registered for this event. If you want to change your registration, or you feel that you've received this message in error, please contact the site administrator.") . ' ' . ts('You can also <a href="%1">register another participant</a>.', array(1 => $registerUrl));
-            $session->setStatus($status, ts('Oops.'), 'alert');
+            CRM_Core_Session::singleton()->setStatus($status, ts('Oops.'), 'alert');
             $url = CRM_Utils_System::url('civicrm/event/info',
               "reset=1&id={$self->_values['event']['id']}&noFullMsg=true"
             );
@@ -1229,7 +1217,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
 
           if ($isAdditional) {
             $status = ts("It looks like this participant is already registered for this event. If you want to change your registration, or you feel that you've received this message in error, please contact the site administrator.");
-            $session->setStatus($status, ts('Oops.'), 'alert');
+            CRM_Core_Session::singleton()->setStatus($status, ts('Oops.'), 'alert');
             return $participant->id;
           }
         }
