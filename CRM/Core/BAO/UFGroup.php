@@ -967,9 +967,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
    *   contact_id if found, null otherwise
    */
   public static function findContact(&$params, $id = NULL, $contactType = 'Individual') {
-    $dedupeParams = CRM_Dedupe_Finder::formatParams($params, $contactType);
-    $dedupeParams['check_permission'] = CRM_Utils_Array::value('check_permission', $params, TRUE);
-    $ids = CRM_Dedupe_Finder::dupesByParams($dedupeParams, $contactType, 'Supervised', array($id));
+    $ids = CRM_Contact_BAO_Contact::getDuplicateContacts($params, $contactType, 'Supervised', array($id), CRM_Utils_Array::value('check_permission', $params, TRUE));
     if (!empty($ids)) {
       return implode(',', $ids);
     }
