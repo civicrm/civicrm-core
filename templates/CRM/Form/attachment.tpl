@@ -31,7 +31,7 @@
           {foreach from=$currentAttachmentInfo key=attKey item=attVal}
                 <div id="attachStatusMesg" class="status hiddenElement"></div>
                 <div id="attachFileRecord_{$attVal.fileID}">
-                  <strong><a href="{$attVal.url}">{$attVal.cleanName}</a></strong>
+                  <strong><a href="{$attVal.url}"><i class="crm-i {$attVal.icon}"></i> {$attVal.cleanName}</a></strong>
                   {if $attVal.description}&nbsp;-&nbsp;{$attVal.description}{/if}
                   {if !empty($attVal.tag)}
                     <br />
