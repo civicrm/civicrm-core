@@ -959,7 +959,7 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
       )
     );
 
-    $form->addField('financial_trxn_card_type', array('entity' => 'FinancialTrxn', 'name' => 'card_type'));
+    $form->addField('financial_trxn_card_type', array('entity' => 'FinancialTrxn', 'name' => 'card_type', 'action' => 'get'));
 
     // CRM-16713 - contribution search by premiums on 'Find Contribution' form.
     $form->add('select', 'contribution_product_id',
