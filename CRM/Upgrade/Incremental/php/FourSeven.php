@@ -317,6 +317,21 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
   }
 
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_4_7_19($rev) {
+    $query = "SELECT id FROM civicrm_financial_account WHERE opening_balance <> 0 OR current_period_opening_balance <> 0";
+    $result = CRM_Core_DAO::executeQuery($query);
+    if (!$result->N) {
+      $this->addTask('Drop Column current_period_opening_balance From civicrm_financial_account table.', 'dropColumn', 'civicrm_financial_account', 'current_period_opening_balance');
+      $this->addTask('Drop Column opening_balance From civicrm_financial_account table.', 'dropColumn', 'civicrm_financial_account', 'opening_balance');
+    }
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
+  }
+
   /*
    * Important! All upgrade functions MUST add a 'runSql' task.
    * Uncomment and use the following template for a new upgrade version
