@@ -109,8 +109,8 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'title' => 'One Day Phone Call Notice',
       'limit_to' => '1',
       'absolute_date' => NULL,
-      'body_html' => '<p>1-Day (non-repeating)</p>',
-      'body_text' => '1-Day (non-repeating)',
+      'body_html' => '<p>1-Day (non-repeating) (for {activity.subject})</p>',
+      'body_text' => '1-Day (non-repeating) (for {activity.subject})',
       'end_action' => NULL,
       'end_date' => NULL,
       'end_frequency_interval' => NULL,
@@ -125,7 +125,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'recipient' => '2',
       'recipient_listing' => NULL,
       'recipient_manual' => NULL,
-      'record_activity' => NULL,
+      'record_activity' => 1,
       'repetition_frequency_interval' => NULL,
       'repetition_frequency_unit' => NULL,
       'start_action_condition' => 'before',
@@ -804,6 +804,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     $activity = $this->createTestObject('CRM_Activity_DAO_Activity', $this->fixtures['phonecall']);
     $this->assertTrue(is_numeric($activity->id));
     $contact = $this->callAPISuccess('contact', 'create', $this->fixtures['contact']);
+    $activity->subject = "Test subject for Phonecall";
     $activity->save();
 
     $source['contact_id'] = $contact['id'];
@@ -831,6 +832,14 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
         'recipients' => array(),
       ),
     ));
+    $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, FALSE, FALSE, 'name');
+    $activityDAO = new CRM_Activity_DAO_Activity();
+    $activityDAO->source_record_id = $activity->id;
+    $activityDAO->activity_type_id = array_search('Reminder Sent', $activityTypes);
+    $activityDAO->find();
+    while ($activityDAO->fetch()) {
+      $this->assertContains($activity->subject, $activityDAO->details);
+    }
   }
 
   public function testActivityDateTimeMatchRepeatableSchedule() {
