@@ -247,13 +247,15 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
     $contributions = $contacts = $notSent = array();
     foreach ($contributionIDs as $item => $contributionId) {
       // get contribution information
-      $contribution = CRM_Utils_Token::getContributionTokenDetails(array('contribution_id' => $contributionId),
-        $returnProperties,
-        NULL,
-        $messageToken,
-        $task
-      );
-      $contribution = $contributions[$contributionId] = $contribution[$contributionId];
+
+      // retrieve contribution tokens listed in $messageToken using Contribution.Get API
+      $contributions[$contributionId] = array();
+      if (!empty($messageToken['contribution'])) {
+        $contributions[$contributionId] = civicrm_api3('Contribution', 'getsingle', array(
+          'id' => $contributionId,
+          'return' => $messageToken['contribution'],
+        ));
+      }
 
       if ($isIncludeSoftCredits) {
         //@todo find out why this happens & add comments
