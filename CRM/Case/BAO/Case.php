@@ -1235,7 +1235,7 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
       LEFT JOIN civicrm_email ce
         ON ce.contact_id = cc.id
         AND ce.is_primary= 1
-      WHERE cr.case_id =  %1';
+      WHERE cr.case_id =  %1 AND cr.is_active AND cc.is_deleted <> 1';
 
     $params = array(1 => array($caseID, 'Integer'));
     $dao = CRM_Core_DAO::executeQuery($query, $params);

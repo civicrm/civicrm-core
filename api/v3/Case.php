@@ -269,7 +269,7 @@ function civicrm_api3_case_get($params, $sql = NULL) {
     // Add necessary joins to the first case client
     if ($contactSort) {
       $sql->join('ccc', 'LEFT JOIN (SELECT * FROM civicrm_case_contact WHERE id IN (SELECT MIN(id) FROM civicrm_case_contact GROUP BY case_id)) AS ccc ON ccc.case_id = a.id');
-      $sql->join('case_contact', 'LEFT JOIN civicrm_contact AS case_contact ON ccc.contact_id = case_contact.id');
+      $sql->join('case_contact', 'LEFT JOIN civicrm_contact AS case_contact ON ccc.contact_id = case_contact.id AND case_contact.is_deleted <> 1');
     }
   }
 
