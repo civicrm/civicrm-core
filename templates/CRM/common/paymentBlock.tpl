@@ -124,7 +124,6 @@
       CRM.loadPage(dataUrl, {target: '#billing-payment-block'});
     }
 
-    $('.crm-group.payment_options-group').show();
     $('[name=payment_processor_id]').on('change.paymentBlock', function() {
         buildPaymentBlock($(this).val());
     });
