@@ -1011,7 +1011,7 @@ abstract class CRM_Utils_Hook {
    *   Your query must return two columns:
    *     the contact 'data' to display in the autocomplete dropdown (usually contact.sort_name - aliased as 'data')
    *     the contact IDs
-   * @param string $name
+   * @param string $queryText
    *   The name string to execute the query against (this is the value being typed in by the user).
    * @param string $context
    *   The context in which this ajax call is being made (for example: 'customfield', 'caseview').
@@ -1021,8 +1021,8 @@ abstract class CRM_Utils_Hook {
    *
    * @return mixed
    */
-  public static function contactListQuery(&$query, $name, $context, $id) {
-    return self::singleton()->invoke(array('query', 'name', 'context', 'id'), $query, $name, $context, $id,
+  public static function contactListQuery(&$query, $queryText, $context, $id) {
+    return self::singleton()->invoke(array('query', 'queryText', 'context', 'id'), $query, $queryText, $context, $id,
       self::$_nullObject, self::$_nullObject,
       'civicrm_contactListQuery'
     );
@@ -1171,13 +1171,13 @@ abstract class CRM_Utils_Hook {
    *
    * @param array $options
    *   Associated array of option values / id
-   * @param string $name
+   * @param string $groupName
    *   Option group name
    *
    * @return mixed
    */
-  public static function optionValues(&$options, $name) {
-    return self::singleton()->invoke(array('options', 'name'), $options, $name,
+  public static function optionValues(&$options, $groupName) {
+    return self::singleton()->invoke(array('options', 'groupName'), $options, $groupName,
       self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
       'civicrm_optionValues'
     );
@@ -1841,55 +1841,55 @@ abstract class CRM_Utils_Hook {
   /**
    * This hook is called while preparing a profile form.
    *
-   * @param string $name
+   * @param string $profileName
    * @return mixed
    */
-  public static function buildProfile($name) {
-    return self::singleton()->invoke(array('name'), $name, self::$_nullObject, self::$_nullObject, self::$_nullObject,
+  public static function buildProfile($profileName) {
+    return self::singleton()->invoke(array('profileName'), $profileName, self::$_nullObject, self::$_nullObject, self::$_nullObject,
       self::$_nullObject, self::$_nullObject, 'civicrm_buildProfile');
   }
 
   /**
    * This hook is called while validating a profile form submission.
    *
-   * @param string $name
+   * @param string $profileName
    * @return mixed
    */
-  public static function validateProfile($name) {
-    return self::singleton()->invoke(array('name'), $name, self::$_nullObject, self::$_nullObject, self::$_nullObject,
+  public static function validateProfile($profileName) {
+    return self::singleton()->invoke(array('profileName'), $profileName, self::$_nullObject, self::$_nullObject, self::$_nullObject,
       self::$_nullObject, self::$_nullObject, 'civicrm_validateProfile');
   }
 
   /**
    * This hook is called processing a valid profile form submission.
    *
-   * @param string $name
+   * @param string $profileName
    * @return mixed
    */
-  public static function processProfile($name) {
-    return self::singleton()->invoke(array('name'), $name, self::$_nullObject, self::$_nullObject, self::$_nullObject,
+  public static function processProfile($profileName) {
+    return self::singleton()->invoke(array('profileName'), $profileName, self::$_nullObject, self::$_nullObject, self::$_nullObject,
       self::$_nullObject, self::$_nullObject, 'civicrm_processProfile');
   }
 
   /**
    * This hook is called while preparing a read-only profile screen
    *
-   * @param string $name
+   * @param string $profileName
    * @return mixed
    */
-  public static function viewProfile($name) {
-    return self::singleton()->invoke(array('name'), $name, self::$_nullObject, self::$_nullObject, self::$_nullObject,
+  public static function viewProfile($profileName) {
+    return self::singleton()->invoke(array('profileName'), $profileName, self::$_nullObject, self::$_nullObject, self::$_nullObject,
       self::$_nullObject, self::$_nullObject, 'civicrm_viewProfile');
   }
 
   /**
    * This hook is called while preparing a list of contacts (based on a profile)
    *
-   * @param string $name
+   * @param string $profileName
    * @return mixed
    */
-  public static function searchProfile($name) {
-    return self::singleton()->invoke(array('name'), $name, self::$_nullObject, self::$_nullObject, self::$_nullObject,
+  public static function searchProfile($profileName) {
+    return self::singleton()->invoke(array('profileName'), $profileName, self::$_nullObject, self::$_nullObject, self::$_nullObject,
       self::$_nullObject, self::$_nullObject, 'civicrm_searchProfile');
   }
 

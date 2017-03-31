@@ -111,6 +111,22 @@ class GenericHookEvent extends \Symfony\Component\EventDispatcher\Event {
   private $returnValues = array();
 
   /**
+   * List of field names that are prohibited due to conflicts
+   * in the class-hierarchy.
+   *
+   * @var array
+   */
+  private static $BLACKLIST = array(
+    'name',
+    'dispatcher',
+    'propagationStopped',
+    'hookBlacklist',
+    'hookValues',
+    'hookFields',
+    'hookFieldsFlip',
+  );
+
+  /**
    * Create a GenericHookEvent using key-value pairs.
    *
    * @param array $params
@@ -122,6 +138,7 @@ class GenericHookEvent extends \Symfony\Component\EventDispatcher\Event {
     $e->hookValues = array_values($params);
     $e->hookFields = array_keys($params);
     $e->hookFieldsFlip = array_flip($e->hookFields);
+    self::assertValidHookFields($e->hookFields);
     return $e;
   }
 
@@ -142,7 +159,20 @@ class GenericHookEvent extends \Symfony\Component\EventDispatcher\Event {
     $e->hookValues = $hookValues;
     $e->hookFields = $hookFields;
     $e->hookFieldsFlip = array_flip($e->hookFields);
+    self::assertValidHookFields($e->hookFields);
     return $e;
+  }
+
+  /**
+   * @param array $fields
+   *   List of field names.
+   */
+  private static function assertValidHookFields($fields) {
+    $bad = array_intersect($fields, self::$BLACKLIST);
+    if ($bad) {
+      throw new \RuntimeException("Hook relies on conflicted field names: "
+        . implode(', ', $bad));
+    }
   }
 
   /**
