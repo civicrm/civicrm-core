@@ -2561,6 +2561,11 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
             if ($membership_status == 'Pending' && $membership->is_pay_later == 1) {
               $values['is_pay_later'] = 1;
             }
+            // Pass amount to floatval as string '0.00' is considered a
+            // valid amount and includes Fee section in the mail.
+            if (isset($values['amount'])) {
+              $values['amount'] = floatval($values['amount']);
+            }
 
             if (!empty($this->contribution_recur_id) && $paymentObject) {
               $url = $paymentObject->subscriptionURL($membership->id, 'membership', 'cancel');
