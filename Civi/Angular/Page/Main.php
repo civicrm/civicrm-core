@@ -81,6 +81,7 @@ class Main extends \CRM_Core_Page {
         'angular' => array(
           'modules' => array_merge(array('ngRoute'), array_keys($modules)),
           'cacheCode' => $page->res->getCacheCode(),
+          'bundleUrl' => \Civi::service('asset_builder')->getUrl('angular-modules.json'),
         ),
       ));
     });
@@ -104,11 +105,13 @@ class Main extends \CRM_Core_Page {
     else {
       // Note: addScriptUrl() bypasses the normal string-localization of addScriptFile(),
       // but that's OK because all Angular strings (JS+HTML) will load via crmResource.
-      $aggScriptUrl = \CRM_Utils_System::url('civicrm/ajax/angular-modules', 'format=js&r=' . $page->res->getCacheCode(), FALSE, NULL, FALSE);
+      // $aggScriptUrl = \CRM_Utils_System::url('civicrm/ajax/angular-modules', 'format=js&r=' . $page->res->getCacheCode(), FALSE, NULL, FALSE);
+      $aggScriptUrl = \Civi::service('asset_builder')->getUrl('angular-modules.js');
       $this->res->addScriptUrl($aggScriptUrl, 120, $this->region);
 
       // FIXME: The following CSS aggregator doesn't currently handle path-adjustments - which can break icons.
       //$aggStyleUrl = \CRM_Utils_System::url('civicrm/ajax/angular-modules', 'format=css&r=' . $page->res->getCacheCode(), FALSE, NULL, FALSE);
+      //$aggStyleUrl = \Civi::service('asset_builder')->getUrl('angular-modules.css');
       //$this->res->addStyleUrl($aggStyleUrl, 120, $this->region);
 
       foreach ($this->angular->getResources(array_keys($modules), 'css', 'cacheUrl') as $url) {
