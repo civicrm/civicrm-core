@@ -2102,6 +2102,30 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
+   * This hook is called whenever the system builds a new copy of
+   * semi-static asset.
+   *
+   * @param string $asset
+   *   The name of the asset.
+   *   Ex: 'angular.json'
+   * @param array $params
+   *   List of optional arguments which influence the content.
+   *   Note: Params are immutable because they are part of the cache-key.
+   * @param string $mimeType
+   *   Initially, NULL. Modify to specify the mime-type.
+   * @param string $content
+   *   Initially, NULL. Modify to specify the rendered content.
+   * @return null
+   *   the return value is ignored
+   */
+  public static function buildAsset($asset, $params, &$mimeType, &$content) {
+    return self::singleton()->invoke(array('asset', 'params', 'mimeType', 'content'),
+      $asset, $params, $mimeType, $content, self::$_nullObject, self::$_nullObject,
+      'civicrm_buildAsset'
+    );
+  }
+
+  /**
    * This hook fires whenever a record in a case changes.
    *
    * @param \Civi\CCase\Analyzer $analyzer

@@ -122,6 +122,11 @@
      <access_arguments>access CiviCRM</access_arguments>
   </item>
   <item>
+    <path>civicrm/asset/builder</path>
+    <page_callback>\Civi\Core\AssetBuilder::pageRun</page_callback>
+    <access_arguments>*always allow*</access_arguments>
+  </item>
+  <item>
      <path>civicrm/contribute/ajax/tableview</path>
      <page_callback>CRM_Contribute_Page_DashBoard</page_callback>
      <access_arguments>access CiviCRM</access_arguments>

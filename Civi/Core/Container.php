@@ -178,6 +178,11 @@ class Container {
       array()
     ));
 
+    $container->setDefinition('asset_builder', new Definition(
+      'Civi\Core\AssetBuilder',
+      array()
+    ));
+
     $container->setDefinition('pear_mail', new Definition('Mail'))
       ->setFactoryClass('CRM_Utils_Mail')->setFactoryMethod('createMailer');
 
