@@ -1675,6 +1675,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         $result = array('payment_status_id' => 1, 'contribution' => $membershipContribution);
         $this->completeTransaction($result, $result['contribution']->id);
       }
+      // return as completeTransaction() already sends the receipt mail.
+      return;
     }
 
     CRM_Contribute_BAO_ContributionPage::sendMail($contactID,
