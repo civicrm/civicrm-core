@@ -142,4 +142,92 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
     $this->assertEquals(3, $arr['zoo']['half']);
   }
 
+  public function getSortExamples() {
+    $red = array('label' => 'Red', 'id' => 1, 'weight' => '90');
+    $orange = array('label' => 'Orange', 'id' => 2, 'weight' => '70');
+    $yellow = array('label' => 'Yellow', 'id' => 3, 'weight' => '10');
+    $green = array('label' => 'Green', 'id' => 4, 'weight' => '70');
+    $blue = array('label' => 'Blue', 'id' => 5, 'weight' => '70');
+
+    $examples = array();
+    $examples[] = array(
+      array(
+        'r' => $red,
+        'y' => $yellow,
+        'g' => $green,
+        'o' => $orange,
+        'b' => $blue,
+      ),
+      'id',
+      array(
+        'r' => $red,
+        'o' => $orange,
+        'y' => $yellow,
+        'g' => $green,
+        'b' => $blue,
+      ),
+    );
+    $examples[] = array(
+      array(
+        'r' => $red,
+        'y' => $yellow,
+        'g' => $green,
+        'o' => $orange,
+        'b' => $blue,
+      ),
+      'label',
+      array(
+        'b' => $blue,
+        'g' => $green,
+        'o' => $orange,
+        'r' => $red,
+        'y' => $yellow,
+      ),
+    );
+    $examples[] = array(
+      array(
+        'r' => $red,
+        'g' => $green,
+        'y' => $yellow,
+        'o' => $orange,
+        'b' => $blue,
+      ),
+      array('weight', 'id'),
+      array(
+        'y' => $yellow,
+        'o' => $orange,
+        'g' => $green,
+        'b' => $blue,
+        'r' => $red,
+      ),
+    );
+
+    return $examples;
+  }
+
+  /**
+   * @param array $array
+   * @param string|array $field
+   * @param $expected
+   * @dataProvider getSortExamples
+   */
+  public function testCrmArraySortByField($array, $field, $expected) {
+    $actual = CRM_Utils_Array::crmArraySortByField($array, $field);
+
+    // assertEquals() has nicer error output, but it's not precise about order.
+    $this->assertEquals($expected, $actual);
+
+    $aIter = new ArrayIterator($actual);
+    $eIter = new ArrayIterator($expected);
+    $this->assertEquals($eIter->count(), $aIter->count());
+    $pos = 0;
+    while ($aIter->valid()) {
+      $this->assertEquals($eIter->key(), $aIter->key(), "Keys at offset $pos do not match");
+      $this->assertEquals($eIter->current(), $aIter->current(), "Values at offset $pos do not match");
+      $aIter->next();
+      $eIter->next();
+      $pos++;
+    }
+  }
+
 }

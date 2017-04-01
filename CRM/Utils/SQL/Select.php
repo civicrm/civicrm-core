@@ -326,14 +326,12 @@ class CRM_Utils_SQL_Select implements ArrayAccess {
    * @param int $weight
    * @return \CRM_Utils_SQL_Select
    */
-  public function orderBy($exprs, $args = NULL, $weight = NULL) {
+  public function orderBy($exprs, $args = NULL, $weight = 0) {
+    static $guid = 0;
     $exprs = (array) $exprs;
-    if ($weight === NULL) {
-      $weight = count($this->orderBys);
-    }
     foreach ($exprs as $expr) {
       $evaluatedExpr = $this->interpolate($expr, $args);
-      $this->orderBys[$evaluatedExpr] = array('value' => $evaluatedExpr, 'weight' => $weight++);
+      $this->orderBys[$evaluatedExpr] = array('value' => $evaluatedExpr, 'weight' => $weight, 'guid' => $guid++);
     }
     return $this;
   }
@@ -578,7 +576,8 @@ class CRM_Utils_SQL_Select implements ArrayAccess {
       $sql .= 'HAVING (' . implode(') AND (', $this->havings) . ")\n";
     }
     if ($this->orderBys) {
-      $orderBys = CRM_Utils_Array::crmArraySortByField($this->orderBys, 'weight');
+      $orderBys = CRM_Utils_Array::crmArraySortByField($this->orderBys,
+        array('weight', 'guid'));
       $orderBys = CRM_Utils_Array::collect('value', $orderBys);
       $sql .= 'ORDER BY ' . implode(', ', $orderBys) . "\n";
     }
