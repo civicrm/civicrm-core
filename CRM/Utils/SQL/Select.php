@@ -323,13 +323,15 @@ class CRM_Utils_SQL_Select implements ArrayAccess {
    *
    * @param string|array $exprs list of SQL expressions
    * @param null|array $args use NULL to disable interpolation; use an array of variables to enable
-   * @return CRM_Utils_SQL_Select
+   * @param int $weight
+   * @return \CRM_Utils_SQL_Select
    */
-  public function orderBy($exprs, $args = NULL) {
+  public function orderBy($exprs, $args = NULL, $weight = 0) {
+    static $guid = 0;
     $exprs = (array) $exprs;
     foreach ($exprs as $expr) {
       $evaluatedExpr = $this->interpolate($expr, $args);
-      $this->orderBys[$evaluatedExpr] = $evaluatedExpr;
+      $this->orderBys[$evaluatedExpr] = array('value' => $evaluatedExpr, 'weight' => $weight, 'guid' => $guid++);
     }
     return $this;
   }
@@ -574,7 +576,10 @@ class CRM_Utils_SQL_Select implements ArrayAccess {
       $sql .= 'HAVING (' . implode(') AND (', $this->havings) . ")\n";
     }
     if ($this->orderBys) {
-      $sql .= 'ORDER BY ' . implode(', ', $this->orderBys) . "\n";
+      $orderBys = CRM_Utils_Array::crmArraySortByField($this->orderBys,
+        array('weight', 'guid'));
+      $orderBys = CRM_Utils_Array::collect('value', $orderBys);
+      $sql .= 'ORDER BY ' . implode(', ', $orderBys) . "\n";
     }
     if ($this->limit !== NULL) {
       $sql .= 'LIMIT ' . $this->limit . "\n";

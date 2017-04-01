@@ -563,4 +563,138 @@ class api_v3_CaseTest extends CiviCaseTestCase {
     $this->assertEquals(array($case1['id'], $case2['id']), array_keys(CRM_Utils_Array::rekey($result['api.Case.get']['values'], 'id')));
   }
 
+  /**
+   * Test the ability to order by client using the join syntax.
+   *
+   * For multi-client cases, should order by the first client.
+   */
+  public function testCaseGetOrderByClient() {
+    $contact1 = $this->individualCreate(array('first_name' => 'Aa', 'last_name' => 'Zz'));
+    $contact2 = $this->individualCreate(array('first_name' => 'Bb', 'last_name' => 'Zz'));
+    $contact3 = $this->individualCreate(array('first_name' => 'Cc', 'last_name' => 'Xx'));
+
+    $case1 = $this->callAPISuccess('Case', 'create', array(
+      'contact_id' => $contact1,
+      'subject' => "Test case 1",
+      'case_type_id' => $this->caseTypeId,
+    ));
+    $case2 = $this->callAPISuccess('Case', 'create', array(
+      'contact_id' => $contact2,
+      'subject' => "Test case 2",
+      'case_type_id' => $this->caseTypeId,
+    ));
+    $case3 = $this->callAPISuccess('Case', 'create', array(
+      'contact_id' => array($contact3, $contact1),
+      'subject' => "Test case 3",
+      'case_type_id' => $this->caseTypeId,
+    ));
+
+    $result = $this->callAPISuccess('Case', 'get', array(
+      'contact_id' => array('IN' => array($contact1, $contact2, $contact3)),
+      'sequential' => 1,
+      'return' => 'id',
+      'options' => array('sort' => 'contact_id.first_name'),
+    ));
+    $this->assertEquals($case3['id'], $result['values'][2]['id']);
+    $this->assertEquals($case2['id'], $result['values'][1]['id']);
+    $this->assertEquals($case1['id'], $result['values'][0]['id']);
+
+    $result = $this->callAPISuccess('Case', 'get', array(
+      'contact_id' => array('IN' => array($contact1, $contact2, $contact3)),
+      'sequential' => 1,
+      'return' => 'id',
+      'options' => array('sort' => 'contact_id.last_name ASC, contact_id.first_name DESC'),
+    ));
+    $this->assertEquals($case1['id'], $result['values'][2]['id']);
+    $this->assertEquals($case2['id'], $result['values'][1]['id']);
+    $this->assertEquals($case3['id'], $result['values'][0]['id']);
+
+    $result = $this->callAPISuccess('Case', 'get', array(
+      'contact_id' => array('IN' => array($contact1, $contact2, $contact3)),
+      'sequential' => 1,
+      'return' => 'id',
+      'options' => array('sort' => 'contact_id.first_name DESC'),
+    ));
+    $this->assertEquals($case1['id'], $result['values'][2]['id']);
+    $this->assertEquals($case2['id'], $result['values'][1]['id']);
+    $this->assertEquals($case3['id'], $result['values'][0]['id']);
+
+    $result = $this->callAPISuccess('Case', 'get', array(
+      'contact_id' => array('IN' => array($contact1, $contact2, $contact3)),
+      'sequential' => 1,
+      'return' => 'id',
+      'options' => array('sort' => 'case_type_id, contact_id DESC, status_id'),
+    ));
+    $this->assertEquals($case1['id'], $result['values'][2]['id']);
+    $this->assertEquals($case2['id'], $result['values'][1]['id']);
+    $this->assertEquals($case3['id'], $result['values'][0]['id']);
+    $this->assertCount(3, $result['values']);
+  }
+
+  /**
+   * Test the ability to add a timeline to an existing case.
+   *
+   * See the case.addtimeline api.
+   *
+   * @throws \Exception
+   */
+  public function testCaseAddtimeline() {
+    $caseSpec = array(
+      'title' => 'Application with Definition',
+      'name' => 'Application_with_Definition',
+      'is_active' => 1,
+      'weight' => 4,
+      'definition' => array(
+        'activityTypes' => array(
+          array('name' => 'Follow up'),
+        ),
+        'activitySets' => array(
+          array(
+            'name' => 'set1',
+            'label' => 'Label 1',
+            'timeline' => 1,
+            'activityTypes' => array(
+              array('name' => 'Open Case', 'status' => 'Completed'),
+            ),
+          ),
+          array(
+            'name' => 'set2',
+            'label' => 'Label 2',
+            'timeline' => 1,
+            'activityTypes' => array(
+              array('name' => 'Follow up'),
+            ),
+          ),
+        ),
+        'caseRoles' => array(
+          array('name' => 'Homeless Services Coordinator', 'creator' => 1, 'manager' => 1),
+        ),
+      ),
+    );
+    $cid = $this->individualCreate();
+    $caseType = $this->callAPISuccess('CaseType', 'create', $caseSpec);
+    $case = $this->callAPISuccess('Case', 'create', array(
+      'case_type_id' => $caseType['id'],
+      'contact_id' => $cid,
+      'subject' => 'Test case with timeline',
+    ));
+    // Created case should only have 1 activity per the spec
+    $result = $this->callAPISuccessGetSingle('Activity', array('case_id' => $case['id'], 'return' => 'activity_type_id.name'));
+    $this->assertEquals('Open Case', $result['activity_type_id.name']);
+    // Add timeline
+    $timeline = civicrm_api('Case', 'addtimeline', array(
+      'case_id' => $case['id'],
+      'timeline' => 'set2',
+      'version' => 3,
+    ));
+    $result = $this->callAPISuccess('Activity', 'get', array(
+      'case_id' => $case['id'],
+      'return' => 'activity_type_id.name',
+      'sequential' => 1,
+      'options' => array('sort' => 'id'),
+    ));
+    $this->assertEquals(2, $result['count']);
+    $this->assertEquals('Follow up', $result['values'][1]['activity_type_id.name']);
+  }
+
 }

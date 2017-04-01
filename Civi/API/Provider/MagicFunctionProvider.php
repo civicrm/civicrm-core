@@ -86,7 +86,7 @@ class MagicFunctionProvider implements EventSubscriberInterface, ProviderInterfa
       $result = $function($apiRequest);
     }
     elseif ($apiRequest['function'] && !$apiRequest['is_generic']) {
-      $result = isset($extra) ? $function($apiRequest['params'], $extra) : $function($apiRequest['params']);
+      $result = $function($apiRequest['params']);
     }
     return $result;
   }

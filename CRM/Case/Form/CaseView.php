@@ -424,21 +424,13 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
     $session->pushUserContext($url);
 
     if (!empty($params['timeline_id']) && !empty($_POST['_qf_CaseView_next'])) {
-      $session = CRM_Core_Session::singleton();
-      $this->_uid = $session->get('userID');
-      $xmlProcessor = new CRM_Case_XMLProcessor_Process();
-      $xmlProcessorParams = array(
-        'clientID' => $this->_contactID,
-        'creatorID' => $this->_uid,
-        'standardTimeline' => 0,
-        'activity_date_time' => date('YmdHis'),
-        'caseID' => $this->_caseID,
-        'caseType' => $this->_caseType,
-        'activitySetName' => $params['timeline_id'],
-      );
-      $xmlProcessor->run($this->_caseType, $xmlProcessorParams);
-      $reports = $xmlProcessor->get($this->_caseType, 'ActivitySets');
+      civicrm_api3('Case', 'addtimeline', array(
+        'case_id' => $this->_caseID,
+        'timeline' => $params['timeline_id'],
+      ));
 
+      $xmlProcessor = new CRM_Case_XMLProcessor_Process();
+      $reports = $xmlProcessor->get($this->_caseType, 'ActivitySets');
       CRM_Core_Session::setStatus(ts('Activities from the %1 activity set have been added to this case.',
         array(1 => $reports[$params['timeline_id']])
       ), ts('Done'), 'success');

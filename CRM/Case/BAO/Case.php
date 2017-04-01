@@ -329,7 +329,8 @@ WHERE civicrm_case.id = %1";
  LEFT JOIN  civicrm_case_contact ON civicrm_case_contact.contact_id = contact_a.id
  LEFT JOIN  civicrm_email ce ON ( ce.contact_id = contact_a.id AND ce.is_primary = 1)
  LEFT JOIN  civicrm_phone cp ON ( cp.contact_id = contact_a.id AND cp.is_primary = 1)
-     WHERE  civicrm_case_contact.case_id = %1";
+     WHERE  civicrm_case_contact.case_id = %1
+     ORDER BY civicrm_case_contact.id";
 
     $dao = CRM_Core_DAO::executeQuery($query,
       array(1 => array($caseId, 'Integer'))
@@ -1234,7 +1235,7 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
       LEFT JOIN civicrm_email ce
         ON ce.contact_id = cc.id
         AND ce.is_primary= 1
-      WHERE cr.case_id =  %1';
+      WHERE cr.case_id =  %1 AND cr.is_active AND cc.is_deleted <> 1';
 
     $params = array(1 => array($caseID, 'Integer'));
     $dao = CRM_Core_DAO::executeQuery($query, $params);
@@ -3074,6 +3075,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
     $clients = array();
     $caseContact = new CRM_Case_DAO_CaseContact();
     $caseContact->case_id = $caseId;
+    $caseContact->orderBy('id');
     $caseContact->find();
 
     while ($caseContact->fetch()) {
