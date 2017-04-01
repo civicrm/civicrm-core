@@ -63,6 +63,12 @@ class CRM_Report_Form_Case_TimeSpent extends CRM_Report_Form {
             'type' => CRM_Report_Form::OP_STRING,
           ),
         ),
+        'order_bys' => array(
+          'sort_name' => array(
+            'title' => ts('Contact Name'),
+            'default_weight' => '1',
+          ),
+        ),
       ),
       'civicrm_activity' => array(
         'dao' => 'CRM_Activity_DAO_Activity',
@@ -116,6 +122,21 @@ class CRM_Report_Form_Case_TimeSpent extends CRM_Report_Form {
             'options' => $this->activityStatuses,
           ),
         ),
+        'order_bys' => array(
+          'subject' => array(
+            'title' => ts('Activity Subject'),
+          ),
+          'activity_type_id' => array(
+            'title' => ts('Activity Type'),
+          ),
+          'activity_date_time' => array(
+            'title' => ts('Activity Date'),
+          ),
+          'status_id' => array(
+            'title' => ts('Activity Status'),
+          ),
+        ),
+        'grouping' => 'case-fields',
       ),
       'civicrm_activity_source' => array(
         'dao' => 'CRM_Activity_DAO_ActivityContact',
@@ -293,10 +314,6 @@ class CRM_Report_Form_Case_TimeSpent extends CRM_Report_Form {
 
       $this->_groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, $groupBy);
     }
-  }
-
-  public function orderBy() {
-    $this->_orderBy = "ORDER BY {$this->_aliases['civicrm_contact']}.sort_name, {$this->_aliases['civicrm_contact']}.id";
   }
 
   public function postProcess() {
