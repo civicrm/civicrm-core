@@ -165,4 +165,33 @@ class CRM_Upgrade_Incremental_Base {
     return TRUE;
   }
 
+  /**
+   * Add a index to a table column.
+   *
+   * @param CRM_Queue_TaskContext $ctx
+   * @param string $table
+   * @param string $column
+   * @return bool
+   */
+  public static function addIndex($ctx, $table, $column) {
+    $tables = array($table => array($column));
+    CRM_Core_BAO_SchemaHandler::createIndexes($tables);
+
+    return TRUE;
+  }
+
+  /**
+   * Drop a index from a table if it exist.
+   *
+   * @param CRM_Queue_TaskContext $ctx
+   * @param string $table
+   * @param string $indexName
+   * @return bool
+   */
+  public static function dropIndex($ctx, $table, $indexName) {
+    CRM_Core_BAO_SchemaHandler::dropIndexIfExists($table, $indexName);
+
+    return TRUE;
+  }
+
 }
