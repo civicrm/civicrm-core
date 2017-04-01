@@ -148,6 +148,9 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
           'status_id' => array(
             'title' => ts('Status'),
           ),
+          'case_type_name' => array(
+            'title' => 'Case Type',
+          ),
         ),
       ),
       'civicrm_contact' => array(
