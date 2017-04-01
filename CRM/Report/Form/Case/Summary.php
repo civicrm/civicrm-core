@@ -72,7 +72,7 @@ class CRM_Report_Form_Case_Summary extends CRM_Report_Form {
         'order_bys' => array(
           'client_name' => array(
             'title' => ts('Contact Name'),
-            'name' => 'sort_name'
+            'name' => 'sort_name',
           ),
         ),
         'grouping'  => 'case-fields',
@@ -157,7 +157,7 @@ class CRM_Report_Form_Case_Summary extends CRM_Report_Form {
             'title' => ts('Status'),
           ),
         ),
-        'grouping'  => 'case-fields'
+        'grouping'  => 'case-fields',
       ),
       'civicrm_contact' => array(
         'dao' => 'CRM_Contact_DAO_Contact',

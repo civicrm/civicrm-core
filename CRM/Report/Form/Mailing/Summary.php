@@ -150,7 +150,7 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
           'default_order' => 'DESC',
         ),
       ),
-      'grouping' => 'mailing-fields'
+      'grouping' => 'mailing-fields',
     );
 
     $this->_columns['civicrm_mailing_event_queue'] = array(
