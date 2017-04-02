@@ -112,7 +112,7 @@ class CRM_Report_Form_Mailing_Clicks extends CRM_Report_Form {
       'fields' => array(
         'mailing_name' => array(
           'name' => 'name',
-          'title' => ts('Mailing'),
+          'title' => ts('Mailing Name'),
           'default' => TRUE,
         ),
         'mailing_name_alias' => array(
@@ -120,21 +120,36 @@ class CRM_Report_Form_Mailing_Clicks extends CRM_Report_Form {
           'required' => TRUE,
           'no_display' => TRUE,
         ),
+        'mailing_subject' => array(
+          'name' => 'subject',
+          'title' => ts('Mailing Subject'),
+          'default' => TRUE,
+        ),
       ),
       'filters' => array(
         'mailing_id' => array(
           'name' => 'id',
-          'title' => ts('Mailing'),
+          'title' => ts('Mailing Name'),
           'operatorType' => CRM_Report_Form::OP_MULTISELECT,
           'type' => CRM_Utils_Type::T_INT,
           'options' => CRM_Mailing_BAO_Mailing::getMailingsList(),
+          'operator' => 'like',
+        ),
+        'mailing_subject' => array(
+          'name' => 'subject',
+          'title' => ts('Mailing Subject'),
+          'type' => CRM_Utils_Type::T_STRING,
           'operator' => 'like',
         ),
       ),
       'order_bys' => array(
         'mailing_name' => array(
           'name' => 'name',
-          'title' => ts('Mailing'),
+          'title' => ts('Mailing Name'),
+        ),
+        'mailing_subject' => array(
+          'name' => 'subject',
+          'title' => ts('Mailing Subject'),
         ),
       ),
       'grouping' => 'mailing-fields',
