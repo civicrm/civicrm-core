@@ -2517,6 +2517,8 @@ class CRM_Contact_BAO_Query {
    * exposed, or perhaps it's a "search all details" approach which
    * predates decoupling of location types and primary fields?
    *
+   * @see https://issues.civicrm.org/jira/browse/CRM-19967
+   *
    * @return string
    *   the from clause
    */
