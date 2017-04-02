@@ -399,6 +399,7 @@ class CRM_Core_Form_RecurringEntity {
                 'is_active' => 1,
               );
               $excludeDateList[] = $optionGroupValue['value'];
+              // Something is wrong here. The returned BAO object is not being used.
               CRM_Core_BAO_OptionValue::create($optionGroupValue);
             }
           }
