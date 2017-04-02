@@ -87,10 +87,16 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
         ),
         'mailing_name' => array(
           'name' => 'name',
-          'title' => ts('Mailing'),
+          'title' => ts('Mailing Name'),
           'operatorType' => CRM_Report_Form::OP_MULTISELECT,
           'type' => CRM_Utils_Type::T_STRING,
           'options' => self::mailing_select(),
+          'operator' => 'like',
+        ),
+        'mailing_subject' => array(
+          'name' => 'subject',
+          'title' => ts('Mailing Subject'),
+          'type'=> CRM_Utils_Type::T_STRING,
           'operator' => 'like',
         ),
       ),
