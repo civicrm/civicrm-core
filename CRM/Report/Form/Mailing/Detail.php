@@ -104,7 +104,7 @@ class CRM_Report_Form_Mailing_Detail extends CRM_Report_Form {
         'mailing_subject' => array(
           'name' => 'subject',
           'title' => ts('Mailing Subject'),
-          'default' => true,
+          'default' => TRUE,
         ),
       ),
       'filters' => array(
@@ -118,7 +118,7 @@ class CRM_Report_Form_Mailing_Detail extends CRM_Report_Form {
         'mailing_subject' => array(
           'name' => 'subject',
           'title' => ts('Mailing Subject'),
-          'type'=> CRM_Utils_Type::T_STRING,
+          'type' => CRM_Utils_Type::T_STRING,
           'operator' => 'like',
         ),
       ),
@@ -129,7 +129,7 @@ class CRM_Report_Form_Mailing_Detail extends CRM_Report_Form {
         ),
         'mailing_subject' => array(
           'name' => 'subject',
-          'title' => ts('Mailing Subject')
+          'title' => ts('Mailing Subject'),
         ),
       ),
       'grouping' => 'mailing-fields',
