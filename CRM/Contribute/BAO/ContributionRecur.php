@@ -650,6 +650,7 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
               civicrm_api3('membership_payment', 'create', array(
                 'membership_id' => $value['entity_id'],
                 'contribution_id' => $contribution->id,
+                'is_transactional' => FALSE,
               ));
             }
             catch (CiviCRM_API3_Exception $e) {
