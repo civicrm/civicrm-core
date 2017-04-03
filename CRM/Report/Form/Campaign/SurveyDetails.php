@@ -239,6 +239,7 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
           }
 
           $select[] = "{$field['dbAlias']} as {$tableName}_{$fieldName}";
+          $this->_selectAliases[] = "{$tableName}_{$fieldName}";
           $this->_columnHeaders["{$tableName}_{$fieldName}"]['title'] = CRM_Utils_Array::value('title', $field);
           $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = CRM_Utils_Array::value('type', $field);
         }
