@@ -663,19 +663,28 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
    *   Relevant data object values of open activities
    */
   public static function getActivities($params, $getCount = FALSE) {
+    $activities = array();
+
     // fetch all activity IDs whose target/assignee/source contact id is $params['contact_id']
     // currently cannot be done via Activity.Get API so we are using SQL query instead
-    $activityIDs = CRM_Core_DAO::singleValueQuery("SELECT GROUP_CONCAT(DISTINCT activity_id SEPARATOR ',')
-      FROM civicrm_activity_contact
-      WHERE contact_id = %1", array(1 => array($params['contact_id'], 'Integer')));
-    $activityIDs = explode(',', $activityIDs);
+    if (!empty($params['contact_id'])) {
+      $activityIDs = CRM_Core_DAO::singleValueQuery("SELECT GROUP_CONCAT(DISTINCT activity_id SEPARATOR ',')
+        FROM civicrm_activity_contact
+        WHERE contact_id = %1", array(1 => array($params['contact_id'], 'Integer')));
+
+      // if no activities found for given $params['contact_id'] then return empty array
+      if (empty($activityIDs)) {
+        return $getCount ? count($activities) : $activities;
+      }
+      $activityIDs = explode(',', $activityIDs);
+    }
 
     // fetch all active activity types
     $activityTypes = CRM_Core_OptionGroup::values('activity_type');
 
     // Activity.Get API params
     $activityParams = array(
-      'id' => array('IN' => $activityIDs),
+      'id' => (!empty($activityIDs)) ? array('IN' => $activityIDs) : NULL,
       'is_deleted' => 0,
       'is_current_revision' => 1,
       'is_test' => 0,
@@ -702,7 +711,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
     );
 
     if ($params['context'] != 'activity') {
-      $activityParams['status_id'] = 'Scheduled';
+      $activityParams['status_id'] = CRM_Core_PseudoConstant::getKey(__CLASS__, 'status_id', 'Scheduled');
     }
 
     // activity type ID clause
@@ -753,20 +762,18 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       $activityParams['options']['sort'] = (CRM_Utils_Array::value('context', $params) == 'activity') ? "activity_date_time DESC" : "status_id ASC, activity_date_time ASC";
     }
     else {
-      $activityParams['options']['sort'] = $order;
+      $activityParams['options']['sort'] = str_replace('activity_type ', 'activity_type_id.label ', $order);
     }
 
     //TODO :
-    // 1. missing support for is_recurring_activity in API
-    // 2. check is_deleted source_contact_id, this earlier wrap <del> tag around deleted contact name
-    // 3. missing support to sort by activity_type in API,
-    //    this will cause regression in selector column if someone sort by activity type
+    // 1. we should use Activity.Getcount for fetching count only, but  in order to check that
+    //    current logged in user has permission to view Case activities we are performing filtering out those activities from list (see below).
+    //    This logic need to be incorporated in Activity.get definition
     $result = civicrm_api3('Activity', 'Get', $activityParams);
 
-    $activties = array();
     $enabledComponents = self::activityComponents();
     $allCampaigns = CRM_Campaign_BAO_Campaign::getCampaigns(NULL, NULL, FALSE, FALSE, FALSE, TRUE);
-    $bulkActivityTypeID = CRM_Core_OptionGroup::getValue('activity_type', 'Bulk Email', 'name');
+    $bulkActivityTypeID = CRM_Core_PseudoConstant::getKey(__CLASS__, 'activity_type_id', 'Bulk Email');
 
     // CRM-3553, need to check user has access to target groups.
     $mailingIDs = CRM_Mailing_BAO_Mailing::mailingACLIDs();
@@ -787,7 +794,6 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       'source_contact_id' => 'source_contact_id',
       'source_contact_name' => 'source_contact_name',
       'case_id' => 'case_id',
-      'case_subject' => 'case_subject',
     );
 
     foreach ($result['values'] as $id => $activity) {
@@ -822,8 +828,13 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
           }
         }
         // case related fields
-        elseif (in_array($apiKey, array('case_id', 'case_subject')) && !$isBulkActivity) {
+        elseif ($apiKey == 'case_id' && !$isBulkActivity) {
           $activities[$id][$expectedName] = CRM_Utils_Array::value($apiKey, $activity);
+
+          // fetch case subject for case ID found
+          if (!empty($activity['case_id'])) {
+            $activities[$id]['case_subject'] = CRM_Core_DAO::executeQuery('CRM_Case_DAO_Case', $activity['case_id'], 'subject');
+          }
         }
         else {
           $activities[$id][$expectedName] = CRM_Utils_Array::value($apiKey, $activity);
@@ -835,6 +846,13 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
           }
         }
       }
+      // if deleted, wrap in <del>
+      if (!empty($activity['source_contact_id']) &&
+        CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $activity['source_contact_id'], 'is_deleted')
+      ) {
+        $activities[$id]['source_contact_name'] = sprintf("<del>%s<del>", $activity['source_contact_name']);
+      }
+      $activities[$id]['is_recurring_activity'] = CRM_Core_BAO_RecurringEntity::getParentFor($id, 'civicrm_activity');
     }
 
     return $getCount ? count($activities) : $activities;

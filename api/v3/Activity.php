@@ -470,16 +470,10 @@ function _civicrm_api3_activity_get_formatResult($params, $activities, $options)
         break;
 
       case 'case_id':
-      case 'case_subject':
-        $dao = CRM_Core_DAO::executeQuery("SELECT activity_id, case_id, subject FROM civicrm_case_activity cca INNER JOIN civicrm_case cc ON cc.id = cca.case_id WHERE activity_id IN (%1)",
+        $dao = CRM_Core_DAO::executeQuery("SELECT activity_id, case_id FROM civicrm_case_activity WHERE activity_id IN (%1)",
           array(1 => array(implode(',', array_keys($activities)), 'String', CRM_Core_DAO::QUERY_FORMAT_NO_QUOTES)));
         while ($dao->fetch()) {
-          if ($n == 'case_id') {
-            $activities[$dao->activity_id]['case_id'] = $dao->case_id;
-          }
-          else {
-            $activities[$dao->activity_id]['case_subject'] = $dao->subject;
-          }
+          $activities[$dao->activity_id]['case_id'] = $dao->case_id;
         }
         break;
 
