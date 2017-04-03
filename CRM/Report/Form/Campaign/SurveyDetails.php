@@ -350,104 +350,13 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
     }
   }
 
-  public function postProcess() {
-    // get the acl clauses built before we assemble the query
-    $this->buildACLClause($this->_aliases['civicrm_contact']);
-
-    // get ready with post process params
-    $this->beginPostProcess();
-
-    // build query
-    $sql = $this->buildQuery();
-
-    // build array of result based on column headers. This method also allows
-    // modifying column headers before using it to build result set i.e $rows.
-    $rows = array();
-    $this->buildRows($sql, $rows);
-
-    // format result set.
-    $this->formatDisplay($rows);
-
-    //call local post process for only print and pdf.
-    //we do need special formatted o/p only when we do have grouping
-    $orderBys = CRM_Utils_Array::value('order_bys', $this->_params, array());
-    if (in_array($this->_outputMode, array(
-      'print',
-      'pdf',
-    ))) {
-
-      $outPut = array();
-      $templateFile = parent::getTemplateFileName();
-      if (array_key_exists('street_name', $orderBys) ||
-        array_key_exists('street_number', $orderBys)
-      ) {
-        $orderByStreetName = CRM_Utils_Array::value('street_name', $orderBys);
-        $orderByStreetNum = CRM_Utils_Array::value('street_number', $orderBys);
-
-        $pageCnt = 0;
-        $dataPerPage = array();
-        $lastStreetName = $lastStreetNum = NULL;
-        foreach ($rows as $row) {
-          //do we need to take new page.
-          if ($orderByStreetName &&
-            ($lastStreetName !=
-              CRM_Utils_Array::value('civicrm_address_street_name', $row))
-          ) {
-            $pageCnt++;
-          }
-          elseif ($orderByStreetNum &&
-            ($lastStreetNum !=
-              CRM_Utils_Array::value('civicrm_address_street_number', $row) % 2
-            )
-          ) {
-            $pageCnt++;
-          }
-
-          //get the data per page.
-          $dataPerPage[$pageCnt][] = $row;
-          $lastStreetName = CRM_Utils_Array::value('civicrm_address_street_name', $row);
-          $lastStreetNum = CRM_Utils_Array::value('civicrm_address_street_number', $row) % 2;
-        }
-
-        foreach ($dataPerPage as $page) {
-          // assign variables to templates
-          $this->doTemplateAssignment($page);
-          $outPut[] = CRM_Core_Form::$_template->fetch($templateFile);
-        }
-      }
-      else {
-        $this->doTemplateAssignment($rows);
-        $outPut[] = CRM_Core_Form::$_template->fetch($templateFile);
-      }
-
-      $header = $this->_formValues['report_header'];
-      $footer = $this->_formValues['report_footer'];
-
-      //get the cover sheet.
-      $coverSheet = $this->_surveyCoverSheet();
-      $footerImage = preg_replace('/<\/html>|<\/body>|<\/div>/i', '', $footer);
-
-      $outPut = $header . $coverSheet .
-        "<div style=\"page-break-after: always\"></div>" .
-        implode($footerImage .
-          "<div style=\"page-break-after: always\"></div>",
-          $outPut
-        ) . $footer;
-
-      if ($this->_outputMode == 'print') {
-        echo $outPut;
-      }
-      else {
-        CRM_Utils_PDF_Utils::html2pdf($outPut, "CiviReport.pdf");
-      }
-
-      CRM_Utils_System::civiExit();
-    }
-    else {
-      $this->doTemplateAssignment($rows);
-      $this->endPostProcess($rows);
-    }
-
+  public function compileContent() {
+    $coverSheet = $this->_surveyCoverSheet() .
+        "<div style=\"page-break-after: always\"></div>";
+    $templateFile = $this->getHookedTemplateFileName();
+    return $coverSheet .
+      CRM_Core_Form::$_template->fetch($templateFile) .
+      CRM_Utils_Array::value('report_footer', $this->_formValues);
   }
 
   /**
