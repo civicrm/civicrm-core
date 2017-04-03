@@ -53,6 +53,10 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
 
   private static $_surveyRespondentStatus;
 
+  // Survey Question titles are overridden when in print or pdf mode to
+  // say Q1, Q2 instead of the full title - to save space.
+  private $_columnTitleOverrides = array();
+
   /**
    */
   /**
@@ -203,7 +207,7 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
         ),
         'grouping' => 'survey-activity-fields',
       ),
-    ) + $this->addAddressFields();
+    ) + $this->getAddressColumns();
     parent::__construct();
   }
 
@@ -239,9 +243,16 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
           }
 
           $select[] = "{$field['dbAlias']} as {$tableName}_{$fieldName}";
+
+          // Set default title
+          $title = CRM_Utils_Array::value('title', $field);
+          // Check for an override.
+          if (!empty($this->_columnTitleOverrides["{$tableName}_{$fieldName}"])) {
+            $title = $this->_columnTitleOverrides["{$tableName}_{$fieldName}"];
+          }
+          $this->_columnHeaders["{$tableName}_{$fieldName}"]['title'] = $title;
+
           $this->_selectAliases[] = "{$tableName}_{$fieldName}";
-          $this->_columnHeaders["{$tableName}_{$fieldName}"]['title'] = CRM_Utils_Array::value('title', $field);
-          $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = CRM_Utils_Array::value('type', $field);
         }
       }
     }
@@ -754,6 +765,15 @@ INNER  JOIN  civicrm_custom_field cf ON ( cg.id = cf.custom_group_id )
       if (!is_array(CRM_Utils_Array::value('fields', $this->_columns[$resTable]))) {
         $this->_columns[$resTable]['fields'] = array();
       }
+
+      if (in_array($this->_outputMode, array(
+        'print',
+        'pdf',
+      ))) {
+        $this->_columnTitleOverrides["{$resTable}_{$fieldName}"] = 'Q' . $fildCnt;
+        $fildCnt++;
+      }
+
       if (array_key_exists($fieldName, $this->_columns[$resTable]['fields'])) {
         $this->_columns[$resTable]['fields'][$fieldName]['required'] = TRUE;
         $this->_columns[$resTable]['fields'][$fieldName]['isSurveyResponseField'] = TRUE;
@@ -761,13 +781,6 @@ INNER  JOIN  civicrm_custom_field cf ON ( cg.id = cf.custom_group_id )
       }
 
       $title = $responseFields[$fieldName]['title'];
-      if (in_array($this->_outputMode, array(
-        'print',
-        'pdf',
-      ))) {
-        $title = 'Q' . $fildCnt++;
-      }
-
       $fldType = 'CRM_Utils_Type::T_STRING';
       if ($response->time_format) {
         $fldType = CRM_Utils_Type::T_TIMESTAMP;
