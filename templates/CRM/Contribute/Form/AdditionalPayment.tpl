@@ -58,8 +58,6 @@
        {include file="CRM/common/formButtons.tpl"}
     </div>
   {/if}
- {elseif $formType}
-  {include file="CRM/Contribute/Form/AdditionalInfo/$formType.tpl"}
 {else}
 
 <div class="crm-block crm-form-block crm-payment-form-block">
@@ -154,27 +152,8 @@
             <span class="description">{ts}Net value of the payment (Total Amount minus Fee).{/ts}</span></td></tr>
         </table>
       </div>
+      {include file='CRM/Core/BillingBlockWrapper.tpl'}
     </div>
-
-<div class="accordion ui-accordion ui-widget ui-helper-reset">
-  {* Additional Detail / Honoree Information / Premium Information *}
-    {foreach from=$allPanes key=paneName item=paneValue}
-
-      <div class="crm-accordion-wrapper crm-ajax-accordion crm-{$paneValue.id}-accordion {if $paneValue.open neq 'true'}collapsed{/if}">
-        <div class="crm-accordion-header" id="{$paneValue.id}">
-
-          {$paneName}
-        </div><!-- /.crm-accordion-header -->
-        <div class="crm-accordion-body">
-
-          <div class="{$paneValue.id}"></div>
-        </div><!-- /.crm-accordion-body -->
-      </div><!-- /.crm-accordion-wrapper -->
-
-    {/foreach}
-  </div>
-
-
 
     {literal}
     <script type="text/javascript">
@@ -215,7 +194,7 @@
             $('#receiptDate', $form).show();
           }
         }
-  
+
         // bind first click of accordion header to load crm-accordion-body with snippet
         $('#adjust-option-type', $form).hide();
         $('.crm-ajax-accordion .crm-accordion-header', $form).one('click', function() {
@@ -239,7 +218,7 @@
             CRM.loadPage(url, {target: $('div.' + id, $form)});
           }
         }
-        
+
         $('#fee_amount', $form).change( function() {
           var totalAmount = $('#total_amount', $form).val();
           var feeAmount = $('#fee_amount', $form).val();
