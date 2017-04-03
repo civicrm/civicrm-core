@@ -101,17 +101,17 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
     }
 
     if (!$this->contributionRecurID || !$this->_subscriptionDetails) {
-      CRM_Core_Error::fatal('Required information missing.');
+      CRM_Core_Error::statusBounce(ts('Required information missing.'));
     }
 
     if ($this->_subscriptionDetails->membership_id && $this->_subscriptionDetails->auto_renew) {
-      CRM_Core_Error::fatal(ts('You cannot update the subscription.'));
+      CRM_Core_Error::statusBounce(ts('You cannot update the subscription.'));
     }
 
     if (!CRM_Core_Permission::check('edit contributions')) {
       $userChecksum = CRM_Utils_Request::retrieve('cs', 'String', $this, FALSE);
       if (!CRM_Contact_BAO_Contact_Utils::validChecksum($this->_subscriptionDetails->contact_id, $userChecksum)) {
-        CRM_Core_Error::fatal(ts('You do not have permission to update subscription.'));
+        CRM_Core_Error::statusBounce(ts('You do not have permission to update subscription.'));
       }
       $this->_selfService = TRUE;
     }
