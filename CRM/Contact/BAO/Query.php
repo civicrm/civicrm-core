@@ -39,22 +39,33 @@ class CRM_Contact_BAO_Query {
   /**
    * The various search modes.
    *
+   * As of February 2017, entries not present for 4, 32, 64, 1024.
+   *
+   * MODE_ALL seems to be out of sync with the available constants;
+   * if this is intentionally excluding MODE_MAILING then that may
+   * bear documenting?
+   *
+   * Likewise if there's reason for the missing modes (4, 32, 64 etc).
+   *
    * @var int
    */
   const
     NO_RETURN_PROPERTIES = 'CRM_Contact_BAO_Query::NO_RETURN_PROPERTIES',
     MODE_CONTACTS = 1,
     MODE_CONTRIBUTE = 2,
+    // There is no 4,
     MODE_MEMBER = 8,
     MODE_EVENT = 16,
+    // No 32, no 64.
     MODE_GRANT = 128,
     MODE_PLEDGEBANK = 256,
     MODE_PLEDGE = 512,
+    // There is no 1024,
     MODE_CASE = 2048,
-    MODE_ALL = 17407,
     MODE_ACTIVITY = 4096,
     MODE_CAMPAIGN = 8192,
-    MODE_MAILING = 16384;
+    MODE_MAILING = 16384,
+    MODE_ALL = 17407;
 
   /**
    * The default set of return properties.
@@ -82,6 +93,7 @@ class CRM_Contact_BAO_Query {
   public $_paramLookup;
 
   public $_sort;
+
   /**
    * The set of output params
    *
@@ -98,42 +110,42 @@ class CRM_Contact_BAO_Query {
 
   /**
    * The name of the elements that are in the select clause
-   * used to extract the values
+   * used to extract the values.
    *
    * @var array
    */
   public $_element;
 
   /**
-   * The tables involved in the query
+   * The tables involved in the query.
    *
    * @var array
    */
   public $_tables;
 
   /**
-   * The table involved in the where clause
+   * The table involved in the where clause.
    *
    * @var array
    */
   public $_whereTables;
 
   /**
-   * The where clause
+   * Array of WHERE clause components.
    *
    * @var array
    */
   public $_where;
 
   /**
-   * The where string
+   * The WHERE clause as a string.
    *
    * @var string
    */
   public $_whereClause;
 
   /**
-   * Additional permission Where Clause
+   * Additional WHERE clause for permissions.
    *
    * @var string
    */
@@ -2464,9 +2476,14 @@ class CRM_Contact_BAO_Query {
   }
 
   /**
-   * Where tables is sometimes used to create the from clause, but, not reliably, set this AND set tables
-   * It's unclear the intent - there is a 'simpleFrom' clause which takes whereTables into account & a fromClause which doesn't
-   * logic may have eroded
+   * Sometimes used to create the from clause, but, not reliably, set
+   * this AND set tables.
+   *
+   * It's unclear the intent - there is a 'simpleFrom' clause which
+   * takes whereTables into account & a fromClause which doesn't.
+   *
+   * logic may have eroded?
+   *
    * @return array
    */
   public function whereTables() {
@@ -2499,16 +2516,25 @@ class CRM_Contact_BAO_Query {
    * Create the from clause.
    *
    * @param array $tables
-   *   Tables that need to be included in this from clause.
-   *                      if null, return mimimal from clause (i.e. civicrm_contact)
+   *   Tables that need to be included in this from clause. If null,
+   *   return mimimal from clause (i.e. civicrm_contact).
    * @param array $inner
    *   Tables that should be inner-joined.
    * @param array $right
    *   Tables that should be right-joined.
-   *
    * @param bool $primaryLocation
+   *   Search on primary location. See note below.
    * @param int $mode
+   *   Determines search mode based on bitwise MODE_* constants.
    * @param string|NULL $apiEntity
+   *   Determines search mode based on entity by string.
+   *
+   * The $primaryLocation flag only seems to be used when
+   * locationType() has been called. This may be a search option
+   * exposed, or perhaps it's a "search all details" approach which
+   * predates decoupling of location types and primary fields?
+   *
+   * @see https://issues.civicrm.org/jira/browse/CRM-19967
    *
    * @return string
    *   the from clause
