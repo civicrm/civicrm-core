@@ -660,6 +660,33 @@ Expires: ',
   }
 
   /**
+   * Test membership form with Failed Contribution.
+   */
+  public function testFormWithFailedContribution() {
+    $form = $this->getForm();
+    $this->createLoggedInUser();
+    $params = $this->getBaseSubmitParams();
+    unset($params['price_set_id']);
+    unset($params['credit_card_number']);
+    unset($params['cvv2']);
+    unset($params['credit_card_exp_date']);
+    unset($params['credit_card_type']);
+    unset($params['send_receipt']);
+    unset($params['is_recur']);
+
+    $params['record_contribution'] = TRUE;
+    $params['contribution_status_id'] = array_search('Failed', CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name'));
+    $form->_mode = NULL;
+    $form->_contactID = $this->_individualId;
+
+    $form->testSubmit($params);
+    $membership = $this->callAPISuccessGetSingle('Membership', array('contact_id' => $this->_individualId));
+    $form->testSubmit($params);
+    $membership = $this->callAPISuccessGetSingle('Membership', array('contact_id' => $this->_individualId));
+    $this->assertEquals($membership['status_id'], array_search('Pending', CRM_Member_PseudoConstant::membershipStatus()));
+  }
+
+  /**
    * Get a membership form object.
    *
    * We need to instantiate the form to run preprocess, which means we have to trick it about the request method.
