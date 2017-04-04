@@ -62,6 +62,13 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
     if ($rev == '4.7.13') {
       $preUpgradeMessage .= '<p>' . ts('A new permission has been added called %1 This Permission is now used to control access to the Manage Tags screen', array(1 => 'manage tags')) . '</p>';
     }
+    if ($rev == '4.7.19') {
+      $check = CRM_Core_DAO::singleValueQuery("SELECT count(id) FROM civicrm_domain");
+      $smsCheck = CRM_Core_DAO::singleValueQuery("SELECT count(id) FROM civicrm_sms_provider");
+      if ($check > 1 && (bool) $smsCheck) {
+        $postUpgradeMessage .= '<p>civicrm_sms_provider ' . ts('has now had a domain id column added. As there is more than 1 domains in this install you need to manually set the domain id for the providers in this install') . '</p>';
+      }
+    }
   }
 
   /**
@@ -329,6 +336,9 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
       $this->addTask('Drop Column current_period_opening_balance From civicrm_financial_account table.', 'dropColumn', 'civicrm_financial_account', 'current_period_opening_balance');
       $this->addTask('Drop Column opening_balance From civicrm_financial_account table.', 'dropColumn', 'civicrm_financial_account', 'opening_balance');
     }
+    $this->addTask('CRM-19961 - Add domain_id column to civicrm_sms_provider', 'addColumn',
+      'civicrm_sms_provider', 'domain_id', 'int(10) unsigned', "Which Domain is this sms provier for");
+    $this->addTask('CRM-19961 - Populate domain id table and perhaps add foreign key', 'populateSMSProviderDomainId');
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
   }
 
@@ -1058,6 +1068,25 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
         ", $params);
       }
     }
+  }
+
+  /**
+   * CRM-19961
+   * Poputate newly added domain id column and add foriegn key onto table.
+   */
+  public static function populateSMSProviderDomainId() {
+    $count = CRM_Core_DAO::singleValueQuery("SELECT count(id) FROM civicrm_domain");
+    if ($count = 1) {
+      CRM_Core_DAO::executeQuery("UPDATE civicrm_sms_provider SET domain_id = (SELECT id FROM civicrm_domain)");
+    }
+    CRM_Core_DAO::executeQuery("SET FOREIGN_KEY_CHECKS = 0;");
+    CRM_Core_DAO::executeQuery("ALTER TABLE `civicrm_sms_provider`
+      ADD CONSTRAINT FK_civicrm_sms_provider_domain_id
+      FOREIGN KEY (`domain_id`) REFERENCES `civicrm_domain`(`id`)
+      ON DELETE SET NULL");
+
+    CRM_Core_DAO::executeQuery("SET FOREIGN_KEY_CHECKS = 1;");
+    return TRUE;
   }
 
 }
