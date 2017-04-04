@@ -291,13 +291,13 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    * @param string|NULL $mode
    * only return this mode - test|live or NULL for all
    * @param bool $reset
-   * @param bool $domain
-   *   Dp we want to limit this to jusst the current domain.
+   * @param bool $isCurrentDomainOnly
+   *   Do we only want to load payment processors associated with the current domain.
    *
    * @throws CiviCRM_API3_Exception
    * @return array
    */
-  public static function getAllPaymentProcessors($mode = 'all', $reset = FALSE, $domain = TRUE) {
+  public static function getAllPaymentProcessors($mode = 'all', $reset = FALSE, $isCurrentDomainOnly = TRUE) {
 
     $cacheKey = 'CRM_Financial_BAO_Payment_Processor_' . $mode . '_' . CRM_Core_Config::domainID();
     if (!$reset) {
@@ -312,7 +312,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
       'options' => array('sort' => 'is_default DESC, name', 'limit' => 0),
       'api.payment_processor_type.getsingle' => 1,
     );
-    if ($domain) {
+    if ($isCurrentDomainOnly) {
       $retrievalParameters['domain_id'] = CRM_Core_Config::domainID();
     }
     if ($mode == 'test') {
