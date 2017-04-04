@@ -477,17 +477,6 @@ ORDER BY parent_id, weight";
       return FALSE;
     }
 
-    //we need to check core view/edit or supported acls.
-    if (in_array($menuName, array(
-      'Search...',
-      'Contacts',
-    ))) {
-      if (!CRM_Core_Permission::giveMeAllACLs()) {
-        $skipMenuItems[] = $navID;
-        return FALSE;
-      }
-    }
-
     $config = CRM_Core_Config::singleton();
 
     $makeLink = FALSE;
