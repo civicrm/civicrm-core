@@ -644,4 +644,18 @@ MODIFY      {$columnName} varchar( $length )
     return FALSE;
   }
 
+  /**
+   * Add index signature hash to DAO file calculation.
+   *
+   * @param string $table table name
+   * @param array $indices index array spec
+   */
+  public static function addIndexSignature($table, &$indices) {
+    foreach ($indices as $indexName => $index) {
+      $indices[$indexName]['sig'] = $table . "::" .
+        (array_key_exists('unique', $index) ? $index['unique'] : 0) . "::" .
+        implode("::", $index['field']);
+    }
+  }
+
 }

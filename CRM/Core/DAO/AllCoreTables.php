@@ -110,6 +110,70 @@ class CRM_Core_DAO_AllCoreTables {
 
   /**
    * @return array
+   *   List of indices.
+   */
+  public static function indices($localize = TRUE) {
+    $indices = array();
+    self::init();
+    foreach (self::$daoToClass as $class) {
+      if (is_callable(array($class, 'indices'))) {
+        $indices[$class::getTableName()] = $class::indices($localize);
+      }
+    }
+    return $indices;
+  }
+
+  /**
+   * Modify indices to account for localization options.
+   *
+   * @param CRM_Core_DAO $class DAO class
+   * @param array $originalIndices index definitions before localization
+   *
+   * @return array
+   *   index definitions after localization
+   */
+  public static function multilingualize($class, $originalIndices) {
+    $domain = new CRM_Core_DAO_Domain();
+    $domain->find(TRUE);
+    $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
+    if (CRM_Utils_System::isNull($locales)) {
+      return $originalIndices;
+    }
+    $classFields = $class::fields();
+
+    $finalIndices = array();
+    foreach ($originalIndices as $index) {
+      if ($index['localizable']) {
+        foreach ($locales as $locale) {
+          $localIndex = $index;
+          $localIndex['name'] .= "_" . $locale;
+          $fields = array();
+          foreach ($localIndex['field'] as $field) {
+            $baseField = explode('(', $field);
+            if ($classFields[$baseField[0]]['localizable']) {
+              // field name may have eg (3) at end for prefix length
+              // last_name => last_name_fr_FR
+              // last_name(3) => last_name_fr_FR(3)
+              $fields[] = preg_replace('/^([^(]+)(\(\d+\)|)$/', '${1}_' . $locale . '${2}', $field);
+            }
+            else {
+              $fields[] = $field;
+            }
+          }
+          $localIndex['field'] = $fields;
+          $finalIndices[$localIndex['name']] = $localIndex;
+        }
+      }
+      else {
+        $finalIndices[$index['name']] = $index;
+      }
+    }
+    CRM_Core_BAO_SchemaHandler::addIndexSignature(self::getTableForClass($class), $finalIndices);
+    return $finalIndices;
+  }
+
+  /**
+   * @return array
    *   Mapping from brief-names to class-names.
    *   Ex: $result['Contact'] == 'CRM_Contact_DAO_Contact'.
    */
