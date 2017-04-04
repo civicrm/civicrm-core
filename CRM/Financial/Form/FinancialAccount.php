@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -104,21 +104,6 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
       $element->freeze();
     }
 
-    //CRM-16189
-    if (CRM_Contribute_BAO_Contribution::checkContributeSettings('financial_account_bal_enable')) {
-      $this->add('text', 'opening_balance', ts('Opening Balance'), $attributes['opening_balance']);
-      $this->add('text', 'current_period_opening_balance', ts('Current Period Opening Balance'), $attributes['current_period_opening_balance']);
-      $financialAccountType = CRM_Core_PseudoConstant::get(
-        'CRM_Financial_DAO_FinancialAccount',
-        'financial_account_type_id',
-        array('labelColumn' => 'name')
-      );
-      $limitedAccount = array(
-        array_search('Asset', $financialAccountType),
-        array_search('Liability', $financialAccountType),
-      );
-      $this->assign('limitedAccount', json_encode($limitedAccount));
-    }
     $financialAccountType = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialAccount', 'financial_account_type_id');
     if (!empty($financialAccountType)) {
       $element = $this->add('select', 'financial_account_type_id', ts('Financial Account Type'),
@@ -192,7 +177,6 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
     $defaults = parent::setDefaultValues();
     if ($this->_action & CRM_Core_Action::ADD) {
       $defaults['contact_id'] = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Domain', CRM_Core_Config::domainID(), 'contact_id');
-      $defaults['opening_balance'] = $defaults['current_period_opening_balance'] = '0.00';
     }
     return $defaults;
   }
@@ -202,8 +186,12 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
    */
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {
-      CRM_Financial_BAO_FinancialAccount::del($this->_id);
-      CRM_Core_Session::setStatus(ts('Selected Financial Account has been deleted.'));
+      if (CRM_Financial_BAO_FinancialAccount::del($this->_id)) {
+        CRM_Core_Session::setStatus(ts('Selected Financial Account has been deleted.'));
+      }
+      else {
+        CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/admin/financial/financialAccount', "reset=1&action=browse"));
+      }
     }
     else {
       // store the submitted values in an array

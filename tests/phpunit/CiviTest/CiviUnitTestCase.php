@@ -1362,7 +1362,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @return int
    *   Id Payment Processor
    */
-  public function processorCreate() {
+  public function processorCreate($params = array()) {
     $processorParams = array(
       'domain_id' => 1,
       'name' => 'Dummy',
@@ -1375,7 +1375,9 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       'url_recur' => 'http://dummy.com',
       'billing_mode' => 1,
       'sequential' => 1,
+      'payment_instrument_id' => 'Debit Card',
     );
+    $processorParams = array_merge($processorParams, $params);
     $processor = $this->callAPISuccess('PaymentProcessor', 'create', $processorParams);
     return $processor['id'];
   }
@@ -1529,7 +1531,6 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       'receive_date' => date('Ymd'),
       'total_amount' => 100.00,
       'fee_amount' => 5.00,
-      'net_ammount' => 95.00,
       'financial_type_id' => 1,
       'payment_instrument_id' => 1,
       'non_deductible_amount' => 10.00,
@@ -3087,6 +3088,8 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
         'billing_mode' => 3,
         'financial_type_id' => 1,
         'financial_account_id' => 12,
+         // Credit card = 1 so can pass 'by accident'.
+        'payment_instrument_id' => 'Debit Card',
       ),
       $params);
     if (!is_numeric($params['payment_processor_type_id'])) {
@@ -3195,15 +3198,18 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
 
   /**
    * Helper function to create new mailing.
-   * @return mixed
+   *
+   * @param array $params
+   *
+   * @return int
    */
-  public function createMailing() {
-    $params = array(
+  public function createMailing($params = array()) {
+    $params = array_merge(array(
       'subject' => 'maild' . rand(),
       'body_text' => 'bdkfhdskfhduew{domain.address}{action.optOutUrl}',
       'name' => 'mailing name' . rand(),
       'created_id' => 1,
-    );
+    ), $params);
 
     $result = $this->callAPISuccess('Mailing', 'create', $params);
     return $result['id'];
@@ -3266,16 +3272,18 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
    * Create a price set for an event.
    *
    * @param int $feeTotal
+   * @param int $minAmt
    *
    * @return int
    *   Price Set ID.
    */
-  protected function eventPriceSetCreate($feeTotal) {
+  protected function eventPriceSetCreate($feeTotal, $minAmt = 0) {
     // creating price set, price field
     $paramsSet['title'] = 'Price Set';
     $paramsSet['name'] = CRM_Utils_String::titleToVar('Price Set');
     $paramsSet['is_active'] = FALSE;
     $paramsSet['extends'] = 1;
+    $paramsSet['min_amount'] = $minAmt;
 
     $priceset = CRM_Price_BAO_PriceSet::create($paramsSet);
     $priceSetId = $priceset->id;
@@ -3378,7 +3386,6 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
       'participant_id' => $participant['id'],
       'contribution_id' => $contribution['id'],
     );
-    $ids = array();
     $this->callAPISuccess('ParticipantPayment', 'create', $paymentParticipant);
     return array($lineItems, $contribution);
   }
@@ -3391,7 +3398,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
    *
    * @return array
    */
-  protected function createPriceSet($component = 'contribution_page', $componentId = NULL) {
+  protected function createPriceSet($component = 'contribution_page', $componentId = NULL, $priceFieldOptions = array()) {
     $paramsSet['title'] = 'Price Set' . substr(sha1(rand()), 0, 7);
     $paramsSet['name'] = CRM_Utils_String::titleToVar($paramsSet['title']);
     $paramsSet['is_active'] = TRUE;
@@ -3403,7 +3410,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     $this->assertDBCompareValue('CRM_Price_BAO_PriceSet', $priceSetId, 'title',
       'id', $paramsSet['title'], 'Check DB for created priceset'
     );
-    $paramsField = array(
+    $paramsField = array_merge(array(
       'label' => 'Price Field',
       'name' => CRM_Utils_String::titleToVar('Price Field'),
       'html_type' => 'CheckBox',
@@ -3419,7 +3426,8 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
       'price_set_id' => $priceSet['id'],
       'is_enter_qty' => 1,
       'financial_type_id' => $this->getFinancialTypeId('Event Fee'),
-    );
+    ), $priceFieldOptions);
+
     $priceField = CRM_Price_BAO_PriceField::create($paramsField);
     if ($componentId) {
       CRM_Price_BAO_PriceSet::addTo('civicrm_' . $component, $componentId, $priceSetId);
@@ -3527,7 +3535,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
         'to_financial_account_id' => 12,
         'total_amount' => CRM_Utils_Array::value('total_amount', $params, 100),
         'status_id' => 1,
-        'payment_instrument_id' => 1,
+        'payment_instrument_id' => CRM_Utils_Array::value('payment_instrument_id', $params, 1),
       );
     }
     elseif ($context == 'payLater') {
@@ -3622,6 +3630,158 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
         // This is a best-effort cleanup function, ignore.
       }
     }
+  }
+
+  /**
+   * Create Financial Type.
+   *
+   * @param array $params
+   *
+   * @return array
+   */
+  protected function createFinancialType($params = array()) {
+    $params = array_merge($params,
+      array(
+        'name' => 'Financial-Type -' . substr(sha1(rand()), 0, 7),
+        'is_active' => 1,
+      )
+    );
+    return $this->callAPISuccess('FinancialType', 'create', $params);
+  }
+
+  /**
+   * Enable Tax and Invoicing
+   */
+  protected function enableTaxAndInvoicing($params = array()) {
+    // Enable component contribute setting
+    $contributeSetting = array_merge($params,
+      array(
+        'invoicing' => 1,
+        'invoice_prefix' => 'INV_',
+        'credit_notes_prefix' => 'CN_',
+        'due_date' => 10,
+        'due_date_period' => 'days',
+        'notes' => '',
+        'is_email_pdf' => 1,
+        'tax_term' => 'Sales Tax',
+        'tax_display_settings' => 'Inclusive',
+      )
+    );
+    return Civi::settings()->set('contribution_invoice_settings', $contributeSetting);
+  }
+
+  /**
+   * Add Sales Tax relation for financial type with financial account.
+   *
+   * @param int $financialTypeId
+   *
+   * @return obj
+   */
+  protected function relationForFinancialTypeWithFinancialAccount($financialTypeId) {
+    $params = array(
+      'name' => 'Sales tax account ' . substr(sha1(rand()), 0, 4),
+      'financial_account_type_id' => key(CRM_Core_PseudoConstant::accountOptionValues('financial_account_type', NULL, " AND v.name LIKE 'Liability' ")),
+      'is_deductible' => 1,
+      'is_tax' => 1,
+      'tax_rate' => 10,
+      'is_active' => 1,
+    );
+    $account = CRM_Financial_BAO_FinancialAccount::add($params);
+    $entityParams = array(
+      'entity_table' => 'civicrm_financial_type',
+      'account_relationship' => key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Sales Tax Account is' ")),
+      'entity_id' => $financialTypeId,
+      'financial_account_id' => $account->id,
+    );
+    return CRM_Financial_BAO_FinancialTypeAccount::add($entityParams);
+  }
+
+  /**
+   * Create price set with contribution test for test setup.
+   *
+   * This could be merged with 4.5 function setup in api_v3_ContributionPageTest::setUpContributionPage
+   * on parent class at some point (fn is not in 4.4).
+   *
+   * @param $entity
+   * @param array $params
+   */
+  public function createPriceSetWithPage($entity = NULL, $params = array()) {
+    $membershipTypeID = $this->membershipTypeCreate(array('name' => 'Special'));
+    $contributionPageResult = $this->callAPISuccess('contribution_page', 'create', array(
+      'title' => "Test Contribution Page",
+      'financial_type_id' => 1,
+      'currency' => 'NZD',
+      'goal_amount' => 50,
+      'is_pay_later' => 1,
+      'is_monetary' => TRUE,
+      'is_email_receipt' => FALSE,
+    ));
+    $priceSet = $this->callAPISuccess('price_set', 'create', array(
+      'is_quick_config' => 0,
+      'extends' => 'CiviMember',
+      'financial_type_id' => 1,
+      'title' => 'my Page',
+    ));
+    $priceSetID = $priceSet['id'];
+
+    CRM_Price_BAO_PriceSet::addTo('civicrm_contribution_page', $contributionPageResult['id'], $priceSetID);
+    $priceField = $this->callAPISuccess('price_field', 'create', array(
+      'price_set_id' => $priceSetID,
+      'label' => 'Goat Breed',
+      'html_type' => 'Radio',
+    ));
+    $priceFieldValue = $this->callAPISuccess('price_field_value', 'create', array(
+        'price_set_id' => $priceSetID,
+        'price_field_id' => $priceField['id'],
+        'label' => 'Long Haired Goat',
+        'amount' => 20,
+        'financial_type_id' => 'Donation',
+        'membership_type_id' => $membershipTypeID,
+        'membership_num_terms' => 1,
+      )
+    );
+    $this->_ids['price_field_value'] = array($priceFieldValue['id']);
+    $priceFieldValue = $this->callAPISuccess('price_field_value', 'create', array(
+        'price_set_id' => $priceSetID,
+        'price_field_id' => $priceField['id'],
+        'label' => 'Shoe-eating Goat',
+        'amount' => 10,
+        'financial_type_id' => 'Donation',
+        'membership_type_id' => $membershipTypeID,
+        'membership_num_terms' => 2,
+      )
+    );
+    $this->_ids['price_field_value'][] = $priceFieldValue['id'];
+
+    $priceFieldValue = $this->callAPISuccess('price_field_value', 'create', array(
+        'price_set_id' => $priceSetID,
+        'price_field_id' => $priceField['id'],
+        'label' => 'Shoe-eating Goat',
+        'amount' => 10,
+        'financial_type_id' => 'Donation',
+      )
+    );
+    $this->_ids['price_field_value']['cont'] = $priceFieldValue['id'];
+
+    $this->_ids['price_set'] = $priceSetID;
+    $this->_ids['contribution_page'] = $contributionPageResult['id'];
+    $this->_ids['price_field'] = array($priceField['id']);
+
+    $this->_ids['membership_type'] = $membershipTypeID;
+  }
+
+  /**
+   * No results returned.
+   *
+   * @implements CRM_Utils_Hook::aclWhereClause
+   *
+   * @param string $type
+   * @param array $tables
+   * @param array $whereTables
+   * @param int $contactID
+   * @param string $where
+   */
+  public function aclWhereHookNoResults($type, &$tables, &$whereTables, &$contactID, &$where) {
   }
 
 }

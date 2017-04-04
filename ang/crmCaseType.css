@@ -2,7 +2,7 @@
     vertical-align: middle;
     cursor: move;
 }
-.crmCaseType .crm-i {
+.crmCaseType .fa-trash {
     margin: 0.4em 0.2em 0 0;
     cursor: pointer;
 }

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,8 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
- * $Id$
+ * @copyright CiviCRM LLC (c) 2004-2017
  *
  */
 
@@ -55,7 +54,6 @@ class CRM_Profile_Form_Edit extends CRM_Profile_Form {
    *
    * @param
    *
-   * @return void
    */
   public function preProcess() {
     $this->_mode = CRM_Profile_Form::MODE_CREATE;
@@ -153,7 +151,6 @@ SELECT module,is_reserved
   /**
    * Build the form object.
    *
-   * @return void
    */
   public function buildQuickForm() {
     if (empty($this->_ufGroup['id'])) {
@@ -257,8 +254,6 @@ SELECT module,is_reserved
   /**
    * Process the user submitted custom data values.
    *
-   *
-   * @return void
    */
   public function postProcess() {
     parent::postProcess();

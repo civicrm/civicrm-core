@@ -10,7 +10,7 @@
 function contact_get_example() {
   $params = array(
     'return.custom_1' => 1,
-    'id' => 1,
+    'id' => 3,
   );
 
   try{
@@ -22,7 +22,8 @@ function contact_get_example() {
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
     return array(
-      'error' => $errorMessage,
+      'is_error' => 1,
+      'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
     );
@@ -43,13 +44,13 @@ function contact_get_expectedresult() {
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
-    'id' => 1,
+    'id' => 3,
     'values' => array(
-      '1' => array(
-        'contact_id' => '1',
+      '3' => array(
+        'contact_id' => '3',
         'civicrm_value_testgetwithcu_1_id' => '1',
         'custom_1' => 'custom string',
-        'id' => '1',
+        'id' => '3',
       ),
     ),
   );

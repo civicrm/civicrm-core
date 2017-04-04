@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
 
@@ -385,6 +385,29 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
   }
 
   /**
+   * Gets PaymentProcessorID for PayPal
+   *
+   * @return int
+   */
+  public function getPayPalPaymentProcessorID() {
+    // This is an unreliable method as there could be more than one instance.
+    // Recommended approach is to use the civicrm/payment/ipn/xx url where xx is the payment
+    // processor id & the handleNotification function (which should call the completetransaction api & by-pass this
+    // entirely). The only thing the IPN class should really do is extract data from the request, validate it
+    // & call completetransaction or call fail? (which may not exist yet).
+    $paymentProcessorTypeID = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_PaymentProcessorType',
+      'PayPal', 'id', 'name'
+    );
+    return (int) civicrm_api3('PaymentProcessor', 'getvalue', array(
+      'is_test' => 0,
+      'options' => array('limit' => 1),
+      'payment_processor_type_id' => $paymentProcessorTypeID,
+      'return' => 'id',
+    ));
+
+  }
+
+  /**
    * This is the main function to call. It should be sufficient to instantiate the class
    * (with the input parameters) & call this & all will be done
    *
@@ -444,15 +467,8 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
     // processor id & the handleNotification function (which should call the completetransaction api & by-pass this
     // entirely). The only thing the IPN class should really do is extract data from the request, validate it
     // & call completetransaction or call fail? (which may not exist yet).
-    $paymentProcessorTypeID = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_PaymentProcessorType',
-      'PayPal', 'id', 'name'
-    );
-    $paymentProcessorID = (int) civicrm_api3('PaymentProcessor', 'getvalue', array(
-      'is_test' => 0,
-      'options' => array('limit' => 1),
-      'payment_processor_type_id' => $paymentProcessorTypeID,
-      'return' => 'id',
-    ));
+
+    $paymentProcessorID = self::getPayPalPaymentProcessorID();
 
     if (!$this->validateData($input, $ids, $objects, TRUE, $paymentProcessorID)) {
       return FALSE;
@@ -576,9 +592,7 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
     // membership would be an easy add - but not relevant to my customer...
     $this->_component = $input['component'] = 'contribute';
     $input['trxn_date'] = date('Y-m-d-H-i-s', strtotime(self::retrieve('time_created', 'String')));
-    $paymentProcessorID = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_PaymentProcessorType',
-      'PayPal', 'id', 'name'
-    );
+    $paymentProcessorID = self::getPayPalPaymentProcessorID();
 
     if (!$this->validateData($input, $ids, $objects, TRUE, $paymentProcessorID)) {
       throw new CRM_Core_Exception('Data did not validate');

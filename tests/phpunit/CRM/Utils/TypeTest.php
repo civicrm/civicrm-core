@@ -2,6 +2,8 @@
 
 /**
  * Class CRM_Utils_TypeTest
+ * @package CiviCRM
+ * @subpackage CRM_Utils_Type
  * @group headless
  */
 class CRM_Utils_TypeTest extends CiviUnitTestCase {
@@ -46,16 +48,29 @@ class CRM_Utils_TypeTest extends CiviUnitTestCase {
       array('table.`Home-street_address`', 'MysqlColumnNameOrAlias', 'table.`Home-street_address`'),
       array('`table-alias`.`Home-street_address`', 'MysqlColumnNameOrAlias', '`table-alias`.`Home-street_address`'),
       array('`table-alias`.column', 'MysqlColumnNameOrAlias', '`table-alias`.column'),
+      // Spaces also permitted, only when enclosed in backticks.
+      array('`column alias`', 'MysqlColumnNameOrAlias', '`column alias`'),
+      array('`table alias`.column', 'MysqlColumnNameOrAlias', '`table alias`.column'),
+      array('`table alias`.`column alias`', 'MysqlColumnNameOrAlias', '`table alias`.`column alias`'),
+      array('table alias.column alias', 'MysqlColumnNameOrAlias', NULL),
+      array('table alias.column_alias', 'MysqlColumnNameOrAlias', NULL),
+      array('table_alias.column alias', 'MysqlColumnNameOrAlias', NULL),
+      // Functions are not permitted.
       array('column_name, sleep(5)', 'MysqlColumnNameOrAlias', NULL),
+      // Length checking permits only 64 chars.
       array(str_repeat('a', 64), 'MysqlColumnNameOrAlias', str_repeat('a', 64)),
       array(str_repeat('a', 65), 'MysqlColumnNameOrAlias', NULL),
       array(str_repeat('a', 64) . '.' . str_repeat('a', 64), 'MysqlColumnNameOrAlias', str_repeat('a', 64) . '.' . str_repeat('a', 64)),
+      array('`' . str_repeat('a', 64) . '`.`' . str_repeat('b', 64) . '`', 'MysqlColumnNameOrAlias', '`' . str_repeat('a', 64) . '`.`' . str_repeat('b', 64) . '`'),
       array(str_repeat('a', 64) . '.' . str_repeat('a', 65), 'MysqlColumnNameOrAlias', NULL),
       array(str_repeat('a', 65) . '.' . str_repeat('a', 64), 'MysqlColumnNameOrAlias', NULL),
+      // ORDER BY can be ASC or DESC, case not significant.
       array('asc', 'MysqlOrderByDirection', 'asc'),
       array('DESC', 'MysqlOrderByDirection', 'desc'),
       array('DESCc', 'MysqlOrderByDirection', NULL),
       array('table.civicrm_column_name desc', 'MysqlOrderBy', 'table.civicrm_column_name desc'),
+      array('field(civicrm_column_name,4,5,6)', 'MysqlOrderBy', 'field(civicrm_column_name,4,5,6)'),
+      array('field(table.civicrm_column_name,4,5,6)', 'MysqlOrderBy', 'field(table.civicrm_column_name,4,5,6)'),
       array('table.civicrm_column_name desc,other_column, another_column desc', 'MysqlOrderBy', 'table.civicrm_column_name desc,other_column, another_column desc'),
       array('table.`Home-street_address` asc, `table-alias`.`Home-street_address` desc,`table-alias`.column', 'MysqlOrderBy', 'table.`Home-street_address` asc, `table-alias`.`Home-street_address` desc,`table-alias`.column'),
       array('a string', 'String', 'a string'),
@@ -108,6 +123,8 @@ class CRM_Utils_TypeTest extends CiviUnitTestCase {
       array('DESC', 'MysqlOrderByDirection', 'desc'),
       array('DESCc', 'MysqlOrderByDirection', NULL),
       array('table.civicrm_column_name desc', 'MysqlOrderBy', '`table`.`civicrm_column_name` desc'),
+      array('field(contribution_status_id,4,5,6) asc', 'MysqlOrderBy', 'field(`contribution_status_id`,4,5,6) asc'),
+      array('field(contribution_status_id,4,5,6) asc, contact_id asc', 'MysqlOrderBy', 'field(`contribution_status_id`,4,5,6) asc, `contact_id` asc'),
       array('table.civicrm_column_name desc,other_column,another_column desc', 'MysqlOrderBy', '`table`.`civicrm_column_name` desc, `other_column`, `another_column` desc'),
       array('table.`Home-street_address` asc, `table-alias`.`Home-street_address` desc,`table-alias`.column', 'MysqlOrderBy', '`table`.`Home-street_address` asc, `table-alias`.`Home-street_address` desc, `table-alias`.`column`'),
     );

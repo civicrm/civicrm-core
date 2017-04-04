@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  * @param $filesDirectory
  */
@@ -97,8 +97,13 @@ function civicrm_main(&$config) {
     civicrm_setup($files_dirname);
   }
 
-  $dsn = "mysql://{$config['mysql']['username']}:{$config['mysql']['password']}@{$config['mysql']['server']}/{$config['mysql']['database']}?new_link=true";
+  $parts = explode(':', $config['mysql']['server']);
+  if (empty($parts[1])) {
+    $parts[1] = 3306;
+  }
+  $config['mysql']['server'] = implode(':', $parts);
 
+  $dsn = "mysql://{$config['mysql']['username']}:{$config['mysql']['password']}@{$config['mysql']['server']}/{$config['mysql']['database']}?new_link=true";
   civicrm_source($dsn, $sqlPath . DIRECTORY_SEPARATOR . 'civicrm.mysql');
 
   if (!empty($config['loadGenerated'])) {
@@ -146,6 +151,13 @@ function civicrm_source($dsn, $fileName, $lineMode = FALSE) {
   global $crmPath;
 
   require_once "$crmPath/packages/DB.php";
+
+  // CRM-19699 See also CRM_Core_DAO for PHP7 mysqli compatiblity.
+  // Duplicated here because this is not using CRM_Core_DAO directly
+  // and this function may be called directly from Drush.
+  if (!defined('DB_DSN_MODE')) {
+    define('DB_DSN_MODE', 'auto');
+  }
 
   $db = DB::connect($dsn);
   if (PEAR::isError($db)) {
@@ -217,7 +229,14 @@ function civicrm_config(&$config) {
 
   $params['baseURL'] = isset($config['base_url']) ? $config['base_url'] : civicrm_cms_base();
   if ($installType == 'drupal' && defined('VERSION')) {
-    if (version_compare(VERSION, '7.0-rc1') >= 0) {
+    if (version_compare(VERSION, '8.0') >= 0) {
+      $params['cms'] = 'Drupal';
+      $params['CMSdbUser'] = addslashes($config['drupal']['username']);
+      $params['CMSdbPass'] = addslashes($config['drupal']['password']);
+      $params['CMSdbHost'] = $config['drupal']['host'] . ":" . !empty($config['drupal']['port']) ? $config['drupal']['port'] : "3306";
+      $params['CMSdbName'] = addslashes($config['drupal']['database']);
+    }
+    elseif (version_compare(VERSION, '7.0-rc1') >= 0) {
       $params['cms'] = 'Drupal';
       $params['CMSdbUser'] = addslashes($config['drupal']['username']);
       $params['CMSdbPass'] = addslashes($config['drupal']['password']);

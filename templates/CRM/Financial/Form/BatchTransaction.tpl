@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -52,6 +52,7 @@
             {else}
             <td>&nbsp;</td>
           {/if}
+          </tr>
           {include file="CRM/Contribute/Form/Search/Common.tpl"}
         </table>
 	<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
@@ -143,20 +144,10 @@ CRM.$(function($) {
     });
 
     CRM.$("#crm-transaction-selector-assign-{/literal}{$entityID}{literal} #toggleSelect").click( function() {
-      if (CRM.$("#crm-transaction-selector-assign-{/literal}{$entityID}{literal} #toggleSelect").is(':checked')) {
-        CRM.$("#crm-transaction-selector-assign-{/literal}{$entityID}{literal} input[id^='mark_x_']").prop('checked',true);
-      }
-      else {
-        CRM.$("#crm-transaction-selector-assign-{/literal}{$entityID}{literal} input[id^='mark_x_']").prop('checked',false);
-      }
+      toggleFinancialSelections('#toggleSelect', 'assign');
     });
     CRM.$("#crm-transaction-selector-remove-{/literal}{$entityID}{literal} #toggleSelects").click( function() {
-      if (CRM.$("#crm-transaction-selector-remove-{/literal}{$entityID}{literal} #toggleSelects").is(':checked')) {
-        CRM.$("#crm-transaction-selector-remove-{/literal}{$entityID}{literal} input[id^='mark_y_']").prop('checked',true);
-      }
-      else {
-        CRM.$("#crm-transaction-selector-remove-{/literal}{$entityID}{literal} input[id^='mark_y_']").prop('checked',false);
-      }
+      toggleFinancialSelections('#toggleSelects', 'remove');
     });
   {/literal}{else}{literal}
     buildTransactionSelectorRemove();
@@ -172,6 +163,19 @@ function enableActions( type ) {
   }
 }
 
+function toggleFinancialSelections(toggleID, toggleClass) {
+  var mark = 'x';
+  if (toggleClass == 'remove') {
+    mark = 'y';
+  }
+  if (CRM.$("#crm-transaction-selector-" + toggleClass + "-{/literal}{$entityID}{literal} " +	toggleID).is(':checked')) {
+    CRM.$("#crm-transaction-selector-" + toggleClass + "-{/literal}{$entityID}{literal} input[id^='mark_" + mark + "_']").prop('checked',true);
+  }
+  else {
+    CRM.$("#crm-transaction-selector-" + toggleClass + "-{/literal}{$entityID}{literal} input[id^='mark_" + mark + "_']").prop('checked',false);
+  }
+}
+
 function buildTransactionSelectorAssign(filterSearch) {
   var columns = '';
   var sourceUrl = {/literal}'{crmURL p="civicrm/ajax/rest" h=0 q="className=CRM_Financial_Page_AJAX&fnName=getFinancialTransactionsList&snippet=4&context=financialBatch&entityID=$entityID&notPresent=1&statusID=$statusID"}'{literal};
@@ -184,6 +188,7 @@ function buildTransactionSelectorAssign(filterSearch) {
   "bDestroy"   : true,
   "bFilter"    : false,
   "bAutoWidth" : false,
+  "lengthMenu": [ 10, 25, 50, 100, 250, 500, 1000, 2000 ],
   "aaSorting"  : [[5, 'desc']],
   "aoColumns"  : [
     {sClass:'crm-transaction-checkbox', bSortable:false},
@@ -240,10 +245,14 @@ function buildTransactionSelectorAssign(filterSearch) {
       "type": "POST",
       "url": sSource,
       "data": aoData,
-      "success": fnCallback
+      "success": function(b) {
+        fnCallback(b);
+        toggleFinancialSelections('#toggleSelect', 'assign');
+      }
     });
   }
 });
+	
 }
 
 function buildTransactionSelectorRemove( ) {
@@ -295,7 +304,10 @@ function buildTransactionSelectorRemove( ) {
       "type": "POST",
       "url": sSource,
       "data": aoData,
-      "success": fnCallback
+      "success": function(b) {
+        fnCallback(b);
+        toggleFinancialSelections('#toggleSelects', 'remove');
+      }
     });
   }
 });

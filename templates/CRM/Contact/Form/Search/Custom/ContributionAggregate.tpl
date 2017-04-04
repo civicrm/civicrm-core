@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -35,15 +35,13 @@
             {foreach from=$elements item=element}
                 <tr class="crm-contact-custom-search-form-row-{$element}">
                     <td class="label">{$form.$element.label}</td>
-                    {if $element eq 'start_date'}
-                        <td>{include file="CRM/common/jcalendar.tpl" elementName=start_date}</td>
-                    {elseif $element eq 'end_date'}
-                        <td>{include file="CRM/common/jcalendar.tpl" elementName=end_date}</td>
-                    {else}
-                        <td>{$form.$element.html}</td>
-                    {/if}
+                    <td>{$form.$element.html}</td>
                 </tr>
             {/foreach}
+            <tr class="crm-contact-custom-search-contributionDetails-form-block-receive_date">
+              <td class="label">{ts}Contribution Dates{/ts}</td>
+              {include file="CRM/Core/DateRange.tpl" fieldName="contribution_date" from='_low' to='_high'}
+            </tr>
             <tr class="crm-contact-custom-search-contributionDetails-form-block-financial_type">
                 <td class="label">{ts}Financial Type{/ts}</td>
                 <td>{$form.financial_type_id.html|crmAddClass:twenty}</td>

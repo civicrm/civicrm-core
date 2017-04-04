@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -178,7 +178,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
     $contextMenu = NULL
   ) {
     //don't build query constructor, if form is not submitted
-    $force = CRM_Utils_Request::retrieve('force', 'Boolean', CRM_Core_DAO::$_nullObject);
+    $force = CRM_Utils_Request::retrieve('force', 'Boolean');
     if (empty($formValues) && !$force) {
       return;
     }
@@ -488,6 +488,9 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
         elseif (isset($this->_query->_fields[$prop]) && isset($this->_query->_fields[$prop]['title'])) {
           $title = $this->_query->_fields[$prop]['title'];
         }
+        elseif (isset($this->_query->_pseudoConstantsSelect[$prop]) && isset($this->_query->_pseudoConstantsSelect[$prop]['pseudoconstant']['optionGroupName'])) {
+          $title = CRM_Core_BAO_OptionGroup::getTitleByName($this->_query->_pseudoConstantsSelect[$prop]['pseudoconstant']['optionGroupName']);
+        }
         else {
           $title = '';
         }
@@ -542,7 +545,6 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
    *   the total number of rows for this action
    */
   public function &getRows($action, $offset, $rowCount, $sort, $output = NULL) {
-    $config = CRM_Core_Config::singleton();
 
     if (($output == CRM_Core_Selector_Controller::EXPORT ||
         $output == CRM_Core_Selector_Controller::SCREEN
@@ -638,8 +640,6 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
       $names = self::$_properties;
     }
 
-    $multipleSelectFields = array('preferred_communication_method' => 1);
-
     $links = self::links($this->_context, $this->_contextMenu, $this->_key);
 
     //check explicitly added contact to a Smart Group.
@@ -654,11 +654,9 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
       );
     }
 
-    $seenIDs = array();
     while ($result->fetch()) {
       $row = array();
       $this->_query->convertToPseudoNames($result);
-
       // the columns we are interested in
       foreach ($names as $property) {
         if ($property == 'status') {
@@ -670,17 +668,6 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
             $cfID,
             $result->contact_id
           );
-        }
-        elseif (
-          $multipleSelectFields &&
-          array_key_exists($property, $multipleSelectFields)
-        ) {
-          $key = $property;
-          $paramsNew = array($key => $result->$property);
-          $name = array($key => array('newName' => $key, 'groupName' => $key));
-
-          CRM_Core_OptionGroup::lookupValues($paramsNew, $name, FALSE);
-          $row[$key] = $paramsNew[$key];
         }
         elseif (strpos($property, '-im')) {
           $row[$property] = $result->$property;
@@ -839,16 +826,13 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
         $row['contact_sub_type'] = $result->contact_sub_type ? CRM_Contact_BAO_ContactType::contactTypePairs(FALSE, $result->contact_sub_type, ', ') : $result->contact_sub_type;
         $row['contact_id'] = $result->contact_id;
         $row['sort_name'] = $result->sort_name;
+        // Surely this if should be if NOT - otherwise it's just wierd.
         if (array_key_exists('id', $row)) {
           $row['id'] = $result->contact_id;
         }
       }
 
-      // Dedupe contacts
-      if (in_array($row['contact_id'], $seenIDs) === FALSE) {
-        $seenIDs[] = $row['contact_id'];
-        $rows[] = $row;
-      }
+      $rows[$row['contact_id']] = $row;
     }
 
     return $rows;
@@ -867,10 +851,10 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
     // 2. if records are sorted
 
     // get current page requested
-    $pageNum = CRM_Utils_Request::retrieve('crmPID', 'Integer', CRM_Core_DAO::$_nullObject);
+    $pageNum = CRM_Utils_Request::retrieve('crmPID', 'Integer');
 
     // get the current sort order
-    $currentSortID = CRM_Utils_Request::retrieve('crmSID', 'String', CRM_Core_DAO::$_nullObject);
+    $currentSortID = CRM_Utils_Request::retrieve('crmSID', 'String');
 
     $session = CRM_Core_Session::singleton();
 
@@ -896,7 +880,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
     $firstRecord = ($pageNum - 1) * $pageSize;
 
     //for alphabetic pagination selection save
-    $sortByCharacter = CRM_Utils_Request::retrieve('sortByCharacter', 'String', CRM_Core_DAO::$_nullObject);
+    $sortByCharacter = CRM_Utils_Request::retrieve('sortByCharacter', 'String');
 
     //for text field pagination selection save
     $countRow = CRM_Core_BAO_PrevNextCache::getCount($cacheKey, NULL, "entity_table = 'civicrm_contact'");
@@ -915,22 +899,32 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
    * @param $rows
    */
   public function addActions(&$rows) {
-    $config = CRM_Core_Config::singleton();
 
-    $permissions = array(CRM_Core_Permission::getPermission());
-    if (CRM_Core_Permission::check('delete contacts')) {
-      $permissions[] = CRM_Core_Permission::DELETE;
-    }
-    $mask = CRM_Core_Action::mask($permissions);
-    // mask value to hide map link if there are not lat/long
-    $mapMask = $mask & 4095;
+    $basicPermissions = CRM_Core_Permission::check('delete contacts') ? array(CRM_Core_Permission::DELETE) : array();
 
-    // mask value to hide map link if there are not lat/long
-    $mapMask = $mask & 4095;
+    // get permissions on an individual level (CRM-12645)
+    // @todo look at storing this to the session as this is called twice during search results render.
+    $can_edit_list = CRM_Contact_BAO_Contact_Permission::allowList(array_keys($rows), CRM_Core_Permission::EDIT);
 
-    $links = self::links($this->_context, $this->_contextMenu, $this->_key);
+    $links_template = self::links($this->_context, $this->_contextMenu, $this->_key);
 
     foreach ($rows as $id => & $row) {
+      $links = $links_template;
+      if (in_array($id, $can_edit_list)) {
+        $mask = CRM_Core_Action::mask(array_merge(array(CRM_Core_Permission::EDIT), $basicPermissions));
+      }
+      else {
+        $mask = CRM_Core_Action::mask(array_merge(array(CRM_Core_Permission::VIEW), $basicPermissions));
+      }
+
+      if ((!is_numeric(CRM_Utils_Array::value('geo_code_1', $row))) &&
+        (empty($row['city']) ||
+          !CRM_Utils_Array::value('state_province', $row)
+        )
+      ) {
+        $mask = $mask & 4095;
+      }
+
       if (!empty($this->_formValues['deleted_contacts']) && CRM_Core_Permission::check('access deleted contacts')
       ) {
         $links = array(
@@ -967,26 +961,10 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
           $row['contact_id']
         );
       }
-      elseif ((is_numeric(CRM_Utils_Array::value('geo_code_1', $row))) ||
-        (!empty($row['city']) &&
-          CRM_Utils_Array::value('state_province', $row)
-        )
-      ) {
-        $row['action'] = CRM_Core_Action::formLink(
-          $links,
-          $mask,
-          array('id' => $row['contact_id']),
-          ts('more'),
-          FALSE,
-          'contact.selector.actions',
-          'Contact',
-          $row['contact_id']
-        );
-      }
       else {
         $row['action'] = CRM_Core_Action::formLink(
           $links,
-          $mapMask,
+          $mask,
           array('id' => $row['contact_id']),
           ts('more'),
           FALSE,

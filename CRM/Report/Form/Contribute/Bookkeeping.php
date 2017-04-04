@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
   protected $_addressField = FALSE;
@@ -315,6 +315,9 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
             'title' => ts('Trans #'),
             'default' => TRUE,
           ),
+          'card_type' => array(
+            'title' => ts('Credit Card Type'),
+          ),
         ),
         'filters' => array(
           'payment_instrument_id' => array(
@@ -334,6 +337,19 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
             'title' => ts('Transaction Date'),
             'operatorType' => CRM_Report_Form::OP_DATE,
             'type' => CRM_Utils_Type::T_DATE,
+          ),
+          'status_id' => array(
+            'title' => ts('Financial Transaction Status'),
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => CRM_Contribute_PseudoConstant::contributionStatus(),
+            'default' => array(1),
+          ),
+          'card_type' => array(
+            'title' => ts('Credit Card Type'),
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialTrxn', 'card_type'),
+            'default' => NULL,
+            'type' => CRM_Utils_Type::T_STRING,
           ),
         ),
         'order_bys' => array(
@@ -555,7 +571,7 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
 
     $this->groupBy();
 
-    $tempQuery = "CREATE TEMPORARY TABLE {$tempTableName} CHARACTER SET utf8 COLLATE utf8_unicode_ci AS
+    $tempQuery = "CREATE TEMPORARY TABLE {$tempTableName} {$this->_databaseAttributes} AS
                   {$select} {$this->_from} {$this->_where} {$this->_groupBy} ";
     CRM_Core_DAO::executeQuery($tempQuery);
 
@@ -596,6 +612,7 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
     $contributionTypes = CRM_Contribute_PseudoConstant::financialType();
     $paymentInstruments = CRM_Contribute_PseudoConstant::paymentInstrument();
     $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus();
+    $creditCardTypes = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialTrxn', 'card_type');
     foreach ($rows as $rowNum => $row) {
       // convert display name to links
       if (array_key_exists('civicrm_contact_sort_name', $row) &&
@@ -634,6 +651,11 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
           $gender = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id');
           $rows[$rowNum]['civicrm_contact_gender_id'] = $gender[$value];
         }
+        $entryFound = TRUE;
+      }
+
+      if (!empty($row['civicrm_financial_trxn_card_type'])) {
+        $rows[$rowNum]['civicrm_financial_trxn_card_type'] = CRM_Utils_Array::value($row['civicrm_financial_trxn_card_type'], $creditCardTypes);
         $entryFound = TRUE;
       }
 

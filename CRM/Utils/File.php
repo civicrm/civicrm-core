@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -140,7 +140,7 @@ class CRM_Utils_File {
    */
   public static function cleanDir($target, $rmdir = TRUE, $verbose = TRUE) {
     static $exceptions = array('.', '..');
-    if ($target == '' || $target == '/') {
+    if ($target == '' || $target == '/' || !$target) {
       throw new Exception("Overly broad deletion");
     }
 
@@ -287,6 +287,28 @@ class CRM_Utils_File {
   }
 
   /**
+   * Save a fake file somewhere
+   *
+   * @param string $dir
+   *   The directory where the file should be saved.
+   * @param string $contents
+   *   Optional: the contents of the file.
+   * @param string $fileName
+   *
+   * @return string
+   *   The filename saved, or FALSE on failure.
+   */
+  public static function createFakeFile($dir, $contents = 'delete me', $fileName = NULL) {
+    $dir = self::addTrailingSlash($dir);
+    if (!$fileName) {
+      $fileName = 'delete-this-' . CRM_Utils_String::createRandom(10, CRM_Utils_String::ALPHANUMERIC);
+    }
+    $success = file_put_contents($dir . $fileName, $contents);
+
+    return ($success === FALSE) ? FALSE : $fileName;
+  }
+
+  /**
    * @param string|NULL $dsn
    *   Use NULL to load the default/active connection from CRM_Core_DAO.
    *   Otherwise, give a full DSN string.
@@ -419,6 +441,8 @@ class CRM_Utils_File {
   }
 
   /**
+   * Make a valid file name.
+   *
    * @param string $name
    *
    * @return string
@@ -441,8 +465,25 @@ class CRM_Utils_File {
   }
 
   /**
-   * @param $path
-   * @param $ext
+   * Copies a file
+   *
+   * @param $filePath
+   * @return mixed
+   */
+  public static function duplicate($filePath) {
+    $oldName = pathinfo($filePath, PATHINFO_FILENAME);
+    $uniqID = md5(uniqid(rand(), TRUE));
+    $newName = preg_replace('/(_[\w]{32})$/', '', $oldName) . '_' . $uniqID;
+    $newPath = str_replace($oldName, $newName, $filePath);
+    copy($filePath, $newPath);
+    return $newPath;
+  }
+
+  /**
+   * Get files for the extension.
+   *
+   * @param string $path
+   * @param string $ext
    *
    * @return array
    */
@@ -782,6 +823,13 @@ HTACCESS;
     return TRUE;
   }
 
+  /**
+   * Format file.
+   *
+   * @param array $param
+   * @param string $fileName
+   * @param array $extraParams
+   */
   public static function formatFile(&$param, $fileName, $extraParams = array()) {
     if (empty($param[$fileName])) {
       return;
@@ -855,6 +903,26 @@ HTACCESS;
     $mimeType = 'image/' . strtolower(pathinfo($path, PATHINFO_EXTENSION));
 
     return self::getFileURL($path, $mimeType);
+  }
+
+
+  /**
+   * Get file icon class for specific MIME Type
+   *
+   * @param string $mimeType
+   * @return string
+   */
+  public static function getIconFromMimeType($mimeType) {
+    if (!isset(Civi::$statics[__CLASS__]['mimeIcons'])) {
+      Civi::$statics[__CLASS__]['mimeIcons'] = json_decode(file_get_contents(__DIR__ . '/File/mimeIcons.json'), TRUE);
+    }
+    $iconClasses = Civi::$statics[__CLASS__]['mimeIcons'];
+    foreach ($iconClasses as $text => $icon) {
+      if (strpos($mimeType, $text) === 0) {
+        return $icon;
+      }
+    }
+    return $iconClasses['*'];
   }
 
 }

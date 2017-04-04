@@ -8,7 +8,7 @@
 function logging_revert_example() {
   $params = array(
     'log_conn_id' => 'woot',
-    'log_date' => '2016-04-06 02:52:07',
+    'log_date' => '2017-02-07 02:35:06',
   );
 
   try{
@@ -20,7 +20,8 @@ function logging_revert_example() {
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
     return array(
-      'error' => $errorMessage,
+      'is_error' => 1,
+      'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
     );

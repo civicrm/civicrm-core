@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -283,10 +283,11 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       else {
         $lineItem = CRM_Price_BAO_LineItem::getLineItems($this->_id, 'contribution', 1, TRUE, TRUE);
       }
+      // wtf?
       empty($lineItem) ? NULL : $this->_lineItems[] = $lineItem;
     }
 
-    $this->assign('lineItem', empty($this->_lineItems) ? FALSE : $this->_lineItems);
+    $this->assign('lineItem', empty($lineItem) ? FALSE : array($lineItem));
 
     // Set title
     if ($this->_mode && $this->_id) {
@@ -375,10 +376,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     if (isset($defaults['fee_amount'])) {
       $defaults['fee_amount'] = CRM_Utils_Money::format($defaults['fee_amount'], NULL, '%a');
-    }
-
-    if (isset($defaults['net_amount'])) {
-      $defaults['net_amount'] = CRM_Utils_Money::format($defaults['net_amount'], NULL, '%a');
     }
 
     if ($this->_contributionType) {
@@ -649,10 +646,11 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     $paymentInstrument = FALSE;
     if (!$this->_mode) {
+      $checkPaymentID = array_search('Check', CRM_Contribute_PseudoConstant::paymentInstrument('name'));
       $paymentInstrument = $this->add('select', 'payment_instrument_id',
         ts('Payment Method'),
         array('' => ts('- select -')) + CRM_Contribute_PseudoConstant::paymentInstrument(),
-        TRUE, array('onChange' => "return showHideByValue('payment_instrument_id','4','checkNumber','table-row','select',false);")
+        TRUE, array('onChange' => "return showHideByValue('payment_instrument_id','{$checkPaymentID}','checkNumber','table-row','select',false);")
       );
     }
 
@@ -776,7 +774,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     if ($this->_online) {
       $this->assign('hideCalender', TRUE);
     }
-    $checkNumber = $this->add('text', 'check_number', ts('Check Number'), $attributes['check_number']);
+    $checkNumber = $this->add('text', 'check_number', ts('Check Number'), $attributes['contribution_check_number']);
 
     $this->addDateTime('receipt_date', ts('Receipt Date'), FALSE, array('formatType' => 'activityDateTime'));
     $this->addDateTime('cancel_date', ts('Cancelled / Refunded Date'), FALSE, array('formatType' => 'activityDateTime'));
@@ -970,16 +968,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     if (!empty($fields['total_amount']) && (!empty($fields['net_amount']) || !empty($fields['fee_amount']))) {
       $sum = CRM_Utils_Rule::cleanMoney($fields['net_amount']) + CRM_Utils_Rule::cleanMoney($fields['fee_amount']);
-      // For taxable contribution we need to deduct taxable amount from
-      // (net amount + fee amount) before comparing it with total amount
-      if (!empty($self->_values['tax_amount'])) {
-        $componentDetails = CRM_Contribute_BAO_Contribution::getComponentDetails($self->_id);
-        if (!(CRM_Utils_Array::value('membership', $componentDetails) ||
-            CRM_Utils_Array::value('participant', $componentDetails))
-        ) {
-          $sum = CRM_Utils_Money::format($sum - $self->_values['tax_amount'], NULL, '%a');
-        }
-      }
       if (CRM_Utils_Rule::cleanMoney($fields['total_amount']) != $sum) {
         $errors['total_amount'] = ts('The sum of fee amount and net amount must be equal to total amount');
       }
@@ -1244,11 +1232,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       'source' => CRM_Utils_Array::value('source', $paymentParams, CRM_Utils_Array::value('description', $paymentParams)),
       'thankyou_date' => CRM_Utils_Array::value('thankyou_date', $this->_params),
     );
-
-    if (empty($paymentParams['is_pay_later'])) {
-      // @todo look up payment_instrument_id on payment processor table.
-      $contributionParams['payment_instrument_id'] = 1;
-    }
+    $contributionParams['payment_instrument_id'] = $this->_paymentProcessor['payment_instrument_id'];
 
     $contribution = CRM_Contribute_Form_Contribution_Confirm::processFormContribution($this,
       $this->_params,
@@ -1408,6 +1392,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         'id' => $params['id'],
       ));
       $this->_id = $params['id'];
+      $this->_values = $existingContribution;
     }
     else {
       $existingContribution = array();
@@ -1449,7 +1434,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * @throws \Exception
    */
   protected function submit($submittedValues, $action, $pledgePaymentID) {
-    $softParams = $softIDs = array();
+
     $pId = $contribution = $isRelatedId = FALSE;
     $this->_params = $submittedValues;
     $this->beginPostProcess();
@@ -1535,7 +1520,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         );
         CRM_Event_BAO_Participant::add($participantParams);
         if (empty($this->_lineItems)) {
-          $this->_lineItems[] = CRM_Price_BAO_LineItem::getLineItems($entityID, 'participant', 1);
+          $this->_lineItems[] = CRM_Price_BAO_LineItem::getLineItems($entityID, 'participant', TRUE);
         }
       }
       else {
@@ -1543,7 +1528,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         $entityID = $this->_id;
       }
 
-      $lineItems = CRM_Price_BAO_LineItem::getLineItems($entityID, $entityTable, NULL, TRUE, $isRelatedId);
+      $lineItems = CRM_Price_BAO_LineItem::getLineItems($entityID, $entityTable, FALSE, TRUE, $isRelatedId);
       foreach (array_keys($lineItems) as $id) {
         $lineItems[$id]['id'] = $id;
       }
@@ -1602,7 +1587,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
 
     if (!isset($submittedValues['total_amount'])) {
-      $submittedValues['total_amount'] = CRM_Utils_Array::value('total_amount', $this->_values);
+      $submittedValues['total_amount'] = CRM_Utils_Array::value('total_amount', $this->_values) - CRM_Utils_Array::value('tax_amount', $this->_values);
     }
     $this->assign('lineItem', !empty($lineItem) && !$isQuickConfig ? $lineItem : FALSE);
 
@@ -1814,13 +1799,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
     $taxRate = array();
     $getTaxDetails = FALSE;
-    if ($action & CRM_Core_Action::ADD) {
-      $line = $lineItem;
-    }
-    elseif ($action & CRM_Core_Action::UPDATE) {
-      $line = $this->_lineItems;
-    }
-    foreach ($line as $key => $value) {
+
+    foreach ($lineItem as $key => $value) {
       foreach ($value as $v) {
         if (isset($taxRate[(string) CRM_Utils_Array::value('tax_rate', $v)])) {
           $taxRate[(string) $v['tax_rate']] = $taxRate[(string) $v['tax_rate']] + CRM_Utils_Array::value('tax_amount', $v);

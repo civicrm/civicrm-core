@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -30,8 +30,8 @@
     <tr class="crm-mailing-component-form-block-name"><td class="label">{$form.name.label}</td><td>{$form.name.html}</td>
     <tr class="crm-mailing-component-form-block-component_type"><td class="label">{$form.component_type.label}</td><td>{$form.component_type.html}</td>
     <tr class="crm-mailing-component-form-block-subject"><td class="label">{$form.subject.label}</td><td>{$form.subject.html}</td>
-    <tr class="crm-mailing-component-form-block-body_text"><td class="label">{$form.body_text.label}</td><td>{$form.body_text.html}</td>
     <tr class="crm-mailing-component-form-block-body_html"><td class="label">{$form.body_html.label}</td><td>{$form.body_html.html}</td>
+    <tr class="crm-mailing-component-form-block-body_text"><td class="label">{$form.body_text.label}</td><td>{$form.body_text.html}</td>
     <tr class="crm-mailing-component-form-block-is_default"><td class="label">{$form.is_default.label}</td><td>{$form.is_default.html}</td>
     <tr class="crm-mailing-component-form-block-is_active"><td class="label">{$form.is_active.label}</td><td>{$form.is_active.html}</td>
   </table>

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 require_once 'Mail/mime.php';
@@ -216,21 +216,23 @@ WHERE  email = %2
     }
 
     //Pass the groups to be unsubscribed from through a hook.
-    $group_ids = array_keys($groups);
-    $base_group_ids = array_keys($base_groups);
-    CRM_Utils_Hook::unsubscribeGroups('unsubscribe', $mailing_id, $contact_id, $group_ids, $base_group_ids);
+    $groupIds = array_keys($groups);
+    //include child groups if any
+    $groupIds = array_merge($groupIds, CRM_Contact_BAO_Group::getChildGroupIds($groupIds));
+
+    $baseGroupIds = array_keys($base_groups);
+    CRM_Utils_Hook::unsubscribeGroups('unsubscribe', $mailing_id, $contact_id, $groupIds, $baseGroupIds);
 
     // Now we have a complete list of recipient groups.  Filter out all
     // those except smart groups, those that the contact belongs to and
     // base groups from search based mailings.
-
     $baseGroupClause = '';
-    if (!empty($base_group_ids)) {
-      $baseGroupClause = "OR  $group.id IN(" . implode(', ', $base_group_ids) . ")";
+    if (!empty($baseGroupIds)) {
+      $baseGroupClause = "OR  $group.id IN(" . implode(', ', $baseGroupIds) . ")";
     }
     $groupIdClause = '';
-    if ($group_ids || $base_group_ids) {
-      $groupIdClause = "AND $group.id IN (" . implode(', ', array_merge($group_ids, $base_group_ids)) . ")";
+    if ($groupIds || $baseGroupIds) {
+      $groupIdClause = "AND $group.id IN (" . implode(', ', array_merge($groupIds, $baseGroupIds)) . ")";
     }
     $do->query("
             SELECT      $group.id as group_id,
@@ -267,7 +269,7 @@ WHERE  email = %2
     foreach ($groups as $group_id => $group_name) {
       $notremoved = FALSE;
       if ($group_name) {
-        if (in_array($group_id, $base_group_ids)) {
+        if (in_array($group_id, $baseGroupIds)) {
           list($total, $removed, $notremoved) = CRM_Contact_BAO_GroupContact::addContactsToGroup($contacts, $group_id, 'Email', 'Removed');
         }
         else {
@@ -549,7 +551,7 @@ WHERE  email = %2
     }
 
     if ($is_distinct) {
-      $query .= " GROUP BY $queue.id ";
+      $query .= " GROUP BY $queue.id, $unsub.time_stamp, $unsub.org_unsubscribe";
     }
 
     $orderBy = "sort_name ASC, {$unsub}.time_stamp DESC";

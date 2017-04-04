@@ -19,7 +19,8 @@ function order_cancel_example() {
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
     return array(
-      'error' => $errorMessage,
+      'is_error' => 1,
+      'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
     );
@@ -44,7 +45,7 @@ function order_cancel_expectedresult() {
     'values' => array(
       '1' => array(
         'id' => '1',
-        'contact_id' => '14',
+        'contact_id' => '16',
         'financial_type_id' => '1',
         'contribution_page_id' => '',
         'payment_instrument_id' => '4',
@@ -71,6 +72,7 @@ function order_cancel_expectedresult() {
         'campaign_id' => '',
         'creditnote_id' => 'CN_1',
         'tax_amount' => '',
+        'revenue_recognition_date' => '',
         'contribution_type_id' => '1',
       ),
     ),

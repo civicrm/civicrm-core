@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -240,7 +240,7 @@ class CRM_Contact_Form_Edit_Address {
    * @return array|bool
    *   if no errors
    */
-  public static function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files = array(), $self = NULL) {
     $errors = array();
 
     $customDataRequiredFields = array();

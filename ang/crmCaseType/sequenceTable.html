@@ -5,6 +5,7 @@ Required vars: activitySet
 <table>
   <thead>
   <tr>
+    <th></th>
     <th>{{ts('Activity')}}</th>
     <th></th>
   </tr>
@@ -14,6 +15,9 @@ Required vars: activitySet
   <tr ng-repeat="activity in activitySet.activityTypes">
     <td>
       <i class="crm-i fa-arrows grip-n-drag"></i>
+    </td>
+    <td>
+      <i class="crm-i {{ activityTypes[activity.name].icon }}"></i>
       {{ activity.name }}
     </td>
     <td>
@@ -26,7 +30,7 @@ Required vars: activitySet
   <tr class="addRow">
     <td colspan="3">
       <span crm-add-name
-           crm-options="activityTypeNames"
+           crm-options="activityTypeOptions"
            crm-var="newActivity"
            crm-on-add="addActivity(activitySet, newActivity)"
            placeholder="{{ts('Add activity')}}"

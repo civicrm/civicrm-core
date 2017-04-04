@@ -7,7 +7,7 @@
  */
 function job_delete_example() {
   $params = array(
-    'id' => 30,
+    'id' => 31,
   );
 
   try{
@@ -19,7 +19,8 @@ function job_delete_example() {
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
     return array(
-      'error' => $errorMessage,
+      'is_error' => 1,
+      'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
     );

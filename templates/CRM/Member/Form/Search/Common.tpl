@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -41,6 +41,10 @@
     </p>
   </td>
   <td>
+    <p>
+    {$form.membership_is_current_member.label}
+    {$form.membership_is_current_member.html}
+    </p>
     <p>
     {$form.member_is_primary.label}
     {help id="id-member_is_primary" file="CRM/Member/Form/Search.hlp"}

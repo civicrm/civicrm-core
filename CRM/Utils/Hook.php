@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CiviCRM_Hook
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 abstract class CRM_Utils_Hook {
 
@@ -89,6 +89,9 @@ abstract class CRM_Utils_Hook {
     return self::$_singleton;
   }
 
+  /**
+   * CRM_Utils_Hook constructor.
+   */
   public function __construct() {
     $this->cache = CRM_Utils_Cache::create(array(
       'name' => 'hooks',
@@ -317,7 +320,7 @@ abstract class CRM_Utils_Hook {
    *   based on op. pre-hooks return a boolean or
    *                           an error message which aborts the operation
    */
-  public static function post($op, $objectName, $objectId, &$objectRef) {
+  public static function post($op, $objectName, $objectId, &$objectRef = NULL) {
     $event = new \Civi\Core\Event\PostEvent($op, $objectName, $objectId, $objectRef);
     \Civi::service('dispatcher')->dispatch("hook_civicrm_post", $event);
     \Civi::service('dispatcher')->dispatch("hook_civicrm_post::$objectName", $event);
@@ -893,6 +896,23 @@ abstract class CRM_Utils_Hook {
     return self::singleton()->invoke(3, $form, $groups, $mailings,
       self::$_nullObject, self::$_nullObject, self::$_nullObject,
       'civicrm_mailingGroups'
+    );
+  }
+
+  /**
+   * (Experimental) Modify the list of template-types used for CiviMail composition.
+   *
+   * @param array $types
+   *   Sequentially indexed list of template types. Each type specifies:
+   *     - name: string
+   *     - editorUrl: string, Angular template URL
+   *     - weight: int, priority when picking a default value for new mailings
+   * @return mixed
+   */
+  public static function mailingTemplateTypes(&$types) {
+    return self::singleton()->invoke(1, $types, self::$_nullObject, self::$_nullObject,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject,
+      'civicrm_mailingTemplateTypes'
     );
   }
 
@@ -1730,6 +1750,25 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
+   * This hook is called when checking permissions; use this hook to dynamically
+   * escalate user permissions in certain use cases (cf. CRM-19256).
+   *
+   * @param string $permission
+   *   The name of an atomic permission, ie. 'access deleted contacts'
+   * @param bool $granted
+   *   Whether this permission is currently granted. The hook can change this value.
+   *
+   * @return null
+   *   The return value is ignored
+   */
+  public static function permission_check($permission, &$granted) {
+    return self::singleton()->invoke(2, $permission, $granted,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
+      'civicrm_permission_check'
+    );
+  }
+
+  /**
    * @param CRM_Core_Exception Exception $exception
    * @param mixed $request
    *   Reserved for future use.
@@ -2179,8 +2218,11 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
-   * This hook is called for bypass a few civicrm urls from IDS check
-   * @param array $skip list of civicrm url;
+   * This hook is called for bypass a few civicrm urls from IDS check.
+   *
+   * @param array $skip list of civicrm urls
+   *
+   * @return mixed
    */
   public static function idsException(&$skip) {
     return self::singleton()->invoke(1, $skip, self::$_nullObject,
@@ -2195,6 +2237,8 @@ abstract class CRM_Utils_Hook {
    * @param string $geoProvider
    * @param array $values
    * @param SimpleXMLElement $xml
+   *
+   * @return mixed
    */
   public static function geocoderFormat($geoProvider, &$values, $xml) {
     return self::singleton()->invoke(3, $geoProvider, $values, $xml,

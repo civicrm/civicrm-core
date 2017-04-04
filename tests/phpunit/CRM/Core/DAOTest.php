@@ -277,4 +277,35 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     CRM_Core_DAO::executeQuery("DROP TABLE $tempName");
   }
 
+  /**
+   * CRM-19930: Test toArray() function with $format param
+   */
+  public function testDAOtoArray() {
+    $format = 'user[%s]';
+    $params = array(
+      'first_name' => 'Testy',
+      'last_name' => 'McScallion',
+      'contact_type' => 'Individual',
+    );
+
+    $dao = CRM_Contact_BAO_Contact::add($params);
+    $query = "SELECT contact_type, display_name FROM civicrm_contact WHERE id={$dao->id}";
+    $toArray = array(
+      'contact_type' => 'Individual',
+      'display_name' => 'Testy McScallion',
+    );
+    $modifiedKeyArray = array();
+    foreach ($toArray as $k => $v) {
+      $modifiedKeyArray[sprintf($format, $k)] = $v;
+    }
+
+    $dao = CRM_Core_DAO::executeQuery($query);
+    while ($dao->fetch()) {
+      $daoToArray = $dao->toArray();
+      $this->checkArrayEquals($toArray, $daoToArray);
+      $daoToArray = $dao->toArray($format);
+      $this->checkArrayEquals($modifiedKeyArray, $daoToArray);
+    }
+  }
+
 }

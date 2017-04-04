@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -182,6 +182,8 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
           break;
       }
     }
+
+    $this->addElement('text', 'min_amount', ts('Minimum Amount'));
 
     if (CRM_Utils_System::isNull($extends)) {
       $this->assign('extends', FALSE);

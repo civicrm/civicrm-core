@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
  *
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
  */
@@ -64,10 +64,11 @@ class CRM_Event_Form_EventFees {
   }
 
   /**
-   * This function sets the default values for the form in edit/view mode
-   * the default values are retrieved from the database
+   * This function sets the default values for the form in edit/view mode.
    *
    * @param CRM_Core_Form $form
+   *
+   * @return array
    */
   public static function setDefaultValues(&$form) {
     $defaults = array();
@@ -249,7 +250,6 @@ class CRM_Event_Form_EventFees {
   /**
    * This function sets the default values for price set.
    *
-   *
    * @param int $participantID
    * @param int $eventID
    * @param bool $includeQtyZero
@@ -272,7 +272,7 @@ class CRM_Event_Form_EventFees {
     }
 
     // use line items for setdefault price set fields, CRM-4090
-    $lineItems[$participantID] = CRM_Price_BAO_LineItem::getLineItems($participantID, 'participant', NULL, $includeQtyZero);
+    $lineItems[$participantID] = CRM_Price_BAO_LineItem::getLineItems($participantID, 'participant', FALSE, $includeQtyZero);
 
     if (is_array($lineItems[$participantID]) &&
       !CRM_Utils_System::isNull($lineItems[$participantID])
@@ -407,7 +407,7 @@ SELECT  id, html_type
         && !CRM_Utils_Array::value('fee', $form->_values)
         && CRM_Utils_Array::value('snippet', $_REQUEST) == CRM_Core_Smarty::PRINT_NOFORM
       ) {
-        $form->assign('isFTPermissionDenied', TRUE);
+        CRM_Core_Session::setStatus(ts('You do not have all the permissions needed for this page.'), 'Permission Denied', 'error');
         return FALSE;
       }
       if ($form->_mode) {

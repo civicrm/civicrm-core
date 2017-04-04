@@ -86,6 +86,52 @@ class api_v3_MailingTest extends CiviUnitTestCase {
   }
 
   /**
+   *
+   */
+  public function testTemplateTypeOptions() {
+    $types = $this->callAPISuccess('Mailing', 'getoptions', array('field' => 'template_type'));
+    $this->assertTrue(isset($types['values']['traditional']));
+  }
+
+  /**
+   * The `template_options` field should be treated a JSON object.
+   *
+   * This test will create, read, and update the field.
+   */
+  public function testMailerCreateTemplateOptions() {
+    // 1. Create mailing with template_options.
+    $params = $this->_params;
+    $params['template_options'] = json_encode(array('foo' => 'bar_1'));
+    $createResult = $this->callAPISuccess('mailing', 'create', $params);
+    $id = $createResult['id'];
+    $this->assertDBQuery('{"foo":"bar_1"}', 'SELECT template_options FROM civicrm_mailing WHERE id = %1', array(
+      1 => array($id, 'Int'),
+    ));
+    $this->assertEquals('bar_1', $createResult['values'][$id]['template_options']['foo']);
+
+    // 2. Get mailing with template_options.
+    $getResult = $this->callAPISuccess('mailing', 'get', array(
+      'id' => $id,
+    ));
+    $this->assertEquals('bar_1', $getResult['values'][$id]['template_options']['foo']);
+    $getValueResult = $this->callAPISuccess('mailing', 'getvalue', array(
+      'id' => $id,
+      'return' => 'template_options',
+    ));
+    $this->assertEquals('bar_1', $getValueResult['foo']);
+
+    // 3. Update mailing with template_options.
+    $updateResult = $this->callAPISuccess('mailing', 'create', array(
+      'id' => $id,
+      'template_options' => array('foo' => 'bar_2'),
+    ));
+    $this->assertDBQuery('{"foo":"bar_2"}', 'SELECT template_options FROM civicrm_mailing WHERE id = %1', array(
+      1 => array($id, 'Int'),
+    ));
+    $this->assertEquals('bar_2', $updateResult['values'][$id]['template_options']['foo']);
+  }
+
+  /**
    * The Mailing.create API supports magic properties "groups[include,enclude]" and "mailings[include,exclude]".
    * Make sure these work
    */
@@ -289,7 +335,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     );
     // END SAMPLE DATA
 
-    $create = $this->callAPIAndDocument('Mailing', 'create', $params, __FUNCTION__, __FILE__);
+    $create = $this->callAPISuccess('Mailing', 'create', $params);
 
     $preview = $create['values'][$create['id']]['api.MailingRecipients.get'];
     $this->assertEquals(1, $preview['count']);
@@ -712,7 +758,7 @@ SELECT event_queue_id, time_stamp FROM mail_{$type}_temp";
    * we can still have working click-trough URLs working (CRM-17959).
    */
   public function testUrlWithMissingTrackingHash() {
-    $mail = $this->callAPIAndDocument('mailing', 'create', $this->_params + array('scheduled_date' => 'now'), __FUNCTION__, __FILE__);
+    $mail = $this->callAPISuccess('mailing', 'create', $this->_params + array('scheduled_date' => 'now'), __FUNCTION__, __FILE__);
     $jobs = $this->callAPISuccess('mailing_job', 'get', array('mailing_id' => $mail['id']));
     $this->assertEquals(1, $jobs['count']);
 
@@ -746,10 +792,10 @@ SELECT event_queue_id, time_stamp FROM mail_{$type}_temp";
     $this->_params['body_text'] = str_replace("https://civicrm.org", $unicodeURL, $this->_params['body_text']);
     $this->_params['body_html'] = str_replace("https://civicrm.org", $unicodeURL, $this->_params['body_html']);
 
-    $mail = $this->callAPIAndDocument('mailing', 'create', $this->_params + array('scheduled_date' => 'now'), __FUNCTION__, __FILE__);
+    $mail = $this->callAPISuccess('mailing', 'create', $this->_params + array('scheduled_date' => 'now'));
 
     $params = array('mailing_id' => $mail['id'], 'test_email' => 'alice@example.org', 'test_group' => NULL);
-    $deliveredInfo = $this->callAPISuccess($this->_entity, 'send_test', $params);
+    $this->callAPISuccess($this->_entity, 'send_test', $params);
 
     $sql = "SELECT turl.id as url_id, turl.url, q.id as queue_id
       FROM civicrm_mailing_trackable_url as turl

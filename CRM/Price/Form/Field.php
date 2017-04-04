@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -327,13 +327,6 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
       CRM_Core_DAO::getAttribute('CRM_Price_DAO_PriceField', 'help_post')
     );
 
-    // active_on
-    $date_options = array(
-      'format' => 'dmY His',
-      'minYear' => date('Y') - 1,
-      'maxYear' => date('Y') + 5,
-      'addEmptyOption' => TRUE,
-    );
     $this->addDateTime('active_on', ts('Active On'), FALSE, array('formatType' => 'activityDateTime'));
 
     // expire_on

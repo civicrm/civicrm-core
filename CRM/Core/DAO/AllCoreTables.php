@@ -4,7 +4,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,9 +29,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Core_DAO_AllCoreTables {
 
@@ -39,6 +37,11 @@ class CRM_Core_DAO_AllCoreTables {
   private static $daoToClass = NULL;
   private static $entityTypes = NULL;
 
+  /**
+   * Initialise.
+   *
+   * @param bool $fresh
+   */
   public static function init($fresh = FALSE) {
     static $init = FALSE;
     if ($init && !$fresh) {
@@ -68,6 +71,12 @@ class CRM_Core_DAO_AllCoreTables {
 
   /**
    * (Quasi-Private) Do not call externally (except for unit-testing)
+   *
+   * @param string $daoName
+   * @param string $className
+   * @param string $tableName
+   * @param string $fields_callback
+   * @param string $links_callback
    */
   public static function registerEntityType($daoName, $className, $tableName, $fields_callback = NULL, $links_callback = NULL) {
     self::$daoToClass[$daoName] = $className;
@@ -128,11 +137,20 @@ class CRM_Core_DAO_AllCoreTables {
     return FALSE !== array_search($tableName, self::tables());
   }
 
+  /**
+   * Get the DAO for the class.
+   *
+   * @param string $className
+   *
+   * @return string
+   */
   public static function getCanonicalClassName($className) {
     return str_replace('_BAO_', '_DAO_', $className);
   }
 
   /**
+   * Get a list of all DAO classes.
+   *
    * @return array
    *   List of class names.
    */
@@ -140,7 +158,18 @@ class CRM_Core_DAO_AllCoreTables {
     return array_values(self::daoToClass());
   }
 
+  /**
+   * Get the classname for the table.
+   *
+   * @param string $tableName
+   * @return string
+   */
   public static function getClassForTable($tableName) {
+    //CRM-19677: on multilingual setup, trim locale from $tableName to fetch class name
+    if (CRM_Core_I18n::isMultilingual()) {
+      global $dbLocale;
+      $tableName = str_replace($dbLocale, '', $tableName);
+    }
     return CRM_Utils_Array::value($tableName, self::tables());
   }
 
@@ -177,6 +206,11 @@ class CRM_Core_DAO_AllCoreTables {
       self::tables());
   }
 
+  /**
+   * Reinitialise cache.
+   *
+   * @param bool $fresh
+   */
   public static function reinitializeCache($fresh = FALSE) {
     self::init($fresh);
   }
@@ -201,11 +235,12 @@ class CRM_Core_DAO_AllCoreTables {
       $exports = array();
       $fields = $dao::fields();
 
-      foreach($fields as $name => $field) {
+      foreach ($fields as $name => $field) {
         if (CRM_Utils_Array::value('export', $field)) {
           if ($prefix) {
             $exports[$labelName] = & $fields[$name];
-          } else {
+          }
+          else {
             $exports[$name] = & $fields[$name];
           }
         }
@@ -240,11 +275,12 @@ class CRM_Core_DAO_AllCoreTables {
       $imports = array();
       $fields = $dao::fields();
 
-      foreach($fields as $name => $field) {
+      foreach ($fields as $name => $field) {
         if (CRM_Utils_Array::value('import', $field)) {
           if ($prefix) {
             $imports[$labelName] = & $fields[$name];
-          } else {
+          }
+          else {
             $imports[$name] = & $fields[$name];
           }
         }

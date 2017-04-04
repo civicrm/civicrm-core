@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -154,6 +154,9 @@ class CRM_Contact_Form_DedupeRules extends CRM_Admin_Form {
         $fieldSelected = TRUE;
         break;
       }
+    }
+    if (empty($fields['threshold'])) {
+      $errors['threshold'] = ts('Threshold weight cannot be empty or zero.');
     }
 
     if (!$fieldSelected) {

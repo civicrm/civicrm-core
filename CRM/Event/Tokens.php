@@ -4,7 +4,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -44,30 +44,29 @@ class CRM_Event_Tokens extends \Civi\Token\AbstractTokenSubscriber {
    * Class constructor.
    */
   public function __construct() {
-    parent::__construct('event', array(
-      'event_type' => ts('Event Type'),
-      'title' => ts('Event Title'),
-      'event_id' => ts('Event ID'),
-      'start_date' => ts('Event Start Date'),
-      'end_date' => ts('Event End Date'),
-      'summary' => ts('Event Summary'),
-      'description' => ts('Event Description'),
-      'location' => ts('Event Location'),
-      'info_url' => ts('Event Info URL'),
-      'registration_url' => ts('Event Registration URL'),
-      'fee_amount' => ts('Event Fee'),
-      'contact_email' => ts('Event Contact (Email)'),
-      'contact_phone' => ts('Event Contact (Phone)'),
-      'balance' => ts('Event Balance'),
+    parent::__construct('event', array_merge(
+      array(
+        'event_type' => ts('Event Type'),
+        'title' => ts('Event Title'),
+        'event_id' => ts('Event ID'),
+        'start_date' => ts('Event Start Date'),
+        'end_date' => ts('Event End Date'),
+        'summary' => ts('Event Summary'),
+        'description' => ts('Event Description'),
+        'location' => ts('Event Location'),
+        'info_url' => ts('Event Info URL'),
+        'registration_url' => ts('Event Registration URL'),
+        'fee_amount' => ts('Event Fee'),
+        'contact_email' => ts('Event Contact (Email)'),
+        'contact_phone' => ts('Event Contact (Phone)'),
+        'balance' => ts('Event Balance'),
+      ),
+      $this->getCustomTokens('Event')
     ));
   }
 
   /**
-   * Check something about being active.
-   *
-   * @param \Civi\Token\TokenProcessor $processor
-   *
-   * @return bool
+   * @inheritDoc
    */
   public function checkActive(\Civi\Token\TokenProcessor $processor) {
     // Extracted from scheduled-reminders code. See the class description.
@@ -76,6 +75,11 @@ class CRM_Event_Tokens extends \Civi\Token\AbstractTokenSubscriber {
       && $processor->context['actionMapping']->getEntity() === 'civicrm_participant';
   }
 
+  /**
+   * Alter action schedule query.
+   *
+   * @param \Civi\ActionSchedule\Event\MailingQueryEvent $e
+   */
   public function alterActionScheduleQuery(\Civi\ActionSchedule\Event\MailingQueryEvent $e) {
     if ($e->mapping->getEntity() !== 'civicrm_participant') {
       return;
@@ -95,17 +99,7 @@ LEFT JOIN civicrm_phone phone ON phone.id = lb.phone_id
   }
 
   /**
-   * Evaluate the content of a single token.
-   *
-   * @param \Civi\Token\TokenRow $row
-   *   The record for which we want token values.
-   * @param string $entity
-   * @param string $field
-   *   The name of the token field.
-   * @param mixed $prefetch
-   *   Any data that was returned by the prefetch().
-   *
-   * @return mixed
+   * @inheritDoc
    */
   public function evaluateToken(\Civi\Token\TokenRow $row, $entity, $field, $prefetch = NULL) {
     $actionSearchResult = $row->context['actionSearchResult'];
@@ -147,6 +141,9 @@ LEFT JOIN civicrm_phone phone ON phone.id = lb.phone_id
     }
     elseif (isset($actionSearchResult->$field)) {
       $row->tokens($entity, $field, $actionSearchResult->$field);
+    }
+    elseif ($cfID = \CRM_Core_BAO_CustomField::getKeyID($field)) {
+      $row->customToken($entity, $cfID, $actionSearchResult->entity_id);
     }
     else {
       $row->tokens($entity, $field, '');

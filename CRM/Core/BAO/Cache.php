@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -146,19 +146,19 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
 
     $table = self::getTableName();
     $where = self::whereCache($group, $path, $componentID);
-    $id = CRM_Core_DAO::singleValueQuery("SELECT id FROM $table WHERE $where");
+    $dataExists = CRM_Core_DAO::singleValueQuery("SELECT COUNT(*) FROM $table WHERE {$where}");
     $now = date('Y-m-d H:i:s'); // FIXME - Use SQL NOW() or CRM_Utils_Time?
     $dataSerialized = serialize($data);
 
     // This table has a wonky index, so we cannot use REPLACE or
     // "INSERT ... ON DUPE". Instead, use SELECT+(INSERT|UPDATE).
-    if ($id) {
-      $sql = "UPDATE $table SET data = %1, created_date = %2 WHERE id = %3";
-      $dao = CRM_Core_DAO::executeQuery($sql, array(
+    if ($dataExists) {
+      $sql = "UPDATE $table SET data = %1, created_date = %2 WHERE {$where}";
+      $args = array(
         1 => array($dataSerialized, 'String'),
         2 => array($now, 'String'),
-        3 => array($id, 'Int'),
-      ));
+      );
+      $dao = CRM_Core_DAO::executeQuery($sql, $args, TRUE, NULL, FALSE, FALSE);
     }
     else {
       $insert = CRM_Utils_SQL_Insert::into($table)
@@ -169,7 +169,7 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
           'data' => $dataSerialized,
           'created_date' => $now,
         ));
-      $dao = CRM_Core_DAO::executeQuery($insert->toSQL());
+      $dao = CRM_Core_DAO::executeQuery($insert->toSQL(), array(), TRUE, NULL, FALSE, FALSE);
     }
 
     $lock->release();

@@ -25,7 +25,8 @@ function option_value_getsingle_example() {
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
     return array(
-      'error' => $errorMessage,
+      'is_error' => 1,
+      'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
     );
@@ -47,6 +48,7 @@ function option_value_getsingle_expectedresult() {
     'option_group_id' => '1',
     'label' => 'SMS',
     'value' => '4',
+    'name' => 'SMS',
     'filter' => 0,
     'weight' => '4',
     'is_optgroup' => 0,

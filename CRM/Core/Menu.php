@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
  * This file contains the various menus of the CiviCRM module
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 require_once 'CRM/Core/I18n.php';
@@ -624,9 +624,11 @@ class CRM_Core_Menu {
   }
 
   /**
-   * @param $path
+   * @param $path string
+   *   Path of menu item to retrieve.
    *
-   * @return null
+   * @return array
+   *   Menu entry array.
    */
   public static function get($path) {
     // return null if menu rebuild

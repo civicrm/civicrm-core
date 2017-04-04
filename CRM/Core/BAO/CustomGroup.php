@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -657,10 +657,13 @@ ORDER BY civicrm_custom_group.weight,
     }
 
     $contactTypes = CRM_Contact_BAO_ContactType::basicTypeInfo(TRUE);
+    $contactTypes = array_merge($contactTypes, array('Event' => 1));
+
     if ($entityType != 'Contact' && !array_key_exists($entityType, $contactTypes)) {
       throw new CRM_Core_Exception('Invalid Entity Filter');
     }
     $subTypes = CRM_Contact_BAO_ContactType::subTypeInfo($entityType, TRUE);
+    $subTypes = array_merge($subTypes, CRM_Event_PseudoConstant::eventType());
     if (!array_key_exists($subType, $subTypes)) {
       throw new CRM_Core_Exception('Invalid Filter');
     }
@@ -1881,12 +1884,6 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
       // add field information
       foreach ($value['fields'] as $k => $properties) {
         $properties['element_name'] = "custom_{$k}_-{$groupCount}";
-        if ($value = CRM_Utils_Request::retrieve($properties['element_name'], 'String', $form, FALSE, NULL, 'POST')) {
-          $formValues[$properties['element_name']] = $value;
-        }
-        elseif (isset($submittedValues[$properties['element_name']])) {
-          $properties['element_value'] = $submittedValues[$properties['element_name']];
-        }
         if (isset($properties['customValue']) &&
           !CRM_Utils_System::isNull($properties['customValue']) &&
           !isset($properties['element_value'])
@@ -1902,6 +1899,12 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
               $properties['element_value'] = $properties['customValue'][$groupCount]['data'];
             }
           }
+        }
+        if ($value = CRM_Utils_Request::retrieve($properties['element_name'], 'String', $form, FALSE, NULL, 'POST')) {
+          $formValues[$properties['element_name']] = $value;
+        }
+        elseif (isset($submittedValues[$properties['element_name']])) {
+          $properties['element_value'] = $submittedValues[$properties['element_name']];
         }
         unset($properties['customValue']);
         $formattedGroupTree[$key]['fields'][$k] = $properties;
@@ -1970,6 +1973,13 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
               'field_value' => CRM_Core_BAO_CustomField::displayValue($values['data'], $properties['id'], $entityId),
               'options_per_line' => CRM_Utils_Array::value('options_per_line', $properties),
             );
+            // editable = whether this set contains any non-read-only fields
+            if (!isset($details[$groupID][$values['id']]['editable'])) {
+              $details[$groupID][$values['id']]['editable'] = FALSE;
+            }
+            if (empty($properties['is_view'])) {
+              $details[$groupID][$values['id']]['editable'] = TRUE;
+            }
             // also return contact reference contact id if user has view all or edit all contacts perm
             if ((CRM_Core_Permission::check('view all contacts') ||
                 CRM_Core_Permission::check('edit all contacts'))
@@ -2172,6 +2182,7 @@ SELECT  civicrm_custom_group.id as groupID, civicrm_custom_group.title as groupT
     $multipleGroup = array();
     $dao = new CRM_Core_DAO_CustomGroup();
     $dao->is_multiple = 1;
+    $dao->is_active = 1;
     $dao->find();
     while ($dao->fetch()) {
       $multipleGroup[$dao->id] = $dao->title;

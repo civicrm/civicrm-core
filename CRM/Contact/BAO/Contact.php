@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
 
@@ -785,6 +785,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
    *   Whether to actually restore, not delete.
    * @param bool $skipUndelete
    *   Whether to force contact delete or not.
+   * @param bool $checkPermissions
    *
    * @return bool
    *   Was contact deleted?
@@ -2330,10 +2331,10 @@ ORDER BY civicrm_email.is_primary DESC";
    * @param string $ctype
    *   Contact type.
    *
-   * @return object
+   * @return object|null
    *   $dao contact details
    */
-  public static function &matchContactOnEmail($mail, $ctype = NULL) {
+  public static function matchContactOnEmail($mail, $ctype = NULL) {
     $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
     $mail = $strtolower(trim($mail));
     $query = "
@@ -2370,7 +2371,7 @@ WHERE      civicrm_email.email = %1 AND civicrm_contact.is_deleted=0";
     if ($dao->fetch()) {
       return $dao;
     }
-    return CRM_Core_DAO::$_nullObject;
+    return NULL;
   }
 
   /**
@@ -2381,10 +2382,10 @@ WHERE      civicrm_email.email = %1 AND civicrm_contact.is_deleted=0";
    * @param string $ctype
    *   Contact type.
    *
-   * @return object
+   * @return object|null
    *   $dao contact details
    */
-  public static function &matchContactOnOpenId($openId, $ctype = NULL) {
+  public static function matchContactOnOpenId($openId, $ctype = NULL) {
     $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
     $openId = $strtolower(trim($openId));
     $query = "
@@ -2409,7 +2410,7 @@ WHERE      civicrm_openid.openid = %1";
     if ($dao->fetch()) {
       return $dao;
     }
-    return CRM_Core_DAO::$_nullObject;
+    return NULL;
   }
 
   /**
@@ -2516,6 +2517,7 @@ AND       civicrm_openid.is_primary = 1";
         ),
       );
 
+      // @todo This can be figured out from metadata & we can avoid the uncached query.
       CRM_Core_OptionGroup::lookupValues($temp, $names, FALSE);
 
       $values['preferred_communication_method'] = $preffComm;
@@ -2539,14 +2541,6 @@ AND       civicrm_openid.is_primary = 1";
           $values['age']['y'] = CRM_Utils_Array::value('years', $age);
           $values['age']['m'] = CRM_Utils_Array::value('months', $age);
         }
-
-        list($values['birth_date']) = CRM_Utils_Date::setDateDefaults($contact->birth_date, 'birth');
-        $values['birth_date_display'] = $contact->birth_date;
-      }
-
-      if ($contact->deceased_date) {
-        list($values['deceased_date']) = CRM_Utils_Date::setDateDefaults($contact->deceased_date, 'birth');
-        $values['deceased_date_display'] = $contact->deceased_date;
       }
 
       $contact->contact_id = $contact->id;
@@ -3012,6 +3006,79 @@ AND       civicrm_openid.is_primary = 1";
       ),
     );
 
+    $menu['otherActions'] = array(
+      'print' => array(
+        'title' => ts('Print Summary'),
+        'description' => ts('Printer-friendly view of this page.'),
+        'weight' => 5,
+        'ref' => 'crm-contact-print',
+        'key' => 'print',
+        'tab' => 'print',
+        'href' => CRM_Utils_System::url('civicrm/contact/view/print',
+          "reset=1&print=1"
+        ),
+        'class' => 'print',
+        'icon' => 'crm-i fa-print',
+      ),
+      'vcard' => array(
+        'title' => ts('vCard'),
+        'description' => ts('vCard record for this contact.'),
+        'weight' => 10,
+        'ref' => 'crm-contact-vcard',
+        'key' => 'vcard',
+        'tab' => 'vcard',
+        'href' => CRM_Utils_System::url('civicrm/contact/view/vcard',
+          "reset=1"
+        ),
+        'class' => 'vcard',
+        'icon' => 'crm-i fa-list-alt',
+      ),
+    );
+
+    if (CRM_Core_Permission::check('access Contact Dashboard')) {
+      $menu['otherActions']['dashboard'] = array(
+        'title' => ts('Contact Dashboard'),
+        'description' => ts('Contact Dashboard'),
+        'weight' => 15,
+        'ref' => 'crm-contact-dashboard',
+        'key' => 'dashboard',
+        'tab' => 'dashboard',
+        'class' => 'dashboard',
+        // NOTE: As an alternative you can also build url on CMS specific way
+        //  as CRM_Core_Config::singleton()->userSystem->getUserRecordUrl($contactId)
+        'href' => CRM_Utils_System::url('civicrm/user', "reset=1&id={$contactId}"),
+        'icon' => 'crm-i fa-tachometer',
+      );
+    }
+
+    $uid = CRM_Core_BAO_UFMatch::getUFId($contactId);
+    if ($uid) {
+      $menu['otherActions']['user-record'] = array(
+        'title' => ts('User Record'),
+        'description' => ts('User Record'),
+        'weight' => 20,
+        'ref' => 'crm-contact-user-record',
+        'key' => 'user-record',
+        'tab' => 'user-record',
+        'class' => 'user-record',
+        'href' => CRM_Core_Config::singleton()->userSystem->getUserRecordUrl($contactId),
+        'icon' => 'crm-i fa-user',
+      );
+    }
+    elseif (CRM_Core_Config::singleton()->userSystem->checkPermissionAddUser()) {
+      $menu['otherActions']['user-add'] = array(
+        'title' => ts('Create User Record'),
+        'description' => ts('Create User Record'),
+        'weight' => 25,
+        'ref' => 'crm-contact-user-add',
+        'key' => 'user-add',
+        'tab' => 'user-add',
+        'class' => 'user-add',
+        'href' => CRM_Utils_System::url('civicrm/contact/view/useradd', 'reset=1&action=add&cid=' . $contactId),
+        'icon' => 'crm-i fa-user-plus',
+      );
+    }
+
     CRM_Utils_Hook::summaryActions($menu, $contactId);
     //1. check for component is active.
     //2. check for user permissions.
@@ -3029,87 +3096,124 @@ AND       civicrm_openid.is_primary = 1";
     );
     $corePermission = CRM_Core_Permission::getPermission();
 
-    $config = CRM_Core_Config::singleton();
-
     $contextMenu = array();
     foreach ($menu as $key => $values) {
-      $componentName = CRM_Utils_Array::value('component', $values);
+      if ($key != 'otherActions') {
 
-      // if component action - make sure component is enable.
-      if ($componentName && !in_array($componentName, $config->enableComponents)) {
-        continue;
-      }
-
-      // make sure user has all required permissions.
-      $hasAllPermissions = FALSE;
-
-      $permissions = CRM_Utils_Array::value('permissions', $values);
-      if (!is_array($permissions) || empty($permissions)) {
-        $hasAllPermissions = TRUE;
-      }
-
-      // iterate for required permissions in given permissions array.
-      if (!$hasAllPermissions) {
-        $hasPermissions = 0;
-        foreach ($permissions as $permission) {
-          if (CRM_Core_Permission::check($permission)) {
-            $hasPermissions++;
-          }
+        // user does not have necessary permissions.
+        if (!self::checkUserMenuPermissions($aclPermissionedTasks, $corePermission, $values)) {
+          continue;
+        }
+        // build directly accessible action menu.
+        if (in_array($values['ref'], array(
+          'view-contact',
+          'edit-contact',
+        ))) {
+          $contextMenu['primaryActions'][$key] = array(
+            'title' => $values['title'],
+            'ref' => $values['ref'],
+            'class' => CRM_Utils_Array::value('class', $values),
+            'key' => $values['key'],
+          );
+          continue;
         }
 
-        if (count($permissions) == $hasPermissions) {
-          $hasAllPermissions = TRUE;
-        }
-
-        // if still user does not have required permissions, check acl.
-        if (!$hasAllPermissions && $values['ref'] != 'delete-contact') {
-          if (in_array($values['ref'], $aclPermissionedTasks) &&
-            $corePermission == CRM_Core_Permission::EDIT
-          ) {
-            $hasAllPermissions = TRUE;
-          }
-          elseif (in_array($values['ref'], array(
-            'new-email',
-          ))) {
-            // grant permissions for these tasks.
-            $hasAllPermissions = TRUE;
-          }
-        }
-      }
-
-      // user does not have necessary permissions.
-      if (!$hasAllPermissions) {
-        continue;
-      }
-
-      // build directly accessible action menu.
-      if (in_array($values['ref'], array(
-        'view-contact',
-        'edit-contact',
-      ))) {
-        $contextMenu['primaryActions'][$key] = array(
+        // finally get menu item for -more- action widget.
+        $contextMenu['moreActions'][$values['weight']] = array(
           'title' => $values['title'],
           'ref' => $values['ref'],
+          'href' => CRM_Utils_Array::value('href', $values),
+          'tab' => CRM_Utils_Array::value('tab', $values),
           'class' => CRM_Utils_Array::value('class', $values),
           'key' => $values['key'],
         );
-        continue;
       }
+      else {
+        foreach ($values as $value) {
+          // user does not have necessary permissions.
+          if (!self::checkUserMenuPermissions($aclPermissionedTasks, $corePermission, $value)) {
+            continue;
+          }
 
-      // finally get menu item for -more- action widget.
-      $contextMenu['moreActions'][$values['weight']] = array(
-        'title' => $values['title'],
-        'ref' => $values['ref'],
-        'href' => CRM_Utils_Array::value('href', $values),
-        'tab' => CRM_Utils_Array::value('tab', $values),
-        'class' => CRM_Utils_Array::value('class', $values),
-        'key' => $values['key'],
-      );
+          // finally get menu item for -more- action widget.
+          $contextMenu['otherActions'][$value['weight']] = array(
+            'title' => $value['title'],
+            'ref' => $value['ref'],
+            'href' => CRM_Utils_Array::value('href', $value),
+            'tab' => CRM_Utils_Array::value('tab', $value),
+            'class' => CRM_Utils_Array::value('class', $value),
+            'icon' => CRM_Utils_Array::value('icon', $value),
+            'key' => $value['key'],
+          );
+        }
+      }
     }
 
     ksort($contextMenu['moreActions']);
+    ksort($contextMenu['otherActions']);
 
     return $contextMenu;
+  }
+
+  /**
+   * Check if user has permissions to access items in action menu.
+   *
+   * @param array $aclPermissionedTasks
+   *   Array containing ACL related tasks.
+   * @param string $corePermission
+   *   The permission of the user (edit or view or null).
+   * @param array $menuOptions
+   *   Array containing params of the menu (title, href, etc).
+   *
+   * @return bool
+   *   TRUE if user has all permissions, FALSE if otherwise.
+   */
+  public static function checkUserMenuPermissions($aclPermissionedTasks, $corePermission, $menuOptions) {
+    $componentName = CRM_Utils_Array::value('component', $menuOptions);
+
+    // if component action - make sure component is enable.
+    if ($componentName && !in_array($componentName, CRM_Core_Config::singleton()->enableComponents)) {
+      return FALSE;
+    }
+
+    // make sure user has all required permissions.
+    $hasAllPermissions = FALSE;
+
+    $permissions = CRM_Utils_Array::value('permissions', $menuOptions);
+    if (!is_array($permissions) || empty($permissions)) {
+      $hasAllPermissions = TRUE;
+    }
+
+    // iterate for required permissions in given permissions array.
+    if (!$hasAllPermissions) {
+      $hasPermissions = 0;
+      foreach ($permissions as $permission) {
+        if (CRM_Core_Permission::check($permission)) {
+          $hasPermissions++;
+        }
+      }
+
+      if (count($permissions) == $hasPermissions) {
+        $hasAllPermissions = TRUE;
+      }
+
+      // if still user does not have required permissions, check acl.
+      if (!$hasAllPermissions && $menuOptions['ref'] != 'delete-contact') {
+        if (in_array($values['ref'], $aclPermissionedTasks) &&
+            $corePermission == CRM_Core_Permission::EDIT
+            ) {
+          $hasAllPermissions = TRUE;
+        }
+        elseif (in_array($menuOptions['ref'], array(
+          'new-email',
+        ))) {
+          // grant permissions for these tasks.
+          $hasAllPermissions = TRUE;
+        }
+      }
+    }
+
+    return $hasAllPermissions;
   }
 
   /**
@@ -3377,8 +3481,8 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
    * Ensures that is_primary gets assigned to another object if available
    * Also calls pre/post hooks
    *
-   * @var object $type
-   * @var int $id
+   * @param string $type
+   * @param int $id
    * @return bool
    */
   public static function deleteObjectWithPrimary($type, $id) {
@@ -3430,6 +3534,55 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
     );
     CRM_Utils_Hook::selectWhereClause($this, $clauses);
     return $clauses;
+  }
+
+  /**
+   * Get any existing duplicate contacts based on the input parameters.
+   *
+   * @param array $input
+   *   Input parameters to be matched.
+   * @param string $contactType
+   * @param string $rule
+   *  - Supervised
+   *  - Unsupervised
+   * @param $excludedContactIDs
+   *   An array of ids not to be included in the results.
+   * @param bool $checkPermissions
+   * @param int $ruleGroupID
+   *   ID of the rule group to be used if an override is desirable.
+   *
+   * @return array
+   */
+  public static function getDuplicateContacts($input, $contactType, $rule = 'Unsupervised', $excludedContactIDs = array(), $checkPermissions = TRUE, $ruleGroupID = NULL) {
+    $dedupeParams = CRM_Dedupe_Finder::formatParams($input, $contactType);
+    $dedupeParams['check_permission'] = $checkPermissions;
+    $ids = CRM_Dedupe_Finder::dupesByParams($dedupeParams, $contactType, $rule, $excludedContactIDs, $ruleGroupID);
+    return $ids;
+  }
+
+  /**
+   * Get the first duplicate contacts based on the input parameters.
+   *
+   * @param array $input
+   *   Input parameters to be matched.
+   * @param string $contactType
+   * @param string $rule
+   *  - Supervised
+   *  - Unsupervised
+   * @param $excludedContactIDs
+   *   An array of ids not to be included in the results.
+   * @param bool $checkPermissions
+   * @param int $ruleGroupID
+   *   ID of the rule group to be used if an override is desirable.
+   *
+   * @return int|NULL
+   */
+  public static function getFirstDuplicateContact($input, $contactType, $rule = 'Unsupervised', $excludedContactIDs = array(), $checkPermissions = TRUE, $ruleGroupID = NULL) {
+    $ids = self::getDuplicateContacts($input, $contactType, $rule, $excludedContactIDs, $checkPermissions, $ruleGroupID);
+    if (empty($ids)) {
+      return NULL;
+    }
+    return $ids[0];
   }
 
 }

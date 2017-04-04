@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -31,9 +31,7 @@
  * @package CiviCRM_APIv3
  * @subpackage API_Job
  *
- * @copyright CiviCRM LLC (c) 2004-2016
- * @version $Id: Job.php 30879 2010-11-22 15:45:55Z shot $
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -55,6 +53,9 @@ class api_v3_JobTest extends CiviUnitTestCase {
    */
   public $membershipTypeID;
 
+  /**
+   * Set up for tests.
+   */
   public function setUp() {
     parent::setUp();
     $this->membershipTypeID = $this->membershipTypeCreate(array('name' => 'General'));
@@ -121,21 +122,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check with empty array.
-   */
-  public function testDeleteEmpty() {
-    $params = array();
-    $result = $this->callAPIFailure('job', 'delete', $params);
-  }
-
-  /**
-   * Check with No array.
-   */
-  public function testDeleteParamsNotArray() {
-    $result = $this->callAPIFailure('job', 'delete', 'string');
-  }
-
-  /**
    * Check if required fields are not passed.
    */
   public function testDeleteWithoutRequired() {
@@ -156,7 +142,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $params = array(
       'id' => 'abcd',
     );
-    $result = $this->callAPIFailure('job', 'delete', $params);
+    $this->callAPIFailure('job', 'delete', $params);
   }
 
   /**
@@ -165,7 +151,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
   public function testDelete() {
     $createResult = $this->callAPISuccess('job', 'create', $this->_params);
     $params = array('id' => $createResult['id']);
-    $result = $this->callAPIAndDocument('job', 'delete', $params, __FUNCTION__, __FILE__);
+    $this->callAPIAndDocument('job', 'delete', $params, __FUNCTION__, __FILE__);
     $this->assertAPIDeleted($this->_entity, $createResult['id']);
   }
 
@@ -184,7 +170,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * Note that this test is about tesing the metadata / calling of the function & doesn't test the success of the called function
    */
   public function testCallUpdateGreetingSuccess() {
-    $result = $this->callAPISuccess($this->_entity, 'update_greeting', array(
+    $this->callAPISuccess($this->_entity, 'update_greeting', array(
       'gt' => 'postal_greeting',
       'ct' => 'Individual',
     ));
@@ -193,7 +179,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
   public function testCallUpdateGreetingCommaSeparatedParamsSuccess() {
     $gt = 'postal_greeting,email_greeting,addressee';
     $ct = 'Individual,Household';
-    $result = $this->callAPISuccess($this->_entity, 'update_greeting', array('gt' => $gt, 'ct' => $ct));
+    $this->callAPISuccess($this->_entity, 'update_greeting', array('gt' => $gt, 'ct' => $ct));
   }
 
   /**
@@ -213,7 +199,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
     for ($i = 1; $i <= $createTotal; $i++) {
       $contactID = $this->individualCreate();
       $groupID = $this->groupCreate(array('name' => $i, 'title' => $i));
-      $result = $this->callAPISuccess('action_schedule', 'create', array(
+      $this->callAPISuccess('action_schedule', 'create', array(
         'title' => " job $i",
         'subject' => "job $i",
         'entity_value' => $membershipTypeID,
@@ -231,7 +217,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
         'group_id' => $groupID,
       ));
     }
-    $result = $this->callAPISuccess('job', 'send_reminder', array());
+    $this->callAPISuccess('job', 'send_reminder', array());
     $successfulCronCount = CRM_Core_DAO::singleValueQuery("SELECT count(*) FROM civicrm_action_log");
     $this->assertEquals($successfulCronCount, $createTotal);
   }

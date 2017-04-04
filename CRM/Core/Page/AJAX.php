@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
  */
@@ -214,6 +214,16 @@ class CRM_Core_Page_AJAX {
     CRM_Utils_System::setHttpHeader('Cache-Control', "max-age=$ttl, public");
   }
 
+  /**
+   * Set defaults for sort and pager.
+   *
+   * @param int $defaultOffset
+   * @param int $defaultRowCount
+   * @param string $defaultSort
+   * @param string $defaultsortOrder
+   *
+   * @return array
+   */
   public static function defaultSortAndPagerParams($defaultOffset = 0, $defaultRowCount = 25, $defaultSort = NULL, $defaultsortOrder = 'asc') {
     $params = array(
       '_raw_values' => array(),
@@ -246,6 +256,14 @@ class CRM_Core_Page_AJAX {
     return $params;
   }
 
+  /**
+   * Validate ajax input parameters.
+   *
+   * @param array $requiredParams
+   * @param array $optionalParams
+   *
+   * @return array
+   */
   public static function validateParams($requiredParams = array(), $optionalParams = array()) {
     $params = array();
 

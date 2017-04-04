@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 require_once 'Mail/mime.php';
 
@@ -538,23 +538,28 @@ WHERE  mailing_id = %1
       $params = array(1 => array($mailing_id, 'Integer'));
       CRM_Core_DAO::executeQuery($sql, $params);
 
+      $selectClause = array('%1', 'i.contact_id', "i.{$tempColumn}");
+      $select = "SELECT " . implode(', ', $selectClause);
       // CRM-3975
       $groupBy = $groupJoin = '';
+      $orderBy = "i.contact_id, i.{$tempColumn}";
       if ($dedupeEmail) {
+        $orderBy = "MIN(i.contact_id), MIN(i.{$tempColumn})";
         $groupJoin = " INNER JOIN civicrm_email e ON e.id = i.email_id";
         $groupBy = " GROUP BY e.email ";
+        $select = CRM_Contact_BAO_Query::appendAnyValueToSelect($selectClause, 'e.email');
       }
 
       $sql = "
 INSERT INTO civicrm_mailing_recipients ( mailing_id, contact_id, {$tempColumn} )
-SELECT %1, i.contact_id, i.{$tempColumn}
+{$select}
 FROM       civicrm_contact contact_a
 INNER JOIN I_$job_id i ON contact_a.id = i.contact_id
            $groupJoin
            {$aclFrom}
            {$aclWhere}
            $groupBy
-ORDER BY   i.contact_id, i.{$tempColumn}
+ORDER BY   {$orderBy}
 ";
 
       CRM_Core_DAO::executeQuery($sql, $params);
@@ -758,7 +763,7 @@ ORDER BY   i.contact_id, i.{$tempColumn}
    * @return array
    *   reference to an assoc array
    */
-  private function &getTemplates() {
+  public function getTemplates() {
     if (!$this->templates) {
       $this->getHeaderFooter();
       $this->templates = array();
@@ -921,7 +926,7 @@ ORDER BY   i.contact_id, i.{$tempColumn}
    * @return void
    */
   public function getTestRecipients($testParams) {
-    if (array_key_exists($testParams['test_group'], CRM_Core_PseudoConstant::group())) {
+    if (!empty($testParams['test_group']) && array_key_exists($testParams['test_group'], CRM_Core_PseudoConstant::group())) {
       $contacts = civicrm_api('contact', 'get', array(
           'version' => 3,
           'group' => $testParams['test_group'],
@@ -1066,7 +1071,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    * @return array
    *   array ref that hold array refs to the verp info, urls, and headers
    */
-  private function getVerpAndUrlsAndHeaders($job_id, $event_queue_id, $hash, $email, $isForward = FALSE) {
+  public function getVerpAndUrlsAndHeaders($job_id, $event_queue_id, $hash, $email, $isForward = FALSE) {
     $config = CRM_Core_Config::singleton();
 
     /**
@@ -1088,6 +1093,10 @@ ORDER BY   civicrm_email.is_bulkmail DESC
 
     $localpart = CRM_Core_BAO_MailSettings::defaultLocalpart();
     $emailDomain = CRM_Core_BAO_MailSettings::defaultDomain();
+    // Make sure the user configured the site correctly, otherwise you just get "Could not identify any recipients. Perhaps the group is empty?" from the mailing UI
+    if (empty($emailDomain)) {
+      CRM_Core_Error::debug_log_message('Error setting verp parameters, defaultDomain is NULL.  Did you configure the bounce processing account for this domain?');
+    }
 
     foreach ($verpTokens as $key => $value) {
       $verp[$key] = implode($config->verpSeparator,
@@ -1322,11 +1331,10 @@ ORDER BY   civicrm_email.is_bulkmail DESC
 
     $mailParams['attachments'] = $attachments;
 
-    $mailingSubject = CRM_Utils_Array::value('subject', $pEmails);
-    if (is_array($mailingSubject)) {
-      $mailingSubject = implode('', $mailingSubject);
+    $mailParams['Subject'] = CRM_Utils_Array::value('subject', $pEmails);
+    if (is_array($mailParams['Subject'])) {
+      $mailParams['Subject'] = implode('', $mailParams['Subject']);
     }
-    $mailParams['Subject'] = $mailingSubject;
 
     $mailParams['toName'] = CRM_Utils_Array::value('display_name',
       $contact
@@ -1395,7 +1403,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
 
     //CRM-5058
     //token replacement of subject
-    $headers['Subject'] = $mailingSubject;
+    $headers['Subject'] = $mailParams['Subject'];
 
     CRM_Utils_Mail::setMimeParams($message);
     $headers = $message->headers($headers);
@@ -1443,6 +1451,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    *
    * @param array $token_a
    * @param bool $html
+   *   Whether to encode the token result for use in HTML email
    * @param array $contact
    * @param string $verp
    * @param array $urls
@@ -1460,7 +1469,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     if ($type == 'embedded_url') {
       $embed_data = array();
       foreach ($token as $t) {
-        $embed_data[] = $this->getTokenData($t, $html = FALSE, $contact, $verp, $urls, $event_queue_id);
+        $embed_data[] = $this->getTokenData($t, $html, $contact, $verp, $urls, $event_queue_id);
       }
       $numSlices = count($embed_data);
       $url = '';
@@ -1479,6 +1488,10 @@ ORDER BY   civicrm_email.is_bulkmail DESC
         $url .= '"';
       }
       $data = $url;
+      // CRM-20206 Fix ampersand encoding in plain text emails
+      if (empty($html)) {
+        $data = CRM_Utils_String::unstupifyUrl($data);
+      }
     }
     elseif ($type == 'url') {
       if ($this->url_tracking) {
@@ -3168,10 +3181,11 @@ AND        m.id = %1
   }
 
   /**
-   * Whitelist of possible values for the entity_table field
+   * White-list of possible values for the entity_table field.
+   *
    * @return array
    */
-  public static function mailingGroupEntityTables($context = NULL) {
+  public static function mailingGroupEntityTables() {
     return array(
       CRM_Contact_BAO_Group::getTableName() => 'Group',
       CRM_Mailing_BAO_Mailing::getTableName() => 'Mailing',
@@ -3190,6 +3204,58 @@ AND        m.id = %1
     if ((civicrm_api3('Mailing', 'getvalue', array('id' => $id, 'return' => 'visibility'))) === 'Public Pages') {
       return CRM_Utils_System::url('civicrm/mailing/view', array('id' => $id), $absolute, NULL, TRUE, TRUE);
     }
+  }
+
+  /**
+   * Get a list of template types which can be used as `civicrm_mailing.template_type`.
+   *
+   * @return array
+   *   A list of template-types, keyed numerically. Each defines:
+   *     - name: string, a short symbolic name
+   *     - editorUrl: string, Angular template name
+   *
+   *   Ex: $templateTypes[0] === array('name' => 'mosaico', 'editorUrl' => '~/crmMosaico/editor.html').
+   */
+  public static function getTemplateTypes() {
+    if (!isset(Civi::$statics[__CLASS__]['templateTypes'])) {
+      $types = array();
+      $types[] = array(
+        'name' => 'traditional',
+        'editorUrl' => CRM_Mailing_Info::workflowEnabled() ? '~/crmMailing/EditMailingCtrl/workflow.html' : '~/crmMailing/EditMailingCtrl/2step.html',
+        'weight' => 0,
+      );
+
+      CRM_Utils_Hook::mailingTemplateTypes($types);
+
+      $defaults = array('weight' => 0);
+      foreach (array_keys($types) as $typeName) {
+        $types[$typeName] = array_merge($defaults, $types[$typeName]);
+      }
+      usort($types, function ($a, $b) {
+        if ($a['weight'] === $b['weight']) {
+          return 0;
+        }
+        return $a['weight'] < $b['weight'] ? -1 : 1;
+      });
+
+      Civi::$statics[__CLASS__]['templateTypes'] = $types;
+    }
+
+    return Civi::$statics[__CLASS__]['templateTypes'];
+  }
+
+  /**
+   * Get a list of template types.
+   *
+   * @return array
+   *   Array(string $name => string $label).
+   */
+  public static function getTemplateTypeNames() {
+    $r = array();
+    foreach (self::getTemplateTypes() as $type) {
+      $r[$type['name']] = $type['name'];
+    }
+    return $r;
   }
 
 }

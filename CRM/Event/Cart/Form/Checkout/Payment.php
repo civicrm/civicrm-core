@@ -329,6 +329,8 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
   }
 
   /**
+   * Get default from address.
+   *
    * @return mixed
    */
   public function getDefaultFrom() {
@@ -337,7 +339,9 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
   }
 
   /**
-   * @param $events_in_cart
+   * Send email receipt.
+   *
+   * @param array $events_in_cart
    * @param array $params
    */
   public function emailReceipt($events_in_cart, $params) {
@@ -406,9 +410,11 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
   }
 
   /**
-   * @param $fields
-   * @param $files
-   * @param $self
+   * Apply form rules.
+   *
+   * @param array $fields
+   * @param array $files
+   * @param CRM_Core_Form $self
    *
    * @return array|bool
    */
@@ -426,6 +432,8 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
   }
 
   /**
+   * Validate form.
+   *
    * @todo this should surely go! Test & remove.
    * @return bool
    */
@@ -439,6 +447,9 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
     return parent::validate();
   }
 
+  /**
+   * Pre-process form.
+   */
   public function preProcess() {
     $params = $this->_submitValues;
     $this->is_pay_later = CRM_Utils_Array::value('is_pay_later', $params, FALSE) && !CRM_Utils_Array::value('payment_completed', $params);
@@ -446,6 +457,9 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
     parent::preProcess();
   }
 
+  /**
+   * Post process form.
+   */
   public function postProcess() {
 
     $transaction = new CRM_Core_Transaction();
@@ -580,9 +594,11 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
   }
 
   /**
+   * Make payment.
+   *
    * @param array $params
    *
-   * @return array|void
+   * @return array
    * @throws Exception
    */
   public function make_payment(&$params) {
@@ -618,9 +634,11 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
   }
 
   /**
-   * @param $mer_participant
+   * Record contribution.
+   *
+   * @param CRM_Event_BAO_Participant $mer_participant
    * @param array $params
-   * @param $event
+   * @param CRM_Event_BAO_Event $event
    *
    * @return object
    * @throws Exception
@@ -672,6 +690,9 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
     return $contribution;
   }
 
+  /**
+   * Save data to session.
+   */
   public function saveDataToSession() {
     $session_line_items = array();
     foreach ($this->line_items as $line_item) {
@@ -691,6 +712,8 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
   }
 
   /**
+   * Set form default values.
+   *
    * @return array
    */
   public function setDefaultValues() {
@@ -741,9 +764,14 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
   }
 
   /**
+   * Apply discount.
+   *
    * @param string $discountCode
    * @param array $price_set_amount
-   * @param $cost
+   * @param float $cost
+   * @param int $event_id
+   *
+   * @return bool
    */
   protected function apply_discount($discountCode, &$price_set_amount, &$cost, $event_id) {
     //need better way to determine if cividiscount installed
@@ -752,7 +780,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
     $dao = CRM_Core_DAO::executeQuery($sql, '');
     while ($dao->fetch()) {
       if ($dao->is_active != '1') {
-        return;
+        return FALSE;
       }
     }
     $discounted_priceset_ids = _cividiscount_get_discounted_priceset_ids();

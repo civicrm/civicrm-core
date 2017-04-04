@@ -26,7 +26,8 @@ function line_item_create_example() {
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
     return array(
-      'error' => $errorMessage,
+      'is_error' => 1,
+      'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
     );
@@ -62,7 +63,7 @@ function line_item_create_expectedresult() {
         'participant_count' => '',
         'price_field_value_id' => '1',
         'financial_type_id' => '',
-        'deductible_amount' => '',
+        'non_deductible_amount' => '',
         'tax_amount' => '',
       ),
     ),

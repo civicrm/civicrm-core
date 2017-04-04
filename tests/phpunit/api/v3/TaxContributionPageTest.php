@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
 | CiviCRM version 4.7                                                |
 +--------------------------------------------------------------------+
-| Copyright CiviCRM LLC (c) 2004-2016                                |
+| Copyright CiviCRM LLC (c) 2004-2017                                |
 +--------------------------------------------------------------------+
 | This file is a part of CiviCRM.                                    |
 |                                                                    |
@@ -142,18 +142,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
     $halfFinancialRelation = CRM_Financial_BAO_FinancialTypeAccount::add($financialRelationHalftax);
 
     // Enable component contribute setting
-    $contributeSetting = array(
-      'invoicing' => 1,
-      'invoice_prefix' => 'INV_',
-      'credit_notes_prefix' => 'CN_',
-      'due_date' => 10,
-      'due_date_period' => 'days',
-      'notes' => '',
-      'is_email_pdf' => 1,
-      'tax_term' => 'Sales Tax',
-      'tax_display_settings' => 'Inclusive',
-    );
-    $setInvoiceSettings = Civi::settings()->set('contribution_invoice_settings', $contributeSetting);
+    $setInvoiceSettings = $this->enableTaxAndInvoicing();
 
     // Payment Processor
     $paymentProceParams = array(
@@ -252,7 +241,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
       'contribution_status_id' => 1,
     );
 
-    $contribution = $this->callAPIAndDocument('contribution', 'create', $params, __FUNCTION__, __FILE__);
+    $contribution = $this->callAPISuccess('contribution', 'create', $params);
     $this->_ids['contributionId'] = $contribution['id'];
     $this->assertEquals($contribution['values'][$contribution['id']]['contact_id'], $this->_individualId);
     $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 120.00);
@@ -295,9 +284,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
       ),
     );
 
-    $description = "Create Contribution with Nested Line Items.";
-    $subfile = "CreateWithNestedLineItems";
-    $contribution = $this->callAPIAndDocument('contribution', 'create', $params, __FUNCTION__, __FILE__, $description, $subfile);
+    $contribution = $this->callAPISuccess('contribution', 'create', $params);
 
     $lineItems = $this->callAPISuccess('line_item', 'get', array(
       'entity_id' => $contribution['id'],
@@ -322,7 +309,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
       'source' => 'SSF',
       'contribution_status_id' => 2,
     );
-    $contribution = $this->callAPIAndDocument('contribution', 'create', $params, __FUNCTION__, __FILE__);
+    $contribution = $this->callAPISuccess('contribution', 'create', $params, __FUNCTION__, __FILE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['contact_id'], $this->_individualId);
     $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 120.00);
     $this->assertEquals($contribution['values'][$contribution['id']]['financial_type_id'], $this->financialtypeID);
@@ -348,7 +335,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
       'contribution_status_id' => 2,
     );
 
-    $contribution = $this->callAPIAndDocument('contribution', 'create', $params, __FUNCTION__, __FILE__);
+    $contribution = $this->callAPISuccess('contribution', 'create', $params, __FUNCTION__, __FILE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['contact_id'], $this->_individualId);
     $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 120.00);
     $this->assertEquals($contribution['values'][$contribution['id']]['financial_type_id'], $this->financialtypeID);

@@ -60,17 +60,18 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
 
     $this->_contactID = $this->individualCreate();
     //create activity types
+    $this->test_activity_type_value = 9999;
     $activityTypes = $this->callAPISuccess('option_value', 'create', array(
       'option_group_id' => 2,
       'name' => 'Test activity type',
       'label' => 'Test activity type',
+      'value' => $this->test_activity_type_value,
       'sequential' => 1,
     ));
-    $this->test_activity_type_value = $activityTypes['values'][0]['value'];
     $this->test_activity_type_id = $activityTypes['id'];
     $this->_params = array(
       'source_contact_id' => $this->_contactID,
-      'activity_type_id' => $this->test_activity_type_value,
+      'activity_type_id' => 'Test activity type',
       'subject' => 'test activity type id',
       'activity_date_time' => '2011-06-02 14:36:13',
       'status_id' => 2,
@@ -365,13 +366,40 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test civicrm_activity_create() using example code.
+   * Test get returns target and assignee contact names.
    */
-  public function testActivityCreateExample() {
-    require_once 'api/v3/examples/Activity/Create.php';
-    $result = activity_create_example();
-    $expectedResult = activity_create_expectedresult();
-    $this->assertEquals($result, $expectedResult);
+  public function testActivityReturnTargetAssigneeName() {
+
+    $description = "Demonstrates retrieving activity target & source contact names.";
+    $subfile = "GetTargetandAssigneeName";
+    $target1 = $this->callAPISuccess('Contact', 'create', array('contact_type' => 'Individual', 'first_name' => 'A', 'last_name' => 'Cat'));
+    $target2 = $this->callAPISuccess('Contact', 'create', array('contact_type' => 'Individual', 'first_name' => 'B', 'last_name' => 'Good'));
+    $assignee = $this->callAPISuccess('Contact', 'create', array('contact_type' => 'Individual', 'first_name' => 'C', 'last_name' => 'Shore'));
+    $source = $this->callAPISuccess('Contact', 'create', array('contact_type' => 'Individual', 'first_name' => 'D', 'last_name' => 'Bug'));
+
+    $params = array(
+      'source_contact_id' => $source['id'],
+      'subject' => 'Make-it-Happen Meeting',
+      'activity_date_time' => '20170316',
+      'status_id' => 1,
+      'activity_type_id' => 1,
+      'target_contact_id' => array($target1['id'], $target2['id']),
+      'assignee_contact_id' => $assignee['id'],
+    );
+
+    $result = $this->callAPISuccess('activity', 'create', $params);
+    $result = $this->callAPIAndDocument('activity', 'getsingle', array(
+      'id' => $result['id'],
+      'return' => array('source_contact_name', 'target_contact_name', 'assignee_contact_name', 'subject'),
+    ), __FUNCTION__, __FILE__, $description, $subfile);
+
+    $this->assertEquals($params['subject'], $result['subject']);
+    $this->assertEquals($source['id'], $result['source_contact_id']);
+    $this->assertEquals('D Bug', $result['source_contact_name']);
+    $this->assertEquals('A Cat', $result['target_contact_name'][$target1['id']]);
+    $this->assertEquals('B Good', $result['target_contact_name'][$target2['id']]);
+    $this->assertEquals('C Shore', $result['assignee_contact_name'][$assignee['id']]);
+    $this->assertEquals($assignee['id'], $result['assignee_contact_id'][0]);
   }
 
   /**
@@ -390,6 +418,16 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
 
     $this->customFieldDelete($ids['custom_field_id']);
     $this->customGroupDelete($ids['custom_group_id']);
+  }
+
+  /**
+   * Test civicrm_activity_create() using example code.
+   */
+  public function testActivityCreateExample() {
+    require_once 'api/v3/examples/Activity/Create.php';
+    $result = activity_create_example();
+    $expectedResult = activity_create_expectedresult();
+    $this->assertEquals($result, $expectedResult);
   }
 
   /**
@@ -637,6 +675,89 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
     if ($activityget['count'] > 0) {
       $this->assertNotEquals($contact2, $activityget['values'][$activityget['id']]['target_contact_id'][0]);
     }
+  }
+
+  /**
+   * Test that activity.get api works when filtering on subject.
+   */
+  public function testActivityGetSubjectFilter() {
+    $subject = 'test activity ' . __FUNCTION__ . mt_rand();
+    $params = $this->_params;
+    $params['subject'] = $subject;
+    $activity = $this->callAPISuccess('Activity', 'Create', $params);
+    $activityget = $this->callAPISuccess('activity', 'getsingle', array(
+      'subject' => $subject,
+    ));
+    $this->assertEquals($activityget['subject'], $subject);
+  }
+
+  /**
+   * Test that activity.get api works when filtering on details.
+   */
+  public function testActivityGetDetailsFilter() {
+    $details = 'test activity ' . __FUNCTION__ . mt_rand();
+    $params = $this->_params;
+    $params['details'] = $details;
+    $activity = $this->callAPISuccess('Activity', 'Create', $params);
+    $activityget = $this->callAPISuccess('activity', 'getsingle', array(
+      'details' => $details,
+    ));
+    $this->assertEquals($activityget['details'], $details);
+  }
+
+  /**
+   * Test that activity.get api works when filtering on tag.
+   */
+  public function testActivityGetTagFilter() {
+    $tag = $this->callAPISuccess('Tag', 'create', array('name' => mt_rand(), 'used_for' => 'Activities'));
+    $activity = $this->callAPISuccess('Activity', 'Create', $this->_params);
+    $this->callAPISuccess('EntityTag', 'create', array('entity_table' => 'civicrm_activity', 'tag_id' => $tag['id'], 'entity_id' => $activity['id']));
+    $activityget = $this->callAPISuccess('activity', 'getsingle', array(
+      'tag_id' => $tag['id'],
+    ));
+    $this->assertEquals($activityget['id'], $activity['id']);
+  }
+
+  /**
+   * Return tag info
+   */
+  public function testJoinOnTags() {
+    $tagName = 'act_tag_nm_' . mt_rand();
+    $tagDescription = 'act_tag_ds_' . mt_rand();
+    $tagColor = '#' . substr(md5(mt_rand()), 0, 6);
+    $tag = $this->callAPISuccess('Tag', 'create', array('name' => $tagName, 'color' => $tagColor, 'description' => $tagDescription, 'used_for' => 'Activities'));
+    $activity = $this->callAPISuccess('Activity', 'Create', $this->_params);
+    $this->callAPISuccess('EntityTag', 'create', array('entity_table' => 'civicrm_activity', 'tag_id' => $tag['id'], 'entity_id' => $activity['id']));
+    $activityget = $this->callAPISuccess('activity', 'getsingle', array(
+      'id' => $activity['id'],
+      'return' => array('tag_id.name', 'tag_id.description', 'tag_id.color'),
+    ));
+    $this->assertEquals($tagName, $activityget['tag_id'][$tag['id']]['tag_id.name']);
+    $this->assertEquals($tagColor, $activityget['tag_id'][$tag['id']]['tag_id.color']);
+    $this->assertEquals($tagDescription, $activityget['tag_id'][$tag['id']]['tag_id.description']);
+  }
+
+
+  /**
+   * Test that activity.get api works to filter on and return files.
+   */
+  public function testActivityGetFile() {
+    $activity = $this->callAPISuccess('Activity', 'create', $this->_params);
+    $activity2 = $this->callAPISuccess('Activity', 'create', $this->_params2);
+    $file = $this->callAPISuccess('Attachment', 'create', array(
+      'name' => 'actAttachment.txt',
+      'mime_type' => 'text/plain',
+      'description' => 'My test description',
+      'content' => 'My test content',
+      'entity_table' => 'civicrm_activity',
+      'entity_id' => $activity2['id'],
+    ));
+    $activityget = $this->callAPISuccess('activity', 'getsingle', array(
+      'file_id' => $file['id'],
+      'return' => 'file_id',
+    ));
+    $this->assertEquals($activityget['id'], $activity2['id']);
+    $this->assertEquals($file['id'], $activityget['file_id'][0]);
   }
 
   /**
@@ -1050,7 +1171,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
     $this->assertEquals(1, count($target), ' in line ' . __LINE__);
     $this->assertEquals(TRUE, in_array($contact3, $assignee), ' in line ' . __LINE__);
     $this->assertEquals(TRUE, in_array($contact4, $target), ' in line ' . __LINE__);
-
+    $this->_params['activity_type_id'] = $this->test_activity_type_value;
     foreach ($this->_params as $fld => $val) {
       $this->assertEquals($val, $result['values'][$result['id']][$fld]);
     }
@@ -1209,6 +1330,35 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
     foreach ($result['values'] as $key => $value) {
       $this->assertTrue(is_array($value), $key . " is not an array");
     }
+  }
+
+  public function testGetWithOr() {
+    $acts = array(
+      'test or 1' => 'orOperator',
+      'test or 2' => 'orOperator',
+      'test or 3' => 'nothing',
+    );
+    foreach ($acts as $subject => $details) {
+      $params = $this->_params;
+      $params['subject'] = $subject;
+      $params['details'] = $details;
+      $this->callAPISuccess('Activity', 'create', $params);
+    }
+    $result = $this->callAPISuccess('Activity', 'get', array(
+      'details' => 'orOperator',
+    ));
+    $this->assertEquals(2, $result['count']);
+    $result = $this->callAPISuccess('Activity', 'get', array(
+      'details' => 'orOperator',
+      'subject' => 'test or 3',
+    ));
+    $this->assertEquals(0, $result['count']);
+    $result = $this->callAPISuccess('Activity', 'get', array(
+      'details' => 'orOperator',
+      'subject' => 'test or 3',
+      'options' => array('or' => array(array('details', 'subject'))),
+    ));
+    $this->assertEquals(3, $result['count']);
   }
 
 }

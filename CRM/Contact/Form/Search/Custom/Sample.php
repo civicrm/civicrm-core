@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Contact_Form_Search_Custom_Sample extends CRM_Contact_Form_Search_Custom_Base implements CRM_Contact_Form_Search_Interface {
   protected $_aclFrom = NULL;
@@ -42,9 +42,7 @@ class CRM_Contact_Form_Search_Custom_Sample extends CRM_Contact_Form_Search_Cust
     parent::__construct($formValues);
 
     if (!isset($formValues['state_province_id'])) {
-      $this->_stateID = CRM_Utils_Request::retrieve('stateID', 'Integer',
-        CRM_Core_DAO::$_nullObject
-      );
+      $this->_stateID = CRM_Utils_Request::retrieve('stateID', 'Integer');
       if ($this->_stateID) {
         $formValues['state_province_id'] = $this->_stateID;
       }

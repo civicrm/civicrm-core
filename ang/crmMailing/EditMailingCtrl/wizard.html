@@ -1,10 +1,4 @@
-<div crm-ui-debug="mailing"></div>
-
-<div ng-show="isSubmitted()">
-  {{ts('This mailing has been submitted.')}}
-</div>
-
-<form name="crmMailing" novalidate ng-hide="isSubmitted()">
+<div ng-form="crmMailingSubform">
   <div class="crm-block crm-form-block crmMailing">
 
     <div crm-ui-wizard>
@@ -51,7 +45,7 @@
           <div crm-mailing-block-review crm-mailing="mailing" crm-mailing-attachments="attachments"/>
         </div>
         <center>
-          <a class="button crmMailing-submit-button" ng-click="submit()" ng-class="{blocking: block.check(), disabled: crmMailing.$invalid}">
+          <a class="button crmMailing-submit-button" ng-click="submit()" ng-class="{blocking: block.check(), disabled: crmMailingSubform.$invalid}">
             <div>{{ts('Submit Mailing')}}</div>
           </a>
         </center>
@@ -68,4 +62,4 @@
       </span>
     </div>
   </div>
-</form>
+</div>

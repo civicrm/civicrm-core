@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -79,7 +79,7 @@
  * @endcode
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Utils_SQL_Select implements ArrayAccess {
 
@@ -323,13 +323,15 @@ class CRM_Utils_SQL_Select implements ArrayAccess {
    *
    * @param string|array $exprs list of SQL expressions
    * @param null|array $args use NULL to disable interpolation; use an array of variables to enable
-   * @return CRM_Utils_SQL_Select
+   * @param int $weight
+   * @return \CRM_Utils_SQL_Select
    */
-  public function orderBy($exprs, $args = NULL) {
+  public function orderBy($exprs, $args = NULL, $weight = 0) {
+    static $guid = 0;
     $exprs = (array) $exprs;
     foreach ($exprs as $expr) {
       $evaluatedExpr = $this->interpolate($expr, $args);
-      $this->orderBys[$evaluatedExpr] = $evaluatedExpr;
+      $this->orderBys[$evaluatedExpr] = array('value' => $evaluatedExpr, 'weight' => $weight, 'guid' => $guid++);
     }
     return $this;
   }
@@ -340,6 +342,9 @@ class CRM_Utils_SQL_Select implements ArrayAccess {
    * @param array|string $keys
    *   Key name, or an array of key-value pairs.
    * @param null|mixed $value
+   *   The new value of the parameter.
+   *   Values may be strings, ints, or arrays thereof -- provided that the
+   *   SQL query uses appropriate prefix (e.g. "@", "!", "#").
    * @return \CRM_Utils_SQL_Select
    */
   public function param($keys, $value = NULL) {
@@ -459,7 +464,7 @@ class CRM_Utils_SQL_Select implements ArrayAccess {
   /**
    * Given a string like "field_name = @value", replace "@value" with an escaped SQL string
    *
-   * @param $expr SQL expression
+   * @param string $expr SQL expression
    * @param null|array $args a list of values to insert into the SQL expression; keys are prefix-coded:
    *   prefix '@' => escape SQL
    *   prefix '#' => literal number, skip escaping but do validation
@@ -571,7 +576,10 @@ class CRM_Utils_SQL_Select implements ArrayAccess {
       $sql .= 'HAVING (' . implode(') AND (', $this->havings) . ")\n";
     }
     if ($this->orderBys) {
-      $sql .= 'ORDER BY ' . implode(', ', $this->orderBys) . "\n";
+      $orderBys = CRM_Utils_Array::crmArraySortByField($this->orderBys,
+        array('weight', 'guid'));
+      $orderBys = CRM_Utils_Array::collect('value', $orderBys);
+      $sql .= 'ORDER BY ' . implode(', ', $orderBys) . "\n";
     }
     if ($this->limit !== NULL) {
       $sql .= 'LIMIT ' . $this->limit . "\n";
@@ -585,18 +593,63 @@ class CRM_Utils_SQL_Select implements ArrayAccess {
     return $sql;
   }
 
+  /**
+   * Has an offset been set.
+   *
+   * @param string $offset
+   *
+   * @return bool
+   */
   public function offsetExists($offset) {
     return isset($this->params[$offset]);
   }
 
+  /**
+   * Get the value of a SQL parameter.
+   *
+   * @code
+   *   $select['cid'] = 123;
+   *   $select->where('contact.id = #cid');
+   *   echo $select['cid'];
+   * @endCode
+   *
+   * @param string $offset
+   * @return mixed
+   * @see param()
+   * @see ArrayAccess::offsetGet
+   */
   public function offsetGet($offset) {
     return $this->params[$offset];
   }
 
+  /**
+   * Set the value of a SQL parameter.
+   *
+   * @code
+   *   $select['cid'] = 123;
+   *   $select->where('contact.id = #cid');
+   *   echo $select['cid'];
+   * @endCode
+   *
+   * @param string $offset
+   * @param mixed $value
+   *   The new value of the parameter.
+   *   Values may be strings, ints, or arrays thereof -- provided that the
+   *   SQL query uses appropriate prefix (e.g. "@", "!", "#").
+   * @see param()
+   * @see ArrayAccess::offsetSet
+   */
   public function offsetSet($offset, $value) {
     $this->param($offset, $value);
   }
 
+  /**
+   * Unset the value of a SQL parameter.
+   *
+   * @param string $offset
+   * @see param()
+   * @see ArrayAccess::offsetUnset
+   */
   public function offsetUnset($offset) {
     unset($this->params[$offset]);
   }

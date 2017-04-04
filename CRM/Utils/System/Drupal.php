@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -162,8 +162,8 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
    * @inheritDoc
    */
   public function getLoginURL($destination = '') {
-    $query = $destination ? array('destination' => $destination) : array();
-    return url('user', array('query' => $query), TRUE);
+    $query = $destination ? array('destination' => $destination) : NULL;
+    return CRM_Utils_System::url('user', $query, TRUE);
   }
 
   /**
@@ -299,6 +299,11 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
     $base_url = str_replace('http://', 'https://', $base_url);
   }
 
+  /**
+   * Get the name of the users table.
+   *
+   * @return string
+   */
   protected function getUsersTableName() {
     $userFrameworkUsersTableName = Civi::settings()->get('userFrameworkUsersTableName');
     if (empty($userFrameworkUsersTableName)) {
@@ -349,6 +354,8 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
       $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
       $name = $dbDrupal->escapeSimple($strtolower($name));
       $userFrameworkUsersTableName = $this->getUsersTableName();
+
+      // LOWER in query below roughly translates to 'hurt my database without deriving any benefit' See CRM-19811.
       $sql = "
 SELECT u.*
 FROM   {$userFrameworkUsersTableName} u

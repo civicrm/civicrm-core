@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
  */
@@ -370,6 +370,14 @@ class CRM_Event_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
           'qs' => 'reset=1&id=%%id%%&cid=%%cid%%&action=add&component=event',
           'title' => ts('Record Payment'),
         );
+        if (CRM_Core_Config::isEnabledBackOfficeCreditCardPayments()) {
+          $links[CRM_Core_Action::BASIC] = array(
+            'name' => ts('Submit Credit Card payment'),
+            'url' => 'civicrm/payment/add',
+            'qs' => 'reset=1&id=%%id%%&cid=%%cid%%&action=add&component=event&mode=live',
+            'title' => ts('Submit Credit Card payment'),
+          );
+        }
       }
 
       if ($statusTypes[$row['participant_status_id']] == 'Pending refund') {

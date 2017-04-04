@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -38,11 +38,14 @@ class CRM_Mailing_Form_Task_AdhocMailing extends CRM_Contact_Form_Task {
 
   public function preProcess() {
     parent::preProcess();
+    $templateTypes = CRM_Mailing_BAO_Mailing::getTemplateTypes();
     list ($groupId, $ssId) = $this->createHiddenGroup();
     $mailing = civicrm_api3('Mailing', 'create', array(
       'name' => "",
       'campaign_id' => NULL,
       'replyto_email' => "",
+      'template_type' => $templateTypes[0]['name'],
+      'template_options' => array('nonce' => 1),
       'subject' => "",
       'body_html' => "",
       'body_text' => "",

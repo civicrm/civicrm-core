@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -134,13 +134,13 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
    * @param array $ids
    *   (deprecated) associated array with note id - preferably set $params['id'].
    *
-   * @return object
+   * @return object|null
    *   $note CRM_Core_BAO_Note object
    */
   public static function add(&$params, $ids = array()) {
     $dataExists = self::dataExists($params);
     if (!$dataExists) {
-      return CRM_Core_DAO::$_nullObject;
+      return NULL;
     }
 
     if (!empty($params['entity_table']) && $params['entity_table'] == 'civicrm_contact' && !empty($params['check_permissions'])) {

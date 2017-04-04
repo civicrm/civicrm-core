@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -42,17 +42,19 @@
  *   API result array
  */
 function civicrm_api3_option_value_get($params) {
-
-  if (empty($params['option_group_id']) && !empty($params['option_group_name'])) {
-    $opt = array('version' => 3, 'name' => $params['option_group_name']);
-    $optionGroup = civicrm_api('OptionGroup', 'Get', $opt);
-    if (empty($optionGroup['id'])) {
-      return civicrm_api3_create_error("option group name does not correlate to a single option group");
-    }
-    $params['option_group_id'] = $optionGroup['id'];
-  }
-
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+}
+
+/**
+ * Adjust Metadata for get action.
+ *
+ * The metadata is used for setting defaults, documentation & validation.
+ *
+ * @param array $params
+ *   Array of parameters determined by getfields.
+ */
+function _civicrm_api3_option_value_get_spec(&$params) {
+  $params['option_group_id']['api.aliases'] = array('option_group_name');
 }
 
 /**
@@ -99,9 +101,8 @@ function _civicrm_api3_option_value_create_spec(&$params) {
  * Deletes an existing option value.
  *
  * @param array $params
- *
- * @return array
- *   API result array
+ * @return array API result array
+ * @throws API_Exception
  */
 function civicrm_api3_option_value_delete($params) {
   // We will get the option group id before deleting so we can flush pseudoconstants.

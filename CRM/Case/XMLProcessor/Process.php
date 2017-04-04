@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
   /**
@@ -44,7 +44,7 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
     $xml = $this->retrieve($caseType);
 
     if ($xml === FALSE) {
-      $docLink = CRM_Utils_System::docURL2("user/case-management/setup");
+      $docLink = CRM_Utils_System::docURL2("user/case-management/set-up");
       CRM_Core_Error::fatal(ts("Configuration file could not be retrieved for case type = '%1' %2.",
         array(1 => $caseType, 2 => $docLink)
       ));
@@ -69,7 +69,7 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
   public function get($caseType, $fieldSet, $isLabel = FALSE, $maskAction = FALSE) {
     $xml = $this->retrieve($caseType);
     if ($xml === FALSE) {
-      $docLink = CRM_Utils_System::docURL2("user/case-management/setup");
+      $docLink = CRM_Utils_System::docURL2("user/case-management/set-up");
       CRM_Core_Error::fatal(ts("Unable to load configuration file for the referenced case type: '%1' %2.",
         array(1 => $caseType, 2 => $docLink)
       ));
@@ -217,7 +217,7 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
     $relationshipTypeID = array_search($relationshipTypeName, $relationshipTypes);
 
     if ($relationshipTypeID === FALSE) {
-      $docLink = CRM_Utils_System::docURL2("user/case-management/setup");
+      $docLink = CRM_Utils_System::docURL2("user/case-management/set-up");
       CRM_Core_Error::fatal(ts('Relationship type %1, found in case configuration file, is not present in the database %2',
         array(1 => $relationshipTypeName, 2 => $docLink)
       ));
@@ -421,7 +421,7 @@ AND        a.is_deleted = 0
     $activityTypeInfo = CRM_Utils_Array::value($activityTypeName, $activityTypes);
 
     if (!$activityTypeInfo) {
-      $docLink = CRM_Utils_System::docURL2("user/case-management/setup");
+      $docLink = CRM_Utils_System::docURL2("user/case-management/set-up");
       CRM_Core_Error::fatal(ts('Activity type %1, found in case configuration file, is not present in the database %2',
         array(1 => $activityTypeName, 2 => $docLink)
       ));
@@ -437,12 +437,7 @@ AND        a.is_deleted = 0
       $statusName = 'Scheduled';
     }
 
-    if ($this->_isMultiClient) {
-      $client = $params['clientID'];
-    }
-    else {
-      $client = array(1 => $params['clientID']);
-    }
+    $client = (array) $params['clientID'];
 
     //set order
     $orderVal = '';

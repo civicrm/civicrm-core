@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -436,7 +436,7 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
     $genderLabelArray = array(
       1 => 'Female',
       2 => 'Male',
-      3 => 'Transgender',
+      3 => 'Other',
     );
     $prefix = rand(1, 4);
     $suffix = rand(1, 8);

@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -36,7 +36,7 @@
 {else}
 <div class="help">
   {if $gName eq "gender"}
-    {ts}CiviCRM is pre-configured with standard options for individual gender (Male, Female, Transgender). Modify these options as needed for your installation.{/ts}
+    {ts}CiviCRM is pre-configured with standard options for individual gender (Male, Female, Other). Modify these options as needed for your installation.{/ts}
   {elseif $gName eq "individual_prefix"}
       {ts}CiviCRM is pre-configured with standard options for individual contact prefixes (Ms., Mr., Dr. etc.). Customize these options and add new ones as needed for your installation.{/ts}
   {elseif $gName eq "mobile_provider"}
@@ -75,6 +75,9 @@
         {crmButton p="civicrm/admin/options/$gName" q='action=add&reset=1' class="new-option" icon="plus-circle"}{ts 1=$gLabel}Add %1{/ts}{/crmButton}
     </div>
 {/if}
+{foreach from=$rows item=row}
+  {if !empty($row.icon)}{assign var='hasIcons' value=TRUE}{/if}
+{/foreach}
 <div id={$gName}>
         {strip}
   {* handle enable/disable actions*}
@@ -82,6 +85,9 @@
         <table id="options" class="row-highlight">
          <thead>
          <tr>
+            {if !empty($hasIcons)}
+              <th></th>
+            {/if}
             {if $showComponent}
                 <th>{ts}Component{/ts}</th>
             {/if}
@@ -120,10 +126,15 @@
           <tbody>
         {foreach from=$rows item=row}
           <tr id="option_value-{$row.id}" class="crm-admin-options crm-admin-options_{$row.id} crm-entity {cycle values="odd-row,even-row"}{if NOT $row.is_active} disabled{/if}">
+            {if !empty($hasIcons)}
+              <td class="crm-admin-options-icon"><i class="crm-i {$row.icon}"></i></td>
+            {/if}
             {if $showComponent}
               <td class="crm-admin-options-component_name">{$row.component_name}</td>
             {/if}
-            <td class="crm-admin-options-label crm-editable" data-field="label">{$row.label}</td>
+            <td class="crm-admin-options-label crm-editable" data-field="label" {if !empty($row.color)}style="background-color: {$row.color}; color: {$row.color|colorContrast};"{/if}>
+              {$row.label}
+            </td>
             {if $gName eq "case_status"}
               <td class="crm-admin-options-grouping">{$row.grouping}</td>
             {/if}

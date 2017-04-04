@@ -23,7 +23,8 @@ function activity_get_example() {
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
     return array(
-      'error' => $errorMessage,
+      'is_error' => 1,
+      'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
     );
@@ -48,7 +49,7 @@ function activity_get_expectedresult() {
     'values' => array(
       '0' => array(
         'id' => '1',
-        'activity_type_id' => '51',
+        'activity_type_id' => '9999',
         'subject' => 'Make-it-Happen Meeting',
         'activity_date_time' => '2011-01-01 00:00:00',
         'duration' => '120',
@@ -60,6 +61,7 @@ function activity_get_expectedresult() {
         'is_auto' => 0,
         'is_current_revision' => '1',
         'is_deleted' => 0,
+        'is_star' => 0,
         'source_contact_id' => '1',
       ),
     ),

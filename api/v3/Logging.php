@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -44,7 +44,8 @@
 function civicrm_api3_logging_revert($params) {
   $schema = new CRM_Logging_Schema();
   $reverter = new CRM_Logging_Reverter($params['log_conn_id'], CRM_Utils_Array::value('log_date', $params));
-  $reverter->calculateDiffsFromLogConnAndDate($schema->getLogTablesForContact());
+  $tables = !empty($params['tables']) ? (array) $params['tables'] : $schema->getLogTablesForContact();
+  $reverter->calculateDiffsFromLogConnAndDate($tables);
   $reverter->revert();
   return civicrm_api3_create_success(1);
 }
@@ -73,6 +74,12 @@ function _civicrm_api3_logging_revert_spec(&$params) {
     'api.default' => '10 SECOND',
     'description' => ts('Used when log_date is passed in'),
   );
+
+  $params['tables'] = array(
+    'title' => ts('Tables to revert'),
+    'type' => CRM_Utils_Type::T_STRING,
+    'description' => ts('Tables to revert, if not set all contact-referring entities will be reverted'),
+  );
 }
 
 /**
@@ -89,7 +96,8 @@ function civicrm_api3_logging_get($params) {
   $schema = new CRM_Logging_Schema();
   $interval = (empty($params['log_date'])) ? NULL : $params['interval'];
   $differ = new CRM_Logging_Differ($params['log_conn_id'], CRM_Utils_Array::value('log_date', $params), $interval);
-  return civicrm_api3_create_success($differ->getAllChangesForConnection($schema->getLogTablesForContact()));
+  $tables = !empty($params['tables']) ? (array) $params['tables'] : $schema->getLogTablesForContact();
+  return civicrm_api3_create_success($differ->getAllChangesForConnection($tables));
 }
 
 /**
@@ -115,5 +123,10 @@ function _civicrm_api3_logging_get_spec(&$params) {
     'type' => CRM_Utils_Type::T_STRING,
     'api.default' => '10 SECOND',
     'description' => ts('Used when log_date is passed in'),
+  );
+  $params['tables'] = array(
+    'title' => ts('Tables to query'),
+    'type' => CRM_Utils_Type::T_STRING,
+    'description' => ts('Tables to query, if not set all contact-referring entities will be queried'),
   );
 }

@@ -7,8 +7,8 @@
  */
 function participant_create_example() {
   $params = array(
-    'contact_id' => 4,
-    'event_id' => 1,
+    'contact_id' => 2,
+    'event_id' => 2,
     'status_id' => 1,
     'role_id' => 1,
     'register_date' => '2007-07-21 00:00:00',
@@ -25,7 +25,8 @@ function participant_create_example() {
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
     return array(
-      'error' => $errorMessage,
+      'is_error' => 1,
+      'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
     );
@@ -50,8 +51,8 @@ function participant_create_expectedresult() {
     'values' => array(
       '4' => array(
         'id' => '4',
-        'contact_id' => '4',
-        'event_id' => '1',
+        'contact_id' => '2',
+        'event_id' => '2',
         'status_id' => '1',
         'role_id' => '1',
         'register_date' => '20070721000000',
@@ -67,6 +68,7 @@ function participant_create_expectedresult() {
         'discount_amount' => '',
         'cart_id' => '',
         'must_wait' => '',
+        'transferred_to_contact_id' => '',
       ),
     ),
   );

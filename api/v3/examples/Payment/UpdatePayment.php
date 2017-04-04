@@ -24,7 +24,8 @@ function payment_create_example() {
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
     return array(
-      'error' => $errorMessage,
+      'is_error' => 1,
+      'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
     );
@@ -51,7 +52,7 @@ function payment_create_expectedresult() {
         'id' => '5',
         'from_financial_account_id' => '7',
         'to_financial_account_id' => '6',
-        'trxn_date' => '20160217204847',
+        'trxn_date' => '20170207024653',
         'total_amount' => '100',
         'fee_amount' => '',
         'net_amount' => '100',

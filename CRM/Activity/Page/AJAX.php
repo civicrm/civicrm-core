@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  *
  */
 
@@ -236,7 +236,7 @@ class CRM_Activity_Page_AJAX {
             break;
 
           case 'caseRoles':
-            $row['actions'] = '<a href="#editCaseRoleDialog" title="' . ts('Assign %1', array(1 => $typeLabel)) . '" class="crm-hover-button case-miniform" data-contact_type="' . $contactType . '" data-rel_type="' . $row['relation_type'] . '_b_a" data-key="' . CRM_Core_Key::get('civicrm/ajax/relation') . '">' .
+            $row['actions'] = '<a href="#editCaseRoleDialog" title="' . ts('Assign %1', array(1 => $typeLabel)) . '" class="crm-hover-button case-miniform" data-contact_type="' . $contactType . '" data-rel_type="' . $row['relation_type'] . '_a_b" data-key="' . CRM_Core_Key::get('civicrm/ajax/relation') . '">' .
               '<i class="crm-i fa-pencil"></i>' .
               '</a>';
             break;
@@ -389,6 +389,11 @@ class CRM_Activity_Page_AJAX {
     return (array('error_msg' => $error_msg, 'newId' => $mainActivity->id));
   }
 
+  /**
+   * Get activities for the contact.
+   *
+   * @return array
+   */
   public static function getContactActivity() {
     $requiredParameters = array(
       'cid' => 'Integer',

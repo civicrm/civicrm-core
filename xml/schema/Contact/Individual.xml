@@ -78,7 +78,7 @@
     <name>gender</name>
     <type>enum</type>
     <import>true</import>
-    <values>Female, Male, Transgender</values>
+    <values>Female, Male, Other</values>
     <add>1.1</add>
     <drop>1.2</drop>
   </field>

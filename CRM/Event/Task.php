@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
  */
@@ -145,9 +145,9 @@ class CRM_Event_Task {
       if (!CRM_Core_Permission::check('edit event participants')) {
         unset(self::$_tasks[4], self::$_tasks[5], self::$_tasks[15]);
       }
-    }
 
-    CRM_Utils_Hook::searchTasks('event', self::$_tasks);
+      CRM_Utils_Hook::searchTasks('event', self::$_tasks);
+    }
 
     return self::$_tasks;
   }

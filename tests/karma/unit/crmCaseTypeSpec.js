@@ -6,6 +6,7 @@ describe('crmCaseType', function() {
     CRM.resourceUrls = {
       'civicrm': ''
     };
+    // CRM_Case_XMLProcessor::REL_TYPE_CNAME
     CRM.crmCaseType = {
       'REL_TYPE_CNAME': 'label_b_a'
     };
@@ -30,9 +31,9 @@ describe('crmCaseType', function() {
       compile = $compile;
       timeout = $timeout;
       apiCalls = {
-        'actStatuses': {
-          'values': {
-            "272": {
+        actStatuses: {
+          values: [
+            {
               "id": "272",
               "option_group_id": "25",
               "label": "Scheduled",
@@ -45,7 +46,7 @@ describe('crmCaseType', function() {
               "is_reserved": "1",
               "is_active": "1"
             },
-            "273": {
+            {
               "id": "273",
               "option_group_id": "25",
               "label": "Completed",
@@ -57,11 +58,42 @@ describe('crmCaseType', function() {
               "is_reserved": "1",
               "is_active": "1"
             }
-          }
+          ]
         },
-        'actTypes': {
-          'values': {
-            "784": {
+        caseStatuses: {
+          values: [
+            {
+              "id": "290",
+              "option_group_id": "28",
+              "label": "Ongoing",
+              "value": "1",
+              "name": "Open",
+              "grouping": "Opened",
+              "filter": "0",
+              "is_default": "1",
+              "weight": "1",
+              "is_optgroup": "0",
+              "is_reserved": "1",
+              "is_active": "1"
+            },
+            {
+              "id": "291",
+              "option_group_id": "28",
+              "label": "Resolved",
+              "value": "2",
+              "name": "Closed",
+              "grouping": "Closed",
+              "filter": "0",
+              "weight": "2",
+              "is_optgroup": "0",
+              "is_reserved": "1",
+              "is_active": "1"
+            }
+          ]
+        },
+        actTypes: {
+          values: [
+            {
               "id": "784",
               "option_group_id": "2",
               "label": "ADC referral",
@@ -75,7 +107,7 @@ describe('crmCaseType', function() {
               "is_active": "1",
               "component_id": "7"
             },
-            "32": {
+            {
               "id": "32",
               "option_group_id": "2",
               "label": "Add Client To Case",
@@ -90,11 +122,11 @@ describe('crmCaseType', function() {
               "is_active": "1",
               "component_id": "7"
             }
-          }
+          ]
         },
-        'relTypes': {
-          'values' : {
-            "14": {
+        relTypes: {
+          values: [
+            {
               "id": "14",
               "name_a_b": "Benefits Specialist is",
               "label_a_b": "Benefits Specialist is",
@@ -106,7 +138,7 @@ describe('crmCaseType', function() {
               "is_reserved": "0",
               "is_active": "1"
             },
-            "9": {
+            {
               "id": "9",
               "name_a_b": "Case Coordinator is",
               "label_a_b": "Case Coordinator is",
@@ -118,9 +150,9 @@ describe('crmCaseType', function() {
               "is_reserved": "0",
               "is_active": "1"
             }
-          }
+          ]
         },
-        "caseType": {
+        caseType: {
           "id": "1",
           "name": "housing_support",
           "title": "Housing Support",
@@ -167,11 +199,11 @@ describe('crmCaseType', function() {
     }));
 
     it('should load activity statuses', function() {
-      expect(scope.activityStatuses).toEqualData([apiCalls.actStatuses.values['272'], apiCalls.actStatuses.values['273']]);
+      expect(scope.activityStatuses).toEqualData(apiCalls.actStatuses.values);
     });
 
     it('should load activity types', function() {
-      expect(scope.activityTypes).toEqualData(apiCalls.actTypes.values);
+      expect(scope.activityTypes['ADC referral']).toEqualData(apiCalls.actTypes.values[0]);
     });
 
     it('addActivitySet should add an activitySet to the case type', function() {

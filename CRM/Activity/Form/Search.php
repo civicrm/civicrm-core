@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -84,7 +84,7 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
 
     // we allow the controller to set force/reset externally, useful when we are being
     // driven by the wizard framework
-    $this->_reset = CRM_Utils_Request::retrieve('reset', 'Boolean', CRM_Core_DAO::$_nullObject);
+    $this->_reset = CRM_Utils_Request::retrieve('reset', 'Boolean');
     $this->_force = CRM_Utils_Request::retrieve('force', 'Boolean', $this, FALSE);
     $this->_limit = CRM_Utils_Request::retrieve('limit', 'Positive', $this);
     $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this, FALSE, 'search');
@@ -195,9 +195,14 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
       $specialParams = array(
         'activity_type_id',
         'status_id',
-        'activity_subject',
+        'priority_id',
+        'activity_text',
       );
-      $changeNames = array('status_id' => 'activity_status_id');
+      $changeNames = array(
+        'status_id' => 'activity_status_id',
+        'priority_id' => 'activity_priority_id',
+      );
+
       CRM_Contact_BAO_Query::processSpecialFormValue($this->_formValues, $specialParams, $changeNames);
     }
 
@@ -281,7 +286,7 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
       $this->_defaults['activity_status_id'] = $status;
     }
 
-    $survey = CRM_Utils_Request::retrieve('survey', 'Positive', CRM_Core_DAO::$_nullObject);
+    $survey = CRM_Utils_Request::retrieve('survey', 'Positive');
 
     if ($survey) {
       $this->_formValues['activity_survey_id'] = $this->_defaults['activity_survey_id'] = $survey;
@@ -314,9 +319,7 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
 
     // Added for membership search
 
-    $signupType = CRM_Utils_Request::retrieve('signupType', 'Positive',
-      CRM_Core_DAO::$_nullObject
-    );
+    $signupType = CRM_Utils_Request::retrieve('signupType', 'Positive');
 
     if ($signupType) {
       $this->_formValues['activity_role'] = 1;
@@ -342,9 +345,7 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
       }
     }
 
-    $dateLow = CRM_Utils_Request::retrieve('dateLow', 'String',
-      CRM_Core_DAO::$_nullObject
-    );
+    $dateLow = CRM_Utils_Request::retrieve('dateLow', 'String');
 
     if ($dateLow) {
       $dateLow = date('m/d/Y', strtotime($dateLow));
@@ -354,9 +355,7 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
       $this->_defaults['activity_date_low'] = $dateLow;
     }
 
-    $dateHigh = CRM_Utils_Request::retrieve('dateHigh', 'String',
-      CRM_Core_DAO::$_nullObject
-    );
+    $dateHigh = CRM_Utils_Request::retrieve('dateHigh', 'String');
 
     if ($dateHigh) {
       // Activity date time assumes midnight at the beginning of the date

@@ -24,7 +24,8 @@ function contact_create_example() {
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
     return array(
-      'error' => $errorMessage,
+      'is_error' => 1,
+      'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
     );
@@ -45,10 +46,10 @@ function contact_create_expectedresult() {
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
-    'id' => 1,
+    'id' => 3,
     'values' => array(
-      '1' => array(
-        'id' => '1',
+      '3' => array(
+        'id' => '3',
         'contact_type' => 'Individual',
         'contact_sub_type' => '',
         'do_not_email' => 0,

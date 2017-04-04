@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Utils_Type {
   const
@@ -144,7 +144,29 @@ class CRM_Utils_Type {
   }
 
   /**
-   * Helper function to call escape on arrays
+   * Get the data_type for the field.
+   *
+   * @param array $fieldMetadata
+   *   Metadata about the field.
+   *
+   * @return string
+   */
+  public static function getDataTypeFromFieldMetadata($fieldMetadata) {
+    if (isset($fieldMetadata['data_type'])) {
+      return $fieldMetadata['data_type'];
+    }
+    if (empty($fieldMetadata['type'])) {
+      // I would prefer to throw an e-notice but there is some,
+      // probably unnecessary logic, that only retrieves activity fields
+      // if they are 'in the profile' and probably they are not 'in'
+      // until they are added - which might lead to ? who knows!
+      return '';
+    }
+    return self::typeToString($fieldMetadata['type']);
+  }
+
+  /**
+   * Helper function to call escape on arrays.
    *
    * @see escape
    */
@@ -290,7 +312,33 @@ class CRM_Utils_Type {
       case 'MysqlOrderBy':
         if (CRM_Utils_Rule::mysqlOrderBy($data)) {
           $parts = explode(',', $data);
-          foreach ($parts as &$part) {
+
+          // The field() syntax is tricky here because it uses commas & when
+          // we separate by them we break it up. But we want to keep the clauses in order.
+          // so we just clumsily re-assemble it. Test cover exists.
+          $fieldClauseStart = NULL;
+          foreach ($parts as $index => &$part) {
+            if (substr($part, 0, 6) === 'field(') {
+              // Looking to escape a string like 'field(contribution_status_id,3,4,5) asc'
+              // to 'field(`contribution_status_id`,3,4,5) asc'
+              $fieldClauseStart = $index;
+              continue;
+            }
+            if ($fieldClauseStart !== NULL) {
+              // this is part of the list of field options. Concatenate it back on.
+              $parts[$fieldClauseStart] .= ',' . $part;
+              unset($parts[$index]);
+              if (!strstr($parts[$fieldClauseStart], ')')) {
+                // we have not reached the end of the list.
+                continue;
+              }
+              // We have the last piece of the field() clause, time to escape it.
+              $parts[$fieldClauseStart] = self::mysqlOrderByFieldFunctionCallback($parts[$fieldClauseStart]);
+              $fieldClauseStart = NULL;
+              continue;
+
+            }
+            // Normal clause.
             $part = preg_replace_callback('/^(?:(?:((?:`[\w-]{1,64}`|[\w-]{1,64}))(?:\.))?(`[\w-]{1,64}`|[\w-]{1,64})(?: (asc|desc))?)$/i', array('CRM_Utils_Type', 'mysqlOrderByCallback'), trim($part));
           }
           return implode(', ', $parts);
@@ -429,6 +477,19 @@ class CRM_Utils_Type {
     }
 
     return NULL;
+  }
+
+  /**
+   * Preg_replace_callback for mysqlOrderByFieldFunction escape.
+   *
+   * Add backticks around the field name.
+   *
+   * @param string $clause
+   *
+   * @return string
+   */
+  public static function mysqlOrderByFieldFunctionCallback($clause) {
+    return preg_replace('/field\((\w*)/', 'field(`${1}`', $clause);
   }
 
   /**

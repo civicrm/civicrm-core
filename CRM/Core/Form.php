@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -31,7 +31,7 @@
  * machine. Each form can also operate in various modes
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 require_once 'HTML/QuickForm/Page.php';
@@ -217,6 +217,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     'number',
     'url',
     'email',
+    'color',
   );
 
   /**
@@ -268,12 +269,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     $this->addClass(CRM_Utils_System::getClassName($this));
 
     $this->assign('snippet', CRM_Utils_Array::value('snippet', $_GET));
-  }
-
-  /**
-   * Generate ID for some reason & purpose that is unknown & undocumented.
-   */
-  public static function generateID() {
   }
 
   /**
@@ -336,6 +331,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @param bool $required
    * @param array $extra
    *   (attributes for select elements).
+   *   For datepicker elements this is consistent with the data
+   *   from CRM_Utils_Date::getDatePickerExtra
    *
    * @return HTML_QuickForm_Element
    *   Could be an error object
@@ -345,10 +342,25 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     $attributes = '', $required = FALSE, $extra = NULL
   ) {
     // Fudge some extra types that quickform doesn't support
+    $inputType = $type;
     if ($type == 'wysiwyg' || in_array($type, self::$html5Types)) {
       $attributes = ($attributes ? $attributes : array()) + array('class' => '');
       $attributes['class'] = ltrim($attributes['class'] . " crm-form-$type");
+      if ($type == 'wysiwyg' && isset($attributes['preset'])) {
+        $attributes['data-preset'] = $attributes['preset'];
+        unset($attributes['preset']);
+      }
       $type = $type == 'wysiwyg' ? 'textarea' : 'text';
+    }
+    // Like select but accepts rich array data (with nesting, colors, icons, etc) as option list.
+    if ($inputType == 'select2') {
+      $type = 'text';
+      $options = $attributes;
+      $attributes = $attributes = ($extra ? $extra : array()) + array('class' => '');
+      $attributes['class'] = ltrim($attributes['class'] . " crm-select2 crm-form-select2");
+      $attributes['data-select-params'] = json_encode(array('data' => $options, 'multiple' => !empty($attributes['multiple'])));
+      unset($attributes['multiple']);
+      $extra = NULL;
     }
     // @see http://wiki.civicrm.org/confluence/display/CRMDOC/crmDatepicker
     if ($type == 'datepicker') {
@@ -378,6 +390,10 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     $element = $this->addElement($type, $name, $label, $attributes, $extra);
     if (HTML_QuickForm::isError($element)) {
       CRM_Core_Error::fatal(HTML_QuickForm::errorMessage($element));
+    }
+
+    if ($inputType == 'color') {
+      $this->addRule($name, ts('%1 must contain a color value e.g. #ffffff.', array(1 => $label)), 'regex', '/#[0-9a-fA-F]{6}/');
     }
 
     if ($required) {
@@ -1229,7 +1245,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     if ($action & (CRM_Core_Action::UPDATE + CRM_Core_Action::ADD)) {
       return 'create';
     }
-    if ($action & (CRM_Core_Action::BROWSE + CRM_Core_Action::BASIC + CRM_Core_Action::ADVANCED + CRM_Core_Action::PREVIEW)) {
+    if ($action & (CRM_Core_Action::VIEW + CRM_Core_Action::BROWSE + CRM_Core_Action::BASIC + CRM_Core_Action::ADVANCED + CRM_Core_Action::PREVIEW)) {
       return 'get';
     }
     // If you get this exception try adding more cases above.
@@ -1344,11 +1360,16 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *   - multiple - bool
    *   - context - @see CRM_Core_DAO::buildOptionsContext
    * @param bool $required
+   * @param bool $legacyDate
+   *   Temporary param to facilitate the conversion of fields to use the datepicker in
+   *   a controlled way. To convert the field the jcalendar code needs to be removed from the
+   *   tpl as well. That file is intended to be EOL.
+   *
    * @throws \CiviCRM_API3_Exception
    * @throws \Exception
    * @return HTML_QuickForm_Element
    */
-  public function addField($name, $props = array(), $required = FALSE) {
+  public function addField($name, $props = array(), $required = FALSE, $legacyDate = TRUE) {
     // Resolve context.
     if (empty($props['context'])) {
       $props['context'] = $this->getDefaultContext();
@@ -1433,10 +1454,19 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         return $this->add('textarea', $name, $label, $props, $required);
 
       case 'Select Date':
-        //TODO: add range support
-        //TODO: Add date formats
-        //TODO: Add javascript template for dates.
-        return $this->addDate($name, $label, $required, $props);
+        // This is a white list for fields that have been tested with
+        // date picker. We should be able to remove the other
+        if ($legacyDate) {
+          //TODO: add range support
+          //TODO: Add date formats
+          //TODO: Add javascript template for dates.
+          return $this->addDate($name, $label, $required, $props);
+        }
+        else {
+          $fieldSpec = CRM_Utils_Date::addDateMetadataToField($fieldSpec, $fieldSpec);
+          $attributes = array('format' => $fieldSpec['date_format']);
+          return $this->add('datepicker', $name, $label, $attributes, $required, $fieldSpec['datepicker']['extra']);
+        }
 
       case 'Radio':
         $separator = isset($props['separator']) ? $props['separator'] : NULL;
@@ -2295,6 +2325,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *
    * @param array $params
    *   Form input params, default to $this->_params.
+   *
+   * @return string
    */
   public function assignBillingName($params = array()) {
     $name = '';

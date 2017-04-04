@@ -233,4 +233,101 @@ class CRM_Utils_versionCheckTest extends CiviUnitTestCase {
     $this->assertEquals($remoteData, $vc->versionInfo);
   }
 
+  public function testGetSiteStats() {
+    // Create domain address so the domain country will come up in the stats.
+    $country_params = array(
+      'sequential' => 1,
+      'options' => array(
+        'limit' => 1,
+      ),
+    );
+    $country_result = civicrm_api3('country', 'get', $country_params);
+    $country = $country_result['values'][0];
+
+    $domain_params = array(
+      'id' => CRM_Core_Config::domainID(),
+    );
+    CRM_Core_BAO_Domain::retrieve($domain_params, $domain_defaults);
+    $location_type = CRM_Core_BAO_LocationType::getDefault();
+    $address_params = array(
+      'contact_id' => $domain_defaults['contact_id'],
+      'location_type_id' => $location_type->id,
+      'is_primary' => '1',
+      'is_billing' => '0',
+      'street_address' => '1 Main St.',
+      'city' => 'Anywhere',
+      'postal_code' => '99999',
+      'country_id' => $country['id'],
+    );
+    $address_result = civicrm_api3('address', 'create', $address_params);
+
+    // Build stats and test them.
+    $vc = new ReflectionClass('CRM_Utils_VersionCheck');
+    $vc_instance = $vc->newInstance();
+
+    $statsBuilder = $vc->getMethod('getSiteStats');
+    $statsBuilder->setAccessible(TRUE);
+    $statsBuilder->invoke($vc_instance, NULL);
+
+    $statsProperty = $vc->getProperty('stats');
+    $statsProperty->setAccessible(TRUE);
+    $stats = $statsProperty->getValue($vc_instance);
+
+    // Stats array should have correct elements.
+    $this->assertArrayHasKey('version', $stats);
+    $this->assertArrayHasKey('hash', $stats);
+    $this->assertArrayHasKey('uf', $stats);
+    $this->assertArrayHasKey('lang', $stats);
+    $this->assertArrayHasKey('co', $stats);
+    $this->assertArrayHasKey('ufv', $stats);
+    $this->assertArrayHasKey('PHP', $stats);
+    $this->assertArrayHasKey('MySQL', $stats);
+    $this->assertArrayHasKey('communityMessagesUrl', $stats);
+    $this->assertArrayHasKey('domain_isoCode', $stats);
+    $this->assertArrayHasKey('PPTypes', $stats);
+    $this->assertArrayHasKey('entities', $stats);
+    $this->assertArrayHasKey('extensions', $stats);
+    $this->assertType('array', $stats['entities']);
+    $this->assertType('array', $stats['extensions']);
+
+    // Assert $stats['domain_isoCode'] is correct.
+    $this->assertEquals($country['iso_code'], $stats['domain_isoCode']);
+
+    $entity_names = array();
+    foreach ($stats['entities'] as $entity) {
+      $entity_names[] = $entity['name'];
+      $this->assertType('int', $entity['size'], "Stats entity {$entity['name']} has integer size?");
+    }
+
+    $expected_entity_names = array(
+      'Activity',
+      'Case',
+      'Contact',
+      'Relationship',
+      'Campaign',
+      'Contribution',
+      'ContributionPage',
+      'ContributionProduct',
+      'Widget',
+      'Discount',
+      'PriceSetEntity',
+      'UFGroup',
+      'Event',
+      'Participant',
+      'Friend',
+      'Grant',
+      'Mailing',
+      'Membership',
+      'MembershipBlock',
+      'Pledge',
+      'PledgeBlock',
+      'Delivered',
+    );
+    sort($entity_names);
+    sort($expected_entity_names);
+    $this->assertEquals($expected_entity_names, $entity_names);
+
+    // TODO: Also test for enabled extensions.
+  }
+
 }

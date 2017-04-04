@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -93,13 +93,7 @@
         {/if}
         {foreach from=$fields item=field key=fieldName}
           {assign var=n value=$field.name}
-          {if in_array( $n, array( 'thankyou_date', 'cancel_date', 'receipt_date', 'receive_date', 'join_date', 'membership_start_date', 'membership_end_date' ) ) }
-            <div class="compressed crm-grid-cell">
-              <span class="crm-batch-{$n}-{$rowNumber}">
-                {include file="CRM/common/jcalendar.tpl" elementName=$n elementIndex=$rowNumber batchUpdate=1}
-              </span>
-            </div>
-          {elseif $n eq 'soft_credit'}
+          {if $n eq 'soft_credit'}
             <div class="compressed crm-grid-cell">
               {$form.soft_credit_contact_id.$rowNumber.html|crmAddClass:big}
               {$form.soft_credit_amount.$rowNumber.label}&nbsp;{$form.soft_credit_amount.$rowNumber.html|crmAddClass:eight}
@@ -255,7 +249,8 @@ function checkColumns(parentRow) {
   parentRow.find('div .required').each(function () {
     //special case to handle contact autocomplete select
     var fieldId = cj(this).attr('id');
-    if (fieldId.substring(0, 16) == 'primary_contact_') {
+    // datepicker hasTimeEntry would not have an id - not sure why.
+    if (typeof fieldId != 'undefined' && fieldId.substring(0, 16) == 'primary_contact_') {
       // if display value is set then make sure we also check if contact id is set
       if (!cj(this).val()) {
         inValidRow++;
@@ -386,7 +381,7 @@ function updateContactInfo(blockNo, prefix) {
                 cj('select[id="member_option_' + blockNo + '"]').prop('disabled', false).val(2);
                 cj('select[id="field_' + blockNo + '_membership_type_0"]').val(memTypeContactId).change();
                 cj('select[id="field_' + blockNo + '_membership_type_1"]').val(membershipTypeId).change();
-                setDateFieldValue('join_date', membershipJoinDate, blockNo)
+                cj('#field_' + blockNo + '_' + 'join_date').val(membershipJoinDate).trigger('change');
               }
               });
           }

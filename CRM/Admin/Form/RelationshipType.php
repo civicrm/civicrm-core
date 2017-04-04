@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -137,7 +137,6 @@ class CRM_Admin_Form_RelationshipType extends CRM_Admin_Form {
       CRM_Core_Session::setStatus(ts('Selected Relationship type has been deleted.'), ts('Record Deleted'), 'success');
     }
     else {
-      $params = array();
       $ids = array();
 
       // store the submitted values in an array
@@ -163,7 +162,9 @@ class CRM_Admin_Form_RelationshipType extends CRM_Admin_Form {
       $params['contact_sub_type_a'] = $cTypeA[1] ? $cTypeA[1] : 'NULL';
       $params['contact_sub_type_b'] = $cTypeB[1] ? $cTypeB[1] : 'NULL';
 
-      CRM_Contact_BAO_RelationshipType::add($params, $ids);
+      $result = CRM_Contact_BAO_RelationshipType::add($params, $ids);
+
+      $this->ajaxResponse['relationshipType'] = $result->toArray();
 
       CRM_Core_Session::setStatus(ts('The Relationship Type has been saved.'), ts('Saved'), 'success');
     }

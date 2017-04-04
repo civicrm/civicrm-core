@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,7 +27,7 @@
 
 /**
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -100,20 +100,18 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
       $this->_coid = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $this->contributionRecurID, 'id', 'contribution_recur_id');
     }
 
-    if ((!$this->contributionRecurID) ||
-      ($this->_subscriptionDetails == CRM_Core_DAO::$_nullObject)
-    ) {
-      CRM_Core_Error::fatal('Required information missing.');
+    if (!$this->contributionRecurID || !$this->_subscriptionDetails) {
+      CRM_Core_Error::statusBounce(ts('Required information missing.'));
     }
 
     if ($this->_subscriptionDetails->membership_id && $this->_subscriptionDetails->auto_renew) {
-      CRM_Core_Error::fatal(ts('You cannot update the subscription.'));
+      CRM_Core_Error::statusBounce(ts('You cannot update the subscription.'));
     }
 
     if (!CRM_Core_Permission::check('edit contributions')) {
       $userChecksum = CRM_Utils_Request::retrieve('cs', 'String', $this, FALSE);
       if (!CRM_Contact_BAO_Contact_Utils::validChecksum($this->_subscriptionDetails->contact_id, $userChecksum)) {
-        CRM_Core_Error::fatal(ts('You do not have permission to update subscription.'));
+        CRM_Core_Error::statusBounce(ts('You do not have permission to update subscription.'));
       }
       $this->_selfService = TRUE;
     }

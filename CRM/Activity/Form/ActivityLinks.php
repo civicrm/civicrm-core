@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -49,69 +49,57 @@ class CRM_Activity_Form_ActivityLinks extends CRM_Core_Form {
     }
     $urlParams = "action=add&reset=1&cid={$contactId}&selectedChild=activity&atype=";
 
-    $activityTypes = $urls = array();
+    $allTypes = CRM_Utils_Array::value('values', civicrm_api3('OptionValue', 'get', array(
+      'option_group_id' => 'activity_type',
+      'is_active' => 1,
+      'options' => array('limit' => 0, 'sort' => 'weight'),
+    )));
 
-    $emailTypeId = CRM_Core_OptionGroup::getValue('activity_type',
-      'Email',
-      'name'
-    );
+    $activityTypes = array();
 
-    $letterTypeId = CRM_Core_OptionGroup::getValue('activity_type',
-      'Print PDF Letter',
-      'name'
-    );
-    $SMSId = CRM_Core_OptionGroup::getValue('activity_type',
-      'Text Message (SMS)',
-      'label'
-    );
-
-    if (CRM_Utils_Mail::validOutBoundMail() && $contactId) {
-      list($name, $email, $doNotEmail, $onHold, $isDeseased) = CRM_Contact_BAO_Contact::getContactDetails($contactId);
-      if (!$doNotEmail && $email && !$isDeseased) {
-        $activityTypes = array($emailTypeId => ts('Send an Email'));
+    foreach ($allTypes as $act) {
+      $url = 'civicrm/activity/add';
+      if ($act['name'] == 'Email') {
+        if (!CRM_Utils_Mail::validOutBoundMail() || !$contactId) {
+          continue;
+        }
+        list($name, $email, $doNotEmail, $onHold, $isDeseased) = CRM_Contact_BAO_Contact::getContactDetails($contactId);
+        if (!$doNotEmail && $email && !$isDeseased) {
+          $url = 'civicrm/activity/email/add';
+          $act['label'] = ts('Send an Email');
+        }
+        else {
+          continue;
+        }
       }
-    }
-
-    if ($contactId && CRM_SMS_BAO_Provider::activeProviderCount()) {
-      // Check for existence of a mobile phone and ! do not SMS privacy setting
-      $mobileTypeID = CRM_Core_OptionGroup::getValue('phone_type', 'Mobile', 'name');
-      list($name, $phone, $doNotSMS) = CRM_Contact_BAO_Contact_Location::getPhoneDetails($contactId, $mobileTypeID);
-
-      if (!$doNotSMS && $phone) {
-        $sendSMS = array($SMSId => ts('Send SMS'));
-        $activityTypes += $sendSMS;
+      elseif ($act['name'] == 'SMS') {
+        if (!$contactId || !CRM_SMS_BAO_Provider::activeProviderCount()) {
+          continue;
+        }
+        // Check for existence of a mobile phone and ! do not SMS privacy setting
+        $mobileTypeID = CRM_Core_OptionGroup::getValue('phone_type', 'Mobile', 'name');
+        list($name, $phone, $doNotSMS) = CRM_Contact_BAO_Contact_Location::getPhoneDetails($contactId, $mobileTypeID);
+        if (!$doNotSMS && $phone) {
+          $url = 'civicrm/activity/sms/add';
+        }
+        else {
+          continue;
+        }
       }
-    }
-    // this returns activity types sorted by weight
-    $otherTypes = CRM_Core_PseudoConstant::activityType(FALSE);
-
-    $activityTypes += $otherTypes;
-
-    foreach (array_keys($activityTypes) as $typeId) {
-      if ($typeId == $emailTypeId) {
-        $urls[$typeId] = CRM_Utils_System::url('civicrm/activity/email/add',
-          "{$urlParams}{$typeId}", FALSE, NULL, FALSE
-        );
+      elseif ($act['name'] == 'Print PDF Letter') {
+        $url = 'civicrm/activity/pdf/add';
       }
-      elseif ($typeId == $SMSId) {
-        $urls[$typeId] = CRM_Utils_System::url('civicrm/activity/sms/add',
-          "{$urlParams}{$typeId}", FALSE, NULL, FALSE
-        );
+      elseif (!empty($act['filter']) || (!empty($act['component_id']) && $act['component_id'] != '1')) {
+        continue;
       }
-      elseif ($typeId == $letterTypeId) {
-        $urls[$typeId] = CRM_Utils_System::url('civicrm/activity/pdf/add',
-          "{$urlParams}{$typeId}", FALSE, NULL, FALSE
-        );
-      }
-      else {
-        $urls[$typeId] = CRM_Utils_System::url('civicrm/activity/add',
-          "{$urlParams}{$typeId}", FALSE, NULL, FALSE
-        );
-      }
+      $act['url'] = CRM_Utils_System::url($url,
+        "{$urlParams}{$act['value']}", FALSE, NULL, FALSE
+      );
+      $act += array('icon' => 'fa-plus-square-o');
+      $activityTypes[$act['value']] = $act;
     }
 
     $self->assign('activityTypes', $activityTypes);
-    $self->assign('urls', $urls);
 
     $self->assign('suppressForm', TRUE);
   }

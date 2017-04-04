@@ -3,7 +3,7 @@
   +--------------------------------------------------------------------+
   | CiviCRM version 4.7                                                |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2016                                |
+  | Copyright CiviCRM LLC (c) 2004-2017                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /*
@@ -450,7 +450,7 @@ function _civicrm_api3_deprecated_formatted_param($params, &$values, $create = F
               }
 
               if ($errorMsg) {
-                return civicrm_api3_create_error($errorMsg, $value[$key]);
+                return civicrm_api3_create_error($errorMsg);
               }
 
               // finally get soft credit contact id.
@@ -523,7 +523,7 @@ function _civicrm_api3_deprecated_formatted_param($params, &$values, $create = F
             }
           }
           else {
-            return civicrm_api3_create_error('No match found for specified contact in contribution data. Row was skipped.', 'pledge_payment');
+            return civicrm_api3_create_error('No match found for specified contact in pledge payment data. Row was skipped.');
           }
         }
         else {
@@ -539,7 +539,7 @@ function _civicrm_api3_deprecated_formatted_param($params, &$values, $create = F
               $contributionContactID = $params['contribution_contact_id'] = $values['contribution_contact_id'] = $contact->id;
             }
             else {
-              return civicrm_api3_create_error('No match found for specified contact in contribution data. Row was skipped.', 'pledge_payment');
+              return civicrm_api3_create_error('No match found for specified contact in pledge payment data. Row was skipped.');
             }
           }
           else {
@@ -551,21 +551,21 @@ function _civicrm_api3_deprecated_formatted_param($params, &$values, $create = F
 
               // check if only one contact is found
               if (count($matchedIDs) > 1) {
-                return civicrm_api3_create_error($error['error_message']['message'], 'pledge_payment');
+                return civicrm_api3_create_error($error['error_message']['message']);
               }
               else {
                 $contributionContactID = $params['contribution_contact_id'] = $values['contribution_contact_id'] = $matchedIDs[0];
               }
             }
             else {
-              return civicrm_api3_create_error('No match found for specified contact in contribution data. Row was skipped.', 'pledge_payment');
+              return civicrm_api3_create_error('No match found for specified contact in contribution data. Row was skipped.');
             }
           }
         }
 
         if (!empty($params['pledge_id'])) {
           if (CRM_Core_DAO::getFieldValue('CRM_Pledge_DAO_Pledge', $params['pledge_id'], 'contact_id') != $contributionContactID) {
-            return civicrm_api3_create_error('Invalid Pledge ID provided. Contribution row was skipped.', 'pledge_payment');
+            return civicrm_api3_create_error('Invalid Pledge ID provided. Contribution row was skipped.');
           }
           $values['pledge_id'] = $params['pledge_id'];
         }
@@ -575,10 +575,10 @@ function _civicrm_api3_deprecated_formatted_param($params, &$values, $create = F
           $pledgeDetails = CRM_Pledge_BAO_Pledge::getContactPledges($contributionContactID);
 
           if (empty($pledgeDetails)) {
-            return civicrm_api3_create_error('No open pledges found for this contact. Contribution row was skipped.', 'pledge_payment');
+            return civicrm_api3_create_error('No open pledges found for this contact. Contribution row was skipped.');
           }
           elseif (count($pledgeDetails) > 1) {
-            return civicrm_api3_create_error('This contact has more than one open pledge. Unable to determine which pledge to apply the contribution to. Contribution row was skipped.', 'pledge_payment');
+            return civicrm_api3_create_error('This contact has more than one open pledge. Unable to determine which pledge to apply the contribution to. Contribution row was skipped.');
           }
 
           // this mean we have only one pending / in progress pledge
@@ -593,7 +593,7 @@ function _civicrm_api3_deprecated_formatted_param($params, &$values, $create = F
           $values['pledge_payment_id'] = $pledgePaymentDetails['id'];
         }
         else {
-          return civicrm_api3_create_error('Contribution and Pledge Payment amount mismatch for this record. Contribution row was skipped.', 'pledge_payment');
+          return civicrm_api3_create_error('Contribution and Pledge Payment amount mismatch for this record. Contribution row was skipped.');
         }
         break;
 
@@ -1182,9 +1182,7 @@ function _civicrm_api3_deprecated_duplicate_formatted_contact($params) {
     }
   }
   else {
-    require_once 'CRM/Dedupe/Finder.php';
-    $dedupeParams = CRM_Dedupe_Finder::formatParams($params, $params['contact_type']);
-    $ids = CRM_Dedupe_Finder::dupesByParams($dedupeParams, $params['contact_type'], 'Unsupervised');
+    $ids = CRM_Contact_BAO_Contact::getDuplicateContacts($params, $params['contact_type'], 'Unsupervised');
 
     if (!empty($ids)) {
       $ids = implode(',', $ids);
@@ -1377,8 +1375,6 @@ function _civicrm_api3_deprecated_contact_check_custom_params($params, $csType =
 /**
  * @param array $params
  * @param bool $dupeCheck
- * @param bool $dupeErrorArray
- * @param bool $requiredCheck
  * @param int $dedupeRuleGroupID
  *
  * @return array|null
@@ -1386,9 +1382,10 @@ function _civicrm_api3_deprecated_contact_check_custom_params($params, $csType =
 function _civicrm_api3_deprecated_contact_check_params(
   &$params,
   $dupeCheck = TRUE,
-  $dupeErrorArray = FALSE,
-  $requiredCheck = TRUE,
   $dedupeRuleGroupID = NULL) {
+
+  $requiredCheck = TRUE;
+
   if (isset($params['id']) && is_numeric($params['id'])) {
     $requiredCheck = FALSE;
   }
@@ -1455,47 +1452,23 @@ function _civicrm_api3_deprecated_contact_check_params(
   }
 
   if ($dupeCheck) {
-    // @todo switch to using api version by uncommenting these lines & removing following 11.
-    // Any change here is too scary for a stable release.
+    // @todo switch to using api version
     // $dupes = civicrm_api3('Contact', 'duplicatecheck', (array('match' => $params, 'dedupe_rule_id' => $dedupeRuleGroupID)));
     // $ids = $dupes['count'] ? implode(',', array_keys($dupes['values'])) : NULL;
-    // check for record already existing
-    require_once 'CRM/Dedupe/Finder.php';
-    $dedupeParams = CRM_Dedupe_Finder::formatParams($params, $params['contact_type']);
-
-    // CRM-6431
-    // setting 'check_permission' here means that the dedupe checking will be carried out even if the
-    // person does not have permission to carry out de-dupes
-    // this is similar to the front end form
-    if (isset($params['check_permission'])) {
-      $dedupeParams['check_permission'] = $params['check_permission'];
-    }
-
-    $ids = implode(',', CRM_Dedupe_Finder::dupesByParams($dedupeParams, $params['contact_type'], 'Unsupervised', array(), $dedupeRuleGroupID));
-
+    $ids = CRM_Contact_BAO_Contact::getDuplicateContacts($params, $params['contact_type'], 'Unsupervised', array(), CRM_Utils_Array::value('check_permissions', $params, $dedupeRuleGroupID));
     if ($ids != NULL) {
-      if ($dupeErrorArray) {
-        $error = CRM_Core_Error::createError("Found matching contacts: $ids",
-          CRM_Core_Error::DUPLICATE_CONTACT,
-          'Fatal', $ids
-        );
-        return civicrm_api3_create_error($error->pop());
-      }
-
-      return civicrm_api3_create_error("Found matching contacts: $ids");
+      $error = CRM_Core_Error::createError("Found matching contacts: " . implode(',', $ids),
+        CRM_Core_Error::DUPLICATE_CONTACT,
+        'Fatal', $ids
+      );
+      return civicrm_api3_create_error($error->pop());
     }
   }
 
   // check for organisations with same name
   if (!empty($params['current_employer'])) {
-    $organizationParams = array();
-    $organizationParams['organization_name'] = $params['current_employer'];
-
-    require_once 'CRM/Dedupe/Finder.php';
-    $dedupParams = CRM_Dedupe_Finder::formatParams($organizationParams, 'Organization');
-
-    $dedupParams['check_permission'] = FALSE;
-    $dupeIds = CRM_Dedupe_Finder::dupesByParams($dedupParams, 'Organization', 'Supervised');
+    $organizationParams = array('organization_name' => $params['current_employer']);
+    $dupeIds = CRM_Contact_BAO_Contact::getDuplicateContacts($organizationParams, 'Organization', 'Supervised', array(), FALSE);
 
     // check for mismatch employer name and id
     if (!empty($params['employer_id']) && !in_array($params['employer_id'], $dupeIds)

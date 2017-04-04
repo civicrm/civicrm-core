@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -51,14 +51,6 @@ class CRM_Admin_Page_AJAX {
         'navigation' => CRM_Core_BAO_Navigation::createNavigation($contactID),
       ));
     }
-    CRM_Utils_System::civiExit();
-  }
-
-  /**
-   * Return menu tree as json data for editing.
-   */
-  public static function getNavigationList() {
-    echo CRM_Core_BAO_Navigation::buildNavigation(TRUE, FALSE);
     CRM_Utils_System::civiExit();
   }
 
@@ -247,54 +239,6 @@ class CRM_Admin_Page_AJAX {
     CRM_Core_Page_AJAX::returnJsonResponse($ret);
   }
 
-  public static function mergeTagList() {
-    $name = CRM_Utils_Type::escape($_GET['term'], 'String');
-    $fromId = CRM_Utils_Type::escape($_GET['fromId'], 'Integer');
-    $limit = Civi::settings()->get('search_autocomplete_count');
-
-    // build used-for clause to be used in main query
-    $usedForTagA = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Tag', $fromId, 'used_for');
-    $usedForClause = array();
-    if ($usedForTagA) {
-      $usedForTagA = explode(",", $usedForTagA);
-      foreach ($usedForTagA as $key => $value) {
-        $usedForClause[] = "t1.used_for LIKE '%{$value}%'";
-      }
-    }
-    $usedForClause = !empty($usedForClause) ? implode(' OR ', $usedForClause) : '1';
-    sort($usedForTagA);
-
-    // query to list mergable tags
-    $query = "
-SELECT t1.name, t1.id, t1.used_for, t2.name as parent
-FROM   civicrm_tag t1
-LEFT JOIN civicrm_tag t2 ON t1.parent_id = t2.id
-WHERE  t1.id <> {$fromId} AND
-       t1.name LIKE '%{$name}%' AND
-       ({$usedForClause})
-LIMIT $limit";
-    $dao = CRM_Core_DAO::executeQuery($query);
-    $result = array();
-
-    while ($dao->fetch()) {
-      $row = array(
-        'id' => $dao->id,
-        'text' => ($dao->parent ? "{$dao->parent} :: " : '') . $dao->name,
-      );
-      // Add warning about used_for types
-      if (!empty($dao->used_for)) {
-        $usedForTagB = explode(',', $dao->used_for);
-        sort($usedForTagB);
-        $usedForDiff = array_diff($usedForTagA, $usedForTagB);
-        if (!empty($usedForDiff)) {
-          $row['warning'] = TRUE;
-        }
-      }
-      $result[] = $row;
-    }
-    CRM_Utils_JSON::output($result);
-  }
-
   /**
    * Get a list of mappings.
    *
@@ -351,23 +295,52 @@ LIMIT $limit";
     ));
   }
 
-  public static function mergeTags() {
-    $tagAId = CRM_Utils_Type::escape($_POST['fromId'], 'Integer');
-    $tagBId = CRM_Utils_Type::escape($_POST['toId'], 'Integer');
+  /**
+   * Outputs one branch in the tag tree
+   *
+   * Used by jstree to incrementally load tags
+   */
+  public static function getTagTree() {
+    $parent = CRM_Utils_Type::escape(CRM_Utils_Array::value('parent_id', $_GET, 0), 'Integer');
+    $result = array();
 
-    $result = CRM_Core_BAO_EntityTag::mergeTags($tagAId, $tagBId);
-
-    if (!empty($result['tagB_used_for'])) {
-      $usedFor = CRM_Core_OptionGroup::values('tag_used_for');
-      foreach ($result['tagB_used_for'] as & $val) {
-        $val = $usedFor[$val];
+    $parentClause = $parent ? "AND tag.parent_id = $parent" : 'AND tag.parent_id IS NULL';
+    $sql = "SELECT tag.*, child.id AS child, COUNT(et.id) as usages
+      FROM civicrm_tag tag
+      LEFT JOIN civicrm_entity_tag et ON et.tag_id = tag.id
+      LEFT JOIN civicrm_tag child ON child.parent_id = tag.id
+      WHERE tag.is_tagset <> 1 $parentClause
+      GROUP BY tag.id
+      ORDER BY tag.name";
+    $dao = CRM_Core_DAO::executeQuery($sql);
+    while ($dao->fetch()) {
+      $style = '';
+      if ($dao->color) {
+        $style = "background-color: {$dao->color}; color: " . CRM_Utils_Color::getContrast($dao->color);
       }
-      $result['tagB_used_for'] = implode(', ', $result['tagB_used_for']);
+      $result[] = array(
+        'id' => $dao->id,
+        'text' => $dao->name,
+        'icon' => FALSE,
+        'li_attr' => array(
+          'title' => ((string) $dao->description) . ($dao->is_reserved ? ' (*' . ts('Reserved') . ')' : ''),
+          'class' => $dao->is_reserved ? 'is-reserved' : '',
+        ),
+        'a_attr' => array(
+          'style' => $style,
+          'class' => 'crm-tag-item',
+        ),
+        'children' => (bool) $dao->child,
+        'data' => array(
+          'description' => (string) $dao->description,
+          'is_selectable' => (bool) $dao->is_selectable,
+          'is_reserved' => (bool) $dao->is_reserved,
+          'used_for' => $dao->used_for ? explode(',', $dao->used_for) : array(),
+          'color' => $dao->color ? $dao->color : '#ffffff',
+          'usages' => (int) $dao->usages,
+        ),
+      );
     }
-
-    $result['message'] = ts('"%1" has been merged with "%2". All records previously tagged "%1" are now tagged "%2".',
-      array(1 => $result['tagA'], 2 => $result['tagB'])
-    );
 
     CRM_Utils_JSON::output($result);
   }

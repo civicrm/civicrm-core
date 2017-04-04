@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Report_Form_Contribute_Repeat extends CRM_Report_Form {
   protected $_amountClauseWithAND = NULL;
@@ -683,7 +683,7 @@ LEFT JOIN $this->tempTableRepeat2 {$this->_aliases['civicrm_contribution']}2
   public function statistics(&$rows) {
     $statistics = parent::statistics($rows);
     $sql = "{$this->_select} {$this->_from} {$this->_where}";
-    $dao = CRM_Core_DAO::executeQuery($sql);
+    $dao = $this->executeReportQuery($sql);
     //store contributions in array 'contact_sums' for comparison
     $contact_sums = array();
     while ($dao->fetch()) {
@@ -765,7 +765,7 @@ SELECT COUNT({$this->_aliases['civicrm_contribution']}1.total_amount_count )    
     $sql = "{$select} {$this->_from} {$this->_where}
 GROUP BY    currency
 ";
-    $dao = CRM_Core_DAO::executeQuery($sql);
+    $dao = $this->executeReportQuery($sql);
 
     $amount = $average = $amount2 = $average2 = array();
     $count = $count2 = 0;
@@ -834,7 +834,7 @@ GROUP BY    currency
 
     $count = 0;
     $sql = "{$this->_select} {$this->_from} {$this->_where} {$this->_groupBy} {$this->_limit}";
-    $dao = CRM_Core_DAO::executeQuery($sql);
+    $dao = $this->executeReportQuery($sql);
     $rows = array();
     while ($dao->fetch()) {
       foreach ($this->_columnHeaders as $key => $value) {
@@ -1032,11 +1032,11 @@ CREATE TEMPORARY TABLE $this->tempTableRepeat1 (
 {$this->contributionJoinTableColumn} int unsigned,
 total_amount_sum int,
 total_amount_count int
-) ENGINE=HEAP DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci";
-    CRM_Core_DAO::executeQuery($sql);
-    CRM_Core_DAO::executeQuery("INSERT INTO $this->tempTableRepeat1 {$subContributionQuery1}");
+) ENGINE=HEAP {$this->_databaseAttributes}";
+    $this->executeReportQuery($sql);
+    $this->executeReportQuery("INSERT INTO $this->tempTableRepeat1 {$subContributionQuery1}");
 
-    CRM_Core_DAO::executeQuery("
+    $this->executeReportQuery("
       ALTER TABLE $this->tempTableRepeat1 ADD INDEX ({$this->contributionJoinTableColumn})
     ");
 
@@ -1048,12 +1048,12 @@ CREATE TEMPORARY TABLE  $this->tempTableRepeat2 (
 total_amount_sum int,
 total_amount_count int,
 currency varchar(3)
-) ENGINE=HEAP DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci";
-    CRM_Core_DAO::executeQuery($sql);
+) ENGINE=HEAP {$this->_databaseAttributes}";
+    $this->executeReportQuery($sql);
     $sql = "INSERT INTO $this->tempTableRepeat2 {$subContributionQuery2}";
-    CRM_Core_DAO::executeQuery($sql);
+    $this->executeReportQuery($sql);
 
-    CRM_Core_DAO::executeQuery("
+    $this->executeReportQuery("
       ALTER TABLE $this->tempTableRepeat2 ADD INDEX ({$this->contributionJoinTableColumn})
     ");
 

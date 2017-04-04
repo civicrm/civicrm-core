@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -96,6 +96,44 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
     );
     // true tells quickCleanup to drop any tables that might have been created in the test
     $this->quickCleanup($tablesToTruncate, TRUE);
+  }
+
+  /**
+   * Test get participants with role_id.
+   */
+  public function testGetParticipantWithRole() {
+    $roleId = array(1, 2, 3);
+    foreach ($roleId as $role) {
+      $this->participantCreate(array(
+        'contact_id' => $this->individualCreate(),
+        'role_id' => $role,
+        'event_id' => $this->_eventID,
+      ));
+    }
+
+    $params = array(
+      'role_id' => 2,
+    );
+    $result = $this->callAPISuccess('participant', 'get', $params);
+    //Assert all the returned participants has a role_id of 2
+    foreach ($result['values'] as $pid => $values) {
+      $this->assertEquals($values['participant_role_id'], 2);
+    }
+
+    $this->participantCreate(array(
+      'id' => $this->_participantID,
+      'role_id' => NULL,
+      'event_id' => $this->_eventID,
+    ));
+
+    $params['role_id'] = array(
+      'IS NULL' => 1,
+    );
+    $result = $this->callAPISuccess('participant', 'get', $params);
+    foreach ($result['values'] as $pid => $values) {
+      $this->assertEquals($values['participant_role_id'], NULL);
+    }
+
   }
 
   /**

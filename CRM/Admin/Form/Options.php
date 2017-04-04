@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -134,6 +134,9 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
     if ($this->_gName == 'payment_instrument' && $this->_id) {
       $defaults['financial_account_id'] = CRM_Financial_BAO_FinancialTypeAccount::getFinancialAccount($this->_id, 'civicrm_option_value', 'financial_account_id');
     }
+    if (empty($this->_id) || !CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionValue', $this->_id, 'color')) {
+      $defaults['color'] = '#ffffff';
+    }
     return $defaults;
   }
 
@@ -169,6 +172,13 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
         CRM_Core_DAO::getAttribute('CRM_Core_DAO_OptionValue', 'value'),
         TRUE
       );
+    }
+    else {
+      $this->add('text', 'icon', ts('Icon'), array('class' => 'crm-icon-picker', 'title' => ts('Choose Icon'), 'allowClear' => TRUE));
+    }
+
+    if ($this->_gName == 'activity_status') {
+      $this->add('color', 'color', ts('Color'));
     }
 
     if (!in_array($this->_gName, array(
@@ -425,7 +435,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       }
     }
     else {
-      $params = $ids = array();
+      $ids = array();
       $params = $this->exportValues();
 
       // allow multiple defaults within group.
@@ -455,6 +465,10 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
         }
       }
 
+      if (isset($params['color']) && strtolower($params['color']) == '#ffffff') {
+        $params['color'] = 'null';
+      }
+
       $groupParams = array('name' => ($this->_gName));
       $optionValue = CRM_Core_OptionValue::addOptionValue($params, $groupParams, $this->_action, $this->_id);
 
@@ -474,6 +488,8 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
             1 => $this->_gLabel,
             2 => $optionValue->label,
           )), ts('Saved'), 'success');
+
+      $this->ajaxResponse['optionValue'] = $optionValue->toArray();
     }
   }
 

@@ -22,7 +22,8 @@ function constant_get_example() {
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
     return array(
-      'error' => $errorMessage,
+      'is_error' => 1,
+      'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
     );
@@ -42,7 +43,7 @@ function constant_get_expectedresult() {
   $expectedResult = array(
     'is_error' => 0,
     'version' => 3,
-    'count' => 32,
+    'count' => 36,
     'values' => array(
       '1' => 'Meeting',
       '2' => 'Phone Call',
@@ -58,7 +59,7 @@ function constant_get_expectedresult() {
       '12' => 'Inbound Email',
       '17' => 'Membership Renewal Reminder',
       '19' => 'Bulk Email',
-      '22' => 'Print PDF Letter',
+      '22' => 'Print/Merge Document',
       '34' => 'Mass SMS',
       '35' => 'Change Membership Status',
       '36' => 'Change Membership Type',
@@ -76,6 +77,10 @@ function constant_get_expectedresult() {
       '48' => 'Change Registration',
       '49' => 'Downloaded Invoice',
       '50' => 'Emailed Invoice',
+      '51' => 'Contact Merged',
+      '52' => 'Contact Deleted by Merge',
+      '53' => 'Failed Payment',
+      '54' => 'Close Accounting Period',
     ),
     'deprecated' => 'The Constant api is deprecated as of CiviCRM 4.4. Please use the getoptions api action instead.',
   );

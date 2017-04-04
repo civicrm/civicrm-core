@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -30,7 +30,7 @@
  * system.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Extension_System {
   private static $singleton;
@@ -144,7 +144,7 @@ class CRM_Extension_System {
         if (is_dir($vendorPath)) {
           $containers['cmsvendor'] = new CRM_Extension_Container_Basic(
             $vendorPath,
-            $this->parameters['userFrameworkBaseURL'] . DIRECTORY_SEPARATOR . 'vendor',
+            CRM_Utils_File::addTrailingSlash($this->parameters['userFrameworkBaseURL'], '/') . 'vendor',
             $this->getCache(),
             'cmsvendor'
           );

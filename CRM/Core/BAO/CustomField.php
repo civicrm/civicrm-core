@@ -3,7 +3,7 @@
   +--------------------------------------------------------------------+
   | CiviCRM version 4.7                                                |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2016                                |
+  | Copyright CiviCRM LLC (c) 2004-2017                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -131,7 +131,11 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
   public static function create(&$params) {
     $origParams = array_merge(array(), $params);
 
-    if (!isset($params['id'])) {
+    $op = empty($params['id']) ? 'create' : 'edit';
+
+    CRM_Utils_Hook::pre($op, 'CustomField', CRM_Utils_Array::value('id', $params), $params);
+
+    if ($op == 'create') {
       if (!isset($params['column_name'])) {
         // if add mode & column_name not present, calculate it.
         $params['column_name'] = strtolower(CRM_Utils_String::munge($params['label'], '_', 32));
@@ -291,7 +295,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
 
     $triggerRebuild = CRM_Utils_Array::value('triggerRebuild', $params, TRUE);
     //create/drop the index when we toggle the is_searchable flag
-    if (!empty($params['id'])) {
+    if ($op == 'edit') {
       self::createField($customField, 'modify', $indexExist, $triggerRebuild);
     }
     else {
@@ -310,6 +314,8 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
 
     // complete transaction
     $transaction->commit();
+
+    CRM_Utils_Hook::post($op, 'CustomField', $customField->id, $customField);
 
     CRM_Utils_System::flushCache();
 
@@ -1128,6 +1134,8 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     $field->delete();
     CRM_Core_BAO_UFField::delUFField($field->id);
     CRM_Utils_Weight::correctDuplicateWeights('CRM_Core_DAO_CustomField');
+
+    CRM_Utils_Hook::post('delete', 'CustomField', $field->id, $field);
   }
 
   /**
@@ -1210,7 +1218,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         // Or should we throw an exception here if it is?
         $value = is_array($value) ? CRM_Utils_Array::first($value) : $value;
 
-        $actualPHPFormats = CRM_Core_SelectValues::datePluginToPHPFormats();
+        $actualPHPFormats = CRM_Utils_Date::datePluginToPHPFormats();
         $format = CRM_Utils_Array::value('date_format', $field);
 
         if ($format) {
@@ -1435,7 +1443,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           $entityId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_EntityFile',
             $fileID,
             'entity_id',
-            'id'
+            'file_id'
           );
           list($path) = CRM_Core_BAO_File::path($fileID, $entityId, NULL, NULL);
           $url = CRM_Utils_System::url('civicrm/file',
@@ -1643,9 +1651,6 @@ SELECT id
 
       $config = CRM_Core_Config::singleton();
 
-      $fName = $value['name'];
-      $mimeType = $value['type'];
-
       // If we are already passing the file id as a value then retrieve and set the file data
       if (CRM_Utils_Rule::integer($value)) {
         $fileDAO = new CRM_Core_DAO_File();
@@ -1656,6 +1661,10 @@ SELECT id
           $fName = $fileDAO->uri;
           $mimeType = $fileDAO->mime_type;
         }
+      }
+      else {
+        $fName = $value['name'];
+        $mimeType = $value['type'];
       }
 
       $filename = pathinfo($fName, PATHINFO_BASENAME);

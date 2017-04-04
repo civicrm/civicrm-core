@@ -50,6 +50,11 @@
     <type>int unsigned</type>
     <required>true</required>
     <comment>FK to civicrm_batch</comment>
+    <pseudoconstant>
+      <table>civicrm_batch</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>title</labelColumn>
+    </pseudoconstant>
     <add>3.3</add>
   </field>
   <foreignKey>

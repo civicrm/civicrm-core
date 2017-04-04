@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -143,7 +143,7 @@ function civicrm_api3_generic_setValue($apiRequest) {
       $params[$field] = '';
     }
     CRM_Core_BAO_CustomValueTable::setValues($params);
-    CRM_Utils_Hook::post('edit', $entity, $id, CRM_Core_DAO::$_nullObject);
+    CRM_Utils_Hook::post('edit', $entity, $id);
   }
   // Core fields
   elseif (CRM_Core_DAO::setFieldValue($dao_name, $id, $field, $params[$field])) {

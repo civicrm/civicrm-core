@@ -428,7 +428,7 @@ SELECT 'SnapChat' AS website
     UNION ALL
 SELECT 'Vine' AS website
 ) AS temp
-LEFT JOIN civicrm_option_value co ON LOWER(co.name) = LOWER(temp.website)
+LEFT JOIN civicrm_option_value co ON co.name = temp.website
 AND option_group_id = @option_web_id
 WHERE co.id IS NULL;
 
@@ -481,7 +481,7 @@ CASE
    THEN 'Ineligible'
   ELSE 'Submitted'
 END
-WHERE option_group_id = @option_grant_status and LOWER(name) IN ('granted', 'pending', 'approved', 'rejected');
+WHERE option_group_id = @option_grant_status and name IN ('granted', 'pending', 'approved', 'rejected');
 
 SELECT @grant_value := max(cast(value as UNSIGNED)) FROM civicrm_option_value WHERE option_group_id = @option_grant_status;
 SELECT @grant_weight := max(weight) FROM civicrm_option_value WHERE option_group_id = @option_grant_status;
@@ -498,7 +498,7 @@ SELECT 'Awaiting Information' AS grantstatus
     UNION ALL
 SELECT 'Withdrawn' AS grantstatus
 ) AS temp
-LEFT JOIN civicrm_option_value co ON LOWER(co.name) = LOWER(temp.grantstatus)
+LEFT JOIN civicrm_option_value co ON co.name = temp.grantstatus
 AND option_group_id = @option_grant_status
 WHERE co.id IS NULL;
 

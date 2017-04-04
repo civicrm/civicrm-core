@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
  *
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Core_BAO_CustomQuery {
   const PREFIX = 'custom_value_';
@@ -336,7 +336,7 @@ SELECT f.id, f.label, f.data_type,
                 if ($field['data_type'] == 'String') {
                   $value = CRM_Utils_Type::escape($strtolower($value), 'String');
                 }
-                else {
+                elseif ($value) {
                   $value = CRM_Utils_Type::escape($value, 'Integer');
                 }
                 $value = str_replace(array('[', ']', ','), array('\[', '\]', '[:comma:]'), $value);

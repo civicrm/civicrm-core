@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -136,6 +136,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     $query = $db->getQuery(TRUE);
     $query->select('username, email');
     $query->from($JUserTable->getTableName());
+
+    // LOWER in query below roughly translates to 'hurt my database without deriving any benefit' See CRM-19811.
     $query->where('(LOWER(username) = LOWER(\'' . $name . '\')) OR (LOWER(email) = LOWER(\'' . $email . '\'))');
     $db->setQuery($query, 0, 10);
     $users = $db->loadAssocList();
@@ -710,8 +712,20 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
       '',
       $config->userFrameworkBaseURL
     );
+    // CRM-19453 revisited. Under Windows, the pattern wasn't recognised.
+    // This is the original pattern, but it doesn't work under Windows.
+    // By setting the pattern to the one used before the change first and only
+    // changing it means that the change code only affects Windows users.
+    $pattern = '|/media/civicrm/.*$|';
+    if (DIRECTORY_SEPARATOR == '\\') {
+      // This regular expression will handle Windows as well as Linux
+      // and any combination of forward and back slashes in directory
+      // separators.  We only apply it if the directory separator is the one
+      // used by Windows.
+      $pattern = '|[\\\\/]media[\\\\/]civicrm[\\\\/].*$|';
+    }
     $siteRoot = preg_replace(
-      '|/media/civicrm/.*$|',
+      $pattern,
       '',
       $config->imageUploadDir
     );

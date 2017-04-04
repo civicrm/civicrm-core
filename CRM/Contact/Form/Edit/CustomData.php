@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -42,8 +42,8 @@ class CRM_Contact_Form_Edit_CustomData {
    * @param CRM_Core_Form $form
    */
   public static function preProcess(&$form) {
-    $form->_type = CRM_Utils_Request::retrieve('type', 'String', CRM_Core_DAO::$_nullObject);
-    $form->_subType = CRM_Utils_Request::retrieve('subType', 'String', CRM_Core_DAO::$_nullObject);
+    $form->_type = CRM_Utils_Request::retrieve('type', 'String');
+    $form->_subType = CRM_Utils_Request::retrieve('subType', 'String');
 
     //build the custom data as other blocks.
     //$form->assign( "addBlock", false );

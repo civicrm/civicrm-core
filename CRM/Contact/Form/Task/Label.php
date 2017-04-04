@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -48,27 +48,36 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
    * Build the form object.
    */
   public function buildQuickForm() {
+    self::buildLabelForm($this);
+  }
+
+  /**
+   * Common Function to build Mailing Label Form.
+   *
+   * @param CRM_Core_Form $form
+   */
+  public static function buildLabelForm($form) {
     CRM_Utils_System::setTitle(ts('Make Mailing Labels'));
 
     //add select for label
     $label = CRM_Core_BAO_LabelFormat::getList(TRUE);
 
-    $this->add('select', 'label_name', ts('Select Label'), array('' => ts('- select label -')) + $label, TRUE);
+    $form->add('select', 'label_name', ts('Select Label'), array('' => ts('- select label -')) + $label, TRUE);
 
     // add select for Location Type
-    $this->addElement('select', 'location_type_id', ts('Select Location'),
+    $form->addElement('select', 'location_type_id', ts('Select Location'),
       array(
         '' => ts('Primary'),
       ) + CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id'), TRUE
     );
 
     // checkbox for SKIP contacts with Do Not Mail privacy option
-    $this->addElement('checkbox', 'do_not_mail', ts('Do not print labels for contacts with "Do Not Mail" privacy option checked'));
+    $form->addElement('checkbox', 'do_not_mail', ts('Do not print labels for contacts with "Do Not Mail" privacy option checked'));
 
-    $this->add('checkbox', 'merge_same_address', ts('Merge labels for contacts with the same address'), NULL);
-    $this->add('checkbox', 'merge_same_household', ts('Merge labels for contacts belonging to the same household'), NULL);
+    $form->add('checkbox', 'merge_same_address', ts('Merge labels for contacts with the same address'), NULL);
+    $form->add('checkbox', 'merge_same_household', ts('Merge labels for contacts belonging to the same household'), NULL);
 
-    $this->addButtons(array(
+    $form->addButtons(array(
       array(
         'type' => 'submit',
         'name' => ts('Make Mailing Labels'),

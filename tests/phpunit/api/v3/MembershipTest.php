@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -93,6 +93,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
         'civicrm_membership',
         'civicrm_membership_payment',
         'civicrm_membership_log',
+        'civicrm_uf_match',
       ),
       TRUE
     );
@@ -161,6 +162,47 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $this->assertDBRowExist('CRM_Contribute_DAO_Contribution', $ContributionCreate['values'][0]['id']);
     $this->callAPISuccess('Contribution', 'delete', $contribParams);
     $this->assertDBRowNotExist('CRM_Contribute_DAO_Contribution', $ContributionCreate['values'][0]['id']);
+  }
+
+  /**
+   * Test Activity creation on cancellation of membership contribution.
+   */
+  public function testActivityForCancelledContribution() {
+    $contactId = $this->createLoggedInUser();
+    $membershipID = $this->contactMembershipCreate($this->_params);
+    $this->assertDBRowExist('CRM_Member_DAO_Membership', $membershipID);
+
+    $ContributionCreate = $this->callAPISuccess('Contribution', 'create', array(
+      'financial_type_id' => "Member Dues",
+      'total_amount' => 100,
+      'contact_id' => $this->_params['contact_id'],
+    ));
+    $membershipPaymentCreate = $this->callAPISuccess('MembershipPayment', 'create', array(
+      'sequential' => 1,
+      'contribution_id' => $ContributionCreate['id'],
+      'membership_id' => $membershipID,
+    ));
+    $instruments = $this->callAPISuccess('contribution', 'getoptions', array('field' => 'payment_instrument_id'));
+    $this->paymentInstruments = $instruments['values'];
+
+    $form = new CRM_Contribute_Form_Contribution();
+    $form->_id = $ContributionCreate['id'];
+    $form->testSubmit(array(
+      'total_amount' => 100,
+      'financial_type_id' => 1,
+      'receive_date' => '04/21/2015',
+      'receive_date_time' => '11:27PM',
+      'contact_id' => $contactId,
+      'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
+      'contribution_status_id' => 3,
+    ),
+    CRM_Core_Action::UPDATE);
+
+    $activity = $this->callAPISuccess('Activity', 'get', array(
+      'activity_type_id' => "Change Membership Status",
+      'source_record_id' => $membershipID,
+    ));
+    $this->assertNotEmpty($activity['values']);
   }
 
   /**
@@ -1116,6 +1158,66 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $this->assertEquals('2009-01-21', $result['join_date']);
     $this->assertEquals('2008-03-01', $result['start_date']);
     $this->assertEquals('2014-02-28', $result['end_date']);
+  }
+
+  /**
+   * CRM-18503 - Test membership join date is correctly set for fixed memberships.
+   */
+  public function testMembershipJoinDateFixed() {
+    $memStatus = CRM_Member_PseudoConstant::membershipStatus();
+    // Update the fixed membership type to 1 year duration.
+    $this->callAPISuccess('membership_type', 'create', array('id' => $this->_membershipTypeID2, 'duration_interval' => 1));
+    $contactId = $this->createLoggedInUser();
+    // Create membership with 'Pending' status.
+    $params = array(
+      'contact_id' => $contactId,
+      'membership_type_id' => $this->_membershipTypeID2,
+      'source' => 'test membership',
+      'is_pay_later' => 0,
+      'status_id' => array_search('Pending', $memStatus),
+      'skipStatusCal' => 1,
+      'is_for_organization' => 1,
+    );
+    $ids = array();
+    $membership = CRM_Member_BAO_Membership::create($params, $ids);
+
+    // Update membership to 'Completed' and check the dates.
+    $memParams = array(
+      'id' => $membership->id,
+      'contact_id' => $contactId,
+      'is_test' => 0,
+      'membership_type_id' => $this->_membershipTypeID2,
+      'num_terms' => 1,
+      'status_id' => array_search('New', $memStatus),
+    );
+    $result = $this->callAPISuccess('Membership', 'create', $memParams);
+
+    // Extend duration interval if join_date exceeds the rollover period.
+    $joinDate = date('Y-m-d');
+    $year = date('Y');
+    $startDate = date('Y-m-d', strtotime(date('Y-03-01')));
+    $rollOver = TRUE;
+    if (strtotime($startDate) > time()) {
+      $rollOver = FALSE;
+      $startDate = date('Y-m-d', strtotime(date('Y-03-01') . '- 1 year'));
+    }
+    $membershipTypeDetails = CRM_Member_BAO_MembershipType::getMembershipTypeDetails($this->_membershipTypeID2);
+    $fixedPeriodRollover = CRM_Member_BAO_MembershipType::isDuringFixedAnnualRolloverPeriod($joinDate, $membershipTypeDetails, $year, $startDate);
+    $y = 1;
+    if ($fixedPeriodRollover && $rollOver) {
+      $y += 1;
+    }
+
+    $expectedDates = array(
+      'join_date' => date('Ymd'),
+      'start_date' => str_replace('-', '', $startDate),
+      'end_date' => date('Ymd', strtotime(date('Y-03-01') . "+ {$y} year - 1 day")),
+    );
+    foreach ($result['values'] as $values) {
+      foreach ($expectedDates as $date => $val) {
+        $this->assertEquals($val, $values[$date], "Failed asserting {$date} values");
+      }
+    }
   }
 
   /**

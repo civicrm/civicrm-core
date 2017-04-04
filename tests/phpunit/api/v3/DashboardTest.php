@@ -62,6 +62,28 @@ class api_v3_DashboardTest extends CiviUnitTestCase {
   }
 
   /**
+   * CRM-19534.
+   *
+   * Ensure that Dashboard create works fine for non admins
+   */
+  public function testDashboardCreateByNonAdmins() {
+    $loggedInContactID = $this->createLoggedInUser();
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = array();
+    $params = array(
+      'label' => 'New Dashlet element',
+      'name' => 'New Dashlet element',
+      'url' => 'civicrm/report/list&reset=1&compid=99',
+      'fullscreen_url' => 'civicrm/report/list&compid=99&reset=1&context=dashletFullscreen',
+    );
+    $dashboard = $this->callAPISuccess('dashboard', 'create', $params);
+    $this->assertTrue(is_numeric($dashboard['id']), "In line " . __LINE__);
+    $this->assertTrue($dashboard['id'] > 0, "In line " . __LINE__);
+
+    $this->callAPISuccess('dashboard', 'create', $params);
+    $this->assertEquals($dashboard['values'][$dashboard['id']]['is_active'], 1);
+  }
+
+  /**
    * CRM-19217.
    *
    * Ensure that where is_active is specifically set to 0 is_active returns 0.

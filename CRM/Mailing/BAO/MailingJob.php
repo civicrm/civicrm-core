@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 require_once 'Mail.php';
@@ -55,9 +55,12 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
   }
 
   /**
+   * Create mailing job.
+   *
    * @param array $params
    *
-   * @return CRM_Mailing_BAO_MailingJob
+   * @return \CRM_Mailing_BAO_MailingJob
+   * @throws \CRM_Core_Exception
    */
   static public function create($params) {
     $job = new CRM_Mailing_BAO_MailingJob();
@@ -78,10 +81,12 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
   }
 
   /**
-   * Initiate all pending/ready jobs
+   * Initiate all pending/ready jobs.
    *
    * @param array $testParams
-   * @param null $mode
+   * @param string $mode
+   *
+   * @return bool|null
    */
   public static function runJobs($testParams = NULL, $mode = NULL) {
     $job = new CRM_Mailing_BAO_MailingJob();
@@ -189,7 +194,12 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
       }
 
       // Compose and deliver each child job
-      $isComplete = $job->deliver($mailer, $testParams);
+      if (\CRM_Utils_Constant::value('CIVICRM_FLEXMAILER_HACK_DELIVER')) {
+        $isComplete = Civi\Core\Resolver::singleton()->call(CIVICRM_FLEXMAILER_HACK_DELIVER, array($job, $mailer, $testParams));
+      }
+      else {
+        $isComplete = $job->deliver($mailer, $testParams);
+      }
 
       CRM_Utils_Hook::post('create', 'CRM_Mailing_DAO_Spool', $job->id, $isComplete);
 
@@ -492,61 +502,14 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
    * @param array $testParams
    */
   public function deliver(&$mailer, $testParams = NULL) {
+    if (\Civi::settings()->get('experimentalFlexMailerEngine')) {
+      throw new \RuntimeException("Cannot use legacy deliver() when experimentalFlexMailerEngine is enabled");
+    }
+
     $mailing = new CRM_Mailing_BAO_Mailing();
     $mailing->id = $this->mailing_id;
     $mailing->find(TRUE);
     $mailing->free();
-
-    $eq = new CRM_Mailing_Event_BAO_Queue();
-    $eqTable = CRM_Mailing_Event_BAO_Queue::getTableName();
-    $emailTable = CRM_Core_BAO_Email::getTableName();
-    $phoneTable = CRM_Core_DAO_Phone::getTableName();
-    $contactTable = CRM_Contact_BAO_Contact::getTableName();
-    $edTable = CRM_Mailing_Event_BAO_Delivered::getTableName();
-    $ebTable = CRM_Mailing_Event_BAO_Bounce::getTableName();
-
-    $query = "  SELECT      $eqTable.id,
-                                $emailTable.email as email,
-                                $eqTable.contact_id,
-                                $eqTable.hash,
-                                NULL as phone
-                    FROM        $eqTable
-                    INNER JOIN  $emailTable
-                            ON  $eqTable.email_id = $emailTable.id
-                    INNER JOIN  $contactTable
-                            ON  $contactTable.id = $emailTable.contact_id
-                    LEFT JOIN   $edTable
-                            ON  $eqTable.id = $edTable.event_queue_id
-                    LEFT JOIN   $ebTable
-                            ON  $eqTable.id = $ebTable.event_queue_id
-                    WHERE       $eqTable.job_id = " . $this->id . "
-                        AND     $edTable.id IS null
-                        AND     $ebTable.id IS null
-                        AND    $contactTable.is_opt_out = 0";
-
-    if ($mailing->sms_provider_id) {
-      $query = "
-                    SELECT      $eqTable.id,
-                                $phoneTable.phone as phone,
-                                $eqTable.contact_id,
-                                $eqTable.hash,
-                                NULL as email
-                    FROM        $eqTable
-                    INNER JOIN  $phoneTable
-                            ON  $eqTable.phone_id = $phoneTable.id
-                    INNER JOIN  $contactTable
-                            ON  $contactTable.id = $phoneTable.contact_id
-                    LEFT JOIN   $edTable
-                            ON  $eqTable.id = $edTable.event_queue_id
-                    LEFT JOIN   $ebTable
-                            ON  $eqTable.id = $ebTable.event_queue_id
-                    WHERE       $eqTable.job_id = " . $this->id . "
-                        AND     $edTable.id IS null
-                        AND     $ebTable.id IS null
-                        AND    ( $contactTable.is_opt_out = 0
-                        OR       $contactTable.do_not_sms = 0 )";
-    }
-    $eq->query($query);
 
     $config = NULL;
 
@@ -581,11 +544,8 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
 
     // make sure that there's no more than $mailerBatchLimit mails processed in a run
     $mailerBatchLimit = Civi::settings()->get('mailerBatchLimit');
+    $eq = self::findPendingTasks($this->id, $mailing->sms_provider_id ? 'sms' : 'email');
     while ($eq->fetch()) {
-      // if ( ( $mailsProcessed % 100 ) == 0 ) {
-      // CRM_Utils_System::xMemory( "$mailsProcessed: " );
-      // }
-
       if ($mailerBatchLimit > 0 && self::$mailsProcessed >= $mailerBatchLimit) {
         if (!empty($fields)) {
           $this->deliverGroup($fields, $mailing, $mailer, $job_date, $attachments);
@@ -1035,6 +995,70 @@ AND    record_type_id = $targetRecordID
     }
 
     return $result;
+  }
+
+  /**
+   * Search the mailing-event queue for a list of pending delivery tasks.
+   *
+   * @param int $jobId
+   * @param string $medium
+   *   Ex: 'email' or 'sms'.
+   *
+   * @return \CRM_Mailing_Event_BAO_Queue
+   *   A query object whose rows provide ('id', 'contact_id', 'hash') and ('email' or 'phone').
+   */
+  public static function findPendingTasks($jobId, $medium) {
+    $eq = new CRM_Mailing_Event_BAO_Queue();
+    $queueTable = CRM_Mailing_Event_BAO_Queue::getTableName();
+    $emailTable = CRM_Core_BAO_Email::getTableName();
+    $phoneTable = CRM_Core_BAO_Phone::getTableName();
+    $contactTable = CRM_Contact_BAO_Contact::getTableName();
+    $deliveredTable = CRM_Mailing_Event_BAO_Delivered::getTableName();
+    $bounceTable = CRM_Mailing_Event_BAO_Bounce::getTableName();
+
+    $query = "  SELECT      $queueTable.id,
+                                $emailTable.email as email,
+                                $queueTable.contact_id,
+                                $queueTable.hash,
+                                NULL as phone
+                    FROM        $queueTable
+                    INNER JOIN  $emailTable
+                            ON  $queueTable.email_id = $emailTable.id
+                    INNER JOIN  $contactTable
+                            ON  $contactTable.id = $emailTable.contact_id
+                    LEFT JOIN   $deliveredTable
+                            ON  $queueTable.id = $deliveredTable.event_queue_id
+                    LEFT JOIN   $bounceTable
+                            ON  $queueTable.id = $bounceTable.event_queue_id
+                    WHERE       $queueTable.job_id = " . $jobId . "
+                        AND     $deliveredTable.id IS null
+                        AND     $bounceTable.id IS null
+                        AND    $contactTable.is_opt_out = 0";
+
+    if ($medium === 'sms') {
+      $query = "
+                    SELECT      $queueTable.id,
+                                $phoneTable.phone as phone,
+                                $queueTable.contact_id,
+                                $queueTable.hash,
+                                NULL as email
+                    FROM        $queueTable
+                    INNER JOIN  $phoneTable
+                            ON  $queueTable.phone_id = $phoneTable.id
+                    INNER JOIN  $contactTable
+                            ON  $contactTable.id = $phoneTable.contact_id
+                    LEFT JOIN   $deliveredTable
+                            ON  $queueTable.id = $deliveredTable.event_queue_id
+                    LEFT JOIN   $bounceTable
+                            ON  $queueTable.id = $bounceTable.event_queue_id
+                    WHERE       $queueTable.job_id = " . $jobId . "
+                        AND     $deliveredTable.id IS null
+                        AND     $bounceTable.id IS null
+                        AND    ( $contactTable.is_opt_out = 0
+                        OR       $contactTable.do_not_sms = 0 )";
+    }
+    $eq->query($query);
+    return $eq;
   }
 
 }

@@ -19,7 +19,8 @@ function country_get_example() {
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
     return array(
-      'error' => $errorMessage,
+      'is_error' => 1,
+      'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
     );
@@ -40,10 +41,10 @@ function country_get_expectedresult() {
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
-    'id' => 1254,
+    'id' => 1256,
     'values' => array(
-      '1254' => array(
-        'id' => '1254',
+      '1256' => array(
+        'id' => '1256',
         'name' => 'Made Up Land',
         'iso_code' => 'ZZ',
         'region_id' => '1',

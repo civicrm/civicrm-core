@@ -381,7 +381,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     $activities = $obj->getContactActivity();
     // This should include activities of type Meeting only.
     foreach ($activities['data'] as $key => $value) {
-      $this->assertEquals('Meeting', $value['activity_type']);
+      $this->assertContains('Meeting', $value['activity_type']);
     }
     unset($_GET['activity_type_id']);
 

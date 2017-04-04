@@ -4,25 +4,24 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "189ae04cf5b1ca1ee00d56a629a273c3",
-    "content-hash": "c2aba74bbb5b474831736b3e3bcbcb20",
+    "content-hash": "36ffd76fc5e7344ac6e587d11779ceeb",
     "packages": [
         {
             "name": "civicrm/civicrm-cxn-rpc",
-            "version": "v0.15.12.04",
+            "version": "v0.16.12.05",
             "source": {
                 "type": "git",
                 "url": "https://github.com/civicrm/civicrm-cxn-rpc.git",
-                "reference": "6e3a0f956860908a240758ab8c80a020549a6f03"
+                "reference": "e88e78dc491b7e8739a40231f46c2d4459347b12"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/civicrm/civicrm-cxn-rpc/zipball/6e3a0f956860908a240758ab8c80a020549a6f03",
-                "reference": "6e3a0f956860908a240758ab8c80a020549a6f03",
+                "url": "https://api.github.com/repos/civicrm/civicrm-cxn-rpc/zipball/e88e78dc491b7e8739a40231f46c2d4459347b12",
+                "reference": "e88e78dc491b7e8739a40231f46c2d4459347b12",
                 "shasum": ""
             },
             "require": {
-                "phpseclib/phpseclib": "0.3.*",
+                "phpseclib/phpseclib": "1.0.*",
                 "psr/log": "1.0.0"
             },
             "require-dev": {
@@ -45,7 +44,7 @@
                 }
             ],
             "description": "RPC library for CiviConnect",
-            "time": "2015-12-05 04:41:02"
+            "time": "2016-12-06T04:32:51+00:00"
         },
         {
             "name": "dompdf/dompdf",
@@ -106,7 +105,7 @@
             ],
             "description": "DOMPDF is a CSS 2.1 compliant HTML to PDF converter",
             "homepage": "https://github.com/dompdf/dompdf",
-            "time": "2016-05-11 00:36:29"
+            "time": "2016-05-11T00:36:29+00:00"
         },
         {
             "name": "pclzip/pclzip",
@@ -143,7 +142,7 @@
                 "php",
                 "zip"
             ],
-            "time": "2014-06-05 11:42:24"
+            "time": "2014-06-05T11:42:24+00:00"
         },
         {
             "name": "pear/pear_exception",
@@ -198,7 +197,7 @@
             "keywords": [
                 "exception"
             ],
-            "time": "2015-02-10 20:07:52"
+            "time": "2015-02-10T20:07:52+00:00"
         },
         {
             "name": "pear/validate_finance_creditcard",
@@ -276,7 +275,7 @@
             ],
             "description": "A library to read, parse, export and make subsets of different types of font files.",
             "homepage": "https://github.com/PhenX/php-font-lib",
-            "time": "2015-05-06 20:02:39"
+            "time": "2015-05-06T20:02:39+00:00"
         },
         {
             "name": "phenx/php-svg-lib",
@@ -310,7 +309,7 @@
             ],
             "description": "A library to read, parse and export to PDF SVG files.",
             "homepage": "https://github.com/PhenX/php-svg-lib",
-            "time": "2015-05-06 18:49:49"
+            "time": "2015-05-06T18:49:49+00:00"
         },
         {
             "name": "phpoffice/common",
@@ -365,7 +364,7 @@
                 "office",
                 "php"
             ],
-            "time": "2016-07-07 17:26:55"
+            "time": "2016-07-07T17:26:55+00:00"
         },
         {
             "name": "phpoffice/phpword",
@@ -465,20 +464,20 @@
                 "word",
                 "writer"
             ],
-            "time": "2016-07-31 08:53:39"
+            "time": "2016-07-31T08:53:39+00:00"
         },
         {
             "name": "phpseclib/phpseclib",
-            "version": "0.3.10",
+            "version": "1.0.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpseclib/phpseclib.git",
-                "reference": "d15bba1edcc7c89e09cc74c5d961317a8b947bf4"
+                "reference": "38fa7332e96bcc546ce6eb5cbaa1168c96839393"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/d15bba1edcc7c89e09cc74c5d961317a8b947bf4",
-                "reference": "d15bba1edcc7c89e09cc74c5d961317a8b947bf4",
+                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/38fa7332e96bcc546ce6eb5cbaa1168c96839393",
+                "reference": "38fa7332e96bcc546ce6eb5cbaa1168c96839393",
                 "shasum": ""
             },
             "require": {
@@ -488,19 +487,14 @@
                 "phing/phing": "~2.7",
                 "phpunit/phpunit": "~4.0",
                 "sami/sami": "~2.0",
-                "squizlabs/php_codesniffer": "~1.5"
+                "squizlabs/php_codesniffer": "~2.0"
             },
             "suggest": {
                 "ext-gmp": "Install the GMP (GNU Multiple Precision) extension in order to speed up arbitrary precision integer arithmetic operations.",
                 "ext-mcrypt": "Install the Mcrypt extension in order to speed up a wide variety of cryptographic operations.",
-                "pear-pear/PHP_Compat": "Install PHP_Compat to get phpseclib working on PHP < 4.3.3."
+                "pear-pear/PHP_Compat": "Install PHP_Compat to get phpseclib working on PHP < 5.0.0."
             },
             "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "0.3-dev"
-                }
-            },
             "autoload": {
                 "psr-0": {
                     "Crypt": "phpseclib/",
@@ -510,6 +504,7 @@
                     "System": "phpseclib/"
                 },
                 "files": [
+                    "phpseclib/bootstrap.php",
                     "phpseclib/Crypt/Random.php"
                 ]
             },
@@ -540,6 +535,11 @@
                     "name": "Hans-Jürgen Petrich",
                     "email": "petrich@tronic-media.com",
                     "role": "Developer"
+                },
+                {
+                    "name": "Graham Campbell",
+                    "email": "graham@alt-three.com",
+                    "role": "Developer"
                 }
             ],
             "description": "PHP Secure Communications Library - Pure-PHP implementations of RSA, AES, SSH2, SFTP, X.509 etc.",
@@ -563,7 +563,7 @@
                 "x.509",
                 "x509"
             ],
-            "time": "2015-01-28 21:50:33"
+            "time": "2016-10-22T17:53:16+00:00"
         },
         {
             "name": "psr/log",
@@ -601,7 +601,7 @@
                 "psr",
                 "psr-3"
             ],
-            "time": "2012-12-21 11:40:51"
+            "time": "2012-12-21T11:40:51+00:00"
         },
         {
             "name": "symfony/config",
@@ -610,12 +610,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/config.git",
-                "reference": "d93bb29acfa5cff771cb4aa0fb4a97454ddb41e4"
+                "reference": "c7309e33b719433d5cf3845d0b5b9608609d8c8e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/config/zipball/d93bb29acfa5cff771cb4aa0fb4a97454ddb41e4",
-                "reference": "d93bb29acfa5cff771cb4aa0fb4a97454ddb41e4",
+                "url": "https://api.github.com/repos/symfony/config/zipball/c7309e33b719433d5cf3845d0b5b9608609d8c8e",
+                "reference": "c7309e33b719433d5cf3845d0b5b9608609d8c8e",
                 "shasum": ""
             },
             "require": {
@@ -649,7 +649,7 @@
             ],
             "description": "Symfony Config Component",
             "homepage": "http://symfony.com",
-            "time": "2015-01-03 08:01:13"
+            "time": "2015-01-03T08:01:13+00:00"
         },
         {
             "name": "symfony/dependency-injection",
@@ -706,7 +706,7 @@
             ],
             "description": "Symfony DependencyInjection Component",
             "homepage": "http://symfony.com",
-            "time": "2015-01-25 04:37:39"
+            "time": "2015-01-25T04:37:39+00:00"
         },
         {
             "name": "symfony/event-dispatcher",
@@ -763,7 +763,7 @@
             ],
             "description": "Symfony EventDispatcher Component",
             "homepage": "http://symfony.com",
-            "time": "2015-01-29 18:20:43"
+            "time": "2015-01-29T18:20:43+00:00"
         },
         {
             "name": "symfony/filesystem",
@@ -810,7 +810,7 @@
             ],
             "description": "Symfony Filesystem Component",
             "homepage": "http://symfony.com",
-            "time": "2015-01-03 21:04:44"
+            "time": "2015-01-03T21:04:44+00:00"
         },
         {
             "name": "symfony/finder",
@@ -857,7 +857,7 @@
             ],
             "description": "Symfony Finder Component",
             "homepage": "http://symfony.com",
-            "time": "2015-01-03 08:01:13"
+            "time": "2015-01-03T08:01:13+00:00"
         },
         {
             "name": "symfony/process",
@@ -904,7 +904,7 @@
             ],
             "description": "Symfony Process Component",
             "homepage": "http://symfony.com",
-            "time": "2015-02-08 07:07:45"
+            "time": "2015-02-08T07:07:45+00:00"
         },
         {
             "name": "tecnickcom/tcpdf",
@@ -967,7 +967,7 @@
                 "pdf417",
                 "qrcode"
             ],
-            "time": "2015-09-12 10:08:34"
+            "time": "2015-09-12T10:08:34+00:00"
         },
         {
             "name": "totten/ca-config",
@@ -1004,7 +1004,7 @@
             ],
             "description": "Default configuration for certificate authorities",
             "homepage": "https://github.com/totten/ca_config",
-            "time": "2013-02-13 03:40:18"
+            "time": "2013-02-13T03:40:18+00:00"
         },
         {
             "name": "zendframework/zend-escaper",
@@ -1049,7 +1049,7 @@
                 "escaper",
                 "zf2"
             ],
-            "time": "2015-05-07 14:55:31"
+            "time": "2015-05-07T14:55:31+00:00"
         },
         {
             "name": "zendframework/zend-stdlib",
@@ -1104,7 +1104,7 @@
                 "stdlib",
                 "zf2"
             ],
-            "time": "2015-07-21 13:55:46"
+            "time": "2015-07-21T13:55:46+00:00"
         },
         {
             "name": "zendframework/zend-validator",
@@ -1169,7 +1169,7 @@
                 "validator",
                 "zf2"
             ],
-            "time": "2015-09-08 21:04:17"
+            "time": "2015-09-08T21:04:17+00:00"
         },
         {
             "name": "zetacomponents/base",
@@ -1229,7 +1229,7 @@
             ],
             "description": "The Base package provides the basic infrastructure that all packages rely on. Therefore every component relies on this package.",
             "homepage": "https://github.com/zetacomponents",
-            "time": "2009-06-29 10:47:39"
+            "time": "2009-06-29T10:47:39+00:00"
         },
         {
             "name": "zetacomponents/mail",
@@ -1237,7 +1237,7 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/civicrm/zetacomponents-mail.git",
-                "reference": "19f5af66cdde19bc20f41671fe453b37f4121eb1"
+                "reference": "e0feff0e1860f16fa2b3c42795c0351db58120a0"
             },
             "type": "library",
             "autoload": {
@@ -1291,7 +1291,7 @@
             ],
             "description": "The component allows you construct and/or parse Mail messages conforming to  the mail standard. It has support for attachments, multipart messages and HTML  mail. It also interfaces with SMTP to send mail or IMAP, POP3 or mbox to  retrieve e-mail.",
             "homepage": "https://github.com/zetacomponents",
-            "time": "2016-01-08 01:15:38"
+            "time": "2017-03-14 06:51:24"
         }
     ],
     "packages-dev": [],

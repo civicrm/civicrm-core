@@ -13,6 +13,7 @@ function contribution_create_example() {
     'financial_type_id' => 1,
     'contribution_page_id' => 1,
     'trxn_id' => 12345,
+    'is_pay_later' => 1,
     'invoice_id' => 67890,
     'source' => 'SSF',
     'contribution_status_id' => 2,
@@ -27,7 +28,8 @@ function contribution_create_example() {
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
     return array(
-      'error' => $errorMessage,
+      'is_error' => 1,
+      'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
     );
@@ -59,7 +61,7 @@ function contribution_create_expectedresult() {
         'receive_date' => '20120511000000',
         'non_deductible_amount' => '',
         'total_amount' => '100',
-        'fee_amount' => '0',
+        'fee_amount' => 0,
         'net_amount' => '100',
         'trxn_id' => '12345',
         'invoice_id' => '67890',
@@ -72,15 +74,15 @@ function contribution_create_expectedresult() {
         'amount_level' => '',
         'contribution_recur_id' => '',
         'is_test' => '',
-        'is_pay_later' => '',
+        'is_pay_later' => '1',
         'contribution_status_id' => '2',
         'address_id' => '',
         'check_number' => '',
         'campaign_id' => '',
         'creditnote_id' => '',
         'tax_amount' => '',
-        'contribution_type_id' => '1',
         'revenue_recognition_date' => '',
+        'contribution_type_id' => '1',
       ),
     ),
   );
@@ -90,9 +92,9 @@ function contribution_create_expectedresult() {
 
 /*
 * This example has been generated from the API test suite.
-* The test that created it is called "testCreateContributionPendingOnline"
+* The test that created it is called "testCreateContributionPayLaterOnline"
 * and can be found at:
-* https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/TaxContributionPageTest.php
+* https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ContributionTest.php
 *
 * You can see the outcome of the API tests at
 * https://test.civicrm.org/job/CiviCRM-master-git/

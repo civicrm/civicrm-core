@@ -176,7 +176,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
     $this->assertEquals($pnDupePairs[0]['is_selected'], 1, 'Check if second record in dupe pairs is marked as selected.');
 
     // batch merge selected dupes
-    $result = CRM_Dedupe_Merger::batchMerge($dao->id, $this->_groupId, 'safe', TRUE, 5, 1);
+    $result = CRM_Dedupe_Merger::batchMerge($dao->id, $this->_groupId, 'safe', 5, 1);
     $this->assertEquals(count($result['merged']), 2, 'Check number of merged pairs.');
 
     // retrieve pairs from prev next cache table
@@ -232,7 +232,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
     $this->assertEquals(count($foundDupes), count($pnDupePairs), 'Check number of dupe pairs in prev next cache.');
 
     // batch merge all dupes
-    $result = CRM_Dedupe_Merger::batchMerge($dao->id, $this->_groupId, 'safe', TRUE, 5, 2);
+    $result = CRM_Dedupe_Merger::batchMerge($dao->id, $this->_groupId, 'safe', 5, 2);
     $this->assertEquals(count($result['merged']), 3, 'Check number of merged pairs.');
 
     // retrieve pairs from prev next cache table

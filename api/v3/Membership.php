@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -54,9 +54,8 @@ function _civicrm_api3_membership_delete_spec(&$params) {
  *
  * @param array $params
  *   Array array holding id - Id of the contact membership to be deleted.
- *
- * @return array
- *   API result array.
+ * @return array API result array.
+ * @throws API_Exception
  */
 function civicrm_api3_membership_delete($params) {
   if (isset($params['preserve_contribution'])) {
@@ -136,16 +135,13 @@ function civicrm_api3_membership_create($params) {
     $ids['userId'] = $params['contact_id'];
   }
   //for edit membership id should be present
+  // probably not required now.
   if (!empty($params['id'])) {
     $ids['membership'] = $params['id'];
     $action = CRM_Core_Action::UPDATE;
   }
   //need to pass action to handle related memberships.
   $params['action'] = $action;
-
-  if (empty($params['line_item']) && !empty($params['membership_type_id']) && empty($params['skipLineItem'])) {
-    CRM_Price_BAO_LineItem::getLineItemArray($params, NULL, 'membership', $params['membership_type_id']);
-  }
 
   $membershipBAO = CRM_Member_BAO_Membership::create($params, $ids, TRUE);
 

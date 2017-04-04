@@ -43,7 +43,8 @@ function contact_create_example() {
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
     return array(
-      'error' => $errorMessage,
+      'is_error' => 1,
+      'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
     );
@@ -64,10 +65,10 @@ function contact_create_expectedresult() {
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
-    'id' => 1,
+    'id' => 3,
     'values' => array(
-      '1' => array(
-        'id' => '1',
+      '3' => array(
+        'id' => '3',
         'contact_type' => 'Individual',
         'contact_sub_type' => '',
         'do_not_email' => 0,
@@ -124,7 +125,7 @@ function contact_create_expectedresult() {
           'values' => array(
             '0' => array(
               'id' => '1',
-              'contact_id' => '1',
+              'contact_id' => '3',
               'financial_type_id' => '1',
               'contribution_page_id' => '',
               'payment_instrument_id' => '1',
@@ -151,6 +152,7 @@ function contact_create_expectedresult() {
               'campaign_id' => '',
               'creditnote_id' => '',
               'tax_amount' => '',
+              'revenue_recognition_date' => '',
               'contribution_type_id' => '1',
             ),
           ),
@@ -163,7 +165,7 @@ function contact_create_expectedresult() {
           'values' => array(
             '0' => array(
               'id' => '1',
-              'contact_id' => '1',
+              'contact_id' => '3',
               'url' => 'http://civicrm.org',
               'website_type_id' => '',
             ),
@@ -177,7 +179,7 @@ function contact_create_expectedresult() {
           'values' => array(
             '0' => array(
               'id' => '2',
-              'contact_id' => '1',
+              'contact_id' => '3',
               'url' => 'http://chained.org',
               'website_type_id' => '',
             ),

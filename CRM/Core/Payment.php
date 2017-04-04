@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -366,7 +366,7 @@ abstract class CRM_Core_Payment {
   public function validatePaymentInstrument($values, &$errors) {
     CRM_Core_Form::validateMandatoryFields($this->getMandatoryFields(), $values, $errors);
     if ($this->_paymentProcessor['payment_type'] == 1) {
-      CRM_Core_Payment_Form::validateCreditCard($this->_paymentProcessor['id'], $values, $errors);
+      CRM_Core_Payment_Form::validateCreditCard($values, $errors, $this->_paymentProcessor['id']);
     }
   }
 
@@ -410,6 +410,42 @@ abstract class CRM_Core_Payment {
    */
   public function getForm() {
     return $this->_paymentForm;
+  }
+
+  /**
+   * Get help text information (help, description, etc.) about this payment,
+   * to display to the user.
+   *
+   * @param string $context
+   *   Context of the text.
+   *   Only explicitly supported contexts are handled without error.
+   *   Currently supported:
+   *   - contributionPageRecurringHelp (params: is_recur_installments, is_email_receipt)
+   *
+   * @param array $params
+   *   Parameters for the field, context specific.
+   *
+   * @return string
+   */
+  public function getText($context, $params) {
+    // I have deliberately added a noisy fail here.
+    // The function is intended to be extendable, but not by changes
+    // not documented clearly above.
+    switch ($context) {
+      case 'contributionPageRecurringHelp':
+        // require exactly two parameters
+        if (array_keys($params) == array('is_recur_installments', 'is_email_receipt')) {
+          $gotText = ts('Your recurring contribution will be processed automatically.');
+          if ($params['is_recur_installments']) {
+            $gotText .= ts(' You can specify the number of installments, or you can leave the number of installments blank if you want to make an open-ended commitment. In either case, you can choose to cancel at any time.');
+          }
+          if ($params['is_email_receipt']) {
+            $gotText .= ts(' You will receive an email receipt for each recurring contribution.');
+          }
+        }
+        break;
+    }
+    return $gotText;
   }
 
   /**

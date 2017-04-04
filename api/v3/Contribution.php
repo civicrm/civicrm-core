@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -240,17 +240,67 @@ function _civicrm_api3_contribution_delete_spec(&$params) {
 function civicrm_api3_contribution_get($params) {
 
   $mode = CRM_Contact_BAO_Query::MODE_CONTRIBUTE;
+  $additionalOptions = _civicrm_api3_contribution_get_support_nonunique_returns($params);
   $returnProperties = CRM_Contribute_BAO_Query::defaultReturnProperties($mode);
 
-  $contributions = _civicrm_api3_get_using_query_object('Contribution', $params, array(), NULL, $mode, $returnProperties);
+  $contributions = _civicrm_api3_get_using_query_object('Contribution', $params, $additionalOptions, NULL, $mode, $returnProperties);
 
   foreach ($contributions as $id => $contribution) {
     $softContribution = CRM_Contribute_BAO_ContributionSoft::getSoftContribution($id, TRUE);
     $contributions[$id] = array_merge($contribution, $softContribution);
     // format soft credit for backward compatibility
     _civicrm_api3_format_soft_credit($contributions[$id]);
+    _civicrm_api3_contribution_add_supported_fields($contributions[$id]);
+
   }
   return civicrm_api3_create_success($contributions, $params, 'Contribution', 'get');
+}
+
+/**
+ * Fix the return values to reflect cases where the schema has been changed.
+ *
+ * At the query object level using uniquenames dismbiguates between tables.
+ *
+ * However, adding uniquename can change inputs accepted by the api, so we need
+ * to ensure we are asking for the unique name return fields.
+ *
+ * @param array $params
+ *
+ * @return array
+ * @throws \API_Exception
+ */
+function _civicrm_api3_contribution_get_support_nonunique_returns($params) {
+  $additionalOptions = array();
+  $options = _civicrm_api3_get_options_from_params($params, TRUE);
+  foreach (array('check_number', 'address_id') as $changedVariable) {
+    if (isset($options['return']) && !empty($options['return'][$changedVariable])) {
+      $additionalOptions['return']['contribution_' . $changedVariable] = 1;
+    }
+  }
+  return $additionalOptions;
+}
+
+/**
+ * Support for supported output variables.
+ *
+ * @param $contribution
+ */
+function _civicrm_api3_contribution_add_supported_fields(&$contribution) {
+  // These are output fields that are supported in our test contract.
+  // Arguably we should also do the same with 'campaign_id' &
+  // 'source' - which are also fields being rendered with unique names.
+  // That seems more consistent with other api where we output the actual field names.
+  $outputAliases = array(
+    'contribution_check_number' => 'check_number',
+    'contribution_address_id' => 'address_id',
+    'payment_instrument_id' => 'instrument_id',
+  );
+  foreach ($outputAliases as $returnName => $copyTo) {
+    if (array_key_exists($returnName, $contribution)) {
+      $contribution[$copyTo] = $contribution[$returnName];
+    }
+  }
+
 }
 
 /**
@@ -382,8 +432,8 @@ function civicrm_api3_contribution_transact($params) {
  * @throws Exception
  */
 function civicrm_api3_contribution_sendconfirmation($params) {
-  $input = $ids = $values = array();
-  $passThroughParams = array(
+  $ids = $values = array();
+  $allowedParams = array(
     'receipt_from_email',
     'receipt_from_name',
     'receipt_update',
@@ -392,11 +442,8 @@ function civicrm_api3_contribution_sendconfirmation($params) {
     'receipt_text',
     'payment_processor_id',
   );
-  foreach ($passThroughParams as $key) {
-    if (isset($params[$key])) {
-      $input[$key] = $params[$key];
-    }
-  }
+  $input = array_intersect_key($params, array_flip($allowedParams));
+  $input['is_email_receipt'] = TRUE;
   CRM_Contribute_BAO_Contribution::sendMail($input, $ids, $params['id'], $values);
 }
 
@@ -532,7 +579,7 @@ function _civicrm_api3_contribution_completetransaction_spec(&$params) {
   $params['trxn_date'] = array(
     'title' => 'Transaction Date',
     'description' => 'Date this transaction occurred',
-    'type' => CRM_Utils_Type::T_DATE,
+    'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
   );
 }
 
@@ -548,16 +595,20 @@ function _civicrm_api3_contribution_completetransaction_spec(&$params) {
  * @param array $params
  *   Input parameters.
  *
- * @throws API_Exception
+ * @return array
  *   Api result array.
+ * @throws API_Exception
  */
 function civicrm_api3_contribution_repeattransaction(&$params) {
   $input = $ids = array();
   civicrm_api3_verify_one_mandatory($params, NULL, array('contribution_recur_id', 'original_contribution_id'));
   if (empty($params['original_contribution_id'])) {
+    //  CRM-19873 call with test mode.
     $params['original_contribution_id'] = civicrm_api3('contribution', 'getvalue', array(
       'return' => 'id',
+      'contribution_status_id' => array('IN' => array('Completed')),
       'contribution_recur_id' => $params['contribution_recur_id'],
+      'contribution_test' => CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionRecur', $params['contribution_recur_id'], 'is_test'),
       'options' => array('limit' => 1, 'sort' => 'id DESC'),
     ));
   }
@@ -683,7 +734,7 @@ function _civicrm_api3_contribution_repeattransaction_spec(&$params) {
   $params['receive_date'] = array(
     'title' => 'Contribution Receive Date',
     'name' => 'receive_date',
-    'type' => CRM_Utils_Type::T_DATE,
+    'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
     'api.default' => 'now',
   );
   $params['trxn_id'] = array(

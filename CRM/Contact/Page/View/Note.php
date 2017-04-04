@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -166,10 +166,7 @@ class CRM_Contact_Page_View_Note extends CRM_Core_Page {
     );
     $session->pushUserContext($url);
 
-    if (CRM_Utils_Request::retrieve('confirmed', 'Boolean',
-      CRM_Core_DAO::$_nullObject
-    )
-    ) {
+    if (CRM_Utils_Request::retrieve('confirmed', 'Boolean')) {
       CRM_Core_BAO_Note::del($this->_id);
       CRM_Utils_System::redirect($url);
     }

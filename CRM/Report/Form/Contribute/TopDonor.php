@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
  */
@@ -105,26 +105,7 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
             'title' => ts('Contact Subtype'),
           ),
         ),
-        'filters' => array(
-          'gender_id' => array(
-            'title' => ts('Gender'),
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id'),
-          ),
-          'contact_type' => array(
-            'title' => ts('Contact Type'),
-          ),
-          'contact_sub_type' => array(
-            'title' => ts('Contact Subtype'),
-          ),
-        ),
-        'filters' => array(
-          'gender_id' => array(
-            'title' => ts('Gender'),
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id'),
-          ),
-        ),
+        'filters' => $this->getBasicContactFilters(),
       ),
       'civicrm_line_item' => array(
         'dao' => 'CRM_Price_DAO_LineItem',
@@ -150,28 +131,6 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
           ),
         ),
         'filters' => array(
-          'sort_name' => array(
-            'title' => ts('Participant Name'),
-            'type' => CRM_Utils_Type::T_STRING,
-            'operator' => 'like',
-          ),
-          'id' => array(
-            'title' => ts('Contact ID'),
-            'type' => CRM_Utils_Type::T_INT,
-            'no_display' => TRUE,
-          ),
-          'birth_date' => array(
-            'title' => ts('Birth Date'),
-            'operatorType' => CRM_Report_Form::OP_DATE,
-          ),
-          'contact_type' => array(
-            'title' => ts('Contact Type'),
-            'type' => CRM_Utils_Type::T_STRING,
-          ),
-          'contact_sub_type' => array(
-            'title' => ts('Contact Subtype'),
-            'type' => CRM_Utils_Type::T_STRING,
-          ),
           'receive_date' => array(
             'default' => 'this.year',
             'operatorType' => CRM_Report_Form::OP_DATE,
@@ -200,6 +159,24 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Contribute_PseudoConstant::contributionStatus(),
             'default' => array(1),
+          ),
+        ),
+      ),
+      'civicrm_financial_trxn' => array(
+        'dao' => 'CRM_Financial_DAO_FinancialTrxn',
+        'fields' => array(
+          'card_type' => array(
+            'title' => ts('Credit Card Type'),
+            'dbAlias' => 'GROUP_CONCAT(financial_trxn_civireport.card_type SEPARATOR ",")',
+          ),
+        ),
+        'filters' => array(
+          'card_type' => array(
+            'title' => ts('Credit Card Type'),
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => CRM_Financial_DAO_FinancialTrxn::buildOptions('card_type'),
+            'default' => NULL,
+            'type' => CRM_Utils_Type::T_STRING,
           ),
         ),
       ),
@@ -331,6 +308,10 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
              LEFT  JOIN civicrm_phone  {$this->_aliases['civicrm_phone']}
                          ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id AND
                             {$this->_aliases['civicrm_phone']}.is_primary = 1";
+
+    // for credit card type
+    $this->addFinancialTrxnFromClause();
+
     $this->addAddressFromClause();
   }
 
@@ -464,7 +445,7 @@ ORDER BY civicrm_contribution_total_amount_sum DESC
     if ($this->_outputMode == 'html' || $this->_outputMode == 'group') {
       // Replace only first occurrence of SELECT.
       $this->_select = preg_replace('/SELECT/', 'SELECT SQL_CALC_FOUND_ROWS ', $this->_select, 1);
-      $pageId = CRM_Utils_Request::retrieve('crmPID', 'Integer', CRM_Core_DAO::$_nullObject);
+      $pageId = CRM_Utils_Request::retrieve('crmPID', 'Integer');
 
       if (!$pageId && !empty($_POST) && isset($_POST['crmPID_B'])) {
         if (!isset($_POST['PagerBottomButton'])) {
@@ -532,6 +513,11 @@ ORDER BY civicrm_contribution_total_amount_sum DESC
           if ($birthDate) {
             $rows[$rowNum]['civicrm_contact_birth_date'] = CRM_Utils_Date::customFormat($birthDate, '%Y%m%d');
           }
+          $entryFound = TRUE;
+        }
+
+        if (!empty($row['civicrm_financial_trxn_card_type'])) {
+          $rows[$rowNum]['civicrm_financial_trxn_card_type'] = $this->getLabels($row['civicrm_financial_trxn_card_type'], 'CRM_Financial_DAO_FinancialTrxn', 'card_type');
           $entryFound = TRUE;
         }
 

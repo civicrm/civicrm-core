@@ -3,7 +3,7 @@
   +--------------------------------------------------------------------+
   | CiviCRM version 4.7                                                |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2016                                |
+  | Copyright CiviCRM LLC (c) 2004-2017                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -171,6 +171,9 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form {
     $this->add('text', 'name', ts('Batch Name'));
   }
 
+  /**
+   * Set the default values for the form.
+   */
   public function setDefaultValues() {
     // do not setdefault unless it is open/reopened batch
     if (!in_array($this->_batchStatus, array('Open', 'Reopened'))) {

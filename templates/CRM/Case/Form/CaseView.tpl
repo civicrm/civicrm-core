@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -276,7 +276,14 @@
  </div><!-- /.crm-accordion-header -->
  <div class="crm-accordion-body">
   {if $tags}
-    <p class="crm-block crm-content-block crm-case-caseview-display-tags">&nbsp;&nbsp;{$tags}</p>
+    <p class="crm-block crm-content-block crm-case-caseview-display-tags">
+      &nbsp;&nbsp;
+      {foreach from=$tags item='tag'}
+        <span class="crm-tag-item" {if !empty($tag.color)}style="background-color: {$tag.color}; color: {$tag.color|colorContrast};"{/if}>
+          {$tag.text}
+        </span>
+      {/foreach}
+    </p>
   {/if}
 
    {foreach from=$tagSetTags item=displayTagset}

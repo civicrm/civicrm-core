@@ -9,7 +9,7 @@
  */
 function report_template_getstatistics_example() {
   $params = array(
-    'report_id' => 'contribute/recursummary',
+    'report_id' => 'contribute/deferredrevenue',
   );
 
   try{
@@ -21,7 +21,8 @@ function report_template_getstatistics_example() {
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
     return array(
-      'error' => $errorMessage,
+      'is_error' => 1,
+      'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
     );
@@ -41,16 +42,8 @@ function report_template_getstatistics_expectedresult() {
   $expectedResult = array(
     'is_error' => 0,
     'version' => 3,
-    'count' => 1,
-    'id' => 'counts',
-    'values' => array(
-      'counts' => array(
-        'rowCount' => array(
-          'title' => 'Row(s) Listed',
-          'value' => 0,
-        ),
-      ),
-    ),
+    'count' => 0,
+    'values' => '',
   );
 
   return $expectedResult;

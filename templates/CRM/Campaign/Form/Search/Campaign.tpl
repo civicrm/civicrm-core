@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -214,8 +214,7 @@
       "oLanguage": {"sEmptyTable": noRecordFoundMsg,
         "sZeroRecords": noRecordFoundMsg },
       "fnDrawCallback": function () {
-        // FIXME: trigger crmLoad and crmEditable would happen automatically
-        $('.crm-editable').crmEditable();
+        $(this).trigger('crmLoad');
       },
       "fnRowCallback": function (nRow, aData, iDisplayIndex) {
         //insert the id for each row for enable/disable.

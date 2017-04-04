@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
 
@@ -323,10 +323,15 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
     }
 
     $result = FALSE;
-    $file = 'delete-this-' . CRM_Utils_String::createRandom(10, CRM_Utils_String::ALPHANUMERIC);
 
     // this could be a new system with no uploads (yet) -- so we'll make a file
-    file_put_contents("$dir/$file", "delete me");
+    $file = CRM_Utils_File::createFakeFile($dir);
+
+    if ($file === FALSE) {
+      // Couldn't write the file
+      return FALSE;
+    }
+
     $content = @file_get_contents("$url");
     if (stristr($content, $file)) {
       $result = TRUE;
@@ -347,17 +352,18 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
    * @return bool
    */
   public function isDirAccessible($dir, $url) {
-    $dir = rtrim($dir, '/');
     $url = rtrim($url, '/');
     if (empty($dir) || empty($url) || !is_dir($dir)) {
       return FALSE;
     }
 
     $result = FALSE;
-    $file = 'delete-this-' . CRM_Utils_String::createRandom(10, CRM_Utils_String::ALPHANUMERIC);
+    $file = CRM_Utils_File::createFakeFile($dir, 'delete me');
 
-    // this could be a new system with no uploads (yet) -- so we'll make a file
-    file_put_contents("$dir/$file", "delete me");
+    if ($file === FALSE) {
+      // Couldn't write the file
+      return FALSE;
+    }
 
     $headers = @get_headers("$url/$file");
     if (stripos($headers[0], '200')) {

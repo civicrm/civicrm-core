@@ -7,14 +7,14 @@
  */
 function membership_create_example() {
   $params = array(
-    'contact_id' => 88,
-    'membership_type_id' => 53,
+    'contact_id' => 91,
+    'membership_type_id' => 55,
     'join_date' => '2009-01-21',
     'start_date' => '2009-01-21',
     'end_date' => '2009-12-21',
     'source' => 'Payment',
     'is_override' => 1,
-    'status_id' => 33,
+    'status_id' => 34,
     'custom_1' => 'custom string',
   );
 
@@ -27,7 +27,8 @@ function membership_create_example() {
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
     return array(
-      'error' => $errorMessage,
+      'is_error' => 1,
+      'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
     );
@@ -52,13 +53,13 @@ function membership_create_expectedresult() {
     'values' => array(
       '1' => array(
         'id' => '1',
-        'contact_id' => '88',
-        'membership_type_id' => '53',
+        'contact_id' => '91',
+        'membership_type_id' => '55',
         'join_date' => '20090121000000',
         'start_date' => '2013-07-29 00:00:00',
         'end_date' => '2013-08-04 00:00:00',
         'source' => 'Payment',
-        'status_id' => '33',
+        'status_id' => '34',
         'is_override' => '1',
         'owner_membership_id' => '',
         'max_related' => '',

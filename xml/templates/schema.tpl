@@ -1,7 +1,7 @@
 -- +--------------------------------------------------------------------+
 -- | CiviCRM version 4.7                                                |
 -- +--------------------------------------------------------------------+
--- | Copyright CiviCRM LLC (c) 2004-2016                                |
+-- | Copyright CiviCRM LLC (c) 2004-2017                                |
 -- +--------------------------------------------------------------------+
 -- | This file is a part of CiviCRM.                                    |
 -- |                                                                    |
@@ -59,7 +59,8 @@ CREATE TABLE `{$table.name}` (
 {if ! $first},{/if}
 {assign var='first' value=false}
 
-    PRIMARY KEY ( `{$table.primaryKey.name}` )
+    {assign var='firstIndexField' value=true}
+    PRIMARY KEY ({foreach from=$table.primaryKey.field item=fieldName}{if $firstIndexField}{assign var='firstIndexField' value=false}{else},{/if}`{$fieldName}`{/foreach})
 {/if} {* table.primaryKey *}
 
 {if $table.index}

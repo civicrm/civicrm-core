@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -116,6 +116,7 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
       'member_of_contact_id' => 1,
       'duration_unit' => 'day',
       'duration_interval' => 1,
+      'period_type' => 'rolling',
     );
     $result = civicrm_api3('membership_type', 'create', $api_params);
 

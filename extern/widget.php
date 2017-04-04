@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  */
 require_once '../civicrm.config.php';
@@ -38,10 +38,10 @@ $config = CRM_Core_Config::singleton();
 $template = CRM_Core_Smarty::singleton();
 
 require_once 'CRM/Utils/Request.php';
-$cpageId = CRM_Utils_Request::retrieve('cpageId', 'Positive', CRM_Core_DAO::$_nullObject);
-$widgetId = CRM_Utils_Request::retrieve('widgetId', 'Positive', CRM_Core_DAO::$_nullObject);
-$format = CRM_Utils_Request::retrieve('format', 'Positive', CRM_Core_DAO::$_nullObject);
-$includePending = CRM_Utils_Request::retrieve('includePending', 'Boolean', CRM_Core_DAO::$_nullObject);
+$cpageId = CRM_Utils_Request::retrieve('cpageId', 'Positive');
+$widgetId = CRM_Utils_Request::retrieve('widgetId', 'Positive');
+$format = CRM_Utils_Request::retrieve('format', 'Positive');
+$includePending = CRM_Utils_Request::retrieve('includePending', 'Boolean');
 
 require_once 'CRM/Contribute/BAO/Widget.php';
 

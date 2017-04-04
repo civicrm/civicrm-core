@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
 
@@ -375,6 +375,56 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     return $messages;
   }
 
+  /**
+   * Check that important directories are writable.
+   *
+   * @return array
+   *   Any CRM_Utils_Check_Message instances that need to be generated.
+   */
+  public function checkDirsWritable() {
+    $notWritable = array();
+
+    $config = CRM_Core_Config::singleton();
+    $directories = array(
+      'uploadDir' => ts('Temporary Files Directory'),
+      'imageUploadDir' => ts('Images Directory'),
+      'customFileUploadDir' => ts('Custom Files Directory'),
+      'extensionsDir' => ts('CiviCRM Extensions Directory'),
+    );
+
+    foreach ($directories as $directory => $label) {
+      $file = CRM_Utils_File::createFakeFile($config->$directory);
+
+      if ($file === FALSE) {
+        $notWritable[] = "$label ({$config->$directory})";
+      }
+      else {
+        $dirWithSlash = CRM_Utils_File::addTrailingSlash($config->$directory);
+        unlink($dirWithSlash . $file);
+      }
+    }
+
+    $messages = array();
+
+    if (!empty($notWritable)) {
+      $messages[] = new CRM_Utils_Check_Message(
+        __FUNCTION__,
+        ts('The %1 is not writable.  Please check your file permissions.', array(
+          1 => implode(', ', $notWritable),
+          'count' => count($notWritable),
+          'plural' => 'The following directories are not writable: %1.  Please check your file permissions.',
+        )),
+        ts('Directory not writable', array(
+          'count' => count($notWritable),
+          'plural' => 'Directories not writable',
+        )),
+        \Psr\Log\LogLevel::ERROR,
+        'fa-ban'
+      );
+    }
+
+    return $messages;
+  }
 
   /**
    * Checks if new versions are available
@@ -770,6 +820,25 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
         ts('MyISAM Database Engine'),
         \Psr\Log\LogLevel::ERROR,
         'fa-database'
+      );
+    }
+    return $messages;
+  }
+
+  /**
+   * Check for required mbstring extension
+   * @return array
+   */
+  public function checkMbstring() {
+    $messages = array();
+
+    if (!function_exists('mb_substr')) {
+      $messages[] = new CRM_Utils_Check_Message(
+        __FUNCTION__,
+        ts('The PHP Multibyte String extension is needed for CiviCRM to correctly handle user input among other functionality. Ask your system administrator to install it.'),
+        ts('Missing mbstring Extension'),
+        \Psr\Log\LogLevel::WARNING,
+        'fa-server'
       );
     }
     return $messages;

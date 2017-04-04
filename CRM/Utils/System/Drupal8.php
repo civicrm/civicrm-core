@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -615,6 +615,22 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
       'contactMatching' => $contactMatching,
       'contactCreated' => $contactCreated,
     );
+  }
+
+  /**
+   * Drupal 8 has a different function to get current path, hence
+   * overriding the postURL function
+   *
+   * @param string $action
+   *
+   * @return string
+   */
+  public function postURL($action) {
+    if (!empty($action)) {
+      return $action;
+    }
+    $current_path = \Drupal::service('path.current')->getPath();
+    return $this->url($current_path);
   }
 
 }

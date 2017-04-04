@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Contribute_BAO_Contribution_Utils {
 
@@ -42,9 +42,8 @@ class CRM_Contribute_BAO_Contribution_Utils {
    *   value pairs
    * @param int $contactID
    *   Contact id.
-   * @param int $contributionTypeId
+   * @param int $financialTypeID
    *   Financial type id.
-   * @param int|string $component component id
    * @param bool $isTest
    * @param bool $isRecur
    *
@@ -58,17 +57,15 @@ class CRM_Contribute_BAO_Contribution_Utils {
     &$form,
     &$paymentParams,
     $contactID,
-    $contributionTypeId,
-    $component = 'contribution',
+    $financialTypeID,
     $isTest,
     $isRecur
   ) {
     CRM_Core_Payment_Form::mapParams($form->_bltID, $form->_params, $paymentParams, TRUE);
-    $lineItems = $form->_lineItem;
     $isPaymentTransaction = self::isPaymentTransaction($form);
 
     $financialType = new CRM_Financial_DAO_FinancialType();
-    $financialType->id = $contributionTypeId;
+    $financialType->id = $financialTypeID;
     $financialType->find(TRUE);
     if ($financialType->is_deductible) {
       $form->assign('is_deductible', TRUE);
@@ -80,33 +77,43 @@ class CRM_Contribute_BAO_Contribution_Utils {
     //CRM-15297 - contributionType is obsolete - pass financial type as well so people can deprecate it
     $paymentParams['financialType_name'] = $paymentParams['contributionType_name'] = $form->_params['contributionType_name'] = $financialType->name;
     //CRM-11456
-    $paymentParams['financialType_accounting_code'] = $paymentParams['contributionType_accounting_code'] = $form->_params['contributionType_accounting_code'] = CRM_Financial_BAO_FinancialAccount::getAccountingCode($contributionTypeId);
+    $paymentParams['financialType_accounting_code'] = $paymentParams['contributionType_accounting_code'] = $form->_params['contributionType_accounting_code'] = CRM_Financial_BAO_FinancialAccount::getAccountingCode($financialTypeID);
     $paymentParams['contributionPageID'] = $form->_params['contributionPageID'] = $form->_values['id'];
     $paymentParams['contactID'] = $form->_params['contactID'] = $contactID;
 
     //fix for CRM-16317
-    $form->_params['receive_date'] = date('YmdHis');
+    if (empty($form->_params['receive_date'])) {
+      $form->_params['receive_date'] = date('YmdHis');
+    }
+    if (!empty($form->_params['start_date'])) {
+      $form->_params['start_date'] = date('YmdHis');
+    }
     $form->assign('receive_date',
       CRM_Utils_Date::mysqlToIso($form->_params['receive_date'])
     );
+
+    if (empty($form->_values['amount'])) {
+      // If the amount is not in _values[], set it
+      $form->_values['amount'] = $form->_params['amount'];
+    }
 
     if ($isPaymentTransaction) {
       $contributionParams = array(
         'id' => CRM_Utils_Array::value('contribution_id', $paymentParams),
         'contact_id' => $contactID,
-        'line_item' => $lineItems,
         'is_test' => $isTest,
         'campaign_id' => CRM_Utils_Array::value('campaign_id', $paymentParams, CRM_Utils_Array::value('campaign_id', $form->_values)),
         'contribution_page_id' => $form->_id,
         'source' => CRM_Utils_Array::value('source', $paymentParams, CRM_Utils_Array::value('description', $paymentParams)),
       );
-      $isMonetary = !empty($form->_values['is_monetary']);
-      if ($isMonetary) {
-        if (empty($paymentParams['is_pay_later'])) {
-          // @todo look up payment_instrument_id on payment processor table.
-          $contributionParams['payment_instrument_id'] = 1;
-        }
+      if (isset($paymentParams['line_item'])) {
+        // @todo make sure this is consisently set at this point.
+        $contributionParams['line_item'] = $paymentParams['line_item'];
       }
+      if (!empty($form->_paymentProcessor)) {
+        $contributionParams['payment_instrument_id'] = $paymentParams['payment_instrument_id'] = $form->_paymentProcessor['payment_instrument_id'];
+      }
+
       $contribution = CRM_Contribute_Form_Contribution_Confirm::processFormContribution(
         $form,
         $paymentParams,
@@ -118,11 +125,12 @@ class CRM_Contribute_BAO_Contribution_Utils {
         $isRecur
       );
 
-      $paymentParams['contributionTypeID'] = $contributionTypeId;
       $paymentParams['item_name'] = $form->_params['description'];
 
       $paymentParams['qfKey'] = $form->controller->_key;
-      if ($component == 'membership') {
+      if ($paymentParams['skipLineItem']) {
+        // We are not processing the line item here because we are processing a membership.
+        // Do not continue with contribution processing in this function.
         return array('contribution' => $contribution);
       }
 
@@ -134,7 +142,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
         $paymentParams['source'] = $paymentParams['contribution_source'];
       }
 
-      if ($form->_values['is_recur'] && $contribution->contribution_recur_id) {
+      if (CRM_Utils_Array::value('is_recur', $form->_params) && $contribution->contribution_recur_id) {
         $paymentParams['contributionRecurID'] = $contribution->contribution_recur_id;
       }
       if (isset($paymentParams['contribution_source'])) {
@@ -208,10 +216,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
         'payment_processor_id' => 0,
       );
     }
-    elseif (empty($form->_values['amount'])) {
-      // If the amount is not in _values[], set it
-      $form->_values['amount'] = $form->_params['amount'];
-    }
+
     CRM_Contribute_BAO_ContributionPage::sendMail($contactID,
       $form->_values,
       $contribution->is_test
@@ -470,9 +475,26 @@ LIMIT 1
    */
   public static function calculateTaxAmount($amount, $taxRate) {
     $taxAmount = array();
-    $taxAmount['tax_amount'] = round(($taxRate / 100) * CRM_Utils_Rule::cleanMoney($amount), 2);
+    // There can not be any rounding at this stage - as this is prior to quantity multiplication
+    $taxAmount['tax_amount'] = ($taxRate / 100) * CRM_Utils_Rule::cleanMoney($amount);
 
     return $taxAmount;
+  }
+
+  /**
+   * Format monetary amount: round and return to desired decimal place
+   * CRM-20145
+   *
+   * @param float $amount
+   *   Monetary amount
+   * @param int $decimals
+   *   How many decimal places to round to and return
+   *
+   * @return float
+   *   Amount rounded and returned with the desired decimal places
+   */
+  public static function formatAmount($amount, $decimals = 2) {
+    return number_format((float) round($amount, (int) $decimals), (int) $decimals, '.', '');
   }
 
 }

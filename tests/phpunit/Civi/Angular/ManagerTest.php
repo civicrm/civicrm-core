@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -109,7 +109,7 @@ class ManagerTest extends \CiviUnitTestCase {
    */
   public function testGetPartials() {
     $partials = $this->angular->getPartials('crmMailing');
-    $this->assertRegExp('/\<form.*name="crmMailing"/', $partials['~/crmMailing/EditMailingCtrl/2step.html']);
+    $this->assertRegExp('/ng-form="crmMailing/', $partials['~/crmMailing/EditMailingCtrl/2step.html']);
     // If crmMailing changes, feel free to use a different example.
   }
 

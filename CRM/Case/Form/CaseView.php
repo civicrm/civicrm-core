@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -56,8 +56,8 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
     if ($this->_showRelatedCases) {
       $relatedCases = $this->get('relatedCases');
       if (!isset($relatedCases)) {
-        $cId = CRM_Utils_Request::retrieve('cid', 'Integer', CRM_Core_DAO::$_nullObject);
-        $caseId = CRM_Utils_Request::retrieve('id', 'Integer', CRM_Core_DAO::$_nullObject);
+        $cId = CRM_Utils_Request::retrieve('cid', 'Integer');
+        $caseId = CRM_Utils_Request::retrieve('id', 'Integer');
         $relatedCases = CRM_Case_BAO_Case::getRelatedCases($caseId, $cId);
       }
       $this->assign('relatedCases', $relatedCases);
@@ -77,7 +77,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
       CRM_Core_Error::fatal(ts('You are not authorized to access this page.'));
     }
 
-    $fulltext = CRM_Utils_Request::retrieve('context', 'String', CRM_Core_DAO::$_nullObject);
+    $fulltext = CRM_Utils_Request::retrieve('context', 'String');
     if ($fulltext == 'fulltext') {
       $this->assign('fulltext', $fulltext);
     }
@@ -343,28 +343,28 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
       $this->assign('hookCaseSummary', $hookCaseSummary);
     }
 
-    CRM_Core_BAO_Tag::getTags('civicrm_case', $allTags, NULL,
-      '&nbsp;&nbsp;', TRUE);
+    $allTags = CRM_Core_BAO_Tag::getColorTags('civicrm_case');
 
     if (!empty($allTags)) {
-      $this->add('select', 'case_tag', ts('Tags'), $allTags, FALSE,
-        array('id' => 'tags', 'multiple' => 'multiple', 'class' => 'crm-select2')
+      $this->add('select2', 'case_tag', ts('Tags'), $allTags, FALSE,
+        array('id' => 'tags', 'multiple' => 'multiple')
       );
 
       $tags = CRM_Core_BAO_EntityTag::getTag($this->_caseID, 'civicrm_case');
 
-      $this->setDefaults(array('case_tag' => $tags));
-
       foreach ($tags as $tid) {
-        if (isset($allTags[$tid])) {
-          $tags[$tid] = $allTags[$tid];
+        $tagInfo = CRM_Utils_Array::findInTree($tid, $allTags);
+        if ($tagInfo) {
+          $tags[$tid] = $tagInfo;
         }
         else {
           unset($tags[$tid]);
         }
       }
 
-      $this->assign('tags', implode(', ', array_filter($tags)));
+      $this->setDefaults(array('case_tag' => implode(',', array_keys($tags))));
+
+      $this->assign('tags', $tags);
       $this->assign('showTags', TRUE);
     }
     else {
@@ -424,21 +424,13 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
     $session->pushUserContext($url);
 
     if (!empty($params['timeline_id']) && !empty($_POST['_qf_CaseView_next'])) {
-      $session = CRM_Core_Session::singleton();
-      $this->_uid = $session->get('userID');
-      $xmlProcessor = new CRM_Case_XMLProcessor_Process();
-      $xmlProcessorParams = array(
-        'clientID' => $this->_contactID,
-        'creatorID' => $this->_uid,
-        'standardTimeline' => 0,
-        'activity_date_time' => date('YmdHis'),
-        'caseID' => $this->_caseID,
-        'caseType' => $this->_caseType,
-        'activitySetName' => $params['timeline_id'],
-      );
-      $xmlProcessor->run($this->_caseType, $xmlProcessorParams);
-      $reports = $xmlProcessor->get($this->_caseType, 'ActivitySets');
+      civicrm_api3('Case', 'addtimeline', array(
+        'case_id' => $this->_caseID,
+        'timeline' => $params['timeline_id'],
+      ));
 
+      $xmlProcessor = new CRM_Case_XMLProcessor_Process();
+      $reports = $xmlProcessor->get($this->_caseType, 'ActivitySets');
       CRM_Core_Session::setStatus(ts('Activities from the %1 activity set have been added to this case.',
         array(1 => $reports[$params['timeline_id']])
       ), ts('Done'), 'success');

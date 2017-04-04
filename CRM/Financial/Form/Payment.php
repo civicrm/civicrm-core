@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Financial_Form_Payment extends CRM_Core_Form {
 
@@ -96,16 +96,18 @@ class CRM_Financial_Form_Payment extends CRM_Core_Form {
 
   /**
    * Add JS to show icons for the accepted credit cards.
+   *
+   * @param int $paymentProcessorID
    */
   public static function addCreditCardJs($paymentProcessorID = NULL) {
     $creditCards = array();
     $creditCards = CRM_Financial_BAO_PaymentProcessor::getCreditCards($paymentProcessorID);
     $creditCardTypes = CRM_Core_Payment_Form::getCreditCardCSSNames($creditCards);
     CRM_Core_Resources::singleton()
-      ->addScriptFile('civicrm', 'templates/CRM/Core/BillingBlock.js', 10)
+      ->addScriptFile('civicrm', 'templates/CRM/Core/BillingBlock.js', 10, 'html-header', FALSE)
       // workaround for CRM-13634
       // ->addSetting(array('config' => array('creditCardTypes' => $creditCardTypes)));
-      ->addScript('CRM.config.creditCardTypes = ' . json_encode($creditCardTypes) . ';');
+      ->addScript('CRM.config.creditCardTypes = ' . json_encode($creditCardTypes) . ';', '-9999', 'html-header');
   }
 
 }

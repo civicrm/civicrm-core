@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -328,7 +328,7 @@ var surveyActivityIds = {/literal}{$surveyActivityIds}{literal};
         if (interview.errors[error]) errorList =  errorList + '<li>' + interview.errors[error] + '</li>';
       }
       if ( errorList ) {
-        var allErrors = '<i class="crm-i fa-exclamation-triangle crm-i-red"></i> ' + ts('Please correct the following errors in the survey fields below:') + '<ul>' + errorList + '</ul>';
+        var allErrors = '<i class="crm-i fa-exclamation-triangle crm-i-red"></i> {/literal}{ts}Please correct the following errors in the survey fields below:{/ts}{literal}<ul>' + errorList + '</ul>';
         CRM.$('#responseErrors').show( ).html(allErrors);
       }
     }

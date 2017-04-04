@@ -20,6 +20,12 @@ class CRM_Core_CodeGen_DAO extends CRM_Core_CodeGen_BaseTask {
    */
   private $raw;
 
+  /**
+   * CRM_Core_CodeGen_DAO constructor.
+   *
+   * @param \CRM_Core_CodeGen_Main $config
+   * @param string $name
+   */
   public function __construct($config, $name) {
     parent::__construct($config);
     $this->name = $name;
@@ -43,6 +49,9 @@ class CRM_Core_CodeGen_DAO extends CRM_Core_CodeGen_BaseTask {
       $this->getRaw());
   }
 
+  /**
+   * Run generator.
+   */
   public function run() {
     echo "Generating {$this->name} as " . $this->getRelFileName() . "\n";
 
@@ -72,11 +81,18 @@ class CRM_Core_CodeGen_DAO extends CRM_Core_CodeGen_BaseTask {
     return $this->raw;
   }
 
+  /**
+   * Get relative file name.
+   *
+   * @return string
+   */
   public function getRelFileName() {
     return $this->tables[$this->name]['fileName'];
   }
 
   /**
+   * Get the absolute file name.
+   *
    * @return string
    */
   public function getAbsFileName() {

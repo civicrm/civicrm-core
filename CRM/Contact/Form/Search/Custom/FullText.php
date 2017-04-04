@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Contact_Form_Search_Custom_FullText extends CRM_Contact_Form_Search_Custom_Base implements CRM_Contact_Form_Search_Interface {
 
@@ -224,6 +224,10 @@ CREATE TEMPORARY TABLE {$this->_entityIDTableName} (
 ) ENGINE=HEAP DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci
 ";
     CRM_Core_DAO::executeQuery($sql);
+
+    if (!empty($this->_formValues['is_unit_test'])) {
+      $this->_tableNameForTest = $this->_tableName;
+    }
   }
 
   public function fillTable() {
@@ -259,7 +263,7 @@ CREATE TEMPORARY TABLE {$this->_entityIDTableName} (
     $sql = "
 DELETE     t.*
 FROM       {$this->_tableName} t
-WHERE      NOT EXISTS ( SELECT c.id
+WHERE      NOT EXISTS ( SELECT c.contact_id
                         FROM civicrm_acl_contact_cache c
                         WHERE c.user_id = %1 AND t.contact_id = c.contact_id )
 ";
@@ -269,7 +273,7 @@ WHERE      NOT EXISTS ( SELECT c.id
 DELETE     t.*
 FROM       {$this->_tableName} t
 WHERE      t.table_name = 'Activity' AND
-           NOT EXISTS ( SELECT c.id
+           NOT EXISTS ( SELECT c.contact_id
                         FROM civicrm_acl_contact_cache c
                         WHERE c.user_id = %1 AND ( t.target_contact_id = c.contact_id OR t.target_contact_id IS NULL ) )
 ";
@@ -279,7 +283,7 @@ WHERE      t.table_name = 'Activity' AND
 DELETE     t.*
 FROM       {$this->_tableName} t
 WHERE      t.table_name = 'Activity' AND
-           NOT EXISTS ( SELECT c.id
+           NOT EXISTS ( SELECT c.contact_id
                         FROM civicrm_acl_contact_cache c
                         WHERE c.user_id = %1 AND ( t.assignee_contact_id = c.contact_id OR t.assignee_contact_id IS NULL ) )
 ";

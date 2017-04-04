@@ -22,7 +22,8 @@ function participant_get_example() {
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
     return array(
-      'error' => $errorMessage,
+      'is_error' => 1,
+      'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
     );
@@ -51,7 +52,7 @@ function participant_get_expectedresult() {
         'contact_sub_type' => '',
         'sort_name' => 'Anderson, Anthony',
         'display_name' => 'Mr. Anthony Anderson II',
-        'event_id' => '6',
+        'event_id' => '7',
         'event_title' => 'Annual CiviCRM meet',
         'event_start_date' => '2013-07-29 00:00:00',
         'event_end_date' => '2013-08-04 00:00:00',
@@ -62,8 +63,8 @@ function participant_get_expectedresult() {
         'event_type' => 'Conference',
         'participant_status_id' => '2',
         'participant_status' => 'Attended',
-        'participant_role' => 'Attendee',
         'participant_role_id' => '1',
+        'participant_role' => 'Attendee',
         'participant_register_date' => '2007-02-19 00:00:00',
         'participant_source' => 'Wimbeldon',
         'participant_note' => '',
@@ -77,10 +78,10 @@ function participant_get_expectedresult() {
           'is_error' => 0,
           'version' => 3,
           'count' => 1,
-          'id' => 6,
+          'id' => 7,
           'values' => array(
             '0' => array(
-              'id' => '6',
+              'id' => '7',
               'title' => 'Annual CiviCRM meet',
               'event_title' => 'Annual CiviCRM meet',
               'summary' => 'If you have any CiviCRM related issues or want to track where CiviCRM is heading, Sign up now',
@@ -107,7 +108,10 @@ function participant_get_expectedresult() {
               'is_pay_later' => 0,
               'is_partial_payment' => 0,
               'is_multiple_registrations' => 0,
+              'max_additional_participants' => 0,
               'allow_same_participant_emails' => 0,
+              'allow_selfcancelxfer' => 0,
+              'selfcancelxfer_time' => 0,
               'is_template' => 0,
               'created_date' => '2013-07-28 08:49:19',
               'is_share' => '1',

@@ -108,4 +108,23 @@
       <type>CheckBox</type>
     </html>
   </field>
+  <field>
+    <name>domain_id</name>
+    <title>SMS Domain</title>
+    <type>int unsigned</type>
+    <pseudoconstant>
+      <table>civicrm_domain</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+    </pseudoconstant>
+    <comment>Which Domain is this sms provider for</comment>
+    <add>4.7</add>
+  </field>
+  <foreignKey>
+    <name>domain_id</name>
+    <table>civicrm_domain</table>
+    <key>id</key>
+    <add>4.7</add>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
 </table>

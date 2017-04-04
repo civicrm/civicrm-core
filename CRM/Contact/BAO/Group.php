@@ -3,7 +3,7 @@
   +--------------------------------------------------------------------+
   | CiviCRM version 4.7                                                |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2016                                |
+  | Copyright CiviCRM LLC (c) 2004-2017                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
 
@@ -360,7 +360,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     if (isset($params['group_type'])) {
       if (is_array($params['group_type'])) {
         $params['group_type'] = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR,
-            $params['group_type']
+            CRM_Utils_Array::convertCheckboxFormatToArray($params['group_type'])
           ) . CRM_Core_DAO::VALUE_SEPARATOR;
       }
       else {
@@ -657,9 +657,13 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
       //save the mapping for search builder
       if (!$ssId) {
         //save record in mapping table
-        $temp = array();
-        $mappingParams = array('mapping_type' => 'Search Builder');
-        $mapping = CRM_Core_BAO_Mapping::add($mappingParams, $temp);
+        $mappingParams = array(
+          'mapping_type_id' => CRM_Core_OptionGroup::getValue('mapping_type',
+            'Search Builder',
+            'name'
+          ),
+        );
+        $mapping = CRM_Core_BAO_Mapping::add($mappingParams);
         $mappingId = $mapping->id;
       }
       else {
@@ -704,6 +708,20 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
 
       $smartGroup = self::create($groupParams);
       $smartGroupId = $smartGroup->id;
+    }
+
+    // Update mapping with the name and description of the hidden smart group.
+    if ($mappingId) {
+      $mappingParams = array(
+        'id' => $mappingId,
+        'name' => CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $smartGroupId, 'name', 'id'),
+        'description' => CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $smartGroupId, 'description', 'id'),
+        'mapping_type_id' => CRM_Core_OptionGroup::getValue('mapping_type',
+          'Search Builder',
+          'name'
+        ),
+      );
+      CRM_Core_BAO_Mapping::add($mappingParams);
     }
 
     return array($smartGroupId, $ssId);
@@ -843,7 +861,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
                                ON contact.id = gOrg.organization_id ";
 
       //get the Organization ID
-      $orgID = CRM_Utils_Request::retrieve('oid', 'Positive', CRM_Core_DAO::$_nullObject);
+      $orgID = CRM_Utils_Request::retrieve('oid', 'Positive');
       if ($orgID) {
         $where = " AND gOrg.organization_id = {$orgID}";
       }
@@ -882,7 +900,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     $visibility = CRM_Core_SelectValues::ufVisibility();
 
     while ($object->fetch()) {
-      $permission = CRM_Contact_BAO_Group::checkPermission($object->id, $object->title);
+      $permission = CRM_Contact_BAO_Group::checkPermission($object->id, TRUE);
       //@todo CRM-12209 introduced an ACL check in the whereClause function
       // it may be that this checking is now obsolete - or that what remains
       // should be removed to the whereClause (which is also accessed by getCount)
@@ -1001,7 +1019,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
       }
       // Exclude deleted contacts
       $where .= " and c.id = g.contact_id AND c.is_deleted = 0";
-      $dao = CRM_Core_DAO::executeQuery("SELECT g.group_id, COUNT(g.id) as `count` FROM $table g, civicrm_contact c WHERE $where GROUP BY g.group_id");
+      $dao = CRM_Core_DAO::executeQuery("SELECT g.group_id, COUNT(*) as `count` FROM $table g, civicrm_contact c WHERE $where GROUP BY g.group_id");
       while ($dao->fetch()) {
         $values[$dao->group_id]['count'] = $dao->count;
       }
@@ -1072,88 +1090,74 @@ WHERE  id IN $groupIdString
     // Sort the groups into the correct storage by the parent
     // $roots represent the current leaf nodes that need to be checked for
     // children. $rows represent the unplaced nodes
-    $roots = $rows = $allGroups = array();
+    // $tree contains the child nodes based on their parent_id.
+    $roots = array();
+    $tree = array();
     while ($dao->fetch()) {
-      $allGroups[$dao->id] = array(
-        'title' => $dao->title,
-        'visibility' => $dao->visibility,
-        'description' => $dao->description,
-      );
-
-      if ($dao->parents == $parents) {
-        $roots[] = array(
+      if ($dao->parents) {
+        $parentArray = explode(',', $dao->parents);
+        $parent = $parentArray[0];
+        $tree[$parent][] = array(
           'id' => $dao->id,
-          'prefix' => '',
           'title' => $dao->title,
+          'visibility' => $dao->visibility,
+          'description' => $dao->description,
         );
       }
       else {
-        // group can have > 1 parent so $dao->parents may be comma separated list (eg. '1,2,5'). Grab and match on 1st parent.
-        $parentArray = explode(',', $dao->parents);
-        $parent = $parentArray[0];
-        $rows[] = array(
+        $roots[] = array(
           'id' => $dao->id,
-          'prefix' => '',
           'title' => $dao->title,
-          'parents' => $parent,
+          'visibility' => $dao->visibility,
+          'description' => $dao->description,
         );
       }
     }
     $dao->free();
-    // While we have nodes left to build, shift the first (alphabetically)
-    // node of the list, place it in our groups list and loop through the
-    // list of unplaced nodes to find its children. We make a copy to
-    // iterate through because we must modify the unplaced nodes list
-    // during the loop.
-    while (count($roots)) {
-      $new_roots = array();
-      $current_rows = $rows;
-      $root = array_shift($roots);
-      $groups[$root['id']] = array($root['prefix'], $root['title']);
 
-      // As you find the children, append them to the end of the new set
-      // of roots (maintain alphabetical ordering). Also remove the node
-      // from the set of unplaced nodes.
-      if (is_array($current_rows)) {
-        foreach ($current_rows as $key => $row) {
-          if ($row['parents'] == $root['id']) {
-            $new_roots[] = array(
-              'id' => $row['id'],
-              'prefix' => $groups[$root['id']][0] . $spacer,
-              'title' => $row['title'],
-            );
-            unset($rows[$key]);
-          }
-        }
-      }
+    $hierarchy = array();
+    for ($i = 0; $i < count($roots); $i++) {
+      self::buildGroupHierarchy($hierarchy, $roots[$i], $tree, $titleOnly, $spacer, 0);
+    }
+    return $hierarchy;
+  }
 
-      //As a group, insert the new roots into the beginning of the roots
-      //list. This maintains the hierarchical ordering of the tags.
-      $roots = array_merge($new_roots, $roots);
+  /**
+   * Build a list with groups on alphabetical order and child groups after the parent group.
+   *
+   * This is a recursive function filling the $hierarchy parameter.
+   *
+   * @param $hierarchy
+   * @param $group
+   * @param $tree
+   * @param $titleOnly
+   * @param $spacer
+   * @param $level
+   */
+  private static function buildGroupHierarchy(&$hierarchy, $group, $tree, $titleOnly, $spacer, $level) {
+    $spaces = str_repeat($spacer, $level);
+
+    if ($titleOnly) {
+      $hierarchy[$group['id']] = $spaces . $group['title'];
+    }
+    else {
+      $hierarchy[$group['id']] = array(
+        'title' => $spaces . $group['title'],
+        'description' => $group['description'],
+        'visibility' => $group['visibility'],
+      );
     }
 
-    // below is the redundant looping to ensure child groups are populated in the case where user does not have
-    // access to parent groups ( esp. using ACL permissions and logged in user can assess only child groups )
-    foreach ($rows as $value) {
-      $groups[$value['id']] = array($value['prefix'], $value['title']);
-    }
-    // Prefix titles with the calcuated spacing to give the visual
-    // appearance of ordering when transformed into HTML in the form layer. Add description and visibility.
-    $groupsReturn = array();
-    foreach ($groups as $key => $value) {
-      if ($titleOnly) {
-        $groupsReturn[$key] = $value[0] . $value[1];
-      }
-      else {
-        $groupsReturn[$key] = array(
-          'title' => $value[0] . $value[1],
-          'description' => $allGroups[$key]['description'],
-          'visibility' => $allGroups[$key]['visibility'],
-        );
+    // For performance reasons we use a for loop rather than a foreach.
+    // Metrics for performance in an installation with 2867 groups a foreach
+    // caused the function getGroupsHierarchy with a foreach execution takes
+    // around 2.2 seoonds (2,200 ms).
+    // Changing to a for loop execustion takes around 0.02 seconds (20 ms).
+    if (isset($tree[$group['id']]) && is_array($tree[$group['id']])) {
+      for ($i = 0; $i < count($tree[$group['id']]); $i++) {
+        self::buildGroupHierarchy($hierarchy, $tree[$group['id']][$i], $tree, $titleOnly, $spacer, $level + 1);
       }
     }
-
-    return $groupsReturn;
   }
 
   /**
@@ -1339,6 +1343,28 @@ WHERE {$whereClause}";
     else {
       parent::assignTestValues($fieldName, $fieldDef, $counter);
     }
+  }
+
+  /**
+   * Get child group ids
+   *
+   * @param array $ids
+   *    Parent Group IDs
+   *
+   * @return array
+   */
+  public static function getChildGroupIds($ids) {
+    $notFound = FALSE;
+    $childGroupIds = array();
+    foreach ($ids as $id) {
+      $childId = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $id, 'children');
+      while (!empty($childId)) {
+        $childGroupIds[] = $childId;
+        $childId = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $childId, 'children');
+      }
+    }
+
+    return $childGroupIds;
   }
 
 }

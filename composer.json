@@ -18,11 +18,11 @@
     "symfony/finder": "~2.5.0",
     "tecnickcom/tcpdf" : "6.2.*",
     "totten/ca-config": "~13.02",
-    "civicrm/civicrm-cxn-rpc": "~0.15.12.04",
     "zetacomponents/base": "1.7.*",
     "zetacomponents/mail": "dev-1.7-civi",
     "phpoffice/phpword": "^0.13.0",
-    "pear/Validate_Finance_CreditCard": "dev-master"
+    "pear/Validate_Finance_CreditCard": "dev-master",
+    "civicrm/civicrm-cxn-rpc": "~0.16.12.05"
   },
   "repositories": [
     {

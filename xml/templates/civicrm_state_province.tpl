@@ -1,7 +1,7 @@
 -- +--------------------------------------------------------------------+
 -- | CiviCRM version 4.7                                                |
 -- +--------------------------------------------------------------------+
--- | Copyright CiviCRM LLC (c) 2004-2016                                |
+-- | Copyright CiviCRM LLC (c) 2004-2017                                |
 -- +--------------------------------------------------------------------+
 -- | This file is a part of CiviCRM.                                    |
 -- |                                                                    |
@@ -126,7 +126,7 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (1222, 1101, "SK", "Sikkim"),
 (1223, 1101, "TN", "Tamil Nadu"),
 (1224, 1101, "TR", "Tripura"),
-(1225, 1101, "UL", "Uttaranchal"),
+(1225, 1101, "UT", "Uttarakhand"),
 (1226, 1101, "UP", "Uttar Pradesh"),
 (1227, 1101, "WB", "West Bengal"),
 (1228, 1101, "AN", "Andaman and Nicobar Islands"),
@@ -1829,11 +1829,9 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (3345, 1110, "JA", "Jarash"),
 (3346, 1110, "MN", "Ma\'an"),
 (3347, 1110, "MD", "Madaba"),
-(3348, 1112, "110", "Nairobi Municipality"),
-(3349, 1112, "300", "Coast"),
-(3350, 1112, "500", "North-Eastern Kaskazini Mashariki"),
-(3351, 1112, "700", "Rift Valley"),
-(3352, 1112, "900", "Western Magharibi"),
+
+-- CRM-20062 Outdated provinces for Kenya removed .
+
 (3353, 1117, "GB", "Bishkek"),
 (3354, 1117, "B", "Batken"),
 (3355, 1117, "C", "Chu"),
@@ -3312,7 +3310,7 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (4860, 1208, "TPQ", "Taipei County"),
 (4861, 1208, "TTT", "Taitung County"),
 (4862, 1208, "TAO", "Taoyuan County"),
-(4863, 1208, "YUN", "Yunlin Conuty"),
+(4863, 1208, "YUN", "Yunlin County"),
 (4864, 1208, "KEE", "Keelung City"),
 (4865, 1210, "01", "Arusha"),
 (4866, 1210, "02", "Dar-es-Salaam"),
@@ -4001,7 +3999,7 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (NULL, 1066, "LI", "La Libertad"),
 (NULL, 1066, "PA", "La Paz"),
 (NULL, 1066, "UN", "La Union"),
- 
+
 -- CRM-17660 Add missing Cameroon Provinces
 (NULL, 1038, "LT", "Littoral"),
 (NULL, 1038, "NW", "Nord-Ouest"),
@@ -4017,4 +4015,66 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (NULL, 1076, "MQ", "Martinique"),
 (NULL, 1076, "GF", "Guyane"),
 (NULL, 1076, "RE", "La Réunion"),
-(NULL, 1076, "YT", "Mayotte");
+(NULL, 1076, "YT", "Mayotte"),
+
+-- CRM-20062 New counties of Kenya.
+(NULL, 1112, "01", "Baringo"),
+(NULL, 1112, "02", "Bomet"),
+(NULL, 1112, "03", "Bungoma"),
+(NULL, 1112, "04", "Busia"),
+(NULL, 1112, "05", "Elgeyo/Marakwet"),
+(NULL, 1112, "06", "Embu"),
+(NULL, 1112, "07", "Garissa"),
+(NULL, 1112, "08", "Homa Bay"),
+(NULL, 1112, "09", "Isiolo"),
+(NULL, 1112, "10", "Kajiado"),
+(NULL, 1112, "11", "Kakamega"),
+(NULL, 1112, "12", "Kericho"),
+(NULL, 1112, "13", "Kiambu"),
+(NULL, 1112, "14", "Kilifi"),
+(NULL, 1112, "15", "Kirinyaga"),
+(NULL, 1112, "16", "Kisii"),
+(NULL, 1112, "17", "Kisumu"),
+(NULL, 1112, "18", "Kitui"),
+(NULL, 1112, "19", "Kwale"),
+(NULL, 1112, "20", "Laikipia"),
+(NULL, 1112, "21", "Lamu"),
+(NULL, 1112, "22", "Machakos"),
+(NULL, 1112, "23", "Makueni"),
+(NULL, 1112, "24", "Mandera"),
+(NULL, 1112, "25", "Marsabit"),
+(NULL, 1112, "26", "Meru"),
+(NULL, 1112, "27", "Migori"),
+(NULL, 1112, "28", "Mombasa"),
+(NULL, 1112, "29", "Murang'a"),
+(NULL, 1112, "30", "Nairobi City"),
+(NULL, 1112, "31", "Nakuru"),
+(NULL, 1112, "32", "Nandi"),
+(NULL, 1112, "33", "Narok"),
+(NULL, 1112, "34", "Nyamira"),
+(NULL, 1112, "35", "Nyandarua"),
+(NULL, 1112, "36", "Nyeri"),
+(NULL, 1112, "37", "Samburu"),
+(NULL, 1112, "38", "Siaya"),
+(NULL, 1112, "39", "Taita/Taveta"),
+(NULL, 1112, "40", "Tana River"),
+(NULL, 1112, "41", "Tharaka-Nithi"),
+(NULL, 1112, "42", "Trans Nzoia"),
+(NULL, 1112, "43", "Turkana"),
+(NULL, 1112, "44", "Uasin Gishu"),
+(NULL, 1112, "45", "Vihiga"),
+(NULL, 1112, "46", "Wajir"),
+(NULL, 1112, "47", "West Pokot"),
+
+-- CRM-19993 Fixes for ISO compliance with countries and counties
+-- Add states for: India, Ghana, Sierra Leone, Saint Kitts & Nevis
+(NULL, 1101, "CH", "Chandigarh"),
+(NULL, 1083, "CP", "Central"),
+(NULL, 1083, "EP", "Eastern"),
+(NULL, 1083, "NP", "Northern"),
+(NULL, 1083, "WP", "Western"),
+(NULL, 1181, "K", "Saint Kitts"),
+(NULL, 1181, "N", "Nevis"),
+(NULL, 1190, "E", "Eastern"),
+(NULL, 1190, "N", "Northern"),
+(NULL, 1190, "S", "Southern");

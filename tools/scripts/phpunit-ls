@@ -9,9 +9,12 @@ if (!class_exists('PHPUnit_Framework_TestCase')) {
   // but the scanner will try to read metadata about our test-classes, and
   // that requires having the parent-classes defined.
 
+  // Note: Use eval() to prevent IDE scanners from tripping up on this.
+  eval('
   class PHPUnit_Framework_TestCase {}
   class PHPUnit_Extensions_Database_TestCase {}
   class PHPUnit_Extensions_SeleniumTestCase {}
+  \');
 }
 
 \Civi\CiUtil\Command\LsCommand::main($argv);

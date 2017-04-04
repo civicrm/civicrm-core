@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Utils_Check_Message {
   /**
@@ -87,10 +87,10 @@ class CRM_Utils_Check_Message {
    *   Printable message (short).
    * @param string $level
    *   The severity of the message. Use PSR-3 log levels.
+   * @param string $icon
    *
    * @see Psr\Log\LogLevel
    *
-   * @throws \CRM_Core_Exception
    */
   public function __construct($name, $message, $title, $level = \Psr\Log\LogLevel::WARNING, $icon = NULL) {
     $this->name = $name;

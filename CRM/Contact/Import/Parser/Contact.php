@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -1677,7 +1677,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
     //@todo direct call to API function not supported.
     // setting required check to false, CRM-2839
     // plus we do our own required check in import
-    $error = _civicrm_api3_deprecated_contact_check_params($formatted, $dupeCheck, TRUE, FALSE, $dedupeRuleGroupID);
+    $error = _civicrm_api3_deprecated_contact_check_params($formatted, $dupeCheck, $dedupeRuleGroupID);
 
     if ((is_null($error)) && (civicrm_error(_civicrm_api3_deprecated_validate_formatted_contact($formatted)))) {
       $error = _civicrm_api3_deprecated_validate_formatted_contact($formatted);
@@ -1990,7 +1990,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
           case 'Select':
           case 'Radio':
           case 'Autocomplete-Select':
-            if ($customFields[$customFieldID]['data_type'] == 'String') {
+            if ($customFields[$customFieldID]['data_type'] == 'String' || $customFields[$customFieldID]['data_type'] == 'Int') {
               $customOption = CRM_Core_BAO_CustomOption::getCustomOption($customFieldID, TRUE);
               foreach ($customOption as $customValue) {
                 $val = CRM_Utils_Array::value('value', $customValue);

@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -65,7 +65,7 @@
             </a>
           {/if}
           {if $row.amount_level }<br/>({$row.amount_level}){/if}
-          {if $row.contribution_recur_id}<br/>{ts}(Recurring Contribution){/ts}{/if}
+          {if $row.contribution_recur_id}<br/>{ts}(Recurring){/ts}{/if}
         </td>
         {if $softCreditColumns}
           <td class="right bold crm-contribution-soft_credit_amount">

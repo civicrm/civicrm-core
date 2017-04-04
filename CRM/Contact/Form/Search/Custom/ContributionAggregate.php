@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Contact_Form_Search_Custom_ContributionAggregate extends CRM_Contact_Form_Search_Custom_Base implements CRM_Contact_Form_Search_Interface {
 
@@ -83,9 +83,7 @@ class CRM_Contact_Form_Search_Custom_ContributionAggregate extends CRM_Contact_F
       ts('...and $')
     );
     $form->addRule('max_amount', ts('Please enter a valid amount (numbers and decimal point only).'), 'money');
-
-    $form->addDate('start_date', ts('Contribution Date From'), FALSE, array('formatType' => 'custom'));
-    $form->addDate('end_date', ts('...through'), FALSE, array('formatType' => 'custom'));
+    CRM_Core_Form_Date::buildDateRange($form, 'contribution_date', 1, '_low', '_high', ts('From:'), FALSE, FALSE);
 
     $form->addSelect('financial_type_id',
       array('entity' => 'contribution', 'multiple' => 'multiple', 'context' => 'search')
@@ -95,7 +93,7 @@ class CRM_Contact_Form_Search_Custom_ContributionAggregate extends CRM_Contact_F
      * If you are using the sample template, this array tells the template fields to render
      * for the search form.
      */
-    $form->assign('elements', array('min_amount', 'max_amount', 'start_date', 'end_date'));
+    $form->assign('elements', array('min_amount', 'max_amount'));
   }
 
   /**
@@ -197,22 +195,24 @@ civicrm_contact AS contact_a {$this->_aclFrom}
    * @return string
    */
   public function where($includeContactIDs = FALSE) {
-    $clauses = array();
+    $clauses = array(
+      "contrib.contact_id = contact_a.id",
+      "contrib.is_test = 0",
+    );
 
-    $clauses[] = "contrib.contact_id = contact_a.id";
-    $clauses[] = "contrib.is_test = 0";
-
-    $startTime = !empty($this->_formValues['start_date_time']) ? $this->_formValues['start_date_time'] : '00:00:00';
-    $endTime = !empty($this->_formValues['end_date_time']) ? $this->_formValues['end_date_time'] : '23:59:59';
-
-    $startDate = CRM_Utils_Date::processDate($this->_formValues['start_date'], $startTime);
-    if ($startDate) {
-      $clauses[] = "contrib.receive_date >= $startDate";
-    }
-
-    $endDate = CRM_Utils_Date::processDate($this->_formValues['end_date'], $endTime);
-    if ($endDate) {
-      $clauses[] = "contrib.receive_date <= $endDate";
+    $dateParams = array(
+      'contribution_date_relative' => $this->_formValues['contribution_date_relative'],
+      'contribution_date_low' => $this->_formValues['contribution_date_low'],
+      'contribution_date_high' => $this->_formValues['contribution_date_high'],
+    );
+    foreach (CRM_Contact_BAO_Query::convertFormValues($dateParams) as $values) {
+      list($name, $op, $value) = $values;
+      if (strstr($name, '_low')) {
+        $clauses[] = "contrib.receive_date >= " . CRM_Utils_Date::processDate($value);
+      }
+      else {
+        $clauses[] = "contrib.receive_date <= " . CRM_Utils_Date::processDate($value);
+      }
     }
 
     if ($includeContactIDs) {

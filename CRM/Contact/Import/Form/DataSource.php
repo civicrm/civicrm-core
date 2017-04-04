@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -208,7 +208,7 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
     $geoCode = FALSE;
     if (!empty($config->geocodeMethod)) {
       $geoCode = TRUE;
-      $this->addElement('checkbox', 'doGeocodeAddress', ts('Lookup mapping info during import?'));
+      $this->addElement('checkbox', 'doGeocodeAddress', ts('Geocode addresses during import?'));
     }
     $this->assign('geoCode', $geoCode);
 

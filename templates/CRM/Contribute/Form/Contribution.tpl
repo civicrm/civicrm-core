@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -496,34 +496,34 @@
             $('#receiptDate', $form).show();
           }
         }
-      {/literal}{if !$contributionMode}{literal}
-        showHideCancelInfo($('#contribution_status_id', $form));
+        {/literal}{if !$contributionMode}{literal}
+          showHideCancelInfo($('#contribution_status_id', $form));
   
-        $('#contribution_status_id', $form).change(function() {
-         showHideCancelInfo($('#contribution_status_id', $form));
-        });
+          $('#contribution_status_id', $form).change(function() {
+            showHideCancelInfo($('#contribution_status_id', $form));
+          });
   
-        function showHideCancelInfo(obj) {
-          var cancelInfo_show_ids = [{/literal}{$cancelInfo_show_ids}{literal}];
-          if (cancelInfo_show_ids.indexOf(obj.val()) > -1) {
-            $('#cancelInfo', $form).show();
-            $('#total_amount', $form).attr('readonly', true);
+          function showHideCancelInfo(obj) {
+            var cancelInfo_show_ids = [{/literal}{$cancelInfo_show_ids}{literal}];
+            if (cancelInfo_show_ids.indexOf(obj.val()) > -1) {
+              $('#cancelInfo', $form).show();
+              $('#total_amount', $form).attr('readonly', true);
+            }
+            else {
+              $("#cancel_date", $form).val('');
+              $("#cancel_reason", $form).val('');
+              $('#cancelInfo', $form).hide();
+              $("#total_amount", $form).removeAttr('readonly');
+            }
           }
-          else {
-            $("#cancel_date", $form).val('');
-            $("#cancel_reason", $form).val('');
-            $('#cancelInfo', $form).hide();
-            $("#total_amount", $form).removeAttr('readonly');
-          }
-        }
+        {/literal}{/if}
       });
-
-      {/literal}{/if}
     </script>
       {if !$contributionMode}
+        {crmAPI var="checkVal" entity="OptionValue" action="getvalue" version="3" option_group_id="payment_instrument" name="Check" return="value"}
         {include file="CRM/common/showHideByFieldValue.tpl"
         trigger_field_id    ="payment_instrument_id"
-        trigger_value       = '4'
+        trigger_value       = $checkVal
         target_element_id   ="checkNumber"
         target_element_type ="table-row"
         field_type          ="select"

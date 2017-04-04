@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -196,7 +196,7 @@ function civicrm_api3_payment_create(&$params) {
       }
       elseif (!empty($trxn)) {
         // Assign the lineitems proportionally
-        CRM_Contribute_BAO_Contribution::assignProportionalLineItems($params, $trxn, $contribution);
+        CRM_Contribute_BAO_Contribution::assignProportionalLineItems($params, $trxn->id, $contribution['total_amount']);
       }
     }
   }

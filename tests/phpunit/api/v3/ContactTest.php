@@ -572,7 +572,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       ),
     );
 
-    $result = $this->callAPIAndDocument('Contact', 'create', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('Contact', 'create', $params);
     $customFldId = $result['values'][$result['id']]['api.CustomField.create']['id'];
     $this->assertNotNull($result['id']);
     $this->assertNotNull($customFldId);
@@ -583,7 +583,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'api.CustomValue.get' => 1,
     );
 
-    $result = $this->callAPIAndDocument('Contact', 'create', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('Contact', 'create', $params);
     $this->assertNotNull($result['id']);
     $customFldDate = date("YmdHis", strtotime($result['values'][$result['id']]['api.CustomValue.get']['values'][0]['latest']));
     $this->assertNotNull($customFldDate);
@@ -606,14 +606,14 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       ),
       'api.CustomValue.get' => 1,
     );
-    $result = $this->callAPIAndDocument('Contact', 'create', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('Contact', 'create', $params);
     $this->assertNotNull($result['id']);
     $customFldDate = date("Ymd", strtotime($result['values'][$result['id']]['api.CustomValue.get']['values'][0]['latest']));
     $customFldTime = date("His", strtotime($result['values'][$result['id']]['api.CustomValue.get']['values'][0]['latest']));
     $this->assertNotNull($customFldDate);
     $this->assertEquals($dateTime, $customFldDate);
     $this->assertEquals(000000, $customFldTime);
-    $this->callAPIAndDocument('Contact', 'create', $params, __FUNCTION__, __FILE__);
+    $this->callAPISuccess('Contact', 'create', $params);
   }
 
 
@@ -984,8 +984,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    */
   public function testGetGroupIDFromContact() {
     $groupId = $this->groupCreate();
-    $description = "Get all from group and display contacts.";
-    $subFile = "GroupFilterUsingContactAPI";
     $params = array(
       'email' => 'man2@yahoo.com',
       'contact_type' => 'Individual',
@@ -999,7 +997,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'filter.group_id' => $groupId,
       'contact_type' => 'Individual',
     );
-    $result = $this->callAPIAndDocument('contact', 'get', $params, __FUNCTION__, __FILE__, $description, $subFile);
+    $result = $this->callAPISuccess('contact', 'get', $params);
     $this->assertEquals(1, $result['count']);
     // group 26 doesn't exist, but we can still search contacts in it.
     $params = array(
@@ -1012,7 +1010,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'filter.group_id' => "$groupId, 26",
       'contact_type' => 'Individual',
     );
-    $result = $this->callAPIAndDocument('contact', 'get', $params, __FUNCTION__, __FILE__, $description, $subFile);
+    $result = $this->callAPISuccess('contact', 'get', $params);
     $this->assertEquals(1, $result['count']);
     $params = array(
       'filter.group_id' => "26,27",
@@ -1025,7 +1023,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'filter.group_id' => array($groupId, 26),
       'contact_type' => 'Individual',
     );
-    $result = $this->callAPIAndDocument('contact', 'get', $params, __FUNCTION__, __FILE__, $description, $subFile);
+    $result = $this->callAPISuccess('contact', 'get', $params);
     $this->assertEquals(1, $result['count']);
 
     //test in conjunction with other criteria
@@ -1647,6 +1645,40 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
     $this->callAPISuccess('contact', 'delete', $contact);
   }
+
+  /**
+   * Ensure consistent return format for option group fields.
+   */
+  public function testPseudoFields() {
+    $params = array(
+      'preferred_communication_method' => array('Phone', 'SMS'),
+      'preferred_language' => 'en_US',
+      'gender_id' => 'Female',
+      'prefix_id' => 'Mrs.',
+      'suffix_id' => 'II',
+      'communication_style_id' => 'Formal',
+    );
+
+    $contact = $this->callAPISuccess('contact', 'create', array_merge($this->_params, $params));
+
+    $result = $this->callAPISuccess('contact', 'getsingle', array('id' => $contact['id']));
+    $this->assertEquals('Both', $result['preferred_mail_format']);
+
+    $this->assertEquals('en_US', $result['preferred_language']);
+    $this->assertEquals(1, $result['communication_style_id']);
+    $this->assertEquals(1, $result['gender_id']);
+    $this->assertEquals('Female', $result['gender']);
+    $this->assertEquals('Mrs.', $result['individual_prefix']);
+    $this->assertEquals(1, $result['prefix_id']);
+    $this->assertEquals('II', $result['individual_suffix']);
+    $this->assertEquals(CRM_Core_PseudoConstant::getKey("CRM_Contact_BAO_Contact", 'suffix_id', 'II'), $result['suffix_id']);
+    $this->callAPISuccess('contact', 'delete', $contact);
+    $this->assertEquals(array(
+      CRM_Core_PseudoConstant::getKey("CRM_Contact_BAO_Contact", 'preferred_communication_method', 'Phone'),
+      CRM_Core_PseudoConstant::getKey("CRM_Contact_BAO_Contact", 'preferred_communication_method', 'SMS'),
+    ), $result['preferred_communication_method']);
+  }
+
 
   /**
    * Test birth date parameters.
@@ -2407,19 +2439,100 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    *
    * The search string 'b' & 'bob' both return ordered by sort_name if includeOrderByClause
    * is true (default) but if it is false then matches are returned in ID order.
+   *
+   * @dataProvider getSearchSortOptions
    */
-  public function testGetQuickExactFirst() {
+  public function testGetQuickExactFirst($searchParameters, $settings, $firstContact, $secondContact = NULL) {
     $this->getQuickSearchSampleData();
-    $result = $this->callAPISuccess('contact', 'getquick', array('name' => 'b'));
-    $this->assertEquals('A Bobby, Bobby', $result['values'][0]['sort_name']);
-    $this->assertEquals('B Bobby, Bobby', $result['values'][1]['sort_name']);
-    $result = $this->callAPISuccess('contact', 'getquick', array('name' => 'bob'));
-    $this->assertEquals('A Bobby, Bobby', $result['values'][0]['sort_name']);
-    $this->assertEquals('B Bobby, Bobby', $result['values'][1]['sort_name']);
-    $this->callAPISuccess('Setting', 'create', array('includeOrderByClause' => FALSE));
-    $result = $this->callAPISuccess('contact', 'getquick', array('name' => 'bob'));
-    $this->assertEquals('Bob, Bob', $result['values'][0]['sort_name']);
-    $this->assertEquals('A Bobby, Bobby', $result['values'][1]['sort_name']);
+    $this->callAPISuccess('Setting', 'create', $settings);
+    $result = $this->callAPISuccess('contact', 'getquick', $searchParameters);
+    $this->assertEquals($firstContact, $result['values'][0]['sort_name']);
+    $this->assertEquals($secondContact, $result['values'][1]['sort_name']);
+    $this->callAPISuccess('Setting', 'create', array('includeWildCardInName' => TRUE, 'includeOrderByClause' => TRUE));
+  }
+
+  public function getSearchSortOptions() {
+    $firstAlphabeticalContactBySortName = 'A Bobby, Bobby';
+    $secondAlphabeticalContactBySortName = 'Aadvark, Bob';
+    $secondAlphabeticalContactWithEmailBySortName = 'Bob, Bob';
+    $firstAlphabeticalContactFirstNameBob = 'Aadvark, Bob';
+    $secondAlphabeticalContactFirstNameBob  = 'Bob, Bob';
+    $firstByIDContactFirstNameBob = 'Bob, Bob';
+    $secondByIDContactFirstNameBob  = 'K Bobby, Bob';
+    $firstContactByID = 'Bob, Bob';
+    $secondContactByID = 'E Bobby, Bobby';
+    $bobLikeEmail = 'A Bobby, Bobby';
+
+    return array(
+      'empty_search_basic' => array(
+        'search_parameters' => array('name' => '%'),
+        'settings' => array('includeWildCardInName' => TRUE, 'includeOrderByClause' => TRUE),
+        'first_contact' => $firstAlphabeticalContactBySortName,
+        'second_contact' => $secondAlphabeticalContactBySortName,
+      ),
+      'empty_search_basic_no_wildcard' => array(
+        'search_parameters' => array('name' => '%'),
+        'settings' => array('includeWildCardInName' => FALSE, 'includeOrderByClause' => TRUE),
+        'first_contact' => $firstAlphabeticalContactBySortName,
+        'second_contact' => $secondAlphabeticalContactBySortName,
+      ),
+      'single_letter_search_basic' => array(
+        'search_parameters' => array('name' => 'b'),
+        'settings' => array('includeWildCardInName' => TRUE, 'includeOrderByClause' => TRUE),
+        'first_contact' => $firstAlphabeticalContactBySortName,
+        'second_contact' => $secondAlphabeticalContactBySortName,
+      ),
+      'bob_search_basic' => array(
+        'search_parameters' => array('name' => 'bob'),
+        'settings' => array('includeWildCardInName' => TRUE, 'includeOrderByClause' => TRUE),
+        'first_contact' => $firstAlphabeticalContactBySortName,
+        'second_contact' => $secondAlphabeticalContactBySortName,
+      ),
+      'bob_search_no_orderby' => array(
+        'search_parameters' => array('name' => 'bob'),
+        'settings' => array('includeWildCardInName' => TRUE, 'includeOrderByClause' => FALSE),
+        'first_contact' => $firstContactByID,
+        'second_contact' => $secondContactByID,
+      ),
+      'bob_search_no_wildcard' => array(
+        'search_parameters' => array('name' => 'bob'),
+        'settings' => array('includeWildCardInName' => FALSE, 'includeOrderByClause' => TRUE),
+        'second_contact' => $bobLikeEmail,
+        'first_contact' => $secondAlphabeticalContactFirstNameBob,
+      ),
+      // This should be the same as just no wildcard as if we had an exactMatch while searching by
+      // sort name it would rise to the top CRM-19547
+      'bob_search_no_wildcard_no_orderby' => array(
+        'search_parameters' => array('name' => 'bob'),
+        'settings' => array('includeWildCardInName' => FALSE, 'includeOrderByClause' => TRUE),
+        'second_contact' => $bobLikeEmail,
+        'first_contact' => $secondAlphabeticalContactFirstNameBob,
+      ),
+      'first_name_search_basic' => array(
+        'search_parameters' => array('name' => 'bob', 'field_name' => 'first_name'),
+        'settings' => array('includeWildCardInName' => TRUE, 'includeOrderByClause' => TRUE),
+        'first_contact' => $firstAlphabeticalContactFirstNameBob,
+        'second_contact' => $secondAlphabeticalContactFirstNameBob,
+      ),
+      'first_name_search_no_wildcard' => array(
+        'search_parameters' => array('name' => 'bob', 'field_name' => 'first_name'),
+        'settings' => array('includeWildCardInName' => FALSE, 'includeOrderByClause' => TRUE),
+        'first_contact' => $firstAlphabeticalContactFirstNameBob,
+        'second_contact' => $secondAlphabeticalContactFirstNameBob,
+      ),
+      'first_name_search_no_orderby' => array(
+        'search_parameters' => array('name' => 'bob', 'field_name' => 'first_name'),
+        'settings' => array('includeWildCardInName' => TRUE, 'includeOrderByClause' => FALSE),
+        'first_contact' => $firstByIDContactFirstNameBob,
+        'second_contact' => $secondByIDContactFirstNameBob,
+      ),
+      'email_search_basic' => array(
+        'search_parameters' => array('name' => 'bob', 'field_name' => 'email', 'table_name' => 'eml'),
+        'settings' => array('includeWildCardInName' => FALSE, 'includeOrderByClause' => TRUE),
+        'first_contact' => $firstAlphabeticalContactBySortName,
+        'second_contact' => $secondAlphabeticalContactWithEmailBySortName,
+      ),
+    );
   }
 
   /**
@@ -2432,9 +2545,9 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'name' => 'c',
     ));
     $expectedData = array(
+      'A Bobby, Bobby :: bob@bobby.com',
       'Bob, Bob :: bob@bob.com',
       'C Bobby, Bobby',
-      'E Bobby, Bobby :: bob@bobby.com',
       'H Bobby, Bobby :: bob@h.com',
       'Second Domain',
       $this->callAPISuccessGetValue('Contact', array('id' => $loggedInContactID, 'return' => 'last_name')) . ', Logged In :: anthony_anderson@civicrm.org',
@@ -2481,9 +2594,9 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     // Without the acl it would be 6 like the previous email getquick test.
     $this->assertEquals(5, $result['count']);
     $expectedData = array(
+      'A Bobby, Bobby :: bob@bobby.com',
       'Bob, Bob :: bob@bob.com',
       'C Bobby, Bobby',
-      'E Bobby, Bobby :: bob@bobby.com',
       'Second Domain',
       $this->callAPISuccessGetValue('Contact', array('id' => $loggedInContactID, 'return' => 'last_name')) . ', Logged In :: anthony_anderson@civicrm.org',
     );
@@ -2524,14 +2637,14 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'table_name' => 'cc',
     ));
     $this->assertEquals(1, $result['count']);
-    $this->assertEquals('A Bobby, Bobby', $result['values'][0]['sort_name']);
+    $this->assertEquals('E Bobby, Bobby', $result['values'][0]['sort_name']);
     $result = $this->callAPISuccess('contact', 'getquick', array(
       'name' => $max + 2,
       'field_name' => 'contact_id',
       'table_name' => 'cc',
     ));
     $this->assertEquals(1, $result['count']);
-    $this->assertEquals('A Bobby, Bobby', $result['values'][0]['sort_name']);
+    $this->assertEquals('E Bobby, Bobby', $result['values'][0]['sort_name']);
   }
 
   /**
@@ -2548,6 +2661,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'table_name' => 'cc',
     ));
     $expected = array(
+      'Aadvark, Bob',
       'Bob, Bob',
       'K Bobby, Bob',
       'A Bobby, Bobby',
@@ -2559,7 +2673,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->callAPISuccess('Setting', 'create', array('includeOrderByClause' => FALSE));
     $result = $this->callAPISuccess('contact', 'getquick', array('name' => 'bob'));
     $this->assertEquals('Bob, Bob', $result['values'][0]['sort_name']);
-    $this->assertEquals('A Bobby, Bobby', $result['values'][1]['sort_name']);
+    $this->assertEquals('E Bobby, Bobby', $result['values'][1]['sort_name']);
   }
 
   /**
@@ -2568,7 +2682,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   public function testGetQuickFirstNameACLs() {
     $this->getQuickSearchSampleData();
     $userID = $this->createLoggedInUser();
-    $this->callAPISuccess('Setting', 'create', array('includeOrderByClause' => TRUE));
+    $this->callAPISuccess('Setting', 'create', array('includeOrderByClause' => TRUE, 'search_autocomplete_count' => 15));
     CRM_Core_Config::singleton()->userPermissionClass->permissions = array();
     $result = $this->callAPISuccess('contact', 'getquick', array(
       'name' => 'Bob',
@@ -2584,9 +2698,9 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'field_name' => 'first_name',
       'table_name' => 'cc',
     ));
-    $this->assertEquals('K Bobby, Bob', $result['values'][1]['sort_name']);
+    $this->assertEquals('K Bobby, Bob', $result['values'][2]['sort_name']);
     // Without the ACL 9 would be bob@h.com.
-    $this->assertEquals('I Bobby, Bobby', $result['values'][9]['sort_name']);
+    $this->assertEquals('I Bobby, Bobby', $result['values'][10]['sort_name']);
   }
 
   /**
@@ -2655,7 +2769,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   public function getQuickSearchSampleData() {
     $contacts = array(
       array('first_name' => 'Bob', 'last_name' => 'Bob', 'external_identifier' => 'abc', 'email' => 'bob@bob.com'),
-      array('first_name' => 'Bobby', 'last_name' => 'A Bobby', 'external_identifier' => 'abcd'),
+      array('first_name' => 'Bobby', 'last_name' => 'E Bobby', 'external_identifier' => 'abcd'),
       array(
         'first_name' => 'Bobby',
         'last_name' => 'B Bobby',
@@ -2677,13 +2791,14 @@ class api_v3_ContactTest extends CiviUnitTestCase {
         ),
       ),
       array('first_name' => 'Bobby', 'last_name' => 'D Bobby', 'external_identifier' => 'efg'),
-      array('first_name' => 'Bobby', 'last_name' => 'E Bobby', 'external_identifier' => 'hij', 'email' => 'bob@bobby.com'),
+      array('first_name' => 'Bobby', 'last_name' => 'A Bobby', 'external_identifier' => 'hij', 'email' => 'bob@bobby.com'),
       array('first_name' => 'Bobby', 'last_name' => 'F Bobby', 'external_identifier' => 'klm'),
       array('first_name' => 'Bobby', 'last_name' => 'G Bobby', 'external_identifier' => 'nop'),
       array('first_name' => 'Bobby', 'last_name' => 'H Bobby', 'external_identifier' => 'qrs', 'email' => 'bob@h.com'),
       array('first_name' => 'Bobby', 'last_name' => 'I Bobby'),
       array('first_name' => 'Bobby', 'last_name' => 'J Bobby'),
       array('first_name' => 'Bob', 'last_name' => 'K Bobby', 'external_identifier' => 'bcdef'),
+      array('first_name' => 'Bob', 'last_name' => 'Aadvark'),
     );
     foreach ($contacts as $type => $contact) {
       $contact['contact_type'] = 'Individual';
@@ -2876,19 +2991,15 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * Test the duplicate check function.
    */
   public function testDuplicateCheck() {
-    $this->callAPISuccess('Contact', 'create', array(
+    $harry = array(
       'first_name' => 'Harry',
       'last_name' => 'Potter',
       'email' => 'harry@hogwarts.edu',
       'contact_type' => 'Individual',
-    ));
+    );
+    $this->callAPISuccess('Contact', 'create', $harry);
     $result = $this->callAPISuccess('Contact', 'duplicatecheck', array(
-      'match' => array(
-        'first_name' => 'Harry',
-        'last_name' => 'Potter',
-        'email' => 'harry@hogwarts.edu',
-        'contact_type' => 'Individual',
-      ),
+      'match' => $harry,
     ));
 
     $this->assertEquals(1, $result['count']);
@@ -2901,8 +3012,33 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       ),
     ));
     $this->assertEquals(0, $result['count']);
+    $this->callAPIFailure('Contact', 'create', array_merge($harry, array('dupe_check' => 1)));
   }
 
+  /**
+   * Test the duplicate check function.
+   */
+  public function testDuplicateCheckRuleNotReserved() {
+    $harry = array(
+      'first_name' => 'Harry',
+      'last_name' => 'Potter',
+      'email' => 'harry@hogwarts.edu',
+      'contact_type' => 'Individual',
+    );
+    $defaultRule = $this->callAPISuccess('RuleGroup', 'getsingle', array('used' => 'Unsupervised', 'is_reserved' => 1));
+    $this->callAPISuccess('RuleGroup', 'create', array('id' => $defaultRule['id'], 'is_reserved' => 0));
+    $this->callAPISuccess('Contact', 'create', $harry);
+    $result = $this->callAPISuccess('Contact', 'duplicatecheck', array(
+      'match' => $harry,
+    ));
+
+    $this->assertEquals(1, $result['count']);
+    $this->callAPISuccess('RuleGroup', 'create', array('id' => $defaultRule['id'], 'is_reserved' => 1));
+  }
+
+  /**
+   * Test variants on retrieving contact by type.
+   */
   public function testGetByContactType() {
     $individual = $this->callAPISuccess('Contact', 'create', array(
       'email' => 'individual@test.com',
@@ -3081,6 +3217,186 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     foreach ($created_group_ids as $created_group_id) {
       $this->assertContains($created_group_id, $contact_group_ids);
     }
+  }
+
+  /**
+   * CRM-20144 Verify that passing title of group works as well as id
+   * Tests the following formats
+   * contact.get group='title1'
+   * contact.get group=id1
+   */
+  public function testContactGetWithGroupTitle() {
+    // Set up a contact, asser that they were created.
+    $contact_params = array(
+      'contact_type' => 'Individual',
+      'first_name' => 'Test2',
+      'last_name' => 'Groupmember',
+      'email' => 'test@example.org',
+    );
+    $create_contact = $this->callApiSuccess('Contact', 'create', $contact_params);
+    $created_contact_id = $create_contact['id'];
+    // Set up multiple groups, add the contact to the groups.
+    $test_groups = array('Test group C', 'Test group D');
+    foreach ($test_groups as $title) {
+      $group_params = array(
+        'title' => $title,
+        'created_id' => $created_contact_id,
+      );
+      $create_group = $this->callApiSuccess('Group', 'create', $group_params);
+      $created_group_id = $create_group['id'];
+
+      // Add contact to the new group.
+      $group_contact_params = array(
+        'contact_id' => $created_contact_id,
+        'group_id' => $create_group['id'],
+      );
+      $create_group_contact = $this->callApiSuccess('GroupContact', 'create', $group_contact_params);
+      $contact_get = $this->callAPISuccess('contact', 'get', array('group' => $title, 'return' => 'group'));
+      $this->assertEquals(1, $contact_get['count']);
+      $this->assertEquals($created_contact_id, $contact_get['id']);
+      $contact_groups = explode(',', $contact_get['values'][$created_contact_id]['groups']);
+      $this->assertContains((string) $create_group['id'], $contact_groups);
+      $contact_get2 = $this->callAPISuccess('contact', 'get', array('group' => $created_group_id, 'return' => 'group'));
+      $this->assertEquals($created_contact_id, $contact_get2['id']);
+      $contact_groups2 = explode(',', $contact_get2['values'][$created_contact_id]['groups']);
+      $this->assertContains((string) $create_group['id'], $contact_groups2);
+      $this->callAPISuccess('group', 'delete', array('id' => $created_group_id));
+    }
+    $this->callAPISuccess('contact', 'delete', array('id' => $created_contact_id, 'skip_undelete' => TRUE));
+  }
+
+  /**
+   * CRM-20144 Verify that passing title of group works as well as id
+   * Tests the following formats
+   * contact.get group=array('title1', title1)
+   * contact.get group=array('IN' => array('title1', 'title2)
+   */
+  public function testContactGetWithGroupTitleMultipleGroups() {
+    $description = "Get all from group and display contacts.";
+    $subFile = "GroupFilterUsingContactAPI";
+    // Set up a contact, asser that they were created.
+    $contact_params = array(
+      'contact_type' => 'Individual',
+      'first_name' => 'Test2',
+      'last_name' => 'Groupmember',
+      'email' => 'test@example.org',
+    );
+    $create_contact = $this->callApiSuccess('Contact', 'create', $contact_params);
+    $created_contact_id = $create_contact['id'];
+    $createdGroupsTitles = $createdGroupsIds = array();
+    // Set up multiple groups, add the contact to the groups.
+    $test_groups = array('Test group C', 'Test group D');
+    foreach ($test_groups as $title) {
+      $group_params = array(
+        'title' => $title,
+        'created_id' => $created_contact_id,
+      );
+      $create_group = $this->callApiSuccess('Group', 'create', $group_params);
+      $created_group_id = $create_group['id'];
+      $createdGroupsIds[] = $create_group['id'];
+      $createdGroupTitles[] = $title;
+      // Add contact to the new group.
+      $group_contact_params = array(
+        'contact_id' => $created_contact_id,
+        'group_id' => $create_group['id'],
+      );
+      $create_group_contact = $this->callApiSuccess('GroupContact', 'create', $group_contact_params);
+    }
+    $contact_get = $this->callAPISuccess('contact', 'get', array('group' => $createdGroupTitles, 'return' => 'group'));
+    $this->assertEquals(1, $contact_get['count']);
+    $this->assertEquals($created_contact_id, $contact_get['id']);
+    $contact_groups = explode(',', $contact_get['values'][$created_contact_id]['groups']);
+    foreach ($createdGroupsIds as $id) {
+      $this->assertContains((string) $id, $contact_groups);
+    }
+    $contact_get2 = $this->callAPIAndDocument('contact', 'get', array('group' => array('IN' => $createdGroupTitles)), __FUNCTION__, __FILE__, $description, $subFile);
+    $contact_get2 = $this->callAPISuccess('contact', 'get', array('group' => array('IN' => $createdGroupTitles), 'return' => 'group'));
+    $this->assertEquals($created_contact_id, $contact_get2['id']);
+    $contact_groups2 = explode(',', $contact_get2['values'][$created_contact_id]['groups']);
+    foreach ($createdGroupsIds as $id) {
+      $this->assertContains((string) $id, $contact_groups2);
+    }
+    foreach ($createdGroupsIds as $id) {
+      $this->callAPISuccess('group', 'delete', array('id' => $id));
+    }
+    $this->callAPISuccess('contact', 'delete', array('id' => $created_contact_id, 'skip_undelete' => TRUE));
+  }
+
+  /**
+   * CRM-20144 Verify that passing title of group works as well as id
+   * Tests the following formats
+   * contact.get group=array('title1' => 1)
+   * contact.get group=array('titke1' => 1, 'title2' => 1)
+   * contact.get group=array('id1' => 1)
+   * contact.get group=array('id1' => 1, id2 => 1)
+   */
+  public function testContactGetWithGroupTitleMultipleGroupsLegacyFormat() {
+    // Set up a contact, asser that they were created.
+    $contact_params = array(
+      'contact_type' => 'Individual',
+      'first_name' => 'Test2',
+      'last_name' => 'Groupmember',
+      'email' => 'test@example.org',
+    );
+    $create_contact = $this->callApiSuccess('Contact', 'create', $contact_params);
+    $created_contact_id = $create_contact['id'];
+    $createdGroupsTitles = $createdGroupsIds = array();
+    // Set up multiple groups, add the contact to the groups.
+    $test_groups = array('Test group C', 'Test group D');
+    foreach ($test_groups as $title) {
+      $group_params = array(
+        'title' => $title,
+        'created_id' => $created_contact_id,
+      );
+      $create_group = $this->callApiSuccess('Group', 'create', $group_params);
+      $created_group_id = $create_group['id'];
+      $createdGroupsIds[] = $create_group['id'];
+      $createdGroupTitles[] = $title;
+      // Add contact to the new group.
+      $group_contact_params = array(
+        'contact_id' => $created_contact_id,
+        'group_id' => $create_group['id'],
+      );
+      $create_group_contact = $this->callApiSuccess('GroupContact', 'create', $group_contact_params);
+    }
+    $contact_get = $this->callAPISuccess('contact', 'get', array('group' => array($createdGroupTitles[0] => 1), 'return' => 'group'));
+    $this->assertEquals(1, $contact_get['count']);
+    $this->assertEquals($created_contact_id, $contact_get['id']);
+    $contact_groups = explode(',', $contact_get['values'][$created_contact_id]['groups']);
+    foreach ($createdGroupsIds as $id) {
+      $this->assertContains((string) $id, $contact_groups);
+    }
+    $contact_get2 = $this->callAPISuccess('contact', 'get', array('group' => array($createdGroupTitles[0] => 1, $createdGroupTitles[1] => 1), 'return' => 'group'));
+    $this->assertEquals(1, $contact_get2['count']);
+    $this->assertEquals($created_contact_id, $contact_get2['id']);
+    $contact_groups2 = explode(',', $contact_get2['values'][$created_contact_id]['groups']);
+    foreach ($createdGroupsIds as $id) {
+      $this->assertContains((string) $id, $contact_groups2);
+    }
+    $contact_get3 = $this->callAPISuccess('contact', 'get', array('group' => array($createdGroupsIds[0] => 1), 'return' => 'group'));
+    $this->assertEquals($created_contact_id, $contact_get3['id']);
+    $contact_groups3 = explode(',', $contact_get3['values'][$created_contact_id]['groups']);
+    foreach ($createdGroupsIds as $id) {
+      $this->assertContains((string) $id, $contact_groups3);
+    }
+    $contact_get4 = $this->callAPISuccess('contact', 'get', array('group' => array($createdGroupsIds[0] => 1, $createdGroupsIds[1] => 1), 'return' => 'group'));
+    $this->assertEquals($created_contact_id, $contact_get4['id']);
+    $contact_groups4 = explode(',', $contact_get4['values'][$created_contact_id]['groups']);
+    foreach ($createdGroupsIds as $id) {
+      $this->assertContains((string) $id, $contact_groups4);
+    }
+    foreach ($createdGroupsIds as $id) {
+      $this->callAPISuccess('group', 'delete', array('id' => $id));
+    }
+    $this->callAPISuccess('contact', 'delete', array('id' => $created_contact_id, 'skip_undelete' => TRUE));
+  }
+
+  public function testLoggedInUserAPISupportToken() {
+    $description = "Get contact id of the current logged in user";
+    $subFile = "ContactIDOfLoggedInUserContactAPI";
+    $cid = $this->createLoggedInUser();
+    $contact = $this->callAPIAndDocument('contact', 'get', array('id' => 'user_contact_id'), __FUNCTION__, __FILE__, $description, $subFile);
+    $this->assertEquals($cid, $contact['id']);
   }
 
 }

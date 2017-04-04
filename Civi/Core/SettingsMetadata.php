@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -112,7 +112,7 @@ class SettingsMetadata {
       $realFolder = realpath($metaDataFolder);
       if (is_dir($realFolder) && !isset($loadedFolders[$realFolder])) {
         $loadedFolders[$realFolder] = TRUE;
-        $settingsMetadata = $settingsMetadata + self::loadSettingsMetaData($metaDataFolder);
+        $settingsMetadata = $settingsMetadata + self::loadSettingsMetadata($metaDataFolder);
       }
     }
     return $settingsMetadata;

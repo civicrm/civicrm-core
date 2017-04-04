@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,7 +27,7 @@
 
 /**
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  *
  * Generated from {$table.sourceFile}
  * {$generated}
@@ -37,18 +37,20 @@
 require_once 'CRM/Core/DAO.php';
 require_once 'CRM/Utils/Type.php';
 
+/**
+ * {$table.className} constructor.
+ */
 class {$table.className} extends CRM_Core_DAO {ldelim}
 
      /**
-      * static instance to hold the table name
+      * Static instance to hold the table name.
       *
       * @var string
       */
       static $_tableName = '{$table.name}';
 
       /**
-       * static value to see if we should log any modifications to
-       * this table in the civicrm_log table
+       * Should CiviCRM log any modifications to this table in the civicrm_log table.
        *
        * @var boolean
        */
@@ -67,9 +69,7 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
 {/foreach} {* table.fields *}
 
     /**
-     * class constructor
-     *
-     * @return {$table.name}
+     * Class constructor.
      */
     function __construct( ) {ldelim}
         $this->__table = '{$table.name}';
@@ -79,7 +79,7 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
 
 {if $table.foreignKey || $table.dynamicForeignKey}
     /**
-     * Returns foreign keys and entity references
+     * Returns foreign keys and entity references.
      *
      * @return array
      *   [CRM_Core_Reference_Interface]
@@ -111,12 +111,12 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
 {foreach from=$table.fields item=field}
 
 {if $field.uniqueName}
-                                            '{$field.uniqueName}'
+  '{$field.uniqueName}'
 {else}
                                             '{$field.name}'
 {/if}
                => array(
-                                                                      'name'      => '{$field.name}',
+                 'name'      => '{$field.name}',
                                                                       'type'      => {$field.crmType},
 {if $field.title}
                                                                       'title'     => ts('{$field.title}'),
@@ -163,6 +163,9 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
 {if $field.default}
                          'default'   => '{if ($field.default[0]=="'" or $field.default[0]=='"')}{$field.default|substring:1:-1}{else}{$field.default}{/if}',
 {/if} {* field.default *}
+  'table_name' => '{$table.name}',
+  'entity' => '{$table.entity}',
+  'bao' => '{$table.bao}',
 
 {if $field.FKClassName}
                       'FKClassName' => '{$field.FKClassName}',
@@ -181,8 +184,8 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
 'pseudoconstant' => array(
 {*{$pseudoOptions|@print_array}*}
 {foreach from=$pseudoOptions key=optionKey item=optionValue}
-                      '{$optionKey}' => '{$optionValue}',
-                      {/foreach}
+  '{$optionKey}' => '{$optionValue}',
+{/foreach}
                 )
 {/if} {* field.pseudoconstant *}                                                                    ),
 {/foreach} {* table.fields *}

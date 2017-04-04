@@ -9,7 +9,7 @@ function membership_type_create_example() {
   $params = array(
     'name' => '40+ Membership',
     'description' => 'people above 40 are given health instructions',
-    'member_of_contact_id' => 13,
+    'member_of_contact_id' => 7,
     'financial_type_id' => 1,
     'domain_id' => '1',
     'minimum_fee' => '200',
@@ -28,7 +28,8 @@ function membership_type_create_example() {
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
     return array(
-      'error' => $errorMessage,
+      'is_error' => 1,
+      'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
     );
@@ -56,7 +57,7 @@ function membership_type_create_expectedresult() {
         'domain_id' => '1',
         'name' => '40+ Membership',
         'description' => 'people above 40 are given health instructions',
-        'member_of_contact_id' => '13',
+        'member_of_contact_id' => '7',
         'financial_type_id' => '1',
         'minimum_fee' => '200',
         'duration_unit' => 'month',
@@ -72,7 +73,7 @@ function membership_type_create_expectedresult() {
         'receipt_text_signup' => '',
         'receipt_text_renewal' => '',
         'auto_renew' => '',
-        'is_active' => '',
+        'is_active' => '1',
         'contribution_type_id' => '1',
       ),
     ),

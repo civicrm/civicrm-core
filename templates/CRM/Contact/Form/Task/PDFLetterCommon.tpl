@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -247,15 +247,12 @@ function selectFormat( val, bind ) {
   if (!val) {
     val = 0;
     bind = false;
-    var dataUrl = {/literal}"{crmURL p='civicrm/ajax/pdfFormat' h=0 }"{literal};
-    cj.post( dataUrl, {formatId: val}, function( data ) {
-      fillFormatInfo(data, bind);
-      }, 'json');
   }
-  else {
-    data=JSON.parse(val);
+
+  var dataUrl = {/literal}"{crmURL p='civicrm/ajax/pdfFormat' h=0 }"{literal};
+  cj.post( dataUrl, {formatId: val}, function( data ) {
     fillFormatInfo(data, bind);
-  }
+  }, 'json');
 }
 
 function selectPaper( val )

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
  */
@@ -142,9 +142,10 @@ class CRM_Dashlet_Page_Blog extends CRM_Core_Page {
         foreach ($channel->item as $item) {
           $item = (array) $item;
           $item['title'] = strip_tags($item['title']);
-          // Clean up description - remove tags that would break dashboard layout
+          // Clean up description - remove tags & styles that would break dashboard layout
           $description = preg_replace('#<h[1-3][^>]*>(.+?)</h[1-3][^>]*>#s', '<h4>$1</h4>', $item['description']);
-          $description = strip_tags($description, "<a><p><h4><h5><h6><b><i><em><strong><ol><ul><li><dd><dt><code><pre><br/>");
+          $description = strip_tags($description, "<a><p><h4><h5><h6><b><i><em><strong><ol><ul><li><dd><dt><code><pre><br><hr>");
+          $description = preg_replace('/(<[^>]+) style=["\'].*?["\']/i', '$1', $description);
           // Add paragraph markup if it's missing.
           if (strpos($description, '<p') === FALSE) {
             $description = '<p>' . $description . '</p>';

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -69,6 +69,7 @@ class CRM_Admin_Form extends CRM_Core_Form {
    */
   public function preProcess() {
     Civi::resources()->addStyleFile('civicrm', 'css/admin.css');
+    Civi::resources()->addScriptFile('civicrm', 'js/crm.admin.js');
 
     $this->_id = $this->get('id');
     $this->_BAOName = $this->get('BAOName');
@@ -89,13 +90,23 @@ class CRM_Admin_Form extends CRM_Core_Form {
    * @return array
    */
   public function setDefaultValues() {
-    if (isset($this->_id) && empty($this->_values)) {
+    // Fetch defaults from the db
+    if (!empty($this->_id) && empty($this->_values) && CRM_Utils_Rule::positiveInteger($this->_id)) {
       $this->_values = array();
       $params = array('id' => $this->_id);
       $baoName = $this->_BAOName;
       $baoName::retrieve($params, $this->_values);
     }
     $defaults = $this->_values;
+
+    // Allow defaults to be set from the url
+    if (empty($this->_id) && $this->_action & CRM_Core_Action::ADD) {
+      foreach ($_GET as $key => $val) {
+        if ($this->elementExists($key)) {
+          $defaults[$key] = $val;
+        }
+      }
+    }
 
     if ($this->_action == CRM_Core_Action::DELETE &&
       isset($defaults['name'])

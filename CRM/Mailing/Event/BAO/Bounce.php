@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Mailing_Event_BAO_Bounce extends CRM_Mailing_Event_DAO_Bounce {
 
@@ -46,8 +46,8 @@ class CRM_Mailing_Event_BAO_Bounce extends CRM_Mailing_Event_DAO_Bounce {
    *
    * @return bool|null
    */
-  public static function &create(&$params) {
-    $q = &CRM_Mailing_Event_BAO_Queue::verify($params['job_id'],
+  public static function create(&$params) {
+    $q = CRM_Mailing_Event_BAO_Queue::verify($params['job_id'],
       $params['event_queue_id'],
       $params['hash']
     );
@@ -79,45 +79,13 @@ class CRM_Mailing_Event_BAO_Bounce extends CRM_Mailing_Event_DAO_Bounce {
 
     $bounce->copyValues($params);
     $bounce->save();
-    $success = TRUE;
 
-    $bounceTable = CRM_Mailing_Event_BAO_Bounce::getTableName();
-    $bounceType = CRM_Mailing_DAO_BounceType::getTableName();
-    $emailTable = CRM_Core_BAO_Email::getTableName();
-    $queueTable = CRM_Mailing_Event_BAO_Queue::getTableName();
-
-    $bounce->reset();
-    // might want to put distinct inside the count
-    $query = "SELECT     count($bounceTable.id) as bounces,
-                            $bounceType.hold_threshold as threshold
-                FROM        $bounceTable
-                INNER JOIN  $bounceType
-                        ON  $bounceTable.bounce_type_id = $bounceType.id
-                INNER JOIN  $queueTable
-                        ON  $bounceTable.event_queue_id = $queueTable.id
-                INNER JOIN  $emailTable
-                        ON  $queueTable.email_id = $emailTable.id
-                WHERE       $emailTable.id = {$q->email_id}
-                    AND     ($emailTable.reset_date IS NULL
-                        OR  $bounceTable.time_stamp >= $emailTable.reset_date)
-                GROUP BY    $bounceTable.bounce_type_id
-                ORDER BY    threshold, bounces desc";
-
-    $bounce->query($query);
-
-    while ($bounce->fetch()) {
-      if ($bounce->bounces >= $bounce->threshold) {
-        $email = new CRM_Core_BAO_Email();
-        $email->id = $q->email_id;
-        $email->on_hold = TRUE;
-        $email->hold_date = date('YmdHis');
-        $email->save();
-        break;
-      }
+    if ($q->email_id) {
+      self::putEmailOnHold($q->email_id);
     }
     $transaction->commit();
 
-    return $success;
+    return TRUE;
   }
 
   /**
@@ -238,7 +206,7 @@ class CRM_Mailing_Event_BAO_Bounce extends CRM_Mailing_Event_DAO_Bounce {
     }
 
     if ($is_distinct) {
-      $query .= " GROUP BY $queue.id ";
+      $query .= " GROUP BY $queue.id, $bounce.time_stamp, $bounce.bounce_reason, $bounceType.name ";
     }
 
     $orderBy = "sort_name ASC, {$bounce}.time_stamp DESC";
@@ -277,6 +245,48 @@ class CRM_Mailing_Event_BAO_Bounce extends CRM_Mailing_Event_DAO_Bounce {
       );
     }
     return $results;
+  }
+
+  /**
+   * Put the email on hold if it has met the threshold.
+   *
+   * @param int $email_id
+   */
+  protected static function putEmailOnHold($email_id) {
+
+    $bounceTable = CRM_Mailing_Event_BAO_Bounce::getTableName();
+    $bounceType = CRM_Mailing_DAO_BounceType::getTableName();
+    $emailTable = CRM_Core_BAO_Email::getTableName();
+    $queueTable = CRM_Mailing_Event_BAO_Queue::getTableName();
+
+    // might want to put distinct inside the count
+    $query = "SELECT     count($bounceTable.id) as bounces,
+                            $bounceType.hold_threshold as threshold
+                FROM        $bounceTable
+                INNER JOIN  $bounceType
+                        ON  $bounceTable.bounce_type_id = $bounceType.id
+                INNER JOIN  $queueTable
+                        ON  $bounceTable.event_queue_id = $queueTable.id
+                INNER JOIN  $emailTable
+                        ON  $queueTable.email_id = $emailTable.id
+                WHERE       $emailTable.id = $email_id
+                    AND     ($emailTable.reset_date IS NULL
+                        OR  $bounceTable.time_stamp >= $emailTable.reset_date)
+                GROUP BY    $bounceTable.bounce_type_id
+                ORDER BY    threshold, bounces desc";
+
+    $dao = CRM_Core_DAO::executeQuery($query);
+
+    while ($dao->fetch()) {
+      if ($dao->bounces >= $dao->threshold) {
+        $email = new CRM_Core_BAO_Email();
+        $email->id = $email_id;
+        $email->on_hold = TRUE;
+        $email->hold_date = date('YmdHis');
+        $email->save();
+        break;
+      }
+    }
   }
 
 }

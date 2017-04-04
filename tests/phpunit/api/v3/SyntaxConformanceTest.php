@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -1083,6 +1083,47 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     }
     // should create php complaining that a param is missing
     civicrm_api3($Entity, 'Create');
+  }
+
+  /**
+   * @dataProvider entities_create
+   *
+   * Check that create doesn't work with an invalid
+   * @param $Entity
+   * @throws \PHPUnit_Framework_IncompleteTestError
+   */
+  public function testInvalidSort_get($Entity) {
+    $invalidEntitys = array('ActivityType', 'Setting', 'System');
+    if (in_array($Entity, $invalidEntitys)) {
+      $this->markTestSkipped('It seems OK for ' . $Entity . ' to skip here as it silently sips invalid params');
+    }
+    $result = $this->callAPIFailure($Entity, 'get', array('options' => array('sort' => 'sleep(1)')));
+  }
+
+  /**
+   * @dataProvider entities_create
+   *
+   * Check that create doesn't work with an invalid
+   * @param $Entity
+   * @throws \PHPUnit_Framework_IncompleteTestError
+   */
+  public function testValidSortSingleArrayById_get($Entity) {
+    $invalidEntitys = array('ActivityType', 'Setting', 'System');
+    $tests = array(
+      'id' => '_id',
+      'id desc' => '_id desc',
+      'id DESC' => '_id DESC',
+      'id ASC' => '_id ASC',
+      'id asc' => '_id asc');
+    foreach ($tests as $test => $expected) {
+      if (in_array($Entity, $invalidEntitys)) {
+        $this->markTestSkipped('It seems OK for ' . $Entity . ' to skip here as it silently ignores passed in params');
+      }
+      $params = array('sort' => array($test));
+      $result = _civicrm_api3_get_options_from_params($params, FALSE, $Entity, 'get');
+      $lowercase_entity = _civicrm_api_get_entity_name_from_camel($Entity);
+      $this->assertEquals($lowercase_entity . $expected, $result['sort']);
+    }
   }
 
   /**

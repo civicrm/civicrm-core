@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
  * Address Utilities
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Utils_Address {
 
@@ -347,7 +347,29 @@ class CRM_Utils_Address {
 
     $addressFields = array();
     foreach ($addressParts as $name => $field) {
-      $addressFields[$name] = CRM_Utils_Array::value($field, $params);
+      $value = CRM_Utils_Array::value($field, $params);
+      $alternateName = 'billing_' . $name . '_id-' . $billingLocationTypeID;
+      $alternate2 = 'billing_' . $name . '-' . $billingLocationTypeID;
+      if (isset($params[$alternate2]) && !isset($params[$alternateName])) {
+        $alternateName = $alternate2;
+      }
+      //Include values which prepend 'billing_' to country and state_province.
+      if (CRM_Utils_Array::value($alternateName, $params)) {
+        if (empty($value) || !is_numeric($value)) {
+          $value = $params[$alternateName];
+        }
+      }
+      if (is_numeric($value) && ($name == 'state_province' || $name == 'country')) {
+        if ($name == 'state_province') {
+          $addressFields[$name] = CRM_Core_PseudoConstant::stateProvinceAbbreviation($value);
+        }
+        if ($name == 'country') {
+          $addressFields[$name] = CRM_Core_PseudoConstant::countryIsoCode($value);
+        }
+      }
+      else {
+        $addressFields[$name] = $value;
+      }
     }
     return CRM_Utils_Address::format($addressFields);
   }

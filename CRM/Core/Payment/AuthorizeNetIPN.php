@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
 
@@ -58,8 +58,7 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
     $ids = $objects = $input = array();
 
     if ($x_subscription_id) {
-      //Approved
-
+      // Presence of the id means it is approved.
       $input['component'] = $component;
 
       // load post vars in $input
@@ -213,8 +212,10 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
   }
 
   /**
-   * @param $input
-   * @param $ids
+   * Get the input from passed in fields.
+   *
+   * @param array $input
+   * @param array $ids
    *
    * @return bool
    */
@@ -258,8 +259,12 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
   }
 
   /**
-   * @param $ids
-   * @param $input
+   * Get ids from input.
+   *
+   * @param array $ids
+   * @param array $input
+   *
+   * @throws \CRM_Core_Exception
    */
   public function getIDs(&$ids, &$input) {
     $ids['contact'] = $this->retrieve('x_cust_id', 'Integer', FALSE, 0);
@@ -298,8 +303,6 @@ INNER JOIN civicrm_contribution co ON co.contribution_recur_id = cr.id
       // FIXME: figure out fields for event
     }
     else {
-      // get the optional ids
-
       // Get membershipId. Join with membership payment table for additional checks
       $sql = "
     SELECT m.id

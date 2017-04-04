@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -80,13 +80,6 @@ AND    {$this->_componentClause}";
     // we have all the contribution ids, so now we get the contact ids
     parent::setContactIDs();
     $this->assign('single', $this->_single);
-  }
-
-  /**
-   * Sets contribution Ids for unit test.
-   */
-  public function setContributionIds($contributionIds) {
-    $this->_contributionIds = $contributionIds;
   }
 
   /**
@@ -225,7 +218,13 @@ AND    co.id IN ( $contribIDs )";
 
   /**
    * Process the form with submitted params.
+   *
    * Also supports unit test.
+   *
+   * @param CRM_Core_Form $form
+   * @param array $params
+   *
+   * @throws \Exception
    */
   public static function processForm($form, $params) {
     $statusID = CRM_Utils_Array::value('contribution_status_id', $params);

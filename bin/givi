@@ -13,7 +13,7 @@ class DirStack {
   /**
    * @param array $dirs
    */
-  function __construct($dirs = array()) {
+  public function __construct($dirs = array()) {
     $this->dirs = $dirs;
   }
 
@@ -22,17 +22,18 @@ class DirStack {
    *
    * @throws Exception
    */
-  function push($dir) {
+  public function push($dir) {
     $this->dirs[] = getcwd();
     if (!chdir($dir)) {
       throw new Exception("Failed to chdir($dir)");
     }
   }
 
-  function pop() {
+  public function pop() {
     $oldDir = array_pop($this->dirs);
     chdir($oldDir);
   }
+
 }
 
 /**
@@ -94,6 +95,7 @@ class PullRequest {
   public function getRequestorRepoUrl() {
     return $this->data->head->repo->git_url;
   }
+
 }
 
 /**
@@ -184,10 +186,11 @@ class Givi {
   /**
    *
    */
-  function __construct() {
+  public function __construct() {
     $this->dirStack = new DirStack();
     $this->repos = array(
       'core' => '.',
+      'backdrop' => 'backdrop',
       'drupal' => 'drupal',
       'joomla' => 'joomla',
       'packages' => 'packages',
@@ -200,7 +203,7 @@ class Givi {
    *
    * @throws Exception
    */
-  function main($args) {
+  public function main($args) {
     if (!$this->parseOptions($args)) {
       printf("Error parsing arguments\n");
       $this->doHelp();
@@ -227,31 +230,40 @@ class Givi {
       case 'checkout':
         call_user_func_array(array($this, 'doCheckoutAll'), $this->arguments);
         break;
+
       case 'fetch':
         call_user_func_array(array($this, 'doFetchAll'), $this->arguments);
         break;
+
       case 'status':
         call_user_func_array(array($this, 'doStatusAll'), $this->arguments);
         break;
+
       case 'begin':
         call_user_func_array(array($this, 'doBegin'), $this->arguments);
         break;
+
       case 'resume':
         call_user_func_array(array($this, 'doResume'), $this->arguments);
         break;
+
       case 'review':
         call_user_func_array(array($this, 'doReview'), $this->arguments);
         break;
+
       //case 'merge-forward':
       //  call_user_func_array(array($this, 'doMergeForward'), $this->arguments);
       //  break;
+
       case 'push':
         call_user_func_array(array($this, 'doPush'), $this->arguments);
         break;
+
       case 'help':
       case '':
         $this->doHelp();
         break;
+
       default:
         return $this->returnError("unrecognized action: {$this->action}\n");
     }
@@ -270,7 +282,7 @@ class Givi {
    * @param $args
    * @return bool
    */
-  function parseOptions($args) {
+  public function parseOptions($args) {
     $this->branches = array();
     $this->arguments = array();
 
@@ -302,7 +314,7 @@ class Givi {
       elseif (preg_match('/^--repos=(.*)/', $arg, $matches)) {
         $this->repoFilter = $matches[1];
       }
-      elseif (preg_match('/^--(core|packages|joomla|drupal|wordpress)=(.*)/', $arg, $matches)) {
+      elseif (preg_match('/^--(core|packages|joomla|drupal|wordpress|backdrop)=(.*)/', $arg, $matches)) {
         $this->branches[$matches[1]] = $matches[2];
       }
       elseif (preg_match('/^-/', $arg)) {
@@ -320,7 +332,7 @@ class Givi {
     return TRUE;
   }
 
-  function doHelp() {
+  public function doHelp() {
     $program = basename($this->program);
     echo "Givi - Coordinate git checkouts across CiviCRM repositories\n";
     echo "Scenario:\n";
@@ -350,6 +362,7 @@ class Givi {
     echo "  --dry-run: Don't do anything; only print commands that would be run\n";
     echo "  --d6: Specify that Drupal branches should use 6.x-* prefixes\n";
     echo "  --d7: Specify that Drupal branches should use 7.x-* prefixes (default)\n";
+    echo "  --d8: Specify that Drupal branches should use 8.x-* prefixes\n";
     echo "  -f: When switching branches, proceed even if the index or the working tree differs from HEAD. This is used to throw away local changes.\n";
     echo "  --fetch: Fetch the latest code before creating, updating, or checking-out anything\n";
     echo "  --repos=X: Restrict operations to the listed repos (comma-delimited list) (default: all)";
@@ -359,6 +372,7 @@ class Givi {
     echo "Special options:\n";
     echo "  --core=X: Specify the branch to use on the core repository\n";
     echo "  --packages=X: Specify the branch to use on the packages repository\n";
+    echo "  --backdrop=X: Specify the branch to use on the backdrop repository\n";
     echo "  --drupal=X: Specify the branch to use on the drupal repository\n";
     echo "  --joomla=X: Specify the branch to use on the joomla repository\n";
     echo "  --wordpress=X: Specify the branch to use on the wordpress repository\n";
@@ -377,7 +391,7 @@ class Givi {
    *
    * @return bool
    */
-  function doCheckoutAll($baseBranch = NULL) {
+  public function doCheckoutAll($baseBranch = NULL) {
     if (!$baseBranch) {
       return $this->returnError("Missing <branch>\n");
     }
@@ -396,7 +410,7 @@ class Givi {
   /**
    * @return bool
    */
-  function doStatusAll() {
+  public function doStatusAll() {
     foreach ($this->repos as $repo => $relPath) {
       $this->run($repo, $relPath, 'git', 'status');
     }
@@ -408,7 +422,7 @@ class Givi {
    *
    * @return bool
    */
-  function doBegin($baseBranch = NULL) {
+  public function doBegin($baseBranch = NULL) {
     if (!$baseBranch) {
       return $this->returnError("Missing <base-branch>\n");
     }
@@ -441,7 +455,7 @@ class Givi {
    * @return bool
    * @throws Exception
    */
-  function doResume($baseBranch = NULL) {
+  public function doResume($baseBranch = NULL) {
     if (!$baseBranch) {
       return $this->returnError("Missing <base-branch>\n");
     }
@@ -472,7 +486,7 @@ class Givi {
    *
    * @return bool
    */
-  function doReview($baseBranch = NULL) {
+  public function doReview($baseBranch = NULL) {
     if (!$this->doCheckoutAll($baseBranch)) {
       return FALSE;
     }
@@ -504,47 +518,13 @@ class Givi {
     return TRUE;
   }
 
-  /*
-
-  If we want merge-forward changes to be subject to PR process, then this
-  should useful.  Currently using a simpler process based on
-  toosl/scripts/merge-forward
-
-  function doMergeForward($maintBranch, $devBranch) {
-    if (!$maintBranch) {
-      return $this->returnError("Missing <maintenace-base-branch>\n");
-    }
-    if (!$devBranch) {
-      return $this->returnError("Missing <development-base-branch>\n");
-    }
-    list ($maintBranchRepo, $maintBranchName) = $this->parseBranchRepo($maintBranch);
-    list ($devBranchRepo, $devBranchName) = $this->parseBranchRepo($devBranch);
-
-    $newBranchRepo = $devBranchRepo;
-    $newBranchName = $maintBranchName . '-' . $devBranchName . '-' . date('Y-m-d-H-i-s');
-
-    if ($this->fetch) {
-      $this->doFetchAll();
-    }
-
-    foreach ($this->repos as $repo => $relPath) {
-      $filteredMaintBranch = $this->filterBranchName($repo, $maintBranch);
-      $filteredDevBranch = $this->filterBranchName($repo, $devBranch);
-      $filteredNewBranchName = $this->filterBranchName($repo, $newBranchName);
-
-      $this->run($repo, $relPath, 'git', 'checkout', '-b', $filteredNewBranchName, $filteredDevBranch);
-      $this->run($repo, $relPath, 'git', 'merge', $filteredMaintBranch);
-    }
-  }
-  */
-
   /**
    * @param $newBranchRepo
    * @param $newBranchNames
    *
    * @return bool
    */
-  function doPush($newBranchRepo, $newBranchNames) {
+  public function doPush($newBranchRepo, $newBranchNames) {
     if (!$newBranchRepo) {
       return $this->returnError("Missing <remote>\n");
     }
@@ -577,7 +557,7 @@ class Givi {
    * @param string $name branch name
    * @return bool
    */
-  function hasLocalBranch($repo, $name) {
+  public function hasLocalBranch($repo, $name) {
     $path = $this->repos[$repo] . '/.git/refs/heads/' . $name;
     return file_exists($path);
   }
@@ -593,7 +573,7 @@ class Givi {
    * @throws Exception
    * @return array
    */
-  function parseBranchRepo($ref, $defaultRemote = 'origin') {
+  public function parseBranchRepo($ref, $defaultRemote = 'origin') {
     $parts = explode('/', $ref);
     if (count($parts) == 1) {
       return array($defaultRemote, $parts[1]);
@@ -617,7 +597,7 @@ class Givi {
    *
    * @return string
    */
-  function run($repoName, $runDir, $command) {
+  public function run($repoName, $runDir, $command) {
     $this->dirStack->push($runDir);
 
     $args = func_get_args();
@@ -641,7 +621,7 @@ class Givi {
     return $r;
   }
 
-  function doFetchAll() {
+  public function doFetchAll() {
     foreach ($this->repos as $repo => $relPath) {
       $this->run($repo, $relPath, 'git', 'fetch', '--all');
     }
@@ -653,7 +633,7 @@ class Givi {
    *
    * @return array ($repoName => $gitRef)
    */
-  function resolveBranches($default, $overrides) {
+  public function resolveBranches($default, $overrides) {
     $branches = $overrides;
     foreach ($this->repos as $repo => $relPath) {
       if (!isset($branches[$repo])) {
@@ -669,13 +649,19 @@ class Givi {
    *
    * @return string
    */
-  function filterBranchName($repoName, $branchName) {
+  public function filterBranchName($repoName, $branchName) {
     if ($branchName == '') {
       return '';
     }
     if ($repoName == 'drupal') {
       $parts = explode('/', $branchName);
       $last = $this->drupalVersion . '.x-' . array_pop($parts);
+      array_push($parts, $last);
+      return implode('/', $parts);
+    }
+    if ($repoName == 'backdrop') {
+      $parts = explode('/', $branchName);
+      $last = '1.x-' . array_pop($parts);
       array_push($parts, $last);
       return implode('/', $parts);
     }
@@ -689,7 +675,7 @@ class Givi {
    * @throws Exception
    * @return array ($repoName => $repoDir)
    */
-  function filterRepos($filter, $repos) {
+  public function filterRepos($filter, $repos) {
     if ($filter == 'all') {
       return $repos;
     }
@@ -711,11 +697,12 @@ class Givi {
    *
    * @return bool
    */
-  function returnError($message) {
+  public function returnError($message) {
     echo "\nERROR: ", $message, "\n\n";
     $this->doHelp();
     return FALSE;
   }
+
 }
 
 /**
@@ -728,7 +715,7 @@ class HttpClient {
    *
    * @return bool
    */
-  static function download($url, $file) {
+  public static function download($url, $file) {
     // PHP native client is unreliable PITA for HTTPS
     if (exec("which wget")) {
       self::run('wget', '-q', '-O', $file, $url);
@@ -746,7 +733,7 @@ class HttpClient {
    *
    * @return mixed
    */
-  static function getJson($url) {
+  public static function getJson($url) {
     $file = tempnam(sys_get_temp_dir(), 'givi-json-');
     HttpClient::download($url, $file);
     $data = json_decode(file_get_contents($file));
@@ -764,7 +751,7 @@ class HttpClient {
    * @internal param string $runDir
    * @return string
    */
-  static function run($command) {
+  public static function run($command) {
     $args = func_get_args();
     array_shift($args);
     foreach ($args as $arg) {
@@ -775,6 +762,7 @@ class HttpClient {
 
     return $r;
   }
+
 }
 
 $givi = new Givi();

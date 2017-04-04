@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -70,7 +70,14 @@
   </tr>
         <tr class="crm-pledge-form-block-installments">
       <td class="label">{$form.installments.label}</td>
-      <td>{$form.installments.html} {ts}installments of{/ts} {if $action eq 1 or $isPending}{$form.eachPaymentAmount.html|crmMoney:$currency}{elseif $action eq 2 and !$isPending}{$eachPaymentAmount|crmMoney:$currency}{/if}&nbsp;{ts}every{/ts}&nbsp;{$form.frequency_interval.html}&nbsp;{$form.frequency_unit.html}</td></tr>
+      <td>{$form.installments.html} {ts}installments of{/ts}
+        <span class='currency-symbol'>
+          {if $action eq 1 or $isPending}
+            {$form.eachPaymentAmount.html|crmMoney:$currency}
+          {elseif $action eq 2 and !$isPending}
+            {$eachPaymentAmount|crmMoney:$currency}
+          {/if}
+        </span>&nbsp;{ts}every{/ts}&nbsp;{$form.frequency_interval.html}&nbsp;{$form.frequency_unit.html}</td></tr>
         <tr class="crm-pledge-form-block-frequency_day">
       <td class="label nowrap">{$form.frequency_day.label}</td>
       <td>{$form.frequency_day.html} {ts}day of the period{/ts}<br />
@@ -141,33 +148,47 @@
        </table>
 {literal}
 <script type="text/javascript">
-// bind first click of accordion header to load crm-accordion-body with snippet
-// everything else taken care of by cj().crm-accordions()
-cj(document).ready( function() {
-    cj('.crm-ajax-accordion .crm-accordion-header').one('click', function() {
-      loadPanes(cj(this).attr('id'));
+  // bind first click of accordion header to load crm-accordion-body with snippet
+  // everything else taken care of by $().crm-accordions()
+  CRM.$(function($) {
+    $('.crm-ajax-accordion .crm-accordion-header').one('click', function() {
+      loadPanes($(this).attr('id'));
     });
-    cj('.crm-ajax-accordion:not(.collapsed) .crm-accordion-header').each(function(index) {
-      loadPanes(cj(this).attr('id'));
-      });
-});
-// load panes function calls for snippet based on id of crm-accordion-header
-function loadPanes( id ) {
-    var url = "{/literal}{crmURL p='civicrm/contact/view/pledge' q='snippet=4&formType=' h=0}{literal}" + id;
-    {/literal}
-        {if $contributionMode}
-            url = url + "&mode={$contributionMode}";
-        {/if}
-    {literal}
-   if ( ! cj('div.'+id).html() ) {
-      var loading = '<img src="{/literal}{$config->resourceBase}i/loading.gif{literal}" alt="{/literal}{ts escape='js'}loading{/ts}{literal}" />&nbsp;{/literal}{ts escape='js'}Loading{/ts}{literal}...';
-      cj('div.'+id).html(loading);
-      cj.ajax({
-          url    : url,
-          success: function(data) { cj('div.'+id).html(data).trigger('crmLoad'); }
-          });
+    $('#currency').on('change', function() {
+      replaceCurrency($('#currency option:selected').text());
+    });
+    $('.crm-ajax-accordion:not(.collapsed) .crm-accordion-header').each(function(index) {
+      loadPanes($(this).attr('id'));
+    });
+
+    function replaceCurrency(val) {
+      var symbol = '';
+      var eachPaymentAmout = $('#eachPaymentAmount');
+      var pos = val.indexOf("(") + 1;
+      if (pos) {
+        symbol = val.slice(pos, val.lastIndexOf(")"));
       }
-  }
+      $('.currency-symbol').text(symbol).append("&nbsp;").append(eachPaymentAmout);
+    }
+
+    // load panes function calls for snippet based on id of crm-accordion-header
+    function loadPanes( id ) {
+      var url = "{/literal}{crmURL p='civicrm/contact/view/pledge' q='snippet=4&formType=' h=0}{literal}" + id;
+      {/literal}
+        {if $contributionMode}
+          url = url + "&mode={$contributionMode}";
+        {/if}
+      {literal}
+      if ( ! $('div.'+id).html() ) {
+        var loading = '<img src="{/literal}{$config->resourceBase}i/loading.gif{literal}" alt="{/literal}{ts escape='js'}loading{/ts}{literal}" />&nbsp;{/literal}{ts escape='js'}Loading{/ts}{literal}...';
+        $('div.'+id).html(loading);
+        $.ajax({
+          url    : url,
+            success: function(data) { $('div.'+id).html(data).trigger('crmLoad'); }
+        });
+      }
+    }
+  });
 </script>
 {/literal}
 

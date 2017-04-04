@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
  * Class for constructing the payment processor block.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Core_Payment_Form {
 
@@ -326,11 +326,11 @@ class CRM_Core_Payment_Form {
    * Make sure that credit card number and cvv are valid.
    * Called within the scope of a QF formRule function
    *
-   * @param int $processorID
    * @param array $values
    * @param array $errors
+   * @param int $processorID
    */
-  public static function validateCreditCard($processorID = NULL, $values, &$errors) {
+  public static function validateCreditCard($values, &$errors, $processorID = NULL) {
     if (!empty($values['credit_card_type']) || !empty($values['credit_card_number'])) {
       if (!empty($values['credit_card_type'])) {
         $processorCards = CRM_Financial_BAO_PaymentProcessor::getCreditCards($processorID);
@@ -360,13 +360,6 @@ class CRM_Core_Payment_Form {
    * @param bool $reverse
    */
   public static function mapParams($id, $src, &$dst, $reverse = FALSE) {
-    // Set text version of state & country if present.
-    if (isset($src["billing_state_province_id-{$id}"])) {
-      $src["billing_state_province-{$id}"] = CRM_Core_PseudoConstant::stateProvinceAbbreviation($src["billing_state_province_id-{$id}"]);
-    }
-    if (isset($src["billing_country_id-{$id}"])) {
-      $src["billing_country-{$id}"] = CRM_Core_PseudoConstant::countryIsoCode($src["billing_country_id-{$id}"]);;
-    };
     $map = array(
       'first_name' => 'billing_first_name',
       'middle_name' => 'billing_middle_name',

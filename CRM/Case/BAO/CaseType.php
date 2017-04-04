@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -130,6 +130,14 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
       $xmlFile .= "</ActivityTypes>\n";
     }
 
+    if (!empty($definition['statuses'])) {
+      $xmlFile .= "<Statuses>\n";
+      foreach ($definition['statuses'] as $value) {
+        $xmlFile .= "<Status>$value</Status>\n";
+      }
+      $xmlFile .= "</Statuses>\n";
+    }
+
     if (isset($definition['activitySets'])) {
       $xmlFile .= "<ActivitySets>\n";
       foreach ($definition['activitySets'] as $k => $val) {
@@ -222,6 +230,11 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
       foreach ($xml->ActivityTypes->ActivityType as $activityTypeXML) {
         $definition['activityTypes'][] = json_decode(json_encode($activityTypeXML), TRUE);
       }
+    }
+
+    // set statuses
+    if (isset($xml->Statuses)) {
+      $definition['statuses'] = (array) $xml->Statuses->Status;
     }
 
     // set activity sets

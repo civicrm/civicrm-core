@@ -69,7 +69,9 @@ class Container {
 
     // In pre-installation environments, don't bother with caching.
     if (!defined('CIVICRM_TEMPLATE_COMPILEDIR') || !defined('CIVICRM_DSN') || $cacheMode === 'never' || \CRM_Utils_System::isInUpgradeMode()) {
-      return $this->createContainer();
+      $containerBuilder = $this->createContainer();
+      $containerBuilder->compile();
+      return $containerBuilder;
     }
 
     $envId = \CRM_Core_Config_Runtime::getId();
@@ -203,12 +205,20 @@ class Container {
       'Civi\Token\TokenCompatSubscriber',
       array()
     ))->addTag('kernel.event_subscriber');
+    $container->setDefinition("crm_mailing_action_tokens", new Definition(
+      "CRM_Mailing_ActionTokens",
+      array()
+    ))->addTag('kernel.event_subscriber');
 
-    foreach (array('Activity', 'Contribute', 'Event', 'Member') as $comp) {
+    foreach (array('Activity', 'Contribute', 'Event', 'Mailing', 'Member') as $comp) {
       $container->setDefinition("crm_" . strtolower($comp) . "_tokens", new Definition(
         "CRM_{$comp}_Tokens",
         array()
       ))->addTag('kernel.event_subscriber');
+    }
+
+    if (\CRM_Utils_Constant::value('CIVICRM_FLEXMAILER_HACK_SERVICES')) {
+      \Civi\Core\Resolver::singleton()->call(CIVICRM_FLEXMAILER_HACK_SERVICES, array($container));
     }
 
     \CRM_Utils_Hook::container($container);
@@ -235,9 +245,9 @@ class Container {
     $dispatcher->addListener('hook_civicrm_post::Case', array('\Civi\CCase\Events', 'fireCaseChange'));
     $dispatcher->addListener('hook_civicrm_caseChange', array('\Civi\CCase\Events', 'delegateToXmlListeners'));
     $dispatcher->addListener('hook_civicrm_caseChange', array('\Civi\CCase\SequenceListener', 'onCaseChange_static'));
-    $dispatcher->addListener('DAO::post-insert', array('\CRM_Core_BAO_RecurringEntity', 'triggerInsert'));
-    $dispatcher->addListener('DAO::post-update', array('\CRM_Core_BAO_RecurringEntity', 'triggerUpdate'));
-    $dispatcher->addListener('DAO::post-delete', array('\CRM_Core_BAO_RecurringEntity', 'triggerDelete'));
+    $dispatcher->addListener('civi.dao.postInsert', array('\CRM_Core_BAO_RecurringEntity', 'triggerInsert'));
+    $dispatcher->addListener('civi.dao.postUpdate', array('\CRM_Core_BAO_RecurringEntity', 'triggerUpdate'));
+    $dispatcher->addListener('civi.dao.postDelete', array('\CRM_Core_BAO_RecurringEntity', 'triggerDelete'));
     $dispatcher->addListener('hook_civicrm_unhandled_exception', array(
       'CRM_Core_LegacyErrorHandler',
       'handleException',
@@ -248,6 +258,10 @@ class Container {
     $dispatcher->addListener(\Civi\ActionSchedule\Events::MAPPINGS, array('CRM_Contribute_ActionMapping_ByType', 'onRegisterActionMappings'));
     $dispatcher->addListener(\Civi\ActionSchedule\Events::MAPPINGS, array('CRM_Event_ActionMapping', 'onRegisterActionMappings'));
     $dispatcher->addListener(\Civi\ActionSchedule\Events::MAPPINGS, array('CRM_Member_ActionMapping', 'onRegisterActionMappings'));
+
+    if (\CRM_Utils_Constant::value('CIVICRM_FLEXMAILER_HACK_LISTENERS')) {
+      \Civi\Core\Resolver::singleton()->call(CIVICRM_FLEXMAILER_HACK_LISTENERS, array($dispatcher));
+    }
 
     return $dispatcher;
   }

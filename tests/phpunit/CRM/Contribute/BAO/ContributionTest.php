@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -499,7 +499,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     );
     $defaults = array();
     $financialTrxn = CRM_Core_BAO_FinancialTrxn::retrieve($trxnArray, $defaults);
-    $this->assertEquals(2, $financialTrxn->N, 'Mismatch count for is payment flag.');
+    $this->assertEquals(1, $financialTrxn->N, 'Mismatch count for is payment flag.');
     //update contribution amount
     $ids = array('contribution' => $contribution->id);
     $params['total_amount'] = 150;
@@ -514,10 +514,10 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     );
     $defaults = array();
     $financialTrxn = CRM_Core_BAO_FinancialTrxn::retrieve($trxnArray, $defaults);
-    $this->assertEquals(3, $financialTrxn->N, 'Mismatch count for is payment flag.');
+    $this->assertEquals(2, $financialTrxn->N, 'Mismatch count for is payment flag.');
     $trxnArray['is_payment'] = 0;
     $financialTrxn = CRM_Core_BAO_FinancialTrxn::retrieve($trxnArray, $defaults);
-    $this->assertEquals(NULL, $financialTrxn, 'Mismatch count for is payment flag.');
+    $this->assertEquals(1, $financialTrxn->N, 'Mismatch count for is payment flag.');
   }
 
   /**
@@ -585,9 +585,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
    */
   public function testAddPayments() {
     list($lineItems, $contribution) = $this->addParticipantWithContribution();
-    foreach ($lineItems as $value) {
-      CRM_Contribute_BAO_Contribution::addPayments($value, array($contribution));
-    }
+    CRM_Contribute_BAO_Contribution::addPayments(array($contribution));
     $this->checkItemValues($contribution);
   }
 
@@ -617,7 +615,6 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
    */
   public function testAssignProportionalLineItems() {
     list($lineItems, $contribution) = $this->addParticipantWithContribution();
-    $contributions['total_amount'] = $contribution->total_amount;
     $params = array(
       'contribution_id' => $contribution->id,
       'total_amount' => 150.00,
@@ -625,7 +622,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $trxn = new CRM_Financial_DAO_FinancialTrxn();
     $trxn->orderBy('id DESC');
     $trxn->find(TRUE);
-    CRM_Contribute_BAO_Contribution::assignProportionalLineItems($params, $trxn, $contributions);
+    CRM_Contribute_BAO_Contribution::assignProportionalLineItems($params, $trxn->id, $contribution->total_amount);
     $this->checkItemValues($contribution);
   }
 
@@ -938,6 +935,264 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $order = $this->callAPISuccess('order', 'create', $params);
     $allowUpdate = CRM_Contribute_BAO_Contribution::allowUpdateRevenueRecognitionDate($order['id']);
     $this->assertFalse($allowUpdate);
+  }
+
+  /**
+   * Test calculateFinancialItemAmount().
+   */
+  public function testcalculateFinancialItemAmount() {
+    $testParams = array(
+      array(
+        'params' => array(),
+        'amountParams' => array(
+          'line_total' => 100,
+          'previous_line_total' => 300,
+          'diff' => 1,
+        ),
+        'context' => 'changedAmount',
+        'expectedItemAmount' => -200,
+      ),
+      array(
+        'params' => array(),
+        'amountParams' => array(
+          'line_total' => 100,
+          'previous_line_total' => 100,
+          'diff' => -1,
+        ),
+        'context' => 'changePaymentInstrument',
+        'expectedItemAmount' => -100,
+      ),
+      array(
+        'params' => array(
+          'is_quick_config' => TRUE,
+          'total_amount' => 110,
+          'tax_amount' => 10,
+        ),
+        'amountParams' => array(
+          'item_amount' => 100,
+        ),
+        'context' => 'changedAmount',
+        'expectedItemAmount' => 100,
+      ),
+      array(
+        'params' => array(
+          'is_quick_config' => TRUE,
+          'total_amount' => 110,
+          'tax_amount' => 10,
+        ),
+        'amountParams' => array(
+          'item_amount' => NULL,
+        ),
+        'context' => 'changedAmount',
+        'expectedItemAmount' => 110,
+      ),
+      array(
+        'params' => array(
+          'is_quick_config' => TRUE,
+          'total_amount' => 110,
+          'tax_amount' => 10,
+        ),
+        'amountParams' => array(
+          'item_amount' => NULL,
+        ),
+        'context' => NULL,
+        'expectedItemAmount' => 100,
+      ),
+    );
+    foreach ($testParams as $params) {
+      $itemAmount = CRM_Contribute_BAO_Contribution::calculateFinancialItemAmount($params['params'], $params['amountParams'], $params['context']);
+      $this->assertEquals($itemAmount, $params['expectedItemAmount'], 'Invalid Financial Item amount.');
+    }
+  }
+
+  /**
+   * Test recording of amount with comma separator.
+   */
+  public function testCommaSeparatorAmount() {
+    $contactId = $this->individualCreate();
+
+    $params = array(
+      'contact_id' => $contactId,
+      'currency' => 'USD',
+      'financial_type_id' => 1,
+      'contribution_status_id' => 8,
+      'payment_instrument_id' => 1,
+      'receive_date' => '20080522000000',
+      'receipt_date' => '20080522000000',
+      'total_amount' => '20000.00',
+      'partial_payment_total' => '20,000.00',
+      'partial_amount_pay' => '8,000.00',
+    );
+
+    $contribution = CRM_Contribute_BAO_Contribution::create($params);
+    $lastFinancialTrxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contribution->id, 'DESC');
+    $financialTrxn = $this->callAPISuccessGetSingle(
+      'FinancialTrxn',
+      array(
+        'id' => $lastFinancialTrxnId['financialTrxnId'],
+        'return' => array('total_amount'),
+      )
+    );
+    $this->assertEquals($financialTrxn['total_amount'], 8000, 'Invalid Tax amount.');
+  }
+
+  /**
+   * Test for function getSalesTaxFinancialAccounts().
+   */
+  public function testgetSalesTaxFinancialAccounts() {
+    $this->enableTaxAndInvoicing();
+    $financialType = $this->createFinancialType();
+    $financialAccount = $this->relationForFinancialTypeWithFinancialAccount($financialType['id']);
+    $expectedResult = array($financialAccount->financial_account_id => $financialAccount->financial_account_id);
+    $financialType = $this->createFinancialType();
+    $financialAccount = $this->relationForFinancialTypeWithFinancialAccount($financialType['id']);
+    $expectedResult[$financialAccount->financial_account_id] = $financialAccount->financial_account_id;
+    $salesTaxFinancialAccount = CRM_Contribute_BAO_Contribution::getSalesTaxFinancialAccounts();
+    $this->assertTrue(($salesTaxFinancialAccount == $expectedResult), 'Function returned wrong values.');
+  }
+
+  /**
+   * Test for function createProportionalEntry().
+   */
+  public function testcreateProportionalEntry() {
+    list($contribution, $financialAccount) = $this->createContributionWithTax();
+    $params = array(
+      'total_amount' => 55,
+      'to_financial_account_id' => $financialAccount->financial_account_id,
+      'payment_instrument_id' => 1,
+      'trxn_date' => date('Ymd'),
+      'status_id' => 1,
+    );
+    $financialTrxn = $this->callAPISuccess('FinancialTrxn', 'create', $params);
+    $params = array(
+      'amount' => 50,
+      'entity_table' => 'civicrm_contribution',
+      'entity_id' => $contribution['id'],
+      'financial_trxn_id' => $financialTrxn['id'],
+    );
+    $this->callAPISuccess('EntityFinancialTrxn', 'create', $params);
+    $entityParams = array(
+      'contribution_total_amount' => $contribution['total_amount'],
+      'trxn_total_amount' => 55,
+      'line_item_amount' => 100,
+    );
+    $previousLineItem = CRM_Financial_BAO_FinancialItem::getPreviousFinancialItem($contribution['id']);
+    $eftParams = array(
+      'entity_table' => 'civicrm_financial_item',
+      'entity_id' => $previousLineItem->id,
+      'financial_trxn_id' => $financialTrxn['id'],
+    );
+    CRM_Contribute_BAO_Contribution::createProportionalEntry($entityParams, $eftParams);
+    $trxnTestArray = array_merge($eftParams, array(
+      'amount' => 50,
+    ));
+    $entityFinancialTrxn = $this->callAPISuccessGetSingle('EntityFinancialTrxn', $eftParams, $trxnTestArray);
+  }
+
+  /**
+   * Test for function getLastFinancialItemIds().
+   */
+  public function testgetLastFinancialItemIds() {
+    list($contribution, $financialAccount) = $this->createContributionWithTax();
+    list($ftIds, $taxItems) = CRM_Contribute_BAO_Contribution::getLastFinancialItemIds($contribution['id']);
+    $this->assertEquals(count($ftIds), 1, 'Invalid count.');
+    $this->assertEquals(count($taxItems), 1, 'Invalid count.');
+    foreach ($taxItems as $value) {
+      $this->assertEquals($value['amount'], 10, 'Invalid tax amount.');
+    }
+  }
+
+  /**
+   * Test for function createProportionalFinancialEntries().
+   */
+  public function testcreateProportionalFinancialEntries() {
+    list($contribution, $financialAccount) = $this->createContributionWithTax();
+    $params = array(
+      'total_amount' => 55,
+      'to_financial_account_id' => $financialAccount->financial_account_id,
+      'payment_instrument_id' => 1,
+      'trxn_date' => date('Ymd'),
+      'status_id' => 1,
+    );
+    $financialTrxn = $this->callAPISuccess('FinancialTrxn', 'create', $params);
+    $params = array(
+      'amount' => 50,
+      'entity_table' => 'civicrm_contribution',
+      'entity_id' => $contribution['id'],
+      'financial_trxn_id' => $financialTrxn['id'],
+    );
+    $this->callAPISuccess('EntityFinancialTrxn', 'create', $params);
+    $entityParams = array(
+      'contribution_total_amount' => $contribution['total_amount'],
+      'trxn_total_amount' => 55,
+      'trxn_id' => $financialTrxn['id'],
+    );
+    $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($contribution['id']);
+    list($ftIds, $taxItems) = CRM_Contribute_BAO_Contribution::getLastFinancialItemIds($contribution['id']);
+    CRM_Contribute_BAO_Contribution::createProportionalFinancialEntries($entityParams, $lineItems, $ftIds, $taxItems);
+    $eftParams = array(
+      'entity_table' => 'civicrm_financial_item',
+      'financial_trxn_id' => $financialTrxn['id'],
+    );
+    $entityFinancialTrxn = $this->callAPISuccess('EntityFinancialTrxn', 'Get', $eftParams);
+    $this->assertEquals($entityFinancialTrxn['count'], 2, 'Invalid count.');
+    $testAmount = array(5, 50);
+    foreach ($entityFinancialTrxn['values'] as $value) {
+      $this->assertEquals($value['amount'], array_pop($testAmount), 'Invalid amount stored in civicrm_entity_financial_trxn.');
+    }
+  }
+
+  /**
+   * Test to check if amount is proportionally asigned for PI change.
+   */
+  public function testProportionallyAssignedForPIChange() {
+    list($contribution, $financialAccount) = $this->createContributionWithTax();
+    $params = array(
+      'id' => $contribution['id'],
+      'payment_instrument_id' => 3,
+    );
+    $this->callAPISuccess('Contribution', 'create', $params);
+    $lastFinancialTrxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contribution['id'], 'DESC');
+    $eftParams = array(
+      'entity_table' => 'civicrm_financial_item',
+      'financial_trxn_id' => $lastFinancialTrxnId['financialTrxnId'],
+    );
+    $entityFinancialTrxn = $this->callAPISuccess('EntityFinancialTrxn', 'Get', $eftParams);
+    $this->assertEquals($entityFinancialTrxn['count'], 2, 'Invalid count.');
+    $testAmount = array(10, 100);
+    foreach ($entityFinancialTrxn['values'] as $value) {
+      $this->assertEquals($value['amount'], array_pop($testAmount), 'Invalid amount stored in civicrm_entity_financial_trxn.');
+    }
+  }
+
+  /**
+   * Function to create contribution with tax.
+   */
+  public function createContributionWithTax() {
+    $contactId = $this->individualCreate();
+    $this->enableTaxAndInvoicing();
+    $financialType = $this->createFinancialType();
+    $financialAccount = $this->relationForFinancialTypeWithFinancialAccount($financialType['id']);
+    $form = new CRM_Contribute_Form_Contribution();
+
+    $form->testSubmit(array(
+       'total_amount' => 100,
+        'financial_type_id' => $financialType['id'],
+        'receive_date' => '04/21/2015',
+        'receive_date_time' => '11:27PM',
+        'contact_id' => $contactId,
+        'contribution_status_id' => 1,
+        'price_set_id' => 0,
+      ),
+      CRM_Core_Action::ADD
+    );
+    $contribution = $this->callAPISuccessGetSingle('Contribution',
+      array(
+        'contact_id' => $contactId,
+        'return' => array('tax_amount', 'total_amount'),
+      )
+    );
+    return array($contribution, $financialAccount);
   }
 
 }

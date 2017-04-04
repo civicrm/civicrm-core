@@ -3,7 +3,7 @@
   +--------------------------------------------------------------------+
   | CiviCRM version 4.7                                                |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2016                                |
+  | Copyright CiviCRM LLC (c) 2004-2017                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -37,7 +37,7 @@
  * should incorporte services for aggregation, minimization, etc.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
  */
@@ -500,7 +500,7 @@ class CRM_Core_Resources {
       $file = '';
     }
     if ($addCacheCode) {
-      $file .= '?r=' . $this->getCacheCode();
+      $file = $this->addCacheCode($file);
     }
     // TODO consider caching results
     $base = $this->paths->hasVariable($ext)
@@ -643,7 +643,8 @@ class CRM_Core_Resources {
       // Load custom or core css
       $config = CRM_Core_Config::singleton();
       if (!empty($config->customCSSURL)) {
-        $this->addStyleUrl($config->customCSSURL, 99, $region);
+        $customCSSURL = $this->addCacheCode($config->customCSSURL);
+        $this->addStyleUrl($customCSSURL, 99, $region);
       }
       if (!Civi::settings()->get('disable_core_css')) {
         $this->addStyleFile('civicrm', 'css/civicrm.css', -99, $region);
@@ -712,7 +713,6 @@ class CRM_Core_Resources {
       "bower_components/select2/select2.min.js",
       "bower_components/select2/select2.min.css",
       "bower_components/font-awesome/css/font-awesome.min.css",
-      "packages/jquery/plugins/jquery.tableHeader.js",
       "packages/jquery/plugins/jquery.form.min.js",
       "packages/jquery/plugins/jquery.timeentry.min.js",
       "packages/jquery/plugins/jquery.blockUI.min.js",
@@ -727,20 +727,21 @@ class CRM_Core_Resources {
     // add wysiwyg editor
     $editor = Civi::settings()->get('editor_id');
     if ($editor == "CKEditor") {
-      $items[] = "js/wysiwyg/crm.ckeditor.js";
-      $ckConfig = CRM_Admin_Page_CKEditorConfig::getConfigUrl();
-      if ($ckConfig) {
-        $items[] = array('config' => array('CKEditorCustomConfig' => $ckConfig));
-      }
+      CRM_Admin_Page_CKEditorConfig::setConfigDefault();
+      $items[] = array(
+        'config' => array(
+          'wysisygScriptLocation' => Civi::paths()->getUrl("[civicrm.root]/js/wysiwyg/crm.ckeditor.js"),
+          'CKEditorCustomConfig' => CRM_Admin_Page_CKEditorConfig::getConfigUrl(),
+        ),
+      );
     }
 
     // These scripts are only needed by back-office users
     if (CRM_Core_Permission::check('access CiviCRM')) {
+      $items[] = "packages/jquery/plugins/jquery.tableHeader.js";
       $items[] = "packages/jquery/plugins/jquery.menu.min.js";
       $items[] = "css/civicrmNavigation.css";
-      $items[] = "packages/jquery/plugins/jquery.jeditable.min.js";
       $items[] = "packages/jquery/plugins/jquery.notify.min.js";
-      $items[] = "js/jquery/jquery.crmeditable.js";
     }
 
     // JS for multilingual installations
@@ -779,11 +780,15 @@ class CRM_Core_Resources {
    *   is this page request an ajax snippet?
    */
   public static function isAjaxMode() {
-    return in_array(CRM_Utils_Array::value('snippet', $_REQUEST), array(
+    if (in_array(CRM_Utils_Array::value('snippet', $_REQUEST), array(
         CRM_Core_Smarty::PRINT_SNIPPET,
         CRM_Core_Smarty::PRINT_NOFORM,
         CRM_Core_Smarty::PRINT_JSON,
-      ));
+      ))
+    ) {
+      return TRUE;
+    }
+    return strpos(CRM_Utils_System::getUrlPath(), 'civicrm/ajax') === 0;
   }
 
   /**
@@ -875,6 +880,17 @@ class CRM_Core_Resources {
         $fileName = $nonMiniFile;
       }
     }
+  }
+
+  /**
+   * @param string $url
+   * @return string
+   */
+  public function addCacheCode($url) {
+    $hasQuery = strpos($url, '?') !== FALSE;
+    $operator = $hasQuery ? '&' : '?';
+
+    return $url . $operator . 'r=' . $this->cacheCode;
   }
 
 }

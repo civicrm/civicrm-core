@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
  */
@@ -252,7 +252,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
           'cms:view user account',
         ))
     ) {
-      return url('user/' . $uid);
+      return $this->url('user/' . $uid);
     };
   }
 
@@ -545,6 +545,13 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
     return user_load($userID);
   }
 
+  /**
+   * Parse the name of the drupal site.
+   *
+   * @param string $civicrm_root
+   *
+   * @return null|string
+   */
   public function parseDrupalSiteName($civicrm_root) {
     $siteName = NULL;
     if (strpos($civicrm_root,

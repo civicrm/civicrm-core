@@ -20,7 +20,8 @@ function tag_create_example() {
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
     return array(
-      'error' => $errorMessage,
+      'is_error' => 1,
+      'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
     );
@@ -53,6 +54,7 @@ function tag_create_expectedresult() {
         'is_tagset' => '',
         'used_for' => 'civicrm_contact',
         'created_id' => '',
+        'color' => '',
         'created_date' => '2013-07-28 08:49:19',
       ),
     ),

@@ -21,11 +21,9 @@ class CRM_Core_CodeGen_Specification {
 
     echo "Parsing schema description " . $schemaPath . "\n";
     $dbXML = CRM_Core_CodeGen_Util_Xml::parse($schemaPath);
-    // print_r( $dbXML );
 
     echo "Extracting database information\n";
     $this->database = &$this->getDatabase($dbXML);
-    // print_r( $this->database );
 
     $this->classNames = array();
 
@@ -37,7 +35,6 @@ class CRM_Core_CodeGen_Specification {
     $this->tables = $this->orderTables($this->tables);
 
     // add archive tables here
-    $archiveTables = array();
     foreach ($this->tables as $name => $table) {
       if ($table['archive'] == 'true') {
         $name = 'archive_' . $table['name'];
@@ -187,6 +184,7 @@ class CRM_Core_CodeGen_Specification {
     $base = $this->value('base', $tableXML);
     $sourceFile = "xml/schema/{$base}/{$klass}.xml";
     $daoPath = "{$base}/DAO/";
+    $baoPath = __DIR__ . '/../../../' . str_replace(' ', '', "{$base}/BAO/");
     $pre = str_replace('/', '_', $daoPath);
     $this->classNames[$name] = $pre . $klass;
 
@@ -206,6 +204,8 @@ class CRM_Core_CodeGen_Specification {
       'objectName' => $klass,
       'labelName' => substr($name, 8),
       'className' => $this->classNames[$name],
+      'bao' => (file_exists($baoPath . $klass . '.php') ? str_replace('DAO', 'BAO', $this->classNames[$name]) : $this->classNames[$name]),
+      'entity' => $klass,
       'attributes_simple' => trim($database['tableAttributes_simple']),
       'attributes_modern' => trim($database['tableAttributes_modern']),
       'comment' => $this->value('comment', $tableXML),
@@ -365,6 +365,7 @@ class CRM_Core_CodeGen_Specification {
     if (!empty($field['html'])) {
       $validOptions = array(
         'type',
+        'formatType',
         /* Fixme: prior to CRM-13497 these were in a flat structure
         // CRM-13497 moved them to be nested within 'html' but there's no point
         // making that change in the DAOs right now since we are in the process of
@@ -462,26 +463,56 @@ class CRM_Core_CodeGen_Specification {
   }
 
   /**
-   * @param $primaryXML
-   * @param $fields
-   * @param $table
+   * @param object $primaryXML
+   * @param array $fields
+   * @param array $table
    */
   public function getPrimaryKey(&$primaryXML, &$fields, &$table) {
     $name = trim((string ) $primaryXML->name);
 
-    /** need to make sure there is a field of type name */
-    if (!array_key_exists($name, $fields)) {
-      echo "primary key $name in $table->name does not have a field definition, ignoring\n";
-      return;
-    }
-
     // set the autoincrement property of the field
     $auto = $this->value('autoincrement', $primaryXML);
+    if (isset($fields[$name])) {
+      $fields[$name]['autoincrement'] = $auto;
+    }
     $fields[$name]['autoincrement'] = $auto;
     $primaryKey = array(
       'name' => $name,
       'autoincrement' => $auto,
     );
+
+    // populate fields
+    foreach ($primaryXML->fieldName as $v) {
+      $fieldName = (string) ($v);
+      $length = (string) ($v['length']);
+      if (strlen($length) > 0) {
+        $fieldName = "$fieldName($length)";
+      }
+      $primaryKey['field'][] = $fieldName;
+    }
+
+    // when field array is empty set it to the name of the primary key.
+    if (empty($primaryKey['field'])) {
+      $primaryKey['field'][] = $name;
+    }
+
+    // all fieldnames have to be defined and should exist in schema.
+    foreach ($primaryKey['field'] as $fieldName) {
+      if (!$fieldName) {
+        echo "Invalid field defination for index $name\n";
+        return;
+      }
+      $parenOffset = strpos($fieldName, '(');
+      if ($parenOffset > 0) {
+        $fieldName = substr($fieldName, 0, $parenOffset);
+      }
+      if (!array_key_exists($fieldName, $fields)) {
+        echo "Table does not contain $fieldName\n";
+        print_r($fields);
+        exit();
+      }
+    }
+
     $table['primaryKey'] = &$primaryKey;
   }
 

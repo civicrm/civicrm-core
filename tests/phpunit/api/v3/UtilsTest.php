@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -144,10 +144,10 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
       'version' => $this->_apiversion,
     );
     try {
-      $result = civicrm_api3_verify_mandatory($params, 'CRM_Core_BAO_Note', array('note', 'subject'));
+      civicrm_api3_verify_mandatory($params, 'CRM_Core_BAO_Note', array('note', 'subject'));
     }
     catch (Exception $expected) {
-      $this->assertEquals('Mandatory key(s) missing from params array: entity_id, note, subject', $expected->getMessage());
+      $this->assertEquals('Mandatory key(s) missing from params array: note, subject', $expected->getMessage());
       return;
     }
 
@@ -169,10 +169,10 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
     );
 
     try {
-      $result = civicrm_api3_verify_one_mandatory($params, 'CRM_Core_BAO_Note', array('note', 'subject'));
+      civicrm_api3_verify_one_mandatory($params, 'CRM_Core_BAO_Note', array('note', 'subject'));
     }
     catch (Exception $expected) {
-      $this->assertEquals('Mandatory key(s) missing from params array: entity_id, one of (note, subject)', $expected->getMessage());
+      $this->assertEquals('Mandatory key(s) missing from params array: one of (note, subject)', $expected->getMessage());
       return;
     }
 

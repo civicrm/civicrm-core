@@ -19,7 +19,8 @@ function group_get_example() {
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
     return array(
-      'error' => $errorMessage,
+      'is_error' => 1,
+      'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
     );
@@ -49,9 +50,9 @@ function group_get_expectedresult() {
         'description' => 'New Test Group Created',
         'is_active' => '1',
         'visibility' => 'Public Pages',
-        'where_clause' => ' ( `civicrm_group_contact-4`.group_id IN ( 4 ) AND `civicrm_group_contact-4`.status IN (\"Added\") ) ',
-        'select_tables' => 'a:8:{s:15:\"civicrm_contact\";i:1;s:15:\"civicrm_address\";i:1;s:15:\"civicrm_country\";i:1;s:13:\"civicrm_email\";i:1;s:13:\"civicrm_phone\";i:1;s:10:\"civicrm_im\";i:1;s:19:\"civicrm_worldregion\";i:1;s:25:\"`civicrm_group_contact-4`\";s:165:\" LEFT JOIN civicrm_group_contact `civicrm_group_contact-4` ON ( contact_a.id = `civicrm_group_contact-4`.contact_id AND `civicrm_group_contact-4`.group_id IN ( 4 ) )\";}',
-        'where_tables' => 'a:2:{s:15:\"civicrm_contact\";i:1;s:25:\"`civicrm_group_contact-4`\";s:165:\" LEFT JOIN civicrm_group_contact `civicrm_group_contact-4` ON ( contact_a.id = `civicrm_group_contact-4`.contact_id AND `civicrm_group_contact-4`.group_id IN ( 4 ) )\";}',
+        'where_clause' => ' ( `civicrm_group_contact-4`.group_id IN ( 4 )   ) ',
+        'select_tables' => 'a:8:{s:15:\"civicrm_contact\";i:1;s:15:\"civicrm_address\";i:1;s:15:\"civicrm_country\";i:1;s:13:\"civicrm_email\";i:1;s:13:\"civicrm_phone\";i:1;s:10:\"civicrm_im\";i:1;s:19:\"civicrm_worldregion\";i:1;s:25:\"`civicrm_group_contact-4`\";s:165:\" LEFT JOIN civicrm_group_contact `civicrm_group_contact-4` ON (contact_a.id = `civicrm_group_contact-4`.contact_id AND `civicrm_group_contact-4`.status IN (\'Added\'))\";}',
+        'where_tables' => 'a:2:{s:15:\"civicrm_contact\";i:1;s:25:\"`civicrm_group_contact-4`\";s:165:\" LEFT JOIN civicrm_group_contact `civicrm_group_contact-4` ON (contact_a.id = `civicrm_group_contact-4`.contact_id AND `civicrm_group_contact-4`.status IN (\'Added\'))\";}',
         'group_type' => array(
           '0' => '1',
           '1' => '2',

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,11 +28,14 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 require_once 'TbsZip/tbszip.php';
 
+/**
+ * Class CRM_Utils_PDF_Document.
+ */
 class CRM_Utils_PDF_Document {
 
   public static $ooxmlMap = array(
@@ -51,6 +54,8 @@ class CRM_Utils_PDF_Document {
   );
 
   /**
+   * Convert html to a Doc file.
+   *
    * @param array $pages
    * @param string $fileName
    * @param array|int $format
@@ -106,10 +111,11 @@ class CRM_Utils_PDF_Document {
       'pdf' => 'PDF',
     );
 
-    if (realpath($phpWord)) {
-      $phpWord = \PhpOffice\PhpWord\IOFactory::load($phpWord, $formats[$ext]);
+    if (realpath($fileName)) {
+      $phpWord = \PhpOffice\PhpWord\IOFactory::load($fileName, $formats[$ext]);
     }
 
+    \PhpOffice\PhpWord\Settings::setOutputEscapingEnabled(TRUE); //CRM-20015
     $objWriter = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord, $formats[$ext]);
 
     CRM_Utils_System::setHttpHeader('Content-Type', "application/$ext");

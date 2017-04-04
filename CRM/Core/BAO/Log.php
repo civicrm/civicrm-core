@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2016
- * $Id$
- *
  */
 
 /**
@@ -53,7 +51,7 @@ class CRM_Core_BAO_Log extends CRM_Core_DAO_Log {
     $log->entity_id = $id;
     $log->orderBy('modified_date desc');
     $log->limit(1);
-    $result = CRM_Core_DAO::$_nullObject;
+    $result = NULL;
     if ($log->find(TRUE)) {
       list($displayName, $contactImage) = CRM_Contact_BAO_Contact::getDisplayAndImage($log->modified_id);
       $result = array(
@@ -166,16 +164,16 @@ UPDATE civicrm_log
   }
 
   /**
-   * Function for find out whether to use logging schema entries for contact.
-   * summary, instead of normal log entries.
+   * Get the id of the report to use to display the change log.
    *
-   * @return int
-   *   report id of Contact Logging Report (Summary) / false
+   * If logging is not enabled a return value of FALSE means to use the
+   * basic change log view.
+   *
+   * @return int|FALSE
+   *   report id of Contact Logging Report (Summary)
    */
   public static function useLoggingReport() {
-    // first check if logging is enabled
-    $config = CRM_Core_Config::singleton();
-    if (!$config->logging) {
+    if (!\Civi::settings()->get('logging')) {
       return FALSE;
     }
 

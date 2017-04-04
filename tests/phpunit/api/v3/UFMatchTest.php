@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -126,6 +126,42 @@ class api_v3_UFMatchTest extends CiviUnitTestCase {
   public function testCreate() {
     $result = $this->callAPISuccess('uf_match', 'create', $this->_params);
     $this->getAndCheck($this->_params, $result['id'], 'uf_match');
+  }
+
+  /**
+   * Test Civi to CMS email sync optional
+   */
+  public function testUFNameMatchSync() {
+    $this->callAPISuccess('uf_match', 'create', $this->_params);
+    $email1 = substr(sha1(rand()), 0, 7) . '@test.com';
+    $email2 = substr(sha1(rand()), 0, 7) . '@test.com';
+
+    // Case A: Enable CMS integration
+    Civi::settings()->set('syncCMSEmail', TRUE);
+    $this->callAPISuccess('email', 'create', array(
+      'contact_id' => $this->_contactId,
+      'email' => $email1,
+      'is_primary' => 1,
+    ));
+    $ufName = $this->callAPISuccess('uf_match', 'getvalue', array(
+      'contact_id' => $this->_contactId,
+      'return' => 'uf_name',
+    ));
+    $this->assertEquals($email1, $ufName);
+
+    // Case B: Disable CMS integration
+    Civi::settings()->set('syncCMSEmail', FALSE);
+    $this->callAPISuccess('email', 'create', array(
+      'contact_id' => $this->_contactId,
+      'email' => $email2,
+      'is_primary' => 1,
+    ));
+    $ufName = $this->callAPISuccess('uf_match', 'getvalue', array(
+      'contact_id' => $this->_contactId,
+      'return' => 'uf_name',
+    ));
+    $this->assertNotEquals($email2, $ufName, 'primary email will not match if changed on disabled CMS integration setting');
+    $this->assertEquals($email1, $ufName);
   }
 
   public function testDelete() {

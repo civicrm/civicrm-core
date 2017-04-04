@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -36,6 +36,7 @@ class Api3SelectQuery extends SelectQuery {
    * @inheritDoc
    */
   protected function buildWhereClause() {
+    $filters = array();
     foreach ($this->where as $key => $value) {
       $table_name = NULL;
       $column_name = NULL;
@@ -104,22 +105,36 @@ class Api3SelectQuery extends SelectQuery {
         // Just ignore this for the $where_clause.
         continue;
       }
-      if (!is_array($value)) {
-        $this->query->where(array("`$table_name`.`$column_name` = @value"), array(
-          "@value" => $value,
-        ));
+      $operator = is_array($value) ? \CRM_Utils_Array::first(array_keys($value)) : NULL;
+      if (!in_array($operator, \CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
+        $value = array('=' => $value);
       }
-      else {
-        // We expect only one element in the array, of the form
-        // "operator" => "rhs".
-        $operator = \CRM_Utils_Array::first(array_keys($value));
-        if (!in_array($operator, \CRM_Core_DAO::acceptedSQLOperators())) {
-          $this->query->where(array("{$table_name}.{$column_name} = @value"), array("@value" => $value));
-        }
-        else {
-          $this->query->where(\CRM_Core_DAO::createSQLFilter("{$table_name}.{$column_name}", $value));
-        }
+      $filters[$key] = \CRM_Core_DAO::createSQLFilter("{$table_name}.{$column_name}", $value);
+    }
+    // Support OR groups
+    if (!empty($this->where['options']['or'])) {
+      $orGroups = $this->where['options']['or'];
+      if (is_string($orGroups)) {
+        $orGroups = array_map('trim', explode(',', $orGroups));
       }
+      if (!is_array(\CRM_Utils_Array::first($orGroups))) {
+        $orGroups = array($orGroups);
+      }
+      foreach ($orGroups as $orGroup) {
+        $orClause = array();
+        foreach ($orGroup as $key) {
+          if (!isset($filters[$key])) {
+            throw new \CiviCRM_API3_Exception("'$key' specified in OR group but not added to params");
+          }
+          $orClause[] = $filters[$key];
+          unset($filters[$key]);
+        }
+        $this->query->where(implode(' OR ', $orClause));
+      }
+    }
+    // Add the remaining params using AND
+    foreach ($filters as $filter) {
+      $this->query->where($filter);
     }
   }
 
@@ -141,6 +156,10 @@ class Api3SelectQuery extends SelectQuery {
    * Fetch a field from the getFields list
    *
    * Searches by name, uniqueName, and api.aliases
+   *
+   * @param string $fieldName
+   *   Field name.
+   * @return NULL|mixed
    */
   protected function getField($fieldName) {
     if (!$fieldName) {

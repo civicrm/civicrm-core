@@ -99,6 +99,15 @@
     <comment>FK to civicrm_contact, who created this tag</comment>
     <add>3.4</add>
   </field>
+  <field>
+    <name>color</name>
+    <title>Color</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>Hex color value e.g. #ffffff</comment>
+    <default>NULL</default>
+    <add>4.7</add>
+  </field>
   <foreignKey>
     <name>created_id</name>
     <table>civicrm_contact</table>

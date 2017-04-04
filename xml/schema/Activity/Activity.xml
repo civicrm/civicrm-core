@@ -3,7 +3,7 @@
   <base>CRM/Activity</base>
   <class>Activity</class>
   <name>civicrm_activity</name>
-  <comment>Other Activity  details stored here include contact, location, details.</comment>
+  <comment>Other Activity details stored here include contact, location, details.</comment>
   <add>1.1</add>
   <log>true</log>
   <field>
@@ -15,7 +15,6 @@
     <required>true</required>
     <comment>Unique  Other Activity ID</comment>
     <add>1.1</add>
-
   </field>
   <primaryKey>
     <name>id</name>
@@ -45,7 +44,6 @@
     <add>2.0</add>
     <drop>3.2</drop>
   </index>
-
   <field>
     <name>source_record_id</name>
     <type>int unsigned</type>
@@ -81,7 +79,6 @@
     <fieldName>activity_type_id</fieldName>
     <add>1.6</add>
   </index>
-
   <field>
     <name>target_entity_table</name>
     <type>varchar</type>
@@ -91,7 +88,6 @@
     <add>1.1</add>
     <drop>2.0</drop>
   </field>
-
   <field>
     <name>target_entity_id</name>
     <type>int unsigned</type>
@@ -100,7 +96,6 @@
     <add>1.1</add>
     <drop>2.0</drop>
   </field>
-
   <field>
     <name>subject</name>
     <uniqueName>activity_subject</uniqueName>
@@ -116,7 +111,6 @@
     <add>1.1</add>
     <modify>2.0</modify>
   </field>
-
   <field>
     <name>scheduled_date</name>
     <type>datetime</type>
@@ -124,7 +118,6 @@
     <add>1.1</add>
     <drop>2.0</drop>
   </field>
-
   <field>
     <name>activity_date_time</name>
     <import>true</import>
@@ -134,6 +127,7 @@
     <comment>Date and time this activity is scheduled to occur. Formerly named scheduled_date_time.</comment>
     <html>
       <type>Select Date</type>
+      <formatType>activityDateTime</formatType>
     </html>
     <add>2.0</add>
   </field>
@@ -151,7 +145,6 @@
     <add>1.1</add>
     <drop>2.0</drop>
   </field>
-
   <field>
     <name>duration_minutes</name>
     <type>int unsigned</type>
@@ -159,7 +152,6 @@
     <add>1.1</add>
     <drop>2.0</drop>
   </field>
-
   <field>
     <name>duration</name>
     <uniqueName>activity_duration</uniqueName>
@@ -173,7 +165,6 @@
       <type>Text</type>
     </html>
   </field>
-
   <field>
     <name>location</name>
     <uniqueName>activity_location</uniqueName>
@@ -188,7 +179,6 @@
     </html>
     <add>1.1</add>
   </field>
-
   <field>
     <name>phone_id</name>
     <type>int unsigned</type>
@@ -206,7 +196,6 @@
     <add>2.0</add>
     <onDelete>SET NULL</onDelete>
   </foreignKey>
-
   <field>
     <name>phone_number</name>
     <title>Phone (called) Number</title>
@@ -218,7 +207,6 @@
     </html>
     <add>2.0</add>
   </field>
-
   <field>
     <name>details</name>
     <uniqueName>activity_details</uniqueName>
@@ -234,7 +222,6 @@
     </html>
     <add>1.1</add>
   </field>
-
   <field>
     <name>status</name>
     <type>enum</type>
@@ -244,7 +231,6 @@
     <add>1.1</add>
     <drop>2.0</drop>
   </field>
-
   <field>
     <name>status_id</name>
     <uniqueName>activity_status_id</uniqueName>
@@ -289,7 +275,6 @@
     <add>1.1</add>
     <onDelete>CASCADE</onDelete>
   </foreignKey>
-
   <field>
     <name>is_test</name>
     <title>Test</title>
@@ -457,5 +442,15 @@
     <html>
       <type>Text</type>
     </html>
+  </field>
+  <field>
+    <name>is_star</name>
+    <title>Is Starred</title>
+    <type>boolean</type>
+    <default>0</default>
+    <import>true</import>
+    <comment>Activity marked as favorite.</comment>
+    <headerPattern>/(activity.)?(star|favorite)/i</headerPattern>
+    <add>4.7</add>
   </field>
 </table>

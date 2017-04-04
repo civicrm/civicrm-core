@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -51,8 +51,8 @@
   <tbody>
     {foreach from=$dedupeExceptions item=exception key=id}
       <tr id="dupeRow_{$id}" class="{cycle values="odd-row,even-row"}">
-        <td>{$exception.main.name}</td>
-        <td>{$exception.other.name}</td>
+        <td><a href ={crmURL p='civicrm/contact/view' q="reset=1&cid=`$exception.main.id`"}>{$exception.main.name}</a></td>
+        <td><a href ={crmURL p='civicrm/contact/view' q="reset=1&cid=`$exception.other.id`"}>{$exception.other.name}</a></td>
         <td><a id='duplicateContacts' href="#" title={ts}Remove Exception{/ts} onClick="processDupes( {$exception.main.id}, {$exception.other.id}, 'nondupe-dupe', 'dedupe-exception' );return false;">&raquo; {ts}Remove Exception{/ts}</a></td>
       </tr>
     {/foreach}

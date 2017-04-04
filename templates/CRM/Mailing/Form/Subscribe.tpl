@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -41,13 +41,13 @@
         <div class="spacer"></div>
 
         {if ! $single} {* Show all public mailing list groups. Page was loaded w/o a specific group param (gid=N not in query string). *}
-            <table summary="{ts}Group Listings.{/ts}" class="selector" style="width: auto;">
+            <table class="selector" style="width: auto;">
             {counter start=0 skip=1 print=false}
             {foreach from=$rows item=row}
             <tr id='rowid{$row.id}' class="{cycle values="odd-row,even-row"}">
                 {assign var=cbName value=$row.checkbox}
                 <td class="crm-mailing-subscribe-form-block-{$cbName}">{$form.$cbName.html}</td>
-                <td class="crm-mailing-subscribe-form-block-title"><strong>{$row.title}</strong></td>
+                <td class="crm-mailing-subscribe-form-block-title"><label for="{$cbName}"><strong>{$row.title}</strong></label></td>
                 <td class="crm-mailing-subscribe-form-block-description">&nbsp;&nbsp;{$row.description}&nbsp;</td>
             </tr>
             {/foreach}

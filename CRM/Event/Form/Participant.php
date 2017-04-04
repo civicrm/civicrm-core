@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
  *
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
  */
@@ -244,6 +244,8 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       );
 
       $this->assign('hasPayment', $this->_paymentId);
+      $this->assign('componentId', $this->_id);
+      $this->assign('component', 'event');
 
       // CRM-12615 - Get payment information from the primary registration
       if ((!$this->_paymentId) && ($this->_action == CRM_Core_Action::UPDATE)) {
@@ -818,6 +820,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       if (empty($values['payment_instrument_id'])) {
         $errorMsg['payment_instrument_id'] = ts('Payment Method is a required field.');
       }
+      CRM_Price_BAO_PriceField::priceSetValidation($values['priceSetId'], $values, $errorMsg);
     }
 
     // validate contribution status for 'Failed'.
@@ -841,9 +844,15 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       }
     }
     // For single additions - show validation error if the contact has already been registered
-    // for this event with the same role.
+    // for this event.
     if ($self->_single && ($self->_action & CRM_Core_Action::ADD)) {
-      $contactId = $self->_contactId;
+      if ($self->_context == 'standalone') {
+        $contactId = CRM_Utils_Array::value('contact_id', $values);
+      }
+      else {
+        $contactId = $self->_contactId;
+      }
+
       $eventId = CRM_Utils_Array::value('event_id', $values);
       if (!empty($contactId) && !empty($eventId)) {
         $dupeCheck = new CRM_Event_BAO_Participant();
@@ -937,6 +946,9 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     }
 
     $config = CRM_Core_Config::singleton();
+    if (isset($params['total_amount'])) {
+      $params['total_amount'] = CRM_Utils_Rule::cleanMoney($params['total_amount']);
+    }
     if ($this->_isPaidEvent) {
 
       $contributionParams = array();
@@ -1451,7 +1463,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
               $lineItem[$this->_priceSetId][$lineKey] = $line;
             }
             CRM_Price_BAO_LineItem::processPriceSet($participants[$num]->id, $lineItem, CRM_Utils_Array::value($num, $contributions, NULL), 'civicrm_participant');
-            CRM_Contribute_BAO_Contribution::addPayments($value, $contributions);
+            CRM_Contribute_BAO_Contribution::addPayments($contributions);
           }
         }
       }

@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -40,9 +40,14 @@
                 {assign var="element_name_from" value=$element_name|cat:"_from"}
                 {assign var="element_name_to" value=$element_name|cat:"_to"}
                 <tr>
+                  {if $element.data_type neq 'Date'}
                     <td class="label">{$form.$element_name_from.label}</td><td>
                     {$form.$element_name_from.html|crmAddClass:six}
                     &nbsp;&nbsp;{$form.$element_name_to.label}&nbsp;&nbsp;{$form.$element_name_to.html|crmAddClass:six}
+                  {elseif $element.skip_calendar NEQ true }
+                    <td class="label"><label for='{$element_name}'>{$element.label}</label>
+                    {include file="CRM/Core/DateRange.tpl" fieldName=$element_name from='_from' to='_to'}</td><td>
+                  {/if}
             {else}
                 <td class="label">{$form.$element_name.label}</td><td>
                   {$form.$element_name.html}

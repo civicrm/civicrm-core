@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -205,8 +205,9 @@ WHERE  domain_id = %1
   /**
    * Get word replacements for the api.
    *
-   * Get all the word-replacements stored in config-arrays
-   * and convert them to params for the WordReplacement.create API.
+   * Get all the word-replacements stored in config-arrays for the
+   * configured language, and convert them to params for the
+   * WordReplacement.create API.
    *
    * Note: This function is duplicated in CRM_Core_BAO_WordReplacement and
    * CRM_Upgrade_Incremental_php_FourFour to ensure that the incremental upgrade
@@ -222,6 +223,12 @@ WHERE  domain_id = %1
    * @see CRM_Core_BAO_WordReplacement::convertConfigArraysToAPIParams
    */
   public static function getConfigArraysAsAPIParams($rebuildEach) {
+    $settingsResult = civicrm_api3('Setting', 'get', array(
+      'return' => 'lcMessages',
+    ));
+    $returnValues = CRM_Utils_Array::first($settingsResult['values']);
+    $lang = $returnValues['lcMessages'];
+
     $wordReplacementCreateParams = array();
     // get all domains
     $result = civicrm_api3('domain', 'get', array(
@@ -236,19 +243,20 @@ WHERE  domain_id = %1
         $localeCustomArray = unserialize($value["locale_custom_strings"]);
         if (!empty($localeCustomArray)) {
           $wordMatchArray = array();
-          // Traverse Language array
-          foreach ($localeCustomArray as $localCustomData) {
-            // Traverse status array "enabled" "disabled"
-            foreach ($localCustomData as $status => $matchTypes) {
-              $params["is_active"] = ($status == "enabled") ? TRUE : FALSE;
-              // Traverse Match Type array "wildcardMatch" "exactMatch"
-              foreach ($matchTypes as $matchType => $words) {
-                $params["match_type"] = $matchType;
-                foreach ($words as $word => $replace) {
-                  $params["find_word"] = $word;
-                  $params["replace_word"] = $replace;
-                  $wordReplacementCreateParams[] = $params;
-                }
+          // Only return the replacement strings of the current language,
+          // otherwise some replacements will be duplicated, which will
+          // lead to undesired results, like CRM-19683.
+          $localCustomData = $localeCustomArray[$lang];
+          // Traverse status array "enabled" "disabled"
+          foreach ($localCustomData as $status => $matchTypes) {
+            $params["is_active"] = ($status == "enabled") ? TRUE : FALSE;
+            // Traverse Match Type array "wildcardMatch" "exactMatch"
+            foreach ($matchTypes as $matchType => $words) {
+              $params["match_type"] = $matchType;
+              foreach ($words as $word => $replace) {
+                $params["find_word"] = $word;
+                $params["replace_word"] = $replace;
+                $wordReplacementCreateParams[] = $params;
               }
             }
           }

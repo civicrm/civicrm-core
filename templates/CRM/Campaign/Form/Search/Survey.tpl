@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -212,8 +212,7 @@ function loadSurveyList( )
              "oLanguage":{"sEmptyTable"  : noRecordFoundMsg,
                  "sZeroRecords" : noRecordFoundMsg },
              "fnDrawCallback": function() {
-               // FIXME: trigger crmLoad and crmEditable would happen automatically
-               CRM.$('.crm-editable').crmEditable();
+               $(this).trigger('crmLoad');
              },
              "fnRowCallback": function( nRow, aData, iDisplayIndex ) {
                // Crm-editable

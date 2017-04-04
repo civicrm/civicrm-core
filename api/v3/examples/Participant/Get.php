@@ -19,7 +19,8 @@ function participant_get_example() {
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
     return array(
-      'error' => $errorMessage,
+      'is_error' => 1,
+      'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
     );
@@ -48,7 +49,7 @@ function participant_get_expectedresult() {
         'contact_sub_type' => '',
         'sort_name' => 'Anderson, Anthony',
         'display_name' => 'Mr. Anthony Anderson II',
-        'event_id' => '5',
+        'event_id' => '6',
         'event_title' => 'Annual CiviCRM meet',
         'event_start_date' => '2013-07-29 00:00:00',
         'event_end_date' => '2013-08-04 00:00:00',
@@ -59,8 +60,8 @@ function participant_get_expectedresult() {
         'event_type' => 'Conference',
         'participant_status_id' => '2',
         'participant_status' => 'Attended',
-        'participant_role' => 'Attendee',
         'participant_role_id' => '1',
+        'participant_role' => 'Attendee',
         'participant_register_date' => '2007-02-19 00:00:00',
         'participant_source' => 'Wimbeldon',
         'participant_note' => '',

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Logging_Reverter {
   private $db;
@@ -66,6 +66,11 @@ class CRM_Logging_Reverter {
     $this->diffs = $differ->diffsInTables($tables);
   }
 
+  /**
+   * Setter for diffs.
+   *
+   * @param array $diffs
+   */
   public function setDiffs($diffs) {
     $this->diffs = $diffs;
   }
@@ -195,32 +200,6 @@ class CRM_Logging_Reverter {
       }
     }
 
-    // CRM-7353: if nothing altered civicrm_contact, touch it; this will
-    // make sure there’s an entry in log_civicrm_contact for this revert
-    if (empty($diffs['civicrm_contact'])) {
-      $query = "
-                SELECT id FROM `{$this->db}`.log_civicrm_contact
-                WHERE log_conn_id = %1 AND log_date BETWEEN DATE_SUB(%2, INTERVAL 10 SECOND) AND DATE_ADD(%2, INTERVAL 10 SECOND)
-                ORDER BY log_date DESC LIMIT 1
-            ";
-      $params = array(
-        1 => array($this->log_conn_id, 'String'),
-        2 => array($this->log_date, 'String'),
-      );
-      $cid = CRM_Core_DAO::singleValueQuery($query, $params);
-      if (!$cid) {
-        return;
-      }
-
-      $dao = new CRM_Contact_DAO_Contact();
-      $dao->id = $cid;
-      if ($dao->find(TRUE)) {
-        // CRM-8102: MySQL can’t parse its own dates
-        $dao->birth_date = CRM_Utils_Date::isoToMysql($dao->birth_date);
-        $dao->deceased_date = CRM_Utils_Date::isoToMysql($dao->deceased_date);
-        $dao->save();
-      }
-    }
   }
 
 }

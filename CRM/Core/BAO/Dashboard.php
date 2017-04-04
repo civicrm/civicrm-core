@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -431,31 +431,34 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
     $contactIDs = array();
     if ($admin) {
       $query = "SELECT distinct( contact_id )
-                        FROM civicrm_dashboard_contact
-                        WHERE contact_id NOT IN (
-                            SELECT distinct( contact_id )
-                            FROM civicrm_dashboard_contact WHERE dashboard_id = {$dashlet->id}
-                            )";
-
+                        FROM civicrm_dashboard_contact";
       $dao = CRM_Core_DAO::executeQuery($query);
       while ($dao->fetch()) {
-        $contactIDs[] = $dao->contact_id;
+        $contactIDs[$dao->contact_id] = NULL;
       }
     }
     else {
       //Get the id of Logged in User
-      $session = CRM_Core_Session::singleton();
-      $contactID = $session->get('userID');
+      $contactID = CRM_Core_Session::getLoggedInContactID();
       if (!empty($contactID)) {
-        $contactIDs[] = $session->get('userID');
+        $contactIDs[$contactID] = NULL;
       }
     }
 
+    // Remove contact ids that already have this dashlet to avoid DB
+    // constraint violation.
+    $query = "SELECT distinct( contact_id )
+              FROM civicrm_dashboard_contact WHERE dashboard_id = {$dashlet->id}";
+    $dao = CRM_Core_DAO::executeQuery($query);
+    while ($dao->fetch()) {
+      if (array_key_exists($dao->contact_id, $contactIDs)) {
+        unset($contactIDs[$dao->contact_id]);
+      }
+    }
     if (!empty($contactIDs)) {
-      foreach ($contactIDs as $contactID) {
+      foreach ($contactIDs as $contactID => $value) {
         $valuesArray[] = " ( {$dashlet->id}, {$contactID} )";
       }
-
       $valuesString = implode(',', $valuesArray);
       $query = "
                   INSERT INTO civicrm_dashboard_contact ( dashboard_id, contact_id )

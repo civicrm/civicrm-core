@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -66,6 +66,7 @@ function _civicrm_api3_membership_type_create_spec(&$params) {
   $params['name']['api.required'] = 1;
   $params['duration_unit']['api.required'] = 1;
   $params['duration_interval']['api.required'] = 1;
+  $params['period_type']['api.required'] = 1;
   $params['is_active']['api.default'] = 1;
 }
 
@@ -109,7 +110,7 @@ function civicrm_api3_membership_type_get($params) {
  *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_membership_type_getlist_params(&$request) {
-  if (!isset($request['params']['is_active'])) {
+  if (!isset($request['params']['is_active']) && empty($request['params']['id'])) {
     $request['params']['is_active'] = 1;
   }
 }

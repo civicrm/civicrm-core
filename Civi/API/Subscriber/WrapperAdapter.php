@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -33,7 +33,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 /**
  * This is a wrapper for the legacy "API Wrapper" interface which allows
  * wrappers to run through the new kernel. It translates from dispatcher events
- * ('api.prepare', 'api.respond') to wrapper calls ('fromApiInput', 'toApiOutput').
+ * ('civi.api.prepare', 'civi.api.respond') to wrapper calls ('fromApiInput', 'toApiOutput').
  */
 class WrapperAdapter implements EventSubscriberInterface {
 

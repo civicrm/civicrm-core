@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -41,7 +41,7 @@ class CRM_Case_Form_Task_Print extends CRM_Case_Form_Task {
    * Build all the data structures needed to build the form.
    */
   public function preProcess() {
-    parent::preprocess();
+    parent::preProcess();
 
     // set print view, so that print templates are called
     $this->controller->setPrint(1);

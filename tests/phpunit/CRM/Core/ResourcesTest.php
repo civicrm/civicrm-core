@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -41,6 +41,14 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
    */
   protected $mapper;
 
+  /**
+   * @var string for testing cache buster generation
+   */
+  protected $cacheBusterString = 'xBkdk3';
+
+  protected $originalRequest;
+  protected $originalGet;
+
   public function setUp() {
     parent::setUp();
 
@@ -53,6 +61,17 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
     // Templates injected into regions should normally be file names, but for unit-testing it's handy to use "string:" notation
     require_once 'CRM/Core/Smarty/resources/String.php';
     civicrm_smarty_register_string_resource();
+
+    $this->originalRequest = $_REQUEST;
+    $this->originalGet = $_GET;
+  }
+
+  /**
+   * Restore globals so this test doesn't interfere with others.
+   */
+  public function tearDown() {
+    $_REQUEST = $this->originalRequest;
+    $_GET = $this->originalGet;
   }
 
   public function testAddScriptFile() {
@@ -299,6 +318,23 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
   }
 
   /**
+   * @dataProvider ajaxModeData
+   */
+  public function testIsAjaxMode($query, $result) {
+    $_REQUEST = $_GET = $query;
+    $this->assertEquals($result, CRM_Core_Resources::isAjaxMode());
+  }
+
+  public function ajaxModeData() {
+    return array(
+      array(array('q' => 'civicrm/ajax/foo'), TRUE),
+      array(array('q' => 'civicrm/test/page'), FALSE),
+      array(array('q' => 'civicrm/test/page', 'snippet' => 'json'), TRUE),
+      array(array('q' => 'civicrm/test/page', 'snippet' => 'foo'), FALSE),
+    );
+  }
+
+  /**
    * @param CRM_Utils_Cache_Interface $cache
    * @param string $cacheKey
    *
@@ -315,6 +351,38 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
     $c = new CRM_Extension_Container_Basic($basedir, 'http://ext-dir', $cache, $cacheKey);
     $mapper = new CRM_Extension_Mapper($c, NULL, NULL, '/pathto/civicrm', 'http://core-app');
     return array($basedir, $c, $mapper);
+  }
+
+  /**
+   * @param string $url
+   * @param string $expected
+   *
+   * @dataProvider urlForCacheCodeProvider
+   */
+  public function testAddingCacheCode($url, $expected) {
+    $resources = CRM_Core_Resources::singleton();
+    $resources->setCacheCode($this->cacheBusterString);
+    $this->assertEquals($expected, $resources->addCacheCode($url));
+  }
+
+  /**
+   * @return array
+   */
+  public function urlForCacheCodeProvider() {
+    return array(
+      array(
+        'http://www.civicrm.org',
+        'http://www.civicrm.org?r=' . $this->cacheBusterString,
+      ),
+      array(
+        'www.civicrm.org/custom.css?foo=bar',
+        'www.civicrm.org/custom.css?foo=bar&r=' . $this->cacheBusterString,
+      ),
+      array(
+        'civicrm.org/custom.css?car=blue&foo=bar',
+        'civicrm.org/custom.css?car=blue&foo=bar&r=' . $this->cacheBusterString,
+      ),
+    );
   }
 
 }
