@@ -1651,9 +1651,6 @@ SELECT id
 
       $config = CRM_Core_Config::singleton();
 
-      $fName = $value['name'];
-      $mimeType = $value['type'];
-
       // If we are already passing the file id as a value then retrieve and set the file data
       if (CRM_Utils_Rule::integer($value)) {
         $fileDAO = new CRM_Core_DAO_File();
@@ -1664,6 +1661,10 @@ SELECT id
           $fName = $fileDAO->uri;
           $mimeType = $fileDAO->mime_type;
         }
+      }
+      else {
+        $fName = $value['name'];
+        $mimeType = $value['type'];
       }
 
       $filename = pathinfo($fName, PATHINFO_BASENAME);

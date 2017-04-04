@@ -51,4 +51,26 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
     }
   }
 
+  public function fileExtensions() {
+    return array(
+      array('txt'),
+      array('danger'),
+    );
+  }
+
+  /**
+   * @dataProvider fileExtensions
+   * @param string $ext
+   */
+  public function testDuplicate($ext) {
+    $fileName = CRM_Utils_File::makeFileName('test' . rand(100, 999) . ".$ext");
+    CRM_Utils_File::createFakeFile('/tmp', 'test file content', $fileName);
+    $newFile = CRM_Utils_File::duplicate("/tmp/$fileName");
+    $this->assertNotEquals("/tmp/$fileName", $newFile);
+    $contents = file_get_contents($newFile);
+    $this->assertEquals('test file content', $contents);
+    unlink("/tmp/$fileName");
+    unlink($newFile);
+  }
+
 }
