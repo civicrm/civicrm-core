@@ -1347,9 +1347,8 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
     }
 
     $result = array();
-    list($name, $address) = CRM_Contact_BAO_Contact_Location::getEmailDetails($userID);
-
-    $receiptFrom = "$name <$address>";
+    // CRM-20308 get receiptFrom defaults see https://issues.civicrm.org/jira/browse/CRM-20308
+    $receiptFrom = self::getReceiptFrom($activityId);
 
     $recordedActivityParams = array();
 
@@ -3168,6 +3167,61 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
     }
     CRM_Utils_Hook::selectWhereClause($this, $clauses);
     return $clauses;
+  }
+
+  /**
+   * CRM-20308
+   * Method to get the contact id to use as from contact for email copy
+   * 1. Activity Added by Contact's email address
+   * 2. System Default From Address
+   * 3. Default Organization Contact email address
+   * 4. Logged in user
+   *
+   * @param int $activityId
+   * @return mixed $emailFromContactId
+   * @see https://issues.civicrm.org/jira/browse/CRM-20308
+   */
+  private static function getReceiptFrom($activityId) {
+    $emailFromContactId = NULL;
+    if (!empty($activityId)) {
+      try {
+        $emailFromContactId = civicrm_api3('ActivityContact', 'getvalue', array(
+          'activity_id' => $activityId,
+          'record_type_id' => 'Activity Source',
+          'return' => 'contact_id',
+        ));
+      }
+      catch (CiviCRM_API3_Exception $ex) {
+        // get default from address from domain
+        try {
+          $domain = civicrm_api3('Domain', 'getsingle', array('id' => CRM_Core_Config::domainID()));
+          if (isset($domain['from_email'])) {
+            $emailFromContactId = $domain['from_email'];
+          }
+        }
+        catch (CiviCRM_API3_Exception $ex) {
+        }
+        // if not found get email for contact_id 1
+        if (!$emailFromContactId) {
+          try {
+            $emailFromContactId = civicrm_api3('Email', 'getvalue', array(
+              'contact_id' => 1,
+              'return' => 'email',
+            ));
+          }
+          catch (CiviCRM_API3_Exception $ex) {
+          }
+        }
+      }
+
+    }
+    // if not found, use logged in user
+    if (!$emailFromContactId) {
+      $session = CRM_Core_Session::singleton();
+      $emailFromContactId = $session->get('userID');
+    }
+    list($name, $address) = CRM_Contact_BAO_Contact_Location::getEmailDetails($emailFromContactId);
+    return "$name <$address>";
   }
 
 }
