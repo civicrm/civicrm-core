@@ -171,4 +171,77 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
     $this->assertEquals(date('Ymd', strtotime($trxn['values'][$trxn['id']]['trxn_date'])), date('Ymd', strtotime("+1 month")));
   }
 
+  /**
+   * Test for updateCreditCardDetails().
+   */
+  public function testUpdateCreditCardDetailsUsingContributionAPI() {
+    $cid = $this->individualCreate();
+    $params = array(
+      'contact_id' => $cid,
+      'receive_date' => '2016-01-20',
+      'total_amount' => 100,
+      'financial_type_id' => 1,
+    );
+    $contribution = CRM_Contribute_BAO_Contribution::create($params);
+    $lastFinancialTrxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contribution->id, 'DESC');
+    $financialTrxn = $this->callAPISuccessGetSingle(
+      'FinancialTrxn',
+      array(
+        'id' => $lastFinancialTrxnId['financialTrxnId'],
+        'return' => array('card_type', 'pan_truncation'),
+      )
+    );
+    $this->assertEquals(CRM_Utils_Array::value('card_type', $financialTrxn), NULL);
+    $this->assertEquals(CRM_Utils_Array::value('pan_truncation', $financialTrxn), NULL);
+    $params = array(
+      'card_type' => 2,
+      'pan_truncation' => 4567,
+      'id' => $contribution->id,
+    );
+    $this->callAPISuccess("Contribution", "create", $params);
+    $financialTrxn = $this->callAPISuccessGetSingle(
+      'FinancialTrxn',
+      array(
+        'id' => $lastFinancialTrxnId['financialTrxnId'],
+        'return' => array('card_type', 'pan_truncation'),
+      )
+    );
+    $this->assertEquals($financialTrxn['card_type'], 2);
+    $this->assertEquals($financialTrxn['pan_truncation'], 4567);
+  }
+
+  /**
+   * Test for updateCreditCardDetails().
+   */
+  public function testUpdateCreditCardDetails() {
+    $cid = $this->individualCreate();
+    $params = array(
+      'contact_id' => $cid,
+      'receive_date' => '2016-01-20',
+      'total_amount' => 100,
+      'financial_type_id' => 1,
+    );
+    $contribution = CRM_Contribute_BAO_Contribution::create($params);
+    $lastFinancialTrxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contribution->id, 'DESC');
+    $financialTrxn = $this->callAPISuccessGetSingle(
+      'FinancialTrxn',
+      array(
+        'id' => $lastFinancialTrxnId['financialTrxnId'],
+        'return' => array('card_type', 'pan_truncation'),
+      )
+    );
+    $this->assertEquals(CRM_Utils_Array::value('card_type', $financialTrxn), NULL);
+    $this->assertEquals(CRM_Utils_Array::value('pan_truncation', $financialTrxn), NULL);
+    CRM_Core_BAO_FinancialTrxn::updateCreditCardDetails($contribution->id, 4567, 2);
+    $financialTrxn = $this->callAPISuccessGetSingle(
+      'FinancialTrxn',
+      array(
+        'id' => $lastFinancialTrxnId['financialTrxnId'],
+        'return' => array('card_type', 'pan_truncation'),
+      )
+    );
+    $this->assertEquals($financialTrxn['card_type'], 2);
+    $this->assertEquals($financialTrxn['pan_truncation'], 4567);
+  }
+
 }

@@ -696,4 +696,45 @@ WHERE ft.to_financial_account_id != {$toFinancialAccount} AND ft.to_financial_ac
     }
   }
 
+  /**
+   * Update Credit Card Details in civicrm_financial_trxn table.
+   *
+   * @param int $contributionID
+   * @param int $panTruncation
+   * @param int $cardType
+   *
+   */
+  public static function updateCreditCardDetails($contributionID, $panTruncation, $cardType) {
+    $financialTrxn = civicrm_api3('EntityFinancialTrxn', 'get', array(
+      'return' => array('financial_trxn_id.payment_processor_id', 'financial_trxn_id'),
+      'entity_table' => 'civicrm_contribution',
+      'entity_id' => $contributionID,
+      'financial_trxn_id.is_payment' => TRUE,
+      'options' => array('sort' => 'financial_trxn_id DESC', 'limit' => 1),
+    ));
+
+    // In case of Contribution status is Pending From Incomplete Transaction or Failed there is no Financial Entries created for Contribution.
+    // Above api will return 0 count, in such case we won't update card type and pan truncation field.
+    if (!$financialTrxn['count']) {
+      return NULL;
+    }
+
+    $financialTrxn = $financialTrxn['values'][$financialTrxn['id']];
+    $paymentProcessorID = CRM_Utils_Array::value('financial_trxn_id.payment_processor_id', $financialTrxn);
+
+    if ($paymentProcessorID) {
+      return NULL;
+    }
+
+    $financialTrxnId = $financialTrxn['financial_trxn_id'];
+    $trxnparams = array('id' => $financialTrxnId);
+    if (isset($cardType)) {
+      $trxnparams['card_type'] = $cardType;
+    }
+    if (isset($panTruncation)) {
+      $trxnparams['pan_truncation'] = $panTruncation;
+    }
+    civicrm_api3('FinancialTrxn', 'create', $trxnparams);
+  }
+
 }
