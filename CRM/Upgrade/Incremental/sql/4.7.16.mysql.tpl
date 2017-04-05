@@ -25,3 +25,4 @@ UPDATE civicrm_option_value SET icon = 'fa-users' WHERE option_group_id = @optio
 UPDATE `civicrm_dashboard`
   SET name = CONCAT('report/', SUBSTRING_INDEX(SUBSTRING_INDEX(url, '?', 1), '/', -1))
   WHERE name IS NULL AND url LIKE "civicrm/report/instance/%";
+

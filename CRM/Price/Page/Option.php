@@ -156,8 +156,8 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
         $taxAmount = CRM_Contribute_BAO_Contribution_Utils::calculateTaxAmount($customOption[$id]['amount'], $customOption[$id]['tax_rate']);
         $customOption[$id]['tax_amount'] = $taxAmount['tax_amount'];
       }
-      if (!empty($values['financial_type_id'])) {
-        $customOption[$id]['financial_type_id'] = CRM_Contribute_PseudoConstant::financialType($values['financial_type_id']);
+      if (!empty($values['financial_type_id']) && !empty($financialType[$values['financial_type_id']])) {
+        $customOption[$id]['financial_type_id'] = $financialType[$values['financial_type_id']];
       }
       // update enable/disable links depending on price_field properties.
       if ($this->_isSetReserved) {

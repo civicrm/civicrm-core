@@ -98,8 +98,10 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
         if (CRM_Utils_Array::value('visibility', $field) == 'public' ||
            (CRM_Utils_Array::value('visibility', $field) == 'admin' && $adminFieldVisible == TRUE)) {
           $field_name = "event_{$event->id}_price_{$field['id']}";
-          CRM_Price_BAO_PriceField::addQuickFormElement($this, $field_name, $field['id'], FALSE);
-          $price_fields_for_event[] = $field_name;
+          if (!empty($field['options'])) {
+            CRM_Price_BAO_PriceField::addQuickFormElement($this, $field_name, $field['id'], FALSE);
+            $price_fields_for_event[] = $field_name;
+          }
         }
       }
     }

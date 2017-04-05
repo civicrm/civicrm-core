@@ -132,7 +132,9 @@ class CRM_Price_Form_Preview extends CRM_Core_Form {
         foreach ($group['fields'] as $field) {
           $fieldId = $field['id'];
           $elementName = 'price_' . $fieldId;
-          CRM_Price_BAO_PriceField::addQuickFormElement($this, $elementName, $fieldId, FALSE, $field['is_required']);
+          if (!empty($field['options'])) {
+            CRM_Price_BAO_PriceField::addQuickFormElement($this, $elementName, $fieldId, FALSE, $field['is_required']);
+          }
         }
       }
     }

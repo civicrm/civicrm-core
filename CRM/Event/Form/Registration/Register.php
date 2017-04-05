@@ -593,17 +593,18 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
           if (!empty($optionFullIds) && (count($options) == count($optionFullIds))) {
             $isRequire = FALSE;
           }
-
-          //build the element.
-          CRM_Price_BAO_PriceField::addQuickFormElement($form,
-            $elementName,
-            $fieldId,
-            FALSE,
-            $isRequire,
-            NULL,
-            $options,
-            $optionFullIds
-          );
+          if (!empty($options)) {
+            //build the element.
+            CRM_Price_BAO_PriceField::addQuickFormElement($form,
+              $elementName,
+              $fieldId,
+              FALSE,
+              $isRequire,
+              NULL,
+              $options,
+              $optionFullIds
+            );
+          }
         }
       }
       $form->assign('priceSet', $form->_priceSet);
@@ -838,8 +839,8 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
 
     // @todo - can we remove the 'is_monetary' concept?
     if ($self->_values['event']['is_monetary']) {
-      if (empty($self->_requireApproval) && !empty($fields['amount']) && $fields['amount'] > 0 && !isset
-        ($fields['payment_processor_id'])) {
+      if (empty($self->_requireApproval) && !empty($fields['amount']) && $fields['amount'] > 0 &&
+        !isset($fields['payment_processor_id'])) {
         $errors['payment_processor_id'] = ts('Please select a Payment Method');
       }
 
