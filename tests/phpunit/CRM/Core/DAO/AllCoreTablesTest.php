@@ -35,6 +35,11 @@ class CRM_Core_DAO_AllCoreTablesTest extends CiviUnitTestCase {
     $this->assertTrue(is_array($exports['contact_id']));
   }
 
+  /**
+   * Implements hook_civicrm_entityTypes().
+   *
+   * @param array $entityTypes
+   */
   public function _hook_civicrm_entityTypes(&$entityTypes) {
     $entityTypes['CRM_Core_DAO_Email']['fields_callback'][] = function ($class, &$fields) {
       $fields['location_type_id']['foo'] = 'bar';

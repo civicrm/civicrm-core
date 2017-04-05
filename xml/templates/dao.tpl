@@ -166,6 +166,7 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
   'table_name' => '{$table.name}',
   'entity' => '{$table.entity}',
   'bao' => '{$table.bao}',
+  'localizable' => {if ($field.localizable)}{1}{else}{0}{/if},
 
 {if $field.FKClassName}
                       'FKClassName' => '{$field.FKClassName}',

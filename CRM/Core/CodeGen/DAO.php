@@ -109,6 +109,7 @@ class CRM_Core_CodeGen_DAO extends CRM_Core_CodeGen_BaseTask {
    */
   protected function getTableChecksum() {
     if (!$this->tableChecksum) {
+      $flat = array();
       CRM_Utils_Array::flatten($this->tables[$this->name], $flat);
       ksort($flat);
       $this->tableChecksum = md5(json_encode($flat));

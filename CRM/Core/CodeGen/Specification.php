@@ -248,7 +248,6 @@ class CRM_Core_CodeGen_Specification {
     if ($this->value('foreignKey', $tableXML)) {
       $foreign = array();
       foreach ($tableXML->foreignKey as $foreignXML) {
-        // print_r($foreignXML);
 
         if ($this->value('drop', $foreignXML, 0) > 0 and $this->value('drop', $foreignXML, 0) <= $this->buildVersion) {
           continue;
@@ -282,7 +281,7 @@ class CRM_Core_CodeGen_Specification {
    */
   public function getField(&$fieldXML, &$fields) {
     $name = trim((string ) $fieldXML->name);
-    $field = array('name' => $name, 'localizable' => $fieldXML->localizable);
+    $field = array('name' => $name, 'localizable' => ((bool) $fieldXML->localizable) ? 1 : 0);
     $type = (string ) $fieldXML->type;
     switch ($type) {
       case 'varchar':
@@ -553,9 +552,6 @@ class CRM_Core_CodeGen_Specification {
     if ($this->value('unique', $indexXML)) {
       $index['unique'] = TRUE;
     }
-
-    //echo "\$index = \n";
-    //print_r($index);
 
     // field array cannot be empty
     if (empty($index['field'])) {
