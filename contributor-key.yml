@@ -97,6 +97,11 @@
   name        : Davi Alexandre
   jira        : davialexandre
 
+- github      : davidjosephhayes
+  name        : David Hayes
+  organization: Black Brick Software
+  jira        : Dahndy
+
 - github      : davisagli
   name        : David Glick
   organization: Glick Software
@@ -139,11 +144,24 @@
   organization: Spry Digital
   jira        : ehendricks
 
+- github      : ergonlogic
+  name        : Christopher Gervais
+  organization: Ergon Logic Enterprises
+  jira        : ergonlogic
+
 - github      : ErichBSchulz
   name        : Erich Schulz
 
 - name        : Fedor Khodkov
   jira        : fkhodkov
+
+- name        : Fernando Rodríguez
+  organization: Amnistía Internacional España
+  jira        : Fernando
+
+- github      : fliespl
+  name        : Arkadiusz Rzadkowolski
+  jira        : flies
 
 - github      : francescbassas
   name        : Francesc Bassas i Bullich
@@ -184,6 +202,10 @@
   name        : Herb van den Dool
   organization: Freeform Solutions
 
+- name        : Hershel Robinson
+  organization: CiviHosting
+  jira        : hershel
+
 - github      : hoegrammer
   name        : Naomi Rosenberg
   jira        : naomi
@@ -211,12 +233,21 @@
   organization: CompuCorp
   jira        : jamienovick
 
+- github      : jboeke
+  name        : Jonathan Boeke
+  organization: Avietech
+  jira        : jboeke
+
 - github      : jernic
   name        : jernic
 
+- github      : jeromelebleu
+  name        : Jérôme Lebleu
+  jira        : jlebleu
+
 - github      : jitendrapurohit
   name        : Jitendra Purohit
-  organization: CiviCRM
+  organization: Fuzion
   jira        : jitendra.purohit
 
 - github      : jmcclelland
@@ -283,7 +314,8 @@
 
 - github      : kurund
   name        : Kurund Jalmi
-  organization: CiviCRM
+  organization: Web Access
+  jira        : kurund
 
 - github      : lcdservices
   name        : Brian Shaughnessy
@@ -311,6 +343,10 @@
   name        : Richard van Oosterhout
   jira        : magnolia61
 
+- name        : Martin Castle
+  organization: Circle Interactive
+  jira        : marshCircle
+
 - name        : Matt Allard
   organization: City of Winnipeg, Manitoba
   jira        : mattallard
@@ -324,6 +360,10 @@
   name        : Andrew McNaughton
   jira        : mc0e
 
+- name        : Maureen Parks
+  organization: Minnesota Association of Veterinary Technicians
+  jira        : membership
+
 - github      : michaelmcandrew
   name        : Michael McAndrew
   organization: Third Sector Design
@@ -333,9 +373,18 @@
   name        : Mike Kondrashin
   organization: CompuCorp
 
+- github      : mickadoo
+  name        : Michael Devery
+  organization: CompuCorp
+  jira        : michael
+
 - github      : MiltoxBeyond
   name        : Milton Zurita
   jira        : MiltoxB
+
+- name        : Mirela Stanila
+  organization: CompuCorp
+  jira        : mirela
 
 - github      : MiyaNoctem
   name        : Camilo Rodriguez
@@ -351,7 +400,7 @@
 
 - github      : monishdeb
   name        : Monish Deb
-  organization: CiviCRM
+  organization: JMA Consulting
   jira        : monish.deb
 
 - github      : nganivet
@@ -362,6 +411,10 @@
 - name        : Noah Miller
   jira        : noah
 
+- github      : nowszy
+  name        : Pawel Nowak
+  jira        : pnowak
+
 - github      : ogomez78
   name        : Osvaldo Gomez
   organization: Upleaf
@@ -371,6 +424,10 @@
   name        : Omar Abu Hussein
   organization: CompuCorp
   jira        : omarabuhussein
+
+- github      : onlyjob
+  name        : Dmitry Smirnov
+  jira        : onlyjob
 
 - jira        : oskylark
   name        : Owen Pearson
@@ -409,6 +466,10 @@
   organization: CiviCRM
   jira        : rohan1990
 
+- github      : rthouvenin
+  name        : Romain Thouvenin
+  jira        : romain
+
 - github      : rubofvil
   name        : Rubén Pineda
   organization: iXiam
@@ -417,12 +478,16 @@
   name        : Samuel Vanhove
   organization: Coop SymbioTIC
 
+- name        : Stuart Parker
+  jira        : saparker
+
 - github      : saurabhbatra96
   name        : Saurabh Batra
 
 - github      : scardinius
   name        : Tomasz Pietrzkowski
   organization: We Move Europe/Caltha
+  jira        : scardinius
 
 - github      : seamuslee001
   name        : Seamus Lee
@@ -523,6 +588,10 @@
   organization: iXiam
   jira        : VangelisP
 
+- github      : VasanthaKaje
+  name        : Vasantha Kaje
+  jira        : VasanthaKaje
+
 - github      : vedantrathore
   name        : Vedant Rathore
 
@@ -530,6 +599,9 @@
   name        : Véronique Gratioulet
   organization: ATD Fourth World
   jira        : vgratioulet
+
+- github      : vikaskumar14786
+  name        : Vikas Kumar
 
 - name        : William Gordon
   organization: British Humanist Association
@@ -547,5 +619,5 @@
 
 - github      : yashodha
   name        : Yashodha Chaku
-  organization: CiviCRM
+  organization: CiviDesk
   jira        : yashodha
