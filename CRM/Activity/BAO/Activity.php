@@ -730,15 +730,15 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       $activityParams['activity_type_id'] = array('IN' => array_keys($activityTypes));
     }
 
+    $excludeActivityIDs = array();
     if (!empty($params['activity_type_exclude_id'])) {
       if (is_array($params['activity_type_exclude_id'])) {
         foreach ($params['activity_type_exclude_id'] as $idx => $value) {
-          $params['activity_type_exclude_id'][$idx] = CRM_Utils_Type::escape($value, 'Positive');
+          $excludeActivityIDs[$idx] = CRM_Utils_Type::escape($value, 'Positive');
         }
-        $activityParams['activity_type_id'] = array('NOT IN' => $params['activity_type_exclude_id']);
       }
       else {
-        $activityParams['activity_type_id'] = array('!=' => CRM_Utils_Type::escape($params['activity_type_exclude_id'], 'Positive'));
+        $excludeActivityIDs[] = CRM_Utils_Type::escape($params['activity_type_exclude_id'], 'Positive');
       }
     }
 
@@ -746,6 +746,10 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       $params['rowCount'] > 0
     ) {
       $activityParams['options']['limit'] = $params['rowCount'];
+    }
+    // set limit = 0 if we need to fetch the activity count
+    elseif ($getCount) {
+      $activityParams['options']['limit'] = 0;
     }
 
     if (!empty($params['sort'])) {
@@ -797,8 +801,10 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
     );
 
     foreach ($result['values'] as $id => $activity) {
-      // skip case activities if CiviCase is not enabled
-      if (!empty($activity['case_id']) && !in_array('CiviCase', $enabledComponents)) {
+      // skip case activities if CiviCase is not enabled OR those actvities which are
+      if ((!empty($activity['case_id']) && !in_array('CiviCase', $enabledComponents)) ||
+       (count($excludeActivityIDs) && in_array($activity['activity_type_id'], $excludeActivityIDs))
+      ) {
         continue;
       }
 
