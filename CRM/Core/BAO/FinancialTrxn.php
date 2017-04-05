@@ -713,6 +713,8 @@ WHERE ft.to_financial_account_id != {$toFinancialAccount} AND ft.to_financial_ac
       'options' => array('sort' => 'financial_trxn_id DESC', 'limit' => 1),
     ));
 
+    // In case of Contribution status is Pending From Incomplete Transaction or Failed there is no Financial Entries created for Contribution.
+    // Above api will return 0 count, in such case we won't update card type and pan truncation field.
     if (!$financialTrxn['count']) {
       return NULL;
     }
