@@ -342,4 +342,11 @@ class CRM_SMS_DAO_Provider extends CRM_Core_DAO {
     $r = CRM_Core_DAO_AllCoreTables::getExports(__CLASS__, 'sms_provider', $prefix, array());
     return $r;
   }
+  /**
+   * Returns the list of indices
+   */
+  public static function indices($localize = TRUE) {
+    $indices = array();
+    return ($localize && !empty($indices)) ? CRM_Core_DAO_AllCoreTables::multilingualize(__CLASS__, $indices) : $indices;
+  }
 }
