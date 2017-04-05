@@ -171,4 +171,44 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
     $this->assertEquals(date('Ymd', strtotime($trxn['values'][$trxn['id']]['trxn_date'])), date('Ymd', strtotime("+1 month")));
   }
 
+  /**
+   * Test for getCreditCardDetails().
+   */
+  public function testGetCreditCardDetails() {
+    $cid = $this->individualCreate();
+    $params = array(
+      'contact_id' => $cid,
+      'receive_date' => '2016-01-20',
+      'total_amount' => 100,
+      'financial_type_id' => 1,
+    );
+    $contribution = CRM_Contribute_BAO_Contribution::create($params);
+
+    $params = array(
+      'contribution_id' => $contribution->id,
+      'to_financial_account_id' => 1,
+      'trxn_date' => 20091021184930,
+      'trxn_type' => 'Debit',
+      'total_amount' => 10,
+      'net_amount' => 90.00,
+      'currency' => 'USD',
+      'is_payment' => 1,
+      'payment_processor' => 'Dummy',
+      'trxn_id' => 'test_01014000',
+      'card_type' => 1,
+      'pan_truncation' => '4356',
+    );
+    $FinancialTrxn = CRM_Core_BAO_FinancialTrxn::create($params);
+
+    $creditCardDetails = CRM_Core_BAO_FinancialTrxn::getCreditCardDetails($contribution->id);
+    $expectedResult = array(
+      'credit_card_type' => 1,
+      'credit_card_number' => '**** **** **** 4356',
+    );
+    $this->checkArrayEquals($creditCardDetails, $expectedResult);
+    $creditCardDetails = CRM_Core_BAO_FinancialTrxn::getCreditCardDetails($contribution->id, FALSE);
+    $expectedResult['credit_card_number'] = 4356;
+    $this->checkArrayEquals($creditCardDetails, $expectedResult);
+  }
+
 }
