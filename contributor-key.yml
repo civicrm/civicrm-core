@@ -317,6 +317,8 @@
 
 - github      : mattwire
   name        : Matthew Wire
+  organization: MJW Consulting
+  jira        : mattwire
 
 - github      : mc0e
   name        : Andrew McNaughton
