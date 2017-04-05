@@ -33,6 +33,14 @@
  *
  */
 class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
+
+  /**
+   * Static field to hold financial trxn data.
+   *
+   * @var array
+   */
+  static $_financialTrxnData = array();
+
   /**
    * Class constructor.
    *
@@ -694,6 +702,38 @@ WHERE ft.to_financial_account_id != {$toFinancialAccount} AND ft.to_financial_ac
         }
       }
     }
+  }
+
+  /**
+   * Check if financial trxn is via payment processor.
+   *
+   * @param int $contributionID
+   *   Contribution ID
+   *
+   * @param string $returnField
+   *
+   * @return int
+   */
+  public static function hasPaymentProcessorTrxn($contributionID, $returnField = 'payment_processor_id') {
+    if (empty(self::$_financialTrxnData[$contributionID])) {
+      $sql = "SELECT payment_processor_id, financial_trxn_id FROM civicrm_financial_trxn cft
+        INNER JOIN civicrm_entity_financial_trxn ceft ON ceft.financial_trxn_id = cft.id
+      WHERE ceft.entity_table = 'civicrm_contribution'
+        AND ceft.entity_id = %1
+        AND cft.is_payment = 1 ORDER BY cft.id DESC LIMIT 1";
+      $mysqlParams = array(1 => array($contributionID, 'Integer'));
+      $result = CRM_Core_DAO::executeQuery($sql, $mysqlParams);
+      if ($result->fetch()) {
+        self::$_financialTrxnData[$contributionID] = array(
+          'payment_processor_id' => $result->payment_processor_id,
+          'financial_trxn_id' => $result->financial_trxn_id,
+        );
+      }
+      else {
+        return NULL;
+      }
+    }
+    return self::$_financialTrxnData[$contributionID][$returnField];
   }
 
 }

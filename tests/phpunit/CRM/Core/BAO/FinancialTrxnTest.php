@@ -171,4 +171,25 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
     $this->assertEquals(date('Ymd', strtotime($trxn['values'][$trxn['id']]['trxn_date'])), date('Ymd', strtotime("+1 month")));
   }
 
+  /**
+   * Test for hasPaymentProcessorTrxn().
+   */
+  public function testHasPaymentProcessorTrxn() {
+    $cid = $this->individualCreate();
+    $paymentProcessorID = $this->processorCreate();
+    $params = array(
+      'contact_id' => $cid,
+      'receive_date' => '2016-01-20',
+      'total_amount' => 100,
+      'financial_type_id' => 1,
+    );
+    $contribution = CRM_Contribute_BAO_Contribution::create($params);
+    $paymentProcessorId = CRM_Core_BAO_FinancialTrxn::hasPaymentProcessorTrxn($contribution->id);
+    $this->assertEquals($paymentProcessorId, NULL);
+    $params['payment_processor'] = $paymentProcessorID;
+    $contribution = CRM_Contribute_BAO_Contribution::create($params);
+    $paymentProcessorId = CRM_Core_BAO_FinancialTrxn::hasPaymentProcessorTrxn($contribution->id);
+    $this->assertEquals($paymentProcessorId, $paymentProcessorID);
+  }
+
 }
