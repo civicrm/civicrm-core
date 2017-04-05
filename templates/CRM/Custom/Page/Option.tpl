@@ -105,7 +105,8 @@
                 return nRow;
               },
               "fnDrawCallback": function() {
-                $(this).trigger('crmLoad');
+                // FIXME: trigger crmLoad and crmEditable would happen automatically
+                $('.crm-editable').crmEditable();
               },
 
               "fnServerData": function ( sSource, aoData, fnCallback ) {

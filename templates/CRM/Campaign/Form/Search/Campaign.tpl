@@ -214,7 +214,8 @@
       "oLanguage": {"sEmptyTable": noRecordFoundMsg,
         "sZeroRecords": noRecordFoundMsg },
       "fnDrawCallback": function () {
-        $(this).trigger('crmLoad');
+        // FIXME: trigger crmLoad and crmEditable would happen automatically
+        $('.crm-editable').crmEditable();
       },
       "fnRowCallback": function (nRow, aData, iDisplayIndex) {
         //insert the id for each row for enable/disable.

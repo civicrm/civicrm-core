@@ -56,9 +56,6 @@ function smarty_function_crmStyle($params, &$smarty) {
   if (empty($params['region'])) {
     $params['region'] = CRM_Core_Resources::DEFAULT_REGION;
   }
-  if (empty($params['ext'])) {
-    $params['ext'] = 'civicrm';
-  }
 
   if (array_key_exists('file', $params)) {
     $res->addStyleFile($params['ext'], $params['file'], $params['weight'], $params['region']);

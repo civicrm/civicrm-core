@@ -106,7 +106,7 @@ class CRM_Admin_Form_Navigation extends CRM_Admin_Form {
    * @return array
    */
   public function setDefaultValues() {
-    $defaults = parent::setDefaultValues();
+    $defaults = $this->_defaults;
     if (isset($this->_id)) {
       //Take parent id in object variable to calculate the menu
       //weight if menu parent id changed

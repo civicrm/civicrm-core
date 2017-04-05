@@ -198,7 +198,8 @@ function loadPetitionList( )
              "oLanguage":{"sEmptyTable"  : noRecordFoundMsg,
                  "sZeroRecords" : noRecordFoundMsg },
              "fnDrawCallback": function() {
-               $(this).trigger('crmLoad');
+               // FIXME: trigger crmLoad and crmEditable would happen automatically
+               CRM.$('.crm-editable').crmEditable();
              },
              "fnRowCallback": function( nRow, aData, iDisplayIndex ) {
 

@@ -149,7 +149,8 @@ CRM.$(function($) {
         return nRow;
       },
       "fnDrawCallback": function(oSettings) {
-        $(this).trigger('crmLoad');
+        // FIXME: trigger crmLoad and crmEditable would happen automatically
+        $('.crm-editable', '#crm-batch-selector-{/literal}{$batchStatus}{literal}').crmEditable();
         $("#toggleSelect").prop('checked', false);
         if (checkedRows.length) {
           $(checkedRows.join(',')).prop('checked', true).change();
