@@ -271,7 +271,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test getActivitiesCount BAO method.
+   * Test getActivities BAO method for getting count.
    */
   public function testGetActivitiesCountforAdminDashboard() {
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
@@ -291,7 +291,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       'rowCount' => 0,
       'sort' => NULL,
     );
-    $activityCount = CRM_Activity_BAO_Activity::getActivitiesCount($params);
+    $activityCount = CRM_Activity_BAO_Activity::getActivities($params, TRUE);
 
     //since we are loading activities from dataset, we know total number of activities
     // 8 schedule activities that should be shown on dashboard
@@ -300,7 +300,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test getActivitiesCount BAO method.
+   * Test getActivities BAO method for getting count
    */
   public function testGetActivitiesCountforNonAdminDashboard() {
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
@@ -321,7 +321,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       'sort' => NULL,
     );
 
-    $activityCount = CRM_Activity_BAO_Activity::getActivitiesCount($params);
+    $activityCount = CRM_Activity_BAO_Activity::getActivities($params, TRUE);
 
     //since we are loading activities from dataset, we know total number of activities for this contact
     // 5 activities ( 2 scheduled, 3 Completed ), note that dashboard shows only scheduled activities
@@ -330,7 +330,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test getActivitiesCount BAO method.
+   * Test getActivities BAO method for getting count
    */
   public function testGetActivitiesCountforContactSummary() {
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
@@ -350,7 +350,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       'rowCount' => 0,
       'sort' => NULL,
     );
-    $activityCount = CRM_Activity_BAO_Activity::getActivitiesCount($params);
+    $activityCount = CRM_Activity_BAO_Activity::getActivities($params, TRUE);
 
     //since we are loading activities from dataset, we know total number of activities for this contact
     // 5 activities, Contact Summary should show all activities
@@ -394,7 +394,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test getActivitiesCount BAO method.
+   * Test getActivities BAO method for getting count
    */
   public function testGetActivitiesCountforContactSummaryWithNoActivities() {
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
@@ -414,7 +414,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       'rowCount' => 0,
       'sort' => NULL,
     );
-    $activityCount = CRM_Activity_BAO_Activity::getActivitiesCount($params);
+    $activityCount = CRM_Activity_BAO_Activity::getActivities($params, TRUE);
 
     //since we are loading activities from dataset, we know total number of activities for this contact
     // this contact does not have any activity
@@ -433,7 +433,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     );
 
     $params = array(
-      'contact_id' => 5,
+      'contact_id' => NULL,
       'admin' => TRUE,
       'caseId' => NULL,
       'context' => 'home',
@@ -445,7 +445,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     $activities = CRM_Activity_BAO_Activity::getActivities($params);
 
     //since we are loading activities from dataset, we know total number of activities
-    // 8 schedule activities that should be shown on dashboard
+    // with no contact ID and there should be 8 schedule activities shown on dashboard
     $count = 8;
     $this->assertEquals($count, count($activities));
 
@@ -583,7 +583,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   /**
    * Test getActivities BAO method.
    */
-  public function testGetActivitiesforContactSummaryWithNoActivities() {
+  public function testGetActivitiesforContactSummaryWithActivities() {
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
     $op->execute($this->_dbconn,
       $this->createFlatXMLDataSet(
@@ -591,21 +591,116 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       )
     );
 
-    $params = array(
-      'contact_id' => 17,
-      'admin' => FALSE,
-      'caseId' => NULL,
-      'context' => 'home',
-      'activity_type_id' => NULL,
-      'offset' => 0,
-      'rowCount' => 0,
-      'sort' => NULL,
+    // parameters for different test casess, check each array key for the specific test-case
+    $testCases = array(
+      'with-no-activity' => array(
+        'params' => array(
+          'contact_id' => 17,
+          'admin' => FALSE,
+          'caseId' => NULL,
+          'context' => 'home',
+          'activity_type_id' => NULL,
+          'offset' => 0,
+          'rowCount' => 0,
+          'sort' => NULL,
+        ),
+      ),
+      'with-activity' => array(
+        'params' => array(
+          'contact_id' => 1,
+          'admin' => FALSE,
+          'caseId' => NULL,
+          'context' => 'home',
+          'activity_type_id' => NULL,
+          'offset' => 0,
+          'rowCount' => 0,
+          'sort' => NULL,
+        ),
+      ),
+      'with-activity_type' => array(
+        'params' => array(
+          'contact_id' => 3,
+          'admin' => FALSE,
+          'caseId' => NULL,
+          'context' => 'home',
+          'activity_type_id' => 2,
+          'offset' => 0,
+          'rowCount' => 0,
+          'sort' => NULL,
+        ),
+      ),
+      'exclude-all-activity_type' => array(
+        'params' => array(
+          'contact_id' => 3,
+          'admin' => FALSE,
+          'caseId' => NULL,
+          'context' => 'home',
+          'activity_type_exclude_id' => array(1, 2),
+          'offset' => 0,
+          'rowCount' => 0,
+          'sort' => NULL,
+        ),
+      ),
+      'sort-by-subject' => array(
+        'params' => array(
+          'contact_id' => 1,
+          'admin' => FALSE,
+          'caseId' => NULL,
+          'context' => 'home',
+          'activity_type_id' => NULL,
+          'offset' => 0,
+          'rowCount' => 0,
+          'sort' => 'subject DESC',
+        ),
+      ),
     );
-    $activities = CRM_Activity_BAO_Activity::getActivities($params);
 
-    //since we are loading activities from dataset, we know total number of activities for this contact
-    // This contact does not have any activities
-    $this->assertEquals(0, count($activities));
+    foreach ($testCases as $caseName => $testCase) {
+      $activities = CRM_Activity_BAO_Activity::getActivities($testCase['params']);
+      $activityCount = CRM_Activity_BAO_Activity::getActivities($testCase['params'], TRUE);
+      if ($caseName == 'with-no-activity') {
+        $this->assertEquals(0, count($activities));
+        $this->assertEquals(0, $activityCount);
+      }
+      elseif ($caseName == 'with-activity') {
+        // contact id 1 is assigned as source, target and assignee for activity id 1, 7 and 8 respectively
+        $this->assertEquals(3, count($activities));
+        $this->assertEquals(3, $activityCount);
+        $this->assertEquals(1, $activities[1]['source_contact_id']);
+        $this->assertEquals(TRUE, array_key_exists(1, $activities[7]['target_contact_name']));
+        $this->assertEquals(TRUE, array_key_exists(1, $activities[8]['assignee_contact_name']));
+      }
+      elseif ($caseName == 'with-activity_type') {
+        // contact id 3 for activity type 2 is assigned as assignee, source and target for
+        // activity id 1, 3 and 8 respectively
+        $this->assertEquals(3, count($activities));
+        $this->assertEquals(3, $activityCount);
+        // ensure activity type id is 2
+        $this->assertEquals(2, $activities[1]['activity_type_id']);
+        $this->assertEquals(3, $activities[3]['source_contact_id']);
+        $this->assertEquals(TRUE, array_key_exists(3, $activities[8]['target_contact_name']));
+        $this->assertEquals(TRUE, array_key_exists(3, $activities[1]['assignee_contact_name']));
+      }
+      if ($caseName == 'exclude-all-activity_type') {
+        $this->assertEquals(0, count($activities));
+        $this->assertEquals(0, $activityCount);
+      }
+      if ($caseName == 'sort-by-subject') {
+        $this->assertEquals(3, count($activities));
+        $this->assertEquals(3, $activityCount);
+        // activities should be order by 'subject DESC'
+        $subjectOrder = array(
+          'subject 8',
+          'subject 7',
+          'subject 1',
+        );
+        $count = 0;
+        foreach ($activities as $activity) {
+          $this->assertEquals($subjectOrder[$count], $activity['subject']);
+          $count++;
+        }
+      }
+    }
   }
 
 }
