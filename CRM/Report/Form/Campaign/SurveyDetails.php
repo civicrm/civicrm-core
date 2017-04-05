@@ -748,7 +748,7 @@ INNER  JOIN  civicrm_custom_field cf ON ( cg.id = cf.custom_group_id )
       WHERE  cf.id IN ( ' . implode(' , ', $responseFieldIds) .
       ' )  ORDER BY cf.weight';
     $response = CRM_Core_DAO::executeQuery($query);
-    $fildCnt = 1;
+    $fieldCnt = 1;
     while ($response->fetch()) {
       $resTable = $response->table_name;
       $fieldName = "custom_{$response->cfId}";
@@ -770,8 +770,8 @@ INNER  JOIN  civicrm_custom_field cf ON ( cg.id = cf.custom_group_id )
         'print',
         'pdf',
       ))) {
-        $this->_columnTitleOverrides["{$resTable}_{$fieldName}"] = 'Q' . $fildCnt;
-        $fildCnt++;
+        $this->_columnTitleOverrides["{$resTable}_{$fieldName}"] = 'Q' . $fieldCnt;
+        $fieldCnt++;
       }
 
       if (array_key_exists($fieldName, $this->_columns[$resTable]['fields'])) {
