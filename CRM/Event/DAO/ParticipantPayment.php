@@ -107,6 +107,7 @@ class CRM_Event_DAO_ParticipantPayment extends CRM_Core_DAO {
           'table_name' => 'civicrm_participant_payment',
           'entity' => 'ParticipantPayment',
           'bao' => 'CRM_Event_BAO_ParticipantPayment',
+          'localizable' => 0,
         ) ,
         'participant_id' => array(
           'name' => 'participant_id',
@@ -117,6 +118,7 @@ class CRM_Event_DAO_ParticipantPayment extends CRM_Core_DAO {
           'table_name' => 'civicrm_participant_payment',
           'entity' => 'ParticipantPayment',
           'bao' => 'CRM_Event_BAO_ParticipantPayment',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Event_DAO_Participant',
         ) ,
         'contribution_id' => array(
@@ -128,6 +130,7 @@ class CRM_Event_DAO_ParticipantPayment extends CRM_Core_DAO {
           'table_name' => 'civicrm_participant_payment',
           'entity' => 'ParticipantPayment',
           'bao' => 'CRM_Event_BAO_ParticipantPayment',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Contribute_DAO_Contribution',
         ) ,
       );

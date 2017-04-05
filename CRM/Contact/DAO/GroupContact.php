@@ -127,6 +127,7 @@ class CRM_Contact_DAO_GroupContact extends CRM_Core_DAO {
           'table_name' => 'civicrm_group_contact',
           'entity' => 'GroupContact',
           'bao' => 'CRM_Contact_BAO_GroupContact',
+          'localizable' => 0,
         ) ,
         'group_id' => array(
           'name' => 'group_id',
@@ -137,6 +138,7 @@ class CRM_Contact_DAO_GroupContact extends CRM_Core_DAO {
           'table_name' => 'civicrm_group_contact',
           'entity' => 'GroupContact',
           'bao' => 'CRM_Contact_BAO_GroupContact',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Contact_DAO_Group',
           'html' => array(
             'type' => 'Select',
@@ -156,6 +158,7 @@ class CRM_Contact_DAO_GroupContact extends CRM_Core_DAO {
           'table_name' => 'civicrm_group_contact',
           'entity' => 'GroupContact',
           'bao' => 'CRM_Contact_BAO_GroupContact',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Contact_DAO_Contact',
         ) ,
         'status' => array(
@@ -168,6 +171,7 @@ class CRM_Contact_DAO_GroupContact extends CRM_Core_DAO {
           'table_name' => 'civicrm_group_contact',
           'entity' => 'GroupContact',
           'bao' => 'CRM_Contact_BAO_GroupContact',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -183,6 +187,7 @@ class CRM_Contact_DAO_GroupContact extends CRM_Core_DAO {
           'table_name' => 'civicrm_group_contact',
           'entity' => 'GroupContact',
           'bao' => 'CRM_Contact_BAO_GroupContact',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Core_DAO_LocBlock',
         ) ,
         'email_id' => array(
@@ -193,6 +198,7 @@ class CRM_Contact_DAO_GroupContact extends CRM_Core_DAO {
           'table_name' => 'civicrm_group_contact',
           'entity' => 'GroupContact',
           'bao' => 'CRM_Contact_BAO_GroupContact',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Core_DAO_Email',
         ) ,
       );

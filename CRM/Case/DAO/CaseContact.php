@@ -107,6 +107,7 @@ class CRM_Case_DAO_CaseContact extends CRM_Core_DAO {
           'table_name' => 'civicrm_case_contact',
           'entity' => 'CaseContact',
           'bao' => 'CRM_Case_BAO_CaseContact',
+          'localizable' => 0,
         ) ,
         'case_id' => array(
           'name' => 'case_id',
@@ -117,6 +118,7 @@ class CRM_Case_DAO_CaseContact extends CRM_Core_DAO {
           'table_name' => 'civicrm_case_contact',
           'entity' => 'CaseContact',
           'bao' => 'CRM_Case_BAO_CaseContact',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Case_DAO_Case',
         ) ,
         'contact_id' => array(
@@ -128,6 +130,7 @@ class CRM_Case_DAO_CaseContact extends CRM_Core_DAO {
           'table_name' => 'civicrm_case_contact',
           'entity' => 'CaseContact',
           'bao' => 'CRM_Case_BAO_CaseContact',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Contact_DAO_Contact',
           'html' => array(
             'type' => 'EntityRef',

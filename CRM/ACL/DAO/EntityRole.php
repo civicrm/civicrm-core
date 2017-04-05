@@ -118,6 +118,7 @@ class CRM_ACL_DAO_EntityRole extends CRM_Core_DAO {
           'table_name' => 'civicrm_acl_entity_role',
           'entity' => 'EntityRole',
           'bao' => 'CRM_ACL_BAO_EntityRole',
+          'localizable' => 0,
         ) ,
         'acl_role_id' => array(
           'name' => 'acl_role_id',
@@ -128,6 +129,7 @@ class CRM_ACL_DAO_EntityRole extends CRM_Core_DAO {
           'table_name' => 'civicrm_acl_entity_role',
           'entity' => 'EntityRole',
           'bao' => 'CRM_ACL_BAO_EntityRole',
+          'localizable' => 0,
         ) ,
         'entity_table' => array(
           'name' => 'entity_table',
@@ -140,6 +142,7 @@ class CRM_ACL_DAO_EntityRole extends CRM_Core_DAO {
           'table_name' => 'civicrm_acl_entity_role',
           'entity' => 'EntityRole',
           'bao' => 'CRM_ACL_BAO_EntityRole',
+          'localizable' => 0,
         ) ,
         'entity_id' => array(
           'name' => 'entity_id',
@@ -150,6 +153,7 @@ class CRM_ACL_DAO_EntityRole extends CRM_Core_DAO {
           'table_name' => 'civicrm_acl_entity_role',
           'entity' => 'EntityRole',
           'bao' => 'CRM_ACL_BAO_EntityRole',
+          'localizable' => 0,
         ) ,
         'is_active' => array(
           'name' => 'is_active',
@@ -159,6 +163,7 @@ class CRM_ACL_DAO_EntityRole extends CRM_Core_DAO {
           'table_name' => 'civicrm_acl_entity_role',
           'entity' => 'EntityRole',
           'bao' => 'CRM_ACL_BAO_EntityRole',
+          'localizable' => 0,
         ) ,
       );
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);

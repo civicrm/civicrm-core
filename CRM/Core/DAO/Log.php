@@ -125,6 +125,7 @@ class CRM_Core_DAO_Log extends CRM_Core_DAO {
           'table_name' => 'civicrm_log',
           'entity' => 'Log',
           'bao' => 'CRM_Core_BAO_Log',
+          'localizable' => 0,
         ) ,
         'entity_table' => array(
           'name' => 'entity_table',
@@ -137,6 +138,7 @@ class CRM_Core_DAO_Log extends CRM_Core_DAO {
           'table_name' => 'civicrm_log',
           'entity' => 'Log',
           'bao' => 'CRM_Core_BAO_Log',
+          'localizable' => 0,
         ) ,
         'entity_id' => array(
           'name' => 'entity_id',
@@ -147,6 +149,7 @@ class CRM_Core_DAO_Log extends CRM_Core_DAO {
           'table_name' => 'civicrm_log',
           'entity' => 'Log',
           'bao' => 'CRM_Core_BAO_Log',
+          'localizable' => 0,
         ) ,
         'data' => array(
           'name' => 'data',
@@ -156,6 +159,7 @@ class CRM_Core_DAO_Log extends CRM_Core_DAO {
           'table_name' => 'civicrm_log',
           'entity' => 'Log',
           'bao' => 'CRM_Core_BAO_Log',
+          'localizable' => 0,
         ) ,
         'modified_id' => array(
           'name' => 'modified_id',
@@ -165,6 +169,7 @@ class CRM_Core_DAO_Log extends CRM_Core_DAO {
           'table_name' => 'civicrm_log',
           'entity' => 'Log',
           'bao' => 'CRM_Core_BAO_Log',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Contact_DAO_Contact',
         ) ,
         'modified_date' => array(
@@ -175,6 +180,7 @@ class CRM_Core_DAO_Log extends CRM_Core_DAO {
           'table_name' => 'civicrm_log',
           'entity' => 'Log',
           'bao' => 'CRM_Core_BAO_Log',
+          'localizable' => 0,
         ) ,
       );
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);

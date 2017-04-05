@@ -140,6 +140,7 @@ class CRM_Cxn_DAO_Cxn extends CRM_Core_DAO {
           'table_name' => 'civicrm_cxn',
           'entity' => 'Cxn',
           'bao' => 'CRM_Cxn_BAO_Cxn',
+          'localizable' => 0,
         ) ,
         'app_guid' => array(
           'name' => 'app_guid',
@@ -151,6 +152,7 @@ class CRM_Cxn_DAO_Cxn extends CRM_Core_DAO {
           'table_name' => 'civicrm_cxn',
           'entity' => 'Cxn',
           'bao' => 'CRM_Cxn_BAO_Cxn',
+          'localizable' => 0,
         ) ,
         'app_meta' => array(
           'name' => 'app_meta',
@@ -160,6 +162,7 @@ class CRM_Cxn_DAO_Cxn extends CRM_Core_DAO {
           'table_name' => 'civicrm_cxn',
           'entity' => 'Cxn',
           'bao' => 'CRM_Cxn_BAO_Cxn',
+          'localizable' => 0,
         ) ,
         'cxn_guid' => array(
           'name' => 'cxn_guid',
@@ -171,6 +174,7 @@ class CRM_Cxn_DAO_Cxn extends CRM_Core_DAO {
           'table_name' => 'civicrm_cxn',
           'entity' => 'Cxn',
           'bao' => 'CRM_Cxn_BAO_Cxn',
+          'localizable' => 0,
         ) ,
         'secret' => array(
           'name' => 'secret',
@@ -180,6 +184,7 @@ class CRM_Cxn_DAO_Cxn extends CRM_Core_DAO {
           'table_name' => 'civicrm_cxn',
           'entity' => 'Cxn',
           'bao' => 'CRM_Cxn_BAO_Cxn',
+          'localizable' => 0,
         ) ,
         'perm' => array(
           'name' => 'perm',
@@ -189,6 +194,7 @@ class CRM_Cxn_DAO_Cxn extends CRM_Core_DAO {
           'table_name' => 'civicrm_cxn',
           'entity' => 'Cxn',
           'bao' => 'CRM_Cxn_BAO_Cxn',
+          'localizable' => 0,
         ) ,
         'options' => array(
           'name' => 'options',
@@ -198,6 +204,7 @@ class CRM_Cxn_DAO_Cxn extends CRM_Core_DAO {
           'table_name' => 'civicrm_cxn',
           'entity' => 'Cxn',
           'bao' => 'CRM_Cxn_BAO_Cxn',
+          'localizable' => 0,
         ) ,
         'is_active' => array(
           'name' => 'is_active',
@@ -208,6 +215,7 @@ class CRM_Cxn_DAO_Cxn extends CRM_Core_DAO {
           'table_name' => 'civicrm_cxn',
           'entity' => 'Cxn',
           'bao' => 'CRM_Cxn_BAO_Cxn',
+          'localizable' => 0,
         ) ,
         'created_date' => array(
           'name' => 'created_date',
@@ -219,6 +227,7 @@ class CRM_Cxn_DAO_Cxn extends CRM_Core_DAO {
           'table_name' => 'civicrm_cxn',
           'entity' => 'Cxn',
           'bao' => 'CRM_Cxn_BAO_Cxn',
+          'localizable' => 0,
         ) ,
         'modified_date' => array(
           'name' => 'modified_date',
@@ -230,6 +239,7 @@ class CRM_Cxn_DAO_Cxn extends CRM_Core_DAO {
           'table_name' => 'civicrm_cxn',
           'entity' => 'Cxn',
           'bao' => 'CRM_Cxn_BAO_Cxn',
+          'localizable' => 0,
         ) ,
         'fetched_date' => array(
           'name' => 'fetched_date',
@@ -241,6 +251,7 @@ class CRM_Cxn_DAO_Cxn extends CRM_Core_DAO {
           'table_name' => 'civicrm_cxn',
           'entity' => 'Cxn',
           'bao' => 'CRM_Cxn_BAO_Cxn',
+          'localizable' => 0,
         ) ,
       );
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);

@@ -174,6 +174,7 @@ class CRM_Core_DAO_MappingField extends CRM_Core_DAO {
           'table_name' => 'civicrm_mapping_field',
           'entity' => 'MappingField',
           'bao' => 'CRM_Core_DAO_MappingField',
+          'localizable' => 0,
         ) ,
         'mapping_id' => array(
           'name' => 'mapping_id',
@@ -184,6 +185,7 @@ class CRM_Core_DAO_MappingField extends CRM_Core_DAO {
           'table_name' => 'civicrm_mapping_field',
           'entity' => 'MappingField',
           'bao' => 'CRM_Core_DAO_MappingField',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Core_DAO_Mapping',
         ) ,
         'name' => array(
@@ -196,6 +198,7 @@ class CRM_Core_DAO_MappingField extends CRM_Core_DAO {
           'table_name' => 'civicrm_mapping_field',
           'entity' => 'MappingField',
           'bao' => 'CRM_Core_DAO_MappingField',
+          'localizable' => 0,
         ) ,
         'contact_type' => array(
           'name' => 'contact_type',
@@ -207,6 +210,7 @@ class CRM_Core_DAO_MappingField extends CRM_Core_DAO {
           'table_name' => 'civicrm_mapping_field',
           'entity' => 'MappingField',
           'bao' => 'CRM_Core_DAO_MappingField',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -220,6 +224,7 @@ class CRM_Core_DAO_MappingField extends CRM_Core_DAO {
           'table_name' => 'civicrm_mapping_field',
           'entity' => 'MappingField',
           'bao' => 'CRM_Core_DAO_MappingField',
+          'localizable' => 0,
         ) ,
         'location_type_id' => array(
           'name' => 'location_type_id',
@@ -229,6 +234,7 @@ class CRM_Core_DAO_MappingField extends CRM_Core_DAO {
           'table_name' => 'civicrm_mapping_field',
           'entity' => 'MappingField',
           'bao' => 'CRM_Core_DAO_MappingField',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Core_DAO_LocationType',
         ) ,
         'phone_type_id' => array(
@@ -239,6 +245,7 @@ class CRM_Core_DAO_MappingField extends CRM_Core_DAO {
           'table_name' => 'civicrm_mapping_field',
           'entity' => 'MappingField',
           'bao' => 'CRM_Core_DAO_MappingField',
+          'localizable' => 0,
         ) ,
         'im_provider_id' => array(
           'name' => 'im_provider_id',
@@ -248,6 +255,7 @@ class CRM_Core_DAO_MappingField extends CRM_Core_DAO {
           'table_name' => 'civicrm_mapping_field',
           'entity' => 'MappingField',
           'bao' => 'CRM_Core_DAO_MappingField',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -264,6 +272,7 @@ class CRM_Core_DAO_MappingField extends CRM_Core_DAO {
           'table_name' => 'civicrm_mapping_field',
           'entity' => 'MappingField',
           'bao' => 'CRM_Core_DAO_MappingField',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -280,6 +289,7 @@ class CRM_Core_DAO_MappingField extends CRM_Core_DAO {
           'table_name' => 'civicrm_mapping_field',
           'entity' => 'MappingField',
           'bao' => 'CRM_Core_DAO_MappingField',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Contact_DAO_RelationshipType',
         ) ,
         'relationship_direction' => array(
@@ -291,6 +301,7 @@ class CRM_Core_DAO_MappingField extends CRM_Core_DAO {
           'table_name' => 'civicrm_mapping_field',
           'entity' => 'MappingField',
           'bao' => 'CRM_Core_DAO_MappingField',
+          'localizable' => 0,
         ) ,
         'grouping' => array(
           'name' => 'grouping',
@@ -303,6 +314,7 @@ class CRM_Core_DAO_MappingField extends CRM_Core_DAO {
           'table_name' => 'civicrm_mapping_field',
           'entity' => 'MappingField',
           'bao' => 'CRM_Core_DAO_MappingField',
+          'localizable' => 0,
         ) ,
         'operator' => array(
           'name' => 'operator',
@@ -314,6 +326,7 @@ class CRM_Core_DAO_MappingField extends CRM_Core_DAO {
           'table_name' => 'civicrm_mapping_field',
           'entity' => 'MappingField',
           'bao' => 'CRM_Core_DAO_MappingField',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -331,6 +344,7 @@ class CRM_Core_DAO_MappingField extends CRM_Core_DAO {
           'table_name' => 'civicrm_mapping_field',
           'entity' => 'MappingField',
           'bao' => 'CRM_Core_DAO_MappingField',
+          'localizable' => 0,
         ) ,
       );
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);

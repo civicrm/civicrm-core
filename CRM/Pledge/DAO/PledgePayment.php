@@ -151,6 +151,7 @@ class CRM_Pledge_DAO_PledgePayment extends CRM_Core_DAO {
           'table_name' => 'civicrm_pledge_payment',
           'entity' => 'PledgePayment',
           'bao' => 'CRM_Pledge_BAO_PledgePayment',
+          'localizable' => 0,
         ) ,
         'pledge_id' => array(
           'name' => 'pledge_id',
@@ -161,6 +162,7 @@ class CRM_Pledge_DAO_PledgePayment extends CRM_Core_DAO {
           'table_name' => 'civicrm_pledge_payment',
           'entity' => 'PledgePayment',
           'bao' => 'CRM_Pledge_BAO_PledgePayment',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Pledge_DAO_Pledge',
         ) ,
         'contribution_id' => array(
@@ -171,6 +173,7 @@ class CRM_Pledge_DAO_PledgePayment extends CRM_Core_DAO {
           'table_name' => 'civicrm_pledge_payment',
           'entity' => 'PledgePayment',
           'bao' => 'CRM_Pledge_BAO_PledgePayment',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Contribute_DAO_Contribution',
         ) ,
         'pledge_payment_scheduled_amount' => array(
@@ -191,6 +194,7 @@ class CRM_Pledge_DAO_PledgePayment extends CRM_Core_DAO {
           'table_name' => 'civicrm_pledge_payment',
           'entity' => 'PledgePayment',
           'bao' => 'CRM_Pledge_BAO_PledgePayment',
+          'localizable' => 0,
         ) ,
         'pledge_payment_actual_amount' => array(
           'name' => 'actual_amount',
@@ -209,6 +213,7 @@ class CRM_Pledge_DAO_PledgePayment extends CRM_Core_DAO {
           'table_name' => 'civicrm_pledge_payment',
           'entity' => 'PledgePayment',
           'bao' => 'CRM_Pledge_BAO_PledgePayment',
+          'localizable' => 0,
         ) ,
         'currency' => array(
           'name' => 'currency',
@@ -221,6 +226,7 @@ class CRM_Pledge_DAO_PledgePayment extends CRM_Core_DAO {
           'table_name' => 'civicrm_pledge_payment',
           'entity' => 'PledgePayment',
           'bao' => 'CRM_Pledge_BAO_PledgePayment',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -245,6 +251,7 @@ class CRM_Pledge_DAO_PledgePayment extends CRM_Core_DAO {
           'table_name' => 'civicrm_pledge_payment',
           'entity' => 'PledgePayment',
           'bao' => 'CRM_Pledge_BAO_PledgePayment',
+          'localizable' => 0,
         ) ,
         'pledge_payment_reminder_date' => array(
           'name' => 'reminder_date',
@@ -259,6 +266,7 @@ class CRM_Pledge_DAO_PledgePayment extends CRM_Core_DAO {
           'table_name' => 'civicrm_pledge_payment',
           'entity' => 'PledgePayment',
           'bao' => 'CRM_Pledge_BAO_PledgePayment',
+          'localizable' => 0,
         ) ,
         'pledge_payment_reminder_count' => array(
           'name' => 'reminder_count',
@@ -273,6 +281,7 @@ class CRM_Pledge_DAO_PledgePayment extends CRM_Core_DAO {
           'table_name' => 'civicrm_pledge_payment',
           'entity' => 'PledgePayment',
           'bao' => 'CRM_Pledge_BAO_PledgePayment',
+          'localizable' => 0,
         ) ,
         'pledge_payment_status_id' => array(
           'name' => 'status_id',
@@ -286,6 +295,7 @@ class CRM_Pledge_DAO_PledgePayment extends CRM_Core_DAO {
           'table_name' => 'civicrm_pledge_payment',
           'entity' => 'PledgePayment',
           'bao' => 'CRM_Pledge_BAO_PledgePayment',
+          'localizable' => 0,
           'pseudoconstant' => array(
             'optionGroupName' => 'contribution_status',
             'optionEditPath' => 'civicrm/admin/options/contribution_status',

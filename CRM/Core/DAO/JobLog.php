@@ -136,6 +136,7 @@ class CRM_Core_DAO_JobLog extends CRM_Core_DAO {
           'table_name' => 'civicrm_job_log',
           'entity' => 'JobLog',
           'bao' => 'CRM_Core_DAO_JobLog',
+          'localizable' => 0,
         ) ,
         'domain_id' => array(
           'name' => 'domain_id',
@@ -146,6 +147,7 @@ class CRM_Core_DAO_JobLog extends CRM_Core_DAO {
           'table_name' => 'civicrm_job_log',
           'entity' => 'JobLog',
           'bao' => 'CRM_Core_DAO_JobLog',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Core_DAO_Domain',
           'pseudoconstant' => array(
             'table' => 'civicrm_domain',
@@ -161,6 +163,7 @@ class CRM_Core_DAO_JobLog extends CRM_Core_DAO {
           'table_name' => 'civicrm_job_log',
           'entity' => 'JobLog',
           'bao' => 'CRM_Core_DAO_JobLog',
+          'localizable' => 0,
         ) ,
         'job_id' => array(
           'name' => 'job_id',
@@ -170,6 +173,7 @@ class CRM_Core_DAO_JobLog extends CRM_Core_DAO {
           'table_name' => 'civicrm_job_log',
           'entity' => 'JobLog',
           'bao' => 'CRM_Core_DAO_JobLog',
+          'localizable' => 0,
         ) ,
         'name' => array(
           'name' => 'name',
@@ -181,6 +185,7 @@ class CRM_Core_DAO_JobLog extends CRM_Core_DAO {
           'table_name' => 'civicrm_job_log',
           'entity' => 'JobLog',
           'bao' => 'CRM_Core_DAO_JobLog',
+          'localizable' => 0,
         ) ,
         'command' => array(
           'name' => 'command',
@@ -192,6 +197,7 @@ class CRM_Core_DAO_JobLog extends CRM_Core_DAO {
           'table_name' => 'civicrm_job_log',
           'entity' => 'JobLog',
           'bao' => 'CRM_Core_DAO_JobLog',
+          'localizable' => 0,
         ) ,
         'description' => array(
           'name' => 'description',
@@ -203,6 +209,7 @@ class CRM_Core_DAO_JobLog extends CRM_Core_DAO {
           'table_name' => 'civicrm_job_log',
           'entity' => 'JobLog',
           'bao' => 'CRM_Core_DAO_JobLog',
+          'localizable' => 0,
         ) ,
         'data' => array(
           'name' => 'data',
@@ -212,6 +219,7 @@ class CRM_Core_DAO_JobLog extends CRM_Core_DAO {
           'table_name' => 'civicrm_job_log',
           'entity' => 'JobLog',
           'bao' => 'CRM_Core_DAO_JobLog',
+          'localizable' => 0,
         ) ,
       );
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);

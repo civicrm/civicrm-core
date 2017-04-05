@@ -104,6 +104,7 @@ class CRM_Financial_DAO_Currency extends CRM_Core_DAO {
           'table_name' => 'civicrm_currency',
           'entity' => 'Currency',
           'bao' => 'CRM_Financial_DAO_Currency',
+          'localizable' => 0,
         ) ,
         'name' => array(
           'name' => 'name',
@@ -120,6 +121,7 @@ class CRM_Financial_DAO_Currency extends CRM_Core_DAO {
           'table_name' => 'civicrm_currency',
           'entity' => 'Currency',
           'bao' => 'CRM_Financial_DAO_Currency',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -134,6 +136,7 @@ class CRM_Financial_DAO_Currency extends CRM_Core_DAO {
           'table_name' => 'civicrm_currency',
           'entity' => 'Currency',
           'bao' => 'CRM_Financial_DAO_Currency',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -153,6 +156,7 @@ class CRM_Financial_DAO_Currency extends CRM_Core_DAO {
           'table_name' => 'civicrm_currency',
           'entity' => 'Currency',
           'bao' => 'CRM_Financial_DAO_Currency',
+          'localizable' => 0,
         ) ,
         'full_name' => array(
           'name' => 'full_name',
@@ -164,6 +168,7 @@ class CRM_Financial_DAO_Currency extends CRM_Core_DAO {
           'table_name' => 'civicrm_currency',
           'entity' => 'Currency',
           'bao' => 'CRM_Financial_DAO_Currency',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,

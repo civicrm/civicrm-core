@@ -181,6 +181,7 @@ class CRM_Contribute_DAO_Widget extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_widget',
           'entity' => 'Widget',
           'bao' => 'CRM_Contribute_BAO_Widget',
+          'localizable' => 0,
         ) ,
         'contribution_page_id' => array(
           'name' => 'contribution_page_id',
@@ -190,6 +191,7 @@ class CRM_Contribute_DAO_Widget extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_widget',
           'entity' => 'Widget',
           'bao' => 'CRM_Contribute_BAO_Widget',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Contribute_DAO_ContributionPage',
         ) ,
         'is_active' => array(
@@ -200,6 +202,7 @@ class CRM_Contribute_DAO_Widget extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_widget',
           'entity' => 'Widget',
           'bao' => 'CRM_Contribute_BAO_Widget',
+          'localizable' => 0,
         ) ,
         'title' => array(
           'name' => 'title',
@@ -211,6 +214,7 @@ class CRM_Contribute_DAO_Widget extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_widget',
           'entity' => 'Widget',
           'bao' => 'CRM_Contribute_BAO_Widget',
+          'localizable' => 0,
         ) ,
         'url_logo' => array(
           'name' => 'url_logo',
@@ -222,6 +226,7 @@ class CRM_Contribute_DAO_Widget extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_widget',
           'entity' => 'Widget',
           'bao' => 'CRM_Contribute_BAO_Widget',
+          'localizable' => 0,
         ) ,
         'button_title' => array(
           'name' => 'button_title',
@@ -233,6 +238,7 @@ class CRM_Contribute_DAO_Widget extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_widget',
           'entity' => 'Widget',
           'bao' => 'CRM_Contribute_BAO_Widget',
+          'localizable' => 0,
         ) ,
         'about' => array(
           'name' => 'about',
@@ -242,6 +248,7 @@ class CRM_Contribute_DAO_Widget extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_widget',
           'entity' => 'Widget',
           'bao' => 'CRM_Contribute_BAO_Widget',
+          'localizable' => 0,
         ) ,
         'url_homepage' => array(
           'name' => 'url_homepage',
@@ -253,6 +260,7 @@ class CRM_Contribute_DAO_Widget extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_widget',
           'entity' => 'Widget',
           'bao' => 'CRM_Contribute_BAO_Widget',
+          'localizable' => 0,
         ) ,
         'color_title' => array(
           'name' => 'color_title',
@@ -263,6 +271,7 @@ class CRM_Contribute_DAO_Widget extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_widget',
           'entity' => 'Widget',
           'bao' => 'CRM_Contribute_BAO_Widget',
+          'localizable' => 0,
         ) ,
         'color_button' => array(
           'name' => 'color_button',
@@ -273,6 +282,7 @@ class CRM_Contribute_DAO_Widget extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_widget',
           'entity' => 'Widget',
           'bao' => 'CRM_Contribute_BAO_Widget',
+          'localizable' => 0,
         ) ,
         'color_bar' => array(
           'name' => 'color_bar',
@@ -283,6 +293,7 @@ class CRM_Contribute_DAO_Widget extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_widget',
           'entity' => 'Widget',
           'bao' => 'CRM_Contribute_BAO_Widget',
+          'localizable' => 0,
         ) ,
         'color_main_text' => array(
           'name' => 'color_main_text',
@@ -293,6 +304,7 @@ class CRM_Contribute_DAO_Widget extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_widget',
           'entity' => 'Widget',
           'bao' => 'CRM_Contribute_BAO_Widget',
+          'localizable' => 0,
         ) ,
         'color_main' => array(
           'name' => 'color_main',
@@ -303,6 +315,7 @@ class CRM_Contribute_DAO_Widget extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_widget',
           'entity' => 'Widget',
           'bao' => 'CRM_Contribute_BAO_Widget',
+          'localizable' => 0,
         ) ,
         'color_main_bg' => array(
           'name' => 'color_main_bg',
@@ -313,6 +326,7 @@ class CRM_Contribute_DAO_Widget extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_widget',
           'entity' => 'Widget',
           'bao' => 'CRM_Contribute_BAO_Widget',
+          'localizable' => 0,
         ) ,
         'color_bg' => array(
           'name' => 'color_bg',
@@ -323,6 +337,7 @@ class CRM_Contribute_DAO_Widget extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_widget',
           'entity' => 'Widget',
           'bao' => 'CRM_Contribute_BAO_Widget',
+          'localizable' => 0,
         ) ,
         'color_about_link' => array(
           'name' => 'color_about_link',
@@ -333,6 +348,7 @@ class CRM_Contribute_DAO_Widget extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_widget',
           'entity' => 'Widget',
           'bao' => 'CRM_Contribute_BAO_Widget',
+          'localizable' => 0,
         ) ,
         'color_homepage_link' => array(
           'name' => 'color_homepage_link',
@@ -343,6 +359,7 @@ class CRM_Contribute_DAO_Widget extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_widget',
           'entity' => 'Widget',
           'bao' => 'CRM_Contribute_BAO_Widget',
+          'localizable' => 0,
         ) ,
       );
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);

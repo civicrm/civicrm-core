@@ -113,6 +113,7 @@ class CRM_Activity_DAO_ActivityContact extends CRM_Core_DAO {
           'table_name' => 'civicrm_activity_contact',
           'entity' => 'ActivityContact',
           'bao' => 'CRM_Activity_BAO_ActivityContact',
+          'localizable' => 0,
         ) ,
         'activity_id' => array(
           'name' => 'activity_id',
@@ -123,6 +124,7 @@ class CRM_Activity_DAO_ActivityContact extends CRM_Core_DAO {
           'table_name' => 'civicrm_activity_contact',
           'entity' => 'ActivityContact',
           'bao' => 'CRM_Activity_BAO_ActivityContact',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Activity_DAO_Activity',
         ) ,
         'contact_id' => array(
@@ -139,6 +141,7 @@ class CRM_Activity_DAO_ActivityContact extends CRM_Core_DAO {
           'table_name' => 'civicrm_activity_contact',
           'entity' => 'ActivityContact',
           'bao' => 'CRM_Activity_BAO_ActivityContact',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Contact_DAO_Contact',
         ) ,
         'record_type_id' => array(
@@ -149,6 +152,7 @@ class CRM_Activity_DAO_ActivityContact extends CRM_Core_DAO {
           'table_name' => 'civicrm_activity_contact',
           'entity' => 'ActivityContact',
           'bao' => 'CRM_Activity_BAO_ActivityContact',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,

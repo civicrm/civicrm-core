@@ -113,6 +113,7 @@ class CRM_Contact_DAO_ACLContactCache extends CRM_Core_DAO {
           'table_name' => 'civicrm_acl_contact_cache',
           'entity' => 'ACLContactCache',
           'bao' => 'CRM_Contact_DAO_ACLContactCache',
+          'localizable' => 0,
         ) ,
         'user_id' => array(
           'name' => 'user_id',
@@ -122,6 +123,7 @@ class CRM_Contact_DAO_ACLContactCache extends CRM_Core_DAO {
           'table_name' => 'civicrm_acl_contact_cache',
           'entity' => 'ACLContactCache',
           'bao' => 'CRM_Contact_DAO_ACLContactCache',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Contact_DAO_Contact',
         ) ,
         'contact_id' => array(
@@ -133,6 +135,7 @@ class CRM_Contact_DAO_ACLContactCache extends CRM_Core_DAO {
           'table_name' => 'civicrm_acl_contact_cache',
           'entity' => 'ACLContactCache',
           'bao' => 'CRM_Contact_DAO_ACLContactCache',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Contact_DAO_Contact',
         ) ,
         'operation' => array(
@@ -146,6 +149,7 @@ class CRM_Contact_DAO_ACLContactCache extends CRM_Core_DAO {
           'table_name' => 'civicrm_acl_contact_cache',
           'entity' => 'ACLContactCache',
           'bao' => 'CRM_Contact_DAO_ACLContactCache',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,

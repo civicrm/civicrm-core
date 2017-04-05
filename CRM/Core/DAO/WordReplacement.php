@@ -123,6 +123,7 @@ class CRM_Core_DAO_WordReplacement extends CRM_Core_DAO {
           'table_name' => 'civicrm_word_replacement',
           'entity' => 'WordReplacement',
           'bao' => 'CRM_Core_BAO_WordReplacement',
+          'localizable' => 0,
         ) ,
         'find_word' => array(
           'name' => 'find_word',
@@ -134,6 +135,7 @@ class CRM_Core_DAO_WordReplacement extends CRM_Core_DAO {
           'table_name' => 'civicrm_word_replacement',
           'entity' => 'WordReplacement',
           'bao' => 'CRM_Core_BAO_WordReplacement',
+          'localizable' => 0,
         ) ,
         'replace_word' => array(
           'name' => 'replace_word',
@@ -145,6 +147,7 @@ class CRM_Core_DAO_WordReplacement extends CRM_Core_DAO {
           'table_name' => 'civicrm_word_replacement',
           'entity' => 'WordReplacement',
           'bao' => 'CRM_Core_BAO_WordReplacement',
+          'localizable' => 0,
         ) ,
         'is_active' => array(
           'name' => 'is_active',
@@ -155,6 +158,7 @@ class CRM_Core_DAO_WordReplacement extends CRM_Core_DAO {
           'table_name' => 'civicrm_word_replacement',
           'entity' => 'WordReplacement',
           'bao' => 'CRM_Core_BAO_WordReplacement',
+          'localizable' => 0,
         ) ,
         'match_type' => array(
           'name' => 'match_type',
@@ -166,6 +170,7 @@ class CRM_Core_DAO_WordReplacement extends CRM_Core_DAO {
           'table_name' => 'civicrm_word_replacement',
           'entity' => 'WordReplacement',
           'bao' => 'CRM_Core_BAO_WordReplacement',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -181,6 +186,7 @@ class CRM_Core_DAO_WordReplacement extends CRM_Core_DAO {
           'table_name' => 'civicrm_word_replacement',
           'entity' => 'WordReplacement',
           'bao' => 'CRM_Core_BAO_WordReplacement',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Core_DAO_Domain',
           'pseudoconstant' => array(
             'table' => 'civicrm_domain',

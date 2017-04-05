@@ -143,6 +143,7 @@ class CRM_Contribute_DAO_ContributionProduct extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_product',
           'entity' => 'ContributionProduct',
           'bao' => 'CRM_Contribute_DAO_ContributionProduct',
+          'localizable' => 0,
         ) ,
         'product_id' => array(
           'name' => 'product_id',
@@ -152,6 +153,7 @@ class CRM_Contribute_DAO_ContributionProduct extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_product',
           'entity' => 'ContributionProduct',
           'bao' => 'CRM_Contribute_DAO_ContributionProduct',
+          'localizable' => 0,
         ) ,
         'contribution_id' => array(
           'name' => 'contribution_id',
@@ -161,6 +163,7 @@ class CRM_Contribute_DAO_ContributionProduct extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_product',
           'entity' => 'ContributionProduct',
           'bao' => 'CRM_Contribute_DAO_ContributionProduct',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Contribute_DAO_Contribution',
         ) ,
         'product_option' => array(
@@ -177,6 +180,7 @@ class CRM_Contribute_DAO_ContributionProduct extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_product',
           'entity' => 'ContributionProduct',
           'bao' => 'CRM_Contribute_DAO_ContributionProduct',
+          'localizable' => 0,
         ) ,
         'quantity' => array(
           'name' => 'quantity',
@@ -189,6 +193,7 @@ class CRM_Contribute_DAO_ContributionProduct extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_product',
           'entity' => 'ContributionProduct',
           'bao' => 'CRM_Contribute_DAO_ContributionProduct',
+          'localizable' => 0,
         ) ,
         'fulfilled_date' => array(
           'name' => 'fulfilled_date',
@@ -202,6 +207,7 @@ class CRM_Contribute_DAO_ContributionProduct extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_product',
           'entity' => 'ContributionProduct',
           'bao' => 'CRM_Contribute_DAO_ContributionProduct',
+          'localizable' => 0,
         ) ,
         'contribution_start_date' => array(
           'name' => 'start_date',
@@ -215,6 +221,7 @@ class CRM_Contribute_DAO_ContributionProduct extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_product',
           'entity' => 'ContributionProduct',
           'bao' => 'CRM_Contribute_DAO_ContributionProduct',
+          'localizable' => 0,
         ) ,
         'contribution_end_date' => array(
           'name' => 'end_date',
@@ -228,6 +235,7 @@ class CRM_Contribute_DAO_ContributionProduct extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_product',
           'entity' => 'ContributionProduct',
           'bao' => 'CRM_Contribute_DAO_ContributionProduct',
+          'localizable' => 0,
         ) ,
         'comment' => array(
           'name' => 'comment',
@@ -236,6 +244,7 @@ class CRM_Contribute_DAO_ContributionProduct extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_product',
           'entity' => 'ContributionProduct',
           'bao' => 'CRM_Contribute_DAO_ContributionProduct',
+          'localizable' => 0,
         ) ,
         'financial_type_id' => array(
           'name' => 'financial_type_id',
@@ -246,6 +255,7 @@ class CRM_Contribute_DAO_ContributionProduct extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_product',
           'entity' => 'ContributionProduct',
           'bao' => 'CRM_Contribute_DAO_ContributionProduct',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Financial_DAO_FinancialType',
           'pseudoconstant' => array(
             'table' => 'civicrm_financial_type',

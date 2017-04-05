@@ -143,6 +143,7 @@ class CRM_Core_DAO_Setting extends CRM_Core_DAO {
           'table_name' => 'civicrm_setting',
           'entity' => 'Setting',
           'bao' => 'CRM_Core_BAO_Setting',
+          'localizable' => 0,
         ) ,
         'name' => array(
           'name' => 'name',
@@ -154,6 +155,7 @@ class CRM_Core_DAO_Setting extends CRM_Core_DAO {
           'table_name' => 'civicrm_setting',
           'entity' => 'Setting',
           'bao' => 'CRM_Core_BAO_Setting',
+          'localizable' => 0,
         ) ,
         'value' => array(
           'name' => 'value',
@@ -163,6 +165,7 @@ class CRM_Core_DAO_Setting extends CRM_Core_DAO {
           'table_name' => 'civicrm_setting',
           'entity' => 'Setting',
           'bao' => 'CRM_Core_BAO_Setting',
+          'localizable' => 0,
         ) ,
         'domain_id' => array(
           'name' => 'domain_id',
@@ -173,6 +176,7 @@ class CRM_Core_DAO_Setting extends CRM_Core_DAO {
           'table_name' => 'civicrm_setting',
           'entity' => 'Setting',
           'bao' => 'CRM_Core_BAO_Setting',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Core_DAO_Domain',
           'pseudoconstant' => array(
             'table' => 'civicrm_domain',
@@ -188,6 +192,7 @@ class CRM_Core_DAO_Setting extends CRM_Core_DAO {
           'table_name' => 'civicrm_setting',
           'entity' => 'Setting',
           'bao' => 'CRM_Core_BAO_Setting',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Contact_DAO_Contact',
         ) ,
         'is_domain' => array(
@@ -198,6 +203,7 @@ class CRM_Core_DAO_Setting extends CRM_Core_DAO {
           'table_name' => 'civicrm_setting',
           'entity' => 'Setting',
           'bao' => 'CRM_Core_BAO_Setting',
+          'localizable' => 0,
         ) ,
         'component_id' => array(
           'name' => 'component_id',
@@ -207,6 +213,7 @@ class CRM_Core_DAO_Setting extends CRM_Core_DAO {
           'table_name' => 'civicrm_setting',
           'entity' => 'Setting',
           'bao' => 'CRM_Core_BAO_Setting',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Core_DAO_Component',
           'html' => array(
             'type' => 'Select',
@@ -225,6 +232,7 @@ class CRM_Core_DAO_Setting extends CRM_Core_DAO {
           'table_name' => 'civicrm_setting',
           'entity' => 'Setting',
           'bao' => 'CRM_Core_BAO_Setting',
+          'localizable' => 0,
         ) ,
         'created_id' => array(
           'name' => 'created_id',
@@ -234,6 +242,7 @@ class CRM_Core_DAO_Setting extends CRM_Core_DAO {
           'table_name' => 'civicrm_setting',
           'entity' => 'Setting',
           'bao' => 'CRM_Core_BAO_Setting',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Contact_DAO_Contact',
         ) ,
       );

@@ -399,6 +399,7 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
           'table_name' => 'civicrm_contact',
           'entity' => 'Contact',
           'bao' => 'CRM_Contact_BAO_Contact',
+          'localizable' => 0,
         ) ,
         'contact_type' => array(
           'name' => 'contact_type',
@@ -414,6 +415,7 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
           'table_name' => 'civicrm_contact',
           'entity' => 'Contact',
           'bao' => 'CRM_Contact_BAO_Contact',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -439,6 +441,7 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
           'table_name' => 'civicrm_contact',
           'entity' => 'Contact',
           'bao' => 'CRM_Contact_BAO_Contact',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -461,6 +464,7 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
           'table_name' => 'civicrm_contact',
           'entity' => 'Contact',
           'bao' => 'CRM_Contact_BAO_Contact',
+          'localizable' => 0,
           'html' => array(
             'type' => 'CheckBox',
           ) ,
@@ -477,6 +481,7 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
           'table_name' => 'civicrm_contact',
           'entity' => 'Contact',
           'bao' => 'CRM_Contact_BAO_Contact',
+          'localizable' => 0,
           'html' => array(
             'type' => 'CheckBox',
           ) ,
@@ -493,6 +498,7 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
           'table_name' => 'civicrm_contact',
           'entity' => 'Contact',
           'bao' => 'CRM_Contact_BAO_Contact',
+          'localizable' => 0,
           'html' => array(
             'type' => 'CheckBox',
           ) ,
@@ -509,6 +515,7 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
           'table_name' => 'civicrm_contact',
           'entity' => 'Contact',
           'bao' => 'CRM_Contact_BAO_Contact',
+          'localizable' => 0,
           'html' => array(
             'type' => 'CheckBox',
           ) ,
@@ -525,6 +532,7 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
           'table_name' => 'civicrm_contact',
           'entity' => 'Contact',
           'bao' => 'CRM_Contact_BAO_Contact',
+          'localizable' => 0,
           'html' => array(
             'type' => 'CheckBox',
           ) ,
@@ -543,6 +551,7 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
           'table_name' => 'civicrm_contact',
           'entity' => 'Contact',
           'bao' => 'CRM_Contact_BAO_Contact',
+          'localizable' => 0,
           'html' => array(
             'type' => 'CheckBox',
           ) ,
@@ -563,6 +572,7 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
           'table_name' => 'civicrm_contact',
           'entity' => 'Contact',
           'bao' => 'CRM_Contact_BAO_Contact',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -582,6 +592,7 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
           'table_name' => 'civicrm_contact',
           'entity' => 'Contact',
           'bao' => 'CRM_Contact_BAO_Contact',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -600,6 +611,7 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
           'table_name' => 'civicrm_contact',
           'entity' => 'Contact',
           'bao' => 'CRM_Contact_BAO_Contact',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -618,6 +630,7 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
           'table_name' => 'civicrm_contact',
           'entity' => 'Contact',
           'bao' => 'CRM_Contact_BAO_Contact',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -637,6 +650,7 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
           'table_name' => 'civicrm_contact',
           'entity' => 'Contact',
           'bao' => 'CRM_Contact_BAO_Contact',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -656,6 +670,7 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
           'table_name' => 'civicrm_contact',
           'entity' => 'Contact',
           'bao' => 'CRM_Contact_BAO_Contact',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -673,6 +688,7 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
           'table_name' => 'civicrm_contact',
           'entity' => 'Contact',
           'bao' => 'CRM_Contact_BAO_Contact',
+          'localizable' => 0,
           'html' => array(
             'type' => 'File',
           ) ,
@@ -692,6 +708,7 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
           'table_name' => 'civicrm_contact',
           'entity' => 'Contact',
           'bao' => 'CRM_Contact_BAO_Contact',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -715,6 +732,7 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
           'table_name' => 'civicrm_contact',
           'entity' => 'Contact',
           'bao' => 'CRM_Contact_BAO_Contact',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -740,6 +758,7 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
           'table_name' => 'civicrm_contact',
           'entity' => 'Contact',
           'bao' => 'CRM_Contact_BAO_Contact',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -761,6 +780,7 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
           'table_name' => 'civicrm_contact',
           'entity' => 'Contact',
           'bao' => 'CRM_Contact_BAO_Contact',
+          'localizable' => 0,
         ) ,
         'api_key' => array(
           'name' => 'api_key',
@@ -772,6 +792,7 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
           'table_name' => 'civicrm_contact',
           'entity' => 'Contact',
           'bao' => 'CRM_Contact_BAO_Contact',
+          'localizable' => 0,
         ) ,
         'contact_source' => array(
           'name' => 'source',
@@ -788,6 +809,7 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
           'table_name' => 'civicrm_contact',
           'entity' => 'Contact',
           'bao' => 'CRM_Contact_BAO_Contact',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -807,6 +829,7 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
           'table_name' => 'civicrm_contact',
           'entity' => 'Contact',
           'bao' => 'CRM_Contact_BAO_Contact',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -826,6 +849,7 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
           'table_name' => 'civicrm_contact',
           'entity' => 'Contact',
           'bao' => 'CRM_Contact_BAO_Contact',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -845,6 +869,7 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
           'table_name' => 'civicrm_contact',
           'entity' => 'Contact',
           'bao' => 'CRM_Contact_BAO_Contact',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -862,6 +887,7 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
           'table_name' => 'civicrm_contact',
           'entity' => 'Contact',
           'bao' => 'CRM_Contact_BAO_Contact',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -883,6 +909,7 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
           'table_name' => 'civicrm_contact',
           'entity' => 'Contact',
           'bao' => 'CRM_Contact_BAO_Contact',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -906,6 +933,7 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
           'table_name' => 'civicrm_contact',
           'entity' => 'Contact',
           'bao' => 'CRM_Contact_BAO_Contact',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -922,6 +950,7 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
           'table_name' => 'civicrm_contact',
           'entity' => 'Contact',
           'bao' => 'CRM_Contact_BAO_Contact',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -938,6 +967,7 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
           'table_name' => 'civicrm_contact',
           'entity' => 'Contact',
           'bao' => 'CRM_Contact_BAO_Contact',
+          'localizable' => 0,
         ) ,
         'email_greeting_custom' => array(
           'name' => 'email_greeting_custom',
@@ -954,6 +984,7 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
           'table_name' => 'civicrm_contact',
           'entity' => 'Contact',
           'bao' => 'CRM_Contact_BAO_Contact',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -968,6 +999,7 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
           'table_name' => 'civicrm_contact',
           'entity' => 'Contact',
           'bao' => 'CRM_Contact_BAO_Contact',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -980,6 +1012,7 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
           'table_name' => 'civicrm_contact',
           'entity' => 'Contact',
           'bao' => 'CRM_Contact_BAO_Contact',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -999,6 +1032,7 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
           'table_name' => 'civicrm_contact',
           'entity' => 'Contact',
           'bao' => 'CRM_Contact_BAO_Contact',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -1013,6 +1047,7 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
           'table_name' => 'civicrm_contact',
           'entity' => 'Contact',
           'bao' => 'CRM_Contact_BAO_Contact',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -1025,6 +1060,7 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
           'table_name' => 'civicrm_contact',
           'entity' => 'Contact',
           'bao' => 'CRM_Contact_BAO_Contact',
+          'localizable' => 0,
         ) ,
         'addressee_custom' => array(
           'name' => 'addressee_custom',
@@ -1041,6 +1077,7 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
           'table_name' => 'civicrm_contact',
           'entity' => 'Contact',
           'bao' => 'CRM_Contact_BAO_Contact',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -1055,6 +1092,7 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
           'table_name' => 'civicrm_contact',
           'entity' => 'Contact',
           'bao' => 'CRM_Contact_BAO_Contact',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -1074,6 +1112,7 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
           'table_name' => 'civicrm_contact',
           'entity' => 'Contact',
           'bao' => 'CRM_Contact_BAO_Contact',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -1091,6 +1130,7 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
           'table_name' => 'civicrm_contact',
           'entity' => 'Contact',
           'bao' => 'CRM_Contact_BAO_Contact',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -1112,6 +1152,7 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
           'table_name' => 'civicrm_contact',
           'entity' => 'Contact',
           'bao' => 'CRM_Contact_BAO_Contact',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select Date',
             'formatType' => 'birth',
@@ -1129,6 +1170,7 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
           'table_name' => 'civicrm_contact',
           'entity' => 'Contact',
           'bao' => 'CRM_Contact_BAO_Contact',
+          'localizable' => 0,
           'html' => array(
             'type' => 'CheckBox',
           ) ,
@@ -1146,6 +1188,7 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
           'table_name' => 'civicrm_contact',
           'entity' => 'Contact',
           'bao' => 'CRM_Contact_BAO_Contact',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select Date',
             'formatType' => 'birth',
@@ -1166,6 +1209,7 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
           'table_name' => 'civicrm_contact',
           'entity' => 'Contact',
           'bao' => 'CRM_Contact_BAO_Contact',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -1178,6 +1222,7 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
           'table_name' => 'civicrm_contact',
           'entity' => 'Contact',
           'bao' => 'CRM_Contact_BAO_Contact',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Contact_DAO_Contact',
           'html' => array(
             'type' => 'Select',
@@ -1198,6 +1243,7 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
           'table_name' => 'civicrm_contact',
           'entity' => 'Contact',
           'bao' => 'CRM_Contact_BAO_Contact',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -1217,6 +1263,7 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
           'table_name' => 'civicrm_contact',
           'entity' => 'Contact',
           'bao' => 'CRM_Contact_BAO_Contact',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -1237,6 +1284,7 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
           'table_name' => 'civicrm_contact',
           'entity' => 'Contact',
           'bao' => 'CRM_Contact_BAO_Contact',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -1253,6 +1301,7 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
           'table_name' => 'civicrm_contact',
           'entity' => 'Contact',
           'bao' => 'CRM_Contact_BAO_Contact',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Contact_DAO_Contact',
           'html' => array(
             'type' => 'EntityRef',
@@ -1270,6 +1319,7 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
           'table_name' => 'civicrm_contact',
           'entity' => 'Contact',
           'bao' => 'CRM_Contact_BAO_Contact',
+          'localizable' => 0,
           'html' => array(
             'type' => 'CheckBox',
           ) ,
@@ -1288,6 +1338,7 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
           'table_name' => 'civicrm_contact',
           'entity' => 'Contact',
           'bao' => 'CRM_Contact_BAO_Contact',
+          'localizable' => 0,
         ) ,
         'modified_date' => array(
           'name' => 'modified_date',
@@ -1303,6 +1354,7 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
           'table_name' => 'civicrm_contact',
           'entity' => 'Contact',
           'bao' => 'CRM_Contact_BAO_Contact',
+          'localizable' => 0,
         ) ,
       );
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);

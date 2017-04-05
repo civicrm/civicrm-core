@@ -348,6 +348,7 @@ class CRM_Mailing_DAO_Mailing extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing',
           'entity' => 'Mailing',
           'bao' => 'CRM_Mailing_BAO_Mailing',
+          'localizable' => 0,
         ) ,
         'domain_id' => array(
           'name' => 'domain_id',
@@ -357,6 +358,7 @@ class CRM_Mailing_DAO_Mailing extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing',
           'entity' => 'Mailing',
           'bao' => 'CRM_Mailing_BAO_Mailing',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Core_DAO_Domain',
           'pseudoconstant' => array(
             'table' => 'civicrm_domain',
@@ -372,6 +374,7 @@ class CRM_Mailing_DAO_Mailing extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing',
           'entity' => 'Mailing',
           'bao' => 'CRM_Mailing_BAO_Mailing',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Mailing_DAO_Component',
         ) ,
         'footer_id' => array(
@@ -382,6 +385,7 @@ class CRM_Mailing_DAO_Mailing extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing',
           'entity' => 'Mailing',
           'bao' => 'CRM_Mailing_BAO_Mailing',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Mailing_DAO_Component',
         ) ,
         'reply_id' => array(
@@ -392,6 +396,7 @@ class CRM_Mailing_DAO_Mailing extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing',
           'entity' => 'Mailing',
           'bao' => 'CRM_Mailing_BAO_Mailing',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Mailing_DAO_Component',
         ) ,
         'unsubscribe_id' => array(
@@ -402,6 +407,7 @@ class CRM_Mailing_DAO_Mailing extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing',
           'entity' => 'Mailing',
           'bao' => 'CRM_Mailing_BAO_Mailing',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Mailing_DAO_Component',
         ) ,
         'resubscribe_id' => array(
@@ -411,6 +417,7 @@ class CRM_Mailing_DAO_Mailing extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing',
           'entity' => 'Mailing',
           'bao' => 'CRM_Mailing_BAO_Mailing',
+          'localizable' => 0,
         ) ,
         'optout_id' => array(
           'name' => 'optout_id',
@@ -420,6 +427,7 @@ class CRM_Mailing_DAO_Mailing extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing',
           'entity' => 'Mailing',
           'bao' => 'CRM_Mailing_BAO_Mailing',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Mailing_DAO_Component',
         ) ,
         'name' => array(
@@ -432,6 +440,7 @@ class CRM_Mailing_DAO_Mailing extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing',
           'entity' => 'Mailing',
           'bao' => 'CRM_Mailing_BAO_Mailing',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -446,6 +455,7 @@ class CRM_Mailing_DAO_Mailing extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing',
           'entity' => 'Mailing',
           'bao' => 'CRM_Mailing_BAO_Mailing',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -463,6 +473,7 @@ class CRM_Mailing_DAO_Mailing extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing',
           'entity' => 'Mailing',
           'bao' => 'CRM_Mailing_BAO_Mailing',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -477,6 +488,7 @@ class CRM_Mailing_DAO_Mailing extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing',
           'entity' => 'Mailing',
           'bao' => 'CRM_Mailing_BAO_Mailing',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -491,6 +503,7 @@ class CRM_Mailing_DAO_Mailing extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing',
           'entity' => 'Mailing',
           'bao' => 'CRM_Mailing_BAO_Mailing',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -507,6 +520,7 @@ class CRM_Mailing_DAO_Mailing extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing',
           'entity' => 'Mailing',
           'bao' => 'CRM_Mailing_BAO_Mailing',
+          'localizable' => 0,
           'pseudoconstant' => array(
             'callback' => 'CRM_Mailing_BAO_Mailing::getTemplateTypeNames',
           )
@@ -519,6 +533,7 @@ class CRM_Mailing_DAO_Mailing extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing',
           'entity' => 'Mailing',
           'bao' => 'CRM_Mailing_BAO_Mailing',
+          'localizable' => 0,
         ) ,
         'subject' => array(
           'name' => 'subject',
@@ -530,6 +545,7 @@ class CRM_Mailing_DAO_Mailing extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing',
           'entity' => 'Mailing',
           'bao' => 'CRM_Mailing_BAO_Mailing',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -542,6 +558,7 @@ class CRM_Mailing_DAO_Mailing extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing',
           'entity' => 'Mailing',
           'bao' => 'CRM_Mailing_BAO_Mailing',
+          'localizable' => 0,
         ) ,
         'body_html' => array(
           'name' => 'body_html',
@@ -551,6 +568,7 @@ class CRM_Mailing_DAO_Mailing extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing',
           'entity' => 'Mailing',
           'bao' => 'CRM_Mailing_BAO_Mailing',
+          'localizable' => 0,
         ) ,
         'url_tracking' => array(
           'name' => 'url_tracking',
@@ -560,6 +578,7 @@ class CRM_Mailing_DAO_Mailing extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing',
           'entity' => 'Mailing',
           'bao' => 'CRM_Mailing_BAO_Mailing',
+          'localizable' => 0,
           'html' => array(
             'type' => 'CheckBox',
           ) ,
@@ -572,6 +591,7 @@ class CRM_Mailing_DAO_Mailing extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing',
           'entity' => 'Mailing',
           'bao' => 'CRM_Mailing_BAO_Mailing',
+          'localizable' => 0,
           'html' => array(
             'type' => 'CheckBox',
           ) ,
@@ -584,6 +604,7 @@ class CRM_Mailing_DAO_Mailing extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing',
           'entity' => 'Mailing',
           'bao' => 'CRM_Mailing_BAO_Mailing',
+          'localizable' => 0,
           'html' => array(
             'type' => 'CheckBox',
           ) ,
@@ -596,6 +617,7 @@ class CRM_Mailing_DAO_Mailing extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing',
           'entity' => 'Mailing',
           'bao' => 'CRM_Mailing_BAO_Mailing',
+          'localizable' => 0,
         ) ,
         'is_completed' => array(
           'name' => 'is_completed',
@@ -605,6 +627,7 @@ class CRM_Mailing_DAO_Mailing extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing',
           'entity' => 'Mailing',
           'bao' => 'CRM_Mailing_BAO_Mailing',
+          'localizable' => 0,
           'html' => array(
             'type' => 'CheckBox',
           ) ,
@@ -617,6 +640,7 @@ class CRM_Mailing_DAO_Mailing extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing',
           'entity' => 'Mailing',
           'bao' => 'CRM_Mailing_BAO_Mailing',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Core_DAO_MessageTemplate',
         ) ,
         'override_verp' => array(
@@ -627,6 +651,7 @@ class CRM_Mailing_DAO_Mailing extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing',
           'entity' => 'Mailing',
           'bao' => 'CRM_Mailing_BAO_Mailing',
+          'localizable' => 0,
           'html' => array(
             'type' => 'CheckBox',
           ) ,
@@ -639,6 +664,7 @@ class CRM_Mailing_DAO_Mailing extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing',
           'entity' => 'Mailing',
           'bao' => 'CRM_Mailing_BAO_Mailing',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Contact_DAO_Contact',
         ) ,
         'created_date' => array(
@@ -649,6 +675,7 @@ class CRM_Mailing_DAO_Mailing extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing',
           'entity' => 'Mailing',
           'bao' => 'CRM_Mailing_BAO_Mailing',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select Date',
           ) ,
@@ -661,6 +688,7 @@ class CRM_Mailing_DAO_Mailing extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing',
           'entity' => 'Mailing',
           'bao' => 'CRM_Mailing_BAO_Mailing',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Contact_DAO_Contact',
         ) ,
         'scheduled_date' => array(
@@ -671,6 +699,7 @@ class CRM_Mailing_DAO_Mailing extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing',
           'entity' => 'Mailing',
           'bao' => 'CRM_Mailing_BAO_Mailing',
+          'localizable' => 0,
         ) ,
         'approver_id' => array(
           'name' => 'approver_id',
@@ -680,6 +709,7 @@ class CRM_Mailing_DAO_Mailing extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing',
           'entity' => 'Mailing',
           'bao' => 'CRM_Mailing_BAO_Mailing',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Contact_DAO_Contact',
         ) ,
         'approval_date' => array(
@@ -690,6 +720,7 @@ class CRM_Mailing_DAO_Mailing extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing',
           'entity' => 'Mailing',
           'bao' => 'CRM_Mailing_BAO_Mailing',
+          'localizable' => 0,
         ) ,
         'approval_status_id' => array(
           'name' => 'approval_status_id',
@@ -699,6 +730,7 @@ class CRM_Mailing_DAO_Mailing extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing',
           'entity' => 'Mailing',
           'bao' => 'CRM_Mailing_BAO_Mailing',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -715,6 +747,7 @@ class CRM_Mailing_DAO_Mailing extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing',
           'entity' => 'Mailing',
           'bao' => 'CRM_Mailing_BAO_Mailing',
+          'localizable' => 0,
           'html' => array(
             'type' => 'TextArea',
           ) ,
@@ -727,6 +760,7 @@ class CRM_Mailing_DAO_Mailing extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing',
           'entity' => 'Mailing',
           'bao' => 'CRM_Mailing_BAO_Mailing',
+          'localizable' => 0,
           'html' => array(
             'type' => 'CheckBox',
           ) ,
@@ -742,6 +776,7 @@ class CRM_Mailing_DAO_Mailing extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing',
           'entity' => 'Mailing',
           'bao' => 'CRM_Mailing_BAO_Mailing',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -757,6 +792,7 @@ class CRM_Mailing_DAO_Mailing extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing',
           'entity' => 'Mailing',
           'bao' => 'CRM_Mailing_BAO_Mailing',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Campaign_DAO_Campaign',
           'html' => array(
             'type' => 'Select',
@@ -775,6 +811,7 @@ class CRM_Mailing_DAO_Mailing extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing',
           'entity' => 'Mailing',
           'bao' => 'CRM_Mailing_BAO_Mailing',
+          'localizable' => 0,
           'html' => array(
             'type' => 'CheckBox',
           ) ,
@@ -786,6 +823,7 @@ class CRM_Mailing_DAO_Mailing extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing',
           'entity' => 'Mailing',
           'bao' => 'CRM_Mailing_BAO_Mailing',
+          'localizable' => 0,
           'FKClassName' => 'CRM_SMS_DAO_Provider',
           'html' => array(
             'type' => 'Select',
@@ -801,6 +839,7 @@ class CRM_Mailing_DAO_Mailing extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing',
           'entity' => 'Mailing',
           'bao' => 'CRM_Mailing_BAO_Mailing',
+          'localizable' => 0,
         ) ,
         'location_type_id' => array(
           'name' => 'location_type_id',
@@ -810,6 +849,7 @@ class CRM_Mailing_DAO_Mailing extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing',
           'entity' => 'Mailing',
           'bao' => 'CRM_Mailing_BAO_Mailing',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Core_DAO_LocationType',
           'pseudoconstant' => array(
             'table' => 'civicrm_location_type',
@@ -828,6 +868,7 @@ class CRM_Mailing_DAO_Mailing extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing',
           'entity' => 'Mailing',
           'bao' => 'CRM_Mailing_BAO_Mailing',
+          'localizable' => 0,
           'pseudoconstant' => array(
             'callback' => 'CRM_Core_SelectValues::emailSelectMethods',
           )
@@ -842,6 +883,7 @@ class CRM_Mailing_DAO_Mailing extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing',
           'entity' => 'Mailing',
           'bao' => 'CRM_Mailing_BAO_Mailing',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,

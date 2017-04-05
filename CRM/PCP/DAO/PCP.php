@@ -177,6 +177,7 @@ class CRM_PCP_DAO_PCP extends CRM_Core_DAO {
           'table_name' => 'civicrm_pcp',
           'entity' => 'PCP',
           'bao' => 'CRM_PCP_BAO_PCP',
+          'localizable' => 0,
         ) ,
         'pcp_contact_id' => array(
           'name' => 'contact_id',
@@ -187,6 +188,7 @@ class CRM_PCP_DAO_PCP extends CRM_Core_DAO {
           'table_name' => 'civicrm_pcp',
           'entity' => 'PCP',
           'bao' => 'CRM_PCP_BAO_PCP',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Contact_DAO_Contact',
           'html' => array(
             'type' => 'EntityRef',
@@ -200,6 +202,7 @@ class CRM_PCP_DAO_PCP extends CRM_Core_DAO {
           'table_name' => 'civicrm_pcp',
           'entity' => 'PCP',
           'bao' => 'CRM_PCP_BAO_PCP',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -218,6 +221,7 @@ class CRM_PCP_DAO_PCP extends CRM_Core_DAO {
           'table_name' => 'civicrm_pcp',
           'entity' => 'PCP',
           'bao' => 'CRM_PCP_BAO_PCP',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -230,6 +234,7 @@ class CRM_PCP_DAO_PCP extends CRM_Core_DAO {
           'table_name' => 'civicrm_pcp',
           'entity' => 'PCP',
           'bao' => 'CRM_PCP_BAO_PCP',
+          'localizable' => 0,
           'html' => array(
             'type' => 'TexArea',
           ) ,
@@ -242,6 +247,7 @@ class CRM_PCP_DAO_PCP extends CRM_Core_DAO {
           'table_name' => 'civicrm_pcp',
           'entity' => 'PCP',
           'bao' => 'CRM_PCP_BAO_PCP',
+          'localizable' => 0,
           'html' => array(
             'type' => 'TexArea',
           ) ,
@@ -256,6 +262,7 @@ class CRM_PCP_DAO_PCP extends CRM_Core_DAO {
           'table_name' => 'civicrm_pcp',
           'entity' => 'PCP',
           'bao' => 'CRM_PCP_BAO_PCP',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -269,6 +276,7 @@ class CRM_PCP_DAO_PCP extends CRM_Core_DAO {
           'table_name' => 'civicrm_pcp',
           'entity' => 'PCP',
           'bao' => 'CRM_PCP_BAO_PCP',
+          'localizable' => 0,
         ) ,
         'page_type' => array(
           'name' => 'page_type',
@@ -281,6 +289,7 @@ class CRM_PCP_DAO_PCP extends CRM_Core_DAO {
           'table_name' => 'civicrm_pcp',
           'entity' => 'PCP',
           'bao' => 'CRM_PCP_BAO_PCP',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -294,6 +303,7 @@ class CRM_PCP_DAO_PCP extends CRM_Core_DAO {
           'table_name' => 'civicrm_pcp',
           'entity' => 'PCP',
           'bao' => 'CRM_PCP_BAO_PCP',
+          'localizable' => 0,
         ) ,
         'is_thermometer' => array(
           'name' => 'is_thermometer',
@@ -302,6 +312,7 @@ class CRM_PCP_DAO_PCP extends CRM_Core_DAO {
           'table_name' => 'civicrm_pcp',
           'entity' => 'PCP',
           'bao' => 'CRM_PCP_BAO_PCP',
+          'localizable' => 0,
           'html' => array(
             'type' => 'CheckBox',
           ) ,
@@ -313,6 +324,7 @@ class CRM_PCP_DAO_PCP extends CRM_Core_DAO {
           'table_name' => 'civicrm_pcp',
           'entity' => 'PCP',
           'bao' => 'CRM_PCP_BAO_PCP',
+          'localizable' => 0,
           'html' => array(
             'type' => 'CheckBox',
           ) ,
@@ -329,6 +341,7 @@ class CRM_PCP_DAO_PCP extends CRM_Core_DAO {
           'table_name' => 'civicrm_pcp',
           'entity' => 'PCP',
           'bao' => 'CRM_PCP_BAO_PCP',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -344,6 +357,7 @@ class CRM_PCP_DAO_PCP extends CRM_Core_DAO {
           'table_name' => 'civicrm_pcp',
           'entity' => 'PCP',
           'bao' => 'CRM_PCP_BAO_PCP',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -362,6 +376,7 @@ class CRM_PCP_DAO_PCP extends CRM_Core_DAO {
           'table_name' => 'civicrm_pcp',
           'entity' => 'PCP',
           'bao' => 'CRM_PCP_BAO_PCP',
+          'localizable' => 0,
           'html' => array(
             'type' => 'CheckBox',
           ) ,
@@ -374,6 +389,7 @@ class CRM_PCP_DAO_PCP extends CRM_Core_DAO {
           'table_name' => 'civicrm_pcp',
           'entity' => 'PCP',
           'bao' => 'CRM_PCP_BAO_PCP',
+          'localizable' => 0,
           'html' => array(
             'type' => 'CheckBox',
           ) ,

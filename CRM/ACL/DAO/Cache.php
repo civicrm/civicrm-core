@@ -113,6 +113,7 @@ class CRM_ACL_DAO_Cache extends CRM_Core_DAO {
           'table_name' => 'civicrm_acl_cache',
           'entity' => 'Cache',
           'bao' => 'CRM_ACL_BAO_Cache',
+          'localizable' => 0,
         ) ,
         'contact_id' => array(
           'name' => 'contact_id',
@@ -122,6 +123,7 @@ class CRM_ACL_DAO_Cache extends CRM_Core_DAO {
           'table_name' => 'civicrm_acl_cache',
           'entity' => 'Cache',
           'bao' => 'CRM_ACL_BAO_Cache',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Contact_DAO_Contact',
         ) ,
         'acl_id' => array(
@@ -133,6 +135,7 @@ class CRM_ACL_DAO_Cache extends CRM_Core_DAO {
           'table_name' => 'civicrm_acl_cache',
           'entity' => 'Cache',
           'bao' => 'CRM_ACL_BAO_Cache',
+          'localizable' => 0,
           'FKClassName' => 'CRM_ACL_DAO_ACL',
         ) ,
         'modified_date' => array(
@@ -144,6 +147,7 @@ class CRM_ACL_DAO_Cache extends CRM_Core_DAO {
           'table_name' => 'civicrm_acl_cache',
           'entity' => 'Cache',
           'bao' => 'CRM_ACL_BAO_Cache',
+          'localizable' => 0,
         ) ,
       );
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);

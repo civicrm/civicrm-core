@@ -116,6 +116,7 @@ class CRM_Core_DAO_File extends CRM_Core_DAO {
           'table_name' => 'civicrm_file',
           'entity' => 'File',
           'bao' => 'CRM_Core_BAO_File',
+          'localizable' => 0,
         ) ,
         'file_type_id' => array(
           'name' => 'file_type_id',
@@ -125,6 +126,7 @@ class CRM_Core_DAO_File extends CRM_Core_DAO {
           'table_name' => 'civicrm_file',
           'entity' => 'File',
           'bao' => 'CRM_Core_BAO_File',
+          'localizable' => 0,
         ) ,
         'mime_type' => array(
           'name' => 'mime_type',
@@ -136,6 +138,7 @@ class CRM_Core_DAO_File extends CRM_Core_DAO {
           'table_name' => 'civicrm_file',
           'entity' => 'File',
           'bao' => 'CRM_Core_BAO_File',
+          'localizable' => 0,
         ) ,
         'uri' => array(
           'name' => 'uri',
@@ -147,6 +150,7 @@ class CRM_Core_DAO_File extends CRM_Core_DAO {
           'table_name' => 'civicrm_file',
           'entity' => 'File',
           'bao' => 'CRM_Core_BAO_File',
+          'localizable' => 0,
         ) ,
         'document' => array(
           'name' => 'document',
@@ -156,6 +160,7 @@ class CRM_Core_DAO_File extends CRM_Core_DAO {
           'table_name' => 'civicrm_file',
           'entity' => 'File',
           'bao' => 'CRM_Core_BAO_File',
+          'localizable' => 0,
         ) ,
         'description' => array(
           'name' => 'description',
@@ -167,6 +172,7 @@ class CRM_Core_DAO_File extends CRM_Core_DAO {
           'table_name' => 'civicrm_file',
           'entity' => 'File',
           'bao' => 'CRM_Core_BAO_File',
+          'localizable' => 0,
         ) ,
         'upload_date' => array(
           'name' => 'upload_date',
@@ -176,6 +182,7 @@ class CRM_Core_DAO_File extends CRM_Core_DAO {
           'table_name' => 'civicrm_file',
           'entity' => 'File',
           'bao' => 'CRM_Core_BAO_File',
+          'localizable' => 0,
         ) ,
       );
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);

@@ -140,6 +140,7 @@ class CRM_Case_DAO_Case extends CRM_Core_DAO {
           'table_name' => 'civicrm_case',
           'entity' => 'Case',
           'bao' => 'CRM_Case_BAO_Case',
+          'localizable' => 0,
         ) ,
         'case_type_id' => array(
           'name' => 'case_type_id',
@@ -155,6 +156,7 @@ class CRM_Case_DAO_Case extends CRM_Core_DAO {
           'table_name' => 'civicrm_case',
           'entity' => 'Case',
           'bao' => 'CRM_Case_BAO_Case',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Case_DAO_CaseType',
           'html' => array(
             'type' => 'Select',
@@ -180,6 +182,7 @@ class CRM_Case_DAO_Case extends CRM_Core_DAO {
           'table_name' => 'civicrm_case',
           'entity' => 'Case',
           'bao' => 'CRM_Case_BAO_Case',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -197,6 +200,7 @@ class CRM_Case_DAO_Case extends CRM_Core_DAO {
           'table_name' => 'civicrm_case',
           'entity' => 'Case',
           'bao' => 'CRM_Case_BAO_Case',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select Date',
           ) ,
@@ -214,6 +218,7 @@ class CRM_Case_DAO_Case extends CRM_Core_DAO {
           'table_name' => 'civicrm_case',
           'entity' => 'Case',
           'bao' => 'CRM_Case_BAO_Case',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select Date',
           ) ,
@@ -228,6 +233,7 @@ class CRM_Case_DAO_Case extends CRM_Core_DAO {
           'table_name' => 'civicrm_case',
           'entity' => 'Case',
           'bao' => 'CRM_Case_BAO_Case',
+          'localizable' => 0,
           'html' => array(
             'type' => 'TextArea',
           ) ,
@@ -246,6 +252,7 @@ class CRM_Case_DAO_Case extends CRM_Core_DAO {
           'table_name' => 'civicrm_case',
           'entity' => 'Case',
           'bao' => 'CRM_Case_BAO_Case',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -266,6 +273,7 @@ class CRM_Case_DAO_Case extends CRM_Core_DAO {
           'table_name' => 'civicrm_case',
           'entity' => 'Case',
           'bao' => 'CRM_Case_BAO_Case',
+          'localizable' => 0,
         ) ,
       );
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);

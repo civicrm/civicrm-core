@@ -116,6 +116,7 @@ class CRM_Mailing_Event_DAO_Bounce extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_event_bounce',
           'entity' => 'Bounce',
           'bao' => 'CRM_Mailing_Event_BAO_Bounce',
+          'localizable' => 0,
         ) ,
         'event_queue_id' => array(
           'name' => 'event_queue_id',
@@ -126,6 +127,7 @@ class CRM_Mailing_Event_DAO_Bounce extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_event_bounce',
           'entity' => 'Bounce',
           'bao' => 'CRM_Mailing_Event_BAO_Bounce',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Mailing_Event_DAO_Queue',
         ) ,
         'bounce_type_id' => array(
@@ -136,6 +138,7 @@ class CRM_Mailing_Event_DAO_Bounce extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_event_bounce',
           'entity' => 'Bounce',
           'bao' => 'CRM_Mailing_Event_BAO_Bounce',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -155,6 +158,7 @@ class CRM_Mailing_Event_DAO_Bounce extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_event_bounce',
           'entity' => 'Bounce',
           'bao' => 'CRM_Mailing_Event_BAO_Bounce',
+          'localizable' => 0,
         ) ,
         'time_stamp' => array(
           'name' => 'time_stamp',
@@ -165,6 +169,7 @@ class CRM_Mailing_Event_DAO_Bounce extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_event_bounce',
           'entity' => 'Bounce',
           'bao' => 'CRM_Mailing_Event_BAO_Bounce',
+          'localizable' => 0,
         ) ,
       );
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);

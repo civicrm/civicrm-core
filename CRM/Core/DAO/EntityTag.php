@@ -113,6 +113,7 @@ class CRM_Core_DAO_EntityTag extends CRM_Core_DAO {
           'table_name' => 'civicrm_entity_tag',
           'entity' => 'EntityTag',
           'bao' => 'CRM_Core_BAO_EntityTag',
+          'localizable' => 0,
         ) ,
         'entity_table' => array(
           'name' => 'entity_table',
@@ -124,6 +125,7 @@ class CRM_Core_DAO_EntityTag extends CRM_Core_DAO {
           'table_name' => 'civicrm_entity_tag',
           'entity' => 'EntityTag',
           'bao' => 'CRM_Core_BAO_EntityTag',
+          'localizable' => 0,
           'pseudoconstant' => array(
             'optionGroupName' => 'tag_used_for',
             'optionEditPath' => 'civicrm/admin/options/tag_used_for',
@@ -138,6 +140,7 @@ class CRM_Core_DAO_EntityTag extends CRM_Core_DAO {
           'table_name' => 'civicrm_entity_tag',
           'entity' => 'EntityTag',
           'bao' => 'CRM_Core_BAO_EntityTag',
+          'localizable' => 0,
         ) ,
         'tag_id' => array(
           'name' => 'tag_id',
@@ -148,6 +151,7 @@ class CRM_Core_DAO_EntityTag extends CRM_Core_DAO {
           'table_name' => 'civicrm_entity_tag',
           'entity' => 'EntityTag',
           'bao' => 'CRM_Core_BAO_EntityTag',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Core_DAO_Tag',
           'html' => array(
             'type' => 'Select',

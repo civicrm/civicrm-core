@@ -197,6 +197,7 @@ class CRM_Campaign_DAO_Campaign extends CRM_Core_DAO {
           'table_name' => 'civicrm_campaign',
           'entity' => 'Campaign',
           'bao' => 'CRM_Campaign_BAO_Campaign',
+          'localizable' => 0,
         ) ,
         'name' => array(
           'name' => 'name',
@@ -214,6 +215,7 @@ class CRM_Campaign_DAO_Campaign extends CRM_Core_DAO {
           'table_name' => 'civicrm_campaign',
           'entity' => 'Campaign',
           'bao' => 'CRM_Campaign_BAO_Campaign',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -233,6 +235,7 @@ class CRM_Campaign_DAO_Campaign extends CRM_Core_DAO {
           'table_name' => 'civicrm_campaign',
           'entity' => 'Campaign',
           'bao' => 'CRM_Campaign_BAO_Campaign',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -247,6 +250,7 @@ class CRM_Campaign_DAO_Campaign extends CRM_Core_DAO {
           'table_name' => 'civicrm_campaign',
           'entity' => 'Campaign',
           'bao' => 'CRM_Campaign_BAO_Campaign',
+          'localizable' => 0,
           'html' => array(
             'type' => 'TextArea',
           ) ,
@@ -264,6 +268,7 @@ class CRM_Campaign_DAO_Campaign extends CRM_Core_DAO {
           'table_name' => 'civicrm_campaign',
           'entity' => 'Campaign',
           'bao' => 'CRM_Campaign_BAO_Campaign',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select Date',
           ) ,
@@ -281,6 +286,7 @@ class CRM_Campaign_DAO_Campaign extends CRM_Core_DAO {
           'table_name' => 'civicrm_campaign',
           'entity' => 'Campaign',
           'bao' => 'CRM_Campaign_BAO_Campaign',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select Date',
           ) ,
@@ -299,6 +305,7 @@ class CRM_Campaign_DAO_Campaign extends CRM_Core_DAO {
           'table_name' => 'civicrm_campaign',
           'entity' => 'Campaign',
           'bao' => 'CRM_Campaign_BAO_Campaign',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -321,6 +328,7 @@ class CRM_Campaign_DAO_Campaign extends CRM_Core_DAO {
           'table_name' => 'civicrm_campaign',
           'entity' => 'Campaign',
           'bao' => 'CRM_Campaign_BAO_Campaign',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -344,6 +352,7 @@ class CRM_Campaign_DAO_Campaign extends CRM_Core_DAO {
           'table_name' => 'civicrm_campaign',
           'entity' => 'Campaign',
           'bao' => 'CRM_Campaign_BAO_Campaign',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -362,6 +371,7 @@ class CRM_Campaign_DAO_Campaign extends CRM_Core_DAO {
           'table_name' => 'civicrm_campaign',
           'entity' => 'Campaign',
           'bao' => 'CRM_Campaign_BAO_Campaign',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Campaign_DAO_Campaign',
           'html' => array(
             'type' => 'EntityRef',
@@ -376,6 +386,7 @@ class CRM_Campaign_DAO_Campaign extends CRM_Core_DAO {
           'table_name' => 'civicrm_campaign',
           'entity' => 'Campaign',
           'bao' => 'CRM_Campaign_BAO_Campaign',
+          'localizable' => 0,
           'html' => array(
             'type' => 'CheckBox',
           ) ,
@@ -388,6 +399,7 @@ class CRM_Campaign_DAO_Campaign extends CRM_Core_DAO {
           'table_name' => 'civicrm_campaign',
           'entity' => 'Campaign',
           'bao' => 'CRM_Campaign_BAO_Campaign',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Contact_DAO_Contact',
         ) ,
         'created_date' => array(
@@ -398,6 +410,7 @@ class CRM_Campaign_DAO_Campaign extends CRM_Core_DAO {
           'table_name' => 'civicrm_campaign',
           'entity' => 'Campaign',
           'bao' => 'CRM_Campaign_BAO_Campaign',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select Date',
           ) ,
@@ -410,6 +423,7 @@ class CRM_Campaign_DAO_Campaign extends CRM_Core_DAO {
           'table_name' => 'civicrm_campaign',
           'entity' => 'Campaign',
           'bao' => 'CRM_Campaign_BAO_Campaign',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Contact_DAO_Contact',
         ) ,
         'last_modified_date' => array(
@@ -420,6 +434,7 @@ class CRM_Campaign_DAO_Campaign extends CRM_Core_DAO {
           'table_name' => 'civicrm_campaign',
           'entity' => 'Campaign',
           'bao' => 'CRM_Campaign_BAO_Campaign',
+          'localizable' => 0,
         ) ,
         'goal_general' => array(
           'name' => 'goal_general',
@@ -429,6 +444,7 @@ class CRM_Campaign_DAO_Campaign extends CRM_Core_DAO {
           'table_name' => 'civicrm_campaign',
           'entity' => 'Campaign',
           'bao' => 'CRM_Campaign_BAO_Campaign',
+          'localizable' => 0,
           'html' => array(
             'type' => 'RichTextEditor',
           ) ,
@@ -445,6 +461,7 @@ class CRM_Campaign_DAO_Campaign extends CRM_Core_DAO {
           'table_name' => 'civicrm_campaign',
           'entity' => 'Campaign',
           'bao' => 'CRM_Campaign_BAO_Campaign',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,

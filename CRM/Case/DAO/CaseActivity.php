@@ -107,6 +107,7 @@ class CRM_Case_DAO_CaseActivity extends CRM_Core_DAO {
           'table_name' => 'civicrm_case_activity',
           'entity' => 'CaseActivity',
           'bao' => 'CRM_Case_DAO_CaseActivity',
+          'localizable' => 0,
         ) ,
         'case_id' => array(
           'name' => 'case_id',
@@ -117,6 +118,7 @@ class CRM_Case_DAO_CaseActivity extends CRM_Core_DAO {
           'table_name' => 'civicrm_case_activity',
           'entity' => 'CaseActivity',
           'bao' => 'CRM_Case_DAO_CaseActivity',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Case_DAO_Case',
         ) ,
         'activity_id' => array(
@@ -128,6 +130,7 @@ class CRM_Case_DAO_CaseActivity extends CRM_Core_DAO {
           'table_name' => 'civicrm_case_activity',
           'entity' => 'CaseActivity',
           'bao' => 'CRM_Case_DAO_CaseActivity',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Activity_DAO_Activity',
         ) ,
       );

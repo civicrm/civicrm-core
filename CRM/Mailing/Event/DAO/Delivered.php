@@ -104,6 +104,7 @@ class CRM_Mailing_Event_DAO_Delivered extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_event_delivered',
           'entity' => 'Delivered',
           'bao' => 'CRM_Mailing_Event_BAO_Delivered',
+          'localizable' => 0,
         ) ,
         'event_queue_id' => array(
           'name' => 'event_queue_id',
@@ -114,6 +115,7 @@ class CRM_Mailing_Event_DAO_Delivered extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_event_delivered',
           'entity' => 'Delivered',
           'bao' => 'CRM_Mailing_Event_BAO_Delivered',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Mailing_Event_DAO_Queue',
         ) ,
         'time_stamp' => array(
@@ -125,6 +127,7 @@ class CRM_Mailing_Event_DAO_Delivered extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_event_delivered',
           'entity' => 'Delivered',
           'bao' => 'CRM_Mailing_Event_BAO_Delivered',
+          'localizable' => 0,
         ) ,
       );
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);

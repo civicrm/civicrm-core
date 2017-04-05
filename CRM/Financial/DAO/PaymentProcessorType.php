@@ -199,6 +199,7 @@ class CRM_Financial_DAO_PaymentProcessorType extends CRM_Core_DAO {
           'table_name' => 'civicrm_payment_processor_type',
           'entity' => 'PaymentProcessorType',
           'bao' => 'CRM_Financial_BAO_PaymentProcessorType',
+          'localizable' => 0,
         ) ,
         'name' => array(
           'name' => 'name',
@@ -210,6 +211,7 @@ class CRM_Financial_DAO_PaymentProcessorType extends CRM_Core_DAO {
           'table_name' => 'civicrm_payment_processor_type',
           'entity' => 'PaymentProcessorType',
           'bao' => 'CRM_Financial_BAO_PaymentProcessorType',
+          'localizable' => 0,
         ) ,
         'title' => array(
           'name' => 'title',
@@ -221,6 +223,7 @@ class CRM_Financial_DAO_PaymentProcessorType extends CRM_Core_DAO {
           'table_name' => 'civicrm_payment_processor_type',
           'entity' => 'PaymentProcessorType',
           'bao' => 'CRM_Financial_BAO_PaymentProcessorType',
+          'localizable' => 0,
         ) ,
         'description' => array(
           'name' => 'description',
@@ -232,6 +235,7 @@ class CRM_Financial_DAO_PaymentProcessorType extends CRM_Core_DAO {
           'table_name' => 'civicrm_payment_processor_type',
           'entity' => 'PaymentProcessorType',
           'bao' => 'CRM_Financial_BAO_PaymentProcessorType',
+          'localizable' => 0,
         ) ,
         'is_active' => array(
           'name' => 'is_active',
@@ -241,6 +245,7 @@ class CRM_Financial_DAO_PaymentProcessorType extends CRM_Core_DAO {
           'table_name' => 'civicrm_payment_processor_type',
           'entity' => 'PaymentProcessorType',
           'bao' => 'CRM_Financial_BAO_PaymentProcessorType',
+          'localizable' => 0,
         ) ,
         'is_default' => array(
           'name' => 'is_default',
@@ -250,6 +255,7 @@ class CRM_Financial_DAO_PaymentProcessorType extends CRM_Core_DAO {
           'table_name' => 'civicrm_payment_processor_type',
           'entity' => 'PaymentProcessorType',
           'bao' => 'CRM_Financial_BAO_PaymentProcessorType',
+          'localizable' => 0,
         ) ,
         'user_name_label' => array(
           'name' => 'user_name_label',
@@ -260,6 +266,7 @@ class CRM_Financial_DAO_PaymentProcessorType extends CRM_Core_DAO {
           'table_name' => 'civicrm_payment_processor_type',
           'entity' => 'PaymentProcessorType',
           'bao' => 'CRM_Financial_BAO_PaymentProcessorType',
+          'localizable' => 0,
         ) ,
         'password_label' => array(
           'name' => 'password_label',
@@ -270,6 +277,7 @@ class CRM_Financial_DAO_PaymentProcessorType extends CRM_Core_DAO {
           'table_name' => 'civicrm_payment_processor_type',
           'entity' => 'PaymentProcessorType',
           'bao' => 'CRM_Financial_BAO_PaymentProcessorType',
+          'localizable' => 0,
         ) ,
         'signature_label' => array(
           'name' => 'signature_label',
@@ -280,6 +288,7 @@ class CRM_Financial_DAO_PaymentProcessorType extends CRM_Core_DAO {
           'table_name' => 'civicrm_payment_processor_type',
           'entity' => 'PaymentProcessorType',
           'bao' => 'CRM_Financial_BAO_PaymentProcessorType',
+          'localizable' => 0,
         ) ,
         'subject_label' => array(
           'name' => 'subject_label',
@@ -290,6 +299,7 @@ class CRM_Financial_DAO_PaymentProcessorType extends CRM_Core_DAO {
           'table_name' => 'civicrm_payment_processor_type',
           'entity' => 'PaymentProcessorType',
           'bao' => 'CRM_Financial_BAO_PaymentProcessorType',
+          'localizable' => 0,
         ) ,
         'class_name' => array(
           'name' => 'class_name',
@@ -300,6 +310,7 @@ class CRM_Financial_DAO_PaymentProcessorType extends CRM_Core_DAO {
           'table_name' => 'civicrm_payment_processor_type',
           'entity' => 'PaymentProcessorType',
           'bao' => 'CRM_Financial_BAO_PaymentProcessorType',
+          'localizable' => 0,
         ) ,
         'url_site_default' => array(
           'name' => 'url_site_default',
@@ -310,6 +321,7 @@ class CRM_Financial_DAO_PaymentProcessorType extends CRM_Core_DAO {
           'table_name' => 'civicrm_payment_processor_type',
           'entity' => 'PaymentProcessorType',
           'bao' => 'CRM_Financial_BAO_PaymentProcessorType',
+          'localizable' => 0,
         ) ,
         'url_api_default' => array(
           'name' => 'url_api_default',
@@ -320,6 +332,7 @@ class CRM_Financial_DAO_PaymentProcessorType extends CRM_Core_DAO {
           'table_name' => 'civicrm_payment_processor_type',
           'entity' => 'PaymentProcessorType',
           'bao' => 'CRM_Financial_BAO_PaymentProcessorType',
+          'localizable' => 0,
         ) ,
         'url_recur_default' => array(
           'name' => 'url_recur_default',
@@ -330,6 +343,7 @@ class CRM_Financial_DAO_PaymentProcessorType extends CRM_Core_DAO {
           'table_name' => 'civicrm_payment_processor_type',
           'entity' => 'PaymentProcessorType',
           'bao' => 'CRM_Financial_BAO_PaymentProcessorType',
+          'localizable' => 0,
         ) ,
         'url_button_default' => array(
           'name' => 'url_button_default',
@@ -340,6 +354,7 @@ class CRM_Financial_DAO_PaymentProcessorType extends CRM_Core_DAO {
           'table_name' => 'civicrm_payment_processor_type',
           'entity' => 'PaymentProcessorType',
           'bao' => 'CRM_Financial_BAO_PaymentProcessorType',
+          'localizable' => 0,
         ) ,
         'url_site_test_default' => array(
           'name' => 'url_site_test_default',
@@ -350,6 +365,7 @@ class CRM_Financial_DAO_PaymentProcessorType extends CRM_Core_DAO {
           'table_name' => 'civicrm_payment_processor_type',
           'entity' => 'PaymentProcessorType',
           'bao' => 'CRM_Financial_BAO_PaymentProcessorType',
+          'localizable' => 0,
         ) ,
         'url_api_test_default' => array(
           'name' => 'url_api_test_default',
@@ -360,6 +376,7 @@ class CRM_Financial_DAO_PaymentProcessorType extends CRM_Core_DAO {
           'table_name' => 'civicrm_payment_processor_type',
           'entity' => 'PaymentProcessorType',
           'bao' => 'CRM_Financial_BAO_PaymentProcessorType',
+          'localizable' => 0,
         ) ,
         'url_recur_test_default' => array(
           'name' => 'url_recur_test_default',
@@ -370,6 +387,7 @@ class CRM_Financial_DAO_PaymentProcessorType extends CRM_Core_DAO {
           'table_name' => 'civicrm_payment_processor_type',
           'entity' => 'PaymentProcessorType',
           'bao' => 'CRM_Financial_BAO_PaymentProcessorType',
+          'localizable' => 0,
         ) ,
         'url_button_test_default' => array(
           'name' => 'url_button_test_default',
@@ -380,6 +398,7 @@ class CRM_Financial_DAO_PaymentProcessorType extends CRM_Core_DAO {
           'table_name' => 'civicrm_payment_processor_type',
           'entity' => 'PaymentProcessorType',
           'bao' => 'CRM_Financial_BAO_PaymentProcessorType',
+          'localizable' => 0,
         ) ,
         'billing_mode' => array(
           'name' => 'billing_mode',
@@ -390,6 +409,7 @@ class CRM_Financial_DAO_PaymentProcessorType extends CRM_Core_DAO {
           'table_name' => 'civicrm_payment_processor_type',
           'entity' => 'PaymentProcessorType',
           'bao' => 'CRM_Financial_BAO_PaymentProcessorType',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -405,6 +425,7 @@ class CRM_Financial_DAO_PaymentProcessorType extends CRM_Core_DAO {
           'table_name' => 'civicrm_payment_processor_type',
           'entity' => 'PaymentProcessorType',
           'bao' => 'CRM_Financial_BAO_PaymentProcessorType',
+          'localizable' => 0,
         ) ,
         'payment_type' => array(
           'name' => 'payment_type',
@@ -415,6 +436,7 @@ class CRM_Financial_DAO_PaymentProcessorType extends CRM_Core_DAO {
           'table_name' => 'civicrm_payment_processor_type',
           'entity' => 'PaymentProcessorType',
           'bao' => 'CRM_Financial_BAO_PaymentProcessorType',
+          'localizable' => 0,
         ) ,
         'payment_instrument_id' => array(
           'name' => 'payment_instrument_id',
@@ -425,6 +447,7 @@ class CRM_Financial_DAO_PaymentProcessorType extends CRM_Core_DAO {
           'table_name' => 'civicrm_payment_processor_type',
           'entity' => 'PaymentProcessorType',
           'bao' => 'CRM_Financial_BAO_PaymentProcessorType',
+          'localizable' => 0,
           'pseudoconstant' => array(
             'optionGroupName' => 'payment_instrument',
             'optionEditPath' => 'civicrm/admin/options/payment_instrument',

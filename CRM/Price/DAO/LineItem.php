@@ -176,6 +176,7 @@ class CRM_Price_DAO_LineItem extends CRM_Core_DAO {
           'table_name' => 'civicrm_line_item',
           'entity' => 'LineItem',
           'bao' => 'CRM_Price_BAO_LineItem',
+          'localizable' => 0,
         ) ,
         'entity_table' => array(
           'name' => 'entity_table',
@@ -188,6 +189,7 @@ class CRM_Price_DAO_LineItem extends CRM_Core_DAO {
           'table_name' => 'civicrm_line_item',
           'entity' => 'LineItem',
           'bao' => 'CRM_Price_BAO_LineItem',
+          'localizable' => 0,
         ) ,
         'entity_id' => array(
           'name' => 'entity_id',
@@ -198,6 +200,7 @@ class CRM_Price_DAO_LineItem extends CRM_Core_DAO {
           'table_name' => 'civicrm_line_item',
           'entity' => 'LineItem',
           'bao' => 'CRM_Price_BAO_LineItem',
+          'localizable' => 0,
         ) ,
         'contribution_id' => array(
           'name' => 'contribution_id',
@@ -207,6 +210,7 @@ class CRM_Price_DAO_LineItem extends CRM_Core_DAO {
           'table_name' => 'civicrm_line_item',
           'entity' => 'LineItem',
           'bao' => 'CRM_Price_BAO_LineItem',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Contribute_DAO_Contribution',
         ) ,
         'price_field_id' => array(
@@ -217,6 +221,7 @@ class CRM_Price_DAO_LineItem extends CRM_Core_DAO {
           'table_name' => 'civicrm_line_item',
           'entity' => 'LineItem',
           'bao' => 'CRM_Price_BAO_LineItem',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Price_DAO_PriceField',
         ) ,
         'label' => array(
@@ -230,6 +235,7 @@ class CRM_Price_DAO_LineItem extends CRM_Core_DAO {
           'table_name' => 'civicrm_line_item',
           'entity' => 'LineItem',
           'bao' => 'CRM_Price_BAO_LineItem',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -247,6 +253,7 @@ class CRM_Price_DAO_LineItem extends CRM_Core_DAO {
           'table_name' => 'civicrm_line_item',
           'entity' => 'LineItem',
           'bao' => 'CRM_Price_BAO_LineItem',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -264,6 +271,7 @@ class CRM_Price_DAO_LineItem extends CRM_Core_DAO {
           'table_name' => 'civicrm_line_item',
           'entity' => 'LineItem',
           'bao' => 'CRM_Price_BAO_LineItem',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -281,6 +289,7 @@ class CRM_Price_DAO_LineItem extends CRM_Core_DAO {
           'table_name' => 'civicrm_line_item',
           'entity' => 'LineItem',
           'bao' => 'CRM_Price_BAO_LineItem',
+          'localizable' => 0,
         ) ,
         'participant_count' => array(
           'name' => 'participant_count',
@@ -291,6 +300,7 @@ class CRM_Price_DAO_LineItem extends CRM_Core_DAO {
           'table_name' => 'civicrm_line_item',
           'entity' => 'LineItem',
           'bao' => 'CRM_Price_BAO_LineItem',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -304,6 +314,7 @@ class CRM_Price_DAO_LineItem extends CRM_Core_DAO {
           'table_name' => 'civicrm_line_item',
           'entity' => 'LineItem',
           'bao' => 'CRM_Price_BAO_LineItem',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Price_DAO_PriceFieldValue',
         ) ,
         'financial_type_id' => array(
@@ -315,6 +326,7 @@ class CRM_Price_DAO_LineItem extends CRM_Core_DAO {
           'table_name' => 'civicrm_line_item',
           'entity' => 'LineItem',
           'bao' => 'CRM_Price_BAO_LineItem',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Financial_DAO_FinancialType',
           'html' => array(
             'type' => 'Select',
@@ -339,6 +351,7 @@ class CRM_Price_DAO_LineItem extends CRM_Core_DAO {
           'table_name' => 'civicrm_line_item',
           'entity' => 'LineItem',
           'bao' => 'CRM_Price_BAO_LineItem',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -360,6 +373,7 @@ class CRM_Price_DAO_LineItem extends CRM_Core_DAO {
           'table_name' => 'civicrm_line_item',
           'entity' => 'LineItem',
           'bao' => 'CRM_Price_BAO_LineItem',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,

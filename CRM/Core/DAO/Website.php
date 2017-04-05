@@ -112,6 +112,7 @@ class CRM_Core_DAO_Website extends CRM_Core_DAO {
           'table_name' => 'civicrm_website',
           'entity' => 'Website',
           'bao' => 'CRM_Core_BAO_Website',
+          'localizable' => 0,
         ) ,
         'contact_id' => array(
           'name' => 'contact_id',
@@ -121,6 +122,7 @@ class CRM_Core_DAO_Website extends CRM_Core_DAO {
           'table_name' => 'civicrm_website',
           'entity' => 'Website',
           'bao' => 'CRM_Core_BAO_Website',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Contact_DAO_Contact',
         ) ,
         'url' => array(
@@ -138,6 +140,7 @@ class CRM_Core_DAO_Website extends CRM_Core_DAO {
           'table_name' => 'civicrm_website',
           'entity' => 'Website',
           'bao' => 'CRM_Core_BAO_Website',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -150,6 +153,7 @@ class CRM_Core_DAO_Website extends CRM_Core_DAO {
           'table_name' => 'civicrm_website',
           'entity' => 'Website',
           'bao' => 'CRM_Core_BAO_Website',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,

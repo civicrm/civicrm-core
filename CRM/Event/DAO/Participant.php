@@ -213,6 +213,7 @@ class CRM_Event_DAO_Participant extends CRM_Core_DAO {
           'table_name' => 'civicrm_participant',
           'entity' => 'Participant',
           'bao' => 'CRM_Event_BAO_Participant',
+          'localizable' => 0,
         ) ,
         'participant_contact_id' => array(
           'name' => 'contact_id',
@@ -228,6 +229,7 @@ class CRM_Event_DAO_Participant extends CRM_Core_DAO {
           'table_name' => 'civicrm_participant',
           'entity' => 'Participant',
           'bao' => 'CRM_Event_BAO_Participant',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Contact_DAO_Contact',
         ) ,
         'event_id' => array(
@@ -244,6 +246,7 @@ class CRM_Event_DAO_Participant extends CRM_Core_DAO {
           'table_name' => 'civicrm_participant',
           'entity' => 'Participant',
           'bao' => 'CRM_Event_BAO_Participant',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Event_DAO_Event',
         ) ,
         'participant_status_id' => array(
@@ -261,6 +264,7 @@ class CRM_Event_DAO_Participant extends CRM_Core_DAO {
           'table_name' => 'civicrm_participant',
           'entity' => 'Participant',
           'bao' => 'CRM_Event_BAO_Participant',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Event_DAO_ParticipantStatusType',
           'html' => array(
             'type' => 'Select',
@@ -287,6 +291,7 @@ class CRM_Event_DAO_Participant extends CRM_Core_DAO {
           'table_name' => 'civicrm_participant',
           'entity' => 'Participant',
           'bao' => 'CRM_Event_BAO_Participant',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -308,6 +313,7 @@ class CRM_Event_DAO_Participant extends CRM_Core_DAO {
           'table_name' => 'civicrm_participant',
           'entity' => 'Participant',
           'bao' => 'CRM_Event_BAO_Participant',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select Date',
             'formatType' => 'activityDateTime',
@@ -328,6 +334,7 @@ class CRM_Event_DAO_Participant extends CRM_Core_DAO {
           'table_name' => 'civicrm_participant',
           'entity' => 'Participant',
           'bao' => 'CRM_Event_BAO_Participant',
+          'localizable' => 0,
         ) ,
         'participant_fee_level' => array(
           'name' => 'fee_level',
@@ -344,6 +351,7 @@ class CRM_Event_DAO_Participant extends CRM_Core_DAO {
           'table_name' => 'civicrm_participant',
           'entity' => 'Participant',
           'bao' => 'CRM_Event_BAO_Participant',
+          'localizable' => 0,
         ) ,
         'participant_is_test' => array(
           'name' => 'is_test',
@@ -357,6 +365,7 @@ class CRM_Event_DAO_Participant extends CRM_Core_DAO {
           'table_name' => 'civicrm_participant',
           'entity' => 'Participant',
           'bao' => 'CRM_Event_BAO_Participant',
+          'localizable' => 0,
         ) ,
         'participant_is_pay_later' => array(
           'name' => 'is_pay_later',
@@ -370,6 +379,7 @@ class CRM_Event_DAO_Participant extends CRM_Core_DAO {
           'table_name' => 'civicrm_participant',
           'entity' => 'Participant',
           'bao' => 'CRM_Event_BAO_Participant',
+          'localizable' => 0,
         ) ,
         'participant_fee_amount' => array(
           'name' => 'fee_amount',
@@ -388,6 +398,7 @@ class CRM_Event_DAO_Participant extends CRM_Core_DAO {
           'table_name' => 'civicrm_participant',
           'entity' => 'Participant',
           'bao' => 'CRM_Event_BAO_Participant',
+          'localizable' => 0,
         ) ,
         'participant_registered_by_id' => array(
           'name' => 'registered_by_id',
@@ -403,6 +414,7 @@ class CRM_Event_DAO_Participant extends CRM_Core_DAO {
           'table_name' => 'civicrm_participant',
           'entity' => 'Participant',
           'bao' => 'CRM_Event_BAO_Participant',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Event_DAO_Participant',
         ) ,
         'participant_discount_id' => array(
@@ -414,6 +426,7 @@ class CRM_Event_DAO_Participant extends CRM_Core_DAO {
           'table_name' => 'civicrm_participant',
           'entity' => 'Participant',
           'bao' => 'CRM_Event_BAO_Participant',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Core_DAO_Discount',
         ) ,
         'participant_fee_currency' => array(
@@ -432,6 +445,7 @@ class CRM_Event_DAO_Participant extends CRM_Core_DAO {
           'table_name' => 'civicrm_participant',
           'entity' => 'Participant',
           'bao' => 'CRM_Event_BAO_Participant',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -455,6 +469,7 @@ class CRM_Event_DAO_Participant extends CRM_Core_DAO {
           'table_name' => 'civicrm_participant',
           'entity' => 'Participant',
           'bao' => 'CRM_Event_BAO_Participant',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Campaign_DAO_Campaign',
           'pseudoconstant' => array(
             'table' => 'civicrm_campaign',
@@ -470,6 +485,7 @@ class CRM_Event_DAO_Participant extends CRM_Core_DAO {
           'table_name' => 'civicrm_participant',
           'entity' => 'Participant',
           'bao' => 'CRM_Event_BAO_Participant',
+          'localizable' => 0,
         ) ,
         'cart_id' => array(
           'name' => 'cart_id',
@@ -479,6 +495,7 @@ class CRM_Event_DAO_Participant extends CRM_Core_DAO {
           'table_name' => 'civicrm_participant',
           'entity' => 'Participant',
           'bao' => 'CRM_Event_BAO_Participant',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Event_Cart_DAO_Cart',
         ) ,
         'must_wait' => array(
@@ -489,6 +506,7 @@ class CRM_Event_DAO_Participant extends CRM_Core_DAO {
           'table_name' => 'civicrm_participant',
           'entity' => 'Participant',
           'bao' => 'CRM_Event_BAO_Participant',
+          'localizable' => 0,
         ) ,
         'transferred_to_contact_id' => array(
           'name' => 'transferred_to_contact_id',
@@ -504,6 +522,7 @@ class CRM_Event_DAO_Participant extends CRM_Core_DAO {
           'table_name' => 'civicrm_participant',
           'entity' => 'Participant',
           'bao' => 'CRM_Event_BAO_Participant',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Contact_DAO_Contact',
         ) ,
       );

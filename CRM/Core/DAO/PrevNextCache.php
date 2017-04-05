@@ -113,6 +113,7 @@ class CRM_Core_DAO_PrevNextCache extends CRM_Core_DAO {
           'table_name' => 'civicrm_prevnext_cache',
           'entity' => 'PrevNextCache',
           'bao' => 'CRM_Core_BAO_PrevNextCache',
+          'localizable' => 0,
         ) ,
         'entity_table' => array(
           'name' => 'entity_table',
@@ -124,6 +125,7 @@ class CRM_Core_DAO_PrevNextCache extends CRM_Core_DAO {
           'table_name' => 'civicrm_prevnext_cache',
           'entity' => 'PrevNextCache',
           'bao' => 'CRM_Core_BAO_PrevNextCache',
+          'localizable' => 0,
         ) ,
         'entity_id1' => array(
           'name' => 'entity_id1',
@@ -134,6 +136,7 @@ class CRM_Core_DAO_PrevNextCache extends CRM_Core_DAO {
           'table_name' => 'civicrm_prevnext_cache',
           'entity' => 'PrevNextCache',
           'bao' => 'CRM_Core_BAO_PrevNextCache',
+          'localizable' => 0,
         ) ,
         'entity_id2' => array(
           'name' => 'entity_id2',
@@ -144,6 +147,7 @@ class CRM_Core_DAO_PrevNextCache extends CRM_Core_DAO {
           'table_name' => 'civicrm_prevnext_cache',
           'entity' => 'PrevNextCache',
           'bao' => 'CRM_Core_BAO_PrevNextCache',
+          'localizable' => 0,
         ) ,
         'cacheKey' => array(
           'name' => 'cacheKey',
@@ -155,6 +159,7 @@ class CRM_Core_DAO_PrevNextCache extends CRM_Core_DAO {
           'table_name' => 'civicrm_prevnext_cache',
           'entity' => 'PrevNextCache',
           'bao' => 'CRM_Core_BAO_PrevNextCache',
+          'localizable' => 0,
         ) ,
         'data' => array(
           'name' => 'data',
@@ -164,6 +169,7 @@ class CRM_Core_DAO_PrevNextCache extends CRM_Core_DAO {
           'table_name' => 'civicrm_prevnext_cache',
           'entity' => 'PrevNextCache',
           'bao' => 'CRM_Core_BAO_PrevNextCache',
+          'localizable' => 0,
         ) ,
         'is_selected' => array(
           'name' => 'is_selected',
@@ -172,6 +178,7 @@ class CRM_Core_DAO_PrevNextCache extends CRM_Core_DAO {
           'table_name' => 'civicrm_prevnext_cache',
           'entity' => 'PrevNextCache',
           'bao' => 'CRM_Core_BAO_PrevNextCache',
+          'localizable' => 0,
         ) ,
       );
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);

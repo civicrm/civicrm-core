@@ -92,6 +92,7 @@ class CRM_Core_DAO_Component extends CRM_Core_DAO {
           'table_name' => 'civicrm_component',
           'entity' => 'Component',
           'bao' => 'CRM_Core_DAO_Component',
+          'localizable' => 0,
         ) ,
         'name' => array(
           'name' => 'name',
@@ -104,6 +105,7 @@ class CRM_Core_DAO_Component extends CRM_Core_DAO {
           'table_name' => 'civicrm_component',
           'entity' => 'Component',
           'bao' => 'CRM_Core_DAO_Component',
+          'localizable' => 0,
         ) ,
         'namespace' => array(
           'name' => 'namespace',
@@ -117,6 +119,7 @@ class CRM_Core_DAO_Component extends CRM_Core_DAO {
           'table_name' => 'civicrm_component',
           'entity' => 'Component',
           'bao' => 'CRM_Core_DAO_Component',
+          'localizable' => 0,
         ) ,
       );
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);

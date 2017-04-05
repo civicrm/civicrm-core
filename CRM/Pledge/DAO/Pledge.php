@@ -233,6 +233,7 @@ class CRM_Pledge_DAO_Pledge extends CRM_Core_DAO {
           'table_name' => 'civicrm_pledge',
           'entity' => 'Pledge',
           'bao' => 'CRM_Pledge_BAO_Pledge',
+          'localizable' => 0,
         ) ,
         'pledge_contact_id' => array(
           'name' => 'contact_id',
@@ -248,6 +249,7 @@ class CRM_Pledge_DAO_Pledge extends CRM_Core_DAO {
           'table_name' => 'civicrm_pledge',
           'entity' => 'Pledge',
           'bao' => 'CRM_Pledge_BAO_Pledge',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Contact_DAO_Contact',
           'html' => array(
             'type' => 'EntityRef',
@@ -261,6 +263,7 @@ class CRM_Pledge_DAO_Pledge extends CRM_Core_DAO {
           'table_name' => 'civicrm_pledge',
           'entity' => 'Pledge',
           'bao' => 'CRM_Pledge_BAO_Pledge',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Financial_DAO_FinancialType',
           'html' => array(
             'type' => 'Select',
@@ -279,6 +282,7 @@ class CRM_Pledge_DAO_Pledge extends CRM_Core_DAO {
           'table_name' => 'civicrm_pledge',
           'entity' => 'Pledge',
           'bao' => 'CRM_Pledge_BAO_Pledge',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Contribute_DAO_ContributionPage',
         ) ,
         'pledge_amount' => array(
@@ -299,6 +303,7 @@ class CRM_Pledge_DAO_Pledge extends CRM_Core_DAO {
           'table_name' => 'civicrm_pledge',
           'entity' => 'Pledge',
           'bao' => 'CRM_Pledge_BAO_Pledge',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -316,6 +321,7 @@ class CRM_Pledge_DAO_Pledge extends CRM_Core_DAO {
           'table_name' => 'civicrm_pledge',
           'entity' => 'Pledge',
           'bao' => 'CRM_Pledge_BAO_Pledge',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -331,6 +337,7 @@ class CRM_Pledge_DAO_Pledge extends CRM_Core_DAO {
           'table_name' => 'civicrm_pledge',
           'entity' => 'Pledge',
           'bao' => 'CRM_Pledge_BAO_Pledge',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -352,6 +359,7 @@ class CRM_Pledge_DAO_Pledge extends CRM_Core_DAO {
           'table_name' => 'civicrm_pledge',
           'entity' => 'Pledge',
           'bao' => 'CRM_Pledge_BAO_Pledge',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -371,6 +379,7 @@ class CRM_Pledge_DAO_Pledge extends CRM_Core_DAO {
           'table_name' => 'civicrm_pledge',
           'entity' => 'Pledge',
           'bao' => 'CRM_Pledge_BAO_Pledge',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -385,6 +394,7 @@ class CRM_Pledge_DAO_Pledge extends CRM_Core_DAO {
           'table_name' => 'civicrm_pledge',
           'entity' => 'Pledge',
           'bao' => 'CRM_Pledge_BAO_Pledge',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -398,6 +408,7 @@ class CRM_Pledge_DAO_Pledge extends CRM_Core_DAO {
           'table_name' => 'civicrm_pledge',
           'entity' => 'Pledge',
           'bao' => 'CRM_Pledge_BAO_Pledge',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -411,6 +422,7 @@ class CRM_Pledge_DAO_Pledge extends CRM_Core_DAO {
           'table_name' => 'civicrm_pledge',
           'entity' => 'Pledge',
           'bao' => 'CRM_Pledge_BAO_Pledge',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select Date',
           ) ,
@@ -429,6 +441,7 @@ class CRM_Pledge_DAO_Pledge extends CRM_Core_DAO {
           'table_name' => 'civicrm_pledge',
           'entity' => 'Pledge',
           'bao' => 'CRM_Pledge_BAO_Pledge',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select Date',
           ) ,
@@ -441,6 +454,7 @@ class CRM_Pledge_DAO_Pledge extends CRM_Core_DAO {
           'table_name' => 'civicrm_pledge',
           'entity' => 'Pledge',
           'bao' => 'CRM_Pledge_BAO_Pledge',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select Date',
           ) ,
@@ -453,6 +467,7 @@ class CRM_Pledge_DAO_Pledge extends CRM_Core_DAO {
           'table_name' => 'civicrm_pledge',
           'entity' => 'Pledge',
           'bao' => 'CRM_Pledge_BAO_Pledge',
+          'localizable' => 0,
         ) ,
         'cancel_date' => array(
           'name' => 'cancel_date',
@@ -462,6 +477,7 @@ class CRM_Pledge_DAO_Pledge extends CRM_Core_DAO {
           'table_name' => 'civicrm_pledge',
           'entity' => 'Pledge',
           'bao' => 'CRM_Pledge_BAO_Pledge',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select Date',
           ) ,
@@ -474,6 +490,7 @@ class CRM_Pledge_DAO_Pledge extends CRM_Core_DAO {
           'table_name' => 'civicrm_pledge',
           'entity' => 'Pledge',
           'bao' => 'CRM_Pledge_BAO_Pledge',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select Date',
           ) ,
@@ -487,6 +504,7 @@ class CRM_Pledge_DAO_Pledge extends CRM_Core_DAO {
           'table_name' => 'civicrm_pledge',
           'entity' => 'Pledge',
           'bao' => 'CRM_Pledge_BAO_Pledge',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -500,6 +518,7 @@ class CRM_Pledge_DAO_Pledge extends CRM_Core_DAO {
           'table_name' => 'civicrm_pledge',
           'entity' => 'Pledge',
           'bao' => 'CRM_Pledge_BAO_Pledge',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -513,6 +532,7 @@ class CRM_Pledge_DAO_Pledge extends CRM_Core_DAO {
           'table_name' => 'civicrm_pledge',
           'entity' => 'Pledge',
           'bao' => 'CRM_Pledge_BAO_Pledge',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -530,6 +550,7 @@ class CRM_Pledge_DAO_Pledge extends CRM_Core_DAO {
           'table_name' => 'civicrm_pledge',
           'entity' => 'Pledge',
           'bao' => 'CRM_Pledge_BAO_Pledge',
+          'localizable' => 0,
           'pseudoconstant' => array(
             'optionGroupName' => 'contribution_status',
             'optionEditPath' => 'civicrm/admin/options/contribution_status',
@@ -547,6 +568,7 @@ class CRM_Pledge_DAO_Pledge extends CRM_Core_DAO {
           'table_name' => 'civicrm_pledge',
           'entity' => 'Pledge',
           'bao' => 'CRM_Pledge_BAO_Pledge',
+          'localizable' => 0,
           'html' => array(
             'type' => 'CheckBox',
           ) ,
@@ -564,6 +586,7 @@ class CRM_Pledge_DAO_Pledge extends CRM_Core_DAO {
           'table_name' => 'civicrm_pledge',
           'entity' => 'Pledge',
           'bao' => 'CRM_Pledge_BAO_Pledge',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Campaign_DAO_Campaign',
           'html' => array(
             'type' => 'Select',
