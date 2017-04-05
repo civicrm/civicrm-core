@@ -1705,6 +1705,8 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
   }
 
   /**
+   * @deprecated - use the api instead.
+   *
    * Get the Activities of a target contact.
    *
    * @param int $contactId
@@ -1714,6 +1716,7 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
    *   array of activity fields
    */
   public static function getContactActivity($contactId) {
+    // @todo remove this function entirely.
     $activities = array();
     $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
     $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);

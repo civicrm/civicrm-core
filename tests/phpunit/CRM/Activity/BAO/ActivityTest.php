@@ -81,6 +81,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       'subject', 'Database check for created activity.'
     );
 
+    // @todo - remove this deprecated functions
     $activities = CRM_Activity_BAO_Activity::getContactActivity($targetContactId);
 
     $this->assertEquals($activities[$activityId]['subject'], 'Scheduling Meeting', 'Verify activity subject is correct.');
