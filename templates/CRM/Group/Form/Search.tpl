@@ -142,10 +142,12 @@
         //Reload table after draw
         $(settings.nTable).trigger('crmLoad');
         if (parentsOnly) {
-          $('tbody tr.crm-group-parent', settings.nTable).each( function() {
-            $(this).find('td:first')
-              .prepend('{/literal}<span class="collapsed show-children" title="{ts}show child groups{/ts}"/></span>{literal}')
-              .find('div').css({'display': 'inline'});
+          CRM.loadScript(CRM.config.resourceBase + 'js/jquery/jquery.crmEditable.js').done(function () {
+            $('tbody tr.crm-group-parent', settings.nTable).each(function () {
+              $(this).find('td:first')
+                .prepend('{/literal}<span class="collapsed show-children" title="{ts}show child groups{/ts}"/></span>{literal}')
+                .find('div').css({'display': 'inline'});
+            });
           });
         }
       }
