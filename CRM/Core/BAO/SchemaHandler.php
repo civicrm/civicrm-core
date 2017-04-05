@@ -428,9 +428,9 @@ ADD UNIQUE INDEX `unique_entity_id` ( `entity_id` )";
    * @todo add support for length & multilingual on combined keys.
    *
    * @param string $createIndexPrefix
-   * @param array $substrLenghts
+   * @param array $substrLengths
    */
-  public static function createIndexes($tables, $createIndexPrefix = 'index', $substrLenghts = array()) {
+  public static function createIndexes($tables, $createIndexPrefix = 'index', $substrLengths = array()) {
     $queries = array();
     $domain = new CRM_Core_DAO_Domain();
     $domain->find(TRUE);
@@ -464,8 +464,8 @@ ADD UNIQUE INDEX `unique_entity_id` ( `entity_id` )";
         else {
           // handle indices over substrings, CRM-6245
           // $lengthName is appended to index name, $lengthSize is the field size modifier
-          $lengthName = isset($substrLenghts[$table][$fieldName]) ? "_{$substrLenghts[$table][$fieldName]}" : '';
-          $lengthSize = isset($substrLenghts[$table][$fieldName]) ? "({$substrLenghts[$table][$fieldName]})" : '';
+          $lengthName = isset($substrLengths[$table][$fieldName]) ? "_{$substrLengths[$table][$fieldName]}" : '';
+          $lengthSize = isset($substrLengths[$table][$fieldName]) ? "({$substrLengths[$table][$fieldName]})" : '';
         }
 
         $names = array(

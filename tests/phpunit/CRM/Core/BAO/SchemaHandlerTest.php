@@ -93,14 +93,14 @@ class CRM_Core_BAO_SchemaHandlerTest extends CiviUnitTestCase {
   /**
    * Test the drop index if exists function for a non-existent index.
    */
-  public function testCHeckIndexNotExists() {
+  public function testCheckIndexNotExists() {
     $this->assertFalse(CRM_Core_BAO_SchemaHandler::checkIfIndexExists('civicrm_contact', 'magic_button'));
   }
 
   /**
    * Test the drop index if exists function for a non-existent index.
    */
-  public function testCHeckIndexExists() {
+  public function testCheckIndexExists() {
     $this->assertTrue(CRM_Core_BAO_SchemaHandler::checkIfIndexExists('civicrm_contact', 'index_hash'));
   }
 
