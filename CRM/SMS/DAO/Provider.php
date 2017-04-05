@@ -149,6 +149,7 @@ class CRM_SMS_DAO_Provider extends CRM_Core_DAO {
           'table_name' => 'civicrm_sms_provider',
           'entity' => 'Provider',
           'bao' => 'CRM_SMS_BAO_Provider',
+          'localizable' => 0,
         ) ,
         'name' => array(
           'name' => 'name',
@@ -160,6 +161,7 @@ class CRM_SMS_DAO_Provider extends CRM_Core_DAO {
           'table_name' => 'civicrm_sms_provider',
           'entity' => 'Provider',
           'bao' => 'CRM_SMS_BAO_Provider',
+          'localizable' => 0,
         ) ,
         'title' => array(
           'name' => 'title',
@@ -171,6 +173,7 @@ class CRM_SMS_DAO_Provider extends CRM_Core_DAO {
           'table_name' => 'civicrm_sms_provider',
           'entity' => 'Provider',
           'bao' => 'CRM_SMS_BAO_Provider',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -184,6 +187,7 @@ class CRM_SMS_DAO_Provider extends CRM_Core_DAO {
           'table_name' => 'civicrm_sms_provider',
           'entity' => 'Provider',
           'bao' => 'CRM_SMS_BAO_Provider',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -197,6 +201,7 @@ class CRM_SMS_DAO_Provider extends CRM_Core_DAO {
           'table_name' => 'civicrm_sms_provider',
           'entity' => 'Provider',
           'bao' => 'CRM_SMS_BAO_Provider',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -210,6 +215,7 @@ class CRM_SMS_DAO_Provider extends CRM_Core_DAO {
           'table_name' => 'civicrm_sms_provider',
           'entity' => 'Provider',
           'bao' => 'CRM_SMS_BAO_Provider',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -223,6 +229,7 @@ class CRM_SMS_DAO_Provider extends CRM_Core_DAO {
           'table_name' => 'civicrm_sms_provider',
           'entity' => 'Provider',
           'bao' => 'CRM_SMS_BAO_Provider',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -235,6 +242,7 @@ class CRM_SMS_DAO_Provider extends CRM_Core_DAO {
           'table_name' => 'civicrm_sms_provider',
           'entity' => 'Provider',
           'bao' => 'CRM_SMS_BAO_Provider',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -246,6 +254,7 @@ class CRM_SMS_DAO_Provider extends CRM_Core_DAO {
           'table_name' => 'civicrm_sms_provider',
           'entity' => 'Provider',
           'bao' => 'CRM_SMS_BAO_Provider',
+          'localizable' => 0,
           'html' => array(
             'type' => 'CheckBox',
           ) ,
@@ -257,6 +266,7 @@ class CRM_SMS_DAO_Provider extends CRM_Core_DAO {
           'table_name' => 'civicrm_sms_provider',
           'entity' => 'Provider',
           'bao' => 'CRM_SMS_BAO_Provider',
+          'localizable' => 0,
           'html' => array(
             'type' => 'CheckBox',
           ) ,
@@ -269,6 +279,7 @@ class CRM_SMS_DAO_Provider extends CRM_Core_DAO {
           'table_name' => 'civicrm_sms_provider',
           'entity' => 'Provider',
           'bao' => 'CRM_SMS_BAO_Provider',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Core_DAO_Domain',
           'pseudoconstant' => array(
             'table' => 'civicrm_domain',

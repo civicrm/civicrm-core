@@ -107,6 +107,7 @@ class CRM_Queue_DAO_QueueItem extends CRM_Core_DAO {
           'table_name' => 'civicrm_queue_item',
           'entity' => 'QueueItem',
           'bao' => 'CRM_Queue_BAO_QueueItem',
+          'localizable' => 0,
         ) ,
         'queue_name' => array(
           'name' => 'queue_name',
@@ -119,6 +120,7 @@ class CRM_Queue_DAO_QueueItem extends CRM_Core_DAO {
           'table_name' => 'civicrm_queue_item',
           'entity' => 'QueueItem',
           'bao' => 'CRM_Queue_BAO_QueueItem',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -131,6 +133,7 @@ class CRM_Queue_DAO_QueueItem extends CRM_Core_DAO {
           'table_name' => 'civicrm_queue_item',
           'entity' => 'QueueItem',
           'bao' => 'CRM_Queue_BAO_QueueItem',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -144,6 +147,7 @@ class CRM_Queue_DAO_QueueItem extends CRM_Core_DAO {
           'table_name' => 'civicrm_queue_item',
           'entity' => 'QueueItem',
           'bao' => 'CRM_Queue_BAO_QueueItem',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select Date',
           ) ,
@@ -156,6 +160,7 @@ class CRM_Queue_DAO_QueueItem extends CRM_Core_DAO {
           'table_name' => 'civicrm_queue_item',
           'entity' => 'QueueItem',
           'bao' => 'CRM_Queue_BAO_QueueItem',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select Date',
           ) ,
@@ -168,6 +173,7 @@ class CRM_Queue_DAO_QueueItem extends CRM_Core_DAO {
           'table_name' => 'civicrm_queue_item',
           'entity' => 'QueueItem',
           'bao' => 'CRM_Queue_BAO_QueueItem',
+          'localizable' => 0,
         ) ,
       );
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);

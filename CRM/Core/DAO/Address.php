@@ -267,6 +267,7 @@ class CRM_Core_DAO_Address extends CRM_Core_DAO {
           'table_name' => 'civicrm_address',
           'entity' => 'Address',
           'bao' => 'CRM_Core_BAO_Address',
+          'localizable' => 0,
         ) ,
         'contact_id' => array(
           'name' => 'contact_id',
@@ -276,6 +277,7 @@ class CRM_Core_DAO_Address extends CRM_Core_DAO {
           'table_name' => 'civicrm_address',
           'entity' => 'Address',
           'bao' => 'CRM_Core_BAO_Address',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Contact_DAO_Contact',
         ) ,
         'location_type_id' => array(
@@ -286,6 +288,7 @@ class CRM_Core_DAO_Address extends CRM_Core_DAO {
           'table_name' => 'civicrm_address',
           'entity' => 'Address',
           'bao' => 'CRM_Core_BAO_Address',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -303,6 +306,7 @@ class CRM_Core_DAO_Address extends CRM_Core_DAO {
           'table_name' => 'civicrm_address',
           'entity' => 'Address',
           'bao' => 'CRM_Core_BAO_Address',
+          'localizable' => 0,
           'html' => array(
             'type' => 'CheckBox',
           ) ,
@@ -315,6 +319,7 @@ class CRM_Core_DAO_Address extends CRM_Core_DAO {
           'table_name' => 'civicrm_address',
           'entity' => 'Address',
           'bao' => 'CRM_Core_BAO_Address',
+          'localizable' => 0,
           'html' => array(
             'type' => 'CheckBox',
           ) ,
@@ -337,6 +342,7 @@ class CRM_Core_DAO_Address extends CRM_Core_DAO {
           'table_name' => 'civicrm_address',
           'entity' => 'Address',
           'bao' => 'CRM_Core_BAO_Address',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -353,6 +359,7 @@ class CRM_Core_DAO_Address extends CRM_Core_DAO {
           'table_name' => 'civicrm_address',
           'entity' => 'Address',
           'bao' => 'CRM_Core_BAO_Address',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -372,6 +379,7 @@ class CRM_Core_DAO_Address extends CRM_Core_DAO {
           'table_name' => 'civicrm_address',
           'entity' => 'Address',
           'bao' => 'CRM_Core_BAO_Address',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -386,6 +394,7 @@ class CRM_Core_DAO_Address extends CRM_Core_DAO {
           'table_name' => 'civicrm_address',
           'entity' => 'Address',
           'bao' => 'CRM_Core_BAO_Address',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -404,6 +413,7 @@ class CRM_Core_DAO_Address extends CRM_Core_DAO {
           'table_name' => 'civicrm_address',
           'entity' => 'Address',
           'bao' => 'CRM_Core_BAO_Address',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -418,6 +428,7 @@ class CRM_Core_DAO_Address extends CRM_Core_DAO {
           'table_name' => 'civicrm_address',
           'entity' => 'Address',
           'bao' => 'CRM_Core_BAO_Address',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -432,6 +443,7 @@ class CRM_Core_DAO_Address extends CRM_Core_DAO {
           'table_name' => 'civicrm_address',
           'entity' => 'Address',
           'bao' => 'CRM_Core_BAO_Address',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -450,6 +462,7 @@ class CRM_Core_DAO_Address extends CRM_Core_DAO {
           'table_name' => 'civicrm_address',
           'entity' => 'Address',
           'bao' => 'CRM_Core_BAO_Address',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -469,6 +482,7 @@ class CRM_Core_DAO_Address extends CRM_Core_DAO {
           'table_name' => 'civicrm_address',
           'entity' => 'Address',
           'bao' => 'CRM_Core_BAO_Address',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -488,6 +502,7 @@ class CRM_Core_DAO_Address extends CRM_Core_DAO {
           'table_name' => 'civicrm_address',
           'entity' => 'Address',
           'bao' => 'CRM_Core_BAO_Address',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -502,6 +517,7 @@ class CRM_Core_DAO_Address extends CRM_Core_DAO {
           'table_name' => 'civicrm_address',
           'entity' => 'Address',
           'bao' => 'CRM_Core_BAO_Address',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -521,6 +537,7 @@ class CRM_Core_DAO_Address extends CRM_Core_DAO {
           'table_name' => 'civicrm_address',
           'entity' => 'Address',
           'bao' => 'CRM_Core_BAO_Address',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -533,6 +550,7 @@ class CRM_Core_DAO_Address extends CRM_Core_DAO {
           'table_name' => 'civicrm_address',
           'entity' => 'Address',
           'bao' => 'CRM_Core_BAO_Address',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Core_DAO_County',
           'html' => array(
             'type' => 'ChainSelect',
@@ -551,6 +569,7 @@ class CRM_Core_DAO_Address extends CRM_Core_DAO {
           'table_name' => 'civicrm_address',
           'entity' => 'Address',
           'bao' => 'CRM_Core_BAO_Address',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Core_DAO_StateProvince',
           'html' => array(
             'type' => 'ChainSelect',
@@ -576,6 +595,7 @@ class CRM_Core_DAO_Address extends CRM_Core_DAO {
           'table_name' => 'civicrm_address',
           'entity' => 'Address',
           'bao' => 'CRM_Core_BAO_Address',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -595,6 +615,7 @@ class CRM_Core_DAO_Address extends CRM_Core_DAO {
           'table_name' => 'civicrm_address',
           'entity' => 'Address',
           'bao' => 'CRM_Core_BAO_Address',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -609,6 +630,7 @@ class CRM_Core_DAO_Address extends CRM_Core_DAO {
           'table_name' => 'civicrm_address',
           'entity' => 'Address',
           'bao' => 'CRM_Core_BAO_Address',
+          'localizable' => 0,
         ) ,
         'country_id' => array(
           'name' => 'country_id',
@@ -618,6 +640,7 @@ class CRM_Core_DAO_Address extends CRM_Core_DAO {
           'table_name' => 'civicrm_address',
           'entity' => 'Address',
           'bao' => 'CRM_Core_BAO_Address',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Core_DAO_Country',
           'html' => array(
             'type' => 'Select',
@@ -642,6 +665,7 @@ class CRM_Core_DAO_Address extends CRM_Core_DAO {
           'table_name' => 'civicrm_address',
           'entity' => 'Address',
           'bao' => 'CRM_Core_BAO_Address',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -659,6 +683,7 @@ class CRM_Core_DAO_Address extends CRM_Core_DAO {
           'table_name' => 'civicrm_address',
           'entity' => 'Address',
           'bao' => 'CRM_Core_BAO_Address',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -671,6 +696,7 @@ class CRM_Core_DAO_Address extends CRM_Core_DAO {
           'table_name' => 'civicrm_address',
           'entity' => 'Address',
           'bao' => 'CRM_Core_BAO_Address',
+          'localizable' => 0,
           'html' => array(
             'type' => 'CheckBox',
           ) ,
@@ -685,6 +711,7 @@ class CRM_Core_DAO_Address extends CRM_Core_DAO {
           'table_name' => 'civicrm_address',
           'entity' => 'Address',
           'bao' => 'CRM_Core_BAO_Address',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -703,6 +730,7 @@ class CRM_Core_DAO_Address extends CRM_Core_DAO {
           'table_name' => 'civicrm_address',
           'entity' => 'Address',
           'bao' => 'CRM_Core_BAO_Address',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -720,6 +748,7 @@ class CRM_Core_DAO_Address extends CRM_Core_DAO {
           'table_name' => 'civicrm_address',
           'entity' => 'Address',
           'bao' => 'CRM_Core_BAO_Address',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Core_DAO_Address',
         ) ,
       );

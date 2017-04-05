@@ -96,6 +96,7 @@ class CRM_Mailing_DAO_BounceType extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_bounce_type',
           'entity' => 'BounceType',
           'bao' => 'CRM_Mailing_DAO_BounceType',
+          'localizable' => 0,
         ) ,
         'name' => array(
           'name' => 'name',
@@ -108,6 +109,7 @@ class CRM_Mailing_DAO_BounceType extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_bounce_type',
           'entity' => 'BounceType',
           'bao' => 'CRM_Mailing_DAO_BounceType',
+          'localizable' => 0,
         ) ,
         'description' => array(
           'name' => 'description',
@@ -119,6 +121,7 @@ class CRM_Mailing_DAO_BounceType extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_bounce_type',
           'entity' => 'BounceType',
           'bao' => 'CRM_Mailing_DAO_BounceType',
+          'localizable' => 0,
         ) ,
         'hold_threshold' => array(
           'name' => 'hold_threshold',
@@ -129,6 +132,7 @@ class CRM_Mailing_DAO_BounceType extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_bounce_type',
           'entity' => 'BounceType',
           'bao' => 'CRM_Mailing_DAO_BounceType',
+          'localizable' => 0,
         ) ,
       );
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);

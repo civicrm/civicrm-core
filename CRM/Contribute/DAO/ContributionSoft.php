@@ -152,6 +152,7 @@ class CRM_Contribute_DAO_ContributionSoft extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_soft',
           'entity' => 'ContributionSoft',
           'bao' => 'CRM_Contribute_BAO_ContributionSoft',
+          'localizable' => 0,
         ) ,
         'contribution_id' => array(
           'name' => 'contribution_id',
@@ -162,6 +163,7 @@ class CRM_Contribute_DAO_ContributionSoft extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_soft',
           'entity' => 'ContributionSoft',
           'bao' => 'CRM_Contribute_BAO_ContributionSoft',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Contribute_DAO_Contribution',
         ) ,
         'contribution_soft_contact_id' => array(
@@ -178,6 +180,7 @@ class CRM_Contribute_DAO_ContributionSoft extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_soft',
           'entity' => 'ContributionSoft',
           'bao' => 'CRM_Contribute_BAO_ContributionSoft',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Contact_DAO_Contact',
         ) ,
         'amount' => array(
@@ -198,6 +201,7 @@ class CRM_Contribute_DAO_ContributionSoft extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_soft',
           'entity' => 'ContributionSoft',
           'bao' => 'CRM_Contribute_BAO_ContributionSoft',
+          'localizable' => 0,
         ) ,
         'currency' => array(
           'name' => 'currency',
@@ -210,6 +214,7 @@ class CRM_Contribute_DAO_ContributionSoft extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_soft',
           'entity' => 'ContributionSoft',
           'bao' => 'CRM_Contribute_BAO_ContributionSoft',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -229,6 +234,7 @@ class CRM_Contribute_DAO_ContributionSoft extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_soft',
           'entity' => 'ContributionSoft',
           'bao' => 'CRM_Contribute_BAO_ContributionSoft',
+          'localizable' => 0,
           'FKClassName' => 'CRM_PCP_DAO_PCP',
           'pseudoconstant' => array(
             'table' => 'civicrm_pcp',
@@ -243,6 +249,7 @@ class CRM_Contribute_DAO_ContributionSoft extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_soft',
           'entity' => 'ContributionSoft',
           'bao' => 'CRM_Contribute_BAO_ContributionSoft',
+          'localizable' => 0,
         ) ,
         'pcp_roll_nickname' => array(
           'name' => 'pcp_roll_nickname',
@@ -254,6 +261,7 @@ class CRM_Contribute_DAO_ContributionSoft extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_soft',
           'entity' => 'ContributionSoft',
           'bao' => 'CRM_Contribute_BAO_ContributionSoft',
+          'localizable' => 0,
         ) ,
         'pcp_personal_note' => array(
           'name' => 'pcp_personal_note',
@@ -265,6 +273,7 @@ class CRM_Contribute_DAO_ContributionSoft extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_soft',
           'entity' => 'ContributionSoft',
           'bao' => 'CRM_Contribute_BAO_ContributionSoft',
+          'localizable' => 0,
         ) ,
         'soft_credit_type_id' => array(
           'name' => 'soft_credit_type_id',
@@ -275,6 +284,7 @@ class CRM_Contribute_DAO_ContributionSoft extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_soft',
           'entity' => 'ContributionSoft',
           'bao' => 'CRM_Contribute_BAO_ContributionSoft',
+          'localizable' => 0,
           'pseudoconstant' => array(
             'optionGroupName' => 'soft_credit_type',
             'optionEditPath' => 'civicrm/admin/options/soft_credit_type',

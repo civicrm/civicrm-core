@@ -112,6 +112,7 @@ class CRM_Core_DAO_StateProvince extends CRM_Core_DAO {
           'table_name' => 'civicrm_state_province',
           'entity' => 'StateProvince',
           'bao' => 'CRM_Core_DAO_StateProvince',
+          'localizable' => 0,
         ) ,
         'name' => array(
           'name' => 'name',
@@ -128,6 +129,7 @@ class CRM_Core_DAO_StateProvince extends CRM_Core_DAO {
           'table_name' => 'civicrm_state_province',
           'entity' => 'StateProvince',
           'bao' => 'CRM_Core_DAO_StateProvince',
+          'localizable' => 0,
         ) ,
         'abbreviation' => array(
           'name' => 'abbreviation',
@@ -139,6 +141,7 @@ class CRM_Core_DAO_StateProvince extends CRM_Core_DAO {
           'table_name' => 'civicrm_state_province',
           'entity' => 'StateProvince',
           'bao' => 'CRM_Core_DAO_StateProvince',
+          'localizable' => 0,
         ) ,
         'country_id' => array(
           'name' => 'country_id',
@@ -149,6 +152,7 @@ class CRM_Core_DAO_StateProvince extends CRM_Core_DAO {
           'table_name' => 'civicrm_state_province',
           'entity' => 'StateProvince',
           'bao' => 'CRM_Core_DAO_StateProvince',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Core_DAO_Country',
         ) ,
       );

@@ -124,6 +124,7 @@ class CRM_Core_DAO_OpenID extends CRM_Core_DAO {
           'table_name' => 'civicrm_openid',
           'entity' => 'OpenID',
           'bao' => 'CRM_Core_BAO_OpenID',
+          'localizable' => 0,
         ) ,
         'contact_id' => array(
           'name' => 'contact_id',
@@ -133,6 +134,7 @@ class CRM_Core_DAO_OpenID extends CRM_Core_DAO {
           'table_name' => 'civicrm_openid',
           'entity' => 'OpenID',
           'bao' => 'CRM_Core_BAO_OpenID',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Contact_DAO_Contact',
         ) ,
         'location_type_id' => array(
@@ -143,6 +145,7 @@ class CRM_Core_DAO_OpenID extends CRM_Core_DAO {
           'table_name' => 'civicrm_openid',
           'entity' => 'OpenID',
           'bao' => 'CRM_Core_BAO_OpenID',
+          'localizable' => 0,
         ) ,
         'openid' => array(
           'name' => 'openid',
@@ -160,6 +163,7 @@ class CRM_Core_DAO_OpenID extends CRM_Core_DAO {
           'table_name' => 'civicrm_openid',
           'entity' => 'OpenID',
           'bao' => 'CRM_Core_BAO_OpenID',
+          'localizable' => 0,
         ) ,
         'allowed_to_login' => array(
           'name' => 'allowed_to_login',
@@ -170,6 +174,7 @@ class CRM_Core_DAO_OpenID extends CRM_Core_DAO {
           'table_name' => 'civicrm_openid',
           'entity' => 'OpenID',
           'bao' => 'CRM_Core_BAO_OpenID',
+          'localizable' => 0,
         ) ,
         'is_primary' => array(
           'name' => 'is_primary',
@@ -179,6 +184,7 @@ class CRM_Core_DAO_OpenID extends CRM_Core_DAO {
           'table_name' => 'civicrm_openid',
           'entity' => 'OpenID',
           'bao' => 'CRM_Core_BAO_OpenID',
+          'localizable' => 0,
         ) ,
       );
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);

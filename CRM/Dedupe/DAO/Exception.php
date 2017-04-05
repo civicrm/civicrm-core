@@ -107,6 +107,7 @@ class CRM_Dedupe_DAO_Exception extends CRM_Core_DAO {
           'table_name' => 'civicrm_dedupe_exception',
           'entity' => 'Exception',
           'bao' => 'CRM_Dedupe_DAO_Exception',
+          'localizable' => 0,
         ) ,
         'contact_id1' => array(
           'name' => 'contact_id1',
@@ -116,6 +117,7 @@ class CRM_Dedupe_DAO_Exception extends CRM_Core_DAO {
           'table_name' => 'civicrm_dedupe_exception',
           'entity' => 'Exception',
           'bao' => 'CRM_Dedupe_DAO_Exception',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Contact_DAO_Contact',
         ) ,
         'contact_id2' => array(
@@ -126,6 +128,7 @@ class CRM_Dedupe_DAO_Exception extends CRM_Core_DAO {
           'table_name' => 'civicrm_dedupe_exception',
           'entity' => 'Exception',
           'bao' => 'CRM_Dedupe_DAO_Exception',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Contact_DAO_Contact',
         ) ,
       );

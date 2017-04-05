@@ -128,6 +128,7 @@ class CRM_Mailing_DAO_Spool extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_spool',
           'entity' => 'Spool',
           'bao' => 'CRM_Mailing_BAO_Spool',
+          'localizable' => 0,
         ) ,
         'job_id' => array(
           'name' => 'job_id',
@@ -138,6 +139,7 @@ class CRM_Mailing_DAO_Spool extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_spool',
           'entity' => 'Spool',
           'bao' => 'CRM_Mailing_BAO_Spool',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Mailing_DAO_MailingJob',
         ) ,
         'recipient_email' => array(
@@ -148,6 +150,7 @@ class CRM_Mailing_DAO_Spool extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_spool',
           'entity' => 'Spool',
           'bao' => 'CRM_Mailing_BAO_Spool',
+          'localizable' => 0,
         ) ,
         'headers' => array(
           'name' => 'headers',
@@ -157,6 +160,7 @@ class CRM_Mailing_DAO_Spool extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_spool',
           'entity' => 'Spool',
           'bao' => 'CRM_Mailing_BAO_Spool',
+          'localizable' => 0,
         ) ,
         'body' => array(
           'name' => 'body',
@@ -166,6 +170,7 @@ class CRM_Mailing_DAO_Spool extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_spool',
           'entity' => 'Spool',
           'bao' => 'CRM_Mailing_BAO_Spool',
+          'localizable' => 0,
         ) ,
         'added_at' => array(
           'name' => 'added_at',
@@ -175,6 +180,7 @@ class CRM_Mailing_DAO_Spool extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_spool',
           'entity' => 'Spool',
           'bao' => 'CRM_Mailing_BAO_Spool',
+          'localizable' => 0,
         ) ,
         'removed_at' => array(
           'name' => 'removed_at',
@@ -184,6 +190,7 @@ class CRM_Mailing_DAO_Spool extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_spool',
           'entity' => 'Spool',
           'bao' => 'CRM_Mailing_BAO_Spool',
+          'localizable' => 0,
         ) ,
       );
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);

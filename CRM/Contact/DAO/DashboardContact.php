@@ -123,6 +123,7 @@ class CRM_Contact_DAO_DashboardContact extends CRM_Core_DAO {
           'table_name' => 'civicrm_dashboard_contact',
           'entity' => 'DashboardContact',
           'bao' => 'CRM_Contact_BAO_DashboardContact',
+          'localizable' => 0,
         ) ,
         'dashboard_id' => array(
           'name' => 'dashboard_id',
@@ -133,6 +134,7 @@ class CRM_Contact_DAO_DashboardContact extends CRM_Core_DAO {
           'table_name' => 'civicrm_dashboard_contact',
           'entity' => 'DashboardContact',
           'bao' => 'CRM_Contact_BAO_DashboardContact',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Core_DAO_Dashboard',
         ) ,
         'contact_id' => array(
@@ -144,6 +146,7 @@ class CRM_Contact_DAO_DashboardContact extends CRM_Core_DAO {
           'table_name' => 'civicrm_dashboard_contact',
           'entity' => 'DashboardContact',
           'bao' => 'CRM_Contact_BAO_DashboardContact',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Contact_DAO_Contact',
         ) ,
         'column_no' => array(
@@ -154,6 +157,7 @@ class CRM_Contact_DAO_DashboardContact extends CRM_Core_DAO {
           'table_name' => 'civicrm_dashboard_contact',
           'entity' => 'DashboardContact',
           'bao' => 'CRM_Contact_BAO_DashboardContact',
+          'localizable' => 0,
         ) ,
         'is_active' => array(
           'name' => 'is_active',
@@ -163,6 +167,7 @@ class CRM_Contact_DAO_DashboardContact extends CRM_Core_DAO {
           'table_name' => 'civicrm_dashboard_contact',
           'entity' => 'DashboardContact',
           'bao' => 'CRM_Contact_BAO_DashboardContact',
+          'localizable' => 0,
         ) ,
         'weight' => array(
           'name' => 'weight',
@@ -172,6 +177,7 @@ class CRM_Contact_DAO_DashboardContact extends CRM_Core_DAO {
           'table_name' => 'civicrm_dashboard_contact',
           'entity' => 'DashboardContact',
           'bao' => 'CRM_Contact_BAO_DashboardContact',
+          'localizable' => 0,
         ) ,
       );
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);

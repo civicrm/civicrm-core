@@ -113,6 +113,7 @@ class CRM_Price_DAO_PriceSetEntity extends CRM_Core_DAO {
           'table_name' => 'civicrm_price_set_entity',
           'entity' => 'PriceSetEntity',
           'bao' => 'CRM_Price_DAO_PriceSetEntity',
+          'localizable' => 0,
         ) ,
         'entity_table' => array(
           'name' => 'entity_table',
@@ -125,6 +126,7 @@ class CRM_Price_DAO_PriceSetEntity extends CRM_Core_DAO {
           'table_name' => 'civicrm_price_set_entity',
           'entity' => 'PriceSetEntity',
           'bao' => 'CRM_Price_DAO_PriceSetEntity',
+          'localizable' => 0,
         ) ,
         'entity_id' => array(
           'name' => 'entity_id',
@@ -135,6 +137,7 @@ class CRM_Price_DAO_PriceSetEntity extends CRM_Core_DAO {
           'table_name' => 'civicrm_price_set_entity',
           'entity' => 'PriceSetEntity',
           'bao' => 'CRM_Price_DAO_PriceSetEntity',
+          'localizable' => 0,
         ) ,
         'price_set_id' => array(
           'name' => 'price_set_id',
@@ -145,6 +148,7 @@ class CRM_Price_DAO_PriceSetEntity extends CRM_Core_DAO {
           'table_name' => 'civicrm_price_set_entity',
           'entity' => 'PriceSetEntity',
           'bao' => 'CRM_Price_DAO_PriceSetEntity',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Price_DAO_PriceSet',
         ) ,
       );

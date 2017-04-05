@@ -116,6 +116,7 @@ class CRM_Core_DAO_SystemLog extends CRM_Core_DAO {
           'table_name' => 'civicrm_system_log',
           'entity' => 'SystemLog',
           'bao' => 'CRM_Core_DAO_SystemLog',
+          'localizable' => 0,
         ) ,
         'message' => array(
           'name' => 'message',
@@ -128,6 +129,7 @@ class CRM_Core_DAO_SystemLog extends CRM_Core_DAO {
           'table_name' => 'civicrm_system_log',
           'entity' => 'SystemLog',
           'bao' => 'CRM_Core_DAO_SystemLog',
+          'localizable' => 0,
         ) ,
         'context' => array(
           'name' => 'context',
@@ -137,6 +139,7 @@ class CRM_Core_DAO_SystemLog extends CRM_Core_DAO {
           'table_name' => 'civicrm_system_log',
           'entity' => 'SystemLog',
           'bao' => 'CRM_Core_DAO_SystemLog',
+          'localizable' => 0,
         ) ,
         'level' => array(
           'name' => 'level',
@@ -149,6 +152,7 @@ class CRM_Core_DAO_SystemLog extends CRM_Core_DAO {
           'table_name' => 'civicrm_system_log',
           'entity' => 'SystemLog',
           'bao' => 'CRM_Core_DAO_SystemLog',
+          'localizable' => 0,
         ) ,
         'timestamp' => array(
           'name' => 'timestamp',
@@ -159,6 +163,7 @@ class CRM_Core_DAO_SystemLog extends CRM_Core_DAO {
           'table_name' => 'civicrm_system_log',
           'entity' => 'SystemLog',
           'bao' => 'CRM_Core_DAO_SystemLog',
+          'localizable' => 0,
         ) ,
         'contact_id' => array(
           'name' => 'contact_id',
@@ -168,6 +173,7 @@ class CRM_Core_DAO_SystemLog extends CRM_Core_DAO {
           'table_name' => 'civicrm_system_log',
           'entity' => 'SystemLog',
           'bao' => 'CRM_Core_DAO_SystemLog',
+          'localizable' => 0,
         ) ,
         'hostname' => array(
           'name' => 'hostname',
@@ -179,6 +185,7 @@ class CRM_Core_DAO_SystemLog extends CRM_Core_DAO {
           'table_name' => 'civicrm_system_log',
           'entity' => 'SystemLog',
           'bao' => 'CRM_Core_DAO_SystemLog',
+          'localizable' => 0,
         ) ,
       );
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);

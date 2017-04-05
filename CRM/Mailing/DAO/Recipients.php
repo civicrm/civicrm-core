@@ -119,6 +119,7 @@ class CRM_Mailing_DAO_Recipients extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_recipients',
           'entity' => 'Recipients',
           'bao' => 'CRM_Mailing_BAO_Recipients',
+          'localizable' => 0,
         ) ,
         'mailing_id' => array(
           'name' => 'mailing_id',
@@ -129,6 +130,7 @@ class CRM_Mailing_DAO_Recipients extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_recipients',
           'entity' => 'Recipients',
           'bao' => 'CRM_Mailing_BAO_Recipients',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Mailing_DAO_Mailing',
         ) ,
         'contact_id' => array(
@@ -140,6 +142,7 @@ class CRM_Mailing_DAO_Recipients extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_recipients',
           'entity' => 'Recipients',
           'bao' => 'CRM_Mailing_BAO_Recipients',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Contact_DAO_Contact',
         ) ,
         'email_id' => array(
@@ -151,6 +154,7 @@ class CRM_Mailing_DAO_Recipients extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_recipients',
           'entity' => 'Recipients',
           'bao' => 'CRM_Mailing_BAO_Recipients',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Core_DAO_Email',
         ) ,
         'phone_id' => array(
@@ -162,6 +166,7 @@ class CRM_Mailing_DAO_Recipients extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_recipients',
           'entity' => 'Recipients',
           'bao' => 'CRM_Mailing_BAO_Recipients',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Core_DAO_Phone',
         ) ,
       );

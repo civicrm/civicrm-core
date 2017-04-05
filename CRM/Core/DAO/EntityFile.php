@@ -113,6 +113,7 @@ class CRM_Core_DAO_EntityFile extends CRM_Core_DAO {
           'table_name' => 'civicrm_entity_file',
           'entity' => 'EntityFile',
           'bao' => 'CRM_Core_DAO_EntityFile',
+          'localizable' => 0,
         ) ,
         'entity_table' => array(
           'name' => 'entity_table',
@@ -124,6 +125,7 @@ class CRM_Core_DAO_EntityFile extends CRM_Core_DAO {
           'table_name' => 'civicrm_entity_file',
           'entity' => 'EntityFile',
           'bao' => 'CRM_Core_DAO_EntityFile',
+          'localizable' => 0,
         ) ,
         'entity_id' => array(
           'name' => 'entity_id',
@@ -134,6 +136,7 @@ class CRM_Core_DAO_EntityFile extends CRM_Core_DAO {
           'table_name' => 'civicrm_entity_file',
           'entity' => 'EntityFile',
           'bao' => 'CRM_Core_DAO_EntityFile',
+          'localizable' => 0,
         ) ,
         'file_id' => array(
           'name' => 'file_id',
@@ -144,6 +147,7 @@ class CRM_Core_DAO_EntityFile extends CRM_Core_DAO {
           'table_name' => 'civicrm_entity_file',
           'entity' => 'EntityFile',
           'bao' => 'CRM_Core_DAO_EntityFile',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Core_DAO_File',
         ) ,
       );

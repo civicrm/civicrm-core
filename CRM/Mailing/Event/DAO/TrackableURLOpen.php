@@ -111,6 +111,7 @@ class CRM_Mailing_Event_DAO_TrackableURLOpen extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_event_trackable_url_open',
           'entity' => 'TrackableURLOpen',
           'bao' => 'CRM_Mailing_Event_BAO_TrackableURLOpen',
+          'localizable' => 0,
         ) ,
         'event_queue_id' => array(
           'name' => 'event_queue_id',
@@ -121,6 +122,7 @@ class CRM_Mailing_Event_DAO_TrackableURLOpen extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_event_trackable_url_open',
           'entity' => 'TrackableURLOpen',
           'bao' => 'CRM_Mailing_Event_BAO_TrackableURLOpen',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Mailing_Event_DAO_Queue',
         ) ,
         'trackable_url_id' => array(
@@ -132,6 +134,7 @@ class CRM_Mailing_Event_DAO_TrackableURLOpen extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_event_trackable_url_open',
           'entity' => 'TrackableURLOpen',
           'bao' => 'CRM_Mailing_Event_BAO_TrackableURLOpen',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Mailing_DAO_TrackableURL',
         ) ,
         'time_stamp' => array(
@@ -143,6 +146,7 @@ class CRM_Mailing_Event_DAO_TrackableURLOpen extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_event_trackable_url_open',
           'entity' => 'TrackableURLOpen',
           'bao' => 'CRM_Mailing_Event_BAO_TrackableURLOpen',
+          'localizable' => 0,
         ) ,
       );
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);

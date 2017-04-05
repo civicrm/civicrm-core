@@ -141,6 +141,7 @@ class CRM_Core_DAO_LocBlock extends CRM_Core_DAO {
           'table_name' => 'civicrm_loc_block',
           'entity' => 'LocBlock',
           'bao' => 'CRM_Core_DAO_LocBlock',
+          'localizable' => 0,
         ) ,
         'address_id' => array(
           'name' => 'address_id',
@@ -149,6 +150,7 @@ class CRM_Core_DAO_LocBlock extends CRM_Core_DAO {
           'table_name' => 'civicrm_loc_block',
           'entity' => 'LocBlock',
           'bao' => 'CRM_Core_DAO_LocBlock',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Core_DAO_Address',
         ) ,
         'email_id' => array(
@@ -158,6 +160,7 @@ class CRM_Core_DAO_LocBlock extends CRM_Core_DAO {
           'table_name' => 'civicrm_loc_block',
           'entity' => 'LocBlock',
           'bao' => 'CRM_Core_DAO_LocBlock',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Core_DAO_Email',
         ) ,
         'phone_id' => array(
@@ -167,6 +170,7 @@ class CRM_Core_DAO_LocBlock extends CRM_Core_DAO {
           'table_name' => 'civicrm_loc_block',
           'entity' => 'LocBlock',
           'bao' => 'CRM_Core_DAO_LocBlock',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Core_DAO_Phone',
         ) ,
         'im_id' => array(
@@ -176,6 +180,7 @@ class CRM_Core_DAO_LocBlock extends CRM_Core_DAO {
           'table_name' => 'civicrm_loc_block',
           'entity' => 'LocBlock',
           'bao' => 'CRM_Core_DAO_LocBlock',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Core_DAO_IM',
         ) ,
         'address_2_id' => array(
@@ -185,6 +190,7 @@ class CRM_Core_DAO_LocBlock extends CRM_Core_DAO {
           'table_name' => 'civicrm_loc_block',
           'entity' => 'LocBlock',
           'bao' => 'CRM_Core_DAO_LocBlock',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Core_DAO_Address',
         ) ,
         'email_2_id' => array(
@@ -194,6 +200,7 @@ class CRM_Core_DAO_LocBlock extends CRM_Core_DAO {
           'table_name' => 'civicrm_loc_block',
           'entity' => 'LocBlock',
           'bao' => 'CRM_Core_DAO_LocBlock',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Core_DAO_Email',
         ) ,
         'phone_2_id' => array(
@@ -203,6 +210,7 @@ class CRM_Core_DAO_LocBlock extends CRM_Core_DAO {
           'table_name' => 'civicrm_loc_block',
           'entity' => 'LocBlock',
           'bao' => 'CRM_Core_DAO_LocBlock',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Core_DAO_Phone',
         ) ,
         'im_2_id' => array(
@@ -212,6 +220,7 @@ class CRM_Core_DAO_LocBlock extends CRM_Core_DAO {
           'table_name' => 'civicrm_loc_block',
           'entity' => 'LocBlock',
           'bao' => 'CRM_Core_DAO_LocBlock',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Core_DAO_IM',
         ) ,
       );

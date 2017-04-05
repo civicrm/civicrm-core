@@ -110,6 +110,7 @@ class CRM_Financial_DAO_FinancialType extends CRM_Core_DAO {
           'table_name' => 'civicrm_financial_type',
           'entity' => 'FinancialType',
           'bao' => 'CRM_Financial_BAO_FinancialType',
+          'localizable' => 0,
         ) ,
         'financial_type' => array(
           'name' => 'name',
@@ -127,6 +128,7 @@ class CRM_Financial_DAO_FinancialType extends CRM_Core_DAO {
           'table_name' => 'civicrm_financial_type',
           'entity' => 'FinancialType',
           'bao' => 'CRM_Financial_BAO_FinancialType',
+          'localizable' => 0,
         ) ,
         'description' => array(
           'name' => 'description',
@@ -138,6 +140,7 @@ class CRM_Financial_DAO_FinancialType extends CRM_Core_DAO {
           'table_name' => 'civicrm_financial_type',
           'entity' => 'FinancialType',
           'bao' => 'CRM_Financial_BAO_FinancialType',
+          'localizable' => 0,
         ) ,
         'is_deductible' => array(
           'name' => 'is_deductible',
@@ -148,6 +151,7 @@ class CRM_Financial_DAO_FinancialType extends CRM_Core_DAO {
           'table_name' => 'civicrm_financial_type',
           'entity' => 'FinancialType',
           'bao' => 'CRM_Financial_BAO_FinancialType',
+          'localizable' => 0,
         ) ,
         'is_reserved' => array(
           'name' => 'is_reserved',
@@ -157,6 +161,7 @@ class CRM_Financial_DAO_FinancialType extends CRM_Core_DAO {
           'table_name' => 'civicrm_financial_type',
           'entity' => 'FinancialType',
           'bao' => 'CRM_Financial_BAO_FinancialType',
+          'localizable' => 0,
         ) ,
         'is_active' => array(
           'name' => 'is_active',
@@ -166,6 +171,7 @@ class CRM_Financial_DAO_FinancialType extends CRM_Core_DAO {
           'table_name' => 'civicrm_financial_type',
           'entity' => 'FinancialType',
           'bao' => 'CRM_Financial_BAO_FinancialType',
+          'localizable' => 0,
         ) ,
       );
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);

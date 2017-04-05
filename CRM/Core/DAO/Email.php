@@ -160,6 +160,7 @@ class CRM_Core_DAO_Email extends CRM_Core_DAO {
           'table_name' => 'civicrm_email',
           'entity' => 'Email',
           'bao' => 'CRM_Core_BAO_Email',
+          'localizable' => 0,
         ) ,
         'contact_id' => array(
           'name' => 'contact_id',
@@ -169,6 +170,7 @@ class CRM_Core_DAO_Email extends CRM_Core_DAO {
           'table_name' => 'civicrm_email',
           'entity' => 'Email',
           'bao' => 'CRM_Core_BAO_Email',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Contact_DAO_Contact',
         ) ,
         'location_type_id' => array(
@@ -179,6 +181,7 @@ class CRM_Core_DAO_Email extends CRM_Core_DAO {
           'table_name' => 'civicrm_email',
           'entity' => 'Email',
           'bao' => 'CRM_Core_BAO_Email',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -204,6 +207,7 @@ class CRM_Core_DAO_Email extends CRM_Core_DAO {
           'table_name' => 'civicrm_email',
           'entity' => 'Email',
           'bao' => 'CRM_Core_BAO_Email',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -216,6 +220,7 @@ class CRM_Core_DAO_Email extends CRM_Core_DAO {
           'table_name' => 'civicrm_email',
           'entity' => 'Email',
           'bao' => 'CRM_Core_BAO_Email',
+          'localizable' => 0,
         ) ,
         'is_billing' => array(
           'name' => 'is_billing',
@@ -225,6 +230,7 @@ class CRM_Core_DAO_Email extends CRM_Core_DAO {
           'table_name' => 'civicrm_email',
           'entity' => 'Email',
           'bao' => 'CRM_Core_BAO_Email',
+          'localizable' => 0,
         ) ,
         'on_hold' => array(
           'name' => 'on_hold',
@@ -239,6 +245,7 @@ class CRM_Core_DAO_Email extends CRM_Core_DAO {
           'table_name' => 'civicrm_email',
           'entity' => 'Email',
           'bao' => 'CRM_Core_BAO_Email',
+          'localizable' => 0,
           'html' => array(
             'type' => 'CheckBox',
           ) ,
@@ -256,6 +263,7 @@ class CRM_Core_DAO_Email extends CRM_Core_DAO {
           'table_name' => 'civicrm_email',
           'entity' => 'Email',
           'bao' => 'CRM_Core_BAO_Email',
+          'localizable' => 0,
         ) ,
         'hold_date' => array(
           'name' => 'hold_date',
@@ -265,6 +273,7 @@ class CRM_Core_DAO_Email extends CRM_Core_DAO {
           'table_name' => 'civicrm_email',
           'entity' => 'Email',
           'bao' => 'CRM_Core_BAO_Email',
+          'localizable' => 0,
         ) ,
         'reset_date' => array(
           'name' => 'reset_date',
@@ -274,6 +283,7 @@ class CRM_Core_DAO_Email extends CRM_Core_DAO {
           'table_name' => 'civicrm_email',
           'entity' => 'Email',
           'bao' => 'CRM_Core_BAO_Email',
+          'localizable' => 0,
         ) ,
         'signature_text' => array(
           'name' => 'signature_text',
@@ -289,6 +299,7 @@ class CRM_Core_DAO_Email extends CRM_Core_DAO {
           'table_name' => 'civicrm_email',
           'entity' => 'Email',
           'bao' => 'CRM_Core_BAO_Email',
+          'localizable' => 0,
         ) ,
         'signature_html' => array(
           'name' => 'signature_html',
@@ -304,6 +315,7 @@ class CRM_Core_DAO_Email extends CRM_Core_DAO {
           'table_name' => 'civicrm_email',
           'entity' => 'Email',
           'bao' => 'CRM_Core_BAO_Email',
+          'localizable' => 0,
         ) ,
       );
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);

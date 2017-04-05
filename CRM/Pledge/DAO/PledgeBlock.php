@@ -154,6 +154,7 @@ class CRM_Pledge_DAO_PledgeBlock extends CRM_Core_DAO {
           'table_name' => 'civicrm_pledge_block',
           'entity' => 'PledgeBlock',
           'bao' => 'CRM_Pledge_BAO_PledgeBlock',
+          'localizable' => 0,
         ) ,
         'entity_table' => array(
           'name' => 'entity_table',
@@ -165,6 +166,7 @@ class CRM_Pledge_DAO_PledgeBlock extends CRM_Core_DAO {
           'table_name' => 'civicrm_pledge_block',
           'entity' => 'PledgeBlock',
           'bao' => 'CRM_Pledge_BAO_PledgeBlock',
+          'localizable' => 0,
         ) ,
         'entity_id' => array(
           'name' => 'entity_id',
@@ -175,6 +177,7 @@ class CRM_Pledge_DAO_PledgeBlock extends CRM_Core_DAO {
           'table_name' => 'civicrm_pledge_block',
           'entity' => 'PledgeBlock',
           'bao' => 'CRM_Pledge_BAO_PledgeBlock',
+          'localizable' => 0,
         ) ,
         'pledge_frequency_unit' => array(
           'name' => 'pledge_frequency_unit',
@@ -186,6 +189,7 @@ class CRM_Pledge_DAO_PledgeBlock extends CRM_Core_DAO {
           'table_name' => 'civicrm_pledge_block',
           'entity' => 'PledgeBlock',
           'bao' => 'CRM_Pledge_BAO_PledgeBlock',
+          'localizable' => 0,
         ) ,
         'is_pledge_interval' => array(
           'name' => 'is_pledge_interval',
@@ -195,6 +199,7 @@ class CRM_Pledge_DAO_PledgeBlock extends CRM_Core_DAO {
           'table_name' => 'civicrm_pledge_block',
           'entity' => 'PledgeBlock',
           'bao' => 'CRM_Pledge_BAO_PledgeBlock',
+          'localizable' => 0,
         ) ,
         'max_reminders' => array(
           'name' => 'max_reminders',
@@ -205,6 +210,7 @@ class CRM_Pledge_DAO_PledgeBlock extends CRM_Core_DAO {
           'table_name' => 'civicrm_pledge_block',
           'entity' => 'PledgeBlock',
           'bao' => 'CRM_Pledge_BAO_PledgeBlock',
+          'localizable' => 0,
         ) ,
         'initial_reminder_day' => array(
           'name' => 'initial_reminder_day',
@@ -215,6 +221,7 @@ class CRM_Pledge_DAO_PledgeBlock extends CRM_Core_DAO {
           'table_name' => 'civicrm_pledge_block',
           'entity' => 'PledgeBlock',
           'bao' => 'CRM_Pledge_BAO_PledgeBlock',
+          'localizable' => 0,
         ) ,
         'additional_reminder_day' => array(
           'name' => 'additional_reminder_day',
@@ -225,6 +232,7 @@ class CRM_Pledge_DAO_PledgeBlock extends CRM_Core_DAO {
           'table_name' => 'civicrm_pledge_block',
           'entity' => 'PledgeBlock',
           'bao' => 'CRM_Pledge_BAO_PledgeBlock',
+          'localizable' => 0,
         ) ,
         'pledge_start_date' => array(
           'name' => 'pledge_start_date',
@@ -236,6 +244,7 @@ class CRM_Pledge_DAO_PledgeBlock extends CRM_Core_DAO {
           'table_name' => 'civicrm_pledge_block',
           'entity' => 'PledgeBlock',
           'bao' => 'CRM_Pledge_BAO_PledgeBlock',
+          'localizable' => 0,
         ) ,
         'is_pledge_start_date_visible' => array(
           'name' => 'is_pledge_start_date_visible',
@@ -246,6 +255,7 @@ class CRM_Pledge_DAO_PledgeBlock extends CRM_Core_DAO {
           'table_name' => 'civicrm_pledge_block',
           'entity' => 'PledgeBlock',
           'bao' => 'CRM_Pledge_BAO_PledgeBlock',
+          'localizable' => 0,
         ) ,
         'is_pledge_start_date_editable' => array(
           'name' => 'is_pledge_start_date_editable',
@@ -256,6 +266,7 @@ class CRM_Pledge_DAO_PledgeBlock extends CRM_Core_DAO {
           'table_name' => 'civicrm_pledge_block',
           'entity' => 'PledgeBlock',
           'bao' => 'CRM_Pledge_BAO_PledgeBlock',
+          'localizable' => 0,
         ) ,
       );
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);

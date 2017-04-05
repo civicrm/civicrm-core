@@ -130,6 +130,7 @@ class CRM_Core_DAO_StatusPreference extends CRM_Core_DAO {
           'table_name' => 'civicrm_status_pref',
           'entity' => 'StatusPreference',
           'bao' => 'CRM_Core_BAO_StatusPreference',
+          'localizable' => 0,
         ) ,
         'domain_id' => array(
           'name' => 'domain_id',
@@ -140,6 +141,7 @@ class CRM_Core_DAO_StatusPreference extends CRM_Core_DAO {
           'table_name' => 'civicrm_status_pref',
           'entity' => 'StatusPreference',
           'bao' => 'CRM_Core_BAO_StatusPreference',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Core_DAO_Domain',
           'pseudoconstant' => array(
             'table' => 'civicrm_domain',
@@ -163,6 +165,7 @@ class CRM_Core_DAO_StatusPreference extends CRM_Core_DAO {
           'table_name' => 'civicrm_status_pref',
           'entity' => 'StatusPreference',
           'bao' => 'CRM_Core_BAO_StatusPreference',
+          'localizable' => 0,
         ) ,
         'hush_until' => array(
           'name' => 'hush_until',
@@ -178,6 +181,7 @@ class CRM_Core_DAO_StatusPreference extends CRM_Core_DAO {
           'table_name' => 'civicrm_status_pref',
           'entity' => 'StatusPreference',
           'bao' => 'CRM_Core_BAO_StatusPreference',
+          'localizable' => 0,
         ) ,
         'ignore_severity' => array(
           'name' => 'ignore_severity',
@@ -193,6 +197,7 @@ class CRM_Core_DAO_StatusPreference extends CRM_Core_DAO {
           'table_name' => 'civicrm_status_pref',
           'entity' => 'StatusPreference',
           'bao' => 'CRM_Core_BAO_StatusPreference',
+          'localizable' => 0,
           'pseudoconstant' => array(
             'callback' => 'CRM_Utils_Check::getSeverityList',
           )
@@ -207,6 +212,7 @@ class CRM_Core_DAO_StatusPreference extends CRM_Core_DAO {
           'table_name' => 'civicrm_status_pref',
           'entity' => 'StatusPreference',
           'bao' => 'CRM_Core_BAO_StatusPreference',
+          'localizable' => 0,
         ) ,
         'check_info' => array(
           'name' => 'check_info',
@@ -218,6 +224,7 @@ class CRM_Core_DAO_StatusPreference extends CRM_Core_DAO {
           'table_name' => 'civicrm_status_pref',
           'entity' => 'StatusPreference',
           'bao' => 'CRM_Core_BAO_StatusPreference',
+          'localizable' => 0,
         ) ,
       );
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);

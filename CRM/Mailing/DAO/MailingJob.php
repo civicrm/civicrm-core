@@ -153,6 +153,7 @@ class CRM_Mailing_DAO_MailingJob extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_job',
           'entity' => 'MailingJob',
           'bao' => 'CRM_Mailing_BAO_MailingJob',
+          'localizable' => 0,
         ) ,
         'mailing_id' => array(
           'name' => 'mailing_id',
@@ -163,6 +164,7 @@ class CRM_Mailing_DAO_MailingJob extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_job',
           'entity' => 'MailingJob',
           'bao' => 'CRM_Mailing_BAO_MailingJob',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Mailing_DAO_Mailing',
         ) ,
         'scheduled_date' => array(
@@ -173,6 +175,7 @@ class CRM_Mailing_DAO_MailingJob extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_job',
           'entity' => 'MailingJob',
           'bao' => 'CRM_Mailing_BAO_MailingJob',
+          'localizable' => 0,
         ) ,
         'start_date' => array(
           'name' => 'start_date',
@@ -182,6 +185,7 @@ class CRM_Mailing_DAO_MailingJob extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_job',
           'entity' => 'MailingJob',
           'bao' => 'CRM_Mailing_BAO_MailingJob',
+          'localizable' => 0,
         ) ,
         'end_date' => array(
           'name' => 'end_date',
@@ -191,6 +195,7 @@ class CRM_Mailing_DAO_MailingJob extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_job',
           'entity' => 'MailingJob',
           'bao' => 'CRM_Mailing_BAO_MailingJob',
+          'localizable' => 0,
         ) ,
         'status' => array(
           'name' => 'status',
@@ -202,6 +207,7 @@ class CRM_Mailing_DAO_MailingJob extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_job',
           'entity' => 'MailingJob',
           'bao' => 'CRM_Mailing_BAO_MailingJob',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -217,6 +223,7 @@ class CRM_Mailing_DAO_MailingJob extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_job',
           'entity' => 'MailingJob',
           'bao' => 'CRM_Mailing_BAO_MailingJob',
+          'localizable' => 0,
         ) ,
         'job_type' => array(
           'name' => 'job_type',
@@ -228,6 +235,7 @@ class CRM_Mailing_DAO_MailingJob extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_job',
           'entity' => 'MailingJob',
           'bao' => 'CRM_Mailing_BAO_MailingJob',
+          'localizable' => 0,
         ) ,
         'parent_id' => array(
           'name' => 'parent_id',
@@ -238,6 +246,7 @@ class CRM_Mailing_DAO_MailingJob extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_job',
           'entity' => 'MailingJob',
           'bao' => 'CRM_Mailing_BAO_MailingJob',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Mailing_DAO_MailingJob',
         ) ,
         'job_offset' => array(
@@ -248,6 +257,7 @@ class CRM_Mailing_DAO_MailingJob extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_job',
           'entity' => 'MailingJob',
           'bao' => 'CRM_Mailing_BAO_MailingJob',
+          'localizable' => 0,
         ) ,
         'job_limit' => array(
           'name' => 'job_limit',
@@ -257,6 +267,7 @@ class CRM_Mailing_DAO_MailingJob extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_job',
           'entity' => 'MailingJob',
           'bao' => 'CRM_Mailing_BAO_MailingJob',
+          'localizable' => 0,
         ) ,
       );
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);

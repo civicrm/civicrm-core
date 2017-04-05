@@ -190,6 +190,7 @@ class CRM_Financial_DAO_FinancialTrxn extends CRM_Core_DAO {
           'table_name' => 'civicrm_financial_trxn',
           'entity' => 'FinancialTrxn',
           'bao' => 'CRM_Financial_DAO_FinancialTrxn',
+          'localizable' => 0,
         ) ,
         'from_financial_account_id' => array(
           'name' => 'from_financial_account_id',
@@ -199,6 +200,7 @@ class CRM_Financial_DAO_FinancialTrxn extends CRM_Core_DAO {
           'table_name' => 'civicrm_financial_trxn',
           'entity' => 'FinancialTrxn',
           'bao' => 'CRM_Financial_DAO_FinancialTrxn',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Financial_DAO_FinancialAccount',
           'html' => array(
             'type' => 'Select',
@@ -217,6 +219,7 @@ class CRM_Financial_DAO_FinancialTrxn extends CRM_Core_DAO {
           'table_name' => 'civicrm_financial_trxn',
           'entity' => 'FinancialTrxn',
           'bao' => 'CRM_Financial_DAO_FinancialTrxn',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Financial_DAO_FinancialAccount',
           'html' => array(
             'type' => 'Select',
@@ -236,6 +239,7 @@ class CRM_Financial_DAO_FinancialTrxn extends CRM_Core_DAO {
           'table_name' => 'civicrm_financial_trxn',
           'entity' => 'FinancialTrxn',
           'bao' => 'CRM_Financial_DAO_FinancialTrxn',
+          'localizable' => 0,
         ) ,
         'total_amount' => array(
           'name' => 'total_amount',
@@ -250,6 +254,7 @@ class CRM_Financial_DAO_FinancialTrxn extends CRM_Core_DAO {
           'table_name' => 'civicrm_financial_trxn',
           'entity' => 'FinancialTrxn',
           'bao' => 'CRM_Financial_DAO_FinancialTrxn',
+          'localizable' => 0,
         ) ,
         'fee_amount' => array(
           'name' => 'fee_amount',
@@ -263,6 +268,7 @@ class CRM_Financial_DAO_FinancialTrxn extends CRM_Core_DAO {
           'table_name' => 'civicrm_financial_trxn',
           'entity' => 'FinancialTrxn',
           'bao' => 'CRM_Financial_DAO_FinancialTrxn',
+          'localizable' => 0,
         ) ,
         'net_amount' => array(
           'name' => 'net_amount',
@@ -276,6 +282,7 @@ class CRM_Financial_DAO_FinancialTrxn extends CRM_Core_DAO {
           'table_name' => 'civicrm_financial_trxn',
           'entity' => 'FinancialTrxn',
           'bao' => 'CRM_Financial_DAO_FinancialTrxn',
+          'localizable' => 0,
         ) ,
         'currency' => array(
           'name' => 'currency',
@@ -293,6 +300,7 @@ class CRM_Financial_DAO_FinancialTrxn extends CRM_Core_DAO {
           'table_name' => 'civicrm_financial_trxn',
           'entity' => 'FinancialTrxn',
           'bao' => 'CRM_Financial_DAO_FinancialTrxn',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -316,6 +324,7 @@ class CRM_Financial_DAO_FinancialTrxn extends CRM_Core_DAO {
           'table_name' => 'civicrm_financial_trxn',
           'entity' => 'FinancialTrxn',
           'bao' => 'CRM_Financial_DAO_FinancialTrxn',
+          'localizable' => 0,
         ) ,
         'trxn_id' => array(
           'name' => 'trxn_id',
@@ -327,6 +336,7 @@ class CRM_Financial_DAO_FinancialTrxn extends CRM_Core_DAO {
           'table_name' => 'civicrm_financial_trxn',
           'entity' => 'FinancialTrxn',
           'bao' => 'CRM_Financial_DAO_FinancialTrxn',
+          'localizable' => 0,
         ) ,
         'trxn_result_code' => array(
           'name' => 'trxn_result_code',
@@ -338,6 +348,7 @@ class CRM_Financial_DAO_FinancialTrxn extends CRM_Core_DAO {
           'table_name' => 'civicrm_financial_trxn',
           'entity' => 'FinancialTrxn',
           'bao' => 'CRM_Financial_DAO_FinancialTrxn',
+          'localizable' => 0,
         ) ,
         'status_id' => array(
           'name' => 'status_id',
@@ -352,6 +363,7 @@ class CRM_Financial_DAO_FinancialTrxn extends CRM_Core_DAO {
           'table_name' => 'civicrm_financial_trxn',
           'entity' => 'FinancialTrxn',
           'bao' => 'CRM_Financial_DAO_FinancialTrxn',
+          'localizable' => 0,
           'pseudoconstant' => array(
             'optionGroupName' => 'contribution_status',
             'optionEditPath' => 'civicrm/admin/options/contribution_status',
@@ -365,6 +377,7 @@ class CRM_Financial_DAO_FinancialTrxn extends CRM_Core_DAO {
           'table_name' => 'civicrm_financial_trxn',
           'entity' => 'FinancialTrxn',
           'bao' => 'CRM_Financial_DAO_FinancialTrxn',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Financial_DAO_PaymentProcessor',
         ) ,
         'financial_trxn_payment_instrument_id' => array(
@@ -375,6 +388,7 @@ class CRM_Financial_DAO_FinancialTrxn extends CRM_Core_DAO {
           'table_name' => 'civicrm_financial_trxn',
           'entity' => 'FinancialTrxn',
           'bao' => 'CRM_Financial_DAO_FinancialTrxn',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -391,6 +405,7 @@ class CRM_Financial_DAO_FinancialTrxn extends CRM_Core_DAO {
           'table_name' => 'civicrm_financial_trxn',
           'entity' => 'FinancialTrxn',
           'bao' => 'CRM_Financial_DAO_FinancialTrxn',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -409,6 +424,7 @@ class CRM_Financial_DAO_FinancialTrxn extends CRM_Core_DAO {
           'table_name' => 'civicrm_financial_trxn',
           'entity' => 'FinancialTrxn',
           'bao' => 'CRM_Financial_DAO_FinancialTrxn',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -421,6 +437,7 @@ class CRM_Financial_DAO_FinancialTrxn extends CRM_Core_DAO {
           'table_name' => 'civicrm_financial_trxn',
           'entity' => 'FinancialTrxn',
           'bao' => 'CRM_Financial_DAO_FinancialTrxn',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,

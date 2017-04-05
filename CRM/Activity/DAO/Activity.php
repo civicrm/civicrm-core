@@ -242,6 +242,7 @@ class CRM_Activity_DAO_Activity extends CRM_Core_DAO {
           'table_name' => 'civicrm_activity',
           'entity' => 'Activity',
           'bao' => 'CRM_Activity_BAO_Activity',
+          'localizable' => 0,
         ) ,
         'source_record_id' => array(
           'name' => 'source_record_id',
@@ -251,6 +252,7 @@ class CRM_Activity_DAO_Activity extends CRM_Core_DAO {
           'table_name' => 'civicrm_activity',
           'entity' => 'Activity',
           'bao' => 'CRM_Activity_BAO_Activity',
+          'localizable' => 0,
         ) ,
         'activity_type_id' => array(
           'name' => 'activity_type_id',
@@ -267,6 +269,7 @@ class CRM_Activity_DAO_Activity extends CRM_Core_DAO {
           'table_name' => 'civicrm_activity',
           'entity' => 'Activity',
           'bao' => 'CRM_Activity_BAO_Activity',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -290,6 +293,7 @@ class CRM_Activity_DAO_Activity extends CRM_Core_DAO {
           'table_name' => 'civicrm_activity',
           'entity' => 'Activity',
           'bao' => 'CRM_Activity_BAO_Activity',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -307,6 +311,7 @@ class CRM_Activity_DAO_Activity extends CRM_Core_DAO {
           'table_name' => 'civicrm_activity',
           'entity' => 'Activity',
           'bao' => 'CRM_Activity_BAO_Activity',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select Date',
             'formatType' => 'activityDateTime',
@@ -325,6 +330,7 @@ class CRM_Activity_DAO_Activity extends CRM_Core_DAO {
           'table_name' => 'civicrm_activity',
           'entity' => 'Activity',
           'bao' => 'CRM_Activity_BAO_Activity',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -344,6 +350,7 @@ class CRM_Activity_DAO_Activity extends CRM_Core_DAO {
           'table_name' => 'civicrm_activity',
           'entity' => 'Activity',
           'bao' => 'CRM_Activity_BAO_Activity',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -356,6 +363,7 @@ class CRM_Activity_DAO_Activity extends CRM_Core_DAO {
           'table_name' => 'civicrm_activity',
           'entity' => 'Activity',
           'bao' => 'CRM_Activity_BAO_Activity',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Core_DAO_Phone',
           'html' => array(
             'type' => 'EntityRef',
@@ -371,6 +379,7 @@ class CRM_Activity_DAO_Activity extends CRM_Core_DAO {
           'table_name' => 'civicrm_activity',
           'entity' => 'Activity',
           'bao' => 'CRM_Activity_BAO_Activity',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -388,6 +397,7 @@ class CRM_Activity_DAO_Activity extends CRM_Core_DAO {
           'table_name' => 'civicrm_activity',
           'entity' => 'Activity',
           'bao' => 'CRM_Activity_BAO_Activity',
+          'localizable' => 0,
           'html' => array(
             'type' => 'RichTextEditor',
           ) ,
@@ -405,6 +415,7 @@ class CRM_Activity_DAO_Activity extends CRM_Core_DAO {
           'table_name' => 'civicrm_activity',
           'entity' => 'Activity',
           'bao' => 'CRM_Activity_BAO_Activity',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -421,6 +432,7 @@ class CRM_Activity_DAO_Activity extends CRM_Core_DAO {
           'table_name' => 'civicrm_activity',
           'entity' => 'Activity',
           'bao' => 'CRM_Activity_BAO_Activity',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -437,6 +449,7 @@ class CRM_Activity_DAO_Activity extends CRM_Core_DAO {
           'table_name' => 'civicrm_activity',
           'entity' => 'Activity',
           'bao' => 'CRM_Activity_BAO_Activity',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Activity_DAO_Activity',
         ) ,
         'activity_is_test' => array(
@@ -451,6 +464,7 @@ class CRM_Activity_DAO_Activity extends CRM_Core_DAO {
           'table_name' => 'civicrm_activity',
           'entity' => 'Activity',
           'bao' => 'CRM_Activity_BAO_Activity',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -464,6 +478,7 @@ class CRM_Activity_DAO_Activity extends CRM_Core_DAO {
           'table_name' => 'civicrm_activity',
           'entity' => 'Activity',
           'bao' => 'CRM_Activity_BAO_Activity',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -479,6 +494,7 @@ class CRM_Activity_DAO_Activity extends CRM_Core_DAO {
           'table_name' => 'civicrm_activity',
           'entity' => 'Activity',
           'bao' => 'CRM_Activity_BAO_Activity',
+          'localizable' => 0,
         ) ,
         'relationship_id' => array(
           'name' => 'relationship_id',
@@ -489,6 +505,7 @@ class CRM_Activity_DAO_Activity extends CRM_Core_DAO {
           'table_name' => 'civicrm_activity',
           'entity' => 'Activity',
           'bao' => 'CRM_Activity_BAO_Activity',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Contact_DAO_Relationship',
         ) ,
         'is_current_revision' => array(
@@ -504,6 +521,7 @@ class CRM_Activity_DAO_Activity extends CRM_Core_DAO {
           'table_name' => 'civicrm_activity',
           'entity' => 'Activity',
           'bao' => 'CRM_Activity_BAO_Activity',
+          'localizable' => 0,
           'html' => array(
             'type' => 'CheckBox',
           ) ,
@@ -516,6 +534,7 @@ class CRM_Activity_DAO_Activity extends CRM_Core_DAO {
           'table_name' => 'civicrm_activity',
           'entity' => 'Activity',
           'bao' => 'CRM_Activity_BAO_Activity',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Activity_DAO_Activity',
         ) ,
         'activity_result' => array(
@@ -528,6 +547,7 @@ class CRM_Activity_DAO_Activity extends CRM_Core_DAO {
           'table_name' => 'civicrm_activity',
           'entity' => 'Activity',
           'bao' => 'CRM_Activity_BAO_Activity',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -544,6 +564,7 @@ class CRM_Activity_DAO_Activity extends CRM_Core_DAO {
           'table_name' => 'civicrm_activity',
           'entity' => 'Activity',
           'bao' => 'CRM_Activity_BAO_Activity',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -561,6 +582,7 @@ class CRM_Activity_DAO_Activity extends CRM_Core_DAO {
           'table_name' => 'civicrm_activity',
           'entity' => 'Activity',
           'bao' => 'CRM_Activity_BAO_Activity',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Campaign_DAO_Campaign',
           'html' => array(
             'type' => 'CheckBox',
@@ -584,6 +606,7 @@ class CRM_Activity_DAO_Activity extends CRM_Core_DAO {
           'table_name' => 'civicrm_activity',
           'entity' => 'Activity',
           'bao' => 'CRM_Activity_BAO_Activity',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -599,6 +622,7 @@ class CRM_Activity_DAO_Activity extends CRM_Core_DAO {
           'table_name' => 'civicrm_activity',
           'entity' => 'Activity',
           'bao' => 'CRM_Activity_BAO_Activity',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -616,6 +640,7 @@ class CRM_Activity_DAO_Activity extends CRM_Core_DAO {
           'table_name' => 'civicrm_activity',
           'entity' => 'Activity',
           'bao' => 'CRM_Activity_BAO_Activity',
+          'localizable' => 0,
         ) ,
       );
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);

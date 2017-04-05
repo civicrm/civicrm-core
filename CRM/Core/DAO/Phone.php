@@ -148,6 +148,7 @@ class CRM_Core_DAO_Phone extends CRM_Core_DAO {
           'table_name' => 'civicrm_phone',
           'entity' => 'Phone',
           'bao' => 'CRM_Core_BAO_Phone',
+          'localizable' => 0,
         ) ,
         'contact_id' => array(
           'name' => 'contact_id',
@@ -157,6 +158,7 @@ class CRM_Core_DAO_Phone extends CRM_Core_DAO {
           'table_name' => 'civicrm_phone',
           'entity' => 'Phone',
           'bao' => 'CRM_Core_BAO_Phone',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Contact_DAO_Contact',
         ) ,
         'location_type_id' => array(
@@ -167,6 +169,7 @@ class CRM_Core_DAO_Phone extends CRM_Core_DAO {
           'table_name' => 'civicrm_phone',
           'entity' => 'Phone',
           'bao' => 'CRM_Core_BAO_Phone',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -184,6 +187,7 @@ class CRM_Core_DAO_Phone extends CRM_Core_DAO {
           'table_name' => 'civicrm_phone',
           'entity' => 'Phone',
           'bao' => 'CRM_Core_BAO_Phone',
+          'localizable' => 0,
         ) ,
         'is_billing' => array(
           'name' => 'is_billing',
@@ -193,6 +197,7 @@ class CRM_Core_DAO_Phone extends CRM_Core_DAO {
           'table_name' => 'civicrm_phone',
           'entity' => 'Phone',
           'bao' => 'CRM_Core_BAO_Phone',
+          'localizable' => 0,
         ) ,
         'mobile_provider_id' => array(
           'name' => 'mobile_provider_id',
@@ -202,6 +207,7 @@ class CRM_Core_DAO_Phone extends CRM_Core_DAO {
           'table_name' => 'civicrm_phone',
           'entity' => 'Phone',
           'bao' => 'CRM_Core_BAO_Phone',
+          'localizable' => 0,
         ) ,
         'phone' => array(
           'name' => 'phone',
@@ -218,6 +224,7 @@ class CRM_Core_DAO_Phone extends CRM_Core_DAO {
           'table_name' => 'civicrm_phone',
           'entity' => 'Phone',
           'bao' => 'CRM_Core_BAO_Phone',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -237,6 +244,7 @@ class CRM_Core_DAO_Phone extends CRM_Core_DAO {
           'table_name' => 'civicrm_phone',
           'entity' => 'Phone',
           'bao' => 'CRM_Core_BAO_Phone',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -251,6 +259,7 @@ class CRM_Core_DAO_Phone extends CRM_Core_DAO {
           'table_name' => 'civicrm_phone',
           'entity' => 'Phone',
           'bao' => 'CRM_Core_BAO_Phone',
+          'localizable' => 0,
         ) ,
         'phone_type_id' => array(
           'name' => 'phone_type_id',
@@ -260,6 +269,7 @@ class CRM_Core_DAO_Phone extends CRM_Core_DAO {
           'table_name' => 'civicrm_phone',
           'entity' => 'Phone',
           'bao' => 'CRM_Core_BAO_Phone',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,

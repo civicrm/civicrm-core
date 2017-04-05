@@ -184,6 +184,7 @@ class CRM_Grant_DAO_Grant extends CRM_Core_DAO {
           'table_name' => 'civicrm_grant',
           'entity' => 'Grant',
           'bao' => 'CRM_Grant_BAO_Grant',
+          'localizable' => 0,
         ) ,
         'grant_contact_id' => array(
           'name' => 'contact_id',
@@ -198,6 +199,7 @@ class CRM_Grant_DAO_Grant extends CRM_Core_DAO {
           'table_name' => 'civicrm_grant',
           'entity' => 'Grant',
           'bao' => 'CRM_Grant_BAO_Grant',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Contact_DAO_Contact',
           'html' => array(
             'type' => 'EntityRef',
@@ -215,6 +217,7 @@ class CRM_Grant_DAO_Grant extends CRM_Core_DAO {
           'table_name' => 'civicrm_grant',
           'entity' => 'Grant',
           'bao' => 'CRM_Grant_BAO_Grant',
+          'localizable' => 0,
         ) ,
         'decision_date' => array(
           'name' => 'decision_date',
@@ -229,6 +232,7 @@ class CRM_Grant_DAO_Grant extends CRM_Core_DAO {
           'table_name' => 'civicrm_grant',
           'entity' => 'Grant',
           'bao' => 'CRM_Grant_BAO_Grant',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select Date',
           ) ,
@@ -246,6 +250,7 @@ class CRM_Grant_DAO_Grant extends CRM_Core_DAO {
           'table_name' => 'civicrm_grant',
           'entity' => 'Grant',
           'bao' => 'CRM_Grant_BAO_Grant',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select Date',
           ) ,
@@ -258,6 +263,7 @@ class CRM_Grant_DAO_Grant extends CRM_Core_DAO {
           'table_name' => 'civicrm_grant',
           'entity' => 'Grant',
           'bao' => 'CRM_Grant_BAO_Grant',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select Date',
           ) ,
@@ -275,6 +281,7 @@ class CRM_Grant_DAO_Grant extends CRM_Core_DAO {
           'table_name' => 'civicrm_grant',
           'entity' => 'Grant',
           'bao' => 'CRM_Grant_BAO_Grant',
+          'localizable' => 0,
           'html' => array(
             'type' => 'CheckBox',
           ) ,
@@ -292,6 +299,7 @@ class CRM_Grant_DAO_Grant extends CRM_Core_DAO {
           'table_name' => 'civicrm_grant',
           'entity' => 'Grant',
           'bao' => 'CRM_Grant_BAO_Grant',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -318,6 +326,7 @@ class CRM_Grant_DAO_Grant extends CRM_Core_DAO {
           'table_name' => 'civicrm_grant',
           'entity' => 'Grant',
           'bao' => 'CRM_Grant_BAO_Grant',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -334,6 +343,7 @@ class CRM_Grant_DAO_Grant extends CRM_Core_DAO {
           'table_name' => 'civicrm_grant',
           'entity' => 'Grant',
           'bao' => 'CRM_Grant_BAO_Grant',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -355,6 +365,7 @@ class CRM_Grant_DAO_Grant extends CRM_Core_DAO {
           'table_name' => 'civicrm_grant',
           'entity' => 'Grant',
           'bao' => 'CRM_Grant_BAO_Grant',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -370,6 +381,7 @@ class CRM_Grant_DAO_Grant extends CRM_Core_DAO {
           'table_name' => 'civicrm_grant',
           'entity' => 'Grant',
           'bao' => 'CRM_Grant_BAO_Grant',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -395,6 +407,7 @@ class CRM_Grant_DAO_Grant extends CRM_Core_DAO {
           'table_name' => 'civicrm_grant',
           'entity' => 'Grant',
           'bao' => 'CRM_Grant_BAO_Grant',
+          'localizable' => 0,
           'html' => array(
             'type' => 'TextArea',
           ) ,
@@ -413,6 +426,7 @@ class CRM_Grant_DAO_Grant extends CRM_Core_DAO {
           'table_name' => 'civicrm_grant',
           'entity' => 'Grant',
           'bao' => 'CRM_Grant_BAO_Grant',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -430,6 +444,7 @@ class CRM_Grant_DAO_Grant extends CRM_Core_DAO {
           'table_name' => 'civicrm_grant',
           'entity' => 'Grant',
           'bao' => 'CRM_Grant_BAO_Grant',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Financial_DAO_FinancialType',
           'pseudoconstant' => array(
             'table' => 'civicrm_financial_type',

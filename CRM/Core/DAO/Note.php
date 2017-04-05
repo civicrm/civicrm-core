@@ -137,6 +137,7 @@ class CRM_Core_DAO_Note extends CRM_Core_DAO {
           'table_name' => 'civicrm_note',
           'entity' => 'Note',
           'bao' => 'CRM_Core_BAO_Note',
+          'localizable' => 0,
         ) ,
         'entity_table' => array(
           'name' => 'entity_table',
@@ -149,6 +150,7 @@ class CRM_Core_DAO_Note extends CRM_Core_DAO {
           'table_name' => 'civicrm_note',
           'entity' => 'Note',
           'bao' => 'CRM_Core_BAO_Note',
+          'localizable' => 0,
           'pseudoconstant' => array(
             'callback' => 'CRM_Core_BAO_Note::entityTables',
           )
@@ -162,6 +164,7 @@ class CRM_Core_DAO_Note extends CRM_Core_DAO {
           'table_name' => 'civicrm_note',
           'entity' => 'Note',
           'bao' => 'CRM_Core_BAO_Note',
+          'localizable' => 0,
         ) ,
         'note' => array(
           'name' => 'note',
@@ -178,6 +181,7 @@ class CRM_Core_DAO_Note extends CRM_Core_DAO {
           'table_name' => 'civicrm_note',
           'entity' => 'Note',
           'bao' => 'CRM_Core_BAO_Note',
+          'localizable' => 0,
           'html' => array(
             'type' => 'TextArea',
           ) ,
@@ -190,6 +194,7 @@ class CRM_Core_DAO_Note extends CRM_Core_DAO {
           'table_name' => 'civicrm_note',
           'entity' => 'Note',
           'bao' => 'CRM_Core_BAO_Note',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Contact_DAO_Contact',
         ) ,
         'modified_date' => array(
@@ -200,6 +205,7 @@ class CRM_Core_DAO_Note extends CRM_Core_DAO {
           'table_name' => 'civicrm_note',
           'entity' => 'Note',
           'bao' => 'CRM_Core_BAO_Note',
+          'localizable' => 0,
         ) ,
         'subject' => array(
           'name' => 'subject',
@@ -211,6 +217,7 @@ class CRM_Core_DAO_Note extends CRM_Core_DAO {
           'table_name' => 'civicrm_note',
           'entity' => 'Note',
           'bao' => 'CRM_Core_BAO_Note',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -225,6 +232,7 @@ class CRM_Core_DAO_Note extends CRM_Core_DAO {
           'table_name' => 'civicrm_note',
           'entity' => 'Note',
           'bao' => 'CRM_Core_BAO_Note',
+          'localizable' => 0,
           'pseudoconstant' => array(
             'optionGroupName' => 'note_privacy',
             'optionEditPath' => 'civicrm/admin/options/note_privacy',

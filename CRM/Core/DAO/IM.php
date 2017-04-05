@@ -130,6 +130,7 @@ class CRM_Core_DAO_IM extends CRM_Core_DAO {
           'table_name' => 'civicrm_im',
           'entity' => 'IM',
           'bao' => 'CRM_Core_BAO_IM',
+          'localizable' => 0,
         ) ,
         'contact_id' => array(
           'name' => 'contact_id',
@@ -139,6 +140,7 @@ class CRM_Core_DAO_IM extends CRM_Core_DAO {
           'table_name' => 'civicrm_im',
           'entity' => 'IM',
           'bao' => 'CRM_Core_BAO_IM',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Contact_DAO_Contact',
         ) ,
         'location_type_id' => array(
@@ -149,6 +151,7 @@ class CRM_Core_DAO_IM extends CRM_Core_DAO {
           'table_name' => 'civicrm_im',
           'entity' => 'IM',
           'bao' => 'CRM_Core_BAO_IM',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -173,6 +176,7 @@ class CRM_Core_DAO_IM extends CRM_Core_DAO {
           'table_name' => 'civicrm_im',
           'entity' => 'IM',
           'bao' => 'CRM_Core_BAO_IM',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -185,6 +189,7 @@ class CRM_Core_DAO_IM extends CRM_Core_DAO {
           'table_name' => 'civicrm_im',
           'entity' => 'IM',
           'bao' => 'CRM_Core_BAO_IM',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -201,6 +206,7 @@ class CRM_Core_DAO_IM extends CRM_Core_DAO {
           'table_name' => 'civicrm_im',
           'entity' => 'IM',
           'bao' => 'CRM_Core_BAO_IM',
+          'localizable' => 0,
         ) ,
         'is_billing' => array(
           'name' => 'is_billing',
@@ -210,6 +216,7 @@ class CRM_Core_DAO_IM extends CRM_Core_DAO {
           'table_name' => 'civicrm_im',
           'entity' => 'IM',
           'bao' => 'CRM_Core_BAO_IM',
+          'localizable' => 0,
         ) ,
       );
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);

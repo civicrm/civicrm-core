@@ -136,6 +136,7 @@ class CRM_Core_DAO_Domain extends CRM_Core_DAO {
           'table_name' => 'civicrm_domain',
           'entity' => 'Domain',
           'bao' => 'CRM_Core_BAO_Domain',
+          'localizable' => 0,
         ) ,
         'name' => array(
           'name' => 'name',
@@ -147,6 +148,7 @@ class CRM_Core_DAO_Domain extends CRM_Core_DAO {
           'table_name' => 'civicrm_domain',
           'entity' => 'Domain',
           'bao' => 'CRM_Core_BAO_Domain',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -161,6 +163,7 @@ class CRM_Core_DAO_Domain extends CRM_Core_DAO {
           'table_name' => 'civicrm_domain',
           'entity' => 'Domain',
           'bao' => 'CRM_Core_BAO_Domain',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -175,6 +178,7 @@ class CRM_Core_DAO_Domain extends CRM_Core_DAO {
           'table_name' => 'civicrm_domain',
           'entity' => 'Domain',
           'bao' => 'CRM_Core_BAO_Domain',
+          'localizable' => 0,
           'html' => array(
             'type' => 'TextArea',
           ) ,
@@ -189,6 +193,7 @@ class CRM_Core_DAO_Domain extends CRM_Core_DAO {
           'table_name' => 'civicrm_domain',
           'entity' => 'Domain',
           'bao' => 'CRM_Core_BAO_Domain',
+          'localizable' => 0,
         ) ,
         'contact_id' => array(
           'name' => 'contact_id',
@@ -198,6 +203,7 @@ class CRM_Core_DAO_Domain extends CRM_Core_DAO {
           'table_name' => 'civicrm_domain',
           'entity' => 'Domain',
           'bao' => 'CRM_Core_BAO_Domain',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Contact_DAO_Contact',
         ) ,
         'locales' => array(
@@ -208,6 +214,7 @@ class CRM_Core_DAO_Domain extends CRM_Core_DAO {
           'table_name' => 'civicrm_domain',
           'entity' => 'Domain',
           'bao' => 'CRM_Core_BAO_Domain',
+          'localizable' => 0,
         ) ,
         'locale_custom_strings' => array(
           'name' => 'locale_custom_strings',
@@ -219,6 +226,7 @@ class CRM_Core_DAO_Domain extends CRM_Core_DAO {
           'table_name' => 'civicrm_domain',
           'entity' => 'Domain',
           'bao' => 'CRM_Core_BAO_Domain',
+          'localizable' => 0,
           'html' => array(
             'type' => 'TextArea',
           ) ,

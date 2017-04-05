@@ -113,6 +113,7 @@ class CRM_Batch_DAO_EntityBatch extends CRM_Core_DAO {
           'table_name' => 'civicrm_entity_batch',
           'entity' => 'EntityBatch',
           'bao' => 'CRM_Batch_BAO_EntityBatch',
+          'localizable' => 0,
         ) ,
         'entity_table' => array(
           'name' => 'entity_table',
@@ -124,6 +125,7 @@ class CRM_Batch_DAO_EntityBatch extends CRM_Core_DAO {
           'table_name' => 'civicrm_entity_batch',
           'entity' => 'EntityBatch',
           'bao' => 'CRM_Batch_BAO_EntityBatch',
+          'localizable' => 0,
         ) ,
         'entity_id' => array(
           'name' => 'entity_id',
@@ -134,6 +136,7 @@ class CRM_Batch_DAO_EntityBatch extends CRM_Core_DAO {
           'table_name' => 'civicrm_entity_batch',
           'entity' => 'EntityBatch',
           'bao' => 'CRM_Batch_BAO_EntityBatch',
+          'localizable' => 0,
         ) ,
         'batch_id' => array(
           'name' => 'batch_id',
@@ -144,6 +147,7 @@ class CRM_Batch_DAO_EntityBatch extends CRM_Core_DAO {
           'table_name' => 'civicrm_entity_batch',
           'entity' => 'EntityBatch',
           'bao' => 'CRM_Batch_BAO_EntityBatch',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Batch_DAO_Batch',
           'pseudoconstant' => array(
             'table' => 'civicrm_batch',

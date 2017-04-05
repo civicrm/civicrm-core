@@ -124,6 +124,7 @@ class CRM_Dedupe_DAO_Rule extends CRM_Core_DAO {
           'table_name' => 'civicrm_dedupe_rule',
           'entity' => 'Rule',
           'bao' => 'CRM_Dedupe_BAO_Rule',
+          'localizable' => 0,
         ) ,
         'dedupe_rule_group_id' => array(
           'name' => 'dedupe_rule_group_id',
@@ -134,6 +135,7 @@ class CRM_Dedupe_DAO_Rule extends CRM_Core_DAO {
           'table_name' => 'civicrm_dedupe_rule',
           'entity' => 'Rule',
           'bao' => 'CRM_Dedupe_BAO_Rule',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Dedupe_DAO_RuleGroup',
         ) ,
         'rule_table' => array(
@@ -147,6 +149,7 @@ class CRM_Dedupe_DAO_Rule extends CRM_Core_DAO {
           'table_name' => 'civicrm_dedupe_rule',
           'entity' => 'Rule',
           'bao' => 'CRM_Dedupe_BAO_Rule',
+          'localizable' => 0,
         ) ,
         'rule_field' => array(
           'name' => 'rule_field',
@@ -159,6 +162,7 @@ class CRM_Dedupe_DAO_Rule extends CRM_Core_DAO {
           'table_name' => 'civicrm_dedupe_rule',
           'entity' => 'Rule',
           'bao' => 'CRM_Dedupe_BAO_Rule',
+          'localizable' => 0,
         ) ,
         'rule_length' => array(
           'name' => 'rule_length',
@@ -168,6 +172,7 @@ class CRM_Dedupe_DAO_Rule extends CRM_Core_DAO {
           'table_name' => 'civicrm_dedupe_rule',
           'entity' => 'Rule',
           'bao' => 'CRM_Dedupe_BAO_Rule',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -181,6 +186,7 @@ class CRM_Dedupe_DAO_Rule extends CRM_Core_DAO {
           'table_name' => 'civicrm_dedupe_rule',
           'entity' => 'Rule',
           'bao' => 'CRM_Dedupe_BAO_Rule',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,

@@ -185,6 +185,7 @@ class CRM_Member_DAO_Membership extends CRM_Core_DAO {
           'table_name' => 'civicrm_membership',
           'entity' => 'Membership',
           'bao' => 'CRM_Member_BAO_Membership',
+          'localizable' => 0,
         ) ,
         'membership_contact_id' => array(
           'name' => 'contact_id',
@@ -200,6 +201,7 @@ class CRM_Member_DAO_Membership extends CRM_Core_DAO {
           'table_name' => 'civicrm_membership',
           'entity' => 'Membership',
           'bao' => 'CRM_Member_BAO_Membership',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Contact_DAO_Contact',
           'html' => array(
             'type' => 'EntityRef',
@@ -219,6 +221,7 @@ class CRM_Member_DAO_Membership extends CRM_Core_DAO {
           'table_name' => 'civicrm_membership',
           'entity' => 'Membership',
           'bao' => 'CRM_Member_BAO_Membership',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Member_DAO_MembershipType',
           'html' => array(
             'type' => 'Select',
@@ -242,6 +245,7 @@ class CRM_Member_DAO_Membership extends CRM_Core_DAO {
           'table_name' => 'civicrm_membership',
           'entity' => 'Membership',
           'bao' => 'CRM_Member_BAO_Membership',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select Date',
             'formatType' => 'activityDate',
@@ -260,6 +264,7 @@ class CRM_Member_DAO_Membership extends CRM_Core_DAO {
           'table_name' => 'civicrm_membership',
           'entity' => 'Membership',
           'bao' => 'CRM_Member_BAO_Membership',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select Date',
             'formatType' => 'activityDate',
@@ -278,6 +283,7 @@ class CRM_Member_DAO_Membership extends CRM_Core_DAO {
           'table_name' => 'civicrm_membership',
           'entity' => 'Membership',
           'bao' => 'CRM_Member_BAO_Membership',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select Date',
             'formatType' => 'activityDate',
@@ -297,6 +303,7 @@ class CRM_Member_DAO_Membership extends CRM_Core_DAO {
           'table_name' => 'civicrm_membership',
           'entity' => 'Membership',
           'bao' => 'CRM_Member_BAO_Membership',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -315,6 +322,7 @@ class CRM_Member_DAO_Membership extends CRM_Core_DAO {
           'table_name' => 'civicrm_membership',
           'entity' => 'Membership',
           'bao' => 'CRM_Member_BAO_Membership',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Member_DAO_MembershipStatus',
           'html' => array(
             'type' => 'Select',
@@ -338,6 +346,7 @@ class CRM_Member_DAO_Membership extends CRM_Core_DAO {
           'table_name' => 'civicrm_membership',
           'entity' => 'Membership',
           'bao' => 'CRM_Member_BAO_Membership',
+          'localizable' => 0,
           'html' => array(
             'type' => 'CheckBox',
           ) ,
@@ -354,6 +363,7 @@ class CRM_Member_DAO_Membership extends CRM_Core_DAO {
           'table_name' => 'civicrm_membership',
           'entity' => 'Membership',
           'bao' => 'CRM_Member_BAO_Membership',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Member_DAO_Membership',
         ) ,
         'max_related' => array(
@@ -364,6 +374,7 @@ class CRM_Member_DAO_Membership extends CRM_Core_DAO {
           'table_name' => 'civicrm_membership',
           'entity' => 'Membership',
           'bao' => 'CRM_Member_BAO_Membership',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -380,6 +391,7 @@ class CRM_Member_DAO_Membership extends CRM_Core_DAO {
           'table_name' => 'civicrm_membership',
           'entity' => 'Membership',
           'bao' => 'CRM_Member_BAO_Membership',
+          'localizable' => 0,
           'html' => array(
             'type' => 'CheckBox',
           ) ,
@@ -396,6 +408,7 @@ class CRM_Member_DAO_Membership extends CRM_Core_DAO {
           'table_name' => 'civicrm_membership',
           'entity' => 'Membership',
           'bao' => 'CRM_Member_BAO_Membership',
+          'localizable' => 0,
           'html' => array(
             'type' => 'CheckBox',
           ) ,
@@ -408,6 +421,7 @@ class CRM_Member_DAO_Membership extends CRM_Core_DAO {
           'table_name' => 'civicrm_membership',
           'entity' => 'Membership',
           'bao' => 'CRM_Member_BAO_Membership',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Contribute_DAO_ContributionRecur',
         ) ,
         'member_campaign_id' => array(
@@ -423,6 +437,7 @@ class CRM_Member_DAO_Membership extends CRM_Core_DAO {
           'table_name' => 'civicrm_membership',
           'entity' => 'Membership',
           'bao' => 'CRM_Member_BAO_Membership',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Campaign_DAO_Campaign',
           'html' => array(
             'type' => 'Select',

@@ -116,6 +116,7 @@ class CRM_Dedupe_DAO_RuleGroup extends CRM_Core_DAO {
           'table_name' => 'civicrm_dedupe_rule_group',
           'entity' => 'RuleGroup',
           'bao' => 'CRM_Dedupe_BAO_RuleGroup',
+          'localizable' => 0,
         ) ,
         'contact_type' => array(
           'name' => 'contact_type',
@@ -127,6 +128,7 @@ class CRM_Dedupe_DAO_RuleGroup extends CRM_Core_DAO {
           'table_name' => 'civicrm_dedupe_rule_group',
           'entity' => 'RuleGroup',
           'bao' => 'CRM_Dedupe_BAO_RuleGroup',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -146,6 +148,7 @@ class CRM_Dedupe_DAO_RuleGroup extends CRM_Core_DAO {
           'table_name' => 'civicrm_dedupe_rule_group',
           'entity' => 'RuleGroup',
           'bao' => 'CRM_Dedupe_BAO_RuleGroup',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -161,6 +164,7 @@ class CRM_Dedupe_DAO_RuleGroup extends CRM_Core_DAO {
           'table_name' => 'civicrm_dedupe_rule_group',
           'entity' => 'RuleGroup',
           'bao' => 'CRM_Dedupe_BAO_RuleGroup',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Radio',
           ) ,
@@ -178,6 +182,7 @@ class CRM_Dedupe_DAO_RuleGroup extends CRM_Core_DAO {
           'table_name' => 'civicrm_dedupe_rule_group',
           'entity' => 'RuleGroup',
           'bao' => 'CRM_Dedupe_BAO_RuleGroup',
+          'localizable' => 0,
         ) ,
         'title' => array(
           'name' => 'title',
@@ -189,6 +194,7 @@ class CRM_Dedupe_DAO_RuleGroup extends CRM_Core_DAO {
           'table_name' => 'civicrm_dedupe_rule_group',
           'entity' => 'RuleGroup',
           'bao' => 'CRM_Dedupe_BAO_RuleGroup',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -201,6 +207,7 @@ class CRM_Dedupe_DAO_RuleGroup extends CRM_Core_DAO {
           'table_name' => 'civicrm_dedupe_rule_group',
           'entity' => 'RuleGroup',
           'bao' => 'CRM_Dedupe_BAO_RuleGroup',
+          'localizable' => 0,
           'html' => array(
             'type' => 'CheckBox',
           ) ,

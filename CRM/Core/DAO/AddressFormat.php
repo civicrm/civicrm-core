@@ -86,6 +86,7 @@ class CRM_Core_DAO_AddressFormat extends CRM_Core_DAO {
           'table_name' => 'civicrm_address_format',
           'entity' => 'AddressFormat',
           'bao' => 'CRM_Core_DAO_AddressFormat',
+          'localizable' => 0,
         ) ,
         'format' => array(
           'name' => 'format',
@@ -95,6 +96,7 @@ class CRM_Core_DAO_AddressFormat extends CRM_Core_DAO {
           'table_name' => 'civicrm_address_format',
           'entity' => 'AddressFormat',
           'bao' => 'CRM_Core_DAO_AddressFormat',
+          'localizable' => 0,
         ) ,
       );
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);

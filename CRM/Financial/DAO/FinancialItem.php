@@ -154,6 +154,7 @@ class CRM_Financial_DAO_FinancialItem extends CRM_Core_DAO {
           'table_name' => 'civicrm_financial_item',
           'entity' => 'FinancialItem',
           'bao' => 'CRM_Financial_BAO_FinancialItem',
+          'localizable' => 0,
         ) ,
         'created_date' => array(
           'name' => 'created_date',
@@ -165,6 +166,7 @@ class CRM_Financial_DAO_FinancialItem extends CRM_Core_DAO {
           'table_name' => 'civicrm_financial_item',
           'entity' => 'FinancialItem',
           'bao' => 'CRM_Financial_BAO_FinancialItem',
+          'localizable' => 0,
         ) ,
         'transaction_date' => array(
           'name' => 'transaction_date',
@@ -175,6 +177,7 @@ class CRM_Financial_DAO_FinancialItem extends CRM_Core_DAO {
           'table_name' => 'civicrm_financial_item',
           'entity' => 'FinancialItem',
           'bao' => 'CRM_Financial_BAO_FinancialItem',
+          'localizable' => 0,
         ) ,
         'contact_id' => array(
           'name' => 'contact_id',
@@ -189,6 +192,7 @@ class CRM_Financial_DAO_FinancialItem extends CRM_Core_DAO {
           'table_name' => 'civicrm_financial_item',
           'entity' => 'FinancialItem',
           'bao' => 'CRM_Financial_BAO_FinancialItem',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Contact_DAO_Contact',
         ) ,
         'description' => array(
@@ -201,6 +205,7 @@ class CRM_Financial_DAO_FinancialItem extends CRM_Core_DAO {
           'table_name' => 'civicrm_financial_item',
           'entity' => 'FinancialItem',
           'bao' => 'CRM_Financial_BAO_FinancialItem',
+          'localizable' => 0,
         ) ,
         'amount' => array(
           'name' => 'amount',
@@ -215,6 +220,7 @@ class CRM_Financial_DAO_FinancialItem extends CRM_Core_DAO {
           'table_name' => 'civicrm_financial_item',
           'entity' => 'FinancialItem',
           'bao' => 'CRM_Financial_BAO_FinancialItem',
+          'localizable' => 0,
         ) ,
         'currency' => array(
           'name' => 'currency',
@@ -230,6 +236,7 @@ class CRM_Financial_DAO_FinancialItem extends CRM_Core_DAO {
           'table_name' => 'civicrm_financial_item',
           'entity' => 'FinancialItem',
           'bao' => 'CRM_Financial_BAO_FinancialItem',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -248,6 +255,7 @@ class CRM_Financial_DAO_FinancialItem extends CRM_Core_DAO {
           'table_name' => 'civicrm_financial_item',
           'entity' => 'FinancialItem',
           'bao' => 'CRM_Financial_BAO_FinancialItem',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Financial_DAO_FinancialAccount',
           'html' => array(
             'type' => 'Select',
@@ -270,6 +278,7 @@ class CRM_Financial_DAO_FinancialItem extends CRM_Core_DAO {
           'table_name' => 'civicrm_financial_item',
           'entity' => 'FinancialItem',
           'bao' => 'CRM_Financial_BAO_FinancialItem',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -288,6 +297,7 @@ class CRM_Financial_DAO_FinancialItem extends CRM_Core_DAO {
           'table_name' => 'civicrm_financial_item',
           'entity' => 'FinancialItem',
           'bao' => 'CRM_Financial_BAO_FinancialItem',
+          'localizable' => 0,
         ) ,
         'entity_id' => array(
           'name' => 'entity_id',
@@ -297,6 +307,7 @@ class CRM_Financial_DAO_FinancialItem extends CRM_Core_DAO {
           'table_name' => 'civicrm_financial_item',
           'entity' => 'FinancialItem',
           'bao' => 'CRM_Financial_BAO_FinancialItem',
+          'localizable' => 0,
         ) ,
       );
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);

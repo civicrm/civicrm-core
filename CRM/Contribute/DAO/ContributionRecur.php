@@ -258,6 +258,7 @@ class CRM_Contribute_DAO_ContributionRecur extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_recur',
           'entity' => 'ContributionRecur',
           'bao' => 'CRM_Contribute_BAO_ContributionRecur',
+          'localizable' => 0,
         ) ,
         'contact_id' => array(
           'name' => 'contact_id',
@@ -268,6 +269,7 @@ class CRM_Contribute_DAO_ContributionRecur extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_recur',
           'entity' => 'ContributionRecur',
           'bao' => 'CRM_Contribute_BAO_ContributionRecur',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Contact_DAO_Contact',
         ) ,
         'amount' => array(
@@ -283,6 +285,7 @@ class CRM_Contribute_DAO_ContributionRecur extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_recur',
           'entity' => 'ContributionRecur',
           'bao' => 'CRM_Contribute_BAO_ContributionRecur',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -298,6 +301,7 @@ class CRM_Contribute_DAO_ContributionRecur extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_recur',
           'entity' => 'ContributionRecur',
           'bao' => 'CRM_Contribute_BAO_ContributionRecur',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -319,6 +323,7 @@ class CRM_Contribute_DAO_ContributionRecur extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_recur',
           'entity' => 'ContributionRecur',
           'bao' => 'CRM_Contribute_BAO_ContributionRecur',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -337,6 +342,7 @@ class CRM_Contribute_DAO_ContributionRecur extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_recur',
           'entity' => 'ContributionRecur',
           'bao' => 'CRM_Contribute_BAO_ContributionRecur',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -349,6 +355,7 @@ class CRM_Contribute_DAO_ContributionRecur extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_recur',
           'entity' => 'ContributionRecur',
           'bao' => 'CRM_Contribute_BAO_ContributionRecur',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -362,6 +369,7 @@ class CRM_Contribute_DAO_ContributionRecur extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_recur',
           'entity' => 'ContributionRecur',
           'bao' => 'CRM_Contribute_BAO_ContributionRecur',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select Date',
           ) ,
@@ -375,6 +383,7 @@ class CRM_Contribute_DAO_ContributionRecur extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_recur',
           'entity' => 'ContributionRecur',
           'bao' => 'CRM_Contribute_BAO_ContributionRecur',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select Date',
           ) ,
@@ -387,6 +396,7 @@ class CRM_Contribute_DAO_ContributionRecur extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_recur',
           'entity' => 'ContributionRecur',
           'bao' => 'CRM_Contribute_BAO_ContributionRecur',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select Date',
           ) ,
@@ -399,6 +409,7 @@ class CRM_Contribute_DAO_ContributionRecur extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_recur',
           'entity' => 'ContributionRecur',
           'bao' => 'CRM_Contribute_BAO_ContributionRecur',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select Date',
           ) ,
@@ -411,6 +422,7 @@ class CRM_Contribute_DAO_ContributionRecur extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_recur',
           'entity' => 'ContributionRecur',
           'bao' => 'CRM_Contribute_BAO_ContributionRecur',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select Date',
           ) ,
@@ -425,6 +437,7 @@ class CRM_Contribute_DAO_ContributionRecur extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_recur',
           'entity' => 'ContributionRecur',
           'bao' => 'CRM_Contribute_BAO_ContributionRecur',
+          'localizable' => 0,
         ) ,
         'payment_token_id' => array(
           'name' => 'payment_token_id',
@@ -434,6 +447,7 @@ class CRM_Contribute_DAO_ContributionRecur extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_recur',
           'entity' => 'ContributionRecur',
           'bao' => 'CRM_Contribute_BAO_ContributionRecur',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Financial_DAO_PaymentToken',
         ) ,
         'trxn_id' => array(
@@ -446,6 +460,7 @@ class CRM_Contribute_DAO_ContributionRecur extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_recur',
           'entity' => 'ContributionRecur',
           'bao' => 'CRM_Contribute_BAO_ContributionRecur',
+          'localizable' => 0,
         ) ,
         'invoice_id' => array(
           'name' => 'invoice_id',
@@ -457,6 +472,7 @@ class CRM_Contribute_DAO_ContributionRecur extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_recur',
           'entity' => 'ContributionRecur',
           'bao' => 'CRM_Contribute_BAO_ContributionRecur',
+          'localizable' => 0,
         ) ,
         'contribution_status_id' => array(
           'name' => 'contribution_status_id',
@@ -471,6 +487,7 @@ class CRM_Contribute_DAO_ContributionRecur extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_recur',
           'entity' => 'ContributionRecur',
           'bao' => 'CRM_Contribute_BAO_ContributionRecur',
+          'localizable' => 0,
           'pseudoconstant' => array(
             'optionGroupName' => 'contribution_status',
             'optionEditPath' => 'civicrm/admin/options/contribution_status',
@@ -488,6 +505,7 @@ class CRM_Contribute_DAO_ContributionRecur extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_recur',
           'entity' => 'ContributionRecur',
           'bao' => 'CRM_Contribute_BAO_ContributionRecur',
+          'localizable' => 0,
           'html' => array(
             'type' => 'CheckBox',
           ) ,
@@ -502,6 +520,7 @@ class CRM_Contribute_DAO_ContributionRecur extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_recur',
           'entity' => 'ContributionRecur',
           'bao' => 'CRM_Contribute_BAO_ContributionRecur',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -514,6 +533,7 @@ class CRM_Contribute_DAO_ContributionRecur extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_recur',
           'entity' => 'ContributionRecur',
           'bao' => 'CRM_Contribute_BAO_ContributionRecur',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select Date',
           ) ,
@@ -526,6 +546,7 @@ class CRM_Contribute_DAO_ContributionRecur extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_recur',
           'entity' => 'ContributionRecur',
           'bao' => 'CRM_Contribute_BAO_ContributionRecur',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -538,6 +559,7 @@ class CRM_Contribute_DAO_ContributionRecur extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_recur',
           'entity' => 'ContributionRecur',
           'bao' => 'CRM_Contribute_BAO_ContributionRecur',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select Date',
           ) ,
@@ -551,6 +573,7 @@ class CRM_Contribute_DAO_ContributionRecur extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_recur',
           'entity' => 'ContributionRecur',
           'bao' => 'CRM_Contribute_BAO_ContributionRecur',
+          'localizable' => 0,
           'html' => array(
             'type' => 'CheckBox',
           ) ,
@@ -563,6 +586,7 @@ class CRM_Contribute_DAO_ContributionRecur extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_recur',
           'entity' => 'ContributionRecur',
           'bao' => 'CRM_Contribute_BAO_ContributionRecur',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Financial_DAO_PaymentProcessor',
         ) ,
         'financial_type_id' => array(
@@ -577,6 +601,7 @@ class CRM_Contribute_DAO_ContributionRecur extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_recur',
           'entity' => 'ContributionRecur',
           'bao' => 'CRM_Contribute_BAO_ContributionRecur',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Financial_DAO_FinancialType',
           'pseudoconstant' => array(
             'table' => 'civicrm_financial_type',
@@ -592,6 +617,7 @@ class CRM_Contribute_DAO_ContributionRecur extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_recur',
           'entity' => 'ContributionRecur',
           'bao' => 'CRM_Contribute_BAO_ContributionRecur',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -613,6 +639,7 @@ class CRM_Contribute_DAO_ContributionRecur extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_recur',
           'entity' => 'ContributionRecur',
           'bao' => 'CRM_Contribute_BAO_ContributionRecur',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Campaign_DAO_Campaign',
           'pseudoconstant' => array(
             'table' => 'civicrm_campaign',
@@ -629,6 +656,7 @@ class CRM_Contribute_DAO_ContributionRecur extends CRM_Core_DAO {
           'table_name' => 'civicrm_contribution_recur',
           'entity' => 'ContributionRecur',
           'bao' => 'CRM_Contribute_BAO_ContributionRecur',
+          'localizable' => 0,
           'html' => array(
             'type' => 'CheckBox',
           ) ,

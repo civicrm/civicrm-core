@@ -152,6 +152,7 @@ class CRM_Core_DAO_Tag extends CRM_Core_DAO {
           'table_name' => 'civicrm_tag',
           'entity' => 'Tag',
           'bao' => 'CRM_Core_BAO_Tag',
+          'localizable' => 0,
         ) ,
         'name' => array(
           'name' => 'name',
@@ -164,6 +165,7 @@ class CRM_Core_DAO_Tag extends CRM_Core_DAO {
           'table_name' => 'civicrm_tag',
           'entity' => 'Tag',
           'bao' => 'CRM_Core_BAO_Tag',
+          'localizable' => 0,
         ) ,
         'description' => array(
           'name' => 'description',
@@ -175,6 +177,7 @@ class CRM_Core_DAO_Tag extends CRM_Core_DAO {
           'table_name' => 'civicrm_tag',
           'entity' => 'Tag',
           'bao' => 'CRM_Core_BAO_Tag',
+          'localizable' => 0,
         ) ,
         'parent_id' => array(
           'name' => 'parent_id',
@@ -185,6 +188,7 @@ class CRM_Core_DAO_Tag extends CRM_Core_DAO {
           'table_name' => 'civicrm_tag',
           'entity' => 'Tag',
           'bao' => 'CRM_Core_BAO_Tag',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Core_DAO_Tag',
         ) ,
         'is_selectable' => array(
@@ -196,6 +200,7 @@ class CRM_Core_DAO_Tag extends CRM_Core_DAO {
           'table_name' => 'civicrm_tag',
           'entity' => 'Tag',
           'bao' => 'CRM_Core_BAO_Tag',
+          'localizable' => 0,
         ) ,
         'is_reserved' => array(
           'name' => 'is_reserved',
@@ -204,6 +209,7 @@ class CRM_Core_DAO_Tag extends CRM_Core_DAO {
           'table_name' => 'civicrm_tag',
           'entity' => 'Tag',
           'bao' => 'CRM_Core_BAO_Tag',
+          'localizable' => 0,
         ) ,
         'is_tagset' => array(
           'name' => 'is_tagset',
@@ -212,6 +218,7 @@ class CRM_Core_DAO_Tag extends CRM_Core_DAO {
           'table_name' => 'civicrm_tag',
           'entity' => 'Tag',
           'bao' => 'CRM_Core_BAO_Tag',
+          'localizable' => 0,
         ) ,
         'used_for' => array(
           'name' => 'used_for',
@@ -223,6 +230,7 @@ class CRM_Core_DAO_Tag extends CRM_Core_DAO {
           'table_name' => 'civicrm_tag',
           'entity' => 'Tag',
           'bao' => 'CRM_Core_BAO_Tag',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -239,6 +247,7 @@ class CRM_Core_DAO_Tag extends CRM_Core_DAO {
           'table_name' => 'civicrm_tag',
           'entity' => 'Tag',
           'bao' => 'CRM_Core_BAO_Tag',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Contact_DAO_Contact',
         ) ,
         'color' => array(
@@ -252,6 +261,7 @@ class CRM_Core_DAO_Tag extends CRM_Core_DAO {
           'table_name' => 'civicrm_tag',
           'entity' => 'Tag',
           'bao' => 'CRM_Core_BAO_Tag',
+          'localizable' => 0,
         ) ,
         'created_date' => array(
           'name' => 'created_date',
@@ -261,6 +271,7 @@ class CRM_Core_DAO_Tag extends CRM_Core_DAO {
           'table_name' => 'civicrm_tag',
           'entity' => 'Tag',
           'bao' => 'CRM_Core_BAO_Tag',
+          'localizable' => 0,
         ) ,
       );
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);

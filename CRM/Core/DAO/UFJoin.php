@@ -137,6 +137,7 @@ class CRM_Core_DAO_UFJoin extends CRM_Core_DAO {
           'table_name' => 'civicrm_uf_join',
           'entity' => 'UFJoin',
           'bao' => 'CRM_Core_BAO_UFJoin',
+          'localizable' => 0,
         ) ,
         'is_active' => array(
           'name' => 'is_active',
@@ -147,6 +148,7 @@ class CRM_Core_DAO_UFJoin extends CRM_Core_DAO {
           'table_name' => 'civicrm_uf_join',
           'entity' => 'UFJoin',
           'bao' => 'CRM_Core_BAO_UFJoin',
+          'localizable' => 0,
         ) ,
         'module' => array(
           'name' => 'module',
@@ -159,6 +161,7 @@ class CRM_Core_DAO_UFJoin extends CRM_Core_DAO {
           'table_name' => 'civicrm_uf_join',
           'entity' => 'UFJoin',
           'bao' => 'CRM_Core_BAO_UFJoin',
+          'localizable' => 0,
         ) ,
         'entity_table' => array(
           'name' => 'entity_table',
@@ -170,6 +173,7 @@ class CRM_Core_DAO_UFJoin extends CRM_Core_DAO {
           'table_name' => 'civicrm_uf_join',
           'entity' => 'UFJoin',
           'bao' => 'CRM_Core_BAO_UFJoin',
+          'localizable' => 0,
           'pseudoconstant' => array(
             'callback' => 'CRM_Core_BAO_UFJoin::entityTables',
           )
@@ -182,6 +186,7 @@ class CRM_Core_DAO_UFJoin extends CRM_Core_DAO {
           'table_name' => 'civicrm_uf_join',
           'entity' => 'UFJoin',
           'bao' => 'CRM_Core_BAO_UFJoin',
+          'localizable' => 0,
         ) ,
         'weight' => array(
           'name' => 'weight',
@@ -193,6 +198,7 @@ class CRM_Core_DAO_UFJoin extends CRM_Core_DAO {
           'table_name' => 'civicrm_uf_join',
           'entity' => 'UFJoin',
           'bao' => 'CRM_Core_BAO_UFJoin',
+          'localizable' => 0,
         ) ,
         'uf_group_id' => array(
           'name' => 'uf_group_id',
@@ -203,6 +209,7 @@ class CRM_Core_DAO_UFJoin extends CRM_Core_DAO {
           'table_name' => 'civicrm_uf_join',
           'entity' => 'UFJoin',
           'bao' => 'CRM_Core_BAO_UFJoin',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Core_DAO_UFGroup',
           'html' => array(
             'type' => 'Select',
@@ -221,6 +228,7 @@ class CRM_Core_DAO_UFJoin extends CRM_Core_DAO {
           'table_name' => 'civicrm_uf_join',
           'entity' => 'UFJoin',
           'bao' => 'CRM_Core_BAO_UFJoin',
+          'localizable' => 0,
         ) ,
       );
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);

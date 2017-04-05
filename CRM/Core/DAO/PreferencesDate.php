@@ -114,6 +114,7 @@ class CRM_Core_DAO_PreferencesDate extends CRM_Core_DAO {
           'table_name' => 'civicrm_preferences_date',
           'entity' => 'PreferencesDate',
           'bao' => 'CRM_Core_BAO_PreferencesDate',
+          'localizable' => 0,
         ) ,
         'name' => array(
           'name' => 'name',
@@ -126,6 +127,7 @@ class CRM_Core_DAO_PreferencesDate extends CRM_Core_DAO {
           'table_name' => 'civicrm_preferences_date',
           'entity' => 'PreferencesDate',
           'bao' => 'CRM_Core_BAO_PreferencesDate',
+          'localizable' => 0,
         ) ,
         'description' => array(
           'name' => 'description',
@@ -137,6 +139,7 @@ class CRM_Core_DAO_PreferencesDate extends CRM_Core_DAO {
           'table_name' => 'civicrm_preferences_date',
           'entity' => 'PreferencesDate',
           'bao' => 'CRM_Core_BAO_PreferencesDate',
+          'localizable' => 0,
         ) ,
         'start' => array(
           'name' => 'start',
@@ -147,6 +150,7 @@ class CRM_Core_DAO_PreferencesDate extends CRM_Core_DAO {
           'table_name' => 'civicrm_preferences_date',
           'entity' => 'PreferencesDate',
           'bao' => 'CRM_Core_BAO_PreferencesDate',
+          'localizable' => 0,
         ) ,
         'end' => array(
           'name' => 'end',
@@ -157,6 +161,7 @@ class CRM_Core_DAO_PreferencesDate extends CRM_Core_DAO {
           'table_name' => 'civicrm_preferences_date',
           'entity' => 'PreferencesDate',
           'bao' => 'CRM_Core_BAO_PreferencesDate',
+          'localizable' => 0,
         ) ,
         'date_format' => array(
           'name' => 'date_format',
@@ -168,6 +173,7 @@ class CRM_Core_DAO_PreferencesDate extends CRM_Core_DAO {
           'table_name' => 'civicrm_preferences_date',
           'entity' => 'PreferencesDate',
           'bao' => 'CRM_Core_BAO_PreferencesDate',
+          'localizable' => 0,
         ) ,
         'time_format' => array(
           'name' => 'time_format',
@@ -179,6 +185,7 @@ class CRM_Core_DAO_PreferencesDate extends CRM_Core_DAO {
           'table_name' => 'civicrm_preferences_date',
           'entity' => 'PreferencesDate',
           'bao' => 'CRM_Core_BAO_PreferencesDate',
+          'localizable' => 0,
         ) ,
       );
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);

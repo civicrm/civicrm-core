@@ -143,6 +143,7 @@ class CRM_Core_DAO_Country extends CRM_Core_DAO {
           'table_name' => 'civicrm_country',
           'entity' => 'Country',
           'bao' => 'CRM_Core_BAO_Country',
+          'localizable' => 0,
         ) ,
         'name' => array(
           'name' => 'name',
@@ -159,6 +160,7 @@ class CRM_Core_DAO_Country extends CRM_Core_DAO {
           'table_name' => 'civicrm_country',
           'entity' => 'Country',
           'bao' => 'CRM_Core_BAO_Country',
+          'localizable' => 0,
         ) ,
         'iso_code' => array(
           'name' => 'iso_code',
@@ -170,6 +172,7 @@ class CRM_Core_DAO_Country extends CRM_Core_DAO {
           'table_name' => 'civicrm_country',
           'entity' => 'Country',
           'bao' => 'CRM_Core_BAO_Country',
+          'localizable' => 0,
         ) ,
         'country_code' => array(
           'name' => 'country_code',
@@ -181,6 +184,7 @@ class CRM_Core_DAO_Country extends CRM_Core_DAO {
           'table_name' => 'civicrm_country',
           'entity' => 'Country',
           'bao' => 'CRM_Core_BAO_Country',
+          'localizable' => 0,
         ) ,
         'address_format_id' => array(
           'name' => 'address_format_id',
@@ -190,6 +194,7 @@ class CRM_Core_DAO_Country extends CRM_Core_DAO {
           'table_name' => 'civicrm_country',
           'entity' => 'Country',
           'bao' => 'CRM_Core_BAO_Country',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Core_DAO_AddressFormat',
         ) ,
         'idd_prefix' => array(
@@ -202,6 +207,7 @@ class CRM_Core_DAO_Country extends CRM_Core_DAO {
           'table_name' => 'civicrm_country',
           'entity' => 'Country',
           'bao' => 'CRM_Core_BAO_Country',
+          'localizable' => 0,
         ) ,
         'ndd_prefix' => array(
           'name' => 'ndd_prefix',
@@ -213,6 +219,7 @@ class CRM_Core_DAO_Country extends CRM_Core_DAO {
           'table_name' => 'civicrm_country',
           'entity' => 'Country',
           'bao' => 'CRM_Core_BAO_Country',
+          'localizable' => 0,
         ) ,
         'region_id' => array(
           'name' => 'region_id',
@@ -223,6 +230,7 @@ class CRM_Core_DAO_Country extends CRM_Core_DAO {
           'table_name' => 'civicrm_country',
           'entity' => 'Country',
           'bao' => 'CRM_Core_BAO_Country',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Core_DAO_Worldregion',
         ) ,
         'is_province_abbreviated' => array(
@@ -233,6 +241,7 @@ class CRM_Core_DAO_Country extends CRM_Core_DAO {
           'table_name' => 'civicrm_country',
           'entity' => 'Country',
           'bao' => 'CRM_Core_BAO_Country',
+          'localizable' => 0,
         ) ,
       );
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);

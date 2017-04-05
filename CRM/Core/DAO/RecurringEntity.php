@@ -102,6 +102,7 @@ class CRM_Core_DAO_RecurringEntity extends CRM_Core_DAO {
           'table_name' => 'civicrm_recurring_entity',
           'entity' => 'RecurringEntity',
           'bao' => 'CRM_Core_BAO_RecurringEntity',
+          'localizable' => 0,
         ) ,
         'parent_id' => array(
           'name' => 'parent_id',
@@ -112,6 +113,7 @@ class CRM_Core_DAO_RecurringEntity extends CRM_Core_DAO {
           'table_name' => 'civicrm_recurring_entity',
           'entity' => 'RecurringEntity',
           'bao' => 'CRM_Core_BAO_RecurringEntity',
+          'localizable' => 0,
         ) ,
         'entity_id' => array(
           'name' => 'entity_id',
@@ -121,6 +123,7 @@ class CRM_Core_DAO_RecurringEntity extends CRM_Core_DAO {
           'table_name' => 'civicrm_recurring_entity',
           'entity' => 'RecurringEntity',
           'bao' => 'CRM_Core_BAO_RecurringEntity',
+          'localizable' => 0,
         ) ,
         'entity_table' => array(
           'name' => 'entity_table',
@@ -133,6 +136,7 @@ class CRM_Core_DAO_RecurringEntity extends CRM_Core_DAO {
           'table_name' => 'civicrm_recurring_entity',
           'entity' => 'RecurringEntity',
           'bao' => 'CRM_Core_BAO_RecurringEntity',
+          'localizable' => 0,
         ) ,
         'mode' => array(
           'name' => 'mode',
@@ -144,6 +148,7 @@ class CRM_Core_DAO_RecurringEntity extends CRM_Core_DAO {
           'table_name' => 'civicrm_recurring_entity',
           'entity' => 'RecurringEntity',
           'bao' => 'CRM_Core_BAO_RecurringEntity',
+          'localizable' => 0,
         ) ,
       );
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);

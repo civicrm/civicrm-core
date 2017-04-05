@@ -125,6 +125,7 @@ class CRM_Core_DAO_Discount extends CRM_Core_DAO {
           'table_name' => 'civicrm_discount',
           'entity' => 'Discount',
           'bao' => 'CRM_Core_BAO_Discount',
+          'localizable' => 0,
         ) ,
         'entity_table' => array(
           'name' => 'entity_table',
@@ -136,6 +137,7 @@ class CRM_Core_DAO_Discount extends CRM_Core_DAO {
           'table_name' => 'civicrm_discount',
           'entity' => 'Discount',
           'bao' => 'CRM_Core_BAO_Discount',
+          'localizable' => 0,
         ) ,
         'entity_id' => array(
           'name' => 'entity_id',
@@ -146,6 +148,7 @@ class CRM_Core_DAO_Discount extends CRM_Core_DAO {
           'table_name' => 'civicrm_discount',
           'entity' => 'Discount',
           'bao' => 'CRM_Core_BAO_Discount',
+          'localizable' => 0,
         ) ,
         'participant_discount_name' => array(
           'name' => 'price_set_id',
@@ -160,6 +163,7 @@ class CRM_Core_DAO_Discount extends CRM_Core_DAO {
           'table_name' => 'civicrm_discount',
           'entity' => 'Discount',
           'bao' => 'CRM_Core_BAO_Discount',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Price_DAO_PriceSet',
         ) ,
         'start_date' => array(
@@ -170,6 +174,7 @@ class CRM_Core_DAO_Discount extends CRM_Core_DAO {
           'table_name' => 'civicrm_discount',
           'entity' => 'Discount',
           'bao' => 'CRM_Core_BAO_Discount',
+          'localizable' => 0,
         ) ,
         'end_date' => array(
           'name' => 'end_date',
@@ -179,6 +184,7 @@ class CRM_Core_DAO_Discount extends CRM_Core_DAO {
           'table_name' => 'civicrm_discount',
           'entity' => 'Discount',
           'bao' => 'CRM_Core_BAO_Discount',
+          'localizable' => 0,
         ) ,
       );
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);

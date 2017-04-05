@@ -107,6 +107,7 @@ class CRM_Contact_DAO_GroupContactCache extends CRM_Core_DAO {
           'table_name' => 'civicrm_group_contact_cache',
           'entity' => 'GroupContactCache',
           'bao' => 'CRM_Contact_BAO_GroupContactCache',
+          'localizable' => 0,
         ) ,
         'group_id' => array(
           'name' => 'group_id',
@@ -117,6 +118,7 @@ class CRM_Contact_DAO_GroupContactCache extends CRM_Core_DAO {
           'table_name' => 'civicrm_group_contact_cache',
           'entity' => 'GroupContactCache',
           'bao' => 'CRM_Contact_BAO_GroupContactCache',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Contact_DAO_Group',
           'html' => array(
             'type' => 'Select',
@@ -136,6 +138,7 @@ class CRM_Contact_DAO_GroupContactCache extends CRM_Core_DAO {
           'table_name' => 'civicrm_group_contact_cache',
           'entity' => 'GroupContactCache',
           'bao' => 'CRM_Contact_BAO_GroupContactCache',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Contact_DAO_Contact',
         ) ,
       );

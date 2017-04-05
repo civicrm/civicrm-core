@@ -105,6 +105,7 @@ class CRM_Member_DAO_MembershipPayment extends CRM_Core_DAO {
           'table_name' => 'civicrm_membership_payment',
           'entity' => 'MembershipPayment',
           'bao' => 'CRM_Member_BAO_MembershipPayment',
+          'localizable' => 0,
         ) ,
         'membership_id' => array(
           'name' => 'membership_id',
@@ -115,6 +116,7 @@ class CRM_Member_DAO_MembershipPayment extends CRM_Core_DAO {
           'table_name' => 'civicrm_membership_payment',
           'entity' => 'MembershipPayment',
           'bao' => 'CRM_Member_BAO_MembershipPayment',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Member_DAO_Membership',
         ) ,
         'contribution_id' => array(
@@ -125,6 +127,7 @@ class CRM_Member_DAO_MembershipPayment extends CRM_Core_DAO {
           'table_name' => 'civicrm_membership_payment',
           'entity' => 'MembershipPayment',
           'bao' => 'CRM_Member_BAO_MembershipPayment',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Contribute_DAO_Contribution',
         ) ,
       );

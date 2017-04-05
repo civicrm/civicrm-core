@@ -121,6 +121,7 @@ class CRM_Core_DAO_Extension extends CRM_Core_DAO {
           'table_name' => 'civicrm_extension',
           'entity' => 'Extension',
           'bao' => 'CRM_Core_BAO_Extension',
+          'localizable' => 0,
         ) ,
         'type' => array(
           'name' => 'type',
@@ -132,6 +133,7 @@ class CRM_Core_DAO_Extension extends CRM_Core_DAO {
           'table_name' => 'civicrm_extension',
           'entity' => 'Extension',
           'bao' => 'CRM_Core_BAO_Extension',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -150,6 +152,7 @@ class CRM_Core_DAO_Extension extends CRM_Core_DAO {
           'table_name' => 'civicrm_extension',
           'entity' => 'Extension',
           'bao' => 'CRM_Core_BAO_Extension',
+          'localizable' => 0,
         ) ,
         'name' => array(
           'name' => 'name',
@@ -166,6 +169,7 @@ class CRM_Core_DAO_Extension extends CRM_Core_DAO {
           'table_name' => 'civicrm_extension',
           'entity' => 'Extension',
           'bao' => 'CRM_Core_BAO_Extension',
+          'localizable' => 0,
         ) ,
         'label' => array(
           'name' => 'label',
@@ -182,6 +186,7 @@ class CRM_Core_DAO_Extension extends CRM_Core_DAO {
           'table_name' => 'civicrm_extension',
           'entity' => 'Extension',
           'bao' => 'CRM_Core_BAO_Extension',
+          'localizable' => 0,
         ) ,
         'file' => array(
           'name' => 'file',
@@ -198,6 +203,7 @@ class CRM_Core_DAO_Extension extends CRM_Core_DAO {
           'table_name' => 'civicrm_extension',
           'entity' => 'Extension',
           'bao' => 'CRM_Core_BAO_Extension',
+          'localizable' => 0,
         ) ,
         'schema_version' => array(
           'name' => 'schema_version',
@@ -214,6 +220,7 @@ class CRM_Core_DAO_Extension extends CRM_Core_DAO {
           'table_name' => 'civicrm_extension',
           'entity' => 'Extension',
           'bao' => 'CRM_Core_BAO_Extension',
+          'localizable' => 0,
         ) ,
         'is_active' => array(
           'name' => 'is_active',
@@ -224,6 +231,7 @@ class CRM_Core_DAO_Extension extends CRM_Core_DAO {
           'table_name' => 'civicrm_extension',
           'entity' => 'Extension',
           'bao' => 'CRM_Core_BAO_Extension',
+          'localizable' => 0,
         ) ,
       );
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);

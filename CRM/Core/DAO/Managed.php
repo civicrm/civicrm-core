@@ -110,6 +110,7 @@ class CRM_Core_DAO_Managed extends CRM_Core_DAO {
           'table_name' => 'civicrm_managed',
           'entity' => 'Managed',
           'bao' => 'CRM_Core_DAO_Managed',
+          'localizable' => 0,
         ) ,
         'module' => array(
           'name' => 'module',
@@ -122,6 +123,7 @@ class CRM_Core_DAO_Managed extends CRM_Core_DAO {
           'table_name' => 'civicrm_managed',
           'entity' => 'Managed',
           'bao' => 'CRM_Core_DAO_Managed',
+          'localizable' => 0,
         ) ,
         'name' => array(
           'name' => 'name',
@@ -133,6 +135,7 @@ class CRM_Core_DAO_Managed extends CRM_Core_DAO {
           'table_name' => 'civicrm_managed',
           'entity' => 'Managed',
           'bao' => 'CRM_Core_DAO_Managed',
+          'localizable' => 0,
         ) ,
         'entity_type' => array(
           'name' => 'entity_type',
@@ -145,6 +148,7 @@ class CRM_Core_DAO_Managed extends CRM_Core_DAO {
           'table_name' => 'civicrm_managed',
           'entity' => 'Managed',
           'bao' => 'CRM_Core_DAO_Managed',
+          'localizable' => 0,
         ) ,
         'entity_id' => array(
           'name' => 'entity_id',
@@ -155,6 +159,7 @@ class CRM_Core_DAO_Managed extends CRM_Core_DAO {
           'table_name' => 'civicrm_managed',
           'entity' => 'Managed',
           'bao' => 'CRM_Core_DAO_Managed',
+          'localizable' => 0,
         ) ,
         'cleanup' => array(
           'name' => 'cleanup',
@@ -166,6 +171,7 @@ class CRM_Core_DAO_Managed extends CRM_Core_DAO {
           'table_name' => 'civicrm_managed',
           'entity' => 'Managed',
           'bao' => 'CRM_Core_DAO_Managed',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,

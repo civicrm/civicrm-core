@@ -154,6 +154,7 @@ class CRM_ACL_DAO_ACL extends CRM_Core_DAO {
           'table_name' => 'civicrm_acl',
           'entity' => 'ACL',
           'bao' => 'CRM_ACL_BAO_ACL',
+          'localizable' => 0,
         ) ,
         'name' => array(
           'name' => 'name',
@@ -165,6 +166,7 @@ class CRM_ACL_DAO_ACL extends CRM_Core_DAO {
           'table_name' => 'civicrm_acl',
           'entity' => 'ACL',
           'bao' => 'CRM_ACL_BAO_ACL',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Text',
           ) ,
@@ -178,6 +180,7 @@ class CRM_ACL_DAO_ACL extends CRM_Core_DAO {
           'table_name' => 'civicrm_acl',
           'entity' => 'ACL',
           'bao' => 'CRM_ACL_BAO_ACL',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Radio',
           ) ,
@@ -193,6 +196,7 @@ class CRM_ACL_DAO_ACL extends CRM_Core_DAO {
           'table_name' => 'civicrm_acl',
           'entity' => 'ACL',
           'bao' => 'CRM_ACL_BAO_ACL',
+          'localizable' => 0,
         ) ,
         'entity_id' => array(
           'name' => 'entity_id',
@@ -202,6 +206,7 @@ class CRM_ACL_DAO_ACL extends CRM_Core_DAO {
           'table_name' => 'civicrm_acl',
           'entity' => 'ACL',
           'bao' => 'CRM_ACL_BAO_ACL',
+          'localizable' => 0,
         ) ,
         'operation' => array(
           'name' => 'operation',
@@ -214,6 +219,7 @@ class CRM_ACL_DAO_ACL extends CRM_Core_DAO {
           'table_name' => 'civicrm_acl',
           'entity' => 'ACL',
           'bao' => 'CRM_ACL_BAO_ACL',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,
@@ -231,6 +237,7 @@ class CRM_ACL_DAO_ACL extends CRM_Core_DAO {
           'table_name' => 'civicrm_acl',
           'entity' => 'ACL',
           'bao' => 'CRM_ACL_BAO_ACL',
+          'localizable' => 0,
         ) ,
         'object_id' => array(
           'name' => 'object_id',
@@ -240,6 +247,7 @@ class CRM_ACL_DAO_ACL extends CRM_Core_DAO {
           'table_name' => 'civicrm_acl',
           'entity' => 'ACL',
           'bao' => 'CRM_ACL_BAO_ACL',
+          'localizable' => 0,
         ) ,
         'acl_table' => array(
           'name' => 'acl_table',
@@ -251,6 +259,7 @@ class CRM_ACL_DAO_ACL extends CRM_Core_DAO {
           'table_name' => 'civicrm_acl',
           'entity' => 'ACL',
           'bao' => 'CRM_ACL_BAO_ACL',
+          'localizable' => 0,
         ) ,
         'acl_id' => array(
           'name' => 'acl_id',
@@ -260,6 +269,7 @@ class CRM_ACL_DAO_ACL extends CRM_Core_DAO {
           'table_name' => 'civicrm_acl',
           'entity' => 'ACL',
           'bao' => 'CRM_ACL_BAO_ACL',
+          'localizable' => 0,
         ) ,
         'is_active' => array(
           'name' => 'is_active',
@@ -269,6 +279,7 @@ class CRM_ACL_DAO_ACL extends CRM_Core_DAO {
           'table_name' => 'civicrm_acl',
           'entity' => 'ACL',
           'bao' => 'CRM_ACL_BAO_ACL',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Checkbox',
           ) ,

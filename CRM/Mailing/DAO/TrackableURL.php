@@ -104,6 +104,7 @@ class CRM_Mailing_DAO_TrackableURL extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_trackable_url',
           'entity' => 'TrackableURL',
           'bao' => 'CRM_Mailing_BAO_TrackableURL',
+          'localizable' => 0,
         ) ,
         'url' => array(
           'name' => 'url',
@@ -114,6 +115,7 @@ class CRM_Mailing_DAO_TrackableURL extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_trackable_url',
           'entity' => 'TrackableURL',
           'bao' => 'CRM_Mailing_BAO_TrackableURL',
+          'localizable' => 0,
         ) ,
         'mailing_id' => array(
           'name' => 'mailing_id',
@@ -124,6 +126,7 @@ class CRM_Mailing_DAO_TrackableURL extends CRM_Core_DAO {
           'table_name' => 'civicrm_mailing_trackable_url',
           'entity' => 'TrackableURL',
           'bao' => 'CRM_Mailing_BAO_TrackableURL',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Mailing_DAO_Mailing',
         ) ,
       );

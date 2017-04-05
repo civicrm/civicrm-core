@@ -98,6 +98,7 @@ class CRM_Core_DAO_Mapping extends CRM_Core_DAO {
           'table_name' => 'civicrm_mapping',
           'entity' => 'Mapping',
           'bao' => 'CRM_Core_BAO_Mapping',
+          'localizable' => 0,
         ) ,
         'name' => array(
           'name' => 'name',
@@ -109,6 +110,7 @@ class CRM_Core_DAO_Mapping extends CRM_Core_DAO {
           'table_name' => 'civicrm_mapping',
           'entity' => 'Mapping',
           'bao' => 'CRM_Core_BAO_Mapping',
+          'localizable' => 0,
         ) ,
         'description' => array(
           'name' => 'description',
@@ -120,6 +122,7 @@ class CRM_Core_DAO_Mapping extends CRM_Core_DAO {
           'table_name' => 'civicrm_mapping',
           'entity' => 'Mapping',
           'bao' => 'CRM_Core_BAO_Mapping',
+          'localizable' => 0,
         ) ,
         'mapping_type_id' => array(
           'name' => 'mapping_type_id',
@@ -129,6 +132,7 @@ class CRM_Core_DAO_Mapping extends CRM_Core_DAO {
           'table_name' => 'civicrm_mapping',
           'entity' => 'Mapping',
           'bao' => 'CRM_Core_BAO_Mapping',
+          'localizable' => 0,
           'html' => array(
             'type' => 'Select',
           ) ,

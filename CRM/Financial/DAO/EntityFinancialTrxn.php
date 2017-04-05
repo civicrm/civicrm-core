@@ -117,6 +117,7 @@ class CRM_Financial_DAO_EntityFinancialTrxn extends CRM_Core_DAO {
           'table_name' => 'civicrm_entity_financial_trxn',
           'entity' => 'EntityFinancialTrxn',
           'bao' => 'CRM_Financial_DAO_EntityFinancialTrxn',
+          'localizable' => 0,
         ) ,
         'entity_table' => array(
           'name' => 'entity_table',
@@ -134,6 +135,7 @@ class CRM_Financial_DAO_EntityFinancialTrxn extends CRM_Core_DAO {
           'table_name' => 'civicrm_entity_financial_trxn',
           'entity' => 'EntityFinancialTrxn',
           'bao' => 'CRM_Financial_DAO_EntityFinancialTrxn',
+          'localizable' => 0,
         ) ,
         'entity_id' => array(
           'name' => 'entity_id',
@@ -143,6 +145,7 @@ class CRM_Financial_DAO_EntityFinancialTrxn extends CRM_Core_DAO {
           'table_name' => 'civicrm_entity_financial_trxn',
           'entity' => 'EntityFinancialTrxn',
           'bao' => 'CRM_Financial_DAO_EntityFinancialTrxn',
+          'localizable' => 0,
         ) ,
         'financial_trxn_id' => array(
           'name' => 'financial_trxn_id',
@@ -151,6 +154,7 @@ class CRM_Financial_DAO_EntityFinancialTrxn extends CRM_Core_DAO {
           'table_name' => 'civicrm_entity_financial_trxn',
           'entity' => 'EntityFinancialTrxn',
           'bao' => 'CRM_Financial_DAO_EntityFinancialTrxn',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Financial_DAO_FinancialTrxn',
         ) ,
         'amount' => array(
@@ -171,6 +175,7 @@ class CRM_Financial_DAO_EntityFinancialTrxn extends CRM_Core_DAO {
           'table_name' => 'civicrm_entity_financial_trxn',
           'entity' => 'EntityFinancialTrxn',
           'bao' => 'CRM_Financial_DAO_EntityFinancialTrxn',
+          'localizable' => 0,
         ) ,
       );
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);

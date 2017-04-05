@@ -212,6 +212,7 @@ class CRM_Core_DAO_Menu extends CRM_Core_DAO {
           'table_name' => 'civicrm_menu',
           'entity' => 'Menu',
           'bao' => 'CRM_Core_DAO_Menu',
+          'localizable' => 0,
         ) ,
         'domain_id' => array(
           'name' => 'domain_id',
@@ -222,6 +223,7 @@ class CRM_Core_DAO_Menu extends CRM_Core_DAO {
           'table_name' => 'civicrm_menu',
           'entity' => 'Menu',
           'bao' => 'CRM_Core_DAO_Menu',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Core_DAO_Domain',
           'pseudoconstant' => array(
             'table' => 'civicrm_domain',
@@ -239,6 +241,7 @@ class CRM_Core_DAO_Menu extends CRM_Core_DAO {
           'table_name' => 'civicrm_menu',
           'entity' => 'Menu',
           'bao' => 'CRM_Core_DAO_Menu',
+          'localizable' => 0,
         ) ,
         'path_arguments' => array(
           'name' => 'path_arguments',
@@ -248,6 +251,7 @@ class CRM_Core_DAO_Menu extends CRM_Core_DAO {
           'table_name' => 'civicrm_menu',
           'entity' => 'Menu',
           'bao' => 'CRM_Core_DAO_Menu',
+          'localizable' => 0,
         ) ,
         'title' => array(
           'name' => 'title',
@@ -258,6 +262,7 @@ class CRM_Core_DAO_Menu extends CRM_Core_DAO {
           'table_name' => 'civicrm_menu',
           'entity' => 'Menu',
           'bao' => 'CRM_Core_DAO_Menu',
+          'localizable' => 0,
         ) ,
         'access_callback' => array(
           'name' => 'access_callback',
@@ -269,6 +274,7 @@ class CRM_Core_DAO_Menu extends CRM_Core_DAO {
           'table_name' => 'civicrm_menu',
           'entity' => 'Menu',
           'bao' => 'CRM_Core_DAO_Menu',
+          'localizable' => 0,
         ) ,
         'access_arguments' => array(
           'name' => 'access_arguments',
@@ -278,6 +284,7 @@ class CRM_Core_DAO_Menu extends CRM_Core_DAO {
           'table_name' => 'civicrm_menu',
           'entity' => 'Menu',
           'bao' => 'CRM_Core_DAO_Menu',
+          'localizable' => 0,
         ) ,
         'page_callback' => array(
           'name' => 'page_callback',
@@ -289,6 +296,7 @@ class CRM_Core_DAO_Menu extends CRM_Core_DAO {
           'table_name' => 'civicrm_menu',
           'entity' => 'Menu',
           'bao' => 'CRM_Core_DAO_Menu',
+          'localizable' => 0,
         ) ,
         'page_arguments' => array(
           'name' => 'page_arguments',
@@ -298,6 +306,7 @@ class CRM_Core_DAO_Menu extends CRM_Core_DAO {
           'table_name' => 'civicrm_menu',
           'entity' => 'Menu',
           'bao' => 'CRM_Core_DAO_Menu',
+          'localizable' => 0,
         ) ,
         'breadcrumb' => array(
           'name' => 'breadcrumb',
@@ -307,6 +316,7 @@ class CRM_Core_DAO_Menu extends CRM_Core_DAO {
           'table_name' => 'civicrm_menu',
           'entity' => 'Menu',
           'bao' => 'CRM_Core_DAO_Menu',
+          'localizable' => 0,
         ) ,
         'return_url' => array(
           'name' => 'return_url',
@@ -318,6 +328,7 @@ class CRM_Core_DAO_Menu extends CRM_Core_DAO {
           'table_name' => 'civicrm_menu',
           'entity' => 'Menu',
           'bao' => 'CRM_Core_DAO_Menu',
+          'localizable' => 0,
         ) ,
         'return_url_args' => array(
           'name' => 'return_url_args',
@@ -329,6 +340,7 @@ class CRM_Core_DAO_Menu extends CRM_Core_DAO {
           'table_name' => 'civicrm_menu',
           'entity' => 'Menu',
           'bao' => 'CRM_Core_DAO_Menu',
+          'localizable' => 0,
         ) ,
         'component_id' => array(
           'name' => 'component_id',
@@ -338,6 +350,7 @@ class CRM_Core_DAO_Menu extends CRM_Core_DAO {
           'table_name' => 'civicrm_menu',
           'entity' => 'Menu',
           'bao' => 'CRM_Core_DAO_Menu',
+          'localizable' => 0,
           'FKClassName' => 'CRM_Core_DAO_Component',
           'html' => array(
             'type' => 'Select',
@@ -356,6 +369,7 @@ class CRM_Core_DAO_Menu extends CRM_Core_DAO {
           'table_name' => 'civicrm_menu',
           'entity' => 'Menu',
           'bao' => 'CRM_Core_DAO_Menu',
+          'localizable' => 0,
         ) ,
         'is_public' => array(
           'name' => 'is_public',
@@ -365,6 +379,7 @@ class CRM_Core_DAO_Menu extends CRM_Core_DAO {
           'table_name' => 'civicrm_menu',
           'entity' => 'Menu',
           'bao' => 'CRM_Core_DAO_Menu',
+          'localizable' => 0,
         ) ,
         'is_exposed' => array(
           'name' => 'is_exposed',
@@ -374,6 +389,7 @@ class CRM_Core_DAO_Menu extends CRM_Core_DAO {
           'table_name' => 'civicrm_menu',
           'entity' => 'Menu',
           'bao' => 'CRM_Core_DAO_Menu',
+          'localizable' => 0,
         ) ,
         'is_ssl' => array(
           'name' => 'is_ssl',
@@ -383,6 +399,7 @@ class CRM_Core_DAO_Menu extends CRM_Core_DAO {
           'table_name' => 'civicrm_menu',
           'entity' => 'Menu',
           'bao' => 'CRM_Core_DAO_Menu',
+          'localizable' => 0,
         ) ,
         'weight' => array(
           'name' => 'weight',
@@ -394,6 +411,7 @@ class CRM_Core_DAO_Menu extends CRM_Core_DAO {
           'table_name' => 'civicrm_menu',
           'entity' => 'Menu',
           'bao' => 'CRM_Core_DAO_Menu',
+          'localizable' => 0,
         ) ,
         'type' => array(
           'name' => 'type',
@@ -405,6 +423,7 @@ class CRM_Core_DAO_Menu extends CRM_Core_DAO {
           'table_name' => 'civicrm_menu',
           'entity' => 'Menu',
           'bao' => 'CRM_Core_DAO_Menu',
+          'localizable' => 0,
         ) ,
         'page_type' => array(
           'name' => 'page_type',
@@ -416,6 +435,7 @@ class CRM_Core_DAO_Menu extends CRM_Core_DAO {
           'table_name' => 'civicrm_menu',
           'entity' => 'Menu',
           'bao' => 'CRM_Core_DAO_Menu',
+          'localizable' => 0,
         ) ,
         'skipBreadcrumb' => array(
           'name' => 'skipBreadcrumb',
@@ -425,6 +445,7 @@ class CRM_Core_DAO_Menu extends CRM_Core_DAO {
           'table_name' => 'civicrm_menu',
           'entity' => 'Menu',
           'bao' => 'CRM_Core_DAO_Menu',
+          'localizable' => 0,
         ) ,
       );
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);
