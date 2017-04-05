@@ -155,8 +155,10 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
     if ($id) {
       $lineItems = array(CRM_Price_BAO_LineItem::getLineItemsByContributionID(($id)));
       $firstLineItem = reset($lineItems[0]);
-      $priceSet = civicrm_api3('PriceSet', 'getsingle', array('id' => $firstLineItem['price_set_id'], 'return' => 'is_quick_config, id'));
-      $displayLineItems = !$priceSet['is_quick_config'];
+      if (!empty($firstLineItem['price_set_id'])) {
+        $priceSet = civicrm_api3('PriceSet', 'getsingle', array('id' => $firstLineItem['price_set_id'], 'return' => 'is_quick_config, id'));
+        $displayLineItems = !$priceSet['is_quick_config'];
+      }
     }
     $this->assign('lineItem', $lineItems);
     $this->assign('displayLineItems', $displayLineItems);
