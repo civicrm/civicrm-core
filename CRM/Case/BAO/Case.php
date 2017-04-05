@@ -3183,20 +3183,15 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
     $emailFromContactId = NULL;
     if (!empty($activityId)) {
       try {
-        $sourceRecordTypeId = civicrm_api3('OptionValue', 'getvalue', array(
-          'option_group_id' => 'activity_contacts',
-          'name' => 'Activity Source',
-          'return' => 'value'));
         $emailFromContactId = civicrm_api3('ActivityContact', 'getvalue', array(
           'activity_id' => $activityId,
-          'record_type_id' => $sourceRecordTypeId,
+          'record_type_id' => 'Activity Source',
           'return' => 'contact_id'
         ));
       } catch (CiviCRM_API3_Exception $ex) {
         // get default from address from domain
-        $domainId = CRM_Core_Config::domainID();
         try {
-          $domain = civicrm_api3('Domain', 'getsingle', array('id' => $domainId));
+          $domain = civicrm_api3('Domain', 'getsingle', array('id' => CRM_Core_Config::domainID()));
           if (isset($domain['from_email'])) {
             $emailFromContactId = $domain['from_email'];
           }
