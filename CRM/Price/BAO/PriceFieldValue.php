@@ -175,7 +175,7 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
     $fieldValueDAO = new CRM_Price_DAO_PriceFieldValue();
     $fieldValueDAO->price_field_id = $fieldId;
     if (!$setId) {
-      CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes);
+      CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes, CRM_Core_Action::ADD);
       $addWhere = "financial_type_id IN (0)";
       if (!empty($financialTypes)) {
         $addWhere = "financial_type_id IN (" . implode(',', array_keys($financialTypes)) . ")";
