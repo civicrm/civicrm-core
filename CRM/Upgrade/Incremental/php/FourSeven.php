@@ -340,6 +340,7 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
       'civicrm_sms_provider', 'domain_id', 'int(10) unsigned', "Which Domain is this sms provier for");
     $this->addTask('CRM-19961 - Populate domain id table and perhaps add foreign key', 'populateSMSProviderDomainId');
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
+    $this->addTask('CRM-16633 - Add "Change Case Subject" activity', 'addChangeCaseSubjectActivityType');
     $this->addTask('Add is_public column to civicrm_custom_group', 'addColumn',
       'civicrm_custom_group', 'is_public', "boolean DEFAULT '1' COMMENT 'Is this property public?'");
   }
@@ -1088,6 +1089,25 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
       ON DELETE SET NULL");
 
     CRM_Core_DAO::executeQuery("SET FOREIGN_KEY_CHECKS = 1;");
+    return TRUE;
+  }
+
+  /**
+   * CRM-16633 - Add activity type for Change Case Status
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   *
+   * @return bool
+   */
+  public static function addChangeCaseSubjectActivityType(CRM_Queue_TaskContext $ctx) {
+    CRM_Core_BAO_OptionValue::ensureOptionValueExists(array(
+      'option_group_id' => 'activity_type',
+      'name' => 'Change Case Subject',
+      'label' => ts('Change Case Subject'),
+      'is_active' => TRUE,
+      'component_id' => 'CiviCase',
+      'icon' => 'fa-pencil-square-o',
+    ));
     return TRUE;
   }
 

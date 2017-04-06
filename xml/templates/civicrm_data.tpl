@@ -327,6 +327,8 @@ VALUES
    (@option_group_id_act, '{ts escape="sql"}Follow up{/ts}',          14, 'Follow up',          NULL, 0,  0, 14, '', 0, 1, 1, @caseCompId, NULL, 'fa-share-square-o'),
    (@option_group_id_act, '{ts escape="sql"}Change Case Type{/ts}',   15, 'Change Case Type',   NULL, 0,  0, 15, '', 0, 1, 1, @caseCompId, NULL, 'fa-random'),
    (@option_group_id_act, '{ts escape="sql"}Change Case Status{/ts}', 16, 'Change Case Status', NULL, 0,  0, 16, '', 0, 1, 1, @caseCompId, NULL, 'fa-pencil-square-o'),
+   (@option_group_id_act, '{ts escape="sql"}Change Case Subject{/ts}',53, 'Change Case Subject',NULL, 0,  0, 53, '', 0, 1, 1, @caseCompId, NULL, 'fa-pencil-square-o'),
+   (@option_group_id_act, '{ts escape="sql"}Change Custom Data{/ts}', 33, 'Change Custom Data', NULL, 0,  0, 33, '', 0, 1, 1, @caseCompId, NULL, 'fa-table'),
 
    (@option_group_id_act, '{ts escape="sql"}Membership Renewal Reminder{/ts}',        17, 'Membership Renewal Reminder',  NULL, 1, NULL, 17, '{ts escape="sql"}offline membership renewal reminder.{/ts}',                      0, 1, 1, @memberCompId, NULL, NULL),
    (@option_group_id_act, '{ts escape="sql"}Change Case Start Date{/ts}',             18, 'Change Case Start Date',         NULL, 0,  0, 18, '', 0, 1, 1, @caseCompId, NULL , 'fa-calendar'),
@@ -345,11 +347,8 @@ VALUES
    (@option_group_id_act, '{ts escape="sql"}Canvass{/ts}',                            29, 'Canvass', NULL,0, 0, 28, '', 0, 1, 1, @campaignCompId, NULL, NULL),
    (@option_group_id_act, '{ts escape="sql"}PhoneBank{/ts}',                          30, 'PhoneBank', NULL,0, 0, 29, '', 0, 1, 1, @campaignCompId, NULL, NULL),
    (@option_group_id_act, '{ts escape="sql"}WalkList{/ts}',                           31, 'WalkList', NULL,0, 0, 30, '', 0, 1, 1, @campaignCompId, NULL, NULL),
-   (@option_group_id_act, '{ts escape="sql"}Petition Signature{/ts}',                           32, 'Petition', NULL,0, 0, 31, '', 0, 1, 1, @campaignCompId, NULL, NULL),
+   (@option_group_id_act, '{ts escape="sql"}Petition Signature{/ts}',                 32, 'Petition', NULL,0, 0, 31, '', 0, 1, 1, @campaignCompId, NULL, NULL),
    (@option_group_id_act, '{ts escape="sql"}Mass SMS{/ts}',                           34, 'Mass SMS',         NULL, 1, NULL, 34, '{ts escape="sql"}Mass SMS{/ts}',                                                    0, 1, 1, NULL, NULL, NULL),
-
--- Activity Types for CiviCampaign CiviCase
-   (@option_group_id_act, '{ts escape="sql"}Change Custom Data{/ts}',                 33, 'Change Custom Data', NULL,0, 0, 33, '', 0, 1, 1, @caseCompId, NULL, 'fa-table'),
 
 -- Additional Membership-related Activity Types
    (@option_group_id_act, '{ts escape="sql"}Change Membership Status{/ts}',           35, 'Change Membership Status',   NULL, 1, NULL, 35, '{ts escape="sql"}Change Membership Status.{/ts}',                         0, 1, 1, @memberCompId, NULL, NULL),
@@ -386,7 +385,7 @@ VALUES
    (@option_group_id_act, '{ts escape="sql"}Contact Deleted by Merge{/ts}', 52, 'Contact Deleted by Merge', NULL, 1, NULL, 52, '{ts escape="sql"}Contact was merged into another contact{/ts}',0, 1, 1, NULL, NULL, NULL),
 
   -- Activity Type for failed payment
-   (@option_group_id_act, 'Failed Payment', 53, 'Failed Payment', NULL, 1, 0, 53, 'Failed Payment', 0, 1, 1, @contributeCompId, NULL, NULL),
+   (@option_group_id_act, 'Failed Payment', 54, 'Failed Payment', NULL, 1, 0, 54, 'Failed Payment', 0, 1, 1, @contributeCompId, NULL, NULL),
 
    (@option_group_id_gender, '{ts escape="sql"}Female{/ts}', 1, 'Female', NULL, 0, NULL, 1, NULL, 0, 0, 1, NULL, NULL, NULL),
    (@option_group_id_gender, '{ts escape="sql"}Male{/ts}',   2, 'Male',   NULL, 0, NULL, 2, NULL, 0, 0, 1, NULL, NULL, NULL),
