@@ -1458,6 +1458,8 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
   }
 
   /**
+   * @deprecated - use the api instead.
+   *
    * Get the Activities of a target contact.
    *
    * @param int $contactId
@@ -1467,6 +1469,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
    *   array of activity fields
    */
   public static function getContactActivity($contactId) {
+    // @todo remove this function entirely.
     $activities = array();
     $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
     $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);

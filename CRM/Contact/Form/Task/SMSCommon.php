@@ -198,6 +198,7 @@ class CRM_Contact_Form_Task_SMSCommon {
 
         if (CRM_Utils_System::getClassName($form) == 'CRM_Activity_Form_Task_SMS') {
           //to check for "if the contact id belongs to a specified activity type"
+          // @todo use the api instead - function is deprecated.
           $actDetails = CRM_Activity_BAO_Activity::getContactActivity($contactId);
           if (self::RECIEVED_SMS_ACTIVITY_SUBJECT !=
             CRM_Utils_Array::retrieveValueRecursive($actDetails, 'subject')
