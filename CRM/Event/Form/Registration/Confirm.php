@@ -981,6 +981,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
 
     if ($paymentProcessor) {
       $contribParams['payment_instrument_id'] = $paymentProcessor['payment_instrument_id'];
+      $contribParams['payment_processor'] = $paymentProcessor['id'];
     }
 
     if (!$pending && $result) {
@@ -1037,7 +1038,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       $contribParams['address_id'] = CRM_Contribute_BAO_Contribution::createAddress($params, $form->_bltID);
     }
 
-    $contribParams['payment_processor'] = CRM_Utils_Array::value('payment_processor', $params);
     $contribParams['skipLineItem'] = 1;
     // create contribution record
     $contribution = CRM_Contribute_BAO_Contribution::add($contribParams, $ids);
