@@ -243,10 +243,13 @@ if (!CRM.vars) CRM.vars = {};
       var script = document.createElement('script');
       scriptsLoaded[url] = $.Deferred();
       script.onload = function () {
-        if (window.jQuery === CRM.$ && CRM.CMSjQuery) {
-          window.jQuery = CRM.CMSjQuery;
-        }
-        scriptsLoaded[url].resolve();
+        // Give the script time to execute
+        window.setTimeout(function () {
+          if (window.jQuery === CRM.$ && CRM.CMSjQuery) {
+            window.jQuery = CRM.CMSjQuery;
+          }
+          scriptsLoaded[url].resolve();
+        }, 100);
       };
       // Make jQuery global available while script is loading
       if (window.jQuery !== CRM.$) {
