@@ -3188,7 +3188,8 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
           'record_type_id' => 'Activity Source',
           'return' => 'contact_id',
         ));
-      } catch (CiviCRM_API3_Exception $ex) {
+      }
+      catch (CiviCRM_API3_Exception $ex) {
         // get default from address from domain
         try {
           $domain = civicrm_api3('Domain', 'getsingle', array('id' => CRM_Core_Config::domainID()));
@@ -3220,4 +3221,5 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
     list($name, $address) = CRM_Contact_BAO_Contact_Location::getEmailDetails($emailFromContactId);
     return "$name <$address>";
   }
+
 }
