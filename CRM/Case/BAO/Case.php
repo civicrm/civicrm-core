@@ -3195,8 +3195,8 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
           if (isset($domain['from_email'])) {
             $emailFromContactId = $domain['from_email'];
           }
-        } catch (CiviCRM_API3_Exception $ex) {
-
+        }
+        catch (CiviCRM_API3_Exception $ex) {
         }
         // if not found get email for contact_id 1
         if (!$emailFromContactId) {
@@ -3205,8 +3205,8 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
               'contact_id' => 1,
               'return' => 'email',
             ));
-          } catch (CiviCRM_API3_Exception $ex) {
-
+          }
+          catch (CiviCRM_API3_Exception $ex) {
           }
         }
       }
@@ -3220,5 +3220,4 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
     list($name, $address) = CRM_Contact_BAO_Contact_Location::getEmailDetails($emailFromContactId);
     return "$name <$address>";
   }
-  
 }
