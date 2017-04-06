@@ -410,13 +410,13 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
     $financialAccount = CRM_Financial_BAO_FinancialAccount::getAllDeferredFinancialAccount();
     // The two deferred financial accounts which are created by default.
     $expected = array(
-      "Deferred Revenue - Event Fee",
-      "Deferred Revenue - Member Dues",
+      "Deferred Revenue - Member Dues (2740)",
+      "Deferred Revenue - Event Fee (2730)",
     );
     $this->assertEquals(array_count_values($expected), array_count_values($financialAccount), "The two arrays are not the same");
     $this->_createDeferredFinancialAccount();
     $financialAccount = CRM_Financial_BAO_FinancialAccount::getAllDeferredFinancialAccount();
-    $expected[] = "TestFinancialAccount_1";
+    $expected[] = "TestFinancialAccount_1 (4800)";
     $this->assertEquals(array_count_values($expected), array_count_values($financialAccount), "The two arrays are not the same");
   }
 
