@@ -1073,6 +1073,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         "reset=1&action=add&context={$this->_context}&cid={$this->_contactID}&mode={$this->_mode}"
       ));
     }
+    elseif ($this->_context == 'pledge') {
+      $session->set('reloadPledgeTab', TRUE);
+    }
     elseif ($buttonName == $this->getButtonName('upload', 'new')) {
       $session->replaceUserContext(CRM_Utils_System::url('civicrm/contact/view/contribution',
         "reset=1&action=add&context={$this->_context}&cid={$this->_contactID}"
