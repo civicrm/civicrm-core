@@ -286,4 +286,28 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
     return $siteContacts;
   }
 
+  /**
+   * CRM-20308 & CRM-19657
+   * Return domain information / user information for the useage in receipts
+   * Try default from adress then fall back to using logged in user details
+   */
+  public function getDefaultReceiptFrom() {
+    $domain = civicrm_api3('domain', 'getsingle', array('id' => CRM_Core_Config::domainID()));
+    if (!empty($domain['from_email'])) {
+      return array($domain['from_name'], $domain['from_email']);
+    }
+    if (!empty($domain['domain_email'])) {
+      return array($domain['name'], $domain['domain_email']);
+    }
+    $userID = CRM_Core_Session::singleton()->getLoggedInContactID();
+    $userName = '';
+    $userEmail = '';
+    if (!empty($userID)) {
+      list($userName, $userEmail) = CRM_Contact_BAO_Contact_Location::getEmailDetails($userID);
+    }
+    // If still empty fall back to the logged in user details.
+    // return empty values no matter what.
+    return array($userName, $userEmail);
+  }
+
 }

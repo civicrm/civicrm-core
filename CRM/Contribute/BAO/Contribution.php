@@ -4777,23 +4777,8 @@ LIMIT 1;";
     if (!empty($pageValues['receipt_from_email'])) {
       return array($pageValues['receipt_from_name'], $pageValues['receipt_from_email']);
     }
-    // If we are still empty fall back to the domain.
-    $domain = civicrm_api3('domain', 'getsingle', array('id' => CRM_Core_Config::domainID()));
-    if (!empty($domain['from_email'])) {
-      return array($domain['from_name'], $domain['from_email']);
-    }
-    if (!empty($domain['domain_email'])) {
-      return array($domain['name'], $domain['domain_email']);
-    }
-    $userID = CRM_Core_Session::singleton()->getLoggedInContactID();
-    $userName = '';
-    $userEmail = '';
-    if (!empty($userID)) {
-      list($userName, $userEmail) = CRM_Contact_BAO_Contact_Location::getEmailDetails($userID);
-    }
-    // If still empty fall back to the logged in user details.
-    // return empty values no matter what.
-    return array($userName, $userEmail);
+    // If we are still empty fall back to the domain or logged in user information.
+    return CRM_Core_BAO_Domain::getDefaultReceiptFrom();
   }
 
   /**
