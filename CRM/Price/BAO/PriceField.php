@@ -94,8 +94,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
     }
     $optionsIds = array();
     $maxIndex = CRM_Price_Form_Field::NUM_OPTION;
-    $priceField2 = civicrm_api3('price_field', 'getsingle', array('id' => $priceField->id));
-    if ($priceField2['html_type'] == 'Text') {
+    if ($priceField->html_type == 'Text') {
       $maxIndex = 1;
       $fieldOptions = civicrm_api3('price_field_value', 'get', array(
         'price_field_id' => $priceField->id,
@@ -103,6 +102,13 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
       ));
       foreach ($fieldOptions['values'] as $option) {
         $optionsIds['id'] = $option['id'];
+        // CRM-19741 If we are dealing with price fields that are Text only set the field value label to match
+        if (!empty($params['id']) && $priceField->label != $option['label']) {
+          $fieldValue = new CRM_Price_DAO_PriceFieldValue();
+          $fieldValue->label = $priceField->label;
+          $fieldValue->id = $option['id'];
+          $fieldValue->save();
+        }
       }
     }
     $defaultArray = array();
@@ -170,12 +176,12 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
           throw new CRM_Core_Exception($e->getMessage());
         }
       }
-      elseif (!empty($optionIds)) {
-        $optionsLoad = civicrm_api3('price_field_value', 'get', array('id' => $optionIds['id']));
-        $options = $optionsLoad['values'][$option['id']];
+      elseif (!empty($optionsIds)) {
+        $optionsLoad = civicrm_api3('price_field_value', 'get', array('id' => $optionsIds['id']));
+        $options = $optionsLoad['values'][$optionsIds['id']];
         $options['is_active'] = CRM_Utils_Array::value('is_active', $params, 1);
         try {
-          CRM_Price_BAO_PriceFieldValue::create($options, $optionIds);
+          CRM_Price_BAO_PriceFieldValue::create($options, $optionsIds);
         }
         catch (Exception $e) {
           $transaction->rollback();
