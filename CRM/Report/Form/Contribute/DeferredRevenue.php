@@ -250,6 +250,9 @@ class CRM_Report_Form_Contribute_DeferredRevenue extends CRM_Report_Form {
         'fields' => array(
           'batch_id' => array(
             'title' => ts('Batch Title'),
+            'dbAlias' => "GROUP_CONCAT(DISTINCT batch_civireport.batch_id
+                                    ORDER BY batch_civireport.batch_id SEPARATOR ',')",
+
           ),
         ),
         'filters' => array(
@@ -342,7 +345,7 @@ class CRM_Report_Form_Contribute_DeferredRevenue extends CRM_Report_Form {
     if ($this->isTableSelected('civicrm_batch')) {
       $this->_from .= "
         LEFT JOIN civicrm_entity_batch {$this->_aliases['civicrm_batch']}
-          ON {$this->_aliases['civicrm_batch']}.entity_id = {$this->_aliases['civicrm_financial_trxn_1']}.id
+          ON {$this->_aliases['civicrm_batch']}.entity_id = {$this->_aliases['civicrm_financial_trxn']}.id
           AND {$this->_aliases['civicrm_batch']}.entity_table = 'civicrm_financial_trxn'";
     }
   }
