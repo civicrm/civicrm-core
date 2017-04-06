@@ -120,6 +120,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
       'help_pre',
       'help_post',
       'is_active',
+      'is_public',
       'is_multiple',
     );
     foreach ($fields as $field) {
@@ -332,6 +333,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
    * @param bool $checkPermission
    * @param varchar $singleRecord
    *   holds 'new' or id if view/edit/copy form for a single record is being loaded.
+   * @param bool $showPublicOnly
    *
    * @return array
    *   Custom field 'tree'.
@@ -356,7 +358,8 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
     $onlySubType = NULL,
     $returnAll = FALSE,
     $checkPermission = TRUE,
-    $singleRecord = NULL
+    $singleRecord = NULL,
+    $showPublicOnly = FALSE
   ) {
     if ($entityID) {
       $entityID = CRM_Utils_Type::escape($entityID, 'Integer');
@@ -414,6 +417,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
         'extends_entity_column_id',
         'extends_entity_column_value',
         'max_multiple',
+        'is_public',
       ),
     );
 
@@ -494,6 +498,10 @@ WHERE civicrm_custom_group.is_active = 1
         CRM_Core_Permission::customGroupClause(CRM_Core_Permission::VIEW,
           'civicrm_custom_group.'
         );
+    }
+
+    if ($showPublicOnly) {
+      $strWhere .= "AND civicrm_custom_group.is_public = 1";
     }
 
     $orderBy = "

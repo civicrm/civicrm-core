@@ -340,6 +340,8 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
       'civicrm_sms_provider', 'domain_id', 'int(10) unsigned', "Which Domain is this sms provier for");
     $this->addTask('CRM-19961 - Populate domain id table and perhaps add foreign key', 'populateSMSProviderDomainId');
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
+    $this->addTask('Add is_public column to civicrm_custom_group', 'addColumn',
+      'civicrm_custom_group', 'is_public', "boolean DEFAULT '1' COMMENT 'Is this property public?'");
   }
 
   /*

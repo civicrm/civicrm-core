@@ -64,6 +64,10 @@
         <td>&nbsp;</td>
         <td>{$form.is_active.html} {$form.is_active.label}</td>
     </tr>
+    <tr>
+        <td>&nbsp;</td>
+        <td>{$form.is_public.html} {$form.is_public.label}</td>
+    </tr>
     <tr class="html-adjust">
         <td class="label">{$form.help_pre.label} <!--{if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_custom_group' field='help_pre' id=$gid}{/if}-->{help id="id-help_pre"}</td>
         <td>{$form.help_pre.html}</td>
