@@ -392,33 +392,6 @@ WHERE  contribution_id = {$id}
     return $result;
   }
 
-  /**
-   * @param int $financialTypeId
-   *
-   * @return array
-   */
-  public function getFinancialAccounts($financialTypeId) {
-    $financialAccounts = array();
-    CRM_Core_PseudoConstant::populate($financialAccounts,
-      'CRM_Financial_DAO_EntityFinancialAccount',
-      $all = TRUE,
-      $retrieve = 'financial_account_id',
-      $filter = NULL,
-      " entity_id = {$financialTypeId} ", NULL, 'account_relationship');
-    return $financialAccounts;
-  }
-
-  /**
-   * @param int $financialTypeId
-   * @param int $relationTypeId
-   *
-   * @return mixed
-   */
-  public function getFinancialAccount($financialTypeId, $relationTypeId) {
-    $financialAccounts = $this->getFinancialAccounts($financialTypeId);
-    return CRM_Utils_Array::value($relationTypeId, $financialAccounts);
-  }
-
   public function preProcessPledge() {
     //get the payment values associated with given pledge payment id OR check for payments due.
     $this->_pledgeValues = array();
