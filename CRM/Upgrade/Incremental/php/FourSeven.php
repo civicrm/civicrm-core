@@ -121,6 +121,9 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
         . '<br />' . ts('You can re-enable it by visitng the <a %1>CKEditor Config</a> screen and setting "fullPage = true" under the Advanced Options of the CiviMail preset.', array(1 => $ck_href))
         . '</p>';
     }
+    if ($rev == '4.7.19') {
+      $postUpgradeMessage .= '<br /><br />' . ts('Default version of the following System Workflow Message Templates have been modified: <ul><li>Additional Payment Receipt or Refund Notification</li></ul> If you have modified these templates, please review the new default versions and implement updates as needed to your copies (Administer > Communications > Message Templates > System Workflow Messages).');
+    }
   }
 
   /**

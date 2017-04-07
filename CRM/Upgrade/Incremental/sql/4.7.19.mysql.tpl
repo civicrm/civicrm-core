@@ -22,3 +22,5 @@ ON price_field.price_field_id = cpf.id
 SET cpf.is_active = 0
 WHERE price_field.price_field_id IS NULL;
 
+-- CRM-20400
+{include file='../CRM/Upgrade/4.7.19.msg_template/civicrm_msg_template.tpl'}
