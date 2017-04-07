@@ -24,9 +24,7 @@
 
   <tr>
     <td>
-      {if $paymentConfig.confirm_email_text}
-      <p>{$paymentConfig.confirm_email_text|htmlize}</p>
-      {elseif $isRefund}
+      {if $isRefund}
       <p>{ts}A refund has been issued based on changes in your registration selections.{/ts}</p>
       {else}
       <p>{ts}A payment has been received.{/ts}</p>
@@ -43,7 +41,7 @@
   </tr>
   <tr>
     <td {$labelStyle}>
-      {ts}Total Fees{/ts}
+      {ts}Total Amount{/ts}
     </td>
     <td {$valueStyle}>
       {$totalAmount|crmMoney}
@@ -71,26 +69,26 @@
     </tr>
     <tr>
       <td {$labelStyle}>
-  {ts}{if $component eq 'event'}Total Fees{/if}{/ts}
+        {ts}Total Amount{/ts}
       </td>
       <td {$valueStyle}>
-  {$totalAmount|crmMoney}
+        {$totalAmount|crmMoney}
       </td>
       </tr>
       <tr>
       <td {$labelStyle}>
-  {ts}This Payment Amount{/ts}
+        {ts}This Payment Amount{/ts}
       </td>
       <td {$valueStyle}>
-  {$paymentAmount|crmMoney}
+        {$paymentAmount|crmMoney}
       </td>
       </tr>
      <tr>
       <td {$labelStyle}>
-  {ts}Balance Owed{/ts}
+        {ts}Balance Owed{/ts}
       </td>
        <td {$valueStyle}>
-  {$amountOwed|crmMoney}
+         {$amountOwed|crmMoney}
       </td> {* This will be zero after final payment. *}
      </tr>
      <tr> <td {$emptyBlockStyle}></td>
@@ -98,7 +96,7 @@
       {if $paymentsComplete}
       <tr>
       <td colspan='2' {$valueStyle}>
-  {ts}Thank-you. This completes your payment for {if $component eq 'event'}{$event.event_title}{/if}.{/ts}
+        {ts}Thank-you. This completes your payment for {if $component eq 'event'}{$event.event_title}{/if}.{/ts}
       </td>
      </tr>
       {/if}
@@ -106,10 +104,10 @@
   {if $receive_date}
     <tr>
       <td {$labelStyle}>
-  {ts}Transaction Date{/ts}
+        {ts}Transaction Date{/ts}
       </td>
       <td {$valueStyle}>
-  {$receive_date|crmDate}
+        {$receive_date|crmDate}
       </td>
     </tr>
   {/if}
@@ -189,7 +187,7 @@
       </td>
     </tr>
 
-    {if $event.participant_role neq 'Attendee' and $defaultRole}
+    {if $event.participant_role}
     <tr>
       <td {$labelStyle}>
         {ts}Participant Role{/ts}
