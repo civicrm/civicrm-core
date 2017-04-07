@@ -1839,9 +1839,8 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
     $checkDiscount = CRM_Core_BAO_Discount::findSet($eventID, 'civicrm_event');
     if (!empty($checkDiscount)) {
       $mainAmount = self::getUnDiscountedAmountForEventPriceSetFieldValue($eventID, $discountedPriceFieldOptionID, $feeLevel);
-      $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Discounts Account is' "));
-      $transactionParams['from_financial_account_id'] = CRM_Contribute_PseudoConstant::financialAccountType(
-        $financialTypeID, $relationTypeId);
+      $transactionParams['from_financial_account_id'] = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount(
+        $financialTypeID, 'Discounts Account is');
       if (!empty($transactionParams['trxnParams']['from_financial_account_id'])) {
         $transactionParams['trxnParams']['total_amount'] = $mainAmount - $total_amount;
         $transactionParams['trxnParams']['payment_processor_id'] = NULL;
@@ -2173,8 +2172,7 @@ WHERE (entity_table = 'civicrm_participant' AND entity_id = {$participantId} AND
         CRM_Core_DAO::$_nullArray,
         CRM_Core_DAO::$_nullArray
       );
-      $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Accounts Receivable Account is' "));
-      $toFinancialAccount = CRM_Contribute_PseudoConstant::financialAccountType($updatedContribution->financial_type_id, $relationTypeId);
+      $toFinancialAccount = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($updatedContribution->financial_type_id, 'Accounts Receivable Account is');
       $adjustedTrxnValues = array(
         'from_financial_account_id' => NULL,
         'to_financial_account_id' => $toFinancialAccount,

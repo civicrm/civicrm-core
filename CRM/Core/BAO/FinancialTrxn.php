@@ -97,8 +97,7 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
     if (!$contributionFinancialTypeId) {
       $contributionFinancialTypeId = CRM_Core_DAO::getFieldValue('CRM_Contribute_BAO_Contribution', $contributionId, 'financial_type_id');
     }
-    $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Accounts Receivable Account is' "));
-    $toFinancialAccount = CRM_Contribute_PseudoConstant::financialAccountType($contributionFinancialTypeId, $relationTypeId);
+    $toFinancialAccount = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($contributionFinancialTypeId, 'Accounts Receivable Account is');
     $q = "SELECT ft.id, ft.total_amount FROM civicrm_financial_trxn ft INNER JOIN civicrm_entity_financial_trxn eft ON (eft.financial_trxn_id = ft.id AND eft.entity_table = 'civicrm_contribution') WHERE eft.entity_id = %1 AND ft.to_financial_account_id = %2";
 
     $p[1] = array($contributionId, 'Integer');
@@ -357,14 +356,12 @@ WHERE ceft.entity_id = %1";
 
     if (!empty($params['cost'])) {
       $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
-      $financialAccountType = CRM_Contribute_PseudoConstant::financialAccountType($params['financial_type_id']);
-      $accountRelationship = CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name IN ('Premiums Inventory Account is', 'Cost of Sales Account is')");
-      $toFinancialAccount = !empty($params['isDeleted']) ? 'Premiums Inventory Account is' : 'Cost of Sales Account is';
-      $fromFinancialAccount = !empty($params['isDeleted']) ? 'Cost of Sales Account is' : 'Premiums Inventory Account is';
+      $toFinancialAccountType = !empty($params['isDeleted']) ? 'Premiums Inventory Account is' : 'Cost of Sales Account is';
+      $fromFinancialAccountType = !empty($params['isDeleted']) ? 'Cost of Sales Account is' : 'Premiums Inventory Account is';
       $accountRelationship = array_flip($accountRelationship);
       $financialtrxn = array(
-        'to_financial_account_id' => $financialAccountType[$accountRelationship[$toFinancialAccount]],
-        'from_financial_account_id' => $financialAccountType[$accountRelationship[$fromFinancialAccount]],
+        'to_financial_account_id' => CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($params['financial_type_id'], $toFinancialAccountType),
+        'from_financial_account_id' => CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($params['financial_type_id'], $fromFinancialAccountType),
         'trxn_date' => date('YmdHis'),
         'total_amount' => CRM_Utils_Array::value('cost', $params) ? $params['cost'] : 0,
         'currency' => CRM_Utils_Array::value('currency', $params),
@@ -401,7 +398,6 @@ WHERE ceft.entity_id = %1";
    * @return bool
    */
   public static function recordFees($params) {
-    $expenseTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Expense Account is' "));
     $domainId = CRM_Core_Config::domainID();
     $amount = 0;
     if (!empty($params['prevContribution'])) {
@@ -418,7 +414,7 @@ WHERE ceft.entity_id = %1";
     else {
       $financialTypeId = $params['financial_type_id'];
     }
-    $financialAccount = CRM_Contribute_PseudoConstant::financialAccountType($financialTypeId, $expenseTypeId);
+    $financialAccount = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($financialTypeId, 'Expense Account is');
 
     $params['trxnParams']['from_financial_account_id'] = $params['to_financial_account_id'];
     $params['trxnParams']['to_financial_account_id'] = $financialAccount;
@@ -479,10 +475,8 @@ WHERE ceft.entity_id = %1";
       $statusId = CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name');
       $refundStatusId = CRM_Core_OptionGroup::getValue('contribution_status', 'Refunded', 'name');
 
-      $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Accounts Receivable Account is' "));
-      $toFinancialAccount = CRM_Contribute_PseudoConstant::financialAccountType($financialTypeId, $relationTypeId);
-      $feeRelationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Expense Account is' "));
-      $feeFinancialAccount = CRM_Contribute_PseudoConstant::financialAccountType($financialTypeId, $feeRelationTypeId);
+      $toFinancialAccount = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($financialTypeId, 'Accounts Receivable Account is');
+      $feeFinancialAccount = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($financialTypeId, 'Expense Account is');
 
       if (empty($lineItemTotal)) {
         $lineItemTotal = CRM_Price_BAO_LineItem::getLineTotal($contributionId);

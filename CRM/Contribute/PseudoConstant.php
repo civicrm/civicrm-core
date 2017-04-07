@@ -48,13 +48,6 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    * Financial types
    * @var array
    */
-  private static $financialTypeAccount;
-
-
-  /**
-   * Financial types
-   * @var array
-   */
   private static $financialAccount;
 
   /**
@@ -379,36 +372,25 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
   }
 
   /**
-   * Get all financial accounts for a Financial type.
-   *
-   * The static array  $financialTypeAccount is returned
+   * Get financial account for a Financial type.
    *
    *
-   * @param int $financialTypeId
-   * @param int $relationTypeId
-   * @return array
-   *   array reference of all financial accounts for a Financial type
+   * @param int $entityId
+   * @param string $accountRelationType
+   *
+   * @return int
    */
-  public static function financialAccountType($financialTypeId, $relationTypeId = NULL) {
-    if (!CRM_Utils_Array::value($financialTypeId, self::$financialTypeAccount)) {
-      $condition = " entity_id = $financialTypeId ";
-      CRM_Core_PseudoConstant::populate(
-        self::$financialTypeAccount[$financialTypeId],
-        'CRM_Financial_DAO_EntityFinancialAccount',
-        $all = TRUE,
-        $retrieve = 'financial_account_id',
-        $filter = NULL,
-        $condition,
-        NULL,
-        'account_relationship'
-      );
+  public static function getRelationalFinancialAccount($entityId, $accountRelationType) {
+    $result = civicrm_api3('EntityFinancialAccount', 'get', array(
+      'return' => array("financial_account_id"),
+      'account_relationship.name' => $accountRelationType,
+      'entity_table' => 'civicrm_financial_type',
+      'entity_id' => $entityId,
+    ));
+    if (!$result['count']) {
+      return NULL;
     }
-
-    if ($relationTypeId) {
-      return CRM_Utils_Array::value($relationTypeId, self::$financialTypeAccount[$financialTypeId]);
-    }
-
-    return self::$financialTypeAccount[$financialTypeId];
+    return $result['values'][$result['id']]['financial_account_id'];
   }
 
   /**
