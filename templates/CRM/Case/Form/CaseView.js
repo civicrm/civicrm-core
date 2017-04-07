@@ -206,6 +206,18 @@
           $(this).select2('val', '');
         }
       })
+      // When changing case subject, record an activity
+      .on('crmFormSuccess', '[data-field=subject]', function(e, value) {
+        var id = caseId();
+        CRM.api3('Activity', 'create', {
+          case_id: id,
+          activity_type_id: 'Change Case Subject',
+          subject: value,
+          status_id: 'Completed'
+        }).done(function() {
+          $('#case_id_' + id).dataTable().api().draw();
+        });
+      })
       .on('click', 'a.case-miniform', function(e) {
         var dialog,
           $el = $(this),
