@@ -378,19 +378,23 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    * @param int $entityId
    * @param string $accountRelationType
    * @param string $entityTable
+   * @param string $returnField
    * @return int
    */
-  public static function getRelationalFinancialAccount($entityId, $accountRelationType, $entityTable = 'civicrm_financial_type') {
-    $result = civicrm_api3('EntityFinancialAccount', 'get', array(
-      'return' => array("financial_account_id"),
-      'account_relationship.name' => $accountRelationType,
+  public static function getRelationalFinancialAccount($entityId, $accountRelationType, $entityTable = 'civicrm_financial_type', $returnField = 'financial_account_id') {
+    $params = array(
+      'return' => array($returnField),
       'entity_table' => $entityTable,
       'entity_id' => $entityId,
-    ));
+    );
+    if ($accountRelationType) {
+      $params['account_relationship.name'] = $accountRelationType;
+    }
+    $result = civicrm_api3('EntityFinancialAccount', 'get', $params);
     if (!$result['count']) {
       return NULL;
     }
-    return $result['values'][$result['id']]['financial_account_id'];
+    return $result['values'][$result['id']][$returnField];
   }
 
   /**

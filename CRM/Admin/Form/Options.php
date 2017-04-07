@@ -132,7 +132,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
     }
     // CRM-11516
     if ($this->_gName == 'payment_instrument' && $this->_id) {
-      $defaults['financial_account_id'] = CRM_Financial_BAO_FinancialTypeAccount::getFinancialAccount($this->_id, 'civicrm_option_value', 'financial_account_id');
+      $defaults['financial_account_id'] = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($this->_id, NULL, 'civicrm_option_value');
     }
     if (empty($this->_id) || !CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionValue', $this->_id, 'color')) {
       $defaults['color'] = '#ffffff';

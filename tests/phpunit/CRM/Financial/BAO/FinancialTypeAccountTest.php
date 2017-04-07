@@ -70,7 +70,7 @@ class CRM_Financial_BAO_FinancialTypeAccountTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check method getFinancialAccount()
+   * Check method retrieve()
    */
   public function testRetrieve() {
     list($financialAccount, $financialType, $financialAccountType) = $this->createFinancialAccount(
@@ -89,29 +89,6 @@ class CRM_Financial_BAO_FinancialTypeAccountTest extends CiviUnitTestCase {
     $financialAccountType = CRM_Financial_BAO_FinancialTypeAccount::retrieve($financialParams, $defaults);
     $this->assertEquals($financialAccountType['entity_id'], $financialType->id, 'Verify Entity Id.');
     $this->assertEquals($financialAccountType['financial_account_id'], $financialAccount->id, 'Verify Financial Account Id.');
-  }
-
-  /**
-   * Check method getFinancialAccount()
-   */
-  public function testGetFinancialAccount() {
-    list($financialAccount, $financialType, $financialAccountType) = $this->createFinancialAccount(
-      'Asset'
-    );
-    $params = array(
-      'financial_account_id' => $financialAccount->id,
-      'payment_processor_type_id' => 1,
-      'domain_id' => 1,
-      'billing_mode' => 1,
-      'name' => 'paymentProcessor',
-    );
-    $processor = CRM_Financial_BAO_PaymentProcessor::create($params);
-
-    $account = CRM_Financial_BAO_FinancialTypeAccount::getFinancialAccount(
-      $processor->id,
-      'civicrm_payment_processor'
-    );
-    $this->assertEquals($account, $financialAccount->name, 'Verify Financial Account Name');
   }
 
   /**
