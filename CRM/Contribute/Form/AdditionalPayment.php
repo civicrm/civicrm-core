@@ -82,8 +82,6 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
 
     parent::preProcess();
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
-    // @todo don't set this - rely on parent $this->contactID
-    $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
     $this->_component = CRM_Utils_Request::retrieve('component', 'String', $this, TRUE);
     $this->_view = CRM_Utils_Request::retrieve('view', 'String', $this, FALSE);
     $this->assign('component', $this->_component);
@@ -210,10 +208,13 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       return;
     }
 
+    // expose payment form in backoffice irrespective of mode
+    $defaults = $this->_values;
     CRM_Core_Payment_Form::buildPaymentForm($this, $this->_paymentProcessor, FALSE, TRUE, CRM_Utils_Request::retrieve('payment_instrument_id', 'Integer'));
+    $this->add('select', 'payment_processor_id', ts('Payment Processor'), $this->_processors, NULL);
+
     $attributes = CRM_Core_DAO::getAttribute('CRM_Financial_DAO_FinancialTrxn');
 
-    $this->add('select', 'payment_processor_id', ts('Payment Processor'), $this->_processors, NULL);
     $label = ($this->_refund) ? ts('Refund Amount') : ts('Payment Amount');
     $this->addMoney('total_amount',
       $label,
@@ -221,16 +222,6 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       $attributes['total_amount'],
       TRUE, 'currency', NULL
     );
-
-    $this->add('select', 'payment_instrument_id',
-      ts('Payment Method'),
-      array('' => ts('- select -')) + CRM_Contribute_PseudoConstant::paymentInstrument(),
-      FALSE,
-      array('onChange' => "return showHideByValue('payment_instrument_id','4','checkNumber','table-row','select',false);")
-    );
-
-    $this->add('text', 'check_number', ts('Check Number'), $attributes['financial_trxn_check_number']);
-    $this->add('text', 'trxn_id', ts('Transaction ID'), array('class' => 'twelve') + $attributes['trxn_id']);
 
     //add receipt for offline contribution
     $this->addElement('checkbox', 'is_email_receipt', ts('Send Receipt?'));
@@ -254,19 +245,30 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     $this->assign('component', $this->_component);
     $this->assign('email', $this->_contributorEmail);
 
-    $this->add('text', 'fee_amount', ts('Fee Amount'),
-      $attributes['fee_amount']
-    );
-    $this->addRule('fee_amount', ts('Please enter a valid monetary value for Fee Amount.'), 'money');
-
-    $this->add('text', 'net_amount', ts('Net Amount'),
-      $attributes['net_amount']
-    );
-    $this->addRule('net_amount', ts('Please enter a valid monetary value for Net Amount.'), 'money');
-
     $js = NULL;
     if (!$this->_mode) {
       $js = array('onclick' => "return verify( );");
+
+      $this->add('select', 'payment_instrument_id',
+        ts('Payment Method'),
+        array('' => ts('- select -')) + CRM_Contribute_PseudoConstant::paymentInstrument(),
+        TRUE, array('onChange' => "return showHideByValue('payment_instrument_id','4','checkNumber','table-row','select',false);")
+      );
+
+      $this->add('text', 'check_number', ts('Check Number'), $attributes['financial_trxn_check_number']);
+      $this->add('text', 'trxn_id', ts('Transaction ID'), array('class' => 'twelve') + $attributes['trxn_id']);
+      // add various dates
+      $dateLabel = ($this->_refund) ? ts('Refund Date') : ts('Date Received');
+      $this->addDateTime('trxn_date', $dateLabel, FALSE, array('formatType' => 'activityDateTime'));
+      $this->add('text', 'fee_amount', ts('Fee Amount'),
+        $attributes['fee_amount']
+      );
+      $this->addRule('fee_amount', ts('Please enter a valid monetary value for Fee Amount.'), 'money');
+
+      $this->add('text', 'net_amount', ts('Net Amount'),
+        $attributes['net_amount']
+      );
+      $this->addRule('net_amount', ts('Please enter a valid monetary value for Net Amount.'), 'money');
     }
 
     $buttonName = $this->_refund ? 'Record Refund' : 'Record Payment';
@@ -363,7 +365,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       $this->assign('contributeMode', 'direct');
       $this->processCreditCard($this->_params);
     }
-
+    $submittedValues['trxn_date'] = CRM_Utils_Date::processDate($submittedValues['trxn_date'], CRM_Utils_Array::value('trxn_date_time', $submittedValues));
     $defaults = array();
     $contribution = civicrm_api3('Contribution', 'getsingle', array(
       'return' => array("contribution_status_id"),
@@ -399,19 +401,9 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     $config = CRM_Core_Config::singleton();
     $session = CRM_Core_Session::singleton();
 
-    $unsetParams = array(
-      'trxn_id',
-      'payment_instrument_id',
-      'contribution_status_id',
-    );
-    foreach ($unsetParams as $key) {
-      if (isset($submittedValues[$key])) {
-        unset($submittedValues[$key]);
-      }
-    }
-
-    // Get the required fields value only.
-    $params = $submittedValues;
+    //get the payment processor id as per mode.
+    //@todo unclear relevance of mode - seems like a lot of duplicated params here!
+    $this->_params['payment_processor'] = $this->_params['payment_processor_id'];
 
     $now = date('YmdHis');
     $fields = array();
@@ -426,44 +418,27 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
 
     //set email for primary location.
     $fields['email-Primary'] = 1;
-    $params['email-Primary'] = $this->_contributorEmail;
-
-    // now set the values for the billing location.
-    foreach ($this->_fields as $name => $dontCare) {
-      $fields[$name] = 1;
-    }
-
-    // also add location name to the array
-    $params["address_name-{$this->_bltID}"] = CRM_Utils_Array::value('billing_first_name', $params) . ' ' . CRM_Utils_Array::value('billing_middle_name', $params) . ' ' . CRM_Utils_Array::value('billing_last_name', $params);
-    $params["address_name-{$this->_bltID}"] = trim($params["address_name-{$this->_bltID}"]);
+    $this->_params['email-Primary'] = $this->_contributorEmail;
     $fields["address_name-{$this->_bltID}"] = 1;
+    $fields["email-{$this->_bltID}"] = 1;
 
     $ctype = civicrm_api3('Contact', 'getvalue', array(
       'return' => "contact_type",
       'id' => $this->_contactId,
     ));
 
-    $nameFields = array('first_name', 'middle_name', 'last_name');
-    foreach ($nameFields as $name) {
-      $fields[$name] = 1;
-      if (array_key_exists("billing_$name", $params)) {
-        $params[$name] = $params["billing_{$name}"];
-        $params['preserveDBName'] = TRUE;
-      }
-    }
+    $fields = $this->formatParamsForPaymentProcessor($fields);
 
     if (!empty($params['source'])) {
       unset($params['source']);
     }
-    $contactID = CRM_Contact_BAO_Contact::createProfileContact($params, $fields,
+    $contactID = CRM_Contact_BAO_Contact::createProfileContact($this->_params, $fields,
       $this->_contactId,
       NULL, NULL,
       $ctype
     );
 
     // Add all the additional payment params we need.
-    $this->_params["state_province-{$this->_bltID}"] = $this->_params["billing_state_province-{$this->_bltID}"] = CRM_Core_PseudoConstant::stateProvinceAbbreviation($this->_params["billing_state_province_id-{$this->_bltID}"]);
-    $this->_params["country-{$this->_bltID}"] = $this->_params["billing_country-{$this->_bltID}"] = CRM_Core_PseudoConstant::countryIsoCode($this->_params["billing_country_id-{$this->_bltID}"]);
 
     $this->_params['amount'] = $this->_params['total_amount'];
     // @todo - stop setting amount level in this function & call the CRM_Price_BAO_PriceSet::getAmountLevel
@@ -476,23 +451,22 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       $config->defaultCurrency
     );
 
-    if (!empty($this->_params['trxn_date'])) {
-      $this->_params['receive_date'] = $this->_params['trxn_date'];
-    }
-
+    $this->_params['receive_date'] = date('Ymd');
     if (empty($this->_params['invoice_id'])) {
       $this->_params['invoiceID'] = md5(uniqid(rand(), TRUE));
     }
+    // TODO: we need to always generate invoice_id internally and should avoid to fetch that at form level
     else {
       $this->_params['invoiceID'] = $this->_params['invoice_id'];
     }
 
-    $this->assignBillingName($params);
+    $this->assignBillingName($this->_params);
     $this->assign('address', CRM_Utils_Address::getFormattedBillingAddressFieldsFromParameters(
-      $params,
+      $this->_params,
       $this->_bltID
     ));
 
+    $params = $this->_params;
     //Add common data to formatted params
     CRM_Contribute_Form_AdditionalInfo::postProcessCommon($params, $this->_params, $this);
     // at this point we've created a contact and stored its address etc
@@ -502,23 +476,26 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     $paymentParams['contactID'] = $this->_contactId;
     CRM_Core_Payment_Form::mapParams($this->_bltID, $this->_params, $paymentParams, TRUE);
 
+    // add some financial type details to the params list
+    // if folks need to use it
+    $financialTypeId = civicrm_api3('Contribution', 'getvalue', array(
+      'return' => "financial_type_id",
+      'id' => $this->_contributionId,
+    ));
+    $paymentParams['contributionType_name'] = $this->_params['contributionType_name'] = $paymentParams['financialType_name'] = civicrm_api3('FinancialType', 'getvalue', array(
+      'return' => "name",
+      'id' => $financialTypeId,
+    ));
     $paymentParams['contributionPageID'] = NULL;
     if (!empty($this->_params['is_email_receipt'])) {
       $paymentParams['email'] = $this->_contributorEmail;
-      $paymentParams['is_email_receipt'] = 1;
+      $paymentParams['is_email_receipt'] = TRUE;
     }
     else {
-      $paymentParams['is_email_receipt'] = 0;
-      $this->_params['is_email_receipt'] = 0;
-    }
-    if (!empty($this->_params['receive_date'])) {
-      $paymentParams['receive_date'] = $this->_params['receive_date'];
-    }
-    if (!empty($this->_params['receive_date'])) {
-      $paymentParams['receive_date'] = $this->_params['receive_date'];
+      $paymentParams['is_email_receipt'] = $this->_params['is_email_receipt'] = FALSE;
     }
 
-    $result = NULL;
+    $result = $errorMessage = NULL;
 
     if ($paymentParams['amount'] > 0.0) {
       try {
@@ -527,34 +504,47 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
         $result = $payment->doPayment($paymentParams);
       }
       catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
-        //set the contribution mode.
-        $urlParams = "action=add&cid={$this->_contactId}&id={$this->_id}&component={$this->_component}";
-        if ($this->_mode) {
-          $urlParams .= "&mode={$this->_mode}";
-        }
-        CRM_Core_Error::displaySessionError($result);
-        CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/payment/add', $urlParams));
+        Civi::log()->error('Payment processor exception: ' . $e->getMessage());
+        $errorMessage = $e->getMessage();
       }
     }
 
-    if ($result) {
-      $this->_params = array_merge($this->_params, $result);
+    // Payment is not completed
+    if (CRM_Utils_Array::value('payment_status_id', $result) != 1 || $errorMessage) {
+      //set the contribution mode.
+      $urlParams = "action=add&cid={$this->_contactId}&id={$this->_contributionId}&component={$this->_component}&mode={$this->_mode}";
+      if (!$errorMessage) {
+        $errorMessage = ts('Payment from payment processor failed.');
+      }
+      CRM_Core_Session::singleton()->setStatus($errorMessage, ts('Payment Failed'), 'error');
+      CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/payment/add', $urlParams));
     }
+
+    $this->_params = array_merge($this->_params, $result);
 
     if (empty($this->_params['receive_date'])) {
       $this->_params['receive_date'] = $now;
     }
-
-    $this->set('params', $this->_params);
-
+    $this->_params['trxn_date'] = $this->_params['receive_date'];
+    $this->_params['payment_instrument_id'] = CRM_Utils_Array::value('payment_instrument_id', $this->_paymentProcessor);
     // set source if not set
     if (empty($this->_params['source'])) {
       $userID = $session->get('userID');
-      $userSortName = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $userID,
-        'sort_name'
-      );
-      $this->_params['source'] = ts('Submit Credit Card Payment by: %1', array(1 => $userSortName));
+      $userSortName = civicrm_api3('Contact', 'getvalue', array(
+        'return' => "display_name",
+        'id' => $userID,
+      ));
+      $this->_params['source'] = ts('Submitted Credit Card Payment by: %1', array(1 => $userSortName));
     }
+
+    $date = CRM_Utils_Date::format($this->_params['credit_card_exp_date']);
+    $date = CRM_Utils_Date::mysqlToIso($date);
+    $this->assign('credit_card_type', CRM_Utils_Array::value('credit_card_type', $this->_params));
+    $this->assign('credit_card_exp_date', $date);
+    $this->assign('credit_card_number',
+      CRM_Utils_System::mungeCreditCard($this->_params['credit_card_number'])
+    );
+    $this->set('params', $this->_params);
   }
 
   /**
@@ -568,13 +558,13 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     // email receipt sending
     // send message template
     if ($this->_component == 'event') {
-      $eventId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant', $this->_id, 'event_id', 'id');
-
-      $returnProperties = array('fee_label', 'start_date', 'end_date', 'is_show_location', 'title');
-      CRM_Core_DAO::commonRetrieveAll('CRM_Event_DAO_Event', 'id', $eventId, $events, $returnProperties);
-      $event = $events[$eventId];
-      unset($event['start_date']);
-      unset($event['end_date']);
+      $eventId = civicrm_api3('Participant', 'getvalue', array(
+        'return' => "event_id",
+        'id' => $this->_id,
+      ));
+      $event = civicrm_api3('Event', 'getsingle', array(
+        'id' => $eventId,
+      ));
 
       $this->assign('event', $event);
       $this->assign('isShowLocation', $event['is_show_location']);
@@ -589,20 +579,23 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     }
 
     // assign payment info here
-    $paymentConfig['confirm_email_text'] = CRM_Utils_Array::value('confirm_email_text', $params);
-    $this->assign('paymentConfig', $paymentConfig);
     $isRefund = ($this->_paymentType == 'refund') ? TRUE : FALSE;
     $this->assign('isRefund', $isRefund);
+    $this->assign('totalAmount', $this->_amtTotal);
+    if ($params['total_amount'] > 0) {
+      $this->assign('isAmountzero', FALSE);
+    }
+    else {
+      $this->assign('isAmountzero', TRUE);
+    }
     if ($isRefund) {
       $this->assign('totalPaid', $this->_amtPaid);
-      $this->assign('totalAmount', $this->_amtTotal);
       $this->assign('refundAmount', $params['total_amount']);
     }
     else {
       $balance = $this->_amtTotal - ($this->_amtPaid + $params['total_amount']);
       $paymentsComplete = ($balance == 0) ? 1 : 0;
       $this->assign('amountOwed', $balance);
-      $this->assign('totalAmount', $this->_amtTotal);
       $this->assign('paymentAmount', $params['total_amount']);
       $this->assign('paymentsComplete', $paymentsComplete);
     }
@@ -612,13 +605,11 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     $this->assign('trxn_id', CRM_Utils_Array::value('trxn_id', $params));
     $this->assign('receive_date', CRM_Utils_Array::value('trxn_date', $params));
     $paymentInstrument = CRM_Contribute_PseudoConstant::paymentInstrument();
-    if (array_key_exists('payment_instrument_id', $params)) {
-      $this->assign('paidBy',
-        CRM_Utils_Array::value($params['payment_instrument_id'],
-          $paymentInstrument
-        )
-      );
-    }
+    $this->assign('paidBy',
+      CRM_Utils_Array::value($params['payment_instrument_id'],
+        $paymentInstrument
+      )
+    );
     $this->assign('checkNumber', CRM_Utils_Array::value('check_number', $params));
 
     $sendTemplateParams = array(
