@@ -170,11 +170,11 @@ class CRM_Upgrade_Incremental_Base {
    *
    * @param CRM_Queue_TaskContext $ctx
    * @param string $table
-   * @param string $column
+   * @param string|array $column
    * @return bool
    */
   public static function addIndex($ctx, $table, $column) {
-    $tables = array($table => array($column));
+    $tables = array($table => (array) $column);
     CRM_Core_BAO_SchemaHandler::createIndexes($tables);
 
     return TRUE;
