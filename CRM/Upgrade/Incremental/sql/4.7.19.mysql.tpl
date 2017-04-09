@@ -24,3 +24,7 @@ WHERE price_field.price_field_id IS NULL;
 
 -- CRM-20400
 {include file='../CRM/Upgrade/4.7.19.msg_template/civicrm_msg_template.tpl'}
+
+-- CRM-20402 Improve dectection of spam bounces
+SELECT @bounceTypeID := max(id) FROM civicrm_mailing_bounce_type WHERE name = 'Spam';
+UPDATE civicrm_mailing_bounce_pattern SET pattern = '(detected|rejected) (as|due to) spam' WHERE bounce_type_id = @bounceTypeID AND pattern = '(detected|rejected) as spam';
