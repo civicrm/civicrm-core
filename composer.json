@@ -14,6 +14,7 @@
     "symfony/event-dispatcher": "~2.5.0",
     "symfony/filesystem": "~2.5.0",
     "symfony/process": "~2.5.0",
+    "symfony/yaml": "~2.5.0",
     "psr/log": "1.0.0",
     "symfony/finder": "~2.5.0",
     "tecnickcom/tcpdf" : "6.2.*",
