@@ -942,7 +942,8 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
     $cc = NULL,
     $bcc = NULL,
     $contactIds = NULL,
-    $additionalDetails = NULL
+    $additionalDetails = NULL,
+    $campaign_id = NULL
   ) {
     // get the contact details of logged in contact, which we set as from email
     if ($userID == NULL) {
@@ -992,6 +993,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       'details' => $details,
       // FIXME: check for name Completed and get ID from that lookup
       'status_id' => 2,
+      'campaign_id' => $campaign_id,
     );
 
     // CRM-5916: strip [case #…] before saving the activity (if present in subject)
