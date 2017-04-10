@@ -543,7 +543,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         self::addActivities($subject, $contribution->contact_id, $fileName, $params);
       }
 
-      // CRM-20387 save my human-readable invoice number as invoice_id in the contribution table, 
+      // CRM-20387 save my human-readable invoice number as invoice_id in the contribution table,
       // but only if the current value is empty
       if (empty($contribution->invoice_id)) {
         CRM_Core_DAO::setFieldValue('CRM_Contribute_DAO_Contribution', $contribution->id, 'invoice_id', $invoiceId);
