@@ -295,22 +295,25 @@ WHERE cc.id IN (' . implode(',', $contactIds) . ') AND con.is_test = 0';
    * @return object CRM_Core_DAO
    */
   public static function getPreviousFinancialItem($entityId, $entityTable = 'civicrm_line_item') {
-    $liabilityAccountType = CRM_Core_OptionGroup::getValue('financial_account_type', 'Liability', 'name');
+    // fetch value of 'Liability' financial account type later used in the query
+    $liabilityAccountType = CRM_Core_PseudoConstant::getKey('CRM_Financial_BAO_FinancialAccount', 'financial_account_type_id', 'Liability');
     $queryParams = array(
-      1 => array($entityId, 'Integer'),
-      2 => array($entityTable, 'String'),
+      1 => array($entityTable, 'String'),
+      2 => array($entityId, 'Integer'),
       3 => array($liabilityAccountType, 'Integer'),
     );
+    // CRM-20260: retieve latest financial item which doesn't have financial account as Liability,
+    //  this is to ensure that we always get the financial item related to chargable price NOT tax price
     $query = 'SELECT cfi.id, cfi.description, cfi.amount, cfi.financial_account_id, cfi.status_id
       FROM `civicrm_financial_item` cfi
-        INNER JOIN civicrm_entity_financial_trxn ceft 
+        INNER JOIN civicrm_entity_financial_trxn ceft
           ON ceft.entity_id = cfi.id AND ceft.entity_table = "civicrm_financial_item"
         INNER JOIN civicrm_financial_trxn cft ON cft.id = ceft.financial_trxn_id
         INNER JOIN civicrm_financial_account cfa ON cfa.id = cfi.financial_account_id
-      WHERE cfi.entity_table = %2 AND cfi.entity_id = %1 AND 
+      WHERE cfi.entity_table = %1 AND cfi.entity_id = %2 AND
         CASE
           WHEN cfa.financial_account_type_id = %3
-            AND cfi.financial_account_id  = from_financial_account_id
+            AND cfi.financial_account_id = cft.from_financial_account_id
           THEN 1
           WHEN cfa.financial_account_type_id = %3
           THEN 0
