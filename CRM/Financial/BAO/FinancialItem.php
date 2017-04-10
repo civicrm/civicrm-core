@@ -311,14 +311,9 @@ WHERE cc.id IN (' . implode(',', $contactIds) . ') AND con.is_test = 0';
         INNER JOIN civicrm_financial_trxn cft ON cft.id = ceft.financial_trxn_id
         INNER JOIN civicrm_financial_account cfa ON cfa.id = cfi.financial_account_id
       WHERE cfi.entity_table = %1 AND cfi.entity_id = %2 AND
-        CASE
-          WHEN cfa.financial_account_type_id = %3
-            AND cfi.financial_account_id = cft.from_financial_account_id
-          THEN 1
-          WHEN cfa.financial_account_type_id = %3
-          THEN 0
-          ELSE 1
-        END
+        ((cfa.financial_account_type_id = %3 AND cfi.financial_account_id = cft.from_financial_account_id)
+          OR cfa.financial_account_type_id <> %3
+        )
       ORDER BY cfi.id DESC LIMIT 1';
     $prevFinancialItem = CRM_Core_DAO::executeQuery($query, $queryParams);
     $prevFinancialItem->fetch();
