@@ -106,11 +106,6 @@ class CRM_SMS_BAO_Provider extends CRM_SMS_DAO_Provider {
    * @param int $providerId
    */
   public static function updateRecord($values, $providerId) {
-    $current_domain_id = CRM_Core_DAO::getFieldValue('CRM_SMS_DAO_Provider', $providerId, 'domain_id');
-    if (isset($current_domain_id) || is_null($current_domain_id)) {
-      $current_domain_id = CRM_Core_Config::domainID();
-    }
-    $values['domain_id'] = CRM_Utils_Array::value('domain_id', $values, $current_domain_id);
     $dao = new CRM_SMS_DAO_Provider();
     $dao->id = $providerId;
     if ($dao->find(TRUE)) {
