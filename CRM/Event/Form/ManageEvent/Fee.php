@@ -386,7 +386,10 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
     $this->addElement('submit', $this->getButtonName('submit'), ts('Add Discount Set to Fee Table'),
       array('class' => 'crm-form-submit cancel')
     );
-
+    if (CRM_Contribute_BAO_Contribution::checkContributeSettings('deferred_revenue_enabled')) {
+      $deferredFinancialType = CRM_Financial_BAO_FinancialAccount::getDeferredFinancialType();
+      $this->assign('deferredFinancialType', array_keys($deferredFinancialType));
+    }
     $this->buildAmountLabel();
     parent::buildQuickForm();
   }
@@ -523,13 +526,6 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
           $errors['pay_later_receipt'] = ts('Please enter the Pay Later instructions to be displayed to your users.');
         }
       }
-    }
-    // CRM-16189
-    try {
-      CRM_Financial_BAO_FinancialAccount::validateFinancialType($values['financial_type_id']);
-    }
-    catch (CRM_Core_Exception $e) {
-      $errors['financial_type_id'] = $e->getMessage();
     }
     return empty($errors) ? TRUE : $errors;
   }

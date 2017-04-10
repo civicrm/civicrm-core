@@ -76,13 +76,6 @@ class CRM_Price_BAO_PriceSet extends CRM_Price_DAO_PriceSet {
     else {
       $priceSetID = CRM_Utils_Array::value('id', $params);
     }
-    // CRM-16189
-    if ($validatePriceSet && !empty($params['financial_type_id'])) {
-      CRM_Financial_BAO_FinancialAccount::validateFinancialType(
-        $params['financial_type_id'],
-        $priceSetID
-      );
-    }
     $priceSetBAO = new CRM_Price_BAO_PriceSet();
     $priceSetBAO->copyValues($params);
     if (self::eventPriceSetDomainID()) {

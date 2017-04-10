@@ -106,13 +106,6 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
       }
     }
 
-    // CRM-16189
-    if (!empty($params['financial_type_id'])) {
-      CRM_Financial_BAO_FinancialAccount::validateFinancialType(
-        $params['financial_type_id']
-      );
-    }
-
     // action is taken depending upon the mode
     $membershipType = new CRM_Member_DAO_MembershipType();
     $membershipType->copyValues($params);

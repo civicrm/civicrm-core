@@ -404,15 +404,6 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
       if ($fields['financial_type_id'] == '') {
         $errors['financial_type_id'] = ts('Financial Type is a required field');
       }
-      else {
-        // CRM-16189
-        try {
-          CRM_Financial_BAO_FinancialAccount::validateFinancialType($fields['financial_type_id'], $form->_sid);
-        }
-        catch (CRM_Core_Exception $e) {
-          $errors['financial_type_id'] = $e->getMessage();
-        }
-      }
     }
 
     //avoid the same price field label in Within PriceSet
@@ -529,13 +520,6 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
           }
 
           $_flagOption = $_emptyRow = 0;
-          // CRM-16189
-          try {
-            CRM_Financial_BAO_FinancialAccount::validateFinancialType($fields['option_financial_type_id'][$index], $form->_fid, 'PriceField');
-          }
-          catch(CRM_Core_Exception $e) {
-            $errors["option_financial_type_id[{$index}]"] = $e->getMessage();
-          }
         }
 
         if (!empty($memTypesIDS)) {
