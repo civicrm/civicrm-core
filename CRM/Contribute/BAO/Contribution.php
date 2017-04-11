@@ -5529,4 +5529,45 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
     return TRUE;
   }
 
+  /**
+   * Function to replace contribution tokens.
+   *
+   * @param array $contributionIds
+   *
+   * @param string $subject
+   *
+   * @param array $subjectToken
+   *
+   * @param string $text
+   *
+   * @param string $html
+   *
+   * @param array $messageToken
+   *
+   * @param bool $escapeSmarty
+   *
+   * @return array
+   */
+  public static function replaceContributionTokens(
+    $contributionIds,
+    $subject,
+    $subjectToken,
+    $text,
+    $html,
+    $messageToken,
+    $escapeSmarty
+  ) {
+    if (empty($contributionIds)) {
+      return array();
+    }
+    $contributionDetails = array();
+    foreach ($contributionIds as $id) {
+      $result = civicrm_api3('Contribution', 'get', array('id' => $id));
+      $contributionDetails[$result['values'][$result['id']]['contact_id']]['subject'] = CRM_Utils_Token::replaceContributionTokens($subject, $result, FALSE, $subjectToken, FALSE, $escapeSmarty);
+      $contributionDetails[$result['values'][$result['id']]['contact_id']]['text'] = CRM_Utils_Token::replaceContributionTokens($text, $result, FALSE, $messageToken, FALSE, $escapeSmarty);
+      $contributionDetails[$result['values'][$result['id']]['contact_id']]['html'] = CRM_Utils_Token::replaceContributionTokens($html, $result, FALSE, $messageToken, FALSE, $escapeSmarty);
+    }
+    return $contributionDetails;
+  }
+
 }
