@@ -43,6 +43,18 @@ function civicrm_api3_sms_provider_create($params) {
 }
 
 /**
+ * Adjust Metadata for Create action.
+ *
+ * The metadata is used for setting defaults, documentation & validation.
+ *
+ * @param array $params
+ *   Array of parameters determined by getfields.
+ */
+function _civicrm_api3_sms_provider_create_spec(&$params) {
+  $params['domain_id']['api.default'] = CRM_Core_Config::domainID();
+}
+
+/**
  * Get an sms_provider.
  *
  * @param array $params

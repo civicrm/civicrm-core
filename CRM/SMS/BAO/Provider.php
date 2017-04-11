@@ -77,6 +77,7 @@ class CRM_SMS_BAO_Provider extends CRM_SMS_DAO_Provider {
       $select = implode(',', $selectArr);
       $dao->selectAdd($select);
     }
+    $dao->whereAdd("(domain_id = " . CRM_Core_Config::domainID() . " OR domain_id IS NULL)");
     $dao->orderBy($orderBy);
     $dao->find();
     while ($dao->fetch()) {
@@ -87,15 +88,20 @@ class CRM_SMS_BAO_Provider extends CRM_SMS_DAO_Provider {
   }
 
   /**
+   * Save a new record into the database
+   * @todo create a create function to do this work
    * @param $values
    */
   public static function saveRecord($values) {
+    $values['domain_id'] = CRM_Utils_Array::value('domain_id', $values, CRM_Core_Config::domainID());
     $dao = new CRM_SMS_DAO_Provider();
     $dao->copyValues($values);
     $dao->save();
   }
 
   /**
+   * Update an SMS provider in the database.
+   * @todo combine with saveRecord in a create function
    * @param $values
    * @param int $providerId
    */
@@ -131,6 +137,7 @@ class CRM_SMS_BAO_Provider extends CRM_SMS_DAO_Provider {
 
     $dao = new CRM_SMS_DAO_Provider();
     $dao->id = $providerID;
+    $dao->whereAdd = "(domain_id = " .  CRM_Core_Config::domainID() . "OR domain_id IS NULL)";
     if (!$dao->find(TRUE)) {
       return NULL;
     }
