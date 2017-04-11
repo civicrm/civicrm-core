@@ -175,7 +175,7 @@ class CRM_SMS_Form_Provider extends CRM_Core_Form {
       if ($this->_id) {
         $recData['id'] = $this->_id;
       }
-      CRM_SMS_BAO_Provider::create($recData);
+      civicrm_api3('SmsProvider', 'create', $recData);
     }
   }
 
