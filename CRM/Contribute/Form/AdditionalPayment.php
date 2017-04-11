@@ -74,6 +74,8 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
   public $_action = NULL;
 
   public function preProcess() {
+
+    parent::preProcess();
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
     $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
     $this->_component = CRM_Utils_Request::retrieve('component', 'String', $this, TRUE);
@@ -129,9 +131,6 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     else {
       CRM_Core_Error::fatal(ts('No payment information found for this record'));
     }
-
-    //set the payment mode - _mode property is defined in parent class
-    $this->_mode = CRM_Utils_Request::retrieve('mode', 'String', $this);
 
     if (!empty($this->_mode) && $this->_paymentType == 'refund') {
       CRM_Core_Error::fatal(ts('Credit card payment is not for Refund payments use'));
