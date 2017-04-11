@@ -435,6 +435,10 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
                   $name = "`$locationTypeName-$fieldName`";
                 }
               }
+              else if ($fieldName == 'postal_code') {
+                // HACK. Try to work around CRM-20415.
+                $name = "`$fieldName`";
+              }
               else {
                 $name = "`$locationTypeName-$fieldName`";
               }
