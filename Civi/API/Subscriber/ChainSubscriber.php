@@ -127,9 +127,12 @@ class ChainSubscriber implements EventSubscriberInterface {
 
         // Hard coded list of entitys that have fields starting api_ and shouldn't be automatically
         // deemed to be chained API calls
-        if ((($subEntity == 'type' || $subEntity == 'url') && $entity == 'SmsProvider') ||
-          ($entity == 'Job' && ($subEntity == 'prefix' || $subEntity == 'entity' || $subEntity == 'action')) ||
-          ($entity == 'Contact' && $subEntity == 'key')) {
+        $skipList = array(
+          'SmsProvider' => array('type', 'url', 'params'),
+          'Job' => array('prefix', 'entity', 'action'),
+          'Contact' => array('key'),
+        );
+        if (isset($skipList[$entity]) && in_array($subEntity, $skipList[$entity])) {
           continue;
         }
 
