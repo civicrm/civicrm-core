@@ -398,4 +398,13 @@ class Container {
     return \Civi::$statics[__CLASS__]['boot'][$name];
   }
 
+  /**
+   * Determine whether the container services are available.
+   *
+   * @return bool
+   */
+  public static function isContainerBooted() {
+    return isset(\Civi::$statics[__CLASS__]['container']);
+  }
+
 }

@@ -156,7 +156,7 @@ abstract class CRM_Utils_Hook {
     &$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6,
     $fnSuffix
   ) {
-    if (is_array($names) && !defined('CIVICRM_FORCE_LEGACY_HOOK')) {
+    if (is_array($names) && !defined('CIVICRM_FORCE_LEGACY_HOOK') && \Civi\Core\Container::isContainerBooted()) {
       $event = \Civi\Core\Event\GenericHookEvent::createOrdered(
         $names,
         array(&$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6)
@@ -1821,6 +1821,9 @@ abstract class CRM_Utils_Hook {
   /**
    * This hook is called for declaring managed entities via API.
    *
+   * Note: This is a preboot hook. It will dispatch via the extension/module
+   * subsystem but *not* the Symfony EventDispatcher.
+   *
    * @param array[] $entityTypes
    *   List of entity types; each entity-type is an array with keys:
    *   - name: string, a unique short name (e.g. "ReportInstance")
@@ -2133,14 +2136,14 @@ abstract class CRM_Utils_Hook {
    * flush the cache. Additionally, you should relax caching during development.
    * In `civicrm.settings.php`, set define('CIVICRM_CONTAINER_CACHE', 'auto').
    *
+   * Note: This is a preboot hook. It will dispatch via the extension/module
+   * subsystem but *not* the Symfony EventDispatcher.
+   *
    * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
    * @see http://symfony.com/doc/current/components/dependency_injection/index.html
    */
   public static function container(\Symfony\Component\DependencyInjection\ContainerBuilder $container) {
-    // This hook fires during system bootstrap, after CRM_Extension_System
-    // initializes but before the container or dispatcher initialize. Therefore,
-    // we cannot use containerized services (like the dispatcher).
-    self::singleton()->invokeViaUF(1, $container, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_container');
+    self::singleton()->invoke(array('container'), $container, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_container');
   }
 
   /**
