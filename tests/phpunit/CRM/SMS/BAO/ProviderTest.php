@@ -64,12 +64,13 @@ class CRM_SMS_BAO_ProviderTest extends CiviUnitTestCase {
       'is_active' => 1,
       'api_type' => 1,
     );
-    CRM_SMS_BAO_Provider::create($values, array());
+    $this->callAPISuccess('SmsProvider', 'create', $values);
+    // CRM_SMS_BAO_Provider::create($values);
     $provider = $this->callAPISuccess('SmsProvider', 'getsingle', array('title' => 'test SMS provider'));
     $domain_id = CRM_Core_DAO::getFieldValue('CRM_SMS_DAO_Provider', $provider['id'], 'domain_id');
     $this->assertNull($domain_id);
-    $values2 = array('title' => 'Test SMS Provider2');
-    CRM_SMS_BAO_Provider::create($values2, array('id' => $provider['id']));
+    $values2 = array('title' => 'Test SMS Provider2', 'id' => $provider['id']);
+    CRM_SMS_BAO_Provider::create($values2);
     $provider = $this->callAPISuccess('SmsProvider', 'getsingle', array('id' => $provider['id']));
     $this->assertEquals('Test SMS Provider2', $provider['title']);
     $domain_id = CRM_Core_DAO::getFieldValue('CRM_SMS_DAO_Provider', $provider['id'], 'domain_id');

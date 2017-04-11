@@ -172,13 +172,10 @@ class CRM_SMS_Form_Provider extends CRM_Core_Form {
     $recData['is_default'] = CRM_Utils_Array::value('is_default', $recData, 0);
 
     if ($this->_action && (CRM_Core_Action::UPDATE || CRM_Core_Action::ADD)) {
-      if (!empty($this->_id)) {
-        $ids = array('id' => $this->_id);
+      if ($this->_id) {
+        $recData['id'] = $this->_id;
       }
-      else {
-        $ids = array();
-      }
-      CRM_SMS_BAO_Provider::create($recData, $ids);
+      CRM_SMS_BAO_Provider::create($recData);
     }
   }
 
