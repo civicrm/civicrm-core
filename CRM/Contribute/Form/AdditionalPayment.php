@@ -176,20 +176,8 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     }
     $defaults = array();
     if ($this->_mode) {
-      $defaults = $this->_values;
-
-      $config = CRM_Core_Config::singleton();
-      // set default country from config if no country set
-      if (empty($defaults["billing_country_id-{$this->_bltID}"])) {
-        $defaults["billing_country_id-{$this->_bltID}"] = $config->defaultContactCountry;
-      }
-
-      if (empty($defaults["billing_state_province_id-{$this->_bltID}"])) {
-        $defaults["billing_state_province_id-{$this->_bltID}"] = $config->defaultContactStateProvince;
-      }
-
-      $billingDefaults = $this->getProfileDefaults('Billing', $this->_contactId);
-      $defaults = array_merge($defaults, $billingDefaults);
+      CRM_Core_Payment_Form::setDefaultValues($this, $this->_contactId);
+      $defaults = array_merge($defaults, $this->_defaults);
     }
 
     if (empty($defaults['trxn_date']) && empty($defaults['trxn_date_time'])) {
@@ -209,6 +197,9 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     return $defaults;
   }
 
+  /**
+   * Build the form object.
+   */
   public function buildQuickForm() {
     if ($this->_view == 'transaction' && ($this->_action & CRM_Core_Action::BROWSE)) {
       $this->addButtons(array(
@@ -222,56 +213,8 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       );
       return;
     }
-    $ccPane = NULL;
-    if ($this->_mode) {
-      if (CRM_Utils_Array::value('payment_type', $this->_processors) & CRM_Core_Payment::PAYMENT_TYPE_DIRECT_DEBIT
-      ) {
-        $ccPane = array(ts('Direct Debit Information') => 'DirectDebit');
-      }
-      else {
-        $ccPane = array(ts('Credit Card Information') => 'CreditCard');
-      }
-      $defaults = $this->_values;
-      $showAdditionalInfo = FALSE;
 
-      foreach ($ccPane as $name => $type) {
-        if ($this->_formType == $type || !empty($_POST["hidden_{$type}"]) ||
-          CRM_Utils_Array::value("hidden_{$type}", $defaults)
-        ) {
-          $showAdditionalInfo = TRUE;
-          $allPanes[$name]['open'] = 'true';
-        }
-
-        $urlParams = "snippet=4&formType={$type}";
-        if ($this->_mode) {
-          $urlParams .= "&mode={$this->_mode}";
-        }
-        $open = 'false';
-        if ($type == 'CreditCard' ||
-          $type == 'DirectDebit'
-        ) {
-          $open = 'true';
-        }
-
-        $allPanes[$name] = array(
-          'url' => CRM_Utils_System::url('civicrm/payment/add', $urlParams),
-          'open' => $open,
-          'id' => $type,
-        );
-
-        CRM_Core_Payment_Form::buildPaymentForm($this, $this->_paymentProcessor, FALSE, TRUE);
-
-        $qfKey = $this->controller->_key;
-        $this->assign('qfKey', $qfKey);
-        $this->assign('allPanes', $allPanes);
-        $this->assign('showAdditionalInfo', $showAdditionalInfo);
-
-        if ($this->_formType) {
-          $this->assign('formType', $this->_formType);
-          return;
-        }
-      }
-    }
+    CRM_Core_Payment_Form::buildPaymentForm($this, $this->_paymentProcessor, FALSE, TRUE);
     $attributes = CRM_Core_DAO::getAttribute('CRM_Financial_DAO_FinancialTrxn');
 
     $this->add('select', 'payment_processor_id', ts('Payment Processor'), $this->_processors, NULL);
