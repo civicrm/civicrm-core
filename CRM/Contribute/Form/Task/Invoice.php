@@ -544,8 +544,9 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       }
 
       // CRM-20387 save my human-readable invoice number as invoice_id in the contribution table,
-      // but only if the current value is empty
-      if (empty($contribution->invoice_id)) {
+      // but only if the current value is one of: set by this invoicing code, or pay-later, or empty.
+      $set_by_invoicing_code = (0 === strpos($contribution->invoice_id, CRM_Utils_Array::value('invoice_prefix', $prefixValue)));
+      if ($set_by_invoicing_code || empty($contribution->invoice_id) || $contribution->is_pay_later) {
         CRM_Core_DAO::setFieldValue('CRM_Contribute_DAO_Contribution', $contribution->id, 'invoice_id', $invoiceId);
       }
       $invoiceTemplate->clearTemplateVars();
