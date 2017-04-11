@@ -94,6 +94,10 @@
     <default>NULL</default>
     <comment>date transaction occurred</comment>
     <add>1.3</add>
+    <html>
+      <type>Select Date</type>
+      <formatType>activityDateTime</formatType>
+    </html>
   </field>
   <field>
     <name>trxn_type</name>

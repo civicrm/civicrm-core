@@ -180,12 +180,8 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       $defaults = array_merge($defaults, $this->_defaults);
     }
 
-    if (empty($defaults['trxn_date']) && empty($defaults['trxn_date_time'])) {
-      list($defaults['trxn_date'], $defaults['trxn_date_time'])
-        = CRM_Utils_Date::setDateDefaults(
-          CRM_Utils_Array::value('register_date', $defaults),
-          'activityDateTime'
-        );
+    if (empty($defaults['trxn_date'])) {
+      $defaults['trxn_date'] = date('Y-m-d H:i:s');
     }
 
     if ($this->_refund) {
@@ -242,9 +238,8 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
 
     $this->add('textarea', 'receipt_text', ts('Confirmation Message'));
 
-    // add various dates
     $dateLabel = ($this->_refund) ? ts('Refund Date') : ts('Date Received');
-    $this->addDateTime('trxn_date', $dateLabel, FALSE, array('formatType' => 'activityDateTime'));
+    $this->addField('trxn_date', array('entity' => 'FinancialTrxn', 'label' => $dateLabel, 'context' => 'Contribution'), FALSE, FALSE);
 
     if ($this->_contactId && $this->_id) {
       if ($this->_component == 'event') {
@@ -338,7 +333,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
         )
       );
     }
-    $submittedValues['trxn_date'] = CRM_Utils_Date::processDate($submittedValues['trxn_date'], $submittedValues['trxn_date_time']);
+
     if ($this->_mode) {
       // process credit card
       $this->assign('contributeMode', 'direct');
@@ -476,7 +471,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     );
 
     if (!empty($this->_params['trxn_date'])) {
-      $this->_params['receive_date'] = CRM_Utils_Date::processDate($this->_params['trxn_date'], $this->_params['trxn_date_time']);
+      $this->_params['receive_date'] = $this->_params['trxn_date'];
     }
 
     if (empty($this->_params['invoice_id'])) {
