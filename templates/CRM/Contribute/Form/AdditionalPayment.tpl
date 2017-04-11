@@ -116,7 +116,6 @@
       <div class="crm-accordion-header">
         {if $paymentType EQ 'refund'}{ts}Refund Details{/ts}{else}{ts}Payment Details{/ts}{/if}
       </div>
-      {if !$contributionMode}
       <div class="crm-accordion-body">
         <table class="form-layout-compressed" >
           <tr class="crm-payment-form-block-trxn_date">

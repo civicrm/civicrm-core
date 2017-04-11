@@ -82,6 +82,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
 
     parent::preProcess();
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
+    $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
     $this->_component = CRM_Utils_Request::retrieve('component', 'String', $this, TRUE);
     $this->_view = CRM_Utils_Request::retrieve('view', 'String', $this, FALSE);
     $this->assign('component', $this->_component);
@@ -208,8 +209,6 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       return;
     }
 
-    // expose payment form in backoffice irrespective of mode
-    $defaults = $this->_values;
     CRM_Core_Payment_Form::buildPaymentForm($this, $this->_paymentProcessor, FALSE, TRUE, CRM_Utils_Request::retrieve('payment_instrument_id', 'Integer'));
     $this->add('select', 'payment_processor_id', ts('Payment Processor'), $this->_processors, NULL);
 
@@ -510,7 +509,8 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     }
 
     // Payment is not completed
-    if (CRM_Utils_Array::value('payment_status_id', $result) != 1 || $errorMessage) {
+    $completedContributionStatusID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
+    if (CRM_Utils_Array::value('payment_status_id', $result) != $completedContributionStatusID || $errorMessage) {
       //set the contribution mode.
       $urlParams = "action=add&cid={$this->_contactId}&id={$this->_contributionId}&component={$this->_component}&mode={$this->_mode}";
       if (!$errorMessage) {
