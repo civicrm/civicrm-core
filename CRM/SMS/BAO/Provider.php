@@ -102,7 +102,7 @@ class CRM_SMS_BAO_Provider extends CRM_SMS_DAO_Provider {
       CRM_Utils_Hook::pre('create', 'SmsProvider', NULL, $params);
     }
 
-    $provider = new static();
+    $provider = new CRM_SMS_DAO_Provider();
     if ($id) {
       $provider->id = $id;
       $provider->find(TRUE);
