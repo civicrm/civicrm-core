@@ -451,6 +451,14 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
         $query->_qill[$grouping][] = ts('Card Type %1 %2', array(1 => $op, 2 => $value));
         return;
 
+      case 'financial_trxn_pan_truncation':
+        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause('civicrm_financial_trxn.pan_truncation', $op, $value);
+        $query->_tables['civicrm_financial_trxn'] = $query->_whereTables['civicrm_financial_trxn'] = 1;
+        $query->_tables['civicrm_contribution'] = $query->_whereTables['civicrm_contribution'] = 1;
+        list($op, $value) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Financial_DAO_FinancialTrxn', 'pan_truncation', $value, $op);
+        $query->_qill[$grouping][] = ts('Card Number %1 %2', array(1 => $op, 2 => $value));
+        return;
+
       default:
         //all other elements are handle in this case
         $fldName = substr($name, 13);
@@ -960,6 +968,12 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
     );
 
     $form->addField('financial_trxn_card_type', array('entity' => 'FinancialTrxn', 'name' => 'card_type', 'action' => 'get'));
+
+    $form->add('text', 'financial_trxn_pan_truncation', ts('Card Number'), array(
+      'size' => 5,
+      'maxlength' => 4,
+      'autocomplete' => 'off',
+    ));
 
     // CRM-16713 - contribution search by premiums on 'Find Contribution' form.
     $form->add('select', 'contribution_product_id',

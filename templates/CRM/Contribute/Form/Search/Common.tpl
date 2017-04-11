@@ -51,6 +51,10 @@
       {$form.financial_trxn_card_type.label} <br />
       {$form.financial_trxn_card_type.html}
     </div>
+    <div class="float-left" id="pan_truncation_wrapper">
+      {$form.financial_trxn_pan_truncation.label} <br />
+      {$form.financial_trxn_pan_truncation.html}
+    </div>
   </td>
   <td>
     {$form.contribution_trxn_id.label} <br />
