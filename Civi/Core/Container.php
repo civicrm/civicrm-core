@@ -106,6 +106,9 @@ class Container {
     $container->addObjectResource($this);
     $container->setParameter('civicrm_base_path', $civicrm_base_path);
     //$container->set(self::SELF, $this);
+
+    $container->addResource(new \Symfony\Component\Config\Resource\FileResource(__FILE__));
+
     $container->setDefinition(self::SELF, new Definition(
       'Civi\Core\Container',
       array()
@@ -134,7 +137,7 @@ class Container {
       ->setFactoryService(self::SELF)->setFactoryMethod('createAngularManager');
 
     $container->setDefinition('dispatcher', new Definition(
-      'Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher',
+      'Civi\Core\CiviEventDispatcher',
       array(new Reference('service_container'))
     ))
       ->setFactoryService(self::SELF)->setFactoryMethod('createEventDispatcher');
@@ -238,9 +241,11 @@ class Container {
    * @return \Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher
    */
   public function createEventDispatcher($container) {
-    $dispatcher = new ContainerAwareEventDispatcher($container);
+    $dispatcher = new CiviEventDispatcher($container);
     $dispatcher->addListener(SystemInstallEvent::EVENT_NAME, array('\Civi\Core\InstallationCanary', 'check'));
     $dispatcher->addListener(SystemInstallEvent::EVENT_NAME, array('\Civi\Core\DatabaseInitializer', 'initialize'));
+    $dispatcher->addListener('hook_civicrm_pre', array('\Civi\Core\Event\PreEvent', 'dispatchSubevent'), 100);
+    $dispatcher->addListener('hook_civicrm_post', array('\Civi\Core\Event\PostEvent', 'dispatchSubevent'), 100);
     $dispatcher->addListener('hook_civicrm_post::Activity', array('\Civi\CCase\Events', 'fireCaseChange'));
     $dispatcher->addListener('hook_civicrm_post::Case', array('\Civi\CCase\Events', 'fireCaseChange'));
     $dispatcher->addListener('hook_civicrm_caseChange', array('\Civi\CCase\Events', 'delegateToXmlListeners'));
@@ -251,7 +256,7 @@ class Container {
     $dispatcher->addListener('hook_civicrm_unhandled_exception', array(
       'CRM_Core_LegacyErrorHandler',
       'handleException',
-    ));
+    ), -200);
     $dispatcher->addListener(\Civi\ActionSchedule\Events::MAPPINGS, array('CRM_Activity_ActionMapping', 'onRegisterActionMappings'));
     $dispatcher->addListener(\Civi\ActionSchedule\Events::MAPPINGS, array('CRM_Contact_ActionMapping', 'onRegisterActionMappings'));
     $dispatcher->addListener(\Civi\ActionSchedule\Events::MAPPINGS, array('CRM_Contribute_ActionMapping_ByPage', 'onRegisterActionMappings'));

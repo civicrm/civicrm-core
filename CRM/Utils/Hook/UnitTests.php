@@ -94,25 +94,39 @@ class CRM_Utils_Hook_UnitTests extends CRM_Utils_Hook {
    *
    * @return mixed
    */
-  public function invoke(
+  public function invokeViaUF(
     $numParams,
     &$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6,
     $fnSuffix) {
     $params = array(&$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6);
+
+    $fResult1 = $fResult2 = $fResult3 = NULL;
+
     // run standard hooks
     if ($this->civiModules === NULL) {
       $this->civiModules = array();
       $this->requireCiviModules($this->civiModules);
     }
-    $this->runHooks($this->civiModules, $fnSuffix, $numParams, $arg1, $arg2, $arg3, $arg4, $arg5, $arg6);
+    $fResult1 = $this->runHooks($this->civiModules, $fnSuffix, $numParams, $arg1, $arg2, $arg3, $arg4, $arg5, $arg6);
+
     // run mock object hooks
     if ($this->mockObject && is_callable(array($this->mockObject, $fnSuffix))) {
-      call_user_func(array($this->mockObject, $fnSuffix), $arg1, $arg2, $arg3, $arg4, $arg5, $arg6);
+      $fResult2 = call_user_func(array($this->mockObject, $fnSuffix), $arg1, $arg2, $arg3, $arg4, $arg5, $arg6);
     }
+
     // run adhoc hooks
     if (!empty($this->adhocHooks[$fnSuffix])) {
-      call_user_func_array($this->adhocHooks[$fnSuffix], $params);
+      $fResult3 = call_user_func_array($this->adhocHooks[$fnSuffix], $params);
     }
+
+    $result = array();
+    foreach (array($fResult1, $fResult2, $fResult3) as $fResult) {
+      if (!empty($fResult) && is_array($fResult)) {
+        $result = array_merge($result, $fResult);
+      }
+    }
+
+    return empty($result) ? TRUE : $result;
   }
 
 }
