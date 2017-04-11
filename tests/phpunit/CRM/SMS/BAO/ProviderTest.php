@@ -64,12 +64,12 @@ class CRM_SMS_BAO_ProviderTest extends CiviUnitTestCase {
       'is_active' => 1,
       'api_type' => 1,
     );
-    CRM_SMS_BAO_Provider::saveRecord($values);
+    $this->callAPISuccess('SmsProvider', 'create', $values);
     $provider = $this->callAPISuccess('SmsProvider', 'getsingle', array('title' => 'test SMS provider'));
     $domain_id = CRM_Core_DAO::getFieldValue('CRM_SMS_DAO_Provider', $provider['id'], 'domain_id');
     $this->assertNull($domain_id);
-    $values2 = array('title' => 'Test SMS Provider2');
-    CRM_SMS_BAO_Provider::updateRecord($values2, $provider['id']);
+    $values2 = array('title' => 'Test SMS Provider2', 'id' => $provider['id']);
+    $this->callAPISuccess('SmsProvider', 'create', $values2);
     $provider = $this->callAPISuccess('SmsProvider', 'getsingle', array('id' => $provider['id']));
     $this->assertEquals('Test SMS Provider2', $provider['title']);
     $domain_id = CRM_Core_DAO::getFieldValue('CRM_SMS_DAO_Provider', $provider['id'], 'domain_id');
@@ -89,7 +89,7 @@ class CRM_SMS_BAO_ProviderTest extends CiviUnitTestCase {
       'is_active' => 1,
       'api_type' => 1,
     );
-    CRM_SMS_BAO_Provider::saveRecord($values);
+    $this->callAPISuccess('SmsProvider', 'create', $values);
     $provider = $this->callAPISuccess('SmsProvider', 'getsingle', array('title' => 'test SMS provider'));
     $domain_id = CRM_Core_DAO::getFieldValue('CRM_SMS_DAO_Provider', $provider['id'], 'domain_id');
     $this->assertEquals(CRM_Core_Config::domainID(), $domain_id);
