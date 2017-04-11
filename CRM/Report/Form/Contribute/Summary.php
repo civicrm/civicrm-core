@@ -264,7 +264,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
           ),
         ),
         'group_bys' => array(
-          'batch_id' => array('title' => ts('Batch ID')),
+          'batch_id' => array('title' => ts('Batch Title')),
         ),
       ),
       'civicrm_contribution_soft' => array(
