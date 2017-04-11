@@ -268,6 +268,10 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
      * Payment successfully sent to gateway - process the response now
      */
     $result = strstr($responseData, "RESULT");
+    if (empty($result)) {
+      return self::errorExit(9016, "No RESULT code from PayPal.");
+    }
+
     $nvpArray = array();
     while (strlen($result)) {
       // name
@@ -523,6 +527,9 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
         // we got a good response, drop out of loop.
         break;
       }
+    }
+    if ($responseHeaders['http_code'] != 200) {
+      return self::errorExit(9015, "Error connecting to the payflo API server.");
     }
 
     /*
