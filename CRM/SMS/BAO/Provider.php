@@ -88,30 +88,41 @@ class CRM_SMS_BAO_Provider extends CRM_SMS_DAO_Provider {
   }
 
   /**
-   * Save a new record into the database
-   * @todo create a create function to do this work
-   * @param $values
+   * Create or Update an SMS provider
+   * @param array $params
+   * @param array $ids to update
+   * @return array saved values
    */
-  public static function saveRecord($values) {
-    $values['domain_id'] = CRM_Utils_Array::value('domain_id', $values, CRM_Core_Config::domainID());
-    $dao = new CRM_SMS_DAO_Provider();
-    $dao->copyValues($values);
-    $dao->save();
-  }
+  public static function create($params, $ids = array()) {
+    $id = CRM_Utils_Array::value('id', $ids, CRM_Utils_Array::value('id', $params));
 
-  /**
-   * Update an SMS provider in the database.
-   * @todo combine with saveRecord in a create function
-   * @param $values
-   * @param int $providerId
-   */
-  public static function updateRecord($values, $providerId) {
-    $dao = new CRM_SMS_DAO_Provider();
-    $dao->id = $providerId;
-    if ($dao->find(TRUE)) {
-      $dao->copyValues($values);
-      $dao->save();
+    if ($id) {
+      CRM_Utils_Hook::pre('edit', 'SmsProvider', $id, $params);
     }
+    else {
+      CRM_Utils_Hook::pre('create', 'SmsProvider', NULL, $params);
+    }
+
+    $provider = new static();
+    if ($id) {
+      $provider->id = $id;
+      $provider->find(TRUE);
+    }
+    if ($id) {
+      $provider->domain_id = CRM_Utils_Array::value('domain_id', $params, $provider->domain_id);
+    }
+    else {
+      $provider->domain_id = CRM_Utils_Array::value('domain_id', $params, CRM_Core_Config::domainID());
+    }
+    $provider->copyValues($params);
+    $result = $provider->save();
+    if ($id) {
+      CRM_Utils_Hook::post('edit', 'SmsProvider', $provider->id, $provider);
+    }
+    else {
+      CRM_Utils_Hook::post('create', 'SmsProvider', NULL, $provider);
+    }
+    return $result;
   }
 
   /**

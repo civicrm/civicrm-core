@@ -171,11 +171,14 @@ class CRM_SMS_Form_Provider extends CRM_Core_Form {
     $recData['is_active'] = CRM_Utils_Array::value('is_active', $recData, 0);
     $recData['is_default'] = CRM_Utils_Array::value('is_default', $recData, 0);
 
-    if ($this->_action & CRM_Core_Action::UPDATE) {
-      CRM_SMS_BAO_Provider::updateRecord($recData, $this->_id);
-    }
-    elseif ($this->_action & CRM_Core_Action::ADD) {
-      CRM_SMS_BAO_Provider::saveRecord($recData);
+    if ($this->_action && (CRM_Core_Action::UPDATE || CRM_Core_Action::ADD)) {
+      if (!empty($this->_id)) {
+        $ids = array('id' => $this->_id);
+      }
+      else {
+        $ids = array();
+      }
+      CRM_SMS_BAO_Provider::create($recData, $ids);
     }
   }
 
