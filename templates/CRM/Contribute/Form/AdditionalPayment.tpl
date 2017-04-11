@@ -109,13 +109,13 @@
         <table class="form-layout-compressed" >
           <tr class="crm-payment-form-block-trxn_date">
             <td class="label">{$form.trxn_date.label}</td>
-            <td {$valueStyle}>{include file="CRM/common/jcalendar.tpl" elementName=trxn_date}<br />
+            <td>{$form.trxn_date.html}<br />
               <span class="description">{ts}The date this payment was received.{/ts}</span>
             </td>
           </tr>
           <tr class="crm-payment-form-block-payment_instrument_id">
             <td class="label">{$form.payment_instrument_id.label}</td>
-            <td {$valueStyle}>{$form.payment_instrument_id.html} {help id="payment_instrument_id"}</td>
+            <td >{$form.payment_instrument_id.html} {help id="payment_instrument_id"}</td>
             </td>
           </tr>
           {if $showCheckNumber || !$isOnline}
@@ -126,7 +126,7 @@
           {/if}
           <tr class="crm-payment-form-block-trxn_id">
             <td class="label">{$form.trxn_id.label}</td>
-            <td {$valueStyle}>{$form.trxn_id.html} {help id="id-trans_id"}</td>
+            <td>{$form.trxn_id.html} {help id="id-trans_id"}</td>
           </tr>
           {if $email and $outBound_option != 2}
             <tr class="crm-payment-form-block-is_email_receipt">
@@ -148,9 +148,9 @@
                 {$form.receipt_text.html|crmAddClass:huge}
             </td>
           </tr>
-           <tr class="crm-payment-form-block-fee_amount"><td class="label">{$form.fee_amount.label}</td><td{$valueStyle}>{$form.fee_amount.html|crmMoney:$currency:'XXX':'YYY'}<br />
+           <tr class="crm-payment-form-block-fee_amount"><td class="label">{$form.fee_amount.label}</td><td>{$form.fee_amount.html|crmMoney:$currency:'XXX':'YYY'}<br />
             <span class="description">{ts}Processing fee for this transaction (if applicable).{/ts}</span></td></tr>
-           <tr class="crm-payment-form-block-net_amount"><td class="label">{$form.net_amount.label}</td><td{$valueStyle}>{$form.net_amount.html|crmMoney:$currency:'':1}<br />
+           <tr class="crm-payment-form-block-net_amount"><td class="label">{$form.net_amount.label}</td><td>{$form.net_amount.html|crmMoney:$currency:'':1}<br />
             <span class="description">{ts}Net value of the payment (Total Amount minus Fee).{/ts}</span></td></tr>
         </table>
       </div>
