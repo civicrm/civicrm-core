@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2017
- * $Id$
- *
  */
 
 /**
@@ -65,9 +63,10 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
   /**
    * Get the domain BAO.
    *
-   * @param null $reset
+   * @param bool $reset
    *
-   * @return CRM_Core_BAO_Domain|null
+   * @return \CRM_Core_BAO_Domain
+   * @throws \CRM_Core_Exception
    */
   public static function getDomain($reset = NULL) {
     static $domain = NULL;
@@ -75,7 +74,7 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
       $domain = new CRM_Core_BAO_Domain();
       $domain->id = CRM_Core_Config::domainID();
       if (!$domain->find(TRUE)) {
-        CRM_Core_Error::fatal();
+        throw new CRM_Core_Exception('No domain in DB');
       }
     }
     return $domain;
