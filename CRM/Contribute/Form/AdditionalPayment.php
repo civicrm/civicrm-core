@@ -513,9 +513,6 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     $paymentParams['contactID'] = $this->_contactId;
     CRM_Core_Payment_Form::mapParams($this->_bltID, $this->_params, $paymentParams, TRUE);
 
-    // add some financial type details to the params list
-    // if folks need to use it
-    $paymentParams['contributionType_name'] = $this->_params['contributionType_name'] = $contributionType->name;
     $paymentParams['contributionPageID'] = NULL;
     if (!empty($this->_params['is_email_receipt'])) {
       $paymentParams['email'] = $this->_contributorEmail;
