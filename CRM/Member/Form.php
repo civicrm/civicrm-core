@@ -169,6 +169,7 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
       );
       CRM_Core_Payment_Form::buildPaymentForm($this, $this->_paymentProcessor, FALSE, TRUE);
     }
+
     // Build the form for auto renew. This is displayed when in credit card mode or update mode.
     // The reason for showing it in update mode is not that clear.
     if ($this->_mode || ($this->_action & CRM_Core_Action::UPDATE)) {
@@ -189,7 +190,6 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
         ts('Membership renewed automatically')
       );
 
-      $this->assignPaymentRelatedVariables();
     }
     $this->assign('autoRenewOptions', json_encode($this->membershipTypeRenewalStatus));
 
@@ -303,9 +303,7 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
       }
     }
 
-    if ($this->_mode) {
-      $this->assignPaymentRelatedVariables();
-    }
+    $this->assignPaymentRelatedVariables();
 
     if ($this->_id) {
       $this->_memType = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $this->_id, 'membership_type_id');
@@ -441,6 +439,7 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
    * @param array $formValues
    */
   public function testSubmit($formValues) {
+    $this->setContextVariables($formValues);
     $this->_memType = $formValues['membership_type_id'][1];
     $this->_params = $formValues;
     $this->submit();

@@ -411,6 +411,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'billing_last_name' => 'Gruffier',
       'selectMembership' => $this->_ids['membership_type'],
       'email-Primary' => 'billy-goat@the-new-bridge.net',
+      'payment_processor_id' => $this->params['payment_processor_id'],
     );
 
     $this->callAPISuccess('contribution_page', 'submit', $submitParams);
