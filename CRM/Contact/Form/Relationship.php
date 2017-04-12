@@ -357,25 +357,37 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
   }
 
   /**
+   * This function is called when the form is submitted and also from unit test.
+   * @param array $params
+   *
+   * @return array
+   */
+  public function submit($params) {
+    switch ($this->getAction()) {
+      case CRM_Core_Action::DELETE:
+        $this->deleteAction($this->_relationshipId);
+        return array();
+
+      case CRM_Core_Action::UPDATE:
+        return $this->updateAction($params);
+
+      default:
+        return $this->createAction($params);
+    }
+  }
+
+  /**
    * This function is called when the form is submitted.
    */
   public function postProcess() {
     // Store the submitted values in an array.
     $params = $this->controller->exportValues($this->_name);
 
-    switch ($this->getAction()) {
-      case CRM_Core_Action::DELETE:
-        $this->deleteAction($this->_relationshipId);
-        return;
-
-      case CRM_Core_Action::UPDATE:
-        list ($params, $relationshipIds) = $this->updateAction($params);
-        break;
-
-      default:
-        list ($params, $relationshipIds) = $this->createAction($params);
-        break;
+    $values = $this->submit($params);
+    if (empty($values)) {
+      return;
     }
+    list ($params, $relationshipIds) = $values;
 
     // if this is called from case view,
     //create an activity for case role removal.CRM-4480
@@ -513,7 +525,12 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
     $params = $this->preparePostProcessParameters($params);
     $params = $params[0];
 
-    CRM_Contact_BAO_Relationship::create($params);
+    try {
+      civicrm_api3('relationship', 'create', $params);
+    }
+    catch (CiviCRM_API3_Exception $e) {
+      throw new CRM_Core_Exception('Relationship create error ' . $e->getMessage());
+    }
 
     $this->clearCurrentEmployer($params);
 

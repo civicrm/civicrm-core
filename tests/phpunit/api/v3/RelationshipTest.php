@@ -356,7 +356,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
   /**
    * Check relationship creation with custom data.
    */
-  public function testRelationshipCreateWithCustomData() {
+  public function testRelationshipCreateEditWithCustomData() {
     $this->createCustomGroup();
     $this->_ids = $this->createCustomField();
     //few custom Values for comparing
@@ -381,6 +381,21 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
       'id' => $result['id'],
     );
     $this->assertDBState('CRM_Contact_DAO_Relationship', $result['id'], $relationParams);
+
+    //Test Edit of custom field from the form.
+    $getParams = array('id' => $result['id']);
+    $updateParams = array_merge($getParams, array(
+      "custom_{$this->_ids[0]}" => 'Edited Text Value',
+      'relationship_type_id' => $this->_relTypeID . '_b_a',
+      'related_contact_id' => $this->_cId_a,
+    ));
+    $reln = new CRM_Contact_Form_Relationship();
+    $reln->_action = CRM_Core_Action::UPDATE;
+    $reln->_relationshipId = $result['id'];
+    $reln->submit($updateParams);
+
+    $check = $this->callAPISuccess('relationship', 'get', $getParams);
+    $this->assertEquals("Edited Text Value", $check['values'][$check['id']]["custom_{$this->_ids[0]}"]);
 
     $params['id'] = $result['id'];
     $this->callAPISuccess('relationship', 'delete', $params);
@@ -444,10 +459,8 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
       'is_active' => 1,
     );
 
-    $this->callAPISuccess('CustomField', 'create', $params);
-
-    $customField = NULL;
-    $ids[] = $customField['result']['customFieldId'];
+    $customField = $this->callAPISuccess('CustomField', 'create', $params);
+    $ids[] = $customField['id'];
 
     $optionValue[] = array(
       'label' => 'Red',
