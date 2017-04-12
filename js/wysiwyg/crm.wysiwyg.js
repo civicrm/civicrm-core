@@ -34,14 +34,15 @@
     },
     // Fallback function to use when a wysiwyg has not been initialized
     _insertIntoTextarea: function(item, text) {
-      var origVal = $(item).val();
-      var origPos = item[0].selectionStart;
-      var newVal = origVal + text;
-      $(item).val(newVal);
+      itemObj = $(item);
+      var origVal = itemObj.val();
+      var origPos = itemObj[0].selectionStart;
+      var newVal = origVal.substring(0, origPos) + text + origVal.substring(origPos, origPos.length);
+      itemObj.val(newVal);
       var newPos = (origPos + text.length);
-      item[0].selectionStart = newPos;
-      item[0].selectionEnd = newPos;
-      $(item).triggerHandler('change');
+      itemObj[0].selectionStart = newPos;
+      itemObj[0].selectionEnd = newPos;
+      itemObj.triggerHandler('change');
       CRM.wysiwyg.focus(item);
     },
     // Create a "collapsed" textarea that expands into a wysiwyg when clicked
