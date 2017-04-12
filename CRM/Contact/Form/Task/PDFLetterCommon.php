@@ -37,6 +37,20 @@
 class CRM_Contact_Form_Task_PDFLetterCommon {
 
   /**
+   * @return array
+   *   Array(string $machineName => string $label).
+   */
+  public static function getLoggingOptions() {
+    return array(
+      'none' => ts('Do not record'),
+      'multiple' => ts('Multiple activities (one per contact)'),
+      'combined' => ts('One combined activity'),
+      'combined-attached' => ts('One combined activity plus one file attachment'),
+      // 'multiple-attached' <== not worth the work
+    );
+  }
+
+  /**
    * Build all the data structures needed to build the form.
    *
    * @param CRM_Core_Form $form
