@@ -290,7 +290,7 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
    * Return domain information / user information for the useage in receipts
    * Try default from adress then fall back to using logged in user details
    */
-  public function getDefaultReceiptFrom() {
+  public static function getDefaultReceiptFrom() {
     $domain = civicrm_api3('domain', 'getsingle', array('id' => CRM_Core_Config::domainID()));
     if (!empty($domain['from_email'])) {
       return array($domain['from_name'], $domain['from_email']);

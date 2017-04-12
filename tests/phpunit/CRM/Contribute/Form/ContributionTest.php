@@ -426,6 +426,58 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test the submit function that completes the partially paid payment using Credit Card
+   */
+  public function testPartialPaymentWithCreditCard() {
+    // create a partially paid contribution by using back-office form
+    $form = new CRM_Contribute_Form_Contribution();
+    $form->testSubmit(array(
+      'total_amount' => 50,
+      'financial_type_id' => 1,
+      'receive_date' => '04/21/2015',
+      'receive_date_time' => '11:27PM',
+      'contact_id' => $this->_individualId,
+      'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
+      'check_number' => substr(sha1(rand()), 0, 7),
+      'billing_city-5' => 'Vancouver',
+      'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Partially paid'),
+    ), CRM_Core_Action::ADD
+    );
+    $contribution = $this->callAPISuccessGetSingle('Contribution', array());
+    $this->assertNotEmpty($contribution);
+    $this->assertEquals('Partially paid', $contribution['contribution_status']);
+
+    // pay additional amount by using Credit Card
+    $form = new CRM_Contribute_Form_AdditionalPayment();
+    $form->controller = new CRM_Core_Controller();
+
+    $form->testSubmit(array(
+      'id' => $contribution['id'],
+      'contact_id' => $this->_individualId,
+      'total_amount' => 50,
+      'currency' => 'USD',
+      'financial_type_id' => 1,
+      'receive_date' => '04/21/2015',
+      'receive_date_time' => '11:27PM',
+      'payment_instrument_id' => array_search('Credit card', $this->paymentInstruments),
+      'payment_processor_id' => $this->paymentProcessorID,
+      'credit_card_exp_date' => array('M' => 5, 'Y' => 2025),
+      'credit_card_number' => '411111111111111',
+      'cvv2' => 234,
+      'credit_card_type' => 'Visa',
+      'billing_city-5' => 'Vancouver',
+      'billing_state_province_id-5' => 1059,
+      'billing_postal_code-5' => 1321312,
+      'billing_country_id-5' => 1228,
+      'trxn_date' => '2017-04-11 13:05:11',
+    ), 'live');
+
+    $contribution = $this->callAPISuccessGetSingle('Contribution', array());
+    $this->assertNotEmpty($contribution);
+    $this->assertEquals('Completed', $contribution['contribution_status']);
+  }
+
+  /**
    * Test the submit function does not create a billing address if no details provided.
    */
   public function testSubmitCreditCardWithNoBillingAddress() {
