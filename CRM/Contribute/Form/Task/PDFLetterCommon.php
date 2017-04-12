@@ -248,14 +248,17 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
     foreach ($contributionIDs as $item => $contributionId) {
       // get contribution information
 
-      // retrieve contribution tokens listed in $messageToken using Contribution.Get API
-      $contributions[$contributionId] = array();
+      // basic return attributes needed, see below for there usage
+      $returnValues = array('contact_id', 'total_amount');
       if (!empty($messageToken['contribution'])) {
-        $contributions[$contributionId] = civicrm_api3('Contribution', 'getsingle', array(
-          'id' => $contributionId,
-          'return' => $messageToken['contribution'],
-        ));
+        $returnValues = array_merge($messageToken['contribution'], $returnValues);
       }
+      // retrieve contribution tokens listed in $returnProperties using Contribution.Get API
+      $contribution = civicrm_api3('Contribution', 'getsingle', array(
+        'id' => $contributionId,
+        'return' => $returnValues,
+      ));
+      $contributions[$contributionId] = $contribution;
 
       if ($isIncludeSoftCredits) {
         //@todo find out why this happens & add comments
