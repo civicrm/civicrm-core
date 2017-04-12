@@ -554,7 +554,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
     // For displaying relationship status.
     if (!$isStatusFilter && $relStatus) {
       $statistics['filters'][] = array(
-        'title' => 'Relationship Status',
+        'title' => ts('Relationship Status'),
         'value' => $relStatus,
       );
     }

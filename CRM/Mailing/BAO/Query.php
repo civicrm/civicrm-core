@@ -42,7 +42,7 @@ class CRM_Mailing_BAO_Query {
       self::$_mailingFields = array();
       $_mailingFields['mailing_id'] = array(
         'name' => 'mailing_id',
-        'title' => 'Mailing ID',
+        'title' => ts('Mailing ID'),
         'where' => 'civicrm_mailing.id',
       );
     }
