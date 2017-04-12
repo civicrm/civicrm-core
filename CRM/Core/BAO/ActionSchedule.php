@@ -304,11 +304,11 @@ FROM civicrm_action_schedule cas
             ->context('actionSearchResult', (object) $dao->toArray());
           foreach ($tokenProcessor->evaluate()->getRows() as $tokenRow) {
             if ($actionSchedule->mode == 'SMS' or $actionSchedule->mode == 'User_Preference') {
-              CRM_Utils_Array::extend($errors, self::sendReminderSms($tokenRow, $actionSchedule, $dao->contactID));
+              CRM_Utils_Array::extend($errors, self::sendReminderSms($tokenRow, $actionSchedule, $dao, $mapping));
             }
 
             if ($actionSchedule->mode == 'Email' or $actionSchedule->mode == 'User_Preference') {
-              CRM_Utils_Array::extend($errors, self::sendReminderEmail($tokenRow, $actionSchedule, $dao->contactID));
+              CRM_Utils_Array::extend($errors, self::sendReminderEmail($tokenRow, $actionSchedule, $dao, $mapping));
             }
           }
         }
@@ -324,14 +324,7 @@ FROM civicrm_action_schedule cas
           'action_date_time' => $now,
         );
         CRM_Core_BAO_ActionLog::create($logParams);
-
-        // insert activity log record if needed
-        if ($actionSchedule->record_activity && empty($errors)) {
-          $caseID = empty($dao->case_id) ? NULL : $dao->case_id;
-          CRM_Core_BAO_ActionSchedule::createMailingActivity($actionSchedule, $mapping, $dao->contactID, $dao->entityID, $caseID);
-        }
       }
-
       $dao->free();
     }
   }
@@ -460,9 +453,10 @@ FROM civicrm_action_schedule cas
    * @param int $contactID
    * @param int $entityID
    * @param int|NULL $caseID
+   * @param string $activityHtml
    * @throws CRM_Core_Exception
    */
-  protected static function createMailingActivity($actionSchedule, $mapping, $contactID, $entityID, $caseID) {
+  protected static function createMailingActivity($actionSchedule, $mapping, $contactID, $entityID, $caseID, $activityHtml = '') {
     $session = CRM_Core_Session::singleton();
 
     if ($mapping->getEntity() == 'civicrm_membership') {
@@ -476,7 +470,7 @@ FROM civicrm_action_schedule cas
 
     $activityParams = array(
       'subject' => $actionSchedule->title,
-      'details' => $actionSchedule->body_html,
+      'details' => $activityHtml ? $activityHtml : $actionSchedule->body_html,
       'source_contact_id' => $session->get('userID') ? $session->get('userID') : $contactID,
       'target_contact_id' => $contactID,
       'activity_date_time' => CRM_Utils_Time::getTime('YmdHis'),
@@ -531,12 +525,14 @@ FROM civicrm_action_schedule cas
   /**
    * @param \Civi\Token\TokenRow $tokenRow
    * @param CRM_Core_DAO_ActionSchedule $schedule
-   * @param int $toContactID
+   * @param CRM_Core_DAO $dao
+   * @param array $mapping
    * @throws CRM_Core_Exception
    * @return array
    *   List of error messages.
    */
-  protected static function sendReminderSms($tokenRow, $schedule, $toContactID) {
+  protected static function sendReminderSms($tokenRow, $schedule, $dao, $mapping) {
+    $toContactID = $dao->contactID;
     $toPhoneNumber = self::pickSmsPhoneNumber($toContactID);
     if (!$toPhoneNumber) {
       return array("sms_phone_missing" => "Couldn't find recipient's phone number.");
@@ -573,7 +569,10 @@ FROM civicrm_action_schedule cas
       $activity->id,
       $userID
     );
-
+    if ($schedule->record_activity) {
+      $caseID = empty($dao->case_id) ? NULL : $dao->case_id;
+      CRM_Core_BAO_ActionSchedule::createMailingActivity($schedule, $mapping, $toContactID, $dao->entity_id, $caseID, $sms_body_text);
+    }
     return array();
   }
 
@@ -595,11 +594,13 @@ FROM civicrm_action_schedule cas
   /**
    * @param \Civi\Token\TokenRow $tokenRow
    * @param CRM_Core_DAO_ActionSchedule $schedule
-   * @param int $toContactID
+   * @param CRM_Core_DAO $dao
+   * @param array $mapping
    * @return array
    *   List of error messages.
    */
-  protected static function sendReminderEmail($tokenRow, $schedule, $toContactID) {
+  protected static function sendReminderEmail($tokenRow, $schedule, $dao, $mapping) {
+    $toContactID = $dao->contactID;
     $toEmail = CRM_Contact_BAO_Contact::getPrimaryEmail($toContactID);
     if (!$toEmail) {
       return array("email_missing" => "Couldn't find recipient's email address.");
@@ -620,6 +621,7 @@ FROM civicrm_action_schedule cas
       'subject' => $tokenRow->render('subject'),
       'entity' => 'action_schedule',
       'entity_id' => $schedule->id,
+      'reminder_id' => $dao->reminderID,
     );
 
     if (!$body_html || $tokenRow->context['contact']['preferred_mail_format'] == 'Text' ||
@@ -638,7 +640,10 @@ FROM civicrm_action_schedule cas
     if (!$result || is_a($result, 'PEAR_Error')) {
       return array('email_fail' => 'Failed to send message');
     }
-
+    if ($schedule->record_activity) {
+      $caseID = empty($dao->case_id) ? NULL : $dao->case_id;
+      CRM_Core_BAO_ActionSchedule::createMailingActivity($schedule, $mapping, $toContactID, $dao->entity_id, $caseID, $body_html);
+    }
     return array();
   }
 

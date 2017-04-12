@@ -285,6 +285,10 @@ class CRM_Utils_Mail {
         CRM_Core_Session::setStatus($message, ts('Mailing Error'), 'error');
         return FALSE;
       }
+      //make following details avilable in postemailsend hook
+      $params['to'] = $to;
+      $params['headers'] = $headers;
+      $params['message'] = $message;
       // CRM-10699
       CRM_Utils_Hook::postEmailSend($params);
       return TRUE;
