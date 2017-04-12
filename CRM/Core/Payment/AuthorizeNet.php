@@ -378,7 +378,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
     $fields['x_country'] = $this->_getParam('country');
     $fields['x_customer_ip'] = $this->_getParam('ip_address');
     $fields['x_email'] = $this->_getParam('email');
-    $fields['x_invoice_num'] = substr($this->_getParam('invoiceID'), 0, 20);
+    $fields['x_invoice_num'] = $this->_getParam('invoiceID');
     $fields['x_amount'] = $amount;
     $fields['x_currency_code'] = $this->_getParam('currencyID');
     $fields['x_description'] = $this->_getParam('description');
