@@ -3118,10 +3118,9 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'id' => $trxn['financial_trxn_id'],
     );
     if ($context == 'payLater') {
-      $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Accounts Receivable Account is' "));
       $compareParams = array(
         'status_id' => 1,
-        'from_financial_account_id' => CRM_Contribute_PseudoConstant::financialAccountType($contribution['financial_type_id'], $relationTypeId),
+        'from_financial_account_id' => CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($contribution['financial_type_id'], 'Accounts Receivable Account is'),
       );
     }
     elseif ($context == 'refund') {
