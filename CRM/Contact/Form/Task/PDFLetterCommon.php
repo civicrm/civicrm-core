@@ -429,8 +429,12 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
 
   /**
    * @param CRM_Core_Form $form
-   * @param $html_message
-   * @param $contactIds
+   * @param string $html_message
+   * @param array $contactIds
+   * @return array
+   *   List of activity IDs.
+   *   There may be 1 or more, depending on the system-settings
+   *   and use-case.
    *
    * @throws CRM_Core_Exception
    */
@@ -456,33 +460,62 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
     if (!empty($form->_activityId)) {
       $activityParams += array('id' => $form->_activityId);
     }
-    if ($form->_cid) {
-      $activity = CRM_Activity_BAO_Activity::create($activityParams);
-      if (!empty($form->_caseId)) {
-        $caseActivityParams = array('activity_id' => $activity->id, 'case_id' => $form->_caseId);
+
+    // This seems silly, but the old behavior was to first check `_cid`
+    // and then use the provided `$contactIds`. Probably not even necessary,
+    // but difficult to audit.
+    $contactIds = $form->_cid ? array($form->_cid) : $contactIds;
+
+    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
+
+    $activityIds = array();
+    switch (Civi::settings()->get('recordGeneratedLetters')) {
+      case 'none':
+        return array();
+
+      case 'multiple':
+        // One activity per contact.
+        foreach ($contactIds as $contactId) {
+          $activity = CRM_Activity_BAO_Activity::create($activityParams);
+          $activityIds[$contactId] = $activity->id;
+          $activityTargetParams = array(
+            'activity_id' => $activity->id,
+            'contact_id' => $contactId,
+            'record_type_id' => CRM_Utils_Array::key('Activity Targets', $activityContacts),
+          );
+          CRM_Activity_BAO_ActivityContact::create($activityTargetParams);
+        }
+
+        break;
+
+      case 'combined':
+      case 'combined-attached':
+        // One activity with all contacts.
+        $activity = CRM_Activity_BAO_Activity::create($activityParams);
+        $activityIds[] = $activity->id;
+
+        foreach ($contactIds as $contactId) {
+          $activityTargetParams = array(
+            'activity_id' => $activity->id,
+            'contact_id' => $contactId,
+            'record_type_id' => CRM_Utils_Array::key('Activity Targets', $activityContacts),
+          );
+          CRM_Activity_BAO_ActivityContact::create($activityTargetParams);
+        }
+        break;
+
+      default:
+        throw new CRM_Core_Exception("Unrecognized option in recordGeneratedLetters: " . Civi::settings()->get('recordGeneratedLetters'));
+    }
+
+    if (!empty($form->_caseId)) {
+      foreach ($activityIds as $activityId) {
+        $caseActivityParams = array('activity_id' => $activityId, 'case_id' => $form->_caseId);
         CRM_Case_BAO_Case::processCaseActivity($caseActivityParams);
       }
     }
-    else {
-      // create  Print PDF activity for each selected contact. CRM-6886
-      $activityIds = array();
-      foreach ($contactIds as $contactId) {
-        $activityID = CRM_Activity_BAO_Activity::create($activityParams);
-        $activityIds[$contactId] = $activityID->id;
-      }
-    }
 
-    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
-    $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
-
-    foreach ($contactIds as $contactId) {
-      $activityTargetParams = array(
-        'activity_id' => empty($activity->id) ? $activityIds[$contactId] : $activity->id,
-        'contact_id' => $contactId,
-        'record_type_id' => $targetID,
-      );
-      CRM_Activity_BAO_ActivityContact::create($activityTargetParams);
-    }
+    return $activityIds;
   }
 
   /**
