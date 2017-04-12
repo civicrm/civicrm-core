@@ -110,7 +110,7 @@
       case 'Case':
         return 'case_1';
       default:
-        if (!$.isEmptyObject(CRM.contactSubTypes) && ($.inArray(field_type,CRM.contactSubTypes) > -1)) {
+        if (CRM.contactSubTypes.length && ($.inArray(field_type,CRM.contactSubTypes) > -1)) {
           return 'contact_1';
         }
         else {
