@@ -310,6 +310,11 @@ FROM civicrm_action_schedule cas
             if ($actionSchedule->mode == 'Email' or $actionSchedule->mode == 'User_Preference') {
               CRM_Utils_Array::extend($errors, self::sendReminderEmail($tokenRow, $actionSchedule, $dao->contactID));
             }
+            // insert activity log record if needed
+            if ($actionSchedule->record_activity && empty($errors)) {
+              $caseID = empty($dao->case_id) ? NULL : $dao->case_id;
+              CRM_Core_BAO_ActionSchedule::createMailingActivity($tokenRow, $mapping, $dao->contactID, $dao->entityID, $caseID);
+            }
           }
         }
         catch (\Civi\Token\TokenException $e) {
@@ -324,12 +329,6 @@ FROM civicrm_action_schedule cas
           'action_date_time' => $now,
         );
         CRM_Core_BAO_ActionLog::create($logParams);
-
-        // insert activity log record if needed
-        if ($actionSchedule->record_activity && empty($errors)) {
-          $caseID = empty($dao->case_id) ? NULL : $dao->case_id;
-          CRM_Core_BAO_ActionSchedule::createMailingActivity($actionSchedule, $mapping, $dao->contactID, $dao->entityID, $caseID);
-        }
       }
 
       $dao->free();
@@ -455,14 +454,14 @@ FROM civicrm_action_schedule cas
    * WISHLIST: Instead of saving $actionSchedule->body_html, call this immediately after
    * sending the message and pass in the fully rendered text of the message.
    *
-   * @param CRM_Core_DAO_ActionSchedule $actionSchedule
+   * @param object $tokenRow
    * @param Civi\ActionSchedule\Mapping $mapping
    * @param int $contactID
    * @param int $entityID
    * @param int|NULL $caseID
    * @throws CRM_Core_Exception
    */
-  protected static function createMailingActivity($actionSchedule, $mapping, $contactID, $entityID, $caseID) {
+  protected static function createMailingActivity($tokenRow, $mapping, $contactID, $entityID, $caseID) {
     $session = CRM_Core_Session::singleton();
 
     if ($mapping->getEntity() == 'civicrm_membership') {
@@ -475,8 +474,8 @@ FROM civicrm_action_schedule cas
     }
 
     $activityParams = array(
-      'subject' => $actionSchedule->title,
-      'details' => $actionSchedule->body_html,
+      'subject' => $tokenRow->render('subject'),
+      'details' => $tokenRow->render('body_html'),
       'source_contact_id' => $session->get('userID') ? $session->get('userID') : $contactID,
       'target_contact_id' => $contactID,
       'activity_date_time' => CRM_Utils_Time::getTime('YmdHis'),
