@@ -98,7 +98,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
       'contribution' => array(
         'financial_type',
         $customFieldKey,
-      )
+      ),
     );
 
     list($contributions, $contacts) = CRM_Contribute_Form_Task_PDFLetterCommon::buildContributionArray('contact_id', $contributionIDs, $returnProperties, TRUE, TRUE, $messageToken, 'test', '**', FALSE);
