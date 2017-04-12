@@ -447,12 +447,9 @@ class CRM_Core_Payment_BaseIPN {
    * @param bool $recur
    */
   public function completeTransaction(&$input, &$ids, &$objects, &$transaction, $recur = FALSE) {
-    $isRecurring = $this->_isRecurring;
-    $isFirstOrLastRecurringPayment = $this->_isFirstOrLastRecurringPayment;
     $contribution = &$objects['contribution'];
 
-    CRM_Contribute_BAO_Contribution::completeOrder($input, $ids, $objects, $transaction, $recur, $contribution,
-      $isRecurring, $isFirstOrLastRecurringPayment);
+    CRM_Contribute_BAO_Contribution::completeOrder($input, $ids, $objects, $transaction, $recur, $contribution);
   }
 
   /**

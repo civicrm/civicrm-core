@@ -163,12 +163,13 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
 
     $this->checkMD5($paymentProcessorObject, $input);
 
+    $isFirstOrLastRecurringPayment = FALSE;
     if ($input['response_code'] == 1) {
       // Approved
       if ($first) {
         $recur->start_date = $now;
         $recur->trxn_id = $recur->processor_id;
-        $this->_isFirstOrLastRecurringPayment = CRM_Core_Payment::RECURRING_PAYMENT_START;
+        $isFirstOrLastRecurringPayment = CRM_Core_Payment::RECURRING_PAYMENT_START;
       }
       $statusName = 'In Progress';
       if (($recur->installments > 0) &&
@@ -177,7 +178,7 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
         // this is the last payment
         $statusName = 'Completed';
         $recur->end_date = $now;
-        $this->_isFirstOrLastRecurringPayment = CRM_Core_Payment::RECURRING_PAYMENT_END;
+        $isFirstOrLastRecurringPayment = CRM_Core_Payment::RECURRING_PAYMENT_END;
       }
       $recur->modified_date = $now;
       $recur->contribution_status_id = array_search($statusName, $contributionStatus);
@@ -209,6 +210,16 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
     }
 
     $this->completeTransaction($input, $ids, $objects, $transaction, $recur);
+
+    // Only Authorize.net does this so it is on the a.net class. If there is a need for other processors
+    // to do this we should make it available via the api, e.g as a parameter, changing the nuance
+    // from isSentReceipt to an array of which receipts to send.
+    // Note that there is site-by-site opinions on which notifications are good to send.
+    if ($isFirstOrLastRecurringPayment) {
+      CRM_Contribute_BAO_ContributionRecur::sendRecurringStartOrEndNotification($ids, $recur,
+        $isFirstOrLastRecurringPayment);
+    }
+
   }
 
   /**
