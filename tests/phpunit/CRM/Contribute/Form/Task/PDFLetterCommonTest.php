@@ -62,19 +62,55 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
    */
   public function testBuildContributionArray() {
     $this->_individualId = $this->individualCreate();
-    $params = array('contact_id' => $this->_individualId, 'total_amount' => 6, 'financial_type_id' => 'Donation');
-    $contributionIDs = $returnProperties = $messageToken = array();
+
+    $customGroup = $this->callAPISuccess('CustomGroup', 'create', array(
+      'title' => 'Test Custom Set for Contribution',
+      'extends' => 'Contribution',
+      'is_active' => TRUE,
+    ));
+    $params = array(
+      'custom_group_id' => $customGroup['id'],
+      'label' => 'Text field',
+      'html_type' => 'Text',
+      'data_type' => 'String',
+      'weight' => 1,
+      'is_active' => 1,
+    );
+    $customField = $this->callAPISuccess('CustomField', 'create', $params);
+    $customFieldKey = 'custom_' . $customField['id'];
+
+    $params = array(
+      'contact_id' => $this->_individualId,
+      'total_amount' => 6,
+      'financial_type_id' => 'Donation',
+      $customFieldKey => 'Text_' . substr(sha1(rand()), 0, 7),
+    );
+    $contributionIDs = $returnProperties = array();
     $result = $this->callAPISuccess('Contribution', 'create', $params);
     $contributionIDs[] = $result['id'];
     $result = $this->callAPISuccess('Contribution', 'create', $params);
     $contributionIDs[] = $result['id'];
     $this->hookClass->setHook('civicrm_tokenValues', array($this, 'hookTokenValues'));
 
+    // assume that there are two token {contribution.financial_type} and
+    // {contribution.custom_N} in message content
+    $messageToken = array(
+      'contribution' => array(
+        'financial_type',
+        $customFieldKey,
+      ),
+    );
+
     list($contributions, $contacts) = CRM_Contribute_Form_Task_PDFLetterCommon::buildContributionArray('contact_id', $contributionIDs, $returnProperties, TRUE, TRUE, $messageToken, 'test', '**', FALSE);
 
     $this->assertEquals('Anthony', $contacts[$this->_individualId]['first_name']);
     $this->assertEquals('emo', $contacts[$this->_individualId]['favourite_emoticon']);
     $this->assertEquals('Donation', $contributions[$result['id']]['financial_type']);
+    // CRM-20359: assert that contribution custom field token is rightfully replaced by its value
+    $this->assertEquals($params[$customFieldKey], $contributions[$result['id']][$customFieldKey]);
+
+    $this->customFieldDelete($customField['id']);
+    $this->customGroupDelete($customGroup['id']);
   }
 
   /**
