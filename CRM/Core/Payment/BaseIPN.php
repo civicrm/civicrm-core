@@ -392,6 +392,8 @@ class CRM_Core_Payment_BaseIPN {
   }
 
   /**
+   * @deprecated
+   *
    * Jumbled up function.
    *
    * The purpose of this function is to transition a pending transaction to Completed including updating any
