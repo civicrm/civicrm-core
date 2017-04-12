@@ -555,7 +555,7 @@ WHERE li.contribution_id = %1";
 
     if (!$entityId) {
       $priceSetDetails = CRM_Price_BAO_PriceSet::getDefaultPriceSet($entityTable);
-      $totalAmount = CRM_Utils_Array::value('total_amount', $params);
+      $totalAmount = CRM_Utils_Array::value('partial_payment_total', $params, CRM_Utils_Array::value('total_amount', $params));
       $financialType = CRM_Utils_Array::value('financial_type_id', $params);
       foreach ($priceSetDetails as $values) {
         if ($entityTable == 'membership') {
