@@ -59,6 +59,12 @@
                 <p class="description">{ts}If enabled, CiviCRM sends PDF receipt as an attachment during event signup or online contribution.{/ts}</p>
             </td>
         </tr>
+        <tr class="crm-miscellaneous-form-block-recordGeneratedLetters">
+            <td class="label">{$form.recordGeneratedLetters.label}</td>
+            <td>{$form.recordGeneratedLetters.html}<br />
+                <p class="description">{ts}When generating a letter (PDF/Word) via mail-merge, how should the letter be recorded?{/ts}</p>
+            </td>
+        </tr>
         <tr class="crm-miscellaneous-form-block-wkhtmltopdfPath">
             <td class="label">{$form.wkhtmltopdfPath.label}</td>
             <td>{$form.wkhtmltopdfPath.html}<br />
