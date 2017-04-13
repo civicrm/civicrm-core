@@ -943,6 +943,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $params['is_email_receipt'] = $isEmailReceipt;
     }
     $params['is_recur'] = $isRecur;
+    $params['payment_instrument_id'] = $contributionParams['payment_instrument_id'];
     $recurringContributionID = self::processRecurringContribution($form, $params, $contactID, $financialType);
     $nonDeductibleAmount = self::getNonDeductibleAmount($params, $financialType, $online, $form);
 
@@ -1668,8 +1669,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       // also it reset any payment processor selection result into pending free membership
       // so its a kind of hack to complete free membership at this point since there is no $form->_paymentProcessor info
       if (!empty($membershipContribution) && !is_a($membershipContribution, 'CRM_Core_Error')) {
-        $paymentProcessorIDs = explode(CRM_Core_DAO::VALUE_SEPARATOR, CRM_Utils_Array::value('payment_processor', $this->_values));
-        if (empty($form->_paymentProcessor) && !empty($paymentProcessorIDs)) {
+        if (empty($form->_paymentProcessor)) {
+          // @todo this can maybe go now we are setting payment_processor_id = 0 more reliably.
+          $paymentProcessorIDs = explode(CRM_Core_DAO::VALUE_SEPARATOR, CRM_Utils_Array::value('payment_processor', $this->_values));
           $this->_paymentProcessor['id'] = $paymentProcessorIDs[0];
         }
         $result = array('payment_status_id' => 1, 'contribution' => $membershipContribution);
@@ -1943,10 +1945,14 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $form->_values['fee'] = $priceSetFields['fields'];
     $form->_priceSetId = $priceSetID;
     $form->setFormAmountFields($priceSetID);
+    $capabilities = array();
+    if ($form->_mode) {
+      $capabilities[] = (ucfirst($form->_mode) . 'Mode');
+    }
+    $form->_paymentProcessors = CRM_Financial_BAO_PaymentProcessor::getPaymentProcessors($capabilities);
+    $form->_params['payment_processor_id'] = !empty($params['payment_processor_id']) ? $params['payment_processor_id'] : 0;
+    $form->_paymentProcessor = $form->_paymentProcessors[$form->_params['payment_processor_id']];
     if (!empty($params['payment_processor_id'])) {
-      $form->_paymentProcessor = civicrm_api3('payment_processor', 'getsingle', array(
-        'id' => $params['payment_processor_id'],
-      ));
       // The concept of contributeMode is deprecated as is the billing_mode concept.
       if ($form->_paymentProcessor['billing_mode'] == 1) {
         $form->_contributeMode = 'direct';
@@ -1954,9 +1960,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       else {
         $form->_contributeMode = 'notify';
       }
-    }
-    else {
-      $form->_params['payment_processor_id'] = 0;
     }
 
     $priceFields = $priceFields[$priceSetID]['fields'];

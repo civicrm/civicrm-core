@@ -43,6 +43,12 @@ class CRM_Financial_Form_Payment extends CRM_Core_Form {
    * @var array
    */
   public $_paymentProcessor;
+
+  /**
+   * @var bool
+   */
+  public $isBackOffice = FALSE;
+
   /**
    * Set variables up before form is built.
    */
@@ -55,6 +61,9 @@ class CRM_Financial_Form_Payment extends CRM_Core_Form {
       TRUE);
     $this->currency = CRM_Utils_Request::retrieve('currency', 'String', CRM_Core_DAO::$_nullObject,
       TRUE);
+
+    $this->paymentInstrumentID = CRM_Utils_Request::retrieve('payment_instrument_id', 'Integer');
+    $this->isBackOffice = CRM_Utils_Request::retrieve('is_back_office', 'Integer');
 
     $this->assignBillingType();
 
@@ -100,7 +109,6 @@ class CRM_Financial_Form_Payment extends CRM_Core_Form {
    * @param int $paymentProcessorID
    */
   public static function addCreditCardJs($paymentProcessorID = NULL) {
-    $creditCards = array();
     $creditCards = CRM_Financial_BAO_PaymentProcessor::getCreditCards($paymentProcessorID);
     $creditCardTypes = CRM_Core_Payment_Form::getCreditCardCSSNames($creditCards);
     CRM_Core_Resources::singleton()

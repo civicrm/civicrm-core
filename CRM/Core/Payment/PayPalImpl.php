@@ -137,6 +137,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    * @param CRM_Core_Form $form
    */
   protected function addPaypalExpressCode(&$form) {
+    // @todo use $this->isBackOffice() instead, test.
     if (empty($form->isBackOffice)) {
       $form->_expressButtonName = $form->getButtonName('upload', 'express');
       $form->assign('expressButtonName', $form->_expressButtonName);

@@ -138,6 +138,15 @@ class CRM_Core_Payment_Manual extends CRM_Core_Payment {
   }
 
   /**
+   * Set payment instrument id.
+   *
+   * @param int $paymentInstrumentID
+   */
+  public function setPaymentInstrumentID($paymentInstrumentID) {
+    $this->paymentInstrumentID = $paymentInstrumentID;
+  }
+
+  /**
    * Get the name of the payment type.
    *
    * @return string
@@ -170,6 +179,15 @@ class CRM_Core_Payment_Manual extends CRM_Core_Payment {
    * @return bool
    */
   public function supportsEditRecurringContribution() {
+    return TRUE;
+  }
+
+  /**
+   * Are back office payments supported.
+   *
+   * @return bool
+   */
+  protected function supportsBackOffice() {
     return TRUE;
   }
 

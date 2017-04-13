@@ -1110,6 +1110,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     $joinDate = $startDate = $endDate = NULL;
     $membershipTypes = $membership = $calcDate = array();
     $membershipType = NULL;
+    $paymentInstrumentID = $this->_paymentProcessor['object']->getPaymentInstrumentID();
 
     $mailSend = FALSE;
     $formValues = $this->setPriceSetParameters($formValues);
@@ -1139,6 +1140,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
 
     $config = CRM_Core_Config::singleton();
 
+    // @todo this is no longer required if we convert some date fields.
     $this->convertDateFieldsToMySQL($formValues);
 
     $membershipTypeValues = array();
@@ -1362,11 +1364,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         $params['financial_type_id'] = CRM_Utils_Array::value('financial_type_id', $formValues);
       }
 
-      // @todo - test removing this line. The beginPostProcess Function should have done it for us.
-      $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($formValues['payment_processor_id'],
-        $this->_mode
-      );
-
       //get the payment processor id as per mode. Try removing in favour of beginPostProcess.
       $params['payment_processor_id'] = $formValues['payment_processor_id'] = $this->_paymentProcessor['id'];
       $params['register_date'] = date('YmdHis');
@@ -1411,7 +1408,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         $financialType->id = $params['financial_type_id'];
         $financialType->find(TRUE);
         $this->_params = $formValues;
-        $paymentParams['payment_instrument_id'] = $this->_paymentProcessor['payment_instrument_id'];
+
         $contribution = CRM_Contribute_Form_Contribution_Confirm::processFormContribution($this,
           $paymentParams,
           NULL,
@@ -1423,7 +1420,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
             'contribution_page_id' => CRM_Utils_Array::value('contribution_page_id', $formValues),
             'source' => CRM_Utils_Array::value('source', $paymentParams, CRM_Utils_Array::value('description', $paymentParams)),
             'thankyou_date' => CRM_Utils_Array::value('thankyou_date', $paymentParams),
-            'payment_instrument_id' => $this->_paymentProcessor['payment_instrument_id'],
+            'payment_instrument_id' => $paymentInstrumentID,
           ),
           $financialType,
           FALSE,
@@ -1545,7 +1542,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
           // of a single path!
           unset($membershipParams['lineItems']);
         }
-
+        $membershipParams['payment_instrument_id'] = $paymentInstrumentID;
         $membership = CRM_Member_BAO_Membership::create($membershipParams, $ids);
         $params['contribution'] = CRM_Utils_Array::value('contribution', $membershipParams);
         unset($params['lineItems']);
