@@ -318,6 +318,14 @@ class CRM_Utils_File {
    * @param bool $dieOnErrors
    */
   public static function sourceSQLFile($dsn, $fileName, $prefix = NULL, $isQueryString = FALSE, $dieOnErrors = TRUE) {
+    if (!$isQueryString) {
+      if (FALSE === file_get_contents($fileName)) {
+        // Our file cannot be found.
+        // Using 'die' here breaks this on extension upgrade.
+        throw new CRM_Exception('Could not find the SQL file.');
+      }
+    }
+
     if ($dsn === NULL) {
       $db = CRM_Core_DAO::getConnection();
     }
