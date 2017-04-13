@@ -36,7 +36,8 @@ use Dompdf\Options;
 class CRM_Utils_PDF_Utils {
 
   /**
-   * @param $text
+   * @param array $text
+   *   List of HTML snippets.
    * @param string $fileName
    * @param bool $output
    * @param null $pdfFormat

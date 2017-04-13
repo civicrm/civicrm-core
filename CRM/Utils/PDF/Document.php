@@ -57,6 +57,7 @@ class CRM_Utils_PDF_Document {
    * Convert html to a Doc file.
    *
    * @param array $pages
+   *   List of HTML snippets.
    * @param string $fileName
    * @param array|int $format
    */
@@ -176,7 +177,8 @@ class CRM_Utils_PDF_Document {
    * @param string $filePath
    *   Document file path
    * @param array $contents
-   *   Content of formatted/token-replaced document
+   *   Content of formatted/token-replaced document.
+   *   List of HTML snippets.
    * @param string $docType
    *   Document type e.g. odt/docx
    * @param clsTbsZip $zip
