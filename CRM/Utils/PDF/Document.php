@@ -59,6 +59,8 @@ class CRM_Utils_PDF_Document {
    * @param array $pages
    *   List of HTML snippets.
    * @param string $fileName
+   *   The logical filename to return to client.
+   *   Ex: "HelloWorld.odt".
    * @param array|int $format
    */
   public static function html2doc($pages, $fileName, $format = array()) {
@@ -101,7 +103,13 @@ class CRM_Utils_PDF_Document {
   /**
    * @param object|string $phpWord
    * @param string $ext
+   *   File extension/type.
+   *   Ex: docx, odt, html.
    * @param string $fileName
+   *   The logical filename to return to client.
+   *   Ex: "HelloWorld.odt".
+   *   Alternatively, a full path of a file to display. This seems sketchy.
+   *   Ex: "/var/lib/data/HelloWorld.odt".
    */
   public static function printDoc($phpWord, $ext, $fileName) {
     $formats = array(
@@ -178,7 +186,8 @@ class CRM_Utils_PDF_Document {
    *   Content of formatted/token-replaced document.
    *   List of HTML snippets.
    * @param string $fileName
-   *   Document file name
+   *   The logical filename to return to client.
+   *   Ex: "HelloWorld.odt".
    * @param string $docType
    *   Document type e.g. odt/docx
    * @param clsTbsZip $zip
