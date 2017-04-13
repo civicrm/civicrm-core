@@ -607,7 +607,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
    */
   private static function getMimeType($type) {
     $mimeTypes = array(
-      'pdf' => 'applicatoin/pdf',
+      'pdf' => 'application/pdf',
       'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
       'odt' => 'application/vnd.oasis.opendocument.text',
       'html' => 'text/html',
