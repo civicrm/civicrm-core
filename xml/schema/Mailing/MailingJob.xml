@@ -32,19 +32,25 @@
   <field>
     <name>scheduled_date</name>
     <title>Mailing Scheduled Date</title>
-    <type>datetime</type>
+    <type>timestamp</type>
+    <default>NULL</default>
+    <required>false</required>
     <comment>date on which this job was scheduled.</comment>
   </field>
   <field>
     <name>start_date</name>
     <title>Mailing Job Start Date</title>
-    <type>datetime</type>
+    <type>timestamp</type>
+    <default>NULL</default>
+    <required>false</required>
     <comment>date on which this job was started.</comment>
   </field>
   <field>
     <name>end_date</name>
     <title>Mailing Job End Date</title>
-    <type>datetime</type>
+    <type>timestamp</type>
+    <default>NULL</default>
+    <required>false</required>
     <comment>date on which this job ended.</comment>
   </field>
   <field>
