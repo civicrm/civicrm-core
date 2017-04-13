@@ -346,9 +346,6 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
     $this->addTask('CRM-16633 - Add "Change Case Subject" activity', 'addChangeCaseSubjectActivityType');
     $this->addTask('Add is_public column to civicrm_custom_group', 'addColumn',
       'civicrm_custom_group', 'is_public', "boolean DEFAULT '1' COMMENT 'Is this property public?'");
-
-    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
-    $this->addTask(ts('Add column to support bi-directional relationship types'), 'addBidirectionRelationshipTypeField');
   }
 
   /**
@@ -361,6 +358,16 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
     $this->addTask('Add activity_status column to civicrm_mail_settings', 'addColumn',
       'civicrm_mail_settings', 'activity_status', "varchar (255) DEFAULT NULL COMMENT 'Name of status to use when creating email to activity.'");
+  }
+
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_4_7_22($rev) {
+    $this->addTask(ts('Add column to support bi-directional relationship types'), 'addColumn',
+      'civicrm_relationship_type', 'is_bidirectional', "tinyint(4) DEFAULT '0' COMMENT 'Can this relationship type be used bi-directionaly?'");
   }
 
   /*

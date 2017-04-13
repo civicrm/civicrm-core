@@ -64,7 +64,7 @@
             <tr class="crm-relationship-type-form-block-is_bidirectional">
                 <td class="label">{$form.is_bidirectional.label}</td>
                 <td>{$form.is_bidirectional.html}<br />
-                  <span class="description">{ts}Can a 'B to A' relationship be created when their is's an existing 'A to B' relationship?{/ts}</span>
+                  <span class="description">{ts}Can this relationship exist in both directions simultaneously (eg A follows B and B follows A). If no, CiviCRM rejects the second relationship's creation as being a duplicate.{/ts}</span>
                 </td>
             </tr>
         </table>

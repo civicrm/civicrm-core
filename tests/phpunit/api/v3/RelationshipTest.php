@@ -205,6 +205,10 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     );
     $this->callAPIFailure('relationship', 'create', $params, 'Duplicate Relationship');
 
+    $params['contact_id_a'] = $this->_cId_b;
+    $params['contact_id_b'] = $this->_cId_a;
+    $this->callAPIFailure('relationship', 'create', $params, 'Duplicate Relationship');
+
     $params['id'] = $relationship['id'];
     $this->callAPISuccess('relationship', 'delete', $params);
   }
@@ -1290,6 +1294,38 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     // Deleting the organization should cause the related membership to be deleted.
     $this->callAPISuccess('contact', 'delete', array('id' => $this->_cId_b));
     $this->callAPISuccessGetCount('membership', array('contact_id' => $this->_cId_a), 0);
+  }
+
+  /**
+   * Check bi-directional relationship setting.
+   */
+  public function testBidirectionalRelationship() {
+    $relTypeParams = array(
+      'name_a_b' => 'Favourite is',
+      'name_b_a' => 'Favourite of',
+      'description' => 'Testing bidirectional relationship type',
+      'contact_type_a' => 'Individual',
+      'contact_type_b' => 'Individual',
+      'is_reserved' => 1,
+      'is_active' => 1,
+      'is_bidirectional' => 1,
+    );
+    $relType = $this->relationshipTypeCreate($relTypeParams);
+
+    $params = array(
+      'contact_id_a' => $this->_cId_a,
+      'contact_id_b' => $this->_cId_a_2,
+      'relationship_type_id' => $relType,
+    );
+    $this->callAPISuccess('Relationship', 'create', $params);
+
+    $params = array(
+      'contact_id_a' => $this->_cId_a_2,
+      'contact_id_b' => $this->_cId_a,
+      'relationship_type_id' => $relType,
+    );
+    $this->callAPISuccess('Relationship', 'create', $params);
+    $this->relationshipTypeDelete($relType);
   }
 
 }

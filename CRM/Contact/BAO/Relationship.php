@@ -931,24 +931,22 @@ WHERE  relationship_type_id = " . CRM_Utils_Type::escape($type, 'Integer');
       }
     }
 
-    $is_bidirectional = CRM_Core_DAO::singleValueQuery(
-      "SELECT is_bidirectional FROM civicrm_relationship_type WHERE id=%1", array(1 => array($type, 'Int'))
-    );
+    $isBidirectional = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_RelationshipType', $type, 'is_bidirectional');
     // CRM-19630
-    $e_id = CRM_Utils_Type::escape($id, 'Integer');
-    $e_contactId = CRM_Utils_Type::escape($contactId, 'Integer');
+    $id = CRM_Utils_Type::escape($id, 'Integer');
+    $contactId = CRM_Utils_Type::escape($contactId, 'Integer');
 
-    if ($is_bidirectional) {
+    if ($isBidirectional) {
       $queryString .=
-        " AND contact_id_a = $e_id" .
-        " AND contact_id_b = $e_contactId";
+        " AND contact_id_a = $id" .
+        " AND contact_id_b = $contactId";
     }
     else {
       $queryString .=
-        " AND ( ( contact_id_a = $e_id" .
-        " AND contact_id_b = $e_contactId" .
-        " ) OR ( contact_id_a = $e_contactId" .
-        " AND contact_id_b = $e_id ) ) ";
+        " AND ( ( contact_id_a = $id" .
+        " AND contact_id_b = $contactId" .
+        " ) OR ( contact_id_a = $contactId" .
+        " AND contact_id_b = $id ) ) ";
     }
 
     //if caseId is provided, include it duplicate checking.

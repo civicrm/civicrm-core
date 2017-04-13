@@ -124,10 +124,6 @@ class CRM_Admin_Form_RelationshipType extends CRM_Admin_Form {
       if (!empty($defaults['contact_sub_type_b'])) {
         $defaults['contact_types_b'] .= '__' . $defaults['contact_sub_type_b'];
       }
-      // CRM-19630
-      $defaults['is_bidirectional'] = CRM_Contact_DAO_RelationshipType::singleValueQuery(
-        "SELECT is_bidirectional FROM civicrm_relationship_type WHERE id=%1", array(1 => array($this->_id, 'Int')));
-
       return $defaults;
     }
     else {
