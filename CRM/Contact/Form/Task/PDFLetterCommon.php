@@ -410,8 +410,12 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
       $html[] = $tokenHtml;
     }
 
-    $saveToFile = count($activityIds) === 1 && Civi::settings()->get('recordGeneratedLetters') === 'combined-attached';
+    $saveToFile = Civi::settings()->get('recordGeneratedLetters') === 'combined-attached';
     if ($saveToFile) {
+      if (count($activityIds) !== 1) {
+        throw new CRM_Core_Exception("When recordGeneratedLetters=combined-attached, there should only be one activity.");
+      }
+
       // We need to capture data from various output-generators whose only
       // consistent output format is writing to the console (for download).
       $tmpFile = tempnam(sys_get_temp_dir(), 'PDFLetterCommon-');
