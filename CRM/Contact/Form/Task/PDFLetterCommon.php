@@ -410,21 +410,12 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
       $html[] = $tokenHtml;
     }
 
-    $saveToFile = Civi::settings()->get('recordGeneratedLetters') === 'combined-attached';
-    if ($saveToFile) {
+    $tee = NULL;
+    if (Civi::settings()->get('recordGeneratedLetters') === 'combined-attached') {
       if (count($activityIds) !== 1) {
         throw new CRM_Core_Exception("When recordGeneratedLetters=combined-attached, there should only be one activity.");
       }
-
-      // We need to capture data from various output-generators whose only
-      // consistent output format is writing to the console (for download).
-      $tmpFile = tempnam(sys_get_temp_dir(), 'PDFLetterCommon-');
-      $tmpFh = fopen($tmpFile, 'w');
-      ob_start(function ($buf) use ($tmpFh) {
-        // Pass to file, then continue to stdout.
-        fwrite($tmpFh, $buf);
-        return FALSE;
-      });
+      $tee = CRM_Utils_ConsoleTee::create()->start();
     }
 
     $type = $formValues['document_type'];
@@ -444,10 +435,9 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
       CRM_Utils_PDF_Document::html2doc($html, $fileName, $formValues);
     }
 
-    if ($saveToFile) {
-      ob_end_flush();
-      fclose($tmpFh);
-      $content = file_get_contents($tmpFile, NULL, NULL, NULL, 5);
+    if ($tee) {
+      $tee->stop();
+      $content = file_get_contents($tee->getFileName(), NULL, NULL, NULL, 5);
       if (empty($content)) {
         throw new \CRM_Core_Exception("Failed to capture document content (type=$type)!");
       }
@@ -458,7 +448,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
           'name' => $fileName,
           'mime_type' => $mimeType,
           'options' => array(
-            'move-file' => $tmpFile,
+            'move-file' => $tee->getFileName(),
           ),
         ));
       }
