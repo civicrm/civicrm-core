@@ -498,8 +498,6 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
     // but difficult to audit.
     $contactIds = $form->_cid ? array($form->_cid) : $contactIds;
 
-    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
-
     $activityIds = array();
     switch (Civi::settings()->get('recordGeneratedLetters')) {
       case 'none':
@@ -508,14 +506,11 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
       case 'multiple':
         // One activity per contact.
         foreach ($contactIds as $contactId) {
-          $activity = CRM_Activity_BAO_Activity::create($activityParams);
+          $fullParams = array(
+            'target_contact_id' => $contactId,
+          ) + $activityParams;
+          $activity = CRM_Activity_BAO_Activity::create($fullParams);
           $activityIds[$contactId] = $activity->id;
-          $activityTargetParams = array(
-            'activity_id' => $activity->id,
-            'contact_id' => $contactId,
-            'record_type_id' => CRM_Utils_Array::key('Activity Targets', $activityContacts),
-          );
-          CRM_Activity_BAO_ActivityContact::create($activityTargetParams);
         }
 
         break;
@@ -523,17 +518,11 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
       case 'combined':
       case 'combined-attached':
         // One activity with all contacts.
-        $activity = CRM_Activity_BAO_Activity::create($activityParams);
+        $fullParams = array(
+          'target_contact_id' => $contactIds,
+        ) + $activityParams;
+        $activity = CRM_Activity_BAO_Activity::create($fullParams);
         $activityIds[] = $activity->id;
-
-        foreach ($contactIds as $contactId) {
-          $activityTargetParams = array(
-            'activity_id' => $activity->id,
-            'contact_id' => $contactId,
-            'record_type_id' => CRM_Utils_Array::key('Activity Targets', $activityContacts),
-          );
-          CRM_Activity_BAO_ActivityContact::create($activityTargetParams);
-        }
         break;
 
       default:
