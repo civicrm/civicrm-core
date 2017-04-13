@@ -2998,7 +2998,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
  AS SELECT ca.case_id, a.id, a.activity_date_time, a.status_id, a.activity_type_id
  FROM civicrm_case_activity ca
  INNER JOIN civicrm_activity a ON ca.activity_id=a.id
- WHERE a.activity_date_time = 
+ WHERE a.activity_date_time =
 (SELECT b.activity_date_time FROM civicrm_case_activity bca
  INNER JOIN civicrm_activity b ON bca.activity_id=b.id
  WHERE b.activity_date_time <= DATE_ADD( NOW(), INTERVAL 14 DAY )
@@ -3011,7 +3011,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
  AS SELECT ca.case_id, a.id, a.activity_date_time, a.status_id, a.activity_type_id
  FROM civicrm_case_activity ca
  INNER JOIN civicrm_activity a ON ca.activity_id=a.id
- WHERE a.activity_date_time = 
+ WHERE a.activity_date_time =
 (SELECT b.activity_date_time FROM civicrm_case_activity bca
  INNER JOIN civicrm_activity b ON bca.activity_id=b.id
  WHERE b.activity_date_time >= DATE_SUB( NOW(), INTERVAL 14 DAY )
@@ -3170,57 +3170,37 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
   }
 
   /**
-   * CRM-20308
-   * Method to get the contact id to use as from contact for email copy
+   * CRM-20308: Method to get the contact id to use as from contact for email copy
    * 1. Activity Added by Contact's email address
    * 2. System Default From Address
    * 3. Default Organization Contact email address
    * 4. Logged in user
    *
-   * @param int $activityId
+   * @param int $activityID
+   *
    * @return mixed $emailFromContactId
    * @see https://issues.civicrm.org/jira/browse/CRM-20308
    */
-  private static function getReceiptFrom($activityId) {
-    $emailFromContactId = NULL;
-    if (!empty($activityId)) {
-      try {
-        $emailFromContactId = civicrm_api3('ActivityContact', 'getvalue', array(
-          'activity_id' => $activityId,
-          'record_type_id' => 'Activity Source',
-          'return' => 'contact_id',
-        ));
-      }
-      catch (CiviCRM_API3_Exception $ex) {
-        // get default from address from domain
-        try {
-          $domain = civicrm_api3('Domain', 'getsingle', array('id' => CRM_Core_Config::domainID()));
-          if (isset($domain['from_email'])) {
-            $emailFromContactId = $domain['from_email'];
-          }
-        }
-        catch (CiviCRM_API3_Exception $ex) {
-        }
-        // if not found get email for contact_id 1
-        if (!$emailFromContactId) {
-          try {
-            $emailFromContactId = civicrm_api3('Email', 'getvalue', array(
-              'contact_id' => 1,
-              'return' => 'email',
-            ));
-          }
-          catch (CiviCRM_API3_Exception $ex) {
-          }
-        }
-      }
+  public static function getReceiptFrom($activityID) {
+    $name = $address = NULL;
 
+    if (!empty($activityID)) {
+      // There is always a 'Added by' contact for a activity,
+      //  so we can safely use ActivityContact.Getvalue API
+      $sourceContactId = civicrm_api3('ActivityContact', 'getvalue', array(
+        'activity_id' => $activityID,
+        'record_type_id' => 'Activity Source',
+        'return' => 'contact_id',
+      ));
+      list($name, $address) = CRM_Contact_BAO_Contact_Location::getEmailDetails($sourceContactId);
     }
-    // if not found, use logged in user
-    if (!$emailFromContactId) {
-      $session = CRM_Core_Session::singleton();
-      $emailFromContactId = $session->get('userID');
+
+    // If 'From' email address not found for Source Activity Contact then
+    //   fetch the email from domain or logged in user.
+    if (empty($address)) {
+      list($name, $address) = CRM_Core_BAO_Domain::getDefaultReceiptFrom();
     }
-    list($name, $address) = CRM_Contact_BAO_Contact_Location::getEmailDetails($emailFromContactId);
+
     return "$name <$address>";
   }
 
