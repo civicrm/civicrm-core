@@ -396,6 +396,8 @@ WHERE  v.option_group_id = g.id
       return NULL;
     }
 
+    Civi::log()->warning('Deprecated function, use CRM_Core_Pseudoconsant::getKey', array('civi.tag' => 'deprecated'));
+
     $query = "
 SELECT  v.label as label ,v.{$valueField} as value
 FROM   civicrm_option_value v,
