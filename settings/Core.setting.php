@@ -448,7 +448,7 @@ return array(
       'class' => 'crm-select2',
     ),
     'default' => 'multiple',
-    'add' => '4.3',
+    'add' => '4.7',
     'title' => 'Record generated letters',
     'is_domain' => 1,
     'is_contact' => 0,
