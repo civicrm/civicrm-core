@@ -384,7 +384,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
 
     if (empty($defaults['payment_instrument_id'])) {
-      $defaults['payment_instrument_id'] = key(CRM_Core_OptionGroup::values('payment_instrument', FALSE, FALSE, FALSE, 'AND is_default = 1'));
+      $defaults['payment_instrument_id'] = $this->getDefaultPaymentInstrumentId();
     }
 
     if (!empty($defaults['is_test'])) {
@@ -561,26 +561,24 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $paneNames[ts('Premium Information')] = 'Premium';
     }
 
-    if ($this->_mode) {
-      if (CRM_Core_Payment_Form::buildPaymentForm($this, $this->_paymentProcessor, FALSE, TRUE) == TRUE) {
-        if (!empty($this->_recurPaymentProcessors)) {
-          $buildRecurBlock = TRUE;
-          if ($this->_ppID) {
-            // ppID denotes a pledge payment.
-            foreach ($this->_paymentProcessors as $processor) {
-              if (!empty($processor['is_recur']) && !empty($processor['object']) && $processor['object']->supports('recurContributionsForPledges')) {
-                $buildRecurBlock = TRUE;
-                break;
-              }
-              $buildRecurBlock = FALSE;
+    if (CRM_Core_Payment_Form::buildPaymentForm($this, $this->_paymentProcessor, FALSE, TRUE, $this->getDefaultPaymentInstrumentId()) == TRUE) {
+      if (!empty($this->_recurPaymentProcessors)) {
+        $buildRecurBlock = TRUE;
+        if ($this->_ppID) {
+          // ppID denotes a pledge payment.
+          foreach ($this->_paymentProcessors as $processor) {
+            if (!empty($processor['is_recur']) && !empty($processor['object']) && $processor['object']->supports('recurContributionsForPledges')) {
+              $buildRecurBlock = TRUE;
+              break;
             }
+            $buildRecurBlock = FALSE;
           }
-          if ($buildRecurBlock) {
-            CRM_Contribute_Form_Contribution_Main::buildRecur($this);
-            $this->setDefaults(array('is_recur' => 0));
-            $this->assign('buildRecurBlock', TRUE);
-            $recurJs = array('onChange' => "buildRecurBlock( this.value ); return false;");
-          }
+        }
+        if ($buildRecurBlock) {
+          CRM_Contribute_Form_Contribution_Main::buildRecur($this);
+          $this->setDefaults(array('is_recur' => 0));
+          $this->assign('buildRecurBlock', TRUE);
+          $recurJs = array('onChange' => "buildRecurBlock( this.value ); return false;");
         }
       }
     }
@@ -1899,6 +1897,19 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
 
     return 0;
+  }
+
+  /**
+   * Get the default payment instrument id.
+   *
+   * @return int
+   */
+  protected function getDefaultPaymentInstrumentId() {
+    $paymentInstrumentID = CRM_Utils_Request::retrieve('payment_instrument_id', 'Integer');
+    if ($paymentInstrumentID) {
+      return $paymentInstrumentID;
+    }
+    return key(CRM_Core_OptionGroup::values('payment_instrument', FALSE, FALSE, FALSE, 'AND is_default = 1'));
   }
 
 }

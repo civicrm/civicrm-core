@@ -235,11 +235,6 @@
   </table>
 
   {if !$contributionMode}
-    <div class="crm-accordion-wrapper crm-accordion_title-accordion crm-accordion-processed" id="paymentDetails_Information">
-      <div class="crm-accordion-header">
-        {ts}Payment Details{/ts}
-      </div>
-      <div class="crm-accordion-body">
         <table class="form-layout-compressed" >
           <tr class="crm-contribution-form-block-receive_date">
             <td class="label">{$form.receive_date.label}</td>
@@ -287,8 +282,6 @@
             <td>{$form.from_email_address.html}</td>
           </tr>
         </table>
-      </div>
-    </div>
   {/if}
 
   {include file='CRM/Core/BillingBlockWrapper.tpl'}
