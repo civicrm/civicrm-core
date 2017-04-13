@@ -359,11 +359,11 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
     $buttonName = $form->controller->getButtonName();
     $skipOnHold = isset($form->skipOnHold) ? $form->skipOnHold : FALSE;
     $skipDeceased = isset($form->skipDeceased) ? $form->skipDeceased : TRUE;
-    $html = $document = array();
+    $html = $activityIds = array();
 
     // CRM-16725 Skip creation of activities if user is previewing their PDF letter(s)
     if ($buttonName == '_qf_PDF_upload') {
-      self::createActivities($form, $html_message, $form->_contactIds);
+      $activityIds = self::createActivities($form, $html_message, $form->_contactIds);
     }
 
     if (!empty($formValues['document_file_path'])) {
@@ -410,17 +410,53 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
       $html[] = $tokenHtml;
     }
 
+    $saveToFile = count($activityIds) === 1 && Civi::settings()->get('recordGeneratedLetters') === 'combined-attached';
+    if ($saveToFile) {
+      // We need to capture data from various output-generators whose only
+      // consistent output format is writing to the console (for download).
+      $tmpFile = tempnam(sys_get_temp_dir(), 'PDFLetterCommon-');
+      $tmpFh = fopen($tmpFile, 'w');
+      ob_start(function ($buf) use ($tmpFh) {
+        // Pass to file, then continue to stdout.
+        fwrite($tmpFh, $buf);
+        return FALSE;
+      });
+    }
+
     $type = $formValues['document_type'];
+    $mimeType = self::getMimeType($type);
 
     if ($type == 'pdf') {
-      CRM_Utils_PDF_Utils::html2pdf($html, "CiviLetter.pdf", FALSE, $formValues);
+      $fileName = "CiviLetter.$type";
+      CRM_Utils_PDF_Utils::html2pdf($html, $fileName, FALSE, $formValues);
     }
     elseif (!empty($formValues['document_file_path'])) {
       $fileName = pathinfo($formValues['document_file_path'], PATHINFO_FILENAME) . '.' . $type;
       CRM_Utils_PDF_Document::printDocuments($html, $fileName, $type, $zip);
     }
     else {
-      CRM_Utils_PDF_Document::html2doc($html, "CiviLetter.$type", $formValues);
+      $fileName = "CiviLetter.$type";
+      CRM_Utils_PDF_Document::html2doc($html, $fileName, $formValues);
+    }
+
+    if ($saveToFile) {
+      ob_end_flush();
+      fclose($tmpFh);
+      $content = file_get_contents($tmpFile, NULL, NULL, NULL, 5);
+      if (empty($content)) {
+        throw new \CRM_Core_Exception("Failed to capture document content (type=$type)!");
+      }
+      foreach ($activityIds as $activityId) {
+        civicrm_api3('Attachment', 'create', array(
+          'entity_table' => 'civicrm_activity',
+          'entity_id' => $activityId,
+          'name' => $fileName,
+          'mime_type' => $mimeType,
+          'options' => array(
+            'move-file' => $tmpFile,
+          ),
+        ));
+      }
     }
 
     $form->postProcessHook();
@@ -560,6 +596,28 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
       $m = implode($newLineOperators['br']['oper'], $messages);
     }
     $message = implode($newLineOperators['p']['oper'], $htmlMsg);
+  }
+
+  /**
+   * Convert from a vague-type/file-extension to mime-type.
+   *
+   * @param string $type
+   * @return string
+   * @throws \CRM_Core_Exception
+   */
+  private static function getMimeType($type) {
+    $mimeTypes = array(
+      'pdf' => 'applicatoin/pdf',
+      'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'odt' => 'application/vnd.oasis.opendocument.text',
+      'html' => 'text/html',
+    );
+    if (isset($mimeTypes[$type])) {
+      return $mimeTypes[$type];
+    }
+    else {
+      throw new \CRM_Core_Exception("Cannot determine mime type");
+    }
   }
 
 }
