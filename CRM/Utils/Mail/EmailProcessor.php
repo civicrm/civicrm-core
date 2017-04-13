@@ -123,7 +123,7 @@ class CRM_Utils_Mail_EmailProcessor {
 
   /**
    * @param $civiMail
-   * @param CRM_Core_DAO $dao
+   * @param CRM_Core_DAO_MailSettings $dao
    * @param bool $is_create_activities
    *   Create activities.
    *
@@ -247,6 +247,9 @@ class CRM_Utils_Mail_EmailProcessor {
           $params = _civicrm_api3_deprecated_activity_buildmailparams($mailParams, $emailActivityTypeId);
 
           $params['version'] = 3;
+          if (!empty($dao->activity_status)) {
+            $params['status_id'] = $dao->activity_status;
+          }
           $result = civicrm_api('activity', 'create', $params);
 
           if ($result['is_error']) {
