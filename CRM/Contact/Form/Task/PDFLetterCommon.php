@@ -416,7 +416,8 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
       CRM_Utils_PDF_Utils::html2pdf($html, "CiviLetter.pdf", FALSE, $formValues);
     }
     elseif (!empty($formValues['document_file_path'])) {
-      CRM_Utils_PDF_Document::printDocuments($formValues['document_file_path'], $html, $type, $zip);
+      $fileName = pathinfo($formValues['document_file_path'], PATHINFO_FILENAME) . '.' . $type;
+      CRM_Utils_PDF_Document::printDocuments($html, $fileName, $type, $zip);
     }
     else {
       CRM_Utils_PDF_Document::html2doc($html, "CiviLetter.$type", $formValues);

@@ -174,11 +174,11 @@ class CRM_Utils_PDF_Document {
   /**
    * Modify contents of docx/odt file(s) and later merged into one final document
    *
-   * @param string $filePath
-   *   Document file path
    * @param array $contents
    *   Content of formatted/token-replaced document.
    *   List of HTML snippets.
+   * @param string $fileName
+   *   Document file name
    * @param string $docType
    *   Document type e.g. odt/docx
    * @param clsTbsZip $zip
@@ -188,7 +188,7 @@ class CRM_Utils_PDF_Document {
    *
    * @return string
    */
-  public static function printDocuments($filePath, $contents, $docType, $zip, $returnFinalContent = FALSE) {
+  public static function printDocuments($contents, $fileName, $docType, $zip, $returnFinalContent = FALSE) {
     $dataMap = self::$ooxmlMap[$docType];
 
     $finalContent = $zip->FileRead($dataMap['dataFile']);
@@ -217,7 +217,6 @@ class CRM_Utils_PDF_Document {
     // Replace the loaded document file content located at $filePath with $finaContent
     $zip->FileReplace($dataMap['dataFile'], $finalContent, TBSZIP_STRING);
 
-    $fileName = pathinfo($filePath, PATHINFO_FILENAME) . '.' . $docType;
     $zip->Flush(TBSZIP_DOWNLOAD, $fileName);
   }
 
