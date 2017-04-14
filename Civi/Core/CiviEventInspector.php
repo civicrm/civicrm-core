@@ -1,13 +1,14 @@
 <?php
+namespace Civi\Core;
 
 /**
- * Class CRM_Utils_Hook_Inspector
+ * Class CiviEventInspector
  *
  * The hook inspector is a development tool which provides metadata about hooks.
  * It can be used for code-generators and documentation-generators.
  *
  * @code
- * $i = new CRM_Utils_Hook_Inspector();
+ * $i = new CiviEventInspector();
  * print_r(CRM_Utils_Array::collect('name', $i->getHooks()));
  * @endCode
  *
@@ -15,13 +16,13 @@
  * as code-generation and inspection. It should be not called by regular
  * runtime logic.
  */
-class CRM_Utils_Hook_Inspector {
+class CiviEventInspector {
 
   /**
    * Register the default hooks defined by 'CRM_Utils_Hook'.
    *
    * @param \Civi\Core\Event\GenericHookEvent $e
-   * @see CRM_Utils_Hook::hooks()
+   * @see \CRM_Utils_Hook::hooks()
    */
   public static function findBuiltInHooks(\Civi\Core\Event\GenericHookEvent $e) {
     $skipList = array('singleton');
@@ -43,12 +44,12 @@ class CRM_Utils_Hook_Inspector {
    * Perform a scan to identify/describe all hooks.
    *
    * @param bool $force
-   * @return CRM_Utils_Hook_Inspector
+   * @return CiviEventInspector
    */
   public function build($force = FALSE) {
     if ($force || $this->hooks === NULL) {
       $this->hooks = array();
-      CRM_Utils_Hook::hooks($this);
+      \CRM_Utils_Hook::hooks($this);
       ksort($this->hooks);
     }
     return $this;
@@ -96,7 +97,7 @@ class CRM_Utils_Hook_Inspector {
    * Add a new hook definition.
    *
    * @param array $hook
-   * @return CRM_Utils_Hook_Inspector
+   * @return CiviEventInspector
    */
   public function add($hook) {
     $name = isset($hook['name']) ? $hook['name'] : NULL;
@@ -112,7 +113,7 @@ class CRM_Utils_Hook_Inspector {
     }
 
     if (TRUE !== $this->validate($hook)) {
-      throw new CRM_Core_Exception("Failed to register hook ($name). Invalid definition.");
+      throw new \CRM_Core_Exception("Failed to register hook ($name). Invalid definition.");
     }
 
     $this->hooks[$name] = $hook;
@@ -130,19 +131,19 @@ class CRM_Utils_Hook_Inspector {
    *   Ex: 'hook_civicrm_'.
    * @param null|callable $filter
    *   An optional function to filter/rewrite the metadata for each hook.
-   * @return CRM_Utils_Hook_Inspector
+   * @return CiviEventInspector
    */
   public function addStaticStubs($className, $prefix = 'hook_', $filter = NULL) {
-    $class = new ReflectionClass($className);
+    $class = new \ReflectionClass($className);
 
-    foreach ($class->getMethods(ReflectionMethod::IS_STATIC) as $method) {
+    foreach ($class->getMethods(\ReflectionMethod::IS_STATIC) as $method) {
       if (!isset($method->name)) {
         continue;
       }
 
       $hook = array(
         'name' => $prefix . $method->name,
-        'description_html' => $method->getDocComment() ? CRM_Admin_Page_APIExplorer::formatDocBlock($method->getDocComment()) : '',
+        'description_html' => $method->getDocComment() ? \CRM_Admin_Page_APIExplorer::formatDocBlock($method->getDocComment()) : '',
         'fields' => array(),
         'class' => 'Civi\Core\Event\GenericHookEvent',
       );

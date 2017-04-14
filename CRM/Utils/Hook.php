@@ -1844,7 +1844,7 @@ abstract class CRM_Utils_Hook {
   /**
    * Build a description of available hooks.
    *
-   * @param CRM_Utils_Hook_Inspector $inspector
+   * @param \Civi\Core\CiviEventInspector $inspector
    */
   public static function hooks($inspector) {
     $event = \Civi\Core\Event\GenericHookEvent::create(array(

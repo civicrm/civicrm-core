@@ -1,13 +1,14 @@
 <?php
+namespace Civi\Core;
 
 /**
- * Class CRM_Utils_Hook_InspectorTest
+ * Class CiviEventInspectorTest
  * @group headless
  */
-class CRM_Utils_Hook_InspectorTest extends CiviUnitTestCase {
+class CiviEventInspectorTest extends \CiviUnitTestCase {
 
   public function testGet() {
-    $inspector = new CRM_Utils_Hook_Inspector();
+    $inspector = new CiviEventInspector();
     $hook = $inspector->get('hook_civicrm_alterSettingsMetaData');
     $this->assertEquals('hook_civicrm_alterSettingsMetaData', $hook['name']);
     $this->assertEquals(array('settingsMetaData', 'domainID', 'profile'), array_keys($hook['fields']));
@@ -18,7 +19,7 @@ class CRM_Utils_Hook_InspectorTest extends CiviUnitTestCase {
   }
 
   public function testGetAll() {
-    $inspector = new CRM_Utils_Hook_Inspector();
+    $inspector = new CiviEventInspector();
     $all = $inspector->getAll();
     $this->assertTrue(count($all) > 1);
     $this->assertTrue(isset($all['hook_civicrm_alterSettingsMetaData']));
