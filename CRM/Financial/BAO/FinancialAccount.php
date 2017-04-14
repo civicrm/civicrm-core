@@ -455,4 +455,26 @@ LIMIT 1";
     return $financialAccount;
   }
 
+  /**
+   * Get Organization Name associated with Financial Account.
+   *
+   * @param bool $checkPermissions
+   *
+   * @return array
+   *
+   */
+  public static function getOrganizationNames($checkPermissions = TRUE) {
+    $result = civicrm_api3('FinancialAccount', 'get', array(
+      'return' => array("contact_id.organization_name", "contact_id"),
+      'contact_id.is_deleted' => 0,
+      'options' => array('limit' => 0),
+      'check_permissions' => $checkPermissions,
+    ));
+    $organizationNames = array();
+    foreach ($result['values'] as $values) {
+      $organizationNames[$values['contact_id']] = $values['contact_id.organization_name'];
+    }
+    return $organizationNames;
+  }
+
 }
