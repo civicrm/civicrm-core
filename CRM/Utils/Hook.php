@@ -1845,15 +1845,13 @@ abstract class CRM_Utils_Hook {
    * Build a description of available hooks.
    *
    * @param CRM_Utils_Hook_Inspector $inspector
-   * @return null
    */
   public static function hooks($inspector) {
-    return self::singleton()->invoke(array('inspector'), $inspector, self::$_nullObject, self::$_nullObject,
-      self::$_nullObject, self::$_nullObject, self::$_nullObject,
-      'civicrm_hooks'
-    );
+    $event = \Civi\Core\Event\GenericHookEvent::create(array(
+      'inspector' => $inspector,
+    ));
+    Civi::dispatcher()->dispatch('hook_civicrm_hooks', $event);
   }
-
 
   /**
    * This hook is called while preparing a profile form.
