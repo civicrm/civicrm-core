@@ -40,7 +40,7 @@ class SystemInstallEvent extends \Symfony\Component\EventDispatcher\Event {
 
   /**
    * @param \Civi\Core\Event\GenericHookEvent $e
-   * @see \CRM_Utils_Hook::hooks
+   * @see \CRM_Utils_Hook::eventDefs
    */
   public static function hookEventDefs($e) {
     $e->inspector->addEventClass(self::EVENT_NAME, __CLASS__);

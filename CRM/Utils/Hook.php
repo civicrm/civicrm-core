@@ -1846,11 +1846,11 @@ abstract class CRM_Utils_Hook {
    *
    * @param \Civi\Core\CiviEventInspector $inspector
    */
-  public static function hooks($inspector) {
+  public static function eventDefs($inspector) {
     $event = \Civi\Core\Event\GenericHookEvent::create(array(
       'inspector' => $inspector,
     ));
-    Civi::dispatcher()->dispatch('hook_civicrm_hooks', $event);
+    Civi::dispatcher()->dispatch('hook_civicrm_eventDefs', $event);
   }
 
   /**

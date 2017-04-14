@@ -22,7 +22,7 @@ class CiviEventInspector {
    * Register the default hooks defined by 'CRM_Utils_Hook'.
    *
    * @param \Civi\Core\Event\GenericHookEvent $e
-   * @see \CRM_Utils_Hook::hooks()
+   * @see \CRM_Utils_Hook::eventDefs()
    */
   public static function findBuiltInEvents(\Civi\Core\Event\GenericHookEvent $e) {
     $skipList = array('singleton');
@@ -49,7 +49,7 @@ class CiviEventInspector {
   public function build($force = FALSE) {
     if ($force || $this->eventDefs === NULL) {
       $this->eventDefs = array();
-      \CRM_Utils_Hook::hooks($this);
+      \CRM_Utils_Hook::eventDefs($this);
       ksort($this->eventDefs);
     }
     return $this;

@@ -107,7 +107,7 @@ class Events {
 
   /**
    * @param \Civi\Core\Event\GenericHookEvent $e
-   * @see \CRM_Utils_Hook::hooks
+   * @see \CRM_Utils_Hook::eventDefs
    */
   public static function hookEventDefs($e) {
     $e->inspector->addEventClass(self::AUTHORIZE, 'Civi\API\Event\AuthorizeEvent');
