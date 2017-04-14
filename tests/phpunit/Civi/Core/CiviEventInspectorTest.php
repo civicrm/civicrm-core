@@ -18,6 +18,8 @@ class CiviEventInspectorTest extends \CiviUnitTestCase {
     $this->assertFalse($eventDef['fields']['domainID']['ref']);
     $this->assertEquals('&$settingsMetaData, $domainID, $profile', $eventDef['signature']);
     $this->assertTrue($inspector->validate($eventDef));
+    $this->assertTrue($eventDef['stub'] instanceof \ReflectionMethod);
+    $this->assertTrue($eventDef['stub']->isStatic());
   }
 
   public function testGetAll() {
@@ -28,6 +30,10 @@ class CiviEventInspectorTest extends \CiviUnitTestCase {
     foreach ($all as $name => $eventDef) {
       $this->assertEquals($name, $eventDef['name']);
       $this->assertTrue($inspector->validate($eventDef));
+      if (isset($eventDef['stub'])) {
+        $this->assertTrue($eventDef['stub'] instanceof \ReflectionMethod);
+        $this->assertTrue($eventDef['stub']->isStatic());
+      }
     }
   }
 

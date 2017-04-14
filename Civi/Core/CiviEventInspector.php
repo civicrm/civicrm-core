@@ -192,6 +192,7 @@ class CiviEventInspector {
         'description_html' => $method->getDocComment() ? \CRM_Admin_Page_APIExplorer::formatDocBlock($method->getDocComment()) : '',
         'fields' => array(),
         'class' => 'Civi\Core\Event\GenericHookEvent',
+        'stub' => $method,
       );
 
       foreach ($method->getParameters() as $parameter) {
