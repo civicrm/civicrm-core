@@ -77,7 +77,7 @@ class CiviEventInspector {
    */
   public function find($regex) {
     $this->build();
-    return array_filter($this->eventDefs, function($e) use ($regex) {
+    return array_filter($this->eventDefs, function ($e) use ($regex) {
       return preg_match($regex, $e['name']);
     });
   }
@@ -101,11 +101,21 @@ class CiviEventInspector {
    *   TRUE if valid.
    */
   public function validate($eventDef) {
-    return
-      is_array($eventDef)
-      && !empty($eventDef['name'])
-      && isset($eventDef['signature'])
-      && is_array($eventDef['fields']);
+    if (!is_array($eventDef) || empty($eventDef['name']) || !isset($eventDef['type'])) {
+      return FALSE;
+    }
+
+    if (!in_array($eventDef['type'], array('hook', 'object'))) {
+      return FALSE;
+    }
+
+    if ($eventDef['type'] === 'hook') {
+      if (!isset($eventDef['signature']) || !is_array($eventDef['fields'])) {
+        return FALSE;
+      }
+    }
+
+    return TRUE;
   }
 
   /**
@@ -117,11 +127,11 @@ class CiviEventInspector {
   public function add($eventDef) {
     $name = isset($eventDef['name']) ? $eventDef['name'] : NULL;
 
-    if (!isset($eventDef['is_hook'])) {
-      $eventDef['is_hook'] = (bool) preg_match('/^hook_/', $eventDef['name']);
+    if (!isset($eventDef['type'])) {
+      $eventDef['type'] = preg_match('/^hook_/', $eventDef['name']) ? 'hook' : 'object';
     }
 
-    if (empty($eventDef['signature'])) {
+    if ($eventDef['type'] === 'hook' && empty($eventDef['signature'])) {
       $eventDef['signature'] = implode(', ', array_map(
         function ($field) {
           $sigil = $field['ref'] ? '&$' : '$';
@@ -136,6 +146,23 @@ class CiviEventInspector {
     }
 
     $this->eventDefs[$name] = $eventDef;
+    return $this;
+  }
+
+  /**
+   * Scan a Symfony event class for metadata, and add it.
+   *
+   * @param string $event
+   *   Ex: 'civi.api.authorize'.
+   * @param string $className
+   *   Ex: 'Civi\API\Event\AuthorizeEvent'.
+   * @return CiviEventInspector
+   */
+  public function addEventClass($event, $className) {
+    $this->add(array(
+      'name' => $event,
+      'class' => $className,
+    ));
     return $this;
   }
 
