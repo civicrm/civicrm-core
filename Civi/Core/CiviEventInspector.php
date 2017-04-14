@@ -12,6 +12,14 @@ namespace Civi\Core;
  * print_r(CRM_Utils_Array::collect('name', $i->getAll()));
  * @endCode
  *
+ * An event definition includes these fields:
+ *  - type: string, required. Ex: 'hook' or 'object'
+ *  - name: string, required. Ex: 'hook_civicrm_post' or 'civi.dao.postInsert'
+ *  - class: string, required. Ex: 'Civi\Core\Event\GenericHookEvent'.
+ *  - signature: string, required FOR HOOKS. Ex: '$first, &$second'.
+ *  - fields: array, required FOR HOOKS. List of hook parameters.
+ *  - stub: ReflectionMethod, optional. An example function with docblocks/inputs.
+ *
  * Note: The inspector is only designed for use in developer workflows, such
  * as code-generation and inspection. It should be not called by regular
  * runtime logic.
