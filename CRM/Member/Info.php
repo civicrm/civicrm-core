@@ -58,7 +58,7 @@ class CRM_Member_Info extends CRM_Core_Component_Info {
     return array(
       'name' => 'CiviMember',
       'translatedName' => ts('CiviMember'),
-      'title' => 'CiviCRM Membership Engine',
+      'title' => ts('CiviCRM Membership Engine'),
       'search' => 1,
       'showActivitiesInCore' => 1,
     );

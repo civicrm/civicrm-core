@@ -85,7 +85,7 @@ class CRM_Report_Form_Membership_Summary extends CRM_Report_Form {
         'grouping' => 'member-fields',
         'fields' => array(
           'membership_type_id' => array(
-            'title' => 'Membership Type',
+            'title' => ts('Membership Type'),
             'required' => TRUE,
           ),
           'join_date' => NULL,

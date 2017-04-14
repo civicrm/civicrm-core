@@ -49,7 +49,7 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
     return array(
       'name' => 'CiviMail',
       'translatedName' => ts('CiviMail'),
-      'title' => 'CiviCRM Mailing Engine',
+      'title' => ts('CiviCRM Mailing Engine'),
       'search' => 1,
       'showActivitiesInCore' => 1,
     );

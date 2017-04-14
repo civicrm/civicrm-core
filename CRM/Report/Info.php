@@ -54,7 +54,7 @@ class CRM_Report_Info extends CRM_Core_Component_Info {
     return array(
       'name' => 'CiviReport',
       'translatedName' => ts('CiviReport'),
-      'title' => 'CiviCRM Report Engine',
+      'title' => ts('CiviCRM Report Engine'),
       'search' => 0,
       'showActivitiesInCore' => 1,
     );

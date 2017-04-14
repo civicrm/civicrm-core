@@ -48,7 +48,7 @@ class CRM_Campaign_Info extends CRM_Core_Component_Info {
     return array(
       'name' => 'CiviCampaign',
       'translatedName' => ts('CiviCampaign'),
-      'title' => 'CiviCRM Campaign Engine',
+      'title' => ts('CiviCRM Campaign Engine'),
       'search' => 1,
       'showActivitiesInCore' => 1,
     );

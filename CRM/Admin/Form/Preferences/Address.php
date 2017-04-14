@@ -65,7 +65,7 @@ class CRM_Admin_Form_Preferences_Address extends CRM_Admin_Form_Preferences {
         ),
         'hideCountryMailingLabels' => array(
           'html_type' => 'YesNo',
-          'title' => 'Hide Country in Mailing Labels when same as domain country',
+          'title' => ts('Hide Country in Mailing Labels when same as domain country'),
           'weight' => 4,
         ),
       ),
