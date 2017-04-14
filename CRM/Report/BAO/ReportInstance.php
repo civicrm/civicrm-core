@@ -364,24 +364,35 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
    *  - general script-add.
    */
   public static function getActionMetadata() {
-    $actions = array(
-      'report_instance.save' => array('title' => ts('Save')),
-      'report_instance.copy' => array(
+    $actions = array();
+    if (CRM_Core_Permission::check('save Report Criteria')) {
+      $actions['report_instance.save'] = array('title' => ts('Save'));
+      $actions['report_instance.copy'] = array(
         'title' => ts('Save a Copy'),
         'data' => array(
           'is_confirm' => TRUE,
           'confirm_title' => ts('Save a copy...'),
           'confirm_refresh_fields' => json_encode(array(
-            'title' => array('selector' => '.crm-report-instanceForm-form-block-title', 'prepend' => ts('(Copy) ')),
-            'description' => array('selector' => '.crm-report-instanceForm-form-block-description', 'prepend' => ''),
-            'parent_id' => array('selector' => '.crm-report-instanceForm-form-block-parent_id', 'prepend' => ''),
+            'title' => array(
+              'selector' => '.crm-report-instanceForm-form-block-title',
+              'prepend' => ts('(Copy) '),
+            ),
+            'description' => array(
+              'selector' => '.crm-report-instanceForm-form-block-description',
+              'prepend' => '',
+            ),
+            'parent_id' => array(
+              'selector' => '.crm-report-instanceForm-form-block-parent_id',
+              'prepend' => '',
+            ),
           )),
         ),
-      ),
-      'report_instance.print' => array('title' => ts('Print Report')),
-      'report_instance.pdf' => array('title' => ts('Print to PDF')),
-      'report_instance.csv' => array('title' => ts('Export as CSV')),
-    );
+      );
+    }
+    $actions['report_instance.print'] = array('title' => ts('Print Report'));
+    $actions['report_instance.pdf'] = array('title' => ts('Print to PDF'));
+    $actions['report_instance.csv'] = array('title' => ts('Export as CSV'));
+
     if (CRM_Core_Permission::check('administer Reports')) {
       $actions['report_instance.delete'] = array(
         'title' => ts('Delete report'),
