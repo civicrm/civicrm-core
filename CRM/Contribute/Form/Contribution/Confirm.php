@@ -1475,6 +1475,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         $isTest,
         $isRecurForFirstTransaction
       );
+      $paymentResults[] = array('contribution_id' => $paymentResult['contribution']->id, 'result' => $paymentResult);
 
       if (!empty($paymentResult['contribution'])) {
         $this->postProcessPremium($premiumParams, $paymentResult['contribution']);
@@ -1644,8 +1645,12 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       // CRM-19792 : set necessary fields for payment processor
       CRM_Core_Payment_Form::mapParams($form->_bltID, $paymentParams, $paymentParams, TRUE);
 
-      $paymentActionResult = $payment->doPayment($paymentParams, 'contribute');
-      $paymentResults[] = array('contribution_id' => $paymentResult['contribution']->id, 'result' => $paymentActionResult);
+      // If this is a single membership-related contribution, it won't have
+      // be performed yet, so do it now.
+      if ($isPaidMembership && !$isProcessSeparateMembershipTransaction) {
+        $paymentActionResult = $payment->doPayment($paymentParams, 'contribute');
+        $paymentResults[] = array('contribution_id' => $paymentResult['contribution']->id, 'result' => $paymentActionResult);
+      }
       // Do not send an email if Recurring transaction is done via Direct Mode
       // Email will we sent when the IPN is received.
       foreach ($paymentResults as $result) {
@@ -1780,6 +1785,14 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     );
 
     $result = array();
+
+    if ($tempParams['skipLineItem']) {
+      // We are not processing the line item here because we are processing a membership.
+      // So unset the total_amount param, which stores the non-membership contribution amount.
+      $tempParams['total_amount'] = $membershipContribution->total_amount;
+      $tempParams['contributionID'] = $membershipContribution->id;
+    }
+
     if ($form->_values['is_monetary'] && !$form->_params['is_pay_later'] && $minimumFee > 0.0) {
       // At the moment our tests are calling this form in a way that leaves 'object' empty. For
       // now we compensate here.
