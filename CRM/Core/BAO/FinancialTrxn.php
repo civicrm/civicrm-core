@@ -622,21 +622,30 @@ WHERE ft.is_payment = 1
    * Create transaction for deferred revenue.
    *
    * @param array $lineItems
-   *
-   * @param int $contributionId
-   *
+   * @param int|CRM_Contribute_BAO_Contribution $contribution
    * @param bool $update
-   *
    * @param string $context
    *
+   * @return void
    */
-  public static function createDeferredTrxn($lineItems, $contributionId, $update = FALSE, $context = NULL) {
-    if (empty($lineItems)) {
+  public static function createDeferredTrxn($lineItems, $contribution, $update = FALSE, $context = NULL) {
+    if (empty($lineItems) || empty($contribution)) {
       return;
     }
-    $contributionDetails = civicrm_api3('Contribution', 'getsingle', array(
-      'id' => $contributionId,
-    ));
+
+    if (is_numeric($contribution)) {
+      $contributionDetails = civicrm_api3('Contribution', 'getsingle', array(
+        'id' => $contribution,
+      ));
+    }
+    elseif (is_object($contribution) && ($contribution instanceof CRM_Contribute_BAO_Contribution)) {
+      $contributionDetails = $contribution->toArray();
+    }
+    // return if contribution details cannot be fetched
+    else {
+      return;
+    }
+
     $revenueRecognitionDate = CRM_Utils_Array::value('revenue_recognition_date', $contributionDetails);
     if (!CRM_Utils_System::isNull($revenueRecognitionDate)) {
       $statuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
@@ -649,7 +658,7 @@ WHERE ft.is_payment = 1
         return;
       }
       $trxnParams = array(
-        'contribution_id' => $contributionId,
+        'contribution_id' => $contributionDetails['id'],
         'fee_amount' => '0.00',
         'currency' => $contributionDetails['currency'],
         'trxn_id' => $contributionDetails['trxn_id'],
@@ -835,8 +844,8 @@ WHERE ft.is_payment = 1
       $membershipID = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipPayment', $contributionID, 'membership_id', 'contribution_id');
     }
     // consider revenue_recognition_date as the recieve date or current date
+    $params['revenue_recognition_date'] = CRM_Utils_Array::value('receive_date', $params, date('Ymd'));
     if ($membershipID) {
-      $params['revenue_recognition_date'] = CRM_Utils_Array::value('receive_date', $params, date('Ymd'));
       $params['membership_id'] = $membershipID;
     }
   }
