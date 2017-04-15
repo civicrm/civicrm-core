@@ -230,6 +230,7 @@
    <field name="street_address"         type="text" indexed="true" stored="false" multiValued="true"/>
    <field name="supplemental_address_1" type="text" indexed="true" stored="false" multiValued="true"/>
    <field name="supplemental_address_2" type="text" indexed="true" stored="false" multiValued="true"/>
+   <field name="supplemental_address_3" type="text" indexed="true" stored="false" multiValued="true"/>
    <field name="city"                   type="text" indexed="true" stored="false" multiValued="true"/>
 
    <field name="county"                 type="text" indexed="true" stored="false" multiValued="true"/>
@@ -285,6 +286,7 @@
    <copyField source="street_address"         dest="address"/>
    <copyField source="supplemental_address_1" dest="address"/>
    <copyField source="supplemental_address_2" dest="address"/>
+   <copyField source="supplemental_address_3" dest="address"/>
    <copyField source="city"                   dest="address"/>
    <copyField source="county"                 dest="address"/>
    <copyField source="state"                  dest="address"/>
@@ -309,6 +311,7 @@
    <copyField source="street_address"         dest="text"/>
    <copyField source="supplemental_address_1" dest="text"/>
    <copyField source="supplemental_address_2" dest="text"/>
+   <copyField source="supplemental_address_3" dest="text"/>
    <copyField source="city"                   dest="text"/>
    <copyField source="county"                 dest="text"/>
    <copyField source="state"                  dest="text"/>

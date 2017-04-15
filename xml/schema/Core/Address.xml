@@ -221,6 +221,9 @@
     <title>Supplemental Address 3</title>
     <type>varchar</type>
     <length>96</length>
+    <import>true</import>
+    <headerPattern>/(supplemental(\s)?)?address(\s\d+)?/i</headerPattern>
+    <dataPattern>/unit|ap(ar)?t(ment)?\s(\d|\w)+/i</dataPattern>
     <comment>Supplemental Address Information, Line 3</comment>
     <add>1.1</add>
     <html>

@@ -49,6 +49,7 @@
   <tr style="vertical-align:top;"><td style="padding-right:1em;">{literal}{contact.street_address}{/literal}</td><td>{ts}Full street address (e.g. 110 Main Street).{/ts}</td>
   <tr style="vertical-align:top;"><td style="padding-right:1em;">{literal}{contact.supplemental_address_1}{/literal}</td><td>{ts}Supplemental address 1 (line is skipped if empty).{/ts}</td>
   <tr style="vertical-align:top;"><td style="padding-right:1em;">{literal}{contact.supplemental_address_2}{/literal}</td><td>{ts}Supplemental address 2 (line is skipped if empty).{/ts}</td>
+  <tr style="vertical-align:top;"><td style="padding-right:1em;">{literal}{contact.supplemental_address_3}{/literal}</td><td>{ts}Supplemental address 3 (line is skipped if empty).{/ts}</td>
   <tr style="vertical-align:top;"><td style="padding-right:1em;">{literal}{contact.city}{/literal}</td><td>{ts}City.{/ts}</td>
   <tr style="vertical-align:top;"><td style="padding-right:1em;">{literal}{contact.county}{/literal}</td><td>{ts}County name. If you want to include the county in your screen displays, the <strong>County</strong> checkbox should be set under <strong>Address Editing &raquo; Address Fields</strong> on this screen, and county names must be added to the civicrm_county table in your database.{/ts}</td>
   <tr style="vertical-align:top;"><td style="padding-right:1em;">{literal}{contact.state_province}{/literal}</td><td>{ts}State or province <strong>abbreviation</strong>.{/ts}</td>

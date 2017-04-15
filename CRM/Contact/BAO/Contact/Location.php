@@ -132,6 +132,7 @@ LEFT JOIN civicrm_phone ON ( civicrm_phone.contact_id = civicrm_contact.id )
           civicrm_address.street_address as street_address,
           civicrm_address.supplemental_address_1 as supplemental_address_1,
           civicrm_address.supplemental_address_2 as supplemental_address_2,
+          civicrm_address.supplemental_address_3 as supplemental_address_3,
           civicrm_address.city as city,
           civicrm_address.postal_code as postal_code,
           civicrm_address.postal_code_suffix as postal_code_suffix,
@@ -180,6 +181,7 @@ AND civicrm_contact.id IN $idString ";
           $dao->street_address,
           $dao->supplemental_address_1,
           $dao->supplemental_address_2,
+          $dao->supplemental_address_3,
           $dao->city,
         )
       );

@@ -50,6 +50,7 @@ function setting_getdefaults_expectedresult() {
 {contact.street_address}
 {contact.supplemental_address_1}
 {contact.supplemental_address_2}
+{contact.supplemental_address_3}
 {contact.city}{, }{contact.state_province}{ }{contact.postal_code}
 {contact.country}',
       ),

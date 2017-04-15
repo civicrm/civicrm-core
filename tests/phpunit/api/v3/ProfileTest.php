@@ -726,6 +726,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
           'state_province' => 'Michigan',
           'supplemental_address_1' => 'Hallmark Ct',
           'supplemental_address_2' => 'Jersey Village',
+          'supplemental_address_3' => 'My Town',
           'postal_code' => '90210',
           'city' => 'Gotham City',
           'is_billing' => 0,
@@ -783,6 +784,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
         'state_province' => 'Michigan',
         'supplemental_address_1' => 'Hallmark Ct',
         'supplemental_address_2' => 'Jersey Village',
+        'supplemental_address_3' => 'My Town',
       ),
     );
 

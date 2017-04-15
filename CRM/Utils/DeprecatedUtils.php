@@ -1133,6 +1133,7 @@ function _civicrm_api3_deprecated_add_formatted_location_blocks(&$values, &$para
     'state_province',
     'supplemental_address_1',
     'supplemental_address_2',
+    'supplemental_address_3',
     'StateProvince.name',
   );
 

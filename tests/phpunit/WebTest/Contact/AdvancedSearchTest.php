@@ -475,6 +475,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     $this->type("address_1_street_address", "street 1 $firstName");
     $this->type("address_1_supplemental_address_1", "street supplement 1 $firstName");
     $this->type("address_1_supplemental_address_2", "street supplement 2 $firstName");
+    $this->type("address_1_supplemental_address_3", "street supplement 2 $firstName");
     $this->type("address_1_city", "city$firstName");
     $this->type("address_1_postal_code", "100100");
     $this->select("address_1_country_id", "UNITED STATES");

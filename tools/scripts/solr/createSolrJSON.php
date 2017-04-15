@@ -301,6 +301,7 @@ function getAddressInfo(&$contactIDs, &$values) {
   $sql = "
 SELECT     c.id as contact_id, l.name as location_type,
            a.street_address, a.supplemental_address_1, a.supplemental_address_2,
+           a.supplemental_address_3,
            a.city, a.postal_code,
            s.name as state, co.name as country
 FROM       civicrm_contact c
@@ -312,7 +313,7 @@ WHERE c.id IN ( $ids )
 ";
 
   $fields = array('location_type', 'street_address', 'supplemental_address_1',
-    'supplemental_address_2', 'city', 'postal_code',
+    'supplemental_address_2', 'supplemental_address_3', 'city', 'postal_code',
     'state', 'country',
   );
   $dao = &CRM_Core_DAO::executeQuery($sql);

@@ -430,6 +430,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
     $locationFields = array(
       'supplemental_address_1',
       'supplemental_address_2',
+      'supplemental_address_3',
       'city',
       'country',
       'email',
