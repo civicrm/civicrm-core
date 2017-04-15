@@ -953,28 +953,6 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
   }
 
   /**
-   * Searches for a contact in the db with similar attributes.
-   *
-   * @param array $params
-   *   The list of values to be used in the where clause.
-   * @param int $id
-   *   The current contact id (hence excluded from matching).
-   * @param string $contactType
-   *
-   * @return int|null
-   *   contact_id if found, null otherwise
-   */
-  public static function findContact(&$params, $id = NULL, $contactType = 'Individual') {
-    $ids = CRM_Contact_BAO_Contact::getDuplicateContacts($params, $contactType, 'Supervised', array($id), CRM_Utils_Array::value('check_permission', $params, TRUE));
-    if (!empty($ids)) {
-      return implode(',', $ids);
-    }
-    else {
-      return NULL;
-    }
-  }
-
-  /**
    * Given a contact id and a field set, return the values from the db.
    *
    * @param int $cid
