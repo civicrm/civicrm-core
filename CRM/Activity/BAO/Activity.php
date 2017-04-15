@@ -370,17 +370,15 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
           self::deleteActivityContact($activityId, $assigneeID);
         }
 
-        $values = array();
         foreach ($params['assignee_contact_id'] as $acID) {
           if ($acID) {
-            $values[] = "( $activityId, $acID, $assigneeID )";
+            $assigneeParams = array(
+              'activity_id' => $activityId,
+              'contact_id' => $acID,
+              'record_type_id' => $assigneeID,
+            );
+            CRM_Activity_BAO_ActivityContact::create($assigneeParams);
           }
-        }
-        while (!empty($values)) {
-          $input = array_splice($values, 0, CRM_Core_DAO::BULK_INSERT_COUNT);
-          $str = implode(',', $input);
-          $sql = "INSERT IGNORE INTO civicrm_activity_contact ( activity_id, contact_id, record_type_id ) VALUES $str;";
-          CRM_Core_DAO::executeQuery($sql);
         }
       }
       else {
@@ -425,18 +423,15 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
           self::deleteActivityContact($activityId, $targetID);
         }
 
-        $values = array();
         foreach ($params['target_contact_id'] as $tid) {
           if ($tid) {
-            $values[] = "( $activityId, $tid,  $targetID )";
+            $targetContactParams = array(
+              'activity_id' => $activityId,
+              'contact_id' => $tid,
+              'record_type_id' => $targetID,
+            );
+            CRM_Activity_BAO_ActivityContact::create($targetContactParams);
           }
-        }
-
-        while (!empty($values)) {
-          $input = array_splice($values, 0, CRM_Core_DAO::BULK_INSERT_COUNT);
-          $str = implode(',', $input);
-          $sql = "INSERT IGNORE INTO civicrm_activity_contact ( activity_id, contact_id, record_type_id ) VALUES $str;";
-          CRM_Core_DAO::executeQuery($sql);
         }
       }
       else {
