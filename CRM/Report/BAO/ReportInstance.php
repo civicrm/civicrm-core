@@ -381,15 +381,15 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
           'confirm_refresh_fields' => json_encode(array(
             'title' => array(
               'selector' => '.crm-report-instanceForm-form-block-title',
-              'prepend' => ts('(Copy) ')
+              'prepend' => ts('(Copy) '),
             ),
             'description' => array(
               'selector' => '.crm-report-instanceForm-form-block-description',
-              'prepend' => ''
+              'prepend' => '',
             ),
             'parent_id' => array(
               'selector' => '.crm-report-instanceForm-form-block-parent_id',
-              'prepend' => ''
+              'prepend' => '',
             ),
           )),
         ),
