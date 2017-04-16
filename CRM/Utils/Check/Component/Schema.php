@@ -39,13 +39,20 @@ class CRM_Utils_Check_Component_Schema extends CRM_Utils_Check_Component {
     $messages = array();
     $missingIndices = CRM_Core_BAO_SchemaHandler::getMissingIndices();
     if ($missingIndices) {
-      $messages[] = new CRM_Utils_Check_Message(
+      $msg = new CRM_Utils_Check_Message(
         __FUNCTION__,
-        ts('You have missing indices on some tables. This may cause poor performance.  Please run System.updateindexes from the api explorer'),
+        ts('You have missing indices on some tables. This may cause poor performance.'),
         ts('Performance warning: Missing indices'),
         \Psr\Log\LogLevel::WARNING,
         'fa-server'
       );
+      $msg->addAction(
+        ts('Update Incices'),
+        ts('Update all database indices now? This may take a few minutes and cause a noticeable performance lag for all users while running.'),
+        'api3',
+        array('System', 'updateindexes', array())
+      );
+      $messages[] = $msg;
     }
     return $messages;
   }
