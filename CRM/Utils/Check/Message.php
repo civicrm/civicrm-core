@@ -59,6 +59,12 @@ class CRM_Utils_Check_Message {
   private $help;
 
   /**
+   * @var array
+   *   actions which can be performed with this message
+   */
+  private $actions = array();
+
+  /**
    * @var string
    *   crm-i css class
    */
@@ -155,6 +161,27 @@ class CRM_Utils_Check_Message {
   }
 
   /**
+   * Set optional additional actions text.
+   *
+   * @param string $title
+   *   Text displayed on the status message as a link or button.
+   * @param string $confirmation
+   *   Optional confirmation message before performing action
+   * @param string $type
+   *   Currently supports: api3 or href
+   * @param array $params
+   *   Params to be passed to CRM.api3 or CRM.url depending on type
+   */
+  public function addAction($title, $confirmation, $type, $params) {
+    $this->actions[] = array(
+      'title' => $title,
+      'confirm' => $confirmation,
+      'type' => $type,
+      'params' => $params,
+    );
+  }
+
+  /**
    * Set severity level
    *
    * @param string|int $level
@@ -194,6 +221,9 @@ class CRM_Utils_Check_Message {
     }
     if (!empty($this->help)) {
       $array['help'] = $this->help;
+    }
+    if (!empty($this->actions)) {
+      $array['actions'] = $this->actions;
     }
     return $array;
   }
