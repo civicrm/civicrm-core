@@ -25,10 +25,10 @@
  +--------------------------------------------------------------------+
  */
 /**
- * Class CRM_Member_BAO_MembershipTypeTest
+ * Class CRM_Core_I18n_SchemaTest
  * @group headless
  */
-class CRM_Core_118n_SchemaTest extends CiviUnitTestCase {
+class CRM_Core_I18n_SchemaTest extends CiviUnitTestCase {
 
   /**
    * Test tables to translate
@@ -49,7 +49,7 @@ class CRM_Core_118n_SchemaTest extends CiviUnitTestCase {
   public function tearDown() {
     CRM_Core_I18n_Schema::makeSinglelingual('en_US');
     parent::tearDown();
-  } 
+  }
 
   /**
    * @param string $table
@@ -57,14 +57,19 @@ class CRM_Core_118n_SchemaTest extends CiviUnitTestCase {
    *
    * @dataProvider translateTables
    */
-   public function testI18nSchemaRewrite($table, $expectedRewrite) {
-     CRM_Core_I18n_Schema::makeMultilingual('en_US');
-     $query = "Select * FROM {$table}";
-     $new_query = CRM_Core_I18n_Schema::rewriteQuery($query);
-     $this->assertEquals("Select * FROM {$expectedRewrite}", $new_query);
-     $query2 = "Select * FROM {$table} LIMIT 1";
-     $new_query2 = CRM_Core_I18n_Schema::rewriteQuery($query2);
-     $this->assertEquals("Select * FROM {$expectedRewrite} LIMIT 1", $new_query2);
-   }
+  public function testI18nSchemaRewrite($table, $expectedRewrite) {
+    CRM_Core_I18n_Schema::makeMultilingual('en_US');
+    global $dbLocale;
+    $dbLocale = '_en_US';
+    $query = "Select * FROM {$table}";
+    $new_query = CRM_Core_I18n_Schema::rewriteQuery($query);
+    $this->assertEquals("Select * FROM {$expectedRewrite}", $new_query);
+    $query2 = "Select * FROM {$table} LIMIT 1";
+    $new_query2 = CRM_Core_I18n_Schema::rewriteQuery($query2);
+    $this->assertEquals("Select * FROM {$expectedRewrite} LIMIT 1", $new_query2);
+    $query3 = "SELECT * FROM {$table} JOIN civicrm_contact LIMIT 1";
+    $new_query3 = CRM_Core_I18n_Schema::rewriteQuery($query3);
+    $this->assertEquals("SELECT * FROM {$expectedRewrite} JOIN civicrm_contact LIMIT 1", $new_query3);
+  }
 
 }
