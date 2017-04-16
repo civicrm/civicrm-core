@@ -79,5 +79,12 @@
     <add>4.3</add>
     <onDelete>RESTRICT</onDelete>
   </foreignKey>
+  <index>
+    <name>index_entity_id_entity_table_account_relationship</name>
+    <fieldName>entity_id</fieldName>
+    <fieldName>entity_table</fieldName>
+    <fieldName>account_relationship</fieldName>
+    <unique>true</unique>
+    <add>4.7</add>
+  </index>
 </table>
-
