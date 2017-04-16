@@ -231,12 +231,15 @@ class CRM_Core_BAO_SchemaHandlerTest extends CiviUnitTestCase {
   public function testReconcileMissingIndices() {
     CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_contact DROP INDEX index_sort_name');
     $missingIndices = CRM_Core_BAO_SchemaHandler::getMissingIndices();
-    $this->assertEquals(array('civicrm_contact' => array(array(
-      'name' => 'index_sort_name',
-      'field' => array('sort_name'),
-      'localizable' => FALSE,
-      'sig' => 'civicrm_contact::0::sort_name',
-    ))), $missingIndices);
+    $this->assertEquals(array(
+      'civicrm_contact' => array(
+        array(
+          'name' => 'index_sort_name',
+          'field' => array('sort_name'),
+          'localizable' => FALSE,
+          'sig' => 'civicrm_contact::0::sort_name',
+        ),
+    )), $missingIndices);
     $this->callAPISuccess('System', 'updateindexes', array());
     $missingIndices = CRM_Core_BAO_SchemaHandler::getMissingIndices();
     $this->assertTrue(empty($missingIndices));

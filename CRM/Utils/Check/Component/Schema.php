@@ -41,14 +41,8 @@ class CRM_Utils_Check_Component_Schema extends CRM_Utils_Check_Component {
     if ($missingIndices) {
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__,
-        ts('You have missing indices on some tables. This may cause poor performance.  Please run ...'
-          // May want to reference blog post on this ...
-          // array(
-          //   1 => 'https://civicrm.org/blog/totten/psa-please-verify-php-extension-mysqli',
-          //   2 => 'mysqli',
-          // )
-        ),
-        ts('Performance warning: Rebuild indices'),
+        ts('You have missing indices on some tables. This may cause poor performance.  Please run System.updateindexes from the api explorer'),
+        ts('Performance warning: Missing indices'),
         \Psr\Log\LogLevel::WARNING,
         'fa-server'
       );
