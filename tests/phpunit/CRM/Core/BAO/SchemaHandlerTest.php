@@ -239,7 +239,8 @@ class CRM_Core_BAO_SchemaHandlerTest extends CiviUnitTestCase {
           'localizable' => FALSE,
           'sig' => 'civicrm_contact::0::sort_name',
         ),
-    )), $missingIndices);
+      ),
+    ), $missingIndices);
     $this->callAPISuccess('System', 'updateindexes', array());
     $missingIndices = CRM_Core_BAO_SchemaHandler::getMissingIndices();
     $this->assertTrue(empty($missingIndices));

@@ -20,7 +20,7 @@ class CRM_Admin_Page_ExtensionsUpgrade extends CRM_Core_Page {
       'queue' => $queue,
       'errorMode' => CRM_Queue_Runner::ERROR_ABORT,
       'onEnd' => array('CRM_Admin_Page_ExtensionsUpgrade', 'onEnd'),
-      'onEndUrl' => CRM_Utils_System::url(self::END_URL, self::END_PARAMS),
+      'onEndUrl' => !empty($_GET['destination']) ? $_GET['destination'] : CRM_Utils_System::url(self::END_URL, self::END_PARAMS),
     ));
 
     CRM_Core_Error::debug_log_message('CRM_Admin_Page_ExtensionsUpgrade: Start upgrades');

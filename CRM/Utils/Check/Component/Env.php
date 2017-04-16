@@ -139,11 +139,9 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
    * @return array
    */
   public function checkDebug() {
-    $messages = array();
-
     $config = CRM_Core_Config::singleton();
     if ($config->debug) {
-      $messages[] = new CRM_Utils_Check_Message(
+      $message = new CRM_Utils_Check_Message(
         __FUNCTION__,
         ts('Warning: Debug is enabled in <a href="%1">system settings</a>. This should not be enabled on production servers.',
           array(1 => CRM_Utils_System::url('civicrm/admin/setting/debug', 'reset=1'))),
@@ -151,9 +149,16 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
         \Psr\Log\LogLevel::WARNING,
         'fa-bug'
       );
+      $message->addAction(
+        ts('Disable Debug Mode'),
+        ts('Disable debug mode now?'),
+        'api3',
+        array('Setting', 'create', array('debug_enabled' => 0))
+      );
+      return array($message);
     }
 
-    return $messages;
+    return array();
   }
 
   /**
@@ -716,23 +721,28 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
 
 
   /**
-   * Checks if extensions are set up properly
+   * Checks if there are pending extension upgrades.
+   *
    * @return array
    */
   public function checkExtensionUpgrades() {
-    $messages = array();
-
     if (CRM_Extension_Upgrades::hasPending()) {
-      $messages[] = new CRM_Utils_Check_Message(
+      $message = new CRM_Utils_Check_Message(
         __FUNCTION__,
-        ts('Extension upgrades are pending.  Please visit <a href="%1">the upgrade page</a> to run them.',
-          array(1 => CRM_Utils_System::url('civicrm/admin/extensions/upgrade', 'reset=1'))),
-        ts('Run Extension Upgrades'),
+        ts('Extension upgrades should be run as soon as possible.'),
+        ts('Extension Upgrades Pending'),
         \Psr\Log\LogLevel::ERROR,
         'fa-plug'
       );
+      $message->addAction(
+        ts('Run Upgrades'),
+        ts('Run extension upgrades now?'),
+        'href',
+        array('path' => 'civicrm/admin/extensions/upgrade', 'query' => array('reset' => 1, 'destination' => CRM_Utils_System::url('civicrm/a/#/status')))
+      );
+      return array($message);
     }
-    return $messages;
+    return array();
   }
 
   /**
