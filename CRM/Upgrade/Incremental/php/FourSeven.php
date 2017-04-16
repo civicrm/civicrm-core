@@ -1027,7 +1027,7 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
    *
    * @param \CRM_Queue_TaskContext $ctx
    */
-  public function updateKenyanProvinces(CRM_Queue_TaskContext $ctx) {
+  public static function updateKenyanProvinces(CRM_Queue_TaskContext $ctx) {
     $kenyaCountryID = CRM_Core_DAO::singleValueQuery('SELECT max(id) from civicrm_country where iso_code = "KE"');
     $oldProvinces = array(
       'Nairobi Municipality',
