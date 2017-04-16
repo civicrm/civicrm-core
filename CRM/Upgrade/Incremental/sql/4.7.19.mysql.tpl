@@ -28,3 +28,13 @@ WHERE price_field.price_field_id IS NULL;
 -- CRM-20402 Improve dectection of spam bounces
 SELECT @bounceTypeID := max(id) FROM civicrm_mailing_bounce_type WHERE name = 'Spam';
 UPDATE civicrm_mailing_bounce_pattern SET pattern = '(detected|rejected) (as|due to) spam' WHERE bounce_type_id = @bounceTypeID AND pattern = '(detected|rejected) as spam';
+
+-- CRM-19464 add 'Supplemental Address 3', increment weights after supplemental_address_2 to slot in this new one
+SELECT @option_group_id_adOpt := max(id) from civicrm_option_group where name = 'address_options';
+SELECT @max_val := MAX(ROUND(op.value)) FROM civicrm_option_value op WHERE op.option_group_id = @option_group_id_adOpt;
+SELECT @supp2_wt := weight FROM civicrm_option_value WHERE name = 'supplemental_address_2';
+UPDATE civicrm_option_value SET weight = weight + 1 WHERE option_group_id = @option_group_id_adOpt AND weight > @supp2_wt;
+INSERT INTO
+ `civicrm_option_value` (`option_group_id`, {localize field='label'}label{/localize}, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, {localize field='description'}description{/localize}, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `visibility_id`, `icon`)
+VALUES
+  (@option_group_id_adOpt, {localize}'{ts escape="sql"}Supplemental Address 3{/ts}'{/localize}, (SELECT @max_val := @max_val + 1), 'supplemental_address_3', NULL, 0, NULL, (SELECT @supp2_wt := @supp2_wt + 1), {localize}''{/localize}, 0, 0, 1, NULL, NULL, NULL);
