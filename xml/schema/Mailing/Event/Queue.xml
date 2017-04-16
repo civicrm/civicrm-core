@@ -63,6 +63,11 @@
     <title>Security Hash</title>
     <comment>Security hash</comment>
   </field>
+  <index>
+    <name>index_hash</name>
+    <fieldName>hash</fieldName>
+    <add>4.7</add>
+  </index>
   <field>
     <name>phone_id</name>
     <type>int unsigned</type>
