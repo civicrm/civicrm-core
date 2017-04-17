@@ -1498,7 +1498,7 @@ input.crm-form-entityref {
   text-decoration: none;
 }
 
-.crm-container .panel {
+.crm-container ul.panel {
   display: none;
   z-index: 9999;
   position: absolute;
