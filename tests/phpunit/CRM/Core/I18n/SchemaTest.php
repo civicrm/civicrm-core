@@ -96,7 +96,7 @@ class CRM_Core_I18n_SchemaTest extends CiviUnitTestCase {
     $this->assertEquals("DELETE FROM {$expectedRewrite}", $new_query8);
     $query9 = 'INSERT INTO ' . "{$table}" . ' (foo, bar) VALUES (123, "' . "Just a {$table} string" . '")';
     $new_query9 = CRM_Core_I18n_Schema::rewriteQuery($query9);
-    $this->assertEquals('INSERT INTO ' . "{$expectedRewrite}" . ' (foo, bar) VALUES (123, "' . "Just a {$table} string)", $new_query9);
+    $this->assertEquals('INSERT INTO ' . "{$expectedRewrite}" . ' (foo, bar) VALUES (123, "' . "Just a {$table} string" . '")', $new_query9);
   }
 
 }
