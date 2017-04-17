@@ -16,6 +16,12 @@ and ensure the next release works -- all with a predictable timeline.
    [Release Management README](https://github.com/civicrm/release-management/blob/master/README.md).
  * For an example invitation, see the previous [invitation for the April-May 2016](https://github.com/civicrm/release-management/issues/1).
 
+## Pull-Request Scope
+
+A good pull request (PR) addresses a clearly-defined problem. There should be a detailed description logged in the [issue tracker](http://issues.civicrm.org/). Excellent PRs also increase test coverage. If you are tempted to do additional tweaks or code cleanup outside the scope of that issue, you could make a separate commit and include them in the PR if they are minor & non-controversial, or create a seperate PR if they are more complex.
+
+There is no size limit for PRs as long as they are focused on completely solving a discreet problem. As a practical matter, though, bigger PRs may take longer to review and merge. When possible, split "epic" issues into bite-sized chunks as long as each seperate PR is functionally complete and does not cause merge conflicts with your other PRs. In the latter case, add commits to an existing PR.
+
 ## Pull-Request Subject
 
 When filing a pull-request, use a descriptive subject. These are good examples:
