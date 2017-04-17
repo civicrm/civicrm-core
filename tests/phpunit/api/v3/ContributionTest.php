@@ -3587,7 +3587,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'total_amount' => 100,
       'financial_type_id' => 1,
       'payment_instrument' => 'Credit Card',
-      'card_type' => 'Visa',
+      'card_type' => CRM_Core_PseudoConstant::getKey('CRM_Financial_DAO_FinancialTrxn', 'card_type', 'Visa'),
       'pan_truncation' => 4567,
     );
     $contribution = $this->callAPISuccess('contribution', 'create', $params);

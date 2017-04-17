@@ -160,6 +160,14 @@ function _civicrm_api3_contribution_create_spec(&$params) {
     'type' => CRM_Utils_Type::T_STRING,
     'description' => 'Transaction ID specific to the refund taking place',
   );
+  $params['card_type'] = array(
+    'title' => 'Card Type ID',
+    'description' => 'Providing Credit Card Type ID',
+    'type' => CRM_Utils_Type::T_INT,
+    'pseudoconstant' => array(
+      'optionGroupName' => 'accept_creditcard',
+    ),
+  );
 }
 
 /**
