@@ -2121,14 +2121,24 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
    *
    * @param int $membershipId
    *   Membership id.
+   * @all bool
+   *   if more than one payment associated with membership id need to be returned.
    *
    * @return int
    *   contribution id
    */
-  public static function getMembershipContributionId($membershipId) {
+  public static function getMembershipContributionId($membershipId, $all = FALSE) {
 
     $membershipPayment = new CRM_Member_DAO_MembershipPayment();
     $membershipPayment->membership_id = $membershipId;
+    if ($all && $membershipPayment->find()) {
+      $contributionIds = array();
+      while ($membershipPayment->fetch()) {
+        $contributionIds[] = $membershipPayment->contribution_id;
+      }
+      return $contributionIds;
+    }
+
     if ($membershipPayment->find(TRUE)) {
       return $membershipPayment->contribution_id;
     }
