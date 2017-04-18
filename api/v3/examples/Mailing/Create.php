@@ -11,17 +11,17 @@ function mailing_create_example() {
     'body_text' => 'This is {contact.display_name}.
 https://civicrm.org
 {domain.address}{action.optOutUrl}',
-    'body_html' => '<p>This is {contact.display_name}.</p><p><a href='https://civicrm.org/'>CiviCRM.org</a></p><p>{domain.address}{action.optOutUrl}</p>',
+    'body_html' => '<p>This is {contact.display_name}.</p><p><a href=\'https://civicrm.org/\'>CiviCRM.org</a></p><p>{domain.address}{action.optOutUrl}</p>',
     'name' => 'mailing name',
-    'created_id' => 11,
+    'created_id' => 3,
     'header_id' => '',
     'footer_id' => '',
     'groups' => array(
       'include' => array(
-        '0' => 9,
+        '0' => 2,
       ),
       'exclude' => array(
-        '0' => 10,
+        '0' => 3,
       ),
     ),
     'mailings' => array(
@@ -74,10 +74,10 @@ function mailing_create_expectedresult() {
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
-    'id' => 5,
+    'id' => 1,
     'values' => array(
-      '5' => array(
-        'id' => '5',
+      '1' => array(
+        'id' => '1',
         'domain_id' => '1',
         'header_id' => '',
         'footer_id' => '',
@@ -104,7 +104,7 @@ https://civicrm.org
         'is_completed' => '',
         'msg_template_id' => '',
         'override_verp' => '1',
-        'created_id' => '11',
+        'created_id' => '3',
         'created_date' => '2013-07-28 08:49:19',
         'scheduled_id' => '',
         'scheduled_date' => '',
@@ -125,11 +125,11 @@ https://civicrm.org
           'is_error' => 0,
           'version' => 3,
           'count' => 1,
-          'id' => 5,
+          'id' => 1,
           'values' => array(
             '0' => array(
-              'id' => '5',
-              'mailing_id' => '5',
+              'id' => '1',
+              'mailing_id' => '1',
               'scheduled_date' => '20130728085413',
               'start_date' => '',
               'end_date' => '',
@@ -146,13 +146,13 @@ https://civicrm.org
           'is_error' => 0,
           'version' => 3,
           'count' => 1,
-          'id' => 4,
+          'id' => 1,
           'values' => array(
             '0' => array(
-              'id' => '4',
-              'mailing_id' => '5',
-              'contact_id' => '12',
-              'email_id' => '12',
+              'id' => '1',
+              'mailing_id' => '1',
+              'contact_id' => '4',
+              'email_id' => '4',
               'api.contact.getvalue' => 'Mr. Includer Person II',
               'api.email.getvalue' => 'include.me@example.org',
             ),
