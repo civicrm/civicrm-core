@@ -131,7 +131,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_DAO_SetEntity extends CRM_Core_DAO {
    *
    * @return array
    */
-  pubic static function &fields() {
+  public static function &fields() {
     if (!(self::$_fields)) {
       self::$_fields = array(
         'id' => array(
