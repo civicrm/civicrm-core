@@ -222,7 +222,7 @@ class CRM_Core_Config_MagicMerge {
     if (!isset($this->map[$k])) {
       throw new \CRM_Core_Exception("Cannot read unrecognized property CRM_Core_Config::\${$k}.");
     }
-    if (isset($this->cache[$k])) {
+    if (array_key_exists($k, $this->cache)) {
       return $this->cache[$k];
     }
 
@@ -309,7 +309,11 @@ class CRM_Core_Config_MagicMerge {
     }
     unset($this->cache[$k]);
     $type = $this->map[$k][0];
-    $name = isset($this->map[$k][1]) ? $this->map[$k][1] : $k;
+
+    $name = $k;
+    // If foreign name is set, use that name (except with callback types because
+    // their second parameter is the object, not the foreign name).
+    $name = isset($this->map[$k][1]) && $type != 'callback' ? $this->map[$k][1] : $k;
 
     switch ($type) {
       case 'setting':
