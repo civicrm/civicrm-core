@@ -64,8 +64,8 @@
     <table class="report-layout display">
       <tr>
         <th class="statistics" scope="row"></th>
-        <th class="statistics right" scope="row">Count</th>
-        <th class="statistics right" scope="row">Amount</th>
+        <th class="statistics right" scope="row">{ts}Count{/ts}</th>
+        <th class="statistics right" scope="row">{ts}Amount{/ts}</th>
       </tr>
         {foreach from=$totalStatistics.total_statistics key=key item=val}
            <tr>
@@ -83,8 +83,8 @@
       {foreach from=$grantStatistics item=values key=key}
        <tr>
          <th class="statistics" scope="row">{$values.title}</th>
-         <th class="statistics right" scope="row">Number of Grants (%)</th>
-         <th class="statistics right" scope="row">Total Amount (%)</th>
+         <th class="statistics right" scope="row">{ts}Number of Grants (%){/ts}</th>
+         <th class="statistics right" scope="row">{ts}Total Amount (%){/ts}</th>
        </tr>
          {foreach from=$values.value item=row key=field}
            <tr>
