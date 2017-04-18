@@ -36,10 +36,15 @@ use Dompdf\Options;
 class CRM_Utils_PDF_Utils {
 
   /**
-   * @param $text
+   * @param array $text
+   *   List of HTML snippets.
    * @param string $fileName
+   *   The logical filename to display.
+   *   Ex: "HelloWorld.pdf".
    * @param bool $output
+   *   FALSE to display PDF. TRUE to return as string.
    * @param null $pdfFormat
+   *   Unclear. Possibly PdfFormat or formValues.
    *
    * @return string|void
    */

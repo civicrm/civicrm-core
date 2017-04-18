@@ -437,6 +437,27 @@ return array(
     'description' => "If enabled, CiviCRM sends PDF receipt as an attachment during event signup or online contribution.",
     'help_text' => NULL,
   ),
+  'recordGeneratedLetters' => array(
+    'group_name' => 'CiviCRM Preferences',
+    'group' => 'core',
+    'name' => 'recordGeneratedLetters',
+    'type' => 'String',
+    'quick_form_type' => 'Select',
+    'html_type' => 'Select',
+    'html_attributes' => array(
+      'class' => 'crm-select2',
+    ),
+    'default' => 'multiple',
+    'add' => '4.7',
+    'title' => 'Record generated letters',
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => 'When generating a letter (PDF/Word) via mail-merge, how should the letter be recorded?',
+    'help_text' => NULL,
+    'pseudoconstant' => array(
+      'callback' => 'CRM_Contact_Form_Task_PDFLetterCommon::getLoggingOptions',
+    ),
+  ),
   'wkhtmltopdfPath' => array(
     'group_name' => 'CiviCRM Preferences',
     'group' => 'core',
