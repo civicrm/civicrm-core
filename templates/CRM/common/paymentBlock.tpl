@@ -133,6 +133,10 @@
         buildPaymentBlock($(this).val());
     });
 
+    $('#payment_instrument_id').on('change.paymentBlock', function() {
+      buildPaymentBlock(0);
+    });
+
     $('#billing-payment-block').on('crmLoad', function() {
       $('.crm-submit-buttons input').prop('disabled', false);
     })
