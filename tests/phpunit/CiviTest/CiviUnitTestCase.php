@@ -2295,6 +2295,11 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     $smarty = CRM_Core_Smarty::singleton();
     $smarty->assign('testFunction', $testFunction);
     $smarty->assign('function', _civicrm_api_get_entity_name_from_camel($entity) . "_$action");
+    foreach ($params as $index => $param) {
+      if (is_string($param)) {
+        $params[$index] = addslashes($param);
+      }
+    }
     $smarty->assign('params', $params);
     $smarty->assign('entity', $entity);
     $smarty->assign('testFile', basename($testFile));
