@@ -26,7 +26,7 @@ dm_install_drupal "$SRC/backdrop" "$TRG/backdrop"
 
 # gen tarball
 cd $TRG/..
-tar czf $DM_TARGETDIR/civicrm-$DM_VERSION-backdrop-unstable.tar.gz civicrm
+tar czf $DM_TARGETDIR/civicrm-$DM_VERSION-backdrop.tar.gz civicrm
 
 # clean up
 rm -rf $TRG
