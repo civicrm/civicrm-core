@@ -105,7 +105,21 @@ class CRM_Mailing_Event_BAO_Confirm extends CRM_Mailing_Event_DAO_Confirm {
     $config = CRM_Core_Config::singleton();
 
     $domain = CRM_Core_BAO_Domain::getDomain();
-    list($domainEmailName, $_) = CRM_Core_BAO_Domain::getNameAndEmail();
+	
+    //get the default domain email address.
+    list($domainEmailName, $domainEmailAddress) = CRM_Core_BAO_Domain::getNameAndEmail();
+	
+	$localpart = CRM_Core_BAO_MailSettings::defaultLocalpart();
+    $emailDomain = CRM_Core_BAO_MailSettings::defaultDomain();
+
+    $bounce_address = implode($config->verpSeparator,
+        array(
+          $localpart . 'c',
+		  $se->contact_id,
+          $se->id,
+          $se->hash,
+        )
+      ) . "@$emailDomain";
 
     list($display_name, $email) = CRM_Contact_BAO_Contact_Location::getEmailDetails($se->contact_id);
 
@@ -145,11 +159,11 @@ class CRM_Mailing_Event_BAO_Confirm extends CRM_Mailing_Event_DAO_Confirm {
     $mailParams = array(
       'groupName' => 'Mailing Event ' . $component->component_type,
       'subject' => $component->subject,
-      'from' => "\"$domainEmailName\" <do-not-reply@$emailDomain>",
+      'from' => "\"{$domainEmailName}\" <{$domainEmailAddress}>",
       'toEmail' => $email,
       'toName' => $display_name,
-      'replyTo' => "do-not-reply@$emailDomain",
-      'returnPath' => "do-not-reply@$emailDomain",
+      'replyTo' => "\"{$domainEmailName}\" <{$domainEmailAddress}>",
+      'returnPath' => $bounce_address,
       'html' => $html,
       'text' => $text,
     );

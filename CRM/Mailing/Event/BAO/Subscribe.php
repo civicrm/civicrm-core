@@ -219,7 +219,7 @@ SELECT     civicrm_email.id as email_id
     $localpart = CRM_Core_BAO_MailSettings::defaultLocalpart();
     $emailDomain = CRM_Core_BAO_MailSettings::defaultDomain();
 
-    $confirm = implode($config->verpSeparator,
+    $bounce_address = implode($config->verpSeparator,
         array(
           $localpart . 'c',
           $this->contact_id,
@@ -243,8 +243,8 @@ SELECT     civicrm_email.id as email_id
       'Subject' => $component->subject,
       'From' => "\"{$domainEmailName}\" <{$domainEmailAddress}>",
       'To' => $email,
-      'Reply-To' => $confirm,
-      'Return-Path' => "do-not-reply@$emailDomain",
+      'Reply-To' => "\"{$domainEmailName}\" <{$domainEmailAddress}>",
+      'Return-Path' => $bounce_address,
     );
 
     $url = CRM_Utils_System::url('civicrm/mailing/confirm',
