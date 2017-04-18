@@ -188,13 +188,13 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
       'FinancialTrxn',
       array(
         'id' => $lastFinancialTrxnId['financialTrxnId'],
-        'return' => array('card_type', 'pan_truncation'),
+        'return' => array('card_type_id', 'pan_truncation'),
       )
     );
-    $this->assertEquals(CRM_Utils_Array::value('card_type', $financialTrxn), NULL);
+    $this->assertEquals(CRM_Utils_Array::value('card_type_id', $financialTrxn), NULL);
     $this->assertEquals(CRM_Utils_Array::value('pan_truncation', $financialTrxn), NULL);
     $params = array(
-      'card_type' => 2,
+      'card_type_id' => 2,
       'pan_truncation' => 4567,
       'id' => $contribution->id,
     );
@@ -203,10 +203,10 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
       'FinancialTrxn',
       array(
         'id' => $lastFinancialTrxnId['financialTrxnId'],
-        'return' => array('card_type', 'pan_truncation'),
+        'return' => array('card_type_id', 'pan_truncation'),
       )
     );
-    $this->assertEquals($financialTrxn['card_type'], 2);
+    $this->assertEquals($financialTrxn['card_type_id'], 2);
     $this->assertEquals($financialTrxn['pan_truncation'], 4567);
   }
 
@@ -227,20 +227,20 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
       'FinancialTrxn',
       array(
         'id' => $lastFinancialTrxnId['financialTrxnId'],
-        'return' => array('card_type', 'pan_truncation'),
+        'return' => array('card_type_id', 'pan_truncation'),
       )
     );
-    $this->assertEquals(CRM_Utils_Array::value('card_type', $financialTrxn), NULL);
+    $this->assertEquals(CRM_Utils_Array::value('card_type_id', $financialTrxn), NULL);
     $this->assertEquals(CRM_Utils_Array::value('pan_truncation', $financialTrxn), NULL);
     CRM_Core_BAO_FinancialTrxn::updateCreditCardDetails($contribution->id, 4567, 2);
     $financialTrxn = $this->callAPISuccessGetSingle(
       'FinancialTrxn',
       array(
         'id' => $lastFinancialTrxnId['financialTrxnId'],
-        'return' => array('card_type', 'pan_truncation'),
+        'return' => array('card_type_id', 'pan_truncation'),
       )
     );
-    $this->assertEquals($financialTrxn['card_type'], 2);
+    $this->assertEquals($financialTrxn['card_type_id'], 2);
     $this->assertEquals($financialTrxn['pan_truncation'], 4567);
   }
 

@@ -251,13 +251,13 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
         'dao' => 'CRM_Financial_DAO_FinancialTrxn',
         'fields' => array(
           'card_type_id' => array(
-            'title' => ts('Credit Card Type ID'),
+            'title' => ts('Credit Card Type'),
             'dbAlias' => 'GROUP_CONCAT(financial_trxn_civireport.card_type_id SEPARATOR ",")',
           ),
         ),
         'filters' => array(
           'card_type_id' => array(
-            'title' => ts('Credit Card Type ID'),
+            'title' => ts('Credit Card Type'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'default' => NULL,
             'options' => CRM_Financial_DAO_FinancialTrxn::buildOptions('card_type_id'),

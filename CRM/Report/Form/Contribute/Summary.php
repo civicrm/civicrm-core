@@ -230,7 +230,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
         'dao' => 'CRM_Financial_DAO_FinancialTrxn',
         'fields' => array(
           'card_type_id' => array(
-            'title' => ts('Credit Card Type ID'),
+            'title' => ts('Credit Card Type'),
             'dbAlias' => 'GROUP_CONCAT(financial_trxn_civireport.card_type_id SEPARATOR ",")',
           ),
         ),
@@ -238,7 +238,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
           'card_type_id' => array(
             'title' => ts('Credit Card Type'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialTrxn', 'card_type_id'),
+            'options' => CRM_Financial_DAO_FinancialTrxn::buildOptions('card_type_id'),
             'default' => NULL,
             'type' => CRM_Utils_Type::T_STRING,
           ),
