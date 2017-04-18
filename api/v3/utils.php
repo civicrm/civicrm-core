@@ -2083,7 +2083,7 @@ function _civicrm_api3_validate_integer(&$params, $fieldName, &$fieldInfo, $enti
       elseif (is_numeric($realContactId)) {
         $fieldValue = $realContactId;
       }
-      elseif (is_null($realContactId) && empty($fieldInfo['api.required'])) {
+      elseif (is_null($realContactId) && empty($fieldInfo['api.required']) && $fieldValue === 'user_contact_id') {
         // If not mandatory this will be OK. If mandatory it should fail.
         $fieldValue = NULL;
       }

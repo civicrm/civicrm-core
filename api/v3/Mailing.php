@@ -133,8 +133,8 @@ function _civicrm_api3_mailing_gettokens_spec(&$params) {
  *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_mailing_create_spec(&$params) {
-  $params['created_id']['api.required'] = 1;
   $params['created_id']['api.default'] = 'user_contact_id';
+  $params['subject']['api.required'] = TRUE;
 
   $params['override_verp']['api.default'] = !CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME, 'track_civimail_replies');
   $params['visibility']['api.default'] = 'Public Pages';
@@ -153,7 +153,7 @@ function _civicrm_api3_mailing_create_spec(&$params) {
   $params['unsubscribe_id']['api.default'] = CRM_Mailing_PseudoConstant::defaultComponent('Unsubscribe', '');
   $params['mailing_type']['api.default'] = 'standalone';
   $defaultAddress = CRM_Core_OptionGroup::values('from_email_address', NULL, NULL, NULL, ' AND is_default = 1');
-  foreach ($defaultAddress as $id => $value) {
+  foreach ($defaultAddress as $value) {
     if (preg_match('/"(.*)" <(.*)>/', $value, $match)) {
       $params['from_email']['api.default'] = $match[2];
       $params['from_name']['api.default'] = $match[1];
