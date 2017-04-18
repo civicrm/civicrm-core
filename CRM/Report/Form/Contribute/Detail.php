@@ -292,16 +292,16 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
       'civicrm_financial_trxn' => array(
         'dao' => 'CRM_Financial_DAO_FinancialTrxn',
         'fields' => array(
-          'card_type' => array(
-            'title' => ts('Credit Card Type'),
-            'dbAlias' => 'GROUP_CONCAT(financial_trxn_civireport.card_type SEPARATOR ",")',
+          'card_type_id' => array(
+            'title' => ts('Credit Card Type ID'),
+            'dbAlias' => 'GROUP_CONCAT(financial_trxn_civireport.card_type_id SEPARATOR ",")',
           ),
         ),
         'filters' => array(
-          'card_type' => array(
-            'title' => ts('Credit Card Type'),
+          'card_type_id' => array(
+            'title' => ts('Credit Card Type ID'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Financial_DAO_FinancialTrxn::buildOptions('card_type'),
+            'options' => CRM_Financial_DAO_FinancialTrxn::buildOptions('card_type_id'),
             'default' => NULL,
             'type' => CRM_Utils_Type::T_STRING,
           ),
@@ -765,8 +765,8 @@ UNION ALL
         $rows[$rowNum]['civicrm_batch_batch_id'] = CRM_Utils_Array::value($row['civicrm_batch_batch_id'], $batches);
         $entryFound = TRUE;
       }
-      if (!empty($row['civicrm_financial_trxn_card_type'])) {
-        $rows[$rowNum]['civicrm_financial_trxn_card_type'] = $this->getLabels($row['civicrm_financial_trxn_card_type'], 'CRM_Financial_DAO_FinancialTrxn', 'card_type');
+      if (!empty($row['civicrm_financial_trxn_card_type_id'])) {
+        $rows[$rowNum]['civicrm_financial_trxn_card_type_id'] = $this->getLabels($row['civicrm_financial_trxn_card_type_id'], 'CRM_Financial_DAO_FinancialTrxn', 'card_type_id');
         $entryFound = TRUE;
       }
 

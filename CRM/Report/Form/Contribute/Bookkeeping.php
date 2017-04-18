@@ -347,8 +347,8 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
             'title' => ts('Trans #'),
             'default' => TRUE,
           ),
-          'card_type' => array(
-            'title' => ts('Credit Card Type'),
+          'card_type_id' => array(
+            'title' => ts('Credit Card Type ID'),
           ),
         ),
         'filters' => array(
@@ -376,10 +376,10 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
             'options' => CRM_Contribute_PseudoConstant::contributionStatus(),
             'default' => array(1),
           ),
-          'card_type' => array(
-            'title' => ts('Credit Card Type'),
+          'card_type_id' => array(
+            'title' => ts('Credit Card Type ID'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialTrxn', 'card_type'),
+            'options' => CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialTrxn', 'card_type_id'),
             'default' => NULL,
             'type' => CRM_Utils_Type::T_STRING,
           ),
@@ -648,7 +648,7 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
     $contributionTypes = CRM_Contribute_PseudoConstant::financialType();
     $paymentInstruments = CRM_Contribute_PseudoConstant::paymentInstrument();
     $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus();
-    $creditCardTypes = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialTrxn', 'card_type');
+    $creditCardTypes = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialTrxn', 'card_type_id');
     foreach ($rows as $rowNum => $row) {
       // convert display name to links
       if (array_key_exists('civicrm_contact_sort_name', $row) &&
@@ -690,8 +690,8 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
         $entryFound = TRUE;
       }
 
-      if (!empty($row['civicrm_financial_trxn_card_type'])) {
-        $rows[$rowNum]['civicrm_financial_trxn_card_type'] = CRM_Utils_Array::value($row['civicrm_financial_trxn_card_type'], $creditCardTypes);
+      if (!empty($row['civicrm_financial_trxn_card_type_id'])) {
+        $rows[$rowNum]['civicrm_financial_trxn_card_type_id'] = CRM_Utils_Array::value($row['civicrm_financial_trxn_card_type_id'], $creditCardTypes);
         $entryFound = TRUE;
       }
 

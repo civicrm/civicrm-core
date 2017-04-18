@@ -5,7 +5,7 @@ SELECT @close_acc_period_act_val := `value` FROM civicrm_option_value WHERE opti
 SELECT @close_accounting_period_activity_count := count(id) FROM `civicrm_activity` WHERE `activity_type_id` = @close_acc_period_act_val;
 
 -- Delete Close Accounting Period activity type
-DELETE FROM civicrm_option_value 
+DELETE FROM civicrm_option_value
     WHERE option_group_id = @option_group_id_act AND name = 'Close Accounting Period' AND @close_accounting_period_activity_count = 0;
 
 --  CRM-19517 Disable all price fields and price field options that use disabled fianancial types
@@ -38,3 +38,6 @@ INSERT INTO
  `civicrm_option_value` (`option_group_id`, {localize field='label'}label{/localize}, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, {localize field='description'}description{/localize}, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `visibility_id`, `icon`)
 VALUES
   (@option_group_id_adOpt, {localize}'{ts escape="sql"}Supplemental Address 3{/ts}'{/localize}, (SELECT @max_val := @max_val + 1), 'supplemental_address_3', NULL, 0, NULL, (SELECT @supp2_wt := @supp2_wt + 1), {localize}''{/localize}, 0, 0, 1, NULL, NULL, NULL);
+
+-- CRM-20439 rename card_type to card_type_id of civicrm_financial_trxn table (IIDA-126)
+ALTER TABLE `civicrm_financial_trxn` CHANGE `card_type` `card_type_id` INT(10) UNSIGNED NULL DEFAULT NULL COMMENT 'FK to accept_creditcard option group values';

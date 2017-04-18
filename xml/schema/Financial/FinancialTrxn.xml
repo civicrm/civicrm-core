@@ -237,9 +237,9 @@
     <add>4.3</add>
   </index>
   <field>
-    <name>card_type</name>
-    <uniqueName>financial_trxn_card_type</uniqueName>
-    <title>Card Type</title>
+    <name>card_type_id</name>
+    <uniqueName>financial_trxn_card_type_id</uniqueName>
+    <title>Card Type ID</title>
     <type>int unsigned</type>
     <comment>FK to accept_creditcard option group values</comment>
     <pseudoconstant>
