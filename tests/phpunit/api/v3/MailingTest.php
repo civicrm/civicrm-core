@@ -86,6 +86,15 @@ class api_v3_MailingTest extends CiviUnitTestCase {
   }
 
   /**
+   * Per CRM-20316 the mailing should still create without created_id (not mandatory).
+   */
+  public function testMailerCreateSuccessNoCreatedID() {
+    unset($this->_params['created_id']);
+    $result = $this->callAPIAndDocument('mailing', 'create', $this->_params + array('scheduled_date' => 'now'), __FUNCTION__, __FILE__);
+    $this->getAndCheck($this->_params, $result['id'], 'mailing');
+  }
+
+  /**
    *
    */
   public function testTemplateTypeOptions() {
