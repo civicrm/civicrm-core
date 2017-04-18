@@ -723,7 +723,7 @@ WHERE ft.to_financial_account_id != {$toFinancialAccount} AND ft.to_financial_ac
     $financialTrxnId = $financialTrxn['financial_trxn_id'];
     $trxnparams = array('id' => $financialTrxnId);
     if (isset($cardType)) {
-      $trxnparams['card_type'] = $cardType;
+      $trxnparams['card_type_id'] = $cardType;
     }
     if (isset($panTruncation)) {
       $trxnparams['pan_truncation'] = $panTruncation;
