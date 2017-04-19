@@ -170,6 +170,26 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
+   * CRM-20316 this should fail based on validation with no logged in user.
+   *
+   * Since the field is required the validation should reject the default.
+   */
+  public function testActivityCreateWithMissingContactIdNoLoggedInUser() {
+    CRM_Core_Session::singleton()->set('userID', NULL);
+    $params = array(
+      'subject' => 'Make-it-Happen Meeting',
+      'activity_date_time' => date('Ymd'),
+      'duration' => 120,
+      'location' => 'Pennsylvania',
+      'details' => 'a test activity',
+      'status_id' => 1,
+      'activity_name' => 'Test activity type',
+    );
+
+    $this->callAPIFailure('activity', 'create', $params, 'source_contact_id is not a valid integer');
+  }
+
+  /**
    * Test civicrm_activity_id() with non-numeric source_contact_id.
    */
   public function testActivityCreateWithNonNumericContactId() {

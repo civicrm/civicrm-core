@@ -180,9 +180,6 @@ function civicrm_api3_activity_create($params) {
  */
 function _civicrm_api3_activity_create_spec(&$params) {
 
-  // Default for source_contact_id = currently logged in user.
-  $params['source_contact_id']['api.default'] = 'user_contact_id';
-
   $params['status_id']['api.aliases'] = array('activity_status');
 
   $params['assignee_contact_id'] = array(
@@ -210,6 +207,7 @@ function _civicrm_api3_activity_create_spec(&$params) {
     'FKClassName' => 'CRM_Contact_DAO_Contact',
     'api.default' => 'user_contact_id',
     'FKApiName' => 'Contact',
+    'api.required' => TRUE,
   );
 
   $params['case_id'] = array(
