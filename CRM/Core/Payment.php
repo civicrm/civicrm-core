@@ -61,18 +61,6 @@ abstract class CRM_Core_Payment {
     BILLING_MODE_NOTIFY = 4;
 
   /**
-   * Which payment type(s) are we using?
-   *
-   * credit card
-   * direct debit
-   * or both
-   * @todo create option group - nb omnipay uses a 3rd type - transparent redirect cc
-   */
-  const
-    PAYMENT_TYPE_CREDIT_CARD = 1,
-    PAYMENT_TYPE_DIRECT_DEBIT = 2;
-
-  /**
    * Subscription / Recurring payment Status
    * START, END
    */
