@@ -1867,32 +1867,43 @@ WHERE  id = $cfID
     return $customProfile;
   }
 
-  /* Function to retrieve all events those having location block set.
-   *
-   * @return array
-   *   array of all events.
-   */
   /**
+   * Retrieve all event addresses.
+   *
    * @return array
    */
   public static function getLocationEvents() {
     $events = array();
+    $ret = array(
+      'loc_block_id',
+      'loc_block_id.address_id.name',
+      'loc_block_id.address_id.street_address',
+      'loc_block_id.address_id.supplemental_address_1',
+      'loc_block_id.address_id.supplemental_address_2',
+      'loc_block_id.address_id.supplemental_address_3',
+      'loc_block_id.address_id.city',
+      'loc_block_id.address_id.state_province_id.name',
+    );
 
-    $query = "
-SELECT CONCAT_WS(' :: ' , ca.name, ca.street_address, ca.city, sp.name, ca.supplemental_address_1, ca.supplemental_address_2, ca.supplemental_address_3) title, ce.loc_block_id
-FROM   civicrm_event ce
-INNER JOIN civicrm_loc_block lb ON ce.loc_block_id = lb.id
-INNER JOIN civicrm_address ca   ON lb.address_id = ca.id
-LEFT  JOIN civicrm_state_province sp ON ca.state_province_id = sp.id
-ORDER BY sp.name, ca.city, ca.street_address ASC
-";
+    $result = civicrm_api3('Event', 'get', array(
+      'check_permissions' => TRUE,
+      'return' => $ret,
+      'loc_block_id.address_id' => array('IS NOT NULL' => 1),
+    ));
 
-    $dao = CRM_Core_DAO::executeQuery($query);
-    while ($dao->fetch()) {
-      $events[$dao->loc_block_id] = $dao->title;
+    foreach ($result['values'] as $event) {
+      $address = '';
+      foreach ($ret as $field) {
+        if ($field != 'loc_block_id' && !empty($event[$field])) {
+          $address .= ($address ? ' :: ' : '') . $event[$field];
+        }
+      }
+      if ($address) {
+        $events[$event['loc_block_id']] = $address;
+      }
     }
 
-    return $events;
+    return CRM_Utils_Array::asort($events);
   }
 
   /**
@@ -2039,13 +2050,18 @@ WHERE  ce.loc_block_id = $locBlockId";
     static $permissions = NULL;
 
     if (empty($permissions)) {
-      $allEvents = CRM_Event_PseudoConstant::event(NULL, TRUE);
-      $createdEvents = array();
+      $result = civicrm_api3('Event', 'get', array(
+        'check_permissions' => 1,
+        'return' => 'title',
+      ));
+      $allEvents = CRM_Utils_Array::collect('title', $result['values']);
 
-      $session = CRM_Core_Session::singleton();
-      if ($userID = $session->get('userID')) {
-        $createdEvents = array_keys(CRM_Event_PseudoConstant::event(NULL, TRUE, "created_id={$userID}"));
-      }
+      $result = civicrm_api3('Event', 'get', array(
+        'check_permissions' => 1,
+        'return' => 'title',
+        'created_id' => 'user_contact_id',
+      ));
+      $createdEvents = CRM_Utils_Array::collect('title', $result['values']);
 
       // Note: for a multisite setup, a user with edit all events, can edit all events
       // including those from other sites
