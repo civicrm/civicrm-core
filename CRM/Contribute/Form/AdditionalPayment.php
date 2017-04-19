@@ -53,6 +53,11 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
 
   protected $_refund = NULL;
 
+  /**
+   * @deprecated - use parent $this->contactID
+   *
+   * @var int
+   */
   protected $_contactId = NULL;
 
   protected $_contributorDisplayName = NULL;
@@ -77,10 +82,10 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
 
     parent::preProcess();
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
+    // @todo don't set this - rely on parent $this->contactID
     $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
     $this->_component = CRM_Utils_Request::retrieve('component', 'String', $this, TRUE);
     $this->_view = CRM_Utils_Request::retrieve('view', 'String', $this, FALSE);
-    $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE);
     $this->assign('component', $this->_component);
     $this->assign('id', $this->_id);
     $this->assign('suppressPaymentFormButtons', $this->isBeingCalledFromSelectorContext());
@@ -136,8 +141,6 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     }
 
     list($this->_contributorDisplayName, $this->_contributorEmail) = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contactId);
-
-    $this->assignPaymentRelatedVariables();
 
     $this->assign('contributionMode', $this->_mode);
     $this->assign('contactId', $this->_contactId);

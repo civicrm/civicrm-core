@@ -181,7 +181,7 @@ class CRM_Core_Payment_Manual extends CRM_Core_Payment {
    * @return string
    */
   public function getPaymentTypeLabel() {
-    return 'Payment';
+    return CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', $this->getPaymentInstrumentID());
   }
 
   /**

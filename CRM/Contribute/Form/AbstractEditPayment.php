@@ -221,6 +221,7 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
     CRM_Core_Resources::singleton()->addVars('coreForm', array('contact_id' => (int) $this->_contactID));
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'add');
     $this->_mode = empty($this->_mode) ? CRM_Utils_Request::retrieve('mode', 'String', $this) : $this->_mode;
+    $this->assignPaymentRelatedVariables();
   }
 
   /**
@@ -643,6 +644,19 @@ WHERE  contribution_id = {$id}
 
     $billingDefaults = $this->getProfileDefaults('Billing', $this->_contactID);
     return array_merge($defaults, $billingDefaults);
+  }
+
+  /**
+   * Get the default payment instrument id.
+   *
+   * @return int
+   */
+  protected function getDefaultPaymentInstrumentId() {
+    $paymentInstrumentID = CRM_Utils_Request::retrieve('payment_instrument_id', 'Integer');
+    if ($paymentInstrumentID) {
+      return $paymentInstrumentID;
+    }
+    return key(CRM_Core_OptionGroup::values('payment_instrument', FALSE, FALSE, FALSE, 'AND is_default = 1'));
   }
 
 }
