@@ -310,7 +310,6 @@ class CRM_Core_Config_MagicMerge {
     unset($this->cache[$k]);
     $type = $this->map[$k][0];
 
-    $name = $k;
     // If foreign name is set, use that name (except with callback types because
     // their second parameter is the object, not the foreign name).
     $name = isset($this->map[$k][1]) && $type != 'callback' ? $this->map[$k][1] : $k;
