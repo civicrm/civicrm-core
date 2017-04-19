@@ -177,14 +177,21 @@ class api_v3_CaseTest extends CiviCaseTestCase {
 
     // Move Case to Trash
     $id = $result['id'];
-    $result = $this->callAPISuccess('case', 'delete', array('id' => $id, 'move_to_trash' => 1));
+    $this->callAPISuccess('case', 'delete', array('id' => $id, 'move_to_trash' => 1));
 
     // Check result - also check that 'case_id' works as well as 'id'
     $result = $this->callAPISuccess('case', 'get', array('case_id' => $id));
     $this->assertEquals(1, $result['values'][$id]['is_deleted']);
 
-    // Delete Case Permanently - also check that 'case_id' works as well as 'id'
-    $result = $this->callAPISuccess('case', 'delete', array('case_id' => $id));
+    // Restore Case from Trash
+    $this->callAPISuccess('case', 'restore', array('id' => $id));
+
+    // Check result
+    $result = $this->callAPISuccess('case', 'get', array('case_id' => $id));
+    $this->assertEquals(0, $result['values'][$id]['is_deleted']);
+
+    // Delete Case Permanently
+    $this->callAPISuccess('case', 'delete', array('case_id' => $id));
 
     // Check result - case should no longer exist
     $result = $this->callAPISuccess('case', 'get', array('id' => $id));

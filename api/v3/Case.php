@@ -492,8 +492,7 @@ function civicrm_api3_case_update($params) {
  * @endcode
  *
  * @throws API_Exception
- * @return bool
- *   true if success, else false
+ * @return mixed
  */
 function civicrm_api3_case_delete($params) {
   //check parameters
@@ -504,6 +503,33 @@ function civicrm_api3_case_delete($params) {
   }
   else {
     throw new API_Exception('Could not delete case.');
+  }
+}
+
+/**
+ * Case.restore API specification
+ *
+ * @param array $spec description of fields supported by this API call
+ * @return void
+ */
+function _civicrm_api3_case_restore_spec(&$spec) {
+  $result = civicrm_api3('Case', 'getfields', array('api_action' => 'delete'));
+  $spec = array('id' => $result['values']['id']);
+}
+
+/**
+ * Restore a specified case from the trash.
+ *
+ * @param array $params
+ * @throws API_Exception
+ * @return mixed
+ */
+function civicrm_api3_case_restore($params) {
+  if (CRM_Case_BAO_Case::restoreCase($params['id'])) {
+    return civicrm_api3_create_success($params, $params, 'Case', 'restore');
+  }
+  else {
+    throw new API_Exception('Could not restore case.');
   }
 }
 
