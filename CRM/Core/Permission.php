@@ -1016,6 +1016,12 @@ class CRM_Core_Permission {
         'access CiviCRM',
         'delete in CiviCase',
       ),
+      'restore' => array(
+        'administer CiviCase',
+      ),
+      'merge' => array(
+        'administer CiviCase',
+      ),
       'default' => array(
         // At minimum the user needs one of the following. Finer-grained access is controlled by CRM_Case_BAO_Case::addSelectWhereClause
         array('access my cases and activities', 'access all cases and activities'),

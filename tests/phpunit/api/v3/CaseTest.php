@@ -177,14 +177,21 @@ class api_v3_CaseTest extends CiviCaseTestCase {
 
     // Move Case to Trash
     $id = $result['id'];
-    $result = $this->callAPISuccess('case', 'delete', array('id' => $id, 'move_to_trash' => 1));
+    $this->callAPISuccess('case', 'delete', array('id' => $id, 'move_to_trash' => 1));
 
     // Check result - also check that 'case_id' works as well as 'id'
     $result = $this->callAPISuccess('case', 'get', array('case_id' => $id));
     $this->assertEquals(1, $result['values'][$id]['is_deleted']);
 
-    // Delete Case Permanently - also check that 'case_id' works as well as 'id'
-    $result = $this->callAPISuccess('case', 'delete', array('case_id' => $id));
+    // Restore Case from Trash
+    $this->callAPISuccess('case', 'restore', array('id' => $id));
+
+    // Check result
+    $result = $this->callAPISuccess('case', 'get', array('case_id' => $id));
+    $this->assertEquals(0, $result['values'][$id]['is_deleted']);
+
+    // Delete Case Permanently
+    $this->callAPISuccess('case', 'delete', array('case_id' => $id));
 
     // Check result - case should no longer exist
     $result = $this->callAPISuccess('case', 'get', array('id' => $id));
@@ -695,6 +702,35 @@ class api_v3_CaseTest extends CiviCaseTestCase {
     ));
     $this->assertEquals(2, $result['count']);
     $this->assertEquals('Follow up', $result['values'][1]['activity_type_id.name']);
+  }
+
+
+  /**
+   * Test the case merge function.
+   *
+   * 2 cases should be mergeable into 1
+   *
+   * @throws \Exception
+   */
+  public function testCaseMerge() {
+    $contact1 = $this->individualCreate(array(), 1);
+    $case1 = $this->callAPISuccess('Case', 'create', array(
+      'contact_id' => $contact1,
+      'subject' => "Test case 1",
+      'case_type_id' => $this->caseTypeId,
+    ));
+    $case2 = $this->callAPISuccess('Case', 'create', array(
+      'contact_id' => $contact1,
+      'subject' => "Test case 2",
+      'case_type_id' => $this->caseTypeId,
+    ));
+    $result = $this->callAPISuccess('Case', 'getcount', array('contact_id' => $contact1));
+    $this->assertEquals(2, $result);
+
+    $this->callAPISuccess('Case', 'merge', array('case_id_1' => $case1['id'], 'case_id_2' => $case2['id']));
+
+    $result = $this->callAPISuccess('Case', 'getsingle', array('id' => $case2['id']));
+    $this->assertEquals(1, $result['is_deleted']);
   }
 
 }
