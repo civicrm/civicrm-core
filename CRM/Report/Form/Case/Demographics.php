@@ -97,6 +97,13 @@ class CRM_Report_Form_Case_Demographics extends CRM_Report_Form {
             'no_display' => TRUE,
           ),
         ),
+        'order_bys' => array(
+          'sort_name' => array(
+            'title' => ts('Contact Name'),
+            'default_weight' => '1',
+            'dbAlias' => 'civicrm_contact_sort_name',
+          ),
+        ),
         'grouping' => 'contact-fields',
       ),
       'civicrm_email' => array(
@@ -186,6 +193,13 @@ class CRM_Report_Form_Case_Demographics extends CRM_Report_Form {
           'end_date' => array(
             'title' => ts('Case End'),
             'operatorType' => CRM_Report_Form::OP_DATE,
+          ),
+        ),
+        'order_bys' => array(
+          'id' => array(
+            'title' => ts('Case ID'),
+            'default_weight' => '2',
+            'dbAlias' => 'civicrm_case_id',
           ),
         ),
       ),
@@ -369,10 +383,6 @@ where (cg.extends='Contact' OR cg.extends='Individual' OR cg.extends_entity_colu
   public function groupBy() {
     $groupBy = array("{$this->_aliases['civicrm_contact']}.id", "{$this->_aliases['civicrm_case']}.id");
     $this->_groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, $groupBy);
-  }
-
-  public function orderBy() {
-    $this->_orderBy = "ORDER BY {$this->_aliases['civicrm_contact']}.sort_name, {$this->_aliases['civicrm_contact']}.id, {$this->_aliases['civicrm_case']}.id";
   }
 
   public function postProcess() {

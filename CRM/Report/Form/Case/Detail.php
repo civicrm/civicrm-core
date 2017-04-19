@@ -54,6 +54,8 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
 
   protected $_customGroupExtends = array('Case');
 
+  protected $_caseTypeNameOrderBy = FALSE;
+
   /**
    */
   public function __construct() {
@@ -133,6 +135,21 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
             'operatorType' => CRM_Report_Form::OP_SELECT,
             'options' => $this->deleted_labels,
             'default' => 0,
+          ),
+        ),
+        'order_bys'  => array(
+          'start_date' => array(
+            'title' => ts('Start Date'),
+            'default_weight' => 1,
+          ),
+          'end_date' => array(
+            'title' => ts('End Date'),
+          ),
+          'status_id' => array(
+            'title' => ts('Status'),
+          ),
+          'case_type_name' => array(
+            'title' => 'Case Type',
           ),
         ),
       ),
@@ -336,6 +353,16 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
         }
       }
     }
+
+    if ($orderBys = $this->_params['order_bys']) {
+      foreach ($orderBys as $orderBy) {
+        if ($orderBy['column'] == 'case_type_name') {
+          $select[] = "civireport_case_types.title as case_type_name";
+          $this->_caseTypeNameOrderBy = TRUE;
+        }
+      }
+    }
+
     $this->_selectClauses = $select;
 
     $this->_select = 'SELECT ' . implode(', ', $select) . ' ';
@@ -391,6 +418,14 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
     // Include clause for last completed activity of the case
     if ($this->_activityLastCompleted) {
       $this->_from .= " LEFT JOIN civicrm_activity {$this->_aliases['civicrm_activity_last_completed']} ON ( {$this->_aliases['civicrm_activity_last_completed']}.id = ( SELECT max(activity_id) FROM civicrm_case_activity cca, civicrm_activity ca WHERE ca.id = cca.activity_id AND cca.case_id = {$case}.id AND ca.status_id = 2 ) )";
+    }
+
+    //include case type name
+    if ($this->_caseTypeNameOrderBy) {
+      $this->_from .= "
+        LEFT JOIN civicrm_case_type civireport_case_types
+          ON {$case}.case_type_id = civireport_case_types.id
+      ";
     }
   }
 
@@ -480,7 +515,11 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
   }
 
   public function orderBy() {
-    $this->_orderBy = " ORDER BY {$this->_aliases['civicrm_case']}.start_date DESC ";
+    parent::orderBy();
+
+    if ($this->_caseTypeNameOrderBy) {
+      $this->_orderBy = str_replace('case_civireport.case_type_name', 'civireport_case_types.title', $this->_orderBy);
+    }
   }
 
   public function caseDetailSpecialColumnProcess() {
