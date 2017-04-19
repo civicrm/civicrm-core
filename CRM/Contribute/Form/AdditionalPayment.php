@@ -99,7 +99,6 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       return;
     }
     $this->_fromEmails = CRM_Core_BAO_Email::getFromEmail();
-    $this->_formType = CRM_Utils_Array::value('formType', $_GET);
 
     $enitityType = NULL;
     $enitityType = 'contribution';
@@ -436,10 +435,10 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     $params["address_name-{$this->_bltID}"] = trim($params["address_name-{$this->_bltID}"]);
     $fields["address_name-{$this->_bltID}"] = 1;
 
-    $ctype = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
-      $this->_contactId,
-      'contact_type'
-    );
+    $ctype = civicrm_api3('Contact', 'getvalue', array(
+      'return' => "contact_type",
+      'id' => $this->_contactId,
+    ));
 
     $nameFields = array('first_name', 'middle_name', 'last_name');
     foreach ($nameFields as $name) {
@@ -569,9 +568,11 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
   }
 
   /**
+   * Function to send email receipt.
+   *
    * @param array $params
    *
-   * @return mixed
+   * @return bool
    */
   public function emailReceipt(&$params) {
     // email receipt sending
@@ -647,11 +648,56 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       $sendTemplateParams['from'] = $receiptFrom;
       $sendTemplateParams['toName'] = $this->_contributorDisplayName;
       $sendTemplateParams['toEmail'] = $this->_contributorEmail;
-      $sendTemplateParams['cc'] = CRM_Utils_Array::value('cc', $this->_fromEmails);
-      $sendTemplateParams['bcc'] = CRM_Utils_Array::value('bcc', $this->_fromEmails);
     }
     list($mailSent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
     return $mailSent;
+  }
+
+  /**
+   * Wrapper for unit testing the post process submit function.
+   *
+   *
+   * @param array $params
+   * @param string|null $creditCardMode
+   * @param string $enitityType
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function testSubmit($params, $creditCardMode = NULL, $enitityType = 'contribute') {
+    $this->_bltID = 5;
+    if (!empty($params['contribution_id'])) {
+      $this->_contributionId = $params['contribution_id'];
+
+      $paymentInfo = CRM_Core_BAO_FinancialTrxn::getPartialPaymentWithType($this->_contributionId, $enitityType);
+      $paymentDetails = CRM_Contribute_BAO_Contribution::getPaymentInfo($this->_contributionId, $enitityType, FALSE, TRUE);
+
+      $this->_amtPaid = $paymentDetails['paid'];
+      $this->_amtTotal = $paymentDetails['total'];
+
+      if (!empty($paymentInfo['refund_due'])) {
+        $this->_refund = $paymentInfo['refund_due'];
+        $this->_paymentType = 'refund';
+      }
+      elseif (!empty($paymentInfo['amount_owed'])) {
+        $this->_owed = $paymentInfo['amount_owed'];
+        $this->_paymentType = 'owed';
+      }
+    }
+
+    if (!empty($params['contact_id'])) {
+      $this->_contactId = $params['contact_id'];
+    }
+
+    if ($creditCardMode) {
+      $this->_mode = $creditCardMode;
+    }
+
+    // Required because processCreditCard calls set method on this.
+    $_SERVER['REQUEST_METHOD'] = 'GET';
+    $this->controller = new CRM_Core_Controller();
+
+    $this->_fields = array();
+    $this->submit($params);
   }
 
 }

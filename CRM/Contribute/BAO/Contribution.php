@@ -3943,8 +3943,9 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
       $activityType = ($paymentType == 'refund') ? 'Refund' : 'Payment';
 
       self::addActivityForPayment($entityObj, $financialTrxn, $activityType, $component, $contributionId);
+      return $financialTrxn;
     }
-    return $financialTrxn;
+
   }
 
   /**
