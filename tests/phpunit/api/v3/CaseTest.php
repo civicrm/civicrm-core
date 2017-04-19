@@ -704,4 +704,33 @@ class api_v3_CaseTest extends CiviCaseTestCase {
     $this->assertEquals('Follow up', $result['values'][1]['activity_type_id.name']);
   }
 
+
+  /**
+   * Test the case merge function.
+   *
+   * 2 cases should be mergeable into 1
+   *
+   * @throws \Exception
+   */
+  public function testCaseMerge() {
+    $contact1 = $this->individualCreate(array(), 1);
+    $case1 = $this->callAPISuccess('Case', 'create', array(
+      'contact_id' => $contact1,
+      'subject' => "Test case 1",
+      'case_type_id' => $this->caseTypeId,
+    ));
+    $case2 = $this->callAPISuccess('Case', 'create', array(
+      'contact_id' => $contact1,
+      'subject' => "Test case 2",
+      'case_type_id' => $this->caseTypeId,
+    ));
+    $result = $this->callAPISuccess('Case', 'getcount', array('contact_id' => $contact1));
+    $this->assertEquals(2, $result);
+
+    $this->callAPISuccess('Case', 'merge', array('case_id_1' => $case1['id'], 'case_id_2' => $case2['id']));
+
+    $result = $this->callAPISuccess('Case', 'getsingle', array('id' => $case2['id']));
+    $this->assertEquals(1, $result['is_deleted']);
+  }
+
 }

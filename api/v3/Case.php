@@ -399,6 +399,42 @@ function _civicrm_api3_case_addtimeline_spec(&$params) {
 }
 
 /**
+ * Merge 2 cases.
+ *
+ * @param array $params
+ *
+ * @throws API_Exception
+ * @return array
+ */
+function civicrm_api3_case_merge($params) {
+  $clients1 = CRM_Case_BAO_Case::getCaseClients($params['case_id_1']);
+  $clients2 = CRM_Case_BAO_Case::getCaseClients($params['case_id_2']);
+  CRM_Case_BAO_Case::mergeCases($clients1[0], $params['case_id_1'], $clients2[0], $params['case_id_2']);
+  return civicrm_api3_create_success();
+}
+
+/**
+ * Adjust Metadata for merge action.
+ *
+ * @param array $params
+ *   Array of parameters determined by getfields.
+ */
+function _civicrm_api3_case_merge_spec(&$params) {
+  $params['case_id_1'] = array(
+    'title' => 'Case ID 1',
+    'description' => 'Id of main case',
+    'type' => CRM_Utils_Type::T_INT,
+    'api.required' => 1,
+  );
+  $params['case_id_2'] = array(
+    'title' => 'Case ID 2',
+    'description' => 'Id of second case',
+    'type' => CRM_Utils_Type::T_INT,
+    'api.required' => 1,
+  );
+}
+
+/**
  * Declare deprecated api functions.
  *
  * @deprecated api notice
