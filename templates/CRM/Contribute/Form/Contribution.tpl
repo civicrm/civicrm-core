@@ -235,6 +235,10 @@
   </table>
 
   {if !$contributionMode}
+    <fieldset class="payment-details_group">
+      <legend>
+        {ts}Payment Details{/ts}
+      </legend>
         <table class="form-layout-compressed" >
           <tr class="crm-contribution-form-block-receive_date">
             <td class="label">{$form.receive_date.label}</td>
@@ -282,6 +286,7 @@
             <td>{$form.from_email_address.html}</td>
           </tr>
         </table>
+      </fieldset>
   {/if}
 
   {include file='CRM/Core/BillingBlockWrapper.tpl'}

@@ -1274,6 +1274,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
               'payment_processor_id' => $this->_paymentProcessor['id'],
               'is_transactional' => FALSE,
               'fee_amount' => CRM_Utils_Array::value('fee_amount', $result),
+              'card_type_id' => CRM_Utils_Array::value('card_type_id', $paymentParams),
+              'pan_truncation' => CRM_Utils_Array::value('pan_truncation', $paymentParams),
             ));
             // This has now been set to 1 in the DB - declare it here also
             $contribution->contribution_status_id = 1;
@@ -1432,10 +1434,11 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * @throws \Exception
    */
   protected function submit($submittedValues, $action, $pledgePaymentID) {
-
     $pId = $contribution = $isRelatedId = FALSE;
     $this->_params = $submittedValues;
     $this->beginPostProcess();
+    // reassign submitted form values if the any information is formatted via beginPostProcess
+    $submittedValues = $this->_params;
 
     if (!empty($submittedValues['price_set_id']) && $action & CRM_Core_Action::UPDATE) {
       $line = CRM_Price_BAO_LineItem::getLineItems($this->_id, 'contribution');
@@ -1643,6 +1646,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         'cancel_reason',
         'source',
         'check_number',
+        'card_type_id',
+        'pan_truncation',
       );
       foreach ($fields as $f) {
         $params[$f] = CRM_Utils_Array::value($f, $formValues);
