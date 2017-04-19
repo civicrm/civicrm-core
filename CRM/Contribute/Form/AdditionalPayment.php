@@ -330,6 +330,8 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
    *
    */
   public function submit($submittedValues) {
+    $this->_params = $submittedValues;
+    $this->beginPostProcess();
     $participantId = NULL;
     if ($this->_component == 'event') {
       $participantId = $this->_id;
@@ -403,12 +405,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     }
 
     // Get the required fields value only.
-    $params = $this->_params = $submittedValues;
-
-    //get the payment processor id as per mode.
-    //@todo unclear relevance of mode - seems like a lot of duplicated params here!
-    $this->_params['payment_processor'] = $params['payment_processor_id']
-      = $this->_params['payment_processor_id'] = $submittedValues['payment_processor_id'] = $this->_paymentProcessor['id'];
+    $params = $submittedValues;
 
     $now = date('YmdHis');
     $fields = array();
@@ -462,11 +459,6 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     $this->_params["state_province-{$this->_bltID}"] = $this->_params["billing_state_province-{$this->_bltID}"] = CRM_Core_PseudoConstant::stateProvinceAbbreviation($this->_params["billing_state_province_id-{$this->_bltID}"]);
     $this->_params["country-{$this->_bltID}"] = $this->_params["billing_country-{$this->_bltID}"] = CRM_Core_PseudoConstant::countryIsoCode($this->_params["billing_country_id-{$this->_bltID}"]);
 
-    if ($this->_paymentProcessor['payment_type'] & CRM_Core_Payment::PAYMENT_TYPE_CREDIT_CARD) {
-      $this->_params['year'] = CRM_Core_Payment_Form::getCreditCardExpirationYear($this->_params);
-      $this->_params['month'] = CRM_Core_Payment_Form::getCreditCardExpirationMonth($this->_params);
-    }
-    $this->_params['ip_address'] = CRM_Utils_System::ipAddress();
     $this->_params['amount'] = $this->_params['total_amount'];
     // @todo - stop setting amount level in this function & call the CRM_Price_BAO_PriceSet::getAmountLevel
     // function to get correct amount level consistently. Remove setting of the amount level in
@@ -494,14 +486,6 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       $params,
       $this->_bltID
     ));
-
-    $date = CRM_Utils_Date::format($params['credit_card_exp_date']);
-    $date = CRM_Utils_Date::mysqlToIso($date);
-    $this->assign('credit_card_type', CRM_Utils_Array::value('credit_card_type', $params));
-    $this->assign('credit_card_exp_date', $date);
-    $this->assign('credit_card_number',
-      CRM_Utils_System::mungeCreditCard($params['credit_card_number'])
-    );
 
     //Add common data to formatted params
     CRM_Contribute_Form_AdditionalInfo::postProcessCommon($params, $this->_params, $this);
@@ -656,7 +640,6 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
   /**
    * Wrapper for unit testing the post process submit function.
    *
-   *
    * @param array $params
    * @param string|null $creditCardMode
    * @param string $enitityType
@@ -665,6 +648,11 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
    */
   public function testSubmit($params, $creditCardMode = NULL, $enitityType = 'contribute') {
     $this->_bltID = 5;
+    // Required because processCreditCard calls set method on this.
+    $_SERVER['REQUEST_METHOD'] = 'GET';
+    $this->controller = new CRM_Core_Controller();
+
+    $this->assignPaymentRelatedVariables();
     if (!empty($params['contribution_id'])) {
       $this->_contributionId = $params['contribution_id'];
 
@@ -691,10 +679,6 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     if ($creditCardMode) {
       $this->_mode = $creditCardMode;
     }
-
-    // Required because processCreditCard calls set method on this.
-    $_SERVER['REQUEST_METHOD'] = 'GET';
-    $this->controller = new CRM_Core_Controller();
 
     $this->_fields = array();
     $this->submit($params);

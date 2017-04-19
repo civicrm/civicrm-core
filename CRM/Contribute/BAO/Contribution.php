@@ -3223,6 +3223,9 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       if (!empty($financialTrxnValues)) {
         $trxnParams = array_merge($trxnParams, $financialTrxnValues);
       }
+      if (empty($trxnParams['payment_processor_id'])) {
+        unset($trxnParams['payment_processor_id']);
+      }
 
       $params['trxnParams'] = $trxnParams;
 

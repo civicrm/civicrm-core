@@ -127,7 +127,7 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
 
   /**
    * Test the submit function that completes the partially paid Contribution using Credit Card.
-
+   */
   public function testAddPaymentUsingCreditCardForPartialyPaidContribution() {
     $this->createContribution('Partially paid');
 
@@ -135,7 +135,6 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
     $this->submitPayment(70, 'live');
     $this->checkResults(array(30, 70), 2);
   }
-   */
 
   /**
    * Test the submit function that completes the partially paid Contribution.
@@ -163,10 +162,11 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
     $this->submitPayment(20);
     $this->checkResults(array(30, 50, 20), 3);
   }
+
   /**
    * Test the submit function that completes the partially paid Contribution with multiple payments.
-   *
-  public function testMultiplePaymentForPartialyPaidContributionWithOneCreditCardPayment() {
+   */
+  public function testMultiplePaymentForPartiallyPaidContributionWithOneCreditCardPayment() {
     $this->createContribution('Partially paid');
 
     // pay additional amount
@@ -179,10 +179,9 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
     $this->checkResults(array(30, 50, 20), 3);
   }
 
-
   /**
    * Test the submit function that completes the pending pay later Contribution using Credit Card.
-   *
+   */
   public function testAddPaymentUsingCreditCardForPendingPayLaterContribution() {
     $this->createContribution('Pending');
 
@@ -190,7 +189,6 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
     $this->submitPayment(100, 'live');
     $this->checkResults(array(100), 1);
   }
-   */
 
   /**
    * Test the submit function that completes the pending pay later Contribution.
@@ -233,7 +231,7 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
 
   /**
    * Test the submit function that completes the pending pay later Contribution with multiple payments.
-   *
+   */
   public function testMultiplePaymentForPendingPayLaterContributionWithOneCreditCardPayment() {
     $this->createContribution('Pending');
 
@@ -253,7 +251,6 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
     $this->submitPayment(10, 'live');
     $this->checkResults(array(50, 20, 20, 10), 4);
   }
-   */
 
   /**
    * Function to create pending pay later or partially paid conntribution.
@@ -303,6 +300,7 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
       'receive_date' => '04/21/2015',
       'receive_date_time' => '11:27PM',
       'trxn_date' => '2017-04-11 13:05:11',
+      'payment_processor_id' => 0,
     );
     if ($mode) {
       $submitParams += array(
