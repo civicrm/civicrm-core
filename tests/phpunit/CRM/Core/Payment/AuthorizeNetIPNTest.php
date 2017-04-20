@@ -56,7 +56,34 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
       ));
     $this->assertEquals(2, $contribution['count']);
     $this->assertEquals('second_one', $contribution['values'][1]['trxn_id']);
+    $this->assertEquals(date('Y-m-d'), date('Y-m-d', strtotime($contribution['values'][1]['receive_date'])));
   }
+
+  /**
+   * Test IPN response updates contribution_recur & contribution for first & second contribution
+   */
+  public function testIPNPaymentRecurSuccessSuppliedReceiveDate() {
+    $this->setupRecurringPaymentProcessorTransaction();
+    $IPN = new CRM_Core_Payment_AuthorizeNetIPN($this->getRecurTransaction());
+    $IPN->main();
+    $contribution = $this->callAPISuccess('contribution', 'getsingle', array('id' => $this->_contributionID));
+    $this->assertEquals(1, $contribution['contribution_status_id']);
+    $this->assertEquals('6511143069', $contribution['trxn_id']);
+    // source gets set by processor
+    $this->assertTrue(substr($contribution['contribution_source'], 0, 20) == "Online Contribution:");
+    $contributionRecur = $this->callAPISuccess('contribution_recur', 'getsingle', array('id' => $this->_contributionRecurID));
+    $this->assertEquals(5, $contributionRecur['contribution_status_id']);
+    $IPN = new CRM_Core_Payment_AuthorizeNetIPN(array_merge(array('receive_date' => '1 July 2010'), $this->getRecurSubsequentTransaction()));
+    $IPN->main();
+    $contribution = $this->callAPISuccess('contribution', 'get', array(
+      'contribution_recur_id' => $this->_contributionRecurID,
+      'sequential' => 1,
+    ));
+    $this->assertEquals(2, $contribution['count']);
+    $this->assertEquals('second_one', $contribution['values'][1]['trxn_id']);
+    $this->assertEquals('2010-07-01', date('Y-m-d', strtotime($contribution['values'][1]['receive_date'])));
+  }
+
 
   /**
    * Test IPN response updates contribution_recur & contribution for first & second contribution
