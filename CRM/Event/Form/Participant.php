@@ -814,12 +814,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     }
 
     if (!empty($values['record_contribution'])) {
-      if (empty($values['financial_type_id'])) {
-        $errorMsg['financial_type_id'] = ts('Please enter the associated Financial Type');
-      }
-      if (empty($values['payment_instrument_id'])) {
-        $errorMsg['payment_instrument_id'] = ts('Payment Method is a required field.');
-      }
+      CRM_Contribute_Form_PaymentDetails::formRule($values, $errorMsg);
       CRM_Price_BAO_PriceField::priceSetValidation($values['priceSetId'], $values, $errorMsg);
     }
 
@@ -1350,6 +1345,8 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
           'receive_date',
           'check_number',
           'campaign_id',
+          'card_type',
+          'pan_truncation',
         );
 
         foreach ($recordContribution as $f) {
