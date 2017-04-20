@@ -3385,6 +3385,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         // also make it available as return value
         self::recordAlwaysAccountsReceivable($trxnParams, $params);
         $trxnParams['pan_truncation'] = CRM_Utils_Array::value('pan_truncation', $params);
+        $trxnParams['card_type_id'] = CRM_Utils_Array::value('card_type_id', $params);
         $return = $financialTxn = CRM_Core_BAO_FinancialTrxn::create($trxnParams);
         $params['entity_id'] = $financialTxn->id;
         if (empty($params['partial_payment_total']) && empty($params['partial_amount_pay'])) {
@@ -3808,6 +3809,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       $params['partial_amount_pay'] = $trxnsData['total_amount'];
       $trxnsData['net_amount'] = !empty($trxnsData['net_amount']) ? $trxnsData['net_amount'] : $trxnsData['total_amount'];
       $params['pan_truncation'] = CRM_Utils_Array::value('pan_truncation', $trxnsData);
+      $params['card_type_id'] = CRM_Utils_Array::value('card_type_id', $trxnsData);
 
       // record the entry
       $financialTrxn = CRM_Contribute_BAO_Contribution::recordFinancialAccounts($params, $trxnsData);
