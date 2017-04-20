@@ -967,7 +967,6 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
     $visaID = CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_FinancialTrxn', 'card_type_id', 'Visa');
     $form = new CRM_Contribute_Form_Contribution();
     $form->_mode = 'Live';
-    $error = FALSE;
     $form->testSubmit(
       array(
         'total_amount' => 50,
@@ -1014,9 +1013,8 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
         'return' => array('card_type_id', 'pan_truncation'),
       )
     );
-    // @todo in test environment FinancialTrxn.getsingle doesn't fetch card_type_id value
-    //$this->assertEquals(CRM_Utils_Array::value('card_type_id', $financialTrxn), $visaID);
-    $this->assertEquals(CRM_Utils_Array::value('pan_truncation', $financialTrxn), 1111);
+    $this->assertEquals($visaID, $financialTrxn['card_type_id']);
+    $this->assertEquals(1111, $financialTrxn['pan_truncation']);
   }
 
 }
