@@ -156,7 +156,7 @@ class CRM_Admin_Page_PaymentProcessor extends CRM_Core_Page_Basic {
         'PaymentProcessor',
         $dao->id
       );
-      $paymentProcessor[$dao->id]['financialAccount'] = CRM_Financial_BAO_FinancialTypeAccount::getFinancialAccount($dao->id, 'civicrm_payment_processor');
+      $paymentProcessor[$dao->id]['financialAccount'] = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($dao->id, NULL, 'civicrm_payment_processor', 'financial_account_id.name');
     }
 
     $this->assign('rows', $paymentProcessor);

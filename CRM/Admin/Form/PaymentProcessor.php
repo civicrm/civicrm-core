@@ -359,7 +359,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
         $defaults[$testName] = $testDAO->{$field['name']};
       }
     }
-    $defaults['financial_account_id'] = CRM_Financial_BAO_FinancialTypeAccount::getFinancialAccount($dao->id, 'civicrm_payment_processor', 'financial_account_id');
+    $defaults['financial_account_id'] = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($dao->id, NULL, 'civicrm_payment_processor');
 
     return $defaults;
   }
