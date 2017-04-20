@@ -325,11 +325,26 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
   }
 
   /**
+   * Test harness for submit.
+   *
+   * @param $submittedValues
+   * @param $mode
+   */
+  public function testSubmit($submittedValues, $mode) {
+    $this->_mode = $mode;
+    $this->assignPaymentRelatedVariables();
+    $this->_contactId = $submittedValues['contact_id'];
+    $this->_contributionId = $submittedValues['id'];
+    $this->submit($submittedValues);
+
+  }
+
+  /**
    * Process Payments.
    * @param array $submittedValues
    *
    */
-  public function submit($submittedValues) {
+  protected function submit($submittedValues) {
     $participantId = NULL;
     if ($this->_component == 'event') {
       $participantId = $this->_id;
