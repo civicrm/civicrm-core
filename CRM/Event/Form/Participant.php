@@ -85,6 +85,10 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   protected $_noteId = NULL;
 
   /**
+   * @deprecated
+   *
+   * Use parent $this->contactID
+   *
    * The id of the contact associated with this participation.
    *
    * @var int
@@ -204,20 +208,19 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * @return void
    */
   public function preProcess() {
+    parent::preProcess();
     $this->_showFeeBlock = CRM_Utils_Array::value('eventId', $_GET);
     $this->assign('showFeeBlock', FALSE);
     $this->assign('feeBlockPaid', FALSE);
 
-    $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
-    $this->_mode = CRM_Utils_Request::retrieve('mode', 'String', $this);
+    // @todo eliminate this duplication.
+    $this->_contactId = $this->_contactID;
     $this->_eID = CRM_Utils_Request::retrieve('eid', 'Positive', $this);
     $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this);
     $this->assign('context', $this->_context);
 
-    if ($this->_contactId) {
-      $displayName = CRM_Contact_BAO_Contact::displayName($this->_contactId);
-      $this->assign('displayName', $displayName);
-      $this->setPageTitle(ts('Event Registration for %1', array(1 => $displayName)));
+    if ($this->_contactID) {
+      $this->setPageTitle(ts('Event Registration for %1', array(1 => $this->userDisplayName)));
     }
     else {
       $this->setPageTitle(ts('Event Registration'));
@@ -271,7 +274,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
 
     if ($this->_mode) {
       $this->assign('participantMode', $this->_mode);
-      $this->assignPaymentRelatedVariables();
     }
 
     if ($this->_showFeeBlock) {
@@ -935,7 +937,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     $participantStatus = CRM_Event_PseudoConstant::participantStatus();
     // set the contact, when contact is selected
     if (!empty($params['contact_id'])) {
-      $this->_contactId = $params['contact_id'];
+      $this->_contactID = $this->_contactId = $params['contact_id'];
     }
     if ($this->_priceSetId && $isQuickConfig = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_priceSetId, 'is_quick_config')) {
       $this->_quickConfig = $isQuickConfig;
@@ -1340,20 +1342,22 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         $contributionParams['currency'] = $config->defaultCurrency;
         $contributionParams['non_deductible_amount'] = 'null';
         $contributionParams['receipt_date'] = !empty($params['send_receipt']) ? CRM_Utils_Array::value('receive_date', $params) : 'null';
+        $contributionParams['contact_id'] = $this->_contactID;
+        // @todo change receive_date to datepicker field. Strip out all wrangling.
+        $contributionParams['receive_date'] = $params['receive_date'];
 
         $recordContribution = array(
-          'contact_id',
           'financial_type_id',
           'payment_instrument_id',
           'trxn_id',
           'contribution_status_id',
-          'receive_date',
           'check_number',
           'campaign_id',
+          'pan_truncation',
         );
 
         foreach ($recordContribution as $f) {
-          $contributionParams[$f] = CRM_Utils_Array::value($f, $params);
+          $contributionParams[$f] = CRM_Utils_Array::value($f, $this->_params);
           if ($f == 'trxn_id') {
             $this->assign('trxn_id', $contributionParams[$f]);
           }

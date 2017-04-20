@@ -431,6 +431,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    */
   public function testSubmit() {
     $form = $this->getForm();
+    $form->preProcess();
     $this->mut = new CiviMailUtils($this, TRUE);
     $form->_mode = 'test';
     $this->createLoggedInUser();
@@ -538,6 +539,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    */
   public function testFormStatusUpdate() {
     $form = $this->getForm();
+    $form->preProcess();
     $this->_individualId = $this->createLoggedInUser();
     $memParams = array(
       'contact_id' => $this->_individualId,
@@ -580,6 +582,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    */
   public function testSubmitPayLaterWithBilling() {
     $form = $this->getForm(NULL);
+    $form->preProcess();
     $this->createLoggedInUser();
     $params = array(
       'cid' => $this->_individualId,
@@ -706,6 +709,7 @@ Expires: ',
    */
   public function testFormWithFailedContribution() {
     $form = $this->getForm();
+    $form->preProcess();
     $this->createLoggedInUser();
     $params = $this->getBaseSubmitParams();
     unset($params['price_set_id']);
@@ -739,7 +743,6 @@ Expires: ',
     $form = new CRM_Member_Form_Membership();
     $_SERVER['REQUEST_METHOD'] = 'GET';
     $form->controller = new CRM_Core_Controller();
-    $form->_bltID = 5;
     return $form;
   }
 

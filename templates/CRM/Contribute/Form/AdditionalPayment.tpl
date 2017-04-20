@@ -99,7 +99,9 @@
       </td>
     </tr>
    </table>
+
     <div class="crm-accordion-wrapper crm-accordion_title-accordion crm-accordion-processed" id="paymentDetails_Information">
+      {if !$contributionMode}
       <div class="crm-accordion-header">
         {if $paymentType EQ 'refund'}{ts}Refund Details{/ts}{else}{ts}Payment Details{/ts}{/if}
       </div>
@@ -152,6 +154,7 @@
             <span class="description">{ts}Net value of the payment (Total Amount minus Fee).{/ts}</span></td></tr>
         </table>
       </div>
+      {/if}
       {include file='CRM/Core/BillingBlockWrapper.tpl'}
     </div>
 
