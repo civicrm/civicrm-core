@@ -119,6 +119,32 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $this->assertEquals($result['values'][$this->_eventIds[1]]['event_title'], 'Annual CiviCRM meet 2');
   }
 
+  /**
+   * Test getLocationEvents() function invokes selectWhereClause() hook
+   */
+  public function testGetEventWithPermissionHook() {
+    $address = $this->callAPISuccess('address', 'create', array(
+      'contact_id' => 'null',
+      'location_type_id' => 1,
+      'street_address' => '1234567',
+    ));
+    $params = array(
+      'address_id' => $address['id'],
+    );
+    $result = $this->callAPISuccess('loc_block', 'create', $params);
+    $params = array(
+      'id' => $this->_events[1]['id'],
+      'loc_block_id' => $result['id'],
+    );
+    $this->callAPISuccess('Event', 'create', $params);
+    $result = CRM_Event_BAO_Event::getLocationEvents();
+    $this->assertEquals(1, count($result));
+
+    $this->hookClass->setHook('civicrm_selectWhereClause', array($this, 'selectWhereClauseHook'));
+    $result = CRM_Event_BAO_Event::getLocationEvents();
+    $this->assertEquals(0, count($result));
+  }
+
   public function testGetEventByEventTitle() {
 
     $params = array(

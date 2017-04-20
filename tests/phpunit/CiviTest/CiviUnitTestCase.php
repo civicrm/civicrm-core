@@ -3800,4 +3800,16 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
   public function aclWhereHookNoResults($type, &$tables, &$whereTables, &$contactID, &$where) {
   }
 
+  /**
+   * @implements CRM_Utils_Hook::selectWhereClause
+   *
+   * @param string $entity
+   * @param array $clauses
+   */
+  public function selectWhereClauseHook($entity, &$clauses) {
+    if ($entity == 'Event') {
+      $clauses['event_type_id'][] = "IN (2, 3, 4)";
+    }
+  }
+
 }
