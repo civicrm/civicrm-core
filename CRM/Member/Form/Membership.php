@@ -1308,6 +1308,8 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         'check_number',
         'campaign_id',
         'receive_date',
+        'card_type_id',
+        'pan_truncation',
       );
 
       foreach ($recordContribution as $f) {

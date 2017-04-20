@@ -67,8 +67,8 @@ class CRM_Core_Payment_Form {
     $processor['object']->setBackOffice($isBackOffice);
     $processor['object']->setPaymentInstrumentID($paymentInstrumentID);
     $paymentTypeName = self::getPaymentTypeName($processor);
-    $paymentTypeLabel = self::getPaymentTypeLabel($processor);
     $form->assign('paymentTypeName', $paymentTypeName);
+    $paymentTypeLabel = self::getPaymentTypeLabel($processor);
     $form->assign('paymentTypeLabel', $paymentTypeLabel);
     $form->assign('isBackOffice', $isBackOffice);
     $form->_paymentFields = $form->billingFieldSets[$paymentTypeName]['fields'] = self::getPaymentFieldMetadata($processor);

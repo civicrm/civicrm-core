@@ -95,7 +95,7 @@ class CRM_Core_Payment_Manual extends CRM_Core_Payment {
       // However there is an ambiguity as that field is an integer & should hence be called
       // credit_card_type_id, or it should store 'visa' It probably makes sense to fix that before going much
       // further as the code I've seen makes it clear that it will require work arounds.
-      return array('pan_truncation');
+      return array('credit_card_type', 'pan_truncation');
     }
     elseif ($paymentInstrument === 'Check') {
       // Really we should render check_number here, but we need to review how we edit

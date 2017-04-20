@@ -2037,6 +2037,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     // fix currency ID
     $this->_params['currencyID'] = CRM_Core_Config::singleton()->defaultCurrency;
 
+    CRM_Contribute_Form_AbstractEditPayment::formatCreditCardDetails($this->_params);
+
     // CRM-18854
     if (CRM_Utils_Array::value('is_pledge', $this->_params) && !CRM_Utils_Array::value('pledge_id', $this->_values) && CRM_Utils_Array::value('adjust_recur_start_date', $this->_values)) {
       $pledgeBlock = CRM_Pledge_BAO_PledgeBlock::getPledgeBlock($this->_id);
@@ -2434,14 +2436,15 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     if (CRM_Utils_Array::value('payment_status_id', $result) == 1) {
       try {
         civicrm_api3('contribution', 'completetransaction', array(
-            'id' => $contributionID,
-            'trxn_id' => CRM_Utils_Array::value('trxn_id', $result),
-            'payment_processor_id' => $this->_paymentProcessor['id'],
-            'is_transactional' => FALSE,
-            'fee_amount' => CRM_Utils_Array::value('fee_amount', $result),
-            'receive_date' => CRM_Utils_Array::value('receive_date', $result),
-          )
-        );
+          'id' => $contributionID,
+          'trxn_id' => CRM_Utils_Array::value('trxn_id', $result),
+          'payment_processor_id' => $this->_paymentProcessor['id'],
+          'is_transactional' => FALSE,
+          'fee_amount' => CRM_Utils_Array::value('fee_amount', $result),
+          'receive_date' => CRM_Utils_Array::value('receive_date', $result),
+          'card_type_id' => CRM_Utils_Array::value('card_type_id', $result),
+          'pan_truncation' => CRM_Utils_Array::value('pan_truncation', $result),
+        ));
       }
       catch (CiviCRM_API3_Exception $e) {
         if ($e->getErrorCode() != 'contribution_completed') {

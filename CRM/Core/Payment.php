@@ -61,6 +61,18 @@ abstract class CRM_Core_Payment {
     BILLING_MODE_NOTIFY = 4;
 
   /**
+   * Which payment type(s) are we using?
+   *
+   * credit card
+   * direct debit
+   * or both
+   * @todo create option group - nb omnipay uses a 3rd type - transparent redirect cc
+   */
+  const
+    PAYMENT_TYPE_CREDIT_CARD = 1,
+    PAYMENT_TYPE_DIRECT_DEBIT = 2;
+
+  /**
    * Subscription / Recurring payment Status
    * START, END
    */
@@ -780,6 +792,13 @@ abstract class CRM_Core_Payment {
           'size' => 4,
           'maxlength' => 4,
           'autocomplete' => 'off',
+        ),
+        'rules' => array(
+          array(
+            'rule_message' => ts('Please enter valid last 4 digit card number.'),
+            'rule_name' => 'numeric',
+            'rule_parameters' => NULL,
+          ),
         ),
       ),
     );
