@@ -184,7 +184,12 @@ class CRM_Admin_Page_APIExplorer extends CRM_Core_Page {
    * @param string $text
    * @return string
    */
-  private static function formatDocBlock($text) {
+  public static function formatDocBlock($text) {
+    // Normalize #leading spaces.
+    $lines = explode("\n", $text);
+    $lines = preg_replace('/^ +\*/', ' *', $lines);
+    $text = implode("\n", $lines);
+
     // Get rid of comment stars
     $text = str_replace(array("\n * ", "\n *\n", "\n */\n", "/**\n"), array("\n", "\n\n", '', ''), $text);
 

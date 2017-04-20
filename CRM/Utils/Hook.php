@@ -1842,6 +1842,18 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
+   * Build a description of available hooks.
+   *
+   * @param \Civi\Core\CiviEventInspector $inspector
+   */
+  public static function eventDefs($inspector) {
+    $event = \Civi\Core\Event\GenericHookEvent::create(array(
+      'inspector' => $inspector,
+    ));
+    Civi::dispatcher()->dispatch('hook_civicrm_eventDefs', $event);
+  }
+
+  /**
    * This hook is called while preparing a profile form.
    *
    * @param string $profileName

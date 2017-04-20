@@ -105,4 +105,16 @@ class Events {
     );
   }
 
+  /**
+   * @param \Civi\Core\Event\GenericHookEvent $e
+   * @see \CRM_Utils_Hook::eventDefs
+   */
+  public static function hookEventDefs($e) {
+    $e->inspector->addEventClass(self::AUTHORIZE, 'Civi\API\Event\AuthorizeEvent');
+    $e->inspector->addEventClass(self::EXCEPTION, 'Civi\API\Event\ExceptionEvent');
+    $e->inspector->addEventClass(self::PREPARE, 'Civi\API\Event\PrepareEvent');
+    $e->inspector->addEventClass(self::RESOLVE, 'Civi\API\Event\ResolveEvent');
+    $e->inspector->addEventClass(self::RESPOND, 'Civi\API\Event\RespondEvent');
+  }
+
 }
