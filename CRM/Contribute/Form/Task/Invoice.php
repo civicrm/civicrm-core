@@ -327,10 +327,20 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         $lineItem = CRM_Price_BAO_LineItem::getLineItems($eid, 'participant', NULL, TRUE, FALSE, TRUE);
       }
 
-      //TO DO: Need to do changes for partially paid to display amount due on PDF invoice
-      $amountDue = ($input['amount'] - $input['amount']);
+      $resultPayments = civicrm_api3('Payment', 'get', array(
+            'sequential' => 1,
+            'contribution_id' => $contribID,
+      ));
+      $amountPaid = 0;
+      foreach($resultPayments['values'] as $singlePayment) {
+        // Only count payments that have been (status =) completed
+        if ($singlePayment['status_id'] == 1) {
+          $amountPaid += $singlePayment['total_amount'];
+        }
+      }
+      $amountDue = ($input['amount'] - $amountPaid);
 
-      // retreiving the subtotal and sum of same tax_rate
+      // retrieving the subtotal and sum of same tax_rate
       $dataArray = array();
       $subTotal = 0;
       foreach ($lineItem as $entity_id => $taxRate) {
@@ -420,6 +430,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         'defaultCurrency' => $config->defaultCurrency,
         'amount' => $contribution->total_amount,
         'amountDue' => $amountDue,
+        'amountPaid'=> $amountPaid,
         'invoice_date' => $invoiceDate,
         'dueDate' => $dueDate,
         'notes' => CRM_Utils_Array::value('notes', $prefixValue),

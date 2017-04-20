@@ -101,7 +101,7 @@
                       {$value.label}
                     {else}
                       {$value.field_title} - {$value.label}
-                    {/if} 
+                    {/if}
                     {if $value.description}
                       <div>{$value.description|truncate:30:"..."}</div>
                     {/if}
@@ -143,6 +143,7 @@
                 <td colspan = "3"></td>
                 <td style = "padding-left:20px;text-align:right;"><b><font size = "1">{ts 1=$defaultCurrency}TOTAL %1{/ts}</font></b></td>
                 <td style = "padding-left:34px;text-align:right;"><font size = "1">{$amount|crmMoney:$currency}</font></td>
+                <td style = "padding-left:34px;"><font size = "1" align = "right"></fonts></td>
               </tr>
               {if $is_pay_later == 0}
                 <tr>
@@ -155,7 +156,7 @@
                     {/if}
                     </font>
                   </td>
-                  <td style = "padding-left:34px;text-align:right;"><font size = "1">{$amount|crmMoney:$currency}</font></td>
+                  <td style = "padding-left:34px;text-align:right;"><font size = "1">{$amountPaid|crmMoney:$currency}</font></td>
                 </tr>
                 <tr>
                   <td colspan = "3"></td>
@@ -307,7 +308,7 @@
           <td></td>
           <td style = "padding-left:70px;"><font size = "1"align = "right">{$source}</font></td>
           <td>
-            <font size = "1" align = "right"> 
+            <font size = "1" align = "right">
               {if $domain_phone}{$domain_phone}{/if}
             </font>
           </td>
@@ -317,9 +318,9 @@
           <td></td>
           <td></td>
           <td>
-            <font size = "1" align = "right"> 
+            <font size = "1" align = "right">
               {if $domain_email}{$domain_email}{/if}
-            </font> 
+            </font>
           </td>
         </tr>
       </table>
@@ -348,7 +349,7 @@
                         {$value.label}
                       {else}
                         {$value.field_title} - {$value.label}
-                      {/if} 
+                      {/if}
                       {if $value.description}
                         <div>{$value.description|truncate:30:"..."}</div>
                       {/if}
