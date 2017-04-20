@@ -573,6 +573,13 @@ WHERE  contribution_id = {$id}
       $this->assign('credit_card_type', CRM_Utils_Array::value('credit_card_type', $this->_params));
     }
     $this->_params['ip_address'] = CRM_Utils_System::ipAddress();
+    if (in_array('credit_card_type', array_keys($this->_params))) {
+      $this->_params['card_type_id'] = CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_FinancialTrxn', 'card_type_id', $this->_params['credit_card_type']);
+    }
+    if (!empty($this->_params['credit_card_number']) && empty($this->_params['pan_truncation'])) {
+      $this->_params['pan_truncation'] = substr($this->_params['credit_card_number'], -4);
+    }
+
   }
 
 
