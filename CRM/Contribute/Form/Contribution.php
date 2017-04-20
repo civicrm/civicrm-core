@@ -462,6 +462,27 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $defaults['campaign_id'] = $this->_pledgeValues['campaign_id'];
     }
 
+    if ($this->_id) {
+      $financialTrxn = $this->getlatestPayment();
+      if ($financialTrxn) {
+        $paymentProcessorID = CRM_Utils_Array::value('financial_trxn_id.payment_processor_id', $financialTrxn);
+        $result = civicrm_api3('FinancialTrxn', 'getsingle', array(
+          'return' => array("card_type", "pan_truncation"),
+          'id' => $financialTrxn['financial_trxn_id'],
+        ));
+        $defaults['card_type'] = CRM_Utils_Array::value('card_type', $result);
+        $defaults['pan_truncation'] = CRM_Utils_Array::value('pan_truncation', $result);
+
+        // if payment is done via payment processor then freeze these two fields
+        if ($paymentProcessorID) {
+          // if last 4 digit of credit card number found then append with with '*' string
+          if ($defaults['pan_truncation']) {
+            $defaults['pan_truncation'] = "**** **** **** " . $defaults['pan_truncation'];
+          }
+          $this->freeze(array('card_type', 'pan_truncation'));
+        }
+      }
+    }
     $this->_defaults = $defaults;
     return $defaults;
   }
@@ -648,8 +669,14 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $paymentInstrument = $this->add('select', 'payment_instrument_id',
         ts('Payment Method'),
         array('' => ts('- select -')) + CRM_Contribute_PseudoConstant::paymentInstrument(),
-        TRUE, array('onChange' => "return showHideByValue('payment_instrument_id','{$checkPaymentID}','checkNumber','table-row','select',false);")
+        TRUE
       );
+      $this->addField('card_type', array('entity' => 'FinancialTrxn', 'context' => 'get'));
+      $this->add('text', 'pan_truncation', ts('Card Number'), array(
+        'size' => 5,
+        'maxlength' => 4,
+        'autocomplete' => 'off',
+      ));
     }
 
     $trxnId = $this->add('text', 'trxn_id', ts('Transaction ID'), array('class' => 'twelve') + $attributes['trxn_id']);
@@ -1019,6 +1046,18 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $errors['financial_type_id'] = ' ';
       $errors['_qf_default'] = $e->getMessage();
     }
+    if (!$self->_mode && !empty($fields['pan_truncation'])) {
+      // on edit form fetch the latest payment
+      $financialTrxn = $self->_id ? $self->getlatestPayment() : NULL;
+
+      // On edit or new contribution backoffice form, if the earlier payment wasn't done by using payment processor
+      //  and the value of pan_truncation isn't 4 digit numeric number then throw the desired validation error
+      if (empty($financialTrxn['financial_trxn_id.payment_processor_id']) &&
+        (!is_numeric($fields['pan_truncation']) || (strlen($fields['pan_truncation']) != 4))
+      ) {
+        $errors['pan_truncation'] = ts('Please enter valid last 4 digit card number.');
+      }
+    }
     $errors = array_merge($errors, $softErrors);
     return $errors;
   }
@@ -1252,7 +1291,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       // NOTE - I expect this is obsolete.
       $payment = Civi\Payment\System::singleton()->getByProcessor($this->_paymentProcessor);
       try {
-        $statuses = CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id');
+        $statuses = CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id', 'validate');
         $result = $payment->doPayment($paymentParams, 'contribute');
         $this->assign('trxn_id', $result['trxn_id']);
         $contribution->trxn_id = $result['trxn_id'];
@@ -1268,13 +1307,20 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
          */
         if ($result['payment_status_id'] == array_search('Completed', $statuses)) {
           try {
-            civicrm_api3('contribution', 'completetransaction', array(
+            $params = array(
               'id' => $contribution->id,
               'trxn_id' => $result['trxn_id'],
               'payment_processor_id' => $this->_paymentProcessor['id'],
               'is_transactional' => FALSE,
               'fee_amount' => CRM_Utils_Array::value('fee_amount', $result),
-            ));
+            );
+            if (!empty($paymentParams['credit_card_type'])) {
+              $params['card_type'] = $paymentParams['credit_card_type'];
+            }
+            if (!empty($paymentParams['credit_card_number'])) {
+              $params['pan_truncation'] = substr($paymentParams['credit_card_number'], -4);
+            }
+            civicrm_api3('contribution', 'completetransaction', $params);
             // This has now been set to 1 in the DB - declare it here also
             $contribution->contribution_status_id = 1;
           }
@@ -1643,6 +1689,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         'cancel_reason',
         'source',
         'check_number',
+        'card_type',
+        'pan_truncation',
       );
       foreach ($fields as $f) {
         $params[$f] = CRM_Utils_Array::value($f, $formValues);
@@ -1833,6 +1881,26 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         $this->assign('totalTaxAmount', CRM_Utils_Array::value('tax_amount', $submittedValues));
       }
     }
+  }
+
+  /**
+   * Get last payment for contribution
+   * ie latest entry in civicrm_financial_trxn for entity_table civicrm_contribution.
+   *
+   * @return array
+   */
+  protected function getlatestPayment() {
+    $financialTrxn = civicrm_api3('EntityFinancialTrxn', 'get', array(
+       'return' => array('financial_trxn_id.payment_processor_id', 'financial_trxn_id'),
+       'entity_table' => 'civicrm_contribution',
+       'entity_id' => $this->_id,
+       'financial_trxn_id.is_payment' => TRUE,
+       'options' => array('sort' => 'financial_trxn_id DESC', 'limit' => 1),
+    ));
+    if (!$financialTrxn['count']) {
+      return array();
+    }
+    return $financialTrxn['values'][$financialTrxn['id']];
   }
 
   /**
