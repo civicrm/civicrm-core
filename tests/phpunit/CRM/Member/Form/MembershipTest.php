@@ -790,4 +790,99 @@ Expires: ',
     return $params;
   }
 
+  /**
+   * Test the submit function of the membership form with Card Type and Pan Truncation.
+   */
+  public function testSubmitWithCardTypeAndPanTruncation() {
+    $form = $this->getForm();
+    $this->createLoggedInUser();
+    $params = array(
+      'cid' => $this->_individualId,
+      'join_date' => date('m/d/Y', time()),
+      'start_date' => '',
+      'end_date' => '',
+      'membership_type_id' => array(23, $this->membershipTypeAnnualFixedID),
+      'auto_renew' => '0',
+      'max_related' => '',
+      'num_terms' => '1',
+      'source' => '',
+      'total_amount' => '50.00',
+      'financial_type_id' => '2', //Member dues, see data.xml
+      'soft_credit_type_id' => '',
+      'contribution_status_id' => 1,
+      'payment_instrument_id' => 1,
+      'soft_credit_contact_id' => '',
+      'record_contribution' => TRUE,
+      'from_email_address' => '"Demonstrators Anonymous" <info@example.org>',
+      'pan_truncation' => '4111',
+      'card_type' => 1,
+      'send_receipt' => TRUE,
+      'receipt_text' => 'Receipt text',
+    );
+    $form->_contactID = $this->_individualId;
+    $form->testSubmit($params);
+    $financialTrxn = $this->callAPISuccessGetSingle('EntityFinancialTrxn', array(
+      'sequential' => 1,
+      'return' => array("financial_trxn_id.card_type", "financial_trxn_id.pan_truncation"),
+      'entity_table' => "civicrm_contribution",
+      'entity_id' => 1,
+    ));
+    $this->assertEquals($financialTrxn['financial_trxn_id.card_type'], 1);
+    $this->assertEquals($financialTrxn['financial_trxn_id.pan_truncation'], 4111);
+  }
+
+  /**
+   * Test the submit function of the membership form.
+   */
+  public function testSubmitWithCardTypeAndPanTruncationLive() {
+    $form = $this->getForm();
+    $form->_mode = 'live';
+    $this->createLoggedInUser();
+    $params = array(
+      'cid' => $this->_individualId,
+      'join_date' => date('m/d/Y', time()),
+      'start_date' => '',
+      'end_date' => '',
+      // This format reflects the 23 being the organisation & the 25 being the type.
+      'membership_type_id' => array(23, $this->membershipTypeAnnualFixedID),
+      'auto_renew' => '0',
+      'max_related' => '',
+      'num_terms' => '1',
+      'source' => '',
+      'total_amount' => '50.00',
+      'financial_type_id' => '2', //Member dues, see data.xml
+      'soft_credit_type_id' => '',
+      'soft_credit_contact_id' => '',
+      'from_email_address' => '"Demonstrators Anonymous" <info@example.org>',
+      'payment_processor_id' => $this->_paymentProcessorID,
+      'credit_card_number' => '4111111111111111',
+      'cvv2' => '123',
+      'credit_card_exp_date' => array(
+        'M' => '9',
+        'Y' => date('Y', strtotime('+5 years')),
+      ),
+      'credit_card_type' => 'Visa',
+      'billing_first_name' => 'Test',
+      'billing_middlename' => 'Last',
+      'billing_street_address-5' => '10 Test St',
+      'billing_city-5' => 'Test',
+      'billing_state_province_id-5' => '1003',
+      'billing_postal_code-5' => '90210',
+      'billing_country_id-5' => '1228',
+      'send_receipt' => TRUE,
+      'receipt_text' => 'Receipt text',
+    );
+    $form->_contactID = $this->_individualId;
+    $form->testSubmit($params);
+    $financialTrxn = $this->callAPISuccessGetSingle('EntityFinancialTrxn', array(
+      'sequential' => 1,
+      'return' => array("financial_trxn_id.card_type", "financial_trxn_id.pan_truncation"),
+      'entity_table' => "civicrm_contribution",
+      'entity_id' => 1,
+      'financial_trxn_id.is_payment' => TRUE,
+    ));
+    $this->assertEquals($financialTrxn['financial_trxn_id.card_type'], 1);
+    $this->assertEquals($financialTrxn['financial_trxn_id.pan_truncation'], 1111);
+  }
+
 }
