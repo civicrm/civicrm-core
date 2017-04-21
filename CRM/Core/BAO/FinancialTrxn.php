@@ -436,13 +436,13 @@ WHERE ceft.entity_id = %1";
         'transaction_date' => date('YmdHis'),
         'amount' => $amount,
         'description' => 'Fee',
-        'status_id' => CRM_Core_OptionGroup::getValue('financial_item_status', 'Paid', 'name'),
+        'status_id' => CRM_Core_Pseudoconstant::getKey('CRM_Financial_BAO_FinancialItem', 'status_id', 'Paid'),
         'entity_table' => 'civicrm_financial_trxn',
         'entity_id' => $params['entity_id'],
         'currency' => $params['trxnParams']['currency'],
       );
     $trxnIDS['id'] = $trxn->id;
-    $financialItem = CRM_Financial_BAO_FinancialItem::create($fItemParams, NULL, $trxnIDS);
+    CRM_Financial_BAO_FinancialItem::create($fItemParams, NULL, $trxnIDS);
   }
 
   /**
