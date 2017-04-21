@@ -533,7 +533,7 @@ function civicrm_api3_contribution_completetransaction(&$params) {
   if (!$contribution->loadRelatedObjects($input, $ids, TRUE)) {
     throw new API_Exception('failed to load related objects');
   }
-  elseif ($contribution->contribution_status_id == CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name')) {
+  elseif ($contribution->contribution_status_id == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed')) {
     throw new API_Exception(ts('Contribution already completed'), 'contribution_completed');
   }
   $input['trxn_id'] = !empty($params['trxn_id']) ? $params['trxn_id'] : $contribution->trxn_id;
