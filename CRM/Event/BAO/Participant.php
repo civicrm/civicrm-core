@@ -1207,13 +1207,17 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
       CRM_Core_DAO::setFieldValue('CRM_Event_DAO_Participant', $participantID, 'status_id', $newStatusID);
     }
 
-    $cascadeAdditionalIds = self::getValidAdditionalIds($participantID, $oldStatusID, $newStatusID);
+    $additionalIds = self::getValidAdditionalIds($participantID, $oldStatusID, $newStatusID);
 
-    if (!empty($cascadeAdditionalIds)) {
-      $cascadeAdditionalIds = implode(',', $cascadeAdditionalIds);
+    if (!empty($additionalIds)) {
+      $cascadeAdditionalIds = implode(',', $additionalIds);
       $query = "UPDATE civicrm_participant cp SET cp.status_id = %1 WHERE  cp.id IN ({$cascadeAdditionalIds})";
       $params = array(1 => array($newStatusID, 'Integer'));
       $dao = CRM_Core_DAO::executeQuery($query, $params);
+      //Call post hook after updating additional participant status.
+      foreach ($additionalIds as $id) {
+        CRM_Utils_Hook::post('edit', 'Participant', $id);
+      }
       return TRUE;
     }
     return FALSE;

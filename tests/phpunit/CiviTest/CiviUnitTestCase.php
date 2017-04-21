@@ -3812,4 +3812,31 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     }
   }
 
+  /**
+   * An implementation of hook_civicrm_post used with all our test cases.
+   *
+   * @param $op
+   * @param string $objectName
+   * @param int $objectId
+   * @param $objectRef
+   */
+  public function onPost($op, $objectName, $objectId, &$objectRef) {
+    if ($op == 'create' && $objectName == 'Individual') {
+      CRM_Core_DAO::executeQuery(
+        "UPDATE civicrm_contact SET nick_name = 'munged' WHERE id = %1",
+        array(
+          1 => array($objectId, 'Integer'),
+        )
+      );
+    }
+
+    if ($op == 'edit' && $objectName == 'Participant') {
+      $params = array(
+        1 => array($objectId, 'Integer'),
+      );
+      $query = "UPDATE civicrm_participant SET source = 'Post Hook Update' WHERE id = %1";
+      CRM_Core_DAO::executeQuery($query, $params);
+    }
+  }
+
 }
