@@ -304,11 +304,23 @@ function civicrm_api3_activity_get($params) {
         "Cannot access activities. Required permission: 'view all activities''"
       );
     }
-
-    if (!CRM_Activity_BAO_Activity::checkPermission($params['id'], CRM_Core_Action::VIEW)) {
-      throw new \Civi\API\Exception\UnauthorizedException(
-        'You do not have permission to view this activity'
-      );
+    $ids = array();
+    if (is_array($params['id'])) {
+      foreach ($params['id'] as $operator => $values) {
+        if (in_array($operator, CRM_Core_DAO::acceptedSQLOperators())) {
+          $ids = $values;
+        }
+      }
+    }
+    else {
+      $ids = array($params['id']);
+    }
+    foreach ($ids as $id) {
+      if (!CRM_Activity_BAO_Activity::checkPermission($id, CRM_Core_Action::VIEW)) {
+        throw new \Civi\API\Exception\UnauthorizedException(
+          'You do not have permission to view this activity'
+        );
+      }
     }
   }
 
