@@ -342,6 +342,7 @@ WHERE  v.option_group_id = g.id
    * @return null
    */
   public static function getLabel($groupName, $value, $onlyActiveValue = TRUE) {
+    Civi::log()->warning('Deprecated function, use CRM_Core_Pseudoconsant::getLabel', array('civi.tag' => 'deprecated'));
     if (empty($groupName) ||
       empty($value)
     ) {
