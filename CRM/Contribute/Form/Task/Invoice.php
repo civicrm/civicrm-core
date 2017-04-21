@@ -333,7 +333,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       ));
       $amountPaid = 0;
       foreach($resultPayments['values'] as $singlePayment) {
-        // Only count payments that have been (status =) completed
+        // Only count payments that have been (status =) completed.
         if ($singlePayment['status_id'] == 1) {
           $amountPaid += $singlePayment['total_amount'];
         }
