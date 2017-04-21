@@ -1475,9 +1475,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         $isTest,
         $isRecurForFirstTransaction
       );
-      $paymentResults[] = array('contribution_id' => $paymentResult['contribution']->id, 'result' => $paymentResult);
-
       if (!empty($paymentResult['contribution'])) {
+        $paymentResults[] = array('contribution_id' => $paymentResult['contribution']->id, 'result' => $paymentResult);
         $this->postProcessPremium($premiumParams, $paymentResult['contribution']);
         //note that this will be over-written if we are using a separate membership transaction. Otherwise there is only one
         $membershipContribution = $paymentResult['contribution'];
@@ -1786,12 +1785,17 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     $result = array();
 
-    if ($tempParams['skipLineItem']) {
-      // We are not processing the line item here because we are processing a membership.
-      // So unset the total_amount param, which stores the non-membership contribution amount.
-      $tempParams['total_amount'] = $membershipContribution->total_amount;
-      $tempParams['contributionID'] = $membershipContribution->id;
-    }
+    // We're not processing the line item here because we are processing a membership.
+    // To ensure processing of the correct parameters, replace relevant parameters
+    // in $tempParams with those in $membershipContribution.
+    $tempParams['amount_level'] = $membershipContribution->amount_level;
+    $tempParams['total_amount'] = $membershipContribution->total_amount;
+    $tempParams['tax_amount'] = $membershipContribution->tax_amount;
+    $tempParams['contactID'] = $membershipContribution->contact_id;
+    $tempParams['financialTypeID'] = $membershipContribution->financial_type_id;
+    $tempParams['invoiceID'] = $membershipContribution->invoice_id;
+    $tempParams['trxn_id'] = $membershipContribution->trxn_id;
+    $tempParams['contributionID'] = $membershipContribution->id;
 
     if ($form->_values['is_monetary'] && !$form->_params['is_pay_later'] && $minimumFee > 0.0) {
       // At the moment our tests are calling this form in a way that leaves 'object' empty. For
