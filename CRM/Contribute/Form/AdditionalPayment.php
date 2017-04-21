@@ -356,8 +356,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     if ($this->_mode) {
       // process credit card
       $this->assign('contributeMode', 'direct');
-      $this->processCreditCard($submittedValues);
-      $submittedValues = $this->_params;
+      $this->processCreditCard($this->_params);
     }
 
     $defaults = array();
@@ -366,7 +365,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       'id' => $this->_contributionId,
     ));
     $contributionStatusId = CRM_Utils_Array::value('contribution_status_id', $contribution);
-    $result = CRM_Contribute_BAO_Contribution::recordAdditionalPayment($this->_contributionId, $submittedValues, $this->_paymentType, $participantId);
+    $result = CRM_Contribute_BAO_Contribution::recordAdditionalPayment($this->_contributionId, $this->_params, $this->_paymentType, $participantId);
     // Fetch the contribution & do proportional line item assignment
     $params = array('id' => $this->_contributionId);
     $contribution = CRM_Contribute_BAO_Contribution::retrieve($params, $defaults, $params);
@@ -374,12 +373,12 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
 
     $statusMsg = ts('The payment record has been processed.');
     // send email
-    if (!empty($result) && !empty($submittedValues['is_email_receipt'])) {
-      $submittedValues['contact_id'] = $this->_contactId;
-      $submittedValues['contribution_id'] = $this->_contributionId;
+    if (!empty($result) && !empty($this->_params['is_email_receipt'])) {
+      $this->_params['contact_id'] = $this->_contactId;
+      $this->_params['contribution_id'] = $this->_contributionId;
       // to get 'from email id' for send receipt
-      $this->fromEmailId = $submittedValues['from_email_address'];
-      $sendReceipt = $this->emailReceipt($submittedValues);
+      $this->fromEmailId = $this->_params['from_email_address'];
+      $sendReceipt = $this->emailReceipt($this->_params);
       if ($sendReceipt) {
         $statusMsg .= ' ' . ts('A receipt has been emailed to the contributor.');
       }
