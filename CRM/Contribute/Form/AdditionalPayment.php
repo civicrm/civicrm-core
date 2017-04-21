@@ -358,10 +358,10 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       // process credit card
       $this->assign('contributeMode', 'direct');
       $this->processCreditCard($submittedValues);
-      $submittedValues = $this->_params;
     }
 
     $defaults = array();
+    $submittedValues = $this->_params;
     $contribution = civicrm_api3('Contribution', 'getsingle', array(
       'return' => array("contribution_status_id"),
       'id' => $this->_contributionId,
