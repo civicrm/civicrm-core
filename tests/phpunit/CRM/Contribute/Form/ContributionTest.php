@@ -525,7 +525,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'is_email_receipt' => TRUE,
       'from_email_address' => 'test@test.com',
       'price_set_id' => $priceSetId,
-      'contribution_status_id' => CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name'),
+      'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending'),
     );
 
     foreach ($priceFieldValue['values'] as $id => $price) {
