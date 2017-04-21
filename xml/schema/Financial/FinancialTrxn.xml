@@ -272,7 +272,8 @@
     <name>pan_truncation</name>
     <uniqueName>financial_trxn_pan_truncation</uniqueName>
     <title>Pan Truncation</title>
-    <type>int unsigned</type>
+    <type>varchar</type>
+    <length>4</length>
     <html>
       <type>Text</type>
       <size>4</size>
