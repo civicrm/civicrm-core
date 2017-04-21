@@ -332,7 +332,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
             'contribution_id' => $contribID,
       ));
       $amountPaid = 0;
-      foreach($resultPayments['values'] as $singlePayment) {
+      foreach ($resultPayments['values'] as $singlePayment) {
         // Only count payments that have been (status =) completed.
         if ($singlePayment['status_id'] == 1) {
           $amountPaid += $singlePayment['total_amount'];
@@ -430,7 +430,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         'defaultCurrency' => $config->defaultCurrency,
         'amount' => $contribution->total_amount,
         'amountDue' => $amountDue,
-        'amountPaid'=> $amountPaid,
+        'amountPaid' => $amountPaid,
         'invoice_date' => $invoiceDate,
         'dueDate' => $dueDate,
         'notes' => CRM_Utils_Array::value('notes', $prefixValue),
