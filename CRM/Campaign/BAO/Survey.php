@@ -269,7 +269,7 @@ SELECT  survey.id                         as id,
       if (!$includePetition) {
         //we only have activity type as a
         //difference between survey and petition.
-        $petitionTypeID = CRM_Core_OptionGroup::getValue('activity_type', 'petition', 'name');
+        $petitionTypeID = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'petition');
 
         $where = array();
         if ($petitionTypeID) {

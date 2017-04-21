@@ -283,17 +283,11 @@ SELECT r.payment_processor_id
         $activityParams = array(
           'source_contact_id' => $dao->contact_id,
           'source_record_id' => CRM_Utils_Array::value('source_record_id', $activityParams),
-          'activity_type_id' => CRM_Core_OptionGroup::getValue('activity_type',
-            'Cancel Recurring Contribution',
-            'name'
-          ),
+          'activity_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Cancel Recurring Contribution'),
           'subject' => CRM_Utils_Array::value('subject', $activityParams, ts('Recurring contribution cancelled')),
           'details' => $details,
           'activity_date_time' => date('YmdHis'),
-          'status_id' => CRM_Core_OptionGroup::getValue('activity_status',
-            'Completed',
-            'name'
-          ),
+          'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_status_id', 'Completed'),
         );
         $session = CRM_Core_Session::singleton();
         $cid = $session->get('userID');
@@ -301,6 +295,7 @@ SELECT r.payment_processor_id
           $activityParams['target_contact_id'][] = $activityParams['source_contact_id'];
           $activityParams['source_contact_id'] = $cid;
         }
+        // @todo use the api & do less wrangling above
         CRM_Activity_BAO_Activity::create($activityParams);
       }
 
@@ -310,6 +305,7 @@ SELECT r.payment_processor_id
         return TRUE;
       }
       else {
+        // @todo - this is bad! Get the function out of the ipn.
         $baseIPN = new CRM_Core_Payment_BaseIPN();
         return $baseIPN->cancelled($objects, $transaction);
       }
