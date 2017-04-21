@@ -90,11 +90,6 @@ class CRM_Core_Payment_Manual extends CRM_Core_Payment {
 
     $paymentInstrument = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', $this->getPaymentInstrumentID());
     if ($paymentInstrument === 'Credit Card') {
-      // @todo - return credit_card_type field once the underlying code works to extract this field.
-      // Note the problem is this should be stored in civicrm_financial_trxn.credit_card_type.
-      // However there is an ambiguity as that field is an integer & should hence be called
-      // credit_card_type_id, or it should store 'visa' It probably makes sense to fix that before going much
-      // further as the code I've seen makes it clear that it will require work arounds.
       return array('credit_card_type', 'pan_truncation');
     }
     elseif ($paymentInstrument === 'Check') {
