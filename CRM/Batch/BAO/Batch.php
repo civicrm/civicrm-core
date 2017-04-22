@@ -502,7 +502,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
    *   all batches excluding batches with data entry in progress
    */
   public static function getBatches() {
-    $dataEntryStatusId = CRM_Core_OptionGroup::getValue('batch_status', 'Data Entry', 'name');
+    $dataEntryStatusId = CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Data Entry');
     $query = "SELECT id, title
       FROM civicrm_batch
       WHERE item_count >= 1
