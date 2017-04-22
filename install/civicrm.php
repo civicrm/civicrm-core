@@ -226,7 +226,14 @@ function civicrm_config(&$config) {
 
   $params['baseURL'] = isset($config['base_url']) ? $config['base_url'] : civicrm_cms_base();
   if ($installType == 'drupal' && defined('VERSION')) {
-    if (version_compare(VERSION, '7.0-rc1') >= 0) {
+    if (version_compare(VERSION, '8.0') >= 0) {
+      $params['cms'] = 'Drupal';
+      $params['CMSdbUser'] = addslashes($config['drupal']['username']);
+      $params['CMSdbPass'] = addslashes($config['drupal']['password']);
+      $params['CMSdbHost'] = $config['drupal']['host'] . ":" . !empty($config['drupal']['port']) ? $config['drupal']['port'] : "3306";
+      $params['CMSdbName'] = addslashes($config['drupal']['database']);
+    }
+    elseif (version_compare(VERSION, '7.0-rc1') >= 0) {
       $params['cms']       = 'Drupal';
       $params['CMSdbUser'] = addslashes($config['drupal']['username']);
       $params['CMSdbPass'] = addslashes($config['drupal']['password']);
