@@ -73,6 +73,10 @@ if (!defined('CIVICRM_UF_DSN') && CIVICRM_UF !== 'UnitTests') {
   define( 'CIVICRM_UF_DSN'           , 'mysql://%%CMSdbUser%%:%%CMSdbPass%%@%%CMSdbHost%%/%%CMSdbName%%?new_link=true');
 }
 
+if (file_exists(__DIR__ . '/civicrm.settings.extra.php')) {
+  require_once __DIR__ . '/civicrm.settings.extra.php';
+}
+
 /**
  * CiviCRM Database Settings
  *

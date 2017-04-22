@@ -139,6 +139,15 @@ function civicrm_main(&$config) {
   civicrm_write_file($configFile,
     $string
   );
+  if ($installType == 'wordpress') {
+    $configFileExtra = $files_dirname . DIRECTORY_SEPARATOR . 'civicrm' . DIRECTORY_SEPARATOR . 'civicrm.settings.extra.php';
+  }
+  if ($installType == 'wordpress') {
+    $string = civicrm_config_extra($config);
+    civicrm_write_file($configFileExtra,
+      $string
+    );
+  }
 
 }
 
@@ -274,6 +283,78 @@ function civicrm_config(&$config) {
 
     // CRM-12386
     $params['crmRoot'] = addslashes($params['crmRoot']);
+    //CRM-16421
+    /*
+     * Add Paramaters for installing WP in custom directory structure
+     *
+     */
+    $params['wpbaseURL']                 = home_url() . '/';
+    $params['wpadminURL']                = admin_url();
+    $params['wpuserFrameworkresorceURL'] = plugin_dir_url(CIVICRM_PLUGIN_FILE) . 'civicrm';
+  }
+
+  $params['siteKey'] = md5(rand() . mt_rand() . rand() . uniqid('', TRUE) . $params['baseURL']);
+  // Would prefer openssl_random_pseudo_bytes(), but I don't think it's universally available.
+
+  $str = file_get_contents($tplPath . 'civicrm.settings.php.template');
+  foreach ($params as $key => $value) {
+    $str = str_replace('%%' . $key . '%%', $value, $str);
+  }
+  return trim($str);
+
+}
+
+/**
+ * @param $config
+ *
+ * @return string
+ */
+function civicrm_config_extra(&$config) {
+  global $crmPath, $comPath;
+  global $compileDir;
+  global $tplPath, $installType;
+
+  $params = array(
+    'crmRoot'            => $crmPath,
+    'templateCompileDir' => $compileDir,
+    'frontEnd'           => 0,
+    'dbUser'             => addslashes($config['mysql']['username']),
+    'dbPass'             => addslashes($config['mysql']['password']),
+    'dbHost'             => $config['mysql']['server'],
+    'dbName'             => addslashes($config['mysql']['database']),
+  );
+
+  $params['baseURL'] = isset($config['base_url']) ? $config['base_url'] : civicrm_cms_base();
+  if ($installType == 'wordpress') {
+    $params['cms']       = 'WordPress';
+    $params['CMSdbUser'] = addslashes(DB_USER);
+    $params['CMSdbPass'] = addslashes(DB_PASSWORD);
+    $params['CMSdbHost'] = DB_HOST;
+    $params['CMSdbName'] = addslashes(DB_NAME);
+
+    // CRM-12386
+    $params['crmRoot'] = addslashes($params['crmRoot']);
+    //CRM-16421
+    /*
+     * Add Paramaters for installing WP in custom directory structure
+     *
+     */
+    $params['wpbaseURL']                 = home_url() . '/';
+    $params['wpadminURL']                = admin_url();
+    $params['wpuserFrameworkresorceURL'] = plugin_dir_url(CIVICRM_PLUGIN_FILE) . 'civicrm';
+
+    //CRM-16421
+    /*
+     * change template to WP specific template
+     * Will need to standardize to handle all 3 CMS with extra file or have 3 templates
+     */
+
+    $str = file_get_contents($tplPath . 'civicrm.settings.extra.php.template');
+    foreach ($params as $key => $value) {
+      $str = str_replace('%%' . $key . '%%', $value, $str);
+    }
+    return trim($str);
+
   }
 
   $params['siteKey'] = md5(rand() . mt_rand() . rand() . uniqid('', TRUE) . $params['baseURL']);
