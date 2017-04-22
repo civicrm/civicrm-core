@@ -31,7 +31,7 @@ Dear {$contactDisplayName}
 
 {if $paymentsComplete}
 
-{ts}Thank you for completing payment.
+{ts}Thank you for completing payment.{/ts}
 {/if}
 {/if}
 {if $receive_date}
