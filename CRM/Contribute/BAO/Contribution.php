@@ -184,7 +184,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       $partialAmtPay = $params['partial_amount_pay'];
       $params['total_amount'] = $partialAmtTotal;
       if ($partialAmtPay < $partialAmtTotal) {
-        $params['contribution_status_id'] = CRM_Core_OptionGroup::getValue('contribution_status', 'Partially paid', 'name');
+        $params['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Partially paid');
         $params['is_pay_later'] = 0;
         $setPrevContribution = FALSE;
       }
@@ -288,7 +288,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       'payment_instrument_id' => key(CRM_Core_OptionGroup::values('payment_instrument',
           FALSE, FALSE, FALSE, 'AND is_default = 1')
       ),
-      'contribution_status_id' => CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name'),
+      'contribution_status_id' => CRM_Core_Pseudoconstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
     );
   }
 
@@ -3116,7 +3116,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       $partialAmtTotal = CRM_Utils_Rule::cleanMoney($params['partial_payment_total']);
 
       $fromFinancialAccountId = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($params['financial_type_id'], 'Accounts Receivable Account is');
-      $statusId = CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name');
+      $statusId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
       $params['total_amount'] = $partialAmtPay;
 
       $balanceTrxnInfo = CRM_Core_BAO_FinancialTrxn::getBalanceTrxnAmt($params['contribution']->id, $params['financial_type_id']);
@@ -3795,7 +3795,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    * @return null|object
    */
   public static function recordAdditionalPayment($contributionId, $trxnsData, $paymentType = 'owed', $participantId = NULL, $updateStatus = TRUE) {
-    $statusId = CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name');
+    $statusId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
     $getInfoOf['id'] = $contributionId;
     $defaults = array();
     $contributionDAO = CRM_Contribute_BAO_Contribution::retrieve($getInfoOf, $defaults, CRM_Core_DAO::$_nullArray);
@@ -3897,7 +3897,7 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
     elseif ($paymentType == 'refund') {
       $trxnsData['total_amount'] = -$trxnsData['total_amount'];
       $trxnsData['from_financial_account_id'] = $arAccountId;
-      $trxnsData['status_id'] = CRM_Core_OptionGroup::getValue('contribution_status', 'Refunded', 'name');
+      $trxnsData['status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Refunded');
       // record the entry
       $financialTrxn = CRM_Contribute_BAO_Contribution::recordFinancialAccounts($params, $trxnsData);
 
