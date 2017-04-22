@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,9 +28,8 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
- *
  * @param $filesDirectory
  */
 function civicrm_setup($filesDirectory) {
@@ -85,20 +84,26 @@ function civicrm_main(&$config) {
 
   if ($installType == 'drupal') {
     $siteDir = isset($config['site_dir']) ? $config['site_dir'] : getSiteDir($cmsPath, $_SERVER['SCRIPT_FILENAME']);
-    civicrm_setup($cmsPath . DIRECTORY_SEPARATOR . 'sites' . DIRECTORY_SEPARATOR . $siteDir . DIRECTORY_SEPARATOR . 'files'
+    civicrm_setup($cmsPath . DIRECTORY_SEPARATOR . 'sites' . DIRECTORY_SEPARATOR .
+      $siteDir . DIRECTORY_SEPARATOR . 'files'
     );
   }
   elseif ($installType == 'backdrop') {
     civicrm_setup($cmsPath . DIRECTORY_SEPARATOR . 'files');
   }
   elseif ($installType == 'wordpress') {
-    $upload_dir    = wp_upload_dir();
+    $upload_dir = wp_upload_dir();
     $files_dirname = $upload_dir['basedir'];
     civicrm_setup($files_dirname);
   }
 
-  $dsn = "mysql://{$config['mysql']['username']}:{$config['mysql']['password']}@{$config['mysql']['server']}/{$config['mysql']['database']}?new_link=true";
+  $parts = explode(':', $config['mysql']['server']);
+  if (empty($parts[1])) {
+    $parts[1] = 3306;
+  }
+  $config['mysql']['server'] = implode(':', $parts);
 
+  $dsn = "mysql://{$config['mysql']['username']}:{$config['mysql']['password']}@{$config['mysql']['server']}/{$config['mysql']['database']}?new_link=true";
   civicrm_source($dsn, $sqlPath . DIRECTORY_SEPARATOR . 'civicrm.mysql');
 
   if (!empty($config['loadGenerated'])) {
@@ -106,9 +111,9 @@ function civicrm_main(&$config) {
   }
   else {
     if (isset($config['seedLanguage'])
-        and preg_match('/^[a-z][a-z]_[A-Z][A-Z]$/', $config['seedLanguage'])
-            and file_exists($sqlPath . DIRECTORY_SEPARATOR . "civicrm_data.{$config['seedLanguage']}.mysql")
-                and file_exists($sqlPath . DIRECTORY_SEPARATOR . "civicrm_acl.{$config['seedLanguage']}.mysql")
+      and preg_match('/^[a-z][a-z]_[A-Z][A-Z]$/', $config['seedLanguage'])
+      and file_exists($sqlPath . DIRECTORY_SEPARATOR . "civicrm_data.{$config['seedLanguage']}.mysql")
+      and file_exists($sqlPath . DIRECTORY_SEPARATOR . "civicrm_acl.{$config['seedLanguage']}.mysql")
     ) {
       civicrm_source($dsn, $sqlPath . DIRECTORY_SEPARATOR . "civicrm_data.{$config['seedLanguage']}.mysql");
       civicrm_source($dsn, $sqlPath . DIRECTORY_SEPARATOR . "civicrm_acl.{$config['seedLanguage']}.mysql");
@@ -155,6 +160,13 @@ function civicrm_source($dsn, $fileName, $lineMode = FALSE) {
   global $crmPath;
 
   require_once "$crmPath/packages/DB.php";
+
+  // CRM-19699 See also CRM_Core_DAO for PHP7 mysqli compatiblity.
+  // Duplicated here because this is not using CRM_Core_DAO directly
+  // and this function may be called directly from Drush.
+  if (!defined('DB_DSN_MODE')) {
+    define('DB_DSN_MODE', 'auto');
+  }
 
   $db = DB::connect($dsn);
   if (PEAR::isError($db)) {
@@ -215,13 +227,13 @@ function civicrm_config(&$config) {
   global $tplPath, $installType;
 
   $params = array(
-    'crmRoot'            => $crmPath,
+    'crmRoot' => $crmPath,
     'templateCompileDir' => $compileDir,
-    'frontEnd'           => 0,
-    'dbUser'             => addslashes($config['mysql']['username']),
-    'dbPass'             => addslashes($config['mysql']['password']),
-    'dbHost'             => $config['mysql']['server'],
-    'dbName'             => addslashes($config['mysql']['database']),
+    'frontEnd' => 0,
+    'dbUser' => addslashes($config['mysql']['username']),
+    'dbPass' => addslashes($config['mysql']['password']),
+    'dbHost' => $config['mysql']['server'],
+    'dbName' => addslashes($config['mysql']['database']),
   );
 
   $params['baseURL'] = isset($config['base_url']) ? $config['base_url'] : civicrm_cms_base();
@@ -234,14 +246,14 @@ function civicrm_config(&$config) {
       $params['CMSdbName'] = addslashes($config['drupal']['database']);
     }
     elseif (version_compare(VERSION, '7.0-rc1') >= 0) {
-      $params['cms']       = 'Drupal';
+      $params['cms'] = 'Drupal';
       $params['CMSdbUser'] = addslashes($config['drupal']['username']);
       $params['CMSdbPass'] = addslashes($config['drupal']['password']);
       $params['CMSdbHost'] = $config['drupal']['server'];
       $params['CMSdbName'] = addslashes($config['drupal']['database']);
     }
     elseif (version_compare(VERSION, '6.0') >= 0) {
-      $params['cms']       = 'Drupal6';
+      $params['cms'] = 'Drupal6';
       $params['CMSdbUser'] = addslashes($config['drupal']['username']);
       $params['CMSdbPass'] = addslashes($config['drupal']['password']);
       $params['CMSdbHost'] = $config['drupal']['server'];
@@ -249,21 +261,21 @@ function civicrm_config(&$config) {
     }
   }
   elseif ($installType == 'drupal') {
-    $params['cms']       = $config['cms'];
+    $params['cms'] = $config['cms'];
     $params['CMSdbUser'] = addslashes($config['cmsdb']['username']);
     $params['CMSdbPass'] = addslashes($config['cmsdb']['password']);
     $params['CMSdbHost'] = $config['cmsdb']['server'];
     $params['CMSdbName'] = addslashes($config['cmsdb']['database']);
   }
   elseif ($installType == 'backdrop') {
-    $params['cms']       = 'Backdrop';
+    $params['cms'] = 'Backdrop';
     $params['CMSdbUser'] = addslashes($config['backdrop']['username']);
     $params['CMSdbPass'] = addslashes($config['backdrop']['password']);
     $params['CMSdbHost'] = $config['backdrop']['server'];
     $params['CMSdbName'] = addslashes($config['backdrop']['database']);
   }
   else {
-    $params['cms']       = 'WordPress';
+    $params['cms'] = 'WordPress';
     $params['CMSdbUser'] = addslashes(DB_USER);
     $params['CMSdbPass'] = addslashes(DB_PASSWORD);
     $params['CMSdbHost'] = DB_HOST;
@@ -353,7 +365,6 @@ function civicrm_config_extra(&$config) {
     $str = str_replace('%%' . $key . '%%', $value, $str);
   }
   return trim($str);
-
 }
 
 /**
@@ -366,8 +377,8 @@ function civicrm_cms_base() {
   $numPrevious = 6;
 
   if (isset($_SERVER['HTTPS']) &&
-      !empty($_SERVER['HTTPS']) &&
-      strtolower($_SERVER['HTTPS']) != 'off'
+    !empty($_SERVER['HTTPS']) &&
+    strtolower($_SERVER['HTTPS']) != 'off'
   ) {
     $url = 'https://' . $_SERVER['HTTP_HOST'];
   }
@@ -383,7 +394,7 @@ function civicrm_cms_base() {
     //lets allow to install in custom dir. CRM-6840
     global $cmsPath;
     $crmDirLevels = str_replace($cmsPath, '', str_replace('\\', '/', $_SERVER['SCRIPT_FILENAME']));
-    $baseURL      = str_replace($crmDirLevels, '', str_replace('\\', '/', $baseURL));
+    $baseURL = str_replace($crmDirLevels, '', str_replace('\\', '/', $baseURL));
   }
   elseif ($installType == 'wordpress') {
     $baseURL = str_replace($url, '', site_url());
