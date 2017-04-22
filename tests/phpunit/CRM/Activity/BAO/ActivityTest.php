@@ -11,7 +11,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
 
   public function tearDown() {
     // truncate a few tables
-    $tablesToTruncate = array('civicrm_contact', 'civicrm_activity', 'civicrm_activity_contact');
+    $tablesToTruncate = array('civicrm_contact', 'civicrm_activity', 'civicrm_activity_contact', 'civicrm_email');
     $this->quickCleanup($tablesToTruncate);
   }
 
@@ -759,9 +759,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     elseif (!empty($domainInfo['domain_email'])) {
       $expectedFromAddress = sprintf("%s <%s>", $domainInfo['name'], $domainInfo['domain_email']);
     }
-    // TODO: due to unknown reason the following assertion fails on
-    //   test.civicrm.org test build but works fine on local
-    // $this->assertEquals($expectedFromAddress, $formAddress);
+    $this->assertEquals($expectedFromAddress, $formAddress);
     // ----------------------- End of Case 2 ---------------------------
 
     // TODO: Case 4 about checking the $formAddress on basis of logged contact ID respectively needs,
