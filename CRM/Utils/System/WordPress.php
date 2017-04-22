@@ -266,6 +266,12 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
+   * 27-09-2016
+   * CRM-16421 CRM-17633 WIP Changes to support WP in it's own directory
+   * https://wiki.civicrm.org/confluence/display/CRM/WordPress+installed+in+its+own+directory+issues
+   * For now leave hard coded wp-admin references.
+   * TODO: remove wp-admin references and replace with admin_url() in the future.  Look at best way to get path to admin_url
+   *
    * @param $absolute
    * @param $frontend
    * @param $forceBackend
@@ -274,22 +280,12 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    */
   private function getBaseUrl($absolute, $frontend, $forceBackend) {
     $config = CRM_Core_Config::singleton();
-
-    $base = $absolute ? $config->userFrameworkBaseURL : $config->useFrameworkRelativeBase;
-
     if ((is_admin() && !$frontend) || $forceBackend) {
-      $base .= 'wp-admin/admin.php';
-      return $base;
+      return Civi::paths()->getUrl('[wp.backend]/.', $absolute ? 'absolute' : 'relative');
     }
-    elseif (defined('CIVICRM_UF_WP_BASEPAGE')) {
-      $base .= CIVICRM_UF_WP_BASEPAGE;
-      return $base;
+    else {
+      return Civi::paths()->getUrl('[wp.frontend]/.', $absolute ? 'absolute' : 'relative');
     }
-    elseif (isset($config->wpBasePage)) {
-      $base .= $config->wpBasePage;
-      return $base;
-    }
-    return $base;
   }
 
   /**
