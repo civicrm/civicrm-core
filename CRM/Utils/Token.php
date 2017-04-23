@@ -1249,22 +1249,15 @@ class CRM_Utils_Token {
 
     foreach ($contactIDs as $key => $contactID) {
       if (array_key_exists($contactID, $contactDetails)) {
-        if (CRM_Utils_Array::value('preferred_communication_method', $returnProperties) == 1
-          && array_key_exists('preferred_communication_method', $contactDetails[$contactID])
+        if (!empty($contactDetails[$contactID]['preferred_communication_method'])
         ) {
-          $pcm = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'preferred_communication_method');
-
-          // communication Preference
-          $contactPcm = explode(CRM_Core_DAO::VALUE_SEPARATOR,
-            $contactDetails[$contactID]['preferred_communication_method']
-          );
-          $result = array();
-          foreach ($contactPcm as $key => $val) {
+          $communicationPreferences = array();
+          foreach ($contactDetails[$contactID]['preferred_communication_method'] as $key => $val) {
             if ($val) {
-              $result[$val] = $pcm[$val];
+              $communicationPreferences[$val] = CRM_Core_PseudoConstant::getLabel('CRM_Contact_DAO_Contact', 'preferred_communication_method', $val);
             }
           }
-          $contactDetails[$contactID]['preferred_communication_method'] = implode(', ', $result);
+          $contactDetails[$contactID]['preferred_communication_method'] = implode(', ', $communicationPreferences);
         }
 
         foreach ($custom as $cfID) {
