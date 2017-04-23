@@ -49,13 +49,17 @@
   <field>
     <name>added_at</name>
     <title>Added</title>
-    <type>datetime</type>
+    <type>timestamp</type>
+    <required>false</required>
+    <default>NULL</default>
     <comment>date on which this job was added.</comment>
   </field>
   <field>
     <name>removed_at</name>
     <title>Removed</title>
-    <type>datetime</type>
+    <type>timestamp</type>
+    <required>false</required>
+    <default>NULL</default>
     <comment>date on which this job was removed.</comment>
   </field>
 </table>
