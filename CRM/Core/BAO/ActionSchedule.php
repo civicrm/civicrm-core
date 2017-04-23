@@ -465,12 +465,14 @@ FROM civicrm_action_schedule cas
     $session = CRM_Core_Session::singleton();
 
     if ($mapping->getEntity() == 'civicrm_membership') {
+      // @todo - not required with api
       $activityTypeID
-        = CRM_Core_OptionGroup::getValue('activity_type', 'Membership Renewal Reminder', 'name');
+        = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Membership Renewal Reminder');
     }
     else {
+      // @todo - not required with api
       $activityTypeID
-        = CRM_Core_OptionGroup::getValue('activity_type', 'Reminder Sent', 'name');
+        = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Reminder Sent');
     }
 
     $activityParams = array(
@@ -478,11 +480,14 @@ FROM civicrm_action_schedule cas
       'details' => $tokenRow->render('body_html'),
       'source_contact_id' => $session->get('userID') ? $session->get('userID') : $contactID,
       'target_contact_id' => $contactID,
+      // @todo - not required with api
       'activity_date_time' => CRM_Utils_Time::getTime('YmdHis'),
-      'status_id' => CRM_Core_OptionGroup::getValue('activity_status', 'Completed', 'name'),
+      // @todo - not required with api
+      'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'status_id', 'Completed'),
       'activity_type_id' => $activityTypeID,
       'source_record_id' => $entityID,
     );
+    // @todo use api, remove all the above wrangling
     $activity = CRM_Activity_BAO_Activity::create($activityParams);
 
     //file reminder on case if source activity is a case activity

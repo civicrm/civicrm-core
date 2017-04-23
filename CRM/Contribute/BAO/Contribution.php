@@ -560,20 +560,20 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
 
     $transaction->commit();
 
-    // check if activity record exist for this contribution, if
-    // not add activity
-    $activity = new CRM_Activity_DAO_Activity();
-    $activity->source_record_id = $contribution->id;
-    $activity->activity_type_id = CRM_Core_OptionGroup::getValue('activity_type',
-      'Contribution',
-      'name'
-    );
+    $activity = civicrm_api3('Activity', 'get', array(
+      'source_record_id' => $contribution->id,
+      'options' => array('limit' => 1),
+      'sequential' => 1,
+      'activity_type_id' => 'Contribution',
+      'return' => array('id', 'campaign'),
+    ));
 
     //CRM-18406: Update activity when edit contribution.
-    if ($activity->find(TRUE)) {
+    if ($activity['count']) {
       // CRM-13237 : if activity record found, update it with campaign id of contribution
-      CRM_Core_DAO::setFieldValue('CRM_Activity_BAO_Activity', $activity->id, 'campaign_id', $contribution->campaign_id);
-      $contribution->activity_id = $activity->id;
+      // @todo compare campaign ids first.
+      CRM_Core_DAO::setFieldValue('CRM_Activity_BAO_Activity', $activity['id'], 'campaign_id', $contribution->campaign_id);
+      $contribution->activity_id = $activity['id'];
     }
     if (empty($contribution->contact_id)) {
       $contribution->find(TRUE);
@@ -3987,16 +3987,10 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
     $activityParams = array(
       'source_contact_id' => $targetCid,
       'source_record_id' => $srcRecId,
-      'activity_type_id' => CRM_Core_OptionGroup::getValue('activity_type',
-        $activityType,
-        'name'
-      ),
+      'activity_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', $activityType),
       'subject' => $subject,
       'activity_date_time' => $date,
-      'status_id' => CRM_Core_OptionGroup::getValue('activity_status',
-        'Completed',
-        'name'
-      ),
+      'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_status_id', 'Completed'),
       'skipRecentView' => TRUE,
     );
 
@@ -4007,6 +4001,7 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
       $activityParams['source_contact_id'] = $id;
       $activityParams['target_contact_id'][] = $targetCid;
     }
+    // @todo use api.
     CRM_Activity_BAO_Activity::create($activityParams);
   }
 
