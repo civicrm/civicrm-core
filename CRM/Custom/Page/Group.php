@@ -271,7 +271,7 @@ class CRM_Custom_Page_Group extends CRM_Core_Page {
       $allRelationshipType = array_merge($allRelationshipType, $subTypeRelationshipTypes);
     }
 
-    $subTypes['Relationship'] = $allRelationshipType;
+    $subTypes['Relationship'] = CRM_Custom_Form_Group::getFormattedList($allRelationshipType);
 
     $cSubTypes = CRM_Core_Component::contactSubTypes();
     $contactSubTypes = array();
@@ -303,12 +303,6 @@ class CRM_Custom_Page_Group extends CRM_Core_Page {
               }
               elseif ($subName == 3) {
                 $colValue = $colValue ? $colValue . ', ' . $subTypes['ParticipantEventType'][$sub] : $subTypes['ParticipantEventType'][$sub];
-              }
-            }
-            elseif ($type == 'Relationship') {
-              $colValue = $colValue ? $colValue . ', ' . $subTypes[$type][$sub . '_a_b'] : $subTypes[$type][$sub . '_a_b'];
-              if (isset($subTypes[$type][$sub . '_b_a'])) {
-                $colValue = $colValue ? $colValue . ', ' . $subTypes[$type][$sub . '_b_a'] : $subTypes[$type][$sub . '_b_a'];
               }
             }
             else {
