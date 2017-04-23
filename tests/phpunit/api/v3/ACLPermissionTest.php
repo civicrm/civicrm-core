@@ -37,6 +37,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
   public $DBResetRequired = FALSE;
   protected $_entity;
   protected $allowedContactId = 0;
+  protected $allowedContacts = array();
 
   public function setUp() {
     parent::setUp();
@@ -469,6 +470,19 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
   }
 
   /**
+   * Only specified contact returned.
+   * @implements CRM_Utils_Hook::aclWhereClause
+   * @param $type
+   * @param $tables
+   * @param $whereTables
+   * @param $contactID
+   * @param $where
+   */
+  public function aclWhereMultipleContacts($type, &$tables, &$whereTables, &$contactID, &$where) {
+    $where = " contact_a.id IN (" . implode(', ', $this->allowedContacts) . ")";
+  }
+
+  /**
    * Basic check that an unpermissioned call keeps working and permissioned call fails.
    */
   public function testGetActivityNoPermissions() {
@@ -557,6 +571,51 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
     $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereHookAllResults'));
     $this->contactDelete($contacts['source_contact_id']);
     $this->callAPISuccess('Activity', 'getsingle', array('check_permissions' => 1, 'id' => $activity['id']));
+  }
+
+  /**
+   * Test get activities multiple ids with check permissions
+   * CRM-20441
+   */
+  public function testActivitiesGetMultipleIdsCheckPermissions() {
+    $this->createLoggedInUser();
+    $activity = $this->activityCreate();
+    $activity2 = $this->activityCreate();
+    $this->setPermissions(array('access CiviCRM'));
+    $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereHookAllResults'));
+    // Get activities associated with contact $this->_contactID.
+    $params = array(
+      'id' => array('IN' => array($activity['id'], $activity2['id'])),
+      'check_permissions' => TRUE,
+    );
+    $result = $this->callAPISuccess('activity', 'get', $params);
+    $this->assertEquals(2, $result['count']);
+  }
+
+  /**
+   * Test get activities multiple ids with check permissions
+   * Limit access to One contact
+   * CRM-20441
+   */
+  public function testActivitiesGetMultipleIdsCheckPermissionsLimitedACL() {
+    $this->createLoggedInUser();
+    $activity = $this->activityCreate();
+    $contacts = $this->getActivityContacts($activity);
+    $this->setPermissions(array('access CiviCRM'));
+    foreach ($contacts as $contact_id) {
+      $this->allowedContacts[] = $contact_id;
+    }
+    $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereMultipleContacts'));
+    $contact2 = $this->individualCreate();
+    $activity2 = $this->activityCreate(array('source_contact_id' => $contact2));
+    // Get activities associated with contact $this->_contactID.
+    $params = array(
+      'id' => array('IN' => array($activity['id'])),
+      'check_permissions' => TRUE,
+    );
+    $result = $this->callAPISuccess('activity', 'get', $params);
+    $this->assertEquals(1, $result['count']);
+    $this->callAPIFailure('activity', 'get', array_merge($params, array('id' => array('IN', array($activity2['id'])))));
   }
 
   /**
