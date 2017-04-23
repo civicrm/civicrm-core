@@ -190,10 +190,16 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
    * @param bool $isQueryString
    */
   public function source($fileName, $isQueryString = FALSE) {
-
-    CRM_Utils_File::sourceSQLFile($this->_config->dsn,
-      $fileName, NULL, $isQueryString
-    );
+    if ($isQueryString) {
+      CRM_Utils_File::runSqlQuery($this->_config->dsn,
+        $fileName, NULL
+      );
+    }
+    else {
+      CRM_Utils_File::sourceSQLFile($this->_config->dsn,
+        $fileName, NULL
+      );
+    }
   }
 
   public function preProcess() {
