@@ -105,7 +105,6 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     }
     $this->_fromEmails = CRM_Core_BAO_Email::getFromEmail();
 
-    $entityType = NULL;
     $entityType = 'contribution';
     if ($this->_component == 'event') {
       $entityType = 'participant';
