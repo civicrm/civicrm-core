@@ -41,3 +41,6 @@ VALUES
 
 -- CRM-20439 rename card_type to card_type_id of civicrm_financial_trxn table (IIDA-126)
 ALTER TABLE `civicrm_financial_trxn` CHANGE `card_type` `card_type_id` INT(10) UNSIGNED NULL DEFAULT NULL COMMENT 'FK to accept_creditcard option group values';
+
+-- CRM-20465
+ALTER TABLE `civicrm_financial_trxn` CHANGE `pan_truncation` `pan_truncation` VARCHAR( 4 ) NULL DEFAULT NULL COMMENT 'Last 4 digits of credit card';
