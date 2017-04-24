@@ -1255,9 +1255,13 @@ class CRM_Utils_Token {
           $pcm = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'preferred_communication_method');
 
           // communication Preference
-          $contactPcm = explode(CRM_Core_DAO::VALUE_SEPARATOR,
-            $contactDetails[$contactID]['preferred_communication_method']
-          );
+          $contactPcm = $contactDetails[$contactID]['preferred_communication_method'];
+          // this part is deprecated as due to recent improvement, we get a array of
+          //  preferred communication values instead of string via Contact.Get API
+          if (!isset($contactPcm)) {
+            $contactPcm = explode(CRM_Core_DAO::VALUE_SEPARATOR, $contactPcm);
+          }
+
           $result = array();
           foreach ($contactPcm as $key => $val) {
             if ($val) {
