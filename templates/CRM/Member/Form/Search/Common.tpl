@@ -52,6 +52,11 @@
     <p>
     {$form.member_auto_renew.label}&nbsp;{$form.member_auto_renew.html}
     </p>
+    <p>
+    {$form.member_override.label}
+    {help id="id-member_override" file="CRM/Member/Form/Search.hlp"}
+    {$form.member_override.html}
+    </p>
   </td>
 </tr>
 

@@ -33,3 +33,14 @@
     <li>{ts}Select neither to show all members, regardless of whether they are the direct member or inherit it through a relationship,{/ts}</li>
   </ul>
 {/htxt}
+
+{htxt id="id-member_override-title"}
+  {ts}Status Override{/ts}
+{/htxt}
+{htxt id="id-member_override"}
+  <ul>
+    <li>{ts}Select "Yes" to display only memberships with a Status Override set (membership is manually forced to a specific status){/ts}</li>
+    <li>{ts}Select "No" to display only memberships with no Status Override set (membership is subject to the normal status rules){/ts}</li>
+    <li>{ts}Select neither to show all memberships, regardless of whether or not they have Status Override set{/ts}</li>
+  </ul>
+{/htxt}
