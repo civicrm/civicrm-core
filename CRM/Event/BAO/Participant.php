@@ -1207,18 +1207,22 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
       CRM_Core_DAO::setFieldValue('CRM_Event_DAO_Participant', $participantID, 'status_id', $newStatusID);
     }
 
-    $additionalIds = self::getValidAdditionalIds($participantID, $oldStatusID, $newStatusID);
+    $cascadeAdditionalIds = self::getValidAdditionalIds($participantID, $oldStatusID, $newStatusID);
 
-    if (!empty($additionalIds)) {
-      $cascadeAdditionalIds = implode(',', $additionalIds);
-      $query = "UPDATE civicrm_participant cp SET cp.status_id = %1 WHERE  cp.id IN ({$cascadeAdditionalIds})";
-      $params = array(1 => array($newStatusID, 'Integer'));
-      $dao = CRM_Core_DAO::executeQuery($query, $params);
-      //Call post hook after updating additional participant status.
-      foreach ($additionalIds as $id) {
-        CRM_Utils_Hook::post('edit', 'Participant', $id);
+    if (!empty($cascadeAdditionalIds)) {
+      try {
+        foreach ($cascadeAdditionalIds as $id) {
+          $participantParams = array(
+            'id' => $id,
+            'status_id' => $newStatusID,
+          );
+          civicrm_api3('Participant', 'create', $participantParams);
+        }
+        return TRUE;
       }
-      return TRUE;
+      catch (CiviCRM_API3_Exception $e) {
+        throw new CRM_Core_Exception('Failed to update additional participant status in database');
+      }
     }
     return FALSE;
   }
