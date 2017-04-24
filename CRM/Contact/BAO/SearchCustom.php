@@ -71,12 +71,11 @@ class CRM_Contact_BAO_SearchCustom {
 
     // check that the csid exists in the db along with the right file
     // and implements the right interface
-    $customSearchClass = CRM_Core_OptionGroup::getLabel('custom_search',
-      $customSearchID
-    );
-    if (!$customSearchClass) {
-      return $error;
-    }
+    $customSearchClass = civicrm_api3('OptionValue', 'getvalue', array(
+      'option_group_id' => 'custom_search',
+      'return' => 'name',
+      'value' => $customSearchID,
+    ));
 
     $ext = CRM_Extension_System::singleton()->getMapper();
 

@@ -64,6 +64,10 @@ class CRM_Core_Error_Log extends \Psr\Log\AbstractLogger {
         $context['exception'] = CRM_Core_Error::formatTextException($context['exception']);
       }
       $message .= "\n" . print_r($context, 1);
+
+      if (CRM_Utils_System::isDevelopment() && CRM_Utils_Array::value('civi.tag', $context) === 'deprecated') {
+        trigger_error($message, E_USER_DEPRECATED);
+      }
     }
     CRM_Core_Error::debug_log_message($message, FALSE, '', $this->map[$level]);
   }
