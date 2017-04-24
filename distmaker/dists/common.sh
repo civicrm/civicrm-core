@@ -237,5 +237,6 @@ function dm_git_checkout() {
   pushd "$1"
     git checkout .
     git checkout "$2"
+    git pull
   popd
 }
