@@ -325,6 +325,18 @@ class CRM_Member_BAO_Query {
         $query->_tables['civicrm_membership'] = $query->_whereTables['civicrm_membership'] = 1;
         return;
 
+      case 'member_override':
+        if ($value) {
+          $query->_where[$grouping][] = " civicrm_membership.is_override IS TRUE";
+          $query->_qill[$grouping][] = ts("Membership has Status Override");
+        }
+        else {
+          $query->_where[$grouping][] = " civicrm_membership.is_override IS NOT TRUE";
+          $query->_qill[$grouping][] = ts("Membership does NOT have Status Override");
+        }
+        $query->_tables['civicrm_membership'] = $query->_whereTables['civicrm_membership'] = 1;
+        return;
+
       case 'member_campaign_id':
         $campParams = array(
           'op' => $op,
@@ -431,6 +443,7 @@ class CRM_Member_BAO_Query {
     $form->addYesNo('member_pay_later', ts('Pay Later?'));
     $form->addYesNo('member_auto_renew', ts('Auto-Renew?'));
     $form->addYesNo('member_test', ts('Membership is a Test?'));
+    $form->addYesNo('member_override', ts('Status Override?'));
 
     // add all the custom  searchable fields
     $extends = array('Membership');
