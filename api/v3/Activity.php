@@ -305,10 +305,16 @@ function civicrm_api3_activity_get($params) {
       );
     }
     $ids = array();
+    $allowed_operators = array(
+      'IN',
+    );
     if (is_array($params['id'])) {
       foreach ($params['id'] as $operator => $values) {
-        if (in_array($operator, CRM_Core_DAO::acceptedSQLOperators())) {
+        if (in_array($operator, CRM_Core_DAO::acceptedSQLOperators()) && in_array($operator, $allowed_operators)) {
           $ids = $values;
+        }
+        else {
+          throw new \Civi\Api\Exception('Used an unsupported sql operator with Activity.get API');
         }
       }
     }
