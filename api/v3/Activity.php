@@ -314,7 +314,7 @@ function civicrm_api3_activity_get($params) {
           $ids = $values;
         }
         else {
-          throw new \Civi\Api\Exception('Used an unsupported sql operator with Activity.get API');
+          throw new \API_Exception(ts('Used an unsupported sql operator with Activity.get API'));
         }
       }
     }
