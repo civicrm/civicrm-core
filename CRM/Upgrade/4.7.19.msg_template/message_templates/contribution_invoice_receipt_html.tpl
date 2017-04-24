@@ -143,7 +143,7 @@
                 <td colspan = "3"></td>
                 <td style = "padding-left:20px;text-align:right;"><b><font size = "1">{ts 1=$defaultCurrency}TOTAL %1{/ts}</font></b></td>
                 <td style = "padding-left:34px;text-align:right;"><font size = "1">{$amount|crmMoney:$currency}</font></td>
-                <td style = "padding-left:34px;"><font size = "1" align = "right"></fonts></td>
+                <td style = "padding-left:34px;"><font size = "1" align = "right"></font></td>
               </tr>
               {if $is_pay_later == 0}
                 <tr>
@@ -166,7 +166,7 @@
                   <td colspan = "3"></td>
                   <td style = "padding-left:20px;text-align:right;"><b><font size = "1">{ts}AMOUNT DUE:{/ts} </font></b></td>
                   <td style = "padding-left:34px;text-align:right;"><b><font size = "1">{$amountDue|crmMoney:$currency}</font></b></td>
-                  <td style = "padding-left:34px;"><font size = "1" align = "right"></fonts></td>
+                  <td style = "padding-left:34px;"><font size = "1" align = "right"></font></td>
                 </tr>
               {/if}
               <br/><br/><br/>
@@ -406,7 +406,7 @@
                   <td colspan = "3"></td>
                   <td style = "padding-left:28px;text-align:right;"><b><font size = "1">{ts}REMAINING CREDIT{/ts}</font></b></td>
                   <td style = "padding-left:28px;text-align:right;"><b><font size = "1">{$amountDue|crmMoney:$currency}</font></b></td>
-                  <td style = "padding-left:28px;"><font size = "1" align = "right"></fonts></td>
+                  <td style = "padding-left:28px;"><font size = "1" align = "right"></font></td>
                 </tr>
               {/if}
               <br/><br/><br/>

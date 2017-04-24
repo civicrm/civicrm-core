@@ -115,7 +115,7 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
         . '</p>';
     }
     if ($rev == '4.7.19') {
-      $postUpgradeMessage .= '<br /><br />' . ts('Default version of the following System Workflow Message Templates have been modified: <ul><li>Additional Payment Receipt or Refund Notification</li></ul> If you have modified these templates, please review the new default versions and implement updates as needed to your copies (Administer > Communications > Message Templates > System Workflow Messages).');
+      $postUpgradeMessage .= '<br /><br />' . ts('Default version of the following System Workflow Message Templates have been modified: <ul><li>Additional Payment Receipt or Refund Notification</li><li>Contribution Invoice</li></ul> If you have modified these templates, please review the new default versions and implement updates as needed to your copies (Administer > Communications > Message Templates > System Workflow Messages).');
       $check = CRM_Core_DAO::singleValueQuery("SELECT count(id) FROM civicrm_domain");
       $smsCheck = CRM_Core_DAO::singleValueQuery("SELECT count(id) FROM civicrm_sms_provider");
       if ($check > 1 && (bool) $smsCheck) {
