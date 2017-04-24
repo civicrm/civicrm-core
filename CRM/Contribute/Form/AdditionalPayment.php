@@ -105,10 +105,9 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     }
     $this->_fromEmails = CRM_Core_BAO_Email::getFromEmail();
 
-    $enitityType = NULL;
-    $enitityType = 'contribution';
+    $entityType = 'contribution';
     if ($this->_component == 'event') {
-      $enitityType = 'participant';
+      $entityType = 'participant';
       $this->_contributionId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment', $this->_id, 'contribution_id', 'participant_id');
       $eventId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant', $this->_id, 'event_id', 'id');
       $this->_fromEmails = CRM_Event_BAO_Event::getFromEmailIds($eventId);
@@ -118,7 +117,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       $this->_fromEmails['from_email_id'] = CRM_Core_BAO_Email::getFromEmail();
     }
 
-    $paymentInfo = CRM_Core_BAO_FinancialTrxn::getPartialPaymentWithType($this->_id, $enitityType);
+    $paymentInfo = CRM_Core_BAO_FinancialTrxn::getPartialPaymentWithType($this->_id, $entityType);
     $paymentDetails = CRM_Contribute_BAO_Contribution::getPaymentInfo($this->_id, $this->_component, FALSE, TRUE);
 
     $this->_amtPaid = $paymentDetails['paid'];
