@@ -693,7 +693,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
         }
       }
     }
-    if (empty($activityIDs)) {
+    if (isset($activityIDs) && empty($activityIDs)) {
       return $getCount ? count($activities) : $activities;
     }
 
