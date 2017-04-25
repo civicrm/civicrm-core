@@ -85,7 +85,7 @@ return array(
     'html_type' => 'Text',
     'default' => 'simple',
     'add' => '4.5',
-    'title' => 'How to handle full-tet queries',
+    'title' => 'How to handle full-text queries',
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => NULL,

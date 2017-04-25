@@ -1107,5 +1107,22 @@ class CRM_Core_SelectValues {
       6 => ts('Both'),
     );
   }
+  /**
+   * Logging providers.
+   */
+  public static function loggingProviders() {
+    // Initialise with log types we know are available.
+    $results = array(
+      'crm_core_error' => 'CiviCRM file-based log',
+      'ErrorLog' => 'PHP error log',
+      'Syslog' => 'Syslog - UNIX system log',
+      'BrowserConsole' => 'Browser console',
+    );
+
+    // @TODO If Drupal, consider offering PSR3 watchdog method?
+
+    // @TODO Scan for available implementations, eg any provided by extensions.
+    return $results;
+  }
 
 }

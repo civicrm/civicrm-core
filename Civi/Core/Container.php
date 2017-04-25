@@ -11,6 +11,12 @@ use Doctrine\Common\Cache\FilesystemCache;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\Tools\Setup;
+use Monolog\Logger;
+use Monolog\Handler\StreamHandler;
+use Monolog\Handler\ErrorLogHandler;
+use Monolog\Handler\SyslogHandler;
+use Monolog\Handler\BrowserConsoleHandler;
+use Monolog\Processor\PsrLogMessageProcessor;
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -159,7 +165,12 @@ class Container {
     ))
       ->setFactoryClass('CRM_Cxn_BAO_Cxn')->setFactoryMethod('createRegistrationClient');
 
-    $container->setDefinition('psr_log', new Definition('CRM_Core_Error_Log', array()));
+    $container->setDefinition('psr_log', new Definition(
+      'Psr\Log\LoggerInterface',
+      array()
+    ))
+      ->setFactoryService(self::SELF)->setFactoryMethod('getPsrLogger');
+    // $container->setDefinition('psr_log', new Definition('CRM_Core_Error_Log', array()));
 
     foreach (array('js_strings', 'community_messages') as $cacheName) {
       $container->setDefinition("cache.{$cacheName}", new Definition(
@@ -409,6 +420,42 @@ class Container {
    */
   public static function isContainerBooted() {
     return isset(\Civi::$statics[__CLASS__]['container']);
+
+  }
+
+  /**
+   * @return \Psr\Log\LoggerInterface $logger
+   */
+  public function getPsrLogger() {
+    $base_url = parse_url(CIVICRM_UF_BASEURL, PHP_URL_HOST);
+    $log_method = \Civi::settings()->get('logging_method');
+    $logger = new Logger("civicrm[$base_url]");
+    switch ($log_method) {
+      case 'Syslog':
+        $syslog = new SyslogHandler('user', 'local0');
+        $logger->pushProcessor(new PsrLogMessageProcessor);
+        $logger->pushHandler($syslog);
+        break;
+
+      case 'ErrorLog':
+        $errlog = new ErrorLogHandler();
+        $logger->pushProcessor(new PsrLogMessageProcessor);
+        $logger->pushHandler($errlog);
+        break;
+
+      case 'BrowserConsole':
+        $errlog = new BrowserConsoleHandler();
+        $logger->pushProcessor(new PsrLogMessageProcessor);
+        $logger->pushHandler($errlog);
+        break;
+
+      case 'crm_core_error':
+        $crmlogger = new \CRM_Core_Error_Log();
+        return $crmlogger;
+    }
+    $logger->warning('Warning: prolonged use of CiviCRM may lead to {impact}.', array('{impact}' => 'contribution'));
+    $logger->error('This is a sponsored message from: {sponsor}.', array('{sponsor}' => 'Weyland-Yutani'));
+    return $logger;
   }
 
 }
