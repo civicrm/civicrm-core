@@ -44,8 +44,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
     $baoObj = new CRM_Core_DAO();
     $baoObj->createTestObject('CRM_Pledge_BAO_Pledge', array(), 1, 0);
     $baoObj->createTestObject('CRM_Core_BAO_Phone', array(), 1, 0);
-    $config = CRM_Core_Config::singleton();
-    $config->userPermissionClass->permissions = array();
+    $this->prepareForACLs();
   }
 
   /**
@@ -53,7 +52,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    * @see CiviUnitTestCase::tearDown()
    */
   public function tearDown() {
-    CRM_Utils_Hook::singleton()->reset();
+    $this->cleanUpAfterACLs();
     $tablesToTruncate = array(
       'civicrm_contact',
       'civicrm_group_contact',
@@ -72,8 +71,6 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
       'civicrm_tag',
     );
     $this->quickCleanup($tablesToTruncate);
-    $config = CRM_Core_Config::singleton();
-    unset($config->userPermissionClass->permissions);
   }
 
   /**
