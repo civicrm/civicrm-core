@@ -693,6 +693,9 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
         }
       }
     }
+    if (empty($activityIDs)) {
+      return $getCount ? count($activities) : $activities;
+    }
 
     // fetch all active activity types
     $activityTypes = CRM_Core_OptionGroup::values('activity_type');
