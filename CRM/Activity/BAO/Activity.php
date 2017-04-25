@@ -679,7 +679,10 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       $activityIDs = explode(',', $activityIDs);
     }
 
-    // CRM-20441 Check if user has access to the activities
+    // CRM-20441 Check if user has access to the activities.
+    // This is a temporary fix we need to figure out the rules around
+    // the right permissions to access Activities.
+    // This attpemts to reduce fatal errors in 4.7.19 RC.
     foreach ($activityIDs as $key => $activityId) {
       try {
         civicrm_api3('Activity', 'get', array('id' => $activityId, 'check_permissions' => 1));
