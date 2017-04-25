@@ -430,7 +430,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'SurveyRespondant',
       'UFMatch',
       'UFJoin',
-      'UFField',
       'OptionValue',
       'Relationship',
       'RelationshipType',
@@ -655,6 +654,12 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'StatusPreference' => array(
         'break_return' => array(
           'ignore_severity',
+        ),
+      ),
+      'UFField' => array(
+        // This is validated against options that can't be generated in an automated test context.
+        'cant_update' => array(
+          'field_name',
         ),
       ),
     );

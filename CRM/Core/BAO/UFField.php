@@ -42,6 +42,46 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
   private static $_contriBatchEntryFields = NULL;
   private static $_memberBatchEntryFields = NULL;
 
+  /**
+   * Create UFField object.
+   *
+   * @param array $params
+   *   Array per getfields metadata.
+   *
+   * @throws CRM_Core_Exception
+   *
+   * @return CRM_Core_BAO_UFField
+   */
+  public static function create(&$params) {
+    // CRM-14756: If the user gives the id, uf_group_id is retrieved and then set.
+    if (!empty($params['id']) && empty($params['uf_group_id'])) {
+      $params['uf_group_id'] = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFField', $params['id'], 'uf_group_id', 'id');
+    }
+    $groupId = CRM_Utils_Array::value('uf_group_id', $params);
+
+    $field_name = CRM_Utils_Array::value('field_name', $params);
+    if (
+      (!$field_name && empty($params['id'])) ||
+      ($field_name && !CRM_Core_BAO_UFField::isValidFieldName($field_name))) {
+      throw new CRM_Core_Exception('The field_name is not valid');
+    }
+
+    if (strpos($field_name, 'formatting') !== 0 && CRM_Core_BAO_UFField::duplicateField($params)) {
+      throw new CRM_Core_Exception("The field was not added. It already exists in this profile.");
+    }
+
+    $params['weight'] = CRM_Core_BAO_UFField::autoWeight($params);
+
+    $ufField = CRM_Core_BAO_UFField::add($params);
+
+    $fieldsType = CRM_Core_BAO_UFGroup::calculateGroupType($groupId, TRUE);
+    CRM_Core_BAO_UFGroup::updateGroupTypes($groupId, $fieldsType);
+
+    civicrm_api3('profile', 'getfields', array('cache_clear' => TRUE));
+
+    return $ufField;
+  }
+
 
   /**
    * Fetch object based on array of properties.
@@ -55,20 +95,6 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
    */
   public static function retrieve(&$params, &$defaults) {
     return CRM_Core_DAO::commonRetrieve('CRM_Core_DAO_UFField', $params, $defaults);
-  }
-
-  /**
-   * Get the form title.
-   *
-   * @param int $id
-   *   Id of uf_form.
-   *
-   * @return string
-   *   title
-   *
-   */
-  public static function getTitle($id) {
-    return CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFField', $groupId, 'title');
   }
 
   /**
@@ -119,15 +145,21 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
    *
    * @param array $params
    *   An associative array with field and values.
-   * @param $ids
    *
-   * @return mixed
-   * @ids   array $ids    array that containd ids
-   *
+   * @return bool
    */
-  public static function duplicateField($params, $ids) {
+  public static function duplicateField($params) {
     $ufField = new CRM_Core_DAO_UFField();
-    $ufField->uf_group_id = CRM_Utils_Array::value('uf_group', $ids);
+
+    $ufField->uf_group_id = CRM_Utils_Array::value('uf_group_id', $params);
+
+    $field_type       = CRM_Utils_Array::value('field_type', $params);
+    $field_name       = CRM_Utils_Array::value('field_name', $params);
+    $location_type_id = CRM_Utils_Array::value('location_type_id', $params, CRM_Utils_Array::value('website_type_id', $params));
+    $phone_type       = CRM_Utils_Array::value('phone_type_id', $params, CRM_Utils_Array::value('phone_type', $params));
+
+    $params['field_name'] = array($field_type, $field_name, $location_type_id, $phone_type);
+
     $ufField->field_type = $params['field_name'][0];
     $ufField->field_name = $params['field_name'][1];
     if ($params['field_name'][1] == 'url') {
@@ -138,8 +170,8 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
     }
     $ufField->phone_type_id = CRM_Utils_Array::value(3, $params['field_name']);
 
-    if (!empty($ids['uf_field'])) {
-      $ufField->whereAdd("id <> " . CRM_Utils_Array::value('uf_field', $ids));
+    if (!empty($params['id'])) {
+      $ufField->whereAdd("id <> " . CRM_Utils_Array::value('id', $params));
     }
 
     return $ufField->find(TRUE);
@@ -203,26 +235,36 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
     // set values for uf field properties and save
     $ufField = new CRM_Core_DAO_UFField();
     $ufField->copyValues($params);
-    $ufField->field_type = $params['field_name'][0];
-    $ufField->field_name = $params['field_name'][1];
 
-    //should not set location type id for Primary
-    $locationTypeId = NULL;
-    if ($params['field_name'][1] == 'url') {
-      $ufField->website_type_id = CRM_Utils_Array::value(2, $params['field_name']);
-    }
-    else {
-      $locationTypeId = CRM_Utils_Array::value(2, $params['field_name']);
-      $ufField->website_type_id = NULL;
-    }
-    if ($locationTypeId) {
-      $ufField->location_type_id = $locationTypeId;
-    }
-    else {
-      $ufField->location_type_id = 'null';
-    }
+    if (isset($params['field_name']) && !is_string($params['field_name'])) {
 
-    $ufField->phone_type_id = CRM_Utils_Array::value(3, $params['field_name'], 'NULL');
+      $field_type       = CRM_Utils_Array::value('field_type', $params);
+      $field_name       = CRM_Utils_Array::value('field_name', $params);
+      $location_type_id = CRM_Utils_Array::value('location_type_id', $params, CRM_Utils_Array::value('website_type_id', $params));
+      $phone_type       = CRM_Utils_Array::value('phone_type_id', $params, CRM_Utils_Array::value('phone_type', $params));
+
+      $params['field_name'] = array($field_type, $field_name, $location_type_id, $phone_type);
+      $ufField->field_type = $params['field_name'][0];
+      $ufField->field_name = $params['field_name'][1];
+
+      // Should not set location type id for Primary.
+      $locationTypeId = NULL;
+      if ($params['field_name'][1] == 'url') {
+        $ufField->website_type_id = CRM_Utils_Array::value(2, $params['field_name']);
+      }
+      else {
+        $locationTypeId = CRM_Utils_Array::value(2, $params['field_name']);
+        $ufField->website_type_id = NULL;
+      }
+      if ($locationTypeId) {
+        $ufField->location_type_id = $locationTypeId;
+      }
+      else {
+        $ufField->location_type_id = 'null';
+      }
+
+      $ufField->phone_type_id = CRM_Utils_Array::value(3, $params['field_name'], 'NULL');
+    }
 
     return $ufField->save();
   }
@@ -230,18 +272,33 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
   /**
    * Automatically determine one weight and modify others.
    *
+   * If there is a specific legacy-stype opt-out of autoweight then return early.
+   * This is from an early version of api v3 but is still used & tested in the replace function.
+   *
+   * Also return early if this is an update and weight has not been set - in that case
+   * weight does not need to be tampered with.
+   *
    * @param array $params
    *   UFField record, e.g. with 'weight', 'uf_group_id', and 'field_id'.
    * @return int
    */
   public static function autoWeight($params) {
+    if (isset($params['option.autoweight'])) {
+      return CRM_Utils_Array::value('weight', $params);
+    }
+    if (isset($params['option.autoweight']) && !$params['option.autoweight']) {
+      return CRM_Utils_Array::value('weight', $params);
+    }
+    if (!empty($params['id']) && empty($params['weight'])) {
+      return NULL;
+    }
     // fix for CRM-316
     $oldWeight = NULL;
 
-    if (!empty($params['field_id'])) {
-      $oldWeight = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFField', $params['field_id'], 'weight', 'id');
+    if (!empty($params['id'])) {
+      $oldWeight = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFField', $params['id'], 'weight', 'id');
     }
-    $fieldValues = array('uf_group_id' => $params['group_id']);
+    $fieldValues = array('uf_group_id' => $params['uf_group_id']);
     return CRM_Utils_Weight::updateOtherWeights('CRM_Core_DAO_UFField', $oldWeight, CRM_Utils_Array::value('weight', $params, 0), $fieldValues);
   }
 
@@ -254,13 +311,13 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
    *   Set the is_active field.
    */
   public static function setUFField($customFieldId, $is_active) {
-    //find the profile id given custom field
+    // Find the profile id given custom field.
     $ufField = new CRM_Core_DAO_UFField();
     $ufField->field_name = "custom_" . $customFieldId;
 
     $ufField->find();
     while ($ufField->fetch()) {
-      //enable/ disable profile
+      // Enable/ disable profile.
       CRM_Core_BAO_UFField::setIsActive($ufField->id, $is_active);
     }
   }
@@ -322,7 +379,7 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
     $dao = CRM_Core_DAO::executeQuery($queryString, $p);
 
     while ($dao->fetch()) {
-      //enable/ disable profile
+      // Enable/ disable profile.
       CRM_Core_BAO_UFField::setUFField($dao->custom_field_id, $is_active);
     }
   }
