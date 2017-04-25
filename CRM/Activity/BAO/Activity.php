@@ -788,7 +788,14 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
     // 1. we should use Activity.Getcount for fetching count only, but  in order to check that
     //    current logged in user has permission to view Case activities we are performing filtering out those activities from list (see below).
     //    This logic need to be incorporated in Activity.get definition
-    $result = civicrm_api3('Activity', 'Get', $activityParams);
+    try {
+      $result = civicrm_api3('Activity', 'Get', $activityParams);
+    }
+    catch (CiviCRM_API3_Exception $e) {
+      // CRM-20441: if the loggedin user has not enough permission to view activities
+      //  then return empty result instead of throwring error
+      return $getCount ? count($activities) : $activities;
+    }
 
     $enabledComponents = self::activityComponents();
     $allCampaigns = CRM_Campaign_BAO_Campaign::getCampaigns(NULL, NULL, FALSE, FALSE, FALSE, TRUE);
