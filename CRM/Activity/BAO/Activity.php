@@ -664,46 +664,15 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
   public static function getActivities($params, $getCount = FALSE) {
     $activities = array();
 
-    // fetch all activity IDs whose target/assignee/source contact id is $params['contact_id']
-    // currently cannot be done via Activity.Get API so we are using SQL query instead
-    if (!empty($params['contact_id'])) {
-      $activityIDs = CRM_Core_DAO::singleValueQuery("SELECT GROUP_CONCAT(DISTINCT activity_id SEPARATOR ',')
-        FROM civicrm_activity_contact
-        WHERE contact_id = %1", array(1 => array($params['contact_id'], 'Integer')));
-
-      // if no activities found for given $params['contact_id'] then return empty array
-      if (empty($activityIDs)) {
-        return $getCount ? count($activities) : $activities;
-      }
-      $activityIDs = explode(',', $activityIDs);
-      // CRM-20441 Check if user has access to the activities.
-      // This is a temporary fix we need to figure out the rules around
-      // the right permissions to access Activities.
-      // This attempts to reduce fatal errors in 4.7.19 RC.
-      if (!empty($activityIDs)) {
-        foreach ($activityIDs as $key => $activityId) {
-          try {
-            civicrm_api3('Activity', 'get', array('id' => $activityId, 'check_permissions' => 1));
-          }
-          catch (Exception $e) {
-            unset($activityIDs[$key]);
-          }
-        }
-      }
-      if (empty($activityIDs)) {
-        return $getCount ? count($activities) : $activities;
-      }
-    }
-
     // fetch all active activity types
     $activityTypes = CRM_Core_OptionGroup::values('activity_type');
 
     // Activity.Get API params
     $activityParams = array(
-      'id' => (!empty($activityIDs)) ? array('IN' => $activityIDs) : NULL,
       'is_deleted' => 0,
       'is_current_revision' => 1,
       'is_test' => 0,
+      'contact_id' => CRM_Utils_Array::value('contact_id', $params),
       'return' => array(
         'activity_date_time',
         'source_record_id',
