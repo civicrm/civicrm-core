@@ -619,6 +619,25 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test get activities multiple ids with check permissions
+   * CRM-20441
+   */
+  public function testActivitiesGetMultipleIdsCheckPermissionsNotIN() {
+    $this->createLoggedInUser();
+    $activity = $this->activityCreate();
+    $activity2 = $this->activityCreate();
+    $this->setPermissions(array('access CiviCRM'));
+    $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereHookAllResults'));
+    // Get activities associated with contact $this->_contactID.
+    $params = array(
+      'id' => array('NOT IN' => array($activity['id'], $activity2['id'])),
+      'check_permissions' => TRUE,
+    );
+    $result = $this->callAPIFailure('activity', 'get', $params);
+    $this->assertEquals('Used an unsupported sql operator with Activity.get API', $result['error_message']);
+  }
+
+  /**
    * Get the contacts for the activity.
    *
    * @param $activity

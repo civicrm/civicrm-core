@@ -1356,6 +1356,10 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     if ($this->_mode) {
       $params['total_amount'] = CRM_Utils_Array::value('total_amount', $formValues, 0);
 
+      //CRM-20264 : Store CC type and number (last 4 digit) during backoffice or online payment
+      $params['card_type_id'] = CRM_Utils_Array::value('card_type_id', $this->_params);
+      $params['pan_truncation'] = CRM_Utils_Array::value('pan_truncation', $this->_params);
+
       if (!$isQuickConfig) {
         $params['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet',
           $this->_priceSetId,

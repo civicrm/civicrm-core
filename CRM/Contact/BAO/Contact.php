@@ -3199,7 +3199,7 @@ AND       civicrm_openid.is_primary = 1";
 
       // if still user does not have required permissions, check acl.
       if (!$hasAllPermissions && $menuOptions['ref'] != 'delete-contact') {
-        if (in_array($values['ref'], $aclPermissionedTasks) &&
+        if (in_array($menuOptions['ref'], $aclPermissionedTasks) &&
             $corePermission == CRM_Core_Permission::EDIT
             ) {
           $hasAllPermissions = TRUE;

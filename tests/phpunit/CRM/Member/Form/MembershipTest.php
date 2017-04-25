@@ -478,6 +478,18 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'is_test' => TRUE,
     ));
 
+    //CRM-20264 : Check that CC type and number (last 4 digit) is stored during backoffice membership payment
+    $lastFinancialTrxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contribution['id'], 'DESC');
+    $financialTrxn = $this->callAPISuccessGetSingle(
+      'FinancialTrxn',
+      array(
+        'id' => $lastFinancialTrxnId['financialTrxnId'],
+        'return' => array('card_type_id', 'pan_truncation'),
+      )
+    );
+    $this->assertEquals(1, $financialTrxn['card_type_id']);
+    $this->assertEquals(1111, $financialTrxn['pan_truncation']);
+
     $this->callAPISuccessGetCount('LineItem', array(
       'entity_id' => $membership['id'],
       'entity_table' => 'civicrm_membership',
