@@ -7,12 +7,18 @@
 class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   public function setUp() {
     parent::setUp();
+    $this->prepareForACLs();
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('view all contacts', 'access CiviCRM');
   }
 
+  /**
+   * Clean up after tests.
+   */
   public function tearDown() {
-    // truncate a few tables
-    $tablesToTruncate = array('civicrm_contact', 'civicrm_activity', 'civicrm_activity_contact', 'civicrm_email');
+    $tablesToTruncate = array('civicrm_activity', 'civicrm_activity_contact', 'civicrm_email');
     $this->quickCleanup($tablesToTruncate);
+    $this->cleanUpAfterACLs();
+    parent::tearDown();
   }
 
   /**
@@ -33,8 +39,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       'subject', 'Database check for created activity.'
     );
 
-    // Now call create() to modify an existing Activity
-
+    // Now call create() to modify an existing Activity.
     $params = array(
       'id' => $activityId,
       'source_contact_id' => $contactId,
@@ -114,11 +119,11 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
 
     CRM_Activity_BAO_Activity::create($params);
 
-    $activityId = $this->assertDBNotNull('CRM_Activity_DAO_Activity', 'Scheduling Meeting', 'id',
+    $this->assertDBNotNull('CRM_Activity_DAO_Activity', 'Scheduling Meeting', 'id',
       'subject', 'Database check for created activity.'
     );
 
-    $activityTargetId = $this->assertDBNotNull('CRM_Activity_DAO_ActivityContact', $targetContactId,
+    $this->assertDBNotNull('CRM_Activity_DAO_ActivityContact', $targetContactId,
       'id', 'contact_id',
       'Database check for created activity target.'
     );
@@ -163,11 +168,11 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
 
     CRM_Activity_BAO_Activity::create($params);
 
-    $activityId = $this->assertDBNotNull('CRM_Activity_DAO_Activity', 'Scheduling Meeting', 'id',
+    $this->assertDBNotNull('CRM_Activity_DAO_Activity', 'Scheduling Meeting', 'id',
       'subject', 'Database check for created activity.'
     );
 
-    $activityTargetId = $this->assertDBNotNull('CRM_Activity_DAO_ActivityContact', $targetContactId,
+    $this->assertDBNotNull('CRM_Activity_DAO_ActivityContact', $targetContactId,
       'id', 'contact_id',
       'Database check for created activity target.'
     );
@@ -214,7 +219,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       'subject', 'Database check for created activity.'
     );
 
-    $activityTargetId = $this->assertDBNotNull('CRM_Activity_DAO_ActivityContact', $targetContactId,
+    $this->assertDBNotNull('CRM_Activity_DAO_ActivityContact', $targetContactId,
       'id', 'contact_id',
       'Database check for created activity target.'
     );
@@ -256,7 +261,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       'subject', 'Database check for created activity.'
     );
 
-    $activityAssignmentId = $this->assertDBNotNull('CRM_Activity_DAO_ActivityContact',
+    $this->assertDBNotNull('CRM_Activity_DAO_ActivityContact',
       $assigneeContactId, 'id', 'contact_id',
       'Database check for created activity assignment.'
     );
@@ -274,7 +279,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   /**
    * Test getActivities BAO method for getting count.
    */
-  public function testGetActivitiesCountforAdminDashboard() {
+  public function testGetActivitiesCountForAdminDashboard() {
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
     $op->execute($this->_dbconn,
       $this->createFlatXMLDataSet(
@@ -381,7 +386,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
 
     $activities = $obj->getContactActivity();
     // This should include activities of type Meeting only.
-    foreach ($activities['data'] as $key => $value) {
+    foreach ($activities['data'] as $value) {
       $this->assertContains('Meeting', $value['activity_type']);
     }
     unset($_GET['activity_type_id']);
@@ -389,7 +394,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     $_GET['activity_type_exclude_id'] = 1;
     $activities = $obj->getContactActivity();
     // None of the activities should be of type Meeting.
-    foreach ($activities['data'] as $key => $value) {
+    foreach ($activities['data'] as $value) {
       $this->assertNotEquals('Meeting', $value['activity_type']);
     }
   }
@@ -425,7 +430,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   /**
    * Test getActivities BAO method.
    */
-  public function testGetActivitiesforAdminDashboard() {
+  public function testGetActivitiesForAdminDashboard() {
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
     $op->execute($this->_dbconn,
       $this->createFlatXMLDataSet(
@@ -506,10 +511,11 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   public function testTargetCountforContactSummary() {
     $targetCount = 5;
     $contactId = $this->individualCreate();
+    $targetContactIDs = array();
     for ($i = 0; $i < $targetCount; $i++) {
       $targetContactIDs[] = $this->individualCreate(array(), $i);
     }
-    // create activities with 5 target contacts
+    // Create activities with 5 target contacts.
     $activityParams = array(
       'source_contact_id' => $contactId,
       'target_contact_id' => $targetContactIDs,
@@ -733,7 +739,6 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     $formAddress = CRM_Case_BAO_Case::getReceiptFrom($activity['id']);
     $expectedFromAddress = sprintf("%s <%s>", $sourceDisplayName, $sourceContactParams['email']);
     $this->assertEquals($expectedFromAddress, $formAddress);
-    // ----------------------- End of Case 1 ---------------------------
 
     // Case 2: System Default From Address
     //  but first erase the email address of existing source contact ID
@@ -760,7 +765,6 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       $expectedFromAddress = sprintf("%s <%s>", $domainInfo['name'], $domainInfo['domain_email']);
     }
     $this->assertEquals($expectedFromAddress, $formAddress);
-    // ----------------------- End of Case 2 ---------------------------
 
     // TODO: Case 4 about checking the $formAddress on basis of logged contact ID respectively needs,
     //  to change the domain setting, which isn't straight forward in test environment

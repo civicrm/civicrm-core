@@ -1805,6 +1805,29 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
+   * Prepare class for ACLs.
+   */
+  protected function prepareForACLs() {
+    $config = CRM_Core_Config::singleton();
+    $config->userPermissionClass->permissions = array();
+  }
+
+  /**
+   * Reset after ACLs.
+   */
+  protected function cleanUpAfterACLs() {
+    CRM_Utils_Hook::singleton()->reset();
+    $tablesToTruncate = array(
+      'civicrm_acl',
+      'civicrm_acl_cache',
+      'civicrm_acl_entity_role',
+      'civicrm_acl_contact_cache',
+    );
+    $this->quickCleanup($tablesToTruncate);
+    $config = CRM_Core_Config::singleton();
+    unset($config->userPermissionClass->permissions);
+  }
+  /**
    * Create a smart group.
    *
    * By default it will be a group of households.
