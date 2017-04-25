@@ -467,19 +467,6 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Only specified contact returned.
-   * @implements CRM_Utils_Hook::aclWhereClause
-   * @param $type
-   * @param $tables
-   * @param $whereTables
-   * @param $contactID
-   * @param $where
-   */
-  public function aclWhereMultipleContacts($type, &$tables, &$whereTables, &$contactID, &$where) {
-    $where = " contact_a.id IN (" . implode(', ', $this->allowedContacts) . ")";
-  }
-
-  /**
    * Basic check that an unpermissioned call keeps working and permissioned call fails.
    */
   public function testGetActivityNoPermissions() {
@@ -501,9 +488,9 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
   /**
    * View all activities is required unless id is passed in.
    */
-  public function testGetActivityViewAllContactsNotEnoughWIthoutID() {
+  public function testGetActivityViewAllContactsEnoughWIthoutID() {
     $this->setPermissions(array('view all contacts', 'access CiviCRM'));
-    $this->callAPIFailure('Activity', 'get', array('check_permissions' => 1));
+    $this->callAPISuccess('Activity', 'get', array('check_permissions' => 1));
   }
 
   /**
@@ -630,8 +617,8 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
       'id' => array('NOT IN' => array($activity['id'], $activity2['id'])),
       'check_permissions' => TRUE,
     );
-    $result = $this->callAPIFailure('activity', 'get', $params);
-    $this->assertEquals('Used an unsupported sql operator with Activity.get API', $result['error_message']);
+    $result = $this->callAPISuccess('activity', 'get', $params);
+    $this->assertEquals(0, $result['count']);
   }
 
   /**

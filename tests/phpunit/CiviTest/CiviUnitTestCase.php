@@ -3824,6 +3824,19 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
   }
 
   /**
+   * Only specified contact returned.
+   * @implements CRM_Utils_Hook::aclWhereClause
+   * @param $type
+   * @param $tables
+   * @param $whereTables
+   * @param $contactID
+   * @param $where
+   */
+  public function aclWhereMultipleContacts($type, &$tables, &$whereTables, &$contactID, &$where) {
+    $where = " contact_a.id IN (" . implode(', ', $this->allowedContacts) . ")";
+  }
+
+  /**
    * @implements CRM_Utils_Hook::selectWhereClause
    *
    * @param string $entity
