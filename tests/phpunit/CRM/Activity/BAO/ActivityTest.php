@@ -280,29 +280,9 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
    * Test getActivities BAO method for getting count.
    */
   public function testGetActivitiesCountForAdminDashboard() {
-    $op = new PHPUnit_Extensions_Database_Operation_Insert();
-    $op->execute($this->_dbconn,
-      $this->createFlatXMLDataSet(
-        dirname(__FILE__) . '/activities_for_dashboard_count.xml'
-      )
-    );
-
-    $params = array(
-      'contact_id' => NULL,
-      'admin' => TRUE,
-      'caseId' => NULL,
-      'context' => 'home',
-      'activity_type_id' => NULL,
-      'offset' => 0,
-      'rowCount' => 0,
-      'sort' => NULL,
-    );
-    $activityCount = CRM_Activity_BAO_Activity::getActivities($params, TRUE);
-
-    //since we are loading activities from dataset, we know total number of activities
-    // 8 schedule activities that should be shown on dashboard
-    $count = 8;
-    $this->assertEquals($count, $activityCount);
+    $this->setUpForActivityDashboardTests();
+    $activityCount = CRM_Activity_BAO_Activity::getActivities($this->_params, TRUE);
+    $this->assertEquals(8, $activityCount);
   }
 
   /**
@@ -431,24 +411,8 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
    * Test getActivities BAO method.
    */
   public function testGetActivitiesForAdminDashboard() {
-    $op = new PHPUnit_Extensions_Database_Operation_Insert();
-    $op->execute($this->_dbconn,
-      $this->createFlatXMLDataSet(
-        dirname(__FILE__) . '/activities_for_dashboard_count.xml'
-      )
-    );
-
-    $params = array(
-      'contact_id' => NULL,
-      'admin' => TRUE,
-      'caseId' => NULL,
-      'context' => 'home',
-      'activity_type_id' => NULL,
-      'offset' => 0,
-      'rowCount' => 0,
-      'sort' => NULL,
-    );
-    $activities = CRM_Activity_BAO_Activity::getActivities($params);
+    $this->setUpForActivityDashboardTests();
+    $activities = CRM_Activity_BAO_Activity::getActivities($this->_params);
 
     //since we are loading activities from dataset, we know total number of activities
     // with no contact ID and there should be 8 schedule activities shown on dashboard
@@ -460,6 +424,17 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       $this->assertEquals($value['activity_type_id'], 2, 'Verify activity type is correct.');
       $this->assertEquals($value['status_id'], 1, 'Verify all activities are scheduled.');
     }
+  }
+
+  /**
+   * Test getActivities BAO method.
+   */
+  public function testGetActivitiesForAdminDashboardNoViewContacts() {
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('access CiviCRM');
+    $this->setUpForActivityDashboardTests();
+    $activities = CRM_Activity_BAO_Activity::getActivities($this->_params);
+    $this->assertEquals(0, count($activities));
+
   }
 
   /**
@@ -770,6 +745,29 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
 
     // TODO: Case 4 about checking the $formAddress on basis of logged contact ID respectively needs,
     //  to change the domain setting, which isn't straight forward in test environment
+  }
+
+  /**
+   * Set up for testing activity queries.
+   */
+  protected function setUpForActivityDashboardTests() {
+    $op = new PHPUnit_Extensions_Database_Operation_Insert();
+    $op->execute($this->_dbconn,
+      $this->createFlatXMLDataSet(
+        dirname(__FILE__) . '/activities_for_dashboard_count.xml'
+      )
+    );
+
+    $this->_params = array(
+      'contact_id' => NULL,
+      'admin' => TRUE,
+      'caseId' => NULL,
+      'context' => 'home',
+      'activity_type_id' => NULL,
+      'offset' => 0,
+      'rowCount' => 0,
+      'sort' => NULL,
+    );
   }
 
 }
