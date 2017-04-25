@@ -1210,11 +1210,19 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
     $cascadeAdditionalIds = self::getValidAdditionalIds($participantID, $oldStatusID, $newStatusID);
 
     if (!empty($cascadeAdditionalIds)) {
-      $cascadeAdditionalIds = implode(',', $cascadeAdditionalIds);
-      $query = "UPDATE civicrm_participant cp SET cp.status_id = %1 WHERE  cp.id IN ({$cascadeAdditionalIds})";
-      $params = array(1 => array($newStatusID, 'Integer'));
-      $dao = CRM_Core_DAO::executeQuery($query, $params);
-      return TRUE;
+      try {
+        foreach ($cascadeAdditionalIds as $id) {
+          $participantParams = array(
+            'id' => $id,
+            'status_id' => $newStatusID,
+          );
+          civicrm_api3('Participant', 'create', $participantParams);
+        }
+        return TRUE;
+      }
+      catch (CiviCRM_API3_Exception $e) {
+        throw new CRM_Core_Exception('Failed to update additional participant status in database');
+      }
     }
     return FALSE;
   }
