@@ -426,6 +426,96 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
   }
 
   /**
+   * Try to retrieve a relationship searching on multi-select custom field.
+   */
+  public function testGetWithCustomContains() {
+    $custom_group_result = $this->CallApiSuccess('CustomGroup', 'Create', array(
+      'name' => 'custom_group_on_relationship',
+      'title' => 'Custom group on relationship (test)',
+      'extends' => 'Relationship',
+      'is_active' => 1,
+      'sequential' => 1,
+    ));
+
+    $custom_field_result = $this->CallApiSuccess('CustomField', 'Create', array(
+      'custom_group_id' => $custom_group_result['id'],
+      'weight' => 1,
+      'name' => 'my_custom_field',
+      'label' => 'My custom field',
+      'data_type' => 'String',
+      'html_type' => 'Multi-Select',
+      'option_values' => array(
+        'A' => array(
+          'weight' => 1,
+          'value' => 'A',
+          'label' => 'label A',
+          'is_active' => 1,
+        ),
+        'B' => array(
+          'weight' => 2,
+          'value' => 'B',
+          'label' => 'label B',
+          'is_active' => 1,
+        ),
+        'C' => array(
+          'weight' => 3,
+          'value' => 'C',
+          'label' => 'label C',
+          'is_active' => 1,
+        ),
+      ),
+      'is_active' => 1,
+      'sequential' => 1,
+    ));
+
+    $organization_create_result = $this->CallApiSuccess('Contact', 'Create', array(
+      'contact_type' => 'Organization',
+      'organization_name' => 'Schmoe inc.',
+      'sequential' => 1,
+    ));
+
+    $contact_create_result = $this->CallApiSuccess('Contact', 'Create', array(
+      'contact_type' => 'Individual',
+      'first_name' => 'Joe',
+      'last_name' => 'Schmoe',
+      'api.relationship.create' => array(
+        'contact_id_a' => '$value.id',
+        'contact_id_b' => $organization_create_result['id'],
+        'relationship_type_id' => 5, // works for
+        'custom_' . $custom_field_result['id'] => array('A', 'B'),
+      ),
+      'sequential' => 1,
+    ));
+
+    $relationship_id = $contact_create_result['values'][0]['api.relationship.create']['id'];
+
+    $relationship_get_result = $this->CallApiSuccess('Relationship', 'GetSingle', array(
+      'custom_' . $custom_field_result['id'] => array('CONTAINS' => 'B'),
+      'sequential' => 1,
+    ));
+
+    // Clean up first, then assert.
+
+    $this->CallApiSuccess('Contact', 'Delete', array(
+      'id' => $contact_create_result['id'],
+    ));
+
+    $this->CallApiSuccess('Contact', 'Delete', array(
+      'id' => $organization_create_result['id'],
+    ));
+
+    $this->CallApiSuccess('CustomField', 'Delete', array(
+      'id' => $custom_field_result['id'],
+    ));
+
+    $this->CallApiSuccess('CustomGroup', 'Delete', array(
+      'id' => $custom_group_result['id'],
+    ));
+
+    $this->AssertEquals($relationship_id, $relationship_get_result['id']);
+  }
+
+  /**
    * @return mixed
    */
   public function createCustomGroup() {
