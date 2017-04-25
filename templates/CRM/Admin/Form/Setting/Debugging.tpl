@@ -29,6 +29,21 @@
 </div>
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
          <table class="form-layout">
+             <tr class="crm-debugging-form-block-debug">
+                 <td class="label">{$form.logging_method.label}</td>
+                 <td>{$form.logging_method.html}<br />
+                 <span class="description">
+                    <p>{ts}Select the logging method to use.{/ts} {help id='logging_method'}</p>
+                    <p>
+                       <ul>
+                        <li>CiviCRM file log - legacy method, logs to file: <tt>{$civicrm_logfile_location}</tt>.</li>
+                        <li>PHP error_log - logs to PHP error: <tt>{$php_error_log_location}</tt>.</li>
+                        <li>Syslog - logs to UNIX syslog.</li>
+                        <li>Browser console - logs to browser console, testing environments only.</li>
+                       </ul>
+                    </p>
+                 </span></td>
+             </tr>
             {if $form.userFrameworkLogging}
             <tr class="crm-debugging-form-block-userFrameworkLogging">
                 <td class="label">{$form.userFrameworkLogging.label}</td>

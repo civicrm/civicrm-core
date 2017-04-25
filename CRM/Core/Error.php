@@ -528,29 +528,23 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * in the formatting of the output.
    *
    * @param string $variable_name
-   * @param mixed $variable
-   * @param bool $print
-   *   Should we use print_r ? (else we use var_dump).
-   * @param bool $log
-   *   Should we log or return the output.
-   * @param string $comp
    *   Variable name.
+   * @param mixed $variable
+   *   Variable value.
+   * @param bool $print
+   *   Use print_r (if true) or var_dump (if false).
+   * @param bool $log
+   *   Log or return the output?
+   * @param string $prefix
+   *   Prefix for output logfile.
    *
    * @return string
-   *   the generated output
-   *
-   *
+   *   The generated output
    *
    * @see CRM_Core_Error::debug()
    * @see CRM_Core_Error::debug_log_message()
    */
-  public static function debug_var(
-    $variable_name,
-    $variable,
-    $print = TRUE,
-    $log = TRUE,
-    $comp = ''
-  ) {
+  public static function debug_var($variable_name, $variable, $print = TRUE, $log = TRUE, $prefix = '') {
     // check if variable is set
     if (!isset($variable)) {
       $out = "\$$variable_name is not set";
@@ -573,7 +567,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
         reset($variable);
       }
     }
-    return self::debug_log_message($out, FALSE, $comp);
+    return self::debug_log_message($out, FALSE, $prefix);
   }
 
   /**
@@ -586,17 +580,17 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * @param bool $out
    *   Should we log or return the output.
    *
-   * @param string $comp
-   *   Message to be output.
+   * @param string $prefix
+   *   Message prefix.
    * @param string $priority
    *
    * @return string
    *   Format of the backtrace
    */
-  public static function debug_log_message($message, $out = FALSE, $comp = '', $priority = NULL) {
+  public static function debug_log_message($message, $out = FALSE, $prefix = '', $priority = NULL) {
     $config = CRM_Core_Config::singleton();
 
-    $file_log = self::createDebugLogger($comp);
+    $file_log = self::createDebugLogger($prefix);
     $file_log->log("$message\n", $priority);
 
     $str = '<p/><code>' . htmlspecialchars($message) . '</code>';

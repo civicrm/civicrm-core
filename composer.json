@@ -23,6 +23,7 @@
     "phpoffice/phpword": "^0.13.0",
     "pear/Validate_Finance_CreditCard": "dev-master",
     "civicrm/civicrm-cxn-rpc": "~0.16.12.05"
+    "monolog/monolog": "^1.19"
   },
   "repositories": [
     {

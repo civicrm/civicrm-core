@@ -37,6 +37,24 @@
  */
 
 return array(
+  'logging_method' => array(
+    'title' => 'Debug log method',
+    'group_name' => 'Developer Preferences',
+    'group' => 'developer',
+    'name' => 'debug_log_method',
+    'type' => 'String',
+    'quick_form_type' => 'Select',
+    'pseudoconstant' => array(
+      'callback' => 'CRM_Core_SelectValues::loggingProviders',
+    ),
+    'default' => 'legacy',
+    'add' => '4.7',
+    'is_domain' => 1,
+    'is_contact' => 0,
+    //
+    'description' => '',
+    'help_text' => 'CRM_Core_Error" is the long-standing CiviCRM file log. "Syslog" logs to the UNIX system log.',
+  ),
   'userFrameworkLogging' => array(
     'group_name' => 'Developer Preferences',
     'group' => 'developer',
@@ -48,8 +66,8 @@ return array(
     'title' => 'Enable Drupal Watchdog Logging',
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => "Set this value to Yes if you want CiviCRM error/debugging messages to appear in the Drupal error logs",
-    'help_text' => "Set this value to Yes if you want CiviCRM error/debugging messages the appear in your CMS' error log. In the case of Drupal, this will cause all CiviCRM error messages to appear in the watchdog (assuming you have Drupal's watchdog enabled)",
+    'description' => "Set this value to Yes if you want CiviCRM error/debugging messages to appear in the CMS error logs",
+    'help_text' => "Set this value to Yes if you want CiviCRM error/debugging messages the appear in the CMS error log. In the case of Drupal, this will cause all CiviCRM error messages to appear in the watchdog (assuming you have Drupal's watchdog enabled)",
   ),
   'debug_enabled' => array(
     'group_name' => 'Developer Preferences',

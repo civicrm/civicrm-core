@@ -37,6 +37,7 @@
 class CRM_Admin_Form_Setting_Debugging extends CRM_Admin_Form_Setting {
 
   protected $_settings = array(
+    'logging_method' => CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME,
     'debug_enabled' => CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME,
     'backtrace' => CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME,
     'fatalErrorHandler' => CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME,
@@ -46,10 +47,32 @@ class CRM_Admin_Form_Setting_Debugging extends CRM_Admin_Form_Setting {
    * Build the form object.
    */
   public function buildQuickForm() {
-    CRM_Utils_System::setTitle(ts(' Settings - Debugging and Error Handling '));
+    CRM_Utils_System::setTitle(ts('Settings - Debugging and Error Handling'));
+
+    // Get expected location: CiviCRM error log.
+    if (!isset(\Civi::$statics['CRM_Core_Error']['logger_file'])) {
+      // Log file location is set only when first message is logged via CRM_Core_Error.
+      CRM_Core_Error::debug_log_message('Finding CRM_Core_Error logfile.');
+    }
+    $this->assign('civicrm_logfile_location', \Civi::$statics['CRM_Core_Error']['logger_file']);
+
+    // Get expected location/destination: PHP error log.
+    $php_error_log = ini_get('error_log');
+    if (empty($php_error_log)) {
+      $php_error_log = 'error_log unset, will use SAPI error log';
+    }
+    $this->assign('php_error_log_location', $php_error_log);
+
     if (CRM_Core_Config::singleton()->userSystem->supports_UF_Logging == '1') {
       $this->_settings['userFrameworkLogging'] = CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME;
     }
+
+    Civi::log()->info('Hello, log!');
+    Civi::log()->warning('Oh no, {kittens}!', array('kittens' => 'wildcats'));
+    $var = 'the coffee';
+    Civi::log()->error("There is something bad with {var}.", array(
+        'var' => $var,
+    ));
 
     parent::buildQuickForm();
   }
