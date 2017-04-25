@@ -791,6 +791,7 @@ abstract class CRM_Core_Payment {
         'attributes' => array(
           'size' => 4,
           'maxlength' => 4,
+          'minlength' => 4,
           'autocomplete' => 'off',
         ),
         'rules' => array(
