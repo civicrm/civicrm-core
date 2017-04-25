@@ -679,6 +679,16 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       $activityIDs = explode(',', $activityIDs);
     }
 
+    // CRM-20441 Check if user has access to the activities
+    foreach ($activityIDs as $key => $activityId) {
+      try {
+        civicrm_api3('Activity', 'get', array('id' => $activityId, 'check_permissions' => 1));
+      }
+      catch (Exception $e) {
+        unset($activityIDs[$key]);
+      }
+    }
+
     // fetch all active activity types
     $activityTypes = CRM_Core_OptionGroup::values('activity_type');
 
