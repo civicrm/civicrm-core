@@ -276,6 +276,12 @@ class CRM_Contact_BAO_Query {
   public $_useGroupBy = FALSE;
 
   /**
+   * We should email to to all email addresses of a given contact 
+   * CRM-19876
+   */
+  public $_allEmails = FALSE;
+  
+  /**
    * The relationship type direction
    *
    * @var array
@@ -1345,7 +1351,11 @@ class CRM_Contact_BAO_Query {
    * @return array
    *   sql query parts as an array
    */
-  public function query($count = FALSE, $sortByChar = FALSE, $groupContacts = FALSE, $onlyDeleted = FALSE) {
+  public function query($count = FALSE, $sortByChar = FALSE, $groupContacts = FALSE, $onlyDeleted = FALSE, $allEmails=FALSE) {
+    //set allEmails property here
+    // CRM-19876
+    $this->_allEmails = $allEmails;
+      
     // build permission clause
     $this->generatePermissionClause($onlyDeleted, $count);
 
@@ -1432,6 +1442,17 @@ class CRM_Contact_BAO_Query {
       if (isset($this->_distinctComponentClause)) {
         $select .= "{$this->_distinctComponentClause}, ";
       }
+      
+      // CRM-19876
+      if($this->_allEmails)
+      {
+          if(isset($this->_select['email']) && isset($this->_select['email_id']))
+          {
+              $this->_select['email'] = 'group_concat(civicrm_email.email) as `email`';
+              $this->_select['email_id'] = 'min(civicrm_email.id) as `email_id`';    
+          }
+      }
+      
       $select .= implode(', ', $this->_select);
       $from = $this->_fromClause;
     }
@@ -2513,7 +2534,7 @@ class CRM_Contact_BAO_Query {
    * @return string
    *   the from clause
    */
-  public static function fromClause(&$tables, $inner = NULL, $right = NULL, $primaryLocation = TRUE, $mode = 1, $apiEntity = NULL) {
+  public static function fromClause(&$tables, $inner = NULL, $right = NULL, $primaryLocation = TRUE, $mode = 1, $apiEntity = NULL, $allEmails = FALSE) {
 
     $from = ' FROM civicrm_contact contact_a';
     if (empty($tables)) {
@@ -2605,7 +2626,8 @@ class CRM_Contact_BAO_Query {
         continue;
       }
       $searchPrimary = '';
-      if (Civi::settings()->get('searchPrimaryDetailsOnly') || $apiEntity) {
+      // CRM-19876
+      if (!$allEmails && (Civi::settings()->get('searchPrimaryDetailsOnly') || $apiEntity)) {
         $searchPrimary = "AND {$name}.is_primary = 1";
       }
       switch ($name) {
@@ -4321,7 +4343,8 @@ civicrm_relationship.is_permission_a_b = 0
     $count = FALSE,
     $skipPermissions = TRUE,
     $mode = CRM_Contact_BAO_Query::MODE_CONTACTS,
-    $apiEntity = NULL
+    $apiEntity = NULL,
+    $allEmails = FALSE
   ) {
 
     $query = new CRM_Contact_BAO_Query(
@@ -4330,7 +4353,8 @@ civicrm_relationship.is_permission_a_b = 0
       $skipPermissions,
       TRUE, $smartGroupCache,
       NULL, 'AND',
-      $apiEntity
+      $apiEntity,
+      $allEmails
     );
 
     //this should add a check for view deleted if permissions are enabled
@@ -4342,7 +4366,8 @@ civicrm_relationship.is_permission_a_b = 0
     // note : this modifies _fromClause and _simpleFromClause
     $query->includePseudoFieldsJoin($sort);
 
-    list($select, $from, $where, $having) = $query->query($count);
+    // CRM-19876
+    list($select, $from, $where, $having) = $query->query($count, FALSE, FALSE, FALSE, $allEmails);
 
     $options = $query->_options;
     if (!empty($query->_permissionWhereClause)) {
@@ -4359,6 +4384,9 @@ civicrm_relationship.is_permission_a_b = 0
     // add group by
     if ($query->_useGroupBy) {
       $sql .= self::getGroupByFromSelectColumns($query->_select, 'contact_a.id');
+    }
+    else if($allEmails && isset($query->_select['email']) && isset($query->_select['email_id'])) {
+      $sql .= self::getGroupByFromSelectColumns($query->_select, array('contact_a.id','contact_a.sort_name','contact_a.display_name', 'contact_a.do_not_email', 'contact_a.preferred_mail_format', 'contact_a.is_deceased','civicrm_email.on_hold'  ));
     }
     if (!empty($sort)) {
       $sort = CRM_Utils_Type::escape($sort, 'String');
@@ -4834,6 +4862,10 @@ civicrm_relationship.is_permission_a_b = 0
         // note : this modifies _fromClause and _simpleFromClause
         $this->includePseudoFieldsJoin($this->_sort);
       }
+    }
+    elseif($this->_allEmails) {
+      $this->_fromClause = self::fromClause($this->_tables, NULL, NULL, $this->_primaryLocation, $this->_mode, NULL, $this->_allEmails);
+      $this->_simpleFromClause = self::fromClause($this->_whereTables, NULL, NULL, $this->_primaryLocation, $this->_mode);
     }
     else {
       // add delete clause if needed even if we are skipping permission
