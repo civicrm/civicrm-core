@@ -1305,6 +1305,9 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     $eventParams = array('id' => $params['id']);
     CRM_Event_BAO_Event::retrieve($eventParams, $form->_values['event']);
     $form->set('registerByID', $params['registerByID']);
+    if (!empty($params['paymentProcessorObj'])) {
+      $form->_paymentProcessor = $params['paymentProcessorObj'];
+    }
     $form->postProcess();
   }
 
