@@ -1805,6 +1805,29 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
+   * Prepare class for ACLs.
+   */
+  protected function prepareForACLs() {
+    $config = CRM_Core_Config::singleton();
+    $config->userPermissionClass->permissions = array();
+  }
+
+  /**
+   * Reset after ACLs.
+   */
+  protected function cleanUpAfterACLs() {
+    CRM_Utils_Hook::singleton()->reset();
+    $tablesToTruncate = array(
+      'civicrm_acl',
+      'civicrm_acl_cache',
+      'civicrm_acl_entity_role',
+      'civicrm_acl_contact_cache',
+    );
+    $this->quickCleanup($tablesToTruncate);
+    $config = CRM_Core_Config::singleton();
+    unset($config->userPermissionClass->permissions);
+  }
+  /**
    * Create a smart group.
    *
    * By default it will be a group of households.
@@ -3798,6 +3821,19 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
    * @param string $where
    */
   public function aclWhereHookNoResults($type, &$tables, &$whereTables, &$contactID, &$where) {
+  }
+
+  /**
+   * Only specified contact returned.
+   * @implements CRM_Utils_Hook::aclWhereClause
+   * @param $type
+   * @param $tables
+   * @param $whereTables
+   * @param $contactID
+   * @param $where
+   */
+  public function aclWhereMultipleContacts($type, &$tables, &$whereTables, &$contactID, &$where) {
+    $where = " contact_a.id IN (" . implode(', ', $this->allowedContacts) . ")";
   }
 
   /**
