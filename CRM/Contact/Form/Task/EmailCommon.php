@@ -256,10 +256,18 @@ class CRM_Contact_Form_Task_EmailCommon {
             if (!empty($form->_toEmail) && $form->_toEmail['contact_id'] == $contactId) {
               $email = $form->_toEmail['email'];
             }
-            $toArray[] = array(
-              'text' => '"' . $value['sort_name'] . '" <' . $email . '>',
-              'id' => "$contactId::{$email}",
-            );
+            
+            // CRM-19876
+            $emailArr = explode(",", $email);
+            foreach($emailArr as $contactEmail)
+            {
+                $toArray[] = array(
+                  'text' => '"' . $value['sort_name'] . '" <' . $contactEmail . '>',
+                  'id' => "$contactId::{$contactEmail}",
+                );    
+            }
+            
+              
           }
           elseif (in_array($contactId, $form->_ccContactIds)) {
             $ccArray[] = array(
