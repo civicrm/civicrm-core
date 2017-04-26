@@ -156,6 +156,11 @@ WHERE  email = %2
                      WHERE $job.id = " . CRM_Utils_Type::escape($job_id, 'Integer'));
     $do->fetch();
     $mailing_id = $do->mailing_id;
+    $entity = CRM_Core_DAO::getFieldValue('CRM_Mailing_DAO_MailingGroup', $mailing_id, 'entity_table', 'mailing_id');
+    $groupClause = '';
+    if ($entity == $group) {
+      $groupClause = "AND $group.is_hidden = 0";
+    }
 
     $do->query("
             SELECT      $mg.entity_table as entity_table,
@@ -164,11 +169,10 @@ WHERE  email = %2
             FROM        $mg
             INNER JOIN  $job
                 ON      $job.mailing_id = $mg.mailing_id
-            INNER JOIN  $group
-                ON      $mg.entity_id = $group.id
+            INNER JOIN  $entity
+                ON      $mg.entity_id = $entity.id
             WHERE       $job.id = " . CRM_Utils_Type::escape($job_id, 'Integer') . "
-                AND     $mg.group_type IN ('Include', 'Base')
-                AND     $group.is_hidden = 0"
+                AND     $mg.group_type IN ('Include', 'Base') $groupClause"
     );
 
     // Make a list of groups and a list of prior mailings that received
