@@ -54,29 +54,23 @@ function civicrm_api3_uf_field_create($params) {
     $groupId = CRM_Utils_Array::value('uf_group_id', $params);
   }
 
-  $field_type       = CRM_Utils_Array::value('field_type', $params);
-  $field_name       = CRM_Utils_Array::value('field_name', $params);
-  $location_type_id = CRM_Utils_Array::value('location_type_id', $params, CRM_Utils_Array::value('website_type_id', $params));
-  $phone_type       = CRM_Utils_Array::value('phone_type_id', $params, CRM_Utils_Array::value('phone_type', $params));
+  $field_name = CRM_Utils_Array::value('field_name', $params);
 
   if (strpos($field_name, 'formatting') !== 0 && !CRM_Core_BAO_UFField::isValidFieldName($field_name)) {
     throw new API_Exception('The field_name is not valid');
   }
-  $params['field_name'] = array($field_type, $field_name, $location_type_id, $phone_type);
 
   if (!(CRM_Utils_Array::value('group_id', $params))) {
     $params['group_id'] = $groupId;
   }
 
-  $ids = $ufFieldArray = array();
-  $ids['uf_group'] = $groupId;
+  $ufFieldArray = array();
 
   $fieldId = CRM_Utils_Array::value('id', $params);
   if (!empty($fieldId)) {
     $UFField = new CRM_Core_BAO_UFField();
     $UFField->id = $fieldId;
     if ($UFField->find(TRUE)) {
-      $ids['uf_group'] = $UFField->uf_group_id;
       if (!(CRM_Utils_Array::value('group_id', $params))) {
         // this copied here from previous api function - not sure if required
         $params['group_id'] = $UFField->uf_group_id;
@@ -85,12 +79,18 @@ function civicrm_api3_uf_field_create($params) {
     else {
       throw new API_Exception("there is no field for this fieldId");
     }
-    $ids['uf_field'] = $fieldId;
   }
+  $params['uf_group_id'] = $params['group_id'];
 
-  if (CRM_Core_BAO_UFField::duplicateField($params, $ids)) {
+  if (CRM_Core_BAO_UFField::duplicateField($params)) {
     throw new API_Exception("The field was not added. It already exists in this profile.");
   }
+
+  // @todo fix BAO to be less weird.
+  $field_type       = CRM_Utils_Array::value('field_type', $params);
+  $location_type_id = CRM_Utils_Array::value('location_type_id', $params, CRM_Utils_Array::value('website_type_id', $params));
+  $phone_type       = CRM_Utils_Array::value('phone_type_id', $params, CRM_Utils_Array::value('phone_type', $params));
+  $params['field_name'] = array($field_type, $field_name, $location_type_id, $phone_type);
   //@todo why is this even optional? Surely weight should just be 'managed' ??
   if (CRM_Utils_Array::value('option.autoweight', $params, TRUE)) {
     $params['weight'] = CRM_Core_BAO_UFField::autoWeight($params);
