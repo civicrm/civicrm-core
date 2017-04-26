@@ -1243,7 +1243,7 @@ class CRM_Utils_Token {
     $numberofContacts = count($contactIDs);
     $query = new CRM_Contact_BAO_Query($params, $returnProperties);
 
-    $details = $query->apiQuery($params, $returnProperties, NULL, NULL, 0, $numberofContacts);
+    $details = $query->apiQuery($params, $returnProperties, NULL, NULL, 0, $numberofContacts, $smartGroupCache = TRUE, FALSE, TRUE, CRM_Contact_BAO_Query::MODE_CONTACTS, NULL, TRUE);    
 
     $contactDetails = &$details[0];
 
