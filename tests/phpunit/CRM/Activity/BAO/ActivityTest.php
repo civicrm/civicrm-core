@@ -15,7 +15,8 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
    * Clean up after tests.
    */
   public function tearDown() {
-    $tablesToTruncate = array('civicrm_activity', 'civicrm_activity_contact');
+    // truncate a few tables
+    $tablesToTruncate = array('civicrm_contact', 'civicrm_activity', 'civicrm_activity_contact', 'civicrm_email');
     $this->quickCleanup($tablesToTruncate);
     $this->cleanUpAfterACLs();
     parent::tearDown();
@@ -751,9 +752,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     elseif (!empty($domainInfo['domain_email'])) {
       $expectedFromAddress = sprintf("%s <%s>", $domainInfo['name'], $domainInfo['domain_email']);
     }
-    // TODO: due to unknown reason the following assertion fails on
-    //   test.civicrm.org test build but works fine on local
-    // $this->assertEquals($expectedFromAddress, $formAddress);
+    $this->assertEquals($expectedFromAddress, $formAddress);
 
     // TODO: Case 4 about checking the $formAddress on basis of logged contact ID respectively needs,
     //  to change the domain setting, which isn't straight forward in test environment

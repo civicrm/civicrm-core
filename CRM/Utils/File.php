@@ -313,18 +313,28 @@ class CRM_Utils_File {
    *   Use NULL to load the default/active connection from CRM_Core_DAO.
    *   Otherwise, give a full DSN string.
    * @param string $fileName
-   * @param null $prefix
-   * @param bool $isQueryString
+   * @param string $prefix
    * @param bool $dieOnErrors
    */
-  public static function sourceSQLFile($dsn, $fileName, $prefix = NULL, $isQueryString = FALSE, $dieOnErrors = TRUE) {
-    if (!$isQueryString) {
-      if (FALSE === file_get_contents($fileName)) {
-        // Our file cannot be found.
-        // Using 'die' here breaks this on extension upgrade.
-        throw new CRM_Exception('Could not find the SQL file.');
-      }
+  public static function sourceSQLFile($dsn, $fileName, $prefix = NULL, $dieOnErrors = TRUE) {
+    if (FALSE === file_get_contents($fileName)) {
+      // Our file cannot be found.
+      // Using 'die' here breaks this on extension upgrade.
+      throw new CRM_Exception('Could not find the SQL file.');
     }
+
+    self::runSqlQuery($dsn, file_get_contents($fileName), $prefix, $dieOnErrors);
+  }
+
+  /**
+   *
+   * @param string|NULL $dsn
+   * @param string $queryString
+   * @param string $prefix
+   * @param bool $dieOnErrors
+   */
+  public static function runSqlQuery($dsn, $queryString, $prefix = NULL, $dieOnErrors = TRUE) {
+    $string = $prefix . $queryString;
 
     if ($dsn === NULL) {
       $db = CRM_Core_DAO::getConnection();
@@ -343,14 +353,6 @@ class CRM_Utils_File {
     $db->query('SET NAMES utf8');
     $transactionId = CRM_Utils_Type::escape(CRM_Utils_Request::id(), 'String');
     $db->query('SET @uniqueID = ' . "'$transactionId'");
-
-    if (!$isQueryString) {
-      $string = $prefix . file_get_contents($fileName);
-    }
-    else {
-      // use filename as query string
-      $string = $prefix . $fileName;
-    }
 
     // get rid of comments starting with # and --
 
@@ -373,6 +375,7 @@ class CRM_Utils_File {
       }
     }
   }
+
   /**
    *
    * Strips comment from a possibly multiline SQL string

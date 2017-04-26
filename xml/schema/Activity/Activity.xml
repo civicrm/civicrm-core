@@ -109,7 +109,7 @@
       <type>Text</type>
     </html>
     <add>1.1</add>
-    <modify>2.0</modify>
+    <change>2.0</change>
   </field>
   <field>
     <name>scheduled_date</name>

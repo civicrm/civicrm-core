@@ -75,13 +75,16 @@
   </foreignKey>
   <field>
     <name>created_date</name>
-    <type>datetime</type>
+    <type>timestamp</type>
+    <default>CURRENT_TIMESTAMP</default>
     <comment>When was the cache item created</comment>
     <add>2.1</add>
   </field>
   <field>
     <name>expired_date</name>
-    <type>datetime</type>
+    <type>timestamp</type>
+    <default>NULL</default>
+    <required>false</required>
     <comment>When should the cache item expire</comment>
     <add>2.1</add>
   </field>

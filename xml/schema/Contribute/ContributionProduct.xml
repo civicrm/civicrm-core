@@ -51,7 +51,6 @@
     <name>quantity</name>
     <title>Quantity</title>
     <type>int</type>
-    <value>1</value>
     <export>true</export>
     <comment></comment>
     <add>1.4</add>

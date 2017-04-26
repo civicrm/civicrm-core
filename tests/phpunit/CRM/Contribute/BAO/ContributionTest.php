@@ -36,7 +36,6 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
    */
   public function tearDown() {
     $this->quickCleanUpFinancialEntities();
-    $this->quickCleanUpFinancialEntities(array('civicrm_event'));
     parent::tearDown();
   }
 
@@ -800,11 +799,9 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     // Check amount in activity.
     $activityParams = array(
       'source_record_id' => $contribution->id,
-      'activity_type_id' => CRM_Core_OptionGroup::getValue('activity_type',
-        'Contribution',
-        'name'
-      ),
+      'activity_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Contribution'),
     );
+    // @todo use api instead.
     $activity = CRM_Activity_BAO_Activity::retrieve($activityParams, $defaults);
 
     $this->assertEquals($contribution->id, $activity->source_record_id, 'Check for activity associated with contribution.');
@@ -1078,14 +1075,14 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $previousLineItem = CRM_Financial_BAO_FinancialItem::getPreviousFinancialItem($contribution['id']);
     $eftParams = array(
       'entity_table' => 'civicrm_financial_item',
-      'entity_id' => $previousLineItem->id,
+      'entity_id' => $previousLineItem['id'],
       'financial_trxn_id' => $financialTrxn['id'],
     );
     CRM_Contribute_BAO_Contribution::createProportionalEntry($entityParams, $eftParams);
     $trxnTestArray = array_merge($eftParams, array(
       'amount' => 50,
     ));
-    $entityFinancialTrxn = $this->callAPISuccessGetSingle('EntityFinancialTrxn', $eftParams, $trxnTestArray);
+    $this->callAPISuccessGetSingle('EntityFinancialTrxn', $eftParams, $trxnTestArray);
   }
 
   /**

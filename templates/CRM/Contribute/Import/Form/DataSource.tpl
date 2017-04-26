@@ -25,7 +25,7 @@
 *}
 {* Contribution Import Wizard - Step 1 (upload data file) *}
 {* @var $form Contains the array for the form elements and other form associated information assigned to the template by the controller *}
- <div class="crm-block crm-form-block  crm-contribution-import-uploadfile-form-block id="upload-file">
+ <div class="crm-block crm-form-block  crm-contribution-import-uploadfile-form-block" id="upload-file">
  {* WizardHeader.tpl provides visual display of steps thru the wizard as well as title for current step *}
 {include file="CRM/common/WizardHeader.tpl"}
 <div class="help">

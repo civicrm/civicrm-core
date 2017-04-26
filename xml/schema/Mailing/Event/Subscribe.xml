@@ -61,7 +61,8 @@
   <field>
     <name>time_stamp</name>
     <title>Mailing Subscribe Timestamp</title>
-    <type>datetime</type>
+    <type>timestamp</type>
+    <default>CURRENT_TIMESTAMP</default>
     <required>true</required>
     <comment>When this subscription event occurred.</comment>
   </field>
