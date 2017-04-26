@@ -277,54 +277,59 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
 
     $this->assign('activityId', $this->_activityId);
 
-    // Check for required permissions, CRM-6264.
+    try {
+      $activity = civicrm_api3('Activity', 'getsingle', array(
+        'id' => $this->_activityId,
+        'check_permissions' => 1,
+      ));
+    }
+    catch (CiviCRM_API3_Exception $e) {
+      CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
+    }
+
+    // Check for edit permissions, CRM-6264.
     if ($this->_activityId &&
       in_array($this->_action, array(
         CRM_Core_Action::UPDATE,
         CRM_Core_Action::VIEW,
-      )) &&
-      !CRM_Activity_BAO_Activity::checkPermission($this->_activityId, $this->_action)
+      ))
     ) {
-      CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
-    }
-    if (($this->_action & CRM_Core_Action::VIEW) &&
-      CRM_Activity_BAO_Activity::checkPermission($this->_activityId, CRM_Core_Action::UPDATE)
-    ) {
-      $this->assign('permission', 'edit');
+      $isEdit = CRM_Activity_BAO_Activity::checkPermission($this->_activityId, CRM_Core_Action::UPDATE);
+      $this->assign('permission', ($isEdit ? 'edit' : NULL));
+      if (!$isEdit && $this->_action === CRM_Core_Action::UPDATE) {
+        CRM_Core_Error::statusBounce(ts('You do not have permission to edit this activity.'));
+      }
     }
 
     if (!$this->_activityTypeId && $this->_activityId) {
-      $this->_activityTypeId = CRM_Core_DAO::getFieldValue('CRM_Activity_DAO_Activity',
-        $this->_activityId,
-        'activity_type_id'
-      );
+      $this->_activityTypeId = $activity['activity_type_id'];
+    }
+    if ($this->_activityTypeId) {
+      // Set activity type name and description to template.
+      list($discard, $activityTypeDescription) = CRM_Core_BAO_OptionValue::getActivityTypeDetails($this->_activityTypeId);
+      $this->assign('activityTypeDescription', $activityTypeDescription);
+    }
+    // hack to retrieve activity type id from post variables
+    if (!$this->_activityTypeId) {
+      $this->_activityTypeId = CRM_Utils_Array::value('activity_type_id', $_POST);
     }
 
     // Assigning Activity type name.
     if ($this->_activityTypeId) {
-      $activityTName = CRM_Core_OptionGroup::values('activity_type', FALSE, FALSE, FALSE, 'AND v.value = ' . $this->_activityTypeId, 'label');
-      if ($activityTName[$this->_activityTypeId]) {
-        $this->_activityTypeName = $activityTName[$this->_activityTypeId];
-        $this->assign('activityTName', $activityTName[$this->_activityTypeId]);
-      }
+      $this->_activityTypeName = CRM_Core_PseudoConstant::getLabel('CRM_Activity_BAO_Activity', 'activity_type_id', $this->_activityTypeId);
+      $this->assign('activityTName', $this->_activityTypeName);
+      $this->assign('pageTitle', ts('%1 Activity', array(1 => $this->_activityTypeName)));
     }
-
-    // Set title.
-    if (isset($activityTName)) {
-      $activityName = CRM_Utils_Array::value($this->_activityTypeId, $activityTName);
-      $this->assign('pageTitle', ts('%1 Activity', array(1 => $activityName)));
-
-      if ($this->_currentlyViewedContactId) {
-        $displayName = CRM_Contact_BAO_Contact::displayName($this->_currentlyViewedContactId);
-        // Check if this is default domain contact CRM-10482.
-        if (CRM_Contact_BAO_Contact::checkDomainContact($this->_currentlyViewedContactId)) {
-          $displayName .= ' (' . ts('default organization') . ')';
-        }
-        CRM_Utils_System::setTitle($displayName . ' - ' . $activityName);
+    if ($this->_currentlyViewedContactId) {
+      $displayName = CRM_Contact_BAO_Contact::displayName($this->_currentlyViewedContactId);
+      // Check if this is default domain contact CRM-10482.
+      if (CRM_Contact_BAO_Contact::checkDomainContact($this->_currentlyViewedContactId)) {
+        $displayName .= ' (' . ts('default organization') . ')';
       }
-      else {
-        CRM_Utils_System::setTitle(ts('%1 Activity', array(1 => $activityName)));
-      }
+      CRM_Utils_System::setTitle($displayName . ' - ' . $this->_activityTypeName);
+    }
+    else {
+      CRM_Utils_System::setTitle(ts('%1 Activity', array(1 => $this->_activityTypeName)));
     }
 
     // Check the mode when this form is called either single or as
@@ -380,13 +385,6 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       $this->_groupTree = CRM_Core_BAO_CustomGroup::getTree('Activity', $this,
         $this->_activityId, 0, $this->_activityTypeId
       );
-    }
-
-    if ($this->_activityTypeId) {
-      // Set activity type name and description to template.
-      list($this->_activityTypeName, $activityTypeDescription) = CRM_Core_BAO_OptionValue::getActivityTypeDetails($this->_activityTypeId);
-      $this->assign('activityTypeName', $this->_activityTypeName);
-      $this->assign('activityTypeDescription', $activityTypeDescription);
     }
 
     // set user context
@@ -456,11 +454,6 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       $session->pushUserContext(CRM_Utils_System::url($urlString, $urlParams));
     }
 
-    // hack to retrieve activity type id from post variables
-    if (!$this->_activityTypeId) {
-      $this->_activityTypeId = CRM_Utils_Array::value('activity_type_id', $_POST);
-    }
-
     // when custom data is included in this page
     if (!empty($_POST['hidden_custom'])) {
       // We need to set it in the session for the code below to work.
@@ -497,6 +490,8 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       $this->_values = array();
       if (isset($this->_activityId) && $this->_activityId) {
         $params = array('id' => $this->_activityId);
+        $this->_values = $activity;
+        // @todo use $activity which is already loaded & not deprecated. Figure out gaps first.
         CRM_Activity_BAO_Activity::retrieve($params, $this->_values);
       }
       $this->set('values', $this->_values);
