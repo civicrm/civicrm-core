@@ -293,42 +293,6 @@ function _civicrm_api3_activity_get_spec(&$params) {
  * @throws \Civi\API\Exception\UnauthorizedException
  */
 function civicrm_api3_activity_get($params) {
-  if (!empty($params['check_permissions']) && !CRM_Core_Permission::check('view all activities')) {
-    // In absence of view all activities permission it's possible to see a specific activity by ACL.
-    // Note still allowing view all activities to override ACLs is based on the 'don't change too much
-    // if you are not sure principle' and it could be argued that the ACLs should always be applied.
-    if (empty($params['id']) || !empty($params['contact_id'])) {
-      // We fall back to the original blunt permissions if we don't have an id to check or we are about
-      // to go to the weird place that the legacy 'contact_id' parameter takes us to.
-      throw new \Civi\API\Exception\UnauthorizedException(
-        "Cannot access activities. Required permission: 'view all activities''"
-      );
-    }
-    $ids = array();
-    $allowed_operators = array(
-      'IN',
-    );
-    if (is_array($params['id'])) {
-      foreach ($params['id'] as $operator => $values) {
-        if (in_array($operator, CRM_Core_DAO::acceptedSQLOperators()) && in_array($operator, $allowed_operators)) {
-          $ids = $values;
-        }
-        else {
-          throw new \API_Exception(ts('Used an unsupported sql operator with Activity.get API'));
-        }
-      }
-    }
-    else {
-      $ids = array($params['id']);
-    }
-    foreach ($ids as $id) {
-      if (!CRM_Activity_BAO_Activity::checkPermission($id, CRM_Core_Action::VIEW)) {
-        throw new \Civi\API\Exception\UnauthorizedException(
-          'You do not have permission to view this activity'
-        );
-      }
-    }
-  }
 
   $sql = CRM_Utils_SQL_Select::fragment();
   $recordTypes = civicrm_api3('ActivityContact', 'getoptions', array('field' => 'record_type_id'));
@@ -339,6 +303,16 @@ function civicrm_api3_activity_get($params) {
     'source_contact_id' => array_search('Activity Source', $recordTypes),
     'assignee_contact_id' => array_search('Activity Assignees', $recordTypes),
   );
+  if (empty($params['target_contact_id']) && empty($params['source_contact_id'])
+    && empty($params['assignee_contact_id']) &&
+    !empty($params['check_permissions']) && !CRM_Core_Permission::check('view all activities')
+    && !CRM_Core_Permission::check('view all contacts')
+  ) {
+    // Force join on the activity contact table.
+    // @todo get this & other acl filters to work, remove check further down.
+    //$params['contact_id'] = array('IS NOT NULL' => TRUE);
+  }
+
   foreach ($activityContactOptions as $activityContactName => $activityContactValue) {
     if (!empty($params[$activityContactName])) {
       if (!is_array($params[$activityContactName])) {
@@ -379,6 +353,14 @@ function civicrm_api3_activity_get($params) {
     }
   }
   $activities = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, FALSE, 'Activity', $sql);
+  if (!empty($params['check_permissions']) && !CRM_Core_Permission::check('view all activities')) {
+    // @todo get this to work at the query level - see contact_id join above.
+    foreach ($activities as $activity) {
+      if (!CRM_Activity_BAO_Activity::checkPermission($activity['id'], CRM_Core_Action::VIEW)) {
+        unset($activities[$activity['id']]);
+      }
+    }
+  }
   $options = _civicrm_api3_get_options_from_params($params, FALSE, 'Activity', 'get');
   if ($options['is_count']) {
     return civicrm_api3_create_success($activities, $params, 'Activity', 'get');
