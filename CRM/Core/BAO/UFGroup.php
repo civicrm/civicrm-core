@@ -1769,9 +1769,9 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       if (is_array($profileType)) {
         if (in_array($contactType, $profileType)) {
           return TRUE;
-        }	
+        }
       }
-      
+
       if (($contactType == $profileType) || $profileType == 'Contact') {
         return TRUE;
       }
