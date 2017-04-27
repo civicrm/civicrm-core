@@ -58,20 +58,6 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
   }
 
   /**
-   * Get the form title.
-   *
-   * @param int $id
-   *   Id of uf_form.
-   *
-   * @return string
-   *   title
-   *
-   */
-  public static function getTitle($id) {
-    return CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFField', $groupId, 'title');
-  }
-
-  /**
    * Update the is_active flag in the db.
    *
    * @param int $id
@@ -247,13 +233,13 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
    *   Set the is_active field.
    */
   public static function setUFField($customFieldId, $is_active) {
-    //find the profile id given custom field
+    // Find the profile id given custom field.
     $ufField = new CRM_Core_DAO_UFField();
     $ufField->field_name = "custom_" . $customFieldId;
 
     $ufField->find();
     while ($ufField->fetch()) {
-      //enable/ disable profile
+      // Enable/ disable profile.
       CRM_Core_BAO_UFField::setIsActive($ufField->id, $is_active);
     }
   }
@@ -315,7 +301,7 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
     $dao = CRM_Core_DAO::executeQuery($queryString, $p);
 
     while ($dao->fetch()) {
-      //enable/ disable profile
+      // Enable/ disable profile.
       CRM_Core_BAO_UFField::setUFField($dao->custom_field_id, $is_active);
     }
   }
