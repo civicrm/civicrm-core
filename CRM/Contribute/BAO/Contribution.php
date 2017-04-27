@@ -3525,6 +3525,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     ) {
       return;
     }
+    $itemAmount = NULL;
     if ($context == 'changedAmount' || $context == 'changeFinancialType') {
       $itemAmount = $params['trxnParams']['total_amount'] = $params['trxnParams']['net_amount'] = ($params['total_amount'] - $params['prevContribution']->total_amount);
 
@@ -3633,7 +3634,16 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     $trxn = CRM_Core_BAO_FinancialTrxn::create($params['trxnParams']);
     $previousLineItem = CRM_Price_BAO_LineItem::getLineItemsByContributionID($params['prevContribution']->id);
     $params['entity_id'] = $trxn->id;
-    if ($context != 'changePaymentInstrument') {
+
+    if ($context == 'changePaymentInstrument') {
+      // store financial item Proportionaly.
+      $trxnParams = array(
+        'total_amount' => $trxn->total_amount,
+        'contribution_id' => $params['contribution']->id,
+      );
+      self::assignProportionalLineItems($trxnParams, $trxn->id, $params['prevContribution']->total_amount);
+    }
+    else {
       $itemParams['entity_table'] = 'civicrm_line_item';
       $trxnIds['id'] = $params['entity_id'];
       foreach ($params['line_item'] as $fieldId => $fields) {
@@ -3658,7 +3668,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
             'previous_line_total' => CRM_Utils_Array::value('line_total', CRM_Utils_Array::value($lineItemDetails['id'], $previousLineItem)),
             'item_amount' => $itemAmount,
           );
-          $amount = self::calculateFinancialItemAmount($params, $amountParams, $context, $fieldValues);
+          $amount = self::calculateFinancialItemAmount($params, $amountParams, $context, $lineItemDetails);
           $itemParams = array(
             'transaction_date' => $receiveDate,
             'contact_id' => $params['prevContribution']->contact_id,
@@ -3683,7 +3693,8 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
               $taxAmount = $previousLineItem[$lineItemDetails['id']]['tax_amount'];
             }
             elseif ($context == 'changedAmount') {
-              $taxAmount = $taxAmount - $previousLineItem[$lineItemDetails['id']]['tax_amount'];
+              // @todo why we are not recording the new tax amount instead of difference between new and old tax amount
+              //$taxAmount = $taxAmount - $previousLineItem[$lineItemDetails['id']]['tax_amount'];
             }
 
             $itemParams['amount'] = self::getMultiplier($params['contribution']->contribution_status_id, $context) * $taxAmount;
@@ -3705,14 +3716,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         }
       }
     }
-    if ($context == 'changePaymentInstrument') {
-      // store financial item Proportionaly.
-      $trxnParams = array(
-        'total_amount' => $trxn->total_amount,
-        'contribution_id' => $params['contribution']->id,
-      );
-      self::assignProportionalLineItems($trxnParams, $trxn->id, $params['prevContribution']->total_amount);
-    }
+
     CRM_Core_BAO_FinancialTrxn::createDeferredTrxn(CRM_Utils_Array::value('line_item', $params), $params['contribution'], TRUE, $context);
   }
 
@@ -5362,15 +5366,16 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
    * @return float
    */
   protected static function getFinancialItemAmountFromParams($params, $context, $lineItemDetails, $isARefund) {
-    if ($context == 'changedAmount' || $context == 'changeFinancialType') {
-      return $params['total_amount'] - $params['prevContribution']->total_amount;
+    $taxAmount = CRM_Utils_Array::value('tax_amount', $params, 0.00);
+    if ($context == 'changeFinancialType' || $context == 'changedAmount') {
+      return ($params['total_amount'] - $params['prevContribution']->total_amount);
     }
     elseif ($context == 'changedStatus') {
-      $cancelledTaxAmount = 0;
-      if ($isARefund) {
-        $cancelledTaxAmount = CRM_Utils_Array::value('tax_amount', $params, '0.00');
+      // if it's a status change on refund then return the total amount with tax amount
+      if (!$isARefund) {
+        $taxAmount = 0;
       }
-      return self::getMultiplier($params['contribution']->contribution_status_id, $context) * ($params['trxnParams']['total_amount'] + $cancelledTaxAmount);
+      return self::getMultiplier($params['contribution']->contribution_status_id, $context) * ($params['trxnParams']['total_amount'] + $taxAmount);
     }
     elseif ($context === NULL) {
       // erm, yes because? but, hey, it's tested.
