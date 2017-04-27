@@ -5562,4 +5562,37 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
     return $contributionDetails;
   }
 
+  /**
+   * Calculate amounts when Financial type for contribution is changed.
+   *
+   * @param array $params
+   *   contribution params
+   * @param float $trxnAmount
+   *   financial trxn total amount
+   * @param float $totalAmount
+   *   Contribution total amount
+   *
+   * @return array
+   */
+  public static function calculateFTChangeAmount(&$params, $trxnAmount, &$totalAmount) {
+    $changeFTAmount = $trxnAmount;
+    $ignoreChangeAmount = FALSE;
+    $taxAmounts = array(
+      'new_tax_amount' => NULL,
+    );
+    if (isset($params['prevContribution']->total_amount) || isset($params['tax_amount'])) {
+      $taxAmount = CRM_Utils_Array::value('tax_amount', $params, 0);
+      $changesinTaxAmount = $totalAmount - $params['prevContribution']->total_amount + $params['prevContribution']->tax_amount - $taxAmount;
+      $taxAmounts['new_tax_amount'] = $taxAmount;
+      if ($changesinTaxAmount == 0) {
+        $ignoreChangeAmount = TRUE;
+        $changeFTAmount = $totalAmount;
+      }
+      elseif ($taxAmount) {
+        self::calculateTaxForChangeInFinancialType($params, $totalAmount, $taxAmounts, $changeFTAmount);
+      }
+    }
+    return array($changeFTAmount, $ignoreChangeAmount, $taxAmounts);
+  }
+
 }
