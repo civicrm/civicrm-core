@@ -244,4 +244,14 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
     $this->assertEquals($financialTrxn['pan_truncation'], 4567);
   }
 
+  /**
+   * Test for formatCreditCardDetails().
+   */
+  public function testFormatCreditCardDetails() {
+    $cardType = CRM_Core_BAO_FinancialTrxn::formatCreditCardDetails(2);
+    $this->assertEquals($cardType, 2);
+    $cardType = CRM_Core_BAO_FinancialTrxn::formatCreditCardDetails('Visa');
+    $this->assertEquals($cardType, 1);
+  }
+
 }
