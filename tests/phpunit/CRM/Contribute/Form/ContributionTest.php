@@ -965,9 +965,8 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
 
     $this->assertEquals(100, $items['values'][0]['amount']);
     $this->assertEquals(10, $items['values'][1]['amount']);
-    // @todo what should the amount BE? I believe this is incorrect elsewhere too.
-    // currently it is $120 - ie the first one not incremented. This is consistent
-    // with my testing on CRM-19723
+    // @todo currently its $110 which is incorrect, the proper value should be $200
+    // $this->assertEquals(200, $items['values'][2]['amount']);
     $this->assertEquals(20, $items['values'][3]['amount']);
   }
 

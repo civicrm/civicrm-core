@@ -35,3 +35,12 @@
     {ts}You can optionally assign this activity to someone. Assigned activities will appear in their Activities listing at CiviCRM Home.{/ts}
   </p>
 {/htxt}
+
+{htxt id="sent_copy_email"}
+  <p>
+    {ts}When CiviCRM emails a copy of this activity to each assignees, that email will come from the contact listed under "Added By".{/ts}
+  </p>
+  <p>
+    {ts}If (in rare cases) that contact has no email address, then CiviCRM will send the email from the default "from" email address configured for this domain. And finally, if that email address has not been configured, then CiviCRM will send the email from the email address associated with the currently logged in user who creates this activity.{/ts}
+  </p>
+{/htxt}

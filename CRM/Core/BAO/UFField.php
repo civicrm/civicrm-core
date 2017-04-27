@@ -119,30 +119,23 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
    *
    * @param array $params
    *   An associative array with field and values.
-   * @param $ids
    *
-   * @return mixed
-   * @ids   array $ids    array that containd ids
-   *
+   * @return bool
    */
-  public static function duplicateField($params, $ids) {
+  public static function duplicateField($params) {
     $ufField = new CRM_Core_DAO_UFField();
-    $ufField->uf_group_id = CRM_Utils_Array::value('uf_group', $ids);
-    $ufField->field_type = $params['field_name'][0];
-    $ufField->field_name = $params['field_name'][1];
-    if ($params['field_name'][1] == 'url') {
-      $ufField->website_type_id = CRM_Utils_Array::value(2, $params['field_name'], NULL);
-    }
-    else {
-      $ufField->location_type_id = (CRM_Utils_Array::value(2, $params['field_name'])) ? $params['field_name'][2] : 'NULL';
-    }
-    $ufField->phone_type_id = CRM_Utils_Array::value(3, $params['field_name']);
+    $ufField->uf_group_id = CRM_Utils_Array::value('uf_group_id', $params);
+    $ufField->field_type = $params['field_type'];
+    $ufField->field_name = $params['field_name'];
+    $ufField->website_type_id = CRM_Utils_Array::value('website_type_id', $params);
+    $ufField->location_type_id = CRM_Utils_Array::value('location_type_id', $params);
+    $ufField->phone_type_id = CRM_Utils_Array::value('phone_type_id', $params);;
 
-    if (!empty($ids['uf_field'])) {
-      $ufField->whereAdd("id <> " . CRM_Utils_Array::value('uf_field', $ids));
+    if (!empty($params['id'])) {
+      $ufField->whereAdd("id <> " . $params['id']);
     }
 
-    return $ufField->find(TRUE);
+    return ($ufField->find(TRUE) ? 1 : 0);
   }
 
   /**
