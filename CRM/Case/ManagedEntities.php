@@ -71,17 +71,17 @@ class CRM_Case_ManagedEntities {
     foreach ($actTypes as $actType) {
       $managed = array(
         'module' => 'civicrm',
-        'name' => "civicase:act:$actType",
+        'name' => "civicase:act:" . $actType['name'],
         'entity' => 'OptionValue',
         'update' => 'never',
         'cleanup' => 'unused',
         'params' => array(
           'version' => 3,
           'option_group_id' => 'activity_type',
-          'label' => $actType,
-          'name' => $actType,
-          'description' => $actType,
-          'component_id' => 'CiviCase',
+          'label' => $actType['name'],
+          'name' => $actType['name'],
+          'description' => $actType['name'],
+          'component_id' => $actType['component_name'],
         ),
       );
 

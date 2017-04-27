@@ -108,7 +108,10 @@ class CRM_Case_XMLRepositoryTest extends CiviUnitTestCase {
     );
 
     // omitted: 'Single Activity Type'
-    $expected = array('First Activity Type', 'Second Activity Type', 'Third Activity Type');
+    $expected = array(
+      array('component_name' => 'CiviCase', 'name' => 'First Activity Type'),
+      array('component_name' => 'CiviCase', 'name' => 'Second Activity Type'),
+      array('component_name' => 'CiviCase', 'name' => 'Third Activity Type'));
     $actual = $repo->getAllDeclaredActivityTypes();
     $this->assertEquals($expected, $actual);
   }

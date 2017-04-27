@@ -230,7 +230,8 @@ class CRM_Case_XMLRepository {
   }
 
   /**
-   * @return array<string> symbolic-names of activity-types
+   * @return array[]
+   * @see CRM_Case_XMLProcessor_Process::getDeclaredActivityTypes()
    */
   public function getAllDeclaredActivityTypes() {
     $result = array();
@@ -241,7 +242,7 @@ class CRM_Case_XMLRepository {
       $result = array_merge($result, $p->getDeclaredActivityTypes($caseTypeXML));
     }
 
-    $result = array_unique($result);
+    $result = array_map("unserialize", array_unique(array_map("serialize", $result)));
     sort($result);
     return $result;
   }
@@ -276,7 +277,10 @@ class CRM_Case_XMLRepository {
     $count = 0;
     foreach ($this->getAllCaseTypes() as $caseTypeName) {
       $caseTypeXML = $this->retrieve($caseTypeName);
-      if (in_array($activityType, $p->getDeclaredActivityTypes($caseTypeXML))) {
+      $declaredActivityTypes = array_map(function($row) {
+        return $row['name'];
+      }, $p->getDeclaredActivityTypes($caseTypeXML));
+      if (in_array($activityType, $declaredActivityTypes)) {
         $count++;
       }
     }

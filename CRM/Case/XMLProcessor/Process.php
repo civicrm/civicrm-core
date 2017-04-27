@@ -313,14 +313,25 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
 
   /**
    * @param SimpleXMLElement $caseTypeXML
-   * @return array<string> symbolic activity-type names
+   * @return array[]
+   *   List of activity types along with their component name. Each activity type is an array with keys:
+   *    'name': string; activity type name
+   *    'component_name': string; activity type component name ( e.g : CiviCase )
    */
   public function getDeclaredActivityTypes($caseTypeXML) {
     $result = array();
 
+    $componentName = 'CiviCase';
+    if (!empty($caseTypeXML->componentName)) {
+      $componentName = (string) $caseTypeXML->componentName;
+    }
+
     if (!empty($caseTypeXML->ActivityTypes) && $caseTypeXML->ActivityTypes->ActivityType) {
       foreach ($caseTypeXML->ActivityTypes->ActivityType as $activityTypeXML) {
-        $result[] = (string) $activityTypeXML->name;
+        $result[] = array(
+          'name' => (string) $activityTypeXML->name,
+          'component_name' => $componentName
+        );
       }
     }
 
@@ -328,13 +339,16 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
       foreach ($caseTypeXML->ActivitySets->ActivitySet as $activitySetXML) {
         if ($activitySetXML->ActivityTypes && $activitySetXML->ActivityTypes->ActivityType) {
           foreach ($activitySetXML->ActivityTypes->ActivityType as $activityTypeXML) {
-            $result[] = (string) $activityTypeXML->name;
+            $result[] = array(
+              'name' => (string) $activityTypeXML->name,
+              'component_name' => $componentName
+            );
           }
         }
       }
     }
 
-    $result = array_unique($result);
+    $result = array_map("unserialize", array_unique(array_map("serialize", $result)));
     sort($result);
     return $result;
   }
