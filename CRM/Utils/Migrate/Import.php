@@ -48,7 +48,10 @@ class CRM_Utils_Migrate_Import {
   public function run($file) {
     // read xml file
     $dom = new DomDocument();
-    if (!$dom->load($file)) {
+    $oldValue = libxml_disable_entity_loader(FALSE);
+    $load = $dom->load($file);
+    libxml_disable_entity_loader($oldValue);
+    if (!$load) {
       throw new CRM_Core_Exception("Failed to parse XML file \"$file\"");
     }
     $dom->xinclude();
