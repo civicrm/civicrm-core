@@ -579,7 +579,7 @@ LEFT JOIN civicrm_option_group aog ON aog.name='activity_type'
       $condition .= " AND case_relationship.contact_id_b = {$userID} ";
     }
     if ($type == 'upcoming' || $type == 'any') {
-      $closedId = CRM_Core_OptionGroup::getValue('case_status', 'Closed', 'name');
+      $closedId = CRM_Core_PseudoConstant::getKey('CRM_Case_BAO_Case', 'case_status_id', 'Closed');
       $condition .= "
 AND civicrm_case.status_id != $closedId";
     }
