@@ -466,29 +466,6 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   /**
    * Test getActivities BAO method.
    */
-  public function testGetActivitiesForAdminDashboardNoViewContacts() {
-    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('access CiviCRM');
-    $this->setUpForActivityDashboardTests();
-    $activities = CRM_Activity_BAO_Activity::getActivities($this->_params);
-    $this->assertEquals(0, count($activities));
-  }
-
-  /**
-   * Test getActivities BAO method.
-   */
-  public function testGetActivitiesForAdminDashboardAclLimitedViewContacts() {
-    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('access CiviCRM');
-    $this->allowedContacts = array(1, 3, 4, 5);
-    $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereMultipleContacts'));
-    $this->setUpForActivityDashboardTests();
-    $activities = CRM_Activity_BAO_Activity::getActivities($this->_params);
-    $this->assertEquals(1, count($activities));
-
-  }
-
-  /**
-   * Test getActivities BAO method.
-   */
   public function testGetActivitiesforNonAdminDashboard() {
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
     $op->execute($this->_dbconn,
