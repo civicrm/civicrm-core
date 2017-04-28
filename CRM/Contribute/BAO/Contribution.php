@@ -3422,7 +3422,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       && $params['prevContribution']->contribution_status_id != $params['contribution']->contribution_status_id
     ) {
       $eventID = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant', $entityId, 'event_id');
-      $feeLevel[] = str_replace('', '', $params['prevContribution']->amount_level);
+      $feeLevel[] = str_replace('', '', $params['prevContribution']->amount_level);
       CRM_Event_BAO_Participant::createDiscountTrxn($eventID, $params, $feeLevel);
     }
     unset($params['line_item']);
@@ -3594,7 +3594,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
             }
           }
           else {
-            $amount = $diff * $lineItemDetails['line_total'];
+            $amount = $diff * $fieldValues['line_total'];
           }
 
           $itemParams = array(
@@ -3602,8 +3602,8 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
             'contact_id' => $params['prevContribution']->contact_id,
             'currency' => $currency,
             'amount' => $amount,
-            'description' => $prevFinancialItem['description'],
-            'status_id' => $prevFinancialItem['status_id'],
+            'description' => $prevFinancialItem->description,
+            'status_id' => $prevFinancialItem->status_id,
             'financial_account_id' => $financialAccount,
             'entity_table' => 'civicrm_line_item',
             'entity_id' => $fieldValues['id'],
@@ -3612,10 +3612,10 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
           $params['line_item'][$fieldId][$fieldValueId]['deferred_line_total'] = $amount;
           $params['line_item'][$fieldId][$fieldValueId]['financial_item_id'] = $financialItem->id;
 
-          if ($lineItemDetails['tax_amount']) {
+          if ($fieldValues['tax_amount']) {
             $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
             $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
-            $itemParams['amount'] = $diff * $lineItemDetails['tax_amount'];
+            $itemParams['amount'] = $diff * $fieldValues['tax_amount'];
             $itemParams['description'] = $taxTerm;
             if ($fieldValues['financial_type_id']) {
               $itemParams['financial_account_id'] = self::getFinancialAccountId($fieldValues['financial_type_id']);
