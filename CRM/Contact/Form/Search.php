@@ -526,12 +526,6 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
 
     $this->assign('actionButtonName', $this->_actionButtonName);
 
-    // reset from session, CRM-3526
-    $session = CRM_Core_Session::singleton();
-    if ($this->_force && $session->get('selectedSearchContactIds')) {
-      $session->resetScope('selectedSearchContactIds');
-    }
-
     // if we dont get this from the url, use default if one exsts
     $config = CRM_Core_Config::singleton();
     if ($this->_ufGroupID == NULL &&
