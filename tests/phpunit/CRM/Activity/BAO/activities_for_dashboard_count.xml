@@ -1,26 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!--  $Id: dataset.xml 23301 2009-08-17 13:02:24Z walt $  -->
 <dataset>
-    <!--  Source Contact for Activity: 1 -->
-    <civicrm_contact
-        id="1"
-        contact_type="Individual"
-        is_opt_out="0"
-        display_name="Test Contact 1"
-        sort_name="Test Contact 1"
-        first_name="Test"
-        last_name="Contact 1"
-    />
-    <!--  Source Contact for Activity: 2 -->
-    <civicrm_contact
-        id="2"
-        contact_type="Individual"
-        is_opt_out="0"
-        display_name="Test Contact 2"
-        sort_name="Test Contact 2"
-        first_name="Test"
-        last_name="Contact 2"
-    />
     <!-- Source Contact for Activity: 3 -->
     <civicrm_contact
         id="3"
