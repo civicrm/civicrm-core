@@ -39,8 +39,7 @@
   <field>
     <name>time_stamp</name>
     <title>Unsubscribe Timestamp</title>
-    <type>timestamp</type>
-    <default>CURRENT_TIMESTAMP</default>
+    <type>datetime</type>
     <required>true</required>
     <comment>When this delivery event occurred.</comment>
   </field>

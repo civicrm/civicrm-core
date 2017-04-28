@@ -109,4 +109,23 @@ class CRM_Utils_API_ReloadOptionTest extends CiviUnitTestCase {
     $this->assertAPISuccess($result['values'][0]['api.Email.create']);
   }
 
+  /**
+   * An implementation of hook_civicrm_post used with all our test cases.
+   *
+   * @param $op
+   * @param string $objectName
+   * @param int $objectId
+   * @param $objectRef
+   */
+  public function onPost($op, $objectName, $objectId, &$objectRef) {
+    if ($op == 'create' && $objectName == 'Individual') {
+      CRM_Core_DAO::executeQuery(
+        "UPDATE civicrm_contact SET nick_name = 'munged' WHERE id = %1",
+        array(
+          1 => array($objectId, 'Integer'),
+        )
+      );
+    }
+  }
+
 }

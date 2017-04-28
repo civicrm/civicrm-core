@@ -32,8 +32,7 @@
   <field>
     <name>time_stamp</name>
     <title>Reply Timestamp</title>
-    <type>timestamp</type>
-    <default>CURRENT_TIMESTAMP</default>
+    <type>datetime</type>
     <required>true</required>
     <comment>When this reply event occurred.</comment>
   </field>

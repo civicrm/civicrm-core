@@ -286,7 +286,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
 
       // to get billing address if present
       $billingAddress = array();
-      foreach ($addressDetails as $address) {
+      foreach ($addressDetails as $key => $address) {
         if ((isset($address['is_billing']) && $address['is_billing'] == 1) && (isset($address['is_primary']) && $address['is_primary'] == 1) && $address['contact_id'] == $contribution->contact_id) {
           $billingAddress[$address['contact_id']] = $address;
           break;
@@ -343,7 +343,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       // retrieving the subtotal and sum of same tax_rate
       $dataArray = array();
       $subTotal = 0;
-      foreach ($lineItem as $taxRate) {
+      foreach ($lineItem as $entity_id => $taxRate) {
         if (isset($dataArray[(string) $taxRate['tax_rate']])) {
           $dataArray[(string) $taxRate['tax_rate']] = $dataArray[(string) $taxRate['tax_rate']] + CRM_Utils_Array::value('tax_amount', $taxRate);
         }

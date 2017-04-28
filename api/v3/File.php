@@ -116,8 +116,7 @@ function civicrm_api3_file_update($params) {
     $fileDAO->save();
   }
   $file = array();
-  $cloneDAO = clone($fileDAO);
-  _civicrm_api3_object_to_array($cloneDAO, $file);
+  _civicrm_api3_object_to_array(clone($fileDAO), $file);
   return $file;
 }
 

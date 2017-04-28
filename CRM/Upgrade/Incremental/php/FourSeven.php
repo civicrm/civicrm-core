@@ -346,16 +346,6 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
       'civicrm_custom_group', 'is_public', "boolean DEFAULT '1' COMMENT 'Is this property public?'");
   }
 
-  /**
-   * Upgrade function.
-   *
-   * @param string $rev
-   */
-  public function upgrade_4_7_20($rev) {
-    $this->addtask('Fix Schema on civicrm_action_schedule', 'fixSchemaOnCiviCRMActionSchedule');
-    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
-  }
-
   /*
    * Important! All upgrade functions MUST add a 'runSql' task.
    * Uncomment and use the following template for a new upgrade version
@@ -1119,37 +1109,6 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
       'component_id' => 'CiviCase',
       'icon' => 'fa-pencil-square-o',
     ));
-    return TRUE;
-  }
-
-  /**
-   * CRM-19986 fix schema differnces in civicrm_action_schedule
-   */
-  public static function fixSchemaOnCiviCRMActionSchedule() {
-    $config = CRM_Core_Config::singleton();
-    $dbUf = DB::parseDSN($config->dsn);
-    $query = "
-      SELECT CONSTRAINT_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
-      WHERE TABLE_SCHEMA = %1
-      AND TABLE_NAME = %2
-      AND CONSTRAINT_NAME = %3
-      AND CONSTRAINT_TYPE = 'FOREIGN KEY'
-    ";
-    $params = array(
-      1 => array($dbUf['database'], 'String'),
-      2 => array('civicrm_action_schedule', 'String'),
-      3 => array('FK_civicrm_action_schedule_sms_template_id', 'String'),
-    );
-    $dao = CRM_Core_DAO::executeQuery($query, $params);
-    if (!$dao->fetch()) {
-      CRM_Core_DAO::executeQuery("ALTER TABLE `civicrm_action_schedule`
-        ADD CONSTRAINT FK_civicrm_action_schedule_sms_template_id
-        FOREIGN KEY (`sms_template_id`)  REFERENCES `civicrm_msg_template`(`id`)
-        ON DELETE SET NULL");
-    }
-    CRM_Core_DAO::executeQuery("ALTER TABLE `civicrm_action_schedule`
-      CHANGE `mapping_id` `mapping_id` varchar(64) COLLATE
-      utf8_unicode_ci DEFAULT NULL COMMENT 'Name/ID of the mapping to use on this table'");
     return TRUE;
   }
 

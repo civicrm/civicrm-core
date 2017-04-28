@@ -781,35 +781,4 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
     $this->callAPISuccess('contact', 'delete', array('id' => $result['id']));
   }
 
-  /**
-   * Test participant invoke post hook after status update.
-   */
-  public function testPostHookForAdditionalParticipant() {
-    $participantID = $this->participantCreate(array(
-      'contact_id' => $this->_contactID,
-      'status_id' => 5,
-      'event_id' => $this->_eventID,
-    ));
-    $participantID2 = $this->participantCreate(array(
-      'contact_id' => $this->_contactID2,
-      'event_id' => $this->_eventID,
-      'status_id' => 5,
-      'registered_by_id' => $participantID,
-    ));
-
-    $this->hookClass->setHook('civicrm_post', array($this, 'onPost'));
-    $params = array(
-      'id' => $participantID,
-      'status_id' => 1,
-    );
-    $this->callAPISuccess('Participant', 'create', $params);
-
-    $result = $this->callAPISuccess('Participant', 'get', array('source' => 'Post Hook Update'));
-    $this->assertEquals(2, $result['count']);
-
-    $expected = array($participantID, $participantID2);
-    $actual = array_keys($result['values']);
-    $this->checkArrayEquals($expected, $actual);
-  }
-
 }

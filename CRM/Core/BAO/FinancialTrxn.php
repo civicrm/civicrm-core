@@ -436,13 +436,13 @@ WHERE ceft.entity_id = %1";
         'transaction_date' => date('YmdHis'),
         'amount' => $amount,
         'description' => 'Fee',
-        'status_id' => CRM_Core_Pseudoconstant::getKey('CRM_Financial_BAO_FinancialItem', 'status_id', 'Paid'),
+        'status_id' => CRM_Core_OptionGroup::getValue('financial_item_status', 'Paid', 'name'),
         'entity_table' => 'civicrm_financial_trxn',
         'entity_id' => $params['entity_id'],
         'currency' => $params['trxnParams']['currency'],
       );
     $trxnIDS['id'] = $trxn->id;
-    CRM_Financial_BAO_FinancialItem::create($fItemParams, NULL, $trxnIDS);
+    $financialItem = CRM_Financial_BAO_FinancialItem::create($fItemParams, NULL, $trxnIDS);
   }
 
   /**
@@ -472,8 +472,8 @@ WHERE ceft.entity_id = %1";
     $financialTypeId = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $contributionId, 'financial_type_id');
 
     if ($contributionId && $financialTypeId) {
-      $statusId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
-      $refundStatusId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Refunded');
+      $statusId = CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name');
+      $refundStatusId = CRM_Core_OptionGroup::getValue('contribution_status', 'Refunded', 'name');
 
       $toFinancialAccount = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($financialTypeId, 'Accounts Receivable Account is');
       $feeFinancialAccount = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($financialTypeId, 'Expense Account is');

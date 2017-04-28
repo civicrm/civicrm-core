@@ -41,7 +41,6 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   protected $_entity = 'contribution_page';
   protected $contribution_result = NULL;
   protected $_priceSetParams = array();
-  protected $_membershipBlockAmount = 2;
   /**
    * Payment processor details.
    * @var array
@@ -628,79 +627,6 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test submit with a membership block in place.
-   *
-   * Ensure a separate payment for the membership vs the contribution, with
-   * correct amounts.
-   */
-  public function testSubmitMembershipBlockIsSeparatePaymentPaymentProcessorNowChargesCorrectAmounts() {
-    $this->setUpMembershipContributionPage(TRUE);
-    $processor = Civi\Payment\System::singleton()->getById($this->_paymentProcessor['id']);
-    $processor->setDoDirectPaymentResult(array('fee_amount' => .72));
-    $test_uniq = uniqid();
-    $contributionPageAmount = 10;
-    $submitParams = array(
-      'price_' . $this->_ids['price_field'][0] => reset($this->_ids['price_field_value']),
-      'id' => (int) $this->_ids['contribution_page'],
-      'amount' => $contributionPageAmount,
-      'billing_first_name' => 'Billy',
-      'billing_middle_name' => 'Goat',
-      'billing_last_name' => 'Gruff',
-      'email-Primary' => 'henry@8th.king',
-      'selectMembership' => $this->_ids['membership_type'],
-      'payment_processor_id' => $this->_paymentProcessor['id'],
-      'credit_card_number' => '4111111111111111',
-      'credit_card_type' => 'Visa',
-      'credit_card_exp_date' => array('M' => 9, 'Y' => 2040),
-      'cvv2' => 123,
-      'TEST_UNIQ' => $test_uniq,
-    );
-
-    // set custom hook
-    $this->hookClass->setHook('civicrm_alterPaymentProcessorParams', array($this, 'hook_civicrm_alterPaymentProcessorParams'));
-
-    $this->callAPISuccess('contribution_page', 'submit', $submitParams, __FUNCTION__, __FILE__, 'submit contribution page', NULL);
-    $contributions = $this->callAPISuccess('contribution', 'get', array(
-      'contribution_page_id' => $this->_ids['contribution_page'],
-      'contribution_status_id' => 1,
-    ));
-
-    $result = civicrm_api3('SystemLog', 'get', array(
-      'sequential' => 1,
-      'message' => array('LIKE' => "%{$test_uniq}%"),
-    ));
-    $this->assertCount(2, $result['values'], "Expected exactly 2 log entries matching {$test_uniq}.");
-
-    // Examine logged entries to ensure correct values.
-    $contribution_ids = array();
-    $found_membership_amount = $found_contribution_amount = FALSE;
-    foreach ($result['values'] as $value) {
-      list($junk, $json) = explode("$test_uniq:", $value['message']);
-      $logged_contribution = json_decode($json, TRUE);
-      $contribution_ids[] = $logged_contribution['contributionID'];
-      if (!empty($logged_contribution['total_amount'])) {
-        $amount = $logged_contribution['total_amount'];
-      }
-      else {
-        $amount = $logged_contribution['amount'];
-      }
-
-      if ($amount == $this->_membershipBlockAmount) {
-        $found_membership_amount = TRUE;
-      }
-      if ($amount == $contributionPageAmount) {
-        $found_contribution_amount = TRUE;
-      }
-    }
-
-    $distinct_contribution_ids = array_unique($contribution_ids);
-    $this->assertCount(2, $distinct_contribution_ids, "Expected exactly 2 log contributions with distinct contributionIDs.");
-    $this->assertTrue($found_contribution_amount, "Expected one log contribution with amount '$contributionPageAmount' (the contribution page amount)");
-    $this->assertTrue($found_membership_amount, "Expected one log contribution with amount '$this->_membershipBlockAmount' (the membership amount)");
-
-  }
-
-  /**
    * Test that when a transaction fails the pending contribution remains.
    *
    * An activity should also be created. CRM-16417.
@@ -1224,7 +1150,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       $priceFieldValue = $this->callAPISuccess('price_field_value', 'create', array(
         'name' => 'membership_amount',
         'label' => 'Membership Amount',
-        'amount' => $this->_membershipBlockAmount,
+        'amount' => 2,
         'financial_type_id' => 'Donation',
         'format.only_id' => TRUE,
         'membership_type_id' => $membershipTypeID,
@@ -1601,26 +1527,6 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
 
     // Compare this to what it should be!
     $this->assertEquals($lineItem_TaxAmount, round($submitParams['tax_amount'], 2), 'Wrong Sales Tax Amount is calculated and stored.');
-  }
-
-  public function hook_civicrm_alterPaymentProcessorParams($paymentObj, &$rawParams, &$cookedParams) {
-    // Ensure total_amount are the same if they're both given.
-    $total_amount = CRM_Utils_Array::value('total_amount', $rawParams);
-    $amount = CRM_Utils_Array::value('amount', $rawParams);
-    if (!empty($total_amount) && !empty($amount) && $total_amount != $amount) {
-      throw new Exception("total_amount '$total_amount' and amount '$amount' differ.");
-    }
-
-    // Log parameters for later debugging and testing.
-    $message = __FUNCTION__ . ": {$rawParams['TEST_UNIQ']}:";
-    $log_params = array_intersect_key($rawParams, array(
-      'amount' => 1,
-      'total_amount' => 1,
-      'contributionID' => 1,
-    ));
-    $message .= json_encode($log_params);
-    $log = new CRM_Utils_SystemLogger();
-    $log->debug($message, $_REQUEST);
   }
 
 }

@@ -55,9 +55,8 @@
   </field>
   <field>
     <name>last_run</name>
-    <type>timestamp</type>
+    <type>datetime</type>
     <default>NULL</default>
-    <required>false</required>
     <comment>When was this cron entry last run</comment>
     <add>4.1</add>
   </field>

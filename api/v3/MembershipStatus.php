@@ -109,8 +109,7 @@ function civicrm_api3_membership_status_update($params) {
     $membershipStatusBAO->save();
   }
   $membershipStatus = array();
-  $cloneBAO = clone($membershipStatusBAO);
-  _civicrm_api3_object_to_array($cloneBAO, $membershipStatus);
+  _civicrm_api3_object_to_array(clone($membershipStatusBAO), $membershipStatus);
   $membershipStatus['is_error'] = 0;
   return $membershipStatus;
 }

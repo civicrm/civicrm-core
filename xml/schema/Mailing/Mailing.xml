@@ -271,15 +271,12 @@
   </foreignKey>
   <field>
     <name>created_date</name>
-    <type>timestamp</type>
-    <default>CURRENT_TIMESTAMP</default>
-    <required>false</required>
+    <type>datetime</type>
     <title>Mailing Created Date</title>
     <comment>Date and time this mailing was created.</comment>
     <add>3.0</add>
     <html>
       <type>Select Date</type>
-      <formatType>activityDateTime</formatType>
     </html>
   </field>
   <field>
@@ -296,16 +293,10 @@
   </foreignKey>
   <field>
     <name>scheduled_date</name>
-    <type>timestamp</type>
-    <default>NULL</default>
-    <required>false</required>
+    <type>datetime</type>
     <title>Mailing Scheduled Date</title>
     <comment>Date and time this mailing was scheduled.</comment>
     <add>3.3</add>
-    <html>
-      <type>Select Date</type>
-      <formatType>activityDateTime</formatType>
-    </html>
   </field>
   <field>
     <name>approver_id</name>
@@ -321,16 +312,10 @@
   </foreignKey>
   <field>
     <name>approval_date</name>
-    <type>timestamp</type>
-    <default>NULL</default>
-    <required>false</required>
+    <type>datetime</type>
     <title>Mailing Approved Date</title>
     <comment>Date and time this mailing was approved.</comment>
     <add>3.3</add>
-    <html>
-      <type>Select Date</type>
-      <formatType>activityDateTime</formatType>
-    </html>
   </field>
   <field>
     <name>approval_status_id</name>

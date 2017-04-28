@@ -121,9 +121,7 @@
   <field>
     <name>created_date</name>
     <title>AB Test Created Date</title>
-    <type>timestamp</type>
-    <required>false</required>
-    <default>CURRENT_TIMESTAMP</default>
+    <type>datetime</type>
     <comment>When was this item created</comment>
     <add>4.6</add>
     <html>

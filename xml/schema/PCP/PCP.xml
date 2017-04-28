@@ -68,7 +68,7 @@
     <default>NULL</default>
     <add>2.2</add>
     <html>
-      <type>TextArea</type>
+      <type>TexArea</type>
     </html>
   </field>
   <field>
@@ -77,7 +77,7 @@
     <default>NULL</default>
     <add>2.2</add>
     <html>
-      <type>TextArea</type>
+      <type>TexArea</type>
     </html>
   </field>
   <field>
