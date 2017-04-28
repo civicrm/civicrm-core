@@ -15,7 +15,8 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
    * Clean up after tests.
    */
   public function tearDown() {
-    $tablesToTruncate = array('civicrm_activity', 'civicrm_activity_contact', 'civicrm_email');
+    // truncate a few tables
+    $tablesToTruncate = array('civicrm_contact', 'civicrm_activity', 'civicrm_activity_contact', 'civicrm_email');
     $this->quickCleanup($tablesToTruncate);
     $this->cleanUpAfterACLs();
     parent::tearDown();

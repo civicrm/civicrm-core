@@ -537,27 +537,12 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
     }
 
     //check for duplicate fields
-    $apiFormattedParams = $params;
-    $apiFormattedParams['field_type'] = $params['field_name'][0];
-    $apiFormattedParams['field_name'] = $params['field_name'][1];
-    if (!empty($params['field_name'][2])) {
-      if ($apiFormattedParams['field_name'] === 'url') {
-        $apiFormattedParams['website_type_id'] = $params['field_name'][2];
-      }
-      else {
-        $apiFormattedParams['location_type_id'] = $params['field_name'][2];
-      }
-    }
-    if (!empty($params['field_name'][3])) {
-      $apiFormattedParams['phone_type_id'] = $params['field_name'][3];
-    }
-
-    if ($apiFormattedParams['field_type'] != "Formatting" && CRM_Core_BAO_UFField::duplicateField($apiFormattedParams)) {
-      CRM_Core_Error::statusBounce(ts('The selected field already exists in this profile.'), NULL, ts('Field Not Added'));
+    if ($params["field_name"][0] != "Formatting" && CRM_Core_BAO_UFField::duplicateField($params, array('uf_group' => $params['uf_group_id'], 'uf_field' => $params['id']))) {
+      CRM_Core_Session::setStatus(ts('The selected field already exists in this profile.'), ts('Field Not Added'), 'error');
+      return;
     }
     else {
       $params['weight'] = CRM_Core_BAO_UFField::autoWeight($params);
-      // @todo use api & $apiFormatter
       $ufField = CRM_Core_BAO_UFField::add($params);
 
       //reset other field is searchable and in selector settings, CRM-4363

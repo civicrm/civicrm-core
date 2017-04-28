@@ -117,9 +117,9 @@ WHERE  contact_id = {$params['contact_id']}
    * @param array $entityBlock
    *   Input parameters to find object.
    *
-   * @return array
+   * @return bool
    */
-  public static function getValues($entityBlock) {
+  public static function &getValues($entityBlock) {
     return CRM_Core_BAO_Block::getValues('email', $entityBlock);
   }
 
@@ -283,7 +283,8 @@ AND    reset_date IS NULL
    *   an array of email ids
    */
   public static function getFromEmail() {
-    $contactID = CRM_Core_Session::singleton()->getLoggedInContactID();
+    $session = CRM_Core_Session::singleton();
+    $contactID = $session->get('userID');
     $fromEmailValues = array();
 
     // add all configured FROM email addresses
@@ -298,7 +299,7 @@ AND    reset_date IS NULL
       $contactEmails = self::allEmails($contactID);
       $fromDisplayName = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $contactID, 'display_name');
 
-      foreach ($contactEmails as $emailVal) {
+      foreach ($contactEmails as $emailId => $emailVal) {
         $email = trim($emailVal['email']);
         if (!$email || $emailVal['on_hold']) {
           continue;

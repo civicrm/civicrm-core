@@ -918,8 +918,61 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
     );
 
     $mut->checkMailLog($strings);
-    $this->callAPISuccessGetCount('FinancialTrxn', array(), 3);
-    $this->callAPISuccessGetCount('FinancialItem', array(), 2);
+    $this->callAPISuccessGetCount('FinancialTrxn', array(), 4);
+    $items = $this->callAPISuccess('FinancialItem', 'get', array('sequential' => 1));
+    $this->assertEquals(4, $items['count']);
+    $this->assertEquals('Contribution Amount', $items['values'][0]['description']);
+    $this->assertEquals('Sales Tax', $items['values'][1]['description']);
+    $this->assertEquals('Contribution Amount', $items['values'][0]['description']);
+    $this->assertEquals('Sales Tax', $items['values'][1]['description']);
+
+    $this->assertEquals(100, $items['values'][0]['amount']);
+    $this->assertEquals(10, $items['values'][1]['amount']);
+    // @todo what should the amount BE? I believe this is incorrect elsewhere too.
+    // currently it is $120 - ie the first one not incremented. This is consistent
+    // with my testing on CRM-19723
+    $this->assertEquals(20, $items['values'][3]['amount']);
+  }
+
+  /**
+   * Do the first contributions, in preparation for an edit-submit.
+   *
+   * @return array
+   *
+   * @throws \Exception
+   */
+  protected function doInitialSubmit() {
+    $form = new CRM_Contribute_Form_Contribution();
+
+    $form->testSubmit(array(
+      'total_amount' => 100,
+      'financial_type_id' => $this->_financialTypeId,
+      'receive_date' => '04/21/2015',
+      'receive_date_time' => '11:27PM',
+      'contact_id' => $this->_individualId,
+      'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
+      'contribution_status_id' => 1,
+      'price_set_id' => 0,
+    ),
+      CRM_Core_Action::ADD
+    );
+    $contribution = $this->callAPISuccessGetSingle('Contribution',
+      array(
+        'contribution_id' => 1,
+        'return' => array(
+          'tax_amount',
+          'total_amount',
+          'net_amount',
+          'financial_type_id',
+          'receive_date',
+          'payment_instrument_id',
+        ),
+      )
+    );
+    $this->assertEquals(110, $contribution['total_amount']);
+    $this->assertEquals(10, $contribution['tax_amount']);
+    $this->assertEquals(110, $contribution['net_amount']);
+    return array($form, $contribution);
   }
 
   /**
