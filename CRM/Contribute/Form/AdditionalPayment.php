@@ -217,7 +217,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     $label = ($this->_refund) ? ts('Refund Amount') : ts('Payment Amount');
     $this->addMoney('total_amount',
       $label,
-      FALSE,
+      TRUE,
       $attributes['total_amount'],
       TRUE, 'currency', NULL
     );
@@ -225,7 +225,8 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     $this->add('select', 'payment_instrument_id',
       ts('Payment Method'),
       array('' => ts('- select -')) + CRM_Contribute_PseudoConstant::paymentInstrument(),
-      TRUE, array('onChange' => "return showHideByValue('payment_instrument_id','4','checkNumber','table-row','select',false);")
+      FALSE,
+      array('onChange' => "return showHideByValue('payment_instrument_id','4','checkNumber','table-row','select',false);")
     );
 
     $this->add('text', 'check_number', ts('Check Number'), $attributes['financial_trxn_check_number']);
@@ -307,6 +308,10 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     if (!empty($fields['net_amount']) && $netAmt != $fields['net_amount']) {
       $errors['net_amount'] = ts('Net amount should be equal to the difference between payment amount and fee amount.');
     }
+    if ($self->_paymentProcessor['id'] === 0 && empty($fields['payment_instrument_id'])) {
+      $errors['payment_instrument_id'] = ts('Payment method is a required field');
+    }
+
     return $errors;
   }
 
