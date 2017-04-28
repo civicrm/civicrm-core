@@ -241,7 +241,7 @@
     <uniqueName>activity_status_id</uniqueName>
     <title>Activity Status</title>
     <import>true</import>
-    <export>false</export>
+    <export>true</export>
     <headerPattern>/(activity.)?status(.label$)?/i</headerPattern>
     <type>int unsigned</type>
     <comment>ID of the status this activity is currently in. Foreign key to civicrm_option_value.</comment>
