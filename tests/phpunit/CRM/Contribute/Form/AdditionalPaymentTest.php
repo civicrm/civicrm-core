@@ -322,6 +322,7 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
         'check_number' => 'check-12345',
       );
     }
+    $form->cid = $this->_individualId;
     $form->testSubmit($submitParams, $mode);
   }
 

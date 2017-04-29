@@ -611,6 +611,8 @@ WHERE  contribution_id = {$id}
         CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_contactID, 'contact_type')
       );
     }
+
+    $this->assignBillingName($this->_params);
   }
 
   /**
