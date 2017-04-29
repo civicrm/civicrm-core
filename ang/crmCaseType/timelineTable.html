@@ -60,7 +60,7 @@ Required vars: activitySet
         ui-jq="select2"
         ui-options="{dropdownAutoWidth : true}"
         ng-model="activity.reference_select"
-        ng-options="key as value for (key,value) in {newest: 'Newest', oldest: 'Oldest'}"
+        ng-options="key as value for (key,value) in {newest: ts('Newest'), oldest: ts('Oldest')}"
         ng-hide="activity.name == 'Open Case'"
         ng-required="activity.name != 'Open Case'"
         >
