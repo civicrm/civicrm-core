@@ -25,7 +25,7 @@ class CRM_Widget_Widget {
           ),
         ),
         'getEmbedCode' => array(
-          'description' => 'Gets embed code.  Perhaps overkill, but we can track dropoffs in this case. by # of people reqeusting emebed code / number of unique instances.',
+          'description' => 'Gets embed code.  Perhaps overkill, but we can track dropoffs in this case. by # of people requesting embed code / number of unique instances.',
           'access' => 'remote',
           'arguments' => array(
             'contributionPageID',
