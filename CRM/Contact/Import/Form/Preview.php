@@ -271,7 +271,7 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
       'dedupe' => $this->get('dedupe'),
       'newGroupName' => $this->controller->exportValue($this->_name, 'newGroupName'),
       'newGroupDesc' => $this->controller->exportValue($this->_name, 'newGroupDesc'),
-      'newGroupType' => $this->controller->exportValue($this->_name, 'newGroupType'),
+      'newGroupType' => array_keys($this->controller->exportValue($this->_name, 'newGroupType')),
       'groups' => $this->controller->exportValue($this->_name, 'groups'),
       'allGroups' => $this->get('groups'),
       'newTagName' => $this->controller->exportValue($this->_name, 'newTagName'),
