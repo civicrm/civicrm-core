@@ -1478,6 +1478,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       ) {
         unset($submittedValues['tax_amount']);
       }
+      // @todo - look to remove this line. I believe it relates to CRM-16460
+      // and possibly contributes to fixing the issue described there but
+      // would cause breakage for negative values in some cases.
       $submittedValues['total_amount'] = CRM_Utils_Array::value('amount', $submittedValues);
     }
     if ($this->_id) {
