@@ -696,7 +696,11 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
   }
 
   /**
-   * Test that if a negative contribution is entered it does not get reset to $0
+   * Test that if a negative contribution is entered it does not get reset to $0.
+   *
+   * Note that this fails locally for me & I believe there may be an issue for some sites
+   * with negative numbers. Grep for CRM-16460 to find the places I think that might
+   * be affected if you hit this.
    */
   public function testEnterNegativeContribution() {
     $form = new CRM_Contribute_Form_Contribution();
