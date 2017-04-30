@@ -2560,6 +2560,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     $this->restoreDefaultPriceSetConfig();
     $var = TRUE;
     CRM_Member_BAO_Membership::createRelatedMemberships($var, $var, TRUE);
+    $this->disableTaxAndInvoicing();
     System::singleton()->flushProcessors();
   }
 
@@ -3694,6 +3695,19 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
         'is_email_pdf' => 1,
         'tax_term' => 'Sales Tax',
         'tax_display_settings' => 'Inclusive',
+      )
+    );
+    return Civi::settings()->set('contribution_invoice_settings', $contributeSetting);
+  }
+
+  /**
+   * Enable Tax and Invoicing
+   */
+  protected function disableTaxAndInvoicing($params = array()) {
+    // Enable component contribute setting
+    $contributeSetting = array_merge($params,
+      array(
+        'invoicing' => 0,
       )
     );
     return Civi::settings()->set('contribution_invoice_settings', $contributeSetting);

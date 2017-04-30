@@ -587,22 +587,23 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
    *
    * @param array $params
    * @param string|null $creditCardMode
-   * @param string $enitityType
+   * @param string $entityType
    *
    * @throws \CiviCRM_API3_Exception
    */
-  public function testSubmit($params, $creditCardMode = NULL, $enitityType = 'contribute') {
+  public function testSubmit($params, $creditCardMode = NULL, $entityType = 'contribute') {
     $this->_bltID = 5;
     // Required because processCreditCard calls set method on this.
     $_SERVER['REQUEST_METHOD'] = 'GET';
     $this->controller = new CRM_Core_Controller();
 
     $this->assignPaymentRelatedVariables();
+
     if (!empty($params['contribution_id'])) {
       $this->_contributionId = $params['contribution_id'];
 
-      $paymentInfo = CRM_Core_BAO_FinancialTrxn::getPartialPaymentWithType($this->_contributionId, $enitityType);
-      $paymentDetails = CRM_Contribute_BAO_Contribution::getPaymentInfo($this->_contributionId, $enitityType, FALSE, TRUE);
+      $paymentInfo = CRM_Core_BAO_FinancialTrxn::getPartialPaymentWithType($this->_contributionId, $entityType);
+      $paymentDetails = CRM_Contribute_BAO_Contribution::getPaymentInfo($this->_contributionId, $entityType, FALSE, TRUE);
 
       $this->_amtPaid = $paymentDetails['paid'];
       $this->_amtTotal = $paymentDetails['total'];
