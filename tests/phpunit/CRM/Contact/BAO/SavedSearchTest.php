@@ -117,7 +117,7 @@ class CRM_Contact_BAO_SavedSearchTest extends CiviUnitTestCase {
         0 => 'activity_date_high',
         1 => '=',
         2 => '20170501235959',
-      )
+      ),
     );
     $formValues = array(
       'activity_date_relative' => 'ending.week',
@@ -137,7 +137,7 @@ class CRM_Contact_BAO_SavedSearchTest extends CiviUnitTestCase {
         0 => 'custom_13_high',
         1 => '=',
         2 => '20170501235959',
-      )
+      ),
     );
     $formValues = array(
       'custom_13_relative' => 'ending.week',
