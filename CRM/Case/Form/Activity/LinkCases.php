@@ -57,7 +57,7 @@ class CRM_Case_Form_Activity_LinkCases {
     // get the related cases for given case.
     $relatedCases = $form->get('relatedCases');
     if (!isset($relatedCases)) {
-      $relatedCases = CRM_Case_BAO_Case::getRelatedCases($caseId, $form->_currentlyViewedContactId);
+      $relatedCases = CRM_Case_BAO_Case::getRelatedCases($caseId);
       $form->set('relatedCases', empty($relatedCases) ? FALSE : $relatedCases);
     }
   }

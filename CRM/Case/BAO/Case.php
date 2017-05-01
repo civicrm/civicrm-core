@@ -1904,30 +1904,26 @@ SELECT civicrm_contact.id as casemanager_id,
   }
 
   /**
-   * Retrieve related cases for give case.
+   * Retrieve related case ids for given case.
    *
-   * @param int $mainCaseId
-   *   Id of main case.
-   * @param int $contactId
-   *   Id of contact.
+   * @param int $caseId
    * @param bool $excludeDeleted
    *   Do not include deleted cases.
    *
    * @return array
    */
-  public static function getRelatedCases($mainCaseId, $contactId, $excludeDeleted = TRUE) {
+  public static function getRelatedCaseIds($caseId, $excludeDeleted = TRUE) {
     //FIXME : do check for permissions.
 
-    $relatedCases = array();
-    if (!$mainCaseId || !$contactId) {
-      return $relatedCases;
+    if (!$caseId) {
+      return array();
     }
 
     $linkActType = array_search('Link Cases',
       CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'name')
     );
     if (!$linkActType) {
-      return $relatedCases;
+      return array();
     }
 
     $whereClause = "mainCase.id = %2";
@@ -1935,7 +1931,6 @@ SELECT civicrm_contact.id as casemanager_id,
       $whereClause .= " AND ( relAct.is_deleted = 0 OR relAct.is_deleted IS NULL )";
     }
 
-    //1. first fetch related case ids.
     $query = "
     SELECT  relCaseAct.case_id
       FROM  civicrm_case mainCase
@@ -1947,7 +1942,7 @@ SELECT civicrm_contact.id as casemanager_id,
 
     $dao = CRM_Core_DAO::executeQuery($query, array(
       1 => array($linkActType, 'Integer'),
-      2 => array($mainCaseId, 'Integer'),
+      2 => array($caseId, 'Integer'),
     ));
     $relatedCaseIds = array();
     while ($dao->fetch()) {
@@ -1955,9 +1950,24 @@ SELECT civicrm_contact.id as casemanager_id,
     }
     $dao->free();
 
-    // there are no related cases.
-    if (empty($relatedCaseIds)) {
-      return $relatedCases;
+    return array_values($relatedCaseIds);
+  }
+
+  /**
+   * Retrieve related case details for given case.
+   *
+   * @param int $caseId
+   * @param bool $excludeDeleted
+   *   Do not include deleted cases.
+   *
+   * @return array
+   */
+  public static function getRelatedCases($caseId, $excludeDeleted = TRUE) {
+    $relatedCaseIds = self::getRelatedCaseIds($caseId, $excludeDeleted);
+    $relatedCases = array();
+
+    if (!$relatedCaseIds) {
+      return array();
     }
 
     $whereClause = 'relCase.id IN ( ' . implode(',', $relatedCaseIds) . ' )';
