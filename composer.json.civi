@@ -1,0 +1,68 @@
+{
+  "name": "australian_greens/civicrm",
+  "type": "drupal-module",
+  "description": "AG Repo of the CiviCRM Module",
+  "require": {
+    "dompdf/dompdf" : "0.8.*",
+    "electrolinux/phpquery": "^0.9.6",
+    "symfony/config": "^2.8.44 || ~3.0",
+    "symfony/polyfill-iconv": "~1.0",
+    "symfony/dependency-injection": "^2.8.44 || ~3.0",
+    "symfony/event-dispatcher": "^2.8.44 || ~3.0",
+    "symfony/filesystem": "^2.8.44 || ~3.0",
+    "symfony/process": "^2.8.44 || ~3.0",
+    "psr/log": "~1.1",
+    "symfony/finder": "^2.8.44 || ~3.0",
+    "tecnickcom/tcpdf" : "6.2.*",
+    "totten/ca-config": "~17.05",
+    "zetacomponents/base": "1.9.*",
+    "zetacomponents/mail": "dev-master",
+    "marcj/topsort": "~1.1",
+    "phpoffice/phpword": "^0.15.0",
+    "pear/validate_finance_creditcard": "dev-master",
+    "civicrm/civicrm-cxn-rpc": "~0.19.01.08",
+    "pear/auth_sasl": "1.1.0",
+    "pear/net_smtp": "1.6.*",
+    "pear/net_socket": "1.0.*",
+    "pear/mail": "^1.4",
+    "civicrm/civicrm-setup": "~0.2.0",
+    "guzzlehttp/guzzle": "^6.3",
+    "psr/simple-cache": "~1.0.1",
+    "cweagans/composer-patches": "~1.0",
+    "pear/log": "1.13.1",
+    "ezyang/htmlpurifier": "4.10",
+    "katzien/php-mime-type": "2.1.0"
+  },
+  "scripts": {
+    "post-install-cmd": [
+      "bash tools/scripts/composer/dompdf-cleanup.sh",
+      "bash tools/scripts/composer/tcpdf-cleanup.sh",
+      "bash tools/scripts/composer/pear-exception-fix.sh",
+      "bash tools/scripts/composer/net-smtp-fix.sh",
+      "bash tools/scripts/composer/pear-mail-fix.sh",
+      "bash tools/scripts/composer/phpword-jquery.sh"
+    ],
+    "post-update-cmd": [
+      "bash tools/scripts/composer/dompdf-cleanup.sh",
+      "bash tools/scripts/composer/tcpdf-cleanup.sh",
+      "bash tools/scripts/composer/pear-exception-fix.sh",
+      "bash tools/scripts/composer/net-smtp-fix.sh",
+      "bash tools/scripts/composer/pear-mail-fix.sh",
+      "bash tools/scripts/composer/phpword-jquery.sh"
+    ]
+  },
+  "extra": {
+    "patches": {
+      "phpoffice/common": {
+        "Fix handling of libxml_disable_entity_loader": "tools/scripts/composer/patches/phpoffice-common-xml-entity-fix.patch"
+      },
+      "phpoffice/phpword": {
+        "Fix handling of libxml_disable_entity_loader": "tools/scripts/composer/patches/phpword-libxml-fix-global-handling.patch"
+      },
+      "zetacomponents/mail": {
+        "CiviCRM Custom Patches for ZetaCompoents mail": "tools/scripts/composer/patches/civicrm-custom-patches-zetacompoents-mail.patch"
+      }
+    }
+  }
+}
+
