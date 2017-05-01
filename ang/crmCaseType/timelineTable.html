@@ -22,14 +22,14 @@ Required vars: activitySet
     </td>
     <td>
       <i class="crm-i {{ activityTypes[activity.name].icon }}"></i>
-      {{ activity.name }}
+      {{ activity.label }}
     </td>
     <td>
       <select
         ui-jq="select2"
         ui-options="{dropdownAutoWidth : true}"
         ng-model="activity.status"
-        ng-options="actStatus.name as actStatus.name for actStatus in activityStatuses|orderBy:'name'"
+        ng-options="actStatus.name as actStatus.label for actStatus in activityStatuses|orderBy:'label'"
         >
         <option value=""></option>
       </select>
@@ -39,7 +39,7 @@ Required vars: activitySet
         ui-jq="select2"
         ui-options="{dropdownAutoWidth : true}"
         ng-model="activity.reference_activity"
-        ng-options="actTypeName as actTypeName for actTypeName in activityTypeNames"
+        ng-options="activityType.name as activityType.label for activityType in activitySet.activityTypes"
         ng-hide="activity.name == 'Open Case'"
         ng-required="activity.name != 'Open Case'"
         >
@@ -60,7 +60,7 @@ Required vars: activitySet
         ui-jq="select2"
         ui-options="{dropdownAutoWidth : true}"
         ng-model="activity.reference_select"
-        ng-options="key as value for (key,value) in {newest: 'Newest', oldest: 'Oldest'}"
+        ng-options="key as value for (key,value) in {newest: ts('Newest'), oldest: ts('Oldest')}"
         ng-hide="activity.name == 'Open Case'"
         ng-required="activity.name != 'Open Case'"
         >
