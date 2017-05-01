@@ -99,6 +99,56 @@ class CRM_Contact_BAO_SavedSearchTest extends CiviUnitTestCase {
 
 
   /**
+   * Test relative dates
+   *
+   * The function saveRelativeDates should detect whether a field is using
+   * a relative date range and include in the fromValues a relative_date
+   * index so it is properly detects when executed.
+   */
+  public function testRelativeDates() {
+    // First test using a core field.
+    $queryParams = array(
+      0 => array(
+        0 => 'activity_date_low',
+        1 => '=',
+        2 => '20170425000000'
+      ),
+      1 => array(
+        0 => 'activity_date_high',
+        1 => '=',
+        2 => '20170501235959'
+      )
+    );
+    $formValues = array(
+      'activity_date_relative' => 'ending.week'
+    );
+    CRM_Contact_BAO_SavedSearch::saveRelativeDates($queryParams, $formValues);
+    $this->assertArrayHasKey('activity', $queryParams['relative_dates'], 'Relative date in activity date smart group failed.');
+
+    // Now test using a custom field.
+    $queryParams = array(
+      0 => array(
+        0 => 'custom_13_low',
+        1 => '=',
+        2 => '20170425000000'
+      ),
+      1 => array(
+        0 => 'custom_13_high',
+        1 => '=',
+        2 => '20170501235959'
+      )
+    );
+    $formValues = array(
+      'custom_13_relative' => 'ending.week'
+    );
+    CRM_Contact_BAO_SavedSearch::saveRelativeDates($queryParams, $formValues);
+    // Since custom_13 doesn't have the word 'date' in it, the key is
+    // set to 0, rather than the field name.
+    $this->assertArrayHasKey('0', $queryParams['relative_dates'], 'Relative date in custom field smart group creation failed.');
+
+  }
+
+  /**
    * Get variants of the fields we want to test.
    *
    * @return array
