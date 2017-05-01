@@ -121,7 +121,36 @@ describe('crmCaseType', function() {
               "is_reserved": "1",
               "is_active": "1",
               "component_id": "7"
-            }
+            },
+            {
+              "id": "18",
+              "option_group_id": "2",
+              "label": "Open Case",
+              "value": "13",
+              "name": "Open Case",
+              "filter": "0",
+              "is_default": "0",
+              "weight": "13",
+              "is_optgroup": "0",
+              "is_reserved": "1",
+              "is_active": "1",
+              "component_id": "7",
+              "icon": "fa-folder-open-o"
+            },
+            {
+              "id": "857",
+              "option_group_id": "2",
+              "label": "Medical evaluation",
+              "value": "55",
+              "name": "Medical evaluation",
+              "filter": "0",
+              "is_default": "0",
+              "weight": "56",
+              "is_optgroup": "0",
+              "is_reserved": "0",
+              "is_active": "1",
+              "component_id": "7"
+            },
           ]
         },
         relTypes: {
