@@ -182,37 +182,11 @@
         });
 
         function checkEmailDependancies() {
-          if ($('#is_email_receipt', $form).attr('checked')) {
-            $('#fromEmail, #notice', $form).show();
-            $('#receiptDate', $form).hide();
+          if ($('#is_email_receipt', $form).prop('checked')) {
+            $('#fromEmail', $form).show();
           }
           else {
-            $('#fromEmail, #notice', $form).hide( );
-            $('#receiptDate', $form).show();
-          }
-        }
-
-        // bind first click of accordion header to load crm-accordion-body with snippet
-        $('#adjust-option-type', $form).hide();
-        $('.crm-ajax-accordion .crm-accordion-header', $form).one('click', function() {
-          loadPanes($(this).attr('id'));
-        });
-        $('.crm-ajax-accordion:not(.collapsed) .crm-accordion-header', $form).each(function(index) {
-          loadPanes($(this).attr('id'));
-        });
-        // load panes function call for snippet based on id of crm-accordion-header
-        function loadPanes(id) {
-          var url = "{/literal}{crmURL p='civicrm/payment/add' q='formType=' h=0}{literal}" + id;
-          {/literal}
-          {if $contributionMode}
-            url += "&mode={$contributionMode}";
-          {/if}
-          {if $qfKey}
-            url += "&qfKey={$qfKey}";
-          {/if}
-          {literal}
-          if (!$('div.'+ id, $form).html()) {
-            CRM.loadPage(url, {target: $('div.' + id, $form)});
+           $('#fromEmail', $form).hide( );
           }
         }
 
