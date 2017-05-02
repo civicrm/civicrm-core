@@ -3682,7 +3682,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       }
     }
 
-    CRM_Core_BAO_FinancialTrxn::createDeferredTrxn(CRM_Utils_Array::value('line_item', $params), $params['id'], TRUE, $context);
+    CRM_Core_BAO_FinancialTrxn::createDeferredTrxn(CRM_Utils_Array::value('line_item', $params), $params['contribution']->id, TRUE, $context);
   }
 
   /**
