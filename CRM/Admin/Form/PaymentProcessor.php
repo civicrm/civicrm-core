@@ -166,8 +166,22 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
   public function buildQuickForm($check = FALSE) {
     parent::buildQuickForm();
 
-    if ($this->_action & CRM_Core_Action::DELETE) {
-      return;
+    switch ($this->_action) {
+      case CRM_Core_Action::DELETE:
+        return;
+        break;
+      case CRM_Core_Action::DISABLE:
+        CRM_Financial_BAO_PaymentProcessor::enable($this->_id, false);
+        CRM_Utils_System::redirect('/civicrm/admin/paymentProcessor?reset=1');
+        CRM_Core_Session::setStatus("", ts('Payment Processor Disabled.'), "success");
+        return;
+        break;
+      case CRM_Core_Action::ENABLE:
+        CRM_Financial_BAO_PaymentProcessor::enable($this->_id, true);
+        CRM_Utils_System::redirect('/civicrm/admin/paymentProcessor?reset=1');
+        CRM_Core_Session::setStatus("", ts('Payment Processor Enabled.'), "success");
+        return;
+        break;
     }
 
     $attributes = CRM_Core_DAO::getAttribute('CRM_Financial_DAO_PaymentProcessor');
