@@ -102,7 +102,31 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
     if (CRM_Utils_Array::value('option.autoweight', $params, TRUE)) {
       $params['weight'] = CRM_Core_BAO_UFField::autoWeight($params);
     }
-    $ufField = CRM_Core_BAO_UFField::add($params);
+    // set values for uf field properties and save
+    $ufField = new CRM_Core_DAO_UFField();
+    $ufField->copyValues($params);
+    $ufField->field_type = $params['field_name'][0];
+    $ufField->field_name = $params['field_name'][1];
+
+    //should not set location type id for Primary
+    $locationTypeId = NULL;
+    if ($params['field_name'][1] == 'url') {
+      $ufField->website_type_id = CRM_Utils_Array::value(2, $params['field_name']);
+    }
+    else {
+      $locationTypeId = CRM_Utils_Array::value(2, $params['field_name']);
+      $ufField->website_type_id = NULL;
+    }
+    if ($locationTypeId) {
+      $ufField->location_type_id = $locationTypeId;
+    }
+    else {
+      $ufField->location_type_id = 'null';
+    }
+
+    $ufField->phone_type_id = CRM_Utils_Array::value(3, $params['field_name'], 'NULL');
+
+    $ufField->save();
 
     $fieldsType = CRM_Core_BAO_UFGroup::calculateGroupType($groupId, TRUE);
     CRM_Core_BAO_UFGroup::updateGroupTypes($groupId, $fieldsType);
@@ -237,42 +261,6 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
     }
 
     return $isMultiRecordFieldPresent;
-  }
-
-  /**
-   * Add the UF Field.
-   *
-   * @param array $params
-   *   (reference) array containing the values submitted by the form.
-   *
-   * @return CRM_Core_BAO_UFField
-   */
-  public static function add(&$params) {
-    // set values for uf field properties and save
-    $ufField = new CRM_Core_DAO_UFField();
-    $ufField->copyValues($params);
-    $ufField->field_type = $params['field_name'][0];
-    $ufField->field_name = $params['field_name'][1];
-
-    //should not set location type id for Primary
-    $locationTypeId = NULL;
-    if ($params['field_name'][1] == 'url') {
-      $ufField->website_type_id = CRM_Utils_Array::value(2, $params['field_name']);
-    }
-    else {
-      $locationTypeId = CRM_Utils_Array::value(2, $params['field_name']);
-      $ufField->website_type_id = NULL;
-    }
-    if ($locationTypeId) {
-      $ufField->location_type_id = $locationTypeId;
-    }
-    else {
-      $ufField->location_type_id = 'null';
-    }
-
-    $ufField->phone_type_id = CRM_Utils_Array::value(3, $params['field_name'], 'NULL');
-
-    return $ufField->save();
   }
 
   /**
