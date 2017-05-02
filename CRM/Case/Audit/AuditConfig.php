@@ -61,9 +61,8 @@ class CRM_Case_Audit_AuditConfig {
     $this->includeRules = array();
 
     $doc = new DOMDocument();
-    $oldValue = libxml_disable_entity_loader(FALSE);
-    $load = $doc->load(dirname(__FILE__) . '/' . $this->filename);
-    libxml_disable_entity_loader($oldValue);
+    $xmlString = file_get_contents(dirname(__FILE__) . '/' . $this->filename);
+    $load = $doc->loadXML($xmlString);
     if ($load) {
       $regions = $doc->getElementsByTagName("region");
       foreach ($regions as $region) {

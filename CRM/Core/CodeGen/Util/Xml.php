@@ -11,10 +11,10 @@ class CRM_Core_CodeGen_Util_Xml {
    * @return SimpleXMLElement|bool
    */
   public static function parse($file) {
-    $oldValue = libxml_disable_entity_loader(FALSE);
     $dom = new DomDocument();
-    $dom->load($file);
-    libxml_disable_entity_loader($oldValue);
+    $xmlString = file_get_contents($file);
+    $dom->loadXML($xmlString);
+    $dom->documentURI = $file;
     $dom->xinclude();
     $xml = simplexml_import_dom($dom);
     return $xml;
