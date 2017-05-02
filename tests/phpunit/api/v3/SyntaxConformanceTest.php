@@ -1081,6 +1081,9 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     if ($Entity === 'Setting') {
       $this->markTestSkipped('It seems OK for setting to skip here as it silently sips invalid params');
     }
+    elseif ($Entity === 'Mailing') {
+      $this->markTestSkipped('It seems OK for "Mailing" to skip here because you can create empty drafts');
+    }
     // should create php complaining that a param is missing
     civicrm_api3($Entity, 'Create');
   }
