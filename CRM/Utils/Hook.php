@@ -1980,6 +1980,13 @@ abstract class CRM_Utils_Hook {
    * @deprecated
    */
   public static function alterMail(&$mailer, $driver, $params) {
+    // This has been deprecated on the premise it MIGHT be called externally for a long time.
+    // We don't have a clear policy on how much we support external extensions calling internal
+    // hooks (ie. in general we say 'don't call internal functions', but some hooks like pre hooks
+    // are expected to be called externally.
+    // It's really really unlikely anyone uses this - but let's add deprecations for a couple
+    // of releases first.
+    Civi::log()->warning('Deprecated function CRM_Utils_Hook::alterMail, use CRM_Utils_Hook::alterMailer', array('civi.tag' => 'deprecated'));
     return CRM_Utils_Hook::alterMailer($mailer, $driver, $params);
   }
 
