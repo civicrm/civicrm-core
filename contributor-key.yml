@@ -38,6 +38,11 @@
   name        : Andrew Thompson
   jira        : andrewpthompson
 
+- github      : anthonylindsay
+  name        : Anthony Lindsay
+  organization: Annertech
+  jira        : anthonylindsay
+
 - github      : artem3
   name        : Artem Goncharenko
 
@@ -85,7 +90,6 @@
 
 - github      : davecivicrm
   name        : Dave Greenberg
-  organization: CiviCRM
   jira        : dgg
 
 - github      : davejenx
@@ -119,16 +123,18 @@
 
 - github      : dlobo
   name        : Donald Lobo
-  organization: CiviCRM
   jira        : lobo
-
-- name        : David Tarrant
-  organization: Nubay Services
-  jira        : dtarrant
 
 - github      : dkguru
   organization: Jesper Angelo
   jira        : dkguru
+
+- name        : Samuel Haskell
+  jira        : dotsam
+
+- name        : David Tarrant
+  organization: Nubay Services
+  jira        : dtarrant
 
 - github      : edzelopez
   name        : Edsel Lopez
@@ -151,6 +157,11 @@
 
 - github      : ErichBSchulz
   name        : Erich Schulz
+
+- github      : ErikHommel
+  name        : Erik Hommel
+  organization: CiviCoop
+  jira        : erikhommel
 
 - name        : Fedor Khodkov
   jira        : fkhodkov
@@ -178,6 +189,11 @@
 - github      : gemmapotaka
   name        : Gemma Potaka
   organization: Fuzion
+  jira        : gemma.potaka
+
+- name        : Greg Harris
+  organization: Team Expansion
+  jira        : gharris
 
 - github      : ginkgofjg
   name        : Frank Gómez
@@ -193,6 +209,11 @@
   organization: CompuCorp
   jira        : guanhuan
 
+- github      : guyiac
+  name        : Guy Iaccarino
+  organization: Greenleaf Advancement
+  jira        : guyiac
+
 - github      : h-c-c
   name        : Peter Hartmann
   organization: Hartmann Computer Consulting
@@ -201,6 +222,7 @@
 - github      : herbdool
   name        : Herb van den Dool
   organization: Freeform Solutions
+  jira        : herb@freeform
 
 - name        : Hershel Robinson
   organization: CiviHosting
@@ -378,6 +400,11 @@
   organization: CompuCorp
   jira        : michael
 
+- github      : mikaweinstein
+  name        : Mika Weinstein
+  organization: AGH Strategies
+  jira        : mikaweinstein
+
 - github      : MiltoxBeyond
   name        : Milton Zurita
   jira        : MiltoxB
@@ -394,6 +421,9 @@
   name        : Mathieu Lutfy
   organization: Coop SymbioTIC
   jira        : mlutfy
+
+- name        : Michal Mach
+  jira        : mover
 
 - github      : mollux
   name        : Mattias Michaux
@@ -414,6 +444,10 @@
 - github      : nowszy
   name        : Pawel Nowak
   jira        : pnowak
+
+- name        : René Nieuwburg
+  organization: Comunica2
+  jira        : ñull
 
 - github      : ogomez78
   name        : Osvaldo Gomez
@@ -455,6 +489,15 @@
   organization: JMA Consulting
   jira        : pradeep.nayak
 
+- name        : Angela Cacciola
+  organization: Canine Companions for Independence
+  jira        : princessang417
+
+- github      : quicksketch
+  name        : Nate Lampton
+  organization: Lullabot
+  jira        : quicksketch
+
 - name        : Lutz Frommberger
   jira        : re-quest
 
@@ -474,9 +517,17 @@
   name        : Rubén Pineda
   organization: iXiam
 
+- name        : Sheila Burkett
+  organization: Spry Digital
+  jira        : saburkett
+
 - github      : samuelsov
   name        : Samuel Vanhove
   organization: Coop SymbioTIC
+
+- github      : sdragnev
+  name        : Stan Dragnev
+  jira        : stan_d
 
 - name        : Stuart Parker
   jira        : saparker
@@ -528,6 +579,7 @@
 - github      : systopia
   name        : Björn Endres
   organization: Systopia
+  jira        : b.systopia
 
 - github      : tamarmeir
   name        : Tamar Meir
@@ -539,7 +591,6 @@
 
 - github      : tobiaslounsbury
   name        : Tobias Lounsbury
-  organization: Ginkgo Street Labs
 
 - github      : totten
   name        : Tim Otten
@@ -560,6 +611,11 @@
   name        : Thomas Schüttler
   organization: Oxfam Germany
   jira        : tschuettler
+
+- github      : tunbola
+  name        : Tunbola Ogunwande
+  organization: Timbsoft Technologies
+  jira        : tunbolawande@gmail.com
 
 - github      : twomice
   name        : Allen Shaw
