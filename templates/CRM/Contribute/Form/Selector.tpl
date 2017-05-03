@@ -72,25 +72,30 @@
             <span class="nowrap">{$row.contribution_soft_credit_amount|crmMoney:$row.currency}</span>
           </td>
         {/if}
-        <td class="crm-contribution-type crm-contribution-type_{$row.financial_type_id} crm-financial-type crm-financial-type_{$row.financial_type_id}">
-          {$row.financial_type}
-        </td>
-        <td class="crm-contribution-source">
-          {$row.contribution_source}
-        </td>
-        <td class="crm-contribution-receive_date">
-          {$row.receive_date|crmDate}
-        </td>
-        <td class="crm-contribution-thankyou_date">
-          {$row.thankyou_date|crmDate}
-        </td>
-        <td class="crm-contribution-status">
-          {$row.contribution_status}<br/>
-          {if $row.cancel_date}
-            {$row.cancel_date|crmDate}
+      {foreach from=$columnHeaders item=column}
+        {assign var='columnName' value=$column.field_name}
+        {if !$columnName}{* if field_name has not been set skip, this helps with not changing anything not specifically edited *}
+        {elseif $columnName === 'total_amount'}{* rendered above as soft credit columns = confusing *}
+        {elseif $column.type === 'actions'}{* rendered below as soft credit column handling = not fixed *}
+        {elseif $columnName == 'contribution-status'}
+          <td class="crm-contribution-status">
+            {$row.contribution_status}<br/>
+            {if $row.cancel_date}
+              {$row.cancel_date|crmDate}
+            {/if}
+          </td>
+        {else}
+          {if $column.type == 'date'}
+            <td class="crm-contribution-{$columnName}">
+              {$row.$columnName|crmDate}
+            </td>
+          {else}
+          <td class="crm-{$columnName} crm-{$columnName}_{$row.columnName}">
+            {$row.$columnName}
+          </td>
           {/if}
-        </td>
-        <td class="crm-contribution-product_name">{$row.product_name}</td>
+        {/if}
+      {/foreach}
         {if $softCreditColumns}
           <td class="crm-contribution-soft_credit_name">
             <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.contribution_soft_credit_contact_id`"}">{$row.contribution_soft_credit_name}</a>
