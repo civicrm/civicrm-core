@@ -28,7 +28,7 @@
 {/htxt}
 {htxt id="id-intro"}
     {capture assign=newPageURL}{crmURL p='civicrm/admin/contribute/add' q='action=add&reset=1'}{/capture}
-    <p>{ts}CiviContribute allows you to create and maintain any number of Online Contribution Pages. You can create different pages for different programs or campaigns - and customize text, amounts, types of information collected from contributors, etc.{/ts}</p>
+    <p>{ts}CiviContribute allows you to create and maintain any number of Online Contribution Pages. You can create different pages for different programs or campaigns, and you can customize text, amounts, types of information collected from contributors, etc.{/ts}</p>
     {ts}For existing pages{/ts}:
     <ul class="indented">
     <li>{ts}Click <strong>Configure</strong> to view and modify settings, amounts, and text for existing pages.{/ts}</li>

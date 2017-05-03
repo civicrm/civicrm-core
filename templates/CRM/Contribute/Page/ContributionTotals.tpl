@@ -29,9 +29,9 @@
 
     {if $annual.count}
         <tr>
-            <th class="contriTotalLeft right">{ts}Current Year-to-Date{/ts} - {$annual.amount}</th>
-            <th class="right"> &nbsp; {ts}# Completed Contributions{/ts} - {$annual.count}</th>
-            <th class="right contriTotalRight"> &nbsp; {ts}Avg Amount{/ts} - {$annual.avg}</th>
+            <th class="contriTotalLeft right">{ts}Current Year-to-Date{/ts} &ndash; {$annual.amount}</th>
+            <th class="right"> &nbsp; {ts}# Completed Contributions{/ts} &ndash; {$annual.count}</th>
+            <th class="right contriTotalRight"> &nbsp; {ts}Avg Amount{/ts} &ndash; {$annual.avg}</th>
             {if $contributionSummary.cancel.amount}
                 <td>&nbsp;</td>
             {/if}
@@ -42,29 +42,29 @@
       <tr>
           {if $contributionSummary.total.amount}
             {if $contributionSummary.total.currencyCount gt 1}
-              <th class="contriTotalLeft right">{ts}Total{/ts} - {$contributionSummary.total.amount}</th>
-              <th class="left contriTotalRight"> &nbsp; {ts}# Completed{/ts} - {$contributionSummary.total.count}</th>
+              <th class="contriTotalLeft right">{ts}Total{/ts} &ndash; {$contributionSummary.total.amount}</th>
+              <th class="left contriTotalRight"> &nbsp; {ts}# Completed{/ts} &ndash; {$contributionSummary.total.count}</th>
             </tr><tr>
-              <th class="contriTotalLeft">{ts}Avg{/ts} - {$contributionSummary.total.avg}</th>
-              <th class="right"> &nbsp; {ts}Median{/ts} - {$contributionSummary.total.median}</th>
-              <th class="right contriTotalRight"> &nbsp; {ts}Mode{/ts} - {$contributionSummary.total.mode}</th>
+              <th class="contriTotalLeft">{ts}Avg{/ts} &ndash; {$contributionSummary.total.avg}</th>
+              <th class="right"> &nbsp; {ts}Median{/ts} &ndash; {$contributionSummary.total.median}</th>
+              <th class="right contriTotalRight"> &nbsp; {ts}Mode{/ts} &ndash; {$contributionSummary.total.mode}</th>
             {else}
-              <th class="contriTotalLeft right">{ts}Total{/ts} - {$contributionSummary.total.amount}</th>
-              <th class="right"> &nbsp; {ts}# Completed{/ts} - {$contributionSummary.total.count}</th>
-              <th class="right"> &nbsp; {ts}Avg{/ts} - {$contributionSummary.total.avg}</th>
-              <th class="right"> &nbsp; {ts}Median{/ts} - {$contributionSummary.total.median}</th>
-              <th class="right contriTotalRight"> &nbsp; {ts}Mode{/ts} - {$contributionSummary.total.mode}</th>
+              <th class="contriTotalLeft right">{ts}Total{/ts} &ndash; {$contributionSummary.total.amount}</th>
+              <th class="right"> &nbsp; {ts}# Completed{/ts} &ndash; {$contributionSummary.total.count}</th>
+              <th class="right"> &nbsp; {ts}Avg{/ts} &ndash; {$contributionSummary.total.avg}</th>
+              <th class="right"> &nbsp; {ts}Median{/ts} &ndash; {$contributionSummary.total.median}</th>
+              <th class="right contriTotalRight"> &nbsp; {ts}Mode{/ts} &ndash; {$contributionSummary.total.mode}</th>
             {/if}
           {/if}
           {if $contributionSummary.cancel.amount}
-            <th class="disabled right contriTotalRight"> &nbsp; {ts}Total Cancelled Amount{/ts} - {$contributionSummary.cancel.amount}</th>
+            <th class="disabled right contriTotalRight"> &nbsp; {ts}Total Cancelled Amount{/ts} &ndash; {$contributionSummary.cancel.amount}</th>
           {/if}
       </tr>
       {if $contributionSummary.soft_credit.count}
       <tr>
-        <th class="contriTotalLeft right">{ts}Total Soft Credit Amount{/ts} - {$contributionSummary.soft_credit.amount}</th>
-        <th class="right"> &nbsp; {ts}# Completed Soft Credits{/ts} - {$contributionSummary.soft_credit.count}</th>
-        <th class="right contriTotalRight"> &nbsp; {ts}Avg Soft Credit Amount{/ts} - {$contributionSummary.soft_credit.avg}</th>
+        <th class="contriTotalLeft right">{ts}Total Soft Credit Amount{/ts} &ndash; {$contributionSummary.soft_credit.amount}</th>
+        <th class="right"> &nbsp; {ts}# Completed Soft Credits{/ts} &ndash; {$contributionSummary.soft_credit.count}</th>
+        <th class="right contriTotalRight"> &nbsp; {ts}Avg Soft Credit Amount{/ts} &ndash; {$contributionSummary.soft_credit.avg}</th>
       </tr>
       {/if}
     {/if}

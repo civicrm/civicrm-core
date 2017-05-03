@@ -182,7 +182,7 @@ CRM.$(function($) {
                 <span class="bold">{$row.name} &nbsp;
                 {if ($membershipBlock.display_min_fee AND $context EQ "makeContribution") AND $row.minimum_fee GT 0 }
                     {if $is_separate_payment OR ! $form.amount.label}
-                        - {$row.minimum_fee|crmMoney}
+                        &ndash; {$row.minimum_fee|crmMoney}
                     {else}
                         {ts 1=$row.minimum_fee|crmMoney}(contribute at least %1 to be eligible for this membership){/ts}
                     {/if}

@@ -51,13 +51,13 @@
 {/htxt}
 {htxt id="upload-compose"}
 <p>{ts}You can use your favorite editor to create content on your local computer and then <strong>Upload</strong> the files. OR you can <strong>Compose</strong> content directly on the screen.{/ts}</p>
-<p>{ts}If you choose to compose on the screen, a basic WYSIWYG (what-you-see-is-what-you-get) editor is provided which you can use create simple HTML messages. However, if you are planning on creating HTML messages with complex layouts - it is best to use an HTML editor on your local computer. Then locate and upload the saved file(s) by clicking the <strong>Browse</strong> button.{/ts}</p>
+<p>{ts}If you choose to compose on the screen, a basic WYSIWYG (what-you-see-is-what-you-get) editor is provided which you can use create simple HTML messages. However, if you are planning on creating HTML messages with complex layouts, it is best to use an HTML editor on your local computer. Then locate and upload the saved file(s) by clicking the <strong>Browse</strong> button.{/ts}</p>
 {/htxt}
 
 {htxt id="id-message-text-title"}
   {ts}Text Message{/ts}
 {/htxt}
 {htxt id="id-message-text"}
-<p>{ts}You can send your email as a simple text-only message, as an HTML formatted message, or both. Text-only messages are sufficient for most email communication - and some recipients may prefer not to receive HTML formatted messages.{/ts}</p>
-<p>{ts}HTML messages have more visual impact, allow you to include images, and may be more readable if you are including links to website pages. However, different email programs may interpret HTML formats differently - so use this option cautiously unless you have a template format that has been tested with different web and desktop email programs.{/ts}</p>
+<p>{ts}You can send your email as a simple text-only message, as an HTML formatted message, or both. Text-only messages are sufficient for most email communication, and some recipients may prefer not to receive HTML formatted messages.{/ts}</p>
+<p>{ts}HTML messages have more visual impact, allow you to include images, and may be more readable if you are including links to website pages. However, different email programs may interpret HTML formats differently, so use this option cautiously unless you have a template format that has been tested with different web and desktop email programs.{/ts}</p>
 {/htxt}

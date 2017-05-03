@@ -51,7 +51,7 @@
 {/htxt}
 {htxt id="id-supporter_profile"}
 {capture assign="createProfileURL"}{crmURL p="civicrm/admin/uf/group" q="reset=1"}{/capture}
-{ts 1=$createProfileURL}This is used to collect or update basic information (e.g. name and email address) from users while they are creating a Personal Campaign Page. The profile you select must be configured with 'Account creation required' (under Profile Settings &raquo; Advanced Settings). You must include an Email address field - and you may include any number of other fields in the profile. If you don't yet have an appropriate Profile configured, you will need to <a href='%1'>create one first</a>, and then return to this form to select it.{/ts}
+{ts 1=$createProfileURL}This is used to collect or update basic information (e.g. name and email address) from users while they are creating a Personal Campaign Page. The profile you select must be configured with 'Account creation required' (under Profile Settings &raquo; Advanced Settings). You must include an Email address field&mdash;and you may include any number of other fields in the profile. If you don't yet have an appropriate Profile configured, you will need to <a href='%1'>create one first</a>, and then return to this form to select it.{/ts}
 {/htxt}
 
 {htxt id="id-is_tellfriend-title"}

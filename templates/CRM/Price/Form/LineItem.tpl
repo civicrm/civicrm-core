@@ -53,7 +53,7 @@
       </tr>
       {foreach from=$value item=line}
         <tr>
-          <td>{if $line.html_type eq 'Text'}{$line.label}{else}{$line.field_title} - {$line.label}{/if} {if $line.description}
+          <td>{if $line.field_title && $line.html_type neq 'Text'}{$line.field_title} &ndash; {$line.label}{else}{$line.label}{/if} {if $line.description}
               <div class="description">{$line.description}</div>{/if}</td>
           {if $context NEQ "Membership"}
             <td class="right">{$line.qty}</td>
