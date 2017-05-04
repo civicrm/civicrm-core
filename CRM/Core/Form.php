@@ -2364,7 +2364,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @param string $id
    * @param string $hlpFile
    */
-  protected function addHelp($name, $id, $hlpFile = null) {
+  protected function addHelp($name, $id, $hlpFile = NULL) {
     $this->_help[$name]['id'] = $id;
     $this->_help[$name]['hlpFile'] = $hlpFile;
   }
