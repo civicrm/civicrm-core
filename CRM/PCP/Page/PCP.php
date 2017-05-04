@@ -214,7 +214,7 @@ class CRM_PCP_Page_PCP extends CRM_Core_Page_Basic {
       }
     }
 
-    $approvedId = CRM_Core_OptionGroup::getValue('pcp_status', 'Approved', 'name');
+    $approvedId = CRM_Core_PseudoConstant::getKey('CRM_PCP_BAO_PCP', 'status_id', 'Approved');
 
     //check for delete CRM-4418
     $allowToDelete = CRM_Core_Permission::check('delete in CiviContribute');
