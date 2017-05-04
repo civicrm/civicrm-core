@@ -111,7 +111,7 @@
   </table>
 </div>
 
-<div ng-show="$.isEmptyObject(appMetas)" class="messages status no-popup">
+<div ng-show="appMetas.length === 0" class="messages status no-popup">
   <i class="crm-i fa-info-circle"></i>
   {{ts('No available applications')}}
 </div>
