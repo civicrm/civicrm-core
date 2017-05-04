@@ -32,7 +32,6 @@ $data = array(
   ),
   'tar' => array(),
   'git' => array(
-    'civicrm-backdrop@1.x' => repo("$DM_SOURCEDIR/backdrop", getenv('DM_REF_BACKDROP')),
     'civicrm-core' => repo("$DM_SOURCEDIR", getenv('DM_REF_CORE')),
     'civicrm-drupal@6.x' => repo("$DM_SOURCEDIR/drupal", getenv('DM_REF_DRUPAL6')),
     'civicrm-drupal@7.x' => repo("$DM_SOURCEDIR/drupal", getenv('DM_REF_DRUPAL')),
@@ -42,9 +41,6 @@ $data = array(
   ),
 );
 
-if (getenv('BPACK')) {
-  $data['tar']['Backdrop'] = "civicrm-$DM_VERSION-backdrop-unstable.tar.gz";
-}
 if (getenv('J5PACK')) {
   $data['tar']['Joomla'] = "civicrm-$DM_VERSION-joomla.zip";
 }
