@@ -815,7 +815,10 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
    *
    * @throws \CiviCRM_API3_Exception
    */
-  public static function updateOnNewPayment($recurringContributionID, $paymentStatus) {
+  public static function updateOnNewPayment($recurringContributionID, $paymentStatus, $effectiveDate) {
+    if (empty($effectiveDate)) {
+      $effectiveDate = date('Y-m-d');
+    }
     if (!in_array($paymentStatus, array('Completed', 'Failed'))) {
       return;
     }
@@ -849,8 +852,8 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
       // Only update next sched date if it's empty or 'just now' because payment processors may be managing
       // the scheduled date themselves as core did not previously provide any help.
       if (empty($existing['next_sched_contribution_date']) || strtotime($existing['next_sched_contribution_date']) ==
-        strtotime(date('Y-m-d'))) {
-        $params['next_sched_contribution_date'] = date('Y-m-d', strtotime('+' . $existing['frequency_interval'] . ' ' . $existing['frequency_unit']));
+        strtotime($effectiveDate)) {
+        $params['next_sched_contribution_date'] = date('Y-m-d', strtotime('+' . $existing['frequency_interval'] . ' ' . $existing['frequency_unit'], strtotime($effectiveDate)));
       }
     }
     civicrm_api3('ContributionRecur', 'create', $params);
@@ -868,7 +871,9 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
    */
   protected static function isComplete($recurringContributionID, $installments) {
     $paidInstallments = CRM_Core_DAO::singleValueQuery(
-      'SELECT count(*) FROM civicrm_contribution WHERE id = %1',
+      'SELECT count(*) FROM civicrm_contribution 
+        WHERE contribution_recur_id = %1
+        AND contribution_status_id = ' . CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
       array(1 => array($recurringContributionID, 'Integer'))
     );
     if ($paidInstallments >= $installments) {
