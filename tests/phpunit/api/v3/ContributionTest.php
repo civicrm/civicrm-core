@@ -2907,6 +2907,77 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test sending a mail via the API.
+   * This simulates webform_civicrm using pay later contribution page
+   */
+  public function testSendconfirmationPayLater() {
+    $mut = new CiviMailUtils($this, TRUE);
+
+    // Create contribution page
+    $pageParams = array(
+      'title' => 'Webform Contributions',
+      'financial_type_id' => 1,
+      'contribution_type_id' => 1,
+      'is_confirm_enabled' => 1,
+      'is_pay_later' => 1,
+      'pay_later_text' => 'I will send payment by cheque',
+      'pay_later_receipt' => 'Send your cheque payable to "CiviCRM LLC" to the office',
+    );
+    $contributionPage = $this->callAPISuccess('contribution_page', 'create', $pageParams);
+
+    // Create pay later contribution
+    $contribParams = array(
+      'contact_id' => $this->_individualId,
+      'financial_type_id' => 1,
+      'is_pay_later' => 1,
+      'contribution_status_id' => 2,
+      'contribution_page_id' => $contributionPage['id'],
+      'total_amount' => '10.00',
+    );
+    $contribution = $this->callAPISuccess('contribution', 'create', $contribParams);
+
+    // Create line item
+    $lineItemParams = array(
+      'contribution_id' => $contribution['id'],
+      'entity_id' => $contribution['id'],
+      'entity_table' => 'civicrm_contribution',
+      'label' => 'My lineitem label',
+      'qty' => 1,
+      'unit_price' => "10.00",
+      'line_total' => "10.00",
+    );
+    $lineItem = $this->callAPISuccess('lineItem', 'create', $lineItemParams);
+
+    // Create email
+    try {
+      civicrm_api3('contribution', 'sendconfirmation', array(
+          'id' => $contribution['id'],
+          'receipt_from_email' => 'api@civicrm.org',
+        )
+      );
+    } catch (Exception $e) {
+      // Need to figure out how to stop this some other day
+      // We don't care about the Payment Processor because this is Pay Later
+      // The point of this test is to check we get the pay_later version of the mail
+      if ($e->getMessage() != "Undefined variable: CRM16923AnUnreliableMethodHasBeenUserToDeterminePaymentProcessorFromContributionPage") {
+        throw $e;
+      }
+    }
+
+    // Retrieve mail & check it has the pay_later_receipt info
+    $mut->getMostRecentEmail('raw');
+    $mut->checkMailLog(array(
+        (string)$contribParams['total_amount'],
+        $pageParams['pay_later_receipt'],
+      ), array(
+        'Event',
+      )
+    );
+    $mut->stop();
+  }
+
+
+  /**
    * Check credit card details in sent mail via API
    *
    * @param $mut obj CiviMailUtils instance

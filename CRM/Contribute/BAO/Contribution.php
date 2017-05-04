@@ -2791,6 +2791,8 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     }
     $values['customGroup'] = $customGroup;
 
+    $values['is_pay_later'] = $this->is_pay_later;
+    
     return $values;
   }
 
