@@ -510,6 +510,7 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
         'name' => $this->_includeSoftCredits ? ts('Contribution Amount') : ts('Amount'),
         'sort' => 'total_amount',
         'direction' => CRM_Utils_Sort::DONTCARE,
+        'field_name' => 'total_amount',
       ),
     );
     if ($this->_includeSoftCredits) {
@@ -520,6 +521,7 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
             array(
               'name' => ts('Soft Credit Amount'),
               'sort' => 'contribution_soft_credit_amount',
+              'field_name' => 'contribution_soft_credit_amount',
               'direction' => CRM_Utils_Sort::DONTCARE,
             ),
           )
@@ -532,31 +534,39 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
           array(
             'name' => ts('Type'),
             'sort' => 'financial_type',
+            'field_name' => 'financial_type',
             'direction' => CRM_Utils_Sort::DONTCARE,
           ),
           array(
             'name' => ts('Source'),
             'sort' => 'contribution_source',
+            'field_name' => 'contribution_source',
             'direction' => CRM_Utils_Sort::DONTCARE,
           ),
           array(
             'name' => ts('Received'),
             'sort' => 'receive_date',
+            'field_name' => 'receive_date',
+            'type' => 'date',
             'direction' => CRM_Utils_Sort::DESCENDING,
           ),
           array(
             'name' => ts('Thank-you Sent'),
             'sort' => 'thankyou_date',
+            'field_name' => 'receive_date',
+            'type' => 'date',
             'direction' => CRM_Utils_Sort::DONTCARE,
           ),
           array(
             'name' => ts('Status'),
             'sort' => 'contribution_status',
+            'field_name' => 'contribution_status',
             'direction' => CRM_Utils_Sort::DONTCARE,
           ),
           array(
             'name' => ts('Premium'),
             'sort' => 'product_name',
+            'field_name' => 'product_name',
             'direction' => CRM_Utils_Sort::DONTCARE,
           ),
         )
@@ -591,9 +601,14 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
     self::$_columnHeaders
       = array_merge(
         self::$_columnHeaders, array(
-          array('desc' => ts('Actions')),
+          array('desc' => ts('Actions'), 'type' => 'actions'),
         )
       );
+    foreach (array_keys(self::$_columnHeaders) as $index) {
+      // Add weight & space it out a bit to allow headers to be inserted.
+      self::$_columnHeaders[$index]['weight'] = $index * 10;
+    }
+
     CRM_Core_Smarty::singleton()->assign('softCreditColumns', $this->_includeSoftCredits);
     return self::$_columnHeaders;
   }
