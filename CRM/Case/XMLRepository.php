@@ -136,7 +136,9 @@ class CRM_Case_XMLRepository {
     if ($fileName && file_exists($fileName)) {
       // read xml file
       $dom = new DomDocument();
-      $dom->load($fileName);
+      $xmlString = file_get_contents($fileName);
+      $dom->loadXML($xmlString);
+      $dom->documentURI = $fileName;
       $dom->xinclude();
       $fileXml = simplexml_import_dom($dom);
     }
