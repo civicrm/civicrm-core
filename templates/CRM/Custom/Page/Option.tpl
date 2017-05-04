@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -105,8 +105,7 @@
                 return nRow;
               },
               "fnDrawCallback": function() {
-                // FIXME: trigger crmLoad and crmEditable would happen automatically
-                $('.crm-editable').crmEditable();
+                $(this).trigger('crmLoad');
               },
 
               "fnServerData": function ( sSource, aoData, fnCallback ) {

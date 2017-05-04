@@ -7,11 +7,11 @@
  */
 function message_template_create_example() {
   $params = array(
-    'msg_title' => 'msg_title_165',
-    'msg_subject' => 'msg_subject_165',
-    'msg_text' => 'msg_text_165',
-    'msg_html' => 'msg_html_165',
-    'workflow_id' => 165,
+    'msg_title' => 'msg_title_284',
+    'msg_subject' => 'msg_subject_284',
+    'msg_text' => 'msg_text_284',
+    'msg_html' => 'msg_html_284',
+    'workflow_id' => 284,
     'is_default' => '1',
     'is_reserved' => 1,
   );
@@ -25,7 +25,8 @@ function message_template_create_example() {
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
     return array(
-      'error' => $errorMessage,
+      'is_error' => 1,
+      'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
     );
@@ -46,16 +47,16 @@ function message_template_create_expectedresult() {
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
-    'id' => 67,
+    'id' => 69,
     'values' => array(
-      '67' => array(
-        'id' => '67',
-        'msg_title' => 'msg_title_165',
-        'msg_subject' => 'msg_subject_165',
-        'msg_text' => 'msg_text_165',
-        'msg_html' => 'msg_html_165',
+      '69' => array(
+        'id' => '69',
+        'msg_title' => 'msg_title_284',
+        'msg_subject' => 'msg_subject_284',
+        'msg_text' => 'msg_text_284',
+        'msg_html' => 'msg_html_284',
         'is_active' => '1',
-        'workflow_id' => '165',
+        'workflow_id' => '284',
         'is_default' => '1',
         'is_reserved' => '1',
         'is_sms' => '',

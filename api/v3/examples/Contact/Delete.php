@@ -7,7 +7,7 @@
  */
 function contact_delete_example() {
   $params = array(
-    'id' => 1,
+    'id' => 3,
   );
 
   try{
@@ -19,7 +19,8 @@ function contact_delete_example() {
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
     return array(
-      'error' => $errorMessage,
+      'is_error' => 1,
+      'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
     );

@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -105,7 +105,11 @@
         {capture assign='profilePathVar'}{/capture}
       {/if}
 
-      var dataUrl = "{crmURL p='civicrm/payment/form' h=0 q="currency=`$currency`&`$urlPathVar``$profilePathVar``$contributionPageID``$preProfileID`processor_id="}" + type;
+      {capture assign='isBackOfficePathVar'}&is_back_office={$isBackOffice}&{/capture}
+
+      var payment_instrument_id = $('#payment_instrument_id').val();
+
+      var dataUrl = "{crmURL p='civicrm/payment/form' h=0 q="&currency=`$currency`&`$urlPathVar``$isBackOfficePathVar``$profilePathVar``$contributionPageID``$preProfileID`processor_id="}" + type;
       {literal}
       if (typeof(CRM.vars) != "undefined") {
         if (typeof(CRM.vars.coreForm) != "undefined") {
@@ -118,16 +122,21 @@
           }
         }
       }
+      dataUrl =  dataUrl + "&payment_instrument_id=" + payment_instrument_id;
 
       // Processors like pp-express will hide the form submit buttons, so re-show them when switching
       $('.crm-submit-buttons', $form).show().find('input').prop('disabled', true);
       CRM.loadPage(dataUrl, {target: '#billing-payment-block'});
     }
 
-    $('.crm-group.payment_options-group').show();
     $('[name=payment_processor_id]').on('change.paymentBlock', function() {
         buildPaymentBlock($(this).val());
     });
+
+    $('#payment_instrument_id').on('change.paymentBlock', function() {
+      buildPaymentBlock(0);
+    });
+
     $('#billing-payment-block').on('crmLoad', function() {
       $('.crm-submit-buttons input').prop('disabled', false);
     })

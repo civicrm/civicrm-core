@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Core_I18n {
 
@@ -97,7 +97,11 @@ class CRM_Core_I18n {
     return $this->_nativegettext;
   }
 
-
+  /**
+   * Set native locale for getText.
+   *
+   * @param string $locale
+   */
   protected function setNativeGettextLocale($locale) {
 
     $locale .= '.utf8';
@@ -117,6 +121,11 @@ class CRM_Core_I18n {
 
   }
 
+  /**
+   * Set getText locale.
+   *
+   * @param string $locale
+   */
   protected function setPhpGettextLocale($locale) {
 
     // we support both the old file hierarchy format and the new:
@@ -137,7 +146,6 @@ class CRM_Core_I18n {
     $this->_extensioncache['civicrm'] = $this->_phpgettext;
 
   }
-
 
   /**
    * Return languages available in this instance of CiviCRM.
@@ -221,6 +229,11 @@ class CRM_Core_I18n {
     return strtr($str, $tr);
   }
 
+  /**
+   * Get the directory for l10n resources.
+   *
+   * @return string
+   */
   public static function getResourceDir() {
     static $dir = NULL;
     if ($dir === NULL) {

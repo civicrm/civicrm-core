@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -38,23 +38,23 @@
   
 <table class="report-layout display">
    {foreach from=$rows item=row}
-   <thead><th colspan=16><font color="black" size="3">{$row.label}</font></th></thead>
+     <thead><th colspan=16><font color="black" size="3">{$row.label}</font></th></thead>
    
-  <thead class="sticky">
-    <tr>
-   {foreach from=$columnHeaders item=ignore key=header}
-       <th>{$header}</th>
-  {/foreach}
-    </tr>
-  </thead>
-   {foreach from=$row.rows item=innerRow}
-    <tr>
-   {foreach from=$columnHeaders item=ignore key=header}
-       <td>{$innerRow.$header}</td>
+     <thead class="sticky">
+     <tr>
+       {foreach from=$columnHeaders item=label key=header}
+         <th>{$label.title}</th>
+       {/foreach}
+     </tr>
+     </thead>
+     {foreach from=$row.rows item=innerRow key=rowid}
+     <tr>
+       {foreach from=$columnHeaders item=ignore key=header}
+         <td>{$innerRow.$header}</td>
+       {/foreach}
+     {/foreach}
+     </tr>
    {/foreach}
-  {/foreach}
-    </tr>
-{/foreach}
 </table>
 
   <br />

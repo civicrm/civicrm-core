@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
  */
@@ -132,7 +132,9 @@ class CRM_Price_Form_Preview extends CRM_Core_Form {
         foreach ($group['fields'] as $field) {
           $fieldId = $field['id'];
           $elementName = 'price_' . $fieldId;
-          CRM_Price_BAO_PriceField::addQuickFormElement($this, $elementName, $fieldId, FALSE, $field['is_required']);
+          if (!empty($field['options'])) {
+            CRM_Price_BAO_PriceField::addQuickFormElement($this, $elementName, $fieldId, FALSE, $field['is_required']);
+          }
         }
       }
     }

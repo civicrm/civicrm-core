@@ -8,12 +8,12 @@ class Events {
    *
    * @see EntityListEvent
    */
-  const MAPPINGS = 'actionSchedule.getMappings';
+  const MAPPINGS = 'civi.actionSchedule.getMappings';
 
   /**
    * Prepare the pre-mailing query. This query loads details about
    * the contact/entity so that they're available for mail-merge.
    */
-  const MAILING_QUERY = 'actionSchedule.prepareMailingQuery';
+  const MAILING_QUERY = 'civi.actionSchedule.prepareMailingQuery';
 
 }

@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -221,4 +221,3 @@
   {* Payment processors sometimes need to append something to the end of the billing block. We create a region for
      clarity  - the plan is to move to assigning this through the payment processor to this region *}
 {/crmRegion}
-

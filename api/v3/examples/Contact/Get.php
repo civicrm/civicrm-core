@@ -19,7 +19,8 @@ function contact_get_example() {
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
     return array(
-      'error' => $errorMessage,
+      'is_error' => 1,
+      'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
     );
@@ -40,10 +41,10 @@ function contact_get_expectedresult() {
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
-    'id' => 1,
+    'id' => 3,
     'values' => array(
-      '1' => array(
-        'contact_id' => '1',
+      '3' => array(
+        'contact_id' => '3',
         'contact_type' => 'Individual',
         'contact_sub_type' => '',
         'sort_name' => 'man2@yahoo.com',
@@ -79,10 +80,11 @@ function contact_get_expectedresult() {
         'sic_code' => '',
         'contact_is_deleted' => 0,
         'current_employer' => '',
-        'address_id' => '2',
-        'street_address' => '1 my road',
+        'address_id' => '',
+        'street_address' => '',
         'supplemental_address_1' => '',
         'supplemental_address_2' => '',
+        'supplemental_address_3' => '',
         'city' => '',
         'postal_code_suffix' => '',
         'postal_code' => '',
@@ -101,6 +103,7 @@ function contact_get_expectedresult() {
         'im' => '',
         'worldregion_id' => '',
         'world_region' => '',
+        'languages' => 'English (United States)',
         'individual_prefix' => '',
         'individual_suffix' => '',
         'communication_style' => '',
@@ -108,7 +111,7 @@ function contact_get_expectedresult() {
         'state_province_name' => '',
         'state_province' => '',
         'country' => '',
-        'id' => '1',
+        'id' => '3',
       ),
     ),
   );

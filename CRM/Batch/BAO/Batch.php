@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -648,10 +648,11 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
     }
 
     $from = "civicrm_financial_trxn
-LEFT JOIN civicrm_entity_financial_trxn ON civicrm_entity_financial_trxn.financial_trxn_id = civicrm_financial_trxn.id
+INNER JOIN civicrm_entity_financial_trxn ON civicrm_entity_financial_trxn.financial_trxn_id = civicrm_financial_trxn.id
+INNER JOIN civicrm_contribution ON (civicrm_contribution.id = civicrm_entity_financial_trxn.entity_id
+  AND civicrm_entity_financial_trxn.entity_table='civicrm_contribution')
 LEFT JOIN civicrm_entity_batch ON civicrm_entity_batch.entity_table = 'civicrm_financial_trxn'
 AND civicrm_entity_batch.entity_id = civicrm_financial_trxn.id
-LEFT JOIN civicrm_contribution ON civicrm_contribution.id = civicrm_entity_financial_trxn.entity_id
 LEFT JOIN civicrm_financial_type ON civicrm_financial_type.id = civicrm_contribution.financial_type_id
 LEFT JOIN civicrm_contact contact_a ON contact_a.id = civicrm_contribution.contact_id
 LEFT JOIN civicrm_contribution_soft ON civicrm_contribution_soft.contribution_id = civicrm_contribution.id
@@ -708,6 +709,8 @@ LEFT JOIN civicrm_contribution_soft ON civicrm_contribution_soft.contribution_id
           $values['contribution_date_high'] = $date['to'];
         }
         $searchParams = CRM_Contact_BAO_Query::convertFormValues($values);
+        // @todo the use of defaultReturnProperties means the search will be inefficient
+        // as slow-unneeded properties are included.
         $query = new CRM_Contact_BAO_Query($searchParams,
           CRM_Contribute_BAO_Query::defaultReturnProperties(CRM_Contact_BAO_Query::MODE_CONTRIBUTE,
             FALSE
@@ -720,24 +723,15 @@ LEFT JOIN civicrm_contribution_soft ON civicrm_contribution_soft.contribution_id
     }
     if (!empty($query->_where[0])) {
       $where = implode(' AND ', $query->_where[0]) .
-        " AND civicrm_entity_batch.batch_id IS NULL
-         AND civicrm_entity_financial_trxn.entity_table = 'civicrm_contribution'";
+        " AND civicrm_entity_batch.batch_id IS NULL ";
       $where = str_replace('civicrm_contribution.payment_instrument_id', 'civicrm_financial_trxn.payment_instrument_id', $where);
-      $searchValue = TRUE;
     }
     else {
-      $searchValue = FALSE;
-    }
-
-    if (!$searchValue) {
       if (!$notPresent) {
-        $where = " ( civicrm_entity_batch.batch_id = {$entityID}
-        AND civicrm_entity_batch.entity_table = 'civicrm_financial_trxn'
-        AND civicrm_entity_financial_trxn.entity_table = 'civicrm_contribution') ";
+        $where = " civicrm_entity_batch.batch_id = {$entityID} ";
       }
       else {
-        $where = " ( civicrm_entity_batch.batch_id IS NULL
-        AND civicrm_entity_financial_trxn.entity_table = 'civicrm_contribution')";
+        $where = " civicrm_entity_batch.batch_id IS NULL ";
       }
     }
 

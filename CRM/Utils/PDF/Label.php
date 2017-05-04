@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -30,7 +30,7 @@
  * functionality and smarts to the base PDF_Label.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -255,6 +255,11 @@ class CRM_Utils_PDF_Label extends TCPDF {
     }
   }
 
+  /**
+   * Get the available font names.
+   *
+   * @return array
+   */
   public function getFontNames() {
     // Define labels for TCPDF core fonts
     $fontLabel = array(

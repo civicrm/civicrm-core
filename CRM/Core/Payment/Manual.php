@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Core_Payment_Manual extends CRM_Core_Payment {
 
@@ -84,8 +84,23 @@ class CRM_Core_Payment_Manual extends CRM_Core_Payment {
    * @return array
    */
   public function getPaymentFormFields() {
+    if (!$this->isBackOffice()) {
+      return array();
+    }
+
+    $paymentInstrument = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', $this->getPaymentInstrumentID());
+    if ($paymentInstrument === 'Credit Card') {
+      return array('credit_card_type', 'pan_truncation');
+    }
+    elseif ($paymentInstrument === 'Check') {
+      // Really we should render check_number here, but we need to review how we edit
+      // check_numebr since we expose it as editable on the contribution form,
+      // even though it should only be editable from a transation specific form.
+      return array();
+    }
     return array();
   }
+
   /**
    * Process payment.
    *
@@ -138,6 +153,15 @@ class CRM_Core_Payment_Manual extends CRM_Core_Payment {
   }
 
   /**
+   * Set payment instrument id.
+   *
+   * @param int $paymentInstrumentID
+   */
+  public function setPaymentInstrumentID($paymentInstrumentID) {
+    $this->paymentInstrumentID = $paymentInstrumentID;
+  }
+
+  /**
    * Get the name of the payment type.
    *
    * @return string
@@ -152,7 +176,7 @@ class CRM_Core_Payment_Manual extends CRM_Core_Payment {
    * @return string
    */
   public function getPaymentTypeLabel() {
-    return '';
+    return CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', $this->getPaymentInstrumentID());
   }
 
   /**
@@ -170,6 +194,15 @@ class CRM_Core_Payment_Manual extends CRM_Core_Payment {
    * @return bool
    */
   public function supportsEditRecurringContribution() {
+    return TRUE;
+  }
+
+  /**
+   * Are back office payments supported.
+   *
+   * @return bool
+   */
+  protected function supportsBackOffice() {
     return TRUE;
   }
 

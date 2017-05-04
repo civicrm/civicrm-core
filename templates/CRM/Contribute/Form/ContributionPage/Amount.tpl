@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -272,6 +272,8 @@
        {/if}
      {literal}
      CRM.$(function($) {
+       var psid = $('#price_set_id').val();
+       showHideAmountBlock(psid, 'price_set_id');
        function checked_payment_processors() {
          var ids = [];
          $('.crm-contribution-contributionpage-amount-form-block-payment_processor input[type="checkbox"]').each(function(){

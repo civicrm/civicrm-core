@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -31,7 +31,7 @@
  * abstract class.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
  */
@@ -58,7 +58,7 @@ class CRM_Member_Info extends CRM_Core_Component_Info {
     return array(
       'name' => 'CiviMember',
       'translatedName' => ts('CiviMember'),
-      'title' => 'CiviCRM Membership Engine',
+      'title' => ts('CiviCRM Membership Engine'),
       'search' => 1,
       'showActivitiesInCore' => 1,
     );

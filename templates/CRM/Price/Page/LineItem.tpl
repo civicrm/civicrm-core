@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -78,7 +78,7 @@
     {if $getTaxDetails}
       <td class="right">{$line.line_total|crmMoney}</td>
       {if $line.tax_rate != "" || $line.tax_amount != ""}
-        <td class="right">{$taxTerm} ({$line.tax_rate|string_format:"%.2f"}%)</td>
+        <td class="right">{$taxTerm} ({$line.tax_rate|string_format:"%.3f"}%)</td>
         <td class="right">{$line.tax_amount|crmMoney}</td>
       {else}
         <td></td>

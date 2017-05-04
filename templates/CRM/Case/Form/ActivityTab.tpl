@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -82,7 +82,7 @@
         <th data-data="target_contact_name" class="crm-case-activities-with">{ts}With{/ts}</th>
         <th data-data="source_contact_name" class="crm-case-activities-assignee">{ts}Reporter{/ts}</th>
         <th data-data="assignee_contact_name" class="crm-case-activities-assignee">{ts}Assignee{/ts}</th>
-        <th data-data="status_id" cell-class="crmf-status_id crm-editable" cell-data-type="select" class="crm-case-activities-status">{ts}Status{/ts}</th>
+        <th data-data="status_id" cell-class="crmf-status_id crm-editable" cell-data-type="select" cell-data-refresh=1 class="crm-case-activities-status">{ts}Status{/ts}</th>
         <th data-data="links" data-orderable="false" class="crm-case-activities-status">&nbsp;</th>
       </tr></thead>
     </table>
@@ -111,6 +111,16 @@
       })(CRM.$);
     </script>
   {/literal}
+  <style type="text/css">
+    {crmAPI var='statuses' entity='OptionValue' action='get' return="color,value" option_limit=0 option_group_id="activity_status"}
+    {foreach from=$statuses.values item=status}
+    {if !empty($status.color)}
+    table#case_id_{$caseID} tr.status-id-{$status.value} {ldelim}
+      border-left: 3px solid {$status.color};
+    {rdelim}
+    {/if}
+    {/foreach}
+  </style>
 
 {if isset($isForm) and $isForm}
     </div><!-- /.crm-accordion-body -->

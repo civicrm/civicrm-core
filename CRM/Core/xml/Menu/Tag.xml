@@ -12,10 +12,21 @@
     <weight>25</weight>
   </item>
   <item>
-    <path>civicrm/tag/add</path>
+    <path>civicrm/tag/edit</path>
     <title>New Tag</title>
-    <page_callback>CRM_Tag_Page_Tag</page_callback>
+    <page_callback>CRM_Tag_Form_Edit</page_callback>
     <path_arguments>action=add</path_arguments>
+    <access_arguments>administer CiviCRM;manage tags</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/tag/merge</path>
+    <title>Merge Tags</title>
+    <page_callback>CRM_Tag_Form_Merge</page_callback>
+    <access_arguments>administer CiviCRM;manage tags</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/ajax/tagTree</path>
+    <page_callback>CRM_Admin_Page_AJAX::getTagTree</page_callback>
     <access_arguments>administer CiviCRM;manage tags</access_arguments>
   </item>
 </menu>

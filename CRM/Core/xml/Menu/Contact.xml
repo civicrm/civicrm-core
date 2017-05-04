@@ -121,6 +121,7 @@
      <path>civicrm/contact/merge</path>
      <title>Merge Contact</title>
      <page_callback>CRM_Contact_Form_Merge</page_callback>
+     <access_arguments>merge duplicate contacts</access_arguments>
   </item>
   <item>
      <path>civicrm/contact/email</path>

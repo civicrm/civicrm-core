@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
  */
@@ -112,6 +112,13 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
             'type' => CRM_Utils_Type::T_STRING,
           ),
         ),
+        'order_bys' => array(
+          'sort_name_a' => array(
+            'title' => ts('Contact A'),
+            'name' => 'sort_name',
+            'default_weight' => '1',
+          ),
+        ),
         'grouping' => 'contact_a_fields',
       ),
       'civicrm_contact_b' => array(
@@ -153,6 +160,13 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => $contact_type,
             'type' => CRM_Utils_Type::T_STRING,
+          ),
+        ),
+        'order_bys' => array(
+          'sort_name_b' => array(
+            'title' => ts('Contact B'),
+            'name' => 'sort_name',
+            'default_weight' => '2',
           ),
         ),
         'grouping' => 'contact_b_fields',
@@ -220,6 +234,16 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
             'default' => TRUE,
           ),
         ),
+        'order_bys' => array(
+          'label_a_b' => array(
+            'title' => ts('Relationship A-B'),
+            'name' => 'label_a_b',
+          ),
+          'label_b_A' => array(
+            'title' => ts('Relationship B-A'),
+            'name' => 'label_b_a',
+          ),
+        ),
         'grouping' => 'relation-fields',
       ),
       'civicrm_relationship' => array(
@@ -263,7 +287,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
           'relationship_type_id' => array(
             'title' => ts('Relationship'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, 'null', NULL, NULL, TRUE),
+            'options' => CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, NULL, NULL, NULL, TRUE),
             'type' => CRM_Utils_Type::T_INT,
           ),
           'start_date' => array(
@@ -554,7 +578,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
     // For displaying relationship status.
     if (!$isStatusFilter && $relStatus) {
       $statistics['filters'][] = array(
-        'title' => 'Relationship Status',
+        'title' => ts('Relationship Status'),
         'value' => $relStatus,
       );
     }
@@ -579,10 +603,6 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
     }
 
     $this->_groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, $groupBy);
-  }
-
-  public function orderBy() {
-    $this->_orderBy = " ORDER BY {$this->_aliases['civicrm_contact']}.sort_name, {$this->_aliases['civicrm_contact_b']}.sort_name ";
   }
 
   public function postProcess() {

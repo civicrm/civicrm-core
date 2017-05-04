@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,7 +25,7 @@
 *}
 {* CiviCase Configuration Help - displayed when component is enabled but not yet configured. *}
 
-{capture assign=docLink}{docURL page="user/case-management/setup" text="CiviCase Setup documentation"}{/capture}
+{capture assign=docLink}{docURL page="user/case-management/set-up" text="CiviCase Setup documentation"}{/capture}
 
 <div class="messages status no-popup">
       <div class="icon inform-icon"></div>&nbsp;

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -1110,6 +1110,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     $joinDate = $startDate = $endDate = NULL;
     $membershipTypes = $membership = $calcDate = array();
     $membershipType = NULL;
+    $paymentInstrumentID = $this->_paymentProcessor['object']->getPaymentInstrumentID();
 
     $mailSend = FALSE;
     $formValues = $this->setPriceSetParameters($formValues);
@@ -1139,6 +1140,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
 
     $config = CRM_Core_Config::singleton();
 
+    // @todo this is no longer required if we convert some date fields.
     $this->convertDateFieldsToMySQL($formValues);
 
     $membershipTypeValues = array();
@@ -1230,8 +1232,19 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       'start_date' => 'startDate',
       'end_date' => 'endDate',
     );
+    $dateModified = FALSE;
     foreach ($dateTypes as $dateField => $dateVariable) {
+      if (!empty($params['id'])) {
+        $membershipDate = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $params['id'], $dateField, 'id');
+        if ($membershipDate != date('Y-m-d', strtotime($formValues[$dateField]))) {
+          $dateModified = TRUE;
+        }
+      }
       $$dateVariable = CRM_Utils_Date::processDate($formValues[$dateField]);
+    }
+    //skip status calculation on update if none of the dates are modified.
+    if (!empty($params['id']) && empty($params['is_override']) && !$dateModified) {
+      $params['skipStatusCal'] = TRUE;
     }
 
     $memTypeNumTerms = empty($termsByType) ? CRM_Utils_Array::value('num_terms', $formValues) : NULL;
@@ -1295,6 +1308,8 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         'check_number',
         'campaign_id',
         'receive_date',
+        'card_type_id',
+        'pan_truncation',
       );
 
       foreach ($recordContribution as $f) {
@@ -1314,7 +1329,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       }
 
       if (empty($params['is_override']) &&
-        CRM_Utils_Array::value('contribution_status_id', $params) == array_search('Pending', CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name'))
+        CRM_Utils_Array::value('contribution_status_id', $params) != array_search('Completed', $allContributionStatus)
       ) {
         $params['status_id'] = array_search('Pending', $allMemberStatus);
         $params['skipStatusCal'] = TRUE;
@@ -1341,6 +1356,10 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     if ($this->_mode) {
       $params['total_amount'] = CRM_Utils_Array::value('total_amount', $formValues, 0);
 
+      //CRM-20264 : Store CC type and number (last 4 digit) during backoffice or online payment
+      $params['card_type_id'] = CRM_Utils_Array::value('card_type_id', $this->_params);
+      $params['pan_truncation'] = CRM_Utils_Array::value('pan_truncation', $this->_params);
+
       if (!$isQuickConfig) {
         $params['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet',
           $this->_priceSetId,
@@ -1350,11 +1369,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       else {
         $params['financial_type_id'] = CRM_Utils_Array::value('financial_type_id', $formValues);
       }
-
-      // @todo - test removing this line. The beginPostProcess Function should have done it for us.
-      $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($formValues['payment_processor_id'],
-        $this->_mode
-      );
 
       //get the payment processor id as per mode. Try removing in favour of beginPostProcess.
       $params['payment_processor_id'] = $formValues['payment_processor_id'] = $this->_paymentProcessor['id'];
@@ -1400,7 +1414,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         $financialType->id = $params['financial_type_id'];
         $financialType->find(TRUE);
         $this->_params = $formValues;
-        $paymentParams['payment_instrument_id'] = $this->_paymentProcessor['payment_instrument_id'];
+
         $contribution = CRM_Contribute_Form_Contribution_Confirm::processFormContribution($this,
           $paymentParams,
           NULL,
@@ -1412,7 +1426,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
             'contribution_page_id' => CRM_Utils_Array::value('contribution_page_id', $formValues),
             'source' => CRM_Utils_Array::value('source', $paymentParams, CRM_Utils_Array::value('description', $paymentParams)),
             'thankyou_date' => CRM_Utils_Array::value('thankyou_date', $paymentParams),
-            'payment_instrument_id' => $this->_paymentProcessor['payment_instrument_id'],
+            'payment_instrument_id' => $paymentInstrumentID,
           ),
           $financialType,
           FALSE,
@@ -1534,7 +1548,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
           // of a single path!
           unset($membershipParams['lineItems']);
         }
-
+        $membershipParams['payment_instrument_id'] = $paymentInstrumentID;
         $membership = CRM_Member_BAO_Membership::create($membershipParams, $ids);
         $params['contribution'] = CRM_Utils_Array::value('contribution', $membershipParams);
         unset($params['lineItems']);

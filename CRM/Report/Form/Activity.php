@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Report_Form_Activity extends CRM_Report_Form {
   protected $_selectAliasesTotal = array();
@@ -256,6 +256,11 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
           'details' => array(
             'title' => ts('Activity Details'),
           ),
+          'priority_id' => array(
+            'title' => ts('Priority'),
+            'default' => TRUE,
+            'type' => CRM_Utils_Type::T_STRING,
+          ),
         ),
         'filters' => array(
           'activity_date_time' => array(
@@ -277,6 +282,12 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
           'details' => array(
             'title' => ts('Activity Details'),
             'type' => CRM_Utils_Type::T_TEXT,
+          ),
+          'priority_id' => array(
+            'title' => ts('Activity Priority'),
+            'type' => CRM_Utils_Type::T_STRING,
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => CRM_Core_PseudoConstant::get('CRM_Activity_DAO_Activity', 'priority_id'),
           ),
         ),
         'order_bys' => array(
@@ -716,7 +727,7 @@ FROM civireport_activity_temp_target tar
 GROUP BY civicrm_activity_id $having {$this->_orderBy}";
     $select = 'AS addtogroup_contact_id';
     $query = str_ireplace('AS civicrm_contact_contact_target_id', $select, $query);
-    $dao = CRM_Core_DAO::executeQuery($query);
+    $dao = $this->executeReportQuery($query);
 
     $contactIDs = array();
     // Add resulting contacts to group
@@ -791,9 +802,9 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
     $this->customDataFrom();
     $this->where('target');
     $insertCols = implode(',', $this->_selectAliases);
-    $tempQuery = "CREATE TEMPORARY TABLE civireport_activity_temp_target CHARACTER SET utf8 COLLATE utf8_unicode_ci AS
+    $tempQuery = "CREATE TEMPORARY TABLE civireport_activity_temp_target {$this->_databaseAttributes} AS
 {$this->_select} {$this->_from} {$this->_where} ";
-    CRM_Core_DAO::executeQuery($tempQuery);
+    $this->executeReportQuery($tempQuery);
 
     // 2. add new columns to hold assignee and source results
     // fixme: add when required
@@ -808,7 +819,7 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
   ADD COLUMN civicrm_phone_contact_source_phone VARCHAR(128),
   ADD COLUMN civicrm_email_contact_assignee_email VARCHAR(128),
   ADD COLUMN civicrm_email_contact_source_email VARCHAR(128)";
-    CRM_Core_DAO::executeQuery($tempQuery);
+    $this->executeReportQuery($tempQuery);
 
     // 3. fill temp table with assignee results
     $this->buildACLClause(array('civicrm_contact_assignee'));
@@ -820,7 +831,7 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
     $tempQuery = "INSERT INTO civireport_activity_temp_target ({$insertCols})
 {$this->_select}
 {$this->_from} {$this->_where}";
-    CRM_Core_DAO::executeQuery($tempQuery);
+    $this->executeReportQuery($tempQuery);
 
     // 4. fill temp table with source results
     $this->buildACLClause(array('civicrm_contact_source'));
@@ -832,7 +843,7 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
     $tempQuery = "INSERT INTO civireport_activity_temp_target ({$insertCols})
 {$this->_select}
 {$this->_from} {$this->_where}";
-    CRM_Core_DAO::executeQuery($tempQuery);
+    $this->executeReportQuery($tempQuery);
 
     // 5. show final result set from temp table
     $rows = array();
@@ -877,6 +888,7 @@ FROM civireport_activity_temp_target tar
     $entryFound = FALSE;
     $activityType = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE);
     $activityStatus = CRM_Core_PseudoConstant::activityStatus();
+    $priority = CRM_Core_PseudoConstant::get('CRM_Activity_DAO_Activity', 'priority_id');
     $viewLinks = FALSE;
     $context = CRM_Utils_Request::retrieve('context', 'String', $this, FALSE, 'report');
     $actUrl = '';
@@ -993,6 +1005,13 @@ FROM civireport_activity_temp_target tar
         }
       }
 
+      if (array_key_exists('civicrm_activity_priority_id', $row)) {
+        if ($value = $row['civicrm_activity_priority_id']) {
+          $rows[$rowNum]['civicrm_activity_priority_id'] = $priority[$value];
+          $entryFound = TRUE;
+        }
+      }
+
       if (array_key_exists('civicrm_activity_details', $row) && $this->_outputMode == 'html') {
         if ($value = $row['civicrm_activity_details']) {
           $fullDetails = $rows[$rowNum]['civicrm_activity_details'];
@@ -1060,7 +1079,7 @@ FROM civireport_activity_temp_target tar
 
       // initialize array of total counts
       $totals = array();
-      $dao = CRM_Core_DAO::executeQuery($query);
+      $dao = $this->executeReportQuery($query);
       while ($dao->fetch()) {
         // let $this->_alterDisplay translate any integer ids to human-readable values.
         $rows[0] = $dao->toArray();

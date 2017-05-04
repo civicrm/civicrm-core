@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
 
@@ -58,8 +58,7 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
     $ids = $objects = $input = array();
 
     if ($x_subscription_id) {
-      //Approved
-
+      // Presence of the id means it is approved.
       $input['component'] = $component;
 
       // load post vars in $input
@@ -149,7 +148,7 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
       $contribution->financial_type_id = $objects['contributionType']->id;
       $contribution->contribution_page_id = $ids['contributionPage'];
       $contribution->contribution_recur_id = $ids['contributionRecur'];
-      $contribution->receive_date = $now;
+      $contribution->receive_date = $input['receive_date'];
       $contribution->currency = $objects['contribution']->currency;
       $contribution->payment_instrument_id = $objects['contribution']->payment_instrument_id;
       $contribution->amount_level = $objects['contribution']->amount_level;
@@ -164,12 +163,13 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
 
     $this->checkMD5($paymentProcessorObject, $input);
 
+    $isFirstOrLastRecurringPayment = FALSE;
     if ($input['response_code'] == 1) {
       // Approved
       if ($first) {
         $recur->start_date = $now;
         $recur->trxn_id = $recur->processor_id;
-        $this->_isFirstOrLastRecurringPayment = CRM_Core_Payment::RECURRING_PAYMENT_START;
+        $isFirstOrLastRecurringPayment = CRM_Core_Payment::RECURRING_PAYMENT_START;
       }
       $statusName = 'In Progress';
       if (($recur->installments > 0) &&
@@ -178,7 +178,7 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
         // this is the last payment
         $statusName = 'Completed';
         $recur->end_date = $now;
-        $this->_isFirstOrLastRecurringPayment = CRM_Core_Payment::RECURRING_PAYMENT_END;
+        $isFirstOrLastRecurringPayment = CRM_Core_Payment::RECURRING_PAYMENT_END;
       }
       $recur->modified_date = $now;
       $recur->contribution_status_id = array_search($statusName, $contributionStatus);
@@ -210,11 +210,23 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
     }
 
     $this->completeTransaction($input, $ids, $objects, $transaction, $recur);
+
+    // Only Authorize.net does this so it is on the a.net class. If there is a need for other processors
+    // to do this we should make it available via the api, e.g as a parameter, changing the nuance
+    // from isSentReceipt to an array of which receipts to send.
+    // Note that there is site-by-site opinions on which notifications are good to send.
+    if ($isFirstOrLastRecurringPayment) {
+      CRM_Contribute_BAO_ContributionRecur::sendRecurringStartOrEndNotification($ids, $recur,
+        $isFirstOrLastRecurringPayment);
+    }
+
   }
 
   /**
-   * @param $input
-   * @param $ids
+   * Get the input from passed in fields.
+   *
+   * @param array $input
+   * @param array $ids
    *
    * @return bool
    */
@@ -227,6 +239,8 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
     $input['response_reason_text'] = $this->retrieve('x_response_reason_text', 'String', FALSE);
     $input['subscription_paynum'] = $this->retrieve('x_subscription_paynum', 'Integer', FALSE, 0);
     $input['trxn_id'] = $this->retrieve('x_trans_id', 'String', FALSE);
+    $input['trxn_id'] = $this->retrieve('x_trans_id', 'String', FALSE);
+    $input['receive_date'] = $this->retrieve('receive_date', 'String', FALSE, 'now');
 
     if ($input['trxn_id']) {
       $input['is_test'] = 0;
@@ -258,8 +272,12 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
   }
 
   /**
-   * @param $ids
-   * @param $input
+   * Get ids from input.
+   *
+   * @param array $ids
+   * @param array $input
+   *
+   * @throws \CRM_Core_Exception
    */
   public function getIDs(&$ids, &$input) {
     $ids['contact'] = $this->retrieve('x_cust_id', 'Integer', FALSE, 0);
@@ -298,8 +316,6 @@ INNER JOIN civicrm_contribution co ON co.contribution_recur_id = cr.id
       // FIXME: figure out fields for event
     }
     else {
-      // get the optional ids
-
       // Get membershipId. Join with membership payment table for additional checks
       $sql = "
     SELECT m.id

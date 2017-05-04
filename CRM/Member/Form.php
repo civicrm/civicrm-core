@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -167,8 +167,8 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
         $this->_processors, TRUE,
         array('onChange' => "buildAutoRenew( null, this.value, '{$this->_mode}');")
       );
-      CRM_Core_Payment_Form::buildPaymentForm($this, $this->_paymentProcessor, FALSE, TRUE);
     }
+    CRM_Core_Payment_Form::buildPaymentForm($this, $this->_paymentProcessor, FALSE, TRUE, $this->getDefaultPaymentInstrumentId());
     // Build the form for auto renew. This is displayed when in credit card mode or update mode.
     // The reason for showing it in update mode is not that clear.
     if ($this->_mode || ($this->_action & CRM_Core_Action::UPDATE)) {
@@ -189,7 +189,6 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
         ts('Membership renewed automatically')
       );
 
-      $this->assignPaymentRelatedVariables();
     }
     $this->assign('autoRenewOptions', json_encode($this->membershipTypeRenewalStatus));
 
@@ -301,10 +300,6 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
       if (isset($params[$paramKey]) && !isset($this->$classVar)) {
         $this->$classVar = $params[$paramKey];
       }
-    }
-
-    if ($this->_mode) {
-      $this->assignPaymentRelatedVariables();
     }
 
     if ($this->_id) {
@@ -441,6 +436,7 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
    * @param array $formValues
    */
   public function testSubmit($formValues) {
+    $this->setContextVariables($formValues);
     $this->_memType = $formValues['membership_type_id'][1];
     $this->_params = $formValues;
     $this->submit();

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,9 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -65,53 +63,21 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
   /**
    * Get the domain BAO.
    *
-   * @param null $reset
+   * @param bool $reset
    *
-   * @return CRM_Core_BAO_Domain|null
+   * @return \CRM_Core_BAO_Domain
+   * @throws \CRM_Core_Exception
    */
-  public static function &getDomain($reset = NULL) {
+  public static function getDomain($reset = NULL) {
     static $domain = NULL;
     if (!$domain || $reset) {
       $domain = new CRM_Core_BAO_Domain();
       $domain->id = CRM_Core_Config::domainID();
       if (!$domain->find(TRUE)) {
-        CRM_Core_Error::fatal();
+        throw new CRM_Core_Exception('No domain in DB');
       }
     }
     return $domain;
-  }
-
-  /**
-   * Change active domain (ie. to perform a temporary action) such as changing
-   * config for all domains
-   *
-   * Switching around the global domain variable is very risky business. This
-   * is ONLY used as a hack to allow CRM_Core_BAO_Setting::setItems to manipulate
-   * the civicrm_domain.config_backend in multiple domains. When/if config_backend
-   * goes away, this hack should be removed.
-   *
-   * @param int $domainID
-   *   Id for domain you want to set as current.
-   * @deprecated
-   * @see http://issues.civicrm.org/jira/browse/CRM-11204
-   */
-  public static function setDomain($domainID) {
-    CRM_Core_Config::domainID($domainID);
-    self::getDomain($domainID);
-    CRM_Core_Config::singleton(TRUE, TRUE);
-  }
-
-  /**
-   * Reset domain to default (ie. as loaded from settings). This is the
-   * counterpart to CRM_Core_BAO_Domain::setDomain.
-   *
-   * @deprecated
-   * @see CRM_Core_BAO_Domain::setDomain
-   */
-  public static function resetDomain() {
-    CRM_Core_Config::domainID(NULL, TRUE);
-    self::getDomain(NULL, TRUE);
-    CRM_Core_Config::singleton(TRUE, TRUE);
   }
 
   /**
@@ -317,6 +283,30 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
       }
     }
     return $siteContacts;
+  }
+
+  /**
+   * CRM-20308 & CRM-19657
+   * Return domain information / user information for the useage in receipts
+   * Try default from adress then fall back to using logged in user details
+   */
+  public static function getDefaultReceiptFrom() {
+    $domain = civicrm_api3('domain', 'getsingle', array('id' => CRM_Core_Config::domainID()));
+    if (!empty($domain['from_email'])) {
+      return array($domain['from_name'], $domain['from_email']);
+    }
+    if (!empty($domain['domain_email'])) {
+      return array($domain['name'], $domain['domain_email']);
+    }
+    $userID = CRM_Core_Session::singleton()->getLoggedInContactID();
+    $userName = '';
+    $userEmail = '';
+    if (!empty($userID)) {
+      list($userName, $userEmail) = CRM_Contact_BAO_Contact_Location::getEmailDetails($userID);
+    }
+    // If still empty fall back to the logged in user details.
+    // return empty values no matter what.
+    return array($userName, $userEmail);
   }
 
 }

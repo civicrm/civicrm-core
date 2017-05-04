@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -58,7 +58,7 @@
                 <td class="label">{$form.customTemplateDir.label}</td>
                 <td>{$form.customTemplateDir.html|crmAddClass:'huge40'}<br />
                     <span class="description">{ts}Path where site specific templates are stored if any. This directory is searched first if set. Custom JavaScript code can be added to templates by creating files named <em>templateFile.extra.tpl</em>.{/ts} {docURL page="Customize Built-in Screens" resource="wiki"}</span><br />
-                    <span class="description">{ts}CiviCase configuration files can also be stored in this custom path.{/ts} {docURL page="user/case-management/setup"}</span>
+                    <span class="description">{ts}CiviCase configuration files can also be stored in this custom path.{/ts} {docURL page="user/case-management/set-up"}</span>
                 </td>
             </tr>
             <tr class="crm-path-form-block-customPHPPathDir">

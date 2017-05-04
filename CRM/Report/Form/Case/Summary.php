@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Report_Form_Case_Summary extends CRM_Report_Form {
 
@@ -61,7 +61,7 @@ class CRM_Report_Form_Case_Summary extends CRM_Report_Form {
         'fields' => array(
           'client_name' => array(
             'name' => 'sort_name',
-            'title' => ts('Client'),
+            'title' => ts('Contact Name'),
             'required' => TRUE,
           ),
           'id' => array(
@@ -69,6 +69,13 @@ class CRM_Report_Form_Case_Summary extends CRM_Report_Form {
             'required' => TRUE,
           ),
         ),
+        'order_bys' => array(
+          'client_name' => array(
+            'title' => ts('Contact Name'),
+            'name' => 'sort_name',
+          ),
+        ),
+        'grouping'  => 'case-fields',
       ),
       'civicrm_case' => array(
         'dao' => 'CRM_Case_DAO_Case',
@@ -139,6 +146,18 @@ class CRM_Report_Form_Case_Summary extends CRM_Report_Form {
             'default' => 0,
           ),
         ),
+        'order_bys'  => array(
+          'start_date' => array(
+            'title' => ts('Start Date'),
+          ),
+          'end_date' => array(
+            'title' => ts('End Date'),
+          ),
+          'status_id' => array(
+            'title' => ts('Status'),
+          ),
+        ),
+        'grouping'  => 'case-fields',
       ),
       'civicrm_contact' => array(
         'dao' => 'CRM_Contact_DAO_Contact',

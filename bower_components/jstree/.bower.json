@@ -1,0 +1,42 @@
+{
+  "name": "jstree",
+  "version": "3.3.4",
+  "main": [
+    "./dist/jstree.js",
+    "./dist/themes/default/style.css"
+  ],
+  "ignore": [
+    "**/.*",
+    "docs",
+    "demo",
+    "libs",
+    "node_modules",
+    "test",
+    "libs",
+    "jstree.jquery.json",
+    "gruntfile.js",
+    "package.json",
+    "bower.json",
+    "component.json",
+    "LICENCE-MIT",
+    "README.md"
+  ],
+  "dependencies": {
+    "jquery": ">=1.9.1"
+  },
+  "keywords": [
+    "ui",
+    "tree",
+    "jstree"
+  ],
+  "homepage": "https://github.com/vakata/jstree",
+  "_release": "3.3.4",
+  "_resolution": {
+    "type": "version",
+    "tag": "3.3.4",
+    "commit": "a6a0d0dfb784d5ef0b3415d847ac7b6bfbab1f16"
+  },
+  "_source": "https://github.com/vakata/jstree.git",
+  "_target": "~3",
+  "_originalSource": "jstree"
+}

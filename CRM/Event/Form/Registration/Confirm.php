@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,7 +27,7 @@
 
 /**
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -430,6 +430,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       $this->set('finalAmount', $this->_amount);
     }
     $participantCount = array();
+    $taxAmount = $totalTaxAmount = 0;
 
     //unset the skip participant from params.
     //build the $participantCount array.
@@ -442,7 +443,10 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       elseif ($participantNum) {
         $participantCount[$participantNum] = 'participant';
       }
-
+      $totalTaxAmount += CRM_Utils_Array::value('tax_amount', $record, 0);
+      if (CRM_Utils_Array::value('is_primary', $record)) {
+        $taxAmount = &$params[$participantNum]['tax_amount'];
+      }
       //lets get additional participant id to cancel.
       if ($this->_allowConfirmation && is_array($cancelledIds)) {
         $additonalId = CRM_Utils_Array::value('participant_id', $record);
@@ -451,7 +455,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         }
       }
     }
-
+    $taxAmount = $totalTaxAmount;
     $payment = $registerByID = $primaryCurrencyID = $contribution = NULL;
     $paymentObjError = ts('The system did not record payment details for this payment and so could not process the transaction. Please report this error to the site administrator.');
 
@@ -569,14 +573,10 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           }
 
           if (is_object($payment)) {
-            try {
-              $result = $payment->doPayment($value);
-              $value = array_merge($value, $result);
-            }
-            catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
-              CRM_Core_Session::singleton()->setStatus($e->getMessage());
-              CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/event/register', "id={$this->_eventId}"));
-            }
+            // Not quite sure why we don't just user $value since it contains the data
+            // from result
+            // @todo ditch $result & retest.
+            list($result, $value) = $this->processPayment($payment, $value);
           }
           else {
             CRM_Core_Error::fatal($paymentObjError);
@@ -639,9 +639,9 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           !$this->_allowWaitlist && !$this->_requireApproval
         ) {
           // transactionID & receive date required while building email template
-          $this->assign('trxn_id', $value['trxn_id']);
-          $this->assign('receive_date', CRM_Utils_Date::mysqlToIso($value['receive_date']));
-          $this->set('receiveDate', CRM_Utils_Date::mysqlToIso($value['receive_date']));
+          $this->assign('trxn_id', CRM_Utils_Array::value('trxn_id', $value));
+          $this->assign('receive_date', CRM_Utils_Date::mysqlToIso(CRM_Utils_Array::value('receive_date', $value)));
+          $this->set('receiveDate', CRM_Utils_Date::mysqlToIso(CRM_Utils_Array::value('receive_date', $value)));
           $this->set('trxnId', CRM_Utils_Array::value('trxn_id', $value));
         }
       }
@@ -820,7 +820,8 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           // call postprocess hook before leaving
           $this->postProcessHook();
           // this does not return
-          $payment->doPayment($primaryParticipant, 'event');
+
+          $this->processPayment($payment, $primaryParticipant);
         }
         else {
           CRM_Core_Error::fatal($paymentObjError);
@@ -959,6 +960,9 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       $params['amount_level'] = $params['amount_level'] . ts(' (multiple participants)') . CRM_Core_DAO::VALUE_SEPARATOR;
     }
 
+    // CRM-20264: fetch CC type ID and number (last 4 digit) and assign it back to $params
+    CRM_Contribute_Form_AbstractEditPayment::formatCreditCardDetails($params);
+
     $contribParams = array(
       'contact_id' => $contactID,
       'financial_type_id' => !empty($form->_values['event']['financial_type_id']) ? $form->_values['event']['financial_type_id'] : $params['financial_type_id'],
@@ -971,6 +975,8 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       'source' => !empty($params['participant_source']) ? $params['participant_source'] : $params['description'],
       'is_pay_later' => CRM_Utils_Array::value('is_pay_later', $params, 0),
       'campaign_id' => CRM_Utils_Array::value('campaign_id', $params),
+      'card_type_id' => CRM_Utils_Array::value('card_type_id', $params),
+      'pan_truncation' => CRM_Utils_Array::value('pan_truncation', $params),
     );
 
     if ($paymentProcessor) {
@@ -1290,14 +1296,37 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     $_REQUEST['id'] = $form->_eventId = $params['id'];
     $form->controller = new CRM_Event_Controller_Registration();
     $form->_params = $params['params'];
+    $form->_amount = $form->_totalAmount = CRM_Utils_Array::value('totalAmount', $params);
     $form->set('params', $params['params']);
     $form->_values['custom_pre_id'] = array();
     $form->_values['custom_post_id'] = array();
+    $form->_values['event'] = CRM_Utils_Array::value('event', $params);
     $form->_contributeMode = $params['contributeMode'];
     $eventParams = array('id' => $params['id']);
     CRM_Event_BAO_Event::retrieve($eventParams, $form->_values['event']);
     $form->set('registerByID', $params['registerByID']);
     $form->postProcess();
+  }
+
+  /**
+   * Process the payment, redirecting back to the page on error.
+   *
+   * @param $payment
+   * @param $value
+   *
+   * @return array
+   */
+  private function processPayment($payment, $value) {
+    try {
+      $result = $payment->doPayment($value, 'event');
+      return array($result, $value);
+    }
+    catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
+      Civi::log()->error('Payment processor exception: ' . $e->getMessage());
+      CRM_Core_Session::singleton()->setStatus($e->getMessage());
+      CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/event/register', "id={$this->_eventId}"));
+    }
+    return array();
   }
 
 }

@@ -26,7 +26,8 @@ function activity_get_example() {
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
     return array(
-      'error' => $errorMessage,
+      'is_error' => 1,
+      'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
     );
@@ -51,7 +52,7 @@ function activity_get_expectedresult() {
     'values' => array(
       '0' => array(
         'id' => '1',
-        'activity_type_id' => '51',
+        'activity_type_id' => '9999',
         'subject' => 'test activity type id',
         'activity_date_time' => '2011-06-02 14:36:13',
         'duration' => '120',
@@ -63,6 +64,7 @@ function activity_get_expectedresult() {
         'is_auto' => 0,
         'is_current_revision' => '1',
         'is_deleted' => 0,
+        'is_star' => 0,
         'assignee_contact_id' => array(
           '0' => '3',
         ),
@@ -114,6 +116,7 @@ function activity_get_expectedresult() {
               'street_address' => '',
               'supplemental_address_1' => '',
               'supplemental_address_2' => '',
+              'supplemental_address_3' => '',
               'city' => '',
               'postal_code_suffix' => '',
               'postal_code' => '',
@@ -132,6 +135,7 @@ function activity_get_expectedresult() {
               'im' => '',
               'worldregion_id' => '',
               'world_region' => '',
+              'languages' => 'English (United States)',
               'individual_prefix' => 'Mr.',
               'individual_suffix' => 'II',
               'communication_style' => '',

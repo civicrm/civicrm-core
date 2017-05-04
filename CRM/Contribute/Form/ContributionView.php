@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -219,6 +219,21 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
       NULL,
       $recentOther
     );
+    $contributionStatus = $status[$values['contribution_status_id']];
+    if (in_array($contributionStatus, array('Partially paid', 'Pending refund'))
+        || ($contributionStatus == 'Pending' && $values['is_pay_later'])
+        ) {
+      if ($contributionStatus == 'Pending refund') {
+        $this->assign('paymentButtonName', ts('Record Refund'));
+      }
+      else {
+        $this->assign('paymentButtonName', ts('Record Payment'));
+      }
+      $this->assign('addRecordPayment', TRUE);
+      $this->assign('contactId', $values['contact_id']);
+      $this->assign('componentId', $id);
+      $this->assign('component', 'contribution');
+    }
   }
 
   /**

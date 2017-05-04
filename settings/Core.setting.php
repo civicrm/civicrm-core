@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
  */
@@ -127,7 +127,7 @@ return array(
     'name' => 'address_format',
     'type' => 'String',
     'html_type' => 'TextArea',
-    'default' => "{contact.address_name}\n{contact.street_address}\n{contact.supplemental_address_1}\n{contact.supplemental_address_2}\n{contact.city}{, }{contact.state_province}{ }{contact.postal_code}\n{contact.country}",
+    'default' => "{contact.address_name}\n{contact.street_address}\n{contact.supplemental_address_1}\n{contact.supplemental_address_2}\n{contact.supplemental_address_3}\n{contact.city}{, }{contact.state_province}{ }{contact.postal_code}\n{contact.country}",
     'add' => '4.1',
     'title' => 'Address Format',
     'is_domain' => 1,
@@ -141,7 +141,7 @@ return array(
     'name' => 'mailing_format',
     'type' => 'String',
     'html_type' => 'Text',
-    'default' => "{contact.addressee}\n{contact.street_address}\n{contact.supplemental_address_1}\n{contact.supplemental_address_2}\n{contact.city}{, }{contact.state_province}{ }{contact.postal_code}\n{contact.country}",
+    'default' => "{contact.addressee}\n{contact.street_address}\n{contact.supplemental_address_1}\n{contact.supplemental_address_2}\n{contact.supplemental_address_3}\n{contact.city}{, }{contact.state_province}{ }{contact.postal_code}\n{contact.country}",
     'add' => '4.1',
     'title' => 'Mailing Format',
     'is_domain' => 1,
@@ -436,6 +436,27 @@ return array(
     'is_contact' => 0,
     'description' => "If enabled, CiviCRM sends PDF receipt as an attachment during event signup or online contribution.",
     'help_text' => NULL,
+  ),
+  'recordGeneratedLetters' => array(
+    'group_name' => 'CiviCRM Preferences',
+    'group' => 'core',
+    'name' => 'recordGeneratedLetters',
+    'type' => 'String',
+    'quick_form_type' => 'Select',
+    'html_type' => 'Select',
+    'html_attributes' => array(
+      'class' => 'crm-select2',
+    ),
+    'default' => 'multiple',
+    'add' => '4.7',
+    'title' => 'Record generated letters',
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => 'When generating a letter (PDF/Word) via mail-merge, how should the letter be recorded?',
+    'help_text' => NULL,
+    'pseudoconstant' => array(
+      'callback' => 'CRM_Contact_Form_Task_PDFLetterCommon::getLoggingOptions',
+    ),
   ),
   'wkhtmltopdfPath' => array(
     'group_name' => 'CiviCRM Preferences',
@@ -917,5 +938,19 @@ return array(
     'is_contact' => 0,
     'description' => ts('Default to only loading matches against this number of contacts'),
     'help_text' => ts('Deduping larger databases can crash the server. By configuring a limit other than 0 here the dedupe query will only search for matches against a limited number of contacts.'),
+  ),
+  'syncCMSEmail' => array(
+    'group_name' => 'CiviCRM Preferences',
+    'group' => 'core',
+    'name' => 'syncCMSEmail',
+    'type' => 'Boolean',
+    'quick_form_type' => 'YesNo',
+    'default' => 1,
+    'add' => '4.7',
+    'title' => 'Sync CMS Email',
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => 'If enabled, then CMS email id will be syncronised with CiviCRM contacts\'s primary email.',
+    'help_text' => NULL,
   ),
 );

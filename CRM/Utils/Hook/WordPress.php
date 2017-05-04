@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Utils_Hook_WordPress extends CRM_Utils_Hook {
 
@@ -83,7 +83,7 @@ class CRM_Utils_Hook_WordPress extends CRM_Utils_Hook {
    *
    * @return mixed
    */
-  public function invoke(
+  public function invokeViaUF(
     $numParams,
     &$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6,
     $fnSuffix
@@ -179,7 +179,7 @@ class CRM_Utils_Hook_WordPress extends CRM_Utils_Hook {
         if (!empty($config->customPHPPathDir) &&
           file_exists("{$config->customPHPPathDir}/civicrmHooks.php")
         ) {
-          @include_once 'civicrmHooks.php';
+          @include_once "{$config->customPHPPathDir}/civicrmHooks.php";
         }
 
         // initialise with the pre-existing 'wordpress' prefix

@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -80,7 +80,7 @@
         </td>
       {/if}
       <td class="crm-case-caseview-case_subject label">
-        <span class="crm-case-summary-label">{ts}Subject{/ts}:</span>&nbsp;{$caseDetails.case_subject}
+        <span class="crm-case-summary-label">{ts}Subject{/ts}:</span>&nbsp;<span class="crm-editable" data-field="subject">{$caseDetails.case_subject}</span>
       </td>
       <td class="crm-case-caseview-case_type label">
         <span class="crm-case-summary-label">{ts}Type{/ts}:</span>&nbsp;{$caseDetails.case_type}&nbsp;<a class="crm-hover-button crm-popup"  href="{crmURL p='civicrm/case/activity' q="action=add&reset=1&cid=`$contactId`&caseid=`$caseId`&selectedChild=activity&atype=`$changeCaseTypeId`"}" title="{ts}Change case type (creates activity record){/ts}"><i class="crm-i fa-pencil"></i></a>
@@ -276,7 +276,14 @@
  </div><!-- /.crm-accordion-header -->
  <div class="crm-accordion-body">
   {if $tags}
-    <p class="crm-block crm-content-block crm-case-caseview-display-tags">&nbsp;&nbsp;{$tags}</p>
+    <p class="crm-block crm-content-block crm-case-caseview-display-tags">
+      &nbsp;&nbsp;
+      {foreach from=$tags item='tag'}
+        <span class="crm-tag-item" {if !empty($tag.color)}style="background-color: {$tag.color}; color: {$tag.color|colorContrast};"{/if}>
+          {$tag.text}
+        </span>
+      {/foreach}
+    </p>
   {/if}
 
    {foreach from=$tagSetTags item=displayTagset}
@@ -318,3 +325,31 @@
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 {/if} {* view related cases if end *}
 </div>
+{literal}
+<style type="text/css">
+  .crm-case-caseview-case_subject span.crm-editable {
+    padding-right: 32px;
+    position: relative;
+  }
+  .crm-case-caseview-case_subject span.crm-editable:before {
+    position: absolute;
+    font-family: 'FontAwesome';
+    top: 0;
+    right: 10px;
+    content: "\f040";
+    opacity: 0.7;
+    color: #000;
+    font-size: .92em;
+  }
+  .crm-case-caseview-case_subject span.crm-editable-editing {
+    padding-right: 0;
+  }
+  .crm-case-caseview-case_subject span.crm-editable-editing form > input {
+    min-width: 20em;
+    padding: 3px;
+  }
+  .crm-case-caseview-case_subject span.crm-editable-editing:before {
+    content: "";
+  }
+</style>
+{/literal}

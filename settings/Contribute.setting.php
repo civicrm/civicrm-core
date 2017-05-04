@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
  */
@@ -130,36 +130,6 @@ return array(
     'html_type' => 'select',
     'add' => '4.7',
     'title' => 'Default invoice payment page',
-    'is_domain' => 1,
-    'is_contact' => 0,
-    'description' => NULL,
-    'help_text' => NULL,
-  ),
-  'financial_account_bal_enable' => array(
-    'group_name' => 'Contribute Preferences',
-    'group' => 'contribute',
-    'name' => 'financial_account_bal_enable',
-    'type' => 'Integer',
-    'html_type' => 'checkbox',
-    'quick_form_type' => 'Element',
-    'default' => 0,
-    'add' => '4.7',
-    'title' => 'Enable Financial Account Balances',
-    'is_domain' => 1,
-    'is_contact' => 0,
-    'description' => NULL,
-    'help_text' => NULL,
-  ),
-  'prior_financial_period' => array(
-    'group_name' => 'Contribute Preferences',
-    'group' => 'contribute',
-    'name' => 'prior_financial_period',
-    'type' => 'activityDate',
-    'quick_form_type' => 'Date',
-    'html_type' => 'Date',
-    'default' => NULL,
-    'add' => '4.7',
-    'title' => 'Prior Financial Period',
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => NULL,

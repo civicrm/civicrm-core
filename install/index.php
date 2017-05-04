@@ -36,7 +36,7 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Changes and modifications (c) 2007-2015 by CiviCRM LLC
+ * Changes and modifications (c) 2007-2017 by CiviCRM LLC
  *
  */
 

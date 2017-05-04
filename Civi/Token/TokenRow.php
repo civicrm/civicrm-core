@@ -127,6 +127,29 @@ class TokenRow {
   }
 
   /**
+   * Update the value of a custom field token.
+   *
+   * @param string $entity
+   * @param int $customFieldID
+   * @param int $entityID
+   * @return TokenRow
+   */
+  public function customToken($entity, $customFieldID, $entityID) {
+    $customFieldName = "custom_" . $customFieldID;
+    $fieldValue = civicrm_api3($entity, 'getvalue', array(
+      'return' => $customFieldName,
+      'id' => $entityID,
+    ));
+
+    // format the raw custom field value into proper display value
+    if ($fieldValue) {
+      $fieldValue = \CRM_Core_BAO_CustomField::displayValue($fieldValue, $customFieldID);
+    }
+
+    return $this->tokens($entity, $customFieldName, $fieldValue);
+  }
+
+  /**
    * Update the value of a token. Apply formatting based on DB schema.
    *
    * @param string $tokenEntity
@@ -134,6 +157,8 @@ class TokenRow {
    * @param string $baoName
    * @param array $baoField
    * @param mixed $fieldValue
+   * @return TokenRow
+   * @throws \CRM_Core_Exception
    */
   public function dbToken($tokenEntity, $tokenField, $baoName, $baoField, $fieldValue) {
     if ($fieldValue === NULL || $fieldValue === '') {

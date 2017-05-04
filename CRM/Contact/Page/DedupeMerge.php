@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Contact_Page_DedupeMerge extends CRM_Core_Page {
 
@@ -98,7 +98,7 @@ class CRM_Contact_Page_DedupeMerge extends CRM_Core_Page {
     for ($i = 1; $i <= ceil($total / self::BATCHLIMIT); $i++) {
       $task  = new CRM_Queue_Task(
         array('CRM_Contact_Page_DedupeMerge', 'callBatchMerge'),
-        array($rgid, $gid, $mode, FALSE, self::BATCHLIMIT, $isSelected),
+        array($rgid, $gid, $mode, self::BATCHLIMIT, $isSelected),
         "Processed " . $i * self::BATCHLIMIT . " pair of duplicates out of " . $total
       );
 
@@ -126,17 +126,13 @@ class CRM_Contact_Page_DedupeMerge extends CRM_Core_Page {
    * @param int $gid
    * @param string $mode
    *   'safe' mode or 'force' mode.
-   * @param bool $autoFlip
-   *   Override the values in the prevnext table & use the lowest value?
-   *   As the form offers the user to flip the values themselves this should
-   *   only be TRUE if you wish to ignore the user.
    * @param int $batchLimit
    * @param int $isSelected
    *
    * @return int
    */
-  public static function callBatchMerge(CRM_Queue_TaskContext $ctx, $rgid, $gid, $mode = 'safe', $autoFlip, $batchLimit, $isSelected) {
-    CRM_Dedupe_Merger::batchMerge($rgid, $gid, $mode, $autoFlip, $batchLimit, $isSelected);
+  public static function callBatchMerge(CRM_Queue_TaskContext $ctx, $rgid, $gid, $mode = 'safe', $batchLimit, $isSelected) {
+    CRM_Dedupe_Merger::batchMerge($rgid, $gid, $mode, $batchLimit, $isSelected);
     return CRM_Queue_Task::TASK_SUCCESS;
   }
 

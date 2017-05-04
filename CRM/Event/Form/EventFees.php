@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
  *
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
  */
@@ -64,10 +64,11 @@ class CRM_Event_Form_EventFees {
   }
 
   /**
-   * This function sets the default values for the form in edit/view mode
-   * the default values are retrieved from the database
+   * This function sets the default values for the form in edit/view mode.
    *
    * @param CRM_Core_Form $form
+   *
+   * @return array
    */
   public static function setDefaultValues(&$form) {
     $defaults = array();
@@ -249,7 +250,6 @@ class CRM_Event_Form_EventFees {
   /**
    * This function sets the default values for price set.
    *
-   *
    * @param int $participantID
    * @param int $eventID
    * @param bool $includeQtyZero
@@ -407,13 +407,12 @@ SELECT  id, html_type
         && !CRM_Utils_Array::value('fee', $form->_values)
         && CRM_Utils_Array::value('snippet', $_REQUEST) == CRM_Core_Smarty::PRINT_NOFORM
       ) {
-        $form->assign('isFTPermissionDenied', TRUE);
+        CRM_Core_Session::setStatus(ts('You do not have all the permissions needed for this page.'), 'Permission Denied', 'error');
         return FALSE;
       }
-      if ($form->_mode) {
-        CRM_Core_Payment_Form::buildPaymentForm($form, $form->_paymentProcessor, FALSE, TRUE);
-      }
-      elseif (!$form->_mode) {
+
+      CRM_Core_Payment_Form::buildPaymentForm($form, $form->_paymentProcessor, FALSE, TRUE, self::getDefaultPaymentInstrumentId());
+      if (!$form->_mode) {
         $form->addElement('checkbox', 'record_contribution', ts('Record Payment?'), NULL,
           array('onclick' => "return showHideByValue('record_contribution','','payment_information','table-row','radio',false);")
         );
@@ -510,6 +509,21 @@ SELECT  id, html_type
     $mailingInfo = Civi::settings()->get('mailing_backend');
     $form->assign('outBound_option', $mailingInfo['outBound_option']);
     $form->assign('hasPayment', $form->_paymentId);
+  }
+
+  /**
+   * Get the default payment instrument id.
+   *
+   * @todo resolve relationship between this form & abstractEdit -which should be it's parent.
+   *
+   * @return int
+   */
+  protected static function getDefaultPaymentInstrumentId() {
+    $paymentInstrumentID = CRM_Utils_Request::retrieve('payment_instrument_id', 'Integer');
+    if ($paymentInstrumentID) {
+      return $paymentInstrumentID;
+    }
+    return key(CRM_Core_OptionGroup::values('payment_instrument', FALSE, FALSE, FALSE, 'AND is_default = 1'));
   }
 
 }

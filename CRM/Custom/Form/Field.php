@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
  */
@@ -959,6 +959,8 @@ AND    option_group_id = %2";
       switch ($params['data_type']) {
         case 'StateProvince':
           $fieldStateProvince = $strtolower($params['default_value']);
+
+          // LOWER in query below roughly translates to 'hurt my database without deriving any benefit' See CRM-19811.
           $query = "
 SELECT id
   FROM civicrm_state_province
@@ -972,6 +974,8 @@ SELECT id
 
         case 'Country':
           $fieldCountry = $strtolower($params['default_value']);
+
+          // LOWER in query below roughly translates to 'hurt my database without deriving any benefit' See CRM-19811.
           $query = "
 SELECT id
   FROM civicrm_country

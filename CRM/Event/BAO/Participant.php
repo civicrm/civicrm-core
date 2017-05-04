@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 
 /**
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
 
@@ -648,6 +648,7 @@ GROUP BY  participant.event_id
           'title' => ts('Participant Note'),
           'name' => 'participant_note',
           'headerPattern' => '/(participant.)?note$/i',
+          'type' => 'text',
         ),
       );
 
@@ -749,7 +750,7 @@ GROUP BY  participant.event_id
       $eventFields = CRM_Event_DAO_Event::export();
       $noteField = array(
         'participant_note' => array(
-          'title' => 'Participant Note',
+          'title' => ts('Participant Note'),
           'name' => 'participant_note',
           'type' => CRM_Utils_Type::T_STRING,
         ),
@@ -757,7 +758,7 @@ GROUP BY  participant.event_id
 
       $participantStatus = array(
         'participant_status' => array(
-          'title' => 'Participant Status (label)',
+          'title' => ts('Participant Status (label)'),
           'name' => 'participant_status',
           'type' => CRM_Utils_Type::T_STRING,
         ),
@@ -765,7 +766,7 @@ GROUP BY  participant.event_id
 
       $participantRole = array(
         'participant_role' => array(
-          'title' => 'Participant Role (label)',
+          'title' => ts('Participant Role (label)'),
           'name' => 'participant_role',
           'type' => CRM_Utils_Type::T_STRING,
         ),
@@ -1838,9 +1839,8 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
     $checkDiscount = CRM_Core_BAO_Discount::findSet($eventID, 'civicrm_event');
     if (!empty($checkDiscount)) {
       $mainAmount = self::getUnDiscountedAmountForEventPriceSetFieldValue($eventID, $discountedPriceFieldOptionID, $feeLevel);
-      $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Discounts Account is' "));
-      $transactionParams['from_financial_account_id'] = CRM_Contribute_PseudoConstant::financialAccountType(
-        $financialTypeID, $relationTypeId);
+      $transactionParams['from_financial_account_id'] = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount(
+        $financialTypeID, 'Discounts Account is');
       if (!empty($transactionParams['trxnParams']['from_financial_account_id'])) {
         $transactionParams['trxnParams']['total_amount'] = $mainAmount - $total_amount;
         $transactionParams['trxnParams']['payment_processor_id'] = NULL;
@@ -1905,7 +1905,12 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
         // if found in submitted items, do not use it for new item creations
         if (in_array($previousLineItem['price_field_value_id'], $submittedFieldValueIds)) {
           // if submitted line items are existing don't fire INSERT query
-          unset($insertLines[$previousLineItem['price_field_value_id']]);
+          if ($previousLineItem['line_total'] != 0) {
+            unset($insertLines[$previousLineItem['price_field_value_id']]);
+          }
+          else {
+            $insertLines[$previousLineItem['price_field_value_id']]['skip'] = TRUE;
+          }
           // for updating the line items i.e. use-case - once deselect-option selecting again
           if (($previousLineItem['line_total'] != $submittedLineItems[$previousLineItem['price_field_value_id']]['line_total']) ||
             ($submittedLineItems[$previousLineItem['price_field_value_id']]['line_total'] == 0 && $submittedLineItems[$previousLineItem['price_field_value_id']]['qty'] == 1) ||
@@ -1920,6 +1925,7 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
       $submittedFields = implode(', ', $submittedFieldId);
       $submittedFieldValues = implode(', ', $submittedFieldValueIds);
     }
+    $financialItemsArray = array();
     if (!empty($submittedFields) && !empty($submittedFieldValues)) {
       $updateLineItem = "UPDATE civicrm_line_item li
 INNER JOIN civicrm_financial_item fi
@@ -1945,7 +1951,6 @@ GROUP BY li.entity_table, li.entity_id, price_field_value_id, fi.id
       $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
       $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
       $updateFinancialItemInfoValues = array();
-      $financialItemsArray = array();
       while ($updateFinancialItemInfoDAO->fetch()) {
         $updateFinancialItemInfoValues = (array) $updateFinancialItemInfoDAO;
         $updateFinancialItemInfoValues['transaction_date'] = date('YmdHis');
@@ -2025,21 +2030,19 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
     // insert new line items
     if (!empty($insertLines)) {
       foreach ($insertLines as $valueId => $lineParams) {
-        $lineParams['entity_table'] = 'civicrm_participant';
-        $lineParams['entity_id'] = $participantId;
-        $lineParams['contribution_id'] = $contributionId;
-        $lineObj = CRM_Price_BAO_LineItem::create($lineParams);
+        if (!array_key_exists('skip', $lineParams)) {
+          $lineParams['entity_table'] = 'civicrm_participant';
+          $lineParams['entity_id'] = $participantId;
+          $lineParams['contribution_id'] = $contributionId;
+          $lineObj = CRM_Price_BAO_LineItem::create($lineParams);
+        }
       }
     }
 
     // the recordAdjustedAmt code would execute over here
     $ids = CRM_Event_BAO_Participant::getParticipantIds($contributionId);
     if (count($ids) > 1) {
-      $total = 0;
-      foreach ($ids as $val) {
-        $total += CRM_Price_BAO_LineItem::getLineTotal($val, 'civicrm_participant');
-      }
-      $updatedAmount = $total;
+      $updatedAmount = CRM_Price_BAO_LineItem::getLineTotal($contributionId);
     }
     else {
       $updatedAmount = $params['amount'];
@@ -2097,6 +2100,7 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
 FROM civicrm_line_item
 WHERE (entity_table = 'civicrm_participant' AND entity_id = {$participantId} AND qty > 0)";
     $getUpdatedLineItemsDAO = CRM_Core_DAO::executeQuery($getUpdatedLineItems);
+    $line = array();
     while ($getUpdatedLineItemsDAO->fetch()) {
       $line[$getUpdatedLineItemsDAO->price_field_value_id] = $getUpdatedLineItemsDAO->label . ' - ' . (float) $getUpdatedLineItemsDAO->qty;
     }
@@ -2168,8 +2172,7 @@ WHERE (entity_table = 'civicrm_participant' AND entity_id = {$participantId} AND
         CRM_Core_DAO::$_nullArray,
         CRM_Core_DAO::$_nullArray
       );
-      $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Accounts Receivable Account is' "));
-      $toFinancialAccount = CRM_Contribute_PseudoConstant::financialAccountType($updatedContribution->financial_type_id, $relationTypeId);
+      $toFinancialAccount = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($updatedContribution->financial_type_id, 'Accounts Receivable Account is');
       $adjustedTrxnValues = array(
         'from_financial_account_id' => NULL,
         'to_financial_account_id' => $toFinancialAccount,

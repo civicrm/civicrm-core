@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Core_OptionValue {
 
@@ -148,6 +148,7 @@ class CRM_Core_OptionValue {
 
       $optionValue[$dao->id]['label'] = htmlspecialchars($optionValue[$dao->id]['label']);
       $optionValue[$dao->id]['order'] = $optionValue[$dao->id]['weight'];
+      $optionValue[$dao->id]['icon'] = CRM_Utils_Array::value('icon', $optionValue[$dao->id], '');
       $optionValue[$dao->id]['action'] = CRM_Core_Action::formLink($links, $action,
         array(
           'id' => $dao->id,
@@ -305,6 +306,10 @@ class CRM_Core_OptionValue {
 
       $nameTitle = array();
       if ($mode == 'contribute') {
+        // This is part of a move towards standardising option values but we
+        // should derive them from the fields array so am deprecating it again...
+        // note that the reason this was needed was that payment_instrument_id was
+        // not set to exportable.
         $nameTitle = array(
           'payment_instrument' => array(
             'name' => 'payment_instrument',

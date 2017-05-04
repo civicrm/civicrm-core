@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
 
@@ -248,6 +248,26 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
         ),
       ),
     );
+    $this->_columns += array(
+      'civicrm_financial_trxn' => array(
+        'dao' => 'CRM_Financial_DAO_FinancialTrxn',
+        'fields' => array(
+          'card_type_id' => array(
+            'title' => ts('Credit Card Type'),
+            'dbAlias' => 'GROUP_CONCAT(financial_trxn_civireport.card_type_id SEPARATOR ",")',
+          ),
+        ),
+        'filters' => array(
+          'card_type_id' => array(
+            'title' => ts('Credit Card Type'),
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => CRM_Financial_DAO_FinancialTrxn::buildOptions('card_type_id'),
+            'default' => NULL,
+            'type' => CRM_Utils_Type::T_STRING,
+          ),
+        ),
+      ),
+    );
 
     // If we have a campaign, build out the relevant elements
     if ($campaignEnabled && !empty($this->activeCampaigns)) {
@@ -358,6 +378,8 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
       $this->selectivelyAddLocationTablesJoinsToFilterQuery();
     }
 
+    // for credit card type
+    $this->addFinancialTrxnFromClause();
   }
 
   /**
@@ -556,7 +578,7 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
     $this->contactTempTable = 'civicrm_report_temp_lybunt_c_' . date('Ymd_') . uniqid();
     $this->limit();
     $getContacts = "
-      CREATE TEMPORARY TABLE $this->contactTempTable
+      CREATE TEMPORARY TABLE $this->contactTempTable {$this->_databaseAttributes}
       SELECT SQL_CALC_FOUND_ROWS {$this->_aliases['civicrm_contact']}.id as cid {$this->_from} {$this->_where}
       GROUP BY {$this->_aliases['civicrm_contact']}.id";
     $this->executeReportQuery($getContacts);
@@ -581,6 +603,7 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
    */
   public function buildQuery($applyLimit = TRUE) {
     $this->buildGroupTempTable();
+    $this->buildPermissionClause();
     // Calling where & select before FROM allows us to build temp tables to use in from.
     $this->where();
     $this->select();
@@ -730,6 +753,11 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
         if ($birthDate) {
           $rows[$rowNum]['civicrm_contact_birth_date'] = CRM_Utils_Date::customFormat($birthDate, '%Y%m%d');
         }
+        $entryFound = TRUE;
+      }
+
+      if (!empty($row['civicrm_financial_trxn_card_type_id'])) {
+        $rows[$rowNum]['civicrm_financial_trxn_card_type_id'] = $this->getLabels($row['civicrm_financial_trxn_card_type_id'], 'CRM_Financial_DAO_FinancialTrxn', 'card_type_id');
         $entryFound = TRUE;
       }
 

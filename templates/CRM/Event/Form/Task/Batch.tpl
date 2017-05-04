@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -73,8 +73,34 @@
               <td class="crm-event-title">{$details.$pid.title}</td>
               {foreach from=$fields item=field key=fieldName}
                 {assign var=n value=$field.name}
-                {if ( $n eq 'participant_register_date' ) }
-                   <td class="compressed">{include file="CRM/common/jcalendar.tpl" elementName=$n elementIndex=$pid batchUpdate=1}</td>
+
+                {* CRM-19860 Copied from templates/CRM/Contact/Form/Task/Batch.tpl *}
+                {if $field.options_per_line}
+                  <td class="compressed">
+                    {assign var="count" value="1"}
+                    {strip}
+                      <table class="form-layout-compressed">
+                      <tr>
+                        {* sort by fails for option per line. Added a variable to iterate through the element array*}
+                        {assign var="index" value="1"}
+                        {foreach name=optionOuter key=optionKey item=optionItem from=$form.field.$pid.$n}
+                          {if $index < 10}
+                            {assign var="index" value=`$index+1`}
+                          {else}
+                            <td class="labels font-light">{$form.field.$pid.$n.$optionKey.html}</td>
+                            {if $count == $field.options_per_line}
+                            </tr>
+                            <tr>
+                              {assign var="count" value="1"}
+                              {else}
+                              {assign var="count" value=`$count+1`}
+                            {/if}
+                          {/if}
+                        {/foreach}
+                      </tr>
+                      </table>
+                    {/strip}
+                  </td>
                 {else}
                   <td class="compressed">{$form.field.$pid.$n.html}</td>
                 {/if}

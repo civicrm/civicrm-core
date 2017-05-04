@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -43,7 +43,7 @@
  * This provides greater consistency/predictability after flushing.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Core_PseudoConstant {
 
@@ -548,6 +548,7 @@ class CRM_Core_PseudoConstant {
       return $var;
     }
 
+    /* @var CRM_Core_DAO $object */
     $object = new $name();
 
     $object->selectAdd();
@@ -565,6 +566,10 @@ class CRM_Core_PseudoConstant {
 
     if (!$all) {
       $object->$filter = 1;
+      $aclClauses = array_filter($name::getSelectWhereClause());
+      foreach ($aclClauses as $clause) {
+        $object->whereAdd($clause);
+      }
     }
 
     $object->find();
@@ -1003,7 +1008,7 @@ WHERE  id = %1";
    *   Db column name/label.
    * @param bool $reset
    *   Reset relationship types if true.
-   * @param bool|NULL $isActive
+   * @param bool $isActive
    *   Filter by is_active. NULL to disable.
    *
    * @return array

@@ -187,7 +187,8 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
 
       case self::AUTH_ERROR:
         $params['payment_status_id'] = array_search('Failed', $contributionStatus);
-        break;
+        $errormsg = $response_fields[2] . ' ' . $response_fields[3];
+        return self::error($response_fields[1], $errormsg);
 
       case self::AUTH_DECLINED:
         $errormsg = $response_fields[2] . ' ' . $response_fields[3];
@@ -377,7 +378,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
     $fields['x_country'] = $this->_getParam('country');
     $fields['x_customer_ip'] = $this->_getParam('ip_address');
     $fields['x_email'] = $this->_getParam('email');
-    $fields['x_invoice_num'] = substr($this->_getParam('invoiceID'), 0, 20);
+    $fields['x_invoice_num'] = $this->_getParam('invoiceID');
     $fields['x_amount'] = $amount;
     $fields['x_currency_code'] = $this->_getParam('currencyID');
     $fields['x_description'] = $this->_getParam('description');
@@ -816,7 +817,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
 
     curl_close($submit);
 
-    $responseFields = $this->_ParseArbReturn($response);
+    $responseFields = $this->_parseArbReturn($response);
     $message = "{$responseFields['code']}: {$responseFields['text']}";
 
     if ($responseFields['resultCode'] == 'Error') {

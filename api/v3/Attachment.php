@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -430,6 +430,7 @@ function _civicrm_api3_attachment_format_result($fileDao, $entityFileDao, $retur
     'upload_date' => is_numeric($fileDao->upload_date) ? CRM_Utils_Date::mysqlToIso($fileDao->upload_date) : $fileDao->upload_date,
     'entity_table' => $entityFileDao->entity_table,
     'entity_id' => $entityFileDao->entity_id,
+    'icon' => CRM_Utils_File::getIconFromMimeType($fileDao->mime_type),
   );
   $result['url'] = CRM_Utils_System::url(
     'civicrm/file', 'reset=1&id=' . $result['id'] . '&eid=' . $result['entity_id'],

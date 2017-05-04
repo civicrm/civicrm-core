@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Activity_BAO_Query {
 
@@ -39,13 +39,13 @@ class CRM_Activity_BAO_Query {
    */
   public static function select(&$query) {
     if (!empty($query->_returnProperties['activity_id'])) {
-      $query->_select['activity_id'] = "civicrm_activity.id as activity_id";
+      $query->_select['activity_id'] = 'civicrm_activity.id as activity_id';
       $query->_element['activity_id'] = 1;
       $query->_tables['civicrm_activity'] = $query->_whereTables['civicrm_activity'] = 1;
     }
 
     if (!empty($query->_returnProperties['activity_type_id'])) {
-      $query->_select['activity_type_id'] = "activity_type.value as activity_type_id";
+      $query->_select['activity_type_id'] = 'activity_type.value as activity_type_id';
       $query->_element['activity_type_id'] = 1;
       $query->_tables['civicrm_activity'] = 1;
       $query->_tables['activity_type'] = 1;
@@ -54,7 +54,7 @@ class CRM_Activity_BAO_Query {
     }
 
     if (!empty($query->_returnProperties['activity_type'])) {
-      $query->_select['activity_type'] = "activity_type.label as activity_type";
+      $query->_select['activity_type'] = 'activity_type.label as activity_type';
       $query->_element['activity_type'] = 1;
       $query->_tables['civicrm_activity'] = 1;
       $query->_tables['activity_type'] = 1;
@@ -63,19 +63,19 @@ class CRM_Activity_BAO_Query {
     }
 
     if (!empty($query->_returnProperties['activity_subject'])) {
-      $query->_select['activity_subject'] = "civicrm_activity.subject as activity_subject";
+      $query->_select['activity_subject'] = 'civicrm_activity.subject as activity_subject';
       $query->_element['activity_subject'] = 1;
       $query->_tables['civicrm_activity'] = $query->_whereTables['civicrm_activity'] = 1;
     }
 
     if (!empty($query->_returnProperties['activity_date_time'])) {
-      $query->_select['activity_date_time'] = "civicrm_activity.activity_date_time as activity_date_time";
+      $query->_select['activity_date_time'] = 'civicrm_activity.activity_date_time as activity_date_time';
       $query->_element['activity_date_time'] = 1;
       $query->_tables['civicrm_activity'] = $query->_whereTables['civicrm_activity'] = 1;
     }
 
     if (!empty($query->_returnProperties['activity_status_id'])) {
-      $query->_select['activity_status_id'] = "activity_status.value as activity_status_id";
+      $query->_select['activity_status_id'] = 'activity_status.value as activity_status_id';
       $query->_element['activity_status_id'] = 1;
       $query->_tables['civicrm_activity'] = 1;
       $query->_tables['activity_status'] = 1;
@@ -84,8 +84,8 @@ class CRM_Activity_BAO_Query {
     }
 
     if (!empty($query->_returnProperties['activity_status'])) {
-      $query->_select['activity_status'] = "activity_status.label as activity_status,
-      civicrm_activity.status_id as status_id";
+      $query->_select['activity_status'] = 'activity_status.label as activity_status,
+      civicrm_activity.status_id as status_id';
       $query->_element['activity_status'] = 1;
       $query->_tables['civicrm_activity'] = 1;
       $query->_tables['activity_status'] = 1;
@@ -94,31 +94,31 @@ class CRM_Activity_BAO_Query {
     }
 
     if (!empty($query->_returnProperties['activity_duration'])) {
-      $query->_select['activity_duration'] = "civicrm_activity.duration as activity_duration";
+      $query->_select['activity_duration'] = 'civicrm_activity.duration as activity_duration';
       $query->_element['activity_duration'] = 1;
       $query->_tables['civicrm_activity'] = $query->_whereTables['civicrm_activity'] = 1;
     }
 
     if (!empty($query->_returnProperties['activity_location'])) {
-      $query->_select['activity_location'] = "civicrm_activity.location as activity_location";
+      $query->_select['activity_location'] = 'civicrm_activity.location as activity_location';
       $query->_element['activity_location'] = 1;
       $query->_tables['civicrm_activity'] = $query->_whereTables['civicrm_activity'] = 1;
     }
 
     if (!empty($query->_returnProperties['activity_details'])) {
-      $query->_select['activity_details'] = "civicrm_activity.details as activity_details";
+      $query->_select['activity_details'] = 'civicrm_activity.details as activity_details';
       $query->_element['activity_details'] = 1;
       $query->_tables['civicrm_activity'] = $query->_whereTables['civicrm_activity'] = 1;
     }
 
     if (!empty($query->_returnProperties['source_record_id'])) {
-      $query->_select['source_record_id'] = "civicrm_activity.source_record_id as source_record_id";
+      $query->_select['source_record_id'] = 'civicrm_activity.source_record_id as source_record_id';
       $query->_element['source_record_id'] = 1;
       $query->_tables['civicrm_activity'] = $query->_whereTables['civicrm_activity'] = 1;
     }
 
     if (!empty($query->_returnProperties['activity_is_test'])) {
-      $query->_select['activity_is_test'] = "civicrm_activity.is_test as activity_is_test";
+      $query->_select['activity_is_test'] = 'civicrm_activity.is_test as activity_is_test';
       $query->_element['activity_is_test'] = 1;
       $query->_tables['civicrm_activity'] = $query->_whereTables['civicrm_activity'] = 1;
     }
@@ -151,6 +151,15 @@ class CRM_Activity_BAO_Query {
       $query->_tables['parent_id'] = 1;
       $query->_whereTables['parent_id'] = 1;
       $query->_element['parent_id'] = 1;
+    }
+
+    if (!empty($query->_returnProperties['activity_priority'])) {
+      $query->_select['activity_priority'] = 'activity_priority.label as activity_priority,
+      civicrm_activity.priority_id as priority_id';
+      $query->_element['activity_priority'] = 1;
+      $query->_tables['activity_priority'] = 1;
+      $query->_whereTables['activity_priority'] = 1;
+      $query->_tables['civicrm_activity'] = $query->_whereTables['civicrm_activity'] = 1;
     }
   }
 
@@ -190,15 +199,18 @@ class CRM_Activity_BAO_Query {
       case 'activity_type_id':
       case 'activity_status_id':
       case 'activity_engagement_level':
-      case 'activity_subject':
       case 'activity_id':
       case 'activity_campaign_id':
+      case 'activity_priority_id':
+        // We no longer expect "subject" as a specific criteria (as of CRM-19447),
+        // but we still use activity_subject in Activity.Get API
+      case 'activity_subject':
 
         $qillName = $name;
         if (in_array($name, array('activity_engagement_level', 'activity_id'))) {
           $name = $qillName = str_replace('activity_', '', $name);
         }
-        if (in_array($name, array('activity_status_id', 'activity_subject'))) {
+        if (in_array($name, array('activity_status_id', 'activity_subject', 'activity_priority_id'))) {
           $name = str_replace('activity_', '', $name);
           $qillName = str_replace('_id', '', $qillName);
         }
@@ -213,8 +225,13 @@ class CRM_Activity_BAO_Query {
         $query->_qill[$grouping][] = ts('%1 %2 %3', array(1 => $fields[$qillName]['title'], 2 => $op, 3 => $value));
         break;
 
+      case 'activity_text':
+        self::whereClauseSingleActivityText($values, $query);
+        break;
+
       case 'activity_type':
       case 'activity_status':
+      case 'activity_priority':
         $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("$name.label", $op, $value, 'String');
         list($op, $value) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Activity_DAO_Activity', $name, $value, $op);
         $query->_qill[$grouping][] = ts('%1 %2 %3', array(1 => $fields[$name]['title'], 2 => $op, 3 => $value));
@@ -373,6 +390,12 @@ class CRM_Activity_BAO_Query {
                                AND option_group_activity_type.id = activity_type.option_group_id ) ";
         break;
 
+      case 'activity_priority':
+        $from .= " $side JOIN civicrm_option_group option_group_activity_priority ON (option_group_activity_priority.name = 'priority')";
+        $from .= " $side JOIN civicrm_option_value activity_priority ON (civicrm_activity.priority_id = activity_priority.value
+                              AND option_group_activity_priority.id = activity_priority.option_group_id ) ";
+        break;
+
       case 'civicrm_activity_tag':
         $from .= " $side JOIN civicrm_entity_tag as civicrm_activity_tag ON ( civicrm_activity_tag.entity_table = 'civicrm_activity' AND civicrm_activity_tag.entity_id = civicrm_activity.id ) ";
         break;
@@ -425,8 +448,24 @@ class CRM_Activity_BAO_Query {
     $form->addSelect('status_id',
       array('entity' => 'activity', 'multiple' => 'multiple', 'option_url' => NULL, 'placeholder' => ts('- any -'))
     );
-    $form->setDefaults(array('status_id' => array($activityStatus['Completed'], $activityStatus['Scheduled'])));
-    $form->addElement('text', 'activity_subject', ts('Subject'), CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'sort_name'));
+    $ssID = $form->get('ssID');
+    $status = array($activityStatus['Completed'], $activityStatus['Scheduled']);
+    //If status is saved in smart group.
+    if (!empty($ssID) && !empty($form->_formValues['activity_status_id'])) {
+      $status = $form->_formValues['activity_status_id'];
+    }
+    $form->setDefaults(array('status_id' => $status));
+
+    $form->addElement('text', 'activity_text', ts('Activity Text'), CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'sort_name'));
+
+    $form->addRadio('activity_option', '', CRM_Core_SelectValues::activityTextOptions());
+    $form->setDefaults(array('activity_option' => 'both'));
+
+    $priority = CRM_Core_PseudoConstant::get('CRM_Activity_DAO_Activity', 'priority_id');
+    $form->addSelect('priority_id',
+    array('entity' => 'activity', 'label' => ts('Priority'), 'multiple' => 'multiple', 'option_url' => NULL, 'placeholder' => ts('- any -'))
+    );
+
     $form->addYesNo('activity_test', ts('Activity is a Test?'));
     $activity_tags = CRM_Core_BAO_Tag::getTags('civicrm_activity');
     if ($activity_tags) {
@@ -514,6 +553,7 @@ class CRM_Activity_BAO_Query {
         'activity_location' => 1,
         'activity_details' => 1,
         'activity_status' => 1,
+        'activity_priority' => 1,
         'source_contact' => 1,
         'source_record_id' => 1,
         'activity_is_test' => 1,
@@ -556,6 +596,32 @@ class CRM_Activity_BAO_Query {
     CRM_Utils_Rule::validDateRange($fields, 'activity_date', $errors, ts('Activity Date'));
 
     return empty($errors) ? TRUE : $errors;
+  }
+
+  /**
+   * Where/qill clause for notes
+   *
+   * @param array $values
+   */
+  public static function whereClauseSingleActivityText(&$values, &$query) {
+    list($name, $op, $value, $grouping, $wildcard) = $values;
+    $activityOptionValues = $query->getWhereValues('activity_option', $grouping);
+    $activityOption = CRM_Utils_Array::value(2, $activityOptionValues, 6);
+
+    $query->_useDistinct = TRUE;
+
+    $label = ts('Activity Text (%1)', array(1 => CRM_Utils_Array::value($activityOption, CRM_Core_SelectValues::activityTextOptions())));
+    $clauses = array();
+    if ($activityOption % 2 == 0) {
+      $clauses[] = $query->buildClause('civicrm_activity.details', $op, $value, 'String');
+    }
+    if ($activityOption % 3 == 0) {
+      $clauses[] = $query->buildClause('civicrm_activity.subject', $op, $value, 'String');
+    }
+
+    $query->_where[$grouping][] = "( " . implode(' OR ', $clauses) . " )";
+    list($qillOp, $qillVal) = $query->buildQillForFieldValue(NULL, $name, $value, $op);
+    $query->_qill[$grouping][] = ts("%1 %2 '%3'", array(1 => $label, 2 => $qillOp, 3 => $qillVal));
   }
 
 }

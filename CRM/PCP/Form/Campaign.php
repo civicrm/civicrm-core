@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,19 +28,19 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
- * This class generates form components for processing a pcp page creati
- *
+ * This class generates form components for processing a pcp page.
  */
 class CRM_PCP_Form_Campaign extends CRM_Core_Form {
   public $_context;
   public $_component;
 
+  /**
+   * Pre-process form.
+   */
   public function preProcess() {
     // we do not want to display recently viewed items, so turn off
     $this->assign('displayRecent', FALSE);
@@ -64,8 +64,14 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
     parent::preProcess();
   }
 
+  /**
+   * Set default form values.
+   *
+   * @return array
+   *   Default values for the form.
+   */
   public function setDefaultValues() {
-    $dafaults = array();
+    $defaults = array();
     $dao = new CRM_PCP_DAO_PCP();
 
     if ($this->_pageId) {
@@ -97,8 +103,6 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     $this->add('text', 'pcp_title', ts('Title'), NULL, TRUE);
@@ -188,9 +192,6 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
 
   /**
    * Process the form submission.
-   *
-   *
-   * @return void
    */
   public function postProcess() {
     $params = $this->controller->exportValues($this->_name);

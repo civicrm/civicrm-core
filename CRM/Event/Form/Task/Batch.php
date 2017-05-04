@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
  */
@@ -269,9 +269,6 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
 
   /**
    * Process the form after the input has been submitted and validated.
-   *
-   *
-   * @return void
    */
   public function postProcess() {
     $params = $this->exportValues();
@@ -286,12 +283,8 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
         );
 
         $value['id'] = $key;
-        if (!empty($value['participant_register_date'])) {
-          $value['register_date'] = CRM_Utils_Date::processDate($value['participant_register_date'], $value['participant_register_date_time']);
-        }
 
         if (!empty($value['participant_role'])) {
-          $participantRoles = CRM_Event_PseudoConstant::participantRole();
           if (is_array($value['participant_role'])) {
             $value['role_id'] = implode(CRM_Core_DAO::VALUE_SEPARATOR, array_keys($value['participant_role']));
           }
@@ -318,14 +311,9 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
           }
         }
 
-        if (!empty($value['participant_source'])) {
-          $value['source'] = $value['participant_source'];
-        }
-        unset($value['participant_register_date']);
         unset($value['participant_status']);
-        unset($value['participant_source']);
 
-        CRM_Event_BAO_Participant::create($value);
+        civicrm_api3('Participant', 'create', $value);
 
         //need to trigger mails when we change status
         if ($statusChange) {
@@ -507,6 +495,8 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
     }
 
     //complete the contribution.
+    // @todo use the api - ie civicrm_api3('Contribution', 'completetransaction', $input);
+    // as this method is not preferred / supported.
     $baseIPN->completeTransaction($input, $ids, $objects, $transaction, FALSE);
 
     // reset template values before processing next transactions

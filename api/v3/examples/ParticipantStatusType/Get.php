@@ -26,7 +26,8 @@ function participant_status_type_get_example() {
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
     return array(
-      'error' => $errorMessage,
+      'is_error' => 1,
+      'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
     );
@@ -47,10 +48,10 @@ function participant_status_type_get_expectedresult() {
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
-    'id' => 17,
+    'id' => 18,
     'values' => array(
-      '17' => array(
-        'id' => '17',
+      '18' => array(
+        'id' => '18',
         'name' => 'test status',
         'label' => 'I am a test',
         'class' => 'Positive',

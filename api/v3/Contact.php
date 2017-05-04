@@ -3,7 +3,7 @@
   +--------------------------------------------------------------------+
   | CiviCRM version 4.7                                                |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2016                                |
+  | Copyright CiviCRM LLC (c) 2004-2017                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -55,8 +55,14 @@ function civicrm_api3_contact_create($params) {
     throw new \Civi\API\Exception\UnauthorizedException('Permission denied to modify contact record');
   }
 
-  $dupeCheck = CRM_Utils_Array::value('dupe_check', $params, FALSE);
-  $values = _civicrm_api3_contact_check_params($params, $dupeCheck);
+  if (!empty($params['dupe_check'])) {
+    $ids = CRM_Contact_BAO_Contact::getDuplicateContacts($params, $params['contact_type'], 'Unsupervised', array(), $params['check_permission']);
+    if (count($ids) > 0) {
+      throw new API_Exception("Found matching contacts: " . implode(',', $ids), "duplicate", array("ids" => $ids));
+    }
+  }
+
+  $values = _civicrm_api3_contact_check_params($params);
   if ($values) {
     return $values;
   }
@@ -204,6 +210,10 @@ function _civicrm_api3_contact_get_spec(&$params) {
   );
   $params['supplemental_address_2'] = array(
     'title' => 'Primary Address Supplemental Address 2',
+    'type' => CRM_Utils_Type::T_STRING,
+  );
+  $params['supplemental_address_3'] = array(
+    'title' => 'Primary Address Supplemental Address 3',
     'type' => CRM_Utils_Type::T_STRING,
   );
   $params['current_employer'] = array(
@@ -376,6 +386,37 @@ function _civicrm_api3_contact_get_supportanomalies(&$params, &$options) {
     unset($params['filter.group_id']);
     $options['input_params']['group'] = $groups;
   }
+  if (isset($params['group'])) {
+    $groups = $params['group'];
+    $allGroups = CRM_Core_PseudoConstant::group();
+    if (is_array($groups) && in_array(key($groups), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
+      // Get the groups array.
+      $groupsArray = $groups[key($groups)];
+      foreach ($groupsArray as &$group) {
+        if (!is_numeric($group) && array_search($group, $allGroups)) {
+          $group = array_search($group, $allGroups);
+        }
+      }
+      // Now reset the $groups array with the ids not the titles.
+      $groups[key($groups)] = $groupsArray;
+    }
+    // handle format like 'group' => array('title1', 'title2').
+    elseif (is_array($groups)) {
+      foreach ($groups as $k => &$group) {
+        if (!is_numeric($group) && array_search($group, $allGroups)) {
+          $group = array_search($group, $allGroups);
+        }
+        if (!is_numeric($k) && array_search($k, $allGroups)) {
+          unset($groups[$k]);
+          $groups[array_search($k, $allGroups)] = $group;
+        }
+      }
+    }
+    elseif (!is_numeric($groups) &&  array_search($groups, $allGroups)) {
+      $groups = array_search($groups, $allGroups);
+    }
+    $params['group'] = $groups;
+  }
 }
 
 /**
@@ -424,13 +465,12 @@ function civicrm_api3_contact_delete($params) {
  * This function is on it's way out.
  *
  * @param array $params
- * @param bool $dupeCheck
  *
  * @return null
  * @throws API_Exception
  * @throws CiviCRM_API3_Exception
  */
-function _civicrm_api3_contact_check_params(&$params, $dupeCheck) {
+function _civicrm_api3_contact_check_params(&$params) {
 
   switch (strtolower(CRM_Utils_Array::value('contact_type', $params))) {
     case 'household':
@@ -463,35 +503,13 @@ function _civicrm_api3_contact_check_params(&$params, $dupeCheck) {
     }
   }
 
-  if ($dupeCheck) {
-    // check for record already existing
-    $dedupeParams = CRM_Dedupe_Finder::formatParams($params, $params['contact_type']);
-
-    // CRM-6431
-    // setting 'check_permission' here means that the dedupe checking will be carried out even if the
-    // person does not have permission to carry out de-dupes
-    // this is similar to the front end form
-    if (isset($params['check_permission'])) {
-      $dedupeParams['check_permission'] = $params['check_permission'];
-    }
-
-    $ids = CRM_Dedupe_Finder::dupesByParams($dedupeParams, $params['contact_type'], 'Unsupervised', array());
-
-    if (count($ids) > 0) {
-      throw new API_Exception("Found matching contacts: " . implode(',', $ids), "duplicate", array("ids" => $ids));
-    }
-  }
-
   // The BAO no longer supports the legacy param "current_employer" so here is a shim for api backward-compatability
   if (!empty($params['current_employer'])) {
     $organizationParams = array(
       'organization_name' => $params['current_employer'],
     );
 
-    $dedupParams = CRM_Dedupe_Finder::formatParams($organizationParams, 'Organization');
-
-    $dedupParams['check_permission'] = FALSE;
-    $dupeIds = CRM_Dedupe_Finder::dupesByParams($dedupParams, 'Organization', 'Supervised');
+    $dupeIds = CRM_Contact_BAO_Contact::getDuplicateContacts($organizationParams, 'Organization', 'Supervised', array(), FALSE);
 
     // check for mismatch employer name and id
     if (!empty($params['employer_id']) && !in_array($params['employer_id'], $dupeIds)) {
@@ -1073,11 +1091,10 @@ function _civicrm_api3_contact_deprecation() {
  *   -int main_id: main contact id with whom merge has to happen
  *   -int other_id: duplicate contact which would be deleted after merge operation
  *   -string mode: "safe" skips the merge if there are no conflicts. Does a force merge otherwise.
- *   -boolean auto_flip: whether to let api decide which contact to retain and which to delete.
  *
  * @return array
  *   API Result Array
- * @throws CiviCRM_API3_Exception
+ * @throws API_Exception
  */
 function civicrm_api3_contact_merge($params) {
   if (($result = CRM_Dedupe_Merger::merge(array(
@@ -1085,10 +1102,10 @@ function civicrm_api3_contact_merge($params) {
         'srcID' => $params['to_remove_id'],
         'dstID' => $params['to_keep_id'],
       ),
-    ), array(), $params['mode'], $params['auto_flip'])) != FALSE) {
+    ), array(), $params['mode'])) != FALSE) {
     return civicrm_api3_create_success($result, $params);
   }
-  throw new CiviCRM_API3_Exception('Merge failed');
+  throw new API_Exception('Merge failed');
 }
 
 /**
@@ -1110,10 +1127,6 @@ function _civicrm_api3_contact_merge_spec(&$params) {
     'api.required' => 1,
     'type' => CRM_Utils_Type::T_INT,
     'api.aliases' => array('other_id'),
-  );
-  $params['auto_flip'] = array(
-    'title' => 'Swap destination and source to retain lowest id?',
-    'api.default' => TRUE,
   );
   $params['mode'] = array(
     // @todo need more detail on what this means.
@@ -1306,17 +1319,14 @@ function _civicrm_api3_contact_getlist_output($result, $request) {
  *   API formatted array
  */
 function civicrm_api3_contact_duplicatecheck($params) {
-  $dedupeParams = CRM_Dedupe_Finder::formatParams($params['match'], $params['match']['contact_type']);
-
-  // CRM-6431
-  // setting 'check_permission' here means that the dedupe checking will be carried out even if the
-  // person does not have permission to carry out de-dupes
-  // this is similar to the front end form
-  if (isset($params['check_permission'])) {
-    $dedupeParams['check_permission'] = $params['check_permission'];
-  }
-
-  $dupes = CRM_Dedupe_Finder::dupesByParams($dedupeParams, $params['match']['contact_type'], 'Unsupervised', array(), CRM_Utils_Array::value('dedupe_rule_id', $params));
+  $dupes = CRM_Contact_BAO_Contact::getDuplicateContacts(
+    $params['match'],
+    $params['match']['contact_type'],
+    'Unsupervised',
+    array(),
+    CRM_Utils_Array::value('check_permissions', $params),
+    CRM_Utils_Array::value('dedupe_rule_id', $params)
+  );
   $values = empty($dupes) ? array() : array_fill_keys($dupes, array());
   return civicrm_api3_create_success($values, $params, 'Contact', 'duplicatecheck');
 }

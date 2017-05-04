@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
  */
@@ -305,7 +305,6 @@ class CRM_Export_BAO_Export {
 
     $returnProperties = array();
     $paymentFields = $selectedPaymentFields = FALSE;
-    $relationField = NULL;
 
     $phoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
     // Warning - this imProviders var is used in a somewhat fragile way - don't rename it
@@ -330,6 +329,7 @@ class CRM_Export_BAO_Export {
         'street_address',
         'supplemental_address_1',
         'supplemental_address_2',
+        'supplemental_address_3',
         'city',
         'postal_code',
         'postal_code_suffix',
@@ -343,7 +343,7 @@ class CRM_Export_BAO_Export {
       );
 
       foreach ($fields as $key => $value) {
-        $phoneTypeId = $imProviderId = NULL;
+        $phoneTypeId = $imProviderId = $relationField = NULL;
         $relationshipTypes = $fieldName = CRM_Utils_Array::value(1, $value);
         if (!$fieldName) {
           continue;
@@ -722,8 +722,6 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
       }
     }
 
-    $multipleSelectFields = array('preferred_communication_method' => 1);
-
     $addPaymentHeader = FALSE;
 
     $paymentDetails = array();
@@ -791,7 +789,6 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
         $query->convertToPseudoNames($iterationDAO);
 
         //first loop through output columns so that we return what is required, and in same order.
-        $relationshipField = 0;
         foreach ($outputColumns as $field => $value) {
 
           // add im_provider to $dao object
@@ -869,12 +866,6 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
               }
               $field = $field . '_';
 
-              if (array_key_exists($relationField, $multipleSelectFields)) {
-                $param = array($relationField => $fieldValue);
-                $names = array($relationField => array('newName' => $relationField, 'groupName' => $relationField));
-                CRM_Core_OptionGroup::lookupValues($param, $names, FALSE);
-                $fieldValue = $param[$relationField];
-              }
               if (is_object($relDAO) && $relationField == 'id') {
                 $row[$field . $relationField] = $relDAO->contact_id;
               }
@@ -949,22 +940,6 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
             //check for custom data
             if ($cfID = CRM_Core_BAO_CustomField::getKeyID($field)) {
               $row[$field] = CRM_Core_BAO_CustomField::displayValue($fieldValue, $cfID);
-            }
-            elseif (array_key_exists($field, $multipleSelectFields)) {
-              //option group fixes
-              $paramsNew = array($field => $fieldValue);
-              if ($field == 'test_tutoring') {
-                $name = array($field => array('newName' => $field, 'groupName' => 'test'));
-                // for  readers group
-              }
-              elseif (substr($field, 0, 4) == 'cmr_') {
-                $name = array($field => array('newName' => $field, 'groupName' => substr($field, 0, -3)));
-              }
-              else {
-                $name = array($field => array('newName' => $field, 'groupName' => $field));
-              }
-              CRM_Core_OptionGroup::lookupValues($paramsNew, $name, FALSE);
-              $row[$field] = $paramsNew[$field];
             }
 
             elseif (in_array($field, array(

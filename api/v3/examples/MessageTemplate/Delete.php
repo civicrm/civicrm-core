@@ -7,7 +7,7 @@
  */
 function message_template_delete_example() {
   $params = array(
-    'id' => 70,
+    'id' => 72,
   );
 
   try{
@@ -19,7 +19,8 @@ function message_template_delete_example() {
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
     return array(
-      'error' => $errorMessage,
+      'is_error' => 1,
+      'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
     );
@@ -40,7 +41,7 @@ function message_template_delete_expectedresult() {
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
-    'values' => TRUE,
+    'values' => 1,
   );
 
   return $expectedResult;

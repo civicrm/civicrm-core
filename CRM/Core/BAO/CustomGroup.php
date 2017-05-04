@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -120,6 +120,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
       'help_pre',
       'help_post',
       'is_active',
+      'is_public',
       'is_multiple',
     );
     foreach ($fields as $field) {
@@ -332,6 +333,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
    * @param bool $checkPermission
    * @param varchar $singleRecord
    *   holds 'new' or id if view/edit/copy form for a single record is being loaded.
+   * @param bool $showPublicOnly
    *
    * @return array
    *   Custom field 'tree'.
@@ -356,7 +358,8 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
     $onlySubType = NULL,
     $returnAll = FALSE,
     $checkPermission = TRUE,
-    $singleRecord = NULL
+    $singleRecord = NULL,
+    $showPublicOnly = FALSE
   ) {
     if ($entityID) {
       $entityID = CRM_Utils_Type::escape($entityID, 'Integer');
@@ -414,6 +417,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
         'extends_entity_column_id',
         'extends_entity_column_value',
         'max_multiple',
+        'is_public',
       ),
     );
 
@@ -494,6 +498,10 @@ WHERE civicrm_custom_group.is_active = 1
         CRM_Core_Permission::customGroupClause(CRM_Core_Permission::VIEW,
           'civicrm_custom_group.'
         );
+    }
+
+    if ($showPublicOnly) {
+      $strWhere .= "AND civicrm_custom_group.is_public = 1";
     }
 
     $orderBy = "
@@ -1884,12 +1892,6 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
       // add field information
       foreach ($value['fields'] as $k => $properties) {
         $properties['element_name'] = "custom_{$k}_-{$groupCount}";
-        if ($value = CRM_Utils_Request::retrieve($properties['element_name'], 'String', $form, FALSE, NULL, 'POST')) {
-          $formValues[$properties['element_name']] = $value;
-        }
-        elseif (isset($submittedValues[$properties['element_name']])) {
-          $properties['element_value'] = $submittedValues[$properties['element_name']];
-        }
         if (isset($properties['customValue']) &&
           !CRM_Utils_System::isNull($properties['customValue']) &&
           !isset($properties['element_value'])
@@ -1905,6 +1907,12 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
               $properties['element_value'] = $properties['customValue'][$groupCount]['data'];
             }
           }
+        }
+        if ($value = CRM_Utils_Request::retrieve($properties['element_name'], 'String', $form, FALSE, NULL, 'POST')) {
+          $formValues[$properties['element_name']] = $value;
+        }
+        elseif (isset($submittedValues[$properties['element_name']])) {
+          $properties['element_value'] = $submittedValues[$properties['element_name']];
         }
         unset($properties['customValue']);
         $formattedGroupTree[$key]['fields'][$k] = $properties;

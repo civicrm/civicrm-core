@@ -49,6 +49,8 @@ class CRM_Core_CodeGen_Util_Template {
   }
 
   /**
+   * Run template generator.
+   *
    * @param string $infile
    *   Filename of the template, without a path.
    * @param string $outpath
@@ -68,6 +70,13 @@ class CRM_Core_CodeGen_Util_Template {
     }
   }
 
+  /**
+   * Fetch via Smarty.
+   *
+   * @param string $infile
+   *
+   * @return string
+   */
   public function fetch($infile) {
     return $this->smarty->fetch($infile);
   }

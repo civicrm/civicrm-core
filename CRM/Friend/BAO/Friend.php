@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
  */
@@ -54,11 +54,10 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
    *
-   * @return CRM_Friend_BAO_Friend
+   * @return int
    */
   public static function add(&$params) {
-    $friend = CRM_Contact_BAO_Contact::createProfileContact($params, CRM_Core_DAO::$_nullArray);
-    return $friend;
+    return CRM_Contact_BAO_Contact::createProfileContact($params, CRM_Core_DAO::$_nullArray);
   }
 
   /**
@@ -143,27 +142,26 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
 
       //create contact only if it does not exits in db
       $value['email'] = $value['email-Primary'];
-      $value['check_permission'] = FALSE;
-      $contact = CRM_Core_BAO_UFGroup::findContact($value, NULL, 'Individual');
+      $contactID = CRM_Contact_BAO_Contact::getFirstDuplicateContact($value, 'Individual', 'Supervised', array(), FALSE);
 
-      if (!$contact) {
-        $contact = self::add($value);
+      if (!$contactID) {
+        $contactID = self::add($value);
       }
 
       // attempt to save activity targets
       $targetParams = array(
         'activity_id' => $activity->id,
-        'contact_id' => $contact,
+        'contact_id' => $contactID,
         'record_type_id' => $targetID,
       );
 
       // See if it already exists
       $activityContact = new CRM_Activity_DAO_ActivityContact();
       $activityContact->activity_id = $activity->id;
-      $activityContact->contact_id = $contact;
+      $activityContact->contact_id = $contactID;
       $activityContact->find(TRUE);
       if (empty($activityContact->id)) {
-        $resultTarget = CRM_Activity_BAO_ActivityContact::create($targetParams);
+        CRM_Activity_BAO_ActivityContact::create($targetParams);
       }
     }
 

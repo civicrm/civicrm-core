@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -72,7 +72,26 @@ class CRM_Case_Form_Activity_ChangeCaseStatus {
     $form->removeElement('status_id');
     $form->removeElement('priority_id');
 
+    $caseTypes = array();
+
     $form->_caseStatus = CRM_Case_PseudoConstant::caseStatus();
+    $statusNames = CRM_Case_PseudoConstant::caseStatus('name');
+
+    // Limit case statuses to allowed types for these case(s)
+    $allCases = civicrm_api3('Case', 'get', array('return' => 'case_type_id', 'id' => array('IN' => (array) $form->_caseId)));
+    foreach ($allCases['values'] as $case) {
+      $caseTypes[$case['case_type_id']] = $case['case_type_id'];
+    }
+    $caseTypes = civicrm_api3('CaseType', 'get', array('id' => array('IN' => $caseTypes)));
+    foreach ($caseTypes['values'] as $ct) {
+      if (!empty($ct['definition']['statuses'])) {
+        foreach ($form->_caseStatus as $id => $label) {
+          if (!in_array($statusNames[$id], $ct['definition']['statuses'])) {
+            unset($form->_caseStatus[$id]);
+          }
+        }
+      }
+    }
 
     foreach ($form->_caseId as $key => $val) {
       $form->_oldCaseStatus[] = $form->_defaultCaseStatus[] = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_Case', $val, 'status_id');
@@ -183,9 +202,6 @@ class CRM_Case_Form_Activity_ChangeCaseStatus {
         $activity->save();
       }
     }
-
-    // FIXME: does this do anything ?
-    $params['statusMsg'] = ts('Case Status changed successfully.');
   }
 
 }

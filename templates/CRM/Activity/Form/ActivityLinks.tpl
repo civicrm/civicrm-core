@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -32,8 +32,8 @@
 {if $as_select} {* on 3.2, the activities can be either a drop down select (on the activity tab) or a list (on the action menu) *}
 <select name="other_activity" class="crm-form-select crm-select2 crm-action-menu fa-plus">
   <option value="">{ts}New Activity{/ts}</option>
-{foreach from=$activityTypes key=k item=link}
-  <option value="{$urls.$k}">{$link}</option>
+{foreach from=$activityTypes item=act}
+  <option value="{$act.url}" data-icon="{$act.icon}">{$act.label}</option>
 {/foreach}
 </select>
 {literal}
@@ -56,15 +56,20 @@
 {else}
 <ul>
   <li class="crm-activity-tab"><a href="#" data-tab="activity">{ts}Record Activity:{/ts}</a></li>
-{foreach from=$activityTypes key=k item=link}
-<li class="crm-activity-type_{$k}"><a href="{$urls.$k}" data-tab="activity">{$link}</a></li>
+{foreach from=$activityTypes key=k item=act}
+<li class="crm-activity-type_{$k}">
+  <a href="{$act.url}" data-tab="activity">
+    <i class="crm-i {$act.icon}"></i> {$act.label}
+  </a>
+</li>
 {/foreach}
 
 {* add hook links if any *}
 {if $hookLinks}
    {foreach from=$hookLinks item=link}
     <li>
-        <a href="{$link.url}" data-tab="activity"{if !empty($link.title)} title="{$link.title}"{/if}>
+        <a href="{$link.url}" data-tab="activity"{if !empty($link.title)} title="{$link.title}"{/if}
+        {if !empty($link.class)} class="{$link.class}"{/if}>
           {if $link.img}
                 <img src="{$link.img}" alt="{$link.title}" />&nbsp;
           {/if}

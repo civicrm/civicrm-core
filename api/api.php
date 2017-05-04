@@ -128,42 +128,57 @@ function _civicrm_api_get_camel_name($entity) {
  * @param string $separator
  */
 function _civicrm_api_replace_variables(&$params, &$parentResult, $separator = '.') {
-
-  foreach ($params as $field => $value) {
-
+  foreach ($params as $field => &$value) {
     if (is_string($value) && substr($value, 0, 6) == '$value') {
-      $valueSubstitute = substr($value, 7);
-
-      if (!empty($parentResult[$valueSubstitute])) {
-        $params[$field] = $parentResult[$valueSubstitute];
-      }
-      else {
-
-        $stringParts = explode($separator, $value);
-        unset($stringParts[0]);
-
-        $fieldname = array_shift($stringParts);
-
-        //when our string is an array we will treat it as an array from that . onwards
-        $count = count($stringParts);
-        while ($count > 0) {
-          $fieldname .= "." . array_shift($stringParts);
-          if (array_key_exists($fieldname, $parentResult) && is_array($parentResult[$fieldname])) {
-            $arrayLocation = $parentResult[$fieldname];
-            foreach ($stringParts as $key => $innerValue) {
-              $arrayLocation = CRM_Utils_Array::value($innerValue, $arrayLocation);
-            }
-            $params[$field] = $arrayLocation;
-          }
-          $count = count($stringParts);
-        }
-      }
-      // CRM-16168 If we have failed to swap it out we should unset it rather than leave the placeholder.
-      if (substr($params[$field], 0, 6) == '$value') {
-        $params[$field] = NULL;
-      }
+      $value = _civicrm_api_replace_variable($value, $parentResult, $separator);
+    }
+    // Handle the operator syntax: array('OP' => $val)
+    elseif (is_array($value) && is_string(reset($value)) && substr(reset($value), 0, 6) == '$value') {
+      $key = key($value);
+      $value[$key] = _civicrm_api_replace_variable($value[$key], $parentResult, $separator);
     }
   }
+}
+
+/**
+ * Swap out a $value.foo variable with the value from parent api results.
+ *
+ * Called by _civicrm_api_replace_variables to do the substitution.
+ *
+ * @param string $value
+ * @param array $parentResult
+ * @param string $separator
+ * @return mixed|null
+ */
+function _civicrm_api_replace_variable($value, $parentResult, $separator) {
+  $valueSubstitute = substr($value, 7);
+
+  if (!empty($parentResult[$valueSubstitute])) {
+    return $parentResult[$valueSubstitute];
+  }
+  else {
+    $stringParts = explode($separator, $value);
+    unset($stringParts[0]);
+    // CRM-16168 If we have failed to swap it out we should unset it rather than leave the placeholder.
+    $value = NULL;
+
+    $fieldname = array_shift($stringParts);
+
+    //when our string is an array we will treat it as an array from that . onwards
+    $count = count($stringParts);
+    while ($count > 0) {
+      $fieldname .= "." . array_shift($stringParts);
+      if (array_key_exists($fieldname, $parentResult) && is_array($parentResult[$fieldname])) {
+        $arrayLocation = $parentResult[$fieldname];
+        foreach ($stringParts as $key => $innerValue) {
+          $arrayLocation = CRM_Utils_Array::value($innerValue, $arrayLocation);
+        }
+        $value = $arrayLocation;
+      }
+      $count = count($stringParts);
+    }
+  }
+  return $value;
 }
 
 /**

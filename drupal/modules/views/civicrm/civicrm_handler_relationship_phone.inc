@@ -25,9 +25,9 @@
 
 /**
  * Field handler to provide relationship to CiviCRM email.
- *
- * @ingroup civicrm_relationship_handlers
- */
+*
+* @ingroup civicrm_relationship_handlers
+*/
 class civicrm_handler_relationship_phone extends civicrm_handler_relationship_location {
 
   static $_phoneType;
@@ -89,25 +89,12 @@ class civicrm_handler_relationship_phone extends civicrm_handler_relationship_lo
     return $join;
   }
 
-  function ensure_my_table() {
-    if (!isset($this->table_alias)) {
-      if (!method_exists($this->query, 'ensure_table')) {
-        vpr(t('Ensure my table called but query has no ensure_table method.'));
-        return;
-      }
-      $join = $this->get_join();
-      $this->table_alias = $this->query->ensure_table($this->table, $this->relationship, $join);
-    }
-    return $this->table_alias;
-  }
-
   /**
    * Called to implement a relationship in a query.
    */
   function query() {
-    // Just ensure the one table. This is briefer than parent::query(), which
-    // attempts to create an additional join.
-    $this->alias = $this->ensure_my_table();
+    $join = $this->get_join();
+    $this->alias = $this->query->add_table($this->table, $this->relationship, $join);
     //register relationship
     $this->view->relationship[$this->options['id']]->alias = $this->alias;
     $this->query->relationships[$this->alias] = array(

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
  * Class for constructing the payment processor block.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Core_Payment_Form {
 
@@ -52,8 +52,10 @@ class CRM_Core_Payment_Form {
    *   Display billing fields even for pay later.
    * @param bool $isBackOffice
    *   Is this a back office function? If so the option to suppress the cvn needs to be evaluated.
+   * @param int $paymentInstrumentID
+   *   ID of the payment processor.
    */
-  static public function setPaymentFieldsByProcessor(&$form, $processor, $billing_profile_id = NULL, $isBackOffice = FALSE) {
+  static public function setPaymentFieldsByProcessor(&$form, $processor, $billing_profile_id = NULL, $isBackOffice = FALSE, $paymentInstrumentID = NULL) {
     $form->billingFieldSets = array();
     // Load the pay-later processor
     // @todo load this right up where the other processors are loaded initially.
@@ -62,10 +64,13 @@ class CRM_Core_Payment_Form {
     }
 
     $processor['object']->setBillingProfile($billing_profile_id);
+    $processor['object']->setBackOffice($isBackOffice);
+    $processor['object']->setPaymentInstrumentID($paymentInstrumentID);
     $paymentTypeName = self::getPaymentTypeName($processor);
-    $paymentTypeLabel = self::getPaymentTypeLabel($processor);
     $form->assign('paymentTypeName', $paymentTypeName);
+    $paymentTypeLabel = self::getPaymentTypeLabel($processor);
     $form->assign('paymentTypeLabel', $paymentTypeLabel);
+    $form->assign('isBackOffice', $isBackOffice);
     $form->_paymentFields = $form->billingFieldSets[$paymentTypeName]['fields'] = self::getPaymentFieldMetadata($processor);
     $form->_paymentFields = array_merge($form->_paymentFields, self::getBillingAddressMetadata($processor, $form->_bltID));
     $form->assign('paymentFields', self::getPaymentFields($processor));
@@ -111,6 +116,7 @@ class CRM_Core_Payment_Form {
   protected static function addCommonFields(&$form, $paymentFields) {
     $requiredPaymentFields = array();
     foreach ($paymentFields as $name => $field) {
+      // @todo - remove the cc_field check - no longer useful.
       if (!empty($field['cc_field'])) {
         if ($field['htmlType'] == 'chainSelect') {
           $form->addChainSelect($field['name'], array('required' => FALSE));
@@ -142,8 +148,7 @@ class CRM_Core_Payment_Form {
    * @return array
    */
   public static function getPaymentFields($paymentProcessor) {
-    $paymentProcessorObject = Civi\Payment\System::singleton()->getByProcessor($paymentProcessor);
-    return $paymentProcessorObject->getPaymentFormFields();
+    return $paymentProcessor['object']->getPaymentFormFields();
   }
 
   /**
@@ -152,8 +157,7 @@ class CRM_Core_Payment_Form {
    * @return array
    */
   public static function getPaymentFieldMetadata($paymentProcessor) {
-    $paymentProcessorObject = Civi\Payment\System::singleton()->getByProcessor($paymentProcessor);
-    return array_intersect_key($paymentProcessorObject->getPaymentFormFieldsMetadata(), array_flip(self::getPaymentFields($paymentProcessor)));
+    return array_intersect_key($paymentProcessor['object']->getPaymentFormFieldsMetadata(), array_flip(self::getPaymentFields($paymentProcessor)));
   }
 
   /**
@@ -220,10 +224,12 @@ class CRM_Core_Payment_Form {
    *   although the distinction is losing it's meaning as front end forms are used for back office and a permission
    *   for the 'enter without cvn' is probably more appropriate. Paypal std does not support another user
    *   entering details but once again the issue is not back office but 'another user'.
+   * @param int $paymentInstrumentID
+   *   Payment instrument ID.
    *
    * @return bool
    */
-  public static function buildPaymentForm(&$form, $processor, $billing_profile_id, $isBackOffice) {
+  public static function buildPaymentForm(&$form, $processor, $billing_profile_id, $isBackOffice, $paymentInstrumentID = NULL) {
     //if the form has address fields assign to the template so the js can decide what billing fields to show
     $profileAddressFields = $form->get('profileAddressFields');
     if (!empty($profileAddressFields)) {
@@ -234,7 +240,7 @@ class CRM_Core_Payment_Form {
       return NULL;
     }
 
-    self::setPaymentFieldsByProcessor($form, $processor, $billing_profile_id, $isBackOffice);
+    self::setPaymentFieldsByProcessor($form, $processor, $billing_profile_id, $isBackOffice, $paymentInstrumentID);
     self::addCommonFields($form, $form->_paymentFields);
     self::addRules($form, $form->_paymentFields);
     return (!empty($form->_paymentFields));

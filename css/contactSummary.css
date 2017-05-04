@@ -345,6 +345,26 @@ div#crm-contact-thumbnail {
   width: 100%;
 }
 
+#tagtree {
+  max-height: 500px;
+  overflow: auto;
+}
+
+#tagtree li {
+  margin-top: 5px;
+}
+#tagtree ins.jstree-icon {
+  cursor: pointer;
+  position: relative;
+  top: -3px;
+}
+#tagtree .jstree-disabled {
+  cursor: not-allowed;
+}
+#tagtree .jstree-disabled > .jstree-checkbox {
+  opacity: .2;
+}
+
 #tagGroup table .label {
   color: #FFF;
 }

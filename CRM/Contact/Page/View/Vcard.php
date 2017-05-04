@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 require_once 'Contact/Vcard/Build.php';
@@ -88,8 +88,8 @@ class CRM_Contact_Page_View_Vcard extends CRM_Contact_Page_View {
       $vcard->setTitle($defaults['job_title']);
     }
 
-    if (!empty($defaults['birth_date_display'])) {
-      $vcard->setBirthday(CRM_Utils_Array::value('birth_date_display', $defaults));
+    if (!empty($defaults['birth_date'])) {
+      $vcard->setBirthday(CRM_Utils_Array::value('birth_date', $defaults));
     }
 
     if (!empty($defaults['home_URL'])) {
@@ -106,6 +106,9 @@ class CRM_Contact_Page_View_Vcard extends CRM_Contact_Page_View {
         $extend = CRM_Utils_Array::value('supplemental_address_1', $location);
         if (!empty($location['supplemental_address_2'])) {
           $extend .= ', ' . $location['supplemental_address_2'];
+        }
+        if (!empty($location['supplemental_address_3'])) {
+          $extend .= ', ' . $location['supplemental_address_3'];
         }
         $street = CRM_Utils_Array::value('street_address', $location);
         $locality = CRM_Utils_Array::value('city', $location);

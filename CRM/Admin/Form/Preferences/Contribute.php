@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -41,9 +41,6 @@ class CRM_Admin_Form_Preferences_Contribute extends CRM_Admin_Form_Preferences {
     'always_post_to_accounts_receivable' => CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,
     'deferred_revenue_enabled' => CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,
     'default_invoice_page' => CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,
-    'financial_account_bal_enable' => CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,
-    'fiscalYearStart' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
-    'prior_financial_period' => CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,
     'invoicing' => CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,
   );
 
@@ -169,34 +166,6 @@ class CRM_Admin_Form_Preferences_Contribute extends CRM_Admin_Form_Preferences {
     }
     $this->assign('htmlFields', $htmlFields);
     parent::buildQuickForm();
-    $this->addFormRule(array('CRM_Admin_Form_Preferences_Contribute', 'formRule'), $this);
-  }
-
-  /**
-   * Global validation rules for the form.
-   *
-   * @param array $values
-   *   posted values of the form
-   * @param $files
-   * @param $self
-   *
-   * @return array
-   *   list of errors to be posted back to the form
-   */
-  public static function formRule($values, $files, $self) {
-    $errors = array();
-    if (CRM_Utils_Array::value('deferred_revenue_enabled', $values)) {
-      $errorMessage = CRM_Financial_BAO_FinancialAccount::validateTogglingDeferredRevenue();
-      if ($errorMessage) {
-        // Since the error msg is too long and
-        // takes the whole space to display inline
-        // therefore setting blank text to highlight the field
-        // setting actual error msg to _qf_default to show in pop-up screen
-        $errors['deferred_revenue_enabled'] = ' ';
-        $errors['_qf_default'] = $errorMessage;
-      }
-    }
-    return $errors;
   }
 
   /**
@@ -217,9 +186,6 @@ class CRM_Admin_Form_Preferences_Contribute extends CRM_Admin_Form_Preferences {
         )
       );
     }
-    $defaults['fiscalYearStart'] = Civi::settings()->get('fiscalYearStart');
-    $period = CRM_Contribute_BAO_Contribution::checkContributeSettings('prior_financial_period');
-    $this->assign('priorFinancialPeriod', $period);
     return $defaults;
   }
 
@@ -232,7 +198,6 @@ class CRM_Admin_Form_Preferences_Contribute extends CRM_Admin_Form_Preferences {
     unset($params['qfKey']);
     unset($params['entryURL']);
     Civi::settings()->set('contribution_invoice_settings', $params);
-    Civi::settings()->set('fiscalYearStart', $params['fiscalYearStart']);
 
     // to set default value for 'Invoices / Credit Notes' checkbox on display preferences
     $values = CRM_Core_BAO_Setting::getItem("CiviCRM Preferences");

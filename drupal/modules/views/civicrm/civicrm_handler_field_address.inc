@@ -55,10 +55,10 @@ class civicrm_handler_field_address extends civicrm_handler_field_location {
     }
     if (isset($this->options['is_billing']) && $this->options['is_billing']) {
       $extra[] = array(
-          'value' => $this->options['is_billing'],
-          'numeric' => TRUE,
-          'field' => 'is_billing',
-          'operator' => '=',
+        'value' => $this->options['is_billing'],
+        'numeric' => TRUE,
+        'field' => 'is_billing',
+        'operator' => '=',
       );
     }
     if (!empty($extra)) {
@@ -80,7 +80,11 @@ class civicrm_handler_field_address extends civicrm_handler_field_location {
         exit;
       }
       $join = $this->get_join();
-      $this->table_alias = $this->query->ensure_table($this->table, $this->relationship, $join);
+      if (empty($this->relationship)) { //https://www.drupal.org/node/2617032
+        $this->table_alias = $this->query->add_table($this->table, $this->relationship, $join);
+      } else {
+        $this->table_alias = $this->query->ensure_table($this->table, $this->relationship, $join);
+      }
     }
     return $this->table_alias;
   }

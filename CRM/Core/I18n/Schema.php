@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Core_I18n_Schema {
 
@@ -368,7 +368,7 @@ class CRM_Core_I18n_Schema {
       // CRM-19093
       // should match the civicrm table name such as: civicrm_event
       // but must not match the table name if it's a substring of another table: civicrm_events_in_cart
-      $query = preg_replace("/([^'\"])({$table})([^a-z_'\"])/", "\\1\\2{$dbLocale}\\3", $query);
+      $query = preg_replace("/([^'\"])({$table})(\z|[^a-z_'\"])/", "\\1\\2{$dbLocale}\\3", $query);
     }
     // uncomment the below to rewrite the civicrm_value_* queries
     // $query = preg_replace("/(civicrm_value_[a-z0-9_]+_\d+)([^_])/", "\\1{$dbLocale}\\2", $query);

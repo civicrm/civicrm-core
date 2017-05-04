@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -165,6 +165,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
       $errors['cms_name'] = $nameError;
     }
 
+    // LOWER in query below roughly translates to 'hurt my database without deriving any benefit' See CRM-19811.
     $sql = "
       SELECT name, mail
       FROM {users}
@@ -287,6 +288,11 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
     $base_url = str_replace('http://', 'https://', $base_url);
   }
 
+  /**
+   * Get the name of the table that stores the user details.
+   *
+   * @return string
+   */
   protected function getUsersTableName() {
     $userFrameworkUsersTableName = Civi::settings()->get('userFrameworkUsersTableName');
     if (empty($userFrameworkUsersTableName)) {

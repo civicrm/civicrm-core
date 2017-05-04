@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -34,7 +34,7 @@
  * want to deal with that so late in the 4.3 dev cycle.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Utils_HttpClient {
 
@@ -92,17 +92,12 @@ class CRM_Utils_HttpClient {
 
     $fp = @fopen($localFile, "w");
     if (!$fp) {
-      // Fixme: throw error instead of setting message
-      CRM_Core_Session::setStatus(ts('Unable to write to %1.<br />Is the location writable?', array(1 => $localFile)), ts('Write Error'), 'error');
       return self::STATUS_WRITE_ERROR;
     }
     curl_setopt($ch, CURLOPT_FILE, $fp);
 
     curl_exec($ch);
     if (curl_errno($ch)) {
-      // Fixme: throw error instead of setting message
-      CRM_Core_Session::setStatus(ts('Unable to download extension from %1. Error Message: %2',
-        array(1 => $remoteFile, 2 => curl_error($ch))), ts('Extension download error'), 'error');
       return self::STATUS_DL_ERROR;
     }
     else {

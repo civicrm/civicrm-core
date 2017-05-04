@@ -21,9 +21,10 @@
    | GNU Affero General Public License or the licensing of CiviCRM,     |
    | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
    +--------------------------------------------------------------------+
-   
+
    **
-   * @file Provides Views integration for custom CiviCRM custom field option groups
+   * @file Provides Views integration for multi valued fields like
+   * contact subtype and CiviCRM custom field option groups
    *
    * @author Matt Chapman <Matt@NinjitsuWeb.com>
    */
@@ -37,14 +38,20 @@ class civicrm_handler_filter_custom_option extends views_handler_filter_in_opera
 
   function get_value_options() {
     if (!isset($this->value_options)) {
-      // extract the field id from the name
-      if (preg_match('/_(\d+)$/', $this->real_field, $match)) {
-        require_once 'CRM/Core/BAO/CustomOption.php';
-        $options = CRM_Core_BAO_CustomOption::getCustomOption($match[1]);
+      if ($this->real_field == 'contact_sub_type') {
+        require_once 'CRM/Contact/BAO/ContactType.php';
+        $this->value_options = CRM_Contact_BAO_ContactType::subTypePairs();
       }
-      if (is_array($options)) {
-        foreach ($options as $id => $opt) {
-          $this->value_options[$opt['value']] = strip_tags($opt['label']);
+      else {
+        // extract the field id from the name
+        if (preg_match('/_(\d+)$/', $this->real_field, $match)) {
+          require_once 'CRM/Core/BAO/CustomOption.php';
+          $options = CRM_Core_BAO_CustomOption::getCustomOption($match[1]);
+        }
+        if (is_array($options)) {
+          foreach ($options as $id => $opt) {
+            $this->value_options[$opt['value']] = strip_tags($opt['label']);
+          }
         }
       }
     }
@@ -58,9 +65,9 @@ class civicrm_handler_filter_custom_option extends views_handler_filter_in_opera
         'short' => t('all'),
         'method' => 'op_simple',
         'values' => 1,
-        ),
-      );
-    
+      ),
+    );
+
     return $operators;
   }
 

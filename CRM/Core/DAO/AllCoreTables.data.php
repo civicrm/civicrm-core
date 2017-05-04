@@ -3,7 +3,7 @@
 +--------------------------------------------------------------------+
 | CiviCRM version 4.7                                                |
 +--------------------------------------------------------------------+
-| Copyright CiviCRM LLC (c) 2004-2016                                |
+| Copyright CiviCRM LLC (c) 2004-2017                                |
 +--------------------------------------------------------------------+
 | This file is a part of CiviCRM.                                    |
 |                                                                    |
@@ -24,7 +24,7 @@
 | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
 +--------------------------------------------------------------------+
 */
-// (GenCodeChecksum:adc57a6fcde47d2eeabf043734987a37)
+// (GenCodeChecksum:IGNORE)
 return array(
   'CRM_Core_DAO_AddressFormat' => array(
     'name' => 'AddressFormat',
@@ -205,11 +205,6 @@ return array(
     'name' => 'FinancialItem',
     'class' => 'CRM_Financial_DAO_FinancialItem',
     'table' => 'civicrm_financial_item',
-  ) ,
-  'CRM_SMS_DAO_Provider' => array(
-    'name' => 'Provider',
-    'class' => 'CRM_SMS_DAO_Provider',
-    'table' => 'civicrm_sms_provider',
   ) ,
   'CRM_Member_DAO_MembershipStatus' => array(
     'name' => 'MembershipStatus',
@@ -461,66 +456,6 @@ return array(
     'class' => 'CRM_Contact_DAO_GroupOrganization',
     'table' => 'civicrm_group_organization',
   ) ,
-  'CRM_Mailing_DAO_Mailing' => array(
-    'name' => 'Mailing',
-    'class' => 'CRM_Mailing_DAO_Mailing',
-    'table' => 'civicrm_mailing',
-  ) ,
-  'CRM_Mailing_DAO_MailingGroup' => array(
-    'name' => 'MailingGroup',
-    'class' => 'CRM_Mailing_DAO_MailingGroup',
-    'table' => 'civicrm_mailing_group',
-  ) ,
-  'CRM_Mailing_DAO_TrackableURL' => array(
-    'name' => 'TrackableURL',
-    'class' => 'CRM_Mailing_DAO_TrackableURL',
-    'table' => 'civicrm_mailing_trackable_url',
-  ) ,
-  'CRM_Mailing_DAO_MailingJob' => array(
-    'name' => 'MailingJob',
-    'class' => 'CRM_Mailing_DAO_MailingJob',
-    'table' => 'civicrm_mailing_job',
-  ) ,
-  'CRM_Mailing_DAO_Recipients' => array(
-    'name' => 'Recipients',
-    'class' => 'CRM_Mailing_DAO_Recipients',
-    'table' => 'civicrm_mailing_recipients',
-  ) ,
-  'CRM_Mailing_DAO_Spool' => array(
-    'name' => 'Spool',
-    'class' => 'CRM_Mailing_DAO_Spool',
-    'table' => 'civicrm_mailing_spool',
-  ) ,
-  'CRM_Mailing_Event_DAO_Queue' => array(
-    'name' => 'Queue',
-    'class' => 'CRM_Mailing_Event_DAO_Queue',
-    'table' => 'civicrm_mailing_event_queue',
-  ) ,
-  'CRM_Mailing_Event_DAO_Bounce' => array(
-    'name' => 'Bounce',
-    'class' => 'CRM_Mailing_Event_DAO_Bounce',
-    'table' => 'civicrm_mailing_event_bounce',
-  ) ,
-  'CRM_Mailing_Event_DAO_Delivered' => array(
-    'name' => 'Delivered',
-    'class' => 'CRM_Mailing_Event_DAO_Delivered',
-    'table' => 'civicrm_mailing_event_delivered',
-  ) ,
-  'CRM_Mailing_Event_DAO_Forward' => array(
-    'name' => 'Forward',
-    'class' => 'CRM_Mailing_Event_DAO_Forward',
-    'table' => 'civicrm_mailing_event_forward',
-  ) ,
-  'CRM_Mailing_Event_DAO_Opened' => array(
-    'name' => 'Opened',
-    'class' => 'CRM_Mailing_Event_DAO_Opened',
-    'table' => 'civicrm_mailing_event_opened',
-  ) ,
-  'CRM_Mailing_Event_DAO_Reply' => array(
-    'name' => 'Reply',
-    'class' => 'CRM_Mailing_Event_DAO_Reply',
-    'table' => 'civicrm_mailing_event_reply',
-  ) ,
   'CRM_Mailing_Event_DAO_Subscribe' => array(
     'name' => 'Subscribe',
     'class' => 'CRM_Mailing_Event_DAO_Subscribe',
@@ -530,16 +465,6 @@ return array(
     'name' => 'Confirm',
     'class' => 'CRM_Mailing_Event_DAO_Confirm',
     'table' => 'civicrm_mailing_event_confirm',
-  ) ,
-  'CRM_Mailing_Event_DAO_TrackableURLOpen' => array(
-    'name' => 'TrackableURLOpen',
-    'class' => 'CRM_Mailing_Event_DAO_TrackableURLOpen',
-    'table' => 'civicrm_mailing_event_trackable_url_open',
-  ) ,
-  'CRM_Mailing_Event_DAO_Unsubscribe' => array(
-    'name' => 'Unsubscribe',
-    'class' => 'CRM_Mailing_Event_DAO_Unsubscribe',
-    'table' => 'civicrm_mailing_event_unsubscribe',
   ) ,
   'CRM_Contribute_DAO_ContributionPage' => array(
     'name' => 'ContributionPage',
@@ -570,6 +495,11 @@ return array(
     'name' => 'PaymentToken',
     'class' => 'CRM_Financial_DAO_PaymentToken',
     'table' => 'civicrm_payment_token',
+  ) ,
+  'CRM_SMS_DAO_Provider' => array(
+    'name' => 'Provider',
+    'class' => 'CRM_SMS_DAO_Provider',
+    'table' => 'civicrm_sms_provider',
   ) ,
   'CRM_Member_DAO_MembershipType' => array(
     'name' => 'MembershipType',
@@ -665,6 +595,76 @@ return array(
     'name' => 'Relationship',
     'class' => 'CRM_Contact_DAO_Relationship',
     'table' => 'civicrm_relationship',
+  ) ,
+  'CRM_Mailing_DAO_Mailing' => array(
+    'name' => 'Mailing',
+    'class' => 'CRM_Mailing_DAO_Mailing',
+    'table' => 'civicrm_mailing',
+  ) ,
+  'CRM_Mailing_DAO_MailingGroup' => array(
+    'name' => 'MailingGroup',
+    'class' => 'CRM_Mailing_DAO_MailingGroup',
+    'table' => 'civicrm_mailing_group',
+  ) ,
+  'CRM_Mailing_DAO_TrackableURL' => array(
+    'name' => 'TrackableURL',
+    'class' => 'CRM_Mailing_DAO_TrackableURL',
+    'table' => 'civicrm_mailing_trackable_url',
+  ) ,
+  'CRM_Mailing_DAO_MailingJob' => array(
+    'name' => 'MailingJob',
+    'class' => 'CRM_Mailing_DAO_MailingJob',
+    'table' => 'civicrm_mailing_job',
+  ) ,
+  'CRM_Mailing_DAO_Recipients' => array(
+    'name' => 'Recipients',
+    'class' => 'CRM_Mailing_DAO_Recipients',
+    'table' => 'civicrm_mailing_recipients',
+  ) ,
+  'CRM_Mailing_DAO_Spool' => array(
+    'name' => 'Spool',
+    'class' => 'CRM_Mailing_DAO_Spool',
+    'table' => 'civicrm_mailing_spool',
+  ) ,
+  'CRM_Mailing_Event_DAO_Queue' => array(
+    'name' => 'Queue',
+    'class' => 'CRM_Mailing_Event_DAO_Queue',
+    'table' => 'civicrm_mailing_event_queue',
+  ) ,
+  'CRM_Mailing_Event_DAO_Bounce' => array(
+    'name' => 'Bounce',
+    'class' => 'CRM_Mailing_Event_DAO_Bounce',
+    'table' => 'civicrm_mailing_event_bounce',
+  ) ,
+  'CRM_Mailing_Event_DAO_Delivered' => array(
+    'name' => 'Delivered',
+    'class' => 'CRM_Mailing_Event_DAO_Delivered',
+    'table' => 'civicrm_mailing_event_delivered',
+  ) ,
+  'CRM_Mailing_Event_DAO_Forward' => array(
+    'name' => 'Forward',
+    'class' => 'CRM_Mailing_Event_DAO_Forward',
+    'table' => 'civicrm_mailing_event_forward',
+  ) ,
+  'CRM_Mailing_Event_DAO_Opened' => array(
+    'name' => 'Opened',
+    'class' => 'CRM_Mailing_Event_DAO_Opened',
+    'table' => 'civicrm_mailing_event_opened',
+  ) ,
+  'CRM_Mailing_Event_DAO_Reply' => array(
+    'name' => 'Reply',
+    'class' => 'CRM_Mailing_Event_DAO_Reply',
+    'table' => 'civicrm_mailing_event_reply',
+  ) ,
+  'CRM_Mailing_Event_DAO_TrackableURLOpen' => array(
+    'name' => 'TrackableURLOpen',
+    'class' => 'CRM_Mailing_Event_DAO_TrackableURLOpen',
+    'table' => 'civicrm_mailing_event_trackable_url_open',
+  ) ,
+  'CRM_Mailing_Event_DAO_Unsubscribe' => array(
+    'name' => 'Unsubscribe',
+    'class' => 'CRM_Mailing_Event_DAO_Unsubscribe',
+    'table' => 'civicrm_mailing_event_unsubscribe',
   ) ,
   'CRM_Contribute_DAO_ContributionRecur' => array(
     'name' => 'ContributionRecur',

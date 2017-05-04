@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -107,11 +107,12 @@
                   <div id="allow_auto_renew">
                     <div class='crm-section auto-renew'>
                       <div class='label'></div>
-                      <div class ='content'>
+                      <div class='content' id="auto_renew">
                         {if isset($form.auto_renew) }
                           {$form.auto_renew.html}&nbsp;{$form.auto_renew.label}
                         {/if}
                       </div>
+                      <div class='content' id="force_renew" style='display: none'>{ts}Membership will renew automatically.{/ts}</div>
                     </div>
                   </div>
                 {/if}

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -40,7 +40,13 @@
  *   to indicate this entire api entity is deprecated
  */
 function _civicrm_api3_mailing_group_deprecation() {
-  return 'The MailingGroup api is deprecated. Use the mailing_event apis instead.';
+  $message = 'This action is deprecated. Use the mailing_event API instead.';
+  return array(
+    'event_unsubscribe' => $message,
+    'event_domain_unsubscribe' => $message,
+    'event_resubscribe' => $message,
+    'event_subscribe' => $message,
+  );
 }
 
 /**

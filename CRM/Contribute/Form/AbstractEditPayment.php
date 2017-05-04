@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -187,12 +187,19 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
 
   /**
    * Is this a backoffice form
-   * (this will affect whether paypal express code is displayed)
+   *
    * @var bool
    */
   public $isBackOffice = TRUE;
 
   protected $_formType;
+
+  /**
+   * Payment instrument id for the transaction.
+   *
+   * @var int
+   */
+  public $paymentInstrumentID;
 
   /**
    * Array of fields to display on billingBlock.tpl - this is not fully implemented but basically intent is the panes/fieldsets on this page should
@@ -213,6 +220,9 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
     $this->assign('contactID', $this->_contactID);
     CRM_Core_Resources::singleton()->addVars('coreForm', array('contact_id' => (int) $this->_contactID));
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'add');
+    $this->_mode = empty($this->_mode) ? CRM_Utils_Request::retrieve('mode', 'String', $this) : $this->_mode;
+    $this->assign('isBackOffice', $this->isBackOffice);
+    $this->assignPaymentRelatedVariables();
   }
 
   /**
@@ -306,7 +316,6 @@ WHERE  contribution_id = {$id}
    * @throws Exception
    */
   public function getValidProcessors() {
-    $defaultID = NULL;
     $capabilities = array('BackOffice');
     if ($this->_mode) {
       $capabilities[] = (ucfirst($this->_mode) . 'Mode');
@@ -322,36 +331,37 @@ WHERE  contribution_id = {$id}
   public function assignProcessors() {
     //ensure that processor has a valid config
     //only valid processors get display to user
-
-    if ($this->_mode) {
-      $this->assign('processorSupportsFutureStartDate', CRM_Financial_BAO_PaymentProcessor::hasPaymentProcessorSupporting(array('FutureRecurStartDate')));
-      $this->_paymentProcessors = $this->getValidProcessors();
-      if (!isset($this->_paymentProcessor['id'])) {
-        // if the payment processor isn't set yet (as indicated by the presence of an id,) we'll grab the first one which should be the default
-        $this->_paymentProcessor = reset($this->_paymentProcessors);
-      }
-      if (empty($this->_paymentProcessors)) {
-        throw new CRM_Core_Exception(ts('You will need to configure the %1 settings for your Payment Processor before you can submit a credit card transactions.', array(1 => $this->_mode)));
-      }
-      $this->_processors = array();
-      foreach ($this->_paymentProcessors as $id => $processor) {
-        // @todo review this. The inclusion of this IF was to address test processors being incorrectly loaded.
-        // However the function $this->getValidProcessors() is expected to only return the processors relevant
-        // to the mode (using the actual id - ie. the id of the test processor for the test processor).
-        // for some reason there was a need to filter here per commit history - but this indicates a problem
-        // somewhere else.
-        if ($processor['is_test'] == ($this->_mode == 'test')) {
-          $this->_processors[$id] = ts($processor['name']);
-          if (!empty($processor['description'])) {
-            $this->_processors[$id] .= ' : ' . ts($processor['description']);
-          }
-          if ($processor['is_recur']) {
-            $this->_recurPaymentProcessors[$id] = $this->_processors[$id];
-          }
+    $this->assign('processorSupportsFutureStartDate', CRM_Financial_BAO_PaymentProcessor::hasPaymentProcessorSupporting(array('FutureRecurStartDate')));
+    $this->_paymentProcessors = $this->getValidProcessors();
+    if (!isset($this->_paymentProcessor['id'])) {
+      // if the payment processor isn't set yet (as indicated by the presence of an id,) we'll grab the first one which should be the default
+      $this->_paymentProcessor = reset($this->_paymentProcessors);
+    }
+    if (!$this->_mode) {
+      $this->_paymentProcessor = $this->_paymentProcessors[0];
+    }
+    elseif (empty($this->_paymentProcessors) || array_keys($this->_paymentProcessors) === array(0)) {
+      throw new CRM_Core_Exception(ts('You will need to configure the %1 settings for your Payment Processor before you can submit a credit card transactions.', array(1 => $this->_mode)));
+    }
+    $this->_processors = array();
+    foreach ($this->_paymentProcessors as $id => $processor) {
+      // @todo review this. The inclusion of this IF was to address test processors being incorrectly loaded.
+      // However the function $this->getValidProcessors() is expected to only return the processors relevant
+      // to the mode (using the actual id - ie. the id of the test processor for the test processor).
+      // for some reason there was a need to filter here per commit history - but this indicates a problem
+      // somewhere else.
+      if ($processor['is_test'] == ($this->_mode == 'test')) {
+        $this->_processors[$id] = ts($processor['name']);
+        if (!empty($processor['description'])) {
+          $this->_processors[$id] .= ' : ' . ts($processor['description']);
+        }
+        if ($processor['is_recur']) {
+          $this->_recurPaymentProcessors[$id] = $this->_processors[$id];
         }
       }
-      CRM_Financial_Form_Payment::addCreditCardJs($id);
     }
+    CRM_Financial_Form_Payment::addCreditCardJs($id);
+
     $this->assign('recurringPaymentProcessorIds',
       empty($this->_recurPaymentProcessors) ? '' : implode(',', array_keys($this->_recurPaymentProcessors))
     );
@@ -382,33 +392,6 @@ WHERE  contribution_id = {$id}
       $currentCurrency
     );
     return $result;
-  }
-
-  /**
-   * @param int $financialTypeId
-   *
-   * @return array
-   */
-  public function getFinancialAccounts($financialTypeId) {
-    $financialAccounts = array();
-    CRM_Core_PseudoConstant::populate($financialAccounts,
-      'CRM_Financial_DAO_EntityFinancialAccount',
-      $all = TRUE,
-      $retrieve = 'financial_account_id',
-      $filter = NULL,
-      " entity_id = {$financialTypeId} ", NULL, 'account_relationship');
-    return $financialAccounts;
-  }
-
-  /**
-   * @param int $financialTypeId
-   * @param int $relationTypeId
-   *
-   * @return mixed
-   */
-  public function getFinancialAccount($financialTypeId, $relationTypeId) {
-    $financialAccounts = $this->getFinancialAccounts($financialTypeId);
-    return CRM_Utils_Array::value($relationTypeId, $financialAccounts);
   }
 
   public function preProcessPledge() {
@@ -530,13 +513,9 @@ WHERE  contribution_id = {$id}
         list($this->userDisplayName, $this->userEmail) = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contactID);
         $this->assign('displayName', $this->userDisplayName);
       }
-      if ($this->_mode) {
-        $this->assignProcessors();
-
-        $this->assignBillingType();
-
-        CRM_Core_Payment_Form::setPaymentFieldsByProcessor($this, $this->_paymentProcessor, FALSE, TRUE);
-      }
+      $this->assignProcessors();
+      $this->assignBillingType();
+      CRM_Core_Payment_Form::setPaymentFieldsByProcessor($this, $this->_paymentProcessor, FALSE, TRUE, CRM_Utils_Request::retrieve('payment_instrument_id', 'Integer'));
     }
     catch (CRM_Core_Exception $e) {
       CRM_Core_Error::fatal($e->getMessage());
@@ -568,8 +547,27 @@ WHERE  contribution_id = {$id}
       $this->assign('credit_card_type', CRM_Utils_Array::value('credit_card_type', $this->_params));
     }
     $this->_params['ip_address'] = CRM_Utils_System::ipAddress();
+
+    self::formatCreditCardDetails($this->_params);
   }
 
+  /**
+   * Format credit card details like:
+   *  1. Retrieve last 4 digit from credit card number as pan_truncation
+   *  2. Retrieve credit card type id from name
+   *
+   * @param array $params
+   *
+   * @return void
+   */
+  public static function formatCreditCardDetails(&$params) {
+    if (in_array('credit_card_type', array_keys($params))) {
+      $params['card_type_id'] = CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_FinancialTrxn', 'card_type_id', $params['credit_card_type']);
+    }
+    if (!empty($params['credit_card_number']) && empty($params['pan_truncation'])) {
+      $params['pan_truncation'] = substr($params['credit_card_number'], -4);
+    }
+  }
 
   /**
    * Add the billing address to the contact who paid.
@@ -639,6 +637,19 @@ WHERE  contribution_id = {$id}
 
     $billingDefaults = $this->getProfileDefaults('Billing', $this->_contactID);
     return array_merge($defaults, $billingDefaults);
+  }
+
+  /**
+   * Get the default payment instrument id.
+   *
+   * @return int
+   */
+  protected function getDefaultPaymentInstrumentId() {
+    $paymentInstrumentID = CRM_Utils_Request::retrieve('payment_instrument_id', 'Integer');
+    if ($paymentInstrumentID) {
+      return $paymentInstrumentID;
+    }
+    return key(CRM_Core_OptionGroup::values('payment_instrument', FALSE, FALSE, FALSE, 'AND is_default = 1'));
   }
 
 }

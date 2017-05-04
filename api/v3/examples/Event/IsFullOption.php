@@ -22,7 +22,8 @@ function event_getsingle_example() {
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
     return array(
-      'error' => $errorMessage,
+      'is_error' => 1,
+      'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
     );
@@ -43,11 +44,13 @@ function event_getsingle_expectedresult() {
     'id' => '1',
     'title' => 'Annual CiviCRM meet',
     'event_title' => 'Annual CiviCRM meet',
+    'event_description' => '',
     'event_type_id' => '1',
     'participant_listing_id' => 0,
     'is_public' => '1',
     'start_date' => '2008-10-21 00:00:00',
     'event_start_date' => '2008-10-21 00:00:00',
+    'event_end_date' => '',
     'is_online_registration' => 0,
     'max_participants' => '1',
     'is_monetary' => 0,
@@ -59,9 +62,12 @@ function event_getsingle_expectedresult() {
     'is_pay_later' => 0,
     'is_partial_payment' => 0,
     'is_multiple_registrations' => 0,
+    'max_additional_participants' => 0,
     'allow_same_participant_emails' => 0,
+    'allow_selfcancelxfer' => 0,
+    'selfcancelxfer_time' => 0,
     'is_template' => 0,
-    'created_date' => '2015-02-22 23:13:11',
+    'created_date' => '2017-02-07 02:22:22',
     'is_share' => '1',
     'is_confirm_enabled' => '1',
     'is_billing_required' => 0,

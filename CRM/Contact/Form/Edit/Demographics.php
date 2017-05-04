@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -45,10 +45,10 @@ class CRM_Contact_Form_Edit_Demographics {
   public static function buildQuickForm(&$form) {
     $form->addField('gender_id', array('entity' => 'contact', 'type' => 'Radio', 'allowClear' => TRUE));
 
-    $form->addField('birth_date', array('entity' => 'contact', 'formatType' => 'birth'));
+    $form->addField('birth_date', array('entity' => 'contact'), FALSE, FALSE);
 
     $form->addField('is_deceased', array('entity' => 'contact', 'label' => ts('Contact is Deceased'), 'onclick' => "showDeceasedDate()"));
-    $form->addField('deceased_date', array('entity' => 'contact', 'formatType' => 'birth'));
+    $form->addField('deceased_date', array('entity' => 'contact'), FALSE, FALSE);
   }
 
   /**

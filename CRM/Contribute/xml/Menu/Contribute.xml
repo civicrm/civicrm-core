@@ -319,15 +319,6 @@
     <component>CiviContribute</component>
   </item>
   <item>
-    <path>civicrm/admin/contribute/closeaccperiod</path>
-    <title>Close Accounting Period</title>
-    <page_callback>CRM_Contribute_Form_CloseAccPeriod</page_callback>
-    <access_arguments>access CiviContribute,administer CiviCRM,administer Accounting</access_arguments>
-    <page_type>1</page_type>
-    <weight>640</weight>
-    <component>CiviContribute</component>
-  </item>
-  <item>
     <path>civicrm/ajax/softcontributionlist</path>
     <page_callback>CRM_Contribute_Page_AJAX::getSoftContributionRows</page_callback>
     <access_arguments>access CiviCRM</access_arguments>

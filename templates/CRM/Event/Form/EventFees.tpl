@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,13 +24,6 @@
  +--------------------------------------------------------------------+
 *}
 {assign var=isRecordPayment value=1 }
-{if $isFTPermissionDenied}
-  <script>
-  {literal}
-    CRM.alert(ts('You do not have all the permissions needed for this page.'), 'Permission Denied', 'error');
-  {/literal}
-  </script>
-{/if}
 {if $paid} {* We retrieve this tpl when event is selected - keep it empty if event is not paid *}
     <table class="form-layout">
     {if $priceSet}
@@ -104,26 +97,13 @@
            </fieldset>
            </td>
         </tr>
-
-        {* Record contribution field only present if we are NOT in submit credit card mode (! participantMode). *}
-        {include file="CRM/common/showHideByFieldValue.tpl"
-            trigger_field_id    ="record_contribution"
-            trigger_value       =""
-            target_element_id   ="payment_information"
-            target_element_type ="table-row"
-            field_type          ="radio"
-            invert              = 0
-        }
     {/if}
     </table>
 
 {/if}
 
-{* credit card block when it is live or test mode*}
-{if $participantMode and $paid}
-  <div class="spacer"></div>
-  {include file='CRM/Core/BillingBlockWrapper.tpl'}
-{/if}
+{include file='CRM/Core/BillingBlockWrapper.tpl'}
+
 {if ($email OR $batchEmail) and $outBound_option != 2}
     <fieldset id="send_confirmation_receipt"><legend>{if $paid}{ts}Registration Confirmation and Receipt{/ts}{else}{ts}Registration Confirmation{/ts}{/if}</legend>
       <table class="form-layout" style="width:auto;">

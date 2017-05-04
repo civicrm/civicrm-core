@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -30,7 +30,7 @@
  * PEAR_ErrorStack and use that framework
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 require_once 'PEAR/ErrorStack.php';
@@ -309,6 +309,11 @@ class CRM_Core_Error extends PEAR_ErrorStack {
 
   /**
    * Display an error page with an error message describing what happened.
+   *
+   * @deprecated
+   *  This is a really annoying function. We ❤ exceptions. Be exceptional!
+   *
+   * @see CRM-20181
    *
    * @param string $message
    *   The error message.
@@ -600,7 +605,15 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     }
     $file_log->close();
 
-    if (!empty($config->userFrameworkLogging)) {
+    if (!isset(\Civi::$statics[__CLASS__]['userFrameworkLogging'])) {
+      // Set it to FALSE first & then try to set it. This is to prevent a loop as calling
+      // $config->userFrameworkLogging can trigger DB queries & under log mode this
+      // then gets called again.
+      \Civi::$statics[__CLASS__]['userFrameworkLogging'] = FALSE;
+      \Civi::$statics[__CLASS__]['userFrameworkLogging'] = $config->userFrameworkLogging;
+    }
+
+    if (!empty(\Civi::$statics[__CLASS__]['userFrameworkLogging'])) {
       // should call $config->userSystem->logger($message) here - but I got a situation where userSystem was not an object - not sure why
       if ($config->userSystem->is_drupal and function_exists('watchdog')) {
         watchdog('civicrm', '%message', array('%message' => $message), WATCHDOG_DEBUG);
@@ -650,7 +663,12 @@ class CRM_Core_Error extends PEAR_ErrorStack {
 
   /**
    * Generate a hash for the logfile.
+   *
    * CRM-13640.
+   *
+   * @param CRM_Core_Config $config
+   *
+   * @return string
    */
   public static function generateLogFileHash($config) {
     // Use multiple (but stable) inputs for hash information.

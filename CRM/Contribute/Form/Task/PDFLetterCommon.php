@@ -10,9 +10,12 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
    * Process the form after the input has been submitted and validated.
    *
    * @param CRM_Contribute_Form_Task $form
+   * @param array $formValues
    */
-  public static function postProcess(&$form) {
-    $formValues = $form->controller->exportValues($form->getName());
+  public static function postProcess(&$form, $formValues = NULL) {
+    if (empty($formValues)) {
+      $formValues = $form->controller->exportValues($form->getName());
+    }
     list($formValues, $categories, $html_message, $messageToken, $returnProperties) = self::processMessageTemplate($formValues);
     $isPDF = FALSE;
     $emailParams = array();
@@ -108,12 +111,25 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
         }
       }
     }
+
+    if (!empty($formValues['is_unit_test'])) {
+      return $html;
+    }
     //createActivities requires both $form->_contactIds and $contacts -
     //@todo - figure out why
     $form->_contactIds = array_keys($contacts);
     self::createActivities($form, $html_message, $form->_contactIds);
+
+    //CRM-19761
     if (!empty($html)) {
-      CRM_Utils_PDF_Utils::html2pdf($html, "CiviLetter.pdf", FALSE, $formValues);
+      $type = $formValues['document_type'];
+
+      if ($type == 'pdf') {
+        CRM_Utils_PDF_Utils::html2pdf($html, "CiviLetter.pdf", FALSE, $formValues);
+      }
+      else {
+        CRM_Utils_PDF_Document::html2doc($html, "CiviLetter.$type", $formValues);
+      }
     }
 
     $form->postProcessHook();
@@ -231,13 +247,18 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
     $contributions = $contacts = $notSent = array();
     foreach ($contributionIDs as $item => $contributionId) {
       // get contribution information
-      $contribution = CRM_Utils_Token::getContributionTokenDetails(array('contribution_id' => $contributionId),
-        $returnProperties,
-        NULL,
-        $messageToken,
-        $task
-      );
-      $contribution = $contributions[$contributionId] = $contribution[$contributionId];
+
+      // basic return attributes needed, see below for there usage
+      $returnValues = array('contact_id', 'total_amount');
+      if (!empty($messageToken['contribution'])) {
+        $returnValues = array_merge($messageToken['contribution'], $returnValues);
+      }
+      // retrieve contribution tokens listed in $returnProperties using Contribution.Get API
+      $contribution = civicrm_api3('Contribution', 'getsingle', array(
+        'id' => $contributionId,
+        'return' => $returnValues,
+      ));
+      $contributions[$contributionId] = $contribution;
 
       if ($isIncludeSoftCredits) {
         //@todo find out why this happens & add comments

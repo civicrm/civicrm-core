@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -162,13 +162,7 @@
           </span>
         {/if}
         <div id="recurHelp" class="description">
-          {ts}Your recurring contribution will be processed automatically.{/ts}
-          {if $is_recur_installments}
-            {ts}You can specify the number of installments, or you can leave the number of installments blank if you want to make an open-ended commitment. In either case, you can choose to cancel at any time.{/ts}
-          {/if}
-          {if $is_email_receipt}
-            {ts}You will receive an email receipt for each recurring contribution.{/ts}
-          {/if}
+          {$recurringHelpText}
         </div>
       </div>
       <div class="clear"></div>
@@ -355,11 +349,11 @@
     }
     if (isRecur.val() > 0) {
       cj('#recurHelp').show();
-      cj('#amount_sum_label').text(ts('Regular amount'));
+      cj('#amount_sum_label').text('{/literal}{ts escape='js'}Regular amount{/ts}{literal}');
     }
     else {
       cj('#recurHelp').hide();
-      cj('#amount_sum_label').text(ts('Total amount'));
+      cj('#amount_sum_label').text('{/literal}{ts escape='js'}Total amount{/ts}{literal}');
     }
   }
 

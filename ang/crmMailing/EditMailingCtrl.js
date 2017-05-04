@@ -13,6 +13,10 @@
     var block = $scope.block = crmBlocker();
     var myAutosave = null;
 
+    var templateTypes = _.where(CRM.crmMailing.templateTypes, {name: selectedMail.template_type});
+    if (!templateTypes[0]) throw 'Unrecognized template type: ' + selectedMail.template_type;
+    $scope.mailingEditorUrl = templateTypes[0].editorUrl;
+
     $scope.isSubmitted = function isSubmitted() {
       return _.size($scope.mailing.jobs) > 0;
     };
@@ -43,7 +47,7 @@
     // @return Promise
     $scope.submit = function submit(options) {
       options = options || {};
-      if (block.check() || $scope.crmMailing.$invalid) {
+      if (block.check()) {
         return;
       }
 

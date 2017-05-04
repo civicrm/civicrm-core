@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -130,9 +130,22 @@
               $row.title|substr:0:5 == "Phone"}
 
             <td>
-              {* @TODO check if this is ever an array or a fileName? *}
-              {* This is on one long line for address formatting *}
-              {if $row.title|substr:0:7 == "Address"}<span style="white-space: pre" id="main_{$blockName}_{$blockId}">{else}<span id="main_{$blockName}_{$blockId}">{/if}{if !is_array($row.main)}{$row.main}{elseif $row.main.fileName}{$row.main.fileName}{else}{', '|implode:$row.main}{/if}</span>
+              {strip}
+                {if $row.title|substr:0:7 == "Address"}
+                  <span style="white-space: pre" id="main_{$blockName}_{$blockId}">
+                {else}
+                  <span id="main_{$blockName}_{$blockId}">
+                {/if}
+                {* @TODO check if this is ever an array or a fileName? *}
+                {if !is_array($row.main)}
+                  {$row.main}
+                {elseif $row.main.fileName}
+                  {$row.main.fileName}
+                {else}
+                  {', '|implode:$row.main}
+                {/if}
+                </span>
+              {/strip}
             </td>
 
             <td>
@@ -220,10 +233,6 @@
       {/if}
     {/foreach}
   </table>
-  <div class='form-item'>
-    <!--<p>{$form.moveBelongings.html} {$form.moveBelongings.label}</p>-->
-    <!--<p>{$form.deleteOther.html} {$form.deleteOther.label}</p>-->
-  </div>
 
   <div class="crm-submit-buttons">
     {include file="CRM/common/formButtons.tpl" location="bottom"}
@@ -239,7 +248,7 @@
   /**
    * Triggered when a 'location' or 'type' destination is changed, and when
    * the operation or 'set primary' checkboxes are changed.
-   * 
+   *
    * Check to see if the 'main' contact record has a corresponding location
    * block when the destination of a field is changed. Allow existing location
    * fields to be overwritten with data from the 'other' contact.
@@ -388,29 +397,26 @@
     }
   }
 
+  /**
+   * Toggle the location type and the is_primary on & off depending on whether the merge box is ticked.
+   *
+   * @param element
+   */
+  function toggleRelatedLocationFields(element) {
+    relatedElements = CRM.$(element).parent().siblings('td').find('input,select,label,hidden');
+    if (CRM.$(element).is(':checked')) {
+      relatedElements.removeClass('disabled').attr('disabled', false);
+
+    }
+    else {
+      relatedElements.addClass('disabled').attr('disabled', true);
+    }
+
+  }
+
   CRM.$(function($) {
-
-    $('table td input.form-checkbox').each(function() {
-      var ele = null;
-      var element = $(this).attr('id').split('_',3);
-
-      switch ( element['1'] ) {
-        case 'addressee':
-          ele = '#' + element['0'] + '_' + element['1'];
-          break;
-
-         case 'email':
-         case 'postal':
-           ele = '#' + element['0'] + '_' + element['1'] + '_' + element['2'];
-           break;
-      }
-
-      if( ele ) {
-        $(this).on('click', function() {
-          var val = $(this).prop('checked');
-          $('input' + ele + ', input' + ele + '_custom').prop('checked', val);
-        });
-      }
+    $('input.crm-form-checkbox[data-is_location]').on('click', function(){
+      toggleRelatedLocationFields(this)
     });
 
     // Show/hide matching data rows
@@ -419,6 +425,8 @@
     });
 
     // Call mergeBlock whenever a location type is changed
+    // (This is applied to the body because the inputs can be added dynamically
+    // to the form, and we need to catch when they change.)
     $('body').on('change', 'select[id$="locTypeId"],select[id$="typeTypeId"],input[id$="[operation]"],input[id$="[set_other_primary]"]', function(event){
 
       // All the information we need is held in the id, separated by underscores

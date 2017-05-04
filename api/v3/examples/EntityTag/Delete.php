@@ -7,8 +7,8 @@
  */
 function entity_tag_delete_example() {
   $params = array(
-    'contact_id_h' => 37,
-    'tag_id' => '17',
+    'contact_id_h' => 31,
+    'tag_id' => '15',
   );
 
   try{
@@ -20,7 +20,8 @@ function entity_tag_delete_example() {
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
     return array(
-      'error' => $errorMessage,
+      'is_error' => 1,
+      'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
     );

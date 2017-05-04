@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -194,15 +194,20 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
    *   the default array reference
    */
   public function setDefaultValues() {
-    $defaults = $this->_formValues;
+    // Set ssID for unit tests.
+    if (empty($this->_ssID)) {
+      $this->_ssID = $this->get('ssID');
+    }
+
+    $defaults = array_merge($this->_formValues, array(
+      'privacy_toggle' => 1,
+      'operator' => 'AND',
+    ));
     $this->normalizeDefaultValues($defaults);
 
     if ($this->_context === 'amtg') {
       $defaults['task'] = CRM_Contact_Task::GROUP_CONTACTS;
     }
-
-    $defaults['privacy_toggle'] = 1;
-    $defaults['operator'] = 'AND';
 
     return $defaults;
   }
@@ -342,7 +347,9 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
       'contribution_trxn_id',
       'activity_type_id',
       'status_id',
+      'priority_id',
       'activity_subject',
+      'activity_details',
       'contribution_page_id',
       'contribution_product_id',
       'payment_instrument_id',
@@ -350,7 +357,10 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
       'contact_tags',
       'preferred_communication_method',
     );
-    $changeNames = array('status_id' => 'activity_status_id');
+    $changeNames = array(
+      'status_id' => 'activity_status_id',
+      'priority_id' => 'activity_priority_id',
+    );
     CRM_Contact_BAO_Query::processSpecialFormValue($this->_formValues, $specialParams, $changeNames);
 
     $taglist = CRM_Utils_Array::value('contact_taglist', $this->_formValues);

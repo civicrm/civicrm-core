@@ -66,7 +66,7 @@ class civicrm_handler_field_location extends civicrm_handler_field {
       '#title' => t('Label'),
       '#default_value' => $label,
       '#dependency' => array(
-        'edit-options-custom-label' => array(1),
+          'edit-options-custom-label' => array(1),
       ),
       '#weight' => -102,
     );
@@ -111,7 +111,11 @@ class civicrm_handler_field_location extends civicrm_handler_field {
         exit;
       }
       $join = $this->get_join();
-      $this->table_alias = $this->query->ensure_table($this->table, $this->relationship, $join);
+      if (empty($this->relationship)) { //https://www.drupal.org/node/2617032
+        $this->table_alias = $this->query->add_table($this->table, $this->relationship, $join);
+      } else {
+        $this->table_alias = $this->query->ensure_table($this->table, $this->relationship, $join);
+      }
     }
     return $this->table_alias;
   }

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                               |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -70,10 +70,10 @@ class civicrm_handler_field_im extends civicrm_handler_field_location {
     }
     if (isset($this->options['provider']) && $this->options['provider']) {
       $extra[] = array(
-          'value' => $this->options['provider'],
-          'numeric' => TRUE,
-          'field' => 'provider_id',
-          'operator' => '=',
+        'value' => $this->options['provider'],
+        'numeric' => TRUE,
+        'field' => 'provider_id',
+        'operator' => '=',
       );
     }
     if (!empty($extra)) {
@@ -95,7 +95,11 @@ class civicrm_handler_field_im extends civicrm_handler_field_location {
         exit;
       }
       $join = $this->get_join();
-      $this->table_alias = $this->query->ensure_table($this->table, $this->relationship, $join);
+      if (empty($this->relationship)) { //https://www.drupal.org/node/2617032
+        $this->table_alias = $this->query->add_table($this->table, $this->relationship, $join);
+      } else {
+        $this->table_alias = $this->query->ensure_table($this->table, $this->relationship, $join);
+      }
     }
     return $this->table_alias;
   }

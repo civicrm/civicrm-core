@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -118,6 +118,7 @@
             <thead>
             <tr>
                 <th>{ts}Membership{/ts}</th>
+                <th>{ts}Member Since{/ts}</th>
                 <th>{ts}Start Date{/ts}</th>
                 <th>{ts}End Date{/ts}</th>
                 <th>{ts}Status{/ts}</th>
@@ -131,6 +132,7 @@
                 <td class="crm-membership-membership_type">{$inActiveMember.membership_type}
         {if $inActiveMember.owner_membership_id}<br />({ts}by relationship{/ts}){/if}
     </td>
+                <td class="crm-membership-join_date" data-order="{$inActiveMember.join_date}">{$inActiveMember.join_date|crmDate}</td>
                 <td class="crm-membership-start_date" data-order="{$inActiveMember.start_date}">{$inActiveMember.start_date|crmDate}</td>
                 <td class="crm-membership-end_date" data-order="{$inActiveMember.end_date}">{$inActiveMember.end_date|crmDate}</td>
                 <td class="crm-membership-status">{$inActiveMember.status}</td>

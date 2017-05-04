@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
  */
@@ -759,6 +759,12 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
               'Supplementary Address Field 2'),
             'default' => CRM_Utils_Array::value('supplemental_address_2', $options['defaults'], FALSE),
             'name' => 'supplemental_address_2',
+          ),
+          $options['prefix'] . 'supplemental_address_3' => array(
+            'title' => ts($options['prefix_label'] .
+              'Supplementary Address Field 3'),
+            'default' => CRM_Utils_Array::value('supplemental_address_3', $options['defaults'], FALSE),
+            'name' => 'supplemental_address_3',
           ),
           $options['prefix'] . 'street_number' => array(
             'name' => 'street_number',

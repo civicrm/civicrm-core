@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Contribute_BAO_Contribution_Utils {
 
@@ -475,9 +475,26 @@ LIMIT 1
    */
   public static function calculateTaxAmount($amount, $taxRate) {
     $taxAmount = array();
-    $taxAmount['tax_amount'] = round(($taxRate / 100) * CRM_Utils_Rule::cleanMoney($amount), 2);
+    // There can not be any rounding at this stage - as this is prior to quantity multiplication
+    $taxAmount['tax_amount'] = ($taxRate / 100) * CRM_Utils_Rule::cleanMoney($amount);
 
     return $taxAmount;
+  }
+
+  /**
+   * Format monetary amount: round and return to desired decimal place
+   * CRM-20145
+   *
+   * @param float $amount
+   *   Monetary amount
+   * @param int $decimals
+   *   How many decimal places to round to and return
+   *
+   * @return float
+   *   Amount rounded and returned with the desired decimal places
+   */
+  public static function formatAmount($amount, $decimals = 2) {
+    return number_format((float) round($amount, (int) $decimals), (int) $decimals, '.', '');
   }
 
 }

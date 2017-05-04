@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
  */
@@ -120,6 +120,9 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
       if ($element->getAttribute('data-api-entity') && $element->getAttribute('data-entity-value')) {
         $this->renderFrozenEntityRef($el, $element);
       }
+      elseif ($element->getAttribute('type') == 'text' && $element->getAttribute('data-select-params')) {
+        $this->renderFrozenSelect2($el, $element);
+      }
       elseif ($element->getAttribute('type') == 'text' && $element->getAttribute('formatType')) {
         list($date, $time) = CRM_Utils_Date::setDateDefaults($element->getValue(), $element->getAttribute('formatType'), $element->getAttribute('format'), $element->getAttribute('timeformat'));
         $date .= ($element->getAttribute('timeformat')) ? " $time" : '';
@@ -139,7 +142,7 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
         $this->addOptionsEditLink($el, $element);
       }
 
-      if ($element->getType() == 'group' && $element->getAttribute('allowClear')) {
+      if ($element->getAttribute('allowClear')) {
         $this->appendUnselectButton($el, $element);
       }
     }
@@ -251,6 +254,27 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
     }
     // Convert array values back to a string
     $field->setValue(implode(',', $val));
+  }
+
+  /**
+   * Render select2 as text.
+   *
+   * @param array $el
+   * @param HTML_QuickForm_element $field
+   */
+  public function renderFrozenSelect2(&$el, $field) {
+    $params = json_decode($field->getAttribute('data-select-params'), TRUE);
+    $val = $field->getValue();
+    if ($val && !empty($params['data'])) {
+      $display = array();
+      foreach (explode(',', $val) as $item) {
+        $match = CRM_Utils_Array::findInTree($item, $params['data']);
+        if (isset($match['text']) && strlen($match['text'])) {
+          $display[] = $match['text'];
+        }
+      }
+      $el['html'] = implode('; ', $display) . '<input type="hidden" value="' . $field->getValue() . '" name="' . $field->getAttribute('name') . '">';
+    }
   }
 
   /**

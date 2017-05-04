@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -50,6 +50,9 @@
     margin-top: 1em;
     overflow: auto;
   }
+  #api-params tr td {
+    padding-top: 13px;
+  }
   #api-params-table th:first-child,
   #api-params-table td:first-child {
     width: 35%;
@@ -68,6 +71,61 @@
   #api-params-table td:first-child + td + td,
   #api-params-table th:first-child + th + th {
     width: 65%
+  }
+  #api-params .api-sort-handle {
+    margin-right: 10px;
+    cursor: move;
+  }
+  #api-params tr td > .crm-i,
+  #api-params tr td > a .crm-i {
+    color: lightgrey;
+  }
+  #api-params tr:hover td > .crm-i,
+  #api-params tr:hover td > a .crm-i {
+    color: grey;
+  }
+  #api-params .api-and-or {
+    margin-left: 1.2em;
+    font-size: .8em;
+    position: relative;
+    top: 5px;
+    width: 10em;
+    margin-bottom: -9px;
+  }
+  #api-params .api-and-or > span {
+    padding: 0 1em;
+    background: white;
+    cursor: pointer;
+  }
+  #api-params .api-or,
+  #api-params tr.or .api-and {
+    color: lightgrey;
+  }
+  #api-params tr.or .api-or {
+    color: inherit;
+  }
+  #api-params .api-and-or .crm-i {
+    transform: rotate(180deg);
+  }
+  #api-params tr.or .api-and-or .crm-i {
+    transform: initial;
+  }
+  #api-params .api-and-or:hover .crm-i {
+    color: #2786c2;
+  }
+  #api-params tr.or {
+    border-top: 3px solid lightgrey;
+    border-left: 3px solid lightgrey;
+    border-right: 3px solid lightgrey;
+  }
+  #api-params tr.or + tr {
+    border-left: 3px solid lightgrey;
+    border-right: 3px solid lightgrey;
+    border-bottom: 3px solid lightgrey;
+  }
+  #api-params tr.or + tr.or {
+    border-top: none;
+    border-bottom: none;
   }
   #api-generated td:first-child {
     width: 60px;
@@ -171,13 +229,13 @@
 <div id="mainTabContainer">
   <ul>
     <li class="ui-corner-all" title="GUI to build and execute API calls">
-      <a href="#explorer-tab">{ts}Explorer{/ts}</a>
+      <a href="#explorer-tab"><i class="crm-i fa-search"></i> {ts}Explorer{/ts}</a>
     </li>
     <li class="ui-corner-all" title="Auto-generated examples from the test suite">
-      <a href="#examples-tab">{ts}Examples{/ts}</a>
+      <a href="#examples-tab"><i class="crm-i fa-book"></i> {ts}Examples{/ts}</a>
     </li>
     <li class="ui-corner-all" title="API source-code and code-level documentation">
-      <a href="#docs-tab">{ts}Code Docs{/ts}</a>
+      <a href="#docs-tab"><i class="crm-i fa-code"></i> {ts}Code Docs{/ts}</a>
     </li>
   </ul>
 
@@ -303,7 +361,11 @@
 {strip}
 <script type="text/template" id="api-param-tpl">
   <tr class="api-param-row">
-    <td><input style="width: 100%;" class="crm-form-text api-param-name api-input" value="<%= name %>" placeholder="{ts}Parameter{/ts}" /></td>
+    <td>
+      <i class="crm-i api-sort-handle fa-arrows"></i>
+      <input style="width: 90%;" class="crm-form-text api-param-name api-input" value="<%= name %>" placeholder="{ts}Parameter{/ts}" />
+      <div class="api-and-or"><span><span class="api-and">{ts}AND{/ts}</span> <i class="crm-i fa-toggle-on"></i> <span class="api-or">{ts}OR{/ts}</span></span></div>
+    </td>
     <td>
       {literal}
       <% if (noOps) { %>
@@ -357,7 +419,8 @@
 <script type="text/template" id="api-chain-tpl">
   <tr class="api-chain-row">
     <td>
-      <select style="width: 100%;" class="crm-form-select api-chain-entity">
+      <i class="crm-i api-sort-handle fa-arrows"></i>
+      <select style="width: 90%;" class="crm-form-select api-chain-entity">
         <option value=""></option>
         {foreach from=$entities.values item=entity}
           <option value="{$entity}" {if !empty($entities.deprecated) && in_array($entity, $entities.deprecated)}class="strikethrough"{/if}>

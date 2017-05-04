@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -327,13 +327,6 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
       CRM_Core_DAO::getAttribute('CRM_Price_DAO_PriceField', 'help_post')
     );
 
-    // active_on
-    $date_options = array(
-      'format' => 'dmY His',
-      'minYear' => date('Y') - 1,
-      'maxYear' => date('Y') + 5,
-      'addEmptyOption' => TRUE,
-    );
     $this->addDateTime('active_on', ts('Active On'), FALSE, array('formatType' => 'activityDateTime'));
 
     // expire_on
@@ -410,15 +403,6 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
       }
       if ($fields['financial_type_id'] == '') {
         $errors['financial_type_id'] = ts('Financial Type is a required field');
-      }
-      else {
-        // CRM-16189
-        try {
-          CRM_Financial_BAO_FinancialAccount::validateFinancialType($fields['financial_type_id'], $form->_sid);
-        }
-        catch (CRM_Core_Exception $e) {
-          $errors['financial_type_id'] = $e->getMessage();
-        }
       }
     }
 
@@ -536,13 +520,6 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
           }
 
           $_flagOption = $_emptyRow = 0;
-          // CRM-16189
-          try {
-            CRM_Financial_BAO_FinancialAccount::validateFinancialType($fields['option_financial_type_id'][$index], $form->_fid, 'PriceField');
-          }
-          catch(CRM_Core_Exception $e) {
-            $errors["option_financial_type_id[{$index}]"] = $e->getMessage();
-          }
         }
 
         if (!empty($memTypesIDS)) {

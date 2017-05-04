@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
 
@@ -87,11 +87,27 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
         ),
         'mailing_name' => array(
           'name' => 'name',
-          'title' => ts('Mailing'),
+          'title' => ts('Mailing Name'),
           'operatorType' => CRM_Report_Form::OP_MULTISELECT,
           'type' => CRM_Utils_Type::T_STRING,
           'options' => self::mailing_select(),
           'operator' => 'like',
+        ),
+        'mailing_subject' => array(
+          'name' => 'subject',
+          'title' => ts('Mailing Subject'),
+          'type' => CRM_Utils_Type::T_STRING,
+          'operator' => 'like',
+        ),
+      ),
+      'order_bys' => array(
+        'mailing_name' => array(
+          'name' => 'name',
+          'title' => ts('Mailing Name'),
+        ),
+        'mailing_subject' => array(
+          'name' => 'subject',
+          'title' => ts('Mailing Subject'),
         ),
       ),
     );
@@ -130,6 +146,17 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
           'type' => CRM_Utils_Type::T_DATE,
         ),
       ),
+      'order_bys' => array(
+        'start_date' => array(
+          'title' => ts('Start Date'),
+        ),
+        'end_date' => array(
+          'title' => ts('End Date'),
+          'default_weight' => '1',
+          'default_order' => 'DESC',
+        ),
+      ),
+      'grouping' => 'mailing-fields',
     );
 
     $this->_columns['civicrm_mailing_event_queue'] = array(
@@ -460,10 +487,6 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
       "{$this->_aliases['civicrm_mailing']}.id",
     );
     $this->_groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, $groupBy);
-  }
-
-  public function orderBy() {
-    $this->_orderBy = " ORDER BY {$this->_aliases['civicrm_mailing_job']}.end_date DESC ";
   }
 
   public function postProcess() {

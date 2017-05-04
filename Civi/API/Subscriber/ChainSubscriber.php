@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -124,6 +124,17 @@ class ChainSubscriber implements EventSubscriberInterface {
           'debug' => \CRM_Utils_Array::value('debug', $params),
         );
         $subEntity = _civicrm_api_get_entity_name_from_camel($subAPI[1]);
+
+        // Hard coded list of entitys that have fields starting api_ and shouldn't be automatically
+        // deemed to be chained API calls
+        $skipList = array(
+          'SmsProvider' => array('type', 'url', 'params'),
+          'Job' => array('prefix', 'entity', 'action'),
+          'Contact' => array('key'),
+        );
+        if (isset($skipList[$entity]) && in_array($subEntity, $skipList[$entity])) {
+          continue;
+        }
 
         foreach ($result['values'] as $idIndex => $parentAPIValues) {
 

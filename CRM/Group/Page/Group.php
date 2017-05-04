@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Group_Page_Group extends CRM_Core_Page_Basic {
   protected $_sortByCharacter;
@@ -100,21 +100,6 @@ class CRM_Group_Page_Group extends CRM_Core_Page_Basic {
   }
 
   /**
-   * Make sure that the user has permission to access this group.
-   *
-   * @param int $id
-   *   The id of the object.
-   * @param int $title
-   *   Name or title of the object.
-   *
-   * @return string
-   *   the permission that the user has (or null)
-   */
-  public function checkPermission($id, $title) {
-    return CRM_Contact_BAO_Group::checkPermission($id, $title);
-  }
-
-  /**
    * Re-implement browse.
    *
    * We need to do slightly different things for groups vs saved search groups, hence we
@@ -143,7 +128,7 @@ class CRM_Group_Page_Group extends CRM_Core_Page_Basic {
     if (!empty($_GET['update_smart_groups'])) {
       CRM_Contact_BAO_GroupContactCache::loadAll();
     }
-    elseif (!CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_group_contact_cache LIMIT 1")) {
+    elseif (!CRM_Core_DAO::singleValueQuery("SELECT contact_id FROM civicrm_group_contact_cache LIMIT 1")) {
       CRM_Core_Session::setStatus(ts('Count data for smart groups is not currently calculated. You may click Update Smart Groups to generate it. Be aware this can cause significant server load'));
     }
 

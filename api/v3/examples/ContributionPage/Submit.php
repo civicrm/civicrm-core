@@ -9,16 +9,14 @@
  */
 function contribution_page_submit_example() {
   $params = array(
-    'price_3' => '',
     'id' => 1,
-    'amount' => 10,
+    'pledge_amount' => array(
+      '2' => 1,
+    ),
     'billing_first_name' => 'Billy',
     'billing_middle_name' => 'Goat',
     'billing_last_name' => 'Gruff',
     'email' => 'billy@goat.gruff',
-    'selectMembership' => array(
-      '0' => 1,
-    ),
     'payment_processor_id' => 1,
     'credit_card_number' => '4111111111111111',
     'credit_card_type' => 'Visa',
@@ -27,9 +25,12 @@ function contribution_page_submit_example() {
       'Y' => 2040,
     ),
     'cvv2' => 123,
-    'is_recur' => 1,
-    'frequency_interval' => 1,
-    'frequency_unit' => 'month',
+    'pledge_id' => '1',
+    'cid' => '77',
+    'contact_id' => '77',
+    'amount' => '100',
+    'is_pledge' => TRUE,
+    'pledge_block_id' => 2,
   );
 
   try{
@@ -41,7 +42,8 @@ function contribution_page_submit_example() {
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
     return array(
-      'error' => $errorMessage,
+      'is_error' => 1,
+      'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
     );
@@ -70,7 +72,7 @@ function contribution_page_submit_expectedresult() {
 
 /*
 * This example has been generated from the API test suite.
-* The test that created it is called "testSubmitMembershipPriceSetPaymentPaymentProcessorRecurDelayed"
+* The test that created it is called "testSubmitPledgePayment"
 * and can be found at:
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ContributionPageTest.php
 *

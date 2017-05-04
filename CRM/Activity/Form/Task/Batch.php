@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -78,8 +78,8 @@ class CRM_Activity_Form_Task_Batch extends CRM_Activity_Form_Task {
     if (!empty($contactDetails)) {
       foreach ($contactDetails as $key => $value) {
         $assignee = CRM_Activity_BAO_ActivityAssignment::retrieveAssigneeIdsByActivityId($key);
-        foreach ($assignee as $keys => $values) {
-          $assigneeContact[] = CRM_Contact_BAO_Contact::displayname($values);
+        foreach ($assignee as $values) {
+          $assigneeContact[] = CRM_Contact_BAO_Contact::displayName($values);
         }
         $contactDetails[$key]['assignee_display_name'] = !empty($assigneeContact) ? implode(';', $assigneeContact) : NULL;
       }
@@ -95,7 +95,7 @@ class CRM_Activity_Form_Task_Batch extends CRM_Activity_Form_Task {
     $ufGroupId = $this->get('ufGroupId');
 
     if (!$ufGroupId) {
-      CRM_Core_Error::fatal('ufGroupId is missing');
+      throw new CRM_Core_Exception('The profile id is missing');
     }
     $this->_title = ts('Update multiple activities') . ' - ' . CRM_Core_BAO_UFGroup::getTitle($ufGroupId);
     CRM_Utils_System::setTitle($this->_title);
@@ -108,7 +108,7 @@ class CRM_Activity_Form_Task_Batch extends CRM_Activity_Form_Task {
     $suppressFields = FALSE;
     $removehtmlTypes = array('File', 'Autocomplete-Select');
     foreach ($this->_fields as $name => $field) {
-      if ($cfID = CRM_Core_BAO_CustomField::getKeyID($name) &&
+      if (CRM_Core_BAO_CustomField::getKeyID($name) &&
         in_array($this->_fields[$name]['html_type'], $removehtmlTypes)
       ) {
         $suppressFields = TRUE;
@@ -138,7 +138,6 @@ class CRM_Activity_Form_Task_Batch extends CRM_Activity_Form_Task {
 
     $this->assign('profileTitle', $this->_title);
     $this->assign('componentIds', $this->_activityHolderIds);
-    $fileFieldExists = FALSE;
 
     // Load all campaigns.
     if (array_key_exists('activity_campaign_id', $this->_fields)) {
@@ -151,6 +150,10 @@ class CRM_Activity_Form_Task_Batch extends CRM_Activity_Form_Task {
     }
 
     $customFields = CRM_Core_BAO_CustomField::getFields('Activity');
+    // It is possible to have fields that are required in CiviCRM not be required in the
+    // profile. Overriding that here. Perhaps a better approach would be to
+    // make them required in the schema & read that up through getFields functionality.
+    $requiredFields = array('activity_date_time');
 
     foreach ($this->_activityHolderIds as $activityId) {
       $typeId = CRM_Core_DAO::getFieldValue("CRM_Activity_DAO_Activity", $activityId, 'activity_type_id');
@@ -170,6 +173,9 @@ class CRM_Activity_Form_Task_Batch extends CRM_Activity_Form_Task {
         }
         else {
           // Handle non custom fields.
+          if (in_array($field['name'], $requiredFields)) {
+            $field['is_required'] = TRUE;
+          }
           CRM_Core_BAO_UFGroup::buildProfile($this, $field, NULL, $activityId);
         }
       }
@@ -197,7 +203,6 @@ class CRM_Activity_Form_Task_Batch extends CRM_Activity_Form_Task {
 
     $defaults = array();
     foreach ($this->_activityHolderIds as $activityId) {
-      $details[$activityId] = array();
       CRM_Core_BAO_UFGroup::setProfileDefaults(NULL, $this->_fields, $defaults, FALSE, $activityId, 'Activity');
     }
 
@@ -218,20 +223,12 @@ class CRM_Activity_Form_Task_Batch extends CRM_Activity_Form_Task {
         );
         $value['id'] = $key;
 
-        if (!empty($value['activity_date_time'])) {
-          $value['activity_date_time'] = CRM_Utils_Date::processDate($value['activity_date_time'], $value['activity_date_time_time']);
-        }
-
         if (!empty($value['activity_status_id'])) {
           $value['status_id'] = $value['activity_status_id'];
         }
 
         if (!empty($value['activity_details'])) {
           $value['details'] = $value['activity_details'];
-        }
-
-        if (!empty($value['activity_duration'])) {
-          $value['duration'] = $value['activity_duration'];
         }
 
         if (!empty($value['activity_location'])) {
@@ -242,30 +239,9 @@ class CRM_Activity_Form_Task_Batch extends CRM_Activity_Form_Task {
           $value['subject'] = $value['activity_subject'];
         }
 
-        $query = "
-SELECT a.activity_type_id, ac.contact_id
-FROM   civicrm_activity a
-JOIN   civicrm_activity_contact ac ON ( ac.activity_id = a.id
-AND    ac.record_type_id = %2 )
-WHERE  a.id = %1 ";
-        $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
-        $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
-        $params = array(1 => array($key, 'Integer'), 2 => array($sourceID, 'Integer'));
-        $dao = CRM_Core_DAO::executeQuery($query, $params);
-        $dao->fetch();
+        $activityId = civicrm_api3('activity', 'create', $value);
 
-        // Get Activity Type ID
-        $value['activity_type_id'] = $dao->activity_type_id;
-
-        // Get Conatct ID
-        $value['source_contact_id'] = $dao->contact_id;
-
-        // make call use API 3
-        $value['version'] = 3;
-
-        $activityId = civicrm_api('activity', 'update', $value);
-
-        // add custom field values
+        // @todo this would be done by the api call above if the parames were passed through.
         if (!empty($value['custom']) &&
           is_array($value['custom'])
         ) {

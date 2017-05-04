@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
 
@@ -125,6 +125,11 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
             'title' => ts('Duration'),
             'default' => TRUE,
           ),
+          'priority_id' => array(
+            'title' => ts('Priority'),
+            'default' => TRUE,
+            'type' => CRM_Utils_Type::T_STRING,
+          ),
           'id' => array(
             'title' => ts('Total Activities'),
             'required' => TRUE,
@@ -150,7 +155,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
             'options' => CRM_Core_PseudoConstant::activityStatus(),
           ),
           'priority_id' => array(
-            'title' => ts('Priority'),
+            'title' => ts('Activity Priority'),
             'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_PseudoConstant::get('CRM_Activity_DAO_Activity', 'priority_id'),
@@ -246,7 +251,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
           if (!empty($field['required']) || !empty($this->_params['fields'][$fieldName])) {
-            if ($tableName == 'civicrm_email') {
+            if ($tableName == 'civicrm_email' || in_array('email', CRM_Utils_Array::collect('column', $this->_params['order_bys']))) {
               $this->_emailField = TRUE;
             }
             if ($tableName == 'civicrm_phone') {
@@ -332,13 +337,6 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
                LEFT JOIN civicrm_case_contact
                       ON civicrm_case_contact.case_id = civicrm_case.id ";
 
-      if ($this->_emailField) {
-        $this->_from .= "
-              LEFT JOIN civicrm_email  {$this->_aliases['civicrm_email']}
-                     ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_email']}.contact_id AND
-                       {$this->_aliases['civicrm_email']}.is_primary = 1 ";
-      }
-
       if ($this->_phoneField) {
         $this->_from .= "
               LEFT JOIN civicrm_phone  {$this->_aliases['civicrm_phone']}
@@ -355,6 +353,13 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
               LEFT JOIN civicrm_contact contact_civireport
                      ON target_activity.contact_id = contact_civireport.id
               {$this->_aclFrom}";
+    }
+
+    if ($this->_emailField) {
+      $this->_from .= "
+            LEFT JOIN civicrm_email  {$this->_aliases['civicrm_email']}
+                   ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_email']}.contact_id AND
+                     {$this->_aliases['civicrm_email']}.is_primary = 1 ";
     }
   }
 
@@ -417,6 +422,11 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
     }
   }
 
+  /**
+   * Group the fields.
+   *
+   * @param bool $includeSelectCol
+   */
   public function groupBy($includeSelectCol = TRUE) {
     $this->_groupBy = array();
     if (!empty($this->_params['group_bys']) &&
@@ -667,6 +677,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
     $entryFound = FALSE;
     $activityType = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE);
     $activityStatus = CRM_Core_PseudoConstant::activityStatus();
+    $priority = CRM_Core_PseudoConstant::get('CRM_Activity_DAO_Activity', 'priority_id');
     $onHover = ts('View Contact Summary for this Contact');
     foreach ($rows as $rowNum => $row) {
       // make count columns point to activity detail report
@@ -753,6 +764,13 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
       if (array_key_exists('civicrm_activity_status_id', $row)) {
         if ($value = $row['civicrm_activity_status_id']) {
           $rows[$rowNum]['civicrm_activity_status_id'] = $activityStatus[$value];
+          $entryFound = TRUE;
+        }
+      }
+
+      if (array_key_exists('civicrm_activity_priority_id', $row)) {
+        if ($value = $row['civicrm_activity_priority_id']) {
+          $rows[$rowNum]['civicrm_activity_priority_id'] = $priority[$value];
           $entryFound = TRUE;
         }
       }

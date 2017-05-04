@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,7 +27,7 @@
 
 /**
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -112,11 +112,11 @@ class CRM_Utils_Pager extends Pager_Sliding {
      * page variable, but a different form element for one at the bottom.
      */
     $this->_response['titleTop'] = ts('Page %1 of %2', array(
-        1 => '<input size="2" maxlength="3" name="' . self::PAGE_ID . '" type="text" value="' . $this->_response['currentPage'] . '" />',
+        1 => '<input size="2" maxlength="4" name="' . self::PAGE_ID . '" type="text" value="' . $this->_response['currentPage'] . '" />',
         2 => $this->_response['numPages'],
       ));
     $this->_response['titleBottom'] = ts('Page %1 of %2', array(
-        1 => '<input size="2" maxlength="3" name="' . self::PAGE_ID_BOTTOM . '" type="text" value="' . $this->_response['currentPage'] . '" />',
+        1 => '<input size="2" maxlength="4" name="' . self::PAGE_ID_BOTTOM . '" type="text" value="' . $this->_response['currentPage'] . '" />',
         2 => $this->_response['numPages'],
       ));
   }

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -115,6 +115,22 @@ class CRM_Contribute_Form_Task extends CRM_Core_Form {
     }
     else {
       $queryParams = $form->get('queryParams');
+      $isTest = FALSE;
+      foreach ($queryParams as $fields) {
+        if ($fields[0] == 'contribution_test') {
+          $isTest = TRUE;
+          break;
+        }
+      }
+      if (!$isTest) {
+        $queryParams[] = array(
+          'contribution_test',
+          '=',
+          0,
+          0,
+          0,
+        );
+      }
       $returnProperties = array('contribution_id' => 1);
       $sortOrder = $sortCol = NULL;
       if ($form->get(CRM_Utils_Sort::SORT_ORDER)) {
@@ -182,6 +198,15 @@ class CRM_Contribute_Form_Task extends CRM_Core_Form {
         $urlParams
       ));
     }
+  }
+
+  /**
+   * Sets contribution Ids for unit test.
+   *
+   * @param array $contributionIds
+   */
+  public function setContributionIds($contributionIds) {
+    $this->_contributionIds = $contributionIds;
   }
 
   /**

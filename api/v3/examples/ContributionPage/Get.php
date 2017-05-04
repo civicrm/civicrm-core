@@ -7,7 +7,6 @@
  */
 function contribution_page_get_example() {
   $params = array(
-    'amount' => '34567',
     'currency' => 'NZD',
     'financial_type_id' => 1,
   );
@@ -21,7 +20,8 @@ function contribution_page_get_example() {
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
     return array(
-      'error' => $errorMessage,
+      'is_error' => 1,
+      'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
     );
@@ -54,17 +54,20 @@ function contribution_page_get_expectedresult() {
         'is_confirm_enabled' => '1',
         'is_recur_interval' => 0,
         'is_recur_installments' => 0,
+        'adjust_recur_start_date' => 0,
         'is_pay_later' => '1',
         'is_partial_payment' => 0,
         'is_allow_other_amount' => 0,
         'goal_amount' => '34567.00',
-        'is_for_organization' => 0,
-        'is_email_receipt' => 0,
+        'is_email_receipt' => '1',
+        'receipt_from_name' => 'Ego Freud',
+        'receipt_from_email' => 'yourconscience@donate.com',
         'is_active' => '1',
         'amount_block_is_active' => '1',
         'currency' => 'NZD',
         'is_share' => '1',
         'is_billing_required' => 0,
+        'contribution_type_id' => '1',
       ),
     ),
   );
@@ -74,7 +77,7 @@ function contribution_page_get_expectedresult() {
 
 /*
 * This example has been generated from the API test suite.
-* The test that created it is called "testGetContributionPageByAmount"
+* The test that created it is called "testGetBasicContributionPage"
 * and can be found at:
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ContributionPageTest.php
 *

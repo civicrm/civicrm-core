@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -91,9 +91,11 @@ function civicrm_api3_price_set_get($params) {
     return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
   }
   $result = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, FALSE);
-  // Fetch associated entities
-  foreach ($result as &$item) {
-    $item['entity'] = CRM_Price_BAO_PriceSet::getUsedBy($item['id'], 'entity');
+  // Fetch associated entities if the return has not been previously limited.
+  if (!isset($params['return'])) {
+    foreach ($result as &$item) {
+      $item['entity'] = CRM_Price_BAO_PriceSet::getUsedBy($item['id'], 'entity');
+    }
   }
   return civicrm_api3_create_success($result, $params);
 }

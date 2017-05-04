@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -234,6 +234,61 @@
     {/if}
   </table>
 
+  {if !$contributionMode}
+    <fieldset class="payment-details_group">
+      <legend>
+        {ts}Payment Details{/ts}
+      </legend>
+        <table class="form-layout-compressed" >
+          <tr class="crm-contribution-form-block-receive_date">
+            <td class="label">{$form.receive_date.label}</td>
+            <td {$valueStyle}>{include file="CRM/common/jcalendar.tpl" elementName=receive_date}<br />
+              <span class="description">{ts}The date this contribution was received.{/ts}</span>
+            </td>
+          </tr>
+          <tr class="crm-contribution-form-block-payment_instrument_id">
+            <td class="label">{$form.payment_instrument_id.label}</td>
+            <td {$valueStyle}>{$form.payment_instrument_id.html} {help id="payment_instrument_id"}</td>
+            </td>
+          </tr>
+          {if $showCheckNumber || !$isOnline}
+            <tr id="checkNumber" class="crm-contribution-form-block-check_number">
+              <td class="label">{$form.check_number.label}</td>
+              <td>{$form.check_number.html}</td>
+            </tr>
+          {/if}
+          <tr class="crm-contribution-form-block-trxn_id">
+            <td class="label">{$form.trxn_id.label}</td>
+            <td {$valueStyle}>{$form.trxn_id.html} {help id="id-trans_id"}</td>
+          </tr>
+          {if $email and $outBound_option != 2}
+            <tr class="crm-contribution-form-block-is_email_receipt">
+              <td class="label">
+                {$form.is_email_receipt.label}</td><td>{$form.is_email_receipt.html}&nbsp;
+                <span class="description">{ts 1=$email}Automatically email a receipt for this payment to %1?{/ts}</span>
+              </td>
+            </tr>
+          {elseif $context eq 'standalone' and $outBound_option != 2 }
+            <tr id="email-receipt" style="display:none;" class="crm-contribution-form-block-is_email_receipt">
+              <td class="label">{$form.is_email_receipt.label}</td>
+              <td>{$form.is_email_receipt.html} <span class="description">{ts}Automatically email a receipt for this payment to {/ts}<span id="email-address"></span>?</span>
+              </td>
+            </tr>
+          {/if}
+          <tr id="receiptDate" class="crm-contribution-form-block-receipt_date">
+            <td class="label">{$form.receipt_date.label}</td>
+            <td>{include file="CRM/common/jcalendar.tpl" elementName=receipt_date}<br />
+              <span class="description">{ts}Date that a receipt was sent to the contributor.{/ts}</span>
+            </td>
+          </tr>
+          <tr id="fromEmail" class="crm-contribution-form-block-receipt_date" style="display:none;">
+            <td class="label">{$form.from_email_address.label}</td>
+            <td>{$form.from_email_address.html}</td>
+          </tr>
+        </table>
+      </fieldset>
+  {/if}
+
   {include file='CRM/Core/BillingBlockWrapper.tpl'}
 
     <!-- start of soft credit -->
@@ -300,63 +355,6 @@
       {include file="CRM/Contribute/Form/PCP.js.tpl"}
     {/if}
     <!-- end of PCP -->
-
-    {if !$contributionMode}
-    <div class="crm-accordion-wrapper crm-accordion_title-accordion crm-accordion-processed" id="paymentDetails_Information">
-      <div class="crm-accordion-header">
-        {ts}Payment Details{/ts}
-      </div>
-      <div class="crm-accordion-body">
-        <table class="form-layout-compressed" >
-          <tr class="crm-contribution-form-block-receive_date">
-            <td class="label">{$form.receive_date.label}</td>
-            <td {$valueStyle}>{include file="CRM/common/jcalendar.tpl" elementName=receive_date}<br />
-              <span class="description">{ts}The date this contribution was received.{/ts}</span>
-            </td>
-          </tr>
-          <tr class="crm-contribution-form-block-payment_instrument_id">
-            <td class="label">{$form.payment_instrument_id.label}</td>
-            <td {$valueStyle}>{$form.payment_instrument_id.html} {help id="payment_instrument_id"}</td>
-            </td>
-          </tr>
-          {if $showCheckNumber || !$isOnline}
-            <tr id="checkNumber" class="crm-contribution-form-block-check_number">
-              <td class="label">{$form.check_number.label}</td>
-              <td>{$form.check_number.html}</td>
-            </tr>
-          {/if}
-          <tr class="crm-contribution-form-block-trxn_id">
-            <td class="label">{$form.trxn_id.label}</td>
-            <td {$valueStyle}>{$form.trxn_id.html} {help id="id-trans_id"}</td>
-          </tr>
-          {if $email and $outBound_option != 2}
-            <tr class="crm-contribution-form-block-is_email_receipt">
-              <td class="label">
-                {$form.is_email_receipt.label}</td><td>{$form.is_email_receipt.html}&nbsp;
-                <span class="description">{ts 1=$email}Automatically email a receipt for this payment to %1?{/ts}</span>
-              </td>
-            </tr>
-            {elseif $context eq 'standalone' and $outBound_option != 2 }
-            <tr id="email-receipt" style="display:none;" class="crm-contribution-form-block-is_email_receipt">
-              <td class="label">{$form.is_email_receipt.label}</td>
-              <td>{$form.is_email_receipt.html} <span class="description">{ts}Automatically email a receipt for this payment to {/ts}<span id="email-address"></span>?</span>
-              </td>
-            </tr>
-          {/if}
-          <tr id="receiptDate" class="crm-contribution-form-block-receipt_date">
-            <td class="label">{$form.receipt_date.label}</td>
-            <td>{include file="CRM/common/jcalendar.tpl" elementName=receipt_date}<br />
-              <span class="description">{ts}Date that a receipt was sent to the contributor.{/ts}</span>
-            </td>
-          </tr>
-          <tr id="fromEmail" class="crm-contribution-form-block-receipt_date" style="display:none;">
-            <td class="label">{$form.from_email_address.label}</td>
-            <td>{$form.from_email_address.html}</td>
-          </tr>
-        </table>
-      </div>
-    </div>
-    {/if}
 
   {if !$payNow}
     <div id="customData" class="crm-contribution-form-block-customData"></div>
@@ -485,7 +483,7 @@
         $('#is_email_receipt', $form).click(function() {
           checkEmailDependancies();
         });
-  
+
         function checkEmailDependancies( ) {
           if ($('#is_email_receipt', $form).prop('checked')) {
             $('#fromEmail', $form).show();
@@ -498,11 +496,11 @@
         }
         {/literal}{if !$contributionMode}{literal}
           showHideCancelInfo($('#contribution_status_id', $form));
-  
+
           $('#contribution_status_id', $form).change(function() {
             showHideCancelInfo($('#contribution_status_id', $form));
           });
-  
+
           function showHideCancelInfo(obj) {
             var cancelInfo_show_ids = [{/literal}{$cancelInfo_show_ids}{literal}];
             if (cancelInfo_show_ids.indexOf(obj.val()) > -1) {
@@ -520,9 +518,10 @@
       });
     </script>
       {if !$contributionMode}
+        {crmAPI var="checkVal" entity="OptionValue" action="getvalue" version="3" option_group_id="payment_instrument" name="Check" return="value"}
         {include file="CRM/common/showHideByFieldValue.tpl"
         trigger_field_id    ="payment_instrument_id"
-        trigger_value       = '4'
+        trigger_value       = $checkVal
         target_element_id   ="checkNumber"
         target_element_type ="table-row"
         field_type          ="select"

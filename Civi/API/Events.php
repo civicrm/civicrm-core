@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -45,7 +45,7 @@ class Events {
    *
    * @see AuthorizeEvent
    */
-  const AUTHORIZE = 'api.authorize';
+  const AUTHORIZE = 'civi.api.authorize';
 
   /**
    * Determine which API provider executes the given request. For successful
@@ -54,28 +54,28 @@ class Events {
    *
    * @see ResolveEvent
    */
-  const RESOLVE = 'api.resolve';
+  const RESOLVE = 'civi.api.resolve';
 
   /**
    * Apply pre-execution logic
    *
    * @see PrepareEvent
    */
-  const PREPARE = 'api.prepare';
+  const PREPARE = 'civi.api.prepare';
 
   /**
    * Apply post-execution logic
    *
    * @see RespondEvent
    */
-  const RESPOND = 'api.respond';
+  const RESPOND = 'civi.api.respond';
 
   /**
    * Handle any exceptions.
    *
    * @see ExceptionEvent
    */
-  const EXCEPTION = 'api.exception';
+  const EXCEPTION = 'civi.api.exception';
 
   /**
    * Weight - Early
@@ -103,6 +103,18 @@ class Events {
       self::RESOLVE,
       self::RESPOND,
     );
+  }
+
+  /**
+   * @param \Civi\Core\Event\GenericHookEvent $e
+   * @see \CRM_Utils_Hook::eventDefs
+   */
+  public static function hookEventDefs($e) {
+    $e->inspector->addEventClass(self::AUTHORIZE, 'Civi\API\Event\AuthorizeEvent');
+    $e->inspector->addEventClass(self::EXCEPTION, 'Civi\API\Event\ExceptionEvent');
+    $e->inspector->addEventClass(self::PREPARE, 'Civi\API\Event\PrepareEvent');
+    $e->inspector->addEventClass(self::RESOLVE, 'Civi\API\Event\ResolveEvent');
+    $e->inspector->addEventClass(self::RESPOND, 'Civi\API\Event\RespondEvent');
   }
 
 }

@@ -23,7 +23,8 @@ function payment_processor_create_example() {
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
     return array(
-      'error' => $errorMessage,
+      'is_error' => 1,
+      'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
     );
@@ -51,7 +52,7 @@ function payment_processor_create_expectedresult() {
         'domain_id' => '1',
         'name' => 'API Test PP',
         'description' => '',
-        'payment_processor_type_id' => '18',
+        'payment_processor_type_id' => '1',
         'is_active' => '',
         'is_default' => 0,
         'is_test' => 0,
@@ -67,6 +68,8 @@ function payment_processor_create_expectedresult() {
         'billing_mode' => '1',
         'is_recur' => 0,
         'payment_type' => '1',
+        'payment_instrument_id' => '1',
+        'accepted_credit_cards' => '',
       ),
     ),
   );

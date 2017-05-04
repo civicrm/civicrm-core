@@ -19,7 +19,8 @@ function order_get_example() {
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
     return array(
-      'error' => $errorMessage,
+      'is_error' => 1,
+      'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
     );
@@ -63,10 +64,11 @@ function order_get_expectedresult() {
         'thankyou_date' => '',
         'contribution_source' => '',
         'amount_level' => '',
+        'contribution_recur_id' => '',
         'is_test' => 0,
         'is_pay_later' => 0,
         'contribution_status_id' => '1',
-        'check_number' => '',
+        'contribution_check_number' => '',
         'contribution_campaign_id' => '',
         'financial_type_id' => '1',
         'financial_type' => 'Donation',
@@ -78,7 +80,6 @@ function order_get_expectedresult() {
         'fulfilled_date' => '',
         'contribution_start_date' => '',
         'contribution_end_date' => '',
-        'contribution_recur_id' => '',
         'financial_account_id' => '1',
         'accounting_code' => '4200',
         'campaign_id' => '',
@@ -89,7 +90,7 @@ function order_get_expectedresult() {
         'payment_instrument' => 'Check',
         'payment_instrument_id' => '4',
         'instrument_id' => '4',
-        'contribution_check_number' => '',
+        'check_number' => '',
         'id' => '1',
         'contribution_type_id' => '1',
         'line_items' => array(
@@ -105,7 +106,8 @@ function order_get_expectedresult() {
             'line_total' => '100.00',
             'price_field_value_id' => '1',
             'financial_type_id' => '1',
-            'deductible_amount' => '0.00',
+            'non_deductible_amount' => '0.00',
+            'contribution_type_id' => '1',
           ),
         ),
       ),

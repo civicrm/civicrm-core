@@ -968,11 +968,6 @@ class DB_DataObject extends DB_DataObject_Overload
             if (!isset($this->$k)) {
                 continue;
             }
-            // dont insert data into mysql timestamps
-            // use query() if you really want to do this!!!!
-            if ($v & DB_DATAOBJECT_MYSQLTIMESTAMP) {
-                continue;
-            }
 
             if ($leftq) {
                 $leftq  .= ', ';
@@ -999,6 +994,19 @@ class DB_DataObject extends DB_DataObject_Overload
                 $rightq .= " NULL ";
                 continue;
             }
+          if (($v & DB_DATAOBJECT_DATE) || ($v & DB_DATAOBJECT_TIME) || $v & DB_DATAOBJECT_MYSQLTIMESTAMP) {
+            if (strpos($this->$k, '-') !== FALSE) {
+              /*
+               * per CRM-14986 we have been having ongoing problems with the format returned from $dao->find(TRUE) NOT
+               * being acceptable for an immediate save. This has resulted in the codebase being smattered with
+               * instances of CRM_Utils_Date::isoToMysql for date fields retrieved in this way
+               * which seems both risky (have to remember to do it for every field) & cludgey.
+               * doing it here should be safe as only fields with a '-' in them will be affected - if they are
+               *  already formatted or empty then this line will not be hit
+               */
+              $this->$k = CRM_Utils_Date::isoToMysql($this->$k);
+            }
+          }
             // DATE is empty... on a col. that can be null..
             // note: this may be usefull for time as well..
             if (!$this->$k &&
@@ -3645,7 +3653,7 @@ class DB_DataObject extends DB_DataObject_Overload
      * @return   array of key => value for row
      */
 
-    function toArray($format = '%s', $hideEmpty = false)
+    function toArray($format = null, $hideEmpty = false)
     {
         global $_DB_DATAOBJECT;
         $ret = array();
@@ -3659,24 +3667,35 @@ class DB_DataObject extends DB_DataObject_Overload
 
             if (!isset($this->$k)) {
                 if (!$hideEmpty) {
-                    $ret[sprintf($format,$k)] = '';
+                    if ($format === null)
+                        $ret[$k] = '';
+                    else
+                        $ret[sprintf($format,$k)] = '';
                 }
                 continue;
             }
             // call the overloaded getXXXX() method. - except getLink and getLinks
             if (method_exists($this,'get'.$k) && !in_array(strtolower($k),array('links','link'))) {
-                $ret[sprintf($format,$k)] = $this->{'get'.$k}();
+                if ($format === null)
+                    $ret[$k] = $this->{'get'.$k}();
+                else
+                    $ret[sprintf($format,$k)] = $this->{'get'.$k}();
                 continue;
             }
             // should this call toValue() ???
-            $ret[sprintf($format,$k)] = $this->$k;
+            if ($format === null)
+                $ret[$k] = $this->$k;
+            else
+                $ret[sprintf($format,$k)] = $this->$k;
         }
         if (!$this->_link_loaded) {
             return $ret;
         }
         foreach($this->_link_loaded as $k) {
-            $ret[sprintf($format,$k)] = $this->$k->toArray();
-
+            if ($format === null)
+                $ret[$k] = $this->$k->toArray();
+            else
+                $ret[sprintf($format,$k)] = $this->$k->toArray();
         }
 
         return $ret;

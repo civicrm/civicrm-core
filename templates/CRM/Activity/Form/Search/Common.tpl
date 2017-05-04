@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -96,8 +96,9 @@
 </tr>
 <tr>
   <td>
-    {$form.activity_subject.label}<br/>
-    {$form.activity_subject.html|crmAddClass:big}
+    {$form.activity_text.label}<br/>
+    {$form.activity_text.html|crmAddClass:big}<br/>
+    {$form.activity_option.html}<br/>
   </td>
   <td colspan="2">
     {$form.status_id.label}<br/>
@@ -105,8 +106,10 @@
   </td>
 </tr>
 <tr>
-  {* td intentionally left blank to align the 'is test' widget on the right *}
-  <td></td>
+  <td>
+    {$form.priority_id.label}<br />
+    {$form.priority_id.html}
+  </td>
   <td colspan="2">
     {$form.activity_test.label} {help id="is-test" file="CRM/Contact/Form/Search/Advanced"}
     &nbsp; {$form.activity_test.html}

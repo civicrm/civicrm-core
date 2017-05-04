@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -49,4 +49,28 @@
       </td>
     </tr>
   {/if}
+  {crmAPI var='caseTypes' entity='CaseType' action='get' option_limit=0 sequential=0}
+  {crmAPI var='caseStatusLabels' entity='Case' action='getoptions' option_limit=0 field="case_status_id" context='create'}
+  {crmAPI var='caseStatusNames' entity='Case' action='getoptions' option_limit=0 field="case_status_id" context='validate' sequential=0}
+  {literal}
+  <script type="text/javascript">
+    CRM.$(function($) {
+      var $form = $("form.{/literal}{$form.formClass}{literal}");
+      var caseTypes = {/literal}{$caseTypes.values|@json_encode}{literal};
+      var caseStatusLabels = {/literal}{$caseStatusLabels.values|@json_encode}{literal};
+      var caseStatusNames = {/literal}{$caseStatusNames.values|@json_encode}{literal};
+      if ($('#case_type_id, #status_id', $form).length === 2) {
+        $('#case_type_id', $form).change(function() {
+          if ($(this).val()) {
+            var caseType = caseTypes[$(this).val()].definition;
+            var newOptions = CRM._.filter(caseStatusLabels, function(opt, key) {
+              return !caseType.statuses || !caseType.statuses.length || caseType.statuses.indexOf(caseStatusNames[key]) > -1;
+            });
+            CRM.utils.setOptions($('#status_id', $form), newOptions);
+          }
+        })
+      }
+    });
+  </script>
+  {/literal}
 {/if}

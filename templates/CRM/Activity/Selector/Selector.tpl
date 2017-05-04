@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -75,5 +75,15 @@
       })(CRM.$);
     </script>
   {/literal}
+  <style type="text/css">
+    {crmAPI var='statuses' entity='OptionValue' action='get' return="color,value" option_limit=0 option_group_id="activity_status"}
+    {foreach from=$statuses.values item=status}
+      {if !empty($status.color)}
+        table.contact-activity-selector-{$context} tr.status-id-{$status.value} {ldelim}
+          border-left: 3px solid {$status.color};
+        {rdelim}
+      {/if}
+    {/foreach}
+  </style>
 </div>
 {include file="CRM/Case/Form/ActivityToCase.tpl" contactID=$contactId}

@@ -70,10 +70,10 @@ class civicrm_handler_field_website extends civicrm_handler_field_location {
     }
     if (isset($this->options['website_type']) && $this->options['website_type']) {
       $extra[] = array(
-          'value' => $this->options['website_type'],
-          'numeric' => TRUE,
-          'field' => 'website_type_id',
-          'operator' => '=',
+        'value' => $this->options['website_type'],
+        'numeric' => TRUE,
+        'field' => 'website_type_id',
+        'operator' => '=',
       );
     }
     if (!empty($extra)) {
@@ -95,7 +95,11 @@ class civicrm_handler_field_website extends civicrm_handler_field_location {
         exit;
       }
       $join = $this->get_join();
-      $this->table_alias = $this->query->ensure_table($this->table, $this->relationship, $join);
+      if (empty($this->relationship)) { //https://www.drupal.org/node/2617032
+        $this->table_alias = $this->query->add_table($this->table, $this->relationship, $join);
+      } else {
+        $this->table_alias = $this->query->ensure_table($this->table, $this->relationship, $join);
+      }
     }
     return $this->table_alias;
   }

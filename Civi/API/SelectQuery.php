@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -114,7 +114,7 @@ abstract class SelectQuery {
   /**
    * Build & execute the query and return results array
    *
-   * @return array
+   * @return array|int
    * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \Exception
@@ -230,8 +230,8 @@ abstract class SelectQuery {
       }
       $fieldInfo = \CRM_Utils_Array::value($fieldName, $fkField['FKApiSpec']);
 
-      // FIXME: What if the foreign key is not the "id" column?
-      if (!$fieldInfo || !isset($fkField['FKApiSpec']['id'])) {
+      $keyColumn = \CRM_Utils_Array::value('FKKeyColumn', $fkField, 'id');
+      if (!$fieldInfo || !isset($fkField['FKApiSpec'][$keyColumn])) {
         // Join doesn't exist - might be another param with a dot in it for some reason, we'll just ignore it.
         return NULL;
       }
@@ -240,9 +240,13 @@ abstract class SelectQuery {
 
       // Add acl condition
       $joinCondition = array_merge(
-        array("$prev.$fk = $tableAlias.id"),
+        array("$prev.$fk = $tableAlias.$keyColumn"),
         $this->getAclClause($tableAlias, \_civicrm_api3_get_BAO($fkField['FKApiName']), $subStack)
       );
+
+      if (!empty($fkField['FKCondition'])) {
+        $joinCondition[] = str_replace($fkTable, $tableAlias, $fkField['FKCondition']);
+      }
 
       $this->join($side, $fkTable, $tableAlias, $joinCondition);
 
@@ -259,7 +263,7 @@ abstract class SelectQuery {
   }
 
   /**
-   * Get join info for dynamically-joined fields (e.g. "entity_id")
+   * Get join info for dynamically-joined fields (e.g. "entity_id", "option_group")
    *
    * @param $fkField
    * @param $stack
@@ -272,6 +276,12 @@ abstract class SelectQuery {
         $fkField['FKClassName'] = \CRM_Core_DAO_AllCoreTables::getClassForTable($entityTable);
         $fkField['FKApiName'] = \CRM_Core_DAO_AllCoreTables::getBriefName($fkField['FKClassName']);
       }
+    }
+    if (!empty($fkField['pseudoconstant']['optionGroupName'])) {
+      $fkField['FKClassName'] = 'CRM_Core_DAO_OptionValue';
+      $fkField['FKApiName'] = 'OptionValue';
+      $fkField['FKKeyColumn'] = 'value';
+      $fkField['FKCondition'] = "civicrm_option_value.option_group_id = (SELECT id FROM civicrm_option_group WHERE name = '{$fkField['pseudoconstant']['optionGroupName']}')";
     }
   }
 
@@ -392,21 +402,24 @@ abstract class SelectQuery {
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   protected function buildOrderBy() {
-    $orderBy = array();
     $sortParams = is_string($this->orderBy) ? explode(',', $this->orderBy) : (array) $this->orderBy;
-    foreach ($sortParams as $item) {
-      $words = preg_split("/[\s]+/", trim($item));
+    foreach ($sortParams as $index => $item) {
+      $item = trim($item);
+      if ($item == '(1)') {
+        continue;
+      }
+      $words = preg_split("/[\s]+/", $item);
       if ($words) {
         // Direction defaults to ASC unless DESC is specified
         $direction = strtoupper(\CRM_Utils_Array::value(1, $words, '')) == 'DESC' ? ' DESC' : '';
         $field = $this->getField($words[0]);
         if ($field) {
-          $orderBy[] = self::MAIN_TABLE_ALIAS . '.' . $field['name'] . $direction;
+          $this->query->orderBy(self::MAIN_TABLE_ALIAS . '.' . $field['name'] . $direction, NULL, $index);
         }
         elseif (strpos($words[0], '.')) {
           $join = $this->addFkField($words[0], 'LEFT');
           if ($join) {
-            $orderBy[] = "`{$join[0]}`.`{$join[1]}`$direction";
+            $this->query->orderBy("`{$join[0]}`.`{$join[1]}`$direction", NULL, $index);
           }
         }
         else {
@@ -414,7 +427,6 @@ abstract class SelectQuery {
         }
       }
     }
-    $this->query->orderBy($orderBy);
   }
 
   /**

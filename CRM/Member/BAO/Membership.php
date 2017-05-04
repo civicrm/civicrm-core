@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
 
@@ -1000,7 +1000,7 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
     $fields = array_merge($fields, $expFieldMembership);
     $membershipStatus = array(
       'membership_status' => array(
-        'title' => 'Membership Status',
+        'title' => ts('Membership Status'),
         'name' => 'membership_status',
         'type' => CRM_Utils_Type::T_STRING,
         'where' => 'civicrm_membership_status.name',
@@ -1942,7 +1942,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
         // Insert renewed dates for CURRENT membership
         $memParams = array();
         $memParams['join_date'] = CRM_Utils_Date::isoToMysql($membership->join_date);
-        $memParams['start_date'] = CRM_Utils_Date::isoToMysql($membership->start_date);
+        $memParams['start_date'] = CRM_Utils_Array::value('start_date', $formDates, CRM_Utils_Date::isoToMysql($membership->start_date));
         $memParams['end_date'] = CRM_Utils_Array::value('end_date', $formDates);
         if (empty($memParams['end_date'])) {
           $memParams['end_date'] = CRM_Utils_Array::value('end_date', $dates);
@@ -2408,6 +2408,8 @@ WHERE      civicrm_membership.is_test = 0";
       'tax_amount',
       'skipLineItem',
       'contribution_recur_id',
+      'pan_truncation',
+      'card_type_id',
     );
     foreach ($recordContribution as $f) {
       $contributionParams[$f] = CRM_Utils_Array::value($f, $params);

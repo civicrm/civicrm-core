@@ -128,15 +128,7 @@ class CRM_Event_Cart_Form_Cart extends CRM_Core_Form {
    * @return mixed|null
    */
   public static function find_contact($fields) {
-    $dedupe_params = CRM_Dedupe_Finder::formatParams($fields, 'Individual');
-    $dedupe_params['check_permission'] = FALSE;
-    $ids = CRM_Dedupe_Finder::dupesByParams($dedupe_params, 'Individual');
-    if (is_array($ids)) {
-      return array_pop($ids);
-    }
-    else {
-      return NULL;
-    }
+    return CRM_Contact_BAO_Contact::getFirstDuplicateContact($fields, 'Individual', 'Unsupervised', array(), FALSE);
   }
 
   /**

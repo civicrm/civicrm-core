@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -118,6 +118,58 @@ abstract class CRM_Core_Payment {
    * @var int|string
    */
   protected $billingProfile;
+
+  /**
+   * Payment instrument ID.
+   *
+   * This is normally retrieved from the payment_processor table.
+   *
+   * @var int
+   */
+  protected $paymentInstrumentID;
+
+  /**
+   * Is this a back office transaction.
+   *
+   * @var bool
+   */
+  protected $backOffice = FALSE;
+
+  /**
+   * @return bool
+   */
+  public function isBackOffice() {
+    return $this->backOffice;
+  }
+
+  /**
+   * Set back office property.
+   *
+   * @param bool $isBackOffice
+   */
+  public function setBackOffice($isBackOffice) {
+    $this->backOffice = $isBackOffice;
+  }
+
+  /**
+   * Get payment instrument id.
+   *
+   * @return int
+   */
+  public function getPaymentInstrumentID() {
+    return $this->paymentInstrumentID ? $this->paymentInstrumentID : $this->_paymentProcessor['payment_instrument_id'];
+  }
+
+  /**
+   * Set payment Instrument id.
+   *
+   * By default we actually ignore the form value. The manual processor takes it more seriously.
+   *
+   * @param int $paymentInstrumentID
+   */
+  public function setPaymentInstrumentID($paymentInstrumentID) {
+    $this->paymentInstrumentID = $this->_paymentProcessor['payment_instrument_id'];
+  }
 
   /**
    * Set base return path (offsite processors).
@@ -413,6 +465,42 @@ abstract class CRM_Core_Payment {
   }
 
   /**
+   * Get help text information (help, description, etc.) about this payment,
+   * to display to the user.
+   *
+   * @param string $context
+   *   Context of the text.
+   *   Only explicitly supported contexts are handled without error.
+   *   Currently supported:
+   *   - contributionPageRecurringHelp (params: is_recur_installments, is_email_receipt)
+   *
+   * @param array $params
+   *   Parameters for the field, context specific.
+   *
+   * @return string
+   */
+  public function getText($context, $params) {
+    // I have deliberately added a noisy fail here.
+    // The function is intended to be extendable, but not by changes
+    // not documented clearly above.
+    switch ($context) {
+      case 'contributionPageRecurringHelp':
+        // require exactly two parameters
+        if (array_keys($params) == array('is_recur_installments', 'is_email_receipt')) {
+          $gotText = ts('Your recurring contribution will be processed automatically.');
+          if ($params['is_recur_installments']) {
+            $gotText .= ts(' You can specify the number of installments, or you can leave the number of installments blank if you want to make an open-ended commitment. In either case, you can choose to cancel at any time.');
+          }
+          if ($params['is_email_receipt']) {
+            $gotText .= ts(' You will receive an email receipt for each recurring contribution.');
+          }
+        }
+        break;
+    }
+    return $gotText;
+  }
+
+  /**
    * Getter for accessing member vars.
    *
    * @todo believe this is unused
@@ -685,6 +773,34 @@ abstract class CRM_Core_Payment {
         ),
         'is_required' => TRUE,
 
+      ),
+      'check_number' => array(
+        'htmlType' => 'text',
+        'name' => 'check_number',
+        'title' => ts('Check Number'),
+        'is_required' => FALSE,
+        'cc_field' => TRUE,
+        'attributes' => NULL,
+      ),
+      'pan_truncation' => array(
+        'htmlType' => 'text',
+        'name' => 'pan_truncation',
+        'title' => ts('Last 4 digits of the card'),
+        'is_required' => FALSE,
+        'cc_field' => TRUE,
+        'attributes' => array(
+          'size' => 4,
+          'maxlength' => 4,
+          'minlength' => 4,
+          'autocomplete' => 'off',
+        ),
+        'rules' => array(
+          array(
+            'rule_message' => ts('Please enter valid last 4 digit card number.'),
+            'rule_name' => 'numeric',
+            'rule_parameters' => NULL,
+          ),
+        ),
       ),
     );
   }

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  *
  */
 
@@ -161,14 +161,14 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
         $to = CRM_Utils_Request::retrieve($name . '_to', 'String', $this);
         $value = array();
         if ($from && $to) {
-          $value['from'] = $from;
-          $value['to'] = $to;
+          $value[$name . '_from'] = $from;
+          $value[$name . '_to'] = $to;
         }
         elseif ($from) {
-          $value['from'] = $from;
+          $value[$name . '_from'] = $from;
         }
         elseif ($to) {
-          $value['to'] = $to;
+          $value[$name . '_to'] = $to;
         }
       }
       elseif ((substr($name, 0, 7) == 'custom_') &&
@@ -247,7 +247,12 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
         if ($operator) {
           $this->_params[$name . '_operator'] = $operator;
         }
-        $this->_params[$name] = $this->_fields[$name]['value'] = $value;
+        if ((substr($name, 0, 6) == 'custom') && !empty($field['is_search_range'])) {
+          $this->_params += $value;
+        }
+        else {
+          $this->_params[$name] = $this->_fields[$name]['value'] = $value;
+        }
       }
     }
 

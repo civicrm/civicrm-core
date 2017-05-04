@@ -9,7 +9,7 @@
  */
 function contact_get_example() {
   $params = array(
-    'id' => 1,
+    'id' => 3,
     'api.website.getValue' => array(
       'return' => 'url',
     ),
@@ -26,7 +26,8 @@ function contact_get_example() {
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
     return array(
-      'error' => $errorMessage,
+      'is_error' => 1,
+      'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
     );
@@ -47,10 +48,10 @@ function contact_get_expectedresult() {
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
-    'id' => 1,
+    'id' => 3,
     'values' => array(
-      '1' => array(
-        'contact_id' => '1',
+      '3' => array(
+        'contact_id' => '3',
         'contact_type' => 'Individual',
         'contact_sub_type' => '',
         'sort_name' => 'xyz3, abc3',
@@ -86,10 +87,11 @@ function contact_get_expectedresult() {
         'sic_code' => '',
         'contact_is_deleted' => 0,
         'current_employer' => '',
-        'address_id' => '2',
-        'street_address' => '1 my road',
+        'address_id' => '',
+        'street_address' => '',
         'supplemental_address_1' => '',
         'supplemental_address_2' => '',
+        'supplemental_address_3' => '',
         'city' => '',
         'postal_code_suffix' => '',
         'postal_code' => '',
@@ -108,6 +110,7 @@ function contact_get_expectedresult() {
         'im' => '',
         'worldregion_id' => '',
         'world_region' => '',
+        'languages' => 'English (United States)',
         'individual_prefix' => '',
         'individual_suffix' => '',
         'communication_style' => '',
@@ -115,59 +118,61 @@ function contact_get_expectedresult() {
         'state_province_name' => '',
         'state_province' => '',
         'country' => '',
-        'id' => '1',
+        'id' => '3',
         'api.website.getValue' => 'http://civicrm.org',
         'api.Contribution.getCount' => 2,
         'api.CustomValue.get' => array(
           'is_error' => 0,
           'version' => 3,
-          'count' => 8,
+          'count' => 7,
           'values' => array(
             '0' => array(
-              'entity_id' => '1',
+              'entity_id' => '3',
+              'entity_table' => 'Contact',
               'latest' => 'value 4',
               'id' => '1',
-              'entity_table' => 'Contact',
             ),
             '1' => array(
+              'entity_id' => '3',
               'entity_table' => 'Contact',
-            ),
-            '2' => array(
-              'entity_id' => '1',
               'latest' => 'value 3',
               'id' => '2',
               '1' => 'value 2',
-              'entity_table' => 'Contact',
               '2' => 'value 3',
             ),
-            '3' => array(
-              'entity_id' => '1',
+            '2' => array(
+              'entity_id' => '3',
+              'entity_table' => 'Contact',
               'latest' => '',
               'id' => '3',
               '1' => 'warm beer',
               '2' => '',
             ),
-            '4' => array(
-              'entity_id' => '1',
+            '3' => array(
+              'entity_id' => '3',
+              'entity_table' => 'Contact',
               'latest' => '',
               'id' => '4',
               '1' => '',
               '2' => '',
             ),
-            '5' => array(
-              'entity_id' => '1',
+            '4' => array(
+              'entity_id' => '3',
+              'entity_table' => 'Contact',
               'latest' => 'defaultValue',
               'id' => '5',
               '1' => 'defaultValue',
             ),
-            '6' => array(
-              'entity_id' => '1',
+            '5' => array(
+              'entity_id' => '3',
+              'entity_table' => 'Contact',
               'latest' => 'vegemite',
               'id' => '6',
               '1' => 'vegemite',
             ),
-            '7' => array(
-              'entity_id' => '1',
+            '6' => array(
+              'entity_id' => '3',
+              'entity_table' => 'Contact',
               'latest' => '',
               'id' => '7',
               '1' => '',

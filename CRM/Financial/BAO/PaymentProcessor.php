@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -77,6 +77,17 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
         'financial_account_id' => $params['financial_account_id'],
       );
       CRM_Financial_BAO_FinancialTypeAccount::add($values);
+    }
+
+    if (isset($params['id']) && isset($params['is_active']) && !isset($params['is_test'])) {
+      // check if is_active has changed & if so update test instance is_active too.
+      $test_id = self::getTestProcessorId($params['id']);
+      $testDAO = new CRM_Financial_DAO_PaymentProcessor();
+      $testDAO->id = $test_id;
+      if ($testDAO->find(TRUE)) {
+        $testDAO->is_active = $params['is_active'];
+        $testDAO->save();
+      }
     }
 
     Civi\Payment\System::singleton()->flushProcessors();
@@ -252,6 +263,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
     return civicrm_api3('payment_processor', 'getvalue', array(
       'return' => 'id',
       'name' => $liveProcessorName,
+      'is_test' => 1,
       'domain_id' => CRM_Core_Config::domainID(),
     ));
   }
@@ -279,11 +291,13 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    * @param string|NULL $mode
    * only return this mode - test|live or NULL for all
    * @param bool $reset
+   * @param bool $isCurrentDomainOnly
+   *   Do we only want to load payment processors associated with the current domain.
    *
    * @throws CiviCRM_API3_Exception
    * @return array
    */
-  public static function getAllPaymentProcessors($mode = 'all', $reset = FALSE) {
+  public static function getAllPaymentProcessors($mode = 'all', $reset = FALSE, $isCurrentDomainOnly = TRUE) {
 
     $cacheKey = 'CRM_Financial_BAO_Payment_Processor_' . $mode . '_' . CRM_Core_Config::domainID();
     if (!$reset) {
@@ -295,10 +309,12 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
 
     $retrievalParameters = array(
       'is_active' => TRUE,
-      'domain_id' => CRM_Core_Config::domainID(),
-      'options' => array('sort' => 'is_default DESC, name'),
+      'options' => array('sort' => 'is_default DESC, name', 'limit' => 0),
       'api.payment_processor_type.getsingle' => 1,
     );
+    if ($isCurrentDomainOnly) {
+      $retrievalParameters['domain_id'] = CRM_Core_Config::domainID();
+    }
     if ($mode == 'test') {
       $retrievalParameters['is_test'] = 1;
     }
@@ -330,11 +346,11 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
       'name' => 'pay_later',
       'billing_mode' => '',
       'is_default' => 0,
-      // This should ideally be retrieved from the DB but existing default is check so we'll code that for now.
-      'payment_instrument_id' => CRM_Core_OptionGroup::getValue('payment_instrument', 'Check', 'name'),
+      'payment_instrument_id' => key(CRM_Core_OptionGroup::values('payment_instrument', FALSE, FALSE, FALSE, 'AND is_default = 1')),
       // Making this optionally recur would give lots of options -but it should
       // be a row in the payment processor table before we do that.
       'is_recur' => FALSE,
+      'is_test' => FALSE,
     );
 
     CRM_Utils_Cache::singleton()->set($cacheKey, $processors['values']);
@@ -360,9 +376,13 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    *   available processors
    */
   public static function getPaymentProcessors($capabilities = array(), $ids = FALSE) {
-    $mode = NULL;
     $testProcessors = in_array('TestMode', $capabilities) ? self::getAllPaymentProcessors('test') : array();
-    $processors = self::getAllPaymentProcessors('all');
+    if (is_array($ids)) {
+      $processors = self::getAllPaymentProcessors('all', TRUE, FALSE);
+    }
+    else {
+      $processors = self::getAllPaymentProcessors('all', TRUE);
+    }
 
     if (in_array('TestMode', $capabilities) && is_array($ids)) {
       $possibleLiveIDs = array_diff($ids, array_keys($testProcessors));
@@ -380,18 +400,18 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
 
     foreach ($processors as $index => $processor) {
       if (is_array($ids) && !in_array($processor['id'], $ids)) {
-        unset ($processors[$index]);
+        unset($processors[$index]);
         continue;
       }
       // Invalid processors will store a null value in 'object' (e.g. if not all required config fields are present).
       // This is determined by calling when loading the processor via the $processorObject->checkConfig() function.
       if (!is_a($processor['object'], 'CRM_Core_Payment')) {
-        unset ($processors[$index]);
+        unset($processors[$index]);
         continue;
       }
       foreach ($capabilities as $capability) {
         if (($processor['object']->supports($capability)) == FALSE) {
-          unset ($processors[$index]);
+          unset($processors[$index]);
           continue 1;
         }
       }
@@ -402,6 +422,21 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
 
   /**
    * Is there a processor on this site with the specified capability.
+   *
+   * The capabilities are defined on CRM_Core_Payment and can be extended by
+   * processors.
+   *
+   * examples are
+   *  - supportsBackOffice
+   *  - supportsLiveMode
+   *  - supportsFutureRecurDate
+   *  - supportsCancelRecurring
+   *  - supportsRecurContributionsForPledges
+   *
+   * They are passed as array('BackOffice');
+   *
+   * Details of specific functions are in the docblocks on the CRM_Core_Payment class.
+   *
    * @param array $capabilities
    *
    * @return bool

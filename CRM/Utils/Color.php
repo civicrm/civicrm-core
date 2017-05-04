@@ -1,8 +1,9 @@
-{*
+<?php
+/*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,9 +23,34 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*}
+ */
 
-{htxt id=$id}
-  {crmAPI var='result' entity='tag' action='getsingle' return="description" id=$id}
-  {$result.description}
-{/htxt}
+/**
+ *
+ * @package CRM
+ * @copyright CiviCRM LLC (c) 2004-2017
+ */
+
+/**
+ * Static utility functions for working with colors
+ */
+class CRM_Utils_Color {
+
+  /**
+   * Determine the appropriate text color for a given background.
+   *
+   * Based on YIQ value.
+   *
+   * @param string $hexcolor
+   * @return string
+   */
+  public static function getContrast($hexcolor) {
+    $hexcolor = trim($hexcolor, ' #');
+    $r = hexdec(substr($hexcolor, 0, 2));
+    $g = hexdec(substr($hexcolor, 2, 2));
+    $b = hexdec(substr($hexcolor, 4, 2));
+    $yiq = (($r * 299) + ($g * 587) + ($b * 114)) / 1000;
+    return ($yiq >= 128) ? 'black' : 'white';
+  }
+
+}

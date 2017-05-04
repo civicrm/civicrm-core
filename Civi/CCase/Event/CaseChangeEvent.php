@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -26,12 +26,13 @@
  */
 
 namespace Civi\CCase\Event;
+use Civi\Core\Event\GenericHookEvent;
 
 /**
  * Class CaseChangeEvent
  * @package Civi\API\Event
  */
-class CaseChangeEvent extends \Symfony\Component\EventDispatcher\Event {
+class CaseChangeEvent extends GenericHookEvent {
   /**
    * @var \Civi\CCase\Analyzer
    */
@@ -42,6 +43,13 @@ class CaseChangeEvent extends \Symfony\Component\EventDispatcher\Event {
    */
   public function __construct($analyzer) {
     $this->analyzer = $analyzer;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function getHookValues() {
+    return array($this->analyzer);
   }
 
 }

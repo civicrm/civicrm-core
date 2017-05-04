@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -297,20 +297,19 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
         }
       }
 
-      if (!defined('CIVICRM_GROUPTREE')) {
-        $group = CRM_Utils_Array::value('group', $this->_formValues);
-        if ($group && !is_array($group)) {
-          unset($this->_formValues['group']);
-          $this->_formValues['group'][$group] = 1;
-        }
+      $group = CRM_Utils_Array::value('group', $this->_formValues);
+      if ($group && !is_array($group)) {
+        unset($this->_formValues['group']);
+        $this->_formValues['group'][$group] = 1;
+      }
 
-        if ($group && is_array($group)) {
-          unset($this->_formValues['group']);
-          foreach ($group as $notImportant => $groupID) {
-            $this->_formValues['group'][$groupID] = 1;
-          }
+      if ($group && is_array($group)) {
+        unset($this->_formValues['group']);
+        foreach ($group as $groupID) {
+          $this->_formValues['group'][$groupID] = 1;
         }
       }
+
     }
 
     CRM_Core_BAO_CustomValue::fixCustomFieldValue($this->_formValues);

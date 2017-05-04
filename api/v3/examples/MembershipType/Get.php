@@ -19,7 +19,8 @@ function membership_type_get_example() {
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
     return array(
-      'error' => $errorMessage,
+      'is_error' => 1,
+      'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
     );
@@ -47,7 +48,7 @@ function membership_type_get_expectedresult() {
         'domain_id' => '1',
         'name' => 'General',
         'member_of_contact_id' => '4',
-        'financial_type_id' => '1',
+        'financial_type_id' => '2',
         'minimum_fee' => '0.00',
         'duration_unit' => 'year',
         'duration_interval' => '1',
@@ -55,6 +56,7 @@ function membership_type_get_expectedresult() {
         'visibility' => 'Public',
         'auto_renew' => 0,
         'is_active' => '1',
+        'contribution_type_id' => '2',
       ),
     ),
   );

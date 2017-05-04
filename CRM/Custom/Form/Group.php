@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  * $Id$
  *
  */
@@ -323,6 +323,9 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
     // is this set active ?
     $this->addElement('advcheckbox', 'is_active', ts('Is this Custom Data Set active?'));
 
+    //Is this set visible on public pages?
+    $this->addElement('advcheckbox', 'is_public', ts('Is this Custom Data Set public?'));
+
     // does this set have multiple record?
     $multiple = $this->addElement('advcheckbox', 'is_multiple',
       ts('Does this Custom Field Set allow multiple records?'), NULL);
@@ -382,7 +385,7 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
       $defaults['weight'] = CRM_Utils_Weight::getDefaultWeight('CRM_Core_DAO_CustomGroup');
 
       $defaults['is_multiple'] = $defaults['min_multiple'] = 0;
-      $defaults['is_active'] = $defaults['collapse_display'] = 1;
+      $defaults['is_active'] = $defaults['is_public'] = $defaults['collapse_display'] = 1;
       $defaults['style'] = 'Inline';
     }
     elseif (empty($defaults['max_multiple']) && !$this->_isGroupEmpty) {

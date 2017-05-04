@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CiviCRM_Hook
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Utils_Hook_UnitTests extends CRM_Utils_Hook {
 
@@ -52,6 +52,7 @@ class CRM_Utils_Hook_UnitTests extends CRM_Utils_Hook {
    * Use a unit-testing mock object to handle hook invocations.
    *
    * e.g. hook_civicrm_foo === $mockObject->foo()
+   * Mocks with a magic `__call()` method are called for every hook invokation.
    *
    * @param object $mockObject
    */
@@ -60,7 +61,7 @@ class CRM_Utils_Hook_UnitTests extends CRM_Utils_Hook {
   }
 
   /**
-   * Register a piece of code to run when invoking a hook.
+   * Register a function to run when invoking a specific hook.
    * @param string $hook
    *   Hook name, e.g civicrm_pre.
    * @param array $callable
@@ -72,7 +73,7 @@ class CRM_Utils_Hook_UnitTests extends CRM_Utils_Hook {
   }
 
   /**
-   * Invoke hooks.
+   * Invoke standard, mock and ad hoc hooks.
    *
    * @param int $numParams
    *   Number of parameters to pass to the hook.
@@ -93,37 +94,39 @@ class CRM_Utils_Hook_UnitTests extends CRM_Utils_Hook {
    *
    * @return mixed
    */
-  /**
-   * @param int $numParams
-   * @param mixed $arg1
-   * @param mixed $arg2
-   * @param mixed $arg3
-   * @param mixed $arg4
-   * @param mixed $arg5
-   * @param mixed $arg6
-   * @param string $fnSuffix
-   *
-   * @return mixed
-   */
-  public function invoke(
+  public function invokeViaUF(
     $numParams,
     &$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6,
     $fnSuffix) {
-
     $params = array(&$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6);
 
+    $fResult1 = $fResult2 = $fResult3 = NULL;
+
+    // run standard hooks
     if ($this->civiModules === NULL) {
       $this->civiModules = array();
       $this->requireCiviModules($this->civiModules);
     }
-    $this->runHooks($this->civiModules, $fnSuffix, $numParams, $arg1, $arg2, $arg3, $arg4, $arg5, $arg6);
+    $fResult1 = $this->runHooks($this->civiModules, $fnSuffix, $numParams, $arg1, $arg2, $arg3, $arg4, $arg5, $arg6);
 
+    // run mock object hooks
     if ($this->mockObject && is_callable(array($this->mockObject, $fnSuffix))) {
-      call_user_func(array($this->mockObject, $fnSuffix), $arg1, $arg2, $arg3, $arg4, $arg5, $arg6);
+      $fResult2 = call_user_func(array($this->mockObject, $fnSuffix), $arg1, $arg2, $arg3, $arg4, $arg5, $arg6);
     }
+
+    // run adhoc hooks
     if (!empty($this->adhocHooks[$fnSuffix])) {
-      call_user_func_array($this->adhocHooks[$fnSuffix], $params);
+      $fResult3 = call_user_func_array($this->adhocHooks[$fnSuffix], $params);
     }
+
+    $result = array();
+    foreach (array($fResult1, $fResult2, $fResult3) as $fResult) {
+      if (!empty($fResult) && is_array($fResult)) {
+        $result = array_merge($result, $fResult);
+      }
+    }
+
+    return empty($result) ? TRUE : $result;
   }
 
 }

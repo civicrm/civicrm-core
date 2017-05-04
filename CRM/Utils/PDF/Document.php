@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,11 +28,14 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 require_once 'TbsZip/tbszip.php';
 
+/**
+ * Class CRM_Utils_PDF_Document.
+ */
 class CRM_Utils_PDF_Document {
 
   public static $ooxmlMap = array(
@@ -51,8 +54,13 @@ class CRM_Utils_PDF_Document {
   );
 
   /**
+   * Convert html to a Doc file.
+   *
    * @param array $pages
+   *   List of HTML snippets.
    * @param string $fileName
+   *   The logical filename to return to client.
+   *   Ex: "HelloWorld.odt".
    * @param array|int $format
    */
   public static function html2doc($pages, $fileName, $format = array()) {
@@ -95,7 +103,13 @@ class CRM_Utils_PDF_Document {
   /**
    * @param object|string $phpWord
    * @param string $ext
+   *   File extension/type.
+   *   Ex: docx, odt, html.
    * @param string $fileName
+   *   The logical filename to return to client.
+   *   Ex: "HelloWorld.odt".
+   *   Alternatively, a full path of a file to display. This seems sketchy.
+   *   Ex: "/var/lib/data/HelloWorld.odt".
    */
   public static function printDoc($phpWord, $ext, $fileName) {
     $formats = array(
@@ -106,10 +120,11 @@ class CRM_Utils_PDF_Document {
       'pdf' => 'PDF',
     );
 
-    if (realpath($phpWord)) {
-      $phpWord = \PhpOffice\PhpWord\IOFactory::load($phpWord, $formats[$ext]);
+    if (realpath($fileName)) {
+      $phpWord = \PhpOffice\PhpWord\IOFactory::load($fileName, $formats[$ext]);
     }
 
+    \PhpOffice\PhpWord\Settings::setOutputEscapingEnabled(TRUE); //CRM-20015
     $objWriter = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord, $formats[$ext]);
 
     CRM_Utils_System::setHttpHeader('Content-Type', "application/$ext");
@@ -167,10 +182,12 @@ class CRM_Utils_PDF_Document {
   /**
    * Modify contents of docx/odt file(s) and later merged into one final document
    *
-   * @param string $filePath
-   *   Document file path
    * @param array $contents
-   *   Content of formatted/token-replaced document
+   *   Content of formatted/token-replaced document.
+   *   List of HTML snippets.
+   * @param string $fileName
+   *   The logical filename to return to client.
+   *   Ex: "HelloWorld.odt".
    * @param string $docType
    *   Document type e.g. odt/docx
    * @param clsTbsZip $zip
@@ -180,7 +197,7 @@ class CRM_Utils_PDF_Document {
    *
    * @return string
    */
-  public static function printDocuments($filePath, $contents, $docType, $zip, $returnFinalContent = FALSE) {
+  public static function printDocuments($contents, $fileName, $docType, $zip, $returnFinalContent = FALSE) {
     $dataMap = self::$ooxmlMap[$docType];
 
     $finalContent = $zip->FileRead($dataMap['dataFile']);
@@ -209,7 +226,6 @@ class CRM_Utils_PDF_Document {
     // Replace the loaded document file content located at $filePath with $finaContent
     $zip->FileReplace($dataMap['dataFile'], $finalContent, TBSZIP_STRING);
 
-    $fileName = pathinfo($filePath, PATHINFO_FILENAME) . '.' . $docType;
     $zip->Flush(TBSZIP_DOWNLOAD, $fileName);
   }
 

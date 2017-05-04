@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -57,6 +57,12 @@
             <td class="label">{$form.doNotAttachPDFReceipt.label}</td>
             <td>{$form.doNotAttachPDFReceipt.html}<br />
                 <p class="description">{ts}If enabled, CiviCRM sends PDF receipt as an attachment during event signup or online contribution.{/ts}</p>
+            </td>
+        </tr>
+        <tr class="crm-miscellaneous-form-block-recordGeneratedLetters">
+            <td class="label">{$form.recordGeneratedLetters.label}</td>
+            <td>{$form.recordGeneratedLetters.html}<br />
+                <p class="description">{ts}When generating a letter (PDF/Word) via mail-merge, how should the letter be recorded?{/ts}</p>
             </td>
         </tr>
         <tr class="crm-miscellaneous-form-block-wkhtmltopdfPath">

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 
 /**
@@ -488,6 +488,9 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
         elseif (isset($this->_query->_fields[$prop]) && isset($this->_query->_fields[$prop]['title'])) {
           $title = $this->_query->_fields[$prop]['title'];
         }
+        elseif (isset($this->_query->_pseudoConstantsSelect[$prop]) && isset($this->_query->_pseudoConstantsSelect[$prop]['pseudoconstant']['optionGroupName'])) {
+          $title = CRM_Core_BAO_OptionGroup::getTitleByName($this->_query->_pseudoConstantsSelect[$prop]['pseudoconstant']['optionGroupName']);
+        }
         else {
           $title = '';
         }
@@ -637,8 +640,6 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
       $names = self::$_properties;
     }
 
-    $multipleSelectFields = array('preferred_communication_method' => 1);
-
     $links = self::links($this->_context, $this->_contextMenu, $this->_key);
 
     //check explicitly added contact to a Smart Group.
@@ -656,7 +657,6 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
     while ($result->fetch()) {
       $row = array();
       $this->_query->convertToPseudoNames($result);
-
       // the columns we are interested in
       foreach ($names as $property) {
         if ($property == 'status') {
@@ -668,17 +668,6 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
             $cfID,
             $result->contact_id
           );
-        }
-        elseif (
-          $multipleSelectFields &&
-          array_key_exists($property, $multipleSelectFields)
-        ) {
-          $key = $property;
-          $paramsNew = array($key => $result->$property);
-          $name = array($key => array('newName' => $key, 'groupName' => $key));
-
-          CRM_Core_OptionGroup::lookupValues($paramsNew, $name, FALSE);
-          $row[$key] = $paramsNew[$key];
         }
         elseif (strpos($property, '-im')) {
           $row[$property] = $result->$property;

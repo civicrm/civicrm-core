@@ -9,7 +9,7 @@
  */
 function membership_get_example() {
   $params = array(
-    'contact_id' => 44,
+    'contact_id' => 47,
     'filters' => array(
       'is_current' => 1,
     ),
@@ -24,7 +24,8 @@ function membership_get_example() {
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
     return array(
-      'error' => $errorMessage,
+      'is_error' => 1,
+      'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
     );
@@ -49,13 +50,13 @@ function membership_get_expectedresult() {
     'values' => array(
       '1' => array(
         'id' => '1',
-        'contact_id' => '44',
-        'membership_type_id' => '27',
+        'contact_id' => '47',
+        'membership_type_id' => '29',
         'join_date' => '2009-01-21',
         'start_date' => '2013-07-29 00:00:00',
         'end_date' => '2013-08-04 00:00:00',
         'source' => 'Payment',
-        'status_id' => '21',
+        'status_id' => '22',
         'is_override' => '1',
         'is_test' => 0,
         'is_pay_later' => 0,

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  *
  */
 
@@ -500,7 +500,11 @@ class CRM_Profile_Form extends CRM_Core_Form {
             ) {
               $entityId = $this->_activityId;
             }
-            $url = CRM_Core_BAO_CustomField::getFileURL($entityId, $key);
+
+            $url = '';
+            if (isset($value)) {
+              $url = CRM_Core_BAO_CustomField::getFileURL($entityId, $key, $value);
+            }
 
             if ($url) {
               $customFiles[$name]['displayURL'] = ts("Attached File") . ": {$url['file_url']}";
@@ -924,7 +928,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
       if (!$ctype) {
         $ctype = 'Individual';
       }
-      $dedupeParams = CRM_Dedupe_Finder::formatParams($fields, $ctype);
+
       if ($form->_mode == CRM_Profile_Form::MODE_CREATE) {
         // fix for CRM-2888
         $exceptions = array();
@@ -934,17 +938,11 @@ class CRM_Profile_Form extends CRM_Core_Form {
         $exceptions = array($form->_session->get('userID'));
       }
 
-      // for dialog mode we should always use fuzzy rule.
-      $ruleType = 'Unsupervised';
-      if ($form->_context == 'dialog') {
-        $ruleType = 'Supervised';
-      }
-
-      $dedupeParams['check_permission'] = FALSE;
-      $ids = CRM_Dedupe_Finder::dupesByParams($dedupeParams,
-        $ctype,
-        $ruleType,
+      $ids = CRM_Contact_BAO_Contact::getDuplicateContacts(
+        $fields, $ctype,
+        ($form->_context === 'dialog' ? 'Supervised' : 'Unsupervised'),
         $exceptions,
+        FALSE,
         $form->_ruleGroupID
       );
       if ($ids) {

@@ -22,7 +22,8 @@ function domain_create_example() {
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
     return array(
-      'error' => $errorMessage,
+      'is_error' => 1,
+      'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
     );
@@ -50,10 +51,10 @@ function domain_create_expectedresult() {
         'name' => 'A-team domain',
         'description' => 'domain of chaos',
         'config_backend' => '',
-        'version' => '4.2',
         'contact_id' => '6',
         'locales' => '',
         'locale_custom_strings' => '',
+        'domain_version' => '4.2',
       ),
     ),
   );

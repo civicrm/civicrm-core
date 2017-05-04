@@ -17,9 +17,7 @@
           crm-ui-select="{dropdownAutoWidth : true}"
           name="location_type_id"
           ng-model="model.mailing.location_type_id"
-          required
           >
-
           <option value="">{{ts('Automatic')}}</option>
           <option ng-repeat="locType in model.fields.location_type_id.options"
                   ng-value="locType.key">{{locType.value}}</option>
@@ -32,7 +30,6 @@
           crm-ui-select=""
           name="email_selection_method"
           ng-model="model.mailing.email_selection_method"
-          required
           >
           <option ng-repeat="selMet in model.fields.email_selection_method.options"
                   ng-value="selMet.key">{{selMet.value}}</option>

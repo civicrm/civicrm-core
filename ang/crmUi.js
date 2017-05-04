@@ -588,7 +588,12 @@
               $timeout(function () {
                 // ex: msg_template_id adds new item then selects it; use $timeout to ensure that
                 // new item is added before selection is made
-                element.select2('val', ngModel.$modelValue);
+                var newVal = _.cloneDeep(ngModel.$modelValue);
+                // Fix possible data-type mismatch
+                if (typeof newVal === 'string' && element.select2('container').hasClass('select2-container-multi')) {
+                  newVal = newVal.length ? newVal.split(',') : [];
+                }
+                element.select2('val', newVal);
               });
             };
           }
@@ -631,7 +636,12 @@
             $timeout(function () {
               // ex: msg_template_id adds new item then selects it; use $timeout to ensure that
               // new item is added before selection is made
-              element.select2('val', ngModel.$modelValue);
+              var newVal = _.cloneDeep(ngModel.$modelValue);
+              // Fix possible data-type mismatch
+              if (typeof newVal === 'string' && element.select2('container').hasClass('select2-container-multi')) {
+                newVal = newVal.length ? newVal.split(',') : [];
+              }
+              element.select2('val', newVal);
             });
           };
           function refreshModel() {

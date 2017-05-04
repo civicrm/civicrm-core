@@ -218,6 +218,26 @@ function _civicrm_core_data(&$data, $enabled) {
     ),
   );
 
+  //LEGAL Name for the Contact
+  $data['civicrm_contact']['legal_name'] = array(
+    'title' => t('Legal Name'),
+    'help' => t('Legal Name of the Contact'),
+    'field' => array(
+      'handler' => 'civicrm_handler_field_contact_link',
+      'click sortable' => TRUE,
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument_string',
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_string',
+      'allow empty' => TRUE,
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+  );
+
   //Gender
   $data['civicrm_contact']['gender'] = array(
     'title' => t('Gender'),
@@ -609,9 +629,7 @@ function _civicrm_core_data(&$data, $enabled) {
       'pseudo method' => 'subTypePairs',
     ),
     'filter' => array(
-      'handler' => 'civicrm_handler_filter_pseudo_constant',
-      'pseudo class' => 'CRM_Contact_BAO_ContactType',
-      'pseudo method' => 'subTypePairs',
+      'handler' => 'civicrm_handler_filter_custom_option',
     ),
     'sort' => array(
       'handler' => 'views_handler_sort',
@@ -710,6 +728,11 @@ function _civicrm_core_data(&$data, $enabled) {
       'left_field' => 'id',
       'field' => 'contact_id',
     ),
+  );
+  //CiviCRM Address
+  $data['civicrm_address']['table']['join']['civicrm_address'] = array(
+      'left_field' => 'id',
+      'field' => 'id',
   );
 
   //CiviCRM Address Using Contacts as a pitstop before going on to Participants
@@ -1145,6 +1168,12 @@ function _civicrm_core_data(&$data, $enabled) {
     ),
   );
 
+  //CiviCRM Email
+  $data['civicrm_email']['table']['join']['civicrm_email'] = array(
+      'left_field' => 'id',
+      'field' => 'id',
+  );
+
   //CiviCRM Email Using Contacts as a pitstop before going on to Participants
   $data['civicrm_email']['table']['join']['civicrm_participant'] = array(
     'left_table' => 'civicrm_contact',
@@ -1299,6 +1328,12 @@ function _civicrm_core_data(&$data, $enabled) {
       'left_field' => 'id',
       'field' => 'contact_id',
     ),
+  );
+
+  //CiviCRM Phone
+  $data['civicrm_phone']['table']['join']['civicrm_phone'] = array(
+      'left_field' => 'id',
+      'field' => 'id',
   );
 
   //CiviCRM Phone Using Contacts as a pitstop before going on to Participants
@@ -1533,6 +1568,12 @@ function _civicrm_core_data(&$data, $enabled) {
       ),
   );
 
+  //CiviCRM Im
+  $data['civicrm_im']['table']['join']['civicrm_im'] = array(
+      'left_field' => 'id',
+      'field' => 'id',
+  );
+
   //CiviCRM Im Using Contacts as a pitstop before going on to Participants
   $data['civicrm_im']['table']['join']['civicrm_participant'] = array(
       'left_table' => 'civicrm_contact',
@@ -1646,7 +1687,7 @@ function _civicrm_core_data(&$data, $enabled) {
       'title' => t('Name'),
       'help' => t('IM screen name'),
       'field' => array(
-          'handler' => 'views_handler_field',
+          'handler' => 'civicrm_handler_field_im',
           'click sortable' => TRUE,
       ),
   );
@@ -1731,6 +1772,12 @@ function _civicrm_core_data(&$data, $enabled) {
     ),
   );
 
+  //CiviCRM Website
+  $data['civicrm_website']['table']['join']['civicrm_website'] = array(
+      'left_field' => 'id',
+      'field' => 'id',
+  );
+
   //CiviCRM Website Using Contacts as a pitstop before going on to Participants
   $data['civicrm_website']['table']['join']['civicrm_participant'] = array(
     'left_table' => 'civicrm_contact',
@@ -1800,7 +1847,7 @@ function _civicrm_core_data(&$data, $enabled) {
     'title' => t('Website URL'),
     'help' => t('Website URL'),
     'field' => array(
-      'handler' => 'views_handler_field',
+      'handler' => 'civicrm_handler_field_website',
       'click sortable' => TRUE,
     ),
     'argument' => array(
@@ -1816,8 +1863,8 @@ function _civicrm_core_data(&$data, $enabled) {
     'relationship' => array(
       'base' => 'civicrm_contact',
       'base field' => 'id',
-      'handler' => 'views_handler_relationship',
-      'label' => t('Related Phone'),
+      'handler' => 'civicrm_handler_relationship_website',
+      'label' => t('Related Website'),
     ),
   );
   // CIVICRM Activities are here with all the activeness they can muster, base tabling it up.
@@ -2508,6 +2555,44 @@ function _civicrm_core_data(&$data, $enabled) {
     ),
   );
 
+  $data['civicrm_relationship']['is_permission_a_b'] = array(
+    'title' => t('Contact A has Permission Over Contact B?'),
+    'help' => t('Contact A has Permission Over Contact B?'),
+    'field' => array(
+      'handler' => 'views_handler_field',
+      'click sortable' => TRUE,
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument_string',
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_string',
+      'allow empty' => TRUE,
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+  );
+
+  $data['civicrm_relationship']['is_permission_b_a'] = array(
+    'title' => t('Contact B has Permission Over Contact A?'),
+    'help' => t('Contact B has Permission Over Contact A?'),
+    'field' => array(
+      'handler' => 'views_handler_field',
+      'click sortable' => TRUE,
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument_string',
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_string',
+      'allow empty' => TRUE,
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+  );
+
   //Relationship start date
   $data['civicrm_relationship']['start_date'] = array(
     'title' => t('Start Date'),
@@ -2902,19 +2987,13 @@ function _civicrm_core_data(&$data, $enabled) {
     ),
   );
 
-
   // Pull in all the Custom fields
   $query = "select id, extends, extends_entity_column_value, style from civicrm_custom_group where is_active = 1";
 
   $dao = CRM_Core_DAO::executeQuery($query);
 
-
   while ($dao->fetch()) {
-    // call getTree using $dao->id as groupID, $dao->extends as entityType, with possible subtypes in $dao->extends_entity_column_value
-    $extendsContactSubtype = (('Contact' === $dao->extends) && !empty($dao->extends_entity_column_value));
-    $contactSubtypes = !$extendsContactSubtype ? NULL : array_filter(explode(CRM_Core_DAO::VALUE_SEPARATOR, $dao->extends_entity_column_value));
-    $contactSubtypes = empty($contactSubtypes) ? NULL : $contactSubtypes;
-    $data = civicrm_views_custom_data_cache($data, $dao->extends, $dao->id, $contactSubtypes);
+    // Call getTree using $dao->id as groupID, $dao->extends as entityType, with possible subtypes in $dao->extends_entity_column_value
+    $data = civicrm_views_custom_data_cache($data, $dao->extends, $dao->id, $dao->extends_entity_column_value);
   }
 }
-

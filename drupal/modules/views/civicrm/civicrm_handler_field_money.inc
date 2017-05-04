@@ -36,7 +36,7 @@ class civicrm_handler_field_money extends views_handler_field {
     }
     require_once 'CRM/Utils/Money.php';
 
-    if ($this->definition['currency field']) {
+    if (!empty($this->definition['currency field'])) {
       $this->additional_fields['currency'] = array('field' => $this->definition['currency field']);
     }
   }

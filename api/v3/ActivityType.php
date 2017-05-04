@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -110,10 +110,8 @@ function _civicrm_api3_activity_type_create_spec(&$params) {
  *
  * @param array $params
  *   Array including id of activity_type to delete.
- *
- * @return array
- *   API result array
- *
+ * @return array API result array
+ * @throws API_Exception
  * @deprecated use OptionValue api
  */
 function civicrm_api3_activity_type_delete($params) {

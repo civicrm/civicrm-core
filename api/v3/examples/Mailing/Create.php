@@ -9,18 +9,19 @@ function mailing_create_example() {
   $params = array(
     'subject' => 'Hello {contact.display_name}',
     'body_text' => 'This is {contact.display_name}.
+https://civicrm.org
 {domain.address}{action.optOutUrl}',
-    'body_html' => '<p>This is {contact.display_name}.</p><p>{domain.address}{action.optOutUrl}</p>',
+    'body_html' => '<p>This is {contact.display_name}.</p><p><a href=\'https://civicrm.org/\'>CiviCRM.org</a></p><p>{domain.address}{action.optOutUrl}</p>',
     'name' => 'mailing name',
-    'created_id' => 9,
+    'created_id' => 3,
     'header_id' => '',
     'footer_id' => '',
     'groups' => array(
       'include' => array(
-        '0' => 7,
+        '0' => 2,
       ),
       'exclude' => array(
-        '0' => 8,
+        '0' => 3,
       ),
     ),
     'mailings' => array(
@@ -51,7 +52,8 @@ function mailing_create_example() {
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
     return array(
-      'error' => $errorMessage,
+      'is_error' => 1,
+      'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
     );
@@ -72,10 +74,10 @@ function mailing_create_expectedresult() {
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
-    'id' => 4,
+    'id' => 1,
     'values' => array(
-      '4' => array(
-        'id' => '4',
+      '1' => array(
+        'id' => '1',
         'domain_id' => '1',
         'header_id' => '',
         'footer_id' => '',
@@ -84,13 +86,17 @@ function mailing_create_expectedresult() {
         'resubscribe_id' => '6',
         'optout_id' => '7',
         'name' => 'mailing name',
+        'mailing_type' => 'standalone',
         'from_name' => 'FIXME',
         'from_email' => 'info@EXAMPLE.ORG',
         'replyto_email' => 'info@EXAMPLE.ORG',
+        'template_type' => '',
+        'template_options' => '',
         'subject' => 'Hello {contact.display_name}',
         'body_text' => 'This is {contact.display_name}.
+https://civicrm.org
 {domain.address}{action.optOutUrl}',
-        'body_html' => '<p>This is {contact.display_name}.</p><p>{domain.address}{action.optOutUrl}</p>',
+        'body_html' => '<p>This is {contact.display_name}.</p><p><a href=\'https://civicrm.org/\'>CiviCRM.org</a></p><p>{domain.address}{action.optOutUrl}</p>',
         'url_tracking' => '1',
         'forward_replies' => '',
         'auto_responder' => '',
@@ -98,7 +104,7 @@ function mailing_create_expectedresult() {
         'is_completed' => '',
         'msg_template_id' => '',
         'override_verp' => '1',
-        'created_id' => '9',
+        'created_id' => '3',
         'created_date' => '2013-07-28 08:49:19',
         'scheduled_id' => '',
         'scheduled_date' => '',
@@ -114,15 +120,16 @@ function mailing_create_expectedresult() {
         'hash' => '',
         'location_type_id' => '',
         'email_selection_method' => '',
+        'language' => '',
         'api.mailing_job.create' => array(
           'is_error' => 0,
           'version' => 3,
           'count' => 1,
-          'id' => 5,
+          'id' => 1,
           'values' => array(
             '0' => array(
-              'id' => '5',
-              'mailing_id' => '4',
+              'id' => '1',
+              'mailing_id' => '1',
               'scheduled_date' => '20130728085413',
               'start_date' => '',
               'end_date' => '',
@@ -139,13 +146,13 @@ function mailing_create_expectedresult() {
           'is_error' => 0,
           'version' => 3,
           'count' => 1,
-          'id' => 4,
+          'id' => 1,
           'values' => array(
             '0' => array(
-              'id' => '4',
-              'mailing_id' => '4',
-              'contact_id' => '10',
-              'email_id' => '10',
+              'id' => '1',
+              'mailing_id' => '1',
+              'contact_id' => '4',
+              'email_id' => '4',
               'api.contact.getvalue' => 'Mr. Includer Person II',
               'api.email.getvalue' => 'include.me@example.org',
             ),

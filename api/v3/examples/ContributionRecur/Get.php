@@ -19,7 +19,8 @@ function contribution_recur_get_example() {
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
     return array(
-      'error' => $errorMessage,
+      'is_error' => 1,
+      'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
     );
@@ -52,6 +53,7 @@ function contribution_recur_get_expectedresult() {
         'installments' => '12',
         'start_date' => '2013-07-29 00:00:00',
         'create_date' => '20120130621222105',
+        'modified_date' => '2012-11-14 16:02:35',
         'contribution_status_id' => '1',
         'is_test' => 0,
         'cycle_day' => '1',

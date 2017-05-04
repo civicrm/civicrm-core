@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 class CRM_Dedupe_Merger {
 
@@ -589,8 +589,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *   Helps decide how to behave when there are conflicts.
    *   A 'safe' value skips the merge if there are any un-resolved conflicts, wheras 'aggressive'
    *   mode does a force merge.
-   * @param bool $autoFlip to let api decide which contact to retain and which to delete.
-   *   Whether to let api decide which contact to retain and which to delete.
    * @param int $batchLimit number of merges to carry out in one batch.
    * @param int $isSelected if records with is_selected column needs to be processed.
    *
@@ -602,7 +600,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *
    * @return array|bool
    */
-  public static function batchMerge($rgid, $gid = NULL, $mode = 'safe', $autoFlip = TRUE, $batchLimit = 1, $isSelected = 2, $criteria = array(), $checkPermissions = TRUE) {
+  public static function batchMerge($rgid, $gid = NULL, $mode = 'safe', $batchLimit = 1, $isSelected = 2, $criteria = array(), $checkPermissions = TRUE) {
     $redirectForPerformance = ($batchLimit > 1) ? TRUE : FALSE;
     $reloadCacheIfEmpty = (!$redirectForPerformance && $isSelected == 2);
     $dupePairs = self::getDuplicatePairs($rgid, $gid, $reloadCacheIfEmpty, $batchLimit, $isSelected, '', ($mode == 'aggressive'), $criteria, $checkPermissions);
@@ -614,7 +612,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       'join' => self::getJoinOnDedupeTable(),
       'where' => self::getWhereString($batchLimit, $isSelected),
     );
-    return CRM_Dedupe_Merger::merge($dupePairs, $cacheParams, $mode, $autoFlip, $redirectForPerformance, $checkPermissions);
+    return CRM_Dedupe_Merger::merge($dupePairs, $cacheParams, $mode, $redirectForPerformance, $checkPermissions);
   }
 
   /**
@@ -651,6 +649,12 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     return $where;
   }
 
+  /**
+   * Update the statistics for the merge set.
+   *
+   * @param string $cacheKeyString
+   * @param array $result
+   */
   public static function updateMergeStats($cacheKeyString, $result = array()) {
     // gather latest stats
     $merged  = count($result['merged']);
@@ -695,6 +699,14 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     CRM_Core_BAO_PrevNextCache::deleteItem(NULL, "{$cacheKeyString}_stats");
   }
 
+  /**
+   * Get merge outcome statistics.
+   *
+   * @param string $cacheKeyString
+   *
+   * @return array
+   *   Array of how many were merged and how many were skipped.
+   */
   public static function getMergeStats($cacheKeyString) {
     $stats = CRM_Core_BAO_PrevNextCache::retrieve("{$cacheKeyString}_stats");
     if (!empty($stats)) {
@@ -703,6 +715,13 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     return $stats;
   }
 
+  /**
+   * Get merge statistics message.
+   *
+   * @param string $cacheKeyString
+   *
+   * @return string
+   */
   public static function getMergeStatsMsg($cacheKeyString) {
     $msg   = '';
     $stats = CRM_Dedupe_Merger::getMergeStats($cacheKeyString);
@@ -727,8 +746,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *   Helps decide how to behave when there are conflicts.
    *                             A 'safe' value skips the merge if there are any un-resolved conflicts.
    *                             Does a force merge otherwise (aggressive mode).
-   * @param bool $autoFlip to let api decide which contact to retain and which to delete.
-   *   Whether to let api decide which contact to retain and which to delete.
    *
    * @param bool $redirectForPerformance
    *   Redirect to a url for batch processing.
@@ -739,7 +756,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * @return array|bool
    */
   public static function merge($dupePairs = array(), $cacheParams = array(), $mode = 'safe',
-                               $autoFlip = TRUE, $redirectForPerformance = FALSE, $checkPermissions = TRUE
+     $redirectForPerformance = FALSE, $checkPermissions = TRUE
   ) {
     $cacheKeyString = CRM_Utils_Array::value('cache_key_string', $cacheParams);
     $resultStats = array('merged' => array(), 'skipped' => array());
@@ -1041,8 +1058,8 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     $qfZeroBug = 'e8cddb72-a257-11dc-b9cc-0016d3330ee9';
     $fields = self::getMergeFieldsMetadata();
 
-    $main = self::getMergeContactDetails($mainId, 'main');
-    $other = self::getMergeContactDetails($otherId, 'main');
+    $main = self::getMergeContactDetails($mainId);
+    $other = self::getMergeContactDetails($otherId);
     $specialValues['main'] = self::getSpecialValues($main);
     $specialValues['other'] = self::getSpecialValues($other);
 
@@ -1148,7 +1165,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         $values = civicrm_api3($blockName, 'get', $searchParams);
         if ($values['count']) {
           $cnt = 0;
-          foreach ($values['values'] as $index => $value) {
+          foreach ($values['values'] as $value) {
             $locations[$moniker][$blockName][$cnt] = $value;
             // Fix address display
             if ($blockName == 'address') {
@@ -1502,10 +1519,9 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         CRM_Core_DAO::$_nullObject, NULL, -1
       );
     }
-    $cgTree = &$treeCache[$migrationInfo['main_details']['contact_type']];
 
     $cFields = array();
-    foreach ($cgTree as $key => $group) {
+    foreach ($treeCache[$migrationInfo['main_details']['contact_type']] as $key => $group) {
       if (!isset($group['fields'])) {
         continue;
       }
@@ -1976,13 +1992,12 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * Get the details of the contact to be merged.
    *
    * @param int $contact_id
-   * @param string $moniker
    *
    * @return array
    *
    * @throws CRM_Core_Exception
    */
-  public static function getMergeContactDetails($contact_id, $moniker) {
+  public static function getMergeContactDetails($contact_id) {
     $params = array(
       'contact_id' => $contact_id,
       'version' => 3,
@@ -1992,9 +2007,8 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
     // CRM-18480: Cancel the process if the contact is already deleted
     if (isset($result['values'][$contact_id]['contact_is_deleted']) && !empty($result['values'][$contact_id]['contact_is_deleted'])) {
-      throw new CRM_Core_Exception(ts('Cannot merge because the \'%1\' contact (ID %2) has been deleted.', array(
-        1 => $moniker,
-        2 => $contact_id,
+      throw new CRM_Core_Exception(ts('Cannot merge because one contact (ID %1) has been deleted.', array(
+        1 => $contact_id,
       )));
     }
 

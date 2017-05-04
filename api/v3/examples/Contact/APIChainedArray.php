@@ -10,7 +10,7 @@
  */
 function contact_get_example() {
   $params = array(
-    'id' => 1,
+    'id' => 3,
     'api.website.get' => array(),
     'api.Contribution.get' => array(
       'total_amount' => '120.00',
@@ -28,7 +28,8 @@ function contact_get_example() {
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
     return array(
-      'error' => $errorMessage,
+      'is_error' => 1,
+      'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
     );
@@ -49,10 +50,10 @@ function contact_get_expectedresult() {
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
-    'id' => 1,
+    'id' => 3,
     'values' => array(
-      '1' => array(
-        'contact_id' => '1',
+      '3' => array(
+        'contact_id' => '3',
         'contact_type' => 'Individual',
         'contact_sub_type' => '',
         'sort_name' => 'xyz3, abc3',
@@ -88,10 +89,11 @@ function contact_get_expectedresult() {
         'sic_code' => '',
         'contact_is_deleted' => 0,
         'current_employer' => '',
-        'address_id' => '2',
-        'street_address' => '1 my road',
+        'address_id' => '',
+        'street_address' => '',
         'supplemental_address_1' => '',
         'supplemental_address_2' => '',
+        'supplemental_address_3' => '',
         'city' => '',
         'postal_code_suffix' => '',
         'postal_code' => '',
@@ -110,6 +112,7 @@ function contact_get_expectedresult() {
         'im' => '',
         'worldregion_id' => '',
         'world_region' => '',
+        'languages' => 'English (United States)',
         'individual_prefix' => '',
         'individual_suffix' => '',
         'communication_style' => '',
@@ -117,7 +120,7 @@ function contact_get_expectedresult() {
         'state_province_name' => '',
         'state_province' => '',
         'country' => '',
-        'id' => '1',
+        'id' => '3',
         'api.website.get' => array(
           'is_error' => 0,
           'version' => 3,
@@ -126,7 +129,7 @@ function contact_get_expectedresult() {
           'values' => array(
             '0' => array(
               'id' => '1',
-              'contact_id' => '1',
+              'contact_id' => '3',
               'url' => 'http://civicrm.org',
             ),
           ),
@@ -138,13 +141,15 @@ function contact_get_expectedresult() {
           'id' => 2,
           'values' => array(
             '0' => array(
-              'contact_id' => '1',
+              'contact_id' => '3',
               'contact_type' => 'Individual',
               'contact_sub_type' => '',
               'sort_name' => 'xyz3, abc3',
               'display_name' => 'abc3 xyz3',
               'contribution_id' => '2',
               'currency' => 'USD',
+              'payment_instrument' => 'Credit Card',
+              'payment_instrument_id' => '1',
               'receive_date' => '2011-01-01 00:00:00',
               'non_deductible_amount' => '10.00',
               'total_amount' => '120.00',
@@ -158,10 +163,12 @@ function contact_get_expectedresult() {
               'thankyou_date' => '',
               'contribution_source' => 'SSF',
               'amount_level' => '',
+              'contribution_recur_id' => '',
               'is_test' => 0,
               'is_pay_later' => 0,
+              'contribution_status' => 'Completed',
               'contribution_status_id' => '1',
-              'check_number' => '',
+              'contribution_check_number' => '',
               'contribution_campaign_id' => '',
               'financial_type_id' => '1',
               'financial_type' => 'Donation',
@@ -173,16 +180,14 @@ function contact_get_expectedresult() {
               'fulfilled_date' => '',
               'contribution_start_date' => '',
               'contribution_end_date' => '',
-              'contribution_recur_id' => '',
               'financial_account_id' => '1',
               'accounting_code' => '4200',
+              'campaign_id' => '',
+              'contribution_campaign_title' => '',
               'contribution_note' => '',
               'contribution_batch' => '',
-              'contribution_status' => 'Completed',
-              'payment_instrument' => 'Credit Card',
-              'payment_instrument_id' => '1',
+              'check_number' => '',
               'instrument_id' => '1',
-              'contribution_check_number' => '',
               'id' => '2',
               'contribution_type_id' => '1',
             ),

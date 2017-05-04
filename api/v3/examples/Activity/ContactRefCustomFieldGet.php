@@ -22,7 +22,8 @@ function activity_get_example() {
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
     return array(
-      'error' => $errorMessage,
+      'is_error' => 1,
+      'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
     );
@@ -47,7 +48,7 @@ function activity_get_expectedresult() {
     'values' => array(
       '1' => array(
         'id' => '1',
-        'activity_type_id' => '51',
+        'activity_type_id' => '9999',
         'subject' => 'test activity type id',
         'activity_date_time' => '2011-06-02 14:36:13',
         'duration' => '120',
@@ -59,13 +60,14 @@ function activity_get_expectedresult() {
         'is_auto' => 0,
         'is_current_revision' => '1',
         'is_deleted' => 0,
-        'source_contact_id' => '1',
+        'is_star' => 0,
         'custom_1' => 'defaultValue',
-        'custom_1_1' => 'defaultValue',
+        'custom_2_id' => '1',
         'custom_2' => 'Anderson, Anthony',
+        'source_contact_id' => '1',
+        'custom_1_1' => 'defaultValue',
         'custom_2_1' => 'Anderson, Anthony',
         'custom_2_1_id' => '1',
-        'custom_2_id' => '1',
       ),
     ),
   );

@@ -25,7 +25,8 @@ function mailing_a_b_create_example() {
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
     return array(
-      'error' => $errorMessage,
+      'is_error' => 1,
+      'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
     );
@@ -56,11 +57,13 @@ function mailing_a_b_create_expectedresult() {
         'mailing_id_b' => '2',
         'mailing_id_c' => '3',
         'domain_id' => '1',
-        'testing_criteria_id' => '',
-        'winner_criteria_id' => '',
+        'testing_criteria' => 'subject',
+        'winner_criteria' => 'open',
         'specific_url' => '',
-        'declare_winning_time' => '20150224231452',
+        'declare_winning_time' => '20170209023708',
         'group_percentage' => '10',
+        'created_id' => '3',
+        'created_date' => '2013-07-28 08:49:19',
       ),
     ),
   );

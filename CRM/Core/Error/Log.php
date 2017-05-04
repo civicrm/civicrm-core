@@ -4,7 +4,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -33,6 +33,9 @@
  */
 class CRM_Core_Error_Log extends \Psr\Log\AbstractLogger {
 
+  /**
+   * CRM_Core_Error_Log constructor.
+   */
   public function __construct() {
     $this->map = array(
       \Psr\Log\LogLevel::DEBUG => PEAR_LOG_DEBUG,
