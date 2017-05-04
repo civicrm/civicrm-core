@@ -17,7 +17,8 @@ function repo($path, $branch) {
       'branch' => $branch,
       'commit' => $commit,
     );
-  } else {
+  }
+  else {
     return array();
   }
 }
