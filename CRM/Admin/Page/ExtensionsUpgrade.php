@@ -14,6 +14,8 @@ class CRM_Admin_Page_ExtensionsUpgrade extends CRM_Core_Page {
    * Run Page.
    */
   public function run() {
+    CRM_Core_Invoke::rebuildMenuAndCaches(TRUE);
+
     $queue = CRM_Extension_Upgrades::createQueue();
     $runner = new CRM_Queue_Runner(array(
       'title' => ts('Database Upgrades'),
