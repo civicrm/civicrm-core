@@ -1314,7 +1314,7 @@ class CRM_Report_Form extends CRM_Core_Form {
    * @param string $sql
    */
   protected function addToDeveloperTab($sql) {
-    if (!CRM_Core_Permission::check('view report sql')) {
+    if (!CRM_Core_Permission::check('view report sql') || $this->_outputMode) {
       return;
     }
     $this->tabs['Developer'] = array(
