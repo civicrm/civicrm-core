@@ -36,6 +36,7 @@ $data = array(
     'civicrm-drupal@6.x' => repo("$DM_SOURCEDIR/drupal", getenv('DM_REF_DRUPAL6')),
     'civicrm-drupal@7.x' => repo("$DM_SOURCEDIR/drupal", getenv('DM_REF_DRUPAL')),
     //'civicrm-drupal@8.x' => repo("$DM_SOURCEDIR/drupal", getenv('DM_REF_DRUPAL8')),
+    'civicrm-joomla' => repo("$DM_SOURCEDIR/joomla", getenv('DM_REF_JOOMLA')),
     'civicrm-packages' => repo("$DM_SOURCEDIR/packages", getenv('DM_REF_PACKAGES')),
     'civicrm-wordpress' => repo("$DM_SOURCEDIR/WordPress", getenv('DM_REF_WORDPRESS')),
   ),
