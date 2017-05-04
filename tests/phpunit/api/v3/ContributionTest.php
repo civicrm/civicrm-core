@@ -2955,7 +2955,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
           'receipt_from_email' => 'api@civicrm.org',
         )
       );
-    } catch (Exception $e) {
+    }
+    catch (Exception $e) {
       // Need to figure out how to stop this some other day
       // We don't care about the Payment Processor because this is Pay Later
       // The point of this test is to check we get the pay_later version of the mail
@@ -2967,7 +2968,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     // Retrieve mail & check it has the pay_later_receipt info
     $mut->getMostRecentEmail('raw');
     $mut->checkMailLog(array(
-        (string)$contribParams['total_amount'],
+        (string) $contribParams['total_amount'],
         $pageParams['pay_later_receipt'],
       ), array(
         'Event',
