@@ -2654,8 +2654,10 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($this->id);
         if (!empty($lineItems)) {
           $firstLineItem = reset($lineItems);
-          $priceSet = civicrm_api3('PriceSet', 'getsingle', array('id' => $firstLineItem['price_set_id'], 'return' => 'is_quick_config, id'));
-          $values['priceSetID'] = $priceSet['id'];
+          if (CRM_Utils_Array::value('price_set_id', $firstLineItem)) {
+            $priceSet = civicrm_api3('PriceSet', 'getsingle', array('id' => $firstLineItem['price_set_id'], 'return' => 'is_quick_config, id'));
+            $values['priceSetID'] = $priceSet['id'];
+          }
           foreach ($lineItems as &$eachItem) {
             if (isset($this->_relatedObjects['membership'])
              && is_array($this->_relatedObjects['membership'])
@@ -2666,7 +2668,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
             }
             // This is actually used in conjunction with is_quick_config in the template & we should deprecate it.
             // However, that does create upgrade pain so would be better to be phased in.
-            $values['useForMember'] = !$priceSet['is_quick_config'];
+            $values['useForMember'] = !(isset($priceSet) && $priceSet['is_quick_config']);
           }
           $values['lineItem'][0] = $lineItems;
         }
