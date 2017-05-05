@@ -228,6 +228,13 @@ class CRM_Utils_Address_BatchUpdate {
           $addressParams['geo_code_2'] = $params['geo_code_2'];
           $addressParams['postal_code'] = $params['postal_code'];
           $addressParams['postal_code_suffix'] = CRM_Utils_Array::value('postal_code_suffix', $params);
+          $addressParams['city'] = $params['city'];
+          isset($params['county_id'])         && $addressParams['county_id']         = $params['county_id'];
+          isset($params['state_province_id']) && $addressParams['state_province_id'] = $params['state_province_id'];
+          isset($params['country_id'])        && $addressParams['country_id']        = $params['country_id'];
+          isset($params['street_name'])       && $addressParams['street_name']       = $params['street_name'];
+          isset($params['street_number'])     && $addressParams['street_number']     = $params['street_number'];
+          isset($params['street_unit'])       && $addressParams['street_unit']       = $params['street_unit'];
         }
       }
 
