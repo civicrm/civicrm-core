@@ -294,6 +294,7 @@
           <tr><td>Smarty</td><td><pre class="linenums" id="api-smarty" title='smarty syntax (for get actions)'></pre></td></tr>
           <tr><td>Php</td><td><pre class="linenums" id="api-php" title='php syntax'></pre></td></tr>
           <tr><td>Javascript</td><td><pre class="linenums" id="api-json" title='javascript syntax'></pre></td></tr>
+          <tr><td>Cv</td><td><pre id="api-cv" title='cv cli syntax'></pre></td></tr>
           {if $config->userSystem->is_drupal}
             <tr><td>Drush</td><td><pre id="api-drush" title='drush syntax'></pre></td></tr>
           {/if}
