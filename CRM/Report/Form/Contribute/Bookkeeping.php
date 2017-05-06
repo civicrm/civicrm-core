@@ -247,6 +247,8 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
             'type' => CRM_Utils_Type::T_STRING,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Contribute_PseudoConstant::financialAccount(),
+            'name' => 'id',
+            'alias' => 'financial_account_civireport_credit',
           ),
         ),
       ),
