@@ -640,15 +640,12 @@ MODIFY      {$columnName} varchar( $length )
   }
 
   /**
-   * Remove a foreign key from a table if it exists.
-   *
-   * @param $table_name
-   * @param $constraint_name
-   *
-   * @return bool
+   * Check if a foreign key Exists
+   * @param string $table_name
+   * @param string $constraint_name
+   * @return bool TRUE if FK is found
    */
-  public static function safeRemoveFK($table_name, $constraint_name) {
-
+  public static function checkFKExists($table_name, $constraint_name) {
     $config = CRM_Core_Config::singleton();
     $dbUf = DB::parseDSN($config->dsn);
     $query = "
@@ -666,6 +663,21 @@ MODIFY      {$columnName} varchar( $length )
     $dao = CRM_Core_DAO::executeQuery($query, $params);
 
     if ($dao->fetch()) {
+      return TRUE;
+    }
+    return FALSE;
+  }
+
+  /**
+   * Remove a foreign key from a table if it exists.
+   *
+   * @param $table_name
+   * @param $constraint_name
+   *
+   * @return bool
+   */
+  public static function safeRemoveFK($table_name, $constraint_name) {
+    if (self::checkFKExists($table_name, $constraint_name)) {
       CRM_Core_DAO::executeQuery("ALTER TABLE {$table_name} DROP FOREIGN KEY {$constraint_name}", array());
       return TRUE;
     }
