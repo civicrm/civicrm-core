@@ -213,7 +213,7 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
       "action=view&reset=1&id={$values['id']}&cid={$values['contact_id']}&context=home"
     );
 
-    $title = $displayName . ' - (' . CRM_Utils_Money::format($values['total_amount']) . ' ' . ' - ' . $values['financial_type'] . ')';
+    $title = $displayName . ' - (' . CRM_Utils_Money::format($values['total_amount'], $values['currency']) . ' ' . ' - ' . $values['financial_type'] . ')';
 
     $recentOther = array();
     if (CRM_Core_Permission::checkActionPermission('CiviContribute', CRM_Core_Action::UPDATE)) {
