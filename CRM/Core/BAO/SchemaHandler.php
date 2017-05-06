@@ -646,7 +646,6 @@ MODIFY      {$columnName} varchar( $length )
    * @return bool TRUE if FK is found
    */
   public static function checkFKExists($table_name, $constraint_name) {
-    $found = FALSE;
     $config = CRM_Core_Config::singleton();
     $dbUf = DB::parseDSN($config->dsn);
     $query = "
@@ -664,9 +663,9 @@ MODIFY      {$columnName} varchar( $length )
     $dao = CRM_Core_DAO::executeQuery($query, $params);
 
     if ($dao->fetch()) {
-      $found = TRUE;
+      return TRUE;
     }
-    return $found;
+    return FALSE;
   }
 
   /**
@@ -678,9 +677,7 @@ MODIFY      {$columnName} varchar( $length )
    * @return bool
    */
   public static function safeRemoveFK($table_name, $constraint_name) {
-    $check = self::checkFKExists($table_name, $constraint_name);
-
-    if ($check) {
+    if (self::checkFKExists($table_name, $constraint_name)) {
       CRM_Core_DAO::executeQuery("ALTER TABLE {$table_name} DROP FOREIGN KEY {$constraint_name}", array());
       return TRUE;
     }

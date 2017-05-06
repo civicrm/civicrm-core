@@ -133,6 +133,15 @@ class CRM_Upgrade_Incremental_Base {
   }
 
   /**
+   * @param string $table_name
+   * @param string $constraint_name
+   * @return bool
+   */
+  public static function checkFKExists($table_name, $constraint_name) {
+    return CRM_Core_BAO_SchemaHandler::checkFKExists($table_name, $constraint_name);
+  }
+
+  /**
    * Add a column to a table if it doesn't already exist
    *
    * @param CRM_Queue_TaskContext $ctx

@@ -1093,8 +1093,7 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
     if ($count = 1) {
       CRM_Core_DAO::executeQuery("UPDATE civicrm_sms_provider SET domain_id = (SELECT id FROM civicrm_domain)");
     }
-    $check = CRM_Core_BAO_SchemaHandler::checkFKExists('civicrm_sms_provider', 'FK_civicrm_sms_provider_domain_id');
-    if (!$check) {
+    if (!parent::checkFKExists('civicrm_sms_provider', 'FK_civicrm_sms_provider_domain_id')) {
       CRM_Core_DAO::executeQuery("SET FOREIGN_KEY_CHECKS = 0;");
       CRM_Core_DAO::executeQuery("ALTER TABLE `civicrm_sms_provider`
         ADD CONSTRAINT FK_civicrm_sms_provider_domain_id
@@ -1129,8 +1128,7 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
    * CRM-19986 fix schema differnces in civicrm_action_schedule
    */
   public static function fixSchemaOnCiviCRMActionSchedule() {
-    $check = CRM_Core_BAO_SchemaHandler::checkFKExists('civicrm_action_schedule', 'FK_civicrm_action_schedule_sms_template_id');
-    if (!$check) {
+    if (!parent::checkFKExists('civicrm_action_schedule', 'FK_civicrm_action_schedule_sms_template_id')) {
       CRM_Core_DAO::executeQuery("ALTER TABLE `civicrm_action_schedule`
         ADD CONSTRAINT FK_civicrm_action_schedule_sms_template_id
         FOREIGN KEY (`sms_template_id`)  REFERENCES `civicrm_msg_template`(`id`)
