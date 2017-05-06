@@ -702,6 +702,7 @@
       smarty: "{crmAPI var='result' entity='" + entity + "' action='" + action + "'" + (params.sequential ? '' : ' sequential=0'),
       php: "$result = civicrm_api3('" + entity + "', '" + action + "'",
       json: "CRM.api3('" + entity + "', '" + action + "'",
+      cv: "cv api " + entity + '.' + action + ' ',
       drush: "drush cvapi " + entity + '.' + action + ' ',
       wpcli: "wp cv api " + entity + '.' + action + ' ',
       rest: CRM.config.resourceBase + "extern/rest.php?entity=" + entity + "&action=" + action + "&api_key=userkey&key=sitekey&json=" + JSON.stringify(params)
@@ -725,6 +726,7 @@
         q.smarty += ' ' + key + '=' + smartyFormat(value, json, key);
       }
       // FIXME: This is not totally correct cli syntax
+      q.cv += key + '=' + json + ' ';
       q.drush += key + '=' + json + ' ';
       q.wpcli += key + '=' + json + ' ';
     });
