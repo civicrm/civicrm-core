@@ -323,13 +323,23 @@ class CRM_Contribute_Form_AdditionalInfo {
    * @param CRM_Core_Form $form
    *   instance of Contribution form.
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
+   *   See notes on $tplParams
    * @param bool $ccContribution
    *   is it credit card contribution.
+   * @param array $tplParams
+   *   Array of parameters to assign to the form. This list is the focus of
+   *   unit tests and is intended to be clearly defined & to be an effort to standardise
+   *   parameters, eventually replacing the undefined $params array. Add fields here
+   *   as testing (in FormContributionTest) is added.
+   *   -  amount
+   *   - financialTypeArray
    *
    * @return array
    */
-  public static function emailReceipt(&$form, &$params, $ccContribution = FALSE) {
+  public static function emailReceipt(&$form, &$params, $ccContribution = FALSE, $tplParams = array()) {
+    if (isset($tplParams['financialTypeArray'])) {
+      $tplParams['financialTypes'] = implode('|', $tplParams['financialTypeArray']);
+    }
     $form->assign('receiptType', 'contribution');
     // Retrieve Financial Type Name from financial_type_id
     $params['contributionType_name'] = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType',
@@ -456,6 +466,10 @@ class CRM_Contribute_Form_AdditionalInfo {
     }
 
     $template = CRM_Core_Smarty::singleton();
+    // @todo - 'dataArray' is a really bad name. We should grandfather in a meaningful name,
+    // once we know what data is actually in there!
+    // If all of the following rows are just to figure out whether to attach a pdf then it's
+    // looking like the var should be calculated earlier & passed in.
     $taxAmt = $template->get_template_vars('dataArray');
     $eventTaxAmt = $template->get_template_vars('totalTaxAmount');
     $prefixValue = Civi::settings()->get('contribution_invoice_settings');
@@ -467,7 +481,7 @@ class CRM_Contribute_Form_AdditionalInfo {
       $isEmailPdf = FALSE;
     }
 
-    list($sendReceipt, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate(
+    list($sendReceipt) = CRM_Core_BAO_MessageTemplate::sendTemplate(
       array(
         'groupName' => 'msg_tpl_workflow_contribution',
         'valueName' => 'contribution_offline_receipt',
@@ -479,6 +493,7 @@ class CRM_Contribute_Form_AdditionalInfo {
         'isTest' => $form->_mode == 'test',
         'PDFFilename' => ts('receipt') . '.pdf',
         'isEmailPdf' => $isEmailPdf,
+        'tplParams' => $tplParams,
       )
     );
 

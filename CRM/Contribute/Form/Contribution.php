@@ -1749,7 +1749,18 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
         // to get 'from email id' for send receipt
         $this->fromEmailId = $formValues['from_email_address'];
-        if (CRM_Contribute_Form_AdditionalInfo::emailReceipt($this, $formValues)) {
+        // $tplParams are parameters which are tested to be in the template (CRMContributeFormContributionTest)
+        // and deliberately synchronised with the variables available from the
+        // front end. In time it is hoped they will replace $formValues which is not
+        // clearly defined and predictable.
+        // For most sites it would be better to use the same template for front end and back end payments.
+        $tplParams = array('amount' => $formValues['total_amount']);
+        foreach ($lineItem as $priceLineItem) {
+          foreach ($priceLineItem as $lineItemRow) {
+            $tplParams['financialTypeArray'][$lineItemRow['financial_type_id']] = CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_Contribution', 'financial_type_id', $lineItemRow['financial_type_id']);
+          }
+        }
+        if (CRM_Contribute_Form_AdditionalInfo::emailReceipt($this, $formValues, FALSE, $tplParams)) {
           $this->statusMessage[] = ts('A receipt has been emailed to the contributor.');
         }
       }
