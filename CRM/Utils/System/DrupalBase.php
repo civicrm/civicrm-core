@@ -575,4 +575,18 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
     return $siteName;
   }
 
+  /**
+   * @inheritDoc
+   */
+  public function getDefaultFileStorage() {
+    $path = CRM_Utils_File::baseFilePath();
+    $drupalRoot = $this->cmsRootPath();
+    $url = CRM_Utils_System::url(trim(str_replace($drupalRoot, '', $path), '\\/'), NULL, TRUE);
+
+    return array(
+      'url' => CRM_Utils_File::addTrailingSlash($url, '/'),
+      'path' => $path,
+    );
+  }
+
 }

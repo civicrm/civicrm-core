@@ -172,4 +172,16 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Base {
     throw new Exception("Method not implemented: getLoginURL");
   }
 
+  /**
+   * @inheritDoc
+   */
+  public function getDefaultFileStorage() {
+    $config = CRM_Core_Config::singleton();
+
+    return array(
+      'url' => $config->userFrameworkBaseURL . "sites/default/files/civicrm/",
+      'path' => CRM_Utils_File::baseFilePath(),
+    );
+  }
+
 }
