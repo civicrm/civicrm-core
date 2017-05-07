@@ -2349,4 +2349,26 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     return $name;
   }
 
+  /**
+   * Add an element to the $_help array, which is used to programmatically
+   * construct help icon markup.
+   *
+   * @param string $name The name of the element to modify.
+   * @param string $id
+   * @param string $hlpFile
+   */
+  protected function addHelp($name, $id, $hlpFile) {
+    $smarty = new CRM_Core_Smarty();
+    $pluginDir = $smarty->singleton()->plugins_dir[1];
+    require_once $pluginDir . 'function.help.php';
+    $params = array(
+      'id' => $id,
+      'file' => $hlpFile,
+      'title' => $name,
+    );
+    $helpHtml = smarty_function_help($params, $smarty);
+    $element = $this->getElement($name);
+    $element->_label .= " $helpHtml";
+  }
+
 }

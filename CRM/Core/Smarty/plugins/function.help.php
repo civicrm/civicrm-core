@@ -45,7 +45,11 @@
  *   the help html to be inserted
  */
 function smarty_function_help($params, &$smarty) {
-  if (!isset($params['id']) || !isset($smarty->_tpl_vars['config'])) {
+  if (!isset($params['id'])) {
+    return NULL;
+  }
+
+  if (!isset($smarty->_tpl_vars['config']) && !isset($params['title'])) {
     return NULL;
   }
 
