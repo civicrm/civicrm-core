@@ -2354,8 +2354,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * construct help icon markup.
    *
    * @param string $name The name of the element to modify.
-   * @param string $id
-   * @param string $hlpFile
+   * @param string $id the htxt id of the help to load from the .hlp file.
+   * @param string $hlpFile The path to the .hlp file, relative to the CiviCRM root.
    */
   protected function addHelp($name, $id, $hlpFile) {
     $smarty = new CRM_Core_Smarty();
