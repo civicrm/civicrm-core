@@ -15,7 +15,13 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
    * Clean up after tests.
    */
   public function tearDown() {
-    $tablesToTruncate = array('civicrm_activity', 'civicrm_activity_contact', 'civicrm_email');
+    $tablesToTruncate = array(
+      'civicrm_activity',
+      'civicrm_activity_contact',
+      'civicrm_uf_match',
+      'civicrm_campaign',
+      'civicrm_email',
+    );
     $this->quickCleanup($tablesToTruncate);
     $this->cleanUpAfterACLs();
     parent::tearDown();
@@ -806,6 +812,111 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       'rowCount' => 0,
       'sort' => NULL,
     );
+  }
+
+  public function testSendEmailBasic() {
+    $contactId = $this->individualCreate();
+
+    // create a logged in USER since the code references it for sendEmail user.
+    $this->createLoggedInUser();
+    $session = CRM_Core_Session::singleton();
+    $loggedInUser = $session->get('userID');
+
+    $contact = $this->civicrm_api('contact', 'getsingle', array('id' => $contactId, 'version' => $this->_apiversion));
+    $contactDetailsIntersectKeys = array(
+      'contact_id' => '',
+      'sort_name' => '',
+      'display_name' => '',
+      'do_not_email' => '',
+      'preferred_mail_format' => '',
+      'is_deceased' => '',
+      'email' => '',
+      'on_hold' => '',
+    );
+    $contactDetails = array(
+      array_intersect_key($contact, $contactDetailsIntersectKeys),
+    );
+
+    $subject = __FUNCTION__ . ' subject';
+    $html = __FUNCTION__ . ' html';
+    $text = __FUNCTION__ . ' text';
+    $userID = $loggedInUser;
+
+    list($sent, $activity_id) = $email_result = CRM_Activity_BAO_Activity::sendEmail(
+      $contactDetails,
+      $subject,
+      $text,
+      $html,
+      $contact['email'],
+      $userID,
+      $from = __FUNCTION__ . '@example.com'
+    );
+
+    $activity = $this->civicrm_api('activity', 'getsingle', array('id' => $activity_id, 'version' => $this->_apiversion));
+    $details = "-ALTERNATIVE ITEM 0-
+$html
+-ALTERNATIVE ITEM 1-
+$text
+-ALTERNATIVE END-
+";
+    $this->assertEquals($activity['details'], $details, 'Activity details does not match.');
+    $this->assertEquals($activity['subject'], $subject, 'Activity subject does not match.');
+  }
+
+  public function testSendEmailWithCampaign() {
+    // Create a contact and contactDetails array.
+    $contactId = $this->individualCreate();
+
+    // create a logged in USER since the code references it for sendEmail user.
+    $this->createLoggedInUser();
+    $session = CRM_Core_Session::singleton();
+    $loggedInUser = $session->get('userID');
+
+    $contact = $this->civicrm_api('contact', 'getsingle', array('id' => $contactId, 'version' => $this->_apiversion));
+    $contactDetailsIntersectKeys = array(
+      'contact_id' => '',
+      'sort_name' => '',
+      'display_name' => '',
+      'do_not_email' => '',
+      'preferred_mail_format' => '',
+      'is_deceased' => '',
+      'email' => '',
+      'on_hold' => '',
+    );
+    $contactDetails = array(
+      array_intersect_key($contact, $contactDetailsIntersectKeys),
+    );
+
+    // Create a campaign.
+    $result = $this->civicrm_api('Campaign', 'create', array(
+      'version' => $this->_apiversion,
+      'title' => __FUNCTION__ . ' campaign',
+    ));
+    $campaign_id = $result['id'];
+
+    $subject = __FUNCTION__ . ' subject';
+    $html = __FUNCTION__ . ' html';
+    $text = __FUNCTION__ . ' text';
+    $userID = $loggedInUser;
+
+    list($sent, $activity_id) = $email_result = CRM_Activity_BAO_Activity::sendEmail(
+      $contactDetails,
+      $subject,
+      $text,
+      $html,
+      $contact['email'],
+      $userID,
+      $from = __FUNCTION__ . '@example.com',
+      $attachments = NULL,
+      $cc = NULL,
+      $bcc = NULL,
+      $contactIds = NULL,
+      $additionalDetails = NULL,
+      NULL,
+      $campaign_id
+    );
+    $activity = $this->civicrm_api('activity', 'getsingle', array('id' => $activity_id, 'version' => $this->_apiversion));
+    $this->assertEquals($activity['campaign_id'], $campaign_id, 'Activity campaign_id does not match.');
   }
 
 }
