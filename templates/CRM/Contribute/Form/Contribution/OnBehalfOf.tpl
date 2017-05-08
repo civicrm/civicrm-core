@@ -191,7 +191,12 @@
         else {
           // do not set defaults to file type fields
           if ($('#' + ele).attr('type') != 'file') {
-            $('#' + ele ).val(data[ele].value).change();
+            if (ele.split("_").pop() == 'display') {
+              $("[id^='"+ele+"']").val(data[ele].value).change();
+            }
+            else {
+              $('#' + ele ).val(data[ele].value).change();
+            }
           }
         }
       }
