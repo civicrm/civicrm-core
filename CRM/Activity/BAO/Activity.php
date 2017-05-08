@@ -1403,6 +1403,8 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
    *   Contact ids.
    * @param string $additionalDetails
    *   The additional information of CC and BCC appended to the activity Details.
+   * @param array $contributionIds
+   * @param int $campaignId
    *
    * @return array
    *   ( sent, activityId) if any email is sent and activityId
@@ -1421,7 +1423,7 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
     $contactIds = NULL,
     $additionalDetails = NULL,
     $contributionIds = NULL,
-    $campaign_id = NULL
+    $campaignId = NULL
   ) {
     // get the contact details of logged in contact, which we set as from email
     if ($userID == NULL) {
@@ -1470,7 +1472,7 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
       'details' => $details,
       // FIXME: check for name Completed and get ID from that lookup
       'status_id' => 2,
-      'campaign_id' => $campaign_id,
+      'campaign_id' => $campaignId,
     );
 
     // CRM-5916: strip [case #…] before saving the activity (if present in subject)

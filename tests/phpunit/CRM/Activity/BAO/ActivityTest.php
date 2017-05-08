@@ -5,10 +5,8 @@
  * @group headless
  */
 class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
-
   public function setUp() {
     parent::setUp();
-
     $this->prepareForACLs();
     CRM_Core_Config::singleton()->userPermissionClass->permissions = array('view all contacts', 'access CiviCRM');
   }
@@ -18,7 +16,6 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
    */
   public function tearDown() {
     $tablesToTruncate = array(
-      'civicrm_contact',
       'civicrm_activity',
       'civicrm_activity_contact',
       'civicrm_uf_match',
@@ -915,6 +912,7 @@ $text
       $bcc = NULL,
       $contactIds = NULL,
       $additionalDetails = NULL,
+      NULL,
       $campaign_id
     );
     $activity = $this->civicrm_api('activity', 'getsingle', array('id' => $activity_id, 'version' => $this->_apiversion));
