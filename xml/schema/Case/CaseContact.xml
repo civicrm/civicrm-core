@@ -55,6 +55,7 @@
     <name>UI_case_contact_id</name>
     <fieldName>case_id</fieldName>
     <fieldName>contact_id</fieldName>
+    <unique>true</unique>
     <add>2.1</add>
   </index>
 </table>
