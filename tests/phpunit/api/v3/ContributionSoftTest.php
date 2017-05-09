@@ -291,7 +291,7 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
     $params = array(
       'id' => $softcontributionID,
     );
-    $result = $this->callAPISuccess('contribution_soft', 'delete', $params);
+    $this->callAPISuccess('contribution_soft', 'delete', $params);
   }
 
   /**
@@ -307,7 +307,7 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
     $params = array(
       'contribution_source' => 'SSF',
     );
-    $softcontribution = $this->callAPIFailure('contribution_soft', 'delete', $params);
+    $this->callAPIFailure('contribution_soft', 'delete', $params);
   }
 
   public function testDeleteContributionSoft() {
@@ -324,7 +324,7 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
     $params = array(
       'id' => $softcontributionID,
     );
-    $result = $this->callAPIAndDocument('contribution_soft', 'delete', $params, __FUNCTION__, __FILE__);
+    $this->callAPIAndDocument('contribution_soft', 'delete', $params, __FUNCTION__, __FILE__);
   }
 
   ///////////////// civicrm_contribution_search methods
