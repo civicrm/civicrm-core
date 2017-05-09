@@ -1184,11 +1184,7 @@ class CRM_Utils_Token {
     $className = NULL,
     $jobID = NULL
   ) {
-    if (empty($contactIDs)) {
-      // putting a fatal here so we can track if/when this happens
-      CRM_Core_Error::fatal();
-    }
-    // @todo this functions needs unit tests.
+
     $params = array();
     foreach ($contactIDs as $key => $contactID) {
       $params[] = array(
@@ -1239,11 +1235,9 @@ class CRM_Utils_Token {
       }
     }
 
-    //get the total number of contacts to fetch from database.
-    $numberofContacts = count($contactIDs);
     $query = new CRM_Contact_BAO_Query($params, $returnProperties);
 
-    $details = $query->apiQuery($params, $returnProperties, NULL, NULL, 0, $numberofContacts);
+    $details = $query->apiQuery($params, $returnProperties, NULL, NULL, 0, count($contactIDs));
 
     $contactDetails = &$details[0];
 
