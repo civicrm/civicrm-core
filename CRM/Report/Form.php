@@ -714,7 +714,7 @@ class CRM_Report_Form extends CRM_Core_Form {
         }
       }
 
-      $doNotCopy = array('required');
+      $doNotCopy = array('required', 'default');
 
       $fieldGroups = array('fields', 'filters', 'group_bys', 'order_bys');
       foreach ($fieldGroups as $fieldGrp) {
