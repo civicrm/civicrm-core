@@ -82,13 +82,19 @@ class api_v3_ExtensionTest extends CiviUnitTestCase {
 
   /**
    * Test Extension Get resturns detailed information
+   * Note that this is likely to fail locally but will work on Jenkins due to the result count check
    * CRM-20532
    */
   public function testExtesnionGet() {
     $result = $this->callAPISuccess('extension', 'get', array());
     $testExtensionResult = $this->callAPISuccess('extension', 'get', array('key' => 'test.extension.manager.paymenttest'));
     $this->assertNotNull($result['values'][$testExtensionResult['id']]['typeInfo']);
-    $this->assertEquals(11, $result['count']);
+    $this->assertEquals(6, $result['count']);
+  }
+
+  public function testGetMultipleExtensions() {
+    $result = $this->callAPISuccess('extension', 'get', array('key' => array('test.extension.manager.paymenttest', 'test.extension.manager.moduletest')));
+    $this->assertEquals(2, $result['count']);
   }
 
 }
