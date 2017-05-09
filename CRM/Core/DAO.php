@@ -346,6 +346,11 @@ class CRM_Core_DAO extends DB_DataObject {
     // rewrite queries that should use $dbLocale-based views for multi-language installs
     global $dbLocale, $_DB_DATAOBJECT;
 
+    if (empty($_DB_DATAOBJECT['CONNECTIONS'][$this->_database_dsn_md5])) {
+      // Will force connection to be populated per CRM-20541.
+      new CRM_Core_DAO();
+    }
+
     $conn = &$_DB_DATAOBJECT['CONNECTIONS'][$this->_database_dsn_md5];
     $orig_options = $conn->options;
     $this->_setDBOptions($this->_options);
