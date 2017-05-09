@@ -57,4 +57,35 @@ class api_v3_ExtensionTest extends CiviUnitTestCase {
     $this->assertEquals('CiviDiscount', $result['values'][0]['name']);
   }
 
+  /**
+   * Test retunging a single extension
+   */
+  public function testSingleExtesnionGet() {
+    $result = $this->callAPISuccess('extension', 'get', array('key' => 'test.extension.manager.moduletest'));
+    $this->assertEquals('test.extension.manager.moduletest', $result['values'][$result['id']]['key']);
+    $this->assertEquals('module', $result['values'][$result['id']]['type']);
+    $this->assertEquals('test_extension_manager_moduletest', $result['values'][$result['id']]['name']);
+  }
+
+  /**
+   * Test single get with specific fields in return
+   */
+  public function testSingleExtesnionGetWithReturnFields() {
+    $result = $this->callAPISuccess('extension', 'get', array('key' => 'test.extension.manager.moduletest', 'return' => array('name', 'status', 'key')));
+    $this->assertEquals('test.extension.manager.moduletest', $result['values'][$result['id']]['key']);
+    $this->assertNull($result['values'][$result['id']]['type']);
+    $this->assertEquals('test_extension_manager_moduletest', $result['values'][$result['id']]['name']);
+    $this->assertEquals('uninstalled', $result['values'][$result['id']]['status']);
+  }
+
+  /**
+   * Test Extension Get resturns detailed information
+   */
+  public function testeExtesnionGet() {
+    $result = $this->callAPISuccess('extension', 'get', array());
+    $angularResult = $this->callAPISuccess('extension', 'get', array('key' => 'org.civicrm.angularprofiles'));
+    $this->assertNotNull($result['values'][$angularResult['id']]['comments']);
+    $this->assertEquals(11, $result['count']);
+  }
+
 }
