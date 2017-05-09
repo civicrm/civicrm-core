@@ -45,7 +45,7 @@ class CRM_Contact_Form_Task_EmailCommonTest extends CiviUnitTestCase {
   /**
    * Test generating domain emails
    */
-  public function testDomainEmailGeneation() {
+  public function testDomainEmailGeneration() {
     $emails = CRM_Contact_Form_Task_EmailCommon::domainEmails();
     $this->assertNotEmpty($emails);
     $optionValue = $this->callAPISuccess('OptionValue', 'Get', array(
