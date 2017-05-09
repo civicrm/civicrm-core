@@ -414,6 +414,18 @@ class CRM_Contact_Form_Task_EmailCommon {
 
     // check and ensure that
     $formValues = $form->controller->exportValues($form->getName());
+    self::submit($form, $formValues);
+  }
+
+  /**
+   * Submit the form values.
+   *
+   * This is also accessible for testing.
+   *
+   * @param CRM_Core_Form $form
+   * @param array $formValues
+   */
+  public static function submit(&$form, $formValues) {
     self::saveMessageTemplate($formValues);
 
     $from = CRM_Utils_Array::value($formValues['fromEmailAddress'], $form->_emails);

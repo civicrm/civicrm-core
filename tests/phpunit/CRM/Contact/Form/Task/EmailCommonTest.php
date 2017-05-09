@@ -55,4 +55,28 @@ class CRM_Contact_Form_Task_EmailCommonTest extends CiviUnitTestCase {
     $this->assertEquals('"Seamus Lee" <seamus@example.com>', $optionValue['values'][$this->_optionValue['id']]['label']);
   }
 
+  public function testPostProcess() {
+    $this->createLoggedInUser();
+    $form = new CRM_Contact_Form_Task_Email();
+    $_SERVER['REQUEST_METHOD'] = 'GET';
+    $form->controller = new CRM_Core_Controller();
+
+    for ($i = 0; $i < 27; $i++) {
+      $email = 'spy' . $i . '@secretsquirrels.com';
+      $contactID = $this->individualCreate(array('email' => $email));
+      $form->_contactIds[$contactID] = $contactID;
+      $form->_toContactEmails[$this->callAPISuccessGetValue('Email', array('return' => 'id', 'email' => $email))] = $email;
+    }
+    $form->_allContactIds = $form->_toContactIds = $form->_contactIds;
+    $form->_emails = array(1 => 'mickey@mouse.com');
+    $form->_fromEmails = array(1 => 'mickey@mouse.com');
+
+    CRM_Contact_Form_Task_EmailCommon::buildQuickForm($form);
+
+    CRM_Contact_Form_Task_EmailCommon::submit($form, array(
+      'fromEmailAddress' => 1,
+      'subject' => 'Really interesting stuff',
+    ));
+  }
+
 }
