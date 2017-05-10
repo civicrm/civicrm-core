@@ -1811,6 +1811,7 @@ WHERE      activity.id IN ($activityIds)";
       if ($activity->contribution_status_id != 1) {
         return NULL;
       }
+      $activityType = $component = 'Contribution';
 
       // retrieve existing activity based on source_record_id and activity_type
       if (empty($params['id'])) {
@@ -1825,7 +1826,6 @@ WHERE      activity.id IN ($activityIds)";
       }
 
       $date = CRM_Utils_Date::isoToMysql($activity->receive_date);
-      $activityType = $component = 'Contribution';
     }
 
     $activityParams = array(

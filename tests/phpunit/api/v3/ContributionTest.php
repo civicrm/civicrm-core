@@ -2595,6 +2595,14 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     ));
     $this->assertEquals(2, $logs['count']);
     $this->assertNotEquals($stateOfGrace, $logs['values'][2]['status_id']);
+
+    //Assert only three activities are created.
+    $activities = CRM_Activity_BAO_Activity::getContactActivity($this->_ids['contact']);
+    $this->assertEquals(3, count($activities));
+    $activityNames = array_flip(CRM_Utils_Array::collect('activity_name', $activities));
+    $this->assertArrayHasKey('Contribution', $activityNames);
+    $this->assertArrayHasKey('Membership Signup', $activityNames);
+    $this->assertArrayHasKey('Change Membership Status', $activityNames);
     $this->cleanUpAfterPriceSets();
   }
 

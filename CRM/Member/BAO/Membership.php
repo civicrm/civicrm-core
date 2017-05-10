@@ -144,8 +144,9 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
       'status_id' => CRM_Utils_Array::value('membership_activity_status', $params, 'Completed'),
     );
     if (in_array($allStatus[$membership->status_id], array('Pending', 'Grace'))) {
-      $activityParams['status_id'] = CRM_Core_OptionGroup::getValue('activity_status', 'Scheduled', 'name');
+      $activityParams['status_id'] = 'Scheduled';
     }
+    $activityParams['status_id'] = CRM_Core_OptionGroup::getValue('activity_status', $activityParams['status_id'], 'name');
 
     $targetContactID = $membership->contact_id;
     if (!empty($params['is_for_organization'])) {
@@ -1853,7 +1854,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
           'join_date' => $currentMembership['join_date'],
           'membership_type_id' => $membershipTypeID,
           'max_related' => !empty($membershipTypeDetails['max_related']) ? $membershipTypeDetails['max_related'] : NULL,
-          'membership_activity_status' => $isPayLater ? 'Scheduled' : 'Completed',
+          'membership_activity_status' => ($pending || $isPayLater) ? 'Scheduled' : 'Completed',
         );
         if ($contributionRecurID) {
           $memParams['contribution_recur_id'] = $contributionRecurID;
