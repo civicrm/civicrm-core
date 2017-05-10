@@ -1868,6 +1868,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
 
             // CRM-15735-to update the membership status as per the contribution receive date
             $joinDate = NULL;
+            $oldStatus = $membership->status_id;
             if (!empty($params['receive_date'])) {
               $joinDate = $params['receive_date'];
               $status = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate($membership->start_date,
@@ -1883,7 +1884,6 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
             }
 
             if ($currentMembership) {
-              $oldStatus = $currentMembership['status_id'];
               CRM_Member_BAO_Membership::fixMembershipStatusBeforeRenew($currentMembership, NULL);
               $dates = CRM_Member_BAO_MembershipType::getRenewalDatesForMembershipType($membership->id, NULL, NULL, $numterms);
               $dates['join_date'] = CRM_Utils_Date::customFormat($currentMembership['join_date'], $format);

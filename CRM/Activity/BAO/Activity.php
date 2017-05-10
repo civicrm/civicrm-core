@@ -2067,6 +2067,7 @@ WHERE      activity.id IN ($activityIds)";
       if ($activity->contribution_status_id != 1) {
         return NULL;
       }
+      $activityType = $component = 'Contribution';
 
       // retrieve existing activity based on source_record_id and activity_type
       if (empty($params['id'])) {
@@ -2081,14 +2082,12 @@ WHERE      activity.id IN ($activityIds)";
       }
 
       $date = CRM_Utils_Date::isoToMysql($activity->receive_date);
-      $activityType = $component = 'Contribution';
     }
 
     $activityParams = array(
       'source_contact_id' => $activity->contact_id,
       'source_record_id' => $activity->id,
       'activity_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', $activityType),
-      'target_contact_id' => $activity->contact_id,
       'activity_date_time' => $date,
       'is_test' => $activity->is_test,
       'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_status_id', 'Completed'),

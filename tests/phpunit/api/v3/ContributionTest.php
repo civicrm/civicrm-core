@@ -2751,6 +2751,13 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     ));
     $this->assertEquals(2, $logs['count']);
     $this->assertNotEquals($stateOfGrace, $logs['values'][2]['status_id']);
+    //Assert only three activities are created.
+    $activities = CRM_Activity_BAO_Activity::getContactActivity($this->_ids['contact']);
+    $this->assertEquals(3, count($activities));
+    $activityNames = array_flip(CRM_Utils_Array::collect('activity_name', $activities));
+    $this->assertArrayHasKey('Contribution', $activityNames);
+    $this->assertArrayHasKey('Membership Signup', $activityNames);
+    $this->assertArrayHasKey('Change Membership Status', $activityNames);
     $this->cleanUpAfterPriceSets();
   }
 
@@ -2877,8 +2884,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'financial_type_id' => 1,
       'payment_instrument_id' => 'Credit Card',
       'non_deductible_amount' => 10.00,
-      'trxn_id' => 'jdhfi88',
-      'invoice_id' => 'djfhiewuyr',
+      'trxn_id' => 'jdhfi' . rand(1, 100),
+      'invoice_id' => 'djfhiew' . rand(5, 100),
       'source' => 'SSF',
       'contribution_status_id' => 2,
       'contribution_page_id' => $this->_ids['contribution_page'],
