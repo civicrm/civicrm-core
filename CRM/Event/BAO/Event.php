@@ -1889,6 +1889,9 @@ WHERE  id = $cfID
       'check_permissions' => TRUE,
       'return' => $ret,
       'loc_block_id.address_id' => array('IS NOT NULL' => 1),
+      'options' => array(
+        'limit' => 0,
+      ),
     ));
 
     foreach ($result['values'] as $event) {
