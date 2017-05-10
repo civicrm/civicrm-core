@@ -2053,6 +2053,9 @@ WHERE  ce.loc_block_id = $locBlockId";
       $result = civicrm_api3('Event', 'get', array(
         'check_permissions' => 1,
         'return' => 'title',
+        'options' => array(
+          'limit' => 0,
+        ),
       ));
       $allEvents = CRM_Utils_Array::collect('title', $result['values']);
 
@@ -2060,6 +2063,9 @@ WHERE  ce.loc_block_id = $locBlockId";
         'check_permissions' => 1,
         'return' => 'title',
         'created_id' => 'user_contact_id',
+        'options' => array(
+          'limit' => 0,
+        ),
       ));
       $createdEvents = CRM_Utils_Array::collect('title', $result['values']);
 
