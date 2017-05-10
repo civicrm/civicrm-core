@@ -34,7 +34,7 @@
         matchingUfGroups = ufGroupCollection.subcollection({
           filter: function(ufGroupModel) {
             //CRM-16915 - filter with module used by the profile
-            if (options.usedByFilter.length) {
+            if (options.usedByFilter && options.usedByFilter.length) {
               usedByFilter = options.usedByFilter;
             }
             return ufGroupModel.checkGroupType(options.groupTypeFilter, options.allowAllSubtypes, usedByFilter);
@@ -45,7 +45,7 @@
       }
 
       //CRM-15427 check for valid subtypes raise a warning if not valid
-      if (options.allowAllSubtypes && validTypesId.length === 0) {
+      if (options.allowAllSubtypes && !validTypesId.length) {
         validTypes = ufGroupCollection.subcollection({
           filter: function(ufGroupModel) {
             return ufGroupModel.checkGroupType(options.groupTypeFilter);
