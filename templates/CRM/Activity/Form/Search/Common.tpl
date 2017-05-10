@@ -25,6 +25,14 @@
 *}
 <tr>
   <td colspan="2">
+    {$form.activity_fulltext_query.label}
+    <br>
+    {$form.activity_fulltext_query_operator.html}
+    {$form.activity_fulltext_query.html}
+  </td>
+</tr>
+<tr>
+  <td colspan="2">
     {$form.activity_role.html}
     </span>
   </td>
