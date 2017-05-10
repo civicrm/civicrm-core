@@ -489,21 +489,11 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
       }
     }
     else {
-      $pathVars = explode('/', str_replace('\\', '/', $_SERVER['SCRIPT_FILENAME']));
-
-      //might be windows installation.
-      $firstVar = array_shift($pathVars);
-      if ($firstVar) {
-        $cmsRoot = $firstVar;
-      }
-
-      //start w/ csm dir search.
-      foreach ($pathVars as $var) {
-        $cmsRoot .= "/$var";
+      if (function_exists('get_home_path()')) {
+        $cmsRoot = get_home_path();
         if ($this->validInstallDir($cmsRoot)) {
-          //stop as we found bootstrap.
+          define('CIVICRM_CMSDIR' , $cmsRoot);  //should we go ahead and set the constant here for future bootstrap performance?
           $valid = TRUE;
-          break;
         }
       }
     }
