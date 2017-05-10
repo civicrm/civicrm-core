@@ -2009,7 +2009,9 @@ ORDER BY civicrm_email.is_primary DESC";
       //CRM-13596 - add to existing contact types, rather than overwriting
       $data_contact_sub_type_arr = CRM_Utils_Array::explodePadded($data['contact_sub_type']);
       if (!in_array($params['contact_sub_type_hidden'], $data_contact_sub_type_arr)) {
-        $data['contact_sub_type'] .= CRM_Utils_Array::implodePadded($params['contact_sub_type_hidden']);
+        //CRM-20517 - make sure contact_sub_type gets the correct delimiters
+        $data['contact_sub_type'] = trim($data['contact_sub_type'], CRM_Core_DAO::VALUE_SEPARATOR);
+        $data['contact_sub_type'] = CRM_Core_DAO::VALUE_SEPARATOR . $data['contact_sub_type'] . CRM_Utils_Array::implodePadded($params['contact_sub_type_hidden']);
       }
     }
 
