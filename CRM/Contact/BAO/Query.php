@@ -5233,6 +5233,13 @@ SELECT COUNT( conts.total_amount ) as cancel_count,
         $value = $value[$op];
       }
 
+      $this->_tables[$tableName] = $this->_whereTables[$tableName] = 1;
+
+      // handle IS NULL / IS NOT NULL / IS EMPTY / IS NOT EMPTY
+      if ($this->nameNullOrEmptyOp($fieldName, $op, $grouping)) {
+        return;
+      }
+
       $date = $format = NULL;
       if (strstr($op, 'IN')) {
         $format = array();
@@ -5261,8 +5268,6 @@ SELECT COUNT( conts.total_amount ) as cancel_count,
       else {
         $this->_where[$grouping][] = self::buildClause("{$tableName}.{$dbFieldName}", $op);
       }
-
-      $this->_tables[$tableName] = $this->_whereTables[$tableName] = 1;
 
       $op = CRM_Utils_Array::value($op, CRM_Core_SelectValues::getSearchBuilderOperators(), $op);
       $this->_qill[$grouping][] = "$fieldTitle $op $format";
