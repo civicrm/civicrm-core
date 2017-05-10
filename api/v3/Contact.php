@@ -1254,6 +1254,11 @@ function _civicrm_api3_contact_getlist_params(&$request) {
   // Contact api doesn't support array(LIKE => 'foo') syntax
   if (!empty($request['input'])) {
     $request['params'][$request['search_field']] = $request['input'];
+    // Temporarily override wildcard setting
+    if (Civi::settings()->get('includeWildCardInName') != $request['add_wildcard']) {
+      Civi::$statics['civicrm_api3_contact_getlist']['override_wildcard'] = !$request['add_wildcard'];
+      Civi::settings()->set('includeWildCardInName', $request['add_wildcard']);
+    }
   }
 }
 
@@ -1305,6 +1310,11 @@ function _civicrm_api3_contact_getlist_output($result, $request) {
       }
       $output[] = $data;
     }
+  }
+  // Restore wildcard override by _civicrm_api3_contact_getlist_params
+  if (isset(Civi::$statics['civicrm_api3_contact_getlist']['override_wildcard'])) {
+    Civi::settings()->set('includeWildCardInName', Civi::$statics['civicrm_api3_contact_getlist']['override_wildcard']);
+    unset(Civi::$statics['civicrm_api3_contact_getlist']['override_wildcard']);
   }
   return $output;
 }
