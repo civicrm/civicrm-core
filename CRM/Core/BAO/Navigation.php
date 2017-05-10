@@ -439,9 +439,12 @@ ORDER BY parent_id, weight";
       if (!isset($nodes[$origKey]['attributes']['navID'])) {
         $newKey = ++$maxNavID;
         $nodes[$origKey]['attributes']['navID'] = $newKey;
-        $nodes[$newKey] = $nodes[$origKey];
-        unset($nodes[$origKey]);
-        $origKey = $newKey;
+        if ($origKey != $newKey) {
+          // If the keys are different, reset the array index to match.
+          $nodes[$newKey] = $nodes[$origKey];
+          unset($nodes[$origKey]);
+          $origKey = $newKey;
+        }
       }
       if (isset($nodes[$origKey]['child']) && is_array($nodes[$origKey]['child'])) {
         self::_fixNavigationMenu($nodes[$origKey]['child'], $maxNavID, $nodes[$origKey]['attributes']['navID']);
