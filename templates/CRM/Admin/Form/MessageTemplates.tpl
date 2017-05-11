@@ -165,8 +165,7 @@
       });
       function showHideUpload(type) {
         var show = (type == 1) ? false : true;
-        $("#msg_html_section").toggle(show);
-        $("#msg_text_section, #pdf_format").toggle(show);
+        $("#msg_html_section, #msg_text_section, #pdf_format").toggle(show);
         $("#file_id").parent().parent().toggle(!show);
 
         // auto file type validation
