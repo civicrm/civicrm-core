@@ -247,6 +247,28 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
   }
 
   /**
+   * Check with non-ascii labels
+   */
+  public function testCustomFieldCreateWithNonAsciiLabel() {
+    $customGroup = $this->customGroupCreate(array('extends' => 'Contact', 'title' => 'select_test_group'));
+    $params = array(
+      'custom_group_id' => $customGroup['id'],
+      'label' => 'ôôôô',
+      'html_type' => 'Select',
+      'data_type' => 'String',
+      'weight' => 4,
+      'is_required' => 1,
+      'is_searchable' => 0,
+      'is_active' => 1,
+    );
+    $customField = $this->callAPISuccess('custom_field', 'create', $params);
+    $this->assertNotNull($customField['id']);
+    $params['label'] = 'ààà';
+    $customField = $this->callAPISuccess('custom_field', 'create', $params);
+    $this->assertNotNull($customField['id']);
+  }
+
+  /**
    * Test custom field with existing option group.
    */
   public function testCustomFieldExistingOptionGroup() {
