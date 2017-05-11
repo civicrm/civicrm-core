@@ -576,10 +576,11 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       CRM_Core_DAO::setFieldValue('CRM_Activity_BAO_Activity', $activity['id'], 'campaign_id', $contribution->campaign_id);
       $contribution->activity_id = $activity['id'];
     }
+
     if (empty($contribution->contact_id)) {
       $contribution->find(TRUE);
     }
-    CRM_Activity_BAO_Activity::addActivity($contribution, 'Offline');
+    CRM_Activity_BAO_Activity::addActivity($contribution, 'Contribution');
 
     // do not add to recent items for import, CRM-4399
     if (empty($params['skipRecentView'])) {
@@ -1867,6 +1868,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
 
             // CRM-15735-to update the membership status as per the contribution receive date
             $joinDate = NULL;
+            $oldStatus = $membership->status_id;
             if (!empty($params['receive_date'])) {
               $joinDate = $params['receive_date'];
               $status = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate($membership->start_date,
@@ -1931,8 +1933,41 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
             //update related Memberships.
             CRM_Member_BAO_Membership::updateRelatedMemberships($membership->id, $formattedParams);
 
-            //CRM-19678: No Membership Renewal Activity is created when a Pay Later is set to Completed
-            CRM_Activity_BAO_Activity::addActivity($membership, 'Membership Renewal', $membership->contact_id);
+            foreach (array('Membership Signup', 'Membership Renewal') as $activityType) {
+              $scheduledActivityID = CRM_Utils_Array::value('id',
+                civicrm_api3('Activity', 'Get',
+                  array(
+                    'source_record_id' => $membership->id,
+                    'activity_type_id' => $activityType,
+                    'status_id' => 'Scheduled',
+                    'options' => array(
+                      'limit' => 1,
+                      'sort' => 'id DESC',
+                    ),
+                  )
+                )
+              );
+              // 1. Update Schedule Membership Signup/Renewal activity to completed on successful payment of pending membership
+              // 2. OR Create renewal activity scheduled if its membership renewal will be paid later
+              if ($scheduledActivityID) {
+                CRM_Activity_BAO_Activity::addActivity($membership, $activityType, $membership->contact_id, array('id' => $scheduledActivityID));
+                break;
+              }
+            }
+
+            // track membership status change if any
+            if (!empty($oldStatus) && $membership->status_id != $oldStatus) {
+              $allStatus = CRM_Member_BAO_Membership::buildOptions('status_id', 'get');
+              CRM_Activity_BAO_Activity::addActivity($membership,
+                'Change Membership Status',
+                NULL,
+                array(
+                  'subject' => "Status changed from {$allStatus[$oldStatus]} to {$allStatus[$membership->status_id]}",
+                  'source_contact_id' => $membershipLog['modified_id'],
+                  'priority_id' => 'Normal',
+                )
+              );
+            }
 
             $updateResult['membership_end_date'] = CRM_Utils_Date::customFormat($dates['end_date'],
               '%B %E%f, %Y'
@@ -4608,8 +4643,6 @@ LIMIT 1;";
             $var = TRUE;
             CRM_Member_BAO_Membership::createRelatedMemberships($var, $var, TRUE);
             civicrm_api3('Membership', 'create', $membershipParams);
-            //CRM-19600: Add Membership Renewal activity
-            CRM_Activity_BAO_Activity::addActivity($membership, 'Membership Renewal', $membership->contact_id);
           }
         }
       }

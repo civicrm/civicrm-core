@@ -2739,7 +2739,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     ));
     $this->assertEquals(1, $logs['count']);
     $this->assertEquals($stateOfGrace, $membership['status_id']);
-    $contribution = $this->callAPISuccess('contribution', 'completetransaction', array('id' => $this->_ids['contribution']));
+    $this->callAPISuccess('contribution', 'completetransaction', array('id' => $this->_ids['contribution']));
     $membership = $this->callAPISuccess('membership', 'getsingle', array('id' => $this->_ids['membership']));
     $this->assertEquals(date('Y-m-d', strtotime('yesterday + 1 year')), $membership['end_date']);
     $this->callAPISuccessGetSingle('LineItem', array(
@@ -2749,14 +2749,15 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $logs = $this->callAPISuccess('MembershipLog', 'get', array(
       'membership_id' => $this->_ids['membership'],
     ));
-    //CRM-19600: Ensure that 'Membership Renewal' activity is created after successful membership regsitration
-    $activity = $this->callAPISuccess('Activity', 'get', array(
-      'activity_type_id' => 'Membership Renewal',
-      'source_record_id' => $contribution['id'],
-    ));
-    $this->assertEquals(1, $activity['count']);
     $this->assertEquals(2, $logs['count']);
     $this->assertNotEquals($stateOfGrace, $logs['values'][2]['status_id']);
+    //Assert only three activities are created.
+    $activities = CRM_Activity_BAO_Activity::getContactActivity($this->_ids['contact']);
+    $this->assertEquals(3, count($activities));
+    $activityNames = array_flip(CRM_Utils_Array::collect('activity_name', $activities));
+    $this->assertArrayHasKey('Contribution', $activityNames);
+    $this->assertArrayHasKey('Membership Signup', $activityNames);
+    $this->assertArrayHasKey('Change Membership Status', $activityNames);
     $this->cleanUpAfterPriceSets();
   }
 
@@ -2771,6 +2772,13 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     );
     $this->setUpPendingContribution($this->_ids['price_field_value'][0]);
     $this->callAPISuccess('membership', 'getsingle', array('id' => $this->_ids['membership']));
+    // Case 1: Assert that Membership Signup Activity is created on Pending to Completed Contribution via backoffice
+    $activity = $this->callAPISuccess('Activity', 'get', array(
+      'activity_type_id' => 'Membership Signup',
+      'source_record_id' => $this->_ids['membership'],
+      'status_id' => 'Scheduled',
+    ));
+    $this->assertEquals(1, $activity['count']);
 
     // change pending contribution to completed
     $form = new CRM_Contribute_Form_Contribution();
@@ -2812,11 +2820,29 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     catch (Civi\Payment\Exception\PaymentProcessorException $e) {
       $error = TRUE;
     }
+    // Case 2: After successful payment for Pending backoffice there are three activities created
+    //  2.a Update status of existing Scheduled Membership Signup (created in step 1) to Completed
     $activity = $this->callAPISuccess('Activity', 'get', array(
-      'activity_type_id' => 'Membership Renewal',
-      'source_record_id' => $this->_ids['contribution'],
+      'activity_type_id' => 'Membership Signup',
+      'source_record_id' => $this->_ids['membership'],
+      'status_id' => 'Completed',
     ));
     $this->assertEquals(1, $activity['count']);
+    // 2.b Contribution activity created to record successful payment
+    $activity = $this->callAPISuccess('Activity', 'get', array(
+      'activity_type_id' => 'Contribution',
+      'source_record_id' => $this->_ids['contribution'],
+      'status_id' => 'Completed',
+    ));
+    $this->assertEquals(1, $activity['count']);
+    // 2.c 'Change membership type' activity created to record Membership status change from Grace to Current
+    $activity = $this->callAPISuccess('Activity', 'get', array(
+      'activity_type_id' => 'Change Membership Status',
+      'source_record_id' => $this->_ids['membership'],
+      'status_id' => 'Completed',
+    ));
+    $this->assertEquals(1, $activity['count']);
+    $this->assertEquals('Status changed from Grace to Current', $activity['values'][$activity['id']]['subject']);
   }
 
   /**
@@ -2841,7 +2867,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    *
    * @param int $priceFieldValueID
    */
-  public function setUpPendingContribution($priceFieldValueID) {
+  public function setUpPendingContribution($priceFieldValueID, $contriParams = array()) {
     $contactID = $this->individualCreate();
     $membership = $this->callAPISuccess('membership', 'create', array(
       'contact_id' => $contactID,
@@ -2850,7 +2876,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'end_date' => 'yesterday',
       'join_date' => 'yesterday - 1 year',
     ));
-    $contribution = $this->callAPISuccess('contribution', 'create', array(
+    $contribution = $this->callAPISuccess('contribution', 'create', array_merge(array(
       'domain_id' => 1,
       'contact_id' => $contactID,
       'receive_date' => date('Ymd'),
@@ -2858,13 +2884,13 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'financial_type_id' => 1,
       'payment_instrument_id' => 'Credit Card',
       'non_deductible_amount' => 10.00,
-      'trxn_id' => 'jdhfi88',
-      'invoice_id' => 'djfhiewuyr',
+      'trxn_id' => 'jdhfi' . rand(1, 100),
+      'invoice_id' => 'djfhiew' . rand(5, 100),
       'source' => 'SSF',
       'contribution_status_id' => 2,
       'contribution_page_id' => $this->_ids['contribution_page'],
       'api.membership_payment.create' => array('membership_id' => $membership['id']),
-    ));
+    ), $contriParams));
 
     $this->callAPISuccess('line_item', 'create', array(
       'entity_id' => $contribution['id'],
