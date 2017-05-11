@@ -83,13 +83,11 @@ class CRM_Utils_String {
     // we only use the ascii character set since mysql does not create table names / field names otherwise
     // CRM-11744
     $name = preg_replace('/[^a-zA-Z0-9]+/', $char, trim($name));
-      
 
     //If there are no ascii characters present.
     if ($name == $char) {
       $name = self::createRandom($len, self::ALPHANUMERIC);
     }
-
 
     if ($len) {
       // lets keep variable names short
