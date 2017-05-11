@@ -351,6 +351,7 @@ class CRM_Core_Selector_Controller {
           $reorderedHeaders[$key] = $columnHeader;
         }
       }
+      ksort($reorderedHeaders);
       $rowsEmpty = count($rows) ? FALSE : TRUE;
       $qill = $this->getQill();
       $summary = $this->getSummary();
@@ -370,7 +371,7 @@ class CRM_Core_Selector_Controller {
         self::$_template->assign_by_ref("{$this->_prefix}pager", $this->_pager);
         self::$_template->assign_by_ref("{$this->_prefix}sort", $this->_sort);
 
-        self::$_template->assign_by_ref("{$this->_prefix}columnHeaders", $columnHeaders);
+        self::$_template->assign_by_ref("{$this->_prefix}columnHeaders", $reorderedHeaders);
         self::$_template->assign_by_ref("{$this->_prefix}rows", $rows);
         self::$_template->assign("{$this->_prefix}rowsEmpty", $rowsEmpty);
         self::$_template->assign("{$this->_prefix}qill", $qill);
