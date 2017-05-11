@@ -1027,7 +1027,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           $form->_values
         )
       );
-      if ($eventStartDate) {
+      if (strtotime($eventStartDate) > strtotime(date('Ymt'))) {
         $contribParams['revenue_recognition_date'] = date('Ymd', strtotime($eventStartDate));
       }
     }
