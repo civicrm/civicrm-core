@@ -34,12 +34,13 @@
     },
     // Fallback function to use when a wysiwyg has not been initialized
     _insertIntoTextarea: function(item, text) {
-      itemObj = $(item);
+      var itemObj = $(item);
       var origVal = itemObj.val();
-      var origPos = itemObj[0].selectionStart;
-      var newVal = origVal.substring(0, origPos) + text + origVal.substring(origPos, origPos.length);
+      var origStart = itemObj[0].selectionStart;
+      var origEnd = itemObj[0].selectionEnd;
+      var newVal = origVal.substring(0, origStart) + text + origVal.substring(origEnd);
       itemObj.val(newVal);
-      var newPos = (origPos + text.length);
+      var newPos = (origStart + text.length);
       itemObj[0].selectionStart = newPos;
       itemObj[0].selectionEnd = newPos;
       itemObj.triggerHandler('change');
