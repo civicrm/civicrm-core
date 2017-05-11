@@ -65,6 +65,12 @@
     <tr>
       {include file="CRM/Core/DateRange.tpl" fieldName="relation_end_date" from='_low' to='_high'}
     </tr>
+    <tr>
+      <td colspan="2"><label>{ts}Active Period{/ts}</label></td>
+    </tr>
+    <tr>
+      {include file="CRM/Core/DateRange.tpl" fieldName="relation_active_period_date" from='_low' to='_high'}
+    </tr>
     {if $relationshipGroupTree}
       <tr>
       <td colspan="2">

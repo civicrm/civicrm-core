@@ -1972,6 +1972,8 @@ class CRM_Contact_BAO_Query {
       case 'relation_start_date_low':
       case 'relation_end_date_high':
       case 'relation_end_date_low':
+      case 'relation_active_period_date_high':
+      case 'relation_active_period_date_low':
       case 'relation_target_name':
       case 'relation_status':
       case 'relation_date_low':
@@ -4130,6 +4132,7 @@ civicrm_relationship.is_permission_a_b = 0
     }
 
     $this->addRelationshipDateClauses($grouping, $where);
+    $this->addRelationshipActivePeriodClauses($grouping, $where);
     if (!empty($relationType) && !empty($rType) && isset($rType->id)) {
       $where[$grouping][] = 'civicrm_relationship.relationship_type_id = ' . $rType->id;
     }
@@ -4191,6 +4194,62 @@ civicrm_relationship.is_permission_a_b = 0
         $where[$grouping][] = "civicrm_relationship.$dateField <= $date";
         $this->_qill[$grouping][] = ($dateField == 'end_date' ? ts('Relationship Ended on or Before') : ts('Relationship Recorded Start Date On or Before')) . " " . CRM_Utils_Date::customFormat($date);
       }
+    }
+  }
+
+  /**
+   * Add start & end active period criteria in
+   * @param string $grouping
+   * @param array $where
+   *   = array to add where clauses to, in case you are generating a temp table.
+   * not the main query.
+   */
+  public function addRelationshipActivePeriodClauses($grouping, &$where) {
+    $dateValues = array();
+    $dateField = 'active_period_date';
+
+    $dateValueLow = $this->getWhereValues('relation_active_period_date_low', $grouping);
+    $dateValueHigh = $this->getWhereValues('relation_active_period_date_high', $grouping);
+    if (!empty($dateValueLow) && !empty($dateValueHigh)) {
+      $dateValueLowFormated = date('Ymd', strtotime($dateValueLow[2]));
+      $dateValueHighFormated = date('Ymd', strtotime($dateValueHigh[2]));
+      $where[$grouping][] = self::getRelationshipActivePeriodClauses($dateValueLowFormated, $dateValueHighFormated, TRUE);
+      $this->_qill[$grouping][] = (ts('Relationship was active between')) . " " . CRM_Utils_Date::customFormat($dateValueLowFormated) . " and " . CRM_Utils_Date::customFormat($dateValueHighFormated);
+    }
+    elseif (!empty($dateValueLow)) {
+      $dateValueLowFormated = date('Ymd', strtotime($dateValueLow[2]));
+      $where[$grouping][] = self::getRelationshipActivePeriodClauses($dateValueLowFormated, NULL, TRUE);
+      $this->_qill[$grouping][] = (ts('Relationship was active after')) . " " . CRM_Utils_Date::customFormat($dateValueLowFormated);
+    }
+    elseif (!empty($dateValueHigh)) {
+      $dateValueHighFormated = date('Ymd', strtotime($dateValueHigh[2]));
+      $where[$grouping][] = self::getRelationshipActivePeriodClauses(NULL, $dateValueHighFormated, TRUE);
+      $this->_qill[$grouping][] = (ts('Relationship was active before')) . " " . CRM_Utils_Date::customFormat($dateValueHighFormated);
+    }
+  }
+
+  /**
+   * Get start & end active period criteria
+   */
+  public static function getRelationshipActivePeriodClauses($from, $to, $forceTableName) {
+    $tableName = $forceTableName ? 'civicrm_relationship.' : '';
+    if (!is_null($from) && !is_null($to)) {
+      return '(((' . $tableName . 'start_date >= ' . $from . ' AND ' . $tableName . 'start_date <= ' . $to . ') OR
+                (' . $tableName . 'end_date >= ' . $from . ' AND ' . $tableName . 'end_date <= ' . $to . ') OR
+                (' . $tableName . 'start_date <= ' . $from . ' AND ' . $tableName . 'end_date >= ' . $to . ' )) OR
+               (' . $tableName . 'start_date IS NULL AND ' . $tableName . 'end_date IS NULL) OR
+               (' . $tableName . 'start_date IS NULL AND ' . $tableName . 'end_date >= ' . $from . ') OR
+               (' . $tableName . 'end_date IS NULL AND ' . $tableName . 'start_date <= ' . $to . '))';
+    }
+    elseif (!is_null($from)) {
+      return '((' . $tableName . 'start_date >= ' . $from . ') OR
+               (' . $tableName . 'start_date IS NULL AND ' . $tableName . 'end_date IS NULL) OR
+               (' . $tableName . 'start_date IS NULL AND ' . $tableName . 'end_date >= ' . $from . '))';
+    }
+    elseif (!is_null($to)) {
+      return '((' . $tableName . 'start_date <= ' . $to . ') OR
+               (' . $tableName . 'start_date IS NULL AND ' . $tableName . 'end_date IS NULL) OR
+               (' . $tableName . 'end_date IS NULL AND ' . $tableName . 'start_date <= ' . $to . '))';
     }
   }
 
