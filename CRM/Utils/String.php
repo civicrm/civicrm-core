@@ -83,8 +83,7 @@ class CRM_Utils_String {
     // we only use the ascii character set since mysql does not create table names / field names otherwise
     // CRM-11744
     $name = preg_replace('/[^a-zA-Z0-9]+/', $char, trim($name));
-
-      //var_dump($name);exit;
+      
 
     //If there are no ascii characters present.
     if ($name == $char) {
