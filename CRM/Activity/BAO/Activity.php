@@ -1509,7 +1509,7 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
 
     // get token details for contacts, call only if tokens are used
     $details = array();
-    if (!empty($returnProperties) || !empty($tokens) || !empty($allTokens)) {
+    if (!empty($returnProperties) || !empty($allTokens)) {
       list($details) = CRM_Utils_Token::getTokenDetails(
         $contactIds,
         $returnProperties,
@@ -1637,11 +1637,6 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
 
     $text = &$activityParams['sms_text_message'];
 
-    // CRM-4575
-    // token replacement of addressee/email/postal greetings
-    // get the tokens added in subject and message
-    $messageToken = CRM_Utils_Token::getTokens($text);
-
     // Create the meta level record first ( sms activity )
     $activityTypeID = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity',
       'activity_type_id',
@@ -1664,28 +1659,27 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
     $activity = self::create($activityParams);
     $activityID = $activity->id;
 
-    $returnProperties = array();
-
-    if (isset($messageToken['contact'])) {
-      foreach ($messageToken['contact'] as $key => $value) {
-        $returnProperties[$value] = 1;
+    // Check if this SMS message contains any tokens to be replaced.
+    $messageToken = CRM_Utils_Token::getTokens($text);
+    if (!empty($messageToken)) {
+      $returnProperties = array();
+      if (isset($messageToken['contact'])) {
+        foreach ($messageToken['contact'] as $key => $value) {
+          $returnProperties[$value] = 1;
+        }
       }
-    }
-
-    // call token hook
-    $tokens = array();
-    CRM_Utils_Hook::tokens($tokens);
-    $categories = array_keys($tokens);
-
-    // get token details for contacts, call only if tokens are used
-    $details = array();
-    if (!empty($returnProperties) || !empty($tokens)) {
+      $details = array();
       list($details) = CRM_Utils_Token::getTokenDetails($contactIds,
         $returnProperties,
         NULL, NULL, FALSE,
         $messageToken,
         'CRM_Activity_BAO_Activity'
       );
+
+      // In order to fill tokens, we neet $categories (used below)
+      $tokens = array();
+      CRM_Utils_Hook::tokens($tokens);
+      $categories = array_keys($tokens);
     }
 
     $success = 0;
@@ -1693,23 +1687,25 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
     $errMsgs = array();
     foreach ($contactDetails as $values) {
       $contactId = $values['contact_id'];
-
-      if (!empty($details) && is_array($details["{$contactId}"])) {
-        // unset phone from details since it always returns primary number
-        unset($details["{$contactId}"]['phone']);
-        unset($details["{$contactId}"]['phone_type_id']);
-        $values = array_merge($values, $details["{$contactId}"]);
+      $tokenText = $text;
+      // Replace contact tokens if they are present.
+      if (isset($messageToken['contact'])) {
+        $tokenText = CRM_Utils_Token::replaceContactTokens($tokenText, $details[$contactId], FALSE, $messageToken, FALSE, $escapeSmarty);
       }
 
-      $tokenText = CRM_Utils_Token::replaceContactTokens($text, $values, FALSE, $messageToken, FALSE, $escapeSmarty);
-      $tokenText = CRM_Utils_Token::replaceHookTokens($tokenText, $values, $categories, FALSE, $escapeSmarty);
+      // Always check for hook tokens, could be additional custom contact tokens or any other kind of tokens.
+      if (!empty(($messageToken))) {
+        $tokenText = CRM_Utils_Token::replaceHookTokens($tokenText, $details[$contactId], $categories, FALSE, $escapeSmarty);
+      }
 
-      // Only send if the phone is of type mobile
+      // If the number being passed in is a mobile one, then we use it.
       $phoneTypes = CRM_Core_OptionGroup::values('phone_type', TRUE, FALSE, FALSE, NULL, 'name');
       if ($values['phone_type_id'] == CRM_Utils_Array::value('Mobile', $phoneTypes)) {
         $smsParams['To'] = $values['phone'];
       }
       else {
+        // Setting this to empty will cause sendSMSMessage to try to find a mobile
+        // number for this contact.
         $smsParams['To'] = '';
       }
 
@@ -1720,7 +1716,6 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
         $activityID,
         $userID
       );
-
       if (PEAR::isError($sendResult)) {
         // Collect all of the PEAR_Error objects
         $errMsgs[] = $sendResult;
@@ -1767,27 +1762,22 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
     $activityID,
     $userID = NULL
   ) {
-    $toDoNotSms = "";
-    $toPhoneNumber = "";
-
-    if ($smsParams['To']) {
-      $toPhoneNumber = trim($smsParams['To']);
-    }
-    elseif ($toID) {
+    if (!$smsParams['To'] && $toID) {
+      // We don't have an explicit mobile number set, so look it up based on
+      // contact id.
       $filters = array('is_deceased' => 0, 'is_deleted' => 0, 'do_not_sms' => 0);
       $toPhoneNumbers = CRM_Core_BAO_Phone::allPhones($toID, FALSE, 'Mobile', $filters);
       // To get primary mobile phonenumber,if not get the first mobile phonenumber
       if (!empty($toPhoneNumbers)) {
         $toPhoneNumerDetails = reset($toPhoneNumbers);
-        $toPhoneNumber = CRM_Utils_Array::value('phone', $toPhoneNumerDetails);
-        // Contact allows to send sms
-        $toDoNotSms = 0;
+        $smsParams['To'] = CRM_Utils_Array::value('phone', $toPhoneNumerDetails);
       }
     }
 
-    // make sure both phone are valid
-    // and that the recipient wants to receive sms
-    if (empty($toPhoneNumber) or $toDoNotSms) {
+    $recipient = trim($smsParams['To']);
+
+    // Make sure mobile phone is present.
+    if (empty($recipient)) {
       return PEAR::raiseError(
         'Recipient phone number is invalid or recipient does not want to receive SMS',
         NULL,
@@ -1795,7 +1785,6 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
       );
     }
 
-    $recipient = $smsParams['To'];
     $smsParams['contact_id'] = $toID;
     $smsParams['parent_activity_id'] = $activityID;
 
