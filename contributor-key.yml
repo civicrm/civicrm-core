@@ -444,6 +444,8 @@
 
 - name        : Noah Miller
   jira        : noah
+  organization: Lemniscus
+  github      : highfalutin
 
 - github      : nowszy
   name        : Pawel Nowak
