@@ -161,14 +161,14 @@ class CRM_Core_Permission_Joomla extends CRM_Core_Permission_Base {
   /**
    * Fetches the associations between user groups and CiviCRM permissions.
    *
-   * @return stdClass
+   * @return object
    *   Properties of the object are Joomla-fied permission names.
    */
   private function getUserGroupPermsAssociations() {
     // Get a db connection.
     $db = JFactory::getDbo();
     // Create a new query object.
-    $query = $db->getQuery(true);
+    $query = $db->getQuery(TRUE);
 
     // Build query to fetch user-group/permission associations.
     $query
@@ -179,20 +179,22 @@ class CRM_Core_Permission_Joomla extends CRM_Core_Permission_Base {
     // Reset the query using our newly populated query object.
     $db->setQuery($query);
 
-    // Load the result as a stdClass objects, decoding JSON on the way
+    // Load the result as a stdClass object, decoding JSON on the way
     return json_decode($db->loadObject()->rules);
   }
 
   /**
    * Writes user-group/permissions associations back to Joomla.
    *
-   * @param stdClass $associations
+   * @param object $associations
+   *   Same format as the return of
+   *   CRM_Core_Permission_Joomla->getUserGroupPermsAssociations().
    */
   private function updateGroupPermsAssociations(stdClass $associations) {
     // Get a db connection.
     $db = JFactory::getDbo();
     // Create a new query object.
-    $query = $db->getQuery(true);
+    $query = $db->getQuery(TRUE);
 
     // Build query to update CiviCRM's user-group/permission associations.
     $query
