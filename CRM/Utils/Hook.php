@@ -2302,24 +2302,12 @@ abstract class CRM_Utils_Hook {
   /**
    * This hook is called before an inbound SMS is processed.
    *
-   * @param string $from
-   *   The phone number the message is from, as set by SMS provider
-   * @param int $fromContactID
-   *   Set to override default matching
-   * @param string $to
-   *   The optional phone number the message is to, as set by SMS provider
-   * @param int $toContactID
-   *   Set to override default matching
-   * @param string $body
-   *   The body text of the message
-   * @param string $trackID
-   *   The tracking ID of the message
-   *
+   * @param CRM_SMS_Message Object $message
+   *   An SMS message recieved
    * @return mixed
    */
-  public static function inboundSMS(&$from, &$fromContactID = NULL, &$to, &$toContactID = NULL, &$body, &$trackID) {
-    return self::singleton()
-      ->invoke(6, $from, $fromContactID, $to, $toContactID, $body, $trackID, 'civicrm_inboundSMS');
+  public static function inboundSMS(&$message) {
+    return self::singleton()->invoke(array('message'), $message, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_inboundSMS');
   }
 
 }
