@@ -90,6 +90,10 @@ class CRM_Core_Permission_Joomla extends CRM_Core_Permission_Base {
     }
   }
 
+  public function isModulePermissionSupported() {
+    return TRUE;
+  }
+
   /**
    * @param $perm
    *
@@ -129,6 +133,74 @@ class CRM_Core_Permission_Joomla extends CRM_Core_Permission_Base {
    */
   public function checkGroupRole($array) {
     return FALSE;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function upgradePermissions($permissions) {
+    $translatedPerms = array();
+    foreach (array_flip($permissions) as $perm) {
+      $translated = $this->translateJoomlaPermission($perm);
+      $translatedPerms[] = $translated[0];
+    }
+
+    $associations = $this->getUserGroupPermsAssociations();
+    $originalAssociations = clone $associations;
+    foreach (array_keys(get_object_vars($associations)) as $permName) {
+      if (!in_array($permName, $translatedPerms)) {
+        unset($associations->$permName);
+      }
+    }
+
+    if ($originalAssociations !== $associations) {
+      $this->updateGroupPermsAssociations($associations);
+    }
+  }
+
+  /**
+   * Fetches the associations between user groups and CiviCRM permissions.
+   *
+   * @return stdClass
+   *   Properties of the object are Joomla-fied permission names.
+   */
+  private function getUserGroupPermsAssociations() {
+    // Get a db connection.
+    $db = JFactory::getDbo();
+    // Create a new query object.
+    $query = $db->getQuery(true);
+
+    // Build query to fetch user-group/permission associations.
+    $query
+        ->select($db->quoteName('rules'))
+        ->from($db->quoteName('#__assets'))
+        ->where($db->quoteName('name') . ' = ' . $db->quote('com_civicrm'));
+
+    // Reset the query using our newly populated query object.
+    $db->setQuery($query);
+
+    // Load the result as a stdClass objects, decoding JSON on the way
+    return json_decode($db->loadObject()->rules);
+  }
+
+  /**
+   * Writes user-group/permissions associations back to Joomla.
+   *
+   * @param stdClass $associations
+   */
+  private function updateGroupPermsAssociations(stdClass $associations) {
+    // Get a db connection.
+    $db = JFactory::getDbo();
+    // Create a new query object.
+    $query = $db->getQuery(true);
+
+    // Build query to update CiviCRM's user-group/permission associations.
+    $query
+        ->update($db->quoteName('#__assets'))
+        ->set($db->quoteName('rules') . ' = ' . $db->quote(json_encode($associations)))
+        ->where($db->quoteName('name') . ' = ' . $db->quote('com_civicrm'));
+
+    $db->setQuery($query)->execute();
   }
 
 }
