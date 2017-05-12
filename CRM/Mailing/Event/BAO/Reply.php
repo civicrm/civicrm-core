@@ -117,6 +117,8 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
     $emails = CRM_Core_BAO_Email::getTableName();
     $queue = CRM_Mailing_Event_BAO_Queue::getTableName();
     $contacts = CRM_Contact_BAO_Contact::getTableName();
+    $domain_id = CRM_Core_Config::domainID();
+    $domainValues = civicrm_api3('Domain', 'get', array('sequential' => 1, 'id' => $domain_id));
 
     $eq = new CRM_Core_DAO();
     $eq->query("SELECT     $contacts.display_name as display_name,
@@ -142,6 +144,11 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
       // CRM-5567: we need to set Reply-To: so that any response
       // to the forward goes to the sender of the reply
       $parsed->setHeader('Reply-To', $replyto instanceof ezcMailAddress ? $replyto : $parsed->from->__toString());
+
+      // CRM-17754 Include re-sent headers to indicate that we have forwarded on the email
+      $domainEmail = $domainValues['values'][0]['from_email'];
+      $parsed->setHeader('Resent-From', $domainEmail);
+      $parsed->setHeader('Resent-Date', date('r'));
 
       // $h must be an array, so we can't use generateHeaders()'s result,
       // but we have to regenerate the headers because we changed To
@@ -183,6 +190,9 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
         'From' => $from,
         'Reply-To' => empty($replyto) ? $eq->email : $replyto,
         'Return-Path' => "do-not-reply@{$emailDomain}",
+        // CRM-17754 Include re-sent headers to indicate that we have forwarded on the email
+        'Resent-From' => $domainValues['values'][0]['from_email'],
+        'Resent-Date' => date('r'),
       );
 
       $message->setTxtBody($bodyTxt);
