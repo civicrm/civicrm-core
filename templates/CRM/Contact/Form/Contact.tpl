@@ -258,6 +258,70 @@
           $('div' + addClass).last().show();
         });
     });
+
+    {/literal}{* Ajax check for matching contacts *}
+    {if $checkSimilar == 1}
+    var viewIndividual = "{crmURL p='civicrm/contact/view' q='reset=1&cid=' h=0}",
+      contactType = {$contactType|@json_encode},
+      rules = {$ruleFields|@json_encode},
+    {literal}
+      ruleFields = {},
+      $ruleElements = $(),
+      matchMessage;
+    $.each(rules, function(i, field) {
+      // Match regular fields
+      var $el = $('#' + field + ', #' + field + '_1_' + field, $form).filter(':input');
+      // Match custom fields
+      if (!$el.length && field.lastIndexOf('_') > 0) {
+        var pieces = field.split('_');
+        field = 'custom_' + pieces[pieces.length-1];
+        $el = $('#' + field + ', [name=' + field + '_-1]', $form).filter(':input');
+      }
+      if ($el.length) {
+        ruleFields[field] = $el;
+        $ruleElements = $ruleElements.add($el);
+      }
+    });
+    $ruleElements.on('change', checkMatches);
+    function checkMatches() {
+      // Close msg if it exists
+      matchMessage && matchMessage.close && matchMessage.close();
+      if ($(this).is('input[type=text]') && $(this).val().length < 2) {
+        return;
+      }
+      var match = {contact_type: contactType};
+      $.each(ruleFields, function(fieldName, ruleField) {
+        if (ruleField.length > 1) {
+          match[fieldName] = ruleField.filter(':checked').val();
+        } else {
+          match[fieldName] = ruleField.val();
+        }
+      });
+      CRM.api3('contact', 'duplicatecheck', {
+        match: match,
+        rule_type: 'Supervised',
+        options: {sort: 'sort_name'},
+        return: ['display_name', 'email']
+      }).done(function(data) {
+        var title = data.count == 1 ? {/literal}"{ts escape='js'}Similar Contact Found{/ts}" : "{ts escape='js'}Similar Contacts Found{/ts}"{literal},
+          msg = "<em>{/literal}{ts escape='js'}If the contact you were trying to add is listed below, click their name to view or edit their record{/ts}{literal}:</em>";
+        if (data.is_error == 1 || data.count == 0) {
+          return;
+        }
+        msg += '<ul class="matching-contacts-actions">';
+        $.each(data.values, function(i, contact) {
+          contact.email = contact.email || '';
+          msg += '<li><a href="'+viewIndividual+contact.id+'">'+ contact.display_name +'</a> '+contact.email+'</li>';
+        });
+        msg += '</ul>';
+        matchMessage = CRM.alert(msg, title);
+        $('.matching-contacts-actions a').click(function() {
+          // No confirmation dialog on click
+          $('[data-warn-changes=true]').attr('data-warn-changes', 'false');
+        });
+      });
+    }
+    {/literal}{/if}{literal}
   });
 
 </script>
