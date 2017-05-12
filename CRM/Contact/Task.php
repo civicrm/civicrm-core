@@ -60,7 +60,8 @@ class CRM_Contact_Task {
     EMAIL_UNHOLD = 22,
     RESTORE = 23,
     DELETE_PERMANENTLY = 24,
-    COMMUNICATION_PREFS = 25;
+    COMMUNICATION_PREFS = 25,
+    INDIVIDUAL_CONTACTS = 26;
 
   /**
    * The task array
@@ -177,6 +178,16 @@ class CRM_Contact_Task {
           'title' => ts('SMS - schedule/send'),
           'class' => 'CRM_Contact_Form_Task_SMS',
           'result' => TRUE,
+        );
+      }
+
+      if (CRM_Contact_BAO_ContactType::isActive('Individual')) {
+        $label = CRM_Contact_BAO_ContactType::getLabel('individual');
+        self::$_tasks[self::INDIVIDUAL_CONTACTS] = array(
+          'title' => ts('Add relationship - to %1',
+            array(1 => $label)
+          ),
+          'class' => 'CRM_Contact_Form_Task_AddToIndividual',
         );
       }
 
