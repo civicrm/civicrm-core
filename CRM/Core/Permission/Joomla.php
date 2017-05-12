@@ -190,7 +190,7 @@ class CRM_Core_Permission_Joomla extends CRM_Core_Permission_Base {
    *   Same format as the return of
    *   CRM_Core_Permission_Joomla->getUserGroupPermsAssociations().
    */
-  private function updateGroupPermsAssociations(stdClass $associations) {
+  private function updateGroupPermsAssociations($associations) {
     // Get a db connection.
     $db = JFactory::getDbo();
     // Create a new query object.
