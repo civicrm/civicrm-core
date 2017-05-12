@@ -760,7 +760,7 @@
       alert(ts('Select an entity.'));
       return;
     }
-    if (!_.includes(action, 'get') && action != 'check') {
+    if (!_.includes(action, 'get') && !_.includes(action, 'check')) {
       var msg = action === 'delete' ? ts('This will delete data from CiviCRM. Are you sure?') : ts('This will write to the database. Continue?');
       CRM.confirm({title: ts('Confirm %1', {1: action}), message: msg}).on('crmConfirm:yes', execute);
     } else {
