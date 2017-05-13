@@ -214,7 +214,7 @@ INNER JOIN civicrm_mailing_job mj ON mj.mailing_id = m.id AND mj.id = %1";
     if (!$message->fromContactID) {
       // find sender by phone number if $fromContactID not set by hook
       $formatFrom = '%' . $this->formatPhone($this->stripPhone($message->from), $like, "like");
-      $message->fromContactID = CRM_Core_DAO::singleValueQuery("SELECT contact_id FROM civicrm_phone JOIN civicrm_contact ON civicrm_contact.id = civicrm_phone.contact_id WHERE !civicrm_contact.is_deleted AND phone LIKE '%1'", array(
+      $message->fromContactID = CRM_Core_DAO::singleValueQuery("SELECT contact_id FROM civicrm_phone JOIN civicrm_contact ON civicrm_contact.id = civicrm_phone.contact_id WHERE !civicrm_contact.is_deleted AND phone LIKE %1", array(
         1 => array($formatFrom, 'String')));
     }
 
@@ -247,14 +247,14 @@ INNER JOIN civicrm_mailing_job mj ON mj.mailing_id = m.id AND mj.id = %1";
       $message->fromContactID = $fromContact->id;
     }
 
-    if (!($message->toContactID)) {
+    if (!$message->toContactID) {
       // find recipient if $toContactID not set by hook
       if ($message->to) {
-        $message->toContactID = CRM_Core_DAO::singleValueQuery("SELECT contact_id FROM civicrm_phone JOIN civicrm_contact ON civicrm_contact.id = civicrm_phone.contact_id WHERE !civicrm_contact.is_deleted AND phone LIKE '%1'", array(
+        $message->toContactID = CRM_Core_DAO::singleValueQuery("SELECT contact_id FROM civicrm_phone JOIN civicrm_contact ON civicrm_contact.id = civicrm_phone.contact_id WHERE !civicrm_contact.is_deleted AND phone LIKE %1", array(
           1 => array('%' . $message->to, 'String')));
       }
       else {
-        $message->toContactID = $fromContactID;
+        $message->toContactID = $message->fromContactID;
       }
     }
 
@@ -273,8 +273,7 @@ INNER JOIN civicrm_mailing_job mj ON mj.mailing_id = m.id AND mj.id = %1";
         'phone_number' => $message->from,
       );
       if ($message->trackID) {
-        $trackID = CRM_Utils_Type::escape($message->trackID, 'String');
-        $activityParams['result'] = $trackID;
+        $activityParams['result'] = CRM_Utils_Type::escape($message->trackID, 'String');
       }
 
       $result = CRM_Activity_BAO_Activity::create($activityParams);
