@@ -334,9 +334,6 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
    * @param int $groupByID
    */
   public static function assignCombinedContributionValues($contact, $contributions, $groupBy, $groupByID) {
-    if (!defined('CIVICRM_MAIL_SMARTY') || !CIVICRM_MAIL_SMARTY) {
-      return;
-    }
     CRM_Core_Smarty::singleton()->assign('contact_aggregate', $contact['contact_aggregate']);
     CRM_Core_Smarty::singleton()
       ->assign('contributions', array_intersect_key($contributions, $contact['contribution_ids'][$groupBy][$groupByID]));

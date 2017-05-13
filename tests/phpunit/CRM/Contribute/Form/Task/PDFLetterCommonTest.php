@@ -175,4 +175,179 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
     }
   }
 
+  /**
+   * Test assignment of variables when using the group by function.
+   *
+   * We are looking to see that the contribution aggregate and contributions arrays reflect the most
+   * recent contact rather than a total aggregate, since we are using group by.
+   */
+  public function testPostProcessGroupByContact() {
+    $this->hookClass->setHook('civicrm_tokenValues', array($this, 'hook_aggregateTokenValues'));
+    $this->hookClass->setHook('civicrm_tokens', array($this, 'hook_tokens'));
+    $this->mut = new CiviMailUtils($this, TRUE);
+    $this->_individualId = $this->individualCreate();
+    $this->_individualId2 = $this->individualCreate();
+    $htmlMessage = "{aggregate.rendered_token}";
+    $formValues = array(
+      'is_unit_test' => TRUE,
+      'group_by' => 'contact_id',
+      'html_message' => $htmlMessage,
+      'email_options' => 'both',
+      'subject' => 'Testy test test',
+    );
+
+    $contributionIDs = array();
+    $contribution = $this->callAPISuccess('Contribution', 'create', array(
+      'contact_id' => $this->_individualId,
+      'total_amount' => 100,
+      'financial_type_id' => 'Donation',
+    ));
+    $contributionIDs[] = $contribution['id'];
+    $contribution = $this->callAPISuccess('Contribution', 'create', array(
+      'contact_id' => $this->_individualId2,
+      'total_amount' => 10,
+      'financial_type_id' => 'Donation',
+    ));
+    $contributionIDs[] = $contribution['id'];
+
+    $contribution = $this->callAPISuccess('Contribution', 'create', array(
+      'contact_id' => $this->_individualId2,
+      'total_amount' => 1,
+      'financial_type_id' => 'Donation',
+    ));
+    $contributionIDs[] = $contribution['id'];
+
+    $form = new CRM_Contribute_Form_Task_PDFLetter();
+    $form->setContributionIds($contributionIDs);
+
+    $html = CRM_Contribute_Form_Task_PDFLetterCommon::postProcess($form, $formValues);
+    $this->assertEquals("<table border='1' cellpadding='2' cellspacing='0' class='table'>
+  <tbody>
+  <tr>
+    <th>Date</th>
+    <th>Amount</th>
+    <th>Financial Type</th>
+    <th>Source</th>
+  </tr>
+  <!--
+   -->
+  <tr>
+    <td></td>
+    <td>$ 100.00</td>
+    <td></td>
+    <td></td>
+  </tr>
+  <!--
+    -->
+  <tr>
+    <td><strong>Total</strong></td>
+    <td><strong>$ 100.00</strong></td>
+    <td></td>
+    <td></td>
+  </tr>
+  </tbody>
+</table>", $html[1]);
+    $this->assertEquals("<table border='1' cellpadding='2' cellspacing='0' class='table'>
+  <tbody>
+  <tr>
+    <th>Date</th>
+    <th>Amount</th>
+    <th>Financial Type</th>
+    <th>Source</th>
+  </tr>
+  <!--
+    -->
+  <tr>
+    <td></td>
+    <td>$ 10.00</td>
+    <td></td>
+    <td></td>
+  </tr>
+  <!--
+     -->
+  <tr>
+    <td></td>
+    <td>$ 1.00</td>
+    <td></td>
+    <td></td>
+  </tr>
+  <!--
+  -->
+  <tr>
+    <td><strong>Total</strong></td>
+    <td><strong>$ 11.00</strong></td>
+    <td></td>
+    <td></td>
+  </tr>
+  </tbody>
+</table>", $html[2]);
+
+  }
+
+  /**
+   * Implements civicrm_tokens().
+   */
+  function hook_tokens(&$tokens) {
+    $tokens['aggregate'] = array('rendered_token' => 'rendered_token');
+  }
+
+  /**
+   * Get the html message.
+   *
+   * @return string
+   */
+  public function getHtmlMessage() {
+    return '{assign var=\'contact_aggregate\' value=0}
+<table border=\'1\' cellpadding=\'2\' cellspacing=\'0\' class=\'table\'>
+  <tbody>
+  <tr>
+    <th>Date</th>
+    <th>Amount</th>
+    <th>Financial Type</th>
+    <th>Source</th>
+  </tr>
+  <!--
+{foreach from=$contributions item=contribution}
+ {if $contribution.contact_id == $messageContactID}
+ {assign var=\'date\' value=$contribution.receive_date|date_format:\'%d %B %Y\'}
+ {assign var=contact_aggregate
+value=$contact_aggregate+$contribution.total_amount}
+-->
+  <tr>
+    <td>{$date}</td>
+    <td>{$contribution.total_amount|crmMoney}</td>
+    <td>{$contribution.financial_type}</td>
+    <td>{$contribution.source}</td>
+  </tr>
+  <!--
+  {/if}
+{/foreach}
+-->
+  <tr>
+    <td><strong>Total</strong></td>
+    <td><strong>{$contact_aggregate|crmMoney}</strong></td>
+    <td></td>
+    <td></td>
+  </tr>
+  </tbody>
+</table>';
+  }
+
+  /**
+   * Implements CiviCRM hook.
+   *
+   * @param array $values
+   * @param array $contactIDs
+   * @param null $job
+   * @param array $tokens
+   * @param null $context
+   */
+  function hook_aggregateTokenValues(&$values, $contactIDs, $job = NULL, $tokens = array(), $context = NULL) {
+    foreach ($contactIDs as $contactID) {
+      CRM_Core_Smarty::singleton()->assign('messageContactID', $contactID);
+      $values[$contactID]['aggregate.rendered_token'] = CRM_Core_Smarty::singleton()
+        ->fetch('string:' . $this->getHtmlMessage());
+    }
+  }
+
 }
