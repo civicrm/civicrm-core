@@ -75,9 +75,16 @@ class Main extends \CRM_Core_Page {
     $page = $this; // PHP 5.3 does not propagate $this to inner functions.
 
     $this->res->addSettingsFactory(function () use (&$modules, $page) {
+      try {
+        $activeModuleUrls = \CRM_Extension_System::singleton()->getMapper()->getActiveModuleUrls();
+      }
+      catch (\CRM_Extension_Exception_MissingException $e) {
+        $activeModuleUrls = array();
+      }
+
       // TODO optimization; client-side caching
       return array_merge($page->angular->getResources(array_keys($modules), 'settings', 'settings'), array(
-        'resourceUrls' => \CRM_Extension_System::singleton()->getMapper()->getActiveModuleUrls(),
+        'resourceUrls' => $activeModuleUrls,
         'angular' => array(
           'modules' => array_merge(array('ngRoute'), array_keys($modules)),
           'cacheCode' => $page->res->getCacheCode(),
