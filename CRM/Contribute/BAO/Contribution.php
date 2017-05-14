@@ -1734,8 +1734,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
             if ($contriId == $contributionId) {
               continue;
             }
-            $status = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $contriId, 'contribution_status_id');
-            if ($status == array_search('Completed', $contributionStatuses)) {
+            if (CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contriId) === 'Completed') {
               $update = FALSE;
             }
           }
@@ -1796,8 +1795,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
             if ($contriId == $contributionId) {
               continue;
             }
-            $status = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $contriId, 'contribution_status_id');
-            if ($status == array_search('Completed', $contributionStatuses)) {
+            if (CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contriId) === 'Completed') {
               $update = FALSE;
             }
           }
