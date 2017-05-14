@@ -1727,7 +1727,18 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
     if ($contributionStatusId == array_search('Cancelled', $contributionStatuses)) {
       if (is_array($memberships)) {
         foreach ($memberships as $membership) {
-          if ($membership) {
+          $update = TRUE;
+          //Update Membership status if there is no other completed contribution associated with the membership.
+          $relatedContributions = CRM_Member_BAO_Membership::getMembershipContributionId($membership->id, TRUE);
+          foreach ($relatedContributions as $contriId) {
+            if ($contriId == $contributionId) {
+              continue;
+            }
+            if (CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contriId) === 'Completed') {
+              $update = FALSE;
+            }
+          }
+          if ($membership && $update) {
             $newStatus = array_search('Cancelled', $membershipStatuses);
 
             // Create activity
@@ -1777,7 +1788,18 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
     elseif ($contributionStatusId == array_search('Failed', $contributionStatuses)) {
       if (is_array($memberships)) {
         foreach ($memberships as $membership) {
-          if ($membership) {
+          $update = TRUE;
+          //Update Membership status if there is no other completed contribution associated with the membership.
+          $relatedContributions = CRM_Member_BAO_Membership::getMembershipContributionId($membership->id, TRUE);
+          foreach ($relatedContributions as $contriId) {
+            if ($contriId == $contributionId) {
+              continue;
+            }
+            if (CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contriId) === 'Completed') {
+              $update = FALSE;
+            }
+          }
+          if ($membership && $update) {
             $membership->status_id = array_search('Expired', $membershipStatuses);
             $membership->save();
 

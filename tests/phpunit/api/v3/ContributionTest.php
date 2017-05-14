@@ -2835,6 +2835,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'status_id' => 'Completed',
     ));
     $this->assertEquals(1, $activity['count']);
+
     // 2.c 'Change membership type' activity created to record Membership status change from Grace to Current
     $activity = $this->callAPISuccess('Activity', 'get', array(
       'activity_type_id' => 'Change Membership Status',
@@ -2843,6 +2844,48 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     ));
     $this->assertEquals(1, $activity['count']);
     $this->assertEquals('Status changed from Grace to Current', $activity['values'][$activity['id']]['subject']);
+
+    //Create another pending contribution for renewal
+    $contribution = $this->callAPISuccess('contribution', 'create', array(
+      'domain_id' => 1,
+      'contact_id' => $this->_ids['contact'],
+      'receive_date' => date('Ymd'),
+      'total_amount' => 20.00,
+      'financial_type_id' => 1,
+      'payment_instrument_id' => 'Credit Card',
+      'non_deductible_amount' => 10.00,
+      'trxn_id' => 'rdhfi88',
+      'invoice_id' => 'dofhiewuyr',
+      'source' => 'SSF',
+      'contribution_status_id' => 2,
+      'contribution_page_id' => $this->_ids['contribution_page'],
+      'api.membership_payment.create' => array('membership_id' => $this->_ids['membership']),
+    ));
+
+    $this->callAPISuccess('line_item', 'create', array(
+      'entity_id' => $contribution['id'],
+      'entity_table' => 'civicrm_contribution',
+      'contribution_id' => $contribution['id'],
+      'price_field_id' => $this->_ids['price_field'][0],
+      'qty' => 1,
+      'unit_price' => 20,
+      'line_total' => 20,
+      'financial_type_id' => 1,
+      'price_field_value_id' => $this->_ids['price_field_value'][0],
+    ));
+
+    //Update it to Failed.
+    $form->_params['id'] = $contribution['id'];
+    $form->_params['contribution_status_id'] = 4;
+    try {
+      $form->testSubmit($form->_params, CRM_Core_Action::UPDATE);
+    }
+    catch (Civi\Payment\Exception\PaymentProcessorException $e) {
+      $error = TRUE;
+    }
+    //Existing membership should not get updated to expired.
+    $membership = $this->callAPISuccess('membership', 'getsingle', array('id' => $this->_ids['membership']));
+    $this->assertNotEquals($membership['status_id'], 4);
   }
 
   /**
