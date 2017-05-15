@@ -48,7 +48,7 @@
     <name>title</name>
     <title>Batch Title</title>
     <type>varchar</type>
-    <length>64</length>
+    <length>255</length>
     <localizable>true</localizable>
     <comment>Friendly Name.</comment>
     <add>4.2</add>
