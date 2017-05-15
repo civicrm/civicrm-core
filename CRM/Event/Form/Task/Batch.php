@@ -158,9 +158,10 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
 
     //fix for CRM-2752
     // get the option value for custom data type
-    $this->_roleCustomDataTypeID = CRM_Core_OptionGroup::getValue('custom_data_type', 'ParticipantRole', 'name');
-    $this->_eventNameCustomDataTypeID = CRM_Core_OptionGroup::getValue('custom_data_type', 'ParticipantEventName', 'name');
-    $this->_eventTypeCustomDataTypeID = CRM_Core_OptionGroup::getValue('custom_data_type', 'ParticipantEventType', 'name');
+    $customDataType = CRM_Core_OptionGroup::values('custom_data_type', FALSE, FALSE, FALSE, NULL, 'name');
+    $this->_roleCustomDataTypeID = array_search('ParticipantRole', $customDataType);
+    $this->_eventNameCustomDataTypeID = array_search('ParticipantEventName', $customDataType);
+    $this->_eventTypeCustomDataTypeID = array_search('ParticipantEventType', $customDataType);
 
     // build custom data getFields array
     $customFieldsRole = CRM_Core_BAO_CustomField::getFields('Participant', FALSE, FALSE, NULL, $this->_roleCustomDataTypeID);
