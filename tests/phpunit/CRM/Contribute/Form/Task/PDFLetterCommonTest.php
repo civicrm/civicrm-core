@@ -63,6 +63,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
    */
   public function tearDown() {
     $this->quickCleanUpFinancialEntities();
+    $this->quickCleanup(array('civicrm_uf_match'));
     CRM_Utils_Hook::singleton()->reset();
   }
 
@@ -146,6 +147,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
    * html returned by postProcess function.
    */
   public function testPostProcess() {
+    $this->createLoggedInUser();
     $this->_individualId = $this->individualCreate();
     foreach (array('docx', 'odt') as $docType) {
       $formValues = array(
@@ -191,6 +193,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
    * recent contact rather than a total aggregate, since we are using group by.
    */
   public function testPostProcessGroupByContact() {
+    $this->createLoggedInUser();
     $this->hookClass->setHook('civicrm_tokenValues', array($this, 'hook_aggregateTokenValues'));
     $this->hookClass->setHook('civicrm_tokens', array($this, 'hook_tokens'));
     $this->mut = new CiviMailUtils($this, TRUE);
@@ -210,12 +213,14 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
       'contact_id' => $this->_individualId,
       'total_amount' => 100,
       'financial_type_id' => 'Donation',
+      'receive_date' => '2016-12-25',
     ));
     $contributionIDs[] = $contribution['id'];
     $contribution = $this->callAPISuccess('Contribution', 'create', array(
       'contact_id' => $this->_individualId2,
       'total_amount' => 10,
       'financial_type_id' => 'Donation',
+      'receive_date' => '2016-12-25',
     ));
     $contributionIDs[] = $contribution['id'];
 
@@ -223,6 +228,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
       'contact_id' => $this->_individualId2,
       'total_amount' => 1,
       'financial_type_id' => 'Donation',
+      'receive_date' => '2016-12-25',
     ));
     $contributionIDs[] = $contribution['id'];
 
@@ -241,9 +247,9 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
   <!--
    -->
   <tr>
-    <td></td>
+    <td>25 December 2016</td>
     <td>$ 100.00</td>
-    <td></td>
+    <td>Donation</td>
     <td></td>
   </tr>
   <!--
@@ -267,17 +273,17 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
   <!--
     -->
   <tr>
-    <td></td>
+    <td>25 December 2016</td>
     <td>$ 10.00</td>
-    <td></td>
+    <td>Donation</td>
     <td></td>
   </tr>
   <!--
      -->
   <tr>
-    <td></td>
+    <td>25 December 2016</td>
     <td>$ 1.00</td>
-    <td></td>
+    <td>Donation</td>
     <td></td>
   </tr>
   <!--
@@ -290,16 +296,22 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
   </tr>
   </tbody>
 </table>", $html[2]);
+
+    $activities = $this->callAPISuccess('Activity', 'get', array('activity_type_id' => 'Print PDF Letter', 'sequential' => 1));
+    $this->assertEquals(2, $activities['count']);
+    $this->assertEquals($html[1], $activities['values'][0]['details']);
+    $this->assertEquals($html[2], $activities['values'][1]['details']);
     // Checking it is not called multiple times.
     // once for each contact create + once for the activities.
     $this->assertEquals(3, $this->hookTokensCalled);
+    $this->mut->checkAllMailLog($html);
 
   }
 
   /**
    * Implements civicrm_tokens().
    */
-  function hook_tokens(&$tokens) {
+  public function hook_tokens(&$tokens) {
     $this->hookTokensCalled++;
     $tokens['aggregate'] = array('rendered_token' => 'rendered_token');
   }
@@ -330,7 +342,7 @@ value=$contact_aggregate+$contribution.total_amount}
     <td>{$date}</td>
     <td>{$contribution.total_amount|crmMoney}</td>
     <td>{$contribution.financial_type}</td>
-    <td>{$contribution.source}</td>
+    <td></td>
   </tr>
   <!--
   {/if}
@@ -355,7 +367,7 @@ value=$contact_aggregate+$contribution.total_amount}
    * @param array $tokens
    * @param null $context
    */
-  function hook_aggregateTokenValues(&$values, $contactIDs, $job = NULL, $tokens = array(), $context = NULL) {
+  public function hook_aggregateTokenValues(&$values, $contactIDs, $job = NULL, $tokens = array(), $context = NULL) {
     foreach ($contactIDs as $contactID) {
       CRM_Core_Smarty::singleton()->assign('messageContactID', $contactID);
       $values[$contactID]['aggregate.rendered_token'] = CRM_Core_Smarty::singleton()

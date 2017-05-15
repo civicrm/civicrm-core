@@ -365,7 +365,12 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
 
     // CRM-16725 Skip creation of activities if user is previewing their PDF letter(s)
     if ($buttonName == '_qf_PDF_upload') {
-      $activityIds = self::createActivities($form, $html_message, $form->_contactIds);
+
+      // This seems silly, but the old behavior was to first check `_cid`
+      // and then use the provided `$contactIds`. Probably not even necessary,
+      // but difficult to audit.
+      $contactIds = $form->_cid ? array($form->_cid) : $form->_contactIds;
+      $activityIds = self::createActivities($form, $html_message, $contactIds, $formValues['subject'], CRM_Utils_Array::value('campaign_id', $formValues));
     }
 
     if (!empty($formValues['document_file_path'])) {
@@ -465,6 +470,10 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
    * @param CRM_Core_Form $form
    * @param string $html_message
    * @param array $contactIds
+   * @param string $subject
+   * @param int $campaign_id
+   * @param array $perContactHtml
+   *
    * @return array
    *   List of activity IDs.
    *   There may be 1 or more, depending on the system-settings
@@ -472,33 +481,19 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
    *
    * @throws CRM_Core_Exception
    */
-  public static function createActivities($form, $html_message, $contactIds) {
-    //Added for CRM-12682: Add activity subject and campaign fields
-    $formValues = $form->controller->exportValues($form->getName());
+  public static function createActivities($form, $html_message, $contactIds, $subject, $campaign_id, $perContactHtml = array()) {
 
-    $session = CRM_Core_Session::singleton();
-    $userID = $session->get('userID');
-    $activityTypeID = CRM_Core_OptionGroup::getValue(
-      'activity_type',
-      'Print PDF Letter',
-      'name'
-    );
     $activityParams = array(
-      'subject' => $formValues['subject'],
-      'campaign_id' => CRM_Utils_Array::value('campaign_id', $formValues),
-      'source_contact_id' => $userID,
-      'activity_type_id' => $activityTypeID,
+      'subject' => $subject,
+      'campaign_id' => $campaign_id,
+      'source_contact_id' => CRM_Core_Session::singleton()->getLoggedInContactID(),
+      'activity_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Print PDF Letter'),
       'activity_date_time' => date('YmdHis'),
       'details' => $html_message,
     );
     if (!empty($form->_activityId)) {
       $activityParams += array('id' => $form->_activityId);
     }
-
-    // This seems silly, but the old behavior was to first check `_cid`
-    // and then use the provided `$contactIds`. Probably not even necessary,
-    // but difficult to audit.
-    $contactIds = $form->_cid ? array($form->_cid) : $contactIds;
 
     $activityIds = array();
     switch (Civi::settings()->get('recordGeneratedLetters')) {
@@ -511,8 +506,11 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
           $fullParams = array(
             'target_contact_id' => $contactId,
           ) + $activityParams;
-          $activity = CRM_Activity_BAO_Activity::create($fullParams);
-          $activityIds[$contactId] = $activity->id;
+          if (isset($perContactHtml[$contactId])) {
+            $fullParams['details'] = implode('<hr>', $perContactHtml[$contactId]);
+          }
+          $activity = civicrm_api3('Activity', 'create', $fullParams);
+          $activityIds[$contactId] = $activity['id'];
         }
 
         break;
@@ -612,12 +610,12 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
    * @return array
    */
   protected static function getTokenCategories() {
-    if (self::$tokenCategories === NULL) {
+    if (!isset(Civi::$statics[__CLASS__]['token_categories'])) {
       $tokens = array();
       CRM_Utils_Hook::tokens($tokens);
-      self::$tokenCategories = array_keys($tokens);
+      Civi::$statics[__CLASS__]['token_categories'] = array_keys($tokens);
     }
-    return self::$tokenCategories;
+    return Civi::$statics[__CLASS__]['token_categories'];
   }
 
 }
