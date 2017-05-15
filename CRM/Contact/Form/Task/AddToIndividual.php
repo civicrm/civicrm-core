@@ -49,19 +49,7 @@ class CRM_Contact_Form_Task_AddToIndividual extends CRM_Contact_Form_Task_AddToP
    * Process the form after the input has been submitted and validated.
    */
   public function postProcess() {
-    // store the submitted values in an array
-    $this->params = $this->controller->exportValues($this->_name);
-
-    $this->set('searchDone', 0);
-    if (!empty($_POST['_qf_AddToIndividual_refresh'])) {
-      $searchParams['contact_type'] = 'Individual';
-      $searchParams['rel_contact'] = $this->params['name'];
-      $this->search($this, $searchParams);
-      $this->set('searchDone', 1);
-      return;
-    }
-
-    $this->addRelationships();
+    parent::postProcess();
   }
 
 }

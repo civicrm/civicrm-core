@@ -262,4 +262,23 @@ class CRM_Contact_Form_Task_AddToParentClass extends CRM_Contact_Form_Task {
     }
   }
 
+  /**
+   * Process the form after the input has been submitted and validated.
+   */
+  public function postProcess() {
+    // store the submitted values in an array
+    $this->params = $this->controller->exportValues($this->_name);
+    $this->set('searchDone', 0);
+    $contactType = $this->get('contactType');
+
+    if (!empty($_POST["_qf_AddTo{$contactType}_refresh"])) {
+      $searchParams['contact_type'] = $contactType;
+      $searchParams['rel_contact'] = $this->params['name'];
+      $this->search($this, $searchParams);
+      $this->set('searchDone', 1);
+      return;
+    }
+    $this->addRelationships();
+  }
+
 }
