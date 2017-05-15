@@ -43,6 +43,15 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
 
   protected $_contactIds = NULL;
 
+  /**
+   * Count how many times the hookTokens is called.
+   *
+   * This only needs to be called once, check refactoring doesn't change this.
+   *
+   * @var int
+   */
+  protected $hookTokensCalled = 0;
+
   protected function setUp() {
     parent::setUp();
     $this->_individualId = $this->individualCreate(array('first_name' => 'Anthony', 'last_name' => 'Collins'));
@@ -281,6 +290,9 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
   </tr>
   </tbody>
 </table>", $html[2]);
+    // Checking it is not called multiple times.
+    // once for each contact create + once for the activities.
+    $this->assertEquals(3, $this->hookTokensCalled);
 
   }
 
@@ -288,6 +300,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
    * Implements civicrm_tokens().
    */
   function hook_tokens(&$tokens) {
+    $this->hookTokensCalled++;
     $tokens['aggregate'] = array('rendered_token' => 'rendered_token');
   }
 

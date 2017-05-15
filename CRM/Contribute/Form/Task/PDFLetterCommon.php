@@ -53,8 +53,6 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
       }
     }
     $separator = '****~~~~';// a placeholder in case the separator is common in the string - e.g ', '
-    $validated = FALSE;
-
     $groupBy = $formValues['group_by'];
 
     // skip some contacts ?
@@ -67,35 +65,30 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
     }
     list($contributions, $contacts) = self::buildContributionArray($groupBy, $contributionIDs, $returnProperties, $skipOnHold, $skipDeceased, $messageToken, $task, $separator, $form->_includesSoftCredits);
     $html = array();
+    $contactHtml = array();
     foreach ($contributions as $contributionId => $contribution) {
       $contact = &$contacts[$contribution['contact_id']];
-      $grouped = $groupByID = 0;
+      $grouped = FALSE;
+      $groupByID = 0;
       if ($groupBy) {
         $groupByID = empty($contribution[$groupBy]) ? 0 : $contribution[$groupBy];
         $contribution = $contact['combined'][$groupBy][$groupByID];
         $grouped = TRUE;
       }
 
-      self::assignCombinedContributionValues($contact, $contributions, $groupBy, $groupByID);
-
       if (empty($groupBy) || empty($contact['is_sent'][$groupBy][$groupByID])) {
-        if (!$validated && in_array($realSeparator, $tableSeparators) && !self::isValidHTMLWithTableSeparator($messageToken, $html_message)) {
-          $realSeparator = ', ';
-          CRM_Core_Session::setStatus(ts('You have selected the table cell separator, but one or more token fields are not placed inside a table cell. This would result in invalid HTML, so comma separators have been used instead.'));
-        }
-        $validated = TRUE;
-        $html[$contributionId] = str_replace($separator, $realSeparator, self::resolveTokens($html_message, $contact, $contribution, $messageToken, $categories, $grouped, $separator));
-        $contact['is_sent'][$groupBy][$groupByID] = TRUE;
+        $html[$contributionId] = self::generateHtml($contact, $contribution, $groupBy, $contributions, $realSeparator, $tableSeparators, $messageToken, $html_message, $separator, $grouped, $groupByID);
+        $contactHtml[$contact['contact_id']][] = $html[$contributionId];
         if (!empty($formValues['email_options'])) {
           if (self::emailLetter($contact, $html[$contributionId], $isPDF, $formValues, $emailParams)) {
             $emailed++;
             if (!stristr($formValues['email_options'], 'both')) {
-              unset($html[$contributionId]);
+              $emailedHtml[$contributionId] = TRUE;
             }
           }
         }
+        $contact['is_sent'][$groupBy][$groupByID] = TRUE;
       }
-
       // update dates (do it for each contribution including grouped recurring contribution)
       //@todo - the 2 calls below bypass all hooks. Using the api would possibly be slower than one call but not than 2
       if ($receipt_update) {
@@ -112,14 +105,17 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
       }
     }
 
+
     if (!empty($formValues['is_unit_test'])) {
       return $html;
     }
+
     //createActivities requires both $form->_contactIds and $contacts -
     //@todo - figure out why
     $form->_contactIds = array_keys($contacts);
     self::createActivities($form, $html_message, $form->_contactIds);
 
+    $html = array_diff_key($html, $emailedHtml);
     //CRM-19761
     if (!empty($html)) {
       $type = $formValues['document_type'];
@@ -392,6 +388,42 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
     catch (CRM_Core_Exception $e) {
       return FALSE;
     }
+  }
+
+  /**
+   * @param $contact
+   * @param $formValues
+   * @param $contribution
+   * @param $groupBy
+   * @param $contributions
+   * @param $realSeparator
+   * @param $tableSeparators
+   * @param $messageToken
+   * @param $html_message
+   * @param $separator
+   * @param $categories
+   * @param bool $grouped
+   * @param int $groupByID
+   *
+   * @return string
+   */
+  protected static function generateHtml(&$contact, $contribution, $groupBy, $contributions, $realSeparator, $tableSeparators, $messageToken, $html_message, $separator, $grouped, $groupByID) {
+    static $validated = FALSE;
+    $html = NULL;
+
+    $categories = self::getTokenCategories();
+    self::assignCombinedContributionValues($contact, $contributions, $groupBy, $groupByID);
+
+    if (empty($groupBy) || empty($contact['is_sent'][$groupBy][$groupByID])) {
+      if (!$validated && in_array($realSeparator, $tableSeparators) && !self::isValidHTMLWithTableSeparator($messageToken, $html_message)) {
+        $realSeparator = ', ';
+        CRM_Core_Session::setStatus(ts('You have selected the table cell separator, but one or more token fields are not placed inside a table cell. This would result in invalid HTML, so comma separators have been used instead.'));
+      }
+      $validated = TRUE;
+      $html = str_replace($separator, $realSeparator, self::resolveTokens($html_message, $contact, $contribution, $messageToken, $categories, $grouped, $separator));
+    }
+
+    return $html;
   }
 
 }

@@ -36,6 +36,8 @@
  */
 class CRM_Contact_Form_Task_PDFLetterCommon {
 
+  protected static $tokenCategories;
+
   /**
    * @return array
    *   Array(string $machineName => string $label).
@@ -328,9 +330,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
       $bao->savePdfFormat($formValues, $formValues['format_id']);
     }
 
-    $tokens = array();
-    CRM_Utils_Hook::tokens($tokens);
-    $categories = array_keys($tokens);
+    $categories = self::getTokenCategories();
 
     //time being hack to strip '&nbsp;'
     //from particular letter line, CRM-6798
@@ -352,6 +352,8 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
    * Process the form after the input has been submitted and validated.
    *
    * @param CRM_Core_Form $form
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function postProcess(&$form) {
     $formValues = $form->controller->exportValues($form->getName());
@@ -602,6 +604,20 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
     else {
       throw new \CRM_Core_Exception("Cannot determine mime type");
     }
+  }
+
+  /**
+   * Get the categories required for rendering tokens.
+   *
+   * @return array
+   */
+  protected static function getTokenCategories() {
+    if (self::$tokenCategories === NULL) {
+      $tokens = array();
+      CRM_Utils_Hook::tokens($tokens);
+      self::$tokenCategories = array_keys($tokens);
+    }
+    return self::$tokenCategories;
   }
 
 }
