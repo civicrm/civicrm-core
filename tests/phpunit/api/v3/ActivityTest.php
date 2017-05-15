@@ -1014,6 +1014,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
    */
   public function testActivityUpdate() {
     $result = $this->callAPISuccess('activity', 'create', $this->_params);
+    $this->_contactID2 = $this->individualCreate();
 
     $params = array(
       'id' => $result['id'],
@@ -1024,6 +1025,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
       'details' => 'Lets update Meeting',
       'status_id' => 1,
       'source_contact_id' => $this->_contactID,
+      'assignee_contact_id' => $this->_contactID2,
       'priority_id' => 1,
     );
 
@@ -1032,6 +1034,26 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
     $params['activity_date_time'] = '2009-10-11 12:34:56';
     // we also unset source_contact_id since it is stored in an aux table
     unset($params['source_contact_id']);
+    //Check if assignee created.
+    $assignee = $this->callAPISuccess('ActivityContact', 'get', array(
+      'activity_id' => $result['id'],
+      'return' => array("contact_id"),
+      'record_type_id' => "Activity Assignees",
+    ));
+    $this->assertNotEmpty($assignee['values']);
+
+    //clear assignee contacts.
+    $updateParams = array(
+      'id' => $result['id'],
+      'assignee_contact_id' => array(),
+    );
+    $activity = $this->callAPISuccess('activity', 'create', $updateParams);
+    $assignee = $this->callAPISuccess('ActivityContact', 'get', array(
+      'activity_id' => $activity['id'],
+      'return' => array("contact_id"),
+      'record_type_id' => "Activity Assignees",
+    ));
+    $this->assertEmpty($assignee['values']);
     $this->getAndCheck($params, $result['id'], 'activity');
   }
 
