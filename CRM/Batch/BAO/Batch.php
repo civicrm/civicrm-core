@@ -185,7 +185,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
    * @return array
    *   associated array of batch list
    */
-  public function getBatchListSelector(&$params) {
+  public static function getBatchListSelector(&$params) {
     // format the params
     $params['offset'] = ($params['page'] - 1) * $params['rp'];
     $params['rowCount'] = $params['rp'];
@@ -274,11 +274,12 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
     {$limit}";
 
     $object = CRM_Core_DAO::executeQuery($query, $params, TRUE, 'CRM_Batch_DAO_Batch');
+    $obj = new CRM_Batch_BAO_Batch();
     if (!empty($params['context'])) {
-      $links = self::links($params['context']);
+      $links = $obj->links($params['context']);
     }
     else {
-      $links = self::links();
+      $links = $obj->links();
     }
 
     $batchTypes = CRM_Core_PseudoConstant::get('CRM_Batch_DAO_Batch', 'type_id');
