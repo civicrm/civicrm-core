@@ -2108,6 +2108,28 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
+   * Alter the definition of some Angular HTML partials.
+   *
+   * @param \Civi\Angular\Manager $angular
+   *
+   * @code
+   * function example_civicrm_alterAngular($angular) {
+   *   $angular->add(ChangeSet::create('mychanges')
+   *     ->alterHtml('~/crmMailing/EditMailingCtrl/2step.html', function(phpQueryObject $doc) {
+   *       $doc->find('[ng-form="crmMailingSubform"]')->attr('cat-stevens', 'ts(\'wild world\')');
+   *     })
+   *   );
+   * }
+   * @endCode
+   */
+  public static function alterAngular($angular) {
+    $event = \Civi\Core\Event\GenericHookEvent::create(array(
+      'angular' => $angular,
+    ));
+    Civi::dispatcher()->dispatch('hook_civicrm_alterAngular', $event);
+  }
+
+  /**
    * This hook is called whenever the system builds a new copy of
    * semi-static asset.
    *

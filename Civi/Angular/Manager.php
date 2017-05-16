@@ -36,6 +36,12 @@ class Manager {
   protected $cache;
 
   /**
+   * @var array
+   *   Array(string $name => ChangeSet $change).
+   */
+  protected $changeSets = NULL;
+
+  /**
    * @param \CRM_Core_Resources $res
    *   The resource manager.
    */
@@ -143,6 +149,33 @@ class Manager {
   }
 
   /**
+   * Get the partial HTML documents for a module (unfiltered).
+   *
+   * @param string $name
+   *   Angular module name.
+   * @return array
+   *   Array(string $extFilePath => string $html)
+   * @throws \Exception
+   *   Invalid partials configuration.
+   */
+  public function getRawPartials($name) {
+    $module = $this->getModule($name);
+    $result = array();
+    if (isset($module['partials'])) {
+      foreach ($module['partials'] as $partialDir) {
+        $partialDir = $this->res->getPath($module['ext']) . '/' . $partialDir;
+        $files = \CRM_Utils_File::findFiles($partialDir, '*.html', TRUE);
+        foreach ($files as $file) {
+          $filename = '~/' . $name . '/' . $file;
+          $result[$filename] = file_get_contents($partialDir . '/' . $file);
+        }
+      }
+      return $result;
+    }
+    return $result;
+  }
+
+  /**
    * Get the partial HTML documents for a module.
    *
    * @param string $name
@@ -155,24 +188,11 @@ class Manager {
   public function getPartials($name) {
     $cacheKey = "angular-partials::$name";
     $cacheValue = $this->cache->get($cacheKey);
-    if ($cacheValue !== NULL) {
-      return $cacheValue;
+    if ($cacheValue === NULL) {
+      $cacheValue = ChangeSet::applyResourceFilters($this->getChangeSets(), 'partials', $this->getRawPartials($name));
+      $this->cache->set($cacheKey, $cacheValue);
     }
-    $module = $this->getModule($name);
-    $result = array();
-    if (isset($module['partials'])) {
-      foreach ($module['partials'] as $partialDir) {
-        $partialDir = $this->res->getPath($module['ext']) . '/' . $partialDir;
-        $files = \CRM_Utils_File::findFiles($partialDir, '*.html', TRUE);
-        foreach ($files as $file) {
-          $filename = '~/' . $name . '/' . $file;
-          $result[$filename] = file_get_contents($partialDir . '/' . $file);
-        }
-      }
-    }
-
-    $this->cache->set($cacheKey, $result);
-    return $result;
+    return $cacheValue;
   }
 
   /**
@@ -274,7 +294,29 @@ class Manager {
         }
       }
     }
-    return $result;
+
+    return ChangeSet::applyResourceFilters($this->getChangeSets(), $resType, $result);
+  }
+
+  /**
+   * @return array
+   *   Array(string $name => ChangeSet $changeSet).
+   */
+  public function getChangeSets() {
+    if ($this->changeSets === NULL) {
+      $this->changeSets = array();
+      \CRM_Utils_Hook::alterAngular($this);
+    }
+    return $this->changeSets;
+  }
+
+  /**
+   * @param ChangeSet $changeSet
+   * @return \Civi\Angular\Manager
+   */
+  public function add($changeSet) {
+    $this->changeSets[$changeSet->getName()] = $changeSet;
+    return $this;
   }
 
 }
