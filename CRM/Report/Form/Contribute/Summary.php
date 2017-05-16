@@ -551,6 +551,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
    */
   public function groupBy() {
     $this->_groupBy = "";
+    $groupByColumns = array();
     $append = FALSE;
     if (!empty($this->_params['group_bys']) &&
       is_array($this->_params['group_bys'])
@@ -574,15 +575,15 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
                   $append = '';
                 }
                 if ($this->_params['group_bys_freq'][$fieldName] == 'FISCALYEAR') {
-                  $this->_groupBy[] = self::fiscalYearOffset($field['dbAlias']);
+                  $groupByColumns[] = self::fiscalYearOffset($field['dbAlias']);
                 }
                 else {
-                  $this->_groupBy[] = "$append {$this->_params['group_bys_freq'][$fieldName]}({$field['dbAlias']})";
+                  $groupByColumns[] = "$append {$this->_params['group_bys_freq'][$fieldName]}({$field['dbAlias']})";
                 }
                 $append = TRUE;
               }
               else {
-                $this->_groupBy[] = $field['dbAlias'];
+                $groupByColumns[] = $field['dbAlias'];
               }
             }
           }
@@ -590,18 +591,18 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
       }
 
       if (!empty($this->_statFields) &&
-        (($append && count($this->_groupBy) <= 1) || (!$append)) &&
+        (($append && count($groupByColumns) <= 1) || (!$append)) &&
         !$this->_having
       ) {
         $this->_rollup = " WITH ROLLUP";
       }
       $groupBy = array();
-      foreach ($this->_groupBy as $key => $val) {
+      foreach ($groupByColumns as $key => $val) {
         if (strpos($val, ';;') !== FALSE) {
           $groupBy = array_merge($groupBy, explode(';;', $val));
         }
         else {
-          $groupBy[] = $this->_groupBy[$key];
+          $groupBy[] = $groupByColumns[$key];
         }
       }
       $this->_groupBy = "GROUP BY " . implode(', ', $groupBy);
