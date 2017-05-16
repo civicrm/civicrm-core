@@ -3250,7 +3250,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
         'contact_id' => $created_contact_id,
         'group_id' => $create_group['id'],
       );
-      $create_group_contact = $this->callApiSuccess('GroupContact', 'create', $group_contact_params);
+      $this->callApiSuccess('GroupContact', 'create', $group_contact_params);
       $contact_get = $this->callAPISuccess('contact', 'get', array('group' => $title, 'return' => 'group'));
       $this->assertEquals(1, $contact_get['count']);
       $this->assertEquals($created_contact_id, $contact_get['id']);
