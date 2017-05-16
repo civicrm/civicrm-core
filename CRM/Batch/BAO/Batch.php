@@ -51,24 +51,16 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
    * Create a new batch.
    *
    * @param array $params
-   * @param array $ids
-   *   Associated array of ids.
-   * @param string $context
-   *   String.
    *
    * @return object
    *   $batch batch object
    */
-  public static function create(&$params, $ids = NULL, $context = NULL) {
+  public static function create(&$params) {
     if (empty($params['id'])) {
       $params['name'] = CRM_Utils_String::titleToVar($params['title']);
     }
-
     $batch = new CRM_Batch_DAO_Batch();
     $batch->copyValues($params);
-    if ($context == 'financialBatch' && !empty($ids['batchID'])) {
-      $batch->id = $ids['batchID'];
-    }
     $batch->save();
 
     return $batch;

@@ -196,11 +196,9 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
    */
   public function postProcess() {
     $session = CRM_Core_Session::singleton();
-    $ids = array();
     $params = $this->exportValues();
     $batchStatus = CRM_Core_PseudoConstant::get('CRM_Batch_DAO_Batch', 'status_id');
     if ($this->_id) {
-      $ids['batchID'] = $this->_id;
       $params['id'] = $this->_id;
     }
 
@@ -228,7 +226,7 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
       $activityTypeName = 'Edit Batch';
     }
 
-    $batch = CRM_Batch_BAO_Batch::create($params, $ids, 'financialBatch');
+    $batch = CRM_Batch_BAO_Batch::create($params);
 
     $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, FALSE, FALSE, 'name');
 

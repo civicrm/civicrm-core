@@ -183,7 +183,6 @@ class CRM_Financial_Page_AJAX {
     if ($recordClass[0] == 'CRM' && count($recordClass) >= 3) {
       foreach ($records as $recordID) {
         $params = array();
-        $ids = NULL;
         switch ($op) {
           case 'assign':
           case 'remove':
@@ -207,14 +206,12 @@ class CRM_Financial_Page_AJAX {
             $params = $totals[$recordID];
           case 'reopen':
             $status = $op == 'close' ? 'Closed' : 'Reopened';
-            $ids['batchID'] = $recordID;
             $batchStatus = CRM_Core_PseudoConstant::get('CRM_Batch_DAO_Batch', 'status_id', array('labelColumn' => 'name'));
             $params['status_id'] = CRM_Utils_Array::key($status, $batchStatus);
             $session = CRM_Core_Session::singleton();
             $params['modified_date'] = date('YmdHis');
             $params['modified_id'] = $session->get('userID');
             $params['id'] = $recordID;
-            $context = "financialBatch";
             break;
 
           case 'export':
@@ -223,17 +220,11 @@ class CRM_Financial_Page_AJAX {
 
           case 'delete':
             $params = $recordID;
-            $context = "financialBatch";
             break;
         }
 
         if (method_exists($recordBAO, $methods[$op]) & !empty($params)) {
-          if (isset($context)) {
-            $updated = call_user_func_array(array($recordBAO, $methods[$op]), array(&$params, $ids, $context));
-          }
-          else {
-            $updated = call_user_func_array(array($recordBAO, $methods[$op]), array(&$params, $ids));
-          }
+          $updated = call_user_func_array(array($recordBAO, $methods[$op]), array(&$params));
           if ($updated) {
             $redirectStatus = $updated->status_id;
             if ($batchStatus[$updated->status_id] == "Reopened") {
