@@ -31,11 +31,17 @@ class Manager {
   protected $modules = NULL;
 
   /**
+   * @var \CRM_Utils_Cache_Interface
+   */
+  protected $cache;
+
+  /**
    * @param \CRM_Core_Resources $res
    *   The resource manager.
    */
-  public function __construct($res) {
+  public function __construct($res, \CRM_Utils_Cache_Interface $cache = NULL) {
     $this->res = $res;
+    $this->cache = $cache ? $cache : new \CRM_Utils_Cache_Arraycache(array());
   }
 
   /**
@@ -147,6 +153,11 @@ class Manager {
    *   Invalid partials configuration.
    */
   public function getPartials($name) {
+    $cacheKey = "angular-partials::$name";
+    $cacheValue = $this->cache->get($cacheKey);
+    if ($cacheValue !== NULL) {
+      return $cacheValue;
+    }
     $module = $this->getModule($name);
     $result = array();
     if (isset($module['partials'])) {
@@ -159,6 +170,8 @@ class Manager {
         }
       }
     }
+
+    $this->cache->set($cacheKey, $result);
     return $result;
   }
 
@@ -208,19 +221,9 @@ class Manager {
         $result = array_unique(array_merge($result, $strings));
       }
     }
-    if (isset($module['partials'])) {
-      foreach ($module['partials'] as $partialDir) {
-        $partialDir = $this->res->getPath($module['ext']) . '/' . $partialDir;
-        $files = \CRM_Utils_File::findFiles($partialDir, '*.html');
-        foreach ($files as $file) {
-          $strings = $this->res->getStrings()->get(
-            $module['ext'],
-            $file,
-            'text/html'
-          );
-          $result = array_unique(array_merge($result, $strings));
-        }
-      }
+    $partials = $this->getPartials($name);
+    foreach ($partials as $partial) {
+      $result = array_unique(array_merge($result, \CRM_Utils_JS::parseStrings($partial)));
     }
     return $result;
   }
