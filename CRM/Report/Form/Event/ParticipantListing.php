@@ -472,7 +472,10 @@ ORDER BY  cv.label
               $this->_balance = TRUE;
             }
             $alias = "{$tableName}_{$fieldName}";
-            $select[] = "{$field['dbAlias']} as $alias";
+	    $select[] = "{$field['dbAlias']} as $alias";
+	    if ($this->_lineitemField == TRUE) {
+              $select[] = "sum(". "{$field['dbAlias']}".")"." as $alias";
+            }
             $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = CRM_Utils_Array::value('type', $field);
             $this->_columnHeaders["{$tableName}_{$fieldName}"]['no_display'] = CRM_Utils_Array::value('no_display', $field);
             $this->_columnHeaders["{$tableName}_{$fieldName}"]['title'] = CRM_Utils_Array::value('title', $field);
