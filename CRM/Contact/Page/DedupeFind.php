@@ -70,16 +70,13 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
     );
     $this->assign('urlQuery', CRM_Utils_System::makeQueryString($urlQry));
 
-    $session = CRM_Core_Session::singleton();
-    $contactIds = $session->get('selectedSearchContactIds');
-    if ($context == 'search' || !empty($contactIds)) {
+    if ($context == 'search') {
       $context = 'search';
-      $this->assign('backURL', $session->readUserContext());
+      $this->assign('backURL', CRM_Core_Session::singleton()->readUserContext());
     }
 
     if ($action & CRM_Core_Action::RENEW) {
       // empty cache
-
       if ($rgid) {
         CRM_Core_BAO_PrevNextCache::deleteItem(NULL, CRM_Dedupe_Merger::getMergeCacheKeyString($rgid, $gid));
       }
@@ -165,13 +162,6 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
           }
           $this->set("dedupe_dupes_$gid", $foundDupes);
         }
-        elseif (!empty($contactIds)) {
-          $foundDupes = $this->get("search_dedupe_dupes_$gid");
-          if (!$foundDupes) {
-            $foundDupes = CRM_Dedupe_Finder::dupes($rgid, $contactIds);
-          }
-          $this->set("search_dedupe_dupes_$gid", $foundDupes);
-        }
         else {
           $foundDupes = $this->get('dedupe_dupes');
           if (!$foundDupes) {
@@ -204,16 +194,15 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
           $this->_rgid = $rgid;
           $this->_mainContacts = $mainContacts;
 
-          $session = CRM_Core_Session::singleton();
           $urlQry['action'] = 'update';
           if ($this->_cid) {
             $urlQry['cid'] = $this->_cid;
-            $session->pushUserContext(CRM_Utils_System::url('civicrm/contact/deduperules',
+            CRM_Core_Session::singleton()->pushUserContext(CRM_Utils_System::url('civicrm/contact/deduperules',
               $urlQry
             ));
           }
           else {
-            $session->pushUserContext(CRM_Utils_System::url('civicrm/contact/dedupefind',
+            CRM_Core_Session::singleton()->pushUserContext(CRM_Utils_System::url('civicrm/contact/dedupefind',
               $urlQry
             ));
           }
@@ -239,7 +228,6 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
     }
     $this->assign('context', $context);
 
-    // parent run
     return parent::run();
   }
 
