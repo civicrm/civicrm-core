@@ -140,9 +140,16 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
    * @return array
    */
   public static function addBatchEntity(&$params) {
+    $op = 'edit';
+    $entityId = CRM_Utils_Array::value('id', $params);
+    if (!$entityId) {
+      $op = 'create';
+    }
+    CRM_Utils_Hook::pre($op, 'EntityBatch', $entityId, $params);
     $entityBatch = new CRM_Batch_DAO_EntityBatch();
     $entityBatch->copyValues($params);
     $entityBatch->save();
+    CRM_Utils_Hook::post($op, 'EntityBatch', $entityBatch->id, $entityBatch);
     return $entityBatch;
   }
 
@@ -153,8 +160,11 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
    */
   public static function removeBatchEntity($params) {
     $entityBatch = new CRM_Batch_DAO_EntityBatch();
+    $entityId = CRM_Utils_Array::value('id', $params);
+    CRM_Utils_Hook::pre('delete', 'EntityBatch', $entityId, $params);
     $entityBatch->copyValues($params);
     $entityBatch->delete();
+    CRM_Utils_Hook::post('delete', 'EntityBatch', $entityBatch->id, $entityBatch);
     return $entityBatch;
   }
 
