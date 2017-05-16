@@ -1135,7 +1135,7 @@ class CRM_Core_Permission {
     $permissions['state_province'] = array(
       'get' => array(
         'access CiviCRM',
-      )
+      ),
     );
 
     // Price sets are shared by several components, user needs access to at least one of them
