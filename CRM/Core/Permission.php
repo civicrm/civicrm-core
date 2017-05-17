@@ -1132,6 +1132,12 @@ class CRM_Core_Permission {
     // Loc block is only used for events
     $permissions['loc_block'] = $permissions['event'];
 
+    $permissions['state_province'] = array(
+      'get' => array(
+        'access CiviCRM',
+      ),
+    );
+
     // Price sets are shared by several components, user needs access to at least one of them
     $permissions['price_set'] = array(
       'default' => array(
