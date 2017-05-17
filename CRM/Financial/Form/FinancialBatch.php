@@ -216,7 +216,9 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
       $params['mode_id'] = CRM_Utils_Array::key('Manual Batch', $batchMode);
       $params['status_id'] = CRM_Utils_Array::key('Open', $batchStatus);
       $params['created_date'] = date('YmdHis');
-      $params['created_id'] = $session->get('userID');
+      if (empty($params['created_id'])) {
+        $params['created_id'] = $session->get('userID');
+      }
       $details = "{$params['title']} batch has been created by this contact.";
       $activityTypeName = 'Create Batch';
     }
@@ -229,6 +231,9 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
     }
 
     $batch = CRM_Batch_BAO_Batch::create($params, $ids, 'financialBatch');
+
+    //set batch id
+    $this->_id = $batch->id;
 
     $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, FALSE, FALSE, 'name');
 
