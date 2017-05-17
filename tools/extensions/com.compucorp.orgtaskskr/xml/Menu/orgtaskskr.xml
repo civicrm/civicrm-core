@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<menu>
+  <item>
+    <path>civicrm/tasklist</path>
+    <page_callback>CRM_Orgtaskskr_Page_TaskList</page_callback>
+    <title>TaskList</title>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/tasklist/admin</path>
+    <page_callback>CRM_Orgtaskskr_Form_OrgTaskListAdmin</page_callback>
+    <title>Organization Activity Lists Administration</title>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
+</menu>
