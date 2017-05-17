@@ -70,7 +70,7 @@ class CRM_Utils_VersionCheck {
   /**
    * @var string
    */
-  public $pingbackUrl = 'http://latest.civicrm.org/stable.php?format=json';
+  public $pingbackUrl = 'https://latest.civicrm.org/stable.php?format=json';
 
   /**
    * Pingback params
