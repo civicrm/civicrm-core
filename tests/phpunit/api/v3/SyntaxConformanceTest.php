@@ -463,7 +463,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'PledgePayment',
       'ContributionPage',
       'Phone',
-      'PaymentProcessor',
       'Setting',
       'MailingContact',
       'SystemLog',
