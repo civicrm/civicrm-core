@@ -1275,7 +1275,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $checkAgainst = array(
       'financial_trxn_id.to_financial_account_id.name' => 'Deferred Revenue - Event Fee',
       'financial_trxn_id.from_financial_account_id.name' => 'Event Fee',
-      'financial_trxn_id' => '2'
+      'financial_trxn_id' => '2',
     );
     $result = $this->callAPISuccessGetSingle('EntityFinancialTrxn', array(
       'return' => array(
