@@ -539,43 +539,6 @@ function civicrm_api3_activity_delete($params) {
  *   array with errors
  */
 function _civicrm_api3_activity_check_params(&$params) {
-
-  $contactIDFields = array_intersect_key($params,
-    array(
-      'source_contact_id' => 1,
-      'assignee_contact_id' => 1,
-      'target_contact_id' => 1,
-    )
-  );
-
-  // this should be handled by wrapper layer & probably the api would already manage it
-  //correctly by doing post validation - ie. a failure should result in a roll-back = an error
-  // needs testing
-  if (!empty($contactIDFields)) {
-    $contactIds = array();
-    foreach ($contactIDFields as $fieldname => $contactfield) {
-      if (empty($contactfield)) {
-        continue;
-      }
-      if (is_array($contactfield)) {
-        foreach ($contactfield as $contactkey => $contactvalue) {
-          $contactIds[$contactvalue] = $contactvalue;
-        }
-      }
-      else {
-        $contactIds[$contactfield] = $contactfield;
-      }
-    }
-
-    $sql = '
-SELECT  count(*)
-  FROM  civicrm_contact
- WHERE  id IN (' . implode(', ', $contactIds) . ' )';
-    if (count($contactIds) != CRM_Core_DAO::singleValueQuery($sql)) {
-      throw new API_Exception('Invalid Contact Id');
-    }
-  }
-
   $activityIds = array(
     'activity' => CRM_Utils_Array::value('id', $params),
     'parent' => CRM_Utils_Array::value('parent_id', $params),

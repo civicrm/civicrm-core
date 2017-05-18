@@ -1641,7 +1641,9 @@ function _civicrm_api3_validate_foreign_keys($entity, $action, &$params, $fields
   foreach ($fields as $fieldName => $fieldInfo) {
     if (!empty($fieldInfo['FKClassName'])) {
       if (!empty($params[$fieldName])) {
-        _civicrm_api3_validate_constraint($params[$fieldName], $fieldName, $fieldInfo);
+        foreach ((array) $params[$fieldName] as $fieldValue) {
+          _civicrm_api3_validate_constraint($fieldValue, $fieldName, $fieldInfo);
+        }
       }
       elseif (!empty($fieldInfo['required'])) {
         throw new Exception("DB Constraint Violation - $fieldName should possibly be marked as mandatory for $entity,$action API. If so, please raise a bug report.");
