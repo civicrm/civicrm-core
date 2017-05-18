@@ -746,15 +746,16 @@ MODIFY      {$columnName} varchar( $length )
     $queries = array();
     foreach ($missingIndices as $table => $indexList) {
       foreach ($indexList as $index) {
-        $queries[] = "CREATE " .
-        (array_key_exists('unique', $index) && $index['unique'] ? 'UNIQUE ' : '') .
-        "INDEX {$index['name']} ON {$table} (" .
-          implode(", ", $index['field']) .
-        ")";
+        if (!CRM_Core_BAO_SchemaHandler::checkIfIndexExists($table, $index['name'])) {
+          $queries[] = "CREATE " .
+          (array_key_exists('unique', $index) && $index['unique'] ? 'UNIQUE ' : '') .
+          "INDEX {$index['name']} ON {$table} (" .
+            implode(", ", $index['field']) .
+          ")";
+        }
       }
     }
 
-    /* FIXME potential problem if index name already exists, so check before creating */
     $dao = new CRM_Core_DAO();
     foreach ($queries as $query) {
       $dao->query($query, FALSE);
