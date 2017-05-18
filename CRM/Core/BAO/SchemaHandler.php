@@ -746,19 +746,20 @@ MODIFY      {$columnName} varchar( $length )
     $queries = array();
     foreach ($missingIndices as $table => $indexList) {
       foreach ($indexList as $index) {
-        $idx_queries = array();
         if (CRM_Core_BAO_SchemaHandler::checkIfIndexExists($table, $index['name'])) {
-          $idx_queries[] = 'SET foreign_key_checks = 0';
-          $idx_queries[] = 'DROP INDEX ' . $index['name'] . ' ON ' . $table;
+          $queries[] = 'SET foreign_key_checks = 0';
+          $queries[] = 'DROP INDEX ' . $index['name'] . ' ON ' . $table;
         }
-        $idx_queries[] = "CREATE " .
+        $queries[] = "CREATE " .
           (array_key_exists('unique', $index) && $index['unique'] ? 'UNIQUE ' : '') .
           "INDEX {$index['name']} ON {$table} (" .
             implode(", ", $index['field']) .
           ")";
-        $idx_queries[] = 'SET foreign_key_checks = 1';
+        $queries[] = 'SET foreign_key_checks = 1';
       }
     }
+
+    // Civi::log()->alert('$queries: ' . print_r($queries, 1));
 
     $dao = new CRM_Core_DAO();
     foreach ($queries as $query) {
