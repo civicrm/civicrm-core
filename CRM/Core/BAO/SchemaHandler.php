@@ -746,13 +746,17 @@ MODIFY      {$columnName} varchar( $length )
     $queries = array();
     foreach ($missingIndices as $table => $indexList) {
       foreach ($indexList as $index) {
-        if (!CRM_Core_BAO_SchemaHandler::checkIfIndexExists($table, $index['name'])) {
-          $queries[] = "CREATE " .
+        $idx_queries = array();
+        if (CRM_Core_BAO_SchemaHandler::checkIfIndexExists($table, $index['name'])) {
+          $idx_queries[] = 'SET foreign_key_checks = 0';
+          $idx_queries[] = 'DROP INDEX ' . $index['name'] . ' ON ' . $table;
+        }
+        $idx_queries[] = "CREATE " .
           (array_key_exists('unique', $index) && $index['unique'] ? 'UNIQUE ' : '') .
           "INDEX {$index['name']} ON {$table} (" .
             implode(", ", $index['field']) .
           ")";
-        }
+        $idx_queries[] = 'SET foreign_key_checks = 1';
       }
     }
 
