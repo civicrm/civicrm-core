@@ -720,6 +720,7 @@ MODIFY      {$columnName} varchar( $length )
       $extSigs[] = CRM_Utils_Array::collect('sig', $indices);
     }
     CRM_Utils_Array::flatten($extSigs, $existingSigs);
+    // Civi::log()->alert(print_r(['$requiredSigs' => $requiredSigs, '$existingSigs' => $existingSigs], 1));
 
     // Compare
     $missingSigs = array_diff($requiredSigs, $existingSigs);
@@ -730,10 +731,12 @@ MODIFY      {$columnName} varchar( $length )
       foreach ($requiredIndices[$sigParts[0]] as $index) {
         if ($index['sig'] == $sig) {
           $missingIndices[$sigParts[0]][] = $index;
+          // Civi::log()->alert(print_r(['$index' => $index], 1));
           continue;
         }
       }
     }
+    // Civi::log()->alert('$missingIndices: ' . print_r($missingIndices, 1));
     return $missingIndices;
   }
 
