@@ -12,8 +12,19 @@
         apiCalls = (apiCalls || []).concat([['System', 'check', {sequential: 1}]]);
         $('#crm-status-list').block();
         crmApi(apiCalls, true)
-          .then(function(result) {
-            $scope.statuses = result[result.length - 1].values;
+          .then(function(results) {
+            $scope.statuses = results[results.length - 1].values;
+            results.forEach(function(result) {
+              if (result.is_error) {
+                var error_message = result.error_message;
+                if (typeof(result.debug_information) !== 'undefined') {
+                  error_message += '<div class="status-debug-information">' +
+                      '<b>Debug information:</b><br>' +
+                      result.debug_information + '</div>';
+                }
+                CRM.alert(error_message, 'API error', 'error');
+                }
+              });
             $('#crm-status-list').unblock();
           });
       }
