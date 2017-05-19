@@ -453,6 +453,75 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Check that permissions on API key are restricted (CRM-18112).
+   */
+  public function testCreateApiKey() {
+    $config = CRM_Core_Config::singleton();
+    $contactId = $this->individualCreate(array(
+      'first_name' => 'A',
+      'last_name' => 'B',
+    ));
+
+    // Allow edit -- because permissions aren't being checked
+    $config->userPermissionClass->permissions = array();
+    $result = $this->callAPISuccess('Contact', 'create', array(
+      'id' => $contactId,
+      'api_key' => 'original',
+    ));
+    $this->assertEquals('original', $result['values'][$contactId]['api_key']);
+
+    // Allow edit -- because we have adequate permission
+    $config->userPermissionClass->permissions = array('access CiviCRM', 'edit all contacts', 'edit api keys');
+    $result = $this->callAPISuccess('Contact', 'create', array(
+      'check_permissions' => 1,
+      'id' => $contactId,
+      'api_key' => 'abcd1234',
+    ));
+    $this->assertEquals('abcd1234', $result['values'][$contactId]['api_key']);
+
+    // Disallow edit -- because we don't have permission
+    $config->userPermissionClass->permissions = array('access CiviCRM', 'edit all contacts');
+    $result = $this->callAPIFailure('Contact', 'create', array(
+      'check_permissions' => 1,
+      'id' => $contactId,
+      'api_key' => 'defg4321',
+    ));
+    $this->assertRegExp(';Permission denied to modify api key;', $result['error_message']);
+
+    // Return everything -- because permissions are not being checked
+    $config->userPermissionClass->permissions = array();
+    $result = $this->callAPISuccess('Contact', 'create', array(
+      'id' => $contactId,
+      'first_name' => 'A2',
+    ));
+    $this->assertEquals('A2', $result['values'][$contactId]['first_name']);
+    $this->assertEquals('B', $result['values'][$contactId]['last_name']);
+    $this->assertEquals('abcd1234', $result['values'][$contactId]['api_key']);
+
+    // Return everything -- because we have adequate permission
+    $config->userPermissionClass->permissions = array('access CiviCRM', 'edit all contacts', 'edit api keys');
+    $result = $this->callAPISuccess('Contact', 'create', array(
+      'check_permissions' => 1,
+      'id' => $contactId,
+      'first_name' => 'A3',
+    ));
+    $this->assertEquals('A3', $result['values'][$contactId]['first_name']);
+    $this->assertEquals('B', $result['values'][$contactId]['last_name']);
+    $this->assertEquals('abcd1234', $result['values'][$contactId]['api_key']);
+
+    // Restricted return -- because we don't have permission
+    $config->userPermissionClass->permissions = array('access CiviCRM', 'edit all contacts');
+    $result = $this->callAPISuccess('Contact', 'create', array(
+      'check_permissions' => 1,
+      'id' => $contactId,
+      'first_name' => 'A4',
+    ));
+    $this->assertEquals('A4', $result['values'][$contactId]['first_name']);
+    $this->assertEquals('B', $result['values'][$contactId]['last_name']);
+    $this->assertTrue(empty($result['values'][$contactId]['api_key']));
+  }
+
+  /**
    * Check with complete array + custom field.
    *
    * Note that the test is written on purpose without any
