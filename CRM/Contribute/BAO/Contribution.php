@@ -4727,10 +4727,6 @@ LIMIT 1;";
         $contribution->contact_id = $ids['related_contact'];
       }
       CRM_Activity_BAO_Activity::addActivity($contribution, NULL, $targetContactID);
-      // event
-    }
-    else {
-      CRM_Activity_BAO_Activity::addActivity($participant);
     }
 
     // CRM-9132 legacy behaviour was that receipts were sent out in all instances. Still sending

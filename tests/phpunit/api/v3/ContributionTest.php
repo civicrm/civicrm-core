@@ -2704,7 +2704,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   public function testCompleteTransactionWithParticipantRecord() {
     $mut = new CiviMailUtils($this, TRUE);
     $mut->clearMessages();
-    $this->createLoggedInUser();
+    $this->_individualId = $this->createLoggedInUser();
     $contributionID = $this->createPendingParticipantContribution();
     $this->callAPISuccess('contribution', 'completetransaction', array(
         'id' => $contributionID,
@@ -2715,6 +2715,16 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'return' => 'participant_status_id',
     ));
     $this->assertEquals(1, $participantStatus);
+
+    //Assert only three activities are created.
+    $activities = CRM_Activity_BAO_Activity::getContactActivity($this->_individualId);
+    $this->assertEquals(3, count($activities));
+    $activityNames = array_count_values(CRM_Utils_Array::collect('activity_name', $activities));
+    // record two activities before and after completing payment for Event registration
+    $this->assertEquals(2, $activityNames['Event Registration']);
+    // update the original 'Contribution' activity created after completing payment
+    $this->assertEquals(1, $activityNames['Contribution']);
+
     $mut->checkMailLog(array(
       'Annual CiviCRM meet',
       'Event',
@@ -3104,9 +3114,9 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    */
   public function createPendingParticipantContribution() {
     $event = $this->eventCreate(array('is_email_confirm' => 1, 'confirm_from_email' => 'test@civicrm.org'));
-    $participantID = $this->participantCreate(array('event_id' => $event['id'], 'status_id' => 6));
+    $participantID = $this->participantCreate(array('event_id' => $event['id'], 'status_id' => 6, 'contact_id' => $this->_individualId));
     $this->_ids['participant'] = $participantID;
-    $params = array_merge($this->_params, array('contribution_status_id' => 2, 'financial_type_id' => 'Event Fee'));
+    $params = array_merge($this->_params, array('contact_id' => $this->_individualId, 'contribution_status_id' => 2, 'financial_type_id' => 'Event Fee'));
     $contribution = $this->callAPISuccess('contribution', 'create', $params);
     $this->callAPISuccess('participant_payment', 'create', array(
       'contribution_id' => $contribution['id'],
