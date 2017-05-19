@@ -9,6 +9,7 @@
 
       // Refresh the list. Optionally execute api calls first.
       function refresh(apiCalls, title) {
+        title = title || 'Untitled operation';
         apiCalls = (apiCalls || []).concat([['System', 'check', {sequential: 1}]]);
         $('#crm-status-list').block();
         crmApi(apiCalls, true)
