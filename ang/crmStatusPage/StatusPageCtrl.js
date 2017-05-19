@@ -8,7 +8,7 @@
       $scope.statuses = statusData.values;
 
       // Refresh the list. Optionally execute api calls first.
-      function refresh(apiCalls) {
+      function refresh(apiCalls, title) {
         apiCalls = (apiCalls || []).concat([['System', 'check', {sequential: 1}]]);
         $('#crm-status-list').block();
         crmApi(apiCalls, true)
@@ -16,13 +16,13 @@
             $scope.statuses = results[results.length - 1].values;
             results.forEach(function(result) {
               if (result.is_error) {
-                var error_message = ts('result.error_message');
+                var error_message = ts(result.error_message);
                 if (typeof(result.debug_information) !== 'undefined') {
                   error_message += '<div class="status-debug-information">' +
                       '<b>' + ts('Debug information') + ':</b><br>' +
                       result.debug_information + '</div>';
                 }
-                CRM.alert(error_message, ts('API error'), 'error');
+                CRM.alert(error_message, ts('Operation failed: ' + title), 'error');
                 }
               });
             $('#crm-status-list').unblock();
@@ -37,7 +37,7 @@
             ignore_severity: visible ? 0 : status.severity,
             hush_until: until
           }]
-        ]);
+        ], 'Set preference');
       };
       
       $scope.countVisible = function(visibility) {
@@ -54,7 +54,7 @@
               break;
 
             case 'api3':
-              refresh([action.params]);
+              refresh([action.params], action.title);
               break;
           }
         }
