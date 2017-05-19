@@ -58,87 +58,28 @@ class Manager {
   public function getModules() {
     if ($this->modules === NULL) {
       $config = \CRM_Core_Config::singleton();
+      global $civicrm_root;
+
+      // Note: It would be nice to just glob("$civicrm_root/ang/*.ang.php"), but at time
+      // of writing CiviMail and CiviCase have special conditionals.
 
       $angularModules = array();
-      $angularModules['angularFileUpload'] = array(
-        'ext' => 'civicrm',
-        'js' => array('bower_components/angular-file-upload/angular-file-upload.min.js'),
-      );
-      $angularModules['crmApp'] = array(
-        'ext' => 'civicrm',
-        'js' => array('ang/crmApp.js'),
-      );
-      $angularModules['crmAttachment'] = array(
-        'ext' => 'civicrm',
-        'js' => array('ang/crmAttachment.js'),
-        'css' => array('ang/crmAttachment.css'),
-        'partials' => array('ang/crmAttachment'),
-        'settings' => array(
-          'token' => \CRM_Core_Page_AJAX_Attachment::createToken(),
-        ),
-      );
-      $angularModules['crmAutosave'] = array(
-        'ext' => 'civicrm',
-        'js' => array('ang/crmAutosave.js'),
-      );
-      $angularModules['crmCxn'] = array(
-        'ext' => 'civicrm',
-        'js' => array('ang/crmCxn.js', 'ang/crmCxn/*.js'),
-        'css' => array('ang/crmCxn.css'),
-        'partials' => array('ang/crmCxn'),
-      );
-      //$angularModules['crmExample'] = array(
-      //  'ext' => 'civicrm',
-      //  'js' => array('ang/crmExample.js'),
-      //  'partials' => array('ang/crmExample'),
-      //);
-      $angularModules['crmResource'] = array(
-        'ext' => 'civicrm',
-        // 'js' => array('js/angular-crmResource/byModule.js'), // One HTTP request per module.
-        'js' => array('js/angular-crmResource/all.js'), // One HTTP request for all modules.
-      );
-      $angularModules['crmUi'] = array(
-        'ext' => 'civicrm',
-        'js' => array('ang/crmUi.js'),
-        'partials' => array('ang/crmUi'),
-      );
-      $angularModules['crmUtil'] = array(
-        'ext' => 'civicrm',
-        'js' => array('ang/crmUtil.js'),
-      );
-      // https://github.com/jwstadler/angular-jquery-dialog-service
-      $angularModules['dialogService'] = array(
-        'ext' => 'civicrm',
-        'js' => array('bower_components/angular-jquery-dialog-service/dialog-service.js'),
-      );
-      $angularModules['ngRoute'] = array(
-        'ext' => 'civicrm',
-        'js' => array('bower_components/angular-route/angular-route.min.js'),
-      );
-      $angularModules['ngSanitize'] = array(
-        'ext' => 'civicrm',
-        'js' => array('bower_components/angular-sanitize/angular-sanitize.min.js'),
-      );
-      $angularModules['ui.utils'] = array(
-        'ext' => 'civicrm',
-        'js' => array('bower_components/angular-ui-utils/ui-utils.min.js'),
-      );
-      $angularModules['ui.sortable'] = array(
-        'ext' => 'civicrm',
-        'js' => array('bower_components/angular-ui-sortable/sortable.min.js'),
-      );
-      $angularModules['unsavedChanges'] = array(
-        'ext' => 'civicrm',
-        'js' => array('bower_components/angular-unsavedChanges/dist/unsavedChanges.min.js'),
-      );
-
-      $angularModules['statuspage'] = array(
-        'ext' => 'civicrm',
-        'js' => array('ang/crmStatusPage.js', 'ang/crmStatusPage/*.js'),
-        'css' => array('ang/crmStatusPage.css'),
-        'partials' => array('ang/crmStatusPage'),
-        'settings' => array(),
-      );
+      $angularModules['angularFileUpload'] = include "$civicrm_root/ang/angularFileUpload.ang.php";
+      $angularModules['crmApp'] = include "$civicrm_root/ang/crmApp.ang.php";
+      $angularModules['crmAttachment'] = include "$civicrm_root/ang/crmAttachment.ang.php";
+      $angularModules['crmAutosave'] = include "$civicrm_root/ang/crmAutosave.ang.php";
+      $angularModules['crmCxn'] = include "$civicrm_root/ang/crmCxn.ang.php";
+      // $angularModules['crmExample'] = include "$civicrm_root/ang/crmExample.ang.php";
+      $angularModules['crmResource'] = include "$civicrm_root/ang/crmResource.ang.php";
+      $angularModules['crmUi'] = include "$civicrm_root/ang/crmUi.ang.php";
+      $angularModules['crmUtil'] = include "$civicrm_root/ang/crmUtil.ang.php";
+      $angularModules['dialogService'] = include "$civicrm_root/ang/dialogService.ang.php";
+      $angularModules['ngRoute'] = include "$civicrm_root/ang/ngRoute.ang.php";
+      $angularModules['ngSanitize'] = include "$civicrm_root/ang/ngSanitize.ang.php";
+      $angularModules['ui.utils'] = include "$civicrm_root/ang/ui.utils.ang.php";
+      $angularModules['ui.sortable'] = include "$civicrm_root/ang/ui.sortable.ang.php";
+      $angularModules['unsavedChanges'] = include "$civicrm_root/ang/unsavedChanges.ang.php";
+      $angularModules['statuspage'] = include "$civicrm_root/ang/crmStatusPage.ang.php";
 
       foreach (\CRM_Core_Component::getEnabledComponents() as $component) {
         $angularModules = array_merge($angularModules, $component->getAngularModules());
