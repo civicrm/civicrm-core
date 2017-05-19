@@ -71,17 +71,26 @@ class Main extends \CRM_Core_Page {
    * Register resources required by Angular.
    */
   public function registerResources() {
-    $modules = $this->angular->getModules();
     $page = $this; // PHP 5.3 does not propagate $this to inner functions.
 
-    $this->res->addSettingsFactory(function () use (&$modules, $page) {
+    $allModuleNames = array_keys($this->angular->getModules());
+    $moduleNames = $this->getModules();
+    if (count(array_diff($allModuleNames, $moduleNames))) {
+      $assetParams = array('modules' => implode(',', $moduleNames));
+    }
+    else {
+      // The module list will be "all modules that the user can see".
+      $assetParams = array('nonce' => md5(implode(',', $moduleNames)));
+    }
+
+    $this->res->addSettingsFactory(function () use (&$moduleNames, $page, $assetParams) {
       // TODO optimization; client-side caching
-      return array_merge($page->angular->getResources(array_keys($modules), 'settings', 'settings'), array(
+      return array_merge($page->angular->getResources($moduleNames, 'settings', 'settings'), array(
         'resourceUrls' => \CRM_Extension_System::singleton()->getMapper()->getActiveModuleUrls(),
         'angular' => array(
-          'modules' => array_merge(array('ngRoute'), array_keys($modules)),
+          'modules' => array_merge(array('ngRoute'), $moduleNames),
           'cacheCode' => $page->res->getCacheCode(),
-          'bundleUrl' => \Civi::service('asset_builder')->getUrl('angular-modules.json'),
+          'bundleUrl' => \Civi::service('asset_builder')->getUrl('angular-modules.json', $assetParams),
         ),
       ));
     });
@@ -91,7 +100,7 @@ class Main extends \CRM_Core_Page {
     $headOffset = 0;
     $config = \CRM_Core_Config::singleton();
     if ($config->debug) {
-      foreach ($modules as $moduleName => $module) {
+      foreach ($moduleNames as $moduleName) {
         foreach ($this->angular->getResources($moduleName, 'css', 'cacheUrl') as $url) {
           $this->res->addStyleUrl($url, self::DEFAULT_MODULE_WEIGHT + (++$headOffset), $this->region);
         }
@@ -106,15 +115,15 @@ class Main extends \CRM_Core_Page {
       // Note: addScriptUrl() bypasses the normal string-localization of addScriptFile(),
       // but that's OK because all Angular strings (JS+HTML) will load via crmResource.
       // $aggScriptUrl = \CRM_Utils_System::url('civicrm/ajax/angular-modules', 'format=js&r=' . $page->res->getCacheCode(), FALSE, NULL, FALSE);
-      $aggScriptUrl = \Civi::service('asset_builder')->getUrl('angular-modules.js');
+      $aggScriptUrl = \Civi::service('asset_builder')->getUrl('angular-modules.js', $assetParams);
       $this->res->addScriptUrl($aggScriptUrl, 120, $this->region);
 
       // FIXME: The following CSS aggregator doesn't currently handle path-adjustments - which can break icons.
       //$aggStyleUrl = \CRM_Utils_System::url('civicrm/ajax/angular-modules', 'format=css&r=' . $page->res->getCacheCode(), FALSE, NULL, FALSE);
-      //$aggStyleUrl = \Civi::service('asset_builder')->getUrl('angular-modules.css');
+      //$aggStyleUrl = \Civi::service('asset_builder')->getUrl('angular-modules.css', $assetParams);
       //$this->res->addStyleUrl($aggStyleUrl, 120, $this->region);
 
-      foreach ($this->angular->getResources(array_keys($modules), 'css', 'cacheUrl') as $url) {
+      foreach ($this->angular->getResources($moduleNames, 'css', 'cacheUrl') as $url) {
         $this->res->addStyleUrl($url, self::DEFAULT_MODULE_WEIGHT + (++$headOffset), $this->region);
       }
     }
@@ -125,6 +134,17 @@ class Main extends \CRM_Core_Page {
     \CRM_Core_Resources::singleton()->addSetting(array(
       'angularRoute' => \CRM_Utils_Request::retrieve('route', 'String'),
     ));
+  }
+
+  /**
+   * Get a list of Angular modules to include on this page.
+   *
+   * @return array
+   *   List of module names.
+   *   Ex: array('angularFileUpload', 'crmUi', 'crmUtil').
+   */
+  public function getModules() {
+    return array_keys($this->angular->getModules());
   }
 
 }
