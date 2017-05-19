@@ -89,6 +89,7 @@ class Main extends \CRM_Core_Page {
         'resourceUrls' => \CRM_Extension_System::singleton()->getMapper()->getActiveModuleUrls(),
         'angular' => array(
           'modules' => array_merge(array('ngRoute'), $moduleNames),
+          'requires' => $page->angular->getResources($moduleNames, 'requires', 'requires'),
           'cacheCode' => $page->res->getCacheCode(),
           'bundleUrl' => \Civi::service('asset_builder')->getUrl('angular-modules.json', $assetParams),
         ),
@@ -96,6 +97,7 @@ class Main extends \CRM_Core_Page {
     });
 
     $this->res->addScriptFile('civicrm', 'bower_components/angular/angular.min.js', 100, $this->region, FALSE);
+    $this->res->addScriptFile('civicrm', 'js/crm.angular.js', 101, $this->region, FALSE);
 
     $headOffset = 0;
     $config = \CRM_Core_Config::singleton();

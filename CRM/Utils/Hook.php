@@ -2075,7 +2075,12 @@ abstract class CRM_Utils_Hook {
    * EXPERIMENTAL: This hook allows one to register additional Angular modules
    *
    * @param array $angularModules
-   *   List of modules.
+   *   List of modules. Each module defines:
+   *    - ext: string, the CiviCRM extension which hosts the files.
+   *    - js: array, list of JS files or globs.
+   *    - css: array, list of CSS files or globs.
+   *    - partials: array, list of base-dirs containing HTML.
+   *    - requires: array, list of required Angular modules.
    * @return null
    *   the return value is ignored
    *
@@ -2090,6 +2095,7 @@ abstract class CRM_Utils_Hook {
    *     'js' => array('js/part1.js', 'js/part2.js'),
    *     'css' => array('css/myAngularModule.css'),
    *     'partials' => array('partials/myBigAngularModule'),
+   *     'requires' => array('otherModuleA', 'otherModuleB'),
    *   );
    * }
    * @endcode

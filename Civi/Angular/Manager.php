@@ -262,6 +262,7 @@ class Manager {
               break;
 
             case 'settings':
+            case 'requires':
               if (!empty($module[$resType])) {
                 $result[$moduleName] = $module[$resType];
               }

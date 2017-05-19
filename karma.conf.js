@@ -1,3 +1,21 @@
+var cv = require('civicrm-cv')({mode: 'sync'});
+var _CV = cv('vars:show');
+var cmd =
+  'CRM_Core_BAO_ConfigSetting::enableComponent("CiviCase");' +
+  'global $civicrm_root;' +
+  '$f = CRM_Utils_File::addTrailingSlash($civicrm_root)."tmp/karma.cv.js";' +
+  'mkdir(dirname($f), 0777, TRUE);' +
+  '$a=Civi::service("angular");' +
+  '$data = "var CRM = CRM || {}; CRM.angular =";' +
+  '$data .= json_encode(array(' +
+  '   "modules" => array_keys($a->getModules()),' +
+  '   "requires" => $a->getResources(array_keys($a->getModules()), "requires","requires"),' +
+  '));' +
+  '$data .= ";";' +
+  'file_put_contents($f, $data);' +
+  'return $f;';
+var angularTempFile = cv(['php:eval', '-U', _CV.ADMIN_USER, cmd]);
+
 module.exports = function(config) {
   config.set({
     autoWatch: true,
@@ -15,6 +33,8 @@ module.exports = function(config) {
       'packages/jquery/plugins/jquery.timeentry.js',
       'js/Common.js',
       'bower_components/angular/angular.js',
+      'js/crm.angular.js',
+      angularTempFile,
       'bower_components/angular-file-upload/angular-file-upload.js',
       'bower_components/angular-jquery-dialog-service/dialog-service.js',
       'bower_components/angular-route/angular-route.js',
@@ -22,7 +42,6 @@ module.exports = function(config) {
       'bower_components/angular-ui-sortable/sortable.js',
       'bower_components/angular-ui-utils/ui-utils.js',
       'bower_components/angular-unsavedChanges/dist/unsavedChanges.js',
-      'tests/karma/modules.js',
       'js/crm.ajax.js',
       'ang/*.js',
       'ang/**/*.js',
