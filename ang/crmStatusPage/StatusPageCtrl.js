@@ -16,13 +16,13 @@
             $scope.statuses = results[results.length - 1].values;
             results.forEach(function(result) {
               if (result.is_error) {
-                var error_message = result.error_message;
+                var error_message = ts('result.error_message');
                 if (typeof(result.debug_information) !== 'undefined') {
                   error_message += '<div class="status-debug-information">' +
-                      '<b>Debug information:</b><br>' +
+                      '<b>' + ts('Debug information') + ':</b><br>' +
                       result.debug_information + '</div>';
                 }
-                CRM.alert(error_message, 'API error', 'error');
+                CRM.alert(error_message, ts('API error'), 'error');
                 }
               });
             $('#crm-status-list').unblock();
