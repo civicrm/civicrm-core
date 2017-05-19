@@ -2720,7 +2720,9 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $activities = CRM_Activity_BAO_Activity::getContactActivity($this->_individualId);
     $this->assertEquals(3, count($activities));
     $activityNames = array_count_values(CRM_Utils_Array::collect('activity_name', $activities));
+    // record two activities before and after completing payment for Event registration
     $this->assertEquals(2, $activityNames['Event Registration']);
+    // update the original 'Contribution' activity created after completing payment
     $this->assertEquals(1, $activityNames['Contribution']);
 
     $mut->checkMailLog(array(
