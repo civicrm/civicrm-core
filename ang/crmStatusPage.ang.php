@@ -11,4 +11,5 @@ return array(
   'css' => array('ang/crmStatusPage.css'),
   'partials' => array('ang/crmStatusPage'),
   'settings' => array(),
+  'requires' => array('crmUi', 'crmUtil', 'ngRoute'),
 );

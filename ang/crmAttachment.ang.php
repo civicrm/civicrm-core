@@ -11,4 +11,5 @@ return array(
   'settings' => array(
     'token' => \CRM_Core_Page_AJAX_Attachment::createToken(),
   ),
+  'requires' => array('angularFileUpload'),
 );

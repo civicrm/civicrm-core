@@ -7,4 +7,5 @@ return array(
   'ext' => 'civicrm',
   'js' => array('ang/crmExample.js'),
   'partials' => array('ang/crmExample'),
+  'requires' => array('crmUtil', 'ngRoute', 'ui.utils', 'crmUi'),
 );

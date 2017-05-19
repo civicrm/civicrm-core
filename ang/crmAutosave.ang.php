@@ -6,4 +6,5 @@
 return array(
   'ext' => 'civicrm',
   'js' => array('ang/crmAutosave.js'),
+  'requires' => array('crmUtil'),
 );

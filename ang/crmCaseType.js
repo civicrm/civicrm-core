@@ -1,6 +1,6 @@
 (function(angular, $, _) {
 
-  var crmCaseType = angular.module('crmCaseType', ['ngRoute', 'ui.utils', 'crmUi', 'unsavedChanges', 'crmUtil']);
+  var crmCaseType = angular.module('crmCaseType', CRM.angRequires('crmCaseType'));
 
   // Note: This template will be passed to cloneDeep(), so don't put any funny stuff in here!
   var newCaseTypeTemplate = {

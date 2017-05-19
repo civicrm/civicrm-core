@@ -6,4 +6,5 @@
 return array(
   'ext' => 'civicrm',
   'js' => array('ang/crmUtil.js'),
+  'requires' => array(),
 );

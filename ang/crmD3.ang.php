@@ -12,4 +12,5 @@ return array(
     'ang/crmD3.js',
     'bower_components/d3/d3.min.js',
   ),
+  'requires' => array(),
 );
