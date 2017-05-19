@@ -800,9 +800,9 @@ WHERE ft.is_payment = 1
     if (!$membershipID && $contributionID) {
       $membershipID = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipPayment', $contributionID, 'membership_id', 'contribution_id');
     }
-    // consider revenue_recognition_date as the recieve date or current date
-    $params['revenue_recognition_date'] = CRM_Utils_Array::value('receive_date', $params, date('Ymd'));
     if ($membershipID) {
+      // consider revenue_recognition_date as the recieve date or current date
+      $params['revenue_recognition_date'] = CRM_Utils_Array::value('receive_date', $params, date('Ymd'));
       $params['membership_id'] = $membershipID;
     }
   }
