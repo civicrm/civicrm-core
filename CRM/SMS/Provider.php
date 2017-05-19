@@ -203,9 +203,17 @@ INNER JOIN civicrm_mailing_job mj ON mj.mailing_id = m.id AND mj.id = %1";
    * @throws CRM_Core_Exception
    */
   public function processInbound($from, $body, $to = NULL, $trackID = NULL) {
-    $formatFrom = $this->formatPhone($this->stripPhone($from), $like, "like");
-    $escapedFrom = CRM_Utils_Type::escape($formatFrom, 'String');
-    $fromContactID = CRM_Core_DAO::singleValueQuery('SELECT contact_id FROM civicrm_phone JOIN civicrm_contact ON civicrm_contact.id = civicrm_phone.contact_id WHERE !civicrm_contact.is_deleted AND phone LIKE "%' . $escapedFrom . '"');
+    $fromContactID = NULL;
+    $toContactID = NULL;
+    // call hook_civicrm_inboundSMS
+    CRM_Utils_Hook::inboundSMS($from, $fromContactID, $to, $toContactID, $body, $trackID);
+
+    if (!$fromContactID) {
+      // find sender by phone number if $fromContactID not set by hook
+      $formatFrom = $this->formatPhone($this->stripPhone($from), $like, "like");
+      $escapedFrom = CRM_Utils_Type::escape($formatFrom, 'String');
+      $fromContactID = CRM_Core_DAO::singleValueQuery('SELECT contact_id FROM civicrm_phone JOIN civicrm_contact ON civicrm_contact.id = civicrm_phone.contact_id WHERE !civicrm_contact.is_deleted AND phone LIKE "%' . $escapedFrom . '"');
+    }
 
     if (!$fromContactID) {
       // unknown mobile sender -- create new contact
@@ -236,12 +244,15 @@ INNER JOIN civicrm_mailing_job mj ON mj.mailing_id = m.id AND mj.id = %1";
       $fromContactID = $fromContact->id;
     }
 
-    if ($to) {
-      $to = CRM_Utils_Type::escape($to, 'String');
-      $toContactID = CRM_Core_DAO::singleValueQuery('SELECT contact_id FROM civicrm_phone JOIN civicrm_contact ON civicrm_contact.id = civicrm_phone.contact_id WHERE !civicrm_contact.is_deleted AND phone LIKE "%' . $to . '"');
-    }
-    else {
-      $toContactID = $fromContactID;
+    if (!($toContactID)) {
+      // find recipient if $toContactID not set by hook
+      if ($to) {
+        $to = CRM_Utils_Type::escape($to, 'String');
+        $toContactID = CRM_Core_DAO::singleValueQuery('SELECT contact_id FROM civicrm_phone JOIN civicrm_contact ON civicrm_contact.id = civicrm_phone.contact_id WHERE !civicrm_contact.is_deleted AND phone LIKE "%' . $to . '"');
+      }
+      else {
+        $toContactID = $fromContactID;
+      }
     }
 
     if ($fromContactID) {
