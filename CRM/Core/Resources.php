@@ -311,6 +311,7 @@ class CRM_Core_Resources {
     foreach ($this->settingsFactories as $callable) {
       $result = $this->mergeSettings($result, $callable());
     }
+    CRM_Utils_Hook::alterResourceSettings($result);
     return $result;
   }
 

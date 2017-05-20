@@ -2072,6 +2072,19 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
+   * Modify the CRM_Core_Resources settings data.
+   *
+   * @param array $data
+   * @see CRM_Core_Resources::addSetting
+   */
+  public static function alterResourceSettings(&$data) {
+    $event = \Civi\Core\Event\GenericHookEvent::create(array(
+      'data' => &$data,
+    ));
+    Civi::dispatcher()->dispatch('hook_civicrm_alterResourceSettings', $event);
+  }
+
+  /**
    * EXPERIMENTAL: This hook allows one to register additional Angular modules
    *
    * @param array $angularModules
