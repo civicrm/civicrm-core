@@ -82,6 +82,13 @@
     {/if}
     {if $contributionMode}
       <tr class="crm-contribution-form-block-payment_processor_id"><td class="label nowrap">{$form.payment_processor_id.label}<span class="crm-marker"> * </span></td><td>{$form.payment_processor_id.html}</td></tr>
+    {else}
+      <tr class="crm-contribution-form-block-receive_date">
+        <td class="label">{$form.receive_date.label}</td>
+        <td {$valueStyle}>{include file="CRM/common/jcalendar.tpl" elementName=receive_date}<br />
+          <span class="description">{ts}The date this contribution was received.{/ts}</span>
+        </td>
+      </tr>
     {/if}
     <tr class="crm-contribution-form-block-contribution_type_id crm-contribution-form-block-financial_type_id">
       <td class="label">{$form.financial_type_id.label}</td><td{$valueStyle}>{$form.financial_type_id.html}&nbsp;
@@ -241,55 +248,57 @@
   </table>
 
   {if !$contributionMode}
-    <fieldset class="payment-details_group">
-      <legend>
-        {ts}Payment Details{/ts}
-      </legend>
-        <table class="form-layout-compressed" >
-          <tr class="crm-contribution-form-block-payment_instrument_id">
-            <td class="label">{$form.payment_instrument_id.label}</td>
-            <td {$valueStyle}>{$form.payment_instrument_id.html} {help id="payment_instrument_id"}</td>
-            </td>
-          </tr>
-          {if $showCheckNumber || !$isOnline}
-            <tr id="checkNumber" class="crm-contribution-form-block-check_number">
-              <td class="label">{$form.check_number.label}</td>
-              <td>{$form.check_number.html}</td>
-            </tr>
-          {/if}
-          <tr class="crm-contribution-form-block-trxn_id">
-            <td class="label">{$form.trxn_id.label}</td>
-            <td {$valueStyle}>{$form.trxn_id.html} {help id="id-trans_id"}</td>
-          </tr>
-          {if $email and $outBound_option != 2}
-            <tr class="crm-contribution-form-block-is_email_receipt">
-              <td class="label">
-                {$form.is_email_receipt.label}</td><td>{$form.is_email_receipt.html}&nbsp;
-                <span class="description">{ts 1=$email}Automatically email a receipt for this payment to %1?{/ts}</span>
+      <div class="crm-accordion-wrapper crm-accordion_title-accordion crm-accordion-processed payment-details_group">
+        <div class="crm-accordion-header">
+          {ts}Payment Details{/ts}
+        </div>
+        <div class="crm-accordion-body">
+        {if $contribID && $payments}
+          {include file="CRM/Contribute/Form/PaymentInfoBlock.tpl"}
+        {else}
+          <table class="form-layout-compressed" >
+            <tr class="crm-contribution-form-block-payment_instrument_id">
+              <td class="label">{$form.payment_instrument_id.label}</td>
+              <td {$valueStyle}>{$form.payment_instrument_id.html} {help id="payment_instrument_id"}</td>
               </td>
             </tr>
-          {elseif $context eq 'standalone' and $outBound_option != 2 }
-            <tr id="email-receipt" style="display:none;" class="crm-contribution-form-block-is_email_receipt">
-              <td class="label">{$form.is_email_receipt.label}</td>
-              <td>{$form.is_email_receipt.html} <span class="description">{ts}Automatically email a receipt for this payment to {/ts}<span id="email-address"></span>?</span>
+            <tr class="crm-contribution-form-block-trxn_id">
+              <td class="label">{$form.trxn_id.label}</td>
+              <td {$valueStyle}>{$form.trxn_id.html} {help id="id-trans_id"}</td>
+            </tr>
+            {if $email and $outBound_option != 2}
+              <tr class="crm-contribution-form-block-is_email_receipt">
+                <td class="label">
+                  {$form.is_email_receipt.label}</td><td>{$form.is_email_receipt.html}&nbsp;
+                  <span class="description">{ts 1=$email}Automatically email a receipt for this payment to %1?{/ts}</span>
+                </td>
+              </tr>
+            {elseif $context eq 'standalone' and $outBound_option != 2 }
+              <tr id="email-receipt" style="display:none;" class="crm-contribution-form-block-is_email_receipt">
+                <td class="label">{$form.is_email_receipt.label}</td>
+                <td>{$form.is_email_receipt.html} <span class="description">{ts}Automatically email a receipt for this payment to {/ts}<span id="email-address"></span>?</span>
+                </td>
+              </tr>
+            {/if}
+            <tr id="receiptDate" class="crm-contribution-form-block-receipt_date">
+              <td class="label">{$form.receipt_date.label}</td>
+              <td>{include file="CRM/common/jcalendar.tpl" elementName=receipt_date}<br />
+                <span class="description">{ts}Date that a receipt was sent to the contributor.{/ts}</span>
               </td>
             </tr>
-          {/if}
-          <tr id="receiptDate" class="crm-contribution-form-block-receipt_date">
-            <td class="label">{$form.receipt_date.label}</td>
-            <td>{include file="CRM/common/jcalendar.tpl" elementName=receipt_date}<br />
-              <span class="description">{ts}Date that a receipt was sent to the contributor.{/ts}</span>
-            </td>
-          </tr>
-          <tr id="fromEmail" class="crm-contribution-form-block-receipt_date" style="display:none;">
-            <td class="label">{$form.from_email_address.label}</td>
-            <td>{$form.from_email_address.html}</td>
-          </tr>
-        </table>
-      </fieldset>
+            <tr id="fromEmail" class="crm-contribution-form-block-receipt_date" style="display:none;">
+              <td class="label">{$form.from_email_address.label}</td>
+              <td>{$form.from_email_address.html}</td>
+            </tr>
+          </table>
+        {/if}
+      </div>
+    </div>
   {/if}
 
-  {include file='CRM/Core/BillingBlockWrapper.tpl'}
+  {if $contributionMode OR !$payments}
+    {include file='CRM/Core/BillingBlockWrapper.tpl'}
+  {/if}
 
     <!-- start of soft credit -->
     {if !$payNow}

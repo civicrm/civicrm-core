@@ -248,8 +248,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       return;
     }
 
-    $this->assign('showCheckNumber', TRUE);
-
     $this->_fromEmails = CRM_Core_BAO_Email::getFromEmail();
 
     if (in_array('CiviPledge', CRM_Core_Config::singleton()->enableComponents) && !$this->_formType) {
@@ -637,10 +635,14 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $paymentInstrument = FALSE;
     if (!$this->_mode) {
       $checkPaymentID = array_search('Check', CRM_Contribute_PseudoConstant::paymentInstrument('name'));
+
+      // since we are showing payments info on edit mode instead of payment details block,
+      //  payment_instrument isn't required field.
+      $required = $this->_id ? FALSE : TRUE;
       $paymentInstrument = $this->add('select', 'payment_instrument_id',
         ts('Payment Method'),
         array('' => ts('- select -')) + CRM_Contribute_PseudoConstant::paymentInstrument(),
-        TRUE, array('onChange' => "return showHideByValue('payment_instrument_id','{$checkPaymentID}','checkNumber','table-row','select',false);")
+        $required, array('onChange' => "return showHideByValue('payment_instrument_id','{$checkPaymentID}','checkNumber','table-row','select',false);")
       );
     }
 
@@ -731,6 +733,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
           }
           break;
       }
+      $paymentInfo = CRM_Contribute_BAO_Contribution::getPaymentInfo($this->_id, 'contribution', TRUE);
+      $this->assign('payments', $paymentInfo['transaction']);
     }
     else {
       unset($status[CRM_Utils_Array::key('Refunded', $statusName)]);
