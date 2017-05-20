@@ -594,10 +594,21 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
     else {
       CRM_Core_Error::fatal("Could not locate exporter: $exporterClass");
     }
+    $export = array();
     foreach ($batchIds as $batchId) {
+      // export only batches whose status is set to Exported.
+      $result = civicrm_api3('Batch', 'getcount', array(
+        'id' => $batchId,
+        'status_id' => "Exported",
+      ));
+      if (!$result) {
+        continue;
+      }
       $export[$batchId] = $exporter->generateExportQuery($batchId);
     }
-    $exporter->makeExport($export);
+    if ($export) {
+      $exporter->makeExport($export);
+    }
   }
 
   /**
