@@ -141,6 +141,9 @@ abstract class CRM_Financial_BAO_ExportFormat {
   }
 
   public function initiateDownload() {
+    if (!$this->_isDownloadFile) {
+      return NULL;
+    }
     $config = CRM_Core_Config::singleton();
     // zip files if more than one.
     if (count($this->_downloadFile) > 1) {
