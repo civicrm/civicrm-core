@@ -302,7 +302,7 @@ class CRM_Report_Form_Contribute_DeferredRevenue extends CRM_Report_Form {
         ON entity_financial_trxn_item.entity_id = {$this->_aliases['civicrm_financial_item']}.id
         AND entity_financial_trxn_item.entity_table = 'civicrm_financial_item'
       INNER JOIN civicrm_financial_trxn {$this->_aliases['civicrm_financial_trxn_1']}
-        ON {$this->_aliases['civicrm_financial_trxn_1']}.from_financial_account_id = {$this->_aliases['civicrm_financial_account']}.id
+        ON {$this->_aliases['civicrm_financial_trxn_1']}.to_financial_account_id = {$this->_aliases['civicrm_financial_account']}.id
         AND {$this->_aliases['civicrm_financial_trxn_1']}.id =  entity_financial_trxn_item.financial_trxn_id 
       INNER JOIN civicrm_entity_financial_trxn financial_trxn_contribution
         ON financial_trxn_contribution.financial_trxn_id = {$this->_aliases['civicrm_financial_trxn_1']}.id
