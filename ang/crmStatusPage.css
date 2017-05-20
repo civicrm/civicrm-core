@@ -75,3 +75,7 @@
   z-index: 99999;
   font-weight: normal;
 }
+
+.status-debug-information {
+  font-size: smaller;
+}
