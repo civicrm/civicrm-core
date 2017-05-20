@@ -56,17 +56,25 @@ class CRM_Financial_Form_Payment extends CRM_Core_Form {
   public function preProcess() {
     parent::preProcess();
 
-    $this->_values['custom_pre_id'] = CRM_Utils_Request::retrieve('pre_profile_id', 'Integer', $this);
+    $this->_values['financial_trxn_id'] = CRM_Utils_Request::retrieve('financial_trxn_id', 'Integer', $this);
 
-    $this->_paymentProcessorID = CRM_Utils_Request::retrieve('processor_id', 'Integer', CRM_Core_DAO::$_nullObject,
-      TRUE);
-    $this->currency = CRM_Utils_Request::retrieve('currency', 'String', CRM_Core_DAO::$_nullObject,
-      TRUE);
+    if (!empty($this->_values['financial_trxn_id'])) {
+      $this->getFinancialInfo($this->_values['financial_trxn_id']);
+      $this->isBackOffice = TRUE;
+    }
+    else {
+      $this->_values['custom_pre_id'] = CRM_Utils_Request::retrieve('pre_profile_id', 'Integer', $this);
 
-    $this->paymentInstrumentID = CRM_Utils_Request::retrieve('payment_instrument_id', 'Integer');
-    $this->isBackOffice = CRM_Utils_Request::retrieve('is_back_office', 'Integer');
+      $this->_paymentProcessorID = CRM_Utils_Request::retrieve('processor_id', 'Integer', CRM_Core_DAO::$_nullObject,
+        TRUE);
+      $this->currency = CRM_Utils_Request::retrieve('currency', 'String', CRM_Core_DAO::$_nullObject,
+        TRUE);
 
-    $this->assignBillingType();
+      $this->paymentInstrumentID = CRM_Utils_Request::retrieve('payment_instrument_id', 'Integer');
+      $this->isBackOffice = CRM_Utils_Request::retrieve('is_back_office', 'Integer');
+
+      $this->assignBillingType();
+    }
 
     $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($this->_paymentProcessorID);
 
@@ -99,8 +107,26 @@ class CRM_Financial_Form_Payment extends CRM_Core_Form {
    * Set default values for the form.
    */
   public function setDefaultValues() {
-    $contactID = $this->getContactID();
-    CRM_Core_Payment_Form::setDefaultValues($this, $contactID);
+    if (!empty($this->_values['financial_trxn_id'])) {
+      $financialTrxn = civicrm_api3('FinancialTrxn', 'Getsingle', array('id' => $this->_values['financial_trxn_id']));
+      foreach (array('check_number', 'credit_card_type', 'pan_truncation') as $fieldName) {
+        if ($fieldName == 'credit_card_type' && !empty($financialTrxn['card_type_id'])) {
+          $this->_defaults['credit_card_type'] = CRM_Core_PseudoConstant::getName(
+            'CRM_Financial_DAO_FinancialTrxn',
+            'card_type_id',
+            $financialTrxn['card_type_id']
+          );
+        }
+        else {
+          $this->_defaults[$fieldName] = CRM_Utils_Array::value($fieldName, $financialTrxn);
+        }
+      }
+    }
+    else {
+      $contactID = $this->getContactID();
+      CRM_Core_Payment_Form::setDefaultValues($this, $contactID);
+    }
+
     return $this->_defaults;
   }
 
@@ -108,17 +134,26 @@ class CRM_Financial_Form_Payment extends CRM_Core_Form {
    * Add JS to show icons for the accepted credit cards.
    *
    * @param int $paymentProcessorID
+   * @param string $region
    */
-  public static function addCreditCardJs($paymentProcessorID = NULL) {
+  public static function addCreditCardJs($paymentProcessorID = NULL, $region = 'billing-block') {
     $creditCards = CRM_Financial_BAO_PaymentProcessor::getCreditCards($paymentProcessorID);
     $creditCardTypes = CRM_Core_Payment_Form::getCreditCardCSSNames($creditCards);
     CRM_Core_Resources::singleton()
       // CRM-20516: add BillingBlock script on billing-block region
       //  to support this feature in payment form snippet too.
-      ->addScriptFile('civicrm', 'templates/CRM/Core/BillingBlock.js', 10, 'billing-block', FALSE)
+      ->addScriptFile('civicrm', 'templates/CRM/Core/BillingBlock.js', 10, $region, FALSE)
       // workaround for CRM-13634
       // ->addSetting(array('config' => array('creditCardTypes' => $creditCardTypes)));
-      ->addScript('CRM.config.creditCardTypes = ' . json_encode($creditCardTypes) . ';', '-9999', 'billing-block');
+      ->addScript('CRM.config.creditCardTypes = ' . json_encode($creditCardTypes) . ';', '-9999', $region);
+  }
+
+  public function getFinancialInfo($financialTrxnID) {
+    $financialTrxn = civicrm_api3('FinancialTrxn', 'Getsingle', array('id' => $financialTrxnID));
+
+    $this->_paymentProcessorID = CRM_Utils_Array::value('payment_processor_id', $financialTrxn, 0);
+    $this->currency = $financialTrxn['currency'];
+    $this->paymentInstrumentID = $financialTrxn['payment_instrument_id'];;
   }
 
 }
