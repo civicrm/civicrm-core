@@ -18,3 +18,6 @@ fi
 if ! grep -q '@STREAM_CRYPTO_METHOD_TLSv1_1_CLIENT' vendor/pear/net_smtp/Net/SMTP.php; then
 patch vendor/pear/net_smtp/Net/SMTP.php < tools/scripts/composer/patches/net-smtp-tls-patch.txt
 fi
+if ! grep -q 'function __construct' vendor/pear/net_smtp/Net/SMTP.php; then
+patch vendor/pear/net_smtp/Net/SMTP.php < tools/scripts/composer/patches/net-smtp-php7-patch.txt
+fi
