@@ -16,7 +16,8 @@
     "symfony/finder": "2.3.*",
     "tecnickcom/tcpdf" : "6.2.*",
     "totten/ca-config": "~13.02",
-    "civicrm/civicrm-cxn-rpc": "~0.15.12.04"
+    "civicrm/civicrm-cxn-rpc": "~0.15.12.04",
+    "pear/Auth_SASL": "1.1.0"
   },
   "scripts": {
     "post-install-cmd": [
