@@ -1552,6 +1552,7 @@ class Installer extends InstallRequirements {
 
         include_once "./core/includes/bootstrap.inc";
         include_once "./core/includes/unicode.inc";
+        include_once "./core/includes/config.inc";
 
         backdrop_bootstrap(BACKDROP_BOOTSTRAP_FULL);
 
