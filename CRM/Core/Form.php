@@ -132,6 +132,13 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   protected $_is_pay_later_enabled;
 
   /**
+   * An array containing attributes to programmatically create help icons.
+   *
+   * @var array
+   */
+  protected $_help;
+
+  /**
    * The renderer used for this form
    *
    * @var object
@@ -2353,6 +2360,19 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     $name = trim($name);
     $this->assign('billingName', $name);
     return $name;
+  }
+
+  /**
+   * Add an element to the $_help array, which is used to programmatically
+   * construct help icon markup.
+   *
+   * @param string $name
+   * @param string $id
+   * @param string $hlpFile
+   */
+  protected function addHelp($name, $id, $hlpFile = NULL) {
+    $this->_help[$name]['id'] = $id;
+    $this->_help[$name]['hlpFile'] = $hlpFile;
   }
 
 }
