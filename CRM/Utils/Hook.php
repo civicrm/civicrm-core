@@ -2299,4 +2299,15 @@ abstract class CRM_Utils_Hook {
     );
   }
 
+  /**
+   * This hook is called before an inbound SMS is processed.
+   *
+   * @param CRM_SMS_Message Object $message
+   *   An SMS message recieved
+   * @return mixed
+   */
+  public static function inboundSMS(&$message) {
+    return self::singleton()->invoke(array('message'), $message, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_inboundSMS');
+  }
+
 }
