@@ -664,6 +664,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
    * @return CRM_Core_DAO
    */
   public static function getBatchFinancialItems($entityID, $returnValues, $notPresent = NULL, $params = NULL, $getCount = FALSE) {
+    $limit = NULL;
     if (!$getCount) {
       if (!empty($params['rowCount']) &&
         $params['rowCount'] > 0
@@ -770,16 +771,25 @@ LEFT JOIN civicrm_contribution_soft ON civicrm_contribution_soft.contribution_id
       }
     }
 
-    $sql = "
-SELECT {$select}
-FROM   {$from}
-WHERE  {$where}
-       {$orderBy}
-";
+    $query = array(
+      'select' => $select,
+      'from' => $from,
+      'where' => $where,
+      'orderBy' => $orderBy,
+      'groupBy' => '',
+      'limit' => $limit,
+    );
 
-    if (isset($limit)) {
-      $sql .= "{$limit}";
-    }
+    CRM_Utils_Hook::alterBatchTransactionListQuery($query, $entityID, $params, $notPresent);
+
+    $sql = "
+      SELECT {$query['select']}
+      FROM   {$query['from']}
+      WHERE  {$query['where']}
+             {$query['groupBy']}
+             {$query['orderBy']}
+             {$query['limit']}
+    ";
 
     $result = CRM_Core_DAO::executeQuery($sql);
     return $result;
