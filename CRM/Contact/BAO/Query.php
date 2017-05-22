@@ -4210,21 +4210,23 @@ civicrm_relationship.is_permission_a_b = 0
 
     $dateValueLow = $this->getWhereValues('relation_active_period_date_low', $grouping);
     $dateValueHigh = $this->getWhereValues('relation_active_period_date_high', $grouping);
+    $dateValueLowFormated = $dateValueHighFormated = NULL;
     if (!empty($dateValueLow) && !empty($dateValueHigh)) {
       $dateValueLowFormated = date('Ymd', strtotime($dateValueLow[2]));
       $dateValueHighFormated = date('Ymd', strtotime($dateValueHigh[2]));
-      $where[$grouping][] = self::getRelationshipActivePeriodClauses($dateValueLowFormated, $dateValueHighFormated, TRUE);
       $this->_qill[$grouping][] = (ts('Relationship was active between')) . " " . CRM_Utils_Date::customFormat($dateValueLowFormated) . " and " . CRM_Utils_Date::customFormat($dateValueHighFormated);
     }
     elseif (!empty($dateValueLow)) {
       $dateValueLowFormated = date('Ymd', strtotime($dateValueLow[2]));
-      $where[$grouping][] = self::getRelationshipActivePeriodClauses($dateValueLowFormated, NULL, TRUE);
       $this->_qill[$grouping][] = (ts('Relationship was active after')) . " " . CRM_Utils_Date::customFormat($dateValueLowFormated);
     }
     elseif (!empty($dateValueHigh)) {
       $dateValueHighFormated = date('Ymd', strtotime($dateValueHigh[2]));
-      $where[$grouping][] = self::getRelationshipActivePeriodClauses(NULL, $dateValueHighFormated, TRUE);
       $this->_qill[$grouping][] = (ts('Relationship was active before')) . " " . CRM_Utils_Date::customFormat($dateValueHighFormated);
+    }
+
+    if ($activePeriodClauses = self::getRelationshipActivePeriodClauses($dateValueLowFormated, $dateValueHighFormated, TRUE)) {
+      $where[$grouping][] = $activePeriodClauses;
     }
   }
 

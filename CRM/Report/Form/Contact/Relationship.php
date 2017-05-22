@@ -815,14 +815,8 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
       $to = ($type == CRM_Utils_Type::T_DATE) ? substr($to, 0, 8) : $to;
     }
 
-    if ($from && $to) {
+    if ($from || $to) {
       return CRM_Contact_BAO_Query::getRelationshipActivePeriodClauses($from, $to, FALSE);
-    }
-    elseif ($from) {
-      return CRM_Contact_BAO_Query::getRelationshipActivePeriodClauses($from, NULL, FALSE);
-    }
-    elseif ($to) {
-      return CRM_Contact_BAO_Query::getRelationshipActivePeriodClauses(NULL, $to, FALSE);
     }
     return NULL;
   }
