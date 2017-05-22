@@ -2185,6 +2185,7 @@ WHERE (entity_table = 'civicrm_participant' AND entity_id = {$participantId} AND
         'from_financial_account_id' => NULL,
         'to_financial_account_id' => $toFinancialAccount,
         'total_amount' => $balanceAmt,
+        'net_amount' => $balanceAmt,
         'status_id' => $completedStatusId,
         'payment_instrument_id' => $updatedContribution->payment_instrument_id,
         'contribution_id' => $updatedContribution->id,
