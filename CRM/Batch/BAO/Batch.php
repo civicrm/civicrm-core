@@ -51,25 +51,23 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
    * Create a new batch.
    *
    * @param array $params
-   * @param array $ids
-   *   Associated array of ids.
-   * @param string $context
-   *   String.
    *
    * @return object
    *   $batch batch object
    */
-  public static function create(&$params, $ids = NULL, $context = NULL) {
-    if (empty($params['id'])) {
+  public static function create(&$params) {
+    $op = 'edit';
+    $batchId = CRM_Utils_Array::value('id', $params);
+    if (!$batchId) {
+      $op = 'create';
       $params['name'] = CRM_Utils_String::titleToVar($params['title']);
     }
-
+    CRM_Utils_Hook::pre($op, 'Batch', $batchId, $params);
     $batch = new CRM_Batch_DAO_Batch();
     $batch->copyValues($params);
-    if ($context == 'financialBatch' && !empty($ids['batchID'])) {
-      $batch->id = $ids['batchID'];
-    }
     $batch->save();
+
+    CRM_Utils_Hook::post($op, 'Batch', $batch->id, $batch);
 
     return $batch;
   }
@@ -170,9 +168,11 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
    */
   public static function deleteBatch($batchId) {
     // delete entry from batch table
+    CRM_Utils_Hook::pre('delete', 'Batch', $batchId, CRM_Core_DAO::$_nullArray);
     $batch = new CRM_Batch_DAO_Batch();
     $batch->id = $batchId;
     $batch->delete();
+    CRM_Utils_Hook::post('delete', 'Batch', $batch->id, $batch);
     return TRUE;
   }
 
