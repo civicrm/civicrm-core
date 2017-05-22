@@ -177,12 +177,10 @@ class CRM_Admin_Form_Preferences_Contribute extends CRM_Admin_Form_Preferences {
     $defaults = Civi::settings()->get('contribution_invoice_settings');
     //CRM-16691: Changes made related to settings of 'CVV'.
     foreach (array('cvv_backoffice_required') as $setting) {
-      $settingMetaData = civicrm_api3('setting', 'getfields', array('name' => $setting));
       $defaults[$setting] = civicrm_api3('setting', 'getvalue',
         array(
           'name' => $setting,
           'group' => CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,
-          'default_value' => CRM_Utils_Array::value('default', $settingMetaData['values'][$setting]),
         )
       );
     }
