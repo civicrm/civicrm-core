@@ -274,7 +274,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
    */
   public function testGetMatches() {
     $this->setupMatchData();
-    $pairs = CRM_Dedupe_Merger::getDuplicatePairs(
+    $pairs = CRM_Dedupe_Finder::getDuplicatePairs(
       1,
       NULL,
       TRUE,
@@ -311,7 +311,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
     $this->setupMatchData();
     $ruleGroups = $this->callAPISuccessGetSingle('RuleGroup', array('contact_type' => 'Organization', 'used' => 'Supervised'));
 
-    $pairs = CRM_Dedupe_Merger::getDuplicatePairs(
+    $pairs = CRM_Dedupe_Finder::getDuplicatePairs(
       $ruleGroups['id'],
       NULL,
       TRUE,
@@ -385,7 +385,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
 
     $this->callAPISuccess('GroupContact', 'create', array('group_id' => $groupID, 'contact_id' => $this->contacts[4]['id']));
 
-    $pairs = CRM_Dedupe_Merger::getDuplicatePairs(
+    $pairs = CRM_Dedupe_Finder::getDuplicatePairs(
       $ruleGroups['id'],
       $groupID,
       TRUE,
@@ -414,7 +414,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
 
     $this->callAPISuccess('GroupContact', 'create', array('group_id' => $groupID, 'contact_id' => $this->contacts[5]['id']));
     CRM_Core_DAO::executeQuery("DELETE FROM civicrm_prevnext_cache");
-    $pairs = CRM_Dedupe_Merger::getDuplicatePairs(
+    $pairs = CRM_Dedupe_Finder::getDuplicatePairs(
       $ruleGroups['id'],
       $groupID,
       TRUE,
@@ -463,7 +463,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
 
     $this->callAPISuccess('GroupContact', 'create', array('group_id' => $groupID, 'contact_id' => $this->contacts[3]['id']));
 
-    $pairs = CRM_Dedupe_Merger::getDuplicatePairs(
+    $pairs = CRM_Dedupe_Finder::getDuplicatePairs(
       1,
       $groupID,
       TRUE,

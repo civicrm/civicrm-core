@@ -603,7 +603,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
   public static function batchMerge($rgid, $gid = NULL, $mode = 'safe', $batchLimit = 1, $isSelected = 2, $criteria = array(), $checkPermissions = TRUE) {
     $redirectForPerformance = ($batchLimit > 1) ? TRUE : FALSE;
     $reloadCacheIfEmpty = (!$redirectForPerformance && $isSelected == 2);
-    $dupePairs = self::getDuplicatePairs($rgid, $gid, $reloadCacheIfEmpty, $batchLimit, $isSelected, '', ($mode == 'aggressive'), $criteria, $checkPermissions);
+    $dupePairs = CRM_Dedupe_Finder::getDuplicatePairs($rgid, $gid, $reloadCacheIfEmpty, $batchLimit, $isSelected, '', ($mode == 'aggressive'), $criteria, $checkPermissions);
 
     $cacheParams = array(
       'cache_key_string' => self::getMergeCacheKeyString($rgid, $gid, $criteria, $checkPermissions),
@@ -1861,41 +1861,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         'status_id' => 'Completed',
       ));
     }
-  }
-
-  /**
-   * Get Duplicate Pairs based on a rule for a group.
-   *
-   * @param int $rule_group_id
-   * @param int $group_id
-   * @param bool $reloadCacheIfEmpty
-   * @param int $batchLimit
-   * @param bool $isSelected
-   * @param array|string $orderByClause
-   * @param bool $includeConflicts
-   * @param array $criteria
-   *   Additional criteria to narrow down the merge group.
-   *
-   * @param bool $checkPermissions
-   *   Respect logged in user permissions.
-   *
-   * @return array
-   *    Array of matches meeting the criteria.
-   */
-  public static function getDuplicatePairs($rule_group_id, $group_id, $reloadCacheIfEmpty, $batchLimit, $isSelected, $orderByClause = '', $includeConflicts = TRUE, $criteria = array(), $checkPermissions = TRUE) {
-    $where = self::getWhereString($batchLimit, $isSelected);
-    $cacheKeyString = self::getMergeCacheKeyString($rule_group_id, $group_id, $criteria, $checkPermissions);
-    $join = self::getJoinOnDedupeTable();
-    $dupePairs = CRM_Core_BAO_PrevNextCache::retrieve($cacheKeyString, $join, $where, 0, 0, array(), $orderByClause, $includeConflicts);
-    if (empty($dupePairs) && $reloadCacheIfEmpty) {
-      // If we haven't found any dupes, probably cache is empty.
-      // Try filling cache and give another try. We don't need to specify include conflicts here are there will not be any
-      // until we have done some processing.
-      CRM_Core_BAO_PrevNextCache::refillCache($rule_group_id, $group_id, $cacheKeyString, $criteria, $checkPermissions);
-      $dupePairs = CRM_Core_BAO_PrevNextCache::retrieve($cacheKeyString, $join, $where, 0, 0, array(), $orderByClause, $includeConflicts);
-      return $dupePairs;
-    }
-    return $dupePairs;
   }
 
   /**

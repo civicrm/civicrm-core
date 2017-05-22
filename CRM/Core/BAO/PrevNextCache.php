@@ -213,7 +213,7 @@ WHERE  cacheKey     = %3 AND
    * Retrieve from prev-next cache.
    *
    * This function is used from a variety of merge related functions, although
-   * it would probably be good to converge on calling CRM_Dedupe_Merger::getDuplicatePairs.
+   * it would probably be good to converge on calling CRM_Dedupe_Finder::getDuplicatePairs.
    *
    * We seem to currently be storing stats in this table too & they might make more sense in
    * the main cache table.
@@ -352,57 +352,6 @@ WHERE (pn.cacheKey $op %1 OR pn.cacheKey $op %2)
       2 => array("{$cacheKey}_conflicts", 'String'),
     ) + $params;
     return (int) CRM_Core_DAO::singleValueQuery($query, $params, TRUE, FALSE);
-  }
-
-  /**
-   * Repopulate the cache of merge prospects.
-   *
-   * @param int $rgid
-   * @param int $gid
-   * @param NULL $cacheKeyString
-   * @param array $criteria
-   *   Additional criteria to filter by.
-   *
-   * @param bool $checkPermissions
-   *   Respect logged in user's permissions.
-   *
-   * @return bool
-   * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
-   */
-  public static function refillCache($rgid, $gid, $cacheKeyString, $criteria, $checkPermissions) {
-    if (!$cacheKeyString && $rgid) {
-      $cacheKeyString = CRM_Dedupe_Merger::getMergeCacheKeyString($rgid, $gid, $criteria, $checkPermissions);
-    }
-
-    if (!$cacheKeyString) {
-      return FALSE;
-    }
-
-    // 1. Clear cache if any
-    $sql = "DELETE FROM civicrm_prevnext_cache WHERE  cacheKey LIKE %1";
-    CRM_Core_DAO::executeQuery($sql, array(1 => array("{$cacheKeyString}%", 'String')));
-
-    // FIXME: we need to start using temp tables / queries here instead of arrays.
-    // And cleanup code in CRM/Contact/Page/DedupeFind.php
-
-    // 2. FILL cache
-    $foundDupes = array();
-    if ($rgid && $gid) {
-      $foundDupes = CRM_Dedupe_Finder::dupesInGroup($rgid, $gid);
-    }
-    elseif ($rgid) {
-      $contactIDs = array();
-      if (!empty($criteria)) {
-        $contacts = civicrm_api3('Contact', 'get', array_merge(array('options' => array('limit' => 0), 'return' => 'id'), $criteria['contact']));
-        $contactIDs = array_keys($contacts['values']);
-      }
-      $foundDupes = CRM_Dedupe_Finder::dupes($rgid, $contactIDs, $checkPermissions);
-    }
-
-    if (!empty($foundDupes)) {
-      CRM_Dedupe_Finder::parseAndStoreDupePairs($foundDupes, $cacheKeyString);
-    }
   }
 
   public static function cleanupCache() {
