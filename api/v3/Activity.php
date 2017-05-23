@@ -159,9 +159,11 @@ function civicrm_api3_activity_create($params) {
 
   if (isset($activityBAO->id)) {
     if ($case_id && !$createRevision) {
-      // If this is a brand new case activity we need to add this
-      $caseActivityParams = array('activity_id' => $activityBAO->id, 'case_id' => $case_id);
-      CRM_Case_BAO_Case::processCaseActivity($caseActivityParams);
+      // If this is a brand new case activity, add to case(s)
+      foreach ((array) $case_id as $singleCaseId) {
+        $caseActivityParams = array('activity_id' => $activityBAO->id, 'case_id' => $singleCaseId);
+        CRM_Case_BAO_Case::processCaseActivity($caseActivityParams);
+      }
     }
 
     _civicrm_api3_object_to_array($activityBAO, $activityArray[$activityBAO->id]);
@@ -471,7 +473,7 @@ function _civicrm_api3_activity_get_formatResult($params, $activities, $options)
         $dao = CRM_Core_DAO::executeQuery("SELECT activity_id, case_id FROM civicrm_case_activity WHERE activity_id IN (%1)",
           array(1 => array(implode(',', array_keys($activities)), 'String', CRM_Core_DAO::QUERY_FORMAT_NO_QUOTES)));
         while ($dao->fetch()) {
-          $activities[$dao->activity_id]['case_id'] = $dao->case_id;
+          $activities[$dao->activity_id]['case_id'][] = $dao->case_id;
         }
         break;
 

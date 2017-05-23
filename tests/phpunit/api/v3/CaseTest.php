@@ -327,7 +327,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
       'subject' => 'Test followup 123',
       'return' => array('case_id'),
     ));
-    $this->assertEquals($case['id'], $result['case_id']);
+    $this->assertContains($case['id'], $result['case_id']);
   }
 
   /**
