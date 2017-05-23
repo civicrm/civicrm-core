@@ -8,5 +8,5 @@ return array(
   'js' => array('ang/crmCxn.js', 'ang/crmCxn/*.js'),
   'css' => array('ang/crmCxn.css'),
   'partials' => array('ang/crmCxn'),
-  'requires' => array('crmUtil', 'ngRoute', 'ngSanitize', 'ui.utils', 'crmUi', 'dialogService'),
+  'requires' => array('crmUtil', 'ngRoute', 'ngSanitize', 'ui.utils', 'crmUi', 'dialogService', 'crmResource'),
 );

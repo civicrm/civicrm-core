@@ -14,5 +14,5 @@ return array(
   ),
   'css' => array('ang/crmMailing.css'),
   'partials' => array('ang/crmMailing'),
-  'requires' => array('crmUtil', 'crmAttachment', 'crmAutosave', 'ngRoute', 'ui.utils', 'crmUi', 'dialogService'),
+  'requires' => array('crmUtil', 'crmAttachment', 'crmAutosave', 'ngRoute', 'ui.utils', 'crmUi', 'dialogService', 'crmResource'),
 );

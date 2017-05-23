@@ -16,5 +16,5 @@ return array(
   'js' => array('ang/crmCaseType.js'),
   'css' => array('ang/crmCaseType.css'),
   'partials' => array('ang/crmCaseType'),
-  'requires' => array('ngRoute', 'ui.utils', 'crmUi', 'unsavedChanges', 'crmUtil'),
+  'requires' => array('ngRoute', 'ui.utils', 'crmUi', 'unsavedChanges', 'crmUtil', 'crmResource'),
 );
