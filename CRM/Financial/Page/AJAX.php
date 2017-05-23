@@ -165,8 +165,8 @@ class CRM_Financial_Page_AJAX {
 
     $entityID = CRM_Utils_Request::retrieve('entityID', 'Positive', CRM_Core_DAO::$_nullObject, FALSE, NULL, 'POST');
     $methods = array(
-      'assign' => 'addBatchEntity',
-      'remove' => 'removeBatchEntity',
+      'assign' => 'create',
+      'remove' => 'del',
       'reopen' => 'create',
       'close' => 'create',
       'delete' => 'deleteBatch',
@@ -486,10 +486,10 @@ class CRM_Financial_Page_AJAX {
           'batch_id' => $entityID,
         );
         if ($action == 'Assign') {
-          $updated = CRM_Batch_BAO_Batch::addBatchEntity($params);
+          $updated = CRM_Batch_BAO_EntityBatch::create($params);
         }
         else {
-          $updated = CRM_Batch_BAO_Batch::removeBatchEntity($params);
+          $updated = CRM_Batch_BAO_EntityBatch::del($params);
         }
       }
     }

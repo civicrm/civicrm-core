@@ -90,6 +90,9 @@ CRM.$(function($) {
 });
 function assignRemove(recordID, op) {
   var recordBAO = 'CRM_Batch_BAO_Batch';
+  if (op == 'assign' || op == 'remove') {
+    recordBAO = 'CRM_Batch_BAO_EntityBatch';   
+  }
   var entityID = {/literal}"{$entityID}"{literal};
   if (op == 'close' || op == 'export') {
     var mismatch = checkMismatch();
