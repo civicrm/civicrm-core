@@ -176,7 +176,7 @@ class CRM_Core_BAO_CustomOption {
           $dao->id
         );
     }
-    // crm_core_Error::Debug('t', $options);
+
     return $options;
   }
 
