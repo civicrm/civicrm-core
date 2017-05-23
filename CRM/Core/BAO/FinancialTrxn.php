@@ -670,7 +670,6 @@ WHERE ft.is_payment = 1
         'status_id' => array_search('Completed', $statuses),
         'payment_instrument_id' => $contributionDetails['payment_instrument_id'],
         'check_number' => $contributionDetails['check_number'],
-        'is_payment' => 1,
       );
 
       $deferredRevenues = array();
