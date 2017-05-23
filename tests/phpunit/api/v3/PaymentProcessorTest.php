@@ -79,6 +79,38 @@ class api_v3_PaymentProcessorTest extends CiviUnitTestCase {
   }
 
   /**
+   * Update payment processor.
+   */
+  public function testPaymentProcessorUpdate() {
+    $params = $this->_params;
+    $result = $this->callAPISuccess('payment_processor', 'create', $params);
+    $this->assertNotNull($result['id']);
+
+    $updateParams = array(
+      'id' => $result['id'],
+      'name' => 'Update API Test',
+    );
+    $this->assertDBState('CRM_Financial_DAO_PaymentProcessor', $result['id'], $params);
+    $this->callAPISuccess('payment_processor', 'create', $updateParams);
+    $result = $this->callAPISuccess('payment_processor', 'get', array('id' => $result['id']));
+
+    $expectedResult = array(
+      'id' => $result['id'],
+      'domain_id' => $params['domain_id'],
+      'name' => $updateParams['name'],
+      'payment_processor_type_id' => $params['payment_processor_type_id'],
+      'is_default' => 0,
+      'is_test' => 0,
+      'class_name' => $params['class_name'],
+      'billing_mode' => 1,
+      'is_recur' => $params['is_recur'],
+      'payment_type' => 1,
+      'payment_instrument_id' => 1,
+    );
+    $this->checkArrayEquals($expectedResult, $result['values'][$result['id']]);
+  }
+
+  /**
    * Test  using example code.
    */
   public function testPaymentProcessorCreateExample() {
