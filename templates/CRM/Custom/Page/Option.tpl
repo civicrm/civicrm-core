@@ -71,7 +71,7 @@
                               {sClass:'crm-custom_option-label'},
                               {sClass:'crm-custom_option-value'},
                               {sClass:'crm-custom_option-default_value'},
-                              {sClass:'crm-custom_option-description'},
+                              {sClass:'crm-custom_option-default_description'},
                               {sClass:'crm-custom_option-is_active'},
                               {sClass:'crm-custom_option-links'},
                               {sClass:'hiddenElement'}
