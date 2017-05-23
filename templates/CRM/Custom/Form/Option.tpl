@@ -42,6 +42,9 @@
         <tr class="crm-custom_option-form-block-value">
             <td class="label">{$form.value.label}</td>
             <td>{$form.value.html}</td>
+        <tr class="crm-custom_option-form-block-desc">
+            <td class="label">{$form.description.label}</td>
+            <td>{$form.description.html}</td>
         <tr class="crm-custom_option-form-block-weight">
             <td class="label">{$form.weight.label}</td>
             <td>{$form.weight.html}</td>
