@@ -284,6 +284,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
     );
     $apiParams['return'] = $return;
     $batches = civicrm_api3('Batch', 'get', $apiParams);
+    $obj = new CRM_Batch_BAO_Batch();
     if (!empty($params['context'])) {
       $links = $obj->links($params['context']);
     }
