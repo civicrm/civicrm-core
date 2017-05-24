@@ -371,7 +371,7 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
     $priceFields = CRM_Member_BAO_Membership::setQuickConfigMembershipParameters(
       $formValues['membership_type_id'][0],
       $formValues['membership_type_id'][1],
-      $formValues['total_amount'],
+      CRM_Utils_Array::value('total_amount', $formValues),
       $this->_priceSetId
     );
     $formValues = array_merge($formValues, $priceFields['price_fields']);
