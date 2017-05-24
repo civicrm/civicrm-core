@@ -768,8 +768,8 @@ MODIFY      {$columnName} varchar( $length )
       $existing_indexes = array();
       $sql = "SHOW INDEXES IN `$table`";
       $dao = CRM_Core_DAO::executeQuery($sql);
-      while($dao->fetch()) {
-        if(!in_array($dao->Key_name, $existing_indexes)) {
+      while ($dao->fetch()) {
+        if (!in_array($dao->Key_name, $existing_indexes)) {
           $existing_indexes[] = $dao->Key_name;
         }
       }
@@ -784,7 +784,7 @@ MODIFY      {$columnName} varchar( $length )
 
         // An index can reference multiple fields, check each field for a
         // correspending foreign key.
-        foreach($index['field'] as $field) {
+        foreach ($index['field'] as $field) {
           $sql = "SELECT u.CONSTRAINT_NAME, u.COLUMN_NAME, u.REFERENCED_COLUMN_NAME,
             u.REFERENCED_TABLE_NAME, UPDATE_RULE, DELETE_RULE FROM
             information_schema.KEY_COLUMN_USAGE u JOIN information_schema.REFERENTIAL_CONSTRAINTS c ON
@@ -792,13 +792,13 @@ MODIFY      {$columnName} varchar( $length )
             WHERE u.COLUMN_NAME = %0 AND u.TABLE_NAME = %1";
           $params = array(0 => array($field, 'String'), 1 => array($table, 'String'));
           $dao = CRM_Core_DAO::executeQuery($sql, $params);
-          while($dao->fetch()) {
+          while ($dao->fetch()) {
             // Keep track of this foreign key.
             $existing_foreign_keys[$dao->CONSTRAINT_NAME] = array(
               'table_name' => $dao->REFERENCED_TABLE_NAME,
               'column_name' => $dao->COLUMN_NAME,
               'referenced_column_name' => $dao->REFERENCED_COLUMN_NAME,
-              'on_delete' => $dao->DELETE_RULE
+              'on_delete' => $dao->DELETE_RULE,
             );
             // And now kill it.
             CRM_Core_BAO_SchemaHandler::safeRemoveFK($table, $dao->CONSTRAINT_NAME);
@@ -811,7 +811,7 @@ MODIFY      {$columnName} varchar( $length )
           (array_key_exists('unique', $index) && $index['unique'] ? 'UNIQUE ' : '') .
           "INDEX {$index['name']} (" .  implode(", ", $index['field']) .
         ")";
-        foreach($existing_foreign_keys as $foreign_key_name => $foreign_key) {
+        foreach ($existing_foreign_keys as $foreign_key_name => $foreign_key) {
           $queries[] = "ALTER TABLE {$table} ADD CONSTRAINT `{$foreign_key_name}`
             FOREIGN KEY (`{$foreign_key['column_name']}`) REFERENCES
             `{$foreign_key['table_name']}` (`{$foreign_key['referenced_column_name']}`)
