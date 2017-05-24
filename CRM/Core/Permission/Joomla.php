@@ -140,20 +140,25 @@ class CRM_Core_Permission_Joomla extends CRM_Core_Permission_Base {
    */
   public function upgradePermissions($permissions) {
     $translatedPerms = array();
+
+    // Flipping the $permissions array gives us just the raw names of the
+    // permissions. The descriptions, etc., are irrelevant for the purposes of
+    // this method.
     foreach (array_flip($permissions) as $perm) {
       $translated = $this->translateJoomlaPermission($perm);
       $translatedPerms[] = $translated[0];
     }
 
     $associations = $this->getUserGroupPermsAssociations();
-    $originalAssociations = clone $associations;
+    $cmsPermsHaveGoneStale = FALSE;
     foreach (array_keys(get_object_vars($associations)) as $permName) {
       if (!in_array($permName, $translatedPerms)) {
         unset($associations->$permName);
+        $cmsPermsHaveGoneStale = TRUE;
       }
     }
 
-    if ($originalAssociations !== $associations) {
+    if ($cmsPermsHaveGoneStale) {
       $this->updateGroupPermsAssociations($associations);
     }
   }
@@ -161,22 +166,19 @@ class CRM_Core_Permission_Joomla extends CRM_Core_Permission_Base {
   /**
    * Fetches the associations between user groups and CiviCRM permissions.
    *
+   * @see https://docs.joomla.org/Selecting_data_using_JDatabase
    * @return object
    *   Properties of the object are Joomla-fied permission names.
    */
   private function getUserGroupPermsAssociations() {
-    // Get a db connection.
     $db = JFactory::getDbo();
-    // Create a new query object.
     $query = $db->getQuery(TRUE);
 
-    // Build query to fetch user-group/permission associations.
     $query
         ->select($db->quoteName('rules'))
         ->from($db->quoteName('#__assets'))
         ->where($db->quoteName('name') . ' = ' . $db->quote('com_civicrm'));
 
-    // Reset the query using our newly populated query object.
     $db->setQuery($query);
 
     // Load the result as a stdClass object, decoding JSON on the way
@@ -186,17 +188,15 @@ class CRM_Core_Permission_Joomla extends CRM_Core_Permission_Base {
   /**
    * Writes user-group/permissions associations back to Joomla.
    *
+   * @see https://docs.joomla.org/Inserting,_Updating_and_Removing_data_using_JDatabase
    * @param object $associations
    *   Same format as the return of
    *   CRM_Core_Permission_Joomla->getUserGroupPermsAssociations().
    */
   private function updateGroupPermsAssociations($associations) {
-    // Get a db connection.
     $db = JFactory::getDbo();
-    // Create a new query object.
     $query = $db->getQuery(TRUE);
 
-    // Build query to update CiviCRM's user-group/permission associations.
     $query
         ->update($db->quoteName('#__assets'))
         ->set($db->quoteName('rules') . ' = ' . $db->quote(json_encode($associations)))
