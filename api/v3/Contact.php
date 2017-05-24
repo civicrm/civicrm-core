@@ -119,6 +119,8 @@ function civicrm_api3_contact_create($params) {
     _civicrm_api3_object_to_array_unique_fields($contact, $values[$contact->id]);
   }
 
+  $values = _civicrm_api3_contact_formatResult($params, $values);
+
   return civicrm_api3_create_success($values, $params, 'Contact', 'create');
 }
 
@@ -158,6 +160,7 @@ function civicrm_api3_contact_get($params) {
   $options = array();
   _civicrm_api3_contact_get_supportanomalies($params, $options);
   $contacts = _civicrm_api3_get_using_query_object('Contact', $params, $options);
+  $contacts = _civicrm_api3_contact_formatResult($params, $contacts);
   return civicrm_api3_create_success($contacts, $params, 'Contact');
 }
 
@@ -173,6 +176,35 @@ function civicrm_api3_contact_getcount($params) {
   _civicrm_api3_contact_get_supportanomalies($params, $options);
   $count = _civicrm_api3_get_using_query_object('Contact', $params, $options, 1);
   return (int) $count;
+}
+
+/**
+ * Filter the result.
+ *
+ * @param array $result
+ *
+ * @return array
+ * @throws \CRM_Core_Exception
+ */
+function _civicrm_api3_contact_formatResult($params, $result) {
+  $apiKeyPerms = array('edit api keys', 'administer CiviCRM');
+  $allowApiKey = empty($params['check_permissions']) || CRM_Core_Permission::check(array($apiKeyPerms));
+  if (!$allowApiKey) {
+    if (is_array($result)) {
+      // Single-value $result
+      if (isset($result['api_key'])) {
+        unset($result['api_key']);
+      }
+
+      // Multi-value $result
+      foreach ($result as $key => $row) {
+        if (is_array($row)) {
+          unset($result[$key]['api_key']);
+        }
+      }
+    }
+  }
+  return $result;
 }
 
 /**
