@@ -727,9 +727,11 @@ MODIFY      {$columnName} varchar( $length )
     $missingIndices = array();
     foreach ($missingSigs as $sig) {
       $sigParts = explode('::', $sig);
-      foreach ($requiredIndices[$sigParts[0]] as $index) {
+      $table = $sigParts[0];
+      foreach ($requiredIndices[$table] as $index) {
         if ($index['sig'] == $sig) {
-          $missingIndices[$sigParts[0]][] = $index;
+          $index['name_exists'] = CRM_Utils_Array::value($index['name'], $existingIndices[$table]) ? 1 : 0;
+          $missingIndices[$table][] = $index;
           continue;
         }
       }
@@ -746,20 +748,25 @@ MODIFY      {$columnName} varchar( $length )
     $queries = array();
     foreach ($missingIndices as $table => $indexList) {
       foreach ($indexList as $index) {
+        if (CRM_Utils_Array::value('name_exists', $index)) {
+          $queries[] = "DROP INDEX {$index['name']} ON {$table}";
+        }
         $queries[] = "CREATE " .
-        (array_key_exists('unique', $index) && $index['unique'] ? 'UNIQUE ' : '') .
-        "INDEX {$index['name']} ON {$table} (" .
-          implode(", ", $index['field']) .
-        ")";
+          (CRM_Utils_Array::value('unique', $index) && $index['unique'] ? 'UNIQUE ' : '') .
+          "INDEX {$index['name']} ON {$table} (" .
+            implode(", ", $index['field']) .
+          ")";
       }
     }
 
-    /* FIXME potential problem if index name already exists, so check before creating */
     $dao = new CRM_Core_DAO();
+    Civi::log()->info(__METHOD__ . ": Starting index drops and creates");
     foreach ($queries as $query) {
+      Civi::log()->info(__METHOD__ . " {sql}", array('sql' => $query));
       $dao->query($query, FALSE);
     }
     $dao->free();
+    Civi::log()->info(__METHOD__ . ": Finished index drops and creates");
   }
 
 }

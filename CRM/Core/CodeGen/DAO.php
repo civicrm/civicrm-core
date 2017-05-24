@@ -62,12 +62,10 @@ class CRM_Core_CodeGen_DAO extends CRM_Core_CodeGen_BaseTask {
 
     $template = new CRM_Core_CodeGen_Util_Template('php');
     $template->assign('table', $this->tables[$this->name]);
-    if (empty($this->tables[$this->name]['index'])) {
-      $template->assign('indicesPhp', var_export(array(), 1));
-    }
-    else {
-      $template->assign('indicesPhp', var_export($this->tables[$this->name]['index'], 1));
-    }
+    $indices = CRM_Utils_Array::value('foreignKeyIndex', $this->tables[$this->name], array()) +
+      CRM_Utils_Array::value('index', $this->tables[$this->name], array());
+    $template->assign('indicesPhp', var_export($indices, 1));
+
     $template->assign('genCodeChecksum', $this->getTableChecksum());
     $template->run('dao.tpl', $this->getAbsFileName());
   }
@@ -81,12 +79,9 @@ class CRM_Core_CodeGen_DAO extends CRM_Core_CodeGen_BaseTask {
     if (!$this->raw) {
       $template = new CRM_Core_CodeGen_Util_Template('php');
       $template->assign('table', $this->tables[$this->name]);
-      if (empty($this->tables[$this->name]['index'])) {
-        $template->assign('indicesPhp', var_export(array(), 1));
-      }
-      else {
-        $template->assign('indicesPhp', var_export($this->tables[$this->name]['index'], 1));
-      }
+      $indices = CRM_Utils_Array::value('foreignKeyIndex', $this->tables[$this->name], array()) +
+        CRM_Utils_Array::value('index', $this->tables[$this->name], array());
+      $template->assign('indicesPhp', var_export($indices, 1));
       $template->assign('genCodeChecksum', 'NEW');
       $this->raw = $template->fetch('dao.tpl');
     }
