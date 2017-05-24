@@ -27,7 +27,7 @@
 <div id="crm-recently-viewed" class="left crm-container">
     <ul>
     {foreach from=$recentlyViewed item=item}
-         <li class="crm-recently-viewed" ><a  href="{$item.url}" title="{$item.title}">
+         <li class="crm-recently-viewed" ><a  href="{$item.url}" title="{$item.title|escape:'html'}">
          {if $item.image_url}
             <span class="icon crm-icon {if $item.subtype}{$item.subtype}{else}{$item.type}{/if}-icon" style="background: url('{$item.image_url}')"></span>
          {else}
