@@ -97,6 +97,11 @@ class Manager {
         $angularModules = array_merge($angularModules, $component->getAngularModules());
       }
       \CRM_Utils_Hook::angularModules($angularModules);
+      foreach (array_keys($angularModules) as $module) {
+        if (!isset($angularModules[$module]['basePages'])) {
+          $angularModules[$module]['basePages'] = array('civicrm/a');
+        }
+      }
       $this->modules = $this->resolvePatterns($angularModules);
     }
 
@@ -122,6 +127,59 @@ class Manager {
       throw new \Exception("Unrecognized Angular module");
     }
     return $modules[$name];
+  }
+
+  /**
+   * Resolve a full list of Angular dependencies.
+   *
+   * @param array $names
+   *   List of Angular modules.
+   *   Ex: array('crmMailing').
+   * @return array
+   *   List of Angular modules, include all dependencies.
+   *   Ex: array('crmMailing', 'crmUi', 'crmUtil', 'ngRoute').
+   */
+  public function resolveDependencies($names) {
+    $allModules = $this->getModules();
+    $visited = array();
+    $result = $names;
+    while (($missingModules = array_diff($result, array_keys($visited))) && !empty($missingModules)) {
+      foreach ($missingModules as $module) {
+        $visited[$module] = 1;
+        if (!isset($allModules[$module])) {
+          \Civi::log()->warning('Unrecognized Angular module {name}. Please ensure that all Angular modules are declared.', array(
+            'name' => $module,
+            'civi.tag' => 'deprecated',
+          ));
+        }
+        elseif (isset($allModules[$module]['requires'])) {
+          $result = array_unique(array_merge($result, $allModules[$module]['requires']));
+        }
+      }
+    }
+    sort($result);
+    return $result;
+  }
+
+  /**
+   * Get a list of Angular modules that should be loaded on the given
+   * base-page.
+   *
+   * @param string $basePage
+   *   The name of the base-page for which we want a list of moudles.
+   * @return array
+   *   List of Angular modules.
+   *   Ex: array('crmMailing', 'crmUi', 'crmUtil', 'ngRoute').
+   */
+  public function resolveDefaultModules($basePage) {
+    $modules = $this->getModules();
+    $result = array();
+    foreach ($modules as $moduleName => $module) {
+      if (in_array($basePage, $module['basePages']) || in_array('*', $module['basePages'])) {
+        $result[] = $moduleName;
+      }
+    }
+    return $result;
   }
 
   /**

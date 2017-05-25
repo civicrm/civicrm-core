@@ -2094,6 +2094,10 @@ abstract class CRM_Utils_Hook {
    *    - css: array, list of CSS files or globs.
    *    - partials: array, list of base-dirs containing HTML.
    *    - requires: array, list of required Angular modules.
+   *    - basePages: array, uncondtionally load this module onto the given Angular pages. [v4.7.21+]
+   *      If omitted, default to "array('civicrm/a')" for backward compat.
+   *      For a utility that should only be loaded on-demand, use "array()".
+   *      For a utility that should be loaded in all pages use, "array('*')".
    * @return null
    *   the return value is ignored
    *
@@ -2109,6 +2113,7 @@ abstract class CRM_Utils_Hook {
    *     'css' => array('css/myAngularModule.css'),
    *     'partials' => array('partials/myBigAngularModule'),
    *     'requires' => array('otherModuleA', 'otherModuleB'),
+   *     'basePages' => array('civicrm/a'),
    *   );
    * }
    * @endcode

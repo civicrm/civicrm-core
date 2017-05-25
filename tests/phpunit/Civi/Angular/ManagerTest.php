@@ -168,6 +168,32 @@ class ManagerTest extends \CiviUnitTestCase {
   }
 
   /**
+   * Get the full, recursive list of dependencies for a set of Angular modules.
+   */
+  public function testResolveDeps() {
+    // If crmMailing changes, feel free to use a different example.
+    $expected = array(
+      'angularFileUpload',
+      'crmAttachment',
+      'crmAutosave',
+      'crmCxn',
+      'crmMailing',
+      'crmResource',
+      'crmUtil',
+      'crmUi',
+      'dialogService',
+      'ngRoute',
+      'ngSanitize',
+      'ui.utils',
+    );
+    $input = array('crmMailing', 'crmCxn');
+    $actual = $this->angular->resolveDependencies($input);
+    sort($expected);
+    sort($actual);
+    $this->assertEquals($expected, $actual);
+  }
+
+  /**
    * Example hook. Modifies `2step.html` by adding the attribute
    * `cat-stevens="ts('wild world')"`.
    *
