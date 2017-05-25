@@ -730,7 +730,7 @@ class CRM_Core_Resources {
       CRM_Admin_Page_CKEditorConfig::setConfigDefault();
       $items[] = array(
         'config' => array(
-          'wysisygScriptLocation' => Civi::paths()->getUrl("[civicrm.root]/js/wysiwyg/crm.ckeditor.js"),
+          'wysisygScriptLocation' => Civi::paths()->getUrl("sites/all/modules/civicrm/js/wysiwyg/crm.ckeditor.js"),
           'CKEditorCustomConfig' => CRM_Admin_Page_CKEditorConfig::getConfigUrl(),
         ),
       );
