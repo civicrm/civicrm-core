@@ -82,6 +82,14 @@
     <p>{ts}Use this filter to limit search results to relationships where the related contacts are part of a specific group or groups. For example, you might want to find all individuals who are employees ('Employee of' relationship type) of organizations which are in your 'Corporate Sponsors' group.{/ts}</p>
 {/htxt}
 
+{htxt id="id-relationship-active-period-title"}
+{ts}Active Period{/ts}
+{/htxt}
+{htxt id="id-relationship-active-period"}
+    <p>{ts}Use this filter to limit search results to relationships which were active during the specified time period (e.g. this is useful if you need to search all volunteer relationships that were active during 2014).{/ts}</p>
+    <p>{ts}By definition a relationship is active if any of these conditions occurs: (1) Start Date <= Current Date <= End Date (2) Start Date <= Current Date and End Date is not defined (3) Start Date is not defined and Current Date <= End Date{/ts}</p>
+{/htxt}
+
 {htxt id="id-all-tags-title"}
 {ts}Tags{/ts}
 {/htxt}
