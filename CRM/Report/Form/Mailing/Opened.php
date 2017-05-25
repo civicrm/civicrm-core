@@ -173,7 +173,7 @@ class CRM_Report_Form_Mailing_Opened extends CRM_Report_Form {
       'grouping' => 'contact-fields',
     );
 
-    $this->_columns['civicrm_event_opened'] = array(
+    $this->_columns['civicrm_mailing_event_opened'] = array(
       'dao' => 'CRM_Mailing_Event_DAO_Opened',
       'fields' => array(
         'id' => array(
@@ -261,17 +261,17 @@ class CRM_Report_Form_Mailing_Opened extends CRM_Report_Form {
       FROM civicrm_contact {$this->_aliases['civicrm_contact']} {$this->_aclFrom}";
 
     $this->_from .= "
-      INNER JOIN civicrm_mailing_event_queue {$this->_aliases['civicrm_mailing_event_queue']}
-        ON {$this->_aliases['civicrm_mailing_event_queue']}.contact_id = {$this->_aliases['civicrm_contact']}.id
+      INNER JOIN civicrm_mailing_event_queue
+        ON civicrm_mailing_event_queue.contact_id = {$this->_aliases['civicrm_contact']}.id
       LEFT JOIN civicrm_email {$this->_aliases['civicrm_email']}
-        ON {$this->_aliases['civicrm_mailing_event_queue']}.email_id = {$this->_aliases['civicrm_email']}.id
-      INNER JOIN civicrm_mailing_event_opened {$this->_aliases['civicrm_event_opened']}
-        ON {$this->_aliases['civicrm_event_opened']}.event_queue_id = {$this->_aliases['civicrm_mailing_event_queue']}.id
-      INNER JOIN civicrm_mailing_job {$this->_aliases['civicrm_mailing_job']}
-        ON {$this->_aliases['civicrm_mailing_event_queue']}.job_id = {$this->_aliases['civicrm_mailing_job']}.id
+        ON civicrm_mailing_event_queue.email_id = {$this->_aliases['civicrm_email']}.id
+      INNER JOIN civicrm_mailing_event_opened {$this->_aliases['civicrm_mailing_event_opened']}
+        ON {$this->_aliases['civicrm_mailing_event_opened']}.event_queue_id = civicrm_mailing_event_queue.id
+      INNER JOIN civicrm_mailing_job
+        ON civicrm_mailing_event_queue.job_id = civicrm_mailing_job.id
       INNER JOIN civicrm_mailing {$this->_aliases['civicrm_mailing']}
-        ON {$this->_aliases['civicrm_mailing_job']}.mailing_id = {$this->_aliases['civicrm_mailing']}.id
-        AND {$this->_aliases['civicrm_mailing_job']}.is_test = 0
+        ON civicrm_mailing_job.mailing_id = {$this->_aliases['civicrm_mailing']}.id
+        AND civicrm_mailing_job.is_test = 0
     ";
 
     if ($this->_phoneField) {

@@ -195,7 +195,7 @@ class CRM_Report_Form_Mailing_Clicks extends CRM_Report_Form {
       'grouping' => 'mailing-fields',
     );
 
-    $this->_columns['civicrm_event_trackable_url_open'] = array(
+    $this->_columns['civicrm_mailing_event_trackable_url_open'] = array(
       'dao' => 'CRM_Mailing_Event_DAO_TrackableURLOpen',
       'fields' => array(
         'time_stamp' => array(
@@ -279,19 +279,19 @@ class CRM_Report_Form_Mailing_Clicks extends CRM_Report_Form {
       FROM civicrm_contact {$this->_aliases['civicrm_contact']} {$this->_aclFrom}";
 
     $this->_from .= "
-      INNER JOIN civicrm_mailing_event_queue {$this->_aliases['civicrm_mailing_event_queue']}
-        ON {$this->_aliases['civicrm_mailing_event_queue']}.contact_id = {$this->_aliases['civicrm_contact']}.id
+      INNER JOIN civicrm_mailing_event_queue
+        ON civicrm_mailing_event_queue.contact_id = {$this->_aliases['civicrm_contact']}.id
       LEFT JOIN civicrm_email {$this->_aliases['civicrm_email']}
-        ON {$this->_aliases['civicrm_mailing_event_queue']}.email_id = {$this->_aliases['civicrm_email']}.id
+        ON civicrm_mailing_event_queue.email_id = {$this->_aliases['civicrm_email']}.id
       INNER JOIN civicrm_mailing_event_trackable_url_open {$this->_aliases['civicrm_mailing_event_trackable_url_open']}
-        ON {$this->_aliases['civicrm_mailing_event_trackable_url_open']}.event_queue_id = {$this->_aliases['civicrm_mailing_event_queue']}.id
+        ON {$this->_aliases['civicrm_mailing_event_trackable_url_open']}.event_queue_id = civicrm_mailing_event_queue.id
       INNER JOIN civicrm_mailing_trackable_url {$this->_aliases['civicrm_mailing_trackable_url']}
         ON {$this->_aliases['civicrm_mailing_event_trackable_url_open']}.trackable_url_id = {$this->_aliases['civicrm_mailing_trackable_url']}.id
-      INNER JOIN civicrm_mailing_job {$this->_aliases['civicrm_mailing_job']}
-        ON {$this->_aliases['civicrm_mailing_event_queue']}.job_id = {$this->_aliases['civicrm_mailing_job']}.id
+      INNER JOIN civicrm_mailing_job
+        ON civicrm_mailing_event_queue.job_id = civicrm_mailing_job.id
       INNER JOIN civicrm_mailing {$this->_aliases['civicrm_mailing']}
-        ON {$this->_aliases['civicrm_mailing_job']}.mailing_id = {$this->_aliases['civicrm_mailing']}.id
-        AND {$this->_aliases['civicrm_mailing_job']}.is_test = 0
+        ON civicrm_mailing_job.mailing_id = {$this->_aliases['civicrm_mailing']}.id
+        AND civicrm_mailing_job.is_test = 0
     ";
 
     if ($this->_phoneField) {
