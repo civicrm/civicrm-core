@@ -266,6 +266,12 @@
               <td class="label">{$form.trxn_id.label}</td>
               <td {$valueStyle}>{$form.trxn_id.html} {help id="id-trans_id"}</td>
             </tr>
+            <tr class="crm-contribution-form-block-trxn_date">
+              <td class="label">{$form.trxn_date.label}</td>
+              <td {$valueStyle}>{include file="CRM/common/jcalendar.tpl" elementName=trxn_date}<br />
+                <span class="description">{ts}The transaction date on which this transaction occurred{/ts}</span>
+              </td>
+            </tr>
             {if $email and $outBound_option != 2}
               <tr class="crm-contribution-form-block-is_email_receipt">
                 <td class="label">
