@@ -2381,4 +2381,21 @@ abstract class CRM_Utils_Hook {
     return self::singleton()->invoke(array('message'), $message, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_inboundSMS');
   }
 
+  /**
+   * This hook is called before emails are sent to activity assignees.
+   *
+   * @param array $recipients
+   * @param Activity object $activity
+   * @param array $params as passed to postProcess()
+   * @param string $context
+   *
+   * @return mixed
+   */
+  public static function activityMailRecipients(&$recipients, $activity, $params, $context) {
+    return self::singleton()->invoke(array('recipients', 'activity', 'params', 'context'),
+      $recipients, $activity, $params, $context, self::$_nullObject, self::$_nullObject,
+      'civicrm_activityMailRecipients'
+    );
+  }
+
 }

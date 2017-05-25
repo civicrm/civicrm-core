@@ -1050,20 +1050,14 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     if (Civi::settings()->get('activity_assignee_notification')) {
       $activityIDs = array($activity->id);
       if ($followupActivity) {
-        $activityIDs = array_merge($activityIDs, array($followupActivity->id));
+        $activityIDs[] = $followupActivity->id;
       }
       $assigneeContacts = CRM_Activity_BAO_ActivityAssignment::getAssigneeNames($activityIDs, TRUE, FALSE);
 
       if (!CRM_Utils_Array::crmIsEmptyArray($params['assignee_contact_id'])) {
-        $mailToContacts = array();
-
-        // Build an associative array with unique email addresses.
-        foreach ($activityAssigned as $id => $dnc) {
-          if (isset($id) && array_key_exists($id, $assigneeContacts)) {
-            $mailToContacts[$assigneeContacts[$id]['email']] = $assigneeContacts[$id];
-          }
-        }
-
+        $recipientIds = array_keys($activityAssigned);
+        CRM_Utils_Hook::activityMailRecipients($recipientIds, $activity, $params, "main");
+        $mailToContacts = CRM_Activity_BAO_Activity::buildMailToContacts($recipientIds, $assigneeContacts, $activity->id);
         $sent = CRM_Activity_BAO_Activity::sendToAssignee($activity, $mailToContacts);
         if ($sent) {
           $mailStatus .= ts("A copy of the activity has also been sent to assignee contacts(s).");
@@ -1072,13 +1066,14 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
 
       // Also send email to follow-up activity assignees if set
       if ($followupActivity) {
-        $mailToFollowupContacts = array();
+        $recipientIds = array();
         foreach ($assigneeContacts as $values) {
           if ($values['activity_id'] == $followupActivity->id) {
-            $mailToFollowupContacts[$values['email']] = $values;
+            $recipientIds[] = $values['contact_id'];
           }
         }
-
+        CRM_Utils_Hook::activityMailRecipients($recipientIds, $followupActivity, $params, "followup");
+        $mailToFollowupContacts = CRM_Activity_BAO_Activity::buildMailToContacts($recipientIds, $assigneeContacts, $followupActivity->id);
         $sentFollowup = CRM_Activity_BAO_Activity::sendToAssignee($followupActivity, $mailToFollowupContacts);
         if ($sentFollowup) {
           $mailStatus .= '<br />' . ts("A copy of the follow-up activity has also been sent to follow-up assignee contacts(s).");
