@@ -97,10 +97,12 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
     }
     //checks the given price set doesnot start with digit
     $title = $fields['title'];
-    // gives the ascii value
-    $asciiValue = ord($title{0});
-    if ($asciiValue >= 48 && $asciiValue <= 57) {
-      $errors['title'] = ts("Name cannot not start with a digit");
+    if ($title) {
+      // gives the ascii value
+      $asciiValue = ord($title{0});
+      if ($asciiValue >= 48 && $asciiValue <= 57) {
+        $errors['title'] = ts("Name cannot not start with a digit");
+      }
     }
     return empty($errors) ? TRUE : $errors;
   }
