@@ -292,7 +292,8 @@ class CRM_Extension_Mapper {
         SELECT full_name, file
         FROM civicrm_extension
         WHERE is_active = 1
-        AND type = "module"
+          AND type = "module"
+        ORDER BY id
       ';
       $dao = CRM_Core_DAO::executeQuery($sql);
       while ($dao->fetch()) {
