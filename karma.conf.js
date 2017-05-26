@@ -5,6 +5,7 @@ module.exports = function(config) {
     exclude: [
     ],
     files: [
+      'bower_components/phantomjs-polyfill/bind-polyfill.js',
       'bower_components/jquery/dist/jquery.min.js',
       'bower_components/jquery-ui/jquery-ui.min.js',
       'bower_components/lodash-compat/lodash.min.js',
