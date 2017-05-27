@@ -134,31 +134,6 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   }
 
   /**
-   * Create entity batch entry.
-   *
-   * @param array $params
-   * @return array
-   */
-  public static function addBatchEntity(&$params) {
-    $entityBatch = new CRM_Batch_DAO_EntityBatch();
-    $entityBatch->copyValues($params);
-    $entityBatch->save();
-    return $entityBatch;
-  }
-
-  /**
-   * Remove entries from entity batch.
-   * @param array $params
-   * @return CRM_Batch_DAO_EntityBatch
-   */
-  public static function removeBatchEntity($params) {
-    $entityBatch = new CRM_Batch_DAO_EntityBatch();
-    $entityBatch->copyValues($params);
-    $entityBatch->delete();
-    return $entityBatch;
-  }
-
-  /**
    * Delete batch entry.
    *
    * @param int $batchId

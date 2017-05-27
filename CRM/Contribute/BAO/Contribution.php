@@ -3468,7 +3468,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         'entity_table' => 'civicrm_financial_trxn',
         'entity_id' => $financialTxn->id,
       );
-      CRM_Batch_BAO_Batch::addBatchEntity($entityParams);
+      CRM_Batch_BAO_EntityBatch::create($entityParams);
     }
 
     // when a fee is charged
