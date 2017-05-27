@@ -131,6 +131,17 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
       $errors['api_action'] = ts('Given API command is not defined.');
     }
 
+    $authorized = FALSE;
+    try {
+      $authorized = $apiKernel->runAuthorize($fields['api_entity'], $fields['api_action'], array('version' => 3) + $fields['parameters']);
+    }
+    catch (Exception $e) {
+      $authorized = FALSE;
+    }
+    if (!$authorized) {
+      $errors['api_entity'] = ts('You do not have permission to run this job please consult your Administrator');
+    }
+
     if (!empty($errors)) {
       return $errors;
     }
