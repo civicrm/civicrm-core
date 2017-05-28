@@ -41,8 +41,8 @@
     {else}
       <div class="crm-section tag-section {$tagsetType}-tagset {$tagsetType}-tagset-{$tagset.parentID}-section">
         <div class="crm-clearfix">
-          {$form.$elemName.$parID.label}
-          {$form.$elemName.$parID.html}
+          <div class="label">{$form.$elemName.$parID.label}</div>
+          <div class="content">{$form.$elemName.$parID.html}</div>
         </div>
       </div>
     {/if}
