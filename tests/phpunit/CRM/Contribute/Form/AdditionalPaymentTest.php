@@ -262,7 +262,7 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
     if ($typeofContribution == 'Partially paid') {
       $contributionParams = array_merge($this->_params, array(
         'partial_payment_total' => 100.00,
-        'partial_amount_pay' => 30,
+        'partial_amount_to_pay' => 30,
         'contribution_status_id' => 1,
       ));
     }
