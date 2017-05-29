@@ -88,7 +88,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    *
    * @return int|null
    */
-  protected static function getRegistrationContactID($fields, $self, $isAdditional) {
+  public static function getRegistrationContactID($fields, $self, $isAdditional) {
 
     $contactID = NULL;
     if (!$isAdditional) {
