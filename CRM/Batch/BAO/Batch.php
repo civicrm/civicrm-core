@@ -200,7 +200,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
       $batch['total'] = '';
       $batch['payment_instrument'] = $value['payment_instrument'];
       $batch['item_count'] = CRM_Utils_Array::value('item_count', $value);
-      $batch['type'] = $value['batch_type'];
+      $batch['type'] = CRM_Utils_Array::value('batch_type', $value);
       if (!empty($value['total'])) {
         $batch['total'] = CRM_Utils_Money::format($value['total']);
       }
