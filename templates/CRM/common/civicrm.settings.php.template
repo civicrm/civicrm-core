@@ -65,7 +65,9 @@ if (!defined('CIVICRM_UF')) {
 /**
  * Content Management System (CMS) Datasource:
  *
- * Update this setting with your CMS (Drupal, Backdrop CMS, or Joomla) database username, server and DB name.
+ * Update this setting with your CMS (Drupal, Backdrop CMS, or Joomla) database username, password, server and DB name.
+ * If any of these contain a single quote or backslash, escape those characters with a backslash: \' and \\, respectively.
+ *
  * Datasource (DSN) format:
  *      define( 'CIVICRM_UF_DSN', 'mysql://cms_db_username:cms_db_password@db_server/cms_database?new_link=true');
  */
@@ -91,6 +93,9 @@ if (!defined('CIVICRM_UF_DSN') && CIVICRM_UF !== 'UnitTests') {
  *      CMS DB Name = cms, DB User = cms
  *      CiviCRM DB Name = civicrm, CiviCRM DB User = civicrm
  *      define( 'CIVICRM_DSN'         , 'mysql://civicrm:YOUR_PASSWORD@localhost/civicrm?new_link=true');
+ *
+ * If your username, password, server or DB name contain a single quote or backslash, escape those characters
+ * with a backslash: \' and \\, respectively.
  *
  */
 if (!defined('CIVICRM_DSN')) {
