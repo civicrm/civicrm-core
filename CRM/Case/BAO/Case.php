@@ -1214,7 +1214,7 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
     }
     $values = array();
     $query = '
-      SELECT cc.display_name as name, cc.sort_name as sort_name, cc.id, cr.relationship_type_id, crt.label_b_a as role, crt.name_b_a, ce.email
+      SELECT cc.display_name as name, cc.sort_name as sort_name, cc.id, cr.relationship_type_id, crt.label_b_a as role, crt.name_b_a, ce.email, cp.phone
       FROM civicrm_relationship cr
       LEFT JOIN civicrm_relationship_type crt
         ON crt.id = cr.relationship_type_id
@@ -1223,6 +1223,9 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
       LEFT JOIN civicrm_email ce
         ON ce.contact_id = cc.id
         AND ce.is_primary= 1
+      LEFT JOIN civicrm_phone cp
+        ON cp.contact_id = cc.id
+        AND cp.is_primary= 1
       WHERE cr.case_id =  %1 AND cr.is_active AND cc.is_deleted <> 1';
 
     $params = array(1 => array($caseID, 'Integer'));
@@ -1240,6 +1243,7 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
           'relationship_type_id' => $dao->relationship_type_id,
           'role' => $dao->role,
           'email' => $dao->email,
+          'phone' => $dao->phone,
         );
         // Add more info about the role (creator, manager)
         $role = CRM_Utils_Array::value($dao->name_b_a, $caseRoles);
