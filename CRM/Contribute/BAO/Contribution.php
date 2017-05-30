@@ -3634,6 +3634,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         ) {
           CRM_Core_BAO_FinancialTrxn::createDeferredTrxn(self::$_deferredLineItems, $params['id'], TRUE);
         }
+        self::$_trxnIDs = NULL;
         return;
       }
     }
