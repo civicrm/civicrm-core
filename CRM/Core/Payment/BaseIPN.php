@@ -447,6 +447,7 @@ class CRM_Core_Payment_BaseIPN {
     $source = NULL;
     if ($input['component'] == 'contribute') {
       if ($contribution->contribution_page_id) {
+        // Note that we may have overwritten the is_email_receipt input, fix that below.
         CRM_Contribute_BAO_ContributionPage::setValues($contribution->contribution_page_id, $values);
         $source = ts('Online Contribution') . ': ' . $values['title'];
       }
@@ -460,7 +461,11 @@ class CRM_Core_Payment_BaseIPN {
         $values['receipt_from_email'] = $domainValues[1];
       }
 
-      if ($recurContrib && $recurContrib->id && !isset($input['is_email_receipt'])) {
+      if (isset($input['is_email_receipt'])) {
+        // CRM-19601 - we may have overwritten this above.
+        $values['is_email_receipt'] = $input['is_email_receipt'];
+      }
+      elseif ($recurContrib && $recurContrib->id) {
         //CRM-13273 - is_email_receipt setting on recurring contribution should take precedence over contribution page setting
         // but CRM-16124 if $input['is_email_receipt'] is set then that should not be overridden.
         $values['is_email_receipt'] = $recurContrib->is_email_receipt;
@@ -611,6 +616,10 @@ LIMIT 1;";
       $values['totalAmount'] = $input['amount'];
 
       $contribution->source = ts('Online Event Registration') . ': ' . $values['event']['title'];
+      // Set the value of is_email_confirm to the argument supplied in is_email_receipt, if available.
+      if (isset($input['is_email_receipt'])) {
+        $values['event']['is_email_confirm'] = $input['is_email_receipt'];
+      }
 
       if ($values['event']['is_email_confirm']) {
         $contribution->receipt_date = self::$_now;

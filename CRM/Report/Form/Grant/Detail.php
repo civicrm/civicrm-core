@@ -94,6 +94,10 @@ class CRM_Report_Form_Grant_Detail extends CRM_Report_Form {
       'civicrm_grant' => array(
         'dao' => 'CRM_Grant_DAO_Grant',
         'fields' => array(
+          'id' => array(
+            'name' => 'grant_id',
+            'title' => ts('Grant ID'),
+          ),
           'grant_type_id' => array(
             'name' => 'grant_type_id',
             'title' => ts('Grant Type'),
@@ -240,8 +244,9 @@ class CRM_Report_Form_Grant_Detail extends CRM_Report_Form {
   public function from() {
     $this->_from = "
         FROM civicrm_grant {$this->_aliases['civicrm_grant']}
-                        LEFT JOIN civicrm_contact {$this->_aliases['civicrm_contact']}
-                    ON ({$this->_aliases['civicrm_grant']}.contact_id  = {$this->_aliases['civicrm_contact']}.id  ) ";
+                        INNER JOIN civicrm_contact {$this->_aliases['civicrm_contact']}
+                    ON ({$this->_aliases['civicrm_grant']}.contact_id  = {$this->_aliases['civicrm_contact']}.id  )
+		    AND ({$this->_aliases['civicrm_contact']}.is_deleted = 0)";
     if ($this->_addressField) {
       $this->_from .= "
                   LEFT JOIN civicrm_address {$this->_aliases['civicrm_address']}
