@@ -295,7 +295,6 @@ ORDER BY start_date desc
    LIMIT $offset, $rowCount";
 
     $dao = CRM_Core_DAO::executeQuery($query, $params, TRUE, 'CRM_Event_DAO_Event');
-    $permissions = CRM_Event_BAO_Event::checkPermission();
 
     //get all campaigns.
     $allCampaigns = CRM_Campaign_BAO_Campaign::getCampaigns(NULL, NULL, FALSE, FALSE, FALSE, TRUE);
@@ -318,7 +317,8 @@ ORDER BY start_date desc
     )));
     $eventType = CRM_Core_OptionGroup::values('event_type');
     while ($dao->fetch()) {
-      if (in_array($dao->id, $permissions[CRM_Core_Permission::VIEW])) {
+      // Check permissions one by one, to avoid memory problems (CRM-20665).
+      if (CRM_Event_BAO_Event::checkPermission($dao->id, CRM_Core_Permission::VIEW)) {
         $manageEvent[$dao->id] = array();
         $repeat = CRM_Core_BAO_RecurringEntity::getPositionAndCount($dao->id, 'civicrm_event');
         $manageEvent[$dao->id]['repeat'] = '';
@@ -337,10 +337,12 @@ ORDER BY start_date desc
           $action -= CRM_Core_Action::DISABLE;
         }
 
-        if (!in_array($dao->id, $permissions[CRM_Core_Permission::DELETE])) {
+        // Check permissions one by one, to avoid memory problems (CRM-20665).
+        if (CRM_Event_BAO_Event::checkPermission($dao->id, CRM_Core_Permission::DELETE)) {
           $action -= CRM_Core_Action::DELETE;
         }
-        if (!in_array($dao->id, $permissions[CRM_Core_Permission::EDIT])) {
+        // Check permissions one by one, to avoid memory problems (CRM-20665).
+        if (CRM_Event_BAO_Event::checkPermission($dao->id, CRM_Core_Permission::EDIT)) {
           $action -= CRM_Core_Action::UPDATE;
         }
 
