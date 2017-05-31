@@ -453,7 +453,7 @@ AND       CEF.entity_id    = %2";
 
     // add attachments
     for ($i = 1; $i <= $numAttachments; $i++) {
-      $form->addElement('file', "attachFile_$i", ts('Attach File'), 'size=30 maxlength=60');
+      $form->addElement('file', "attachFile_$i", ts('Attach File'), 'size=30 maxlength=221');
       $form->addUploadElement("attachFile_$i");
       $form->setMaxFileSize($maxFileSize * 1024 * 1024);
       $form->addRule("attachFile_$i",
