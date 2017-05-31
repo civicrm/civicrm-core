@@ -324,40 +324,6 @@ WHERE  ( civicrm_event.is_template IS NULL OR civicrm_event.is_template = 0 )";
     $eventSummary = $eventIds = array();
     $config = CRM_Core_Config::singleton();
 
-    // get permission and include them here
-    // does not scale, but rearranging code for now
-    // FIXME in a future release
-    $permissions = CRM_Event_BAO_Event::checkPermission();
-    $validEventIDs = '';
-    if (empty($permissions[CRM_Core_Permission::VIEW])) {
-      $eventSummary['total_events'] = 0;
-      return $eventSummary;
-    }
-    else {
-      $validEventIDs = " AND civicrm_event.id IN ( " . implode(',', array_values($permissions[CRM_Core_Permission::VIEW])) . " ) ";
-    }
-
-    // We're fetching recent and upcoming events (where start date is 7 days ago OR later)
-    $query = "
-SELECT     count(id) as total_events
-FROM       civicrm_event
-WHERE      civicrm_event.is_active = 1 AND
-           ( civicrm_event.is_template IS NULL OR civicrm_event.is_template = 0) AND
-           civicrm_event.start_date >= DATE_SUB( NOW(), INTERVAL 7 day )
-           $validEventIDs";
-
-    $dao = CRM_Core_DAO::executeQuery($query);
-
-    if ($dao->fetch()) {
-      $eventSummary['total_events'] = $dao->total_events;
-    }
-
-    if (empty($eventSummary) ||
-      $dao->total_events == 0
-    ) {
-      return $eventSummary;
-    }
-
     //get the participant status type values.
     $cpstObject = new CRM_Event_DAO_ParticipantStatusType();
     $cpst = $cpstObject->getTableName();
@@ -387,7 +353,7 @@ WHERE      civicrm_event.is_active = 1 AND
     else {
       $event_summary_limit = "";
     }
-
+    // We're fetching recent and upcoming events (where start date is 7 days ago OR later)
     $query = "
 SELECT     civicrm_event.id as id, civicrm_event.title as event_title, civicrm_event.is_public as is_public,
            civicrm_event.max_participants as max_participants, civicrm_event.start_date as start_date,
@@ -406,7 +372,6 @@ LEFT JOIN  civicrm_recurring_entity ON ( civicrm_event.id = civicrm_recurring_en
 WHERE      civicrm_event.is_active = 1 AND
            ( civicrm_event.is_template IS NULL OR civicrm_event.is_template = 0) AND
            civicrm_event.start_date >= DATE_SUB( NOW(), INTERVAL 7 day )
-           $validEventIDs
 ORDER BY   civicrm_event.start_date ASC
 $event_summary_limit
 ";
@@ -432,7 +397,13 @@ $event_summary_limit
       'id' => CRM_Event_ActionMapping::EVENT_NAME_MAPPING_ID,
     )));
     $dao = CRM_Core_DAO::executeQuery($query, $params);
+    // $eventSummary['total_events'] used to contain the total number of events,
+    // but since it is not used, I ditched it for fixing CRM-20665.
     while ($dao->fetch()) {
+      // Check permissions one by one, to avoid memory problems (CRM-20665).
+      if (!CRM_Event_BAO_Event::checkPermission($dao->id, CRM_Core_Permission::VIEW)) {
+        continue;
+      }
       foreach ($properties as $property => $name) {
         $set = NULL;
         switch ($name) {
@@ -463,8 +434,8 @@ $event_summary_limit
             }
 
             $eventSummary['events'][$dao->id][$property] = $set;
-            if (is_array($permissions[CRM_Core_Permission::EDIT])
-              && in_array($dao->id, $permissions[CRM_Core_Permission::EDIT])) {
+            // Check permissions one by one, to avoid memory problems (CRM-20665).
+            if (CRM_Event_BAO_Event::checkPermission($dao->id, CRM_Core_Permission::EDIT)) {
               $eventSummary['events'][$dao->id]['configure'] = CRM_Utils_System::url('civicrm/admin/event', "action=update&id=$dao->id&reset=1");
             }
             break;
@@ -523,6 +494,9 @@ $event_summary_limit
             $eventSummary['events'][$dao->id][$property] = $dao->$name;
             break;
         }
+      }
+      if ($eventSummary['total_events'] == 0) {
+        return $eventSummary;
       }
 
       // prepare the area for per-status participant counts
