@@ -13,3 +13,6 @@ f5daa30 | Change Case Contact DAO so index is unique CRM-20537 | PR likely to be
 76eb305 | Port of PR 1035 to fix CRM-20549 to fix regression caused in events | PR likely to be merged in for 4.7.20  
 15ffa75 | CRM-20238 Create Hook for inbound SMS Port of PR 10347 | PR merged into 4.7.21  
 4a9aa15 | CRM-20516 Card type widget appears on front end when a different processor selected | PR merged into 4.7.20  
+6eb23c5 | Atrium 4666 && Atrium 4668 Fix issue where new contribuions were being recorded as 0 | Needs better fix overall  
+c957780 | Fix SMS upgrade issue | PR Merged into 4.7.20  
+5c3bc35 | Fix Fatal error when trying to view contribution if no price set is linked  | Pr Merged int 4.7.20  
