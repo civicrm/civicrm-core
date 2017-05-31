@@ -1247,9 +1247,15 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         // In the context of displaying a profile, show file/image
         if ($value) {
           if ($entityId) {
-            $url = self::getFileURL($entityId, $field['id']);
-            if ($url) {
-              $display = $url['file_url'];
+            $file = civicrm_api3('File', 'get', array(
+              'sequential' => 1,
+              'uri' => $value,
+            ));
+            if (!empty($file['values'])) {
+              $url = self::getFileURL($entityId, $field['id'], $file['id']);
+              if ($url) {
+                $display = $url['file_url'];
+              }
             }
           }
           else {
