@@ -346,13 +346,7 @@ WHERE  ( civicrm_event.is_template IS NULL OR civicrm_event.is_template = 0 )";
     }
     // Get the event summary display preferences
     $show_max_events = Civi::settings()->get('show_events');
-    // show all events if show_events is set to a negative value
-    if (isset($show_max_events) && $show_max_events >= 0) {
-      $event_summary_limit = "LIMIT      0, $show_max_events";
-    }
-    else {
-      $event_summary_limit = "";
-    }
+
     // We're fetching recent and upcoming events (where start date is 7 days ago OR later)
     $query = "
 SELECT     civicrm_event.id as id, civicrm_event.title as event_title, civicrm_event.is_public as is_public,
@@ -373,7 +367,6 @@ WHERE      civicrm_event.is_active = 1 AND
            ( civicrm_event.is_template IS NULL OR civicrm_event.is_template = 0) AND
            civicrm_event.start_date >= DATE_SUB( NOW(), INTERVAL 7 day )
 ORDER BY   civicrm_event.start_date ASC
-$event_summary_limit
 ";
     $eventParticipant = array();
 
@@ -397,12 +390,21 @@ $event_summary_limit
       'id' => CRM_Event_ActionMapping::EVENT_NAME_MAPPING_ID,
     )));
     $dao = CRM_Core_DAO::executeQuery($query, $params);
-    // $eventSummary['total_events'] used to contain the total number of events,
-    // but since it is not used, I ditched it for fixing CRM-20665.
+    $eventSummary['total_events'] = 0;
     while ($dao->fetch()) {
       // Check permissions one by one, to avoid memory problems (CRM-20665).
       if (!CRM_Event_BAO_Event::checkPermission($dao->id, CRM_Core_Permission::VIEW)) {
         continue;
+      }
+      ++$eventSummary['total_events'];
+      if (isset($show_max_events) && $eventSummary['total_events'] > $show_max_events) {
+        // This is a hack. I think $eventSummary['total_events'] is only used
+        // to determine whether a link 'browse more events' should be shown.
+        // So once we have more events than show_max_events, we can return.
+        // FIXME: This is confusing!
+        // $eventSummary['total_events'] should be replaced by
+        // $eventSummary['more_available'] or something like that.
+        return $eventSummary;
       }
       foreach ($properties as $property => $name) {
         $set = NULL;
@@ -495,9 +497,6 @@ $event_summary_limit
             break;
         }
       }
-      if ($eventSummary['total_events'] == 0) {
-        return $eventSummary;
-      }
 
       // prepare the area for per-status participant counts
       $statusClasses = array('Positive', 'Pending', 'Waiting', 'Negative');
@@ -532,6 +531,9 @@ $event_summary_limit
       }
     }
 
+    if ($eventSummary['total_events'] == 0) {
+      return $eventSummary;
+    }
     $countedRoles = CRM_Event_PseudoConstant::participantRole(NULL, 'filter = 1');
     $nonCountedRoles = CRM_Event_PseudoConstant::participantRole(NULL, '( filter = 0 OR filter IS NULL )');
     $countedStatus = CRM_Event_PseudoConstant::participantStatus(NULL, 'is_counted = 1');
@@ -2024,7 +2026,9 @@ WHERE  ce.loc_block_id = $locBlockId";
    *   the permission that the user has (or null)
    */
   public static function checkPermission($eventId = NULL, $type = CRM_Core_Permission::VIEW) {
-    static $permissions = NULL;
+    // Don't put all permissions in a static variable, because this can cause
+    // memory problems. (CRM-20665)
+    $permissions = NULL;
 
     if (empty($permissions)) {
       $params = array(
