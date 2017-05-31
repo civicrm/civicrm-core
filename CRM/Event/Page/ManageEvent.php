@@ -137,7 +137,13 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
           'field' => 'is_online_registration',
         );
 
-      if (CRM_Core_Permission::check('administer CiviCRM') || CRM_Event_BAO_Event::checkPermission(NULL, CRM_Core_Permission::EDIT)) {
+      // Don't retrieve all events you can change to decide whether to show
+      // this link. (CRM-20665)
+      if (CRM_Core_Permission::check('administer CiviCRM') || CRM_Core_Permission::check('access CiviEvent')) {
+        // If you can access CiviEvent, you can create events. If you can
+        // create events, you can schedule reminders for your events.
+        // We don't know which event is shown, so we put the link there just
+        // in case.
         self::$_tabLinks[$cacheKey]['reminder']
           = array(
             'title' => ts('Schedule Reminders'),
