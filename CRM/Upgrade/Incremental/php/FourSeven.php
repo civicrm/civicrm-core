@@ -1094,7 +1094,7 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
    */
   public static function populateSMSProviderDomainId() {
     $count = CRM_Core_DAO::singleValueQuery("SELECT count(id) FROM civicrm_domain");
-    if ($count = 1) {
+    if ($count == 1) {
       CRM_Core_DAO::executeQuery("UPDATE civicrm_sms_provider SET domain_id = (SELECT id FROM civicrm_domain)");
     }
     if (!parent::checkFKExists('civicrm_sms_provider', 'FK_civicrm_sms_provider_domain_id')) {
