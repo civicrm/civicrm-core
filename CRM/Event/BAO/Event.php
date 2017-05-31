@@ -2019,15 +2019,19 @@ WHERE  ce.loc_block_id = $locBlockId";
   /**
    * Make sure that the user has permission to access this event.
    *
-   * @param int $eventId
+   * @param int $eventId - required to fix CRM-20665.
    * @param int $type
    *
-   * @return string
-   *   the permission that the user has (or null)
+   * @return bool
+   *   TRUE if the user has permission $type on the event with given $eventId
    */
-  public static function checkPermission($eventId = NULL, $type = CRM_Core_Permission::VIEW) {
-    // Don't put all permissions in a static variable, because this can cause
-    // memory problems. (CRM-20665)
+  public static function checkPermission($eventId, $type = CRM_Core_Permission::VIEW) {
+    // FIXME: This method needs cleanup.
+    // Before CRM-20665, this method used to return all ID's of events a user
+    // could view, all ID's of events a user could edit and all ID's of events
+    // a user could delete.
+    // But this ended up in memory problems once you had a lot of events.
+    // I hacked around the problem, but this resulted in dodgy code.
     $permissions = NULL;
 
     if (empty($permissions)) {
