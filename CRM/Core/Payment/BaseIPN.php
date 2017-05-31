@@ -125,6 +125,14 @@ class CRM_Core_Payment_BaseIPN {
 
     $objects['contact'] = &$contact;
     $objects['contribution'] = &$contribution;
+
+    // CRM-19478: handle oddity when p=null is set in place of contribution page ID,
+    if (!empty($ids['contributionPage']) && !is_numeric($ids['contributionPage'])) {
+      // We don't need to worry if about removing contribution page id as it will be set later in
+      //  CRM_Contribute_BAO_Contribution::loadRelatedObjects(..) using $objects['contribution']->contribution_page_id
+      unset($ids['contributionPage']);
+    }
+
     if (!$this->loadObjects($input, $ids, $objects, $required, $paymentProcessorID)) {
       return FALSE;
     }
