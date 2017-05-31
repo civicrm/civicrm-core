@@ -364,7 +364,7 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
    */
   protected function ensurePriceParamsAreSet(&$formValues) {
     foreach ($formValues as $key => $value) {
-      if ((substr($key, 0, 6) == 'price_') && is_int(substr($key, 7))) {
+      if ((substr($key, 0, 6) == 'price_') && is_numeric(substr($key, 6))) {
         return;
       }
     }
