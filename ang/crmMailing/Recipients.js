@@ -210,7 +210,7 @@
               var params = {
                 input: input,
                 page_num: rcpAjaxState.page_i,
-                params: { is_hidden: 0 },
+                params: { is_hidden: 0, is_active: 1 },
               };
               return params;
             },
