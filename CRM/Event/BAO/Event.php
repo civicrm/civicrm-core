@@ -1870,43 +1870,54 @@ WHERE  id = $cfID
   /**
    * Retrieve all event addresses.
    *
+   * FIXME: This function does not scale. Don't use it.
+   *
    * @return array
    */
   public static function getLocationEvents() {
-    $events = array();
-    $ret = array(
+    // I rewrote this as a quick fix for CRM-20669. But we really should
+    // get rid of this function.
+    $locations = array();
+
+    // In the original version, you would only get the locations of events you
+    // have view-permissions for.
+    // But if you have to check this for all
+    // existing locations (in our particular case, we have 6000+ locations),
+    // this takes too much time. So I will fetch all locations. Which is probably wrong.
+
+    $sql = "SELECT e.loc_block_id,
+          a.name, a.street_address, a.supplemental_address_1, a.supplemental_address_2, a.supplemental_address_3, a.city,
+          sp.name AS st_prov
+        FROM civicrm_event e
+        JOIN civicrm_loc_block lb ON e.loc_block_id = lb.id
+        JOIN civicrm_address a ON lb.address_id = a.id
+        LEFT OUTER JOIN ccciv.civicrm_state_province sp ON a.state_province_id = sp.id
+        GROUP BY a.street_address, a.supplemental_address_1, a.supplemental_address_2, a.supplemental_address_3, a.city, sp.name";
+    $fields = [
       'loc_block_id',
-      'loc_block_id.address_id.name',
-      'loc_block_id.address_id.street_address',
-      'loc_block_id.address_id.supplemental_address_1',
-      'loc_block_id.address_id.supplemental_address_2',
-      'loc_block_id.address_id.supplemental_address_3',
-      'loc_block_id.address_id.city',
-      'loc_block_id.address_id.state_province_id.name',
-    );
+      'name',
+      'street_address',
+      'supplemental_address_1',
+      'supplemental_address_2',
+      'supplemental_address_3',
+      'city',
+      'st_prov',
+    ];
 
-    $result = civicrm_api3('Event', 'get', array(
-      'check_permissions' => TRUE,
-      'return' => $ret,
-      'loc_block_id.address_id' => array('IS NOT NULL' => 1),
-      'options' => array(
-        'limit' => 0,
-      ),
-    ));
-
-    foreach ($result['values'] as $event) {
+    $dao = CRM_Core_DAO::executeQuery($sql);
+    while ($dao->fetch()) {
       $address = '';
-      foreach ($ret as $field) {
-        if ($field != 'loc_block_id' && !empty($event[$field])) {
-          $address .= ($address ? ' :: ' : '') . $event[$field];
+      foreach ($fields as $field) {
+        if ($field != 'loc_block_id' && !empty($dao->$field)) {
+          $address .= ($address ? ' :: ' : '') . $dao->$field;
         }
       }
       if ($address) {
-        $events[$event['loc_block_id']] = $address;
+        $locations[$dao->loc_block_id] = $address;
       }
     }
 
-    return CRM_Utils_Array::asort($events);
+    return CRM_Utils_Array::asort($locations);
   }
 
   /**
