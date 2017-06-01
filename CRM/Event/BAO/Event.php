@@ -1893,7 +1893,7 @@ WHERE  id = $cfID
         JOIN civicrm_address a ON lb.address_id = a.id
         LEFT OUTER JOIN ccciv.civicrm_state_province sp ON a.state_province_id = sp.id
         GROUP BY a.street_address, a.supplemental_address_1, a.supplemental_address_2, a.supplemental_address_3, a.city, sp.name";
-    $fields = [
+    $fields = array(
       'loc_block_id',
       'name',
       'street_address',
@@ -1902,7 +1902,7 @@ WHERE  id = $cfID
       'supplemental_address_3',
       'city',
       'st_prov',
-    ];
+    );
 
     $dao = CRM_Core_DAO::executeQuery($sql);
     while ($dao->fetch()) {
