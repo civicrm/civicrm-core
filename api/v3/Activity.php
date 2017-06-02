@@ -327,31 +327,49 @@ function civicrm_api3_activity_get($params) {
       );
     }
   }
-  if (!empty($params['tag_id'])) {
-    if (!is_array($params['tag_id'])) {
-      $params['tag_id'] = array('=' => $params['tag_id']);
-    }
-    $clause = \CRM_Core_DAO::createSQLFilter('tag_id', $params['tag_id']);
-    if ($clause) {
-      $sql->where('a.id IN (SELECT entity_id FROM civicrm_entity_tag WHERE entity_table = "civicrm_activity" AND !clause)', array('!clause' => $clause));
-    }
-  }
-  if (!empty($params['file_id'])) {
-    if (!is_array($params['file_id'])) {
-      $params['file_id'] = array('=' => $params['file_id']);
-    }
-    $clause = \CRM_Core_DAO::createSQLFilter('file_id', $params['file_id']);
-    if ($clause) {
-      $sql->where('a.id IN (SELECT entity_id FROM civicrm_entity_file WHERE entity_table = "civicrm_activity" AND !clause)', array('!clause' => $clause));
-    }
-  }
-  if (!empty($params['case_id'])) {
-    if (!is_array($params['case_id'])) {
-      $params['case_id'] = array('=' => $params['case_id']);
-    }
-    $clause = \CRM_Core_DAO::createSQLFilter('case_id', $params['case_id']);
-    if ($clause) {
-      $sql->where('a.id IN (SELECT activity_id FROM civicrm_case_activity WHERE !clause)', array('!clause' => $clause));
+
+  // Define how to handle filters on some related entities.
+  // Subqueries are nice in (a) avoiding duplicates and (b) when the result
+  // list is expected to be bite-sized. Joins are nice (a) with larger
+  // datasets and (b) checking for non-existent relations.
+  $rels = array(
+    'tag_id' => array(
+      'subquery' => 'a.id IN (SELECT entity_id FROM civicrm_entity_tag WHERE entity_table = "civicrm_activity" AND !clause)',
+      'join' => '!joinType civicrm_entity_tag !alias ON (!alias.entity_table = "civicrm_activity" AND !alias.entity_id = a.id)',
+      'column' => 'tag_id',
+    ),
+    'file_id' => array(
+      'subquery' => 'a.id IN (SELECT entity_id FROM civicrm_entity_file WHERE entity_table = "civicrm_activity" AND !clause)',
+      'join' => '!joinType civicrm_entity_file !alias ON (!alias.entity_table = "civicrm_activity" AND !alias.entity_id = a.id)',
+      'column' => 'file_id',
+    ),
+    'case_id' => array(
+      'subquery' => 'a.id IN (SELECT activity_id FROM civicrm_case_activity WHERE !clause)',
+      'join' => '!joinType civicrm_case_activity !alias ON (!alias.activity_id = a.id)',
+      'column' => 'case_id',
+    ),
+  );
+  foreach ($rels as $filter => $relSpec) {
+    if (!empty($params[$filter])) {
+      if (!is_array($params[$filter])) {
+        $params[$filter] = array('=' => $params[$filter]);
+      }
+      // $mode is one of ('LEFT JOIN', 'INNER JOIN', 'SUBQUERY')
+      $mode = isset($params[$filter]['IS NULL']) ? 'LEFT JOIN' : 'SUBQUERY';
+      if ($mode === 'SUBQUERY') {
+        $clause = \CRM_Core_DAO::createSQLFilter($relSpec['column'], $params[$filter]);
+        if ($clause) {
+          $sql->where($relSpec['subquery'], array('!clause' => $clause));
+        }
+      }
+      else {
+        $alias = 'actjoin_' . $filter;
+        $clause = \CRM_Core_DAO::createSQLFilter($alias . "." . $relSpec['column'], $params[$filter]);
+        if ($clause) {
+          $sql->join($alias, $relSpec['join'], array('!alias' => $alias, 'joinType' => $mode));
+          $sql->where($clause);
+        }
+      }
     }
   }
   $activities = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, FALSE, 'Activity', $sql);
