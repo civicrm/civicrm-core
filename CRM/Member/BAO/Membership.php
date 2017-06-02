@@ -189,7 +189,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
         );
         // 1. Update Schedule Membership Signup/Renwal activity to completed on successful payment of pending membership
         // 2. OR Create renewal activity scheduled if its membership renewal will be paid later
-        if (!empty($activityParams['id']) || $activityType == 'Membership Renewal') {
+        if (!empty($params['membership_activity_status']) && (!empty($activityParams['id']) || $activityType == 'Membership Renewal')) {
           CRM_Activity_BAO_Activity::addActivity($membership, $activityType, $targetContactID, $activityParams);
           break;
         }
@@ -1170,6 +1170,7 @@ AND civicrm_membership.is_test = %2";
     $currentMembership['today_date'] = $today;
 
     if ($status['id'] !== $currentMembership['status_id']) {
+      $oldStatus = $currentMembership['status_id'];
       $memberDAO = new CRM_Member_DAO_Membership();
       $memberDAO->id = $currentMembership['id'];
       $memberDAO->find(TRUE);
@@ -1216,6 +1217,19 @@ AND civicrm_membership.is_test = %2";
       else {
         $logParams['modified_id'] = $currentMembership['contact_id'];
       }
+
+      //Create activity for status change.
+      $allStatus = CRM_Member_BAO_Membership::buildOptions('status_id', 'get');
+      CRM_Activity_BAO_Activity::addActivity($memberDAO,
+        'Change Membership Status',
+        NULL,
+        array(
+          'subject' => "Status changed from {$allStatus[$oldStatus]} to {$allStatus[$status['id']]}",
+          'source_contact_id' => $logParams['modified_id'],
+          'priority_id' => 'Normal',
+        )
+      );
+
       CRM_Member_BAO_MembershipLog::add($logParams, CRM_Core_DAO::$_nullArray);
     }
   }
@@ -1946,6 +1960,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
         if (!empty($currentMembership['id'])) {
           $ids['membership'] = $currentMembership['id'];
         }
+        $memParams['membership_activity_status'] = ($pending || $isPayLater) ? 'Scheduled' : 'Completed';
       }
       //CRM-4555
       if ($pending) {
