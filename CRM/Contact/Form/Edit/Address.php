@@ -163,10 +163,7 @@ class CRM_Contact_Form_Edit_Address {
     $form->assign('geoCode', $geoCode);
 
     // Process any address custom data -
-    $groupTree = CRM_Core_BAO_CustomGroup::getTree('Address',
-      $form,
-      $entityId
-    );
+    $groupTree = CRM_Core_BAO_CustomGroup::getTree('Address', NULL, $entityId);
 
     if (isset($groupTree) && is_array($groupTree)) {
       // use simplified formatted groupTree

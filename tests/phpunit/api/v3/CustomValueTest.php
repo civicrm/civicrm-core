@@ -412,9 +412,44 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
     ));
     $fieldName = 'custom_' . $cf['id'];
     $contact = $this->individualCreate(array($fieldName => array('2', '3')));
+
+    // Verify values are formatted correctly
     $tree = $this->callAPISuccess('CustomValue', 'gettree', array('entity_type' => 'Contact', 'entity_id' => $contact));
     $this->assertEquals(array('2', '3'), $tree['values']['TestGettree']['fields']['got_options']['value']['data']);
     $this->assertEquals('Two, Three', $tree['values']['TestGettree']['fields']['got_options']['value']['display']);
+
+    // Try limiting the return params
+    $tree = $this->callAPISuccess('CustomValue', 'gettree', array(
+      'entity_type' => 'Contact',
+      'entity_id' => $contact,
+      'return' => array(
+        'custom_group.id',
+        'custom_field.id',
+      ),
+    ));
+    $this->assertEquals(array('2', '3'), $tree['values']['TestGettree']['fields']['got_options']['value']['data']);
+    $this->assertEquals(array('id', 'fields'), array_keys($tree['values']['TestGettree']));
+
+    // Verify that custom set appears for individuals even who don't have any custom data
+    $contact2 = $this->individualCreate();
+    $tree = $this->callAPISuccess('CustomValue', 'gettree', array('entity_type' => 'Contact', 'entity_id' => $contact2));
+    $this->assertArrayHasKey('TestGettree', $tree['values']);
+
+    // Verify that custom set doesn't appear for other contact types
+    $org = $this->organizationCreate();
+    $tree = $this->callAPISuccess('CustomValue', 'gettree', array('entity_type' => 'Contact', 'entity_id' => $org));
+    $this->assertArrayNotHasKey('TestGettree', $tree['values']);
+
+  }
+
+  public function testGettree_getfields() {
+    $fields = $this->callAPISuccess('CustomValue', 'getfields', array('api_action' => 'gettree'));
+    $fields = $fields['values'];
+    $this->assertTrue((bool) $fields['entity_id']['api.required']);
+    $this->assertTrue((bool) $fields['entity_type']['api.required']);
+    $this->assertEquals('custom_group.id', $fields['custom_group.id']['name']);
+    $this->assertEquals('custom_field.id', $fields['custom_field.id']['name']);
+    $this->assertEquals('custom_value.id', $fields['custom_value.id']['name']);
   }
 
 }

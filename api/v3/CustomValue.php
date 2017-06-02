@@ -256,6 +256,30 @@ function _civicrm_api3_custom_value_gettree_spec(&$spec) {
     'api.required' => 1,
     'options' => array_combine($entities, $entities),
   );
+  // Return params for custom group, field & value
+  foreach (CRM_Core_DAO_CustomGroup::fields() as $field) {
+    $name = 'custom_group.' . $field['name'];
+    $spec[$name] = array('name' => $name) + $field;
+  }
+  foreach (CRM_Core_DAO_CustomField::fields() as $field) {
+    $name = 'custom_field.' . $field['name'];
+    $spec[$name] = array('name' => $name) + $field;
+  }
+  $spec['custom_value.id'] = array(
+    'title' => 'Custom Value Id',
+    'description' => 'Id of record in custom value table',
+    'type' => CRM_Utils_Type::T_INT,
+  );
+  $spec['custom_value.data'] = array(
+    'title' => 'Custom Value (Raw)',
+    'description' => 'Raw value as stored in the database',
+    'type' => CRM_Utils_Type::T_STRING,
+  );
+  $spec['custom_value.display'] = array(
+    'title' => 'Custom Value (Formatted)',
+    'description' => 'Custom value formatted for display',
+    'type' => CRM_Utils_Type::T_STRING,
+  );
 }
 
 /**
@@ -278,6 +302,10 @@ function civicrm_api3_custom_value_gettree($params) {
     if (isset($toReturn[$type])) {
       $toReturn[$type][] = $field;
     }
+  }
+  // We must have a name if not indexing sequentially
+  if (empty($params['sequential']) && $toReturn['custom_field']) {
+    $toReturn['custom_field'][] = 'name';
   }
   switch ($params['entity_type']) {
     case 'Contact':
@@ -316,7 +344,7 @@ function civicrm_api3_custom_value_gettree($params) {
       }
     }
   }
-  $tree = CRM_Core_BAO_CustomGroup::getTree($treeParams['entityType'], NULL, $params['entity_id'], NULL, $treeParams['subTypes'], $treeParams['subName'], TRUE, NULL, FALSE, CRM_Utils_Array::value('check_permissions', $params, TRUE));
+  $tree = CRM_Core_BAO_CustomGroup::getTree($treeParams['entityType'], $toReturn, $params['entity_id'], NULL, $treeParams['subTypes'], $treeParams['subName'], TRUE, NULL, FALSE, CRM_Utils_Array::value('check_permissions', $params, TRUE));
   unset($tree['info']);
   $result = array();
   foreach ($tree as $group) {

@@ -307,7 +307,7 @@
       populateFields(fields, entity, action, '', required);
       showFields(required);
       renderJoinSelector();
-      if (_.includes(['get', 'getsingle', 'getvalue', 'getstat'], action)) {
+      if (_.includes(['get', 'getsingle', 'getvalue', 'getstat', 'gettree'], action)) {
         showReturn();
       }
     });

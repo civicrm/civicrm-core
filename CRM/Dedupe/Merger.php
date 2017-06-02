@@ -1383,7 +1383,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     $mainTree = CRM_Core_BAO_CustomGroup::getTree($main['contact_type'], NULL, $mainId, -1,
       CRM_Utils_Array::value('contact_sub_type', $main), NULL, TRUE, NULL, TRUE, $checkPermissions
     );
-    $otherTree = CRM_Core_BAO_CustomGroup::getTree($main['contact_type'], CRM_Core_DAO::$_nullObject, $otherId, -1,
+    $otherTree = CRM_Core_BAO_CustomGroup::getTree($main['contact_type'], NULL, $otherId, -1,
       CRM_Utils_Array::value('contact_sub_type', $other), NULL, TRUE, NULL, TRUE, $checkPermissions
     );
     CRM_Core_DAO::freeResult();
@@ -1515,9 +1515,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     // fix custom fields so they're edible by createProfileContact()
     static $treeCache = array();
     if (!array_key_exists($migrationInfo['main_details']['contact_type'], $treeCache)) {
-      $treeCache[$migrationInfo['main_details']['contact_type']] = CRM_Core_BAO_CustomGroup::getTree($migrationInfo['main_details']['contact_type'],
-        CRM_Core_DAO::$_nullObject, NULL, -1
-      );
+      $treeCache[$migrationInfo['main_details']['contact_type']] = CRM_Core_BAO_CustomGroup::getTree($migrationInfo['main_details']['contact_type'], NULL, NULL, -1);
     }
 
     $cFields = array();
