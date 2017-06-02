@@ -4601,6 +4601,7 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
               'contact_id' => $membership->contact_id,
               'is_test' => $membership->is_test,
               'membership_type_id' => $membership->membership_type_id,
+              'membership_activity_status' => 'Completed',
             );
 
             $currentMembership = CRM_Member_BAO_Membership::getContactMembership($membershipParams['contact_id'],
