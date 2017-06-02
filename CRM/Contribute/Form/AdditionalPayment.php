@@ -132,7 +132,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       $this->_paymentType = 'owed';
     }
     else {
-      CRM_Core_Error::fatal(ts('No payment information found for this record'));
+      $this->_paymentType = 'overpaid';
     }
 
     if (!empty($this->_mode) && $this->_paymentType == 'refund') {

@@ -440,12 +440,12 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
         'cxt' => $this->_context,
       );
 
-      if (in_array($row['contribution_status_name'], array('Partially paid', 'Pending refund')) || $isPayLater) {
+      if (in_array($row['contribution_status_name'], array('Partially paid', 'Pending refund', 'Completed')) || $isPayLater) {
         $buttonName = ts('Record Payment');
         if ($row['contribution_status_name'] == 'Pending refund') {
           $buttonName = ts('Record Refund');
         }
-        elseif (CRM_Core_Config::isEnabledBackOfficeCreditCardPayments()) {
+        elseif ($row['contribution_status_name'] != 'Completed' && CRM_Core_Config::isEnabledBackOfficeCreditCardPayments()) {
           $links[CRM_Core_Action::BASIC] = array(
             'name' => ts('Submit Credit Card payment'),
             'url' => 'civicrm/payment/add',
