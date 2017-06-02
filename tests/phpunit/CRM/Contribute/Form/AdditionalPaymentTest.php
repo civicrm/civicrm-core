@@ -207,6 +207,30 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test the submit function that submit additional payment over paid contribution.
+   */
+  public function testAddPaymentForCompletedContribution() {
+    $this->createContribution('Completed');
+    $contribution = $this->callAPISuccessGetSingle('Contribution', array('id' => $this->_contributionId));
+    $this->assertEquals(100.00, $contribution['total_amount']);
+    $this->assertEquals('Completed', $contribution['contribution_status']);
+
+    // pay additional amount
+    $this->submitPayment(10);
+    $contribution = $this->callAPISuccessGetSingle('Contribution', array('id' => $this->_contributionId));
+    $this->assertEquals(110.00, $contribution['total_amount']);
+    $this->assertEquals('Completed', $contribution['contribution_status']);
+
+    // pay another additional amount
+    $this->submitPayment(20);
+    $contribution = $this->callAPISuccessGetSingle('Contribution', array('id' => $this->_contributionId));
+    $this->assertEquals(130.00, $contribution['total_amount']);
+    $this->assertEquals('Completed', $contribution['contribution_status']);
+
+    $this->checkResults(array(100, 10, 20), 3);
+  }
+
+  /**
    * Test the submit function that completes the pending pay later Contribution with multiple payments.
    */
   public function testMultiplePaymentForPendingPayLaterContribution() {
@@ -259,19 +283,29 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
    *
    */
   public function createContribution($typeofContribution = 'Pending') {
+    $contributionParams = array(
+      'contribution_status_id' => CRM_Core_Pseudoconstant::getKey(
+        'CRM_Contribute_BAO_Contribution',
+        'contribution_status_id',
+        $typeofContribution
+      ),
+    );
     if ($typeofContribution == 'Partially paid') {
-      $contributionParams = array_merge($this->_params, array(
+      $contributionParams = array_merge($contributionParams, $this->_params, array(
         'partial_payment_total' => 100.00,
         'partial_amount_to_pay' => 30,
-        'contribution_status_id' => 1,
       ));
     }
     elseif ($typeofContribution == 'Pending') {
-      $contributionParams = array_merge($this->_params, array(
-        'contribution_status_id' => 2,
+      $contributionParams = array_merge($contributionParams, $this->_params, array(
         'is_pay_later' => 1,
       ));
     }
+    else {
+      $contributionParams = array_merge($this->_params, $contributionParams);
+    }
+
+    CRM_Core_Error::debug_var('$contributionParams', $contributionParams);
     $contribution = $this->callAPISuccess('Contribution', 'create', $contributionParams);
     $contribution = $this->callAPISuccessGetSingle('Contribution', array('id' => $contribution['id']));
     $this->assertNotEmpty($contribution);
