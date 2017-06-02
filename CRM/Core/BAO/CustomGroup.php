@@ -385,6 +385,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
     $tableData = array(
       'civicrm_custom_field' => array(
         'id',
+        'name',
         'label',
         'column_name',
         'data_type',

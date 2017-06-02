@@ -397,4 +397,24 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
     $this->assertEquals($params[$controlFieldName], $result[$controlFieldName]);
   }
 
+  public function testGettree() {
+    $cg = $this->callAPISuccess('CustomGroup', 'create', array(
+      'title' => 'TestGettree',
+      'extends' => 'Individual',
+    ));
+    $cf = $this->callAPISuccess('CustomField', 'create', array(
+      'custom_group_id' => $cg['id'],
+      'label' => 'Got Options',
+      'name' => 'got_options',
+      "data_type" => "String",
+      "html_type" => "Multi-Select",
+      'option_values' => array('1' => 'One', '2' => 'Two', '3' => 'Three'),
+    ));
+    $fieldName = 'custom_' . $cf['id'];
+    $contact = $this->individualCreate(array($fieldName => array('2', '3')));
+    $tree = $this->callAPISuccess('CustomValue', 'gettree', array('entity_type' => 'Contact', 'entity_id' => $contact));
+    $this->assertEquals(array('2', '3'), $tree['values']['TestGettree']['fields']['got_options']['value']['data']);
+    $this->assertEquals('Two, Three', $tree['values']['TestGettree']['fields']['got_options']['value']['display']);
+  }
+
 }
