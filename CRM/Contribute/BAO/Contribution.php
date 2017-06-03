@@ -4205,7 +4205,7 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
     $taxRates = CRM_Core_PseudoConstant::getTaxRates();
 
     // Update contribution.
-    if (!empty($params['id'])) {
+    if (!empty($params['id']) && !$isLineItem) {
       // CRM-19126 and CRM-19152 If neither total or financial_type_id are set on an update
       // there are no tax implications - early return.
       if (!isset($params['total_amount']) && !isset($params['financial_type_id'])) {
