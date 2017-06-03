@@ -47,10 +47,7 @@ class CRM_Contact_Form_Search_Custom_MultipleValues extends CRM_Contact_Form_Sea
   public function __construct(&$formValues) {
     parent::__construct($formValues);
 
-    $this->_groupTree = CRM_Core_BAO_CustomGroup::getTree("'Contact', 'Individual', 'Organization', 'Household'",
-      CRM_Core_DAO::$_nullObject,
-      NULL, -1
-    );
+    $this->_groupTree = CRM_Core_BAO_CustomGroup::getTree("'Contact', 'Individual', 'Organization', 'Household'", NULL, NULL, -1);
 
     $this->_group = CRM_Utils_Array::value('group', $this->_formValues);
 
