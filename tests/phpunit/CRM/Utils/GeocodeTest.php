@@ -36,8 +36,8 @@ class CRM_Utils_GeocodeTest extends CiviUnitTestCase {
         'street_address' => '1600 Pennsylvania Avenue',
         'city' => 'Washington',
         'state_province' => 'DC',
-        'location_type_id' => 1
-      )
+        'location_type_id' => 1,
+      ),
     );
     $result = civicrm_api3('Contact', 'create', $params);
     $contact_values = array_pop($result['values']);
@@ -54,6 +54,5 @@ class CRM_Utils_GeocodeTest extends CiviUnitTestCase {
     $new_contact_values = array_pop($new_result['values']);
     $new_address_values = array_pop($new_contact_values['api.Address.create']['values']);
     $this->assertArrayNotHasKey('geo_code_1', $new_address_values, 'No geocoding when geocodeMethod is empty');
-
   }
 }
