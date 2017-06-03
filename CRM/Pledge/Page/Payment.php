@@ -52,6 +52,13 @@ class CRM_Pledge_Page_Payment extends CRM_Core_Page {
       $this->edit();
     }
     else {
+      $session = CRM_Core_Session::singleton();
+      if ($session->get('reloadPledgeTab') === TRUE) {
+        $this->ajaxResponse['updateTabs'] = array(
+          '#tab_pledge' => CRM_Contact_BAO_Contact::getCountComponent('pledge', $this->_contactId),
+        );
+        $session->set('reloadPledgeTab', FALSE);
+      }
       $pledgeId = CRM_Utils_Request::retrieve('pledgeId', 'Positive', $this);
 
       $paymentDetails = CRM_Pledge_BAO_PledgePayment::getPledgePayments($pledgeId);
