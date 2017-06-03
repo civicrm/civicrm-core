@@ -222,7 +222,7 @@ class CRM_Core_Config_MagicMerge {
     if (!isset($this->map[$k])) {
       throw new \CRM_Core_Exception("Cannot read unrecognized property CRM_Core_Config::\${$k}.");
     }
-    if (array_key_exists($k, $this->cache)) {
+    if (isset($this->cache[$k])) {
       return $this->cache[$k];
     }
 
