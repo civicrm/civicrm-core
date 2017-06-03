@@ -3667,7 +3667,10 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
             $itemParams['amount'] = self::getMultiplier($params['contribution']->contribution_status_id, $context) * $lineItemDetails['tax_amount'];
             $itemParams['description'] = $taxTerm;
             if ($lineItemDetails['financial_type_id']) {
-              $itemParams['financial_account_id'] = self::getFinancialAccountId($lineItemDetails['financial_type_id']);
+              $itemParams['financial_account_id'] = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount(
+                $lineItemDetails['financial_type_id'],
+                'Sales Tax Account is'
+              );
             }
             CRM_Financial_BAO_FinancialItem::create($itemParams, NULL, $trxnIds);
           }
@@ -4180,27 +4183,6 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
       $info['transaction'] = $rows;
     }
     return $info;
-  }
-
-  /**
-   * Get financial account id has 'Sales Tax Account is' account relationship with financial type.
-   *
-   * @param int $financialTypeId
-   *
-   * @return int
-   *   Financial Account Id
-   */
-  public static function getFinancialAccountId($financialTypeId) {
-    $accountRel = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Sales Tax Account is' "));
-    $searchParams = array(
-      'entity_table' => 'civicrm_financial_type',
-      'entity_id' => $financialTypeId,
-      'account_relationship' => $accountRel,
-    );
-    $result = array();
-    CRM_Financial_BAO_FinancialTypeAccount::retrieve($searchParams, $result);
-
-    return CRM_Utils_Array::value('financial_account_id', $result);
   }
 
   /**
