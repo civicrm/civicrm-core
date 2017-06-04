@@ -55,4 +55,5 @@ class CRM_Utils_GeocodeTest extends CiviUnitTestCase {
     $new_address_values = array_pop($new_contact_values['api.Address.create']['values']);
     $this->assertArrayNotHasKey('geo_code_1', $new_address_values, 'No geocoding when geocodeMethod is empty');
   }
+
 }
