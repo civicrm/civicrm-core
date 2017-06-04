@@ -157,6 +157,8 @@ class CRM_Extension_Browser {
 
   /**
    * Get a description of a particular extension.
+   * This function is an optimised form of getExtensions() - it returns the
+   * extension's details as soon as it's found without caching anything.
    *
    * @param string $key
    *   Fully-qualified extension name.
@@ -164,14 +166,22 @@ class CRM_Extension_Browser {
    * @return CRM_Extension_Info|NULL
    */
   public function getExtension($key) {
-    // TODO optimize performance -- we don't need to fetch/cache the entire repo
-    $exts = $this->getExtensions();
-    if (array_key_exists($key, $exts)) {
-      return $exts[$key];
-    }
-    else {
+    if (!$this->isEnabled() || count($this->checkRequirements())) {
       return NULL;
     }
+
+    $remote = $this->_discoverRemote();
+    if (!is_array($remote)) {
+      return NULL;
+    }
+
+    foreach ($remote as $e) {
+      if ($key == $e->key) {
+        return $e;
+      }
+    }
+
+    return NULL;
   }
 
   /**
