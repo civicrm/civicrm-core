@@ -718,33 +718,44 @@ WHERE li.contribution_id = %1";
     }
     $trxn = $lineItemObj->_recordAdjustedAmt($updatedAmount, $paidAmount, $contributionId, $taxAmount, $updateAmountLevel);
 
-    $trxnId = array();
-    if (!empty($trxn->id)) {
-      $trxnId['id'] = $trxn->id;
-    }
+    $contributionCompletedStatusID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_DAO_Contribution', 'contribution_status_id', 'Completed');
     if (!empty($financialItemsArray)) {
       foreach ($financialItemsArray as $updateFinancialItemInfoValues) {
-        $tempTrxnID = $trxnId;
-        if (!empty($updateFinancialItemInfoValues['financialTrxn'])) {
+        $newFinancialItem = CRM_Financial_BAO_FinancialItem::create($updateFinancialItemInfoValues);
+        // record reverse transaction only if Contribution is Completed because for pending refund or
+        //   partially paid we are already recording the surplus owed or refund amount
+        if (!empty($updateFinancialItemInfoValues['financialTrxn']) && ($contributionCompletedStatusID ==
+          CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $contributionId, 'contribution_status_id'))
+        ) {
           $trxnTable = array(
-            'entity_id' => $updateFinancialItemInfoValues['financialTrxn']['entity_id'],
-            'entity_table' => $updateFinancialItemInfoValues['financialTrxn']['entity_table'],
+            'entity_id' => $newFinancialItem->id,
+            'entity_table' => 'civicrm_financial_item',
           );
-          $newTrxn = CRM_Core_BAO_FinancialTrxn::create($updateFinancialItemInfoValues['financialTrxn'], $trxnTable);
-          $tempTrxnID = array('id' => $newTrxn->id);
+          $reverseTrxn = CRM_Core_BAO_FinancialTrxn::create($updateFinancialItemInfoValues['financialTrxn'], $trxnTable);
+          // record reverse entity financial trxn linked to membership's related contribution
+          civicrm_api3('EntityFinancialTrxn', 'create', array(
+            'entity_table' => "civicrm_contribution",
+            'entity_id' => $contributionId,
+            'financial_trxn_id' => $reverseTrxn->id,
+            'amount' => $reverseTrxn->total_amount,
+          ));
+          unset($updateFinancialItemInfoValues['financialTrxn']);
         }
-        CRM_Financial_BAO_FinancialItem::create($updateFinancialItemInfoValues, NULL, $tempTrxnID);
         if (!empty($updateFinancialItemInfoValues['tax'])) {
           $updateFinancialItemInfoValues['tax']['amount'] = $updateFinancialItemInfoValues['amount'];
           $updateFinancialItemInfoValues['tax']['description'] = $updateFinancialItemInfoValues['description'];
           if (!empty($updateFinancialItemInfoValues['financial_account_id'])) {
             $updateFinancialItemInfoValues['financial_account_id'] = $updateFinancialItemInfoValues['tax']['financial_account_id'];
           }
-          CRM_Financial_BAO_FinancialItem::create($updateFinancialItemInfoValues, NULL, $trxnId);
+          CRM_Financial_BAO_FinancialItem::create($updateFinancialItemInfoValues);
         }
       }
     }
 
+    $trxnId = array();
+    if (!empty($trxn->id)) {
+      $trxnId['id'] = $trxn->id;
+    }
     $lineItemObj->_addLineItemOnChangeFeeSelection($lineItemsToAdd, $entityID, $entityTable, $contributionId, $trxnId, TRUE);
 
     // update participant fee_amount column
@@ -968,7 +979,7 @@ WHERE li.contribution_id = %1";
             $changedFinancialTypeID = $lineParams['financial_type_id'];
             $adjustedTrxnValues = array(
               'from_financial_account_id' => NULL,
-              'to_financial_account_id' => CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($lineParams['financial_type_id'], 'Income Account is'),
+              'to_financial_account_id' => CRM_Financial_BAO_FinancialTypeAccount::getInstrumentFinancialAccount($updatedContribution->payment_instrument_id),
               'total_amount' => $lineParams['line_total'],
               'net_amount' => $lineParams['line_total'],
               'status_id' => $updatedContribution->contribution_status_id,
@@ -1047,26 +1058,26 @@ WHERE li.contribution_id = %1";
    *
    */
   protected function _getRelatedCancelFinancialTrxn($financialItemID) {
-    $query = "SELECT ft.*
-FROM civicrm_financial_trxn ft
-INNER JOIN civicrm_entity_financial_trxn eft ON eft.financial_trxn_id = ft.id AND eft.entity_table = 'civicrm_financial_item'
-WHERE eft.entity_id = %1
-ORDER BY eft.id DESC
-LIMIT 1; ";
+    $financialTrxn = civicrm_api3('EntityFinancialTrxn', 'getsingle', array(
+      'entity_table' => 'civicrm_financial_item',
+      'entity_id' => $financialItemID,
+      'options' => array(
+        'sort' => 'id DESC',
+        'limit' => 1,
+      ),
+      'api.FinancialTrxn.getsingle' => array(
+        'id' => "\$value.financial_trxn_id",
+      ),
+    ));
 
-    $dao = CRM_Core_DAO::executeQuery($query, array(1 => array($financialItemID, 'Integer')));
-    $financialTrxn = array();
-    while ($dao->fetch()) {
-      $financialTrxn = $dao->toArray();
-      unset($financialTrxn['id']);
-      $financialTrxn = array_merge($financialTrxn, array(
-        'trxn_date' => date('YmdHis'),
-        'total_amount' => -$financialTrxn['total_amount'],
-        'net_amount' => -$financialTrxn['net_amount'],
-        'entity_table' => 'civicrm_financial_item',
-        'entity_id' => $financialItemID,
-      ));
-    }
+    $financialTrxn = array_merge($financialTrxn['api.FinancialTrxn.getsingle'], array(
+      'trxn_date' => date('YmdHis'),
+      'total_amount' => -$financialTrxn['api.FinancialTrxn.getsingle']['total_amount'],
+      'net_amount' => -$financialTrxn['api.FinancialTrxn.getsingle']['net_amount'],
+      'entity_table' => 'civicrm_financial_item',
+      'entity_id' => $financialItemID,
+    ));
+    unset($financialTrxn['id']);
 
     return $financialTrxn;
   }
