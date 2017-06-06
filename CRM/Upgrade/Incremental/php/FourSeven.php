@@ -346,6 +346,13 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
     $this->addTask('CRM-16633 - Add "Change Case Subject" activity', 'addChangeCaseSubjectActivityType');
     $this->addTask('Add is_public column to civicrm_custom_group', 'addColumn',
       'civicrm_custom_group', 'is_public', "boolean DEFAULT '1' COMMENT 'Is this property public?'");
+
+    $domain = new CRM_Core_DAO_Domain();
+    $domain->find(TRUE);
+    if ($domain->locales) {
+      $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
+      CRM_Core_I18n_Schema::rebuildMultilingualSchema($locales, NULL);
+    }
   }
 
   /**
