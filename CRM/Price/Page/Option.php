@@ -126,6 +126,9 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
          // Explicitly do not check permissions so we are not
          // restricted by financial type, so we can change them.
         'check_permissions' => FALSE,
+        'options' => array(
+          'limit' => 0,
+        ),
     ));
     $customOption = $priceOptions['values'];
 
