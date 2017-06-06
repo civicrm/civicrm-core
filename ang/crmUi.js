@@ -690,7 +690,8 @@
       return {
         restrict: 'EA',
         scope: {
-          crmUiTabSet: '@'
+          crmUiTabSet: '@',
+          tabSetOptions: '@'
         },
         templateUrl: '~/crmUi/tabset.html',
         transclude: true,
