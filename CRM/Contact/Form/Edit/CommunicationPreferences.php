@@ -108,7 +108,7 @@ class CRM_Contact_Form_Edit_CommunicationPreferences {
       $greetingTokensDescription = CRM_Core_PseudoConstant::greeting($filter, 'description');
 
       if ($form->_contactId) {
-        foreach($greetingTokens as $key => &$emailGreetingString) {
+        foreach ($greetingTokens as $key => &$emailGreetingString) {
           $contactDetails = array();
           $contactDetails = array(array($form->_contactId => $contactDetails));
           if ($emailGreetingString) {
