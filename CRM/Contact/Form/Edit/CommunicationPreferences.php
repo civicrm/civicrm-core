@@ -120,7 +120,7 @@ class CRM_Contact_Form_Edit_CommunicationPreferences {
             $emailGreetingString = CRM_Core_DAO::escapeString(CRM_Utils_String::stripSpaces($emailGreetingString));
             if (!empty($greetingTokensDescription[$key])) {
               // Append description to processed greeting
-              $emailGreetingString .= ' ( '. $greetingTokensDescription[$key] .' )';
+              $emailGreetingString .= ' ( ' . $greetingTokensDescription[$key] . ' )';
             }
           }
         }
