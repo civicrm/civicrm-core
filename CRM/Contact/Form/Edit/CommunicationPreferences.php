@@ -100,6 +100,32 @@ class CRM_Contact_Form_Edit_CommunicationPreferences {
 
       //add addressee in Contact form
       $greetingTokens = CRM_Core_PseudoConstant::greeting($filter);
+
+      // Instead of showing smarty token with/o conditional logic in Drop down list,
+      // show processed token. (Only in Contact Edit mode)
+
+      // Get Description of each greeting
+      $greetingTokensDescription = CRM_Core_PseudoConstant::greeting($filter, 'description');
+
+      if ($form->_contactId) {
+        foreach($greetingTokens as $key => &$emailGreetingString) {
+          $contactDetails = array();
+          $contactDetails = array(array($form->_contactId => $contactDetails));
+          if ($emailGreetingString) {
+            CRM_Contact_BAO_Contact_Utils::processGreetingTemplate($emailGreetingString,
+              $contactDetails,
+              $form->_contactId,
+              'CRM_Contact_BAO_Contact'
+            );
+            $emailGreetingString = CRM_Core_DAO::escapeString(CRM_Utils_String::stripSpaces($emailGreetingString));
+            if (!empty($greetingTokensDescription[$key])) {
+              // Append description to processed greeting
+              $emailGreetingString .= ' ( '. $greetingTokensDescription[$key] .' )';
+            }
+          }
+        }
+      }
+
       if (!empty($greetingTokens)) {
         $form->addElement('select', $fields['field'], $fields['label'],
           array(
