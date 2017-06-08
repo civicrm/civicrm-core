@@ -104,7 +104,7 @@ class CRM_Financial_Form_Payment_Search extends CRM_Core_Form_Search {
     }
 
     $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues);
-    $selector = new CRM_Contribute_Selector_Search($this->_queryParams,
+    $selector = new CRM_Financial_Selector_Search($this->_queryParams,
       $this->_action,
       NULL,
       $this->_single,
@@ -140,7 +140,7 @@ class CRM_Financial_Form_Payment_Search extends CRM_Core_Form_Search {
   public function buildQuickForm() {
     parent::buildQuickForm();
 
-    CRM_Contribute_BAO_Query::buildSearchForm($this);
+    CRM_Financial_BAO_Query::buildSearchForm($this);
   }
 
   public function postProcess() {
@@ -167,7 +167,7 @@ class CRM_Financial_Form_Payment_Search extends CRM_Core_Form_Search {
     }
 
     $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues);
-    $selector = new CRM_Contribute_Selector_Search($this->_queryParams,
+    $selector = new CRM_Financial_Selector_Search($this->_queryParams,
       $this->_action,
       NULL,
       $this->_single,
@@ -195,9 +195,7 @@ class CRM_Financial_Form_Payment_Search extends CRM_Core_Form_Search {
     if ($this->_context == 'user') {
       $query->setSkipPermission(TRUE);
     }
-    $summary = &$query->summaryContribution($this->_context);
-    $this->set('summary', $summary);
-    $this->assign('contributionSummary', $summary);
     $controller->run();
   }
+
 }
