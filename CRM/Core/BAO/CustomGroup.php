@@ -425,7 +425,8 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
       $toReturn = $tableData;
     }
     else {
-      $toReturn = array_filter($toReturn) + $tableData;
+      // Supply defaults and remove unknown array keys
+      $toReturn = array_intersect_key(array_filter($toReturn) + $tableData, $tableData);
       // Merge in required fields that we must have
       $toReturn['custom_field'] = array_unique(array_merge($toReturn['custom_field'], array('id', 'column_name', 'data_type')));
       $toReturn['custom_group'] = array_unique(array_merge($toReturn['custom_group'], array('id', 'is_multiple', 'table_name', 'name')));
