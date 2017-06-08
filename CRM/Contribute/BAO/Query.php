@@ -104,6 +104,8 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
     }
 
     self::addSoftCreditFields($query);
+
+    CRM_Financial_BAO_Query::select($query);
   }
 
   /**

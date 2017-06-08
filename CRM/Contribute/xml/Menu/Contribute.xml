@@ -323,4 +323,12 @@
     <page_callback>CRM_Contribute_Page_AJAX::getSoftContributionRows</page_callback>
     <access_arguments>access CiviCRM</access_arguments>
   </item>
+  <item>
+    <path>civicrm/payment/search</path>
+    <title>Find Payments</title>
+    <page_callback>CRM_Financial_Controller_Search</page_callback>
+    <access_arguments>access CiviContribute</access_arguments>
+    <page_type>1</page_type>
+    <weight>640</weight>
+  </item>
 </menu>
