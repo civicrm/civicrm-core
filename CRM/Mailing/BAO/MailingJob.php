@@ -431,7 +431,9 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
     }
     else {
       // Creating 'child jobs'
-      for ($i = 0; $i < $recipient_count; $i = $i + $offset) {
+      $scheduled_unixtime = strtotime($this->scheduled_date);
+      for ($i = 0, $s = 0; $i < $recipient_count; $i = $i + $offset, $s++) {
+        $params[2][0] = date('Y-m-d H:i:s', $scheduled_unixtime + $s);
         $params[6][0] = $i;
         $params[7][0] = $offset;
         CRM_Core_DAO::executeQuery($sql, $params);
