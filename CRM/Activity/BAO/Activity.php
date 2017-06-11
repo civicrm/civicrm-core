@@ -2140,6 +2140,10 @@ WHERE      activity.id IN ($activityIds)";
         $membershipType = CRM_Member_PseudoConstant::membershipType($entityObj->membership_type_id);
         $subject = $membershipType ? $membershipType : ts('Membership');
 
+        if (is_array($subject)) {
+          $subject = implode(", ", $subject);
+        }
+
         if (!CRM_Utils_System::isNull($entityObj->source)) {
           $subject .= " - {$entityObj->source}";
         }
