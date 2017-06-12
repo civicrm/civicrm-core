@@ -22,5 +22,4 @@ function safe_delete() {
 
 ##############################################################################
 ## Remove example/CLI scripts. They're not needed and increase the attack-surface.
-safe_delete vendor/phpoffice/phpword/samples/bootstrap/js/jquery.min.js
-
+safe_delete vendor/phpoffice/phpword/samples
