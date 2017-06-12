@@ -1237,7 +1237,7 @@ class CRM_Utils_System {
    */
   public static function getDocBaseURL() {
     // FIXME: move this to configuration at some stage
-    return 'http://book.civicrm.org/';
+    return 'http://docs.civicrm.org/';
   }
 
   /**
@@ -1283,6 +1283,7 @@ class CRM_Utils_System {
       }
       else {
         $docBaseURL = self::getDocBaseURL();
+        $page = self::formatDocUrl($page);
       }
       return $docBaseURL . str_replace(' ', '+', $page);
     }
@@ -1321,6 +1322,7 @@ class CRM_Utils_System {
     }
     else {
       $docBaseURL = self::getDocBaseURL();
+      $params['page'] = self::formatDocUrl($params['page']);
     }
 
     if (!isset($params['title']) or $params['title'] === NULL) {
@@ -1346,6 +1348,18 @@ class CRM_Utils_System {
     else {
       return "<a href=\"{$link}\" $style target=\"_blank\" class=\"crm-doc-link no-popup\" title=\"{$params['title']}\">{$params['text']}</a>";
     }
+  }
+
+  /**
+   * Add language and version parameters to the doc url.
+   *
+   * Note that this function may run before CiviCRM is initialized and so should not call ts() or perform any db lookups.
+   *
+   * @param $url
+   * @return mixed
+   */
+  public static function formatDocUrl($url) {
+    return preg_replace('#^user/#', 'user/en/4.6/', $url);
   }
 
   /**
