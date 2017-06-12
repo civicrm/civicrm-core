@@ -204,7 +204,7 @@ class CRM_Event_BAO_CRM19273 extends CiviUnitTestCase {
       'receive_date' => date('Y-m-d') . " 00:00:00",
       'skipLineItem' => 1,
       'partial_payment_total' => $this->_expensiveFee,
-      'partial_amount_pay' => $actualPaidAmt,
+      'partial_amount_to_pay' => $actualPaidAmt,
     );
 
     $contribution = CRM_Contribute_BAO_Contribution::create($contributionParams);

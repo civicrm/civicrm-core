@@ -1399,7 +1399,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
             // the owed amount
             $contributionParams['partial_payment_total'] = $amountOwed;
             // the actual amount paid
-            $contributionParams['partial_amount_pay'] = $params['total_amount'];
+            $contributionParams['partial_amount_to_pay'] = $params['total_amount'];
           }
         }
 
@@ -1550,7 +1550,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         $this->assign('totalAmount', $contributionParams['total_amount']);
         if (isset($contributionParams['partial_payment_total'])) {
           // balance amount
-          $balanceAmount = $contributionParams['partial_payment_total'] - $contributionParams['partial_amount_pay'];
+          $balanceAmount = $contributionParams['partial_payment_total'] - $contributionParams['partial_amount_to_pay'];
           $this->assign('balanceAmount', $balanceAmount);
         }
         $this->assign('isPrimary', 1);

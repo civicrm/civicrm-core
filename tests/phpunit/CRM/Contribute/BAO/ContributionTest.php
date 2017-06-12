@@ -690,7 +690,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       'financial_type_id' => 4,
       'contribution_status_id' => 1,
       'partial_payment_total' => 300.00,
-      'partial_amount_pay' => 150,
+      'partial_amount_to_pay' => 150,
       'contribution_mode' => 'participant',
       'participant_id' => $participant->id,
     );
@@ -1017,7 +1017,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       'receipt_date' => '20080522000000',
       'total_amount' => '20000.00',
       'partial_payment_total' => '20,000.00',
-      'partial_amount_pay' => '8,000.00',
+      'partial_amount_to_pay' => '8,000.00',
     );
 
     $contribution = CRM_Contribute_BAO_Contribution::create($params);
