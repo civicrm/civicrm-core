@@ -684,6 +684,11 @@
       <type>CheckBox</type>
     </html>
   </field>
+  <index>
+    <name>index_is_deceased</name>
+    <fieldName>is_deceased</fieldName>
+    <add>4.7</add>
+  </index>
   <field>
     <name>deceased_date</name>
     <type>date</type>
