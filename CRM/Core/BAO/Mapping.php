@@ -604,7 +604,8 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
                 }
                 //CRM-20672 If contact target type not set e.g. "All Contacts" relationship - present user with all field options and let them determine what they expect to work
                 else {
-                  foreach ($contactTypes as $contactType => $label) {
+                  $types = CRM_Contact_BAO_ContactType::basicTypes(FALSE);
+                  foreach ($types as $contactType => $label) {
                     $relatedFields = array_merge($relatedFields, (array) $relatedMapperFields[$label]);
                   }
                   $relatedFields = array_merge($relatedFields, (array) $relationshipCustomFields);
