@@ -358,7 +358,7 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
     // is the key in $this->_columns, and $fieldName is the key in that array's
     // ['fields'] array.
     // Reference: CRM-20660
-    $distinct_count_columns = array(
+    $distinctCountColumns = array(
       'civicrm_mailing_event_queue.queue_count',
       'civicrm_mailing_event_delivered.delivered_count',
       'civicrm_mailing_event_bounce.bounce_count',
@@ -393,11 +393,9 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
               if (in_array($tableName, $count_tables)) {
                 // Use the DISTINCT keyword appropriately, based on the contents
                 // of $distinct_count_columns.
-                if (in_array("{$tableName}.{$fieldName}", $distinct_count_columns)) {
+                $distinct = '';
+                if (in_array("{$tableName}.{$fieldName}", $distinctCountColumns)) {
                   $distinct = 'DISTINCT';
-                }
-                else {
-                  $distinct = '';
                 }
                 $select[] = "count($distinct {$field['dbAlias']}) as {$tableName}_{$fieldName}";
               }
