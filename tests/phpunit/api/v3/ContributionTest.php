@@ -2473,7 +2473,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
     $this->mut->checkMailLog(array(
       'is_recur:::1',
-      'cancelSubscriptionUrl:::http://dummy.com',
+      'cancelSubscriptionUrl:::'. CIVICRM_UF_BASEURL,
     ));
     $this->mut->stop();
     $this->revertTemplateToReservedTemplate();
