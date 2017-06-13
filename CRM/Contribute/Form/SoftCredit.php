@@ -37,25 +37,6 @@
 class CRM_Contribute_Form_SoftCredit {
 
   /**
-   * Set variables up before form is built.
-   *
-   * @param CRM_Core_Form $form
-   */
-  public static function preProcess(&$form) {
-    $contriDAO = new CRM_Contribute_DAO_Contribution();
-    $contriDAO->id = $form->_id;
-    $contriDAO->find(TRUE);
-    if ($contriDAO->contribution_page_id) {
-      $ufJoinParams = array(
-        'module' => 'soft_credit',
-        'entity_table' => 'civicrm_contribution_page',
-        'entity_id' => $contriDAO->contribution_page_id,
-      );
-      $profileId = CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinParams);
-    }
-  }
-
-  /**
    * Function used to build form element for soft credit block.
    *
    * @param CRM_Core_Form $form
