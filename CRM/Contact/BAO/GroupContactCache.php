@@ -390,7 +390,7 @@ AND    refresh_date IS NULL
    * Function to clear group contact cache and reset the corresponding
    *  group's cache and refresh date
    *
-   *  @param int $groupID
+   * @param int $groupID
    *
    */
   public static function clearGroupContactCache($groupID) {
