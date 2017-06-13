@@ -680,7 +680,8 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   /**
    * Generate the name of the logfile to use and store it as a static.
    *
-   * This function includes poor man's log file management and a check as to whether the file exists.
+   * This function includes simplistic log rotation and a check as to whether
+   * the file exists.
    *
    * @param string $prefix
    */
@@ -693,9 +694,9 @@ class CRM_Core_Error extends PEAR_ErrorStack {
       $hash = self::generateLogFileHash($config);
       $fileName = $config->configAndLogDir . 'CiviCRM.' . $prefixString . $hash . '.log';
 
-      // Roll log file monthly or if greater than 256M
-      // note that PHP file functions have a limit of 2G and hence
-      // the alternative was introduce
+      // Roll log file monthly or if greater than 256M.
+      // Size-based rotation introduced in response to filesize limits on
+      // certain OS/PHP combos.
       if (file_exists($fileName)) {
         $fileTime = date("Ym", filemtime($fileName));
         $fileSize = filesize($fileName);
