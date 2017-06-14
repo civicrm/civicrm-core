@@ -89,6 +89,14 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
             'type' => CRM_Utils_Type::T_STRING,
           ),
         ),
+
+        'order_bys' => array(
+          'sort_name_a' => array(
+            'title' => ts('Contact A'),
+            'name' => 'sort_name',
+            'default_weight' => '1',
+          ),
+        ),
         'grouping' => 'contact_a_fields',
       ),
       'civicrm_contact_b' => array(
@@ -183,6 +191,14 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
             'name' => 'phone_ext',
           ),
         ),
+
+        'order_bys' => array(
+          'sort_name_b' => array(
+            'title' => ts('Contact B'),
+            'name' => 'sort_name',
+            'default_weight' => '2',
+          ),
+        ),
         'grouping' => 'contact_b_fields',
       ),
       'civicrm_relationship_type' => array(
@@ -253,6 +269,33 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
           'end_date' => array(
             'title' => ts('End Date'),
             'type' => CRM_Utils_Type::T_DATE,
+          ),
+
+          'is_permission_a_b' => array(
+            'title' => ts('Does contact A have permission over contact B?'),
+            'operatorType' => CRM_Report_Form::OP_SELECT,
+            'options' => array(
+              '' => ts('- Any -'),
+              1 => ts('Yes'),
+              0 => ts('No'),
+            ),
+            'type' => CRM_Utils_Type::T_INT,
+          ),
+          'is_permission_b_a' => array(
+            'title' => ts('Does contact B have permission over contact A?'),
+            'operatorType' => CRM_Report_Form::OP_SELECT,
+            'options' => array(
+              '' => ts('- Any -'),
+              1 => ts('Yes'),
+              0 => ts('No'),
+            ),
+            'type' => CRM_Utils_Type::T_INT,
+          ),
+        ),
+        'order_bys' => array(
+          'start_date' => array(
+            'title' => ts('Start Date'),
+            'name' => 'start_date',
           ),
         ),
         'grouping' => 'relation-fields',
@@ -551,10 +594,6 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
     else {
       $this->_groupBy = " GROUP BY {$this->_aliases['civicrm_relationship']}.id ";
     }
-  }
-
-  public function orderBy() {
-    $this->_orderBy = " ORDER BY {$this->_aliases['civicrm_contact']}.sort_name, {$this->_aliases['civicrm_contact_b']}.sort_name ";
   }
 
   public function postProcess() {
