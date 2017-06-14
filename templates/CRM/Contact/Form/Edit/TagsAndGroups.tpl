@@ -87,38 +87,36 @@
   <div class="crm-accordion-header">{$title}</div>
   <div class="crm-accordion-body" id="tagGroup">
 {/if}
-<div class="form-layout-compressed{if $context EQ 'profile'} crm-profile-tagsandgroups{/if}">
-  {if !$type || $type eq 'group'}
-    <div class="crm-section crm-clearfix">
-      {if $title}
-        <div class="label">{$form.group.label}</div>
-      {/if}
-      {if $groupElementType eq 'select'}
-        <div class="content">{$form.group.html}</div>
-      {else}
-        {foreach key=key item=item from=$tagGroup.group}
-          <div class="group-wrapper">
-            {$form.group.$key.html}
-            {if $item.description}
-              <span class="description">{$item.description}</span>
+    <table class="form-layout-compressed{if $context EQ 'profile'} crm-profile-tagsandgroups{/if}">
+      <tr>
+        {if !$type || $type eq 'tag'}
+          <td>
+            <span class="label">{if $title}{$form.tag.label}{/if}</span><br />
+            {$form.tag.html}
+          </td>
+        {/if}
+        {if !$type || $type eq 'group'}
+          <td>
+            {if $groupElementType eq 'select'}
+              <span class="label">{if $title}{$form.group.label}{/if}</span>
+              {$form.group.html}
+            {else}
+              {foreach key=key item=item from=$tagGroup.group}
+                <div class="group-wrapper">
+                  {$form.group.$key.html}
+                  {if $item.description}
+                    <div class="description">{$item.description}</div>
+                  {/if}
+                </div>
+              {/foreach}
             {/if}
-          </div>
-        {/foreach}
+          </td>
+        {/if}
+      </tr>
+      {if !$type || $type eq 'tag'}
+        <tr><td>{include file="CRM/common/Tagset.tpl"}</td></tr>
       {/if}
-    </div>
-  {/if}
-  {if (!$type || $type eq 'tag') && $tree}
-    <div class="crm-section crm-clearfix">
-      {if $title}
-        <div class="label">{$form.tag.label}</div>
-      {/if}
-      <div class="content" id="tagtree">
-        {include file="CRM/Contact/Form/Edit/Tagtree.tpl" level=1}
-      </div>
-    </div>
-    {include file="CRM/common/Tagset.tpl"}
-  {/if}
-</div>
+    </table>
 {if $title}
   </div>
 </div><!-- /.crm-accordion-wrapper -->
