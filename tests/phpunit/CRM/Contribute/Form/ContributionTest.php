@@ -185,6 +185,8 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
    * Test the submit function on the contribution page.
    */
   public function testSubmitCreditCardPayPal() {
+    $mut = new CiviMailUtils($this, TRUE);
+    $mut->clearMessages(0);
     $form = new CRM_Contribute_Form_Contribution();
     $paymentProcessorID = $this->paymentProcessorCreate(array('is_test' => 0));
     $form->_mode = 'Live';
@@ -218,6 +220,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
         'hidden_AdditionalDetail' => 1,
         'hidden_Premium' => 1,
         'from_email_address' => '"civi45" <civi45@civicrm.com>',
+        'is_email_receipt' => TRUE,
         'receipt_date' => '',
         'receipt_date_time' => '',
         'payment_processor_id' => $paymentProcessorID,
@@ -239,6 +242,11 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     ), 1);
     $contact = $this->callAPISuccessGetSingle('Contact', array('id' => $this->_individualId));
     $this->assertTrue(empty($contact['source']));
+    if (!$error) {
+      $msgs = $mut->getAllMessages();
+      $this->assertEquals(1, count($msgs));
+    }
+    $mut->stop();
   }
 
   /**
