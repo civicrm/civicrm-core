@@ -681,7 +681,6 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
   public function alterDisplay(&$rows) {
     // Custom code to alter rows.
     $entryFound = FALSE;
-    //crm_core_Error::debug('r', $rows);
     foreach ($rows as $rowNum => $row) {
 
       // Handle ID to label conversion for contact fields
