@@ -1276,6 +1276,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
               'fee_amount' => CRM_Utils_Array::value('fee_amount', $result),
               'card_type_id' => CRM_Utils_Array::value('card_type_id', $paymentParams),
               'pan_truncation' => CRM_Utils_Array::value('pan_truncation', $paymentParams),
+              'is_email_receipt' => FALSE,
             ));
             // This has now been set to 1 in the DB - declare it here also
             $contribution->contribution_status_id = 1;
