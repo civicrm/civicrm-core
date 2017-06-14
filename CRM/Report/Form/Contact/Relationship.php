@@ -554,7 +554,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
     }
     $this->_where = "WHERE ( {$this->_aliases['civicrm_contact']}.is_deleted = 0 AND {$this->_aliases['civicrm_contact_b']}.is_deleted = 0 ) ";
     if ($whereClauses) {
-      $this->_where .=  ' AND ' . implode(' AND ', $whereClauses);
+      $this->_where .= ' AND ' . implode(' AND ', $whereClauses);
     }
     else {
       $this->_having = '';
