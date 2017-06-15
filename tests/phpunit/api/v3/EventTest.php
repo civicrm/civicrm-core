@@ -421,7 +421,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
     // Search for events having NULL as the value for this custom
     // field. This should return all events created in setUp.
     $check = $this->callAPISuccess($this->_entity, 'get', array(
-        'custom_' . $ids['custom_field_id'] => ['IS NULL' => 1],
+        'custom_' . $ids['custom_field_id'] => array('IS NULL' => 1),
       ));
 
     $this->assertGreaterThan(0, $check['count']);
