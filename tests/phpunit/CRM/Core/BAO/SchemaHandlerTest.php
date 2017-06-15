@@ -181,9 +181,10 @@ class CRM_Core_BAO_SchemaHandlerTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check there are no missing indices
+   * Check there are no missing indices after updating
    */
-  public function testGetMissingIndices() {
+  public function testUpdateIndices() {
+    $this->callAPISuccess('System', 'updateindexes', array());
     $missingIndices = CRM_Core_BAO_SchemaHandler::getMissingIndices();
     $this->assertTrue(empty($missingIndices));
   }
@@ -229,18 +230,19 @@ class CRM_Core_BAO_SchemaHandlerTest extends CiviUnitTestCase {
    * Check there are no missing indices
    */
   public function testReconcileMissingIndices() {
-    CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_contact DROP INDEX index_sort_name');
+    if (CRM_Core_BAO_SchemaHandler::checkIfIndexExists('civicrm_contact', 'index_sort_name')) {
+      CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_contact DROP INDEX index_sort_name');
+    }
     $missingIndices = CRM_Core_BAO_SchemaHandler::getMissingIndices();
     $this->assertEquals(array(
-      'civicrm_contact' => array(
-        array(
-          'name' => 'index_sort_name',
-          'field' => array('sort_name'),
-          'localizable' => FALSE,
-          'sig' => 'civicrm_contact::0::sort_name',
-        ),
+      array(
+        'name' => 'index_sort_name',
+        'field' => array('sort_name'),
+        'localizable' => FALSE,
+        'sig' => 'civicrm_contact::0::sort_name',
+        'name_exists' => 0,
       ),
-    ), $missingIndices);
+    ), $missingIndices['civicrm_contact']);
     $this->callAPISuccess('System', 'updateindexes', array());
     $missingIndices = CRM_Core_BAO_SchemaHandler::getMissingIndices();
     $this->assertTrue(empty($missingIndices));
