@@ -321,11 +321,6 @@ class CRM_Admin_Page_AJAX {
         $style = "background-color: {$dao->color}; color: " . CRM_Utils_Color::getContrast($dao->color);
       }
       $hasChildTags = empty($childTagIDs[$dao->id]) ? FALSE : TRUE;
-      // get tag IDs includeing its child tags, later used to fetch usage count
-      $tagIDs = array($dao->id);
-      if ($hasChildTags) {
-        $tagIDs = array_merge($tagIDs, $childTagIDs[$dao->id]);
-      }
       $usedFor = (array) explode(',', $dao->used_for);
       $result[] = array(
         'id' => $dao->id,
@@ -348,7 +343,7 @@ class CRM_Admin_Page_AJAX {
           'color' => $dao->color ? $dao->color : '#ffffff',
           'usages' => civicrm_api3('EntityTag', 'getcount', array(
             'entity_table' => array('IN' => $usedFor),
-            'tag_id' => array('IN' => $tagIDs),
+            'tag_id' => $dao->id,
           )),
         ),
       );
