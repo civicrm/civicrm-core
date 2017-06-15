@@ -319,7 +319,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
    */
   public function testSubmitCreditCardNoReceipt() {
     $mut = new CiviMailUtils($this, TRUE);
-    $mut->clearMessages(0);
+    $mut->clearMessages();
     $form = new CRM_Contribute_Form_Contribution();
     $form->_mode = 'Live';
     $error = FALSE;
@@ -352,6 +352,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
         'hidden_AdditionalDetail' => 1,
         'hidden_Premium' => 1,
         'from_email_address' => '"civi45" <civi45@civicrm.com>',
+        'is_email_receipt' => FALSE,
         'receipt_date' => '',
         'receipt_date_time' => '',
         'payment_processor_id' => $this->paymentProcessorID,
