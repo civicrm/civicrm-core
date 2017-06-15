@@ -350,6 +350,10 @@ class api_v3_AddressTest extends CiviUnitTestCase {
 
   /**
    * Test Creating address of same type alreay ind the database
+   * This is legacy API v3 behaviour and not correct behaviour
+   * however we are too far down the path wiwth v3 to fix this
+   * @link https://chat.civicrm.org/civicrm/pl/zcq3jkg69jdt5g4aqze6bbe9pc
+   * @todo vis this in v4 api
    */
   public function testCreateDuplicateLocationTypes() {
     $address1 = $this->callAPISuccess('address', 'create', $this->_params);
