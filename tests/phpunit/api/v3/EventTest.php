@@ -410,6 +410,27 @@ class api_v3_EventTest extends CiviUnitTestCase {
   }
 
   /**
+   * Check searching on custom fields with IS NULL.
+   *
+   * https://issues.civicrm.org/jira/browse/CRM-20740
+   */
+  public function testSearchCustomFieldIsNull() {
+    // create custom group with custom field on event
+    $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
+
+    // Search for events having NULL as the value for this custom
+    // field. This should return all events created in setUp.
+    $check = $this->callAPISuccess($this->_entity, 'get', array(
+        'custom_' . $ids['custom_field_id'] => array('IS NULL' => 1),
+      ));
+
+    $this->assertGreaterThan(0, $check['count']);
+
+    $this->customFieldDelete($ids['custom_field_id']);
+    $this->customGroupDelete($ids['custom_group_id']);
+  }
+
+  /**
    * Test searching on custom fields returning a contact reference.
    *
    * https://issues.civicrm.org/jira/browse/CRM-16036

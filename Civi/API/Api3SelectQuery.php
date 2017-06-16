@@ -89,7 +89,10 @@ class Api3SelectQuery extends SelectQuery {
         $column_name = $key;
       }
       elseif (($cf_id = \CRM_Core_BAO_CustomField::getKeyID($key)) != FALSE) {
-        list($table_name, $column_name) = $this->addCustomField($this->apiFieldSpec['custom_' . $cf_id], 'INNER');
+        // If we check a custom field on 'IS NULL', it should also work when there is no
+        // record in the custom value table, see CRM-20740.
+        $side = empty($value['IS NULL']) ? 'INNER' : 'LEFT OUTER';
+        list($table_name, $column_name) = $this->addCustomField($this->apiFieldSpec['custom_' . $cf_id], $side);
       }
       elseif (strpos($key, '.')) {
         $fkInfo = $this->addFkField($key, 'INNER');
