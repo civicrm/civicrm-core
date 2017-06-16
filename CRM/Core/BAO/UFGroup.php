@@ -3237,7 +3237,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
           //get the groupTree as per subTypes.
           $groupTree = array();
           foreach ($componentSubType as $subType) {
-            $subTree = CRM_Core_BAO_CustomGroup::getTree($componentBAOName, CRM_Core_DAO::$_nullObject,
+            $subTree = CRM_Core_BAO_CustomGroup::getTree($componentBAOName, NULL,
               $componentId, 0, $values[$subType]
             );
             $groupTree = CRM_Utils_Array::crmArrayMerge($groupTree, $subTree);

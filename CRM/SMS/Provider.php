@@ -203,11 +203,22 @@ INNER JOIN civicrm_mailing_job mj ON mj.mailing_id = m.id AND mj.id = %1";
    * @throws CRM_Core_Exception
    */
   public function processInbound($from, $body, $to = NULL, $trackID = NULL) {
-    $formatFrom = $this->formatPhone($this->stripPhone($from), $like, "like");
-    $escapedFrom = CRM_Utils_Type::escape($formatFrom, 'String');
-    $fromContactID = CRM_Core_DAO::singleValueQuery('SELECT contact_id FROM civicrm_phone JOIN civicrm_contact ON civicrm_contact.id = civicrm_phone.contact_id WHERE !civicrm_contact.is_deleted AND phone LIKE "%' . $escapedFrom . '"');
+    $message = new CRM_SMS_Message();
+    $message->from = $from;
+    $message->to = $to;
+    $message->body = $body;
+    $message->trackID = $trackID;
+    // call hook_civicrm_inboundSMS
+    CRM_Utils_Hook::inboundSMS($message);
 
-    if (!$fromContactID) {
+    if (!$message->fromContactID) {
+      // find sender by phone number if $fromContactID not set by hook
+      $formatFrom = '%' . $this->formatPhone($this->stripPhone($message->from), $like, "like");
+      $message->fromContactID = CRM_Core_DAO::singleValueQuery("SELECT contact_id FROM civicrm_phone JOIN civicrm_contact ON civicrm_contact.id = civicrm_phone.contact_id WHERE !civicrm_contact.is_deleted AND phone LIKE %1", array(
+        1 => array($formatFrom, 'String')));
+    }
+
+    if (!$message->fromContactID) {
       // unknown mobile sender -- create new contact
       // use fake @mobile.sms email address for new contact since civi
       // requires email or name for all contacts
@@ -215,7 +226,7 @@ INNER JOIN civicrm_mailing_job mj ON mj.mailing_id = m.id AND mj.id = %1";
       $phoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
       $phoneloc = array_search('Home', $locationTypes);
       $phonetype = array_search('Mobile', $phoneTypes);
-      $stripFrom = $this->stripPhone($from);
+      $stripFrom = $this->stripPhone($message->from);
       $contactparams = array(
         'contact_type' => 'Individual',
         'email' => array(
@@ -233,38 +244,40 @@ INNER JOIN civicrm_mailing_job mj ON mj.mailing_id = m.id AND mj.id = %1";
         ),
       );
       $fromContact = CRM_Contact_BAO_Contact::create($contactparams, FALSE, TRUE, FALSE);
-      $fromContactID = $fromContact->id;
+      $message->fromContactID = $fromContact->id;
     }
 
-    if ($to) {
-      $to = CRM_Utils_Type::escape($to, 'String');
-      $toContactID = CRM_Core_DAO::singleValueQuery('SELECT contact_id FROM civicrm_phone JOIN civicrm_contact ON civicrm_contact.id = civicrm_phone.contact_id WHERE !civicrm_contact.is_deleted AND phone LIKE "%' . $to . '"');
-    }
-    else {
-      $toContactID = $fromContactID;
+    if (!$message->toContactID) {
+      // find recipient if $toContactID not set by hook
+      if ($message->to) {
+        $message->toContactID = CRM_Core_DAO::singleValueQuery("SELECT contact_id FROM civicrm_phone JOIN civicrm_contact ON civicrm_contact.id = civicrm_phone.contact_id WHERE !civicrm_contact.is_deleted AND phone LIKE %1", array(
+          1 => array('%' . $message->to, 'String')));
+      }
+      else {
+        $message->toContactID = $message->fromContactID;
+      }
     }
 
-    if ($fromContactID) {
+    if ($message->fromContactID) {
       $actStatusIDs = array_flip(CRM_Core_OptionGroup::values('activity_status'));
       $activityTypeID = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Inbound SMS');
 
       // note: lets not pass status here, assuming status will be updated by callback
       $activityParams = array(
-        'source_contact_id' => $toContactID,
-        'target_contact_id' => $fromContactID,
+        'source_contact_id' => $message->toContactID,
+        'target_contact_id' => $message->fromContactID,
         'activity_type_id' => $activityTypeID,
         'activity_date_time' => date('YmdHis'),
         'status_id' => $actStatusIDs['Completed'],
-        'details' => $body,
-        'phone_number' => $from,
+        'details' => $message->body,
+        'phone_number' => $message->from,
       );
-      if ($trackID) {
-        $trackID = CRM_Utils_Type::escape($trackID, 'String');
-        $activityParams['result'] = $trackID;
+      if ($message->trackID) {
+        $activityParams['result'] = CRM_Utils_Type::escape($message->trackID, 'String');
       }
 
       $result = CRM_Activity_BAO_Activity::create($activityParams);
-      CRM_Core_Error::debug_log_message("Inbound SMS recorded for cid={$fromContactID}.");
+      CRM_Core_Error::debug_log_message("Inbound SMS recorded for cid={$message->fromContactID}.");
       return $result;
     }
   }

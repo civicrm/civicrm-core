@@ -1214,7 +1214,7 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
     }
     $values = array();
     $query = '
-      SELECT cc.display_name as name, cc.sort_name as sort_name, cc.id, cr.relationship_type_id, crt.label_b_a as role, crt.name_b_a, ce.email
+      SELECT cc.display_name as name, cc.sort_name as sort_name, cc.id, cr.relationship_type_id, crt.label_b_a as role, crt.name_b_a, ce.email, cp.phone
       FROM civicrm_relationship cr
       LEFT JOIN civicrm_relationship_type crt
         ON crt.id = cr.relationship_type_id
@@ -1223,6 +1223,9 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
       LEFT JOIN civicrm_email ce
         ON ce.contact_id = cc.id
         AND ce.is_primary= 1
+      LEFT JOIN civicrm_phone cp
+        ON cp.contact_id = cc.id
+        AND cp.is_primary= 1
       WHERE cr.case_id =  %1 AND cr.is_active AND cc.is_deleted <> 1';
 
     $params = array(1 => array($caseID, 'Integer'));
@@ -1240,6 +1243,7 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
           'relationship_type_id' => $dao->relationship_type_id,
           'role' => $dao->role,
           'email' => $dao->email,
+          'phone' => $dao->phone,
         );
         // Add more info about the role (creator, manager)
         $role = CRM_Utils_Array::value($dao->name_b_a, $caseRoles);
@@ -1904,30 +1908,26 @@ SELECT civicrm_contact.id as casemanager_id,
   }
 
   /**
-   * Retrieve related cases for give case.
+   * Retrieve related case ids for given case.
    *
-   * @param int $mainCaseId
-   *   Id of main case.
-   * @param int $contactId
-   *   Id of contact.
+   * @param int $caseId
    * @param bool $excludeDeleted
    *   Do not include deleted cases.
    *
    * @return array
    */
-  public static function getRelatedCases($mainCaseId, $contactId, $excludeDeleted = TRUE) {
+  public static function getRelatedCaseIds($caseId, $excludeDeleted = TRUE) {
     //FIXME : do check for permissions.
 
-    $relatedCases = array();
-    if (!$mainCaseId || !$contactId) {
-      return $relatedCases;
+    if (!$caseId) {
+      return array();
     }
 
     $linkActType = array_search('Link Cases',
       CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'name')
     );
     if (!$linkActType) {
-      return $relatedCases;
+      return array();
     }
 
     $whereClause = "mainCase.id = %2";
@@ -1935,7 +1935,6 @@ SELECT civicrm_contact.id as casemanager_id,
       $whereClause .= " AND ( relAct.is_deleted = 0 OR relAct.is_deleted IS NULL )";
     }
 
-    //1. first fetch related case ids.
     $query = "
     SELECT  relCaseAct.case_id
       FROM  civicrm_case mainCase
@@ -1947,7 +1946,7 @@ SELECT civicrm_contact.id as casemanager_id,
 
     $dao = CRM_Core_DAO::executeQuery($query, array(
       1 => array($linkActType, 'Integer'),
-      2 => array($mainCaseId, 'Integer'),
+      2 => array($caseId, 'Integer'),
     ));
     $relatedCaseIds = array();
     while ($dao->fetch()) {
@@ -1955,9 +1954,24 @@ SELECT civicrm_contact.id as casemanager_id,
     }
     $dao->free();
 
-    // there are no related cases.
-    if (empty($relatedCaseIds)) {
-      return $relatedCases;
+    return array_values($relatedCaseIds);
+  }
+
+  /**
+   * Retrieve related case details for given case.
+   *
+   * @param int $caseId
+   * @param bool $excludeDeleted
+   *   Do not include deleted cases.
+   *
+   * @return array
+   */
+  public static function getRelatedCases($caseId, $excludeDeleted = TRUE) {
+    $relatedCaseIds = self::getRelatedCaseIds($caseId, $excludeDeleted);
+    $relatedCases = array();
+
+    if (!$relatedCaseIds) {
+      return array();
     }
 
     $whereClause = 'relCase.id IN ( ' . implode(',', $relatedCaseIds) . ' )';

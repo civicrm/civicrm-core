@@ -3394,7 +3394,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
       'financial_type_id' => 4,
       'contribution_status_id' => 1,
       'partial_payment_total' => 300.00,
-      'partial_amount_pay' => 150,
+      'partial_amount_to_pay' => 150,
       'contribution_mode' => 'participant',
       'participant_id' => $participant['id'],
     );

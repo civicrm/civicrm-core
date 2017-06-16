@@ -136,6 +136,10 @@ function _civicrm_api_replace_variables(&$params, &$parentResult, $separator = '
     elseif (is_array($value) && is_string(reset($value)) && substr(reset($value), 0, 6) == '$value') {
       $key = key($value);
       $value[$key] = _civicrm_api_replace_variable($value[$key], $parentResult, $separator);
+      // A null value with an operator will cause an error, so remove it.
+      if ($value[$key] === NULL) {
+        $value = '';
+      }
     }
   }
 }

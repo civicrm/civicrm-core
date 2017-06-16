@@ -814,7 +814,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           }
 
           //get event custom field information
-          $groupTree = CRM_Core_BAO_CustomGroup::getTree('Event', $this, $this->_eventId, 0, $this->_values['event']['event_type_id']);
+          $groupTree = CRM_Core_BAO_CustomGroup::getTree('Event', NULL, $this->_eventId, 0, $this->_values['event']['event_type_id']);
           $primaryParticipant['eventCustomFields'] = $groupTree;
 
           // call postprocess hook before leaving

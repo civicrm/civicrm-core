@@ -690,7 +690,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       'financial_type_id' => 4,
       'contribution_status_id' => 1,
       'partial_payment_total' => 300.00,
-      'partial_amount_pay' => 150,
+      'partial_amount_to_pay' => 150,
       'contribution_mode' => 'participant',
       'participant_id' => $participant->id,
     );
@@ -1017,7 +1017,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       'receipt_date' => '20080522000000',
       'total_amount' => '20000.00',
       'partial_payment_total' => '20,000.00',
-      'partial_amount_pay' => '8,000.00',
+      'partial_amount_to_pay' => '8,000.00',
     );
 
     $contribution = CRM_Contribute_BAO_Contribution::create($params);
@@ -1246,6 +1246,62 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $this->assertEquals("<p>Contribution Source: ABC</p></br>
       <p>Contribution Invoice ID: 12345</p></br>
       <p>Contribution Receive Date: May 11th, 2015</p></br>", $contributionDetails[$contactId2]['html'], "The html does not match");
+  }
+
+  /**
+   * Test for contribution with deferred revenue.
+   */
+  public function testContributionWithDeferredRevenue() {
+    $contactId = $this->individualCreate();
+    Civi::settings()->set('deferred_revenue_enabled', TRUE);
+    $params = array(
+      'contact_id' => $contactId,
+      'receive_date' => '20120511',
+      'total_amount' => 100.00,
+      'financial_type_id' => 'Event Fee',
+      'trxn_id' => 12345,
+      'invoice_id' => 67890,
+      'source' => 'SSF',
+      'contribution_status_id' => 'Completed',
+      'revenue_recognition_date' => date('Ymd', strtotime("+3 month")),
+    );
+    $contribution = $this->callAPISuccess('contribution', 'create', $params);
+
+    $this->callAPISuccessGetCount('EntityFinancialTrxn', array(
+      'entity_table' => "civicrm_contribution",
+      'entity_id' => $contribution['id'],
+    ), 2);
+
+    $checkAgainst = array(
+      'financial_trxn_id.to_financial_account_id.name' => 'Deferred Revenue - Event Fee',
+      'financial_trxn_id.from_financial_account_id.name' => 'Event Fee',
+      'financial_trxn_id' => '2',
+    );
+    $result = $this->callAPISuccessGetSingle('EntityFinancialTrxn', array(
+      'return' => array(
+        "financial_trxn_id.from_financial_account_id.name",
+        "financial_trxn_id.to_financial_account_id.name",
+        "financial_trxn_id",
+      ),
+      'entity_table' => "civicrm_contribution",
+      'entity_id' => $contribution['id'],
+      'financial_trxn_id.is_payment' => 0,
+    ), $checkAgainst);
+
+    $result = $this->callAPISuccessGetSingle('EntityFinancialTrxn', array(
+      'entity_table' => "civicrm_financial_item",
+      'financial_trxn_id' => $result['financial_trxn_id'],
+      'return' => array('entity_id'),
+    ));
+
+    $checkAgainst = array(
+      'financial_account_id.name' => 'Deferred Revenue - Event Fee',
+      'id' => $result['entity_id'],
+    );
+    $result = $this->callAPISuccessGetSingle('FinancialItem', array(
+      'id' => $result['entity_id'],
+      'return' => array("financial_account_id.name"),
+    ), $checkAgainst);
   }
 
 }

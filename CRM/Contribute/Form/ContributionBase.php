@@ -893,7 +893,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
           }
         }
 
-        $form->assign('fieldSetTitle', ts('Organization Details'));
+        $form->assign('fieldSetTitle', ts(CRM_Core_BAO_UFGroup::getTitle($form->_values['onbehalf_profile_id'])));
 
         if (CRM_Utils_Array::value('is_for_organization', $form->_values)) {
           if ($form->_values['is_for_organization'] == 2) {
@@ -919,7 +919,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
           if (!empty($form->_submitValues['onbehalfof_id'])) {
             $form->assign('submittedOnBehalf', $form->_submitValues['onbehalfof_id']);
           }
-          $form->assign('submittedOnBehalfInfo', json_encode($form->_submitValues['onbehalf']));
+          $form->assign('submittedOnBehalfInfo', json_encode(str_replace('"', '\"', $form->_submitValues['onbehalf']), JSON_HEX_APOS));
         }
 
         $fieldTypes = array('Contact', 'Organization');

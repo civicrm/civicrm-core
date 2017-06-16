@@ -97,9 +97,21 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
    * @param bool $useTable
    */
   public static function preProcessCommon(&$form, $useTable = FALSE) {
-
     $form->_contactIds = array();
     $form->_contactTypes = array();
+
+    $isStandAlone = (in_array('task', $form->urlPath));
+    if ($isStandAlone) {
+      list($form->_task, $title) = CRM_Contact_Task::getTaskAndTitleByClass(get_class($form));
+      if (!array_key_exists($form->_task, CRM_Contact_Task::permissionedTaskTitles(CRM_Core_Permission::getPermission()))) {
+        CRM_Core_Error::fatal(ts('You do not have enough permission to do this task.'));
+      }
+      $form->_contactIds = explode(',', CRM_Utils_Request::retrieve('cids', 'String', $form, TRUE));
+      if (empty($form->_contactIds)) {
+        CRM_Core_Error::statusBounce(ts("You did't selected any contact to perform this task."));
+      }
+      $form->setTitle($title);
+    }
 
     // get the submitted values of the search form
     // we'll need to get fv from either search or adv search in the future
@@ -116,7 +128,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
       self::$_searchFormValues = $form->controller->exportValues('Custom');
       $fragment .= '/custom';
     }
-    else {
+    elseif (!$isStandAlone) {
       self::$_searchFormValues = $form->controller->exportValues('Basic');
     }
 
@@ -183,7 +195,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
           CRM_Core_DAO::executeQuery($sql);
         }
       }
-      else {
+      elseif (empty($form->_contactIds)) {
         // filter duplicates here
         // CRM-7058
         // might be better to do this in the query, but that logic is a bit complex

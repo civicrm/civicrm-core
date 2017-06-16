@@ -79,6 +79,27 @@ class CRM_SMS_ProviderTest extends CiviUnitTestCase {
     $this->assertEquals($contact['id'], $activity['target_contact_id'][0]);
   }
 
+  /**
+   * CRM-20238 Add test of ProcessInbound function where no To number is passed into the function but the toContactId gets set in a hook
+   */
+  public function testProcessInboundSetToContactIDUsingHook() {
+    $provider = new testSMSProvider();
+    $this->hookClass->setHook('civicrm_inboundSMS', array($this, 'smsHookTest'));
+    $result = $provider->processInbound('+61412345678', 'This is a test message', NULL, '12345');
+    $this->assertEquals('This is a test message', $result->details);
+    $this->assertEquals('+61412345678', $result->phone_number);
+    $this->assertEquals('12345', $result->result);
+    $contact = $this->callAPISuccess('contact', 'getsingle', array('phone' => '+61487654321'));
+    $activity = $this->callAPISuccess('activity', 'getsingle', array('id' => $result->id, 'return' => array('source_contact_id', 'target_contact_id', 'assignee_contact_id')));
+    $this->assertEquals($contact['id'], $activity['source_contact_id']);
+  }
+
+
+  public function smsHookTest(&$message) {
+    $testSourceContact = $this->individualCreate(array('phone' => array(1 => array('phone' => '+61487654321'))));
+    $message->toContactID = $testSourceContact;
+  }
+
 }
 
 /**

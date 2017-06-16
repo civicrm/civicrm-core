@@ -117,7 +117,6 @@ class CRM_Utils_Cache_Redis implements CRM_Utils_Cache_Interface {
    */
   public function set($key, &$value) {
     if (!$this->_cache->set($this->_prefix . $key, serialize($value), $this->_timeout)) {
-      CRM_Core_Error::debug('Result Code: ', $this->_cache->getResultMessage());
       CRM_Core_Error::fatal("Redis set failed, wondering why?, $key", $value);
       return FALSE;
     }

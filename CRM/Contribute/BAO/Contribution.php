@@ -179,9 +179,9 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
 
     $setPrevContribution = TRUE;
     // CRM-13964 partial payment
-    if (!empty($params['partial_payment_total']) && !empty($params['partial_amount_pay'])) {
+    if (!empty($params['partial_payment_total']) && !empty($params['partial_amount_to_pay'])) {
       $partialAmtTotal = $params['partial_payment_total'];
-      $partialAmtPay = $params['partial_amount_pay'];
+      $partialAmtPay = $params['partial_amount_to_pay'];
       $params['total_amount'] = $partialAmtTotal;
       if ($partialAmtPay < $partialAmtTotal) {
         $params['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Partially paid');
@@ -2747,7 +2747,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
 
       CRM_Event_BAO_Event::retrieve($eventParams, $values['event']);
       // add custom fields for event
-      $eventGroupTree = CRM_Core_BAO_CustomGroup::getTree('Event', $this->_relatedObjects['event'], $this->_relatedObjects['event']->id);
+      $eventGroupTree = CRM_Core_BAO_CustomGroup::getTree('Event', NULL, $this->_relatedObjects['event']->id);
 
       $eventCustomGroup = array();
       foreach ($eventGroupTree as $key => $group) {
@@ -2775,7 +2775,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
 
       CRM_Event_BAO_Participant::getValues($participantParams, $values['participant'], $participantIds);
       // add custom fields for event
-      $participantGroupTree = CRM_Core_BAO_CustomGroup::getTree('Participant', $this->_relatedObjects['participant'], $this->_relatedObjects['participant']->id);
+      $participantGroupTree = CRM_Core_BAO_CustomGroup::getTree('Participant', NULL, $this->_relatedObjects['participant']->id);
       $participantCustomGroup = array();
       foreach ($participantGroupTree as $key => $group) {
         if ($key === 'info') {
@@ -2827,7 +2827,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       }
     }
 
-    $groupTree = CRM_Core_BAO_CustomGroup::getTree('Contribution', $this, $this->id);
+    $groupTree = CRM_Core_BAO_CustomGroup::getTree('Contribution', NULL, $this->id);
 
     $customGroup = array();
     foreach ($groupTree as $key => $group) {
@@ -3168,9 +3168,9 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     $statusId = $params['contribution']->contribution_status_id;
     // CRM-13964 partial payment
     if ($contributionStatus == 'Partially paid'
-      && !empty($params['partial_payment_total']) && !empty($params['partial_amount_pay'])
+      && !empty($params['partial_payment_total']) && !empty($params['partial_amount_to_pay'])
     ) {
-      $partialAmtPay = CRM_Utils_Rule::cleanMoney($params['partial_amount_pay']);
+      $partialAmtPay = CRM_Utils_Rule::cleanMoney($params['partial_amount_to_pay']);
       $partialAmtTotal = CRM_Utils_Rule::cleanMoney($params['partial_payment_total']);
 
       $fromFinancialAccountId = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($params['financial_type_id'], 'Accounts Receivable Account is');
@@ -3450,7 +3450,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         $trxnParams['card_type_id'] = CRM_Utils_Array::value('card_type_id', $params);
         $return = $financialTxn = CRM_Core_BAO_FinancialTrxn::create($trxnParams);
         $params['entity_id'] = $financialTxn->id;
-        if (empty($params['partial_payment_total']) && empty($params['partial_amount_pay'])) {
+        if (empty($params['partial_payment_total']) && empty($params['partial_amount_to_pay'])) {
           self::$_trxnIDs[] = $financialTxn->id;
         }
       }
@@ -3468,7 +3468,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         'entity_table' => 'civicrm_financial_trxn',
         'entity_id' => $financialTxn->id,
       );
-      CRM_Batch_BAO_Batch::addBatchEntity($entityParams);
+      CRM_Batch_BAO_EntityBatch::create($entityParams);
     }
 
     // when a fee is charged
@@ -3852,7 +3852,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     $arAccountId = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($contributionDAO->financial_type_id, 'Accounts Receivable Account is');
     if ($paymentType == 'owed') {
       $params['partial_payment_total'] = $contributionDAO->total_amount;
-      $params['partial_amount_pay'] = $trxnsData['total_amount'];
+      $params['partial_amount_to_pay'] = $trxnsData['total_amount'];
       $trxnsData['net_amount'] = !empty($trxnsData['net_amount']) ? $trxnsData['net_amount'] : $trxnsData['total_amount'];
       $params['pan_truncation'] = CRM_Utils_Array::value('pan_truncation', $trxnsData);
       $params['card_type_id'] = CRM_Utils_Array::value('card_type_id', $trxnsData);
@@ -3936,7 +3936,7 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
       }
     }
     elseif ($paymentType == 'refund') {
-      $trxnsData['total_amount'] = -$trxnsData['total_amount'];
+      $trxnsData['total_amount'] = $trxnsData['net_amount'] = -$trxnsData['total_amount'];
       $trxnsData['from_financial_account_id'] = $arAccountId;
       $trxnsData['status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Refunded');
       // record the entry
@@ -3954,11 +3954,16 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
       $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($contributionDAO->id);
       if (!empty($lineItems)) {
         foreach ($lineItems as $lineItemId => $lineItemValue) {
+          // don't record financial item for cancelled line-item
+          if ($lineItemValue['qty'] == 0) {
+            continue;
+          }
           $paid = $lineItemValue['line_total'] * ($financialTrxn->total_amount / $contributionDAO->total_amount);
           $addFinancialEntry = array(
             'transaction_date' => $financialTrxn->trxn_date,
             'contact_id' => $contributionDAO->contact_id,
             'amount' => round($paid, 2),
+            'currency' => $contributionDAO->currency,
             'status_id' => array_search('Paid', $financialItemStatus),
             'entity_id' => $lineItemId,
             'entity_table' => 'civicrm_line_item',
@@ -4531,6 +4536,12 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
       'source' => self::getRecurringContributionDescription($contribution, $event),
     ), array_intersect_key($input, array_fill_keys($inputContributionWhiteList, 1)
     ));
+
+    // CRM-20678 Ensure that the currency is correct in subseqent transcations.
+    if (empty($contributionParams['currency']) && isset($objects['first_contribution']->currency)) {
+      $contributionParams['currency'] = $objects['first_contribution']->currency;
+    }
+
     $contributionParams['payment_processor'] = $input['payment_processor'] = $paymentProcessorId;
 
     // If paymentProcessor is not set then the payment_instrument_id would not be correct.

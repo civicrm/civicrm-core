@@ -489,7 +489,7 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
    * Conditionally fire an event during the first page run.
    *
    * The install system is currently implemented several times, so it's hard to add
-   * new installation logic. We use a poor-man's method to detect the first run.
+   * new installation logic. We use a makeshift method to detect the first run.
    *
    * Situations to test:
    *  - New installation

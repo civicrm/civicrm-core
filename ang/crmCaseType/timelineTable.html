@@ -53,7 +53,7 @@ Required vars: activitySet
         ng-model="activity.reference_offset"
         ng-hide="activity.name == 'Open Case'"
         ng-required="activity.name != 'Open Case'"
-        />
+        >
     </td>
     <td>
       <select
@@ -80,12 +80,12 @@ Required vars: activitySet
   <tfoot>
   <tr class="addRow">
     <td colspan="6">
-      <span crm-add-name
+      <span crm-add-name=""
            crm-options="activityTypeOptions"
            crm-var="newActivity"
            crm-on-add="addActivity(activitySet, newActivity)"
            placeholder="{{ts('Add activity')}}"
-              />
+      ></span>
     </td>
   </tr>
   </tfoot>

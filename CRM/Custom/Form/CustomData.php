@@ -163,7 +163,7 @@ class CRM_Custom_Form_CustomData {
     }
 
     $groupTree = CRM_Core_BAO_CustomGroup::getTree($form->_type,
-      $form,
+      NULL,
       $form->_entityId,
       $gid,
       $subType,

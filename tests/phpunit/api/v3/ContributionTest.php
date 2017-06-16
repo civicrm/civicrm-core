@@ -3462,7 +3462,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  protected function setUpRepeatTransaction($recurParams = array(), $flag) {
+  protected function setUpRepeatTransaction($recurParams = array(), $flag, $contributionParams = array()) {
     $paymentProcessorID = $this->paymentProcessorCreate();
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', array_merge(array(
       'contact_id' => $this->_individualId,
@@ -3479,8 +3479,9 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $originalContribution = '';
     if ($flag == 'multiple') {
       // CRM-19309 create a contribution + also add in line_items (plural):
+      $params = array_merge($this->_params, $contributionParams);
       $originalContribution = $this->callAPISuccess('contribution', 'create', array_merge(
-          $this->_params,
+          $params,
           array(
             'contribution_recur_id' => $contributionRecur['id'],
             'skipLineItem' => 1,
@@ -3505,10 +3506,9 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       );
     }
     elseif ($flag == 'single') {
-      $originalContribution = $this->callAPISuccess('contribution', 'create', array_merge(
-          $this->_params,
-          array('contribution_recur_id' => $contributionRecur['id']))
-      );
+      $params = array_merge($this->_params, array('contribution_recur_id' => $contributionRecur['id']));
+      $params = array_merge($params, $contributionParams);
+      $originalContribution = $this->callAPISuccess('contribution', 'create', $params);
     }
     $originalContribution['payment_processor_id'] = $paymentProcessorID;
     return $originalContribution;
@@ -3794,6 +3794,20 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     );
     $this->assertEquals(CRM_Utils_Array::value('card_type_id', $financialTrxn), $creditCardTypeIDs['Amex']);
     $this->assertEquals(CRM_Utils_Array::value('pan_truncation', $financialTrxn), 2345);
+  }
+
+  /**
+   * Test repeat contribution uses non default currency
+   * @see https://issues.civicrm.org/jira/projects/CRM/issues/CRM-20678
+   */
+  public function testRepeatTransactionWithDifferenceCurrency() {
+    $originalContribution = $this->setUpRepeatTransaction(array('currency' => 'AUD'), 'single', array('currency' => 'AUD'));
+    $contribution = $this->callAPISuccess('contribution', 'repeattransaction', array(
+      'original_contribution_id' => $originalContribution['id'],
+      'contribution_status_id' => 'Completed',
+      'trxn_id' => uniqid(),
+    ));
+    $this->assertEquals('AUD', $contribution['values'][$contribution['id']]['currency']);
   }
 
 }

@@ -1,5 +1,6 @@
 <?php
-/*
+
+/**
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
@@ -25,31 +26,43 @@
  +--------------------------------------------------------------------+
  */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
- */
-
-/**
- * This class provides the functionality to add contact(s) to Organization.
- */
-class CRM_Contact_Form_Task_AddToOrganization extends CRM_Contact_Form_Task_AddToParentClass {
+class CRM_SMS_Message {
 
   /**
-   * Build the form object.
+   * @var String
+   * What address is this SMS message coming from.
    */
-  public function buildQuickForm() {
-    $this->set('contactType', 'Organization');
-    $this->assign('contactType', 'Organization');
-    parent::buildQuickForm();
-  }
+  public $from = '';
+
 
   /**
-   * Process the form after the input has been submitted and validated.
+   * @var String
+   * What address is this SMS message going to.
    */
-  public function postProcess() {
-    parent::postProcess();
-  }
+  public $to = '';
+
+  /**
+   * @var Integer
+   * Contact ID that is matched to the From address
+   */
+  public $fromContactID = NULL;
+
+  /**
+   * @var Integer
+   * Contact ID that is matched to the To address
+   */
+  public $toContactID = NULL;
+
+  /**
+   * @var String
+   * Body content of the message
+   */
+  public $body = '';
+
+  /**
+   * @var Integer
+   * Trackable ID in the system to match to
+   */
+  public $trackID = NULL;
 
 }

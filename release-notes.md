@@ -14,6 +14,15 @@ Other resources for identifying changes are:
     * https://github.com/civicrm/civicrm-joomla
     * https://github.com/civicrm/civicrm-wordpress
 
+## CiviCRM 4.7.20
+
+Released June 7, 2017
+
+- **[Features](release-notes/4.7.20.md#features)**
+- **[Bugs resolved](release-notes/4.7.20.md#bugs)**
+- **[Miscellany](release-notes/4.7.20.md#misc)**
+- **[Credits](release-notes/4.7.20.md#credits)**
+
 ## CiviCRM 4.7.19
 
 Released May 3, 2017

@@ -40,74 +40,16 @@ class CRM_Contact_Form_Task_AddToIndividual extends CRM_Contact_Form_Task_AddToP
    * Build the form object.
    */
   public function buildQuickForm() {
-    CRM_Utils_System::setTitle(ts('Add Contacts to Individual'));
-    $this->addElement('text', 'name', ts('Find Target Individual'));
-
-    $this->add('select',
-      'relationship_type_id',
-      ts('Relationship Type'),
-      array(
-        '' => ts('- select -'),
-      ) +
-      CRM_Contact_BAO_Relationship::getRelationType("Individual"), TRUE
-    );
-
-    $searchRows = $this->get('searchRows');
-    $searchCount = $this->get('searchCount');
-    if ($searchRows) {
-      $checkBoxes = array();
-      $chekFlag = 0;
-      foreach ($searchRows as $id => $row) {
-        if (!$chekFlag) {
-          $chekFlag = $id;
-        }
-
-        $checkBoxes[$id] = $this->createElement('radio', NULL, NULL, NULL, $id);
-      }
-
-      $this->addGroup($checkBoxes, 'contact_check');
-      if ($chekFlag) {
-        $checkBoxes[$chekFlag]->setChecked(TRUE);
-      }
-      $this->assign('searchRows', $searchRows);
-    }
-
-    $this->assign('searchCount', $searchCount);
-    $this->assign('searchDone', $this->get('searchDone'));
-    $this->assign('contact_type_display', ts('Individual'));
-    $this->addElement('submit', $this->getButtonName('refresh'), ts('Search'), array('class' => 'crm-form-submit'));
-    $this->addElement('submit', $this->getButtonName('cancel'), ts('Cancel'), array('class' => 'crm-form-submit'));
-    $this->addButtons(array(
-        array(
-          'type' => 'next',
-          'name' => ts('Add to Individual'),
-          'isDefault' => TRUE,
-        ),
-        array(
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ),
-      )
-    );
+    $this->set('contactType', 'Individual');
+    $this->assign('contactType', 'Individual');
+    parent::buildQuickForm();
   }
 
   /**
    * Process the form after the input has been submitted and validated.
    */
   public function postProcess() {
-    // store the submitted values in an array
-    $this->params = $this->controller->exportValues($this->_name);
-
-    $this->set('searchDone', 0);
-    if (!empty($_POST['_qf_AddToIndividual_refresh'])) {
-      $searchParams['contact_type'] = 'Individual';
-      $searchParams['rel_contact'] = $this->params['name'];
-      $this->search($this, $searchParams);
-      $this->set('searchDone', 1);
-      return;
-    }
-
-    $this->addRelationships();
+    parent::postProcess();
   }
 
 }
