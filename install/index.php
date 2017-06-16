@@ -1488,8 +1488,10 @@ class Installer extends InstallRequirements {
         // now enable civicrm module.
         module_enable(array('civicrm', 'civicrmtheme'));
 
-        // SystemInstallEvent will be call from here with the first call of CiviCRM_Core_Settings
-        // we need to pass the seedLanguage before that
+        // SystemInstallEvent will be called from here with the first call of CRM_Core_Config,
+        // which calls Core_BAO_ConfigSetting::applyLocale(), who will default to calling
+        // Civi::settings()->get('lcMessages');
+        // Therefore, we need to pass the seedLanguage before that.
         global $civicrm_setting;
         $civicrm_setting['domain']['lcMessages'] = $config['seedLanguage'];
 
