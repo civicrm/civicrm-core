@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "9717496290241ba85372c78b619e957b",
+    "content-hash": "e82d6a686e096c759ad855215be1d672",
     "packages": [
         {
             "name": "civicrm/civicrm-cxn-rpc",
@@ -776,12 +776,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/config.git",
-                "reference": "d93bb29acfa5cff771cb4aa0fb4a97454ddb41e4"
+                "reference": "c7309e33b719433d5cf3845d0b5b9608609d8c8e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/config/zipball/d93bb29acfa5cff771cb4aa0fb4a97454ddb41e4",
-                "reference": "d93bb29acfa5cff771cb4aa0fb4a97454ddb41e4",
+                "url": "https://api.github.com/repos/symfony/config/zipball/c7309e33b719433d5cf3845d0b5b9608609d8c8e",
+                "reference": "c7309e33b719433d5cf3845d0b5b9608609d8c8e",
                 "shasum": ""
             },
             "require": {
@@ -1137,16 +1137,16 @@
         },
         {
             "name": "totten/ca-config",
-            "version": "v13.02.0",
+            "version": "v17.05.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/totten/ca_config.git",
-                "reference": "7a51033f4e18c1ac846a16c6de16050e735b01cf"
+                "reference": "461cf05f932897c37ca87e9a85283d4963b49f09"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/totten/ca_config/zipball/7a51033f4e18c1ac846a16c6de16050e735b01cf",
-                "reference": "7a51033f4e18c1ac846a16c6de16050e735b01cf",
+                "url": "https://api.github.com/repos/totten/ca_config/zipball/461cf05f932897c37ca87e9a85283d4963b49f09",
+                "reference": "461cf05f932897c37ca87e9a85283d4963b49f09",
                 "shasum": ""
             },
             "require": {
@@ -1170,7 +1170,7 @@
             ],
             "description": "Default configuration for certificate authorities",
             "homepage": "https://github.com/totten/ca_config",
-            "time": "2013-02-13T03:40:18+00:00"
+            "time": "2017-05-10T20:08:17+00:00"
         },
         {
             "name": "zendframework/zend-escaper",
