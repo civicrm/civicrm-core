@@ -3936,7 +3936,7 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
       }
     }
     elseif ($paymentType == 'refund') {
-      $trxnsData['total_amount'] = -$trxnsData['total_amount'];
+      $trxnsData['total_amount'] = $trxnsData['net_amount'] = -$trxnsData['total_amount'];
       $trxnsData['from_financial_account_id'] = $arAccountId;
       $trxnsData['status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Refunded');
       // record the entry
@@ -3954,11 +3954,16 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
       $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($contributionDAO->id);
       if (!empty($lineItems)) {
         foreach ($lineItems as $lineItemId => $lineItemValue) {
+          // don't record financial item for cancelled line-item
+          if ($lineItemValue['qty'] == 0) {
+            continue;
+          }
           $paid = $lineItemValue['line_total'] * ($financialTrxn->total_amount / $contributionDAO->total_amount);
           $addFinancialEntry = array(
             'transaction_date' => $financialTrxn->trxn_date,
             'contact_id' => $contributionDAO->contact_id,
             'amount' => round($paid, 2),
+            'currency' => $contributionDAO->currency,
             'status_id' => array_search('Paid', $financialItemStatus),
             'entity_id' => $lineItemId,
             'entity_table' => 'civicrm_line_item',

@@ -243,6 +243,51 @@ class CRM_Event_BAO_CRM19273 extends CiviUnitTestCase {
 
     CRM_Event_BAO_Participant::changeFeeSelections($PSparams, $this->participantID, $this->_contributionId, $this->_feeBlock, $lineItem, $this->_expensiveFee, $this->_priceSetID);
     $this->balanceCheck($this->_veryExpensive);
+
+  }
+
+  /**
+   * Test that proper financial items are recorded for cancelled line items
+   */
+  public function testCRM20611() {
+    $PSparams['price_1'] = 1;
+    $lineItem = CRM_Price_BAO_LineItem::getLineItems($this->participantID, 'participant');
+    CRM_Event_BAO_Participant::changeFeeSelections($PSparams, $this->participantID, $this->_contributionId, $this->_feeBlock, $lineItem, $this->_expensiveFee, $this->_priceSetID);
+    $this->balanceCheck($this->_expensiveFee);
+
+    $PSparams['price_1'] = 2;
+    $lineItem = CRM_Price_BAO_LineItem::getLineItems($this->participantID, 'participant');
+    CRM_Event_BAO_Participant::changeFeeSelections($PSparams, $this->participantID, $this->_contributionId, $this->_feeBlock, $lineItem, $this->_expensiveFee, $this->_priceSetID);
+    $this->balanceCheck($this->_cheapFee);
+
+    //Complete the refund payment.
+    $submittedValues = array(
+      'total_amount' => 120,
+      'payment_instrument_id' => 3,
+    );
+    CRM_Contribute_BAO_Contribution::recordAdditionalPayment($this->_contributionId, $submittedValues, 'refund', $this->participantID);
+
+    // retrieve the cancelled line-item information
+    $cancelledLineItem = $this->callAPISuccessGetSingle('LineItem', array(
+      'entity_table' => 'civicrm_participant',
+      'entity_id' => $this->participantID,
+      'qty' => 0,
+    ));
+    // retrieve the related financial lin-items
+    $financialItems = $this->callAPISuccess('FinancialItem', 'Get', array(
+      'entity_id' => $cancelledLineItem['id'],
+      'entity_table' => 'civicrm_line_item',
+    ));
+    $this->assertEquals($financialItems['count'], 2, 'Financial Items for Cancelled fee is not proper');
+
+    $contributionCompletedStatusID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
+    $expectedAmount = 100.00;
+    foreach ($financialItems['values'] as $id => $financialItem) {
+      $this->assertEquals($expectedAmount, $financialItem['amount']);
+      $this->assertNotEmpty($financialItem['financial_account_id']);
+      $this->assertEquals($contributionCompletedStatusID, $financialItem['status_id']);
+      $expectedAmount = -$expectedAmount;
+    }
   }
 
 }
