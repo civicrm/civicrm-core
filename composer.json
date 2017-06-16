@@ -38,13 +38,15 @@
       "bash tools/scripts/composer/dompdf-cleanup.sh",
       "bash tools/scripts/composer/tcpdf-cleanup.sh",
       "bash tools/scripts/composer/pear-exception-fix.sh",
-      "bash tools/scripts/composer/net-smtp-fix.sh"
+      "bash tools/scripts/composer/net-smtp-fix.sh",
+      "bash tools/scripts/composer/phpword-jquery.sh"
     ],
     "post-update-cmd": [
       "bash tools/scripts/composer/dompdf-cleanup.sh",
       "bash tools/scripts/composer/tcpdf-cleanup.sh",
       "bash tools/scripts/composer/pear-exception-fix.sh",
-      "bash tools/scripts/composer/net-smtp-fix.sh"
+      "bash tools/scripts/composer/net-smtp-fix.sh",
+      "bash tools/scripts/composer/phpword-jquery.sh"
     ]
   }
 }
