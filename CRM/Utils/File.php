@@ -596,6 +596,25 @@ HTACCESS;
     }
     return $_path;
   }
+  
+  /**
+   * Create the base public file path from which all our public internal directories are
+   * offset. This is set in civicrm.settings.php.
+   */
+  public static function basePublicFilePath() {
+    static $_path = NULL;
+    if (!$_path) {
+      // Note: Don't rely on $config; that creates a dependency loop.
+      if (!defined('CIVICRM_PUBLIC_FILES_DIR')) {
+        throw new RuntimeException("Undefined constant: CIVICRM_PUBLIC_FILES_DIR");
+      }
+
+      $path = CIVICRM_PUBLIC_FILES_DIR;
+
+      $_path = CRM_Utils_File::addTrailingSlash($path);
+    }
+    return $_path;
+  }
 
   /**
    * Determine if a path is absolute.
@@ -633,8 +652,8 @@ HTACCESS;
       return $directory;
     }
 
-    // make everything relative from the baseFilePath
-    $basePath = self::baseFilePath();
+    // make everything relative from the basePublicFilePath
+    $basePath = self::basePublicFilePath();
     // check if basePath is a substr of $directory, if so
     // return rest of string
     if (substr($directory, 0, strlen($basePath)) == $basePath) {
