@@ -611,7 +611,7 @@ abstract class CRM_Utils_System_Base {
 
     return array(
       'url' => $filesURL,
-      'path' => CRM_Utils_File::baseFilePath(),
+      'path' => CRM_Utils_File::basePublicFilePath(),
     );
   }
 
