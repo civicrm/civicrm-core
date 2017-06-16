@@ -61,6 +61,51 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
   /**
    * @inheritDoc
    */
+  public function getCiviSourceStorage() {
+    global $civicrm_root;
+
+    // Don't use $config->userFrameworkBaseURL; it has garbage on it.
+    // More generally, we shouldn't be using $config here.
+    if (!defined('CIVICRM_UF_BASEURL')) {
+      throw new RuntimeException('Undefined constant: CIVICRM_UF_BASEURL');
+    }
+
+    $cmsUrl = CIVICRM_UF_BASEURL;
+    if (CRM_Utils_System::isSSL()) {
+      $cmsUrl = str_replace('http://', 'https://', $cmsUrl);
+    }
+    $civiRelPath = CRM_Utils_File::relativize(realpath($civicrm_root), realpath($this->cmsRootPath()));
+    $civiUrl = rtrim($cmsUrl, '/') . '/' . ltrim($civiRelPath, ' /');
+    return array(
+      'url' => CRM_Utils_File::addTrailingSlash($civiUrl, '/'),
+      'path' => CRM_Utils_File::addTrailingSlash($civicrm_root),
+    );
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function getDefaultFileStorage() {
+    $config = CRM_Core_Config::singleton();
+    $baseURL = CRM_Utils_System::languageNegotiationURL($config->userFrameworkBaseURL, FALSE, TRUE);
+
+    $siteName = $this->parseDrupalSiteName('/files/civicrm');
+    if ($siteName) {
+      $filesURL = $baseURL . "sites/$siteName/files/civicrm/";
+    }
+    else {
+      $filesURL = $baseURL . "sites/default/files/civicrm/";
+    }
+
+    return array(
+      'url' => $filesURL,
+      'path' => CRM_Utils_File::baseFilePath(),
+    );
+  }
+
+  /**
+   * @inheritDoc
+   */
   public function getDefaultSiteSettings($dir) {
     $config = CRM_Core_Config::singleton();
     $siteName = $siteRoot = NULL;
@@ -546,33 +591,50 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
   }
 
   /**
-   * Parse the name of the drupal site.
+   * Determine if Drupal multi-site applies to the current request -- and,
+   * specifically, determine the name of the multisite folder.
    *
-   * @param string $civicrm_root
-   *
+   * @param string $flagFile
+   *   Check if $flagFile exists inside the site dir.
    * @return null|string
+   *   string, e.g. `bar.example.com` if using multisite.
+   *   NULL if using the default site.
    */
-  public function parseDrupalSiteName($civicrm_root) {
-    $siteName = NULL;
-    if (strpos($civicrm_root,
-        DIRECTORY_SEPARATOR . 'sites' . DIRECTORY_SEPARATOR . 'all' . DIRECTORY_SEPARATOR . 'modules'
-      ) === FALSE
-    ) {
-      $startPos = strpos($civicrm_root,
-        DIRECTORY_SEPARATOR . 'sites' . DIRECTORY_SEPARATOR
-      );
-      $endPos = strpos($civicrm_root,
-        DIRECTORY_SEPARATOR . 'modules' . DIRECTORY_SEPARATOR
-      );
-      if ($startPos && $endPos) {
-        // if component is in sites/SITENAME/modules
-        $siteName = substr($civicrm_root,
-          $startPos + 7,
-          $endPos - $startPos - 7
-        );
+  private function parseDrupalSiteName($flagFile = '') {
+    $phpSelf = array_key_exists('PHP_SELF', $_SERVER) ? $_SERVER['PHP_SELF'] : '';
+    $httpHost = array_key_exists('HTTP_HOST', $_SERVER) ? $_SERVER['HTTP_HOST'] : '';
+    if (empty($httpHost)) {
+      $httpHost = parse_url(CIVICRM_UF_BASEURL, PHP_URL_HOST);
+      if (parse_url(CIVICRM_UF_BASEURL, PHP_URL_PORT)) {
+        $httpHost .= ':' . parse_url(CIVICRM_UF_BASEURL, PHP_URL_PORT);
       }
     }
-    return $siteName;
+
+    $confdir = $this->cmsRootPath() . '/sites';
+
+    if (file_exists($confdir . "/sites.php")) {
+      include $confdir . "/sites.php";
+    }
+    else {
+      $sites = array();
+    }
+
+    $uri = explode('/', $phpSelf);
+    $server = explode('.', implode('.', array_reverse(explode(':', rtrim($httpHost, '.')))));
+    for ($i = count($uri) - 1; $i > 0; $i--) {
+      for ($j = count($server); $j > 0; $j--) {
+        $dir = implode('.', array_slice($server, -$j)) . implode('.', array_slice($uri, 0, $i));
+        if (file_exists("$confdir/$dir" . $flagFile)) {
+          \Civi::$statics[__CLASS__]['drupalSiteName'] = $dir;
+          return \Civi::$statics[__CLASS__]['drupalSiteName'];
+        }
+        // check for alias
+        if (isset($sites[$dir]) && file_exists("$confdir/{$sites[$dir]}" . $flagFile)) {
+          \Civi::$statics[__CLASS__]['drupalSiteName'] = $sites[$dir];
+          return \Civi::$statics[__CLASS__]['drupalSiteName'];
+        }
+      }
+    }
   }
 
 }
