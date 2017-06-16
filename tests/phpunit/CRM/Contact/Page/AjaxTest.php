@@ -262,21 +262,21 @@ class CRM_Contact_Page_AjaxTest extends CiviUnitTestCase {
     );
     CRM_Core_BAO_EntityTag::add($params);
 
-    // CASE I : check the usage count of parent tag which need to be 3
-    //  as it should also include the count of child tags
+    // CASE I : check the usage count of parent tag which need to be 1
+    //  as the one contact added
     $_REQUEST['is_unit_test'] = TRUE;
     $parentTagTreeResult = CRM_Admin_Page_AJAX::getTagTree();
     foreach ($parentTagTreeResult as $result) {
       if ($result['id'] == $parentTag['id']) {
-        $this->assertEquals(3, $result['data']['usages']);
+        $this->assertEquals(1, $result['data']['usages']);
       }
     }
 
-    // CASE 2 : check the usage count of level 1 child tag, which needs to be 2
-    //  as it should also include the count of its child tag
+    // CASE 2 : check the usage count of level 1 child tag, which needs to be 1
+    //  as it should include the count of added one contact
     $_GET['parent_id'] = $parentTag['id'];
     $childTagTree = CRM_Admin_Page_AJAX::getTagTree();
-    $this->assertEquals(2, $childTagTree[0]['data']['usages']);
+    $this->assertEquals(1, $childTagTree[0]['data']['usages']);
 
     // CASE 2 : check the usage count of child tag at level 2
     //which needs to be 1 as it has no child tag
