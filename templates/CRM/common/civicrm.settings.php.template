@@ -176,8 +176,20 @@ if (!defined('CIVICRM_LOGGING_DSN')) {
 global $civicrm_root;
 
 $civicrm_root = '%%crmRoot%%';
+
+/**
+ * Set to a private directory if Apache isn't available.
+ */
 if (!defined('CIVICRM_TEMPLATE_COMPILEDIR')) {
   define( 'CIVICRM_TEMPLATE_COMPILEDIR', '%%templateCompileDir%%');
+}
+
+/**
+ * Provide a default public CiviCRM file path where Apache isn't available.
+ * For files that need to be publicly accessible such as the CKEditor configuration file.
+ */
+if (!defined('CIVICRM_PUBLIC_FILES_DIR')) {
+  define( 'CIVICRM_PUBLIC_FILES_DIR', '%%publicFilesDir%%');
 }
 
 /**
