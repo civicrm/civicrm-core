@@ -2403,6 +2403,15 @@ WHERE      civicrm_membership.is_test = 0";
       $contributionParams[$f] = CRM_Utils_Array::value($f, $params);
     }
 
+	//CRM-14538 - fix
+	//set the partial total and partial pay amount 
+	if (!empty($params['total_amount']) && !empty($params['partial_amount_pay'])) {
+			if ($params['total_amount'] > $params['partial_amount_pay']) {
+				$contributionParams['partial_payment_total'] = $params['total_amount'];
+				$contributionParams['partial_amount_pay'] = $params['partial_amount_pay'];
+			}
+	}
+	
     // make entry in batch entity batch table
     if (!empty($params['batch_id'])) {
       $contributionParams['batch_id'] = $params['batch_id'];

@@ -38,18 +38,42 @@ class CRM_Contribute_Page_PaymentInfo extends CRM_Core_Page {
     $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this, TRUE);
     $this->_cid = CRM_Utils_Request::retrieve('cid', 'String', $this, TRUE);
 
-    $this->assign('cid', $this->_cid);
+	$this->assign('cid', $this->_cid);
     $this->assign('id', $this->_id);
     $this->assign('context', $this->_context);
     $this->assign('component', $this->_component);
-    if ($this->_component != 'event') {
-      $this->assign('hideButtonLinks', TRUE);
-    }
+    
+	//CRM-14538 - fix
+	if ($this->_component == 'event' || $this->_component == 'membership') {
+      $this->assign('hideButtonLinks', FALSE);
+    }else{
+	  $this->assign('hideButtonLinks', TRUE);
+	}
+	
   }
 
   public function browse() {
+	  
     $getTrxnInfo = $this->_context == 'transaction' ? TRUE : FALSE;
-    $paymentInfo = CRM_Contribute_BAO_Contribution::getPaymentInfo($this->_id, $this->_component, $getTrxnInfo, TRUE);
+	
+	//CRM-14538 - fix
+	if ($this->_component == 'membership'){
+		//get contribution id using membership ID
+		 $membership = civicrm_api3('MembershipPayment', 'get', array(
+				'sequential' => 1,
+				'membership_id' => $this->_id,
+				));
+	  
+	  $membershipdetails = $membership['values'];
+	  
+	  foreach($membershipdetails as $key => $values){
+		$paymentInfo[] = CRM_Contribute_BAO_Contribution::getPaymentInfo($values['contribution_id'], $this->_component, $getTrxnInfo, TRUE);
+	  }
+		
+	} else {
+		$paymentInfo[] = CRM_Contribute_BAO_Contribution::getPaymentInfo($this->_id, $this->_component, $getTrxnInfo, TRUE);
+	}
+	
     if ($this->_context == 'payment_info') {
       $this->assign('paymentInfo', $paymentInfo);
     }

@@ -466,6 +466,10 @@ WHERE ceft.entity_id = %1";
     if ($entityName == 'participant') {
       $contributionId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment', $entityId, 'contribution_id', 'participant_id');
     }
+	else if ($entityName == 'membership') { 
+	  //CRM-14538 - fix
+      $contributionId = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipPayment', $entityId, 'contribution_id', 'membership_id');
+	}
     else {
       $contributionId = $entityId;
     }
@@ -685,10 +689,10 @@ WHERE ft.to_financial_account_id NOT IN ( " . implode(', ', $filteredFinancialAc
         }
         foreach ($results['values'] as $result) {
           if ($result['account_relationship'] == $accountRel) {
-            $trxnParams['from_financial_account_id'] = $result['financial_account_id'];
+            $trxnParams['to_financial_account_id'] = $result['financial_account_id'];
           }
           else {
-            $trxnParams['to_financial_account_id'] = $result['financial_account_id'];
+            $trxnParams['from_financial_account_id'] = $result['financial_account_id'];
           }
         }
         foreach ($deferredRevenue['revenue'] as $revenue) {

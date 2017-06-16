@@ -565,8 +565,9 @@
     {/literal}{if $buildPriceSet}{literal}
     cj( "#totalAmountORPriceSet" ).hide( );
     cj( "#mem_type_id" ).hide( );
-    cj('#total_amount').attr("readonly", true);
-    cj( "#num_terms_row" ).hide( );
+	//CRM-14538 - fix
+    cj('#total_amount').attr("readonly", false);
+	cj( "#num_terms_row" ).hide( );
     cj(".crm-membership-form-block-financial_type_id-mode").hide();
     {/literal}{/if}{literal}
 
@@ -601,8 +602,10 @@
       }
 
       cj( "#total_amount" ).val( '' );
-      cj('#total_amount').attr("readonly", true);
-
+      
+	  //CRM-14538 - fix
+	  cj('#total_amount').attr("readonly", false);
+	
       var dataUrl = {/literal}"{crmURL h=0 q='snippet=4'}"{literal} + '&priceSetId=' + priceSetId;
 
       var response = cj.ajax({

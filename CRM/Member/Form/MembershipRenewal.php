@@ -353,6 +353,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
 
       $this->add('text', 'total_amount', ts('Amount'));
       $this->addRule('total_amount', ts('Please enter a valid amount.'), 'money');
+	  
 
       $this->addDate('receive_date', ts('Received'), FALSE, array('formatType' => 'activityDateTime'));
 
@@ -493,9 +494,11 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     $this->assign('receive_date', $this->_params['receive_date']);
     $this->processBillingAddress();
     list($userName) = CRM_Contact_BAO_Contact_Location::getEmailDetails(CRM_Core_Session::singleton()->get('userID'));
-    $this->_params['total_amount'] = CRM_Utils_Array::value('total_amount', $this->_params,
-      CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $this->_memType, 'minimum_fee')
+	
+	$this->_params['total_amount'] = CRM_Utils_Array::value('total_amount', $this->_params,     
+	CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $this->_memType, 'minimum_fee')
     );
+	
     $this->_membershipId = $this->_id;
     $customFieldsFormatted = CRM_Core_BAO_CustomField::postProcess($this->_params,
       $this->_id,
@@ -519,8 +522,25 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     else {
       $this->_params['receipt_date'] = NULL;
     }
-
-    if ($this->_mode) {
+	
+	//CRM-14538 - fix
+	//set the partial total and partial pay amount 
+	
+	$membershipType = CRM_Member_BAO_MembershipType::getMembershipTypeDetails($this->_memType);
+	
+	if (CRM_Utils_Array::value('minimum_fee', $membershipType)){
+		$amount = $membershipType['minimum_fee'];
+		if (!empty($amount) && !empty($this->_params['total_amount'])) {
+		  if ($amount > $formValues['total_amount'] ) {
+				$this->_params['partial_amount_pay'] = $this->_params['total_amount'];
+				$this->_params['total_amount'] = $membershipType['minimum_fee'];
+				$this->_params['partial_payment_total'] = $membershipType['minimum_fee'];
+			}
+		}
+	}
+	
+	
+	if ($this->_mode) {
       $this->_params['register_date'] = $now;
       $this->_params['description'] = ts("Contribution submitted by a staff person using member's credit card for renewal");
       $this->_params['amount'] = $this->_params['total_amount'];
@@ -655,7 +675,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
         $this->_params['paidBy'] = $paymentInstrument[$this->_params['payment_instrument_id']];
       }
       //get the group Tree
-      $this->_groupTree = CRM_Core_BAO_CustomGroup::getTree('Membership', NULL, $this->_id, FALSE, $this->_memType);
+      $this->_groupTree = CRM_Core_BAO_CustomGroup::getTree('Membership', $this, $this->_id, FALSE, $this->_memType);
 
       // retrieve custom data
       $customFields = $customValues = $fo = array();

@@ -189,7 +189,18 @@ class CRM_Member_Form_MembershipView extends CRM_Core_Form {
         $id,
         'owner_membership_id'
       );
-
+	  //CRM-14538 - fix
+	  // Get Line Items
+	  if (isset($id)) {
+		$lineItem = CRM_Price_BAO_LineItem::getLineItems($id,'membership');
+		if (!CRM_Utils_System::isNull($lineItem)) {
+			$values[$id]['lineItem'][] = $lineItem;
+		}
+		$this->assign('componentId', $id);
+		$this->assign('component', 'membership');
+	  }
+	  
+	  
       if (isset($values['owner_membership_id'])) {
         $values['owner_contact_id'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership',
           $values['owner_membership_id'],
@@ -377,7 +388,7 @@ SELECT r.id, c.id as cid, c.display_name as name, c.job_title as comment,
 
       $memType = CRM_Core_DAO::getFieldValue("CRM_Member_DAO_Membership", $id, "membership_type_id");
 
-      $groupTree = CRM_Core_BAO_CustomGroup::getTree('Membership', NULL, $id, 0, $memType);
+      $groupTree = CRM_Core_BAO_CustomGroup::getTree('Membership', $this, $id, 0, $memType);
       CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree, FALSE, NULL, NULL, NULL, $id);
 
       $isRecur = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $id, 'contribution_recur_id');
