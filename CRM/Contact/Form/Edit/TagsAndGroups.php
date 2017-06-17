@@ -128,7 +128,7 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
 
         if ($groupElementType == 'select' && !empty($groupsOptions)) {
           $form->add('select', $fName, $groupName, $groupsOptions, FALSE,
-            array('id' => $fName, 'multiple' => 'multiple', 'class' => 'crm-select2')
+            array('id' => $fName, 'multiple' => 'multiple', 'class' => 'crm-select2 twenty')
           );
           $form->assign('groupCount', count($groupsOptions));
         }
@@ -145,40 +145,10 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
     }
 
     if ($type & self::TAG) {
-      $fName = 'tag';
-      if ($fieldName) {
-        $fName = $fieldName;
-      }
-      $form->_tagGroup[$fName] = 1;
+      $tags = CRM_Core_BAO_Tag::getColorTags('civicrm_contact');
 
-      // get the list of all the categories
-      $tags = new CRM_Core_BAO_Tag();
-      $tree = $tags->getTree('civicrm_contact', TRUE);
-      // let's not load jstree if there are not children. This also fixes blank
-      // display at the beginning of checkboxes
-      $loadJsTree = CRM_Utils_Array::retrieveValueRecursive($tree, 'children');
-      $form->assign('loadjsTree', FALSE);
-      if (!empty($loadJsTree)) {
-        // CODE FROM CRM/Tag/Form/Tag.php //
-        CRM_Core_Resources::singleton()
-          ->addScriptFile('civicrm', 'packages/jquery/plugins/jstree/jquery.jstree.js', 0, 'html-header', FALSE)
-          ->addStyleFile('civicrm', 'packages/jquery/plugins/jstree/themes/default/style.css', 0, 'html-header');
-        $form->assign('loadjsTree', TRUE);
-      }
-
-      $elements = array();
-      self::climbtree($form, $tree, $elements);
-
-      $form->addGroup($elements, $fName, $tagName, '<br />');
-      $form->assign('tagCount', count($elements));
-      $form->assign('tree', $tree);
-      $form->assign('tag', $tree);
-      $form->assign('entityID', $contactId);
-      $form->assign('entityTable', 'civicrm_contact');
-      $form->assign('allTags', CRM_Core_BAO_Tag::getTagsUsedFor('civicrm_contact', FALSE));
-
-      if ($isRequired) {
-        $form->addRule($fName, ts('%1 is a required field.', array(1 => $tagName)), 'required');
+      if (!empty($tags)) {
+        $form->add('select2', 'tag', ts('Tag(s)'), $tags, FALSE, array('class' => 'huge', 'placeholder' => ts('- select -'), 'multiple' => TRUE));
       }
 
       // build tag widget
@@ -186,31 +156,6 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
       CRM_Core_Form_Tag::buildQuickForm($form, $parentNames, 'civicrm_contact', $contactId, FALSE, TRUE);
     }
     $form->assign('tagGroup', $form->_tagGroup);
-  }
-
-  /**
-   * Climb tree.
-   *
-   * @param $form
-   * @param $tree
-   * @param $elements
-   *
-   * @return mixed
-   */
-  public static function climbtree($form, $tree, &$elements) {
-    foreach ($tree as $tagID => $varValue) {
-      $tagAttribute = array(
-        'onclick' => "return changeRowColor(\"rowidtag_$tagID\")",
-        'id' => "tag_{$tagID}",
-      );
-
-      $elements[$tagID] = $form->createElement('checkbox', $tagID, '', $varValue['name'], $tagAttribute);
-
-      if (array_key_exists('children', $varValue)) {
-        self::climbtree($form, $varValue['children'], $elements);
-      }
-    }
-    return $elements;
   }
 
   /**
@@ -249,17 +194,7 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
     }
 
     if ($type & self::TAG) {
-      $fName = 'tag';
-      if ($fieldName) {
-        $fName = $fieldName;
-      }
-
-      $contactTag = CRM_Core_BAO_EntityTag::getTag($id);
-      if ($contactTag) {
-        foreach ($contactTag as $tag) {
-          $defaults[$fName . '[' . $tag . ']'] = 1;
-        }
-      }
+      $defaults['tag'] = implode(',', CRM_Core_BAO_EntityTag::getTag($id, 'civicrm_contact'));
     }
   }
 
