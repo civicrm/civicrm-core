@@ -71,6 +71,7 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
     ) {
       return array();
     }
+    global $civicrm_root;
 
     $reportIds = array();
     $reportTypes = array('detail', 'opened', 'bounce', 'clicks');
@@ -81,32 +82,9 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
       $reportIds[$report] = $result['values'][0]['id'];
     }
     $result = array();
-    $result['crmMailing'] = array(
-      'ext' => 'civicrm',
-      'js' => array(
-        'ang/crmMailing.js',
-        'ang/crmMailing/*.js',
-      ),
-      'css' => array('ang/crmMailing.css'),
-      'partials' => array('ang/crmMailing'),
-    );
-    $result['crmMailingAB'] = array(
-      'ext' => 'civicrm',
-      'js' => array(
-        'ang/crmMailingAB.js',
-        'ang/crmMailingAB/*.js',
-        'ang/crmMailingAB/*/*.js',
-      ),
-      'css' => array('ang/crmMailingAB.css'),
-      'partials' => array('ang/crmMailingAB'),
-    );
-    $result['crmD3'] = array(
-      'ext' => 'civicrm',
-      'js' => array(
-        'ang/crmD3.js',
-        'bower_components/d3/d3.min.js',
-      ),
-    );
+    $result['crmMailing'] = include "$civicrm_root/ang/crmMailing.ang.php";
+    $result['crmMailingAB'] = include "$civicrm_root/ang/crmMailingAB.ang.php";
+    $result['crmD3'] = include "$civicrm_root/ang/crmD3.ang.php";
 
     $config = CRM_Core_Config::singleton();
     $session = CRM_Core_Session::singleton();

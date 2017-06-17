@@ -109,7 +109,18 @@ class ManagerTest extends \CiviUnitTestCase {
    */
   public function testGetPartials() {
     $partials = $this->angular->getPartials('crmMailing');
-    $this->assertRegExp('/ng-form="crmMailing/', $partials['~/crmMailing/EditMailingCtrl/2step.html']);
+    $this->assertRegExp('/ng-form="crmMailingSubform">/', $partials['~/crmMailing/EditMailingCtrl/2step.html']);
+    // If crmMailing changes, feel free to use a different example.
+  }
+
+  /**
+   * Get HTML fragments from an example module. The HTML is modified via hook.
+   */
+  public function testGetPartials_Hooked() {
+    \CRM_Utils_Hook::singleton()->setHook('civicrm_alterAngular', array($this, 'hook_civicrm_alterAngular'));
+
+    $partials = $this->angular->getPartials('crmMailing');
+    $this->assertRegExp('/ng-form="crmMailingSubform" cat-stevens="ts\\(\'wild world\'\\)">/', $partials['~/crmMailing/EditMailingCtrl/2step.html']);
     // If crmMailing changes, feel free to use a different example.
   }
 
@@ -119,7 +130,83 @@ class ManagerTest extends \CiviUnitTestCase {
   public function testGetStrings() {
     $strings = $this->angular->getStrings('crmMailing');
     $this->assertTrue(in_array('Save Draft', $strings));
+    $this->assertFalse(in_array('wild world', $strings));
     // If crmMailing changes, feel free to use a different example.
+  }
+
+  /**
+   * Get a translatable string from an example module. The HTML is modified via hook.
+   */
+  public function testGetStrings_Hooked() {
+    \CRM_Utils_Hook::singleton()->setHook('civicrm_alterAngular', array($this, 'hook_civicrm_alterAngular'));
+
+    $strings = $this->angular->getStrings('crmMailing');
+    $this->assertTrue(in_array('wild world', $strings));
+    // If crmMailing changes, feel free to use a different example.
+  }
+
+  /**
+   * Get the list of dependencies for an Angular module.
+   */
+  public function testGetRequires() {
+    $requires = $this->angular->getResources(array('crmMailing'), 'requires', 'requires');
+    $this->assertTrue(in_array('ngRoute', $requires['crmMailing']));
+    $this->assertFalse(in_array('crmCatStevens', $requires['crmMailing']));
+    // If crmMailing changes, feel free to use a different example.
+  }
+
+  /**
+   * Get the list of dependencies for an Angular module. It can be modified via hook.
+   */
+  public function testGetRequires_Hooked() {
+    \CRM_Utils_Hook::singleton()->setHook('civicrm_alterAngular', array($this, 'hook_civicrm_alterAngular'));
+
+    $requires = $this->angular->getResources(array('crmMailing'), 'requires', 'requires');
+    $this->assertTrue(in_array('ngRoute', $requires['crmMailing']));
+    $this->assertTrue(in_array('crmCatStevens', $requires['crmMailing']));
+    // If crmMailing changes, feel free to use a different example.
+  }
+
+  /**
+   * Get the full, recursive list of dependencies for a set of Angular modules.
+   */
+  public function testResolveDeps() {
+    // If crmMailing changes, feel free to use a different example.
+    $expected = array(
+      'angularFileUpload',
+      'crmAttachment',
+      'crmAutosave',
+      'crmCxn',
+      'crmMailing',
+      'crmResource',
+      'crmUtil',
+      'crmUi',
+      'dialogService',
+      'ngRoute',
+      'ngSanitize',
+      'ui.utils',
+    );
+    $input = array('crmMailing', 'crmCxn');
+    $actual = $this->angular->resolveDependencies($input);
+    sort($expected);
+    sort($actual);
+    $this->assertEquals($expected, $actual);
+  }
+
+  /**
+   * Example hook. Modifies `2step.html` by adding the attribute
+   * `cat-stevens="ts('wild world')"`.
+   *
+   * @param \Civi\Angular\Manager $angular
+   * @see \CRM_Utils_Hook::alterAngular
+   */
+  public function hook_civicrm_alterAngular($angular) {
+    $angular->add(ChangeSet::create('cat-stevens')
+      ->requires('crmMailing', 'crmCatStevens')
+      ->alterHtml('~/crmMailing/EditMailingCtrl/2step.html', function(\phpQueryObject $doc){
+        $doc->find('[ng-form="crmMailingSubform"]')->attr('cat-stevens', 'ts(\'wild world\')');
+      })
+    );
   }
 
 }

@@ -1,8 +1,6 @@
 (function (angular, $, _) {
 
-  angular.module('crmCxn', [
-    'crmUtil', 'ngRoute', 'ngSanitize', 'ui.utils', 'crmUi', 'dialogService'
-  ]);
+  angular.module('crmCxn', CRM.angRequires('crmCxn'));
 
   angular.module('crmCxn').config([
     '$routeProvider',
