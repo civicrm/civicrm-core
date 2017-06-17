@@ -72,6 +72,18 @@ use Civi\Core\Exception\UnknownAssetException;
  */
 class AssetBuilder {
 
+  /**
+   * @return array
+   *   Array(string $value => string $label).
+   */
+  public static function getCacheModes() {
+    return array(
+      '0' => ts('Disable'),
+      '1' => ts('Enable'),
+      'auto' => ts('Auto'),
+    );
+  }
+
   protected $cacheEnabled;
 
   /**
@@ -80,7 +92,11 @@ class AssetBuilder {
    */
   public function __construct($cacheEnabled = NULL) {
     if ($cacheEnabled === NULL) {
-      $cacheEnabled = !\CRM_Core_Config::singleton()->debug;
+      $cacheEnabled = \Civi::settings()->get('assetCache');
+      if ($cacheEnabled === 'auto') {
+        $cacheEnabled = !\CRM_Core_Config::singleton()->debug;
+      }
+      $cacheEnabled = (bool) $cacheEnabled;
     }
     $this->cacheEnabled = $cacheEnabled;
   }
