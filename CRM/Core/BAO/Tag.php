@@ -531,4 +531,40 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
     return $tags;
   }
 
+  /**
+   * Get child tags IDs
+   *
+   * @return array $childTagIDs
+   *   associated array of child tags in Array('Parent Tag ID' => Array('Child Tag 1', ...)) format
+   */
+  public static function getChildTags() {
+    $childTagIDs = array();
+
+    // only fetch those tags which has child tags
+    $getChildGroupSQL = "SELECT parent.id as parent_id, GROUP_CONCAT(child.id) as child_id
+        FROM civicrm_tag parent,
+        civicrm_tag child
+        WHERE parent.is_tagset <> 1 AND child.parent_id = parent.id
+        GROUP BY parent.id
+    ";
+    $dao = CRM_Core_DAO::executeQuery($getChildGroupSQL);
+    while ($dao->fetch()) {
+      $childTagIDs[$dao->parent_id] = (array) explode(',', $dao->child_id);
+    }
+
+    // check if child tag has any childs, if found then include those child tags inside parent tag
+    //  i.e. format Array('parent_tag' => array('child_tag_1', ...), 'child_tag_1' => array(child_tag_1_1, ..), ..)
+    //  to Array('parent_tag' => array('child_tag_1', 'child_tag_1_1'...), ..)
+    foreach ($childTagIDs as $parentTagID => $childTags) {
+      foreach ($childTags as $childTag) {
+        // if $childTag has any child tag of its own
+        if (array_key_exists($childTag, $childTagIDs)) {
+          $childTagIDs[$parentTagID] = array_merge($childTagIDs[$parentTagID], $childTagIDs[$childTag]);
+        }
+      }
+    }
+
+    return $childTagIDs;
+  }
+
 }
