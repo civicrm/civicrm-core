@@ -690,16 +690,7 @@ class CRM_Report_Form extends CRM_Core_Form {
     }
 
     foreach ($this->_columns as $tableName => $table) {
-      // set alias
-      if (!isset($table['alias'])) {
-        $this->_columns[$tableName]['alias'] = substr($tableName, 8) .
-          '_civireport';
-      }
-      else {
-        $this->_columns[$tableName]['alias'] = $table['alias'] . '_civireport';
-      }
-
-      $this->_aliases[$tableName] = $this->_columns[$tableName]['alias'];
+      $this->setTableAlias($table, $tableName);
 
       $expFields = array();
       // higher preference to bao object
@@ -714,7 +705,7 @@ class CRM_Report_Form extends CRM_Core_Form {
         }
       }
 
-      $doNotCopy = array('required');
+      $doNotCopy = array('required', 'default');
 
       $fieldGroups = array('fields', 'filters', 'group_bys', 'order_bys');
       foreach ($fieldGroups as $fieldGrp) {
@@ -4959,6 +4950,28 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
     $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = CRM_Utils_Array::value('type', $field);
     $this->_selectAliases[] = $alias;
     return $select;
+  }
+
+  /**
+   * Set table alias.
+   *
+   * @param array $table
+   * @param string $tableName
+   *
+   * @return string
+   *   Alias for table.
+   */
+  protected function setTableAlias($table, $tableName) {
+    if (!isset($table['alias'])) {
+      $this->_columns[$tableName]['alias'] = substr($tableName, 8) .
+        '_civireport';
+    }
+    else {
+      $this->_columns[$tableName]['alias'] = $table['alias'] . '_civireport';
+    }
+
+    $this->_aliases[$tableName] = $this->_columns[$tableName]['alias'];
+    return $this->_aliases[$tableName];
   }
 
 }

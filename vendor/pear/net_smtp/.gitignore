@@ -1,0 +1,14 @@
+.DS_Store
+
+# Tests
+run-tests.log
+/tests/*.diff
+/tests/*.exp
+/tests/*.log
+/tests/*.out
+/tests/config.php
+
+# composer related
+composer.lock
+composer.phar
+vendor

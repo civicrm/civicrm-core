@@ -150,7 +150,7 @@ class ChainSubscriber implements EventSubscriberInterface {
               $subParams['entity_table'] = 'civicrm_' . $lowercase_entity;
             }
 
-            $crm16084 = FALSE;
+            $addEntityId = TRUE;
             if ($subEntity == 'relationship' && $lowercase_entity == 'contact') {
               // if a relationship call is chained to a contact call, we need
               // to check whether contact_id_a or contact_id_b for the
@@ -159,12 +159,12 @@ class ChainSubscriber implements EventSubscriberInterface {
               // See CRM-16084.
               foreach (array_keys($newparams) as $key) {
                 if (substr($key, 0, 11) == 'contact_id_') {
-                  $crm16084 = TRUE;
+                  $addEntityId = FALSE;
                   break;
                 }
               }
             }
-            if (!$crm16084) {
+            if ($addEntityId) {
               $subParams[$lowercase_entity . "_id"] = $parentAPIValues['id'];
             }
           }

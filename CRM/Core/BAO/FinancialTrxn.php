@@ -436,13 +436,13 @@ WHERE ceft.entity_id = %1";
         'transaction_date' => date('YmdHis'),
         'amount' => $amount,
         'description' => 'Fee',
-        'status_id' => CRM_Core_OptionGroup::getValue('financial_item_status', 'Paid', 'name'),
+        'status_id' => CRM_Core_Pseudoconstant::getKey('CRM_Financial_BAO_FinancialItem', 'status_id', 'Paid'),
         'entity_table' => 'civicrm_financial_trxn',
         'entity_id' => $params['entity_id'],
         'currency' => $params['trxnParams']['currency'],
       );
     $trxnIDS['id'] = $trxn->id;
-    $financialItem = CRM_Financial_BAO_FinancialItem::create($fItemParams, NULL, $trxnIDS);
+    CRM_Financial_BAO_FinancialItem::create($fItemParams, NULL, $trxnIDS);
   }
 
   /**
@@ -472,11 +472,27 @@ WHERE ceft.entity_id = %1";
     $financialTypeId = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $contributionId, 'financial_type_id');
 
     if ($contributionId && $financialTypeId) {
-      $statusId = CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name');
-      $refundStatusId = CRM_Core_OptionGroup::getValue('contribution_status', 'Refunded', 'name');
+      $statusId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
+      $refundStatusId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Refunded');
 
-      $toFinancialAccount = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($financialTypeId, 'Accounts Receivable Account is');
-      $feeFinancialAccount = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($financialTypeId, 'Expense Account is');
+      $filteredFinancialAccounts = array();
+      $filteredFinancialAccountRel = array(
+        'Accounts Receivable Account is',
+        'Expense Account is',
+      );
+      if (CRM_Contribute_BAO_Contribution::checkContributeSettings('deferred_revenue_enabled')) {
+        $filteredFinancialAccountRel = array_merge($filteredFinancialAccountRel, array(
+          'Deferred Revenue Account is',
+          'Income Account is',
+        ));
+      }
+
+      foreach ($filteredFinancialAccountRel as $financialAccountRel) {
+        $financialAccount = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($financialTypeId, $financialAccountRel);
+        if ($financialAccount) {
+          $filteredFinancialAccounts[] = $financialAccount;
+        }
+      }
 
       if (empty($lineItemTotal)) {
         $lineItemTotal = CRM_Price_BAO_LineItem::getLineTotal($contributionId);
@@ -485,9 +501,10 @@ WHERE ceft.entity_id = %1";
 SELECT SUM(ft.total_amount)
 FROM civicrm_financial_trxn ft
   INNER JOIN civicrm_entity_financial_trxn eft ON (ft.id = eft.financial_trxn_id AND eft.entity_table = 'civicrm_contribution' AND eft.entity_id = {$contributionId})
-WHERE ft.to_financial_account_id != {$toFinancialAccount} AND ft.to_financial_account_id != {$feeFinancialAccount}
+WHERE ft.to_financial_account_id NOT IN ( " . implode(', ', $filteredFinancialAccounts) . " )
   AND ft.status_id IN ({$statusId}, {$refundStatusId})
 ";
+
       $ftTotalAmt = CRM_Core_DAO::singleValueQuery($sqlFtTotalAmt);
       $value = 0;
       if (!$ftTotalAmt) {
@@ -668,10 +685,10 @@ WHERE ft.to_financial_account_id != {$toFinancialAccount} AND ft.to_financial_ac
         }
         foreach ($results['values'] as $result) {
           if ($result['account_relationship'] == $accountRel) {
-            $trxnParams['to_financial_account_id'] = $result['financial_account_id'];
+            $trxnParams['from_financial_account_id'] = $result['financial_account_id'];
           }
           else {
-            $trxnParams['from_financial_account_id'] = $result['financial_account_id'];
+            $trxnParams['to_financial_account_id'] = $result['financial_account_id'];
           }
         }
         foreach ($deferredRevenue['revenue'] as $revenue) {

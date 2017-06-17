@@ -1,0 +1,6 @@
+language: php
+install:
+  - pear install package.xml
+php:
+  - 5.2
+script: phpunit tests/

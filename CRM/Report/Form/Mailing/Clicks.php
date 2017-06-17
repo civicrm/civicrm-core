@@ -195,6 +195,29 @@ class CRM_Report_Form_Mailing_Clicks extends CRM_Report_Form {
       'grouping' => 'mailing-fields',
     );
 
+    $this->_columns['civicrm_mailing_event_trackable_url_open'] = array(
+      'dao' => 'CRM_Mailing_Event_DAO_TrackableURLOpen',
+      'fields' => array(
+        'time_stamp' => array(
+          'title' => ts('Click Date'),
+          'default' => TRUE,
+        ),
+      ),
+      'filters' => array(
+        'time_stamp' => array(
+          'title' => ts('Click Date'),
+          'operatorType' => CRM_Report_Form::OP_DATE,
+          'type' => CRM_Utils_Type::T_DATE,
+        ),
+      ),
+      'order_bys' => array(
+        'time_stamp' => array(
+          'title' => ts('Click Date'),
+        ),
+      ),
+      'grouping' => 'mailing-fields',
+    );
+
     $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
     parent::__construct();
@@ -231,7 +254,7 @@ class CRM_Report_Form_Mailing_Clicks extends CRM_Report_Form {
     }
 
     if (!empty($this->_params['charts'])) {
-      $select[] = "COUNT(civicrm_mailing_event_trackable_url_open.id) as civicrm_mailing_click_count";
+      $select[] = "COUNT({$this->_aliases['civicrm_event_trackable_url_open']}.id) as civicrm_mailing_click_count";
       $this->_columnHeaders["civicrm_mailing_click_count"]['title'] = ts('Click Count');
     }
 
@@ -253,28 +276,30 @@ class CRM_Report_Form_Mailing_Clicks extends CRM_Report_Form {
 
   public function from() {
     $this->_from = "
-        FROM civicrm_contact {$this->_aliases['civicrm_contact']} {$this->_aclFrom}";
+      FROM civicrm_contact {$this->_aliases['civicrm_contact']} {$this->_aclFrom}";
 
     $this->_from .= "
-        INNER JOIN civicrm_mailing_event_queue
-          ON civicrm_mailing_event_queue.contact_id = {$this->_aliases['civicrm_contact']}.id
-        LEFT JOIN civicrm_email {$this->_aliases['civicrm_email']}
-          ON civicrm_mailing_event_queue.email_id = {$this->_aliases['civicrm_email']}.id
-        INNER JOIN civicrm_mailing_event_trackable_url_open
-          ON civicrm_mailing_event_trackable_url_open.event_queue_id = civicrm_mailing_event_queue.id
-        INNER JOIN civicrm_mailing_trackable_url {$this->_aliases['civicrm_mailing_trackable_url']}
-          ON civicrm_mailing_event_trackable_url_open.trackable_url_id = {$this->_aliases['civicrm_mailing_trackable_url']}.id
-        INNER JOIN civicrm_mailing_job
-          ON civicrm_mailing_event_queue.job_id = civicrm_mailing_job.id
-        INNER JOIN civicrm_mailing {$this->_aliases['civicrm_mailing']}
-          ON civicrm_mailing_job.mailing_id = {$this->_aliases['civicrm_mailing']}.id
-          AND civicrm_mailing_job.is_test = 0
-      ";
+      INNER JOIN civicrm_mailing_event_queue
+        ON civicrm_mailing_event_queue.contact_id = {$this->_aliases['civicrm_contact']}.id
+      LEFT JOIN civicrm_email {$this->_aliases['civicrm_email']}
+        ON civicrm_mailing_event_queue.email_id = {$this->_aliases['civicrm_email']}.id
+      INNER JOIN civicrm_mailing_event_trackable_url_open {$this->_aliases['civicrm_mailing_event_trackable_url_open']}
+        ON {$this->_aliases['civicrm_mailing_event_trackable_url_open']}.event_queue_id = civicrm_mailing_event_queue.id
+      INNER JOIN civicrm_mailing_trackable_url {$this->_aliases['civicrm_mailing_trackable_url']}
+        ON {$this->_aliases['civicrm_mailing_event_trackable_url_open']}.trackable_url_id = {$this->_aliases['civicrm_mailing_trackable_url']}.id
+      INNER JOIN civicrm_mailing_job
+        ON civicrm_mailing_event_queue.job_id = civicrm_mailing_job.id
+      INNER JOIN civicrm_mailing {$this->_aliases['civicrm_mailing']}
+        ON civicrm_mailing_job.mailing_id = {$this->_aliases['civicrm_mailing']}.id
+        AND civicrm_mailing_job.is_test = 0
+    ";
+
     if ($this->_phoneField) {
       $this->_from .= "
-            LEFT JOIN civicrm_phone {$this->_aliases['civicrm_phone']}
-                   ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id AND
-                      {$this->_aliases['civicrm_phone']}.is_primary = 1 ";
+        LEFT JOIN civicrm_phone {$this->_aliases['civicrm_phone']}
+          ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id
+          AND {$this->_aliases['civicrm_phone']}.is_primary = 1
+      ";
     }
   }
 
@@ -289,7 +314,7 @@ class CRM_Report_Form_Mailing_Clicks extends CRM_Report_Form {
       $groupBy = "{$this->_aliases['civicrm_mailing']}.id";
     }
     else {
-      $groupBy = "civicrm_mailing_event_trackable_url_open.id";
+      $groupBy = "{$this->_aliases['civicrm_mailing_event_trackable_url_open']}.id";
     }
     $this->_groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, $groupBy);
   }

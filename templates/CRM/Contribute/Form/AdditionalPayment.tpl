@@ -63,9 +63,9 @@
 <div class="crm-block crm-form-block crm-payment-form-block">
 
   {if !$email}
-  <div class="messages status no-popup">
-    <div class="icon inform-icon"></div>&nbsp;{ts}You will not be able to send an automatic email receipt for this payment because there is no email address recorded for this contact. If you want a receipt to be sent when this payment is recorded, click Cancel and then click Edit from the Summary tab to add an email address before recording the payment.{/ts}
-  </div>
+    <div class="messages status no-popup">
+      <div class="icon inform-icon"></div>&nbsp;{ts}You will not be able to send an automatic email receipt for this payment because there is no email address recorded for this contact. If you want a receipt to be sent when this payment is recorded, click Cancel and then click Edit from the Summary tab to add an email address before recording the payment.{/ts}
+    </div>
   {/if}
   {if $newCredit AND $contributionMode EQ null}
     {if $contactId}
@@ -97,6 +97,20 @@
       <td>
         <span id='totalAmount'>{$form.currency.html|crmAddClass:eight}&nbsp;{$form.total_amount.html|crmAddClass:eight}</span>&nbsp; <span class="status">{if $paymentType EQ 'refund'}{ts}Refund Due{/ts}{else}{ts}Balance Owed{/ts}{/if}:&nbsp;{$paymentAmt|crmMoney}</span>
       </td>
+      {if $email and $outBound_option != 2}
+        <tr class="crm-payment-form-block-is_email_receipt">
+          <td class="label">
+            {$form.is_email_receipt.label}
+          </td>
+          <td>{$form.is_email_receipt.html}&nbsp;
+              <span class="description">{ts 1=$email}Automatically email a receipt to %1?{/ts}</span>
+          </td>
+        </tr>
+        <tr id="fromEmail" class="crm-payment-form-block-from_email_address" style="display:none;">
+          <td class="label">{$form.from_email_address.label}</td>
+          <td>{$form.from_email_address.html}</td>
+        </tr>
+      {/if}
     </tr>
    </table>
 
@@ -128,27 +142,7 @@
             <td class="label">{$form.trxn_id.label}</td>
             <td>{$form.trxn_id.html} {help id="id-trans_id"}</td>
           </tr>
-          {if $email and $outBound_option != 2}
-            <tr class="crm-payment-form-block-is_email_receipt">
-              <td class="label">
-                {$form.is_email_receipt.label}</td><td>{$form.is_email_receipt.html}&nbsp;
-                <span class="description">{ts 1=$email}Automatically email a receipt to %1?{/ts}</span>
-              </td>
-            </tr>
-          {/if}
-          <tr id="fromEmail" class="crm-payment-form-block-receipt_date" style="display:none;">
-            <td class="label">{$form.from_email_address.label}</td>
-            <td>{$form.from_email_address.html}</td>
-          </tr>
-          <tr id='notice' class="crm-event-eventfees-form-block-receipt_text">
-            <td class="label">{$form.receipt_text.label}</td>
-            <td><span class="description">
-                {ts}Enter a message you want included at the beginning of the confirmation email.{/ts}
-                </span><br />
-                {$form.receipt_text.html|crmAddClass:huge}
-            </td>
-          </tr>
-           <tr class="crm-payment-form-block-fee_amount"><td class="label">{$form.fee_amount.label}</td><td>{$form.fee_amount.html|crmMoney:$currency:'XXX':'YYY'}<br />
+          <tr class="crm-payment-form-block-fee_amount"><td class="label">{$form.fee_amount.label}</td><td{$valueStyle}>{$form.fee_amount.html|crmMoney:$currency:'XXX':'YYY'}<br />
             <span class="description">{ts}Processing fee for this transaction (if applicable).{/ts}</span></td></tr>
            <tr class="crm-payment-form-block-net_amount"><td class="label">{$form.net_amount.label}</td><td>{$form.net_amount.html|crmMoney:$currency:'':1}<br />
             <span class="description">{ts}Net value of the payment (Total Amount minus Fee).{/ts}</span></td></tr>
@@ -188,37 +182,11 @@
         });
 
         function checkEmailDependancies() {
-          if ($('#is_email_receipt', $form).attr('checked')) {
-            $('#fromEmail, #notice', $form).show();
-            $('#receiptDate', $form).hide();
+          if ($('#is_email_receipt', $form).prop('checked')) {
+            $('#fromEmail', $form).show();
           }
           else {
-            $('#fromEmail, #notice', $form).hide( );
-            $('#receiptDate', $form).show();
-          }
-        }
-
-        // bind first click of accordion header to load crm-accordion-body with snippet
-        $('#adjust-option-type', $form).hide();
-        $('.crm-ajax-accordion .crm-accordion-header', $form).one('click', function() {
-          loadPanes($(this).attr('id'));
-        });
-        $('.crm-ajax-accordion:not(.collapsed) .crm-accordion-header', $form).each(function(index) {
-          loadPanes($(this).attr('id'));
-        });
-        // load panes function call for snippet based on id of crm-accordion-header
-        function loadPanes(id) {
-          var url = "{/literal}{crmURL p='civicrm/payment/add' q='formType=' h=0}{literal}" + id;
-          {/literal}
-          {if $contributionMode}
-            url += "&mode={$contributionMode}";
-          {/if}
-          {if $qfKey}
-            url += "&qfKey={$qfKey}";
-          {/if}
-          {literal}
-          if (!$('div.'+ id, $form).html()) {
-            CRM.loadPage(url, {target: $('div.' + id, $form)});
+           $('#fromEmail', $form).hide( );
           }
         }
 

@@ -59,19 +59,10 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
    * @inheritDoc
    */
   public function getAngularModules() {
-    $result = array();
-    $result['crmCaseType'] = array(
-      'ext' => 'civicrm',
-      'js' => array('ang/crmCaseType.js'),
-      'css' => array('ang/crmCaseType.css'),
-      'partials' => array('ang/crmCaseType'),
-    );
+    global $civicrm_root;
 
-    CRM_Core_Resources::singleton()->addSetting(array(
-      'crmCaseType' => array(
-        'REL_TYPE_CNAME' => CRM_Case_XMLProcessor::REL_TYPE_CNAME,
-      ),
-    ));
+    $result = array();
+    $result['crmCaseType'] = include "$civicrm_root/ang/crmCaseType.ang.php";
     return $result;
   }
 
@@ -212,15 +203,12 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
     if (CRM_Core_Permission::check('access all cases and activities') ||
       CRM_Core_Permission::check('add cases')
     ) {
-      $atype = CRM_Core_OptionGroup::getValue('activity_type',
-        'Open Case',
-        'name'
-      );
-      if ($atype) {
+      $activityType = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Open Case');
+      if ($activityType) {
         $shortCuts = array_merge($shortCuts, array(
           array(
             'path' => 'civicrm/case/add',
-            'query' => "reset=1&action=add&atype=$atype&context=standalone",
+            'query' => "reset=1&action=add&atype={$activityType}&context=standalone",
             'ref' => 'new-case',
             'title' => ts('Case'),
           ),

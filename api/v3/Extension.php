@@ -332,6 +332,7 @@ function _civicrm_api3_extension_refresh_spec(&$fields) {
  *   API result
  */
 function civicrm_api3_extension_get($params) {
+  $keys = isset($params['key']) ? (array) $params['key'] : NULL;
   $statuses = CRM_Extension_System::singleton()->getManager()->getStatuses();
   $mapper = CRM_Extension_System::singleton()->getMapper();
   $result = array();
@@ -346,9 +347,18 @@ function civicrm_api3_extension_get($params) {
     }
     $info = CRM_Extension_System::createExtendedInfo($obj);
     $info['id'] = $id++; // backward compatibility with indexing scheme
-    $result[] = $info;
+    if (!empty($params['key'])) {
+      if (in_array($key, $keys)) {
+        $result[] = $info;
+      }
+    }
+    else {
+      $result[] = $info;
+    }
   }
-  return _civicrm_api3_basic_array_get('Extension', $params, $result, 'id', array());
+  $options = _civicrm_api3_get_options_from_params($params);
+  $returnFields = !empty($options['return']) ? $options['return'] : array();
+  return _civicrm_api3_basic_array_get('Extension', $params, $result, 'id', $returnFields);
 }
 
 /**

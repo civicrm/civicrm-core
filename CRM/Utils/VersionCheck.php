@@ -33,7 +33,7 @@
 class CRM_Utils_VersionCheck {
   const
     CACHEFILE_NAME = 'version-info-cache.json',
-    // after this length of time we fall back on poor-man's cron (7+ days)
+    // After which length of time we expire the cached version info (7+ days).
     CACHEFILE_EXPIRE = 605000;
 
   /**
@@ -70,7 +70,7 @@ class CRM_Utils_VersionCheck {
   /**
    * @var string
    */
-  public $pingbackUrl = 'http://latest.civicrm.org/stable.php?format=json';
+  public $pingbackUrl = 'https://latest.civicrm.org/stable.php?format=json';
 
   /**
    * Pingback params
@@ -106,7 +106,7 @@ class CRM_Utils_VersionCheck {
     // Populate remote $versionInfo from cache file
     $this->isInfoAvailable = $this->readCacheFile();
 
-    // Poor-man's cron fallback if scheduled job is enabled but has failed to run
+    // Fallback if scheduled job is enabled but has failed to run.
     $expiryTime = time() - self::CACHEFILE_EXPIRE;
     if (!empty($this->cronJob['is_active']) &&
       (!$this->isInfoAvailable || filemtime($this->cacheFile) < $expiryTime)

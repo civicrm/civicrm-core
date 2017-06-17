@@ -1276,6 +1276,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
               'fee_amount' => CRM_Utils_Array::value('fee_amount', $result),
               'card_type_id' => CRM_Utils_Array::value('card_type_id', $paymentParams),
               'pan_truncation' => CRM_Utils_Array::value('pan_truncation', $paymentParams),
+              'is_email_receipt' => FALSE,
             ));
             // This has now been set to 1 in the DB - declare it here also
             $contribution->contribution_status_id = 1;
@@ -1478,6 +1479,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       ) {
         unset($submittedValues['tax_amount']);
       }
+      // @todo - look to remove this line. I believe it relates to CRM-16460
+      // and possibly contributes to fixing the issue described there but
+      // would cause breakage for negative values in some cases.
       $submittedValues['total_amount'] = CRM_Utils_Array::value('amount', $submittedValues);
     }
     if ($this->_id) {
@@ -1594,8 +1598,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     $isEmpty = array_keys(array_flip($submittedValues['soft_credit_contact_id']));
     if ($this->_id && count($isEmpty) == 1 && key($isEmpty) == NULL) {
-      //Delete existing soft credit records if soft credit list is empty on update
-      CRM_Contribute_BAO_ContributionSoft::del(array('contribution_id' => $this->_id, 'pcp_id' => 0));
+      civicrm_api3('ContributionSoft', 'get', array('contribution_id' => $this->_id, 'pcp_id' => NULL, 'api.ContributionSoft.delete' => 1));
     }
 
     // set the contact, when contact is selected
@@ -1693,10 +1696,10 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
       // Set is_pay_later flag for back-office offline Pending status contributions CRM-8996
       // else if contribution_status is changed to Completed is_pay_later flag is changed to 0, CRM-15041
-      if ($params['contribution_status_id'] == CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name')) {
+      if ($params['contribution_status_id'] == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending')) {
         $params['is_pay_later'] = 1;
       }
-      elseif ($params['contribution_status_id'] == CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name')) {
+      elseif ($params['contribution_status_id'] == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed')) {
         $params['is_pay_later'] = 0;
       }
 

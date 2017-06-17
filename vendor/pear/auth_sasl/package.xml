@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package version="2.0"
+ xmlns="http://pear.php.net/dtd/package-2.0"
+ xmlns:tasks="http://pear.php.net/dtd/tasks-1.0"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:schemaLocation="http://pear.php.net/dtd/tasks-1.0
+  http://pear.php.net/dtd/tasks-1.0.xsd
+  http://pear.php.net/dtd/package-2.0
+  http://pear.php.net/dtd/package-2.0.xsd"
+>
+ <name>Auth_SASL</name>
+ <channel>pear.php.net</channel>
+ <summary>Abstraction of various SASL mechanism responses</summary>
+ <description>
+Provides code to generate responses to common SASL mechanisms, including:
+- Digest-MD5
+- Cram-MD5
+- Plain
+- Anonymous
+- Login (Pseudo mechanism)
+- SCRAM
+ </description>
+
+ <lead>
+  <name>Anish Mistry</name>
+  <user>amistry</user>
+  <email>amistry@am-productions.biz</email>
+  <active>no</active>
+ </lead>
+ <lead>
+  <name>Richard Heyes</name>
+  <user>richard</user>
+  <email>richard@php.net</email>
+  <active>no</active>
+ </lead>
+ <lead>
+  <name>Michael Bretterklieber</name>
+  <user>mbretter</user>
+  <email>michael@bretterklieber.com</email>
+  <active>no</active>
+ </lead>
+
+ <date>2017-03-07</date>
+ <version>
+  <release>1.1.0</release>
+  <api>1.1.0</api>
+ </version>
+ <stability>
+  <release>stable</release>
+  <api>stable</api>
+ </stability>
+ <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD</license>
+ <notes>
+* Set minimum PHP version to 5.4.0
+* Set minimum PEAR version to 1.10.1
+
+* Request #21033: PHP warning depreciated
+ </notes>
+
+ <contents>
+  <dir name="/">
+   <dir name="Auth">
+    <dir name="SASL">
+     <file name="Anonymous.php" role="php" />
+     <file name="Common.php" role="php" />
+     <file name="CramMD5.php" role="php" />
+     <file name="DigestMD5.php" role="php" />
+     <file name="External.php" role="php" />
+     <file name="Login.php" role="php" />
+     <file name="Plain.php" role="php" />
+     <file name="SCRAM.php" role="php" />
+    </dir> <!-- //SASL -->
+    <file name="SASL.php" role="php" />
+   </dir><!-- /Auth -->
+  </dir> <!-- / -->
+ </contents>
+
+ <dependencies>
+  <required>
+   <php>
+    <min>5.4.0</min>
+   </php>
+   <pearinstaller>
+    <min>1.10.1</min>
+   </pearinstaller>
+  </required>
+ </dependencies>
+
+ <phprelease />
+
+ <changelog>
+
+  <release>
+   <version>
+    <release>1.1.0</release>
+    <api>1.1.0</api>
+   </version>
+   <stability>
+    <release>stable</release>
+    <api>stable</api>
+   </stability>
+   <date>2017-03-07</date>
+   <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD</license>
+   <notes>
+* Set minimum PHP version to 5.4.0
+* Set minimum PEAR version to 1.10.1
+
+* Request #21033: PHP warning depreciated
+   </notes>
+  </release>
+
+  <release>
+   <version>
+    <release>1.0.6</release>
+    <api>1.0.3</api>
+   </version>
+   <stability>
+    <release>stable</release>
+    <api>stable</api>
+   </stability>
+   <date>2011-09-27</date>
+   <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD</license>
+   <notes>
+QA release
+* Bug #18856: Authentication warnings because of wrong Auth_SASL::factory argument [kguest]
+   </notes>
+  </release>
+
+  <release>
+   <version>
+    <release>1.0.5</release>
+    <api>1.0.3</api>
+   </version>
+   <stability>
+    <release>stable</release>
+    <api>stable</api>
+   </stability>
+   <date>2011-09-04</date>
+   <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD</license>
+   <notes>
+QA release
+* Added support for any mechanism of the SCRAM family; with thanks to Jehan Pagès. [kguest]
+* crammd5 and digestmd5 mechanisms name deprecated in favour of IANA registered names 'cram-md5' and 'digest-md5'; with thanks to Jehan Pagès. [kguest]
+   </notes>
+  </release>
+
+  <release>
+   <version>
+    <release>1.0.4</release>
+    <api>1.0.3</api>
+   </version>
+   <stability>
+    <release>stable</release>
+    <api>stable</api>
+   </stability>
+   <date>2010-02-07</date>
+   <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD</license>
+   <notes>
+QA release
+* Fix bug #16624: open_basedir restriction warning in DigestMD5.php [till]
+   </notes>
+  </release>
+
+  <release>
+   <version>
+    <release>1.0.3</release>
+    <api>1.0.3</api>
+   </version>
+   <stability>
+    <release>stable</release>
+    <api>stable</api>
+   </stability>
+   <date>2009-08-05</date>
+   <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD</license>
+   <notes>
+QA release
+* Move SVN to proper directory structure [cweiske]
+* Fix Bug #8775: Error in package.xml
+* Fix Bug #14671: Security issue due to seeding random number generator [cweiske]
+   </notes>
+  </release>
+
+  <release>
+   <version>
+    <release>1.0.2</release>
+    <api>1.0.2</api>
+   </version>
+   <stability>
+    <release>stable</release>
+    <api>stable</api>
+   </stability>
+   <date>2006-05-21</date>
+   <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD</license>
+   <notes>
+* Fixed Bug #2143 Auth_SASL_DigestMD5::getResponse() generates invalid response
+* Fixed Bug #6611 Suppress PHP 5 Notice Errors
+* Fixed Bug #2154 realm isn't contained in challange
+   </notes>
+  </release>
+
+  <release>
+   <version>
+    <release>1.0.1</release>
+    <api>1.0.1</api>
+   </version>
+   <stability>
+    <release>stable</release>
+    <api>stable</api>
+   </stability>
+   <date>2003-09-11</date>
+   <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD</license>
+   <notes>* Added authcid/authzid separation in PLAIN and DIGEST-MD5.
+   </notes>
+  </release>
+
+ </changelog>
+</package>

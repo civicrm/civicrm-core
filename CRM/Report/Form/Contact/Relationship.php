@@ -298,6 +298,10 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
             'title' => ts('End Date'),
             'type' => CRM_Utils_Type::T_DATE,
           ),
+          'active_period_date' => array(
+            'title' => ts('Active Period'),
+            'type' => CRM_Utils_Type::T_DATE,
+          ),
         ),
         'grouping' => 'relation-fields',
       ),
@@ -438,7 +442,12 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
             $from = CRM_Utils_Array::value("{$fieldName}_from", $this->_params);
             $to = CRM_Utils_Array::value("{$fieldName}_to", $this->_params);
 
-            $clause = $this->dateClause($field['name'], $relative, $from, $to, $field['type']);
+            if ($fieldName == 'active_period_date') {
+              $clause = $this->activeClause($field['name'], $relative, $from, $to, $field['type']);
+            }
+            else {
+              $clause = $this->dateClause($field['name'], $relative, $from, $to, $field['type']);
+            }
           }
           else {
             $op = CRM_Utils_Array::value("{$fieldName}_op", $this->_params);
@@ -772,6 +781,44 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
       $clause = "(start_date >= CURDATE() OR end_date < CURDATE())";
     }
     return $clause;
+  }
+
+  /**
+   * Get SQL where clause for a active period field.
+   *
+   * @param string $fieldName
+   * @param string $relative
+   * @param string $from
+   * @param string $to
+   * @param string $type
+   * @param string $fromTime
+   * @param string $toTime
+   *
+   * @return null|string
+   */
+  public function activeClause(
+    $fieldName,
+    $relative, $from, $to, $type = NULL, $fromTime = NULL, $toTime = NULL
+    ) {
+    $clauses = array();
+    if (in_array($relative, array_keys($this->getOperationPair(CRM_Report_Form::OP_DATE)))) {
+      return NULL;
+    }
+
+    list($from, $to) = $this->getFromTo($relative, $from, $to, $fromTime, $toTime);
+
+    if ($from) {
+      $from = ($type == CRM_Utils_Type::T_DATE) ? substr($from, 0, 8) : $from;
+    }
+
+    if ($to) {
+      $to = ($type == CRM_Utils_Type::T_DATE) ? substr($to, 0, 8) : $to;
+    }
+
+    if ($from || $to) {
+      return CRM_Contact_BAO_Query::getRelationshipActivePeriodClauses($from, $to, FALSE);
+    }
+    return NULL;
   }
 
 }

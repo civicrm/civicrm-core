@@ -94,8 +94,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
     }
     //Delete PCP against this contribution and create new on submitted PCP information
     elseif (array_key_exists('pcp', $params) && $pcpId) {
-      $deleteParams = array('id' => $pcpId);
-      CRM_Contribute_BAO_ContributionSoft::del($deleteParams);
+      civicrm_api3('ContributionSoft', 'delete', array('id' => $pcpId));
     }
     if (isset($params['soft_credit'])) {
       $softParams = $params['soft_credit'];
@@ -117,8 +116,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
       // delete any extra soft-credit while updating back-office contribution
       foreach ((array) $softIDs as $softID) {
         if (!in_array($softID, $params['soft_credit_ids'])) {
-          $deleteParams = array('id' => $softID);
-          CRM_Contribute_BAO_ContributionSoft::del($deleteParams);
+          civicrm_api3('ContributionSoft', 'delete', array('id' => $softID));
         }
       }
     }
@@ -229,27 +227,6 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
       return $contributionSoft;
     }
     return NULL;
-  }
-
-  /**
-   * Delete soft credits.
-   *
-   * @param array $params
-   *
-   */
-  public static function del($params) {
-    //delete from contribution soft table
-    $contributionSoft = new CRM_Contribute_DAO_ContributionSoft();
-    $contributionSoft->id = CRM_Utils_Array::value('id', $params);
-    if (!$contributionSoft->find()) {
-      return FALSE;
-    }
-    unset($params['id']);
-    foreach ($params as $column => $value) {
-      $contributionSoft->$column = $value;
-    }
-    $contributionSoft->delete();
-    return TRUE;
   }
 
   /**

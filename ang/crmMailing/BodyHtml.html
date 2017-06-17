@@ -4,13 +4,14 @@ Required vars: mailing
 <div ng-form="htmlForm" crm-ui-id-scope>
   <div ng-controller="EmailBodyCtrl">
     <div style="float: right;">
-      <input crm-mailing-token on-select="$broadcast('insert:body_html', token.name)" tabindex="-1" style="z-index:1"/>
+      <input crm-mailing-token on-select="$broadcast('insert:body_html', token.name)" tabindex="-1" style="z-index:1">
     </div>
 
     <div>
       <textarea
         crm-ui-id="htmlForm.body_html"
-        crm-ui-richtext name="body_html"
+        crm-ui-richtext
+        name="body_html"
         crm-ui-insert-rx="insert:body_html"
         ng-model="mailing.body_html"
         ng-blur="checkTokens(mailing, 'body_html', 'insert:body_html')"

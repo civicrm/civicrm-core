@@ -74,17 +74,13 @@ class CRM_Contact_Form_Task_EmailCommon {
 
     $form->_emails = $emails = array();
 
-    $session = CRM_Core_Session::singleton();
-    $contactID = $session->get('userID');
+    $contactID = CRM_Core_Session::singleton()->getLoggedInContactID();
+    $fromDisplayName  = CRM_Core_Session::singleton()->getLoggedInContactDisplayName();
 
     $form->_contactIds = array($contactID);
     $contactEmails = CRM_Core_BAO_Email::allEmails($contactID);
 
     $form->_onHold = array();
-
-    $fromDisplayName = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
-      $contactID, 'display_name'
-    );
 
     foreach ($contactEmails as $emailId => $item) {
       $email = $item['email'];
@@ -370,6 +366,9 @@ class CRM_Contact_Form_Task_EmailCommon {
       }
     }
 
+    //Added for CRM-15984: Add campaign field
+    CRM_Campaign_BAO_Campaign::addCampaign($form);
+
     $form->addFormRule(array('CRM_Contact_Form_Task_EmailCommon', 'formRule'), $form);
     CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'templates/CRM/Contact/Form/Task/EmailCommon.js', 0, 'html-header');
   }
@@ -418,8 +417,21 @@ class CRM_Contact_Form_Task_EmailCommon {
 
     // check and ensure that
     $formValues = $form->controller->exportValues($form->getName());
-    $fromEmail = $formValues['fromEmailAddress'];
-    $from = CRM_Utils_Array::value($fromEmail, $form->_emails);
+    self::submit($form, $formValues);
+  }
+
+  /**
+   * Submit the form values.
+   *
+   * This is also accessible for testing.
+   *
+   * @param CRM_Core_Form $form
+   * @param array $formValues
+   */
+  public static function submit(&$form, $formValues) {
+    self::saveMessageTemplate($formValues);
+
+    $from = CRM_Utils_Array::value($formValues['fromEmailAddress'], $form->_emails);
     $subject = $formValues['subject'];
 
     // CRM-13378: Append CC and BCC information at the end of Activity Details and format cc and bcc fields
@@ -461,27 +473,6 @@ class CRM_Contact_Form_Task_EmailCommon {
     if (isset($form->_caseId) && is_numeric($form->_caseId)) {
       $hash = substr(sha1(CIVICRM_SITE_KEY . $form->_caseId), 0, 7);
       $subject = "[case #$hash] $subject";
-    }
-
-    // process message template
-    if (!empty($formValues['saveTemplate']) || !empty($formValues['updateTemplate'])) {
-      $messageTemplate = array(
-        'msg_text' => $formValues['text_message'],
-        'msg_html' => $formValues['html_message'],
-        'msg_subject' => $formValues['subject'],
-        'is_active' => TRUE,
-      );
-
-      if (!empty($formValues['saveTemplate'])) {
-        $messageTemplate['msg_title'] = $formValues['saveTemplateName'];
-        CRM_Core_BAO_MessageTemplate::add($messageTemplate);
-      }
-
-      if (!empty($formValues['template']) && !empty($formValues['updateTemplate'])) {
-        $messageTemplate['id'] = $formValues['template'];
-        unset($messageTemplate['msg_title']);
-        CRM_Core_BAO_MessageTemplate::add($messageTemplate);
-      }
     }
 
     $attachments = array();
@@ -531,7 +522,8 @@ class CRM_Contact_Form_Task_EmailCommon {
       $bcc,
       array_keys($form->_toContactDetails),
       $additionalDetails,
-      $contributionIds
+      $contributionIds,
+      CRM_Utils_Array::value('campaign_id', $formValues)
     );
 
     $followupStatus = '';
@@ -603,6 +595,33 @@ class CRM_Contact_Form_Task_EmailCommon {
           );
           CRM_Case_BAO_Case::processCaseActivity($caseParams);
         }
+      }
+    }
+  }
+
+  /**
+   * Save the template if update selected.
+   *
+   * @param array $formValues
+   */
+  protected static function saveMessageTemplate($formValues) {
+    if (!empty($formValues['saveTemplate']) || !empty($formValues['updateTemplate'])) {
+      $messageTemplate = array(
+        'msg_text' => $formValues['text_message'],
+        'msg_html' => $formValues['html_message'],
+        'msg_subject' => $formValues['subject'],
+        'is_active' => TRUE,
+      );
+
+      if (!empty($formValues['saveTemplate'])) {
+        $messageTemplate['msg_title'] = $formValues['saveTemplateName'];
+        CRM_Core_BAO_MessageTemplate::add($messageTemplate);
+      }
+
+      if (!empty($formValues['template']) && !empty($formValues['updateTemplate'])) {
+        $messageTemplate['id'] = $formValues['template'];
+        unset($messageTemplate['msg_title']);
+        CRM_Core_BAO_MessageTemplate::add($messageTemplate);
       }
     }
   }

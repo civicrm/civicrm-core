@@ -1475,8 +1475,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         $isTest,
         $isRecurForFirstTransaction
       );
-
       if (!empty($paymentResult['contribution'])) {
+        $paymentResults[] = array('contribution_id' => $paymentResult['contribution']->id, 'result' => $paymentResult);
         $this->postProcessPremium($premiumParams, $paymentResult['contribution']);
         //note that this will be over-written if we are using a separate membership transaction. Otherwise there is only one
         $membershipContribution = $paymentResult['contribution'];
@@ -1537,7 +1537,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         $i++;
         $numTerms = CRM_Utils_Array::value($memType, $typesTerms, 1);
         if (!empty($membershipContribution)) {
-          $pendingStatus = CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name');
+          $pendingStatus = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
           $pending = ($membershipContribution->contribution_status_id == $pendingStatus) ? TRUE : FALSE;
         }
         else {
@@ -1644,8 +1644,12 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       // CRM-19792 : set necessary fields for payment processor
       CRM_Core_Payment_Form::mapParams($form->_bltID, $paymentParams, $paymentParams, TRUE);
 
-      $paymentActionResult = $payment->doPayment($paymentParams, 'contribute');
-      $paymentResults[] = array('contribution_id' => $paymentResult['contribution']->id, 'result' => $paymentActionResult);
+      // If this is a single membership-related contribution, it won't have
+      // be performed yet, so do it now.
+      if ($isPaidMembership && !$isProcessSeparateMembershipTransaction) {
+        $paymentActionResult = $payment->doPayment($paymentParams, 'contribute');
+        $paymentResults[] = array('contribution_id' => $paymentResult['contribution']->id, 'result' => $paymentActionResult);
+      }
       // Do not send an email if Recurring transaction is done via Direct Mode
       // Email will we sent when the IPN is received.
       foreach ($paymentResults as $result) {
@@ -1780,6 +1784,19 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     );
 
     $result = array();
+
+    // We're not processing the line item here because we are processing a membership.
+    // To ensure processing of the correct parameters, replace relevant parameters
+    // in $tempParams with those in $membershipContribution.
+    $tempParams['amount_level'] = $membershipContribution->amount_level;
+    $tempParams['total_amount'] = $membershipContribution->total_amount;
+    $tempParams['tax_amount'] = $membershipContribution->tax_amount;
+    $tempParams['contactID'] = $membershipContribution->contact_id;
+    $tempParams['financialTypeID'] = $membershipContribution->financial_type_id;
+    $tempParams['invoiceID'] = $membershipContribution->invoice_id;
+    $tempParams['trxn_id'] = $membershipContribution->trxn_id;
+    $tempParams['contributionID'] = $membershipContribution->id;
+
     if ($form->_values['is_monetary'] && !$form->_params['is_pay_later'] && $minimumFee > 0.0) {
       // At the moment our tests are calling this form in a way that leaves 'object' empty. For
       // now we compensate here.

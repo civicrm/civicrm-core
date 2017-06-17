@@ -60,7 +60,7 @@ class CRM_Core_I18n_SchemaStructure {
           'description' => "text",
         ) ,
         'civicrm_batch' => array(
-          'title' => "varchar(64)",
+          'title' => "varchar(255)",
           'description' => "text",
         ) ,
         'civicrm_premiums' => array(

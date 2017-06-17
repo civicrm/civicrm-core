@@ -159,9 +159,11 @@ function civicrm_api3_activity_create($params) {
 
   if (isset($activityBAO->id)) {
     if ($case_id && !$createRevision) {
-      // If this is a brand new case activity we need to add this
-      $caseActivityParams = array('activity_id' => $activityBAO->id, 'case_id' => $case_id);
-      CRM_Case_BAO_Case::processCaseActivity($caseActivityParams);
+      // If this is a brand new case activity, add to case(s)
+      foreach ((array) $case_id as $singleCaseId) {
+        $caseActivityParams = array('activity_id' => $activityBAO->id, 'case_id' => $singleCaseId);
+        CRM_Case_BAO_Case::processCaseActivity($caseActivityParams);
+      }
     }
 
     _civicrm_api3_object_to_array($activityBAO, $activityArray[$activityBAO->id]);
@@ -293,42 +295,6 @@ function _civicrm_api3_activity_get_spec(&$params) {
  * @throws \Civi\API\Exception\UnauthorizedException
  */
 function civicrm_api3_activity_get($params) {
-  if (!empty($params['check_permissions']) && !CRM_Core_Permission::check('view all activities')) {
-    // In absence of view all activities permission it's possible to see a specific activity by ACL.
-    // Note still allowing view all activities to override ACLs is based on the 'don't change too much
-    // if you are not sure principle' and it could be argued that the ACLs should always be applied.
-    if (empty($params['id']) || !empty($params['contact_id'])) {
-      // We fall back to the original blunt permissions if we don't have an id to check or we are about
-      // to go to the weird place that the legacy 'contact_id' parameter takes us to.
-      throw new \Civi\API\Exception\UnauthorizedException(
-        "Cannot access activities. Required permission: 'view all activities''"
-      );
-    }
-    $ids = array();
-    $allowed_operators = array(
-      'IN',
-    );
-    if (is_array($params['id'])) {
-      foreach ($params['id'] as $operator => $values) {
-        if (in_array($operator, CRM_Core_DAO::acceptedSQLOperators()) && in_array($operator, $allowed_operators)) {
-          $ids = $values;
-        }
-        else {
-          throw new \API_Exception(ts('Used an unsupported sql operator with Activity.get API'));
-        }
-      }
-    }
-    else {
-      $ids = array($params['id']);
-    }
-    foreach ($ids as $id) {
-      if (!CRM_Activity_BAO_Activity::checkPermission($id, CRM_Core_Action::VIEW)) {
-        throw new \Civi\API\Exception\UnauthorizedException(
-          'You do not have permission to view this activity'
-        );
-      }
-    }
-  }
 
   $sql = CRM_Utils_SQL_Select::fragment();
   $recordTypes = civicrm_api3('ActivityContact', 'getoptions', array('field' => 'record_type_id'));
@@ -339,6 +305,16 @@ function civicrm_api3_activity_get($params) {
     'source_contact_id' => array_search('Activity Source', $recordTypes),
     'assignee_contact_id' => array_search('Activity Assignees', $recordTypes),
   );
+  if (empty($params['target_contact_id']) && empty($params['source_contact_id'])
+    && empty($params['assignee_contact_id']) &&
+    !empty($params['check_permissions']) && !CRM_Core_Permission::check('view all activities')
+    && !CRM_Core_Permission::check('view all contacts')
+  ) {
+    // Force join on the activity contact table.
+    // @todo get this & other acl filters to work, remove check further down.
+    //$params['contact_id'] = array('IS NOT NULL' => TRUE);
+  }
+
   foreach ($activityContactOptions as $activityContactName => $activityContactValue) {
     if (!empty($params[$activityContactName])) {
       if (!is_array($params[$activityContactName])) {
@@ -351,34 +327,60 @@ function civicrm_api3_activity_get($params) {
       );
     }
   }
-  if (!empty($params['tag_id'])) {
-    if (!is_array($params['tag_id'])) {
-      $params['tag_id'] = array('=' => $params['tag_id']);
-    }
-    $clause = \CRM_Core_DAO::createSQLFilter('tag_id', $params['tag_id']);
-    if ($clause) {
-      $sql->where('a.id IN (SELECT entity_id FROM civicrm_entity_tag WHERE entity_table = "civicrm_activity" AND !clause)', array('!clause' => $clause));
-    }
-  }
-  if (!empty($params['file_id'])) {
-    if (!is_array($params['file_id'])) {
-      $params['file_id'] = array('=' => $params['file_id']);
-    }
-    $clause = \CRM_Core_DAO::createSQLFilter('file_id', $params['file_id']);
-    if ($clause) {
-      $sql->where('a.id IN (SELECT entity_id FROM civicrm_entity_file WHERE entity_table = "civicrm_activity" AND !clause)', array('!clause' => $clause));
-    }
-  }
-  if (!empty($params['case_id'])) {
-    if (!is_array($params['case_id'])) {
-      $params['case_id'] = array('=' => $params['case_id']);
-    }
-    $clause = \CRM_Core_DAO::createSQLFilter('case_id', $params['case_id']);
-    if ($clause) {
-      $sql->where('a.id IN (SELECT activity_id FROM civicrm_case_activity WHERE !clause)', array('!clause' => $clause));
+
+  // Define how to handle filters on some related entities.
+  // Subqueries are nice in (a) avoiding duplicates and (b) when the result
+  // list is expected to be bite-sized. Joins are nice (a) with larger
+  // datasets and (b) checking for non-existent relations.
+  $rels = array(
+    'tag_id' => array(
+      'subquery' => 'a.id IN (SELECT entity_id FROM civicrm_entity_tag WHERE entity_table = "civicrm_activity" AND !clause)',
+      'join' => '!joinType civicrm_entity_tag !alias ON (!alias.entity_table = "civicrm_activity" AND !alias.entity_id = a.id)',
+      'column' => 'tag_id',
+    ),
+    'file_id' => array(
+      'subquery' => 'a.id IN (SELECT entity_id FROM civicrm_entity_file WHERE entity_table = "civicrm_activity" AND !clause)',
+      'join' => '!joinType civicrm_entity_file !alias ON (!alias.entity_table = "civicrm_activity" AND !alias.entity_id = a.id)',
+      'column' => 'file_id',
+    ),
+    'case_id' => array(
+      'subquery' => 'a.id IN (SELECT activity_id FROM civicrm_case_activity WHERE !clause)',
+      'join' => '!joinType civicrm_case_activity !alias ON (!alias.activity_id = a.id)',
+      'column' => 'case_id',
+    ),
+  );
+  foreach ($rels as $filter => $relSpec) {
+    if (!empty($params[$filter])) {
+      if (!is_array($params[$filter])) {
+        $params[$filter] = array('=' => $params[$filter]);
+      }
+      // $mode is one of ('LEFT JOIN', 'INNER JOIN', 'SUBQUERY')
+      $mode = isset($params[$filter]['IS NULL']) ? 'LEFT JOIN' : 'SUBQUERY';
+      if ($mode === 'SUBQUERY') {
+        $clause = \CRM_Core_DAO::createSQLFilter($relSpec['column'], $params[$filter]);
+        if ($clause) {
+          $sql->where($relSpec['subquery'], array('!clause' => $clause));
+        }
+      }
+      else {
+        $alias = 'actjoin_' . $filter;
+        $clause = \CRM_Core_DAO::createSQLFilter($alias . "." . $relSpec['column'], $params[$filter]);
+        if ($clause) {
+          $sql->join($alias, $relSpec['join'], array('!alias' => $alias, 'joinType' => $mode));
+          $sql->where($clause);
+        }
+      }
     }
   }
   $activities = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, FALSE, 'Activity', $sql);
+  if (!empty($params['check_permissions']) && !CRM_Core_Permission::check('view all activities')) {
+    // @todo get this to work at the query level - see contact_id join above.
+    foreach ($activities as $activity) {
+      if (!CRM_Activity_BAO_Activity::checkPermission($activity['id'], CRM_Core_Action::VIEW)) {
+        unset($activities[$activity['id']]);
+      }
+    }
+  }
   $options = _civicrm_api3_get_options_from_params($params, FALSE, 'Activity', 'get');
   if ($options['is_count']) {
     return civicrm_api3_create_success($activities, $params, 'Activity', 'get');
@@ -489,7 +491,7 @@ function _civicrm_api3_activity_get_formatResult($params, $activities, $options)
         $dao = CRM_Core_DAO::executeQuery("SELECT activity_id, case_id FROM civicrm_case_activity WHERE activity_id IN (%1)",
           array(1 => array(implode(',', array_keys($activities)), 'String', CRM_Core_DAO::QUERY_FORMAT_NO_QUOTES)));
         while ($dao->fetch()) {
-          $activities[$dao->activity_id]['case_id'] = $dao->case_id;
+          $activities[$dao->activity_id]['case_id'][] = $dao->case_id;
         }
         break;
 
@@ -557,43 +559,6 @@ function civicrm_api3_activity_delete($params) {
  *   array with errors
  */
 function _civicrm_api3_activity_check_params(&$params) {
-
-  $contactIDFields = array_intersect_key($params,
-    array(
-      'source_contact_id' => 1,
-      'assignee_contact_id' => 1,
-      'target_contact_id' => 1,
-    )
-  );
-
-  // this should be handled by wrapper layer & probably the api would already manage it
-  //correctly by doing post validation - ie. a failure should result in a roll-back = an error
-  // needs testing
-  if (!empty($contactIDFields)) {
-    $contactIds = array();
-    foreach ($contactIDFields as $fieldname => $contactfield) {
-      if (empty($contactfield)) {
-        continue;
-      }
-      if (is_array($contactfield)) {
-        foreach ($contactfield as $contactkey => $contactvalue) {
-          $contactIds[$contactvalue] = $contactvalue;
-        }
-      }
-      else {
-        $contactIds[$contactfield] = $contactfield;
-      }
-    }
-
-    $sql = '
-SELECT  count(*)
-  FROM  civicrm_contact
- WHERE  id IN (' . implode(', ', $contactIds) . ' )';
-    if (count($contactIds) != CRM_Core_DAO::singleValueQuery($sql)) {
-      throw new API_Exception('Invalid Contact Id');
-    }
-  }
-
   $activityIds = array(
     'activity' => CRM_Utils_Array::value('id', $params),
     'parent' => CRM_Utils_Array::value('parent_id', $params),

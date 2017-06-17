@@ -2162,7 +2162,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       CRM_Contribute_Form_SoftCredit::addPCPFields($form, "[$rowNumber]");
     }
     elseif ($fieldName == 'currency') {
-      $form->addCurrency($name, $title, $required);
+      $form->addCurrency($name, $title, $required, NULL, FALSE, FALSE);
     }
     elseif ($fieldName == 'contribution_page_id') {
       $form->add('select', $name, $title,
@@ -3237,7 +3237,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
           //get the groupTree as per subTypes.
           $groupTree = array();
           foreach ($componentSubType as $subType) {
-            $subTree = CRM_Core_BAO_CustomGroup::getTree($componentBAOName, CRM_Core_DAO::$_nullObject,
+            $subTree = CRM_Core_BAO_CustomGroup::getTree($componentBAOName, NULL,
               $componentId, 0, $values[$subType]
             );
             $groupTree = CRM_Utils_Array::crmArrayMerge($groupTree, $subTree);

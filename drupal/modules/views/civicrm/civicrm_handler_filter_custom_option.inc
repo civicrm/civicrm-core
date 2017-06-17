@@ -84,7 +84,7 @@ class civicrm_handler_filter_custom_option extends views_handler_filter_in_opera
     $op = ($this->operator == 'in' || $this->operator == 'all') ? 'LIKE' : 'NOT LIKE';
     $glue = ($this->operator == 'in') ? 'OR ' : 'AND ';
     foreach ($this->value as $value) {
-      $clauses[] = "$this->table_alias.$this->real_field " . $op . " '%" . $sep . $value . $sep . "%' ";
+      $clauses[] = "$this->table_alias.$this->real_field " . $op . " '%" . $sep . CRM_Core_DAO::escapeString($value) . $sep . "%' ";
     }
     $clause = implode($glue, $clauses);
     $this->query->add_where_expression($this->options['group'], $clause);

@@ -452,10 +452,7 @@ AND        a.is_deleted = 0
         'is_auto' => FALSE,
         'is_current_revision' => 1,
         'subject' => CRM_Utils_Array::value('subject', $params) ? $params['subject'] : $activityTypeName,
-        'status_id' => CRM_Core_OptionGroup::getValue('activity_status',
-          $statusName,
-          'name'
-        ),
+        'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_status_id', $statusName),
         'target_contact_id' => $client,
         'medium_id' => CRM_Utils_Array::value('medium_id', $params),
         'location' => CRM_Utils_Array::value('location', $params),
@@ -470,10 +467,7 @@ AND        a.is_deleted = 0
         'source_contact_id' => $params['creatorID'],
         'is_auto' => TRUE,
         'is_current_revision' => 1,
-        'status_id' => CRM_Core_OptionGroup::getValue('activity_status',
-          $statusName,
-          'name'
-        ),
+        'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_status_id', $statusName),
         'target_contact_id' => $client,
         'weight' => $orderVal,
       );
@@ -556,6 +550,7 @@ AND        a.is_deleted = 0
       $activityParams['skipRecentView'] = TRUE;
     }
 
+    // @todo - switch to using api & remove the parameter pre-wrangling above.
     $activity = CRM_Activity_BAO_Activity::create($activityParams);
 
     if (!$activity) {

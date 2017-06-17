@@ -294,11 +294,12 @@
           <tr><td>Smarty</td><td><pre class="linenums" id="api-smarty" title='smarty syntax (for get actions)'></pre></td></tr>
           <tr><td>Php</td><td><pre class="linenums" id="api-php" title='php syntax'></pre></td></tr>
           <tr><td>Javascript</td><td><pre class="linenums" id="api-json" title='javascript syntax'></pre></td></tr>
+          <tr><td><a href="https://github.com/civicrm/cv" target="_blank">cv</a></td><td><pre id="api-cv" title='cv cli syntax'></pre></td></tr>
           {if $config->userSystem->is_drupal}
-            <tr><td>Drush</td><td><pre id="api-drush" title='drush syntax'></pre></td></tr>
+            <tr><td><a href="http://www.drush.org/" target="_blank">drush</a></td><td><pre id="api-drush" title='drush syntax'></pre></td></tr>
           {/if}
           {if $config->userSystem->is_wordpress}
-            <tr><td>WP-CLI</td><td><pre id="api-wpcli" title='wp-cli syntax'></pre></td></tr>
+            <tr><td><a href="http://wp-cli.org/" target="_blank">wp-cli</a></td><td><pre id="api-wpcli" title='wp-cli syntax'></pre></td></tr>
           {/if}
         </table>
       </div>

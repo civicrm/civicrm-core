@@ -20,7 +20,10 @@ namespace Civi\Angular\Page;
 class Modules extends \CRM_Core_Page {
 
   /**
-   * See class description.
+   * Generate asset content (when accessed via older, custom
+   * "civicrm/ajax/anulgar-modules" route).
+   *
+   * @deprecated
    */
   public function run() {
     /**
@@ -57,6 +60,40 @@ class Modules extends \CRM_Core_Page {
     }
 
     \CRM_Utils_System::civiExit();
+  }
+
+  /**
+   * Generate asset content (when accessed via AssetBuilder).
+   *
+   * @param \Civi\Core\Event\GenericHookEvent $event
+   * @see CRM_Utils_hook::buildAsset()
+   * @see \Civi\Core\AssetBuilder
+   */
+  public static function buildAngularModules($event) {
+    $page = new Modules();
+    $angular = \Civi::service('angular');
+
+    switch ($event->asset) {
+      case 'angular-modules.json':
+        $moduleNames = $page->parseModuleNames(\CRM_Utils_Array::value('modules', $event->params), $angular);
+        $event->mimeType = 'application/json';
+        $event->content = json_encode($page->getMetadata($moduleNames, $angular));
+        break;
+
+      case 'angular-modules.js':
+        $moduleNames = $page->parseModuleNames(\CRM_Utils_Array::value('modules', $event->params), $angular);
+        $event->mimeType = 'application/javascript';
+        $event->content = $page->digestJs($angular->getResources($moduleNames, 'js', 'path'));
+        break;
+
+      case 'angular-modules.css':
+        $moduleNames = $page->parseModuleNames(\CRM_Utils_Array::value('modules', $event->params), $angular);
+        $event->mimeType = 'text/css';
+        $event->content = \CRM_Utils_File::concat($angular->getResources($moduleNames, 'css', 'path'), "\n");
+
+      default:
+        // Not our problem.
+    }
   }
 
   /**

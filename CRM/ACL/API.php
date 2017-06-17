@@ -190,10 +190,8 @@ class CRM_ACL_API {
    * @param string $tableName
    * @param null $allGroups
    * @param null $includedGroups
-   * @param bool $flush
    *
-   * @return array
-   *   the ids of the groups for which the user has permissions
+   * @return bool
    */
   public static function groupPermission(
     $type,
@@ -201,39 +199,23 @@ class CRM_ACL_API {
     $contactID = NULL,
     $tableName = 'civicrm_saved_search',
     $allGroups = NULL,
-    $includedGroups = NULL,
-    $flush = FALSE
+    $includedGroups = NULL
   ) {
 
-    static $cache = array();
-    $groups = array();
-    //@todo this is pretty hacky!!!
-    //adding a way for unit tests to flush the cache
-    if ($flush) {
-      $cache = array();
-      return NULL;
+    if (!isset(Civi::$statics[__CLASS__]) || !isset(Civi::$statics[__CLASS__]['group_permission'])) {
+      Civi::$statics[__CLASS__]['group_permission'] = array();
     }
+
     if (!$contactID) {
-      $session = CRM_Core_Session::singleton();
-      $contactID = NULL;
-      if ($session->get('userID')) {
-        $contactID = $session->get('userID');
-      }
+      $contactID = CRM_Core_Session::singleton()->getLoggedInContactID();
     }
 
     $key = "{$tableName}_{$type}_{$contactID}";
-    if (array_key_exists($key, $cache)) {
-      $groups = &$cache[$key];
-    }
-    else {
-      $groups = self::group($type, $contactID, $tableName, $allGroups, $includedGroups);
-      $cache[$key] = $groups;
-    }
-    if (empty($groups)) {
-      return FALSE;
+    if (!array_key_exists($key, Civi::$statics[__CLASS__]['group_permission'])) {
+      Civi::$statics[__CLASS__]['group_permission'][$key] = self::group($type, $contactID, $tableName, $allGroups, $includedGroups);
     }
 
-    return in_array($groupID, $groups) ? TRUE : FALSE;
+    return in_array($groupID, Civi::$statics[__CLASS__]['group_permission'][$key]);
   }
 
 }

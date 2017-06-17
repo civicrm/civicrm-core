@@ -32,7 +32,7 @@
       });
     };
 
-    var moduleUrl = CRM.url('civicrm/ajax/angular-modules', {l: CRM.config.lcMessages, r: CRM.angular.cacheCode});
+    var moduleUrl = CRM.angular.bundleUrl;
     $http.get(moduleUrl)
       .success(function httpSuccess(data) {
         templates = [];

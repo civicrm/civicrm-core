@@ -909,18 +909,12 @@ WHERE  id = %1";
    */
   public static function allGroup($groupType = NULL, $excludeHidden = TRUE) {
     $condition = CRM_Contact_BAO_Group::groupTypeCondition($groupType, $excludeHidden);
-
-    if (!self::$group) {
-      self::$group = array();
-    }
-
     $groupKey = ($groupType ? $groupType : 'null') . !empty($excludeHidden);
 
-    if (!isset(self::$group[$groupKey])) {
-      self::$group[$groupKey] = NULL;
-      self::populate(self::$group[$groupKey], 'CRM_Contact_DAO_Group', FALSE, 'title', 'is_active', $condition);
+    if (!isset(Civi::$statics[__CLASS__]['groups']['allGroup'][$groupKey])) {
+      self::populate(Civi::$statics[__CLASS__]['groups']['allGroup'][$groupKey], 'CRM_Contact_DAO_Group', FALSE, 'title', 'is_active', $condition);
     }
-    return self::$group[$groupKey];
+    return Civi::$statics[__CLASS__]['groups']['allGroup'][$groupKey];
   }
 
   /**

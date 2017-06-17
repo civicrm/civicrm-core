@@ -774,6 +774,9 @@ CREATE TABLE `civicrm_contact` (
   ,     INDEX `UI_gender`(
         gender_id
   )
+  ,     INDEX `index_is_deceased`(
+        is_deceased
+  )
   ,     INDEX `index_household_name`(
         household_name
   )
@@ -914,7 +917,7 @@ CREATE TABLE `civicrm_batch` (
 
      `id` int unsigned NOT NULL AUTO_INCREMENT  COMMENT 'Unique Address ID',
      `name` varchar(64)    COMMENT 'Variable name/programmatic handle for this batch.',
-     `title` varchar(64)    COMMENT 'Friendly Name.',
+     `title` varchar(255)    COMMENT 'Friendly Name.',
      `description` text    COMMENT 'Description of this batch set.',
      `created_id` int unsigned    COMMENT 'FK to Contact ID',
      `created_date` datetime    COMMENT 'When was this item created',
@@ -1017,7 +1020,7 @@ CREATE TABLE `civicrm_mailing_abtest` (
      `declare_winning_time` datetime    COMMENT 'In how much time to declare winner',
      `group_percentage` int unsigned    ,
      `created_id` int unsigned    COMMENT 'FK to Contact ID',
-     `created_date` datetime    COMMENT 'When was this item created' 
+     `created_date` timestamp NULL  DEFAULT CURRENT_TIMESTAMP COMMENT 'When was this item created' 
 ,
         PRIMARY KEY (`id`)
  
@@ -1758,8 +1761,8 @@ CREATE TABLE `civicrm_cache` (
      `path` varchar(255)    COMMENT 'Unique path name for cache element',
      `data` longtext    COMMENT 'data associated with this path',
      `component_id` int unsigned    COMMENT 'Component that this menu item belongs to',
-     `created_date` datetime    COMMENT 'When was the cache item created',
-     `expired_date` datetime    COMMENT 'When should the cache item expire' 
+     `created_date` timestamp   DEFAULT CURRENT_TIMESTAMP COMMENT 'When was the cache item created',
+     `expired_date` timestamp NULL  DEFAULT NULL COMMENT 'When should the cache item expire' 
 ,
         PRIMARY KEY (`id`)
  
@@ -2050,7 +2053,7 @@ CREATE TABLE `civicrm_job` (
      `id` int unsigned NOT NULL AUTO_INCREMENT  COMMENT 'Job Id',
      `domain_id` int unsigned NOT NULL   COMMENT 'Which Domain is this scheduled job for',
      `run_frequency` varchar(8)   DEFAULT "Daily" COMMENT 'Scheduled job run frequency.',
-     `last_run` datetime   DEFAULT NULL COMMENT 'When was this cron entry last run',
+     `last_run` timestamp NULL  DEFAULT NULL COMMENT 'When was this cron entry last run',
      `scheduled_run_date` timestamp NULL  DEFAULT NULL COMMENT 'When is this cron entry scheduled to run',
      `name` varchar(255)    COMMENT 'Title of the job',
      `description` varchar(255)    COMMENT 'Description of the job',
@@ -2140,7 +2143,8 @@ CREATE TABLE `civicrm_mail_settings` (
      `username` varchar(255)    COMMENT 'username to use when polling',
      `password` varchar(255)    COMMENT 'password to use when polling',
      `is_ssl` tinyint    COMMENT 'whether to use SSL or not',
-     `source` varchar(255)    COMMENT 'folder to poll from when using IMAP, path to poll from when using Maildir, etc.' 
+     `source` varchar(255)    COMMENT 'folder to poll from when using IMAP, path to poll from when using Maildir, etc.',
+     `activity_status` varchar(255)    COMMENT 'Name of status to use when creating email to activity.' 
 ,
         PRIMARY KEY (`id`)
  
@@ -2812,7 +2816,7 @@ CREATE TABLE `civicrm_mailing_event_subscribe` (
      `group_id` int unsigned NOT NULL   COMMENT 'FK to Group',
      `contact_id` int unsigned NOT NULL   COMMENT 'FK to Contact',
      `hash` varchar(255) NOT NULL   COMMENT 'Security hash',
-     `time_stamp` datetime NOT NULL   COMMENT 'When this subscription event occurred.' 
+     `time_stamp` timestamp NOT NULL  DEFAULT CURRENT_TIMESTAMP COMMENT 'When this subscription event occurred.' 
 ,
         PRIMARY KEY (`id`)
  
@@ -2832,7 +2836,7 @@ CREATE TABLE `civicrm_mailing_event_confirm` (
 
      `id` int unsigned NOT NULL AUTO_INCREMENT  ,
      `event_subscribe_id` int unsigned NOT NULL   COMMENT 'FK to civicrm_mailing_event_subscribe',
-     `time_stamp` datetime NOT NULL   COMMENT 'When this confirmation event occurred.' 
+     `time_stamp` timestamp NOT NULL  DEFAULT CURRENT_TIMESTAMP COMMENT 'When this confirmation event occurred.' 
 ,
         PRIMARY KEY (`id`)
  
@@ -3212,7 +3216,7 @@ CREATE TABLE `civicrm_case_contact` (
 ,
         PRIMARY KEY (`id`)
  
-    ,     INDEX `UI_case_contact_id`(
+    ,     UNIQUE INDEX `UI_case_contact_id`(
         case_id
       , contact_id
   )
@@ -3746,11 +3750,11 @@ CREATE TABLE `civicrm_mailing` (
      `msg_template_id` int unsigned    COMMENT 'FK to the message template.',
      `override_verp` tinyint   DEFAULT 0 COMMENT 'Should we overrite VERP address in Reply-To',
      `created_id` int unsigned    COMMENT 'FK to Contact ID who first created this mailing',
-     `created_date` datetime    COMMENT 'Date and time this mailing was created.',
+     `created_date` timestamp NULL  DEFAULT CURRENT_TIMESTAMP COMMENT 'Date and time this mailing was created.',
      `scheduled_id` int unsigned    COMMENT 'FK to Contact ID who scheduled this mailing',
-     `scheduled_date` datetime    COMMENT 'Date and time this mailing was scheduled.',
+     `scheduled_date` timestamp NULL  DEFAULT NULL COMMENT 'Date and time this mailing was scheduled.',
      `approver_id` int unsigned    COMMENT 'FK to Contact ID who approved this mailing',
-     `approval_date` datetime    COMMENT 'Date and time this mailing was approved.',
+     `approval_date` timestamp NULL  DEFAULT NULL COMMENT 'Date and time this mailing was approved.',
      `approval_status_id` int unsigned    COMMENT 'The status of this mailing. Values: none, approved, rejected',
      `approval_note` longtext    COMMENT 'Note behind the decision.',
      `is_archived` tinyint   DEFAULT 0 COMMENT 'Is this mailing archived?',
@@ -3828,9 +3832,9 @@ CREATE TABLE `civicrm_mailing_job` (
 
      `id` int unsigned NOT NULL AUTO_INCREMENT  ,
      `mailing_id` int unsigned NOT NULL   COMMENT 'The ID of the mailing this Job will send.',
-     `scheduled_date` datetime    COMMENT 'date on which this job was scheduled.',
-     `start_date` datetime    COMMENT 'date on which this job was started.',
-     `end_date` datetime    COMMENT 'date on which this job ended.',
+     `scheduled_date` timestamp NULL  DEFAULT NULL COMMENT 'date on which this job was scheduled.',
+     `start_date` timestamp NULL  DEFAULT NULL COMMENT 'date on which this job was started.',
+     `end_date` timestamp NULL  DEFAULT NULL COMMENT 'date on which this job ended.',
      `status` varchar(12)    COMMENT 'The state of this job',
      `is_test` tinyint   DEFAULT 0 COMMENT 'Is this job for a test mail?',
      `job_type` varchar(255)    COMMENT 'Type of mailling job: null | child ',
@@ -3881,8 +3885,8 @@ CREATE TABLE `civicrm_mailing_spool` (
      `recipient_email` text    COMMENT 'The email of the receipients this mail is to be sent.',
      `headers` text    COMMENT 'The header information of this mailing .',
      `body` text    COMMENT 'The body of this mailing.',
-     `added_at` datetime    COMMENT 'date on which this job was added.',
-     `removed_at` datetime    COMMENT 'date on which this job was removed.' 
+     `added_at` timestamp NULL  DEFAULT NULL COMMENT 'date on which this job was added.',
+     `removed_at` timestamp NULL  DEFAULT NULL COMMENT 'date on which this job was removed.' 
 ,
         PRIMARY KEY (`id`)
  
@@ -3930,7 +3934,7 @@ CREATE TABLE `civicrm_mailing_event_bounce` (
      `event_queue_id` int unsigned NOT NULL   COMMENT 'FK to EventQueue',
      `bounce_type_id` int unsigned    COMMENT 'What type of bounce was it?',
      `bounce_reason` varchar(255)    COMMENT 'The reason the email bounced.',
-     `time_stamp` datetime NOT NULL   COMMENT 'When this bounce event occurred.' 
+     `time_stamp` timestamp NOT NULL  DEFAULT CURRENT_TIMESTAMP COMMENT 'When this bounce event occurred.' 
 ,
         PRIMARY KEY (`id`)
  
@@ -3950,7 +3954,7 @@ CREATE TABLE `civicrm_mailing_event_delivered` (
 
      `id` int unsigned NOT NULL AUTO_INCREMENT  ,
      `event_queue_id` int unsigned NOT NULL   COMMENT 'FK to EventQueue',
-     `time_stamp` datetime NOT NULL   COMMENT 'When this delivery event occurred.' 
+     `time_stamp` timestamp NOT NULL  DEFAULT CURRENT_TIMESTAMP COMMENT 'When this delivery event occurred.' 
 ,
         PRIMARY KEY (`id`)
  
@@ -3971,7 +3975,7 @@ CREATE TABLE `civicrm_mailing_event_forward` (
      `id` int unsigned NOT NULL AUTO_INCREMENT  ,
      `event_queue_id` int unsigned NOT NULL   COMMENT 'FK to EventQueue',
      `dest_queue_id` int unsigned    COMMENT 'FK to EventQueue for destination',
-     `time_stamp` datetime NOT NULL   COMMENT 'When this forward event occurred.' 
+     `time_stamp` timestamp NOT NULL  DEFAULT CURRENT_TIMESTAMP COMMENT 'When this forward event occurred.' 
 ,
         PRIMARY KEY (`id`)
  
@@ -3991,7 +3995,7 @@ CREATE TABLE `civicrm_mailing_event_opened` (
 
      `id` int unsigned NOT NULL AUTO_INCREMENT  ,
      `event_queue_id` int unsigned NOT NULL   COMMENT 'FK to EventQueue',
-     `time_stamp` datetime NOT NULL   COMMENT 'When this open event occurred.' 
+     `time_stamp` timestamp NOT NULL  DEFAULT CURRENT_TIMESTAMP COMMENT 'When this open event occurred.' 
 ,
         PRIMARY KEY (`id`)
  
@@ -4011,7 +4015,7 @@ CREATE TABLE `civicrm_mailing_event_reply` (
 
      `id` int unsigned NOT NULL AUTO_INCREMENT  ,
      `event_queue_id` int unsigned NOT NULL   COMMENT 'FK to EventQueue',
-     `time_stamp` datetime NOT NULL   COMMENT 'When this reply event occurred.' 
+     `time_stamp` timestamp NOT NULL  DEFAULT CURRENT_TIMESTAMP COMMENT 'When this reply event occurred.' 
 ,
         PRIMARY KEY (`id`)
  
@@ -4032,7 +4036,7 @@ CREATE TABLE `civicrm_mailing_event_trackable_url_open` (
      `id` int unsigned NOT NULL AUTO_INCREMENT  ,
      `event_queue_id` int unsigned NOT NULL   COMMENT 'FK to EventQueue',
      `trackable_url_id` int unsigned NOT NULL   COMMENT 'FK to TrackableURL',
-     `time_stamp` datetime NOT NULL   COMMENT 'When this trackable URL open occurred.' 
+     `time_stamp` timestamp NOT NULL  DEFAULT CURRENT_TIMESTAMP COMMENT 'When this trackable URL open occurred.' 
 ,
         PRIMARY KEY (`id`)
  
@@ -4053,7 +4057,7 @@ CREATE TABLE `civicrm_mailing_event_unsubscribe` (
      `id` int unsigned NOT NULL AUTO_INCREMENT  ,
      `event_queue_id` int unsigned NOT NULL   COMMENT 'FK to EventQueue',
      `org_unsubscribe` tinyint NOT NULL   COMMENT 'Unsubscribe at org- or group-level',
-     `time_stamp` datetime NOT NULL   COMMENT 'When this delivery event occurred.' 
+     `time_stamp` timestamp NOT NULL  DEFAULT CURRENT_TIMESTAMP COMMENT 'When this delivery event occurred.' 
 ,
         PRIMARY KEY (`id`)
  

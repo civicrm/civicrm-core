@@ -27,7 +27,7 @@
 {crmRegion name="contribute-form-contributionpage-amount-main"}
 <div class="crm-block crm-form-block crm-contribution-contributionpage-amount-form-block">
 <div class="help">
-    {ts}Use this form to configure Contribution Amount options. You can give contributors the ability to enter their own contribution amounts - and/or provide a fixed list of amounts. For fixed amounts, you can enter a label for each 'level' of contribution (e.g. Friend, Sustainer, etc.). If you allow people to enter their own dollar amounts, you can also set minimum and maximum values. Depending on your choice of Payment Processor, you may be able to offer a recurring contribution option.{/ts} {docURL page="user/contributions/payment-processors"}
+    {ts}Use this form to configure Contribution Amount options. You can give contributors the ability to enter their own contribution amounts and/or provide a fixed list of amounts. For fixed amounts, you can enter a label for each 'level' of contribution (e.g. Friend, Sustainer, etc.). If you allow people to enter their own dollar amounts, you can also set minimum and maximum values. Depending on your choice of Payment Processor, you may be able to offer a recurring contribution option.{/ts} {docURL page="user/contributions/payment-processors"}
 </div>
     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
     {if !$paymentProcessor}
@@ -76,7 +76,7 @@
         <tr class="crm-contribution-contributionpage-amount-form-block-amount_block_is_active">
           <th scope="row" class="label">{$form.amount_block_is_active.label}</th>
           <td>{$form.amount_block_is_active.html}<br />
-          <span class="description">{ts}Uncheck this box if you are using this contribution page for membership signup and renewal only - and you do NOT want users to select or enter any additional contribution amounts.{/ts}</span></td>
+          <span class="description">{ts}Uncheck this box if you are using this contribution page for membership signup and renewal only &ndash; and you do NOT want users to select or enter any additional contribution amounts.{/ts}</span></td>
         </tr>
         <tr id="priceSet" class="crm-contribution-contributionpage-amount-form-block-priceSet">
           <th scope="row" class="label">{$form.price_set_id.label}</th>
@@ -423,7 +423,7 @@
     function setDateDefaults() {
      {/literal}{if !$pledge_calendar_date}{literal}
        cj('#pledge_calendar_date').prop('disabled', 'disabled');
-       cj("#pledge_calendar_date").next('input').prop('disabled', 'disabled'); 
+       cj("#pledge_calendar_date").next('input').prop('disabled', 'disabled');
      {/literal}{/if}
 
      {if !$pledge_calendar_month}{literal}

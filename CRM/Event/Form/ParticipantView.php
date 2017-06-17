@@ -133,23 +133,24 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
     }
 
     // get the option value for custom data type
-    $roleCustomDataTypeID = CRM_Core_OptionGroup::getValue('custom_data_type', 'ParticipantRole', 'name');
-    $eventNameCustomDataTypeID = CRM_Core_OptionGroup::getValue('custom_data_type', 'ParticipantEventName', 'name');
-    $eventTypeCustomDataTypeID = CRM_Core_OptionGroup::getValue('custom_data_type', 'ParticipantEventType', 'name');
+    $customDataType = CRM_Core_OptionGroup::values('custom_data_type', FALSE, FALSE, FALSE, NULL, 'name');
+    $roleCustomDataTypeID = array_search('ParticipantRole', $customDataType);
+    $eventNameCustomDataTypeID = array_search('ParticipantEventName', $customDataType);
+    $eventTypeCustomDataTypeID = array_search('ParticipantEventType', $customDataType);
     $allRoleIDs = explode(CRM_Core_DAO::VALUE_SEPARATOR, $values[$participantID]['role_id']);
     $groupTree = array();
     $finalTree = array();
 
     foreach ($allRoleIDs as $k => $v) {
-      $roleGroupTree = CRM_Core_BAO_CustomGroup::getTree('Participant', $this, $participantID, NULL, $v, $roleCustomDataTypeID);
-      $eventGroupTree = CRM_Core_BAO_CustomGroup::getTree('Participant', $this, $participantID, NULL,
+      $roleGroupTree = CRM_Core_BAO_CustomGroup::getTree('Participant', NULL, $participantID, NULL, $v, $roleCustomDataTypeID);
+      $eventGroupTree = CRM_Core_BAO_CustomGroup::getTree('Participant', NULL, $participantID, NULL,
         $values[$participantID]['event_id'], $eventNameCustomDataTypeID
       );
       $eventTypeID = CRM_Core_DAO::getFieldValue("CRM_Event_DAO_Event", $values[$participantID]['event_id'], 'event_type_id', 'id');
-      $eventTypeGroupTree = CRM_Core_BAO_CustomGroup::getTree('Participant', $this, $participantID, NULL, $eventTypeID, $eventTypeCustomDataTypeID);
+      $eventTypeGroupTree = CRM_Core_BAO_CustomGroup::getTree('Participant', NULL, $participantID, NULL, $eventTypeID, $eventTypeCustomDataTypeID);
       $groupTree = CRM_Utils_Array::crmArrayMerge($roleGroupTree, $eventGroupTree);
       $groupTree = CRM_Utils_Array::crmArrayMerge($groupTree, $eventTypeGroupTree);
-      $groupTree = CRM_Utils_Array::crmArrayMerge($groupTree, CRM_Core_BAO_CustomGroup::getTree('Participant', $this, $participantID));
+      $groupTree = CRM_Utils_Array::crmArrayMerge($groupTree, CRM_Core_BAO_CustomGroup::getTree('Participant', NULL, $participantID));
       foreach ($groupTree as $treeId => $trees) {
         $finalTree[$treeId] = $trees;
       }

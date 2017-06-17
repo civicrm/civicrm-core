@@ -96,7 +96,7 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
       'currency' => $contribution->currency,
       'entity_table' => 'civicrm_line_item',
       'entity_id' => $lineItem->id,
-      'description' => ($lineItem->qty != 1 ? $lineItem->qty . ' of ' : '') . ' ' . $lineItem->label,
+      'description' => ($lineItem->qty != 1 ? $lineItem->qty . ' of ' : '') . $lineItem->label,
       'status_id' => $itemStatus,
     );
 
@@ -286,25 +286,25 @@ WHERE cc.id IN (' . implode(',', $contactIds) . ') AND con.is_test = 0';
   }
 
   /**
-   * Get last financial item data.
+   * Get most relevant previous financial item relating to the line item.
+   *
+   * This function specifically excludes sales tax.
    *
    * @param int $entityId
    *
-   * @param string $entityTable
-   *
    * @return object CRM_Core_DAO
    */
-  public static function getPreviousFinancialItem($entityId, $entityTable = 'civicrm_line_item') {
-    $queryParams = array(
-      1 => array($entityId, 'Integer'),
-      2 => array($entityTable, 'String'),
+  public static function getPreviousFinancialItem($entityId) {
+    $params = array(
+      'entity_id' => $entityId,
+      'entity_table' => 'civicrm_line_item',
+      'options' => array('limit' => 1, 'sort' => 'id DESC'),
     );
-    $query = 'SELECT id, description, status_id, financial_account_id 
-      FROM civicrm_financial_item
-      WHERE entity_id = %1 AND entity_table = %2 ORDER BY id DESC LIMIT 1';
-    $prevFinancialItem = CRM_Core_DAO::executeQuery($query, $queryParams);
-    $prevFinancialItem->fetch();
-    return $prevFinancialItem;
+    $salesTaxFinancialAccounts = civicrm_api3('FinancialAccount', 'get', array('is_tax' => 1));
+    if ($salesTaxFinancialAccounts['count']) {
+      $params['financial_account_id'] = array('NOT IN' => array_keys($salesTaxFinancialAccounts['values']));
+    }
+    return civicrm_api3('FinancialItem', 'getsingle', $params);
   }
 
 }

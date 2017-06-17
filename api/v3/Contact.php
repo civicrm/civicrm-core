@@ -129,6 +129,8 @@ function civicrm_api3_contact_create($params) {
     _civicrm_api3_object_to_array_unique_fields($contact, $values[$contact->id]);
   }
 
+  $values = _civicrm_api3_contact_formatResult($params, $values);
+
   return civicrm_api3_create_success($values, $params, 'Contact', 'create');
 }
 
@@ -168,7 +170,37 @@ function civicrm_api3_contact_get($params) {
   $options = array();
   _civicrm_api3_contact_get_supportanomalies($params, $options);
   $contacts = _civicrm_api3_get_using_query_object('Contact', $params, $options);
+  $contacts = _civicrm_api3_contact_formatResult($params, $contacts);
   return civicrm_api3_create_success($contacts, $params, 'Contact');
+}
+
+/**
+ * Filter the result.
+ *
+ * @param array $result
+ *
+ * @return array
+ * @throws \CRM_Core_Exception
+ */
+function _civicrm_api3_contact_formatResult($params, $result) {
+  $apiKeyPerms = array('edit api keys', 'administer CiviCRM');
+  $allowApiKey = empty($params['check_permissions']) || CRM_Core_Permission::check(array($apiKeyPerms));
+  if (!$allowApiKey) {
+    if (is_array($result)) {
+      // Single-value $result
+      if (isset($result['api_key'])) {
+        unset($result['api_key']);
+      }
+
+      // Multi-value $result
+      foreach ($result as $key => $row) {
+        if (is_array($row)) {
+          unset($result[$key]['api_key']);
+        }
+      }
+    }
+  }
+  return $result;
 }
 
 /**
@@ -1254,6 +1286,11 @@ function _civicrm_api3_contact_getlist_params(&$request) {
   // Contact api doesn't support array(LIKE => 'foo') syntax
   if (!empty($request['input'])) {
     $request['params'][$request['search_field']] = $request['input'];
+    // Temporarily override wildcard setting
+    if (Civi::settings()->get('includeWildCardInName') != $request['add_wildcard']) {
+      Civi::$statics['civicrm_api3_contact_getlist']['override_wildcard'] = !$request['add_wildcard'];
+      Civi::settings()->set('includeWildCardInName', $request['add_wildcard']);
+    }
   }
 }
 
@@ -1305,6 +1342,11 @@ function _civicrm_api3_contact_getlist_output($result, $request) {
       }
       $output[] = $data;
     }
+  }
+  // Restore wildcard override by _civicrm_api3_contact_getlist_params
+  if (isset(Civi::$statics['civicrm_api3_contact_getlist']['override_wildcard'])) {
+    Civi::settings()->set('includeWildCardInName', Civi::$statics['civicrm_api3_contact_getlist']['override_wildcard']);
+    unset(Civi::$statics['civicrm_api3_contact_getlist']['override_wildcard']);
   }
   return $output;
 }

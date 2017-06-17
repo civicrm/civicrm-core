@@ -5,7 +5,7 @@
     pageTitle = 'CiviCRM',
     documentTitle = 'CiviCRM';
 
-  angular.module('crmUi', [])
+  angular.module('crmUi', CRM.angRequires('crmUi'))
 
     // example <div crm-ui-accordion crm-title="ts('My Title')" crm-collapsed="true">...content...</div>
     // WISHLIST: crmCollapsed should support two-way/continuous binding
@@ -690,7 +690,8 @@
       return {
         restrict: 'EA',
         scope: {
-          crmUiTabSet: '@'
+          crmUiTabSet: '@',
+          tabSetOptions: '@'
         },
         templateUrl: '~/crmUi/tabset.html',
         transclude: true,

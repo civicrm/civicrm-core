@@ -83,7 +83,6 @@ function civicrm_api3_generic_getList($apiRequest) {
  * @param array $fields
  */
 function _civicrm_api3_generic_getList_defaults($entity, &$request, $apiDefaults, $fields) {
-  $config = CRM_Core_Config::singleton();
   $defaults = array(
     'page_num' => 1,
     'input' => '',
@@ -91,6 +90,7 @@ function _civicrm_api3_generic_getList_defaults($entity, &$request, $apiDefaults
     'color_field' => isset($fields['color']) ? 'color' : NULL,
     'id_field' => $entity == 'option_value' ? 'value' : 'id',
     'description_field' => array(),
+    'add_wildcard' => Civi::settings()->get('includeWildCardInName'),
     'params' => array(),
     'extra' => array(),
   );
@@ -119,7 +119,7 @@ function _civicrm_api3_generic_getList_defaults($entity, &$request, $apiDefaults
   );
   // When searching e.g. autocomplete
   if ($request['input']) {
-    $params[$request['search_field']] = array('LIKE' => ($config->includeWildCardInName ? '%' : '') . $request['input'] . '%');
+    $params[$request['search_field']] = array('LIKE' => ($request['add_wildcard'] ? '%' : '') . $request['input'] . '%');
   }
   // When looking up a field e.g. displaying existing record
   if (!empty($request['id'])) {

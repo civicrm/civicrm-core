@@ -24,7 +24,7 @@
  +--------------------------------------------------------------------+
 *}
 {capture assign=tokenDocLink}{docURL page="user/common-workflows/tokens-and-mail-merge"}{/capture}
-{capture assign=schedRemindersDocLink}{docURL page="user/current/email/scheduled-reminders/"}{/capture}
+{capture assign=schedRemindersDocLink}{docURL page="user/email/scheduled-reminders/"}{/capture}
 {capture assign=schedRemURL}{crmURL p='civicrm/admin/scheduleReminders' q="reset=1"}{/capture}
 {capture assign=upgradeTemplatesDocLink}{docURL page="Updating System Workflow Message Templates after Upgrades - method 1 - kdiff" resource="wiki"}{/capture}
 {htxt id="id-intro-title"}

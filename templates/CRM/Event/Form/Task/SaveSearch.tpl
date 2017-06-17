@@ -41,7 +41,7 @@
         </ul>
       </div>
     {/if}
-    <p>{docURL page='user/current/organising-your-data/smart-groups/'}</p>
+    <p>{docURL page='user/organising-your-data/smart-groups/'}</p>
   </div>
 
  <table class="form-layout-compressed">

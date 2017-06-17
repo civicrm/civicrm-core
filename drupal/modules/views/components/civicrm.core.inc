@@ -198,6 +198,26 @@ function _civicrm_core_data(&$data, $enabled) {
     ),
   );
 
+  //Current Employer ID
+  $data['civicrm_contact']['employer_id'] = array(
+    'title' => t('Current Employer Id'),
+    'help' => t('Current Employer Id'),
+    'field' => array(
+      'handler' => 'civicrm_handler_field_contact_link',
+      'click sortable' => TRUE,
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument_string',
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_string',
+      'allow empty' => TRUE,
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+  );
+
   //DISPLAY Name for the Contact (Full Name with Prefixes and Suffixes)
   $data['civicrm_contact']['display_name'] = array(
     'title' => t('Display Name'),
@@ -590,6 +610,10 @@ function _civicrm_core_data(&$data, $enabled) {
     ),
     'sort' => array(
       'handler' => 'views_handler_sort',
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_string',
+      'allow empty' => TRUE,
     ),
     'argument' => array(
       'handler' => 'views_handler_argument_string',

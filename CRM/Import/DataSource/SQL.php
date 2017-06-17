@@ -81,7 +81,7 @@ class CRM_Import_DataSource_SQL extends CRM_Import_DataSource {
   public static function formRule($fields, $files, $form) {
     $errors = array();
 
-    // poor man's query validation (case-insensitive regex matching on word boundaries)
+    // Makeshift query validation (case-insensitive regex matching on word boundaries)
     $forbidden = array('ALTER', 'CREATE', 'DELETE', 'DESCRIBE', 'DROP', 'SHOW', 'UPDATE', 'information_schema');
     foreach ($forbidden as $pattern) {
       if (preg_match("/\\b$pattern\\b/i", $fields['sqlQuery'])) {

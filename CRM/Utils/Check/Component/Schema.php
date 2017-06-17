@@ -47,7 +47,7 @@ class CRM_Utils_Check_Component_Schema extends CRM_Utils_Check_Component {
         'fa-server'
       );
       $msg->addAction(
-        ts('Update Incices'),
+        ts('Update Indices'),
         ts('Update all database indices now? This may take a few minutes and cause a noticeable performance lag for all users while running.'),
         'api3',
         array('System', 'updateindexes')

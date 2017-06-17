@@ -66,7 +66,7 @@ class CRM_Case_Form_CustomData extends CRM_Core_Form {
     $this->_contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
 
     $groupTree = CRM_Core_BAO_CustomGroup::getTree('Case',
-      $this,
+      NULL,
       $this->_entityID,
       $this->_groupID,
       $this->_subTypeID

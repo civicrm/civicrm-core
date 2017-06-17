@@ -50,7 +50,7 @@ class CRM_Contact_Page_Inline_Email extends CRM_Core_Page {
     $entityBlock = array('contact_id' => $contactId);
     $emails = CRM_Core_BAO_Email::getValues($entityBlock);
     if (!empty($emails)) {
-      foreach ($emails as $key => & $value) {
+      foreach ($emails as &$value) {
         $value['location_type'] = $locationTypes[$value['location_type_id']];
       }
     }

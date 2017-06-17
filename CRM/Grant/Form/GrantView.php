@@ -117,7 +117,7 @@ class CRM_Grant_Form_GrantView extends CRM_Core_Form {
     $this->assign('attachment', $attachment);
 
     $grantType = CRM_Core_DAO::getFieldValue("CRM_Grant_DAO_Grant", $this->_id, "grant_type_id");
-    $groupTree = CRM_Core_BAO_CustomGroup::getTree("Grant", $this, $this->_id, 0, $grantType);
+    $groupTree = CRM_Core_BAO_CustomGroup::getTree("Grant", NULL, $this->_id, 0, $grantType);
     CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree, FALSE, NULL, NULL, NULL, $this->_id);
 
     $this->assign('id', $this->_id);

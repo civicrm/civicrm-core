@@ -331,11 +331,13 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
    * @param string $rev
    */
   public function upgrade_4_7_19($rev) {
-    $query = "SELECT id FROM civicrm_financial_account WHERE opening_balance <> 0 OR current_period_opening_balance <> 0";
-    $result = CRM_Core_DAO::executeQuery($query);
-    if (!$result->N) {
-      $this->addTask('Drop Column current_period_opening_balance From civicrm_financial_account table.', 'dropColumn', 'civicrm_financial_account', 'current_period_opening_balance');
-      $this->addTask('Drop Column opening_balance From civicrm_financial_account table.', 'dropColumn', 'civicrm_financial_account', 'opening_balance');
+    if (CRM_Core_BAO_SchemaHandler::checkIfFieldExists('civicrm_financial_account', 'opening_balance')) {
+      $query = "SELECT id FROM civicrm_financial_account WHERE opening_balance <> 0 OR current_period_opening_balance <> 0";
+      $result = CRM_Core_DAO::executeQuery($query);
+      if (!$result->N) {
+        $this->addTask('Drop Column current_period_opening_balance From civicrm_financial_account table.', 'dropColumn', 'civicrm_financial_account', 'current_period_opening_balance');
+        $this->addTask('Drop Column opening_balance From civicrm_financial_account table.', 'dropColumn', 'civicrm_financial_account', 'opening_balance');
+      }
     }
     $this->addTask('CRM-19961 - Add domain_id column to civicrm_sms_provider', 'addColumn',
       'civicrm_sms_provider', 'domain_id', 'int(10) unsigned', "Which Domain is this sms provier for");
@@ -344,6 +346,18 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
     $this->addTask('CRM-16633 - Add "Change Case Subject" activity', 'addChangeCaseSubjectActivityType');
     $this->addTask('Add is_public column to civicrm_custom_group', 'addColumn',
       'civicrm_custom_group', 'is_public', "boolean DEFAULT '1' COMMENT 'Is this property public?'");
+  }
+
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_4_7_20($rev) {
+    $this->addtask('Fix Schema on civicrm_action_schedule', 'fixSchemaOnCiviCRMActionSchedule');
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
+    $this->addTask('Add activity_status column to civicrm_mail_settings', 'addColumn',
+      'civicrm_mail_settings', 'activity_status', "varchar (255) DEFAULT NULL COMMENT 'Name of status to use when creating email to activity.'");
   }
 
   /*
@@ -1080,16 +1094,18 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
    */
   public static function populateSMSProviderDomainId() {
     $count = CRM_Core_DAO::singleValueQuery("SELECT count(id) FROM civicrm_domain");
-    if ($count = 1) {
+    if ($count == 1) {
       CRM_Core_DAO::executeQuery("UPDATE civicrm_sms_provider SET domain_id = (SELECT id FROM civicrm_domain)");
     }
-    CRM_Core_DAO::executeQuery("SET FOREIGN_KEY_CHECKS = 0;");
-    CRM_Core_DAO::executeQuery("ALTER TABLE `civicrm_sms_provider`
-      ADD CONSTRAINT FK_civicrm_sms_provider_domain_id
-      FOREIGN KEY (`domain_id`) REFERENCES `civicrm_domain`(`id`)
-      ON DELETE SET NULL");
+    if (!parent::checkFKExists('civicrm_sms_provider', 'FK_civicrm_sms_provider_domain_id')) {
+      CRM_Core_DAO::executeQuery("SET FOREIGN_KEY_CHECKS = 0;");
+      CRM_Core_DAO::executeQuery("ALTER TABLE `civicrm_sms_provider`
+        ADD CONSTRAINT FK_civicrm_sms_provider_domain_id
+        FOREIGN KEY (`domain_id`) REFERENCES `civicrm_domain`(`id`)
+        ON DELETE SET NULL");
 
-    CRM_Core_DAO::executeQuery("SET FOREIGN_KEY_CHECKS = 1;");
+      CRM_Core_DAO::executeQuery("SET FOREIGN_KEY_CHECKS = 1;");
+    }
     return TRUE;
   }
 
@@ -1109,6 +1125,22 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
       'component_id' => 'CiviCase',
       'icon' => 'fa-pencil-square-o',
     ));
+    return TRUE;
+  }
+
+  /**
+   * CRM-19986 fix schema differnces in civicrm_action_schedule
+   */
+  public static function fixSchemaOnCiviCRMActionSchedule() {
+    if (!parent::checkFKExists('civicrm_action_schedule', 'FK_civicrm_action_schedule_sms_template_id')) {
+      CRM_Core_DAO::executeQuery("ALTER TABLE `civicrm_action_schedule`
+        ADD CONSTRAINT FK_civicrm_action_schedule_sms_template_id
+        FOREIGN KEY (`sms_template_id`)  REFERENCES `civicrm_msg_template`(`id`)
+        ON DELETE SET NULL");
+    }
+    CRM_Core_DAO::executeQuery("ALTER TABLE `civicrm_action_schedule`
+      CHANGE `mapping_id` `mapping_id` varchar(64) COLLATE
+      utf8_unicode_ci DEFAULT NULL COMMENT 'Name/ID of the mapping to use on this table'");
     return TRUE;
   }
 

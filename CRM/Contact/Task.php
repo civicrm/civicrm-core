@@ -60,7 +60,8 @@ class CRM_Contact_Task {
     EMAIL_UNHOLD = 22,
     RESTORE = 23,
     DELETE_PERMANENTLY = 24,
-    COMMUNICATION_PREFS = 25;
+    COMMUNICATION_PREFS = 25,
+    INDIVIDUAL_CONTACTS = 26;
 
   /**
    * The task array
@@ -82,18 +83,22 @@ class CRM_Contact_Task {
         self::GROUP_CONTACTS => array(
           'title' => ts('Group - add contacts'),
           'class' => 'CRM_Contact_Form_Task_AddToGroup',
+          'url' => 'civicrm/task/add-to-group',
         ),
         self::REMOVE_CONTACTS => array(
           'title' => ts('Group - remove contacts'),
           'class' => 'CRM_Contact_Form_Task_RemoveFromGroup',
+          'url' => 'civicrm/task/remove-from-group',
         ),
         self::TAG_CONTACTS => array(
           'title' => ts('Tag - add to contacts'),
           'class' => 'CRM_Contact_Form_Task_AddToTag',
+          'url' => 'civicrm/task/add-to-tag',
         ),
         self::REMOVE_TAGS => array(
           'title' => ts('Tag - remove from contacts'),
           'class' => 'CRM_Contact_Form_Task_RemoveFromTag',
+          'url' => 'civicrm/task/remove-from-tag',
         ),
         self::EXPORT_CONTACTS => array(
           'title' => ts('Export contacts'),
@@ -107,11 +112,13 @@ class CRM_Contact_Task {
           'title' => ts('Email - send now (to 50 or less)'),
           'class' => 'CRM_Contact_Form_Task_Email',
           'result' => TRUE,
+          'url' => 'civicrm/task/send-email',
         ),
         self::DELETE_CONTACTS => array(
           'title' => ts('Delete contacts'),
           'class' => 'CRM_Contact_Form_Task_Delete',
           'result' => FALSE,
+          'url' => 'civicrm/task/delete-contact',
         ),
         self::RECORD_CONTACTS => array(
           'title' => ts('Add activity'),
@@ -136,6 +143,7 @@ class CRM_Contact_Task {
           'title' => ts('Mailing labels - print'),
           'class' => 'CRM_Contact_Form_Task_Label',
           'result' => TRUE,
+          'url' => 'civicrm/task/make-mailing-label',
         ),
         self::BATCH_UPDATE => array(
           'title' => ts('Update multiple contacts'),
@@ -144,19 +152,23 @@ class CRM_Contact_Task {
             'CRM_Contact_Form_Task_Batch',
           ),
           'result' => TRUE,
+          'url' => 'civicrm/task/pick-profile',
         ),
         self::PRINT_FOR_CONTACTS => array(
           'title' => ts('Print/merge document'),
           'class' => 'CRM_Contact_Form_Task_PDF',
           'result' => TRUE,
+          'url' => 'civicrm/task/print-document',
         ),
         self::EMAIL_UNHOLD => array(
           'title' => ts('Email - unhold addresses'),
           'class' => 'CRM_Contact_Form_Task_Unhold',
+          'url' => 'civicrm/task/unhold-email',
         ),
         self::COMMUNICATION_PREFS => array(
           'title' => ts('Communication preferences - alter'),
           'class' => 'CRM_Contact_Form_Task_AlterPreferences',
+          'url' => 'civicrm/task/alter-contact-preference',
         ),
         self::RESTORE => array(
           'title' => ts('Restore contacts from trash'),
@@ -177,6 +189,16 @@ class CRM_Contact_Task {
           'title' => ts('SMS - schedule/send'),
           'class' => 'CRM_Contact_Form_Task_SMS',
           'result' => TRUE,
+        );
+      }
+
+      if (CRM_Contact_BAO_ContactType::isActive('Individual')) {
+        $label = CRM_Contact_BAO_ContactType::getLabel('individual');
+        self::$_tasks[self::INDIVIDUAL_CONTACTS] = array(
+          'title' => ts('Add relationship - to %1',
+            array(1 => $label)
+          ),
+          'class' => 'CRM_Contact_Form_Task_AddToIndividual',
         );
       }
 
@@ -363,6 +385,30 @@ class CRM_Contact_Task {
       CRM_Utils_Array::value('class', self::$_tasks[$value]),
       CRM_Utils_Array::value('result', self::$_tasks[$value]),
     );
+  }
+
+  /**
+   * Function to return the task information on basis of provided task's form name
+   *
+   * @param string $className
+   *
+   * @return array
+   */
+  public static function getTaskAndTitleByClass($className) {
+    self::initTasks();
+
+    foreach (self::$_tasks as $task => $value) {
+      if (!empty($value['url']) && (
+        (is_array($value['class']) && in_array($className, $value['class'])) ||
+         ($value['class'] == $className)
+        )
+      ) {
+        return array(
+          $task,
+          CRM_Utils_Array::value('title', $value),
+        );
+      }
+    }
   }
 
 }

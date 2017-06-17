@@ -84,7 +84,7 @@
         <tr>
   </table>
 
-      <div id="msg_html" class="crm-accordion-wrapper crm-html_email-accordion ">
+      <div id="msg_html_section" class="crm-accordion-wrapper crm-html_email-accordion ">
         <div class="crm-accordion-header">
             {ts}HTML Format{/ts}
             {help id="id-message-text" file="CRM/Contact/Form/Task/Email.hlp"}
@@ -102,7 +102,7 @@
         </div><!-- /.crm-accordion-body -->
       </div><!-- /.crm-accordion-wrapper -->
 
-      <div id="msg_text" class="crm-accordion-wrapper crm-plaint_text_email-accordion ">
+      <div id="msg_text_section" class="crm-accordion-wrapper crm-plaint_text_email-accordion ">
         <div class="crm-accordion-header">
                 {ts}Plain-Text Format{/ts}
         </div><!-- /.crm-accordion-header -->
@@ -165,8 +165,7 @@
       });
       function showHideUpload(type) {
         var show = (type == 1) ? false : true;
-        $("#msg_html").toggle(show);
-        $("#msg_text, #pdf_format").toggle(show);
+        $("#msg_html_section, #msg_text_section, #pdf_format").toggle(show);
         $("#file_id").parent().parent().toggle(!show);
 
         // auto file type validation

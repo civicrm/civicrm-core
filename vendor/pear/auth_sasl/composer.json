@@ -1,0 +1,41 @@
+{
+    "authors": [
+        {
+            "email": "amistry@am-productions.biz",
+            "name": "Anish Mistry",
+            "role": "Lead"
+        },
+        {
+            "email": "richard@php.net",
+            "name": "Richard Heyes",
+            "role": "Lead"
+        },
+        {
+            "email": "michael@bretterklieber.com",
+            "name": "Michael Bretterklieber",
+            "role": "Lead"
+        }
+    ],
+    "autoload": {
+        "psr-0": {
+            "Auth": "./"
+        }
+    },
+    "description": "Abstraction of various SASL mechanism responses",
+    "include-path": [
+        "./"
+    ],
+    "license": "BSD",
+    "name": "pear/auth_sasl",
+    "support": {
+        "issues": "http://pear.php.net/bugs/search.php?cmd=display&package_name[]=Auth_SASL",
+        "source": "https://github.com/pear/Auth_SASL"
+    },
+    "type": "library",
+    "require": {
+        "pear/pear_exception": "@stable"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "@stable"
+    }
+}

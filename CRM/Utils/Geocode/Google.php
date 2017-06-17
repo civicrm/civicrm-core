@@ -82,7 +82,7 @@ class CRM_Utils_Geocode_Google {
       $add .= ',+';
     }
 
-    if (!empty($values['state_province']) || !empty($values['state_province_id'])) {
+    if (!empty($values['state_province']) || (!empty($values['state_province_id']) && $values['state_province_id'] != 'null')) {
       if (!empty($values['state_province_id'])) {
         $stateProvince = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_StateProvince', $values['state_province_id']);
       }

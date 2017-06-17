@@ -60,6 +60,7 @@ class CRM_Report_Form_Contribute_DeferredRevenue extends CRM_Report_Form {
             'title' => ts('Transaction Amount'),
             'type' => CRM_Utils_Type::T_MONEY,
             'required' => TRUE,
+            'dbAlias' => 'SUM(financial_trxn_1_civireport.total_amount )',
           ),
         ),
         'filters' => array(
@@ -301,7 +302,7 @@ class CRM_Report_Form_Contribute_DeferredRevenue extends CRM_Report_Form {
         ON entity_financial_trxn_item.entity_id = {$this->_aliases['civicrm_financial_item']}.id
         AND entity_financial_trxn_item.entity_table = 'civicrm_financial_item'
       INNER JOIN civicrm_financial_trxn {$this->_aliases['civicrm_financial_trxn_1']}
-        ON {$this->_aliases['civicrm_financial_trxn_1']}.from_financial_account_id = {$this->_aliases['civicrm_financial_account']}.id
+        ON {$this->_aliases['civicrm_financial_trxn_1']}.to_financial_account_id = {$this->_aliases['civicrm_financial_account']}.id
         AND {$this->_aliases['civicrm_financial_trxn_1']}.id =  entity_financial_trxn_item.financial_trxn_id 
       INNER JOIN civicrm_entity_financial_trxn financial_trxn_contribution
         ON financial_trxn_contribution.financial_trxn_id = {$this->_aliases['civicrm_financial_trxn_1']}.id
@@ -317,6 +318,7 @@ class CRM_Report_Form_Contribute_DeferredRevenue extends CRM_Report_Form {
         ON {$this->_aliases['civicrm_contribution']}.id = financial_trxn_contribution.entity_id
       INNER JOIN civicrm_line_item line_item 
         ON line_item.contribution_id = {$this->_aliases['civicrm_contribution']}.id
+        AND line_item.financial_type_id = entity_financial_account_deferred.entity_id
       LEFT JOIN civicrm_participant {$this->_aliases['civicrm_participant']}
         ON CASE
           WHEN line_item.entity_table = 'civicrm_participant'

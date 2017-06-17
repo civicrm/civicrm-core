@@ -62,15 +62,14 @@ function _civicrm_api3_contribution_soft_create_spec(&$params) {
  * Deletes an existing Soft Credit.
  *
  * @param array $params
+ *
+ * @return array
+ *   Api formatted result.
+ *
  * @throws API_Exception
  */
 function civicrm_api3_contribution_soft_delete($params) {
-  // Non standard BAO - we have to write custom code to cope.
-  $result = CRM_Contribute_BAO_ContributionSoft::del(array('id' => $params['id']));
-  if (!$result) {
-    throw new API_Exception('Cannot delete contributionSoft ' . $params['id']);
-  }
-  civicrm_api3_create_success(TRUE);
+  return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**

@@ -1,0 +1,14 @@
+{
+  "name": "phantomjs-polyfill",
+  "homepage": "https://github.com/conversocial/phantomjs-polyfill",
+  "version": "0.0.2",
+  "_release": "0.0.2",
+  "_resolution": {
+    "type": "version",
+    "tag": "v0.0.2",
+    "commit": "a1f767df019a1d02bfca39546dfe6bcc8c057c75"
+  },
+  "_source": "https://github.com/conversocial/phantomjs-polyfill.git",
+  "_target": "^0.0.2",
+  "_originalSource": "phantomjs-polyfill"
+}

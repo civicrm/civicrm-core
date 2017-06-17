@@ -283,17 +283,11 @@ SELECT r.payment_processor_id
         $activityParams = array(
           'source_contact_id' => $dao->contact_id,
           'source_record_id' => CRM_Utils_Array::value('source_record_id', $activityParams),
-          'activity_type_id' => CRM_Core_OptionGroup::getValue('activity_type',
-            'Cancel Recurring Contribution',
-            'name'
-          ),
+          'activity_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Cancel Recurring Contribution'),
           'subject' => CRM_Utils_Array::value('subject', $activityParams, ts('Recurring contribution cancelled')),
           'details' => $details,
           'activity_date_time' => date('YmdHis'),
-          'status_id' => CRM_Core_OptionGroup::getValue('activity_status',
-            'Completed',
-            'name'
-          ),
+          'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_status_id', 'Completed'),
         );
         $session = CRM_Core_Session::singleton();
         $cid = $session->get('userID');
@@ -301,6 +295,7 @@ SELECT r.payment_processor_id
           $activityParams['target_contact_id'][] = $activityParams['source_contact_id'];
           $activityParams['source_contact_id'] = $cid;
         }
+        // @todo use the api & do less wrangling above
         CRM_Activity_BAO_Activity::create($activityParams);
       }
 
@@ -310,6 +305,7 @@ SELECT r.payment_processor_id
         return TRUE;
       }
       else {
+        // @todo - this is bad! Get the function out of the ipn.
         $baseIPN = new CRM_Core_Payment_BaseIPN();
         return $baseIPN->cancelled($objects, $transaction);
       }
@@ -819,7 +815,10 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
    *
    * @throws \CiviCRM_API3_Exception
    */
-  public static function updateOnNewPayment($recurringContributionID, $paymentStatus) {
+  public static function updateOnNewPayment($recurringContributionID, $paymentStatus, $effectiveDate) {
+    if (empty($effectiveDate)) {
+      $effectiveDate = date('Y-m-d');
+    }
     if (!in_array($paymentStatus, array('Completed', 'Failed'))) {
       return;
     }
@@ -853,8 +852,8 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
       // Only update next sched date if it's empty or 'just now' because payment processors may be managing
       // the scheduled date themselves as core did not previously provide any help.
       if (empty($existing['next_sched_contribution_date']) || strtotime($existing['next_sched_contribution_date']) ==
-        strtotime(date('Y-m-d'))) {
-        $params['next_sched_contribution_date'] = date('Y-m-d', strtotime('+' . $existing['frequency_interval'] . ' ' . $existing['frequency_unit']));
+        strtotime($effectiveDate)) {
+        $params['next_sched_contribution_date'] = date('Y-m-d', strtotime('+' . $existing['frequency_interval'] . ' ' . $existing['frequency_unit'], strtotime($effectiveDate)));
       }
     }
     civicrm_api3('ContributionRecur', 'create', $params);
@@ -872,7 +871,9 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
    */
   protected static function isComplete($recurringContributionID, $installments) {
     $paidInstallments = CRM_Core_DAO::singleValueQuery(
-      'SELECT count(*) FROM civicrm_contribution WHERE id = %1',
+      'SELECT count(*) FROM civicrm_contribution 
+        WHERE contribution_recur_id = %1
+        AND contribution_status_id = ' . CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
       array(1 => array($recurringContributionID, 'Integer'))
     );
     if ($paidInstallments >= $installments) {

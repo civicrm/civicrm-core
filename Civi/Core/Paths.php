@@ -78,6 +78,9 @@ class Paths {
   public function getVariable($name, $attr) {
     if (!isset($this->variables[$name])) {
       $this->variables[$name] = call_user_func($this->variableFactory[$name]);
+      if (isset($GLOBALS['civicrm_paths'][$name])) {
+        $this->variables[$name] = array_merge($this->variables[$name], $GLOBALS['civicrm_paths'][$name]);
+      }
     }
     if (!isset($this->variables[$name][$attr])) {
       throw new \RuntimeException("Cannot resolve path using \"$name.$attr\"");

@@ -244,12 +244,9 @@
         }
       });
 
-      // get dataTable
-      var table = CRM.$('table#dupePairs').DataTable();
-
       // apply the search
       $('#searchOptions input').on( 'keyup change', function () {
-        table
+        $('table#dupePairs').DataTable()
           .column($(this).attr('search-column'))
           .search(this.value)
           .draw();
@@ -257,7 +254,7 @@
 
       // show / hide columns
       $('input.toggle-vis').on('click', function (e) {
-        var column = table.column( $(this).attr('data-column-main') );
+        var column = $('table#dupePairs').DataTable().column( $(this).attr('data-column-main') );
         column.visible( ! column.visible() );
 
         // nowrap to conflicts column is applied only during initial rendering
@@ -268,7 +265,7 @@
         }
 
         if ($(this).attr('data-column-dupe')) {
-          column = table.column( $(this).attr('data-column-dupe') );
+          column = $('table#dupePairs').DataTable().column( $(this).attr('data-column-dupe') );
           column.visible( ! column.visible() );
         }
       });
@@ -276,7 +273,7 @@
       // keep the conflicts checkbox checked when context is "conflicts"
       if(context == 'conflicts') {
         $('#conflicts').attr('checked', true);
-        var column = table.column( $('#conflicts').attr('data-column-main') );
+        var column = $('table#dupePairs').DataTable().column( $('#conflicts').attr('data-column-main') );
         column.visible( ! column.visible() );
       }
 
@@ -289,12 +286,12 @@
         var request = $.post(postUrl, {pnid : $el.data('pnid')});
         request.done(function(dt) {
           var mapper = {1:3, 2:4, 5:6, 7:8, 9:10}
-          var idx = table.row($elTr).index();
+          var idx = $('table#dupePairs').DataTable().row($elTr).index();
           $.each(mapper, function(key, val) {
-            var v1  = table.cell(idx, key).data();
-            var v2  = table.cell(idx, val).data();
-            table.cell(idx, key).data(v2);
-            table.cell(idx, val).data(v1);
+            var v1  = $('table#dupePairs').DataTable().cell(idx, key).data();
+            var v2  = $('table#dupePairs').DataTable().cell(idx, val).data();
+            $('table#dupePairs').DataTable().cell(idx, key).data(v2);
+            $('table#dupePairs').DataTable().cell(idx, val).data(v1);
           });
           // keep the checkbox checked if needed
           $('input.crm-dedupe-select', $elTr).prop('checked', $elTr.hasClass('crm-row-selected'));
@@ -312,12 +309,12 @@
           CRM.$.post(dataUrl, {pnid: ids}, function (response) {
             var mapper = {1:3, 2:4, 5:6, 7:8, 9:10}
             $('.crm-row-selected').each(function() {
-              var idx = table.row(this).index();
+              var idx = $('table#dupePairs').DataTable().row(this).index();
               $.each(mapper, function(key, val) {
-                var v1  = table.cell(idx, key).data();
-                var v2  = table.cell(idx, val).data();
-                table.cell(idx, key).data(v2);
-                table.cell(idx, val).data(v1);
+                var v1  = $('table#dupePairs').DataTable().cell(idx, key).data();
+                var v2  = $('table#dupePairs').DataTable().cell(idx, val).data();
+                $('table#dupePairs').DataTable().cell(idx, key).data(v2);
+                $('table#dupePairs').DataTable().cell(idx, val).data(v1);
               });
               // keep the checkbox checked if needed
               $('input.crm-dedupe-select', this).prop('checked', $(this).hasClass('crm-row-selected'));

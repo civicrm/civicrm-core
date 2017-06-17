@@ -2750,7 +2750,7 @@ tbody.scrollContent tr.alternateRow {
 .crm-container a.sorting_desc,
 .crm-container a.sorting_asc {
   color: #A7A7A7;
-  background: url("../packages/jquery/plugins/DataTables/media/images/sort_both.png") no-repeat left center;
+  background: url("../bower_components/datatables/media/images/sort_both.png") no-repeat left center;
   padding-left: 20px;
 }
 .crm-container a.sorting_desc,
@@ -2765,16 +2765,16 @@ tbody.scrollContent tr.alternateRow {
 }
 
 .crm-container table thead a.sorting_asc {
-  background: url("../packages/jquery/plugins/DataTables/media/images/sort_asc.png") no-repeat left center;
+  background: url("../bower_components/datatables/media/images/sort_asc.png") no-repeat left center;
 }
 .crm-container table thead a.sorting_desc {
-  background: url("../packages/jquery/plugins/DataTables/media/images/sort_desc.png") no-repeat left center;
+  background: url("../bower_components/datatables/media/images/sort_desc.png") no-repeat left center;
 }
 .crm-container table thead a.sorting_asc_disabled {
-  background: url("../packages/jquery/plugins/DataTables/media/images/sort_asc_disabled.png") no-repeat left center;
+  background: url("../bower_components/datatables/media/images/sort_asc_disabled.png") no-repeat left center;
 }
 .crm-container table thead a.sorting_desc_disabled {
-  background: url("../packages/jquery/plugins/DataTables/media/images/sort_desc_disabled.png") no-repeat left center;
+  background: url("../bower_components/datatables/media/images/sort_desc_disabled.png") no-repeat left center;
 }
 
 /* Otherwise for some reason we have 2 sort icons */
@@ -2798,7 +2798,9 @@ tbody.scrollContent tr.alternateRow {
 }
 
 .crm-container .disabled,
+.crm-container .disabled td,
 .crm-container .cancelled,
+.crm-container .cancelled td,
 .crm-container li.disabled a.ui-tabs-anchor,
 .crm-container li.crm-count-0 a.ui-tabs-anchor,
 .crm-container li.crm-count-0 a.ui-tabs-anchor em {

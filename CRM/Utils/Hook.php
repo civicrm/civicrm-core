@@ -1980,6 +1980,13 @@ abstract class CRM_Utils_Hook {
    * @deprecated
    */
   public static function alterMail(&$mailer, $driver, $params) {
+    // This has been deprecated on the premise it MIGHT be called externally for a long time.
+    // We don't have a clear policy on how much we support external extensions calling internal
+    // hooks (ie. in general we say 'don't call internal functions', but some hooks like pre hooks
+    // are expected to be called externally.
+    // It's really really unlikely anyone uses this - but let's add deprecations for a couple
+    // of releases first.
+    Civi::log()->warning('Deprecated function CRM_Utils_Hook::alterMail, use CRM_Utils_Hook::alterMailer', array('civi.tag' => 'deprecated'));
     return CRM_Utils_Hook::alterMailer($mailer, $driver, $params);
   }
 
@@ -2065,10 +2072,32 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
+   * Modify the CRM_Core_Resources settings data.
+   *
+   * @param array $data
+   * @see CRM_Core_Resources::addSetting
+   */
+  public static function alterResourceSettings(&$data) {
+    $event = \Civi\Core\Event\GenericHookEvent::create(array(
+      'data' => &$data,
+    ));
+    Civi::dispatcher()->dispatch('hook_civicrm_alterResourceSettings', $event);
+  }
+
+  /**
    * EXPERIMENTAL: This hook allows one to register additional Angular modules
    *
    * @param array $angularModules
-   *   List of modules.
+   *   List of modules. Each module defines:
+   *    - ext: string, the CiviCRM extension which hosts the files.
+   *    - js: array, list of JS files or globs.
+   *    - css: array, list of CSS files or globs.
+   *    - partials: array, list of base-dirs containing HTML.
+   *    - requires: array, list of required Angular modules.
+   *    - basePages: array, uncondtionally load this module onto the given Angular pages. [v4.7.21+]
+   *      If omitted, default to "array('civicrm/a')" for backward compat.
+   *      For a utility that should only be loaded on-demand, use "array()".
+   *      For a utility that should be loaded in all pages use, "array('*')".
    * @return null
    *   the return value is ignored
    *
@@ -2083,6 +2112,8 @@ abstract class CRM_Utils_Hook {
    *     'js' => array('js/part1.js', 'js/part2.js'),
    *     'css' => array('css/myAngularModule.css'),
    *     'partials' => array('partials/myBigAngularModule'),
+   *     'requires' => array('otherModuleA', 'otherModuleB'),
+   *     'basePages' => array('civicrm/a'),
    *   );
    * }
    * @endcode
@@ -2091,6 +2122,52 @@ abstract class CRM_Utils_Hook {
     return self::singleton()->invoke(array('angularModules'), $angularModules,
       self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
       'civicrm_angularModules'
+    );
+  }
+
+  /**
+   * Alter the definition of some Angular HTML partials.
+   *
+   * @param \Civi\Angular\Manager $angular
+   *
+   * @code
+   * function example_civicrm_alterAngular($angular) {
+   *   $angular->add(ChangeSet::create('mychanges')
+   *     ->alterHtml('~/crmMailing/EditMailingCtrl/2step.html', function(phpQueryObject $doc) {
+   *       $doc->find('[ng-form="crmMailingSubform"]')->attr('cat-stevens', 'ts(\'wild world\')');
+   *     })
+   *   );
+   * }
+   * @endCode
+   */
+  public static function alterAngular($angular) {
+    $event = \Civi\Core\Event\GenericHookEvent::create(array(
+      'angular' => $angular,
+    ));
+    Civi::dispatcher()->dispatch('hook_civicrm_alterAngular', $event);
+  }
+
+  /**
+   * This hook is called whenever the system builds a new copy of
+   * semi-static asset.
+   *
+   * @param string $asset
+   *   The name of the asset.
+   *   Ex: 'angular.json'
+   * @param array $params
+   *   List of optional arguments which influence the content.
+   *   Note: Params are immutable because they are part of the cache-key.
+   * @param string $mimeType
+   *   Initially, NULL. Modify to specify the mime-type.
+   * @param string $content
+   *   Initially, NULL. Modify to specify the rendered content.
+   * @return null
+   *   the return value is ignored
+   */
+  public static function buildAsset($asset, $params, &$mimeType, &$content) {
+    return self::singleton()->invoke(array('asset', 'params', 'mimeType', 'content'),
+      $asset, $params, $mimeType, $content, self::$_nullObject, self::$_nullObject,
+      'civicrm_buildAsset'
     );
   }
 
@@ -2290,6 +2367,17 @@ abstract class CRM_Utils_Hook {
       self::$_nullObject, self::$_nullObject, self::$_nullObject,
       'civicrm_geocoderFormat'
     );
+  }
+
+  /**
+   * This hook is called before an inbound SMS is processed.
+   *
+   * @param CRM_SMS_Message Object $message
+   *   An SMS message recieved
+   * @return mixed
+   */
+  public static function inboundSMS(&$message) {
+    return self::singleton()->invoke(array('message'), $message, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_inboundSMS');
   }
 
 }

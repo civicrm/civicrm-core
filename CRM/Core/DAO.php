@@ -346,6 +346,11 @@ class CRM_Core_DAO extends DB_DataObject {
     // rewrite queries that should use $dbLocale-based views for multi-language installs
     global $dbLocale, $_DB_DATAOBJECT;
 
+    if (empty($_DB_DATAOBJECT['CONNECTIONS'][$this->_database_dsn_md5])) {
+      // Will force connection to be populated per CRM-20541.
+      new CRM_Core_DAO();
+    }
+
     $conn = &$_DB_DATAOBJECT['CONNECTIONS'][$this->_database_dsn_md5];
     $orig_options = $conn->options;
     $this->_setDBOptions($this->_options);
@@ -529,6 +534,9 @@ class CRM_Core_DAO extends DB_DataObject {
    *     * @return mixed Int (No. of rows affected) on success, false on failure, 0 on no data affected
    */
   public function delete($useWhere = FALSE) {
+    $preEvent = new \Civi\Core\DAO\Event\PreDelete($this);
+    \Civi::service('dispatcher')->dispatch("civi.dao.preDelete", $preEvent);
+
     $result = parent::delete($useWhere);
 
     $event = new \Civi\Core\DAO\Event\PostDelete($this, $result);

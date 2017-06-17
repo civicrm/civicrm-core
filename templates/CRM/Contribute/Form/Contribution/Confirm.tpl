@@ -70,7 +70,7 @@
                     <strong> -------------------------------------------</strong><br />
                     {ts}Total{/ts}: <strong>{$amount+$minimum_fee|crmMoney}</strong><br />
                 {elseif $amount }
-                    {ts}Amount{/ts}: <strong>{$amount|crmMoney} {if $amount_level } - {$amount_level} {/if}</strong>
+                    {ts}Amount{/ts}: <strong>{$amount|crmMoney} {if $amount_level } &ndash; {$amount_level} {/if}</strong>
                 {else}
                     {$membership_name} {ts}Membership{/ts}: <strong>{$minimum_fee|crmMoney}</strong>
                 {/if}
@@ -79,7 +79,7 @@
                      {ts}Total Tax Amount{/ts}: <strong>{$totalTaxAmount|crmMoney} </strong><br />
                 {/if}
 		{if $amount}
-                    {if $installments}{ts}Installment Amount{/ts}{else}{ts}Total Amount{/ts}{/if} : <strong>{$amount|crmMoney} {if $amount_level } - {$amount_level} {/if}</strong>
+                    {if $installments}{ts}Installment Amount{/ts}{else}{ts}Total Amount{/ts}{/if}: <strong>{$amount|crmMoney}{if $amount_level } &ndash; {$amount_level}{/if}</strong>
                 {else}
                     {$membership_name} {ts}Membership{/ts}: <strong>{$minimum_fee|crmMoney}</strong>
                 {/if}
