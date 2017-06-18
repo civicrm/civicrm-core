@@ -186,7 +186,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
    */
   public function testSubmitCreditCardPayPal() {
     $mut = new CiviMailUtils($this, TRUE);
-    $mut->clearMessages(0);
+    $mut->clearMessages();
     $form = new CRM_Contribute_Form_Contribution();
     $paymentProcessorID = $this->paymentProcessorCreate(array('is_test' => 0));
     $form->_mode = 'Live';
@@ -246,6 +246,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       $msgs = $mut->getAllMessages();
       $this->assertEquals(1, count($msgs));
     }
+    $mut->clearMessages();
     $mut->stop();
   }
 
@@ -254,7 +255,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
    */
   public function testSubmitCreditCardWithEmailReceipt() {
     $mut = new CiviMailUtils($this, TRUE);
-    $mut->clearMessages(0);
+    $mut->clearMessages();
     $form = new CRM_Contribute_Form_Contribution();
     $form->_mode = 'Live';
     $error = FALSE;
