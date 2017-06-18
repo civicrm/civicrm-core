@@ -127,7 +127,7 @@ class CRM_Core_Permission {
         foreach ($permission as $orPerm) {
           if (self::check($orPerm)) {
             //one of our 'or' permissions has succeeded - stop checking this permission
-            return TRUE;;
+            return TRUE;
           }
         }
         //none of our our conditions was met

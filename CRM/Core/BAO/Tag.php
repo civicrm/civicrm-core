@@ -413,6 +413,20 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
       return NULL;
     }
 
+    // Check permission to create or modify reserved tag
+    if (!empty($params['check_permissions']) && !CRM_Core_Permission::check('administer reserved tags')) {
+      if (!empty($params['is_reserved']) || ($id && CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Tag', $id, 'is_reserved'))) {
+        throw new CRM_Core_Exception('Insufficient permission to administer reserved tag.');
+      }
+    }
+
+    // Check permission to create or modify tagset
+    if (!empty($params['check_permissions']) && !CRM_Core_Permission::check('administer Tagsets')) {
+      if (!empty($params['is_tagset']) || ($id && CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Tag', $id, 'is_tagset'))) {
+        throw new CRM_Core_Exception('Insufficient permission to administer tagset.');
+      }
+    }
+
     $tag = new CRM_Core_DAO_Tag();
 
     // if parent id is set then inherit used for and is hidden properties
