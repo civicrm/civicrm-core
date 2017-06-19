@@ -52,7 +52,7 @@ class CRM_Activity_Form_SearchTest extends CiviUnitTestCase {
         'source_contact_name' => 'Anderson, Anthony',
         'checkbox' => 'mark_x_1',
         'mailingId' => '',
-        'action' => '<span><a href="http://dmaster.local/index.php?q=civicrm/contact/view/contribution&amp;action=view&amp;reset=1&amp;id=1&amp;cid=3&amp;context=search&amp;searchContext=activity&amp;key=' . $qfKey . '" class="action-item crm-hover-button" title=\'View Activity\' >View</a></span>',
+        'action' => '<span><a href="/index.php?q=civicrm/contact/view/contribution&amp;action=view&amp;reset=1&amp;id=1&amp;cid=3&amp;context=search&amp;searchContext=activity&amp;key=' . $qfKey . '" class="action-item crm-hover-button" title=\'View Activity\' >View</a></span>',
         'campaign' => NULL,
         'campaign_id' => NULL,
         'repeat' => '',
