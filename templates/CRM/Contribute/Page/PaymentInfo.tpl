@@ -84,7 +84,7 @@ CRM.$(function($) {
   {elseif $paymentInfo.balance < 0}
      {assign var=paymentButtonName value='Record Refund'}
   {/if}
-  <a class="action-item crm-hover-button" href='{crmURL p="civicrm/payment" q="action=add&reset=1&component=``$paymentInfo.component`&id=`$paymentInfo.id`&cid=`$cid`"}'><i class="crm-i fa-plus-circle"></i> {ts}{$paymentButtonName}{/ts}</a>
+  <a class="action-item crm-hover-button" href='{crmURL p="civicrm/payment" q="action=add&reset=1&component=`$paymentInfo.component`&id=`$paymentInfo.id`&cid=`$cid`"}'><i class="crm-i fa-plus-circle"></i> {ts}{$paymentButtonName}{/ts}</a>
 
 {/if}
 </td></tr>	  {*CRM-14538 - fix*}

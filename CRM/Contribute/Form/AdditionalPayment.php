@@ -111,15 +111,27 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       $this->_contributionId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment', $this->_id, 'contribution_id', 'participant_id');
       $eventId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant', $this->_id, 'event_id', 'id');
       $this->_fromEmails = CRM_Event_BAO_Event::getFromEmailIds($eventId);
+	  
+	  //CRM-14538 - CRM-20626 - keep the original line for event - nothing changed
+	  $paymentInfo = CRM_Core_BAO_FinancialTrxn::getPartialPaymentWithType($this->_id, $entityType);
     }
     else {
       $this->_contributionId = $this->_id;
       $this->_fromEmails['from_email_id'] = CRM_Core_BAO_Email::getFromEmail();
+	  
+	  //CRM-14538 - CRM-20626 - get the total using contribution ID
+	  $total = CRM_Core_BAO_FinancialTrxn::getBalanceTrxnAmt($this->_id);  
+	  $baseTrxnId = $total['trxn_id'];
+      $total = $total['total_amount'];
+	  
+	  $paymentInfo = CRM_Core_BAO_FinancialTrxn::getPartialPaymentWithType($this->_id, $entityType,TRUE,$total);
+	  
     }
 
-    $paymentInfo = CRM_Core_BAO_FinancialTrxn::getPartialPaymentWithType($this->_id, $entityType);
-    $paymentDetails = CRM_Contribute_BAO_Contribution::getPaymentInfo($this->_id, $this->_component, FALSE, TRUE);
+	//CRM-14538 - CRM-20626 - fix
+	$paymentDetails = CRM_Contribute_BAO_Contribution::getPaymentInfo($this->_id, $this->_component, FALSE, FALSE);
 
+	
     $this->_amtPaid = $paymentDetails['paid'];
     $this->_amtTotal = $paymentDetails['total'];
 
@@ -146,6 +158,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     $this->assign('paymentType', $this->_paymentType);
     $this->assign('paymentAmt', abs($paymentAmt));
 
+	
     $this->setPageTitle($this->_refund ? ts('Refund') : ts('Payment'));
   }
 
