@@ -338,48 +338,44 @@
     }
   }
 
-  function showHideAmountBlock( element, elementName )
-        {
-     // show / hide when amount section is active check/uncheck.
-
-     var priceSetID = {/literal}'{$priceSetID}'{literal};
-
-     switch ( elementName ) {
+  function showHideAmountBlock(element, elementName) {
+    // show / hide when amount section is active check/uncheck.
+    var priceSetID = {/literal}'{$priceSetID}'{literal};
+    switch (elementName) {
       case 'price_set_id':
-           if ( element ) {
-               cj('#amountFields').hide();
-           } else {
-               cj('#amountFields').show();
-           }
-           cj("#amount_block_is_active").prop('checked', true );
-      break;
-
-      case 'is_pledge_active' :
-      case 'is_allow_other_amount' :
-           if ( element.checked ) {
-               if ( priceSetID ) cj( "#price_set_id" ).val( '' );
-             cj('#amountFields').show();
-                 }
-           cj("#amount_block_is_active").prop('checked', true );
-      break;
-
-         case 'amount_block_is_active' :
-           if ( element.checked ) {
-               if ( priceSetID ) {
-           cj('#amountFields').hide();
-           cj( "#price_set_id" ).val( priceSetID );
-        } else {
-           cj('#amountFields').show();
-           cj( "#price_set_id" ).val( '' );
+        if (element) {
+          cj('#amountFields').hide();
         }
-        cj('#priceSet, #recurringFields').show();
-           } else {
-            cj( "#price_set_id" ).val( '' );
-            cj('#amountFields, #priceSet, #recurringFields').hide();
-           }
-      break;
-     }
-   }
+        break;
+
+      case 'is_pledge_active':
+      case 'is_allow_other_amount':
+        if (element.checked) {
+          if (priceSetID) cj( "#price_set_id" ).val('');
+          cj('#amountFields').show();
+        }
+        cj("#amount_block_is_active").prop('checked', true );
+        break;
+
+      case 'amount_block_is_active':
+        if (element.checked) {
+          if (priceSetID) {
+            cj('#amountFields').hide();
+            cj( "#price_set_id" ).val(priceSetID);
+          }
+          else {
+            cj('#amountFields').show();
+            cj( "#price_set_id" ).val('');
+          }
+          cj('#priceSet, #recurringFields').show();
+        }
+        else {
+          cj( "#price_set_id" ).val('');
+          cj('#amountFields, #priceSet, #recurringFields').hide();
+        }
+        break;
+      }
+    }
 
     function showRecurring( paymentProcessorIds ) {
         var display = true;
