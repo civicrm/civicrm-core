@@ -852,7 +852,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     //Update Status and check activities created.
     $updateStatus = array(
       'id' => $result['id'],
-      'status_id' => 6,
+      'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Cancelled'),
     );
     $this->callAPISuccess('Membership', 'create', $updateStatus);
     $activities = CRM_Activity_BAO_Activity::getContactActivity($this->_contactID);
