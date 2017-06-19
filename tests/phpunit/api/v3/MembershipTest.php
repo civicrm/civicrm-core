@@ -848,6 +848,19 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     );
 
     $result = $this->callAPISuccess('membership', 'create', $params);
+
+    //Update Status and check activities created.
+    $updateStatus = array(
+      'id' => $result['id'],
+      'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Cancelled'),
+    );
+    $this->callAPISuccess('Membership', 'create', $updateStatus);
+    $activities = CRM_Activity_BAO_Activity::getContactActivity($this->_contactID);
+    $this->assertEquals(2, count($activities));
+    $activityNames = array_flip(CRM_Utils_Array::collect('activity_name', $activities));
+    $this->assertArrayHasKey('Membership Signup', $activityNames);
+    $this->assertArrayHasKey('Change Membership Status', $activityNames);
+
     $this->callAPISuccess('Membership', 'Delete', array(
       'id' => $result['id'],
     ));
