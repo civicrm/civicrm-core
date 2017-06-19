@@ -916,18 +916,11 @@ AND    status IN ( 'Scheduled', 'Running', 'Paused' )
       if (!$activityTypeID) {
         if ($mailing->sms_provider_id) {
           $mailing->subject = $mailing->name;
-          $activityTypeID = CRM_Core_OptionGroup::getValue(
-            'activity_type',
-            'Mass SMS',
-            'name'
+          $activityTypeID = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Mass SMS'
           );
         }
         else {
-          $activityTypeID = CRM_Core_OptionGroup::getValue(
-            'activity_type',
-            'Bulk Email',
-            'name'
-          );
+          $activityTypeID = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Bulk Email');
         }
         if (!$activityTypeID) {
           CRM_Core_Error::fatal();
