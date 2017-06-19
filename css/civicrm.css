@@ -2337,7 +2337,7 @@ div.crm-master-accordion-header a.helpicon {
 }
 
 .crm-status-box-outer.status-start {
-  background: #F8FF03 url("../bower_components/jquery-ui/themes/smoothness/images/animated-overlay.gif");
+  background: #F8FF03 url("../i/animated-overlay.gif");
 }
 
 .crm-status-box-outer .crm-status-box-inner {
