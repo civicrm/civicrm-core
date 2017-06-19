@@ -1517,7 +1517,8 @@ class CRM_Utils_Token {
     $key = 'contribution';
     if (self::$_tokens[$key] == NULL) {
       self::$_tokens[$key] = array_keys(array_merge(CRM_Contribute_BAO_Contribution::exportableFields('All'),
-        array('campaign', 'financial_type')
+        array('campaign', 'financial_type'),
+        self::getCustomFieldTokens('Contribution')
       ));
     }
   }
@@ -1795,6 +1796,25 @@ class CRM_Utils_Token {
       'gender' => 'gender_id',
       'communication_style' => 'communication_style_id',
     );
+  }
+
+  /**
+   * Get all custom field tokens of $entity
+   *
+   * @param string $entity
+   * @param bool $usedForTokenWidget
+   *
+   * @return array $customTokens
+   *   return custom field tokens in array('custom_N' => 'label') format
+   */
+  public static function getCustomFieldTokens($entity, $usedForTokenWidget = FALSE) {
+    $customTokens = array();
+    $tokenName = $usedForTokenWidget ? "{contribution.custom_%d}" : "custom_%d";
+    foreach (CRM_Core_BAO_CustomField::getFields($entity) as $id => $info) {
+      $customTokens[sprintf($tokenName, $id)] = $info['label'];
+    }
+
+    return $customTokens;
   }
 
   /**

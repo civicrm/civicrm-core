@@ -61,7 +61,7 @@ class CRM_Event_Tokens extends \Civi\Token\AbstractTokenSubscriber {
         'contact_phone' => ts('Event Contact (Phone)'),
         'balance' => ts('Event Balance'),
       ),
-      $this->getCustomTokens('Event')
+      CRM_Utils_Token::getCustomFieldTokens('Event')
     ));
   }
 
