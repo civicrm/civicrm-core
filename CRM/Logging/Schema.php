@@ -378,7 +378,7 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
       }
       $columnsOf[$table] = array();
       while ($dao->fetch()) {
-        $columnsOf[$table][] = $dao->Field;
+        $columnsOf[$table][] = CRM_Utils_type::escape($dao->Field, 'MysqlColumnNameOrAlias');
       }
     }
 
