@@ -1891,7 +1891,7 @@ WHERE  id = $cfID
         FROM civicrm_event e
         JOIN civicrm_loc_block lb ON e.loc_block_id = lb.id
         JOIN civicrm_address a ON lb.address_id = a.id
-        LEFT OUTER JOIN ccciv.civicrm_state_province sp ON a.state_province_id = sp.id
+        LEFT OUTER JOIN civicrm_state_province sp ON a.state_province_id = sp.id
         GROUP BY a.street_address, a.supplemental_address_1, a.supplemental_address_2, a.supplemental_address_3, a.city, sp.name";
     $fields = array(
       'loc_block_id',
