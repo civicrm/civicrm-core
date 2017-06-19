@@ -560,7 +560,35 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     $this->callAPISuccessGetSingle('Address', array(
       'id' => $contribution['address_id'],
     ));
+  }
 
+  /**
+   * CRM-20745: Test the submit function correctly sets the
+   * receive date for recurring contribution.
+   */
+  public function testSubmitCreditCardWithRecur() {
+    $form = new CRM_Contribute_Form_Contribution();
+    $receiveDate = date('m/d/Y', strtotime('+1 month'));
+    $form->testSubmit(array(
+      'total_amount' => 50,
+      'financial_type_id' => 1,
+      'is_recur' => 1,
+      'frequency_interval' => 2,
+      'frequency_unit' => 'month',
+      'installments' => 2,
+      'receive_date' => $receiveDate,
+      'receive_date_time' => '11:27PM',
+      'contact_id' => $this->_individualId,
+      'payment_instrument_id' => array_search('Credit Card', $this->paymentInstruments),
+      'payment_processor_id' => $this->paymentProcessorID,
+      'credit_card_exp_date' => array('M' => 5, 'Y' => 2025),
+      'credit_card_number' => '411111111111111',
+      'billing_city-5' => 'Vancouver',
+    ), CRM_Core_Action::ADD,
+      'live'
+    );
+    $contribution = $this->callAPISuccessGetSingle('Contribution', array('return' => 'receive_date'));
+    $this->assertEquals(date("m/d/Y", strtotime($contribution['receive_date'])), $receiveDate);
   }
 
   /**
