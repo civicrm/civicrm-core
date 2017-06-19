@@ -301,10 +301,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     else {
       $this->setPageTitle($this->_ppID ? ts('Pledge Payment') : ts('Contribution'));
     }
-
-    if ($this->_id) {
-      CRM_Contribute_Form_SoftCredit::preprocess($this);
-    }
   }
 
   /**
