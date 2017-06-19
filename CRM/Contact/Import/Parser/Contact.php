@@ -543,15 +543,15 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
         $possibleMatches = $this->getPossibleContactMatches($params);
       }
       catch (CRM_Core_Exception $e) {
-       $errorMessage = $e->getMessage();
-       array_unshift($values, $errorMessage);
+        $errorMessage = $e->getMessage();
+        array_unshift($values, $errorMessage);
 
         $importRecordParams = array(
           $statusFieldName => 'ERROR',
-          "${statusFieldName}Msg" => $errorMessage
-         );
-         $this->updateImportRecord($values[count($values) - 1], $importRecordParams);
-         return CRM_Import_Parser::ERROR;
+          "${statusFieldName}Msg" => $errorMessage,
+        );
+        $this->updateImportRecord($values[count($values) - 1], $importRecordParams);
+        return CRM_Import_Parser::ERROR;
       }
       foreach ($possibleMatches as $possibleID) {
         $params['id'] = $formatted['id'] = $possibleID;
