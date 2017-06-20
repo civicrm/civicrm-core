@@ -596,7 +596,7 @@ HTACCESS;
     }
     return $_path;
   }
-  
+
   /**
    * Create the base public file path from which all our public internal directories are
    * offset. This is set in civicrm.settings.php.
