@@ -5033,13 +5033,19 @@ LIMIT 1;";
   public static function assignProportionalLineItems($trxnParams, $trxnId, $contributionTotalAmount) {
     $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($trxnParams['contribution_id']);
     if (!empty($lineItems)) {
-      // get financial item
-      list($ftIds, $taxItems) = self::getLastFinancialItemIds($trxnParams['contribution_id']);
       $entityParams = array(
         'contribution_total_amount' => $contributionTotalAmount,
         'trxn_total_amount' => $trxnParams['total_amount'],
         'trxn_id' => $trxnId,
       );
+      $lineItemTotal = CRM_Price_BAO_LineItem::getLineTotal($trxnParams['contribution_id']);
+      if ($lineItemTotal != abs($trxnParams['total_amount'])) {
+        $balAmount = CRM_Core_BAO_FinancialTrxn::getPartialPaymentWithType($trxnParams['contribution_id'], 'contribution', FALSE, $lineItemTotal);
+        $entityParams['contribution_total_amount'] = $balAmount + $trxnParams['total_amount'];
+        $entityParams['is_payment'] = TRUE;
+      }
+      // get financial item
+      list($ftIds, $taxItems) = self::getLastFinancialItemIds($trxnParams['contribution_id']);
       self::createProportionalFinancialEntries($entityParams, $lineItems, $ftIds, $taxItems);
     }
   }
@@ -5590,12 +5596,27 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
       'entity_table' => 'civicrm_financial_item',
       'financial_trxn_id' => $entityParams['trxn_id'],
     );
+    $query = "SELECT sum(ceft.amount) as trxn_amount FROM `civicrm_financial_trxn` cft
+      INNER JOIN civicrm_entity_financial_trxn ceft ON ceft.entity_table = 'civicrm_financial_item'
+        AND ceft.financial_trxn_id = cft.id AND cft.is_payment = 1
+      INNER JOIN civicrm_financial_item cfi ON cfi.id = ceft.entity_id
+      INNER JOIN civicrm_line_item cli ON cli.id = cfi.entity_id
+        AND cfi.entity_table = 'civicrm_line_item' AND cli.id = %1
+    ";
     foreach ($lineItems as $key => $value) {
       if ($value['qty'] == 0) {
         continue;
       }
       $eftParams['entity_id'] = $ftIds[$value['price_field_value_id']];
       $entityParams['line_item_amount'] = $value['line_total'];
+      if (!empty($entityParams['is_payment'])) {
+        $queryParams = array(1 => array($key, 'Integer'));
+        $paidAmount = CRM_Core_DAO::singleValueQuery($query, $queryParams);
+        $entityParams['line_item_amount'] -= $paidAmount;
+      }
+      if ($entityParams['line_item_amount'] == 0) {
+        continue;
+      }
       self::createProportionalEntry($entityParams, $eftParams);
       if (array_key_exists($value['price_field_value_id'], $taxItems)) {
         $entityParams['line_item_amount'] = $taxItems[$value['price_field_value_id']]['amount'];
