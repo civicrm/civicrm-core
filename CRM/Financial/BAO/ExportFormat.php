@@ -51,6 +51,12 @@ abstract class CRM_Financial_BAO_ExportFormat {
   static protected $_template;
 
   /**
+   * Download Exported file.
+   * @var boolean
+   */
+  public $_isDownloadFile;
+
+  /**
    * Class constructor.
    */
   public function __construct() {
