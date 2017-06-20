@@ -78,16 +78,16 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
     );
     $customField = $this->callAPISuccess('CustomField', 'create', $params);
     $customFieldKey = 'custom_' . $customField['id'];
+    $campaignTitle = 'Test Campaign ' . substr(sha1(rand()), 0, 7);
 
     $params = array(
       'contact_id' => $this->_individualId,
       'total_amount' => 6,
+      'campaign_id' => $this->campaignCreate(array('title' => $campaignTitle), FALSE),
       'financial_type_id' => 'Donation',
       $customFieldKey => 'Text_' . substr(sha1(rand()), 0, 7),
     );
     $contributionIDs = $returnProperties = array();
-    $result = $this->callAPISuccess('Contribution', 'create', $params);
-    $contributionIDs[] = $result['id'];
     $result = $this->callAPISuccess('Contribution', 'create', $params);
     $contributionIDs[] = $result['id'];
     $this->hookClass->setHook('civicrm_tokenValues', array($this, 'hookTokenValues'));
@@ -97,6 +97,8 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
     $messageToken = array(
       'contribution' => array(
         'financial_type',
+        'payment_instrument',
+        'campaign',
         $customFieldKey,
       ),
     );
@@ -106,6 +108,8 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
     $this->assertEquals('Anthony', $contacts[$this->_individualId]['first_name']);
     $this->assertEquals('emo', $contacts[$this->_individualId]['favourite_emoticon']);
     $this->assertEquals('Donation', $contributions[$result['id']]['financial_type']);
+    $this->assertEquals($campaignTitle, $contributions[$result['id']]['campaign']);
+    $this->assertEquals('Check', $contributions[$result['id']]['payment_instrument']);
     // CRM-20359: assert that contribution custom field token is rightfully replaced by its value
     $this->assertEquals($params[$customFieldKey], $contributions[$result['id']][$customFieldKey]);
 
