@@ -351,7 +351,7 @@ class CRM_Core_Selector_Controller {
           $reorderedHeaders[$key] = $columnHeader;
         }
       }
-      ksort($reorderedHeaders);
+      
       $rowsEmpty = count($rows) ? FALSE : TRUE;
       $qill = $this->getQill();
       $summary = $this->getSummary();
