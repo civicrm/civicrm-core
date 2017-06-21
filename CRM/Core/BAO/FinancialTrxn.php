@@ -169,7 +169,7 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
       $orderBy = CRM_Utils_Type::escape($orderBy, 'String');
     }
 
-    $query = "SELECT ceft.id, ceft.financial_trxn_id, cft.trxn_id FROM `civicrm_financial_trxn` cft
+    $query = "SELECT ceft.id, ceft.financial_trxn_id, ceft1.entity_id as financial_item_id, cft.trxn_id FROM `civicrm_financial_trxn` cft
 LEFT JOIN civicrm_entity_financial_trxn ceft
 ON ceft.financial_trxn_id = cft.id AND ceft.entity_table = 'civicrm_contribution'
 LEFT JOIN civicrm_entity_financial_trxn ceft1
@@ -184,6 +184,7 @@ LIMIT 1;";
     $dao = CRM_Core_DAO::executeQuery($query, $params);
     if ($dao->fetch()) {
       $ids['entityFinancialTrxnId'] = $dao->id;
+      $ids['financialItemID'] = $dao->financial_item_id;
       $ids['financialTrxnId'] = $dao->financial_trxn_id;
       $ids['trxn_id'] = $dao->trxn_id;
     }
@@ -727,6 +728,55 @@ WHERE ft.is_payment = 1
       $trxnparams['pan_truncation'] = $panTruncation;
     }
     civicrm_api3('FinancialTrxn', 'create', $trxnparams);
+  }
+
+  /**
+   * The function is responsible for handling financial entries if payment instrument is changed
+   *
+   * @param array $inputParams
+   *
+   */
+  public static function updateFinancialAccountsOnPaymentInstrumentChange($inputParams) {
+    $prevContribution = $inputParams['prevContribution'];
+    $currentContribution = $inputParams['contribution'];
+
+    $deferredFinancialAccount = CRM_Utils_Array::value('deferred_financial_account_id', $inputParams);
+    if (empty($deferredFinancialAccount)) {
+      $deferredFinancialAccount = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($prevContribution->financial_type_id, 'Deferred Revenue Account is');
+    }
+
+    $lastFinancialTrxnId = self::getFinancialTrxnId($prevContribution->id, 'DESC', FALSE, NULL, $deferredFinancialAccount);
+    // If payment instrument is changed reverse the last payment
+    //  in terms of reversing financial item and trxn
+    if (!empty($lastFinancialTrxnId['financialTrxnId'])) {
+      $lastFinancialTrxn = civicrm_api3('FinancialTrxn', 'getsingle', array('id' => $lastFinancialTrxnId['financialTrxnId']));
+      unset($lastFinancialTrxn['id']);
+      $lastFinancialTrxn['trxn_date'] = $inputParams['trxnParams']['trxn_date'];
+      $lastFinancialTrxn['total_amount'] = -$lastFinancialTrxn['total_amount'];
+      $lastFinancialTrxn['net_amount'] = -$lastFinancialTrxn['net_amount'];
+      $lastFinancialTrxn['fee_amount'] = -$lastFinancialTrxn['fee_amount'];
+      $lastFinancialTrxn['contribution_id'] = $prevContribution->id;
+      $trxn = CRM_Core_BAO_FinancialTrxn::create($lastFinancialTrxn);
+      // reverse financial item too
+      if (!empty($lastFinancialTrxnId['financialItemID'])) {
+        $lastFinancialItem = civicrm_api3('FinancialItem', 'getsingle', array('id' => $lastFinancialTrxnId['financialItemID']));
+        unset($lastFinancialItem['id']);
+        $lastFinancialItem['amount'] = -$lastFinancialItem['amount'];
+        $lastFinancialItem['created_date'] = date('YmdHis');
+        $lastFinancialItem['transaction_date'] = $inputParams['trxnParams']['trxn_date'];
+        $trxnParams = array('id' => $trxn->id);
+        CRM_Financial_BAO_FinancialItem::create($lastFinancialItem, NULL, $trxnParams);
+      }
+    }
+
+    $trxn = CRM_Core_BAO_FinancialTrxn::create($inputParams['trxnParams']);
+    // store financial item Proportionaly.
+    $trxnParams = array(
+      'total_amount' => $trxn->total_amount,
+      'contribution_id' => $currentContribution->id,
+    );
+    CRM_Contribute_BAO_Contribution::assignProportionalLineItems($trxnParams, $trxn->id, $prevContribution->total_amount);
+    self::createDeferredTrxn(CRM_Utils_Array::value('line_item', $inputParams), $currentContribution, TRUE, 'changePaymentInstrument');
   }
 
 }
