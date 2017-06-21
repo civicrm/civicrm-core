@@ -430,6 +430,14 @@ class civicrm_cli_csv_file extends civicrm_cli {
         continue;
       }
       $this->row++;
+      if ($this->row % 1000 == 0) {
+        // Reset PEAR_DB_DATAOBJECT cache to prevent memory leak
+        $GLOBALS['_DB_DATAOBJECT']['RESULTS'] = array();
+        $GLOBALS['_DB_DATAOBJECT']['RESULTSEQ'] = 1;
+        $GLOBALS['_DB_DATAOBJECT']['RESULTFIELDS'] = array();
+        // Forces garbage collection
+        memory_get_usage(true);
+      }
       $params = $this->convertLine($data);
       $this->processLine($params);
     }
