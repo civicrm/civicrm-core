@@ -3397,23 +3397,14 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
         );
       }
       if ($context == 'paymentInstrument') {
-        $compareParams += array(
-          'to_financial_account_id' => CRM_Financial_BAO_FinancialTypeAccount::getInstrumentFinancialAccount(4),
-          'payment_instrument_id' => 4,
-        );
-      }
-      else {
-        $compareParams['to_financial_account_id'] = 12;
-      }
-      $this->assertDBCompareValues('CRM_Financial_DAO_FinancialTrxn', $trxnParams1, array_merge($compareParams, $extraParams));
-      $compareParams['total_amount'] = 100;
-      if ($context == 'paymentInstrument') {
         $compareParams['to_financial_account_id'] = CRM_Financial_BAO_FinancialTypeAccount::getInstrumentFinancialAccount($instrumentId);
         $compareParams['payment_instrument_id'] = $instrumentId;
       }
       else {
         $compareParams['to_financial_account_id'] = 12;
       }
+      $this->assertDBCompareValues('CRM_Financial_DAO_FinancialTrxn', $trxnParams1, array_merge($compareParams, $extraParams));
+      $compareParams['total_amount'] = 100;
     }
 
     $this->assertDBCompareValues('CRM_Financial_DAO_FinancialTrxn', $params, array_merge($compareParams, $extraParams));
