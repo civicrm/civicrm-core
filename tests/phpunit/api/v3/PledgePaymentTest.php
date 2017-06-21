@@ -88,6 +88,54 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test status of pledge on payments and cancellation.
+   */
+  public function testPledgeStatus() {
+    //Status should initially be Pending.
+    $checkStatus = $this->callAPISuccess('pledge', 'getsingle', array(
+      'id' => $this->_pledgeID,
+      'return' => 'pledge_status',
+    ));
+    $this->assertEquals('Pending', $checkStatus['pledge_status']);
+
+    //Make first payment.
+    $paymentParams = array(
+      'contact_id' => $this->_individualId,
+      'pledge_id' => $this->_pledgeID,
+      'contribution_id' => $this->_contributionID,
+      'status_id' => 1,
+    );
+    $firstPayment = $this->callAPISuccess('pledge_payment', 'create', $paymentParams);
+
+    //Status should be 'In Progress' after first payment.
+    $checkStatus = $this->callAPISuccess('pledge', 'getsingle', array(
+      'id' => $this->_pledgeID,
+      'return' => 'pledge_status',
+    ));
+    $this->assertEquals('In Progress', $checkStatus['pledge_status']);
+
+    //Cancel the Pledge.
+    $paymentStatusTypes = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+    $updateParams = array(
+      'id' => $this->_pledgeID,
+      'status_id' => array_search('Cancelled', $paymentStatusTypes),
+    );
+    $this->callAPISuccess('pledge', 'create', $updateParams);
+
+    //Status should be calculated as Cancelled.
+    $pledgeStatus = CRM_Pledge_BAO_PledgePayment::calculatePledgeStatus($this->_pledgeID);
+    $this->assertEquals('Cancelled', $paymentStatusTypes[$pledgeStatus]);
+
+    //Already completed payments should not be cancelled.
+    $checkPaymentStatus = $this->callAPISuccess('pledge_payment', 'getsingle', array(
+      'id' => $firstPayment['id'],
+      'return' => 'status_id',
+    ));
+    $this->assertEquals(array_search('Completed', $paymentStatusTypes), $checkPaymentStatus['status_id']);
+  }
+
+
+  /**
    * Test that passing in a single variable works:: status_id
    */
   public function testGetSinglePledgePaymentByStatusID() {
