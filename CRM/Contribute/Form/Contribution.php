@@ -307,7 +307,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * @return array
    */
   public function setDefaultValues() {
-
     $defaults = $this->_values;
 
     // Set defaults for pledge payment.
@@ -364,12 +363,11 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       }
     }
 
-    if (isset($defaults['non_deductible_amount'])) {
-      $defaults['non_deductible_amount'] = CRM_Utils_Money::format($defaults['non_deductible_amount'], NULL, '%a');
-    }
-
-    if (isset($defaults['fee_amount'])) {
-      $defaults['fee_amount'] = CRM_Utils_Money::format($defaults['fee_amount'], NULL, '%a');
+    $amountFields = array('non_deductible_amount', 'fee_amount', 'net_amount');
+    foreach ($amountFields as $amt) {
+      if (isset($defaults[$amt])) {
+        $defaults[$amt] = CRM_Utils_Money::format($defaults[$amt], NULL, '%a');
+      }
     }
 
     if ($this->_contributionType) {
