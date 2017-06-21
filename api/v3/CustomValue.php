@@ -363,13 +363,13 @@ function civicrm_api3_custom_value_gettree($params) {
       unset($field['customValue']);
       if (!empty($fieldInfo['customValue'])) {
         $field['value'] = CRM_Utils_Array::first($fieldInfo['customValue']);
+        if (!$toReturn['custom_value'] || in_array('display', $toReturn['custom_value'])) {
+          $field['value']['display'] = CRM_Core_BAO_CustomField::displayValue($field['value']['data'], $fieldInfo);
+        }
         foreach (array_keys($field['value']) as $key) {
           if ($toReturn['custom_value'] && !in_array($key, $toReturn['custom_value'])) {
             unset($field['value'][$key]);
           }
-        }
-        if (!$toReturn['custom_value'] || in_array('display', $toReturn['custom_value'])) {
-          $field['value']['display'] = CRM_Core_BAO_CustomField::displayValue($field['value']['data'], $fieldInfo);
         }
       }
       if (empty($params['sequential'])) {
