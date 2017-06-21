@@ -188,7 +188,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
     $membershipRecords = FALSE;
     if ($this->_action & CRM_Core_Action::UPDATE) {
       $result = civicrm_api3("Membership", "get", array("membership_type_id" => $this->_id, "options" => array("limit" => 1)));
-      $membershipRecords = $result["count"] > 0;
+      $membershipRecords = ($result["count"] > 0);
       if ($membershipRecords) {
         $memberRel->freeze();
       }
