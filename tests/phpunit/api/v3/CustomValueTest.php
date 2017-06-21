@@ -428,7 +428,19 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
       ),
     ));
     $this->assertEquals(array('2', '3'), $tree['values']['TestGettree']['fields']['got_options']['value']['data']);
+    $this->assertEquals('Two, Three', $tree['values']['TestGettree']['fields']['got_options']['value']['display']);
     $this->assertEquals(array('id', 'fields'), array_keys($tree['values']['TestGettree']));
+
+    // Ensure display values are returned even if data is not
+    $tree = $this->callAPISuccess('CustomValue', 'gettree', array(
+      'entity_type' => 'Contact',
+      'entity_id' => $contact,
+      'return' => array(
+        'custom_value.display',
+      ),
+    ));
+    $this->assertEquals('Two, Three', $tree['values']['TestGettree']['fields']['got_options']['value']['display']);
+    $this->assertFalse(isset($tree['values']['TestGettree']['fields']['got_options']['value']['data']));
 
     // Verify that custom set appears for individuals even who don't have any custom data
     $contact2 = $this->individualCreate();
