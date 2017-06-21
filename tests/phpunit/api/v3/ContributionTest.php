@@ -2833,6 +2833,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'receipt_date' => '',
       'receipt_date_time' => '',
       'payment_processor_id' => $this->paymentProcessorID,
+      'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_DAO_Contribution', 'payment_instrument_id', 'Credit Card'),
       'currency' => 'USD',
       'contribution_page_id' => $this->_ids['contribution_page'],
       'contribution_mode' => 'membership',

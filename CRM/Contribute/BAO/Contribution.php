@@ -3375,6 +3375,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         // instrument is null and now new payment instrument is added along with the payment
         $params['trxnParams']['payment_instrument_id'] = $params['contribution']->payment_instrument_id;
         $params['trxnParams']['check_number'] = CRM_Utils_Array::value('check_number', $params);
+        $financialAccountsUpdatedOnPIChange = FALSE;
         if (array_key_exists('payment_instrument_id', $params)) {
           if (CRM_Utils_System::isNull($params['prevContribution']->payment_instrument_id) &&
             !CRM_Utils_System::isNull($params['contribution']->payment_instrument_id)
@@ -3384,25 +3385,26 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
             if (!($params['contribution']->contribution_status_id == array_search('Completed', $contributionStatuses) &&
               in_array($params['prevContribution']->contribution_status_id, $pendingStatus))
             ) {
-              CRM_Core_BAO_FinancialTrxn::updateFinancialAccountsOnPaymentInstrumentChange($params);
-              $updated = TRUE;
+              $financialAccountsUpdatedOnPIChange = TRUE;
             }
           }
           elseif ((!CRM_Utils_System::isNull($params['contribution']->payment_instrument_id) ||
               !CRM_Utils_System::isNull($params['prevContribution']->payment_instrument_id)) &&
             $params['contribution']->payment_instrument_id != $params['prevContribution']->payment_instrument_id
           ) {
-            CRM_Core_BAO_FinancialTrxn::updateFinancialAccountsOnPaymentInstrumentChange($params);
-            $updated = TRUE;
+            $financialAccountsUpdatedOnPIChange = TRUE;
           }
           elseif (!CRM_Utils_System::isNull($params['contribution']->check_number) &&
             $params['contribution']->check_number != $params['prevContribution']->check_number
           ) {
             // another special case when check number is changed, create new financial records
             // create financial trxn with negative amount
-            CRM_Core_BAO_FinancialTrxn::updateFinancialAccountsOnPaymentInstrumentChange($params);
-            $updated = TRUE;
+            $financialAccountsUpdatedOnPIChange = TRUE;
           }
+        }
+
+        if ($financialAccountsUpdatedOnPIChange) {
+          $updated = CRM_Core_BAO_FinancialTrxn::updateFinancialAccountsOnPaymentInstrumentChange($params);
         }
 
         //if Change contribution amount
@@ -3410,9 +3412,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         $params['trxnParams']['net_amount'] = CRM_Utils_Array::value('net_amount', $params);
         $params['trxnParams']['total_amount'] = $trxnParams['total_amount'] = $params['total_amount'] = $totalAmount;
         $params['trxnParams']['trxn_id'] = $params['contribution']->trxn_id;
-        if (isset($totalAmount) &&
-          $totalAmount != $params['prevContribution']->total_amount
-        ) {
+        if (!$financialAccountsUpdatedOnPIChange && (isset($totalAmount) && $totalAmount != $params['prevContribution']->total_amount)) {
           //Update Financial Records
           $params['trxnParams']['from_financial_account_id'] = NULL;
           self::updateFinancialAccounts($params, 'changedAmount');
@@ -5499,7 +5499,8 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
     $sql = "SELECT fi.id, li.price_field_value_id, li.tax_amount, fi.financial_account_id
       FROM civicrm_financial_item fi
       INNER JOIN civicrm_line_item li ON li.id = fi.entity_id and fi.entity_table = 'civicrm_line_item'
-      WHERE li.contribution_id = %1";
+      WHERE li.contribution_id = %1
+    ";
     $dao = CRM_Core_DAO::executeQuery($sql, array(1 => array($contributionId, 'Integer')));
     $ftIds = $taxItems = array();
     $salesTaxFinancialAccount = self::getSalesTaxFinancialAccounts();
