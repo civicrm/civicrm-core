@@ -128,6 +128,7 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
         'check_permissions' => FALSE,
         'options' => array(
           'limit' => 0,
+          'sort' => array('weight', 'label'),
         ),
     ));
     $customOption = $priceOptions['values'];
