@@ -3889,4 +3889,22 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     }
   }
 
+
+  /**
+   * Instantiate form object.
+   *
+   * We need to instantiate the form to run preprocess, which means we have to trick it about the request method.
+   *
+   * @param string $class
+   *   Name of form class.
+   *
+   * @return \CRM_Core_Form
+   */
+  public function getFormObject($class) {
+    $form = new $class();
+    $_SERVER['REQUEST_METHOD'] = 'GET';
+    $form->controller = new CRM_Core_Controller();
+    return $form;
+  }
+
 }

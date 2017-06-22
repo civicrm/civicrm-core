@@ -108,22 +108,19 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
   /**
    * Get the list of mappings.
    *
-   * @param string $mappingTypeId
-   *   Mapping type id.
+   * @param string $mappingType
+   *   Mapping type name.
    *
    * @return array
-   *   array of mapping name
+   *   Array of mapping names, keyed by id.
    */
-  public static function getMappings($mappingTypeId) {
+  public static function getMappings($mappingType) {
+    $result = civicrm_api3('Mapping', 'get', array('mapping_type_id' => $mappingType, 'options' => array('limit' => 1, 'sort' => 'name')));
     $mapping = array();
-    $mappingDAO = new CRM_Core_DAO_Mapping();
-    $mappingDAO->mapping_type_id = $mappingTypeId;
-    $mappingDAO->find();
 
-    while ($mappingDAO->fetch()) {
-      $mapping[$mappingDAO->id] = $mappingDAO->name;
+    foreach ($result['values'] as $key => $value) {
+      $mapping[$key] = $value['name'];
     }
-
     return $mapping;
   }
 
