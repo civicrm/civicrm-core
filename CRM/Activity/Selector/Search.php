@@ -197,9 +197,7 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
     // type of selector
     $this->_action = $action;
     $this->_query = new CRM_Contact_BAO_Query($this->_queryParams,
-      CRM_Activity_BAO_Query::defaultReturnProperties(CRM_Contact_BAO_Query::MODE_ACTIVITY,
-        FALSE
-      ),
+      CRM_Activity_BAO_Query::selectorReturnProperties(),
       NULL, FALSE, FALSE,
       CRM_Contact_BAO_Query::MODE_ACTIVITY
     );
@@ -285,6 +283,7 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
       if (empty($result->activity_id)) {
         continue;
       }
+      $this->_query->convertToPseudoNames($result);
 
       // the columns we are interested in
       foreach (self::$_properties as $property) {

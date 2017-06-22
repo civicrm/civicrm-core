@@ -677,7 +677,6 @@ class CRM_Contact_BAO_Query {
         ($name == 'parent_id')
       ) {
         CRM_Activity_BAO_Query::select($this);
-        continue;
       }
 
       // if this is a hierarchical name, we ignore it
@@ -859,11 +858,11 @@ class CRM_Contact_BAO_Query {
                 // If we have an option group defined then rather than joining the option value table in
                 // (which is an unindexed join) we render the option value on output.
                 // @todo - extend this to other pseudoconstants.
-                if ($this->pseudoConstantNameIsInReturnProperties($field)) {
+                if ($this->pseudoConstantNameIsInReturnProperties($field, $name)) {
                   $pseudoFieldName = $field['pseudoconstant']['optionGroupName'];
                   $this->_pseudoConstantsSelect[$pseudoFieldName] = array(
                     'pseudoField' => $field['name'],
-                    'idCol' => $field['name'],
+                    'idCol' => $name,
                     'field_name' => $field['name'],
                     'bao' => $field['bao'],
                     'pseudoconstant' => $field['pseudoconstant'],
@@ -6431,10 +6430,12 @@ AND   displayRelType.is_active = 1
    * have been requested. Payment_instrument is the option groun name field value.
    *
    * @param array $field
+   * @param string $fieldName
+   *   The unique name of the field - ie. the one it will be aliased to in the query.
    *
    * @return bool
    */
-  private function pseudoConstantNameIsInReturnProperties($field) {
+  private function pseudoConstantNameIsInReturnProperties($field, $fieldName = NULL) {
     if (!isset($field['pseudoconstant']['optionGroupName'])) {
       return FALSE;
     }
@@ -6442,6 +6443,11 @@ AND   displayRelType.is_active = 1
     if (CRM_Utils_Array::value($field['pseudoconstant']['optionGroupName'], $this->_returnProperties)) {
       return TRUE;
     }
+    if (CRM_Utils_Array::value($fieldName, $this->_returnProperties)) {
+      return TRUE;
+    }
+    // Is this still required - the above goes off the unique name. Test with things like
+    // communication_prefferences & prefix_id.
     if (CRM_Utils_Array::value($field['name'], $this->_returnProperties)) {
       return TRUE;
     }
