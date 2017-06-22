@@ -61,6 +61,12 @@
                 <td class="label">{$form.is_active.label}</td>
                 <td>{$form.is_active.html}</td>
             </tr>
+            <tr class="crm-relationship-type-form-block-is_bidirectional">
+                <td class="label">{$form.is_bidirectional.label}</td>
+                <td>{$form.is_bidirectional.html}<br />
+                  <span class="description">{ts}Can this relationship exist in both directions simultaneously (eg A follows B and B follows A). If no, CiviCRM rejects the second relationship's creation as being a duplicate.{/ts}</span>
+                </td>
+            </tr>
         </table>
     {/if}
     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>

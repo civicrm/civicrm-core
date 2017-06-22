@@ -84,6 +84,9 @@ class CRM_Admin_Form_RelationshipType extends CRM_Admin_Form {
 
     $isActive = &$this->add('checkbox', 'is_active', ts('Enabled?'));
 
+    // CRM-19630
+    $this->add('checkbox', 'is_bidirectional', ts('Bi-Directional?'));
+
     //only selected field should be allow for edit, CRM-4888
     if ($this->_id &&
       CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_RelationshipType', $this->_id, 'is_reserved')
@@ -142,6 +145,8 @@ class CRM_Admin_Form_RelationshipType extends CRM_Admin_Form {
       // store the submitted values in an array
       $params = $this->exportValues();
       $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
+      // CRM-19630
+      $params['is_bidirectional'] = CRM_Utils_Array::value('is_bidirectional', $params, 0);
 
       if ($this->_action & CRM_Core_Action::UPDATE) {
         $ids['relationshipType'] = $this->_id;

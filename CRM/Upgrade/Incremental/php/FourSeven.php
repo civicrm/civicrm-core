@@ -360,6 +360,16 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
       'civicrm_mail_settings', 'activity_status', "varchar (255) DEFAULT NULL COMMENT 'Name of status to use when creating email to activity.'");
   }
 
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_4_7_22($rev) {
+    $this->addTask(ts('Add column to support bi-directional relationship types'), 'addColumn',
+      'civicrm_relationship_type', 'is_bidirectional', "tinyint(4) DEFAULT '0' COMMENT 'Can this relationship type be used bi-directionaly?'");
+  }
+
   /*
    * Important! All upgrade functions MUST add a 'runSql' task.
    * Uncomment and use the following template for a new upgrade version
