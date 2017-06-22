@@ -320,7 +320,6 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
           $cType = 'All';
         }
 
-        $relatedFields = array();
         $relatedFields = CRM_Contact_BAO_Contact::importableFields($cType);
         unset($relatedFields['']);
         $values = array();
@@ -632,7 +631,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
         $errors['saveMappingName'] = ts('Name is required to save Import Mapping');
       }
       else {
-        $mappingTypeId = CRM_Core_OptionGroup::getValue('mapping_type', 'Import Contact', 'name');
+        $mappingTypeId = CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Mapping', 'mapping_type_id', 'Import Contact');
         if (CRM_Core_BAO_Mapping::checkMapping($nameField, $mappingTypeId)) {
           $errors['saveMappingName'] = ts('Duplicate Import Mapping Name');
         }
