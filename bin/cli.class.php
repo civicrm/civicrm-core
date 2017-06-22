@@ -436,7 +436,7 @@ class civicrm_cli_csv_file extends civicrm_cli {
         $GLOBALS['_DB_DATAOBJECT']['RESULTSEQ'] = 1;
         $GLOBALS['_DB_DATAOBJECT']['RESULTFIELDS'] = array();
         // Forces garbage collection
-        memory_get_usage(true);
+        memory_get_usage(TRUE);
       }
       $params = $this->convertLine($data);
       $this->processLine($params);
