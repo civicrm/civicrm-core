@@ -258,6 +258,10 @@ class CRM_Core_CodeGen_Specification {
         }
       }
       $table['foreignKey'] = &$foreign;
+
+      $fkIndex = $this->getForeignKeyIndices($foreign, $fields);
+      CRM_Core_BAO_SchemaHandler::addIndexSignature($name, $fkIndex);
+      $table['foreignKeyIndex'] = &$fkIndex;
     }
 
     if ($this->value('dynamicForeignKey', $tableXML)) {
@@ -608,6 +612,24 @@ class CRM_Core_CodeGen_Specification {
       'onDelete' => $this->value('onDelete', $foreignXML, FALSE),
     );
     $foreignKeys[$name] = &$foreignKey;
+  }
+
+  /**
+   * construct an index array for the FK like the ones specified for non-FK indices
+   * @param  [array] $foreign foreign key array
+   * @param  [array] $fields  array of table fields
+   * @return [array]          index definition
+   */
+  public function getForeignKeyIndices($foreign, $fields) {
+    $index = array();
+    foreach ($foreign as $fk) {
+      $index[$fk['uniqName']] = array(
+        'name' => $fk['uniqName'],
+        'field' => array($fk['name']),
+        'localizable' => $fields[$fk['name']]['localizable'],
+      );
+    }
+    return $index;
   }
 
   /**
