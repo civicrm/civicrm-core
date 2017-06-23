@@ -550,6 +550,30 @@ class InstallRequirements {
   }
 
   /**
+   * Connect via mysqli.
+   *
+   * This is exactly the same as mysqli_connect(), except that it accepts
+   * the port as part of the `$host`.
+   *
+   * @param $host
+   * @param $username
+   * @param $password
+   * @param string $database
+   * @return \mysqli
+   */
+  protected function connect($host, $username, $password, $database = '') {
+    $hostParts = explode(':', $host);
+    if (count($hostParts) > 1) {
+      list ($host, $port) = $hostParts;
+    }
+    else {
+      $port = '';
+    }
+    $conn = @mysqli_connect($host, $username, $password, $database, $port);
+    return $conn;
+  }
+
+  /**
    * Check everything except the database.
    */
   public function check() {
@@ -949,7 +973,7 @@ class InstallRequirements {
    */
   public function requireMysqlConnection($server, $username, $password, $testDetails) {
     $this->testing($testDetails);
-    $this->conn = @mysqli_connect($server, $username, $password);
+    $this->conn = $this->connect($server, $username, $password);
 
     if ($this->conn) {
       return TRUE;
@@ -966,7 +990,7 @@ class InstallRequirements {
    */
   public function requireMySQLServer($server, $testDetails) {
     $this->testing($testDetails);
-    $conn = @mysqli_connect($server, NULL, NULL);
+    $conn = $this->connect($server, NULL, NULL);
 
     if ($conn || mysqli_connect_errno() < 2000) {
       return TRUE;
@@ -1011,7 +1035,7 @@ class InstallRequirements {
    */
   public function requireMySQLInnoDB($server, $username, $password, $database, $testDetails) {
     $this->testing($testDetails);
-    $conn = @mysqli_connect($server, $username, $password);
+    $conn = $this->connect($server, $username, $password);
     if (!$conn) {
       $testDetails[2] .= ' ' . ts("Could not determine if MySQL has InnoDB support. Assuming no.");
       $this->error($testDetails);
@@ -1046,7 +1070,7 @@ class InstallRequirements {
    */
   public function requireMySQLTempTables($server, $username, $password, $database, $testDetails) {
     $this->testing($testDetails);
-    $conn = @mysqli_connect($server, $username, $password);
+    $conn = $this->connect($server, $username, $password);
     if (!$conn) {
       $testDetails[2] = ts('Could not login to the database.');
       $this->error($testDetails);
@@ -1076,7 +1100,7 @@ class InstallRequirements {
    */
   public function requireMySQLTrigger($server, $username, $password, $database, $testDetails) {
     $this->testing($testDetails);
-    $conn = @mysqli_connect($server, $username, $password);
+    $conn = $this->connect($server, $username, $password);
     if (!$conn) {
       $testDetails[2] = ts('Could not login to the database.');
       $this->error($testDetails);
@@ -1116,7 +1140,7 @@ class InstallRequirements {
    */
   public function requireMySQLLockTables($server, $username, $password, $database, $testDetails) {
     $this->testing($testDetails);
-    $conn = @mysqli_connect($server, $username, $password);
+    $conn = $this->connect($server, $username, $password);
     if (!$conn) {
       $testDetails[2] = ts('Could not connect to the database server.');
       $this->error($testDetails);
@@ -1163,7 +1187,7 @@ class InstallRequirements {
    */
   public function requireMySQLAutoIncrementIncrementOne($server, $username, $password, $testDetails) {
     $this->testing($testDetails);
-    $conn = @mysqli_connect($server, $username, $password);
+    $conn = $this->connect($server, $username, $password);
     if (!$conn) {
       $testDetails[2] = ts('Could not connect to the database server.');
       $this->error($testDetails);
@@ -1197,7 +1221,7 @@ class InstallRequirements {
    */
   public function requireMySQLThreadStack($server, $username, $password, $database, $minValueKB, $testDetails) {
     $this->testing($testDetails);
-    $conn = @mysqli_connect($server, $username, $password);
+    $conn = $this->connect($server, $username, $password);
     if (!$conn) {
       $testDetails[2] = ts('Could not connect to the database server.');
       $this->error($testDetails);
@@ -1241,7 +1265,7 @@ class InstallRequirements {
     $onlyRequire = FALSE
   ) {
     $this->testing($testDetails);
-    $conn = @mysqli_connect($server, $username, $password);
+    $conn = $this->connect($server, $username, $password);
 
     $okay = NULL;
     if (@mysqli_select_db($conn, $database)) {
@@ -1380,7 +1404,7 @@ class Installer extends InstallRequirements {
    * @param $database
    */
   public function createDatabaseIfNotExists($server, $username, $password, $database) {
-    $conn = @mysqli_connect($server, $username, $password);
+    $conn = $this->connect($server, $username, $password);
 
     if (@mysqli_select_db($conn, $database)) {
       // skip if database already present
