@@ -484,6 +484,87 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
   }
 
   /**
+   * CRM-19653 : Test that custom field data should/shouldn't be overriden on
+   *   selecting/not selecting option to migrate data respectively
+   */
+  public function testCustomDataOverwrite() {
+    $this->setupMatchData();
+
+    $originalContactID = $this->contacts[0]['id'];
+    $duplicateContactID1 = $this->contacts[1]['id']; // used as duplicate contact in 1st use-case
+    $duplicateContactID2 = $this->contacts[2]['id']; // used as duplicate contact in 2nd use-case
+
+    // create custom set that extends Individual
+    $createGroup = $this->callAPISuccess('custom_group', 'create', array(
+      'title' => 'Test_Group',
+      'name' => 'test_group',
+      'extends' => array('Individual'),
+      'style' => 'Inline',
+      'is_multiple' => FALSE,
+      'is_active' => 1,
+    ));
+    // create custom field of HTML type 'Text'
+    $createField = $this->callAPISuccess('custom_field', 'create', array(
+      'label' => 'Graduation',
+      'data_type' => 'Alphanumeric',
+      'html_type' => 'Text',
+      'custom_group_id' => $createGroup['id'],
+    ));
+    $customFieldName = "custom_" . $createField['id'];
+    // update the text custom field for original contact with value 'abc'
+    $this->callAPISuccess('Contact', 'create', array(
+      'id' => $originalContactID,
+      $customFieldName => 'abc',
+    ));
+    // update the text custom field for duplicate contact 1 with value 'def'
+    $this->callAPISuccess('Contact', 'create', array(
+      'id' => $duplicateContactID1,
+      "custom_{$customFieldName}" => 'def',
+    ));
+    // update the text custom field for duplicate contact 2 with value 'ghi'
+    $this->callAPISuccess('Contact', 'create', array(
+      'id' => $duplicateContactID2,
+      "custom_{$customFieldName}" => 'ghi',
+    ));
+
+    /*** USE-CASE 1: DO NOT OVERWRITE CUSTOM FIELD VALUE **/
+    $rowsElementsAndInfo = CRM_Dedupe_Merger::getRowsElementsAndInfo($originalContactID, $duplicateContactID1);
+    $migrationData = array(
+      'main_details' => $rowsElementsAndInfo['main_details'],
+      'other_details' => $rowsElementsAndInfo['other_details'],
+      "move_{$customFieldName}" => NULL,
+    );
+    // migrate data of duplicate contact
+    CRM_Dedupe_Merger::moveAllBelongings($originalContactID, $duplicateContactID1, $migrationData);
+    $data = $this->callAPISuccess('Contact', 'getsingle', array(
+      'id' => $originalContactID,
+      'return' => array($customFieldName),
+    ));
+    // ensure that the value is not overridden
+    $this->assertEquals('abc', $data[$customFieldName], 'Custom field value wasn\'t suppose to be overridden with duplicate contact');
+
+    /*** USE-CASE 2: OVERWRITE CUSTOM FIELD VALUE **/
+    $rowsElementsAndInfo = CRM_Dedupe_Merger::getRowsElementsAndInfo($originalContactID, $duplicateContactID2);
+    $migrationData = array(
+      'main_details' => $rowsElementsAndInfo['main_details'],
+      'other_details' => $rowsElementsAndInfo['other_details'],
+      "move_{$customFieldName}" => 'ghi',
+    );
+    // migrate data of duplicate contact
+    CRM_Dedupe_Merger::moveAllBelongings($originalContactID, $duplicateContactID2, $migrationData);
+    $data = $this->callAPISuccess('Contact', 'getsingle', array(
+      'id' => $originalContactID,
+      'return' => array($customFieldName),
+    ));
+    // ensure that value is overridden
+    $this->assertEquals('ghi', $data[$customFieldName], 'Custom field value was suppose to be overridden with duplicate contact');
+
+    // cleanup created custom set
+    $this->callAPISuccess('CustomField', 'delete', array('id' => $createField['id']));
+    $this->callAPISuccess('CustomGroup', 'delete', array('id' => $createGroup['id']));
+  }
+
+  /**
    * Set up some contacts for our matching.
    */
   public function setupMatchData() {

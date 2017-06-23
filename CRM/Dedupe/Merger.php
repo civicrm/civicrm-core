@@ -1567,18 +1567,19 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
             if (!empty($customfieldValues[$key])) {
               $existingValue = explode(CRM_Core_DAO::VALUE_SEPARATOR, $customfieldValues[$key]);
               if (is_array($existingValue) && !empty($existingValue)) {
-                $mergeValue = $submmtedCustomValue = array();
+                $mergeValue = $submittedCustomValue = array();
                 if ($value == 'null') {
                   // CRM-19074 if someone has deliberately chosen to overwrite with 'null', respect it.
                   $submitted[$key] = $value;
                 }
                 else {
                   if ($value) {
-                    $submmtedCustomValue = explode(CRM_Core_DAO::VALUE_SEPARATOR, $value);
+                    $submittedCustomValue = explode(CRM_Core_DAO::VALUE_SEPARATOR, $value);
                   }
 
-                  //hack to remove null and duplicate values from array.
-                  foreach (array_merge($submmtedCustomValue, $existingValue) as $k => $v) {
+                  // CRM-19653: overwrite or add the existing custom field value with dupicate contact's
+                  // custom field value stored at $submittedCustomValue.
+                  foreach ($submittedCustomValue as $k => $v) {
                     if ($v != '' && !in_array($v, $mergeValue)) {
                       $mergeValue[] = $v;
                     }
