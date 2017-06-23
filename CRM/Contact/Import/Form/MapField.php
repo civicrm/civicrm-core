@@ -665,11 +665,59 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
       $this->controller->resetPage($this->_name);
       return;
     }
-
-    $mapper = array();
-    $mapperKeys = array();
     $mapperKeys = $this->controller->exportValue($this->_name, 'mapper');
-    $mapperKeysMain = array();
+
+    $parser = $this->submit($params, $mapperKeys);
+
+    // add all the necessary variables to the form
+    $parser->set($this);
+  }
+
+  /**
+   * Format custom field name.
+   *
+   * Combine group and field name to avoid conflict.
+   *
+   * @param array $fields
+   *
+   * @return array
+   */
+  public function formatCustomFieldName(&$fields) {
+    //CRM-2676, replacing the conflict for same custom field name from different custom group.
+    $fieldIds = $formattedFieldNames = array();
+    foreach ($fields as $key => $value) {
+      if ($customFieldId = CRM_Core_BAO_CustomField::getKeyID($key)) {
+        $fieldIds[] = $customFieldId;
+      }
+    }
+
+    if (!empty($fieldIds) && is_array($fieldIds)) {
+      $groupTitles = CRM_Core_BAO_CustomGroup::getGroupTitles($fieldIds);
+
+      if (!empty($groupTitles)) {
+        foreach ($groupTitles as $fId => $values) {
+          $key = "custom_{$fId}";
+          $groupTitle = $values['groupTitle'];
+          $formattedFieldNames[$key] = $fields[$key] . ' :: ' . $groupTitle;
+        }
+      }
+    }
+
+    return $formattedFieldNames;
+  }
+
+  /**
+   * Main submit function.
+   *
+   * Extracted to add testing & start refactoring.
+   *
+   * @param $params
+   * @param $mapperKeys
+   *
+   * @return \CRM_Contact_Import_Parser_Contact
+   */
+  public function submit($params, $mapperKeys) {
+    $mapper = $mapperKeysMain = array();
 
     $phoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
     $imProviders = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
@@ -968,42 +1016,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
       $this->get('contactSubType'),
       $this->get('dedupe')
     );
-
-    // add all the necessary variables to the form
-    $parser->set($this);
-  }
-
-  /**
-   * Format custom field name.
-   *
-   * Combine group and field name to avoid conflict.
-   *
-   * @param array $fields
-   *
-   * @return array
-   */
-  public function formatCustomFieldName(&$fields) {
-    //CRM-2676, replacing the conflict for same custom field name from different custom group.
-    $fieldIds = $formattedFieldNames = array();
-    foreach ($fields as $key => $value) {
-      if ($customFieldId = CRM_Core_BAO_CustomField::getKeyID($key)) {
-        $fieldIds[] = $customFieldId;
-      }
-    }
-
-    if (!empty($fieldIds) && is_array($fieldIds)) {
-      $groupTitles = CRM_Core_BAO_CustomGroup::getGroupTitles($fieldIds);
-
-      if (!empty($groupTitles)) {
-        foreach ($groupTitles as $fId => $values) {
-          $key = "custom_{$fId}";
-          $groupTitle = $values['groupTitle'];
-          $formattedFieldNames[$key] = $fields[$key] . ' :: ' . $groupTitle;
-        }
-      }
-    }
-
-    return $formattedFieldNames;
+    return $parser;
   }
 
 }
