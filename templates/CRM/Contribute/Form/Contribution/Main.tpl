@@ -184,7 +184,7 @@
       <div class="clear"></div>
     </div>
 
-    <div class="crm-public-form-item crm-section">
+    <div id='onBehalfOfOrg' class="crm-public-form-item crm-section">
       {include file="CRM/Contribute/Form/Contribution/OnBehalfOf.tpl"}
     </div>
 
