@@ -160,7 +160,7 @@
                 {if $futurePaymentProcessor}
                     <tr id="adjustRecurringFields" class="crm-contribution-form-block-adjust_recur_start_date"><th scope="row" class="label">{$form.adjust_recur_start_date.label}</th>
                         <td>{$form.adjust_recur_start_date.html}<br/>
-			  <div id="recurDefaults">
+                          <div id="recurDefaults">
                             <span class="description">{$form.pledge_default_toggle.label}</span>
                             <table class="form-layout-compressed">
                               <tr class="crm-contribution-form-block-date_of_recurring_contribution">
@@ -345,6 +345,9 @@
       case 'price_set_id':
         if (element) {
           cj('#amountFields').hide();
+        }
+        else {
+          cj('#amountFields').show();
         }
         break;
 
