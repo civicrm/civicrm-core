@@ -704,7 +704,6 @@ class api_v3_CaseTest extends CiviCaseTestCase {
     $this->assertEquals('Follow up', $result['values'][1]['activity_type_id.name']);
   }
 
-
   /**
    * Test the case merge function.
    *
