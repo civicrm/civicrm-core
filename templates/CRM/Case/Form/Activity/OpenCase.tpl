@@ -62,9 +62,9 @@
       if ($('#case_type_id, #status_id', $form).length === 2) {
         $('#case_type_id', $form).change(function() {
           if ($(this).val()) {
-            var caseType = caseTypes[$(this).val()].definition;
-            var newOptions = CRM._.filter(caseStatusLabels, function(opt, key) {
-              return !caseType.statuses || !caseType.statuses.length || caseType.statuses.indexOf(caseStatusNames[key]) > -1;
+            var definition = caseTypes[$(this).val()].definition;
+            var newOptions = CRM._.filter(caseStatusLabels, function(opt) {
+              return !definition.statuses || !definition.statuses.length || definition.statuses.indexOf(caseStatusNames[opt.key]) > -1;
             });
             CRM.utils.setOptions($('#status_id', $form), newOptions);
           }
