@@ -247,6 +247,14 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $params['campaign_id'] = $this->campaignCreate();
 
     $contributionID = $this->contributionCreate($params);
+
+    // update contribution with invoice number
+    $params = array_merge($params, array(
+      'id' => $contributionID,
+      'invoice_number' => CRM_Utils_Array::value('invoice_prefix', Civi::settings()->get('contribution_invoice_settings')) . "" . $contributionID,
+    ));
+    $contributionID = $this->contributionCreate($params);
+
     $contribution = $this->callAPISuccessGetSingle('Contribution', array('id' => $contributionID));
     $this->assertEquals('bouncer', $contribution['check_number']);
     $this->assertEquals('bouncer', $contribution['contribution_check_number']);

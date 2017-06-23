@@ -232,6 +232,7 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
         CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes);
         $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_contribution.$name", 'IN', array_keys($financialTypes), 'String');
       case 'invoice_id':
+      case 'invoice_number':
       case 'payment_instrument_id':
       case 'contribution_payment_instrument_id':
       case 'contribution_page_id':
@@ -943,7 +944,7 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
 
     // Add field for transaction ID search
     $form->addElement('text', 'contribution_trxn_id', ts("Transaction ID"));
-    $form->addElement('text', 'invoice_id', ts("Invoice ID"));
+    $form->addElement('text', 'invoice_number', ts("Invoice Number"));
     $form->addElement('text', 'contribution_check_number', ts('Check Number'));
 
     // Add field for pcp display in roll search
