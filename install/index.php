@@ -432,9 +432,10 @@ class InstallRequirements {
    * This is exactly the same as mysqli_connect(), except that it accepts
    * the port as part of the `$host`.
    *
-   * @param $host
-   * @param $username
-   * @param $password
+   * @param string $host
+   *   Ex: 'localhost', 'localhost:3307', '127.0.0.1:3307', '[::1]', '[::1]:3307'.
+   * @param string $username
+   * @param string $password
    * @param string $database
    * @return \mysqli
    */
