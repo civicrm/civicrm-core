@@ -440,8 +440,9 @@ class InstallRequirements {
    */
   protected function connect($host, $username, $password, $database = '') {
     $hostParts = explode(':', $host);
-    if (count($hostParts) > 1) {
-      list ($host, $port) = $hostParts;
+    if (count($hostParts) > 1 && strrpos($host, ']') !== strlen($host) - 1) {
+      $port = array_pop($hostParts);
+      $host = implode(':', $hostParts);
     }
     else {
       $port = '';
