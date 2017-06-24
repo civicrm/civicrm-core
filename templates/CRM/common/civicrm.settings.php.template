@@ -28,6 +28,7 @@
 /**
  * CiviCRM Configuration File.
  */
+global $civicrm_root, $civicrm_setting, $civicrm_paths;
 
 /**
  * Content Management System (CMS) Host:
@@ -73,9 +74,7 @@ if (!defined('CIVICRM_UF_DSN') && CIVICRM_UF !== 'UnitTests') {
   define( 'CIVICRM_UF_DSN'           , 'mysql://%%CMSdbUser%%:%%CMSdbPass%%@%%CMSdbHost%%/%%CMSdbName%%?new_link=true');
 }
 
-if (file_exists(__DIR__ . '/civicrm.settings.extra.php')) {
-  require_once __DIR__ . '/civicrm.settings.extra.php';
-}
+// %%extraSettings%%
 
 /**
  * CiviCRM Database Settings
@@ -172,8 +171,6 @@ if (!defined('CIVICRM_LOGGING_DSN')) {
  *
  */
 
-global $civicrm_root;
-
 $civicrm_root = '%%crmRoot%%';
 if (!defined('CIVICRM_TEMPLATE_COMPILEDIR')) {
   define( 'CIVICRM_TEMPLATE_COMPILEDIR', '%%templateCompileDir%%');
@@ -220,8 +217,6 @@ if (!defined('CIVICRM_UF_BASEURL')) {
  *
  * Uncomment and edit the below as appropriate.
  */
- // Add this line only once above any settings overrides.
- //  global $civicrm_setting;
 
  // Override the Temporary Files directory.
  // $civicrm_setting['Directory Preferences']['uploadDir'] = '/path/to/upload-dir' ;
