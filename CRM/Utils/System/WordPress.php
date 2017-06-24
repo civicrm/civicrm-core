@@ -280,25 +280,12 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    */
   private function getBaseUrl($absolute, $frontend, $forceBackend) {
     $config = CRM_Core_Config::singleton();
-    if (!defined('CIVICRM_UF_ADMINURL')) {
-      define('CIVICRM_UF_ADMINURL', CIVICRM_UF_BASEURL . 'wp-admin/');
-    }
-    if (!defined('CIVICRM_UF_WP_BASEURL')) {
-      define('CIVICRM_UF_WP_BASEURL', CIVICRM_UF_BASEURL);
-    }
     if ((is_admin() && !$frontend) || $forceBackend) {
-      $url = CIVICRM_UF_ADMINURL . 'admin.php';
-      return $url;
+      return Civi::paths()->getUrl('[wp.backend]/.', $absolute ? 'absolute' : 'relative');
     }
-    elseif (defined('CIVICRM_UF_WP_BASEPAGE')) {
-      $url = CIVICRM_UF_WP_BASEURL . CIVICRM_UF_WP_BASEPAGE;
-      return $url;
+    else {
+      return Civi::paths()->getUrl('[wp.frontend]/.', $absolute ? 'absolute' : 'relative');
     }
-    elseif (isset($config->wpBasePage)) {
-      $url = CIVICRM_UF_WP_BASEURL . $config->wpBasePage;
-      return $url;
-    }
-    return $absolute ? $url : preg_replace(';https?://[^/]+/;', '/', $url);
   }
 
   /**
