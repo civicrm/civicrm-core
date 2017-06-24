@@ -34,12 +34,9 @@
  * Extra Site URLs:
  *
  */
-if (!defined('CIVICRM_UF_WP_BASEURL')) {
-  define( 'CIVICRM_UF_WP_BASEURL'      , '%%wpbaseURL%%');
-}
-if (!defined('CIVICRM_UF_ADMINURL')) {
-  define( 'CIVICRM_UF_ADMINURL' , '%%wpadminURL%%' );
-}
+global $civicrm_paths;
+$civicrm_paths['wp.frontend.base']['url'] = '%%wpbaseURL%%';
+$civicrm_paths['wp.backend.base']['url'] = '%%wpadminURL%%';
 
 /**
  * Define any CiviCRM Settings Overrides per http://wiki.civicrm.org/confluence/display/CRMDOC/Override+CiviCRM+Settings
