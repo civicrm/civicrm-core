@@ -220,9 +220,11 @@ SELECT module,is_reserved
 
     $this->assign('cancelURL', $this->_cancelURL);
 
+    $cancelButtonValue = !empty($this->_ufGroup['cancel_button_text']) ? $this->_ufGroup['cancel_button_text'] : ts('Cancel');
+    $this->assign('cancelButtonText', $cancelButtonValue);
+
     if (($this->_multiRecord & CRM_Core_Action::DELETE) && $this->_recordExists) {
       $this->_deleteButtonName = $this->getButtonName('upload', 'delete');
-
       $this->addElement('submit', $this->_deleteButtonName, ts('Delete'));
 
       return;
@@ -241,7 +243,7 @@ SELECT module,is_reserved
 
     $buttons[] = array(
       'type' => $buttonName,
-      'name' => ts('Save'),
+      'name' => !empty($this->_ufGroup['submit_button_text']) ? $this->_ufGroup['submit_button_text'] : ts('Save'),
       'isDefault' => TRUE,
     );
 
