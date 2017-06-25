@@ -340,6 +340,7 @@ class CRM_Core_Selector_Controller {
       $rows = self::getRows($this);
       CRM_Utils_Hook::searchColumns($contextName, $columnHeaders, $rows, $this);
       $reorderedHeaders = array();
+      $noWeightHeaders = array();
       foreach ($columnHeaders as $key => $columnHeader) {
         // So far only contribution selector sets weight, so just use key if not.
         // Extension writers will need to fix other getColumnHeaders (or add a wrapper)
@@ -348,16 +349,19 @@ class CRM_Core_Selector_Controller {
           $reorderedHeaders[$columnHeader['weight']] = $columnHeader;
         }
         else {
-          $reorderedHeaders[$key] = $columnHeader;
+          $noWeightHeaders[$key] = $columnHeader;
         }
       }
       ksort($reorderedHeaders);
+      // Merge headers not containing weight to ordered headers
+      $finalColumnHeaders = array_merge($reorderedHeaders, $noWeightHeaders);
+
       $rowsEmpty = count($rows) ? FALSE : TRUE;
       $qill = $this->getQill();
       $summary = $this->getSummary();
       // if we need to store in session, lets update session
       if ($this->_output & self::SESSION) {
-        $this->_store->set("{$this->_prefix}columnHeaders", $reorderedHeaders);
+        $this->_store->set("{$this->_prefix}columnHeaders", $finalColumnHeaders);
         if ($this->_dynamicAction) {
           $this->_object->removeActions($rows);
         }
@@ -371,7 +375,7 @@ class CRM_Core_Selector_Controller {
         self::$_template->assign_by_ref("{$this->_prefix}pager", $this->_pager);
         self::$_template->assign_by_ref("{$this->_prefix}sort", $this->_sort);
 
-        self::$_template->assign_by_ref("{$this->_prefix}columnHeaders", $reorderedHeaders);
+        self::$_template->assign_by_ref("{$this->_prefix}columnHeaders", $finalColumnHeaders);
         self::$_template->assign_by_ref("{$this->_prefix}rows", $rows);
         self::$_template->assign("{$this->_prefix}rowsEmpty", $rowsEmpty);
         self::$_template->assign("{$this->_prefix}qill", $qill);
