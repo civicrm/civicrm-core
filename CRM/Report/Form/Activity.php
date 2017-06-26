@@ -779,6 +779,8 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
       $this->_formValues["activity_date_time_relative"] = NULL;
     }
     $this->beginPostProcess();
+    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
+    $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
 
     //Assign those recordtype to array which have filter operator as 'Is not empty' or 'Is empty'
     $nullFilters = array();
@@ -860,9 +862,18 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
     }
     $this->limit();
     $groupByFromSelect = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, 'civicrm_activity_id');
+
+    $this->_aclWhere = "";
+    $this->buildPermissionClause();
+
     $sql = "{$this->_select}
-FROM civireport_activity_temp_target tar
-{$groupByFromSelect} {$this->_having} {$this->_orderBy} {$this->_limit}";
+      FROM civireport_activity_temp_target tar
+      INNER JOIN civicrm_activity {$this->_aliases['civicrm_activity']} ON {$this->_aliases['civicrm_activity']}.id = tar.civicrm_activity_id
+      INNER JOIN civicrm_activity_contact {$this->_aliases['civicrm_activity_contact']} ON {$this->_aliases['civicrm_activity_contact']}.activity_id = {$this->_aliases['civicrm_activity']}.id
+      AND {$this->_aliases['civicrm_activity_contact']}.record_type_id = {$sourceID}
+      LEFT JOIN civicrm_contact contact_civireport ON contact_civireport.id = {$this->_aliases['civicrm_activity_contact']}.contact_id 
+      WHERE (1) AND {$this->_aclWhere} {$groupByFromSelect} {$this->_having} {$this->_orderBy} {$this->_limit}";
+
     $this->buildRows($sql, $rows);
 
     // format result set.
