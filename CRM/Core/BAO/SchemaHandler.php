@@ -723,6 +723,23 @@ MODIFY      {$columnName} varchar( $length )
 
     // Compare
     $missingSigs = array_diff($requiredSigs, $existingSigs);
+
+    //CRM-20774 - Get index key which exist in db but the value varies.
+    $existingKeyIndices = array();
+    $existingKeySigs = array_intersect_key($missingSigs, $existingSigs);
+    if (!empty($existingKeySigs)) {
+      $missingSigs = array_diff_key($missingSigs, $existingKeySigs);
+      foreach ($existingKeySigs as $sig) {
+        $sigParts = explode('::', $sig);
+        foreach ($requiredIndices[$sigParts[0]] as $index) {
+          if ($index['sig'] == $sig) {
+            $existingKeyIndices[$sigParts[0]][] = $index;
+            continue;
+          }
+        }
+      }
+    }
+
     // Get missing indices
     $missingIndices = array();
     foreach ($missingSigs as $sig) {
@@ -734,7 +751,7 @@ MODIFY      {$columnName} varchar( $length )
         }
       }
     }
-    return $missingIndices;
+    return array($missingIndices, $existingKeyIndices);
   }
 
   /**

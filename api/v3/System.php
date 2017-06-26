@@ -408,6 +408,7 @@ function civicrm_api3_system_updatelogtables() {
  * This adds any indexes that exist in the schema but not the database.
  */
 function civicrm_api3_system_updateindexes() {
-  CRM_Core_BAO_SchemaHandler::createMissingIndices(CRM_Core_BAO_SchemaHandler::getMissingIndices());
+  list($missingIndices) = CRM_Core_BAO_SchemaHandler::getMissingIndices();
+  CRM_Core_BAO_SchemaHandler::createMissingIndices($missingIndices);
   return civicrm_api3_create_success(1);
 }
