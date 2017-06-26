@@ -158,7 +158,7 @@ function calculateText(priceElement) {
   }
   eval('var option = '+ cj(priceElement).attr('price'));
   optionPart = option[1].split(optionSep);
-  addprice = parseFloat(optionPart[0]);
+  addprice = parseFloat(optionPart[0]).toPrecision(2);
   var curval  = textval * addprice;
   cj(priceElement).data('line_raw_total', curval);
   display(calculateTotalFee());
