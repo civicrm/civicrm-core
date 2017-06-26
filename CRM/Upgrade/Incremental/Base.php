@@ -148,15 +148,32 @@ class CRM_Upgrade_Incremental_Base {
    * @param string $table
    * @param string $column
    * @param string $properties
+   * @param bool $localizable is this a field that should be localized
    * @return bool
    */
-  public static function addColumn($ctx, $table, $column, $properties) {
-    if (!CRM_Core_BAO_SchemaHandler::checkIfFieldExists($table, $column)) {
-      CRM_Core_DAO::executeQuery("ALTER TABLE `$table` ADD COLUMN `$column` $properties",
-        array(), TRUE, NULL, FALSE, FALSE);
-    }
+  public static function addColumn($ctx, $table, $column, $properties, $localizable = FALSE) {
     $domain = new CRM_Core_DAO_Domain();
     $domain->find(TRUE);
+    $queries = array();
+    if (!CRM_Core_BAO_SchemaHandler::checkIfFieldExists($table, $column)) {
+      if ($domain->locales) {
+        if ($localizable) {
+          $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
+          foreach ($locales as $locale) {
+            $queries[] = "ALTER TABLE `$table` ADD COLUMN `{$column}_{$locale}` $properties";
+          }
+        }
+        else {
+          $queries[] = "ALTER TABLE `$table` ADD COLUMN `$column` $properties";
+        }
+      }
+      else {
+        $queries[] = "ALTER TABLE `$table` ADD COLUMN `$column` $properties";
+      }
+      foreach ($queries as $query) {
+        CRM_Core_DAO::executeQuery($query, array(), TRUE, NULL, FALSE, FALSE);
+      }
+    }
     if ($domain->locales) {
       $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
       CRM_Core_I18n_Schema::rebuildMultilingualSchema($locales, NULL);
