@@ -657,7 +657,8 @@ WHERE ft.is_payment = 1
       if (!$update
         && (!(CRM_Utils_Array::value($contributionDetails['contribution_status_id'], $statuses) == 'Completed'
         || (CRM_Utils_Array::value($contributionDetails['contribution_status_id'], $statuses) == 'Pending'
-          && $contributionDetails['is_pay_later']))
+          && $contributionDetails['is_pay_later'])
+	|| CRM_Utils_Array::value($contributionDetails['contribution_status_id'], $statuses) == 'Partially paid')
         )
       ) {
         return;
