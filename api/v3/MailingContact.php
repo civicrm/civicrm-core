@@ -159,7 +159,7 @@ GROUP BY   m.id
     }
     $select = implode(', ', $select);
 
-    $orderBy = 'ORDER BY j.start_date DESC';
+    $orderBy = 'ORDER BY MIN(j.start_date) DESC';
     if ($sort) {
       $orderBy = "ORDER BY $sort";
     }
