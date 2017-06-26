@@ -368,17 +368,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       $this->processCreditCard();
     }
 
-    $defaults = array();
-    $contribution = civicrm_api3('Contribution', 'getsingle', array(
-      'return' => array("contribution_status_id"),
-      'id' => $this->_contributionId,
-    ));
-    $contributionStatusId = CRM_Utils_Array::value('contribution_status_id', $contribution);
     $result = CRM_Contribute_BAO_Contribution::recordAdditionalPayment($this->_contributionId, $this->_params, $this->_paymentType, $participantId);
-    // Fetch the contribution & do proportional line item assignment
-    $params = array('id' => $this->_contributionId);
-    $contribution = CRM_Contribute_BAO_Contribution::retrieve($params, $defaults, $params);
-    CRM_Contribute_BAO_Contribution::addPayments(array($contribution), $contributionStatusId);
 
     $statusMsg = ts('The payment record has been processed.');
     // send email

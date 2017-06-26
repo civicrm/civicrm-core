@@ -3864,6 +3864,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     $getInfoOf['id'] = $contributionId;
     $defaults = array();
     $contributionDAO = CRM_Contribute_BAO_Contribution::retrieve($getInfoOf, $defaults, CRM_Core_DAO::$_nullArray);
+    $prevContributionStatusId = $defaults['contribution_status_id'];
     if (!$participantId) {
       $participantId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment', $contributionId, 'participant_id', 'contribution_id');
     }
@@ -4025,6 +4026,9 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
       $activityType = ($paymentType == 'refund') ? 'Refund' : 'Payment';
 
       self::addActivityForPayment($entityObj, $financialTrxn, $activityType, $component, $contributionId);
+    // Fetch the contribution & do proportional line item assignment
+    $contribution[] = self::getOriginalContribution($contributionId);
+    CRM_Contribute_BAO_Contribution::addPayments($contribution, $prevContributionStatusId);
       return $financialTrxn;
     }
 
