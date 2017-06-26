@@ -686,7 +686,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
         $this->_retCode = CRM_Import_Parser::VALID;
       }
     }
-    elseif (isset($newContact) && CRM_Core_Error::isAPIError($newContact, CRM_Core_ERROR::DUPLICATE_CONTACT)) {
+    elseif (isset($newContact) && CRM_Core_Error::isAPIError($newContact, CRM_Core_Error::DUPLICATE_CONTACT)) {
       // if duplicate, no need of further processing
       if ($onDuplicate == CRM_Import_Parser::DUPLICATE_SKIP) {
         $errorMessage = "Skipping duplicate record";
@@ -700,8 +700,10 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
       }
 
       $relationship = TRUE;
-      # see CRM-10433 - might return comma separate list of all dupes
-      $dupeContactIDs = explode(',', $newContact['error_message']['params'][0]);
+      // CRM-10433/CRM-20739 - IDs could be string or array; handle accordingly
+      if (!is_array($dupeContactIDs = $newContact['error_message']['params'][0])) {
+        $dupeContactIDs = explode(',', $dupeContactIDs);
+      }
       $dupeCount = count($dupeContactIDs);
       $contactID = array_pop($dupeContactIDs);
       // check to see if we had more than one duplicate contact id.
