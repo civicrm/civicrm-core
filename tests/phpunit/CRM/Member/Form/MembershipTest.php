@@ -523,7 +523,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     $this->createLoggedInUser();
     $priceSet = $this->callAPISuccess('PriceSet', 'Get', array("extends" => "CiviMember"));
     $form->set('priceSetId', $priceSet['id']);
-    $partiallyPaidAmount = 25;
+    $partiallyPaidAmount = 15;
     CRM_Price_BAO_PriceSet::buildPriceSet($form);
     $params = array(
       'cid' => $this->_individualId,
@@ -533,7 +533,8 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       // This format reflects the 23 being the organisation & the 25 being the type.
       'membership_type_id' => array(23, $this->membershipTypeAnnualFixedID),
       'record_contribution' => 1,
-      'total_amount' => $partiallyPaidAmount,
+      'partial_payment_total' => 50.00,
+      'partial_amount_to_pay' => $partiallyPaidAmount,
       'receive_date' => date('m/d/Y', time()),
       'receive_date_time' => '08:36PM',
       'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
@@ -551,7 +552,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     ));
     $this->assertEquals('Partially paid', $contribution['contribution_status']);
     $this->assertEquals(50.00, $contribution['total_amount']);
-    $this->assertEquals(25.00, $contribution['net_amount']);
+    $this->assertEquals(50.00, $contribution['net_amount']);
 
     // Step 2: submit the other half of the partial payment
     //  via AdditionalPayment form to complete the related contribution
