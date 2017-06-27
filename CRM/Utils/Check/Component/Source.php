@@ -35,13 +35,6 @@ class CRM_Utils_Check_Component_Source extends CRM_Utils_Check_Component {
   public function getRemovedFiles() {
     $files[] = '[civicrm.packages]/Auth/SASL';
     $files[] = '[civicrm.packages]/Auth/SASL.php';
-    $files[] = '[civicrm.packages]/Auth/SASL/Anonymous.php';
-    $files[] = '[civicrm.packages]/Auth/SASL/Common.php';
-    $files[] = '[civicrm.packages]/Auth/SASL/CramMD5.php';
-    $files[] = '[civicrm.packages]/Auth/SASL/DigestMD5.php';
-    $files[] = '[civicrm.packages]/Auth/SASL/External.php';
-    $files[] = '[civicrm.packages]/Auth/SASL/Login.php';
-    $files[] = '[civicrm.packages]/Auth/SASL/Plain.php';
     $files[] = '[civicrm.packages]/Net/SMTP.php';
     $files[] = '[civicrm.packages]/Net/Socket.php';
     $files[] = '[civicrm.packages]/_ORIGINAL_/Net/SMTP.php';
