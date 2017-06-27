@@ -2222,4 +2222,33 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
     return array($extIDMatch);
   }
 
+  /**
+   * Format the form mapping parameters ready for the parser.
+   *
+   * @param int $count
+   *   Number of rows.
+   *
+   * @return array $parserParameters
+   */
+  public static function getParameterForParser($count) {
+    $baseArray = array();
+    for ($i = 0; $i < $count; $i++) {
+      $baseArray[$i] = NULL;
+    }
+    $parserParameters['mapperLocType'] = $baseArray;
+    $parserParameters['mapperPhoneType'] = $baseArray;
+    $parserParameters['mapperImProvider'] = $baseArray;
+    $parserParameters['mapperWebsiteType'] = $baseArray;
+    $parserParameters['mapperRelated'] = $baseArray;
+    $parserParameters['relatedContactType'] = $baseArray;
+    $parserParameters['relatedContactDetails'] = $baseArray;
+    $parserParameters['relatedContactLocType'] = $baseArray;
+    $parserParameters['relatedContactPhoneType'] = $baseArray;
+    $parserParameters['relatedContactImProvider'] = $baseArray;
+    $parserParameters['relatedContactWebsiteType'] = $baseArray;
+
+    return $parserParameters;
+
+  }
+
 }
