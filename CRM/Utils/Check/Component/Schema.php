@@ -54,7 +54,7 @@ class CRM_Utils_Check_Component_Schema extends CRM_Utils_Check_Component {
     }
     if ($missingIndices || $existingKeyIndices) {
       $message = "You have missing indices on some tables. This may cause poor performance.";
-      if ($keyMessage) {
+      if (!empty($keyMessage)) {
         $message = $keyMessage;
       }
       $msg = new CRM_Utils_Check_Message(
