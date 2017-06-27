@@ -668,6 +668,10 @@ WHERE  civicrm_pledge.id = %2
       $payments = implode(',', $paymentIds);
       $paymentClause = " AND civicrm_pledge_payment.id IN ( {$payments} )";
     }
+    elseif ($paymentStatusId == array_search('Cancelled', $allStatus)) {
+      $completedStatus = array_search('Completed', $allStatus);
+      $paymentClause = " AND civicrm_pledge_payment.status_id != {$completedStatus}";
+    }
     $actualAmountClause = NULL;
     $contributionIdClause = NULL;
     if (isset($contributionId) && !$isScriptUpdate) {
