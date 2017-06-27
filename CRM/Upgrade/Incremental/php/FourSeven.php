@@ -360,6 +360,17 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
       'civicrm_mail_settings', 'activity_status', "varchar (255) DEFAULT NULL COMMENT 'Name of status to use when creating email to activity.'");
   }
 
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_4_7_21($rev) {
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
+    $this->addTask('Ensure that Package versions of files are correctly updated', 'fixPackageVersionUpgrade4721');
+  }
+
+
   /*
    * Important! All upgrade functions MUST add a 'runSql' task.
    * Uncomment and use the following template for a new upgrade version
@@ -1141,6 +1152,21 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
     CRM_Core_DAO::executeQuery("ALTER TABLE `civicrm_action_schedule`
       CHANGE `mapping_id` `mapping_id` varchar(64) COLLATE
       utf8_unicode_ci DEFAULT NULL COMMENT 'Name/ID of the mapping to use on this table'");
+    return TRUE;
+  }
+
+  /**
+   * CRM-20748
+   * Ensure that packages that have been updated to now come from vendor are updated
+   */
+  public static function fixPackageVersionUpgrade4721() {
+    $netFiles = array('Socket.php', 'SMTP.php');
+    foreach ($netFiles as $file) {
+      global $civicrm_root;
+      if (file_exists($civicrm_root . '/packages/Net/' . $file)) {
+        @unlink($civicrm_root . '/packages/Net/' . $file);
+      }
+    }
     return TRUE;
   }
 
