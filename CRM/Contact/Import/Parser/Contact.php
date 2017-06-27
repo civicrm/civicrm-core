@@ -1677,7 +1677,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
     //get the prefix id etc if exists
     CRM_Contact_BAO_Contact::resolveDefaults($formatted, TRUE);
 
-    require_once 'CRM/Utils/DeprecatedUtils.php';
     //@todo direct call to API function not supported.
     // setting required check to false, CRM-2839
     // plus we do our own required check in import
@@ -1955,7 +1954,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
           }
 
           if (!$break) {
-            list($value, $formatted) = $this->formatContactParameters();
+            $this->formatContactParameters($value, $formatted);
           }
         }
         if (!$isAddressCustomField) {
@@ -2445,6 +2444,15 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
           $params[$blockFieldName][++$blockCnt]
         );
 
+        if ($values['location_type_id'] === 'Primary') {
+          if (!empty($params['id'])) {
+            $primary = civicrm_api3($block, 'get', array('return' => 'location_type_id', 'contact_id' => $params['id'], 'is_primary' => 1, 'sequential' => 1));
+          }
+          $defaultLocationType = CRM_Core_BAO_LocationType::getDefault();
+          $values['location_type_id'] = (isset($primary) && $primary['count']) ? $primary['values'][0]['location_type_id'] : $defaultLocationType->id;
+          $values['is_primary'] = 1;
+        }
+
         if (empty($params['id']) && ($blockCnt == 1)) {
           $params[$blockFieldName][$blockCnt]['is_primary'] = TRUE;
         }
@@ -2540,6 +2548,16 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
           }
           $params['address'][$addressCnt][$field] = $values[$field];
         }
+      }
+
+      if ($values['location_type_id'] === 'Primary') {
+        if (!empty($params['id'])) {
+          $primary = civicrm_api3('Address', 'get', array('return' => 'location_type_id', 'contact_id' => $params['id'], 'is_primary' => 1, 'sequential' => 1));
+        }
+        $defaultLocationType = CRM_Core_BAO_LocationType::getDefault();
+        $params['address'][$addressCnt]['location_type_id'] = (isset($primary) && $primary['count']) ? $primary['values'][0]['location_type_id'] : $defaultLocationType->id;
+        $params['address'][$addressCnt]['is_primary'] = 1;
+
       }
 
       if ($addressCnt == 1) {

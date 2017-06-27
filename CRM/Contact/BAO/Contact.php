@@ -3587,4 +3587,23 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
     return $ids[0];
   }
 
+  /**
+   * Check if a field is associated with an entity that has a location type.
+   *
+   * (ie. is an address, phone, email etc field).
+   *
+   * @param string $fieldTitle
+   *   Title of the field (not the name - create a new function for that if required).
+   *
+   * @return bool
+   */
+  public static function isFieldHasLocationType($fieldTitle) {
+    foreach (CRM_Contact_BAO_Contact::importableFields() as $key => $field) {
+      if ($field['title'] === $fieldTitle) {
+        return CRM_Utils_Array::value('hasLocationType', $field);
+      }
+    }
+    return FALSE;
+  }
+
 }
