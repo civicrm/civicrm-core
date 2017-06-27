@@ -505,8 +505,8 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
       //get the membership status and type values.
       $statusANDType = self::getStatusANDTypeValues($membership->id);
       foreach (array(
-    'status',
-    'membership_type',
+      'status',
+      'membership_type',
       ) as $fld) {
         $defaults[$fld] = CRM_Utils_Array::value($fld, $statusANDType[$membership->id]);
       }
@@ -2303,7 +2303,7 @@ WHERE      civicrm_membership.is_test = 0";
     }
 
     //CRM-14538 - fix
-    //set the partial total and partial pay amount 
+    //set the partial total and partial pay amount
     if (!empty($params['total_amount']) && !empty($params['partial_amount_pay'])) {
       if ($params['total_amount'] > $params['partial_amount_pay']) {
         $contributionParams['partial_payment_total'] = $params['total_amount'];

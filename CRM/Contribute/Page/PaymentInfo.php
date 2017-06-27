@@ -68,7 +68,7 @@ class CRM_Contribute_Page_PaymentInfo extends CRM_Core_Page {
       $membershipdetails = $membership['values'];
 
       foreach ($membershipdetails as $key => $values) {
-        //CRM-14538 - CRM-20626 - fix  
+        //CRM-14538 - CRM-20626 - fix
         $paymentInfo[] = CRM_Contribute_BAO_Contribution::getPaymentInfo($values['contribution_id'], $this->_component, $getTrxnInfo, FALSE);
       }
     }

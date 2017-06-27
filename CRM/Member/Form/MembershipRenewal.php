@@ -333,7 +333,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       $this->add('text', 'total_amount', ts('Amount'));
       $this->addRule('total_amount', ts('Please enter a valid amount.'), 'money');
 
-
       $this->addDate('receive_date', ts('Received'), FALSE, array('formatType' => 'activityDateTime'));
 
       $this->add('select', 'payment_instrument_id', ts('Payment Method'), array('' => ts('- select -')) + CRM_Contribute_PseudoConstant::paymentInstrument(), FALSE, array('onChange' => "return showHideByValue('payment_instrument_id','4','checkNumber','table-row','select',false);")
@@ -492,7 +491,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     }
 
     //CRM-14538 - fix
-    //set the partial total and partial pay amount 
+    //set the partial total and partial pay amount
 
     $membershipType = CRM_Member_BAO_MembershipType::getMembershipTypeDetails($this->_memType);
 
@@ -506,7 +505,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
         }
       }
     }
-
 
     if ($this->_mode) {
       $this->_params['register_date'] = $now;

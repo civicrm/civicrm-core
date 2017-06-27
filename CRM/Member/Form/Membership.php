@@ -1121,8 +1121,8 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
 
     $lineItem = array($this->_priceSetId => array());
 
-    //CRM-14538 - fix	
-    //we dont need to override amount field 
+    //CRM-14538 - fix
+    //we dont need to override amount field
     CRM_Price_BAO_PriceSet::processAmount($this->_priceSet['fields'], $formValues, $lineItem[$this->_priceSetId]);
 
     if (CRM_Utils_Array::value('tax_amount', $formValues)) {
@@ -1130,7 +1130,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     }
 
     $params['total_amount'] = CRM_Utils_Array::value('amount', $formValues);
-
 
     $submittedFinancialType = CRM_Utils_Array::value('financial_type_id', $formValues);
     if (!empty($lineItem[$this->_priceSetId])) {
@@ -1150,16 +1149,15 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       }
     }
 
-
     //CRM-14538 - fix
-    //set the partial total and partial pay amount 
+    //set the partial total and partial pay amount
     $membershipType = CRM_Member_BAO_MembershipType::getMembershipTypeDetails($this->_memTypeSelected);
     $amount = 0;
 
     if (CRM_Utils_Array::value('minimum_fee', $membershipType) && !$this->_priceSetId) {
       $amount = $membershipType['minimum_fee'];
     }
-    else if ($this->_priceSetId) {
+    elseif ($this->_priceSetId) {
       $amount = $formValues['amount'];
     }
 

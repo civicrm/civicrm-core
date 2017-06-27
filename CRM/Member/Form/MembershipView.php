@@ -195,7 +195,6 @@ class CRM_Member_Form_MembershipView extends CRM_Core_Form {
         $this->assign('component', 'membership');
       }
 
-
       if (isset($values['owner_membership_id'])) {
         $values['owner_contact_id'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $values['owner_membership_id'], 'contact_id', 'id'
         );
