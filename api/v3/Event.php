@@ -208,7 +208,7 @@ function _civicrm_api3_event_getisfull(&$event, $event_id) {
   if (!empty($eventFullResult) && is_int($eventFullResult)) {
     $event[$event_id]['available_places'] = $eventFullResult;
   }
-  else if (is_null($eventFullResult)) {
+  elseif (is_null($eventFullResult)) {
     return $event[$event_id]['is_full'] = 0;
   }
   else {
