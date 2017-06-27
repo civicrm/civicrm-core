@@ -140,17 +140,35 @@ class CRM_Contact_Imports_Parser_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that the import parser changes the external identifier when there is a dedupe match.
+   *
+   * @throws \Exception
+   */
+  public function testImportBillingAddress() {
+    list($contactValues) = $this->setUpBaseContact();
+    $contactValues['nick_name'] = 'Old Bill';
+    $contactValues['external_identifier'] = 'android';
+    $contactValues['street_address'] = 'Big Mansion';
+    $this->runImport($contactValues, CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Import_Parser::VALID, array(0 => NULL, 1 => NULL, 2 => NULL, 3 => NULL, 4 => NULL, 5 => 2));
+    $address = $this->callAPISuccessGetSingle('Address', array('street_address' => 'Big Mansion'));
+    $this->assertEquals(2, $address['location_type_id']);
+
+    $this->callAPISuccessGetSingle('Contact', $contactValues);
+  }
+
+  /**
    * Run the import parser.
    *
    * @param array $originalValues
    *
    * @param int $onDuplicateAction
    * @param int $expectedResult
+   * @param array|null $mapperLocType
    */
-  protected function runImport($originalValues, $onDuplicateAction, $expectedResult) {
+  protected function runImport($originalValues, $onDuplicateAction, $expectedResult, $mapperLocType = NULL) {
     $fields = array_keys($originalValues);
     $values = array_values($originalValues);
-    $parser = new CRM_Contact_Import_Parser_Contact($fields);
+    $parser = new CRM_Contact_Import_Parser_Contact($fields, $mapperLocType);
     $parser->_contactType = 'Individual';
     $parser->_onDuplicate = $onDuplicateAction;
     $parser->init();
