@@ -498,7 +498,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     if (CRM_Utils_Array::value('minimum_fee', $membershipType)) {
       $amount = $membershipType['minimum_fee'];
       if (!empty($amount) && !empty($this->_params['total_amount'])) {
-        if ($amount > $formValues['total_amount']) {
+        if ($amount > $this->_params['total_amount']) {
           $this->_params['partial_amount_pay'] = $this->_params['total_amount'];
           $this->_params['total_amount'] = $membershipType['minimum_fee'];
           $this->_params['partial_payment_total'] = $membershipType['minimum_fee'];
