@@ -2278,14 +2278,9 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
     //      Custom
 
     // Cache the various object fields
-    static $fields = NULL;
-
-    if ($fields == NULL) {
-      $fields = array();
-    }
+    static $fields = array();
 
     // first add core contact values since for other Civi modules they are not added
-    require_once 'CRM/Contact/BAO/Contact.php';
     $contactFields = CRM_Contact_DAO_Contact::fields();
     _civicrm_api3_store_values($contactFields, $values, $params);
 
