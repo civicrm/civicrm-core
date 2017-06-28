@@ -56,6 +56,7 @@ class CRM_Utils_Check_Component_Schema extends CRM_Utils_Check_Component {
       $message = "You have missing indices on some tables. This may cause poor performance.";
       if (!empty($keyMessage)) {
         $message = $keyMessage;
+        $message .= ts("If you are unsure how to perform this action or do not know what to do please contact your system administrator for assistance");
       }
       $msg = new CRM_Utils_Check_Message(
         __FUNCTION__,
