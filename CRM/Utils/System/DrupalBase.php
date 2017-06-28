@@ -59,37 +59,13 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
-   */
-  public function getCiviSourceStorage() {
-    global $civicrm_root;
-
-    // Don't use $config->userFrameworkBaseURL; it has garbage on it.
-    // More generally, we shouldn't be using $config here.
-    if (!defined('CIVICRM_UF_BASEURL')) {
-      throw new RuntimeException('Undefined constant: CIVICRM_UF_BASEURL');
-    }
-
-    $cmsUrl = CIVICRM_UF_BASEURL;
-    if (CRM_Utils_System::isSSL()) {
-      $cmsUrl = str_replace('http://', 'https://', $cmsUrl);
-    }
-    $civiRelPath = CRM_Utils_File::relativize(realpath($civicrm_root), realpath($this->cmsRootPath()));
-    $civiUrl = rtrim($cmsUrl, '/') . '/' . ltrim($civiRelPath, ' /');
-    return array(
-      'url' => CRM_Utils_File::addTrailingSlash($civiUrl, '/'),
-      'path' => CRM_Utils_File::addTrailingSlash($civicrm_root),
-    );
-  }
-
-  /**
    * @inheritdoc
    */
   public function getDefaultFileStorage() {
     $config = CRM_Core_Config::singleton();
     $baseURL = CRM_Utils_System::languageNegotiationURL($config->userFrameworkBaseURL, FALSE, TRUE);
 
-    $siteName = $this->parseDrupalSiteName('/files/civicrm');
+    $siteName = $this->parseDrupalSiteNameFromRequest('/files/civicrm');
     if ($siteName) {
       $filesURL = $baseURL . "sites/$siteName/files/civicrm/";
     }
@@ -591,6 +567,37 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
   }
 
   /**
+   * Parse the name of the drupal site.
+   *
+   * @param string $civicrm_root
+   *
+   * @return null|string
+   * @deprecated
+   */
+  public function parseDrupalSiteNameFromRoot($civicrm_root) {
+    $siteName = NULL;
+    if (strpos($civicrm_root,
+        DIRECTORY_SEPARATOR . 'sites' . DIRECTORY_SEPARATOR . 'all' . DIRECTORY_SEPARATOR . 'modules'
+      ) === FALSE
+    ) {
+      $startPos = strpos($civicrm_root,
+        DIRECTORY_SEPARATOR . 'sites' . DIRECTORY_SEPARATOR
+      );
+      $endPos = strpos($civicrm_root,
+        DIRECTORY_SEPARATOR . 'modules' . DIRECTORY_SEPARATOR
+      );
+      if ($startPos && $endPos) {
+        // if component is in sites/SITENAME/modules
+        $siteName = substr($civicrm_root,
+          $startPos + 7,
+          $endPos - $startPos - 7
+        );
+      }
+    }
+    return $siteName;
+  }
+
+  /**
    * Determine if Drupal multi-site applies to the current request -- and,
    * specifically, determine the name of the multisite folder.
    *
@@ -600,7 +607,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
    *   string, e.g. `bar.example.com` if using multisite.
    *   NULL if using the default site.
    */
-  private function parseDrupalSiteName($flagFile = '') {
+  private function parseDrupalSiteNameFromRequest($flagFile = '') {
     $phpSelf = array_key_exists('PHP_SELF', $_SERVER) ? $_SERVER['PHP_SELF'] : '';
     $httpHost = array_key_exists('HTTP_HOST', $_SERVER) ? $_SERVER['HTTP_HOST'] : '';
     if (empty($httpHost)) {
