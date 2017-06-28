@@ -184,7 +184,7 @@ class CRM_Core_BAO_SchemaHandlerTest extends CiviUnitTestCase {
    * Check there are no missing indices
    */
   public function testGetMissingIndices() {
-    $missingIndices = CRM_Core_BAO_SchemaHandler::getMissingIndices();
+    list($missingIndices) = CRM_Core_BAO_SchemaHandler::getMissingIndices();
     $this->assertTrue(empty($missingIndices));
   }
 
@@ -230,7 +230,7 @@ class CRM_Core_BAO_SchemaHandlerTest extends CiviUnitTestCase {
    */
   public function testReconcileMissingIndices() {
     CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_contact DROP INDEX index_sort_name');
-    $missingIndices = CRM_Core_BAO_SchemaHandler::getMissingIndices();
+    list($missingIndices) = CRM_Core_BAO_SchemaHandler::getMissingIndices();
     $this->assertEquals(array(
       'civicrm_contact' => array(
         array(
@@ -242,8 +242,37 @@ class CRM_Core_BAO_SchemaHandlerTest extends CiviUnitTestCase {
       ),
     ), $missingIndices);
     $this->callAPISuccess('System', 'updateindexes', array());
-    $missingIndices = CRM_Core_BAO_SchemaHandler::getMissingIndices();
+    list($missingIndices) = CRM_Core_BAO_SchemaHandler::getMissingIndices();
     $this->assertTrue(empty($missingIndices));
+  }
+
+  /**
+   * Check for partial indices
+   */
+  public function testPartialIndices() {
+    CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_prevnext_cache DROP INDEX index_all');
+    //Missing Column `is_selected`.
+    CRM_Core_DAO::executeQuery('CREATE INDEX index_all ON civicrm_prevnext_cache (cacheKey, entity_id1, entity_id2, entity_table)');
+    list($missingIndices, $existingKeyIndices) = CRM_Core_BAO_SchemaHandler::getMissingIndices();
+    $this->assertNotEmpty($existingKeyIndices);
+
+    CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_entity_tag DROP INDEX UI_entity_id_entity_table_tag_id');
+    //Test incorrect Ordering(correct order defined is entity_id and then entity_table, tag_id).
+    CRM_Core_DAO::executeQuery('CREATE INDEX UI_entity_id_entity_table_tag_id ON civicrm_entity_tag (entity_table, entity_id, tag_id)');
+    list($missingIndices, $existingKeyIndices) = CRM_Core_BAO_SchemaHandler::getMissingIndices();
+    $this->assertNotEmpty($existingKeyIndices);
+    $this->assertEquals(array('civicrm_prevnext_cache', 'civicrm_entity_tag'), array_keys($existingKeyIndices));
+
+    //Drop false index and create again.
+    CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_prevnext_cache DROP INDEX index_all');
+    CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_entity_tag DROP INDEX UI_entity_id_entity_table_tag_id');
+    list($missingIndices, $existingKeyIndices) = CRM_Core_BAO_SchemaHandler::getMissingIndices();
+    $this->assertEmpty($existingKeyIndices);
+    CRM_Core_BAO_SchemaHandler::createMissingIndices($missingIndices);
+    //Both vars should be empty now.
+    list($missingIndices, $existingKeyIndices) = CRM_Core_BAO_SchemaHandler::getMissingIndices();
+    $this->assertEmpty($missingIndices);
+    $this->assertEmpty($existingKeyIndices);
   }
 
   /**
