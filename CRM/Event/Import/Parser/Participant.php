@@ -574,12 +574,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
           if (!CRM_Utils_Rule::integer($value)) {
             return civicrm_api3_create_error("contact_id not valid: $value");
           }
-          $dao = new CRM_Core_DAO();
-          $qParams = array();
-          $svq = $dao->singleValueQuery("SELECT id FROM civicrm_contact WHERE id = $value",
-            $qParams
-          );
-          if (!$svq) {
+          if (!CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_contact WHERE id = $value")) {
             return civicrm_api3_create_error("Invalid Contact ID: There is no contact record with contact_id = $value.");
           }
           $values['contact_id'] = $values['participant_contact_id'];
