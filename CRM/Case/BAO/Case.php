@@ -3136,6 +3136,17 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
       case 'medium_id':
         $className = 'CRM_Activity_BAO_Activity';
         break;
+
+      // Filter status id by case type id
+      case 'status_id':
+        if (!empty($props['case_type_id'])) {
+          $idField = is_numeric($props['case_type_id']) ? 'id' : 'name';
+          $caseType = civicrm_api3('CaseType', 'getsingle', array($idField => $props['case_type_id'], 'return' => 'definition'));
+          if (!empty($caseType['definition']['statuses'])) {
+            $params['condition'] = 'v.name IN ("' . implode('","', $caseType['definition']['statuses']) . '")';
+          }
+        }
+        break;
     }
     return CRM_Core_PseudoConstant::get($className, $fieldName, $params, $context);
   }

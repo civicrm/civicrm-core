@@ -329,6 +329,7 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
     }
     $transaction->commit();
     CRM_Case_XMLRepository::singleton(TRUE);
+    CRM_Core_OptionGroup::flushAll();
 
     return $caseType;
   }
