@@ -24,7 +24,7 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
  */
-
+require_once 'CRM/Utils/DeprecatedUtils.php';
 /**
  *
  * @package CRM
@@ -1953,8 +1953,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
           }
 
           if (!$break) {
-            require_once 'CRM/Utils/DeprecatedUtils.php';
-            _civicrm_api3_deprecated_add_formatted_param($value, $formatted);
+            list($value, $formatted) = $this->formatContactParameters();
           }
         }
         if (!$isAddressCustomField) {
@@ -1976,11 +1975,10 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
       if ($key == 'id' && isset($field)) {
         $formatted[$key] = $field;
       }
-      require_once 'CRM/Utils/DeprecatedUtils.php';
-      _civicrm_api3_deprecated_add_formatted_param($formatValues, $formatted);
+      $this->formatContactParameters($formatValues, $formatted);
 
       //Handling Custom Data
-      // note: Address custom fields will be handled separately inside _civicrm_api3_deprecated_add_formatted_param
+      // note: Address custom fields will be handled separately inside formatContactParameters
       if (($customFieldID = CRM_Core_BAO_CustomField::getKeyID($key)) &&
         array_key_exists($customFieldID, $customFields) &&
         !array_key_exists($customFieldID, $addressCustomFields)
@@ -2249,6 +2247,23 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
 
     return $parserParameters;
 
+  }
+
+  /**
+   * Format contact parameters.
+   *
+   * @todo this function needs re-writing & re-merging into the main function.
+   *
+   * Here be dragons.
+   *
+   * @param array $values
+   * @param array $params
+   *
+   * @return bool
+   */
+  protected function formatContactParameters(&$values, &$params) {
+    _civicrm_api3_deprecated_add_formatted_param($values, $params);
+    return TRUE;
   }
 
 }
