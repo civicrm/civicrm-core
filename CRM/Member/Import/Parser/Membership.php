@@ -415,12 +415,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
       $joinDate = CRM_Utils_Date::customFormat(CRM_Utils_Array::value('join_date', $formatted), '%Y-%m-%d');
 
       if ($this->_contactIdIndex < 0) {
-
-        //retrieve contact id using contact dedupe rule
-        $formatValues['contact_type'] = $this->_contactType;
-        $formatValues['version'] = 3;
-        require_once 'CRM/Utils/DeprecatedUtils.php';
-        $error = _civicrm_api3_deprecated_check_contact_dedupe($formatValues);
+        $error = $this->checkContactDuplicate($formatValues);
 
         if (CRM_Core_Error::isAPIError($error, CRM_Core_ERROR::DUPLICATE_CONTACT)) {
           $matchedIDs = explode(',', $error['error_message']['params'][0]);
