@@ -453,10 +453,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
         $paramValues['contact_type'] = $this->_contactType;
       }
 
-      $paramValues['version'] = 3;
-      //retrieve contact id using contact dedupe rule
-      require_once 'CRM/Utils/DeprecatedUtils.php';
-      $error = _civicrm_api3_deprecated_check_contact_dedupe($paramValues);
+      $error = $this->checkContactDuplicate($paramValues);
 
       if (CRM_Core_Error::isAPIError($error, CRM_Core_ERROR::DUPLICATE_CONTACT)) {
         $matchedIDs = explode(',', $error['error_message']['params'][0]);
