@@ -158,10 +158,12 @@ WHERE  email = %2
                      WHERE $job.id = " . CRM_Utils_Type::escape($job_id, 'Integer'));
     $do->fetch();
     $mailing_id = $do->mailing_id;
+    $mailing_type = CRM_Core_DAO::getFieldValue('CRM_Mailing_DAO_Mailing', $mailing_id, 'mailing_type', 'id');
     $entity = CRM_Core_DAO::getFieldValue('CRM_Mailing_DAO_MailingGroup', $mailing_id, 'entity_table', 'mailing_id');
 
-    // If $entity is null then most likely we are dealing with an AB test
-    if (empty($entity)) {
+    // If $entity is null and $mailing_Type is either winner or experiment then we are deailing with an AB test
+    $abtest_types = array('experiment', 'winner');
+    if (empty($entity) && in_array($mailing_type, $abtest_types)) {
       $mailing_id_a = CRM_Core_DAO::getFieldValue('CRM_Mailing_DAO_MailingAB', $mailing_id, 'mailing_id_a', 'mailing_id_b');
       $field = 'mailing_id_b';
       if (empty($mailing_id_a)) {
@@ -170,7 +172,7 @@ WHERE  email = %2
       }
       $jobJoin = "INNER JOIN $ab ON $ab.mailing_id_a = $mg.mailing_id
         INNER JOIN $job ON $job.mailing_id = $ab.$field";
-      $entity = CRM_Core_DAO::getFieldValue('CRM_Mailing_DAO_MailingGroup', $maiing_id_a, 'entity_table', 'mailing_id');
+      $entity = CRM_Core_DAO::getFieldValue('CRM_Mailing_DAO_MailingGroup', $mailing_id_a, 'entity_table', 'mailing_id');
     }
     else {
       $jobJoin = "INNER JOIN  $job ON      $job.mailing_id = $mg.mailing_id";
