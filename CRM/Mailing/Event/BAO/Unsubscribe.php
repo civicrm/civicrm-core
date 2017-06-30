@@ -149,7 +149,7 @@ WHERE  email = %2
     $group = $groupObject->getTableName();
     $gcObject = new CRM_Contact_BAO_GroupContact();
     $gc = $gcObject->getTableName();
-    $abObject = new CRM_Mailing_DAO_MailingAB();
+    $abObject = new CRM_Mailing_BAO_ABTest();
     $ab = $abObject->getTableName();
 
     //We Need the mailing Id for the hook...
@@ -182,18 +182,38 @@ WHERE  email = %2
     if ($entity == $group) {
       $groupClause = "AND $group.is_hidden = 0";
     }
-
-    $do->query("
+    $entityTypes = array();
+    $mailingGroups = array();
+    $do->query("SELECT DISTINCT $mg.entity_table
+      FROM $mg
+      WHERE $mg.mailing_id = " . CRM_Utils_Type::escape($correct_mailing_id, 'Integer') . "
+      AND $mg.group_type IN ('Include', 'Base')");
+    while ($do->fetch()) {
+      $entityTypes[] = $do->entity_table;
+    }
+    foreach ($entityTypes as $entity) {
+      $groupClause = '';
+      if ($entity == $group) {
+        $groupClause = "AND $group.is_hidden = 0";
+      }
+      $do->query("
             SELECT      $mg.entity_table as entity_table,
                         $mg.entity_id as entity_id,
                         $mg.group_type as group_type
             FROM        $mg
-            $jobJoin
             INNER JOIN  $entity
                 ON      $mg.entity_id = $entity.id
-            WHERE       $job.id = " . CRM_Utils_Type::escape($job_id, 'Integer') . "
+                WHERE   $mg.mailing_id = " . CRM_Utils_Type::escape($correct_mailing_id, 'Integer') . "
                 AND     $mg.group_type IN ('Include', 'Base') $groupClause"
-    );
+      );
+      while ($do->fetch()) {
+        $mailingGroups[] = array(
+          'entity_table' => $do->entity_table,
+          'entity_id' => $do->entity_id,
+          'group_type' => $do->group_type,
+        );
+      }
+    }
 
     // Make a list of groups and a list of prior mailings that received
     // this mailing.
@@ -202,17 +222,17 @@ WHERE  email = %2
     $base_groups = array();
     $mailings = array();
 
-    while ($do->fetch()) {
-      if ($do->entity_table == $group) {
-        if ($do->group_type == 'Base') {
-          $base_groups[$do->entity_id] = NULL;
+    foreach ($mailingGroups as $mailingGroup) {
+      if ($mailingGroup['entity_table'] == $group) {
+        if ($mailingGroup['group_type'] == 'Base') {
+          $base_groups[$mailingGroup['entity_id']] = NULL;
         }
         else {
-          $groups[$do->entity_id] = NULL;
+          $groups[$mailingGroup['entity_id']] = NULL;
         }
       }
-      elseif ($do->entity_table == $mailing) {
-        $mailings[] = $do->entity_id;
+      elseif ($mailingGroup['entity_table'] == $mailing) {
+        $mailings[] = $mailingGroup['entity_id'];
       }
     }
 
