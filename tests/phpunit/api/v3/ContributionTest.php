@@ -1147,7 +1147,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     );
     $contribution = $this->callAPISuccess('contribution', 'create', $newParams);
     $this->assertAPISuccess($contribution);
-    $this->_checkFinancialTrxn($contribution, 'paymentInstrument', $instrumentId);
+
+    $this->_checkFinancialTrxn($contribution, 'changePaymentInstrument', $instrumentId);
 
     // cleanup - delete created payment instrument
     $this->_deletedAddedPaymentInstrument();
@@ -3364,7 +3365,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
         'status_id' => 3,
       );
     }
-    elseif ($context == 'changeFinancial' || $context == 'paymentInstrument') {
+    elseif (in_array($context, array('changeFinancial', 'paymentInstrument', 'changePaymentInstrument'))) {
       $entityParams = array(
         'entity_id' => $contribution['id'],
         'entity_table' => 'civicrm_contribution',
@@ -3386,18 +3387,21 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
           'status_id' => 1,
         );
       }
-      if ($context == 'paymentInstrument') {
+      if (in_array($context, array('paymentInstrument', 'changePaymentInstrument'))) {
         $compareParams += array(
           'to_financial_account_id' => CRM_Financial_BAO_FinancialTypeAccount::getInstrumentFinancialAccount(4),
           'payment_instrument_id' => 4,
         );
+        if ($context == 'changePaymentInstrument') {
+          $compareParams['to_financial_account_id'] = CRM_Financial_BAO_FinancialTypeAccount::getInstrumentFinancialAccount($instrumentId);
+        }
       }
       else {
         $compareParams['to_financial_account_id'] = 12;
       }
       $this->assertDBCompareValues('CRM_Financial_DAO_FinancialTrxn', $trxnParams1, array_merge($compareParams, $extraParams));
       $compareParams['total_amount'] = 100;
-      if ($context == 'paymentInstrument') {
+      if (in_array($context, array('paymentInstrument', 'changePaymentInstrument'))) {
         $compareParams['to_financial_account_id'] = CRM_Financial_BAO_FinancialTypeAccount::getInstrumentFinancialAccount($instrumentId);
         $compareParams['payment_instrument_id'] = $instrumentId;
       }

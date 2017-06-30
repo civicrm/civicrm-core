@@ -3412,7 +3412,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         $params['trxnParams']['net_amount'] = CRM_Utils_Array::value('net_amount', $params);
         $params['trxnParams']['total_amount'] = $trxnParams['total_amount'] = $params['total_amount'] = $totalAmount;
         $params['trxnParams']['trxn_id'] = $params['contribution']->trxn_id;
-        if (!$financialAccountsUpdatedOnPIChange && (isset($totalAmount) && $totalAmount != $params['prevContribution']->total_amount)) {
+        if (isset($totalAmount) && $totalAmount != $params['prevContribution']->total_amount) {
           //Update Financial Records
           $params['trxnParams']['from_financial_account_id'] = NULL;
           self::updateFinancialAccounts($params, 'changedAmount');

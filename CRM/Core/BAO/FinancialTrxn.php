@@ -741,6 +741,8 @@ WHERE ft.is_payment = 1
   public static function updateFinancialAccountsOnPaymentInstrumentChange($inputParams) {
     $prevContribution = $inputParams['prevContribution'];
     $currentContribution = $inputParams['contribution'];
+    // ensure that there are all the information in updated contribution object identified by $currentContribution
+    $currentContribution->find(TRUE);
 
     $deferredFinancialAccount = CRM_Utils_Array::value('deferred_financial_account_id', $inputParams);
     if (empty($deferredFinancialAccount)) {
@@ -759,20 +761,19 @@ WHERE ft.is_payment = 1
     $lastFinancialTrxn = civicrm_api3('FinancialTrxn', 'getsingle', array('id' => $lastFinancialTrxnId['financialTrxnId']));
     unset($lastFinancialTrxn['id']);
     $lastFinancialTrxn['trxn_date'] = $inputParams['trxnParams']['trxn_date'];
-    $lastFinancialTrxn['total_amount'] = -$lastFinancialTrxn['total_amount'];
-    $lastFinancialTrxn['net_amount'] = -$lastFinancialTrxn['net_amount'];
-    $lastFinancialTrxn['fee_amount'] = -$lastFinancialTrxn['fee_amount'];
+    $lastFinancialTrxn['total_amount'] = -$inputParams['trxnParams']['total_amount'];
+    $lastFinancialTrxn['net_amount'] = -$inputParams['trxnParams']['net_amount'];
+    $lastFinancialTrxn['fee_amount'] = -$inputParams['trxnParams']['fee_amount'];
     $lastFinancialTrxn['to_financial_account_id'] = CRM_Financial_BAO_FinancialTypeAccount::getInstrumentFinancialAccount($currentContribution->payment_instrument_id);
     $lastFinancialTrxn['contribution_id'] = $prevContribution->id;
-    CRM_Core_BAO_FinancialTrxn::create($lastFinancialTrxn);
-
-    $trxn = CRM_Core_BAO_FinancialTrxn::create($inputParams['trxnParams']);
-
-    $trxnParams = array(
-      'total_amount' => $trxn->total_amount,
-      'contribution_id' => $currentContribution->id,
-    );
-    CRM_Contribute_BAO_Contribution::assignProportionalLineItems($trxnParams, $trxn->id, $prevContribution->total_amount);
+    foreach (array($lastFinancialTrxn, $inputParams['trxnParams']) as $financialTrxnParams) {
+      $trxn = CRM_Core_BAO_FinancialTrxn::create($financialTrxnParams);
+      $trxnParams = array(
+        'total_amount' => $trxn->total_amount,
+        'contribution_id' => $currentContribution->id,
+      );
+      CRM_Contribute_BAO_Contribution::assignProportionalLineItems($trxnParams, $trxn->id, $prevContribution->total_amount);
+    }
 
     self::createDeferredTrxn(CRM_Utils_Array::value('line_item', $inputParams), $currentContribution, TRUE, 'changePaymentInstrument');
 

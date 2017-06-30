@@ -1177,21 +1177,12 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
     $mut->checkMailLog($strings);
     $this->callAPISuccessGetCount('FinancialTrxn', array(), 3);
     $items = $this->callAPISuccess('FinancialItem', 'get', array('sequential' => 1));
-    // count will be 3 since we changed check_number, due to which
-    //  it records a new reverse financial item
-    $this->assertEquals(4, $items['count']);
+    $this->assertEquals(2, $items['count']);
     $this->assertEquals('Contribution Amount', $items['values'][0]['description']);
     $this->assertEquals(100, $items['values'][0]['amount']);
 
     $this->assertEquals('Sales Tax', $items['values'][1]['description']);
     $this->assertEquals(10, $items['values'][1]['amount']);
-
-    $this->assertEquals('Contribution Amount', $items['values'][2]['description']); // reversed financial item
-    $this->assertEquals(-100, $items['values'][2]['amount']);
-
-    $this->assertEquals('Contribution Amount', $items['values'][3]['description']);
-    // @todo currently its $110 which is incorrect, the proper value should be $200
-    // $this->assertEquals(100, $items['values'][3]['amount']);
   }
 
   /**
@@ -1240,21 +1231,16 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
     );
 
     $mut->checkMailLog($strings);
-    $this->callAPISuccessGetCount('FinancialTrxn', array(), 3);
+    $this->callAPISuccessGetCount('FinancialTrxn', array(), 4);
     $items = $this->callAPISuccess('FinancialItem', 'get', array('sequential' => 1));
-    $this->assertEquals(5, $items['count']);
+    $this->assertEquals(4, $items['count']);
     $this->assertEquals('Contribution Amount', $items['values'][0]['description']);
     $this->assertEquals('Sales Tax', $items['values'][1]['description']);
-    $this->assertEquals('Contribution Amount', $items['values'][0]['description']); // reversed financial item
-    $this->assertEquals('Contribution Amount', $items['values'][3]['description']);
-    $this->assertEquals('Sales Tax', $items['values'][4]['description']);
 
     $this->assertEquals(100, $items['values'][0]['amount']);
     $this->assertEquals(10, $items['values'][1]['amount']);
-    $this->assertEquals(-100, $items['values'][2]['amount']); // reversed financial item
     // @todo currently its $110 which is incorrect, the proper value should be $200
     // $this->assertEquals(200, $items['values'][3]['amount']);
-    $this->assertEquals(20, $items['values'][4]['amount']);
   }
 
   /**
