@@ -73,7 +73,9 @@ abstract class CRM_Activity_Import_Parser extends CRM_Import_Parser {
     &$mapper,
     $skipColumnHeader = FALSE,
     $mode = self::MODE_PREVIEW,
-    $onDuplicate = self::DUPLICATE_SKIP
+    $onDuplicate = self::DUPLICATE_SKIP,
+    $statusID = NULL,
+    $totalRowCount = NULL
   ) {
     if (!is_array($fileName)) {
       CRM_Core_Error::fatal();
@@ -106,6 +108,10 @@ abstract class CRM_Activity_Import_Parser extends CRM_Import_Parser {
     }
     else {
       $this->_activeFieldCount = count($this->_activeFields);
+    }
+    if ($statusID) {
+      $this->progressImport($statusID);
+      $startTimestamp = $currTimestamp = $prevTimestamp = time();
     }
 
     while (!feof($fd)) {
@@ -148,6 +154,9 @@ abstract class CRM_Activity_Import_Parser extends CRM_Import_Parser {
       }
       elseif ($mode == self::MODE_IMPORT) {
         $returnCode = $this->import($onDuplicate, $values);
+        if ($statusID && (($this->_lineCount % 50) == 0)) {
+          $prevTimestamp = $this->progressImport($statusID, FALSE, $startTimestamp, $prevTimestamp, $totalRowCount);
+        }
       }
       else {
         $returnCode = self::ERROR;
