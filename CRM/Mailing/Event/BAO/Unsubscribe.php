@@ -149,7 +149,7 @@ WHERE  email = %2
     $group = $groupObject->getTableName();
     $gcObject = new CRM_Contact_BAO_GroupContact();
     $gc = $gcObject->getTableName();
-    $abObject = new CRM_Mailing_BAO_ABTest();
+    $abObject = new CRM_Mailing_DAO_MailingAB();
     $ab = $abObject->getTableName();
 
     //We Need the mailing Id for the hook...
@@ -158,30 +158,21 @@ WHERE  email = %2
                      WHERE $job.id = " . CRM_Utils_Type::escape($job_id, 'Integer'));
     $do->fetch();
     $mailing_id = $do->mailing_id;
-    $mailing_type = CRM_Core_DAO::getFieldValue('CRM_Mailing_DAO_Mailing', $mailing_id, 'mailing_type', 'id');
-    $entity = CRM_Core_DAO::getFieldValue('CRM_Mailing_DAO_MailingGroup', $mailing_id, 'entity_table', 'mailing_id');
-
-    // If $entity is null and $mailing_Type is either winner or experiment then we are deailing with an AB test
-    $abtest_types = array('experiment', 'winner');
-    if (empty($entity) && in_array($mailing_type, $abtest_types)) {
-      $mailing_id_a = CRM_Core_DAO::getFieldValue('CRM_Mailing_DAO_MailingAB', $mailing_id, 'mailing_id_a', 'mailing_id_b');
-      $field = 'mailing_id_b';
-      if (empty($mailing_id_a)) {
-        $mailing_id_a = CRM_Core_DAO::getFieldValue('CRM_Mailing_DAO_MailingAB', $mailing_id, 'mailing_id_a', 'mailing_id_c');
-        $field = 'mailing_id_c';
+    $mailing_type = CRM_Core_DAO::getFieldValue('CRM_Mailing_BAO_Mailing', $mailing_id, 'mailing_type', 'id');
+    $abTypes = array('winner', 'experiment');
+    $correct_mailing_id = $mailing_id;
+    if (in_array($mailing_type, $abTypes)) {
+      if ($mailing_type == 'winner') {
+        $correct_mailing_id = CRM_Core_DAO::getFieldValue('CRM_Mailing_DAO_MailingAB', $mailing_id, 'mailing_id_a', 'mailing_id_c');
       }
-      $jobJoin = "INNER JOIN $ab ON $ab.mailing_id_a = $mg.mailing_id
-        INNER JOIN $job ON $job.mailing_id = $ab.$field";
-      $entity = CRM_Core_DAO::getFieldValue('CRM_Mailing_DAO_MailingGroup', $mailing_id_a, 'entity_table', 'mailing_id');
-    }
-    else {
-      $jobJoin = "INNER JOIN  $job ON      $job.mailing_id = $mg.mailing_id";
+      else {
+        $mailing_id_a = CRM_Core_DAO::getFieldValue('CRM_Mailing_DAO_MailingAB', $mailing_id, 'mailing_id_a', 'mailing_id_b');
+        if (!empty($mailing_id_a)) {
+          $correct_mailing_id = $mailing_id_a;
+        }
+      }
     }
 
-    $groupClause = '';
-    if ($entity == $group) {
-      $groupClause = "AND $group.is_hidden = 0";
-    }
     $entityTypes = array();
     $mailingGroups = array();
     $do->query("SELECT DISTINCT $mg.entity_table
