@@ -403,6 +403,10 @@ class CRM_Activity_Page_AJAX {
       'context' => 'String',
       'activity_type_id' => 'Integer',
       'activity_type_exclude_id' => 'Integer',
+      'activity_status_id' => 'String',
+      'activity_date_relative' => 'String',
+      'activity_date_low' => 'String',
+      'activity_date_high' => 'String',
     );
 
     $params = CRM_Core_Page_AJAX::defaultSortAndPagerParams();
