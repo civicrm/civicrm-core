@@ -98,6 +98,7 @@ class CRM_Contribute_Import_Form_Preview extends CRM_Import_Form_Preview {
       'downloadConflictRecordsUrl',
       'downloadMismatchRecordsUrl',
     );
+    $this->setStatusUrl();
 
     foreach ($properties as $property) {
       $this->assign($property, $this->get($property));
@@ -148,7 +149,9 @@ class CRM_Contribute_Import_Form_Preview extends CRM_Import_Form_Preview {
       $skipColumnHeader,
       CRM_Import_Parser::MODE_IMPORT,
       $this->get('contactType'),
-      $onDuplicate
+      $onDuplicate,
+      $this->get('statusID'),
+      $this->get('totalRowCount')
     );
 
     // Add all the necessary variables to the form.
