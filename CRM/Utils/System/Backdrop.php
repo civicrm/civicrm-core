@@ -606,6 +606,11 @@ AND    u.status = 1
    * @inheritDoc
    */
   public function cmsRootPath($scriptFilename = NULL) {
+    global $civicrm_paths;
+    if (!empty($civicrm_paths['cms.root']['path'])) {
+      return $civicrm_paths['cms.root']['path'];
+    }
+
     $cmsRoot = NULL;
     $valid = NULL;
 
