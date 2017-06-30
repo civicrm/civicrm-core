@@ -694,6 +694,11 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    *   local file system path to CMS root, or NULL if it cannot be determined
    */
   public function cmsRootPath() {
+    global $civicrm_paths;
+    if (!empty($civicrm_paths['cms.root']['path'])) {
+      return $civicrm_paths['cms.root']['path'];
+    }
+
     list($url, $siteName, $siteRoot) = $this->getDefaultSiteSettings();
     $includePath = "$siteRoot/libraries/cms/version";
     if (file_exists("$includePath/version.php")) {

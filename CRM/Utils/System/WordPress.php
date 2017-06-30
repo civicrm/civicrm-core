@@ -481,6 +481,11 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    *   local file system path to CMS root, or NULL if it cannot be determined
    */
   public function cmsRootPath() {
+    global $civicrm_paths;
+    if (!empty($civicrm_paths['cms.root']['path'])) {
+      return $civicrm_paths['cms.root']['path'];
+    }
+
     $cmsRoot = $valid = NULL;
     if (defined('CIVICRM_CMSDIR')) {
       if ($this->validInstallDir(CIVICRM_CMSDIR)) {
