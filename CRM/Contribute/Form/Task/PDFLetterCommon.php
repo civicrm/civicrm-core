@@ -246,10 +246,8 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
   public static function buildContributionArray($groupBy, $contributionIDs, $returnProperties, $skipOnHold, $skipDeceased, $messageToken, $task, $separator, $isIncludeSoftCredits) {
     $contributions = $contacts = $notSent = array();
     foreach ($contributionIDs as $item => $contributionId) {
-      // get contribution information
-
       // basic return attributes needed, see below for there usage
-      $returnValues = array('contact_id', 'total_amount');
+      $returnValues = array('contact_id', 'total_amount', 'contribution_campaign_title');
       if (!empty($messageToken['contribution'])) {
         $returnValues = array_merge($messageToken['contribution'], $returnValues);
       }
@@ -258,6 +256,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
         'id' => $contributionId,
         'return' => $returnValues,
       ));
+      $contribution['campaign'] = CRM_Utils_Array::value('contribution_campaign_title', $contribution);
       $contributions[$contributionId] = $contribution;
 
       if ($isIncludeSoftCredits) {
