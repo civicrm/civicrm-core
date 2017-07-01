@@ -80,7 +80,9 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
     }
 
     $caseTypeDAO->copyValues($params);
-    return $caseTypeDAO->save();
+    $result = $caseTypeDAO->save();
+    CRM_Case_XMLRepository::singleton()->flush();
+    return $result;
   }
 
   /**
