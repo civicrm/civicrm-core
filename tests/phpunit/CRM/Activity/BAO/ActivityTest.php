@@ -745,20 +745,20 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     // activity IDs catagorised by date
     $lastWeekActivities = array(1, 2, 3);
     $todayActivities = array(4, 5, 6, 7);
-    $lastMonthActivities = array(8, 9, 10, 11);
+    $lastTwoMonthsActivities = array(8, 9, 10, 11);
     $lastYearActivties = array(12, 13, 14, 15, 16);
 
     // date values later used to set activity date value
     $lastWeekDate = date('YmdHis', strtotime('1 week ago'));
     $today = date('YmdHis');
-    $lastMonthDate = date('YmdHis', strtotime('1 month ago'));
+    $lastTwoMonthAgoDate = date('YmdHis', strtotime('2 months ago'));
     $lastYearDate = date('YmdHis', strtotime('1 year ago'));
     for ($i = 1; $i <= 16; $i++) {
       if (in_array($i, $lastWeekActivities)) {
         $date = $lastWeekDate;
       }
-      elseif (in_array($i, $lastMonthActivities)) {
-        $date = $lastMonthDate;
+      elseif (in_array($i, $lastTwoMonthsActivities)) {
+        $date = $lastTwoMonthAgoDate;
       }
       elseif (in_array($i, $lastYearActivties)) {
         $date = $lastYearDate;
@@ -814,13 +814,13 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
           'sort' => NULL,
         ),
       ),
-      'last-month-activity' => array(
+      'this-quarter-activity' => array(
         'params' => array(
           'contact_id' => 1,
           'admin' => TRUE,
           'caseId' => NULL,
           'context' => 'activity',
-          'activity_date_relative' => 'previous.month',
+          'activity_date_relative' => 'this.quarter',
           'activity_type_id' => NULL,
           'offset' => 0,
           'rowCount' => 0,
@@ -871,10 +871,10 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
         $this->assertEquals(count($lastWeekActivities), count($activitiesDep));
         $this->checkArrayEquals($lastWeekActivities, $activityIDs);
       }
-      elseif ($caseName == 'last-month-activity') {
-        $this->assertEquals(count($lastMonthActivities), $activityCount);
-        $this->assertEquals(count($lastMonthActivities), count($activitiesDep));
-        $this->checkArrayEquals($lastMonthActivities, $activityIDs);
+      elseif ($caseName == 'lhis-quarter-activity') {
+        $this->assertEquals(count($lastTwoMonthsActivities), $activityCount);
+        $this->assertEquals(count($lastTwoMonthsActivities), count($activitiesDep));
+        $this->checkArrayEquals($lastTwoMonthsActivities, $activityIDs);
       }
       elseif ($caseName == 'last-year-activity') {
         $this->assertEquals(count($lastYearActivties), $activityCount);

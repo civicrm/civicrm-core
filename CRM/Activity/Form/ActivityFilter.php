@@ -67,8 +67,7 @@ class CRM_Activity_Form_ActivityFilter extends CRM_Core_Form {
   public function setDefaultValues() {
     // CRM-11761 retrieve user's activity filter preferences
     $defaults = array();
-    $userID = CRM_Core_Session::getLoggedInContactID();
-    if ($userID) {
+    if (Civi::settings()->get('preserve_activity_tab_filter') && ($userID = CRM_Core_Session::getLoggedInContactID())) {
       $defaults = Civi::service('settings_manager')
         ->getBagByContact(NULL, $userID)
         ->get('activity_tab_filter');

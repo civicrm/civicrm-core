@@ -39,7 +39,7 @@
           </td>
           {include file="CRM/Core/DateRange.tpl" fieldName="activity_date" from='_low' to='_high' label='Date'}
           <td class="crm-contact-form-block-activity_status_filter_id crm-inline-edit-field">
-            {ts}Status{/ts}: {$form.status_id.html|crmAddClass:medium}
+            {ts}Status{/ts}<br /> {$form.status_id.html|crmAddClass:medium}
           </td>
         </tr>
       </table>

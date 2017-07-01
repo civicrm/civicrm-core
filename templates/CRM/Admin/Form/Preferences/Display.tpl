@@ -143,6 +143,16 @@
       </td>
     </tr>
 
+    <tr class="crm-preferences-display-form-block-preserve_activity_tab_filter">
+      <td class="label"></td>
+      <td>{$form.preserve_activity_tab_filter.html} {$form.preserve_activity_tab_filter.label}</td>
+    </tr>
+    <tr class="crm-preferences-display-form-block-description">
+      <td>&nbsp;</td>
+      <td class="description">{ts}When enabled, any filter settings a user selects on the contact's Activity tab will be remembered as they visit other contacts.{/ts}
+      </td>
+    </tr>
+
     <tr class="crm-preferences-display-form-block-user_dashboard_options">
       <td class="label">{$form.user_dashboard_options.label}</td>
       <td>{$form.user_dashboard_options.html}<span id="invoice_help">  {help id="id-invoices_id"}</span></td>

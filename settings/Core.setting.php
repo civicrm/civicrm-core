@@ -953,4 +953,18 @@ return array(
     'description' => 'If enabled, then CMS email id will be syncronised with CiviCRM contacts\'s primary email.',
     'help_text' => NULL,
   ),
+  'preserve_activity_tab_filter' => array(
+    'group_name' => 'CiviCRM Preferences',
+    'group' => 'core',
+    'name' => 'preserve_activity_tab_filter',
+    'type' => 'String',
+    'html_type' => 'Text',
+    'default' => '0',
+    'add' => '4.7',
+    'title' => 'Preserve activity filters as a user preference',
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => 'When enabled, any filter settings a user selects on the contact\'s Activity tab will be remembered as they visit other contacts',
+    'help_text' => NULL,
+  ),
 );
