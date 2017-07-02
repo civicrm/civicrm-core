@@ -37,6 +37,25 @@ class CRM_Core_Page_AJAX_RecurringEntity {
       if ($dao->find(TRUE)) {
         $dao->mode = $mode;
         $dao->save();
+
+        //CRM-20787 Fix
+        //I am not sure about other fields, if mode = 3 apply for an event then other fields
+        //should be save for all other series events or not so applying for price set only for now here.
+        if (CRM_Core_BAO_RecurringEntity::MODE_ALL_ENTITY_IN_SERIES === $mode) {
+            //Step-1: Get Price set for parent event
+            $currentEventPriceSet = CRM_Price_BAO_PriceSet::getPriceSetOfEntity($entityTable, $entityId);
+
+            //Step-2: Get all events of series
+            $seriesEventRecords = CRM_Core_BAO_RecurringEntity::getEntitiesFor($entityId, $entityTable);
+            foreach($seriesEventRecords as $event) {
+                //Step-3: Save price set in other series events
+                if (CRM_Price_BAO_PriceSet::removeFrom($event['table'], $event['id'])) { //Remove existing priceset
+                    CRM_Core_BAO_Discount::del($event['id'], $event['table']);
+                    CRM_Price_BAO_PriceSet::addTo($event['table'], $event['id'], $currentEventPriceSet['price_set_id']); //Add new price set
+                }
+            }
+        }
+        //CRM-20787 - Fix end
         $finalResult['status'] = 'Done';
       }
       else {
