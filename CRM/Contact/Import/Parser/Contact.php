@@ -2412,50 +2412,41 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
 
     // get the formatted location blocks into params - w/ 3.0 format, CRM-4605
     if (!empty($values['location_type_id'])) {
-      static $fields = NULL;
-      if ($fields == NULL) {
-        $fields = array();
-      }
-
-      foreach (array(
-                 'Phone',
-                 'Email',
-                 'IM',
-                 'OpenID',
-                 'Phone_Ext',
-               ) as $block) {
-        $name = strtolower($block);
-        if (!array_key_exists($name, $values)) {
+      $blockTypes = array(
+        'phone' => 'Phone',
+        'email' => 'Email',
+        'im' => 'IM',
+        'openid' => 'OpenID',
+        'phone_ext' => 'Phone',
+      );
+      foreach ($blockTypes as $blockFieldName => $block) {
+        if (!array_key_exists($blockFieldName, $values)) {
           continue;
         }
 
-        if ($name == 'phone_ext') {
-          $block = 'Phone';
-        }
-
         // block present in value array.
-        if (!array_key_exists($name, $params) || !is_array($params[$name])) {
-          $params[$name] = array();
+        if (!array_key_exists($blockFieldName, $params) || !is_array($params[$blockFieldName])) {
+          $params[$blockFieldName] = array();
         }
 
         if (!array_key_exists($block, $fields)) {
           $className = "CRM_Core_DAO_$block";
-          $fields[$block] =& $className::fields();
+          $fields[$block] = $className::fields();
         }
 
-        $blockCnt = count($params[$name]);
+        $blockCnt = count($params[$blockFieldName]);
 
         // copy value to dao field name.
-        if ($name == 'im') {
-          $values['name'] = $values[$name];
+        if ($blockFieldName == 'im') {
+          $values['name'] = $values[$blockFieldName];
         }
 
         _civicrm_api3_store_values($fields[$block], $values,
-          $params[$name][++$blockCnt]
+          $params[$blockFieldName][++$blockCnt]
         );
 
         if (empty($params['id']) && ($blockCnt == 1)) {
-          $params[$name][$blockCnt]['is_primary'] = TRUE;
+          $params[$blockFieldName][$blockCnt]['is_primary'] = TRUE;
         }
 
         // we only process single block at a time.
