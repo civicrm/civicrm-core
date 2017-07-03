@@ -3442,7 +3442,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     $smartGroups = array_keys($groups['values']);
 
     $query = "
-       SELECT group_contact.contact_id as id
+       SELECT DISTINCT group_contact.contact_id as id
        FROM civicrm_group_contact group_contact
        WHERE group_contact.group_id IN (" . implode(', ', $filteredGroups) . ")
        AND group_contact.status = 'Added' ";
