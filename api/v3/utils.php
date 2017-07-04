@@ -922,8 +922,10 @@ function _civicrm_api3_build_fields_array(&$bao, $unique = TRUE) {
   if ($unique) {
     if (empty($fields['id'])) {
       $lowercase_entity = _civicrm_api_get_entity_name_from_camel(_civicrm_api_get_entity_name_from_dao($bao));
-      $fields['id'] = $fields[$lowercase_entity . '_id'];
-      unset($fields[$lowercase_entity . '_id']);
+      if (isset($fields[$lowercase_entity . '_id'])) {
+        $fields['id'] = $fields[$lowercase_entity . '_id'];
+        unset($fields[$lowercase_entity . '_id']);
+      }
     }
     return $fields;
   }
