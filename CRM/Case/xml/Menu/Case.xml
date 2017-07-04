@@ -65,6 +65,14 @@
      <page_callback>CRM_Case_Page_CaseDetails</page_callback>
   </item>
   <item>
+     <path>civicrm/admin/setting/case</path>
+     <title>CiviCase Settings</title>
+     <page_callback>CRM_Admin_Form_Setting_Case</page_callback>
+     <adminGroup>CiviCase</adminGroup>
+     <icon>admin/small/36.png</icon>
+     <weight>380</weight>
+  </item>
+  <item>
      <path>civicrm/admin/options/case_type</path>
      <title>Case Types</title>
      <desc>List of types which can be assigned to Cases. (Enable the Cases tab from System Settings - Enable Components if you want to track cases.)</desc>
