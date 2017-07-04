@@ -225,10 +225,29 @@ class CRM_Extension_System {
       $cacheDir = NULL;
       if ($this->getDefaultContainer()) {
         $cacheDir = $this->getDefaultContainer()->getBaseDir() . DIRECTORY_SEPARATOR . 'cache';
+        $this->createGitIgnoreForCacheFiles($this->getDefaultContainer()->getBaseDir());
       }
       $this->browser = new CRM_Extension_Browser($this->getRepositoryUrl(), '', $cacheDir);
     }
     return $this->browser;
+  }
+
+  /**
+   * Create .gitignore to remove cache dir.
+   *
+   * @param string $extPath
+   */
+  public function createGitIgnoreForCacheFiles($extPath) {
+    if (!empty($extPath)) {
+      $path = $extPath . DIRECTORY_SEPARATOR . '.gitignore';
+      if (file_exists($path)) {
+        //Return if cache dir is already ignored.
+        if (in_array('cache', explode("\n", file_get_contents($path)))) {
+          return;
+        }
+      }
+      file_put_contents($path, "cache\n", FILE_APPEND);
+    }
   }
 
   /**
