@@ -55,7 +55,7 @@ return array(
     'pseudoconstant' => array(
       'callback' => 'CRM_Case_Info::getRedactOptions',
     ),
-    'description' => '',
+    'description' => 'Should activity emails be redacted? (Set "Auto" to load setting from the legacy "Settings.xml" file.)',
     'help_text' => '',
   ),
   'civicaseAllowMultipleCaseClients' => array(
@@ -76,7 +76,7 @@ return array(
     'pseudoconstant' => array(
       'callback' => 'CRM_Case_Info::getMultiClientOptions',
     ),
-    'description' => '',
+    'description' => 'How many clients may be associated with a given case? (Set "Auto" to load setting from the legacy "Settings.xml" file.)',
     'help_text' => '',
   ),
   'civicaseNaturalActivityTypeSort' => array(
@@ -97,7 +97,7 @@ return array(
     'pseudoconstant' => array(
       'callback' => 'CRM_Case_Info::getSortOptions',
     ),
-    'description' => '',
+    'description' => 'How to sort activity-types on the "Manage Case" screen? (Set "Auto" to load setting from the legacy "Settings.xml" file.)',
     'help_text' => '',
   ),
 );
