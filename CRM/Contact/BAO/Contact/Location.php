@@ -51,7 +51,7 @@ class CRM_Contact_BAO_Contact_Location {
       $primaryClause = " AND civicrm_email.is_primary = 1";
     }
 
-    // CRM-20362 retriving Billing email address.
+    // CRM-20362 retrieving Billing email address.
     if ($isBilling) {
       $primaryClause = " AND civicrm_email.is_billing = 1";
     }
