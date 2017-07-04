@@ -394,6 +394,28 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
   }
 
   /**
+   * CRM-20640: Test the group filter works on the contribution summary when a single contact in 2 groups.
+   */
+  public function testContributionSummaryWithSingleContactsInTwoGroups() {
+    list($groupID1, $individualID) = $this->setUpPopulatedGroup(TRUE);
+    // create second group and add the individual to it.
+    $groupID2 = $this->groupCreate(array('name' => uniqid(), 'title' => uniqid()));
+    $this->callAPISuccess('GroupContact', 'create', array(
+      'group_id' => $groupID2,
+      'contact_id' => $individualID,
+      'status' => 'Added',
+    ));
+
+    $rows = $this->callAPISuccess('report_template', 'getrows', array(
+      'report_id' => 'contribute/summary',
+      'gid_value' => array($groupID1, $groupID2),
+      'gid_op' => 'in',
+      'options' => array('metadata' => array('sql')),
+    ));
+    $this->assertEquals(1, $rows['count']);
+  }
+
+  /**
    * Test the group filter works on the contribution summary when 2 groups are involved.
    */
   public function testContributionSummaryWithTwoGroupsWithIntersection() {
@@ -463,9 +485,11 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    * This gives us a range of scenarios for testing contacts are included only once
    * whenever they are hard-added or in the criteria.
    *
+   * @param bool $returnAddedContact
+   *
    * @return int
    */
-  public function setUpPopulatedGroup() {
+  public function setUpPopulatedGroup($returnAddedContact = FALSE) {
     $individual1ID = $this->individualCreate();
     $individualID = $this->individualCreate();
     $individualIDRemoved = $this->individualCreate();
@@ -487,6 +511,11 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
 
     // Refresh the cache for test purposes. It would be better to alter to alter the GroupContact add function to add contacts to the cache.
     CRM_Contact_BAO_GroupContactCache::remove($groupID, FALSE);
+
+    if ($returnAddedContact) {
+      return array($groupID, $individualID);
+    }
+
     return $groupID;
   }
 
