@@ -876,15 +876,11 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
       $mappingParams = array(
         'name' => $params['saveMappingName'],
         'description' => $params['saveMappingDesc'],
-        'mapping_type_id' => CRM_Core_OptionGroup::getValue('mapping_type',
-          'Import Contact',
-          'name'
-        ),
+        'mapping_type_id' => 'Import Contact',
       );
 
-      $saveMapping = CRM_Core_BAO_Mapping::add($mappingParams);
+      $saveMapping = civicrm_api3('Mapping', 'create', $mappingParams);
 
-      $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
       $contactType = $this->get('contactType');
       switch ($contactType) {
         case CRM_Import_Parser::CONTACT_INDIVIDUAL:
@@ -901,7 +897,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
 
       for ($i = 0; $i < $this->_columnCount; $i++) {
         $saveMappingFields = new CRM_Core_DAO_MappingField();
-        $saveMappingFields->mapping_id = $saveMapping->id;
+        $saveMappingFields->mapping_id = $saveMapping['id'];
         $saveMappingFields->contact_type = $cType;
         $saveMappingFields->column_number = $i;
 
@@ -930,7 +926,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
         }
         else {
           $saveMappingFields->name = $mapper[$i];
-          $location_id = array_keys($locationTypes, $locations[$i]);
+          $locationTypeID = $parserParameters['mapperLocType'][$i];
           // to get phoneType id and provider id separately
           // before saving mappingFields of phone and IM, CRM-3140
           if (CRM_Utils_Array::value('0', $mapperKeys[$i]) == 'url') {
@@ -943,7 +939,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
             elseif (CRM_Utils_Array::value('0', $mapperKeys[$i]) == 'im') {
               $saveMappingFields->im_provider_id = isset($mapperKeys[$i][2]) ? $mapperKeys[$i][2] : NULL;
             }
-            $saveMappingFields->location_type_id = isset($location_id[0]) ? $location_id[0] : NULL;
+            $saveMappingFields->location_type_id = is_numeric($locationTypeID) ? $locationTypeID : NULL;
           }
           $saveMappingFields->relationship_type_id = NULL;
         }
