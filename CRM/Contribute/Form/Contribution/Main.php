@@ -138,10 +138,12 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         //don't set custom data Used for Contribution (CRM-1344)
         if (substr($name, 0, 7) == 'custom_') {
           $id = substr($name, 7);
-          if (!CRM_Core_BAO_CustomGroup::checkCustomField($id, $removeCustomFieldTypes)) {
-            continue;
+          if ((!CRM_Core_BAO_CustomGroup::checkCustomField($id, $removeCustomFieldTypes))) {
+            if ($dontCare['data_type'] === 'ContactReference') {
+            } else {
+                continue;
+            }
           }
-          // ignore component fields
         }
         elseif (array_key_exists($name, $contribFields) || (substr($name, 0, 11) == 'membership_') || (substr($name, 0, 13) == 'contribution_')) {
           continue;
