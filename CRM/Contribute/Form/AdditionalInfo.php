@@ -441,9 +441,18 @@ class CRM_Contribute_Form_AdditionalInfo {
     }
 
     $form->assign_by_ref('formValues', $params);
+
+    // CRM-20362 Considering billing address of the contact if any,
+    // If got null use default (primary email address).
+
     list($contributorDisplayName,
       $contributorEmail
-      ) = CRM_Contact_BAO_Contact_Location::getEmailDetails($params['contact_id']);
+      ) = CRM_Contact_BAO_Contact_Location::getEmailDetails($params['contact_id'], FALSE, NULL, TRUE);
+
+    if ($contributorEmail == NULL) {
+      list($contributorDisplayName, $contributorEmail) = CRM_Contact_BAO_Contact_Location::getEmailDetails($params['contact_id']);
+    }
+
     $form->assign('contactID', $params['contact_id']);
     $form->assign('contributionID', $params['contribution_id']);
 

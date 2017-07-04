@@ -271,13 +271,30 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
     // here we store details in order to do that
     if (!empty($formValues['soft_credit_contact_id'])) {
       $this->_receiptContactId = $this->_contributorContactID = $formValues['soft_credit_contact_id'];
+
+      // CRM-20362 Considering billing address of the contact if any,
+      // If got null use default (primary email address).
       list($this->_contributorDisplayName,
-        $this->_contributorEmail) = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contributorContactID);
+        $this->_contributorEmail) = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contributorContactID, FALSE, NULL, TRUE);
+
+      if ($this->_contributorEmail == NULL) {
+        list($this->_contributorDisplayName,
+              $this->_contributorEmail) = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contributorContactID);
+      }
+
     }
     else {
       $this->_receiptContactId = $this->_contributorContactID = $this->_contactID;
-      $this->_contributorDisplayName = $this->_memberDisplayName;
-      $this->_contributorEmail = $this->_memberEmail;
+
+      // CRM-20362 Considering billing address of the contact if any,
+      // If got null use default (primary email address).
+      list($this->_contributorDisplayName,
+        $this->_contributorEmail) = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contributorContactID, FALSE, NULL, TRUE);
+
+      if ($this->_contributorEmail == NULL) {
+        $this->_contributorDisplayName = $this->_memberDisplayName;
+        $this->_contributorEmail = $this->_memberEmail;
+      }
     }
   }
 

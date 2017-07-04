@@ -240,6 +240,28 @@ class CRM_Core_BAO_Block {
       $contactId = $params['contact_id'];
     }
 
+    /*
+    Bug fix: CRM-20362
+    If the location_type_id (Email type) is billing then set 'is_billing'
+    to true for particular email param, which sets is_billing to 1 for civicrm_email table.
+     */
+
+    if ($blockName == "email") {
+      foreach ($params[$blockName] as $key => $email) {
+        $locationTypeId = $email["location_type_id"];
+        $locationType = civicrm_api3('LocationType', 'get', array(
+              'id' => $locationTypeId,
+              'sequential' => 1,
+            ));
+        if ($locationType["count"] > 0) {
+          $locationType = $locationType["values"][0];
+          if ($locationType["name"] == "Billing") {
+            $params['email'][$key]["is_billing"] = TRUE;
+          }
+        }
+      }
+    }
+
     $updateBlankLocInfo = CRM_Utils_Array::value('updateBlankLocInfo', $params, FALSE);
     $isIdSet = CRM_Utils_Array::value('isIdSet', $params[$blockName], FALSE);
 

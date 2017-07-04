@@ -40,14 +40,20 @@ class CRM_Contact_BAO_Contact_Location {
    *
    * @param bool $isPrimary
    * @param int $locationTypeID
+   * @param bool $isBilling
    *
    * @return array
    *   Array of display_name, email, location type and location id if found, or (null,null,null, null)
    */
-  public static function getEmailDetails($id, $isPrimary = TRUE, $locationTypeID = NULL) {
+  public static function getEmailDetails($id, $isPrimary = TRUE, $locationTypeID = NULL, $isBilling = FALSE) {
     $primaryClause = NULL;
     if ($isPrimary) {
       $primaryClause = " AND civicrm_email.is_primary = 1";
+    }
+
+    // CRM-20362 retriving Billing email address.
+    if ($isBilling) {
+      $primaryClause = " AND civicrm_email.is_billing = 1";
     }
 
     $locationClause = NULL;
