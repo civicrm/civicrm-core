@@ -387,9 +387,12 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     $this->add('textarea', 'receipt_text_renewal', ts('Renewal Message'));
 
     // Retrieve the name and email of the contact - this will be the TO for receipt email
+    // CRM-20362 changing function getEmailDetails to getBillingEmailDetails which fall backs to primary
+    // email address if no billing address found.
+
     list($this->_contributorDisplayName,
       $this->_contributorEmail
-      ) = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contactID);
+      ) = CRM_Contact_BAO_Contact_Location::getBillingEmailDetails($this->_contactID);
     $this->assign('email', $this->_contributorEmail);
     // The member form uses emailExists. Assigning both while we transition / synchronise.
     $this->assign('emailExists', $this->_contributorEmail);

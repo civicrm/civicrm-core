@@ -447,11 +447,7 @@ class CRM_Contribute_Form_AdditionalInfo {
 
     list($contributorDisplayName,
       $contributorEmail
-      ) = CRM_Contact_BAO_Contact_Location::getEmailDetails($params['contact_id'], FALSE, NULL, TRUE);
-
-    if ($contributorEmail == NULL) {
-      list($contributorDisplayName, $contributorEmail) = CRM_Contact_BAO_Contact_Location::getEmailDetails($params['contact_id']);
-    }
+      ) = CRM_Contact_BAO_Contact_Location::getBillingEmailDetails($params['contact_id']);
 
     $form->assign('contactID', $params['contact_id']);
     $form->assign('contributionID', $params['contribution_id']);

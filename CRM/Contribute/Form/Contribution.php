@@ -402,6 +402,13 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       }
     }
 
+    // CRM-20362 Considering billing address of the contact if any,
+    // If got null use default (primary email address).
+    list($billingDisplayName, $billingEmailAddress) = CRM_Contact_BAO_Contact_Location::getBillingEmailDetails($this->_contactID);
+    if ($billingEmailAddress != NULL) {
+      $this->userEmail = $billingEmailAddress;
+    }
+
     if (isset($this->userEmail)) {
       $this->assign('email', $this->userEmail);
     }
@@ -1125,13 +1132,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       // If got null use default (primary email address).
       list($this->userDisplayName,
         $this->userEmail
-        ) = CRM_Contact_BAO_Contact_Location::getEmailDetails($contactID, FALSE, NULL, TRUE);
-
-      if ($this->_contributorEmail == NULL) {
-        list($this->userDisplayName,
-              $this->userEmail
-              ) = CRM_Contact_BAO_Contact_Location::getEmailDetails($contactID);
-      }
+        ) = CRM_Contact_BAO_Contact_Location::getBillingEmailDetails($contactID);
 
       $this->assign('displayName', $this->userDisplayName);
     }

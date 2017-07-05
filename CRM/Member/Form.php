@@ -275,12 +275,7 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
       // CRM-20362 Considering billing address of the contact if any,
       // If got null use default (primary email address).
       list($this->_contributorDisplayName,
-        $this->_contributorEmail) = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contributorContactID, FALSE, NULL, TRUE);
-
-      if ($this->_contributorEmail == NULL) {
-        list($this->_contributorDisplayName,
-              $this->_contributorEmail) = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contributorContactID);
-      }
+        $this->_contributorEmail) = CRM_Contact_BAO_Contact_Location::getBillingEmailDetails($this->_contributorContactID);
 
     }
     else {
@@ -289,12 +284,8 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
       // CRM-20362 Considering billing address of the contact if any,
       // If got null use default (primary email address).
       list($this->_contributorDisplayName,
-        $this->_contributorEmail) = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contributorContactID, FALSE, NULL, TRUE);
+        $this->_contributorEmail) = CRM_Contact_BAO_Contact_Location::getBillingEmailDetails($this->_contributorContactID);
 
-      if ($this->_contributorEmail == NULL) {
-        $this->_contributorDisplayName = $this->_memberDisplayName;
-        $this->_contributorEmail = $this->_memberEmail;
-      }
     }
   }
 
