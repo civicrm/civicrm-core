@@ -15,10 +15,11 @@
     "psr/log": "1.0.0",
     "symfony/finder": "2.3.*",
     "tecnickcom/tcpdf" : "6.2.*",
-    "totten/ca-config": "~13.02",
-    "civicrm/civicrm-cxn-rpc": "~0.15.12.04",
     "pear/Net_SMTP": "1.6.*",
-    "pear/Net_socket": "1.0.*"
+    "pear/Net_socket": "1.0.*",
+    "totten/ca-config": "~17.05",
+    "civicrm/civicrm-cxn-rpc": "~0.16.12.05",
+    "pear/Auth_SASL": "1.1.0"
   },
   "scripts": {
     "post-install-cmd": [
