@@ -44,9 +44,9 @@ class CRM_Utils_Check_Source {
     $files[] = $civicrm_root . '/packages/Net/SMTP.php';
     $files[] = $civicrm_root . '/packages/Net/Socket.php';
     $files[] = $civicrm_root . '/packages/_ORIGINAL_/Net/SMTP.php';
-    $files[] = $civicrm_root . '/vendor]/pear/net_smtp/examples';
-    $files[] = $civicrm_root . '/vendor]/pear/net_smtp/tests';
-    $files[] = $civicrm_root . '/vendor]/pear/net_smtp/phpdoc.sh';
+    $files[] = $civicrm_root . '/vendor/pear/net_smtp/examples';
+    $files[] = $civicrm_root . '/vendor/pear/net_smtp/tests';
+    $files[] = $civicrm_root . '/vendor/pear/net_smtp/phpdoc.sh';
 
     return $files;
   }
