@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
@@ -39,14 +39,14 @@ class CRM_Utils_Check_Source {
 
   public function getRemovedFiles() {
     global $civicrm_root;
-    $files[] = $civicrm_root . '/packages/Auth/SASL';
-    $files[] = $civicrm_root . '/packages/Auth/SASL.php';
-    $files[] = $civicrm_root . '/packages/Net/SMTP.php';
-    $files[] = $civicrm_root . '/packages/Net/Socket.php';
-    $files[] = $civicrm_root . '/packages/_ORIGINAL_/Net/SMTP.php';
-    $files[] = $civicrm_root . '/vendor/pear/net_smtp/examples';
-    $files[] = $civicrm_root . '/vendor/pear/net_smtp/tests';
-    $files[] = $civicrm_root . '/vendor/pear/net_smtp/phpdoc.sh';
+    $files[] = array('path' => $civicrm_root . 'packages/Auth/SASL', 'name' => 'Auth/SASL');
+    $files[] = array('path' => $civicrm_root . 'packages/Auth/SASL.php', 'name' => 'Auth/SASL.php');
+    $files[] = array('path' => $civicrm_root . 'packages/Net/SMTP.php', 'name' => 'Net/SMTP.php');
+    $files[] = array('path' => $civicrm_root . 'packages/Net/Socket.php', 'name' => 'Net/Socket.php');
+    $files[] = array('path' => $civicrm_root . 'packages/_ORIGINAL_/Net/SMTP.php', 'name' => '_ORIGINAL_/Net/SMTP.php');
+    $files[] = array('path' => $civicrm_root . 'vendor/pear/net_smtp/examples', 'name' => 'pear/net_smtp/examples');
+    $files[] = array('path' => $civicrm_root . 'vendor/pear/net_smtp/tests', 'name' => 'pear/net_smtp/tests');
+    $files[] = array('path' => $civicrm_root . 'vendor/pear/net_smtp/phpdoc.sh', 'name' => 'pear/net_smtp/phpdoc.sh');
 
     return $files;
   }
@@ -62,14 +62,13 @@ class CRM_Utils_Check_Source {
     $orphans = array();
 
     foreach ($this->getRemovedFiles() as $file) {
-      if (file_exists($file)) {
+      if (file_exists($file['path'])) {
         $orphans[] = array(
-          'name' => $file,
-          'path' => $file,
+          'name' => $file['name'],
+          'path' => $file['path'],
         );
       }
     }
-
     usort($orphans, function ($a, $b) {
       // Children first, then parents.
       $diff = strlen($b['name']) - strlen($a['name']);
