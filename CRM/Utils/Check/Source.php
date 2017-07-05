@@ -30,7 +30,12 @@
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2017
  */
-class CRM_Utils_Component_Source extends CRM_Utils_Check_Component {
+class CRM_Utils_Check_Source {
+
+  public function checkAll() {
+    $messages = $this->checkOrphans();
+    return $messages;
+  }
 
   public function getRemovedFiles() {
     global $civicrm_root;

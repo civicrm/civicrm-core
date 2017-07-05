@@ -121,7 +121,7 @@ class CRM_Utils_Check {
     $checks = array();
     $checks[] = new CRM_Utils_Check_Security();
     $checks[] = new CRM_Utils_Check_Env();
-
+    $checks[] = new CRM_Utils_Check_Source();
     $compInfo = CRM_Core_Component::getEnabledComponents();
     foreach ($compInfo as $compObj) {
       switch ($compObj->info['name']) {
