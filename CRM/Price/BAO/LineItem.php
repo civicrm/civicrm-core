@@ -302,7 +302,7 @@ WHERE li.contribution_id = %1";
       if (isset($lineItems[$dao->id]['financial_type_id']) && array_key_exists($lineItems[$dao->id]['financial_type_id'], $taxRates)) {
         // We are close to output/display here - so apply some rounding at output/display level - to not show Tax Rate in all 8 decimals
         // Cast to float so trailing zero decimals are removed.
-        $lineItems[$dao->id]['tax_rate'] = (float)round($taxRates[$lineItems[$dao->id]['financial_type_id']], 3);
+        $lineItems[$dao->id]['tax_rate'] = (float) round($taxRates[$lineItems[$dao->id]['financial_type_id']], 3);
       }
       else {
         // There is no Tax Rate associated with this Financial Type

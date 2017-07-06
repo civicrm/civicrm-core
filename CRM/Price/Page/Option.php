@@ -154,7 +154,7 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
       // Adding the required fields in the array
       if (isset($taxRate[$values['financial_type_id']])) {
         // Cast to float so trailing zero decimals are removed
-        $customOption[$id]['tax_rate'] = (float)$taxRate[$values['financial_type_id']];
+        $customOption[$id]['tax_rate'] = (float) $taxRate[$values['financial_type_id']];
         if ($invoicing && isset($customOption[$id]['tax_rate'])) {
           $getTaxDetails = TRUE;
         }

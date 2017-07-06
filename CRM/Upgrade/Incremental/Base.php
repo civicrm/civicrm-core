@@ -187,9 +187,9 @@ class CRM_Upgrade_Incremental_Base {
    * @param CRM_Queue_TaskContext $ctx
    * @param string $table
    * @param string $column
-   * @param string $newColumn (new name for column)
    * @param string $properties
    * @param bool $localizable is this a field that should be localized
+   * @param string $newColumn (new name for column)
    * @return bool
    */
   public static function alterColumn($ctx, $table, $column, $properties, $localizable = FALSE, $newColumn = NULL) {
