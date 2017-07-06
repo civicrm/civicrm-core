@@ -115,7 +115,7 @@
         var mtype = cj("#membership_type_id").val();
         var postUrl = "{/literal}{crmURL p='civicrm/ajax/memType' h=0}{literal}";
         cj.post( postUrl, {mtype: mtype}, function( data ) {
-          cj("#amount").val( data.total_amount );
+          cj("#amount").val( data.total_amount_numeric );
           cj("#label").val( data.name );
 
         }, 'json');

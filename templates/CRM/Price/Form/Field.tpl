@@ -209,7 +209,7 @@
     var postUrl = "{/literal}{crmURL p='civicrm/ajax/memType' h=0}{literal}";
 
     cj.post( postUrl, {mtype: mtype}, function(data) {
-      cj("#option_amount_"+ row).val(data.total_amount);
+      cj("#option_amount_"+ row).val(data.total_amount_numeric);
       cj("#option_label_"+ row).val(data.name);
       cj("#option_financial_type_id_"+ row).val(data.financial_type_id);
       if (data.name) {

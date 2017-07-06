@@ -104,7 +104,7 @@
   {/if}
   {if $invoicing && $tax_amount}
     <tr>
-      <td class="label">{ts}Total Tax Amount{/ts}</td>
+      <td class="label">{ts}Total {$taxTerm} Amount{/ts}</td>
       <td>{$tax_amount|crmMoney:$currency}</td>
     </tr>
   {/if}
