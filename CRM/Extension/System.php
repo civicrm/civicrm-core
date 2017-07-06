@@ -98,6 +98,7 @@ class CRM_Extension_System {
     $parameters['extensionsDir'] = CRM_Utils_Array::value('extensionsDir', $parameters, $config->extensionsDir);
     $parameters['extensionsURL'] = CRM_Utils_Array::value('extensionsURL', $parameters, $config->extensionsURL);
     $parameters['resourceBase'] = CRM_Utils_Array::value('resourceBase', $parameters, $config->resourceBase);
+    $parameters['uploadDir'] = CRM_Utils_Array::value('uploadDir', $parameters, $config->uploadDir);
     $parameters['userFrameworkBaseURL'] = CRM_Utils_Array::value('userFrameworkBaseURL', $parameters, $config->userFrameworkBaseURL);
     if (!array_key_exists('civicrm_root', $parameters)) {
       $parameters['civicrm_root'] = $GLOBALS['civicrm_root'];
@@ -223,31 +224,12 @@ class CRM_Extension_System {
   public function getBrowser() {
     if ($this->browser === NULL) {
       $cacheDir = NULL;
-      if ($this->getDefaultContainer()) {
-        $cacheDir = $this->getDefaultContainer()->getBaseDir() . DIRECTORY_SEPARATOR . 'cache';
-        $this->createGitIgnoreForCacheFiles($this->getDefaultContainer()->getBaseDir());
+      if (!empty($this->parameters['uploadDir'])) {
+        $cacheDir = CRM_Utils_File::addTrailingSlash($this->parameters['uploadDir']) . 'cache';
       }
       $this->browser = new CRM_Extension_Browser($this->getRepositoryUrl(), '', $cacheDir);
     }
     return $this->browser;
-  }
-
-  /**
-   * Create .gitignore to remove cache dir.
-   *
-   * @param string $extPath
-   */
-  public function createGitIgnoreForCacheFiles($extPath) {
-    if (!empty($extPath)) {
-      $path = $extPath . DIRECTORY_SEPARATOR . '.gitignore';
-      if (file_exists($path)) {
-        //Return if cache dir is already ignored.
-        if (in_array('cache', explode("\n", file_get_contents($path)))) {
-          return;
-        }
-      }
-      file_put_contents($path, "cache\n", FILE_APPEND);
-    }
   }
 
   /**
