@@ -18,7 +18,7 @@ return array(
     'Psr\\Log\\' => array($vendorDir . '/psr/log'),
     'PHPUnit_' => array($baseDir . '/packages'),
     'PEAR' => array($vendorDir . '/pear/pear_exception'),
-    'Net' => array($vendorDir . '/phpseclib/phpseclib/phpseclib', $vendorDir . '/pear/net_socket', $vendorDir . '/pear/net_smtp'),
+    'Net' => array($vendorDir . '/pear/net_socket', $vendorDir . '/pear/net_smtp', $vendorDir . '/phpseclib/phpseclib/phpseclib'),
     'Math' => array($vendorDir . '/phpseclib/phpseclib/phpseclib'),
     'FontLib\\' => array($vendorDir . '/phenx/php-font-lib/src'),
     'File' => array($vendorDir . '/phpseclib/phpseclib/phpseclib'),

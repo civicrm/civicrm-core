@@ -34,6 +34,24 @@ class Paths {
       ->register('civicrm.root', function () {
         return \CRM_Core_Config::singleton()->userSystem->getCiviSourceStorage();
       })
+      ->register('civicrm.packages', function () {
+        return array(
+          'path' => \Civi::paths()->getPath('[civicrm.root]/packages/'),
+          'url' => \Civi::paths()->getUrl('[civicrm.root]/packages/'),
+        );
+      })
+      ->register('civicrm.vendor', function () {
+        return array(
+          'path' => \Civi::paths()->getPath('[civicrm.root]/vendor/'),
+          'url' => \Civi::paths()->getUrl('[civicrm.root]/vendor/'),
+        );
+      })
+      ->register('civicrm.bower', function () {
+        return array(
+          'path' => \Civi::paths()->getPath('[civicrm.root]/bower_components/'),
+          'url' => \Civi::paths()->getUrl('[civicrm.root]/bower_components/'),
+        );
+      })
       ->register('civicrm.files', function () {
         return \CRM_Core_Config::singleton()->userSystem->getDefaultFileStorage();
       })

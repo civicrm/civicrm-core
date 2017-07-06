@@ -126,9 +126,9 @@ class ComposerStaticInit15273363a8ff4b798eb304902c5f2b23
         array (
             'Net' => 
             array (
-                0 => __DIR__ . '/..' . '/phpseclib/phpseclib/phpseclib',
-                1 => __DIR__ . '/..' . '/pear/net_socket',
-                2 => __DIR__ . '/..' . '/pear/net_smtp',
+                0 => __DIR__ . '/..' . '/pear/net_socket',
+                1 => __DIR__ . '/..' . '/pear/net_smtp',
+                2 => __DIR__ . '/..' . '/phpseclib/phpseclib/phpseclib',
             ),
         ),
         'M' => 
