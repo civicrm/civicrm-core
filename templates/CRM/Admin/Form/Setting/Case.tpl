@@ -32,19 +32,19 @@
      <tr class="crm-case-form-block-civicaseRedactActivityEmail">
        <td class="label">{$form.civicaseRedactActivityEmail.label}</td>
        <td>{$form.civicaseRedactActivityEmail.html}<br />
-         <span class="description">{ts}Should activity emails be redacted?{/ts} {ts}(Set "Auto" to load setting from the legacy "Settings.xml" file.){/ts}</span>
+         <span class="description">{ts}Should activity emails be redacted?{/ts} {ts}(Set "Default" to load setting from the legacy "Settings.xml" file.){/ts}</span>
        </td>
      </tr>
      <tr class="crm-case-form-block-civicaseAllowMultipleCaseClients">
        <td class="label">{$form.civicaseAllowMultipleCaseClients.label}</td>
        <td>{$form.civicaseAllowMultipleCaseClients.html}<br />
-         <span class="description">{ts}How many clients may be associated with a given case?{/ts} {ts}(Set "Auto" to load setting from the legacy "Settings.xml" file.){/ts}</span>
+         <span class="description">{ts}How many clients may be associated with a given case?{/ts} {ts}(Set "Default" to load setting from the legacy "Settings.xml" file.){/ts}</span>
        </td>
      </tr>
       <tr class="crm-case-form-block-civicaseNaturalActivityTypeSort">
           <td class="label">{$form.civicaseNaturalActivityTypeSort.label}</td>
           <td>{$form.civicaseNaturalActivityTypeSort.html}<br />
-            <span class="description">{ts}How to sort activity-types on the "Manage Case" screen? {/ts} {ts}(Set "Auto" to load setting from the legacy "Settings.xml" file.){/ts}</span>
+            <span class="description">{ts}How to sort activity-types on the "Manage Case" screen? {/ts} {ts}(Set "Default" to load setting from the legacy "Settings.xml" file.){/ts}</span>
           </td>
       </tr>
   </table>

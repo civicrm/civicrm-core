@@ -47,7 +47,7 @@ return array(
     'html_attributes' => array(
       //'class' => 'crm-select2',
     ),
-    'default' => 'auto',
+    'default' => 'default',
     'add' => '4.7',
     'title' => 'Redact Activity Email',
     'is_domain' => 1,
@@ -55,7 +55,7 @@ return array(
     'pseudoconstant' => array(
       'callback' => 'CRM_Case_Info::getRedactOptions',
     ),
-    'description' => 'Should activity emails be redacted? (Set "Auto" to load setting from the legacy "Settings.xml" file.)',
+    'description' => 'Should activity emails be redacted? (Set "Default" to load setting from the legacy "Settings.xml" file.)',
     'help_text' => '',
   ),
   'civicaseAllowMultipleCaseClients' => array(
@@ -68,7 +68,7 @@ return array(
     'html_attributes' => array(
       //'class' => 'crm-select2',
     ),
-    'default' => 'auto',
+    'default' => 'default',
     'add' => '4.7',
     'title' => 'Allow Multiple Case Clients',
     'is_domain' => 1,
@@ -76,7 +76,7 @@ return array(
     'pseudoconstant' => array(
       'callback' => 'CRM_Case_Info::getMultiClientOptions',
     ),
-    'description' => 'How many clients may be associated with a given case? (Set "Auto" to load setting from the legacy "Settings.xml" file.)',
+    'description' => 'How many clients may be associated with a given case? (Set "Default" to load setting from the legacy "Settings.xml" file.)',
     'help_text' => '',
   ),
   'civicaseNaturalActivityTypeSort' => array(
@@ -89,7 +89,7 @@ return array(
     'html_attributes' => array(
       //'class' => 'crm-select2',
     ),
-    'default' => 'auto',
+    'default' => 'default',
     'add' => '4.7',
     'title' => 'Activity Type Sorting',
     'is_domain' => 1,
@@ -97,7 +97,7 @@ return array(
     'pseudoconstant' => array(
       'callback' => 'CRM_Case_Info::getSortOptions',
     ),
-    'description' => 'How to sort activity-types on the "Manage Case" screen? (Set "Auto" to load setting from the legacy "Settings.xml" file.)',
+    'description' => 'How to sort activity-types on the "Manage Case" screen? (Set "Default" to load setting from the legacy "Settings.xml" file.)',
     'help_text' => '',
   ),
 );

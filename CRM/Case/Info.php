@@ -251,7 +251,7 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
    */
   public static function getRedactOptions() {
     return array(
-      'auto' => ts('Auto'),
+      'default' => ts('Default'),
       '0' => ts('Do not redact emails'),
       '1' => ts('Redact emails'),
     );
@@ -263,7 +263,7 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
    */
   public static function getMultiClientOptions() {
     return array(
-      'auto' => ts('Auto'),
+      'default' => ts('Default'),
       '0' => ts('Single client per case'),
       '1' => ts('Multiple client per case'),
     );
@@ -275,7 +275,7 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
    */
   public static function getSortOptions() {
     return array(
-      'auto' => ts('Auto'),
+      'default' => ts('Default'),
       '0' => ts('Definition order'),
       '1' => ts('Alphabetical order'),
     );

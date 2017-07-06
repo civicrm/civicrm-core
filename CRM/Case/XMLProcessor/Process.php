@@ -635,7 +635,7 @@ AND        a.is_deleted = 0
    */
   public function getRedactActivityEmail() {
     $setting = Civi::settings()->get('civicaseRedactActivityEmail');
-    if ($setting !== 'auto') {
+    if ($setting !== 'default') {
       return (int) $setting;
     }
     $xml = $this->retrieve("Settings");
@@ -650,7 +650,7 @@ AND        a.is_deleted = 0
    */
   public function getAllowMultipleCaseClients() {
     $setting = Civi::settings()->get('civicaseAllowMultipleCaseClients');
-    if ($setting !== 'auto') {
+    if ($setting !== 'default') {
       return (int) $setting;
     }
     $xml = $this->retrieve("Settings");
@@ -668,7 +668,7 @@ AND        a.is_deleted = 0
    */
   public function getNaturalActivityTypeSort() {
     $setting = Civi::settings()->get('civicaseNaturalActivityTypeSort');
-    if ($setting !== 'auto') {
+    if ($setting !== 'default') {
       return (int) $setting;
     }
     $xml = $this->retrieve("Settings");
