@@ -604,6 +604,12 @@ WHERE  civicrm_pledge.id = %2
   public static function calculatePledgeStatus($pledgeId) {
     $paymentStatusTypes = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
 
+    //return if the pledge is cancelled.
+    $currentPledgeStatus = CRM_Core_DAO::getFieldValue('CRM_Pledge_DAO_Pledge', $pledgeId, 'status_id', 'id', TRUE);
+    if ($currentPledgeStatus == array_search('Cancelled', $paymentStatusTypes)) {
+      return $currentPledgeStatus;
+    }
+
     // retrieve all pledge payments for this particular pledge
     $allPledgePayments = $allStatus = array();
     $returnProperties = array('status_id');
@@ -661,6 +667,10 @@ WHERE  civicrm_pledge.id = %2
     if (!empty($paymentIds)) {
       $payments = implode(',', $paymentIds);
       $paymentClause = " AND civicrm_pledge_payment.id IN ( {$payments} )";
+    }
+    elseif ($paymentStatusId == array_search('Cancelled', $allStatus)) {
+      $completedStatus = array_search('Completed', $allStatus);
+      $paymentClause = " AND civicrm_pledge_payment.status_id != {$completedStatus}";
     }
     $actualAmountClause = NULL;
     $contributionIdClause = NULL;
