@@ -644,7 +644,7 @@ AND        a.is_deleted = 0
    *   1 if allowed, 0 if not
    */
   public function getAllowMultipleCaseClients() {
-    return $this->getBoolSetting('civicaseAllowMultipleCaseClients', 'AllowMultipleCaseClients');
+    return $this->getBoolSetting('civicaseAllowMultipleClients', 'AllowMultipleCaseClients');
   }
 
   /**

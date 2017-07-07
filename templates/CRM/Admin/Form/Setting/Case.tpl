@@ -35,9 +35,9 @@
          <span class="description">{ts}Should activity emails be redacted?{/ts} {ts}(Set "Default" to load setting from the legacy "Settings.xml" file.){/ts}</span>
        </td>
      </tr>
-     <tr class="crm-case-form-block-civicaseAllowMultipleCaseClients">
-       <td class="label">{$form.civicaseAllowMultipleCaseClients.label}</td>
-       <td>{$form.civicaseAllowMultipleCaseClients.html}<br />
+     <tr class="crm-case-form-block-civicaseAllowMultipleClients">
+       <td class="label">{$form.civicaseAllowMultipleClients.label}</td>
+       <td>{$form.civicaseAllowMultipleClients.html}<br />
          <span class="description">{ts}How many clients may be associated with a given case?{/ts} {ts}(Set "Default" to load setting from the legacy "Settings.xml" file.){/ts}</span>
        </td>
      </tr>

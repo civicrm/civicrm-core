@@ -58,10 +58,10 @@ return array(
     'description' => 'Should activity emails be redacted? (Set "Default" to load setting from the legacy "Settings.xml" file.)',
     'help_text' => '',
   ),
-  'civicaseAllowMultipleCaseClients' => array(
+  'civicaseAllowMultipleClients' => array(
     'group_name' => 'CiviCRM Preferences',
     'group' => 'core',
-    'name' => 'civicaseAllowMultipleCaseClients',
+    'name' => 'civicaseAllowMultipleClients',
     'type' => 'String',
     'quick_form_type' => 'Select',
     'html_type' => 'Select',

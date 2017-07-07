@@ -17,7 +17,7 @@
   <RedactActivityEmail>0</RedactActivityEmail>
 
   <!-- Set this to 1 if you want to allow multiple clients to be associated with a single case -->
-  <!-- SEE ALSO: Setting "civicaseAllowMultipleCaseClients" -->
+  <!-- SEE ALSO: Setting "civicaseAllowMultipleClients" -->
   <AllowMultipleCaseClients>0</AllowMultipleCaseClients>
 
   <!-- Set this to 1 if you want to have activity types on Manage Case
