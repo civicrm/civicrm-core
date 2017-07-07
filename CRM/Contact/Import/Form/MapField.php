@@ -209,11 +209,10 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
     else {
       $savedMapping = $this->get('savedMapping');
 
-      list($mappingName, $mappingContactType, $mappingLocation, $mappingPhoneType, $mappingImProvider, $mappingRelation, $mappingOperator, $mappingValue, $mappingWebsiteType) = CRM_Core_BAO_Mapping::getMappingFields($savedMapping);
+      list($mappingName, $mappingContactType, $mappingLocation, $mappingPhoneType, $mappingImProvider, $mappingRelation, $mappingOperator, $mappingValue, $mappingWebsiteType) = CRM_Core_BAO_Mapping::getMappingFields($savedMapping, TRUE);
 
       //get loaded Mapping Fields
       $mappingName = CRM_Utils_Array::value(1, $mappingName);
-      $mappingContactType = CRM_Utils_Array::value(1, $mappingContactType);
       $mappingLocation = CRM_Utils_Array::value(1, $mappingLocation);
       $mappingPhoneType = CRM_Utils_Array::value(1, $mappingPhoneType);
       $mappingImProvider = CRM_Utils_Array::value(1, $mappingImProvider);
@@ -250,8 +249,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
     $dataPatterns = $this->get('dataPatterns');
     $hasLocationTypes = $this->get('fieldTypes');
 
-    $this->_location_types = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
-
+    $this->_location_types = array_merge(array('Primary' => ts('Primary')), CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id'));
     $defaultLocationType = CRM_Core_BAO_LocationType::getDefault();
 
     // Pass default location to js
@@ -724,6 +722,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
     $imProviders = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
     $websiteTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Website', 'website_type_id');
     $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
+    $locationTypes['Primary'] = ts('Primary');
 
     for ($i = 0; $i < $this->_columnCount; $i++) {
 
@@ -735,7 +734,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
       $mapperKeysMain[$i] = $fldName;
 
       //need to differentiate non location elements.
-      if ($selOne && is_numeric($selOne)) {
+      if ($selOne && (is_numeric($selOne) || $selOne === 'Primary')) {
         if ($fldName == 'url') {
           $parserParameters['mapperWebsiteType'][$i] = $websiteTypes[$selOne];
         }
@@ -805,8 +804,6 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
     //Updating Mapping Records
     if (!empty($params['updateMapping'])) {
 
-      $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
-
       $mappingFields = new CRM_Core_DAO_MappingField();
       $mappingFields->mapping_id = $params['mappingId'];
       $mappingFields->find();
@@ -863,8 +860,9 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
             elseif (CRM_Utils_Array::value('0', $mapperKeys[$i]) == 'im') {
               $updateMappingFields->im_provider_id = isset($mapperKeys[$i][2]) ? $mapperKeys[$i][2] : NULL;
             }
-            $location = array_keys($locationTypes, $locations[$i]);
-            $updateMappingFields->location_type_id = (isset($location) && isset($location[0])) ? $location[0] : NULL;
+            $locationTypeID = $parserParameters['mapperLocType'][$i];
+            // location_type_id is NULL for non-location fields, and for Primary location.
+            $updateMappingFields->location_type_id = is_numeric($locationTypeID) ? $locationTypeID : 'null';
           }
         }
         $updateMappingFields->save();
@@ -921,7 +919,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
             elseif (CRM_Utils_Array::value('1', $mapperKeys[$i]) == 'im') {
               $saveMappingFields->im_provider_id = isset($mapperKeys[$i][3]) ? $mapperKeys[$i][3] : NULL;
             }
-            $saveMappingFields->location_type_id = isset($mapperKeys[$i][2]) ? $mapperKeys[$i][2] : NULL;
+            $saveMappingFields->location_type_id = (isset($mapperKeys[$i][2]) && $mapperKeys[$i][2] !== 'Primary') ? $mapperKeys[$i][2] : NULL;
           }
         }
         else {

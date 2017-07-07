@@ -140,7 +140,7 @@ class CRM_Contact_Imports_Parser_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test that the import parser changes the external identifier when there is a dedupe match.
+   * Test that the import parser adds the address to the right location.
    *
    * @throws \Exception
    */
@@ -149,10 +149,134 @@ class CRM_Contact_Imports_Parser_ContactTest extends CiviUnitTestCase {
     $contactValues['nick_name'] = 'Old Bill';
     $contactValues['external_identifier'] = 'android';
     $contactValues['street_address'] = 'Big Mansion';
-    $this->runImport($contactValues, CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Import_Parser::VALID, array(0 => NULL, 1 => NULL, 2 => NULL, 3 => NULL, 4 => NULL, 5 => 2));
+    $contactValues['phone'] = '911';
+    $this->runImport($contactValues, CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Import_Parser::VALID, array(0 => NULL, 1 => NULL, 2 => NULL, 3 => NULL, 4 => NULL, 5 => 2, 6 => 2));
     $address = $this->callAPISuccessGetSingle('Address', array('street_address' => 'Big Mansion'));
     $this->assertEquals(2, $address['location_type_id']);
 
+    $phone = $this->callAPISuccessGetSingle('Phone', array('phone' => '911'));
+    $this->assertEquals(2, $phone['location_type_id']);
+
+    $contact = $this->callAPISuccessGetSingle('Contact', $contactValues);
+    $this->callAPISuccess('Contact', 'delete', array('id' => $contact['id']));
+  }
+
+  /**
+   * Test that the import parser adds the address to the primary location.
+   *
+   * @throws \Exception
+   */
+  public function testImportPrimaryAddress() {
+    list($contactValues) = $this->setUpBaseContact();
+    $contactValues['nick_name'] = 'Old Bill';
+    $contactValues['external_identifier'] = 'android';
+    $contactValues['street_address'] = 'Big Mansion';
+    $contactValues['phone'] = 12334;
+    $this->runImport($contactValues, CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Import_Parser::VALID, array(0 => NULL, 1 => NULL, 2 => NULL, 3 => NULL, 4 => NULL, 5 => 'Primary', 6 => 'Primary'));
+    $address = $this->callAPISuccessGetSingle('Address', array('street_address' => 'Big Mansion'));
+    $this->assertEquals(1, $address['location_type_id']);
+
+    $phone = $this->callAPISuccessGetSingle('Phone', array('phone' => '12334'));
+    $this->assertEquals(1, $phone['location_type_id']);
+
+    $contact = $this->callAPISuccessGetSingle('Contact', $contactValues);
+    $this->callAPISuccess('Contact', 'delete', array('id' => $contact['id']));
+  }
+
+  /**
+   * Test that the import parser adds the address to the primary location.
+   *
+   * @throws \Exception
+   */
+  public function testImportTwoAddressFirstPrimary() {
+    list($contactValues) = $this->setUpBaseContact();
+    $contactValues['nick_name'] = 'Old Bill';
+    $contactValues['external_identifier'] = 'android';
+    $contactValues['street_address'] = 'Big Mansion';
+    $contactValues['phone'] = 12334;
+    $fields = array_keys($contactValues);
+    $contactValues['street_address_2'] = 'Teeny Mansion';
+    $contactValues['phone_2'] = 4444;
+    $fields[] = 'street_address';
+    $fields[] = 'phone';
+    $this->runImport($contactValues, CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Import_Parser::VALID, array(0 => NULL, 1 => NULL, 2 => NULL, 3 => NULL, 4 => NULL, 5 => 'Primary', 6 => 'Primary', 7 => 3, 8 => 3), $fields);
+    $contact = $this->callAPISuccessGetSingle('Contact', array('external_identifier' => 'android'));
+    $address = $this->callAPISuccess('Address', 'get', array('contact_id' => $contact['id'], 'sequential' => 1));
+
+    $this->assertEquals(3, $address['values'][0]['location_type_id']);
+    $this->assertEquals(0, $address['values'][0]['is_primary']);
+    $this->assertEquals('Teeny Mansion', $address['values'][0]['street_address']);
+
+    $this->assertEquals(1, $address['values'][1]['location_type_id']);
+    $this->assertEquals(1, $address['values'][1]['is_primary']);
+    $this->assertEquals('Big Mansion', $address['values'][1]['street_address']);
+
+    $phone = $this->callAPISuccess('Phone', 'get', array('contact_id' => $contact['id'], 'sequential' => 1));
+    $this->assertEquals(1, $phone['values'][0]['location_type_id']);
+    $this->assertEquals(1, $phone['values'][0]['is_primary']);
+    $this->assertEquals(12334, $phone['values'][0]['phone']);
+    $this->assertEquals(3, $phone['values'][1]['location_type_id']);
+    $this->assertEquals(0, $phone['values'][1]['is_primary']);
+    $this->assertEquals(4444, $phone['values'][1]['phone']);
+
+    $this->callAPISuccess('Contact', 'delete', array('id' => $contact['id']));
+  }
+
+  /**
+   * Test that the import parser adds the address to the primary location.
+   *
+   * @throws \Exception
+   */
+  public function testImportTwoAddressSecondPrimary() {
+    list($contactValues) = $this->setUpBaseContact();
+    $contactValues['nick_name'] = 'Old Bill';
+    $contactValues['external_identifier'] = 'android';
+    $contactValues['street_address'] = 'Big Mansion';
+    $contactValues['phone'] = 12334;
+    $fields = array_keys($contactValues);
+    $contactValues['street_address_2'] = 'Teeny Mansion';
+    $contactValues['phone_2'] = 4444;
+    $fields[] = 'street_address';
+    $fields[] = 'phone';
+    $this->runImport($contactValues, CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Import_Parser::VALID, array(0 => NULL, 1 => NULL, 2 => NULL, 3 => NULL, 4 => NULL, 5 => 3, 6 => 3, 7 => 'Primary', 8 => 'Primary'), $fields);
+    $contact = $this->callAPISuccessGetSingle('Contact', array('external_identifier' => 'android'));
+    $address = $this->callAPISuccess('Address', 'get', array('contact_id' => $contact['id'], 'sequential' => 1));
+
+    $this->assertEquals(1, $address['values'][0]['location_type_id']);
+    $this->assertEquals(1, $address['values'][0]['is_primary']);
+    $this->assertEquals('Teeny Mansion', $address['values'][0]['street_address']);
+
+    $this->assertEquals(3, $address['values'][1]['location_type_id']);
+    $this->assertEquals(0, $address['values'][1]['is_primary']);
+    $this->assertEquals('Big Mansion', $address['values'][1]['street_address']);
+
+    $phone = $this->callAPISuccess('Phone', 'get', array('contact_id' => $contact['id'], 'sequential' => 1));
+    $this->assertEquals(3, $phone['values'][0]['location_type_id']);
+    $this->assertEquals(0, $phone['values'][0]['is_primary']);
+    $this->assertEquals(12334, $phone['values'][0]['phone']);
+    $this->assertEquals(1, $phone['values'][1]['location_type_id']);
+    $this->assertEquals(1, $phone['values'][1]['is_primary']);
+    $this->assertEquals(4444, $phone['values'][1]['phone']);
+
+    $this->callAPISuccess('Contact', 'delete', array('id' => $contact['id']));
+  }
+
+  /**
+   * Test that the import parser updates the address on the existing primary location.
+   *
+   * @throws \Exception
+   */
+  public function testImportPrimaryAddressUpdate() {
+    list($contactValues) = $this->setUpBaseContact(array('external_identifier' => 'android'));
+    $contactValues['nick_name'] = 'Old Bill';
+    $contactValues['external_identifier'] = 'android';
+    $contactValues['street_address'] = 'Big Mansion';
+    $contactID = $this->callAPISuccessGetValue('Contact', array('external_identifier' => 'android', 'return' => 'id'));
+    $originalAddress = $this->callAPISuccess('Address', 'create', array('location_type_id' => 2, 'street_address' => 'small house', 'contact_id' => $contactID));
+    $this->runImport($contactValues, CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Import_Parser::VALID, array(0 => NULL, 1 => NULL, 2 => NULL, 3 => NULL, 4 => NULL, 5 => 'Primary'));
+    $address = $this->callAPISuccessGetSingle('Address', array('street_address' => 'Big Mansion'));
+    $this->assertEquals(2, $address['location_type_id']);
+    $this->assertEquals($originalAddress['id'], $address['id']);
     $this->callAPISuccessGetSingle('Contact', $contactValues);
   }
 
@@ -164,9 +288,14 @@ class CRM_Contact_Imports_Parser_ContactTest extends CiviUnitTestCase {
    * @param int $onDuplicateAction
    * @param int $expectedResult
    * @param array|null $mapperLocType
+   * @param array|null $fields
+   *   Array of field names. Will be calculated from $originalValues if not passed in, but
+   *   that method does not cope with duplicates.
    */
-  protected function runImport($originalValues, $onDuplicateAction, $expectedResult, $mapperLocType = NULL) {
-    $fields = array_keys($originalValues);
+  protected function runImport($originalValues, $onDuplicateAction, $expectedResult, $mapperLocType = NULL, $fields = NULL) {
+    if (!$fields) {
+      $fields = array_keys($originalValues);
+    }
     $values = array_values($originalValues);
     $parser = new CRM_Contact_Import_Parser_Contact($fields, $mapperLocType);
     $parser->_contactType = 'Individual';

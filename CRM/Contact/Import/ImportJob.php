@@ -138,12 +138,12 @@ class CRM_Contact_Import_ImportJob {
    */
   public function runImport(&$form, $timeout = 55) {
     $mapper = $this->_mapper;
-    $mapperFields;
+    $mapperFields = array();
     $parserParameters = CRM_Contact_Import_Parser_Contact::getParameterForParser(count($mapper));
     $phoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
     $imProviders = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
     $websiteTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Website', 'website_type_id');
-    $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
+    $locationTypes = array_merge(array('Primary' => ts('Primary')), CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id'));
 
     foreach ($mapper as $key => $value) {
 
@@ -155,7 +155,8 @@ class CRM_Contact_Import_ImportJob {
       $this->_mapperKeys[$key] = $fldName;
 
       //need to differentiate non location elements.
-      if ($selOne && is_numeric($selOne)) {
+      // @todo merge this with duplicate code on MapField class.
+      if ($selOne && (is_numeric($selOne) || $selOne === 'Primary')) {
         if ($fldName == 'url') {
           $header[] = $websiteTypes[$selOne];
           $parserParameters['mapperWebsiteType'][$key] = $selOne;
