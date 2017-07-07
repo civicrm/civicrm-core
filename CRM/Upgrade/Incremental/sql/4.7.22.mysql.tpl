@@ -1,15 +1,1 @@
-{* file to handle db changes in 4.7.22 during upgrade *}
-
-{include file='../CRM/Upgrade/4.7.22.msg_template/civicrm_msg_template.tpl'}
-
--- CRM-20816: Add CiviCase settings
-
-SELECT @civicaseAdminId := id FROM civicrm_navigation WHERE name = 'CiviCase' AND domain_id = {$domainID};
-
-INSERT INTO civicrm_navigation
-(domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight)
-VALUES
-({$domainID}, 'civicrm/admin/setting/case?reset=1', '{ts escape="sql" skip="true"}CiviCase Settings{/ts}', 'CiviCase Settings', NULL, 'AND', @civicaseAdminId, '1', NULL, 1);
-
--- CRM-20387
-UPDATE `civicrm_contribution` SET `invoice_number` = `invoice_id` WHERE `invoice_id` LIKE CONCAT('%', `id`);
+{* v4.7.22 is an urgent release. It should have not have schema changes. *}
