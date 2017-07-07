@@ -2437,6 +2437,51 @@ AND cl.modified_id  = c.id
   }
 
   /**
+   * Return list of activity statuses that are considered "completed".
+   *
+   * Note: activity status options use the "grouping" field to distinguish complete from incomplete statuses.
+   *
+   * @return array
+   */
+  public static function getCompletedStatuses() {
+    if (!isset(Civi::$statics[__CLASS__][__FUNCTION__])) {
+      $statuses = civicrm_api3('OptionValue', 'get', array(
+        'option_group_id' => "activity_status",
+        'filter' => 1,
+        'return' => array('value'),
+        'sequential' => 1,
+        'options' => array('limit' => 0),
+      ));
+      Civi::$statics[__CLASS__][__FUNCTION__] = CRM_Utils_Array::collect('value', $statuses['values']);
+    }
+    return Civi::$statics[__CLASS__][__FUNCTION__];
+  }
+
+  /**
+   * Check if status_id is completed.
+   *
+   * Note: activity status options use the "grouping" field to distinguish complete from incomplete statuses.
+   *
+   * @param int $statusId
+   *
+   * @return bool
+   */
+  public static function isCompleted($statusId) {
+    return in_array($statusId, self::getCompletedStatuses());
+  }
+
+  /**
+   * Check if activity is overdue.
+   *
+   * @param array $activity
+   *
+   * @return bool
+   */
+  public static function isOverdue($activity) {
+    return !self::isCompleted($activity['status_id']) && CRM_Utils_Date::overdue($activity['activity_date_time']);
+  }
+
+  /**
    * Get the exportable fields for Activities.
    *
    * @param string $name
@@ -2802,9 +2847,7 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
         $activity['DT_RowId'] = $activityId;
         // Add class to this row if overdue.
         $activity['DT_RowClass'] = "crm-entity status-id-{$values['status_id']}";
-        if (CRM_Utils_Date::overdue(CRM_Utils_Array::value('activity_date_time', $values))
-          && CRM_Utils_Array::value('status_id', $values) == 1
-        ) {
+        if (self::isOverdue($values)) {
           $activity['DT_RowClass'] .= ' status-overdue';
         }
         else {

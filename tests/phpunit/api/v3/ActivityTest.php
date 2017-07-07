@@ -1403,4 +1403,34 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
     $this->assertEquals(3, $result['count']);
   }
 
+  public function testGetOverdue() {
+    $overdueAct = $this->callAPISuccess('Activity', 'create', array('activity_date_time' => 'now - 1 week', 'status_id' => 'Scheduled') + $this->_params);
+    $completedAct = $this->callAPISuccess('Activity', 'create', array('activity_date_time' => 'now - 1 week', 'status_id' => 'Completed') + $this->_params);
+    $ids = array($overdueAct['id'], $completedAct['id']);
+
+    // Test sorting
+    $completedFirst = $this->callAPISuccess('Activity', 'get', array(
+      'id' => array('IN' => $ids),
+      'options' => array('sort' => 'is_overdue ASC'),
+    ));
+    $this->assertEquals(array_reverse($ids), array_keys($completedFirst['values']));
+    $overdueFirst = $this->callAPISuccess('Activity', 'get', array(
+      'id' => array('IN' => $ids),
+      'options' => array('sort' => 'is_overdue DESC'),
+      'return' => 'is_overdue',
+    ));
+    $this->assertEquals($ids, array_keys($overdueFirst['values']));
+
+    // Test return value
+    $this->assertEquals(1, $overdueFirst['values'][$overdueAct['id']]['is_overdue']);
+    $this->assertEquals(0, $overdueFirst['values'][$completedAct['id']]['is_overdue']);
+
+    // Test filtering
+    $onlyOverdue = $this->callAPISuccess('Activity', 'get', array(
+      'id' => array('IN' => $ids),
+      'is_overdue' => 1,
+    ));
+    $this->assertEquals(array($overdueAct['id']), array_keys($onlyOverdue['values']));
+  }
+
 }

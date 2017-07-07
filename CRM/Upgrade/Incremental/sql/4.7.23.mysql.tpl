@@ -13,3 +13,8 @@ VALUES
 
 -- CRM-20387
 UPDATE `civicrm_contribution` SET `invoice_number` = `invoice_id` WHERE `invoice_id` LIKE CONCAT('%', `id`);
+
+UPDATE `civicrm_option_value`
+SET filter = 1
+WHERE option_group_id = (SELECT id FROM civicrm_option_group WHERE name = 'activity_status')
+AND name IN ('Completed', 'Cancelled', 'Unreachable', 'Not Required', 'No-show');
