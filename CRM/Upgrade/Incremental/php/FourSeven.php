@@ -480,6 +480,32 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
         $this->addTask($title, 'updateContributionInvoiceNumber', $startId, $endId, $invoicePrefix);
       }
     }
+    $this->addtask('Fix onbehalf setting in uf_join table', 'fixOnBehalfInUFJoin');
+  }
+
+  /**
+   * Field is_for_organisation in module_data set as 0 should be
+   * inactive in uf_join table
+   */
+  public static function fixOnBehalfInUFJoin() {
+    $ufJoinParams = array(
+      'module' => 'on_behalf',
+      'entity_table' => 'civicrm_contribution_page',
+    );
+    $ufJoin = new CRM_Core_DAO_UFJoin();
+    $ufJoin->copyValues($ufJoinParams);
+    $ufJoin->find();
+    while ($ufJoin->fetch()) {
+      $moduleData = json_decode($ufJoin->module_data, TRUE);
+      //Disable is_active field if is_for_organization is set to 0 && $ufjoin row is still active.
+      if (!empty($moduleData['on_behalf']) && isset($moduleData['on_behalf']['is_for_organization']) &&
+        $moduleData['on_behalf']['is_for_organization'] == 0 && !empty($ufJoin->is_active)) {
+
+        $ufJoin->is_active = 0;
+        $ufJoin->save();
+      }
+    }
+    return TRUE;
   }
 
   /*
