@@ -634,12 +634,7 @@ AND        a.is_deleted = 0
    * @return int
    */
   public function getRedactActivityEmail() {
-    $setting = Civi::settings()->get('civicaseRedactActivityEmail');
-    if ($setting !== 'default') {
-      return (int) $setting;
-    }
-    $xml = $this->retrieve("Settings");
-    return ( string ) $xml->RedactActivityEmail ? 1 : 0;
+    return $this->getBoolSetting('civicaseRedactActivityEmail', 'RedactActivityEmail');
   }
 
   /**
@@ -649,15 +644,7 @@ AND        a.is_deleted = 0
    *   1 if allowed, 0 if not
    */
   public function getAllowMultipleCaseClients() {
-    $setting = Civi::settings()->get('civicaseAllowMultipleCaseClients');
-    if ($setting !== 'default') {
-      return (int) $setting;
-    }
-    $xml = $this->retrieve("Settings");
-    if ($xml) {
-      return ( string ) $xml->AllowMultipleCaseClients ? 1 : 0;
-    }
-    return 0;
+    return $this->getBoolSetting('civicaseAllowMultipleCaseClients', 'AllowMultipleCaseClients');
   }
 
   /**
@@ -667,12 +654,24 @@ AND        a.is_deleted = 0
    *   1 if natural, 0 if alphabetic
    */
   public function getNaturalActivityTypeSort() {
-    $setting = Civi::settings()->get('civicaseNaturalActivityTypeSort');
+    return $this->getBoolSetting('civicaseNaturalActivityTypeSort', 'NaturalActivityTypeSort');
+  }
+
+  /**
+   * @param string $settingKey
+   * @param string $xmlTag
+   * @param mixed $default
+   * @return int
+   */
+  private function getBoolSetting($settingKey, $xmlTag, $default = 0) {
+    $setting = Civi::settings()->get($settingKey);
     if ($setting !== 'default') {
       return (int) $setting;
     }
-    $xml = $this->retrieve("Settings");
-    return ( string ) $xml->NaturalActivityTypeSort ? 1 : 0;
+    if ($xml = $this->retrieve("Settings")) {
+      return (string) $xml->{$xmlTag} ? 1 : 0;
+    }
+    return $default;
   }
 
 }
