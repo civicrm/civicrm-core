@@ -336,13 +336,13 @@ function civicrm_api3_activity_get($params) {
 
   // Handle is_overdue filter
   if (isset($params['is_overdue'])) {
-    $completedStatuses = implode(',', CRM_Activity_BAO_Activity::getCompletedStatuses());
+    $incomplete = implode(',', array_keys(CRM_Activity_BAO_Activity::getStatusesByType(CRM_Activity_BAO_Activity::INCOMPLETE)));
     if ($params['is_overdue']) {
       $sql->where('a.activity_date_time < NOW()');
-      $sql->where("a.status_id NOT IN ($completedStatuses)");
+      $sql->where("a.status_id IN ($incomplete)");
     }
     else {
-      $sql->where("(a.activity_date_time >= NOW() OR a.status_id IN ($completedStatuses))");
+      $sql->where("(a.activity_date_time >= NOW() OR a.status_id NOT IN ($incomplete))");
     }
   }
 
@@ -355,8 +355,8 @@ function civicrm_api3_activity_get($params) {
       // Get sort field and direction
       list($sortField, $dir) = array_pad(explode(' ', $sortString), 2, 'ASC');
       if ($sortField == 'is_overdue') {
-        $completedStatuses = implode(',', CRM_Activity_BAO_Activity::getCompletedStatuses());
-        $sql->orderBy("IF((a.activity_date_time >= NOW() OR a.status_id IN ($completedStatuses)), 0, 1) $dir", NULL, $index);
+        $incomplete = implode(',', array_keys(CRM_Activity_BAO_Activity::getStatusesByType(CRM_Activity_BAO_Activity::INCOMPLETE)));
+        $sql->orderBy("IF((a.activity_date_time >= NOW() OR a.status_id NOT IN ($incomplete)), 0, 1) $dir", NULL, $index);
         $sortString = '(1)';
       }
     }

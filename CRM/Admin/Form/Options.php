@@ -226,7 +226,11 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       $this->add('select',
         'filter',
         ts('Status Type'),
-        array(ts('Incomplete'), ts('Completed'))
+        array(
+          CRM_Activity_BAO_Activity::INCOMPLETE => ts('Incomplete'),
+          CRM_Activity_BAO_Activity::COMPLETED => ts('Completed'),
+          CRM_Activity_BAO_Activity::CANCELLED => ts('Cancelled'),
+        )
       );
     }
     if ($this->_gName == 'redaction_rule') {

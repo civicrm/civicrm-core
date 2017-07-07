@@ -37,6 +37,14 @@
 class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
 
   /**
+   * Activity status types
+   */
+  const
+    INCOMPLETE = 0,
+    COMPLETED = 1,
+    CANCELLED = 2;
+
+  /**
    * Static field for all the activity information that we can potentially export.
    *
    * @var array
@@ -2437,37 +2445,31 @@ AND cl.modified_id  = c.id
   }
 
   /**
-   * Return list of activity statuses that are considered "completed".
+   * Return list of activity statuses of a given type.
    *
-   * Note: activity status options use the "grouping" field to distinguish complete from incomplete statuses.
+   * Note: activity status options use the "grouping" field to distinguish status types.
+   * Types are defined in class constants INCOMPLETE, COMPLETED, CANCELLED
+   *
+   * @param int $type
    *
    * @return array
    */
-  public static function getCompletedStatuses() {
+  public static function getStatusesByType($type) {
     if (!isset(Civi::$statics[__CLASS__][__FUNCTION__])) {
       $statuses = civicrm_api3('OptionValue', 'get', array(
         'option_group_id' => "activity_status",
-        'filter' => 1,
-        'return' => array('value'),
-        'sequential' => 1,
+        'return' => array('value', 'name', 'filter'),
         'options' => array('limit' => 0),
       ));
-      Civi::$statics[__CLASS__][__FUNCTION__] = CRM_Utils_Array::collect('value', $statuses['values']);
+      Civi::$statics[__CLASS__][__FUNCTION__] = $statuses['values'];
     }
-    return Civi::$statics[__CLASS__][__FUNCTION__];
-  }
-
-  /**
-   * Check if status_id is completed.
-   *
-   * Note: activity status options use the "grouping" field to distinguish complete from incomplete statuses.
-   *
-   * @param int $statusId
-   *
-   * @return bool
-   */
-  public static function isCompleted($statusId) {
-    return in_array($statusId, self::getCompletedStatuses());
+    $ret = array();
+    foreach (Civi::$statics[__CLASS__][__FUNCTION__] as $status) {
+      if ($status['filter'] == $type) {
+        $ret[$status['value']] = $status['name'];
+      }
+    }
+    return $ret;
   }
 
   /**
@@ -2478,7 +2480,7 @@ AND cl.modified_id  = c.id
    * @return bool
    */
   public static function isOverdue($activity) {
-    return !self::isCompleted($activity['status_id']) && CRM_Utils_Date::overdue($activity['activity_date_time']);
+    return array_key_exists($activity['status_id'], self::getStatusesByType(self::INCOMPLETE)) && CRM_Utils_Date::overdue($activity['activity_date_time']);
   }
 
   /**
