@@ -570,7 +570,7 @@ class InstallRequirements {
       $host = implode(':', $hostParts);
     }
     else {
-      $port = '';
+      $port = NULL;
     }
     $conn = @mysqli_connect($host, $username, $password, $database, $port);
     return $conn;
