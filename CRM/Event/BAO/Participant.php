@@ -2209,8 +2209,7 @@ WHERE (entity_table = 'civicrm_participant' AND entity_id = {$participantId} AND
 
     $date = CRM_Utils_Date::currentDBDate();
     $event = CRM_Event_BAO_Event::getEvents(0, $eventId);
-    $eventTitle = $event[$eventId];
-    $subject = "Registration selections changed for $eventTitle";
+    $subject = sprintf("Registration selections changed for %s", CRM_Utils_Array::value($eventId, $event));
     $targetCid = $contactId;
     $srcRecId = $participantId;
 
