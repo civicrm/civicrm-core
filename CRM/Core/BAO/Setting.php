@@ -286,7 +286,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    * @return bool
    * @throws \api_Exception
    */
-  public static function validateSetting(&$value, $fieldSpec) {
+  public static function validateSetting(&$value, array $fieldSpec) {
     if ($fieldSpec['type'] == 'String' && is_array($value)) {
       $value = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, $value) . CRM_Core_DAO::VALUE_SEPARATOR;
     }
