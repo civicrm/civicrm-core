@@ -398,6 +398,12 @@ function _civicrm_api3_system_get_whitelist($whitelistFile) {
  */
 function civicrm_api3_system_updatelogtables() {
   $schema = new CRM_Logging_Schema();
+  $missingLogTables = $schema->getMissingLogTables();
+  if (!empty($missingLogTables)) {
+    foreach ($missingLogTables as $tableName) {
+      $schema->fixSchemaDifferencesFor($tableName, NULL, FALSE);
+    }
+  }
   $schema->updateLogTableSchema();
   return civicrm_api3_create_success(1);
 }
