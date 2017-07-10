@@ -1234,7 +1234,21 @@ LEFT JOIN   civicrm_case_activity ON ( civicrm_case_activity.activity_id = tbl.a
       "civicrm_activity.is_test= 0",
     );
 
-    if ($input['context'] != 'activity') {
+    if (isset($input['activity_date_relative']) ||
+        (!empty($input['activity_date_low']) || !empty($input['activity_date_high']))
+    ) {
+      list($from, $to) = CRM_Utils_Date::getFromTo(
+        CRM_Utils_Array::value('activity_date_relative', $input, 0),
+        CRM_Utils_Array::value('activity_date_low', $input),
+        CRM_Utils_Array::value('activity_date_high', $input)
+      );
+      $commonClauses[] = sprintf('civicrm_activity.activity_date_time BETWEEN "%s" AND "%s" ', $from, $to);
+    }
+
+    if (!empty($input['activity_status_id'])) {
+      $commonClauses[] = sprintf("civicrm_activity.status_id IN (%s)", $input['activity_status_id']);
+    }
+    elseif ($input['context'] != 'activity') {
       $commonClauses[] = "civicrm_activity.status_id = 1";
     }
 
