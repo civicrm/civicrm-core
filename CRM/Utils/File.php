@@ -578,7 +578,8 @@ HTACCESS;
     if (!$_path) {
       if (!empty($GLOBALS['civicrm_paths']['civicrm.files']['path'])) {
         $path = $GLOBALS['civicrm_paths']['civicrm.files']['path'];
-      } else {
+      }
+      else {
         // Note: Don't rely on $config; that creates a dependency loop.
         if (!defined('CIVICRM_TEMPLATE_COMPILEDIR')) {
           throw new RuntimeException("Undefined constant: CIVICRM_TEMPLATE_COMPILEDIR");
@@ -595,13 +596,13 @@ HTACCESS;
           unset($checkPath[$cnt]);
           $path = implode(DIRECTORY_SEPARATOR, $checkPath);
         }
-       }
+      }
 
-       $_path = CRM_Utils_File::addTrailingSlash($path);
-     }
+      $_path = CRM_Utils_File::addTrailingSlash($path);
+    }
 
-     return $_path;
-   }
+    return $_path;
+  }
 
   /**
    * Create the base private file path from which all our internal directories are
@@ -613,7 +614,8 @@ HTACCESS;
     if (!$_path) {
       if (!empty($GLOBALS['civicrm_paths']['civicrm.private']['path'])) {
         $path = $GLOBALS['civicrm_paths']['civicrm.private']['path'];
-      } else {
+      }
+      else {
         // Note: Don't rely on $config; that creates a dependency loop.
         if (!defined('CIVICRM_TEMPLATE_COMPILEDIR')) {
           throw new RuntimeException("Undefined constant: CIVICRM_TEMPLATE_COMPILEDIR");
@@ -630,7 +632,7 @@ HTACCESS;
           unset($checkPath[$cnt]);
           $path = implode(DIRECTORY_SEPARATOR, $checkPath);
         }
-       }
+      }
 
       $_path = CRM_Utils_File::addTrailingSlash($path);
     }
