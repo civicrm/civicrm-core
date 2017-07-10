@@ -569,28 +569,68 @@ HTACCESS;
   }
 
   /**
-   * Create the base file path from which all our internal directories are
-   * offset. This is derived from the template compile directory set
+   * Create the base public file path from which all our internal directories are
+   * offset. This is derived from the template compile directory set if [civicrm.files]
+   * isn't set.
    */
   public static function baseFilePath() {
     static $_path = NULL;
     if (!$_path) {
-      // Note: Don't rely on $config; that creates a dependency loop.
-      if (!defined('CIVICRM_TEMPLATE_COMPILEDIR')) {
-        throw new RuntimeException("Undefined constant: CIVICRM_TEMPLATE_COMPILEDIR");
-      }
-      $templateCompileDir = CIVICRM_TEMPLATE_COMPILEDIR;
+      if (!empty($GLOBALS['civicrm_paths']['civicrm.files']['path'])) {
+        $path = $GLOBALS['civicrm_paths']['civicrm.files']['path'];
+      } else {
+        // Note: Don't rely on $config; that creates a dependency loop.
+        if (!defined('CIVICRM_TEMPLATE_COMPILEDIR')) {
+          throw new RuntimeException("Undefined constant: CIVICRM_TEMPLATE_COMPILEDIR");
+        }
+        $templateCompileDir = CIVICRM_TEMPLATE_COMPILEDIR;
 
-      $path = dirname($templateCompileDir);
+        $path = dirname($templateCompileDir);
 
-      //this fix is to avoid creation of upload dirs inside templates_c directory
-      $checkPath = explode(DIRECTORY_SEPARATOR, $path);
+        //this fix is to avoid creation of upload dirs inside templates_c directory
+        $checkPath = explode(DIRECTORY_SEPARATOR, $path);
 
-      $cnt = count($checkPath) - 1;
-      if ($checkPath[$cnt] == 'templates_c') {
-        unset($checkPath[$cnt]);
-        $path = implode(DIRECTORY_SEPARATOR, $checkPath);
-      }
+        $cnt = count($checkPath) - 1;
+        if ($checkPath[$cnt] == 'templates_c') {
+          unset($checkPath[$cnt]);
+          $path = implode(DIRECTORY_SEPARATOR, $checkPath);
+        }
+       }
+
+       $_path = CRM_Utils_File::addTrailingSlash($path);
+     }
+
+     return $_path;
+   }
+
+  /**
+   * Create the base private file path from which all our internal directories are
+   * offset. This is derived from the template compile directory set if [civicrm.private]
+   * isn't set.
+   */
+  public static function basePrivateFilePath() {
+    static $_path = NULL;
+    if (!$_path) {
+      if (!empty($GLOBALS['civicrm_paths']['civicrm.private']['path'])) {
+        $path = $GLOBALS['civicrm_paths']['civicrm.private']['path'];
+      } else {
+        // Note: Don't rely on $config; that creates a dependency loop.
+        if (!defined('CIVICRM_TEMPLATE_COMPILEDIR')) {
+          throw new RuntimeException("Undefined constant: CIVICRM_TEMPLATE_COMPILEDIR");
+        }
+        $templateCompileDir = CIVICRM_TEMPLATE_COMPILEDIR;
+
+        $path = dirname($templateCompileDir);
+
+        //this fix is to avoid creation of upload dirs inside templates_c directory
+        $checkPath = explode(DIRECTORY_SEPARATOR, $path);
+
+        $cnt = count($checkPath) - 1;
+        if ($checkPath[$cnt] == 'templates_c') {
+          unset($checkPath[$cnt]);
+          $path = implode(DIRECTORY_SEPARATOR, $checkPath);
+        }
+       }
 
       $_path = CRM_Utils_File::addTrailingSlash($path);
     }

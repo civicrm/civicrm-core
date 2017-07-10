@@ -217,6 +217,25 @@ if (!defined('CIVICRM_UF_BASEURL')) {
 }
 
 /**
+ * Provide default public and private CiviCRM file paths. (Optional)
+ *
+ * Set [civicrm.files] and [civicrm.private] in order to have more control
+ * over the location of public and private paths.
+ *
+ * Uncomment and edit the below as appropriate.
+ */
+ // Add this line only once above any path overrides.
+ // global $civicrm_paths;
+
+ // Set the path and url for public files.
+ // $civicrm_paths['civicrm.files']['path'] = '/path/to/public-dir';
+ // $civicrm_paths['civicrm.files']['url'] = CIVICRM_UF_BASEURL . '/path/to/public-dir';
+
+ // Set the path and url for private files.
+ // $civicrm_paths['civicrm.private']['path'] = '/path/to/private-dir';
+ // $civicrm_paths['civicrm.private']['url'] = CIVICRM_UF_BASEURL . '/path/to/private-dir';
+
+/**
  * Define any CiviCRM Settings Overrides per http://wiki.civicrm.org/confluence/display/CRMDOC/Override+CiviCRM+Settings
  *
  * Uncomment and edit the below as appropriate.
