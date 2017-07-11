@@ -4085,11 +4085,6 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
         }
       }
     }
-    elseif ($component == 'membership') {
-      $entity = $component;
-      $entityTable = 'civicrm_membership';
-      $contributionId = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipPayment', $id, 'contribution_id', 'membership_id');
-    }
     else {
       $contributionId = $id;
       $entity = 'contribution';
