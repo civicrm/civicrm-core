@@ -110,7 +110,6 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'name' => "AnnualFixed",
       'member_of_contact_id' => 23,
       'duration_unit' => "year",
-      'minimum_fee' => 50,
       'duration_interval' => 1,
       'period_type' => "fixed",
       'fixed_period_start_day' => "101",
@@ -511,100 +510,6 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'Receipt text',
     ));
     $this->mut->stop();
-  }
-
-  /**
-   * Test the submit function of the membership form on membership type change.
-   *  Check if the related contribuion is also updated if the minimum_fee didn't match
-   */
-  public function testContributionUpdateOnMembershipTypeChange() {
-    // Step 1: Create a Membership via backoffice whose with 50.00 payment
-    $form = $this->getForm();
-    $form->preProcess();
-    $this->mut = new CiviMailUtils($this, TRUE);
-    $this->createLoggedInUser();
-    $priceSet = $this->callAPISuccess('PriceSet', 'Get', array("extends" => "CiviMember"));
-    $form->set('priceSetId', $priceSet['id']);
-    CRM_Price_BAO_PriceSet::buildPriceSet($form);
-    $params = array(
-      'cid' => $this->_individualId,
-      'join_date' => date('m/d/Y', time()),
-      'start_date' => '',
-      'end_date' => '',
-      // This format reflects the 23 being the organisation & the 25 being the type.
-      'membership_type_id' => array(23, $this->membershipTypeAnnualFixedID),
-      'record_contribution' => 1,
-      'total_amount' => 50,
-      'receive_date' => date('m/d/Y', time()),
-      'receive_date_time' => '08:36PM',
-      'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
-      'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
-      'financial_type_id' => '2', //Member dues, see data.xml
-      'payment_processor_id' => $this->_paymentProcessorID,
-    );
-    $form->_contactID = $this->_individualId;
-    $form->testSubmit($params);
-    $membership = $this->callAPISuccessGetSingle('Membership', array('contact_id' => $this->_individualId));
-    // check the membership status after partial payment, if its Pending
-    $this->assertEquals(array_search('New', CRM_Member_PseudoConstant::membershipStatus()), $membership['status_id']);
-    $contribution = $this->callAPISuccessGetSingle('Contribution', array(
-      'contact_id' => $this->_individualId,
-    ));
-    $this->assertEquals('Completed', $contribution['contribution_status']);
-    $this->assertEquals(50.00, $contribution['total_amount']);
-    $this->assertEquals(50.00, $contribution['net_amount']);
-
-    // Step 2: Change the membership type whose minimum free is less than earlier membership
-    $secondMembershipType = $this->callAPISuccess('membership_type', 'create', array(
-      'domain_id' => 1,
-      'name' => "Second Test Membership",
-      'member_of_contact_id' => 23,
-      'duration_unit' => "month",
-      'minimum_fee' => 25,
-      'duration_interval' => 1,
-      'period_type' => "fixed",
-      'fixed_period_start_day' => "101",
-      'fixed_period_rollover_day' => "1231",
-      'relationship_type_id' => 20,
-      'financial_type_id' => 2,
-    ));
-    Civi::settings()->set('update_contribution_on_membership_type_change', TRUE);
-    $form = $this->getForm();
-    $form->preProcess();
-    $form->_id = $membership['id'];
-    $form->set('priceSetId', $priceSet['id']);
-    CRM_Price_BAO_PriceSet::buildPriceSet($form);
-    $form->_action = CRM_Core_Action::UPDATE;
-    $params = array(
-      'cid' => $this->_individualId,
-      'join_date' => date('m/d/Y', time()),
-      'start_date' => '',
-      'end_date' => '',
-      // This format reflects the 23 being the organisation & the 25 being the type.
-      'membership_type_id' => array(23, $secondMembershipType['id']),
-      'record_contribution' => 1,
-      'status_id' => 1,
-      'total_amount' => 25,
-      'receive_date' => date('m/d/Y', time()),
-      'receive_date_time' => '08:36PM',
-      'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
-      'financial_type_id' => '2', //Member dues, see data.xml
-      'payment_processor_id' => $this->_paymentProcessorID,
-    );
-    $form->_contactID = $this->_individualId;
-    $form->testSubmit($params);
-    $membership = $this->callAPISuccessGetSingle('Membership', array('contact_id' => $this->_individualId));
-    // check the membership status after partial payment, if its Pending
-    $contribution = $this->callAPISuccessGetSingle('Contribution', array(
-      'contact_id' => $this->_individualId,
-    ));
-    $payment = CRM_Contribute_BAO_Contribution::getPaymentInfo($membership['id'], 'membership', FALSE, TRUE);
-    // Check the contribution status on membership type change whose minimum fee was less than earlier memebership
-    $this->assertEquals('Pending refund', $contribution['contribution_status']);
-    // Earlier paid amount
-    $this->assertEquals(50, $payment['paid']);
-    // balance remaning
-    $this->assertEquals(-25, $payment['balance']);
   }
 
   /**
