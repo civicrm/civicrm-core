@@ -1645,6 +1645,8 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
           $membership = CRM_Member_BAO_Membership::create($membershipParams, $ids);
           $params['contribution'] = CRM_Utils_Array::value('contribution', $membershipParams);
           unset($params['lineItems']);
+          // skip line item creation for next interation since line item(s) are already created.
+          $params['skipLineItem'] = TRUE;
 
           $this->_membershipIDs[] = $membership->id;
           $createdMemberships[$memType] = $membership;
