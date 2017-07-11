@@ -132,6 +132,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
       for ($i = 1; $i <= self::NUM_OPTION; $i++) {
         $defaults['option_status[' . $i . ']'] = 1;
         $defaults['option_weight[' . $i . ']'] = $i;
+        $defaults['option_visibility_id[' . $i . ']'] = 1;
       }
     }
 
@@ -191,6 +192,11 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
     if (count($financialType)) {
       $this->assign('financialType', $financialType);
     }
+
+    //Visibility Type Options
+    $visibilityType = CRM_Core_PseudoConstant::visibility();
+    $this->assign('visibilityType', $visibilityType);
+
     $enabledComponents = CRM_Core_Component::getEnabledComponents();
     $eventComponentId = $memberComponentId = NULL;
     if (array_key_exists('CiviEvent', $enabledComponents)) {
@@ -302,6 +308,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
       // is active ?
       $this->add('checkbox', 'option_status[' . $i . ']', ts('Active?'));
 
+      $this->add('select', 'option_visibility_id[' . $i . ']', ts('Visibility'), array('' => ts('- select -')) + $visibilityType);
       $defaultOption[$i] = $this->createElement('radio', NULL, NULL, NULL, $i);
 
       //for checkbox handling of default option
@@ -651,6 +658,8 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
       //$params['option_description']  = array( 1 => $params['description'] );
       $params['option_weight'] = array(1 => $params['weight']);
       $params['option_financial_type_id'] = array(1 => $params['financial_type_id']);
+      $params['option_visibility_id'] = array(1 => CRM_Utils_Array::value('visibility_id', $params));
+      $params['is_active'] = array(1 => 1);
     }
 
     if ($this->_fid) {

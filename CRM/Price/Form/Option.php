@@ -229,6 +229,9 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
       // is active ?
       $this->add('checkbox', 'is_active', ts('Active?'));
 
+      // is public?
+      $this->add('select', 'visibility_id', ts('Visibility'), CRM_Core_PseudoConstant::visibility());
+
       //is default
       $this->add('checkbox', 'is_default', ts('Default'));
 
@@ -319,6 +322,7 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
       $params['price_field_id'] = $this->_fid;
       $params['is_default'] = CRM_Utils_Array::value('is_default', $params, FALSE);
       $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
+      $params['visibility_id'] = CRM_Utils_Array::value('visibility_id', $params, FALSE);
       $ids = array();
       if ($this->_oid) {
         $ids['id'] = $this->_oid;
