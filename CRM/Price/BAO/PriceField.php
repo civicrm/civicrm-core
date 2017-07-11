@@ -147,6 +147,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
           'is_default' => CRM_Utils_Array::value($params['option_weight'][$index], $defaultArray) ? $defaultArray[$params['option_weight'][$index]] : 0,
           'membership_num_terms' => NULL,
           'non_deductible_amount' => CRM_Utils_Array::value('non_deductible_amount', $params),
+          'visibility_id' => $params['option_visibility_id'][$index],
         );
 
         if ($options['membership_type_id']) {
@@ -431,11 +432,18 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
           $count = CRM_Utils_Array::value('count', $opt, '');
           $max_value = CRM_Utils_Array::value('max_value', $opt, '');
           $priceVal = implode($seperator, array($opt[$valueFieldName] + $taxAmount, $count, $max_value));
+          if (isset($opt['visibility_id'])) {
+            $visibility_id = $opt['visibility_id'];
+          }
+          else {
+            $visibility_id = 1;
+          }
           $extra = array(
             'price' => json_encode(array($elementName, $priceVal)),
             'data-amount' => $opt[$valueFieldName],
             'data-currency' => $currencyName,
             'data-price-field-values' => json_encode($customOption),
+            'visibility' => $visibility_id,
           );
           if (!empty($qf->_quickConfig) && $field->name == 'contribution_amount') {
             $extra += array('onclick' => 'clearAmountOther();');
@@ -536,7 +544,12 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
             $qf->add('text', 'txt-' . $elementName, $label, array('size' => '4'));
           }
         }
-
+        if (isset($opt['visibility_id'])) {
+          $visibility_id = $opt['visibility_id'];
+        }
+        else {
+          $visibility_id = 1;
+        }
         $element = &$qf->add('select', $elementName, $label,
           array(
             '' => ts('- select -'),
