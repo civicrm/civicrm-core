@@ -203,7 +203,7 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File {
     $entityFileDAO->entity_table = $tableName;
 
     if (!$entityFileDAO->find(TRUE)) {
-      CRM_Core_Error::fatal();
+      CRM_Core_Error::fatal(sprintf('No record found for given file ID - %d and entity ID - %d', $fileID, $entityID));
     }
 
     $entityFileDAO->delete();

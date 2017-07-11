@@ -1644,13 +1644,11 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       $dao = CRM_Core_DAO::executeQuery($sql);
       while ($dao->fetch()) {
         $fileIds[$dao->entity_id] = $dao->file_id;
+        if ($dao->entity_id == $mainId) {
+          CRM_Core_BAO_File::deleteFileReferences($fileIds[$mainId], $mainId, $customId);
+        }
       }
       $dao->free();
-
-      // delete the main contact's file
-      if (!empty($fileIds[$mainId])) {
-        CRM_Core_BAO_File::deleteFileReferences($fileIds[$mainId], $mainId, $customId);
-      }
 
       // move the other contact's file to main contact
       //NYSS need to INSERT or UPDATE depending on whether main contact has an existing record
