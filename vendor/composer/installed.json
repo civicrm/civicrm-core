@@ -40,6 +40,149 @@
         ]
     },
     {
+        "name": "phpseclib/phpseclib",
+        "version": "1.0.6",
+        "version_normalized": "1.0.6.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/phpseclib/phpseclib.git",
+            "reference": "aa8368ed12ef389f20d3932d051a7207471ecbab"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/aa8368ed12ef389f20d3932d051a7207471ecbab",
+            "reference": "aa8368ed12ef389f20d3932d051a7207471ecbab",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.0.0"
+        },
+        "require-dev": {
+            "phing/phing": "~2.7",
+            "phpunit/phpunit": "~4.0",
+            "sami/sami": "~2.0",
+            "squizlabs/php_codesniffer": "~2.0"
+        },
+        "suggest": {
+            "ext-gmp": "Install the GMP (GNU Multiple Precision) extension in order to speed up arbitrary precision integer arithmetic operations.",
+            "ext-mcrypt": "Install the Mcrypt extension in order to speed up a wide variety of cryptographic operations.",
+            "pear-pear/PHP_Compat": "Install PHP_Compat to get phpseclib working on PHP < 5.0.0."
+        },
+        "time": "2017-05-08 05:58:24",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-0": {
+                "Crypt": "phpseclib/",
+                "File": "phpseclib/",
+                "Math": "phpseclib/",
+                "Net": "phpseclib/",
+                "System": "phpseclib/"
+            },
+            "files": [
+                "phpseclib/bootstrap.php",
+                "phpseclib/Crypt/Random.php"
+            ]
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "include-path": [
+            "phpseclib/"
+        ],
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Jim Wigginton",
+                "email": "terrafrost@php.net",
+                "role": "Lead Developer"
+            },
+            {
+                "name": "Patrick Monnerat",
+                "email": "pm@datasphere.ch",
+                "role": "Developer"
+            },
+            {
+                "name": "Andreas Fischer",
+                "email": "bantu@phpbb.com",
+                "role": "Developer"
+            },
+            {
+                "name": "Hans-Jürgen Petrich",
+                "email": "petrich@tronic-media.com",
+                "role": "Developer"
+            },
+            {
+                "name": "Graham Campbell",
+                "email": "graham@alt-three.com",
+                "role": "Developer"
+            }
+        ],
+        "description": "PHP Secure Communications Library - Pure-PHP implementations of RSA, AES, SSH2, SFTP, X.509 etc.",
+        "homepage": "http://phpseclib.sourceforge.net",
+        "keywords": [
+            "BigInteger",
+            "aes",
+            "asn.1",
+            "asn1",
+            "blowfish",
+            "crypto",
+            "cryptography",
+            "encryption",
+            "rsa",
+            "security",
+            "sftp",
+            "signature",
+            "signing",
+            "ssh",
+            "twofish",
+            "x.509",
+            "x509"
+        ]
+    },
+    {
+        "name": "civicrm/civicrm-cxn-rpc",
+        "version": "v0.16.12.05",
+        "version_normalized": "0.16.12.05",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/civicrm/civicrm-cxn-rpc.git",
+            "reference": "e88e78dc491b7e8739a40231f46c2d4459347b12"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/civicrm/civicrm-cxn-rpc/zipball/e88e78dc491b7e8739a40231f46c2d4459347b12",
+            "reference": "e88e78dc491b7e8739a40231f46c2d4459347b12",
+            "shasum": ""
+        },
+        "require": {
+            "phpseclib/phpseclib": "1.0.*",
+            "psr/log": "1.0.0"
+        },
+        "require-dev": {
+            "phpunit/phpunit": "3.7.*"
+        },
+        "time": "2016-12-06 04:32:51",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Civi\\Cxn\\Rpc\\": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Tim Otten",
+                "email": "totten@civicrm.org"
+            }
+        ],
+        "description": "RPC library for CiviConnect"
+    },
+    {
         "name": "phenx/php-svg-lib",
         "version": "0.1",
         "version_normalized": "0.1.0.0",
@@ -175,68 +318,84 @@
         "homepage": "https://github.com/dompdf/dompdf"
     },
     {
-        "name": "tecnickcom/tcpdf",
-        "version": "6.2.12",
-        "version_normalized": "6.2.12.0",
+        "name": "electrolinux/phpquery",
+        "version": "0.9.6",
+        "version_normalized": "0.9.6.0",
         "source": {
             "type": "git",
-            "url": "https://github.com/tecnickcom/TCPDF.git",
-            "reference": "2f732eaa91b5665274689b1d40b285a7bacdc37f"
+            "url": "https://github.com/electrolinux/phpquery.git",
+            "reference": "6cb8afcfe8cd4ce45f2f8c27d561383037c27a3a"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/tecnickcom/TCPDF/zipball/2f732eaa91b5665274689b1d40b285a7bacdc37f",
-            "reference": "2f732eaa91b5665274689b1d40b285a7bacdc37f",
+            "url": "https://api.github.com/repos/electrolinux/phpquery/zipball/6cb8afcfe8cd4ce45f2f8c27d561383037c27a3a",
+            "reference": "6cb8afcfe8cd4ce45f2f8c27d561383037c27a3a",
             "shasum": ""
         },
-        "require": {
-            "php": ">=5.3.0"
-        },
-        "time": "2015-09-12 10:08:34",
+        "time": "2013-03-21 12:39:33",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
             "classmap": [
-                "fonts",
-                "config",
-                "include",
-                "tcpdf.php",
-                "tcpdf_parser.php",
-                "tcpdf_import.php",
-                "tcpdf_barcodes_1d.php",
-                "tcpdf_barcodes_2d.php",
-                "include/tcpdf_colors.php",
-                "include/tcpdf_filters.php",
-                "include/tcpdf_font_data.php",
-                "include/tcpdf_fonts.php",
-                "include/tcpdf_images.php",
-                "include/tcpdf_static.php",
-                "include/barcodes/datamatrix.php",
-                "include/barcodes/pdf417.php",
-                "include/barcodes/qrcode.php"
+                "phpQuery/"
             ]
         },
         "notification-url": "https://packagist.org/downloads/",
         "license": [
-            "LGPLv3"
+            "MIT"
         ],
         "authors": [
             {
-                "name": "Nicola Asuni",
-                "email": "info@tecnick.com",
-                "homepage": "http://nicolaasuni.tecnick.com"
+                "name": "Tobiasz Cudnik",
+                "email": "tobiasz.cudnik@gmail.com",
+                "homepage": "https://github.com/TobiaszCudnik",
+                "role": "Developer"
+            },
+            {
+                "name": "didier Belot",
+                "role": "Packager"
             }
         ],
-        "description": "TCPDF is a PHP class for generating PDF documents and barcodes.",
-        "homepage": "http://www.tcpdf.org/",
+        "description": "phpQuery is a server-side, chainable, CSS3 selector driven Document Object Model (DOM) API based on jQuery JavaScript Library",
+        "homepage": "http://code.google.com/p/phpquery/"
+    },
+    {
+        "name": "pclzip/pclzip",
+        "version": "2.8.2",
+        "version_normalized": "2.8.2.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/ivanlanin/pclzip.git",
+            "reference": "19dd1de9d3f5fc4d7d70175b4c344dee329f45fd"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/ivanlanin/pclzip/zipball/19dd1de9d3f5fc4d7d70175b4c344dee329f45fd",
+            "reference": "19dd1de9d3f5fc4d7d70175b4c344dee329f45fd",
+            "shasum": ""
+        },
+        "time": "2014-06-05 11:42:24",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "classmap": [
+                "pclzip.lib.php"
+            ]
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "LGPL-2.1"
+        ],
+        "authors": [
+            {
+                "name": "Vincent Blavet"
+            }
+        ],
+        "description": "A PHP library that offers compression and extraction functions for Zip formatted archives",
+        "homepage": "http://www.phpconcept.net/pclzip",
         "keywords": [
-            "PDFD32000-2008",
-            "TCPDF",
-            "barcodes",
-            "datamatrix",
-            "pdf",
-            "pdf417",
-            "qrcode"
+            "php",
+            "zip"
         ]
     },
     {
@@ -295,6 +454,61 @@
         "keywords": [
             "exception"
         ]
+    },
+    {
+        "name": "pear/auth_sasl",
+        "version": "v1.1.0",
+        "version_normalized": "1.1.0.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/pear/Auth_SASL.git",
+            "reference": "db1ead3dc0bf986d2bab0dbc04d114800cf91dee"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/pear/Auth_SASL/zipball/db1ead3dc0bf986d2bab0dbc04d114800cf91dee",
+            "reference": "db1ead3dc0bf986d2bab0dbc04d114800cf91dee",
+            "shasum": ""
+        },
+        "require": {
+            "pear/pear_exception": "@stable"
+        },
+        "require-dev": {
+            "phpunit/phpunit": "@stable"
+        },
+        "time": "2017-03-07 14:37:05",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-0": {
+                "Auth": "./"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "include-path": [
+            "./"
+        ],
+        "license": [
+            "BSD"
+        ],
+        "authors": [
+            {
+                "name": "Anish Mistry",
+                "email": "amistry@am-productions.biz",
+                "role": "Lead"
+            },
+            {
+                "name": "Richard Heyes",
+                "email": "richard@php.net",
+                "role": "Lead"
+            },
+            {
+                "name": "Michael Bretterklieber",
+                "email": "michael@bretterklieber.com",
+                "role": "Lead"
+            }
+        ],
+        "description": "Abstraction of various SASL mechanism responses"
     },
     {
         "name": "pear/net_socket",
@@ -411,540 +625,6 @@
             "email",
             "mail",
             "smtp"
-        ]
-    },
-    {
-        "name": "civicrm/civicrm-cxn-rpc",
-        "version": "v0.16.12.05",
-        "version_normalized": "0.16.12.05",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/civicrm/civicrm-cxn-rpc.git",
-            "reference": "e88e78dc491b7e8739a40231f46c2d4459347b12"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/civicrm/civicrm-cxn-rpc/zipball/e88e78dc491b7e8739a40231f46c2d4459347b12",
-            "reference": "e88e78dc491b7e8739a40231f46c2d4459347b12",
-            "shasum": ""
-        },
-        "require": {
-            "phpseclib/phpseclib": "1.0.*",
-            "psr/log": "1.0.0"
-        },
-        "require-dev": {
-            "phpunit/phpunit": "3.7.*"
-        },
-        "time": "2016-12-06 04:32:51",
-        "type": "library",
-        "installation-source": "dist",
-        "autoload": {
-            "psr-4": {
-                "Civi\\Cxn\\Rpc\\": "src/"
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "authors": [
-            {
-                "name": "Tim Otten",
-                "email": "totten@civicrm.org"
-            }
-        ],
-        "description": "RPC library for CiviConnect"
-    },
-    {
-        "name": "totten/ca-config",
-        "version": "v17.05.0",
-        "version_normalized": "17.05.0.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/totten/ca_config.git",
-            "reference": "461cf05f932897c37ca87e9a85283d4963b49f09"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/totten/ca_config/zipball/461cf05f932897c37ca87e9a85283d4963b49f09",
-            "reference": "461cf05f932897c37ca87e9a85283d4963b49f09",
-            "shasum": ""
-        },
-        "require": {
-            "php": ">=5.2"
-        },
-        "time": "2017-05-10 20:08:17",
-        "type": "library",
-        "installation-source": "dist",
-        "autoload": {
-            "psr-0": {
-                "CA_Config": "src/"
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "BSD-2-Clause"
-        ],
-        "authors": [
-            {
-                "name": "Tim Otten",
-                "email": "to-git@think.hm"
-            }
-        ],
-        "description": "Default configuration for certificate authorities",
-        "homepage": "https://github.com/totten/ca_config"
-    },
-    {
-        "name": "pear/auth_sasl",
-        "version": "v1.1.0",
-        "version_normalized": "1.1.0.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/pear/Auth_SASL.git",
-            "reference": "db1ead3dc0bf986d2bab0dbc04d114800cf91dee"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/pear/Auth_SASL/zipball/db1ead3dc0bf986d2bab0dbc04d114800cf91dee",
-            "reference": "db1ead3dc0bf986d2bab0dbc04d114800cf91dee",
-            "shasum": ""
-        },
-        "require": {
-            "pear/pear_exception": "@stable"
-        },
-        "require-dev": {
-            "phpunit/phpunit": "@stable"
-        },
-        "time": "2017-03-07 14:37:05",
-        "type": "library",
-        "installation-source": "dist",
-        "autoload": {
-            "psr-0": {
-                "Auth": "./"
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "include-path": [
-            "./"
-        ],
-        "license": [
-            "BSD"
-        ],
-        "authors": [
-            {
-                "name": "Anish Mistry",
-                "email": "amistry@am-productions.biz",
-                "role": "Lead"
-            },
-            {
-                "name": "Richard Heyes",
-                "email": "richard@php.net",
-                "role": "Lead"
-            },
-            {
-                "name": "Michael Bretterklieber",
-                "email": "michael@bretterklieber.com",
-                "role": "Lead"
-            }
-        ],
-        "description": "Abstraction of various SASL mechanism responses"
-    },
-    {
-        "name": "phpseclib/phpseclib",
-        "version": "1.0.6",
-        "version_normalized": "1.0.6.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/phpseclib/phpseclib.git",
-            "reference": "aa8368ed12ef389f20d3932d051a7207471ecbab"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/aa8368ed12ef389f20d3932d051a7207471ecbab",
-            "reference": "aa8368ed12ef389f20d3932d051a7207471ecbab",
-            "shasum": ""
-        },
-        "require": {
-            "php": ">=5.0.0"
-        },
-        "require-dev": {
-            "phing/phing": "~2.7",
-            "phpunit/phpunit": "~4.0",
-            "sami/sami": "~2.0",
-            "squizlabs/php_codesniffer": "~2.0"
-        },
-        "suggest": {
-            "ext-gmp": "Install the GMP (GNU Multiple Precision) extension in order to speed up arbitrary precision integer arithmetic operations.",
-            "ext-mcrypt": "Install the Mcrypt extension in order to speed up a wide variety of cryptographic operations.",
-            "pear-pear/PHP_Compat": "Install PHP_Compat to get phpseclib working on PHP < 5.0.0."
-        },
-        "time": "2017-05-08 05:58:24",
-        "type": "library",
-        "installation-source": "dist",
-        "autoload": {
-            "psr-0": {
-                "Crypt": "phpseclib/",
-                "File": "phpseclib/",
-                "Math": "phpseclib/",
-                "Net": "phpseclib/",
-                "System": "phpseclib/"
-            },
-            "files": [
-                "phpseclib/bootstrap.php",
-                "phpseclib/Crypt/Random.php"
-            ]
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "include-path": [
-            "phpseclib/"
-        ],
-        "license": [
-            "MIT"
-        ],
-        "authors": [
-            {
-                "name": "Jim Wigginton",
-                "email": "terrafrost@php.net",
-                "role": "Lead Developer"
-            },
-            {
-                "name": "Patrick Monnerat",
-                "email": "pm@datasphere.ch",
-                "role": "Developer"
-            },
-            {
-                "name": "Andreas Fischer",
-                "email": "bantu@phpbb.com",
-                "role": "Developer"
-            },
-            {
-                "name": "Hans-Jürgen Petrich",
-                "email": "petrich@tronic-media.com",
-                "role": "Developer"
-            },
-            {
-                "name": "Graham Campbell",
-                "email": "graham@alt-three.com",
-                "role": "Developer"
-            }
-        ],
-        "description": "PHP Secure Communications Library - Pure-PHP implementations of RSA, AES, SSH2, SFTP, X.509 etc.",
-        "homepage": "http://phpseclib.sourceforge.net",
-        "keywords": [
-            "BigInteger",
-            "aes",
-            "asn.1",
-            "asn1",
-            "blowfish",
-            "crypto",
-            "cryptography",
-            "encryption",
-            "rsa",
-            "security",
-            "sftp",
-            "signature",
-            "signing",
-            "ssh",
-            "twofish",
-            "x.509",
-            "x509"
-        ]
-    },
-    {
-        "name": "symfony/dependency-injection",
-        "version": "v2.5.12",
-        "version_normalized": "2.5.12.0",
-        "target-dir": "Symfony/Component/DependencyInjection",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/symfony/dependency-injection.git",
-            "reference": "c42aee05b466cc9c66b87ddf7d263402befb6962"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/symfony/dependency-injection/zipball/c42aee05b466cc9c66b87ddf7d263402befb6962",
-            "reference": "c42aee05b466cc9c66b87ddf7d263402befb6962",
-            "shasum": ""
-        },
-        "require": {
-            "php": ">=5.3.3"
-        },
-        "require-dev": {
-            "symfony/config": "~2.2",
-            "symfony/expression-language": "~2.4,>=2.4.10",
-            "symfony/yaml": "~2.1"
-        },
-        "suggest": {
-            "symfony/config": "",
-            "symfony/proxy-manager-bridge": "Generate service proxies to lazy load them",
-            "symfony/yaml": ""
-        },
-        "time": "2015-01-25 04:37:39",
-        "type": "library",
-        "extra": {
-            "branch-alias": {
-                "dev-master": "2.5-dev"
-            }
-        },
-        "installation-source": "dist",
-        "autoload": {
-            "psr-0": {
-                "Symfony\\Component\\DependencyInjection\\": ""
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "authors": [
-            {
-                "name": "Symfony Community",
-                "homepage": "http://symfony.com/contributors"
-            },
-            {
-                "name": "Fabien Potencier",
-                "email": "fabien@symfony.com"
-            }
-        ],
-        "description": "Symfony DependencyInjection Component",
-        "homepage": "http://symfony.com"
-    },
-    {
-        "name": "symfony/event-dispatcher",
-        "version": "v2.5.12",
-        "version_normalized": "2.5.12.0",
-        "target-dir": "Symfony/Component/EventDispatcher",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/symfony/event-dispatcher.git",
-            "reference": "af6eb6a9a1a3b411facfd8e7e3f82a6be7919c04"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/symfony/event-dispatcher/zipball/af6eb6a9a1a3b411facfd8e7e3f82a6be7919c04",
-            "reference": "af6eb6a9a1a3b411facfd8e7e3f82a6be7919c04",
-            "shasum": ""
-        },
-        "require": {
-            "php": ">=5.3.3"
-        },
-        "require-dev": {
-            "psr/log": "~1.0",
-            "symfony/config": "~2.0,>=2.0.5",
-            "symfony/dependency-injection": "~2.0,>=2.0.5,<2.6.0",
-            "symfony/stopwatch": "~2.3"
-        },
-        "suggest": {
-            "symfony/dependency-injection": "",
-            "symfony/http-kernel": ""
-        },
-        "time": "2015-01-29 18:20:43",
-        "type": "library",
-        "extra": {
-            "branch-alias": {
-                "dev-master": "2.5-dev"
-            }
-        },
-        "installation-source": "dist",
-        "autoload": {
-            "psr-0": {
-                "Symfony\\Component\\EventDispatcher\\": ""
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "authors": [
-            {
-                "name": "Symfony Community",
-                "homepage": "http://symfony.com/contributors"
-            },
-            {
-                "name": "Fabien Potencier",
-                "email": "fabien@symfony.com"
-            }
-        ],
-        "description": "Symfony EventDispatcher Component",
-        "homepage": "http://symfony.com"
-    },
-    {
-        "name": "symfony/finder",
-        "version": "v2.5.12",
-        "version_normalized": "2.5.12.0",
-        "target-dir": "Symfony/Component/Finder",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/symfony/Finder.git",
-            "reference": "e527ebf47ff912a45e148b7d0b107b80ec0b3cc2"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/symfony/Finder/zipball/e527ebf47ff912a45e148b7d0b107b80ec0b3cc2",
-            "reference": "e527ebf47ff912a45e148b7d0b107b80ec0b3cc2",
-            "shasum": ""
-        },
-        "require": {
-            "php": ">=5.3.3"
-        },
-        "time": "2015-01-03 08:01:13",
-        "type": "library",
-        "extra": {
-            "branch-alias": {
-                "dev-master": "2.5-dev"
-            }
-        },
-        "installation-source": "dist",
-        "autoload": {
-            "psr-0": {
-                "Symfony\\Component\\Finder\\": ""
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "authors": [
-            {
-                "name": "Symfony Community",
-                "homepage": "http://symfony.com/contributors"
-            },
-            {
-                "name": "Fabien Potencier",
-                "email": "fabien@symfony.com"
-            }
-        ],
-        "description": "Symfony Finder Component",
-        "homepage": "http://symfony.com"
-    },
-    {
-        "name": "symfony/process",
-        "version": "v2.5.12",
-        "version_normalized": "2.5.12.0",
-        "target-dir": "Symfony/Component/Process",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/symfony/Process.git",
-            "reference": "00a1308e8b5aec5eba7c8f1708426a78f929be8c"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/symfony/Process/zipball/00a1308e8b5aec5eba7c8f1708426a78f929be8c",
-            "reference": "00a1308e8b5aec5eba7c8f1708426a78f929be8c",
-            "shasum": ""
-        },
-        "require": {
-            "php": ">=5.3.3"
-        },
-        "time": "2015-02-08 07:07:45",
-        "type": "library",
-        "extra": {
-            "branch-alias": {
-                "dev-master": "2.5-dev"
-            }
-        },
-        "installation-source": "dist",
-        "autoload": {
-            "psr-0": {
-                "Symfony\\Component\\Process\\": ""
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "authors": [
-            {
-                "name": "Symfony Community",
-                "homepage": "http://symfony.com/contributors"
-            },
-            {
-                "name": "Fabien Potencier",
-                "email": "fabien@symfony.com"
-            }
-        ],
-        "description": "Symfony Process Component",
-        "homepage": "http://symfony.com"
-    },
-    {
-        "name": "electrolinux/phpquery",
-        "version": "0.9.6",
-        "version_normalized": "0.9.6.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/electrolinux/phpquery.git",
-            "reference": "6cb8afcfe8cd4ce45f2f8c27d561383037c27a3a"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/electrolinux/phpquery/zipball/6cb8afcfe8cd4ce45f2f8c27d561383037c27a3a",
-            "reference": "6cb8afcfe8cd4ce45f2f8c27d561383037c27a3a",
-            "shasum": ""
-        },
-        "time": "2013-03-21 12:39:33",
-        "type": "library",
-        "installation-source": "dist",
-        "autoload": {
-            "classmap": [
-                "phpQuery/"
-            ]
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "authors": [
-            {
-                "name": "Tobiasz Cudnik",
-                "email": "tobiasz.cudnik@gmail.com",
-                "homepage": "https://github.com/TobiaszCudnik",
-                "role": "Developer"
-            },
-            {
-                "name": "didier Belot",
-                "role": "Packager"
-            }
-        ],
-        "description": "phpQuery is a server-side, chainable, CSS3 selector driven Document Object Model (DOM) API based on jQuery JavaScript Library",
-        "homepage": "http://code.google.com/p/phpquery/"
-    },
-    {
-        "name": "pclzip/pclzip",
-        "version": "2.8.2",
-        "version_normalized": "2.8.2.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/ivanlanin/pclzip.git",
-            "reference": "19dd1de9d3f5fc4d7d70175b4c344dee329f45fd"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/ivanlanin/pclzip/zipball/19dd1de9d3f5fc4d7d70175b4c344dee329f45fd",
-            "reference": "19dd1de9d3f5fc4d7d70175b4c344dee329f45fd",
-            "shasum": ""
-        },
-        "time": "2014-06-05 11:42:24",
-        "type": "library",
-        "installation-source": "dist",
-        "autoload": {
-            "classmap": [
-                "pclzip.lib.php"
-            ]
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "LGPL-2.1"
-        ],
-        "authors": [
-            {
-                "name": "Vincent Blavet"
-            }
-        ],
-        "description": "A PHP library that offers compression and extraction functions for Zip formatted archives",
-        "homepage": "http://www.phpconcept.net/pclzip",
-        "keywords": [
-            "php",
-            "zip"
         ]
     },
     {
@@ -1421,6 +1101,326 @@
         ],
         "description": "Symfony Config Component",
         "homepage": "http://symfony.com"
+    },
+    {
+        "name": "symfony/dependency-injection",
+        "version": "v2.5.12",
+        "version_normalized": "2.5.12.0",
+        "target-dir": "Symfony/Component/DependencyInjection",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/symfony/dependency-injection.git",
+            "reference": "c42aee05b466cc9c66b87ddf7d263402befb6962"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/symfony/dependency-injection/zipball/c42aee05b466cc9c66b87ddf7d263402befb6962",
+            "reference": "c42aee05b466cc9c66b87ddf7d263402befb6962",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.3"
+        },
+        "require-dev": {
+            "symfony/config": "~2.2",
+            "symfony/expression-language": "~2.4,>=2.4.10",
+            "symfony/yaml": "~2.1"
+        },
+        "suggest": {
+            "symfony/config": "",
+            "symfony/proxy-manager-bridge": "Generate service proxies to lazy load them",
+            "symfony/yaml": ""
+        },
+        "time": "2015-01-25 04:37:39",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "2.5-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-0": {
+                "Symfony\\Component\\DependencyInjection\\": ""
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Symfony Community",
+                "homepage": "http://symfony.com/contributors"
+            },
+            {
+                "name": "Fabien Potencier",
+                "email": "fabien@symfony.com"
+            }
+        ],
+        "description": "Symfony DependencyInjection Component",
+        "homepage": "http://symfony.com"
+    },
+    {
+        "name": "symfony/event-dispatcher",
+        "version": "v2.5.12",
+        "version_normalized": "2.5.12.0",
+        "target-dir": "Symfony/Component/EventDispatcher",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/symfony/event-dispatcher.git",
+            "reference": "af6eb6a9a1a3b411facfd8e7e3f82a6be7919c04"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/symfony/event-dispatcher/zipball/af6eb6a9a1a3b411facfd8e7e3f82a6be7919c04",
+            "reference": "af6eb6a9a1a3b411facfd8e7e3f82a6be7919c04",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.3"
+        },
+        "require-dev": {
+            "psr/log": "~1.0",
+            "symfony/config": "~2.0,>=2.0.5",
+            "symfony/dependency-injection": "~2.0,>=2.0.5,<2.6.0",
+            "symfony/stopwatch": "~2.3"
+        },
+        "suggest": {
+            "symfony/dependency-injection": "",
+            "symfony/http-kernel": ""
+        },
+        "time": "2015-01-29 18:20:43",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "2.5-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-0": {
+                "Symfony\\Component\\EventDispatcher\\": ""
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Symfony Community",
+                "homepage": "http://symfony.com/contributors"
+            },
+            {
+                "name": "Fabien Potencier",
+                "email": "fabien@symfony.com"
+            }
+        ],
+        "description": "Symfony EventDispatcher Component",
+        "homepage": "http://symfony.com"
+    },
+    {
+        "name": "symfony/finder",
+        "version": "v2.5.12",
+        "version_normalized": "2.5.12.0",
+        "target-dir": "Symfony/Component/Finder",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/symfony/Finder.git",
+            "reference": "e527ebf47ff912a45e148b7d0b107b80ec0b3cc2"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/symfony/Finder/zipball/e527ebf47ff912a45e148b7d0b107b80ec0b3cc2",
+            "reference": "e527ebf47ff912a45e148b7d0b107b80ec0b3cc2",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.3"
+        },
+        "time": "2015-01-03 08:01:13",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "2.5-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-0": {
+                "Symfony\\Component\\Finder\\": ""
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Symfony Community",
+                "homepage": "http://symfony.com/contributors"
+            },
+            {
+                "name": "Fabien Potencier",
+                "email": "fabien@symfony.com"
+            }
+        ],
+        "description": "Symfony Finder Component",
+        "homepage": "http://symfony.com"
+    },
+    {
+        "name": "symfony/process",
+        "version": "v2.5.12",
+        "version_normalized": "2.5.12.0",
+        "target-dir": "Symfony/Component/Process",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/symfony/Process.git",
+            "reference": "00a1308e8b5aec5eba7c8f1708426a78f929be8c"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/symfony/Process/zipball/00a1308e8b5aec5eba7c8f1708426a78f929be8c",
+            "reference": "00a1308e8b5aec5eba7c8f1708426a78f929be8c",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.3"
+        },
+        "time": "2015-02-08 07:07:45",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "2.5-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-0": {
+                "Symfony\\Component\\Process\\": ""
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Symfony Community",
+                "homepage": "http://symfony.com/contributors"
+            },
+            {
+                "name": "Fabien Potencier",
+                "email": "fabien@symfony.com"
+            }
+        ],
+        "description": "Symfony Process Component",
+        "homepage": "http://symfony.com"
+    },
+    {
+        "name": "tecnickcom/tcpdf",
+        "version": "6.2.12",
+        "version_normalized": "6.2.12.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/tecnickcom/TCPDF.git",
+            "reference": "2f732eaa91b5665274689b1d40b285a7bacdc37f"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/tecnickcom/TCPDF/zipball/2f732eaa91b5665274689b1d40b285a7bacdc37f",
+            "reference": "2f732eaa91b5665274689b1d40b285a7bacdc37f",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.0"
+        },
+        "time": "2015-09-12 10:08:34",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "classmap": [
+                "fonts",
+                "config",
+                "include",
+                "tcpdf.php",
+                "tcpdf_parser.php",
+                "tcpdf_import.php",
+                "tcpdf_barcodes_1d.php",
+                "tcpdf_barcodes_2d.php",
+                "include/tcpdf_colors.php",
+                "include/tcpdf_filters.php",
+                "include/tcpdf_font_data.php",
+                "include/tcpdf_fonts.php",
+                "include/tcpdf_images.php",
+                "include/tcpdf_static.php",
+                "include/barcodes/datamatrix.php",
+                "include/barcodes/pdf417.php",
+                "include/barcodes/qrcode.php"
+            ]
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "LGPLv3"
+        ],
+        "authors": [
+            {
+                "name": "Nicola Asuni",
+                "email": "info@tecnick.com",
+                "homepage": "http://nicolaasuni.tecnick.com"
+            }
+        ],
+        "description": "TCPDF is a PHP class for generating PDF documents and barcodes.",
+        "homepage": "http://www.tcpdf.org/",
+        "keywords": [
+            "PDFD32000-2008",
+            "TCPDF",
+            "barcodes",
+            "datamatrix",
+            "pdf",
+            "pdf417",
+            "qrcode"
+        ]
+    },
+    {
+        "name": "totten/ca-config",
+        "version": "v17.05.0",
+        "version_normalized": "17.05.0.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/totten/ca_config.git",
+            "reference": "461cf05f932897c37ca87e9a85283d4963b49f09"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/totten/ca_config/zipball/461cf05f932897c37ca87e9a85283d4963b49f09",
+            "reference": "461cf05f932897c37ca87e9a85283d4963b49f09",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.2"
+        },
+        "time": "2017-05-10 20:08:17",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-0": {
+                "CA_Config": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "BSD-2-Clause"
+        ],
+        "authors": [
+            {
+                "name": "Tim Otten",
+                "email": "to-git@think.hm"
+            }
+        ],
+        "description": "Default configuration for certificate authorities",
+        "homepage": "https://github.com/totten/ca_config"
     },
     {
         "name": "zetacomponents/base",
