@@ -2046,6 +2046,14 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     if (!empty($this->_ccid)) {
       $this->_params['contribution_id'] = $this->_ccid;
     }
+    //Set email-bltID if pre/post profile contains an email.
+    if ($this->_emailExists == TRUE) {
+      foreach ($this->_params as $key => $val) {
+        if (substr($key, 0, 6) == 'email-' && empty($this->_params["email-{$this->_bltID}"])) {
+          $this->_params["email-{$this->_bltID}"] = $this->_params[$key];
+        }
+      }
+    }
     // add a description field at the very beginning
     $this->_params['description'] = ts('Online Contribution') . ': ' . (($this->_pcpInfo['title']) ? $this->_pcpInfo['title'] : $this->_values['title']);
 
