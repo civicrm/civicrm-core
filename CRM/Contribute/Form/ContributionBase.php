@@ -227,6 +227,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       // lets just bump this to a regular session error and redirect user to main page
       $this->controller->invalidKeyRedirect();
     }
+    $this->_emailExists = $this->get('emailExists');
 
     // this was used prior to the cleverer this_>getContactID - unsure now
     $this->_userID = CRM_Core_Session::singleton()->getLoggedInContactID();
@@ -652,6 +653,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
               !in_array($profileContactType, array('honor', 'onbehalf'))
           ) {
             $this->_emailExists = TRUE;
+            $this->set('emailExists', TRUE);
           }
         }
 
