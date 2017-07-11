@@ -153,6 +153,12 @@ class CRM_Price_DAO_PriceFieldValue extends CRM_Core_DAO {
    */
   public $non_deductible_amount;
   /**
+   * Implicit FK to civicrm_option_group with name = \'visibility\'
+   *
+   * @var int unsigned
+   */
+  public $visibility_id;
+  /**
    * Class constructor.
    */
   function __construct() {
@@ -433,6 +439,14 @@ class CRM_Price_DAO_PriceFieldValue extends CRM_Core_DAO {
           'html' => array(
             'type' => 'Text',
           ) ,
+        ) ,
+        'visibility_id' => array(
+          'name' => 'visibility_id',
+          'type' => CRM_Utils_Type::T_INT,
+          'default' => '1',
+          'pseudoconstant' => array(
+            'optionGroupName' => 'visibility',
+          ),
         ) ,
       );
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);
