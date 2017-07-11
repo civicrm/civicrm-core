@@ -371,6 +371,8 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
   public function upgrade_4_7_23($rev) {
     $this->addTask('CRM-20387 - Add invoice_number column to civicrm_contribution', 'addColumn',
       'civicrm_contribution', 'invoice_number', "varchar(255) COMMENT 'Human readable invoice number' DEFAULT NULL");
+    $this->addTask('CRM-20772 - Price set calculation precision when sales tax enabled', 'alterColumn',
+      'civicrm_membership_type', 'minimum_fee', "VARCHAR(512) NULL DEFAULT '0.00' COMMENT 'Minimum fee for this membership (0 for free/complimentary memberships).'");
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
   }
 

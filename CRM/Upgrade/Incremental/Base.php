@@ -182,6 +182,51 @@ class CRM_Upgrade_Incremental_Base {
   }
 
   /**
+   * Modify a column in a table
+   *
+   * @param CRM_Queue_TaskContext $ctx
+   * @param string $table
+   * @param string $column
+   * @param string $properties
+   * @param bool $localizable is this a field that should be localized
+   * @param string $newColumn (new name for column)
+   * @return bool
+   */
+  public static function alterColumn($ctx, $table, $column, $properties, $localizable = FALSE, $newColumn = NULL) {
+    if (!isset($newColumn)) {
+      // Option to rename column
+      $newColumn = $column;
+    }
+    $domain = new CRM_Core_DAO_Domain();
+    $domain->find(TRUE);
+    $queries = array();
+    if (!CRM_Core_BAO_SchemaHandler::checkIfFieldExists($table, $column)) {
+      if ($domain->locales) {
+        if ($localizable) {
+          $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
+          foreach ($locales as $locale) {
+            $queries[] = "ALTER TABLE `$table` CHANGE `{$column}_{$locale}` `{$newColumn}_{$locale}` $properties";
+          }
+        }
+        else {
+          $queries[] = "ALTER TABLE `$table` CHANGE `$column` `$newColumn` $properties";
+        }
+      }
+      else {
+        $queries[] = "ALTER TABLE `$table` CHANGE `$column` `$newColumn` $properties";
+      }
+      foreach ($queries as $query) {
+        CRM_Core_DAO::executeQuery($query, array(), TRUE, NULL, FALSE, FALSE);
+      }
+    }
+    if ($domain->locales) {
+      $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
+      CRM_Core_I18n_Schema::rebuildMultilingualSchema($locales, NULL);
+    }
+    return TRUE;
+  }
+
+  /**
    * Drop a column from a table if it exist.
    *
    * @param CRM_Queue_TaskContext $ctx

@@ -838,9 +838,8 @@ WHERE  id = %1";
         $params['amount_level'] = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, $amount_level) . $displayParticipantCount . CRM_Core_DAO::VALUE_SEPARATOR;
       }
     }
-    // @todo this was a fix for CRM-16460 but is too deep in the system for formatting
-    // and probably causes negative amounts to save as $0 depending on server config.
-    $params['amount'] = CRM_Utils_Money::format($totalPrice, NULL, NULL, TRUE);
+    // Don't use CRM_Utils_Money::format here as we need to allow more decimal places so sales tax can be calculated with recurring amounts.
+    $params['amount'] = filter_var($totalPrice, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
     $params['tax_amount'] = $totalTax;
     if ($component) {
       foreach ($autoRenew as $dontCare => $eachAmount) {

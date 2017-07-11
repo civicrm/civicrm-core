@@ -83,7 +83,8 @@ class CRM_Member_Form_MembershipConfig extends CRM_Core_Form {
     }
 
     if (isset($defaults['minimum_fee'])) {
-      $defaults['minimum_fee'] = CRM_Utils_Money::format($defaults['minimum_fee'], NULL, '%a');
+      // Don't use CRM_Utils_Money::format here as we need to allow more decimal places so sales tax can be calculated with recurring amounts.
+      $defaults['minimum_fee'] = filter_var($defaults['minimum_fee'], FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
     }
 
     if (isset($defaults['status'])) {
