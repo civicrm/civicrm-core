@@ -210,8 +210,8 @@ SELECT     civicrm_email.id as email_id
           $this->hash,
         )
       ) . "@$emailDomain";
-	  
-	$bounce_address = $localpart . "@$emailDomain";   
+
+    $bounce_address = $localpart . "@$emailDomain";
 
     $group = new CRM_Contact_BAO_Group();
     $group->id = $this->group_id;
