@@ -62,6 +62,16 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
     if ($rev == '4.7.13') {
       $preUpgradeMessage .= '<p>' . ts('A new permission has been added called %1 This Permission is now used to control access to the Manage Tags screen', array(1 => 'manage tags')) . '</p>';
     }
+    if ($rev == '4.7.22') {
+      // Based on support inquiries for 4.7.21, show message during 4.7.22.
+      // For affected users, this issue prevents loading the regular status screen.
+      if (!$this->checkImageUploadDir()) {
+        $preUpgradeMessage .= '<p>' . ts('There appears to be an inconsistency in the configuration of "Image Upload URL" and "Image Upload Directory".') . '</p>'
+          . '<p>'
+          . ts('Further advice will be displayed at the end of the upgrade.')
+          . '</p>';
+      }
+    }
   }
 
   /**
@@ -120,6 +130,26 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
       $smsCheck = CRM_Core_DAO::singleValueQuery("SELECT count(id) FROM civicrm_sms_provider");
       if ($check > 1 && (bool) $smsCheck) {
         $postUpgradeMessage .= '<p>civicrm_sms_provider ' . ts('has now had a domain id column added. As there is more than 1 domains in this install you need to manually set the domain id for the providers in this install') . '</p>';
+      }
+    }
+    if ($rev == '4.7.22') {
+      // Based on support inquiries for 4.7.21, show message during 4.7.22.
+      // For affected users, this issue prevents loading the regular status screen.
+      if (!$this->checkImageUploadDir()) {
+        $config = CRM_Core_Config::singleton();
+        $postUpgradeMessage .=
+          '<h3>' . ts('Warning') . '</h3>'
+          . '<p>' . ts('There appears to be an inconsistency in the configuration of "Image Upload URL" and "Image Upload Directory".') . '</p>'
+          . sprintf("<ul><li><b>imageUploadDir</b>: <code>%s</code></li><li><b>imageUploadURL</b>: <code>%s</code></li></ul>", htmlentities($config->imageUploadDir), htmlentities($config->imageUploadURL))
+          . '<p>'
+          . ts('You may need to check that: <ul><li>(a) the path and URL match,</li><li> (b) the httpd/htaccess policy allows requests for files inside this folder,</li><li>and (c) the web domain matches the normal web domain.</ul>')
+          . '</p>'
+          . '<p><em>'
+          . ts('(Note: Although files should be readable, it is best if they are not listable or browseable.)')
+          . '</em></p>'
+          . '<p>'
+          . ts('If this remains unresolved, then some important screens may fail to load.')
+          . '</p>';
       }
     }
   }
@@ -1142,6 +1172,15 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
       CHANGE `mapping_id` `mapping_id` varchar(64) COLLATE
       utf8_unicode_ci DEFAULT NULL COMMENT 'Name/ID of the mapping to use on this table'");
     return TRUE;
+  }
+
+  /**
+   * @return bool
+   */
+  protected function checkImageUploadDir() {
+    $config = CRM_Core_Config::singleton();
+    $check = new CRM_Utils_Check_Component_Security();
+    return $config->imageUploadDir && $config->imageUploadURL && $check->isDirAccessible($config->imageUploadDir, $config->imageUploadURL);
   }
 
 }
