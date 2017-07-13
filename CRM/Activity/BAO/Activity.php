@@ -37,6 +37,14 @@
 class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
 
   /**
+   * Activity status types
+   */
+  const
+    INCOMPLETE = 0,
+    COMPLETED = 1,
+    CANCELLED = 2;
+
+  /**
    * Static field for all the activity information that we can potentially export.
    *
    * @var array
@@ -2437,6 +2445,45 @@ AND cl.modified_id  = c.id
   }
 
   /**
+   * Return list of activity statuses of a given type.
+   *
+   * Note: activity status options use the "grouping" field to distinguish status types.
+   * Types are defined in class constants INCOMPLETE, COMPLETED, CANCELLED
+   *
+   * @param int $type
+   *
+   * @return array
+   */
+  public static function getStatusesByType($type) {
+    if (!isset(Civi::$statics[__CLASS__][__FUNCTION__])) {
+      $statuses = civicrm_api3('OptionValue', 'get', array(
+        'option_group_id' => 'activity_status',
+        'return' => array('value', 'name', 'filter'),
+        'options' => array('limit' => 0),
+      ));
+      Civi::$statics[__CLASS__][__FUNCTION__] = $statuses['values'];
+    }
+    $ret = array();
+    foreach (Civi::$statics[__CLASS__][__FUNCTION__] as $status) {
+      if ($status['filter'] == $type) {
+        $ret[$status['value']] = $status['name'];
+      }
+    }
+    return $ret;
+  }
+
+  /**
+   * Check if activity is overdue.
+   *
+   * @param array $activity
+   *
+   * @return bool
+   */
+  public static function isOverdue($activity) {
+    return array_key_exists($activity['status_id'], self::getStatusesByType(self::INCOMPLETE)) && CRM_Utils_Date::overdue($activity['activity_date_time']);
+  }
+
+  /**
    * Get the exportable fields for Activities.
    *
    * @param string $name
@@ -2802,9 +2849,7 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
         $activity['DT_RowId'] = $activityId;
         // Add class to this row if overdue.
         $activity['DT_RowClass'] = "crm-entity status-id-{$values['status_id']}";
-        if (CRM_Utils_Date::overdue(CRM_Utils_Array::value('activity_date_time', $values))
-          && CRM_Utils_Array::value('status_id', $values) == 1
-        ) {
+        if (self::isOverdue($values)) {
           $activity['DT_RowClass'] .= ' status-overdue';
         }
         else {
