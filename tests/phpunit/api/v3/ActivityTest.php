@@ -1374,6 +1374,9 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
     }
   }
 
+  /**
+   * Test or operator in api params
+   */
   public function testGetWithOr() {
     $acts = array(
       'test or 1' => 'orOperator',
@@ -1403,9 +1406,20 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
     $this->assertEquals(3, $result['count']);
   }
 
+  /**
+   * Test handling of is_overdue calculated field
+   */
   public function testGetOverdue() {
-    $overdueAct = $this->callAPISuccess('Activity', 'create', array('activity_date_time' => 'now - 1 week', 'status_id' => 'Scheduled') + $this->_params);
-    $completedAct = $this->callAPISuccess('Activity', 'create', array('activity_date_time' => 'now - 1 week', 'status_id' => 'Completed') + $this->_params);
+    $overdueAct = $this->callAPISuccess('Activity', 'create', array(
+        'activity_date_time' => 'now - 1 week',
+        'status_id' => 'Scheduled',
+      ) + $this->_params
+    );
+    $completedAct = $this->callAPISuccess('Activity', 'create', array(
+        'activity_date_time' => 'now - 1 week',
+        'status_id' => 'Completed',
+      ) + $this->_params
+    );
     $ids = array($overdueAct['id'], $completedAct['id']);
 
     // Test sorting

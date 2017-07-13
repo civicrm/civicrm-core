@@ -2457,7 +2457,7 @@ AND cl.modified_id  = c.id
   public static function getStatusesByType($type) {
     if (!isset(Civi::$statics[__CLASS__][__FUNCTION__])) {
       $statuses = civicrm_api3('OptionValue', 'get', array(
-        'option_group_id' => "activity_status",
+        'option_group_id' => 'activity_status',
         'return' => array('value', 'name', 'filter'),
         'options' => array('limit' => 0),
       ));
