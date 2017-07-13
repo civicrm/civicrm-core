@@ -327,7 +327,7 @@ class CRM_Financial_DAO_PaymentProcessor extends CRM_Core_DAO {
           'bao' => 'CRM_Financial_BAO_PaymentProcessor',
           'localizable' => 0,
           'html' => array(
-            'type' => 'Text',
+            'type' => 'Password',
           ) ,
         ) ,
         'signature' => array(
