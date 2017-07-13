@@ -174,14 +174,4 @@
 
     </script>
     {/literal}
-      {if !$contributionMode}
-        {include file="CRM/common/showHideByFieldValue.tpl"
-        trigger_field_id    ="payment_instrument_id"
-        trigger_value       = '4'
-        target_element_id   ="checkNumber"
-        target_element_type ="table-row"
-        field_type          ="select"
-        invert              = 0
-        }
-    {/if}
 {/if}
