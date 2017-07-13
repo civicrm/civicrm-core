@@ -554,7 +554,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     $this->assign('trxn_id', CRM_Utils_Array::value('trxn_id', $params));
     $this->assign('receive_date', CRM_Utils_Array::value('trxn_date', $params));
     $this->assign('paidBy', CRM_Core_PseudoConstant::getLabel(
-      'CRM_Contribute_BAO_Contribute',
+      'CRM_Contribute_BAO_Contribution',
       'payment_instrument_id',
       $params['payment_instrument_id']
     ));
