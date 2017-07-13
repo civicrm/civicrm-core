@@ -13,3 +13,7 @@ VALUES
 
 -- CRM-20387
 UPDATE `civicrm_contribution` SET `invoice_number` = `invoice_id` WHERE `invoice_id` LIKE CONCAT('%', `id`);
+
+-- CRM-12167
+ALTER TABLE `civicrm_price_field_value`
+ADD COLUMN `visibility_id` int(10);
