@@ -177,7 +177,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       $this->add('text', 'icon', ts('Icon'), array('class' => 'crm-icon-picker', 'title' => ts('Choose Icon'), 'allowClear' => TRUE));
     }
 
-    if ($this->_gName == 'activity_status') {
+    if (in_array($this->_gName, array('activity_status', 'case_status'))) {
       $this->add('color', 'color', ts('Color'));
     }
 
