@@ -61,8 +61,15 @@
         <tr><td class="label">{ts}Start date{/ts}</td><td>{$start_date|crmDate}</td></tr>
         <tr><td class="label">{ts}End date{/ts}</td><td>{$end_date|crmDate}</td></tr>
         <tr><td class="label">{ts}Auto-renew{/ts}</td><td>{$auto_renew}</td></tr>
+     {*CRM-14538 - fix*}
+	  <tr>
+        <td class='label'>{ts}Fees{/ts}</td>
+        <td id='payment-info'></td>
+      </tr>
     </table>
-
+	{*CRM-14538 - fix*}
+	{include file="CRM/Contribute/Page/PaymentInfo.tpl" show='payments'}
+	
     {include file="CRM/Custom/Page/CustomDataView.tpl"}
 
     {if $accessContribution and $rows.0.contribution_id}

@@ -1,28 +1,28 @@
 <?php
 /*
- +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
- |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
- +--------------------------------------------------------------------+
+  +--------------------------------------------------------------------+
+  | CiviCRM version 4.7                                                |
+  +--------------------------------------------------------------------+
+  | Copyright CiviCRM LLC (c) 2004-2017                                |
+  +--------------------------------------------------------------------+
+  | This file is a part of CiviCRM.                                    |
+  |                                                                    |
+  | CiviCRM is free software; you can copy, modify, and distribute it  |
+  | under the terms of the GNU Affero General Public License           |
+  | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+  |                                                                    |
+  | CiviCRM is distributed in the hope that it will be useful, but     |
+  | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+  | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+  | See the GNU Affero General Public License for more details.        |
+  |                                                                    |
+  | You should have received a copy of the GNU Affero General Public   |
+  | License and the CiviCRM Licensing Exception along                  |
+  | with this program; if not, contact CiviCRM LLC                     |
+  | at info[AT]civicrm[DOT]org. If you have questions about the        |
+  | GNU Affero General Public License or the licensing of CiviCRM,     |
+  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+  +--------------------------------------------------------------------+
  */
 
 /**
@@ -38,6 +38,7 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
    *
    * @return \CRM_Financial_DAO_FinancialTrxn
    */
+
   /**
    */
   public function __construct() {
@@ -66,12 +67,11 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
     $trxn->save();
 
     // save to entity_financial_trxn table
-    $entityFinancialTrxnParams
-      = array(
-        'entity_table' => "civicrm_contribution",
-        'financial_trxn_id' => $trxn->id,
-        'amount' => $params['total_amount'],
-      );
+    $entityFinancialTrxnParams = array(
+      'entity_table' => "civicrm_contribution",
+      'financial_trxn_id' => $trxn->id,
+      'amount' => $params['total_amount'],
+    );
 
     if (!empty($trxnEntityTable)) {
       $entityFinancialTrxnParams['entity_table'] = $trxnEntityTable['entity_table'];
@@ -232,7 +232,6 @@ WHERE ft.entity_table = 'civicrm_contribution' AND ft.entity_id = %1
 
     $sqlParams = array(1 => array($entity_id, 'Integer'));
     return CRM_Core_DAO::singleValueQuery($query, $sqlParams);
-
   }
 
   /**
@@ -428,19 +427,18 @@ WHERE ceft.entity_id = %1";
       $financialTrxnID = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($params['trxnParams']['contribution_id'], 'DESC');
       $params['entity_id'] = $financialTrxnID['financialTrxnId'];
     }
-    $fItemParams
-      = array(
-        'financial_account_id' => $financialAccount,
-        'contact_id' => CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Domain', $domainId, 'contact_id'),
-        'created_date' => date('YmdHis'),
-        'transaction_date' => date('YmdHis'),
-        'amount' => $amount,
-        'description' => 'Fee',
-        'status_id' => CRM_Core_Pseudoconstant::getKey('CRM_Financial_BAO_FinancialItem', 'status_id', 'Paid'),
-        'entity_table' => 'civicrm_financial_trxn',
-        'entity_id' => $params['entity_id'],
-        'currency' => $params['trxnParams']['currency'],
-      );
+    $fItemParams = array(
+      'financial_account_id' => $financialAccount,
+      'contact_id' => CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Domain', $domainId, 'contact_id'),
+      'created_date' => date('YmdHis'),
+      'transaction_date' => date('YmdHis'),
+      'amount' => $amount,
+      'description' => 'Fee',
+      'status_id' => CRM_Core_Pseudoconstant::getKey('CRM_Financial_BAO_FinancialItem', 'status_id', 'Paid'),
+      'entity_table' => 'civicrm_financial_trxn',
+      'entity_id' => $params['entity_id'],
+      'currency' => $params['trxnParams']['currency'],
+    );
     $trxnIDS['id'] = $trxn->id;
     CRM_Financial_BAO_FinancialItem::create($fItemParams, NULL, $trxnIDS);
   }
@@ -465,6 +463,10 @@ WHERE ceft.entity_id = %1";
 
     if ($entityName == 'participant') {
       $contributionId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment', $entityId, 'contribution_id', 'participant_id');
+    }
+    elseif ($entityName == 'membership') {
+      //CRM-14538 - fix
+      $contributionId = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipPayment', $entityId, 'contribution_id', 'membership_id');
     }
     else {
       $contributionId = $entityId;
@@ -604,10 +606,7 @@ WHERE ft.is_payment = 1
     $revenueRecognitionDate = $contributionDetails->revenue_recognition_date;
     if (!CRM_Utils_System::isNull($revenueRecognitionDate)) {
       $statuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
-      if (!$update
-        && (CRM_Utils_Array::value($contributionDetails->contribution_status_id, $statuses) != 'Completed'
-          || (CRM_Utils_Array::value($contributionDetails->contribution_status_id, $statuses) != 'Pending'
-            && $contributionDetails->is_pay_later)
+      if (!$update && (CRM_Utils_Array::value($contributionDetails->contribution_status_id, $statuses) != 'Completed' || (CRM_Utils_Array::value($contributionDetails->contribution_status_id, $statuses) != 'Pending' && $contributionDetails->is_pay_later)
           )
       ) {
         return;
@@ -636,8 +635,7 @@ WHERE ft.is_payment = 1
           if ($context == 'changeFinancialType') {
             $deferredRevenues[$key]['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_LineItem', $item['id'], 'financial_type_id');
           }
-          if (in_array($item['entity_table'],
-            array('civicrm_participant', 'civicrm_contribution'))
+          if (in_array($item['entity_table'], array('civicrm_participant', 'civicrm_contribution'))
           ) {
             $deferredRevenues[$key]['revenue'][] = array(
               'amount' => $lineTotal,
@@ -666,10 +664,10 @@ WHERE ft.is_payment = 1
         }
         foreach ($results['values'] as $result) {
           if ($result['account_relationship'] == $accountRel) {
-            $trxnParams['from_financial_account_id'] = $result['financial_account_id'];
+            $trxnParams['to_financial_account_id'] = $result['financial_account_id'];
           }
           else {
-            $trxnParams['to_financial_account_id'] = $result['financial_account_id'];
+            $trxnParams['from_financial_account_id'] = $result['financial_account_id'];
           }
         }
         foreach ($deferredRevenue['revenue'] as $revenue) {
