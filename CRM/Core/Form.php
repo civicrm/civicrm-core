@@ -1524,6 +1524,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       case 'EntityRef':
         return $this->addEntityRef($name, $label, $props, $required);
 
+      case 'Password':
+        return $this->add('password', $name, $label, $props, $required);
+
       // Check datatypes of fields
       // case 'Int':
       //case 'Float':
