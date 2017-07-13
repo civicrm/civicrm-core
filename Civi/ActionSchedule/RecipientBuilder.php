@@ -314,7 +314,7 @@ class RecipientBuilder {
 
     $addlCheck = \CRM_Utils_SQL_Select::from($query['casAddlCheckFrom'])
       ->select('*')
-      ->merge($query, array('wheres'))// why only where? why not the joins?
+      ->merge($query, array('params', 'wheres'))// why only where? why not the joins?
       ->merge($this->prepareRepetitionEndFilter($query['casDateField']))
       ->limit(1)
       ->strict()
@@ -326,11 +326,11 @@ class RecipientBuilder {
         ->merge($this->selectActionLogFields(self::PHASE_ADDITION_REPEAT, $query))
         ->merge($this->joinReminder('INNER JOIN', 'addl', $query))
         ->select("MAX(reminder.action_date_time) as latest_log_time")
-        ->merge($this->prepareAddlFilter('c.id'))
+        ->merge($this->prepareAddlFilter('c.id'), array('params'))
         ->where("c.is_deleted = 0 AND c.is_deceased = 0")
         ->groupBy("reminder.contact_id")
         // @todo replace use of timestampdiff with a direct comparison as TIMESTAMPDIFF cannot use an index.
-        ->having("TIMESTAMPDIFF(HOUR, latest_log_time, CAST(!casNow AS datetime)) >= TIMESTAMPDIFF(HOUR, latest_log_time, DATE_ADD(latest_log_time, INTERVAL !casRepetitionInterval)")
+        ->having("TIMESTAMPDIFF(HOUR, latest_log_time, CAST(!casNow AS datetime)) >= TIMESTAMPDIFF(HOUR, latest_log_time, DATE_ADD(latest_log_time, INTERVAL !casRepetitionInterval))")
         ->param(array(
           'casRepetitionInterval' => $this->parseRepetitionInterval(),
         ))
@@ -572,7 +572,12 @@ WHERE      $group.id = {$groupId}
 
       case self::PHASE_ADDITION_FIRST:
       case self::PHASE_ADDITION_REPEAT:
-        $fragment = \CRM_Utils_SQL_Select::fragment();
+        //CRM-19017: Load default params for fragment query object.
+        $params = array(
+          'casActionScheduleId' => $this->actionSchedule->id,
+          'casNow' => $this->now,
+        );
+        $fragment = \CRM_Utils_SQL_Select::fragment()->param($params);
         $fragment->select(
           array(
             "c.id as contact_id",
