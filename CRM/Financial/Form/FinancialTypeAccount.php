@@ -300,7 +300,9 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
         $params['entity_id'] = $this->_aid;
       }
       $financialTypeAccount = CRM_Financial_BAO_FinancialTypeAccount::add($params, $ids);
-      CRM_Core_Session::setStatus(ts('The financial type Account has been saved.'));
+      if ($financialTypeAccount) {
+        CRM_Core_Session::setStatus(ts('The financial type Account has been saved.'));
+      }
     }
 
     $buttonName = $this->controller->getButtonName();
