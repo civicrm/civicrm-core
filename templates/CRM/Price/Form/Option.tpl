@@ -108,7 +108,7 @@
       {/if}
       <tr class="crm-price-field-form-block-visibility_id">
         <td class="label">{$form.visibility_id.label}</td>
-        <td>&nbsp;{$form.visibility_id.html}</td>
+        <td>&nbsp;{$form.visibility_id.html} {help id="id-visibility"}</td>
       </tr>
     </table>
 

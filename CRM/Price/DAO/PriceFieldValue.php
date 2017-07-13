@@ -443,9 +443,19 @@ class CRM_Price_DAO_PriceFieldValue extends CRM_Core_DAO {
         'visibility_id' => array(
           'name' => 'visibility_id',
           'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Price Field Option Visibility') ,
+          'description' => 'Implicit FK to civicrm_option_group with name = \'visibility\'',
           'default' => '1',
+          'table_name' => 'civicrm_price_field_value',
+          'entity' => 'PriceFieldValue',
+          'bao' => 'CRM_Price_BAO_PriceFieldValue',
+          'localizable' => 0,
+          'html' => array(
+            'type' => 'Select',
+          ) ,
           'pseudoconstant' => array(
             'optionGroupName' => 'visibility',
+            'optionEditPath' => 'civicrm/admin/options/visibility',
           ),
         ) ,
       );
