@@ -439,7 +439,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * @param array $tableOperations
    * @param array $customTableToCopyFrom
    */
-  public static function moveContactBelongings($mainId, $otherId, $tables = FALSE, $tableOperations = array(), $customTableToCopyFrom = array()) {
+  public static function moveContactBelongings($mainId, $otherId, $tables = FALSE, $tableOperations = array(), $customTableToCopyFrom = NULL) {
     $cidRefs = self::cidRefs();
     $eidRefs = self::eidRefs();
     $cpTables = self::cpTables();
@@ -448,11 +448,13 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     $membershipMerge = FALSE;
     
     // getting all custom tables
-    $customTables = array();
-    self::addCustomTablesExtendingContactsToCidRefs($customTables);
-    $customTables = array_keys($customTables);
-    
-    $affected = array_merge(array_keys($cidRefs), array_keys($eidRefs));
+		$customTables = [];
+		if($customTableToCopyFrom != NULL) {
+			self::addCustomTablesExtendingContactsToCidRefs($customTables);
+			$customTables = array_keys($customTables);
+		}
+	
+		$affected = array_merge(array_keys($cidRefs), array_keys($eidRefs));
     if ($tables !== FALSE) {
       // if there are specific tables, sanitize the list
       $affected = array_unique(array_intersect($affected, $tables));
@@ -490,7 +492,8 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     $sqls = array();
     foreach ($affected as $table) {
       // skipping non selected custom table's value migration  
-      if(in_array($table, $customTables) && !in_array($table, $customTableToCopyFrom)){
+      if($customTableToCopyFrom != NULL && in_array($table, $customTables)
+				&& !in_array($table, $customTableToCopyFrom)){
         continue;
       }
       
@@ -1517,19 +1520,46 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 		// capturing the custom table names. The table's value we have to merge
 		// from duplicate contact to original contact
     $customTableToCopyValues = array();
-    foreach ($submittedCustomValue as $key=>$value){
-      $result = civicrm_api3('custom_field', 'get', array('id' => $value, 'is_active' => TRUE));
-      if(!$result['is_error']){
-        foreach ($result['values'] as $k=>$v){
-          $result_ = civicrm_api3('custom_group', 'get', array('id' => $result['values'][$k]['custom_group_id'], 'is_active' => TRUE));
-          if(!$result_['is_error']) {
-            foreach ($result_['values'] as $kk => $vv) {
-              array_push($customTableToCopyValues, $result_['values'][$kk]['table_name']);
-            }
-          }
-        }
-      }
-    }
+		foreach ($submittedCustomValue as $value){
+			if($value != NULL) {
+				$result1 = null;
+				try {
+					$result1 = civicrm_api3('custom_field', 'get', [
+						'id' => $value,
+						'is_active' => TRUE
+					]);
+				} catch (CiviCRM_API3_Exception $e) {
+					// just ignore and continue
+					continue;
+				}
+				if (!civicrm_error($result1)
+					&& isset($result1['values']) && is_array($result1['values'])) {
+					foreach ($result1['values'] as $value1) {
+						if ($value1 != NULL && is_array($value1) && isset($value1['custom_group_id'])) {
+							$result2 = null;
+							try {
+								$result2 = civicrm_api3('custom_group', 'get', [
+									'id' => $value1['custom_group_id'],
+									'is_active' => TRUE
+								]);
+							}catch (CiviCRM_API3_Exception $e) {
+								// just ignore and continue
+								continue;
+							}
+							if (!civicrm_error($result2)
+								&& isset($result2['values']) && is_array($result2['values'])
+							) {
+								foreach ($result2['values'] as $value2) {
+									if ($value2 != NULL && is_array($value2) && isset($value2['table_name'])) {
+										array_push($customTableToCopyValues, $value2['table_name']);
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
   
     // **** Do contact related migrations
     CRM_Dedupe_Merger::moveContactBelongings($mainId, $otherId, FALSE, array(), $customTableToCopyValues);
