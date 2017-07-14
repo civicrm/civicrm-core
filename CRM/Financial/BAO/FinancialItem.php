@@ -105,25 +105,19 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
       $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
       $params['amount'] = $lineItem->tax_amount;
       $params['description'] = $taxTerm;
-      $accountRel = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Sales Tax Account is' "));
+      $accountRelName = 'Sales Tax Account is';
     }
     else {
       $accountRelName = 'Income Account is';
       if (property_exists($contribution, 'revenue_recognition_date') && !CRM_Utils_System::isNull($contribution->revenue_recognition_date)) {
         $accountRelName = 'Deferred Revenue Account is';
       }
-      $accountRel = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE '{$accountRelName}' "));
     }
     if ($lineItem->financial_type_id) {
-      $searchParams = array(
-        'entity_table' => 'civicrm_financial_type',
-        'entity_id' => $lineItem->financial_type_id,
-        'account_relationship' => $accountRel,
+      $params['financial_account_id'] = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount(
+        $lineItem->financial_type_id,
+        $accountRelName
       );
-
-      $result = array();
-      CRM_Financial_BAO_FinancialTypeAccount::retrieve($searchParams, $result);
-      $params['financial_account_id'] = CRM_Utils_Array::value('financial_account_id', $result);
     }
     if (empty($trxnId)) {
       $trxnId['id'] = CRM_Contribute_BAO_Contribution::$_trxnIDs;
