@@ -219,6 +219,14 @@ class CRM_Member_BAO_Query extends CRM_Core_BAO_Query {
       case 'membership_status_id':
       case 'membership_type':
       case 'membership_type_id':
+        if (strpos($name, 'status') !== FALSE) {
+          $name = 'status_id';
+          $qillName = ts('Membership Status');
+        }
+        else {
+          $name = 'membership_type_id';
+          $qillName = ts('Membership Type');
+        }
         // CRM-17075 we are specifically handling the possibility we are dealing with the entity reference field
         // for membership_type_id here (although status would be handled if converted). The unhandled pathway at the moment
         // is from groupContactCache::load and this is a small fix to get the entity reference field to work.
@@ -228,25 +236,19 @@ class CRM_Member_BAO_Query extends CRM_Core_BAO_Query {
         if (is_string($value) && strpos($value, ',') && $op == '=') {
           $value = array('IN' => explode(',', $value));
         }
+        elseif (is_string($value) && !strpos($value, ',')) {
+          $value = CRM_Core_PseudoConstant::getKey('CRM_Member_DAO_Membership', $name, $value);
+        }
       case 'membership_id':
       case 'member_id': // CRM-18523 Updated to membership_id but kept member_id case for backwards compatibility
       case 'member_campaign_id':
-
-        if (strpos($name, 'status') !== FALSE) {
-          $name = 'status_id';
-          $qillName = ts('Membership Status');
-        }
-        elseif ($name == 'membership_id' || $name == 'member_id') {
+        if ($name == 'membership_id' || $name == 'member_id') {
           $name = 'id';
           $qillName = ts('Membership ID');
         }
         elseif ($name == 'member_campaign_id') {
           $name = 'campaign_id';
           $qillName = ts('Campaign');
-        }
-        else {
-          $name = 'membership_type_id';
-          $qillName = ts('Membership Type');
         }
         $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_membership.$name",
           $op,
