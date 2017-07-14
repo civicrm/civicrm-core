@@ -576,6 +576,7 @@
     .directive('crmUiSelect', function ($parse, $timeout) {
       return {
         require: '?ngModel',
+        priority: 1,
         scope: {
           crmUiSelect: '='
         },
@@ -611,7 +612,6 @@
             element.crmSelect2(scope.crmUiSelect || {});
             if (ngModel) {
               element.on('change', refreshModel);
-              $timeout(ngModel.$render);
             }
           }
 
