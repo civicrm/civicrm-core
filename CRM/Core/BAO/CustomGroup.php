@@ -122,6 +122,8 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
       'is_active',
       'is_multiple',
     );
+    $current_db_version = CRM_Core_DAO::singleValueQuery("SELECT version FROM civicrm_domain WHERE id = " . CRM_Core_Config::domainID());
+    $is_public_version = $current_db_version >= '4.7.19' ? 1 : 0;
     if ($is_public_version) {
       $fields[] = 'is_public';
     }
