@@ -331,10 +331,11 @@ class CiviMailUtils extends PHPUnit_Framework_TestCase {
    * Remove any sent messages from the log.
    *
    * @param int $limit
+   *  How many recent messages to remove, defaults to 0 (all).
    *
    * @throws \Exception
    */
-  public function clearMessages($limit = 1) {
+  public function clearMessages($limit = 0) {
     if ($this->_webtest) {
       throw new Exception("Not implemented: clearMessages for WebTest");
     }
