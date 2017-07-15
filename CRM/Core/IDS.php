@@ -112,56 +112,30 @@ class CRM_Core_IDS {
       return $configFile;
     }
 
-    $tmpDir = empty($config->uploadDir) ? CIVICRM_TEMPLATE_COMPILEDIR : $config->uploadDir;
-
     // also clear the stat cache in case we are upgrading
     clearstatcache();
 
-    global $civicrm_root;
-    $contents = "
-[General]
-    filter_type         = xml
-    filter_path         = {$civicrm_root}/packages/IDS/default_filter.xml
-    tmp_path            = $tmpDir
-    HTML_Purifier_Path  = IDS/vendors/htmlpurifier/HTMLPurifier.auto.php
-    HTML_Purifier_Cache = $tmpDir
-    scan_keys           = false
-    exceptions[]        = __utmz
-    exceptions[]        = __utmc
-    exceptions[]        = widget_code
-    exceptions[]        = html_message
-    exceptions[]        = text_message
-    exceptions[]        = body_html
-    exceptions[]        = msg_html
-    exceptions[]        = msg_text
-    exceptions[]        = msg_subject
-    exceptions[]        = description
-    exceptions[]        = intro
-    exceptions[]        = thankyou_text
-    exceptions[]        = intro_text
-    exceptions[]        = body_text
-    exceptions[]        = footer_text
-    exceptions[]        = thankyou_text
-    exceptions[]        = tf_thankyou_text
-    exceptions[]        = thankyou_footer
-    exceptions[]        = thankyou_footer_text
-    exceptions[]        = new_text
-    exceptions[]        = renewal_text
-    exceptions[]        = help_pre
-    exceptions[]        = help_post
-    exceptions[]        = confirm_title
-    exceptions[]        = confirm_text
-    exceptions[]        = confirm_footer_text
-    exceptions[]        = confirm_email_text
-    exceptions[]        = report_header
-    exceptions[]        = report_footer
-    exceptions[]        = data
-    exceptions[]        = json
-    exceptions[]        = instructions
-    exceptions[]        = suggested_message
-    exceptions[]        = page_text
-    exceptions[]        = details
-";
+    $config = self::createStandardConfig();
+    $contents = "\n";
+    $lineTpl = "    %-19s = %s\n";
+    foreach ($config as $section => $fields) {
+      $contents .= "[$section]\n";
+      foreach ($fields as $key => $value) {
+        if ($key === 'scan_keys' && $value == '') {
+          $value = 'false';
+        }
+
+        if (is_array($value)) {
+          foreach ($value as $v) {
+            $contents .= sprintf($lineTpl, $key . '[]', $v);
+          }
+        }
+        else {
+          $contents .= sprintf($lineTpl, $key, $value);
+        }
+      }
+    }
+
     if (file_put_contents($configFile, $contents) === FALSE) {
       CRM_Core_Error::movedSiteError($configFile);
     }
@@ -171,6 +145,81 @@ class CRM_Core_IDS {
     CRM_Utils_File::restrictAccess($config->configAndLogDir);
 
     return $configFile;
+  }
+
+  /**
+   * Create conservative, minimalist IDS configuration.
+   *
+   * @return array
+   */
+  public static function createBaseConfig() {
+    $config = \CRM_Core_Config::singleton();
+    $tmpDir = empty($config->uploadDir) ? CIVICRM_TEMPLATE_COMPILEDIR : $config->uploadDir;
+    global $civicrm_root;
+
+    return array(
+      'General' => array(
+        'filter_type' => 'xml',
+        'filter_path' => "{$civicrm_root}/packages/IDS/default_filter.xml",
+        'tmp_path' => $tmpDir,
+        'HTML_Purifier_Path' => 'IDS/vendors/htmlpurifier/HTMLPurifier.auto.php',
+        'HTML_Purifier_Cache' => $tmpDir,
+        'scan_keys' => '',
+        'exceptions' => array('__utmz', '__utmc'),
+      ),
+    );
+  }
+
+  /**
+   * Create the standard, general-purpose IDS configuration used by many pages.
+   *
+   * @return array
+   */
+  public static function createStandardConfig() {
+    $excs = array(
+      'widget_code',
+      'html_message',
+      'text_message',
+      'body_html',
+      'msg_html',
+      'msg_text',
+      'msg_subject',
+      'description',
+      'intro',
+      'thankyou_text',
+      'intro_text',
+      'body_text',
+      'footer_text',
+      'thankyou_text',
+      'tf_thankyou_text',
+      'thankyou_footer',
+      'thankyou_footer_text',
+      'new_text',
+      'renewal_text',
+      'help_pre',
+      'help_post',
+      'confirm_title',
+      'confirm_text',
+      'confirm_footer_text',
+      'confirm_email_text',
+      'report_header',
+      'report_footer',
+      'data',
+      'json',
+      'instructions',
+      'suggested_message',
+      'page_text',
+      'details',
+    );
+
+    $result = self::createBaseConfig();
+
+    $result['General']['exceptions'] = array_merge(
+      $result['General']['exceptions'],
+      $excs
+    );
+
+    return $result;
   }
 
   /**
