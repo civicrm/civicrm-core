@@ -431,7 +431,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       )
     );
     $mut->stop();
-    $mut->clearMessages(999);
+    $mut->clearMessages();
   }
 
   /**
@@ -505,7 +505,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       )
     );
     $mut->stop();
-    $mut->clearMessages(999);
+    $mut->clearMessages();
   }
 
   /**
