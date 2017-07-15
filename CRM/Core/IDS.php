@@ -52,19 +52,34 @@ class CRM_Core_IDS {
    * This function includes the IDS vendor parts and runs the
    * detection routines on the request array.
    *
-   * @param array $args
-   *   List of path parts.
+   * @param array $route
    *
    * @return bool
    */
-  public function check($args) {
+  public function check($route) {
+    if (CRM_Core_Permission::check('skip IDS check')) {
+      return NULL;
+    }
+
     // lets bypass a few civicrm urls from this check
     $skip = array('civicrm/admin/setting/updateConfigBackend', 'civicrm/admin/messageTemplates');
     CRM_Utils_Hook::idsException($skip);
-    $this->path = implode('/', $args);
+    $this->path = $route['path'];
     if (in_array($this->path, $skip)) {
       return NULL;
     }
+
+    $config = \CRM_Core_IDS::createStandardConfig();
+    foreach (array('json', 'html', 'exception') as $section) {
+      if (isset($route['ids_arguments'][$section])) {
+        foreach ($route['ids_arguments'][$section] as $v) {
+          $config['General'][$section][] = $v;
+        }
+        $config['General'][$section] = array_unique($config['General'][$section]);
+      }
+    }
+
+    $init = self::create($config);
 
     // Add request url and user agent.
     $_REQUEST['IDS_request_uri'] = $_SERVER['REQUEST_URI'];
@@ -72,21 +87,8 @@ class CRM_Core_IDS {
       $_REQUEST['IDS_user_agent'] = $_SERVER['HTTP_USER_AGENT'];
     }
 
-    $configFile = self::createConfigFile(FALSE);
-
-    // init the PHPIDS and pass the REQUEST array
-    require_once 'IDS/Init.php';
-    try {
-      $init = IDS_Init::init($configFile);
-      $ids = new IDS_Monitor($_REQUEST, $init);
-    }
-    catch (Exception $e) {
-      // might be an old stale copy of Config.IDS.ini
-      // lets try to rebuild it again and see if it works
-      $configFile = self::createConfigFile(TRUE);
-      $init = IDS_Init::init($configFile);
-      $ids = new IDS_Monitor($_REQUEST, $init);
-    }
+    require_once 'IDS/Monitor.php';
+    $ids = new \IDS_Monitor($_REQUEST, $init);
 
     $result = $ids->run();
     if (!$result->isEmpty()) {
@@ -97,54 +99,25 @@ class CRM_Core_IDS {
   }
 
   /**
-   * Create the default config file for the IDS system.
+   * Create a new PHPIDS configuration object.
    *
-   * @param bool $force
-   *   Should we recreate it irrespective if it exists or not.
-   *
-   * @return string
-   *   the full path to the config file
+   * @param array $config
+   *   PHPIDS configuration array (per INI format).
+   * @return \IDS_Init
    */
-  public static function createConfigFile($force = FALSE) {
-    $config = CRM_Core_Config::singleton();
-    $configFile = $config->configAndLogDir . 'Config.IDS.ini';
-    if (!$force && file_exists($configFile)) {
-      return $configFile;
-    }
+  protected static function create($config) {
+    require_once 'IDS/Init.php';
+    $init = \IDS_Init::init(NULL);
+    $init->setConfig($config, TRUE);
 
-    // also clear the stat cache in case we are upgrading
-    clearstatcache();
+    // Cleanup
+    $reflection = new \ReflectionProperty('IDS_Init', 'instances');
+    $reflection->setAccessible(TRUE);
+    $value = $reflection->getValue(NULL);
+    unset($value[NULL]);
+    $reflection->setValue(NULL, $value);
 
-    $config = self::createStandardConfig();
-    $contents = "\n";
-    $lineTpl = "    %-19s = %s\n";
-    foreach ($config as $section => $fields) {
-      $contents .= "[$section]\n";
-      foreach ($fields as $key => $value) {
-        if ($key === 'scan_keys' && $value == '') {
-          $value = 'false';
-        }
-
-        if (is_array($value)) {
-          foreach ($value as $v) {
-            $contents .= sprintf($lineTpl, $key . '[]', $v);
-          }
-        }
-        else {
-          $contents .= sprintf($lineTpl, $key, $value);
-        }
-      }
-    }
-
-    if (file_put_contents($configFile, $contents) === FALSE) {
-      CRM_Core_Error::movedSiteError($configFile);
-    }
-
-    // also create the .htaccess file so we prevent the reading of the log and ini files
-    // via a browser, CRM-3875
-    CRM_Utils_File::restrictAccess($config->configAndLogDir);
-
-    return $configFile;
+    return $init;
   }
 
   /**
@@ -232,7 +205,7 @@ class CRM_Core_IDS {
    *
    * @return bool
    */
-  private function react(IDS_Report $result) {
+  public function react(IDS_Report $result) {
 
     $impact = $result->getImpact();
     if ($impact >= $this->threshold['kick']) {
