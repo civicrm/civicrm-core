@@ -39,4 +39,4 @@ if grep -q '&Auth_SASL::factory' vendor/pear/net_smtp/Net/SMTP.php; then
   patch vendor/pear/net_smtp/Net/SMTP.php < tools/scripts/composer/patches/net-smtp-ref-patch.txt
 fi
 
-safe_delete vendor/pear/net_smtp/{examples,phpdoc.sh,tests}
+safe_delete vendor/pear/net_smtp/{README.rst,examples,phpdoc.sh,tests}
