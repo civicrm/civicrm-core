@@ -24,3 +24,20 @@ UPDATE `civicrm_option_value`
 SET filter = 2
 WHERE option_group_id = (SELECT id FROM civicrm_option_group WHERE name = 'activity_status')
 AND name IN ('Cancelled', 'Unreachable', 'Not Required', 'No-show');
+
+-- CRM-20848 : Set non-quick-config price field and their respective price options to active if it's not
+UPDATE civicrm_price_field_value cpfv
+INNER JOIN civicrm_financial_type cft ON cft.id = cpfv.financial_type_id
+INNER JOIN civicrm_price_field pf ON pf.id = cpfv.price_field_id
+INNER JOIN civicrm_price_set ps ON ps.id = pf.price_set_id
+SET cpfv.is_active = 1
+WHERE ps.is_quick_config = 1;
+
+UPDATE civicrm_price_field cpf
+LEFT JOIN (SELECT DISTINCT price_field_id AS price_field_id
+  FROM civicrm_price_field_value
+  WHERE is_active = 1) AS price_field
+ON price_field.price_field_id = cpf.id
+LEFT JOIN civicrm_price_set ps ON ps.id = cpf.price_set_id
+SET cpf.is_active = 1
+WHERE ps.is_quick_config = 1 AND cpf.is_active = 0;
