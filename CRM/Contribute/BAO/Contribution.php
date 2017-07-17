@@ -233,6 +233,10 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     $params['contribution'] = $contribution;
     self::recordFinancialAccounts($params);
 
+    if (!$contributionID) {
+      self::storeInvoiceNumber($contribution->id);
+    }
+
     if (self::isUpdateToRecurringContribution($params)) {
       CRM_Contribute_BAO_ContributionRecur::updateOnNewPayment(
         (!empty($params['contribution_recur_id']) ? $params['contribution_recur_id'] : $params['prevContribution']->contribution_recur_id),
@@ -5754,6 +5758,27 @@ LIMIT 1;";
       $contributionDetails[$result['values'][$result['id']]['contact_id']]['html'] = CRM_Utils_Token::replaceContributionTokens($html, $result, FALSE, $messageToken, FALSE, $escapeSmarty);
     }
     return $contributionDetails;
+  }
+
+  /**
+   * Generate and store invoice_number for contribution.
+   *
+   * @param int $contributionId
+   *
+   * @return string
+   */
+  public static function storeInvoiceNumber($contributionId) {
+    $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
+    $invoiceNumber = NULL;
+    if (!empty($invoiceSettings['invoicing']) && !empty($invoiceSettings['invoice_prefix'])) {
+      $invoiceNumber = $invoiceSettings['invoice_prefix'] . $contributionId;
+      $params = array(
+        'id' => $contributionId,
+        'invoice_number' => $invoiceNumber,
+      );
+      civicrm_api3('Contribution', 'create', $params);
+    }
+    return $invoiceNumber;
   }
 
 }
