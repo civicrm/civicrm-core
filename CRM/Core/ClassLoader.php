@@ -104,7 +104,8 @@ class CRM_Core_ClassLoader {
     }
     $civicrm_base_path = dirname(dirname(__DIR__));
 
-    require_once dirname(dirname(__DIR__)) . '/vendor/autoload.php';
+    // @todo: need some way to check if we should register vendor or not
+    //require_once dirname(dirname(__DIR__)) . '/vendor/autoload.php';
 
     // we do this to prevent a autoloader errors with joomla / 3rd party packages
     // use absolute path since we dont know the content of include_path as yet
@@ -123,7 +124,8 @@ class CRM_Core_ClassLoader {
     );
     $include_paths = implode(PATH_SEPARATOR, $include_paths);
     set_include_path($include_paths . PATH_SEPARATOR . get_include_path());
-    require_once "$civicrm_base_path/vendor/autoload.php";
+    // @todo: need some way to check if we should register vendor or not
+    //require_once "$civicrm_base_path/vendor/autoload.php";
   }
 
   /**
