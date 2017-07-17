@@ -233,34 +233,11 @@ function civicrm_api3_membership_get($params) {
     return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
   }
 
-  // Define how to handle filters on some related entities like here Group
-  $sql = CRM_Utils_SQL_Select::fragment();
-  $rels = array(
-    'contact_id.group' => array(
-      'join' => '
-        !joinType civicrm_group_contact rgc ON (rgc.contact_id = a.contact_id)
-        !joinType civicrm_group rg ON (rg.id = rgc.group_id AND rgc.status = \'Added\')
-        !joinType civicrm_group_contact_cache sgc ON (sgc.contact_id = a.contact_id)
-        !joinType civicrm_group sg ON (sg.id = sgc.group_id)
-      ',
-      'column' => 'name',
-    ),
+  $membershipValues = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__),
+    $params, FALSE, 'Membership',
+    // returns a CRM_Utils_SQL_Select with JOINs and WHEREs based on $params values
+    _civicrm_api3_membership_get_extraFilters($params)
   );
-  foreach ($rels as $filter => $relSpec) {
-    if (!empty($params[$filter])) {
-      if (!is_array($params[$filter])) {
-        $params[$filter] = array('=' => $params[$filter]);
-      }
-      $clause = sprintf("(%s OR %s)",
-        \CRM_Core_DAO::createSQLFilter("rg." . $relSpec['column'], $params[$filter]),
-        \CRM_Core_DAO::createSQLFilter("sg." . $relSpec['column'], $params[$filter])
-      );
-      $sql->join('', $relSpec['join'], array('joinType' => 'LEFT JOIN'));
-      $sql->where($clause);
-    }
-  }
-
-  $membershipValues = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, FALSE, 'Membership', $sql);
 
   $return = $options['return'];
   if (empty($membershipValues) ||
@@ -360,4 +337,96 @@ function _civicrm_api3_membership_relationsship_get_customv2behaviour(&$params, 
     }
   }
   return $members;
+}
+
+/**
+ * Support filters beyond what basic_get can do.
+ *
+ * @param array $params
+ * @throws \CiviCRM_API3_Exception
+ * @throws \Exception
+ * @return 
+ *    CRM_Utils_SQL_Select $sql
+ */
+function _civicrm_api3_membership_get_extraFilters($params = '')
+{
+  $sql = CRM_Utils_SQL_Select::fragment();
+  $rels = array(
+    'contact_id.group' => array(
+      'join' => '
+        !joinType civicrm_group_contact rgc ON (rgc.contact_id = a.contact_id)
+        !joinType civicrm_group rg ON (rg.id = rgc.group_id AND rgc.status = \'Added\')
+        !joinType civicrm_group_contact_cache sgc ON (sgc.contact_id = a.contact_id)
+        !joinType civicrm_group sg ON (sg.id = sgc.group_id)
+      ',
+      'column' => 'name',
+    ),
+    'contact_id.tag' => array(
+      'join' => '
+        !joinType civicrm_entity_tag et ON (et.entity_id = a.contact_id)
+        !joinType civicrm_tag t ON (t.id = et.tag_id AND t.is_selectable = 1)
+      ',
+      'column' => 'name',
+    ),
+    'contact_id.contact_type' => array(
+      'join' => '
+        !joinType civicrm_contact c ON (c.id = a.contact_id)
+      ',
+      'column' => 'contact_type',
+    ),
+  );
+
+  // strings that will be used on the query builder
+  $joins = '';
+  $clauses = '';
+
+  foreach ($rels as $filter => $relSpec) {
+    // the join may be needed even if there are no parameter's values selected
+    if (isset($params[$filter])) {
+      // add the respective parameter's join 
+      $joins .= $relSpec['join'];
+
+      if(empty($params[$filter]))
+        // there's nothing that can be done with clauses
+        break;
+
+      // treat the parameter based on its type
+      $params[$filter] = is_array($params[$filter]) ?
+        (array_key_exists(0, $params[$filter]) ?
+          // since the interface allows to fill several parameters with the = option
+          // if it is a one level array with numerical indexes, group them in an IN
+          array('IN' => $params[$filter]) :
+          // otherwise do nothing
+          $params[$filter]
+        ) :
+        // if it is not an array set = as default, this will not affect !=
+        array('=' => $params[$filter]);
+
+      $clauses .= empty($clauses) ? '' : ' AND ';
+      switch ($filter) {
+        case 'contact_id.group':
+          $clauses .=
+           sprintf("(%s OR %s)",
+            \CRM_Core_DAO::createSQLFilter("rg." . $relSpec['column'], $params[$filter]),
+            \CRM_Core_DAO::createSQLFilter("sg." . $relSpec['column'], $params[$filter]));
+          break;
+        case 'contact_id.tag':
+          $clauses .=
+            \CRM_Core_DAO::createSQLFilter("t." . $relSpec['column'], $params[$filter]);
+          break;
+        case 'contact_id.contact_type':
+          $clauses .=
+            \CRM_Core_DAO::createSQLFilter("c." . $relSpec['column'], $params[$filter]);
+          break;
+      }
+    }
+  }
+  if(!empty($joins)) {
+    $sql->join('', $joins, array('joinType' => 'LEFT JOIN'));
+    // a WHERE may only exist if there are previous joins
+    // but even if there are JOINS there may be no $clauses
+    if(!empty($clauses))
+      $sql->where($clauses);
+  }
+  return $sql;
 }
