@@ -65,6 +65,16 @@
   </div>
   {/if}
   <div class="crm-block crm-form-block crm-membership-form-block">
+    {if $newCredit AND $action EQ 1 AND $membershipMode EQ null}
+    <div class="action-link css_right crm-link-credit-card-mode">
+      {if $contactId}
+        {capture assign=ccModeLink}{crmURL p='civicrm/contact/view/membership' q="reset=1&action=add&cid=`$contactId`&context=`$context`&mode=live"}{/capture}
+      {else}
+        {capture assign=ccModeLink}{crmURL p='civicrm/contact/view/membership' q="reset=1&action=add&context=standalone&mode=live"}{/capture}
+      {/if}
+     <a class="open-inline-noreturn action-item crm-hover-button" href="{$ccModeLink}">&raquo; {ts}submit credit card membership{/ts}</a>
+    </div>
+    {/if}
     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
     {if $action eq 8}
     <div class="messages status no-popup">
