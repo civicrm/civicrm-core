@@ -232,7 +232,35 @@ function civicrm_api3_membership_get($params) {
   if ($options['is_count']) {
     return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
   }
-  $membershipValues = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, FALSE, 'Membership');
+
+  // Define how to handle filters on some related entities like here Group
+  $sql = CRM_Utils_SQL_Select::fragment();
+  $rels = array(
+    'contact_id.group' => array(
+      'join' => '
+        !joinType civicrm_group_contact rgc ON (rgc.contact_id = a.contact_id)
+        !joinType civicrm_group rg ON (rg.id = rgc.group_id AND rgc.status = \'Added\')
+        !joinType civicrm_group_contact_cache sgc ON (sgc.contact_id = a.contact_id)
+        !joinType civicrm_group sg ON (sg.id = sgc.group_id)
+      ',
+      'column' => 'name',
+    ),
+  );
+  foreach ($rels as $filter => $relSpec) {
+    if (!empty($params[$filter])) {
+      if (!is_array($params[$filter])) {
+        $params[$filter] = array('=' => $params[$filter]);
+      }
+      $clause = sprintf("(%s OR %s)",
+        \CRM_Core_DAO::createSQLFilter("rg." . $relSpec['column'], $params[$filter]),
+        \CRM_Core_DAO::createSQLFilter("sg." . $relSpec['column'], $params[$filter])
+      );
+      $sql->join('', $relSpec['join'], array('joinType' => 'LEFT JOIN'));
+      $sql->where($clause);
+    }
+  }
+
+  $membershipValues = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, FALSE, 'Membership', $sql);
 
   $return = $options['return'];
   if (empty($membershipValues) ||
