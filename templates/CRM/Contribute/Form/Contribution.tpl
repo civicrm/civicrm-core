@@ -225,6 +225,12 @@
         </fieldset>
         </td>
       </tr>
+      <tr class="crm-contribution-form-block-receive_date">
+        <td class="label">{$form.receive_date.label}</td>
+        <td {$valueStyle}>{include file="CRM/common/jcalendar.tpl" elementName=receive_date}<br />
+          <span class="description">{ts}The date this contribution was received.{/ts}</span>
+        </td>
+      </tr>
     {/if}
     {if $form.revenue_recognition_date && !$payNow}
       <tr class="crm-contribution-form-block-revenue_recognition_date">
@@ -240,12 +246,6 @@
         {ts}Payment Details{/ts}
       </legend>
         <table class="form-layout-compressed" >
-          <tr class="crm-contribution-form-block-receive_date">
-            <td class="label">{$form.receive_date.label}</td>
-            <td {$valueStyle}>{include file="CRM/common/jcalendar.tpl" elementName=receive_date}<br />
-              <span class="description">{ts}The date this contribution was received.{/ts}</span>
-            </td>
-          </tr>
           <tr class="crm-contribution-form-block-payment_instrument_id">
             <td class="label">{$form.payment_instrument_id.label}</td>
             <td {$valueStyle}>{$form.payment_instrument_id.html} {help id="payment_instrument_id"}</td>
