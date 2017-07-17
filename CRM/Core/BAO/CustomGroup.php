@@ -120,9 +120,13 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
       'help_pre',
       'help_post',
       'is_active',
-      'is_public',
       'is_multiple',
     );
+    $current_db_version = CRM_Core_DAO::singleValueQuery("SELECT version FROM civicrm_domain WHERE id = " . CRM_Core_Config::domainID());
+    $is_public_version = $current_db_version >= '4.7.19' ? 1 : 0;
+    if ($is_public_version) {
+      $fields[] = 'is_public';
+    }
     foreach ($fields as $field) {
       if (isset($params[$field]) || $field == 'is_multiple') {
         $group->$field = CRM_Utils_Array::value($field, $params, FALSE);
@@ -418,9 +422,13 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
         'extends_entity_column_id',
         'extends_entity_column_value',
         'max_multiple',
-        'is_public',
       ),
     );
+    $current_db_version = CRM_Core_DAO::singleValueQuery("SELECT version FROM civicrm_domain WHERE id = " . CRM_Core_Config::domainID());
+    $is_public_version = $current_db_version >= '4.7.19' ? 1 : 0;
+    if ($is_public_version) {
+      $tableData['custom_group'][] = 'is_public';
+    }
     if (!$toReturn || !is_array($toReturn)) {
       $toReturn = $tableData;
     }
@@ -513,7 +521,7 @@ WHERE civicrm_custom_group.is_active = 1
         );
     }
 
-    if ($showPublicOnly) {
+    if ($showPublicOnly && $is_public_version) {
       $strWhere .= "AND civicrm_custom_group.is_public = 1";
     }
 
