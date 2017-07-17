@@ -10,6 +10,39 @@ class CRM_Utils_SQL_SelectTest extends CiviUnitTestCase {
     $this->assertLike('SELECT * FROM foo bar', $select->toSQL());
   }
 
+  public function testExecute_OK() {
+    // We need some SQL query.
+    $select = CRM_Utils_SQL_Select::from('civicrm_contact')
+      ->select('count(*) as cnt');
+    $this->assertLike('SELECT count(*) as cnt FROM civicrm_contact', $select->toSQL());
+
+    // Try with typical fetch().
+    $rows = 0;
+    $dao = $select->execute();
+    while ($dao->fetch()) {
+      $rows++;
+      $this->assertTrue(is_numeric($dao->cnt), "Expect query to execute");
+    }
+    $this->assertEquals(1, $rows);
+
+    // Try with fetchValue().
+    $this->assertTrue(is_numeric($select->execute()->fetchValue()));
+
+    // Try with fetchAll()
+    $records = $select->execute()->fetchAll();
+    $this->assertTrue(is_numeric($records[0]['cnt']));
+  }
+
+  public function testExecute_Error() {
+    try {
+      CRM_Utils_SQL_Select::from('civicrm_contact')->select('snarb;barg')->execute();
+      $this->fail('Expected an exception');
+    }
+    catch (PEAR_Exception $e) {
+      $this->assertTrue(TRUE, "Received expected exception");
+    }
+  }
+
   public function testGetFields() {
     $select = CRM_Utils_SQL_Select::from('foo')
       ->select('bar')

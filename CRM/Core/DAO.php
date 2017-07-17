@@ -1033,6 +1033,22 @@ FROM   civicrm_domain
   }
 
   /**
+   * Returns a singular value.
+   *
+   * @return mixed|NULL
+   */
+  public function fetchValue() {
+    $result = $this->getDatabaseResult();
+    $row = $result->fetchRow();
+    $ret = NULL;
+    if ($row) {
+      $ret = $row[0];
+    }
+    $this->free();
+    return $ret;
+  }
+
+  /**
    * Get all the result records as mapping between columns.
    *
    * @param string $keyColumn

@@ -594,6 +594,25 @@ class CRM_Utils_SQL_Select implements ArrayAccess {
   }
 
   /**
+   * @return CRM_Core_DAO
+   */
+  public function execute($daoName = NULL, $i18nRewrite = TRUE) {
+    // Don't pass through $params. toSQL() handles interpolation.
+    $params = array();
+
+    // Don't pass through $abort, $trapException. Just use straight-up exceptions.
+    $abort = TRUE;
+    $trapException = FALSE;
+    $errorScope = CRM_Core_TemporaryErrorScope::useException();
+
+    // Don't pass through freeDAO. You can do it yourself.
+    $freeDAO = FALSE;
+
+    return CRM_Core_DAO::executeQuery($this->toSQL(), $params, $abort, $daoName,
+      $freeDAO, $i18nRewrite, $trapException);
+  }
+
+  /**
    * Has an offset been set.
    *
    * @param string $offset
