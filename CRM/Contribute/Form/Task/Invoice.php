@@ -312,7 +312,10 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
           $creditNoteId = $contribution->creditnote_id;
         }
       }
-      $invoiceNumber = CRM_Utils_Array::value('invoice_prefix', $prefixValue) . "" . $contribution->id;
+      $invoiceNumber = $contribution->invoice_number;
+      if (!$invoiceNumber) {
+        $invoiceNumber = CRM_Contribute_BAO_Contribution::storeInvoiceNumber($contribution->id);
+      }
 
       //to obtain due date for PDF invoice
       $contributionReceiveDate = date('F j,Y', strtotime(date($input['receive_date'])));
@@ -556,8 +559,6 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         $fileName = self::putFile($html, $pdfFileName);
         self::addActivities($subject, $contribution->contact_id, $fileName, $params);
       }
-
-      CRM_Core_DAO::setFieldValue('CRM_Contribute_DAO_Contribution', $contribution->id, 'invoice_number', $invoiceNumber);
       $invoiceTemplate->clearTemplateVars();
     }
 

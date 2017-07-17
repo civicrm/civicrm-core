@@ -412,6 +412,10 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
     $this->addTask('CRM-20387 - Add invoice_number column to civicrm_contribution', 'addColumn',
       'civicrm_contribution', 'invoice_number', "varchar(255) COMMENT 'Human readable invoice number' DEFAULT NULL");
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
+    $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
+    if (!empty($invoiceSettings['invoicing']) && !empty($invoiceSettings['invoice_prefix'])) {
+      $this->addTask(ts('Update Contribution Invoice number'), 'updateContributionInvoiceNumber', $rev, $invoiceSettings['invoice_prefix']);
+    }
   }
 
   /**
@@ -599,6 +603,19 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
     }
 
     return $settings;
+  }
+
+  /**
+   * Update Invoice number for all completed contribution.
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   *
+   * @return bool
+   */
+  public static function updateContributionInvoiceNumber(CRM_Queue_TaskContext $ctx, $invoicePrefix) {
+    $sql = "UPDATE `civicrm_contribution` SET `invoice_number` = CONCAT(%1, `id`)";
+    $params = array(1 => array($invoicePrefix, 'string'));
+    return TRUE;
   }
 
   /**
