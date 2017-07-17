@@ -330,7 +330,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
           'start_date' => array(
             'title' => ts('Start Date'),
             'name' => 'start_date',
-	  ),
+          ),
           'active_period_date' => array(
             'title' => ts('Active Period'),
             'type' => CRM_Utils_Type::T_DATE,
