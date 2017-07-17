@@ -101,7 +101,9 @@
 
 {/if}
 
-{include file='CRM/Core/BillingBlockWrapper.tpl'}
+{if $action neq 2}
+  {include file='CRM/Core/BillingBlockWrapper.tpl'}
+{/if}
 
 {if ($email OR $batchEmail) and $outBound_option != 2}
     <fieldset id="send_confirmation_receipt"><legend>{if $paid}{ts}Registration Confirmation and Receipt{/ts}{else}{ts}Registration Confirmation{/ts}{/if}</legend>

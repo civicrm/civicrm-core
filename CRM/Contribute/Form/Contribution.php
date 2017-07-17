@@ -248,8 +248,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       return;
     }
 
-    $this->assign('showCheckNumber', TRUE);
-
     $this->_fromEmails = CRM_Core_BAO_Email::getFromEmail();
 
     if (in_array('CiviPledge', CRM_Core_Config::singleton()->enableComponents) && !$this->_formType) {
@@ -704,7 +702,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     if ($this->_online) {
       $this->assign('hideCalender', TRUE);
     }
-    $checkNumber = $this->add('text', 'check_number', ts('Check Number'), $attributes['contribution_check_number']);
 
     $this->addDateTime('receipt_date', ts('Receipt Date'), FALSE, array('formatType' => 'activityDateTime'));
     $this->addDateTime('cancel_date', ts('Cancelled / Refunded Date'), FALSE, array('formatType' => 'activityDateTime'));
@@ -839,7 +836,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       if ($totalAmount) {
         $totalAmount->freeze();
       }
-      $checkNumber->freeze();
       $paymentInstrument->freeze();
       $trxnId->freeze();
       $financialType->freeze();
