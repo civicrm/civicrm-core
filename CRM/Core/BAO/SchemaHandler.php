@@ -759,21 +759,9 @@ MODIFY      {$columnName} varchar( $length )
    *
    * @param array $missingIndices as returned by getMissingIndices()
    */
-  public static function createMissingIndices($missingIndices) {
+  public static function createMissingIndices($missingIndices, $existingKeyIndices = array()) {
     $queries = array();
     foreach ($missingIndices as $table => $indexList) {
-      // $missingIndices can include indices that exist but need to be
-      // replaced with a new definition. If that is the case, we have to
-      // delete them before we can re-create them or we get an error.
-      $existing_indexes = array();
-      $sql = "SHOW INDEXES IN `$table`";
-      $dao = CRM_Core_DAO::executeQuery($sql);
-      while ($dao->fetch()) {
-        if (!in_array($dao->Key_name, $existing_indexes)) {
-          $existing_indexes[] = $dao->Key_name;
-        }
-      }
-
       // Iterate over each missing index for this table.
       foreach ($indexList as $index) {
         // If an index is used for a foreign key, we have to remove the
@@ -805,8 +793,13 @@ MODIFY      {$columnName} varchar( $length )
           }
         }
         // If the index exists, we preface with a DROP statement.
+        // See if the index exists.
+        $index_exists = FALSE;
+        if (array_key_exists($table, $existingKeyIndices) && in_array($index['name'], $existingKeyIndices[$table])) {
+          $index_exists = TRUE;
+        }
         $queries[] = "ALTER TABLE $table " .
-          (in_array($index['name'], $existing_indexes) ? 'DROP INDEX ' . $index['name'] . ', ' : '') .
+          ($index_exists ? 'DROP INDEX ' . $index['name'] . ', ' : '') .
           'ADD ' .
           (array_key_exists('unique', $index) && $index['unique'] ? 'UNIQUE ' : '') .
           "INDEX {$index['name']} (" .  implode(", ", $index['field']) .
