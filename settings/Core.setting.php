@@ -955,7 +955,7 @@ return array(
     'title' => 'Max Emails Kill Switch',
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => NULL,
+    'description' => 'The number of contacts that you are allowed to send direct email to, via (Email - Send now) search task',
     'help_text' => NULL,
   ),
   'syncCMSEmail' => array(
