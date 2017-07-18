@@ -832,6 +832,7 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
         'trxn_id' => 1,
         // join
         'invoice_id' => 1,
+        'invoice_number' => 1,
         // added
         'currency' => 1,
         // to
