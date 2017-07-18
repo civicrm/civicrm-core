@@ -117,6 +117,9 @@
                     {if $hasPayment or $parentHasPayment}
                         <a class="action-item crm-hover-button" href='{crmURL p="civicrm/event/participant/feeselection" q="reset=1&id=`$participantId`&cid=`$contactId`&action=update"}'><i class="crm-i fa-pencil"></i> {ts}Change Selections{/ts}</a>
                     {/if}
+                    {if $transferOrCancelLink}
+                      <a class="action-item crm-hover-button" href={$transferOrCancelLink}><i class="crm-i fa-times"></i> {ts}Transfer or Cancel{/ts}</a>
+                    {/if}
                 {/if}
                 </td>
             {else}
