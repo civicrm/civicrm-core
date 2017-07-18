@@ -248,6 +248,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       return;
     }
 
+    $this->assign('showCheckNumber', TRUE);
+
     $this->_fromEmails = CRM_Core_BAO_Email::getFromEmail();
 
     if (in_array('CiviPledge', CRM_Core_Config::singleton()->enableComponents) && !$this->_formType) {

@@ -24,21 +24,24 @@
  +--------------------------------------------------------------------+
 *}
 
-<div id="payment-details-block">
-{* content of payment edit form is rendered here *}
-</div>
-
+{crmRegion name="billing-block"}
+   <div id="payment-edit-section" class="crm-section billing_mode-section">
+     {foreach from=$paymentFields item=paymentField}
+       {assign var='name' value=$paymentField.name}
+       <div class="crm-section {$form.$paymentField.name}-section">
+         <div class="label">{$form.$name.label}
+           {if $requiredPaymentFields.$name}<span class="crm-marker" title="{ts}This field is required.{/ts}">*</span>{/if}
+         </div>
+         <div class="content">{$form.$name.html}
+           {if $name == 'credit_card_type'}
+             <div class="crm-credit_card_type-icons"></div>
+           {/if}
+         </div>
+         <div class="clear"></div>
+       </div>
+     {/foreach}
+   </div>
+{/crmRegion}
 <div class="crm-submit-buttons">
   {include file="CRM/common/formButtons.tpl" location="bottom"}
 </div>
-
-{literal}
-  <script type="text/javascript">
-    CRM.$(function($) {
-      {/literal}
-        var dataUrl = "{crmURL p='civicrm/payment/form' h=0 q="&financial_trxn_id=`$id`"}";
-      {literal}
-      CRM.loadPage(dataUrl, {target: '#payment-details-block'});
-    });
-  </script>
-{/literal}

@@ -82,13 +82,6 @@
     {/if}
     {if $contributionMode}
       <tr class="crm-contribution-form-block-payment_processor_id"><td class="label nowrap">{$form.payment_processor_id.label}<span class="crm-marker"> * </span></td><td>{$form.payment_processor_id.html}</td></tr>
-    {else}
-      <tr class="crm-contribution-form-block-receive_date">
-        <td class="label">{$form.receive_date.label}</td>
-        <td {$valueStyle}>{include file="CRM/common/jcalendar.tpl" elementName=receive_date}<br />
-          <span class="description">{ts}The date this contribution was received.{/ts}</span>
-        </td>
-      </tr>
     {/if}
     <tr class="crm-contribution-form-block-contribution_type_id crm-contribution-form-block-financial_type_id">
       <td class="label">{$form.financial_type_id.label}</td><td{$valueStyle}>{$form.financial_type_id.html}&nbsp;
@@ -257,11 +250,23 @@
           {include file="CRM/Contribute/Form/PaymentInfoBlock.tpl"}
         {else}
           <table class="form-layout-compressed" >
+            <tr class="crm-contribution-form-block-receive_date">
+              <td class="label">{$form.receive_date.label}</td>
+              <td {$valueStyle}>{include file="CRM/common/jcalendar.tpl" elementName=receive_date}<br />
+                <span class="description">{ts}The date this contribution was received.{/ts}</span>
+              </td>
+            </tr>
             <tr class="crm-contribution-form-block-payment_instrument_id">
               <td class="label">{$form.payment_instrument_id.label}</td>
               <td {$valueStyle}>{$form.payment_instrument_id.html} {help id="payment_instrument_id"}</td>
               </td>
             </tr>
+            {if $showCheckNumber || !$isOnline}
+              <tr id="checkNumber" class="crm-contribution-form-block-check_number">
+                <td class="label">{$form.check_number.label}</td>
+                <td>{$form.check_number.html}</td>
+              </tr>
+            {/if}
             <tr class="crm-contribution-form-block-trxn_id">
               <td class="label">{$form.trxn_id.label}</td>
               <td {$valueStyle}>{$form.trxn_id.html} {help id="id-trans_id"}</td>
