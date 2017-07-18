@@ -236,7 +236,7 @@ class CRM_Report_Form_Mailing_Opened extends CRM_Report_Form {
     }
 
     if (!empty($this->_params['charts'])) {
-      $select[] = "COUNT({$this->_aliases['civicrm_event_opened']}.id) as civicrm_mailing_opened_count";
+      $select[] = "COUNT({$this->_aliases['civicrm_mailing_event_opened']}.id) as civicrm_mailing_opened_count";
       $this->_columnHeaders["civicrm_mailing_opened_count"]['title'] = ts('Opened Count');
     }
 
