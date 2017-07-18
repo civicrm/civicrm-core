@@ -273,6 +273,35 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test Membership.Get API with group ID filter
+   */
+  public function testGetByTag() {
+    $this->_membershipID = $this->contactMembershipCreate($this->_params);
+
+    // Create group and add contact ID used in membership create
+    $tagName = uniqid();
+    $tag = $this->tagCreate(array(
+      'name' => $tagName,
+      'used_for' => 'civicrm_contact',
+    ));
+    $this->callAPISuccess('EntityTag', 'create', array(
+      'entity_table' => 'civicrm_contact',
+      'entity_id' => $this->_contactID,
+      'tag_id' => $tag['id'],
+    ));
+    $membership = $this->callAPISuccess('membership', 'get', array(
+      'contact_id.tag' => $tagName,
+    ));
+    $this->assertEquals(1, $membership['count']);
+    $this->assertEquals($this->_contactID, $membership['values'][$this->_membershipID]['contact_id']);
+
+    // cleanup
+    $this->callAPISuccess('Membership', 'Delete', array(
+      'id' => $this->_membershipID,
+    ));
+  }
+
+  /**
    * Test civicrm_membership_get with params not array.
    *
    * Gets treated as contact_id, memberships expected.
