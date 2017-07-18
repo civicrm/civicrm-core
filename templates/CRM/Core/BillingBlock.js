@@ -27,7 +27,6 @@
       // set the card type value as default if any found
       var cardtype = $('#credit_card_type').val();
       if (cardtype) {
-        var card_type_values = CRM.config.creditCardTypes;
         $.each(CRM.config.creditCardTypes, function(key, value) {
           // highlight the selected card type icon
           if (value == cardtype) {
