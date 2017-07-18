@@ -37,7 +37,6 @@
  * components in CiviCRM (since they all have send email as a task)
  */
 class CRM_Contact_Form_Task_EmailCommon {
-  const MAX_EMAILS_KILL_SWITCH = 50;
 
   public $_contactDetails = array();
   public $_allContactDetails = array();
@@ -409,9 +408,11 @@ class CRM_Contact_Form_Task_EmailCommon {
    * @param CRM_Core_Form $form
    */
   public static function postProcess(&$form) {
-    if (count($form->_contactIds) > self::MAX_EMAILS_KILL_SWITCH) {
+    $maxEmailKillSwitch = Civi::settings()->get('max_emails_kill_switch');
+
+    if (count($form->_contactIds) > $maxEmailKillSwitch) {
       CRM_Core_Error::fatal(ts('Please do not use this task to send a lot of emails (greater than %1). We recommend using CiviMail instead.',
-        array(1 => self::MAX_EMAILS_KILL_SWITCH)
+        array(1 => $maxEmailKillSwitch)
       ));
     }
 
@@ -624,6 +625,9 @@ class CRM_Contact_Form_Task_EmailCommon {
         CRM_Core_BAO_MessageTemplate::add($messageTemplate);
       }
     }
+  }
+
+  private function getMaxEmailsKillSwitch() {
   }
 
 }
