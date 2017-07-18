@@ -132,7 +132,7 @@ class CRM_Contact_Page_DedupeRules extends CRM_Core_Page_Basic {
     // get all rule groups
     $ruleGroups = array();
     $dao = new CRM_Dedupe_DAO_RuleGroup();
-    $dao->orderBy('contact_type,used ASC');
+    $dao->orderBy('contact_type ASC, used ASC, id ASC');
     $dao->find();
 
     $dedupeRuleTypes = CRM_Core_SelectValues::getDedupeRuleTypes();
