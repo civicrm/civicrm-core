@@ -18,16 +18,17 @@ Other resources for identifying changes are:
 
 Released August 2, 2017
 
-- **[Features](4.7.23.md#features)**
-- **[Bugs resolved](4.7.23.md#bugs)**
-- **[Miscellany](4.7.23.md#misc)**
-- **[Credits](4.7.23.md#credits)**
+- **[Features](release-notes/4.7.23.md#features)**
+- **[Bugs resolved](release-notes/4.7.23.md#bugs)**
+- **[Miscellany](release-notes/4.7.23.md#misc)**
+- **[Credits](release-notes/4.7.23.md#credits)**
 
 ## CiviCRM 4.7.22
 
 Released July 12, 2017
 
 - **[Bugs resolved](release-notes/4.7.22.md#bugs)**
+- **[Credits](release-notes/4.7.22.md#credits)**
 
 ## CiviCRM 4.7.21
 

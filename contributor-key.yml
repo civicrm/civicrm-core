@@ -185,6 +185,10 @@
   organization: Nubay Services
   jira        : dtarrant
 
+- name        : Diego Viegas
+  organization: dotPro
+  jira        : diegov
+
 - github      : dvhirst
   name        : Donald Hirst
   jira        : dvhirst
@@ -487,6 +491,11 @@
   organization: Minnesota Association of Veterinary Technicians
   jira        : membership
 
+- github      : mepps
+  name        : Maggie Epps
+  organization: Wikimedia Foundation
+  jira        : mepps
+
 - github      : mfb
   name        : Mark Burdett
   organization: Electronic Frontier Foundation
@@ -526,6 +535,10 @@
   name        : Camilo Rodriguez
   organization: CompuCorp
   jira        : Miya27
+
+- name        : Michael Lueck
+  organization: Lueck Data Systems
+  jira        : mdlueck
 
 - github      : mlutfy
   name        : Mathieu Lutfy
