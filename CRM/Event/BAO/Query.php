@@ -253,6 +253,10 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
    * @param $query
    */
   public static function whereClauseSingle(&$values, &$query) {
+    $checkPermission = TRUE;
+    if (!empty($query->_skipPermission)) {
+      $checkPermission = FALSE;
+    }
     list($name, $op, $value, $grouping, $wildcard) = $values;
     $fields = array_merge(CRM_Event_BAO_Event::fields(), CRM_Event_BAO_Participant::exportableFields());
 
@@ -461,7 +465,7 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
         if (!array_key_exists($qillName, $fields)) {
           break;
         }
-        list($op, $value) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Event_DAO_Event', $name, $value, $op);
+        list($op, $value) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Event_DAO_Event', $name, $value, $op, array('check_permission' => $checkPermission));
         $query->_qill[$grouping][] = ts('%1 %2 %3', array(1 => $fields[$qillName]['title'], 2 => $op, 3 => $value));
         return;
     }
