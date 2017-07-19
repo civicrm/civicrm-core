@@ -5,40 +5,24 @@
   "license": "AGPL-3.0",
   "authors": [
     {
-        "name": "Atif Shaikh"
+      "name": "Coleman Watts",
+      "role": "Product Manager"
     },
     {
-        "name": "Coleman Watts"
+      "name": "Joshua Gowans",
+      "role": "Project Manager"
     },
     {
-        "name": "David Greenberg"
+      "name": "Mathieu Lutfy",
+      "role": "Infrastructure"
     },
     {
-        "name": "Eileen McNaughton"
+      "name": "Tim Otten",
+      "role": "Software Architect"
     },
     {
-        "name": "Jitendra Purohit"
-    },
-    {
-        "name": "Josh Gowan"
-    },
-    {
-        "name": "Kurund Jalmi"
-    },
-    {
-        "name": "Michael McAndrew"
-    },
-    {
-        "name": "Monish Deb"
-    },
-    {
-        "name": "Rohan Ramesh Katkar"
-    },
-    {
-        "name": "Tim Otten"
-    },
-    {
-        "name": "Yashodha Chaku"
+      "name": "CiviCRM Community",
+      "homepage": "https://civicrm.org"
     }
   ],
   "autoload": {
