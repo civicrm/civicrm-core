@@ -461,6 +461,44 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->assertEquals($membership['contact_id'], $contributions['values'][$membershipPayment['contribution_id']]['contact_id']);
   }
 
+
+  /**
+   * Test submit with a membership block in place.
+   */
+  public function testSubmitMembershipBlockIsSeparatePaymentWithPayLater() {
+    $this->setUpMembershipContributionPage(TRUE);
+    $this->_ids['membership_type'] = array($this->membershipTypeCreate(array('minimum_fee' => 2)));
+    //Pay later
+    $submitParams = array(
+      'price_' . $this->_ids['price_field'][0] => reset($this->_ids['price_field_value']),
+      'id' => (int) $this->_ids['contribution_page'],
+      'amount' => 0,
+      'billing_first_name' => 'Billy',
+      'billing_middle_name' => 'Goat',
+      'billing_last_name' => 'Gruff',
+      'is_pay_later' => 1,
+      'selectMembership' => $this->_ids['membership_type'],
+    );
+
+    $this->callAPISuccess('contribution_page', 'submit', $submitParams);
+    $contributions = $this->callAPISuccess('contribution', 'get', array('contribution_page_id' => $this->_ids['contribution_page']));
+    $this->assertCount(2, $contributions['values']);
+    foreach ($contributions['values'] as $val) {
+      $this->assertEquals('Pending', $val['contribution_status']);
+    }
+
+    //Membership should be in Pending state.
+    $membershipPayment = $this->callAPISuccess('membership_payment', 'getsingle', array());
+    $this->assertTrue(in_array($membershipPayment['contribution_id'], array_keys($contributions['values'])));
+    $membership = $this->callAPISuccessGetSingle('membership', array('id' => $membershipPayment['membership_id']));
+    $pendingStatus = $this->callAPISuccessGetSingle('MembershipStatus', array(
+      'return' => array("id"),
+      'name' => "Pending",
+    ));
+    $this->assertEquals($membership['status_id'], $pendingStatus['id']);
+    $this->assertEquals($membership['contact_id'], $contributions['values'][$membershipPayment['contribution_id']]['contact_id']);
+  }
+
   /**
    * Test submit with a membership block in place.
    */
