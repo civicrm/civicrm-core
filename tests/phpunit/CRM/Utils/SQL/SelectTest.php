@@ -10,13 +10,12 @@ class CRM_Utils_SQL_SelectTest extends CiviUnitTestCase {
     $this->assertLike('SELECT * FROM foo bar', $select->toSQL());
   }
 
-  public function testExecute_OK() {
-    // We need some SQL query.
-    $select = CRM_Utils_SQL_Select::from('civicrm_contact')
-      ->select('count(*) as cnt');
+  public function testExecute_OK_fetch() {
+    $select = CRM_Utils_SQL_Select::from('civicrm_contact')->select('count(*) as cnt');
     $this->assertLike('SELECT count(*) as cnt FROM civicrm_contact', $select->toSQL());
 
-    // Try with typical fetch().
+    $select = CRM_Utils_SQL_Select::from('civicrm_contact')
+      ->select('count(*) as cnt');
     $rows = 0;
     $dao = $select->execute();
     while ($dao->fetch()) {
@@ -24,18 +23,26 @@ class CRM_Utils_SQL_SelectTest extends CiviUnitTestCase {
       $this->assertTrue(is_numeric($dao->cnt), "Expect query to execute");
     }
     $this->assertEquals(1, $rows);
+  }
 
-    // Try with fetchValue().
+  public function testExecute_OK_fetchValue() {
+    $select = CRM_Utils_SQL_Select::from('civicrm_contact')->select('count(*) as cnt');
+    $this->assertLike('SELECT count(*) as cnt FROM civicrm_contact', $select->toSQL());
     $this->assertTrue(is_numeric($select->execute()->fetchValue()));
+  }
 
-    // Try with fetchAll()
+  public function testExecute_OK_fetchAll() {
+    $select = CRM_Utils_SQL_Select::from('civicrm_contact')->select('count(*) as cnt');
+    $this->assertLike('SELECT count(*) as cnt FROM civicrm_contact', $select->toSQL());
     $records = $select->execute()->fetchAll();
     $this->assertTrue(is_numeric($records[0]['cnt']));
   }
 
   public function testExecute_Error() {
+    $select = CRM_Utils_SQL_Select::from('civicrm_contact')->select('snarb;barg');
+
     try {
-      CRM_Utils_SQL_Select::from('civicrm_contact')->select('snarb;barg')->execute();
+      $select->execute();
       $this->fail('Expected an exception');
     }
     catch (PEAR_Exception $e) {
