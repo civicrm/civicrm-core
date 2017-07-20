@@ -7,6 +7,27 @@
 class CRM_Core_MenuTest extends CiviUnitTestCase {
 
   /**
+   * Check that novel data elements in the menu are correctly
+   * stored and loaded.
+   */
+  public function testModuleData() {
+    CRM_Core_Menu::store(TRUE);
+    $item = CRM_Core_Menu::get('civicrm/case');
+    $this->assertFalse(isset($item['ids_arguments']['exception']));
+    $this->assertFalse(isset($item['whimsy']));
+
+    CRM_Utils_Hook::singleton()->setHook('civicrm_alterMenu', function(&$items){
+      $items['civicrm/case']['ids_arguments']['exception'][] = 'foobar';
+      $items['civicrm/case']['whimsy'] = 'godliness';
+    });
+
+    CRM_Core_Menu::store(TRUE);
+    $item = CRM_Core_Menu::get('civicrm/case');
+    $this->assertTrue(in_array('foobar', $item['ids_arguments']['exception']));
+    $this->assertEquals('godliness', $item['whimsy']);
+  }
+
+  /**
    * @return array
    */
   public function pathArguments() {
