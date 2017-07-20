@@ -285,6 +285,7 @@ class CRM_Core_Menu {
     self::build($menuArray);
 
     $config = CRM_Core_Config::singleton();
+    $daoFields = CRM_Core_DAO_Menu::fields();
 
     foreach ($menuArray as $path => $item) {
       $menu = new CRM_Core_DAO_Menu();
@@ -293,7 +294,17 @@ class CRM_Core_Menu {
 
       $menu->find(TRUE);
 
+      // Move unrecognized fields to $module_data.
+      $module_data = array();
+      foreach (array_keys($item) as $key) {
+        if (!isset($daoFields[$key])) {
+          $module_data[$key] = $item[$key];
+          unset($item[$key]);
+        }
+      }
+
       $menu->copyValues($item);
+      $menu->module_data = serialize($module_data);
 
       foreach (self::$_serializedElements as $element) {
         if (!isset($item[$element]) ||
@@ -689,6 +700,14 @@ UNION (
       self::$_menuCache[$menu->path] = array();
       CRM_Core_DAO::storeValues($menu, self::$_menuCache[$menu->path]);
 
+      // Move module_data into main item.
+      if (isset(self::$_menuCache[$menu->path]['module_data'])) {
+        CRM_Utils_Array::extend(self::$_menuCache[$menu->path],
+          unserialize(self::$_menuCache[$menu->path]['module_data']));
+        unset(self::$_menuCache[$menu->path]['module_data']);
+      }
+
+      // Unserialize other elements.
       foreach (self::$_serializedElements as $element) {
         self::$_menuCache[$menu->path][$element] = unserialize($menu->$element);
 
