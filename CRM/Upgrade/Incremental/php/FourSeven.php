@@ -412,10 +412,29 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
     $this->addTask('CRM-20387 - Add invoice_number column to civicrm_contribution', 'addColumn',
       'civicrm_contribution', 'invoice_number', "varchar(255) COMMENT 'Human readable invoice number' DEFAULT NULL");
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
+  }
+
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_4_7_24($rev) {
     $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
     if (!empty($invoiceSettings['invoicing']) && !empty($invoiceSettings['invoice_prefix'])) {
-      $this->addTask(ts('Update Contribution Invoice number'), 'updateContributionInvoiceNumber', $rev, $invoiceSettings['invoice_prefix']);
+      list($minId, $maxId) = CRM_Core_DAO::executeQuery("SELECT coalesce(min(id),0), coalesce(max(id),0)
+        FROM civicrm_contribution ")->getDatabaseResult()->fetchRow();
+      for ($startId = $minId; $startId <= $maxId; $startId += self::BATCH_SIZE) {
+        $endId = $startId + self::BATCH_SIZE - 1;
+        $title = ts("Upgrade DB to %1: Update Contribution Invoice number (%2 => %3)", array(
+          1 => $rev,
+          2 => $startId,
+          3 => $endId,
+        ));
+        $this->addTask($title, 'updateContributionInvoiceNumber', $startId, $endId, $invoiceSettings['invoice_prefix']);
+      }
     }
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
   }
 
   /**
@@ -612,9 +631,17 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
    *
    * @return bool
    */
-  public static function updateContributionInvoiceNumber(CRM_Queue_TaskContext $ctx, $invoicePrefix) {
-    $sql = "UPDATE `civicrm_contribution` SET `invoice_number` = CONCAT(%1, `id`)";
-    $params = array(1 => array($invoicePrefix, 'string'));
+  public static function updateContributionInvoiceNumber(CRM_Queue_TaskContext $ctx, $startID, $endID, $invoicePrefix) {
+    CRM_Core_DAO::executeQuery("
+      UPDATE `civicrm_contribution` SET `invoice_number` = CONCAT(%1, `id`)
+       WHERE `id` BETWEEN (%2 AND %3) AND `invoice_number` IS NOT NULL ",
+      array(
+        1 => array($invoicePrefix, 'string'),
+        2 => array($startID, 'Integer'),
+        3 => array($endID, 'Integer'),
+      )
+    );
+
     return TRUE;
   }
 
