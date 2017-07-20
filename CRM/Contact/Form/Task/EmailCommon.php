@@ -409,11 +409,7 @@ class CRM_Contact_Form_Task_EmailCommon {
    * @param CRM_Core_Form $form
    */
   public static function postProcess(&$form) {
-    if (count($form->_contactIds) > self::MAX_EMAILS_KILL_SWITCH) {
-      CRM_Core_Error::fatal(ts('Please do not use this task to send a lot of emails (greater than %1). We recommend using CiviMail instead.',
-        array(1 => self::MAX_EMAILS_KILL_SWITCH)
-      ));
-    }
+    self::bounceIfSimpleMailLimitExceeded(count($form->_contactIds));
 
     // check and ensure that
     $formValues = $form->controller->exportValues($form->getName());
@@ -623,6 +619,21 @@ class CRM_Contact_Form_Task_EmailCommon {
         unset($messageTemplate['msg_title']);
         CRM_Core_BAO_MessageTemplate::add($messageTemplate);
       }
+    }
+  }
+
+  /**
+   * Bounce if there are more emails than permitted.
+   *
+   * @param int $count
+   *  The number of emails the user is attempting to send
+   */
+  public static function bounceIfSimpleMailLimitExceeded($count) {
+    $limit = Civi::settings()->get('simple_mail_limit');
+    if ($count > $limit) {
+      CRM_Core_Error::statusBounce(ts('Please do not use this task to send a lot of emails (greater than %1). Many countries have legal requirements when sending bulk emails and the CiviMail framework has opt out functionality and domain tokens to help meet these.',
+        array(1 => $limit)
+      ));
     }
   }
 
