@@ -581,9 +581,9 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
       $this->_relField = TRUE;
     }
 
-    if (!empty($this->_params['activity_date_time_relative']) ||
-      !empty($this->_params['activity_date_time_from']) ||
-      CRM_Utils_Array::value('activity_date_time_to', $this->_params)
+    if (!empty($this->_params['last_activity_date_time_relative']) ||
+      !empty($this->_params['last_activity_date_time_from']) ||
+      CRM_Utils_Array::value('last_activity_date_time_to', $this->_params)
     ) {
       $this->_activityLast = TRUE;
     }
