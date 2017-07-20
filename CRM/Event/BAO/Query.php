@@ -253,10 +253,7 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
    * @param $query
    */
   public static function whereClauseSingle(&$values, &$query) {
-    $checkPermission = TRUE;
-    if (!empty($query->_skipPermission)) {
-      $checkPermission = FALSE;
-    }
+    $checkPermission = empty($query->_skipPermission);
     list($name, $op, $value, $grouping, $wildcard) = $values;
     $fields = array_merge(CRM_Event_BAO_Event::fields(), CRM_Event_BAO_Participant::exportableFields());
 
