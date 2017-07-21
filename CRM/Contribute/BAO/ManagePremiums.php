@@ -106,15 +106,9 @@ class CRM_Contribute_BAO_ManagePremiums extends CRM_Contribute_DAO_Product {
     );
     $params = array_merge($defaults, $params);
 
-    // CRM-14283 - strip protocol and domain from image URLs
-    $image_type = array('image', 'thumbnail');
-    foreach ($image_type as $key) {
-      if (isset($params[$key]) && $params[$key]) {
-        $parsedURL = explode('/', $params[$key]);
-        $pathComponents = array_slice($parsedURL, 3);
-        $params[$key] = '/' . implode('/', $pathComponents);
-      }
-    }
+    // Use local URLs for images when possible
+    $params['image'] = CRM_Utils_String::simplifyURL($params['image'], TRUE);
+    $params['thumbnail'] = CRM_Utils_String::simplifyURL($params['thumbnail'], TRUE);
 
     // Save and return
     $premium = new CRM_Contribute_DAO_Product();
