@@ -23,18 +23,20 @@
 | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
 +--------------------------------------------------------------------+
 *}
-{
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
-  <table class="form-layout-compressed">
-    {foreach from=$settings_fields key="setting_name" item="setting_detail"}
-      <tr class="crm-mail-form-block-{$setting_name}">
-        <td class="label">{$form.$setting_name.label}</td><td>{$form.$setting_name.html}<br />
-          <span class="description">{ts}{$setting_detail.description}{/ts}</span>{if $setting_detail.help_text}
-            {assign var='tplhelp_id' value = $setting_name|cat:'-id'|replace:'_':'-'}
-            {help id="$tplhelp_id"}{/if}</td>
-      </tr>
-    {/foreach}
-  </table>
-  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
-  <div class="spacer"></div>
-</div>
+<table class="form-layout-compressed">
+  {foreach from=$settings_fields key="setting_name" item="setting_detail"}
+    <tr class="crm-mail-form-block-{$setting_name}">
+      <td class="label">{$form.$setting_name.label}</td><td>{$form.$setting_name.html}<br />
+        <span class="description">
+          {ts}{$setting_detail.description}{/ts}
+        </span>
+        {if $setting_detail.help_text}
+          {assign var='tplhelp_id' value = $setting_name|cat:'-id'|replace:'_':'-'}{help id="$tplhelp_id"}
+        {/if}
+      </td>
+    </tr>
+  {/foreach}
+</table>
+<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
+<div class="spacer"></div>
