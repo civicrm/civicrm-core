@@ -86,17 +86,26 @@ class CRM_Contribute_BAO_ManagePremiums extends CRM_Contribute_DAO_Product {
   }
 
   /**
-   * add the financial types.
+   * Add a premium product to the database, and return it.
    *
    * @param array $params
    *   Reference array contains the values submitted by the form.
    * @param array $ids
    *   Reference array contains the id.
    *
-   *
-   * @return object
+   * @return CRM_Contribute_DAO_Product
    */
   public static function add(&$params, &$ids) {
+    $defaults = array(
+      'id' => CRM_Utils_Array::value('premium', $ids),
+      'image' => '',
+      'thumbnail' => '',
+      'is_active' => FALSE,
+      'is_deductible' => FALSE,
+      'currency' => CRM_Core_Config::singleton()->defaultCurrency,
+    );
+    $params = array_merge($defaults, $params);
+
     // CRM-14283 - strip protocol and domain from image URLs
     $image_type = array('image', 'thumbnail');
     foreach ($image_type as $key) {
@@ -107,21 +116,9 @@ class CRM_Contribute_BAO_ManagePremiums extends CRM_Contribute_DAO_Product {
       }
     }
 
-    $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
-    $params['is_deductible'] = CRM_Utils_Array::value('is_deductible', $params, FALSE);
-
-    // action is taken depending upon the mode
+    // Save and return
     $premium = new CRM_Contribute_DAO_Product();
     $premium->copyValues($params);
-
-    $premium->id = CRM_Utils_Array::value('premium', $ids);
-
-    // set currency for CRM-1496
-    if (!isset($premium->currency)) {
-      $config = CRM_Core_Config::singleton();
-      $premium->currency = $config->defaultCurrency;
-    }
-
     $premium->save();
     return $premium;
   }
