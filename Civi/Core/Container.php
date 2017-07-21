@@ -156,7 +156,7 @@ class Container {
       'Civi\Cxn\Rpc\RegistrationClient',
       array()
     ))
-      ->setFactory(array(new Reference(self::SELF), 'createRegistrationClient'));
+      ->setFactory('CRM_Cxn_BAO_Cxn::createRegistrationClient');
 
     $container->setDefinition('psr_log', new Definition('CRM_Core_Error_Log', array()));
 
