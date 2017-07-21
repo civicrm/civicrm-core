@@ -1011,7 +1011,7 @@
               // If the CMS has already added title markup to the page, use it
               $('h1').not('.crm-container h1').each(function() {
                 if (_.trim($(this).html()) === pageTitle) {
-                  $(this).html(newPageTitle);
+                  $(this).addClass('crm-page-title').html(newPageTitle);
                   $el.hide();
                 }
               });
