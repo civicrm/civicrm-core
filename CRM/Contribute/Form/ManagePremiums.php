@@ -296,8 +296,8 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
           if ($gdSupport) {
             if ($imageFile) {
               $error = FALSE;
-              $params['image'] = CRM_Utils_File::resizeImage($imageFile, "_full", 200, 200);
-              $params['thumbnail'] = CRM_Utils_File::resizeImage($imageFile, "_thumb", 50, 50);
+              $params['image'] = CRM_Utils_File::resizeImage($imageFile, 200, 200, "_full");
+              $params['thumbnail'] = CRM_Utils_File::resizeImage($imageFile, 50, 50, "_thumb");
             }
           }
           else {

@@ -917,53 +917,79 @@ HTACCESS;
   }
 
   /**
-   * Resize a premium image to a different size.
+   * Resize an image.
    *
-   * @param string $filename
-   * @param string $resizedName
-   * @param $width
-   * @param $height
+   * @param string $sourceFile
+   *   Filesystem path to existing image on server
+   * @param int $targetWidth
+   *   New width desired, in pixels
+   * @param int $targetHeight
+   *   New height desired, in pixels
+   * @param string $suffix = ""
+   *   If supplied, the image will be renamed to include this suffix. For
+   *   example if the original file name is "foo.png" and $suffix = "_bar",
+   *   then the final file name will be "foo_bar.png".
    *
    * @return string
    *   Path to image
+   * @throws \CRM_Core_Exception
+   *   Under the following conditions
+   *   - When GD is not available.
+   *   - When the source file is not an image.
    */
-  public static function resizeImage($filename, $resizedName, $width, $height) {
-    // figure out the new filename
-    $pathParts = pathinfo($filename);
-    $newFilename = $pathParts['dirname'] . "/" . $pathParts['filename'] . $resizedName . "." . $pathParts['extension'];
+  public static function resizeImage($sourceFile, $targetWidth, $targetHeight, $suffix = "") {
 
-    // get image about original image
-    $imageInfo = getimagesize($filename);
-    $widthOrig = $imageInfo[0];
-    $heightOrig = $imageInfo[1];
-    $image = imagecreatetruecolor($width, $height);
-    if ($imageInfo['mime'] == 'image/gif') {
-      $source = imagecreatefromgif($filename);
+    // Check if GD is installed
+    $gdSupport = CRM_Utils_System::getModuleSetting('gd', 'GD Support');
+    if (!$gdSupport) {
+      throw new CRM_Core_Exception(ts('Unable to resize image because the GD image library is not currently compiled in your PHP installation.'));
     }
-    elseif ($imageInfo['mime'] == 'image/png') {
-      $source = imagecreatefrompng($filename);
+
+    $sourceMime = mime_content_type($sourceFile);
+    if ($sourceMime == 'image/gif') {
+      $sourceData = imagecreatefromgif($sourceFile);
+    }
+    elseif ($sourceMime == 'image/png') {
+      $sourceData = imagecreatefrompng($sourceFile);
+    }
+    elseif ($sourceMime == 'image/jpeg') {
+      $sourceData = imagecreatefromjpeg($sourceFile);
     }
     else {
-      $source = imagecreatefromjpeg($filename);
+      throw new CRM_Core_Exception(ts('Unable to resize image because the file supplied was not an image.'));
     }
 
+    // get image about original image
+    $sourceInfo = getimagesize($sourceFile);
+    $sourceWidth = $sourceInfo[0];
+    $sourceHeight = $sourceInfo[1];
+
+    // figure out the new filename
+    $pathParts = pathinfo($sourceFile);
+    $targetFile = $pathParts['dirname'] . DIRECTORY_SEPARATOR
+      . $pathParts['filename'] . $suffix . "." . $pathParts['extension'];
+
+    $targetData = imagecreatetruecolor($targetWidth, $targetHeight);
+
     // resize
-    imagecopyresized($image, $source, 0, 0, 0, 0, $width, $height, $widthOrig, $heightOrig);
+    imagecopyresized($targetData, $sourceData,
+      0, 0, 0, 0,
+      $targetWidth, $targetHeight, $sourceWidth, $sourceHeight);
 
     // save the resized image
-    $fp = fopen($newFilename, 'w+');
+    $fp = fopen($targetFile, 'w+');
     ob_start();
-    imagejpeg($image);
+    imagejpeg($targetData);
     $image_buffer = ob_get_contents();
     ob_end_clean();
-    imagedestroy($image);
+    imagedestroy($targetData);
     fwrite($fp, $image_buffer);
     rewind($fp);
     fclose($fp);
 
     // return the URL to link to
     $config = CRM_Core_Config::singleton();
-    return $config->imageUploadURL . basename($newFilename);
+    return $config->imageUploadURL . basename($targetFile);
   }
 
   /**
