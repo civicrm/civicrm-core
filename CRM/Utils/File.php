@@ -929,6 +929,11 @@ HTACCESS;
    *   If supplied, the image will be renamed to include this suffix. For
    *   example if the original file name is "foo.png" and $suffix = "_bar",
    *   then the final file name will be "foo_bar.png".
+   * @param bool $preserveAspect = TRUE
+   *   When TRUE $width and $height will be used as a bounding box, outside of
+   *   which the resized image will not extend.
+   *   When FALSE, the image will be resized exactly to $width and $height, even
+   *   if it means stretching it.
    *
    * @return string
    *   Path to image
@@ -937,7 +942,7 @@ HTACCESS;
    *   - When GD is not available.
    *   - When the source file is not an image.
    */
-  public static function resizeImage($sourceFile, $targetWidth, $targetHeight, $suffix = "") {
+  public static function resizeImage($sourceFile, $targetWidth, $targetHeight, $suffix = "", $preserveAspect = TRUE) {
 
     // Check if GD is installed
     $gdSupport = CRM_Utils_System::getModuleSetting('gd', 'GD Support');
@@ -963,6 +968,18 @@ HTACCESS;
     $sourceInfo = getimagesize($sourceFile);
     $sourceWidth = $sourceInfo[0];
     $sourceHeight = $sourceInfo[1];
+
+    // Adjust target width/height if preserving aspect ratio
+    if ($preserveAspect) {
+      $sourceAspect = $sourceWidth / $sourceHeight;
+      $targetAspect = $targetWidth / $targetHeight;
+      if ($sourceAspect > $targetAspect) {
+        $targetHeight = $targetWidth / $sourceAspect;
+      }
+      if ($sourceAspect < $targetAspect) {
+        $targetWidth = $targetHeight * $sourceAspect;
+      }
+    }
 
     // figure out the new filename
     $pathParts = pathinfo($sourceFile);
