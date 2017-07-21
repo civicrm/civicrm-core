@@ -12,16 +12,6 @@ civicrm-version.txt
 civicrm.config.php
 install/langs.php
 node_modules
-packages/.channels
-packages/.depdb
-packages/.depdblock
-packages/.filemap
-packages/.lock
-packages/.registry
-packages/cache
-packages/doc
-packages/temp
-packages/test
 settings_location.php
 sql/case_sample.mysql
 sql/civicrm.mysql
