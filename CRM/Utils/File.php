@@ -916,6 +916,55 @@ HTACCESS;
     return self::getFileURL($path, $mimeType);
   }
 
+  /**
+   * Resize a premium image to a different size.
+   *
+   * @param string $filename
+   * @param string $resizedName
+   * @param $width
+   * @param $height
+   *
+   * @return string
+   *   Path to image
+   */
+  public static function resizeImage($filename, $resizedName, $width, $height) {
+    // figure out the new filename
+    $pathParts = pathinfo($filename);
+    $newFilename = $pathParts['dirname'] . "/" . $pathParts['filename'] . $resizedName . "." . $pathParts['extension'];
+
+    // get image about original image
+    $imageInfo = getimagesize($filename);
+    $widthOrig = $imageInfo[0];
+    $heightOrig = $imageInfo[1];
+    $image = imagecreatetruecolor($width, $height);
+    if ($imageInfo['mime'] == 'image/gif') {
+      $source = imagecreatefromgif($filename);
+    }
+    elseif ($imageInfo['mime'] == 'image/png') {
+      $source = imagecreatefrompng($filename);
+    }
+    else {
+      $source = imagecreatefromjpeg($filename);
+    }
+
+    // resize
+    imagecopyresized($image, $source, 0, 0, 0, 0, $width, $height, $widthOrig, $heightOrig);
+
+    // save the resized image
+    $fp = fopen($newFilename, 'w+');
+    ob_start();
+    imagejpeg($image);
+    $image_buffer = ob_get_contents();
+    ob_end_clean();
+    imagedestroy($image);
+    fwrite($fp, $image_buffer);
+    rewind($fp);
+    fclose($fp);
+
+    // return the URL to link to
+    $config = CRM_Core_Config::singleton();
+    return $config->imageUploadURL . basename($newFilename);
+  }
 
   /**
    * Get file icon class for specific MIME Type
