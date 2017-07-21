@@ -266,82 +266,104 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
    * Process the form submission.
    */
   public function postProcess() {
-
+    // If previewing, don't do any post-processing
     if ($this->_action & CRM_Core_Action::PREVIEW) {
       return;
     }
 
+    // If deleting, then only delete and skip the rest of the post-processing
     if ($this->_action & CRM_Core_Action::DELETE) {
       CRM_Contribute_BAO_ManagePremiums::del($this->_id);
-      CRM_Core_Session::setStatus(ts('Selected Premium Product type has been deleted.'), ts('Deleted'), 'info');
+      CRM_Core_Session::setStatus(
+        ts('Selected Premium Product type has been deleted.'),
+        ts('Deleted'), 'info');
+      return;
     }
-    else {
-      $params = $this->controller->exportValues($this->_name);
-      $imageFile = CRM_Utils_Array::value('uploadFile', $params);
-      $imageFile = $imageFile['name'];
 
-      $config = CRM_Core_Config::singleton();
+    $params = $this->controller->exportValues($this->_name);
 
-      $ids = array();
-      $error = FALSE;
-      // store the submitted values in an array
+    // Clean the the money fields
+    $moneyFields = array('cost', 'price', 'min_contribution');
+    foreach ($moneyFields as $field) {
+      $params[$field] = CRM_Utils_Rule::cleanMoney($params[$field]);
+    }
 
-      // FIX ME
-      if (CRM_Utils_Array::value('imageOption', $params, FALSE)) {
-        $value = CRM_Utils_Array::value('imageOption', $params, FALSE);
-        if ($value == 'image') {
+    $ids = array();
+    if ($this->_action & CRM_Core_Action::UPDATE) {
+      $ids['premium'] = $this->_id;
+    }
 
-          // to check wether GD is installed or not
-          $gdSupport = CRM_Utils_System::getModuleSetting('gd', 'GD Support');
-          if ($gdSupport) {
-            if ($imageFile) {
-              $error = FALSE;
-              $params['image'] = CRM_Utils_File::resizeImage($imageFile, 200, 200, "_full");
-              $params['thumbnail'] = CRM_Utils_File::resizeImage($imageFile, 50, 50, "_thumb");
-            }
-          }
-          else {
-            $error = TRUE;
-            $params['image'] = $config->resourceBase . 'i/contribute/default_premium.jpg';
-            $params['thumbnail'] = $config->resourceBase . 'i/contribute/default_premium_thumb.jpg';
-          }
-        }
-        elseif ($value == 'thumbnail') {
-          $params['image'] = $params['imageUrl'];
-          $params['thumbnail'] = $params['thumbnailUrl'];
-        }
-        elseif ($value == 'default_image') {
-          $url = parse_url($config->userFrameworkBaseURL);
-          $params['image'] = $config->resourceBase . 'i/contribute/default_premium.jpg';
-          $params['thumbnail'] = $config->resourceBase . 'i/contribute/default_premium_thumb.jpg';
-        }
-        else {
-          $params['image'] = "";
-          $params['thumbnail'] = "";
-        }
+    $this->_processImages($params);
+
+    // Save to database
+    $premium = CRM_Contribute_BAO_ManagePremiums::add($params, $ids);
+
+    CRM_Core_Session::setStatus(
+      ts("The Premium '%1' has been saved.", array(1 => $premium->name)),
+      ts('Saved'), 'success');
+  }
+
+  /**
+   * Look at $params to find form info about images. Manipulate images if
+   * necessary. Then alter $params to point to the newly manipulated images.
+   *
+   * @param array $params
+   */
+  protected function _processImages(&$params) {
+    $defaults = array(
+      'imageOption' => 'noImage',
+      'uploadFile' => array('name' => ''),
+      'image' => '',
+      'thumbnail' => '',
+      'imageUrl' => '',
+      'thumbnailUrl' => '',
+    );
+    $params = array_merge($defaults, $params);
+
+    // User is uploading an image
+    if ($params['imageOption'] == 'image') {
+      $imageFile = $params['uploadFile']['name'];
+      try {
+        $params['image'] = CRM_Utils_File::resizeImage($imageFile, 200, 200, "_full");
+        $params['thumbnail'] = CRM_Utils_File::resizeImage($imageFile, 50, 50, "_thumb");
       }
-
-      if ($this->_action & CRM_Core_Action::UPDATE) {
-        $ids['premium'] = $this->_id;
-      }
-
-      // fix the money fields
-      foreach (array(
-                 'cost',
-                 'price',
-                 'min_contribution',
-               ) as $f) {
-        $params[$f] = CRM_Utils_Rule::cleanMoney($params[$f]);
-      }
-
-      $premium = CRM_Contribute_BAO_ManagePremiums::add($params, $ids);
-      if ($error) {
-        CRM_Core_Session::setStatus(ts('No thumbnail of your image was created because the GD image library is not currently compiled in your PHP installation. Product is currently configured to use default thumbnail image. If you have a local thumbnail image you can upload it separately and input the thumbnail URL by editing this premium.'), ts('Notice'), 'alert');
-      }
-      else {
-        CRM_Core_Session::setStatus(ts("The Premium '%1' has been saved.", array(1 => $premium->name)), ts('Saved'), 'success');
+      catch (CRM_Core_Exception $e) {
+        $params['image'] = self::_defaultImage();
+        $params['thumbnail'] = self::_defaultThumbnail();
+        $msg = ts('The product has been configured to use a default image.');
+        CRM_Core_Session::setStatus($e->getMessage() . " $msg", ts('Notice'), 'alert');
       }
     }
+
+    // User is specifying existing URLs for the images
+    elseif ($params['imageOption'] == 'thumbnail') {
+      $params['image'] = $params['imageUrl'];
+      $params['thumbnail'] = $params['thumbnailUrl'];
+    }
+
+    // User wants a default image
+    elseif ($params['imageOption'] == 'default_image') {
+      $params['image'] = self::_defaultImage();
+      $params['thumbnail'] = self::_defaultThumbnail();
+    }
+  }
+
+  /**
+   * Returns the path to the default premium image
+   * @return string
+   */
+  protected static function _defaultImage() {
+    $config = CRM_Core_Config::singleton();
+    return $config->resourceBase . 'i/contribute/default_premium.jpg';
+  }
+
+  /**
+   * Returns the path to the default premium thumbnail
+   * @return string
+   */
+  protected static function _defaultThumbnail() {
+    $config = CRM_Core_Config::singleton();
+    return $config->resourceBase . 'i/contribute/default_premium_thumb.jpg';
   }
 
 }
