@@ -205,6 +205,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
       // set it to null if so (avoids crappy E_NOTICE errors below
       $defaults['location_type_id'] = CRM_Utils_Array::value('location_type_id', $defaults);
 
+      //CRM-20861 - Include custom fields defined for address to set its default location type to 0.
       $specialFields = array_merge(CRM_Core_BAO_UFGroup::getLocationFields(), $addressCustomFields);
       if (!$defaults['location_type_id'] &&
         $defaults["field_type"] != "Formatting" &&
