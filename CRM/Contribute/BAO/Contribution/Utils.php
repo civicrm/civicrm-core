@@ -497,4 +497,111 @@ LIMIT 1
     return number_format((float) round($amount, (int) $decimals), (int) $decimals, '.', '');
   }
 
+  /**
+   * Get contribution statuses by entity e.g. contribution, membership or 'participant'
+   *
+   * @param string $usedFor
+   * @param int $id
+   *   Contribution ID
+   *
+   * @return array
+   *   Array of contribution statuses in array('status id' => 'label') format
+   */
+  public static function getContributionStatuses($usedFor = 'contribution', $id = NULL) {
+    if ($usedFor == 'pledge') {
+      $statusNames = CRM_Core_OptionGroup::values('pledge_status', FALSE, FALSE, FALSE, NULL, 'name');
+    }
+    else {
+      $statusNames = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+    }
+
+    $statusNamesToUnset = array();
+
+    // on create fetch statuses on basis of component
+    if (!$id) {
+      $statusNamesToUnset = array(
+        'Refunded',
+        'Chargeback',
+        'Pending refund',
+      );
+      // Event registration and New Membership backoffice form support partially paid payment,
+      //  so exclude this status only for 'New Contribution' form
+      if ($usedFor == 'contribution') {
+        $statusNamesToUnset = array_merge($statusNamesToUnset, array(
+          'In Progress',
+          'Overdue',
+          'Partially paid',
+        ));
+      }
+      elseif ($usedFor == 'participant') {
+        $statusNamesToUnset = array_merge($statusNamesToUnset, array(
+          'Cancelled',
+          'Failed',
+        ));
+      }
+    }
+    else {
+      $contributionStatus = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $id, 'contribution_status_id');
+      $name = CRM_Utils_Array::value($contributionStatus, $statusNames);
+      switch ($name) {
+        case 'Completed':
+          // [CRM-17498] Removing unsupported status change options.
+          $statusNamesToUnset = array_merge($statusNamesToUnset, array(
+            'Pending',
+            'Failed',
+            'Partially paid',
+            'Pending refund',
+          ));
+          break;
+
+        case 'Cancelled':
+        case 'Chargeback':
+        case 'Refunded':
+          $statusNamesToUnset = array_merge($statusNamesToUnset, array(
+            'Pending',
+            'Failed',
+          ));
+          break;
+
+        case 'Pending':
+        case 'In Progress':
+          $statusNamesToUnset = array_merge($statusNamesToUnset, array(
+            'Refunded',
+            'Chargeback',
+          ));
+          break;
+
+        case 'Failed':
+          $statusNamesToUnset = array_merge($statusNamesToUnset, array(
+            'Pending',
+            'Refunded',
+            'Chargeback',
+            'Completed',
+            'In Progress',
+            'Cancelled',
+          ));
+          break;
+      }
+    }
+
+    foreach ($statusNamesToUnset as $name) {
+      unset($statusNames[CRM_Utils_Array::key($name, $statusNames)]);
+    }
+
+    // based on filtered statuse names fetch the final list of statuses in array('id' => 'label') format
+    if ($usedFor == 'pledge') {
+      $statuses = CRM_Core_OptionGroup::values('pledge_status');
+    }
+    else {
+      $statuses = CRM_Contribute_PseudoConstant::contributionStatus();
+    }
+    foreach ($statuses as $statusID => $label) {
+      if (!array_key_exists($statusID, $statusNames)) {
+        unset($statuses[$statusID]);
+      }
+    }
+
+    return $statuses;
+  }
+
 }

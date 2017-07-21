@@ -367,7 +367,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       );
 
       $this->add('select', 'contribution_status_id', ts('Payment Status'),
-        CRM_Contribute_PseudoConstant::contributionStatus()
+        CRM_Contribute_BAO_Contribution_Utils::getContributionStatuses('membership')
       );
 
       $this->add('text', 'check_number', ts('Check Number'),
