@@ -133,13 +133,13 @@ class Container {
       'Civi\Angular\Manager',
       array()
     ))
-      ->setFactory([new Reference(self::SELF), 'createAngularManager']);
+      ->setFactory(array(new Reference(self::SELF), 'createAngularManager'));
 
     $container->setDefinition('dispatcher', new Definition(
       'Civi\Core\CiviEventDispatcher',
       array(new Reference('service_container'))
     ))
-      ->setFactory([new Reference(self::SELF), 'createEventDispatcher']);
+      ->setFactory(array(new Reference(self::SELF), 'createEventDispatcher'));
 
     $container->setDefinition('magic_function_provider', new Definition(
       'Civi\API\Provider\MagicFunctionProvider',
@@ -150,13 +150,13 @@ class Container {
       'Civi\API\Kernel',
       array(new Reference('dispatcher'), new Reference('magic_function_provider'))
     ))
-      ->setFactory([new Reference(self::SELF), 'createApiKernel']);
+      ->setFactory(array(new Reference(self::SELF), 'createApiKernel'));
 
     $container->setDefinition('cxn_reg_client', new Definition(
       'Civi\Cxn\Rpc\RegistrationClient',
       array()
     ))
-      ->setFactory([new Reference(self::SELF), 'createRegistrationClient']);
+      ->setFactory(array(new Reference(self::SELF), 'createRegistrationClient'));
 
     $container->setDefinition('psr_log', new Definition('CRM_Core_Error_Log', array()));
 
@@ -205,7 +205,7 @@ class Container {
       $container->setDefinition($name, new Definition(
         $class
       ))
-        ->setFactory([$class, 'singleton']);
+        ->setFactory(array($class, 'singleton'));
     }
 
     $container->setDefinition('civi_token_compat', new Definition(
