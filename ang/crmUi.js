@@ -1002,22 +1002,16 @@
         scope: {
           crmDocumentTitle: '='
         },
-        limit: 'ae',
         link: function(scope, $el, attrs) {
           function update() {
             $timeout(function() {
               var newPageTitle = _.trim($el.html()),
-                newDocumentTitle = scope.crmDocumentTitle || $el.text(),
-                cls = $el.attr('class').split(' '),
-                classes = _.filter(cls, function(c) {
-                  return c.indexOf('ng-') !== 0;
-                });
-              classes.push('crm-page-title');
+                newDocumentTitle = scope.crmDocumentTitle || $el.text();
               document.title = $('title').text().replace(documentTitle, newDocumentTitle);
               // If the CMS has already added title markup to the page, use it
               $('h1').not('.crm-container h1').each(function() {
                 if (_.trim($(this).html()) === pageTitle) {
-                  $(this).addClass(classes.join(' ')).html(newPageTitle);
+                  $(this).addClass('crm-page-title').html(newPageTitle);
                   $el.hide();
                 }
               });
