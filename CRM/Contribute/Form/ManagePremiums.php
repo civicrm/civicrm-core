@@ -201,34 +201,35 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
    *
    * @param array $params
    *   (ref.) an assoc array of name/value pairs.
-   *
    * @param $files
    *
    * @return bool|array
    *   mixed true or array of errors
    */
   public static function formRule($params, $files) {
-    if (isset($params['imageOption'])) {
-      if ($params['imageOption'] == 'thumbnail') {
-        if (!$params['imageUrl']) {
-          $errors['imageUrl'] = ts('Image URL is Required');
-        }
-        if (!$params['thumbnailUrl']) {
-          $errors['thumbnailUrl'] = ts('Thumbnail URL is Required');
-        }
+
+    // If choosing to upload an image, then an image must be provided
+    if (
+      isset($params['imageOption']) &&
+      $params['imageOption'] == 'image' &&
+      empty($files['uploadFile']['name'])
+    ) {
+      $errors['uploadFile'] = ts('A file must be selected');
+    }
+
+    // If choosing to use image URLs, then both URLs must be present
+    if (isset($params['imageOption']) && $params['imageOption'] == 'thumbnail') {
+      if (!$params['imageUrl']) {
+        $errors['imageUrl'] = ts('Image URL is Required');
+      }
+      if (!$params['thumbnailUrl']) {
+        $errors['thumbnailUrl'] = ts('Thumbnail URL is Required');
       }
     }
+
     // CRM-13231 financial type required if product has cost
     if (!empty($params['cost']) && empty($params['financial_type_id'])) {
       $errors['financial_type_id'] = ts('Financial Type is required for product having cost.');
-    }
-    $fileLocation = $files['uploadFile']['tmp_name'];
-    if ($fileLocation != "") {
-      list($width, $height) = getimagesize($fileLocation);
-
-      if (($width < 80 || $width > 500) || ($height < 80 || $height > 500)) {
-        //$errors ['uploadFile'] = "Please Enter files with dimensions between 80 x 80 and 500 x 500," . " Dimensions of this file is ".$width."X".$height;
-      }
     }
 
     if (!$params['period_type']) {
