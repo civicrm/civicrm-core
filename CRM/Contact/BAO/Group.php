@@ -1075,7 +1075,7 @@ WHERE  id IN $groupIdString
     if ($parents) {
       // group can have > 1 parent so parents may be comma separated list (eg. '1,2,5'). We just grab and match on 1st parent.
       $parentArray = explode(',', $parents);
-      $parent = $parentArray[0];
+      $parent = self::filterActiveGroups($parentArray);
       $args[2] = array($parent, 'Integer');
       $query .= " AND SUBSTRING_INDEX(parents, ',', 1) = %2";
     }
@@ -1091,7 +1091,7 @@ WHERE  id IN $groupIdString
     while ($dao->fetch()) {
       if ($dao->parents) {
         $parentArray = explode(',', $dao->parents);
-        $parent = $parentArray[0];
+        $parent = self::filterActiveGroups($parentArray);
         $tree[$parent][] = array(
           'id' => $dao->id,
           'title' => $dao->title,
@@ -1376,6 +1376,29 @@ WHERE {$whereClause}";
     }
 
     return $childGroupIDs;
+  }
+
+  /**
+   * Check parent groups and filter out the disabled ones.
+   *
+   * @param array $parentArray
+   *   Array of group Ids.
+   *
+   * @return int
+   */
+  public static function filterActiveGroups($parentArray) {
+    if (count($parentArray) > 1) {
+      foreach ($parentArray as $key => $groupId) {
+        $isActive = civicrm_api3('Group', 'getvalue', array(
+          'id' => $groupId,
+          'return' => 'is_active',
+        ));
+        if (!$isActive) {
+          unset($parentArray[$key]);
+        }
+      }
+    }
+    return reset($parentArray);
   }
 
 }
