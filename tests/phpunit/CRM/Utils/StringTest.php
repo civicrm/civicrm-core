@@ -252,7 +252,8 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
   public function simplifyURLProvider() {
 
     $config = CRM_Core_Config::singleton();
-    $localDomain = parse_url($config->userFrameworkBaseURL)['host'];
+    $urlParts = parse_url($config->userFrameworkBaseURL);
+    $localDomain = $urlParts['host'];
     $externalDomain = 'example.org';
 
     // Ensure that $externalDomain really is different from $localDomain
