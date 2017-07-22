@@ -105,15 +105,25 @@ class CRM_Core_Menu {
    * Read menu.
    *
    * @param string $name
-   * @param string $menu
+   *   File name
+   * @param array $menu
+   *   An alterable list of menu items.
    *
    * @throws Exception
    */
   public static function read($name, &$menu) {
-
-    $config = CRM_Core_Config::singleton();
-
     $xml = simplexml_load_file($name);
+    self::readXML($xml, $menu);
+  }
+
+  /**
+   * @param SimpleXMLElement $xml
+   *   An XML document defining a list of menu items.
+   * @param array $menu
+   *   An alterable list of menu items.
+   */
+  public static function readXML($xml, &$menu) {
+    $config = CRM_Core_Config::singleton();
     foreach ($xml->item as $item) {
       if (!(string ) $item->path) {
         CRM_Core_Error::debug('i', $item);

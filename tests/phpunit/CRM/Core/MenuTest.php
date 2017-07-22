@@ -6,6 +6,32 @@
  */
 class CRM_Core_MenuTest extends CiviUnitTestCase {
 
+  public function testReadXML() {
+    $xmlString = '<?xml version="1.0" encoding="iso-8859-1" ?>
+    <menu>
+      <item>
+         <path>civicrm/foo/bar</path>
+         <title>Foo Bar</title>
+         <desc>The foo is one with the bar.</desc>
+         <page_callback>CRM_Foo_Page_Bar</page_callback>
+         <adminGroup>Customize Data and Screens</adminGroup>
+         <icon>admin/small/foo.png</icon>
+         <weight>10</weight>
+      </item>
+    </menu>
+    ';
+    $xml = simplexml_load_string($xmlString);
+    $menu = array();
+    CRM_Core_Menu::readXML($xml, $menu);
+    $this->assertTrue(isset($menu['civicrm/foo/bar']));
+    $this->assertEquals('Foo Bar', $menu['civicrm/foo/bar']['title']);
+    $this->assertEquals('The foo is one with the bar.', $menu['civicrm/foo/bar']['desc']);
+    $this->assertEquals('CRM_Foo_Page_Bar', $menu['civicrm/foo/bar']['page_callback']);
+    $this->assertEquals('Customize Data and Screens', $menu['civicrm/foo/bar']['adminGroup']);
+    $this->assertEquals('admin/small/foo.png', $menu['civicrm/foo/bar']['icon']);
+    $this->assertEquals('10', $menu['civicrm/foo/bar']['weight']);
+  }
+
   /**
    * Check that novel data elements in the menu are correctly
    * stored and loaded.
