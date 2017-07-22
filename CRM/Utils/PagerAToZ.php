@@ -151,7 +151,7 @@ class CRM_Utils_PagerAToZ {
       $qfKey = CRM_Utils_Array::value('qfKey', $query->_formValues);
     }
     if (empty($qfKey)) {
-      $qfKey = CRM_Utils_Request::retrieve('qfKey', 'String', $this, FALSE, NULL, $_REQUEST);
+      $qfKey = CRM_Utils_Request::retrieve('qfKey', 'String', NULL, FALSE, NULL, $_REQUEST);
     }
 
     $aToZBar = array();
