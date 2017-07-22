@@ -559,6 +559,10 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
 
     jimport('joomla.application.cli');
 
+    if (!defined('JDEBUG')) {
+      define('JDEBUG', FALSE);
+    }
+
     // CRM-14281 Joomla wasn't available during bootstrap, so hook_civicrm_config never executes.
     $config = CRM_Core_Config::singleton();
     CRM_Utils_Hook::config($config);
