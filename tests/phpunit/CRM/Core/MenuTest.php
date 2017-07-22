@@ -30,6 +30,31 @@ class CRM_Core_MenuTest extends CiviUnitTestCase {
     $this->assertEquals('Customize Data and Screens', $menu['civicrm/foo/bar']['adminGroup']);
     $this->assertEquals('admin/small/foo.png', $menu['civicrm/foo/bar']['icon']);
     $this->assertEquals('10', $menu['civicrm/foo/bar']['weight']);
+    $this->assertTrue(!isset($menu['civicrm/foo/bar']['ids_arguments']));
+  }
+
+  public function testReadXML_IDS() {
+    $xmlString = '<?xml version="1.0" encoding="iso-8859-1" ?>
+    <menu>
+      <item>
+         <path>civicrm/foo/bar</path>
+         <title>Foo Bar</title>
+         <ids_arguments>
+          <json>alpha</json>
+          <json>beta</json>
+          <html>gamma</html>
+        </ids_arguments>
+      </item>
+    </menu>
+    ';
+    $xml = simplexml_load_string($xmlString);
+    $menu = array();
+    CRM_Core_Menu::readXML($xml, $menu);
+    $this->assertTrue(isset($menu['civicrm/foo/bar']));
+    $this->assertEquals('Foo Bar', $menu['civicrm/foo/bar']['title']);
+    $this->assertEquals(array('alpha', 'beta'), $menu['civicrm/foo/bar']['ids_arguments']['json']);
+    $this->assertEquals(array('gamma'), $menu['civicrm/foo/bar']['ids_arguments']['html']);
+    $this->assertEquals(array(), $menu['civicrm/foo/bar']['ids_arguments']['exception']);
   }
 
   /**

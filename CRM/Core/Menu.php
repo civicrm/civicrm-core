@@ -132,6 +132,19 @@ class CRM_Core_Menu {
       $path = (string ) $item->path;
       $menu[$path] = array();
       unset($item->path);
+
+      if ($item->ids_arguments) {
+        $ids = array();
+        foreach (array('json', 'html', 'exception') as $type) {
+          $ids[$type] = array();
+          foreach ($item->ids_arguments->{$type} as $value) {
+            $ids[$type][] = (string) $value;
+          }
+        }
+        $menu[$path]['ids_arguments'] = $ids;
+        unset($item->ids_arguments);
+      }
+
       foreach ($item as $key => $value) {
         $key = (string ) $key;
         $value = (string ) $value;
