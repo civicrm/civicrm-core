@@ -410,18 +410,26 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $this->assign('is_pay_later', TRUE);
     }
     $this->assign('contribution_status_id', CRM_Utils_Array::value('contribution_status_id', $defaults));
-    if (!empty($defaults['contribution_status_id']) && in_array(
-        CRM_Contribute_PseudoConstant::contributionStatus($defaults['contribution_status_id'], 'name'),
+    $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus($defaults['contribution_status_id'], 'name');
+    if (!empty($defaults['contribution_status_id'])) {
+      if (in_array(
+        $contributionStatus,
         // Historically not 'Cancelled' hence not using CRM_Contribute_BAO_Contribution::isContributionStatusNegative.
         array('Refunded', 'Chargeback')
       )) {
-      $defaults['refund_trxn_id'] = CRM_Core_BAO_FinancialTrxn::getRefundTransactionTrxnID($this->_id);
+        $defaults['refund_trxn_id'] = CRM_Core_BAO_FinancialTrxn::getRefundTransactionTrxnID($this->_id);
+      }
+      // on edit mode, set trxn_date to current date IF contribution was pending
+      elseif ($this->_id && $contributionStatus == 'Pending') {
+        list($defaults['trxn_date'], $defaults['trxn_date_time']) = CRM_Utils_Date::setDateDefaults(NULL, 'activityDateTime');
+      }
     }
     else {
       $defaults['refund_trxn_id'] = isset($defaults['trxn_id']) ? $defaults['trxn_id'] : NULL;
     }
     $dates = array(
       'receive_date',
+      'trxn_date',
       'receipt_date',
       'cancel_date',
       'thankyou_date',
@@ -431,12 +439,11 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         list($defaults[$key], $defaults[$key . '_time'])
           = CRM_Utils_Date::setDateDefaults(CRM_Utils_Array::value($key, $defaults), 'activityDateTime');
       }
-    }
-
-    if (!$this->_id && empty($defaults['receive_date'])) {
-      list($defaults['receive_date'],
-        $defaults['receive_date_time']
-        ) = CRM_Utils_Date::setDateDefaults(NULL, 'activityDateTime');
+      if (!$this->_id && empty($defaults[$key]) && in_array($key, array('receive_date', 'trxn_date'))) {
+        list($defaults[$key],
+          $defaults["{$key}_time"]
+          ) = CRM_Utils_Date::setDateDefaults(NULL, 'activityDateTime');
+      }
     }
 
     $this->assign('receive_date', CRM_Utils_Date::processDate(CRM_Utils_Array::value('receive_date', $defaults),
@@ -637,14 +644,19 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $paymentInstrument = FALSE;
     if (!$this->_mode) {
       $checkPaymentID = array_search('Check', CRM_Contribute_PseudoConstant::paymentInstrument('name'));
+
+      // since we are showing payments info on edit mode instead of payment details block,
+      //  payment_instrument isn't required field.
+      $required = $this->_id ? FALSE : TRUE;
       $paymentInstrument = $this->add('select', 'payment_instrument_id',
         ts('Payment Method'),
         array('' => ts('- select -')) + CRM_Contribute_PseudoConstant::paymentInstrument(),
-        TRUE, array('onChange' => "return showHideByValue('payment_instrument_id','{$checkPaymentID}','checkNumber','table-row','select',false);")
+        $required, array('onChange' => "return showHideByValue('payment_instrument_id','{$checkPaymentID}','checkNumber','table-row','select',false);")
       );
     }
 
     $trxnId = $this->add('text', 'trxn_id', ts('Transaction ID'), array('class' => 'twelve') + $attributes['trxn_id']);
+    $this->addDateTime('trxn_date', ts('Transaction Date'), FALSE, array('formatType' => 'activityDateTime'));
 
     //add receipt for offline contribution
     $this->addElement('checkbox', 'is_email_receipt', ts('Send Receipt?'));
@@ -731,6 +743,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
           }
           break;
       }
+      $paymentInfo = CRM_Contribute_BAO_Contribution::getPaymentInfo($this->_id, 'contribution', TRUE);
+      $this->assign('payments', $paymentInfo['transaction']);
     }
     else {
       unset($status[CRM_Utils_Array::key('Refunded', $statusName)]);
@@ -1263,6 +1277,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
           try {
             civicrm_api3('contribution', 'completetransaction', array(
               'id' => $contribution->id,
+              'trxn_date' => CRM_Utils_Array::value('trxn_date', $paymentParams, date('YmdHis')),
               'trxn_id' => $result['trxn_id'],
               'payment_processor_id' => $this->_paymentProcessor['id'],
               'is_transactional' => FALSE,
@@ -1501,6 +1516,18 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       if (!empty($this->_payNow)) {
         $this->_params['contribution_id'] = $this->_id;
       }
+      // since we are hiding the payment details block in edit mode,
+      //  this also means that some payment information won't be there in
+      //  submitted formValues, so fetch those default values in here
+      foreach (array(
+        'payment_instrument_id',
+        'check_number',
+        'receipt_date',
+      ) as $fieldName) {
+        if (empty($submittedValues[$fieldName])) {
+          $submittedValues[$fieldName] = CRM_Utils_Array::value($fieldName, $this->_values);
+        }
+      }
     }
 
     if (!$priceSetId && !empty($submittedValues['total_amount']) && $this->_id) {
@@ -1663,6 +1690,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       }
       $dates = array(
         'receive_date',
+        'trxn_date',
         'receipt_date',
         'cancel_date',
       );
