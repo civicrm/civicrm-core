@@ -75,7 +75,9 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
   public static function add(&$params) {
     $caseDAO = new CRM_Case_DAO_Case();
     $caseDAO->copyValues($params);
-    return $caseDAO->save();
+    $result = $caseDAO->save();
+    $caseDAO->find(TRUE); // Get other case values (required by XML processor), this adds to $result array
+    return $result;
   }
 
   /**
