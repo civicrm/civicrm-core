@@ -34,7 +34,7 @@
  *
  * @package CiviCRM
  */
-class CRM_Contribute_Form_Search extends CiviUnitTestCase {
+class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
 
   protected $_individual;
   protected $_tablesToTruncate = array('civicrm_contribution');
