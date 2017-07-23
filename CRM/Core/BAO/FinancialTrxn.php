@@ -563,7 +563,7 @@ WHERE ft.is_payment = 1
       'id' => $lineItem['entity_id'],
     ));
     $membershipTypeDetail = civicrm_api3('MembershipType', 'getsingle', array(
-      'id' => $lineItem['membership_type_id'],
+      'id' => $membershipDetail['membership_type_id'],
     ));
 
     if (empty($membershipDetail['end_date'])) {
