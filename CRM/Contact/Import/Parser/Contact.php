@@ -2466,17 +2466,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
         $params['address'] = array();
       }
 
-      $addressCnt = 1;
-      foreach ($params['address'] as $cnt => $addressBlock) {
-        if (CRM_Utils_Array::value('location_type_id', $values) ==
-          CRM_Utils_Array::value('location_type_id', $addressBlock)
-        ) {
-          $addressCnt = $cnt;
-          break;
-        }
-        $addressCnt++;
-      }
-
       if (!array_key_exists('Address', $fields)) {
         $fields['Address'] = CRM_Core_DAO_Address::fields();
       }
@@ -2529,7 +2518,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
         $values = $newValues;
       }
 
-      _civicrm_api3_store_values($fields['Address'], $values, $params['address'][$addressCnt]);
+      _civicrm_api3_store_values($fields['Address'], $values, $params['address'][$values['location_type_id']]);
 
       $addressFields = array(
         'county',
@@ -2546,7 +2535,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
           if (!array_key_exists('address', $params)) {
             $params['address'] = array();
           }
-          $params['address'][$addressCnt][$field] = $values[$field];
+          $params['address'][$values['location_type_id']][$field] = $values[$field];
         }
       }
 
@@ -2555,14 +2544,9 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
           $primary = civicrm_api3('Address', 'get', array('return' => 'location_type_id', 'contact_id' => $params['id'], 'is_primary' => 1, 'sequential' => 1));
         }
         $defaultLocationType = CRM_Core_BAO_LocationType::getDefault();
-        $params['address'][$addressCnt]['location_type_id'] = (isset($primary) && $primary['count']) ? $primary['values'][0]['location_type_id'] : $defaultLocationType->id;
-        $params['address'][$addressCnt]['is_primary'] = 1;
+        $params['address'][$values['location_type_id']]['location_type_id'] = (isset($primary) && $primary['count']) ? $primary['values'][0]['location_type_id'] : $defaultLocationType->id;
+        $params['address'][$values['location_type_id']]['is_primary'] = 1;
 
-      }
-
-      if ($addressCnt == 1) {
-
-        $params['address'][$addressCnt]['is_primary'] = TRUE;
       }
       return TRUE;
     }
