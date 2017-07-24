@@ -781,6 +781,32 @@ WHERE  id = %1";
   }
 
   /**
+   * Get all the State/Province abbreviations from the database for the specified country.
+   *
+   * @param int $countryID
+   *
+   * @return array
+   *   array of all State/Province abbreviations for the given country.
+   */
+  public static function stateProvinceAbbreviationForCountry($countryID) {
+    if (!isset(\Civi::$statics[__CLASS__]['stateProvinceAbbreviationForCountry'][$countryID])) {
+      \Civi::$statics[__CLASS__]['stateProvinceAbbreviationForCountry'][$countryID] = array();
+    }
+    self::populate(\Civi::$statics[__CLASS__]['stateProvinceAbbreviationForCountry'][$countryID], 'CRM_Core_DAO_StateProvince', TRUE, 'abbreviation', 'is_active', "country_id = " . (int) $countryID, 'abbreviation');
+    return \Civi::$statics[__CLASS__]['stateProvinceAbbreviationForCountry'][$countryID];
+  }
+
+  /**
+   * Get all the State/Province abbreviations from the database for the default country.
+   *
+   * @return array
+   *   array of all State/Province abbreviations for the given country.
+   */
+  public static function stateProvinceAbbreviationForDefaultCountry() {
+    return CRM_Core_PseudoConstant::stateProvinceAbbreviationForCountry(Civi::settings()->get('defaultContactCountry'));
+  }
+
+  /**
    * Get all the countries from database.
    *
    * The static array country is returned, and if it's
