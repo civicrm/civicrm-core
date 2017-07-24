@@ -151,16 +151,11 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
       $params['source'] = $params['contact_source'];
     }
 
-    // Fix for preferred communication method.
-    $prefComm = CRM_Utils_Array::value('preferred_communication_method', $params, '');
-    if ($prefComm && is_array($prefComm)) {
+    if (isset($params['preferred_communication_method']) && is_array($params['preferred_communication_method'])) {
+      CRM_Utils_Array::formatArrayKeys($params['preferred_communication_method']);
+      $contact->preferred_communication_method = CRM_Utils_Array::implodePadded($params['preferred_communication_method']);
       unset($params['preferred_communication_method']);
-
-      CRM_Utils_Array::formatArrayKeys($prefComm);
-      $prefComm = CRM_Utils_Array::implodePadded($prefComm);
     }
-
-    $contact->preferred_communication_method = $prefComm;
 
     $allNull = $contact->copyValues($params);
 

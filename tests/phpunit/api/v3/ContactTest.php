@@ -237,7 +237,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
   }
 
-
   /**
    * Verify that attempt to create contact with empty params fails.
    */
@@ -1713,6 +1712,29 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->assertEquals('man2@yahoo.com', $result['values'][$result['id']]['email']);
 
     $this->callAPISuccess('contact', 'delete', $contact);
+  }
+
+  /**
+   * Ensure consistent return format for option group fields.
+   */
+  public function testSetPreferredCommunicationNull() {
+    $contact = $this->callAPISuccess('contact', 'create', array_merge($this->_params, array(
+      'preferred_communication_method' => array('Phone', 'SMS'),
+    )));
+    $preferredCommunicationMethod = $this->callAPISuccessGetValue('Contact', array(
+      'id' => $contact['id'],
+      'return' => 'preferred_communication_method',
+    ));
+    $this->assertNotEmpty($preferredCommunicationMethod);
+    $contact = $this->callAPISuccess('contact', 'create', array_merge($this->_params, array(
+      'preferred_communication_method' => 'null',
+      'id' => $contact['id'],
+    )));
+    $preferredCommunicationMethod = $this->callAPISuccessGetValue('Contact', array(
+      'id' => $contact['id'],
+      'return' => 'preferred_communication_method',
+    ));
+    $this->assertEmpty($preferredCommunicationMethod);
   }
 
   /**
