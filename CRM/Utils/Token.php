@@ -1235,7 +1235,7 @@ class CRM_Utils_Token {
       }
     }
 
-    $details = CRM_Contact_BAO_Query::apiQuery($params, $returnProperties, NULL, NULL, 0, count($contactIDs));
+    $details = CRM_Contact_BAO_Query::apiQuery($params, $returnProperties, NULL, NULL, 0, count($contactIDs), TRUE, FALSE, TRUE, CRM_Contact_BAO_Query::MODE_CONTACTS, NULL, TRUE);
 
     $contactDetails = &$details[0];
 

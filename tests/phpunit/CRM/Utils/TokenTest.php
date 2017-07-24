@@ -16,27 +16,44 @@ class CRM_Utils_TokenTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test for replaceGreetingTokens.
+   * Test getting contacts w/o primary location type
    *
+   * Check for situation described in CRM-19876.
    */
-  public function testReplaceGreetingTokens() {
-    $tokenString = 'First Name: {contact.first_name} Last Name: {contact.last_name} Birth Date: {contact.birth_date} Prefix: {contact.prefix_id} Suffix: {contact.individual_suffix}';
-    $contactDetails = array(
-      array(
-        2811 => array(
-          'id' => '2811',
-          'contact_type' => 'Individual',
-          'first_name' => 'Morticia',
-          'last_name' => 'Addams',
-          'prefix_id' => 2,
-        ),
-      ),
-    );
-    $contactId = 2811;
-    $className = 'CRM_Contact_BAO_Contact';
-    $escapeSmarty = TRUE;
-    CRM_Utils_Token::replaceGreetingTokens($tokenString, $contactDetails, $contactId, $className, $escapeSmarty);
-    $this->assertEquals($tokenString, 'First Name: Morticia Last Name: Addams Birth Date:  Prefix: Ms. Suffix: ');
+  public function testSearchByPrimaryLocation() {
+    // Disable searchPrimaryDetailsOnly civi settings so we could test the functionality without it.
+    Civi::settings()->set('searchPrimaryDetailsOnly', '0');
+
+    // create a contact with multiple email address and among which one is primary
+    $contactID = $this->individualCreate();
+    $primaryEmail = uniqid() . '@primary.com';
+    $this->callAPISuccess('Email', 'create', array(
+      'contact_id' => $contactID,
+      'email' => $primaryEmail,
+      'location_type_id' => 'Other',
+      'is_primary' => 1,
+    ));
+    $this->callAPISuccess('Email', 'create', array(
+      'contact_id' => $contactID,
+      'email' => uniqid() . '@galaxy.com',
+      'location_type_id' => 'Work',
+      'is_primary' => 0,
+    ));
+    $this->callAPISuccess('Email', 'create', array(
+      'contact_id' => $contactID,
+      'email' => uniqid() . '@galaxy.com',
+      'location_type_id' => 'Work',
+      'is_primary' => 0,
+    ));
+
+    $contactIDs = array($contactID);
+
+    // when we are fetching contact details ON basis of primary address fields
+    $contactDetails = CRM_Utils_Token::getTokenDetails($contactIDs);
+    $this->assertEquals($primaryEmail, $contactDetails[0][$contactID]['email']);
+
+    // restore setting
+    Civi::settings()->set('searchPrimaryDetailsOnly', '1');
   }
 
   /**
