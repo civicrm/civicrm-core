@@ -249,7 +249,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
     $dataPatterns = $this->get('dataPatterns');
     $hasLocationTypes = $this->get('fieldTypes');
 
-    $this->_location_types = array_merge(array('Primary' => ts('Primary')), CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id'));
+    $this->_location_types = array('Primary' => ts('Primary')) + CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
     $defaultLocationType = CRM_Core_BAO_LocationType::getDefault();
 
     // Pass default location to js
