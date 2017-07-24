@@ -405,7 +405,7 @@ class CRM_Pledge_BAO_Query extends CRM_Core_BAO_Query {
         break;
 
       case 'pledge_status':
-        $from .= " $side JOIN civicrm_option_group option_group_pledge_status ON (option_group_pledge_status.name = 'contribution_status')";
+        $from .= " $side JOIN civicrm_option_group option_group_pledge_status ON (option_group_pledge_status.name = 'pledge_status')";
         $from .= " $side JOIN civicrm_option_value pledge_status ON (civicrm_pledge.status_id = pledge_status.value AND option_group_pledge_status.id = pledge_status.option_group_id ) ";
         break;
 

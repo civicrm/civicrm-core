@@ -495,7 +495,7 @@ GROUP BY  currency
             'honor_type' => CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_ContributionSoft', 'soft_credit_type_id', $honorDAO->soft_credit_type_id),
             'honorId' => $pledgeDAO->contact_id,
             'amount' => $pledgeDAO->amount,
-            'status' => CRM_Contribute_PseudoConstant::contributionStatus($pledgeDAO->status_id),
+            'status' => CRM_Core_PseudoConstant::getLabel('CRM_Pledge_BAO_Pledge', 'status_id', $pledgeDAO->status_id),
             'create_date' => $pledgeDAO->create_date,
             'acknowledge_date' => $pledgeDAO->acknowledge_date,
             'type' => CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType',
@@ -790,7 +790,9 @@ GROUP BY  currency
    */
   public static function getContactPledges($contactID) {
     $pledgeDetails = array();
-    $pledgeStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+    $pledgeStatuses = CRM_Core_OptionGroup::values('pledge_status',
+      FALSE, FALSE, FALSE, NULL, 'name'
+    );
 
     $status = array();
 

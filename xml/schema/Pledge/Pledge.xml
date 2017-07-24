@@ -290,9 +290,9 @@
     <export>false</export>
     <type>int unsigned</type>
     <pseudoconstant>
-      <optionGroupName>contribution_status</optionGroupName>
+      <optionGroupName>pledge_status</optionGroupName>
     </pseudoconstant>
-    <comment>Implicit foreign key to civicrm_option_values in the contribution_status option group.</comment>
+    <comment>Implicit foreign key to civicrm_option_values in the pledge_status option group.</comment>
     <add>2.1</add>
   </field>
   <index>

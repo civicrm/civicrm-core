@@ -199,8 +199,11 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
       'start_date' => 'first saturday of march last year',
     );
     $this->_pledge = $this->callAPISuccess('pledge', 'create', array_merge($this->_params, $overdueParams));
+    $pledgeStatuses = CRM_Core_OptionGroup::values('pledge_status',
+      FALSE, FALSE, FALSE, NULL, 'name'
+    );
     $params = array(
-      'pledge_status_id' => '6',
+      'pledge_status_id' => array_search('Overdue', $pledgeStatuses),
     );
     $result = $this->callAPISuccess('pledge', 'get', $params);
     $emptyResult = $this->callAPISuccess('pledge', 'get', array(
