@@ -537,6 +537,82 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
   }
 
   /**
+   * Resolve a state province string (UT or Utah) to an ID.
+   *
+   * If country has been passed in we should select a state belonging to that country.
+   *
+   * Alternatively we should choose from enabled countries, prioritising the default country.
+   *
+   * @param array $values
+   * @param int|NULL $countryID
+   *
+   * @return int|null
+   */
+  protected static function resolveStateProvinceID($values, $countryID) {
+
+    if ($countryID) {
+      $stateProvinceList = CRM_Core_PseudoConstant::stateProvinceForCountry($countryID);
+      if (CRM_Utils_Array::lookupValue($values,
+        'state_province',
+        $stateProvinceList,
+        TRUE
+      )) {
+        return $values['state_province_id'];
+      }
+      $stateProvinceList = CRM_Core_PseudoConstant::stateProvinceForCountry($countryID, 'abbreviation');
+      if (CRM_Utils_Array::lookupValue($values,
+        'state_province',
+        $stateProvinceList,
+        TRUE
+      )) {
+        return $values['state_province_id'];
+      }
+      return NULL;
+    }
+    else {
+      // The underlying lookupValue function needs some de-fanging. Until that has been unravelled we
+      // continue to resolve stateprovince lists in descending order of preference & just 'keep trying'.
+      // prefer matching country..
+      $stateProvinceList = CRM_Core_BAO_Address::buildOptions('state_province_id', NULL, array('country_id' => Civi::settings()->get('defaultContactCountry')));
+      if (CRM_Utils_Array::lookupValue($values,
+        'state_province',
+        $stateProvinceList,
+        TRUE
+      )) {
+        return $values['state_province_id'];
+      }
+
+      $stateProvinceList = CRM_Core_PseudoConstant::stateProvince();
+      if (CRM_Utils_Array::lookupValue($values,
+        'state_province',
+        $stateProvinceList,
+        TRUE
+      )) {
+        return $values['state_province_id'];
+      }
+
+      $stateProvinceList = CRM_Core_PseudoConstant::stateProvinceAbbreviationForDefaultCountry();
+      if (CRM_Utils_Array::lookupValue($values,
+        'state_province',
+        $stateProvinceList,
+        TRUE
+      )) {
+        return $values['state_province_id'];
+      }
+      $stateProvinceList = CRM_Core_PseudoConstant::stateProvinceAbbreviation();
+      if (CRM_Utils_Array::lookupValue($values,
+        'state_province',
+        $stateProvinceList,
+        TRUE
+      )) {
+        return $values['state_province_id'];
+      }
+    }
+
+    return NULL;
+  }
+
+  /**
    * Create last viewed link to recently updated contact.
    *
    * @param array $crudLinkSpec
@@ -580,10 +656,15 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
   /**
    * Get the values for pseudoconstants for name->value and reverse.
    *
+   * @deprecated
+   *
+   * This is called specifically from the contact import parser & should be moved there
+   * as it is not truly a generic function.
+   *
    * @param array $defaults
    *   (reference) the default values, some of which need to be resolved.
    * @param bool $reverse
-   *   True if we want to resolve the values in the reverse direction (value -> name).
+   *   Always true as this function is only called from one place..
    */
   public static function resolveDefaults(&$defaults, $reverse = FALSE) {
     // Hack for birth_date.
@@ -639,36 +720,9 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
               $reverse
             );
           }
-
-          // CRM-7597
-          // if we find a country id above, we need to restrict it to that country
-          // rather than the list of all countries
-
-          if (!empty($values['country_id'])) {
-            $stateProvinceList = CRM_Core_PseudoConstant::stateProvinceForCountry($values['country_id']);
-          }
-          else {
-            $stateProvinceList = CRM_Core_PseudoConstant::stateProvince();
-          }
-          if (!CRM_Utils_Array::lookupValue($values,
-              'state_province',
-              $stateProvinceList,
-              $reverse
-            ) &&
-            $reverse
-          ) {
-
-            if (!empty($values['country_id'])) {
-              $stateProvinceList = CRM_Core_PseudoConstant::stateProvinceForCountry($values['country_id'], 'abbreviation');
-            }
-            else {
-              $stateProvinceList = CRM_Core_PseudoConstant::stateProvinceAbbreviation();
-            }
-            CRM_Utils_Array::lookupValue($values,
-              'state_province',
-              $stateProvinceList,
-              $reverse
-            );
+          $stateProvinceID = self::resolveStateProvinceID($values, CRM_Utils_Array::value('country_id', $values));
+          if ($stateProvinceID) {
+            $values['state_province_id'] = $stateProvinceID;
           }
 
           if (!empty($values['state_province_id'])) {
