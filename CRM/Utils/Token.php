@@ -1571,7 +1571,7 @@ class CRM_Utils_Token {
 
   /**
    * @param int $caseId
-   * @param int $str
+   * @param string $str
    * @param array $knownTokens
    * @param bool $escapeSmarty
    * @return string
@@ -1841,7 +1841,7 @@ class CRM_Utils_Token {
       else {
         $split = explode('.', trim($k, '{}'));
         if (isset($split[1])) {
-          $entity = array_key_exists($split[1], CRM_Core_DAO_Address::export()) ? 'Address' : ucfirst($split[0]);
+          $entity = array_key_exists($split[1], CRM_Core_DAO_Address::export()) ? 'Address' : ucwords(str_replace('_', ' ', $split[0]));
         }
         else {
           $entity = 'Contact';

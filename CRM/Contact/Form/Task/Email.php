@@ -168,6 +168,9 @@ class CRM_Contact_Form_Task_Email extends CRM_Contact_Form_Task {
    */
   public function listTokens() {
     $tokens = CRM_Core_SelectValues::contactTokens();
+    if ($this->getVar('_caseId')) {
+      $tokens = array_merge($tokens, CRM_Core_SelectValues::caseTokens());
+    }
     return $tokens;
   }
 

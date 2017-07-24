@@ -1427,6 +1427,7 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
    *   The additional information of CC and BCC appended to the activity Details.
    * @param array $contributionIds
    * @param int $campaignId
+   * @param int $caseId
    *
    * @return array
    *   ( sent, activityId) if any email is sent and activityId
@@ -1445,7 +1446,8 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
     $contactIds = NULL,
     $additionalDetails = NULL,
     $contributionIds = NULL,
-    $campaignId = NULL
+    $campaignId = NULL,
+    $caseId = NULL
   ) {
     // get the contact details of logged in contact, which we set as from email
     if ($userID == NULL) {
@@ -1601,6 +1603,12 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
       }
       else {
         $tokenHtml = NULL;
+      }
+
+      if ($caseId) {
+        $tokenSubject = CRM_Utils_Token::replaceCaseTokens($caseId, $tokenSubject, $subjectToken, $escapeSmarty);
+        $tokenText = CRM_Utils_Token::replaceCaseTokens($caseId, $tokenText, $messageToken, $escapeSmarty);
+        $tokenHtml = CRM_Utils_Token::replaceCaseTokens($caseId, $tokenHtml, $messageToken, $escapeSmarty);
       }
 
       if (defined('CIVICRM_MAIL_SMARTY') && CIVICRM_MAIL_SMARTY) {
