@@ -454,6 +454,42 @@ class CRM_Contact_Imports_Parser_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * CRM-19888 default country should be used if ambigous.
+   */
+  public function testImportAmbiguousStateCountry() {
+    $countries = CRM_Core_PseudoConstant::country(FALSE, FALSE);
+    $this->callAPISuccess('Setting', 'create', array('countryLimit' => array(array_search('United States', $countries), array_search('Guyana', $countries), array_search('Netherlands', $countries))));
+    $this->callAPISuccess('Setting', 'create', array('provinceLimit' => array(array_search('United States', $countries), array_search('Guyana', $countries), array_search('Netherlands', $countries))));
+    $mapper = array(0 => NULL, 1 => NULL, 2 => 'Primary', 3 => NULL);
+    list($contactValues) = $this->setUpBaseContact();
+    $fields = array_keys($contactValues);
+    $addressValues = array(
+      'street_address' => 'PO Box 2716',
+      'city' => 'Midway',
+      'state_province' => 'UT',
+      'postal_code' => 84049,
+      'country' => 'United States',
+    );
+    $locationTypes = $this->callAPISuccess('Address', 'getoptions', array('field' => 'location_type_id'));
+    $locationTypes = $locationTypes['values'];
+    foreach ($addressValues as $field => $value) {
+      $contactValues['home_' . $field] = $value;
+      $mapper[] = array_search('Home', $locationTypes);
+      $contactValues['work_' . $field] = $value;
+      $mapper[] = array_search('Work', $locationTypes);
+      $fields[] = $field;
+      $fields[] = $field;
+    }
+    $contactValues['work_country'] = '';
+
+    $this->runImport($contactValues, CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Import_Parser::VALID, $mapper, $fields);
+    $addresses = $this->callAPISuccess('Address', 'get', array('contact_id' => array('>' => 2), 'sequential' => 1));
+    $this->assertEquals(2, $addresses['count']);
+    $this->assertEquals(array_search('United States', $countries), $addresses['values'][0]['country_id']);
+    $this->assertEquals(array_search('United States', $countries), $addresses['values'][1]['country_id']);
+  }
+
+  /**
    * Run the import parser.
    *
    * @param array $originalValues

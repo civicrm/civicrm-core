@@ -551,30 +551,64 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
 
     if ($countryID) {
       $stateProvinceList = CRM_Core_PseudoConstant::stateProvinceForCountry($countryID);
+      if (CRM_Utils_Array::lookupValue($values,
+        'state_province',
+        $stateProvinceList,
+        TRUE
+      )) {
+        return $values['state_province_id'];
+      }
+      $stateProvinceList = CRM_Core_PseudoConstant::stateProvinceForCountry($countryID, 'abbreviation');
+      if (CRM_Utils_Array::lookupValue($values,
+        'state_province',
+        $stateProvinceList,
+        TRUE
+      )) {
+        return $values['state_province_id'];
+      }
+      return NULL;
     }
     else {
+      // The underlying lookupValue function needs some de-fanging. Until that has been unravelled we
+      // continue to resolve stateprovince lists in descending order of preference & just 'keep trying'.
+      // prefer matching country..
+      $stateProvinceList = CRM_Core_BAO_Address::buildOptions('state_province_id', NULL, array('country_id' => Civi::settings()->get('defaultContactCountry')));
+      if (CRM_Utils_Array::lookupValue($values,
+        'state_province',
+        $stateProvinceList,
+        TRUE
+      )) {
+        return $values['state_province_id'];
+      }
+
       $stateProvinceList = CRM_Core_PseudoConstant::stateProvince();
-    }
-    if (CRM_Utils_Array::lookupValue($values,
-      'state_province',
-      $stateProvinceList,
-      TRUE
-    )) {
-      return $values['state_province_id'];
+      if (CRM_Utils_Array::lookupValue($values,
+        'state_province',
+        $stateProvinceList,
+        TRUE
+      )) {
+        return $values['state_province_id'];
+      }
+
+      $stateProvinceList = CRM_Core_PseudoConstant::stateProvinceAbbreviationForDefaultCountry();
+      if (CRM_Utils_Array::lookupValue($values,
+        'state_province',
+        $stateProvinceList,
+        TRUE
+      )) {
+        return $values['state_province_id'];
+      }
+      $stateProvinceList = CRM_Core_PseudoConstant::stateProvinceAbbreviation();
+      if (CRM_Utils_Array::lookupValue($values,
+        'state_province',
+        $stateProvinceList,
+        TRUE
+      )) {
+        return $values['state_province_id'];
+      }
     }
 
-    if (!empty($countryID)) {
-      $stateProvinceList = CRM_Core_PseudoConstant::stateProvinceForCountry($countryID, 'abbreviation');
-    }
-    else {
-      $stateProvinceList = CRM_Core_PseudoConstant::stateProvinceAbbreviation();
-    }
-    CRM_Utils_Array::lookupValue($values,
-      'state_province',
-      $stateProvinceList,
-      TRUE
-    );
-    return CRM_Utils_Array::value('state_province_id', $values);
+    return NULL;
   }
 
   /**
@@ -685,7 +719,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
               $reverse
             );
           }
-          $stateProvinceID = self::resolveStateProvinceID($values, CRM_Utils_Array::value('country_id', $values), $reverse);
+          $stateProvinceID = self::resolveStateProvinceID($values, CRM_Utils_Array::value('country_id', $values));
           if ($stateProvinceID) {
             $values['state_province_id'] = $stateProvinceID;
           }
