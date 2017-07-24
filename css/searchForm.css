@@ -59,4 +59,6 @@
 /* CRM-20945 Remove underline to show active pager */
 .crm-container #alpha-filter a.active {
   border-bottom: none;
+  color: #41477E;
+  font-weight: bold;
 }
