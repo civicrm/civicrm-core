@@ -143,7 +143,7 @@ class CRM_Contact_Import_ImportJob {
     $phoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
     $imProviders = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
     $websiteTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Website', 'website_type_id');
-    $locationTypes = array_merge(array('Primary' => ts('Primary')), CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id'));
+    $locationTypes = array('Primary' => ts('Primary')) + CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
 
     foreach ($mapper as $key => $value) {
 
