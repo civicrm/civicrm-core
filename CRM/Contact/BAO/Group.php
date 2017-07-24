@@ -1073,7 +1073,7 @@ FROM   civicrm_group
 WHERE  id IN $groupIdString
 ";
     if ($parents) {
-      // group can have > 1 parent so parents may be comma separated list (eg. '1,2,5'). We just grab and match on 1st parent.
+      // group can have > 1 parent so parents may be comma separated list (eg. '1,2,5').
       $parentArray = explode(',', $parents);
       $parent = self::filterActiveGroups($parentArray);
       $args[2] = array($parent, 'Integer');
