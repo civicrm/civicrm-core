@@ -1073,6 +1073,12 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     if (empty($this->_id) && !empty($contribution->id)) {
       $this->_id = $contribution->id;
     }
+    if (!empty($this->_id) && CRM_Core_Permission::access('CiviMember')) {
+      $membershipPayments = civicrm_api3('MembershipPayment', 'Get', array('contribution_id' => $this->_id));
+      if ($membershipPayments['count'] > 1) {
+        $this->ajaxResponse['updateTabs']['#tab_member'] = CRM_Contact_BAO_Contact::getCountComponent('membership', $this->_contactID);
+      }
+    }
   }
 
   /**
