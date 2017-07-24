@@ -96,19 +96,14 @@ class CRM_Contribute_BAO_ManagePremiums extends CRM_Contribute_DAO_Product {
    * @return CRM_Contribute_DAO_Product
    */
   public static function add(&$params, &$ids) {
-    $defaults = array(
+    $params = array_merge(array(
       'id' => CRM_Utils_Array::value('premium', $ids),
-      'image' => '',
-      'thumbnail' => '',
-      'is_active' => FALSE,
+      'image' => CRM_Utils_String::simplifyURL(CRM_Utils_Array::value('image', $params, ''), TRUE),
+      'thumbnail' => CRM_Utils_String::simplifyURL(CRM_Utils_Array::value('thumbnail', $params, ''), TRUE),
+      'is_active' => 0,
       'is_deductible' => FALSE,
       'currency' => CRM_Core_Config::singleton()->defaultCurrency,
-    );
-    $params = array_merge($defaults, $params);
-
-    // Use local URLs for images when possible
-    $params['image'] = CRM_Utils_String::simplifyURL($params['image'], TRUE);
-    $params['thumbnail'] = CRM_Utils_String::simplifyURL($params['thumbnail'], TRUE);
+    ), $params);
 
     // Save and return
     $premium = new CRM_Contribute_DAO_Product();

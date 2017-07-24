@@ -250,7 +250,6 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
    * @return array
    */
   public function simplifyURLProvider() {
-
     $config = CRM_Core_Config::singleton();
     $urlParts = parse_url($config->userFrameworkBaseURL);
     $localDomain = $urlParts['host'];
@@ -262,51 +261,37 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
     }
 
     return array(
-
-      'prototypical example' =>
-      array(
+      'prototypical example' => array(
         "https://$localDomain/sites/default/files/coffee-mug.jpg",
         FALSE,
         '/sites/default/files/coffee-mug.jpg',
       ),
-
-      'external domain with https' =>
-      array(
+      'external domain with https' => array(
         "https://$externalDomain/sites/default/files/coffee-mug.jpg",
         FALSE,
         "https://$externalDomain/sites/default/files/coffee-mug.jpg",
       ),
-
-      'external domain with http forced to https' =>
-      array(
+      'external domain with http forced to https' => array(
         "http://$externalDomain/sites/default/files/coffee-mug.jpg",
         TRUE,
         "https://$externalDomain/sites/default/files/coffee-mug.jpg",
       ),
-
-      'external domain with http not forced' =>
-      array(
+      'external domain with http not forced' => array(
         "http://$externalDomain/sites/default/files/coffee-mug.jpg",
         FALSE,
         "http://$externalDomain/sites/default/files/coffee-mug.jpg",
       ),
-
-      'local URL' =>
-      array(
+      'local URL' => array(
         "/sites/default/files/coffee-mug.jpg",
         FALSE,
         "/sites/default/files/coffee-mug.jpg",
       ),
-
-      'local URL without a forward slash' =>
-      array(
+      'local URL without a forward slash' => array(
         "sites/default/files/coffee-mug.jpg",
         FALSE,
         "/sites/default/files/coffee-mug.jpg",
       ),
-
-      'empty input' =>
-      array(
+      'empty input' => array(
         '',
         FALSE,
         '',
@@ -334,27 +319,21 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
    */
   public function parseURLProvider() {
     return array(
-
-      "prototypical example" =>
-      array(
+      "prototypical example" => array(
         "https://example.com:8000/foo/bar/?id=1#fragment",
         array(
           'host+port' => "example.com:8000",
           'path+query' => "/foo/bar/?id=1",
         ),
       ),
-
-      "empty" =>
-      array(
+      "empty" => array(
         "",
         array(
           'host+port' => "",
           'path+query' => "",
         ),
       ),
-
-      "path only" =>
-      array(
+      "path only" => array(
         "/foo/bar/image.png",
         array(
           'host+port' => "",
