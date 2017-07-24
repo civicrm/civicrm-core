@@ -1235,6 +1235,7 @@ class CRM_Utils_Token {
       }
     }
 
+    $params['search_by_primary_details_only'] = CRM_Utils_Array::value('search_by_primary_details_only', $params, TRUE);
     $query = new CRM_Contact_BAO_Query($params, $returnProperties);
 
     $details = $query->apiQuery($params, $returnProperties, NULL, NULL, 0, count($contactIDs));

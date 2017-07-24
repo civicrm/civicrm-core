@@ -405,6 +405,12 @@ class CRM_Contact_BAO_Query {
   public $_pseudoConstantsSelect = array();
 
   /**
+   * Set to true when address fields will be always on basis of primary location type
+   * @var Boolean
+   */
+  static $_alwaysSearchByPrimaryOnly = FALSE;
+
+  /**
    * Class constructor which also does all the work.
    *
    * @param array $params
@@ -435,6 +441,11 @@ class CRM_Contact_BAO_Query {
     if ($this->_params == NULL) {
       $this->_params = array();
     }
+
+    // Search by Primary location type ONLY if searchPrimaryDetailsOnly setting is on OR
+    //  search query is trigerred via api OR
+    //  special parameter search_by_primary_details_only = TRUE
+    self::$_alwaysSearchByPrimaryOnly = (Civi::settings()->get('searchPrimaryDetailsOnly') || $apiEntity || !empty($params['search_by_primary_details_only']));
 
     if ($returnProperties === self::NO_RETURN_PROPERTIES) {
       $this->_returnProperties = array();
@@ -2633,10 +2644,9 @@ class CRM_Contact_BAO_Query {
         }
         continue;
       }
-      $searchPrimary = '';
-      if (Civi::settings()->get('searchPrimaryDetailsOnly') || $apiEntity) {
-        $searchPrimary = "AND {$name}.is_primary = 1";
-      }
+
+      $searchPrimary = self::$_alwaysSearchByPrimaryOnly ? "AND {$name}.is_primary = 1" : '';
+
       switch ($name) {
         case 'civicrm_address':
           //CRM-14263 further handling of address joins further down...
