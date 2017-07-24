@@ -1,28 +1,29 @@
 <?php
+
 /*
- +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
- |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
- +--------------------------------------------------------------------+
+  +--------------------------------------------------------------------+
+  | CiviCRM version 4.7                                                |
+  +--------------------------------------------------------------------+
+  | Copyright CiviCRM LLC (c) 2004-2017                                |
+  +--------------------------------------------------------------------+
+  | This file is a part of CiviCRM.                                    |
+  |                                                                    |
+  | CiviCRM is free software; you can copy, modify, and distribute it  |
+  | under the terms of the GNU Affero General Public License           |
+  | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+  |                                                                    |
+  | CiviCRM is distributed in the hope that it will be useful, but     |
+  | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+  | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+  | See the GNU Affero General Public License for more details.        |
+  |                                                                    |
+  | You should have received a copy of the GNU Affero General Public   |
+  | License and the CiviCRM Licensing Exception along                  |
+  | with this program; if not, contact CiviCRM LLC                     |
+  | at info[AT]civicrm[DOT]org. If you have questions about the        |
+  | GNU Affero General Public License or the licensing of CiviCRM,     |
+  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+  +--------------------------------------------------------------------+
  */
 
 /**
@@ -222,8 +223,7 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
     //check for object update
     $this->assertEquals(TRUE, $result);
     //check for is_active
-    $this->assertDBCompareValue('CRM_Core_DAO_CustomGroup', $customGroupId, 'is_active', 'id', 1,
-      'Database check for custom group is_active field.'
+    $this->assertDBCompareValue('CRM_Core_DAO_CustomGroup', $customGroupId, 'is_active', 'id', 1, 'Database check for custom group is_active field.'
     );
 
     $this->customGroupDelete($customGroup['id']);
@@ -279,8 +279,7 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
     $customFieldId = $customField['id'];
 
     $groupTree = CRM_Core_BAO_CustomGroup::getGroupDetail($customGroupId);
-    $this->assertDBNotNull('CRM_Core_DAO_CustomGroup', $customGroupId, 'title', 'id',
-      'Database check for custom group record.'
+    $this->assertDBNotNull('CRM_Core_DAO_CustomGroup', $customGroupId, 'title', 'id', 'Database check for custom group record.'
     );
     //check retieve values of custom group
     unset($groupParams['is_active']);
@@ -355,8 +354,7 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
 
     // Check it worked!
     $this->assertEquals(TRUE, $isDelete);
-    $this->assertDBNull('CRM_Core_DAO_CustomGroup', $customGroup['id'], 'title', 'id',
-      'Database check for custom group record.'
+    $this->assertDBNull('CRM_Core_DAO_CustomGroup', $customGroup['id'], 'title', 'id', 'Database check for custom group record.'
     );
   }
 
@@ -383,12 +381,10 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
     $customGroupId = $customGroup->id;
 
     //check db for custom group.
-    $dbCustomGroupTitle = $this->assertDBNotNull('CRM_Core_DAO_CustomGroup', $customGroupId, 'title', 'id',
-      'Database check for custom group record.'
+    $dbCustomGroupTitle = $this->assertDBNotNull('CRM_Core_DAO_CustomGroup', $customGroupId, 'title', 'id', 'Database check for custom group record.'
     );
     //check for custom group table name
-    $this->assertDBCompareValue('CRM_Core_DAO_CustomGroup', $customGroupId, 'table_name', 'id',
-      $tableName, 'Database check for custom group table name.'
+    $this->assertDBCompareValue('CRM_Core_DAO_CustomGroup', $customGroupId, 'table_name', 'id', $tableName, 'Database check for custom group table name.'
     );
 
     $this->customGroupDelete($customGroup->id);
@@ -429,8 +425,7 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
     $customFieldId = $customField['id'];
 
     //check db for custom field
-    $dbCustomFieldLabel = $this->assertDBNotNull('CRM_Core_DAO_CustomField', $customFieldId, 'label', 'id',
-      'Database check for custom field record.'
+    $dbCustomFieldLabel = $this->assertDBNotNull('CRM_Core_DAO_CustomField', $customFieldId, 'label', 'id', 'Database check for custom field record.'
     );
     $this->assertEquals($customFieldLabel, $dbCustomFieldLabel);
 
@@ -501,16 +496,13 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
     );
     $customGroup = CRM_Core_BAO_CustomGroup::create($params);
 
-    $dbCustomGroupTitle = $this->assertDBNotNull('CRM_Core_DAO_CustomGroup', $customGroup->id, 'title', 'id',
-      'Database check for custom group record.'
+    $dbCustomGroupTitle = $this->assertDBNotNull('CRM_Core_DAO_CustomGroup', $customGroup->id, 'title', 'id', 'Database check for custom group record.'
     );
     $this->assertEquals($params['title'], $dbCustomGroupTitle);
 
-    $dbCustomGroupTableName = $this->assertDBNotNull('CRM_Core_DAO_CustomGroup', $customGroup->id, 'table_name', 'id',
-      'Database check for custom group record.'
+    $dbCustomGroupTableName = $this->assertDBNotNull('CRM_Core_DAO_CustomGroup', $customGroup->id, 'table_name', 'id', 'Database check for custom group record.'
     );
-    $this->assertEquals(strtolower("civicrm_value_{$params['name']}_{$customGroup->id}"), $dbCustomGroupTableName,
-      "The table name should be suffixed with '_ID' unless specified.");
+    $this->assertEquals(strtolower("civicrm_value_{$params['name']}_{$customGroup->id}"), $dbCustomGroupTableName, "The table name should be suffixed with '_ID' unless specified.");
 
     $this->customGroupDelete($customGroup->id);
   }
@@ -533,13 +525,11 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
     );
     $customGroup = CRM_Core_BAO_CustomGroup::create($params);
 
-    $dbCustomGroupTitle = $this->assertDBNotNull('CRM_Core_DAO_CustomGroup', $customGroup->id, 'title', 'id',
-      'Database check for custom group record.'
+    $dbCustomGroupTitle = $this->assertDBNotNull('CRM_Core_DAO_CustomGroup', $customGroup->id, 'title', 'id', 'Database check for custom group record.'
     );
     $this->assertEquals($params['title'], $dbCustomGroupTitle);
 
-    $dbCustomGroupTableName = $this->assertDBNotNull('CRM_Core_DAO_CustomGroup', $customGroup->id, 'table_name', 'id',
-      'Database check for custom group record.'
+    $dbCustomGroupTableName = $this->assertDBNotNull('CRM_Core_DAO_CustomGroup', $customGroup->id, 'table_name', 'id', 'Database check for custom group record.'
     );
     $this->assertEquals($params['table_name'], $dbCustomGroupTableName);
 
@@ -611,6 +601,56 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
 
     $this->assertEquals($groupTitles[$customFieldId]['groupTitle'], 'Test Group', 'Check Group Title.');
     $this->customGroupDelete($customGroup['id']);
+  }
+
+  public function testExtractGetParamsReturnsDatesInIsoFormat() {
+    // Value to be added to URL query string parameters
+    $queryStringValue = '06/13/2017';
+    // Expected value in ISO format.
+    $testValue = '2017-06-13 0:00:00';
+    // Entity which the custom group should extend.
+    $customGroupExtends = 'Individual';
+
+    // Create a custom group to contain the custom field.
+    $groupParams = array(
+      'title' => 'My Custom Group',
+      'name' => 'my_custom_group',
+      'extends' => $customGroupExtends,
+      'help_pre' => 'Custom Group Help Pre',
+      'help_post' => 'Custom Group Help Post',
+      'is_active' => 1,
+      'collapse_display' => 1,
+    );
+    $customGroup = $this->customGroupCreate($groupParams);
+    $customGroupId = $customGroup['id'];
+
+    // Create teh custom field.
+    $fieldParams = array(
+      'custom_group_id' => $customGroupId,
+      'label' => 'My Custom Date Field',
+      'html_type' => 'Select Date',
+      'data_type' => 'Date',
+      'is_required' => 1,
+      'is_searchable' => 0,
+      'is_active' => 1,
+      'default_value' => '',
+    );
+    $customField = $this->customFieldCreate($fieldParams);
+    $customFieldId = $customField['id'];
+
+    // Create a form object. CRM_Core_BAO_CustomGroup::extractGetParams() will
+    // need this, along with the REQUEST_METHOD and controller too.
+    $form = new CRM_Contribute_Form_Contribution();
+    $_SERVER['REQUEST_METHOD'] = 'GET';
+    $form->controller = new CRM_Core_Controller();
+
+    // Set the value in $_GET, then extract query string params with
+    // CRM_Core_BAO_CustomGroup::extractGetParams().
+    $fieldName = 'custom_' . $customFieldId;
+    $_GET[$fieldName] = $queryStringValue;
+    $extractedGetParams = CRM_Core_BAO_CustomGroup::extractGetParams($form, $customGroupExtends);
+
+    $this->assertEquals($extractedGetParams[$fieldName], $testValue);
   }
 
 }
