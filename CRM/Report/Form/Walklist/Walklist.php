@@ -223,7 +223,7 @@ FROM       civicrm_contact {$this->_aliases['civicrm_contact']} {$this->_aclFrom
   }
 
   public function orderBy() {
-    $this->_orderBy = "";
+    $this->_orderBy = array();
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('order_bys', $table)) {
         foreach ($table['order_bys'] as $fieldName => $field) {

@@ -358,7 +358,7 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
   }
 
   public function groupBy() {
-    $this->_groupBy = "";
+    $this->_groupBy = array();
     if (is_array($this->_params['group_bys']) &&
       !empty($this->_params['group_bys'])
     ) {

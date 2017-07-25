@@ -244,7 +244,7 @@ class CRM_Report_Form_Pledge_Summary extends CRM_Report_Form {
   }
 
   public function groupBy() {
-    $this->_groupBy = "";
+    $this->_groupBy = array();
     $append = FALSE;
 
     if (is_array($this->_params['group_bys']) &&
