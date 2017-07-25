@@ -88,6 +88,41 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test process_pledge job log.
+   */
+  public function testProcessPledgeJob() {
+    $pledgeStatuses = CRM_Core_OptionGroup::values('pledge_status',
+      FALSE, FALSE, FALSE, NULL, 'name'
+    );
+    //Make first payment.
+    $paymentParams = array(
+      'contact_id' => $this->_individualId,
+      'pledge_id' => $this->_pledgeID,
+      'contribution_id' => $this->_contributionID,
+      'scheduled_date' => date('Ymd', strtotime("-1 days")),
+      'status_id' => array_search('Pending', $pledgeStatuses),
+    );
+    $firstPayment = $this->callAPISuccess('pledge_payment', 'create', $paymentParams);
+    //Status should be 'Pending' after first incomplete payment.
+    $checkStatus = $this->callAPISuccess('pledge', 'getsingle', array(
+      'id' => $this->_pledgeID,
+      'return' => 'pledge_status',
+    ));
+    $this->assertEquals('Pending', $checkStatus['pledge_status']);
+
+    //Execute process_pledge job log.
+    $result = $this->callAPISuccess('Job', 'process_pledge', array());
+    $this->assertEquals("Checking if status update is needed for Pledge Id: {$this->_pledgeID} (current status is Pending)\n\r- status updated to: Overdue\n\r1 records updated.", $result['values']);
+
+    //Status should be 'Overdue' after processing.
+    $statusAfterProcessing = $this->callAPISuccess('pledge', 'getsingle', array(
+      'id' => $this->_pledgeID,
+      'return' => 'pledge_status',
+    ));
+    $this->assertEquals('Overdue', $statusAfterProcessing['pledge_status']);
+  }
+
+  /**
    * Test status of pledge on payments and cancellation.
    */
   public function testPledgeStatus() {

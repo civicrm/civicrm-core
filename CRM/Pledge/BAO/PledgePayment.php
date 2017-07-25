@@ -349,7 +349,9 @@ WHERE     pledge_id = %1
     $editScheduled = FALSE;
 
     // get all statuses
-    $allStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+    $allStatus = CRM_Core_OptionGroup::values('pledge_status',
+      FALSE, FALSE, FALSE, NULL, 'name', TRUE
+    );
 
     // if we get do not get contribution id means we are editing the scheduled payment.
     if (!empty($paymentIDs)) {
