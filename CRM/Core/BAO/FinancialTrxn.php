@@ -467,9 +467,6 @@ WHERE ceft.entity_id = %1";
     $financialTypeId = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $contributionId, 'financial_type_id');
 
     if ($contributionId && $financialTypeId) {
-      $statusId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
-      $refundStatusId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Refunded');
-
       if (empty($lineItemTotal)) {
         $lineItemTotal = CRM_Price_BAO_LineItem::getLineTotal($contributionId);
       }
@@ -478,7 +475,6 @@ SELECT SUM(ft.total_amount)
 FROM civicrm_financial_trxn ft
   INNER JOIN civicrm_entity_financial_trxn eft ON (ft.id = eft.financial_trxn_id AND eft.entity_table = 'civicrm_contribution' AND eft.entity_id = {$contributionId})
 WHERE ft.is_payment = 1
-  AND ft.status_id IN ({$statusId}, {$refundStatusId})
 ";
 
       $ftTotalAmt = CRM_Core_DAO::singleValueQuery($sqlFtTotalAmt);
@@ -509,15 +505,13 @@ WHERE ft.is_payment = 1
    * @return array
    */
   public static function getTotalPayments($contributionId) {
-    $statusId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
 
     $sql = "SELECT SUM(ft.total_amount) FROM civicrm_financial_trxn ft
       INNER JOIN civicrm_entity_financial_trxn eft ON (eft.financial_trxn_id = ft.id AND eft.entity_table = 'civicrm_contribution')
-      WHERE eft.entity_id = %1 AND ft.is_payment = 1 AND ft.status_id = %2";
+      WHERE eft.entity_id = %1 AND ft.is_payment = 1";
 
     $params = array(
       1 => array($contributionId, 'Integer'),
-      2 => array($statusId, 'Integer'),
     );
 
     return CRM_Core_DAO::singleValueQuery($sql, $params);
