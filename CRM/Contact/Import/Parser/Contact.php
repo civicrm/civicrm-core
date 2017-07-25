@@ -1920,6 +1920,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
       }
       elseif ($key == 'deceased_date' && $val) {
         CRM_Utils_Date::convertToDefaultDate($params, $dateType, $key);
+        $params['is_deceased'] = 1;
       }
       elseif ($key == 'is_deceased' && $val) {
         $params[$key] = CRM_Utils_String::strtoboolstr($val);

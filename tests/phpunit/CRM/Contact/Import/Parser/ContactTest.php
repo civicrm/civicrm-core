@@ -188,6 +188,25 @@ class CRM_Contact_Imports_Parser_ContactTest extends CiviUnitTestCase {
    *
    * @throws \Exception
    */
+  public function testImportDeceased() {
+    list($contactValues) = $this->setUpBaseContact();
+    CRM_Core_Session::singleton()->set("dateTypes", 1);
+    $contactValues['birth_date'] = '1910-12-17';
+    $contactValues['deceased_date'] = '2010-12-17';
+    $this->runImport($contactValues, CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Import_Parser::VALID);
+    $contact = $this->callAPISuccessGetSingle('Contact', $contactValues);
+    $this->assertEquals('1910-12-17', $contact['birth_date']);
+    $this->assertEquals('2010-12-17', $contact['deceased_date']);
+    $this->assertEquals(1, $contact['is_deceased']);
+    $this->callAPISuccess('Contact', 'delete', array('id' => $contact['id']));
+  }
+
+
+  /**
+   * Test that the import parser adds the address to the primary location.
+   *
+   * @throws \Exception
+   */
   public function testImportTwoAddressFirstPrimary() {
     list($contactValues) = $this->setUpBaseContact();
     $contactValues['nick_name'] = 'Old Bill';
