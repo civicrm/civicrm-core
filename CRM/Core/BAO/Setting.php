@@ -199,6 +199,9 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     $fieldsToSet = self::validateSettingsInput($params, $fields);
 
     foreach ($fieldsToSet as $settingField => &$settingValue) {
+      if (empty($fields['values'][$settingField])) {
+        $fields['values'][$settingField] = array();
+      }
       self::validateSetting($settingValue, $fields['values'][$settingField]);
     }
 
