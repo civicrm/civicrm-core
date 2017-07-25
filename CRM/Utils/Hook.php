@@ -25,6 +25,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+
 /**
  *
  * @package CiviCRM_Hook
@@ -2209,7 +2211,8 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
-   * Modify the CiviCRM container - add new services, parameters, extensions, etc.
+   * Modify the CiviCRM container - add new services, parameters, extensions,
+   * etc. For compiler passes @see containerCompilerPass
    *
    * @code
    * use Symfony\Component\Config\Resource\FileResource;
@@ -2229,11 +2232,53 @@ abstract class CRM_Utils_Hook {
    * Note: This is a preboot hook. It will dispatch via the extension/module
    * subsystem but *not* the Symfony EventDispatcher.
    *
-   * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
    * @see http://symfony.com/doc/current/components/dependency_injection/index.html
+   *
+   * @param ContainerBuilder $container
    */
-  public static function container(\Symfony\Component\DependencyInjection\ContainerBuilder $container) {
+  public static function container(ContainerBuilder $container) {
     self::singleton()->invoke(array('container'), $container, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_container');
+  }
+
+  /**
+   * Modify the CiviCRM container before compilation.
+   *
+   * Used for container operations after *all* services have been registered,
+   * but before compilation. For example, gathering tagged services
+   * and registering them in another service.
+   *
+   * @code
+   * use Symfony\Component\DependencyInjection\ContainerBuilder;
+   *
+   * function mymodule_civicrm_container_compile(ContainerBuilder $container) {
+   *   $taggedServices = $container->findTaggedServiceIds('my_tag');
+   *   $myRegister = $container->getDefinition('my_register');
+   *
+   *   foreach ($taggedServices as $serviceId => $attributes) {
+   *     $definition = $container->getDefinition($serviceId);
+   *     $myRegister->addMethodCall('register', $definition);
+   *   }
+   * }
+   * @endcode
+   *
+   * Note: This is a preboot hook. It will dispatch via the extension/module
+   * subsystem but *not* the Symfony EventDispatcher.
+   *
+   * @see https://symfony.com/doc/current/service_container/compiler_passes.html
+   *
+   * @param ContainerBuilder $container
+   */
+  public static function containerCompilerPass(ContainerBuilder $container) {
+    self::singleton()->invoke(
+      array('containerCompilerPass'),
+      $container,
+      self::$_nullObject,
+      self::$_nullObject,
+      self::$_nullObject,
+      self::$_nullObject,
+      self::$_nullObject,
+      'civicrm_containerCompilerPass'
+    );
   }
 
   /**
