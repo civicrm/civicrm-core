@@ -181,11 +181,15 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
     //Record a refund of the remaining amount.
     $submittedValues['total_amount'] = 50;
     CRM_Contribute_BAO_Contribution::recordAdditionalPayment($contribution->id, $submittedValues, 'refund', $participant['id']);
+
+    // record a over paid amount
+    $submittedValues['total_amount'] = 10;
+    CRM_Contribute_BAO_Contribution::recordAdditionalPayment($contribution->id, $submittedValues, 'overpaid', $participant['id']);
     $paymentInfo = CRM_Contribute_BAO_Contribution::getPaymentInfo($participant['id'], 'event', TRUE);
     $transaction = $paymentInfo['transaction'];
 
     //Assert all transaction(owed and refund) are listed on view payments.
-    $this->assertEquals(count($transaction), 3, 'Transaction Details is not proper');
+    $this->assertEquals(count($transaction), 4, 'Transaction Details is not proper');
     $this->assertEquals($transaction[0]['total_amount'], 80.00);
     $this->assertEquals($transaction[0]['status'], 'Completed');
 
@@ -194,6 +198,9 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
 
     $this->assertEquals($transaction[2]['total_amount'], -50.00);
     $this->assertEquals($transaction[2]['status'], 'Refunded');
+
+    $this->assertEquals($transaction[3]['total_amount'], 10.00);
+    $this->assertEquals($transaction[3]['status'], 'Completed');
   }
 
 }

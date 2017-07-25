@@ -92,8 +92,13 @@
       <td class="label">{ts}Total Amount{/ts}</td>
       <td><strong><a class="nowrap bold crm-expand-row" title="{ts}view payments{/ts}"
         href="{crmURL p='civicrm/payment' q="view=transaction&component=contribution&action=browse&cid=`$contact_id`&id=`$contribution_id`&selector=1"}">
-               &nbsp; {$total_amount|crmMoney:$currency}
+               &nbsp; {$total_amount|crmMoney:$currency} &nbsp;
             </strong></a>&nbsp;
+            <a class="action-item crm-hover-button"
+              href="{crmURL p='civicrm/payment' q="reset=1&component=contribution&action=add&cid=`$contact_id`&id=`$contribution_id`"}"
+              title="{ts}Record Payment{/ts}">
+               {ts}Record Payment{/ts}
+            </a>
         {if $contribution_recur_id}
           <strong>{ts}Recurring Contribution{/ts}</strong>
           <br/>

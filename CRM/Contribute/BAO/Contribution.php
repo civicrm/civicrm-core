@@ -3861,7 +3861,27 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     $params['skipLineItem'] = TRUE;
     $trxnsData['trxn_date'] = !empty($trxnsData['trxn_date']) ? $trxnsData['trxn_date'] : date('YmdHis');
     $arAccountId = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($contributionDAO->financial_type_id, 'Accounts Receivable Account is');
-    if ($paymentType == 'owed') {
+    $financialItemPaidStatusID = CRM_Core_PseudoConstant::getKey('CRM_Financial_DAO_FinancialItem', 'status_id', 'Paid');
+    if ($paymentType == 'more than owed') {
+      $params['partial_payment_total'] = $contributionDAO->total_amount + CRM_Utils_Array::value('total_amount', $trxnsData, 0.00);
+      $params['partial_amount_pay'] = CRM_Utils_Array::value('total_amount', $trxnsData, 0.00);
+      $params['pan_truncation'] = CRM_Utils_Array::value('pan_truncation', $trxnsData);
+      $params['card_type_id'] = CRM_Utils_Array::value('card_type_id', $trxnsData);
+      $params['check_number'] = CRM_Utils_Array::value('check_number', $trxnsData);
+      $params['financial_type_id'] = $contributionDAO->financial_type_id;
+      $trxnsData['net_amount'] = !empty($trxnsData['net_amount']) ? $trxnsData['net_amount'] : $trxnsData['total_amount'];
+      $trxnsData['to_financial_account_id'] = CRM_Financial_BAO_FinancialTypeAccount::getInstrumentFinancialAccount($trxnsData['payment_instrument_id']);
+
+      // add financial trxn for the overpaid amount
+      $financialTrxn = CRM_Contribute_BAO_Contribution::recordFinancialAccounts($params, $trxnsData);
+
+      // update contribution
+      $contributionDAO->total_amount += $trxnsData['total_amount'];
+      $contributionDAO->fee_amount += CRM_Utils_Array::value('fee_amount', $trxnsData, 0.00);
+      $contributionDAO->net_amount += $trxnsData['net_amount'];
+      $contributionDAO->save();
+    }
+    elseif ($paymentType == 'owed') {
       $params['partial_payment_total'] = $contributionDAO->total_amount;
       $params['partial_amount_to_pay'] = $trxnsData['total_amount'];
       $trxnsData['net_amount'] = !empty($trxnsData['net_amount']) ? $trxnsData['net_amount'] : $trxnsData['total_amount'];
@@ -3932,15 +3952,12 @@ WHERE eft.entity_table = 'civicrm_contribution'
         }
 
         // update financial item statuses
-        $financialItemStatus = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialItem', 'status_id');
-        $paidStatus = array_search('Paid', $financialItemStatus);
-
         $baseTrxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contributionId);
         $sqlFinancialItemUpdate = "
 UPDATE civicrm_financial_item fi
   LEFT JOIN civicrm_entity_financial_trxn eft
     ON (eft.entity_id = fi.id AND eft.entity_table = 'civicrm_financial_item')
-SET status_id = {$paidStatus}
+SET status_id = {$financialItemPaidStatusID}
 WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
 ";
         CRM_Core_DAO::executeQuery($sqlFinancialItemUpdate);
@@ -3961,7 +3978,6 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
         $contributionDetails = CRM_Core_DAO::setFieldValue('CRM_Contribute_BAO_Contribution', $contributionId, 'contribution_status_id', $statusId);
       }
       // add financial item entry
-      $financialItemStatus = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialItem', 'status_id');
       $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($contributionDAO->id);
       if (!empty($lineItems)) {
         foreach ($lineItems as $lineItemId => $lineItemValue) {
@@ -3974,8 +3990,7 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
             'transaction_date' => $financialTrxn->trxn_date,
             'contact_id' => $contributionDAO->contact_id,
             'amount' => round($paid, 2),
-            'currency' => $contributionDAO->currency,
-            'status_id' => array_search('Paid', $financialItemStatus),
+            'status_id' => $financialItemPaidStatusID,
             'entity_id' => $lineItemId,
             'entity_table' => 'civicrm_line_item',
           );
