@@ -419,29 +419,6 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
    *
    * @param string $rev
    */
-  public function upgrade_4_7_24($rev) {
-    $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
-    if (!empty($invoiceSettings['invoicing']) && !empty($invoiceSettings['invoice_prefix'])) {
-      list($minId, $maxId) = CRM_Core_DAO::executeQuery("SELECT coalesce(min(id),0), coalesce(max(id),0)
-        FROM civicrm_contribution ")->getDatabaseResult()->fetchRow();
-      for ($startId = $minId; $startId <= $maxId; $startId += self::BATCH_SIZE) {
-        $endId = $startId + self::BATCH_SIZE - 1;
-        $title = ts("Upgrade DB to %1: Update Contribution Invoice number (%2 => %3)", array(
-          1 => $rev,
-          2 => $startId,
-          3 => $endId,
-        ));
-        $this->addTask($title, 'updateContributionInvoiceNumber', $startId, $endId, $invoiceSettings['invoice_prefix']);
-      }
-    }
-    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
-  }
-
-  /**
-   * Upgrade function.
-   *
-   * @param string $rev
-   */
   public function upgrade_4_7_25($rev) {
     $this->addTask("CRM-20927 - Add column to 'civicrm_menu' for additional metadata", 'addColumn',
       'civicrm_menu', 'module_data', "text COMMENT 'All other menu metadata not stored in other fields'");
@@ -489,6 +466,20 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
   public function upgrade_4_7_28($rev) {
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
     $this->addTask('CRM-20572: Fix date fields in save search criteria of Contrib Sybunt custom search ', 'fixDateFieldsInSmartGroups');
+    // CRM-20868 : Update invoice_numbers (in batch) with value in [invoice prefix][contribution id] format
+    if ($invoicePrefix = CRM_Contribute_BAO_Contribution::checkContributeSettings('invoice_prefix', TRUE)) {
+      list($minId, $maxId) = CRM_Core_DAO::executeQuery("SELECT coalesce(min(id),0), coalesce(max(id),0)
+        FROM civicrm_contribution ")->getDatabaseResult()->fetchRow();
+      for ($startId = $minId; $startId <= $maxId; $startId += self::BATCH_SIZE) {
+        $endId = $startId + self::BATCH_SIZE - 1;
+        $title = ts("Upgrade DB to %1: Update Contribution Invoice number (%2 => %3)", array(
+          1 => $rev,
+          2 => $startId,
+          3 => $endId,
+        ));
+        $this->addTask($title, 'updateContributionInvoiceNumber', $startId, $endId, $invoicePrefix);
+      }
+    }
   }
 
   /*

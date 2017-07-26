@@ -129,7 +129,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    */
   public function testGetContribution() {
     $contributionSettings = $this->enableTaxAndInvoicing();
-    $invoice_prefix = CRM_Contribute_BAO_Contribution::checkContributeSettings('invoice_prefix');
+    $invoice_prefix = CRM_Contribute_BAO_Contribution::checkContributeSettings('invoice_prefix', TRUE);
     $p = array(
       'contact_id' => $this->_individualId,
       'receive_date' => '2010-01-20',
