@@ -380,9 +380,15 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     $contribution = CRM_Contribute_BAO_Contribution::retrieve($params, $defaults, $params);
     CRM_Contribute_BAO_Contribution::addPayments(array($contribution), $contributionStatusId);
     if ($this->_contributionId && CRM_Core_Permission::access('CiviMember')) {
-      $memPaymentCount = civicrm_api3('MembershipPayment', 'getCount', array('contribution_id' => $this->_contributionId));
-      if ($memPaymentCount > 0) {
+      $membershipPaymentCount = civicrm_api3('MembershipPayment', 'getCount', array('contribution_id' => $this->_contributionId));
+      if ($membershipPaymentCount) {
         $this->ajaxResponse['updateTabs']['#tab_member'] = CRM_Contact_BAO_Contact::getCountComponent('membership', $this->_contactID);
+      }
+    }
+    if ($this->_contributionId && CRM_Core_Permission::access('CiviEvent')) {
+      $participantPaymentCount = civicrm_api3('ParticipantPayment', 'getCount', array('contribution_id' => $this->_contributionId));
+      if ($participantPaymentCount) {
+        $this->ajaxResponse['updateTabs']['#tab_participant'] = CRM_Contact_BAO_Contact::getCountComponent('participant', $this->_contactID);
       }
     }
 

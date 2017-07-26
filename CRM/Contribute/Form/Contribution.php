@@ -1074,9 +1074,15 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $this->_id = $contribution->id;
     }
     if (!empty($this->_id) && CRM_Core_Permission::access('CiviMember')) {
-      $memPaymentCount = civicrm_api3('MembershipPayment', 'getCount', array('contribution_id' => $this->_id));
-      if ($memPaymentCount > 0) {
+      $membershipPaymentCount = civicrm_api3('MembershipPayment', 'getCount', array('contribution_id' => $this->_id));
+      if ($membershipPaymentCount) {
         $this->ajaxResponse['updateTabs']['#tab_member'] = CRM_Contact_BAO_Contact::getCountComponent('membership', $this->_contactID);
+      }
+    }
+    if (!empty($this->_id) && CRM_Core_Permission::access('CiviEvent')) {
+      $participantPaymentCount = civicrm_api3('ParticipantPayment', 'getCount', array('contribution_id' => $this->_id));
+      if ($participantPaymentCount) {
+        $this->ajaxResponse['updateTabs']['#tab_participant'] = CRM_Contact_BAO_Contact::getCountComponent('participant', $this->_contactID);
       }
     }
   }
