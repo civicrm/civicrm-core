@@ -680,12 +680,20 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
 
   /**
    * @dataProvider entities
-   * @expectedException PHPUnit_Framework_Error
    * @param $Entity
    */
   public function testWithoutParam_get($Entity) {
     // should get php complaining that a param is missing
-    $result = civicrm_api($Entity, 'Get');
+    try {
+      $result = civicrm_api($Entity, 'Get');
+      $this->fail('Expected an exception. No exception was thrown.');
+    }
+    catch (ArgumentCountError $e) {
+      /* ok */
+    }
+    catch (PHPUnit_Framework_Error $e) {
+      /* ok */
+    }
   }
 
   /**
@@ -1387,12 +1395,20 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
 
   /**
    * @dataProvider entities
-   * @expectedException PHPUnit_Framework_Error
    * @param $Entity
    */
   public function testWithoutParam_delete($Entity) {
     // should delete php complaining that a param is missing
-    $result = civicrm_api($Entity, 'Delete');
+    try {
+      $result = civicrm_api($Entity, 'Delete');
+      $this->fail('Expected an exception. No exception was thrown.');
+    }
+    catch (ArgumentCountError $e) {
+      /* ok */
+    }
+    catch (PHPUnit_Framework_Error $e) {
+      /* ok */
+    }
   }
 
   /**
