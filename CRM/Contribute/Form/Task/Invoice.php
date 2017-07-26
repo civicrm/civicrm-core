@@ -312,9 +312,8 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
           $creditNoteId = $contribution->creditnote_id;
         }
       }
-      $invoiceNumber = $contribution->invoice_number;
-      if (!$invoiceNumber) {
-        $invoiceNumber = CRM_Contribute_BAO_Contribution::storeInvoiceNumber($contribution->id);
+      if (!$contribution->invoice_number) {
+        $contribution->invoice_number = CRM_Contribute_BAO_Contribution::getInvoiceNumber($contribution->id);
       }
 
       //to obtain due date for PDF invoice
@@ -428,7 +427,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         'component' => $input['component'],
         'id' => $contribution->id,
         'source' => $source,
-        'invoice_number' => $invoiceNumber,
+        'invoice_number' => $contribution->invoice_number,
         'invoice_id' => $contribution->invoice_id,
         'resourceBase' => $config->userFrameworkResourceURL,
         'defaultCurrency' => $config->defaultCurrency,
@@ -472,7 +471,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         $tplParams['creditnote_id'] = $creditNoteId;
       }
 
-      $pdfFileName = "{$invoiceNumber}.pdf";
+      $pdfFileName = $contribution->invoice_number . ".pdf";
       $sendTemplateParams = array(
         'groupName' => 'msg_tpl_workflow_contribution',
         'valueName' => 'contribution_invoice_receipt',

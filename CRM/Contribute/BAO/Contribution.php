@@ -139,6 +139,11 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     //set defaults in create mode
     if (!$contributionID) {
       CRM_Core_DAO::setCreateDefaults($params, self::getDefaults());
+
+      if (empty($params['invoice_number'])) {
+        $nextContributionID = CRM_Core_DAO::singleValueQuery("SELECT COALESCE(MAX(id) + 1, 1) FROM civicrm_contribution");
+        $params['invoice_number'] = self::getInvoiceNumber($nextContributionID);
+      }
     }
 
     $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
@@ -232,10 +237,6 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     //add Account details
     $params['contribution'] = $contribution;
     self::recordFinancialAccounts($params);
-
-    if (!$contributionID) {
-      self::storeInvoiceNumber($contribution->id);
-    }
 
     if (self::isUpdateToRecurringContribution($params)) {
       CRM_Contribute_BAO_ContributionRecur::updateOnNewPayment(
@@ -5109,11 +5110,16 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
    *
    *
    * @param string $name
+   * @param bool $checkInvoicing
    * @return string
    *
    */
-  public static function checkContributeSettings($name = NULL) {
+  public static function checkContributeSettings($name = NULL, $checkInvoicing = FALSE) {
     $contributeSettings = Civi::settings()->get('contribution_invoice_settings');
+
+    if ($checkInvoicing && !CRM_Utils_Array::value('invoicing', $contributeSettings)) {
+      return NULL;
+    }
 
     if ($name) {
       return CRM_Utils_Array::value($name, $contributeSettings);
@@ -5761,24 +5767,18 @@ LIMIT 1;";
   }
 
   /**
-   * Generate and store invoice_number for contribution.
+   * Get invoice_number for contribution.
    *
    * @param int $contributionID
    *
    * @return string
    */
-  public static function storeInvoiceNumber($contributionID) {
-    $invoiceNumber = NULL;
-    if ($invoicePrefix = self::checkContributeSettings('invoice_prefix')) {
-      $invoiceNumber = $invoicePrefix . $contributionID;
-      $params = array(
-        'id' => $contributionID,
-        'invoice_number' => $invoiceNumber,
-      );
-      civicrm_api3('Contribution', 'create', $params);
+  public static function getInvoiceNumber($contributionID) {
+    if ($invoicePrefix = self::checkContributeSettings('invoice_prefix', TRUE)) {
+      return $invoicePrefix . $contributionID;
     }
 
-    return $invoiceNumber;
+    return NULL;
   }
 
 }
