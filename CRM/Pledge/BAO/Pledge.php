@@ -678,9 +678,9 @@ GROUP BY  currency
     $activityType = 'Pledge Acknowledgment';
     $activity = new CRM_Activity_DAO_Activity();
     $activity->source_record_id = $params['id'];
-    $activity->activity_type_id = CRM_Core_OptionGroup::getValue('activity_type',
-      $activityType,
-      'name'
+    $activity->activity_type_id = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity',
+      'activity_type_id',
+      $activityType
     );
 
     // FIXME: Translate
@@ -691,9 +691,9 @@ GROUP BY  currency
         'subject' => $subject,
         'source_contact_id' => $params['contact_id'],
         'source_record_id' => $params['id'],
-        'activity_type_id' => CRM_Core_OptionGroup::getValue('activity_type',
-          $activityType,
-          'name'
+        'activity_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity',
+          'activity_type_id',
+          $activityType
         ),
         'activity_date_time' => CRM_Utils_Date::isoToMysql($params['acknowledge_date']),
         'is_test' => $params['is_test'],
@@ -1058,9 +1058,9 @@ SELECT  pledge.contact_id              as contact_id,
                 'source_contact_id' => $contactId,
                 'source_record_id' => $paymentId,
                 'assignee_contact_id' => $contactId,
-                'activity_type_id' => CRM_Core_OptionGroup::getValue('activity_type',
-                  $activityType,
-                  'name'
+                'activity_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity',
+                  'activity_type_id',
+                  $activityType
                 ),
                 'due_date_time' => CRM_Utils_Date::isoToMysql($details['scheduled_date']),
                 'is_test' => $details['is_test'],
