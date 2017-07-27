@@ -688,6 +688,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       $result = civicrm_api($Entity, 'Get');
       $this->fail('Expected an exception. No exception was thrown.');
     }
+    // As of php7.1 a new Exception is thrown by PHP ArgumentCountError when not enough params are passed.
     catch (ArgumentCountError $e) {
       /* ok */
     }
@@ -1403,6 +1404,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       $result = civicrm_api($Entity, 'Delete');
       $this->fail('Expected an exception. No exception was thrown.');
     }
+    // As of php7.1 a new Exception is thrown by PHP ArgumentCountError when not enough params are passed.
     catch (ArgumentCountError $e) {
       /* ok */
     }
