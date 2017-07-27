@@ -3191,11 +3191,12 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       if (empty($balanceTrxnInfo['trxn_id'])) {
         // create new balance transaction record
         $toFinancialAccount = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($params['financial_type_id'], 'Accounts Receivable Account is');
+        $defaultTrxnDate = !empty($params['contribution']->receive_date) ? $params['contribution']->receive_date : date('YmdHis');
 
         $balanceTrxnParams['total_amount'] = $partialAmtTotal;
         $balanceTrxnParams['to_financial_account_id'] = $toFinancialAccount;
         $balanceTrxnParams['contribution_id'] = $params['contribution']->id;
-        $balanceTrxnParams['trxn_date'] = !empty($params['contribution']->receive_date) ? $params['contribution']->receive_date : date('YmdHis');
+        $balanceTrxnParams['trxn_date'] = CRM_Utils_Array::value('trxn_date', $params, $defaultTrxnDate);
         $balanceTrxnParams['fee_amount'] = CRM_Utils_Array::value('fee_amount', $params);
         $balanceTrxnParams['net_amount'] = CRM_Utils_Array::value('net_amount', $params);
         $balanceTrxnParams['currency'] = $params['contribution']->currency;
@@ -3257,10 +3258,11 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         $totalAmount = $params['total_amount'] = $params['prevContribution']->total_amount;
       }
       //build financial transaction params
+      $defaultTrxnDate = !empty($params['contribution']->receive_date) ? $params['contribution']->receive_date : date('YmdHis');
       $trxnParams = array(
         'contribution_id' => $params['contribution']->id,
         'to_financial_account_id' => $params['to_financial_account_id'],
-        'trxn_date' => !empty($params['contribution']->receive_date) ? $params['contribution']->receive_date : date('YmdHis'),
+        'trxn_date' => CRM_Utils_Array::value('trxn_date', $params, $defaultTrxnDate),
         'total_amount' => $totalAmount,
         'fee_amount' => CRM_Utils_Array::value('fee_amount', $params),
         'net_amount' => CRM_Utils_Array::value('net_amount', $params, $totalAmount),
@@ -4128,12 +4130,11 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
     $info['payLater'] = $contributionIsPayLater;
     $rows = array();
     if ($getTrxnInfo && $baseTrxnId) {
+
       // Need to exclude fee trxn rows so filter out rows where TO FINANCIAL ACCOUNT is expense account
       $sql = "
         SELECT GROUP_CONCAT(fa.`name`) as financial_account,
-          ft.total_amount,
-          ft.payment_instrument_id,
-          ft.trxn_date, ft.trxn_id, ft.status_id, ft.check_number, ft.currency, ft.pan_truncation, ft.card_type_id
+          ft.*
 
         FROM civicrm_contribution con
           LEFT JOIN civicrm_entity_financial_trxn eft ON (eft.entity_id = con.id AND eft.entity_table = 'civicrm_contribution')
@@ -4163,6 +4164,27 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
           }
           $paidByLabel .= " ({$creditCardType}{$pantruncation})";
         }
+
+        // show payment edit link only for payments done via backoffice form
+        $paymentEditLink = '';
+        if (empty($resultDAO->payment_processor_id) && CRM_Core_Permission::check('edit contributions')) {
+          $links = array(
+            CRM_Core_Action::UPDATE => array(
+              'name' => "<i class='crm-i fa-pencil'></i>",
+              'url' => 'civicrm/payment/edit',
+              'qs' => "reset=1&id=%%id%%",
+              'title' => ts('Edit Payment'),
+            ),
+          );
+          $paymentEditLink = CRM_Core_Action::formLink(
+            $links,
+            CRM_Core_Action::mask(array(CRM_Core_Permission::EDIT)),
+            array(
+              'id' => $resultDAO->id,
+            )
+          );
+        }
+
         $val = array(
           'total_amount' => $resultDAO->total_amount,
           'financial_type' => $resultDAO->financial_account,
@@ -4171,6 +4193,7 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
           'trxn_id' => $resultDAO->trxn_id,
           'status' => $statuses[$resultDAO->status_id],
           'currency' => $resultDAO->currency,
+          'action' => $paymentEditLink,
         );
         if ($paidByName == 'Check') {
           $val['check_number'] = $resultDAO->check_number;
@@ -4920,7 +4943,7 @@ LIMIT 1;";
     $balanceTrxnParams['from_financial_account_id'] = $fromFinancialAccountId;
     $balanceTrxnParams['total_amount'] = $params['total_amount'];
     $balanceTrxnParams['contribution_id'] = $params['contribution_id'];
-    $balanceTrxnParams['trxn_date'] = !empty($params['contribution_receive_date']) ? $params['contribution_receive_date'] : date('YmdHis');
+    $balanceTrxnParams['trxn_date'] = CRM_Utils_Array::value('trxn_date', $params, CRM_Utils_Array::value('contribution_receive_date', $params, date('YmdHis')));
     $balanceTrxnParams['fee_amount'] = CRM_Utils_Array::value('fee_amount', $params);
     $balanceTrxnParams['net_amount'] = CRM_Utils_Array::value('total_amount', $params);
     $balanceTrxnParams['currency'] = $contribution['currency'];
