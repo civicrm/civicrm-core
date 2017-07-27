@@ -157,27 +157,6 @@
   {* CRM-7362 --add campaign to contributions *}
   {include file="CRM/Campaign/Form/addCampaignToComponent.tpl" campaignTrClass="crm-contribution-form-block-campaign_id"}
 
-    {if $contributionMode}
-    {if $email and $outBound_option != 2}
-     <tr class="crm-contribution-form-block-is_email_receipt">
-       <td class="label">{$form.is_email_receipt.label}</td>
-       <td>{$form.is_email_receipt.html}&nbsp; <span class="description">{ts 1=$email}Automatically email a receipt for this contribution to %1?{/ts}</span>
-       </td>
-     </tr>
-     {elseif $context eq 'standalone' and $outBound_option != 2 }
-       <tr id="email-receipt" style="display:none;" class="crm-contribution-form-block-is_email_receipt"><td class="label">{$form.is_email_receipt.label}</td><td>{$form.is_email_receipt.html} <span class="description">{ts}Automatically email a receipt for this contribution to {/ts}<span id="email-address"></span>?</span></td></tr>
-    {/if}
-    <tr id="fromEmail" style="display:none;" >
-      <td class="label">{$form.from_email_address.label}</td>
-      <td>{$form.from_email_address.html}</td>
-    </tr>
-    <tr id="receiptDate" class="crm-contribution-form-block-receipt_date">
-      <td class="label">{$form.receipt_date.label}</td>
-      <td>{include file="CRM/common/jcalendar.tpl" elementName=receipt_date}<br />
-        <span class="description">{ts}Date that a receipt was sent to the contributor.{/ts}</span>
-      </td>
-    </tr>
-    {/if}
     {if !$contributionMode || $payNow}
       <tr class="crm-contribution-form-block-contribution_status_id">
         <td class="label">{$form.contribution_status_id.label}</td>
@@ -238,6 +217,32 @@
         <td>{$form.revenue_recognition_date.html}</td>
       </tr>
     {/if}
+
+    {if $email and $outBound_option != 2}
+      <tr class="crm-contribution-form-block-is_email_receipt">
+        <td class="label">{$form.is_email_receipt.label}</td>
+        <td>{$form.is_email_receipt.html}&nbsp;
+          <span class="description">{ts 1=$email}Automatically email a receipt for this payment to %1?{/ts}</span>
+        </td>
+      </tr>
+    {elseif $context eq 'standalone' and $outBound_option != 2 }
+      <tr id="email-receipt" style="display:none;" class="crm-contribution-form-block-is_email_receipt">
+        <td class="label">{$form.is_email_receipt.label}</td>
+        <td>{$form.is_email_receipt.html} <span class="description">{ts}Automatically email a receipt for this payment to {/ts}<span id="email-address"></span>?</span>
+        </td>
+      </tr>
+    {/if}
+    <tr id="fromEmail" class="crm-contribution-form-block-receipt_date" style="display:none;">
+      <td class="label">{$form.from_email_address.label}</td>
+      <td>{$form.from_email_address.html}</td>
+    </tr>
+    <tr id="receiptDate" class="crm-contribution-form-block-receipt_date">
+      <td class="label">{$form.receipt_date.label}</td>
+      <td>{include file="CRM/common/jcalendar.tpl" elementName=receipt_date}<br />
+        <span class="description">{ts}Date that a receipt was sent to the contributor.{/ts}</span>
+      </td>
+    </tr>
+
   </table>
 
   {if !$contributionMode}
@@ -260,30 +265,6 @@
           <tr class="crm-contribution-form-block-trxn_id">
             <td class="label">{$form.trxn_id.label}</td>
             <td {$valueStyle}>{$form.trxn_id.html} {help id="id-trans_id"}</td>
-          </tr>
-          {if $email and $outBound_option != 2}
-            <tr class="crm-contribution-form-block-is_email_receipt">
-              <td class="label">
-                {$form.is_email_receipt.label}</td><td>{$form.is_email_receipt.html}&nbsp;
-                <span class="description">{ts 1=$email}Automatically email a receipt for this payment to %1?{/ts}</span>
-              </td>
-            </tr>
-          {elseif $context eq 'standalone' and $outBound_option != 2 }
-            <tr id="email-receipt" style="display:none;" class="crm-contribution-form-block-is_email_receipt">
-              <td class="label">{$form.is_email_receipt.label}</td>
-              <td>{$form.is_email_receipt.html} <span class="description">{ts}Automatically email a receipt for this payment to {/ts}<span id="email-address"></span>?</span>
-              </td>
-            </tr>
-          {/if}
-          <tr id="receiptDate" class="crm-contribution-form-block-receipt_date">
-            <td class="label">{$form.receipt_date.label}</td>
-            <td>{include file="CRM/common/jcalendar.tpl" elementName=receipt_date}<br />
-              <span class="description">{ts}Date that a receipt was sent to the contributor.{/ts}</span>
-            </td>
-          </tr>
-          <tr id="fromEmail" class="crm-contribution-form-block-receipt_date" style="display:none;">
-            <td class="label">{$form.from_email_address.label}</td>
-            <td>{$form.from_email_address.html}</td>
           </tr>
         </table>
       </fieldset>
