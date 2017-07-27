@@ -447,6 +447,11 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
     require_once 'api/v3/examples/Activity/Create.php';
     $result = activity_create_example();
     $expectedResult = activity_create_expectedresult();
+    // Compare everything *except* timestamps.
+    unset($result['values'][1]['created_date']);
+    unset($result['values'][1]['modified_date']);
+    unset($expectedResult['values'][1]['created_date']);
+    unset($expectedResult['values'][1]['modified_date']);
     $this->assertEquals($result, $expectedResult);
   }
 
