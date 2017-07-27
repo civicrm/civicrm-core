@@ -47,9 +47,16 @@ class CRM_Financial_Form_PaymentEdit extends CRM_Core_Form {
   protected $_values;
 
   /**
+   * Explicitly declare the form context.
+   */
+  public function getDefaultContext() {
+    return 'create';
+  }
+  /**
    * Set variables up before form is built.
    */
   public function preProcess() {
+    $this->_action = CRM_Core_Action::UPDATE;
     parent::preProcess();
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
     $this->assign('id', $this->_id);
@@ -68,6 +75,7 @@ class CRM_Financial_Form_PaymentEdit extends CRM_Core_Form {
   public function setDefaultValues() {
     $defaults = $this->_values;
     if (!empty($defaults['card_type_id'])) {
+      // See comments in getPaymentFields function about why this nastiness exists.
       $defaults['credit_card_type'] = CRM_Core_PseudoConstant::getName('CRM_Financial_DAO_FinancialTrxn', 'card_type_id', $defaults['card_type_id']);
     }
 
@@ -125,6 +133,7 @@ class CRM_Financial_Form_PaymentEdit extends CRM_Core_Form {
       'trxn_date' => CRM_Utils_Array::value('trxn_date', $this->_submitValues, date('YmdHis')),
     );
     if (!empty($this->_submitValues['credit_card_type'])) {
+      // See comments in getPaymentFields function about why this nastiness exists.
       $params['card_type_id'] = CRM_Core_PseudoConstant::getKey(
         'CRM_Financial_DAO_FinancialTrxn',
         'card_type_id',
@@ -152,6 +161,13 @@ class CRM_Financial_Form_PaymentEdit extends CRM_Core_Form {
       );
     }
     elseif ($paymentInstrument == 'Credit Card') {
+      // Ideally we would use $this->addField('card_type_id', array('entity' => 'FinancialTrxn'));
+      // to assign this field (& other fields on this form). However, the addCreditCardJs
+      // adds some 'pretty' to the credit card selection. The 'cost' of this is that because it
+      // was originally written to comply with front end needs (use of the word rather than the id)
+      // we have to do a lot of wrangling with our fields to make the BillingBlock.js code work.
+      // If you are reading this it means it's time to fix the BillingBlock.js to work with
+      // card_type_id and the pseudoconstant options & set this code free. No returns.
       CRM_Financial_Form_Payment::addCreditCardJs(NULL, 'payment-edit-block');
       $paymentFields['credit_card_type'] = array(
         'htmlType' => 'select',
