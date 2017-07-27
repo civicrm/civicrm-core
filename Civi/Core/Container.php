@@ -218,6 +218,29 @@ class Container {
       array('civicrm_case', 'Case')
     ))->addTag('kernel.event_listener', array('event' => 'hook_civicrm_triggerInfo', 'method' => 'onTriggerInfo'));
 
+    $container->setDefinition('civi.case.staticTriggers', new Definition(
+      'Civi\Core\SqlTrigger\StaticTriggers',
+      array(
+        array(
+          array(
+            'upgrade_check' => array('table' => 'civicrm_case', 'column' => 'modified_date'),
+            'table' => 'civicrm_case_activity',
+            'when' => 'AFTER',
+            'event' => array('INSERT'),
+            'sql' => "\nUPDATE civicrm_case SET modified_date = CURRENT_TIMESTAMP WHERE id = NEW.case_id;\n",
+          ),
+          array(
+            'upgrade_check' => array('table' => 'civicrm_case', 'column' => 'modified_date'),
+            'table' => 'civicrm_activity',
+            'when' => 'BEFORE',
+            'event' => array('UPDATE', 'DELETE'),
+            'sql' => "\nUPDATE civicrm_case SET modified_date = CURRENT_TIMESTAMP WHERE id IN (SELECT ca.case_id FROM civicrm_case_activity ca WHERE ca.activity_id = OLD.id);\n",
+          ),
+        ),
+      )
+    ))
+      ->addTag('kernel.event_listener', array('event' => 'hook_civicrm_triggerInfo', 'method' => 'onTriggerInfo'));
+
     $container->setDefinition('civi_token_compat', new Definition(
       'Civi\Token\TokenCompatSubscriber',
       array()
