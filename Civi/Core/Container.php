@@ -208,6 +208,16 @@ class Container {
         ->setFactory(array($class, 'singleton'));
     }
 
+    $container->setDefinition('civi.activity.triggers', new Definition(
+      'Civi\Core\SqlTrigger\TimestampTriggers',
+      array('civicrm_activity', 'Activity')
+    ))->addTag('kernel.event_listener', array('event' => 'hook_civicrm_triggerInfo', 'method' => 'onTriggerInfo'));
+
+    $container->setDefinition('civi.case.triggers', new Definition(
+      'Civi\Core\SqlTrigger\TimestampTriggers',
+      array('civicrm_case', 'Case')
+    ))->addTag('kernel.event_listener', array('event' => 'hook_civicrm_triggerInfo', 'method' => 'onTriggerInfo'));
+
     $container->setDefinition('civi_token_compat', new Definition(
       'Civi\Token\TokenCompatSubscriber',
       array()
