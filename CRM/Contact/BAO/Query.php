@@ -3625,7 +3625,7 @@ WHERE  $smartGroupClause
 
     // Handle numeric postal code range searches properly by casting the column as numeric
     if (is_numeric($value)) {
-      $field = "IF (civicrm_address.postal_code REGEXP '^[0-9]+$', CAST(civicrm_address.postal_code AS UNSIGNED), 0)";
+      $field = "IF (civicrm_address.postal_code REGEXP '^[0-9]{1,10}$', CAST(civicrm_address.postal_code AS UNSIGNED), 0)";
       $val = CRM_Utils_Type::escape($value, 'Integer');
     }
     else {
