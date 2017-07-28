@@ -1523,25 +1523,19 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       if ($value != NULL) {
         $result1 = NULL;
         try {
-          $result1 = civicrm_api3('custom_field', 'get', [
-            'id' => $value,
-            'is_active' => TRUE
-          ]);
+          $result1 = civicrm_api3('custom_field', 'get', array('id' => $value, 'is_active' => TRUE));
         }
         catch (CiviCRM_API3_Exception $e) {
           // just ignore and continue
           continue;
-				}
+        }
         if (!civicrm_error($result1) && isset($result1['values']) && is_array($result1['values'])) {
           foreach ($result1['values'] as $value1) {
             if ($value1 != NULL && is_array($value1) && isset($value1['custom_group_id'])) {
               $result2 = NULL;
-              try { 
-                $result2 = civicrm_api3('custom_group', 'get', [
-                  'id' => $value1['custom_group_id'],
-                  'is_active' => TRUE
-                ]);
-							}
+              try {
+                $result2 = civicrm_api3('custom_group', 'get', array('id' => $value1['custom_group_id'], 'is_active' => TRUE));
+              }
               catch (CiviCRM_API3_Exception $e) {
                 // just ignore and continue
                 continue;
