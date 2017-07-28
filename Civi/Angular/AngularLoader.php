@@ -74,6 +74,8 @@ class AngularLoader {
 
   /**
    * Register resources required by Angular.
+   *
+   * @return AngularLoader
    */
   public function load() {
     $angular = $this->getAngular();
@@ -135,6 +137,8 @@ class AngularLoader {
         $res->addStyleUrl($url, self::DEFAULT_MODULE_WEIGHT + (++$headOffset), $this->getRegion());
       }
     }
+
+    return $this;
   }
 
   /**
@@ -170,9 +174,11 @@ class AngularLoader {
 
   /**
    * @param \CRM_Core_Resources $res
+   * @return AngularLoader
    */
   public function setRes($res) {
     $this->res = $res;
+    return $this;
   }
 
   /**
@@ -184,9 +190,11 @@ class AngularLoader {
 
   /**
    * @param \Civi\Angular\Manager $angular
+   * @return AngularLoader
    */
   public function setAngular($angular) {
     $this->angular = $angular;
+    return $this;
   }
 
   /**
@@ -198,9 +206,11 @@ class AngularLoader {
 
   /**
    * @param string $region
+   * @return AngularLoader
    */
   public function setRegion($region) {
     $this->region = $region;
+    return $this;
   }
 
   /**
@@ -214,9 +224,11 @@ class AngularLoader {
   /**
    * @param string $pageName
    *   Ex: 'civicrm/a'.
+   * @return AngularLoader
    */
   public function setPageName($pageName) {
     $this->pageName = $pageName;
+    return $this;
   }
 
   /**
@@ -238,9 +250,11 @@ class AngularLoader {
 
   /**
    * @param array $modules
+   * @return AngularLoader
    */
   public function setModules($modules) {
     $this->modules = $modules;
+    return $this;
   }
 
 }
