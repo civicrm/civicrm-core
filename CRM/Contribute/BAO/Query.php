@@ -855,6 +855,7 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
         // calling
         'contribution_product_id' => 1,
         //function
+        'revenue_recognition_date' => 1,
       );
       if (self::isSoftCreditOptionEnabled()) {
         $properties = array_merge($properties, self::softCreditReturnProperties());
