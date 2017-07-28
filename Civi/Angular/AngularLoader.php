@@ -220,6 +220,16 @@ class AngularLoader {
   }
 
   /**
+   * @param array|string $modules
+   * @return AngularLoader
+   */
+  public function addModules($modules) {
+    $modules = (array) $modules;
+    $this->modules = array_unique(array_merge($this->modules, $modules));
+    return $this;
+  }
+
+  /**
    * @return array
    */
   public function getModules() {
