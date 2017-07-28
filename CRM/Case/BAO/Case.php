@@ -89,6 +89,10 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
    * @return CRM_Case_BAO_Case
    */
   public static function &create(&$params) {
+    // CRM-20958 - These fields are managed by MySQL triggers. Watch out for clients resaving stale timestamps.
+    unset($params['created_date']);
+    unset($params['modified_date']);
+
     $transaction = new CRM_Core_Transaction();
 
     if (!empty($params['id'])) {
