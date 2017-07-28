@@ -849,4 +849,52 @@ class api_v3_CaseTest extends CiviCaseTestCase {
     return $examples;
   }
 
+  public function testTimestamps() {
+    $params = $this->_params;
+    $case_created = $this->callAPISuccess('case', 'create', $params);
+
+    $case_1 = $this->callAPISuccess('Case', 'getsingle', array(
+      'id' => $case_created['id'],
+    ));
+    $this->assertRegExp(';^\d\d\d\d-\d\d-\d\d \d\d:\d\d;', $case_1['created_date']);
+    $this->assertRegExp(';^\d\d\d\d-\d\d-\d\d \d\d:\d\d;', $case_1['modified_date']);
+    $this->assertApproxEquals(strtotime($case_1['created_date']), strtotime($case_1['modified_date']), 2);
+
+    $activity_1 = $this->callAPISuccess('activity', 'getsingle', array(
+      'case_id' => $case_created['id'],
+      'options' => array(
+        'limit' => 1,
+      ),
+    ));
+    $this->assertRegExp(';^\d\d\d\d-\d\d-\d\d \d\d:\d\d;', $activity_1['created_date']);
+    $this->assertRegExp(';^\d\d\d\d-\d\d-\d\d \d\d:\d\d;', $activity_1['modified_date']);
+    $this->assertApproxEquals(strtotime($activity_1['created_date']), strtotime($activity_1['modified_date']), 2);
+
+    usleep(1.5 * 1000000);
+    $this->callAPISuccess('activity', 'create', array(
+      'id' => $activity_1['id'],
+      'subject' => 'Make cheese',
+    ));
+
+    $activity_2 = $this->callAPISuccess('activity', 'getsingle', array(
+      'id' => $activity_1['id'],
+    ));
+    $this->assertRegExp(';^\d\d\d\d-\d\d-\d\d \d\d:\d\d;', $activity_2['created_date']);
+    $this->assertRegExp(';^\d\d\d\d-\d\d-\d\d \d\d:\d\d;', $activity_2['modified_date']);
+    $this->assertNotEquals($activity_2['created_date'], $activity_2['modified_date']);
+
+    $this->assertEquals($activity_1['created_date'], $activity_2['created_date']);
+    $this->assertNotEquals($activity_1['modified_date'], $activity_2['modified_date']);
+    $this->assertLessThan($activity_2['modified_date'], $activity_1['modified_date'],
+      sprintf("Original modification time (%s) should predate later modification time (%s)", $activity_1['modified_date'], $activity_2['modified_date']));
+
+    $case_2 = $this->callAPISuccess('Case', 'getsingle', array(
+      'id' => $case_created['id'],
+    ));
+    $this->assertRegExp(';^\d\d\d\d-\d\d-\d\d \d\d:\d\d;', $case_2['created_date']);
+    $this->assertRegExp(';^\d\d\d\d-\d\d-\d\d \d\d:\d\d;', $case_2['modified_date']);
+    $this->assertEquals($case_1['created_date'], $case_2['created_date']);
+    $this->assertNotEquals($case_2['created_date'], $case_2['modified_date']);
+  }
+
 }
