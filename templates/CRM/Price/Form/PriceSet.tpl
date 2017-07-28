@@ -42,6 +42,9 @@
               {assign var="element_name" value="price_"|cat:$field_id}
               <div class="label">{$form.$element_name.label}</div>
               <div class="content {$element.name}-content">
+                {if $element.help_pre}
+                  <div class="description">{$element.help_pre}</div>
+                {/if}
                 {assign var="elementCount" value="0"}
                 {assign var="optionCount" value="0"}
                 {assign var="rowCount" value="0"}
@@ -69,7 +72,9 @@
                 {assign var="element_name" value="price_"|cat:$field_id}
 
                 <div class="label">{$form.$element_name.label}</div>
-                <div class="content {$element.name}-content">{$form.$element_name.html}
+                <div class="content {$element.name}-content">
+                  {if $element.help_pre}<span class="description">{$element.help_pre}</span><br />{/if}
+                  {$form.$element_name.html}
                   {if $element.html_type eq 'Text'}
                     {if $element.is_display_amounts}
                     <span class="price-field-amount{if $form.$element_name.frozen EQ 1} sold-out-option{/if}">
