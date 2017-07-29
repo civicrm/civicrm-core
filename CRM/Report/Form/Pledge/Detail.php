@@ -68,7 +68,9 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
    * Class constructor.
    */
   public function __construct() {
-    $this->_pledgeStatuses = CRM_Contribute_PseudoConstant::contributionStatus();
+    $this->_pledgeStatuses = CRM_Core_OptionGroup::values('pledge_status',
+      FALSE, FALSE, FALSE, NULL, 'label'
+    );
     // Check if CiviCampaign is a) enabled and b) has active campaigns
     $config = CRM_Core_Config::singleton();
     $campaignEnabled = in_array("CiviCampaign", $config->enableComponents);
@@ -167,7 +169,7 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
             'title' => ts('Pledge Status'),
             'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Core_OptionGroup::values('contribution_status'),
+            'options' => CRM_Core_OptionGroup::values('pledge_status'),
           ),
           'financial_type_id' => array(
             'title' => ts('Financial Type'),
@@ -596,7 +598,7 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
       //handle status id
       if (array_key_exists('civicrm_pledge_status_id', $row)) {
         if ($value = $row['civicrm_pledge_status_id']) {
-          $rows[$rowNum]['civicrm_pledge_status_id'] = CRM_Contribute_PseudoConstant::contributionStatus($value);
+          $rows[$rowNum]['civicrm_pledge_status_id'] = CRM_Core_PseudoConstant::getLabel('CRM_Pledge_BAO_Pledge', 'status_id', $value);
         }
         $entryFound = TRUE;
       }
