@@ -62,6 +62,11 @@ class AngularLoader {
   protected $modules;
 
   /**
+   * @var array|NULL
+   */
+  protected $crmApp = NULL;
+
+  /**
    * AngularLoader constructor.
    */
   public function __construct() {
@@ -80,6 +85,25 @@ class AngularLoader {
   public function load() {
     $angular = $this->getAngular();
     $res = $this->getRes();
+
+    if ($this->crmApp !== NULL) {
+      $this->addModules($this->crmApp['modules']);
+      $region = \CRM_Core_Region::instance($this->crmApp['region']);
+      $region->update('default', array('disabled' => TRUE));
+      $region->add(array('template' => $this->crmApp['file'], 'weight' => 0));
+      $this->res->addSetting(array(
+        'crmApp' => array(
+          'defaultRoute' => $this->crmApp['defaultRoute'],
+        ),
+      ));
+
+      // If trying to load an Angular page via AJAX, the route must be passed as a
+      // URL parameter, since the server doesn't receive information about
+      // URL fragments (i.e, what comes after the #).
+      $this->res->addSetting(array(
+        'angularRoute' => $this->crmApp['activeRoute'],
+      ));
+    }
 
     $moduleNames = $this->findActiveModules();
     if (!$this->isAllModules($moduleNames)) {
@@ -138,6 +162,40 @@ class AngularLoader {
       }
     }
 
+    return $this;
+  }
+
+  /**
+   * Use Civi's generic "application" module.
+   *
+   * This is suitable for use on a basic, standalone Angular page
+   * like `civicrm/a`. (If you need to integrate Angular with pre-existing,
+   * non-Angular pages... then this probably won't help.)
+   *
+   * The Angular bootstrap process requires an HTML directive like
+   * `<div ng-app="foo">`.
+   *
+   * Calling useApp() will replace the page's main body with the
+   * `<div ng-app="crmApp">...</div>` and apply some configuration options
+   * for the `crmApp` module.
+   *
+   * @param array $settings
+   *   A list of settings. Accepted values:
+   *    - activeRoute: string, the route to open up immediately
+   *    - defaultRoute: string, use this to redirect the default route to another page
+   *    - region: string, the place on the page where we should insert the angular app
+   * @return AngularLoader
+   * @link https://code.angularjs.org/1.5.11/docs/guide/bootstrap
+   */
+  public function useApp($settings = array()) {
+    $defaults = array(
+      'modules' => array('crmApp'),
+      'activeRoute' => NULL,
+      'defaultRoute' => NULL,
+      'region' => 'page-body',
+      'file' => 'Civi/Angular/Page/Main.tpl',
+    );
+    $this->crmApp = array_merge($defaults, $settings);
     return $this;
   }
 
