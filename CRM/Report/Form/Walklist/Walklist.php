@@ -223,15 +223,15 @@ FROM       civicrm_contact {$this->_aliases['civicrm_contact']} {$this->_aclFrom
   }
 
   public function orderBy() {
-    $this->_orderBy = array();
+    $this->_orderBy = "";
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('order_bys', $table)) {
         foreach ($table['order_bys'] as $fieldName => $field) {
-          $this->_orderBy[] = $field['dbAlias'];
+          $this->_orderByArray[] = $field['dbAlias'];
         }
       }
     }
-    $this->_orderBy = "ORDER BY " . implode(', ', $this->_orderBy) . " ";
+    $this->_orderBy = "ORDER BY " . implode(', ', $this->_orderByArray) . " ";
   }
 
   public function postProcess() {
