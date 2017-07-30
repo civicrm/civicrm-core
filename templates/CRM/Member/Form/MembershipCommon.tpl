@@ -100,7 +100,12 @@
 
   <div class="spacer"></div>
 {/if}
-
+{if $membershipMode}
+  <tr>
+    <td class="label">{$form.payment_processor_id.label}</td>
+    <td>{$form.payment_processor_id.html}</td>
+  </tr>
+{/if}
 <tr class="crm-membership-form-block-billing">
   <td colspan="2">
     {include file='CRM/Core/BillingBlockWrapper.tpl'}

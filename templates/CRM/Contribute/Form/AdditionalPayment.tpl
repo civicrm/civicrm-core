@@ -56,9 +56,6 @@
     <tr>
       <td class="font-size12pt label"><strong>{if $component eq 'event'}{ts}Participant{/ts}{else}{ts}Contact{/ts}{/if}</strong></td><td class="font-size12pt"><strong>{$displayName}</strong></td>
     </tr>
-    {if $contributionMode}
-      <tr class="crm-payment-form-block-payment_processor_id"><td class="label nowrap">{$form.payment_processor_id.label}<span class="crm-marker"> * </span></td><td>{$form.payment_processor_id.html}</td></tr>
-    {/if}
     {if $eventName}
       <tr>
         <td class='label'>{ts}Event{/ts}</td><td>{$eventName}</td>
@@ -82,6 +79,9 @@
           <td class="label">{$form.from_email_address.label}</td>
           <td>{$form.from_email_address.html}</td>
         </tr>
+      {/if}
+      {if $contributionMode}
+        <tr class="crm-payment-form-block-payment_processor_id"><td class="label nowrap">{$form.payment_processor_id.label}<span class="crm-marker"> * </span></td><td>{$form.payment_processor_id.html}</td></tr>
       {/if}
     </tr>
    </table>
