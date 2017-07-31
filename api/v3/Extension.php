@@ -394,11 +394,15 @@ function civicrm_api3_extension_getremote($params) {
  * @return array
  */
 function _civicrm_api3_getKeys($params, $key) {
-  if (is_array($params[$key])) {
-    return $params[$key];
-  }
-  if ($params[$key] == '') {
+  if (isset($params[$key])) {
+    if (is_array($params[$key])) {
+      return $params[$key];
+    }
+    if ($params[$key] == '') {
+      return array();
+    }
+    return explode(API_V3_EXTENSION_DELIMITER, $params[$key]);
+  } else {
     return array();
   }
-  return explode(API_V3_EXTENSION_DELIMITER, $params[$key]);
 }
