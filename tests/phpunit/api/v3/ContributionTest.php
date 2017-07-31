@@ -1741,6 +1741,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'contributeMode:::notify',
       'title:::Contribution',
       'displayName:::Mr. Anthony Anderson II',
+      'contributionStatus:::Completed',
     ));
     $mut->stop();
     $this->revertTemplateToReservedTemplate();
