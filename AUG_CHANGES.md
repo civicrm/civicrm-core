@@ -7,4 +7,5 @@ aa21b59 | Agileware Redmine 24407 Atrium 4462 Fix loading of CiviRCRM new mailin
 26bb201 | Add in AUG Change log |  
 45c2935 | CRM-19835 port of PR 9801 | No sign its being merged in core soon  
 e899ec4 | Fix issue where disabled groups were appearing in CiviMail Receipients box | Pr waiting merger as per Redmine 24407 Atrium 4462 
-11462b7 | CRM-20989 Fix Active provider count to know about multisite |  PR merged into 4.7.24
+11462b7 | CRM-20989 Fix Active provider count to know about multisite |  PR merged into 4.7.24  
+528a108 | Atrium-4729 Fix issue where we were loading in non mailing groups into receipients box | Waiting on review of core PR 
