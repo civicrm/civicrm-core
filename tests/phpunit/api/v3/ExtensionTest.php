@@ -109,7 +109,7 @@ class api_v3_ExtensionTest extends CiviUnitTestCase {
    * Test that extension get can be filtered by id.
    */
   public function testGetExtensionByID() {
-    $result = $this->callAPISuccess('extension', 'get', array('id' => 2));
+    $result = $this->callAPISuccess('extension', 'get', array('id' => 2, 'return' => array('label')));
     $this->assertEquals(1, $result['count']);
   }
 
