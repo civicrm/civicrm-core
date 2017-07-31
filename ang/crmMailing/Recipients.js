@@ -207,11 +207,20 @@
               }
 
               rcpAjaxState.page_i = page_num - rcpAjaxState.page_n;
+              var filterParams = {};
+              switch(rcpAjaxState.entity) {
+              case 'civicrm_group':
+                filterParams = { is_hidden: 0, is_active: 1, group_type: {"LIKE": "%2%"} };
+                break;
 
+              case 'civicrm_mailing':
+                filterParams = { is_hidden: 0, is_active: 1 };
+                break;
+              }
               var params = {
                 input: input,
                 page_num: rcpAjaxState.page_i,
-                params: { is_hidden: 0, is_active: 1 },
+                params: filterParams,
               };
               return params;
             },
