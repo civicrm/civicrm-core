@@ -255,10 +255,10 @@ class CRM_Financial_Page_AJAX {
       3 => 'amount',
       4 => 'trxn_id',
       5 => 'transaction_date',
-      5 => 'receive_date',
-      6 => 'payment_method',
-      7 => 'status',
-      8 => 'name',
+      6 => 'receive_date',
+      7 => 'payment_method',
+      8 => 'status',
+      9 => 'name',
     );
 
     $sEcho = CRM_Utils_Type::escape($_REQUEST['sEcho'], 'Integer');
