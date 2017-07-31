@@ -391,6 +391,15 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
       "created_id.sort_name",
       "created_id",
     );
+    if (!CRM_Core_Permission::check("view all manual batches")) {
+      if (CRM_Core_Permission::check("view own manual batches")) {
+        $loggedInContactId = CRM_Core_Session::singleton()->get('userID');
+        $params['created_id'] = $loggedInContactId;
+      }
+      else {
+        $params['created_id'] = 0;
+      }
+    }
     foreach ($return as $field) {
       if (!isset($params[$field])) {
         continue;
