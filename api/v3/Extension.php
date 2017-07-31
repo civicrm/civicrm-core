@@ -402,7 +402,8 @@ function _civicrm_api3_getKeys($params, $key) {
       return array();
     }
     return explode(API_V3_EXTENSION_DELIMITER, $params[$key]);
-  } else {
+  }
+  else {
     return array();
   }
 }
