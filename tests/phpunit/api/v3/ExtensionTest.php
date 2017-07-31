@@ -97,4 +97,12 @@ class api_v3_ExtensionTest extends CiviUnitTestCase {
     $this->assertEquals(2, $result['count']);
   }
 
+  /**
+   * Test that extension get works with api request with parameter full_name as build by api explorer.
+   */
+  public function testGetMultipleExtensionsApiExplorer() {
+    $result = $this->callAPISuccess('extension', 'get', array('full_name' => array('test.extension.manager.paymenttest', 'test.extension.manager.moduletest')));
+    $this->assertEquals(2, $result['count']);
+  }
+
 }
