@@ -193,8 +193,13 @@ class api_v3_CaseTest extends CiviCaseTestCase {
     $params['subject'] = $case['subject'] = 'Something Else';
     $this->callAPISuccess('case', 'create', $params);
 
-    // Verify that updated case is exactly equal to the original with new subject.
+    // Verify that updated case is equal to the original with new subject.
     $result = $this->callAPISuccessGetSingle('Case', array('case_id' => $id));
+    // Modification dates are likely to differ by 0-2 sec. Check manually.
+    $this->assertTrue($result['modified_date'] >= $case['modified_date']);
+    unset($result['modified_date']);
+    unset($case['modified_date']);
+    // Everything else should be identical.
     $this->assertAPIArrayComparison($result, $case);
   }
 
