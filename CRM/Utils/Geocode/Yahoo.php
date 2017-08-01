@@ -122,10 +122,12 @@ class CRM_Utils_Geocode_Yahoo {
 
     $query = 'http://' . self::$_server . self::$_uri . '?' . $add;
 
-    require_once 'HTTP/Request.php';
-    $request = new HTTP_Request($query);
-    $request->sendRequest();
-    $string = $request->getResponseBody();
+    $response = CRM_Utils_Http::get($query);
+    if (!$response['status']) {
+      CRM_Core_Error::debug_var('Geocoding request failed: '. $response['message']);
+    }
+    $string = $response['response']->getBody();
+
     // see CRM-11359 for why we suppress errors with @
     $xml = @simplexml_load_string($string);
     CRM_Utils_Hook::geocoderFormat('Yahoo', $values, $xml);

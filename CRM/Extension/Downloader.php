@@ -110,7 +110,9 @@ class CRM_Extension_Downloader {
       CRM_Core_Error::fatal('Cannot install this extension - downloadUrl is not set!');
     }
 
-    if (!$this->fetch($downloadUrl, $filename)) {
+    $status = CRM_Utils_Http::download($downloadUrl, $filename);
+    if (!$status['status']) {
+      Civi::log()->warning('download() failed: ' . $status['message']);
       return FALSE;
     }
 
@@ -126,27 +128,6 @@ class CRM_Extension_Downloader {
     $this->manager->replace($extractedZipPath);
 
     return TRUE;
-  }
-
-  /**
-   * Download the remote zipfile.
-   *
-   * @param string $remoteFile
-   *   URL of a .zip file.
-   * @param string $localFile
-   *   Path at which to store the .zip file.
-   * @return bool
-   *   Whether the download was successful.
-   */
-  public function fetch($remoteFile, $localFile) {
-    $result = CRM_Utils_HttpClient::singleton()->fetch($remoteFile, $localFile);
-    switch ($result) {
-      case CRM_Utils_HttpClient::STATUS_OK:
-        return TRUE;
-
-      default:
-        return FALSE;
-    }
   }
 
   /**

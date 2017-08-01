@@ -121,10 +121,11 @@ class CRM_Utils_Geocode_Google {
 
     $query = 'https://' . self::$_server . self::$_uri . $add;
 
-    require_once 'HTTP/Request.php';
-    $request = new HTTP_Request($query);
-    $request->sendRequest();
-    $string = $request->getResponseBody();
+    $response = CRM_Utils_Http::get($query);
+    if (!$response['status']) {
+      CRM_Core_Error::debug_var('Geocoding request failed: '. $response['message']);
+    }
+    $string = $response['response']->getBody();
 
     libxml_use_internal_errors(TRUE);
     $xml = @simplexml_load_string($string);

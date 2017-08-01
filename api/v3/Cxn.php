@@ -69,11 +69,11 @@ function _civicrm_api3_cxn_register_spec(&$spec) {
  */
 function civicrm_api3_cxn_register($params) {
   if (!empty($params['app_meta_url'])) {
-    list ($status, $json) = CRM_Utils_HttpClient::singleton()->get($params['app_meta_url']);
-    if (CRM_Utils_HttpClient::STATUS_OK != $status) {
-      throw new API_Exception("Failed to download appMeta. (Bad HTTP response)");
+    $httpget = CRM_Utils_Http::get($params['app_meta_url']);
+    if (!$httpget['status']) {
+      throw new API_Exception("Failed to download appMeta. (Bad HTTP response): " . $httpget['message']);
     }
-    $appMeta = json_decode($json, TRUE);
+    $appMeta = $httpget['response']->json();
     if (empty($appMeta)) {
       throw new API_Exception("Failed to download appMeta. (Malformed)");
     }

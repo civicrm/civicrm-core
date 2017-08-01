@@ -130,11 +130,12 @@ class CRM_Core_CommunityMessages {
    *   parsed JSON
    */
   public function fetchDocument() {
-    list($status, $json) = $this->client->get($this->getRenderedUrl());
-    if ($status != CRM_Utils_HttpClient::STATUS_OK || empty($json)) {
+    $httpget = CRM_Utils_Http::get($this->getRenderedUrl());
+    if (!$httpget['status']) {
+      Civi::log()->warning('CommunityMessages fetchDocument() error: '.$httpget['message']);
       return NULL;
     }
-    $doc = json_decode($json, TRUE);
+    $doc = $httpget['response']->json();
     if (empty($doc) || json_last_error() != JSON_ERROR_NONE) {
       return NULL;
     }
