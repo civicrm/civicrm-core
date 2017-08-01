@@ -194,7 +194,7 @@
       $('#mode', $form).change(loadMsgBox);
 
       function populateRecipient() {
-        var mappingID = $('#entity_0', $form).val();
+        var mappingID = $('#entity_0', $form).val() || $('[name^=mappingID]', $form).val();
         var recipient = $("#recipient", $form).val();
         $("#recipientList", $form).hide();
         if ($('#limit_to').val() != '' ) {
