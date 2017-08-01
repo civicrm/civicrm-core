@@ -360,7 +360,8 @@ WHERE  contribution_id = {$id}
         }
       }
     }
-    CRM_Financial_Form_Payment::addCreditCardJs($id);
+    // CRM-21002: pass the default payment processor ID whose credit card type icons should be populated first
+    CRM_Financial_Form_Payment::addCreditCardJs($this->_paymentProcessor['id']);
 
     $this->assign('recurringPaymentProcessorIds',
       empty($this->_recurPaymentProcessors) ? '' : implode(',', array_keys($this->_recurPaymentProcessors))
