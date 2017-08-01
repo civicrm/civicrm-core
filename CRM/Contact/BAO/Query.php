@@ -2751,6 +2751,17 @@ class CRM_Contact_BAO_Query {
           $from .= CRM_Grant_BAO_Query::from($name, $mode, $side);
           continue;
 
+        case 'civicrm_campaign':
+          //Move to default case if not in either mode.
+          if ($mode & CRM_Contact_BAO_Query::MODE_CONTRIBUTE) {
+            $from .= CRM_Contribute_BAO_Query::from($name, $mode, $side);
+            continue;
+          }
+          elseif ($mode & CRM_Contact_BAO_Query::MODE_MAILING) {
+            $from .= CRM_Mailing_BAO_Query::from($name, $mode, $side);
+            continue;
+          }
+
         case 'civicrm_website':
           $from .= " $side JOIN civicrm_website ON contact_a.id = civicrm_website.contact_id ";
           continue;
