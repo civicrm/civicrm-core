@@ -47,7 +47,7 @@ define('API_V3_EXTENSION_DELIMITER', ',');
  * @return array
  */
 function civicrm_api3_extension_install($params) {
-  $keys = _civicrm_api3_getKeys($params, 'keys');
+  $keys = _civicrm_api3_getKeys($params);
   if (!$keys) {
     return civicrm_api3_create_success();
   }
@@ -119,7 +119,7 @@ function civicrm_api3_extension_upgrade() {
  * @return array
  */
 function civicrm_api3_extension_enable($params) {
-  $keys = _civicrm_api3_getKeys($params, 'keys');
+  $keys = _civicrm_api3_getKeys($params);
   if (count($keys) == 0) {
     return civicrm_api3_create_success();
   }
@@ -149,7 +149,7 @@ function _civicrm_api3_extension_enable_spec(&$fields) {
  * @return array
  */
 function civicrm_api3_extension_disable($params) {
-  $keys = _civicrm_api3_getKeys($params, 'keys');
+  $keys = _civicrm_api3_getKeys($params);
   if (count($keys) == 0) {
     return civicrm_api3_create_success();
   }
@@ -181,7 +181,7 @@ function _civicrm_api3_extension_disable_spec(&$fields) {
  * @return array
  */
 function civicrm_api3_extension_uninstall($params) {
-  $keys = _civicrm_api3_getKeys($params, 'keys');
+  $keys = _civicrm_api3_getKeys($params);
   if (count($keys) == 0) {
     return civicrm_api3_create_success();
   }
@@ -393,7 +393,7 @@ function civicrm_api3_extension_getremote($params) {
  *
  * @return array
  */
-function _civicrm_api3_getKeys($params, $key) {
+function _civicrm_api3_getKeys($params, $key = 'keys') {
   if (isset($params[$key])) {
     if (is_array($params[$key])) {
       return $params[$key];
