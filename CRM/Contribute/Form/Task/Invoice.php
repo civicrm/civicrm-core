@@ -287,11 +287,11 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       // to get billing address if present
       $billingAddress = array();
       foreach ($addressDetails as $address) {
-        if ((isset($address['is_billing']) && $address['is_billing'] == 1) && (isset($address['is_primary']) && $address['is_primary'] == 1) && $address['contact_id'] == $contribution->contact_id) {
+        if (($address['is_billing'] == 1) && ($address['is_primary'] == 1) && ($address['contact_id'] == $contribution->contact_id)) {
           $billingAddress[$address['contact_id']] = $address;
           break;
         }
-        elseif (($address['is_billing'] == 0 && $address['is_primary'] == 1) || (isset($address['is_billing']) && $address['is_billing'] == 1) && $address['contact_id'] == $contribution->contact_id) {
+        elseif (($address['is_billing'] == 0 && $address['is_primary'] == 1) || ($address['is_billing'] == 1) && ($address['contact_id'] == $contribution->contact_id)) {
           $billingAddress[$address['contact_id']] = $address;
         }
       }
@@ -614,15 +614,17 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
     $config->doNotAttachPDFReceipt = 1;
 
     if (!empty($params['output']) && $params['output'] == 'pdf_invoice') {
-      $activityTypeID = CRM_Core_OptionGroup::getValue('activity_type',
-        'Downloaded Invoice',
-        'name'
+      $activityTypeID = CRM_Core_PseudoConstant::getKey(
+        'CRM_Activity_DAO_Activity',
+        'activity_type_id',
+        'Downloaded Invoice'
       );
     }
     else {
-      $activityTypeID = CRM_Core_OptionGroup::getValue('activity_type',
-        'Emailed Invoice',
-        'name'
+      $activityTypeID = CRM_Core_PseudoConstant::getKey(
+        'CRM_Activity_DAO_Activity',
+        'activity_type_id',
+        'Emailed Invoice'
       );
     }
 

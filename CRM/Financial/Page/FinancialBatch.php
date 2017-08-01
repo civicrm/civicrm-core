@@ -76,21 +76,20 @@ class CRM_Financial_Page_FinancialBatch extends CRM_Core_Page_Basic {
   public function run() {
     $context = CRM_Utils_Request::retrieve('context', 'String', $this);
     $this->set("context", $context);
-    // assign vars to templates
-    $id = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE, 0);
-    $action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse'); // default to 'browse'
+
+    $id = $this->getIdAndAction();
 
     // what action to take ?
-    if ($action & (CRM_Core_Action::UPDATE |
+    if ($this->_action & (CRM_Core_Action::UPDATE |
         CRM_Core_Action::ADD |
         CRM_Core_Action::CLOSE |
         CRM_Core_Action::REOPEN |
         CRM_Core_Action::EXPORT)
     ) {
-      $this->edit($action, $id);
+      $this->edit($this->_action, $id);
     }
     // parent run
-    return parent::run();
+    return CRM_Core_Page::run();
   }
 
 

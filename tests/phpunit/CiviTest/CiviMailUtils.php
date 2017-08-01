@@ -331,15 +331,20 @@ class CiviMailUtils extends PHPUnit_Framework_TestCase {
    * Remove any sent messages from the log.
    *
    * @param int $limit
+   *  How many recent messages to remove, defaults to 0 (all).
    *
    * @throws \Exception
    */
-  public function clearMessages($limit = 1) {
+  public function clearMessages($limit = 0) {
     if ($this->_webtest) {
       throw new Exception("Not implemented: clearMessages for WebTest");
     }
     else {
-      CRM_Core_DAO::executeQuery('DELETE FROM civicrm_mailing_spool ORDER BY id DESC LIMIT ' . $limit);
+      $sql = 'DELETE FROM civicrm_mailing_spool ORDER BY id DESC';
+      if ($limit) {
+        $sql .= ' LIMIT ' . $limit;
+      }
+      CRM_Core_DAO::executeQuery($sql);
     }
   }
 

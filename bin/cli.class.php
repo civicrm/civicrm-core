@@ -430,6 +430,10 @@ class civicrm_cli_csv_file extends civicrm_cli {
         continue;
       }
       $this->row++;
+      if ($this->row % 1000 == 0) {
+        // Reset PEAR_DB_DATAOBJECT cache to prevent memory leak
+        CRM_Core_DAO::freeResult();
+      }
       $params = $this->convertLine($data);
       $this->processLine($params);
     }

@@ -199,8 +199,11 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
       'start_date' => 'first saturday of march last year',
     );
     $this->_pledge = $this->callAPISuccess('pledge', 'create', array_merge($this->_params, $overdueParams));
+    $pledgeStatuses = CRM_Core_OptionGroup::values('pledge_status',
+      FALSE, FALSE, FALSE, NULL, 'name'
+    );
     $params = array(
-      'pledge_status_id' => '6',
+      'pledge_status_id' => array_search('Overdue', $pledgeStatuses),
     );
     $result = $this->callAPISuccess('pledge', 'get', $params);
     $emptyResult = $this->callAPISuccess('pledge', 'get', array(
@@ -212,6 +215,24 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
     $this->assertEquals(0, $emptyResult['count']);
   }
 
+  /**
+   * Test pledge_status option group
+   */
+  public function testOptionGroupForPledgeStatus() {
+    $pledgeOg = $this->callAPISuccess('OptionGroup', 'get', array(
+      'name' => "pledge_status",
+    ));
+    $this->assertEquals(1, $pledgeOg['count']);
+
+    $pledgeOv = $this->callAPISuccess('OptionValue', 'get', array(
+      'sequential' => 1,
+      'option_group_id' => "pledge_status",
+    ));
+    $this->assertEquals(5, $pledgeOv['count']);
+    $pledgeStatus = CRM_Utils_Array::collect('name', $pledgeOv['values']);
+    $expected = array('Completed', 'Pending', 'Cancelled', 'In Progress', 'Overdue');
+    $this->assertEquals($expected, $pledgeStatus);
+  }
 
   /**
    * Create 2 pledges - see if we can get by status id.

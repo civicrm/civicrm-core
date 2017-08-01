@@ -47,6 +47,7 @@ class CRM_Custom_Form_CustomDataByType extends CRM_Core_Form {
     $this->_groupCount = CRM_Utils_Request::retrieve('cgcount', 'Positive');
     $this->_entityId = CRM_Utils_Request::retrieve('entityID', 'Positive');
     $this->_groupID = CRM_Utils_Request::retrieve('groupID', 'Positive');
+    $this->_onlySubtype = CRM_Utils_Request::retrieve('onlySubtype', 'Boolean');
     $this->assign('cdType', FALSE);
     $this->assign('cgCount', $this->_groupCount);
 
@@ -57,7 +58,7 @@ class CRM_Custom_Form_CustomDataByType extends CRM_Core_Form {
     if (!is_array($this->_subType) && strstr($this->_subType, CRM_Core_DAO::VALUE_SEPARATOR)) {
       $this->_subType = str_replace(CRM_Core_DAO::VALUE_SEPARATOR, ',', trim($this->_subType, CRM_Core_DAO::VALUE_SEPARATOR));
     }
-    CRM_Custom_Form_CustomData::setGroupTree($this, $this->_subType, $this->_groupID);
+    CRM_Custom_Form_CustomData::setGroupTree($this, $this->_subType, $this->_groupID, $this->_onlySubtype);
 
     $this->assign('suppressForm', TRUE);
     $this->controller->_generateQFKey = FALSE;

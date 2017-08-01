@@ -943,7 +943,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $params['is_email_receipt'] = $isEmailReceipt;
     }
     $params['is_recur'] = $isRecur;
-    $params['payment_instrument_id'] = $contributionParams['payment_instrument_id'];
+    $params['payment_instrument_id'] = CRM_Utils_Array::value('payment_instrument_id', $contributionParams);
     $recurringContributionID = self::processRecurringContribution($form, $params, $contactID, $financialType);
     $nonDeductibleAmount = self::getNonDeductibleAmount($params, $financialType, $online, $form);
 
@@ -1495,6 +1495,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         list($membershipContribution, $secondPaymentResult) = $this->processSecondaryFinancialTransaction($contactID, $form, array_merge($membershipParams, array('skipLineItem' => 1)),
           $isTest, $unprocessedLineItems, CRM_Utils_Array::value('minimum_fee', $membershipDetails, 0), CRM_Utils_Array::value('financial_type_id', $membershipDetails));
         $paymentResults[] = array('contribution_id' => $membershipContribution->id, 'result' => $secondPaymentResult);
+        $totalAmount = $membershipContribution->total_amount;
       }
       catch (CRM_Core_Exception $e) {
         $errors[2] = $e->getMessage();
@@ -2045,6 +2046,14 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     if (!empty($this->_ccid)) {
       $this->_params['contribution_id'] = $this->_ccid;
+    }
+    //Set email-bltID if pre/post profile contains an email.
+    if ($this->_emailExists == TRUE) {
+      foreach ($this->_params as $key => $val) {
+        if (substr($key, 0, 6) == 'email-' && empty($this->_params["email-{$this->_bltID}"])) {
+          $this->_params["email-{$this->_bltID}"] = $this->_params[$key];
+        }
+      }
     }
     // add a description field at the very beginning
     $this->_params['description'] = ts('Online Contribution') . ': ' . (($this->_pcpInfo['title']) ? $this->_pcpInfo['title'] : $this->_values['title']);

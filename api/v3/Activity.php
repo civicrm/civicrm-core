@@ -232,7 +232,7 @@ function _civicrm_api3_activity_get_spec(&$params) {
   $params['tag_id'] = array(
     'title' => 'Tags',
     'description' => 'Find activities with specified tags.',
-    'type' => 1,
+    'type' => CRM_Utils_Type::T_INT,
     'FKClassName' => 'CRM_Core_DAO_Tag',
     'FKApiName' => 'Tag',
     'supports_joins' => TRUE,
@@ -240,44 +240,49 @@ function _civicrm_api3_activity_get_spec(&$params) {
   $params['file_id'] = array(
     'title' => 'Attached Files',
     'description' => 'Find activities with attached files.',
-    'type' => 1,
+    'type' => CRM_Utils_Type::T_INT,
     'FKClassName' => 'CRM_Core_DAO_File',
     'FKApiName' => 'File',
   );
   $params['case_id'] = array(
     'title' => 'Cases',
     'description' => 'Find activities within specified cases.',
-    'type' => 1,
+    'type' => CRM_Utils_Type::T_INT,
     'FKClassName' => 'CRM_Case_DAO_Case',
     'FKApiName' => 'Case',
   );
   $params['contact_id'] = array(
     'title' => 'Activity Contact ID',
     'description' => 'Find activities involving this contact (as target, source, OR assignee).',
-    'type' => 1,
+    'type' => CRM_Utils_Type::T_INT,
     'FKClassName' => 'CRM_Contact_DAO_Contact',
     'FKApiName' => 'Contact',
   );
   $params['target_contact_id'] = array(
     'title' => 'Target Contact ID',
     'description' => 'Find activities with specified target contact.',
-    'type' => 1,
+    'type' => CRM_Utils_Type::T_INT,
     'FKClassName' => 'CRM_Contact_DAO_Contact',
     'FKApiName' => 'Contact',
   );
   $params['source_contact_id'] = array(
     'title' => 'Source Contact ID',
     'description' => 'Find activities with specified source contact.',
-    'type' => 1,
+    'type' => CRM_Utils_Type::T_INT,
     'FKClassName' => 'CRM_Contact_DAO_Contact',
     'FKApiName' => 'Contact',
   );
   $params['assignee_contact_id'] = array(
     'title' => 'Assignee Contact ID',
     'description' => 'Find activities with specified assignee contact.',
-    'type' => 1,
+    'type' => CRM_Utils_Type::T_INT,
     'FKClassName' => 'CRM_Contact_DAO_Contact',
     'FKApiName' => 'Contact',
+  );
+  $params['is_overdue'] = array(
+    'title' => 'Is Activity Overdue',
+    'description' => 'Incomplete activities with a past date.',
+    'type' => CRM_Utils_Type::T_BOOLEAN,
   );
 }
 
@@ -295,16 +300,9 @@ function _civicrm_api3_activity_get_spec(&$params) {
  * @throws \Civi\API\Exception\UnauthorizedException
  */
 function civicrm_api3_activity_get($params) {
-
+  $options = _civicrm_api3_get_options_from_params($params, FALSE, 'Activity', 'get');
   $sql = CRM_Utils_SQL_Select::fragment();
-  $recordTypes = civicrm_api3('ActivityContact', 'getoptions', array('field' => 'record_type_id'));
-  $recordTypes = $recordTypes['values'];
-  $activityContactOptions = array(
-    'contact_id' => NULL,
-    'target_contact_id' => array_search('Activity Targets', $recordTypes),
-    'source_contact_id' => array_search('Activity Source', $recordTypes),
-    'assignee_contact_id' => array_search('Activity Assignees', $recordTypes),
-  );
+
   if (empty($params['target_contact_id']) && empty($params['source_contact_id'])
     && empty($params['assignee_contact_id']) &&
     !empty($params['check_permissions']) && !CRM_Core_Permission::check('view all activities')
@@ -315,6 +313,67 @@ function civicrm_api3_activity_get($params) {
     //$params['contact_id'] = array('IS NOT NULL' => TRUE);
   }
 
+  _civicrm_api3_activity_get_extraFilters($params, $sql);
+
+  // Handle is_overdue sort
+  if (!empty($options['sort'])) {
+    $sort = explode(', ', $options['sort']);
+
+    foreach ($sort as $index => &$sortString) {
+      // Get sort field and direction
+      list($sortField, $dir) = array_pad(explode(' ', $sortString), 2, 'ASC');
+      if ($sortField == 'is_overdue') {
+        $incomplete = implode(',', array_keys(CRM_Activity_BAO_Activity::getStatusesByType(CRM_Activity_BAO_Activity::INCOMPLETE)));
+        $sql->orderBy("IF((a.activity_date_time >= NOW() OR a.status_id NOT IN ($incomplete)), 0, 1) $dir", NULL, $index);
+        // Replace the sort with a placeholder which will be ignored by sql
+        $sortString = '(1)';
+      }
+    }
+    $params['options']['sort'] = implode(', ', $sort);
+  }
+
+  // Ensure there's enough data for calculating is_overdue
+  if (!empty($options['return']['is_overdue']) && (empty($options['return']['status_id']) || empty($options['return']['activity_date_time']))) {
+    $options['return']['status_id'] = $options['return']['activity_date_time'] = 1;
+    $params['return'] = array_keys($options['return']);
+  }
+
+  $activities = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, FALSE, 'Activity', $sql);
+  if (!empty($params['check_permissions']) && !CRM_Core_Permission::check('view all activities')) {
+    // @todo get this to work at the query level - see contact_id join above.
+    foreach ($activities as $activity) {
+      if (!CRM_Activity_BAO_Activity::checkPermission($activity['id'], CRM_Core_Action::VIEW)) {
+        unset($activities[$activity['id']]);
+      }
+    }
+  }
+  if ($options['is_count']) {
+    return civicrm_api3_create_success($activities, $params, 'Activity', 'get');
+  }
+
+  $activities = _civicrm_api3_activity_get_formatResult($params, $activities, $options);
+  //legacy custom data get - so previous formatted response is still returned too
+  return civicrm_api3_create_success($activities, $params, 'Activity', 'get');
+}
+
+/**
+ * Support filters beyond what basic_get can do.
+ *
+ * @param array $params
+ * @param CRM_Utils_SQL_Select $sql
+ * @throws \CiviCRM_API3_Exception
+ * @throws \Exception
+ */
+function _civicrm_api3_activity_get_extraFilters(&$params, &$sql) {
+  // Filter by activity contacts
+  $recordTypes = civicrm_api3('ActivityContact', 'getoptions', array('field' => 'record_type_id'));
+  $recordTypes = $recordTypes['values'];
+  $activityContactOptions = array(
+    'contact_id' => NULL,
+    'target_contact_id' => array_search('Activity Targets', $recordTypes),
+    'source_contact_id' => array_search('Activity Source', $recordTypes),
+    'assignee_contact_id' => array_search('Activity Assignees', $recordTypes),
+  );
   foreach ($activityContactOptions as $activityContactName => $activityContactValue) {
     if (!empty($params[$activityContactName])) {
       if (!is_array($params[$activityContactName])) {
@@ -325,6 +384,19 @@ function civicrm_api3_activity_get($params) {
       $sql->where("a.id IN (SELECT activity_id FROM civicrm_activity_contact WHERE $typeClause !clause)",
         array('#typeId' => $activityContactValue, '!clause' => $clause)
       );
+    }
+  }
+
+  // Handle is_overdue filter
+  // Boolean calculated field - does not support operators
+  if (isset($params['is_overdue'])) {
+    $incomplete = implode(',', array_keys(CRM_Activity_BAO_Activity::getStatusesByType(CRM_Activity_BAO_Activity::INCOMPLETE)));
+    if ($params['is_overdue']) {
+      $sql->where('a.activity_date_time < NOW()');
+      $sql->where("a.status_id IN ($incomplete)");
+    }
+    else {
+      $sql->where("(a.activity_date_time >= NOW() OR a.status_id NOT IN ($incomplete))");
     }
   }
 
@@ -372,23 +444,6 @@ function civicrm_api3_activity_get($params) {
       }
     }
   }
-  $activities = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, FALSE, 'Activity', $sql);
-  if (!empty($params['check_permissions']) && !CRM_Core_Permission::check('view all activities')) {
-    // @todo get this to work at the query level - see contact_id join above.
-    foreach ($activities as $activity) {
-      if (!CRM_Activity_BAO_Activity::checkPermission($activity['id'], CRM_Core_Action::VIEW)) {
-        unset($activities[$activity['id']]);
-      }
-    }
-  }
-  $options = _civicrm_api3_get_options_from_params($params, FALSE, 'Activity', 'get');
-  if ($options['is_count']) {
-    return civicrm_api3_create_success($activities, $params, 'Activity', 'get');
-  }
-
-  $activities = _civicrm_api3_activity_get_formatResult($params, $activities, $options);
-  //legacy custom data get - so previous formatted response is still returned too
-  return civicrm_api3_create_success($activities, $params, 'Activity', 'get');
 }
 
 /**
@@ -492,6 +547,12 @@ function _civicrm_api3_activity_get_formatResult($params, $activities, $options)
           array(1 => array(implode(',', array_keys($activities)), 'String', CRM_Core_DAO::QUERY_FORMAT_NO_QUOTES)));
         while ($dao->fetch()) {
           $activities[$dao->activity_id]['case_id'][] = $dao->case_id;
+        }
+        break;
+
+      case 'is_overdue':
+        foreach ($activities as $key => $activityArray) {
+          $activities[$key]['is_overdue'] = (int) CRM_Activity_BAO_Activity::isOverdue($activityArray);
         }
         break;
 

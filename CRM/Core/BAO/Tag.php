@@ -333,7 +333,10 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
    */
   public static function getColorTags($usedFor = NULL, $allowSelectingNonSelectable = FALSE, $exclude = NULL) {
     $params = array(
-      'options' => array('limit' => 0),
+      'options' => array(
+        'limit' => 0,
+        'sort' => "name ASC",
+      ),
       'is_tagset' => 0,
       'return' => array('name', 'description', 'parent_id', 'color', 'is_selectable', 'used_for'),
     );

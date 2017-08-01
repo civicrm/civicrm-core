@@ -732,6 +732,163 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
+   * CRM-20793 : Test getActivities by using activity date and status filter
+   */
+  public function testbyActivityDateAndStatus() {
+    $op = new PHPUnit_Extensions_Database_Operation_Insert();
+    $op->execute($this->_dbconn,
+      $this->createFlatXMLDataSet(
+        dirname(__FILE__) . '/activities_for_dashboard_count.xml'
+      )
+    );
+
+    // activity IDs catagorised by date
+    $lastWeekActivities = array(1, 2, 3);
+    $todayActivities = array(4, 5, 6, 7);
+    $lastTwoMonthsActivities = array(8, 9, 10, 11);
+    $lastYearActivties = array(12, 13, 14, 15, 16);
+
+    // date values later used to set activity date value
+    $lastWeekDate = date('YmdHis', strtotime('1 week ago'));
+    $today = date('YmdHis');
+    $lastTwoMonthAgoDate = date('YmdHis', strtotime('2 months ago'));
+    $lastYearDate = date('YmdHis', strtotime('1 year ago'));
+    for ($i = 1; $i <= 16; $i++) {
+      if (in_array($i, $lastWeekActivities)) {
+        $date = $lastWeekDate;
+      }
+      elseif (in_array($i, $lastTwoMonthsActivities)) {
+        $date = $lastTwoMonthAgoDate;
+      }
+      elseif (in_array($i, $lastYearActivties)) {
+        $date = $lastYearDate;
+      }
+      elseif (in_array($i, $todayActivities)) {
+        $date = $today;
+      }
+      $this->callAPISuccess('Activity', 'create', array(
+        'id' => $i,
+        'activity_date_time' => $date,
+      ));
+    }
+
+    // parameters for different test cases, check each array key for the specific test-case
+    $testCases = array(
+      'todays-activity' => array(
+        'params' => array(
+          'contact_id' => 1,
+          'admin' => TRUE,
+          'caseId' => NULL,
+          'context' => 'activity',
+          'activity_date_relative' => 'this.day',
+          'activity_type_id' => NULL,
+          'offset' => 0,
+          'rowCount' => 0,
+          'sort' => NULL,
+        ),
+      ),
+      'todays-activity-filtered-by-range' => array(
+        'params' => array(
+          'contact_id' => 1,
+          'admin' => TRUE,
+          'caseId' => NULL,
+          'context' => 'activity',
+          'activity_date_low' => date('Y/m/d', strtotime('yesterday')),
+          'activity_date_high' => date('Y/m/d'),
+          'activity_type_id' => NULL,
+          'offset' => 0,
+          'rowCount' => 0,
+          'sort' => NULL,
+        ),
+      ),
+      'last-week-activity' => array(
+        'params' => array(
+          'contact_id' => 1,
+          'admin' => TRUE,
+          'caseId' => NULL,
+          'context' => 'activity',
+          'activity_date_relative' => 'previous.week',
+          'activity_type_id' => NULL,
+          'offset' => 0,
+          'rowCount' => 0,
+          'sort' => NULL,
+        ),
+      ),
+      'this-quarter-activity' => array(
+        'params' => array(
+          'contact_id' => 1,
+          'admin' => TRUE,
+          'caseId' => NULL,
+          'context' => 'activity',
+          'activity_date_relative' => 'this.quarter',
+          'activity_type_id' => NULL,
+          'offset' => 0,
+          'rowCount' => 0,
+          'sort' => NULL,
+        ),
+      ),
+      'last-year-activity' => array(
+        'params' => array(
+          'contact_id' => 1,
+          'admin' => TRUE,
+          'caseId' => NULL,
+          'context' => 'activity',
+          'activity_date_relative' => 'previous.year',
+          'activity_type_id' => NULL,
+          'offset' => 0,
+          'rowCount' => 0,
+          'sort' => NULL,
+        ),
+      ),
+      'activity-of-all-statuses' => array(
+        'params' => array(
+          'contact_id' => 1,
+          'admin' => TRUE,
+          'caseId' => NULL,
+          'context' => 'activity',
+          'activity_status_id' => '1,2',
+          'activity_type_id' => NULL,
+          'offset' => 0,
+          'rowCount' => 0,
+          'sort' => NULL,
+        ),
+      ),
+    );
+
+    foreach ($testCases as $caseName => $testCase) {
+      $activitiesDep = CRM_Activity_BAO_Activity::deprecatedGetActivities($testCase['params']);
+      $activityCount = CRM_Activity_BAO_Activity::deprecatedGetActivitiesCount($testCase['params']);
+      asort($activitiesDep);
+      $activityIDs = array_keys($activitiesDep);
+
+      if ($caseName == 'todays-activity' || $caseName == 'todays-activity-filtered-by-range') {
+        $this->assertEquals(count($todayActivities), $activityCount);
+        $this->assertEquals(count($todayActivities), count($activitiesDep));
+        $this->checkArrayEquals($todayActivities, $activityIDs);
+      }
+      elseif ($caseName == 'last-week-activity') {
+        $this->assertEquals(count($lastWeekActivities), $activityCount);
+        $this->assertEquals(count($lastWeekActivities), count($activitiesDep));
+        $this->checkArrayEquals($lastWeekActivities, $activityIDs);
+      }
+      elseif ($caseName == 'lhis-quarter-activity') {
+        $this->assertEquals(count($lastTwoMonthsActivities), $activityCount);
+        $this->assertEquals(count($lastTwoMonthsActivities), count($activitiesDep));
+        $this->checkArrayEquals($lastTwoMonthsActivities, $activityIDs);
+      }
+      elseif ($caseName == 'last-year-activity') {
+        $this->assertEquals(count($lastYearActivties), $activityCount);
+        $this->assertEquals(count($lastYearActivties), count($activitiesDep));
+        $this->checkArrayEquals($lastYearActivties, $activityIDs);
+      }
+      elseif ($caseName == 'activity-of-all-statuses') {
+        $this->assertEquals(16, $activityCount);
+        $this->assertEquals(16, count($activitiesDep));
+      }
+    }
+  }
+
+  /**
    * CRM-20308: Test from email address when a 'copy of Activity' event occur
    */
   public function testEmailAddressOfActivityCopy() {

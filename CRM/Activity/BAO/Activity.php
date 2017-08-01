@@ -37,6 +37,14 @@
 class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
 
   /**
+   * Activity status types
+   */
+  const
+    INCOMPLETE = 0,
+    COMPLETED = 1,
+    CANCELLED = 2;
+
+  /**
    * Static field for all the activity information that we can potentially export.
    *
    * @var array
@@ -1234,7 +1242,21 @@ LEFT JOIN   civicrm_case_activity ON ( civicrm_case_activity.activity_id = tbl.a
       "civicrm_activity.is_test= 0",
     );
 
-    if ($input['context'] != 'activity') {
+    if (isset($input['activity_date_relative']) ||
+        (!empty($input['activity_date_low']) || !empty($input['activity_date_high']))
+    ) {
+      list($from, $to) = CRM_Utils_Date::getFromTo(
+        CRM_Utils_Array::value('activity_date_relative', $input, 0),
+        CRM_Utils_Array::value('activity_date_low', $input),
+        CRM_Utils_Array::value('activity_date_high', $input)
+      );
+      $commonClauses[] = sprintf('civicrm_activity.activity_date_time BETWEEN "%s" AND "%s" ', $from, $to);
+    }
+
+    if (!empty($input['activity_status_id'])) {
+      $commonClauses[] = sprintf("civicrm_activity.status_id IN (%s)", $input['activity_status_id']);
+    }
+    elseif ($input['context'] != 'activity') {
       $commonClauses[] = "civicrm_activity.status_id = 1";
     }
 
@@ -2351,7 +2373,10 @@ AND cl.modified_id  = c.id
     $followupParams = array();
     $followupParams['parent_id'] = $activityId;
     $followupParams['source_contact_id'] = CRM_Core_Session::getLoggedInContactID();
-    $followupParams['status_id'] = CRM_Core_OptionGroup::getValue('activity_status', 'Scheduled', 'name');
+    $followupParams['status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity',
+      'activity_status_id',
+      'Scheduled'
+    );
 
     $followupParams['activity_type_id'] = $params['followup_activity_type_id'];
     // Get Subject of Follow-up Activiity, CRM-4491
@@ -2420,6 +2445,45 @@ AND cl.modified_id  = c.id
     $result = $activity->save();
 
     return $result;
+  }
+
+  /**
+   * Return list of activity statuses of a given type.
+   *
+   * Note: activity status options use the "grouping" field to distinguish status types.
+   * Types are defined in class constants INCOMPLETE, COMPLETED, CANCELLED
+   *
+   * @param int $type
+   *
+   * @return array
+   */
+  public static function getStatusesByType($type) {
+    if (!isset(Civi::$statics[__CLASS__][__FUNCTION__])) {
+      $statuses = civicrm_api3('OptionValue', 'get', array(
+        'option_group_id' => 'activity_status',
+        'return' => array('value', 'name', 'filter'),
+        'options' => array('limit' => 0),
+      ));
+      Civi::$statics[__CLASS__][__FUNCTION__] = $statuses['values'];
+    }
+    $ret = array();
+    foreach (Civi::$statics[__CLASS__][__FUNCTION__] as $status) {
+      if ($status['filter'] == $type) {
+        $ret[$status['value']] = $status['name'];
+      }
+    }
+    return $ret;
+  }
+
+  /**
+   * Check if activity is overdue.
+   *
+   * @param array $activity
+   *
+   * @return bool
+   */
+  public static function isOverdue($activity) {
+    return array_key_exists($activity['status_id'], self::getStatusesByType(self::INCOMPLETE)) && CRM_Utils_Date::overdue($activity['activity_date_time']);
   }
 
   /**
@@ -2788,9 +2852,7 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
         $activity['DT_RowId'] = $activityId;
         // Add class to this row if overdue.
         $activity['DT_RowClass'] = "crm-entity status-id-{$values['status_id']}";
-        if (CRM_Utils_Date::overdue(CRM_Utils_Array::value('activity_date_time', $values))
-          && CRM_Utils_Array::value('status_id', $values) == 1
-        ) {
+        if (self::isOverdue($values)) {
           $activity['DT_RowClass'] .= ' status-overdue';
         }
         else {

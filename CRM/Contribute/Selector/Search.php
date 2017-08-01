@@ -553,7 +553,7 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
           array(
             'name' => ts('Thank-you Sent'),
             'sort' => 'thankyou_date',
-            'field_name' => 'receive_date',
+            'field_name' => 'thankyou_date',
             'type' => 'date',
             'direction' => CRM_Utils_Sort::DONTCARE,
           ),

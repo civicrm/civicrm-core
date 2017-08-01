@@ -192,12 +192,12 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
           'participant_register_date' => array('title' => ts('Registration Date')),
           'total_paid' => array(
             'title' => ts('Total Paid'),
-            'dbAlias' => 'SUM(ft.total_amount)',
+            'dbAlias' => 'IFNULL(SUM(ft.total_amount), 0)',
             'type' => 1024,
           ),
           'balance' => array(
             'title' => ts('Balance'),
-            'dbAlias' => 'participant_civireport.fee_amount - SUM(ft.total_amount)',
+            'dbAlias' => 'participant_civireport.fee_amount - IFNULL(SUM(ft.total_amount), 0)',
             'type' => 1024,
           ),
         ),
@@ -563,14 +563,9 @@ ORDER BY  cv.label
       $this->_from .= "
             LEFT JOIN civicrm_entity_financial_trxn eft
                   ON (eft.entity_id = {$this->_aliases['civicrm_contribution']}.id)
-            LEFT JOIN civicrm_financial_account fa
-                  ON (fa.account_type_code = 'AR')
-            LEFT JOIN civicrm_financial_account fae
-                  ON (fae.account_type_code = 'EXP')
             LEFT JOIN civicrm_financial_trxn ft
                   ON (ft.id = eft.financial_trxn_id AND eft.entity_table = 'civicrm_contribution') AND
-                     (ft.to_financial_account_id != fa.id) AND
-                     (ft.to_financial_account_id != fae.id)
+                     (ft.is_payment = 1)
       ";
     }
   }

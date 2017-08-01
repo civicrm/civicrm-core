@@ -81,6 +81,10 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
       $queryObj->_where[0][0]
     );
     $this->assertEquals($queryObj->_qill[0][0], "date field BETWEEN 'June 6th, 2014 12:00 AM AND June 6th, 2015 11:59 PM'");
+
+    //CRM-17236 - Test custom date is correctly displayed without time.
+    $formattedValue = CRM_Core_BAO_CustomField::displayValue(date('Ymdhms'), $dateCustomField['id']);
+    $this->assertEquals(date('m/d/Y'), $formattedValue);
   }
 
   /**

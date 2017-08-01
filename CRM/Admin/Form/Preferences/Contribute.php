@@ -37,6 +37,7 @@
 class CRM_Admin_Form_Preferences_Contribute extends CRM_Admin_Form_Preferences {
   protected $_settings = array(
     'cvv_backoffice_required' => CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,
+    'update_contribution_on_membership_type_change' => CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,
     'acl_financial_type' => CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,
     'always_post_to_accounts_receivable' => CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,
     'deferred_revenue_enabled' => CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,
@@ -196,6 +197,9 @@ class CRM_Admin_Form_Preferences_Contribute extends CRM_Admin_Form_Preferences {
     unset($params['qfKey']);
     unset($params['entryURL']);
     Civi::settings()->set('contribution_invoice_settings', $params);
+    Civi::settings()->set('update_contribution_on_membership_type_change',
+      CRM_Utils_Array::value('update_contribution_on_membership_type_change', $params)
+    );
 
     // to set default value for 'Invoices / Credit Notes' checkbox on display preferences
     $values = CRM_Core_BAO_Setting::getItem("CiviCRM Preferences");

@@ -192,7 +192,7 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
     $this->_contributionPageID = NULL;
 
     $this->setupMembershipRecurringPaymentProcessorTransaction(array('is_email_receipt' => TRUE));
-    $mut->clearMessages(99999);
+    $mut->clearMessages();
     $IPN = new CRM_Core_Payment_AuthorizeNetIPN($this->getRecurTransaction(array('x_trans_id' => 'hers')));
     $IPN->main();
 

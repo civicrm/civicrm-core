@@ -156,7 +156,7 @@ class CRM_Report_Form_Pledge_Summary extends CRM_Report_Form {
             'title' => ts('Pledge Status'),
             'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Core_OptionGroup::values('contribution_status'),
+            'options' => CRM_Core_OptionGroup::values('pledge_status'),
           ),
           'financial_type_id' => array(
             'title' => ts('Financial Type'),
@@ -268,11 +268,11 @@ class CRM_Report_Form_Pledge_Summary extends CRM_Report_Form {
                 )) {
                   $append = '';
                 }
-                $this->_groupBy[] = "$append {$this->_params['group_bys_freq'][$fieldName]}({$field['dbAlias']})";
+                $this->_groupByArray[] = "$append {$this->_params['group_bys_freq'][$fieldName]}({$field['dbAlias']})";
                 $append = TRUE;
               }
               else {
-                $this->_groupBy[] = $field['dbAlias'];
+                $this->_groupByArray[] = $field['dbAlias'];
               }
             }
           }
@@ -280,13 +280,13 @@ class CRM_Report_Form_Pledge_Summary extends CRM_Report_Form {
       }
 
       if (!empty($this->_statFields) &&
-        (($append && count($this->_groupBy) <= 1) || (!$append)) &&
+        (($append && count($this->_groupByArray) <= 1) || (!$append)) &&
         !$this->_having
       ) {
         $this->_rollup = " WITH ROLLUP";
       }
-      $groupBy = $this->_groupBy;
-      $this->_groupBy = "GROUP BY " . implode(', ', $this->_groupBy);
+      $groupBy = $this->_groupByArray;
+      $this->_groupBy = "GROUP BY " . implode(', ', $this->_groupByArray);
     }
     else {
       $groupBy = "{$this->_aliases['civicrm_contact']}.id";
@@ -429,7 +429,7 @@ class CRM_Report_Form_Pledge_Summary extends CRM_Report_Form {
       //handle status id
       if (array_key_exists('civicrm_pledge_status_id', $row)) {
         if ($value = $row['civicrm_pledge_status_id']) {
-          $rows[$rowNum]['civicrm_pledge_status_id'] = CRM_Contribute_PseudoConstant::contributionStatus($value);
+          $rows[$rowNum]['civicrm_pledge_status_id'] = CRM_Core_PseudoConstant::getLabel('CRM_Pledge_BAO_Pledge', 'status_id', $value);
         }
         $entryFound = TRUE;
       }
