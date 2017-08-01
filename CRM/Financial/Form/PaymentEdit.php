@@ -73,13 +73,7 @@ class CRM_Financial_Form_PaymentEdit extends CRM_Core_Form {
    * @return array
    */
   public function setDefaultValues() {
-    $defaults = $this->_values;
-    if (!empty($defaults['card_type_id'])) {
-      // See comments in getPaymentFields function about why this nastiness exists.
-      $defaults['credit_card_type'] = CRM_Core_PseudoConstant::getName('CRM_Financial_DAO_FinancialTrxn', 'card_type_id', $defaults['card_type_id']);
-    }
-
-    return $defaults;
+    return $this->_values;
   }
 
   /**
@@ -91,24 +85,22 @@ class CRM_Financial_Form_PaymentEdit extends CRM_Core_Form {
     $paymentFields = $this->getPaymentFields();
     $this->assign('paymentFields', $paymentFields);
     foreach ($paymentFields as $name => $paymentField) {
-      $this->add($paymentField['htmlType'],
-        $paymentField['name'],
-        $paymentField['title'],
-        $paymentField['attributes'],
-        TRUE
-      );
-      if (!empty($paymentField['rules'])) {
-        foreach ($paymentField['rules'] as $rule) {
-          $this->addRule($name,
-            $rule['rule_message'],
-            $rule['rule_name'],
-            $rule['rule_parameters']
-          );
-        }
+      if (!empty($paymentField['add_field'])) {
+        $this->addField($name, $paymentField['attributes'], $paymentField['is_required']);
+      }
+      else {
+        $this->add($paymentField['htmlType'],
+          $name,
+          $paymentField['title'],
+          $paymentField['attributes'],
+          $paymentField['is_required']
+        );
       }
     }
 
     $this->assign('currency', CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_Currency', $this->_values['currency'], 'symbol', 'name'));
+    $this->addFormRule(array(__CLASS__, 'formRule'), $this);
+
     $this->addButtons(array(
       array(
         'type' => 'submit',
@@ -123,23 +115,51 @@ class CRM_Financial_Form_PaymentEdit extends CRM_Core_Form {
   }
 
   /**
+   * Global form rule.
+   *
+   * @param array $fields
+   *   The input form values.
+   * @param array $files
+   *   The uploaded files if any.
+   * @param $self
+   *
+   * @return bool|array
+   *   true if no errors, else array of errors
+   */
+  public static function formRule($fields, $files, $self) {
+    $errors = array();
+
+    // if Credit Card is chosen and pan_truncation is not NULL ensure that it's value is numeric else throw validation error
+    if (CRM_Core_PseudoConstant::getName('CRM_Financial_DAO_FinancialTrxn', 'payment_instrument_id', $fields['payment_instrument_id']) == 'Credit Card' &&
+      !empty($fields['pan_truncation']) &&
+      !CRM_Utils_Rule::numeric($fields['pan_truncation'])
+    ) {
+      $errors['pan_truncation'] = ts('Please enter a valid Card Number');
+    }
+
+    return $errors;
+  }
+
+  /**
    * Process the form submission.
    */
   public function postProcess() {
     $params = array(
       'id' => $this->_id,
-      'check_number' => CRM_Utils_Array::value('check_number', $this->_submitValues),
-      'pan_truncation' => CRM_Utils_Array::value('pan_truncation', $this->_submitValues),
+      'payment_instrument_id' => $this->_submitValues['payment_instrument_id'],
+      'trxn_id' => CRM_Utils_Array::value('trxn_id', $this->_submitValues),
       'trxn_date' => CRM_Utils_Array::value('trxn_date', $this->_submitValues, date('YmdHis')),
     );
-    if (!empty($this->_submitValues['credit_card_type'])) {
-      // See comments in getPaymentFields function about why this nastiness exists.
-      $params['card_type_id'] = CRM_Core_PseudoConstant::getKey(
-        'CRM_Financial_DAO_FinancialTrxn',
-        'card_type_id',
-        $this->_submitValues['credit_card_type']
-      );
+
+    $paymentInstrumentName = CRM_Core_PseudoConstant::getName('CRM_Financial_DAO_FinancialTrxn', 'payment_instrument_id', $params['payment_instrument_id']);
+    if ($paymentInstrumentName == 'Credit Card') {
+      $params['card_type_id'] = CRM_Utils_Array::value('card_type_id', $this->_submitValues);
+      $params['pan_truncation'] = CRM_Utils_Array::value('pan_truncation', $this->_submitValues);
     }
+    elseif ($paymentInstrumentName == 'Check') {
+      $params['check_number'] = CRM_Utils_Array::value('check_number', $this->_submitValues);
+    }
+
     // update the financial trxn
     civicrm_api3('FinancialTrxn', 'create', $params);
     CRM_Core_Session::singleton()->pushUserContext(CRM_Utils_System::url(CRM_Utils_System::currentPath()));
@@ -149,56 +169,53 @@ class CRM_Financial_Form_PaymentEdit extends CRM_Core_Form {
    * Get payment fields
    */
   public function getPaymentFields() {
-    $paymentFields = array();
-    $paymentInstrument = CRM_Core_PseudoConstant::getName('CRM_Financial_DAO_FinancialTrxn', 'payment_instrument_id', $this->_values['payment_instrument_id']);
-    if ($paymentInstrument == 'Check') {
-      $paymentFields['check_number'] = array(
-        'htmlType' => 'text',
-        'name' => 'check_number',
-        'title' => ts('Check Number'),
-        'is_required' => FALSE,
-        'attributes' => NULL,
-      );
-    }
-    elseif ($paymentInstrument == 'Credit Card') {
-      // Ideally we would use $this->addField('card_type_id', array('entity' => 'FinancialTrxn'));
-      // to assign this field (& other fields on this form). However, the addCreditCardJs
-      // adds some 'pretty' to the credit card selection. The 'cost' of this is that because it
-      // was originally written to comply with front end needs (use of the word rather than the id)
-      // we have to do a lot of wrangling with our fields to make the BillingBlock.js code work.
-      // If you are reading this it means it's time to fix the BillingBlock.js to work with
-      // card_type_id and the pseudoconstant options & set this code free. No returns.
-      CRM_Financial_Form_Payment::addCreditCardJs(NULL, 'payment-edit-block');
-      $paymentFields['credit_card_type'] = array(
-        'htmlType' => 'select',
-        'name' => 'credit_card_type',
-        'title' => ts('Card Type'),
-        'attributes' => array('' => ts('- select -')) + CRM_Contribute_PseudoConstant::creditCard(),
-      );
-      $paymentFields['pan_truncation'] = array(
-        'htmlType' => 'text',
-        'name' => 'pan_truncation',
-        'title' => ts('Last 4 digits of the card'),
+    $paymentFields = array(
+      'payment_instrument_id' => array(
+        'is_required' => TRUE,
+        'add_field' => TRUE,
         'attributes' => array(
-          'size' => 4,
-          'maxlength' => 4,
-          'minlength' => 4,
-          'autocomplete' => 'off',
+          'entity' => 'FinancialTrxn',
+          'name' => 'payment_instrument_id',
         ),
-        'rules' => array(
-          array(
-            'rule_message' => ts('Please enter valid last 4 digit card number.'),
-            'rule_name' => 'numeric',
-            'rule_parameters' => NULL,
-          ),
+      ),
+      'check_number' => array(
+        'is_required' => FALSE,
+        'add_field' => TRUE,
+        'attributes' => array(
+          'entity' => 'FinancialTrxn',
+          'name' => 'check_number',
         ),
-      );
-    }
-    $paymentFields += array(
+      ),
+      // @TODO we need to show card type icon in place of select field
+      'card_type_id' => array(
+        'is_required' => FALSE,
+        'add_field' => TRUE,
+        'attributes' => array(
+          'entity' => 'FinancialTrxn',
+          'name' => 'card_type_id',
+        ),
+      ),
+      'pan_truncation' => array(
+        'is_required' => FALSE,
+        'add_field' => TRUE,
+        'attributes' => array(
+          'entity' => 'FinancialTrxn',
+          'name' => 'pan_truncation',
+        ),
+      ),
+      'trxn_id' => array(
+        'htmlType' => 'text',
+        'title' => ts('Transaction ID'),
+        'is_required' => FALSE,
+        'attributes' => array(
+          'size' => 6,
+        ),
+      ),
       'trxn_date' => array(
         'htmlType' => 'datepicker',
         'name' => 'trxn_date',
         'title' => ts('Transaction Date'),
+        'is_required' => TRUE,
         'attributes' => array(
           'date' => 'yyyy-mm-dd',
           'time' => 24,
@@ -208,6 +225,7 @@ class CRM_Financial_Form_PaymentEdit extends CRM_Core_Form {
         'htmlType' => 'text',
         'name' => 'total_amount',
         'title' => ts('Total Amount'),
+        'is_required' => TRUE,
         'attributes' => array(
           'readonly' => TRUE,
           'size' => 6,
