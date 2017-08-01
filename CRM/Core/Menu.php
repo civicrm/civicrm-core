@@ -135,10 +135,10 @@ class CRM_Core_Menu {
 
       if ($item->ids_arguments) {
         $ids = array();
-        foreach (array('json', 'html', 'exception') as $type) {
-          $ids[$type] = array();
-          foreach ($item->ids_arguments->{$type} as $value) {
-            $ids[$type][] = (string) $value;
+        foreach (array('json' => 'json', 'html' => 'html', 'exception' => 'exceptions') as $tag => $attr) {
+          $ids[$attr] = array();
+          foreach ($item->ids_arguments->{$tag} as $value) {
+            $ids[$attr][] = (string) $value;
           }
         }
         $menu[$path]['ids_arguments'] = $ids;

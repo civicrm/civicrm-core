@@ -69,17 +69,7 @@ class CRM_Core_IDS {
       return NULL;
     }
 
-    $config = \CRM_Core_IDS::createStandardConfig();
-    foreach (array('json', 'html', 'exception') as $section) {
-      if (isset($route['ids_arguments'][$section])) {
-        foreach ($route['ids_arguments'][$section] as $v) {
-          $config['General'][$section][] = $v;
-        }
-        $config['General'][$section] = array_unique($config['General'][$section]);
-      }
-    }
-
-    $init = self::create($config);
+    $init = self::create(self::createRouteConfig($route));
 
     // Add request url and user agent.
     $_REQUEST['IDS_request_uri'] = $_SERVER['REQUEST_URI'];
@@ -193,6 +183,26 @@ class CRM_Core_IDS {
     );
 
     return $result;
+  }
+
+  /**
+   * @param array $route
+   * @return array
+   */
+  public static function createRouteConfig($route) {
+    $config = \CRM_Core_IDS::createStandardConfig();
+    foreach (array('json', 'html', 'exceptions') as $section) {
+      if (isset($route['ids_arguments'][$section])) {
+        if (!isset($config['General'][$section])) {
+          $config['General'][$section] = array();
+        }
+        foreach ($route['ids_arguments'][$section] as $v) {
+          $config['General'][$section][] = $v;
+        }
+        $config['General'][$section] = array_unique($config['General'][$section]);
+      }
+    }
+    return $config;
   }
 
   /**

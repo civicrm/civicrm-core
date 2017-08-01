@@ -42,7 +42,7 @@ class CRM_Core_MenuTest extends CiviUnitTestCase {
          <ids_arguments>
           <json>alpha</json>
           <json>beta</json>
-          <html>gamma</html>
+          <exception>gamma</exception>
         </ids_arguments>
       </item>
     </menu>
@@ -53,8 +53,14 @@ class CRM_Core_MenuTest extends CiviUnitTestCase {
     $this->assertTrue(isset($menu['civicrm/foo/bar']));
     $this->assertEquals('Foo Bar', $menu['civicrm/foo/bar']['title']);
     $this->assertEquals(array('alpha', 'beta'), $menu['civicrm/foo/bar']['ids_arguments']['json']);
-    $this->assertEquals(array('gamma'), $menu['civicrm/foo/bar']['ids_arguments']['html']);
-    $this->assertEquals(array(), $menu['civicrm/foo/bar']['ids_arguments']['exception']);
+    $this->assertEquals(array('gamma'), $menu['civicrm/foo/bar']['ids_arguments']['exceptions']);
+    $this->assertEquals(array(), $menu['civicrm/foo/bar']['ids_arguments']['html']);
+
+    $idsConfig = CRM_Core_IDS::createRouteConfig($menu['civicrm/foo/bar']);
+    $this->assertTrue(in_array('alpha', $idsConfig['General']['json'])); // XML
+    $this->assertTrue(in_array('beta', $idsConfig['General']['json'])); // XML
+    $this->assertTrue(in_array('gamma', $idsConfig['General']['exceptions'])); // XML
+    $this->assertTrue(in_array('thankyou_text', $idsConfig['General']['exceptions'])); // Inherited
   }
 
   /**
@@ -64,17 +70,17 @@ class CRM_Core_MenuTest extends CiviUnitTestCase {
   public function testModuleData() {
     CRM_Core_Menu::store(TRUE);
     $item = CRM_Core_Menu::get('civicrm/case');
-    $this->assertFalse(isset($item['ids_arguments']['exception']));
+    $this->assertFalse(isset($item['ids_arguments']['exceptions']));
     $this->assertFalse(isset($item['whimsy']));
 
     CRM_Utils_Hook::singleton()->setHook('civicrm_alterMenu', function(&$items){
-      $items['civicrm/case']['ids_arguments']['exception'][] = 'foobar';
+      $items['civicrm/case']['ids_arguments']['exceptions'][] = 'foobar';
       $items['civicrm/case']['whimsy'] = 'godliness';
     });
 
     CRM_Core_Menu::store(TRUE);
     $item = CRM_Core_Menu::get('civicrm/case');
-    $this->assertTrue(in_array('foobar', $item['ids_arguments']['exception']));
+    $this->assertTrue(in_array('foobar', $item['ids_arguments']['exceptions']));
     $this->assertEquals('godliness', $item['whimsy']);
   }
 
