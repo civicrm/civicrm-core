@@ -136,7 +136,7 @@
             var gids = [];
             var mids = [];
 
-            for (i in values) {
+            for (var i in values) {
               var dv = convertValueToObj(values[i]);
               if (dv.entity_type == 'civicrm_group') {
                 gids.push(dv.entity_id);
@@ -189,7 +189,7 @@
                     refreshMandatory();
 
                     cb(datamap);
-                  })
+                  });
               });
           },
           ajax: {
@@ -206,11 +206,20 @@
 	      }
 
 	      rcpAjaxState.page_i = page_num - rcpAjaxState.page_n;
+              var filterParams = {};
+              switch(rcpAjaxState.entity) {
+              case 'civicrm_group':
+                filterParams = { is_hidden: 0, is_active: 1, group_type: "Mailing List" };
+                break;
 
+              case 'civicrm_mailing':
+                filterParams = { is_hidden: 0, is_active: 1 };
+                break;
+              }
               var params = {
                 input: input,
                 page_num: rcpAjaxState.page_i,
-                params: { is_hidden: 0, is_active: 1 },
+                params: filterParams,
               };
               return params;
             },
@@ -230,7 +239,7 @@
               results = {
 		children: $.map(data.values, function(obj) {
                   return {   id: obj.id + ' ' + rcpAjaxState.entity + ' ' + rcpAjaxState.type,
-                             text: obj.label }
+                             text: obj.label };
 		})
 	      };
 
