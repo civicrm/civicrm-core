@@ -86,7 +86,11 @@ class CRM_Financial_Form_PaymentEdit extends CRM_Core_Form {
     $this->assign('paymentFields', $paymentFields);
     foreach ($paymentFields as $name => $paymentField) {
       if (!empty($paymentField['add_field'])) {
-        $this->addField($name, $paymentField['attributes'], $paymentField['is_required']);
+        $attributes = array(
+          'entity' => 'FinancialTrxn',
+          'name' => $name,
+        );
+        $this->addField($name, $attributes, $paymentField['is_required']);
       }
       else {
         $this->add($paymentField['htmlType'],
@@ -173,43 +177,23 @@ class CRM_Financial_Form_PaymentEdit extends CRM_Core_Form {
       'payment_instrument_id' => array(
         'is_required' => TRUE,
         'add_field' => TRUE,
-        'attributes' => array(
-          'entity' => 'FinancialTrxn',
-          'name' => 'payment_instrument_id',
-        ),
       ),
       'check_number' => array(
         'is_required' => FALSE,
         'add_field' => TRUE,
-        'attributes' => array(
-          'entity' => 'FinancialTrxn',
-          'name' => 'check_number',
-        ),
       ),
       // @TODO we need to show card type icon in place of select field
       'card_type_id' => array(
         'is_required' => FALSE,
         'add_field' => TRUE,
-        'attributes' => array(
-          'entity' => 'FinancialTrxn',
-          'name' => 'card_type_id',
-        ),
       ),
       'pan_truncation' => array(
         'is_required' => FALSE,
         'add_field' => TRUE,
-        'attributes' => array(
-          'entity' => 'FinancialTrxn',
-          'name' => 'pan_truncation',
-        ),
       ),
       'trxn_id' => array(
-        'htmlType' => 'text',
-        'title' => ts('Transaction ID'),
+        'add_field' => TRUE,
         'is_required' => FALSE,
-        'attributes' => array(
-          'size' => 6,
-        ),
       ),
       'trxn_date' => array(
         'htmlType' => 'datepicker',
