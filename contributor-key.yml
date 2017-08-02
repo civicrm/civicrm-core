@@ -46,6 +46,9 @@
   name        : Andrew Thompson
   jira        : andrewpthompson
 
+- name        : F. M. Andrimont
+  jira        : andrimont
+
 - github      : anthonylindsay
   name        : Anthony Lindsay
   organization: Annertech
@@ -54,6 +57,10 @@
 - github      : arborrow
   name        : Anthony Borrow
   jira        : arborrow
+
+- github      : AronNovakInovae
+  name        : Aron Novak
+  organization: Gizra
 
 - github      : artem3
   name        : Artem Goncharenko
@@ -136,6 +143,7 @@
 
 - github      : davialexandre
   name        : Davi Alexandre
+  organization: CompuCorp
   jira        : davialexandre
 
 - github      : davidjosephhayes
@@ -189,6 +197,10 @@
   organization: dotPro
   jira        : diegov
 
+- name        : Dina London
+  organization: Jvillage Network
+  jira        : dinalondon
+
 - github      : dvhirst
   name        : Donald Hirst
   jira        : dvhirst
@@ -202,6 +214,11 @@
   name        : Eileen McNaughton
   organization: Fuzion
   jira        : eileen
+
+- github      : ejegg
+  name        : Elliott Eggleston
+  organization: Wikimedia Foundation
+  jira        : ejegg
 
 - github      : elisseck
   name        : Eli Lisseck
@@ -363,6 +380,9 @@
   name        : John Kingsnorth
   jira        : john
 
+- github      : JO0st
+  name        : Joost Fock
+
 - github      : JoeMurray
   name        : Joe Murray
   organization: JMA Consulting
@@ -435,6 +455,11 @@
   name        : Kurund Jalmi
   organization: Web Access
   jira        : kurund
+
+- github      : laryn
+  name        : Laryn Kragt Bakker
+  organization: CEDC
+  jira        : lpkb
 
 - github      : lcdservices
   name        : Brian Shaughnessy
@@ -581,6 +606,13 @@
   name        : Pawel Nowak
   jira        : pnowak
 
+- name        : Peter Bull
+  jira        : peter39
+
+- github      : philmck
+  name        : Phil McKerracher
+  jira        : philmck
+
 - name        : René Nieuwburg
   organization: Comunica2
   jira        : ñull
@@ -606,8 +638,9 @@
 - name        : Dennis Gray
   jira        : ozyank
 
-- github      : PalanteJon
+- github      : MegaphoneJon
   name        : Jon Goldberg
+  organization: Megaphone Technology Consulting
   jira        : palantejon
 
 - name        : Patrick Corbett
@@ -717,6 +750,10 @@
   name        : Stephen Palmstrom
   jira        : spalmstr
 
+- github      : spencerbrooks
+  name        : Spencer Brooks
+  organization: Brooks Digital
+
 - github      : sqweets
   name        : Ellen Hendricks
   organization: Spry Digital
@@ -759,6 +796,9 @@
 - name        : Thomas Mannell
   organization: Registered Nurses' Association of Ontario
   jira        : tom.m
+
+- name        : Torrance Hodgson
+  jira        : torrance123
 
 - github      : totten
   name        : Tim Otten
