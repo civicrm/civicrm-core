@@ -678,7 +678,12 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       }
     }
 
+    // Do not freeze full options on the back-end registration forms
     $className = CRM_Utils_System::getClassName($form);
+    $overrideIsFull = FALSE;
+    if ($className == 'CRM_Event_Form_Participant' || $className == 'CRM_Event_Form_ParticipantFeeSelection') {
+      $overrideIsFull = TRUE;
+    }
 
     //get the current price event price set options count.
     $currentOptionsCount = self::getPriceSetOptionCount($form);
@@ -712,6 +717,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
             }
           }
           else {
+            // Do not count currently selected options as 'full'
             if (!empty($defaultPricefieldIds) && in_array($optId, $defaultPricefieldIds)) {
               unset($optionFullIds[$optId]);
             }
@@ -729,14 +735,10 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
             $isFull = TRUE;
           }
         }
-        $option['is_full'] = $isFull;
+        // 'is_full' says whether we should freeze the option in \CRM_Price_BAO_PriceField::freezeIfEnabled
+        $option['is_full'] = $overrideIsFull ? FALSE : $isFull;
         $option['db_total_count'] = $dbTotalCount;
         $option['total_option_count'] = $dbTotalCount + $currentTotalCount;
-      }
-
-      //ignore option full for offline registration.
-      if ($className == 'CRM_Event_Form_Participant') {
-        $optionFullIds = array();
       }
 
       //finally get option ids in.
