@@ -360,7 +360,11 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
         $action -= CRM_Core_Action::ADD;
         $action -= CRM_Core_Action::ADVANCED;
         $action -= CRM_Core_Action::BASIC;
-        $action -= CRM_Core_Action::PROFILE;
+
+        //CRM-21004
+        if (Civi::settings()->get('remote_profile_submissions')) {
+          $action -= CRM_Core_Action::PROFILE;
+        }
       }
 
       $ufGroup[$id]['group_type'] = self::formatGroupTypes($groupTypes);
