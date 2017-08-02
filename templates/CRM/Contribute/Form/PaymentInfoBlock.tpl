@@ -27,23 +27,23 @@
 {if !empty($payments)}
   <table class="selector row-highlight">
     <tr>
-      <th></th>
       <th>{ts}Amount{/ts}</th>
       <th>{ts}Type{/ts}</th>
       <th>{ts}Payment Method{/ts}</th>
       <th>{ts}Received{/ts}</th>
       <th>{ts}Transaction ID{/ts}</th>
       <th>{ts}Status{/ts}</th>
+      <th></th>
     </tr>
     {foreach from=$payments item=payment}
       <tr class="{cycle values="odd-row,even-row"}">
-        <td>{$payment.action}</td>
         <td>{$payment.total_amount|crmMoney:$payment.currency}</td>
         <td>{$payment.financial_type}</td>
         <td>{$payment.payment_instrument}{if $payment.check_number} (#{$payment.check_number}){/if}</td>
         <td>{$payment.receive_date|crmDate}</td>
         <td>{$payment.trxn_id}</td>
         <td>{$payment.status}</td>
+        <td>{$payment.action}</td>
       </tr>
     {/foreach}
   </table>

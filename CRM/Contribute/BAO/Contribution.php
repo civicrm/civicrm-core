@@ -4176,6 +4176,7 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
             CRM_Core_Action::UPDATE => array(
               'name' => "<i class='crm-i fa-pencil'></i>",
               'url' => 'civicrm/payment/edit',
+              'class' => 'medium-popup',
               'qs' => "reset=1&id=%%id%%",
               'title' => ts('Edit Payment'),
             ),

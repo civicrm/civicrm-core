@@ -26,16 +26,12 @@
 
 {crmRegion name="payment-edit-block"}
    <div id="payment-edit-section" class="crm-section billing_mode-section">
-     {foreach from=$paymentFields item=paymentField}
-       {assign var='name' value=$paymentField.name}
+     {foreach from=$paymentFields key=fieldName item=paymentField}
+       {assign var='name' value=$fieldName}
        <div class="crm-container {$name}-section">
          <div class="label">{$form.$name.label}
-           {if $requiredPaymentFields.$name}<span class="crm-marker" title="{ts}This field is required.{/ts}">*</span>{/if}
          </div>
          <div class="content">{if $name eq 'total_amount'}{$currency}&nbsp;&nbsp;{/if}{$form.$name.html}
-           {if $name == 'credit_card_type'}
-             <div class="crm-credit_card_type-icons"></div>
-           {/if}
          </div>
          <div class="clear"></div>
        </div>
@@ -45,3 +41,28 @@
 <div class="crm-submit-buttons">
   {include file="CRM/common/formButtons.tpl" location="bottom"}
 </div>
+
+{literal}
+<script type="text/javascript">
+CRM.$(function ($) {
+
+  showHideFieldsByPaymentInstrumentID();
+  $('#payment_instrument_id').on('change', showHideFieldsByPaymentInstrumentID);
+
+  function showHideFieldsByPaymentInstrumentID() {
+    var paymentInstrumentLabel = $('#payment_instrument_id option:selected').text();
+    if (paymentInstrumentLabel == ts('Credit Card')) {
+      $('.check_number-section').hide();
+      $('.card_type_id-section, .pan_truncation-section').show();
+    }
+    else if (paymentInstrumentLabel == ts('Check')) {
+      $('.card_type_id-section, .pan_truncation-section').hide();
+      $('.check_number-section').show();
+    }
+    else {
+      $('.card_type_id-section, .pan_truncation-section, .check_number-section').hide();
+    }
+  }
+});
+</script>
+{/literal}
