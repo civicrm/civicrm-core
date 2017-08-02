@@ -164,9 +164,45 @@ class CRM_Financial_Form_PaymentEdit extends CRM_Core_Form {
       $params['check_number'] = CRM_Utils_Array::value('check_number', $this->_submitValues);
     }
 
-    // update the financial trxn
-    civicrm_api3('FinancialTrxn', 'create', $params);
+    if ($this->_submitValues['payment_instrument_id'] != $this->_values['payment_instrument_id']) {
+      //first reverse previous transaction
+      $previousFinanciaTrxn = $this->_values;
+      unset($previousFinanciaTrxn['id'], $params['id']);
+      $previousFinanciaTrxn['trxn_date'] = CRM_Utils_Array::value('trxn_date', $params, date('YmdHis'));
+      $previousFinanciaTrxn['total_amount'] = -$previousFinanciaTrxn['total_amount'];
+      $previousFinanciaTrxn['net_amount'] = -$previousFinanciaTrxn['net_amount'];
+      $previousFinanciaTrxn['fee_amount'] = -$previousFinanciaTrxn['fee_amount'];
+      $previousFinanciaTrxn['to_financial_account_id'] = CRM_Financial_BAO_FinancialTypeAccount::getInstrumentFinancialAccount($params['payment_instrument_id']);
+      $previousFinanciaTrxn['contribution_id'] = self::getContributionIDbyTrxn($this->_id);
+      CRM_Core_BAO_FinancialTrxn::create($previousFinanciaTrxn);
+
+      $params['to_financial_account_id'] = $previousFinanciaTrxn['to_financial_account_id'];
+      $params['contribution_id'] = $previousFinanciaTrxn['contribution_id'];
+      foreach (array('total_amount', 'fee_amount', 'net_amount', 'currency', 'is_payment', 'status_id') as $fieldName) {
+        $params[$fieldName] = $this->_values[$fieldName];
+      }
+      CRM_Core_BAO_FinancialTrxn::create($params);
+    }
+    else {
+      // simply update the financial trxn
+      civicrm_api3('FinancialTrxn', 'create', $params);
+    }
     CRM_Core_Session::singleton()->pushUserContext(CRM_Utils_System::url(CRM_Utils_System::currentPath()));
+  }
+
+  /**
+   * Get contribution ID from financial trx ID
+   * @param int $financialTrxnID
+   *
+   * @return int contribution ID
+   */
+  public static function getContributionIDbyTrxn($financialTrxnID) {
+    return CRM_Core_DAO::singleValueQuery("
+      SELECT entity_id
+      FROM civicrm_entity_financial_trxn
+      WHERE entity_table = 'civicrm_contribution' AND financial_trxn_id = %1
+      LIMIT 1
+    ", array(1 => array($financialTrxnID, 'Integer')));
   }
 
   /**
