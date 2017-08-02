@@ -547,6 +547,7 @@ INNER JOIN  civicrm_participant participant ON ( line.entity_table  = 'civicrm_p
 INNER JOIN  civicrm_price_field_value value ON ( value.id = line.price_field_value_id )
 INNER JOIN  civicrm_price_field field       ON ( value.price_field_id = field.id )
      WHERE  participant.event_id = %1
+       AND  line.qty > 0
             {$statusIdClause}
             {$isTestClause}
             {$skipParticipantClause}";
