@@ -1,23 +1,14 @@
 <?php
 namespace Civi\Core;
 
-use Civi\API\Provider\ActionObjectProvider;
 use Civi\Core\Event\SystemInstallEvent;
 use Civi\Core\Lock\LockManager;
-use Doctrine\Common\Annotations\AnnotationReader;
-use Doctrine\Common\Annotations\AnnotationRegistry;
-use Doctrine\Common\Annotations\FileCacheReader;
-use Doctrine\Common\Cache\FilesystemCache;
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
-use Doctrine\ORM\Tools\Setup;
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher;
 use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
 
 // TODO use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
@@ -230,6 +221,7 @@ class Container {
     }
 
     \CRM_Utils_Hook::container($container);
+    \CRM_Utils_Hook::containerCompilerPass($container);
 
     return $container;
   }
