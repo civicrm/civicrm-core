@@ -303,7 +303,7 @@ class CRM_Utils_File {
     if (!$fileName) {
       $fileName = 'delete-this-' . CRM_Utils_String::createRandom(10, CRM_Utils_String::ALPHANUMERIC);
     }
-    $success = file_put_contents($dir . $fileName, $contents);
+    $success = @file_put_contents($dir . $fileName, $contents);
 
     return ($success === FALSE) ? FALSE : $fileName;
   }
