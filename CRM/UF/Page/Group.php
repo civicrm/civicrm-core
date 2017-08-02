@@ -362,7 +362,7 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
         $action -= CRM_Core_Action::BASIC;
 
         //CRM-21004
-        if (Civi::settings()->get('remote_profile_submissions')) {
+        if (array_key_exists(CRM_Core_Action::PROFILE, self::$_actionLinks)) {
           $action -= CRM_Core_Action::PROFILE;
         }
       }
