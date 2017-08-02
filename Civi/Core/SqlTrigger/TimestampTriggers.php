@@ -141,18 +141,15 @@ class TimestampTriggers {
    *   See hook_civicrm_triggerInfo.
    */
   public function alterTriggerInfo(&$info, $tableFilter = NULL) {
-    //during upgrade, first check for valid version and then create triggers
-    //i.e the columns created_date and modified_date are introduced in 4.3.alpha1 so dont create triggers for older version
+    // If we haven't upgraded yet, then the created_date/modified_date may not exist.
+    // In the past, this was a version-based check, but checkFieldExists()
+    // seems more robust.
     if (\CRM_Core_Config::isUpgradeMode()) {
       if (!\CRM_Core_DAO::checkFieldExists($this->getTableName(),
         $this->getCreatedDate())
       ) {
         return;
       }
-      //      $currentVer = CRM_Core_BAO_Domain::version(TRUE);
-      //      if (version_compare($currentVer, '4.3.alpha1') < 0) {
-      //        return;
-      //      }
     }
 
     if ($tableFilter == NULL || $tableFilter == $this->getTableName()) {
