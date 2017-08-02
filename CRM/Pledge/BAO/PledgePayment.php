@@ -605,8 +605,8 @@ WHERE  civicrm_pledge.id = %2
    *   $statusId calculated status id of pledge
    */
   public static function calculatePledgeStatus($pledgeId) {
-    $paymentStatusTypes = CRM_Pledge_BAO_PledgePayment::buildOptions('status_id');
-    $pledgeStatusTypes = CRM_Pledge_BAO_Pledge::buildOptions('status_id');
+    $paymentStatusTypes = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+    $pledgeStatusTypes = CRM_Pledge_BAO_Pledge::buildOptions('status_id', 'validate');
 
     //return if the pledge is cancelled.
     $currentPledgeStatusId = CRM_Core_DAO::getFieldValue('CRM_Pledge_DAO_Pledge', $pledgeId, 'status_id', 'id', TRUE);
