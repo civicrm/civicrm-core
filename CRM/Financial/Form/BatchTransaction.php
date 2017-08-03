@@ -100,7 +100,7 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form {
     }
 
     parent::buildQuickForm();
-    if (CRM_Batch_BAO_Batch::checkBatchPermission('edit', $this->_values['created_id'])) {
+    if (CRM_Batch_BAO_Batch::checkBatchPermission('close', $this->_values['created_id'])) {
       $this->add('submit', 'close_batch', ts('Close Batch'));
       if (CRM_Batch_BAO_Batch::checkBatchPermission('export', $this->_values['created_id'])) {
         $this->add('submit', 'export_batch', ts('Close & Export Batch'));
