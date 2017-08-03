@@ -8,5 +8,5 @@ INSERT INTO `civicrm_option_value` (`option_group_id`, {localize field='label'}`
 (@option_group_id_ps, {localize}'{ts escape="sql"}Completed{/ts}'{/localize} , 1, 'Completed', NULL, 1),
 (@option_group_id_ps, {localize}'{ts escape="sql"}Pending{/ts}'{/localize}    , 2, 'Pending', NULL, 2),
 (@option_group_id_ps, {localize}'{ts escape="sql"}Cancelled{/ts}'{/localize}  , 3, 'Cancelled', NULL, 3),
-(@option_group_id_ps, {localize}'{ts escape="sql"}In Progress{/ts}'{/localize}, 4, 'In Progress', NULL, 4),
+(@option_group_id_ps, {localize}'{ts escape="sql"}In Progress{/ts}'{/localize}, 5, 'In Progress', NULL, 4),
 (@option_group_id_ps, {localize}'{ts escape="sql"}Overdue{/ts}'{/localize}    , 6, 'Overdue', NULL, 5);
