@@ -77,6 +77,10 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
       $entityFinancialTrxnParams['entity_table'] = $trxnEntityTable['entity_table'];
       $entityFinancialTrxnParams['entity_id'] = $trxnEntityTable['entity_id'];
     }
+    elseif (!empty($params['entity_id']) && !empty($params['entity_table'])) {
+      $entityFinancialTrxnParams['entity_table'] = $params['entity_table'];
+      $entityFinancialTrxnParams['entity_id'] = $params['entity_id'];
+    }
     else {
       $entityFinancialTrxnParams['entity_id'] = $params['contribution_id'];
     }
