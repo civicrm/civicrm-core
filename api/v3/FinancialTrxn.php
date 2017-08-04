@@ -39,10 +39,11 @@
  * @return array
  */
 function civicrm_api3_financial_trxn_create($params) {
-  if (empty($params['contribution_id']) && (empty($params['entity_table']) && empty($params['entity_id']))) {
-    return civicrm_api3_create_error('Please provide finanical trxn entity details.');
+  if (empty($params['id']) && empty($params['contribution_id']) && empty($params['entity_id'])) {
+    throw new API_Exception("Mandatory key(s) missing from params array: both contribution_id and entity_id are missing");
   }
-  return _civicrm_api3_basic_create('CRM_Core_BAO_FinancialTrxn', $params);
+
+  return _civicrm_api3_basic_create('CRM_Core_BAO_FinancialTrxn', $params, 'FinancialTrxn');
 }
 
 /**

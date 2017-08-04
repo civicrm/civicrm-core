@@ -4177,7 +4177,7 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
               'name' => "<i class='crm-i fa-pencil'></i>",
               'url' => 'civicrm/payment/edit',
               'class' => 'medium-popup',
-              'qs' => "reset=1&id=%%id%%&contri_id=%%contri_id%%",
+              'qs' => "reset=1&id=%%id%%&contribution_id=%%contribution_id%%",
               'title' => ts('Edit Payment'),
             ),
           );
@@ -4186,7 +4186,7 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
             CRM_Core_Action::mask(array(CRM_Core_Permission::EDIT)),
             array(
               'id' => $resultDAO->id,
-              'contri_id' => $contributionId,
+              'contribution_id' => $contributionId,
             )
           );
         }

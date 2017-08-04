@@ -67,7 +67,7 @@ class CRM_Financial_Form_PaymentEdit extends CRM_Core_Form {
     parent::preProcess();
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
     $this->assign('id', $this->_id);
-    $this->_contributionID = CRM_Utils_Request::retrieve('contri_id', 'Positive', $this);
+    $this->_contributionID = CRM_Utils_Request::retrieve('contribution_id', 'Positive', $this);
 
     $this->_values = civicrm_api3('FinancialTrxn', 'getsingle', array('id' => $this->_id));
     if (!empty($this->_values['payment_processor_id'])) {
@@ -176,7 +176,6 @@ class CRM_Financial_Form_PaymentEdit extends CRM_Core_Form {
 
     CRM_Core_Session::singleton()->pushUserContext(CRM_Utils_System::url(CRM_Utils_System::currentPath()));
   }
-
 
   /**
    * Wrapper function to process form submission
