@@ -100,7 +100,7 @@
             </td>
           </tr>
           <tr class="crm-payment-form-block-payment_instrument_id">
-            <td class="label">{$form.payment_instrument_id.label}</td>
+            <td class="label">{$form.payment_instrument_id.label} <span class="crm-marker" title="{ts}This field is required.{/ts}">*</span></td>
             <td >{$form.payment_instrument_id.html} {help id="payment_instrument_id"}</td>
             </td>
           </tr>
