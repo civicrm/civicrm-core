@@ -75,8 +75,8 @@
         <th class="crm-contact-name">{ts}Name{/ts}</th>
         <th class="crm-amount">{ts}Amount{/ts}</th>
         <th class="crm-trxnID">{ts}Trxn ID{/ts}</th>
-        <th class="crm-trxn_date">{ts}Transaction Date{/ts}</th>
-        <th class="crm-received">{ts}Received{/ts}</th>
+        <th class="crm-trxn_date">{ts}Payment/Transaction Date{/ts}</th>
+        <th class="crm-received">{ts}Contribution Date{/ts}</th>
         <th class="crm-payment-method">{ts}Pay Method{/ts}</th>
         <th class="crm-status">{ts}Status{/ts}</th>
         <th class="crm-type">{ts}Financial Type{/ts}</th>
