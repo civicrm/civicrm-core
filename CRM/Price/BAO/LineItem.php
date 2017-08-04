@@ -731,7 +731,7 @@ WHERE li.contribution_id = %1";
             'entity_id' => $newFinancialItem->id,
             'entity_table' => 'civicrm_financial_item',
           ));
-          $reverseTrxn = CRM_Core_BAO_FinancialTrxn::create($updateFinancialItemInfoValues['financialTrxn']);
+          $reverseTrxn = CRM_Core_BAO_FinancialTrxn::create($updateFinancialItemInfoValues);
           // record reverse entity financial trxn linked to membership's related contribution
           civicrm_api3('EntityFinancialTrxn', 'create', array(
             'entity_table' => "civicrm_contribution",

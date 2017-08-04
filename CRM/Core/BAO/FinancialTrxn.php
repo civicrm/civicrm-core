@@ -50,12 +50,9 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
    *
-   * @param array $ids
-   *   The array that holds all the DB ids.
-   *
    * @return CRM_Core_BAO_FinancialTrxn
    */
-  public static function create(&$params, $ids = array()) {
+  public static function create(&$params) {
     $trxn = new CRM_Financial_DAO_FinancialTrxn();
     $trxn->copyValues($params);
 
@@ -63,18 +60,14 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
       $trxn->currency = CRM_Core_Config::singleton()->defaultCurrency;
     }
 
-    //per http://wiki.civicrm.org/confluence/display/CRM/Database+layer we are moving away from $ids array
-    $financialTrxnID = CRM_Utils_Array::value('FinancialTrxn', $ids, CRM_Utils_Array::value('id', $params));
-    $trxn->id = $financialTrxnID;
-
     $trxn->save();
 
-    // we shoudn't proceed further to record related entity financial trxns if it's update
-    if ($financialTrxnID) {
+    // We shoudn't proceed further to record related entity financial trxns if it's update.
+    if (!empty($params['id'])) {
       return $trxn;
     }
 
-    // save to entity_financial_trxn table
+    // Save to entity_financial_trxn table.
     $entityFinancialTrxnParams = array(
       'entity_table' => CRM_Utils_Array::value('entity_table', $params, 'civicrm_contribution'),
       'entity_id' => CRM_Utils_Array::value('entity_id', $params, CRM_Utils_Array::value('contribution_id', $params)),
@@ -367,6 +360,7 @@ WHERE ceft.entity_id = %1";
         'total_amount' => CRM_Utils_Array::value('cost', $params) ? $params['cost'] : 0,
         'currency' => CRM_Utils_Array::value('currency', $params),
         'status_id' => array_search('Completed', $contributionStatuses),
+        'entity_table' => 'civicrm_contribution',
         'entity_id' => $params['contributionId'],
       );
       CRM_Core_BAO_FinancialTrxn::create($financialtrxn);
