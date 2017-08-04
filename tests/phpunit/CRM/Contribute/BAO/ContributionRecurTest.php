@@ -99,7 +99,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
    */
   public function testSupportFinancialTypeChange() {
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', $this->_params);
-    $contribution = $this->callAPISuccess('contribution', 'create', array(
+    $this->callAPISuccess('contribution', 'create', array(
       'contribution_recur_id' => $contributionRecur['id'],
       'total_amount' => '3.00',
       'financial_type_id' => 1,
@@ -107,7 +107,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
       'currency' => 'USD',
       'contact_id' => $this->individualCreate(),
       'contribution_status_id' => 1,
-      'recieve_date' => 'yesterday',
+      'receive_date' => 'yesterday',
     ));
     $this->assertTrue(CRM_Contribute_BAO_ContributionRecur::supportsFinancialTypeChange($contributionRecur['id']));
   }
