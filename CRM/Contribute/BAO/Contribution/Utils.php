@@ -504,19 +504,18 @@ LIMIT 1
    * @param int $id
    *   Contribution ID
    *
-   * @return array
+   * @return array $statuses
    *   Array of contribution statuses in array('status id' => 'label') format
    */
   public static function getContributionStatuses($usedFor = 'contribution', $id = NULL) {
     if ($usedFor == 'pledge') {
-      $statusNames = CRM_Core_OptionGroup::values('pledge_status', FALSE, FALSE, FALSE, NULL, 'name');
+      $statusNames = CRM_Pledge_BAO_Pledge::buildOptions('status_id', 'validate');
     }
     else {
-      $statusNames = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+      $statusNames = CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id', 'validate');
     }
 
     $statusNamesToUnset = array();
-
     // on create fetch statuses on basis of component
     if (!$id) {
       $statusNamesToUnset = array(
@@ -524,6 +523,7 @@ LIMIT 1
         'Chargeback',
         'Pending refund',
       );
+
       // Event registration and New Membership backoffice form support partially paid payment,
       //  so exclude this status only for 'New Contribution' form
       if ($usedFor == 'contribution') {
@@ -537,6 +537,12 @@ LIMIT 1
         $statusNamesToUnset = array_merge($statusNamesToUnset, array(
           'Cancelled',
           'Failed',
+        ));
+      }
+      elseif ($usedFor == 'membership') {
+        $statusNamesToUnset = array_merge($statusNamesToUnset, array(
+          'In Progress',
+          'Overdue',
         ));
       }
     }
@@ -590,10 +596,10 @@ LIMIT 1
 
     // based on filtered statuse names fetch the final list of statuses in array('id' => 'label') format
     if ($usedFor == 'pledge') {
-      $statuses = CRM_Core_OptionGroup::values('pledge_status');
+      $statuses = CRM_Pledge_BAO_Pledge::buildOptions('status_id');
     }
     else {
-      $statuses = CRM_Contribute_PseudoConstant::contributionStatus();
+      $statuses = CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id');
     }
     foreach ($statuses as $statusID => $label) {
       if (!array_key_exists($statusID, $statusNames)) {

@@ -663,7 +663,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         $component = 'participant';
       }
     }
-    elseif ($this->_ppID) {
+    if ($this->_ppID) {
       $component = 'pledge';
     }
     $status = CRM_Contribute_BAO_Contribution_Utils::getContributionStatuses($component, $this->_id);
@@ -835,7 +835,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     // if status is Cancelled freeze Amount, Payment Instrument, Check #, Financial Type,
     // Net and Fee Amounts are frozen in AdditionalInfo::buildAdditionalDetail
-    if ($this->_id && $this->_values['contribution_status_id'] == array_search('Cancelled', $statusName)) {
+    if ($this->_id && ($this->_values['contribution_status_id'] == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Cancelled'))) {
       if ($totalAmount) {
         $totalAmount->freeze();
       }
