@@ -76,10 +76,10 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form {
         'status' => ts('Status'),
         'description' => ts('Description'),
         'payment_instrument' => ts('Payment Method'),
-        'item_count' => ts('Total Batch Count'),
-        'assigned_item_count' => ts('Actual Batch Count'),
-        'total' => ts('Batch Total Amount'),
-        'assigned_total' => ts('Actual Batch Total Amount'),
+        'item_count' => ts('Expected Number of Items'),
+        'assigned_item_count' => ts('Actual Number of Items'),
+        'total' => ts('Expected Total Amount'),
+        'assigned_total' => ts('Actual Total Amount'),
         'opened_date' => ts('Opened'),
       );
       $this->assign('columnHeaders', $columnHeaders);
