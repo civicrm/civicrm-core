@@ -62,7 +62,7 @@ class CRM_Financial_Form_PaymentEditTest extends CiviUnitTestCase {
       'receive_date' => '04/21/2015',
       'receive_date_time' => '11:27PM',
       'contact_id' => $this->_individualID,
-      'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Check'),
+      'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
       'check_number' => '123XA',
       'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
     ),
@@ -116,6 +116,55 @@ class CRM_Financial_Form_PaymentEditTest extends CiviUnitTestCase {
         $this->assertEquals($expectedPaymentParams[$key][$fieldName], $payments['transaction'][$key][$fieldName]);
       }
     }
+  }
+
+  /**
+   * Test to ensure that multiple check_numbers are concatenated
+   *  and stored in related contribution's check_number
+   */
+  public function testSubmitOnCheckNumberChange() {
+    // CASE 1: Submit contribution using Check as payment instrument and check_number as '123XA'
+    $checkNumber1 = '123XA';
+    $checkPaymentInstrumentID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check');
+    // First create a contribution using 'Check' as payment instrument
+    $form = new CRM_Contribute_Form_Contribution();
+    $form->testSubmit(array(
+      'total_amount' => 50,
+      'financial_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Donation'),
+      'receive_date' => '04/21/2015',
+      'receive_date_time' => '11:27PM',
+      'contact_id' => $this->_individualID,
+      'payment_instrument_id' => $checkPaymentInstrumentID,
+      'check_number' => $checkNumber1,
+      'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
+    ),
+      CRM_Core_Action::ADD);
+    $contribution = $this->callAPISuccessGetSingle('Contribution', array('contact_id' => $this->_individualID));
+    $payments = CRM_Contribute_BAO_Contribution::getPaymentInfo($contribution['id'], 'contribute', TRUE);
+    $financialTrxnInfo = $payments['transaction'][0];
+
+    // CASE 2: Submit payment details via edit form and changed check_number to '456XA',
+    //  ensure that contribution's check_number has concatenated check-numbers
+    $checkNumber2 = '456XA';
+    // build parameters which changed payment instrument and tran date values
+    $params = array(
+      'id' => $financialTrxnInfo['id'],
+      'payment_instrument_id' => $checkPaymentInstrumentID,
+      'check_number' => $checkNumber2,
+      'trxn_date' => date('Y-m-d H:i:s'),
+      'contribution_id' => $contribution['id'],
+    );
+    $form = new CRM_Financial_Form_PaymentEdit();
+    $form->testSubmit($params);
+    $contribution = $this->callAPISuccessGetSingle('Contribution', array('id' => $contribution['id']));
+    $expectedConcatanatedCheckNumbers = implode(',', array($checkNumber1, $checkNumber2));
+    $this->assertEquals($expectedConcatanatedCheckNumbers, $contribution['check_number']);
+
+    // CASE 3: Submit payment details via edit form without any change,
+    //  ensure that contribution's check_number concatenated value isn't changed
+    $form->testSubmit($params);
+    $contribution = $this->callAPISuccessGetSingle('Contribution', array('id' => $contribution['id']));
+    $this->assertEquals($expectedConcatanatedCheckNumbers, $contribution['check_number']);
   }
 
 }
