@@ -338,10 +338,10 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     }
 
     $this->applyFilter('__ALL__', 'trim');
-    
+
     // CRM-20571
     // Get the Join Date from Membership info as it is not available in the Renew form
-    $joinDate =  CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $this->_id, 'join_date');
+    $joinDate = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $this->_id, 'join_date');
     // Save its value in a hidden field
     $this->addElement('hidden', 'join_date', $joinDate);
 
