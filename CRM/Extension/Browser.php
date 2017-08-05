@@ -212,8 +212,11 @@ class CRM_Extension_Browser {
    * @return string
    */
   private function grabCachedJson() {
-    $filename = $this->cacheDir . DIRECTORY_SEPARATOR . self::CACHE_JSON_FILE;
-    $json = file_get_contents($filename);
+    $filename = $this->cacheDir . DIRECTORY_SEPARATOR . self::CACHE_JSON_FILE . '.' . md5($this->getRepositoryUrl());
+    $json = NULL;
+    if (file_exists($filename)) {
+      $json = file_get_contents($filename);
+    }
     if (empty($json)) {
       $json = $this->grabRemoteJson();
     }
@@ -242,7 +245,7 @@ class CRM_Extension_Browser {
       return array();
     }
 
-    $filename = $this->cacheDir . DIRECTORY_SEPARATOR . self::CACHE_JSON_FILE;
+    $filename = $this->cacheDir . DIRECTORY_SEPARATOR . self::CACHE_JSON_FILE . '.' . md5($this->getRepositoryUrl());
     $url = $this->getRepositoryUrl() . $this->indexPath;
     $status = CRM_Utils_HttpClient::singleton()->fetch($url, $filename);
     if ($status !== CRM_Utils_HttpClient::STATUS_OK) {

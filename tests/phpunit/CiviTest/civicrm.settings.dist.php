@@ -41,16 +41,6 @@ grant SUPER on *.* to db_username@localhost identified by 'db_password';\n";
   }
 }
 
-
-require_once "DB.php";
-$dsninfo = DB::parseDSN(CIVICRM_DSN);
-
-$GLOBALS['mysql_host'] = $dsninfo['hostspec'];
-$GLOBALS['mysql_port'] = @$dsninfo['port'];
-$GLOBALS['mysql_user'] = $dsninfo['username'];
-$GLOBALS['mysql_pass'] = $dsninfo['password'];
-$GLOBALS['mysql_db'] = $dsninfo['database'];
-
 /**
  * Content Management System (CMS) Host:
  *
@@ -58,12 +48,23 @@ $GLOBALS['mysql_db'] = $dsninfo['database'];
  */
 define('CIVICRM_UF', 'UnitTests');
 
-
 global $civicrm_root;
 if (empty($civicrm_root)) {
   $civicrm_root = dirname(dirname(dirname(dirname(__FILE__))));
 }
-#$civicrm_root = '/var/www/drupal7.dev.civicrm.org/public/sites/devel.drupal7.tests.dev.civicrm.org/modules/civicrm';
+
+$tests_dir = $civicrm_root . DIRECTORY_SEPARATOR . 'tests' . DIRECTORY_SEPARATOR . 'phpunit';
+$civi_pkgs_dir = $civicrm_root . DIRECTORY_SEPARATOR . 'packages';
+ini_set('safe_mode', 0);
+ini_set('include_path', $civicrm_root . PATH_SEPARATOR . $tests_dir . PATH_SEPARATOR . $civi_pkgs_dir . PATH_SEPARATOR . ini_get('include_path'));
+
+require_once 'DB.php';
+$dsninfo = DB::parseDSN(CIVICRM_DSN);
+$GLOBALS['mysql_host'] = $dsninfo['hostspec'];
+$GLOBALS['mysql_port'] = @$dsninfo['port'];
+$GLOBALS['mysql_user'] = $dsninfo['username'];
+$GLOBALS['mysql_pass'] = $dsninfo['password'];
+$GLOBALS['mysql_db'] = $dsninfo['database'];
 
 // set this to a temporary directory. it defaults to /tmp/civi on linux
 //define( 'CIVICRM_TEMPLATE_COMPILEDIR', 'the/absolute/path/' );

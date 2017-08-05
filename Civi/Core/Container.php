@@ -13,6 +13,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher;
 
 // TODO use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
@@ -81,8 +82,8 @@ class Container {
       ->setFactoryService(self::SELF)->setFactoryMethod('createAngularManager');
 
     $container->setDefinition('dispatcher', new Definition(
-      '\Symfony\Component\EventDispatcher\EventDispatcher',
-      array()
+      'Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher',
+      array(new Reference('service_container'))
     ))
       ->setFactoryService(self::SELF)->setFactoryMethod('createEventDispatcher');
 
@@ -117,6 +118,22 @@ class Container {
         ->setFactoryClass($class)->setFactoryMethod('singleton');
     }
 
+    $container->setDefinition('civi_token_compat', new Definition(
+      'Civi\Token\TokenCompatSubscriber'
+    ));//->addTag('kernel.event_subscriber');
+    $container->setDefinition("crm_mailing_action_tokens", new Definition(
+      "CRM_Mailing_ActionTokens"
+    ));//->addTag('kernel.event_subscriber');
+    $container->setDefinition("crm_mailing_tokens", new Definition(
+      "CRM_Mailing_Tokens"
+    ));//->addTag('kernel.event_subscriber');
+
+    if (\CRM_Utils_Constant::value('CIVICRM_FLEXMAILER_HACK_SERVICES')) {
+      \Civi\Core\Resolver::singleton()->call(CIVICRM_FLEXMAILER_HACK_SERVICES, array($container));
+    }
+
+    \CRM_Utils_Hook::container($container);
+
     return $container;
   }
 
@@ -128,10 +145,11 @@ class Container {
   }
 
   /**
-   * @return \Symfony\Component\EventDispatcher\EventDispatcher
+   * @param ContainerInterface $container
+   * @return \Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher
    */
-  public function createEventDispatcher() {
-    $dispatcher = new \Symfony\Component\EventDispatcher\EventDispatcher();
+  public function createEventDispatcher($container) {
+    $dispatcher = new ContainerAwareEventDispatcher($container);
     $dispatcher->addListener('hook_civicrm_post::Activity', array('\Civi\CCase\Events', 'fireCaseChange'));
     $dispatcher->addListener('hook_civicrm_post::Case', array('\Civi\CCase\Events', 'fireCaseChange'));
     $dispatcher->addListener('hook_civicrm_caseChange', array('\Civi\CCase\Events', 'delegateToXmlListeners'));
@@ -143,6 +161,17 @@ class Container {
       'CRM_Core_LegacyErrorHandler',
       'handleException',
     ));
+
+    // Civi v4.6 uses an older version of Symfony Dispatcher which doesn't support
+    // RegisterListenersPass (aka addTag('kernel.event_subscriber').
+    $dispatcher->addSubscriberService('civi_token_compat', 'Civi\Token\TokenCompatSubscriber');
+    $dispatcher->addSubscriberService('crm_mailing_tokens', 'CRM_Mailing_Tokens');
+    $dispatcher->addSubscriberService('crm_mailing_action_tokens', 'CRM_Mailing_ActionTokens');
+
+    if (\CRM_Utils_Constant::value('CIVICRM_FLEXMAILER_HACK_LISTENERS')) {
+      \Civi\Core\Resolver::singleton()->call(CIVICRM_FLEXMAILER_HACK_LISTENERS, array($dispatcher));
+    }
+
     return $dispatcher;
   }
 
