@@ -373,7 +373,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
         $out['backtrace'] = self::parseBacktrace(debug_backtrace());
         $message .= '<p><em>See console for backtrace</em></p>';
       }
-      CRM_Core_Session::setStatus($message, ts('Sorry an Error Occured'), 'error');
+      CRM_Core_Session::setStatus($message, ts('Sorry an Error Occurred'), 'error');
       CRM_Core_Transaction::forceRollbackIfEnabled();
       CRM_Core_Page_AJAX::returnJsonResponse($out);
     }
