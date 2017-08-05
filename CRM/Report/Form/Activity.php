@@ -863,17 +863,21 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
     $this->limit();
     $groupByFromSelect = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, 'civicrm_activity_id');
 
-    $this->_aclWhere = "";
+    $this->_where = " WHERE (1)";
     $this->buildPermissionClause();
+    if ($this->_aclWhere) {
+      $this->_where .= " AND {$this->_aclWhere} ";
+    }
 
     $sql = "{$this->_select}
       FROM civireport_activity_temp_target tar
       INNER JOIN civicrm_activity {$this->_aliases['civicrm_activity']} ON {$this->_aliases['civicrm_activity']}.id = tar.civicrm_activity_id
       INNER JOIN civicrm_activity_contact {$this->_aliases['civicrm_activity_contact']} ON {$this->_aliases['civicrm_activity_contact']}.activity_id = {$this->_aliases['civicrm_activity']}.id
       AND {$this->_aliases['civicrm_activity_contact']}.record_type_id = {$sourceID}
-      LEFT JOIN civicrm_contact contact_civireport ON contact_civireport.id = {$this->_aliases['civicrm_activity_contact']}.contact_id 
-      WHERE (1) AND {$this->_aclWhere} {$groupByFromSelect} {$this->_having} {$this->_orderBy} {$this->_limit}";
+      LEFT JOIN civicrm_contact contact_civireport ON contact_civireport.id = {$this->_aliases['civicrm_activity_contact']}.contact_id
+      {$this->_where} {$groupByFromSelect} {$this->_having} {$this->_orderBy} {$this->_limit}";
 
+    $this->addToDeveloperTab($sql);
     $this->buildRows($sql, $rows);
 
     // format result set.

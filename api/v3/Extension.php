@@ -332,7 +332,9 @@ function _civicrm_api3_extension_refresh_spec(&$fields) {
  *   API result
  */
 function civicrm_api3_extension_get($params) {
-  $keys = isset($params['key']) ? (array) $params['key'] : NULL;
+  $full_names = _civicrm_api3_getKeys($params, 'full_name');
+  $keys = _civicrm_api3_getKeys($params, 'key');
+  $keys = array_merge($full_names, $keys);
   $statuses = CRM_Extension_System::singleton()->getManager()->getStatuses();
   $mapper = CRM_Extension_System::singleton()->getMapper();
   $result = array();
@@ -347,7 +349,7 @@ function civicrm_api3_extension_get($params) {
     }
     $info = CRM_Extension_System::createExtendedInfo($obj);
     $info['id'] = $id++; // backward compatibility with indexing scheme
-    if (!empty($params['key'])) {
+    if (!empty($keys)) {
       if (in_array($key, $keys)) {
         $result[] = $info;
       }
@@ -358,6 +360,9 @@ function civicrm_api3_extension_get($params) {
   }
   $options = _civicrm_api3_get_options_from_params($params);
   $returnFields = !empty($options['return']) ? $options['return'] : array();
+  if (!in_array('id', $returnFields)) {
+    $returnFields = array_merge($returnFields, array('id'));
+  }
   return _civicrm_api3_basic_array_get('Extension', $params, $result, 'id', $returnFields);
 }
 
@@ -386,16 +391,22 @@ function civicrm_api3_extension_getremote($params) {
  * Determine the list of extension keys.
  *
  * @param array $params
+ * @param string $key
  *   API request params with 'keys'.
  *
  * @return array
  */
-function _civicrm_api3_getKeys($params) {
-  if (is_array($params['keys'])) {
-    return $params['keys'];
+function _civicrm_api3_getKeys($params, $key = 'keys') {
+  if (isset($params[$key])) {
+    if (is_array($params[$key])) {
+      return $params[$key];
+    }
+    if ($params[$key] == '') {
+      return array();
+    }
+    return explode(API_V3_EXTENSION_DELIMITER, $params[$key]);
   }
-  if ($params['keys'] == '') {
+  else {
     return array();
   }
-  return explode(API_V3_EXTENSION_DELIMITER, $params['keys']);
 }

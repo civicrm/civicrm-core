@@ -2751,6 +2751,17 @@ class CRM_Contact_BAO_Query {
           $from .= CRM_Grant_BAO_Query::from($name, $mode, $side);
           continue;
 
+        case 'civicrm_campaign':
+          //Move to default case if not in either mode.
+          if ($mode & CRM_Contact_BAO_Query::MODE_CONTRIBUTE) {
+            $from .= CRM_Contribute_BAO_Query::from($name, $mode, $side);
+            continue;
+          }
+          elseif ($mode & CRM_Contact_BAO_Query::MODE_MAILING) {
+            $from .= CRM_Mailing_BAO_Query::from($name, $mode, $side);
+            continue;
+          }
+
         case 'civicrm_website':
           $from .= " $side JOIN civicrm_website ON contact_a.id = civicrm_website.contact_id ";
           continue;
@@ -3625,7 +3636,7 @@ WHERE  $smartGroupClause
 
     // Handle numeric postal code range searches properly by casting the column as numeric
     if (is_numeric($value)) {
-      $field = "IF (civicrm_address.postal_code REGEXP '^[0-9]+$', CAST(civicrm_address.postal_code AS UNSIGNED), 0)";
+      $field = "IF (civicrm_address.postal_code REGEXP '^[0-9]{1,10}$', CAST(civicrm_address.postal_code AS UNSIGNED), 0)";
       $val = CRM_Utils_Type::escape($value, 'Integer');
     }
     else {
@@ -6121,7 +6132,8 @@ AND   displayRelType.is_active = 1
       $pseudoOptions = CRM_Core_PseudoConstant::worldRegion();
     }
     elseif ($daoName == 'CRM_Event_DAO_Event' && $fieldName == 'id') {
-      $pseudoOptions = CRM_Event_BAO_Event::getEvents(0, $fieldValue, TRUE, TRUE, TRUE);
+      $checkPermission = CRM_Utils_Array::value('check_permission', $pseudoExtraParam, TRUE);
+      $pseudoOptions = CRM_Event_BAO_Event::getEvents(0, $fieldValue, TRUE, $checkPermission, TRUE);
     }
     elseif ($fieldName == 'contribution_product_id') {
       $pseudoOptions = CRM_Contribute_PseudoConstant::products();

@@ -8,7 +8,7 @@
   },
   "include-path": ["vendor/tecnickcom"],
   "require": {
-    "dompdf/dompdf" : "0.7.*",
+    "dompdf/dompdf" : "0.8.*",
     "electrolinux/phpquery": "^0.9.6",
     "symfony/config": "~2.5.0",
     "symfony/dependency-injection": "~2.5.0",

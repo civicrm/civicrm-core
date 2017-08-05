@@ -279,7 +279,8 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
       $session = CRM_Core_Session::singleton();
       $dateType = $session->get('dateTypes');
       $formatted = array();
-      $customFields = CRM_Core_BAO_CustomField::getFields(CRM_Utils_Array::value('contact_type', $params));
+      $customDataType = !empty($params['contact_type']) ? $params['contact_type'] : 'Membership';
+      $customFields = CRM_Core_BAO_CustomField::getFields($customDataType);
 
       // don't add to recent items, CRM-4399
       $formatted['skipRecentView'] = TRUE;

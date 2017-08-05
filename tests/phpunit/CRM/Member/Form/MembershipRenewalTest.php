@@ -137,8 +137,9 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
         'civicrm_address',
       )
     );
-    $this->callAPISuccess('contact', 'delete', array('id' => 17, 'skip_undelete' => TRUE));
-    $this->callAPISuccess('contact', 'delete', array('id' => 23, 'skip_undelete' => TRUE));
+    foreach (array(17, 18, 23, 32) as $contactID) {
+      $this->callAPISuccess('contact', 'delete', array('id' => $contactID, 'skip_undelete' => TRUE));
+    }
     $this->callAPISuccess('relationship_type', 'delete', array('id' => 20));
   }
 

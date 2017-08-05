@@ -58,27 +58,6 @@ class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
   }
 
   /**
-   * Get existing / build navigation for CiviCRM Admin Menu.
-   *
-   * @return array
-   *   associated array
-   */
-  public static function getMenus() {
-    $menus = array();
-
-    $menu = new CRM_Core_DAO_Menu();
-    $menu->domain_id = CRM_Core_Config::domainID();
-    $menu->find();
-
-    while ($menu->fetch()) {
-      if ($menu->title) {
-        $menus[$menu->path] = $menu->title;
-      }
-    }
-    return $menus;
-  }
-
-  /**
    * Add/update navigation record.
    *
    * @param array $params Submitted values

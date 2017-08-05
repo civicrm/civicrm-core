@@ -31,7 +31,11 @@ class CRM_Member_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDFLett
         $html_message,
         $categories
       );
-    self::createActivities($form, $html_message, $contactIDs);
+    // This seems silly, but the old behavior was to first check `_cid`
+    // and then use the provided `$contactIds`. Probably not even necessary,
+    // but difficult to audit.
+    $contactIDs = $form->_cid ? array($form->_cid) : $contactIDs;
+    self::createActivities($form, $html_message, $contactIDs, $formValues['subject'], CRM_Utils_Array::value('campaign_id', $formValues));
 
     CRM_Utils_PDF_Utils::html2pdf($html, "CiviLetter.pdf", FALSE, $formValues);
 

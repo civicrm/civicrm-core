@@ -61,7 +61,7 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
     $action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 0);
     $context = CRM_Utils_Request::retrieve('context', 'String', $this);
     $limit = CRM_Utils_Request::retrieve('limit', 'Integer', $this);
-    $rgid = CRM_Utils_Request::retrieve('rgid', 'Positive');
+    $rgid = CRM_Utils_Request::retrieve('rgid', 'Positive', $this);
     $urlQry = array(
       'reset' => 1,
       'rgid' => $rgid,

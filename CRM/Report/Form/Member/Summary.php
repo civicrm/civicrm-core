@@ -362,7 +362,7 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
     if (is_array($this->_params['group_bys']) &&
       !empty($this->_params['group_bys'])
     ) {
-      foreach ($this->_columns as $tableName => $table) {
+      foreach ($this->_columns as $table) {
         if (array_key_exists('group_bys', $table)) {
           foreach ($table['group_bys'] as $fieldName => $field) {
             if (!empty($this->_params['group_bys'][$fieldName])) {
@@ -379,12 +379,12 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
                 )) {
                   $append = '';
                 }
-                $this->_groupBy[] = $append;
-                $this->_groupBy[] = "{$this->_params['group_bys_freq'][$fieldName]}({$field['dbAlias']})";
+                $this->_groupByArray[] = $append;
+                $this->_groupByArray[] = "{$this->_params['group_bys_freq'][$fieldName]}({$field['dbAlias']})";
                 $append = TRUE;
               }
               else {
-                $this->_groupBy[] = $field['dbAlias'];
+                $this->_groupByArray[] = $field['dbAlias'];
               }
             }
           }
@@ -392,8 +392,8 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
       }
 
       $this->_rollup = ' WITH ROLLUP';
-      $this->_select = CRM_Contact_BAO_Query::appendAnyValueToSelect($this->_selectClauses, array_filter($this->_groupBy));
-      $this->_groupBy = 'GROUP BY ' . implode(', ', array_filter($this->_groupBy)) .
+      $this->_select = CRM_Contact_BAO_Query::appendAnyValueToSelect($this->_selectClauses, array_filter($this->_groupByArray));
+      $this->_groupBy = 'GROUP BY ' . implode(', ', array_filter($this->_groupByArray)) .
         " {$this->_rollup} ";
     }
     else {

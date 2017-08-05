@@ -982,7 +982,7 @@ WHERE  id = %1";
           $autoRenewMembershipTypes[] = $membershiptTypeValue['id'];
         }
       }
-      foreach ($form->_priceSet['fields'] as &$field) {
+      foreach ($form->_priceSet['fields'] as $field) {
         if (array_key_exists('options', $field) && is_array($field['options'])) {
           foreach ($field['options'] as $option) {
             if (!empty($option['membership_type_id'])) {

@@ -37,12 +37,12 @@
 class CRM_Admin_Form_Setting_Mail extends CRM_Admin_Form_Setting {
 
   protected $_settings = array(
-    'replyTo' => CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
     'mailerBatchLimit' => CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
+    'mailThrottleTime' => CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
     'mailerJobSize' => CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
     'mailerJobsMax' => CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
-    'mailThrottleTime' => CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
     'verpSeparator' => CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
+    'replyTo' => CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
   );
 
   /**
@@ -50,15 +50,9 @@ class CRM_Admin_Form_Setting_Mail extends CRM_Admin_Form_Setting {
    */
   public function buildQuickForm() {
     CRM_Utils_System::setTitle(ts('Settings - CiviMail'));
-    $check = TRUE;
-
-    // redirect to Administer Section After hitting either Save or Cancel button.
-    $session = CRM_Core_Session::singleton();
-    $session->pushUserContext(CRM_Utils_System::url('civicrm/admin', 'reset=1'));
-
     $this->addFormRule(array('CRM_Admin_Form_Setting_Mail', 'formRule'));
 
-    parent::buildQuickForm($check);
+    parent::buildQuickForm();
   }
 
   /**

@@ -263,15 +263,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         }
       }
     }
-
-    // get the option value for custom data type
-    $customDataType = CRM_Core_OptionGroup::values('custom_data_type', FALSE, FALSE, FALSE, NULL, 'name');
-    $this->_roleCustomDataTypeID = array_search('ParticipantRole', $customDataType);
-    $this->_eventNameCustomDataTypeID = array_search('ParticipantEventName', $customDataType);
-    $this->_eventTypeCustomDataTypeID = array_search('ParticipantEventType', $customDataType);
-    $this->assign('roleCustomDataTypeID', $this->_roleCustomDataTypeID);
-    $this->assign('eventNameCustomDataTypeID', $this->_eventNameCustomDataTypeID);
-    $this->assign('eventTypeCustomDataTypeID', $this->_eventTypeCustomDataTypeID);
+    $this->setCustomDataTypes();
 
     if ($this->_mode) {
       $this->assign('participantMode', $this->_mode);
@@ -858,9 +850,11 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
 
       $eventId = CRM_Utils_Array::value('event_id', $values);
       if (!empty($contactId) && !empty($eventId)) {
+        $cancelledStatusID = CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'status_id', 'Cancelled');
         $dupeCheck = new CRM_Event_BAO_Participant();
         $dupeCheck->contact_id = $contactId;
         $dupeCheck->event_id = $eventId;
+        $dupeCheck->whereAdd("status_id != {$cancelledStatusID} ");
         $dupeCheck->find(TRUE);
         if (!empty($dupeCheck->id)) {
           $errorMsg['event_id'] = ts("This contact has already been assigned to this event.");
@@ -935,6 +929,42 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       }
     }
 
+    $statusMsg = $this->submit($params);
+    CRM_Core_Session::setStatus($statusMsg, ts('Saved'), 'success');
+    $session = CRM_Core_Session::singleton();
+    $buttonName = $this->controller->getButtonName();
+    if ($this->_context == 'standalone') {
+      if ($buttonName == $this->getButtonName('upload', 'new')) {
+        $urlParams = 'reset=1&action=add&context=standalone';
+        if ($this->_mode) {
+          $urlParams .= '&mode=' . $this->_mode;
+        }
+        if ($this->_eID) {
+          $urlParams .= '&eid=' . $this->_eID;
+        }
+        $session->replaceUserContext(CRM_Utils_System::url('civicrm/participant/add', $urlParams));
+      }
+      else {
+        $session->replaceUserContext(CRM_Utils_System::url('civicrm/contact/view',
+          "reset=1&cid={$this->_contactId}&selectedChild=participant"
+        ));
+      }
+    }
+    elseif ($buttonName == $this->getButtonName('upload', 'new')) {
+      $session->replaceUserContext(CRM_Utils_System::url('civicrm/contact/view/participant',
+        "reset=1&action=add&context={$this->_context}&cid={$this->_contactId}"
+      ));
+    }
+  }
+
+  /**
+   * Submit form.
+   *
+   * @param array $params
+   *
+   * @return array
+   */
+  public function submit($params) {
     $participantStatus = CRM_Event_PseudoConstant::participantStatus();
     // set the contact, when contact is selected
     if (!empty($params['contact_id'])) {
@@ -1242,7 +1272,12 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       $this->_params['mode'] = $this->_mode;
 
       //add contribution record
-      $contributions[] = $contribution = CRM_Event_Form_Registration_Confirm::processContribution($this, $this->_params, $result, $contactID, FALSE);
+      $contributions[] = $contribution = CRM_Event_Form_Registration_Confirm::processContribution(
+        $this, $this->_params,
+        $result, $contactID,
+        FALSE, FALSE,
+        $this->_paymentProcessor
+      );
 
       // add participant record
       $participants = array();
@@ -1713,6 +1748,34 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       $this->_id = $participants[0]->id;
     }
 
+    return $this->getStatusMsg($params, $sent, $updateStatusMsg, $notSent);
+  }
+
+  /**
+   * Set the various IDs relating to custom data types.
+   */
+  public function setCustomDataTypes() {
+    $customDataType = CRM_Core_OptionGroup::values('custom_data_type', FALSE, FALSE, FALSE, NULL, 'name');
+    $this->_roleCustomDataTypeID = array_search('ParticipantRole', $customDataType);
+    $this->_eventNameCustomDataTypeID = array_search('ParticipantEventName', $customDataType);
+    $this->_eventTypeCustomDataTypeID = array_search('ParticipantEventType', $customDataType);
+    $this->assign('roleCustomDataTypeID', $this->_roleCustomDataTypeID);
+    $this->assign('eventNameCustomDataTypeID', $this->_eventNameCustomDataTypeID);
+    $this->assign('eventTypeCustomDataTypeID', $this->_eventTypeCustomDataTypeID);
+  }
+
+  /**
+   * Get status message
+   *
+   * @param array $params
+   * @param int $sent
+   * @param string $updateStatusMsg
+   * @param int $notSent
+   *
+   * @return string
+   */
+  protected function getStatusMsg($params, $sent, $updateStatusMsg, $notSent) {
+    $statusMsg = '';
     if (($this->_action & CRM_Core_Action::UPDATE)) {
       $statusMsg = ts('Event registration information for %1 has been updated.', array(1 => $this->_contributorDisplayName));
       if (!empty($params['send_receipt']) && count($sent)) {
@@ -1740,31 +1803,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         }
       }
     }
-    CRM_Core_Session::setStatus($statusMsg, ts('Saved'), 'success');
-    $session = CRM_Core_Session::singleton();
-    $buttonName = $this->controller->getButtonName();
-    if ($this->_context == 'standalone') {
-      if ($buttonName == $this->getButtonName('upload', 'new')) {
-        $urlParams = 'reset=1&action=add&context=standalone';
-        if ($this->_mode) {
-          $urlParams .= '&mode=' . $this->_mode;
-        }
-        if ($this->_eID) {
-          $urlParams .= '&eid=' . $this->_eID;
-        }
-        $session->replaceUserContext(CRM_Utils_System::url('civicrm/participant/add', $urlParams));
-      }
-      else {
-        $session->replaceUserContext(CRM_Utils_System::url('civicrm/contact/view',
-          "reset=1&cid={$this->_contactId}&selectedChild=participant"
-        ));
-      }
-    }
-    elseif ($buttonName == $this->getButtonName('upload', 'new')) {
-      $session->replaceUserContext(CRM_Utils_System::url('civicrm/contact/view/participant',
-        "reset=1&action=add&context={$this->_context}&cid={$this->_contactId}"
-      ));
-    }
+    return $statusMsg;
   }
 
 }

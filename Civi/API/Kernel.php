@@ -410,7 +410,7 @@ class Kernel {
       }
     }
 
-    $data = civicrm_api3_create_error($msg, $data);
+    $data = \civicrm_api3_create_error($msg, $data);
 
     if (isset($apiRequest['params']) && is_array($apiRequest['params']) && !empty($apiRequest['params']['api.has_parent'])) {
       $errorCode = empty($data['error_code']) ? 'chained_api_failed' : $data['error_code'];

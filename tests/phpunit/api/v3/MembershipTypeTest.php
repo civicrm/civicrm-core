@@ -251,4 +251,56 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
     $this->assertEquals('General', $result['values'][1]['label']);
   }
 
+  /**
+   * Test priceField values are correctly created for membership type
+   * selected in contribution pages.
+   */
+  public function testEnableMembershipTypeOnContributionPage() {
+    $memType = array();
+    $memType[1] = $this->membershipTypeCreate(array('member_of_contact_id' => $this->_contactID, 'minimum_fee' => 100));
+    $priceSet = $this->callAPISuccess('price_set', 'getvalue', array(
+      'name' => 'default_membership_type_amount',
+      'return' => 'id',
+    ));
+    $field = $this->callAPISuccess('price_field', 'create', array(
+      'price_set_id' => $priceSet,
+      'name' => 'membership_amount',
+      'label' => 'Membership Amount',
+      'html_type' => 'Radio',
+    ));
+    $priceFieldValue = $this->callAPISuccess('price_field_value', 'create', array(
+      'name' => 'membership_amount',
+      'label' => 'Membership Amount',
+      'amount' => 100,
+      'financial_type_id' => 'Donation',
+      'format.only_id' => TRUE,
+      'membership_type_id' => $memType[1],
+      'price_field_id' => $field['id'],
+    ));
+
+    $memType[2] = $this->membershipTypeCreate(array('member_of_contact_id' => $this->_contactID, 'minimum_fee' => 200));
+    $fieldParams = array(
+      'id' => $field['id'],
+      'label' => 'Membership Amount',
+      'html_type' => 'Radio',
+    );
+    foreach ($memType as $rowCount => $type) {
+      $membetype = CRM_Member_BAO_MembershipType::getMembershipTypeDetails($type);
+      $fieldParams['option_id'] = array(1 => $priceFieldValue['id']);
+      $fieldParams['option_label'][$rowCount] = CRM_Utils_Array::value('name', $membetype);
+      $fieldParams['option_amount'][$rowCount] = CRM_Utils_Array::value('minimum_fee', $membetype, 0);
+      $fieldParams['option_weight'][$rowCount] = CRM_Utils_Array::value('weight', $membetype);
+      $fieldParams['option_description'][$rowCount] = CRM_Utils_Array::value('description', $membetype);
+      $fieldParams['option_financial_type_id'][$rowCount] = CRM_Utils_Array::value('financial_type_id', $membetype);
+      $fieldParams['membership_type_id'][$rowCount] = $type;
+    }
+    $priceField = CRM_Price_BAO_PriceField::create($fieldParams);
+    $this->assertEquals($priceField->id, $fieldParams['id']);
+
+    foreach ($memType as $type) {
+      $this->callAPISuccess('membership_type', 'delete', array('id' => $type));
+    }
+
+  }
+
 }

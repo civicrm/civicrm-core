@@ -179,7 +179,7 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
     $class = $element->getAttribute('class');
     $type = $element->getType();
     if (!$class) {
-      if ($type == 'text') {
+      if ($type == 'text' || $type == 'password') {
         $size = $element->getAttribute('size');
         if (!empty($size)) {
           $class = CRM_Utils_Array::value($size, self::$_sizeMapper);

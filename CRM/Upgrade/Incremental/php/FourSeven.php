@@ -62,6 +62,16 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
     if ($rev == '4.7.13') {
       $preUpgradeMessage .= '<p>' . ts('A new permission has been added called %1 This Permission is now used to control access to the Manage Tags screen', array(1 => 'manage tags')) . '</p>';
     }
+    if ($rev == '4.7.22') {
+      // Based on support inquiries for 4.7.21, show message during 4.7.22.
+      // For affected users, this issue prevents loading the regular status screen.
+      if (!$this->checkImageUploadDir()) {
+        $preUpgradeMessage .= '<p>' . ts('There appears to be an inconsistency in the configuration of "Image Upload URL" and "Image Upload Directory".') . '</p>'
+          . '<p>'
+          . ts('Further advice will be displayed at the end of the upgrade.')
+          . '</p>';
+      }
+    }
   }
 
   /**
@@ -111,7 +121,7 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
     if ($rev == '4.7.14') {
       $ck_href = 'href="' . CRM_Utils_System::url('civicrm/admin/ckeditor') . '"';
       $postUpgradeMessage .= '<p>' . ts('CiviMail no longer forces CKEditor to add html/head/body tags to email content because some sites place these in the message header/footer. This was added in 4.7.5 and is now disabled by default.')
-        . '<br />' . ts('You can re-enable it by visitng the <a %1>CKEditor Config</a> screen and setting "fullPage = true" under the Advanced Options of the CiviMail preset.', array(1 => $ck_href))
+        . '<br />' . ts('You can re-enable it by visiting the <a %1>CKEditor Config</a> screen and setting "fullPage = true" under the Advanced Options of the CiviMail preset.', array(1 => $ck_href))
         . '</p>';
     }
     if ($rev == '4.7.19') {
@@ -123,6 +133,26 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
       }
     }
     if ($rev == '4.7.22') {
+      // Based on support inquiries for 4.7.21, show message during 4.7.22.
+      // For affected users, this issue prevents loading the regular status screen.
+      if (!$this->checkImageUploadDir()) {
+        $config = CRM_Core_Config::singleton();
+        $postUpgradeMessage .=
+          '<h3>' . ts('Warning') . '</h3>'
+          . '<p>' . ts('There appears to be an inconsistency in the configuration of "Image Upload URL" and "Image Upload Directory".') . '</p>'
+          . sprintf("<ul><li><b>imageUploadDir</b>: <code>%s</code></li><li><b>imageUploadURL</b>: <code>%s</code></li></ul>", htmlentities($config->imageUploadDir), htmlentities($config->imageUploadURL))
+          . '<p>'
+          . ts('You may need to check that: <ul><li>(a) the path and URL match,</li><li> (b) the httpd/htaccess policy allows requests for files inside this folder,</li><li>and (c) the web domain matches the normal web domain.</ul>')
+          . '</p>'
+          . '<p><em>'
+          . ts('(Note: Although files should be readable, it is best if they are not listable or browseable.)')
+          . '</em></p>'
+          . '<p>'
+          . ts('If this remains unresolved, then some important screens may fail to load.')
+          . '</p>';
+      }
+    }
+    if ($rev == '4.7.23') {
       $postUpgradeMessage .= '<br /><br />' . ts('Default version of the following System Workflow Message Templates have been modified: <ul><li>Contribution Invoice</li></ul> If you have modified these templates, please review the new default versions and implement updates as needed to your copies (Administer > Communications > Message Templates > System Workflow Messages).');
     }
   }
@@ -368,7 +398,7 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
    *
    * @param string $rev
    */
-  public function upgrade_4_7_22($rev) {
+  public function upgrade_4_7_23($rev) {
     $this->addTask('CRM-20387 - Add invoice_number column to civicrm_contribution', 'addColumn',
       'civicrm_contribution', 'invoice_number', "varchar(255) COMMENT 'Human readable invoice number' DEFAULT NULL");
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
@@ -1156,6 +1186,15 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
       CHANGE `mapping_id` `mapping_id` varchar(64) COLLATE
       utf8_unicode_ci DEFAULT NULL COMMENT 'Name/ID of the mapping to use on this table'");
     return TRUE;
+  }
+
+  /**
+   * @return bool
+   */
+  protected function checkImageUploadDir() {
+    $config = CRM_Core_Config::singleton();
+    $check = new CRM_Utils_Check_Component_Security();
+    return $config->imageUploadDir && $config->imageUploadURL && $check->isDirAccessible($config->imageUploadDir, $config->imageUploadURL);
   }
 
 }

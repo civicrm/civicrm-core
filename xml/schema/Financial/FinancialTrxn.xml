@@ -175,6 +175,10 @@
     <type>varchar</type>
     <length>255</length>
     <comment>Transaction id supplied by external processor. This may not be unique.</comment>
+    <html>
+      <type>Text</type>
+      <size>10</size>
+    </html>
     <add>1.3</add>
   </field>
   <index>

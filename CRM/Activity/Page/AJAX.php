@@ -403,6 +403,10 @@ class CRM_Activity_Page_AJAX {
       'context' => 'String',
       'activity_type_id' => 'Integer',
       'activity_type_exclude_id' => 'Integer',
+      'activity_status_id' => 'String',
+      'activity_date_relative' => 'String',
+      'activity_date_low' => 'String',
+      'activity_date_high' => 'String',
     );
 
     $params = CRM_Core_Page_AJAX::defaultSortAndPagerParams();
@@ -429,13 +433,22 @@ class CRM_Activity_Page_AJAX {
     }
 
     // store the activity filter preference CRM-11761
-    $session = CRM_Core_Session::singleton();
-    $userID = $session->get('userID');
-    if ($userID) {
-      $activityFilter = array(
-        'activity_type_filter_id' => empty($params['activity_type_id']) ? '' : CRM_Utils_Type::escape($params['activity_type_id'], 'Integer'),
-        'activity_type_exclude_filter_id' => empty($params['activity_type_exclude_id']) ? '' : CRM_Utils_Type::escape($params['activity_type_exclude_id'], 'Integer'),
-      );
+    if (Civi::settings()->get('preserve_activity_tab_filter') && ($userID = CRM_Core_Session::getLoggedInContactID())) {
+      unset($optionalParameters['context']);
+      foreach ($optionalParameters as $searchField => $dataType) {
+        if (!empty($params[$searchField])) {
+          $activityFilter[$searchField] = CRM_Utils_Type::escape($params[$searchField], $dataType);
+          if (in_array($searchField, array('activity_date_low', 'activity_date_high'))) {
+            $activityFilter['activity_date_relative'] = 0;
+          }
+          elseif ($searchField == 'activity_status_id') {
+            $activityFilter['status_id'] = explode(',', $activityFilter[$searchField]);
+          }
+        }
+        elseif (in_array($searchField, array('activity_type_id', 'activity_type_exclude_id'))) {
+          $activityFilter[$searchField] = '';
+        }
+      }
 
       /**
        * @var \Civi\Core\SettingsBag $cSettings

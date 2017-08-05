@@ -115,7 +115,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
    *   Array of mapping names, keyed by id.
    */
   public static function getMappings($mappingType) {
-    $result = civicrm_api3('Mapping', 'get', array('mapping_type_id' => $mappingType, 'options' => array('limit' => 1, 'sort' => 'name')));
+    $result = civicrm_api3('Mapping', 'get', array('mapping_type_id' => $mappingType, 'options' => array('sort' => 'name')));
     $mapping = array();
 
     foreach ($result['values'] as $key => $value) {
@@ -130,10 +130,14 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
    * @param int $mappingId
    *   Mapping id.
    *
+   * @param bool $addPrimary
+   *   Add the key 'Primary' when the field is a location field AND there is
+   *   no location type (meaning Primary)?
+   *
    * @return array
    *   array of mapping fields
    */
-  public static function getMappingFields($mappingId) {
+  public static function getMappingFields($mappingId, $addPrimary = FALSE) {
     //mapping is to be loaded from database
     $mapping = new CRM_Core_DAO_MappingField();
     $mapping->mapping_id = $mappingId;
@@ -148,6 +152,14 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
 
       if (!empty($mapping->location_type_id)) {
         $mappingLocation[$mapping->grouping][$mapping->column_number] = $mapping->location_type_id;
+      }
+      elseif ($addPrimary) {
+        if (CRM_Contact_BAO_Contact::isFieldHasLocationType($mapping->name)) {
+          $mappingLocation[$mapping->grouping][$mapping->column_number] = ts('Primary');
+        }
+        else {
+          $mappingLocation[$mapping->grouping][$mapping->column_number] = NULL;
+        }
       }
 
       if (!empty($mapping->phone_type_id)) {

@@ -1148,6 +1148,9 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $contribution = $this->callAPISuccess('contribution', 'create', $newParams);
     $this->assertAPISuccess($contribution);
     $this->_checkFinancialTrxn($contribution, 'paymentInstrument', $instrumentId);
+
+    // cleanup - delete created payment instrument
+    $this->_deletedAddedPaymentInstrument();
   }
 
   /**
@@ -1173,6 +1176,9 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $contribution = $this->callAPISuccess('contribution', 'create', $newParams);
     $this->assertAPISuccess($contribution);
     $this->_checkFinancialTrxn($contribution, 'paymentInstrument', $instrumentId, array('total_amount' => '-100.00'));
+
+    // cleanup - delete created payment instrument
+    $this->_deletedAddedPaymentInstrument();
   }
 
   /**
@@ -3426,6 +3432,18 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     CRM_Financial_BAO_FinancialTypeAccount::add($financialParams, CRM_Core_DAO::$_nullArray);
     $this->assertNotEmpty($optionValue['values'][$optionValue['id']]['value']);
     return $optionValue['values'][$optionValue['id']]['value'];
+  }
+
+  public function _deletedAddedPaymentInstrument() {
+    $result = $this->callAPISuccess('OptionValue', 'get', array(
+      'option_group_id' => 'payment_instrument',
+      'name' => 'Test Card',
+      'value' => '6',
+      'is_active' => 1,
+    ));
+    if ($id = CRM_Utils_Array::value('id', $result)) {
+      $this->callAPISuccess('OptionValue', 'delete', array('id' => $id));
+    }
   }
 
   /**
