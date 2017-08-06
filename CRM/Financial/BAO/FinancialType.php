@@ -246,8 +246,8 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
   }
 
   /**
-   * Get available Financial Types.
-   *
+   * CRM-21026
+   * Wrapper aroung getAvaliableFinancialTypes to get all including disabled FinancialTypes
    * @param array $financialTypes
    *   (reference ) an array of financial types
    * @param int|string $action
@@ -257,9 +257,47 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
    *
    * @return array
    */
-  public static function getAvailableFinancialTypes(&$financialTypes = NULL, $action = CRM_Core_Action::VIEW, $resetCache = FALSE) {
+  public static function getAllAvailableFinancialTypes(&$financialTypes = NULL, $action = CRM_Core_Action::VIEW, $resetCache = FALSE) {
+    // Flush pseudoconstant cache
+    CRM_Contribute_PseudoConstant::flush('financialType');
+    self::getAvailableFinancialTypes($financialTypes, $action, $resetCache, TRUE);
+    return $financialTypes;
+  }
+
+  /**
+   * CRM-21026
+   * Wrapper aroung getAvaliableFinancialTypes to get all FinancialTypes Excluding Disabled ones.
+   * @param array $financialTypes
+   *   (reference ) an array of financial types
+   * @param int|string $action
+   *   the type of action, can be add, view, edit, delete
+   * @param bool $resetCache
+   *   load values from static cache
+   *
+   * @return array
+   */
+  public static function getAllEnabledAvailableFinancialTypes(&$financialTypes = NULL, $action = CRM_Core_Action::VIEW, $resetCache = FALSE) {
+    self::getAvailableFinancialTypes($financialTypes, $action, $resetCache);
+    return $financialTypes;
+  }
+
+  /**
+   * Get available Financial Types.
+   *
+   * @param array $financialTypes
+   *   (reference ) an array of financial types
+   * @param int|string $action
+   *   the type of action, can be add, view, edit, delete
+   * @param bool $resetCache
+   *   load values from static cache
+   * @param bool $includeDisabled
+   *   Whether we should load in disabled FinancialTypes or Not
+   *
+   * @return array
+   */
+  public static function getAvailableFinancialTypes(&$financialTypes = NULL, $action = CRM_Core_Action::VIEW, $resetCache = FALSE, $includeDisabled = FALSE) {
     if (empty($financialTypes)) {
-      $financialTypes = CRM_Contribute_PseudoConstant::financialType();
+      $financialTypes = CRM_Contribute_PseudoConstant::financialType(NULL, $includeDisabled);
     }
     if (!self::isACLFinancialTypeStatus()) {
       return $financialTypes;

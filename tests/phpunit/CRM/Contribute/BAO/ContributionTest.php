@@ -147,6 +147,41 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * CRM-21026 Test ContributionCount after contribution created with disabled FT
+   */
+  public function testContributionCountDisabledFinancialType() {
+    $contactId = $this->individualCreate();
+    $financialType = array(
+      'name' => 'grassvariety1' . substr(sha1(rand()), 0, 7),
+      'is_reserved' => 0,
+      'is_active' => 0,
+    );
+    $finType = $this->callAPISuccess('financial_type', 'create', $financialType);
+    $params = array(
+      'contact_id' => $contactId,
+      'currency' => 'USD',
+      'financial_type_id' => $finType['id'],
+      'contribution_status_id' => 1,
+      'payment_instrument_id' => 1,
+      'source' => 'STUDENT',
+      'receive_date' => '20080522000000',
+      'receipt_date' => '20080522000000',
+      'id' => NULL,
+      'non_deductible_amount' => 0.00,
+      'total_amount' => 200.00,
+      'fee_amount' => 5,
+      'net_amount' => 195,
+      'trxn_id' => '22ereerwww322323',
+      'invoice_id' => '22ed39c9e9ee6ef6031621ce0eafe6da70',
+      'thankyou_date' => '20080522',
+    );
+    $contribution = CRM_Contribute_BAO_Contribution::create($params);
+    $testResult = $this->callAPISuccess('financial_type', 'create', array('is_active' => 0, 'id' => $finType['id']));
+    $contributionCount = CRM_Contribute_BAO_Contribution::contributionCount($contactId);
+    $this->assertEquals(1, $contributionCount);
+  }
+
+  /**
    * DeleteContribution() method
    */
   public function testDeleteContribution() {
