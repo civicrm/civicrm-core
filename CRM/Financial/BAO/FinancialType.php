@@ -246,7 +246,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
   }
 
   /**
-   * Wrapper aroung getAvaliableFinancialTypes to get all including disabled FinancialTypes
+   * Wrapper aroung getAvailableFinancialTypes to get all including disabled FinancialTypes
    * @param int|string $action
    *   the type of action, can be add, view, edit, delete
    * @param bool $resetCache
@@ -263,7 +263,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
   }
 
   /**
-   * Wrapper aroung getAvaliableFinancialTypes to get all FinancialTypes Excluding Disabled ones.
+   * Wrapper aroung getAvailableFinancialTypes to get all FinancialTypes Excluding Disabled ones.
    * @param int|string $action
    *   the type of action, can be add, view, edit, delete
    * @param bool $resetCache
@@ -377,7 +377,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
     }
     else {
       if ($component == 'contribution') {
-        self::getAvailableFinancialTypes($types);
+        $types = self::getAllEnabledAvailableFinancialTypes();
         $column = "financial_type_id";
       }
       if ($component == 'membership') {
@@ -447,8 +447,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
     if (!self::isACLFinancialTypeStatus()) {
       return TRUE;
     }
-    // @todo consider adding back in disabled types here.
-    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes, CRM_Core_Action::UPDATE);
+    $financialTypes = CRM_Financial_BAO_FinancialType::getAllAvailableFinancialTypes(CRM_Core_Action::UPDATE);
     return isset($financialTypes[$financialTypeID]);
   }
 
