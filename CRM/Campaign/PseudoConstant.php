@@ -61,9 +61,8 @@ class CRM_Campaign_PseudoConstant extends CRM_Core_PseudoConstant {
   private static $engagementLevel;
 
   /**
-   * DEPRECATED. Please use the buildOptions() method in the appropriate BAO object.
+   * @deprecated. Please use the buildOptions() method in the appropriate BAO object.
    * Get all the survey activity types
-   *
    *
    * @param string $returnColumn
    *
@@ -87,7 +86,7 @@ class CRM_Campaign_PseudoConstant extends CRM_Core_PseudoConstant {
   }
 
   /**
-   * DEPRECATED. Please use the buildOptions() method in the appropriate BAO object.
+   * @deprecated. Please use the buildOptions() method in the appropriate BAO object.
    * Get all campaign types.
    *
    * The static array campaignType is returned
@@ -105,7 +104,7 @@ class CRM_Campaign_PseudoConstant extends CRM_Core_PseudoConstant {
   }
 
   /**
-   * DEPRECATED. Please use the buildOptions() method in the appropriate BAO object.
+   * @deprecated. Please use the buildOptions() method in the appropriate BAO object.
    * Get all campaign status.
    *
    * The static array campaignStatus is returned
@@ -123,7 +122,7 @@ class CRM_Campaign_PseudoConstant extends CRM_Core_PseudoConstant {
   }
 
   /**
-   * DEPRECATED. Please use the buildOptions() method in the appropriate BAO object.
+   * @deprecated. Please use the buildOptions() method in the appropriate BAO object.
    * Get all Engagement Level.
    *
    * The static array Engagement Level is returned
