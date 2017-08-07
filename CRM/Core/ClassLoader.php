@@ -96,8 +96,13 @@ class CRM_Core_ClassLoader {
    * @return void
    */
   protected function requireComposerAutoload() {
-    $civicrm_base_path = dirname(dirname(__DIR__));
-    $top_path = dirname(dirname(dirname(dirname(dirname(__DIR__)))));
+    // We are trying to locate 'vendor/autoload.php'. When installing CiviCRM
+    // manually from the built tarball, that will be two directories up in the
+    // civicrm-core directory. However, if civicrm-core was installed via
+    // composer as a library, that'll be 5 directories up where composer was
+    // run (ex. the Drupal root on a Drupal 8 site).
+    $civicrm_base_path = dirname(__DIR__, 2);
+    $top_path = dirname(__DIR__, 5);
 
     if (file_exists($civicrm_base_path . '/vendor/autoload.php')) {
       require_once $civicrm_base_path . '/vendor/autoload.php';
