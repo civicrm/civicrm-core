@@ -147,6 +147,24 @@ class api_v3_CaseTest extends CiviCaseTestCase {
   }
 
   /**
+   * Test case create with valid parameters and custom data.
+   */
+  public function testCaseCreateCustom() {
+    $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
+    $params = $this->_params;
+    $params['custom_' . $ids['custom_field_id']] = "custom string";
+    $result = $this->callAPIAndDocument($this->_entity, 'create', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess($this->_entity, 'get', array(
+      'return.custom_' . $ids['custom_field_id'] => 1,
+      'id' => $result['id'],
+    ));
+    $this->assertEquals("custom string", $result['values'][$result['id']]['custom_' . $ids['custom_field_id']], ' in line ' . __LINE__);
+
+    $this->customFieldDelete($ids['custom_field_id']);
+    $this->customGroupDelete($ids['custom_group_id']);
+  }
+
+  /**
    * Test update (create with id) function with valid parameters.
    */
   public function testCaseUpdate() {
@@ -166,6 +184,43 @@ class api_v3_CaseTest extends CiviCaseTestCase {
     // Verify that updated case is exactly equal to the original with new subject.
     $result = $this->callAPISuccessGetSingle('Case', array('case_id' => $id));
     $this->assertAPIArrayComparison($result, $case);
+  }
+
+  /**
+   * Test case update with custom data
+   */
+  public function testCaseUpdateCustom() {
+    $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
+    $params = $this->_params;
+
+    // Create a case with custom data
+    $params['custom_' . $ids['custom_field_id']] = 'custom string';
+    $result = $this->callAPISuccess($this->_entity, 'create', $params);
+
+    $caseId = $result['id'];
+    $result = $this->callAPISuccess($this->_entity, 'get', array(
+      'return.custom_' . $ids['custom_field_id'] => 1,
+      'version' => 3,
+      'id' => $result['id'],
+    ));
+    $this->assertEquals("custom string", $result['values'][$result['id']]['custom_' . $ids['custom_field_id']]);
+    $fields = $this->callAPISuccess($this->_entity, 'getfields', array('version' => $this->_apiversion));
+    $this->assertTrue(is_array($fields['values']['custom_' . $ids['custom_field_id']]));
+
+    // Update the activity with custom data.
+    $params = array(
+      'id' => $caseId,
+      'custom_' . $ids['custom_field_id'] => 'Updated my test data',
+      'version' => $this->_apiversion,
+    );
+    $result = $this->callAPISuccess($this->_entity, 'create', $params);
+
+    $result = $this->callAPISuccess($this->_entity, 'get', array(
+      'return.custom_' . $ids['custom_field_id'] => 1,
+      'version' => 3,
+      'id' => $result['id'],
+    ));
+    $this->assertEquals("Updated my test data", $result['values'][$result['id']]['custom_' . $ids['custom_field_id']]);
   }
 
   /**
