@@ -246,7 +246,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
   }
 
   /**
-   * Wrapper aroung getAvailableFinancialTypes to get all including disabled FinancialTypes
+   * Wrapper aroung getAvaliableFinancialTypes to get all including disabled FinancialTypes
    * @param int|string $action
    *   the type of action, can be add, view, edit, delete
    * @param bool $resetCache
@@ -263,7 +263,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
   }
 
   /**
-   * Wrapper aroung getAvailableFinancialTypes to get all FinancialTypes Excluding Disabled ones.
+   * Wrapper aroung getAvaliableFinancialTypes to get all FinancialTypes Excluding Disabled ones.
    * @param int|string $action
    *   the type of action, can be add, view, edit, delete
    * @param bool $resetCache
