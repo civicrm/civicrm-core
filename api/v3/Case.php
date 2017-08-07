@@ -82,7 +82,7 @@ function civicrm_api3_case_create($params) {
     }
 
     if (array_key_exists('creator_id', $params)) {
-      throw new API_Exception(ts('You cannot update creator id'));
+      throw new API_Exception('You cannot update creator id');
     }
 
     $mergedCaseId = $origContactIds = array();
