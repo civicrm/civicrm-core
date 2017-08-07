@@ -98,7 +98,7 @@
 <div class="crm-section no-label total_amount-section">
   <div class="content bold">
     {if $getTaxDetails && $totalTaxAmount}
-      {ts}Total {$taxTerm} Amount{/ts}: {$totalTaxAmount|crmMoney}<br />
+      {ts 1=$taxTerm}Total %1 Amount{/ts}: {$totalTaxAmount|crmMoney}<br />
     {/if}
     {if $context EQ "Contribution"}
       {ts}Contribution Total{/ts}:

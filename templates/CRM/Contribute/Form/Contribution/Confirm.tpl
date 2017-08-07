@@ -76,7 +76,7 @@
                 {/if}
               {else}
                 {if $totalTaxAmount }
-                     {ts}Total {$taxTerm} Amount{/ts}: <strong>{$totalTaxAmount|crmMoney} </strong><br />
+                  {ts 1=$taxTerm}Total %1 Amount{/ts}: <strong>{$totalTaxAmount|crmMoney} </strong><br />
                 {/if}
 		{if $amount}
                     {if $installments}{ts}Installment Amount{/ts}{else}{ts}Total Amount{/ts}{/if}: <strong>{$amount|crmMoney}{if $amount_level } &ndash; {$amount_level}{/if}</strong>
