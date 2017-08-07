@@ -111,4 +111,5 @@ class CRM_Utils_RuleTest extends CiviUnitTestCase {
       array('$-500.3333', TRUE),
     );
   }
+
 }
