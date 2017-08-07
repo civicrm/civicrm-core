@@ -39,11 +39,13 @@
  * @param array $params
  *
  * @code
- * //REQUIRED:
+ * //REQUIRED for create:
  * 'case_type_id' => int OR
  * 'case_type' => str (provide one or the other)
  * 'contact_id' => int // case client
  * 'subject' => str
+ * //REQUIRED for update:
+ * 'id' => case Id
  *
  * //OPTIONAL
  * 'medium_id' => int // see civicrm option values for possibilities
@@ -123,9 +125,11 @@ function civicrm_api3_case_create($params) {
     throw new API_Exception('Case not created. Please check input params.');
   }
 
-  foreach ((array) $params['contact_id'] as $cid) {
-    $contactParams = array('case_id' => $caseBAO->id, 'contact_id' => $cid);
-    CRM_Case_BAO_CaseContact::create($contactParams);
+  if (isset($params['contact_id'])) {
+    foreach ((array) $params['contact_id'] as $cid) {
+      $contactParams = array('case_id' => $caseBAO->id, 'contact_id' => $cid);
+      CRM_Case_BAO_CaseContact::create($contactParams);
+    }
   }
 
   if (!isset($params['id'])) {
