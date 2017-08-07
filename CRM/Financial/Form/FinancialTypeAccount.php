@@ -241,6 +241,7 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
       $params = array(
         'account_relationship' => $values['account_relationship'],
         'entity_id' => $self->_aid,
+        'entity_table' => 'civicrm_financial_type',
       );
       $defaults = array();
       if ($self->_action == CRM_Core_Action::ADD) {
