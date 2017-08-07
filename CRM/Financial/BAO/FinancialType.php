@@ -246,10 +246,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
   }
 
   /**
-   * CRM-21026
    * Wrapper aroung getAvaliableFinancialTypes to get all including disabled FinancialTypes
-   * @param array $financialTypes
-   *   an array of financial types
    * @param int|string $action
    *   the type of action, can be add, view, edit, delete
    * @param bool $resetCache
@@ -257,18 +254,16 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
    *
    * @return array
    */
-  public static function getAllAvailableFinancialTypes($financialTypes = NULL, $action = CRM_Core_Action::VIEW, $resetCache = FALSE) {
+  public static function getAllAvailableFinancialTypes($action = CRM_Core_Action::VIEW, $resetCache = FALSE) {
     // Flush pseudoconstant cache
     CRM_Contribute_PseudoConstant::flush('financialType');
-    $fTypes = self::getAvailableFinancialTypes($financialTypes, $action, $resetCache, TRUE);
-    return $fTypes;
+    $thisIsAUselessVariableButSolvesPHPError = NULL;
+    $financialTypes = self::getAvailableFinancialTypes($thisIsAUselessVariableButSolvesPHPError, $action, $resetCache, TRUE);
+    return $financialTypes;
   }
 
   /**
-   * CRM-21026
    * Wrapper aroung getAvaliableFinancialTypes to get all FinancialTypes Excluding Disabled ones.
-   * @param array $financialTypes
-   *   an array of financial types
    * @param int|string $action
    *   the type of action, can be add, view, edit, delete
    * @param bool $resetCache
@@ -276,9 +271,10 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
    *
    * @return array
    */
-  public static function getAllEnabledAvailableFinancialTypes($financialTypes = NULL, $action = CRM_Core_Action::VIEW, $resetCache = FALSE) {
-    $fTypes = self::getAvailableFinancialTypes($financialTypes, $action, $resetCache);
-    return $fTypes;
+  public static function getAllEnabledAvailableFinancialTypes($action = CRM_Core_Action::VIEW, $resetCache = FALSE) {
+    $thisIsAUselessVariableButSolvesPHPError = NULL;
+    $financialTypes = self::getAvailableFinancialTypes($thisIsAUselessVariableButSolvesPHPError, $action, $resetCache);
+    return $financialTypes;
   }
 
   /**
