@@ -653,8 +653,7 @@ CRM.$(function($) {
         taxAmount = isNaN (taxAmount) ? 0:taxAmount;
         var totalTaxAmount = taxAmount + Number(totalAmount);
         totalTaxAmount = formatMoney( totalTaxAmount, 2, separator, thousandMarker );
-
-        $("#totalTaxAmount" ).html('Amount with ' + taxTerm + ' : <span id="currencySymbolShow">' + currencySymbol + '</span> '+ totalTaxAmount);
+        $("#totalTaxAmount" ).html('{/literal}{ts 1=$taxTerm}Amount with %1 :{/ts}{literal} <span id="currencySymbolShow">' + currencySymbol + '</span> '+ totalTaxAmount);
       }
       event.handled = true;
     }
