@@ -495,7 +495,7 @@ function _civicrm_api3_case_deprecation() {
 }
 
 /**
- * Update a specified case.
+ * @deprecated Update a specified case.  Use civicrm_api3_case_create() instead.
  *
  * @param array $params
  *   //REQUIRED:
