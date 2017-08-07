@@ -154,7 +154,9 @@ function civicrm_api3_case_create($params) {
  */
 function _civicrm_api3_case_create_xmlProcessor($params, $caseBAO) {
   // Format params for xmlProcessor
-  if (isset($caseBAO->id)) { $params['id'] = $caseBAO->id; }
+  if (isset($caseBAO->id)) {
+    $params['id'] = $caseBAO->id;
+  }
 
   // Initialize XML processor with $params
   $xmlProcessor = new CRM_Case_XMLProcessor_Process();
@@ -698,7 +700,7 @@ function _civicrm_api3_case_format_params(&$params) {
   $values = array();
   _civicrm_api3_custom_format_params($params, $values, 'Case');
   $params = array_merge($params, $values);
-  
+
   if (empty($params['case_type_id']) && empty($params['case_type'])) {
     return;
   }
