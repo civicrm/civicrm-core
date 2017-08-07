@@ -60,20 +60,15 @@
  *   api result array
  */
 function civicrm_api3_case_create($params) {
-  // Process params
-  $values = array();
-  _civicrm_api3_custom_format_params($params, $values, 'Case');
-  $params = array_merge($params, $values);
-
   _civicrm_api3_case_format_params($params);
 
   if (empty($params['id'])) {
     // Creating a new case, so make sure we have the necessary parameters
-    civicrm_api3_verify_mandatory($params, NULL, [
+    civicrm_api3_verify_mandatory($params, NULL, array(
         'contact_id',
         'subject',
-        ['case_type', 'case_type_id']
-      ]
+        array('case_type', 'case_type_id')
+      )
     );
   }
   else {
@@ -84,38 +79,40 @@ function civicrm_api3_case_create($params) {
       $params['case_id'] = $params['id'];
     }
 
-    // return error if modifying creator id
     if (array_key_exists('creator_id', $params)) {
       throw new API_Exception(ts('You cannot update creator id'));
     }
 
-    $mCaseId = $origContactIds = array();
+    $mergedCaseId = $origContactIds = array();
 
     // get original contact id and creator id of case
     if (!empty($params['contact_id'])) {
+      // FIXME: CRM_Case_BAO_Case::retrieveContactIdsByCaseId returns a 1-based array (1 is the first element)
+      // It should really return a 0-based array for consistency.
       $origContactIds = CRM_Case_BAO_Case::retrieveContactIdsByCaseId($params['id']);
       $origContactId = $origContactIds[1];
     }
 
+    // FIXME: Refactor as separate method to get contactId
     if (count($origContactIds) > 1) {
       // check valid orig contact id
+      if (empty($params['orig_contact_id'])) {
+        throw new API_Exception('Case is linked with more than one contact id. Provide the required params orig_contact_id to be replaced');
+      }
       if (!empty($params['orig_contact_id']) && !in_array($params['orig_contact_id'], $origContactIds)) {
         throw new API_Exception('Invalid case contact id (orig_contact_id)');
-      }
-      elseif (empty($params['orig_contact_id'])) {
-        throw new API_Exception('Case is linked with more than one contact id. Provide the required params orig_contact_id to be replaced');
       }
       $origContactId = $params['orig_contact_id'];
     }
 
     // check for same contact id for edit Client
     if (!empty($params['contact_id']) && !in_array($params['contact_id'], $origContactIds)) {
-      $mCaseId = CRM_Case_BAO_Case::mergeCases($params['contact_id'], $params['case_id'], $origContactId, NULL, TRUE);
+      $mergedCaseId = CRM_Case_BAO_Case::mergeCases($params['contact_id'], $params['case_id'], $origContactId, NULL, TRUE);
     }
 
     // If we merged cases then update the merged case
-    if (!empty($mCaseId[0])) {
-      $params['id'] = $mCaseId[0];
+    if (!empty($mergedCaseId[0])) {
+      $params['id'] = $mergedCaseId[0];
     }
   }
 
@@ -132,7 +129,8 @@ function civicrm_api3_case_create($params) {
   }
 
   if (!isset($params['id'])) {
-    // Creating a new case
+    // As the API was not passed an id we have created a new case.
+    // Only run the xmlProcessor for new cases to get all configuration for the new case.
     _civicrm_api3_case_create_xmlProcessor($params, $caseBAO);
   }
 
@@ -142,12 +140,18 @@ function civicrm_api3_case_create($params) {
 
   // Add custom data
   if (isset($params['custom'])) {
-    _civicrm_api3_custom_data_get($values[$caseBAO->id],TRUE,'case',$caseBAO->id);
+    _civicrm_api3_custom_data_get($values[$caseBAO->id], TRUE, 'case', $caseBAO->id);
   }
 
   return civicrm_api3_create_success($values, $params, 'Case', 'create', $caseBAO);
 }
 
+/**
+ * When creating a new case, run the xmlProcessor to get all necessary params/configuration
+ *  for the new case, as cases use an xml file to store their configuration.
+ * @param $params
+ * @param $caseBAO
+ */
 function _civicrm_api3_case_create_xmlProcessor($params, $caseBAO) {
   // Format params for xmlProcessor
   if (isset($caseBAO->id)) { $params['id'] = $caseBAO->id; }
@@ -155,17 +159,17 @@ function _civicrm_api3_case_create_xmlProcessor($params, $caseBAO) {
   // Initialize XML processor with $params
   $xmlProcessor = new CRM_Case_XMLProcessor_Process();
   $xmlProcessorParams = array(
-    'clientID' => CRM_Utils_Array::value('contact_id',$params),
-    'creatorID' => CRM_Utils_Array::value('creator_id',$params),
+    'clientID' => CRM_Utils_Array::value('contact_id', $params),
+    'creatorID' => CRM_Utils_Array::value('creator_id', $params),
     'standardTimeline' => 1,
     'activityTypeName' => 'Open Case',
-    'caseID' => CRM_Utils_Array::value('id',$params),
-    'subject' => CRM_Utils_Array::value('subject',$params),
-    'location' => CRM_Utils_Array::value('location',$params),
-    'activity_date_time' => CRM_Utils_Array::value('start_date',$params),
-    'duration' => CRM_Utils_Array::value('duration',$params),
-    'medium_id' => CRM_Utils_Array::value('medium_id',$params),
-    'details' => CRM_Utils_Array::value('details',$params),
+    'caseID' => CRM_Utils_Array::value('id', $params),
+    'subject' => CRM_Utils_Array::value('subject', $params),
+    'location' => CRM_Utils_Array::value('location', $params),
+    'activity_date_time' => CRM_Utils_Array::value('start_date', $params),
+    'duration' => CRM_Utils_Array::value('duration', $params),
+    'medium_id' => CRM_Utils_Array::value('medium_id', $params),
+    'details' => CRM_Utils_Array::value('details', $params),
     'custom' => array(),
   );
 
@@ -690,22 +694,29 @@ function _civicrm_api3_case_read(&$cases, $options) {
  * @param array $params
  */
 function _civicrm_api3_case_format_params(&$params) {
-  if (!empty($params['case_type_id']) || !empty($params['case_type'])) {
-    // figure out case type id from case type and vice-versa
-    $caseTypes = CRM_Case_PseudoConstant::caseType('name', FALSE);
-    if (empty($params['case_type_id'])) {
-      $params['case_type_id'] = array_search($params['case_type'], $caseTypes);
+  // Format/include custom params
+  $values = array();
+  _civicrm_api3_custom_format_params($params, $values, 'Case');
+  $params = array_merge($params, $values);
+  
+  if (empty($params['case_type_id']) && empty($params['case_type'])) {
+    return;
+  }
 
-      // DEPRECATED: lookup by label for backward compatibility
-      if (!$params['case_type_id']) {
-        $caseTypeLabels = CRM_Case_PseudoConstant::caseType('title', FALSE);
-        $params['case_type_id'] = array_search($params['case_type'], $caseTypeLabels);
-        $params['case_type'] = $caseTypes[$params['case_type_id']];
-      }
-    }
-    elseif (empty($params['case_type'])) {
+  // figure out case_type_id from case_type and vice-versa
+  $caseTypes = CRM_Case_PseudoConstant::caseType('name', FALSE);
+  if (empty($params['case_type_id'])) {
+    $params['case_type_id'] = array_search($params['case_type'], $caseTypes);
+
+    // DEPRECATED: lookup by label for backward compatibility
+    if (!$params['case_type_id']) {
+      $caseTypeLabels = CRM_Case_PseudoConstant::caseType('title', FALSE);
+      $params['case_type_id'] = array_search($params['case_type'], $caseTypeLabels);
       $params['case_type'] = $caseTypes[$params['case_type_id']];
     }
+  }
+  elseif (empty($params['case_type'])) {
+    $params['case_type'] = $caseTypes[$params['case_type_id']];
   }
 }
 
