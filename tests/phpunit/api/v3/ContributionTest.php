@@ -2671,6 +2671,16 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'receive_date' => '2012-02-29',
       'expected' => '2012-03-29 00:00:00',
     );
+    $result['receive_date_includes_time']['2012-01-01-1-month'] = array(
+      'data' => array(
+        'start_date' => '2012-01-01',
+        'frequency_interval' => 1,
+        'frequency_unit' => 'month',
+        'next_sched_contribution_date' => '2012-02-29',
+      ),
+      'receive_date' => '2012-02-29 16:00:00',
+      'expected' => '2012-03-29 00:00:00',
+    );
     return $result;
   }
 

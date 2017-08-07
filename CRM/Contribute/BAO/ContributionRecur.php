@@ -816,9 +816,8 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
    * @throws \CiviCRM_API3_Exception
    */
   public static function updateOnNewPayment($recurringContributionID, $paymentStatus, $effectiveDate) {
-    if (empty($effectiveDate)) {
-      $effectiveDate = date('Y-m-d');
-    }
+
+    $effectiveDate = $effectiveDate ? date('Y-m-d', strtotime($effectiveDate)) : date('Y-m-d');
     if (!in_array($paymentStatus, array('Completed', 'Failed'))) {
       return;
     }
