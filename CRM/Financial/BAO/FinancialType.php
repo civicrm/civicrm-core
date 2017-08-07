@@ -249,7 +249,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
    * CRM-21026
    * Wrapper aroung getAvaliableFinancialTypes to get all including disabled FinancialTypes
    * @param array $financialTypes
-   *   (reference ) an array of financial types
+   *   an array of financial types
    * @param int|string $action
    *   the type of action, can be add, view, edit, delete
    * @param bool $resetCache
@@ -257,18 +257,18 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
    *
    * @return array
    */
-  public static function getAllAvailableFinancialTypes(&$financialTypes = NULL, $action = CRM_Core_Action::VIEW, $resetCache = FALSE) {
+  public static function getAllAvailableFinancialTypes($financialTypes = NULL, $action = CRM_Core_Action::VIEW, $resetCache = FALSE) {
     // Flush pseudoconstant cache
     CRM_Contribute_PseudoConstant::flush('financialType');
-    self::getAvailableFinancialTypes($financialTypes, $action, $resetCache, TRUE);
-    return $financialTypes;
+    $fTypes = self::getAvailableFinancialTypes($financialTypes, $action, $resetCache, TRUE);
+    return $fTypes;
   }
 
   /**
    * CRM-21026
    * Wrapper aroung getAvaliableFinancialTypes to get all FinancialTypes Excluding Disabled ones.
    * @param array $financialTypes
-   *   (reference ) an array of financial types
+   *   an array of financial types
    * @param int|string $action
    *   the type of action, can be add, view, edit, delete
    * @param bool $resetCache
@@ -276,9 +276,9 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
    *
    * @return array
    */
-  public static function getAllEnabledAvailableFinancialTypes(&$financialTypes = NULL, $action = CRM_Core_Action::VIEW, $resetCache = FALSE) {
-    self::getAvailableFinancialTypes($financialTypes, $action, $resetCache);
-    return $financialTypes;
+  public static function getAllEnabledAvailableFinancialTypes($financialTypes = NULL, $action = CRM_Core_Action::VIEW, $resetCache = FALSE) {
+    $fTypes = self::getAvailableFinancialTypes($financialTypes, $action, $resetCache);
+    return $fTypes;
   }
 
   /**
@@ -371,7 +371,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
       return FALSE;
     }
     if (is_array($whereClauses)) {
-      self::getAvailableFinancialTypes($types);
+      $types = self::getAllEnabledAvailableFinancialTypes();
       if (empty($types)) {
         $whereClauses[] = ' ' . $alias . '.financial_type_id IN (0)';
       }
