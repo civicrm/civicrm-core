@@ -67,7 +67,7 @@ function civicrm_api3_case_create($params) {
     civicrm_api3_verify_mandatory($params, NULL, array(
         'contact_id',
         'subject',
-        array('case_type', 'case_type_id')
+        array('case_type', 'case_type_id'),
       )
     );
   }
