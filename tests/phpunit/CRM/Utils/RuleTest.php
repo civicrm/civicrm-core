@@ -79,4 +79,37 @@ class CRM_Utils_RuleTest extends CiviUnitTestCase {
     );
   }
 
+  /**
+   * @dataProvider moneyDataProvider
+   * @param $inputData
+   * @param $expectedResult
+   */
+  public function testMoney($inputData, $expectedResult) {
+    $this->assertEquals($expectedResult, CRM_Utils_Rule::money($inputData));
+  }
+
+  /**
+   * @return array
+   */
+  public function moneyDataProvider() {
+    return array(
+      array(10, TRUE),
+      array('145.0E+3', FALSE),
+      array('10', TRUE),
+      array(-10, TRUE),
+      array('-10', TRUE),
+      array('-10foo', FALSE),
+      array('-10.0345619', TRUE),
+      array('-10.010,4345619', TRUE),
+      array('10.0104345619', TRUE),
+      array('-0', TRUE),
+      array('-.1', TRUE),
+      array('.1', TRUE),
+      // Test currency symbols too, default locale uses $, so if we wanted to test others we'd need to reconfigure locale
+      array('$500.3333', TRUE),
+      array('-$500.3333', TRUE),
+      array('$-500.3333', TRUE),
+    );
+  }
+
 }
