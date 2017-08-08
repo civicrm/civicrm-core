@@ -543,6 +543,7 @@ INNER JOIN civicrm_contribution       con ON ( mp.contribution_id = con.id )
         // The function looks to load the payment processor ID from the contribution page, which
         // can support multiple processors.
       }
+      $paymentProcessor['payment_processor_type'] = CRM_Core_PseudoConstant::paymentProcessorType(FALSE, $paymentProcessor['payment_processor_type_id'], 'name');
       $result = Civi\Payment\System::singleton()->getByProcessor($paymentProcessor);
     }
     return $result;
