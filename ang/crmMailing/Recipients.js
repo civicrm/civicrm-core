@@ -209,7 +209,7 @@
               var filterParams = {};
               switch(rcpAjaxState.entity) {
               case 'civicrm_group':
-                filterParams = { is_hidden: 0, is_active: 1, group_type: "Mailing List" };
+                filterParams = { is_hidden: 0, is_active: 1, group_type: {"LIKE": "%2%"} };
                 break;
 
               case 'civicrm_mailing':
