@@ -77,6 +77,11 @@ class api_v3_CaseTest extends CiviCaseTestCase {
     );
   }
 
+  public function tearDown() {
+    unset($GLOBALS['civicrm_setting']['domain']['civicaseActivityRevisions']);
+    parent::tearDown();
+  }
+
   /**
    * Check with empty array.
    */
@@ -425,6 +430,44 @@ class api_v3_CaseTest extends CiviCaseTestCase {
     );
 
     //TODO: check some more things
+  }
+
+  /**
+   * If you disable `civicaseActivityRevisions`, then editing an activity
+   * will *not* create or change IDs.
+   */
+  public function testCaseActivityUpdate_Untracked() {
+    $GLOBALS['civicrm_setting']['domain']['civicaseActivityRevisions'] = FALSE;
+    Civi::service('settings_manager')->useMandatory();
+    $this->assertEquals(FALSE, Civi::settings()->get('civicaseActivityRevisions'));
+
+    //  Need to create the case and activity before we can update it
+    $this->testCaseActivityCreate();
+
+    $oldIDs = CRM_Utils_SQL_Select::from('civicrm_activity')
+      ->select('id, original_id, is_current_revision')
+      ->orderBy('id')
+      ->execute()->fetchAll();
+
+    $params = array(
+      'activity_id' => $this->_caseActivityId,
+      'case_id' => 1,
+      'activity_type_id' => 14,
+      'source_contact_id' => $this->_loggedInUser,
+      'subject' => 'New subject',
+    );
+    $result = $this->callAPISuccess('activity', 'create', $params);
+    $this->assertEquals($result['values'][$result['id']]['subject'], $params['subject']);
+
+    // id should not change because we've opted out.
+    $this->assertEquals($this->_caseActivityId, $result['values'][$result['id']]['id']);
+    $this->assertEmpty($result['values'][$result['id']]['original_id']);
+
+    $newIDs = CRM_Utils_SQL_Select::from('civicrm_activity')
+      ->select('id, original_id, is_current_revision')
+      ->orderBy('id')
+      ->execute()->fetchAll();
+    $this->assertEquals($oldIDs, $newIDs);
   }
 
   public function testCaseActivityUpdateCustom() {

@@ -43,6 +43,7 @@
  *   API result array
  */
 function civicrm_api3_activity_create($params) {
+  $isNew = empty($params['id']);
 
   if (empty($params['id'])) {
     // an update does not require any mandatory parameters
@@ -91,7 +92,7 @@ function civicrm_api3_activity_create($params) {
   }
   if (!empty($params['case_id'])) {
     $case_id = $params['case_id'];
-    if (!empty($params['id'])) {
+    if (!empty($params['id']) && Civi::settings()->get('civicaseActivityRevisions')) {
       $oldActivityParams = array('id' => $params['id']);
       if (!$oldActivityValues) {
         CRM_Activity_BAO_Activity::retrieve($oldActivityParams, $oldActivityValues);
@@ -158,7 +159,7 @@ function civicrm_api3_activity_create($params) {
   $activityBAO = CRM_Activity_BAO_Activity::create($params);
 
   if (isset($activityBAO->id)) {
-    if ($case_id && !$createRevision) {
+    if ($case_id && $isNew && !$createRevision) {
       // If this is a brand new case activity, add to case(s)
       foreach ((array) $case_id as $singleCaseId) {
         $caseActivityParams = array('activity_id' => $activityBAO->id, 'case_id' => $singleCaseId);
