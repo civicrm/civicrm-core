@@ -1189,11 +1189,11 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     if (!$orgID) {
       // check if matching organization contact exists
-      $dupeID = CRM_Contact_BAO_Contact::getFirstDuplicateContact($behalfOrganization, 'Organization', 'Unsupervised', array(), FALSE);
+      $dupeIDs = CRM_Contact_BAO_Contact::getDuplicateContacts($behalfOrganization, 'Organization', 'Unsupervised', array(), FALSE);
 
       // CRM-6243 says to pick the first org even if more than one match
       if (count($dupeIDs) >= 1) {
-        $behalfOrganization['contact_id'] = $orgID = $dupeID;
+        $behalfOrganization['contact_id'] = $orgID = $dupeIDs[0];
         // don't allow name edit
         unset($behalfOrganization['organization_name']);
       }
