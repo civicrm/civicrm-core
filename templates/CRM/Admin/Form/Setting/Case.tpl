@@ -47,6 +47,12 @@
         <span class="description">{ts}How to sort activity-types on the "Manage Case" screen? {/ts} {ts}(Set "Default" to load setting from the legacy "Settings.xml" file.){/ts}</span>
       </td>
     </tr>
+    <tr class="crm-case-form-block-civicaseActivityRevisions">
+      <td class="label">{$form.civicaseActivityRevisions.label}</td>
+      <td>{$form.civicaseActivityRevisions.html}<br />
+        <span class="description">{ts}Enable embedded tracking to activity revisions within the "civicrm_activity" table. Alternatively, see "Administer => System Settings => Misc => Logging".{/ts}</span>
+      </td>
+    </tr>
   </table>
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
   <div class="spacer"></div>
