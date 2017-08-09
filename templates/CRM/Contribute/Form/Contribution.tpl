@@ -572,7 +572,9 @@ function buildAmount( priceSetId, financialtypeIds ) {
   cj("#price_set_id option[value='']").html( manual );
 
   cj('label[for="total_amount"]').text('{/literal}{ts}Price Sets{/ts}{literal}');
-  cj("#financial_type_id option[value="+financialtypeIds[priceSetId]+"]").prop('selected', true);
+  if (financialtypeIds) {
+    cj("#financial_type_id option[value="+financialtypeIds[priceSetId]+"]").prop('selected', true);
+  }
   cj(".crm-contribution-form-block-financial_type_id").css("display", "none");
 }
 
