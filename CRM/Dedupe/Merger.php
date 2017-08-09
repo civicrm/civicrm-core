@@ -449,7 +449,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
     // getting all custom tables
     $customTables = array();
-    if ($customTableToCopyFrom != NULL) {
+    if ($customTableToCopyFrom !== NULL) {
       self::addCustomTablesExtendingContactsToCidRefs($customTables);
       $customTables = array_keys($customTables);
     }
@@ -492,7 +492,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     $sqls = array();
     foreach ($affected as $table) {
       // skipping non selected custom table's value migration
-      if ($customTableToCopyFrom != NULL && in_array($table, $customTables) && !in_array($table, $customTableToCopyFrom)) {
+      if ($customTableToCopyFrom !== NULL && in_array($table, $customTables) && !in_array($table, $customTableToCopyFrom)) {
         continue;
       }
 
@@ -523,10 +523,14 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           $preOperationSqls = self::operationSql($mainId, $otherId, $table, $tableOperations);
           $sqls = array_merge($sqls, $preOperationSqls);
 
+          if ($customTableToCopyFrom !== NULL && in_array($table, $customTableToCopyFrom) && !self::customRecordExists($mainId, $table, $field)) {
+            $sqls[] = "INSERT INTO $table ($field) VALUES ($mainId)";
+          }
           $sqls[] = "UPDATE IGNORE $table SET $field = $mainId WHERE $field = $otherId";
           $sqls[] = "DELETE FROM $table WHERE $field = $otherId";
         }
       }
+
       if (isset($eidRefs[$table])) {
         foreach ($eidRefs[$table] as $entityTable => $entityId) {
           $sqls[] = "UPDATE IGNORE $table SET $entityId = $mainId WHERE $entityId = $otherId AND $entityTable = 'civicrm_contact'";
@@ -549,6 +553,22 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       CRM_Dedupe_Merger::addMembershipToRealtedContacts($mainId);
     }
     $transaction->commit();
+  }
+
+  private static function customRecordExists($contactID, $table, $idField) {
+    $sql = "
+      SELECT COUNT(*) AS count
+      FROM $table
+      WHERE $idField = $contactID
+    ";
+    $dbResult = CRM_Core_DAO::executeQuery($sql);
+    $dbResult->fetch();
+
+    if ($dbResult->count > 0) {
+      return true;
+    }
+
+    return false;
   }
 
   /**
@@ -1476,9 +1496,8 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
     $qfZeroBug = 'e8cddb72-a257-11dc-b9cc-0016d3330ee9';
     $relTables = CRM_Dedupe_Merger::relTables();
-    $moveTables = $locationMigrationInfo = $tableOperations = array();
-    // variable for capturing id of civicrm_custom_field id
-    $submittedCustomValue = array();
+    $submittedCustomFields = $moveTables = $locationMigrationInfo = $tableOperations = array();
+
     foreach ($migrationInfo as $key => $value) {
       if ($value == $qfZeroBug) {
         $value = '0';
@@ -1488,8 +1507,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         $value != NULL
       ) {
         $submitted[substr($key, 5)] = $value;
-        // capturing id
-        array_push($submittedCustomValue, substr($key, 12));
+        $submittedCustomFields[] = substr($key, 12);
       }
 
       // Set up initial information for handling migration of location blocks
@@ -1516,45 +1534,9 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       unset($moveTables, $tableOperations);
     }
 
-    // capturing the custom table names. The table's value we have to merge
-    // from duplicate contact to original contact
-    $customTableToCopyValues = array();
-    foreach ($submittedCustomValue as $value) {
-      if ($value != NULL) {
-        $result1 = NULL;
-        try {
-          $result1 = civicrm_api3('custom_field', 'get', array('id' => $value, 'is_active' => TRUE));
-        }
-        catch (CiviCRM_API3_Exception $e) {
-          // just ignore and continue
-          continue;
-        }
-        if (!civicrm_error($result1) && isset($result1['values']) && is_array($result1['values'])) {
-          foreach ($result1['values'] as $value1) {
-            if ($value1 != NULL && is_array($value1) && isset($value1['custom_group_id'])) {
-              $result2 = NULL;
-              try {
-                $result2 = civicrm_api3('custom_group', 'get', array('id' => $value1['custom_group_id'], 'is_active' => TRUE));
-              }
-              catch (CiviCRM_API3_Exception $e) {
-                // just ignore and continue
-                continue;
-              }
-              if (!civicrm_error($result2) && isset($result2['values']) && is_array($result2['values'])) {
-                foreach ($result2['values'] as $value2) {
-                  if ($value2 != NULL && is_array($value2) && isset($value2['table_name'])) {
-                    array_push($customTableToCopyValues, $value2['table_name']);
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-
     // **** Do contact related migrations
-    CRM_Dedupe_Merger::moveContactBelongings($mainId, $otherId, FALSE, array(), $customTableToCopyValues);
+    $customTablesToCopyValues = self::getAffectedCustomTables($submittedCustomFields);
+    CRM_Dedupe_Merger::moveContactBelongings($mainId, $otherId, FALSE, array(), $customTablesToCopyValues);
 
     // FIXME: fix gender, prefix and postfix, so they're edible by createProfileContact()
     $names['gender'] = array('newName' => 'gender_id', 'groupName' => 'gender');
@@ -1621,19 +1603,19 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
             if (!empty($customfieldValues[$key])) {
               $existingValue = explode(CRM_Core_DAO::VALUE_SEPARATOR, $customfieldValues[$key]);
               if (is_array($existingValue) && !empty($existingValue)) {
-                $mergeValue = $submittedCustomValue = array();
+                $mergeValue = $submittedCustomFields = array();
                 if ($value == 'null') {
                   // CRM-19074 if someone has deliberately chosen to overwrite with 'null', respect it.
                   $submitted[$key] = $value;
                 }
                 else {
                   if ($value) {
-                    $submittedCustomValue = explode(CRM_Core_DAO::VALUE_SEPARATOR, $value);
+                    $submittedCustomFields = explode(CRM_Core_DAO::VALUE_SEPARATOR, $value);
                   }
 
                   // CRM-19653: overwrite or add the existing custom field value with dupicate contact's
                   // custom field value stored at $submittedCustomValue.
-                  foreach ($submittedCustomValue as $k => $v) {
+                  foreach ($submittedCustomFields as $k => $v) {
                     if ($v != '' && !in_array($v, $mergeValue)) {
                       $mergeValue[] = $v;
                     }
@@ -1798,6 +1780,52 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     self::createMergeActivities($mainId, $otherId);
 
     return TRUE;
+  }
+
+  /**
+   * Builds an Array of Custom tables for given custom field ID's.
+   *
+   * @param $customFieldIDs
+   *
+   * @return array
+   *   Array of custom table names
+   */
+  private static function getAffectedCustomTables($customFieldIDs) {
+    $customTableToCopyValues = array();
+
+    foreach ($customFieldIDs as $fieldID) {
+      if (!empty($fieldID)) {
+        $customField = NULL;
+        try {
+          $customField = civicrm_api3('custom_field', 'getsingle', array(
+            'id' => $fieldID,
+            'is_active' => TRUE,
+          ));
+        }
+        catch (CiviCRM_API3_Exception $e) {
+          continue;
+        }
+        if (!civicrm_error($customField) && !empty($customField['custom_group_id'])) {
+          $customGroup = NULL;
+          try {
+            $customGroup = civicrm_api3('custom_group', 'getsingle', array(
+              'id' => $customField['custom_group_id'],
+              'is_active' => TRUE,
+            ));
+          }
+          catch (CiviCRM_API3_Exception $e) {
+            // just ignore and continue
+            continue;
+          }
+
+          if (!civicrm_error($customGroup) && !empty($customGroup['table_name'])) {
+            $customTableToCopyValues[] = $customGroup['table_name'];
+          }
+        }
+      }
+    }
+
+    return $customTableToCopyValues;
   }
 
   /**
