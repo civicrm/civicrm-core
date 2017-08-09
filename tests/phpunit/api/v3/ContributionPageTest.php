@@ -1203,13 +1203,47 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test non-recur contribution with membership payment
+   */
+  public function testSubmitMembershipIsSeparatePaymentNotRecur() {
+    //Create recur contribution page.
+    $this->setUpMembershipContributionPage(TRUE, TRUE);
+    $dummyPP = Civi\Payment\System::singleton()->getByProcessor($this->_paymentProcessor);
+    $dummyPP->setDoDirectPaymentResult(array('payment_status_id' => 1, 'trxn_id' => 'create_first_success'));
+
+    //Sumbit payment with recur disabled.
+    $submitParams = array(
+      'price_' . $this->_ids['price_field'][0] => reset($this->_ids['price_field_value']),
+      'id' => (int) $this->_ids['contribution_page'],
+      'amount' => 10,
+      'billing_first_name' => 'Billy',
+      'billing_middle_name' => 'Goat',
+      'billing_last_name' => 'Gruff',
+      'email' => 'billy@goat.gruff',
+      'selectMembership' => $this->_ids['membership_type'],
+      'payment_processor_id' => 1,
+      'credit_card_number' => '4111111111111111',
+      'credit_card_type' => 'Visa',
+      'credit_card_exp_date' => array('M' => 9, 'Y' => 2040),
+      'cvv2' => 123,
+    );
+
+    //Assert if recur contribution is created.
+    $this->callAPISuccess('contribution_page', 'submit', $submitParams);
+    $recur = $this->callAPISuccess('contribution_recur', 'get', array());
+    $this->assertEmpty($recur['count']);
+  }
+
+
+  /**
    * Set up membership contribution page.
    * @param bool $isSeparatePayment
+   * @param bool $isRecur
    */
-  public function setUpMembershipContributionPage($isSeparatePayment = FALSE) {
+  public function setUpMembershipContributionPage($isSeparatePayment = FALSE, $isRecur = FALSE) {
     $this->setUpMembershipBlockPriceSet();
     $this->setupPaymentProcessor();
-    $this->setUpContributionPage();
+    $this->setUpContributionPage($isRecur);
 
     $this->callAPISuccess('membership_block', 'create', array(
       'entity_id' => $this->_ids['contribution_page'],
@@ -1334,8 +1368,13 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
 
   /**
    * Help function to set up contribution page with some defaults.
+   * @param bool $isRecur
    */
-  public function setUpContributionPage() {
+  public function setUpContributionPage($isRecur = FALSE) {
+    if ($isRecur) {
+      $this->params['is_recur'] = 1;
+      $this->params['recur_frequency_unit'] = 'month';
+    }
     $contributionPageResult = $this->callAPISuccess($this->_entity, 'create', $this->params);
     if (empty($this->_ids['price_set'])) {
       $priceSet = $this->callAPISuccess('price_set', 'create', $this->_priceSetParams);
