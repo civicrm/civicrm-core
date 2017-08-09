@@ -142,11 +142,6 @@ function civicrm_api3_case_create($params) {
   $values = array();
   _civicrm_api3_object_to_array($caseBAO, $values[$caseBAO->id]);
 
-  // Add custom data
-  if (isset($params['custom'])) {
-    _civicrm_api3_custom_data_get($values[$caseBAO->id], TRUE, 'case', $caseBAO->id);
-  }
-
   return civicrm_api3_create_success($values, $params, 'Case', 'create', $caseBAO);
 }
 
