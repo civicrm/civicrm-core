@@ -4813,6 +4813,7 @@ LIMIT 1;";
     if (!$returnMessageText) {
       list($values['receipt_from_name'], $values['receipt_from_email']) = self::generateFromEmailAndName($input, $contribution);
     }
+    $values['contribution_status'] = CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contribution->contribution_status_id);
     $return = $contribution->composeMessageArray($input, $ids, $values, $returnMessageText);
     // Contribution ID should really always be set. But ?
     if (!$returnMessageText && (!isset($input['receipt_update']) || $input['receipt_update']) && empty($contribution->receipt_date)) {

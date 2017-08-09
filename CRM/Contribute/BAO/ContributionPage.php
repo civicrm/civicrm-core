@@ -386,6 +386,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         'receipt_date' => !$values['receipt_date'] ? NULL : date('YmdHis', strtotime($values['receipt_date'])),
         'pay_later_receipt' => CRM_Utils_Array::value('pay_later_receipt', $values),
         'honor_block_is_active' => CRM_Utils_Array::value('honor_block_is_active', $values),
+        'contributionStatus' => CRM_Utils_Array::value('contribution_status', $values),
       );
 
       if ($contributionTypeId = CRM_Utils_Array::value('financial_type_id', $values)) {
