@@ -60,6 +60,7 @@ Lighthouse Consulting and Design - Brian Shaughnessy
 Marty Wright
 Matthew Wire
 Mattias Michaux
+Megaphone Technology Consulting - Jon Goldberg
 Mohit Aggarwal
 National Urban League - Lisa Taliano
 Nicholai Burton
@@ -68,7 +69,7 @@ New York City Council
 New York State Senate - Ken Zalewski
 Northbridge Digital - Oliver Gibson
 Olaf Buddenhagen
-Palante Technology Cooperative - Jon Goldberg, Joseph Lacey
+Palante Technology Cooperative - Joseph Lacey
 Paul Campbell
 Progressive Tech Project - Alice Aguilar, Jamie McClelland
 Richard Van Oosterhout
