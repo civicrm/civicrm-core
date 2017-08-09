@@ -204,6 +204,13 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   protected $statusMessageTitle;
 
   /**
+   * Explicitly declare the form context.
+   */
+  public function getDefaultContext() {
+    return 'create';
+  }
+
+  /**
    * Set variables up before form is built.
    */
   public function preProcess() {
@@ -418,28 +425,11 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     else {
       $defaults['refund_trxn_id'] = isset($defaults['trxn_id']) ? $defaults['trxn_id'] : NULL;
     }
-    $dates = array(
-      'receive_date',
-      'receipt_date',
-      'cancel_date',
-      'thankyou_date',
-    );
-    foreach ($dates as $key) {
-      if (!empty($defaults[$key])) {
-        list($defaults[$key], $defaults[$key . '_time'])
-          = CRM_Utils_Date::setDateDefaults(CRM_Utils_Array::value($key, $defaults), 'activityDateTime');
-      }
-    }
 
     if (!$this->_id && empty($defaults['receive_date'])) {
-      list($defaults['receive_date'],
-        $defaults['receive_date_time']
-        ) = CRM_Utils_Date::setDateDefaults(NULL, 'activityDateTime');
+      $defaults['receive_date'] = date('Y-m-d H:i:s');
     }
 
-    $this->assign('receive_date', CRM_Utils_Date::processDate(CRM_Utils_Array::value('receive_date', $defaults),
-      CRM_Utils_Array::value('receive_date_time', $defaults)
-    ));
     $currency = CRM_Utils_Array::value('currency', $defaults);
     $this->assign('currency', $currency);
     // Hack to get currency info to the js layer. CRM-11440.
@@ -698,14 +688,13 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
 
     // add various dates
-    $this->addDateTime('receive_date', ts('Received'), FALSE, array('formatType' => 'activityDateTime'));
+    $this->addField('receive_date', array('entity' => 'contribution'), FALSE, FALSE);
+    $this->addField('receipt_date', array('entity' => 'contribution'), FALSE, FALSE);
+    $this->addField('cancel_date', array('entity' => 'contribution', 'label' => ts('Cancelled / Refunded Date')), FALSE, FALSE);
 
     if ($this->_online) {
       $this->assign('hideCalender', TRUE);
     }
-
-    $this->addDateTime('receipt_date', ts('Receipt Date'), FALSE, array('formatType' => 'activityDateTime'));
-    $this->addDateTime('cancel_date', ts('Cancelled / Refunded Date'), FALSE, array('formatType' => 'activityDateTime'));
 
     $this->add('textarea', 'cancel_reason', ts('Cancellation / Refund Reason'), $attributes['cancel_reason']);
 
@@ -1082,13 +1071,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       CRM_Core_Config::singleton()->defaultCurrency
     );
 
-    if (!empty($this->_params['receive_date'])) {
-      $this->_params['receive_date'] = CRM_Utils_Date::processDate($this->_params['receive_date'], $this->_params['receive_date_time']);
-    }
-    else {
-      $this->_params['receive_date'] = $now;
-    }
-
     $this->_params['pcp_display_in_roll'] = CRM_Utils_Array::value('pcp_display_in_roll', $params);
     $this->_params['pcp_roll_nickname'] = CRM_Utils_Array::value('pcp_roll_nickname', $params);
     $this->_params['pcp_personal_note'] = CRM_Utils_Array::value('pcp_personal_note', $params);
@@ -1133,11 +1115,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     if (!empty($this->_params['is_email_receipt'])) {
       $this->_params['receipt_date'] = $now;
-    }
-    else {
-      $this->_params['receipt_date'] = CRM_Utils_Date::processDate($this->_params['receipt_date'],
-        $params['receipt_date_time'], TRUE
-      );
     }
 
     $this->set('params', $this->_params);
@@ -1607,17 +1584,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         $params['revenue_recognition_date'] = CRM_Utils_Date::processDate(
           '01-' . implode('-', $formValues['revenue_recognition_date'])
         );
-      }
-      $dates = array(
-        'receive_date',
-        'receipt_date',
-        'cancel_date',
-      );
-
-      foreach ($dates as $d) {
-        if (isset($formValues[$d])) {
-          $params[$d] = CRM_Utils_Date::processDate($formValues[$d], CRM_Utils_Array::value($d . '_time', $formValues), TRUE);
-        }
       }
 
       if (!empty($formValues['is_email_receipt'])) {
