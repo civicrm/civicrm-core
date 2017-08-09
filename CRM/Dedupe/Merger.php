@@ -555,6 +555,17 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     $transaction->commit();
   }
 
+  /**
+   * Given a contact ID, will check if a record exists in given table.
+   *
+   * @param $contactID
+   * @param $table
+   * @param $idField
+   *   Field where the contact's ID is stored in the table
+   *
+   * @return bool
+   *   True if a record is found for the given contact ID, false otherwise
+   */
   private static function customRecordExists($contactID, $table, $idField) {
     $sql = "
       SELECT COUNT(*) AS count
