@@ -1796,12 +1796,17 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
         }
         unset($params[$key]);
       }
-      elseif ($customFieldId = CRM_Core_BAO_CustomField::getKeyID($key)) {
-        $custom = TRUE;
-      }
       else {
-        $getValue = CRM_Utils_Array::retrieveValueRecursive($contact, $key);
-
+        if ($customFieldId = CRM_Core_BAO_CustomField::getKeyID($key)) {
+          $custom_params = array('id' => $contact['id'], 'return' => $key);
+          $getValue = civicrm_api3('Contact', 'getvalue', $custom_params);
+          if (empty($getValue)) {
+            unset($getValue);
+          }
+        }
+        else {
+          $getValue = CRM_Utils_Array::retrieveValueRecursive($contact, $key);
+        }
         if ($key == 'contact_source') {
           $params['source'] = $params[$key];
           unset($params[$key]);
@@ -1809,6 +1814,11 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
 
         if ($modeFill && isset($getValue)) {
           unset($params[$key]);
+          if ($customFieldId) {
+            // Extra values must be unset to ensure the values are not
+            // imported.
+            unset($params['custom'][$customFieldId]);
+          }
         }
       }
     }
