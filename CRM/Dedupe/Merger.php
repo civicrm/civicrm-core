@@ -576,10 +576,10 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     $dbResult->fetch();
 
     if ($dbResult->count > 0) {
-      return true;
+      return TRUE;
     }
 
-    return false;
+    return FALSE;
   }
 
   /**

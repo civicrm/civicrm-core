@@ -523,7 +523,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
 
     /*** USE-CASE 1: DO NOT OVERWRITE CUSTOM FIELD VALUE **/
     $this->mergeContacts($originalContactID, $duplicateContactID1, array(
-        "move_{$customFieldName}" => null,
+        "move_{$customFieldName}" => NULL,
     ));
     $this->assertCustomFieldValue($originalContactID, 'abc', $customFieldName);
 
@@ -562,7 +562,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
     $this->assertCustomFieldValue($duplicateContactID, 'abc', "custom_{$customField1['id']}");
 
     $this->mergeContacts($originalContactID, $duplicateContactID, array(
-      "move_custom_{$customField1['id']}" => null,
+      "move_custom_{$customField1['id']}" => NULL,
     ));
     $this->assertCustomFieldValue($originalContactID, '', "custom_{$customField1['id']}");
 
@@ -599,7 +599,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
 
     // Perform merge
     $this->mergeContacts($originalContactID, $duplicateContactID, array(
-      "move_custom_{$customField1['id']}" => null,
+      "move_custom_{$customField1['id']}" => NULL,
       "move_custom_{$customField2['id']}" => 'def',
     ));
     $this->assertCustomFieldValue($originalContactID, '', "custom_{$customField1['id']}");
