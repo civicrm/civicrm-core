@@ -1093,15 +1093,9 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       'payment_instrument_id' => 1,
       'trxn_date' => date('Ymd'),
       'status_id' => 1,
+      'entity_id' => $contribution['id'],
     );
     $financialTrxn = $this->callAPISuccess('FinancialTrxn', 'create', $params);
-    $params = array(
-      'amount' => 50,
-      'entity_table' => 'civicrm_contribution',
-      'entity_id' => $contribution['id'],
-      'financial_trxn_id' => $financialTrxn['id'],
-    );
-    $this->callAPISuccess('EntityFinancialTrxn', 'create', $params);
     $entityParams = array(
       'contribution_total_amount' => $contribution['total_amount'],
       'trxn_total_amount' => 55,
@@ -1111,11 +1105,11 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $eftParams = array(
       'entity_table' => 'civicrm_financial_item',
       'entity_id' => $previousLineItem['id'],
-      'financial_trxn_id' => $financialTrxn['id'],
+      'financial_trxn_id' => (string) $financialTrxn['id'],
     );
     CRM_Contribute_BAO_Contribution::createProportionalEntry($entityParams, $eftParams);
     $trxnTestArray = array_merge($eftParams, array(
-      'amount' => 50,
+      'amount' => '50.00',
     ));
     $this->callAPISuccessGetSingle('EntityFinancialTrxn', $eftParams, $trxnTestArray);
   }
@@ -1139,20 +1133,14 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
   public function testcreateProportionalFinancialEntries() {
     list($contribution, $financialAccount) = $this->createContributionWithTax();
     $params = array(
-      'total_amount' => 55,
+      'total_amount' => 50,
       'to_financial_account_id' => $financialAccount->financial_account_id,
       'payment_instrument_id' => 1,
       'trxn_date' => date('Ymd'),
       'status_id' => 1,
+      'entity_id' => $contribution['id'],
     );
     $financialTrxn = $this->callAPISuccess('FinancialTrxn', 'create', $params);
-    $params = array(
-      'amount' => 50,
-      'entity_table' => 'civicrm_contribution',
-      'entity_id' => $contribution['id'],
-      'financial_trxn_id' => $financialTrxn['id'],
-    );
-    $this->callAPISuccess('EntityFinancialTrxn', 'create', $params);
     $entityParams = array(
       'contribution_total_amount' => $contribution['total_amount'],
       'trxn_total_amount' => 55,

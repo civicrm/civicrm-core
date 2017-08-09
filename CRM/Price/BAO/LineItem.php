@@ -727,11 +727,11 @@ WHERE li.contribution_id = %1";
         if (!empty($updateFinancialItemInfoValues['financialTrxn']) && ($contributionCompletedStatusID ==
           CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $contributionId, 'contribution_status_id'))
         ) {
-          $trxnTable = array(
+          $updateFinancialItemInfoValues = array_merge($updateFinancialItemInfoValues['financialTrxn'], array(
             'entity_id' => $newFinancialItem->id,
             'entity_table' => 'civicrm_financial_item',
-          );
-          $reverseTrxn = CRM_Core_BAO_FinancialTrxn::create($updateFinancialItemInfoValues['financialTrxn'], $trxnTable);
+          ));
+          $reverseTrxn = CRM_Core_BAO_FinancialTrxn::create($updateFinancialItemInfoValues);
           // record reverse entity financial trxn linked to membership's related contribution
           civicrm_api3('EntityFinancialTrxn', 'create', array(
             'entity_table' => "civicrm_contribution",

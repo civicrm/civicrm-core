@@ -40,6 +40,13 @@ class CRM_Financial_Form_PaymentEdit extends CRM_Core_Form {
   protected $_id;
 
   /**
+   * The id of the related contribution ID
+   *
+   * @var int
+   */
+  protected $_contributionID;
+
+  /**
    * The variable which holds the information of a financial transaction
    *
    * @var array
@@ -60,6 +67,7 @@ class CRM_Financial_Form_PaymentEdit extends CRM_Core_Form {
     parent::preProcess();
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
     $this->assign('id', $this->_id);
+    $this->_contributionID = CRM_Utils_Request::retrieve('contribution_id', 'Positive', $this);
 
     $this->_values = civicrm_api3('FinancialTrxn', 'getsingle', array('id' => $this->_id));
     if (!empty($this->_values['payment_processor_id'])) {
@@ -164,9 +172,95 @@ class CRM_Financial_Form_PaymentEdit extends CRM_Core_Form {
       $params['check_number'] = CRM_Utils_Array::value('check_number', $this->_submitValues);
     }
 
-    // update the financial trxn
-    civicrm_api3('FinancialTrxn', 'create', $params);
+    $this->submit($params);
+
     CRM_Core_Session::singleton()->pushUserContext(CRM_Utils_System::url(CRM_Utils_System::currentPath()));
+  }
+
+  /**
+   * Wrapper function to process form submission
+   *
+   * @param array $submittedValues
+   *
+   */
+  protected function submit($submittedValues) {
+    // if payment instrument is changed then
+    //  1. Record a new reverse financial transaction with old payment instrument
+    //  2. Record a new financial transaction with new payment instrument
+    //  3. Add EntityFinancialTrxn records to relate with corresponding financial item and contribution
+    if ($submittedValues['payment_instrument_id'] != $this->_values['payment_instrument_id']) {
+      $previousFinanciaTrxn = $this->_values;
+      $newFinancialTrxn = $submittedValues;
+      unset($previousFinanciaTrxn['id'], $newFinancialTrxn['id']);
+      $previousFinanciaTrxn['trxn_date'] = CRM_Utils_Array::value('trxn_date', $submittedValues, date('YmdHis'));
+      $previousFinanciaTrxn['total_amount'] = -$previousFinanciaTrxn['total_amount'];
+      $previousFinanciaTrxn['net_amount'] = -$previousFinanciaTrxn['net_amount'];
+      $previousFinanciaTrxn['fee_amount'] = -$previousFinanciaTrxn['fee_amount'];
+      $previousFinanciaTrxn['contribution_id'] = $newFinancialTrxn['contribution_id'] = $this->_contributionID;
+
+      $newFinancialTrxn['to_financial_account_id'] = CRM_Financial_BAO_FinancialTypeAccount::getInstrumentFinancialAccount($submittedValues['payment_instrument_id']);
+      foreach (array('total_amount', 'fee_amount', 'net_amount', 'currency', 'is_payment', 'status_id') as $fieldName) {
+        $newFinancialTrxn[$fieldName] = $this->_values[$fieldName];
+      }
+
+      foreach (array($previousFinanciaTrxn, $newFinancialTrxn) as $financialTrxnParams) {
+        civicrm_api3('FinancialTrxn', 'create', $financialTrxnParams);
+        $trxnParams = array(
+          'total_amount' => $financialTrxnParams['total_amount'],
+          'contribution_id' => $this->_contributionID,
+        );
+        $contributionTotalAmount = CRM_Core_DAO::getFieldValue('CRM_Contribute_BAO_Contribution', $this->_contributionID, 'total_amount');
+        CRM_Contribute_BAO_Contribution::assignProportionalLineItems($trxnParams, $submittedValues['id'], $contributionTotalAmount);
+      }
+    }
+    else {
+      // simply update the financial trxn
+      civicrm_api3('FinancialTrxn', 'create', $submittedValues);
+    }
+
+    self::updateRelatedContribution($submittedValues, $this->_contributionID);
+  }
+
+  /**
+   * Wrapper for unit testing the post process submit function.
+   *
+   * @param array $params
+   */
+  public function testSubmit($params) {
+    $this->_id = $params['id'];
+    $this->_contributionID = $params['contribution_id'];
+    $this->_values = civicrm_api3('FinancialTrxn', 'getsingle', array('id' => $params['id']));
+
+    $this->submit($params);
+  }
+
+  /**
+   * Function to update contribution's check_number and trxn_id by
+   *  concatenating values from financial trxn's check_number and trxn_id respectively
+   *
+   * @param array $params
+   * @param int $contributionID
+   */
+  public static function updateRelatedContribution($params, $contributionID) {
+    $contributionDAO = new CRM_Contribute_DAO_Contribution();
+    $contributionDAO->id = $contributionID;
+    $contributionDAO->find(TRUE);
+
+    foreach (array('trxn_id', 'check_number') as $fieldName) {
+      if (!empty($params[$fieldName])) {
+        if (!empty($contributionDAO->$fieldName)) {
+          $values = explode(',', $contributionDAO->$fieldName);
+          // if submitted check_number or trxn_id value is
+          //   already present then ignore else add to $values array
+          if (!in_array($params[$fieldName], $values)) {
+            $values[] = $params[$fieldName];
+          }
+          $contributionDAO->$fieldName = implode(',', $values);
+        }
+      }
+    }
+
+    $contributionDAO->save();
   }
 
   /**
