@@ -240,7 +240,8 @@ class api_v3_JobTestCustomDataTest extends CiviUnitTestCase {
    */
   public function testBatchMergeDateCustomFieldHandlingIsView() {
     $this->customFieldCreate(array(
-      'id' => $this->customFieldID,
+      'label' => 'OnlyView',
+      'custom_group_id' => $this->customGroupID,
       'is_view' => 1,
     ));
     $customFieldLabel = 'custom_' . $this->customFieldID;
@@ -249,7 +250,7 @@ class api_v3_JobTestCustomDataTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('Job', 'process_batch_merge', array());
     $this->assertEquals(1, count($result['values']['merged']));
     $contact = $this->callAPISuccess('Contact', 'getsingle', array('id' => $contactID, 'return' => $customFieldLabel));
-    $this->assertEquals('2012-11-03', $contact[$customFieldLabel]);
+    $this->assertEquals('2012-11-03 00:00:00', $contact[$customFieldLabel]);
   }
 
   /**
