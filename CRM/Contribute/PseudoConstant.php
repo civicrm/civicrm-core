@@ -101,13 +101,17 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    *
    * @param int $id
+   * @param bool $includeDisabled
    *
    * @return array
    *   array reference of all financial types if any
    */
-  public static function &financialType($id = NULL) {
+  public static function &financialType($id = NULL, $includeDisabled = FALSE) {
     if (!self::$financialType) {
-      $condition = " is_active = 1 ";
+      $condition = "";
+      if (!$includeDisabled) {
+        $condition = " is_active = 1 ";
+      }
       CRM_Core_PseudoConstant::populate(
         self::$financialType,
         'CRM_Financial_DAO_FinancialType',
