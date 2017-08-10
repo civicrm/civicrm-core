@@ -91,8 +91,6 @@ function civicrm_api3_case_create($params) {
     if (!empty($params['contact_id'])) {
       $origContactIds = CRM_Case_BAO_Case::retrieveContactIdsByCaseId($params['id']);
       $origContactId = CRM_Utils_Array::first($origContactIds);
-
-
     }
 
     // FIXME: Refactor as separate method to get contactId
