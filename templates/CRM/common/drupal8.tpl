@@ -1,5 +1,4 @@
-<?php
-/*
+{*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
@@ -23,75 +22,61 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
- */
+*}
+{if $config->debug}
+{include file="CRM/common/debug.tpl"}
+{/if}
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
- */
+{* include wysiwyg related files*}
+{include file="CRM/common/wysiwyg.tpl"}
 
-/**
- * This class generates form components for Synchronizing CMS Users
- *
- */
-class CRM_Admin_Form_CMSUser extends CRM_Core_Form {
+<div id="crm-container" class="crm-container{if $urlIsPublic} crm-public{/if}" lang="{$config->lcMessages|truncate:2:"":true}" xml:lang="{$config->lcMessages|truncate:2:"":true}">
 
-  /**
-   * Build the form object.
-   *
-   * @return void
-   */
-  public function buildQuickForm() {
 
-    $this->addButtons(array(
-        array(
-          'type' => 'next',
-          'name' => ts('OK'),
-          'isDefault' => TRUE,
-        ),
-        array(
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ),
-      )
-    );
-  }
+{crmNavigationMenu is_default=1}
 
-  /**
-   * Process the form submission.
-   *
-   *
-   * @return void
-   */
-  public function postProcess() {
-    $result = CRM_Core_Config::singleton()->userSystem->synchronizeUsers();
+{if isset($browserPrint) and $browserPrint}
+{* Javascript window.print link. Used for public pages where we can't do printer-friendly view. *}
+<div id="printer-friendly">
+<a href="#" onclick="window.print(); return false;" title="{ts}Print this page.{/ts}">
+  <div class="ui-icon ui-icon-print"></div>
+</a>
+</div>
+{else}
+{* Printer friendly link/icon. *}
+<div id="printer-friendly">
+<a href="{$printerFriendly}" target='_blank' title="{ts}Printer-friendly view of this page.{/ts}">
+  <div class="ui-icon ui-icon-print"></div>
+</a>
+</div>
+{/if}
 
-    $status = ts('Checked one user record.',
-        array(
-          'count' => $result['contactCount'],
-          'plural' => 'Checked %count user records.',
-        )
-      );
-    if ($result['contactMatching']) {
-      $status .= '<br />' . ts('Found one matching contact record.',
-          array(
-            'count' => $result['contactMatching'],
-            'plural' => 'Found %count matching contact records.',
-          )
-        );
-    }
+{crmRegion name='page-header'}
+{/crmRegion}
+<div class="clear"></div>
 
-    $status .= '<br />' . ts('Created one new contact record.',
-        array(
-          'count' => $result['contactCreated'],
-          'plural' => 'Created %count new contact records.',
-        )
-      );
-    CRM_Core_Session::setStatus($status, ts('Synchronize Complete'), 'success');
-    CRM_Core_Session::singleton()->pushUserContext(CRM_Utils_System::url('civicrm/admin', 'reset=1'));
-  }
+{if isset($localTasks) and $localTasks}
+    {include file="CRM/common/localNav.tpl"}
+{/if}
+<div id="crm-main-content-wrapper">
+  {include file="CRM/common/status.tpl"}
+  {crmRegion name='page-body'}
+    <!-- .tpl file invoked: {$tplFile}. Call via form.tpl if we have a form in the page. -->
+    {if isset($isForm) and $isForm and isset($formTpl)}
+      {include file="CRM/Form/$formTpl.tpl"}
+    {else}
+      {include file=$tplFile}
+    {/if}
+  {/crmRegion}
+</div>
 
-}
+{crmRegion name='page-footer'}
+{if $urlIsPublic}
+  {include file="CRM/common/publicFooter.tpl"}
+{else}
+  {include file="CRM/common/footer.tpl"}
+{/if}
+{/crmRegion}
+
+
+</div> {* end crm-container div *}

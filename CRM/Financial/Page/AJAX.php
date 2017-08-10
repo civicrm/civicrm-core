@@ -472,7 +472,7 @@ class CRM_Financial_Page_AJAX {
     if ($return) {
       return CRM_Utils_JSON::encodeDataTableSelector($financialitems, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
     }
-    header('Content-Type: application/json');
+    CRM_Utils_System::setHttpHeader('Content-Type', 'application/json');
     echo CRM_Utils_JSON::encodeDataTableSelector($financialitems, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
     CRM_Utils_System::civiExit();
   }

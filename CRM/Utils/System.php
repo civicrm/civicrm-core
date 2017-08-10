@@ -240,13 +240,33 @@ class CRM_Utils_System {
   ) {
     $query = self::makeQueryString($query);
 
-    // we have a valid query and it has not yet been transformed
-    if ($htmlize && !empty($query) && strpos($query, '&amp;') === FALSE) {
-      $query = htmlentities($query);
+    // Legacy handling for when the system passes around html escaped strings
+    if (strstr($query, '&amp;')) {
+      $query = html_entity_decode($query);
+    }
+
+    // Extract fragment from path or query if munged together
+    if ($query && strstr($query, '#')) {
+      list($path, $fragment) = explode('#', $query);
+    }
+    if ($path && strstr($path, '#')) {
+      list($path, $fragment) = explode('#', $path);
+    }
+
+    // Extract query from path if munged together
+    if ($path && strstr($path, '?')) {
+      list($path, $extraQuery) = explode('?', $path);
+      $query = $extraQuery . ($query ? "&$query" : '');
     }
 
     $config = CRM_Core_Config::singleton();
-    return $config->userSystem->url($path, $query, $absolute, $fragment, $htmlize, $frontend, $forceBackend);
+    $url = $config->userSystem->url($path, $query, $absolute, $fragment, $frontend, $forceBackend);
+
+    if ($htmlize) {
+      $url = htmlentities($url);
+    }
+
+    return $url;
   }
 
   /**
@@ -410,7 +430,7 @@ class CRM_Utils_System {
       ));
     }
 
-    header('Location: ' . $url);
+    self::setHttpHeader('Location', $url);
     self::civiExit();
   }
 
@@ -813,8 +833,8 @@ class CRM_Utils_System {
   ) {
     $now = gmdate('D, d M Y H:i:s') . ' GMT';
 
-    header('Content-Type: ' . $mimeType);
-    header('Expires: ' . $now);
+    self::setHttpHeader('Content-Type', $mimeType);
+    self::setHttpHeader('Expires', $now);
 
     // lem9 & loic1: IE need specific headers
     $isIE = strstr($_SERVER['HTTP_USER_AGENT'], 'MSIE');
@@ -825,13 +845,13 @@ class CRM_Utils_System {
       $fileString = "filename=\"{$name}\"";
     }
     if ($isIE) {
-      header("Content-Disposition: inline; $fileString");
-      header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-      header('Pragma: public');
+      self::setHttpHeader("Content-Disposition", "inline; $fileString");
+      self::setHttpHeader('Cache-Control', 'must-revalidate, post-check=0, pre-check=0');
+      self::setHttpHeader('Pragma', 'public');
     }
     else {
-      header("Content-Disposition: $disposition; $fileString");
-      header('Pragma: no-cache');
+      self::setHttpHeader("Content-Disposition", "$disposition; $fileString");
+      self::setHttpHeader('Pragma', 'no-cache');
     }
 
     if ($output) {
@@ -1905,6 +1925,14 @@ class CRM_Utils_System {
     }
 
     return NULL;
+  }
+
+  /**
+   * @param string $name
+   * @param string $value
+   */
+  public static function setHttpHeader($name, $value) {
+    CRM_Core_Config::singleton()->userSystem->setHttpHeader($name, $value);
   }
 
 }

@@ -112,8 +112,6 @@ abstract class CRM_Utils_System_Base {
    *   Useful for links that will be displayed outside the site, such as in an RSS feed.
    * @param string $fragment
    *   A fragment identifier (named anchor) to append to the link.
-   * @param bool $htmlize
-   *   Whether to encode special html characters such as &.
    * @param bool $frontend
    *   This link should be to the CMS front end (applies to WP & Joomla).
    * @param bool $forceBackend
@@ -126,7 +124,6 @@ abstract class CRM_Utils_System_Base {
     $query = NULL,
     $absolute = FALSE,
     $fragment = NULL,
-    $htmlize = TRUE,
     $frontend = FALSE,
     $forceBackend = FALSE
   ) {
@@ -742,6 +739,25 @@ abstract class CRM_Utils_System_Base {
    * @param array $list
    */
   public function appendCoreResources(&$list) {
+  }
+
+  /**
+   * @param string $name
+   * @param string $value
+   */
+  public function setHttpHeader($name, $value) {
+    header("$name: $value");
+  }
+
+  /**
+   * Create CRM contacts for all existing CMS users
+   *
+   * @return array
+   * @throws \Exception
+   */
+  public function synchronizeUsers() {
+    throw new Exception('CMS user creation not supported for this framework');
+    return array();
   }
 
 }

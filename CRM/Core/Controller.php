@@ -692,13 +692,13 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    */
   public function setWord($fileName = NULL) {
     //Mark as a CSV file.
-    header('Content-Type: application/vnd.ms-word');
+    CRM_Utils_System::setHttpHeader('Content-Type', 'application/vnd.ms-word');
 
     //Force a download and name the file using the current timestamp.
     if (!$fileName) {
       $fileName = 'Contacts_' . $_SERVER['REQUEST_TIME'] . '.doc';
     }
-    header("Content-Disposition: attachment; filename=Contacts_$fileName");
+    CRM_Utils_System::setHttpHeader("Content-Disposition", "attachment; filename=Contacts_$fileName");
   }
 
   /**
@@ -706,14 +706,14 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    */
   public function setExcel($fileName = NULL) {
     //Mark as an excel file.
-    header('Content-Type: application/vnd.ms-excel');
+    CRM_Utils_System::setHttpHeader('Content-Type', 'application/vnd.ms-excel');
 
     //Force a download and name the file using the current timestamp.
     if (!$fileName) {
       $fileName = 'Contacts_' . $_SERVER['REQUEST_TIME'] . '.xls';
     }
 
-    header("Content-Disposition: attachment; filename=Contacts_$fileName");
+    CRM_Utils_System::setHttpHeader("Content-Disposition", "attachment; filename=Contacts_$fileName");
   }
 
   /**
