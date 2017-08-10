@@ -98,6 +98,11 @@ class Kernel {
 
     try {
       $apiResponse = $this->runRequest($apiRequest);
+
+      // CRM-19798: clear unwanted resources for next api calls and avoid huge
+      // memory leak
+      \CRM_Core_DAO::freeResult();
+
       return $this->formatResult($apiRequest, $apiResponse);
     }
     catch (\Exception $e) {
