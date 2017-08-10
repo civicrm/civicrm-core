@@ -396,7 +396,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
         'custom_' . $customField1,
         'job_title',
         'custom_' . $customField2,
-       ),
+      ),
     );
     $result = civicrm_api3('Contact', 'get', $params);
     $values = array_pop($result['values']);
