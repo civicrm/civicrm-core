@@ -290,6 +290,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
 
         switch ($batchStatusByName[$values['status_id']]) {
           case 'Open':
+          case 'Reopened':
             CRM_Utils_Array::remove($newLinks, 'reopen', 'download');
             break;
 
@@ -299,6 +300,15 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
 
           case 'Exported':
             CRM_Utils_Array::remove($newLinks, 'close', 'edit', 'reopen', 'export');
+        }
+        if (!CRM_Batch_BAO_Batch::checkBatchPermission('edit', $values['created_id'])) {
+          CRM_Utils_Array::remove($newLinks, 'close', 'edit', 'export');
+        }
+        if (!CRM_Batch_BAO_Batch::checkBatchPermission('export', $values['created_id'])) {
+          CRM_Utils_Array::remove($newLinks, 'export', 'download');
+        }
+        if (!CRM_Batch_BAO_Batch::checkBatchPermission('delete', $values['created_id'])) {
+          CRM_Utils_Array::remove($newLinks, 'delete');
         }
       }
       if (!empty($values['type_id'])) {
@@ -381,6 +391,15 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
       "created_id.sort_name",
       "created_id",
     );
+    if (!CRM_Core_Permission::check("view all manual batches")) {
+      if (CRM_Core_Permission::check("view own manual batches")) {
+        $loggedInContactId = CRM_Core_Session::singleton()->get('userID');
+        $params['created_id'] = $loggedInContactId;
+      }
+      else {
+        $params['created_id'] = 0;
+      }
+    }
     foreach ($return as $field) {
       if (!isset($params[$field])) {
         continue;
@@ -784,6 +803,34 @@ WHERE  {$where}
       $batches[$dao->id] = $dao->status_id;
     }
     return $batches;
+  }
+
+  /**
+   * Function to check permission for batch.
+   *
+   * @param string $action
+   * @param int $batchCreatedId
+   *   batch created by contact id
+   *
+   * @return bool
+   */
+  public static function checkBatchPermission($action, $batchCreatedId = NULL) {
+    if (in_array($action, array('reopen', 'close'))) {
+      $action = 'edit';
+    }
+    if (CRM_Core_Permission::check("{$action} all manual batches")) {
+      return TRUE;
+    }
+    if (CRM_Core_Permission::check("{$action} own manual batches")) {
+      $loggedInContactId = CRM_Core_Session::singleton()->get('userID');
+      if ($batchCreatedId == $loggedInContactId) {
+        return TRUE;
+      }
+      elseif (CRM_Utils_System::isNull($batchCreatedId)) {
+        return TRUE;
+      }
+    }
+    return FALSE;
   }
 
 }

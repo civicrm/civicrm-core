@@ -99,6 +99,11 @@ class CRM_Financial_Form_Search extends CRM_Core_Form {
       'delete' => ts('Delete'),
     );
 
+    foreach ($batchAction as $action => $ignore) {
+      if (!CRM_Batch_BAO_Batch::checkBatchPermission($action)) {
+        unset($batchAction[$action]);
+      }
+    }
     $this->add('select',
       'batch_update',
       ts('Task'),
