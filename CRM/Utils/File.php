@@ -303,7 +303,7 @@ class CRM_Utils_File {
     if (!$fileName) {
       $fileName = 'delete-this-' . CRM_Utils_String::createRandom(10, CRM_Utils_String::ALPHANUMERIC);
     }
-    $success = file_put_contents($dir . $fileName, $contents);
+    $success = @file_put_contents($dir . $fileName, $contents);
 
     return ($success === FALSE) ? FALSE : $fileName;
   }
@@ -916,6 +916,98 @@ HTACCESS;
     return self::getFileURL($path, $mimeType);
   }
 
+  /**
+   * Resize an image.
+   *
+   * @param string $sourceFile
+   *   Filesystem path to existing image on server
+   * @param int $targetWidth
+   *   New width desired, in pixels
+   * @param int $targetHeight
+   *   New height desired, in pixels
+   * @param string $suffix = ""
+   *   If supplied, the image will be renamed to include this suffix. For
+   *   example if the original file name is "foo.png" and $suffix = "_bar",
+   *   then the final file name will be "foo_bar.png".
+   * @param bool $preserveAspect = TRUE
+   *   When TRUE $width and $height will be used as a bounding box, outside of
+   *   which the resized image will not extend.
+   *   When FALSE, the image will be resized exactly to $width and $height, even
+   *   if it means stretching it.
+   *
+   * @return string
+   *   Path to image
+   * @throws \CRM_Core_Exception
+   *   Under the following conditions
+   *   - When GD is not available.
+   *   - When the source file is not an image.
+   */
+  public static function resizeImage($sourceFile, $targetWidth, $targetHeight, $suffix = "", $preserveAspect = TRUE) {
+
+    // Check if GD is installed
+    $gdSupport = CRM_Utils_System::getModuleSetting('gd', 'GD Support');
+    if (!$gdSupport) {
+      throw new CRM_Core_Exception(ts('Unable to resize image because the GD image library is not currently compiled in your PHP installation.'));
+    }
+
+    $sourceMime = mime_content_type($sourceFile);
+    if ($sourceMime == 'image/gif') {
+      $sourceData = imagecreatefromgif($sourceFile);
+    }
+    elseif ($sourceMime == 'image/png') {
+      $sourceData = imagecreatefrompng($sourceFile);
+    }
+    elseif ($sourceMime == 'image/jpeg') {
+      $sourceData = imagecreatefromjpeg($sourceFile);
+    }
+    else {
+      throw new CRM_Core_Exception(ts('Unable to resize image because the file supplied was not an image.'));
+    }
+
+    // get image about original image
+    $sourceInfo = getimagesize($sourceFile);
+    $sourceWidth = $sourceInfo[0];
+    $sourceHeight = $sourceInfo[1];
+
+    // Adjust target width/height if preserving aspect ratio
+    if ($preserveAspect) {
+      $sourceAspect = $sourceWidth / $sourceHeight;
+      $targetAspect = $targetWidth / $targetHeight;
+      if ($sourceAspect > $targetAspect) {
+        $targetHeight = $targetWidth / $sourceAspect;
+      }
+      if ($sourceAspect < $targetAspect) {
+        $targetWidth = $targetHeight * $sourceAspect;
+      }
+    }
+
+    // figure out the new filename
+    $pathParts = pathinfo($sourceFile);
+    $targetFile = $pathParts['dirname'] . DIRECTORY_SEPARATOR
+      . $pathParts['filename'] . $suffix . "." . $pathParts['extension'];
+
+    $targetData = imagecreatetruecolor($targetWidth, $targetHeight);
+
+    // resize
+    imagecopyresized($targetData, $sourceData,
+      0, 0, 0, 0,
+      $targetWidth, $targetHeight, $sourceWidth, $sourceHeight);
+
+    // save the resized image
+    $fp = fopen($targetFile, 'w+');
+    ob_start();
+    imagejpeg($targetData);
+    $image_buffer = ob_get_contents();
+    ob_end_clean();
+    imagedestroy($targetData);
+    fwrite($fp, $image_buffer);
+    rewind($fp);
+    fclose($fp);
+
+    // return the URL to link to
+    $config = CRM_Core_Config::singleton();
+    return $config->imageUploadURL . basename($targetFile);
+  }
 
   /**
    * Get file icon class for specific MIME Type

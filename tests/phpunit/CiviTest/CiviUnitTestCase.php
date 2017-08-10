@@ -897,7 +897,6 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   public function callAPISuccessGetSingle($entity, $params, $checkAgainst = NULL) {
     $params += array(
       'version' => $this->_apiversion,
-      'debug' => 1,
     );
     $result = $this->civicrm_api($entity, 'getsingle', $params);
     if (!is_array($result) || !empty($result['is_error']) || isset($result['values'])) {

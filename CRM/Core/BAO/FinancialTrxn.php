@@ -50,12 +50,9 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
    *
-   * @param string $trxnEntityTable
-   *   Entity_table.
-   *
    * @return CRM_Core_BAO_FinancialTrxn
    */
-  public static function create(&$params, $trxnEntityTable = NULL) {
+  public static function create(&$params) {
     $trxn = new CRM_Financial_DAO_FinancialTrxn();
     $trxn->copyValues($params);
 
@@ -65,21 +62,18 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
 
     $trxn->save();
 
-    // save to entity_financial_trxn table
-    $entityFinancialTrxnParams
-      = array(
-        'entity_table' => "civicrm_contribution",
-        'financial_trxn_id' => $trxn->id,
-        'amount' => $params['total_amount'],
-      );
+    // We shoudn't proceed further to record related entity financial trxns if it's update.
+    if (!empty($params['id'])) {
+      return $trxn;
+    }
 
-    if (!empty($trxnEntityTable)) {
-      $entityFinancialTrxnParams['entity_table'] = $trxnEntityTable['entity_table'];
-      $entityFinancialTrxnParams['entity_id'] = $trxnEntityTable['entity_id'];
-    }
-    else {
-      $entityFinancialTrxnParams['entity_id'] = $params['contribution_id'];
-    }
+    // Save to entity_financial_trxn table.
+    $entityFinancialTrxnParams = array(
+      'entity_table' => CRM_Utils_Array::value('entity_table', $params, 'civicrm_contribution'),
+      'entity_id' => CRM_Utils_Array::value('entity_id', $params, CRM_Utils_Array::value('contribution_id', $params)),
+      'financial_trxn_id' => $trxn->id,
+      'amount' => $params['total_amount'],
+    );
 
     $entityTrxn = new CRM_Financial_DAO_EntityFinancialTrxn();
     $entityTrxn->copyValues($entityFinancialTrxnParams);
@@ -366,10 +360,10 @@ WHERE ceft.entity_id = %1";
         'total_amount' => CRM_Utils_Array::value('cost', $params) ? $params['cost'] : 0,
         'currency' => CRM_Utils_Array::value('currency', $params),
         'status_id' => array_search('Completed', $contributionStatuses),
+        'entity_table' => 'civicrm_contribution',
+        'entity_id' => $params['contributionId'],
       );
-      $trxnEntityTable['entity_table'] = 'civicrm_contribution';
-      $trxnEntityTable['entity_id'] = $params['contributionId'];
-      CRM_Core_BAO_FinancialTrxn::create($financialtrxn, $trxnEntityTable);
+      CRM_Core_BAO_FinancialTrxn::create($financialtrxn);
     }
 
     if (!empty($params['oldPremium'])) {
@@ -465,6 +459,9 @@ WHERE ceft.entity_id = %1";
 
     if ($entityName == 'participant') {
       $contributionId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment', $entityId, 'contribution_id', 'participant_id');
+    }
+    elseif ($entityName == 'membership') {
+      $contributionId = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipPayment', $entityId, 'contribution_id', 'membership_id');
     }
     else {
       $contributionId = $entityId;

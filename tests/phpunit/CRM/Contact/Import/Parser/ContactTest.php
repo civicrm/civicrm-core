@@ -175,6 +175,7 @@ class CRM_Contact_Imports_Parser_ContactTest extends CiviUnitTestCase {
     $this->runImport($contactValues, CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Import_Parser::VALID, array(0 => NULL, 1 => NULL, 2 => NULL, 3 => NULL, 4 => NULL, 5 => 'Primary', 6 => 'Primary'));
     $address = $this->callAPISuccessGetSingle('Address', array('street_address' => 'Big Mansion'));
     $this->assertEquals(1, $address['location_type_id']);
+    $this->assertEquals(1, $address['is_primary']);
 
     $phone = $this->callAPISuccessGetSingle('Phone', array('phone' => '12334'));
     $this->assertEquals(1, $phone['location_type_id']);
@@ -182,6 +183,25 @@ class CRM_Contact_Imports_Parser_ContactTest extends CiviUnitTestCase {
     $contact = $this->callAPISuccessGetSingle('Contact', $contactValues);
     $this->callAPISuccess('Contact', 'delete', array('id' => $contact['id']));
   }
+
+  /**
+   * Test that the import parser adds the address to the primary location.
+   *
+   * @throws \Exception
+   */
+  public function testImportDeceased() {
+    list($contactValues) = $this->setUpBaseContact();
+    CRM_Core_Session::singleton()->set("dateTypes", 1);
+    $contactValues['birth_date'] = '1910-12-17';
+    $contactValues['deceased_date'] = '2010-12-17';
+    $this->runImport($contactValues, CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Import_Parser::VALID);
+    $contact = $this->callAPISuccessGetSingle('Contact', $contactValues);
+    $this->assertEquals('1910-12-17', $contact['birth_date']);
+    $this->assertEquals('2010-12-17', $contact['deceased_date']);
+    $this->assertEquals(1, $contact['is_deceased']);
+    $this->callAPISuccess('Contact', 'delete', array('id' => $contact['id']));
+  }
+
 
   /**
    * Test that the import parser adds the address to the primary location.
@@ -271,12 +291,14 @@ class CRM_Contact_Imports_Parser_ContactTest extends CiviUnitTestCase {
     $contactValues['nick_name'] = 'Old Bill';
     $contactValues['external_identifier'] = 'android';
     $contactValues['street_address'] = 'Big Mansion';
+    $contactValues['city'] = 'Big City';
     $contactID = $this->callAPISuccessGetValue('Contact', array('external_identifier' => 'android', 'return' => 'id'));
     $originalAddress = $this->callAPISuccess('Address', 'create', array('location_type_id' => 2, 'street_address' => 'small house', 'contact_id' => $contactID));
-    $this->runImport($contactValues, CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Import_Parser::VALID, array(0 => NULL, 1 => NULL, 2 => NULL, 3 => NULL, 4 => NULL, 5 => 'Primary'));
+    $this->runImport($contactValues, CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Import_Parser::VALID, array(0 => NULL, 1 => NULL, 2 => NULL, 3 => NULL, 4 => NULL, 5 => 'Primary', 6 => 'Primary'));
     $address = $this->callAPISuccessGetSingle('Address', array('street_address' => 'Big Mansion'));
     $this->assertEquals(2, $address['location_type_id']);
     $this->assertEquals($originalAddress['id'], $address['id']);
+    $this->assertEquals('Big City', $address['city']);
     $this->callAPISuccessGetSingle('Contact', $contactValues);
   }
 

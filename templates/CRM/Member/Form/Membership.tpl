@@ -93,12 +93,6 @@
           <td class="label">{$form.contact_id.label}</td>
           <td>{$form.contact_id.html}</td>
         {/if}
-        {if $membershipMode}
-          <tr>
-            <td class="label">{$form.payment_processor_id.label}</td>
-            <td>{$form.payment_processor_id.html}</td>
-          </tr>
-        {/if}
         <tr class="crm-membership-form-block-membership_type_id">
           <td class="label">{$form.membership_type_id.label}</td>
           <td><span id='mem_type_id'>{$form.membership_type_id.html}</span>
@@ -183,7 +177,6 @@
             <fieldset id="recordContribution"><legend>{ts}Membership Payment and Receipt{/ts}</legend>
         {/if}
         {include file="CRM/Member/Form/MembershipCommon.tpl"}
-
         {if $emailExists and $isEmailEnabledForSite}
           <tr id="send-receipt" class="crm-membership-form-block-send_receipt">
             <td class="label">{$form.send_receipt.label}</td><td>{$form.send_receipt.html}<br />

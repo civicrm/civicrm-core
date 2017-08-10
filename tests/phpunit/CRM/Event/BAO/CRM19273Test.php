@@ -227,21 +227,20 @@ class CRM_Event_BAO_CRM19273 extends CiviUnitTestCase {
   }
 
   public function testCRM19273() {
-
     $PSparams['price_1'] = 2;
     $lineItem = CRM_Price_BAO_LineItem::getLineItems($this->participantID, 'participant');
-    CRM_Event_BAO_Participant::changeFeeSelections($PSparams, $this->participantID, $this->_contributionId, $this->_feeBlock, $lineItem, $this->_expensiveFee, $this->_priceSetID);
+    CRM_Price_BAO_LineItem::changeFeeSelections($PSparams, $this->participantID, 'participant', $this->_contributionId, $this->_feeBlock, $lineItem, $this->_expensiveFee);
     $this->balanceCheck($this->_cheapFee);
 
     $PSparams['price_1'] = 1;
     $lineItem = CRM_Price_BAO_LineItem::getLineItems($this->participantID, 'participant');
-    CRM_Event_BAO_Participant::changeFeeSelections($PSparams, $this->participantID, $this->_contributionId, $this->_feeBlock, $lineItem, $this->_expensiveFee, $this->_priceSetID);
+    CRM_Price_BAO_LineItem::changeFeeSelections($PSparams, $this->participantID, 'participant', $this->_contributionId, $this->_feeBlock, $lineItem, $this->_expensiveFee);
     $this->balanceCheck($this->_expensiveFee);
 
     $PSparams['price_1'] = 3;
     $lineItem = CRM_Price_BAO_LineItem::getLineItems($this->participantID, 'participant');
 
-    CRM_Event_BAO_Participant::changeFeeSelections($PSparams, $this->participantID, $this->_contributionId, $this->_feeBlock, $lineItem, $this->_expensiveFee, $this->_priceSetID);
+    CRM_Price_BAO_LineItem::changeFeeSelections($PSparams, $this->participantID, 'participant', $this->_contributionId, $this->_feeBlock, $lineItem, $this->_expensiveFee);
     $this->balanceCheck($this->_veryExpensive);
 
   }

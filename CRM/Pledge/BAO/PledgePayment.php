@@ -98,7 +98,8 @@ WHERE     pledge_id = %1
    */
   public static function create($params) {
     $transaction = new CRM_Core_Transaction();
-    $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+    $overdueStatusID = CRM_Core_PseudoConstant::getKey('CRM_Pledge_BAO_PledgePayment', 'status_id', 'Overdue');
+    $pendingStatusId = CRM_Core_PseudoConstant::getKey('CRM_Pledge_BAO_PledgePayment', 'status_id', 'Pending');
 
     //calculate the scheduled date for every installment
     $now = date('Ymd') . '000000';
@@ -106,19 +107,19 @@ WHERE     pledge_id = %1
     $prevScheduledDate[1] = CRM_Utils_Date::processDate($params['scheduled_date']);
 
     if (CRM_Utils_Date::overdue($prevScheduledDate[1], $now)) {
-      $statues[1] = array_search('Overdue', $contributionStatus);
+      $statues[1] = $overdueStatusID;
     }
     else {
-      $statues[1] = array_search('Pending', $contributionStatus);
+      $statues[1] = $pendingStatusId;
     }
 
     for ($i = 1; $i < $params['installments']; $i++) {
       $prevScheduledDate[$i + 1] = self::calculateNextScheduledDate($params, $i);
       if (CRM_Utils_Date::overdue($prevScheduledDate[$i + 1], $now)) {
-        $statues[$i + 1] = array_search('Overdue', $contributionStatus);
+        $statues[$i + 1] = $overdueStatusID;
       }
       else {
-        $statues[$i + 1] = array_search('Pending', $contributionStatus);
+        $statues[$i + 1] = $pendingStatusId;
       }
     }
 
@@ -349,7 +350,9 @@ WHERE     pledge_id = %1
     $editScheduled = FALSE;
 
     // get all statuses
-    $allStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+    $allStatus = CRM_Core_OptionGroup::values('pledge_status',
+      FALSE, FALSE, FALSE, NULL, 'name', TRUE
+    );
 
     // if we get do not get contribution id means we are editing the scheduled payment.
     if (!empty($paymentIDs)) {
@@ -603,11 +606,12 @@ WHERE  civicrm_pledge.id = %2
    */
   public static function calculatePledgeStatus($pledgeId) {
     $paymentStatusTypes = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+    $pledgeStatusTypes = CRM_Pledge_BAO_Pledge::buildOptions('status_id', 'validate');
 
     //return if the pledge is cancelled.
-    $currentPledgeStatus = CRM_Core_DAO::getFieldValue('CRM_Pledge_DAO_Pledge', $pledgeId, 'status_id', 'id', TRUE);
-    if ($currentPledgeStatus == array_search('Cancelled', $paymentStatusTypes)) {
-      return $currentPledgeStatus;
+    $currentPledgeStatusId = CRM_Core_DAO::getFieldValue('CRM_Pledge_DAO_Pledge', $pledgeId, 'status_id', 'id', TRUE);
+    if ($currentPledgeStatusId == array_search('Cancelled', $pledgeStatusTypes)) {
+      return $currentPledgeStatusId;
     }
 
     // retrieve all pledge payments for this particular pledge
@@ -621,18 +625,18 @@ WHERE  civicrm_pledge.id = %2
     }
 
     if (array_search('Overdue', $allStatus)) {
-      $statusId = array_search('Overdue', $paymentStatusTypes);
+      $statusId = array_search('Overdue', $pledgeStatusTypes);
     }
     elseif (array_search('Completed', $allStatus)) {
       if (count(array_count_values($allStatus)) == 1) {
-        $statusId = array_search('Completed', $paymentStatusTypes);
+        $statusId = array_search('Completed', $pledgeStatusTypes);
       }
       else {
-        $statusId = array_search('In Progress', $paymentStatusTypes);
+        $statusId = array_search('In Progress', $pledgeStatusTypes);
       }
     }
     else {
-      $statusId = array_search('Pending', $paymentStatusTypes);
+      $statusId = array_search('Pending', $pledgeStatusTypes);
     }
 
     return $statusId;
@@ -722,7 +726,9 @@ WHERE  civicrm_pledge_payment.id = {$paymentId}
    */
   public static function getOldestPledgePayment($pledgeID, $limit = 1) {
     // get pending / overdue statuses
-    $pledgeStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+    $pledgeStatuses = CRM_Core_OptionGroup::values('pledge_status',
+      FALSE, FALSE, FALSE, NULL, 'name'
+    );
 
     // get pending and overdue payments
     $status[] = array_search('Pending', $pledgeStatuses);
@@ -894,6 +900,7 @@ WHERE civicrm_pledge_payment.contribution_id = {$paymentContributionId}
   public static function buildOptions($fieldName, $context = NULL, $props = array()) {
     $result = parent::buildOptions($fieldName, $context, $props);
     if ($fieldName == 'status_id') {
+      $result = CRM_Pledge_BAO_Pledge::buildOptions($fieldName, $context, $props);
       $result = array_diff($result, array('Failed', 'In Progress'));
     }
     return $result;
