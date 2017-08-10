@@ -89,10 +89,10 @@ function civicrm_api3_case_create($params) {
 
     // get original contact id and creator id of case
     if (!empty($params['contact_id'])) {
-      // FIXME: CRM_Case_BAO_Case::retrieveContactIdsByCaseId returns a 1-based array (1 is the first element)
-      // It should really return a 0-based array for consistency.
       $origContactIds = CRM_Case_BAO_Case::retrieveContactIdsByCaseId($params['id']);
-      $origContactId = $origContactIds[1];
+      $origContactId = CRM_Utils_Array::first($origContactIds);
+
+
     }
 
     // FIXME: Refactor as separate method to get contactId
@@ -529,7 +529,7 @@ function civicrm_api3_case_update($params) {
   // get original contact id and creator id of case
   if (!empty($params['contact_id'])) {
     $origContactIds = CRM_Case_BAO_Case::retrieveContactIdsByCaseId($params['id']);
-    $origContactId = $origContactIds[1];
+    $origContactId = CRM_Utils_Array::first($origContactIds);
   }
 
   if (count($origContactIds) > 1) {
