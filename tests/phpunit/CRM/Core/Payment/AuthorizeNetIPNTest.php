@@ -35,7 +35,7 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
   }
   /**
    * Ensure recurring contributions from Contribution Pages
-   * with receipt turned off don't send a receipt. 
+   * with receipt turned off don't send a receipt.
    */
   public function testIPNPaymentRecurNoReceipt() {
     $mut = new CiviMailUtils($this, TRUE);
