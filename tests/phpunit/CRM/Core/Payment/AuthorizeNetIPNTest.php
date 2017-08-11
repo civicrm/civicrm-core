@@ -33,6 +33,31 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
   public function tearDown() {
     $this->quickCleanUpFinancialEntities();
   }
+  /**
+   * Ensure recurring contributions from Contribution Pages
+   * with receipt turned off don't send a receipt. 
+   */
+  public function testIPNPaymentRecurNoReceipt() {
+    $mut = new CiviMailUtils($this, TRUE);
+    // Turn off receipts in contribution page.
+    $api_params = array(
+      'id' => $this->_contributionPageID,
+      'is_email_receipt' => FALSE,
+    );
+    $this->callAPISuccess('contributionPage', 'update', $api_params);
+
+    $this->setupRecurringPaymentProcessorTransaction();
+    $IPN = new CRM_Core_Payment_AuthorizeNetIPN($this->getRecurTransaction());
+    $IPN->main();
+
+    // Now send a second one (authorize seems to treat first and second contributions
+    // differently.
+    $IPN = new CRM_Core_Payment_AuthorizeNetIPN($this->getRecurSubsequentTransaction());
+    $IPN->main();
+
+    // There should not be any email.
+    $mut->assertMailLogEmpty();
+  }
 
   /**
    * Test IPN response updates contribution_recur & contribution for first & second contribution
