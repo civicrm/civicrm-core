@@ -10,7 +10,7 @@ CiviCRM Team - Atif Shaikh, Coleman Watts, David Greenberg, Eileen McNaughton,
                Yashodha Chaku
 
 AGH Strategies - Andrew Hunt, Tyrell Cook, Nikki Murray
-Agileware - Francis Whittle
+Agileware - Justin Freeman, Francis Whittle, Iris Abarquez, Vaibhav Sagar
 Andrew West
 Aputsiaĸ Niels Janussen
 Aron Novak
@@ -108,6 +108,7 @@ CiviCRM Team - Atif Shaikh, Coleman Watts, David Greenberg, Donald Lobo,
                Yashodha Chaku
 ADG Communications - Steve Binkowski  
 AGH Strategies - Andrew Hunt, Jane Hanley, Tommy Bobo, Tyrell Cook
+Agileware - Justin Freeman, Francis Whittle, Iris Abarquez, Vaibhav Sagar
 Alex C
 Allan Chappell
 Amnesty International Spain - Carlos Capote
