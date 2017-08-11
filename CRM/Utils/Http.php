@@ -77,4 +77,62 @@ class CRM_Utils_Http {
     return $result;
   }
 
+  public static function download($fromUrl, $toFile, $timeout=5) {
+    $client = new GuzzleHttp\Client();
+    $options = array(
+      'timeout' => $timeout,
+      'save_to' => $toFile,
+    );
+    try {
+      $response = $client->get($fromUrl, $options);
+    } catch (Exception $e) {
+      $return['status'] = FALSE;
+      $return['message'] = $e->getMessage();
+      return $return;
+    }
+    $return['status'] = TRUE;
+    $return['message'] = NULL;
+    return $return;
+  }
+
+  public static function get($url, $headers=array(), $timeout=5) {
+    $client = new GuzzleHttp\Client();
+    $options = array(
+      'headers' => $headers,
+      'timeout' => $timeout,
+    );
+
+    try {
+      $response = $client->get($url, $options);
+    } catch (GuzzleHttp\Exception\RequestException $e) {
+      $return['status'] = FALSE;
+      $return['message'] = $e->getMessage();
+      return $return;
+    }
+    $return['status'] = TRUE;
+    $return['message'] = NULL;
+    $return['response'] = $response;
+    return $return;
+  }
+
+  public static function post($url, $body, $headers=array(), $timeout=5) {
+    $client = new GuzzleHttp\Client();
+    $options = array(
+      'headers' => $headers,
+      'body' => $body,
+      'timeout' => $timeout,
+    );
+
+    try {
+      $response = $client->post($url, $options);
+    } catch (GuzzleHttp\Exception\RequestException $e) {
+      $return['status'] = FALSE;
+      $return['message'] = $e->getMessage();
+      return $return;
+    }
+    $return['status'] = TRUE;
+    $return['message'] = NULL;
+    $return['response'] = $response;
+    return $return;
+  }
 }

@@ -117,12 +117,12 @@ class CRM_Dashlet_Page_Blog extends CRM_Core_Page {
    *   array of blog items; or NULL if not available
    */
   protected function getFeed($url) {
-    $httpClient = new CRM_Utils_HttpClient(self::CHECK_TIMEOUT);
-    list ($status, $rawFeed) = $httpClient->get($url);
-    if ($status !== CRM_Utils_HttpClient::STATUS_OK) {
+    $httpget = CRM_Utils_Http::get($url, array(), self::CHECK_TIMEOUT);
+    if (!$httpget['status']) {
+      Civi::log()->warning('Blog getFeed() error: '.$httpget['message']);
       return NULL;
     }
-    return @simplexml_load_string($rawFeed);
+    return @simplexml_load_string($httpget['response']->getBody());
   }
 
   /**

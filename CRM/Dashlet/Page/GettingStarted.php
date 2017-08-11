@@ -115,13 +115,12 @@ class CRM_Dashlet_Page_GettingStarted extends CRM_Core_Page {
    *   array of gettingStarted items; or NULL if not available
    */
   public function _getHtml($url) {
-
-    $httpClient = new CRM_Utils_HttpClient(self::CHECK_TIMEOUT);
-    list ($status, $html) = $httpClient->get($url);
-    if ($status !== CRM_Utils_HttpClient::STATUS_OK) {
+    $httpget = CRM_Utils_Http::get($url, array(), self::CHECK_TIMEOUT);
+    if (!$httpget['status']) {
+      Civi::log()->warning('GettingStarted _getHtml() error: '.$httpget['message']);
       return NULL;
     }
-
+    $html = $httpget['response']->getBody();
     $tokensList = CRM_Utils_Token::getTokens($html);
     $this->replaceLinkToken($tokensList, $html);
     if ($html) {

@@ -235,14 +235,6 @@ class CRM_Extension_Browser {
    * @throws \CRM_Extension_Exception
    */
   private function grabRemoteJson() {
-
-    ini_set('default_socket_timeout', self::CHECK_TIMEOUT);
-    set_error_handler(array('CRM_Extension_Browser', 'downloadError'));
-
-    if (!ini_get('allow_url_fopen')) {
-      ini_set('allow_url_fopen', 1);
-    }
-
     if (FALSE === $this->getRepositoryUrl()) {
       // don't check if the user has configured civi not to check an external
       // url for extensions. See CRM-10575.
@@ -251,15 +243,11 @@ class CRM_Extension_Browser {
 
     $filename = $this->cacheDir . DIRECTORY_SEPARATOR . self::CACHE_JSON_FILE . '.' . md5($this->getRepositoryUrl());
     $url = $this->getRepositoryUrl() . $this->indexPath;
-    $status = CRM_Utils_HttpClient::singleton()->fetch($url, $filename);
+    $status = CRM_Utils_Http::download($url, $filename, self::CHECK_TIMEOUT);
 
-    ini_restore('allow_url_fopen');
-    ini_restore('default_socket_timeout');
-
-    restore_error_handler();
-
-    if ($status !== CRM_Utils_HttpClient::STATUS_OK) {
-      throw new CRM_Extension_Exception(ts('The CiviCRM public extensions directory at %1 could not be contacted - please check your webserver can make external HTTP requests or contact CiviCRM team on <a href="http://forum.civicrm.org/">CiviCRM forum</a>.', array(1 => $this->getRepositoryUrl())), 'connection_error');
+    if (!$status['status']) {
+      Civi::log()->warning('grabRemoteJson() failed: ' . $status['message']);
+      return array();
     }
 
     // Don't call grabCachedJson here, that would risk infinite recursion
@@ -272,14 +260,4 @@ class CRM_Extension_Browser {
   private function getTsPath() {
     return $this->cacheDir . DIRECTORY_SEPARATOR . 'timestamp.txt';
   }
-
-  /**
-   * A dummy function required for suppressing download errors.
-   *
-   * @param $errorNumber
-   * @param $errorString
-   */
-  public static function downloadError($errorNumber, $errorString) {
-  }
-
 }

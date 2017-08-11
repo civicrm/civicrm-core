@@ -418,22 +418,21 @@ class CRM_Utils_VersionCheck {
    * Store results in the cache file
    */
   private function pingBack() {
-    $params = array(
-      'http' => array(
-        'method' => 'POST',
-        'header' => 'Content-type: application/x-www-form-urlencoded',
-        'content' => http_build_query($this->stats),
-      ),
-    );
-    $ctx = stream_context_create($params);
-    $rawJson = file_get_contents($this->pingbackUrl, FALSE, $ctx);
-    $versionInfo = $rawJson ? json_decode($rawJson, TRUE) : NULL;
+    $headers = array('Content-type' => 'application/x-www-form-urlencoded');
+    $post = CRM_Utils_Http::post($this->pingbackUrl, http_build_query($this->stats), $headers);
+
+    if (!$post['status']) {
+      Civi::log()->warning('Job.version_check failed: ' . $post['message']);
+      return;
+    }
+    $versionInfo = $post['response']->json();
+
     // If we couldn't fetch or parse the data $versionInfo will be NULL
     // Otherwise it will be an array and we'll cache it.
     // Note the array may be empty e.g. in the case of a pre-alpha with no releases
     $this->isInfoAvailable = $versionInfo !== NULL;
     if ($this->isInfoAvailable) {
-      $this->writeCacheFile($rawJson);
+      $this->writeCacheFile($post['response']->getBody());
       $this->setVersionInfo($versionInfo);
     }
   }

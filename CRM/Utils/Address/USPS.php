@@ -84,27 +84,19 @@ class CRM_Utils_Address_USPS {
 
     $XMLQuery = '<AddressValidateRequest USERID="' . $userID . '"><Address ID="0"><Address1>' . CRM_Utils_Array::value('supplemental_address_1', $values, '') . '</Address1><Address2>' . $address2 . '</Address2><City>' . $values['city'] . '</City><State>' . $values['state_province'] . '</State><Zip5>' . $values['postal_code'] . '</Zip5><Zip4>' . CRM_Utils_Array::value('postal_code_suffix', $values, '') . '</Zip4></Address></AddressValidateRequest>';
 
-    require_once 'HTTP/Request.php';
-    $request = new HTTP_Request();
-
-    $request->setURL($url);
-
-    $request->addQueryString('API', 'Verify');
-    $request->addQueryString('XML', $XMLQuery);
-
-    $response = $request->sendRequest();
+    $url = $url . '?API=Verify&XML='.rawurlencode($XMLQuery);
+    $response = CRM_Utils_Http::get($url);
 
     $session = CRM_Core_Session::singleton();
 
-    $code = $request->getResponseCode();
-    if ($code != 200) {
-      $session->setStatus(ts('USPS Address Lookup Failed with HTTP status code: %1',
-        array(1 => $code)
+    if (!$response['status']) {
+      $session->setStatus(ts('USPS Address Lookup Failed with error: %1',
+        array(1 => $response['message'])
       ));
       return FALSE;
     }
 
-    $responseBody = $request->getResponseBody();
+    $responseBody = $response['response']->getBody();
 
     $xml = simplexml_load_string($responseBody);
 
