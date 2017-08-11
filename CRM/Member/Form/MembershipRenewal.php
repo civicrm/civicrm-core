@@ -339,12 +339,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
 
     $this->applyFilter('__ALL__', 'trim');
 
-    // CRM-20571
-    // Get the Join Date from Membership info as it is not available in the Renew form
-    $joinDate = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $this->_id, 'join_date');
-    // Save its value in a hidden field
-    $this->addElement('hidden', 'join_date', $joinDate);
-
     $this->addDate('renewal_date', ts('Date Renewal Entered'), FALSE, array('formatType' => 'activityDate'));
 
     $this->add('select', 'financial_type_id', ts('Financial Type'),
@@ -410,7 +404,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
         );
       }
     }
-    $this->addFormRule(array('CRM_Member_Form_MembershipRenewal', 'formRule'));
+    $this->addFormRule(array('CRM_Member_Form_MembershipRenewal', 'formRule'), $this);
     $this->addElement('checkbox', 'is_different_contribution_contact', ts('Record Payment from a Different Contact?'));
     $this->addSelect('soft_credit_type_id', array('entity' => 'contribution_soft'));
     $this->addEntityRef('soft_credit_contact_id', ts('Payment From'), array('create' => TRUE));
@@ -425,7 +419,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
    * @return bool|array
    *   mixed true or array of errors
    */
-  public static function formRule($params) {
+  public static function formRule($params, $files, $self) {
     $errors = array();
     if ($params['membership_type_id'][0] == 0) {
       $errors['membership_type_id'] = ts('Oops. It looks like you are trying to change the membership type while renewing the membership. Please click the "change membership type" link, and select a Membership Organization.');
@@ -434,12 +428,15 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       $errors['membership_type_id'] = ts('Oops. It looks like you are trying to change the membership type while renewing the membership. Please click the "change membership type" link and select a Membership Type from the list.');
     }
 
+    // CRM-20571
+    // Get the Join Date from Membership info as it is not available in the Renewal form
+    $joinDate = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $self->_id, 'join_date');
+
     // CRM-20571: Check if the renewal date is not before Join Date, if it is then add to 'errors' array
-    // The fields in Renewal form come into this routine in $params array. 'renewal_date' is already in the form and
-    // we added 'join_date' as a hidden field in the buildForm routine with member join date value
+    // The fields in Renewal form come into this routine in $params array. 'renewal_date' is in the form
     // We process both the dates before comparison using CRM utils so that they are in same date format
     if (isset($params['renewal_date'])) {
-      if (CRM_Utils_Date::processDate($params['renewal_date']) < CRM_Utils_Date::processDate($params['join_date'])) {
+      if (CRM_Utils_Date::processDate($params['renewal_date']) < CRM_Utils_Date::processDate($joinDate)) {
         $errors['renewal_date'] = ts('Renewal date must be the same or later than Member since (Join Date).');
       }
     }
