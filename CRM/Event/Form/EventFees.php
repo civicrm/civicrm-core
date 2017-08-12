@@ -226,6 +226,7 @@ class CRM_Event_Form_EventFees {
 
     // CRM-4395
     if ($contriId = $form->get('onlinePendingContributionId')) {
+      $defaults[$form->_pId]['record_contribution'] = 1;
       $contribution = new CRM_Contribute_DAO_Contribution();
       $contribution->id = $contriId;
       $contribution->find(TRUE);
