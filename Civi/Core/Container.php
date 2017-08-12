@@ -89,7 +89,6 @@ class Container {
 
     require_once $file;
     $c = new \CachedCiviContainer();
-    $c->set('service_container', $c);
     return $c;
   }
 
@@ -134,13 +133,13 @@ class Container {
       'Civi\Angular\Manager',
       array()
     ))
-      ->setFactoryService(self::SELF)->setFactoryMethod('createAngularManager');
+      ->setFactory(array(new Reference(self::SELF), 'createAngularManager'));
 
     $container->setDefinition('dispatcher', new Definition(
       'Civi\Core\CiviEventDispatcher',
       array(new Reference('service_container'))
     ))
-      ->setFactoryService(self::SELF)->setFactoryMethod('createEventDispatcher');
+      ->setFactory(array(new Reference(self::SELF), 'createEventDispatcher'));
 
     $container->setDefinition('magic_function_provider', new Definition(
       'Civi\API\Provider\MagicFunctionProvider',
@@ -151,13 +150,13 @@ class Container {
       'Civi\API\Kernel',
       array(new Reference('dispatcher'), new Reference('magic_function_provider'))
     ))
-      ->setFactoryService(self::SELF)->setFactoryMethod('createApiKernel');
+      ->setFactory(array(new Reference(self::SELF), 'createApiKernel'));
 
     $container->setDefinition('cxn_reg_client', new Definition(
       'Civi\Cxn\Rpc\RegistrationClient',
       array()
     ))
-      ->setFactoryClass('CRM_Cxn_BAO_Cxn')->setFactoryMethod('createRegistrationClient');
+      ->setFactory('CRM_Cxn_BAO_Cxn::createRegistrationClient');
 
     $container->setDefinition('psr_log', new Definition('CRM_Core_Error_Log', array()));
 
@@ -170,7 +169,7 @@ class Container {
             'type' => array('*memory*', 'SqlGroup', 'ArrayCache'),
           ),
         )
-      ))->setFactoryClass('CRM_Utils_Cache')->setFactoryMethod('create');
+      ))->setFactory('CRM_Utils_Cache::create');
     }
 
     $container->setDefinition('sql_triggers', new Definition(
@@ -184,7 +183,7 @@ class Container {
     ));
 
     $container->setDefinition('pear_mail', new Definition('Mail'))
-      ->setFactoryClass('CRM_Utils_Mail')->setFactoryMethod('createMailer');
+      ->setFactory('CRM_Utils_Mail::createMailer');
 
     if (empty(\Civi::$statics[__CLASS__]['boot'])) {
       throw new \RuntimeException("Cannot initialize container. Boot services are undefined.");
@@ -206,7 +205,7 @@ class Container {
       $container->setDefinition($name, new Definition(
         $class
       ))
-        ->setFactoryClass($class)->setFactoryMethod('singleton');
+        ->setFactory(array($class, 'singleton'));
     }
 
     $container->setDefinition('civi_token_compat', new Definition(
