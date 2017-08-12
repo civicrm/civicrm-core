@@ -41,7 +41,12 @@ class CRM_Upgrade_Incremental_General {
   /**
    * The recommended PHP version.
    */
-  const MIN_RECOMMENDED_PHP_VER = '5.5';
+  const MIN_RECOMMENDED_PHP_VER = '5.6';
+
+  /**
+   * The previous recommended PHP version.
+   */
+  const PREVIOUS_MIN_RECOMMENDED_PHP_VER = '5.5';
 
   /**
    * The minimum PHP version required to install Civi.
@@ -65,13 +70,28 @@ class CRM_Upgrade_Incremental_General {
    * @param $latestVer
    */
   public static function setPreUpgradeMessage(&$preUpgradeMessage, $currentVer, $latestVer) {
+    $dateFormat = Civi::Settings()->get('dateformatshortdate');
     if (version_compare(phpversion(), self::MIN_RECOMMENDED_PHP_VER) < 0) {
-      $preUpgradeMessage .= '<p>' .
-        ts('This webserver is running an outdated version of PHP (%1). It is strongly recommended to upgrade to PHP %2 or later, as older versions can present a security risk.', array(
-          1 => phpversion(),
-          2 => self::MIN_RECOMMENDED_PHP_VER,
-        )) .
-        '</p>';
+      $preUpgradeMessage .= '<p>';
+      // CRM-20941 PHP 5.3 end date of End of 2017, PHP 5.4 End date End of Feb 2018 Recommend anyone on PHP 5.5 to move up to 5.6 or later e.g. 7.0
+      if (version_compare(phpversion(), self::PREVIOUS_MIN_RECOMMENDED_PHP_VER) >= 0) {
+        $preUpgradeMessage .= ts('You may proceed with the upgrade and CiviCRM %1 will continue working normally, but future releases will require PHP %2 or above. We recommend you use the most recent php version you can', array(
+           1 => $currentVer,
+           2 => self::MIN_RECOMMENDED_PHP_VER,
+        ));
+      }
+      elseif (version_compare(phpversion(), 5.5) < 0) {
+        $date = CRM_Utils_Date::customFormat('2018-02-28', $dateFormat);
+        if (version_compare(phpversion(), 5.4) < 0) {
+          $date = CRM_Utils_Date::customFormat('2017-12-31', $dateFormat);
+        }
+        $preUpgradeMessage .= ts('You may proceed with the upgrade and CiviCRM %1 will continue working normally, but PHP %2 will not work in releases published after %3. We recommend you use the most recent php version you can', array(
+          1 => $currentVer,
+          2 => phpversion(),
+          3 => $date,
+        ));
+      }
+      $preUpgradeMessage .= '</p>';
     }
 
     // http://issues.civicrm.org/jira/browse/CRM-13572
