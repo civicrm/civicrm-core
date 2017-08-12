@@ -89,10 +89,8 @@ class CRM_Utils_Mail_EmailProcessor {
 
   /**
    * Process the mailboxes that aren't default (ie. that aren't used by civiMail for the bounce).
-   * @param bool $is_create_activities
-   *   Should activities be created?
    */
-  public static function processActivities($is_create_activities) {
+  public static function processActivities() {
     $dao = new CRM_Core_DAO_MailSettings();
     $dao->domain_id = CRM_Core_Config::domainID();
     $dao->is_default = FALSE;
@@ -100,7 +98,7 @@ class CRM_Utils_Mail_EmailProcessor {
     $found = FALSE;
     while ($dao->fetch()) {
       $found = TRUE;
-      self::_process(FALSE, $dao, $is_create_activities);
+      self::_process(FALSE, $dao, TRUE);
     }
     if (!$found) {
       CRM_Core_Error::fatal(ts('No mailboxes have been configured for Email to Activity Processing'));

@@ -378,19 +378,6 @@ function _civicrm_api3_job_fetch_bounces_spec(&$params) {
 }
 
 /**
- * Metadata for activities function.
- *
- * @param array $params
- */
-function _civicrm_api3_job_fetch_activities_spec(&$params) {
-  $params['is_create_activities'] = array(
-    'api.default' => 0,
-    'type' => CRM_Utils_Type::T_BOOLEAN,
-    'title' => ts('Create activities for replies?'),
-  );
-}
-
-/**
  * Job to get mail and create activities.
  *
  * @param array $params
@@ -404,7 +391,7 @@ function civicrm_api3_job_fetch_activities($params) {
   }
 
   try {
-    CRM_Utils_Mail_EmailProcessor::processActivities($params['is_create_activities']);
+    CRM_Utils_Mail_EmailProcessor::processActivities();
     $values = array();
     $lock->release();
     return civicrm_api3_create_success($values, $params, 'Job', 'fetch_activities');
