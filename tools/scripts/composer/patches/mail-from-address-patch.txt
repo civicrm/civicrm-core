@@ -1,0 +1,47 @@
+--- mail.php	2017-08-13 11:31:51.768592184 +1000
++++ mail.php	2017-08-13 11:33:43.415727321 +1000
+@@ -152,7 +152,13 @@
+         if (is_a($headerElements, 'PEAR_Error')) {
+             return $headerElements;
+         }
++        list($from, $text_headers) = $headerElements;
++
++        // use Return-Path for SMTP envelope’s FROM address (if set), CRM-5946
++        if (!empty($headers['Return-Path'])) {
++            $from = $headers['Return-Path'];
++        }
++        $this->_params = "-f".$from;
+-        list(, $text_headers) = $headerElements;
+ 
+         // We only use mail()'s optional fifth parameter if the additional
+         // parameters have been provided and we're not running in safe mode.
+--- smtp.php	2017-08-13 11:32:53.490316724 +1000
++++ smtp.php	2017-08-13 11:33:43.415727321 +1000
+@@ -293,13 +293,6 @@
+         }
+         list($from, $textHeaders) = $headerElements;
+ 
+-        /* Since few MTAs are going to allow this header to be forged
+-         * unless it's in the MAIL FROM: exchange, we'll use
+-         * Return-Path instead of From: if it's set. */
+-        if (!empty($headers['Return-Path'])) {
+-            $from = $headers['Return-Path'];
+-        }
+-
+         if (!isset($from)) {
+             $this->_smtp->rset();
+             return PEAR::raiseError('No From: address has been provided',
+@@ -310,6 +318,13 @@
+             $this->_smtp->rset();
+             return PEAR::raiseError($error, PEAR_MAIL_SMTP_ERROR_SENDER);
+         }
++
++        /* Since few MTAs are going to allow this header to be forged
++         * unless it's in the MAIL FROM: exchange, we'll use
++         * Return-Path instead of From: if it's set. */
++        if (!empty($headers['Return-Path'])) {
++            $from = $headers['Return-Path'];
++        }
+ 
+         $recipients = $this->parseRecipients($recipients);
+         if (is_a($recipients, 'PEAR_Error')) {

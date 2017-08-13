@@ -1,0 +1,17 @@
+--- RFC822.php	2017-04-12 03:27:29.000000000 +1000
++++ RFC822.php	2017-08-13 11:39:05.577086256 +1000
+@@ -479,6 +479,14 @@
+         // Trim the whitespace from all of the address strings.
+         array_map('trim', $addresses);
+ 
++        // Check that $addresses is set, if address like this:
++        // Groupname:;
++        // Then errors were appearing.
++        if (!count($addresses)){
++            $this->error = 'Empty group.';
++            return false;
++        }
++
+         // Validate each mailbox.
+         // Format could be one of: name <geezer@domain.com>
+         //                         geezer@domain.com

@@ -1,0 +1,49 @@
+--- mail.php	2017-04-12 03:27:29.000000000 +1000
++++ mail.php	2017-08-13 11:00:18.140228535 +1000
+@@ -114,6 +114,13 @@
+      */
+     public function send($recipients, $headers, $body)
+     {
++        if (defined('CIVICRM_MAIL_LOG')) {
++          CRM_Utils_Mail::logger($recipients, $headers, $body);
++          if(!defined('CIVICRM_MAIL_LOG_AND SEND')) {
++            return TRUE;
++          }
++        }
++
+         if (!is_array($headers)) {
+             return PEAR::raiseError('$headers must be an array');
+         }
+--- smtp.php	2017-04-12 03:27:29.000000000 +1000
++++ smtp.php	2017-08-13 11:00:37.580959806 +1000
+@@ -255,6 +255,13 @@
+      */
+     public function send($recipients, $headers, $body)
+     {
++        if (defined('CIVICRM_MAIL_LOG')) {
++          CRM_Utils_Mail::logger($recipients, $headers, $body);
++          if(!defined('CIVICRM_MAIL_LOG_AND SEND')) {
++            return TRUE;
++          }
++        }
++
+         $result = $this->send_or_fail($recipients, $headers, $body);
+ 
+         /* If persistent connections are disabled, destroy our SMTP object. */
+--- sendmail.php	2017-04-12 03:27:29.000000000 +1000
++++ sendmail.php	2017-08-13 11:01:20.734575958 +1000
+@@ -132,6 +132,14 @@
+      */
+     public function send($recipients, $headers, $body)
+     {
++
++        if (defined('CIVICRM_MAIL_LOG')) {
++          CRM_Utils_Mail::logger($recipients, $headers, $body);
++          if(!defined('CIVICRM_MAIL_LOG_AND SEND')) {
++            return TRUE;
++          }
++        }
++
+         if (!is_array($headers)) {
+             return PEAR::raiseError('$headers must be an array');
+         }
