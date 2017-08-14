@@ -91,10 +91,7 @@ class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFin
       $financialTypeAccount->find(TRUE);
     }
     $financialTypeAccount->copyValues($params);
-    $valid = self::validateRelationship($financialTypeAccount);
-    if (!$valid) {
-      return FALSE;
-    }
+    self::validateRelationship($financialTypeAccount);
     $financialTypeAccount->save();
     return $financialTypeAccount;
   }
@@ -105,7 +102,6 @@ class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFin
    * @param int $financialTypeAccountId
    * @param int $accountId
    *
-   * @return bool
    */
   public static function del($financialTypeAccountId, $accountId = NULL) {
     // check if financial type is present
@@ -277,6 +273,7 @@ WHERE cog.name = 'payment_instrument' ";
    *
    * @param obj $financialTypeAccount of CRM_Financial_DAO_EntityFinancialAccount
    *
+  * @throws CRM_Core_Exception
    */
   public static function validateRelationship($financialTypeAccount) {
     $financialAccountLinks = CRM_Financial_BAO_FinancialAccount::getfinancialAccountRelations();
@@ -286,10 +283,8 @@ WHERE cog.name = 'payment_instrument' ";
       $params = array(
         1 => $accountRelationships[$financialTypeAccount->account_relationship],
       );
-      CRM_Core_Session::setStatus(ts('This financial account cannot have \'%1\' relationship.', $params), ts('Error'), 'error');
-      return FALSE;
+      throw new CRM_Core_Exception(ts("This financial account cannot have '%1' relationship.", $params));
     }
-    return TRUE;
   }
 
 }
