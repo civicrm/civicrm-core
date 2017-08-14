@@ -410,7 +410,7 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
    * @param string $rev
    */
   public function upgrade_4_7_25($rev) {
-    $this->addTask('CRM-20927 - Add Generic Column for other data', 'addColumn',
+    $this->addTask("CRM-20927 - Add column to 'civicrm_menu' for additional metadata", 'addColumn',
       'civicrm_menu', 'module_data', "text COMMENT 'All other menu metadata not stored in other fields'");
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
   }
