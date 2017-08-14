@@ -95,6 +95,7 @@
   // The crmMailingMgr service provides business logic for loading, saving, previewing, etc
   angular.module('crmMailing').factory('crmMailingMgr', function ($q, crmApi, crmFromAddresses, crmQueue) {
     var qApi = crmQueue(crmApi);
+    var saveCount = 0;
     var pickDefaultMailComponent = function pickDefaultMailComponent(type) {
       var mcs = _.where(CRM.crmMailing.headerfooterList, {
         component_type: type,
@@ -339,7 +340,13 @@
             mailing[key] = '';
           }
         });
-
+        
+        //CRM-20892: Keep track of the amount of times this browser instance requests a change to a
+        //mailing and store it in the DB in the change_count field. This will be used to prevent
+        //cross-editing between multiple open browsers/tabs editing the same mailing.
+        saveCount++;
+        params.change_count = saveCount;
+        
         // WORKAROUND: Mailing.create (aka CRM_Mailing_BAO_Mailing::create()) interprets scheduled_date
         // as an *intent* to schedule and creates tertiary records. Saving a draft with a scheduled_date
         // is therefore not allowed. Remove this after fixing Mailing.create's contract.

@@ -60,6 +60,12 @@ class CRM_Mailing_Controller_Send extends CRM_Core_Controller {
       }
       else {
         $redirect = CRM_Utils_System::url('civicrm/a/', NULL, TRUE, '/mailing/' . $mid);
+        
+        //When continuing to edit an existing mailing, we need to reset the change_count stored in 
+        //the DB to keep it in sync with the browser's change count, which will start again at 0 
+        //(See CRM-20892)
+        $query = "UPDATE `civicrm_mailing` SET `change_count` = '0' WHERE `civicrm_mailing`.`id` = " . $mid;
+        $dao = CRM_Core_DAO::executeQuery($query);
       }
       CRM_Utils_System::redirect($redirect);
     }

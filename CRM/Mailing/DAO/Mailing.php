@@ -908,6 +908,17 @@ class CRM_Mailing_DAO_Mailing extends CRM_Core_DAO {
             'optionEditPath' => 'civicrm/admin/options/languages',
           )
         ) ,
+        //For issue CRM-20892
+        'change_count' => array(
+          'name' => 'change_count',
+          'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Mailing Change Count') ,
+          'required' => true,
+          'table_name' => 'civicrm_mailing',
+          'entity' => 'Mailing',
+          'bao' => 'CRM_Mailing_BAO_Mailing',
+          'localizable' => 0,
+        ) ,
       );
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);
     }

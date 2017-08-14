@@ -150,6 +150,7 @@ function _civicrm_api3_mailing_create_spec(&$params) {
   $params['reply_id']['api.default'] = CRM_Mailing_PseudoConstant::defaultComponent('Reply', '');
   $params['resubscribe_id']['api.default'] = CRM_Mailing_PseudoConstant::defaultComponent('Resubscribe', '');
   $params['unsubscribe_id']['api.default'] = CRM_Mailing_PseudoConstant::defaultComponent('Unsubscribe', '');
+  $params['change_count']['api.default'] = 0;
   $params['mailing_type']['api.default'] = 'standalone';
   $defaultAddress = CRM_Core_OptionGroup::values('from_email_address', NULL, NULL, NULL, ' AND is_default = 1');
   foreach ($defaultAddress as $value) {

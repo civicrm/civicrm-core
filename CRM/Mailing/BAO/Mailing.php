@@ -1718,7 +1718,28 @@ ORDER BY   civicrm_email.is_bulkmail DESC
      * - groups OR mailings should be populated.
      * - body html OR body text should be populated.
      */
-
+     
+     //CRM-20892: To prevent cross-editing between open tabs/browsers compare the amount of times
+     //the browser has changed the mailing with the change_count stored in the DB. If they are
+     //different, another instance is trying to make a change to the DB when it shouldn't. If this
+     //is the case, throw an exception.
+    $changeCountDB = 0;
+    if (isset($params['id']))
+    {
+        $mailingTableName = CRM_Mailing_BAO_Mailing::getTableName();
+    
+        $query = "SELECT `change_count` FROM `$mailingTableName` WHERE `id` = " . $params['id'];
+        $dao = CRM_Core_DAO::executeQuery($query);
+        if ($dao && $dao->fetch()) {
+            $changeCountDB = $dao->change_count;
+        }
+        
+        //The browser has made a new change so it should be one ahead of the DB.
+        if ($changeCountDB != ($params['change_count']-1)) {
+            throw new CRM_Core_Exception("Unable to save changes. This mailing is already being changed in another window");
+        }
+    }
+    
     $transaction = new CRM_Core_Transaction();
 
     $mailing = self::add($params, $ids);
@@ -1731,7 +1752,6 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     CRM_Contact_BAO_Contact_Utils::generateChecksum($mailing->id, NULL, NULL, NULL, 'mailing', 16);
 
     $groupTableName = CRM_Contact_BAO_Group::getTableName();
-    $mailingTableName = CRM_Mailing_BAO_Mailing::getTableName();
 
     /* Create the mailing group record */
     $mg = new CRM_Mailing_DAO_MailingGroup();
