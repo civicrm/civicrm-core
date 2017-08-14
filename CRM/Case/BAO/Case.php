@@ -75,7 +75,9 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
   public static function add(&$params) {
     $caseDAO = new CRM_Case_DAO_Case();
     $caseDAO->copyValues($params);
-    return $caseDAO->save();
+    $result = $caseDAO->save();
+    $caseDAO->find(TRUE); // Get other case values (required by XML processor), this adds to $result array
+    return $result;
   }
 
   /**
@@ -271,6 +273,7 @@ WHERE civicrm_case.id = %1";
     $caseContact->case_id = $caseId;
     $caseContact->find();
     $contactArray = array();
+    // FIXME: Why does this return a 1-based array?
     $count = 1;
     while ($caseContact->fetch()) {
       if ($contactID != $caseContact->contact_id) {
