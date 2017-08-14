@@ -487,4 +487,12 @@
       <type>Select</type>
     </html>
   </field>
+  <field>
+    <name>last_modified</name>
+    <title>Who Last Modified Mailing?</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Who last modified this mailing?</comment>
+    <default>0</default>
+  </field>
 </table>

@@ -150,6 +150,7 @@ function _civicrm_api3_mailing_create_spec(&$params) {
   $params['reply_id']['api.default'] = CRM_Mailing_PseudoConstant::defaultComponent('Reply', '');
   $params['resubscribe_id']['api.default'] = CRM_Mailing_PseudoConstant::defaultComponent('Resubscribe', '');
   $params['unsubscribe_id']['api.default'] = CRM_Mailing_PseudoConstant::defaultComponent('Unsubscribe', '');
+  $params['last_modified']['api.default'] = 0;
   $params['mailing_type']['api.default'] = 'standalone';
   $defaultAddress = CRM_Core_OptionGroup::values('from_email_address', NULL, NULL, NULL, ' AND is_default = 1');
   foreach ($defaultAddress as $value) {
@@ -300,6 +301,7 @@ function civicrm_api3_mailing_submit($params) {
 
   $updateParams = array();
   $updateParams['id'] = $params['id'];
+  $updateParams['last_modified'] = $params['last_modified'];
 
   // Note: we'll pass along scheduling/approval fields, but they may get ignored
   // if we don't have permission.

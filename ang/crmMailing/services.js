@@ -95,6 +95,9 @@
   // The crmMailingMgr service provides business logic for loading, saving, previewing, etc
   angular.module('crmMailing').factory('crmMailingMgr', function ($q, crmApi, crmFromAddresses, crmQueue) {
     var qApi = crmQueue(crmApi);
+    //CRM-20892: If the last modified id is based on the number seconds since the epoch, it will
+    //always be unique between browser instances
+    var lastModifiedID = Math.floor(Date.now() / 1000);
     var pickDefaultMailComponent = function pickDefaultMailComponent(type) {
       var mcs = _.where(CRM.crmMailing.headerfooterList, {
         component_type: type,
@@ -339,7 +342,12 @@
             mailing[key] = '';
           }
         });
-
+        
+        //CRM-20892: Pass the last modified id of this browser instance to be stored
+        //in the DB in the last_modified field. This will be used to prevent
+        //cross-editing between multiple open browsers/tabs editing the same mailing.
+        params.last_modified = lastModifiedID;
+        
         // WORKAROUND: Mailing.create (aka CRM_Mailing_BAO_Mailing::create()) interprets scheduled_date
         // as an *intent* to schedule and creates tertiary records. Saving a draft with a scheduled_date
         // is therefore not allowed. Remove this after fixing Mailing.create's contract.
@@ -365,6 +373,7 @@
         var crmMailingMgr = this;
         var params = {
           id: mailing.id,
+          last_modified: lastModifiedID,
           approval_date: 'now',
           scheduled_date: mailing.scheduled_date ? mailing.scheduled_date : 'now'
         };
