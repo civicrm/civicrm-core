@@ -688,10 +688,7 @@ WHERE  civicrm_pledge_payment.pledge_id = %1
        {$paymentClause}
 ";
 
-    // get all status
-    $params = array(1 => array($pledgeId, 'Integer'));
-
-    $dao = CRM_Core_DAO::executeQuery($query, $params);
+    CRM_Core_DAO::executeQuery($query, array(1 => array($pledgeId, 'Integer')));
   }
 
   /**
@@ -772,7 +769,8 @@ LIMIT 0, %2
    */
   public static function adjustPledgePayment($pledgeID, $actualAmount, $pledgeScheduledAmount, $paymentContributionId = NULL, $pPaymentId = NULL, $paymentStatusID = NULL) {
     $allStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
-    if ($paymentStatusID == array_search('Cancelled', $allStatus) || $paymentStatusID == array_search('Refunded', $allStatus)) {
+    $paymentStatusName = CRM_Core_PseudoConstant::getName('CRM_Pledge_BAO_PledgePayment', 'status_id', $paymentStatusID);
+    if ($paymentStatusName == 'Cancelled'|| $paymentStatusName == 'Refunded') {
       $query = "
 SELECT civicrm_pledge_payment.id id
 FROM  civicrm_pledge_payment

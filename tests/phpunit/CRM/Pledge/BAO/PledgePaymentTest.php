@@ -466,8 +466,7 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
       'trxn_id' => 47,
       'total_amount' => 100.00,
       'fee_amount' => 0.00,
-      'net_ammount' => 100.00,
-      'financial_type_id' => 1,
+      'net_amount' => 100.00,
       'payment_instrument_id' => 1,
       'non_deductible_amount' => 0.00,
     ));
