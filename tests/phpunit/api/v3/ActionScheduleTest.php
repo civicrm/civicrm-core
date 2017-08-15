@@ -50,7 +50,7 @@ class api_v3_ActionScheduleTest extends CiviUnitTestCase {
    */
   public function testSimpleActionScheduleCreate() {
     $oldCount = CRM_Core_DAO::singleValueQuery('select count(*) from civicrm_action_schedule');
-    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
+    $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
     $title = "simpleActionSchedule" . substr(sha1(rand()), 0, 7);
     $params = array(
@@ -87,7 +87,7 @@ class api_v3_ActionScheduleTest extends CiviUnitTestCase {
    */
   public function testActionScheduleWithScheduledDatesCreate() {
     $oldCount = CRM_Core_DAO::singleValueQuery('select count(*) from civicrm_action_schedule');
-    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
+    $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
     $title = "simpleActionSchedule" . substr(sha1(rand()), 0, 7);
     $params = array(

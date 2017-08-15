@@ -492,7 +492,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
    * @param string $recordType
    */
   public function from($recordType) {
-    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
+    $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
     $activityTypeId = CRM_Core_DAO::getFieldValue("CRM_Core_DAO_OptionGroup", 'activity_type', 'id', 'name');
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
@@ -779,7 +779,7 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
       $this->_formValues["activity_date_time_relative"] = NULL;
     }
     $this->beginPostProcess();
-    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
+    $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
     $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
 
     //Assign those recordtype to array which have filter operator as 'Is not empty' or 'Is empty'
