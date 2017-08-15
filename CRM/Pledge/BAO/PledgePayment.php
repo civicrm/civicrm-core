@@ -863,7 +863,7 @@ WHERE civicrm_pledge_payment.contribution_id = {$paymentContributionId}
             // means we are editing payment scheduled payment.
             $oldestPaymentAmount = self::getOldestPledgePayment($pledgeID, 2);
           }
-          $newActualAmount = ($actualAmount - $pledgeScheduledAmount);
+          $newActualAmount = round(($actualAmount - $pledgeScheduledAmount), CRM_Utils_Money::getCurrencyPrecision());
           $newPledgeScheduledAmount = $oldestPayment['amount'];
           if (!$paymentContributionId) {
             $newActualAmount = ($actualAmount - $pledgeScheduledAmount);
