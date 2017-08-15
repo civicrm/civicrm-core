@@ -288,16 +288,13 @@ WHERE     pledge_id = %1
    * @return bool
    */
   public static function resetPledgePayment($contributionID) {
-    // get all status
-    $allStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
-
     $transaction = new CRM_Core_Transaction();
 
     $payment = new CRM_Pledge_DAO_PledgePayment();
     $payment->contribution_id = $contributionID;
     if ($payment->find(TRUE)) {
       $payment->contribution_id = 'null';
-      $payment->status_id = array_search('Pending', $allStatus);
+      $payment->status_id = CRM_Core_PseudoConstant::getKey('CRM_Pledge_BAO_Pledge', 'status_id', 'Pending');
       $payment->scheduled_date = NULL;
       $payment->reminder_date = NULL;
       $payment->scheduled_amount = $payment->actual_amount;
@@ -320,18 +317,18 @@ WHERE     pledge_id = %1
    * Update Pledge Payment Status.
    *
    * @param int $pledgeID
-   *   , id of pledge.
+   *   Id of pledge.
    * @param array $paymentIDs
-   *   , ids of pledge payment(s) to update.
+   *   Ids of pledge payment(s) to update.
    * @param int $paymentStatusID
-   *   , payment status to set.
+   *   Payment status to set.
    * @param int $pledgeStatusID
    *   Pledge status to change (if needed).
    * @param float|int $actualAmount , actual amount being paid
    * @param bool $adjustTotalAmount
-   *   , is amount being paid different from scheduled amount?.
+   *   Is amount being paid different from scheduled amount?.
    * @param bool $isScriptUpdate
-   *   , is function being called from bin script?.
+   *   Is function being called from bin script?.
    *
    * @return int
    *   $newStatus, updated status id (or 0)
