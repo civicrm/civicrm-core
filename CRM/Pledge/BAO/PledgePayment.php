@@ -858,7 +858,7 @@ WHERE civicrm_pledge_payment.contribution_id = {$paymentContributionId}
           $paymentId = array($oldestPayment['id']);
           self::updatePledgePayments($pledgeID, array_search('Completed', $allStatus), $paymentId, 0, $paymentContributionId);
           CRM_Core_DAO::setFieldValue('CRM_Pledge_DAO_PledgePayment', $oldestPayment['id'], 'scheduled_amount', 0, 'id');
-          $oldestPayment = self::getOldestPledgePayment($pledgeID);
+
           if (!$paymentContributionId) {
             // means we are editing payment scheduled payment.
             $oldestPaymentAmount = self::getOldestPledgePayment($pledgeID, 2);
