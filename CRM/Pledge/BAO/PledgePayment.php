@@ -367,8 +367,9 @@ WHERE     pledge_id = %1
     }
 
     // if payment ids are passed, we update payment table first, since payments statuses are not dependent on pledge status
-    if ((!empty($paymentIDs) || $pledgeStatusID == array_search('Cancelled', $allStatus)) && (!$editScheduled || $isScriptUpdate)) {
-      if ($pledgeStatusID == array_search('Cancelled', $allStatus)) {
+    $pledgeStatusName = CRM_Core_PseudoConstant::getName('CRM_Pledge_BAO_Pledge', 'status_id', $pledgeStatusID);
+    if ((!empty($paymentIDs) || $pledgeStatusName == 'Cancelled') && (!$editScheduled || $isScriptUpdate)) {
+      if ($pledgeStatusName == 'Cancelled') {
         $paymentStatusID = $pledgeStatusID;
       }
 
