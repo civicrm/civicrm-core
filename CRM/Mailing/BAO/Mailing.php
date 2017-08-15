@@ -1734,9 +1734,15 @@ ORDER BY   civicrm_email.is_bulkmail DESC
             $changeCountDB = $dao->change_count;
         }
         
-        //The browser has made a new change so it should be one ahead of the DB.
-        if ($changeCountDB != ($params['change_count']-1)) {
-            throw new CRM_Core_Exception("Unable to save changes. This mailing is already being changed in another window");
+        //If the change_count in the DB is 0, it has been reset by a continue operation.
+        //Do not throw an exception in this case, and just let the DB's change_count sync again
+        //with the browser's
+        if ($changeCountDB != 0)
+        {
+            //The browser has made a new change so it should be one ahead of the DB.
+            if ($changeCountDB != ($params['change_count']-1)) {
+                throw new CRM_Core_Exception("Unable to save changes. This mailing is already being changed in another window");
+            }
         }
     }
     
