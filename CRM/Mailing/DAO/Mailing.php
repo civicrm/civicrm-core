@@ -300,6 +300,12 @@ class CRM_Mailing_DAO_Mailing extends CRM_Core_DAO {
    */
   public $language;
   /**
+   * Number of times the browser has changed the mailing
+   *
+   * @var int unsigned
+   */
+  public $change_count;
+  /**
    * Class constructor.
    */
   function __construct() {

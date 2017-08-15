@@ -95,7 +95,9 @@
   // The crmMailingMgr service provides business logic for loading, saving, previewing, etc
   angular.module('crmMailing').factory('crmMailingMgr', function ($q, crmApi, crmFromAddresses, crmQueue) {
     var qApi = crmQueue(crmApi);
-    var saveCount = 0;
+    //CRM-20892: If the change_count is based on the number seconds since the epoch, it will
+    //always be unique between browser instances if we only increment the counter by one each change
+    var saveCount = Math.floor(Date.now() / 1000);
     var pickDefaultMailComponent = function pickDefaultMailComponent(type) {
       var mcs = _.where(CRM.crmMailing.headerfooterList, {
         component_type: type,
@@ -372,6 +374,7 @@
         var crmMailingMgr = this;
         var params = {
           id: mailing.id,
+          change_count: saveCount+1,
           approval_date: 'now',
           scheduled_date: mailing.scheduled_date ? mailing.scheduled_date : 'now'
         };

@@ -301,6 +301,7 @@ function civicrm_api3_mailing_submit($params) {
 
   $updateParams = array();
   $updateParams['id'] = $params['id'];
+  $updateParams['change_count'] = $params['change_count'];
 
   // Note: we'll pass along scheduling/approval fields, but they may get ignored
   // if we don't have permission.
