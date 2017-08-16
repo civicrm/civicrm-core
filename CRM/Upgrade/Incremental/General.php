@@ -85,10 +85,11 @@ class CRM_Upgrade_Incremental_General {
         if (version_compare(phpversion(), 5.4) < 0) {
           $date = CRM_Utils_Date::customFormat('2017-12-31', $dateFormat);
         }
-        $preUpgradeMessage .= ts('You may proceed with the upgrade and CiviCRM %1 will continue working normally, but PHP %2 will not work in releases published after %3. We recommend you use the most recent php version you can', array(
+        $preUpgradeMessage .= ts('You may proceed with the upgrade and CiviCRM %1 will continue working normally, but PHP %2 will not work in releases published after %3. We recommend you use the most recent php version you can. For more explanation see <a href="%4">the announcement</a>', array(
           1 => $currentVer,
           2 => phpversion(),
           3 => $date,
+          4 => 'https://civicrm.org/blog/totten/end-of-zombies-php-53-and-54',
         ));
       }
       $preUpgradeMessage .= '</p>';

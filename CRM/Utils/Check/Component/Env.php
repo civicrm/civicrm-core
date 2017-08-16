@@ -76,11 +76,12 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
       }
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__,
-        ts('This system uses PHP version %1. CiviCRM can be installed on this version, However PHP version %1, will not work in releases published after %2, and version %3 is recommended.',
+        ts('This system uses PHP version %1. CiviCRM can be installed on this version. However PHP version %1 will not work in releases published after %2, and version %3 is recommended. For more explanation see <a href="%4"> the announcement</a>',
           array(
             1 => phpversion(),
             2 => $date,
             3 => CRM_Upgrade_Incremental_General::MIN_RECOMMENDED_PHP_VER,
+            4 => 'https://civicrm.org/blog/totten/end-of-zombies-php-53-and-54',
           )),
         ts('PHP Out-of-Date'),
         \Psr\Log\LogLevel::WARNING,
