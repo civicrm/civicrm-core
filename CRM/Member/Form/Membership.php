@@ -695,6 +695,13 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
 
       $this->assign('emailExists', $this->_memberEmail);
       $this->assign('displayName', $this->_memberDisplayName);
+
+      // CRM-20362 Considering billing address of the contact if any,
+      // If got null use default (primary email address).
+
+      list($form->_contributorDisplayName, $form->_contributorEmail) = CRM_Contact_BAO_Contact_Location::getBillingEmailDetails($this->_contactID);
+      $this->assign('billingEmailExists', $billingEmail);
+      $this->assign('billingDisplayName', $billingDisplayName);
     }
 
     $isRecur = FALSE;
@@ -1059,8 +1066,13 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       // & we should aim to move this function to the BAO layer in future.
       // however, we can assume that the contact_id passed in by the batch
       // function will be the recipient
+
+      // CRM-20362 Considering billing address of the contact if any,
+      // If got null use default (primary email address).
+
       list($form->_contributorDisplayName, $form->_contributorEmail)
-        = CRM_Contact_BAO_Contact_Location::getEmailDetails($formValues['contact_id']);
+        = CRM_Contact_BAO_Contact_Location::getBillingEmailDetails($formValues['contact_id']);
+
       if (empty($form->_receiptContactId) || $isBatchProcess) {
         $form->_receiptContactId = $formValues['contact_id'];
       }

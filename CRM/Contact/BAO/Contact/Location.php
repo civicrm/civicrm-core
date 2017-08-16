@@ -73,6 +73,41 @@ WHERE     civicrm_contact.id = %1";
   }
 
   /**
+   * CRM-20362 retriving Billing email address.
+   * Get the display name, billing email, location type and location id of a contact.
+   *
+   * @param int $id
+   *   Id of the contact.
+   *
+   * @param bool $fallBackToPrimary
+   *  In case billing address not found, return primary email address.
+   *  Default value is TRUE.
+   *
+   * @return array
+   *   Array of display_name, email, location type and location id if found, or (null,null,null, null)
+   */
+  public static function getBillingEmailDetails($id, $fallBackToPrimary = TRUE) {
+    $sql = "
+SELECT    civicrm_contact.display_name,
+          civicrm_email.email,
+          civicrm_email.location_type_id,
+          civicrm_email.id
+FROM      civicrm_contact
+JOIN civicrm_email ON ( civicrm_contact.id = civicrm_email.contact_id AND civicrm_email.is_billing = 1)
+WHERE     civicrm_contact.id = %1";
+
+    $params = array(1 => array($id, 'Integer'));
+    $dao = CRM_Core_DAO::executeQuery($sql, $params);
+    if ($dao->fetch()) {
+      return array($dao->display_name, $dao->email, $dao->location_type_id, $dao->id);
+    }
+    if ($fallBackToPrimary) {
+      return self::getEmailDetails($id);
+    }
+    return array(NULL, NULL, NULL, NULL);
+  }
+
+  /**
    * Get the sms number and display name of a contact.
    *
    * @param int $id
