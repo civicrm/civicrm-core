@@ -9,7 +9,7 @@
  * @package CiviCRM
  * @group headless
  */
-class CRM_Contribution_Import_Parser_ContributionTest extends CiviUnitTestCase {
+class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
   protected $_tablesToTruncate = array();
   /**
    * Setup function.
