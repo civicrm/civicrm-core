@@ -412,6 +412,7 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
   public function upgrade_4_7_25($rev) {
     $this->addTask("CRM-20927 - Add column to 'civicrm_menu' for additional metadata", 'addColumn',
       'civicrm_menu', 'module_data', "text COMMENT 'All other menu metadata not stored in other fields'");
+    $this->addTask('CRM-21052 - Determine activity revision policy', 'pickActivityRevisionPolicy');
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
   }
 
@@ -1197,6 +1198,13 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
     CRM_Core_DAO::executeQuery("ALTER TABLE `civicrm_action_schedule`
       CHANGE `mapping_id` `mapping_id` varchar(64) COLLATE
       utf8_unicode_ci DEFAULT NULL COMMENT 'Name/ID of the mapping to use on this table'");
+    return TRUE;
+  }
+
+  public static function pickActivityRevisionPolicy(CRM_Queue_TaskContext $ctx) {
+    // CRM-21052 - If site is using activity revisions, continue doing so. Otherwise, switch out.
+    $count = CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_activity WHERE is_current_revision = 0 OR original_id IS NOT NULL');
+    Civi::settings()->set('civicaseActivityRevisions', $count > 0);
     return TRUE;
   }
 

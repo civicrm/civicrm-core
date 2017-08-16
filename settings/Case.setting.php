@@ -106,7 +106,7 @@ return array(
     'name' => 'civicaseActivityRevisions',
     'type' => 'Boolean',
     'quick_form_type' => 'YesNo',
-    'default' => TRUE,
+    'default' => FALSE,
     'html_type' => 'radio',
     'add' => '4.7',
     'title' => 'Enable Embedded Activity Revisions',
