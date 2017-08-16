@@ -1088,7 +1088,7 @@ FROM   civicrm_domain
       empty($searchValue) ||
       trim(strtolower($searchValue)) == 'null'
     ) {
-      // adding this year since developers forget to check for an id
+      // adding this here since developers forget to check for an id
       // or for the 'null' (which is a bad DAO kludge)
       // and hence we get the first value in the db
       CRM_Core_Error::fatal();
