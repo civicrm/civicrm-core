@@ -125,20 +125,24 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
 
       $cancelURL = CRM_Utils_System::url('civicrm/admin/messageTemplates', "selectedChild={$selectedChild}&reset=1");
       $cancelURL = str_replace('&amp;', '&', $cancelURL);
-      $this->addButtons(
-        array(
-          array(
-            'type' => 'upload',
-            'name' => $this->_action & CRM_Core_Action::DELETE ? ts('Delete') : ts('Save'),
-            'isDefault' => TRUE,
-          ),
-          array(
-            'type' => 'cancel',
-            'name' => ts('Cancel'),
-            'js' => array('onclick' => "location.href='{$cancelURL}'; return false;"),
-          ),
-        )
+      $buttons[] = array(
+        'type' => 'upload',
+        'name' => $this->_action & CRM_Core_Action::DELETE ? ts('Delete') : ts('Save'),
+        'isDefault' => TRUE,
       );
+      if (!($this->_action & CRM_Core_Action::DELETE)) {
+        $buttons[] = array(
+          'type' => 'submit',
+          'name' => ts('Save and Done'),
+          'subName' => 'done',
+        );
+      }
+      $buttons[] = array(
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+        'js' => array('onclick' => "location.href='{$cancelURL}'; return false;"),
+      );
+      $this->addButtons($buttons);
     }
 
     if ($this->_action & CRM_Core_Action::DELETE) {
@@ -296,12 +300,13 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
       $messageTemplate = CRM_Core_BAO_MessageTemplate::add($params);
       CRM_Core_Session::setStatus(ts('The Message Template \'%1\' has been saved.', array(1 => $messageTemplate->msg_title)), ts('Saved'), 'success');
 
+      if (isset($params['_qf_MessageTemplates_upload'])) {
+        CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/admin/messageTemplates/add', "action=update&id={$messageTemplate->id}&reset=1"));
+      }
       if ($this->_workflow_id) {
         CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/admin/messageTemplates', 'selectedChild=workflow&reset=1'));
       }
-      else {
-        CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/admin/messageTemplates', 'selectedChild=user&reset=1'));
-      }
+      CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/admin/messageTemplates', 'selectedChild=user&reset=1'));
     }
   }
 
