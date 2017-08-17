@@ -301,11 +301,11 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
       }
       try {
         $financialTypeAccount = CRM_Financial_BAO_FinancialTypeAccount::add($params, $ids);
+        CRM_Core_Session::setStatus(ts('The financial type Account has been saved.'), ts('Saved'), 'success');
       }
       catch (CRM_Core_Exception $e) {
         CRM_Core_Error::statusBounce($e->getMessage());
       }
-      CRM_Core_Session::setStatus(ts('The financial type Account has been saved.'));
     }
 
     $buttonName = $this->controller->getButtonName();
