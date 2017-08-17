@@ -121,6 +121,7 @@ class CRM_ACL_Page_EntityRole extends CRM_Core_Page_Basic {
 
     // finally browse the acl's
     if ($this->_action & CRM_Core_Action::BROWSE) {
+      $this->browse();
     }
 
     // This replaces parent run, but do parent's parent run
