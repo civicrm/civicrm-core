@@ -52,6 +52,11 @@ class api_v3_CaseTest extends CiviCaseTestCase {
   protected $_caseActivityId;
 
   /**
+   * @var \Civi\Core\SettingsStack
+   */
+  protected $settingsStack;
+
+  /**
    * Test setup for every test.
    *
    * Connect to the database, truncate the tables that will be used
@@ -75,6 +80,13 @@ class api_v3_CaseTest extends CiviCaseTestCase {
       'subject' => 'Test case',
       'contact_id' => 17,
     );
+
+    $this->settingsStack = new \Civi\Core\SettingsStack();
+  }
+
+  public function tearDown() {
+    $this->settingsStack->popAll();
+    parent::tearDown();
   }
 
   /**
@@ -388,7 +400,9 @@ class api_v3_CaseTest extends CiviCaseTestCase {
   /**
    * Test activity api update for case activities.
    */
-  public function testCaseActivityUpdate() {
+  public function testCaseActivityUpdate_Tracked() {
+    $this->settingsStack->push('civicaseActivityRevisions', TRUE);
+
     // Need to create the case and activity before we can update it
     $this->testCaseActivityCreate();
 
@@ -427,7 +441,45 @@ class api_v3_CaseTest extends CiviCaseTestCase {
     //TODO: check some more things
   }
 
+  /**
+   * If you disable `civicaseActivityRevisions`, then editing an activity
+   * will *not* create or change IDs.
+   */
+  public function testCaseActivityUpdate_Untracked() {
+    $this->settingsStack->push('civicaseActivityRevisions', FALSE);
+
+    //  Need to create the case and activity before we can update it
+    $this->testCaseActivityCreate();
+
+    $oldIDs = CRM_Utils_SQL_Select::from('civicrm_activity')
+      ->select('id, original_id, is_current_revision')
+      ->orderBy('id')
+      ->execute()->fetchAll();
+
+    $params = array(
+      'activity_id' => $this->_caseActivityId,
+      'case_id' => 1,
+      'activity_type_id' => 14,
+      'source_contact_id' => $this->_loggedInUser,
+      'subject' => 'New subject',
+    );
+    $result = $this->callAPISuccess('activity', 'create', $params);
+    $this->assertEquals($result['values'][$result['id']]['subject'], $params['subject']);
+
+    // id should not change because we've opted out.
+    $this->assertEquals($this->_caseActivityId, $result['values'][$result['id']]['id']);
+    $this->assertEmpty($result['values'][$result['id']]['original_id']);
+
+    $newIDs = CRM_Utils_SQL_Select::from('civicrm_activity')
+      ->select('id, original_id, is_current_revision')
+      ->orderBy('id')
+      ->execute()->fetchAll();
+    $this->assertEquals($oldIDs, $newIDs);
+  }
+
   public function testCaseActivityUpdateCustom() {
+    $this->settingsStack->push('civicaseActivityRevisions', TRUE);
+
     // Create a case first
     $result = $this->callAPISuccess('case', 'create', $this->_params);
 
@@ -698,9 +750,12 @@ class api_v3_CaseTest extends CiviCaseTestCase {
    *
    * See the case.addtimeline api.
    *
+   * @dataProvider caseActivityRevisionExamples
    * @throws \Exception
    */
-  public function testCaseAddtimeline() {
+  public function testCaseAddtimeline($enableRevisions) {
+    $this->settingsStack->push('civicaseActivityRevisions', $enableRevisions);
+
     $caseSpec = array(
       'title' => 'Application with Definition',
       'name' => 'Application_with_Definition',
@@ -785,6 +840,13 @@ class api_v3_CaseTest extends CiviCaseTestCase {
 
     $result = $this->callAPISuccess('Case', 'getsingle', array('id' => $case2['id']));
     $this->assertEquals(1, $result['is_deleted']);
+  }
+
+  public function caseActivityRevisionExamples() {
+    $examples = array();
+    $examples[] = array(FALSE);
+    $examples[] = array(TRUE);
+    return $examples;
   }
 
 }
