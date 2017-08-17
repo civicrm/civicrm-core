@@ -4,7 +4,12 @@ namespace Civi\Core;
 /**
  * Class SettingsStack
  *
- * The settings stack allows you to temporarily apply settings.
+ * The settings stack allows you to temporarily change (then restore) settings. It's intended
+ * primarily for use in testing.
+ *
+ * Like the global `$civicrm_setting` variable, it works best with typical inert settings that
+ * do not trigger extra activation logic. A handful of settings (such as `enable_components`
+ * and ~5 others)
  *
  * @package Civi\Core
  */
