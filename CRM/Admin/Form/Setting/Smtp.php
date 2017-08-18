@@ -166,7 +166,10 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
         $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
         $result = $mailer->send($toEmail, $headers, $message);
         unset($errorScope);
-        if (!is_a($result, 'PEAR_Error')) {
+        if (defined('CIVICRM_MAIL_LOG')) {
+          CRM_Core_Session::setStatus($testMailStatusMsg . ts('You have defined CIVICRM_MAIL_LOG - no mail will be sent.  Your %1 settings have not been tested.', array(1 => strtoupper($mailerName))), ts("Mail not sent"), "warning");
+        }
+        elseif (!is_a($result, 'PEAR_Error')) {
           CRM_Core_Session::setStatus($testMailStatusMsg . ts('Your %1 settings are correct. A test email has been sent to your email address.', array(1 => strtoupper($mailerName))), ts("Mail Sent"), "success");
         }
         else {
