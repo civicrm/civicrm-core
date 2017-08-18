@@ -60,10 +60,6 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
    * The default values are retrieved from the database.
    */
   public function setDefaultValues() {
-    if ($this->_flagSubmitted) {
-      return NULL;
-    }
-
     $defaults = $this->_values;
 
     if (empty($defaults['pdf_format_id'])) {
@@ -93,10 +89,6 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
    * Build the form object.
    */
   public function buildQuickForm() {
-    if ($this->_flagSubmitted) {
-      return;
-    }
-
     // For VIEW we only want Done button
     if ($this->_action & CRM_Core_Action::VIEW) {
       // currently, the above action is used solely for previewing default workflow templates
@@ -214,7 +206,6 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
     );
 
     $this->add('checkbox', 'is_active', ts('Enabled?'));
-
     $this->addFormRule(array(__CLASS__, 'formRule'), $this);
 
     if ($this->_action & CRM_Core_Action::VIEW) {
@@ -236,13 +227,11 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
    *   array of errors
    */
   public static function formRule($params, $files, $self) {
-    $errors = array();
-
     // If user uploads non-document file other than odt/docx
     if (!empty($files['file_id']['tmp_name']) &&
       array_search($files['file_id']['type'], CRM_Core_SelectValues::documentApplicationType()) == NULL
     ) {
-      $error['file_id'] = ts('Invalid document file format');
+      $errors['file_id'] = ts('Invalid document file format');
     }
     // If default is not set and no document file is uploaded
     elseif (empty($files['file_id']['tmp_name']) && !empty($params['file_type']) && !$self->_is_document) {
@@ -250,7 +239,7 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
       $errors['file_id'] = ts('Please upload document');
     }
 
-    return $errors;
+    return empty($errors) ? TRUE : $errors;
   }
 
   /**
@@ -266,7 +255,7 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
     }
     else {
       // store the submitted values in an array
-      $params = $this->_submitValues;
+      $params = $this->controller->exportValues();
 
       if ($this->_action & CRM_Core_Action::UPDATE) {
         $params['id'] = $this->_id;
@@ -300,9 +289,11 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
       $messageTemplate = CRM_Core_BAO_MessageTemplate::add($params);
       CRM_Core_Session::setStatus(ts('The Message Template \'%1\' has been saved.', array(1 => $messageTemplate->msg_title)), ts('Saved'), 'success');
 
-      if (isset($params['_qf_MessageTemplates_upload'])) {
+      if (isset($this->_submitValues['_qf_MessageTemplates_upload'])) {
+        // Save button was pressed
         CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/admin/messageTemplates/add', "action=update&id={$messageTemplate->id}&reset=1"));
       }
+      // Save and done button was pressed
       if ($this->_workflow_id) {
         CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/admin/messageTemplates', 'selectedChild=workflow&reset=1'));
       }
