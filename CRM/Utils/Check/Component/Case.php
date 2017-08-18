@@ -32,6 +32,8 @@
  */
 class CRM_Utils_Check_Component_Case extends CRM_Utils_Check_Component {
 
+  const DOCTOR_WHEN = 'https://github.com/civicrm/org.civicrm.doctorwhen';
+
   /**
    * @var CRM_Case_XMLRepository
    */
@@ -111,6 +113,50 @@ class CRM_Utils_Check_Component_Case extends CRM_Utils_Check_Component {
       elseif (!$normalFile && !$mungedFile) {
         // ok -- probably a new or DB-based CaseType
       }
+    }
+
+    return $messages;
+  }
+
+  /**
+   * Check that the timestamp columns are populated. (CRM-20958)
+   *
+   * @return array<CRM_Utils_Check_Message>
+   *   An empty array, or a list of warnings
+   */
+  public function checkNullTimestamps() {
+    $messages = array();
+
+    $nullCount = 0;
+    $nullCount += CRM_Utils_SQL_Select::from('civicrm_activity')
+      ->where('created_date IS NULL OR modified_date IS NULL')
+      ->select('COUNT(*)')
+      ->execute()
+      ->fetchValue();
+    $nullCount += CRM_Utils_SQL_Select::from('civicrm_case')
+      ->where('created_date IS NULL OR modified_date IS NULL')
+      ->select('COUNT(*)')
+      ->execute()
+      ->fetchValue();
+
+    if ($nullCount > 0) {
+      $messages[] = new CRM_Utils_Check_Message(
+        __FUNCTION__,
+        '<p>' .
+        ts('The tables "<em>civicrm_activity</em>" and "<em>civicrm_case</em>" were updated to support two new fields, "<em>created_date</em>" and "<em>modified_date</em>". For historical data, these fields may appear blank. (%1 records have NULL timestamps.)', array(
+          1 => $nullCount,
+        )) .
+        '</p><p>' .
+        ts('At time of writing, this is not a problem. However, future extensions and improvements could rely on these fields, so it may be useful to back-fill them.') .
+        '</p><p>' .
+        ts('For further discussion, please visit %1', array(
+          1 => sprintf('<a href="%s" target="_blank">%s</a>', self::DOCTOR_WHEN, self::DOCTOR_WHEN),
+        )) .
+        '</p>',
+        ts('Timestamps for Activities and Cases'),
+        \Psr\Log\LogLevel::NOTICE,
+        'fa-clock-o'
+      );
     }
 
     return $messages;
