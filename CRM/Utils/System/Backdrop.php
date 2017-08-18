@@ -34,7 +34,7 @@
 /**
  * Backdrop-specific logic that differs from Drupal.
  */
-class CRM_Utils_System_Backdrop extends CRM_Utils_System_DrupalBase {
+class CRM_Utils_System_Backdrop extends CRM_Utils_System_BackdropBase {
 
   /**
    * @inheritDoc
@@ -73,12 +73,12 @@ class CRM_Utils_System_Backdrop extends CRM_Utils_System_DrupalBase {
     // we also need to redirect b
     $config->inCiviCRM = TRUE;
 
-    $form = drupal_retrieve_form('user_register_form', $form_state);
+    $form = backdrop_retrieve_form('user_register_form', $form_state);
     $form_state['process_input'] = 1;
     $form_state['submitted'] = 1;
     $form['#array_parents'] = array();
     $form['#tree'] = FALSE;
-    drupal_process_form('user_register_form', $form, $form_state);
+    backdrop_process_form('user_register_form', $form, $form_state);
 
     $config->inCiviCRM = FALSE;
 
@@ -164,7 +164,7 @@ class CRM_Utils_System_Backdrop extends CRM_Utils_System_DrupalBase {
         $pageTitle = $title;
       }
 
-      drupal_set_title($pageTitle, PASS_THROUGH);
+      backdrop_set_title($pageTitle, PASS_THROUGH);
     }
   }
 
@@ -172,7 +172,7 @@ class CRM_Utils_System_Backdrop extends CRM_Utils_System_DrupalBase {
    * @inheritDoc
    */
   public function appendBreadCrumb($breadCrumbs) {
-    $breadCrumb = drupal_get_breadcrumb();
+    $breadCrumb = backdrop_get_breadcrumb();
 
     if (is_array($breadCrumbs)) {
       foreach ($breadCrumbs as $crumbs) {
@@ -190,7 +190,7 @@ class CRM_Utils_System_Backdrop extends CRM_Utils_System_DrupalBase {
         $breadCrumb[] = "<a href=\"{$crumbs['url']}\">{$crumbs['title']}</a>";
       }
     }
-    drupal_set_breadcrumb($breadCrumb);
+    backdrop_set_breadcrumb($breadCrumb);
   }
 
   /**
@@ -198,7 +198,7 @@ class CRM_Utils_System_Backdrop extends CRM_Utils_System_DrupalBase {
    */
   public function resetBreadCrumb() {
     $bc = array();
-    drupal_set_breadcrumb($bc);
+    backdrop_set_breadcrumb($bc);
   }
 
   /**
@@ -212,7 +212,7 @@ class CRM_Utils_System_Backdrop extends CRM_Utils_System_DrupalBase {
         '#type' => 'markup',
         '#markup' => $header,
       );
-      drupal_add_html_head($data, $key);
+      backdrop_add_html_head($data, $key);
     }
   }
 
@@ -232,7 +232,7 @@ class CRM_Utils_System_Backdrop extends CRM_Utils_System_DrupalBase {
     }
     // If the path is within the drupal directory we can use the more efficient 'file' setting
     $params['type'] = $this->formatResourceUrl($url) ? 'file' : 'external';
-    drupal_add_js($url, $params);
+    backdrop_add_js($url, $params);
     return TRUE;
   }
 
@@ -250,7 +250,7 @@ class CRM_Utils_System_Backdrop extends CRM_Utils_System_DrupalBase {
       default:
         return FALSE;
     }
-    drupal_add_js($code, $params);
+    backdrop_add_js($code, $params);
     return TRUE;
   }
 
@@ -264,7 +264,7 @@ class CRM_Utils_System_Backdrop extends CRM_Utils_System_DrupalBase {
     $params = array();
     // If the path is within the drupal directory we can use the more efficient 'file' setting
     $params['type'] = $this->formatResourceUrl($url) ? 'file' : 'external';
-    drupal_add_css($url, $params);
+    backdrop_add_css($url, $params);
     return TRUE;
   }
 
@@ -276,7 +276,7 @@ class CRM_Utils_System_Backdrop extends CRM_Utils_System_DrupalBase {
       return FALSE;
     }
     $params = array('type' => 'inline');
-    drupal_add_css($code, $params);
+    backdrop_add_css($code, $params);
     return TRUE;
   }
 
