@@ -108,12 +108,6 @@ class CRM_Contact_Task {
           ),
           'result' => FALSE,
         ),
-        self::EMAIL_CONTACTS => array(
-          'title' => ts('Email - send now (to 50 or less)'),
-          'class' => 'CRM_Contact_Form_Task_Email',
-          'result' => TRUE,
-          'url' => 'civicrm/task/send-email',
-        ),
         self::DELETE_CONTACTS => array(
           'title' => ts('Delete contacts'),
           'class' => 'CRM_Contact_Form_Task_Delete',
@@ -180,6 +174,14 @@ class CRM_Contact_Task {
           'class' => 'CRM_Contact_Form_Task_Delete',
           'result' => FALSE,
         ),
+      );
+
+      $maxEmailKillSwitch = Civi::settings()->get('max_emails_kill_switch');
+      self::$_tasks[self::EMAIL_CONTACTS] = array(
+        'title' => ts('Email - send now (to ' . $maxEmailKillSwitch . ' or less)'),
+        'class' => 'CRM_Contact_Form_Task_Email',
+        'result' => TRUE,
+        'url' => 'civicrm/task/send-email',
       );
 
       //CRM-16329, if SMS provider is configured show sms action.
