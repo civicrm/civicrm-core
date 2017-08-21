@@ -455,36 +455,16 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     }
 
     $affected = array_merge(array_keys($cidRefs), array_keys($eidRefs));
-    if ($tables !== FALSE) {
-      // if there are specific tables, sanitize the list
-      $affected = array_unique(array_intersect($affected, $tables));
+
+    // if there aren't any specific tables, don't affect the ones handled by relTables()
+    // also don't affect tables in locTables() CRM-15658
+    $relTables = self::relTables();
+    $handled = self::locTables();
+
+    foreach ($relTables as $params) {
+      $handled = array_merge($handled, $params['tables']);
     }
-    else {
-      // if there aren't any specific tables, don't affect the ones handled by relTables()
-      // also don't affect tables in locTables() CRM-15658
-      $relTables = self::relTables();
-      $handled = self::locTables();
-      foreach ($relTables as $params) {
-        $handled = array_merge($handled, $params['tables']);
-      }
-      $affected = array_diff($affected, $handled);
-      /**
-       * CRM-12695
-       * Set $membershipMerge flag only once
-       * while doing contact related migration
-       * to call addMembershipToRealtedContacts()
-       * function only once.
-       * Since the current function (moveContactBelongings) is called twice
-       * with & without parameters $tables & $tableOperations
-       */
-      // retrieve main contact's related table(s)
-      $activeMainRelTables = CRM_Dedupe_Merger::getActiveRelTables($mainId);
-      // check if membership table exists in main contact's related table(s)
-      // set membership flag - CRM-12695
-      if (in_array('rel_table_memberships', $activeMainRelTables)) {
-        $membershipMerge = TRUE;
-      }
-    }
+    $affected = array_diff($affected, $handled);
 
     $mainId = (int) $mainId;
     $otherId = (int) $otherId;
@@ -547,11 +527,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     foreach ($sqls as $sql) {
       CRM_Core_DAO::executeQuery($sql, array(), TRUE, NULL, TRUE);
     }
-    // CRM-12695
-    if ($membershipMerge) {
-      // call to function adding membership to related contacts
-      CRM_Dedupe_Merger::addMembershipToRealtedContacts($mainId);
-    }
+    CRM_Dedupe_Merger::addMembershipToRealtedContacts($mainId);
     $transaction->commit();
   }
 
@@ -1539,15 +1515,10 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     }
     self::mergeLocations($mainId, $otherId, $locationMigrationInfo, $migrationInfo);
 
-    // **** Do tables related migrations
-    if (!empty($moveTables)) {
-      CRM_Dedupe_Merger::moveContactBelongings($mainId, $otherId, $moveTables, $tableOperations);
-      unset($moveTables, $tableOperations);
-    }
-
     // **** Do contact related migrations
     $customTablesToCopyValues = self::getAffectedCustomTables($submittedCustomFields);
-    CRM_Dedupe_Merger::moveContactBelongings($mainId, $otherId, FALSE, array(), $customTablesToCopyValues);
+    CRM_Dedupe_Merger::moveContactBelongings($mainId, $otherId, $moveTables, $tableOperations, $customTablesToCopyValues);
+    unset($moveTables, $tableOperations);
 
     // FIXME: fix gender, prefix and postfix, so they're edible by createProfileContact()
     $names['gender'] = array('newName' => 'gender_id', 'groupName' => 'gender');
