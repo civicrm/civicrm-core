@@ -51,20 +51,13 @@ class CRM_Utils_Crypt {
     if (empty($string)) {
       return $string;
     }
-
-    if (function_exists('mcrypt_module_open') &&
-      defined('CIVICRM_SITE_KEY')
-    ) {
-      $td = mcrypt_module_open(MCRYPT_RIJNDAEL_256, '', MCRYPT_MODE_ECB, '');
-      // ECB mode - iv not needed - CRM-8198
-      $iv = '00000000000000000000000000000000';
-      $ks = mcrypt_enc_get_key_size($td);
-      $key = substr(sha1(CIVICRM_SITE_KEY), 0, $ks);
-
-      mcrypt_generic_init($td, $key, $iv);
-      $string = mcrypt_generic($td, $string);
-      mcrypt_generic_deinit($td);
-      mcrypt_module_close($td);
+    if (defined('CIVICRM_SITE_KEY') && function_exists('openssl_encrypt')) {
+      $raw = defined('OPENSSL_RAW_DATA') ? OPENSSL_RAW_DATA : TRUE;
+      $key = openssl_digest(CIVICRM_SITE_KEY, 'sha256');
+      $method = 'AES-256-ECB';
+      $ivSize = 0;
+      $iv = substr($key, 0, $ivSize);
+      $string = openssl_encrypt($string, $method, $key, $raw, $iv);
     }
     return base64_encode($string);
   }
@@ -77,11 +70,13 @@ class CRM_Utils_Crypt {
    *
    * @param string $string
    *   Ciphertext to be decrypted.
+   * @param bool $useMcrypt
+   *   Should we use the mcrypt methods of decryption
    * @return string
    *   Plaintext, or base64-decoded ciphertext if encryption is disabled or
    *   unavailable.
    */
-  public static function decrypt($string) {
+  public static function decrypt($string, $useMcrypt = FALSE) {
     if (empty($string)) {
       return $string;
     }
@@ -90,22 +85,29 @@ class CRM_Utils_Crypt {
     if (empty($string)) {
       return $string;
     }
+    if (defined('CIVICRM_SITE_KEY')) {
+      if (!$useMcrypt && function_exists('openssl_decrypt')) {
+        $raw = defined('OPENSSL_RAW_DATA') ? OPENSSL_RAW_DATA : TRUE;
+        $key = openssl_digest(CIVICRM_SITE_KEY, 'sha256');
+        $method = 'AES-256-ECB';
+        $ivSize = 0;
+        $iv = substr($string, 0, $ivSize);
+        $data = substr($string, $ivSize);
+        $string = openssl_decrypt($data, $method, $key, $raw, $iv);
+      }
+      elseif (function_exists('mcrypt_module_open')) {
+        $td = mcrypt_module_open(MCRYPT_RIJNDAEL_256, '', MCRYPT_MODE_ECB, '');
+        // ECB mode - iv not needed - CRM-8198
+        $iv = '00000000000000000000000000000000';
+        $ks = mcrypt_enc_get_key_size($td);
+        $key = substr(sha1(CIVICRM_SITE_KEY), 0, $ks);
 
-    if (function_exists('mcrypt_module_open') &&
-      defined('CIVICRM_SITE_KEY')
-    ) {
-      $td = mcrypt_module_open(MCRYPT_RIJNDAEL_256, '', MCRYPT_MODE_ECB, '');
-      // ECB mode - iv not needed - CRM-8198
-      $iv = '00000000000000000000000000000000';
-      $ks = mcrypt_enc_get_key_size($td);
-      $key = substr(sha1(CIVICRM_SITE_KEY), 0, $ks);
-
-      mcrypt_generic_init($td, $key, $iv);
-      $string = rtrim(mdecrypt_generic($td, $string));
-      mcrypt_generic_deinit($td);
-      mcrypt_module_close($td);
+        mcrypt_generic_init($td, $key, $iv);
+        $string = rtrim(mdecrypt_generic($td, $string));
+        mcrypt_generic_deinit($td);
+        mcrypt_module_close($td);
+      }
     }
-
     return $string;
   }
 
