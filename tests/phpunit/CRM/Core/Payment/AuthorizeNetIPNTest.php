@@ -56,11 +56,11 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
     // has is_email_receipt set to 0. 
 		$form = new CRM_Contribute_Form_Contribution();
     $form->_mode = 'Live';
-		$form->testSubmit(array(
+		$contribution = $form->testSubmit(array(
 			'total_amount' => 200,
 			'financial_type_id' => 1,
-			'receive_date' => '04/21/2015',
-			'receive_date_time' => '11:27PM',
+			'receive_date' => date('m/d/Y'),
+			'receive_date_time' => date('H:i:s'),
 			'contact_id' => $this->_contactID,
 			'contribution_status_id' => 1,
 			'credit_card_number' => 4444333322221111,
@@ -73,7 +73,7 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
 			'billing_first_name' => 'Junko',
 			'billing_middle_name' => '',
 			'billing_last_name' => 'Adams',
-			'billing_street_address-5' => '790L Lincoln St S',
+			'billing_street_address-5' => rand() . ' Lincoln St S',
 			'billing_city-5' => 'Maryknoll',
 			'billing_state_province_id-5' => 1031,
 			'billing_postal_code-5' => 10545,
@@ -87,15 +87,28 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
 			'currency' => 'USD',
 			'source' => 'bob sled race',
       'contribution_page_id' => $this->_contributionPageID,
+      'is_recur' => TRUE,
 		), CRM_Core_Action::ADD);
 
+
+    $this->_contributionID = $contribution->id;
+    $this->_contributionRecurID = $contribution->contribution_recur_id;
+    $recur_params = array(
+      'id' => $this->_contributionRecurID,
+      'return' => 'processor_id'
+    );
+    $processor_id = civicrm_api3('ContributionRecur', 'getvalue', $recur_params);
 		// Process the initial one.
-    $IPN = new CRM_Core_Payment_AuthorizeNetIPN($this->getRecurTransaction());
+    $IPN = new CRM_Core_Payment_AuthorizeNetIPN(
+      $this->getRecurTransaction(array('x_subscription_id' => $processor_id))
+    );
     $IPN->main();
 
     // Now send a second one (authorize seems to treat first and second contributions
     // differently.
-    $IPN = new CRM_Core_Payment_AuthorizeNetIPN($this->getRecurSubsequentTransaction());
+    $IPN = new CRM_Core_Payment_AuthorizeNetIPN($this->getRecurSubsequentTransaction(
+      array('x_subscription_id' => $processor_id)
+    ));
     $IPN->main();
 
     // There should not be any email.
@@ -348,11 +361,11 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function getRecurSubsequentTransaction() {
+  public function getRecurSubsequentTransaction($params) {
     return array_merge($this->getRecurTransaction(), array(
       'x_trans_id' => 'second_one',
       'x_MD5_Hash' => 'EA7A3CD65A85757827F51212CA1486A8',
-    ));
+    ), $params);
   }
 
 }
