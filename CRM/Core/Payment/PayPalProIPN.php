@@ -170,14 +170,6 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
       return FALSE;
     }
 
-    if ($input['txnType'] == 'recurring_payment' &&
-      $input['paymentStatus'] != 'Completed'
-    ) {
-      CRM_Core_Error::debug_log_message("Ignore all IPN payments that are not completed");
-      echo "Failure: Invalid parameters<p>";
-      return FALSE;
-    }
-
     $recur = &$objects['contributionRecur'];
 
     // make sure the invoice ids match
@@ -245,7 +237,19 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
           $recur->start_date = $now;
         }
         else {
-          $recur->modified_date = $now;
+          $input['invoice_id'] = md5(uniqid(rand(), TRUE));
+          $input['original_contribution_id'] = $ids['contribution'];
+          $input['contribution_recur_id'] = $ids['contributionRecur'];
+
+          if ($input['paymentStatus'] != 'Completed') {
+            throw new CRM_Core_Exception("Ignore all IPN payments that are not completed");
+          }
+          // In future moving to create pending & then complete, but this OK for now.
+          // Also consider accepting 'Failed' like other processors.
+          $input['contribution_status_id'] = 1;
+
+          civicrm_api3('Contribution', 'repeattransaction', $input);
+          return;
         }
 
         //contribution installment is completed
@@ -310,6 +314,7 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
       $contribution->amount_level = $objects['contribution']->amount_level;
       $contribution->campaign_id = $objects['contribution']->campaign_id;
       $objects['contribution'] = &$contribution;
+      $contribution->invoice_id = md5(uniqid(rand(), TRUE));
     }
     // CRM-13737 - am not aware of any reason why payment_date would not be set - this if is a belt & braces
     $objects['contribution']->receive_date = !empty($input['payment_date']) ? date('YmdHis', strtotime($input['payment_date'])) : $now;
@@ -355,9 +360,6 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
     }
 
     $transaction = new CRM_Core_Transaction();
-
-    $participant = &$objects['participant'];
-    $membership = &$objects['membership'];
 
     $status = $input['paymentStatus'];
     if ($status == 'Denied' || $status == 'Failed' || $status == 'Voided') {
