@@ -104,7 +104,7 @@
             <div id="priceset" class="hiddenElement"></div>
           {/if}
 
-          {if $ppID}{ts}<a href='#' onclick='adjustPayment();'>adjust payment amount</a>{/ts}{help id="adjust-payment-amount"}{/if}
+          {if $ppID}{ts}<a class='action-item crm-hover-button' onclick='adjustPayment();'>adjust payment amount</a>{/ts}{help id="adjust-payment-amount"}{/if}
           <div id="totalAmountBlock">
             {if $hasPriceSets}<span class="description">{ts}Alternatively, you can use a price set.{/ts}</span>{/if}
             <div id="totalTaxAmount" class="label"></div>
