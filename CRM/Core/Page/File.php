@@ -43,7 +43,7 @@ class CRM_Core_Page_File extends CRM_Core_Page {
     $mimeType = CRM_Utils_Request::retrieve('mime-type', 'String', $this);
     $action = CRM_Utils_Request::retrieve('action', 'String', $this);
     $download = CRM_Utils_Request::retrieve('download', 'Integer', $this, FALSE, 1);
-    $disposition = $download === 0 ? 'inline' : 'download';
+    $disposition = $download == 0 ? 'inline' : 'download';
 
     // if we are not providing essential parameter needed for file preview then
     if (empty($fileName) && empty($mimeType)) {
