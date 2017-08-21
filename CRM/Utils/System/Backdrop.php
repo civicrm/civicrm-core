@@ -889,7 +889,7 @@ AND    u.status = 1
     // FIXME!!!!
     return array();
   }
-  
+
   /**
    * @inheritdoc
    */
@@ -910,7 +910,6 @@ AND    u.status = 1
       'path' => CRM_Utils_File::baseFilePath(),
     );
   }
-  
 
   /**
    * Determine if Backdrop multi-site applies to the current request -- and,
