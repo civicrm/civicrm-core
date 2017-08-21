@@ -1489,19 +1489,18 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       if ($value == $qfZeroBug) {
         $value = '0';
       }
-      if ((in_array(substr($key, 5), CRM_Dedupe_Merger::getContactFields()) ||
-          substr($key, 0, 12) == 'move_custom_') &&
-        $value != NULL
-      ) {
+
+      if (substr($key, 0, 12) == 'move_custom_' && $value != NULL) {
         $submitted[substr($key, 5)] = $value;
         $submittedCustomFields[] = substr($key, 12);
       }
-
+      elseif (in_array(substr($key, 5), CRM_Dedupe_Merger::getContactFields()) && $value != NULL) {
+        $submitted[substr($key, 5)] = $value;
+      }
       // Set up initial information for handling migration of location blocks
       elseif (substr($key, 0, 14) == 'move_location_' and $value != NULL) {
         $locationMigrationInfo[$key] = $value;
       }
-
       elseif (substr($key, 0, 15) == 'move_rel_table_' and $value == '1') {
         $moveTables = array_merge($moveTables, $relTables[substr($key, 5)]['tables']);
         if (array_key_exists('operation', $migrationInfo)) {
@@ -1777,28 +1776,15 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
     foreach ($customFieldIDs as $fieldID) {
       if (!empty($fieldID)) {
-        $customField = NULL;
-        try {
-          $customField = civicrm_api3('custom_field', 'getsingle', array(
-            'id' => $fieldID,
+        $customField = civicrm_api3('custom_field', 'getsingle', array(
+          'id' => $fieldID,
+          'is_active' => TRUE,
+        ));
+        if (!civicrm_error($customField) && !empty($customField['custom_group_id'])) {
+          $customGroup = civicrm_api3('custom_group', 'getsingle', array(
+            'id' => $customField['custom_group_id'],
             'is_active' => TRUE,
           ));
-        }
-        catch (CiviCRM_API3_Exception $e) {
-          continue;
-        }
-        if (!civicrm_error($customField) && !empty($customField['custom_group_id'])) {
-          $customGroup = NULL;
-          try {
-            $customGroup = civicrm_api3('custom_group', 'getsingle', array(
-              'id' => $customField['custom_group_id'],
-              'is_active' => TRUE,
-            ));
-          }
-          catch (CiviCRM_API3_Exception $e) {
-            // just ignore and continue
-            continue;
-          }
 
           if (!civicrm_error($customGroup) && !empty($customGroup['table_name'])) {
             $customTableToCopyValues[] = $customGroup['table_name'];
