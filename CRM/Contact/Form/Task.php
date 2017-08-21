@@ -459,7 +459,6 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
     // If contact list has changed, households will probably be at the end of
     // the list. Sort it again by sort_name.
     if (implode(',', $this->_contactIds) != $relID) {
-      $contact_sort = array();
       $result = civicrm_api3('Contact', 'get', array(
         'return' => array('id'),
         'id' => array('IN' => $this->_contactIds),
@@ -484,7 +483,6 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
     $searchParams = $this->controller->exportValues();
     if ($searchParams['radio_ts'] == 'ts_sel') {
       // Create a static group.
-
       $randID = md5(time() . rand(1, 1000)); // groups require a unique name
       $grpTitle = "Hidden Group {$randID}";
       $grpID = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $grpTitle, 'id', 'title');
@@ -509,7 +507,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
           'title' => $newGroupTitle,
           'group_type' => array('2' => 1),
         );
-        $group = CRM_Contact_BAO_Group::create($groupParams);
+        CRM_Contact_BAO_Group::create($groupParams);
       }
 
       // note at this point its a static group
@@ -517,7 +515,6 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
     }
     else {
       // Create a smart group.
-
       $ssId = $this->get('ssID');
       $hiddenSmartParams = array(
         'group_type' => array('2' => 1),
