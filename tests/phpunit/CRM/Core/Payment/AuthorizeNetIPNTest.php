@@ -46,7 +46,50 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
     );
     $this->callAPISuccess('contributionPage', 'update', $api_params);
 
-    $this->setupRecurringPaymentProcessorTransaction();
+		// Create initial recurring payment and initial contribution.
+		// Note - we can't use setupRecurringPaymentProcessorTransaction(), which
+    // would be convenient because it does not fully mimic the real user
+    // experience. Using setupRecurringPaymentProcessorTransaction() doesn't
+    // specify is_email_receipt so it is always set to 1. We need to more
+    // closely mimic what happens with a live transaction to test that
+    // is_email_receipt is not set to 1 if the originating contribution page
+    // has is_email_receipt set to 0. 
+		$form = new CRM_Contribute_Form_Contribution();
+    $form->_mode = 'Live';
+		$form->testSubmit(array(
+			'total_amount' => 200,
+			'financial_type_id' => 1,
+			'receive_date' => '04/21/2015',
+			'receive_date_time' => '11:27PM',
+			'contact_id' => $this->_contactID,
+			'contribution_status_id' => 1,
+			'credit_card_number' => 4444333322221111,
+			'cvv2' => 123,
+			'credit_card_exp_date' => array(
+				'M' => 9,
+				'Y' => 2025,
+			),
+			'credit_card_type' => 'Visa',
+			'billing_first_name' => 'Junko',
+			'billing_middle_name' => '',
+			'billing_last_name' => 'Adams',
+			'billing_street_address-5' => '790L Lincoln St S',
+			'billing_city-5' => 'Maryknoll',
+			'billing_state_province_id-5' => 1031,
+			'billing_postal_code-5' => 10545,
+			'billing_country_id-5' => 1228,
+			'frequency_interval' => 1,
+			'frequency_unit' => 'month',
+			'installments' => '',
+			'hidden_AdditionalDetail' => 1,
+			'hidden_Premium' => 1,
+			'payment_processor_id' => $this->_paymentProcessorID,
+			'currency' => 'USD',
+			'source' => 'bob sled race',
+      'contribution_page_id' => $this->_contributionPageID,
+		), CRM_Core_Action::ADD);
+
+		// Process the initial one.
     $IPN = new CRM_Core_Payment_AuthorizeNetIPN($this->getRecurTransaction());
     $IPN->main();
 
