@@ -109,7 +109,7 @@ class CRM_Contact_Task {
           'result' => FALSE,
         ),
         self::EMAIL_CONTACTS => array(
-          'title' => ts('Email - send now (to 50 or less)'),
+          'title' => ts('Email - send now (to %1 or less)', array(1 => Civi::settings()->get('simple_mail_limit'))),
           'class' => 'CRM_Contact_Form_Task_Email',
           'result' => TRUE,
           'url' => 'civicrm/task/send-email',
