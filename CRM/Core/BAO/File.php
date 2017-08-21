@@ -97,7 +97,7 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File {
     $mimeType = NULL
   ) {
     if (!$mimeType) {
-      CRM_Core_Error::fatal(ts('Mime Type is now a required parameter'));
+      CRM_Core_Error::statusBounce(ts('Mime Type is now a required parameter for file upload'));
     }
 
     $config = CRM_Core_Config::singleton();
@@ -116,7 +116,7 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File {
     CRM_Utils_File::createDir($directoryName);
 
     if (!rename($data, $directoryName . DIRECTORY_SEPARATOR . $filename)) {
-      CRM_Core_Error::fatal(ts('Could not move custom file to custom upload directory'));
+      CRM_Core_Error::statusBounce(ts('Could not move custom file to custom upload directory'));
     }
 
     // to get id's
