@@ -111,4 +111,18 @@ class CRM_Utils_Crypt {
     return $string;
   }
 
+  /**
+   * Convert a Mcrypted sring into one of a openssl encryption
+   * @param string $string base64 encoded mcrypt encoded string
+   * @return string - basee64 encoded OpenSSL string
+   */
+  public static function convertMcryptToOpenSSL($string = NULL) {
+    if (empty($string)) {
+      return $string;
+    }
+    $decodedString = self::decrypt($string, TRUE);
+    $encodedString = self::encrypt($decodedString);
+    return $encodedString;
+  }
+
 }

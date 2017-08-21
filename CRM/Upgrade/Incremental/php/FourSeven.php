@@ -1223,8 +1223,7 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
     foreach ($mailingInfo as $mailing) {
       $values = unserialize($mailing['value']);
       if (!empty($values['smtpPassword'])) {
-        $password = CRM_Utils_Crypt::decrypt($values['smtpPassword'], TRUE);
-        $values['smtpPassword'] = CRM_Utils_Crypt::encrypt($password);
+        $values['smtpPassword'] = CRM_Utils_Crypt::convertMcryptToOpenSSL($values['smtpPassword']);
         $values = serialize($values);
         CRM_Core_DAO::executeQuery("UPDATE civicrm_setting set value = %1 WHERE domain_id = %2 AND name = 'mailing_backend'", array(
           1 => array($values, 'String'),
