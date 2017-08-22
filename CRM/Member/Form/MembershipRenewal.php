@@ -176,7 +176,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
   public function setDefaultValues() {
 
     $defaults = parent::setDefaultValues();
-    $this->_memType = $defaults['membership_type_id'];
 
     // set renewal_date and receive_date to today in correct input format (setDateDefaults uses today if no value passed)
     list($now, $currentTime) = CRM_Utils_Date::setDateDefaults();
@@ -190,19 +189,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
         'contribution_id',
         'membership_id'
       );
-    }
-
-    if (is_numeric($this->_memType)) {
-      $defaults['membership_type_id'] = array();
-      $defaults['membership_type_id'][0] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType',
-        $this->_memType,
-        'member_of_contact_id',
-        'id'
-      );
-      $defaults['membership_type_id'][1] = $this->_memType;
-    }
-    else {
-      $defaults['membership_type_id'] = $this->_memType;
     }
 
     $defaults['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $this->_memType, 'financial_type_id');
@@ -245,7 +231,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     parent::buildQuickForm();
 
     $defaults = parent::setDefaultValues();
-    $this->_memType = $defaults['membership_type_id'];
     $this->assign('customDataType', 'Membership');
     $this->assign('customDataSubType', $this->_memType);
     $this->assign('entityID', $this->_id);
