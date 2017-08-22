@@ -360,7 +360,7 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function getRecurSubsequentTransaction($params) {
+  public function getRecurSubsequentTransaction($params = array()) {
     return array_merge($this->getRecurTransaction(), array(
       'x_trans_id' => 'second_one',
       'x_MD5_Hash' => 'EA7A3CD65A85757827F51212CA1486A8',
