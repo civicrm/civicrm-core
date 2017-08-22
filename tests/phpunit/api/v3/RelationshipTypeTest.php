@@ -94,19 +94,6 @@ class api_v3_RelationshipTypeTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check with no contact type.
-   */
-  public function testRelationshipTypeCreateWithoutContactType() {
-    $relTypeParams = array(
-      'name_a_b' => 'Relation 1 without contact type',
-      'name_b_a' => 'Relation 2 without contact type',
-    );
-    $result = $this->callAPIFailure('relationship_type', 'create', $relTypeParams,
-      'Mandatory key(s) missing from params array: contact_type_a, contact_type_b'
-    );
-  }
-
-  /**
    * Create relationship type.
    */
   public function testRelationshipTypeCreate() {
@@ -190,7 +177,7 @@ class api_v3_RelationshipTypeTest extends CiviUnitTestCase {
   public function testRelationshipTypeUpdateEmpty() {
     $params = array();
     $result = $this->callAPIFailure('relationship_type', 'create', $params);
-    $this->assertEquals($result['error_message'], 'Mandatory key(s) missing from params array: name_a_b, name_b_a, contact_type_a, contact_type_b');
+    $this->assertEquals($result['error_message'], 'Mandatory key(s) missing from params array: name_a_b, name_b_a');
   }
 
   /**
