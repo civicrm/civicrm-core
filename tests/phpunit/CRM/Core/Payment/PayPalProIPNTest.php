@@ -95,6 +95,7 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
       ));
     $this->assertEquals(2, $contribution['count']);
     $this->assertEquals('secondone', $contribution['values'][1]['trxn_id']);
+    $this->assertEquals('Debit Card', $contribution['values'][1]['payment_instrument']);
   }
 
   /**

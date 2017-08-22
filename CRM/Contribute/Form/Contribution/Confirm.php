@@ -1443,7 +1443,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $isTest = CRM_Utils_Array::value('is_test', $membershipParams, FALSE);
     $errors = $paymentResults = array();
     $form->_values['isMembership'] = TRUE;
-    $isRecurForFirstTransaction = CRM_Utils_Array::value('is_recur', $form->_values, CRM_Utils_Array::value('is_recur', $membershipParams));
+    $isRecurForFirstTransaction = CRM_Utils_Array::value('is_recur', $form->_params, CRM_Utils_Array::value('is_recur', $membershipParams));
 
     $totalAmount = $membershipParams['amount'];
 

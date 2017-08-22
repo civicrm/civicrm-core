@@ -8,7 +8,6 @@
       scope: {
         ngRequired: '@'
       },
-      templateUrl: '~/crmMailing/Recipients.html',
       link: function(scope, element, attrs, ngModel) {
         scope.recips = ngModel.$viewValue;
         scope.groups = scope.$parent.$eval(attrs.crmAvailGroups);

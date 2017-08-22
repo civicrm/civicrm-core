@@ -315,4 +315,22 @@ return array(
     'description' => NULL,
     'help_text' => NULL,
   ),
+  'simple_mail_limit' => array(
+    'group_name' => 'Mailing Preferences',
+    'group' => 'mailing',
+    'name' => 'simple_mail_limit',
+    'type' => 'Integer',
+    'quick_form_type' => 'Element',
+    'html_type' => 'text',
+    'html_attributes' => array(
+      'size' => 4,
+      'maxlength' => 8,
+    ),
+    'default' => 50,
+    'title' => 'Simple mail limit',
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => 'The number of emails sendable via simple mail. Make sure you understand the implications for your spam reputation and legal requirements for bulk emails before editing. As there is some risk both to your spam reputation and the products if this is misused it is a hidden setting',
+    'help_text' => 'CiviCRM forces users sending more than this number of mails to use CiviMails. CiviMails have additional precautions: not sending to contacts who do not want bulk mail, adding domain name and opt out links. You should familiarise yourself with the law relevant to you on bulk mailings if changing this setting. For the US https://en.wikipedia.org/wiki/CAN-SPAM_Act_of_2003 is a good place to start.',
+  ),
 );
