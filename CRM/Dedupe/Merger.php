@@ -465,6 +465,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       $handled = array_merge($handled, $params['tables']);
     }
     $affected = array_diff($affected, $handled);
+    $affected = array_unique(array_merge($affected, $tables));
 
     $mainId = (int) $mainId;
     $otherId = (int) $otherId;
