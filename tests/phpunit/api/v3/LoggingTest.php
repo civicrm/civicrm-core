@@ -128,6 +128,18 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
   }
 
   /**
+   * Check if we can create missing log tables using api.
+   */
+  public function testCreateMissingLogTables() {
+    $this->callAPISuccess('Setting', 'create', array('logging' => TRUE));
+    CRM_Core_DAO::executeQuery("DROP TABLE log_civicrm_contact");
+    $this->callAPISuccess('System', 'createmissinglogtables', array());
+
+    //Assert if log_civicrm_contact is created.
+    $this->checkLogTableCreated();
+  }
+
+  /**
    * Check we can update legacy log tables using the api function.
    */
   public function testUpdateLogTableHookINNODB() {

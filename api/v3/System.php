@@ -398,12 +398,6 @@ function _civicrm_api3_system_get_whitelist($whitelistFile) {
  */
 function civicrm_api3_system_updatelogtables() {
   $schema = new CRM_Logging_Schema();
-  $missingLogTables = $schema->getMissingLogTables();
-  if (!empty($missingLogTables)) {
-    foreach ($missingLogTables as $tableName) {
-      $schema->fixSchemaDifferencesFor($tableName, NULL, FALSE);
-    }
-  }
   $schema->updateLogTableSchema();
   return civicrm_api3_create_success(1);
 }
@@ -416,5 +410,21 @@ function civicrm_api3_system_updatelogtables() {
 function civicrm_api3_system_updateindexes() {
   list($missingIndices) = CRM_Core_BAO_SchemaHandler::getMissingIndices();
   CRM_Core_BAO_SchemaHandler::createMissingIndices($missingIndices);
+  return civicrm_api3_create_success(1);
+}
+
+/**
+ * Creates missing log tables.
+ *
+ * CRM-20838 - This adds any missing log tables into the database.
+ */
+function civicrm_api3_system_createmissinglogtables() {
+  $schema = new CRM_Logging_Schema();
+  $missingLogTables = $schema->getMissingLogTables();
+  if (!empty($missingLogTables)) {
+    foreach ($missingLogTables as $tableName) {
+      $schema->fixSchemaDifferencesFor($tableName, NULL, FALSE);
+    }
+  }
   return civicrm_api3_create_success(1);
 }
