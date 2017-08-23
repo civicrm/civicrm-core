@@ -1016,4 +1016,13 @@ AND    u.status = 1
     }
   }
 
+  /**
+   * Append Backdrop CSS to coreResourcesList.
+   *
+   * @param array $list
+   */
+  public function appendCoreResources(&$list) {
+    $list[] = 'css/backdrop.css';
+  }
+  
 }
