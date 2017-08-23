@@ -239,9 +239,10 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
             preg_match($patternColumn, $query, $matches);
             $count = substr_count($query, ' WHERE ');
             if ($count == 2 && strpos($query, 'UNION') !== FALSE) {
+              $tempTable = 'dedupe_copy' . uniqid();
               //Create second copy as single temp table cannot be referred twice in a single query.
-              $dao->query("CREATE TEMPORARY TABLE dedupe_copy_2 SELECT * FROM dedupe WHERE weight >= {$weightSum}");
-              $dupeCopyJoins = array($dupeCopyJoin, str_replace('dedupe_copy', 'dedupe_copy_2', $dupeCopyJoin));
+              $dao->query("CREATE TEMPORARY TABLE $tempTable SELECT * FROM dedupe WHERE weight >= {$weightSum}");
+              $dupeCopyJoins = array($dupeCopyJoin, str_replace('dedupe_copy', $tempTable, $dupeCopyJoin));
               $queryArray = explode('UNION', $query);
               foreach ($queryArray as $key => $value) {
                 $queryArray[$key] = str_replace(' WHERE ', str_replace('column', $matches[1], $dupeCopyJoins[$key]), $queryArray[$key]);
