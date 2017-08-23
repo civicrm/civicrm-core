@@ -59,6 +59,26 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
   }
 
   /**
+   * CRM-20658: Test more then one reference for temp table dedupe_copy
+   */
+  public function testMultiSelectForDedupeCopy() {
+    $this->setupForGroupDedupe();
+    //Create test rule group for individual.
+    $ruleGroup = civicrm_api3('RuleGroup', 'create', array(
+      'contact_type' => "Individual",
+      'threshold' => 20,
+      'used' => "General",
+      'name' => "testrule",
+    ));
+    //Insert first and last name as fields to check on.
+    foreach (array('first_name', 'last_name') as $fieldName) {
+      CRM_Core_DAO::executeQuery("INSERT INTO `civicrm_dedupe_rule` VALUES (NULL, {$ruleGroup['id']}, 'civicrm_contact', '{$fieldName}', NULL, '10')");
+    }
+    $foundDupes = CRM_Dedupe_Finder::dupesInGroup($ruleGroup['id'], $this->groupID);
+    $this->assertEquals(count($foundDupes), 4);
+  }
+
+  /**
    * Test the supervised dedupe rule against a group.
    *
    * @throws \Exception

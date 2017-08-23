@@ -229,20 +229,36 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
           $fieldWeight = array_keys($tableQueries);
           $fieldWeight = $fieldWeight[0];
           $query = array_shift($tableQueries);
+          $dupeWeightClause = 'ON DUPLICATE KEY UPDATE weight = weight + VALUES(weight)';
 
           if ($searchWithinDupes) {
             // get prepared to search within already found dupes if $searchWithinDupes flag is set
             $dao->query("DROP TEMPORARY TABLE IF EXISTS dedupe_copy");
             $dao->query("CREATE TEMPORARY TABLE dedupe_copy SELECT * FROM dedupe WHERE weight >= {$weightSum}");
-            $dao->free();
 
             preg_match($patternColumn, $query, $matches);
-            $query = str_replace(' WHERE ', str_replace('column', $matches[1], $dupeCopyJoin), $query);
+            $count = substr_count($query, ' WHERE ');
+            if ($count == 2 && strpos($query, 'UNION') !== FALSE) {
+              $tempTable = 'dedupe_copy' . uniqid();
+              //Create second copy as single temp table cannot be referred twice in a single query.
+              $dao->query("CREATE TEMPORARY TABLE $tempTable SELECT * FROM dedupe WHERE weight >= {$weightSum}");
+              $dupeCopyJoins = array($dupeCopyJoin, str_replace('dedupe_copy', $tempTable, $dupeCopyJoin));
+              $queryArray = explode('UNION', $query);
+              foreach ($queryArray as $key => $value) {
+                $queryArray[$key] = str_replace(' WHERE ', str_replace('column', $matches[1], $dupeCopyJoins[$key]), $queryArray[$key]);
+              }
+              $query = implode(' UNION ', $queryArray);
+              $dupeWeightClause = str_replace('weight', 'dedupe.weight', $dupeWeightClause);
+            }
+            else {
+              $query = str_replace(' WHERE ', str_replace('column', $matches[1], $dupeCopyJoin), $query);
+            }
+            $dao->free();
           }
           $searchWithinDupes = 1;
 
           // construct and execute the intermediate query
-          $query = "{$insertClause} {$query} {$groupByClause} ON DUPLICATE KEY UPDATE weight = weight + VALUES(weight)";
+          $query = "{$insertClause} {$query} {$groupByClause} {$dupeWeightClause}";
           $dao->query($query);
 
           // FIXME: we need to be more acurate with affected rows, especially for insert vs duplicate insert.
