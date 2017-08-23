@@ -437,14 +437,22 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * @param int $otherId
    * @param bool $tables
    * @param array $tableOperations
+   * @param array $customTableToCopyFrom
    */
-  public static function moveContactBelongings($mainId, $otherId, $tables = FALSE, $tableOperations = array()) {
+  public static function moveContactBelongings($mainId, $otherId, $tables = FALSE, $tableOperations = array(), $customTableToCopyFrom = NULL) {
     $cidRefs = self::cidRefs();
     $eidRefs = self::eidRefs();
     $cpTables = self::cpTables();
     $paymentTables = self::paymentTables();
     // CRM-12695:
     $membershipMerge = FALSE;
+
+    // getting all custom tables
+    $customTables = array();
+    if ($customTableToCopyFrom != NULL) {
+      self::addCustomTablesExtendingContactsToCidRefs($customTables);
+      $customTables = array_keys($customTables);
+    }
 
     $affected = array_merge(array_keys($cidRefs), array_keys($eidRefs));
     if ($tables !== FALSE) {
@@ -483,6 +491,11 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
     $sqls = array();
     foreach ($affected as $table) {
+      // skipping non selected custom table's value migration
+      if ($customTableToCopyFrom != NULL && in_array($table, $customTables) && !in_array($table, $customTableToCopyFrom)) {
+        continue;
+      }
+
       // Call custom processing function for objects that require it
       if (isset($cpTables[$table])) {
         foreach ($cpTables[$table] as $className => $fnName) {
@@ -1464,6 +1477,8 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     $qfZeroBug = 'e8cddb72-a257-11dc-b9cc-0016d3330ee9';
     $relTables = CRM_Dedupe_Merger::relTables();
     $moveTables = $locationMigrationInfo = $tableOperations = array();
+    // variable for capturing id of civicrm_custom_field id
+    $submittedCustomValue = array();
     foreach ($migrationInfo as $key => $value) {
       if ($value == $qfZeroBug) {
         $value = '0';
@@ -1473,6 +1488,8 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         $value != NULL
       ) {
         $submitted[substr($key, 5)] = $value;
+        // capturing id
+        array_push($submittedCustomValue, substr($key, 12));
       }
 
       // Set up initial information for handling migration of location blocks
@@ -1499,8 +1516,45 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       unset($moveTables, $tableOperations);
     }
 
+    // capturing the custom table names. The table's value we have to merge
+    // from duplicate contact to original contact
+    $customTableToCopyValues = array();
+    foreach ($submittedCustomValue as $value) {
+      if ($value != NULL) {
+        $result1 = NULL;
+        try {
+          $result1 = civicrm_api3('custom_field', 'get', array('id' => $value, 'is_active' => TRUE));
+        }
+        catch (CiviCRM_API3_Exception $e) {
+          // just ignore and continue
+          continue;
+        }
+        if (!civicrm_error($result1) && isset($result1['values']) && is_array($result1['values'])) {
+          foreach ($result1['values'] as $value1) {
+            if ($value1 != NULL && is_array($value1) && isset($value1['custom_group_id'])) {
+              $result2 = NULL;
+              try {
+                $result2 = civicrm_api3('custom_group', 'get', array('id' => $value1['custom_group_id'], 'is_active' => TRUE));
+              }
+              catch (CiviCRM_API3_Exception $e) {
+                // just ignore and continue
+                continue;
+              }
+              if (!civicrm_error($result2) && isset($result2['values']) && is_array($result2['values'])) {
+                foreach ($result2['values'] as $value2) {
+                  if ($value2 != NULL && is_array($value2) && isset($value2['table_name'])) {
+                    array_push($customTableToCopyValues, $value2['table_name']);
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
     // **** Do contact related migrations
-    CRM_Dedupe_Merger::moveContactBelongings($mainId, $otherId);
+    CRM_Dedupe_Merger::moveContactBelongings($mainId, $otherId, FALSE, array(), $customTableToCopyValues);
 
     // FIXME: fix gender, prefix and postfix, so they're edible by createProfileContact()
     $names['gender'] = array('newName' => 'gender_id', 'groupName' => 'gender');
