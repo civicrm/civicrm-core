@@ -1017,12 +1017,13 @@ AND    u.status = 1
   }
 
   /**
-   * Append Backdrop CSS to coreResourcesList.
+   * Append Backdrop CSS and JS to coreResourcesList.
    *
    * @param array $list
    */
   public function appendCoreResources(&$list) {
     $list[] = 'css/backdrop.css';
+    $list[] = 'js/crm.backdrop.js';
   }
 
 }
