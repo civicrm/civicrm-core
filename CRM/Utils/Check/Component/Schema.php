@@ -76,4 +76,31 @@ class CRM_Utils_Check_Component_Schema extends CRM_Utils_Check_Component {
     return $messages;
   }
 
+  /**
+   * @return array
+   */
+  public function checkMissingLogTables() {
+    $messages = array();
+    $logging = new CRM_Logging_Schema();
+    $missingLogTables = $logging->getMissingLogTables();
+
+    if ($missingLogTables) {
+      $msg = new CRM_Utils_Check_Message(
+        __FUNCTION__,
+        ts("You don't have logging enabled on some tables. This may cause errors on performing insert/update operation on them."),
+        ts('Missing Log Tables'),
+        \Psr\Log\LogLevel::WARNING,
+        'fa-server'
+      );
+      $msg->addAction(
+        ts('Create Missing Log Tables'),
+        ts('Create missing log tables now? This may take few minutes.'),
+        'api3',
+        array('System', 'createmissinglogtables')
+      );
+      $messages[] = $msg;
+    }
+    return $messages;
+  }
+
 }

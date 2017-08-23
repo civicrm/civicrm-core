@@ -934,4 +934,16 @@ COLS;
     return array_intersect($tables, $this->tables);
   }
 
+  /**
+   * Retrieve missing log tables.
+   *
+   * @return array
+   */
+  public function getMissingLogTables() {
+    if ($this->tablesExist()) {
+      return array_diff($this->tables, array_keys($this->logs));
+    }
+    return array();
+  }
+
 }
