@@ -1215,6 +1215,84 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
   }
 
   /**
+   * Test processOnBehalfOrganization() function.
+   */
+  public function testProcessOnBehalfOrganization() {
+    $orgInfo = array(
+      'phone' => '11111111',
+      'email' => 'testorg@gmail.com',
+      'street_address' => 'test Street',
+      'city' => 'test City',
+      'state_province' => 'AA',
+      'postal_code' => '222222',
+      'country' => 'United States',
+    );
+    $contactID = $this->individualCreate();
+    $orgId = $this->organizationCreate(array('organization_name' => 'testorg1'));
+    $orgCount = $this->callAPISuccessGetCount('Contact', array(
+      'contact_type' => "Organization",
+      'organization_name' => "testorg1",
+    ));
+    $this->assertEquals($orgCount, 1);
+
+    $values = $params = array();
+    $behalfOrganization = array(
+      'organization_name' => 'testorg1',
+      'phone' => array(
+        1 => array(
+          'phone' => $orgInfo['phone'],
+          'is_primary' => 1,
+        ),
+      ),
+      'email' => array(
+        1 => array(
+          'email' => $orgInfo['email'],
+          'is_primary' => 1,
+        ),
+      ),
+      'address' => array(
+        3 => array(
+          'street_address' => $orgInfo['street_address'],
+          'city' => $orgInfo['city'],
+          'location_type_id' => 3,
+          'postal_code' => $orgInfo['postal_code'],
+          'country' => 'US',
+          'state_province' => 'AA',
+          'is_primary' => 1,
+        ),
+      ),
+    );
+    $fields = array(
+      'organization_name' => 1,
+      'phone-3-1' => 1,
+      'email-3' => 1,
+      'street_address-3' => 1,
+      'city-3' => 1,
+      'postal_code-3' => 1,
+      'country-3' => 1,
+      'state_province-3' => 1,
+    );
+    CRM_Contribute_Form_Contribution_Confirm::processOnBehalfOrganization($behalfOrganization, $contactID, $values, $params, $fields);
+
+    //Check whether new organisation is not created.
+    $result = $this->callAPISuccess('Contact', 'get', array(
+      'contact_type' => "Organization",
+      'organization_name' => "testorg1",
+    ));
+    $this->assertEquals($result['count'], 1);
+
+    //Assert all org values are updated.
+    foreach ($orgInfo as $key => $val) {
+      $this->assertEquals($result['values'][$orgId][$key], $val);
+    }
+
+    //Check if alert is assigned to params if more than 1 dupe exists.
+    $orgId = $this->organizationCreate(array('organization_name' => 'testorg1', 'email' => 'testorg@gmail.com'));
+    CRM_Contribute_Form_Contribution_Confirm::processOnBehalfOrganization($behalfOrganization, $contactID, $values, $params, $fields);
+    $this->assertEquals($params['onbehalf_dupe_alert'], 1);
+  }
+
+  /**
    * Test for replaceContributionTokens.
    *   This function tests whether the contribution tokens are replaced with values from contribution.
    */
