@@ -1024,5 +1024,5 @@ AND    u.status = 1
   public function appendCoreResources(&$list) {
     $list[] = 'css/backdrop.css';
   }
-  
+
 }
