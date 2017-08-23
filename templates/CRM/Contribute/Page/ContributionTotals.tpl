@@ -57,7 +57,7 @@
             {/if}
           {/if}
           {if $contributionSummary.cancel.amount}
-            <th class="disabled right contriTotalRight"> &nbsp; {ts}Total Cancelled Amount{/ts} &ndash; {$contributionSummary.cancel.amount}</th>
+            <th class="disabled right contriTotalRight"> &nbsp; {ts}Cancelled/Refunded{/ts} &ndash; {$contributionSummary.cancel.amount}</th>
           {/if}
       </tr>
       {if $contributionSummary.soft_credit.count}
