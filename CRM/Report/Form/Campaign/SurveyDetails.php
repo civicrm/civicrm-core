@@ -185,7 +185,7 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
           'activity_date_time' => array(
             'name' => 'activity_date_time',
             'title' => ts('Date'),
-            'type' => CRM_Utils_Type::T_DATE,
+            'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
           ),
         ),
         'filters' => array(
@@ -211,7 +211,7 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
           ),
           'activity_date_time' => array(
             'title' => ts('Date'),
-            'type' => CRM_Utils_Type::T_DATE,
+            'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
             'operatorType' => CRM_Report_Form::OP_DATE,
           ),
         ),
