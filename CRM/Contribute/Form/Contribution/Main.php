@@ -347,6 +347,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
           array('size' => 30, 'maxlength' => 60, 'class' => 'email'),
           TRUE
         );
+        $this->assign('showMainEmail', TRUE);
         $this->addRule("email-{$this->_bltID}", ts('Email is not valid.'), 'email');
       }
     }

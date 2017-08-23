@@ -175,14 +175,16 @@
       <div class="clear"></div>
     </div>
     {/if}
-    {assign var=n value=email-$bltID}
-    <div class="crm-public-form-item crm-section {$form.$n.name}-section">
-      <div class="label">{$form.$n.label}</div>
-      <div class="content">
-        {$form.$n.html}
+    {if $showMainEmail}
+      {assign var=n value=email-$bltID}
+      <div class="crm-public-form-item crm-section {$form.$n.name}-section">
+        <div class="label">{$form.$n.label}</div>
+        <div class="content">
+          {$form.$n.html}
+        </div>
+        <div class="clear"></div>
       </div>
-      <div class="clear"></div>
-    </div>
+    {/if}
 
     <div id='onBehalfOfOrg' class="crm-public-form-item crm-section">
       {include file="CRM/Contribute/Form/Contribution/OnBehalfOf.tpl"}
