@@ -651,91 +651,31 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     $this->add('select', 'from_email_address', ts('Receipt From'), $this->_fromEmails);
 
-    $status = CRM_Contribute_PseudoConstant::contributionStatus();
-
-    // suppressing contribution statuses that are NOT relevant to pledges (CRM-5169)
-    $statusName = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+    $isUpdate = FALSE;
+    $component = 'contribution';
+    if ($this->_id) {
+      $isUpdate = TRUE;
+      $componentDetails = CRM_Contribute_BAO_Contribution::getComponentDetails($this->_id);
+      if (CRM_Utils_Array::value('membership', $componentDetails)) {
+        $component = 'membership';
+      }
+      elseif (CRM_Utils_Array::value('participant', $componentDetails)) {
+        $component = 'participant';
+      }
+    }
     if ($this->_ppID) {
-      foreach (array(
-                 'Cancelled',
-                 'Failed',
-                 'In Progress',
-               ) as $suppress) {
-        unset($status[CRM_Utils_Array::key($suppress, $statusName)]);
-      }
+      $component = 'pledge';
     }
-    elseif ((!$this->_ppID && $this->_id) || !$this->_id) {
-      $suppressFlag = FALSE;
-      if ($this->_id) {
-        $componentDetails = CRM_Contribute_BAO_Contribution::getComponentDetails($this->_id);
-        if (CRM_Utils_Array::value('membership', $componentDetails) || CRM_Utils_Array::value('participant', $componentDetails)) {
-          $suppressFlag = TRUE;
-        }
-      }
-      if (!$suppressFlag) {
-        foreach (array(
-                   'Overdue',
-                   'In Progress',
-                 ) as $suppress) {
-          unset($status[CRM_Utils_Array::key($suppress, $statusName)]);
-        }
-      }
-      else {
-        unset($status[CRM_Utils_Array::key('Overdue', $statusName)]);
-      }
-    }
+    $status = CRM_Contribute_BAO_Contribution_Utils::getContributionStatuses($component, $this->_id);
 
     // define the status IDs that show the cancellation info, see CRM-17589
     $cancelInfo_show_ids = array();
-    foreach (array_keys($statusName) as $status_id) {
+    foreach (array_keys($status) as $status_id) {
       if (CRM_Contribute_BAO_Contribution::isContributionStatusNegative($status_id)) {
         $cancelInfo_show_ids[] = "'$status_id'";
       }
     }
     $this->assign('cancelInfo_show_ids', implode(',', $cancelInfo_show_ids));
-
-    if ($this->_id) {
-      $contributionStatus = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $this->_id, 'contribution_status_id');
-      $name = CRM_Utils_Array::value($contributionStatus, $statusName);
-      switch ($name) {
-        case 'Completed':
-          // [CRM-17498] Removing unsupported status change options.
-          unset($status[CRM_Utils_Array::key('Pending', $statusName)]);
-          unset($status[CRM_Utils_Array::key('Failed', $statusName)]);
-          unset($status[CRM_Utils_Array::key('Partially paid', $statusName)]);
-          unset($status[CRM_Utils_Array::key('Pending refund', $statusName)]);
-        case 'Cancelled':
-        case 'Chargeback':
-        case 'Refunded':
-          unset($status[CRM_Utils_Array::key('In Progress', $statusName)]);
-          unset($status[CRM_Utils_Array::key('Pending', $statusName)]);
-          unset($status[CRM_Utils_Array::key('Failed', $statusName)]);
-          break;
-
-        case 'Pending':
-        case 'In Progress':
-          unset($status[CRM_Utils_Array::key('Refunded', $statusName)]);
-          unset($status[CRM_Utils_Array::key('Chargeback', $statusName)]);
-          break;
-
-        case 'Failed':
-          foreach (array(
-                     'Pending',
-                     'Refunded',
-                     'Chargeback',
-                     'Completed',
-                     'In Progress',
-                     'Cancelled',
-                   ) as $suppress) {
-            unset($status[CRM_Utils_Array::key($suppress, $statusName)]);
-          }
-          break;
-      }
-    }
-    else {
-      unset($status[CRM_Utils_Array::key('Refunded', $statusName)]);
-      unset($status[CRM_Utils_Array::key('Chargeback', $statusName)]);
-    }
 
     $statusElement = $this->add('select', 'contribution_status_id',
       ts('Contribution Status'),
@@ -895,7 +835,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     // if status is Cancelled freeze Amount, Payment Instrument, Check #, Financial Type,
     // Net and Fee Amounts are frozen in AdditionalInfo::buildAdditionalDetail
-    if ($this->_id && $this->_values['contribution_status_id'] == array_search('Cancelled', $statusName)) {
+    if ($this->_id && ($this->_values['contribution_status_id'] == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Cancelled'))) {
       if ($totalAmount) {
         $totalAmount->freeze();
       }

@@ -638,26 +638,8 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         )
       );
 
-      $allowStatuses = array();
-      $statuses = CRM_Contribute_PseudoConstant::contributionStatus();
-      if ($this->_onlinePendingContributionId) {
-        $statusNames = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
-        foreach ($statusNames as $val => $name) {
-          if (in_array($name, array(
-            'In Progress',
-            'Overdue',
-          ))
-          ) {
-            continue;
-          }
-          $allowStatuses[$val] = $statuses[$val];
-        }
-      }
-      else {
-        $allowStatuses = $statuses;
-      }
       $this->add('select', 'contribution_status_id',
-        ts('Payment Status'), $allowStatuses
+        ts('Payment Status'), CRM_Contribute_BAO_Contribution_Utils::getContributionStatuses('membership')
       );
       $this->add('text', 'check_number', ts('Check Number'),
         CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Contribution', 'check_number')
