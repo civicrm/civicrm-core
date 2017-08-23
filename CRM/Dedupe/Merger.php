@@ -645,7 +645,9 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     }
     // else consider all dupe pairs
     // @todo Adding limit to Where??!!
-    $where .= " LIMIT {$batchLimit}";
+    if ($batchLimit) {
+      $where .= " LIMIT {$batchLimit}";
+    }
     return $where;
   }
 
@@ -1868,6 +1870,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * @param bool $reloadCacheIfEmpty
    * @param int $batchLimit
    * @param bool $isSelected
+   *   Limit to selected pairs.
    * @param array|string $orderByClause
    * @param bool $includeConflicts
    * @param array $criteria
