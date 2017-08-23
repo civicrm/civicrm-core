@@ -95,7 +95,11 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
       'options' => array('limit' => 0),
       'sequential' => 1,
     );
-
+    $groupNames = civicrm_api3('Group', 'get', $params + array(
+      'is_active' => 1,
+      'check_permissions' => TRUE,
+      'return' => array('title', 'visibility', 'group_type', 'is_hidden'),
+    ));
     $headerfooterList = civicrm_api3('MailingComponent', 'get', $params + array(
       'is_active' => 1,
       'return' => array('name', 'component_type', 'is_default', 'body_html', 'body_text'),
@@ -130,6 +134,8 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
           'civiMails' => array(),
           'campaignEnabled' => in_array('CiviCampaign', $config->enableComponents),
           'groupNames' => array(),
+          // @todo see if we can remove this by dynamically generating the test group list
+          'testGroupNames' => $groupNames['values'],
           'headerfooterList' => $headerfooterList['values'],
           'mesTemplate' => $mesTemplate['values'],
           'emailAdd' => $emailAdd['values'],
