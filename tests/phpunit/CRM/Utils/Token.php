@@ -16,6 +16,30 @@ class CRM_Utils_TokenTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test for replaceContactTokens.
+   *
+   */
+  public function testReplaceGreetingTokens() {
+    $tokenString = 'First Name: {contact.first_name} Last Name: {contact.last_name} Birth Date: {contact.birth_date} Prefix: {contact.prefix_id} Suffix: {contact.individual_suffix}';
+    $contactDetails = array(
+      array(
+        2811 => array(
+          'id' => '2811',
+          'contact_type' => 'Individual',
+          'first_name' => 'Morticia',
+          'last_name' => 'Addams',
+          'prefix_id' => 2,
+        ),
+      ),
+    );
+    $contactId = 2811;
+    $className = 'CRM_Contact_BAO_Contact';
+    $escapeSmarty = TRUE;
+    CRM_Utils_Token::replaceGreetingTokens($tokenString, $contactDetails, $contactId, $className, $escapeSmarty);
+    $this->assertEquals($tokenString, 'First Name: Morticia Last Name: Addams Birth Date:  Prefix: Ms. Suffix: ');
+  }
+
+  /**
    * Test getting multiple contacts.
    *
    * Check for situation described in CRM-19876.

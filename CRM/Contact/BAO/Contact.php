@@ -2651,10 +2651,9 @@ AND       civicrm_openid.is_primary = 1";
       $contactDefaults = $defaultGreetings[$contact->contact_type];
     }
 
-    // note that contact object not always has required greeting related
-    // fields that are required to calculate greeting and
-    // also other fields used in tokens etc,
-    // hence we need to retrieve it again.
+    // The contact object has not always required the
+    // fields that are required to calculate greetings
+    // so we need to retrieve it again.
     if ($contact->_query !== FALSE) {
       $contact->find(TRUE);
     }
