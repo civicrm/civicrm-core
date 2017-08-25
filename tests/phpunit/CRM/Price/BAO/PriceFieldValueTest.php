@@ -54,4 +54,5 @@ class CRM_Price_BAO_PriceFieldValueTest extends CiviUnitTestCase {
     $this->assertArrayKeyExists('visibility_id', $fields);
     $this->assertEquals('visibility', $fields['visibility_id']['pseudoconstant']['optionGroupName']);
   }
+
 }
