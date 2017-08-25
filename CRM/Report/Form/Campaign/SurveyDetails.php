@@ -157,6 +157,8 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
         ),
         'grouping' => 'location-fields',
       ),
+    ) + $this->getAddressColumns() +
+    array(
       'civicrm_activity' => array(
         'dao' => 'CRM_Activity_DAO_Activity',
         'alias' => 'survey_activity',
@@ -207,7 +209,7 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
         ),
         'grouping' => 'survey-activity-fields',
       ),
-    ) + $this->getAddressColumns();
+    );
     parent::__construct();
   }
 
