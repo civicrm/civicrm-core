@@ -209,6 +209,6 @@ $('#civicrm-menu').ready(function() {
 });
 $('#civicrm-menu').menuBar({arrowSrc: CRM.config.resourceBase + 'packages/jquery/css/images/arrow.png'});
 $(window).on("beforeunload", function() {
-  $('.crm-logo-sm').addClass('crm-i fa-spin fa-pulse');
+  $('.crm-logo-sm', '#civicrm-menu').addClass('crm-i fa-spin fa-pulse');
 });
 })(CRM.$);{/literal}
