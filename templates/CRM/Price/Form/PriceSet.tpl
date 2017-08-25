@@ -38,7 +38,7 @@
         {* Skip 'Admin' visibility price fields WHEN this tpl is used in online registration unless user has administer CiviCRM permission. *}
         {if $element.visibility EQ 'public' || ($element.visibility EQ 'admin' && $adminFld EQ true) || $context eq 'standalone' || $context eq 'advanced' || $context eq 'search' || $context eq 'participant' || $context eq 'dashboard' || $action eq 1024}
             <div class="crm-section {$element.name}-section">
-            {if ($element.html_type eq 'CheckBox' || $element.html_type == 'Radio') && $element.options_per_line}
+              {if ($element.html_type eq 'CheckBox' || $element.html_type == 'Radio') && $element.options_per_line}
               {assign var="element_name" value="price_"|cat:$field_id}
               <div class="label">{$form.$element_name.label}</div>
               <div class="content {$element.name}-content">
@@ -60,15 +60,17 @@
                     {/if}
                   {/if}
                 {/foreach}
-                {literal}
-                 <script>
-                   cj('input').each(function(){
-                     if (cj(this).attr('visibility') == 2 && typeof adminpage=='undefined'){
-                       cj(this).parent().hide();
-                     }
-                   });
-                 </script>
-               {/literal}
+                <script>
+                  {if !call_user_func(array('CRM_Core_Permission','check'), 'edit event participants')}
+                    {literal}
+                    cj('input').each(function(){
+                      if (cj(this).attr('visibility') == 2 && typeof adminpage == 'undefined') {
+                        cj(this).parent().hide();
+                      }
+                    });
+                    {/literal}
+                  {/if}
+                </script>
                 {if $element.help_post}
                   <div class="description">{$element.help_post}</div>
                 {/if}
@@ -108,6 +110,31 @@
                     {/if}
                   {/if}
                   {if $element.help_post}<br /><span class="description">{$element.help_post}</span>{/if}
+                  {if $element.html_type == 'Select'}
+                    <script>
+                      {if !call_user_func(array('CRM_Core_Permission','check'), 'edit event participants')}
+                        {literal}
+                        cj('select').each(function() {
+                          var priceFieldValues = cj(this).attr('data-price-field-values');
+
+                          if (typeof priceFieldValues != 'undefined') {
+                            priceFieldValues = JSON.parse(priceFieldValues);
+                            cj(this).children().each(function () {
+                              if (priceFieldValues[this.value]) {
+                                if (priceFieldValues[this.value].visibility_id == 2 && typeof adminpage == 'undefined') {
+                                  cj(this).remove();
+                                }
+                              }
+                            });
+                          }
+
+                        });
+                        {/literal}
+                      {/if}
+                    </script>
+
+
+                  {/if}
                 </div>
 
             {/if}
