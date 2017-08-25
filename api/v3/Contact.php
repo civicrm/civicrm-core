@@ -56,7 +56,7 @@ function civicrm_api3_contact_create($params) {
   }
 
   if (!empty($params['dupe_check'])) {
-    $ids = CRM_Contact_BAO_Contact::getDuplicateContacts($params, $params['contact_type'], 'Unsupervised', array(), $params['check_permission']);
+    $ids = CRM_Contact_BAO_Contact::getDuplicateContacts($params, $params['contact_type'], 'Unsupervised', array(), $params['check_permissions']);
     if (count($ids) > 0) {
       throw new API_Exception("Found matching contacts: " . implode(',', $ids), "duplicate", array("ids" => $ids));
     }
