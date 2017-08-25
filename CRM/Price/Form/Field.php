@@ -586,7 +586,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
         }
 
         if ($visibilityOptions[$fields['visibility_id']] == 'public' && $publicOptionCount == 0) {
-          $errors['visibility_id'] = ts('Field with \'Public\' visibility should at least have one \'Public\' option.');
+          $errors['visibility_id'] = ts('You have selected to make this field public but have not enabled any public price options. Please update your selections to include a public price option, or make this field admin visibility only.');
           for ($index = 1; $index <= self::NUM_OPTION; $index++) {
             if (!empty($fields['option_label'][$index]) || !empty($fields['option_amount'][$index])) {
               $errors["option_visibility_id[{$index}]"] = ts('Public field should at least have one public option.');

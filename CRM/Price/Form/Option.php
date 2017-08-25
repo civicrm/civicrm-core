@@ -305,7 +305,7 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
       }
     }
     if ($visibilityOptions[$priceField->visibility_id] == 'public' && $publicCount == 0) {
-      $errors['visibility_id'] = ts('All other options for this \'Public\' field have \'Admin\' visibility. There should at least be one \'Public\' option.');
+      $errors['visibility_id'] = ts('All other options for this \'Public\' field have \'Admin\' visibility. There should at least be one \'Public\' option, or make the field \'Admin\' only.');
     } elseif ($visibilityOptions[$priceField->visibility_id] == 'admin' && $publicCount > 0) {
       $errors['visibility_id'] = ts('You must choose \'Admin\' visibility for this price option, as it belongs to a field with \'Admin\' visibility.');
     }
