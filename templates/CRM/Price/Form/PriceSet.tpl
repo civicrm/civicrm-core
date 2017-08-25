@@ -34,6 +34,13 @@
       {assign var='adminFld' value=true}
     {/if}
 
+    {assign var='hideValues' value=false}
+    {if $extends == 'Event' && !call_user_func(array('CRM_Core_Permission','check'), 'edit event participants')}
+      {assign var='hideValues' value=true}
+    {elseif $extends == 'Contribution' && !call_user_func(array('CRM_Core_Permission','check'), 'edit contributions')}
+      {assign var='hideValues' value=true}
+    {/if}
+
     {foreach from=$priceSet.fields item=element key=field_id}
         {* Skip 'Admin' visibility price fields WHEN this tpl is used in online registration unless user has administer CiviCRM permission. *}
         {if $element.visibility EQ 'public' || ($element.visibility EQ 'admin' && $adminFld EQ true) || $context eq 'standalone' || $context eq 'advanced' || $context eq 'search' || $context eq 'participant' || $context eq 'dashboard' || $action eq 1024}
@@ -60,8 +67,8 @@
                     {/if}
                   {/if}
                 {/foreach}
-                <script>
-                  {if !call_user_func(array('CRM_Core_Permission','check'), 'edit event participants')}
+                {if $hideValues}
+                  <script>
                     {literal}
                     cj('input').each(function(){
                       if (cj(this).attr('visibility') == 2 && typeof adminpage == 'undefined') {
@@ -69,8 +76,8 @@
                       }
                     });
                     {/literal}
-                  {/if}
-                </script>
+                  </script>
+                {/if}
                 {if $element.help_post}
                   <div class="description">{$element.help_post}</div>
                 {/if}
@@ -110,30 +117,25 @@
                     {/if}
                   {/if}
                   {if $element.help_post}<br /><span class="description">{$element.help_post}</span>{/if}
-                  {if $element.html_type == 'Select'}
+                  {if $element.html_type == 'Select' && $hideValues}
                     <script>
-                      {if !call_user_func(array('CRM_Core_Permission','check'), 'edit event participants')}
-                        {literal}
-                        cj('select').each(function() {
-                          var priceFieldValues = cj(this).attr('data-price-field-values');
+                      {literal}
+                      cj('select').each(function() {
+                        var priceFieldValues = cj(this).attr('data-price-field-values');
 
-                          if (typeof priceFieldValues != 'undefined') {
-                            priceFieldValues = JSON.parse(priceFieldValues);
-                            cj(this).children().each(function () {
-                              if (priceFieldValues[this.value]) {
-                                if (priceFieldValues[this.value].visibility_id == 2 && typeof adminpage == 'undefined') {
-                                  cj(this).remove();
-                                }
+                        if (typeof priceFieldValues != 'undefined') {
+                          priceFieldValues = JSON.parse(priceFieldValues);
+                          cj(this).children().each(function () {
+                            if (priceFieldValues[this.value]) {
+                              if (priceFieldValues[this.value].visibility_id == 2 && typeof adminpage == 'undefined') {
+                                cj(this).remove();
                               }
-                            });
-                          }
-
-                        });
-                        {/literal}
-                      {/if}
+                            }
+                          });
+                        }
+                      });
+                      {/literal}
                     </script>
-
-
                   {/if}
                 </div>
 
