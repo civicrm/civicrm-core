@@ -71,14 +71,15 @@ class CRM_Price_Form_FieldTest extends CiviUnitTestCase {
     );
 
     for ($index = 1; $index <= CRM_Price_Form_Field::NUM_OPTION; $index++) {
-      $defaultParams['option_label'][$index] = null;
-      $defaultParams['option_value'][$index] = null;
-      $defaultParams['option_name'][$index] = null;
-      $defaultParams['option_weight'][$index] = null;
-      $defaultParams['option_amount'][$index] = null;
-      $defaultParams['option_visibility_id'][$index] = null;
+      $defaultParams['option_label'][$index] = NULL;
+      $defaultParams['option_value'][$index] = NULL;
+      $defaultParams['option_name'][$index] = NULL;
+      $defaultParams['option_weight'][$index] = NULL;
+      $defaultParams['option_amount'][$index] = NULL;
+      $defaultParams['option_visibility_id'][$index] = NULL;
     }
 
     return array_merge($defaultParams, $params);
   }
+
 }

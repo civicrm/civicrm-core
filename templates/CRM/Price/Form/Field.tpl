@@ -65,6 +65,33 @@
     }
 
   }
+
+  var adminVisibilityID = 0;
+  cj('#visibility_id').on('change', function () {
+    if (adminVisibilityID == 0) {
+      CRM.api3('OptionValue', 'getvalue', {
+        'sequential': 1,
+        'return': 'value',
+        'option_group_id': 'visibility',
+        'name': 'admin'
+      }).done(function(result) {
+        adminVisibilityID = result.result;
+        if (cj('#visibility_id').val() == adminVisibilityID) {
+          updateVisibilitySelects(adminVisibilityID);
+        }
+      });
+    } else {
+      if (cj('#visibility_id').val() == adminVisibilityID) {
+        updateVisibilitySelects(adminVisibilityID);
+      }
+    }
+  });
+
+  function updateVisibilitySelects(value) {
+    for (var i=1; i<=15; i++) {
+      cj('#option_visibility_id_' + i).val(value);
+    }
+  }
 </script>
 {/literal}
 <div class="crm-block crm-form-block crm-price-field-form-block">

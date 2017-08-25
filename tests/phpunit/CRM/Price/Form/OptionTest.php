@@ -82,10 +82,11 @@ class CRM_Price_Form_OptionTest extends CiviUnitTestCase {
     foreach ($this->priceFieldValues as $currentField) {
       if ($this->visibilityOptions[$currentField['visibility_id']] == 'public') {
         $this->publicValue = $currentField;
-      } else {
+      }
+      else {
         $this->adminValue = $currentField;
       }
     }
-
   }
+
 }

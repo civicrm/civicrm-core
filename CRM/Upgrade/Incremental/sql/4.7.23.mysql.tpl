@@ -41,7 +41,3 @@ ON price_field.price_field_id = cpf.id
 LEFT JOIN civicrm_price_set ps ON ps.id = cpf.price_set_id
 SET cpf.is_active = 1
 WHERE ps.is_quick_config = 1 AND cpf.is_active = 0;
-
--- CRM-12167
-ALTER TABLE `civicrm_price_field_value`
-ADD COLUMN `visibility_id` int(10);

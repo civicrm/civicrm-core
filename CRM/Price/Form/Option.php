@@ -291,6 +291,27 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
     ) {
       $errors['count'] = ts('Participant count can not be greater than max participants.');
     }
+
+    $priceField = CRM_Price_BAO_PriceField::findById($fields['fieldId']);
+    $visibilityOptions = CRM_Price_BAO_PriceFieldValue::buildOptions('visibility_id', NULL, array('labelColumn' => 'name'));
+
+    $publicCount = 0;
+    $options = CRM_Price_BAO_PriceField::getOptions($priceField->id);
+    foreach ($options as $currentOption) {
+      if ($fields['optionId'] == $currentOption['id'] && $visibilityOptions[$fields['visibility_id']] == 'public') {
+        $publicCount++;
+      }
+      elseif ($fields['optionId'] != $currentOption['id'] && $visibilityOptions[$currentOption['visibility_id']] == 'public') {
+        $publicCount++;
+      }
+    }
+    if ($visibilityOptions[$priceField->visibility_id] == 'public' && $publicCount == 0) {
+      $errors['visibility_id'] = ts('All other options for this \'Public\' field have \'Admin\' visibility. There should at least be one \'Public\' option, or make the field \'Admin\' only.');
+    }
+    elseif ($visibilityOptions[$priceField->visibility_id] == 'admin' && $publicCount > 0) {
+      $errors['visibility_id'] = ts('You must choose \'Admin\' visibility for this price option, as it belongs to a field with \'Admin\' visibility.');
+    }
+
     return empty($errors) ? TRUE : $errors;
   }
 

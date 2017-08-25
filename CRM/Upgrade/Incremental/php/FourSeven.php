@@ -451,6 +451,8 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
 
     $this->addTask('CRM-21195 - Add icon field to civicrm_navigation', 'addColumn',
       'civicrm_navigation', 'icon', "varchar(255) NULL DEFAULT NULL COMMENT 'CSS class name for an icon'");
+    $this->addTask('CRM-12167 - Add visibility column to civicrm_price_field_value', 'addColumn',
+      'civicrm_price_field_value', 'visibility_id', 'int(10) unsigned DEFAULT 1 COMMENT "Implicit FK to civicrm_option_group with name = \'visibility\'"');
   }
 
   /*

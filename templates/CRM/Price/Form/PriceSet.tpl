@@ -61,15 +61,6 @@
                     {/if}
                   {/if}
                 {/foreach}
-                {literal}
-                 <script>
-                   cj('input').each(function(){
-                     if (cj(this).attr('visibility') == 2 && typeof adminpage=='undefined'){
-                       cj(this).parent().hide();
-                     }
-                   });
-                 </script>
-               {/literal}
                 {if $element.help_post}
                   <div class="description">{$element.help_post}</div>
                 {/if}
