@@ -413,7 +413,6 @@ LEFT JOIN $this->tempTableRepeat2 {$this->_aliases['civicrm_contribution']}2
     $temp = $this->_aliases['civicrm_contribution'];
     $this->_aliases['civicrm_contribution'] = $replaceAliasWith;
     $from = $this->_from;
-    $from .= (string) $this->getPermissionedFTQuery($this, 'civicrm_line_item_report', TRUE);
     $this->_aliases['civicrm_contribution'] = $temp;
     $this->_where = '';
     return $from;

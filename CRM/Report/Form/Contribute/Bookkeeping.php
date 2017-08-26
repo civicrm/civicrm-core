@@ -507,8 +507,6 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
               LEFT JOIN civicrm_batch batch
                     ON  ent_batch.batch_id = batch.id";
     }
-
-    $this->getPermissionedFTQuery($this, "civicrm_line_item_1");
   }
 
   public function orderBy() {
