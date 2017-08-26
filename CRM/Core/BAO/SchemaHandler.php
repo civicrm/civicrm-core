@@ -701,10 +701,14 @@ MODIFY      {$columnName} varchar( $length )
   /**
    * Compare the indices specified in the XML files with those in the DB.
    *
+   * @param bool $dropFalseIndices
+   *  If set - this function deletes false indices present in the DB which mismatches the expected
+   *  values of xml file so that civi re-creates them with correct values using createMissingIndices() function.
+   *
    * @return array
    *   index specifications
    */
-  public static function getMissingIndices() {
+  public static function getMissingIndices($dropFalseIndices = FALSE) {
     $requiredSigs = $existingSigs = array();
     // Get the indices defined (originally) in the xml files
     $requiredIndices = CRM_Core_DAO_AllCoreTables::indices();
@@ -724,16 +728,14 @@ MODIFY      {$columnName} varchar( $length )
     // Compare
     $missingSigs = array_diff($requiredSigs, $existingSigs);
 
-    //CRM-20774 - Get index key which exist in db but the value varies.
-    $existingKeyIndices = array();
+    //CRM-20774 - Drop index key which exist in db but the value varies.
     $existingKeySigs = array_intersect_key($missingSigs, $existingSigs);
-    if (!empty($existingKeySigs)) {
-      $missingSigs = array_diff_key($missingSigs, $existingKeySigs);
+    if ($dropFalseIndices && !empty($existingKeySigs)) {
       foreach ($existingKeySigs as $sig) {
         $sigParts = explode('::', $sig);
         foreach ($requiredIndices[$sigParts[0]] as $index) {
-          if ($index['sig'] == $sig) {
-            $existingKeyIndices[$sigParts[0]][] = $index;
+          if ($index['sig'] == $sig && !empty($index['name'])) {
+            self::dropIndexIfExists($sigParts[0], $index['name']);
             continue;
           }
         }
@@ -751,7 +753,7 @@ MODIFY      {$columnName} varchar( $length )
         }
       }
     }
-    return array($missingIndices, $existingKeyIndices);
+    return $missingIndices;
   }
 
   /**
