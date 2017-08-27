@@ -42,6 +42,7 @@ class CRM_Core_BAO_Log extends CRM_Core_DAO_Log {
    * @param string $table
    *
    * @return array|null
+   *
    */
   public static function &lastModified($id, $table = 'civicrm_contact') {
 
@@ -51,9 +52,11 @@ class CRM_Core_BAO_Log extends CRM_Core_DAO_Log {
     $log->entity_id = $id;
     $log->orderBy('modified_date desc');
     $log->limit(1);
-    $result = NULL;
+    $displayName = $result = $contactImage = NULL;
     if ($log->find(TRUE)) {
-      list($displayName, $contactImage) = CRM_Contact_BAO_Contact::getDisplayAndImage($log->modified_id);
+      if ($log->modified_id) {
+        list($displayName, $contactImage) = CRM_Contact_BAO_Contact::getDisplayAndImage($log->modified_id);
+      }
       $result = array(
         'id' => $log->modified_id,
         'name' => $displayName,
