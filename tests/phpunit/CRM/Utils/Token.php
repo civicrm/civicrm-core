@@ -16,7 +16,7 @@ class CRM_Utils_TokenTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test for replaceContactTokens.
+   * Test for replaceGreetingTokens.
    *
    */
   public function testReplaceGreetingTokens() {
