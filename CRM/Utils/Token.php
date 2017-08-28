@@ -1366,7 +1366,7 @@ class CRM_Utils_Token {
         $tokenString = CRM_Utils_Token::replaceContactTokens($tokenString, $contactDetails, TRUE, $greetingTokens, TRUE, $escapeSmarty);
       }
 
-      self::removeNullContactTokens($tokenString, $contactDetails[0][$contactId], $greetingTokens);
+      self::removeNullContactTokens($tokenString, $contactDetails, $greetingTokens);
       // check if there are any unevaluated tokens
       $greetingTokens = self::getTokens($tokenString);
 
@@ -1436,6 +1436,11 @@ class CRM_Utils_Token {
   private static function removeNullContactTokens(&$tokenString, $contactDetails, &$greetingTokens) {
     $greetingTokensOriginal = $greetingTokens;
     $contactFieldList = CRM_Contact_DAO_Contact::fields();
+    // Sometimes contactDetails are in a multidemensional array, sometimes a
+    // single-dimension array.
+    if (array_key_exists(0, $contactDetails) && is_array($contactDetails[0])) {
+      $contactDetails = current($contactDetails[0]);
+    }
     $nullFields = array_keys(array_diff_key($contactFieldList, $contactDetails));
 
     // Handle legacy tokens
