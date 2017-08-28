@@ -192,6 +192,7 @@ class CRM_Core_PseudoConstant {
    * - onlyActive boolean return only the action option values
    * - fresh      boolean ignore cache entries and go back to DB
    * @param string $context : Context string
+   * @see CRM_Core_DAO::buildOptionsContext
    *
    * @return array|bool
    *   array on success, FALSE on error.
