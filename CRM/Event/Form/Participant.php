@@ -1738,8 +1738,23 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
           $sent[] = $contactID;
           foreach ($participants as $ids => $values) {
             if ($values->contact_id == $contactID) {
-              $values->details = CRM_Utils_Array::value('receipt_text', $params);
-              CRM_Activity_BAO_Activity::addActivity($values, 'Email');
+              $activityParams = array(
+                'source_contact_id' => $values->contact_id,
+                'source_record_id' => $values->id,
+                'activity_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Email'),
+                'is_test' => $values->is_test,
+                'skipRecentView' => TRUE,
+                'campaign_id' => $values->campaign_id,
+                'details' => CRM_Utils_Array::value('receipt_text', $params),
+              );
+
+              // create activity with target contacts
+              $id = CRM_Core_Session::getLoggedInContactID();
+              if ($id) {
+                $activityParams['source_contact_id'] = $id;
+                $activityParams['target_contact_id'][] = $values->contact_id;
+              }
+              CRM_Event_BAO_Participant::addActivity($activityParams);
               break;
             }
           }

@@ -206,7 +206,22 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
     if ((!CRM_Utils_Array::value('id', $params)) ||
       (isset($params['status_id']) && $params['status_id'] != $status)
     ) {
-      CRM_Activity_BAO_Activity::addActivity($participant);
+      $activityParams = array(
+        'source_contact_id' => $participant->contact_id,
+        'source_record_id' => $participant->id,
+        'activity_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Event Registration'),
+        'is_test' => $participant->is_test,
+        'skipRecentView' => TRUE,
+        'campaign_id' => $participant->campaign_id,
+      );
+
+      // create activity with target contacts
+      $id = CRM_Core_Session::getLoggedInContactID();
+      if ($id) {
+        $activityParams['source_contact_id'] = $id;
+        $activityParams['target_contact_id'][] = $participant->contact_id;
+      }
+      self::addActivity($activityParams);
     }
 
     //CRM-5403
@@ -1435,7 +1450,7 @@ UPDATE  civicrm_participant
         foreach ($primaryANDAdditonalIds[$participantId] as $additionalId) {
 
           if ($emailType) {
-            $mail = self::sendTransitionParticipantMail($additionalId,
+            $mail = self::sendTransitionParticipantMail(
               $participantDetails[$additionalId],
               $eventDetails[$participantDetails[$additionalId]['event_id']],
               $contactDetails[$participantDetails[$additionalId]['contact_id']],
@@ -1455,7 +1470,7 @@ UPDATE  civicrm_participant
 
       //now send email appropriate mail to primary.
       if ($emailType) {
-        $mail = self::sendTransitionParticipantMail($participantId,
+        $mail = self::sendTransitionParticipantMail(
           $participantValues,
           $eventDetails[$participantValues['event_id']],
           $contactDetails[$participantValues['contact_id']],
@@ -1497,8 +1512,6 @@ UPDATE  civicrm_participant
    * Send mail and create activity
    * when participant status changed.
    *
-   * @param int $participantId
-   *   Participant id.
    * @param array $participantValues
    *   Participant detail values. status id for participants.
    * @param array $eventDetails
@@ -1512,95 +1525,65 @@ UPDATE  civicrm_participant
    *
    * @return bool
    */
-  public static function sendTransitionParticipantMail(
-    $participantId,
-    $participantValues,
-    $eventDetails,
-    $contactDetails,
-    &$domainValues,
-    $mailType
-  ) {
-    //send emails.
-    $mailSent = FALSE;
-
+  public static function sendTransitionParticipantMail($participantValues, $eventDetails, $contactDetails, &$domainValues, $mailType) {
     //don't send confirmation mail to additional
     //since only primary able to confirm registration.
     if (!empty($participantValues['registered_by_id']) &&
       $mailType == 'Confirm'
     ) {
-      return $mailSent;
+      return array(FALSE);
     }
     $toEmail = CRM_Utils_Array::value('email', $contactDetails);
-    if ($toEmail) {
 
-      $contactId = $participantValues['contact_id'];
-      $participantName = $contactDetails['display_name'];
-
-      //calculate the checksum value.
-      $checksumValue = NULL;
-      if ($mailType == 'Confirm' && !$participantValues['registered_by_id']) {
-        $checksumLife = 'inf';
-        $endDate = CRM_Utils_Array::value('end_date', $eventDetails);
-        if ($endDate) {
-          $checksumLife = (CRM_Utils_Date::unixTime($endDate) - time()) / (60 * 60);
-        }
-        $checksumValue = CRM_Contact_BAO_Contact_Utils::generateChecksum($contactId, NULL, $checksumLife);
-      }
-
-      //take a receipt from as event else domain.
-      $receiptFrom = $domainValues['name'] . ' <' . $domainValues['email'] . '>';
-      if (!empty($eventDetails['confirm_from_name']) && !empty($eventDetails['confirm_from_email'])) {
-        $receiptFrom = $eventDetails['confirm_from_name'] . ' <' . $eventDetails['confirm_from_email'] . '>';
-      }
-
-      list($mailSent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate(
-        array(
-          'groupName' => 'msg_tpl_workflow_event',
-          'valueName' => 'participant_' . strtolower($mailType),
-          'contactId' => $contactId,
-          'tplParams' => array(
-            'contact' => $contactDetails,
-            'domain' => $domainValues,
-            'participant' => $participantValues,
-            'event' => $eventDetails,
-            'paidEvent' => CRM_Utils_Array::value('is_monetary', $eventDetails),
-            'isShowLocation' => CRM_Utils_Array::value('is_show_location', $eventDetails),
-            'isAdditional' => $participantValues['registered_by_id'],
-            'isExpired' => $mailType == 'Expired',
-            'isConfirm' => $mailType == 'Confirm',
-            'checksumValue' => $checksumValue,
-          ),
-          'from' => $receiptFrom,
-          'toName' => $participantName,
-          'toEmail' => $toEmail,
-          'cc' => CRM_Utils_Array::value('cc_confirm', $eventDetails),
-          'bcc' => CRM_Utils_Array::value('bcc_confirm', $eventDetails),
-        )
-      );
-
-      // 3. create activity record.
-      if ($mailSent) {
-        $now = date('YmdHis');
-        $activityType = 'Event Registration';
-        $activityParams = array(
-          'subject' => $subject,
-          'source_contact_id' => $contactId,
-          'source_record_id' => $participantId,
-          'activity_type_id' => CRM_Core_OptionGroup::getValue('activity_type',
-            $activityType,
-            'name'
-          ),
-          'activity_date_time' => CRM_Utils_Date::isoToMysql($now),
-          'due_date_time' => CRM_Utils_Date::isoToMysql($participantValues['register_date']),
-          'is_test' => $participantValues['is_test'],
-          'status_id' => 2,
-        );
-
-        if (is_a(CRM_Activity_BAO_Activity::create($activityParams), 'CRM_Core_Error')) {
-          CRM_Core_Error::fatal('Failed creating Activity for expiration mail');
-        }
-      }
+    if (empty($toEmail)) {
+      return array(FALSE);
     }
+
+    $contactId = $participantValues['contact_id'];
+    $participantName = $contactDetails['display_name'];
+
+    //calculate the checksum value.
+    $checksumValue = NULL;
+    if ($mailType == 'Confirm' && !$participantValues['registered_by_id']) {
+      $checksumLife = 'inf';
+      $endDate = CRM_Utils_Array::value('end_date', $eventDetails);
+      if ($endDate) {
+        $checksumLife = (CRM_Utils_Date::unixTime($endDate) - time()) / (60 * 60);
+      }
+      $checksumValue = CRM_Contact_BAO_Contact_Utils::generateChecksum($contactId, NULL, $checksumLife);
+    }
+
+    //take a receipt from as event else domain.
+    $receiptFrom = $domainValues['name'] . ' <' . $domainValues['email'] . '>';
+    if (!empty($eventDetails['confirm_from_name']) && !empty($eventDetails['confirm_from_email'])) {
+      $receiptFrom = $eventDetails['confirm_from_name'] . ' <' . $eventDetails['confirm_from_email'] . '>';
+    }
+
+    $sendTemplateParams = array(
+      'groupName' => 'msg_tpl_workflow_event',
+      'valueName' => 'participant_' . strtolower($mailType),
+      'contactId' => $contactId,
+      'tplParams' => array(
+        'contact' => $contactDetails,
+        'domain' => $domainValues,
+        'participant' => $participantValues,
+        'event' => $eventDetails,
+        'paidEvent' => CRM_Utils_Array::value('is_monetary', $eventDetails),
+        'isShowLocation' => CRM_Utils_Array::value('is_show_location', $eventDetails),
+        'isAdditional' => $participantValues['registered_by_id'],
+        'isExpired' => $mailType == 'Expired',
+        'isConfirm' => $mailType == 'Confirm',
+        'checksumValue' => $checksumValue,
+      ),
+      'from' => $receiptFrom,
+      'toName' => $participantName,
+      'toEmail' => $toEmail,
+      'cc' => CRM_Utils_Array::value('cc_confirm', $eventDetails),
+      'bcc' => CRM_Utils_Array::value('bcc_confirm', $eventDetails),
+    );
+    list($mailSent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
+
+    self::addActivityForRegistration($mailSent, $subject, $html, $participantValues);
 
     return $mailSent;
   }
@@ -1895,7 +1878,6 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
     $eventId = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_Participant', $participantId, 'event_id');
     $contactId = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_Participant', $participantId, 'contact_id');
 
-    $date = CRM_Utils_Date::currentDBDate();
     $event = CRM_Event_BAO_Event::getEvents(0, $eventId);
     $subject = sprintf("Registration selections changed for %s", CRM_Utils_Array::value($eventId, $event));
 
@@ -1905,19 +1887,98 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
       'source_record_id' => $participantId,
       'activity_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', $activityType),
       'subject' => $subject,
-      'activity_date_time' => $date,
-      'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_status_id', 'Completed'),
       'skipRecentView' => TRUE,
     );
 
     // create activity with target contacts
-    $id = CRM_Core_Session::singleton()->getLoggedInContactID();;
+    $id = CRM_Core_Session::singleton()->getLoggedInContactID();
     if ($id) {
       $activityParams['source_contact_id'] = $id;
       $activityParams['target_contact_id'][] = $contactId;
     }
-    // @todo use api & also look at duplication of similar methods.
-    CRM_Activity_BAO_Activity::create($activityParams);
+
+    self::addActivity($activityParams);
+  }
+
+  /**
+   * Create activity record for participant registration transition
+   * @param $mailSent
+   * @param $subject
+   * @param $details Details of activity (eg. message content)
+   * @param $contactId
+   * @param $participantValues
+   */
+  public static function addActivityForRegistration($mailSent, $subject, $details, $participantValues) {
+    if ($mailSent) {
+      $activityParams = array(
+        'subject' => $subject,
+        'details' => $details,
+        'source_contact_id' => $participantValues['contact_id'],
+        'source_record_id' => $participantValues['id'],
+        'activity_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Event Registration'),
+        'due_date_time' => CRM_Utils_Date::isoToMysql($participantValues['register_date']),
+        'is_test' => $participantValues['is_test'],
+      );
+
+      self::addActivity($activityParams);
+    }
+  }
+
+  /**
+   * Create activity record for participant
+   * @param $activityParams
+   * @return CRM_Activity_BAO_Activity|null|object
+   */
+  public static function addActivity($activityParams) {
+    /* activityParams to be passed in:
+     * subject
+     * details
+     * is_test
+     * activity_type_id
+     * source_record_id
+     */
+    $activityParams['status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_status_id', 'Completed');
+    $activityParams['activity_date_time'] = CRM_Utils_Date::currentDBDate();
+
+    if (empty($activityParams['subject'])) {
+      $eventId = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_Participant', $activityParams['source_record_id'], 'event_id');
+      $activityParams['subject'] = self::getActivitySubject($eventId, $activityParams['status_id']);
+    }
+
+    try {
+      // @todo use api?
+      return CRM_Activity_BAO_Activity::create($activityParams);
+    }
+    catch (Exception $e) {
+      $activityType = CRM_Core_PseudoConstant::getName('CRM_Activity_BAO_Activity', 'activity_type_id', $activityParams['activity_type_id']);
+      CRM_Core_Session::setStatus('Failed creating Activity for ' . $activityType . ': ' . $e->getMessage());
+      Civi::log()->error('Failed creating Activity for ' . $activityType . ': ' . $e->getMessage());
+    }
+    return NULL;
+  }
+
+  /**
+   * Get activity subject based on event and role/status
+   * @param $eventId
+   * @param $statusId
+   * @param $roleId
+   *
+   * @return string
+   */
+  public static function getActivitySubject($eventId, $statusId = NULL, $roleId = NULL) {
+    $event = CRM_Event_BAO_Event::getEvents(1, $eventId, TRUE, FALSE);
+    $roles = CRM_Event_PseudoConstant::participantRole();
+    $status = CRM_Event_PseudoConstant::participantStatus();
+    $subject = $event[$eventId];
+
+    if (!empty($roles[$roleId])) {
+      $subject .= ' - ' . $roles[$roleId];
+    }
+    if (!empty($status[$statusId])) {
+      $subject .= ' - ' . $status[$statusId];
+    }
+
+    return $subject;
   }
 
   /**

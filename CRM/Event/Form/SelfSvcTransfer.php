@@ -513,7 +513,7 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
       $contactDetails[$this->_from_contact_id] = $contactValues;
     }
     //send a 'cancelled' email to user, and cc the event's cc_confirm email
-    $mail = CRM_Event_BAO_Participant::sendTransitionParticipantMail($this->_from_participant_id,
+    $mail = CRM_Event_BAO_Participant::sendTransitionParticipantMail(
       $participantDetails[$this->_from_participant_id],
       $eventDetails[$this->_event_id],
       $contactDetails[$this->_from_contact_id],
