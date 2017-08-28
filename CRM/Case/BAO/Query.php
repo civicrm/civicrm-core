@@ -716,6 +716,16 @@ case_relation_type.id = case_relationship.relationship_type_id )";
       $form->addElement('checkbox', 'case_deleted', ts('Deleted Cases'));
     }
 
+    $form->addElement( 'text',
+      'case_subject',
+      ts('Case Subject'),
+      array('class' => 'huge')
+    );
+    $form->addElement( 'text',
+      'case_id',
+      ts('Case ID')
+    );
+
     self::addCustomFormFields($form, array('Case'));
 
     $form->setDefaults(array('case_owner' => 1));
