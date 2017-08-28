@@ -962,7 +962,7 @@ AND    civicrm_activity.source_record_id = %2
         if (CRM_Core_BAO_Email::isMultipleBulkMail()) {
           static $targetRecordID = NULL;
           if (!$targetRecordID) {
-            $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
+            $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
             $targetRecordID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
           }
 

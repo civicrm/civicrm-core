@@ -2276,7 +2276,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    AND     civicrm_activity_contact.record_type_id = %3
 ";
 
-      $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
+      $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
       $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
 
       $params = array(
