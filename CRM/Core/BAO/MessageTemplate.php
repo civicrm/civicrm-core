@@ -122,7 +122,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
   public static function del($messageTemplatesID) {
     // make sure messageTemplatesID is an integer
     if (!CRM_Utils_Rule::positiveInteger($messageTemplatesID)) {
-      throw new Exception('Invalid Message template');
+      throw new CRM_Core_Exception('Invalid Message template');
     }
 
     // Set mailing msg template col to NULL
@@ -299,7 +299,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
     $diverted->find(1);
 
     if ($diverted->N != 1) {
-      throw new Exception('Did not find a message template with id of %1.', array(1 => $id));
+      throw new CRM_Core_Exception('Did not find a message template with id of %1.', array(1 => $id));
     }
 
     $orig = new CRM_Core_BAO_MessageTemplate();
@@ -308,7 +308,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
     $orig->find(1);
 
     if ($orig->N != 1) {
-      throw new Exception('Message template with id of %1 does not have a default to revert to.', array(1 => $id));
+      throw new CRM_Core_Exception('Message template with id of %1 does not have a default to revert to.', array(1 => $id));
     }
 
     $diverted->msg_subject = $orig->msg_subject;
@@ -455,6 +455,11 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
       $mailContent['html'] = CRM_Utils_Token::replaceHookTokens($mailContent['html'], $contact, $categories, TRUE);
     }
 
+    // Strip remaining tokens before parsing through smarty to avoid smarty errors
+    foreach (array('subject', 'text', 'html') as $elem) {
+      $mailContent[$elem] = CRM_Utils_Token::stripTokens($mailContent[$elem]);
+    }
+
     // strip whitespace from ends and turn into a single line
     $mailContent['subject'] = "{strip}{$mailContent['subject']}{/strip}";
 
@@ -539,7 +544,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
       ) &&
       !$params['messageTemplateID']
     ) {
-      throw new Exception("Message template's option group and/or option value or ID missing.");
+      throw new CRM_Core_Exception("Message template's option group and/or option value or ID missing.");
     }
 
     if (empty($params['is_default'])) {
@@ -554,9 +559,11 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
       $content = civicrm_api3('MessageTemplate', 'getsingle', $params);
     }
     catch (Exception $e) {
-      throw new Exception('No such message template: id=%1. groupName=%2. valueName=%3', array(
-          1 => $params['id'], 2 => $params['groupName'], 3 => $params['valueName'])
-      );
+      throw new CRM_Core_Exception('No such message template: id=%1. groupName=%2. valueName=%3', array(
+          1 => $params['id'],
+          2 => $params['groupName'],
+          3 => $params['valueName'],
+      ));
     }
     return array(
       'subject' => CRM_Utils_Array::value('msg_subject', $content),

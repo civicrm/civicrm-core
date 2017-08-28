@@ -117,7 +117,7 @@ function civicrm_api3_message_template_get($params) {
       $optionGroup = civicrm_api3('OptionGroup', 'getsingle', array('name' => $params['option_group_name']));
       $optionValue = civicrm_api3('OptionValue', 'getsingle', array(
         'name' => $params['option_value_name'],
-        'option_group_id' => $optionGroup['id']
+        'option_group_id' => $optionGroup['id'],
       ));
     }
     catch (Exception $e) {

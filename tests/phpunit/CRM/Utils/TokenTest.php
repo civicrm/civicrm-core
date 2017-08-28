@@ -141,7 +141,7 @@ class CRM_Utils_TokenTest extends CiviUnitTestCase {
       }
     }
   }
-  
+
   public function testStripTokens() {
     $testString = 'Test with {$smarty} and {$smarty.s} and {literal} and {non.smarty}';
     $expectedResult = 'Test with {$smarty} and {$smarty.s} and {literal} and ';
