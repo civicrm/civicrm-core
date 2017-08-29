@@ -309,7 +309,6 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
           $this->_formValues['group'][$groupID] = 1;
         }
       }
-
     }
 
     CRM_Core_BAO_CustomValue::fixCustomFieldValue($this->_formValues);
