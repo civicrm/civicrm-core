@@ -116,6 +116,27 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
   }
 
   /**
+   * @return array
+   */
+  public function checkPhpEcrypt() {
+    $messages = array();
+    if (!function_exists('mcrypt_module_open')) {
+      $messages[] = new CRM_Utils_Check_Message(
+        __FUNCTION__,
+        ts('Your version of PHP does not include the <a href="%1">mcrypt functions</a>. You likely should include the extension "%2". Some passwords will not be stored encrypted, and if you have recently upgraded from a PHP that does include these functions, your encrypted passwords will not be decrypted correctly.',
+          array(
+            1 => 'http://php.net/manual/en/book.mcrypt.php',
+            2 => 'mcrypt',
+          )),
+        ts('PHP Missing Extension "mcrypt"'),
+        \Psr\Log\LogLevel::WARNING,
+        'fa-server'
+      );
+    }
+    return $messages;
+  }
+
+  /**
    * Check that the MySQL time settings match the PHP time settings.
    *
    * @return array<CRM_Utils_Check_Message> an empty array, or a list of warnings
