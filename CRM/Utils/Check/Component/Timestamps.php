@@ -43,12 +43,21 @@ class CRM_Utils_Check_Component_Timestamps extends CRM_Utils_Check_Component {
     $problems = array();
     foreach (self::getConvertedTimestamps() as $target) {
       if (self::isFieldType($target['table'], $target['column'], 'datetime')) {
+        $phrases = array();
+        $phrases[] = sprintf('<em>%s.%s</em>', $target['table'], $target['column']);
+
         if ($target['changed']) {
-          $problems[] = sprintf('<em>%s.%s</em> (New sites default to TIMESTAMP in %s+)', $target['table'], $target['column'], $target['changed']);
+          $phrases[] = sprintf('(New sites default to TIMESTAMP in v%s+)', $target['changed']);
         }
         else {
-          $problems[] = sprintf('<em>%s.%s</em> (Experimental suggestion)', $target['table'], $target['column']);
+          $phrases[] = '(Experimental suggestion)';
         }
+
+        if (isset($target['jira'])) {
+          $phrases[] = sprintf(' [<a href="https://issues.civicrm.org/jira/browse/%s" target="_blank">%s</a>]', $target['jira'], $target['jira']);
+        }
+
+        $problems[] = implode(' ', $phrases);
       }
     }
 
@@ -57,17 +66,20 @@ class CRM_Utils_Check_Component_Timestamps extends CRM_Utils_Check_Component {
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__ . md5(implode(',', $problems)),
         '<p>' .
-        ts('This system includes some SQL columns with type "DATETIME". These <b>may</b> work better as "TIMESTAMP".') .
+        ts('This MySQL database stores certain fields with data-type "DATETIME". To improve timezone support, you <em>may</em> want to change these from "DATETIME" to "TIMESTAMP".') .
         '</p>' .
         '<ul><li>' .
         implode('</li><li>', $problems) .
         '</li></ul>' .
         '<p>' .
+        ts('Changing should improve data-quality for organizations working in multiple timezones. However, if you do change, then you may need to re-test any customizations or processes that reference these fields. Changing is <em>suggested</em> but not <em>required</em>.') .
+        '</p>' .
+        '<p>' .
         ts('For further discussion, please visit %1', array(
           1 => sprintf('<a href="%s" target="_blank">%s</a>', self::DOCTOR_WHEN, self::DOCTOR_WHEN),
         )) .
         '</p>',
-        ts('Timestamp Schema'),
+        ts('Timestamps and Timezones'),
         \Psr\Log\LogLevel::NOTICE,
         'fa-clock-o'
       );
