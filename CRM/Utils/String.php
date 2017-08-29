@@ -47,7 +47,7 @@ class CRM_Utils_String {
   /**
    * Convert a display name into a potential variable name.
    *
-   * @param $title title of the string
+   * @param string $title title of the string
    * @param int $maxLength
    *
    * @return string
