@@ -1291,6 +1291,7 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
       while ($relationship->fetch()) {
         $relationshipCount += $relationship->cnt1 + $relationship->cnt2;
       }
+      CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE IF EXISTS civicrm_contact_relationships");
       return $relationshipCount;
     }
     else {
@@ -1444,6 +1445,7 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
       }
 
       $relationship->free();
+      CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE IF EXISTS civicrm_contact_relationships");
       return $values;
     }
   }
