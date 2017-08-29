@@ -116,6 +116,9 @@ return array(
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => "Setting to define the environment in which this CiviCRM instance is running.",
+    'on_change' => array(
+      'CRM_Core_BAO_Setting::onChangeEnvironmentSetting',
+    ),
   ),
   'fatalErrorHandler' => array(
     'group_name' => 'Developer Preferences',

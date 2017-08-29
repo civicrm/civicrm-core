@@ -395,7 +395,7 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
     $mailingParams = array_merge($this->defaultParams, $params);
     $this->callAPISuccess('mailing', 'create', $mailingParams);
     $this->_mut->assertRecipients(array());
-    $this->callAPISuccess('job', 'process_mailing', array());
+    $this->callAPISuccess('job', 'process_mailing', array('runInNonProductionEnvironment' => TRUE));
 
     $allMessages = $this->_mut->getAllMessages('ezc');
     // There are exactly two contacts produced by setUp().
