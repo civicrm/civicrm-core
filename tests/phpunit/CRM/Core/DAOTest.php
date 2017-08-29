@@ -308,4 +308,42 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     }
   }
 
+  /**
+   * CRM-17748: Test internal DAO options
+   */
+  public function testDBOptions() {
+    $contactIDs = array();
+    for ($i = 0; $i < 10; $i++) {
+      $contactIDs[] = $this->individualCreate(array(
+        'first_name' => 'Alan' . substr(sha1(rand()), 0, 7),
+        'last_name' => 'Smith' . substr(sha1(rand()), 0, 4),
+      ));
+    }
+
+    // Test option 'result_buffering'
+    $this->_testMemoryUsageForUnbufferedQuery();
+
+    // cleanup
+    foreach ($contactIDs as $contactID) {
+      $this->callAPISuccess('Contact', 'delete', array('id' => $contactID));
+    }
+  }
+
+  /**
+   * Helper function to test result of buffered and unbuffered query
+   */
+  public function _testMemoryUsageForUnbufferedQuery() {
+    $sql = "SELECT * FROM civicrm_contact WHERE first_name LIKE 'Alan%' AND last_name LIKE 'Smith%' ";
+
+    $dao = CRM_Core_DAO::executeQuery($sql);
+    $contactsFetchedFromBufferedQuery = $dao->fetchAll();
+    $dao->free();
+
+    $dao = CRM_Core_DAO::executeUnbufferedQuery($sql);
+    $contactsFetchedFromUnbufferedQuery = $dao->fetchAll();
+    $dao->free();
+
+    $this->checkArrayEquals($contactsFetchedFromBufferedQuery, $contactsFetchedFromUnbufferedQuery);
+  }
+
 }

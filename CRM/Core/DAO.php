@@ -1249,43 +1249,17 @@ FROM   civicrm_domain
     $i18nRewrite = TRUE,
     $trapException = FALSE
   ) {
-    $queryStr = self::composeQuery($query, $params, $abort);
-    //CRM_Core_Error::debug( 'q', $queryStr );
-    if (!$daoName) {
-      $dao = new CRM_Core_DAO();
-    }
-    else {
-      $dao = new $daoName();
-    }
 
-    if ($trapException) {
-      CRM_Core_Error::ignoreException();
-    }
-
-    // set the DAO object to use an unbuffered query
-    $dao->setOptions(array('result_buffering' => 0));
-
-    $result = $dao->query($queryStr, $i18nRewrite);
-
-    if ($trapException) {
-      CRM_Core_Error::setCallback();
-    }
-
-    if (is_a($result, 'DB_Error')) {
-      return $result;
-    }
-
-    // since it is unbuffered, ($dao->N==0) is true.  This blocks the standard fetch() mechanism.
-    $dao->N = TRUE;
-
-    if ($freeDAO ||
-      preg_match('/^(insert|update|delete|create|drop|replace)/i', $queryStr)
-    ) {
-      // we typically do this for insert/update/delete stataments OR if explicitly asked to
-      // free the dao
-      $dao->free();
-    }
-    return $dao;
+    return self::executeQuery(
+      $query,
+      $params,
+      $abort,
+      $daoName,
+      $freeDAO,
+      $i18nRewrite,
+      $trapException,
+      array('result_buffering' => 0)
+    );
   }
 
   /**
@@ -1300,6 +1274,7 @@ FROM   civicrm_domain
    * @param bool $freeDAO
    * @param bool $i18nRewrite
    * @param bool $trapException
+   * @param array $options
    *
    * @return CRM_Core_DAO|object
    *   object that holds the results of the query
@@ -1313,7 +1288,8 @@ FROM   civicrm_domain
     $daoName = NULL,
     $freeDAO = FALSE,
     $i18nRewrite = TRUE,
-    $trapException = FALSE
+    $trapException = FALSE,
+    $options = array()
   ) {
     $queryStr = self::composeQuery($query, $params, $abort);
 
@@ -1328,7 +1304,16 @@ FROM   civicrm_domain
       $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
     }
 
+    if ($dao->isValidOption($options)) {
+      $dao->setOptions($options);
+    }
+
     $result = $dao->query($queryStr, $i18nRewrite);
+
+    // since it is unbuffered, ($dao->N==0) is true.  This blocks the standard fetch() mechanism.
+    if (CRM_Utils_Array::value('result_buffering', $options) === 0) {
+      $dao->N = TRUE;
+    }
 
     if (is_a($result, 'DB_Error')) {
       return $result;
@@ -1342,6 +1327,37 @@ FROM   civicrm_domain
       $dao->free();
     }
     return $dao;
+  }
+
+  /**
+   * Wrapper to validate internal DAO options before passing to DB_mysql/DB_Common level
+   *
+   * @param array $options
+   *
+   * @return bool
+   *   Provided options are valid
+   */
+  public function isValidOption($options) {
+    $isValid = FALSE;
+    $validOptions = array(
+      'result_buffering',
+      'persistent',
+      'ssl',
+      'portability',
+    );
+
+    if (empty($options)) {
+      return $isValid;
+    }
+
+    foreach (array_keys($options) as $option) {
+      if (!in_array($option, $validOptions)) {
+        return FALSE;
+      }
+      $isValid = TRUE;
+    }
+
+    return $isValid;
   }
 
   /**
