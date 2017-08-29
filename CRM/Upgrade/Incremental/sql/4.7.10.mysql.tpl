@@ -13,7 +13,6 @@ ALTER TABLE civicrm_pledge_block ADD is_pledge_start_date_visible TINYINT(4) NOT
 ALTER TABLE civicrm_pledge_block ADD is_pledge_start_date_editable TINYINT(4) NOT NULL DEFAULT 0 COMMENT 'If true - recurring start date is editable.';
 ALTER TABLE civicrm_contribution_page ADD adjust_recur_start_date TINYINT(4) NOT NULL DEFAULT 0 COMMENT 'If true - user is able to adjust payment start date.' AFTER is_recur_installments;
 
-
 -- CRM-17608 Merge to DOCx or ODT template
 SELECT @option_group_id_ext := max(id) from civicrm_option_group where name = 'safe_file_extension';
 SELECT @option_group_id_ext_wt  := MAX(weight) FROM civicrm_option_value WHERE option_group_id = @option_group_id_ext;
@@ -22,14 +21,3 @@ INSERT INTO
    `civicrm_option_value` (`option_group_id`, {localize field='label'}label{/localize}, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `is_optgroup`, `is_reserved`, `is_active`)
 VALUES
    (@option_group_id_ext, {localize}'{ts escape="sql"}odt{/ts}'{/localize}, @option_group_id_ext_val+1, 'odt', NULL, 0, 0, @option_group_id_ext_wt+1, 0, 1, 1);
-
--- CRM-18231
-INSERT INTO civicrm_option_group
-      (name, {localize field='title'}title{/localize}, is_reserved, is_active) VALUES ('environment', {localize}'{ts escape="sql"}Environment{/ts}'{/localize}, 0, 1);
-
-SELECT @option_group_id_env := max(id) from civicrm_option_group where name = 'environment';
-INSERT INTO civicrm_option_value (option_group_id, {localize field='label'}label{/localize}, value, name, grouping, filter, is_default, weight, {localize field='description'}description{/localize}, is_optgroup, is_reserved, is_active, component_id, visibility_id)
-VALUES
-   (@option_group_id_env, {localize}'{ts escape="sql"}Production{/ts}'{/localize}, 'Production', 'Production', NULL, 0, 1, 1, {localize}'{ts escape="sql"}Production Environment{/ts}'{/localize}, 0, 0, 1, NULL, NULL),
-   (@option_group_id_env, {localize}'{ts escape="sql"}Staging{/ts}'{/localize}, 'Staging', 'Staging', NULL, 0, NULL, 2, {localize}'{ts escape="sql"}Staging Environment{/ts}'{/localize}, 0, 0, 1, NULL, NULL),
-   (@option_group_id_env, {localize}'{ts escape="sql"}Development{/ts}'{/localize}, 'Development', 'Development', NULL, 0, NULL, 3, {localize}'{ts escape="sql"}Development Environment{/ts}'{/localize}, 0, 0, 1, NULL, NULL);
