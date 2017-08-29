@@ -112,7 +112,12 @@
           {/if}
           </div>
         <div>
-          <p></p>
+          {if $action ne 1 and $action ne 2 and $type eq 'userTemplates'}
+            <div class="action-link">
+              {crmButton p='civicrm/admin/messageTemplates/add' q="action=add&reset=1" id="newMessageTemplates"  icon="plus-circle"}{ts}Add Message Template{/ts}{/crmButton}
+            </div>
+            <div class="spacer"></div>
+          {/if}
             {if !empty( $template_row) }
               <table class="display">
                 <thead>
