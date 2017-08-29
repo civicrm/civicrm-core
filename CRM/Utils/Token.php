@@ -1235,9 +1235,7 @@ class CRM_Utils_Token {
       }
     }
 
-    $query = new CRM_Contact_BAO_Query($params, $returnProperties);
-
-    $details = $query->apiQuery($params, $returnProperties, NULL, NULL, 0, count($contactIDs));
+    $details = CRM_Contact_BAO_Query::apiQuery($params, $returnProperties, NULL, NULL, 0, count($contactIDs));
 
     $contactDetails = &$details[0];
 
@@ -1368,6 +1366,7 @@ class CRM_Utils_Token {
         $tokenString = CRM_Utils_Token::replaceContactTokens($tokenString, $contactDetails, TRUE, $greetingTokens, TRUE, $escapeSmarty);
       }
 
+      self::removeNullContactTokens($tokenString, $contactDetails, $greetingTokens);
       // check if there are any unevaluated tokens
       $greetingTokens = self::getTokens($tokenString);
 
@@ -1422,6 +1421,49 @@ class CRM_Utils_Token {
         list($contact) = $greetingDetails;
         // Replace tokens defined in Hooks.
         $tokenString = CRM_Utils_Token::replaceHookTokens($tokenString, $contact[$contactId], $categories);
+      }
+    }
+  }
+
+  /**
+   * At this point, $contactDetails has loaded the contact from the DAO. Any
+   * (non-custom) missing fields are null.  By removing them, we can avoid
+   * expensive calls to CRM_Contact_BAO_Query.
+   *
+   * @param string $tokenString
+   * @param array $contactDetails
+   */
+  private static function removeNullContactTokens(&$tokenString, $contactDetails, &$greetingTokens) {
+    $greetingTokensOriginal = $greetingTokens;
+    $contactFieldList = CRM_Contact_DAO_Contact::fields();
+    // Sometimes contactDetails are in a multidemensional array, sometimes a
+    // single-dimension array.
+    if (array_key_exists(0, $contactDetails) && is_array($contactDetails[0])) {
+      $contactDetails = current($contactDetails[0]);
+    }
+    $nullFields = array_keys(array_diff_key($contactFieldList, $contactDetails));
+
+    // Handle legacy tokens
+    foreach (self::legacyContactTokens() as $oldToken => $newToken) {
+      if (CRM_Utils_Array::key($newToken, $nullFields)) {
+        $nullFields[] = $oldToken;
+      }
+    }
+
+    // Remove null contact fields from $greetingTokens
+    $greetingTokens['contact'] = array_diff($greetingTokens['contact'], $nullFields);
+
+    // Also remove them from $tokenString
+    $removedTokens = array_diff($greetingTokensOriginal['contact'], $greetingTokens['contact']);
+    // Handle legacy tokens again, sigh
+    if (!empty($removedTokens)) {
+      foreach ($removedTokens as $token) {
+        if (CRM_Utils_Array::value($token, self::legacyContactTokens()) !== NULL) {
+          $removedTokens[] = CRM_Utils_Array::value($token, self::legacyContactTokens());
+        }
+      }
+      foreach ($removedTokens as $token) {
+        $tokenString = str_replace("{contact.$token}", '', $tokenString);
       }
     }
   }
