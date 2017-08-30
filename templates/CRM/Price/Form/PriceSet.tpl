@@ -34,13 +34,6 @@
       {assign var='adminFld' value=true}
     {/if}
 
-    {assign var='hideValues' value=false}
-    {if $extends == 'Event' && !call_user_func(array('CRM_Core_Permission','check'), 'edit event participants')}
-      {assign var='hideValues' value=true}
-    {elseif $extends == 'Contribution' && !call_user_func(array('CRM_Core_Permission','check'), 'edit contributions')}
-      {assign var='hideValues' value=true}
-    {/if}
-
     {foreach from=$priceSet.fields item=element key=field_id}
         {* Skip 'Admin' visibility price fields WHEN this tpl is used in online registration unless user has administer CiviCRM permission. *}
         {if $element.visibility EQ 'public' || ($element.visibility EQ 'admin' && $adminFld EQ true) || $context eq 'standalone' || $context eq 'advanced' || $context eq 'search' || $context eq 'participant' || $context eq 'dashboard' || $action eq 1024}

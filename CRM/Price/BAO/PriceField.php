@@ -604,6 +604,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
               'price' => json_encode(array($opt['id'], $priceVal)),
               'data-amount' => $opt[$valueFieldName],
               'data-currency' => $currencyName,
+              'visibility' => $opt['visibility_id'],
             )
           );
           if ($is_pay_later) {
