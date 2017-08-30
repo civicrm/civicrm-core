@@ -1914,7 +1914,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     $cacheKeyString = "merge {$contactType}";
     $cacheKeyString .= $rule_group_id ? "_{$rule_group_id}" : '_0';
     $cacheKeyString .= $group_id ? "_{$group_id}" : '_0';
-    $cacheKeyString .= !empty($criteria) ? serialize($criteria) : '_0';
+    $cacheKeyString .= !empty($criteria) ? md5(serialize($criteria)) : '_0';
     if ($checkPermissions) {
       $contactID = CRM_Core_Session::getLoggedInContactID();
       if (!$contactID) {
