@@ -48,7 +48,7 @@
       <th>{ts}Max Participant{/ts} {help id="id-participant-max"}</th>
   {/if}
         <th>{ts}Order{/ts}</th>
-        <th>{ts}Visibility{/ts}</th>
+        <th>{ts}Visibility{/ts} {help id="id-visibility-options"}</th>
         <th>{ts}Active?{/ts}</th>
     </tr>
 
