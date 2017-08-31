@@ -444,8 +444,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     $eidRefs = self::eidRefs();
     $cpTables = self::cpTables();
     $paymentTables = self::paymentTables();
-    // CRM-12695:
-    $membershipMerge = FALSE;
 
     // getting all custom tables
     $customTables = array();
