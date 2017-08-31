@@ -418,9 +418,6 @@ class civicrm_cli_csv_file extends civicrm_cli {
       $this->separator = ";";
       rewind($handle);
       $header = fgetcsv($handle, 0, $this->separator);
-      if (count($header) == 1) {
-        die("Invalid file format for " . $this->_file . ". It must be a valid csv with separator ',' or ';'\n");
-      }
     }
 
     $this->header = $header;
