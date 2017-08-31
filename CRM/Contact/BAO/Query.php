@@ -2793,8 +2793,8 @@ class CRM_Contact_BAO_Query {
             $parts = explode('-', $name);
             $locationTypes = CRM_Core_BAO_Address::buildOptions('location_type_id', 'get');
             foreach ($locationTypes as $locationTypeID => $locationType) {
-	      if ($parts[0] == str_replace(' ', '_', $locationType)) {
-		$locationID = $locationTypeID;
+              if ($parts[0] == str_replace(' ', '_', $locationType)) {
+                $locationID = $locationTypeID;
               }
             }
             $from .= " $side JOIN civicrm_{$locationTypeName} `{$name}` ON ( contact_a.id = `{$name}`.contact_id ) and `{$name}`.location_type_id = $locationID ";
