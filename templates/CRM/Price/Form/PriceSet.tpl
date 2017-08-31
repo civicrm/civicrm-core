@@ -60,17 +60,6 @@
                     {/if}
                   {/if}
                 {/foreach}
-                {if $hideValues}
-                  <script>
-                    {literal}
-                    cj('input').each(function(){
-                      if (cj(this).attr('visibility') == 2 && typeof adminpage == 'undefined') {
-                        cj(this).parent().hide();
-                      }
-                    });
-                    {/literal}
-                  </script>
-                {/if}
                 {if $element.help_post}
                   <div class="description">{$element.help_post}</div>
                 {/if}
@@ -110,26 +99,6 @@
                     {/if}
                   {/if}
                   {if $element.help_post}<br /><span class="description">{$element.help_post}</span>{/if}
-                  {if $element.html_type == 'Select' && $hideValues}
-                    <script>
-                      {literal}
-                      cj('select').each(function() {
-                        var priceFieldValues = cj(this).attr('data-price-field-values');
-
-                        if (typeof priceFieldValues != 'undefined') {
-                          priceFieldValues = JSON.parse(priceFieldValues);
-                          cj(this).children().each(function () {
-                            if (priceFieldValues[this.value]) {
-                              if (priceFieldValues[this.value].visibility_id == 2 && typeof adminpage == 'undefined') {
-                                cj(this).remove();
-                              }
-                            }
-                          });
-                        }
-                      });
-                      {/literal}
-                    </script>
-                  {/if}
                 </div>
 
             {/if}
