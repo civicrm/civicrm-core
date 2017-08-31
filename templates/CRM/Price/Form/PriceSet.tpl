@@ -52,7 +52,7 @@
                     {assign var="optionCount" value=`$optionCount+1`}
                     {if $optionCount == 1}
                       {assign var="rowCount" value=`$rowCount+1`}
-                      <div class="price-set-row {$element.name}-row{$rowCount}" id="price_option_{$key}">
+                      <div class="price-set-row {$element.name}-row{$rowCount}">
                     {/if}
                     <span class="price-set-option-content">{$form.$element_name.$key.html}</span>
                     {if $optionCount == $element.options_per_line || $elementCount == $form.$element_name|@count}
