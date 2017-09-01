@@ -364,6 +364,8 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
         dirname(__FILE__) . '/activities_for_dashboard_count.xml'
       )
     );
+    Civi::settings()->set('preserve_activity_tab_filter', 1);
+    $this->createLoggedInUser();
 
     global $_GET;
     $_GET = array(
@@ -372,20 +374,27 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       'activity_type_id' => 1,
       'is_unit_test' => 1,
     );
-    $obj = new CRM_Activity_Page_AJAX();
+    $expectedFilters = array(
+      'activity_type_filter_id' => 1,
+      'activity_type_exclude_filter_id' => '',
+    );
 
-    $activities = $obj->getContactActivity();
+    list($activities, $activityFilter) = CRM_Activity_Page_AJAX::getContactActivity();
+    //Assert whether filters are correctly set.
+    $this->checkArrayEquals($expectedFilters, $activityFilter);
     // This should include activities of type Meeting only.
     foreach ($activities['data'] as $value) {
       $this->assertContains('Meeting', $value['activity_type']);
     }
     unset($_GET['activity_type_id']);
+    $expectedFilters['activity_type_filter_id'] = '';
 
-    $_GET['activity_type_exclude_id'] = 1;
-    $activities = $obj->getContactActivity();
+    $_GET['activity_type_exclude_id'] = $expectedFilters['activity_type_exclude_filter_id'] = 1;
+    list($activities, $activityFilter) = CRM_Activity_Page_AJAX::getContactActivity();
+    $this->checkArrayEquals($expectedFilters, $activityFilter);
     // None of the activities should be of type Meeting.
     foreach ($activities['data'] as $value) {
-      $this->assertNotEquals('Meeting', $value['activity_type']);
+      $this->assertNotContains('Meeting', $value['activity_type']);
     }
   }
 
