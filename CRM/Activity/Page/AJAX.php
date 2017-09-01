@@ -437,7 +437,14 @@ class CRM_Activity_Page_AJAX {
       unset($optionalParameters['context']);
       foreach ($optionalParameters as $searchField => $dataType) {
         if (!empty($params[$searchField])) {
-          $activityFilter[$searchField] = CRM_Utils_Type::escape($params[$searchField], $dataType);
+          $formSearchField = $searchField;
+          if ($searchField == 'activity_type_id') {
+            $formSearchField = 'activity_type_filter_id';
+          }
+          elseif ($searchField == 'activity_type_exclude_id') {
+            $formSearchField = 'activity_type_exclude_filter_id';
+          }
+          $activityFilter[$formSearchField] = CRM_Utils_Type::escape($params[$searchField], $dataType);
           if (in_array($searchField, array('activity_date_low', 'activity_date_high'))) {
             $activityFilter['activity_date_relative'] = 0;
           }
