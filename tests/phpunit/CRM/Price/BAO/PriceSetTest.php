@@ -70,10 +70,10 @@ class CRM_Price_BAO_PriceSetTest extends CiviUnitTestCase {
     $priceSetID = $this->eventPriceSetCreate(9);
     $oldPriceSetInfo = $this->callAPISuccess('PriceSet', 'getsingle', array('id' => $priceSetID));
     $newPriceSet = CRM_Price_BAO_PriceSet::copy($priceSetID);
-    $this->assertEquals('Price_Set__id_' . $newPriceSet->id . '_', $newPriceSet->name);
+    $this->assertEquals(substr($oldPriceSetInfo['name'], 0, 20) . 'price_set_' . $newPriceSet->id, $newPriceSet->name);
     $this->assertEquals($oldPriceSetInfo['title'] . ' [Copy id ' . $newPriceSet->id . ']', $newPriceSet->title);
     $new2PriceSet = CRM_Price_BAO_PriceSet::copy($newPriceSet->id);
-    $this->assertEquals('Price_Set__id_' . $new2PriceSet->id . '_', $new2PriceSet->name);
+    $this->assertEquals(substr($newPriceSet->name, 0, 20) . 'price_set_' . $new2PriceSet->id, $new2PriceSet->name);
     $this->assertEquals($oldPriceSetInfo['title'] . ' [Copy id ' . $new2PriceSet->id . ']', $new2PriceSet->title);
     $oldPriceField = $this->callAPISuccess('priceField', 'getsingle', array('price_set_id' => $priceSetID));
     $oldPriceFieldValue = $this->callAPISuccess('priceFieldValue', 'getsingle', array('price_field_id' => $oldPriceField['id']));
