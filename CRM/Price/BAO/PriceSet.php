@@ -1240,12 +1240,13 @@ WHERE  id = %1";
    */
   public static function copy($id) {
     $maxId = CRM_Core_DAO::singleValueQuery("SELECT max(id) FROM civicrm_price_set");
-
+    $oldTitle = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $id, 'title', 'id');
+    $newTitle = preg_replace('/\[Copy id \d+\]$/', "", $oldTitle);
     $title = ts('[Copy id %1]', array(1 => $maxId + 1));
     $fieldsFix = array(
-      'suffix' => array(
-        'title' => ' ' . $title,
-        'name' => '__Copy_id_' . ($maxId + 1) . '_',
+      'replace' => array(
+        'title' => trim($newTitle) . ' ' . $title,
+        'name' => 'Price_Set__id_' . ($maxId + 1) . '_',
       ),
     );
 
