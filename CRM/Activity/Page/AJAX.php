@@ -420,10 +420,6 @@ class CRM_Activity_Page_AJAX {
     // get the contact activities
     $activities = CRM_Activity_BAO_Activity::getContactActivitySelector($params);
 
-    if (!empty($_GET['is_unit_test'])) {
-      return $activities;
-    }
-
     foreach ($activities['data'] as $key => $value) {
       // Check if recurring activity.
       if (!empty($value['is_recurring_activity'])) {
@@ -436,8 +432,15 @@ class CRM_Activity_Page_AJAX {
     if (Civi::settings()->get('preserve_activity_tab_filter') && ($userID = CRM_Core_Session::getLoggedInContactID())) {
       unset($optionalParameters['context']);
       foreach ($optionalParameters as $searchField => $dataType) {
+        $formSearchField = $searchField;
+        if ($searchField == 'activity_type_id') {
+          $formSearchField = 'activity_type_filter_id';
+        }
+        elseif ($searchField == 'activity_type_exclude_id') {
+          $formSearchField = 'activity_type_exclude_filter_id';
+        }
         if (!empty($params[$searchField])) {
-          $activityFilter[$searchField] = CRM_Utils_Type::escape($params[$searchField], $dataType);
+          $activityFilter[$formSearchField] = CRM_Utils_Type::escape($params[$searchField], $dataType);
           if (in_array($searchField, array('activity_date_low', 'activity_date_high'))) {
             $activityFilter['activity_date_relative'] = 0;
           }
@@ -446,7 +449,7 @@ class CRM_Activity_Page_AJAX {
           }
         }
         elseif (in_array($searchField, array('activity_type_id', 'activity_type_exclude_id'))) {
-          $activityFilter[$searchField] = '';
+          $activityFilter[$formSearchField] = '';
         }
       }
 
@@ -455,6 +458,9 @@ class CRM_Activity_Page_AJAX {
        */
       $cSettings = Civi::service('settings_manager')->getBagByContact(CRM_Core_Config::domainID(), $userID);
       $cSettings->set('activity_tab_filter', $activityFilter);
+    }
+    if (!empty($_GET['is_unit_test'])) {
+      return array($activities, $activityFilter);
     }
 
     CRM_Utils_JSON::output($activities);
