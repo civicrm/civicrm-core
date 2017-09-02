@@ -118,12 +118,12 @@ class CRM_Core_DAO extends DB_DataObject {
     }
     $factory = new CRM_Contact_DAO_Factory();
     CRM_Core_DAO::setFactory($factory);
+    $currentSqlMode = CRM_Core_DAO::singleValueQuery("SELECT @@GLOBAL.sql_mode");
+    $currentModes = explode(',', $currentSqlMode);
     if (CRM_Utils_Constant::value('CIVICRM_MYSQL_STRICT', CRM_Utils_System::isDevelopment())) {
-      if (self::supportsFullGroupBy()) {
-        CRM_Core_DAO::executeQuery("SET SESSION sql_mode = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES'");
-      }
-      else {
-        CRM_Core_DAO::executeQuery("SET SESSION sql_mode = 'STRICT_TRANS_TABLES'");
+      if (!in_array('STRICT_TRANS_TABLES', $currentModes)) {
+        $modes = array_merge(array('STRICT_TRANS_TABLES'), $currentModes);
+        CRM_Core_DAO::executeQuery("SET SESSION sql_mode = %1", array(1 => array(implode(',', $modes), 'String')));
       }
     }
     CRM_Core_DAO::executeQuery('SET NAMES utf8');
@@ -412,7 +412,7 @@ class CRM_Core_DAO extends DB_DataObject {
    * @return mixed
    */
   public static function supportsFullGroupBy() {
-    return version_compare(CRM_Core_DAO::singleValueQuery('SELECT VERSION()'), '5.7.0', '>=');
+    return version_compare(CRM_Core_DAO::singleValueQuery('SELECT VERSION()'), '5.7', '>=');
   }
 
   /**
