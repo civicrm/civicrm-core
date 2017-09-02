@@ -121,10 +121,13 @@ class CRM_Core_DAO extends DB_DataObject {
     $currentSqlMode = CRM_Core_DAO::singleValueQuery("SELECT @@GLOBAL.sql_mode");
     $currentModes = explode(',', $currentSqlMode);
     if (CRM_Utils_Constant::value('CIVICRM_MYSQL_STRICT', CRM_Utils_System::isDevelopment())) {
-      if (!in_array('STRICT_TRANS_TABLES', $currentModes)) {
-        $modes = array_merge(array('STRICT_TRANS_TABLES'), $currentModes);
-        CRM_Core_DAO::executeQuery("SET SESSION sql_mode = %1", array(1 => array(implode(',', $modes), 'String')));
+      if (self::supportsFullGroupBy() && !in_array('ONLY_FULL_GROUP_BY', $currentModes)) {
+        $currentModes[] = 'ONLY_FULL_GROUP_BY';
       }
+      if (!in_array('STRICT_TRANS_TABLES', $currentModes)) {
+        $currentModes = array_merge(array('STRICT_TRANS_TABLES'), $currentModes);
+      }
+      CRM_Core_DAO::executeQuery("SET SESSION sql_mode = %1", array(1 => array(implode(',', $currentModes), 'String')));
     }
     CRM_Core_DAO::executeQuery('SET NAMES utf8');
     CRM_Core_DAO::executeQuery('SET @uniqueID = %1', array(1 => array(CRM_Utils_Request::id(), 'String')));
