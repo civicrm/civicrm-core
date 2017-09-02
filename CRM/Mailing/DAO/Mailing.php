@@ -300,8 +300,14 @@ class CRM_Mailing_DAO_Mailing extends CRM_Core_DAO {
    */
   public $language;
   /**
-   * Class constructor.
+   * Who last modified this mailing? Prevents cross-editing between browser instances.
+   *
+   * @var int unsigned
    */
+  public $last_modified;
+    /**
+    * Class constructor.
+    */
   function __construct() {
     $this->__table = 'civicrm_mailing';
     parent::__construct();
@@ -907,6 +913,18 @@ class CRM_Mailing_DAO_Mailing extends CRM_Core_DAO {
             'keyColumn' => 'name',
             'optionEditPath' => 'civicrm/admin/options/languages',
           )
+        ) ,
+        //For issue CRM-20892
+        'last_modified' => array(
+          'name' => 'last_modified',
+          'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Who Last Modified Mailing?') ,
+          'description' => 'Who last modified this mailing?',
+          'required' => true,
+          'table_name' => 'civicrm_mailing',
+          'entity' => 'Mailing',
+          'bao' => 'CRM_Mailing_BAO_Mailing',
+          'localizable' => 0,
         ) ,
       );
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);
