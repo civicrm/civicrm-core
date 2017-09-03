@@ -211,7 +211,8 @@ VALUES
    ('contact_date_reminder_options' , '{ts escape="sql"}Contact Date Reminder Options{/ts}'      , NULL, 1, 1, 1),
    ('wysiwyg_presets'               , '{ts escape="sql"}WYSIWYG Editor Presets{/ts}'             , NULL, 1, 1, 0),
    ('relative_date_filters'         , '{ts escape="sql"}Relative Date Filters{/ts}'              , NULL, 1, 1, 0),
-   ('pledge_status'                 , '{ts escape="sql"}Pledge Status{/ts}'                      , NULL, 1, 1, 1);
+   ('pledge_status'                 , '{ts escape="sql"}Pledge Status{/ts}'                      , NULL, 1, 1, 1),
+   ('environment'                   , '{ts escape="sql"}Environment{/ts}'                        , NULL, 0, 1, 0);
 
 SELECT @option_group_id_pcm            := max(id) from civicrm_option_group where name = 'preferred_communication_method';
 SELECT @option_group_id_act            := max(id) from civicrm_option_group where name = 'activity_type';
@@ -292,6 +293,7 @@ SELECT @option_group_id_contactDateMode := max(id) from civicrm_option_group whe
 SELECT @option_group_id_date_filter    := max(id) from civicrm_option_group where name = 'relative_date_filters';
 SELECT @option_group_id_wysiwyg_presets    := max(id) from civicrm_option_group where name = 'wysiwyg_presets';
 SELECT @option_group_id_ps    := max(id) from civicrm_option_group where name = 'pledge_status';
+SELECT @option_group_id_env    := max(id) from civicrm_option_group where name = 'environment';
 
 SELECT @contributeCompId := max(id) FROM civicrm_component where name = 'CiviContribute';
 SELECT @eventCompId      := max(id) FROM civicrm_component where name = 'CiviEvent';
@@ -964,6 +966,11 @@ VALUES
 (@option_group_id_wysiwyg_presets, '{ts escape="sql"}Default{/ts}',   '1', 'default',   NULL, NULL, 1, 1, NULL, 0, 1, 1, NULL, NULL, NULL),
 (@option_group_id_wysiwyg_presets, '{ts escape="sql"}CiviMail{/ts}',  '2', 'civimail',  NULL, NULL, 0, 2, NULL, 0, 1, 1, @mailCompId, NULL, NULL),
 (@option_group_id_wysiwyg_presets, '{ts escape="sql"}CiviEvent{/ts}', '3', 'civievent', NULL, NULL, 0, 3, NULL, 0, 1, 1, @eventCompId, NULL, NULL),
+
+-- Environment
+(@option_group_id_env, '{ts escape="sql"}Production{/ts}', 'Production', 'Production', NULL, NULL, 1, 1, 'Production Environment', 0, 1, 1, NULL, NULL, NULL),
+(@option_group_id_env, '{ts escape="sql"}Staging{/ts}', 'Staging', 'Staging', NULL, NULL, 0, 2, 'Staging Environment', 0, 1, 1, NULL, NULL, NULL),
+(@option_group_id_env, '{ts escape="sql"}Development{/ts}', 'Development', 'Development', NULL, NULL, 0, 3, 'Development Environment', 0, 1, 1, NULL, NULL, NULL),
 
 -- Relative Date Filters
    (@option_group_id_date_filter, '{ts escape="sql"}Today{/ts}', 'this.day', 'this.day', NULL, NULL, NULL,1, NULL, 0, 0, 1, NULL, NULL, NULL),

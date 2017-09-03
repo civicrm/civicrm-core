@@ -68,6 +68,7 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
       $this->_defaults['contact_reference_options'] = self::getAutocompleteContactReference();
       $this->_defaults['enableSSL'] = Civi::settings()->get('enableSSL');
       $this->_defaults['verifySSL'] = Civi::settings()->get('verifySSL');
+      $this->_defaults['environment'] = CRM_Core_Config::environment();
       $this->_defaults['enableComponents'] = Civi::settings()->get('enable_components');
     }
 

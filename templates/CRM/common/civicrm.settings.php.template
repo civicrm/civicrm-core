@@ -308,6 +308,17 @@ if (!defined('CIVICRM_DOMAIN_ID')) {
   define( 'CIVICRM_DOMAIN_ID', 1);
 }
 
+/** 
+ * Setting to define the environment in which this CiviCRM instance is running. 
+ * Note the setting here must be value from the option group 'Environment', 
+ * (see Administration > System Settings > Option Groups, Options beside Environment) 
+ * which by default has three option values: 'Production', 'Staging', 'Development'. 
+ * NB: defining a value from CIVICRM_ENVIRONMENT here prevents it from being set 
+ * via the browser. 
+ */ 
+
+// define( 'CIVICRM_ENVIRONMENT', 'Production' ); 
+
 /**
  * Settings to enable external caching using a cache server.  This is an
  * advanced feature, and you should read and understand the documentation

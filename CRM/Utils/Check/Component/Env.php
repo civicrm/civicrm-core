@@ -863,4 +863,24 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     return $messages;
   }
 
+  /**
+   * Check if environment is Production.
+   * @return array
+   */
+  public function checkEnvironment() {
+    $messages = array();
+
+    $environment = CRM_Core_Config::environment();
+    if ($environment != 'Production') {
+      $messages[] = new CRM_Utils_Check_Message(
+        __FUNCTION__,
+        ts('The environment of this CiviCRM instance is set to \'%1\'. Certain functionality like scheduled jobs has been disabled.', array(1 => $environment)),
+        ts('Non-Production Environment'),
+        \Psr\Log\LogLevel::ALERT,
+        'fa-bug'
+      );
+    }
+    return $messages;
+  }
+
 }

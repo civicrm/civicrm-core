@@ -490,4 +490,66 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     return FALSE;
   }
 
+  /**
+   * Check if environment is explicitly set.
+   *
+   * @return bool
+   */
+  public static function isEnvironmentSet($setting, $value = NULL) {
+    $environment = CRM_Core_Config::environment();
+    if ($setting == 'environment' && $environment) {
+      return TRUE;
+    }
+    return FALSE;
+  }
+
+  /**
+   * Check if job is able to be executed by API.
+   *
+   * @throws API_Exception
+   */
+  public static function isAPIJobAllowedToRun($params) {
+    $environment = CRM_Core_Config::environment(NULL, TRUE);
+    if ($environment != 'Production') {
+      if (CRM_Utils_Array::value('runInNonProductionEnvironment', $params)) {
+        $mailing = Civi::settings()->get('mailing_backend_store');
+        if ($mailing) {
+          Civi::settings()->set('mailing_backend', $mailing);
+        }
+      }
+      else {
+        throw new Exception(ts("Job has not been executed as it is a %1 (non-production) environment.", array(1 => $environment)));
+      }
+    }
+  }
+
+  /**
+   * Setting Callback - On Change.
+   *
+   * Respond to changes in the "environment" setting.
+   *
+   * @param array $oldValue
+   *   Value of old environment mode.
+   * @param array $newValue
+   *   Value of new environment mode.
+   * @param array $metadata
+   *   Specification of the setting (per *.settings.php).
+   */
+  public static function onChangeEnvironmentSetting($oldValue, $newValue, $metadata) {
+    if ($newValue != 'Production') {
+      $mailing = Civi::settings()->get('mailing_backend');
+      if ($mailing['outBound_option'] != 2) {
+        Civi::settings()->set('mailing_backend_store', $mailing);
+      }
+      Civi::settings()->set('mailing_backend', array('outBound_option' => CRM_Mailing_Config::OUTBOUND_OPTION_DISABLED));
+      CRM_Core_Session::setStatus(ts('Outbound emails have been disabled. Scheduled jobs will not run unless runInNonProductionEnvironment=TRUE is added as a parameter for a specific job'), ts("Non-production environment set"), "success");
+    }
+    else {
+      $mailing = Civi::settings()->get('mailing_backend_store');
+      if ($mailing) {
+        Civi::settings()->set('mailing_backend', $mailing);
+      }
+    }
+  }
+
 }
