@@ -68,8 +68,20 @@ class CRM_Utils_Mail {
         $params['auth'] = FALSE;
       }
 
-      // set the localhost value, CRM-3153
-      $params['localhost'] = CRM_Utils_Array::value('SERVER_NAME', $_SERVER, 'localhost');
+      /*
+       * Set the localhost value, CRM-3153
+       * Use the host name of the web server, falling back to the base URL
+       * (eg when using the PHP CLI), and then falling back to localhost.
+       */
+      $params['localhost'] = CRM_Utils_Array::value(
+        'SERVER_NAME',
+        $_SERVER,
+        CRM_Utils_Array::value(
+          'host',
+          parse_url(CIVICRM_UF_BASEURL),
+          'localhost'
+        )
+      );
 
       // also set the timeout value, lets set it to 30 seconds
       // CRM-7510
