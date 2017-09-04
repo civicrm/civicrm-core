@@ -1388,16 +1388,19 @@ WHERE {$whereClause}";
    */
   public static function filterActiveGroups($parentArray) {
     if (count($parentArray) > 1) {
-      foreach ($parentArray as $key => $groupId) {
-        $isActive = civicrm_api3('Group', 'getvalue', array(
-          'id' => $groupId,
-          'return' => 'is_active',
-        ));
-        if (!$isActive) {
+      $result = civicrm_api3('Group', 'get', array(
+        'id' => array('IN' => $parentArray),
+        'is_active' => TRUE,
+        'return' => 'id',
+      ));
+      $activeParentGroupIDs = CRM_Utils_Array::collect('id', $result['values']);
+      foreach ($parentArray as $key => $groupID) {
+        if (!array_key_exists($groupID, $activeParentGroupIDs)) {
           unset($parentArray[$key]);
         }
       }
     }
+
     return reset($parentArray);
   }
 
