@@ -570,7 +570,8 @@ function _civicrm_api3_get_using_query_object($entity, $params, $additional_opti
     $getCount,
     $skipPermissions,
     $mode,
-    $entity
+    $entity,
+    TRUE
   );
 
   return $entities;
@@ -603,7 +604,8 @@ function _civicrm_api3_get_query_object($params, $mode, $entity) {
   $newParams = CRM_Contact_BAO_Query::convertFormValues($inputParams, 0, FALSE, $entity);
   $query = new CRM_Contact_BAO_Query($newParams, $returnProperties, NULL,
     FALSE, FALSE, $mode,
-    empty($params['check_permissions'])
+    empty($params['check_permissions']),
+    TRUE, TRUE, NULL, 'AND', 'NULL', TRUE
   );
   list($select, $from, $where, $having) = $query->query();
 
