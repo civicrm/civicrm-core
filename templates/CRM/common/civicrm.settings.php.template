@@ -313,11 +313,10 @@ if (!defined('CIVICRM_DOMAIN_ID')) {
  * Note the setting here must be value from the option group 'Environment', 
  * (see Administration > System Settings > Option Groups, Options beside Environment) 
  * which by default has three option values: 'Production', 'Staging', 'Development'. 
- * NB: defining a value from CIVICRM_ENVIRONMENT here prevents it from being set 
+ * NB: defining a value for environment here prevents it from being set
  * via the browser. 
  */ 
-
-// define( 'CIVICRM_ENVIRONMENT', 'Production' ); 
+// $civicrm_setting[CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME]['environment'] = 'Production'; 
 
 /**
  * Settings to enable external caching using a cache server.  This is an
