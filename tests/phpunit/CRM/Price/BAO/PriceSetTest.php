@@ -57,6 +57,39 @@ class CRM_Price_BAO_PriceSetTest extends CiviUnitTestCase {
     $params = array('priceSetId' => $priceSetID, 'price_' . $field['id'] => 1);
     $amountLevel = CRM_Price_BAO_PriceSet::getAmountLevelText($params);
     $this->assertEquals(CRM_Core_DAO::VALUE_SEPARATOR . 'Price Field - 1' . CRM_Core_DAO::VALUE_SEPARATOR, $amountLevel);
+    $priceFieldValue = $this->callAPISuccess('pricefieldvalue', 'getsingle', array('price_field_id' => $field['id']));
+    $this->callAPISuccess('PriceFieldValue', 'delete', array('id' => $priceFieldValue['id']));
+    $this->callAPISuccess('PriceField', 'delete', array('id' => $field['id']));
+    $this->callAPISuccess('PriceSet', 'delete', array('id' => $priceSetID));
+  }
+
+  /**
+   * CRM-20237 Test that Copied price set does not generate long name and unneded information
+   */
+  public function testCopyPriceSet() {
+    $priceSetID = $this->eventPriceSetCreate(9);
+    $oldPriceSetInfo = $this->callAPISuccess('PriceSet', 'getsingle', array('id' => $priceSetID));
+    $newPriceSet = CRM_Price_BAO_PriceSet::copy($priceSetID);
+    $this->assertEquals(substr($oldPriceSetInfo['name'], 0, 20) . 'price_set_' . $newPriceSet->id, $newPriceSet->name);
+    $this->assertEquals($oldPriceSetInfo['title'] . ' [Copy id ' . $newPriceSet->id . ']', $newPriceSet->title);
+    $new2PriceSet = CRM_Price_BAO_PriceSet::copy($newPriceSet->id);
+    $this->assertEquals(substr($newPriceSet->name, 0, 20) . 'price_set_' . $new2PriceSet->id, $new2PriceSet->name);
+    $this->assertEquals($oldPriceSetInfo['title'] . ' [Copy id ' . $new2PriceSet->id . ']', $new2PriceSet->title);
+    $oldPriceField = $this->callAPISuccess('priceField', 'getsingle', array('price_set_id' => $priceSetID));
+    $oldPriceFieldValue = $this->callAPISuccess('priceFieldValue', 'getsingle', array('price_field_id' => $oldPriceField['id']));
+    $this->callAPISuccess('PriceFieldValue', 'delete', array('id' => $oldPriceFieldValue['id']));
+    $this->callAPISuccess('PriceField', 'delete', array('id' => $oldPriceField['id']));
+    $this->callAPISuccess('PriceSet', 'delete', array('id' => $priceSetID));
+    $newPriceField = $this->callAPISuccess('PriceField', 'getsingle', array('price_set_id' => $newPriceSet->id));
+    $newPriceFieldValue = $this->callAPISuccess('PriceFieldValue', 'getsingle', array('price_field_id' => $newPriceField['id']));
+    $this->callAPISuccess('PriceFieldValue', 'delete', array('id' => $newPriceFieldValue['id']));
+    $this->callAPISuccess('PriceField', 'delete', array('id' => $newPriceField['id']));
+    $this->callAPISuccess('PriceSet', 'delete', array('id' => $newPriceSet->id));
+    $new2PriceField = $this->callAPISuccess('PriceField', 'getsingle', array('price_set_id' => $new2PriceSet->id));
+    $new2PriceFieldValue = $this->callAPISuccess('PriceFieldValue', 'getsingle', array('price_field_id' => $new2PriceField['id']));
+    $this->callAPISuccess('PriceFieldValue', 'delete', array('id' => $new2PriceFieldValue['id']));
+    $this->callAPISuccess('PriceField', 'delete', array('id' => $new2PriceField['id']));
+    $this->callAPISuccess('PriceSet', 'delete', array('id' => $new2PriceSet->id));
   }
 
   /**

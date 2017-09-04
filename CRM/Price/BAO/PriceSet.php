@@ -1240,23 +1240,25 @@ WHERE  id = %1";
    */
   public static function copy($id) {
     $maxId = CRM_Core_DAO::singleValueQuery("SELECT max(id) FROM civicrm_price_set");
+    $priceSet = civicrm_api3('PriceSet', 'getsingle', array('id' => $id));
 
+    $newTitle = preg_replace('/\[Copy id \d+\]$/', "", $priceSet['title']);
     $title = ts('[Copy id %1]', array(1 => $maxId + 1));
     $fieldsFix = array(
-      'suffix' => array(
-        'title' => ' ' . $title,
-        'name' => '__Copy_id_' . ($maxId + 1) . '_',
+      'replace' => array(
+        'title' => trim($newTitle) . ' ' . $title,
+        'name' => substr($priceSet['name'], 0, 20) . 'price_set_' . ($maxId + 1),
       ),
     );
 
-    $copy = &CRM_Core_DAO::copyGeneric('CRM_Price_DAO_PriceSet',
+    $copy = CRM_Core_DAO::copyGeneric('CRM_Price_DAO_PriceSet',
       array('id' => $id),
       NULL,
       $fieldsFix
     );
 
     //copying all the blocks pertaining to the price set
-    $copyPriceField = &CRM_Core_DAO::copyGeneric('CRM_Price_DAO_PriceField',
+    $copyPriceField = CRM_Core_DAO::copyGeneric('CRM_Price_DAO_PriceField',
       array('price_set_id' => $id),
       array('price_set_id' => $copy->id)
     );
