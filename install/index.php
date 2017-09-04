@@ -708,8 +708,8 @@ class InstallRequirements {
     // Check for XML support
     $this->requireFunction('simplexml_load_file', array(
       ts("PHP Configuration"),
-      ts("XML support"),
-      ts("XML support not included in PHP."),
+      ts("SimpleXML support"),
+      ts("SimpleXML support not included in PHP."),
     ));
 
     // Check for JSON support
