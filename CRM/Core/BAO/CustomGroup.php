@@ -1031,7 +1031,6 @@ ORDER BY civicrm_custom_group.weight,
     );
 
     // create select
-    $select = "SELECT";
     $s = array();
     foreach ($tableData as $tableName => $tableColumn) {
       foreach ($tableColumn as $columnName) {

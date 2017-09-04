@@ -13,3 +13,10 @@ INSERT INTO civicrm_option_value (option_group_id, {localize field='label'}label
     (@option_group_id_env, {localize}'{ts escape="sql"}Production{/ts}'{/localize}, 'Production', 'Production', NULL, 0, 1, 1, {localize}'{ts escape="sql"}Production Environment{/ts}'{/localize}, 0, 0, 1, NULL, NULL),
     (@option_group_id_env, {localize}'{ts escape="sql"}Staging{/ts}'{/localize}, 'Staging', 'Staging', NULL, 0, NULL, 2, {localize}'{ts escape="sql"}Staging Environment{/ts}'{/localize}, 0, 0, 1, NULL, NULL),
     (@option_group_id_env, {localize}'{ts escape="sql"}Development{/ts}'{/localize}, 'Development', 'Development', NULL, 0, NULL, 3, {localize}'{ts escape="sql"}Development Environment{/ts}'{/localize}, 0, 0, 1, NULL, NULL);
+
+-- CRM-20935 Clean up orphaned profile links for deleted events
+DELETE civicrm_uf_join
+FROM civicrm_uf_join
+LEFT JOIN civicrm_event e on civicrm_uf_join.entity_id = e.id
+WHERE (civicrm_uf_join.module = 'CiviEvent' OR civicrm_uf_join.module = 'CiviEvent_Additional')
+AND e.id IS NULL;
