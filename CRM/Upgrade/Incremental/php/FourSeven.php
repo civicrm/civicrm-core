@@ -414,6 +414,7 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
       'civicrm_menu', 'module_data', "text COMMENT 'All other menu metadata not stored in other fields'");
     $this->addTask('CRM-21052 - Determine activity revision policy', 'pickActivityRevisionPolicy');
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
+    $this->addTask('CRM-21085 - Convert passwords from mcrypt to openssl', 'updateEncryptionMethod');
   }
 
 
@@ -1215,6 +1216,22 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
     $config = CRM_Core_Config::singleton();
     $check = new CRM_Utils_Check_Component_Security();
     return $config->imageUploadDir && $config->imageUploadURL && $check->isDirAccessible($config->imageUploadDir, $config->imageUploadURL);
+  }
+
+  public static function updateEncryptionMethod() {
+    $mailingInfo = CRM_Core_DAO::executeQuery("SELECT domain_id, value FROM civicrm_setting WHERE name = 'mailing_backend'")->fetchAll();
+    foreach ($mailingInfo as $mailing) {
+      $values = unserialize($mailing['value']);
+      if (!empty($values['smtpPassword'])) {
+        $values['smtpPassword'] = CRM_Utils_Crypt::convertMcryptToOpenSSL($values['smtpPassword']);
+        $values = serialize($values);
+        CRM_Core_DAO::executeQuery("UPDATE civicrm_setting set value = %1 WHERE domain_id = %2 AND name = 'mailing_backend'", array(
+          1 => array($values, 'String'),
+          2 => array($mailing['domain_id'], 'Positive'),
+        ));
+      }
+    }
+    return TRUE;
   }
 
 }
