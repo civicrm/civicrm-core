@@ -125,8 +125,8 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     if ($encrypted_test_pass == base64_encode($test_pass)) {
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__,
-        ts('Your PHP does not include the recommended encryption functions. Some passwords will not be stored encrypted, and if you have recently upgraded from a PHP that does include these functions, your encrypted passwords will not be decrypted correctly. If you are using PHP 7.0 or earlier, you probably want to include the "%1" extension.'
-          array('1' => 'mcrypt'),
+        ts('Your PHP does not include the recommended encryption functions. Some passwords will not be stored encrypted, and if you have recently upgraded from a PHP that does include these functions, your encrypted passwords will not be decrypted correctly. If you are using PHP 7.0 or earlier, you probably want to include the "%1" extension.',
+          array('1' => 'mcrypt')
         ),
         ts('PHP Missing Extension "mcrypt"'),
         \Psr\Log\LogLevel::WARNING,
