@@ -113,8 +113,9 @@ class CRM_Core_Page_AJAX {
         $sql = "UPDATE
           civicrm_price_set cps
           INNER JOIN civicrm_discount cd ON cd.price_set_id = cps.id
-          SET cps.is_quick_config = 0
-          WHERE cd.entity_id = (%1) AND cd.entity_table = 'civicrm_event' ";
+          INNER JOIN civicrm_event ce ON cd.entity_id = ce.id AND cd.entity_table = 'civicrm_event'
+          SET cps.is_quick_config = 0, cps.financial_type_id = IF(cps.financial_type_id IS NULL, ce.financial_type_id, cps.financial_type_id)
+          WHERE cd.entity_id = (%1) ";
         $params = array(1 => array($id, 'Integer'));
         CRM_Core_DAO::executeQuery($sql, $params);
         CRM_Core_BAO_Discount::del($id, $context);
