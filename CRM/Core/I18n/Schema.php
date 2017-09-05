@@ -295,8 +295,10 @@ class CRM_Core_I18n_Schema {
    *   locales to be rebuilt.
    * @param string $version
    *   version of schema structure to use.
+   * @param bool $isUpgradeMode
+   *   Are we upgrading our database
    */
-  public static function rebuildMultilingualSchema($locales, $version = NULL) {
+  public static function rebuildMultilingualSchema($locales, $version = NULL, $isUpgradeMode = FALSE) {
     if ($version) {
       $latest = self::getLatestSchema($version);
       require_once "CRM/Core/I18n/SchemaStructure_{$latest}.php";
@@ -337,7 +339,7 @@ class CRM_Core_I18n_Schema {
     // rebuild views
     foreach ($locales as $locale) {
       foreach ($tables as $table) {
-        $queries[] = self::createViewQuery($locale, $table, $dao, $class);
+        $queries[] = self::createViewQuery($locale, $table, $dao, $class, $isUpgradeMode);
       }
     }
 
@@ -481,13 +483,15 @@ class CRM_Core_I18n_Schema {
    *   A DAO object to run DESCRIBE queries.
    * @param string $class
    *   schema structure class to use.
-   *
+   * @param bool $isUpgradeMode
+   *   Are we in upgrade mode therefore only build based off table not class
    * @return array
    *   array of CREATE INDEX queries
    */
-  private static function createViewQuery($locale, $table, &$dao, $class = 'CRM_Core_I18n_SchemaStructure') {
+  private static function createViewQuery($locale, $table, &$dao, $class = 'CRM_Core_I18n_SchemaStructure', $isUpgradeMode = FALSE) {
     $columns =& $class::columns();
     $cols = array();
+    $tableCols = array();
     $dao->query("DESCRIBE {$table}", FALSE);
     while ($dao->fetch()) {
       // view non-internationalized columns directly
@@ -496,10 +500,16 @@ class CRM_Core_I18n_Schema {
       ) {
         $cols[] = $dao->Field;
       }
+      $tableCols[] = $dao->Field;
     }
     // view intrernationalized columns through an alias
     foreach ($columns[$table] as $column => $_) {
-      $cols[] = "{$column}_{$locale} {$column}";
+      if (!$isUpgradeMode) {
+        $cols[] = "{$column}_{$locale} {$column}";
+      }
+      elseif (in_array("{$column}_{$locale}", $tableCols)) {
+        $cols[] = "{$column}_{$locale} {$column}";
+      }
     }
     return "CREATE OR REPLACE VIEW {$table}_{$locale} AS SELECT " . implode(', ', $cols) . " FROM {$table}";
   }
