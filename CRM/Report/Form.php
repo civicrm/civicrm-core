@@ -2041,21 +2041,8 @@ class CRM_Report_Form extends CRM_Core_Form {
    *
    * @return array
    */
-  public function getFromTo($relative, $from, $to, $fromTime = NULL, $toTime = NULL) {
-    if (empty($toTime)) {
-      $toTime = '235959';
-    }
-    //FIX ME not working for relative
-    if ($relative) {
-      list($term, $unit) = CRM_Utils_System::explode('.', $relative, 2);
-      $dateRange = CRM_Utils_Date::relativeToAbsolute($term, $unit);
-      $from = substr($dateRange['from'], 0, 8);
-      //Take only Date Part, Sometime Time part is also present in 'to'
-      $to = substr($dateRange['to'], 0, 8);
-    }
-    $from = CRM_Utils_Date::processDate($from, $fromTime);
-    $to = CRM_Utils_Date::processDate($to, $toTime);
-    return array($from, $to);
+  public function getFromTo($relative, $from, $to, $fromTime = NULL, int $toTime = 235959) {
+    return CRM_Utils_Date::getFromTo($relative, $from, $to, $fromTime, $toTime);
   }
 
   /**
