@@ -351,9 +351,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
     //add website
     CRM_Core_BAO_Website::create($params['website'], $contact->id, $skipDelete);
 
-    //get userID from session
-    $session = CRM_Core_Session::singleton();
-    $userID = $session->get('userID');
+    $userID = CRM_Core_Session::singleton()->get('userID');
     // add notes
     if (!empty($params['note'])) {
       if (is_array($params['note'])) {
