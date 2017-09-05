@@ -121,7 +121,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
   public function checkPhpEcrypt() {
     $messages = array();
     $test_pass = 'iAmARandomString';
-    $encrypted_test_pass = CRM_Utils_Crypt::encrypt($test_pass) 
+    $encrypted_test_pass = CRM_Utils_Crypt::encrypt($test_pass);
     if ($encrypted_test_pass == base64_encode($test_pass)) {
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__,
