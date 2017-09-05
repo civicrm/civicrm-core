@@ -3516,7 +3516,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * @param $contact
    */
   protected function putGroupContactCacheInClearableState($groupID, $contact) {
-// We need to force the situation where there is invalid data in the cache and it
+    // We need to force the situation where there is invalid data in the cache and it
     // is due to be cleared.
     CRM_Core_DAO::executeQuery("
       INSERT INTO civicrm_group_contact_cache (group_id, contact_id)
