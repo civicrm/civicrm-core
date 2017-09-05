@@ -2076,11 +2076,11 @@ AND cc.sort_name LIKE '%$name%'";
       // FIXME: we cannot directly determine total permissioned relationship, hence re-fire query
       $permissionedRelationships = CRM_Contact_BAO_Relationship::getRelationship($params['contact_id'],
         $relationshipStatus,
-        0, 0, 0,
+        0, 1, 0,
         NULL, NULL,
         $permissionedContacts
       );
-      $params['total'] = count($permissionedRelationships);
+      $params['total'] = $permissionedRelationships;
 
       // format params
       foreach ($relationships as $relationshipId => $values) {
