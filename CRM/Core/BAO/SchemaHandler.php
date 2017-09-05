@@ -371,9 +371,10 @@ ALTER TABLE {$tableName}
    * @param string $tableName
    * @param string $columnName
    * @param bool $l18n
+   * @param bool $isUpgradeMode
    *
    */
-  public static function dropColumn($tableName, $columnName, $l18n = FALSE) {
+  public static function dropColumn($tableName, $columnName, $l18n = FALSE, $isUpgradeMode = FALSE) {
     if (self::checkIfFieldExists($tableName, $columnName)) {
       $sql = "ALTER TABLE $tableName DROP COLUMN $columnName";
       if ($l18n) {
@@ -386,7 +387,7 @@ ALTER TABLE {$tableName}
       $domain->find(TRUE);
       if ($domain->locales) {
         $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
-        CRM_Core_I18n_Schema::rebuildMultilingualSchema($locales, NULL);
+        CRM_Core_I18n_Schema::rebuildMultilingualSchema($locales, NULL, $isUpgradeMode);
       }
     }
   }
