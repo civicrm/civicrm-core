@@ -285,6 +285,10 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
    * @return CRM_Activity_BAO_Activity|null|object
    */
   public static function create(&$params) {
+    // CRM-20958 - These fields are managed by MySQL triggers. Watch out for clients resaving stale timestamps.
+    unset($params['created_date']);
+    unset($params['modified_date']);
+
     // check required params
     if (!self::dataExists($params)) {
       throw new CRM_Core_Exception('Not enough data to create activity object');
