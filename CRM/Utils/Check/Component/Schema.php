@@ -37,27 +37,20 @@ class CRM_Utils_Check_Component_Schema extends CRM_Utils_Check_Component {
    */
   public function checkIndices() {
     $messages = array();
-    list($missingIndices, $existingKeyIndices) = CRM_Core_BAO_SchemaHandler::getMissingIndices();
-    if ($existingKeyIndices) {
+    $missingIndices = CRM_Core_BAO_SchemaHandler::getMissingIndices();
+    if ($missingIndices) {
       $html = '';
-      foreach ($existingKeyIndices as $tableName => $indices) {
+      foreach ($missingIndices as $tableName => $indices) {
         foreach ($indices as $index) {
           $fields = implode(', ', $index['field']);
           $html .= "<tr><td>{$tableName}</td><td>{$index['name']}</td><td>$fields</td>";
         }
       }
-      $keyMessage = "<p>The following tables have an index key with a mismatch in value. Please delete the key indices listed from the below table and then click on 'Update Indices' button. <p>
-        <p><table><thead><tr><th>Table Name</th><th>Key Name</th><th>Fields</th>
+      $message = "<p>The following tables have missing indices. Click 'Update Indices' button to create them.<p>
+        <p><table><thead><tr><th>Table Name</th><th>Key Name</th><th>Expected Indices</th>
         </tr></thead><tbody>
         $html
         </tbody></table></p>";
-    }
-    if ($missingIndices || $existingKeyIndices) {
-      $message = "You have missing indices on some tables. This may cause poor performance.";
-      if (!empty($keyMessage)) {
-        $message = $keyMessage;
-        $message .= ts("If you are unsure how to perform this action or do not know what to do please contact your system administrator for assistance");
-      }
       $msg = new CRM_Utils_Check_Message(
         __FUNCTION__,
         ts($message),
