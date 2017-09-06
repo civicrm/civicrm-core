@@ -75,8 +75,8 @@ class CRM_Upgrade_Incremental_General {
       $preUpgradeMessage .= '<p>';
       // CRM-20941 PHP 5.3 end date of End of 2017, PHP 5.4 End date End of Feb 2018 Recommend anyone on PHP 5.5 to move up to 5.6 or later e.g. 7.0
       if (version_compare(phpversion(), self::PREVIOUS_MIN_RECOMMENDED_PHP_VER) >= 0) {
-        $preUpgradeMessage .= ts('You may proceed with the upgrade and CiviCRM %1 will continue working normally, but future releases will require PHP %2 or above. We recommend you use the most recent php version you can', array(
-           1 => $currentVer,
+        $preUpgradeMessage .= ts('You may proceed with the upgrade and CiviCRM %1 will continue working normally, but future releases will require PHP %2 or above. We recommend you use the most recent php version you can.', array(
+           1 => $latestVer,
            2 => self::MIN_RECOMMENDED_PHP_VER,
         ));
       }
@@ -85,7 +85,7 @@ class CRM_Upgrade_Incremental_General {
         if (version_compare(phpversion(), 5.4) < 0) {
           $date = CRM_Utils_Date::customFormat('2017-12-31', $dateFormat);
         }
-        $preUpgradeMessage .= ts('You may proceed with the upgrade and CiviCRM %1 will continue working normally, but PHP %2 will not work in releases published after %3. We recommend you use the most recent php version you can. For more explanation see <a href="%4">the announcement</a>', array(
+        $preUpgradeMessage .= ts('You may proceed with the upgrade and CiviCRM %1 will continue working normally, but PHP %2 will not work in releases published after %3. We recommend you use the most recent php version you can. For more explanation see <a href="%4">the announcement</a>.', array(
           1 => $currentVer,
           2 => phpversion(),
           3 => $date,
