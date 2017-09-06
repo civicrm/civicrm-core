@@ -31,11 +31,10 @@
       {$form.case_id.label}<br />
       {$form.case_id.html}
     </td>
-    <td class="crm-case-common-form-block-case_subject">
+    <td class="crm-case-common-form-block-case_subject" colspan="2">
       {$form.case_subject.label}<br />
       {$form.case_subject.html}
     </td>
-    <td></td>
   </tr>
 
   <tr>
@@ -71,15 +70,9 @@
       {/if}
     </td>
     <td class="crm-case-common-form-block-case_tags">
-      {if $form.case_tags}
-        <label>{ts}Case Tag(s){/ts}</label>
-        <div id="Tag" class="listing-box">
-          {foreach from=$form.case_tags item="tag_val"}
-            <div class="{cycle values='odd-row,even-row'}">
-              {$tag_val.html}
-            </div>
-          {/foreach}
-        </div>
+      {if $form.case_tags.html}
+        {$form.case_tags.label}<br />
+        {$form.case_tags.html}
       {/if}
     </td>
   </tr>
