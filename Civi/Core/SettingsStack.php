@@ -9,7 +9,7 @@ namespace Civi\Core;
  *
  * Like the global `$civicrm_setting` variable, it works best with typical inert settings that
  * do not trigger extra activation logic. A handful of settings (such as `enable_components`
- * and ~5 others)
+ * and ~5 others) should be avoided, but most settings should work.
  *
  * @package Civi\Core
  */
