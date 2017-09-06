@@ -83,6 +83,10 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'civicrm_acl_contact_cache',
       'civicrm_activity_contact',
       'civicrm_activity',
+      'civicrm_group',
+      'civicrm_group_contact',
+      'civicrm_saved_search',
+      'civicrm_group_contact_cache',
     );
 
     $this->quickCleanup($tablesToTruncate, TRUE);
@@ -132,8 +136,10 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
     // Rinse & repeat, but with the option.
     $this->putGroupContactCacheInClearableState($groupID, $contact);
-    $this->callAPISuccess('contact', 'create', array('id' => $contact['id'], 'options' => array('do_not_reset_cache' => 1)));
+    CRM_Core_Config::setPermitCacheFlushMode(FALSE);
+    $this->callAPISuccess('contact', 'create', array('id' => $contact['id']));
     $this->assertEquals(1, CRM_Core_DAO::singleValueQuery("SELECT count(*) FROM civicrm_group_contact_cache"));
+    CRM_Core_Config::setPermitCacheFlushMode(TRUE);
   }
 
   /**

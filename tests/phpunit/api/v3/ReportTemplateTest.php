@@ -42,7 +42,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    */
   public function tearDown() {
     $this->quickCleanUpFinancialEntities();
-    $this->quickCleanup(array('civicrm_group', 'civicrm_saved_search', 'civicrm_group_contact'));
+    $this->quickCleanup(array('civicrm_group', 'civicrm_saved_search', 'civicrm_group_contact', 'civicrm_group_contact_cache', 'civicrm_group'));
     parent::tearDown();
   }
 
@@ -123,7 +123,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     $result = $this->callAPIAndDocument('report_template', 'getrows', array(
       'report_id' => 'contact/summary',
       'options' => array('metadata' => array('labels', 'title')),
-    ), __FUNCTION__, __FILE__, $description, 'Getrows', 'getrows');
+    ), __FUNCTION__, __FILE__, $description, 'Getrows');
     $this->assertEquals('Contact Name', $result['metadata']['labels']['civicrm_contact_sort_name']);
 
     //the second part of this test has been commented out because it relied on the db being reset to
@@ -470,7 +470,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     }
 
     // Refresh the cache for test purposes. It would be better to alter to alter the GroupContact add function to add contacts to the cache.
-    CRM_Contact_BAO_GroupContactCache::remove($groupID, FALSE);
+    CRM_Contact_BAO_GroupContactCache::clearGroupContactCache($groupID);
     return $groupID;
   }
 
@@ -510,7 +510,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     }
 
     // Refresh the cache for test purposes. It would be better to alter to alter the GroupContact add function to add contacts to the cache.
-    CRM_Contact_BAO_GroupContactCache::remove($groupID, FALSE);
+    CRM_Contact_BAO_GroupContactCache::clearGroupContactCache($groupID);
 
     if ($returnAddedContact) {
       return array($groupID, $individualID);

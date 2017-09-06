@@ -297,8 +297,8 @@ WHERE  id IN ( $groupIDs )
    * In fact it turned out there is little overlap between the code when group is passed in
    * and group is not so it makes more sense as separate functions.
    *
-   * @todo remove last call to this function from outside the class then make function protected,
-   * enforce groupID as an array & remove non group handling.
+   * @todo enforce groupID as an array & remove non group handling.
+   * Use flushCaches when no group id provided.
    *
    * @param int $groupIDs
    *   the groupID to delete cache entries, NULL for all groups.
@@ -306,7 +306,14 @@ WHERE  id IN ( $groupIDs )
    *   run the function exactly once for all groups.
    */
   public static function remove($groupIDs = NULL, $onceOnly = TRUE) {
-    static $invoked = FALSE;
+    if (!is_array($groupIDs)) {
+      Civi::log()
+        ->warning('Deprecated code. This function should not be called without groupIDs. Extensions can use the api job.group_cache_flush', array('civi.tag' => 'deprecated'));
+      return;
+    }
+    if (!isset(Civi::$statics[__CLASS__]['remove_invoked'])) {
+      Civi::$statics[__CLASS__] = array('remove_invoked' => FALSE);
+    }
 
     // typically this needs to happy only once per instance
     // this is especially TRUE in import, where we don't need
@@ -315,14 +322,14 @@ WHERE  id IN ( $groupIDs )
     // i.e. cache is reset for all groups
     if (
       $onceOnly &&
-      $invoked &&
+      Civi::$statics[__CLASS__]['remove_invoked'] &&
       $groupIDs == NULL
     ) {
       return;
     }
 
     if ($groupIDs == NULL) {
-      $invoked = TRUE;
+      Civi::$statics[__CLASS__]['remove_invoked'] = TRUE;
     }
     elseif (is_array($groupIDs)) {
       foreach ($groupIDs as $gid) {
@@ -479,7 +486,7 @@ AND    refresh_date IS NULL
    * @throws \CRM_Core_Exception
    */
   protected static function getLockForRefresh() {
-    if (!isset(Civi::$statics[__CLASS__])) {
+    if (!isset(Civi::$statics[__CLASS__]['is_refresh_init'])) {
       Civi::$statics[__CLASS__] = array('is_refresh_init' => FALSE);
     }
 

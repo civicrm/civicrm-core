@@ -783,9 +783,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     $resultStats = array('merged' => array(), 'skipped' => array());
 
     // we don't want dupe caching to get reset after every-merge, and therefore set the
-    // doNotResetCache flag
-    $config = CRM_Core_Config::singleton();
-    $config->doNotResetCache = 1;
+    CRM_Core_Config::setPermitCacheFlushMode(FALSE);
     $deletedContacts = array();
 
     while (!empty($dupePairs)) {

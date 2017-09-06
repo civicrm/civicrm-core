@@ -897,18 +897,21 @@ INNER JOIN civicrm_contact contact_target ON ( contact_target.id = act.contact_i
    * caches, but are backing off from this with every release. Compromise between ease of coding versus
    * performance versus being accurate at that very instant
    *
-   * @param $contactID
-   *   The contactID that was edited / deleted.
+   * @param bool $isEmptyPrevNextTable
+   *   Should the civicrm_prev_next table be cleared of any contact entries.
+   *   This is currently done from import but not other places and would
+   *   likely affect user experience in unexpected ways. Existing behaviour retained
+   *   ... reluctantly.
    */
-  public static function clearContactCaches($contactID = NULL) {
-    // clear acl cache if any.
-    CRM_ACL_BAO_Cache::resetCache();
-
-    if (empty($contactID)) {
-      // also clear prev/next dedupe cache - if no contactID passed in
+  public static function clearContactCaches($isEmptyPrevNextTable = FALSE) {
+    if (!CRM_Core_Config::isPermitCacheFlushMode()) {
+      return;
+    }
+    if ($isEmptyPrevNextTable) {
       CRM_Core_BAO_PrevNextCache::deleteItem();
     }
-
+    // clear acl cache if any.
+    CRM_ACL_BAO_Cache::resetCache();
     CRM_Contact_BAO_GroupContactCache::opportunisticCacheFlush();
   }
 

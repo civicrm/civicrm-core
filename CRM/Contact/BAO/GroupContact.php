@@ -143,15 +143,7 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
     list($numContactsAdded, $numContactsNotAdded)
       = self::bulkAddContactsToGroup($contactIds, $groupId, $method, $status, $tracking);
 
-    // also reset the acl cache
-    $config = CRM_Core_Config::singleton();
-    if (!$config->doNotResetCache) {
-      CRM_ACL_BAO_Cache::resetCache();
-    }
-
-    // reset the group contact cache for all group(s)
-    // if this group is being used as a smart group
-    CRM_Contact_BAO_GroupContactCache::opportunisticCacheFlush();
+    CRM_Contact_BAO_Contact_Utils::clearContactCaches();
 
     CRM_Utils_Hook::post('create', 'GroupContact', $groupId, $contactIds);
 
@@ -245,21 +237,7 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
       }
     }
 
-    // also reset the acl cache
-    $config = CRM_Core_Config::singleton();
-    if (!$config->doNotResetCache) {
-      CRM_ACL_BAO_Cache::resetCache();
-    }
-
-    // reset the group contact cache for all group(s)
-    // if this group is being used as a smart group
-    // @todo consider what to do here - it feels like we should either
-    // 1) just invalidate the specific group's cache(& perhaps any parents) & let cron do it's thing or
-    // possibly clear this specific groups cache, or just call opportunisticCacheFlush() - which would have the
-    // same effect as the remove call. The reservation about that is that it is no more aggressive for the group that
-    // we know is altered than for all the others, or perhaps, more the point with it's parents & groups that use it in
-    // their criteria.
-    CRM_Contact_BAO_GroupContactCache::remove();
+    CRM_Contact_BAO_Contact_Utils::clearContactCaches();
 
     CRM_Utils_Hook::post($op, 'GroupContact', $groupId, $contactIds);
 
