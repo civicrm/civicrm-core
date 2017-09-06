@@ -760,15 +760,57 @@ MODIFY      {$columnName} varchar( $length )
    *
    * @param array $missingIndices as returned by getMissingIndices()
    */
-  public static function createMissingIndices($missingIndices) {
+  public static function createMissingIndices($missingIndices, $existingKeyIndices = array()) {
     $queries = array();
     foreach ($missingIndices as $table => $indexList) {
+      // Iterate over each missing index for this table.
       foreach ($indexList as $index) {
-        $queries[] = "CREATE " .
-        (array_key_exists('unique', $index) && $index['unique'] ? 'UNIQUE ' : '') .
-        "INDEX {$index['name']} ON {$table} (" .
-          implode(", ", $index['field']) .
+        // If an index is used for a foreign key, we have to remove the
+        // foreign key before we can remove the index. We have to keep
+        // track of any foreign keys we remove so we can put them back
+        // when we are done.
+        $existing_foreign_keys = array();
+
+        // An index can reference multiple fields, check each field for a
+        // correspending foreign key.
+        foreach ($index['field'] as $field) {
+          $sql = "SELECT u.CONSTRAINT_NAME, u.COLUMN_NAME, u.REFERENCED_COLUMN_NAME,
+            u.REFERENCED_TABLE_NAME, UPDATE_RULE, DELETE_RULE FROM
+            information_schema.KEY_COLUMN_USAGE u JOIN information_schema.REFERENTIAL_CONSTRAINTS c ON
+            u.CONSTRAINT_NAME = c.CONSTRAINT_NAME
+            WHERE u.COLUMN_NAME = %0 AND u.TABLE_NAME = %1";
+          $params = array(0 => array($field, 'String'), 1 => array($table, 'String'));
+          $dao = CRM_Core_DAO::executeQuery($sql, $params);
+          while ($dao->fetch()) {
+            // Keep track of this foreign key.
+            $existing_foreign_keys[$dao->CONSTRAINT_NAME] = array(
+              'table_name' => $dao->REFERENCED_TABLE_NAME,
+              'column_name' => $dao->COLUMN_NAME,
+              'referenced_column_name' => $dao->REFERENCED_COLUMN_NAME,
+              'on_delete' => $dao->DELETE_RULE,
+            );
+            // And now kill it.
+            CRM_Core_BAO_SchemaHandler::safeRemoveFK($table, $dao->CONSTRAINT_NAME);
+          }
+        }
+        // If the index exists, we preface with a DROP statement.
+        // See if the index exists.
+        $index_exists = FALSE;
+        if (array_key_exists($table, $existingKeyIndices) && in_array($index['name'], $existingKeyIndices[$table])) {
+          $index_exists = TRUE;
+        }
+        $queries[] = "ALTER TABLE $table " .
+          ($index_exists ? 'DROP INDEX ' . $index['name'] . ', ' : '') .
+          'ADD ' .
+          (array_key_exists('unique', $index) && $index['unique'] ? 'UNIQUE ' : '') .
+          "INDEX {$index['name']} (" .  implode(", ", $index['field']) .
         ")";
+        foreach ($existing_foreign_keys as $foreign_key_name => $foreign_key) {
+          $queries[] = "ALTER TABLE {$table} ADD CONSTRAINT `{$foreign_key_name}`
+            FOREIGN KEY (`{$foreign_key['column_name']}`) REFERENCES
+            `{$foreign_key['table_name']}` (`{$foreign_key['referenced_column_name']}`)
+            ON DELETE {$foreign_key['on_delete']};";
+        }
       }
     }
 
