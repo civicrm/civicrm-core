@@ -487,4 +487,14 @@
       <type>Select</type>
     </html>
   </field>
+  <field>
+   <name>modified_date</name>
+   <uniqueName>mailing_modified_date</uniqueName>
+   <type>timestamp</type>
+   <comment>When was the mailing (or closely related entity) was created or modified or deleted.</comment>
+   <required>false</required>
+   <export>true</export>
+   <default>CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP</default>
+   <add>4.7</add>
+ </field>
 </table>
