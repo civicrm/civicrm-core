@@ -2138,6 +2138,7 @@ abstract class CRM_Utils_Hook {
    *       $doc->find('[ng-form="crmMailingSubform"]')->attr('cat-stevens', 'ts(\'wild world\')');
    *     })
    *   );
+   *   $angular->add($changeSet);
    * }
    * @endCode
    */
