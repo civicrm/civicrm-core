@@ -231,8 +231,8 @@ class CRM_Financial_BAO_ExportFormat_CSV extends CRM_Financial_BAO_ExportFormat 
 
       CRM_Utils_Hook::batchItems($queryResults, $batchItems);
 
-      $financialItems['headers'] = self::formatHeaders($financialItems);
-      self::export($financialItems);
+      $batchItems['headers'] = self::formatHeaders($batchItems);
+      self::export($batchItems);
     }
     parent::initiateDownload();
   }
