@@ -76,7 +76,7 @@ class CRM_Upgrade_Incremental_General {
       // CRM-20941 PHP 5.3 end date of End of 2017, PHP 5.4 End date End of Feb 2018 Recommend anyone on PHP 5.5 to move up to 5.6 or later e.g. 7.0
       if (version_compare(phpversion(), self::PREVIOUS_MIN_RECOMMENDED_PHP_VER) >= 0) {
         $preUpgradeMessage .= ts('You may proceed with the upgrade and CiviCRM %1 will continue working normally, but future releases will require PHP %2 or above. We recommend you use the most recent php version you can', array(
-           1 => $currentVer,
+           1 => $latestVer,
            2 => self::MIN_RECOMMENDED_PHP_VER,
         ));
       }
