@@ -14,14 +14,27 @@ Other resources for identifying changes are:
     * https://github.com/civicrm/civicrm-joomla
     * https://github.com/civicrm/civicrm-wordpress
 
+## CiviCRM 4.7.24
+
+Released September 6, 2017;
+
+- **[Synopsis](release-notes/4.7.24.md#synopsis)**
+- **[Features](release-notes/4.7.24.md#features)**
+- **[Bugs resolved](release-notes/4.7.24.md#bugs)**
+- **[Miscellany](release-notes/4.7.24.md#misc)**
+- **[Credits](release-notes/4.7.24.md#credits)**
+- **[Feedback](release-notes/4.7.24.md#feedback)**
+
 ## CiviCRM 4.7.23
 
 Released August 2, 2017
 
+- **[Synopsis](release-notes/4.7.23.md#synopsis)**
 - **[Features](release-notes/4.7.23.md#features)**
 - **[Bugs resolved](release-notes/4.7.23.md#bugs)**
 - **[Miscellany](release-notes/4.7.23.md#misc)**
 - **[Credits](release-notes/4.7.23.md#credits)**
+- **[Feedback](release-notes/4.7.23.md#feedback)**
 
 ## CiviCRM 4.7.22
 
