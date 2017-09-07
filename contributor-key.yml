@@ -69,6 +69,10 @@
   name        : Arthur Almeida
   organization: Neuwald Tecnologia da Informação
 
+- name        : Sean Prónay
+  organization: Apple Street Market
+  jira        : ASMC
+
 - github      : axon-obriend
   name        : Dan O'Brien
   organization: Ginkgo Street Labs
@@ -193,6 +197,10 @@
   organization: Nubay Services
   jira        : dtarrant
 
+- name        : Dean Valentine
+  organization: National Democratic Institute
+  jira        : dvalentine@ndi.org
+
 - name        : Diego Viegas
   organization: dotPro
   jira        : diegov
@@ -200,6 +208,10 @@
 - name        : Dina London
   organization: Jvillage Network
   jira        : dinalondon
+
+- github      : dsnopek
+  name        : David Snopek
+  organization: myDropWizard
 
 - github      : dvhirst
   name        : Donald Hirst
@@ -326,6 +338,10 @@
   name        : Naomi Rosenberg
   jira        : naomi
 
+- name        : Anthony Colombo
+  organization: DreamSpace
+  jira        : Hunabku
+
 - github      : ineffyble
   name        : Effy Elden
   jira        : effy
@@ -357,6 +373,10 @@
 
 - github      : jernic
   name        : jernic
+
+- name        : Jeremy Nicholls
+  organization: SEN Magazine
+  jira        : jern
 
 - github      : jeromelebleu
   name        : Jérôme Lebleu
@@ -487,6 +507,10 @@
 - name        : Lola Slade
   organization: Freeform Solutions
   jira        : lola_slade
+
+- github      : lsmithgo
+  name        : Lionel Smith-Gordon
+  jira        : lsmithgo
 
 - name        : Madura Krishnamoorthy
   organization: CompuCorp
@@ -789,7 +813,9 @@
   organization: Third Sun
   jira        : thirdsun
 
-- name        : Thomas Nilefalk
+- github      : thoni56
+  name        : Thomas Nilefalk
+  organization: Responsive Development Technologies
   jira        : thoni56
 
 - github      : tobiaslounsbury
@@ -798,6 +824,7 @@
 - name        : Thomas Mannell
   organization: Registered Nurses' Association of Ontario
   jira        : tom.m
+
 
 - name        : Torrance Hodgson
   jira        : torrance123
