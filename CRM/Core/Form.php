@@ -233,6 +233,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *   The type of http method used (GET/POST).
    * @param string $name
    *   The name of the form if different from class name.
+   * @param array $defaults
+   *   Form default values.
    *
    * @return \CRM_Core_Form
    */
@@ -240,7 +242,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     $state = NULL,
     $action = CRM_Core_Action::NONE,
     $method = 'post',
-    $name = NULL
+    $name = NULL,
+    $defaults = array()
   ) {
 
     if ($name) {
@@ -250,6 +253,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       // CRM-15153 - FIXME this name translates to a DOM id and is not always unique!
       $this->_name = CRM_Utils_String::getClassName(CRM_Utils_System::getClassName($this));
     }
+
+    $this->_defaults = $defaults;
 
     parent::__construct($this->_name, $method);
 
