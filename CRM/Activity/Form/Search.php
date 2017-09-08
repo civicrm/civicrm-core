@@ -100,11 +100,11 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
       $this->_formValues = $this->get('formValues');
 
       if ($this->_force) {
-         // If we force the search then merge form values with url values
-         // and set submit values to form values.
-         $this->_formValues = array_merge((array) $this->_formValues, CRM_Utils_Request::exportValues());
-         $this->_submitValues = $this->_formValues;
-       }
+        // If we force the search then merge form values with url values
+        // and set submit values to form values.
+        $this->_formValues = array_merge((array) $this->_formValues, CRM_Utils_Request::exportValues());
+        $this->_submitValues = $this->_formValues;
+      }
     }
 
     if (empty($this->_formValues)) {
