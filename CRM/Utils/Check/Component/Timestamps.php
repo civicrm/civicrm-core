@@ -131,6 +131,7 @@ class CRM_Utils_Check_Component_Timestamps extends CRM_Utils_Check_Component {
       array('table' => 'civicrm_mailing_job', 'column' => 'end_date', 'changed' => '4.7.20', 'jira' => 'CRM-9683'),
       array('table' => 'civicrm_mailing_spool', 'column' => 'added_at', 'changed' => '4.7.20', 'jira' => 'CRM-9683'),
       array('table' => 'civicrm_mailing_spool', 'column' => 'removed_at', 'changed' => '4.7.20', 'jira' => 'CRM-9683'),
+      array('table' => 'civicrm_subscription_history', 'column' => 'date', 'changed' => '4.7.26', 'default' => 'CURRENT_TIMESTAMP', 'jira' => 'CRM-21157'),
     );
   }
 
