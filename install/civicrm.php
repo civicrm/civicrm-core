@@ -305,14 +305,17 @@ function civicrm_cms_base() {
     $url = 'http://' . $_SERVER['HTTP_HOST'];
   }
 
-  $baseURL = $_SERVER['SCRIPT_NAME'];
+  $baseURL = str_replace('//', '/', $_SERVER['SCRIPT_NAME']);
 
   if ($installType == 'drupal' || $installType == 'backdrop') {
     //don't assume 6 dir levels, as civicrm
     //may or may not be in sites/all/modules/
     //lets allow to install in custom dir. CRM-6840
     global $cmsPath;
-    $crmDirLevels = str_replace($cmsPath, '', str_replace('\\', '/', $_SERVER['SCRIPT_FILENAME']));
+
+    // Clean up the filepath.
+    $script_filename = str_replace('//', '/', $_SERVER['SCRIPT_FILENAME']);
+    $crmDirLevels = str_replace($cmsPath, '', str_replace('\\', '/', $script_filename));
     $baseURL = str_replace($crmDirLevels, '', str_replace('\\', '/', $baseURL));
   }
   elseif ($installType == 'wordpress') {
