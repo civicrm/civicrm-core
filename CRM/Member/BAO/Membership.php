@@ -1851,7 +1851,21 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
     $currentMembership = CRM_Member_BAO_Membership::getContactMembership($contactID, $membershipTypeID,
       $is_test, $membershipID, TRUE
     );
+
+    // CRM-21164 check if existing membership is inherited and new membership type does not support one
+    $membershipDifferentOwner = FALSE;
     if ($currentMembership) {
+      $ownerMemberId = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership',
+        $currentMembership['id'],
+        'owner_membership_id', 'id'
+      );
+
+      if ($ownerMemberId && empty($membershipTypeDetails['relationship_type_id'])) {
+        $membershipDifferentOwner = TRUE;
+      }
+    }
+
+    if ($currentMembership && !$membershipDifferentOwner) {
       $renewalMode = TRUE;
 
       // Do NOT do anything.
