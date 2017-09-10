@@ -208,6 +208,11 @@ class Container {
         ->setFactory(array($class, 'singleton'));
     }
 
+    $container->setDefinition('civi.mailing.triggers', new Definition(
+      'Civi\Core\SqlTrigger\TimestampTriggers',
+      array('civicrm_mailing', 'Mailing')
+    ))->addTag('kernel.event_listener', array('event' => 'hook_civicrm_triggerInfo', 'method' => 'onTriggerInfo'));
+
     $container->setDefinition('civi.activity.triggers', new Definition(
       'Civi\Core\SqlTrigger\TimestampTriggers',
       array('civicrm_activity', 'Activity')

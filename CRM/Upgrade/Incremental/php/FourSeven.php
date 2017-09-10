@@ -435,9 +435,9 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
    * @param string $rev
    */
   public function upgrade_4_7_26($rev) {
-    $this->addTask('CRM-20892 - Add modified_date to civicrm_mailing', 'addColumn',
-      'civicrm_mailing', 'modified_date', "timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'When was the mailing (or closely related entity) was created or modified or deleted.'");
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
+    $this->addTask('CRM-20892 - Add modified_date to civicrm_mailing', 'addColumn',
+      'civicrm_mailing', 'modified_date', "timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'When the mailing (or closely related entity) was created or modified or deleted.'");
   }
 
   /*
