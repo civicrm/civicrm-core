@@ -2133,11 +2133,12 @@ abstract class CRM_Utils_Hook {
    *
    * @code
    * function example_civicrm_alterAngular($angular) {
-   *   $angular->add(ChangeSet::create('mychanges')
+   *   $changeSet = \Civi\Angular\ChangeSet::create('mychanges')
    *     ->alterHtml('~/crmMailing/EditMailingCtrl/2step.html', function(phpQueryObject $doc) {
    *       $doc->find('[ng-form="crmMailingSubform"]')->attr('cat-stevens', 'ts(\'wild world\')');
    *     })
    *   );
+   *   $angular->add($changeSet);
    * }
    * @endCode
    */
