@@ -48,7 +48,8 @@
       <th>{ts}Max Participant{/ts} {help id="id-participant-max"}</th>
   {/if}
         <th>{ts}Order{/ts}</th>
-      <th>{ts}Active?{/ts}</th>
+        <th>{ts}Visibility{/ts} {help id="id-visibility-options"}</th>
+        <th>{ts}Active?{/ts}</th>
     </tr>
 
   {section name=rowLoop start=1 loop=16}
@@ -80,7 +81,8 @@
           <td>{$form.option_max_value.$index.html}</td>
       {/if}
       <td> {$form.option_weight.$index.html}</td>
-       <td> {$form.option_status.$index.html}</td>
+      <td> {$form.option_visibility_id.$index.html}</td>
+      <td> {$form.option_status.$index.html}</td>
   </tr>
     {/section}
     </table>
