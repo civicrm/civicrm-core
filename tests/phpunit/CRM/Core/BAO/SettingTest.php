@@ -188,8 +188,9 @@ class CRM_Core_BAO_SettingTest extends CiviUnitTestCase {
     CRM_Core_BAO_Setting::setItem('Staging', CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME, 'environment');
     $values = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME, 'environment');
     $this->assertEquals('Staging', $values);
-
-    define('CIVICRM_ENVIRONMENT', 'Development');
+    global $civicrm_setting;
+    $civicrm_setting[CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME]['environment'] = 'Development';
+    Civi::service('settings_manager')->useMandatory();
     $environment = CRM_Core_Config::environment();
     $this->assertEquals('Development', $environment);
   }

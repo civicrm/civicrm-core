@@ -54,8 +54,7 @@ class CRM_Admin_Form_Setting_Debugging extends CRM_Admin_Form_Setting {
     }
 
     parent::buildQuickForm();
-
-    if (defined('CIVICRM_ENVIRONMENT')) {
+    if (Civi::settings()->getMandatory('environment') !== NULL) {
       $element = $this->getElement('environment');
       $element->freeze();
       CRM_Core_Session::setStatus(ts('The environment settings have been disabled because it has been overridden in the settings file.'), ts('Environment settings'), 'info');

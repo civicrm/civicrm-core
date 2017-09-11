@@ -274,14 +274,7 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
       $environment = $env;
     }
     if ($reset || empty($environment)) {
-      if (defined('CIVICRM_ENVIRONMENT')) {
-        $environment = CIVICRM_ENVIRONMENT;
-        global $civicrm_setting;
-        $civicrm_setting[CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME]['environment'] = $environment;
-      }
-      else {
-        $environment = Civi::settings()->get('environment');
-      }
+      $environment = Civi::settings()->get('environment');
     }
     if (!$environment) {
       $environment = 'Production';
