@@ -28,6 +28,7 @@
 /**
  * CiviCRM Configuration File.
  */
+global $civicrm_setting;
 
 /**
  * Content Management System (CMS) Host:
@@ -221,8 +222,6 @@ if (!defined('CIVICRM_UF_BASEURL')) {
  *
  * Uncomment and edit the below as appropriate.
  */
- // Add this line only once above any settings overrides.
- //  global $civicrm_setting;
 
  // Override the Temporary Files directory.
  // $civicrm_setting['Directory Preferences']['uploadDir'] = '/path/to/upload-dir' ;
