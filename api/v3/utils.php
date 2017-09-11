@@ -2514,8 +2514,6 @@ function _civicrm_api3_check_edit_permissions($bao_name, $params) {
  */
 function _civicrm_api3_compare_timestamps($modifiedDate, $id, $entity) {
   $currentDbInfo = civicrm_api3($entity, 'getsingle', array('id' => $id));
-  drupal_set_message(json_encode(strtotime($currentDbInfo['modified_date'])));
-  drupal_set_message(json_encode(strtotime($modifiedDate)));
   if (strtotime($currentDbInfo['modified_date']) <= strtotime($modifiedDate)) {
     return TRUE;
   }

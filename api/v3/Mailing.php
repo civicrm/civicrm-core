@@ -67,7 +67,7 @@ function civicrm_api3_mailing_create($params) {
     $safeParams = $params;
   }
   $timestampCheck = TRUE;
-  if (!empty($params['id'])) {
+  if (!empty($params['id']) && !empty($params['modified_date'])) {
     $timestampCheck = _civicrm_api3_compare_timestamps($safeParams['modified_date'], $safeParams['id'], 'Mailing');
     unset($safeParams['modified_date']);
   }
