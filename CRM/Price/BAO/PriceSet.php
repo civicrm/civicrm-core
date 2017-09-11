@@ -1053,7 +1053,8 @@ WHERE  id = %1";
         }
         if (!is_array($options) || !in_array($id, $validPriceFieldIds)) {
           continue;
-        } elseif (
+        }
+        elseif (
           $hideAdminValues &&
           $className != 'CRM_Contribute_Form_Contribution' &&
           $className != 'CRM_Member_Form_Membership'

@@ -590,7 +590,8 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
           $options = CRM_Utils_Array::value('options', $field);
           if (!is_array($options)) {
             continue;
-          } elseif (
+          }
+          elseif (
             $hideAdminValues &&
             $className != 'CRM_Event_Form_Participant' &&
             $className != 'CRM_Event_Form_ParticipantFeeSelection'
