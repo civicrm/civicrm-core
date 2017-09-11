@@ -44,8 +44,6 @@ class api_v3_MailingGroupTest extends CiviUnitTestCase {
     $this->_email = 'test@test.test';
   }
 
-  //---------- civicrm_mailing_event_subscribe methods ---------
-
   /**
    * Test civicrm_mailing_group_event_subscribe with wrong params.
    */
@@ -85,8 +83,6 @@ class api_v3_MailingGroupTest extends CiviUnitTestCase {
     $this->contactDelete($contactID);
   }
 
-  //-------- civicrm_mailing_group_event_unsubscribe methods-----------
-
   /**
    * Test civicrm_mailing_group_event_unsubscribe with wrong params.
    */
@@ -100,8 +96,6 @@ class api_v3_MailingGroupTest extends CiviUnitTestCase {
 
     $this->callAPIFailure('mailing_event_unsubscribe', 'create', $params);
   }
-
-  //--------- civicrm_mailing_group_event_domain_unsubscribe methods -------
 
   /**
    * Test civicrm_mailing_group_event_domain_unsubscribe with wrong params.
@@ -117,8 +111,6 @@ class api_v3_MailingGroupTest extends CiviUnitTestCase {
 
     $this->callAPIFailure('mailing_event_unsubscribe', 'create', $params);
   }
-
-  //----------- civicrm_mailing_group_event_resubscribe methods--------
 
   /**
    * Test civicrm_mailing_group_event_resubscribe with wrong params type.
@@ -137,8 +129,6 @@ class api_v3_MailingGroupTest extends CiviUnitTestCase {
     );
     $this->callAPIFailure('mailing_event_resubscribe', 'create', $params);
   }
-
-  //------------------------ success case ---------------------
 
   /**
    * Test civicrm_mailing_group_event_subscribe and civicrm_mailing_event_confirm functions - success expected.
@@ -171,7 +161,7 @@ class api_v3_MailingGroupTest extends CiviUnitTestCase {
       'event_subscribe_id' => $result['values'][$result['id']]['subscribe_id'],
     );
 
-    $result = $this->callAPISuccess('mailing_event_confirm', 'create', $params);
+    $this->callAPISuccess('mailing_event_confirm', 'create', $params);
     $this->contactDelete($contactID);
   }
 

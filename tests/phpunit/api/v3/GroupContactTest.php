@@ -86,8 +86,6 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
     );
   }
 
-  ///////////////// civicrm_group_contact_get methods
-
   /**
    * Test GroupContact.get by ID.
    */
@@ -167,8 +165,6 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
     $this->assertEquals($result['added'], 1);
     $this->assertEquals($result['total_count'], 2);
   }
-
-  ///////////////// civicrm_group_contact_remove methods
 
   /**
    * Test GroupContact.delete by contact+group ID.
