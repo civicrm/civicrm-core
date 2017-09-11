@@ -5351,7 +5351,7 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
 
     if (array_key_exists('payment_instrument_id', $params)) {
       if (CRM_Utils_System::isNull($params['prevContribution']->payment_instrument_id) &&
-        !CRM_Utils_System::isNull($params['contribution']->payment_instrument_id)
+        !CRM_Utils_System::isNull($params['payment_instrument_id'])
       ) {
         //check if status is changed from Pending to Completed
         // do not update payment instrument changes for Pending to Completed
@@ -5361,7 +5361,7 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
           return TRUE;
         }
       }
-      elseif ((!CRM_Utils_System::isNull($params['contribution']->payment_instrument_id) ||
+      elseif ((!CRM_Utils_System::isNull($params['payment_instrument_id']) &&
           !CRM_Utils_System::isNull($params['prevContribution']->payment_instrument_id)) &&
         $params['contribution']->payment_instrument_id != $params['prevContribution']->payment_instrument_id
       ) {
