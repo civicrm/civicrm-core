@@ -272,7 +272,7 @@
   <field>
     <name>created_date</name>
     <type>timestamp</type>
-    <default>CURRENT_TIMESTAMP</default>
+    <default>NULL</default>
     <required>false</required>
     <title>Mailing Created Date</title>
     <comment>Date and time this mailing was created.</comment>
@@ -281,6 +281,16 @@
       <type>Select Date</type>
       <formatType>activityDateTime</formatType>
     </html>
+  </field>
+  <field>
+   <name>modified_date</name>
+   <uniqueName>mailing_modified_date</uniqueName>
+   <type>timestamp</type>
+   <comment>When the mailing (or closely related entity) was created or modified or deleted.</comment>
+   <required>false</required>
+   <export>true</export>
+   <default>CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP</default>
+   <add>4.7</add>
   </field>
   <field>
     <name>scheduled_id</name>
