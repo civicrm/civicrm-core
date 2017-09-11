@@ -744,6 +744,7 @@ WHERE ft.is_payment = 1
     $lastFinancialTrxnId = self::getFinancialTrxnId($prevContribution->id, 'DESC', FALSE, NULL, $deferredFinancialAccount);
 
     // there is no point to proceed as we can't find the last payment made
+    // @todo we should throw an exception here rather than return false.
     if (empty($lastFinancialTrxnId['financialTrxnId'])) {
       return FALSE;
     }
@@ -756,7 +757,6 @@ WHERE ft.is_payment = 1
     $lastFinancialTrxn['total_amount'] = -$inputParams['trxnParams']['total_amount'];
     $lastFinancialTrxn['net_amount'] = -$inputParams['trxnParams']['net_amount'];
     $lastFinancialTrxn['fee_amount'] = -$inputParams['trxnParams']['fee_amount'];
-    $lastFinancialTrxn['to_financial_account_id'] = CRM_Financial_BAO_FinancialTypeAccount::getInstrumentFinancialAccount($currentContribution->payment_instrument_id);
     $lastFinancialTrxn['contribution_id'] = $prevContribution->id;
     foreach (array($lastFinancialTrxn, $inputParams['trxnParams']) as $financialTrxnParams) {
       $trxn = CRM_Core_BAO_FinancialTrxn::create($financialTrxnParams);
