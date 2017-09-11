@@ -28,6 +28,7 @@
 /**
  * CiviCRM Configuration File.
  */
+global $civicrm_setting;
 
 /**
  * Content Management System (CMS) Host:
@@ -221,8 +222,6 @@ if (!defined('CIVICRM_UF_BASEURL')) {
  *
  * Uncomment and edit the below as appropriate.
  */
- // Add this line only once above any settings overrides.
- //  global $civicrm_setting;
 
  // Override the Temporary Files directory.
  // $civicrm_setting['Directory Preferences']['uploadDir'] = '/path/to/upload-dir' ;
@@ -308,15 +307,15 @@ if (!defined('CIVICRM_DOMAIN_ID')) {
   define( 'CIVICRM_DOMAIN_ID', 1);
 }
 
-/** 
- * Setting to define the environment in which this CiviCRM instance is running. 
- * Note the setting here must be value from the option group 'Environment', 
- * (see Administration > System Settings > Option Groups, Options beside Environment) 
- * which by default has three option values: 'Production', 'Staging', 'Development'. 
+/**
+ * Setting to define the environment in which this CiviCRM instance is running.
+ * Note the setting here must be value from the option group 'Environment',
+ * (see Administration > System Settings > Option Groups, Options beside Environment)
+ * which by default has three option values: 'Production', 'Staging', 'Development'.
  * NB: defining a value for environment here prevents it from being set
- * via the browser. 
- */ 
-// $civicrm_setting[CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME]['environment'] = 'Production'; 
+ * via the browser.
+ */
+// $civicrm_setting['domain']['environment'] = 'Production';
 
 /**
  * Settings to enable external caching using a cache server.  This is an
