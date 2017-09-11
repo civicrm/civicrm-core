@@ -2504,3 +2504,20 @@ function _civicrm_api3_check_edit_permissions($bao_name, $params) {
     }
   }
 }
+
+/**
+ * Check if an entity has been modified since the last known modified_date
+ * @param string $modifiedDate Last knowm modified_date
+ * @param int $id Id of record to check
+ * @param string $entity API Entity
+ * @return bool
+ */
+function _civicrm_api3_compare_timestamps($modifiedDate, $id, $entity) {
+  $currentDbInfo = civicrm_api3($entity, 'getsingle', array('id' => $id));
+  drupal_set_message(json_encode(strtotime($currentDbInfo['modified_date'])));
+  drupal_set_message(json_encode(strtotime($modifiedDate)));
+  if (strtotime($currentDbInfo['modified_date']) <= strtotime($modifiedDate)) {
+    return TRUE;
+  }
+  return FALSE;
+}
