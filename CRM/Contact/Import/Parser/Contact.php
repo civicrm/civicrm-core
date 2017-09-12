@@ -1147,8 +1147,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
    * @param null $relationships
    */
   public static function isErrorInCustomData($params, &$errorMessage, $csType = NULL, $relationships = NULL) {
-    $session = CRM_Core_Session::singleton();
-    $dateType = $session->get("dateTypes");
+    $dateType = CRM_Core_Session::singleton()->get("dateTypes");
 
     if (!empty($params['contact_sub_type'])) {
       $csType = CRM_Utils_Array::value('contact_sub_type', $params);
