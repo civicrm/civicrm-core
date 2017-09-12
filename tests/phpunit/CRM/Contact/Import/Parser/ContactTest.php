@@ -303,6 +303,20 @@ class CRM_Contact_Imports_Parser_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test the determination of whether a custom field is valid.
+   */
+  public function testCustomFieldValidation() {
+    $errorMessage = array();
+    $customGroup = $this->customGroupCreate(array('extends' => 'Contact', 'title' => 'ABC'));
+    $customField = $this->customFieldOptionValueCreate($customGroup, 'fieldABC', array('html_type' => 'Multi-Select'));
+    $params = array(
+      'custom_' . $customField['id'] => 'Label1|Label2',
+    );
+    CRM_Contact_Import_Parser_Contact::isErrorInCustomData($params, $errorMessage);
+    $this->assertEquals(array(), $errorMessage);
+  }
+
+  /**
    * Run the import parser.
    *
    * @param array $originalValues
