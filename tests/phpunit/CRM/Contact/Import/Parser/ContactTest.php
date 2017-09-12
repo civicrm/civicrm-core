@@ -303,6 +303,120 @@ class CRM_Contact_Imports_Parser_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that setting duplicate action to fill doesn't blow away data
+   * that exists, but does fill in where it's empty.
+   *
+   * @throw \Exception
+   */
+  public function testImportFill() {
+    // Create a custom field group for testing.
+    $custom_group_name = 'importFillGroup';
+    $results = $this->callAPISuccess('customGroup', 'get', array('title' => $custom_group_name));
+    if ($results['count'] == 0) {
+      $api_params = array(
+        'title' => $custom_group_name,
+        'extends' => 'Individual',
+        'is_active' => TRUE,
+      );
+      $customGroup = $this->callAPISuccess('customGroup', 'create', $api_params);
+    }
+
+    // Add two custom fields.
+    $api_params = array(
+      'custom_group_id' => $customGroup['id'],
+      'label' => 'importFillField1',
+      'html_type' => 'Select',
+      'data_type' => 'String',
+      'option_values' => array(
+        'foo' => 'Foo',
+        'bar' => 'Bar',
+      ),
+    );
+    $result = $this->callAPISuccess('custom_field', 'create', $api_params);
+    $customField1 = $result['id'];
+
+    $api_params = array(
+      'custom_group_id' => $customGroup['id'],
+      'label' => 'importFillField2',
+      'html_type' => 'Select',
+      'data_type' => 'String',
+      'option_values' => array(
+        'baz' => 'Baz',
+        'boo' => 'Boo',
+      ),
+    );
+    $result = $this->callAPISuccess('custom_field', 'create', $api_params);
+    $customField2 = $result['id'];
+
+    // Now set up values.
+    $original_gender = 'Male';
+    $original_custom1 = 'foo';
+    $original_job_title = '';
+    $original_custom2 = '';
+    $original_email = 'test-import-fill@example.org';
+
+    $import_gender = 'Female';
+    $import_custom1 = 'bar';
+    $import_job_title = 'Chief data importer';
+    $import_custom2 = 'baz';
+
+    // Create contact with both one known core field and one custom
+    // field filled in.
+    $api_params = array(
+      'contact_type' => 'Individual',
+      'email' => $original_email,
+      'gender' => $original_gender,
+      'custom_' . $customField1 => $original_custom1,
+    );
+    $result = $this->callAPISuccess('contact', 'create', $api_params);
+    $contact_id = $result['id'];
+
+    // Run an import.
+    $import = array(
+      'email' => $original_email,
+      'gender_id' => $import_gender,
+      'custom_' . $customField1 => $import_custom1,
+      'job_title' => $import_job_title,
+      'custom_' . $customField2 => $import_custom2,
+    );
+
+    $this->runImport($import, CRM_Import_Parser::DUPLICATE_FILL, CRM_Import_Parser::VALID);
+
+    $expected = array(
+      'gender' => $original_gender,
+      'custom_' . $customField1 => $original_custom1,
+      'job_title' => $import_job_title,
+      'custom_' . $customField2 => $import_custom2,
+    );
+
+    $params = array(
+      'id' => $contact_id,
+      'return' => array(
+        'gender',
+        'custom_' . $customField1,
+        'job_title',
+        'custom_' . $customField2,
+      ),
+    );
+    $result = civicrm_api3('Contact', 'get', $params);
+    $values = array_pop($result['values']);
+    foreach ($expected as $field => $expected_value) {
+      if (!isset($values[$field])) {
+        $given_value = NULL;
+      }
+      else {
+        $given_value = $values[$field];
+      }
+      // We expect:
+      //   gender: Male
+      //   job_title: Chief Data Importer
+      //   importFillField1: foo
+      //   importFillField2: baz
+      $this->assertEquals($expected_value, $given_value, "$field properly handled during Fill import");
+    }
+  }
+
+  /**
    * Run the import parser.
    *
    * @param array $originalValues
