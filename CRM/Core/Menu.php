@@ -329,9 +329,10 @@ class CRM_Core_Menu {
           }
         }
 
-        $menu->copyValues($item);
         $menu->module_data = serialize($module_data);
       }
+
+      $menu->copyValues($item);
 
       foreach (self::$_serializedElements as $element) {
         if (!isset($item[$element]) ||
