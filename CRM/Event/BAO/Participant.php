@@ -1788,16 +1788,20 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
     }
 
     // get primary participant id
-    $query = "SELECT participant_id FROM civicrm_participant_payment WHERE contribution_id = {$contributionId}";
-    $participantId = CRM_Core_DAO::singleValueQuery($query);
+    $query = "SELECT participant_id
+      FROM civicrm_participant cp
+      LEFT JOIN civicrm_participant_payment cpp ON cp.id = cpp.participant_id
+      WHERE cpp.contribution_id = {$contributionId}
+      AND cp.registered_by_id IS NULL";
+    $participantPayment = CRM_Core_DAO::executeQuery($query);
 
     // get additional participant ids (including cancelled)
-    if ($participantId) {
-      $ids = array_merge(array(
-        $participantId,
-      ), self::getAdditionalParticipantIds($participantId,
+    while ($participantPayment->fetch()) {
+      $ids = array_merge($ids, array_merge(array(
+        $participantPayment->participant_id,
+      ), self::getAdditionalParticipantIds($participantPayment->participant_id,
         $excludeCancelled
-      ));
+      )));
     }
 
     return $ids;
