@@ -236,7 +236,7 @@ class CRM_Member_BAO_Query extends CRM_Core_BAO_Query {
         if (is_string($value) && strpos($value, ',') && $op == '=') {
           $value = array('IN' => explode(',', $value));
         }
-        elseif (is_string($value) && !strpos($value, ',')) {
+        elseif (is_string($value) && !is_numeric($value) && !strpos($value, ',')) {
           $value = CRM_Core_PseudoConstant::getKey('CRM_Member_DAO_Membership', $name, $value);
         }
       case 'membership_id':
