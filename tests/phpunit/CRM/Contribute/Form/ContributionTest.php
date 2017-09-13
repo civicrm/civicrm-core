@@ -931,6 +931,62 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
   }
 
   /**
+   * Test the submit function if only payment instrument is changed from 'Check' to 'Credit Card'
+   */
+  public function testSubmitUpdateChangePaymentInstrument() {
+    $form = new CRM_Contribute_Form_Contribution();
+
+    $form->testSubmit(array(
+        'total_amount' => 50,
+        'financial_type_id' => 1,
+        'receive_date' => '04/21/2015',
+        'receive_date_time' => '11:27PM',
+        'contact_id' => $this->_individualId,
+        'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
+        'check_number' => '123AX',
+        'contribution_status_id' => 1,
+        'price_set_id' => 0,
+      ),
+      CRM_Core_Action::ADD);
+    $contribution = $this->callAPISuccessGetSingle('Contribution', array('contact_id' => $this->_individualId));
+    $form->testSubmit(array(
+      'total_amount' => 50,
+      'net_amount' => 50,
+      'financial_type_id' => 1,
+      'receive_date' => '04/21/2015',
+      'receive_date_time' => '11:27PM',
+      'contact_id' => $this->_individualId,
+      'payment_instrument_id' => array_search('Credit Card', $this->paymentInstruments),
+      'card_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Financial_DAO_FinancialTrxn', 'card_type_id', 'Visa'),
+      'pan_truncation' => '1011',
+      'contribution_status_id' => 1,
+      'price_set_id' => 0,
+      'id' => $contribution['id'],
+    ),
+      CRM_Core_Action::UPDATE);
+    $contribution = $this->callAPISuccessGetSingle('Contribution', array('contact_id' => $this->_individualId));
+    $this->assertEquals(50, (int) $contribution['total_amount']);
+
+    $financialTransactions = $this->callAPISuccess('FinancialTrxn', 'get', array('sequential' => TRUE));
+    $this->assertEquals(3, $financialTransactions['count']);
+
+    list($oldTrxn, $reversedTrxn, $latestTrxn) = $financialTransactions['values'];
+
+    $this->assertEquals(50, $oldTrxn['total_amount']);
+    $this->assertEquals('123AX', $oldTrxn['check_number']);
+    $this->assertEquals(array_search('Check', $this->paymentInstruments), $oldTrxn['payment_instrument_id']);
+
+    $this->assertEquals(-50, $reversedTrxn['total_amount']);
+    $this->assertEquals('123AX', $reversedTrxn['check_number']);
+    $this->assertEquals(array_search('Check', $this->paymentInstruments), $reversedTrxn['payment_instrument_id']);
+
+    $this->assertEquals(50, $latestTrxn['total_amount']);
+    $this->assertEquals('1011', $latestTrxn['pan_truncation']);
+    $this->assertEquals(array_search('Credit Card', $this->paymentInstruments), $latestTrxn['payment_instrument_id']);
+    $lineItem = $this->callAPISuccessGetSingle('LineItem', array());
+  }
+
+  /**
    * Get parameters for credit card submit calls.
    *
    * @return array

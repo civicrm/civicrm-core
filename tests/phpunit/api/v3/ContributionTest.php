@@ -1147,7 +1147,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     );
     $contribution = $this->callAPISuccess('contribution', 'create', $newParams);
     $this->assertAPISuccess($contribution);
-    $this->_checkFinancialTrxn($contribution, 'paymentInstrument', $instrumentId);
+    $this->checkFinancialTrxnPaymentInstrumentChange($contribution['id'], 4, $instrumentId);
 
     // cleanup - delete created payment instrument
     $this->_deletedAddedPaymentInstrument();
@@ -1175,7 +1175,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     );
     $contribution = $this->callAPISuccess('contribution', 'create', $newParams);
     $this->assertAPISuccess($contribution);
-    $this->_checkFinancialTrxn($contribution, 'paymentInstrument', $instrumentId, array('total_amount' => '-100.00'));
+    $this->checkFinancialTrxnPaymentInstrumentChange($contribution['id'], 4, $instrumentId, -100);
 
     // cleanup - delete created payment instrument
     $this->_deletedAddedPaymentInstrument();
@@ -3334,6 +3334,59 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * Check correct financial transaction entries were created for the change in payment instrument.
+   *
+   * @param int $contributionID
+   * @param int $originalInstrumentID
+   * @param int $newInstrumentID
+   */
+  public function checkFinancialTrxnPaymentInstrumentChange($contributionID, $originalInstrumentID, $newInstrumentID, $amount = 100) {
+
+    $entityFinancialTrxns = $this->getFinancialTransactionsForContribution($contributionID);
+
+    $originalTrxnParams = array(
+      'to_financial_account_id' => CRM_Financial_BAO_FinancialTypeAccount::getInstrumentFinancialAccount($originalInstrumentID),
+      'payment_instrument_id' => $originalInstrumentID,
+      'amount' => $amount,
+      'status_id' => 1,
+    );
+
+    $reversalTrxnParams = array(
+      'to_financial_account_id' => CRM_Financial_BAO_FinancialTypeAccount::getInstrumentFinancialAccount($originalInstrumentID),
+      'payment_instrument_id' => $originalInstrumentID,
+      'amount' => -$amount,
+      'status_id' => 1,
+    );
+
+    $newTrxnParams = array(
+      'to_financial_account_id' => CRM_Financial_BAO_FinancialTypeAccount::getInstrumentFinancialAccount($newInstrumentID),
+      'payment_instrument_id' => $newInstrumentID,
+      'amount' => $amount,
+      'status_id' => 1,
+    );
+
+    foreach (array($originalTrxnParams, $reversalTrxnParams, $newTrxnParams) as $index => $transaction) {
+      $entityFinancialTrxn = $entityFinancialTrxns[$index];
+      $this->assertEquals($entityFinancialTrxn['amount'], $transaction['amount']);
+
+      $financialTrxn = $this->callAPISuccessGetSingle('FinancialTrxn', array(
+        'id' => $entityFinancialTrxn['financial_trxn_id'],
+      ));
+      $this->assertEquals($transaction['status_id'], $financialTrxn['status_id']);
+      $this->assertEquals($transaction['amount'], $financialTrxn['total_amount']);
+      $this->assertEquals($transaction['amount'], $financialTrxn['net_amount']);
+      $this->assertEquals(0, $financialTrxn['fee_amount']);
+      $this->assertEquals($transaction['payment_instrument_id'], $financialTrxn['payment_instrument_id']);
+      $this->assertEquals($transaction['to_financial_account_id'], $financialTrxn['to_financial_account_id']);
+
+      // Generic checks.
+      $this->assertEquals(1, $financialTrxn['is_payment']);
+      $this->assertEquals('USD', $financialTrxn['currency']);
+      $this->assertEquals(date('Y-m-d'), date('Y-m-d', strtotime($financialTrxn['trxn_date'])));
+    }
+  }
+
+  /**
    * Check financial transaction.
    *
    * @todo break this down into sensible functions - most calls to it only use a few lines out of the big if.
@@ -3344,11 +3397,9 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * @param array $extraParams
    */
   public function _checkFinancialTrxn($contribution, $context, $instrumentId = NULL, $extraParams = array()) {
-    $trxnParams = array(
-      'entity_id' => $contribution['id'],
-      'entity_table' => 'civicrm_contribution',
-    );
-    $trxn = current(CRM_Financial_BAO_FinancialItem::retrieveEntityFinancialTrxn($trxnParams, TRUE));
+    $financialTrxns = $this->getFinancialTransactionsForContribution($contribution['id']);
+    $trxn = array_pop($financialTrxns);
+
     $params = array(
       'id' => $trxn['financial_trxn_id'],
     );
@@ -3375,6 +3426,10 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       );
     }
     elseif ($context == 'changeFinancial' || $context == 'paymentInstrument') {
+      // @todo checkFinancialTrxnPaymentInstrumentChange instead for paymentInstrument.
+      // It does the same thing with greater readability.
+      // @todo remove handling for
+
       $entityParams = array(
         'entity_id' => $contribution['id'],
         'entity_table' => 'civicrm_contribution',
@@ -3397,23 +3452,14 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
         );
       }
       if ($context == 'paymentInstrument') {
-        $compareParams += array(
-          'to_financial_account_id' => CRM_Financial_BAO_FinancialTypeAccount::getInstrumentFinancialAccount(4),
-          'payment_instrument_id' => 4,
-        );
-      }
-      else {
-        $compareParams['to_financial_account_id'] = 12;
-      }
-      $this->assertDBCompareValues('CRM_Financial_DAO_FinancialTrxn', $trxnParams1, array_merge($compareParams, $extraParams));
-      $compareParams['total_amount'] = 100;
-      if ($context == 'paymentInstrument') {
         $compareParams['to_financial_account_id'] = CRM_Financial_BAO_FinancialTypeAccount::getInstrumentFinancialAccount($instrumentId);
         $compareParams['payment_instrument_id'] = $instrumentId;
       }
       else {
         $compareParams['to_financial_account_id'] = 12;
       }
+      $this->assertDBCompareValues('CRM_Financial_DAO_FinancialTrxn', $trxnParams1, array_merge($compareParams, $extraParams));
+      $compareParams['total_amount'] = 100;
     }
 
     $this->assertDBCompareValues('CRM_Financial_DAO_FinancialTrxn', $params, array_merge($compareParams, $extraParams));
@@ -3917,6 +3963,25 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'trxn_id' => uniqid(),
     ));
     $this->assertEquals('AUD', $contribution['values'][$contribution['id']]['currency']);
+  }
+
+  /**
+   * Get the financial items for the contribution.
+   *
+   * @param int $contributionID
+   *
+   * @return array
+   *   Array of associated financial items.
+   */
+  protected function getFinancialTransactionsForContribution($contributionID) {
+    $trxnParams = array(
+      'entity_id' => $contributionID,
+      'entity_table' => 'civicrm_contribution',
+    );
+    // @todo the following function has naming errors & has a weird signature & appears to
+    // only be called from test classes. Move into test suite & maybe just use api
+    // from this function.
+    return array_merge(CRM_Financial_BAO_FinancialItem::retrieveEntityFinancialTrxn($trxnParams, FALSE, array()));
   }
 
 }

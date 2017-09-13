@@ -3377,46 +3377,9 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         // instrument is null and now new payment instrument is added along with the payment
         $params['trxnParams']['payment_instrument_id'] = $params['contribution']->payment_instrument_id;
         $params['trxnParams']['check_number'] = CRM_Utils_Array::value('check_number', $params);
-        if (array_key_exists('payment_instrument_id', $params)) {
-          $params['trxnParams']['total_amount'] = -$trxnParams['total_amount'];
-          if (CRM_Utils_System::isNull($params['prevContribution']->payment_instrument_id) &&
-            !CRM_Utils_System::isNull($params['contribution']->payment_instrument_id)
-          ) {
-            //check if status is changed from Pending to Completed
-            // do not update payment instrument changes for Pending to Completed
-            if (!($params['contribution']->contribution_status_id == array_search('Completed', $contributionStatuses) &&
-              in_array($params['prevContribution']->contribution_status_id, $pendingStatus))
-            ) {
-              // for all other statuses create new financial records
-              self::updateFinancialAccounts($params, 'changePaymentInstrument');
-              $params['total_amount'] = $params['trxnParams']['total_amount'] = $trxnParams['total_amount'];
-              self::updateFinancialAccounts($params, 'changePaymentInstrument');
-              $updated = TRUE;
-            }
-          }
-          elseif ((!CRM_Utils_System::isNull($params['contribution']->payment_instrument_id) ||
-              !CRM_Utils_System::isNull($params['prevContribution']->payment_instrument_id)) &&
-            $params['contribution']->payment_instrument_id != $params['prevContribution']->payment_instrument_id
-          ) {
-            // for any other payment instrument changes create new financial records
-            self::updateFinancialAccounts($params, 'changePaymentInstrument');
-            $params['total_amount'] = $params['trxnParams']['total_amount'] = $trxnParams['total_amount'];
-            self::updateFinancialAccounts($params, 'changePaymentInstrument');
-            $updated = TRUE;
-          }
-          elseif (!CRM_Utils_System::isNull($params['contribution']->check_number) &&
-            $params['contribution']->check_number != $params['prevContribution']->check_number
-          ) {
-            // another special case when check number is changed, create new financial records
-            // create financial trxn with negative amount
-            $params['trxnParams']['check_number'] = $params['prevContribution']->check_number;
-            self::updateFinancialAccounts($params, 'changePaymentInstrument');
-            // create financial trxn with positive amount
-            $params['trxnParams']['check_number'] = $params['contribution']->check_number;
-            $params['total_amount'] = $params['trxnParams']['total_amount'] = $trxnParams['total_amount'];
-            self::updateFinancialAccounts($params, 'changePaymentInstrument');
-            $updated = TRUE;
-          }
+
+        if (self::isPaymentInstrumentChange($params, $pendingStatus)) {
+          $updated = CRM_Core_BAO_FinancialTrxn::updateFinancialAccountsOnPaymentInstrumentChange($params);
         }
 
         //if Change contribution amount
@@ -3563,24 +3526,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         }
       }
     }
-    elseif ($context == 'changePaymentInstrument') {
-      $params['trxnParams']['net_amount'] = $params['trxnParams']['total_amount'];
-      $deferredFinancialAccount = CRM_Utils_Array::value('deferred_financial_account_id', $params);
-      if (empty($deferredFinancialAccount)) {
-        $deferredFinancialAccount = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($params['prevContribution']->financial_type_id, 'Deferred Revenue Account is');
-      }
-      $lastFinancialTrxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($params['prevContribution']->id, 'DESC', FALSE, NULL, $deferredFinancialAccount);
-      if (!empty($lastFinancialTrxnId['financialTrxnId'])) {
-        if ($params['total_amount'] != $params['trxnParams']['total_amount']) {
-          $params['trxnParams']['to_financial_account_id'] = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialTrxn', $lastFinancialTrxnId['financialTrxnId'], 'to_financial_account_id');
-          $params['trxnParams']['payment_instrument_id'] = $params['prevContribution']->payment_instrument_id;
-        }
-        else {
-          $params['trxnParams']['to_financial_account_id'] = $params['to_financial_account_id'];
-          $params['trxnParams']['payment_instrument_id'] = $params['contribution']->payment_instrument_id;
-        }
-      }
-    }
 
     if ($context == 'changedStatus') {
       if (($previousContributionStatus == 'Pending'
@@ -3687,14 +3632,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         }
       }
     }
-    if ($context == 'changePaymentInstrument') {
-      // store financial item Proportionaly.
-      $trxnParams = array(
-        'total_amount' => $trxn->total_amount,
-        'contribution_id' => $params['contribution']->id,
-      );
-      self::assignProportionalLineItems($trxnParams, $trxn->id, $params['prevContribution']->total_amount);
-    }
+
     CRM_Core_BAO_FinancialTrxn::createDeferredTrxn(CRM_Utils_Array::value('line_item', $params), $params['contribution'], TRUE, $context);
   }
 
@@ -5398,6 +5336,46 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
       return -1;
     }
     return 1;
+  }
+
+  /**
+   * Does this transaction reflect a payment instrument change.
+   *
+   * @param array $params
+   * @param array $pendingStatuses
+   *
+   * @return bool
+   */
+  protected static function isPaymentInstrumentChange(&$params, $pendingStatuses) {
+    $contributionStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $params['contribution']->contribution_status_id);
+
+    if (array_key_exists('payment_instrument_id', $params)) {
+      if (CRM_Utils_System::isNull($params['prevContribution']->payment_instrument_id) &&
+        !CRM_Utils_System::isNull($params['payment_instrument_id'])
+      ) {
+        //check if status is changed from Pending to Completed
+        // do not update payment instrument changes for Pending to Completed
+        if (!($contributionStatus == 'Completed' &&
+          in_array($params['prevContribution']->contribution_status_id, $pendingStatuses))
+        ) {
+          return TRUE;
+        }
+      }
+      elseif ((!CRM_Utils_System::isNull($params['payment_instrument_id']) &&
+          !CRM_Utils_System::isNull($params['prevContribution']->payment_instrument_id)) &&
+        $params['contribution']->payment_instrument_id != $params['prevContribution']->payment_instrument_id
+      ) {
+        return TRUE;
+      }
+      elseif (!CRM_Utils_System::isNull($params['contribution']->check_number) &&
+        $params['contribution']->check_number != $params['prevContribution']->check_number
+      ) {
+        // another special case when check number is changed, create new financial records
+        // create financial trxn with negative amount
+        return TRUE;
+      }
+    }
+    return FALSE;
   }
 
   /**
