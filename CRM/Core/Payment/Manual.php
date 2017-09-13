@@ -93,10 +93,7 @@ class CRM_Core_Payment_Manual extends CRM_Core_Payment {
       return array('credit_card_type', 'pan_truncation');
     }
     elseif ($paymentInstrument === 'Check') {
-      // Really we should render check_number here, but we need to review how we edit
-      // check_numebr since we expose it as editable on the contribution form,
-      // even though it should only be editable from a transation specific form.
-      return array();
+      return array('check_number');
     }
     return array();
   }

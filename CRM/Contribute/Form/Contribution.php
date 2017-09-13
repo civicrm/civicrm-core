@@ -248,8 +248,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       return;
     }
 
-    $this->assign('showCheckNumber', TRUE);
-
     $this->_fromEmails = CRM_Core_BAO_Email::getFromEmail();
 
     if (in_array('CiviPledge', CRM_Core_Config::singleton()->enableComponents) && !$this->_formType) {
@@ -552,7 +550,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $paneNames[ts('Premium Information')] = 'Premium';
     }
 
-    if (CRM_Core_Payment_Form::buildPaymentForm($this, $this->_paymentProcessor, FALSE, TRUE, $this->getDefaultPaymentInstrumentId()) == TRUE) {
+    $this->payment_instrument_id = CRM_Utils_Array::value('payment_instrument_id', $defaults, $this->getDefaultPaymentInstrumentId());
+    if (CRM_Core_Payment_Form::buildPaymentForm($this, $this->_paymentProcessor, FALSE, TRUE, $this->payment_instrument_id) == TRUE) {
       if (!empty($this->_recurPaymentProcessors)) {
         $buildRecurBlock = TRUE;
         if ($this->_ppID) {
@@ -704,7 +703,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     if ($this->_online) {
       $this->assign('hideCalender', TRUE);
     }
-    $checkNumber = $this->add('text', 'check_number', ts('Check Number'), $attributes['contribution_check_number']);
 
     $this->addDateTime('receipt_date', ts('Receipt Date'), FALSE, array('formatType' => 'activityDateTime'));
     $this->addDateTime('cancel_date', ts('Cancelled / Refunded Date'), FALSE, array('formatType' => 'activityDateTime'));
@@ -839,7 +837,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       if ($totalAmount) {
         $totalAmount->freeze();
       }
-      $checkNumber->freeze();
       $paymentInstrument->freeze();
       $trxnId->freeze();
       $financialType->freeze();
