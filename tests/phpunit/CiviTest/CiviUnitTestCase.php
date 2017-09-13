@@ -2431,10 +2431,12 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @param array $customGroup
    * @param string $name
    *   Name of custom field.
+   * @param array $extraParams
+   *   Additional parameters to pass through.
    *
    * @return array|int
    */
-  public function customFieldOptionValueCreate($customGroup, $name) {
+  public function customFieldOptionValueCreate($customGroup, $name, $extraParams = array()) {
     $fieldParams = array(
       'custom_group_id' => $customGroup['id'],
       'name' => 'test_custom_group',
@@ -2461,7 +2463,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       'option_status' => 1,
     );
 
-    $params = array_merge($fieldParams, $optionGroup, $optionValue);
+    $params = array_merge($fieldParams, $optionGroup, $optionValue, $extraParams);
 
     return $this->callAPISuccess('custom_field', 'create', $params);
   }
