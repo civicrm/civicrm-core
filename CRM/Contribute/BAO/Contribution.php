@@ -3578,6 +3578,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     if ($context != 'changePaymentInstrument') {
       $itemParams['entity_table'] = 'civicrm_line_item';
       $trxnIds['id'] = $params['entity_id'];
+      $previousLineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($params['contribution']->id);
       foreach ($params['line_item'] as $fieldId => $fields) {
         foreach ($fields as $fieldValueId => $lineItemDetails) {
           $prevFinancialItem = CRM_Financial_BAO_FinancialItem::getPreviousFinancialItem($lineItemDetails['id']);
@@ -3586,19 +3587,19 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
             $receiveDate = CRM_Utils_Date::isoToMysql($params['contribution']->receive_date);
           }
 
-          $financialAccount = self::getFinancialAccountForStatusChangeTrxn($params, $prevFinancialItem['financial_account_id']);
+          $financialAccount = self::getFinancialAccountForStatusChangeTrxn($params, CRM_Utils_Array::value('financial_account_id', $prevFinancialItem));
 
           $currency = $params['prevContribution']->currency;
           if ($params['contribution']->currency) {
             $currency = $params['contribution']->currency;
           }
-
+          $previousLineItemTotal = CRM_Utils_Array::value('line_total', CRM_Utils_Array::value($fieldValueId, $previousLineItems), 0);
           $itemParams = array(
             'transaction_date' => $receiveDate,
             'contact_id' => $params['prevContribution']->contact_id,
             'currency' => $currency,
-            'amount' => self::getFinancialItemAmountFromParams($inputParams, $context, $lineItemDetails, $isARefund),
-            'description' => $prevFinancialItem['description'],
+            'amount' => self::getFinancialItemAmountFromParams($inputParams, $context, $lineItemDetails, $isARefund, $previousLineItemTotal),
+            'description' => CRM_Utils_Array::value('description', $prevFinancialItem),
             'status_id' => $prevFinancialItem['status_id'],
             'financial_account_id' => $financialAccount,
             'entity_table' => 'civicrm_line_item',
@@ -3608,10 +3609,18 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
           $params['line_item'][$fieldId][$fieldValueId]['deferred_line_total'] = $itemParams['amount'];
           $params['line_item'][$fieldId][$fieldValueId]['financial_item_id'] = $financialItem->id;
 
-          if ($lineItemDetails['tax_amount'] && $lineItemDetails['tax_amount'] !== 'null') {
+          if (($lineItemDetails['tax_amount'] && $lineItemDetails['tax_amount'] !== 'null') || ($context == 'changeFinancialType')) {
             $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
             $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
-            $itemParams['amount'] = self::getMultiplier($params['contribution']->contribution_status_id, $context) * $lineItemDetails['tax_amount'];
+            $taxAmount = $lineItemDetails['tax_amount'];
+            if ($context == 'changeFinancialType' && $lineItemDetails['tax_amount'] === 'null') {
+              // reverse the Sale Tax amount if there is no tax rate associated with new Financial Type
+              $taxAmount = CRM_Utils_Array::value('tax_amount', CRM_Utils_Array::value($fieldValueId, $previousLineItems), 0);
+            }
+            elseif ($previousLineItemTotal != $lineItemDetails['line_total']) {
+              $taxAmount -= CRM_Utils_Array::value('tax_amount', CRM_Utils_Array::value($fieldValueId, $previousLineItems), 0);
+            }
+            $itemParams['amount'] = self::getMultiplier($params['contribution']->contribution_status_id, $context) * $taxAmount;
             $itemParams['description'] = $taxTerm;
             if ($lineItemDetails['financial_type_id']) {
               $itemParams['financial_account_id'] = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount(
@@ -5291,9 +5300,16 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
    *
    * @return float
    */
-  protected static function getFinancialItemAmountFromParams($params, $context, $lineItemDetails, $isARefund) {
-    if ($context == 'changedAmount' || $context == 'changeFinancialType') {
-      return $params['total_amount'] - $params['prevContribution']->total_amount;
+  protected static function getFinancialItemAmountFromParams($params, $context, $lineItemDetails, $isARefund, $previousLineItemTotal) {
+    if ($context == 'changedAmount') {
+      $lineTotal = $lineItemDetails['line_total'];
+      if ($lineTotal != $previousLineItemTotal) {
+        $lineTotal -= $previousLineItemTotal;
+      }
+      return $lineTotal;
+    }
+    elseif ($context == 'changeFinancialType') {
+      return -$lineItemDetails['line_total'];
     }
     elseif ($context == 'changedStatus') {
       $cancelledTaxAmount = 0;
@@ -5304,7 +5320,7 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
     }
     elseif ($context === NULL) {
       // erm, yes because? but, hey, it's tested.
-      return $params['total_amount'];
+      return $lineItemDetails['line_total'];
     }
     elseif (empty($lineItemDetails['line_total'])) {
       // follow legacy code path
