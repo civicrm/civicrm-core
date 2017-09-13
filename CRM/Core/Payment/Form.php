@@ -207,8 +207,7 @@ class CRM_Core_Payment_Form {
    * @return string
    */
   public static function getPaymentTypeLabel($paymentProcessor) {
-    $paymentProcessorObject = Civi\Payment\System::singleton()->getByProcessor($paymentProcessor);
-    return ts(($paymentProcessorObject->getPaymentTypeLabel()) . ' Information');
+    return ts(($paymentProcessor['object']->getPaymentTypeLabel()) . ' Information');
   }
 
   /**
