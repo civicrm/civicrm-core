@@ -251,6 +251,7 @@ function _civicrm_api3_activity_get_spec(&$params) {
     'type' => CRM_Utils_Type::T_INT,
     'FKClassName' => 'CRM_Case_DAO_Case',
     'FKApiName' => 'Case',
+    'supports_joins' => TRUE,
   );
   $params['contact_id'] = array(
     'title' => 'Activity Contact ID',
@@ -481,10 +482,15 @@ function _civicrm_api3_activity_get_formatResult($params, $activities, $options)
   }
 
   $tagGet = array('tag_id', 'entity_id');
+  $caseGet = $caseIds = array();
   foreach (array_keys($returns) as $key) {
     if (strpos($key, 'tag_id.') === 0) {
       $tagGet[] = $key;
       $returns['tag_id'] = 1;
+    }
+    if (strpos($key, 'case_id.') === 0) {
+      $caseGet[] = str_replace('case_id.', '', $key);
+      $returns['case_id'] = 1;
     }
   }
 
@@ -548,6 +554,7 @@ function _civicrm_api3_activity_get_formatResult($params, $activities, $options)
           array(1 => array(implode(',', array_keys($activities)), 'String', CRM_Core_DAO::QUERY_FORMAT_NO_QUOTES)));
         while ($dao->fetch()) {
           $activities[$dao->activity_id]['case_id'][] = $dao->case_id;
+          $caseIds[$dao->case_id] = $dao->case_id;
         }
         break;
 
@@ -561,6 +568,29 @@ function _civicrm_api3_activity_get_formatResult($params, $activities, $options)
         if (substr($n, 0, 6) == 'custom') {
           $returnProperties[$n] = $v;
         }
+    }
+  }
+
+  // Fetch case fields via the join syntax
+  // Note this is limited to the first case if the activity belongs to more than one
+  if ($caseGet && $caseIds) {
+    $cases = civicrm_api3('Case', 'get', array(
+      'id' => array('IN' => $caseIds),
+      'options' => array('limit' => 0),
+      'check_permissions' => !empty($params['check_permissions']),
+      'return' => $caseGet,
+    ));
+    foreach ($activities as &$activity) {
+      if (!empty($activity['case_id'])) {
+        $case = CRM_Utils_Array::value($activity['case_id'][0], $cases['values']);
+        if ($case) {
+          foreach ($case as $key => $value) {
+            if ($key != 'id') {
+              $activity['case_id.' . $key] = $value;
+            }
+          }
+        }
+      }
     }
   }
 
