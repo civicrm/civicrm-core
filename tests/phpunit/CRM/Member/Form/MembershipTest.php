@@ -866,6 +866,46 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test if membership is updated to New after contribution
+   * is updated from Partially paid to Completed.
+   */
+  public function testSubmitUpdateMembershipFromPartiallyPaid() {
+    $memStatus = CRM_Member_BAO_Membership::buildOptions('status_id', 'validate');
+
+    //Perform a pay later membership contribution.
+    $this->testSubmitPayLaterWithBilling();
+    $membership = $this->callAPISuccessGetSingle('Membership', array('contact_id' => $this->_individualId));
+    $this->assertEquals($membership['status_id'], array_search('Pending', $memStatus));
+    $contribution = $this->callAPISuccessGetSingle('MembershipPayment', array(
+      'membership_id' => $membership['id'],
+    ));
+
+    //Update contribution to Partially paid.
+    $prevContribution = $this->callAPISuccess('Contribution', 'create', array(
+      'id' => $contribution['contribution_id'],
+      'contribution_status_id' => 8,
+    ));
+    $prevContribution = $prevContribution['values'][1];
+
+    //Complete the contribution from offline form.
+    $form = new CRM_Contribute_Form_Contribution();
+    $submitParams = array(
+      'id' => $contribution['contribution_id'],
+      'contribution_status_id' => 1,
+      'price_set_id' => 0,
+    );
+    $fields = array('total_amount', 'net_amount', 'financial_type_id', 'receive_date', 'contact_id', 'payment_instrument_id');
+    foreach ($fields as $val) {
+      $submitParams[$val] = $prevContribution[$val];
+    }
+    $form->testSubmit($submitParams, CRM_Core_Action::UPDATE);
+
+    //Check if Membership is updated to New.
+    $membership = $this->callAPISuccessGetSingle('Membership', array('contact_id' => $this->_individualId));
+    $this->assertEquals($membership['status_id'], array_search('New', $memStatus));
+  }
+
+  /**
    * Test the submit function of the membership form.
    */
   public function testSubmitRecurCompleteInstant() {
