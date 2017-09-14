@@ -50,18 +50,18 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
    *
    * @return CRM_Core_BAO_FinancialTrxn
    */
-  public static function create(&$params) {
+  public static function create($params) {
     $trxn = new CRM_Financial_DAO_FinancialTrxn();
     $trxn->copyValues($params);
 
-    if (!CRM_Utils_Rule::currencyCode($trxn->currency)) {
+    if (empty($params['id']) && !CRM_Utils_Rule::currencyCode($trxn->currency)) {
       $trxn->currency = CRM_Core_Config::singleton()->defaultCurrency;
     }
 
     $trxn->save();
 
-    // We shoudn't proceed further to record related entity financial trxns if it's update.
     if (!empty($params['id'])) {
+      // For an update entity financial transaction record will already exist. Return early.
       return $trxn;
     }
 
