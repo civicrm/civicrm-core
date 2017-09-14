@@ -883,7 +883,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     //Update contribution to Partially paid.
     $prevContribution = $this->callAPISuccess('Contribution', 'create', array(
       'id' => $contribution['contribution_id'],
-      'contribution_status_id' => 8,
+      'contribution_status_id' => 'Partially paid',
     ));
     $prevContribution = $prevContribution['values'][1];
 
@@ -891,7 +891,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     $form = new CRM_Contribute_Form_Contribution();
     $submitParams = array(
       'id' => $contribution['contribution_id'],
-      'contribution_status_id' => 1,
+      'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
       'price_set_id' => 0,
     );
     $fields = array('total_amount', 'net_amount', 'financial_type_id', 'receive_date', 'contact_id', 'payment_instrument_id');
