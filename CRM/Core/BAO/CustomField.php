@@ -1266,6 +1266,10 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         }
         break;
 
+      case 'Link':
+        $display = $display ? "<a href=\"$display\" target=\"_blank\">$display</a>" : $display;
+        break;
+
       case 'TextArea':
         $display = nl2br($display);
         break;
