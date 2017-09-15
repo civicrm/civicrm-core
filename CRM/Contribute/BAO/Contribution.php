@@ -5379,7 +5379,7 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
       }
       elseif ((!CRM_Utils_System::isNull($params['payment_instrument_id']) &&
           !CRM_Utils_System::isNull($params['prevContribution']->payment_instrument_id)) &&
-        $params['contribution']->payment_instrument_id != $params['prevContribution']->payment_instrument_id
+        $params['payment_instrument_id'] != $params['prevContribution']->payment_instrument_id
       ) {
         return TRUE;
       }
