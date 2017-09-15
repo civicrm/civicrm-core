@@ -1835,13 +1835,13 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
 
       // only pending contribution related object processed.
       if ($previousContriStatusId &&
-        ($previousContriStatusId != array_search('Pending', $contributionStatuses))
+        !in_array($contributionStatuses[$previousContriStatusId], array('Pending', 'Partially paid'))
       ) {
         // this is case when we already processed contribution object.
         return $updateResult;
       }
       elseif (!$previousContriStatusId &&
-        $contribution->contribution_status_id != array_search('Pending', $contributionStatuses)
+        !in_array($contributionStatuses[$contribution->contribution_status_id], array('Pending', 'Partially paid'))
       ) {
         // this is case when we are going to process contribution object later.
         return $updateResult;
