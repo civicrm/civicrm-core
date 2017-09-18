@@ -270,8 +270,9 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
     );
 
     $allowRegistration = FALSE;
+    $isEventOpenForRegistration = CRM_Event_BAO_Event::validRegistrationRequest($values['event'], $this->_id);
     if (!empty($values['event']['is_online_registration'])) {
-      if (CRM_Event_BAO_Event::validRegistrationRequest($values['event'], $this->_id)) {
+      if ($isEventOpenForRegistration == 1) {
         // we always generate urls for the front end in joomla
         $action_query = $action === CRM_Core_Action::PREVIEW ? "&action=$action" : '';
         $url = CRM_Utils_System::url('civicrm/event/register',
@@ -337,8 +338,9 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
           $statusMessage = ts('Event is currently full, but you can register and be a part of waiting list.');
         }
       }
-
-      CRM_Core_Session::setStatus($statusMessage);
+      if ($isEventOpenForRegistration == 1) {
+        CRM_Core_Session::setStatus($statusMessage);
+      }
     }
     // we do not want to display recently viewed items, so turn off
     $this->assign('displayRecent', FALSE);
