@@ -1018,7 +1018,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * Function tests that additional financial records are created for online contribution with pending option.
    */
   public function testCreateContributionPendingOnline() {
-    $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::create($this->_processorParams);
+    CRM_Financial_BAO_PaymentProcessor::create($this->_processorParams);
     $contributionPage = $this->callAPISuccess('contribution_page', 'create', $this->_pageParams);
     $this->assertAPISuccess($contributionPage);
     $params = array(
@@ -1736,6 +1736,46 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'is_monetary:::1',
       'amount:::100.00',
       'currency:::USD',
+      'receive_date:::' . date('Ymd', strtotime($contribution['receive_date'])),
+      "receipt_date:::\n",
+      'contributeMode:::notify',
+      'title:::Contribution',
+      'displayName:::Mr. Anthony Anderson II',
+      'contributionStatus:::Completed',
+    ));
+    $mut->stop();
+    $this->revertTemplateToReservedTemplate();
+  }
+
+  /**
+   * Test completing a transaction via the API with a non-USD transaction.
+   */
+  public function testCompleteTransactionEuro() {
+    $mut = new CiviMailUtils($this, TRUE);
+    $this->swapMessageTemplateForTestTemplate();
+    $this->createLoggedInUser();
+    $params = array_merge($this->_params, array('contribution_status_id' => 2, 'currency' => 'EUR'));
+    $contribution = $this->callAPISuccess('contribution', 'create', $params);
+
+    $this->callAPISuccess('contribution', 'completetransaction', array(
+      'id' => $contribution['id'],
+    ));
+
+    $contribution = $this->callAPISuccess('contribution', 'getsingle', array('id' => $contribution['id']));
+    $this->assertEquals('SSF', $contribution['contribution_source']);
+    $this->assertEquals('Completed', $contribution['contribution_status']);
+    $this->assertEquals(date('Y-m-d'), date('Y-m-d', strtotime($contribution['receipt_date'])));
+
+    $entityFinancialTransactions = $this->getFinancialTransactionsForContribution($contribution['id']);
+    $entityFinancialTransaction = reset($entityFinancialTransactions);
+    $financialTrxn = $this->callAPISuccessGetSingle('FinancialTrxn', array('id' => $entityFinancialTransaction['financial_trxn_id']));
+    $this->assertEquals('EUR', $financialTrxn['currency']);
+
+    $mut->checkMailLog(array(
+      'email:::anthony_anderson@civicrm.org',
+      'is_monetary:::1',
+      'amount:::100.00',
+      'currency:::EUR',
       'receive_date:::' . date('Ymd', strtotime($contribution['receive_date'])),
       "receipt_date:::\n",
       'contributeMode:::notify',

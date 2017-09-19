@@ -3467,6 +3467,9 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    * @param array $params
    *   Contribution object, line item array and params for trxn.
    *
+   * @todo stop passing $params by reference. It is unclear the purpose of doing this &
+   * adds unpredictability.
+   *
    * @param string $context
    *   Update scenarios.
    *
@@ -3494,6 +3497,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       return;
     }
     if ($context == 'changedAmount' || $context == 'changeFinancialType') {
+      // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
       $params['trxnParams']['total_amount'] = $params['trxnParams']['net_amount'] = ($params['total_amount'] - $params['prevContribution']->total_amount);
     }
     if ($context == 'changedStatus') {
@@ -3501,6 +3505,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         && (self::isContributionStatusNegative($params['contribution']->contribution_status_id))
       ) {
         $isARefund = TRUE;
+        // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
         $params['trxnParams']['total_amount'] = -$params['total_amount'];
         if (empty($params['contribution']->creditnote_id) || $params['contribution']->creditnote_id == "null") {
           $creditNoteId = self::createCreditNoteId();
@@ -3514,6 +3519,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         $arAccountId = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($financialTypeID, 'Accounts Receivable Account is');
 
         if ($currentContributionStatus == 'Cancelled') {
+          // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
           $params['trxnParams']['to_financial_account_id'] = $arAccountId;
           $params['trxnParams']['total_amount'] = -$params['total_amount'];
           if (is_null($params['contribution']->creditnote_id) || $params['contribution']->creditnote_id == "null") {
@@ -3522,6 +3528,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
           }
         }
         else {
+          // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
           $params['trxnParams']['from_financial_account_id'] = $arAccountId;
         }
       }
@@ -3539,8 +3546,13 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
           // & this can be removed
           return;
         }
+        // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
+        // This is an update so original currency if none passed in.
+        $params['trxnParams']['currency'] = CRM_Utils_Array::value('currency', $params, $params['prevContribution']->currency);
+
         self::recordAlwaysAccountsReceivable($params['trxnParams'], $params);
         $trxn = CRM_Core_BAO_FinancialTrxn::create($params['trxnParams']);
+        // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
         $params['entity_id'] = self::$_trxnIDs[] = $trxn->id;
         $query = "UPDATE civicrm_financial_item SET status_id = %1 WHERE entity_id = %2 and entity_table = 'civicrm_line_item'";
         $sql = "SELECT id, amount FROM civicrm_financial_item WHERE entity_id = %1 and entity_table = 'civicrm_line_item'";
@@ -3574,6 +3586,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     }
 
     $trxn = CRM_Core_BAO_FinancialTrxn::create($params['trxnParams']);
+    // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
     $params['entity_id'] = $trxn->id;
     if ($context != 'changePaymentInstrument') {
       $itemParams['entity_table'] = 'civicrm_line_item';
@@ -3590,6 +3603,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
           $financialAccount = self::getFinancialAccountForStatusChangeTrxn($params, CRM_Utils_Array::value('financial_account_id', $prevFinancialItem));
 
           $currency = $params['prevContribution']->currency;
+          // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
           if ($params['contribution']->currency) {
             $currency = $params['contribution']->currency;
           }
@@ -3606,6 +3620,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
             'entity_id' => $lineItemDetails['id'],
           );
           $financialItem = CRM_Financial_BAO_FinancialItem::create($itemParams, NULL, $trxnIds);
+          // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
           $params['line_item'][$fieldId][$fieldValueId]['deferred_line_total'] = $itemParams['amount'];
           $params['line_item'][$fieldId][$fieldValueId]['financial_item_id'] = $financialItem->id;
 
@@ -3634,6 +3649,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       }
     }
     if ($context == 'changeFinancialType') {
+      // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
       $params['skipLineItem'] = FALSE;
       foreach ($params['line_item'] as &$lineItems) {
         foreach ($lineItems as &$line) {
