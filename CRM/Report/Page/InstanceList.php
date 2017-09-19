@@ -85,8 +85,11 @@ class CRM_Report_Page_InstanceList extends CRM_Core_Page {
   public function info() {
 
     $report = '';
+    $queryParams = array();
+
     if ($this->ovID) {
-      $report .= " AND v.id = {$this->ovID} ";
+      $report .= " AND v.id = %1 ";
+      $queryParams[1] = array($this->ovID, 'Integer');
     }
 
     if ($this->compID) {
@@ -95,7 +98,8 @@ class CRM_Report_Page_InstanceList extends CRM_Core_Page {
         $this->_compName = 'Contact';
       }
       else {
-        $report .= " AND v.component_id = {$this->compID} ";
+        $report .= " AND v.component_id = %2 ";
+        $queryParams[2] = array($this->compID, 'Integer');
         $cmpName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Component', $this->compID,
           'name', 'id'
         );
@@ -106,10 +110,12 @@ class CRM_Report_Page_InstanceList extends CRM_Core_Page {
       }
     }
     elseif ($this->grouping) {
-      $report .= " AND v.grouping = '{$this->grouping}' ";
+      $report .= " AND v.grouping = %3 ";
+      $queryParams[3] = array($this->grouping, 'String');
     }
     elseif ($this->myReports) {
-      $report .= " AND inst.owner_id = " . CRM_Core_Session::getLoggedInContactID();
+      $report .= " AND inst.owner_id = %4 ";
+      $queryParams[4] = array(CRM_Core_Session::getLoggedInContactID(), 'Integer');
     }
 
     $sql = "
@@ -129,12 +135,11 @@ class CRM_Report_Page_InstanceList extends CRM_Core_Page {
                  ON v.component_id = comp.id
 
           WHERE v.is_active = 1 {$report}
-                AND inst.domain_id = %1
+                AND inst.domain_id = %9
           ORDER BY  v.weight ASC, inst.title ASC";
+    $queryParams[9] = array(CRM_Core_Config::domainID(), 'Integer');
 
-    $dao = CRM_Core_DAO::executeQuery($sql, array(
-      1 => array(CRM_Core_Config::domainID(), 'Integer'),
-    ));
+    $dao = CRM_Core_DAO::executeQuery($sql, $queryParams);
 
     $config = CRM_Core_Config::singleton();
     $rows = array();
