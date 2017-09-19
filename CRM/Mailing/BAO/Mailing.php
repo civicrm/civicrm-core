@@ -1323,9 +1323,6 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       $mailParams['text'] = $textBody;
     }
 
-
-
-
     if ($html && ($test || ($contact['preferred_mail_format'] == 'HTML' ||
           $contact['preferred_mail_format'] == 'Both'
         ))
