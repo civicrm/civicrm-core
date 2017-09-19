@@ -24,21 +24,3 @@
  +--------------------------------------------------------------------+
 *}
 {include file="CRM/Form/basicForm.tpl"}
-{literal}
-  <script type="text/javascript">
-    CRM.$(function($) {
-      showHideElement('deferred_revenue_enabled', 'default_invoice_page');
-      $("#deferred_revenue_enabled").click(function() {
-        showHideElement('deferred_revenue_enabled', 'default_invoice_page');
-      });
-      function showHideElement(checkEle, toHide) {
-        if ($('#' + checkEle).prop('checked')) {
-          $("tr.crm-preferences-form-block-" + toHide).show();
-        }
-        else {
-          $("tr.crm-preferences-form-block-" + toHide).hide();
-        }
-      }
-    });
-  </script>
-{/literal}
