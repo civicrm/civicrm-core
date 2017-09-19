@@ -1276,7 +1276,6 @@ ORDER BY   civicrm_email.is_bulkmail DESC
         array_push($pEmail, $template[($idx + 1)]);
       }
     }
-
     $html = NULL;
     if (isset($pEmails['html']) && is_array($pEmails['html']) && count($pEmails['html'])) {
       $html = &$pEmails['html'];
@@ -1313,8 +1312,19 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       if ($useSmarty) {
         $textBody = $smarty->fetch("string:$textBody");
       }
+
+      // CRM-21197: Tokens are inserted after the HTML version of the email has
+      // been converted to text.Therefore any tokens that contain HTML will not
+      // have their HTML converted to text. For this reason, we need to convert
+      // the plain text version of the email to plain text again aftern token
+      // substitution has happened.
+      $textBody = CRM_Utils_String::htmlToText($textBody);
+
       $mailParams['text'] = $textBody;
     }
+
+
+
 
     if ($html && ($test || ($contact['preferred_mail_format'] == 'HTML' ||
           $contact['preferred_mail_format'] == 'Both'
@@ -1336,7 +1346,6 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       $res = NULL;
       return $res;
     }
-
     $mailParams['attachments'] = $attachments;
 
     $mailParams['Subject'] = CRM_Utils_Array::value('subject', $pEmails);
