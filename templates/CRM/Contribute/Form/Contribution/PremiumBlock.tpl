@@ -67,15 +67,15 @@
       {foreach from=$products item=row}
         <div class="premium {if $showPremium}premium-selectable{/if}" id="premium_id-{$row.id}" min_contribution="{$row.min_contribution}">
           <div class="premium-short">
-            {if $row.thumbnail}<div class="premium-short-thumbnail"><img src="{$row.thumbnail}" alt="{$row.name}" /></div>{/if}
-            <div class="premium-short-content">{$row.name}</div>
+            {if $row.thumbnail}<div class="premium-short-thumbnail"><img src="{$row.thumbnail}" alt="{$row.name|escape:'html'}" /></div>{/if}
+            <div class="premium-short-content">{$row.name|escape:'html'}</div>
             <div style="clear:both"></div>
           </div>
 
           <div class="premium-full">
-            <div class="premium-full-image">{if $row.image}<img src="{$row.image}" alt="{$row.name}" />{/if}</div>
+            <div class="premium-full-image">{if $row.image}<img src="{$row.image}" alt="{$row.name|escape:'html'}" />{/if}</div>
             <div class="premium-full-content">
-              <div class="premium-full-title">{$row.name}</div>
+              <div class="premium-full-title">{$row.name|escape:'html'}</div>
               <div class="premium-full-disabled">
                 {ts 1=$row.min_contribution|crmMoney}You must contribute at least %1 to get this item{/ts}<br/>
                 <input type="button" value="{ts 1=$row.min_contribution|crmMoney}Contribute %1 Instead{/ts}" amount="{$row.min_contribution}" />
