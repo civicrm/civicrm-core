@@ -37,17 +37,6 @@
 class CRM_Admin_Form_Extensions extends CRM_Admin_Form {
 
   /**
-   * @param string $key Extension Key to check
-   * @return bool
-   */
-  public static function checkExtesnionKeyIsValid($key = NULL) {
-    if (!empty($key) && !preg_match('/^[0-9a-zA-Z._-]+$/', $key)) {
-      return FALSE;
-    }
-    return TRUE;
-  }
-
-  /**
    * Form pre-processing.
    */
   public function preProcess() {
@@ -56,7 +45,7 @@ class CRM_Admin_Form_Extensions extends CRM_Admin_Form {
     $this->_key = CRM_Utils_Request::retrieve('key', 'String',
       $this, FALSE, 0
     );
-    if (!self::checkExtesnionKeyIsValid($this->_key)) {
+    if (!CRM_Utils_Type::validate($this->_key, 'ExtensionKey')) {
       throw new CRM_Core_Exception('Extension Key does not match expected standard');
     }
     $session = CRM_Core_Session::singleton();
