@@ -833,8 +833,6 @@ class CRM_Core_Resources {
     );
 
     $filters['contact'] = array(
-      array('key' => 'contact_id', 'value' => ts('Contact ID'), 'type' => 'text'),
-      array('key' => 'external_identifier', 'value' => ts('External ID'), 'type' => 'text'),
       array('key' => 'contact_type', 'value' => ts('Contact Type')),
       array('key' => 'group', 'value' => ts('Group'), 'entity' => 'group_contact'),
       array('key' => 'tag', 'value' => ts('Tag'), 'entity' => 'entity_tag'),
@@ -842,6 +840,8 @@ class CRM_Core_Resources {
       array('key' => 'country', 'value' => ts('Country'), 'entity' => 'address'),
       array('key' => 'gender_id', 'value' => ts('Gender')),
       array('key' => 'is_deceased', 'value' => ts('Deceased')),
+      array('key' => 'contact_id', 'value' => ts('Contact ID'), 'type' => 'text'),
+      array('key' => 'external_identifier', 'value' => ts('External ID'), 'type' => 'text'),
       array('key' => 'source', 'value' => ts('Contact Source'), 'type' => 'text'),
     );
 
