@@ -3820,6 +3820,15 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       $participantId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment', $contributionId, 'participant_id', 'contribution_id');
     }
 
+    // fetch membership IDs registered against given contribution ID
+    $membershipPayments = civicrm_api3('MembershipPayment', 'Get', array('contribution_id' => $contributionId));
+    if ($membershipPayments['count']) {
+      $membershipIDs = array();
+      foreach ($membershipPayments['values'] as $membershipPayment) {
+        $membershipIDs[] = $membershipPayment['membership_id'];
+      }
+    }
+
     // build params for recording financial trxn entry
     $params['contribution'] = $contributionDAO;
     $params = array_merge($defaults, $params);
@@ -3897,6 +3906,30 @@ WHERE eft.entity_table = 'civicrm_contribution'
             $participantUpdate['id'] = $val;
             $participantUpdate['status_id'] = array_search('Registered', $participantStatuses);
             CRM_Event_BAO_Participant::add($participantUpdate);
+          }
+        }
+
+        // update membership status
+        if (!empty($membershipIDs) && count($membershipIDs)) {
+          foreach ($membershipIDs as $membershipID) {
+            // fetch the membership information based on ID
+            $membershipInfo = civicrm_api3('Membership', 'getsingle', array('id' => $membershipID));
+            // calculate the status on basis of start, end and join date
+            $calcStatus = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate(
+              $membershipInfo['start_date'],
+              $membershipInfo['end_date'],
+              $membershipInfo['join_date'],
+              'today',
+              TRUE,
+              $membershipInfo['membership_type_id'],
+              $membershipInfo
+            );
+            // update the membership with calculated status_id
+            civicrm_api3('membership', 'create', array(
+              'id' => $membershipID,
+              'membership_type_id' => $membershipInfo['membership_type_id'],
+              'status_id' => CRM_Utils_Array::value('id', $calcStatus, 'New'),
+            ));
           }
         }
 
