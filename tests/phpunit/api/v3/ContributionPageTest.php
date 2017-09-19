@@ -435,6 +435,34 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test submit with a pay later abnd check line item in mails.
+   */
+  public function testSubmitMembershipBlockIsSeparatePaymentPayLaterWithEmail() {
+    $mut = new CiviMailUtils($this, TRUE);
+    $this->setUpMembershipContributionPage();
+    $submitParams = array(
+      'price_' . $this->_ids['price_field'][0] => reset($this->_ids['price_field_value']),
+      'id' => (int) $this->_ids['contribution_page'],
+      'amount' => 10,
+      'billing_first_name' => 'Billy',
+      'billing_middle_name' => 'Goat',
+      'billing_last_name' => 'Gruff',
+      'is_pay_later' => 1,
+      'selectMembership' => $this->_ids['membership_type'],
+      'email-Primary' => 'billy-goat@the-bridge.net',
+    );
+
+    $this->callAPISuccess('contribution_page', 'submit', $submitParams);
+    $contribution = $this->callAPISuccess('contribution', 'getsingle', array('contribution_page_id' => $this->_ids['contribution_page']));
+    $this->callAPISuccess('membership_payment', 'getsingle', array('contribution_id' => $contribution['id']));
+    $mut->checkMailLog(array(
+      'Membership Amount -...             $ 2.00',
+    ));
+    $mut->stop();
+    $mut->clearMessages();
+  }
+
+  /**
    * Test submit with a membership block in place.
    */
   public function testSubmitMembershipBlockIsSeparatePayment() {
