@@ -43,7 +43,7 @@
         </tr>
         {foreach from=$rows item=row}
         <tr class="{cycle values='odd-row,even-row'} {$row.class}{if NOT $row.is_active} disabled{/if}">
-          <td class="crm-contribution-form-block-product_name">{$row.product_name|escape:'html'}</td>
+          <td class="crm-contribution-form-block-product_name">{$row.product_name}</td>
           <td class="crm-contribution-form-block-sku">{$row.sku}</td>
           <td class="crm-contribution-form-block-price">{$row.price }</td>
           <td class="crm-contribution-form-block-min_contribution">{$row.min_contribution}</td>
