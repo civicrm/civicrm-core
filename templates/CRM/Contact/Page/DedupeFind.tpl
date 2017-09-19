@@ -180,6 +180,7 @@
       "ajax": {
         "url": {/literal}'{$sourceUrl}'{literal}
       },
+      "retrieve": true,
       rowCallback: function (row, data) {
         // Set the checked state of the checkbox in the table
         $('input.crm-dedupe-select', row).prop('checked', data.is_selected == 1);
