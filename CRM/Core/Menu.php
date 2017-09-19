@@ -317,17 +317,22 @@ class CRM_Core_Menu {
 
       $menu->find(TRUE);
 
-      // Move unrecognized fields to $module_data.
-      $module_data = array();
-      foreach (array_keys($item) as $key) {
-        if (!isset($daoFields[$key])) {
-          $module_data[$key] = $item[$key];
-          unset($item[$key]);
+      if (!CRM_Core_Config::isUpgradeMode() ||
+        CRM_Core_DAO::checkFieldExists('civicrm_menu', 'module_data', FALSE)
+      ) {
+        // Move unrecognized fields to $module_data.
+        $module_data = array();
+        foreach (array_keys($item) as $key) {
+          if (!isset($daoFields[$key])) {
+            $module_data[$key] = $item[$key];
+            unset($item[$key]);
+          }
         }
+
+        $menu->module_data = serialize($module_data);
       }
 
       $menu->copyValues($item);
-      $menu->module_data = serialize($module_data);
 
       foreach (self::$_serializedElements as $element) {
         if (!isset($item[$element]) ||
