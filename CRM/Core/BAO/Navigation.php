@@ -252,7 +252,7 @@ FROM civicrm_navigation WHERE domain_id = $domainID {$whereClause} ORDER BY pare
 
     // get the list of menus
     $query = "
-SELECT id, label, url, permission, permission_operator, has_separator, parent_id, is_active, name
+SELECT id, label, url, permission, permission_operator, has_separator, parent_id, is_active, name, icon 
 FROM civicrm_navigation
 WHERE domain_id = $domainID
 ORDER BY parent_id, weight";
@@ -264,6 +264,7 @@ ORDER BY parent_id, weight";
           'label' => $navigation->label,
           'name' => $navigation->name,
           'url' => $navigation->url,
+          'icon' => $navigation->icon,
           'permission' => $navigation->permission,
           'operator' => $navigation->permission_operator,
           'separator' => $navigation->has_separator,
@@ -527,6 +528,11 @@ ORDER BY parent_id, weight";
         $skipMenuItems[] = $navID;
         return FALSE;
       }
+    }
+
+    if (!empty($value['attributes']['icon'])) {
+      $menuIcon = '<span class="' . $value['attributes']['icon'] . '"></span>&nbsp;';
+      $name = $menuIcon . $name;
     }
 
     if ($makeLink) {

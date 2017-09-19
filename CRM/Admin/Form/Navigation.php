@@ -67,6 +67,9 @@ class CRM_Admin_Form_Navigation extends CRM_Admin_Form {
     );
 
     $this->add('text', 'url', ts('Url'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_Navigation', 'url'));
+
+    $this->add('text', 'icon', ts('Icon'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_Navigation', 'icon'));
+
     $permissions = array();
     foreach (CRM_Core_Permission::basicPermissions(TRUE, TRUE) as $id => $vals) {
       $permissions[] = array('id' => $id, 'label' => $vals[0], 'description' => (array) CRM_Utils_Array::value(1, $vals));

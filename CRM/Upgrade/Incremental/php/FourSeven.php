@@ -438,6 +438,9 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
     $this->addTask('CRM-20892 - Add modified_date to civicrm_mailing', 'addColumn',
       'civicrm_mailing', 'modified_date', "timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'When the mailing (or closely related entity) was created or modified or deleted.'");
+
+    $this->addTask('CRM-21195 - Add icon field to civicrm_navigation', 'addColumn',
+      'civicrm_navigation', 'icon', "varchar(255) NULL DEFAULT NULL COMMENT 'CSS class name for an icon");
   }
 
   /*
