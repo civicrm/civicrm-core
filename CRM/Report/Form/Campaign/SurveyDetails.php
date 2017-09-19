@@ -184,6 +184,11 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
             'required' => TRUE,
             'title' => ts('Survey Result'),
           ),
+          'activity_date_time' => array(
+            'name' => 'activity_date_time',
+            'title' => ts('Date'),
+            'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+          ),
         ),
         'filters' => array(
           'survey_id' => array(
@@ -206,8 +211,18 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => $resultOptions,
           ),
+          'activity_date_time' => array(
+            'title' => ts('Date'),
+            'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+            'operatorType' => CRM_Report_Form::OP_DATE,
+          ),
         ),
         'grouping' => 'survey-activity-fields',
+        'order_bys' => array(
+          'activity_date_time' => array(
+            'title' => ts('Date'),
+          ),
+        ),
       ),
     );
     parent::__construct();
