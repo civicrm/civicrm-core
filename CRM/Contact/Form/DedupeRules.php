@@ -63,7 +63,7 @@ class CRM_Contact_Form_DedupeRules extends CRM_Admin_Form {
     if (in_array($contactType, $contactTypes['values'])) {
       $this->_contactType = $contactTypes['values'][$contactType];
     }
-    else {
+    elseif (!empty($contactType)) {
       throw new CRM_Core_Exception('Contact Type is Not valid');
     }
     if ($this->_rgid) {
