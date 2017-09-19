@@ -166,7 +166,7 @@
                       </div>
                       <div class="crm-content" id="tags">
                         {foreach from=$contactTag item=tagName key=tagId}
-                          <span class="crm-tag-item" {if !empty($allTags.$tagId.color)}style="background-color: {$allTags.$tagId.color}; color: {$allTags.$tagId.color|colorContrast};"{/if} title="{$allTags.$tagId.description}">
+                          <span class="crm-tag-item" {if !empty($allTags.$tagId.color)}style="background-color: {$allTags.$tagId.color}; color: {$allTags.$tagId.color|colorContrast};"{/if} title="{$allTags.$tagId.description|escape:'html'}">
                             {$tagName}
                           </span>
                         {/foreach}
