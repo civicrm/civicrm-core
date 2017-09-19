@@ -394,6 +394,9 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
         $params['line_item'],
         CRM_Utils_Array::value('contribution', $params)
       );
+      if (!empty($params['contribution'])) {
+        CRM_Contribute_BAO_Contribution::addPayments(array($params['contribution']));
+      }
     }
 
     //insert payment record for this membership
@@ -2423,6 +2426,8 @@ WHERE      civicrm_membership.is_test = 0";
       'contribution_recur_id',
       'pan_truncation',
       'card_type_id',
+      'partial_payment_total',
+      'partial_amount_to_pay',
     );
     foreach ($recordContribution as $f) {
       $contributionParams[$f] = CRM_Utils_Array::value($f, $params);

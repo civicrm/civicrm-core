@@ -121,17 +121,14 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
    */
   public static function getSelectedMemberships($priceSet, $params) {
     $memTypeSelected = array();
-    $priceFieldIDS = self::getPriceFieldIDs($params, $priceSet);
-    if (isset($params['membership_type_id']) && !empty($params['membership_type_id'][1])) {
-      $memTypeSelected = array($params['membership_type_id'][1] => $params['membership_type_id'][1]);
-    }
-    else {
-      foreach ($priceFieldIDS as $priceFieldId) {
-        if ($id = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $priceFieldId, 'membership_type_id')) {
-          $memTypeSelected[$id] = $id;
-        }
+    $priceFieldIDs = self::getPriceFieldIDs($params, $priceSet);
+
+    foreach ($priceFieldIDs as $priceFieldId) {
+      if ($memTypeID = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $priceFieldId, 'membership_type_id')) {
+        $memTypeSelected[$priceFieldId] = $memTypeID;
       }
     }
+
     return $memTypeSelected;
   }
 
@@ -144,24 +141,40 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
    * @return array
    */
   public static function getPriceFieldIDs($params, $priceSet) {
-    $priceFieldIDS = array();
+    $priceFieldIDs = array();
+
+    if (!empty($params['membership_type_id'])) {
+      list($orgID, $selectedMembershipTypeID) = $params['membership_type_id'];
+    }
+
     if (isset($priceSet['fields']) && is_array($priceSet['fields'])) {
       foreach ($priceSet['fields'] as $fieldId => $field) {
         if (!empty($params['price_' . $fieldId])) {
           if (is_array($params['price_' . $fieldId])) {
             foreach ($params['price_' . $fieldId] as $priceFldVal => $isSet) {
               if ($isSet) {
-                $priceFieldIDS[] = $priceFldVal;
+                $priceFieldIDs[] = $priceFldVal;
               }
             }
           }
           elseif (!$field['is_enter_qty']) {
-            $priceFieldIDS[] = $params['price_' . $fieldId];
+            $priceFieldIDs[] = $params['price_' . $fieldId];
+          }
+        }
+        //In case of non-quick config price-set, fetch the
+        //  price field ID of selected membership type ID if any
+        elseif (!empty($selectedMembershipTypeID) && !empty($field['options'])) {
+          foreach ($field['options'] as $priceOptions) {
+            if (CRM_Utils_Array::value('membership_type_id', $priceOptions) == $selectedMembershipTypeID) {
+              $priceFieldIDs[] = $priceOptions['id'];
+              break;
+            }
           }
         }
       }
     }
-    return $priceFieldIDS;
+
+    return $priceFieldIDs;
   }
 
   /**
@@ -740,6 +753,15 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       if (empty($params['membership_type_id'][1])) {
         $errors['membership_type_id'] = ts('Please select a membership type.');
       }
+      elseif (!empty($params['record_contribution'])) {
+        $partiallyPaidContributionStatusID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_DAO_Contribution', 'contribution_status_id', 'Partially paid');
+        // ensure that total_amount is less than the minimum_fee of selected membership type for partial contribution
+        if ($self->allMembershipTypeDetails[$params['membership_type_id'][1]]['minimum_fee'] <= $params['total_amount'] &&
+          $params['contribution_status_id'] == $partiallyPaidContributionStatusID
+        ) {
+          $errors['total_amount'] = ts('For partially paid contribution, amount must be less then the fee amount of selected membership type.');
+        }
+      }
       $numterms = CRM_Utils_Array::value('num_terms', $params);
       if ($numterms && intval($numterms) != $numterms) {
         $errors['num_terms'] = ts('Please enter an integer for the number of terms.');
@@ -1150,43 +1172,14 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
 
     $lineItem = array($this->_priceSetId => array());
 
-    CRM_Price_BAO_PriceSet::processAmount($this->_priceSet['fields'],
-      $formValues, $lineItem[$this->_priceSetId], NULL, $this->_priceSetId);
+    $priceSetID = $this->_priceSetId;
 
     if (CRM_Utils_Array::value('tax_amount', $formValues)) {
       $params['tax_amount'] = $formValues['tax_amount'];
     }
-    $params['total_amount'] = CRM_Utils_Array::value('amount', $formValues);
     $submittedFinancialType = CRM_Utils_Array::value('financial_type_id', $formValues);
-    if (!empty($lineItem[$this->_priceSetId])) {
-      foreach ($lineItem[$this->_priceSetId] as &$li) {
-        if (!empty($li['membership_type_id'])) {
-          if (!empty($li['membership_num_terms'])) {
-            $termsByType[$li['membership_type_id']] = $li['membership_num_terms'];
-          }
-        }
-
-        ///CRM-11529 for quick config backoffice transactions
-        //when financial_type_id is passed in form, update the
-        //lineitems with the financial type selected in form
-        if ($isQuickConfig && $submittedFinancialType) {
-          $li['financial_type_id'] = $submittedFinancialType;
-        }
-      }
-    }
 
     $params['contact_id'] = $this->_contactID;
-
-    $fields = array(
-      'status_id',
-      'source',
-      'is_override',
-      'campaign_id',
-    );
-
-    foreach ($fields as $f) {
-      $params[$f] = CRM_Utils_Array::value($f, $formValues);
-    }
 
     // fix for CRM-3724
     // when is_override false ignore is_admin statuses during membership
@@ -1215,14 +1208,12 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       $calcDates[$memType] = CRM_Member_BAO_MembershipType::getDatesForMembershipType($memType,
         $joinDate, $startDate, $endDate, $memTypeNumTerms
       );
-    }
 
-    foreach ($calcDates as $memType => $calcDate) {
       foreach (array_keys($dateTypes) as $d) {
         //first give priority to form values then calDates.
         $date = CRM_Utils_Array::value($d, $formValues);
         if (!$date) {
-          $date = CRM_Utils_Array::value($d, $calcDate);
+          $date = CRM_Utils_Array::value($d, $calcDates[$memType]);
         }
 
         $membershipTypeValues[$memType][$d] = CRM_Utils_Date::processDate($date);
@@ -1230,7 +1221,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     }
 
     // max related memberships - take from form or inherit from membership type
-    foreach ($this->_memTypeSelected as $memType) {
+    foreach ($this->_memTypeSelected as $priceFieldValueID => $memType) {
       if (array_key_exists('max_related', $formValues)) {
         $membershipTypeValues[$memType]['max_related'] = CRM_Utils_Array::value('max_related', $formValues);
       }
@@ -1241,9 +1232,47 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       $membershipTypes[$memType] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType',
         $memType
       );
+
+      // if contribution status is 'PArtially paid' then record the owed and partially paid amount
+      if (CRM_Utils_Array::value('contribution_status_id', $formValues) == array_search('Partially paid', $allContributionStatus)) {
+        // fetch the owed amount from the price field's amount of this selected membership
+        $formValues['partial_payment_total'] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $priceFieldValueID, 'amount');
+        // the actual amount paid
+        $formValues['partial_amount_to_pay'] = $formValues['total_amount'];
+      }
+    }
+
+    CRM_Price_BAO_PriceSet::processAmount($this->_priceSet['fields'], $formValues, $lineItem[$this->_priceSetId], NULL, $this->_priceSetId);
+
+    if (!empty($lineItem[$this->_priceSetId])) {
+      foreach ($lineItem[$this->_priceSetId] as &$li) {
+        if (!empty($li['membership_type_id'])) {
+          if (!empty($li['membership_num_terms'])) {
+            $termsByType[$li['membership_type_id']] = $li['membership_num_terms'];
+          }
+        }
+
+        ///CRM-11529 for quick config backoffice transactions
+        //when financial_type_id is passed in form, update the
+        //lineitems with the financial type selected in form
+        if ($isQuickConfig && $submittedFinancialType) {
+          $li['financial_type_id'] = $submittedFinancialType;
+        }
+      }
     }
 
     $membershipType = implode(', ', $membershipTypes);
+
+    $fieldNames = array(
+      'status_id',
+      'source',
+      'is_override',
+      'campaign_id',
+      'lineItems',
+    );
+    foreach ($fieldNames as $fieldName) {
+      $params[$fieldName] = CRM_Utils_Array::value($fieldName, $formValues);
+    }
 
     // Retrieve the name and email of the current user - this will be the FROM for the receipt email
     list($userName) = CRM_Contact_BAO_Contact_Location::getEmailDetails($ids['userId']);
@@ -1268,6 +1297,8 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         'receive_date',
         'card_type_id',
         'pan_truncation',
+        'partial_payment_total',
+        'partial_amount_to_pay',
       );
 
       foreach ($recordContribution as $f) {
@@ -1578,14 +1609,14 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       }
       else {
         $count = 0;
-        foreach ($this->_memTypeSelected as $memType) {
+        foreach ($this->_memTypeSelected as $priceFieldValueID => $memType) {
           if ($count && !empty($formValues['record_contribution']) &&
             ($relateContribution = CRM_Member_BAO_Membership::getMembershipContributionId($membership->id))
           ) {
             $membershipTypeValues[$memType]['relate_contribution_id'] = $relateContribution;
           }
-
           $membershipParams = array_merge($params, $membershipTypeValues[$memType]);
+
           if (!empty($formValues['int_amount'])) {
             $init_amount = array();
             foreach ($formValues as $key => $value) {
@@ -1599,7 +1630,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
           if (!empty($softParams)) {
             $membershipParams['soft_credit'] = $softParams;
           }
-
           $membership = CRM_Member_BAO_Membership::create($membershipParams, $ids);
           $params['contribution'] = CRM_Utils_Array::value('contribution', $membershipParams);
           unset($params['lineItems']);
