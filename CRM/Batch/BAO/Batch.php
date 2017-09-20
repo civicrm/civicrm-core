@@ -202,7 +202,8 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
       $batch['item_count'] = CRM_Utils_Array::value('item_count', $value);
       $batch['type'] = CRM_Utils_Array::value('batch_type', $value);
       if (!empty($value['total'])) {
-        $batch['total'] = CRM_Utils_Money::format($value['total']);
+        // CRM-21205
+        $batch['total'] = CRM_Utils_Money::format($value['total'], $value['currency']);
       }
 
       // Compare totals with actuals
@@ -344,6 +345,17 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
         'Batch',
         $values['id']
       );
+      // CRM-21205
+      $values['currency'] = CRM_Core_DAO::singleValueQuery("
+        SELECT GROUP_CONCAT(DISTINCT ft.currency)
+        FROM  civicrm_batch batch
+        JOIN civicrm_entity_batch eb
+          ON batch.id = eb.batch_id
+        JOIN civicrm_financial_trxn ft
+          ON eb.entity_id = ft.id
+        WHERE batch.id = %1
+        GROUP BY batch.id
+      ", array(1 => array($values['id'], 'Positive')));
       $results[$values['id']] = $values;
     }
 
