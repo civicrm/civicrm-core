@@ -31,7 +31,7 @@
         <ul>
           {foreach from=$tabs item='tab'}
             <li class="ui-corner-all">
-              <a title="{$tab.title}" href="#report-tab-{$tab.div_label}">{$tab.title}</a>
+              <a title="{$tab.title|escape}" href="#report-tab-{$tab.div_label}">{$tab.title}</a>
             </li>
           {/foreach}
           {if $instanceForm OR $instanceFormError}
