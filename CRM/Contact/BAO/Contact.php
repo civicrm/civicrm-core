@@ -3011,7 +3011,7 @@ AND       civicrm_openid.is_primary = 1";
         'key' => 'print',
         'tab' => 'print',
         'href' => CRM_Utils_System::url('civicrm/contact/view/print',
-          "reset=1&print=1"
+          "reset=1&print=1&cid=$contactId"
         ),
         'class' => 'print',
         'icon' => 'crm-i fa-print',
@@ -3024,7 +3024,7 @@ AND       civicrm_openid.is_primary = 1";
         'key' => 'vcard',
         'tab' => 'vcard',
         'href' => CRM_Utils_System::url('civicrm/contact/view/vcard',
-          "reset=1"
+          "reset=1&cid=$contactId"
         ),
         'class' => 'vcard',
         'icon' => 'crm-i fa-list-alt',
