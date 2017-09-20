@@ -2110,8 +2110,8 @@ abstract class CRM_Utils_Hook {
    *   );
    *   $angularModules['myBigAngularModule'] = array(
    *     'ext' => 'org.example.mymod',
-   *     'js' => array('js/part1.js', 'js/part2.js'),
-   *     'css' => array('css/myAngularModule.css'),
+   *     'js' => array('js/part1.js', 'js/part2.js', 'ext://other.ext.name/file.js', 'assetBuilder://dynamicAsset.js'),
+   *     'css' => array('css/myAngularModule.css', 'ext://other.ext.name/file.css', 'assetBuilder://dynamicAsset.css'),
    *     'partials' => array('partials/myBigAngularModule'),
    *     'requires' => array('otherModuleA', 'otherModuleB'),
    *     'basePages' => array('civicrm/a'),

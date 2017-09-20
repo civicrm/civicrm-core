@@ -124,6 +124,17 @@ class ManagerTest extends \CiviUnitTestCase {
     // If crmMailing changes, feel free to use a different example.
   }
 
+  public function testGetJs_Asset() {
+    \CRM_Utils_Hook::singleton()->setHook('civicrm_angularModules', array($this, 'hook_civicrm_angularModules_fooBar'));
+
+    $paths = $this->angular->getResources(array('fooBar'), 'js', 'path');
+    $this->assertRegExp('/visual-bundle.[a-z0-9]+.js/', $paths[0]);
+    $this->assertRegExp('/crossfilter/', file_get_contents($paths[0]));
+
+    $this->assertRegExp('/Common.js/', $paths[1]);
+    $this->assertRegExp('/console/', file_get_contents($paths[1]));
+  }
+
   /**
    * Get a translatable string from an example module.
    */
@@ -206,6 +217,16 @@ class ManagerTest extends \CiviUnitTestCase {
       ->alterHtml('~/crmMailing/EditMailingCtrl/2step.html', function(\phpQueryObject $doc){
         $doc->find('[ng-form="crmMailingSubform"]')->attr('cat-stevens', 'ts(\'wild world\')');
       })
+    );
+  }
+
+  public function hook_civicrm_angularModules_fooBar(&$angularModules) {
+    $angularModules['fooBar'] = array(
+      'ext' => 'civicrm',
+      'js' => array(
+        'assetBuilder://visual-bundle.js',
+        'ext://civicrm/js/Common.js',
+      ),
     );
   }
 

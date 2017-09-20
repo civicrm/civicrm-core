@@ -327,7 +327,12 @@ class Manager {
       $module = $this->getModule($moduleName);
       if (isset($module[$resType])) {
         foreach ($module[$resType] as $file) {
-          switch ($refType) {
+          $refTypeSuffix = '';
+          if (is_string($file) && preg_match(';^(assetBuilder|ext)://;', $file)) {
+            $refTypeSuffix = '-' . parse_url($file, PHP_URL_SCHEME);
+          }
+
+          switch ($refType . $refTypeSuffix) {
             case 'path':
               $result[] = $this->res->getPath($module['ext'], $file);
               break;
@@ -338,6 +343,33 @@ class Manager {
 
             case 'cacheUrl':
               $result[] = $this->res->getUrl($module['ext'], $file, TRUE);
+              break;
+
+            case 'path-assetBuilder':
+              $assetName = parse_url($file, PHP_URL_HOST) . parse_url($file, PHP_URL_PATH);
+              $assetParams = array();
+              parse_str('' . parse_url($file, PHP_URL_QUERY), $assetParams);
+              $result[] = \Civi::service('asset_builder')->getPath($assetName, $assetParams);
+              break;
+
+            case 'rawUrl-assetBuilder':
+            case 'cacheUrl-assetBuilder':
+              $assetName = parse_url($file, PHP_URL_HOST) . parse_url($file, PHP_URL_PATH);
+              $assetParams = array();
+              parse_str('' . parse_url($file, PHP_URL_QUERY), $assetParams);
+              $result[] = \Civi::service('asset_builder')->getUrl($assetName, $assetParams);
+              break;
+
+            case 'path-ext':
+              $result[] = $this->res->getPath(parse_url($file, PHP_URL_HOST), ltrim(parse_url($file, PHP_URL_PATH), '/'));
+              break;
+
+            case 'rawUrl-ext':
+              $result[] = $this->res->getUrl(parse_url($file, PHP_URL_HOST), ltrim(parse_url($file, PHP_URL_PATH), '/'));
+              break;
+
+            case 'cacheUrl-ext':
+              $result[] = $this->res->getUrl(parse_url($file, PHP_URL_HOST), ltrim(parse_url($file, PHP_URL_PATH), '/'), TRUE);
               break;
 
             case 'settings':

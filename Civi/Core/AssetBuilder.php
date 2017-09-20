@@ -140,6 +140,23 @@ class AssetBuilder {
   }
 
   /**
+   * @param string $name
+   *   Ex: 'angular.json'.
+   * @param array $params
+   * @return string
+   *   URL.
+   *   Ex: '/var/www/files/civicrm/dyn/angular.abcd1234abcd1234.json'.
+   */
+  public function getPath($name, $params = array()) {
+    if (!$this->isValidName($name)) {
+      throw new \RuntimeException("Invalid dynamic asset name");
+    }
+
+    $fileName = $this->build($name, $params);
+    return $this->getCachePath($fileName);
+  }
+
+  /**
    * Build the cached copy of an $asset.
    *
    * @param string $name
