@@ -809,12 +809,6 @@ ORDER BY   {$orderBy}
 
         $this->templates['html'] = implode("\n", $template);
 
-        // this is where we create a text template from the html template if the text template did not exist
-        // this way we ensure that every recipient will receive an email even if the pref is set to text and the
-        // user uploads an html email only
-        if (empty($this->templates['text'])) {
-          $this->templates['text'] = CRM_Utils_String::htmlToText($this->templates['html']);
-        }
       }
 
       if ($this->subject) {
@@ -1303,22 +1297,31 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     }
 
     $mailParams = $headers;
-    if ($text && ($test || $contact['preferred_mail_format'] == 'Text' ||
+
+    // If we should be sending a text version of the email
+    if (($test || $contact['preferred_mail_format'] == 'Text' ||
         $contact['preferred_mail_format'] == 'Both' ||
         ($contact['preferred_mail_format'] == 'HTML' && !array_key_exists('html', $pEmails))
       )
     ) {
-      $textBody = implode('', $text);
+
+
+      // The following if elseif allows us to ensure that people who have a
+      // preference for text emails will get one even when the person composing
+      // the email has not uploaded a text version.
+
+      // If the text version exists, use it
+      if($text){
+        $textBody = implode('', $text);
+      // Else if it doesn't exist and the html version exists, use it
+      }elseif($html){
+        $textBody = implode('', $html);
+        $textBody = CRM_Utils_String::htmlToText($textBody);
+      }
+
       if ($useSmarty) {
         $textBody = $smarty->fetch("string:$textBody");
       }
-
-      // CRM-21197: Tokens are inserted after the HTML version of the email has
-      // been converted to text.Therefore any tokens that contain HTML will not
-      // have their HTML converted to text. For this reason, we need to convert
-      // the plain text version of the email to plain text again aftern token
-      // substitution has happened.
-      $textBody = CRM_Utils_String::htmlToText($textBody);
 
       $mailParams['text'] = $textBody;
     }
