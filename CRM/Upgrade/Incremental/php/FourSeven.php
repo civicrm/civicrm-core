@@ -72,6 +72,16 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
           . '</p>';
       }
     }
+    if ($rev == '4.7.26') {
+      $params = array(
+        1 => 'Close accounting batches created by user',
+        2 => 'Close all accounting batches',
+        3 => 'Reopen accounting batches created by user',
+        4 => 'Reopen all accounting batches',
+        5 => 'https://wiki.civicrm.org/confluence/display/CRMDOC/Default+Permissions+and+Roles',
+      );
+      $preUpgradeMessage .= '<p>' . ts('A new set of batch permissions has been added called "%1", "%2", "%3" and "%4". These permissions are now used to control access to the Accounting Batches tasks. If your users need to be able to Reopen or Close batches you may need to give them additional permissions. <a href=%5>Read more</a>', $params) . '</p>';
+    }
   }
 
   /**

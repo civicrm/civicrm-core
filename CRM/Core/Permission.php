@@ -826,6 +826,22 @@ class CRM_Core_Permission {
         $prefix . ts('edit all manual batches'),
         ts('Edit all accounting batches'),
       ),
+      'close own manual batches' => array(
+        $prefix . ts('close own manual batches'),
+        ts('Close accounting batches created by user (with Access to CiviContribute)'),
+      ),
+      'close all manual batches' => array(
+        $prefix . ts('close all manual batches'),
+        ts('Close all accounting batches (with Access to CiviContribute)'),
+      ),
+      'reopen own manual batches' => array(
+        $prefix . ts('reopen own manual batches'),
+        ts('Reopen accounting batches created by user (with Access to CiviContribute)'),
+      ),
+      'reopen all manual batches' => array(
+        $prefix . ts('reopen all manual batches'),
+        ts('Reopen all accounting batches (with Access to CiviContribute)'),
+      ),
       'view own manual batches' => array(
         $prefix . ts('view own manual batches'),
         ts('View accounting batches created by user (with Access to CiviContribute)'),

@@ -302,7 +302,13 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
             CRM_Utils_Array::remove($newLinks, 'close', 'edit', 'reopen', 'export');
         }
         if (!CRM_Batch_BAO_Batch::checkBatchPermission('edit', $values['created_id'])) {
-          CRM_Utils_Array::remove($newLinks, 'close', 'edit', 'export');
+          CRM_Utils_Array::remove($newLinks, 'edit');
+        }
+        if (!CRM_Batch_BAO_Batch::checkBatchPermission('close', $values['created_id'])) {
+          CRM_Utils_Array::remove($newLinks, 'close', 'export');
+        }
+        if (!CRM_Batch_BAO_Batch::checkBatchPermission('reopen', $values['created_id'])) {
+          CRM_Utils_Array::remove($newLinks, 'reopen');
         }
         if (!CRM_Batch_BAO_Batch::checkBatchPermission('export', $values['created_id'])) {
           CRM_Utils_Array::remove($newLinks, 'export', 'download');
@@ -815,9 +821,6 @@ WHERE  {$where}
    * @return bool
    */
   public static function checkBatchPermission($action, $batchCreatedId = NULL) {
-    if (in_array($action, array('reopen', 'close'))) {
-      $action = 'edit';
-    }
     if (CRM_Core_Permission::check("{$action} all manual batches")) {
       return TRUE;
     }
