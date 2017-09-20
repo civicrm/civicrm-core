@@ -1305,16 +1305,16 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       )
     ) {
 
-
       // The following if elseif allows us to ensure that people who have a
       // preference for text emails will get one even when the person composing
       // the email has not uploaded a text version.
 
-      // If the text version exists, use it
-      if($text){
+      if ($text) {
+        // If the text version exists, use it
         $textBody = implode('', $text);
-      // Else if it doesn't exist and the html version exists, use it
-      }elseif($html){
+      }
+      elseif ($html) {
+        // Else if it doesn't exist and the html version exists, use it
         $textBody = implode('', $html);
         $textBody = CRM_Utils_String::htmlToText($textBody);
       }
