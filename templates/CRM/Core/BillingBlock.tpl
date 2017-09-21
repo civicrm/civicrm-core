@@ -25,6 +25,11 @@
 *}
 {crmRegion name="billing-block"}
 <div id="payment_information">
+  <script type="text/javascript">
+    {literal}
+    CRM.config.creditCardTypes = {/literal}{$creditCardTypes}{literal};
+  </script>
+  {/literal}
   {if $paymentFields|@count}
     <fieldset class="billing_mode-group {$paymentTypeName}_info-group">
       <legend>

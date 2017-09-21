@@ -72,7 +72,7 @@ class CRM_Financial_Form_Payment extends CRM_Core_Form {
 
     CRM_Core_Payment_ProcessorForm::preProcess($this);
 
-    self::addCreditCardJs($this->_paymentProcessorID);
+    self::addCreditCardJs($this->_paymentProcessorID, 'billing-block', $this);
 
     $this->assign('paymentProcessorID', $this->_paymentProcessorID);
     $this->assign('currency', $this->currency);
@@ -109,17 +109,17 @@ class CRM_Financial_Form_Payment extends CRM_Core_Form {
    *
    * @param int $paymentProcessorID
    * @param string $region
+   * @param CRM_Core_Form $form
    */
-  public static function addCreditCardJs($paymentProcessorID = NULL, $region = 'billing-block') {
+  public static function addCreditCardJs($paymentProcessorID = NULL, $region = 'billing-block', $form) {
     $creditCards = CRM_Financial_BAO_PaymentProcessor::getCreditCards($paymentProcessorID);
     $creditCardTypes = CRM_Core_Payment_Form::getCreditCardCSSNames($creditCards);
+    // workaround for CRM-1364 and CRM-20264 and CRM-20516
+    $form->assign('creditCardTypes', json_encode($creditCardTypes));
     CRM_Core_Resources::singleton()
       // CRM-20516: add BillingBlock script on billing-block region
       //  to support this feature in payment form snippet too.
-      ->addScriptFile('civicrm', 'templates/CRM/Core/BillingBlock.js', 10, $region, FALSE)
-      // workaround for CRM-13634
-      // ->addSetting(array('config' => array('creditCardTypes' => $creditCardTypes)));
-      ->addScript('CRM.config.creditCardTypes = ' . json_encode($creditCardTypes) . ';', '-9999', $region);
+      ->addScriptFile('civicrm', 'templates/CRM/Core/BillingBlock.js', 10, $region, FALSE);
   }
 
 }
