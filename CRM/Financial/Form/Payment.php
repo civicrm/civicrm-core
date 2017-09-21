@@ -119,7 +119,7 @@ class CRM_Financial_Form_Payment extends CRM_Core_Form {
       ->addScriptFile('civicrm', 'templates/CRM/Core/BillingBlock.js', 10, $region, FALSE)
       // workaround for CRM-13634
       // ->addSetting(array('config' => array('creditCardTypes' => $creditCardTypes)));
-      ->addScript('CRM.config.creditCardTypes = ' . json_encode($creditCardTypes) . ';', '-9999', $region);
+      ->addScript('CRM.config.creditCardTypes = ' . json_encode($creditCardTypes) . ';', '-9999', 'page-header');
   }
 
 }
