@@ -353,18 +353,18 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       if (!empty($defaults['tax_amount'])) {
         $componentDetails = CRM_Contribute_BAO_Contribution::getComponentDetails($this->_id);
         if (!(CRM_Utils_Array::value('membership', $componentDetails) || CRM_Utils_Array::value('participant', $componentDetails))) {
-          $defaults['total_amount'] = CRM_Utils_Money::format($defaults['total_amount'] - $defaults['tax_amount'], NULL, '%a');
+          $defaults['total_amount'] = CRM_Utils_Money::formatLocaleNumeric($defaults['total_amount'] - $defaults['tax_amount']);
         }
       }
       else {
-        $defaults['total_amount'] = CRM_Utils_Money::format($defaults['total_amount'], NULL, '%a');
+        $defaults['total_amount'] = CRM_Utils_Money::formatLocaleNumeric($defaults['total_amount']);
       }
     }
 
     $amountFields = array('non_deductible_amount', 'fee_amount', 'net_amount');
     foreach ($amountFields as $amt) {
       if (isset($defaults[$amt])) {
-        $defaults[$amt] = CRM_Utils_Money::format($defaults[$amt], NULL, '%a');
+        $defaults[$amt] = CRM_Utils_Money::formatLocaleNumeric($defaults[$amt]);
       }
     }
 
