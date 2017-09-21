@@ -1279,25 +1279,23 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
     }
 
     // building the query string
-    CRM_Core_DAO::executeQuery("CREATE TEMPORARY TABLE civicrm_contact_relationships " . $select1 . $from1 . $where1 . $select2 . $from2 . $where2);
-    $queryString = "SELECT * FROM civicrm_contact_relationships " . $order . $limit;
+    $queryString = $select1 . $from1 . $where1 . $select2 . $from2 . $where2;
 
     $relationship = new CRM_Contact_DAO_Relationship();
 
-    $relationship->query($queryString);
+    $relationship->query($queryString . $order . $limit);
     $row = array();
     if ($count) {
       $relationshipCount = 0;
       while ($relationship->fetch()) {
         $relationshipCount += $relationship->cnt1 + $relationship->cnt2;
       }
-      CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE IF EXISTS civicrm_contact_relationships");
       return $relationshipCount;
     }
     else {
 
       if ($includeTotalCount) {
-        $values['total_relationships'] = CRM_Core_DAO::singleValueQuery("SELECT count(*) FROM civicrm_contact_relationships");
+        $values['total_relationships'] = CRM_Core_DAO::singleValueQuery("SELECT count(*) FROM ({$queryString}) AS r");
       }
 
       $mask = NULL;
@@ -1445,7 +1443,6 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
       }
 
       $relationship->free();
-      CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE IF EXISTS civicrm_contact_relationships");
       return $values;
     }
   }
