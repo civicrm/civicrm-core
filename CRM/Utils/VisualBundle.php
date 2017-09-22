@@ -39,6 +39,7 @@ class CRM_Utils_VisualBundle {
 
   public static function register() {
     Civi::resources()->addScriptUrl(Civi::service('asset_manager')->getUrl('visual-bundle.js'));
+    Civi::resources()->addStyleUrl(Civi::service('asset_manager')->getUrl('visual-bundle.css'));
   }
 
   /**
@@ -48,7 +49,7 @@ class CRM_Utils_VisualBundle {
    * @see CRM_Utils_hook::buildAsset()
    * @see \Civi\Core\AssetBuilder
    */
-  public static function buildAsset($event) {
+  public static function buildAssetJs($event) {
     if ($event->asset !== 'visual-bundle.js') {
       return;
     }
@@ -77,6 +78,32 @@ class CRM_Utils_VisualBundle {
     $content[] = "})();";
 
     $event->mimeType = 'application/javascript';
+    $event->content = implode("\n", $content);
+  }
+
+  /**
+   * Generate asset content (when accessed via AssetBuilder).
+   *
+   * @param \Civi\Core\Event\GenericHookEvent $event
+   * @see CRM_Utils_hook::buildAsset()
+   * @see \Civi\Core\AssetBuilder
+   */
+  public static function buildAssetCss($event) {
+    if ($event->asset !== 'visual-bundle.css') {
+      return;
+    }
+
+    $files = array(
+      '[civicrm.bower]/dc-2.1.x/dc.min.css',
+    );
+
+    $content = array();
+    foreach ($files as $file) {
+      $content[] = "// File: $file";
+      $content[] = file_get_contents(Civi::paths()->getPath($file));
+    }
+
+    $event->mimeType = 'text/css';
     $event->content = implode("\n", $content);
   }
 
