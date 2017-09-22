@@ -1233,7 +1233,8 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
    * @param bool $permissionedContact
    *   to return only permissioned Contact
    * @param array $params
-   *
+   * @param bool $includeTotalCount
+   *   Include a total count of relationships
    * @return array|int
    *   relationship records
    */
