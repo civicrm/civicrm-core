@@ -87,6 +87,11 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
         }
       }
 
+      if ($value['id'] == $value['master_id']) {
+        $value['master_id'] = 'null';
+        CRM_Core_Session::setStatus(ts("You can't connect an address to itself"), '', 'warning');
+      }
+
       // Note there could be cases when address info already exist ($value[id] is set) for a contact/entity
       // BUT info is not present at this time, and therefore we should be really careful when deleting the block.
       // $updateBlankLocInfo will help take appropriate decision. CRM-5969
@@ -173,6 +178,22 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
 
       //call the function to sync shared address
       self::processSharedAddress($address->id, $params);
+
+      //if address is already shared, share the master address with all children (prevent chaining)
+      if ($address->master_id > 0 && $value['id'] != $value['master_id']) {
+        $result = civicrm_api3('Address', 'get', [
+          'return' => array("contact_id"),
+          'master_id' => $address->id,
+        ]);
+        if ($result['count'] > 0) {
+          $params_copy['address'][1] = $params;
+          foreach ($result['values'] as $key => $value) {
+            $params_copy['contact_id'] = $value['contact_id'];
+            $params_copy['address'][1]['id'] = $key;
+            self::create($params_copy);
+          }
+        }
+      }
 
       // call the function to create shared relationships
       // we only create create relationship if address is shared by Individual
