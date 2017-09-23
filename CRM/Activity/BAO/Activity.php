@@ -1768,6 +1768,10 @@ WHERE      activity.id IN ($activityIds)";
     $activityStatuses = CRM_Core_OptionGroup::values('activity_status');
 
     while ($dao->fetch()) {
+      // If activity type is disabled then do not show activities
+      if (!array_key_exists($dao->activity_type_id, $activityTypes)) {
+        continue;
+      }
       $activities[$dao->activity_id]['id'] = $dao->activity_id;
       $activities[$dao->activity_id]['activity_type_id'] = $dao->activity_type_id;
       $activities[$dao->activity_id]['subject'] = $dao->subject;
