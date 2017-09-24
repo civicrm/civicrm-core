@@ -500,8 +500,10 @@
           flag = true;
         }
       });
+      priceSetTotal = currentTotal;
       cj('.price-set-option-content input, .other_amount-content input').on('input', function () {
-        currentTotal = cj(this).is('[data-amount]') ? cj(this).attr('data-amount').replace(/[^\/\d]/g,'') : (cj(this).val() ? cj(this).val() : 0);
+        currentTotal = cj(this).is('[data-amount]') ? cj(this).attr('data-amount').replace(/[^\/\d]/g,'') : (cj(this).val() ? cj(this).val().replace(/[^\/\d]/g : 0);
+        currentTotal = currentTotal + priceSetTotal;
         if (currentTotal == 0 ) {
           flag = true;
         } else {
