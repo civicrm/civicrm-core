@@ -55,6 +55,9 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
     $form->_values['fee'] = array();
     $form->_isPaidEvent = TRUE;
     $form->_quickConfig = TRUE;
+    $form->_fromEmails = array(
+      'from_email_id' => array('abc@gmail.com' => 1),
+    );
     $form->submit(array(
       'register_date' => 'now',
       'register_date_time' => '00:00:00',
@@ -84,12 +87,51 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       'amount_level' => 'Too much',
       'fee_amount' => 55,
       'total_amount' => 55,
+      'from_email_address' => 'abc@gmail.com',
+      'send_receipt' => 1,
+      'receipt_text' => '',
     ));
     $participants = $this->callAPISuccess('Participant', 'get', array());
     $this->assertEquals(1, $participants['count']);
     $contribution = $this->callAPISuccessGetSingle('Contribution', array());
     $this->assertEquals(55, $contribution['total_amount']);
     $this->assertEquals('Debit Card', $contribution['payment_instrument']);
+  }
+
+  /**
+   * Test offline participant mail.
+   */
+  public function testParticipantOfflineReceipt() {
+    $mut = new CiviMailUtils($this, TRUE);
+
+    //Get workflow id of event_offline receipt.
+    $workflowId = $this->callAPISuccess('OptionValue', 'get', array(
+      'return' => array("id"),
+      'option_group_id' => "msg_tpl_workflow_event",
+      'name' => "event_offline_receipt",
+    ));
+
+    //Modify html to contain event_type_id token.
+    $result = $this->callAPISuccess('MessageTemplate', 'get', array(
+      'sequential' => 1,
+      'return' => array("id", "msg_html"),
+      'workflow_id' => $workflowId['id'],
+      'is_default' => 1,
+    ));
+    $oldMsg = $result['values'][0]['msg_html'];
+    $pos = strpos($oldMsg, 'Please print this confirmation');
+    $newMsg = substr_replace($oldMsg, '<p>Test event type - {$event.event_type_id}</p>', $pos, 0);
+    $this->callAPISuccess('MessageTemplate', 'create', array(
+      'id' => $result['id'],
+      'msg_html' => $newMsg,
+    ));
+
+    $this->testSubmitWithPayment();
+    //Check if type is correctly populated in mails.
+    $mail = $mut->checkMailLog(array(
+        '<p>Test event type - 1</p>',
+      )
+    );
   }
 
 }
