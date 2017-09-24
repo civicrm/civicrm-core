@@ -2056,6 +2056,12 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
           $retValue = $value;
           break;
         }
+        else {
+          $customField['options'] = CRM_Core_BAO_CustomOption::getCustomOption($customField['id']);
+          $retValue = $customField['options'][$value]['label'];
+          break;
+        }
+
       case 'StateProvince':
       case 'Country':
 
