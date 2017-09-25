@@ -832,7 +832,7 @@ INNER JOIN civicrm_contact contact_target ON ( contact_target.id = act.contact_i
       $masterAddress->id = CRM_Utils_Array::value('master_id', $values);
       $masterAddress->find(TRUE);
 
-      //if address master address is shared, use its master (prevent chaining)
+      //if address master address is shared, use its master (prevent chaining) CRM-21214
       if ($masterAddress->master_id > 0) {
         $values['master_id'] = $masterAddress->master_id;
         $masterAddress = new CRM_Core_BAO_Address();
