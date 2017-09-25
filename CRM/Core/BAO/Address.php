@@ -87,7 +87,8 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
         }
       }
 
-      if ($value['id'] == $value['master_id']) {
+      //this prevents an endless loop (prevent chaining) CRM-21214
+      if (!empty($value['id']) && !empty($value['master_id']) && $value['id'] == $value['master_id']) {
         $value['master_id'] = 'null';
         CRM_Core_Session::setStatus(ts("You can't connect an address to itself"), '', 'warning');
       }
@@ -179,8 +180,8 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
       //call the function to sync shared address
       self::processSharedAddress($address->id, $params);
 
-      //if address is already shared, share the master address with all children (prevent chaining)
-      if ($address->master_id > 0 && $value['id'] != $value['master_id']) {
+      //if address is already shared, share the master address with all children (prevent chaining) CRM-21214
+      if ($address->master_id > 0 && $address->master_id != $address->id ) {
         $result = civicrm_api3('Address', 'get', array(
           'return' => array("contact_id"),
           'master_id' => $address->id,
