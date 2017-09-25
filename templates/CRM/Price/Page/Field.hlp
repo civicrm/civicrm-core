@@ -37,6 +37,13 @@
     {ts}You may enter a negative amount value if the field or option is being used to discount the total price.{/ts}
 {/htxt}
 
+{htxt id="id-visibility-options-title"}
+  {ts}Visibility per Option{/ts}
+{/htxt}
+{htxt id="id-visibility-options"}
+  {ts}Select between Admin/Public for each option. 'Public' will show the option to all users accessing the price set. Use 'Admin' to limit the option to users with the 'CiviEvent: edit event participants’ permission (when viewing the field via the event registration pages) or the ‘CiviContribute: edit contributions’ permission (when accessing the field through a contribution page).{/ts}
+{/htxt}
+
 {htxt id="id-participant-count-title"}
   {ts}Participant Count{/ts}
 {/htxt}
@@ -56,7 +63,7 @@
   {ts}Visibility{/ts}
 {/htxt}
 {htxt id="id-visibility"}
-    {ts}Fields with 'Public' visibility will be displayed on your Event Information page AND will be available in the online registration (self-service) form. For some events you may want to allow staff to select special options with special pricing and / or discounts (using negative price set field values). Select 'Admin' visibility for these Price Fields. They will only be included when staff or volunteers are registering participants from the back-office 'Register Event Participants' screen.{/ts}
+  {ts}Fields with 'Public' visibility will be displayed on your Event Information page AND will be available in the online registration (self-service) form. For some events you may want to allow staff to select special options with special pricing and / or discounts (using negative price set field values). Select 'Admin' visibility for these Price Fields. They will only be included when staff or volunteers are registering participants from the back-office 'Register Event Participants' screen. If the parent price field visibility is ‘Public’ then it should be possible to set individual price options as 'Admin', but it should have at least one 'Public' option. If the parent price field visibility is 'Admin', then all the price field options should be set to 'Admin', including any new options added to the form.{/ts}
 {/htxt}
 
 {htxt id="id-member-price-options-title"}

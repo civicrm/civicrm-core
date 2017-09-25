@@ -43,7 +43,7 @@ class CRM_Utils_GeocodeTest extends CiviUnitTestCase {
     $contact_values = array_pop($result['values']);
     $address_values = array_pop($contact_values['api.Address.create']['values']);
     // We should get a geo code setting.
-    $this->assertApproxEquals('38.89', $address_values['geo_code_1'], 1);
+    $this->assertApproxEquals('38.89', CRM_Utils_Array::value('geo_code_1', $address_values), 1);
 
     // Set geocodeMethod to empty.
     $config = CRM_Core_Config::singleton();

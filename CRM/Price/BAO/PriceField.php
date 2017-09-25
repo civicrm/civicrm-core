@@ -42,6 +42,13 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
   protected $_options;
 
   /**
+   * List of visibility option ID's, of the form name => ID
+   *
+   * @var array
+   */
+  private static $visibilityOptionsKeys;
+
+  /**
    * Takes an associative array and creates a price field object.
    *
    * the function extract all the params it needs to initialize the create a
@@ -75,6 +82,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
    *   (reference) an assoc array of name/value pairs.
    *
    * @return CRM_Price_DAO_PriceField
+   * @throws \CRM_Core_Exception
    */
   public static function create(&$params) {
     if (empty($params['id']) && empty($params['name'])) {
@@ -147,6 +155,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
           'is_default' => CRM_Utils_Array::value($params['option_weight'][$index], $defaultArray) ? $defaultArray[$params['option_weight'][$index]] : 0,
           'membership_num_terms' => NULL,
           'non_deductible_amount' => CRM_Utils_Array::value('non_deductible_amount', $params),
+          'visibility_id' => CRM_Utils_Array::value($index, CRM_Utils_Array::value('option_visibility_id', $params), self::getVisibilityOptionID('public')),
         );
 
         if ($options['membership_type_id']) {
@@ -431,11 +440,18 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
           $count = CRM_Utils_Array::value('count', $opt, '');
           $max_value = CRM_Utils_Array::value('max_value', $opt, '');
           $priceVal = implode($seperator, array($opt[$valueFieldName] + $taxAmount, $count, $max_value));
+          if (isset($opt['visibility_id'])) {
+            $visibility_id = $opt['visibility_id'];
+          }
+          else {
+            $visibility_id = self::getVisibilityOptionID('public');
+          }
           $extra = array(
             'price' => json_encode(array($elementName, $priceVal)),
             'data-amount' => $opt[$valueFieldName],
             'data-currency' => $currencyName,
             'data-price-field-values' => json_encode($customOption),
+            'visibility' => $visibility_id,
           );
           if (!empty($qf->_quickConfig) && $field->name == 'contribution_amount') {
             $extra += array('onclick' => 'clearAmountOther();');
@@ -536,7 +552,12 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
             $qf->add('text', 'txt-' . $elementName, $label, array('size' => '4'));
           }
         }
-
+        if (isset($opt['visibility_id'])) {
+          $visibility_id = $opt['visibility_id'];
+        }
+        else {
+          $visibility_id = self::getVisibilityOptionID('public');
+        }
         $element = &$qf->add('select', $elementName, $label,
           array(
             '' => ts('- select -'),
@@ -583,6 +604,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
               'price' => json_encode(array($opt['id'], $priceVal)),
               'data-amount' => $opt[$valueFieldName],
               'data-currency' => $currencyName,
+              'visibility' => $opt['visibility_id'],
             )
           );
           if ($is_pay_later) {
@@ -858,6 +880,33 @@ WHERE  id IN (" . implode(',', array_keys($priceFields)) . ')';
     }
 
     return $label;
+  }
+
+  /**
+   * Given the name of a visibility option, returns its ID.
+   *
+   * @param string $visibilityName
+   *
+   * @return int
+   */
+  public static function getVisibilityOptionID($visibilityName) {
+
+    if (!isset(self::$visibilityOptionsKeys)) {
+      self::$visibilityOptionsKeys = CRM_Price_BAO_PriceField::buildOptions(
+        'visibility_id',
+        NULL,
+        array(
+          'labelColumn' => 'name',
+          'flip' => TRUE,
+        )
+      );
+    }
+
+    if (isset(self::$visibilityOptionsKeys[$visibilityName])) {
+      return self::$visibilityOptionsKeys[$visibilityName];
+    }
+
+    return 0;
   }
 
 }

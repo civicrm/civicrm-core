@@ -132,6 +132,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
       for ($i = 1; $i <= self::NUM_OPTION; $i++) {
         $defaults['option_status[' . $i . ']'] = 1;
         $defaults['option_weight[' . $i . ']'] = $i;
+        $defaults['option_visibility_id[' . $i . ']'] = 1;
       }
     }
 
@@ -191,6 +192,11 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
     if (count($financialType)) {
       $this->assign('financialType', $financialType);
     }
+
+    //Visibility Type Options
+    $visibilityType = CRM_Core_PseudoConstant::visibility();
+    $this->assign('visibilityType', $visibilityType);
+
     $enabledComponents = CRM_Core_Component::getEnabledComponents();
     $eventComponentId = $memberComponentId = NULL;
     if (array_key_exists('CiviEvent', $enabledComponents)) {
@@ -302,6 +308,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
       // is active ?
       $this->add('checkbox', 'option_status[' . $i . ']', ts('Active?'));
 
+      $this->add('select', 'option_visibility_id[' . $i . ']', ts('Visibility'), array('' => ts('- select -')) + $visibilityType);
       $defaultOption[$i] = $this->createElement('radio', NULL, NULL, NULL, $i);
 
       //for checkbox handling of default option
@@ -435,9 +442,10 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
     if ($form->_action & CRM_Core_Action::ADD) {
       if ($fields['html_type'] != 'Text') {
         $countemptyrows = 0;
-        $_flagOption = $_rowError = 0;
+        $publicOptionCount = $_flagOption = $_rowError = 0;
 
         $_showHide = new CRM_Core_ShowHideBlocks('', '');
+        $visibilityOptions = CRM_Price_BAO_PriceFieldValue::buildOptions('visibility_id', NULL, array('labelColumn' => 'name'));
 
         for ($index = 1; $index <= self::NUM_OPTION; $index++) {
 
@@ -523,6 +531,12 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
             $_showHide->addHide($hideBlock);
           }
 
+          if (!empty($fields['option_visibility_id'][$index]) && (!$noLabel || !$noAmount)) {
+            if ($visibilityOptions[$fields['option_visibility_id'][$index]] == 'public') {
+              $publicOptionCount++;
+            }
+          }
+
           $_flagOption = $_emptyRow = 0;
         }
 
@@ -569,6 +583,29 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
         if ($countemptyrows == 15) {
           $errors['option_label[1]'] = $errors['option_amount[1]'] = ts('Label and value cannot be empty.');
           $_flagOption = 1;
+        }
+
+        if ($visibilityOptions[$fields['visibility_id']] == 'public' && $publicOptionCount == 0) {
+          $errors['visibility_id'] = ts('You have selected to make this field public but have not enabled any public price options. Please update your selections to include a public price option, or make this field admin visibility only.');
+          for ($index = 1; $index <= self::NUM_OPTION; $index++) {
+            if (!empty($fields['option_label'][$index]) || !empty($fields['option_amount'][$index])) {
+              $errors["option_visibility_id[{$index}]"] = ts('Public field should at least have one public option.');
+            }
+          }
+        }
+
+        if ($visibilityOptions[$fields['visibility_id']] == 'admin' && $publicOptionCount > 0) {
+          $errors['visibility_id'] = ts('Field with \'Admin\' visibility should only contain \'Admin\' options.');
+
+          for ($index = 1; $index <= self::NUM_OPTION; $index++) {
+
+            $isOptionSet = !empty($fields['option_label'][$index]) || !empty($fields['option_amount'][$index]);
+            $currentOptionVisibility = CRM_Utils_Array::value($fields['option_visibility_id'][$index], $visibilityOptions);
+
+            if ($isOptionSet && $currentOptionVisibility == 'public') {
+              $errors["option_visibility_id[{$index}]"] = ts('\'Admin\' field should only have \'Admin\' visibility options.');
+            }
+          }
         }
       }
       elseif (!empty($fields['max_value']) &&
@@ -651,6 +688,8 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
       //$params['option_description']  = array( 1 => $params['description'] );
       $params['option_weight'] = array(1 => $params['weight']);
       $params['option_financial_type_id'] = array(1 => $params['financial_type_id']);
+      $params['option_visibility_id'] = array(1 => CRM_Utils_Array::value('visibility_id', $params));
+      $params['is_active'] = array(1 => 1);
     }
 
     if ($this->_fid) {
