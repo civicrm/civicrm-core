@@ -181,10 +181,10 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
 
       //if address is already shared, share the master address with all children (prevent chaining)
       if ($address->master_id > 0 && $value['id'] != $value['master_id']) {
-        $result = civicrm_api3('Address', 'get', [
+        $result = civicrm_api3('Address', 'get', array(
           'return' => array("contact_id"),
           'master_id' => $address->id,
-        ]);
+        ));
         if ($result['count'] > 0) {
           $params_copy['address'][1] = $params;
           foreach ($result['values'] as $key => $value) {
