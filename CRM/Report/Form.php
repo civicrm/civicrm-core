@@ -1996,14 +1996,14 @@ class CRM_Report_Form extends CRM_Core_Form {
    * @param string $from
    * @param string $to
    * @param string $type
-   * @param string $fromTime
-   * @param string $toTime
+   * @param int $fromTime
+   * @param int $toTime
    *
    * @return null|string
    */
   public function dateClause(
     $fieldName,
-    $relative, $from, $to, $type = NULL, $fromTime = NULL, $toTime = NULL
+    $relative, $from, $to, $type = NULL, $fromTime = NULL, $toTime = 235959
   ) {
     $clauses = array();
     if (in_array($relative, array_keys($this->getOperationPair(CRM_Report_Form::OP_DATE)))) {
@@ -2459,7 +2459,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
               $from = CRM_Utils_Array::value("{$fieldName}_from", $this->_params);
               $to = CRM_Utils_Array::value("{$fieldName}_to", $this->_params);
               $fromTime = CRM_Utils_Array::value("{$fieldName}_from_time", $this->_params);
-              $toTime = CRM_Utils_Array::value("{$fieldName}_to_time", $this->_params);
+              $toTime = CRM_Utils_Array::value("{$fieldName}_to_time", $this->_params, 235959);
               $clause = $this->dateClause($field['dbAlias'], $relative, $from, $to, $field['type'], $fromTime, $toTime);
             }
           }
@@ -2963,7 +2963,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
                 CRM_Utils_Array::value("{$fieldName}_from", $this->_params),
                 CRM_Utils_Array::value("{$fieldName}_to", $this->_params),
                 CRM_Utils_Array::value("{$fieldName}_from_time", $this->_params),
-                CRM_Utils_Array::value("{$fieldName}_to_time", $this->_params)
+                CRM_Utils_Array::value("{$fieldName}_to_time", $this->_params, 235959)
               );
             $from_time_format = !empty($this->_params["{$fieldName}_from_time"]) ? 'h' : 'd';
             $from = CRM_Utils_Date::customFormat($from, NULL, array($from_time_format));

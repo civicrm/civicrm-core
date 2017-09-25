@@ -700,7 +700,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
               = $this->getFromTo(
                 CRM_Utils_Array::value("activity_date_time_relative", $this->_params),
                 CRM_Utils_Array::value("activity_date_time_from", $this->_params),
-                CRM_Utils_Array::value("activity_date_time_to", $this->_params)
+                CRM_Utils_Array::value("activity_date_time_to", $this->_params, 235959)
                 );
             $url[] = "activity_date_time_from={$from}&activity_date_time_to={$to}";
             break;
