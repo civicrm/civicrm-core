@@ -181,7 +181,7 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
       self::processSharedAddress($address->id, $params);
 
       //if address is already shared, share the master address with all children (prevent chaining) CRM-21214
-      if ($address->master_id > 0 && $address->master_id != $address->id ) {
+      if ($address->master_id > 0 && $address->master_id != $address->id) {
         $result = civicrm_api3('Address', 'get', array(
           'return' => array("contact_id"),
           'master_id' => $address->id,
