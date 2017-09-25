@@ -137,6 +137,10 @@ class CRM_Admin_Form_Navigation extends CRM_Admin_Form {
       $params['current_parent_id'] = $this->_currentParentID;
     }
 
+    if (!empty($params['icon'])) {
+      $params['icon'] = 'crm-i ' . $params['icon'];
+    }
+
     $navigation = CRM_Core_BAO_Navigation::add($params);
 
     // also reset navigation
