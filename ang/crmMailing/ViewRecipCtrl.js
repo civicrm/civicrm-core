@@ -77,8 +77,8 @@
         getCiviMails(mailing);
       }
       _.each(mailing.recipients.groups.include, function(id) {
-        var group = _.where(CRM.crmMailing.groupNames, {id: '' + id});
-        if (group.length) {
+        var group = _.where(CRM.crmMailing.groupNames, {id: parseInt(id)});
+	if (group.length) {
           if (!first) {
             names = names + ', ';
           }
@@ -87,8 +87,8 @@
         }
       });
       _.each(mailing.recipients.mailings.include, function(id) {
-        var oldMailing = _.where(CRM.crmMailing.civiMails, {id: '' + id});
-        if (oldMailing.length) {
+	var oldMailing = _.where(CRM.crmMailing.civiMails, {id: parseInt(id)});
+	if (oldMailing.length) {
           if (!first) {
             names = names + ', ';
           }
@@ -102,8 +102,8 @@
       var first = true;
       var names = '';
       _.each(mailing.recipients.groups.exclude, function(id) {
-        var group = _.where(CRM.crmMailing.groupNames, {id: '' + id});
-        if (group.length) {
+        var group = _.where(CRM.crmMailing.groupNames, {id: parseInt(id)});
+	if (group.length) {
           if (!first) {
             names = names + ', ';
           }
@@ -112,8 +112,8 @@
         }
       });
       _.each(mailing.recipients.mailings.exclude, function(id) {
-        var oldMailing = _.where(CRM.crmMailing.civiMails, {id: '' + id});
-        if (oldMailing.length) {
+        var oldMailing = _.where(CRM.crmMailing.civiMails, {id: parseInt(id)});
+	if (oldMailing.length) {
           if (!first) {
             names = names + ', ';
           }
