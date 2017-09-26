@@ -525,8 +525,7 @@ function civicrm_api3_contribution_completetransaction(&$params) {
   }
   $contribution = new CRM_Contribute_BAO_Contribution();
   $contribution->id = $params['id'];
-  $contribution->find(TRUE);
-  if (!$contribution->id == $params['id']) {
+  if (!$contribution->find(TRUE)) {
     throw new API_Exception('A valid contribution ID is required', 'invalid_data');
   }
 
