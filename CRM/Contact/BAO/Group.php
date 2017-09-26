@@ -1017,6 +1017,13 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
       }
 
       // get group contact count using Contact.GetCount API
+      // CRM-20226 This has been added here in order to address a specific bug. However, a prior
+      // decision was to refresh group counts less aggressively, offering instead a button to
+      // refresh them to give users a better experience by loading pages quicker.
+      // For some sites this can be crazy slow even though only 25 sites resolve. Even for sites
+      // with relatively few smart groups it is not a good user experience.
+      // Adding comments here as I'm not going to tackle a fix this time around but want
+      // to warn people off making it worse.
       $values[$object->id]['count'] = civicrm_api3('Contact', 'getcount', array('group' => $object->id));
     }
 
