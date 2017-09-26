@@ -34,7 +34,7 @@
   {ts}Icon{/ts}
 {/htxt}
 {htxt id="id-menu_icon"}
-{ts}The CSS class for the menu item icon, for example to add a (Font Awesome) phone icon you need to set this value to (fa fa-phone).{/ts}
+{ts}Select an icon to appear to the left side of the navigation menu item.{/ts}
 {/htxt}
 
 {htxt id="id-parent-title"}
