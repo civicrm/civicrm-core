@@ -194,6 +194,9 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
     //with an Organization(CRM-2016)
     $membershipTypesResult = civicrm_api3('MembershipType', 'get', array(
       'member_of_contact_id' => $this->_contactId,
+      'options' => array(
+        'limit' => 0,
+      ),
     ));
     $membershipTypes = CRM_Utils_Array::value('values', $membershipTypesResult, NULL);
 
