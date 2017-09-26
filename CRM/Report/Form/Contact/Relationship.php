@@ -830,8 +830,8 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
    */
   public function activeClause(
     $fieldName,
-    $relative, $from, $to, $type = NULL, $fromTime = NULL, $toTime = NULL
-    ) {
+    $relative, $from, $to, $type = NULL, $fromTime = NULL, $toTime = 235959
+  ) {
     $clauses = array();
     if (in_array($relative, array_keys($this->getOperationPair(CRM_Report_Form::OP_DATE)))) {
       return NULL;
