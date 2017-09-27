@@ -105,20 +105,34 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
         dirname(__FILE__) . '/dataset/data.xml'
       )
     );
-    $membershipTypeAnnualFixed = $this->callAPISuccess('membership_type', 'create', array(
-      'domain_id' => 1,
-      'name' => "AnnualFixed",
-      'member_of_contact_id' => 23,
-      'duration_unit' => "year",
-      'minimum_fee' => 50,
-      'duration_interval' => 1,
-      'period_type' => "fixed",
-      'fixed_period_start_day' => "101",
-      'fixed_period_rollover_day' => "1231",
-      'relationship_type_id' => 20,
-      'financial_type_id' => 2,
-    ));
-    $this->membershipTypeAnnualFixedID = $membershipTypeAnnualFixed['id'];
+
+    $membershipTypes = array(
+      array(
+        'domain_id' => 1,
+        'name' => "AnnualFixed",
+        'member_of_contact_id' => 23,
+        'duration_unit' => "year",
+        'minimum_fee' => 50,
+        'duration_interval' => 1,
+        'period_type' => "fixed",
+        'fixed_period_start_day' => "101",
+        'fixed_period_rollover_day' => "1231",
+        'relationship_type_id' => 20,
+        'financial_type_id' => 2,
+      ),
+      array(
+        'id' => 20,
+      ),
+      array(
+        'id' => 25,
+      ),
+    );
+    foreach ($membershipTypes as $params) {
+      $result = $this->callAPISuccess('MembershipType', 'create', $params);
+      if (!empty($params['name'])) {
+        $this->membershipTypeAnnualFixedID = $result['id'];
+      }
+    }
 
     $instruments = $this->callAPISuccess('contribution', 'getoptions', array('field' => 'payment_instrument_id'));
     $this->paymentInstruments = $instruments['values'];
@@ -158,7 +172,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
   public function testFormRuleEmptyContact() {
     $params = array(
       'contact_select_id' => 0,
-      'membership_type_id' => array(1 => NULL),
+      'membership_type_id' => array(17, NULL),
     );
     $files = array();
     $obj = new CRM_Member_Form_Membership();
@@ -166,7 +180,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     $this->assertType('array', $rc);
     $this->assertTrue(array_key_exists('membership_type_id', $rc));
 
-    $params['membership_type_id'] = array(1 => 3);
+    $params['membership_type_id'] = array(1, 3);
     $rc = $obj->formRule($params, $files, $obj);
     $this->assertType('array', $rc);
     $this->assertTrue(array_key_exists('join_date', $rc));
@@ -188,7 +202,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'join_date' => $ymdNow,
       'start_date' => $ymdYesterday,
       'end_date' => '',
-      'membership_type_id' => array('23', '15'),
+      'membership_type_id' => array('23', '20'),
     );
     $files = array();
     $obj = new CRM_Member_Form_Membership();
@@ -213,7 +227,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'join_date' => $ymdNow,
       'start_date' => $ymdNow,
       'end_date' => $ymdYesterday,
-      'membership_type_id' => array('23', '15'),
+      'membership_type_id' => array('23', '20'),
     );
     $files = array();
     $obj = new CRM_Member_Form_Membership();
@@ -234,7 +248,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'join_date' => $ymdNow,
       'start_date' => '',
       'end_date' => $ymdYearFromNow,
-      'membership_type_id' => array('23', '15'),
+      'membership_type_id' => array('23', '20'),
     );
     $files = array();
     $obj = new CRM_Member_Form_Membership();
@@ -294,7 +308,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'join_date' => date('m/d/Y', $unix1MFmNow),
       'start_date' => '',
       'end_date' => '',
-      'membership_type_id' => array('23', '15'),
+      'membership_type_id' => array('23', '20'),
     );
     $files = array();
     $obj = new CRM_Member_Form_Membership();
@@ -609,6 +623,77 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test the submit function of the membership form for partial payment.
+   */
+  public function testSubmitPartialPayment() {
+    // Step 1: submit a partial payment for a membership via backoffice
+    $form = $this->getForm();
+    $form->preProcess();
+    $this->mut = new CiviMailUtils($this, TRUE);
+    $this->createLoggedInUser();
+    $priceSet = $this->callAPISuccess('PriceSet', 'Get', array("extends" => "CiviMember"));
+    $form->set('priceSetId', $priceSet['id']);
+    $partiallyPaidAmount = 25;
+    CRM_Price_BAO_PriceSet::buildPriceSet($form);
+    $params = array(
+      'cid' => $this->_individualId,
+      'join_date' => date('m/d/Y', time()),
+      'start_date' => '',
+      'end_date' => '',
+      // This format reflects the 23 being the organisation & the 25 being the type.
+      'membership_type_id' => array(23, $this->membershipTypeAnnualFixedID),
+      'record_contribution' => 1,
+      'total_amount' => $partiallyPaidAmount,
+      'receive_date' => date('m/d/Y', time()),
+      'receive_date_time' => '08:36PM',
+      'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
+      'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Partially paid'),
+      'financial_type_id' => '2', //Member dues, see data.xml
+      'payment_processor_id' => $this->_paymentProcessorID,
+    );
+    $form->_contactID = $this->_individualId;
+    $form->testSubmit($params);
+    $membership = $this->callAPISuccessGetSingle('Membership', array('contact_id' => $this->_individualId));
+    // check the membership status after partial payment, if its Pending
+    $this->assertEquals(array_search('Pending', CRM_Member_PseudoConstant::membershipStatus()), $membership['status_id']);
+    $contribution = $this->callAPISuccessGetSingle('Contribution', array(
+      'contact_id' => $this->_individualId,
+    ));
+    $this->assertEquals('Partially paid', $contribution['contribution_status']);
+    $this->assertEquals(50.00, $contribution['total_amount']);
+    $this->assertEquals(25.00, $contribution['net_amount']);
+
+    // Step 2: submit the other half of the partial payment
+    //  via AdditionalPayment form to complete the related contribution
+    $form = new CRM_Contribute_Form_AdditionalPayment();
+    $submitParams = array(
+      'contribution_id' => $contribution['contribution_id'],
+      'contact_id' => $this->_individualId,
+      'total_amount' => $partiallyPaidAmount,
+      'currency' => 'USD',
+      'financial_type_id' => 2,
+      'receive_date' => '04/21/2015',
+      'receive_date_time' => '11:27PM',
+      'trxn_date' => '2017-04-11 13:05:11',
+      'payment_processor_id' => 0,
+      'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
+      'check_number' => 'check-12345',
+    );
+    $form->cid = $this->_individualId;
+    $form->testSubmit($submitParams);
+    $membership = $this->callAPISuccessGetSingle('Membership', array('contact_id' => $this->_individualId));
+    // check the membership status after additional payment, if its changed to 'New'
+    $this->assertEquals(array_search('New', CRM_Member_PseudoConstant::membershipStatus()), $membership['status_id']);
+    // check the contribution status and net amount after additional payment
+    $contribution = $this->callAPISuccessGetSingle('Contribution', array(
+      'contact_id' => $this->_individualId,
+    ));
+    $this->assertEquals('Completed', $contribution['contribution_status']);
+    $this->assertEquals(50.00, $contribution['total_amount']);
+    $this->assertEquals(50.00, $contribution['net_amount']);
+  }
+
+  /**
    * Test the submit function of the membership form.
    */
   public function testSubmitRecur() {
@@ -716,7 +801,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
         'label' => 'Long Haired Goat',
         'amount' => 20,
         'financial_type_id' => 'Donation',
-        'membership_type_id' => 15,
+        'membership_type_id' => 20,
         'membership_num_terms' => 1,
       )
     );
@@ -742,7 +827,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       // This format reflects the 23 being the organisation & the 25 being the type.
       "price_$priceFieldID" => $pfvIDs,
       "price_set_id" => $priceSetID,
-      'membership_type_id' => array(1 => 0),
+      'membership_type_id' => array('23', '20'),
       'auto_renew' => '0',
       'max_related' => '',
       'num_terms' => '2',
