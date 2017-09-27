@@ -366,11 +366,16 @@ WHERE (pn.cacheKey $op %1 OR pn.cacheKey $op %2)
    * @param bool $checkPermissions
    *   Respect logged in user's permissions.
    *
+   * @param int $searchLimit
+   *  Limit for the number of contacts to be used for comparison.
+   *  The search methodology finds all matches for the searchedContacts so this limits
+   *  the number of searched contacts, not the matches found.
+   *
    * @return bool
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public static function refillCache($rgid, $gid, $cacheKeyString, $criteria, $checkPermissions) {
+  public static function refillCache($rgid, $gid, $cacheKeyString, $criteria, $checkPermissions, $searchLimit = 0) {
     if (!$cacheKeyString && $rgid) {
       $cacheKeyString = CRM_Dedupe_Merger::getMergeCacheKeyString($rgid, $gid, $criteria, $checkPermissions);
     }
@@ -389,7 +394,7 @@ WHERE (pn.cacheKey $op %1 OR pn.cacheKey $op %2)
     // 2. FILL cache
     $foundDupes = array();
     if ($rgid && $gid) {
-      $foundDupes = CRM_Dedupe_Finder::dupesInGroup($rgid, $gid);
+      $foundDupes = CRM_Dedupe_Finder::dupesInGroup($rgid, $gid, $searchLimit);
     }
     elseif ($rgid) {
       $contactIDs = array();
@@ -397,7 +402,7 @@ WHERE (pn.cacheKey $op %1 OR pn.cacheKey $op %2)
         $contacts = civicrm_api3('Contact', 'get', array_merge(array('options' => array('limit' => 0), 'return' => 'id'), $criteria['contact']));
         $contactIDs = array_keys($contacts['values']);
       }
-      $foundDupes = CRM_Dedupe_Finder::dupes($rgid, $contactIDs, $checkPermissions);
+      $foundDupes = CRM_Dedupe_Finder::dupes($rgid, $contactIDs, $checkPermissions, $searchLimit);
     }
 
     if (!empty($foundDupes)) {
