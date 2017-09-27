@@ -361,8 +361,8 @@ class CRM_Activity_Page_AJAX {
       CRM_Activity_BAO_ActivityContact::create($targ_params);
     }
 
-    // typically this will be empty, since assignees on another case may be completely different
-    $assigneeContacts = array();
+    //CRM-21114 retrieve assignee contacts from original case; allow overriding from params
+    $assigneeContacts = CRM_Activity_BAO_ActivityContact::retrieveContactIdsByActivityId($params['activityID'], $assigneeID);
     if (!empty($params['assigneeContactIds'])) {
       $assigneeContacts = array_unique(explode(',', $params['assigneeContactIds']));
     }
