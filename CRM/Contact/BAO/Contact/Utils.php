@@ -832,13 +832,6 @@ INNER JOIN civicrm_contact contact_target ON ( contact_target.id = act.contact_i
       $masterAddress->id = CRM_Utils_Array::value('master_id', $values);
       $masterAddress->find(TRUE);
 
-      //if address master address is shared, use its master (prevent chaining) CRM-21214
-      if ($masterAddress->master_id > 0) {
-        $values['master_id'] = $masterAddress->master_id;
-        $masterAddress->id = CRM_Utils_Array::value('master_id', $values);
-        $masterAddress->find(TRUE);
-      }
-
       // 4. modify submitted params and update it with shared contact address
       // make sure you preserve specific form values like location type, is_primary_ is_billing, master_id
       // CRM-10336: Also empty any fields from the existing address block if they don't exist in master (otherwise they will persist)
