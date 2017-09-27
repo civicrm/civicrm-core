@@ -26,6 +26,7 @@
 {literal}
 <script type="text/javascript">
 CRM.$(function($) {
+  var loop;
   $("form#Preview").on('submit', function (e) {
     verify();
   });
@@ -41,11 +42,6 @@ CRM.$(function($) {
         $("#status").text(result[0] + "% Completed");
       }
     });
-  }
-
-  function pollLoop() {
-    setIntermediate();
-    window.setTimeout(pollLoop, 10*1000); // 10 sec
   }
 
   function verify() {
@@ -65,7 +61,7 @@ CRM.$(function($) {
     });
     $("#importProgressBar" ).progressbar({value:0});
     $("#importProgressBar").show( );
-    pollLoop( );
+    loop = window.setInterval(setIntermediate, 5)
   }
 });
 </script>

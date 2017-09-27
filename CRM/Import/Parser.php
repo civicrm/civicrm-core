@@ -287,7 +287,10 @@ abstract class CRM_Import_Parser {
   }
 
   /**
+   * Add progress bar to the import process. Calculates time remaining, status etc.
+   *
    * @param $statusID
+   *   status id of the import process saved in $config->uploadDir.
    * @param bool $startImport
    *   True when progress bar is to be initiated.
    * @param $startTimestamp
