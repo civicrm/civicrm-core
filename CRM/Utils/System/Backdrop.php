@@ -334,7 +334,9 @@ class CRM_Utils_System_Backdrop extends CRM_Utils_System_DrupalBase {
       // SOAP cannot load Backdrop bootstrap and hence we do it the old way
       // Contact CiviSMTP folks if we run into issues with this :)
       $cmsPath = $this->cmsRootPath();
-
+      if (!defined('BACKDROP_ROOT')) {
+        define(BACKDROP_ROOT, $cmsPath);
+      }
       require_once "$cmsPath/core/includes/bootstrap.inc";
       require_once "$cmsPath/core/includes/password.inc";
 
@@ -527,6 +529,7 @@ AND    u.status = 1
       }
     }
     require_once "$cmsPath/core/includes/bootstrap.inc";
+    require_once "$cmsPath/core/includes/config.inc";
     backdrop_bootstrap(BACKDROP_BOOTSTRAP_FULL);
 
     // Explicitly setting error reporting, since we cannot handle Backdrop
