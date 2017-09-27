@@ -1011,9 +1011,11 @@ SELECT is_primary,
 
     // unset contact id
     $skipFields = array('is_primary', 'location_type_id', 'is_billing', 'contact_id');
-    if (!CRM_Utils_System::isNull($params['master_id'])) {
+    // call the function to create a relationship
+    If (!empty($params['master_id']) && $params['master_id'] > 0) {
       self::processSharedAddressRelationship($params['master_id'], $params['contact_id']);
     }
+    // else no new shares will be created, only update shared addresses
     else {
       $skipFields[] = 'master_id';
     }
@@ -1023,7 +1025,8 @@ SELECT is_primary,
 
     $addressDAO = new CRM_Core_DAO_Address();
     while ($dao->fetch()) {
-      if (!CRM_Utils_System::isNull($params['master_id'])) {
+      // call the function to update the relationship
+      If (!empty($params['master_id']) && $params['master_id'] > 0) {
         self::processSharedAddressRelationship($params['master_id'], $dao->contact_id);
       }
       $addressDAO->copyValues($params);
