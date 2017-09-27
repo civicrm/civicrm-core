@@ -1019,7 +1019,7 @@ SELECT is_primary,
       CRM_Core_Session::setStatus(ts("You can't connect an address to itself"), '', 'warning');
     }
   }
-  
+
   /**
    * Update the shared addresses if master address is modified.
    *
