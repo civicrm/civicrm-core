@@ -152,10 +152,9 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
       CRM_Core_BAO_Block::handlePrimary($params, get_class());
     }
 
-    // prevent an endless chain between two shared addresses CRM-21214
-    if (!empty($params['id']) && !empty($params['master_id']) && $params['id'] == $params['master_id']) {
-      $params['master_id'] = 'null';
-      CRM_Core_Session::setStatus(ts("You can't connect an address to itself"), '', 'warning');
+    // (prevent chaining 1) CRM-21214
+    if (!empty($params['master_id']) && $params['master_id'] > 0) {
+      self::fixSharedAddress($params);
     }
 
     $address->copyValues($params);
@@ -179,7 +178,7 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
 
       // call the function to sync shared address and create relationships
       // if address is already shared, share master_id with all children and update relationships accordingly
-      // (prevent chaining) CRM-21214
+      // (prevent chaining 2) CRM-21214
       self::processSharedAddress($address->id, $params);
 
       // lets call the post hook only after we've done all the follow on processing
@@ -997,6 +996,30 @@ SELECT is_primary,
     }
   }
 
+  /**
+   * Fix the shared address if address is already shared
+   * or if address will be shared with itself.
+   *
+   * @param array $params
+   *   Associated array of address params.
+   */
+  public static function fixSharedAddress(&$params) {
+    $query = 'SELECT master_id FROM civicrm_address WHERE id = %1';
+    $dao = CRM_Core_DAO::executeQuery($query, array(1 => array($params['master_id'], 'Integer')));
+    $dao->fetch();
+
+    // if address master address is shared, use its master CRM-21214
+    if (!CRM_Utils_System::isNull($dao->master_id)) {
+      $params['master_id'] = $dao->master_id;
+    }
+
+    // prevent an endless chain between two shared addresses CRM-21214
+    if (!empty($params['id']) && $params['id'] == $params['master_id']) {
+      unset($params['master_id']);
+      CRM_Core_Session::setStatus(ts("You can't connect an address to itself"), '', 'warning');
+    }
+  }
+  
   /**
    * Update the shared addresses if master address is modified.
    *
