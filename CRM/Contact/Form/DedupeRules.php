@@ -60,8 +60,8 @@ class CRM_Contact_Form_DedupeRules extends CRM_Admin_Form {
     $this->_rgid = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE, 0);
     $contactTypes = civicrm_api3('Contact', 'getOptions', array('field' => "contact_type"));
     $contactType = CRM_Utils_Request::retrieve('contact_type', 'String', $this, FALSE, 0);
-    if (in_array($contactType, $contactTypes['values'])) {
-      $this->_contactType = $contactTypes['values'][$contactType];
+    if (CRM_Utils_Array::value($contactType, $contactTypes['values'])) {
+      $this->_contactType = CRM_Utils_Array::value($contactType, $contactTypes['values']);
     }
     elseif (!empty($contactType)) {
       throw new CRM_Core_Exception('Contact Type is Not valid');
