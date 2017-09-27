@@ -1013,7 +1013,8 @@ SELECT is_primary,
     $skipFields = array('is_primary', 'location_type_id', 'is_billing', 'contact_id');
     if (!CRM_Utils_System::isNull($params['master_id'])) {
       self::processSharedAddressRelationship($params['master_id'], $params['contact_id']);
-    } else {
+    }
+    else {
       $skipFields[] = 'master_id';
     }
     foreach ($skipFields as $value) {
