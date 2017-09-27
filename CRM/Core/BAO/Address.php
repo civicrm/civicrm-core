@@ -87,12 +87,6 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
         }
       }
 
-      //this prevents an endless loop (prevent chaining) CRM-21214
-      if (!empty($value['id']) && !empty($value['master_id']) && $value['id'] == $value['master_id']) {
-        $value['master_id'] = 'null';
-        CRM_Core_Session::setStatus(ts("You can't connect an address to itself"), '', 'warning');
-      }
-
       // Note there could be cases when address info already exist ($value[id] is set) for a contact/entity
       // BUT info is not present at this time, and therefore we should be really careful when deleting the block.
       // $updateBlankLocInfo will help take appropriate decision. CRM-5969
@@ -158,6 +152,12 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
       CRM_Core_BAO_Block::handlePrimary($params, get_class());
     }
 
+    // prevent an endless chain between two shared addresses CRM-21214
+    if (!empty($params['id']) && !empty($params['master_id']) && $params['id'] == $params['master_id']) {
+      $params['master_id'] = 'null';
+      CRM_Core_Session::setStatus(ts("You can't connect an address to itself"), '', 'warning');
+    }
+
     $address->copyValues($params);
 
     $address->save();
@@ -177,30 +177,10 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
         CRM_Core_BAO_CustomValueTable::store($addressCustom, 'civicrm_address', $address->id);
       }
 
-      //call the function to sync shared address
+      // call the function to sync shared address and create relationships
+      // if address is already shared, share master_id with all children and update relationships accordingly
+      // (prevent chaining) CRM-21214
       self::processSharedAddress($address->id, $params);
-
-      //if address is already shared, share the master address with all children (prevent chaining) CRM-21214
-      if ($address->master_id > 0 && $address->master_id != $address->id) {
-        $result = civicrm_api3('Address', 'get', array(
-          'return' => array("contact_id"),
-          'master_id' => $address->id,
-        ));
-        if ($result['count'] > 0) {
-          $params_copy['address'][1] = $params;
-          foreach ($result['values'] as $key => $value) {
-            $params_copy['contact_id'] = $value['contact_id'];
-            $params_copy['address'][1]['id'] = $key;
-            self::create($params_copy);
-          }
-        }
-      }
-
-      // call the function to create shared relationships
-      // we only create create relationship if address is shared by Individual
-      if (!CRM_Utils_System::isNull($address->master_id)) {
-        self::processSharedAddressRelationship($address->master_id, $params);
-      }
 
       // lets call the post hook only after we've done all the follow on processing
       CRM_Utils_Hook::post($hook, 'Address', $address->id, $address);
@@ -1026,17 +1006,25 @@ SELECT is_primary,
    *   Associated array of address params.
    */
   public static function processSharedAddress($addressId, $params) {
-    $query = 'SELECT id FROM civicrm_address WHERE master_id = %1';
+    $query = 'SELECT id, contact_id FROM civicrm_address WHERE master_id = %1';
     $dao = CRM_Core_DAO::executeQuery($query, array(1 => array($addressId, 'Integer')));
 
     // unset contact id
-    $skipFields = array('is_primary', 'location_type_id', 'is_billing', 'master_id', 'contact_id');
+    $skipFields = array('is_primary', 'location_type_id', 'is_billing', 'contact_id');
+    if (!CRM_Utils_System::isNull($params['master_id'])) {
+      self::processSharedAddressRelationship($params['master_id'], $params['contact_id']);
+    } else {
+      $skipFields[] = 'master_id';
+    }
     foreach ($skipFields as $value) {
       unset($params[$value]);
     }
 
     $addressDAO = new CRM_Core_DAO_Address();
     while ($dao->fetch()) {
+      if (!CRM_Utils_System::isNull($params['master_id'])) {
+        self::processSharedAddressRelationship($params['master_id'], $dao->contact_id);
+      }
       $addressDAO->copyValues($params);
       $addressDAO->id = $dao->id;
       $addressDAO->save();
@@ -1120,18 +1108,17 @@ SELECT is_primary,
   /**
    * Create relationship between contacts who share an address.
    *
-   * Note that currently we create relationship only for Individual contacts
-   * Individual + Household and Individual + Orgnization
+   * Note that currently we create relationship between
+   * Individual + Household and Individual + Organization
    *
    * @param int $masterAddressId
    *   Master address id.
-   * @param array $params
-   *   Associated array of submitted values.
+   * @param int $currentContactId
+   *   Current contact id.
    */
-  public static function processSharedAddressRelationship($masterAddressId, $params) {
+  public static function processSharedAddressRelationship($masterAddressId, $currentContactId) {
     // get the contact type of contact being edited / created
-    $currentContactType = CRM_Contact_BAO_Contact::getContactType($params['contact_id']);
-    $currentContactId = $params['contact_id'];
+    $currentContactType = CRM_Contact_BAO_Contact::getContactType($currentContactId);
 
     // if current contact is not of type individual return
     if ($currentContactType != 'Individual') {
@@ -1147,8 +1134,7 @@ SELECT is_primary,
     $dao = CRM_Core_DAO::executeQuery($query, array(1 => array($masterAddressId, 'Integer')));
     $dao->fetch();
 
-    // if current contact is not of type individual return, since we don't create relationship between
-    // 2 individuals
+    // master address contact needs to be Household or Organization, otherwise return
     if ($dao->contact_type == 'Individual') {
       return;
     }
