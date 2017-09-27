@@ -81,7 +81,6 @@ class CRM_Contact_Form_Location {
 
     //build 1 instance of all blocks, without using ajax ...
     foreach ($form->_blocks as $blockName => $label) {
-      require_once str_replace('_', DIRECTORY_SEPARATOR, 'CRM_Contact_Form_Edit_' . $blockName) . '.php';
       $name = strtolower($blockName);
 
       $instances = array(1);
