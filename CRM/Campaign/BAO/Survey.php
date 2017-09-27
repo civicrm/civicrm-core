@@ -269,7 +269,7 @@ SELECT  survey.id                         as id,
       if (!$includePetition) {
         //we only have activity type as a
         //difference between survey and petition.
-        $petitionTypeID = CRM_Core_OptionGroup::getValue('activity_type', 'petition', 'name');
+        $petitionTypeID = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'petition');
 
         $where = array();
         if ($petitionTypeID) {
@@ -529,7 +529,7 @@ SELECT  survey.id    as id,
     }
 
     $targetContactIds = ' ( ' . implode(',', $voterIds) . ' ) ';
-    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
+    $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
 
@@ -625,7 +625,7 @@ INNER JOIN  civicrm_activity_contact activityAssignment
             contact_a.display_name as voter_name";
     }
 
-    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
+    $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
 
@@ -1046,7 +1046,7 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
     }
 
     $interviewers = array();
-    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
+    $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
 
     $query = "

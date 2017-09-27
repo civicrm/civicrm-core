@@ -34,7 +34,7 @@
         matchingUfGroups = ufGroupCollection.subcollection({
           filter: function(ufGroupModel) {
             //CRM-16915 - filter with module used by the profile
-            if (!$.isEmptyObject(options.usedByFilter)) {
+            if (options.usedByFilter && options.usedByFilter.length) {
               usedByFilter = options.usedByFilter;
             }
             return ufGroupModel.checkGroupType(options.groupTypeFilter, options.allowAllSubtypes, usedByFilter);
@@ -45,7 +45,7 @@
       }
 
       //CRM-15427 check for valid subtypes raise a warning if not valid
-      if (options.allowAllSubtypes && $.isEmptyObject(validTypesId)) {
+      if (options.allowAllSubtypes && !validTypesId.length) {
         validTypes = ufGroupCollection.subcollection({
           filter: function(ufGroupModel) {
             return ufGroupModel.checkGroupType(options.groupTypeFilter);
@@ -55,7 +55,7 @@
           validTypesId.push(validTypesattr.id);
         });
       }
-      if (!$.isEmptyObject(validTypesId) && $.inArray($select.val(), validTypesId) == -1) {
+      if (validTypesId.length && $.inArray($select.val(), validTypesId) == -1) {
         var civiComponent;
         if (options.groupTypeFilter.indexOf('Membership') !== -1) {
           civiComponent = 'Membership';

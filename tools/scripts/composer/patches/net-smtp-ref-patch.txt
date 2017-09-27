@@ -1,0 +1,22 @@
+--- SMTP.php	2017-06-15 20:08:34.696988543 -0700
++++ SMTP.php.new	2017-06-15 20:08:25.951703778 -0700
+@@ -732,7 +732,8 @@
+         }
+ 
+         $challenge = base64_decode($this->_arguments[0]);
+-        $digest = &Auth_SASL::factory('digest-md5');
++        // CRM-8597
++        $digest = Auth_SASL::factory('digest-md5');
+         $auth_str = base64_encode($digest->getResponse($uid, $pwd, $challenge,
+                                                        $this->host, "smtp",
+                                                        $authz));
+@@ -784,7 +785,8 @@
+         }
+ 
+         $challenge = base64_decode($this->_arguments[0]);
+-        $cram = &Auth_SASL::factory('cram-md5');
++        // CRM-8597
++        $cram = Auth_SASL::factory('cram-md5');
+         $auth_str = base64_encode($cram->getResponse($uid, $pwd, $challenge));
+ 
+         if (PEAR::isError($error = $this->_put($auth_str))) {

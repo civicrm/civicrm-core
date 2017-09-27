@@ -376,7 +376,7 @@
       }).bind('loaded.jstree', function () {
         $('.crm-designer-palette-field', this).draggable({
           appendTo: '.crm-designer',
-          zIndex: $(this.$el).zIndex() + 5000,
+          zIndex: $(this.$el).css("zIndex") + 5000,
           helper: 'clone',
           connectToSortable: '.crm-designer-fields' // FIXME: tight canvas/palette coupling
         });

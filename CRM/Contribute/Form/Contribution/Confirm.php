@@ -943,7 +943,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $params['is_email_receipt'] = $isEmailReceipt;
     }
     $params['is_recur'] = $isRecur;
-    $params['payment_instrument_id'] = $contributionParams['payment_instrument_id'];
+    $params['payment_instrument_id'] = CRM_Utils_Array::value('payment_instrument_id', $contributionParams);
     $recurringContributionID = self::processRecurringContribution($form, $params, $contactID, $financialType);
     $nonDeductibleAmount = self::getNonDeductibleAmount($params, $financialType, $online, $form);
 
@@ -1189,11 +1189,11 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     if (!$orgID) {
       // check if matching organization contact exists
-      $dupeID = CRM_Contact_BAO_Contact::getFirstDuplicateContact($behalfOrganization, 'Organization', 'Unsupervised', array(), FALSE);
+      $dupeIDs = CRM_Contact_BAO_Contact::getDuplicateContacts($behalfOrganization, 'Organization', 'Unsupervised', array(), FALSE);
 
       // CRM-6243 says to pick the first org even if more than one match
       if (count($dupeIDs) >= 1) {
-        $behalfOrganization['contact_id'] = $orgID = $dupeID;
+        $behalfOrganization['contact_id'] = $orgID = $dupeIDs[0];
         // don't allow name edit
         unset($behalfOrganization['organization_name']);
       }
@@ -1443,7 +1443,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $isTest = CRM_Utils_Array::value('is_test', $membershipParams, FALSE);
     $errors = $paymentResults = array();
     $form->_values['isMembership'] = TRUE;
-    $isRecurForFirstTransaction = CRM_Utils_Array::value('is_recur', $form->_values, CRM_Utils_Array::value('is_recur', $membershipParams));
+    $isRecurForFirstTransaction = CRM_Utils_Array::value('is_recur', $form->_params, CRM_Utils_Array::value('is_recur', $membershipParams));
 
     $totalAmount = $membershipParams['amount'];
 
@@ -1475,8 +1475,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         $isTest,
         $isRecurForFirstTransaction
       );
-
       if (!empty($paymentResult['contribution'])) {
+        $paymentResults[] = array('contribution_id' => $paymentResult['contribution']->id, 'result' => $paymentResult);
         $this->postProcessPremium($premiumParams, $paymentResult['contribution']);
         //note that this will be over-written if we are using a separate membership transaction. Otherwise there is only one
         $membershipContribution = $paymentResult['contribution'];
@@ -1495,6 +1495,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         list($membershipContribution, $secondPaymentResult) = $this->processSecondaryFinancialTransaction($contactID, $form, array_merge($membershipParams, array('skipLineItem' => 1)),
           $isTest, $unprocessedLineItems, CRM_Utils_Array::value('minimum_fee', $membershipDetails, 0), CRM_Utils_Array::value('financial_type_id', $membershipDetails));
         $paymentResults[] = array('contribution_id' => $membershipContribution->id, 'result' => $secondPaymentResult);
+        $totalAmount = $membershipContribution->total_amount;
       }
       catch (CRM_Core_Exception $e) {
         $errors[2] = $e->getMessage();
@@ -1537,7 +1538,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         $i++;
         $numTerms = CRM_Utils_Array::value($memType, $typesTerms, 1);
         if (!empty($membershipContribution)) {
-          $pendingStatus = CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name');
+          $pendingStatus = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
           $pending = ($membershipContribution->contribution_status_id == $pendingStatus) ? TRUE : FALSE;
         }
         else {
@@ -1644,8 +1645,12 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       // CRM-19792 : set necessary fields for payment processor
       CRM_Core_Payment_Form::mapParams($form->_bltID, $paymentParams, $paymentParams, TRUE);
 
-      $paymentActionResult = $payment->doPayment($paymentParams, 'contribute');
-      $paymentResults[] = array('contribution_id' => $paymentResult['contribution']->id, 'result' => $paymentActionResult);
+      // If this is a single membership-related contribution, it won't have
+      // be performed yet, so do it now.
+      if ($isPaidMembership && !$isProcessSeparateMembershipTransaction) {
+        $paymentActionResult = $payment->doPayment($paymentParams, 'contribute');
+        $paymentResults[] = array('contribution_id' => $paymentResult['contribution']->id, 'result' => $paymentActionResult);
+      }
       // Do not send an email if Recurring transaction is done via Direct Mode
       // Email will we sent when the IPN is received.
       foreach ($paymentResults as $result) {
@@ -1659,6 +1664,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     $emailValues = array_merge($membershipParams, $form->_values);
     $emailValues['membership_assign'] = 1;
+    $emailValues['useForMember'] = !empty($form->_useForMember);
+
     // Finally send an email receipt for pay-later scenario (although it might sometimes be caught above!)
     if ($totalAmount == 0) {
       // This feels like a bizarre hack as the variable name doesn't seem to be directly connected to it's use in the template.
@@ -1780,6 +1787,19 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     );
 
     $result = array();
+
+    // We're not processing the line item here because we are processing a membership.
+    // To ensure processing of the correct parameters, replace relevant parameters
+    // in $tempParams with those in $membershipContribution.
+    $tempParams['amount_level'] = $membershipContribution->amount_level;
+    $tempParams['total_amount'] = $membershipContribution->total_amount;
+    $tempParams['tax_amount'] = $membershipContribution->tax_amount;
+    $tempParams['contactID'] = $membershipContribution->contact_id;
+    $tempParams['financialTypeID'] = $membershipContribution->financial_type_id;
+    $tempParams['invoiceID'] = $membershipContribution->invoice_id;
+    $tempParams['trxn_id'] = $membershipContribution->trxn_id;
+    $tempParams['contributionID'] = $membershipContribution->id;
+
     if ($form->_values['is_monetary'] && !$form->_params['is_pay_later'] && $minimumFee > 0.0) {
       // At the moment our tests are calling this form in a way that leaves 'object' empty. For
       // now we compensate here.
@@ -2029,6 +2049,14 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     if (!empty($this->_ccid)) {
       $this->_params['contribution_id'] = $this->_ccid;
     }
+    //Set email-bltID if pre/post profile contains an email.
+    if ($this->_emailExists == TRUE) {
+      foreach ($this->_params as $key => $val) {
+        if (substr($key, 0, 6) == 'email-' && empty($this->_params["email-{$this->_bltID}"])) {
+          $this->_params["email-{$this->_bltID}"] = $this->_params[$key];
+        }
+      }
+    }
     // add a description field at the very beginning
     $this->_params['description'] = ts('Online Contribution') . ': ' . (($this->_pcpInfo['title']) ? $this->_pcpInfo['title'] : $this->_values['title']);
 
@@ -2269,7 +2297,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         $membershipParams['campaign_id'] = CRM_Utils_Array::value('campaign_id', $this->_values);
       }
 
-      CRM_Core_Payment_Form::mapParams($this->_bltID, $this->_params, $membershipParams, TRUE);
+      $this->_params = CRM_Core_Payment_Form::mapParams($this->_bltID, $this->_params, $membershipParams, TRUE);
       $this->doMembershipProcessing($contactID, $membershipParams, $premiumParams, $this->_lineItem);
     }
     else {

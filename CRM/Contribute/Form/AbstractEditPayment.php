@@ -360,7 +360,8 @@ WHERE  contribution_id = {$id}
         }
       }
     }
-    CRM_Financial_Form_Payment::addCreditCardJs($id);
+    // CRM-21002: pass the default payment processor ID whose credit card type icons should be populated first
+    CRM_Financial_Form_Payment::addCreditCardJs($this->_paymentProcessor['id']);
 
     $this->assign('recurringPaymentProcessorIds',
       empty($this->_recurPaymentProcessors) ? '' : implode(',', array_keys($this->_recurPaymentProcessors))
@@ -368,7 +369,7 @@ WHERE  contribution_id = {$id}
 
     // this required to show billing block
     // @todo remove this assignment the billing block is now designed to be always included but will not show fieldsets unless those sets of fields are assigned
-    $this->assign_by_ref('paymentProcessor', $processor);
+    $this->assign_by_ref('paymentProcessor', $this->_paymentProcessor);
   }
 
   /**
@@ -515,10 +516,10 @@ WHERE  contribution_id = {$id}
       }
       $this->assignProcessors();
       $this->assignBillingType();
-      CRM_Core_Payment_Form::setPaymentFieldsByProcessor($this, $this->_paymentProcessor, FALSE, TRUE, CRM_Utils_Request::retrieve('payment_instrument_id', 'Integer'));
+      CRM_Core_Payment_Form::setPaymentFieldsByProcessor($this, $this->_paymentProcessor, FALSE, TRUE, CRM_Utils_Request::retrieve('payment_instrument_id', 'Integer', $this));
     }
     catch (CRM_Core_Exception $e) {
-      CRM_Core_Error::fatal($e->getMessage());
+      CRM_Core_Error::statusBounce($e->getMessage());
     }
   }
 
@@ -611,6 +612,8 @@ WHERE  contribution_id = {$id}
         CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_contactID, 'contact_type')
       );
     }
+
+    $this->assignBillingName($this->_params);
   }
 
   /**

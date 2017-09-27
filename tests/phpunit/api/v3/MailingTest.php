@@ -539,6 +539,60 @@ class api_v3_MailingTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test unsubscribe list contains correct groups
+   * when include = 'previous mailing'
+   */
+  public function testUnsubscribeGroupList() {
+    // Create set of groups and add a contact to both of them.
+    $groupID2 = $this->groupCreate(array('name' => 'Test group 2', 'title' => 'group title 2'));
+    $groupID3 = $this->groupCreate(array('name' => 'Test group 3', 'title' => 'group title 3'));
+    $contactId = $this->individualCreate();
+    foreach (array($groupID2, $groupID3) as $grp) {
+      $params = array(
+        'contact_id' => $contactId,
+        'group_id' => $grp,
+      );
+      $this->callAPISuccess('GroupContact', 'create', $params);
+    }
+
+    //Send mail to groupID3
+    $mail = $this->callAPISuccess('mailing', 'create', $this->_params);
+    $params = array('mailing_id' => $mail['id'], 'test_email' => NULL, 'test_group' => $groupID3);
+    $this->callAPISuccess($this->_entity, 'send_test', $params);
+
+    $mgParams = array(
+      'mailing_id' => $mail['id'],
+      'entity_table' => 'civicrm_group',
+      'entity_id' => $groupID3,
+      'group_type' => 'Include',
+    );
+    $mailingGroup = $this->callAPISuccess('MailingGroup', 'create', $mgParams);
+
+    //Include previous mail in the mailing group.
+    $mail2 = $this->callAPISuccess('mailing', 'create', $this->_params);
+    $params = array('mailing_id' => $mail2['id'], 'test_email' => NULL, 'test_group' => $groupID3);
+    $this->callAPISuccess($this->_entity, 'send_test', $params);
+
+    $mgParams = array(
+      'mailing_id' => $mail2['id'],
+      'entity_table' => 'civicrm_mailing',
+      'entity_id' => $mail['id'],
+      'group_type' => 'Include',
+    );
+    $mailingGroup = $this->callAPISuccess('MailingGroup', 'create', $mgParams);
+    //CRM-20431 - Delete group id that matches first mailing id.
+    $this->callAPISuccess('Group', 'delete', array('id' => $this->_groupID));
+    $jobId = CRM_Core_DAO::getFieldValue('CRM_Mailing_DAO_MailingJob', $mail2['id'], 'id', 'mailing_id');
+    $hash = CRM_Core_DAO::getFieldValue('CRM_Mailing_Event_DAO_Queue', $jobId, 'hash', 'job_id');
+    $queueId = CRM_Core_DAO::getFieldValue('CRM_Mailing_Event_DAO_Queue', $jobId, 'id', 'job_id');
+
+    $group = CRM_Mailing_Event_BAO_Unsubscribe::unsub_from_mailing($jobId, $queueId, $hash, TRUE);
+    //Assert only one group returns in the unsubscribe list.
+    $this->assertCount(1, $group);
+    $this->assertEquals($groupID3, key($group));
+  }
+
+  /**
    *
    */
   public function testMailerStats() {

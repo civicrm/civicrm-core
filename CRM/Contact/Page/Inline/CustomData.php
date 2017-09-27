@@ -51,7 +51,7 @@ class CRM_Contact_Page_Inline_CustomData extends CRM_Core_Page {
     //custom groups Inline
     $entityType = CRM_Contact_BAO_Contact::getContactType($contactId);
     $entitySubType = CRM_Contact_BAO_Contact::getContactSubType($contactId);
-    $groupTree = CRM_Core_BAO_CustomGroup::getTree($entityType, $this, $contactId,
+    $groupTree = CRM_Core_BAO_CustomGroup::getTree($entityType, NULL, $contactId,
       $cgId, $entitySubType
     );
     $details = CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree, FALSE, NULL, NULL, NULL, $contactId);

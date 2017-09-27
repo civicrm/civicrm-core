@@ -44,6 +44,58 @@ class CRM_Contact_Form_Task_AddToParentClass extends CRM_Contact_Form_Task {
     parent::preProcess();
   }
 
+  public function buildQuickForm() {
+    $contactType = $this->get('contactType');
+    CRM_Utils_System::setTitle(ts('Add Contacts to %1', array(1 => $contactType)));
+    $this->addElement('text', 'name', ts('Find Target %1', array(1 => $contactType)));
+
+    $this->add('select',
+      'relationship_type_id',
+      ts('Relationship Type'),
+      array(
+        '' => ts('- select -'),
+      ) +
+      CRM_Contact_BAO_Relationship::getRelationType($contactType), TRUE
+    );
+
+    $searchRows = $this->get('searchRows');
+    $searchCount = $this->get('searchCount');
+    if ($searchRows) {
+      $checkBoxes = array();
+      $chekFlag = 0;
+      foreach ($searchRows as $id => $row) {
+        if (!$chekFlag) {
+          $chekFlag = $id;
+        }
+
+        $checkBoxes[$id] = $this->createElement('radio', NULL, NULL, NULL, $id);
+      }
+
+      $this->addGroup($checkBoxes, 'contact_check');
+      if ($chekFlag) {
+        $checkBoxes[$chekFlag]->setChecked(TRUE);
+      }
+      $this->assign('searchRows', $searchRows);
+    }
+
+    $this->assign('searchCount', $searchCount);
+    $this->assign('searchDone', $this->get('searchDone'));
+    $this->assign('contact_type_display', ts($contactType));
+    $this->addElement('submit', $this->getButtonName('refresh'), ts('Search'), array('class' => 'crm-form-submit'));
+    $this->addElement('submit', $this->getButtonName('cancel'), ts('Cancel'), array('class' => 'crm-form-submit'));
+    $this->addButtons(array(
+        array(
+          'type' => 'next',
+          'name' => ts('Add to %1', array(1 => $contactType)),
+          'isDefault' => TRUE,
+        ),
+        array(
+          'type' => 'cancel',
+          'name' => ts('Cancel'),
+        ),
+      )
+    );
+  }
   /**
    * Add relationships from form.
    */
@@ -208,6 +260,25 @@ class CRM_Contact_Form_Task_AddToParentClass extends CRM_Contact_Form_Task {
       $form->set('searchRows', NULL);
       $form->set('duplicateRelationship', NULL);
     }
+  }
+
+  /**
+   * Process the form after the input has been submitted and validated.
+   */
+  public function postProcess() {
+    // store the submitted values in an array
+    $this->params = $this->controller->exportValues($this->_name);
+    $this->set('searchDone', 0);
+    $contactType = $this->get('contactType');
+
+    if (!empty($_POST["_qf_AddTo{$contactType}_refresh"])) {
+      $searchParams['contact_type'] = $contactType;
+      $searchParams['rel_contact'] = $this->params['name'];
+      $this->search($this, $searchParams);
+      $this->set('searchDone', 1);
+      return;
+    }
+    $this->addRelationships();
   }
 
 }

@@ -161,11 +161,9 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
     $hasHeaders = !empty($this->_columnHeaders);
     $headerPatterns = $this->get('headerPatterns');
     $dataPatterns = $this->get('dataPatterns');
-    $hasLocationTypes = $this->get('fieldTypes');
     $mapperKeysValues = $this->controller->exportValue($this->_name, 'mapper');
 
     /* Initialize all field usages to false */
-
     foreach ($mapperKeys as $key) {
       $this->_fieldUsed[$key] = FALSE;
     }
@@ -177,27 +175,6 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
       unset($sel1['contribution_id']);
     }
 
-    // start of soft credit section
-    // get contact type for this import
-    $contactTypeId = $this->get('contactType');
-    $contactTypes = array(
-      CRM_Import_Parser::CONTACT_INDIVIDUAL => 'Individual',
-      CRM_Import_Parser::CONTACT_HOUSEHOLD => 'Household',
-      CRM_Import_Parser::CONTACT_ORGANIZATION => 'Organization',
-    );
-
-    $contactType = isset($contactTypes[$contactTypeId]) ? $contactTypes[$contactTypeId] : '';
-
-    // get importable fields for contact type
-    $contactFields = CRM_Contact_BAO_Contact::importableFields($contactType, NULL);
-
-    // get the Dedupe rule for this contact type and build soft credit array
-    $ruleParams = array(
-      'contact_type' => $contactType,
-      'used' => 'Unsupervised',
-    );
-    $fieldsArray = CRM_Dedupe_BAO_Rule::dedupeRuleFields($ruleParams);
-
     $softCreditFields['contact_id'] = ts('Contact ID');
     $softCreditFields['external_identifier'] = ts('External ID');
     $softCreditFields['email'] = ts('Email');
@@ -207,7 +184,6 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
     $sel4 = NULL;
 
     // end of soft credit section
-
     $js = "<script type='text/javascript'>\n";
     $formName = 'document.forms.' . $this->_name;
 
@@ -265,7 +241,6 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
         $js .= "swapOptions($formName, 'mapper[$i]', 0, 3, 'hs_mapper_0_');\n";
         if ($hasHeaders) {
           // do array search first to see if has mapped key
-          $columnKey = '';
           $columnKey = array_search($this->_columnHeaders[$i], $this->_mapperFields);
           if (isset($this->_fieldUsed[$columnKey])) {
             $defaults["mapper[$i]"] = $columnKey;

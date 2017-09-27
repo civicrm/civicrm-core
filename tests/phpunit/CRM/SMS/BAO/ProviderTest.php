@@ -78,6 +78,32 @@ class CRM_SMS_BAO_ProviderTest extends CiviUnitTestCase {
   }
 
   /**
+   * CRM-20989
+   * Add unit test to ensure that filtering by domain works in get Active Providers
+   */
+  public function testActiveProviderCount() {
+    $values = array(
+      'domain_id' => NULL,
+      'title' => 'test SMS provider',
+      'username' => 'test',
+      'password' => 'dummpy password',
+      'name' => 1,
+      'is_active' => 1,
+      'api_type' => 1,
+    );
+    $provider = $this->callAPISuccess('SmsProvider', 'create', $values);
+    $provider2 = $this->callAPISuccess('SmsProvider', 'create', array_merge($values, array('domain_id' => 2)));
+    $result = CRM_SMS_BAO_Provider::activeProviderCount();
+    $this->assertEquals(1, $result);
+    $provider3 = $this->callAPISuccess('SmsProvider', 'create', array_merge($values, array('domain_id' => 1)));
+    $result = CRM_SMS_BAO_Provider::activeProviderCount();
+    $this->assertEquals(2, $result);
+    CRM_SMS_BAO_Provider::del($provider['id']);
+    CRM_SMS_BAO_Provider::del($provider2['id']);
+    CRM_SMS_BAO_Provider::del($provider3['id']);
+  }
+
+  /**
    * CRM-19961 Check that when a domain is not passed when saving it defaults to current domain when create
    */
   public function testCreateWithoutDomain() {

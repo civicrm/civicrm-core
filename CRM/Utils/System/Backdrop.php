@@ -73,12 +73,12 @@ class CRM_Utils_System_Backdrop extends CRM_Utils_System_DrupalBase {
     // we also need to redirect b
     $config->inCiviCRM = TRUE;
 
-    $form = drupal_retrieve_form('user_register_form', $form_state);
+    $form = backdrop_retrieve_form('user_register_form', $form_state);
     $form_state['process_input'] = 1;
     $form_state['submitted'] = 1;
     $form['#array_parents'] = array();
     $form['#tree'] = FALSE;
-    drupal_process_form('user_register_form', $form, $form_state);
+    backdrop_process_form('user_register_form', $form, $form_state);
 
     $config->inCiviCRM = FALSE;
 
@@ -103,7 +103,7 @@ class CRM_Utils_System_Backdrop extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * Check if username and email exists in the drupal db.
+   * Check if username and email exists in the Backdrop db.
    *
    * @param array $params
    *   Array of name and mail values.
@@ -115,7 +115,7 @@ class CRM_Utils_System_Backdrop extends CRM_Utils_System_DrupalBase {
   public static function checkUserNameEmailExists(&$params, &$errors, $emailName = 'email') {
     $errors = form_get_errors();
     if ($errors) {
-      // unset drupal messages to avoid twice display of errors
+      // unset Backdrop messages to avoid twice display of errors
       unset($_SESSION['messages']);
     }
 
@@ -164,7 +164,7 @@ class CRM_Utils_System_Backdrop extends CRM_Utils_System_DrupalBase {
         $pageTitle = $title;
       }
 
-      drupal_set_title($pageTitle, PASS_THROUGH);
+      backdrop_set_title($pageTitle, PASS_THROUGH);
     }
   }
 
@@ -172,7 +172,7 @@ class CRM_Utils_System_Backdrop extends CRM_Utils_System_DrupalBase {
    * @inheritDoc
    */
   public function appendBreadCrumb($breadCrumbs) {
-    $breadCrumb = drupal_get_breadcrumb();
+    $breadCrumb = backdrop_get_breadcrumb();
 
     if (is_array($breadCrumbs)) {
       foreach ($breadCrumbs as $crumbs) {
@@ -190,7 +190,7 @@ class CRM_Utils_System_Backdrop extends CRM_Utils_System_DrupalBase {
         $breadCrumb[] = "<a href=\"{$crumbs['url']}\">{$crumbs['title']}</a>";
       }
     }
-    drupal_set_breadcrumb($breadCrumb);
+    backdrop_set_breadcrumb($breadCrumb);
   }
 
   /**
@@ -198,7 +198,7 @@ class CRM_Utils_System_Backdrop extends CRM_Utils_System_DrupalBase {
    */
   public function resetBreadCrumb() {
     $bc = array();
-    drupal_set_breadcrumb($bc);
+    backdrop_set_breadcrumb($bc);
   }
 
   /**
@@ -212,7 +212,7 @@ class CRM_Utils_System_Backdrop extends CRM_Utils_System_DrupalBase {
         '#type' => 'markup',
         '#markup' => $header,
       );
-      drupal_add_html_head($data, $key);
+      backdrop_add_html_head($data, $key);
     }
   }
 
@@ -230,9 +230,9 @@ class CRM_Utils_System_Backdrop extends CRM_Utils_System_DrupalBase {
       default:
         return FALSE;
     }
-    // If the path is within the drupal directory we can use the more efficient 'file' setting
+    // If the path is within the Backdrop directory we can use the more efficient 'file' setting
     $params['type'] = $this->formatResourceUrl($url) ? 'file' : 'external';
-    drupal_add_js($url, $params);
+    backdrop_add_js($url, $params);
     return TRUE;
   }
 
@@ -250,7 +250,7 @@ class CRM_Utils_System_Backdrop extends CRM_Utils_System_DrupalBase {
       default:
         return FALSE;
     }
-    drupal_add_js($code, $params);
+    backdrop_add_js($code, $params);
     return TRUE;
   }
 
@@ -262,9 +262,9 @@ class CRM_Utils_System_Backdrop extends CRM_Utils_System_DrupalBase {
       return FALSE;
     }
     $params = array();
-    // If the path is within the drupal directory we can use the more efficient 'file' setting
+    // If the path is within the Backdrop directory we can use the more efficient 'file' setting
     $params['type'] = $this->formatResourceUrl($url) ? 'file' : 'external';
-    drupal_add_css($url, $params);
+    backdrop_add_css($url, $params);
     return TRUE;
   }
 
@@ -276,7 +276,7 @@ class CRM_Utils_System_Backdrop extends CRM_Utils_System_DrupalBase {
       return FALSE;
     }
     $params = array('type' => 'inline');
-    drupal_add_css($code, $params);
+    backdrop_add_css($code, $params);
     return TRUE;
   }
 
@@ -331,7 +331,7 @@ class CRM_Utils_System_Backdrop extends CRM_Utils_System_DrupalBase {
     }
     else {
       // CRM-8638
-      // SOAP cannot load drupal bootstrap and hence we do it the old way
+      // SOAP cannot load Backdrop bootstrap and hence we do it the old way
       // Contact CiviSMTP folks if we run into issues with this :)
       $cmsPath = $this->cmsRootPath();
 
@@ -414,8 +414,8 @@ AND    u.status = 1
    * @inheritDoc
    */
   public function getUFLocale() {
-    // return CiviCRM’s xx_YY locale that either matches Drupal’s Chinese locale
-    // (for CRM-6281), Drupal’s xx_YY or is retrieved based on Drupal’s xx
+    // return CiviCRM’s xx_YY locale that either matches Backdrop’s Chinese locale
+    // (for CRM-6281), Backdrop’s xx_YY or is retrieved based on Backdrop’s xx
     // sometimes for CLI based on order called, this might not be set and/or empty
     global $language;
 
@@ -515,11 +515,11 @@ AND    u.status = 1
       }
       return FALSE;
     }
-    // load drupal bootstrap
+    // load Backdrop bootstrap
     chdir($cmsPath);
     define('BACKDROP_ROOT', $cmsPath);
 
-    // For drupal multi-site CRM-11313
+    // For Backdrop multi-site CRM-11313
     if ($realPath && strpos($realPath, 'sites/all/modules/') === FALSE) {
       preg_match('@sites/([^/]*)/modules@s', $realPath, $matches);
       if (!empty($matches[1])) {
@@ -606,6 +606,11 @@ AND    u.status = 1
    * @inheritDoc
    */
   public function cmsRootPath($scriptFilename = NULL) {
+    global $civicrm_paths;
+    if (!empty($civicrm_paths['cms.root']['path'])) {
+      return $civicrm_paths['cms.root']['path'];
+    }
+
     $cmsRoot = NULL;
     $valid = NULL;
 
@@ -883,6 +888,142 @@ AND    u.status = 1
   public function permissionEmails($permissionName) {
     // FIXME!!!!
     return array();
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function getDefaultFileStorage() {
+    $config = CRM_Core_Config::singleton();
+    $baseURL = CRM_Utils_System::languageNegotiationURL($config->userFrameworkBaseURL, FALSE, TRUE);
+
+    $siteName = $this->parseBackdropSiteNameFromRequest('/files/civicrm');
+    if ($siteName) {
+      $filesURL = $baseURL . "sites/$siteName/files/civicrm/";
+    }
+    else {
+      $filesURL = $baseURL . "files/civicrm/";
+    }
+
+    return array(
+      'url' => $filesURL,
+      'path' => CRM_Utils_File::baseFilePath(),
+    );
+  }
+
+  /**
+   * Check if a resource url is within the Backdrop directory and format appropriately.
+   *
+   * @param $url (reference)
+   *
+   * @return bool
+   *   TRUE for internal paths, FALSE for external. The backdrop_add_js fn is able to add js more
+   *   efficiently if it is known to be in the Backdrop site
+   */
+  public function formatResourceUrl(&$url) {
+    $internal = FALSE;
+    $base = CRM_Core_Config::singleton()->resourceBase;
+    global $base_url;
+    // Handle absolute urls
+    // compares $url (which is some unknown/untrusted value from a third-party dev) to the CMS's base url (which is independent of civi's url)
+    // to see if the url is within our Backdrop dir, if it is we are able to treated it as an internal url
+    if (strpos($url, $base_url) === 0) {
+      $file = trim(str_replace($base_url, '', $url), '/');
+      // CRM-18130: Custom CSS URL not working if aliased or rewritten
+      if (file_exists(BACKDROP_ROOT . $file)) {
+        $url = $file;
+        $internal = TRUE;
+      }
+    }
+    // Handle relative urls that are within the CiviCRM module directory
+    elseif (strpos($url, $base) === 0) {
+      $internal = TRUE;
+      $url = $this->appendCoreDirectoryToResourceBase(dirname(backdrop_get_path('module', 'civicrm')) . '/') . trim(substr($url, strlen($base)), '/');
+    }
+    // Strip query string
+    $q = strpos($url, '?');
+    if ($q && $internal) {
+      $url = substr($url, 0, $q);
+    }
+    return $internal;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function setMessage($message) {
+    backdrop_set_message($message);
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function permissionDenied() {
+    backdrop_access_denied();
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function flush() {
+    backdrop_flush_all_caches();
+  }
+
+  /**
+   * Determine if Backdrop multi-site applies to the current request -- and,
+   * specifically, determine the name of the multisite folder.
+   *
+   * @param string $flagFile
+   *   Check if $flagFile exists inside the site dir.
+   * @return null|string
+   *   string, e.g. `bar.example.com` if using multisite.
+   *   NULL if using the default site.
+   */
+  private function parseBackdropSiteNameFromRequest($flagFile = '') {
+    $phpSelf = array_key_exists('PHP_SELF', $_SERVER) ? $_SERVER['PHP_SELF'] : '';
+    $httpHost = array_key_exists('HTTP_HOST', $_SERVER) ? $_SERVER['HTTP_HOST'] : '';
+    if (empty($httpHost)) {
+      $httpHost = parse_url(CIVICRM_UF_BASEURL, PHP_URL_HOST);
+      if (parse_url(CIVICRM_UF_BASEURL, PHP_URL_PORT)) {
+        $httpHost .= ':' . parse_url(CIVICRM_UF_BASEURL, PHP_URL_PORT);
+      }
+    }
+
+    $confdir = $this->cmsRootPath() . '/sites';
+
+    if (file_exists($confdir . "/sites.php")) {
+      include $confdir . "/sites.php";
+    }
+    else {
+      $sites = array();
+    }
+
+    $uri = explode('/', $phpSelf);
+    $server = explode('.', implode('.', array_reverse(explode(':', rtrim($httpHost, '.')))));
+    for ($i = count($uri) - 1; $i > 0; $i--) {
+      for ($j = count($server); $j > 0; $j--) {
+        $dir = implode('.', array_slice($server, -$j)) . implode('.', array_slice($uri, 0, $i));
+        if (file_exists("$confdir/$dir" . $flagFile)) {
+          \Civi::$statics[__CLASS__]['drupalSiteName'] = $dir;
+          return \Civi::$statics[__CLASS__]['drupalSiteName'];
+        }
+        // check for alias
+        if (isset($sites[$dir]) && file_exists("$confdir/{$sites[$dir]}" . $flagFile)) {
+          \Civi::$statics[__CLASS__]['drupalSiteName'] = $sites[$dir];
+          return \Civi::$statics[__CLASS__]['drupalSiteName'];
+        }
+      }
+    }
+  }
+
+  /**
+   * Append Backdrop CSS and JS to coreResourcesList.
+   *
+   * @param array $list
+   */
+  public function appendCoreResources(&$list) {
+    $list[] = 'css/backdrop.css';
+    $list[] = 'js/crm.backdrop.js';
   }
 
 }

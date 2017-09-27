@@ -124,6 +124,7 @@ class CRM_Core_Config_MagicMerge {
       'backtrace' => array('setting'),
       'contact_default_language' => array('setting'),
       'countryLimit' => array('setting'),
+      'customTranslateFunction' => array('setting'),
       'dateInputFormat' => array('setting'),
       'dateformatDatetime' => array('setting'),
       'dateformatFull' => array('setting'),
@@ -309,7 +310,10 @@ class CRM_Core_Config_MagicMerge {
     }
     unset($this->cache[$k]);
     $type = $this->map[$k][0];
-    $name = isset($this->map[$k][1]) ? $this->map[$k][1] : $k;
+
+    // If foreign name is set, use that name (except with callback types because
+    // their second parameter is the object, not the foreign name).
+    $name = isset($this->map[$k][1]) && $type != 'callback' ? $this->map[$k][1] : $k;
 
     switch ($type) {
       case 'setting':

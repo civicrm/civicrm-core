@@ -1,4 +1,30 @@
 {
+  "name": "civicrm/civicrm-core",
+  "description": "Open source constituent relationship management for non-profits, NGOs and advocacy organizations.",
+  "type": "library",
+  "license": "AGPL-3.0",
+  "authors": [
+    {
+      "name": "Coleman Watts",
+      "role": "Product Manager"
+    },
+    {
+      "name": "Joshua Gowans",
+      "role": "Project Manager"
+    },
+    {
+      "name": "Mathieu Lutfy",
+      "role": "Infrastructure"
+    },
+    {
+      "name": "Tim Otten",
+      "role": "Software Architect"
+    },
+    {
+      "name": "CiviCRM Community",
+      "homepage": "https://civicrm.org"
+    }
+  ],
   "autoload": {
     "psr-0": {
       "PHPUnit_": ["packages/"],
@@ -8,21 +34,25 @@
   },
   "include-path": ["vendor/tecnickcom"],
   "require": {
-    "dompdf/dompdf" : "0.7.*",
-    "symfony/config": "~2.5.0",
-    "symfony/dependency-injection": "~2.5.0",
-    "symfony/event-dispatcher": "~2.5.0",
-    "symfony/filesystem": "~2.5.0",
-    "symfony/process": "~2.5.0",
-    "psr/log": "1.0.0",
-    "symfony/finder": "~2.5.0",
+    "dompdf/dompdf" : "0.8.*",
+    "electrolinux/phpquery": "^0.9.6",
+    "symfony/config": "^2.6.13 || ~3.0",
+    "symfony/dependency-injection": "^2.6.13 || ~3.0",
+    "symfony/event-dispatcher": "^2.6.13 || ~3.0",
+    "symfony/filesystem": "^2.6.13 || ~3.0",
+    "symfony/process": "^2.6.13 || ~3.0",
+    "psr/log": "~1.0.0",
+    "symfony/finder": "^2.6.13 || ~3.0",
     "tecnickcom/tcpdf" : "6.2.*",
-    "totten/ca-config": "~13.02",
+    "totten/ca-config": "~17.05",
     "zetacomponents/base": "1.7.*",
     "zetacomponents/mail": "dev-1.7-civi",
     "phpoffice/phpword": "^0.13.0",
     "pear/Validate_Finance_CreditCard": "dev-master",
-    "civicrm/civicrm-cxn-rpc": "~0.16.12.05"
+    "civicrm/civicrm-cxn-rpc": "~0.17.07.01",
+    "pear/Auth_SASL": "1.1.0",
+    "pear/Net_SMTP": "1.6.*",
+    "pear/Net_socket": "1.0.*"
   },
   "repositories": [
     {
@@ -34,12 +64,16 @@
     "post-install-cmd": [
       "bash tools/scripts/composer/dompdf-cleanup.sh",
       "bash tools/scripts/composer/tcpdf-cleanup.sh",
-      "bash tools/scripts/composer/pear-execption-fix.sh"
+      "bash tools/scripts/composer/pear-exception-fix.sh",
+      "bash tools/scripts/composer/net-smtp-fix.sh",
+      "bash tools/scripts/composer/phpword-jquery.sh"
     ],
     "post-update-cmd": [
       "bash tools/scripts/composer/dompdf-cleanup.sh",
       "bash tools/scripts/composer/tcpdf-cleanup.sh",
-      "bash tools/scripts/composer/pear-execption-fix.sh"
+      "bash tools/scripts/composer/pear-exception-fix.sh",
+      "bash tools/scripts/composer/net-smtp-fix.sh",
+      "bash tools/scripts/composer/phpword-jquery.sh"
     ]
   }
 }

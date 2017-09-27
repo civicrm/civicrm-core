@@ -33,7 +33,7 @@
 {/if}
 <div id="form" class="crm-block crm-form-block crm-contribution-contributionpage-widget-form-block">
     <div class="help">
-        {ts}CiviContribute widgets allow you and your supporters to easily promote this fund-raising campaign. Widget code can be added to any web page - and will provide a real-time display of current contribution results, and a direct link to this contribution page.{/ts} {help id="id-intro"}
+        {ts}CiviContribute widgets allow you and your supporters to easily promote this fund-raising campaign. Widget code can be added to any web page.  It will provide a real-time display of current contribution results and a direct link to this contribution page.{/ts} {help id="id-intro"}
     </div>
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
     <table class="form-layout-compressed">
@@ -47,7 +47,7 @@
             <tr class="crm-contribution-form-block-url_logo"><td class="label">{$form.url_logo.label}</span></td><td>{$form.url_logo.html}</td></tr>
             <tr class="crm-contribution-contributionpage-widget-form-block-button_title"><td class="label">{$form.button_title.label}</td><td>{$form.button_title.html}</td></tr>
             <tr class="crm-contribution-contributionpage-widget-form-block-about"><td class="label">{$form.about.label}<span class="crm-marker"> *</span></td><td>{$form.about.html}
-<br /><span class="description">{ts}Enter content for the about message. You may include HTML formatting tags. You can also include images, as long as they are already uploaded to a server - reference them using complete URLs.{/ts}</span>
+<br /><span class="description">{ts}Enter content for the about message. You may include HTML formatting tags. You can also include images, as long as they are already uploaded to a server&mdash;reference them using complete URLs.{/ts}</span>
 </td></tr>
 
         </table>

@@ -57,4 +57,60 @@ class api_v3_ExtensionTest extends CiviUnitTestCase {
     $this->assertEquals('CiviDiscount', $result['values'][0]['name']);
   }
 
+  /**
+   * Test getting a single extension
+   * CRM-20532
+   */
+  public function testExtensionGetSingleExtension() {
+    $result = $this->callAPISuccess('extension', 'get', array('key' => 'test.extension.manager.moduletest'));
+    $this->assertEquals('test.extension.manager.moduletest', $result['values'][$result['id']]['key']);
+    $this->assertEquals('module', $result['values'][$result['id']]['type']);
+    $this->assertEquals('test_extension_manager_moduletest', $result['values'][$result['id']]['name']);
+  }
+
+  /**
+   * Test single Extension get with specific fields in return
+   * CRM-20532
+   */
+  public function testSingleExtensionGetWithReturnFields() {
+    $result = $this->callAPISuccess('extension', 'get', array('key' => 'test.extension.manager.moduletest', 'return' => array('name', 'status', 'key')));
+    $this->assertEquals('test.extension.manager.moduletest', $result['values'][$result['id']]['key']);
+    $this->assertFalse(isset($result['values'][$result['id']]['type']));
+    $this->assertEquals('test_extension_manager_moduletest', $result['values'][$result['id']]['name']);
+    $this->assertEquals('uninstalled', $result['values'][$result['id']]['status']);
+  }
+
+  /**
+   * Test Extension Get returns detailed information
+   * Note that this is likely to fail locally but will work on Jenkins due to the result count check
+   * CRM-20532
+   */
+  public function testExtensionGet() {
+    $result = $this->callAPISuccess('extension', 'get', array());
+    $testExtensionResult = $this->callAPISuccess('extension', 'get', array('key' => 'test.extension.manager.paymenttest'));
+    $this->assertNotNull($result['values'][$testExtensionResult['id']]['typeInfo']);
+    $this->assertEquals(6, $result['count']);
+  }
+
+  public function testGetMultipleExtensions() {
+    $result = $this->callAPISuccess('extension', 'get', array('key' => array('test.extension.manager.paymenttest', 'test.extension.manager.moduletest')));
+    $this->assertEquals(2, $result['count']);
+  }
+
+  /**
+   * Test that extension get works with api request with parameter full_name as build by api explorer.
+   */
+  public function testGetMultipleExtensionsApiExplorer() {
+    $result = $this->callAPISuccess('extension', 'get', array('full_name' => array('test.extension.manager.paymenttest', 'test.extension.manager.moduletest')));
+    $this->assertEquals(2, $result['count']);
+  }
+
+  /**
+   * Test that extension get can be filtered by id.
+   */
+  public function testGetExtensionByID() {
+    $result = $this->callAPISuccess('extension', 'get', array('id' => 2, 'return' => array('label')));
+    $this->assertEquals(1, $result['count']);
+  }
+
 }

@@ -50,17 +50,15 @@ class api_v3_ActionScheduleTest extends CiviUnitTestCase {
    */
   public function testSimpleActionScheduleCreate() {
     $oldCount = CRM_Core_DAO::singleValueQuery('select count(*) from civicrm_action_schedule');
-    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
+    $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
-    $scheduledStatus = CRM_Core_OptionGroup::getValue('activity_status', 'Scheduled', 'name');
-    $activityTypeId = CRM_Core_OptionGroup::getValue('activity_type', "Meeting", 'name');
     $title = "simpleActionSchedule" . substr(sha1(rand()), 0, 7);
     $params = array(
       'title' => $title,
       'recipient' => $assigneeID,
       'limit_to' => 1,
-      'entity_value' => $activityTypeId,
-      'entity_status' => $scheduledStatus,
+      'entity_value' => 'Meeting',
+      'entity_status' => 'Scheduled',
       'is_active' => 1,
       'record_activity' => 1,
       'start_action_date' => 'activity_date_time',
@@ -89,17 +87,15 @@ class api_v3_ActionScheduleTest extends CiviUnitTestCase {
    */
   public function testActionScheduleWithScheduledDatesCreate() {
     $oldCount = CRM_Core_DAO::singleValueQuery('select count(*) from civicrm_action_schedule');
-    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
+    $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
-    $scheduledStatus = CRM_Core_OptionGroup::getValue('activity_status', 'Scheduled', 'name');
-    $activityTypeId = CRM_Core_OptionGroup::getValue('activity_type', "Meeting", 'name');
     $title = "simpleActionSchedule" . substr(sha1(rand()), 0, 7);
     $params = array(
       'title' => $title,
       'recipient' => $assigneeID,
       'limit_to' => 1,
-      'entity_value' => $activityTypeId,
-      'entity_status' => $scheduledStatus,
+      'entity_value' => 'Meeting',
+      'entity_status' => 'Scheduled',
       'is_active' => 1,
       'record_activity' => 1,
       'mapping_id' => CRM_Activity_ActionMapping::ACTIVITY_MAPPING_ID,

@@ -34,7 +34,7 @@
 </tr>
 <tr>
     <td><a href="{crmURL p='civicrm/admin/contribute/amount' q="reset=1&action=update&id=`$contributionPageID`"}" id="idAmount">&raquo; {ts}Amount{/ts}</a></td>
-    <td>{ts}Use this form to configure Contribution Amount options. You can give contributors the ability to enter their own contribution amounts - and/or provide a fixed list of amounts. For fixed amounts, you can enter a label for each 'level' of contribution (e.g. Friend, Sustainer, etc.). If you allow people to enter their own dollar amounts, you can also set minimum and maximum values. Depending on your choice of Payment Processor, you may be able to offer a recurring contribution option.{/ts}</td>
+    <td>{ts}Use this form to configure Contribution Amount options. You can give contributors the ability to enter their own contribution amounts and/or provide a fixed list of amounts. For fixed amounts, you can enter a label for each 'level' of contribution (e.g. Friend, Sustainer, etc.). If you allow people to enter their own dollar amounts, you can also set minimum and maximum values. Depending on your choice of Payment Processor, you may be able to offer a recurring contribution option.{/ts}</td>
 </tr>
 <tr>
     <td><a href="{crmURL p='civicrm/admin/contribute/membership' q="reset=1&action=update&id=`$contributionPageID`"}" id="idMembership">&raquo; {ts}Memberships{/ts}</a></td>
@@ -42,7 +42,7 @@
 </tr>
 <tr>
     <td><a href="{crmURL p='civicrm/admin/contribute/thankYou' q="reset=1&action=update&id=`$contributionPageID`"}" id="idThanks">&raquo; {ts}Thank-you and Receipting{/ts}</a></td>
-    <td>{ts}Use this form to configure the thank-you message and receipting options. Contributors will see a confirmation and thank-you page after whenever an online contribution is successfully processed. You provide the content and layout of the thank-you section below. You also control whether an electronic receipt is automatically emailed to each contributor - and can add a custom message to that receipt.{/ts}</td>
+    <td>{ts}Use this form to configure the thank-you message and receipting options. Contributors will see a confirmation and thank-you page after whenever an online contribution is successfully processed. You provide the content and layout of the thank-you section below. You also control whether an electronic receipt is automatically emailed to each contributor, and you can add a custom message to that receipt.{/ts}</td>
 </tr>
 <tr>
     <td><a href="{crmURL p='civicrm/admin/contribute/friend' q="reset=1&action=update&id=`$contributionPageID`"}" id="idFriend">&raquo; {ts}Tell a Friend{/ts}</a></td>
@@ -52,7 +52,7 @@
    <td><a href="{crmURL p='civicrm/admin/contribute/custom' q="reset=1&action=update&id=`$contributionPageID`"}" id="idCustom">&raquo; {ts}Include Profiles{/ts}</a></td>
     <td>{ts}You may want to collect information from contributors beyond what is required to make a contribution. For example, you may want to inquire about volunteer availability and skills. Add any number of fields to your contribution form by selecting CiviCRM Profiles (collections of fields) to include at the beginning of the page, and/or at the bottom.{/ts}<br />
 {capture assign=adminGroupURL}{crmURL p="civicrm/admin/uf/group" q="reset=1&action=browse"}{/capture}
-{ts 1=$adminGroupURL}You can use existing CiviCRM Profiles on your page - OR create profile(s) specifically for use in Online Contribution pages. Go to <a href="%1"><strong>Administer CiviCRM Profiles</strong></a> if you need to review, modify or create profiles (you can come back at any time to select or update the Profile(s) used for this page).{/ts}</td>
+{ts 1=$adminGroupURL}You can use existing CiviCRM Profiles on your page or create profile(s) specifically for use in Online Contribution pages. Go to <a href="%1"><strong>Administer CiviCRM Profiles</strong></a> if you need to review, modify or create profiles (you can come back at any time to select or update the Profile(s) used for this page).{/ts}</td>
 </tr>
 <tr>
    <td><a href="{crmURL p='civicrm/admin/contribute/premium q="reset=1&action=update&id=`$contributionPageID`"}" id="idPremium">&raquo; {ts}Premiums{/ts}</a></td>
@@ -60,7 +60,7 @@
 </tr>
 <tr>
    <td><a href="{crmURL p='civicrm/admin/contribute/widget' q="reset=1&action=update&id=`$contributionPageID`"}" id="idWidget">&raquo; {ts}Widget{/ts}</a></td>
-   <td>{ts}Widgets allow you and your supporters to easily promote this fund-raising campaign. Widget code can be added to any web page - and will provide a real-time display of current contribution results, and a direct link to this contribution page.{/ts}</td>
+   <td>{ts}Widgets allow you and your supporters to easily promote this fund-raising campaign. Widget code can be added to any web page.  They will provide a real-time display of current contribution results, and a direct link to this contribution page.{/ts}</td>
 </tr>
 <tr>
   <td><a href="{crmURL p='civicrm/admin/contribute/pcp' q="reset=1&action=update&id=`$contributionPageID`"}" id="idPCP">&raquo; {ts}Personal Campaign Pages{/ts}</a></td>
@@ -68,7 +68,7 @@
 </tr>
 <tr>
   <td><a href="{crmURL p='civicrm/contribute/transact' q="reset=1&action=preview&id=`$contributionPageID`"}" id="idTest">&raquo; {ts}Online Contribution{/ts}</a><br /> ({ts}Test-drive{/ts})</td>
-  <td>{ts}Test-drive the entire contribution process - including custom fields, confirmation, thank-you page, and receipting. Transactions will be directed to your payment processor's test server. No live financial transactions will be submitted. However, a contact record will be created or updated and a test contribution record will be saved to the database. Use obvious test contact names so you can review and delete these records as needed. Test contributions are not visible on the Contributions tab, but can be viewed by searching for 'Test Contributions' in the CiviContribute search form.{/ts}</td>
+  <td>{ts}Test-drive the entire contribution process&mdash;including custom fields, confirmation, thank-you page, and receipting. Transactions will be directed to your payment processor's test server. No live financial transactions will be submitted. However, a contact record will be created or updated and a test contribution record will be saved to the database. Use obvious test contact names so you can review and delete these records as needed. Test contributions are not visible on the Contributions tab, but can be viewed by searching for 'Test Contributions' in the CiviContribute search form.{/ts}</td>
 </tr>
 <tr>
   <td><a href="{crmURL p='civicrm/contribute/transact' q="reset=1&id=`$contributionPageID`"}" id="idLive">&raquo; {ts}Online Contribution{/ts}</a><br /> ({ts}Live{/ts})</td>

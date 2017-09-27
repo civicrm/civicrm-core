@@ -68,6 +68,7 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
       $this->_defaults['contact_reference_options'] = self::getAutocompleteContactReference();
       $this->_defaults['enableSSL'] = Civi::settings()->get('enableSSL');
       $this->_defaults['verifySSL'] = Civi::settings()->get('verifySSL');
+      $this->_defaults['environment'] = CRM_Core_Config::environment();
       $this->_defaults['enableComponents'] = Civi::settings()->get('enable_components');
     }
 
@@ -78,10 +79,7 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
    * Build the form object.
    */
   public function buildQuickForm() {
-    $session = CRM_Core_Session::singleton();
-    $session->pushUserContext(CRM_Utils_System::url('civicrm/admin', 'reset=1'));
-    $args = func_get_args();
-    $check = reset($args);
+    CRM_Core_Session::singleton()->pushUserContext(CRM_Utils_System::url('civicrm/admin', 'reset=1'));
     $this->addButtons(array(
         array(
           'type' => 'next',
@@ -96,9 +94,8 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
     );
 
     $descriptions = array();
-    foreach ($this->_settings as $setting => $group) {
-      $settingMetaData = civicrm_api('setting', 'getfields', array('version' => 3, 'name' => $setting));
-      $props = $settingMetaData['values'][$setting];
+    $settingMetaData = $this->getSettingsMetaData();
+    foreach ($settingMetaData as $setting => $props) {
       if (isset($props['quick_form_type'])) {
         if (isset($props['pseudoconstant'])) {
           $options = civicrm_api3('Setting', 'getoptions', array(
@@ -150,7 +147,9 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
 
       }
     }
+    // setting_description should be deprecated - see Mail.tpl for metadata based tpl.
     $this->assign('setting_descriptions', $descriptions);
+    $this->assign('settings_fields', $settingMetaData);
   }
 
   /**
@@ -289,6 +288,19 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
     return array(
       '1' => 1,
     ) + $autoSearchFields;
+  }
+
+  /**
+   * Get the metadata relating to the settings on the form, ordered by the keys in $this->_settings.
+   *
+   * @return array
+   */
+  protected function getSettingsMetaData() {
+    $allSettingMetaData = civicrm_api3('setting', 'getfields', array());
+    $settingMetaData = array_intersect_key($allSettingMetaData['values'], $this->_settings);
+    // This array_merge re-orders to the key order of $this->_settings.
+    $settingMetaData = array_merge($this->_settings, $settingMetaData);
+    return $settingMetaData;
   }
 
 }

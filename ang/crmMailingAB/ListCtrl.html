@@ -25,7 +25,7 @@ Required vars: mailingABList
   </form>
 </div>
 
-<div ng-show="!$.isEmptyObject(mailingABList)">
+<div ng-show="mailingABList.length">
   <table class="display">
     <thead>
     <tr>
@@ -51,7 +51,7 @@ Required vars: mailingABList
   </table>
 </div>
 
-<div ng-show="$.isEmptyObject(mailingABList)" class="messages status no-popup">
+<div ng-show="mailingABList.length === 0" class="messages status no-popup">
   <i class="crm-i fa-info-circle"></i>
   {{ts('You have no A/B mailings')}}
 </div>

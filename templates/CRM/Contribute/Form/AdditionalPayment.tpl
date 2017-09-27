@@ -24,35 +24,7 @@
  +--------------------------------------------------------------------+
 *}
 {if $transaction}
-  {if !empty($rows)}
-   <table id='info'>
-     <tr class="columnheader">
-       <th>{ts}Amount{/ts}</th>
-       <th>{ts}Type{/ts}</th>
-       <th>{ts}Payment Method{/ts}</th>
-       <th>{ts}Received{/ts}</th>
-       <th>{ts}Transaction ID{/ts}</th>
-       <th>{ts}Status{/ts}</th>
-     </tr>
-     {foreach from=$rows item=row}
-     <tr>
-       <td>{$row.total_amount|crmMoney:$row.currency}</td>
-       <td>{$row.financial_type}</td>
-       <td>{$row.payment_instrument}{if $row.check_number} (#{$row.check_number}){/if}</td>
-       <td>{$row.receive_date|crmDate}</td>
-       <td>{$row.trxn_id}</td>
-       <td>{$row.status}</td>
-     </tr>
-     {/foreach}
-    <table>
-  {else}
-     {if $component eq 'event'}
-       {assign var='entity' value='participant'}
-     {else}
-       {assign var='entity' value=$component}
-     {/if}
-     {ts 1=$entity}No payments found for this %1 record{/ts}
-  {/if}
+  {include file="CRM/Contribute/Form/PaymentInfoBlock.tpl"}
   {if !$suppressPaymentFormButtons}
     <div class="crm-submit-buttons">
        {include file="CRM/common/formButtons.tpl"}
@@ -63,9 +35,9 @@
 <div class="crm-block crm-form-block crm-payment-form-block">
 
   {if !$email}
-  <div class="messages status no-popup">
-    <div class="icon inform-icon"></div>&nbsp;{ts}You will not be able to send an automatic email receipt for this payment because there is no email address recorded for this contact. If you want a receipt to be sent when this payment is recorded, click Cancel and then click Edit from the Summary tab to add an email address before recording the payment.{/ts}
-  </div>
+    <div class="messages status no-popup">
+      <div class="icon inform-icon"></div>&nbsp;{ts}You will not be able to send an automatic email receipt for this payment because there is no email address recorded for this contact. If you want a receipt to be sent when this payment is recorded, click Cancel and then click Edit from the Summary tab to add an email address before recording the payment.{/ts}
+    </div>
   {/if}
   {if $newCredit AND $contributionMode EQ null}
     {if $contactId}
@@ -84,9 +56,6 @@
     <tr>
       <td class="font-size12pt label"><strong>{if $component eq 'event'}{ts}Participant{/ts}{else}{ts}Contact{/ts}{/if}</strong></td><td class="font-size12pt"><strong>{$displayName}</strong></td>
     </tr>
-    {if $contributionMode}
-      <tr class="crm-payment-form-block-payment_processor_id"><td class="label nowrap">{$form.payment_processor_id.label}<span class="crm-marker"> * </span></td><td>{$form.payment_processor_id.html}</td></tr>
-    {/if}
     {if $eventName}
       <tr>
         <td class='label'>{ts}Event{/ts}</td><td>{$eventName}</td>
@@ -97,6 +66,23 @@
       <td>
         <span id='totalAmount'>{$form.currency.html|crmAddClass:eight}&nbsp;{$form.total_amount.html|crmAddClass:eight}</span>&nbsp; <span class="status">{if $paymentType EQ 'refund'}{ts}Refund Due{/ts}{else}{ts}Balance Owed{/ts}{/if}:&nbsp;{$paymentAmt|crmMoney}</span>
       </td>
+      {if $email and $outBound_option != 2}
+        <tr class="crm-payment-form-block-is_email_receipt">
+          <td class="label">
+            {$form.is_email_receipt.label}
+          </td>
+          <td>{$form.is_email_receipt.html}&nbsp;
+              <span class="description">{ts 1=$email}Automatically email a receipt to %1?{/ts}</span>
+          </td>
+        </tr>
+        <tr id="fromEmail" class="crm-payment-form-block-from_email_address" style="display:none;">
+          <td class="label">{$form.from_email_address.label}</td>
+          <td>{$form.from_email_address.html}</td>
+        </tr>
+      {/if}
+      {if $contributionMode}
+        <tr class="crm-payment-form-block-payment_processor_id"><td class="label nowrap">{$form.payment_processor_id.label}<span class="crm-marker"> * </span></td><td>{$form.payment_processor_id.html}</td></tr>
+      {/if}
     </tr>
    </table>
 
@@ -118,37 +104,11 @@
             <td >{$form.payment_instrument_id.html} {help id="payment_instrument_id"}</td>
             </td>
           </tr>
-          {if $showCheckNumber || !$isOnline}
-            <tr id="checkNumber" class="crm-payment-form-block-check_number">
-              <td class="label">{$form.check_number.label}</td>
-              <td>{$form.check_number.html}</td>
-            </tr>
-          {/if}
           <tr class="crm-payment-form-block-trxn_id">
             <td class="label">{$form.trxn_id.label}</td>
             <td>{$form.trxn_id.html} {help id="id-trans_id"}</td>
           </tr>
-          {if $email and $outBound_option != 2}
-            <tr class="crm-payment-form-block-is_email_receipt">
-              <td class="label">
-                {$form.is_email_receipt.label}</td><td>{$form.is_email_receipt.html}&nbsp;
-                <span class="description">{ts 1=$email}Automatically email a receipt to %1?{/ts}</span>
-              </td>
-            </tr>
-          {/if}
-          <tr id="fromEmail" class="crm-payment-form-block-receipt_date" style="display:none;">
-            <td class="label">{$form.from_email_address.label}</td>
-            <td>{$form.from_email_address.html}</td>
-          </tr>
-          <tr id='notice' class="crm-event-eventfees-form-block-receipt_text">
-            <td class="label">{$form.receipt_text.label}</td>
-            <td><span class="description">
-                {ts}Enter a message you want included at the beginning of the confirmation email.{/ts}
-                </span><br />
-                {$form.receipt_text.html|crmAddClass:huge}
-            </td>
-          </tr>
-           <tr class="crm-payment-form-block-fee_amount"><td class="label">{$form.fee_amount.label}</td><td>{$form.fee_amount.html|crmMoney:$currency:'XXX':'YYY'}<br />
+          <tr class="crm-payment-form-block-fee_amount"><td class="label">{$form.fee_amount.label}</td><td{$valueStyle}>{$form.fee_amount.html|crmMoney:$currency:'XXX':'YYY'}<br />
             <span class="description">{ts}Processing fee for this transaction (if applicable).{/ts}</span></td></tr>
            <tr class="crm-payment-form-block-net_amount"><td class="label">{$form.net_amount.label}</td><td>{$form.net_amount.html|crmMoney:$currency:'':1}<br />
             <span class="description">{ts}Net value of the payment (Total Amount minus Fee).{/ts}</span></td></tr>
@@ -188,37 +148,11 @@
         });
 
         function checkEmailDependancies() {
-          if ($('#is_email_receipt', $form).attr('checked')) {
-            $('#fromEmail, #notice', $form).show();
-            $('#receiptDate', $form).hide();
+          if ($('#is_email_receipt', $form).prop('checked')) {
+            $('#fromEmail', $form).show();
           }
           else {
-            $('#fromEmail, #notice', $form).hide( );
-            $('#receiptDate', $form).show();
-          }
-        }
-
-        // bind first click of accordion header to load crm-accordion-body with snippet
-        $('#adjust-option-type', $form).hide();
-        $('.crm-ajax-accordion .crm-accordion-header', $form).one('click', function() {
-          loadPanes($(this).attr('id'));
-        });
-        $('.crm-ajax-accordion:not(.collapsed) .crm-accordion-header', $form).each(function(index) {
-          loadPanes($(this).attr('id'));
-        });
-        // load panes function call for snippet based on id of crm-accordion-header
-        function loadPanes(id) {
-          var url = "{/literal}{crmURL p='civicrm/payment/add' q='formType=' h=0}{literal}" + id;
-          {/literal}
-          {if $contributionMode}
-            url += "&mode={$contributionMode}";
-          {/if}
-          {if $qfKey}
-            url += "&qfKey={$qfKey}";
-          {/if}
-          {literal}
-          if (!$('div.'+ id, $form).html()) {
-            CRM.loadPage(url, {target: $('div.' + id, $form)});
+           $('#fromEmail', $form).hide( );
           }
         }
 
@@ -234,14 +168,4 @@
 
     </script>
     {/literal}
-      {if !$contributionMode}
-        {include file="CRM/common/showHideByFieldValue.tpl"
-        trigger_field_id    ="payment_instrument_id"
-        trigger_value       = '4'
-        target_element_id   ="checkNumber"
-        target_element_type ="table-row"
-        field_type          ="select"
-        invert              = 0
-        }
-    {/if}
 {/if}

@@ -58,7 +58,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
       if (!isset($relatedCases)) {
         $cId = CRM_Utils_Request::retrieve('cid', 'Integer');
         $caseId = CRM_Utils_Request::retrieve('id', 'Integer');
-        $relatedCases = CRM_Case_BAO_Case::getRelatedCases($caseId, $cId);
+        $relatedCases = CRM_Case_BAO_Case::getRelatedCases($caseId);
       }
       $this->assign('relatedCases', $relatedCases);
       $this->assign('showRelatedCases', TRUE);
@@ -141,7 +141,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
     //get the related cases for given case.
     $relatedCases = $this->get('relatedCases');
     if (!isset($relatedCases)) {
-      $relatedCases = CRM_Case_BAO_Case::getRelatedCases($this->_caseID, $this->_contactID);
+      $relatedCases = CRM_Case_BAO_Case::getRelatedCases($this->_caseID);
       $relatedCases = empty($relatedCases) ? FALSE : $relatedCases;
       $this->set('relatedCases', $relatedCases);
     }
@@ -162,7 +162,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
     $entitySubType = !empty($values['case_type_id']) ? $values['case_type_id'] : NULL;
     $this->assign('caseTypeID', $entitySubType);
     $groupTree = CRM_Core_BAO_CustomGroup::getTree('Case',
-      $this,
+      NULL,
       $this->_caseID,
       NULL,
       $entitySubType

@@ -131,7 +131,7 @@ class CRM_Contact_Form_Edit_CommunicationPreferences {
 
     $greetings = self::getGreetingFields($self->_contactType);
     foreach ($greetings as $greeting => $details) {
-      $customizedValue = CRM_Core_OptionGroup::getValue($greeting, 'Customized', 'name');
+      $customizedValue = CRM_Core_PseudoConstant::getKey('CRM_Contact_BAO_Contact', $details['field'], 'Customized');
       if (CRM_Utils_Array::value($details['field'], $fields) == $customizedValue && empty($fields[$details['customField']])) {
         $errors[$details['customField']] = ts('Custom  %1 is a required field if %1 is of type Customized.',
           array(1 => $details['label'])

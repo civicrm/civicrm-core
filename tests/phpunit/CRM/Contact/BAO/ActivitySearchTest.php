@@ -104,7 +104,7 @@ class CRM_Contact_BAO_ActivitySearchTest extends CiviUnitTestCase {
     $subject = 'test activity ' . __FUNCTION__;
     $params = $this->_params;
     $params['subject'] = $subject;
-    $activity = $this->callAPISuccess('Activity', 'Create', $params);
+    $this->callAPISuccess('Activity', 'Create', $params);
 
     $case = array(
       'form_value' => array(

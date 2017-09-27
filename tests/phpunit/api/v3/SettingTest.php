@@ -527,4 +527,27 @@ class api_v3_SettingTest extends CiviUnitTestCase {
     $this->assertEquals('Unconfirmed', $result['values'][$dom['id']]['tag_unconfirmed']);
   }
 
+  /**
+   * Test to set isProductionEnvironment
+   *
+   */
+  public function testSetCivicrmEnvironment() {
+    $params = array(
+      'environment' => 'Staging',
+    );
+    $result = $this->callAPISuccess('Setting', 'create', $params);
+    $params = array(
+      'name' => 'environment',
+      'group' => 'Developer Preferences',
+    );
+    $result = $this->callAPISuccess('Setting', 'getvalue', $params);
+    $this->assertEquals('Staging', $result);
+
+    global $civicrm_setting;
+    $civicrm_setting[CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME]['environment'] = 'Production';
+    Civi::service('settings_manager')->useMandatory();
+    $result = $this->callAPISuccess('Setting', 'getvalue', $params);
+    $this->assertEquals('Production', $result);
+  }
+
 }

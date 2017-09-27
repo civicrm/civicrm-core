@@ -377,7 +377,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
 
     if ($this->_action & CRM_Core_Action::VIEW) {
       // Get the tree of custom fields.
-      $this->_groupTree = CRM_Core_BAO_CustomGroup::getTree('Activity', $this,
+      $this->_groupTree = CRM_Core_BAO_CustomGroup::getTree('Activity', NULL,
         $this->_activityId, 0, $this->_activityTypeId
       );
     }
@@ -986,7 +986,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
    */
   protected function processActivity(&$params) {
     $activityAssigned = array();
-    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
+    $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
     // format assignee params
     if (!CRM_Utils_Array::crmIsEmptyArray($params['assignee_contact_id'])) {

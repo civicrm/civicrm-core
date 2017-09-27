@@ -352,7 +352,9 @@ class SettingsBag {
     }
     $dao->find(TRUE);
 
-    if (isset($metadata['on_change'])) {
+    // string comparison with 0 always return true, so to be ensure the type use ===
+    // ref - https://stackoverflow.com/questions/8671942/php-string-comparasion-to-0-integer-returns-true
+    if (isset($metadata['on_change']) && !($value === 0 && ($dao->value === NULL || unserialize($dao->value) == 0))) {
       foreach ($metadata['on_change'] as $callback) {
         call_user_func(
           \Civi\Core\Resolver::singleton()->get($callback),

@@ -207,6 +207,30 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test permission for participant get.
+   */
+  public function testGetParticipantWithPermission() {
+    $config = CRM_Core_Config::singleton();
+    $config->userPermissionClass->permissions = array();
+    $params = array(
+      'event_id' => $this->_eventID,
+      'check_permissions' => TRUE,
+      'return' => array(
+        'participant_id',
+        'event_id',
+        'participant_register_date',
+        'participant_source',
+      ),
+    );
+    $this->callAPIFailure('participant', 'get', $params);
+
+    $params['check_permissions'] = FALSE;
+    $result = $this->callAPISuccess('participant', 'get', $params);
+    $this->assertEquals($result['is_error'], 0);
+  }
+
+
+  /**
    * Check with params id.
    */
   public function testGetParamsAsIdOnly() {
@@ -779,6 +803,37 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
     $result = $this->callAPIAndDocument('contact', 'create', $params, __FUNCTION__, __FILE__, $description, $subfile);
     $this->assertEquals(1, $result['values'][$result['id']]['api.participant_payment.create']['count']);
     $this->callAPISuccess('contact', 'delete', array('id' => $result['id']));
+  }
+
+  /**
+   * Test participant invoke post hook after status update.
+   */
+  public function testPostHookForAdditionalParticipant() {
+    $participantID = $this->participantCreate(array(
+      'contact_id' => $this->_contactID,
+      'status_id' => 5,
+      'event_id' => $this->_eventID,
+    ));
+    $participantID2 = $this->participantCreate(array(
+      'contact_id' => $this->_contactID2,
+      'event_id' => $this->_eventID,
+      'status_id' => 5,
+      'registered_by_id' => $participantID,
+    ));
+
+    $this->hookClass->setHook('civicrm_post', array($this, 'onPost'));
+    $params = array(
+      'id' => $participantID,
+      'status_id' => 1,
+    );
+    $this->callAPISuccess('Participant', 'create', $params);
+
+    $result = $this->callAPISuccess('Participant', 'get', array('source' => 'Post Hook Update'));
+    $this->assertEquals(2, $result['count']);
+
+    $expected = array($participantID, $participantID2);
+    $actual = array_keys($result['values']);
+    $this->checkArrayEquals($expected, $actual);
   }
 
 }

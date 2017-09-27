@@ -339,7 +339,7 @@ class CRM_Activity_Page_AJAX {
       $targetContacts = array_unique(explode(',', $params['targetContactIds']));
     }
 
-    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
+    $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
     $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
@@ -403,6 +403,10 @@ class CRM_Activity_Page_AJAX {
       'context' => 'String',
       'activity_type_id' => 'Integer',
       'activity_type_exclude_id' => 'Integer',
+      'activity_status_id' => 'String',
+      'activity_date_relative' => 'String',
+      'activity_date_low' => 'String',
+      'activity_date_high' => 'String',
     );
 
     $params = CRM_Core_Page_AJAX::defaultSortAndPagerParams();
@@ -416,10 +420,6 @@ class CRM_Activity_Page_AJAX {
     // get the contact activities
     $activities = CRM_Activity_BAO_Activity::getContactActivitySelector($params);
 
-    if (!empty($_GET['is_unit_test'])) {
-      return $activities;
-    }
-
     foreach ($activities['data'] as $key => $value) {
       // Check if recurring activity.
       if (!empty($value['is_recurring_activity'])) {
@@ -429,19 +429,38 @@ class CRM_Activity_Page_AJAX {
     }
 
     // store the activity filter preference CRM-11761
-    $session = CRM_Core_Session::singleton();
-    $userID = $session->get('userID');
-    if ($userID) {
-      $activityFilter = array(
-        'activity_type_filter_id' => empty($params['activity_type_id']) ? '' : CRM_Utils_Type::escape($params['activity_type_id'], 'Integer'),
-        'activity_type_exclude_filter_id' => empty($params['activity_type_exclude_id']) ? '' : CRM_Utils_Type::escape($params['activity_type_exclude_id'], 'Integer'),
-      );
+    if (Civi::settings()->get('preserve_activity_tab_filter') && ($userID = CRM_Core_Session::getLoggedInContactID())) {
+      unset($optionalParameters['context']);
+      foreach ($optionalParameters as $searchField => $dataType) {
+        $formSearchField = $searchField;
+        if ($searchField == 'activity_type_id') {
+          $formSearchField = 'activity_type_filter_id';
+        }
+        elseif ($searchField == 'activity_type_exclude_id') {
+          $formSearchField = 'activity_type_exclude_filter_id';
+        }
+        if (!empty($params[$searchField])) {
+          $activityFilter[$formSearchField] = CRM_Utils_Type::escape($params[$searchField], $dataType);
+          if (in_array($searchField, array('activity_date_low', 'activity_date_high'))) {
+            $activityFilter['activity_date_relative'] = 0;
+          }
+          elseif ($searchField == 'activity_status_id') {
+            $activityFilter['status_id'] = explode(',', $activityFilter[$searchField]);
+          }
+        }
+        elseif (in_array($searchField, array('activity_type_id', 'activity_type_exclude_id'))) {
+          $activityFilter[$formSearchField] = '';
+        }
+      }
 
       /**
        * @var \Civi\Core\SettingsBag $cSettings
        */
       $cSettings = Civi::service('settings_manager')->getBagByContact(CRM_Core_Config::domainID(), $userID);
       $cSettings->set('activity_tab_filter', $activityFilter);
+    }
+    if (!empty($_GET['is_unit_test'])) {
+      return array($activities, $activityFilter);
     }
 
     CRM_Utils_JSON::output($activities);

@@ -85,6 +85,7 @@ class CRM_Admin_Form_MailSettings extends CRM_Admin_Form {
       0 => ts('Email-to-Activity Processing'),
     );
     $this->add('select', 'is_default', ts('Used For?'), $usedfor);
+    $this->addField('activity_status', array('placeholder' => FALSE));
   }
 
   /**
@@ -92,6 +93,26 @@ class CRM_Admin_Form_MailSettings extends CRM_Admin_Form {
    */
   public function addRules() {
     $this->addFormRule(array('CRM_Admin_Form_MailSettings', 'formRule'));
+  }
+
+  public function getDefaultEntity() {
+    return 'MailSettings';
+  }
+
+  /**
+   * Add local and global form rules.
+   */
+  public function setDefaultValues() {
+    $defaults = parent::setDefaultValues();
+
+    // Set activity status to "Completed" by default.
+    if ($this->_action != CRM_Core_Action::DELETE &&
+      (!$this->_id || !CRM_Core_DAO::getFieldValue('CRM_Core_BAO_MailSettings', $this->_id, 'activity_status'))
+    ) {
+      $defaults['activity_status'] = 'Completed';
+    }
+
+    return $defaults;
   }
 
   /**
@@ -140,6 +161,7 @@ class CRM_Admin_Form_MailSettings extends CRM_Admin_Form {
       'source',
       'is_ssl',
       'is_default',
+      'activity_status',
     );
 
     $params = array();

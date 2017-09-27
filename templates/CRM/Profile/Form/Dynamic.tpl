@@ -154,7 +154,7 @@
               {if $n eq 'email_greeting' or  $n eq 'postal_greeting' or $n eq 'addressee'}
                 {include file="CRM/Profile/Form/GreetingType.tpl"}
               {elseif ( $n eq 'group' && $form.group ) || ( $n eq 'tag' && $form.tag )}
-                {include file="CRM/Contact/Form/Edit/TagsAndGroups.tpl" type=$n context="profile"}
+                {include file="CRM/Contact/Form/Edit/TagsAndGroups.tpl" type=$n context="profile" tableLayout=1}
               {elseif ( $form.$n.name eq 'image_URL' )}
                 {$form.$n.html}
                 {if !empty($imageURL)}

@@ -31,11 +31,23 @@ class Manager {
   protected $modules = NULL;
 
   /**
+   * @var \CRM_Utils_Cache_Interface
+   */
+  protected $cache;
+
+  /**
+   * @var array
+   *   Array(string $name => ChangeSet $change).
+   */
+  protected $changeSets = NULL;
+
+  /**
    * @param \CRM_Core_Resources $res
    *   The resource manager.
    */
-  public function __construct($res) {
+  public function __construct($res, \CRM_Utils_Cache_Interface $cache = NULL) {
     $this->res = $res;
+    $this->cache = $cache ? $cache : new \CRM_Utils_Cache_Arraycache(array());
   }
 
   /**
@@ -58,92 +70,39 @@ class Manager {
   public function getModules() {
     if ($this->modules === NULL) {
       $config = \CRM_Core_Config::singleton();
+      global $civicrm_root;
+
+      // Note: It would be nice to just glob("$civicrm_root/ang/*.ang.php"), but at time
+      // of writing CiviMail and CiviCase have special conditionals.
 
       $angularModules = array();
-      $angularModules['angularFileUpload'] = array(
-        'ext' => 'civicrm',
-        'js' => array('bower_components/angular-file-upload/angular-file-upload.min.js'),
-      );
-      $angularModules['crmApp'] = array(
-        'ext' => 'civicrm',
-        'js' => array('ang/crmApp.js'),
-      );
-      $angularModules['crmAttachment'] = array(
-        'ext' => 'civicrm',
-        'js' => array('ang/crmAttachment.js'),
-        'css' => array('ang/crmAttachment.css'),
-        'partials' => array('ang/crmAttachment'),
-        'settings' => array(
-          'token' => \CRM_Core_Page_AJAX_Attachment::createToken(),
-        ),
-      );
-      $angularModules['crmAutosave'] = array(
-        'ext' => 'civicrm',
-        'js' => array('ang/crmAutosave.js'),
-      );
-      $angularModules['crmCxn'] = array(
-        'ext' => 'civicrm',
-        'js' => array('ang/crmCxn.js', 'ang/crmCxn/*.js'),
-        'css' => array('ang/crmCxn.css'),
-        'partials' => array('ang/crmCxn'),
-      );
-      //$angularModules['crmExample'] = array(
-      //  'ext' => 'civicrm',
-      //  'js' => array('ang/crmExample.js'),
-      //  'partials' => array('ang/crmExample'),
-      //);
-      $angularModules['crmResource'] = array(
-        'ext' => 'civicrm',
-        // 'js' => array('js/angular-crmResource/byModule.js'), // One HTTP request per module.
-        'js' => array('js/angular-crmResource/all.js'), // One HTTP request for all modules.
-      );
-      $angularModules['crmUi'] = array(
-        'ext' => 'civicrm',
-        'js' => array('ang/crmUi.js'),
-        'partials' => array('ang/crmUi'),
-      );
-      $angularModules['crmUtil'] = array(
-        'ext' => 'civicrm',
-        'js' => array('ang/crmUtil.js'),
-      );
-      // https://github.com/jwstadler/angular-jquery-dialog-service
-      $angularModules['dialogService'] = array(
-        'ext' => 'civicrm',
-        'js' => array('bower_components/angular-jquery-dialog-service/dialog-service.js'),
-      );
-      $angularModules['ngRoute'] = array(
-        'ext' => 'civicrm',
-        'js' => array('bower_components/angular-route/angular-route.min.js'),
-      );
-      $angularModules['ngSanitize'] = array(
-        'ext' => 'civicrm',
-        'js' => array('bower_components/angular-sanitize/angular-sanitize.min.js'),
-      );
-      $angularModules['ui.utils'] = array(
-        'ext' => 'civicrm',
-        'js' => array('bower_components/angular-ui-utils/ui-utils.min.js'),
-      );
-      $angularModules['ui.sortable'] = array(
-        'ext' => 'civicrm',
-        'js' => array('bower_components/angular-ui-sortable/sortable.min.js'),
-      );
-      $angularModules['unsavedChanges'] = array(
-        'ext' => 'civicrm',
-        'js' => array('bower_components/angular-unsavedChanges/dist/unsavedChanges.min.js'),
-      );
-
-      $angularModules['statuspage'] = array(
-        'ext' => 'civicrm',
-        'js' => array('ang/crmStatusPage.js', 'ang/crmStatusPage/*.js'),
-        'css' => array('ang/crmStatusPage.css'),
-        'partials' => array('ang/crmStatusPage'),
-        'settings' => array(),
-      );
+      $angularModules['angularFileUpload'] = include "$civicrm_root/ang/angularFileUpload.ang.php";
+      $angularModules['crmApp'] = include "$civicrm_root/ang/crmApp.ang.php";
+      $angularModules['crmAttachment'] = include "$civicrm_root/ang/crmAttachment.ang.php";
+      $angularModules['crmAutosave'] = include "$civicrm_root/ang/crmAutosave.ang.php";
+      $angularModules['crmCxn'] = include "$civicrm_root/ang/crmCxn.ang.php";
+      // $angularModules['crmExample'] = include "$civicrm_root/ang/crmExample.ang.php";
+      $angularModules['crmResource'] = include "$civicrm_root/ang/crmResource.ang.php";
+      $angularModules['crmUi'] = include "$civicrm_root/ang/crmUi.ang.php";
+      $angularModules['crmUtil'] = include "$civicrm_root/ang/crmUtil.ang.php";
+      $angularModules['dialogService'] = include "$civicrm_root/ang/dialogService.ang.php";
+      $angularModules['ngRoute'] = include "$civicrm_root/ang/ngRoute.ang.php";
+      $angularModules['ngSanitize'] = include "$civicrm_root/ang/ngSanitize.ang.php";
+      $angularModules['ui.utils'] = include "$civicrm_root/ang/ui.utils.ang.php";
+      $angularModules['ui.bootstrap'] = include "$civicrm_root/ang/ui.bootstrap.ang.php";
+      $angularModules['ui.sortable'] = include "$civicrm_root/ang/ui.sortable.ang.php";
+      $angularModules['unsavedChanges'] = include "$civicrm_root/ang/unsavedChanges.ang.php";
+      $angularModules['statuspage'] = include "$civicrm_root/ang/crmStatusPage.ang.php";
 
       foreach (\CRM_Core_Component::getEnabledComponents() as $component) {
         $angularModules = array_merge($angularModules, $component->getAngularModules());
       }
       \CRM_Utils_Hook::angularModules($angularModules);
+      foreach (array_keys($angularModules) as $module) {
+        if (!isset($angularModules[$module]['basePages'])) {
+          $angularModules[$module]['basePages'] = array('civicrm/a');
+        }
+      }
       $this->modules = $this->resolvePatterns($angularModules);
     }
 
@@ -172,6 +131,59 @@ class Manager {
   }
 
   /**
+   * Resolve a full list of Angular dependencies.
+   *
+   * @param array $names
+   *   List of Angular modules.
+   *   Ex: array('crmMailing').
+   * @return array
+   *   List of Angular modules, include all dependencies.
+   *   Ex: array('crmMailing', 'crmUi', 'crmUtil', 'ngRoute').
+   */
+  public function resolveDependencies($names) {
+    $allModules = $this->getModules();
+    $visited = array();
+    $result = $names;
+    while (($missingModules = array_diff($result, array_keys($visited))) && !empty($missingModules)) {
+      foreach ($missingModules as $module) {
+        $visited[$module] = 1;
+        if (!isset($allModules[$module])) {
+          \Civi::log()->warning('Unrecognized Angular module {name}. Please ensure that all Angular modules are declared.', array(
+            'name' => $module,
+            'civi.tag' => 'deprecated',
+          ));
+        }
+        elseif (isset($allModules[$module]['requires'])) {
+          $result = array_unique(array_merge($result, $allModules[$module]['requires']));
+        }
+      }
+    }
+    sort($result);
+    return $result;
+  }
+
+  /**
+   * Get a list of Angular modules that should be loaded on the given
+   * base-page.
+   *
+   * @param string $basePage
+   *   The name of the base-page for which we want a list of moudles.
+   * @return array
+   *   List of Angular modules.
+   *   Ex: array('crmMailing', 'crmUi', 'crmUtil', 'ngRoute').
+   */
+  public function resolveDefaultModules($basePage) {
+    $modules = $this->getModules();
+    $result = array();
+    foreach ($modules as $moduleName => $module) {
+      if (in_array($basePage, $module['basePages']) || in_array('*', $module['basePages'])) {
+        $result[] = $moduleName;
+      }
+    }
+    return $result;
+  }
+
+  /**
    * Convert any globs in an Angular module to file names.
    *
    * @param array $modules
@@ -196,7 +208,7 @@ class Manager {
   }
 
   /**
-   * Get the partial HTML documents for a module.
+   * Get the partial HTML documents for a module (unfiltered).
    *
    * @param string $name
    *   Angular module name.
@@ -205,7 +217,7 @@ class Manager {
    * @throws \Exception
    *   Invalid partials configuration.
    */
-  public function getPartials($name) {
+  public function getRawPartials($name) {
     $module = $this->getModule($name);
     $result = array();
     if (isset($module['partials'])) {
@@ -217,8 +229,29 @@ class Manager {
           $result[$filename] = file_get_contents($partialDir . '/' . $file);
         }
       }
+      return $result;
     }
     return $result;
+  }
+
+  /**
+   * Get the partial HTML documents for a module.
+   *
+   * @param string $name
+   *   Angular module name.
+   * @return array
+   *   Array(string $extFilePath => string $html)
+   * @throws \Exception
+   *   Invalid partials configuration.
+   */
+  public function getPartials($name) {
+    $cacheKey = "angular-partials::$name";
+    $cacheValue = $this->cache->get($cacheKey);
+    if ($cacheValue === NULL) {
+      $cacheValue = ChangeSet::applyResourceFilters($this->getChangeSets(), 'partials', $this->getRawPartials($name));
+      $this->cache->set($cacheKey, $cacheValue);
+    }
+    return $cacheValue;
   }
 
   /**
@@ -267,19 +300,9 @@ class Manager {
         $result = array_unique(array_merge($result, $strings));
       }
     }
-    if (isset($module['partials'])) {
-      foreach ($module['partials'] as $partialDir) {
-        $partialDir = $this->res->getPath($module['ext']) . '/' . $partialDir;
-        $files = \CRM_Utils_File::findFiles($partialDir, '*.html');
-        foreach ($files as $file) {
-          $strings = $this->res->getStrings()->get(
-            $module['ext'],
-            $file,
-            'text/html'
-          );
-          $result = array_unique(array_merge($result, $strings));
-        }
-      }
+    $partials = $this->getPartials($name);
+    foreach ($partials as $partial) {
+      $result = array_unique(array_merge($result, \CRM_Utils_JS::parseStrings($partial)));
     }
     return $result;
   }
@@ -318,6 +341,7 @@ class Manager {
               break;
 
             case 'settings':
+            case 'requires':
               if (!empty($module[$resType])) {
                 $result[$moduleName] = $module[$resType];
               }
@@ -329,7 +353,29 @@ class Manager {
         }
       }
     }
-    return $result;
+
+    return ChangeSet::applyResourceFilters($this->getChangeSets(), $resType, $result);
+  }
+
+  /**
+   * @return array
+   *   Array(string $name => ChangeSet $changeSet).
+   */
+  public function getChangeSets() {
+    if ($this->changeSets === NULL) {
+      $this->changeSets = array();
+      \CRM_Utils_Hook::alterAngular($this);
+    }
+    return $this->changeSets;
+  }
+
+  /**
+   * @param ChangeSet $changeSet
+   * @return \Civi\Angular\Manager
+   */
+  public function add($changeSet) {
+    $this->changeSets[$changeSet->getName()] = $changeSet;
+    return $this;
   }
 
 }

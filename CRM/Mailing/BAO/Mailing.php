@@ -1014,17 +1014,25 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     $localpart = CRM_Core_BAO_MailSettings::defaultLocalpart();
     $emailDomain = CRM_Core_BAO_MailSettings::defaultDomain();
     $includeMessageId = CRM_Core_BAO_MailSettings::includeMessageId();
-
-    if ($includeMessageId && (!array_key_exists('Message-ID', $headers))) {
-      $headers['Message-ID'] = '<' . implode($config->verpSeparator,
-          array(
-            $localpart . $prefix,
-            $job_id,
-            $event_queue_id,
-            $hash,
-          )
-        ) . "@{$emailDomain}>";
+    $fields = array();
+    $fields[] = 'Message-ID';
+    // CRM-17754 check if Resent-Message-id is set also if not add it in when re-laying reply email
+    if ($prefix == 'r') {
+      $fields[] = 'Resent-Message-ID';
     }
+    foreach ($fields as $field) {
+      if ($includeMessageId && (!array_key_exists($field, $headers))) {
+        $headers[$field] = '<' . implode($config->verpSeparator,
+            array(
+              $localpart . $prefix,
+              $job_id,
+              $event_queue_id,
+              $hash,
+            )
+          ) . "@{$emailDomain}>";
+      }
+    }
+
   }
 
   /**
@@ -1592,10 +1600,18 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     ) {
       $params['replyto_email'] = $params['from_email'];
     }
-
     $mailing->copyValues($params);
 
+    // CRM-20892 Unset Modifed Date here so that MySQL can correctly set an updated modfied date.
+    unset($mailing->modified_date);
     $result = $mailing->save();
+
+    // CRM-20892 Re find record after saing so we can set the updated modified date in the result.
+    $mailing->find(TRUE);
+
+    if (isset($mailing->modified_date)) {
+      $result->modified_date = $mailing->modified_date;
+    }
 
     if (!empty($ids['mailing'])) {
       CRM_Utils_Hook::post('edit', 'Mailing', $mailing->id, $mailing);
@@ -1779,7 +1795,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       // Populate the recipients.
       if (empty($params['_skip_evil_bao_auto_recipients_'])) {
         // check if it's sms
-        $mode = $mailing->sms_provider_id ? 'sms' : NULL;
+        $mode = $mailing->sms_provider_id && $mailing->sms_provider_id != 'null' ? 'sms' : NULL;
         self::getRecipients($job->id, $mailing->id, TRUE, $mailing->dedupe_email, $mode);
       }
       // Schedule the job now that it has recipients.
@@ -1950,8 +1966,9 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       'header' => ts('Header'),
       'footer' => ts('Footer'),
       'reply' => ts('Reply'),
-      'unsubscribe' => ts('Unsubscribe'),
       'optout' => ts('Opt-Out'),
+      'resubscribe' => ts('Resubscribe'),
+      'unsubscribe' => ts('Unsubscribe'),
     );
     foreach (array_keys($components) as $type) {
       $query[] = "SELECT          {$t['component']}.name as name,

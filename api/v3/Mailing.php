@@ -134,7 +134,6 @@ function _civicrm_api3_mailing_gettokens_spec(&$params) {
  */
 function _civicrm_api3_mailing_create_spec(&$params) {
   $params['created_id']['api.default'] = 'user_contact_id';
-  $params['subject']['api.required'] = TRUE;
 
   $params['override_verp']['api.default'] = !CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME, 'track_civimail_replies');
   $params['visibility']['api.default'] = 'Public Pages';

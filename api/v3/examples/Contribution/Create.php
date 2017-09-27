@@ -83,6 +83,7 @@ function contribution_create_expectedresult() {
         'tax_amount' => '',
         'revenue_recognition_date' => '',
         'contribution_type_id' => '1',
+        'invoice_number' => '',
       ),
     ),
   );

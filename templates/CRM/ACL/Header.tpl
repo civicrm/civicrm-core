@@ -23,7 +23,7 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-{capture assign=docLink}{docURL page='user/current/initial-set-up/permissions-and-access-control/' text='Access Control Documentation'}{/capture}
+{capture assign=docLink}{docURL page='user/initial-set-up/permissions-and-access-control/' text='Access Control Documentation'}{/capture}
 
 <div class="help">
   <p>{ts 1=$docLink}ACLs allow you to control access to CiviCRM data. An ACL consists of an <strong>Operation</strong> (e.g. 'View' or 'Edit'), a <strong>set of data</strong> that the operation can be performed on (e.g. a group of contacts), and a <strong>Role</strong> that has permission to do this operation. Refer to the %1 for more info.{/ts}</p>

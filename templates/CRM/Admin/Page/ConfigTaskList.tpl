@@ -35,15 +35,15 @@
         <td colspan="2">{ts}Site Configuration and Registration{/ts}</td>
     </tr>
     <tr class="even">
-        <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/setting/localization" q="reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle}">{ts}Localization{/ts}</a></td>
+        <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/setting/localization" q="reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle|escape}">{ts}Localization{/ts}</a></td>
         <td>{ts}Localization settings include user language, default currency and available countries for address input.{/ts}</td>
     </tr>
     <tr class="even">
-        <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/domain" q="action=update&reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle}">{ts}Organization Address and Contact Info{/ts}</a></td>
+        <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/domain" q="action=update&reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle|escape}">{ts}Organization Address and Contact Info{/ts}</a></td>
         <td>{ts}Organization name, email address for system-generated emails, organization address{/ts}</td>
     </tr>
     <tr class="even">
-        <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/setting/component" q="action=update&reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle}">{ts}Enable components{/ts}</a></td>
+        <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/setting/component" q="action=update&reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle|escape}">{ts}Enable components{/ts}</a></td>
         <td>{ts}Enable the required CiviCRM components.(CiviContribute, CiviEvent etc.){/ts}</td>
     </tr>
     <tr class="even">
@@ -55,27 +55,27 @@
         <td colspan="2">{ts}Viewing and Editing Contacts{/ts}</td>
     </tr>
     <tr class="even">
-        <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/setting/preferences/display" q="reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle}">{ts}Display Preferences{/ts}</a></td>
+        <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/setting/preferences/display" q="reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle|escape}">{ts}Display Preferences{/ts}</a></td>
         <td>{ts}Configure screen and form elements for Viewing Contacts, Editing Contacts, Advanced Search, Contact Dashboard and WYSIWYG Editor.{/ts}</td>
     </tr>
     <tr class="even">
-        <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/setting/preferences/address" q="reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle}">{ts}Address Settings{/ts}</a></td>
+        <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/setting/preferences/address" q="reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle|escape}">{ts}Address Settings{/ts}</a></td>
         <td>{ts}Format addresses in mailing labels, input forms and screen display.{/ts}</td>
     </tr>
     <tr class="even">
-        <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/setting/mapping" q="reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle}">{ts}Mapping and Geocoding{/ts}</a></td>
+        <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/setting/mapping" q="reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle|escape}">{ts}Mapping and Geocoding{/ts}</a></td>
         <td>{ts}Configure a mapping provider (e.g. Google or Yahoo) to display maps for contact addresses and event locations.{/ts}</td>
     </tr>
     <tr class="even">
-        <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/setting/search" q="reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle}">{ts}Search Settings{/ts}</a></td>
+        <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/setting/search" q="reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle|escape}">{ts}Search Settings{/ts}</a></td>
         <td>{ts}Adjust search behaviors including wildcards, and data to include in quick search results. Adjusting search settings can improve performance for larger datasets.{/ts}</td>
     </tr>
     <tr class="even">
-        <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/setting/misc" q="reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle}">{ts}Misc (Undelete, PDFs, Limits, Logging, Captcha, etc.){/ts}</a></td>
+        <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/setting/misc" q="reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle|escape}">{ts}Misc (Undelete, PDFs, Limits, Logging, Captcha, etc.){/ts}</a></td>
         <td>{ts}Version reporting and alerts, reCAPTCHA configuration and attachments.{/ts}</td>
     </tr>
     <tr class="even">
-        <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/options/subtype" q="reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle}">{ts}Contact Types{/ts}</a></td>
+        <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/options/subtype" q="reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle|escape}">{ts}Contact Types{/ts}</a></td>
         <td>{ts}You can modify the names of the built-in contact types (Individual, Household, Organizations), and you can create or modify "contact subtypes" for more specific uses (e.g. Student, Parent, Team, etc.).{/ts}</td>
     </tr>
 
@@ -83,11 +83,11 @@
         <td colspan="2">{ts}Sending Emails (includes contribution receipts and event confirmations){/ts}</td>
     </tr>
     <tr class="even">
-        <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/setting/smtp" q="reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle}">{ts}Outbound Email{/ts}</a></td>
+        <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/setting/smtp" q="reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle|escape}">{ts}Outbound Email{/ts}</a></td>
         <td>{ts}Settings for outbound email - either SMTP server, port and authentication or Sendmail path and argument.{/ts}</td>
     </tr>
     <tr class="even">
-        <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/options/from_email_address" q="reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle}">{ts}From Email Addresses{/ts}</a></td>
+        <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/options/from_email_address" q="reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle|escape}">{ts}From Email Addresses{/ts}</a></td>
         <td>{ts}Define general email address(es) that can be used as the FROM address when sending email to contacts from within CiviCRM (e.g. info@example.org){/ts}</td>
     </tr>
 
@@ -95,7 +95,7 @@
         <td colspan="2">{ts}Online Contributions / Online Membership Signup / Online Event Registration{/ts}</td>
     </tr>
     <tr class="even">
-        <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/paymentProcessor" q="reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle}">{ts}Payment Processors{/ts}</a></td>
+        <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/paymentProcessor" q="reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle|escape}">{ts}Payment Processors{/ts}</a></td>
         <td>{ts}Select and configure one or more payment processing services for online contributions, events and / or membership fees.{/ts}</td>
     </tr>
     {if $config->userSystem->is_drupal EQ '1'}
@@ -109,7 +109,7 @@
         </tr>
     {/if}
     <tr class="even">
-        <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/messageTemplates" q="selectedChild=workflow&reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle}">{ts}System Workflow Templates{/ts}</a></td>
+        <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/messageTemplates" q="selectedChild=workflow&reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle|escape}">{ts}System Workflow Templates{/ts}</a></td>
         <td>{ts}Review and modify the templates used for system-generated emails, including contribution receipts and event registration confirmations.{/ts}</td>
     </tr>
 </table>
@@ -125,11 +125,11 @@
         <td colspan="2">{ts}Organize your contacts{/ts}</td>
     </tr>
     <tr class="even">
-        <td class="tasklist nowrap"><a href="{crmURL p="civicrm/tag" q="reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle}">{ts}Tags (Categories){/ts}</a></td>
+        <td class="tasklist nowrap"><a href="{crmURL p="civicrm/tag" q="reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle|escape}">{ts}Tags (Categories){/ts}</a></td>
         <td>{ts}Tags can be assigned to any contact record, and are a convenient way to find contacts. You can create as many tags as needed to organize and segment your records.{/ts}</td>
     </tr>
     <tr class="even">
-        <td class="tasklist nowrap"><a href="{crmURL p="civicrm/group" q="reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle}">{ts}Manage Groups{/ts}</a></td>
+        <td class="tasklist nowrap"><a href="{crmURL p="civicrm/group" q="reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle|escape}">{ts}Manage Groups{/ts}</a></td>
         <td>{ts}Use Groups to organize contacts (e.g. these contacts are part of our 'Steering Committee').{/ts}</td>
     </tr>
 
@@ -137,11 +137,11 @@
         <td colspan="2">{ts}Customize Data, Forms and Screens{/ts}</td>
     </tr>
     <tr class="even">
-        <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/custom/group" q="reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle}">{ts}Custom Fields{/ts}</a></td>
+        <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/custom/group" q="reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle|escape}">{ts}Custom Fields{/ts}</a></td>
         <td>{ts}Configure custom fields to collect and store custom data which is not included in the standard CiviCRM forms.{/ts}</td>
     </tr>
     <tr class="even">
-        <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/uf/group" q="reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle}">{ts}Profiles{/ts}</a></td>
+        <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/uf/group" q="reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle|escape}">{ts}Profiles{/ts}</a></td>
         <td>{ts}Profiles allow you to aggregate groups of fields and include them in your site as input forms, contact display pages, and search and listings features.{/ts}</td>
     </tr>
 </table>

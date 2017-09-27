@@ -680,12 +680,21 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
 
   /**
    * @dataProvider entities
-   * @expectedException PHPUnit_Framework_Error
    * @param $Entity
    */
   public function testWithoutParam_get($Entity) {
     // should get php complaining that a param is missing
-    $result = civicrm_api($Entity, 'Get');
+    try {
+      $result = civicrm_api($Entity, 'Get');
+      $this->fail('Expected an exception. No exception was thrown.');
+    }
+    // As of php7.1 a new Exception is thrown by PHP ArgumentCountError when not enough params are passed.
+    catch (ArgumentCountError $e) {
+      /* ok */
+    }
+    catch (PHPUnit_Framework_Error $e) {
+      /* ok */
+    }
   }
 
   /**
@@ -1081,6 +1090,9 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     if ($Entity === 'Setting') {
       $this->markTestSkipped('It seems OK for setting to skip here as it silently sips invalid params');
     }
+    elseif ($Entity === 'Mailing') {
+      $this->markTestSkipped('It seems OK for "Mailing" to skip here because you can create empty drafts');
+    }
     // should create php complaining that a param is missing
     civicrm_api3($Entity, 'Create');
   }
@@ -1384,12 +1396,21 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
 
   /**
    * @dataProvider entities
-   * @expectedException PHPUnit_Framework_Error
    * @param $Entity
    */
   public function testWithoutParam_delete($Entity) {
     // should delete php complaining that a param is missing
-    $result = civicrm_api($Entity, 'Delete');
+    try {
+      $result = civicrm_api($Entity, 'Delete');
+      $this->fail('Expected an exception. No exception was thrown.');
+    }
+    // As of php7.1 a new Exception is thrown by PHP ArgumentCountError when not enough params are passed.
+    catch (ArgumentCountError $e) {
+      /* ok */
+    }
+    catch (PHPUnit_Framework_Error $e) {
+      /* ok */
+    }
   }
 
   /**

@@ -53,17 +53,19 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
     $processor = new CRM_Financial_DAO_PaymentProcessor();
     $processor->copyValues($params);
 
-    $ppTypeDAO = new CRM_Financial_DAO_PaymentProcessorType();
-    $ppTypeDAO->id = $params['payment_processor_type_id'];
-    if (!$ppTypeDAO->find(TRUE)) {
-      CRM_Core_Error::fatal(ts('Could not find payment processor meta information'));
-    }
+    if (empty($params['id'])) {
+      $ppTypeDAO = new CRM_Financial_DAO_PaymentProcessorType();
+      $ppTypeDAO->id = $params['payment_processor_type_id'];
+      if (!$ppTypeDAO->find(TRUE)) {
+        CRM_Core_Error::fatal(ts('Could not find payment processor meta information'));
+      }
 
-    // also copy meta fields from the info DAO
-    $processor->is_recur = $ppTypeDAO->is_recur;
-    $processor->billing_mode = $ppTypeDAO->billing_mode;
-    $processor->class_name = $ppTypeDAO->class_name;
-    $processor->payment_type = $ppTypeDAO->payment_type;
+      // also copy meta fields from the info DAO
+      $processor->is_recur = $ppTypeDAO->is_recur;
+      $processor->billing_mode = $ppTypeDAO->billing_mode;
+      $processor->class_name = $ppTypeDAO->class_name;
+      $processor->payment_type = $ppTypeDAO->payment_type;
+    }
 
     $processor->save();
     // CRM-11826, add entry in civicrm_entity_financial_account
@@ -541,6 +543,7 @@ INNER JOIN civicrm_contribution       con ON ( mp.contribution_id = con.id )
         // The function looks to load the payment processor ID from the contribution page, which
         // can support multiple processors.
       }
+      $paymentProcessor['payment_processor_type'] = CRM_Core_PseudoConstant::paymentProcessorType(FALSE, $paymentProcessor['payment_processor_type_id'], 'name');
       $result = Civi\Payment\System::singleton()->getByProcessor($paymentProcessor);
     }
     return $result;

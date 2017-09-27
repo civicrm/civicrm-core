@@ -300,12 +300,12 @@ WHERE  id IN ( $groupIDs )
    * @todo remove last call to this function from outside the class then make function protected,
    * enforce groupID as an array & remove non group handling.
    *
-   * @param int $groupID
+   * @param int $groupIDs
    *   the groupID to delete cache entries, NULL for all groups.
    * @param bool $onceOnly
    *   run the function exactly once for all groups.
    */
-  public static function remove($groupID = NULL, $onceOnly = TRUE) {
+  public static function remove($groupIDs = NULL, $onceOnly = TRUE) {
     static $invoked = FALSE;
 
     // typically this needs to happy only once per instance
@@ -316,21 +316,21 @@ WHERE  id IN ( $groupIDs )
     if (
       $onceOnly &&
       $invoked &&
-      $groupID == NULL
+      $groupIDs == NULL
     ) {
       return;
     }
 
-    if ($groupID == NULL) {
+    if ($groupIDs == NULL) {
       $invoked = TRUE;
     }
-    elseif (is_array($groupID)) {
-      foreach ($groupID as $gid) {
+    elseif (is_array($groupIDs)) {
+      foreach ($groupIDs as $gid) {
         unset(self::$_alreadyLoaded[$gid]);
       }
     }
-    elseif ($groupID && array_key_exists($groupID, self::$_alreadyLoaded)) {
-      unset(self::$_alreadyLoaded[$groupID]);
+    elseif ($groupIDs && array_key_exists($groupIDs, self::$_alreadyLoaded)) {
+      unset(self::$_alreadyLoaded[$groupIDs]);
     }
 
     $refresh = NULL;
@@ -340,7 +340,7 @@ WHERE  id IN ( $groupIDs )
       2 => array(self::getRefreshDateTime(), 'String'),
     );
 
-    if (!isset($groupID)) {
+    if (!isset($groupIDs)) {
       if ($smartGroupCacheTimeout == 0) {
         $query = "
 DELETE FROM civicrm_group_contact_cache
@@ -352,7 +352,6 @@ SET    cache_date = null,
 ";
       }
       else {
-
         $query = "
 DELETE     gc
 FROM       civicrm_group_contact_cache gc
@@ -372,44 +371,49 @@ WHERE  g.cache_date < %1
 AND    refresh_date IS NULL
 ";
       }
-    }
-    elseif (is_array($groupID)) {
-      $groupIDs = implode(', ', $groupID);
-      $query = "
-DELETE     g
-FROM       civicrm_group_contact_cache g
-WHERE      g.group_id IN ( $groupIDs )
-";
-      $update = "
-UPDATE civicrm_group g
-SET    cache_date = null,
-       refresh_date = null
-WHERE  id IN ( $groupIDs )
-";
+
+      CRM_Core_DAO::executeQuery($query, $params);
+      if ($refresh) {
+        CRM_Core_DAO::executeQuery($refresh, $params);
+      }
+      // also update the cache_date for these groups
+      CRM_Core_DAO::executeQuery($update, $params);
     }
     else {
-      $query = "
-DELETE     g
-FROM       civicrm_group_contact_cache g
-WHERE      g.group_id = %1
-";
-      $update = "
-UPDATE civicrm_group g
-SET    cache_date = null,
-       refresh_date = null
-WHERE  id = %1
-";
-      $params = array(1 => array($groupID, 'Integer'));
+      foreach ((array) $groupIDs as $groupID) {
+        self::clearGroupContactCache($groupID);
+      }
     }
+  }
+
+  /**
+   * Function to clear group contact cache and reset the corresponding
+   *  group's cache and refresh date
+   *
+   * @param int $groupID
+   *
+   */
+  public static function clearGroupContactCache($groupID) {
+    $transaction = new CRM_Core_Transaction();
+    $query = "
+    DELETE  g
+      FROM  civicrm_group_contact_cache g
+      WHERE  g.group_id = %1 ";
+
+    $update = "
+  UPDATE civicrm_group g
+    SET    cache_date = null, refresh_date = null
+    WHERE  id = %1 ";
+
+    $params = array(
+      1 => array($groupID, 'Integer'),
+    );
 
     CRM_Core_DAO::executeQuery($query, $params);
-
-    if ($refresh) {
-      CRM_Core_DAO::executeQuery($refresh, $params);
-    }
-
     // also update the cache_date for these groups
     CRM_Core_DAO::executeQuery($update, $params);
+
+    $transaction->commit();
   }
 
   /**
@@ -493,8 +497,9 @@ WHERE  id = %1
   /**
    * Do an opportunistic cache refresh if the site is configured for these.
    *
-   * Sites that do not run the smart group clearing cron job should refresh the caches under an opportunistic mode, akin
-   * to a poor man's cron. The user session will be forced to wait on this so it is less desirable.
+   * Sites that do not run the smart group clearing cron job should refresh the
+   * caches on demand. The user session will be forced to wait so it is less
+   * ideal.
    */
   public static function opportunisticCacheFlush() {
     if (Civi::settings()->get('smart_group_cache_refresh_mode') == 'opportunistic') {

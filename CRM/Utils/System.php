@@ -41,7 +41,7 @@
  * @method static mixed permissionDenied() Show access denied screen.
  * @method static mixed logout() Log out the current user.
  * @method static mixed updateCategories() Clear CMS caches related to the user registration/profile forms.
- * @method static appendBreadCrumb(string $breadCrumbs) Append an additional breadcrumb tag to the existing breadcrumbs.
+ * @method static appendBreadCrumb(array $breadCrumbs) Append an additional breadcrumb tag to the existing breadcrumbs.
  * @method static resetBreadCrumb() Reset an additional breadcrumb tag to the existing breadcrumb.
  * @method static addHTMLHead(string $bc) Append a string to the head of the HTML file.
  * @method static string postURL(int $action) Determine the post URL for a form.
@@ -1391,7 +1391,7 @@ class CRM_Utils_System {
    * @return mixed
    */
   public static function formatDocUrl($url) {
-    return preg_replace('#^user/((\w\w/)?(stable|current)/)?#', 'user/en/stable/', $url);
+    return preg_replace('#^user/#', 'user/en/stable/', $url);
   }
 
   /**

@@ -58,27 +58,6 @@ class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
   }
 
   /**
-   * Get existing / build navigation for CiviCRM Admin Menu.
-   *
-   * @return array
-   *   associated array
-   */
-  public static function getMenus() {
-    $menus = array();
-
-    $menu = new CRM_Core_DAO_Menu();
-    $menu->domain_id = CRM_Core_Config::domainID();
-    $menu->find();
-
-    while ($menu->fetch()) {
-      if ($menu->title) {
-        $menus[$menu->path] = $menu->title;
-      }
-    }
-    return $menus;
-  }
-
-  /**
    * Add/update navigation record.
    *
    * @param array $params Submitted values
@@ -271,26 +250,24 @@ FROM civicrm_navigation WHERE domain_id = $domainID {$whereClause} ORDER BY pare
     $domainID = CRM_Core_Config::domainID();
     $navigationTree = array();
 
-    // get the list of menus
-    $query = "
-SELECT id, label, url, permission, permission_operator, has_separator, parent_id, is_active, name
-FROM civicrm_navigation
-WHERE domain_id = $domainID
-ORDER BY parent_id, weight";
+    $navigationMenu = new self();
+    $navigationMenu->domain_id = $domainID;
+    $navigationMenu->orderBy('parent_id, weight');
+    $navigationMenu->find();
 
-    $navigation = CRM_Core_DAO::executeQuery($query);
-    while ($navigation->fetch()) {
-      $navigationTree[$navigation->id] = array(
+    while ($navigationMenu->fetch()) {
+      $navigationTree[$navigationMenu->id] = array(
         'attributes' => array(
-          'label' => $navigation->label,
-          'name' => $navigation->name,
-          'url' => $navigation->url,
-          'permission' => $navigation->permission,
-          'operator' => $navigation->permission_operator,
-          'separator' => $navigation->has_separator,
-          'parentID' => $navigation->parent_id,
-          'navID' => $navigation->id,
-          'active' => $navigation->is_active,
+          'label' => $navigationMenu->label,
+          'name' => $navigationMenu->name,
+          'url' => $navigationMenu->url,
+          'icon' => $navigationMenu->icon,
+          'permission' => $navigationMenu->permission,
+          'operator' => $navigationMenu->permission_operator,
+          'separator' => $navigationMenu->has_separator,
+          'parentID' => $navigationMenu->parent_id,
+          'navID' => $navigationMenu->id,
+          'active' => $navigationMenu->is_active,
         ),
       );
     }
@@ -439,9 +416,12 @@ ORDER BY parent_id, weight";
       if (!isset($nodes[$origKey]['attributes']['navID'])) {
         $newKey = ++$maxNavID;
         $nodes[$origKey]['attributes']['navID'] = $newKey;
-        $nodes[$newKey] = $nodes[$origKey];
-        unset($nodes[$origKey]);
-        $origKey = $newKey;
+        if ($origKey != $newKey) {
+          // If the keys are different, reset the array index to match.
+          $nodes[$newKey] = $nodes[$origKey];
+          unset($nodes[$origKey]);
+          $origKey = $newKey;
+        }
       }
       if (isset($nodes[$origKey]['child']) && is_array($nodes[$origKey]['child'])) {
         self::_fixNavigationMenu($nodes[$origKey]['child'], $maxNavID, $nodes[$origKey]['attributes']['navID']);
@@ -484,11 +464,14 @@ ORDER BY parent_id, weight";
       if (substr($url, 0, 4) !== 'http') {
         //CRM-7656 --make sure to separate out url path from url params,
         //as we'r going to validate url path across cross-site scripting.
-        $urlParam = explode('?', $url);
-        if (empty($urlParam[1])) {
-          $urlParam[1] = NULL;
+        $parsedUrl = parse_url($url);
+        if (empty($parsedUrl['query'])) {
+          $parsedUrl['query'] = NULL;
         }
-        $url = CRM_Utils_System::url($urlParam[0], $urlParam[1], FALSE, NULL, TRUE);
+        if (empty($parsedUrl['fragment'])) {
+          $parsedUrl['fragment'] = NULL;
+        }
+        $url = CRM_Utils_System::url($parsedUrl['path'], $parsedUrl['query'], FALSE, $parsedUrl['fragment'], TRUE);
       }
       elseif (strpos($url, '&amp;') === FALSE) {
         $url = htmlspecialchars($url);
@@ -542,6 +525,11 @@ ORDER BY parent_id, weight";
         $skipMenuItems[] = $navID;
         return FALSE;
       }
+    }
+
+    if (!empty($value['attributes']['icon'])) {
+      $menuIcon = sprintf('<span class="%s"></span>&nbsp;', $value['attributes']['icon']);
+      $name = $menuIcon . $name;
     }
 
     if ($makeLink) {

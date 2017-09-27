@@ -37,14 +37,14 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
   public $DBResetRequired = FALSE;
   protected $_entity;
   protected $allowedContactId = 0;
+  protected $allowedContacts = array();
 
   public function setUp() {
     parent::setUp();
     $baoObj = new CRM_Core_DAO();
     $baoObj->createTestObject('CRM_Pledge_BAO_Pledge', array(), 1, 0);
     $baoObj->createTestObject('CRM_Core_BAO_Phone', array(), 1, 0);
-    $config = CRM_Core_Config::singleton();
-    $config->userPermissionClass->permissions = array();
+    $this->prepareForACLs();
   }
 
   /**
@@ -52,7 +52,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    * @see CiviUnitTestCase::tearDown()
    */
   public function tearDown() {
-    CRM_Utils_Hook::singleton()->reset();
+    $this->cleanUpAfterACLs();
     $tablesToTruncate = array(
       'civicrm_contact',
       'civicrm_group_contact',
@@ -71,8 +71,6 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
       'civicrm_tag',
     );
     $this->quickCleanup($tablesToTruncate);
-    $config = CRM_Core_Config::singleton();
-    unset($config->userPermissionClass->permissions);
   }
 
   /**
@@ -114,6 +112,23 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
       'check_permissions' => 1,
       'id' => $cid,
     ));
+  }
+
+  /**
+   * Ensure contact permissions do not block contact-less location entities.
+   */
+  public function testAddressWithoutContactIDAccess() {
+    $ownID = $this->createLoggedInUser();
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('access CiviCRM', 'view all contacts');
+    $this->callAPISuccess('Address', 'create', array(
+      'city' => 'Mouseville',
+      'location_type_id' => 'Main',
+      'api.LocBlock.create' => 1,
+      'contact_id' => $ownID,
+    ));
+    $this->callAPISuccessGetSingle('Address', array('city' => 'Mouseville', 'check_permissions' => 1));
+    CRM_Core_DAO::executeQuery('UPDATE civicrm_address SET contact_id = NULL WHERE contact_id = %1', array(1 => array($ownID, 'Integer')));
+    $this->callAPISuccessGetSingle('Address', array('city' => 'Mouseville', 'check_permissions' => 1));
   }
 
   /**
@@ -490,9 +505,9 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
   /**
    * View all activities is required unless id is passed in.
    */
-  public function testGetActivityViewAllContactsNotEnoughWIthoutID() {
+  public function testGetActivityViewAllContactsEnoughWIthoutID() {
     $this->setPermissions(array('view all contacts', 'access CiviCRM'));
-    $this->callAPIFailure('Activity', 'get', array('check_permissions' => 1));
+    $this->callAPISuccess('Activity', 'get', array('check_permissions' => 1));
   }
 
   /**
@@ -557,6 +572,70 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
     $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereHookAllResults'));
     $this->contactDelete($contacts['source_contact_id']);
     $this->callAPISuccess('Activity', 'getsingle', array('check_permissions' => 1, 'id' => $activity['id']));
+  }
+
+  /**
+   * Test get activities multiple ids with check permissions
+   * CRM-20441
+   */
+  public function testActivitiesGetMultipleIdsCheckPermissions() {
+    $this->createLoggedInUser();
+    $activity = $this->activityCreate();
+    $activity2 = $this->activityCreate();
+    $this->setPermissions(array('access CiviCRM'));
+    $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereHookAllResults'));
+    // Get activities associated with contact $this->_contactID.
+    $params = array(
+      'id' => array('IN' => array($activity['id'], $activity2['id'])),
+      'check_permissions' => TRUE,
+    );
+    $result = $this->callAPISuccess('activity', 'get', $params);
+    $this->assertEquals(2, $result['count']);
+  }
+
+  /**
+   * Test get activities multiple ids with check permissions
+   * Limit access to One contact
+   * CRM-20441
+   */
+  public function testActivitiesGetMultipleIdsCheckPermissionsLimitedACL() {
+    $this->createLoggedInUser();
+    $activity = $this->activityCreate();
+    $contacts = $this->getActivityContacts($activity);
+    $this->setPermissions(array('access CiviCRM'));
+    foreach ($contacts as $contact_id) {
+      $this->allowedContacts[] = $contact_id;
+    }
+    $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereMultipleContacts'));
+    $contact2 = $this->individualCreate();
+    $activity2 = $this->activityCreate(array('source_contact_id' => $contact2));
+    // Get activities associated with contact $this->_contactID.
+    $params = array(
+      'id' => array('IN' => array($activity['id'])),
+      'check_permissions' => TRUE,
+    );
+    $result = $this->callAPISuccess('activity', 'get', $params);
+    $this->assertEquals(1, $result['count']);
+    $this->callAPIFailure('activity', 'get', array_merge($params, array('id' => array('IN', array($activity2['id'])))));
+  }
+
+  /**
+   * Test get activities multiple ids with check permissions
+   * CRM-20441
+   */
+  public function testActivitiesGetMultipleIdsCheckPermissionsNotIN() {
+    $this->createLoggedInUser();
+    $activity = $this->activityCreate();
+    $activity2 = $this->activityCreate();
+    $this->setPermissions(array('access CiviCRM'));
+    $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereHookAllResults'));
+    // Get activities associated with contact $this->_contactID.
+    $params = array(
+      'id' => array('NOT IN' => array($activity['id'], $activity2['id'])),
+      'check_permissions' => TRUE,
+    );
+    $result = $this->callAPISuccess('activity', 'get', $params);
+    $this->assertEquals(0, $result['count']);
   }
 
   /**

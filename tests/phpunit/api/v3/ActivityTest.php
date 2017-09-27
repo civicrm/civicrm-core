@@ -447,6 +447,11 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
     require_once 'api/v3/examples/Activity/Create.php';
     $result = activity_create_example();
     $expectedResult = activity_create_expectedresult();
+    // Compare everything *except* timestamps.
+    unset($result['values'][1]['created_date']);
+    unset($result['values'][1]['modified_date']);
+    unset($expectedResult['values'][1]['created_date']);
+    unset($expectedResult['values'][1]['modified_date']);
     $this->assertEquals($result, $expectedResult);
   }
 
@@ -1014,6 +1019,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
    */
   public function testActivityUpdate() {
     $result = $this->callAPISuccess('activity', 'create', $this->_params);
+    $this->_contactID2 = $this->individualCreate();
 
     $params = array(
       'id' => $result['id'],
@@ -1024,6 +1030,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
       'details' => 'Lets update Meeting',
       'status_id' => 1,
       'source_contact_id' => $this->_contactID,
+      'assignee_contact_id' => $this->_contactID2,
       'priority_id' => 1,
     );
 
@@ -1032,6 +1039,26 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
     $params['activity_date_time'] = '2009-10-11 12:34:56';
     // we also unset source_contact_id since it is stored in an aux table
     unset($params['source_contact_id']);
+    //Check if assignee created.
+    $assignee = $this->callAPISuccess('ActivityContact', 'get', array(
+      'activity_id' => $result['id'],
+      'return' => array("contact_id"),
+      'record_type_id' => "Activity Assignees",
+    ));
+    $this->assertNotEmpty($assignee['values']);
+
+    //clear assignee contacts.
+    $updateParams = array(
+      'id' => $result['id'],
+      'assignee_contact_id' => array(),
+    );
+    $activity = $this->callAPISuccess('activity', 'create', $updateParams);
+    $assignee = $this->callAPISuccess('ActivityContact', 'get', array(
+      'activity_id' => $activity['id'],
+      'return' => array("contact_id"),
+      'record_type_id' => "Activity Assignees",
+    ));
+    $this->assertEmpty($assignee['values']);
     $this->getAndCheck($params, $result['id'], 'activity');
   }
 
@@ -1352,6 +1379,9 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
     }
   }
 
+  /**
+   * Test or operator in api params
+   */
   public function testGetWithOr() {
     $acts = array(
       'test or 1' => 'orOperator',
@@ -1379,6 +1409,47 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
       'options' => array('or' => array(array('details', 'subject'))),
     ));
     $this->assertEquals(3, $result['count']);
+  }
+
+  /**
+   * Test handling of is_overdue calculated field
+   */
+  public function testGetOverdue() {
+    $overdueAct = $this->callAPISuccess('Activity', 'create', array(
+        'activity_date_time' => 'now - 1 week',
+        'status_id' => 'Scheduled',
+      ) + $this->_params
+    );
+    $completedAct = $this->callAPISuccess('Activity', 'create', array(
+        'activity_date_time' => 'now - 1 week',
+        'status_id' => 'Completed',
+      ) + $this->_params
+    );
+    $ids = array($overdueAct['id'], $completedAct['id']);
+
+    // Test sorting
+    $completedFirst = $this->callAPISuccess('Activity', 'get', array(
+      'id' => array('IN' => $ids),
+      'options' => array('sort' => 'is_overdue ASC'),
+    ));
+    $this->assertEquals(array_reverse($ids), array_keys($completedFirst['values']));
+    $overdueFirst = $this->callAPISuccess('Activity', 'get', array(
+      'id' => array('IN' => $ids),
+      'options' => array('sort' => 'is_overdue DESC'),
+      'return' => 'is_overdue',
+    ));
+    $this->assertEquals($ids, array_keys($overdueFirst['values']));
+
+    // Test return value
+    $this->assertEquals(1, $overdueFirst['values'][$overdueAct['id']]['is_overdue']);
+    $this->assertEquals(0, $overdueFirst['values'][$completedAct['id']]['is_overdue']);
+
+    // Test filtering
+    $onlyOverdue = $this->callAPISuccess('Activity', 'get', array(
+      'id' => array('IN' => $ids),
+      'is_overdue' => 1,
+    ));
+    $this->assertEquals(array($overdueAct['id']), array_keys($onlyOverdue['values']));
   }
 
 }

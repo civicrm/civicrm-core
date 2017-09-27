@@ -271,13 +271,26 @@
   </foreignKey>
   <field>
     <name>created_date</name>
-    <type>datetime</type>
+    <type>timestamp</type>
+    <default>NULL</default>
+    <required>false</required>
     <title>Mailing Created Date</title>
     <comment>Date and time this mailing was created.</comment>
     <add>3.0</add>
     <html>
       <type>Select Date</type>
+      <formatType>activityDateTime</formatType>
     </html>
+  </field>
+  <field>
+   <name>modified_date</name>
+   <uniqueName>mailing_modified_date</uniqueName>
+   <type>timestamp</type>
+   <comment>When the mailing (or closely related entity) was created or modified or deleted.</comment>
+   <required>false</required>
+   <export>true</export>
+   <default>CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP</default>
+   <add>4.7</add>
   </field>
   <field>
     <name>scheduled_id</name>
@@ -293,10 +306,16 @@
   </foreignKey>
   <field>
     <name>scheduled_date</name>
-    <type>datetime</type>
+    <type>timestamp</type>
+    <default>NULL</default>
+    <required>false</required>
     <title>Mailing Scheduled Date</title>
     <comment>Date and time this mailing was scheduled.</comment>
     <add>3.3</add>
+    <html>
+      <type>Select Date</type>
+      <formatType>activityDateTime</formatType>
+    </html>
   </field>
   <field>
     <name>approver_id</name>
@@ -312,10 +331,16 @@
   </foreignKey>
   <field>
     <name>approval_date</name>
-    <type>datetime</type>
+    <type>timestamp</type>
+    <default>NULL</default>
+    <required>false</required>
     <title>Mailing Approved Date</title>
     <comment>Date and time this mailing was approved.</comment>
     <add>3.3</add>
+    <html>
+      <type>Select Date</type>
+      <formatType>activityDateTime</formatType>
+    </html>
   </field>
   <field>
     <name>approval_status_id</name>

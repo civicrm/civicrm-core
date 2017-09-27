@@ -533,58 +533,44 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
 
     //Hack for Formatting Field Name
     if ($params['field_name'][0] == 'Formatting') {
-      $params['field_name'][1] = 'formatting_' . rand(1000, 9999);
+      $fieldName = 'formatting_' . rand(1000, 9999);
+    }
+    else {
+      $fieldName = $params['field_name'][1];
     }
 
     //check for duplicate fields
-    if ($params["field_name"][0] != "Formatting" && CRM_Core_BAO_UFField::duplicateField($params, array('uf_group' => $params['uf_group_id'], 'uf_field' => $params['id']))) {
-      CRM_Core_Session::setStatus(ts('The selected field already exists in this profile.'), ts('Field Not Added'), 'error');
-      return;
+    $apiFormattedParams = $params;
+    $apiFormattedParams['field_type'] = $params['field_name'][0];
+    $apiFormattedParams['field_name'] = $fieldName;
+    if (!empty($params['field_name'][2])) {
+      if ($fieldName === 'url') {
+        $apiFormattedParams['website_type_id'] = $params['field_name'][2];
+      }
+      else {
+        $apiFormattedParams['location_type_id'] = $params['field_name'][2];
+      }
+    }
+    if (!empty($params['field_name'][3])) {
+      $apiFormattedParams['phone_type_id'] = $params['field_name'][3];
+    }
+
+    if ($apiFormattedParams['field_type'] != "Formatting" && CRM_Core_BAO_UFField::duplicateField($apiFormattedParams)) {
+      CRM_Core_Error::statusBounce(ts('The selected field already exists in this profile.'), NULL, ts('Field Not Added'));
     }
     else {
-      $params['weight'] = CRM_Core_BAO_UFField::autoWeight($params);
-      $ufField = CRM_Core_BAO_UFField::add($params);
+      $apiFormattedParams['weight'] = CRM_Core_BAO_UFField::autoWeight($params);
+      civicrm_api3('UFField', 'create', $apiFormattedParams);
 
       //reset other field is searchable and in selector settings, CRM-4363
       if ($this->_hasSearchableORInSelector &&
-        in_array($ufField->field_type, array('Participant', 'Contribution', 'Membership', 'Activity', 'Case'))
+        in_array($apiFormattedParams['field_type'], array('Participant', 'Contribution', 'Membership', 'Activity', 'Case'))
       ) {
         CRM_Core_BAO_UFField::resetInSelectorANDSearchable($this->_gid);
       }
 
-      $config = CRM_Core_Config::singleton();
-      $showBestResult = FALSE;
-      if (in_array($ufField->field_name, array(
-        'country',
-        'state_province',
-      )) && count($config->countryLimit) > 1
-      ) {
-        // get state or country field weight if exists
-        $field = 'state_province';
-        if ($ufField->field_name == 'state_province') {
-          $field = 'country';
-        }
-        $ufFieldDAO = new CRM_Core_DAO_UFField();
-        $ufFieldDAO->field_name = $field;
-        $ufFieldDAO->location_type_id = $ufField->location_type_id;
-        $ufFieldDAO->uf_group_id = $ufField->uf_group_id;
+      $this->setMessageIfCountryNotAboveState($fieldName, CRM_Utils_Array::value('location_type_id', $apiFormattedParams), $apiFormattedParams['weight'], $apiFormattedParams['uf_group_id']);
 
-        if ($ufFieldDAO->find(TRUE)) {
-          if ($field == 'country' && $ufFieldDAO->weight > $ufField->weight) {
-            $showBestResult = TRUE;
-          }
-          elseif ($field == 'state_province' && $ufFieldDAO->weight < $ufField->weight) {
-            $showBestResult = TRUE;
-          }
-        }
-      }
-
-      //update group_type every time. CRM-3608
-      if ($this->_gid && is_a($ufField, 'CRM_Core_DAO_UFField')) {
-        // get the profile type.
-        $fieldsType = CRM_Core_BAO_UFGroup::calculateGroupType($this->_gid, TRUE);
-        CRM_Core_BAO_UFGroup::updateGroupTypes($this->_gid, $fieldsType);
-      }
       CRM_Core_Session::setStatus(ts('Your CiviCRM Profile Field \'%1\' has been saved to \'%2\'.',
         array(1 => $name, 2 => $this->_title)
       ), ts('Profile Field Saved'), 'success');
@@ -594,14 +580,13 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
     $session = CRM_Core_Session::singleton();
     if ($buttonName == $this->getButtonName('next', 'new')) {
       $session->replaceUserContext(CRM_Utils_System::url('civicrm/admin/uf/group/field/add',
-        "reset=1&action=add&gid={$this->_gid}&sbr={$showBestResult}"
+        "reset=1&action=add&gid={$this->_gid}"
       ));
     }
     else {
       $session->replaceUserContext(CRM_Utils_System::url('civicrm/admin/uf/group/field',
         "reset=1&action=browse&gid={$this->_gid}"
       ));
-      $session->set('showBestResult', $showBestResult);
     }
   }
 
@@ -1004,6 +989,39 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
         }
     }
     return empty($errors) ? TRUE : $errors;
+  }
+
+  /**
+   * Set a message warning the user about putting country first to render states, if required.
+   *
+   * @param string $fieldName
+   * @param int $locationTypeID
+   * @param int $weight
+   * @param int $ufGroupID
+   */
+  protected function setMessageIfCountryNotAboveState($fieldName, $locationTypeID, $weight, $ufGroupID) {
+    $message = ts('For best results, the Country field should precede the State-Province field in your Profile form. You can use the up and down arrows on field listing page for this profile to change the order of these fields or manually edit weight for Country/State-Province Field.');
+
+    if (in_array($fieldName, array(
+        'country',
+        'state_province',
+      )) && count(CRM_Core_Config::singleton()->countryLimit) > 1
+    ) {
+      // get state or country field weight if exists
+      $ufFieldDAO = new CRM_Core_DAO_UFField();
+      $ufFieldDAO->field_name = ($fieldName == 'state_province' ? 'country' : 'state_province');
+      $ufFieldDAO->location_type_id = $locationTypeID;
+      $ufFieldDAO->uf_group_id = $ufGroupID;
+
+      if ($ufFieldDAO->find(TRUE)) {
+        if ($ufFieldDAO->field_name == 'country' && $ufFieldDAO->weight > $weight) {
+          CRM_Core_Session::setStatus($message);
+        }
+        elseif ($ufFieldDAO->field_name == 'state_province' && $ufFieldDAO->weight < $weight) {
+          CRM_Core_Session::setStatus($message);
+        }
+      }
+    }
   }
 
 }

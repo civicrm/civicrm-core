@@ -226,7 +226,7 @@
   </field>
   <field>
     <name>invoice_id</name>
-    <title>Invoice ID</title>
+    <title>Invoice Reference</title>
     <type>varchar</type>
     <length>255</length>
     <import>true</import>
@@ -236,7 +236,20 @@
       <type>Text</type>
     </html>
     <add>1.3</add>
-    </field>
+  </field>
+  <field>
+    <name>invoice_number</name>
+    <title>Invoice Number</title>
+    <type>varchar</type>
+    <length>255</length>
+    <import>true</import>
+    <headerPattern>/invoice(.?number)?/i</headerPattern>
+    <comment>Human readable invoice number</comment>
+    <html>
+      <type>Text</type>
+    </html>
+    <add>4.7</add>
+  </field>
   <field>
     <name>currency</name>
     <type>varchar</type>

@@ -92,6 +92,8 @@ $('#civicrm-menu').ready(function() {
   $('#sort_name_navigation')
     .autocomplete({
       source: function(request, response) {
+        //start spinning the civi logo
+        $('.crm-logo-sm').addClass('crm-i fa-spin fa-pulse');
         var
           option = $('input[name=quickSearchField]:checked'),
           params = {
@@ -117,6 +119,8 @@ $('#civicrm-menu').ready(function() {
             ret.push({value: '0', label: msg});
           }
           response(ret);
+          //stop spinning the civi logo
+          $('.crm-logo-sm').removeClass('crm-i fa-spin fa-pulse');          
         })
       },
       focus: function (event, ui) {
@@ -204,4 +208,7 @@ $('#civicrm-menu').ready(function() {
   $('#root-menu-div').on('click', 'a', $.Menu.closeAll);
 });
 $('#civicrm-menu').menuBar({arrowSrc: CRM.config.resourceBase + 'packages/jquery/css/images/arrow.png'});
+$(window).on("beforeunload", function() {
+  $('.crm-logo-sm', '#civicrm-menu').addClass('crm-i fa-spin fa-pulse');
+});
 })(CRM.$);{/literal}

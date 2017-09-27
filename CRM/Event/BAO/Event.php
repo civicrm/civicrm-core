@@ -186,15 +186,26 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
     $extends = array('event');
     $groupTree = CRM_Core_BAO_CustomGroup::getGroupDetail(NULL, NULL, $extends);
     foreach ($groupTree as $values) {
-      $query = "DELETE FROM " . $values['table_name'] . " WHERE entity_id = " . $id;
-
-      $params = array(
-        1 => array($values['table_name'], 'string'),
-        2 => array($id, 'integer'),
-      );
-
-      CRM_Core_DAO::executeQuery($query);
+      $query = "DELETE FROM %1 WHERE entity_id = %2";
+      CRM_Core_DAO::executeQuery($query, array(
+        1 => array($values['table_name'], 'String', CRM_Core_DAO::QUERY_FORMAT_NO_QUOTES),
+        2 => array($id, 'Integer'),
+      ));
     }
+
+    // Clean up references to profiles used by the event (CRM-20935)
+    $ufJoinParams = array(
+      'module' => 'CiviEvent',
+      'entity_table' => 'civicrm_event',
+      'entity_id' => $id,
+    );
+    CRM_Core_BAO_UFJoin::deleteAll($ufJoinParams);
+    $ufJoinParams = array(
+      'module' => 'CiviEvent_Additional',
+      'entity_table' => 'civicrm_event',
+      'entity_id' => $id,
+    );
+    CRM_Core_BAO_UFJoin::deleteAll($ufJoinParams);
 
     // price set cleanup, CRM-5527
     CRM_Price_BAO_PriceSet::removeFrom('civicrm_event', $id);
@@ -1664,7 +1675,9 @@ WHERE  id = $cfID
               $htmlType = $dao->html_type;
 
               if ($htmlType == 'File') {
-                $values[$index] = $params[$index];
+                $path = CRM_Utils_Array::value('name', $params[$name]);
+                $fileType = CRM_Utils_Array::value('type', $params[$name]);
+                $values[$index] = CRM_Utils_File::getFileURL($path, $fileType);
               }
               else {
                 if ($dao->data_type == 'Int' ||
@@ -1889,6 +1902,9 @@ WHERE  id = $cfID
       'check_permissions' => TRUE,
       'return' => $ret,
       'loc_block_id.address_id' => array('IS NOT NULL' => 1),
+      'options' => array(
+        'limit' => 0,
+      ),
     ));
 
     foreach ($result['values'] as $event) {
@@ -2053,6 +2069,9 @@ WHERE  ce.loc_block_id = $locBlockId";
       $result = civicrm_api3('Event', 'get', array(
         'check_permissions' => 1,
         'return' => 'title',
+        'options' => array(
+          'limit' => 0,
+        ),
       ));
       $allEvents = CRM_Utils_Array::collect('title', $result['values']);
 
@@ -2060,6 +2079,9 @@ WHERE  ce.loc_block_id = $locBlockId";
         'check_permissions' => 1,
         'return' => 'title',
         'created_id' => 'user_contact_id',
+        'options' => array(
+          'limit' => 0,
+        ),
       ));
       $createdEvents = CRM_Utils_Array::collect('title', $result['values']);
 

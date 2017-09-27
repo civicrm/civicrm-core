@@ -106,7 +106,7 @@ class CRM_Logging_Differ {
           break;
 
         case 'civicrm_activity':
-          $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
+          $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
           $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
           $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
           $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);

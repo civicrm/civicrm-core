@@ -69,6 +69,15 @@ class api_v3_PcpTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test disable a PCP succeeds.
+   */
+  public function testDisablePcp() {
+    $result = civicrm_api3('Pcp', 'create', $this->params);
+    civicrm_api3('Pcp', 'create', array('id' => $result['id'], 'is_active' => 0));
+    $this->getAndCheck($this->params + array('is_active' => 0), $result['id'], $this->entity);
+  }
+
+  /**
    * Test get function succeeds.
    *
    * This is actually largely tested in the get

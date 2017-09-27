@@ -276,10 +276,15 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
    * CRM-14720
    */
   public function testNumericPostal() {
+    // Precaution as hitting some inconsistent set up running in isolation vs in the suite.
+    CRM_Core_DAO::executeQuery('UPDATE civicrm_address SET postal_code = NULL');
+
     $this->individualCreate(array('api.address.create' => array('postal_code' => 5, 'location_type_id' => 'Main')));
     $this->individualCreate(array('api.address.create' => array('postal_code' => 'EH10 4RB-889', 'location_type_id' => 'Main')));
     $this->individualCreate(array('api.address.create' => array('postal_code' => '4', 'location_type_id' => 'Main')));
     $this->individualCreate(array('api.address.create' => array('postal_code' => '6', 'location_type_id' => 'Main')));
+    $this->individualCreate(array('api.address.create' => array('street_address' => 'just a street', 'location_type_id' => 'Main')));
+    $this->individualCreate(array('api.address.create' => array('postal_code' => '12345678444455555555555555555555555555555555551314151617181920', 'location_type_id' => 'Main')));
 
     $params = array(array('postal_code_low', '=', 5, 0, 0));
     CRM_Contact_BAO_Query::convertFormValues($params);

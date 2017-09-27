@@ -353,6 +353,30 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
   }
 
   /**
+   * CRM-20037: Test balance due amount, if contribution is done using deferred Financial Type
+   */
+  public function testBalanceDueIfDeferredRevenueEnabled() {
+    Civi::settings()->set('contribution_invoice_settings', array('deferred_revenue_enabled' => '1'));
+    $deferredFinancialTypeID = $this->_createDeferredFinancialAccount();
+
+    $totalAmount = 100.00;
+    $contribution = $this->callAPISuccess('Contribution', 'create', array(
+      'contact_id' => $this->individualCreate(),
+      'receive_date' => '20120511',
+      'total_amount' => $totalAmount,
+      'financial_type_id' => $deferredFinancialTypeID,
+      'non_deductible_amount' => 10.00,
+      'fee_amount' => 5.00,
+      'net_amount' => 95.00,
+      'source' => 'SSF',
+      'contribution_status_id' => 1,
+    ));
+    $balance = CRM_Core_BAO_FinancialTrxn::getPartialPaymentWithType($contribution['id'], 'contribution', FALSE, $totalAmount);
+    $this->assertEquals(0.0, $balance);
+    Civi::settings()->revert('contribution_invoice_settings');
+  }
+
+  /**
    * Helper function to create deferred financial account.
    */
   public function _createDeferredFinancialAccount() {

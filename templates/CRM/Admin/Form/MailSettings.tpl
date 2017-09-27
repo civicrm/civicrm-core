@@ -67,7 +67,20 @@
 
   <tr class="crm-mail-settings-form-block-is_default"><td class="label">{$form.is_default.label}</td><td>{$form.is_default.html}</td></tr>
   <tr><td class="label">&nbsp;</td><td class="description">{ts}How this mail account will be used. Only one box may be used for bounce processing. It will also be used as the envelope email when sending mass mailings.{/ts}</td></tr>
+
+  <tr class="crm-mail-settings-form-block-activity_status"><td class="label">{$form.activity_status.label}</td><td>{$form.activity_status.html}</td></tr>
     </table>
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 {/if}
 </div>
+{literal}
+<script type="text/javascript">
+  CRM.$(function($) {
+    var $form = $('form.{/literal}{$form.formClass}{literal}');
+    function showActivityStatus() {
+      $('.crm-mail-settings-form-block-activity_status', $form).toggle($(this).val() === '0');
+    }
+    $('select[name=is_default]').each(showActivityStatus).change(showActivityStatus);
+  });
+</script>
+{/literal}

@@ -27,7 +27,7 @@
   {ts}Thank-you and Receipting{/ts}
 {/htxt}
 {htxt id="id_thank"}
-  <p>{ts}Use this form to configure the thank-you message and receipting options for this online contribution page. Contributors will see a thank-you page whenever an online contribution is successfully processed. You provide the content and layout of the thank-you section below. You also control whether an electronic receipt is automatically emailed to each contributor - and can add a custom message to that receipt.{/ts}</p>
+  <p>{ts}Use this form to configure the thank-you message and receipting options for this online contribution page. Contributors will see a thank-you page whenever an online contribution is successfully processed. You provide the content and layout of the thank-you section below. You also control whether an electronic receipt is automatically emailed to each contributor, and you can add a custom message to that receipt.{/ts}</p>
 {/htxt}
 
 {htxt id="id_thankyou-title-title"}

@@ -552,7 +552,6 @@ WHERE li.contribution_id = %1";
    * @param bool $isRelatedID
    */
   public static function getLineItemArray(&$params, $entityId = NULL, $entityTable = 'contribution', $isRelatedID = FALSE) {
-
     if (!$entityId) {
       $priceSetDetails = CRM_Price_BAO_PriceSet::getDefaultPriceSet($entityTable);
       $totalAmount = CRM_Utils_Array::value('partial_payment_total', $params, CRM_Utils_Array::value('total_amount', $params));
@@ -603,6 +602,560 @@ WHERE li.contribution_id = %1";
         }
       }
     }
+  }
+
+  /**
+   * Function to update related contribution of a entity and
+   *  add/update/cancel financial records
+   *
+   * @param array $params
+   * @param int $entityID
+   * @param int $entity
+   * @param int $contributionId
+   * @param $feeBlock
+   * @param array $lineItems
+   * @param $paidAmount
+   *
+   */
+  public static function changeFeeSelections(
+    $params,
+    $entityID,
+    $entity,
+    $contributionId,
+    $feeBlock,
+    $lineItems,
+    $paidAmount
+  ) {
+    $entityTable = "civicrm_" . $entity;
+    CRM_Price_BAO_PriceSet::processAmount($feeBlock,
+      $params, $lineItems
+    );
+    // initialize empty Lineitem instance to call protected helper functions
+    $lineItemObj = new CRM_Price_BAO_LineItem();
+
+    // fetch submitted LineItems from input params and feeBlock information
+    $submittedLineItems = $lineItemObj->_getSubmittedLineItems($params, $feeBlock);
+
+    // retrieve the submitted price field value IDs from $submittedLineItems array keys
+    $submittedPriceFieldValueIDs = empty($submittedLineItems) ? array() : array_keys($submittedLineItems);
+
+    // get lineItems need to be updated and added to record changed fee
+    list($lineItemsToAdd, $lineItemsToUpdate) = $lineItemObj->_getLineItemsToAddAndUpdate($submittedLineItems, $entityID, $entity);
+
+    // cancel previous line item
+    $additionalWhereClause = empty($submittedPriceFieldValueIDs) ? NULL : sprintf("price_field_value_id NOT IN (%s)", implode(', ', $submittedPriceFieldValueIDs));
+    $lineItemObj->_cancelLineItems($entityID, $entityTable, $additionalWhereClause);
+
+    // get financial information that need to be recorded on basis on submitted price field value IDs
+    $financialItemsArray = $lineItemObj->_getFinancialItemsToRecord(
+      $entityID,
+      $entityTable,
+      $contributionId,
+      $submittedPriceFieldValueIDs
+    );
+
+    // update line item with changed line total and other information
+    $totalParticipant = $participantCount = 0;
+    $amountLevel = array();
+    if (!empty($lineItemsToUpdate)) {
+      foreach ($lineItemsToUpdate as $priceFieldValueID => $value) {
+        $taxAmount = "NULL";
+        if (isset($value['tax_amount'])) {
+          $taxAmount = $value['tax_amount'];
+        }
+        $amountLevel[] = $value['label'] . ' - ' . (float) $value['qty'];
+        if ($entity == 'participant' && isset($value['participant_count'])) {
+          $participantCount = $value['participant_count'];
+          $totalParticipant += $value['participant_count'];
+        }
+        $updateLineItemSQL = "
+        UPDATE civicrm_line_item li
+        SET li.qty = {$value['qty']},
+            li.line_total = {$value['line_total']},
+            li.tax_amount = {$taxAmount},
+            li.unit_price = {$value['unit_price']},
+            li.participant_count = {$participantCount},
+            li.label = %1
+      WHERE (li.entity_table = '{$entityTable}' AND li.entity_id = {$entityID}) AND
+        (price_field_value_id = {$priceFieldValueID}) ";
+
+        CRM_Core_DAO::executeQuery($updateLineItemSQL, array(1 => array($value['label'], 'String')));
+      }
+    }
+
+    // insert new 'adjusted amount' transaction entry and update contribution entry.
+    // ensure entity_financial_trxn table has a linking of it.
+    // insert new line items
+    $lineItemObj->_addLineItemOnChangeFeeSelection($lineItemsToAdd, $entityID, $entityTable, $contributionId);
+
+    // the recordAdjustedAmt code would execute over here
+    $count = 0;
+    if ($entity == 'participant') {
+      $count = count(CRM_Event_BAO_Participant::getParticipantIds($contributionId));
+    }
+    else {
+      $count = CRM_Utils_Array::value('count', civicrm_api3('MembershipPayment', 'getcount', array('contribution_id' => $contributionId)));
+    }
+    if ($count > 1) {
+      $updatedAmount = CRM_Price_BAO_LineItem::getLineTotal($contributionId);
+    }
+    else {
+      $updatedAmount = CRM_Utils_Array::value('amount', $params, CRM_Utils_Array::value('total_amount', $params));
+    }
+    if (strlen($params['tax_amount']) != 0) {
+      $taxAmount = $params['tax_amount'];
+    }
+    else {
+      $taxAmount = "NULL";
+    }
+    $displayParticipantCount = '';
+    if ($totalParticipant > 0) {
+      $displayParticipantCount = ' Participant Count -' . $totalParticipant;
+    }
+    $updateAmountLevel = NULL;
+    if (!empty($amountLevel)) {
+      $updateAmountLevel = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, $amountLevel) . $displayParticipantCount . CRM_Core_DAO::VALUE_SEPARATOR;
+    }
+    $trxn = $lineItemObj->_recordAdjustedAmt($updatedAmount, $paidAmount, $contributionId, $taxAmount, $updateAmountLevel);
+
+    $contributionCompletedStatusID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_DAO_Contribution', 'contribution_status_id', 'Completed');
+    if (!empty($financialItemsArray)) {
+      foreach ($financialItemsArray as $updateFinancialItemInfoValues) {
+        $newFinancialItem = CRM_Financial_BAO_FinancialItem::create($updateFinancialItemInfoValues);
+        // record reverse transaction only if Contribution is Completed because for pending refund or
+        //   partially paid we are already recording the surplus owed or refund amount
+        if (!empty($updateFinancialItemInfoValues['financialTrxn']) && ($contributionCompletedStatusID ==
+          CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $contributionId, 'contribution_status_id'))
+        ) {
+          $updateFinancialItemInfoValues = array_merge($updateFinancialItemInfoValues['financialTrxn'], array(
+            'entity_id' => $newFinancialItem->id,
+            'entity_table' => 'civicrm_financial_item',
+          ));
+          $reverseTrxn = CRM_Core_BAO_FinancialTrxn::create($updateFinancialItemInfoValues);
+          // record reverse entity financial trxn linked to membership's related contribution
+          civicrm_api3('EntityFinancialTrxn', 'create', array(
+            'entity_table' => "civicrm_contribution",
+            'entity_id' => $contributionId,
+            'financial_trxn_id' => $reverseTrxn->id,
+            'amount' => $reverseTrxn->total_amount,
+          ));
+          unset($updateFinancialItemInfoValues['financialTrxn']);
+        }
+        if (!empty($updateFinancialItemInfoValues['tax'])) {
+          $updateFinancialItemInfoValues['tax']['amount'] = $updateFinancialItemInfoValues['amount'];
+          $updateFinancialItemInfoValues['tax']['description'] = $updateFinancialItemInfoValues['description'];
+          if (!empty($updateFinancialItemInfoValues['financial_account_id'])) {
+            $updateFinancialItemInfoValues['financial_account_id'] = $updateFinancialItemInfoValues['tax']['financial_account_id'];
+          }
+          CRM_Financial_BAO_FinancialItem::create($updateFinancialItemInfoValues);
+        }
+      }
+    }
+
+    $trxnId = array();
+    if (!empty($trxn->id)) {
+      $trxnId['id'] = $trxn->id;
+    }
+    $lineItemObj->_addLineItemOnChangeFeeSelection($lineItemsToAdd, $entityID, $entityTable, $contributionId, $trxnId, TRUE);
+
+    // update participant fee_amount column
+    $lineItemObj->_updateEntityRecordOnChangeFeeSelection($params, $entityID, $entity);
+  }
+
+  /**
+   * Function to cancel Lineitem whose corrosponding price field option is
+   *  unselected on membership or participant backoffice form
+   *
+   * @param int $entityID
+   * @param string $entityTable
+   * @param string $additionalWhereClause
+   *
+   */
+  protected function _cancelLineItems($entityID, $entityTable, $additionalWhereClause = NULL) {
+    $whereClauses = array(
+      "li.entity_id = %1",
+      "li.entity_table = %2",
+    );
+    if ($additionalWhereClause) {
+      $whereClauses[] = $additionalWhereClause;
+    }
+
+    $where = implode(' AND ', $whereClauses);
+    $sql = "
+      UPDATE civicrm_line_item li
+        INNER JOIN civicrm_financial_item fi ON (li.id = fi.entity_id AND fi.entity_table = 'civicrm_line_item')
+      SET li.qty = 0,
+        li.line_total = 0.00,
+        li.tax_amount = NULL,
+        li.participant_count = 0,
+        li.non_deductible_amount = 0.00
+      WHERE {$where} ";
+
+    CRM_Core_DAO::executeQuery($sql, array(
+      1 => array($entityID, 'Integer'),
+      2 => array($entityTable, 'String'),
+    ));
+  }
+
+  /**
+   * Function to retrieve formatted financial items that need to be recorded as result of changed fee
+   *
+   * @param int $entityID
+   * @param string $entityTable
+   * @param int $contributionID
+   * @param array $submittedPriceFieldValueIDs
+   *
+   * @return array
+   *      List of formatted Financial Items to be recorded
+   */
+  protected function _getFinancialItemsToRecord($entityID, $entityTable, $contributionID, $submittedPriceFieldValueIDs) {
+    $previousLineItems = CRM_Price_BAO_LineItem::getLineItems($entityID, str_replace('civicrm_', '', $entityTable));
+
+    $financialItemsArray = array();
+
+    if (empty($submittedPriceFieldValueIDs)) {
+      return $financialItemsArray;
+    }
+
+    // gathering necessary info to record negative (deselected) financial_item
+    $updateFinancialItem = "
+  SELECT fi.*, SUM(fi.amount) as differenceAmt, price_field_value_id, financial_type_id, tax_amount
+    FROM civicrm_financial_item fi LEFT JOIN civicrm_line_item li ON (li.id = fi.entity_id AND fi.entity_table = 'civicrm_line_item')
+  WHERE (li.entity_table = '{$entityTable}' AND li.entity_id = {$entityID})
+  GROUP BY li.entity_table, li.entity_id, price_field_value_id, fi.id
+    ";
+    $updateFinancialItemInfoDAO = CRM_Core_DAO::executeQuery($updateFinancialItem);
+
+    $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
+    $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
+    $updateFinancialItemInfoValues = array();
+    while ($updateFinancialItemInfoDAO->fetch()) {
+      $updateFinancialItemInfoValues = (array) $updateFinancialItemInfoDAO;
+      $updateFinancialItemInfoValues['transaction_date'] = date('YmdHis');
+      // the below params are not needed
+      $previousFinancialItemID = $updateFinancialItemInfoValues['id'];
+      unset($updateFinancialItemInfoValues['id']);
+      unset($updateFinancialItemInfoValues['created_date']);
+      // if not submitted and difference is not 0 make it negative
+      if (!in_array($updateFinancialItemInfoValues['price_field_value_id'], $submittedPriceFieldValueIDs) && $updateFinancialItemInfoValues['differenceAmt'] != 0) {
+        // INSERT negative financial_items
+        $updateFinancialItemInfoValues['amount'] = -$updateFinancialItemInfoValues['amount'];
+        // reverse the related financial trxn too
+        $updateFinancialItemInfoValues['financialTrxn'] = $this->_getRelatedCancelFinancialTrxn($previousFinancialItemID);
+        if ($previousLineItems[$updateFinancialItemInfoValues['entity_id']]['tax_amount']) {
+          $updateFinancialItemInfoValues['tax']['amount'] = -($previousLineItems[$updateFinancialItemInfoValues['entity_id']]['tax_amount']);
+          $updateFinancialItemInfoValues['tax']['description'] = $taxTerm;
+          if ($updateFinancialItemInfoValues['financial_type_id']) {
+            $updateFinancialItemInfoValues['tax']['financial_account_id'] = CRM_Contribute_BAO_Contribution::getFinancialAccountId($updateFinancialItemInfoValues['financial_type_id']);
+          }
+        }
+        // INSERT negative financial_items for tax amount
+        $financialItemsArray[] = $updateFinancialItemInfoValues;
+      }
+      // if submitted and difference is 0 add a positive entry again
+      elseif (in_array($updateFinancialItemInfoValues['price_field_value_id'], $submittedPriceFieldValueIDs) && $updateFinancialItemInfoValues['differenceAmt'] == 0) {
+        $updateFinancialItemInfoValues['amount'] = $updateFinancialItemInfoValues['amount'];
+        // INSERT financial_items for tax amount
+        if ($updateFinancialItemInfoValues['entity_id'] == $lineItemsToUpdate[$updateFinancialItemInfoValues['price_field_value_id']]['id'] &&
+          isset($lineItemsToUpdate[$updateFinancialItemInfoValues['price_field_value_id']]['tax_amount'])
+        ) {
+          $updateFinancialItemInfoValues['tax']['amount'] = $lineItemsToUpdate[$updateFinancialItemInfoValues['price_field_value_id']]['tax_amount'];
+          $updateFinancialItemInfoValues['tax']['description'] = $taxTerm;
+          if ($lineItemsToUpdate[$updateFinancialItemInfoValues['price_field_value_id']]['financial_type_id']) {
+            $updateFinancialItemInfoValues['tax']['financial_account_id'] = CRM_Contribute_BAO_Contribution::getFinancialAccountId($lineItemsToUpdate[$updateFinancialItemInfoValues['price_field_value_id']]['financial_type_id']);
+          }
+        }
+        $financialItemsArray[] = $updateFinancialItemInfoValues;
+      }
+    }
+
+    return $financialItemsArray;
+  }
+
+  /**
+   * Helper function to retrieve submitted line items from form values $inputParams and used $feeBlock
+   *
+   * @param array $inputParams
+   * @param array $feeBlock
+   *
+   * @return array
+   *     List of submitted line items
+   */
+  protected function _getSubmittedLineItems($inputParams, $feeBlock) {
+    $submittedLineItems = array();
+    foreach ($feeBlock as $id => $values) {
+      CRM_Price_BAO_LineItem::format($id, $inputParams, $values, $submittedLineItems);
+    }
+
+    return $submittedLineItems;
+  }
+
+  /**
+   * Helper function to retrieve formatted lineitems need to be added and/or updated
+   *
+   * @param array $submittedLineItems
+   * @param int $entityID
+   * @param string $entity
+   *
+   * @return array
+   *    Array of formatted lineitems
+   */
+  protected function _getLineItemsToAddAndUpdate($submittedLineItems, $entityID, $entity) {
+    $previousLineItems = CRM_Price_BAO_LineItem::getLineItems($entityID, $entity);
+
+    $lineItemsToAdd = $submittedLineItems;
+    $lineItemsToUpdate = array();
+    $submittedPriceFieldValueIDs = array_keys($submittedLineItems);
+
+    foreach ($previousLineItems as $id => $previousLineItem) {
+      // check through the submitted items if the previousItem exists,
+      // if found in submitted items, do not use it for new item creations
+      if (in_array($previousLineItem['price_field_value_id'], $submittedPriceFieldValueIDs)) {
+        // if submitted line items are existing don't fire INSERT query
+        if ($previousLineItem['line_total'] != 0) {
+          unset($lineItemsToAdd[$previousLineItem['price_field_value_id']]);
+        }
+        else {
+          $lineItemsToAdd[$previousLineItem['price_field_value_id']]['skip'] = TRUE;
+        }
+        // for updating the line items i.e. use-case - once deselect-option selecting again
+        if (($previousLineItem['line_total'] != $submittedLineItems[$previousLineItem['price_field_value_id']]['line_total']) ||
+          ($submittedLineItems[$previousLineItem['price_field_value_id']]['line_total'] == 0 && $submittedLineItems[$previousLineItem['price_field_value_id']]['qty'] == 1) ||
+          ($previousLineItem['qty'] != $submittedLineItems[$previousLineItem['price_field_value_id']]['qty'])
+        ) {
+          $lineItemsToUpdate[$previousLineItem['price_field_value_id']] = $submittedLineItems[$previousLineItem['price_field_value_id']];
+          $lineItemsToUpdate[$previousLineItem['price_field_value_id']]['id'] = $id;
+        }
+      }
+    }
+
+    return array($lineItemsToAdd, $lineItemsToUpdate);
+  }
+
+  /**
+   * Helper function to add lineitems or financial item related to it, to as result of fee change
+   *
+   * @param array $lineItemsToAdd
+   * @param int $entityID
+   * @param string $entityTable
+   * @param int $contributionID
+   * @param array $adjustedFinancialTrxnID
+   * @param bool $addFinancialItemOnly
+   *
+   * @return void
+   */
+  protected function _addLineItemOnChangeFeeSelection(
+    $lineItemsToAdd,
+    $entityID,
+    $entityTable,
+    $contributionID,
+    $adjustedFinancialTrxnID = NULL,
+    $addFinancialItemOnly = FALSE
+  ) {
+    // if there is no line item to add, do not proceed
+    if (empty($lineItemsToAdd)) {
+      return;
+    }
+
+    $changedFinancialTypeID = NULL;
+    $fetchCon = array('id' => $contributionID);
+    $updatedContribution = CRM_Contribute_BAO_Contribution::retrieve($fetchCon, CRM_Core_DAO::$_nullArray, CRM_Core_DAO::$_nullArray);
+    // insert financial items
+    foreach ($lineItemsToAdd as $priceFieldValueID => $lineParams) {
+      $tempFinancialTrxnID = $adjustedFinancialTrxnID;
+      $lineParams = array_merge($lineParams, array(
+        'entity_table' => $entityTable,
+        'entity_id' => $entityID,
+        'contribution_id' => $contributionID,
+      ));
+      if ($addFinancialItemOnly) {
+        // don't add financial item for cancelled line item
+        if ($lineParams['qty'] == 0) {
+          continue;
+        }
+        elseif (empty($adjustedFinancialTrxnID)) {
+          // add financial item if ONLY financial type is changed
+          if ($lineParams['financial_type_id'] != $updatedContribution->financial_type_id) {
+            $changedFinancialTypeID = $lineParams['financial_type_id'];
+            $adjustedTrxnValues = array(
+              'from_financial_account_id' => NULL,
+              'to_financial_account_id' => CRM_Financial_BAO_FinancialTypeAccount::getInstrumentFinancialAccount($updatedContribution->payment_instrument_id),
+              'total_amount' => $lineParams['line_total'],
+              'net_amount' => $lineParams['line_total'],
+              'status_id' => $updatedContribution->contribution_status_id,
+              'payment_instrument_id' => $updatedContribution->payment_instrument_id,
+              'contribution_id' => $updatedContribution->id,
+              'is_payment' => TRUE, // since balance is 0, which means contribution is completed
+              'trxn_date' => date('YmdHis'),
+              'currency' => $updatedContribution->currency,
+            );
+            $adjustedTrxn = CRM_Core_BAO_FinancialTrxn::create($adjustedTrxnValues);
+            $tempFinancialTrxnID = array('id' => $adjustedTrxn->id);
+          }
+          // don't add financial item if line_total and financial type aren't changed,
+          //  which is identified by empty $adjustedFinancialTrxnID
+          else {
+            continue;
+          }
+        }
+        $lineObj = CRM_Price_BAO_LineItem::retrieve($lineParams, CRM_Core_DAO::$_nullArray);
+        // insert financial items
+        // ensure entity_financial_trxn table has a linking of it.
+        CRM_Financial_BAO_FinancialItem::add($lineObj, $updatedContribution, NULL, $tempFinancialTrxnID);
+        if (isset($lineObj->tax_amount)) {
+          CRM_Financial_BAO_FinancialItem::add($lineObj, $updatedContribution, TRUE, $tempFinancialTrxnID);
+        }
+      }
+      elseif (!array_key_exists('skip', $lineParams)) {
+        self::create($lineParams);
+      }
+    }
+
+    if ($changedFinancialTypeID) {
+      $updatedContribution->financial_type_id = $changedFinancialTypeID;
+      $updatedContribution->save();
+    }
+  }
+
+  /**
+   * Helper function to update entity record on change fee selection
+   *
+   * @param array $inputParams
+   * @param int $entityID
+   * @param string $entity
+   *
+   */
+  protected function _updateEntityRecordOnChangeFeeSelection($inputParams, $entityID, $entity) {
+    $entityTable = "civicrm_{$entity}";
+
+    if ($entity == 'participant') {
+      $partUpdateFeeAmt = array('id' => $entityID);
+      $getUpdatedLineItems = "SELECT *
+        FROM civicrm_line_item
+        WHERE (entity_table = '{$entityTable}' AND entity_id = {$entityID} AND qty > 0)";
+      $getUpdatedLineItemsDAO = CRM_Core_DAO::executeQuery($getUpdatedLineItems);
+      $line = array();
+      while ($getUpdatedLineItemsDAO->fetch()) {
+        $line[$getUpdatedLineItemsDAO->price_field_value_id] = $getUpdatedLineItemsDAO->label . ' - ' . (float) $getUpdatedLineItemsDAO->qty;
+      }
+
+      $partUpdateFeeAmt['fee_level'] = implode(', ', $line);
+      $partUpdateFeeAmt['fee_amount'] = $inputParams['amount'];
+      CRM_Event_BAO_Participant::add($partUpdateFeeAmt);
+
+      //activity creation
+      CRM_Event_BAO_Participant::addActivityForSelection($entityID, 'Change Registration');
+    }
+  }
+
+  /**
+   * Helper function to retrieve financial trxn parameters to reverse
+   *  for given financial item identified by $financialItemID
+   *
+   * @param int $financialItemID
+   *
+   * @return array $financialTrxn
+   *
+   */
+  protected function _getRelatedCancelFinancialTrxn($financialItemID) {
+    $financialTrxn = civicrm_api3('EntityFinancialTrxn', 'getsingle', array(
+      'entity_table' => 'civicrm_financial_item',
+      'entity_id' => $financialItemID,
+      'options' => array(
+        'sort' => 'id DESC',
+        'limit' => 1,
+      ),
+      'api.FinancialTrxn.getsingle' => array(
+        'id' => "\$value.financial_trxn_id",
+      ),
+    ));
+
+    $financialTrxn = array_merge($financialTrxn['api.FinancialTrxn.getsingle'], array(
+      'trxn_date' => date('YmdHis'),
+      'total_amount' => -$financialTrxn['api.FinancialTrxn.getsingle']['total_amount'],
+      'net_amount' => -$financialTrxn['api.FinancialTrxn.getsingle']['net_amount'],
+      'entity_table' => 'civicrm_financial_item',
+      'entity_id' => $financialItemID,
+    ));
+    unset($financialTrxn['id']);
+
+    return $financialTrxn;
+  }
+
+  /**
+   * Record adjusted amount.
+   *
+   * @param int $updatedAmount
+   * @param int $paidAmount
+   * @param int $contributionId
+   *
+   * @param int $taxAmount
+   * @param bool $updateAmountLevel
+   *
+   * @return bool|\CRM_Core_BAO_FinancialTrxn
+   */
+  protected function _recordAdjustedAmt($updatedAmount, $paidAmount, $contributionId, $taxAmount = NULL, $updateAmountLevel = NULL) {
+    $pendingAmount = CRM_Core_BAO_FinancialTrxn::getBalanceTrxnAmt($contributionId);
+    $pendingAmount = CRM_Utils_Array::value('total_amount', $pendingAmount, 0);
+    $balanceAmt = $updatedAmount - $paidAmount;
+    if ($paidAmount != $pendingAmount) {
+      $balanceAmt -= $pendingAmount;
+    }
+
+    $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+    $partiallyPaidStatusId = array_search('Partially paid', $contributionStatuses);
+    $pendingRefundStatusId = array_search('Pending refund', $contributionStatuses);
+    $completedStatusId = array_search('Completed', $contributionStatuses);
+
+    $updatedContributionDAO = new CRM_Contribute_BAO_Contribution();
+    $adjustedTrxn = $skip = FALSE;
+    if ($balanceAmt) {
+      if ($balanceAmt > 0 && $paidAmount != 0) {
+        $contributionStatusVal = $partiallyPaidStatusId;
+      }
+      elseif ($balanceAmt < 0 && $paidAmount != 0) {
+        $contributionStatusVal = $pendingRefundStatusId;
+      }
+      elseif ($paidAmount == 0) {
+        //skip updating the contribution status if no payment is made
+        $skip = TRUE;
+        $updatedContributionDAO->cancel_date = 'null';
+        $updatedContributionDAO->cancel_reason = NULL;
+      }
+      // update contribution status and total amount without trigger financial code
+      // as this is handled in current BAO function used for change selection
+      $updatedContributionDAO->id = $contributionId;
+      if (!$skip) {
+        $updatedContributionDAO->contribution_status_id = $contributionStatusVal;
+      }
+      $updatedContributionDAO->total_amount = $updatedContributionDAO->net_amount = $updatedAmount;
+      $updatedContributionDAO->fee_amount = 0;
+      $updatedContributionDAO->tax_amount = $taxAmount;
+      if (!empty($updateAmountLevel)) {
+        $updatedContributionDAO->amount_level = $updateAmountLevel;
+      }
+      $updatedContributionDAO->save();
+      // adjusted amount financial_trxn creation
+      $updatedContribution = CRM_Contribute_BAO_Contribution::getValues(
+        array('id' => $contributionId),
+        CRM_Core_DAO::$_nullArray,
+        CRM_Core_DAO::$_nullArray
+      );
+      $toFinancialAccount = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($updatedContribution->financial_type_id, 'Accounts Receivable Account is');
+      $adjustedTrxnValues = array(
+        'from_financial_account_id' => NULL,
+        'to_financial_account_id' => $toFinancialAccount,
+        'total_amount' => $balanceAmt,
+        'net_amount' => $balanceAmt,
+        'status_id' => $completedStatusId,
+        'payment_instrument_id' => $updatedContribution->payment_instrument_id,
+        'contribution_id' => $updatedContribution->id,
+        'trxn_date' => date('YmdHis'),
+        'currency' => $updatedContribution->currency,
+      );
+      $adjustedTrxn = CRM_Core_BAO_FinancialTrxn::create($adjustedTrxnValues);
+    }
+    return $adjustedTrxn;
   }
 
 }

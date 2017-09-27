@@ -165,8 +165,8 @@ class CRM_Financial_Page_AJAX {
 
     $entityID = CRM_Utils_Request::retrieve('entityID', 'Positive', CRM_Core_DAO::$_nullObject, FALSE, NULL, 'POST');
     $methods = array(
-      'assign' => 'addBatchEntity',
-      'remove' => 'removeBatchEntity',
+      'assign' => 'create',
+      'remove' => 'del',
       'reopen' => 'create',
       'close' => 'create',
       'delete' => 'deleteBatch',
@@ -183,7 +183,6 @@ class CRM_Financial_Page_AJAX {
     if ($recordClass[0] == 'CRM' && count($recordClass) >= 3) {
       foreach ($records as $recordID) {
         $params = array();
-        $ids = NULL;
         switch ($op) {
           case 'assign':
           case 'remove':
@@ -207,14 +206,12 @@ class CRM_Financial_Page_AJAX {
             $params = $totals[$recordID];
           case 'reopen':
             $status = $op == 'close' ? 'Closed' : 'Reopened';
-            $ids['batchID'] = $recordID;
             $batchStatus = CRM_Core_PseudoConstant::get('CRM_Batch_DAO_Batch', 'status_id', array('labelColumn' => 'name'));
             $params['status_id'] = CRM_Utils_Array::key($status, $batchStatus);
             $session = CRM_Core_Session::singleton();
             $params['modified_date'] = date('YmdHis');
             $params['modified_id'] = $session->get('userID');
             $params['id'] = $recordID;
-            $context = "financialBatch";
             break;
 
           case 'export':
@@ -223,17 +220,11 @@ class CRM_Financial_Page_AJAX {
 
           case 'delete':
             $params = $recordID;
-            $context = "financialBatch";
             break;
         }
 
         if (method_exists($recordBAO, $methods[$op]) & !empty($params)) {
-          if (isset($context)) {
-            $updated = call_user_func_array(array($recordBAO, $methods[$op]), array(&$params, $ids, $context));
-          }
-          else {
-            $updated = call_user_func_array(array($recordBAO, $methods[$op]), array(&$params, $ids));
-          }
+          $updated = call_user_func_array(array($recordBAO, $methods[$op]), array(&$params));
           if ($updated) {
             $redirectStatus = $updated->status_id;
             if ($batchStatus[$updated->status_id] == "Reopened") {
@@ -264,9 +255,10 @@ class CRM_Financial_Page_AJAX {
       3 => 'amount',
       4 => 'trxn_id',
       5 => 'transaction_date',
-      6 => 'payment_method',
-      7 => 'status',
-      8 => 'name',
+      6 => 'receive_date',
+      7 => 'payment_method',
+      8 => 'status',
+      9 => 'name',
     );
 
     $sEcho = CRM_Utils_Type::escape($_REQUEST['sEcho'], 'Integer');
@@ -296,6 +288,7 @@ class CRM_Financial_Page_AJAX {
       'contact_a.contact_type',
       'contact_a.contact_sub_type',
       'civicrm_financial_trxn.trxn_date as transaction_date',
+      'civicrm_contribution.receive_date as receive_date',
       'civicrm_financial_type.name',
       'civicrm_financial_trxn.currency as currency',
       'civicrm_financial_trxn.status_id as status',
@@ -307,7 +300,8 @@ class CRM_Financial_Page_AJAX {
       'sort_name' => ts('Contact Name'),
       'amount' => ts('Amount'),
       'trxn_id' => ts('Trxn ID'),
-      'transaction_date' => ts('Received'),
+      'transaction_date' => ts('Transaction Date'),
+      'receive_date' => ts('Received'),
       'payment_method' => ts('Payment Method'),
       'status' => ts('Status'),
       'name' => ts('Type'),
@@ -366,7 +360,7 @@ class CRM_Financial_Page_AJAX {
           continue;
         }
         $row[$financialItem->id][$columnKey] = $financialItem->$columnKey;
-        if ($columnKey == 'sort_name' && $financialItem->$columnKey) {
+        if ($columnKey == 'sort_name' && $financialItem->$columnKey && $financialItem->contact_id) {
           $url = CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid=" . $financialItem->contact_id);
           $row[$financialItem->id][$columnKey] = '<a href=' . $url . '>' . $financialItem->$columnKey . '</a>';
         }
@@ -381,6 +375,9 @@ class CRM_Financial_Page_AJAX {
           $row[$financialItem->id][$columnKey] = CRM_Utils_Money::format($financialItem->$columnKey, $financialItem->currency);
         }
         elseif ($columnKey == 'transaction_date' && $financialItem->$columnKey) {
+          $row[$financialItem->id][$columnKey] = CRM_Utils_Date::customFormat($financialItem->$columnKey);
+        }
+        elseif ($columnKey == 'receive_date' && $financialItem->$columnKey) {
           $row[$financialItem->id][$columnKey] = CRM_Utils_Date::customFormat($financialItem->$columnKey);
         }
         elseif ($columnKey == 'status' && $financialItem->$columnKey) {
@@ -445,7 +442,9 @@ class CRM_Financial_Page_AJAX {
           $financialItem->id
         );
       }
-      $row[$financialItem->id]['contact_type'] = CRM_Contact_BAO_Contact_Utils::getImage(CRM_Utils_Array::value('contact_sub_type', $row[$financialItem->id]) ? CRM_Utils_Array::value('contact_sub_type', $row[$financialItem->id]) : CRM_Utils_Array::value('contact_type', $row[$financialItem->id]), FALSE, $financialItem->contact_id);
+      if ($financialItem->contact_id) {
+        $row[$financialItem->id]['contact_type'] = CRM_Contact_BAO_Contact_Utils::getImage(CRM_Utils_Array::value('contact_sub_type', $row[$financialItem->id]) ? $row[$financialItem->id]['contact_sub_type'] : CRM_Utils_Array::value('contact_type', $row[$financialItem->id]), FALSE, $financialItem->contact_id);
+      }
       $financialitems = $row;
     }
 
@@ -457,6 +456,7 @@ class CRM_Financial_Page_AJAX {
       'amount',
       'trxn_id',
       'transaction_date',
+      'receive_date',
       'payment_method',
       'status',
       'name',
@@ -493,10 +493,10 @@ class CRM_Financial_Page_AJAX {
           'batch_id' => $entityID,
         );
         if ($action == 'Assign') {
-          $updated = CRM_Batch_BAO_Batch::addBatchEntity($params);
+          $updated = CRM_Batch_BAO_EntityBatch::create($params);
         }
         else {
-          $updated = CRM_Batch_BAO_Batch::removeBatchEntity($params);
+          $updated = CRM_Batch_BAO_EntityBatch::del($params);
         }
       }
     }

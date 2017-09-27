@@ -42,6 +42,8 @@ class CRM_Core_Page_File extends CRM_Core_Page {
     $path = CRM_Core_Config::singleton()->customFileUploadDir . $fileName;
     $mimeType = CRM_Utils_Request::retrieve('mime-type', 'String', $this);
     $action = CRM_Utils_Request::retrieve('action', 'String', $this);
+    $download = CRM_Utils_Request::retrieve('download', 'Integer', $this, FALSE, 1);
+    $disposition = $download == 0 ? 'inline' : 'download';
 
     // if we are not providing essential parameter needed for file preview then
     if (empty($fileName) && empty($mimeType)) {
@@ -76,7 +78,10 @@ class CRM_Core_Page_File extends CRM_Core_Page {
       CRM_Utils_System::download(
         CRM_Utils_File::cleanFileName(basename($path)),
         $mimeType,
-        $buffer
+        $buffer,
+        NULL,
+        TRUE,
+        $disposition
       );
     }
   }

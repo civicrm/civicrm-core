@@ -361,7 +361,7 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
    * @param array $params
    */
   public function deleteEmptyActivity(&$params) {
-    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
+    $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
 
     $query = "
@@ -452,10 +452,7 @@ AND        a.is_deleted = 0
         'is_auto' => FALSE,
         'is_current_revision' => 1,
         'subject' => CRM_Utils_Array::value('subject', $params) ? $params['subject'] : $activityTypeName,
-        'status_id' => CRM_Core_OptionGroup::getValue('activity_status',
-          $statusName,
-          'name'
-        ),
+        'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_status_id', $statusName),
         'target_contact_id' => $client,
         'medium_id' => CRM_Utils_Array::value('medium_id', $params),
         'location' => CRM_Utils_Array::value('location', $params),
@@ -470,10 +467,7 @@ AND        a.is_deleted = 0
         'source_contact_id' => $params['creatorID'],
         'is_auto' => TRUE,
         'is_current_revision' => 1,
-        'status_id' => CRM_Core_OptionGroup::getValue('activity_status',
-          $statusName,
-          'name'
-        ),
+        'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_status_id', $statusName),
         'target_contact_id' => $client,
         'weight' => $orderVal,
       );
@@ -556,6 +550,7 @@ AND        a.is_deleted = 0
       $activityParams['skipRecentView'] = TRUE;
     }
 
+    // @todo - switch to using api & remove the parameter pre-wrangling above.
     $activity = CRM_Activity_BAO_Activity::create($activityParams);
 
     if (!$activity) {
@@ -639,8 +634,7 @@ AND        a.is_deleted = 0
    * @return int
    */
   public function getRedactActivityEmail() {
-    $xml = $this->retrieve("Settings");
-    return ( string ) $xml->RedactActivityEmail ? 1 : 0;
+    return $this->getBoolSetting('civicaseRedactActivityEmail', 'RedactActivityEmail');
   }
 
   /**
@@ -650,11 +644,7 @@ AND        a.is_deleted = 0
    *   1 if allowed, 0 if not
    */
   public function getAllowMultipleCaseClients() {
-    $xml = $this->retrieve("Settings");
-    if ($xml) {
-      return ( string ) $xml->AllowMultipleCaseClients ? 1 : 0;
-    }
-    return 0;
+    return $this->getBoolSetting('civicaseAllowMultipleClients', 'AllowMultipleCaseClients');
   }
 
   /**
@@ -664,8 +654,24 @@ AND        a.is_deleted = 0
    *   1 if natural, 0 if alphabetic
    */
   public function getNaturalActivityTypeSort() {
-    $xml = $this->retrieve("Settings");
-    return ( string ) $xml->NaturalActivityTypeSort ? 1 : 0;
+    return $this->getBoolSetting('civicaseNaturalActivityTypeSort', 'NaturalActivityTypeSort');
+  }
+
+  /**
+   * @param string $settingKey
+   * @param string $xmlTag
+   * @param mixed $default
+   * @return int
+   */
+  private function getBoolSetting($settingKey, $xmlTag, $default = 0) {
+    $setting = Civi::settings()->get($settingKey);
+    if ($setting !== 'default') {
+      return (int) $setting;
+    }
+    if ($xml = $this->retrieve("Settings")) {
+      return (string) $xml->{$xmlTag} ? 1 : 0;
+    }
+    return $default;
   }
 
 }

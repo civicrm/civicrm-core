@@ -101,7 +101,7 @@
           {/if}
           {if $activityAssigneeNotification}
             <br />
-            <span class="description"><i class="crm-i fa-paper-plane"></i> {ts}A copy of this activity will be emailed to each Assignee.{/ts}</span>
+            <span class="description"><i class="crm-i fa-paper-plane"></i> {ts}A copy of this activity will be emailed to each Assignee.{/ts} {help id="sent_copy_email"}</span>
           {/if}
         {/if}
       </td>

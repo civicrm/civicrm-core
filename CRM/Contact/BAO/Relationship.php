@@ -1145,13 +1145,17 @@ INNER JOIN  civicrm_contact ";
     else {
       $from .= 'ON ( civicrm_contact.id = civicrm_relationship.contact_id_b ) ';
     }
-    $from .= "
+
+    if (!$count) {
+      $from .= "
 LEFT JOIN  civicrm_address ON (civicrm_address.contact_id = civicrm_contact.id AND civicrm_address.is_primary = 1)
 LEFT JOIN  civicrm_phone   ON (civicrm_phone.contact_id = civicrm_contact.id AND civicrm_phone.is_primary = 1)
 LEFT JOIN  civicrm_email   ON (civicrm_email.contact_id = civicrm_contact.id AND civicrm_email.is_primary = 1)
 LEFT JOIN  civicrm_state_province ON (civicrm_address.state_province_id = civicrm_state_province.id)
 LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
 ";
+    }
+
     $where = 'WHERE ( 1 )';
     if ($contactId) {
       if ($direction == 'a_b') {
@@ -1229,6 +1233,8 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
    * @param bool $permissionedContact
    *   to return only permissioned Contact
    * @param array $params
+   * @param bool $includeTotalCount
+   *   Should we return a count of total accessable relationships
    *
    * @return array|int
    *   relationship records
@@ -1239,7 +1245,7 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
     $count = 0, $relationshipId = 0,
     $links = NULL, $permissionMask = NULL,
     $permissionedContact = FALSE,
-    $params = array()
+    $params = array(), $includeTotalCount = FALSE
   ) {
     $values = array();
     if (!$contactId && !$relationshipId) {
@@ -1273,7 +1279,8 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
     }
 
     // building the query string
-    $queryString = $select1 . $from1 . $where1 . $select2 . $from2 . $where2 . $order . $limit;
+    CRM_Core_DAO::executeQuery("CREATE TEMPORARY TABLE civicrm_contact_relationships " . $select1 . $from1 . $where1 . $select2 . $from2 . $where2);
+    $queryString = "SELECT * FROM civicrm_contact_relationships " . $order . $limit;
 
     $relationship = new CRM_Contact_DAO_Relationship();
 
@@ -1284,9 +1291,14 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
       while ($relationship->fetch()) {
         $relationshipCount += $relationship->cnt1 + $relationship->cnt2;
       }
+      CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE IF EXISTS civicrm_contact_relationships");
       return $relationshipCount;
     }
     else {
+
+      if ($includeTotalCount) {
+        $values['total_relationships'] = CRM_Core_DAO::singleValueQuery("SELECT count(*) FROM civicrm_contact_relationships");
+      }
 
       $mask = NULL;
       if ($status != self::INACTIVE) {
@@ -1433,6 +1445,7 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
       }
 
       $relationship->free();
+      CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE IF EXISTS civicrm_contact_relationships");
       return $values;
     }
   }
@@ -2063,20 +2076,13 @@ AND cc.sort_name LIKE '%$name%'";
       $params['rp'], 0, 0,
       $links, $mask,
       $permissionedContacts,
-      $params
+      $params, TRUE
     );
 
     $contactRelationships = array();
-    $params['total'] = 0;
+    $params['total'] = $relationships['total_relationships'];
+    unset($relationships['total_relationships']);
     if (!empty($relationships)) {
-      // FIXME: we cannot directly determine total permissioned relationship, hence re-fire query
-      $permissionedRelationships = CRM_Contact_BAO_Relationship::getRelationship($params['contact_id'],
-        $relationshipStatus,
-        0, 0, 0,
-        NULL, NULL,
-        $permissionedContacts
-      );
-      $params['total'] = count($permissionedRelationships);
 
       // format params
       foreach ($relationships as $relationshipId => $values) {

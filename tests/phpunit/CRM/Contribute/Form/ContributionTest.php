@@ -185,6 +185,8 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
    * Test the submit function on the contribution page.
    */
   public function testSubmitCreditCardPayPal() {
+    $mut = new CiviMailUtils($this, TRUE);
+    $mut->clearMessages();
     $form = new CRM_Contribute_Form_Contribution();
     $paymentProcessorID = $this->paymentProcessorCreate(array('is_test' => 0));
     $form->_mode = 'Live';
@@ -218,6 +220,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
         'hidden_AdditionalDetail' => 1,
         'hidden_Premium' => 1,
         'from_email_address' => '"civi45" <civi45@civicrm.com>',
+        'is_email_receipt' => TRUE,
         'receipt_date' => '',
         'receipt_date_time' => '',
         'payment_processor_id' => $paymentProcessorID,
@@ -239,6 +242,141 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     ), 1);
     $contact = $this->callAPISuccessGetSingle('Contact', array('id' => $this->_individualId));
     $this->assertTrue(empty($contact['source']));
+    if (!$error) {
+      $msgs = $mut->getAllMessages();
+      $this->assertEquals(1, count($msgs));
+    }
+    $mut->clearMessages();
+    $mut->stop();
+  }
+
+  /**
+   * Test the submit function on the contribution page
+   */
+  public function testSubmitCreditCardWithEmailReceipt() {
+    $mut = new CiviMailUtils($this, TRUE);
+    $mut->clearMessages();
+    $form = new CRM_Contribute_Form_Contribution();
+    $form->_mode = 'Live';
+    $error = FALSE;
+    try {
+      $form->testSubmit(array(
+        'total_amount' => 50,
+        'financial_type_id' => 1,
+        'receive_date' => '04/21/2015',
+        'receive_date_time' => '11:27PM',
+        'contact_id' => $this->_individualId,
+        'contribution_status_id' => 1,
+        'credit_card_number' => 4444333322221111,
+        'cvv2' => 123,
+        'credit_card_exp_date' => array(
+          'M' => 9,
+          'Y' => 2025,
+        ),
+        'credit_card_type' => 'Visa',
+        'billing_first_name' => 'Junko',
+        'billing_middle_name' => '',
+        'billing_last_name' => 'Adams',
+        'billing_street_address-5' => '790L Lincoln St S',
+        'billing_city-5' => 'Maryknoll',
+        'billing_state_province_id-5' => 1031,
+        'billing_postal_code-5' => 10545,
+        'billing_country_id-5' => 1228,
+        'frequency_interval' => 1,
+        'frequency_unit' => 'month',
+        'installments' => '',
+        'hidden_AdditionalDetail' => 1,
+        'hidden_Premium' => 1,
+        'from_email_address' => '"civi45" <civi45@civicrm.com>',
+        'is_email_receipt' => TRUE,
+        'receipt_date' => '',
+        'receipt_date_time' => '',
+        'payment_processor_id' => $this->paymentProcessorID,
+        'currency' => 'USD',
+        'source' => 'bob sled race',
+      ), CRM_Core_Action::ADD);
+    }
+    catch (Civi\Payment\Exception\PaymentProcessorException $e) {
+      $error = TRUE;
+    }
+    $this->callAPISuccessGetCount('Contribution', array(
+      'contact_id' => $this->_individualId,
+      'contribution_status_id' => $error ? 'Failed' : 'Completed',
+      'payment_instrument_id' => $this->callAPISuccessGetValue('PaymentProcessor', array(
+        'return' => 'payment_instrument_id',
+        'id' => $this->paymentProcessorID,
+      )),
+    ), 1);
+    $contact = $this->callAPISuccessGetSingle('Contact', array('id' => $this->_individualId));
+    $this->assertTrue(empty($contact['source']));
+    $msgs = $mut->getAllMessages();
+    $this->assertEquals(1, count($msgs));
+    $mut->stop();
+  }
+
+
+  /**
+   * Test the submit function on the contribution page.
+   */
+  public function testSubmitCreditCardNoReceipt() {
+    $mut = new CiviMailUtils($this, TRUE);
+    $mut->clearMessages();
+    $form = new CRM_Contribute_Form_Contribution();
+    $form->_mode = 'Live';
+    $error = FALSE;
+    try {
+      $form->testSubmit(array(
+        'total_amount' => 60,
+        'financial_type_id' => 1,
+        'receive_date' => '04/21/2015',
+        'receive_date_time' => '11:27PM',
+        'contact_id' => $this->_individualId,
+        'contribution_status_id' => 1,
+        'credit_card_number' => 4444333322221111,
+        'cvv2' => 123,
+        'credit_card_exp_date' => array(
+          'M' => 9,
+          'Y' => 2025,
+        ),
+        'credit_card_type' => 'Visa',
+        'billing_first_name' => 'Junko',
+        'billing_middle_name' => '',
+        'billing_last_name' => 'Adams',
+        'billing_street_address-5' => '790L Lincoln St S',
+        'billing_city-5' => 'Maryknoll',
+        'billing_state_province_id-5' => 1031,
+        'billing_postal_code-5' => 10545,
+        'billing_country_id-5' => 1228,
+        'frequency_interval' => 1,
+        'frequency_unit' => 'month',
+        'installments' => '',
+        'hidden_AdditionalDetail' => 1,
+        'hidden_Premium' => 1,
+        'from_email_address' => '"civi45" <civi45@civicrm.com>',
+        'is_email_receipt' => FALSE,
+        'receipt_date' => '',
+        'receipt_date_time' => '',
+        'payment_processor_id' => $this->paymentProcessorID,
+        'currency' => 'USD',
+        'source' => 'bob sled race',
+      ), CRM_Core_Action::ADD);
+    }
+    catch (Civi\Payment\Exception\PaymentProcessorException $e) {
+      $error = TRUE;
+    }
+
+    $this->callAPISuccessGetCount('Contribution', array(
+      'contact_id' => $this->_individualId,
+      'contribution_status_id' => $error ? 'Failed' : 'Completed',
+      'payment_instrument_id' => $this->callAPISuccessGetValue('PaymentProcessor', array(
+        'return' => 'payment_instrument_id',
+        'id' => $this->paymentProcessorID,
+       )),
+    ), 1);
+    $contact = $this->callAPISuccessGetSingle('Contact', array('id' => $this->_individualId));
+    $this->assertTrue(empty($contact['source']));
+    $mut->assertMailLogEmpty();
+    $mut->stop();
   }
 
   /**
@@ -422,7 +560,35 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     $this->callAPISuccessGetSingle('Address', array(
       'id' => $contribution['address_id'],
     ));
+  }
 
+  /**
+   * CRM-20745: Test the submit function correctly sets the
+   * receive date for recurring contribution.
+   */
+  public function testSubmitCreditCardWithRecur() {
+    $form = new CRM_Contribute_Form_Contribution();
+    $receiveDate = date('m/d/Y', strtotime('+1 month'));
+    $form->testSubmit(array(
+      'total_amount' => 50,
+      'financial_type_id' => 1,
+      'is_recur' => 1,
+      'frequency_interval' => 2,
+      'frequency_unit' => 'month',
+      'installments' => 2,
+      'receive_date' => $receiveDate,
+      'receive_date_time' => '11:27PM',
+      'contact_id' => $this->_individualId,
+      'payment_instrument_id' => array_search('Credit Card', $this->paymentInstruments),
+      'payment_processor_id' => $this->paymentProcessorID,
+      'credit_card_exp_date' => array('M' => 5, 'Y' => 2025),
+      'credit_card_number' => '411111111111111',
+      'billing_city-5' => 'Vancouver',
+    ), CRM_Core_Action::ADD,
+      'live'
+    );
+    $contribution = $this->callAPISuccessGetSingle('Contribution', array('return' => 'receive_date'));
+    $this->assertEquals(date("m/d/Y", strtotime($contribution['receive_date'])), $receiveDate);
   }
 
   /**
@@ -449,7 +615,6 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'city' => 'Vancouver',
       'location_type_id' => 5,
     ), 0);
-
   }
 
   /**
@@ -525,7 +690,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'is_email_receipt' => TRUE,
       'from_email_address' => 'test@test.com',
       'price_set_id' => $priceSetId,
-      'contribution_status_id' => CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name'),
+      'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending'),
     );
 
     foreach ($priceFieldValue['values'] as $id => $price) {
@@ -696,7 +861,11 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
   }
 
   /**
-   * Test that if a negative contribution is entered it does not get reset to $0
+   * Test that if a negative contribution is entered it does not get reset to $0.
+   *
+   * Note that this fails locally for me & I believe there may be an issue for some sites
+   * with negative numbers. Grep for CRM-16460 to find the places I think that might
+   * be affected if you hit this.
    */
   public function testEnterNegativeContribution() {
     $form = new CRM_Contribute_Form_Contribution();
@@ -762,6 +931,62 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
   }
 
   /**
+   * Test the submit function if only payment instrument is changed from 'Check' to 'Credit Card'
+   */
+  public function testSubmitUpdateChangePaymentInstrument() {
+    $form = new CRM_Contribute_Form_Contribution();
+
+    $form->testSubmit(array(
+        'total_amount' => 50,
+        'financial_type_id' => 1,
+        'receive_date' => '04/21/2015',
+        'receive_date_time' => '11:27PM',
+        'contact_id' => $this->_individualId,
+        'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
+        'check_number' => '123AX',
+        'contribution_status_id' => 1,
+        'price_set_id' => 0,
+      ),
+      CRM_Core_Action::ADD);
+    $contribution = $this->callAPISuccessGetSingle('Contribution', array('contact_id' => $this->_individualId));
+    $form->testSubmit(array(
+      'total_amount' => 50,
+      'net_amount' => 50,
+      'financial_type_id' => 1,
+      'receive_date' => '04/21/2015',
+      'receive_date_time' => '11:27PM',
+      'contact_id' => $this->_individualId,
+      'payment_instrument_id' => array_search('Credit Card', $this->paymentInstruments),
+      'card_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Financial_DAO_FinancialTrxn', 'card_type_id', 'Visa'),
+      'pan_truncation' => '1011',
+      'contribution_status_id' => 1,
+      'price_set_id' => 0,
+      'id' => $contribution['id'],
+    ),
+      CRM_Core_Action::UPDATE);
+    $contribution = $this->callAPISuccessGetSingle('Contribution', array('contact_id' => $this->_individualId));
+    $this->assertEquals(50, (int) $contribution['total_amount']);
+
+    $financialTransactions = $this->callAPISuccess('FinancialTrxn', 'get', array('sequential' => TRUE));
+    $this->assertEquals(3, $financialTransactions['count']);
+
+    list($oldTrxn, $reversedTrxn, $latestTrxn) = $financialTransactions['values'];
+
+    $this->assertEquals(50, $oldTrxn['total_amount']);
+    $this->assertEquals('123AX', $oldTrxn['check_number']);
+    $this->assertEquals(array_search('Check', $this->paymentInstruments), $oldTrxn['payment_instrument_id']);
+
+    $this->assertEquals(-50, $reversedTrxn['total_amount']);
+    $this->assertEquals('123AX', $reversedTrxn['check_number']);
+    $this->assertEquals(array_search('Check', $this->paymentInstruments), $reversedTrxn['payment_instrument_id']);
+
+    $this->assertEquals(50, $latestTrxn['total_amount']);
+    $this->assertEquals('1011', $latestTrxn['pan_truncation']);
+    $this->assertEquals(array_search('Credit Card', $this->paymentInstruments), $latestTrxn['payment_instrument_id']);
+    $lineItem = $this->callAPISuccessGetSingle('LineItem', array());
+  }
+
+  /**
    * Get parameters for credit card submit calls.
    *
    * @return array
@@ -773,6 +998,57 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
       'credit_card_exp_date' => array('M' => 5, 'Y' => 2012),
       'credit_card_number' => '411111111111111',
     );
+  }
+
+  /**
+   * Test the submit function that completes the partially paid payment using Credit Card
+   */
+  public function testPartialPaymentWithCreditCard() {
+    // create a partially paid contribution by using back-office form
+    $form = new CRM_Contribute_Form_Contribution();
+    $form->testSubmit(
+      array(
+        'total_amount' => 50,
+        'financial_type_id' => 1,
+        'receive_date' => '04/21/2015',
+        'receive_date_time' => '11:27PM',
+        'contact_id' => $this->_individualId,
+        'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
+        'check_number' => substr(sha1(rand()), 0, 7),
+        'billing_city-5' => 'Vancouver',
+        'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Partially paid'),
+      ), CRM_Core_Action::ADD
+    );
+
+    $contribution = $this->callAPISuccessGetSingle('Contribution', array());
+    $this->assertNotEmpty($contribution);
+    $this->assertEquals('Partially paid', $contribution['contribution_status']);
+    // pay additional amount by using Credit Card
+    $form = new CRM_Contribute_Form_AdditionalPayment();
+    $form->testSubmit(array(
+      'contribution_id' => $contribution['id'],
+      'contact_id' => $this->_individualId,
+      'total_amount' => 50,
+      'currency' => 'USD',
+      'financial_type_id' => 1,
+      'receive_date' => '04/21/2015',
+      'receive_date_time' => '11:27PM',
+      'contact_id' => $this->_individualId,
+      'payment_instrument_id' => array_search('Credit card', $this->paymentInstruments),
+      'payment_processor_id' => $this->paymentProcessorID,
+      'credit_card_exp_date' => array('M' => 5, 'Y' => 2025),
+      'credit_card_number' => '411111111111111',
+      'cvv2' => 234,
+      'credit_card_type' => 'Visa',
+      'billing_city-5' => 'Vancouver',
+      'billing_state_province_id-5' => 1059,
+      'billing_postal_code-5' => 1321312,
+      'billing_country_id-5' => 1228,
+      'trxn_date' => '2017-04-11 13:05:11',
+    ), 'live');
+    $contribution = $this->callAPISuccessGetSingle('Contribution', array());
+    $this->assertNotEmpty($contribution);
+    $this->assertEquals('Completed', $contribution['contribution_status']);
   }
 
   /**
@@ -859,26 +1135,7 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
   public function testReSubmitSaleTax() {
     $this->enableTaxAndInvoicing();
     $this->relationForFinancialTypeWithFinancialAccount($this->_financialTypeId);
-    $form = new CRM_Contribute_Form_Contribution();
-
-    $form->testSubmit(array(
-      'total_amount' => 100,
-      'financial_type_id' => $this->_financialTypeId,
-      'receive_date' => '04/21/2015',
-      'receive_date_time' => '11:27PM',
-      'contact_id' => $this->_individualId,
-      'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
-      'contribution_status_id' => 1,
-      'price_set_id' => 0,
-    ),
-      CRM_Core_Action::ADD
-    );
-    $contribution = $this->callAPISuccessGetSingle('Contribution',
-      array(
-        'contribution_id' => 1,
-        'return' => array('tax_amount', 'total_amount', 'net_amount', 'financial_type_id', 'receive_date', 'payment_instrument_id'),
-      )
-    );
+    list($form, $contribution) = $this->doInitialSubmit();
     $this->assertEquals(110, $contribution['total_amount']);
     $this->assertEquals(10, $contribution['tax_amount']);
     $this->assertEquals(110, $contribution['net_amount']);
@@ -919,7 +1176,114 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
 
     $mut->checkMailLog($strings);
     $this->callAPISuccessGetCount('FinancialTrxn', array(), 3);
-    $this->callAPISuccessGetCount('FinancialItem', array(), 2);
+    $items = $this->callAPISuccess('FinancialItem', 'get', array('sequential' => 1));
+    $this->assertEquals(2, $items['count']);
+    $this->assertEquals('Contribution Amount', $items['values'][0]['description']);
+    $this->assertEquals('Sales Tax', $items['values'][1]['description']);
+
+    $this->assertEquals(100, $items['values'][0]['amount']);
+    $this->assertEquals(10, $items['values'][1]['amount']);
+  }
+
+  /**
+   * Create a contribution & then edit it via backoffice form, checking tax with: default price_set
+   *
+   * @throws \Exception
+   */
+  public function testReSubmitSaleTaxAlteredAmount() {
+    $this->enableTaxAndInvoicing();
+    $this->relationForFinancialTypeWithFinancialAccount($this->_financialTypeId);
+    list($form, $contribution) = $this->doInitialSubmit();
+
+    $mut = new CiviMailUtils($this, TRUE);
+    // Testing here if when we edit something trivial like adding a check_number tax, net, total amount stay the same:
+    $form->testSubmit(array(
+      'id' => $contribution['id'],
+      'total_amount' => 200,
+      'tax_amount' => 20,
+      'financial_type_id' => $contribution['financial_type_id'],
+      'receive_date' => $contribution['receive_date'],
+      'payment_instrument_id' => $contribution['payment_instrument_id'],
+      'price_set_id' => 0,
+      'check_number' => 12345,
+      'contribution_status_id' => 1,
+      'is_email_receipt' => 1,
+      'from_email_address' => 'demo@example.com',
+    ),
+      CRM_Core_Action::UPDATE
+    );
+    $contribution = $this->callAPISuccessGetSingle('Contribution',
+      array(
+        'contribution_id' => 1,
+        'return' => array('tax_amount', 'total_amount', 'net_amount', 'financial_type_id', 'receive_date', 'payment_instrument_id'),
+      )
+    );
+    $this->assertEquals(220, $contribution['total_amount']);
+    $this->assertEquals(20, $contribution['tax_amount']);
+    $this->assertEquals(220, $contribution['net_amount']);
+
+    $strings = array(
+      'Total Tax Amount : $ 20.00',
+      'Total Amount : $ 220.00',
+      'Date Received: April 21st, 2015',
+      'Paid By: Check',
+      'Check Number: 12345',
+    );
+
+    $mut->checkMailLog($strings);
+    $this->callAPISuccessGetCount('FinancialTrxn', array(), 4);
+    $items = $this->callAPISuccess('FinancialItem', 'get', array('sequential' => 1));
+    $this->assertEquals(4, $items['count']);
+    $this->assertEquals('Contribution Amount', $items['values'][0]['description']);
+    $this->assertEquals('Sales Tax', $items['values'][1]['description']);
+    $this->assertEquals('Contribution Amount', $items['values'][0]['description']);
+    $this->assertEquals('Sales Tax', $items['values'][1]['description']);
+
+    $this->assertEquals(100, $items['values'][0]['amount']);
+    $this->assertEquals(10, $items['values'][1]['amount']);
+    $this->assertEquals(100, $items['values'][2]['amount']);
+    $this->assertEquals(10, $items['values'][3]['amount']);
+  }
+
+  /**
+   * Do the first contributions, in preparation for an edit-submit.
+   *
+   * @return array
+   *
+   * @throws \Exception
+   */
+  protected function doInitialSubmit() {
+    $form = new CRM_Contribute_Form_Contribution();
+
+    $form->testSubmit(array(
+      'total_amount' => 100,
+      'financial_type_id' => $this->_financialTypeId,
+      'receive_date' => '04/21/2015',
+      'receive_date_time' => '11:27PM',
+      'contact_id' => $this->_individualId,
+      'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
+      'contribution_status_id' => 1,
+      'price_set_id' => 0,
+    ),
+      CRM_Core_Action::ADD
+    );
+    $contribution = $this->callAPISuccessGetSingle('Contribution',
+      array(
+        'contribution_id' => 1,
+        'return' => array(
+          'tax_amount',
+          'total_amount',
+          'net_amount',
+          'financial_type_id',
+          'receive_date',
+          'payment_instrument_id',
+        ),
+      )
+    );
+    $this->assertEquals(110, $contribution['total_amount']);
+    $this->assertEquals(10, $contribution['tax_amount']);
+    $this->assertEquals(110, $contribution['net_amount']);
+    return array($form, $contribution);
   }
 
   /**

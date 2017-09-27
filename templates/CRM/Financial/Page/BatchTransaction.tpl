@@ -59,10 +59,11 @@
           <th class="crm-contact-type"></th>
           <th class="crm-contact-name">{ts}Name{/ts}</th>
           <th class="crm-amount">{ts}Amount{/ts}</th>
-    <th class="crm-trxnID">{ts}Trxn ID{/ts}</th>
-          <th class="crm-received">{ts}Received{/ts}</th>
+          <th class="crm-trxnID">{ts}Trxn ID{/ts}</th>
+          <th class="crm-trxn_date">{ts}Payment/Transaction Date{/ts}</th>
+          <th class="crm-received">{ts}Contribution Date{/ts}</th>
           <th class="crm-payment-method">{ts}Pay Method{/ts}</th>
-    <th class="crm-status">{ts}Status{/ts}</th>
+          <th class="crm-status">{ts}Status{/ts}</th>
           <th class="crm-type">{ts}Type{/ts}</th>
           <th class="crm-transaction-links"></th>
         </tr>
@@ -90,6 +91,9 @@ CRM.$(function($) {
 });
 function assignRemove(recordID, op) {
   var recordBAO = 'CRM_Batch_BAO_Batch';
+  if (op == 'assign' || op == 'remove') {
+    recordBAO = 'CRM_Batch_BAO_EntityBatch';   
+  }
   var entityID = {/literal}"{$entityID}"{literal};
   if (op == 'close' || op == 'export') {
     var mismatch = checkMismatch();

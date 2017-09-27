@@ -84,15 +84,16 @@
 CRM.$(function($) {
     //if price set is set we use below below code to show for showing auto renew
     var autoRenewOption =  {/literal}'{$autoRenewOption}'{literal};
-    var autoRenew = $("#auto_renew");
+    var autoRenew = $("#auto_renew_section");
+    var autoRenewCheckbox = $("#auto_renew");
     var forceRenew = $("#force_renew");
     autoRenew.hide();
     forceRenew.hide();
     if ( autoRenewOption == 1 ) {
         autoRenew.show();
     } else if ( autoRenewOption == 2 ) {
-        autoRenew.prop('checked',  true );
-        autoRenew.attr( 'readonly', true );
+        autoRenewCheckbox.prop('checked',  true );
+        autoRenewCheckbox.attr( 'readonly', true );
         autoRenew.hide();
         forceRenew.show();
     }
@@ -182,7 +183,7 @@ CRM.$(function($) {
                 <span class="bold">{$row.name} &nbsp;
                 {if ($membershipBlock.display_min_fee AND $context EQ "makeContribution") AND $row.minimum_fee GT 0 }
                     {if $is_separate_payment OR ! $form.amount.label}
-                        - {$row.minimum_fee|crmMoney}
+                        &ndash; {$row.minimum_fee|crmMoney}
                     {else}
                         {ts 1=$row.minimum_fee|crmMoney}(contribute at least %1 to be eligible for this membership){/ts}
                     {/if}
@@ -248,7 +249,7 @@ function showHideAutoRenew( memTypeId )
   if ( !memTypeId && singleMembership ) memTypeId = cj("input:radio[name="+priceSetName+"]").attr('membership-type');
   var renewOptions  = {/literal}{$autoRenewMembershipTypeOptions}{literal};
   var currentOption = eval( "renewOptions." + 'autoRenewMembershipType_' + memTypeId );
-  var autoRenew = cj('#auto_renew');
+  var autoRenew = cj('#auto_renew_section');
   var autoRenewC = cj('input[name="auto_renew"]');
   var forceRenew = cj("#force_renew");
 

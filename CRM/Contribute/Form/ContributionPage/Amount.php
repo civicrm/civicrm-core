@@ -351,7 +351,7 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
     }
 
     //check for the amount label (mandatory)
-    if (!empty($fields['amount_block_is_active']) && empty($fields['amount_label'])) {
+    if (!empty($fields['amount_block_is_active']) && empty($fields['price_set_id']) && empty($fields['amount_label'])) {
       $errors['amount_label'] = ts('Please enter the contribution amount label.');
     }
     $minAmount = CRM_Utils_Array::value('min_amount', $fields);

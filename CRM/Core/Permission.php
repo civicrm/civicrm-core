@@ -127,7 +127,7 @@ class CRM_Core_Permission {
         foreach ($permission as $orPerm) {
           if (self::check($orPerm)) {
             //one of our 'or' permissions has succeeded - stop checking this permission
-            return TRUE;;
+            return TRUE;
           }
         }
         //none of our our conditions was met
@@ -826,6 +826,22 @@ class CRM_Core_Permission {
         $prefix . ts('edit all manual batches'),
         ts('Edit all accounting batches'),
       ),
+      'close own manual batches' => array(
+        $prefix . ts('close own manual batches'),
+        ts('Close accounting batches created by user (with Access to CiviContribute)'),
+      ),
+      'close all manual batches' => array(
+        $prefix . ts('close all manual batches'),
+        ts('Close all accounting batches (with Access to CiviContribute)'),
+      ),
+      'reopen own manual batches' => array(
+        $prefix . ts('reopen own manual batches'),
+        ts('Reopen accounting batches created by user (with Access to CiviContribute)'),
+      ),
+      'reopen all manual batches' => array(
+        $prefix . ts('reopen all manual batches'),
+        ts('Reopen all accounting batches (with Access to CiviContribute)'),
+      ),
       'view own manual batches' => array(
         $prefix . ts('view own manual batches'),
         ts('View accounting batches created by user (with Access to CiviContribute)'),
@@ -1096,6 +1112,7 @@ class CRM_Core_Permission {
         'edit contributions',
       ),
     );
+    $permissions['contribution_recur'] = $permissions['payment'];
 
     // Custom field permissions
     $permissions['custom_field'] = array(
@@ -1131,6 +1148,12 @@ class CRM_Core_Permission {
     );
     // Loc block is only used for events
     $permissions['loc_block'] = $permissions['event'];
+
+    $permissions['state_province'] = array(
+      'get' => array(
+        'access CiviCRM',
+      ),
+    );
 
     // Price sets are shared by several components, user needs access to at least one of them
     $permissions['price_set'] = array(

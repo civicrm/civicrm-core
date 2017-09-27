@@ -286,7 +286,8 @@ abstract class Mapping implements MappingInterface {
   protected static function getValueLabelMap($name) {
     static $valueLabelMap = NULL;
     if ($valueLabelMap === NULL) {
-      $valueLabelMap['activity_type'] = \CRM_Core_PseudoConstant::activityType(TRUE, TRUE);
+      // CRM-20510: Include CiviCampaign activity types along with CiviCase IF component is enabled
+      $valueLabelMap['activity_type'] = \CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE);
       asort($valueLabelMap['activity_type']);
 
       $valueLabelMap['activity_status'] = \CRM_Core_PseudoConstant::activityStatus();

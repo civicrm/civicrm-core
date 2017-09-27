@@ -814,7 +814,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           }
 
           //get event custom field information
-          $groupTree = CRM_Core_BAO_CustomGroup::getTree('Event', $this, $this->_eventId, 0, $this->_values['event']['event_type_id']);
+          $groupTree = CRM_Core_BAO_CustomGroup::getTree('Event', NULL, $this->_eventId, 0, $this->_values['event']['event_type_id']);
           $primaryParticipant['eventCustomFields'] = $groupTree;
 
           // call postprocess hook before leaving
@@ -960,6 +960,9 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       $params['amount_level'] = $params['amount_level'] . ts(' (multiple participants)') . CRM_Core_DAO::VALUE_SEPARATOR;
     }
 
+    // CRM-20264: fetch CC type ID and number (last 4 digit) and assign it back to $params
+    CRM_Contribute_Form_AbstractEditPayment::formatCreditCardDetails($params);
+
     $contribParams = array(
       'contact_id' => $contactID,
       'financial_type_id' => !empty($form->_values['event']['financial_type_id']) ? $form->_values['event']['financial_type_id'] : $params['financial_type_id'],
@@ -978,6 +981,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
 
     if ($paymentProcessor) {
       $contribParams['payment_instrument_id'] = $paymentProcessor['payment_instrument_id'];
+      $contribParams['payment_processor'] = $paymentProcessor['id'];
     }
 
     if (!$pending && $result) {
@@ -1023,7 +1027,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           $form->_values
         )
       );
-      if ($eventStartDate) {
+      if (strtotime($eventStartDate) > strtotime(date('Ymt'))) {
         $contribParams['revenue_recognition_date'] = date('Ymd', strtotime($eventStartDate));
       }
     }
@@ -1034,7 +1038,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       $contribParams['address_id'] = CRM_Contribute_BAO_Contribution::createAddress($params, $form->_bltID);
     }
 
-    $contribParams['payment_processor'] = CRM_Utils_Array::value('payment_processor', $params);
     $contribParams['skipLineItem'] = 1;
     // create contribution record
     $contribution = CRM_Contribute_BAO_Contribution::add($contribParams, $ids);
@@ -1302,6 +1305,9 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     $eventParams = array('id' => $params['id']);
     CRM_Event_BAO_Event::retrieve($eventParams, $form->_values['event']);
     $form->set('registerByID', $params['registerByID']);
+    if (!empty($params['paymentProcessorObj'])) {
+      $form->_paymentProcessor = $params['paymentProcessorObj'];
+    }
     $form->postProcess();
   }
 

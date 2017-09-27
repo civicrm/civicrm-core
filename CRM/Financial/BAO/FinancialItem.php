@@ -96,7 +96,7 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
       'currency' => $contribution->currency,
       'entity_table' => 'civicrm_line_item',
       'entity_id' => $lineItem->id,
-      'description' => ($lineItem->qty != 1 ? $lineItem->qty . ' of ' : '') . ' ' . $lineItem->label,
+      'description' => ($lineItem->qty != 1 ? $lineItem->qty . ' of ' : '') . $lineItem->label,
       'status_id' => $itemStatus,
     );
 
@@ -105,25 +105,19 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
       $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
       $params['amount'] = $lineItem->tax_amount;
       $params['description'] = $taxTerm;
-      $accountRel = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Sales Tax Account is' "));
+      $accountRelName = 'Sales Tax Account is';
     }
     else {
       $accountRelName = 'Income Account is';
       if (property_exists($contribution, 'revenue_recognition_date') && !CRM_Utils_System::isNull($contribution->revenue_recognition_date)) {
         $accountRelName = 'Deferred Revenue Account is';
       }
-      $accountRel = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE '{$accountRelName}' "));
     }
     if ($lineItem->financial_type_id) {
-      $searchParams = array(
-        'entity_table' => 'civicrm_financial_type',
-        'entity_id' => $lineItem->financial_type_id,
-        'account_relationship' => $accountRel,
+      $params['financial_account_id'] = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount(
+        $lineItem->financial_type_id,
+        $accountRelName
       );
-
-      $result = array();
-      CRM_Financial_BAO_FinancialTypeAccount::retrieve($searchParams, $result);
-      $params['financial_account_id'] = CRM_Utils_Array::value('financial_account_id', $result);
     }
     if (empty($trxnId)) {
       $trxnId['id'] = CRM_Contribute_BAO_Contribution::$_trxnIDs;
@@ -286,25 +280,25 @@ WHERE cc.id IN (' . implode(',', $contactIds) . ') AND con.is_test = 0';
   }
 
   /**
-   * Get last financial item data.
+   * Get most relevant previous financial item relating to the line item.
+   *
+   * This function specifically excludes sales tax.
    *
    * @param int $entityId
    *
-   * @param string $entityTable
-   *
    * @return object CRM_Core_DAO
    */
-  public static function getPreviousFinancialItem($entityId, $entityTable = 'civicrm_line_item') {
-    $queryParams = array(
-      1 => array($entityId, 'Integer'),
-      2 => array($entityTable, 'String'),
+  public static function getPreviousFinancialItem($entityId) {
+    $params = array(
+      'entity_id' => $entityId,
+      'entity_table' => 'civicrm_line_item',
+      'options' => array('limit' => 1, 'sort' => 'id DESC'),
     );
-    $query = 'SELECT id, description, status_id, financial_account_id 
-      FROM civicrm_financial_item
-      WHERE entity_id = %1 AND entity_table = %2 ORDER BY id DESC LIMIT 1';
-    $prevFinancialItem = CRM_Core_DAO::executeQuery($query, $queryParams);
-    $prevFinancialItem->fetch();
-    return $prevFinancialItem;
+    $salesTaxFinancialAccounts = civicrm_api3('FinancialAccount', 'get', array('is_tax' => 1));
+    if ($salesTaxFinancialAccounts['count']) {
+      $params['financial_account_id'] = array('NOT IN' => array_keys($salesTaxFinancialAccounts['values']));
+    }
+    return civicrm_api3('FinancialItem', 'getsingle', $params);
   }
 
 }

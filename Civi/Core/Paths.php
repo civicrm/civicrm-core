@@ -35,6 +35,24 @@ class Paths {
       ->register('civicrm.root', function () {
         return \CRM_Core_Config::singleton()->userSystem->getCiviSourceStorage();
       })
+      ->register('civicrm.packages', function () {
+        return array(
+          'path' => \Civi::paths()->getPath('[civicrm.root]/packages/'),
+          'url' => \Civi::paths()->getUrl('[civicrm.root]/packages/'),
+        );
+      })
+      ->register('civicrm.vendor', function () {
+        return array(
+          'path' => \Civi::paths()->getPath('[civicrm.root]/vendor/'),
+          'url' => \Civi::paths()->getUrl('[civicrm.root]/vendor/'),
+        );
+      })
+      ->register('civicrm.bower', function () {
+        return array(
+          'path' => \Civi::paths()->getPath('[civicrm.root]/bower_components/'),
+          'url' => \Civi::paths()->getUrl('[civicrm.root]/bower_components/'),
+        );
+      })
       ->register('civicrm.files', function () {
         return \CRM_Core_Config::singleton()->userSystem->getDefaultFileStorage();
       })
@@ -97,6 +115,9 @@ class Paths {
   public function getVariable($name, $attr) {
     if (!isset($this->variables[$name])) {
       $this->variables[$name] = call_user_func($this->variableFactory[$name]);
+      if (isset($GLOBALS['civicrm_paths'][$name])) {
+        $this->variables[$name] = array_merge($this->variables[$name], $GLOBALS['civicrm_paths'][$name]);
+      }
     }
     if (!isset($this->variables[$name][$attr])) {
       throw new \RuntimeException("Cannot resolve path using \"$name.$attr\"");

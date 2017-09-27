@@ -283,13 +283,6 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
   public function postProcess() {
     $formValues = $this->exportValues();
 
-    // reset all selected contact ids from session
-    // when we came from search context, CRM-3526
-    $session = CRM_Core_Session::singleton();
-    if ($session->get('selectedSearchContactIds')) {
-      $session->resetScope('selectedSearchContactIds');
-    }
-
     $formValues['main_details'] = $this->_mainDetails;
     $formValues['other_details'] = $this->_otherDetails;
     $migrationData = array('migration_info' => $formValues);

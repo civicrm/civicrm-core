@@ -125,4 +125,20 @@ class CRM_Utils_Money {
     return strtr($format, $replacements);
   }
 
+  /**
+   * This is a placeholder function for calculating the number of decimal places for a currency.
+   *
+   * Currently code assumes 2 decimal places but some currencies (bitcoin, middle eastern) have
+   * more. By using this function we can signpost the locations where the number of decimal places is
+   * currency specific for future enhancement.
+   *
+   * @param string $currency
+   *
+   * @return int
+   *   Number of decimal places.
+   */
+  public static function getCurrencyPrecision($currency = NULL) {
+    return 2;
+  }
+
 }

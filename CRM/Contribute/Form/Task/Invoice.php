@@ -286,12 +286,12 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
 
       // to get billing address if present
       $billingAddress = array();
-      foreach ($addressDetails as $key => $address) {
-        if ((isset($address['is_billing']) && $address['is_billing'] == 1) && (isset($address['is_primary']) && $address['is_primary'] == 1) && $address['contact_id'] == $contribution->contact_id) {
+      foreach ($addressDetails as $address) {
+        if (($address['is_billing'] == 1) && ($address['is_primary'] == 1) && ($address['contact_id'] == $contribution->contact_id)) {
           $billingAddress[$address['contact_id']] = $address;
           break;
         }
-        elseif (($address['is_billing'] == 0 && $address['is_primary'] == 1) || (isset($address['is_billing']) && $address['is_billing'] == 1) && $address['contact_id'] == $contribution->contact_id) {
+        elseif (($address['is_billing'] == 0 && $address['is_primary'] == 1) || ($address['is_billing'] == 1) && ($address['contact_id'] == $contribution->contact_id)) {
           $billingAddress[$address['contact_id']] = $address;
         }
       }
@@ -312,12 +312,12 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
           $creditNoteId = $contribution->creditnote_id;
         }
       }
-      $invoiceId = CRM_Utils_Array::value('invoice_prefix', $prefixValue) . "" . $contribution->id;
+      $invoiceNumber = CRM_Utils_Array::value('invoice_prefix', $prefixValue) . "" . $contribution->id;
 
       //to obtain due date for PDF invoice
       $contributionReceiveDate = date('F j,Y', strtotime(date($input['receive_date'])));
       $invoiceDate = date("F j, Y");
-      $dueDate = date('F j ,Y', strtotime($contributionReceiveDate . "+" . $prefixValue['due_date'] . "" . $prefixValue['due_date_period']));
+      $dueDate = date('F j, Y', strtotime($contributionReceiveDate . "+" . $prefixValue['due_date'] . "" . $prefixValue['due_date_period']));
 
       if ($input['component'] == 'contribute') {
         $lineItem = CRM_Price_BAO_LineItem::getLineItemsByContributionID($contribID);
@@ -327,13 +327,23 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         $lineItem = CRM_Price_BAO_LineItem::getLineItems($eid, 'participant', NULL, TRUE, FALSE, TRUE);
       }
 
-      //TO DO: Need to do changes for partially paid to display amount due on PDF invoice
-      $amountDue = ($input['amount'] - $input['amount']);
+      $resultPayments = civicrm_api3('Payment', 'get', array(
+            'sequential' => 1,
+            'contribution_id' => $contribID,
+      ));
+      $amountPaid = 0;
+      foreach ($resultPayments['values'] as $singlePayment) {
+        // Only count payments that have been (status =) completed.
+        if ($singlePayment['status_id'] == 1) {
+          $amountPaid += $singlePayment['total_amount'];
+        }
+      }
+      $amountDue = ($input['amount'] - $amountPaid);
 
-      // retreiving the subtotal and sum of same tax_rate
+      // retrieving the subtotal and sum of same tax_rate
       $dataArray = array();
       $subTotal = 0;
-      foreach ($lineItem as $entity_id => $taxRate) {
+      foreach ($lineItem as $taxRate) {
         if (isset($dataArray[(string) $taxRate['tax_rate']])) {
           $dataArray[(string) $taxRate['tax_rate']] = $dataArray[(string) $taxRate['tax_rate']] + CRM_Utils_Array::value('tax_amount', $taxRate);
         }
@@ -415,11 +425,13 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         'component' => $input['component'],
         'id' => $contribution->id,
         'source' => $source,
-        'invoice_id' => $invoiceId,
+        'invoice_number' => $invoiceNumber,
+        'invoice_id' => $contribution->invoice_id,
         'resourceBase' => $config->userFrameworkResourceURL,
         'defaultCurrency' => $config->defaultCurrency,
         'amount' => $contribution->total_amount,
         'amountDue' => $amountDue,
+        'amountPaid' => $amountPaid,
         'invoice_date' => $invoiceDate,
         'dueDate' => $dueDate,
         'notes' => CRM_Utils_Array::value('notes', $prefixValue),
@@ -457,7 +469,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         $tplParams['creditnote_id'] = $creditNoteId;
       }
 
-      $pdfFileName = "{$invoiceId}.pdf";
+      $pdfFileName = "{$invoiceNumber}.pdf";
       $sendTemplateParams = array(
         'groupName' => 'msg_tpl_workflow_contribution',
         'valueName' => 'contribution_invoice_receipt',
@@ -525,7 +537,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
 
         list($sent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
         // functions call for adding activity with attachment
-        $pdfFileName = "{$invoiceId}.pdf";
+        $pdfFileName = "{$invoiceNumber}.pdf";
         $fileName = self::putFile($html, $pdfFileName);
         self::addActivities($subject, $contribution->contact_id, $fileName, $params);
       }
@@ -540,12 +552,12 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
 
         list($sent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
         // functions call for adding activity with attachment
-        $pdfFileName = "{$invoiceId}.pdf";
+        $pdfFileName = "{$invoiceNumber}.pdf";
         $fileName = self::putFile($html, $pdfFileName);
         self::addActivities($subject, $contribution->contact_id, $fileName, $params);
       }
 
-      CRM_Core_DAO::setFieldValue('CRM_Contribute_DAO_Contribution', $contribution->id, 'invoice_id', $invoiceId);
+      CRM_Core_DAO::setFieldValue('CRM_Contribute_DAO_Contribution', $contribution->id, 'invoice_number', $invoiceNumber);
       $invoiceTemplate->clearTemplateVars();
     }
 
@@ -554,7 +566,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         return $html;
       }
       else {
-        $pdfFileName = "{$invoiceId}.pdf";
+        $pdfFileName = "{$invoiceNumber}.pdf";
         CRM_Utils_PDF_Utils::html2pdf($messageInvoice, $pdfFileName, FALSE, array(
           'margin_top' => 10,
           'margin_left' => 65,
@@ -602,15 +614,17 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
     $config->doNotAttachPDFReceipt = 1;
 
     if (!empty($params['output']) && $params['output'] == 'pdf_invoice') {
-      $activityTypeID = CRM_Core_OptionGroup::getValue('activity_type',
-        'Downloaded Invoice',
-        'name'
+      $activityTypeID = CRM_Core_PseudoConstant::getKey(
+        'CRM_Activity_DAO_Activity',
+        'activity_type_id',
+        'Downloaded Invoice'
       );
     }
     else {
-      $activityTypeID = CRM_Core_OptionGroup::getValue('activity_type',
-        'Emailed Invoice',
-        'name'
+      $activityTypeID = CRM_Core_PseudoConstant::getKey(
+        'CRM_Activity_DAO_Activity',
+        'activity_type_id',
+        'Emailed Invoice'
       );
     }
 

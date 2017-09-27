@@ -1199,7 +1199,7 @@ class CRM_GCD {
     $contactDAO->find();
 
     $count = 0;
-    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
+    $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
     while ($contactDAO->fetch()) {
       if ($count++ > 2) {
         break;
@@ -1318,7 +1318,7 @@ class CRM_GCD {
   private function addMembership() {
     $contact = new CRM_Contact_DAO_Contact();
     $contact->query("SELECT id FROM civicrm_contact where contact_type = 'Individual'");
-    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
+    $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
     while ($contact->fetch()) {
       $contacts[] = $contact->id;
     }
@@ -1693,7 +1693,7 @@ INSERT INTO civicrm_activity_contact
   (contact_id, activity_id, record_type_id)
 VALUES
 ";
-    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
+    $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
     $currentActivityID = CRM_Core_DAO::singleValueQuery("SELECT MAX(id) FROM civicrm_activity");
     $currentActivityID -= 50;
     $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
@@ -1843,7 +1843,7 @@ order by cc.id; ";
     $select = 'SELECT contribution.id contribution_id, cli.id as line_item_id, contribution.contact_id, contribution.receive_date, contribution.total_amount, contribution.currency, cli.label,
       cli.financial_type_id,  cefa.financial_account_id, contribution.payment_instrument_id, contribution.check_number, contribution.trxn_id';
     $where = 'WHERE cefa.account_relationship = 1';
-    $financialAccountId = CRM_Financial_BAO_FinancialTypeAccount::getInstrumentFinancialAccount();
+    $financialAccountId = CRM_Financial_BAO_FinancialTypeAccount::getInstrumentFinancialAccount(4);
     foreach ($components as $component) {
       if ($component == 'contribution') {
         $from = 'FROM `civicrm_contribution` contribution';

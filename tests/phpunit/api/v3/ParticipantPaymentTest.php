@@ -393,4 +393,26 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
     $this->assertDBCompareValues('CRM_Financial_DAO_FinancialItem', $fitemParams, $compareParams);
   }
 
+  /**
+   * test getParticipantIds() function
+   */
+  public function testGetParticipantIds() {
+    $contributionID = $this->contributionCreate(array('contact_id' => $this->_contactID));
+    $expectedParticipants = array($this->_participantID, $this->_participantID2);
+
+    //Create Participant Payment record With Values
+    foreach ($expectedParticipants as $pid) {
+      $params = array(
+        'participant_id' => $pid,
+        'contribution_id' => $contributionID,
+      );
+      $this->callAPISuccess('participant_payment', 'create', $params);
+    }
+    //Check if all participants are listed.
+    $participants = CRM_Event_BAO_Participant::getParticipantIds($contributionID);
+    $this->checkArrayEquals($expectedParticipants, $participants);
+    //delete created contribution
+    $this->contributionDelete($contributionID);
+  }
+
 }

@@ -38,10 +38,12 @@
         ];
 
       function formatButton() {
-        var split = $input.val().split(' ');
+        var val = $input.val().replace('fa ', '');
+        val = val.replace('crm-i ', '');
+        var split = val.split(' ');
         $button.button('option', {
           label: split[0] || ts('None'),
-          icons: {primary: $input.val()}
+          icons: {primary: val ? val : 'fa-'}
         });
         $style.toggle(!!split[0]).val(split[1] || '');
       }

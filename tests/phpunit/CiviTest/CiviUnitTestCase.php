@@ -897,7 +897,6 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   public function callAPISuccessGetSingle($entity, $params, $checkAgainst = NULL) {
     $params += array(
       'version' => $this->_apiversion,
-      'debug' => 1,
     );
     $result = $this->civicrm_api($entity, 'getsingle', $params);
     if (!is_array($result) || !empty($result['is_error']) || isset($result['values'])) {
@@ -1805,6 +1804,29 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
+   * Prepare class for ACLs.
+   */
+  protected function prepareForACLs() {
+    $config = CRM_Core_Config::singleton();
+    $config->userPermissionClass->permissions = array();
+  }
+
+  /**
+   * Reset after ACLs.
+   */
+  protected function cleanUpAfterACLs() {
+    CRM_Utils_Hook::singleton()->reset();
+    $tablesToTruncate = array(
+      'civicrm_acl',
+      'civicrm_acl_cache',
+      'civicrm_acl_entity_role',
+      'civicrm_acl_contact_cache',
+    );
+    $this->quickCleanup($tablesToTruncate);
+    $config = CRM_Core_Config::singleton();
+    unset($config->userPermissionClass->permissions);
+  }
+  /**
    * Create a smart group.
    *
    * By default it will be a group of households.
@@ -1929,12 +1951,15 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * @param array $params
    *   Optional parameters.
+   * @param bool $reloadConfig
+   *   While enabling CiviCampaign component, we shouldn't always forcibly
+   *    reload config as this hinder hook call in test environment
    *
    * @return int
    *   Campaign ID.
    */
-  public function campaignCreate($params = array()) {
-    $this->enableCiviCampaign();
+  public function campaignCreate($params = array(), $reloadConfig = TRUE) {
+    $this->enableCiviCampaign($reloadConfig);
     $campaign = $this->callAPISuccess('campaign', 'create', array_merge(array(
       'name' => 'big_campaign',
       'title' => 'Campaign',
@@ -2225,11 +2250,16 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
 
   /**
    * Enable CiviCampaign Component.
+   *
+   * @param bool $reloadConfig
+   *    Force relaod config or not
    */
-  public function enableCiviCampaign() {
+  public function enableCiviCampaign($reloadConfig = TRUE) {
     CRM_Core_BAO_ConfigSetting::enableComponent('CiviCampaign');
-    // force reload of config object
-    $config = CRM_Core_Config::singleton(TRUE, TRUE);
+    if ($reloadConfig) {
+      // force reload of config object
+      $config = CRM_Core_Config::singleton(TRUE, TRUE);
+    }
     //flush cache by calling with reset
     $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, TRUE, 'name', TRUE);
   }
@@ -2401,10 +2431,12 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @param array $customGroup
    * @param string $name
    *   Name of custom field.
+   * @param array $extraParams
+   *   Additional parameters to pass through.
    *
    * @return array|int
    */
-  public function customFieldOptionValueCreate($customGroup, $name) {
+  public function customFieldOptionValueCreate($customGroup, $name, $extraParams = array()) {
     $fieldParams = array(
       'custom_group_id' => $customGroup['id'],
       'name' => 'test_custom_group',
@@ -2431,7 +2463,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       'option_status' => 1,
     );
 
-    $params = array_merge($fieldParams, $optionGroup, $optionValue);
+    $params = array_merge($fieldParams, $optionGroup, $optionValue, $extraParams);
 
     return $this->callAPISuccess('custom_field', 'create', $params);
   }
@@ -2537,6 +2569,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     $this->restoreDefaultPriceSetConfig();
     $var = TRUE;
     CRM_Member_BAO_Membership::createRelatedMemberships($var, $var, TRUE);
+    $this->disableTaxAndInvoicing();
     System::singleton()->flushProcessors();
   }
 
@@ -3370,7 +3403,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
       'financial_type_id' => 4,
       'contribution_status_id' => 1,
       'partial_payment_total' => 300.00,
-      'partial_amount_pay' => 150,
+      'partial_amount_to_pay' => 150,
       'contribution_mode' => 'participant',
       'participant_id' => $participant['id'],
     );
@@ -3677,6 +3710,19 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
   }
 
   /**
+   * Enable Tax and Invoicing
+   */
+  protected function disableTaxAndInvoicing($params = array()) {
+    // Enable component contribute setting
+    $contributeSetting = array_merge($params,
+      array(
+        'invoicing' => 0,
+      )
+    );
+    return Civi::settings()->set('contribution_invoice_settings', $contributeSetting);
+  }
+
+  /**
    * Add Sales Tax relation for financial type with financial account.
    *
    * @param int $financialTypeId
@@ -3801,6 +3847,19 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
   }
 
   /**
+   * Only specified contact returned.
+   * @implements CRM_Utils_Hook::aclWhereClause
+   * @param $type
+   * @param $tables
+   * @param $whereTables
+   * @param $contactID
+   * @param $where
+   */
+  public function aclWhereMultipleContacts($type, &$tables, &$whereTables, &$contactID, &$where) {
+    $where = " contact_a.id IN (" . implode(', ', $this->allowedContacts) . ")";
+  }
+
+  /**
    * @implements CRM_Utils_Hook::selectWhereClause
    *
    * @param string $entity
@@ -3810,6 +3869,51 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     if ($entity == 'Event') {
       $clauses['event_type_id'][] = "IN (2, 3, 4)";
     }
+  }
+
+  /**
+   * An implementation of hook_civicrm_post used with all our test cases.
+   *
+   * @param $op
+   * @param string $objectName
+   * @param int $objectId
+   * @param $objectRef
+   */
+  public function onPost($op, $objectName, $objectId, &$objectRef) {
+    if ($op == 'create' && $objectName == 'Individual') {
+      CRM_Core_DAO::executeQuery(
+        "UPDATE civicrm_contact SET nick_name = 'munged' WHERE id = %1",
+        array(
+          1 => array($objectId, 'Integer'),
+        )
+      );
+    }
+
+    if ($op == 'edit' && $objectName == 'Participant') {
+      $params = array(
+        1 => array($objectId, 'Integer'),
+      );
+      $query = "UPDATE civicrm_participant SET source = 'Post Hook Update' WHERE id = %1";
+      CRM_Core_DAO::executeQuery($query, $params);
+    }
+  }
+
+
+  /**
+   * Instantiate form object.
+   *
+   * We need to instantiate the form to run preprocess, which means we have to trick it about the request method.
+   *
+   * @param string $class
+   *   Name of form class.
+   *
+   * @return \CRM_Core_Form
+   */
+  public function getFormObject($class) {
+    $form = new $class();
+    $_SERVER['REQUEST_METHOD'] = 'GET';
+    $form->controller = new CRM_Core_Controller();
+    return $form;
   }
 
 }

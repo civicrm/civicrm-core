@@ -534,6 +534,9 @@
     <title>Email Greeting ID</title>
     <comment>FK to civicrm_option_value.id, that has to be valid registered Email Greeting.</comment>
     <add>3.0</add>
+    <pseudoconstant>
+      <optionGroupName>email_greeting</optionGroupName>
+    </pseudoconstant>
   </field>
   <field>
     <name>email_greeting_custom</name>
@@ -567,6 +570,9 @@
     <html>
       <type>Text</type>
     </html>
+    <pseudoconstant>
+      <optionGroupName>postal_greeting</optionGroupName>
+    </pseudoconstant>
   </field>
   <field>
     <name>postal_greeting_custom</name>
@@ -609,6 +615,9 @@
     <html>
       <type>Text</type>
     </html>
+    <pseudoconstant>
+      <optionGroupName>addressee</optionGroupName>
+    </pseudoconstant>
   </field>
   <field>
     <name>addressee_display</name>
@@ -684,6 +693,11 @@
       <type>CheckBox</type>
     </html>
   </field>
+  <index>
+    <name>index_is_deceased</name>
+    <fieldName>is_deceased</fieldName>
+    <add>4.7</add>
+  </index>
   <field>
     <name>deceased_date</name>
     <type>date</type>

@@ -55,11 +55,11 @@ class CRM_Batch_Page_AJAX {
    */
   public static function getBatchList() {
     $sortMapper = array(
-      0 => 'batch.title',
-      1 => 'batch.type_id',
+      0 => 'title',
+      1 => 'type_id',
       2 => '',
-      3 => 'batch.total',
-      4 => 'batch.status_id',
+      3 => 'total',
+      4 => 'status_id',
       5 => '',
     );
 
@@ -80,7 +80,7 @@ class CRM_Batch_Page_AJAX {
 
     if ($context != 'financialBatch') {
       // data entry status batches
-      $params['status_id'] = CRM_Core_OptionGroup::getValue('batch_status', 'Data Entry', 'name');
+      $params['status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Data Entry');
     }
 
     $params['context'] = $context;

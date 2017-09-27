@@ -109,7 +109,7 @@
       <type>Text</type>
     </html>
     <add>1.1</add>
-    <modify>2.0</modify>
+    <change>2.0</change>
   </field>
   <field>
     <name>scheduled_date</name>
@@ -241,7 +241,7 @@
     <uniqueName>activity_status_id</uniqueName>
     <title>Activity Status</title>
     <import>true</import>
-    <export>false</export>
+    <export>true</export>
     <headerPattern>/(activity.)?status(.label$)?/i</headerPattern>
     <type>int unsigned</type>
     <comment>ID of the status this activity is currently in. Foreign key to civicrm_option_value.</comment>
@@ -461,6 +461,26 @@
     <import>true</import>
     <comment>Activity marked as favorite.</comment>
     <headerPattern>/(activity.)?(star|favorite)/i</headerPattern>
+    <add>4.7</add>
+  </field>
+  <field>
+    <name>created_date</name>
+    <uniqueName>activity_created_date</uniqueName>
+    <type>timestamp</type>
+    <comment>When was the activity was created.</comment>
+    <required>false</required>
+    <export>true</export>
+    <default>NULL</default>
+    <add>4.7</add>
+  </field>
+  <field>
+    <name>modified_date</name>
+    <uniqueName>activity_modified_date</uniqueName>
+    <type>timestamp</type>
+    <comment>When was the activity (or closely related entity) was created or modified or deleted.</comment>
+    <required>false</required>
+    <export>true</export>
+    <default>CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP</default>
     <add>4.7</add>
   </field>
 </table>

@@ -188,6 +188,13 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   public $_isBillingAddressRequiredForPayLater;
 
   /**
+   * Flag if email field exists in embedded profile
+   *
+   * @var bool
+   */
+  public $_emailExists = FALSE;
+
+  /**
    * Is this a backoffice form
    * (this will affect whether paypal express code is displayed)
    * @var bool
@@ -220,9 +227,10 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       // lets just bump this to a regular session error and redirect user to main page
       $this->controller->invalidKeyRedirect();
     }
+    $this->_emailExists = $this->get('emailExists');
 
     // this was used prior to the cleverer this_>getContactID - unsure now
-    $this->_userID = CRM_Core_Session::singleton()->get('userID');
+    $this->_userID = CRM_Core_Session::singleton()->getLoggedInContactID();
 
     $this->_contactID = $this->_membershipContactID = $this->getContactID();
     $this->_mid = NULL;
@@ -572,23 +580,36 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
     // The concept of contributeMode is deprecated.
     // The payment processor object can provide info about the fields it shows.
-    if ($this->_contributeMode == 'direct' && $assignCCInfo) {
-      if ($this->_paymentProcessor &&
-        $this->_paymentProcessor['payment_type'] & CRM_Core_Payment::PAYMENT_TYPE_DIRECT_DEBIT
-      ) {
-        $this->assign('account_holder', $this->_params['account_holder']);
-        $this->assign('bank_identification_number', $this->_params['bank_identification_number']);
-        $this->assign('bank_name', $this->_params['bank_name']);
-        $this->assign('bank_account_number', $this->_params['bank_account_number']);
+    if ($assignCCInfo) {
+      /** @var  $paymentProcessorObject \CRM_Core_Payment */
+      $paymentProcessorObject = $this->_paymentProcessor['object'];
+      $paymentFields = $paymentProcessorObject->getPaymentFormFields();
+      foreach ($paymentFields as $index => $paymentField) {
+        if (!isset($this->_params[$paymentField])) {
+          unset($paymentFields[$index]);
+          continue;
+        }
+        if ($paymentField === 'credit_card_exp_date') {
+          $date = CRM_Utils_Date::format(CRM_Utils_Array::value('credit_card_exp_date', $this->_params));
+          $date = CRM_Utils_Date::mysqlToIso($date);
+          $this->assign('credit_card_exp_date', $date);
+        }
+        elseif ($paymentField === 'credit_card_number') {
+          $this->assign('credit_card_number',
+            CRM_Utils_System::mungeCreditCard(CRM_Utils_Array::value('credit_card_number', $this->_params))
+          );
+        }
+        else {
+          $this->assign($paymentField, $this->_params[$paymentField]);
+        }
       }
-      else {
-        $date = CRM_Utils_Date::format(CRM_Utils_Array::value('credit_card_exp_date', $this->_params));
-        $date = CRM_Utils_Date::mysqlToIso($date);
-        $this->assign('credit_card_exp_date', $date);
-        $this->assign('credit_card_number',
-          CRM_Utils_System::mungeCreditCard(CRM_Utils_Array::value('credit_card_number', $this->_params))
-        );
+      $paymentFieldsetLabel = ts('%1 Information', array($paymentProcessorObject->getPaymentTypeLabel()));
+      if (empty($paymentFields)) {
+        $paymentFieldsetLabel = '';
       }
+      $this->assign('paymentFieldsetLabel', $paymentFieldsetLabel);
+      $this->assign('paymentFields', $paymentFields);
+
     }
 
     $this->assign('email',
@@ -639,10 +660,13 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       );
 
       if ($fields) {
-        // unset any email-* fields since we already collect it, CRM-2888
-        foreach (array_keys($fields) as $fieldName) {
-          if (substr($fieldName, 0, 6) == 'email-' && !in_array($profileContactType, array('honor', 'onbehalf'))) {
-            unset($fields[$fieldName]);
+        // determine if email exists in profile so we know if we need to manually insert CRM-2888, CRM-15067
+        foreach ($fields as $key => $field) {
+          if (substr($key, 0, 6) == 'email-' &&
+              !in_array($profileContactType, array('honor', 'onbehalf'))
+          ) {
+            $this->_emailExists = TRUE;
+            $this->set('emailExists', TRUE);
           }
         }
 
@@ -834,11 +858,13 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
         if (empty($member['is_active'])) {
           $msg = ts('Mixed profile not allowed for on behalf of registration/sign up.');
           $onBehalfProfile = CRM_Core_BAO_UFGroup::profileGroups($form->_values['onbehalf_profile_id']);
-          foreach (array(
+          foreach (
+            array(
               'Individual',
               'Organization',
               'Household',
-            ) as $contactType) {
+            ) as $contactType
+          ) {
             if (in_array($contactType, $onBehalfProfile) &&
               (in_array('Membership', $onBehalfProfile) ||
                 in_array('Contribution', $onBehalfProfile)
@@ -882,7 +908,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
           }
         }
 
-        $form->assign('fieldSetTitle', ts('Organization Details'));
+        $form->assign('fieldSetTitle', ts(CRM_Core_BAO_UFGroup::getTitle($form->_values['onbehalf_profile_id'])));
 
         if (CRM_Utils_Array::value('is_for_organization', $form->_values)) {
           if ($form->_values['is_for_organization'] == 2) {
@@ -908,7 +934,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
           if (!empty($form->_submitValues['onbehalfof_id'])) {
             $form->assign('submittedOnBehalf', $form->_submitValues['onbehalfof_id']);
           }
-          $form->assign('submittedOnBehalfInfo', json_encode($form->_submitValues['onbehalf']));
+          $form->assign('submittedOnBehalfInfo', json_encode(str_replace('"', '\"', $form->_submitValues['onbehalf']), JSON_HEX_APOS));
         }
 
         $fieldTypes = array('Contact', 'Organization');

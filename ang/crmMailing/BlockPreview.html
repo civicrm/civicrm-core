@@ -22,7 +22,7 @@ Vars: mailing:obj, testContact:obj, testGroup:obj, crmMailing:FormController
     </div>
     -->
   </div>
-  <div class="preview-contact" ng-form>
+  <div class="preview-contact" ng-form="">
     <div>
       {{ts('Send test email to:')}}
       <a crm-ui-help="hs({id: 'test', title: ts('Test Email')})"></a>
@@ -38,7 +38,7 @@ Vars: mailing:obj, testContact:obj, testGroup:obj, crmMailing:FormController
     </div>
     <button crm-icon="fa-paper-plane" title="{{crmMailing.$invalid || !testContact.email ? ts('Complete all required fields first') : ts('Send test message to %1', {1: testContact.email})}}" ng-disabled="crmMailing.$invalid || !testContact.email" ng-click="doSend({email: testContact.email})">{{ts('Send test')}}</button>
   </div>
-  <div class="preview-group" ng-form>
+  <div class="preview-group" ng-form="">
     <div>
       {{ts('Send test email to group:')}}
       <a crm-ui-help="hs({id: 'test', title: ts('Test Email')})"></a>
@@ -49,13 +49,13 @@ Vars: mailing:obj, testContact:obj, testGroup:obj, crmMailing:FormController
         ui-jq="crmSelect2"
         ui-options="{dropdownAutoWidth : true, allowClear: true, placeholder: ts('Select Group')}"
         ng-model="testGroup.gid"
-        ng-options="group.id as group.title for group in crmMailingConst.groupNames|orderBy:'title'"
+        ng-options="group.id as group.title for group in crmMailingConst.testGroupNames|orderBy:'title'"
         class="crm-action-menu fa-envelope-o"
         >
         <option value=""></option>
       </select>
     </div>
-    <button crm-icon="fa-paper-plane" title="{{crmMailing.$invalid || !testGroup.gid ? ts('Complete all required fields first') : ts('Send test message to group')}}"ng-disabled="crmMailing.$invalid || !testGroup.gid" crm-confirm="{resizable: true, width: '40%', height: '40%', open: previewTestGroup}" on-yes="doSend({gid: testGroup.gid})">{{ts('Send test')}}</button>
+    <button crm-icon="fa-paper-plane" title="{{crmMailing.$invalid || !testGroup.gid ? ts('Complete all required fields first') : ts('Send test message to group')}}" ng-disabled="crmMailing.$invalid || !testGroup.gid" crm-confirm="{resizable: true, width: '40%', height: '40%', open: previewTestGroup}" on-yes="doSend({gid: testGroup.gid})">{{ts('Send test')}}</button>
   </div>
   <div class="clear"></div>
 </div>

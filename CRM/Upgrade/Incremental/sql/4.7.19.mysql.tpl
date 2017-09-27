@@ -11,8 +11,10 @@ DELETE FROM civicrm_option_value
 --  CRM-19517 Disable all price fields and price field options that use disabled fianancial types
 UPDATE civicrm_price_field_value cpfv
 INNER JOIN civicrm_financial_type cft ON cft.id = cpfv.financial_type_id
+INNER JOIN civicrm_price_field pf ON pf.id = cpfv.price_field_id
+INNER JOIN civicrm_price_set ps ON ps.id = pf.price_set_id
 SET cpfv.is_active = 0
-WHERE cft.is_active = 0;
+WHERE cft.is_active = 0 AND ps.is_quick_config = 0;
 
 UPDATE civicrm_price_field cpf
 LEFT JOIN (SELECT DISTINCT price_field_id AS price_field_id
@@ -41,3 +43,6 @@ VALUES
 
 -- CRM-20439 rename card_type to card_type_id of civicrm_financial_trxn table (IIDA-126)
 ALTER TABLE `civicrm_financial_trxn` CHANGE `card_type` `card_type_id` INT(10) UNSIGNED NULL DEFAULT NULL COMMENT 'FK to accept_creditcard option group values';
+
+-- CRM-20465
+ALTER TABLE `civicrm_financial_trxn` CHANGE `pan_truncation` `pan_truncation` VARCHAR( 4 ) NULL DEFAULT NULL COMMENT 'Last 4 digits of credit card';

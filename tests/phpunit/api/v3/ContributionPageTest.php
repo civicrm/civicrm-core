@@ -41,6 +41,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   protected $_entity = 'contribution_page';
   protected $contribution_result = NULL;
   protected $_priceSetParams = array();
+  protected $_membershipBlockAmount = 2;
   /**
    * Payment processor details.
    * @var array
@@ -430,7 +431,35 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       )
     );
     $mut->stop();
-    $mut->clearMessages(999);
+    $mut->clearMessages();
+  }
+
+  /**
+   * Test submit with a pay later abnd check line item in mails.
+   */
+  public function testSubmitMembershipBlockIsSeparatePaymentPayLaterWithEmail() {
+    $mut = new CiviMailUtils($this, TRUE);
+    $this->setUpMembershipContributionPage();
+    $submitParams = array(
+      'price_' . $this->_ids['price_field'][0] => reset($this->_ids['price_field_value']),
+      'id' => (int) $this->_ids['contribution_page'],
+      'amount' => 10,
+      'billing_first_name' => 'Billy',
+      'billing_middle_name' => 'Goat',
+      'billing_last_name' => 'Gruff',
+      'is_pay_later' => 1,
+      'selectMembership' => $this->_ids['membership_type'],
+      'email-Primary' => 'billy-goat@the-bridge.net',
+    );
+
+    $this->callAPISuccess('contribution_page', 'submit', $submitParams);
+    $contribution = $this->callAPISuccess('contribution', 'getsingle', array('contribution_page_id' => $this->_ids['contribution_page']));
+    $this->callAPISuccess('membership_payment', 'getsingle', array('contribution_id' => $contribution['id']));
+    $mut->checkMailLog(array(
+      'Membership Amount -...             $ 2.00',
+    ));
+    $mut->stop();
+    $mut->clearMessages();
   }
 
   /**
@@ -457,6 +486,44 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $membershipPayment = $this->callAPISuccess('membership_payment', 'getsingle', array());
     $this->assertTrue(in_array($membershipPayment['contribution_id'], array_keys($contributions['values'])));
     $membership = $this->callAPISuccessGetSingle('membership', array('id' => $membershipPayment['membership_id']));
+    $this->assertEquals($membership['contact_id'], $contributions['values'][$membershipPayment['contribution_id']]['contact_id']);
+  }
+
+
+  /**
+   * Test submit with a membership block in place.
+   */
+  public function testSubmitMembershipBlockIsSeparatePaymentWithPayLater() {
+    $this->setUpMembershipContributionPage(TRUE);
+    $this->_ids['membership_type'] = array($this->membershipTypeCreate(array('minimum_fee' => 2)));
+    //Pay later
+    $submitParams = array(
+      'price_' . $this->_ids['price_field'][0] => reset($this->_ids['price_field_value']),
+      'id' => (int) $this->_ids['contribution_page'],
+      'amount' => 0,
+      'billing_first_name' => 'Billy',
+      'billing_middle_name' => 'Goat',
+      'billing_last_name' => 'Gruff',
+      'is_pay_later' => 1,
+      'selectMembership' => $this->_ids['membership_type'],
+    );
+
+    $this->callAPISuccess('contribution_page', 'submit', $submitParams);
+    $contributions = $this->callAPISuccess('contribution', 'get', array('contribution_page_id' => $this->_ids['contribution_page']));
+    $this->assertCount(2, $contributions['values']);
+    foreach ($contributions['values'] as $val) {
+      $this->assertEquals('Pending', $val['contribution_status']);
+    }
+
+    //Membership should be in Pending state.
+    $membershipPayment = $this->callAPISuccess('membership_payment', 'getsingle', array());
+    $this->assertTrue(in_array($membershipPayment['contribution_id'], array_keys($contributions['values'])));
+    $membership = $this->callAPISuccessGetSingle('membership', array('id' => $membershipPayment['membership_id']));
+    $pendingStatus = $this->callAPISuccessGetSingle('MembershipStatus', array(
+      'return' => array("id"),
+      'name' => "Pending",
+    ));
+    $this->assertEquals($membership['status_id'], $pendingStatus['id']);
     $this->assertEquals($membership['contact_id'], $contributions['values'][$membershipPayment['contribution_id']]['contact_id']);
   }
 
@@ -504,7 +571,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       )
     );
     $mut->stop();
-    $mut->clearMessages(999);
+    $mut->clearMessages();
   }
 
   /**
@@ -624,6 +691,79 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $mut->checkAllMailLog(array('$ 2.00', 'Contribution Amount', '$ 10.00'), array('Total:'));
     $mut->stop();
     $mut->clearMessages();
+  }
+
+  /**
+   * Test submit with a membership block in place.
+   *
+   * Ensure a separate payment for the membership vs the contribution, with
+   * correct amounts.
+   */
+  public function testSubmitMembershipBlockIsSeparatePaymentPaymentProcessorNowChargesCorrectAmounts() {
+    $this->setUpMembershipContributionPage(TRUE);
+    $processor = Civi\Payment\System::singleton()->getById($this->_paymentProcessor['id']);
+    $processor->setDoDirectPaymentResult(array('fee_amount' => .72));
+    $test_uniq = uniqid();
+    $contributionPageAmount = 10;
+    $submitParams = array(
+      'price_' . $this->_ids['price_field'][0] => reset($this->_ids['price_field_value']),
+      'id' => (int) $this->_ids['contribution_page'],
+      'amount' => $contributionPageAmount,
+      'billing_first_name' => 'Billy',
+      'billing_middle_name' => 'Goat',
+      'billing_last_name' => 'Gruff',
+      'email-Primary' => 'henry@8th.king',
+      'selectMembership' => $this->_ids['membership_type'],
+      'payment_processor_id' => $this->_paymentProcessor['id'],
+      'credit_card_number' => '4111111111111111',
+      'credit_card_type' => 'Visa',
+      'credit_card_exp_date' => array('M' => 9, 'Y' => 2040),
+      'cvv2' => 123,
+      'TEST_UNIQ' => $test_uniq,
+    );
+
+    // set custom hook
+    $this->hookClass->setHook('civicrm_alterPaymentProcessorParams', array($this, 'hook_civicrm_alterPaymentProcessorParams'));
+
+    $this->callAPISuccess('contribution_page', 'submit', $submitParams, __FUNCTION__, __FILE__, 'submit contribution page', NULL);
+    $contributions = $this->callAPISuccess('contribution', 'get', array(
+      'contribution_page_id' => $this->_ids['contribution_page'],
+      'contribution_status_id' => 1,
+    ));
+
+    $result = civicrm_api3('SystemLog', 'get', array(
+      'sequential' => 1,
+      'message' => array('LIKE' => "%{$test_uniq}%"),
+    ));
+    $this->assertCount(2, $result['values'], "Expected exactly 2 log entries matching {$test_uniq}.");
+
+    // Examine logged entries to ensure correct values.
+    $contribution_ids = array();
+    $found_membership_amount = $found_contribution_amount = FALSE;
+    foreach ($result['values'] as $value) {
+      list($junk, $json) = explode("$test_uniq:", $value['message']);
+      $logged_contribution = json_decode($json, TRUE);
+      $contribution_ids[] = $logged_contribution['contributionID'];
+      if (!empty($logged_contribution['total_amount'])) {
+        $amount = $logged_contribution['total_amount'];
+      }
+      else {
+        $amount = $logged_contribution['amount'];
+      }
+
+      if ($amount == $this->_membershipBlockAmount) {
+        $found_membership_amount = TRUE;
+      }
+      if ($amount == $contributionPageAmount) {
+        $found_contribution_amount = TRUE;
+      }
+    }
+
+    $distinct_contribution_ids = array_unique($contribution_ids);
+    $this->assertCount(2, $distinct_contribution_ids, "Expected exactly 2 log contributions with distinct contributionIDs.");
+    $this->assertTrue($found_contribution_amount, "Expected one log contribution with amount '$contributionPageAmount' (the contribution page amount)");
+    $this->assertTrue($found_membership_amount, "Expected one log contribution with amount '$this->_membershipBlockAmount' (the membership amount)");
+
   }
 
   /**
@@ -1091,13 +1231,49 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test non-recur contribution with membership payment
+   */
+  public function testSubmitMembershipIsSeparatePaymentNotRecur() {
+    //Create recur contribution page.
+    $this->setUpMembershipContributionPage(TRUE, TRUE);
+    $dummyPP = Civi\Payment\System::singleton()->getByProcessor($this->_paymentProcessor);
+    $dummyPP->setDoDirectPaymentResult(array('payment_status_id' => 1, 'trxn_id' => 'create_first_success'));
+
+    //Sumbit payment with recur disabled.
+    $submitParams = array(
+      'price_' . $this->_ids['price_field'][0] => reset($this->_ids['price_field_value']),
+      'id' => (int) $this->_ids['contribution_page'],
+      'amount' => 10,
+      'frequency_interval' => 1,
+      'frequency_unit' => 'month',
+      'billing_first_name' => 'Billy',
+      'billing_middle_name' => 'Goat',
+      'billing_last_name' => 'Gruff',
+      'email' => 'billy@goat.gruff',
+      'selectMembership' => $this->_ids['membership_type'],
+      'payment_processor_id' => 1,
+      'credit_card_number' => '4111111111111111',
+      'credit_card_type' => 'Visa',
+      'credit_card_exp_date' => array('M' => 9, 'Y' => 2040),
+      'cvv2' => 123,
+    );
+
+    //Assert if recur contribution is created.
+    $this->callAPISuccess('contribution_page', 'submit', $submitParams);
+    $recur = $this->callAPISuccess('contribution_recur', 'get', array());
+    $this->assertEmpty($recur['count']);
+  }
+
+
+  /**
    * Set up membership contribution page.
    * @param bool $isSeparatePayment
+   * @param bool $isRecur
    */
-  public function setUpMembershipContributionPage($isSeparatePayment = FALSE) {
+  public function setUpMembershipContributionPage($isSeparatePayment = FALSE, $isRecur = FALSE) {
     $this->setUpMembershipBlockPriceSet();
     $this->setupPaymentProcessor();
-    $this->setUpContributionPage();
+    $this->setUpContributionPage($isRecur);
 
     $this->callAPISuccess('membership_block', 'create', array(
       'entity_id' => $this->_ids['contribution_page'],
@@ -1150,7 +1326,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       $priceFieldValue = $this->callAPISuccess('price_field_value', 'create', array(
         'name' => 'membership_amount',
         'label' => 'Membership Amount',
-        'amount' => 2,
+        'amount' => $this->_membershipBlockAmount,
         'financial_type_id' => 'Donation',
         'format.only_id' => TRUE,
         'membership_type_id' => $membershipTypeID,
@@ -1222,8 +1398,13 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
 
   /**
    * Help function to set up contribution page with some defaults.
+   * @param bool $isRecur
    */
-  public function setUpContributionPage() {
+  public function setUpContributionPage($isRecur = FALSE) {
+    if ($isRecur) {
+      $this->params['is_recur'] = 1;
+      $this->params['recur_frequency_unit'] = 'month';
+    }
     $contributionPageResult = $this->callAPISuccess($this->_entity, 'create', $this->params);
     if (empty($this->_ids['price_set'])) {
       $priceSet = $this->callAPISuccess('price_set', 'create', $this->_priceSetParams);
@@ -1527,6 +1708,26 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
 
     // Compare this to what it should be!
     $this->assertEquals($lineItem_TaxAmount, round($submitParams['tax_amount'], 2), 'Wrong Sales Tax Amount is calculated and stored.');
+  }
+
+  public function hook_civicrm_alterPaymentProcessorParams($paymentObj, &$rawParams, &$cookedParams) {
+    // Ensure total_amount are the same if they're both given.
+    $total_amount = CRM_Utils_Array::value('total_amount', $rawParams);
+    $amount = CRM_Utils_Array::value('amount', $rawParams);
+    if (!empty($total_amount) && !empty($amount) && $total_amount != $amount) {
+      throw new Exception("total_amount '$total_amount' and amount '$amount' differ.");
+    }
+
+    // Log parameters for later debugging and testing.
+    $message = __FUNCTION__ . ": {$rawParams['TEST_UNIQ']}:";
+    $log_params = array_intersect_key($rawParams, array(
+      'amount' => 1,
+      'total_amount' => 1,
+      'contributionID' => 1,
+    ));
+    $message .= json_encode($log_params);
+    $log = new CRM_Utils_SystemLogger();
+    $log->debug($message, $_REQUEST);
   }
 
 }

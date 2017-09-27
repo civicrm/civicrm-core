@@ -1,6 +1,6 @@
 (function(angular, $, _) {
 
-  var crmCaseType = angular.module('crmCaseType', ['ngRoute', 'ui.utils', 'crmUi', 'unsavedChanges', 'crmUtil']);
+  var crmCaseType = angular.module('crmCaseType', CRM.angRequires('crmCaseType'));
 
   // Note: This template will be passed to cloneDeep(), so don't put any funny stuff in here!
   var newCaseTypeTemplate = {
@@ -149,6 +149,11 @@
     $scope.caseType.definition = $scope.caseType.definition || [];
     $scope.caseType.definition.activityTypes = $scope.caseType.definition.activityTypes || [];
     $scope.caseType.definition.activitySets = $scope.caseType.definition.activitySets || [];
+    _.each($scope.caseType.definition.activitySets, function (set) {
+      _.each(set.activityTypes, function (type, name) {
+        type.label = $scope.activityTypes[type.name].label;
+      });
+    });
     $scope.caseType.definition.caseRoles = $scope.caseType.definition.caseRoles || [];
     $scope.caseType.definition.statuses = $scope.caseType.definition.statuses || [];
 
@@ -181,6 +186,7 @@
     function addActivityToSet(activitySet, activityTypeName) {
       activitySet.activityTypes.push({
         name: activityTypeName,
+        label: $scope.activityTypes[activityTypeName].label,
         status: 'Scheduled',
         reference_activity: 'Open Case',
         reference_offset: '1',
