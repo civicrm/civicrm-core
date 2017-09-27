@@ -511,6 +511,63 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
   }
 
   /**
+   * Don't populate smart group cache when building Group list.
+   *
+   * It takes forever, especially if you have lots of smart groups.
+   */
+  public function testGroupDontRegenerateSmartGroups() {
+    // Create a contact.
+    $firstName = 'Tweak';
+    $lastName = 'Octonaut';
+    $params = array(
+      'first_name' => $firstName,
+      'last_name' => $lastName,
+      'contact_type' => 'Individual',
+    );
+    $contact = CRM_Contact_BAO_Contact::add($params);
+
+    // Create a smart group.
+    $searchParams = array(
+      'last_name' => $lastName,
+    );
+    $groupParams = array('title' => 'Find all Octonauts', 'formValues' => $searchParams, 'is_active' => 1);
+    $group = CRM_Contact_BAO_Group::createSmartGroup($groupParams);
+
+    // Ensure the smart group is created.
+    $this->assertTrue(is_int($group->id), "Smart group created successfully.");
+    CRM_Contact_BAO_GroupContactCache::load($group, TRUE);
+
+    // Ensure it is populating the cache when loaded.
+    $sql = 'SELECT contact_id FROM civicrm_group_contact_cache WHERE group_id = %1';
+    $params = array(1 => array($group->id, 'Integer'));
+    $dao = CRM_Core_DAO::executeQuery($sql, $params);
+    $this->assertEquals($dao->N, 1, '1 record should be found in smart group');
+
+    // Purge the group contact cache.
+    CRM_Contact_BAO_GroupContactCache::clearGroupContactCache($group->id);
+
+    // Load the Manage Group page code.
+    $_GET = $this->_params;
+    $obj = new CRM_Group_Page_AJAX();
+    $groups = $obj->getGroupList();
+
+    // Make sure we returned our smart group.
+    $found = FALSE;
+    foreach ($groups['data'] as $returned_group) {
+      if ($returned_group['group_id'] == $group->id) {
+        $found = TRUE;
+      }
+    }
+    $this->assertTrue($found, 'Smart group shows up on Manage Group page.');
+
+    // Ensure we did not populate the cache.
+    $sql = 'SELECT contact_id FROM civicrm_group_contact_cache WHERE group_id = %1';
+    $params = array(1 => array($group->id, 'Integer'));
+    $dao = CRM_Core_DAO::executeQuery($sql, $params);
+    $this->assertEquals($dao->N, 0, 'Group contact cache should not be populated on Manage Groups');
+  }
+
+  /**
    * Implements ACLGroup hook.
    * aclGroup function returns a list of permitted groups
    * @param string $type

@@ -1016,15 +1016,16 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
         $values[$object->id]['created_by'] = "<a href='{$contactUrl}'>{$object->created_by}</a>";
       }
 
-      // get group contact count using Contact.GetCount API
-      // CRM-20226 This has been added here in order to address a specific bug. However, a prior
-      // decision was to refresh group counts less aggressively, offering instead a button to
-      // refresh them to give users a better experience by loading pages quicker.
-      // For some sites this can be crazy slow even though only 25 sites resolve. Even for sites
-      // with relatively few smart groups it is not a good user experience.
-      // Adding comments here as I'm not going to tackle a fix this time around but want
-      // to warn people off making it worse.
-      $values[$object->id]['count'] = civicrm_api3('Contact', 'getcount', array('group' => $object->id));
+      // If it's a smart group AND the contacts aren't cached, don't try to
+      // generate a count, it will take forever.
+      if ($object->saved_search_id && is_null($object->cache_date)) {
+        $values[$object->id]['count'] = ts('unknown');
+      }
+      else {
+        // If it's not a smart group or we have them cached, then
+        // populate the count.
+        $values[$object->id]['count'] = civicrm_api3('Contact', 'getcount', array('group' => $object->id));
+      }
     }
 
     // CRM-16905 - Sort by count cannot be done with sql
