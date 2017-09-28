@@ -1514,8 +1514,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     }
     //@todo it should no longer be possible for it to get to this point & membership to not be an array
     if (is_array($membershipTypeIDs) && !empty($membershipContributionID)) {
-      $typesTerms = CRM_Utils_Array::value('types_terms', $membershipParams, array());
-
       $membershipLines = $nonMembershipLines = array();
       foreach ($unprocessedLineItems as $priceSetID => $lines) {
         foreach ($lines as $line) {
@@ -1536,6 +1534,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
           $membershipLineItems = $unprocessedLineItems;
         }
         $i++;
+
+        $typesTerms = CRM_Utils_Array::value('types_terms', $membershipParams, array());
         $numTerms = CRM_Utils_Array::value($memType, $typesTerms, 1);
         if (!empty($membershipContribution)) {
           $pendingStatus = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
