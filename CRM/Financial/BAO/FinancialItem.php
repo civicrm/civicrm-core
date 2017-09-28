@@ -286,7 +286,7 @@ WHERE cc.id IN (' . implode(',', $contactIds) . ') AND con.is_test = 0';
    *
    * @param int $entityId
    *
-   * @return object CRM_Core_DAO
+   * @return array
    */
   public static function getPreviousFinancialItem($entityId) {
     $params = array(

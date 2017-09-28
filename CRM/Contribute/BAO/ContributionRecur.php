@@ -55,7 +55,7 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
    *
-   * @return CRM_Contribute_BAO_Contribution
+   * @return \CRM_Contribute_BAO_ContributionRecur|\CRM_Core_Error
    * @todo move hook calls / extended logic to create - requires changing calls to call create not add
    */
   public static function add(&$params) {
@@ -628,7 +628,7 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
    * Add line items for recurring contribution.
    *
    * @param int $recurId
-   * @param $contribution
+   * @param \CRM_Contribute_BAO_Contribution $contribution
    *
    * @return array
    */
@@ -746,7 +746,7 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
   }
 
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    */
   public static function recurringContribution(&$form) {
     // Recurring contribution fields
