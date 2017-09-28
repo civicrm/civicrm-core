@@ -1282,12 +1282,12 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   }
 
   /**
-   * Uses form properties to determine recurring details for memberships.
+   * Uses form properties to determine term details for memberships.
    *
    * @return array
    *   Term length keyed by membership type ID.
    */
-  protected function getMembershipRecurringDetails() {
+  protected function getMembershipTermDetails() {
     $membershipTypeTerms = array();
 
     $priceFieldIds = $this->get('memberPriceFieldIDS');
@@ -1297,8 +1297,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     foreach ($priceFieldIds as $priceFieldId) {
       $membershipTypeId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $priceFieldId, 'membership_type_id');
       if ($membershipTypeId) {
-        $term = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $priceFieldId, 'membership_num_terms') ? : 1;
-        $membershipTypeTerms[$membershipTypeId] = ($term > 1) ? $term : 1;
+        $membershipTypeTerms[$membershipTypeId] = CRM_Price_BAO_PriceFieldValue::getMembershipTermDetails($priceFieldId);
       }
     }
 

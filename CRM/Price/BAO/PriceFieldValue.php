@@ -202,6 +202,38 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
   }
 
   /**
+   * Retrieve membership term information associated with a price field value.
+   *
+   * @param int $id
+   *   PriceFieldValue ID.
+   *
+   * @return array
+   *   - unit: how a membership term is measured (month, year, etc.)
+   *   - interval: quantity of units in a term (e.g., ONE month)
+   *   - qty: how many terms the price field value purchases (e.g., THREE
+   *     one-month terms)
+   */
+  public static function getMembershipTermDetails($id) {
+    $details = array();
+
+    $query = 'SELECT p.membership_num_terms, m.duration_interval, m.duration_unit
+            FROM civicrm_price_field_value p
+            INNER JOIN civicrm_membership_type m
+            ON p.membership_type_id = m.id
+            WHERE p.id = %1 LIMIT 1';
+
+    $params = array(1 => array($id, 'Integer'));
+    $dao = CRM_Core_DAO::executeQuery($query, $params);
+    $dao->fetch();
+
+    $details['qty'] = $dao->membership_num_terms ? : 1;
+    $details['interval'] = $dao->duration_interval;
+    $details['unit'] = $dao->duration_unit;
+
+    return $details;
+  }
+
+  /**
    * Get the price field option label.
    *
    * @param int $id

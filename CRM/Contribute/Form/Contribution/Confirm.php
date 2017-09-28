@@ -1536,7 +1536,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         $i++;
 
         $typesTerms = CRM_Utils_Array::value('types_terms', $membershipParams, array());
-        $numTerms = CRM_Utils_Array::value($memType, $typesTerms, 1);
+        $termDetails = CRM_Utils_Array::value($memType, $typesTerms);
+        $numTerms = CRM_Utils_Array::value('qty', $termDetails, 1);
         if (!empty($membershipContribution)) {
           $pendingStatus = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
           $pending = ($membershipContribution->contribution_status_id == $pendingStatus) ? TRUE : FALSE;
@@ -2395,7 +2396,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     if (!empty($priceFieldIds)) {
       $membershipParams['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $priceFieldIds['id'], 'financial_type_id');
-      $membershipParams['types_terms'] = $this->getMembershipRecurringDetails();
+      $membershipParams['types_terms'] = $this->getMembershipTermDetails();
       $membershipParams['selectMembership'] = array_keys($membershipParams['types_terms']);
     }
     if (!empty($membershipParams['selectMembership'])) {
