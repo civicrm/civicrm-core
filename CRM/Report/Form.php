@@ -2036,12 +2036,12 @@ class CRM_Report_Form extends CRM_Core_Form {
    * @param bool $relative
    * @param string $from
    * @param string $to
-   * @param string $fromTime
-   * @param string $toTime
+   * @param int $fromTime
+   * @param int $toTime
    *
    * @return array
    */
-  public function getFromTo($relative, $from, $to, $fromTime = NULL, int $toTime = 235959) {
+  public function getFromTo($relative, $from, $to, $fromTime = NULL, $toTime = 235959) {
     return CRM_Utils_Date::getFromTo($relative, $from, $to, $fromTime, $toTime);
   }
 
