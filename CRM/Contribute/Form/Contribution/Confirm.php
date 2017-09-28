@@ -1995,6 +1995,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       }
     }
     $form->set('memberPriceFieldIDS', $membershipPriceFieldIDs);
+    $form->setRecurringMembershipParams();
     $form->processFormSubmission(CRM_Utils_Array::value('contact_id', $params));
   }
 
