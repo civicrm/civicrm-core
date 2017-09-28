@@ -152,8 +152,8 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
       CRM_Core_BAO_Block::handlePrimary($params, get_class());
     }
 
-    // (prevent chaining 1) CRM-21214
-    if (!empty($params['master_id']) && $params['master_id'] > 0) {
+    // (prevent chaining 1 and 3) CRM-21214
+    if (CRM_Utils_Array::value('master_id', $params)) {
       self::fixSharedAddress($params);
     }
 
@@ -1004,18 +1004,15 @@ SELECT is_primary,
    *   Associated array of address params.
    */
   public static function fixSharedAddress(&$params) {
-    $query = 'SELECT master_id FROM civicrm_address WHERE id = %1';
-    $dao = CRM_Core_DAO::executeQuery($query, array(1 => array($params['master_id'], 'Integer')));
-    $dao->fetch();
-
-    // if address master address is shared, use its master CRM-21214
-    if (!CRM_Utils_System::isNull($dao->master_id)) {
-      $params['master_id'] = $dao->master_id;
+    // if address master address is shared, use its master (prevent chaining 1) CRM-21214
+    $masterMasterId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Address', $params['master_id'], 'master_id');
+    if ($masterMasterId > 0) {
+      $params['master_id'] = $masterMasterId;
     }
 
-    // prevent an endless chain between two shared addresses CRM-21214
-    if (!empty($params['id']) && $params['id'] == $params['master_id']) {
-      unset($params['master_id']);
+    // prevent an endless chain between two shared addresses (prevent chaining 3) CRM-21214
+    if (CRM_Utils_Array::value('id', $params) == $params['master_id']) {
+      $params['master_id'] = '';
       CRM_Core_Session::setStatus(ts("You can't connect an address to itself"), '', 'warning');
     }
   }
@@ -1034,12 +1031,12 @@ SELECT is_primary,
 
     // unset contact id
     $skipFields = array('is_primary', 'location_type_id', 'is_billing', 'contact_id');
-    // call the function to create a relationship
-    if (!empty($params['master_id']) && $params['master_id'] > 0) {
+    if (CRM_Utils_Array::value('master_id', $params)) {
+      // call the function to create a relationship for the new shared address
       self::processSharedAddressRelationship($params['master_id'], $params['contact_id']);
     }
-    // else no new shares will be created, only update shared addresses
     else {
+      // else no new shares will be created, only update shared addresses
       $skipFields[] = 'master_id';
     }
     foreach ($skipFields as $value) {
@@ -1049,7 +1046,7 @@ SELECT is_primary,
     $addressDAO = new CRM_Core_DAO_Address();
     while ($dao->fetch()) {
       // call the function to update the relationship
-      if (!empty($params['master_id']) && $params['master_id'] > 0) {
+      if (CRM_Utils_Array::value('master_id', $params)) {
         self::processSharedAddressRelationship($params['master_id'], $dao->contact_id);
       }
       $addressDAO->copyValues($params);
