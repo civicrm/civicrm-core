@@ -2395,19 +2395,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     if (!empty($priceFieldIds)) {
       $membershipParams['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $priceFieldIds['id'], 'financial_type_id');
-      unset($priceFieldIds['id']);
-      $membershipTypeIds = array();
-      $membershipTypeTerms = array();
-      foreach ($priceFieldIds as $priceFieldId) {
-        $membershipTypeId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $priceFieldId, 'membership_type_id');
-        if ($membershipTypeId) {
-          $membershipTypeIds[] = $membershipTypeId;
-          $term = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $priceFieldId, 'membership_num_terms') ? : 1;
-          $membershipTypeTerms[$membershipTypeId] = ($term > 1) ? $term : 1;
-        }
-      }
-      $membershipParams['selectMembership'] = $membershipTypeIds;
-      $membershipParams['types_terms'] = $membershipTypeTerms;
+      $membershipParams['types_terms'] = $this->getMembershipRecurringDetails();
+      $membershipParams['selectMembership'] = array_keys($membershipParams['types_terms']);
     }
     if (!empty($membershipParams['selectMembership'])) {
       // CRM-12233
