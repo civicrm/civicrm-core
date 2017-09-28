@@ -564,7 +564,41 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     $sql = 'SELECT contact_id FROM civicrm_group_contact_cache WHERE group_id = %1';
     $params = array(1 => array($group->id, 'Integer'));
     $dao = CRM_Core_DAO::executeQuery($sql, $params);
-    $this->assertEquals($dao->N, 0, 'Group contact cache should not be populated on Manage Groups');
+    $test = 'Group contact cache should not be populated on Manage Groups ' .
+      'when cache_date is null';
+    $this->assertEquals($dao->N, 0, $test);
+
+    // Do it again, but this time don't clear group contact cache. Instead,
+    // set it to expire.
+    CRM_Contact_BAO_GroupContactCache::load($group, TRUE);
+    $params['name'] = 'smartGroupCacheTimeout';
+    $timeout = civicrm_api3('Setting', 'getvalue', $params);
+    $timeout = intval($timeout) * 60;
+    // Reset the cache_date to $timeout seconds ago minus another 60
+    // seconds for good measure.
+    $cache_date = date('YmdHis', time() - $timeout - 60);
+
+    $sql = "UPDATE civicrm_group SET cache_date = %1 WHERE id = %2";
+    $update_params = array(
+      1 => array($cache_date, 'Timestamp'),
+      2 => array($group->id, 'Integer'),
+    );
+    CRM_Core_DAO::executeQuery($sql, $update_params);
+
+    // Load the Manage Group page code.
+    $_GET = $this->_params;
+    $obj = new CRM_Group_Page_AJAX();
+    $groups = $obj->getGroupList();
+
+    // Ensure we did not regenerate the cache.
+    $sql = 'SELECT DATE_FORMAT(cache_date, "%Y%m%d%H%i%s") AS cache_date ' .
+      'FROM civicrm_group WHERE id = %1';
+    $params = array(1 => array($group->id, 'Integer'));
+    $dao = CRM_Core_DAO::executeQuery($sql, $params);
+    $dao->fetch();
+    $test = 'Group contact cache should not be re-populated on Manage Groups ' .
+     'when cache_date has expired';
+    $this->assertEquals($dao->cache_date, $cache_date, $test);
   }
 
   /**

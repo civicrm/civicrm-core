@@ -1016,14 +1016,35 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
         $values[$object->id]['created_by'] = "<a href='{$contactUrl}'>{$object->created_by}</a>";
       }
 
+      // By default, we try to get a count of the contacts in each group
+      // to display to the user on the Manage Group page.
+      $skip_getcount = FALSE;
       // If it's a smart group AND the contacts aren't cached, don't try to
       // generate a count, it will take forever.
-      if ($object->saved_search_id && is_null($object->cache_date)) {
+      if ($object->saved_search_id) {
+        if (is_null($object->cache_date)) {
+          $skip_getcount = TRUE;
+        }
+        else {
+          // We have a cache_date - see if it is expired.
+          $params['name'] = 'smartGroupCacheTimeout';
+          $timeout = civicrm_api3('Setting', 'getvalue', $params);
+          $cache_expires = date('Y-m-d H:i:s', time() - (intval($timeout) * 60));
+          if ($cache_expires > $object->cache_date) {
+            $skip_getcount = TRUE;
+          }
+        }
+      }
+      if ($object->children) {
+        // If there are children, any of the children could be expired
+        // smart groups.
+        $skip_getcount = TRUE;
+      }
+
+      if ($skip_getcount) {
         $values[$object->id]['count'] = ts('unknown');
       }
       else {
-        // If it's not a smart group or we have them cached, then
-        // populate the count.
         $values[$object->id]['count'] = civicrm_api3('Contact', 'getcount', array('group' => $object->id));
       }
     }
