@@ -1017,31 +1017,10 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
       }
 
       // By default, we try to get a count of the contacts in each group
-      // to display to the user on the Manage Group page.
-      $skip_getcount = FALSE;
-      // If it's a smart group AND the contacts aren't cached, don't try to
-      // generate a count, it will take forever.
-      if ($object->saved_search_id) {
-        if (is_null($object->cache_date)) {
-          $skip_getcount = TRUE;
-        }
-        else {
-          // We have a cache_date - see if it is expired.
-          $params['name'] = 'smartGroupCacheTimeout';
-          $timeout = civicrm_api3('Setting', 'getvalue', $params);
-          $cache_expires = date('Y-m-d H:i:s', time() - (intval($timeout) * 60));
-          if ($cache_expires > $object->cache_date) {
-            $skip_getcount = TRUE;
-          }
-        }
-      }
-      if ($object->children) {
-        // If there are children, any of the children could be expired
-        // smart groups.
-        $skip_getcount = TRUE;
-      }
-
-      if ($skip_getcount) {
+      // to display to the user on the Manage Group page. However, if
+      // that will result in the cache being regenerated, then dipslay
+      // "unknown" instead to avoid a long wait for the user.
+      if (CRM_Contact_BAO_GroupContactCache::shouldGroupBeRefreshed($object->id)) {
         $values[$object->id]['count'] = ts('unknown');
       }
       else {

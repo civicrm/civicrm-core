@@ -543,6 +543,26 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     $dao = CRM_Core_DAO::executeQuery($sql, $params);
     $this->assertEquals($dao->N, 1, '1 record should be found in smart group');
 
+    // Load the Manage Group page code and we should get a count from our
+    // group because the cache is fresh.
+    $_GET = $this->_params;
+    $obj = new CRM_Group_Page_AJAX();
+    $groups = $obj->getGroupList();
+
+    // Make sure we returned our smart group and ensure the count is accurate.
+    $found = FALSE;
+    $right_count = FALSE;
+    foreach ($groups['data'] as $returned_group) {
+      if ($returned_group['group_id'] == $group->id) {
+        $found = TRUE;
+        if ($returned_group['count'] == 1) {
+          $right_count = TRUE;
+        }
+      }
+    }
+    $this->assertTrue($found, 'Smart group shows up on Manage Group page.');
+    $this->assertTrue($right_count, 'Smart group displays proper count when cache is loaded.');
+
     // Purge the group contact cache.
     CRM_Contact_BAO_GroupContactCache::clearGroupContactCache($group->id);
 
@@ -551,14 +571,16 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     $obj = new CRM_Group_Page_AJAX();
     $groups = $obj->getGroupList();
 
-    // Make sure we returned our smart group.
-    $found = FALSE;
+    // Make sure the smart group reports unknown count.
+    $count_is_unknown = FALSE;
     foreach ($groups['data'] as $returned_group) {
       if ($returned_group['group_id'] == $group->id) {
-        $found = TRUE;
+        if ($returned_group['count'] == ts('unknown')) {
+          $count_is_unknown = TRUE;
+        }
       }
     }
-    $this->assertTrue($found, 'Smart group shows up on Manage Group page.');
+    $this->assertTrue($count_is_unknown, 'Smart group shows up as unknown when cache is expired.');
 
     // Ensure we did not populate the cache.
     $sql = 'SELECT contact_id FROM civicrm_group_contact_cache WHERE group_id = %1';
