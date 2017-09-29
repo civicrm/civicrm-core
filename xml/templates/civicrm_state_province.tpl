@@ -4077,4 +4077,25 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (NULL, 1181, "N", "Nevis"),
 (NULL, 1190, "E", "Eastern"),
 (NULL, 1190, "N", "Northern"),
-(NULL, 1190, "S", "Southern");
+(NULL, 1190, "S", "Southern"),
+
+-- Add states for: Barbados
+(NULL, 1009, "GE", "Saint George"),
+(NULL, 1009, "JS", "Saint John's"),
+(NULL, 1009, "MY", "Saint Mary"),
+(NULL, 1009, "PL", "Saint Paul"),
+(NULL, 1009, "PR", "Saint Peter"),
+(NULL, 1009, "PP", "Saint Philip"),
+(NULL, 1009, "BA", "Barbuda"),
+(NULL, 1009, "RA", "Redonda"),
+(NULL, 1018, "CH", "Christ Church"),
+(NULL, 1018, "AW", "Saint Andrew"),
+(NULL, 1018, "GE", "Saint George"),
+(NULL, 1018, "JS", "Saint James"),
+(NULL, 1018, "JN", "Saint John"),
+(NULL, 1018, "JH", "Saint Joseph"),
+(NULL, 1018, "LY", "Saint Lucy"),
+(NULL, 1018, "ML", "Saint Michael"),
+(NULL, 1018, "PR", "Saint Peter"),
+(NULL, 1018, "PP", "Saint Philip"),
+(NULL, 1018, "TS", "Saint Thomas");
