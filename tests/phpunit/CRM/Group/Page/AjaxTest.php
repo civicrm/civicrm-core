@@ -26,6 +26,10 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
 
   public function setUp() {
     parent::setUp();
+    // CRM_Contact_BAO_Group::getPermissionClause sets a static variable.
+    // Ensure it is reset before each run.
+    $force = TRUE;
+    CRM_Contact_BAO_Group::getPermissionClause($force);
     $this->_params = array(
       'page' => 1,
       'rp' => 50,
