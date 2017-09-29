@@ -243,6 +243,9 @@ class civicrm_cli {
 
     $this->_config = CRM_Core_Config::singleton();
 
+    // Don't reset smart group cache on import, it's database-intensive.
+    $this->_config->doNotResetCache = 1;
+
     // HTTP_HOST will be 'localhost' unless overwritten with the -s argument.
     // Now we have a Config object, we can set it from the Base URL.
     if ($_SERVER['HTTP_HOST'] == 'localhost') {
