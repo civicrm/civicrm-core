@@ -262,7 +262,7 @@ WHERE  option_group_id = %1";
       $this, FALSE, 0
     );
 
-    // what action to take ?
+    // take action in addition to default browse ?
     if (($action & (CRM_Core_Action::UPDATE | CRM_Core_Action::ADD |
           CRM_Core_Action::VIEW | CRM_Core_Action::DELETE
         )
