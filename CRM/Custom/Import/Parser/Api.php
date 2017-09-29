@@ -176,7 +176,7 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
     }
     $setDateFields = array_intersect_key($this->_params, array_flip($this->_dateFields));
 
-    CRM_Contact_Import_Parser_Contact::formatCommonData($this->_params, $formatted, $formatted);
+    $this->formatCommonData($this->_params, $formatted, $formatted);
     foreach ($formatted['custom'] as $key => $val) {
       $this->_params['custom_' . $key] = $val[-1]['value'];
     }
