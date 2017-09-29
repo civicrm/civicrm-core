@@ -385,7 +385,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
     $this->callAPISuccess('GroupContact', 'create', array('group_id' => $groupID, 'contact_id' => $householdID, 'status' => 'Added'));
 
     // Refresh the cache for test purposes. It would be better to alter to alter the GroupContact add function to add contacts to the cache.
-    CRM_Contact_BAO_GroupContactCache::remove($groupID, FALSE);
+    CRM_Contact_BAO_GroupContactCache::clearGroupContactCache($groupID);
 
     $sql = CRM_Contact_BAO_Query::getQuery(
       array(array('group', 'IN', array($groupID), 0, 0)),

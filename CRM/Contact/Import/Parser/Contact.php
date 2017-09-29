@@ -1716,11 +1716,10 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
         $this->formatParams($formatted, $onDuplicate, (int) $contactId);
       }
 
-      // pass doNotResetCache flag since resetting and rebuilding cache could be expensive.
-      $config = CRM_Core_Config::singleton();
-      $config->doNotResetCache = 1;
+      // Resetting and rebuilding cache could be expensive.
+      CRM_Core_Config::setPermitCacheFlushMode(FALSE);
       $cid = CRM_Contact_BAO_Contact::createProfileContact($formatted, $contactFields, $contactId, NULL, NULL, $formatted['contact_type']);
-      $config->doNotResetCache = 0;
+      CRM_Core_Config::setPermitCacheFlushMode(TRUE);
 
       $contact = array(
         'contact_id' => $cid,

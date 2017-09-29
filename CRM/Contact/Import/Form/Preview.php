@@ -306,7 +306,7 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
 
     // Clear all caches, forcing any searches to recheck the ACLs or group membership as the import
     // may have changed it.
-    CRM_Contact_BAO_Contact_Utils::clearContactCaches();
+    CRM_Contact_BAO_Contact_Utils::clearContactCaches(TRUE);
 
     // add all the necessary variables to the form
     $importJob->setFormVariables($this);

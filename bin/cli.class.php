@@ -99,6 +99,7 @@ class civicrm_cli {
   public function callApi() {
     require_once 'api/api.php';
 
+    CRM_Core_Config::setPermitCacheFlushMode(FALSE);
     //  CRM-9822 -'execute' action always goes thru Job api and always writes to log
     if ($this->_action != 'execute' && $this->_joblog) {
       require_once 'CRM/Core/JobManager.php';
@@ -111,6 +112,8 @@ class civicrm_cli {
       $this->_params['auth'] = FALSE;
       $result = civicrm_api($this->_entity, $this->_action, $this->_params);
     }
+    CRM_Core_Config::setPermitCacheFlushMode(TRUE);
+    CRM_Contact_BAO_Contact_Utils::clearContactCaches();
 
     if (!empty($result['is_error'])) {
       $this->_log($result['error_message']);

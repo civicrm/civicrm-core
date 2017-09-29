@@ -83,6 +83,10 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'civicrm_acl_contact_cache',
       'civicrm_activity_contact',
       'civicrm_activity',
+      'civicrm_group',
+      'civicrm_group_contact',
+      'civicrm_saved_search',
+      'civicrm_group_contact_cache',
     );
 
     $this->quickCleanup($tablesToTruncate, TRUE);
@@ -113,6 +117,29 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       $contact['id'],
       $params
     );
+  }
+
+  /**
+   * Test that it is possible to prevent cache clearing via option.
+   *
+   * Cache clearing is bypassed if 'options' => array('do_not_reset_cache' => 1 is used.
+   */
+  public function testCreateIndividualNoCacheClear() {
+
+    $contact = $this->callAPISuccess('contact', 'create', $this->_params);
+    $groupID = $this->groupCreate();
+
+    $this->putGroupContactCacheInClearableState($groupID, $contact);
+
+    $this->callAPISuccess('contact', 'create', array('id' => $contact['id']));
+    $this->assertEquals(0, CRM_Core_DAO::singleValueQuery("SELECT count(*) FROM civicrm_group_contact_cache"));
+
+    // Rinse & repeat, but with the option.
+    $this->putGroupContactCacheInClearableState($groupID, $contact);
+    CRM_Core_Config::setPermitCacheFlushMode(FALSE);
+    $this->callAPISuccess('contact', 'create', array('id' => $contact['id']));
+    $this->assertEquals(1, CRM_Core_DAO::singleValueQuery("SELECT count(*) FROM civicrm_group_contact_cache"));
+    CRM_Core_Config::setPermitCacheFlushMode(TRUE);
   }
 
   /**
@@ -3488,6 +3515,22 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $cid = $this->createLoggedInUser();
     $contact = $this->callAPIAndDocument('contact', 'get', array('id' => 'user_contact_id'), __FUNCTION__, __FILE__, $description, $subFile);
     $this->assertEquals($cid, $contact['id']);
+  }
+
+  /**
+   * @param $groupID
+   * @param $contact
+   */
+  protected function putGroupContactCacheInClearableState($groupID, $contact) {
+    // We need to force the situation where there is invalid data in the cache and it
+    // is due to be cleared.
+    CRM_Core_DAO::executeQuery("
+      INSERT INTO civicrm_group_contact_cache (group_id, contact_id)
+      VALUES ({$groupID}, {$contact['id']})
+    ");
+    CRM_Core_DAO::executeQuery("UPDATE civicrm_group SET cache_date = '2017-01-01'");
+    // Reset so it does not skip.
+    Civi::$statics['CRM_Contact_BAO_GroupContactCache']['is_refresh_init'] = FALSE;
   }
 
 }
