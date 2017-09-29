@@ -468,7 +468,6 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
    */
   public function testSharedAddressChaining3() {
     $contactIdA = $this->individualCreate(array(), 0);
-    $contactIdB = $this->individualCreate(array(), 1);
 
     $addressParamsA = array(
       'street_address' => '123 Fake St.',
