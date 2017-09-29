@@ -40,7 +40,7 @@
     </tr>
   {/if}
   <tr class="crm-email-element">
-    <td>{$form.from_email_address.label}{$form.from_email_address.html}{help id ="id-from_email" isAdmin=$isAdmin}</td>
+    <td>{$form.from_email_address.label}{$form.from_email_address.html} {help id="id-from_email" isAdmin=$isAdmin}</td>
   </tr>
   <tr class="crm-email-element">
     <td>{$form.email_comment.label}{$form.email_comment.html}</td>

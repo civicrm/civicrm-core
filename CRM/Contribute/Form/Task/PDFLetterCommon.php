@@ -23,6 +23,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
       $returnProperties['email'] = $returnProperties['on_hold'] = $returnProperties['is_deceased'] = $returnProperties['do_not_email'] = 1;
       $emailParams = array(
         'subject' => $formValues['subject'],
+        'from' => $formValues['from_email_address'],
       );
       // We need display_name for emailLetter() so add to returnProperties here
       $returnProperties['display_name'] = 1;
@@ -371,6 +372,9 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
         $emails = CRM_Core_BAO_Email::getFromEmail();
         $emails = array_keys($emails);
         $defaults['from'] = array_pop($emails);
+      }
+      else {
+        $defaults['from'] = $params['from'];
       }
       if (!empty($params['subject'])) {
         $defaults['subject'] = $params['subject'];

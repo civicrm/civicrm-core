@@ -36,7 +36,7 @@
     <td>{$form.output.email_receipt.html}</td>
   </tr>
   <tr id="selectEmailFrom" style="display: none">
-    <td>{$form.fromEmailAddress.label}: {$form.fromEmailAddress.html}</td>
+    <td>{$form.fromEmailAddress.label} {$form.fromEmailAddress.html} {help id="id-from_email" isAdmin=$isAdmin}</td>
   </tr>
   <tr>
     <td>{$form.output.pdf_receipt.html}</td>
