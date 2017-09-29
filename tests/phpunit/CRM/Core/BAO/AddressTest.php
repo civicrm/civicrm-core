@@ -488,7 +488,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
     $updatedAddressA = CRM_Core_BAO_Address::add($updatedAddressParamsA, FALSE);
 
     // CRM-21214 - AdressA shouldn't be master of itself.
-    $this->assertEquals(NULL, $updatedAddressA->master_id);
+    $this->assertEmpty($updatedAddressA->master_id);
   }
 
 }
