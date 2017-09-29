@@ -87,6 +87,7 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
       catch (CRM_Core_Exception $e) {
         CRM_Core_Error::statusBounce(ts('There is no valid processor for this subscription so it cannot be edited.'));
       }
+      $this->_paymentProcessorObj = $this->_paymentProcessor['object'];
       $this->_subscriptionDetails = CRM_Contribute_BAO_ContributionRecur::getSubscriptionDetails($this->contributionRecurID);
     }
 
