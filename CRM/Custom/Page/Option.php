@@ -208,7 +208,6 @@ WHERE  option_group_id = %1";
     $controller->setEmbedded(TRUE);
     $controller->process();
     $controller->run();
-    $this->browse();
   }
 
   /**
@@ -276,9 +275,8 @@ WHERE  option_group_id = %1";
     elseif ($action & CRM_Core_Action::MAP) {
       $this->alphabetize();
     }
-    else {
-      $this->browse();
-    }
+    $this->browse();
+
     // Call the parents run method
     return parent::run();
   }
