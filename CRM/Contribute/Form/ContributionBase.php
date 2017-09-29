@@ -1318,39 +1318,26 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * Arguably the form should start to build $this->_params in the pre-process main page & use that array consistently throughout.
    */
   protected function setRecurringMembershipParams() {
-    $selectedMembershipTypeID = CRM_Utils_Array::value('selectMembership', $this->_params);
-    if ($selectedMembershipTypeID) {
-      // @todo the price_x fields will ALWAYS allow us to determine the membership - so we should ignore
-      // 'selectMembership' and calculate from the price_x fields so we have one method that always works
-      // this is lazy & only catches when selectMembership is set, but the worst of all worlds would be to fix
-      // this with an else (calculate for price set).
-      $membershipTypes = CRM_Price_BAO_PriceSet::getMembershipTypesFromPriceSet($this->_priceSetId);
-      if (in_array($selectedMembershipTypeID, $membershipTypes['autorenew_required'])
-        || (in_array($selectedMembershipTypeID, $membershipTypes['autorenew_optional']) &&
-          !empty($this->_params['is_recur']))
-      ) {
-        $this->_params['auto_renew'] = TRUE;
-      }
-    }
-    if ((!empty($this->_params['selectMembership']) || !empty($this->_params['priceSetId']))
-      && !empty($this->_paymentProcessor['is_recur']) &&
-      CRM_Utils_Array::value('auto_renew', $this->_params)
-      && empty($this->_params['is_recur']) && empty($this->_params['frequency_interval'])
+    if (
+      !empty($this->_paymentProcessor['is_recur'])
+      && CRM_Utils_Array::value('auto_renew', $this->_params)
+      && empty($this->_params['is_recur'])
+      && empty($this->_params['frequency_interval'])
     ) {
+      $membershipTermDetails = $this->getMembershipTermDetails();
+      if (!empty($membershipTermDetails)) {
+        // TODO: This could be a problem if more than one membership is
+        // purchased, but it's unclear how well that is supported now anyway.
+        $termDetails = array_shift($membershipTermDetails);
 
-      $this->_params['is_recur'] = $this->_values['is_recur'] = 1;
-      // check if price set is not quick config
-      if (!empty($this->_params['priceSetId']) && !CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_params['priceSetId'], 'is_quick_config')) {
-        list($this->_params['frequency_interval'], $this->_params['frequency_unit']) = CRM_Price_BAO_PriceSet::getRecurDetails($this->_params['priceSetId']);
-      }
-      else {
-        // FIXME: set interval and unit based on selected membership type
-        $this->_params['frequency_interval'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType',
-          $this->_params['selectMembership'], 'duration_interval'
-        );
-        $this->_params['frequency_unit'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType',
-          $this->_params['selectMembership'], 'duration_unit'
-        );
+        $this->_params['is_recur'] = $this->_values['is_recur'] = 1;
+        // This is a little confusing because there are various entities with
+        // frequency_* properties, and they don't all have the same meaning.
+        // Below we are calculating the parameters for the contributionRecur
+        // entity from the properties of the membershipType and priceFieldValue
+        // entities.
+        $this->_params['frequency_interval'] = $termDetails['interval'] * $termDetails['qty'];
+        $this->_params['frequency_unit'] = $termDetails['unit'];
       }
     }
   }
