@@ -800,7 +800,7 @@ INNER JOIN civicrm_contact contact_target ON ( contact_target.id = act.contact_i
    * Function handles shared contact address processing.
    * In this function we just modify submitted values so that new address created for the user
    * has same address as shared contact address. We copy the address so that search etc will be
-   * much efficient.
+   * much more efficient.
    *
    * @param array $address
    *   This is associated array which contains submitted form values.
@@ -810,20 +810,20 @@ INNER JOIN civicrm_contact contact_target ON ( contact_target.id = act.contact_i
       return;
     }
 
-    // Sharing contact address during create mode is pretty straight forward.
-    // In update mode we should check following:
-    // - We should check if user has uncheck shared contact address
-    // - If yes then unset the master_id or may be just delete the address that copied master
-    //    Normal update process will automatically create new address with submitted values
+    // In create mode sharing a contact's address is pretty straight forward.
+    // In update mode we should check if the user stops sharing. If yes:
+    // - Set the master_id to an empty value
+    // Normal update process will automatically create new address with submitted values
 
-    // 1. loop through entire subnitted address array
-    $masterAddress = array();
+    // 1. loop through entire submitted address array
     $skipFields = array('is_primary', 'location_type_id', 'is_billing', 'master_id');
     foreach ($address as & $values) {
-      // 2. check if master id exists, if not continue
-      if (empty($values['master_id']) || empty($values['use_shared_address'])) {
-        // we should unset master id when use uncheck share address for existing address
-        $values['master_id'] = 'null';
+      // 2. check if "Use another contact's address" is checked, if not continue
+      // Additionally, if master_id is set (address was shared), set master_id to empty value.
+      if (empty($values['use_shared_address'])) {
+        if (!empty($values['master_id'])) {
+          $values['master_id'] = '';
+        }
         continue;
       }
 
