@@ -226,7 +226,7 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
     $dao = CRM_Core_DAO::executeQuery($query, $params);
     $dao->fetch();
 
-    $details['qty'] = $dao->membership_num_terms ? : 1;
+    $details['qty'] = $dao->membership_num_terms ?: 1;
     $details['interval'] = $dao->duration_interval;
     $details['unit'] = $dao->duration_unit;
 
