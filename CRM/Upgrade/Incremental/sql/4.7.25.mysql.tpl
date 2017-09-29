@@ -20,3 +20,8 @@ FROM civicrm_uf_join
 LEFT JOIN civicrm_event e on civicrm_uf_join.entity_id = e.id
 WHERE (civicrm_uf_join.module = 'CiviEvent' OR civicrm_uf_join.module = 'CiviEvent_Additional')
 AND e.id IS NULL;
+
+-- CRM-21234 Missing subdivisions of Tajikistan.
+ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
+   (NULL, 1209, "DU", "Dushanbe"),
+   (NULL, 1209, "RA", "Nohiyahoi Tobei Jumhurí");
