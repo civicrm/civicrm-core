@@ -276,6 +276,20 @@ AND    reset_date IS NULL
   }
 
   /**
+   * Generate an array of Domain email addresses.
+   * @return array $domainEmails;
+   */
+  public static function domainEmails() {
+    $domainEmails = array();
+    $domainFrom = (array) CRM_Core_OptionGroup::values('from_email_address');
+    foreach (array_keys($domainFrom) as $k) {
+      $domainEmail = $domainFrom[$k];
+      $domainEmails[$domainEmail] = htmlspecialchars($domainEmail);
+    }
+    return $domainEmails;
+  }
+
+  /**
    * Build From Email as the combination of all the email ids of the logged in user and
    * the domain email id
    *
@@ -283,22 +297,20 @@ AND    reset_date IS NULL
    *   an array of email ids
    */
   public static function getFromEmail() {
-    $contactID = CRM_Core_Session::singleton()->getLoggedInContactID();
-    $fromEmailValues = array();
-
     // add all configured FROM email addresses
-    $domainFrom = CRM_Core_OptionGroup::values('from_email_address');
-    foreach (array_keys($domainFrom) as $k) {
-      $domainEmail = $domainFrom[$k];
-      $fromEmailValues[$domainEmail] = htmlspecialchars($domainEmail);
+    $fromEmailValues = self::domainEmails();
+
+    if (!Civi::settings()->get('allow_mail_from_logged_in_contact')) {
+      return $fromEmailValues;
     }
 
     // add logged in user's active email ids
+    $contactID = CRM_Core_Session::singleton()->getLoggedInContactID();
     if ($contactID) {
       $contactEmails = self::allEmails($contactID);
-      $fromDisplayName = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $contactID, 'display_name');
+      $fromDisplayName  = CRM_Core_Session::singleton()->getLoggedInContactDisplayName();
 
-      foreach ($contactEmails as $emailVal) {
+      foreach ($contactEmails as $emailId => $emailVal) {
         $email = trim($emailVal['email']);
         if (!$email || $emailVal['on_hold']) {
           continue;
@@ -309,7 +321,7 @@ AND    reset_date IS NULL
         if (!empty($emailVal['is_primary'])) {
           $fromEmailHtml .= ' ' . ts('(preferred)');
         }
-        $fromEmailValues[$fromEmail] = $fromEmailHtml;
+        $fromEmailValues[$emailId] = $fromEmailHtml;
       }
     }
     return $fromEmailValues;

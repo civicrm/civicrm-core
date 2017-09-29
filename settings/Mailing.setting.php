@@ -346,4 +346,17 @@ return array(
     'description' => 'Enable this setting to rebuild recipient list automatically during composing mail. Disable will allow you to rebuild recipient manually.',
     'help_text' => 'CiviMail automatically fetches recipient list and count whenever mailing groups are included or excluded while composing bulk mail. This phenomena may degrade performance for large sites, so disable this setting to build and fetch recipients for selected groups, manually.',
   ),
+  'allow_mail_from_logged_in_contact' => array(
+    'group_name' => 'Mailing Preferences',
+    'group' => 'mailing',
+    'name' => 'allow_mail_from_logged_in_contact',
+    'type' => 'Boolean',
+    'quick_form_type' => 'YesNo',
+    'default' => 1,
+    'title' => 'Allow mail from logged in contact',
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => 'Allow sending email from the logged in contact\'s email address',
+    'help_text' => 'CiviCRM allows you to send email from the domain from email addresses and the logged in contact id addresses by default. Disable this if you only want to allow the domain from addresses to be used.',
+  ),
 );

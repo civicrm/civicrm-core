@@ -58,6 +58,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
    * @param CRM_Core_Form $form
    */
   public static function preProcess(&$form) {
+    CRM_Contact_Form_Task_EmailCommon::preProcessFromAddress($form);
     $messageText = array();
     $messageSubject = array();
     $dao = new CRM_Core_BAO_MessageTemplate();
@@ -103,6 +104,8 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
       array('size' => 45, 'maxlength' => 255),
       FALSE
     );
+
+    $form->add('select', 'from_email_address', ts('From Email Address'), $form->_fromEmails, TRUE);
 
     $form->add('static', 'pdf_format_header', NULL, ts('Page Format: %1', array(1 => '<span class="pdf-format-header-label"></span>')));
     $form->addSelect('format_id', array(
