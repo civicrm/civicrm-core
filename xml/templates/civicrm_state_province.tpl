@@ -4077,4 +4077,8 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (NULL, 1181, "N", "Nevis"),
 (NULL, 1190, "E", "Eastern"),
 (NULL, 1190, "N", "Northern"),
-(NULL, 1190, "S", "Southern");
+(NULL, 1190, "S", "Southern"),
+
+-- CRM-21234 Missing subdivisions of Tajikistan.
+(NULL, 1209, "DU", "Dushanbe"),
+(NULL, 1209, "RA", "Nohiyahoi Tobei Jumhurí");
