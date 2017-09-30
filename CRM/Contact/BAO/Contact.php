@@ -2075,7 +2075,9 @@ ORDER BY civicrm_email.is_primary DESC";
 
         $blockName = in_array($fieldName, $blocks) ? $fieldName : 'address';
         // CRM-20598 phone_ext is a special case, let's define the blockName manually
-        if ($fieldName == 'phone_ext') $blockName = 'phone';
+        if ($fieldName == 'phone_ext') {
+          $blockName = 'phone';
+        }
 
         $data[$blockName][$loc]['location_type_id'] = $locTypeId;
 

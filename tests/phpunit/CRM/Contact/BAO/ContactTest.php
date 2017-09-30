@@ -1114,7 +1114,10 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     $this->contactDelete($contactId);
   }
 
-  function testUpdateProfileLocationLeak() {
+  /**
+   * Test case for UpdateProfileLocationLeak (CRM-20598).
+   */
+  public function testUpdateProfileLocationLeak() {
     // create a simple contact with address and phone that share the same location type
     $defaults = $this->contactParams();
     $params = array(
