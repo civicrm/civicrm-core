@@ -63,7 +63,7 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
     $this->assign('context', $context);
 
     // Sometimes we want to suppress the Event Full msg
-    $noFullMsg = CRM_Utils_Request::retrieve('noFullMsg', 'String', $this, FALSE, 'false');
+    $noFullMsg = CRM_Utils_Request::retrieve('noFullMsg', 'String', $this, FALSE, 'false') == 'false' ? 0 : 1;
 
     // set breadcrumb to append to 2nd layer pages
     $breadCrumbPath = CRM_Utils_System::url('civicrm/event/info',
@@ -312,10 +312,10 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
       'role_id' => CRM_Utils_Array::value('default_role_id', $values['event']),
     );
 
-    if ($eventFullMessage && ($noFullMsg == 'false') || CRM_Event_BAO_Event::checkRegistration($params)) {
+    if ($eventFullMessage && (!$noFullMsg) || CRM_Event_BAO_Event::checkRegistration($params)) {
       $statusMessage = $eventFullMessage;
       if (CRM_Event_BAO_Event::checkRegistration($params)) {
-        if ($noFullMsg == 'false') {
+        if (!$noFullMsg) {
           if ($values['event']['allow_same_participant_emails']) {
             $statusMessage = ts('It looks like you are already registered for this event.  You may proceed if you want to create an additional registration.');
           }

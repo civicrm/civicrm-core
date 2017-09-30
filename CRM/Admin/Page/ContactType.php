@@ -97,7 +97,7 @@ class CRM_Admin_Page_ContactType extends CRM_Core_Page_Basic {
   public function run() {
     $action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 0);
     $this->assign('action', $action);
-    $id = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE, 0);
+    $id = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE, NULL);
     if (!$action) {
       $this->browse();
     }

@@ -122,10 +122,10 @@ class CRM_Admin_Page_Job extends CRM_Core_Page_Basic {
     CRM_Utils_System::appendBreadCrumb($breadCrumb);
 
     $this->_id = CRM_Utils_Request::retrieve('id', 'String',
-      $this, FALSE, 0
+      $this, FALSE, NULL
     );
     $this->_action = CRM_Utils_Request::retrieve('action', 'String',
-      $this, FALSE, 0
+      $this, FALSE, NULL
     );
 
     if ($this->_action == 'export') {

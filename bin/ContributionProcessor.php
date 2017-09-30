@@ -264,9 +264,9 @@ class CiviContributeProcessor {
           CRM_Core_DAO::$_nullObject, FALSE, 31, 'REQUEST'
         );
         $end = CRM_Utils_Request::retrieve('end', 'String',
-          CRM_Core_DAO::$_nullObject, FALSE, 0, 'REQUEST'
+          CRM_Core_DAO::$_nullObject, FALSE, NULL, 'REQUEST'
         );
-        if ($start < $end) {
+        if (!empty($end) && $start < $end) {
           CRM_Core_Error::fatal("Start offset can't be less than End offset.");
         }
 
