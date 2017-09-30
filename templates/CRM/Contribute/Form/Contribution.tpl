@@ -612,6 +612,7 @@ CRM.$(function($) {
       if (!freezeFinancialType) {
         var financialType = $('#financial_type_id').val();
         var taxRates = '{/literal}{$taxRates}{literal}';
+        var taxTerm = '{/literal}{$taxTerm}{literal}';
         taxRates = JSON.parse(taxRates);
         var currencies = '{/literal}{$currencies}{literal}';
         currencies = JSON.parse(currencies);
@@ -637,8 +638,7 @@ CRM.$(function($) {
         taxAmount = isNaN (taxAmount) ? 0:taxAmount;
         var totalTaxAmount = taxAmount + Number(totalAmount);
         totalTaxAmount = formatMoney( totalTaxAmount, 2, separator, thousandMarker );
-
-        $("#totalTaxAmount" ).html('Amount with tax : <span id="currencySymbolShow">' + currencySymbol + '</span> '+ totalTaxAmount);
+        $("#totalTaxAmount" ).html('{/literal}{ts 1=$taxTerm}Amount with %1 :{/ts}{literal} <span id="currencySymbolShow">' + currencySymbol + '</span> '+ totalTaxAmount);
       }
       event.handled = true;
     }

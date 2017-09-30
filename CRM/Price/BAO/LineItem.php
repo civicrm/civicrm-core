@@ -300,8 +300,8 @@ WHERE li.contribution_id = %1";
       );
       $taxRates = CRM_Core_PseudoConstant::getTaxRates();
       if (isset($lineItems[$dao->id]['financial_type_id']) && array_key_exists($lineItems[$dao->id]['financial_type_id'], $taxRates)) {
-        // We are close to output/display here - so apply some rounding at output/display level - to not show Tax Rate in all 8 decimals
-        $lineItems[$dao->id]['tax_rate'] = round($taxRates[$lineItems[$dao->id]['financial_type_id']], 3);
+        // Cast to float so trailing zero decimals are removed for display.
+        $lineItems[$dao->id]['tax_rate'] = (float) $taxRates[$lineItems[$dao->id]['financial_type_id']];
       }
       else {
         // There is no Tax Rate associated with this Financial Type

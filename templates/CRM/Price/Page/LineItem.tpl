@@ -78,7 +78,7 @@
     {if $getTaxDetails}
       <td class="right">{$line.line_total|crmMoney}</td>
       {if $line.tax_rate != "" || $line.tax_amount != ""}
-        <td class="right">{$taxTerm} ({$line.tax_rate|string_format:"%.3f"}%)</td>
+        <td class="right">{$taxTerm} ({$line.tax_rate}%)</td>
         <td class="right">{$line.tax_amount|crmMoney}</td>
       {else}
         <td></td>
@@ -98,7 +98,7 @@
 <div class="crm-section no-label total_amount-section">
   <div class="content bold">
     {if $getTaxDetails && $totalTaxAmount}
-      {ts}Total Tax Amount{/ts}: {$totalTaxAmount|crmMoney}<br />
+      {ts 1=$taxTerm}Total %1 Amount{/ts}: {$totalTaxAmount|crmMoney}<br />
     {/if}
     {if $context EQ "Contribution"}
       {ts}Contribution Total{/ts}:
