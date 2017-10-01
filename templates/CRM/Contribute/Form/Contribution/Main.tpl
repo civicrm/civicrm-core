@@ -98,7 +98,7 @@
     {else}
       <div class="display-block">
         <td class="label">{$form.total_amount.label}</td>
-        <td><span>{$form.total_amount.html|crmMoney}</span></td>
+        <td><span>{$form.total_amount.html|crmMoney}&nbsp;&nbsp;{if $taxAmount}(includes {$taxTerm} of {$taxAmount|crmMoney}){/if}</span></td>
       </div>
     {/if}
   {else}

@@ -65,33 +65,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     $this->_paymentProcessors = $this->get('paymentProcessors');
     $this->preProcessPaymentOptions();
 
-    if (!empty($this->_ccid)) {
-      $payment = CRM_Contribute_BAO_Contribution::getPaymentInfo($this->_ccid, 'contribution');
-      //bounce if the contribution is not pending.
-      if (empty($payment['balance'])) {
-        CRM_Core_Error::statusBounce(ts("Returning since contribution has already been handled."));
-      }
-      if (!empty($payment['total'])) {
-        $this->_pendingAmount = $payment['total'];
-        $this->assign('pendingAmount', $this->_pendingAmount);
-      }
-      $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($this->_ccid);
-      foreach (array_keys($lineItems) as $id) {
-        $lineItems[$id]['id'] = $id;
-      }
-      $itemId = key($lineItems);
-      if ($itemId && !empty($lineItems[$itemId]['price_field_id'])) {
-        $this->_priceSetId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', $lineItems[$itemId]['price_field_id'], 'price_set_id');
-      }
-
-      if (!empty($lineItems[$itemId]['price_field_id'])) {
-        $this->_lineItem[$this->_priceSetId] = $lineItems;
-      }
-      $isQuickConfig = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_priceSetId, 'is_quick_config');
-      $this->assign('lineItem', $this->_lineItem);
-      $this->assign('is_quick_config', $isQuickConfig);
-      $this->assign('priceSetID', $this->_priceSetId);
-    }
+    $this->assignFormVariablesByContributionID();
 
     // Make the contributionPageID available to the template
     $this->assign('contributionPageID', $this->_id);
@@ -1317,6 +1291,47 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
     // redirect to thank you page
     CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contribute/transact', "_qf_ThankYou_display=1&qfKey=$qfKey", TRUE, NULL, FALSE));
+  }
+
+  /**
+   * Set form variables if contribution ID is found
+   */
+  public function assignFormVariablesByContributionID() {
+    if (empty($this->_ccid)) {
+      return;
+    }
+
+    $payment = CRM_Contribute_BAO_Contribution::getPaymentInfo($this->_ccid, 'contribution');
+    //bounce if the contribution is not pending.
+    if (empty($payment['balance'])) {
+      CRM_Core_Error::statusBounce(ts("Returning since contribution has already been handled."));
+    }
+    if (!empty($payment['total'])) {
+      $this->_pendingAmount = $payment['total'];
+      $this->assign('pendingAmount', $this->_pendingAmount);
+    }
+
+    if ($taxAmount = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $this->_ccid, 'tax_amount')) {
+      $this->set('tax_amount', $taxAmount);
+      $this->assign('taxAmount', $taxAmount);
+    }
+
+    $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($this->_ccid);
+    foreach (array_keys($lineItems) as $id) {
+      $lineItems[$id]['id'] = $id;
+    }
+    $itemId = key($lineItems);
+    if ($itemId && !empty($lineItems[$itemId]['price_field_id'])) {
+      $this->_priceSetId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', $lineItems[$itemId]['price_field_id'], 'price_set_id');
+    }
+
+    if (!empty($lineItems[$itemId]['price_field_id'])) {
+      $this->_lineItem[$this->_priceSetId] = $lineItems;
+    }
+    $isQuickConfig = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_priceSetId, 'is_quick_config');
+    $this->assign('lineItem', $this->_lineItem);
+    $this->assign('is_quick_config', $isQuickConfig);
+    $this->assign('priceSetID', $this->_priceSetId);
   }
 
   /**
