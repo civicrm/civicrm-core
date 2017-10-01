@@ -1825,12 +1825,12 @@ SELECT ps.id, ps.name,
   public static function setPriceSetDefaultsToLastUsedValues(&$defaults, $priceSet, $contactID) {
 
     // this is detailed info on how membership orgs, and the best membership type & price set field to use
-    $contactOrgMemberships = CRM_Member_BAO_Membership::getContactMembershipsByMembershipOrg($contactID);
+    $contactOrgMemberships = CRM_Member_BAO_Membership::getContactMembershipsByMembershipOrg($contactID, $defaults['id']);
 
     // we need a list of all membership types, and the org that corresponds to them
     // we use this later to associate price set mem type to the org it represents.
     $allMemTypes = array_keys(CRM_Member_BAO_MembershipType::getMembershipTypes(FALSE));
-    $allMemOfByMemTypes = CRM_Member_BAO_MembershipType::getMemberOfContactByMemTypes($allMemTypes, $defaults['id']);
+    $allMemOfByMemTypes = CRM_Member_BAO_MembershipType::getMemberOfContactByMemTypes($allMemTypes);
 
     // go through all price fields & options
     foreach ($priceSet['fields'] as $priceFieldId => $priceField) {

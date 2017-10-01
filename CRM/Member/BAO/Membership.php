@@ -2541,21 +2541,19 @@ WHERE      civicrm_membership.is_test = 0";
    * Given specified contact, return a map of membership orgs (that contact
    * has ever been member of), and info on the last membership that contact
    * has signed up for this org.
-
    * Initial use case for this method was to return a list of membership
    * type that a contact should be renewed on when renewing using *any*
    * priceset, unlike online renewals which only renew for a specific price set
    *
-   * @param int $contactId, The contact who's memberships we want breakdown for
-   *        int $mostImportMembershipId.  It is possible that a contact may have
+   * @param int $contactId , The contact who's memberships we want breakdown for
+   * @param int $mostImportMembershipId,  It is possible that a contact may have
    *          multiple memberships for the same org (not usually, but some orgs
    *          do this). Any membership that matches this Id will be given
    *          preference and returned (over all other ones for the same org)
-   * @return array
-   *   Array (int $member_of_contact_id =>
-   *      Array (of the fields returned by the results set (see below)
-   *   )
-   *
+   * @return array Array (int $member_of_contact_id =>
+   * Array (int $member_of_contact_id =>
+   * Array (of the fields returned by the results set (see below)
+   * )
    */
   public static function getContactMembershipsByMembershipOrg($contactId, $mostImportMembershipId) {
     $query = "
