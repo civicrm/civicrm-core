@@ -437,6 +437,7 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
       'civicrm_case', 'created_date', "timestamp NULL  DEFAULT NULL COMMENT 'When was the case was created.'");
     $this->addTask('CRM-20958 - Add modified_date to civicrm_case', 'addColumn',
       'civicrm_case', 'modified_date', "timestamp NULL  DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'When was the case (or closely related entity) was created or modified or deleted.'");
+    $this->addTask('Rebuild Multilingual Schema', 'rebuildMultilingalSchema');
   }
 
   /**
