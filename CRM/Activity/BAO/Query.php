@@ -421,6 +421,7 @@ class CRM_Activity_BAO_Query {
    * @param CRM_Core_Form $form
    */
   public static function buildSearchForm(&$form) {
+    $form->addElement('hidden', 'contact_id');
     $form->addSelect('activity_type_id',
       array('entity' => 'activity', 'label' => ts('Activity Type(s)'), 'multiple' => 'multiple', 'option_url' => NULL, 'placeholder' => ts('- any -'))
     );
