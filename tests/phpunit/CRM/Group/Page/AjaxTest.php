@@ -26,6 +26,10 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
 
   public function setUp() {
     parent::setUp();
+    // CRM_Contact_BAO_Group::getPermissionClause sets a static variable.
+    // Ensure it is reset before each run.
+    $force = TRUE;
+    CRM_Contact_BAO_Group::getPermissionClause($force);
     $this->_params = array(
       'page' => 1,
       'rp' => 50,
@@ -508,6 +512,119 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     $this->assertEquals(1, count($groups['data']), 'Returned groups should exclude disabled by default');
     $this->assertEquals(1, $groups['recordsTotal'], 'Total needs to be set correctly');
     $this->assertEquals('pick-me-active', $groups['data'][0]['title']);
+  }
+
+  /**
+   * Don't populate smart group cache when building Group list.
+   *
+   * It takes forever, especially if you have lots of smart groups.
+   */
+  public function testGroupDontRegenerateSmartGroups() {
+    // Create a contact.
+    $firstName = 'Tweak';
+    $lastName = 'Octonaut';
+    $params = array(
+      'first_name' => $firstName,
+      'last_name' => $lastName,
+      'contact_type' => 'Individual',
+    );
+    $contact = CRM_Contact_BAO_Contact::add($params);
+
+    // Create a smart group.
+    $searchParams = array(
+      'last_name' => $lastName,
+    );
+    $groupParams = array('title' => 'Find all Octonauts', 'formValues' => $searchParams, 'is_active' => 1);
+    $group = CRM_Contact_BAO_Group::createSmartGroup($groupParams);
+
+    // Ensure the smart group is created.
+    $this->assertTrue(is_int($group->id), "Smart group created successfully.");
+    CRM_Contact_BAO_GroupContactCache::load($group, TRUE);
+
+    // Ensure it is populating the cache when loaded.
+    $sql = 'SELECT contact_id FROM civicrm_group_contact_cache WHERE group_id = %1';
+    $params = array(1 => array($group->id, 'Integer'));
+    $dao = CRM_Core_DAO::executeQuery($sql, $params);
+    $this->assertEquals($dao->N, 1, '1 record should be found in smart group');
+
+    // Load the Manage Group page code and we should get a count from our
+    // group because the cache is fresh.
+    $_GET = $this->_params;
+    $obj = new CRM_Group_Page_AJAX();
+    $groups = $obj->getGroupList();
+
+    // Make sure we returned our smart group and ensure the count is accurate.
+    $found = FALSE;
+    $right_count = FALSE;
+    foreach ($groups['data'] as $returned_group) {
+      if ($returned_group['group_id'] == $group->id) {
+        $found = TRUE;
+        if ($returned_group['count'] == 1) {
+          $right_count = TRUE;
+        }
+      }
+    }
+    $this->assertTrue($found, 'Smart group shows up on Manage Group page.');
+    $this->assertTrue($right_count, 'Smart group displays proper count when cache is loaded.');
+
+    // Purge the group contact cache.
+    CRM_Contact_BAO_GroupContactCache::clearGroupContactCache($group->id);
+
+    // Load the Manage Group page code.
+    $_GET = $this->_params;
+    $obj = new CRM_Group_Page_AJAX();
+    $groups = $obj->getGroupList();
+
+    // Make sure the smart group reports unknown count.
+    $count_is_unknown = FALSE;
+    foreach ($groups['data'] as $returned_group) {
+      if ($returned_group['group_id'] == $group->id) {
+        if ($returned_group['count'] == ts('unknown')) {
+          $count_is_unknown = TRUE;
+        }
+      }
+    }
+    $this->assertTrue($count_is_unknown, 'Smart group shows up as unknown when cache is expired.');
+
+    // Ensure we did not populate the cache.
+    $sql = 'SELECT contact_id FROM civicrm_group_contact_cache WHERE group_id = %1';
+    $params = array(1 => array($group->id, 'Integer'));
+    $dao = CRM_Core_DAO::executeQuery($sql, $params);
+    $test = 'Group contact cache should not be populated on Manage Groups ' .
+      'when cache_date is null';
+    $this->assertEquals($dao->N, 0, $test);
+
+    // Do it again, but this time don't clear group contact cache. Instead,
+    // set it to expire.
+    CRM_Contact_BAO_GroupContactCache::load($group, TRUE);
+    $params['name'] = 'smartGroupCacheTimeout';
+    $timeout = civicrm_api3('Setting', 'getvalue', $params);
+    $timeout = intval($timeout) * 60;
+    // Reset the cache_date to $timeout seconds ago minus another 60
+    // seconds for good measure.
+    $cache_date = date('YmdHis', time() - $timeout - 60);
+
+    $sql = "UPDATE civicrm_group SET cache_date = %1 WHERE id = %2";
+    $update_params = array(
+      1 => array($cache_date, 'Timestamp'),
+      2 => array($group->id, 'Integer'),
+    );
+    CRM_Core_DAO::executeQuery($sql, $update_params);
+
+    // Load the Manage Group page code.
+    $_GET = $this->_params;
+    $obj = new CRM_Group_Page_AJAX();
+    $groups = $obj->getGroupList();
+
+    // Ensure we did not regenerate the cache.
+    $sql = 'SELECT DATE_FORMAT(cache_date, "%Y%m%d%H%i%s") AS cache_date ' .
+      'FROM civicrm_group WHERE id = %1';
+    $params = array(1 => array($group->id, 'Integer'));
+    $dao = CRM_Core_DAO::executeQuery($sql, $params);
+    $dao->fetch();
+    $test = 'Group contact cache should not be re-populated on Manage Groups ' .
+     'when cache_date has expired';
+    $this->assertEquals($dao->cache_date, $cache_date, $test);
   }
 
   /**
