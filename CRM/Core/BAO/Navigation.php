@@ -528,7 +528,7 @@ FROM civicrm_navigation WHERE domain_id = $domainID {$whereClause} ORDER BY pare
     }
 
     if (!empty($value['attributes']['icon'])) {
-      $menuIcon = sprintf('<span class="%s"></span>&nbsp;', $value['attributes']['icon']);
+      $menuIcon = sprintf('<span class="menu-item-icon %s"></span>', $value['attributes']['icon']);
       $name = $menuIcon . $name;
     }
 
