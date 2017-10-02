@@ -249,7 +249,7 @@ class CRM_Mailing_Event_BAO_Opened extends CRM_Mailing_Event_DAO_Opened {
     );
 
     if ($is_distinct) {
-      $groupBy = " GROUP BY $queue.id ";
+      $groupBy = " GROUP BY $queue.id, $open.time_stamp ";
       $select = CRM_Contact_BAO_Query::appendAnyValueToSelect($selectClauses, "$queue.id");
     }
     else {
