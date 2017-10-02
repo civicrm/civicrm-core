@@ -151,7 +151,7 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
     }
 
     $this->_activityId = CRM_Utils_Request::retrieve('aid', 'Positive', $this, FALSE, 0, 'GET');
-    if (is_numeric($this->_activityId)) {
+    if (is_numeric($this->_activityId) && !empty($this->_activityId)) {
       $latestRevisionId = CRM_Activity_BAO_Activity::getLatestActivityId($this->_activityId);
       if ($latestRevisionId) {
         $this->_activityId = $latestRevisionId;
