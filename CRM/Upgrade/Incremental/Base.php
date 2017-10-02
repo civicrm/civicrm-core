@@ -228,4 +228,19 @@ class CRM_Upgrade_Incremental_Base {
     return TRUE;
   }
 
+  /**
+   * Rebuild Multilingual Schema.
+   * @param CRM_Queue_TaskContext $ctx
+   * @return bool
+   */
+  public static function rebuildMultilingalSchema($ctx) {
+    $domain = new CRM_Core_DAO_Domain();
+    $domain->find(TRUE);
+    if ($domain->locales) {
+      $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
+      CRM_Core_I18n_Schema::rebuildMultilingualSchema($locales);
+    }
+    return TRUE;
+  }
+
 }
