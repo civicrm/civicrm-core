@@ -383,7 +383,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
       $processors = self::getAllPaymentProcessors('all', TRUE, FALSE);
     }
     else {
-      $processors = self::getAllPaymentProcessors('all', TRUE);
+      $processors = self::getAllPaymentProcessors('live', TRUE, TRUE);
     }
 
     if (in_array('TestMode', $capabilities) && is_array($ids)) {
