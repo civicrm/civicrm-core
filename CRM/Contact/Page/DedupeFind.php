@@ -65,8 +65,11 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
     $cid = CRM_Utils_Request::retrieve('cid', 'Positive', $this, FALSE, 0);
     $isSelected = CRM_Utils_Request::retrieve('selected', 'Int', $this, FALSE, 0);
 
-    // Using a placeholder for criteria as it is intended to be able to pass this later.
-    $criteria = array();
+    $criteria = CRM_Utils_Request::retrieve('criteria', 'String', $this, FALSE, '{}');
+    $this->assign('criteria', $criteria);
+
+    $criteria = json_decode($criteria, TRUE);
+
     $isConflictMode = ($context == 'conflicts');
     if ($cid) {
       $this->_cid = $cid;

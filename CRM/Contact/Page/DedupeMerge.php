@@ -61,9 +61,7 @@ class CRM_Contact_Page_DedupeMerge extends CRM_Core_Page {
     $limit  = CRM_Utils_Request::retrieve('limit', 'Positive');
     $action = CRM_Utils_Request::retrieve('action', 'String');
     $mode   = CRM_Utils_Request::retrieve('mode', 'String', $null, FALSE, 'safe');
-
-    // Using a placeholder for criteria as it is intended to be able to pass this later.
-    $criteria = array();
+    $criteria = CRM_Utils_Request::retrieve('criteria', 'String', $null, FALSE, '{}');
 
     $cacheKeyString = CRM_Dedupe_Merger::getMergeCacheKeyString($rgid, $gid, $criteria);
 
@@ -73,6 +71,7 @@ class CRM_Contact_Page_DedupeMerge extends CRM_Core_Page {
       'rgid' => $rgid,
       'gid' => $gid,
       'limit' => $limit,
+      'criteria' => $criteria,
     );
 
     if ($mode == 'aggressive' && !CRM_Core_Permission::check('force merge duplicate contacts')) {
