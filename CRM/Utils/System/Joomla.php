@@ -362,12 +362,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
       $row = $users[0];
     }
 
-    $joomlaBase = dirname(dirname(dirname(dirname(dirname(dirname(dirname(dirname(__FILE__))))))));
-    if (!defined('JVERSION')) {
-      require $joomlaBase . '/libraries/cms/version/version.php';
-      $jversion = new JVersion();
-      define('JVERSION', $jversion->getShortVersion());
-    }
+    $joomlaBase = self::getBasePath();
+    self::getJVersion($joomlaBase);
 
     if (!empty($row)) {
       $dbPassword = $row->password;
@@ -507,6 +503,26 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     }
   }
 
+  public function getJVersion($joomlaBase) {
+    // Files may be in different places depending on Joomla version
+    if (!defined('JVERSION')) {
+      // Joomla 3.8.0+
+      $versionPhp = $joomlaBase . '/libraries/src/Version.php';
+      if (!file_exists($versionPhp)) {
+        // Joomla < 3.8.0
+        $versionPhp = $joomlaBase . '/libraries/cms/version/version.php';
+      }
+      require $versionPhp;
+      $jversion = new JVersion();
+      define('JVERSION', $jversion->getShortVersion());
+    }
+  }
+
+  public function getBasePath() {
+    // Setup the base path related constant.
+    return dirname(dirname(dirname(dirname(dirname(dirname(dirname(dirname(__FILE__))))))));
+  }
+
   /**
    * Load joomla bootstrap.
    *
@@ -521,8 +537,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    * @return bool
    */
   public function loadBootStrap($params = array(), $loadUser = TRUE, $throwError = TRUE, $realPath = NULL, $loadDefines = TRUE) {
-    // Setup the base path related constant.
-    $joomlaBase = dirname(dirname(dirname(dirname(dirname(dirname(dirname(dirname(__FILE__))))))));
+    $joomlaBase = self::getBasePath();
 
     // load BootStrap here if needed
     // We are a valid Joomla entry point.
@@ -541,12 +556,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     require $joomlaBase . '/libraries/joomla/event/dispatcher.php';
     require $joomlaBase . '/configuration.php';
 
-    // Files may be in different places depending on Joomla version
-    if (!defined('JVERSION')) {
-      require $joomlaBase . '/libraries/cms/version/version.php';
-      $jversion = new JVersion();
-      define('JVERSION', $jversion->getShortVersion());
-    }
+    self::getJVersion($joomlaBase);
 
     if (version_compare(JVERSION, '3.0', 'lt')) {
       require $joomlaBase . '/libraries/joomla/environment/uri.php';
@@ -704,8 +714,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     }
 
     list($url, $siteName, $siteRoot) = $this->getDefaultSiteSettings();
-    $includePath = "$siteRoot/libraries/cms/version";
-    if (file_exists("$includePath/version.php")) {
+    if (file_exists("$siteRoot/administrator/index.php")) {
       return $siteRoot;
     }
     return NULL;
