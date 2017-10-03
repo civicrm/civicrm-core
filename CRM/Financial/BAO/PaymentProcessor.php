@@ -444,8 +444,13 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    * @return bool
    */
   public static function hasPaymentProcessorSupporting($capabilities = array()) {
-    $result = self::getPaymentProcessors($capabilities);
-    return (!empty($result)) ? TRUE : FALSE;
+    static $results;
+    $capabilitiesString = implode('', $capabilities);
+    if (!isset($results[$capabilitiesString])) {
+      $result = self::getPaymentProcessors($capabilities);
+      $results[$capabilitiesString] = (!empty($result)) ? TRUE : FALSE;
+    }
+    return $results[$capabilitiesString];
   }
 
   /**
