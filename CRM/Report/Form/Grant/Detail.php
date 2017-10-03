@@ -281,10 +281,12 @@ class CRM_Report_Form_Grant_Detail extends CRM_Report_Form {
           }
           if (!empty($clause)) {
             $clauses[] = $clause;
-            $this->_where = "WHERE " . implode(' AND ', $clauses);
           }
         }
       }
+    }
+    if (!empty($clauses)) {
+      $this->_where = "WHERE " . implode(' AND ', $clauses);
     }
   }
 

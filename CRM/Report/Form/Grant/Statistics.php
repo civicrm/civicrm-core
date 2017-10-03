@@ -296,12 +296,13 @@ WHERE {$this->_aliases['civicrm_grant']}.amount_total IS NOT NULL
           }
           if (!empty($clause)) {
             $clauses[] = $clause;
-            $this->_where .= " AND " . implode(' AND ', $clauses);
-            $this->_whereClause = $whereClause . " AND " .
-              implode(' AND ', $clauses);
           }
         }
       }
+    }
+    if (!empty($clauses)) {
+      $this->_where = "WHERE " . implode(' AND ', $clauses);
+      $this->_whereClause = $whereClause . " AND " . implode(' AND ', $clauses);
     }
   }
 
