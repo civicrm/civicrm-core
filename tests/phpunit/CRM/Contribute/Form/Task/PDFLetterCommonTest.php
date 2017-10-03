@@ -206,6 +206,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
       'html_message' => $htmlMessage,
       'email_options' => 'both',
       'subject' => 'Testy test test',
+      'from' => 'info@example.com',
     );
 
     $contributionIDs = array();
