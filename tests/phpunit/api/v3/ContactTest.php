@@ -2361,6 +2361,21 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test long display names.
+   *
+   * CRM-21258
+   */
+  public function testContactCreateLongDisplayName() {
+    $result = $this->callAPISuccess('Contact', 'Create', array(
+      'first_name' => str_pad('a', 64, 'a'),
+      'last_name' => str_pad('a', 64, 'a'),
+      'contact_type' => 'Individual',
+    ));
+    $this->assertEquals('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', $result['values'][$result['id']]['display_name']);
+    $this->assertEquals('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa, aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', $result['values'][$result['id']]['sort_name']);
+  }
+
+  /**
    * Test Single Entity format.
    */
   public function testContactGetSingleEntityArray() {

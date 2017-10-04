@@ -179,6 +179,12 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
         $contact->display_name = $contact->sort_name = CRM_Utils_Array::value('organization_name', $params, '');
       }
     }
+    if (strlen($contact->display_name) > 128) {
+      $contact->display_name = substr($contact->display_name, 0, 128);
+    }
+    if (strlen($contact->sort_name) > 128) {
+      $contact->sort_name = substr($contact->sort_name, 0, 128);
+    }
 
     $privacy = CRM_Utils_Array::value('privacy', $params);
     if ($privacy &&
