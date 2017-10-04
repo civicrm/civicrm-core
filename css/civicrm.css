@@ -3016,15 +3016,15 @@ tbody.scrollContent tr.alternateRow {
 .crm-container .select2-dropdown-open .select2-choice .select2-arrow b {
   background-position: -18px 1px;
 }
-.select2-drop .crm-entityref-links {
+.select2-dropdown .crm-entityref-links {
   border-top: 1px solid #d3d3d3;
   margin-top: 9px;
 }
-.select2-drop .crm-entityref-filters {
+.select2-dropdown .crm-entityref-filters {
   margin-top: 4px;
 }
-.select2-drop .crm-entityref-filters select,
-.select2-drop .crm-entityref-filters input {
+.select2-dropdown .crm-entityref-filters select,
+.select2-dropdown .crm-entityref-filters input {
   border-radius: 3px;
   border: 1px solid #f2f2f2;
   background-color: #f6f6f6;
@@ -3032,16 +3032,16 @@ tbody.scrollContent tr.alternateRow {
   font-size: 11px;
   max-width: 60%;
 }
-.select2-drop .crm-entityref-filters select:hover,
-.select2-drop .crm-entityref-filters select:focus,
-.select2-drop .crm-entityref-filters select.active,
-.select2-drop .crm-entityref-filters input {
+.select2-dropdown .crm-entityref-filters select:hover,
+.select2-dropdown .crm-entityref-filters select:focus,
+.select2-dropdown .crm-entityref-filters select.active,
+.select2-dropdown .crm-entityref-filters input {
   border: 1px solid #808080;
 }
-.select2-drop .crm-entityref-filter-value {
+.select2-dropdown .crm-entityref-filter-value {
   margin-left: 1em;
 }
-.select2-drop .crm-entityref-filters input {
+.select2-dropdown .crm-entityref-filters input {
   padding-left: .5em;
   background-color: #fefefe;
 }
@@ -3086,7 +3086,7 @@ tbody.scrollContent tr.alternateRow {
   height: 16px;
   margin: 0;
 }
-.crm-container .select2-results li.select2-no-results {
+.crm-container .select2-results li.select2-results__message {
   padding-left: 4px;
   padding-top: 4px;
   margin-left: 4px;
