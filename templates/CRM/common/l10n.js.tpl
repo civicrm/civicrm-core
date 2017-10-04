@@ -33,10 +33,10 @@
   CRM.formatMoney('init', false, {$moneyFormat|@json_encode});
 
   // Localize select2
-  $.fn.select2.defaults.formatNoMatches = "{ts escape='js'}None found.{/ts}";
-  $.fn.select2.defaults.formatLoadMore = "{ts escape='js'}Loading...{/ts}";
-  $.fn.select2.defaults.formatSearching = "{ts escape='js'}Searching...{/ts}";
-  $.fn.select2.defaults.formatInputTooShort = function() {ldelim}
+  $.fn.select2.defaults.noMatches = "{ts escape='js'}None found.{/ts}";
+  $.fn.select2.defaults.loadMore = "{ts escape='js'}Loading...{/ts}";
+  $.fn.select2.defaults.searching = "{ts escape='js'}Searching...{/ts}";
+  $.fn.select2.defaults.inputTooShort = function() {ldelim}
     return ($(this).data('api-entity') === 'contact' || $(this).data('api-entity') === 'Contact') ? {$contactSearch} : {$otherSearch};
   {rdelim};
 
