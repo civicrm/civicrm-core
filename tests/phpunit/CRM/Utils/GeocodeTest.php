@@ -68,6 +68,9 @@ class CRM_Utils_GeocodeTest extends CiviUnitTestCase {
       if ($e->getMessage() == 'A fatal error was triggered: Aborting batch geocoding. Hit the over query limit on geocoder.') {
         $this->markTestIncomplete('Job.geocode error_message: A fatal error was triggered: Aborting batch geocoding. Hit the over query limit on geocoder.');
       }
+      else {
+        throw $e;
+      }
     }
     $params_address_getsingle = array(
       'contact_id' => $contact_values['id'],
