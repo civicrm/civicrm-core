@@ -783,7 +783,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
    */
   public function testRelationshipGetWithChainedCall() {
     // Create a relationship.
-    $createResult = $this->callAPISuccess('relationship',  'create', $this->_params);
+    $createResult = $this->callAPISuccess('relationship', 'create', $this->_params);
     $id = $createResult['id'];
 
     // Try to retrieve it using chaining.
@@ -809,7 +809,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
    */
   public function testRelationshipGetInChainedCall() {
     // Create a relationship.
-    $this->callAPISuccess('relationship',  'create', $this->_params);
+    $this->callAPISuccess('relationship', 'create', $this->_params);
 
     // Try to retrieve it using chaining.
     $params = array(
