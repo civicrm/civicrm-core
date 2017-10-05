@@ -2433,6 +2433,14 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       try {
         $this->processMembership($membershipParams, $contactID, $customFieldsFormatted, $fieldTypes, $premiumParams, $membershipLineItems);
       }
+      catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
+        CRM_Core_Session::singleton()->setStatus($e->getMessage());
+        if (!empty($this->_contributionID)) {
+          CRM_Contribute_BAO_Contribution::failPayment($this->_contributionID,
+            $contactID, $e->getMessage());
+        }
+        CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contribute/transact', "_qf_Main_display=true&qfKey={$this->_params['qfKey']}"));
+      }
       catch (CRM_Core_Exception $e) {
         CRM_Core_Session::singleton()->setStatus($e->getMessage());
         CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contribute/transact', "_qf_Main_display=true&qfKey={$this->_params['qfKey']}"));
