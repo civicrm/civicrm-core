@@ -347,13 +347,15 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
                            {$this->_aliases['civicrm_phone']}.contact_id AND
                            {$this->_aliases['civicrm_phone']}.is_primary = 1\n";
     }
-    //used when contribution field is selected
+    //used when contribution field is selected.
     if ($this->_contribField) {
+      $contribution_table_join = $this->contributionTableJoin();
       $this->_from .= "
-             LEFT JOIN civicrm_membership_payment cmp
-                 ON {$this->_aliases['civicrm_membership']}.id = cmp.membership_id
+             LEFT JOIN $contribution_table_join as max_payment
+                 ON max_payment.entity_id = {$this->_aliases['civicrm_membership']}.id
              LEFT JOIN civicrm_contribution {$this->_aliases['civicrm_contribution']}
-                 ON cmp.contribution_id={$this->_aliases['civicrm_contribution']}.id\n";
+                 ON max_payment.contact_id = {$this->_aliases['civicrm_contribution']}.contact_id
+                 AND max_payment.receive_date = {$this->_aliases['civicrm_contribution']}.receive_date\n";
     }
   }
 
@@ -484,6 +486,43 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
         break;
       }
     }
+  }
+
+  /**
+   * Create temporary table to get most recent
+   * contribution for each contact and membership type.
+   *
+   * @return string $tempTable.
+   */
+  public function contributionTableJoin() {
+    static $tempTable = NULL;
+    if (!empty($tempTable)) {
+      return $tempTable;
+    }
+    $params = $this->_params;
+    $receive_date_relative = empty($params['receive_date_relative']) ? '' : $params['receive_date_relative'];
+    $receive_date_from = empty($params['receive_date_from']) ? '' : $params['receive_date_from'];
+    $receive_date_to = empty($params['receive_date_to']) ? '' : $params['receive_date_to'];
+    $dateFilter = parent::dateClause('receive_date', $receive_date_relative,
+      $receive_date_from, $receive_date_to);
+    if ($dateFilter) {
+      $dateWhere = 'AND ' . str_replace('receive_date', 'cc.receive_date', $dateFilter);
+    }
+    else {
+      $dateWhere = '';
+    }
+    $tempTable = CRM_Core_DAO::createTempTableName('civicrm_report_memcontr', TRUE);
+    $sql = "
+      CREATE TEMPORARY TABLE $tempTable (INDEX (entity_id, contact_id, receive_date))
+      SELECT cc.contact_id, max(cc.receive_date) as receive_date, cmp.membership_id as entity_id
+      FROM civicrm_membership_payment cmp
+      INNER JOIN civicrm_contribution cc
+      ON cc.id = cmp.contribution_id
+      WHERE cc.is_test = 0
+      $dateWhere
+      GROUP BY cmp.membership_id";
+    CRM_Core_DAO::executeQuery($sql);
+    return $tempTable;
   }
 
 }
