@@ -326,6 +326,7 @@
         link: function (scope, elm, attrs) {
           var iframe = $(elm)[0];
           iframe.setAttribute('width', '100%');
+          iframe.setAttribute('height', '250px');
           iframe.setAttribute('frameborder', '0');
 
           var refresh = function () {
@@ -353,6 +354,10 @@
           $(elm).parent().on('dialogresize dialogopen', function(e, ui) {
             $(this).css({padding: '0', margin: '0', overflow: 'hidden'});
             iframe.setAttribute('height', '' + $(this).innerHeight() + 'px');
+          });
+
+          $(elm).parent().on('dialogresize', function(e, ui) {
+            iframe.setAttribute('class', 'resized');
           });
 
           scope.$parent.$watch(attrs.crmUiIframe, refresh);
@@ -576,7 +581,6 @@
     .directive('crmUiSelect', function ($parse, $timeout) {
       return {
         require: '?ngModel',
-        priority: 1,
         scope: {
           crmUiSelect: '='
         },
@@ -612,6 +616,7 @@
             element.crmSelect2(scope.crmUiSelect || {});
             if (ngModel) {
               element.on('change', refreshModel);
+              $timeout(ngModel.$render);
             }
           }
 
@@ -1011,7 +1016,7 @@
               // If the CMS has already added title markup to the page, use it
               $('h1').not('.crm-container h1').each(function() {
                 if (_.trim($(this).html()) === pageTitle) {
-                  $(this).addClass('crm-page-title').html(newPageTitle);
+                  $(this).html(newPageTitle);
                   $el.hide();
                 }
               });
