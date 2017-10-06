@@ -611,7 +611,6 @@ WHERE li.contribution_id = %1";
    * @param int $contributionId
    * @param $feeBlock
    * @param array $lineItems
-   * @param $paidAmount
    *
    */
   public static function changeFeeSelections(
@@ -620,8 +619,7 @@ WHERE li.contribution_id = %1";
     $entity,
     $contributionId,
     $feeBlock,
-    $lineItems,
-    $paidAmount
+    $lineItems
   ) {
     $entityTable = "civicrm_" . $entity;
     CRM_Price_BAO_PriceSet::processAmount($feeBlock,
@@ -694,8 +692,7 @@ WHERE li.contribution_id = %1";
     if (!empty($amountLevel)) {
       $updateAmountLevel = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, $amountLevel) . $displayParticipantCount . CRM_Core_DAO::VALUE_SEPARATOR;
     }
-    $trxn = $lineItemObj->recordAdjustedAmt($updatedAmount, $paidAmount, $contributionId, $taxAmount, $updateAmountLevel);
-
+    $trxn = $lineItemObj->_recordAdjustedAmt($updatedAmount, $contributionId, $taxAmount, $updateAmountLevel);
     $contributionStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_DAO_Contribution', 'contribution_status_id', CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $contributionId, 'contribution_status_id'));
 
     if (!empty($financialItemsArray)) {
@@ -1034,18 +1031,23 @@ WHERE li.contribution_id = %1";
    * @return array $financialTrxn
    *
    */
-  protected function getRelatedCancelFinancialTrxn($financialItemID) {
-    $financialTrxn = civicrm_api3('EntityFinancialTrxn', 'getsingle', array(
-      'entity_table' => 'civicrm_financial_item',
-      'entity_id' => $financialItemID,
-      'options' => array(
-        'sort' => 'id DESC',
-        'limit' => 1,
-      ),
-      'api.FinancialTrxn.getsingle' => array(
-        'id' => "\$value.financial_trxn_id",
-      ),
-    ));
+  protected function _getRelatedCancelFinancialTrxn($financialItemID) {
+    try {
+      $financialTrxn = civicrm_api3('EntityFinancialTrxn', 'getsingle', array(
+        'entity_table' => 'civicrm_financial_item',
+        'entity_id' => $financialItemID,
+        'options' => array(
+          'sort' => 'id DESC',
+          'limit' => 1,
+        ),
+        'api.FinancialTrxn.getsingle' => array(
+          'id' => "\$value.financial_trxn_id",
+        ),
+      ));
+    }
+    catch (CiviCRM_API3_Exception $e) {
+      return array();
+    }
 
     $financialTrxn = array_merge($financialTrxn['api.FinancialTrxn.getsingle'], array(
       'trxn_date' => date('YmdHis'),
@@ -1063,21 +1065,15 @@ WHERE li.contribution_id = %1";
    * Record adjusted amount.
    *
    * @param int $updatedAmount
-   * @param int $paidAmount
    * @param int $contributionId
-   *
    * @param int $taxAmount
    * @param bool $updateAmountLevel
    *
    * @return bool|\CRM_Core_BAO_FinancialTrxn
    */
-  protected function recordAdjustedAmt($updatedAmount, $paidAmount, $contributionId, $taxAmount = NULL, $updateAmountLevel = NULL) {
-    $pendingAmount = CRM_Core_BAO_FinancialTrxn::getBalanceTrxnAmt($contributionId);
-    $pendingAmount = CRM_Utils_Array::value('total_amount', $pendingAmount, 0);
+  protected function _recordAdjustedAmt($updatedAmount, $contributionId, $taxAmount = NULL, $updateAmountLevel = NULL) {
+    $paidAmount = CRM_Core_BAO_FinancialTrxn::getTotalPayments($contributionId);
     $balanceAmt = $updatedAmount - $paidAmount;
-    if ($paidAmount != $pendingAmount) {
-      $balanceAmt -= $pendingAmount;
-    }
 
     $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
     $partiallyPaidStatusId = array_search('Partially paid', $contributionStatuses);
@@ -1132,6 +1128,12 @@ WHERE li.contribution_id = %1";
       );
       $adjustedTrxn = CRM_Core_BAO_FinancialTrxn::create($adjustedTrxnValues);
     }
+    // CRM-17151: Update the contribution status to completed if balance is zero,
+    //  because due to sucessive fee change will leave the related contribution status incorrect
+    else {
+      CRM_Core_DAO::setFieldValue('CRM_Contribute_DAO_Contribution', $contributionId, 'contribution_status_id', $completedStatusId);
+    }
+
     return $adjustedTrxn;
   }
 
