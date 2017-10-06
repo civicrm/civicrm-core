@@ -552,7 +552,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     $expectedValue, $message
   ) {
     $value = CRM_Core_DAO::getFieldValue($daoName, $searchValue, $returnColumn, $searchColumn, TRUE);
-    $this->assertEquals($value, $expectedValue, $message);
+    $this->assertEquals($expectedValue, $value, $message);
   }
 
   /**
