@@ -529,6 +529,16 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   /**
    * @inheritDoc
    */
+  public function isUserRegistrationPermitted() {
+    if (\Drupal::config('user.settings')->get('register') == 'admin_only') {
+      return FALSE;
+    }
+    return TRUE;
+  }
+
+  /**
+   * @inheritDoc
+   */
   public function getLoggedInUfID() {
     if ($id = \Drupal::currentUser()->id()) {
       return $id;
