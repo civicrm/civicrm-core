@@ -99,8 +99,13 @@ class CRM_Core_BAO_CMSUser {
         return FALSE;
       }
     }
-    elseif ($isDrupal && !variable_get('user_register', TRUE)) {
-      return FALSE;
+    elseif ($isDrupal) {
+      if (function_exists('variable_get') && !variable_get('user_register', TRUE)) {
+        return FALSE;
+      }
+      elseif (\Drupal::config('user.settings')->get('register') == 'admin_only') {
+        return FALSE;
+      }
     }
     elseif ($isWordPress && !get_option('users_can_register')) {
       return FALSE;
