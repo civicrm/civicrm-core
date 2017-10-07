@@ -396,6 +396,15 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
+   * Check if user registration is permitted.
+   *
+   * @return bool
+   */
+  public function isUserRegistrationPermitted() {
+    return FALSE;
+  }
+
+  /**
    * Get user login URL for hosting CMS (method declared in each CMS system class)
    *
    * @param string $destination
