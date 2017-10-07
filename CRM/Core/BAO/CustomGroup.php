@@ -1994,11 +1994,20 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
             $details[$groupID][$values['id']]['collapse_display'] = CRM_Utils_Array::value('collapse_display', $group);
             $details[$groupID][$values['id']]['collapse_adv_display'] = CRM_Utils_Array::value('collapse_adv_display', $group);
             $details[$groupID][$values['id']]['style'] = CRM_Utils_Array::value('style', $group);
+            if ($properties['html_type'] == 'File' && !empty($values['fid'])) {
+              $url = CRM_Core_BAO_CustomField::getFileURL($entityId, $properties['id'], $values['fid']);
+              if ($url) {
+                $fieldValue = $url['file_url'];
+              }
+            }
+            else {
+              $fieldValue = CRM_Core_BAO_CustomField::displayValue($values['data'], $properties['id'], $entityId);
+            }
             $details[$groupID][$values['id']]['fields'][$k] = array(
               'field_title' => CRM_Utils_Array::value('label', $properties),
               'field_type' => CRM_Utils_Array::value('html_type', $properties),
               'field_data_type' => CRM_Utils_Array::value('data_type', $properties),
-              'field_value' => CRM_Core_BAO_CustomField::displayValue($values['data'], $properties['id'], $entityId),
+              'field_value' => $fieldValue,
               'options_per_line' => CRM_Utils_Array::value('options_per_line', $properties),
             );
             // editable = whether this set contains any non-read-only fields
