@@ -518,9 +518,15 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     }
   }
 
+  /**
+   * Setup the base path related constant.
+   * @return mixed
+   */
   public function getBasePath() {
-    // Setup the base path related constant.
-    return dirname(dirname(dirname(dirname(dirname(dirname(dirname(dirname(__FILE__))))))));
+    global $civicrm_root;
+    $joomlaPath = explode('/administrator', $civicrm_root);
+    $joomlaBase = $joomlaPath[0];
+    return $joomlaBase;
   }
 
   /**
