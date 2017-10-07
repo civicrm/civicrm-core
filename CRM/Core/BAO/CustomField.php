@@ -1247,7 +1247,13 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         // In the context of displaying a profile, show file/image
         if ($value) {
           if ($entityId) {
-            $url = self::getFileURL($entityId, $field['id']);
+            if (CRM_Utils_Rule::positiveInteger($value)) {
+              $fileId = $value;
+            }
+            else {
+              $fileId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_File', $value, 'id', 'uri');
+            }
+            $url = self::getFileURL($entityId, $field['id'], $fileId);
             if ($url) {
               $display = $url['file_url'];
             }
