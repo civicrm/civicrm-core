@@ -326,6 +326,7 @@
         link: function (scope, elm, attrs) {
           var iframe = $(elm)[0];
           iframe.setAttribute('width', '100%');
+          iframe.setAttribute('height', '250px');
           iframe.setAttribute('frameborder', '0');
 
           var refresh = function () {
@@ -353,6 +354,10 @@
           $(elm).parent().on('dialogresize dialogopen', function(e, ui) {
             $(this).css({padding: '0', margin: '0', overflow: 'hidden'});
             iframe.setAttribute('height', '' + $(this).innerHeight() + 'px');
+          });
+
+          $(elm).parent().on('dialogresize', function(e, ui) {
+            iframe.setAttribute('class', 'resized');
           });
 
           scope.$parent.$watch(attrs.crmUiIframe, refresh);
