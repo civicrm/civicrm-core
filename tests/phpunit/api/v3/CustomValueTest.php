@@ -395,6 +395,17 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
     $this->assertEquals($params[$radioName], $result[$radioName]);
     // This should not have changed because this field doesn't use the affected option group
     $this->assertEquals($params[$controlFieldName], $result[$controlFieldName]);
+    // Add test of proof that multivalue fields.
+    $this->callAPISuccess('CustomValue', 'create', array(
+      'entity_id' => $contact['id'],
+      $multiSelectName => array($params[$radioName], $params[$controlFieldName]),
+    ));
+    $result = $this->callAPISuccess('Contact', 'getsingle', array(
+      'id' => $contact['id'],
+      'return' => array($selectName, $multiSelectName, $controlFieldName, $radioName),
+    ));
+
+    $this->assertEquals(array($params[$radioName], $params[$controlFieldName]), $result[$multiSelectName]);
   }
 
   public function testGettree() {
