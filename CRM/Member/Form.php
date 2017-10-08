@@ -440,6 +440,14 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
     $this->_priceSetId = self::getPriceSetID($formValues);
     $priceSetDetails = self::getPriceSetDetails($formValues);
     $this->_priceSet = $priceSetDetails[$this->_priceSetId];
+
+    // Call the buildAmount hook again to support extensions such as
+    // cdntaxcalculator, otherwise we cannot customize tax calculations.
+    // Setting the priceSetId this way is required by some extensions
+    // such as CiviDiscount. See: CRM-21276.
+    $this->set('priceSetId', $this->_priceSetId);
+    CRM_Utils_Hook::buildAmount('membership', $this, $this->_priceSet['fields']);
+
     // process price set and get total amount and line items.
     $this->ensurePriceParamsAreSet($formValues);
     return $formValues;
