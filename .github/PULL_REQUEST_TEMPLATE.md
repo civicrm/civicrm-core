@@ -14,6 +14,10 @@ Technical Details
 ----------------------------------------
 _If the PR introduces noteworthy technical changes, please describe them here. Provide code snippets if necessary_
 
+Documentation
+---------------------------------------
+_Has there been a pull request made against either the user, sysadmin, or developer guides where necessary to update or add to the documentation._
+
 Comments
 ----------------------------------------
 _Anything else you would like the reviewer to note_
