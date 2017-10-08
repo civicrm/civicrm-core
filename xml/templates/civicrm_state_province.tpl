@@ -4081,4 +4081,8 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 
 -- CRM-21234 Missing subdivisions of Tajikistan.
 (NULL, 1209, "DU", "Dushanbe"),
-(NULL, 1209, "RA", "Nohiyahoi Tobei Jumhurí");
+(NULL, 1209, "RA", "Nohiyahoi Tobei Jumhurí"),
+
+-- CRM-21268 Missing French overseas departments.
+(NULL, 1076, "WF", "Wallis-et-Futuna"),
+(NULL, 1076, "NC", "Nouvelle-Calédonie");
